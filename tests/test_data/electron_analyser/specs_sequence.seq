@@ -1,14 +1,14 @@
 {
   "regions": [
     {
-      "name": "region",
+      "name": "New_Region",
       "acquisitionMode": "Fixed Transmission",
       "psuMode": "3.5kV",
       "lensMode": "SmallArea",
       "startEnergy": 800.0,
       "endEnergy": 850.0,
       "stepEnergy": 0.1,
-      "passEnergy": 5.0,
+      "passEnergy": "5.0",
       "iterations": 1,
       "exposureTime": 1.0,
       "enabled": false,
@@ -19,14 +19,14 @@
       "estimatedTimeInMs": 0
     },
     {
-      "name": "region2",
+      "name": "New_Region1",
       "acquisitionMode": "Snapshot",
       "psuMode": "1.5kV",
       "lensMode": "LargeArea",
       "startEnergy": 599.866,
       "endEnergy": 600.134,
       "stepEnergy": 0.2680000000000291,
-      "passEnergy": 2.0,
+      "passEnergy": "2.0",
       "iterations": 5,
       "exposureTime": 2.0,
       "enabled": true,

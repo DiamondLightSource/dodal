@@ -1,8 +1,9 @@
-from ophyd_async.core import StandardReadable
+from bluesky.protocols import Movable
+from ophyd_async.core import AsyncStatus, StandardReadable
 from ophyd_async.epics.motor import Motor
 
 
-class TurboSlit(StandardReadable):
+class TurboSlit(StandardReadable, Movable[float]):
     """
     This collection of motors coordinates time resolved XAS experiments.
     It selects a beam out of the polychromatic fan.
@@ -23,3 +24,8 @@ class TurboSlit(StandardReadable):
             self.arc = Motor(prefix=prefix + "ARC")
             self.xfine = Motor(prefix=prefix + "XFINE")
         super().__init__(name=name)
+
+    @AsyncStatus.wrap
+    async def set(self, value: float):
+        """This will move the default XFINE"""
+        await self.xfine.set(value)

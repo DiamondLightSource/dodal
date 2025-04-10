@@ -1,92 +1,158 @@
-import os
+from typing import Any
 
-from tests.devices.unit_tests.electron_analyser.utils import (
-    TEST_DATA_PATH,
-    check_region_model_list_to_expected_values,
+import pytest
+
+from dodal.devices.electron_analyser.abstract_region import (
+    EnergyMode,
+    TAbstractBaseRegion,
 )
-
-from dodal.common.data_util import load_json_file_to_class
-from dodal.devices.electron_analyser.base_region import EnergyMode
-from dodal.devices.electron_analyser.vgscienta.vgscienta_region import (
+from dodal.devices.electron_analyser.vgscienta_region import (
     AcquisitionMode,
     DetectorMode,
     Status,
+    VGScientaRegion,
     VGScientaSequence,
+)
+from tests.devices.unit_tests.electron_analyser.test_util import (
+    TEST_VGSCIENTA_SEQUENCE,
+    assert_region_has_expected_values,
+    assert_region_kinetic_and_binding_energy,
 )
 
 
-def get_expected_region_values():
+@pytest.fixture
+def sequence_file() -> str:
+    return TEST_VGSCIENTA_SEQUENCE
+
+
+@pytest.fixture
+def sequence_class() -> type[VGScientaSequence]:
+    return VGScientaSequence
+
+
+@pytest.fixture
+def expected_region_class() -> type[VGScientaRegion]:
+    return VGScientaRegion
+
+
+@pytest.fixture
+def expected_region_values() -> list[dict[str, Any]]:
     return [
         {
             "name": "New_Region",
             "enabled": True,
-            "regionId": "_aQOmgPsmEe6w2YUF3bV-LA",
-            "lensMode": "Angular56",
-            "passEnergy": 5,
+            "id": "_aQOmgPsmEe6w2YUF3bV-LA",
+            "lens_mode": "Angular56",
+            "pass_energy": "5",
             "slices": 1,
             "iterations": 1,
-            "acquisitionMode": AcquisitionMode.SWEPT,
-            "excitationEnergySource": "source2",
-            "energyMode": EnergyMode.KINETIC,
-            "lowEnergy": 100.0,
-            "highEnergy": 101.0,
-            "fixEnergy": 9.0,
-            "stepTime": 1.0,
-            "totalSteps": 8.0,
-            "totalTime": 8.0,
-            "energyStep": 200.0,
-            "exposureTime": 1.0,
-            "firstXChannel": 1,
-            "lastXChannel": 1000,
-            "firstYChannel": 101,
-            "lastYChannel": 800,
-            "detectorMode": DetectorMode.ADC,
+            "acquisition_mode": AcquisitionMode.SWEPT,
+            "excitation_energy_source": "source2",
+            "energy_mode": EnergyMode.KINETIC,
+            "low_energy": 100.0,
+            "high_energy": 101.0,
+            "fix_energy": 9.0,
+            "step_time": 1.0,
+            "total_steps": 8.0,
+            "total_time": 8.0,
+            "energy_step": 200.0,
+            "exposure_time": 1.0,
+            "first_x_channel": 1,
+            "last_x_channel": 1000,
+            "first_y_channel": 101,
+            "last_y_channel": 800,
+            "detector_mode": DetectorMode.ADC,
             "status": Status.READY,
         },
         {
             "name": "New_Region1",
             "enabled": False,
-            "regionId": "_aQOmgPsmEe6w2YUF3GV-LL",
-            "lensMode": "Angular45",
-            "passEnergy": 10,
+            "id": "_aQOmgPsmEe6w2YUF3GV-LL",
+            "lens_mode": "Angular45",
+            "pass_energy": "10",
             "slices": 10,
             "iterations": 5,
-            "acquisitionMode": AcquisitionMode.FIXED,
-            "excitationEnergySource": "source1",
-            "energyMode": EnergyMode.BINDING,
-            "lowEnergy": 4899.5615,
-            "highEnergy": 4900.4385,
-            "fixEnergy": 4900.0,
-            "stepTime": 0.882,
-            "totalSteps": 1.0,
-            "totalTime": 4.41,
-            "energyStep": 0.877,
-            "exposureTime": 1.0,
-            "firstXChannel": 4,
-            "lastXChannel": 990,
-            "firstYChannel": 110,
-            "lastYChannel": 795,
-            "detectorMode": DetectorMode.PULSE_COUNTING,
+            "acquisition_mode": AcquisitionMode.FIXED,
+            "excitation_energy_source": "source1",
+            "energy_mode": EnergyMode.BINDING,
+            "low_energy": 4899.5615,
+            "high_energy": 4900.4385,
+            "fix_energy": 4900.0,
+            "step_time": 0.882,
+            "total_steps": 1.0,
+            "total_time": 4.41,
+            "energy_step": 0.877,
+            "exposure_time": 1.0,
+            "first_x_channel": 4,
+            "last_x_channel": 990,
+            "first_y_channel": 110,
+            "last_y_channel": 795,
+            "detector_mode": DetectorMode.PULSE_COUNTING,
             "status": Status.READY,
         },
     ]
 
 
-def test_vgscienta_file_loads_into_class():
-    file = os.path.join(TEST_DATA_PATH, "vgscienta_sequence.seq")
-    sequence = load_json_file_to_class(VGScientaSequence, file)
+def test_sequence_get_expected_region_from_name(
+    sequence: VGScientaSequence, expected_region_names: list[str]
+) -> None:
+    for name in expected_region_names:
+        assert sequence.get_region_by_name(name) is not None
+    assert sequence.get_region_by_name("region name should not be in sequence") is None
 
-    assert sequence.get_region_names() == ["New_Region", "New_Region1"]
-    assert sequence.get_enabled_region_names() == ["New_Region"]
 
+def test_sequence_get_expected_region_type(
+    sequence: VGScientaSequence,
+    expected_region_class: type[TAbstractBaseRegion],
+) -> None:
+    regions = sequence.regions
+    enabled_regions = sequence.get_enabled_regions()
+    assert isinstance(regions, list) and all(
+        isinstance(r, expected_region_class) for r in regions
+    )
+    assert isinstance(enabled_regions, list) and all(
+        isinstance(r, expected_region_class) for r in enabled_regions
+    )
+
+
+def test_sequence_get_expected_region_names(
+    sequence: VGScientaSequence, expected_region_names: list[str]
+) -> None:
+    assert sequence.get_region_names() == expected_region_names
+
+
+def test_sequence_get_expected_enabled_region_names(
+    sequence: VGScientaSequence, expected_enabled_region_names: list[str]
+) -> None:
+    assert sequence.get_enabled_region_names() == expected_enabled_region_names
+
+
+def test_sequence_get_expected_excitation_energy_source(
+    sequence: VGScientaSequence,
+) -> None:
     assert (
         sequence.get_excitation_energy_source_by_region(sequence.regions[0])
-        == sequence.excitationEnergySources[1]
+        == sequence.excitation_energy_sources[1]
     )
     assert (
         sequence.get_excitation_energy_source_by_region(sequence.regions[1])
-        == sequence.excitationEnergySources[0]
+        == sequence.excitation_energy_sources[0]
     )
-    check_region_model_list_to_expected_values(
-        sequence.regions, get_expected_region_values()
-    )
+    with pytest.raises(ValueError):
+        sequence.get_excitation_energy_source_by_region(
+            VGScientaRegion(excitation_energy_source="invalid_source")
+        )
+
+
+def test_region_kinetic_and_binding_energy(sequence: VGScientaSequence) -> None:
+    for r in sequence.regions:
+        assert_region_kinetic_and_binding_energy(r)
+
+
+def test_file_loads_into_class_with_expected_values(
+    sequence: VGScientaSequence,
+    expected_region_values: list[dict[str, Any]],
+) -> None:
+    assert len(sequence.regions) == len(expected_region_values)
+    for i, r in enumerate(sequence.regions):
+        assert_region_has_expected_values(r, expected_region_values[i])
