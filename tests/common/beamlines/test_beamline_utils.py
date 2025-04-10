@@ -1,6 +1,7 @@
 import asyncio
 import functools
 import os
+from pathlib import Path
 from unittest.mock import ANY, AsyncMock, MagicMock, patch
 
 import pytest
@@ -13,6 +14,7 @@ from ophyd_async.core import StandardReadable
 
 from dodal.beamlines import i03
 from dodal.common.beamlines import beamline_utils
+from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitPathProvider
 from dodal.devices.eiger import EigerDetector
 from dodal.devices.focusing_mirror import FocusingMirror
 from dodal.devices.motors import XYZPositioner
@@ -195,3 +197,21 @@ def test_skip(RE):
 
     skip = False
     assert not controller.skip
+
+
+def test_get_path_provider():
+    beamline_utils.clear_path_provider()
+    provider = beamline_utils.try_get_path_provider()
+    assert provider is None
+
+    beamline_utils.set_path_provider(
+        StaticVisitPathProvider(
+            "p46",
+            Path("/exports/mybeamline/data/2025"),
+            client=LocalDirectoryServiceClient(),
+        )
+    )
+    provider = beamline_utils.try_get_path_provider()
+    assert isinstance(provider, StaticVisitPathProvider)
+
+    beamline_utils.clear_path_provider()
