@@ -18,7 +18,7 @@ from dodal.devices.oav.oav_parameters import (
     OAVConfigBase,
     OAVConfigBeamCentre,
 )
-from dodal.devices.oav.snapshots.snapshot_with_beam_centre import SnapshotWithBeamCentre
+from dodal.devices.oav.snapshots.snapshot import Snapshot
 from dodal.devices.oav.snapshots.snapshot_with_grid import SnapshotWithGrid
 
 
@@ -83,10 +83,8 @@ class OAV(StandardReadable):
             self.beam_centre_j = create_r_hardware_backed_soft_signal(
                 int, lambda: self._get_beam_position(Coords.Y)
             )
-            self.snapshot = SnapshotWithBeamCentre(
+            self.snapshot = Snapshot(
                 f"{self._prefix}MJPG:",
-                self.beam_centre_i,
-                self.beam_centre_j,
                 self._name,
             )
 
