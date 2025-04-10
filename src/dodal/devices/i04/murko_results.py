@@ -68,17 +68,10 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
         )
         self.pubsub = self.redis_client.pubsub()
         self._last_omega = 0
-        self._last_result = None
         self.sample_id = soft_signal_rw(str)  # Should get from redis
-        self.coords = {"x": {}, "y": {}, "z": {}}
-        self.search_angles = OrderedDict(
-            [  # Angles to search and dimensions to gather at each angle
-                (90, ("x", "z")),
-                (180, ("x", "y")),
-                (270, ()),  # Stop searching here
-            ]
-        )
-        self.angles_to_search = list(self.search_angles.keys())
+        self.stop_angle = 270
+        self.sums = {"x": 0, "y": 0, "z": 0}
+        self.total = 0
 
         with self.add_children_as_readables():
             # Diffs from current x/y/z
@@ -102,26 +95,18 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
     async def trigger(self):
         # Wait for results
         sample_id = await self.sample_id.get_value()
-        final_message = None
-        while self.angles_to_search:
+        while self._last_omega < self.stop_angle:
             # waits here for next batch to be recieved
             message = await self.pubsub.get_message(timeout=self.TIMEOUT_S)
             if message is None:  # No more messages to process
-                await self.process_batch(
-                    final_message, sample_id
-                )  # Process final message again
                 break
             await self.process_batch(message, sample_id)
-            final_message = message
-        x_values = list(self.coords["x"].values())
-        y_values = list(self.coords["y"].values())
-        z_values = list(self.coords["z"].values())
-        assert x_values, "No x values"
-        assert z_values, "No z values"
-        assert y_values, "No y values"
-        self._x_mm_setter(float(np.mean(x_values)))
-        self._y_mm_setter(float(np.mean(y_values)))
-        self._z_mm_setter(float(np.mean(z_values)))
+        avg_x = self.sums["x"] / self.total
+        avg_y = self.sums["y"] / self.total
+        avg_z = self.sums["z"] / self.total
+        self._x_mm_setter(avg_x)
+        self._y_mm_setter(avg_y)
+        self._z_mm_setter(avg_z)
 
     async def process_batch(self, message: dict | None, sample_id: str):
         if message and message["type"] == "message":
@@ -129,10 +114,9 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
             for results in batch_results:
                 LOGGER.info(f"Got {results} from redis")
                 for uuid, result in results.items():
-                    metadata_str = await self.redis_client.hget(
+                    if metadata_str := await self.redis_client.hget(
                         f"murko:{sample_id}:metadata", uuid
-                    )
-                    if metadata_str and self.angles_to_search:
+                    ):
                         self.process_result(result, uuid, metadata_str)
 
     def process_result(
@@ -142,44 +126,26 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
         omega_angle = metadata["omega_angle"]
         LOGGER.info(f"Got angle {omega_angle}")
         # Find closest to next search angle
-        movement = self.get_coords_if_at_angle(metadata, result, omega_angle)
-        if movement is not None:
-            LOGGER.info(f"Using result {uuid}, {metadata_str}, {result}")
-            search_angle = self.angles_to_search.pop(0)
-            for coord in self.search_angles[search_angle]:
-                self.coords[coord][omega_angle] = movement[Coord[coord].value]
-                LOGGER.info(f"Found {coord} at {movement}, angle = {omega_angle}")
+        movement = self.get_coords(metadata, result, omega_angle)
+        LOGGER.info(f"Using result {uuid}, {metadata_str}, {result}")
+        for coord in ("x", "y", "z"):
+            self.sums[coord] += movement[Coord[coord].value]
+            LOGGER.info(f"Found {coord} at {movement}, angle = {omega_angle}")
+        print(self.total)
+        self.total += 1
         self._last_omega = omega_angle
-        self._last_result = result
 
-    def get_coords_if_at_angle(
+    def get_coords(
         self, metadata: MurkoMetadata, result: MurkoResult, omega: float
-    ) -> np.ndarray | None:
+    ) -> np.ndarray:
         """Gets the 'most_likely_click' coordinates from Murko if omega or the last
         omega are the closest angle to the search angle. Otherwise returns None.
         """
-        search_angle = self.angles_to_search[0]
-        LOGGER.info(f"Compare {omega}, {search_angle}, {self._last_omega}")
-        if (  # if last omega is closest
-            abs(omega - search_angle) >= abs(self._last_omega - search_angle)
-            and self._last_result is not None
-        ):
-            closest_result = self._last_result
-            closest_omega = self._last_omega
-        elif omega - search_angle >= 0:  # if this omega is closest
-            closest_result = result
-            closest_omega = omega
-        else:
-            return None
-        coords = closest_result[
-            "most_likely_click"
-        ]  # As proportion from top, left of image
-        shape = closest_result["original_shape"]  # Dimensions of image in pixels
+        coords = result["most_likely_click"]  # As proportion from top, left of image
+        shape = result["original_shape"]  # Dimensions of image in pixels
         # Murko returns coords as y, x
         centre_px = (coords[1] * shape[1], coords[0] * shape[0])
-        LOGGER.info(
-            f"Using image taken at {closest_omega}, which found xtal at {centre_px}"
-        )
+        LOGGER.info(f"Using image taken at {omega}, which found xtal at {centre_px}")
 
         beam_dist_px = calculate_beam_distance(
             (metadata["beam_centre_i"], metadata["beam_centre_j"]),
@@ -190,7 +156,7 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
         return camera_coordinates_to_xyz_mm(
             beam_dist_px[0],
             beam_dist_px[1],
-            closest_omega,
+            omega,
             metadata["microns_per_x_pixel"],
             metadata["microns_per_y_pixel"],
         )
