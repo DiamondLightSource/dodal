@@ -14,7 +14,6 @@ from ophyd_async.core import (
 )
 from redis.asyncio import StrictRedis
 
-from dodal.devices.flux import Flux
 from dodal.devices.i04.constants import RedisConstants
 from dodal.devices.oav.oav_calculations import (
     calculate_beam_distance,
@@ -129,7 +128,7 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
             for results in batch_results:
                 LOGGER.info(f"Got {results} from redis")
                 for uuid, result in results.items():
-                    metadata_str = await self.redis_client.hget(
+                    metadata_str = await self.redis_client.hget(  # type: ignore
                         f"murko:{sample_id}:metadata", uuid
                     )
                     if metadata_str and self.angles_to_search:
