@@ -7,7 +7,7 @@ from ophyd_async.epics.core import epics_signal_rw
 from dodal.devices.electron_analyser.abstract_region import EnergyMode
 
 
-class AbstractAnalyserController(ABC, StandardReadable):
+class AbstractAnalyserDriverIO(ABC, StandardReadable):
     """
     Generic device to configure electron analyser with new region settings.
     Electron analysers should inherit from this class for further specialisation.
@@ -32,6 +32,6 @@ class AbstractAnalyserController(ABC, StandardReadable):
         return excitation_energy - value if mode == EnergyMode.BINDING else value
 
 
-TAbstractAnalyserController = TypeVar(
-    "TAbstractAnalyserController", bound=AbstractAnalyserController
+TAbstractAnalyserDriverIO = TypeVar(
+    "TAbstractAnalyserDriverIO", bound=AbstractAnalyserDriverIO
 )
