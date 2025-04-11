@@ -1,6 +1,5 @@
 import json
 import pickle
-from collections import OrderedDict
 from enum import Enum
 from typing import TypedDict
 
@@ -14,11 +13,9 @@ from ophyd_async.core import (
 )
 from redis.asyncio import StrictRedis
 
-from dodal.devices.flux import Flux
 from dodal.devices.i04.constants import RedisConstants
 from dodal.devices.oav.oav_calculations import (
     calculate_beam_distance,
-    camera_coordinates_to_xyz_mm,
 )
 from dodal.log import LOGGER
 
@@ -72,6 +69,9 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
         self.stop_angle = 270
         self.sums = {"x": 0, "y": 0, "z": 0}
         self.total = 0
+        self.x_dists = []
+        self.y_dists = []
+        self.omegas = []
 
         with self.add_children_as_readables():
             # Diffs from current x/y/z
@@ -97,16 +97,17 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
         sample_id = await self.sample_id.get_value()
         while self._last_omega < self.stop_angle:
             # waits here for next batch to be recieved
-            message = await self.pubsub.get_message(timeout=self.TIMEOUT_S)
+            message = await self.pubsub.get_message(timeout=self.TIMEOUT_S)  # type: ignore
             if message is None:  # No more messages to process
                 break
             await self.process_batch(message, sample_id)
-        avg_x = self.sums["x"] / self.total
-        avg_y = self.sums["y"] / self.total
-        avg_z = self.sums["z"] / self.total
+        LOGGER.info(f"Using average of x beam distances: {self.x_dists}")
+        avg_x = float(np.mean(self.x_dists))
+        LOGGER.info(f"Finding least square y and z from y distances: {self.y_dists}")
+        best_y, best_z = get_yz_least_squares(self.y_dists, self.omegas)
         self._x_mm_setter(avg_x)
-        self._y_mm_setter(avg_y)
-        self._z_mm_setter(avg_z)
+        self._y_mm_setter(best_y)
+        self._z_mm_setter(best_z)
 
     async def process_batch(self, message: dict | None, sample_id: str):
         if message and message["type"] == "message":
@@ -114,7 +115,7 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
             for results in batch_results:
                 LOGGER.info(f"Got {results} from redis")
                 for uuid, result in results.items():
-                    if metadata_str := await self.redis_client.hget(
+                    if metadata_str := await self.redis_client.hget(  # type: ignore
                         f"murko:{sample_id}:metadata", uuid
                     ):
                         self.process_result(result, uuid, metadata_str)
@@ -126,18 +127,10 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
         omega_angle = metadata["omega_angle"]
         LOGGER.info(f"Got angle {omega_angle}")
         # Find closest to next search angle
-        movement = self.get_coords(metadata, result, omega_angle)
+        self.get_coords(metadata, result, omega_angle)
         LOGGER.info(f"Using result {uuid}, {metadata_str}, {result}")
-        for coord in ("x", "y", "z"):
-            self.sums[coord] += movement[Coord[coord].value]
-            LOGGER.info(f"Found {coord} at {movement}, angle = {omega_angle}")
-        print(self.total)
-        self.total += 1
-        self._last_omega = omega_angle
 
-    def get_coords(
-        self, metadata: MurkoMetadata, result: MurkoResult, omega: float
-    ) -> np.ndarray:
+    def get_coords(self, metadata: MurkoMetadata, result: MurkoResult, omega: float):
         """Gets the 'most_likely_click' coordinates from Murko if omega or the last
         omega are the closest angle to the search angle. Otherwise returns None.
         """
@@ -152,11 +145,17 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
             centre_px[0],
             centre_px[1],
         )
+        self.x_dists.append(-beam_dist_px[0] * metadata["microns_per_x_pixel"] / 1000)
+        self.y_dists.append(-beam_dist_px[1] * metadata["microns_per_y_pixel"] / 1000)
+        LOGGER.info(f"Found horizontal distance at {beam_dist_px[0]}, angle = {omega}")
+        LOGGER.info(f"Found vertical distance at {beam_dist_px[1]}, angle = {omega}")
+        self.omegas.append(omega)
 
-        return camera_coordinates_to_xyz_mm(
-            beam_dist_px[0],
-            beam_dist_px[1],
-            omega,
-            metadata["microns_per_x_pixel"],
-            metadata["microns_per_y_pixel"],
-        )
+
+def get_yz_least_squares(v_values: list, thetas_deg: list) -> tuple[float, float]:
+    thetas = np.radians(thetas_deg)
+    matrix = np.column_stack([np.cos(thetas), -np.sin(thetas)])
+
+    yz, residuals, rank, s = np.linalg.lstsq(matrix, v_values, rcond=None)
+    y, z = yz
+    return y, z
