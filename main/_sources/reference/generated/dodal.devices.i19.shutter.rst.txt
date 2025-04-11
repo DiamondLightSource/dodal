@@ -15,7 +15,6 @@ dodal.devices.i19.shutter
    :recursive:
 
    ~shutter.AccessControlledShutter
-   ~shutter.HutchState
 
 
 

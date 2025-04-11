@@ -10,6 +10,7 @@ dodal.devices.i19
    :recursive:
 
    dodal.devices.i19.beamstop
+   dodal.devices.i19.blueapi_device
    dodal.devices.i19.hutch_access
    dodal.devices.i19.shutter
 
