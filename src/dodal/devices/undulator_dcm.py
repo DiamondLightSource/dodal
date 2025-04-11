@@ -4,9 +4,9 @@ from bluesky.protocols import Movable
 from ophyd_async.core import AsyncStatus, Reference, StandardReadable
 
 from dodal.common.beamlines.beamline_parameters import get_beamline_parameters
+from dodal.devices.dcm import DCM
 
 from ..log import LOGGER
-from .dcm import DCM
 from .undulator import Undulator
 
 ENERGY_TIMEOUT_S: float = 30.0

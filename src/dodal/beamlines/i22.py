@@ -18,7 +18,7 @@ from dodal.common.crystal_metadata import (
 from dodal.common.visit import RemoteDirectoryServiceClient, StaticVisitPathProvider
 from dodal.devices.bimorph_mirror import BimorphMirror
 from dodal.devices.focusing_mirror import FocusingMirror
-from dodal.devices.i22.dcm import DoubleCrystalMonochromator
+from dodal.devices.i22.dcm import DCM
 from dodal.devices.i22.fswitch import FSwitch
 from dodal.devices.i22.nxsas import NXSasMetadataHolder, NXSasOAV, NXSasPilatus
 from dodal.devices.linkam3 import Linkam3
@@ -141,8 +141,8 @@ def bimorph_vfm() -> BimorphMirror:
 
 
 @device_factory()
-def dcm() -> DoubleCrystalMonochromator:
-    return DoubleCrystalMonochromator(
+def dcm() -> DCM:
+    return DCM(
         prefix=f"{PREFIX.beamline_prefix}-MO-DCM-01:",
         temperature_prefix=f"{PREFIX.beamline_prefix}-DI-DCM-01:",
         crystal_1_metadata=make_crystal_metadata_from_material(
