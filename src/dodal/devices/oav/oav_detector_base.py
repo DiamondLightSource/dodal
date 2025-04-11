@@ -83,9 +83,6 @@ class OAVBase(StandardReadable):
 
         super().__init__(name)
 
-    # def _read_current_zoom(zoom_level: str):
-    #     return zoom_level
-
     def _get_microns_per_pixel(self, size: int, coord: int, zoom_level: str) -> float:
         """Extracts the microns per x pixel and y pixel for a given zoom level."""
         _zoom = zoom_level
