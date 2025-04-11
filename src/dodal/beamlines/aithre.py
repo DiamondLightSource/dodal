@@ -1,6 +1,6 @@
 from dodal.common.beamlines.beamline_utils import device_factory
 from dodal.devices.aithre_lasershaping.goniometer import Goniometer
-from dodal.devices.aithre_lasershaping.oav import OAV
+from dodal.devices.oav.oav_detector_base import OAV
 from dodal.devices.oav.oav_parameters import OAVConfig
 from dodal.devices.robot import BartRobot
 

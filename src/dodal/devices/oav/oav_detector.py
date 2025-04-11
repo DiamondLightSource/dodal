@@ -1,20 +1,13 @@
-from enum import IntEnum
-
 from bluesky.protocols import Movable
 from ophyd_async.core import (
-    DEFAULT_TIMEOUT,
     AsyncStatus,
-    LazyMock,
     StandardReadable,
+    derived_signal_rw,
 )
 from ophyd_async.epics.core import epics_signal_rw
 
-from dodal.common.signal_utils import create_r_hardware_backed_soft_signal
-from dodal.devices.aithre_lasershaping.oav import OAV
-from dodal.devices.areadetector.plugins.CAM import Cam
-from dodal.devices.oav.oav_parameters import DEFAULT_OAV_WINDOW, OAVConfig
-from dodal.devices.oav.snapshots.snapshot import Snapshot
-from dodal.devices.oav.snapshots.snapshot_with_grid import SnapshotWithGrid
+from dodal.devices.oav.oav_detector_base import OAVBase
+from dodal.devices.oav.oav_parameters import OAVConfig
 
 
 # Workaround to deal with the fact that beamlines may have slightly different string
@@ -32,7 +25,7 @@ class ZoomController(StandardReadable, Movable[str]):
         oav.zoom_controller.set("1.0x")
 
     Note that changing the zoom may change the AD wiring on the associated OAV, as such
-    you should wait on any zoom changs to finish before changing the OAV wiring.
+    you should wait on any zoom changes to finish before changing the OAV wiring.
     """
 
     def __init__(self, prefix: str, name: str = "") -> None:
@@ -47,28 +40,21 @@ class ZoomController(StandardReadable, Movable[str]):
         await self.level.set(value, wait=True)
 
 
-class OAVWithZoom(OAV):
+class OAVWithZoom(OAVBase):
     def __init__(self, prefix: str, config: OAVConfig, name: str = ""):
         _bl_prefix = prefix.split("-")[0]
         self.zoom_controller = ZoomController(f"{_bl_prefix}-EA-OAV-01:FZOOM:", name)
 
-        super().__init__(name, config)
+        self.zoom_level = derived_signal_rw(
+            self._get_zoom_level, zoom_level=self.zoom_controller.level
+        )
 
-    def _read_current_zoom(self, _zoom: str) -> str:
-        return _get_correct_zoom_string(_zoom)
+        super().__init__(
+            prefix=prefix,
+            config=config,
+            name=name,
+            zoom_level=self.zoom_level,
+        )
 
-    def _get_microns_per_pixel(
-        self, size: int, coord: int, zoom_level: str = "1.0"
-    ) -> float:
-        """Extracts the microns per x pixel and y pixel for a given zoom level."""
-        _zoom = self._read_current_zoom(zoom_level)
-        value = self.parameters[_zoom].microns_per_pixel[coord]
-        return value * DEFAULT_OAV_WINDOW[coord] / size
-
-    def _get_beam_position(self, size: int, coord: int, zoom_level: str = "1.0") -> int:
-        """Extracts the beam location in pixels `xCentre` `yCentre`, for a requested \
-        zoom level. """
-        _zoom = self._read_current_zoom(zoom_level)
-        value = self.parameters[_zoom].crosshair[coord]
-
-        return int(value * size / DEFAULT_OAV_WINDOW[coord])
+    def _get_zoom_level(self, zoom_level: str) -> str:
+        return _get_correct_zoom_string(zoom_level)

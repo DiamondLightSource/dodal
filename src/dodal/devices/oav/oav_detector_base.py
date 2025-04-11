@@ -4,6 +4,7 @@ from functools import partial
 from ophyd_async.core import (
     DEFAULT_TIMEOUT,
     LazyMock,
+    SignalRW,
     StandardReadable,
     derived_signal_r,
     soft_signal_rw,
@@ -28,37 +29,52 @@ class Coords(IntEnum):
     Y = 1
 
 
-class OAV(StandardReadable):
-    def __init__(self, prefix: str, config: OAVConfig, name: str = ""):
+no_zoom = soft_signal_rw(str, initial_value="1.0")
+
+
+class OAVBase(StandardReadable):
+    def __init__(
+        self,
+        prefix: str,
+        config: OAVConfig,
+        name: str = "",
+        zoom_level: SignalRW = no_zoom,
+    ):
         self.oav_config = config
         self._prefix = prefix
         self._name = name
+        self.zoom_level = zoom_level
 
         self.cam = Cam(f"{prefix}CAM:", name=name)
 
         with self.add_children_as_readables():
             self.grid_snapshot = SnapshotWithGrid(f"{prefix}MJPG:", name)
             self.sizes = [self.grid_snapshot.x_size, self.grid_snapshot.y_size]
+
             self.microns_per_pixel_x = derived_signal_r(
                 self._get_microns_per_pixel,
                 size=self.sizes[Coords.X],
                 coord=soft_signal_rw(datatype=int, initial_value=Coords.X.value),
+                zoom_level=self.zoom_level,
             )
-            self.microns_per_pixel_x = derived_signal_r(
+            self.microns_per_pixel_y = derived_signal_r(
                 self._get_microns_per_pixel,
                 size=self.sizes[Coords.Y],
                 coord=soft_signal_rw(datatype=int, initial_value=Coords.Y.value),
+                zoom_level=self.zoom_level,
             )
 
             self.beam_centre_i = derived_signal_r(
                 self._get_beam_position,
                 size=self.sizes[Coords.X],
                 coord=soft_signal_rw(datatype=int, initial_value=Coords.X.value),
+                zoom_level=self.zoom_level,
             )
             self.beam_centre_j = derived_signal_r(
                 self._get_beam_position,
                 size=self.sizes[Coords.Y],
                 coord=soft_signal_rw(datatype=int, initial_value=Coords.Y.value),
+                zoom_level=self.zoom_level,
             )
 
             self.snapshot = Snapshot(
@@ -68,14 +84,22 @@ class OAV(StandardReadable):
 
         super().__init__(name)
 
-    def _get_beam_position(self, size: int, coord: Coords) -> int:
-        """Extracts the beam location in pixels `xCentre` `yCentre`"""
-        value = self.parameters["1.0"].crosshair[coord]
-        return int(value * size / DEFAULT_OAV_WINDOW[coord])
+    # def _read_current_zoom(zoom_level: str):
+    #     return zoom_level
 
-    def _get_microns_per_pixel(self, size: int, coord: Coords) -> float:
-        value = self.parameters["1.0"].microns_per_pixel[coord]
+    def _get_microns_per_pixel(self, size: int, coord: int, zoom_level: str) -> float:
+        """Extracts the microns per x pixel and y pixel for a given zoom level."""
+        _zoom = zoom_level
+        value = self.parameters[_zoom].microns_per_pixel[coord]
         return value * DEFAULT_OAV_WINDOW[coord] / size
+
+    def _get_beam_position(self, size: int, coord: int, zoom_level: str) -> int:
+        """Extracts the beam location in pixels `xCentre` `yCentre`, for a requested \
+        zoom level. """
+        _zoom = zoom_level
+        value = self.parameters[_zoom].crosshair[coord]
+
+        return int(value * size / DEFAULT_OAV_WINDOW[coord])
 
     async def connect(
         self,
