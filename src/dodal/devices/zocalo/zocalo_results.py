@@ -142,7 +142,7 @@ class ZocaloResults(StandardReadable, Triggerable):
         self,
         name: str = "zocalo",
         zocalo_environment: str = ZOCALO_ENV,
-        channel: str = "xrc.i03",
+        channel: str = "xrc.i04",
         sort_key: str = DEFAULT_SORT_KEY.value,
         timeout_s: float = DEFAULT_TIMEOUT,
         prefix: str = "",
@@ -263,6 +263,7 @@ class ZocaloResults(StandardReadable, Triggerable):
             )
 
             raw_results = self._raw_results_received.get(timeout=self.timeout_s)
+            LOGGER.info("Got first set of results")
             source_of_first_results = source_from_results(raw_results)
 
             if self.use_gpu and source_of_first_results == ZocaloSource.CPU:
@@ -270,54 +271,58 @@ class ZocaloResults(StandardReadable, Triggerable):
                     "Configured to use GPU results but CPU came first, using CPU results."
                 )
 
-            if self.use_cpu_and_gpu:
-                # Wait for results from CPU and GPU, warn and continue if only GPU times out. Error if CPU times out
-                if source_of_first_results == ZocaloSource.CPU:
-                    LOGGER.warning("Received zocalo results from CPU before GPU")
-                raw_results_two_sources = [raw_results]
-                try:
-                    raw_results_two_sources.append(
-                        self._raw_results_received.get(timeout=self.timeout_s / 2)
-                    )
-                    source_of_second_results = source_from_results(
-                        raw_results_two_sources[1]
-                    )
-                    first_results = raw_results_two_sources[0]["results"]
-                    second_results = raw_results_two_sources[1]["results"]
 
-                    if first_results and second_results:
-                        # Compare results from both sources and warn if they aren't the same
-                        differences_str = get_dict_differences(
-                            first_results[0],
-                            source_of_first_results,
-                            second_results[0],
-                            source_of_second_results,
-                        )
-                        if differences_str:
-                            LOGGER.warning(differences_str)
+            # Wait for results from CPU and GPU, warn and continue if only GPU times out. Error if CPU times out
+            if source_of_first_results == ZocaloSource.CPU:
+                LOGGER.warning("Received zocalo results from CPU before GPU")
+            raw_results_two_sources = [raw_results]
+            try:
+                raw_results_two_sources.append(
+                    self._raw_results_received.get(timeout=self.timeout_s)
+                )
+                source_of_second_results = source_from_results(
+                    raw_results_two_sources[1]
+                )
+                LOGGER.info("Got second set of results")
+                first_results = raw_results_two_sources[0]["results"]
+                second_results = raw_results_two_sources[1]["results"]
 
-                    # Always use CPU results
-                    raw_results = (
-                        raw_results_two_sources[0]
-                        if source_of_first_results == ZocaloSource.CPU
-                        else raw_results_two_sources[1]
+                if first_results and second_results:
+                    # Compare results from both sources and warn if they aren't the same
+                    differences_str = get_dict_differences(
+                        first_results[0],
+                        source_of_first_results,
+                        second_results[0],
+                        source_of_second_results,
                     )
+                    if differences_str:
+                        LOGGER.warning(differences_str)
 
-                except Empty as err:
-                    source_of_missing_results = (
-                        ZocaloSource.CPU.value
-                        if source_of_first_results == ZocaloSource.GPU.value
-                        else ZocaloSource.GPU.value
+                # Always use CPU results
+                raw_results = (
+                    raw_results_two_sources[0]
+                    if source_of_first_results == ZocaloSource.CPU
+                    else raw_results_two_sources[1]
+                )
+
+
+            except Empty as err:
+                source_of_missing_results = (
+                    ZocaloSource.CPU.value
+                    if source_of_first_results == ZocaloSource.GPU.value
+                    else ZocaloSource.GPU.value
+                )
+                if source_of_missing_results == ZocaloSource.GPU.value:
+                    LOGGER.warning(
+                        f"Zocalo results from {source_of_missing_results} timed out. Using results from {source_of_first_results}"
                     )
-                    if source_of_missing_results == ZocaloSource.GPU.value:
-                        LOGGER.warning(
-                            f"Zocalo results from {source_of_missing_results} timed out. Using results from {source_of_first_results}"
-                        )
-                    else:
-                        LOGGER.error(
-                            f"Zocalo results from {source_of_missing_results} timed out and GPU results not yet reliable"
-                        )
-                        raise err
+                else:
+                    LOGGER.error(
+                        f"Zocalo results from {source_of_missing_results} timed out and GPU results not yet reliable"
+                    )
+                    raise err
+                    
+
 
             LOGGER.info(
                 f"Zocalo results from {source_from_results(raw_results)} processing: found {len(raw_results['results'])} crystals."
@@ -358,10 +363,9 @@ class ZocaloResults(StandardReadable, Triggerable):
                 )
             else:
                 # Only add to queue if results are from CPU
-                if not recipe_parameters.get("gpu"):
-                    self._raw_results_received.put(
-                        {"results": results, "recipe_parameters": recipe_parameters}
-                    )
+                self._raw_results_received.put(
+                    {"results": results, "recipe_parameters": recipe_parameters}
+                )
 
         subscription = workflows.recipe.wrap_subscribe(
             self.transport,

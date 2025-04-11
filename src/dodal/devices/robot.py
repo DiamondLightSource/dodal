@@ -15,7 +15,7 @@ from ophyd_async.epics.core import epics_signal_r, epics_signal_rw_rbv, epics_si
 
 from dodal.log import LOGGER
 
-
+from typing import Sequence
 class RobotLoadFailed(Exception):
     error_code: int
     error_string: str
@@ -38,6 +38,18 @@ class PinMounted(StrictEnum):
     NO_PIN_MOUNTED = "No Pin Mounted"
     PIN_MOUNTED = "Pin Mounted"
 
+
+class ErrorStatusSeq(Device):
+    def __init__(self, prefix: str) -> None:
+        self.str = epics_signal_r(Sequence[str], prefix + "_ERR_MSG")
+        self.code = epics_signal_r(int, prefix + "_ERR_CODE")
+        super().__init__()
+
+    async def raise_if_error(self, raise_from: Exception):
+        error_code = await self.code.get_value()
+        if error_code:
+            error_string = await self.str.get_value()
+            raise RobotLoadFailed(int(error_code), error_string) from raise_from
 
 class ErrorStatus(Device):
     def __init__(self, prefix: str) -> None:
@@ -85,7 +97,7 @@ class BartRobot(StandardReadable, Movable[SampleLocation]):
         self.program_name = epics_signal_r(str, prefix + "PROGRAM_NAME")
 
         self.prog_error = ErrorStatus(prefix + "PRG")
-        self.controller_error = ErrorStatus(prefix + "CNTL")
+        self.controller_error = ErrorStatusSeq(prefix + "CNTL")
 
         self.reset = epics_signal_x(prefix + "RESET.PROC")
         super().__init__(name=name)
