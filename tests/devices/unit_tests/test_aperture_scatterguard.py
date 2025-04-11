@@ -175,7 +175,7 @@ async def test_aperture_scatterguard_select_bottom_moves_sg_down_then_assembly_u
 ):
     ap_sg, call_log = aperture_in_medium_pos_w_call_log
 
-    await ap_sg.set(ApertureValue.SMALL)
+    await ap_sg.selected_aperture.set(ApertureValue.SMALL)
 
     call_log.assert_has_calls(_call_list((5.3375, -3.55, 2.43, 48.974, 15.8)))
 
@@ -201,7 +201,7 @@ async def test_aperture_scatterguard_select_top_moves_assembly_down_then_sg_up(
 ):
     ap_sg = aperture_in_medium_pos
 
-    await ap_sg.set(ApertureValue.LARGE)
+    await ap_sg.selected_aperture.set(ApertureValue.LARGE)
 
     _assert_patched_ap_sg_has_call(
         ap_sg,
@@ -231,7 +231,7 @@ async def test_given_aperture_z_still_moving_when_aperture_scatterguard_moved_th
 ):
     set_mock_value(ap_sg.aperture.z.motor_done_move, 0)
     with pytest.raises(InvalidApertureMove):
-        await ap_sg.set(selected_aperture)
+        await ap_sg.selected_aperture.set(selected_aperture)
 
 
 @pytest.mark.parametrize(
@@ -251,7 +251,7 @@ async def test_aperture_scatterguard_throws_error_if_z_outside_tolerance(
     set_mock_value(ap_sg.aperture.z.motor_done_move, 1)
 
     with pytest.raises(InvalidApertureMove):
-        await ap_sg.set(selected_aperture)
+        await ap_sg.selected_aperture.set(selected_aperture)
 
 
 async def test_aperture_scatterguard_returns_status_if_within_tolerance(
@@ -387,7 +387,7 @@ async def test_when_aperture_set_and_device_read_then_position_returned(
     aperture_in_medium_pos: ApertureScatterguard,
     aperture_positions: dict[ApertureValue, AperturePosition],
 ):
-    await aperture_in_medium_pos.set(aperture)
+    await aperture_in_medium_pos.selected_aperture.set(aperture)
     reading = await aperture_in_medium_pos.read()
     _assert_position_in_reading(
         reading,
@@ -413,7 +413,11 @@ async def test_ap_sg_in_runengine(
 
     callback_on_mock_put(ap.y.user_setpoint, set_small_readback_pv)
 
-    RE(bps.abs_set(aperture_in_medium_pos, ApertureValue.SMALL, wait=True))
+    RE(
+        bps.abs_set(
+            aperture_in_medium_pos.selected_aperture, ApertureValue.SMALL, wait=True
+        )
+    )
     assert await ap.x.user_readback.get_value() == test_loc.aperture_x
     assert await ap.y.user_readback.get_value() == test_loc.aperture_y
     assert await ap.z.user_readback.get_value() == test_loc.aperture_z
@@ -487,7 +491,7 @@ async def test_given_in_and_aperture_selected_when_move_out_then_only_aperture_y
 
     assert await y_setpoint.get_value() == aperture_position.aperture_y
 
-    await ap_sg.set(ApertureValue.OUT_OF_BEAM)
+    await ap_sg.selected_aperture.set(ApertureValue.OUT_OF_BEAM)
     await assert_all_positions_other_than_y(ap_sg, aperture_position)
 
     assert (
@@ -508,11 +512,11 @@ async def test_given_out_and_aperture_selected_when_move_in_then_correct_y_selec
     y_setpoint = ap_sg.aperture.y.user_setpoint
     aperture_position = aperture_positions[selected_aperture]
     set_mock_value(ap_sg.aperture.z.user_readback, aperture_position.aperture_z)
-    await ap_sg.set(ApertureValue.OUT_OF_BEAM)
+    await ap_sg.selected_aperture.set(ApertureValue.OUT_OF_BEAM)
 
     await ap_sg.prepare(selected_aperture)
 
-    await ap_sg.set(selected_aperture)
+    await ap_sg.selected_aperture.set(selected_aperture)
     await assert_all_positions_other_than_y(ap_sg, aperture_position)
     assert await y_setpoint.get_value() == aperture_position.aperture_y
 
@@ -534,4 +538,4 @@ async def test_calling_prepare_then_set_in_quick_succession_throws_an_error(
     await ap_sg.prepare(ApertureValue.SMALL)
 
     with pytest.raises(InvalidApertureMove):
-        await ap_sg.set(ApertureValue.SMALL)
+        await ap_sg.selected_aperture.set(ApertureValue.SMALL)
