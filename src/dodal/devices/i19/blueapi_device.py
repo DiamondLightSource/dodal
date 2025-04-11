@@ -98,5 +98,5 @@ class OpticsBlueAPIDevice(StandardReadable, Movable[D]):
                         message = "\n".join(errors)
                         LOGGER.error(f"Plan {value['name']} failed: {message}")  # type:ignore
                         raise RuntimeError(f"Plan failed with error: {message}")
-                    time.sleep(interval)  # noqa
+                await asyncio.sleep(interval)
             LOGGER.info(f"Plan {value['name']} done.")  # type: ignore
