@@ -1,5 +1,4 @@
 from enum import IntEnum
-from functools import partial
 
 from ophyd_async.core import (
     DEFAULT_TIMEOUT,
