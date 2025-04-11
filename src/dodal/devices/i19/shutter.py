@@ -26,7 +26,6 @@ class AccessControlledShutter(OpticsBlueAPIDevice):
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             self.shutter_status = epics_signal_r(ShutterState, f"{prefix}STA")
         self.hutch_request = hutch
-        # self.url = OPTICS_BLUEAPI_URL
         super().__init__(name)
 
     @AsyncStatus.wrap
