@@ -7,7 +7,7 @@ from bluesky.utils import Msg
 
 from dodal.devices.oav.oav_calculations import (
     calculate_beam_distance,
-    camera_coordinates_to_xyz,
+    camera_coordinates_to_xyz_mm,
 )
 from dodal.devices.oav.oav_detector import OAV
 from dodal.devices.oav.pin_image_recognition import PinTipDetection
@@ -90,7 +90,7 @@ def calculate_x_y_z_of_pixel(
     """Get the x, y, z position of a pixel in mm"""
     beam_distance_px: Pixel = calculate_beam_distance(beam_centre, *pixel)
 
-    return current_x_y_z + camera_coordinates_to_xyz(
+    return current_x_y_z + camera_coordinates_to_xyz_mm(
         beam_distance_px[0],
         beam_distance_px[1],
         current_omega,
