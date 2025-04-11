@@ -2,7 +2,7 @@ from bluesky.protocols import Movable
 from ophyd_async.core import (
     AsyncStatus,
     StandardReadable,
-    derived_signal_rw,
+    derived_signal_r,
 )
 from ophyd_async.epics.core import epics_signal_rw
 
@@ -40,12 +40,12 @@ class ZoomController(StandardReadable, Movable[str]):
         await self.level.set(value, wait=True)
 
 
-class OAVWithZoom(OAVBase):
+class OAV(OAVBase):
     def __init__(self, prefix: str, config: OAVConfig, name: str = ""):
         _bl_prefix = prefix.split("-")[0]
         self.zoom_controller = ZoomController(f"{_bl_prefix}-EA-OAV-01:FZOOM:", name)
 
-        self.zoom_level = derived_signal_rw(
+        self.zoom_level = derived_signal_r(
             self._get_zoom_level, zoom_level=self.zoom_controller.level
         )
 
