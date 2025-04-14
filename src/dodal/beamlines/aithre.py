@@ -4,8 +4,8 @@ from dodal.devices.oav.oav_detector_base import OAVBase
 from dodal.devices.oav.oav_parameters import OAVConfig
 from dodal.devices.robot import BartRobot
 
-ZOOM_PARAMS_FILE = "/home/gmg29649/aithre_oav.xml"  # TO-DO: Rename this probably
-DISPLAY_CONFIG = "/home/gmg29649/aithre_display.configuration"  # TO-DO: Make this file
+ZOOM_PARAMS_FILE = "/dls_sw/i23/software/aithre_oav.xml"
+DISPLAY_CONFIG = "/dls_sw/i23/software/aithre_display.configuration"
 
 PREFIX = "LA18L"
 
