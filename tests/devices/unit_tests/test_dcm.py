@@ -3,7 +3,7 @@ from ophyd_async.core import (
     init_devices,
 )
 
-from dodal.devices.dcm import DCM
+from dodal.devices.i03.dcm import DCM
 
 
 @pytest.fixture

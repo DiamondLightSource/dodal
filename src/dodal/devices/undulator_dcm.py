@@ -4,7 +4,7 @@ from bluesky.protocols import Movable
 from ophyd_async.core import AsyncStatus, Reference, StandardReadable
 
 from dodal.common.beamlines.beamline_parameters import get_beamline_parameters
-from dodal.devices.dcm import DCM
+from dodal.devices.i03.dcm import DCM
 
 from ..log import LOGGER
 from .undulator import Undulator

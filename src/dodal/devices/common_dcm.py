@@ -50,7 +50,6 @@ class BaseDCM(StandardReadable, Generic[Xtal_1, Xtal_2]):
         with self.add_children_as_readables():
             # Virtual motor PV's which set the physical motors so that the DCM produces requested
             # wavelength/energy
-
             self.energy_in_kev = Motor(prefix + "ENERGY")
             self.wavelength_in_a = Motor(prefix + "WAVELENGTH")
 
