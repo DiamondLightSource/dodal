@@ -14,14 +14,6 @@ from dodal.devices.oav.oav_parameters import DEFAULT_OAV_WINDOW, OAVConfig
 from dodal.devices.oav.snapshots.snapshot import Snapshot
 from dodal.devices.oav.snapshots.snapshot_with_grid import SnapshotWithGrid
 
-# put this into a config file
-# laserOAVconfig = {
-#     "microns_per_pixel_x": 6,
-#     "microns_per_pixel_y": 6,
-#     "beam_centre_x": 1000,
-#     "beam_centre_y": 1028,
-# }
-
 
 class Coords(IntEnum):
     X = 0
@@ -29,6 +21,12 @@ class Coords(IntEnum):
 
 
 class OAVBase(StandardReadable):
+    """
+    A more basic version of the OAV device that doesn't have a zoom controller - all
+    zoom values are set to 1.0x, unless a different zoom_level signal is passed in as an
+    argument from a child OAV device.
+    """
+
     def __init__(
         self,
         prefix: str,
