@@ -69,8 +69,8 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
         self.stop_angle = 270
         self.sums = {"x": 0, "y": 0, "z": 0}
         self.total = 0
-        self.x_dists = []
-        self.y_dists = []
+        self.x_dists_mm = []
+        self.y_dists_mm = []
         self.omegas = []
 
         with self.add_children_as_readables():
@@ -101,10 +101,10 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
             if message is None:  # No more messages to process
                 break
             await self.process_batch(message, sample_id)
-        LOGGER.info(f"Using average of x beam distances: {self.x_dists}")
-        avg_x = float(np.mean(self.x_dists))
-        LOGGER.info(f"Finding least square y and z from y distances: {self.y_dists}")
-        best_y, best_z = get_yz_least_squares(self.y_dists, self.omegas)
+        LOGGER.info(f"Using average of x beam distances: {self.x_dists_mm}")
+        avg_x = float(np.mean(self.x_dists_mm))
+        LOGGER.info(f"Finding least square y and z from y distances: {self.y_dists_mm}")
+        best_y, best_z = self.get_yz_least_squares(self.y_dists_mm, self.omegas)
         self._x_mm_setter(avg_x)
         self._y_mm_setter(best_y)
         self._z_mm_setter(best_z)
@@ -120,20 +120,15 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
                     ):
                         self.process_result(result, uuid, metadata_str)
 
-    def process_result(
-        self, result: dict, uuid: int, metadata_str: str
-    ) -> float | None:
-        metadata = MurkoMetadata(json.loads(metadata_str))
-        omega_angle = metadata["omega_angle"]
-        LOGGER.info(f"Got angle {omega_angle}")
-        # Find closest to next search angle
-        self.get_coords(metadata, result, omega_angle)
-        LOGGER.info(f"Using result {uuid}, {metadata_str}, {result}")
-
-    def get_coords(self, metadata: MurkoMetadata, result: MurkoResult, omega: float):
-        """Gets the 'most_likely_click' coordinates from Murko if omega or the last
-        omega are the closest angle to the search angle. Otherwise returns None.
+    def process_result(self, result: dict, uuid: int, metadata_str: str):
+        """Uses the 'most_likely_click' coordinates from Murko to calculate the
+        horizontal and vertical distances from the beam centre, and store these values
+        as well as the omega angle the image was taken at.
         """
+        LOGGER.info(f"Using result {uuid}, {metadata_str}, {result}")
+        metadata = MurkoMetadata(json.loads(metadata_str))
+        omega = metadata["omega_angle"]
+        LOGGER.info(f"Got angle {omega}")
         coords = result["most_likely_click"]  # As proportion from top, left of image
         shape = result["original_shape"]  # Dimensions of image in pixels
         # Murko returns coords as y, x
@@ -145,17 +140,30 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
             centre_px[0],
             centre_px[1],
         )
-        self.x_dists.append(-beam_dist_px[0] * metadata["microns_per_x_pixel"] / 1000)
-        self.y_dists.append(-beam_dist_px[1] * metadata["microns_per_y_pixel"] / 1000)
         LOGGER.info(f"Found horizontal distance at {beam_dist_px[0]}, angle = {omega}")
         LOGGER.info(f"Found vertical distance at {beam_dist_px[1]}, angle = {omega}")
+        self.x_dists_mm.append(
+            -beam_dist_px[0] * metadata["microns_per_x_pixel"] / 1000
+        )
+        self.y_dists_mm.append(
+            -beam_dist_px[1] * metadata["microns_per_y_pixel"] / 1000
+        )
         self.omegas.append(omega)
 
+    @staticmethod
+    def get_yz_least_squares(v_values: list, omegas: list) -> tuple[float, float]:
+        """Get the least squares solution for y and z from the vertical distances and omega angles.
 
-def get_yz_least_squares(v_values: list, thetas_deg: list) -> tuple[float, float]:
-    thetas = np.radians(thetas_deg)
-    matrix = np.column_stack([np.cos(thetas), -np.sin(thetas)])
+        Args:
+            v_values (list): List of vertical distances from beam centre in mm.
+            thetas_deg (list): List of omega angles in degrees.
 
-    yz, residuals, rank, s = np.linalg.lstsq(matrix, v_values, rcond=None)
-    y, z = yz
-    return y, z
+        Returns:
+            tuple[float, float]: _description_
+        """
+        thetas = np.radians(omegas)
+        matrix = np.column_stack([np.cos(thetas), -np.sin(thetas)])
+
+        yz, residuals, rank, s = np.linalg.lstsq(matrix, v_values, rcond=None)
+        y, z = yz
+        return y, z
