@@ -5,6 +5,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import numpy as np
 import pytest
 from pytest import approx
+from scipy.spatial.transform import Rotation
 
 from dodal.devices.i04.murko_results import MurkoResultsDevice
 from dodal.devices.oav.oav_calculations import camera_coordinates_to_xyz_mm
@@ -52,6 +53,14 @@ def mock_get_beam_centre(mock_murko_results, x, y):
         "get_beam_centre",
         side_effect=lambda *args, **kwargs: (x, y),
     ).start()
+
+
+def get_y_after_rotation(theta, y, z, beam_centre_y):
+    cos_a = np.cos(np.radians(theta))
+    sin_a = np.sin(np.radians(theta))
+    rel_y = y - beam_centre_y
+    new_y = cos_a * rel_y - sin_a * z + beam_centre_y
+    return new_y
 
 
 def abs_cos(degrees):
@@ -135,9 +144,9 @@ async def test_no_movement_given_sample_centre_matches_beam_centre(
         mock_redis_calls(mock_strict_redis, messages, metadata)
     )
     await mock_murko_results.trigger()
-    assert mock_x_setter.call_args[0][0] == 0
-    assert mock_y_setter.call_args[0][0] == 0
-    assert mock_z_setter.call_args[0][0] == 0
+    assert mock_x_setter.call_args[0][0] == 0, "wrong x"
+    assert mock_y_setter.call_args[0][0] == 0, "wrong y"
+    assert mock_z_setter.call_args[0][0] == 0, "wrong z"
 
 
 @patch("dodal.devices.i04.murko_results.StrictRedis")
@@ -200,10 +209,10 @@ async def test_correct_movement_given_45_and_135_angles(
     )
     await mock_murko_results.trigger()
     assert mock_x_setter.call_args[0][0] == -0.25
-    expected_y = 0.2 * abs_cos(135)
-    assert mock_y_setter.call_args[0][0] == approx(expected_y)
-    expected_z = 0.2 * abs_sin(45)
-    assert mock_z_setter.call_args[0][0] == approx(expected_z)
+    expected_y = 0  # Cant solve at 45, 135 as sin(45) = cos(45)
+    assert mock_y_setter.call_args[0][0] == approx(expected_y), "wrong y"
+    expected_z = 0
+    assert mock_z_setter.call_args[0][0] == approx(expected_z), "wrong z"
 
 
 @patch("dodal.devices.i04.murko_results.StrictRedis")
