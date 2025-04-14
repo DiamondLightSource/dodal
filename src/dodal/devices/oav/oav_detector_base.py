@@ -3,7 +3,7 @@ from enum import IntEnum
 from ophyd_async.core import (
     DEFAULT_TIMEOUT,
     LazyMock,
-    SignalRW,
+    SignalR,
     StandardReadable,
     derived_signal_r,
     soft_signal_rw,
@@ -28,21 +28,20 @@ class Coords(IntEnum):
     Y = 1
 
 
-no_zoom = soft_signal_rw(str, initial_value="1.0")
-
-
 class OAVBase(StandardReadable):
     def __init__(
         self,
         prefix: str,
         config: OAVConfig,
+        zoom_level: SignalR[str] | None = None,
         name: str = "",
-        zoom_level: SignalRW = no_zoom,
     ):
         self.oav_config = config
         self._prefix = prefix
         self._name = name
-        self.zoom_level = zoom_level
+        self.zoom_level = (
+            zoom_level if zoom_level else soft_signal_rw(str, initial_value="1.0")
+        )
 
         self.cam = Cam(f"{prefix}CAM:", name=name)
 
