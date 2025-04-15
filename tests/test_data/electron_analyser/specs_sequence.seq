@@ -1,0 +1,40 @@
+{
+  "regions": [
+    {
+      "name": "New_Region",
+      "acquisitionMode": "Fixed Transmission",
+      "psuMode": "3.5kV",
+      "lensMode": "SmallArea",
+      "startEnergy": 800.0,
+      "endEnergy": 850.0,
+      "stepEnergy": 0.1,
+      "passEnergy": "5.0",
+      "iterations": 1,
+      "exposureTime": 1.0,
+      "enabled": false,
+      "bindingEnergy": false,
+      "values": 1,
+      "slices": 100,
+      "centreEnergy": 0.0,
+      "estimatedTimeInMs": 0
+    },
+    {
+      "name": "New_Region1",
+      "acquisitionMode": "Snapshot",
+      "psuMode": "1.5kV",
+      "lensMode": "LargeArea",
+      "startEnergy": 599.866,
+      "endEnergy": 600.134,
+      "stepEnergy": 0.2680000000000291,
+      "passEnergy": "2.0",
+      "iterations": 5,
+      "exposureTime": 2.0,
+      "enabled": true,
+      "bindingEnergy": true,
+      "values": 1,
+      "slices": 110,
+      "centreEnergy": 0.0,
+      "estimatedTimeInMs": 13718
+    }
+  ]
+}

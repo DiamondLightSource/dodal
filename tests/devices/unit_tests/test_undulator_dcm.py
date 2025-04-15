@@ -12,10 +12,7 @@ from dodal.devices.undulator import AccessError, Undulator, UndulatorGapAccess
 from dodal.devices.undulator_dcm import UndulatorDCM
 from dodal.devices.util.test_utils import patch_motor
 from dodal.log import LOGGER
-
-ID_GAP_LOOKUP_TABLE_PATH: str = (
-    "./tests/devices/unit_tests/test_beamline_undulator_to_gap_lookup_table.txt"
-)
+from tests.constants import UNDULATOR_ID_GAP_LOOKUP_TABLE_PATH
 
 
 @pytest.fixture(autouse=True)
@@ -35,7 +32,7 @@ async def fake_undulator_dcm() -> UndulatorDCM:
             "UND-01",
             name="undulator",
             poles=80,
-            id_gap_lookup_table_path=ID_GAP_LOOKUP_TABLE_PATH,
+            id_gap_lookup_table_path=UNDULATOR_ID_GAP_LOOKUP_TABLE_PATH,
             length=2.0,
         )
         dcm = DCM("DCM-01", name="dcm")
@@ -52,7 +49,7 @@ async def fake_undulator_dcm() -> UndulatorDCM:
 def test_lookup_table_paths_passed(fake_undulator_dcm: UndulatorDCM):
     assert (
         fake_undulator_dcm.undulator_ref().id_gap_lookup_table_path
-        == ID_GAP_LOOKUP_TABLE_PATH
+        == UNDULATOR_ID_GAP_LOOKUP_TABLE_PATH
     )
     assert (
         fake_undulator_dcm.pitch_energy_table_path
@@ -85,7 +82,7 @@ async def test_if_gap_is_wrong_then_logger_info_is_called_and_gap_is_set_correct
     ) == 6.9
     assert (
         await fake_undulator_dcm.undulator_ref().gap_motor.user_setpoint.get_value()
-    ) == 6.045
+    ) == 6.000046153846154
     assert (
         await fake_undulator_dcm.dcm_ref().offset_in_mm.user_setpoint.get_value()
     ) == 25.6
@@ -134,7 +131,7 @@ async def test_if_gap_is_already_correct_then_dont_move_gap(
     mock_load.return_value = np.array([[5700, 5.4606], [7000, 6.045], [9700, 6.404]])
     set_mock_value(fake_undulator_dcm.undulator_ref().current_gap, 5.4605)
 
-    await fake_undulator_dcm.set(5.8)
+    await fake_undulator_dcm.set(5.7001)
 
     # Verify undulator has not been asked to move
     assert (

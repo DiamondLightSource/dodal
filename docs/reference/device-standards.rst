@@ -13,8 +13,8 @@ Where to put devices
 Dodal is written with the philosophy that Ophyd devices should be assumed to be as generic as possible. I.e. you 
 should think about where to place them in the following order:
 
-#. A device that could be used at any facility, e.g. a generic ``EpicsMotor`` or a commercial product with a 
-   standard IOC, should go in https://github.com/bluesky/ophyd-epics-devices
+#. A device that could be used at any facility, e.g. a generic ``Motor`` or a commercial product with a 
+   standard IOC, should go in https://github.com/bluesky/ophyd-async
 #. A device that may be on any beamline should go in the top level of the ``devices`` folder. If it is a quite 
    complex device (e.g. multiple files) it should have a folder of its own e.g. ``oav``
 #. A device that is very specific to a particular beamline should go in the ``devices/ixx`` folder
@@ -150,7 +150,7 @@ based on this and so this has the issues listed above. Instead you should make s
         def __init__(self):
             self.underlying_motor = Motor("MOTOR")
             with self.add_children_as_readables():
-                self.in_out = create_hardware_backed_soft_signal(InOut, self._get_in_out_from_hardware)
+                self.in_out = create_r_hardware_backed_soft_signal(InOut, self._get_in_out_from_hardware)
                 
         async def _get_in_out_from_hardware(self):
             current_position = await self.underlying_motor.get_value()
