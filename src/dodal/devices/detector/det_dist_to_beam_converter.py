@@ -1,6 +1,9 @@
 from enum import Enum
 
-from numpy import interp, loadtxt
+from dodal.devices.util.lookup_tables import (
+    linear_extrapolation_lut,
+    parse_lookup_table,
+)
 
 
 class Axis(Enum):
@@ -11,12 +14,20 @@ class Axis(Enum):
 class DetectorDistanceToBeamXYConverter:
     def __init__(self, lookup_file: str):
         self.lookup_file: str = lookup_file
-        self.lookup_table_values: list = self.parse_table()
+        lookup_table_columns: list = parse_lookup_table(self.lookup_file)
+        self._d_to_x = linear_extrapolation_lut(
+            lookup_table_columns[0], lookup_table_columns[1]
+        )
+        self._d_to_y = linear_extrapolation_lut(
+            lookup_table_columns[0], lookup_table_columns[2]
+        )
 
     def get_beam_xy_from_det_dist(self, det_dist_mm: float, beam_axis: Axis) -> float:
-        beam_axis_values = self.lookup_table_values[beam_axis.value]
-        det_dist_array = self.lookup_table_values[0]
-        return float(interp(det_dist_mm, det_dist_array, beam_axis_values))
+        return (
+            self._d_to_x(det_dist_mm)
+            if beam_axis == Axis.X_AXIS
+            else self._d_to_y(det_dist_mm)
+        )
 
     def get_beam_axis_pixels(
         self,
@@ -41,21 +52,3 @@ class DetectorDistanceToBeamXYConverter:
         return self.get_beam_axis_pixels(
             det_distance, image_size_pixels, det_dim, Axis.X_AXIS
         )
-
-    def reload_lookup_table(self):
-        self.lookup_table_values = self.parse_table()
-
-    def parse_table(self) -> list:
-        rows = loadtxt(self.lookup_file, delimiter=" ", comments=["#", "Units"])
-        columns = list(zip(*rows, strict=False))
-
-        return columns
-
-    def __eq__(self, other):
-        if not isinstance(other, DetectorDistanceToBeamXYConverter):
-            return NotImplemented
-        if self.lookup_file != other.lookup_file:
-            return False
-        if self.lookup_table_values != other.lookup_table_values:
-            return False
-        return True
