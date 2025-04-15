@@ -101,7 +101,8 @@ async def test_given_region_that_analyser_sets_energy_values_correctly(
 
     expected_low_e = region.to_kinetic_energy(region.low_energy, excitation_energy)
     expected_high_e = region.to_kinetic_energy(region.high_energy, excitation_energy)
-    expected_pass_e = region.pass_energy
+    expected_pass_e_type = sim_analyser_driver.pass_energy_type
+    expected_pass_e = expected_pass_e_type(region.pass_energy)
 
     get_mock_put(sim_analyser_driver.low_energy).assert_called_once_with(
         expected_low_e, wait=True

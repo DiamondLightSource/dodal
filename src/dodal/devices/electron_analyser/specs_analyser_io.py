@@ -13,3 +13,7 @@ class SpecsAnalyserDriverIO(AbstractAnalyserDriverIO):
             self.centre_energy = epics_signal_rw(float, prefix + "KINETIC_ENERGY")
 
         super().__init__(prefix, name)
+
+    @property
+    def pass_energy_type(self) -> type:
+        return float

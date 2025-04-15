@@ -20,3 +20,7 @@ class VGScientaAnalyserDriverIO(AbstractAnalyserDriverIO):
             self.image_mode = epics_signal_rw(str, prefix + "ImageMode")
 
         super().__init__(prefix, name)
+
+    @property
+    def pass_energy_type(self) -> type:
+        return str
