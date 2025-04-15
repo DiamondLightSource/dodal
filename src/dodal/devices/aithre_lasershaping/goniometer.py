@@ -18,9 +18,9 @@ class Goniometer(StandardReadable):
         self.vertical_position = derived_signal_rw(
             self._get,
             self._set,
-            sampy=self.sampy.user_readback,
-            sampz=self.sampz.user_readback,
-            omega=self.omega.user_readback,
+            sampy=self.sampy,
+            sampz=self.sampz,
+            omega=self.omega,
         )
         super().__init__(name)
 
