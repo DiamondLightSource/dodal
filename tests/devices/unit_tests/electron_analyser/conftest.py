@@ -10,7 +10,7 @@ from dodal.devices.electron_analyser import (
     VGScientaRegion,
     VGScientaSequence,
 )
-from dodal.devices.electron_analyser.abstract_analyser_io import (
+from dodal.devices.electron_analyser.abstract_analyser import (
     TAbstractAnalyserDriverIO,
 )
 from dodal.devices.electron_analyser.abstract_region import (

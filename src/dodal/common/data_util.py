@@ -1,3 +1,4 @@
+import os
 from typing import TypeVar
 
 from pydantic import BaseModel
@@ -9,6 +10,9 @@ def load_json_file_to_class(
     t: type[TBaseModel],
     file: str,
 ) -> TBaseModel:
+    if not os.path.isfile(file):
+        raise FileNotFoundError
+
     with open(file) as f:
         json_obj = f.read()
     cls = t.model_validate_json(json_obj)

@@ -3,16 +3,18 @@ from bluesky.utils import MsgGenerator, plan
 from ophyd_async.epics.adcore import ADImageMode
 
 from dodal.common.types import MsgGenerator
-from dodal.devices.electron_analyser.abstract_analyser_io import (
+from dodal.devices.electron_analyser.abstract_analyser import (
     AbstractAnalyserDriverIO,
 )
 from dodal.devices.electron_analyser.abstract_region import (
     AbstractBaseRegion,
 )
-from dodal.devices.electron_analyser.specs_analyser_io import SpecsAnalyserDriverIO
+from dodal.devices.electron_analyser.specs_analyser import (
+    SpecsAnalyserDriverIO,
+)
 from dodal.devices.electron_analyser.specs_region import SpecsRegion
 from dodal.devices.electron_analyser.util import to_kinetic_energy
-from dodal.devices.electron_analyser.vgscienta_analyser_io import (
+from dodal.devices.electron_analyser.vgscienta_analyser import (
     VGScientaAnalyserDriverIO,
 )
 from dodal.devices.electron_analyser.vgscienta_region import VGScientaRegion
@@ -89,6 +91,7 @@ def configure_vgscienta(
         analyser.x_channel_size, region.x_channel_size(),
         analyser.y_channel_size, region.y_channel_size(),
         analyser.detector_mode, region.detector_mode,
+        analyser.excitation_energy_source, region.excitation_energy_source,
         analyser.image_mode, ADImageMode.SINGLE,
     )
     # fmt: on

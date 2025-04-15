@@ -13,7 +13,7 @@ from dodal.devices.electron_analyser import (
     VGScientaSequence,
     to_kinetic_energy,
 )
-from dodal.devices.electron_analyser.abstract_analyser_io import (
+from dodal.devices.electron_analyser.abstract_analyser import (
     AbstractAnalyserDriverIO,
 )
 from dodal.devices.electron_analyser.abstract_region import (

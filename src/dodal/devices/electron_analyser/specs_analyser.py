@@ -2,7 +2,9 @@ import numpy as np
 from ophyd_async.core import Array1D, SignalR, StandardReadableFormat, derived_signal_r
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
-from dodal.devices.electron_analyser.abstract_analyser_io import (
+from dodal.common.beamlines.device_helpers import CAM_SUFFIX
+from dodal.devices.electron_analyser.abstract_analyser import (
+    AbstractAnalyserDetector,
     AbstractAnalyserDriverIO,
 )
 
@@ -66,3 +68,15 @@ class SpecsAnalyserDriverIO(AbstractAnalyserDriverIO):
     @property
     def pass_energy_type(self) -> type:
         return float
+
+
+class SpecsAnalyserDetector(AbstractAnalyserDetector[SpecsAnalyserDriverIO]):
+    def __init__(self, prefix: str, name: str):
+        self.driver = SpecsAnalyserDriverIO(prefix + CAM_SUFFIX)
+        super().__init__(prefix, name, self.driver)
+
+        self.per_scan_metadata: list[SignalR] = self.per_scan_metadata + [
+            self.driver.centre_energy,
+            self.driver.psu_mode,
+            self.driver.snapshot_values,
+        ]
