@@ -1,6 +1,6 @@
 from bluesky import plan_stubs as bps
 from bluesky.utils import MsgGenerator
-from ophyd_async.epics.adcore._utils import ADImageMode
+from ophyd_async.epics.adcore import ADImageMode
 
 from dodal.common.types import MsgGenerator
 from dodal.devices.electron_analyser.abstract_analyser_io import (

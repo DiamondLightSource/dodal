@@ -1,6 +1,6 @@
 import pytest
 from bluesky.run_engine import RunEngine
-from ophyd_async.epics.adcore._utils import ADImageMode
+from ophyd_async.epics.adcore import ADImageMode
 from ophyd_async.testing import (
     get_mock_put,
 )
