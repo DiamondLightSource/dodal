@@ -96,7 +96,8 @@ def pytest_runtest_setup(item):
 def pytest_runtest_teardown():
     if "dodal.beamlines.beamline_utils" in sys.modules:
         sys.modules["dodal.beamlines.beamline_utils"].clear_devices()
-        sys.modules["dodal.beamlines.beamline_utils"].clear_path_provider()
+        if "PATH_PROVIDER" in globals():
+            sys.modules["dodal.beamlines.beamline_utils"].clear_path_provider()
 
 
 s03_epics_server_port = getenv("S03_EPICS_CA_SERVER_PORT")
