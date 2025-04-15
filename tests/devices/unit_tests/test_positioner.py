@@ -26,7 +26,7 @@ async def mock_positioner(prefix: str = "BLXX-EA-007:") -> Positioner1D:
 
 async def test_positioner_fail_wrong_value(mock_positioner: Positioner1D[Positions]):
     with pytest.raises(ValueError):
-        await mock_positioner.set(BadPositions.BAD_POSITION)
+        await mock_positioner.set(BadPositions.BAD_POSITION)  # type:ignore
 
 
 async def test_positioner_set_success(mock_positioner: Positioner1D):
