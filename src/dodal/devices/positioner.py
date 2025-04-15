@@ -15,20 +15,20 @@ from ophyd_async.epics.motor import Motor
 T = TypeVar("T", bound=StrictEnum)
 
 
-class Positioner(StandardReadable, Movable[T]):
+class Positioner1D(StandardReadable, Movable[T]):
     """1D stage with a enum table to select positions."""
 
     def __init__(
         self,
         prefix: str,
-        positioner_enum: type[StrictEnum],
+        datatype: type[StrictEnum],
         positioner_pv_suffix: str = ":MP:SELECT",
         name: str = "",
     ) -> None:
         self._stage_motion = Motor(prefix=prefix)
         with self.add_children_as_readables(Format.CONFIG_SIGNAL):
             self.stage_position = epics_signal_rw(
-                positioner_enum,
+                datatype,
                 read_pv=prefix + positioner_pv_suffix,
             )
         super().__init__(name=name)
@@ -43,5 +43,5 @@ def create_positioner(
     prefix,
     positioner_pv_suffix: str = ":MP:SELECT",
     name: str = "",
-) -> Positioner[T]:
-    return Positioner[datatype](prefix, datatype, positioner_pv_suffix, name)
+) -> Positioner1D[T]:
+    return Positioner1D[datatype](prefix, datatype, positioner_pv_suffix, name)
