@@ -78,3 +78,7 @@ class SpecsAnalyserDriverIO(AbstractAnalyserDriverIO):
             to_binding_energy(energy_value, EnergyMode.KINETIC, excitation_energy)
             for energy_value in energy_axis_values
         )
+
+    @property
+    def pass_energy_type(self) -> type:
+        return float

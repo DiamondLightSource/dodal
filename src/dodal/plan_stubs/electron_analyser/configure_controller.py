@@ -29,12 +29,16 @@ def configure_analyser(
     excitation_energy: float,
 ) -> MsgGenerator:
     LOGGER.info(f'Configuring analyser with region "{region.name}"')
+
     low_energy = to_kinetic_energy(
         region.low_energy, region.energy_mode, excitation_energy
     )
     high_energy = to_kinetic_energy(
         region.high_energy, region.energy_mode, excitation_energy
     )
+    pass_energy_type = analyser.pass_energy_type
+    pass_energy = pass_energy_type(region.pass_energy)
+
     # Set detector settings, wait for them all to have completed
     # fmt: off
     yield from bps.mv(
@@ -42,7 +46,7 @@ def configure_analyser(
         analyser.high_energy, high_energy,
         analyser.slices, region.slices,
         analyser.lens_mode, region.lens_mode,
-        analyser.pass_energy, region.pass_energy,
+        analyser.pass_energy, pass_energy,
         analyser.iterations, region.iterations,
         analyser.acquisition_mode, region.acquisition_mode,
     )
