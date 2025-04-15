@@ -6,7 +6,7 @@ from bluesky.run_engine import RunEngine
 from ophyd_async.core import init_devices
 
 from dodal.common.data_util import load_json_file_to_class
-from dodal.devices.electron_analyser.abstract_analyser_io import (
+from dodal.devices.electron_analyser.abstract_analyser import (
     TAbstractAnalyserDriverIO,
 )
 from dodal.devices.electron_analyser.abstract_region import (

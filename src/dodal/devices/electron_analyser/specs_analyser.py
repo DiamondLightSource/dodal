@@ -2,8 +2,10 @@ import numpy as np
 from ophyd_async.core import Array1D, SignalR
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
+from dodal.common.beamlines.device_helpers import CAM_SUFFIX
 from dodal.common.signal_utils import create_r_hardware_backed_soft_signal
-from dodal.devices.electron_analyser.abstract_analyser_io import (
+from dodal.devices.electron_analyser.abstract_analyser import (
+    AbstractAnalyserDetector,
     AbstractAnalyserDriverIO,
 )
 from dodal.devices.electron_analyser.abstract_region import EnergyMode
@@ -15,7 +17,7 @@ class SpecsAnalyserDriverIO(AbstractAnalyserDriverIO):
         with self.add_children_as_readables():
             # Used for setting up region data acquisition
             self.psu_mode = epics_signal_rw(str, prefix + "SCAN_RANGE")
-            self.values = epics_signal_rw(int, prefix + "VALUES")
+            self.sanpeshot_values = epics_signal_rw(int, prefix + "VALUES")
             self.centre_energy = epics_signal_rw(float, prefix + "KINETIC_ENERGY")
 
             # Used to read detector data after acqusition
@@ -78,3 +80,15 @@ class SpecsAnalyserDriverIO(AbstractAnalyserDriverIO):
             to_binding_energy(energy_value, EnergyMode.KINETIC, excitation_energy)
             for energy_value in energy_axis_values
         )
+
+
+class SpecsAnalyserDetector(AbstractAnalyserDetector[SpecsAnalyserDriverIO]):
+    def __init__(self, prefix: str, name: str):
+        self.driver = SpecsAnalyserDriverIO(prefix + CAM_SUFFIX)
+        super().__init__(prefix, name, self.driver)
+
+        self.per_scan_metadata: list[SignalR] = self.per_scan_metadata + [
+            self.driver.centre_energy,
+            self.driver.psu_mode,
+            self.driver.sanpeshot_values,
+        ]

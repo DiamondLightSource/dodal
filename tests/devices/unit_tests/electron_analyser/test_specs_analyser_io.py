@@ -4,7 +4,7 @@ from ophyd_async.testing import (
     get_mock_put,
 )
 
-from dodal.devices.electron_analyser.specs_analyser_io import (
+from dodal.devices.electron_analyser.specs_analyser import (
     SpecsAnalyserDriverIO,
 )
 from dodal.devices.electron_analyser.specs_region import SpecsRegion, SpecsSequence

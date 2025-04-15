@@ -2,19 +2,19 @@ import pytest
 from bluesky.run_engine import RunEngine
 from ophyd_async.testing import get_mock_put
 
-from dodal.devices.electron_analyser.abstract_analyser_io import (
+from dodal.devices.electron_analyser.abstract_analyser import (
     AbstractAnalyserDriverIO,
 )
 from dodal.devices.electron_analyser.abstract_region import (
     AbstractBaseRegion,
     AbstractBaseSequence,
 )
-from dodal.devices.electron_analyser.specs_analyser_io import (
+from dodal.devices.electron_analyser.specs_analyser import (
     SpecsAnalyserDriverIO,
 )
 from dodal.devices.electron_analyser.specs_region import SpecsSequence
 from dodal.devices.electron_analyser.util import to_kinetic_energy
-from dodal.devices.electron_analyser.vgscienta_analyser_io import (
+from dodal.devices.electron_analyser.vgscienta_analyser import (
     VGScientaAnalyserDriverIO,
 )
 from dodal.devices.electron_analyser.vgscienta_region import VGScientaSequence

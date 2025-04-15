@@ -1,20 +1,23 @@
 import numpy as np
-from ophyd_async.core import Array1D, SignalR
+from ophyd_async.core import (
+    Array1D,
+    SignalR,
+    soft_signal_rw,
+)
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
-from dodal.devices.electron_analyser.abstract_analyser_io import (
+from dodal.common.beamlines.device_helpers import CAM_SUFFIX
+from dodal.devices.electron_analyser.abstract_analyser import (
+    AbstractAnalyserDetector,
     AbstractAnalyserDriverIO,
 )
-from dodal.devices.electron_analyser.abstract_region import EnergyMode
-from dodal.devices.electron_analyser.util import to_binding_energy
-from dodal.devices.electron_analyser.vgscienta_region import (
-    DetectorMode,
-)
+from dodal.devices.electron_analyser.vgscienta_region import DetectorMode
 
 
 class VGScientaAnalyserDriverIO(AbstractAnalyserDriverIO):
     def __init__(self, prefix: str, name: str = "") -> None:
         with self.add_children_as_readables():
+            self.excitation_energy_source = soft_signal_rw(str, initial_value=None)
             # Used for setting up region data acquisition
             self.centre_energy = epics_signal_rw(float, prefix + "CENTRE_ENERGY")
             self.first_x_channel = epics_signal_rw(int, prefix + "MinX")
@@ -44,11 +47,21 @@ class VGScientaAnalyserDriverIO(AbstractAnalyserDriverIO):
             return self.angle_axis
         return epics_signal_r(Array1D[np.float64], prefix + "Y_SCALE_RBV")
 
-    async def binding_energy_axis(
-        self, excitation_energy: float
-    ) -> Array1D[np.float64]:
-        energy_axis_values = await self.energy_axis.get_value()
-        return np.array(
-            to_binding_energy(energy_value, EnergyMode.KINETIC, excitation_energy)
-            for energy_value in energy_axis_values
-        )
+
+class VGScientaAnalyserDetector(AbstractAnalyserDetector[VGScientaAnalyserDriverIO]):
+    def __init__(self, prefix: str, name: str):
+        self.driver = VGScientaAnalyserDriverIO(prefix + CAM_SUFFIX)
+        super().__init__(prefix, name, self.driver)
+
+        self.per_scan_metadata: list[SignalR] = self.per_scan_metadata + [
+            self.driver.first_x_channel,
+            self.driver.x_channel_size,
+            self.driver.first_y_channel,
+            self.driver.y_channel_size,
+            self.driver.excitation_energy_source,
+            self.driver.centre_energy,
+            self.driver.detector_mode,
+        ]
+        self.per_point_metadata: list[SignalR] = self.per_point_metadata + [
+            self.driver.external_io,
+        ]
