@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.util.lookup_tables &#8212; dodal 1.44.1.dev9+g9c91e9266 documentation</title>
+    <title>dodal.devices.util.lookup_tables &#8212; dodal 1.44.1.dev10+gc904495d8 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=1781909a"></script>
+    <script src="../../../../_static/documentation_options.js?v=6b32d398"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -524,6 +524,47 @@ window.addEventListener("load", () => mermaid.run());
         <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">interp</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">s_values</span><span class="p">,</span> <span class="n">t_values</span><span class="p">))</span>
 
     <span class="k">return</span> <span class="n">s_to_t2</span></div>
+
+
+
+<div class="viewcode-block" id="linear_extrapolation_lut">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.util.lookup_tables.html#dodal.devices.util.lookup_tables.linear_extrapolation_lut">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">linear_extrapolation_lut</span><span class="p">(</span>
+    <span class="n">s_values</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">t_values</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">float</span><span class="p">],</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return a callable that implements f(s) = t according to the conversion table data</span>
+<span class="sd">    supplied, with linear extrapolation outside that range. Inside the range of the table,</span>
+<span class="sd">    the function is equivalent to that returned by linear_interpolation_lut</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        s_values:  Values of the independent axis</span>
+<span class="sd">        t_values:  Values of the dependent axis</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A callable that returns t for the given s</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">s_values</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">t_values</span><span class="p">),</span> <span class="p">(</span>
+        <span class="s2">&quot;Lookup table does not have the same number of values for each axis&quot;</span>
+    <span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">s_values</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Need at least 2 points in the lookup table&quot;</span>
+    <span class="n">interp</span> <span class="o">=</span> <span class="n">linear_interpolation_lut</span><span class="p">(</span><span class="n">s_values</span><span class="p">,</span> <span class="n">t_values</span><span class="p">)</span>
+    <span class="n">s_min</span> <span class="o">=</span> <span class="n">s_values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">s_max</span> <span class="o">=</span> <span class="n">s_values</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">s_to_t</span><span class="p">(</span><span class="n">s</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">s</span> <span class="o">&lt;</span> <span class="n">s_min</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">t_values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">s</span> <span class="o">-</span> <span class="n">s_min</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">t_values</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">t_values</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="p">(</span>
+                <span class="n">s_values</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">s_values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">s</span> <span class="o">&gt;</span> <span class="n">s_max</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">t_values</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">s</span> <span class="o">-</span> <span class="n">s_max</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">t_values</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">t_values</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span> <span class="o">/</span> <span class="p">(</span>
+                <span class="n">s_values</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">s_values</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">interp</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">s_to_t</span></div>
 
 </pre></div>
 

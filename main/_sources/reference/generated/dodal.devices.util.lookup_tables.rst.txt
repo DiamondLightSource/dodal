@@ -25,6 +25,7 @@ dodal.devices.util.lookup\_tables
    .. autosummary::
    
       energy_distance_table
+      linear_extrapolation_lut
       linear_interpolation_lut
       parse_lookup_table
    

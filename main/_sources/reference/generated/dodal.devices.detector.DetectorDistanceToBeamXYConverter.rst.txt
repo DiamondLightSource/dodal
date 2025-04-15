@@ -24,12 +24,6 @@ dodal.devices.detector.DetectorDistanceToBeamXYConverter
       
       ~DetectorDistanceToBeamXYConverter.get_beam_y_pixels
       
-      
-      ~DetectorDistanceToBeamXYConverter.parse_table
-      
-      
-      ~DetectorDistanceToBeamXYConverter.reload_lookup_table
-      
    
    
 
