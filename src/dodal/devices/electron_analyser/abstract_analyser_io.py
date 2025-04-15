@@ -36,7 +36,10 @@ class AbstractAnalyserDriverIO(ABC, StandardReadable):
     @property
     @abstractmethod
     def pass_energy_type(self) -> type:
-        pass
+        """
+        Return the type the pass_energy should be. Each one is unfortunately different
+        for the underlying analyser software and cannot be changed on epics side.
+        """
 
 
 TAbstractAnalyserDriverIO = TypeVar(
