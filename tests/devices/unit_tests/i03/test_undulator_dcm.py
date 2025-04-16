@@ -5,7 +5,6 @@ import numpy as np
 import pytest
 from ophyd_async.core import AsyncStatus, init_devices
 from ophyd_async.testing import get_mock_put, set_mock_value
-from tests.constants import UNDULATOR_ID_GAP_LOOKUP_TABLE_PATH
 
 from conftest import MOCK_DAQ_CONFIG_PATH
 from dodal.devices.i03.dcm import DCM
@@ -13,6 +12,7 @@ from dodal.devices.i03.undulator_dcm import UndulatorDCM
 from dodal.devices.undulator import AccessError, Undulator, UndulatorGapAccess
 from dodal.devices.util.test_utils import patch_motor
 from dodal.log import LOGGER
+from tests.constants import UNDULATOR_ID_GAP_LOOKUP_TABLE_PATH
 
 
 @pytest.fixture(autouse=True)
