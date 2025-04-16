@@ -2,14 +2,14 @@ from typing import Protocol, runtime_checkable
 
 from bluesky import plan_stubs as bps
 
-from dodal.devices.i03.dcm import DCM
+from dodal.devices.dcm import BaseDCM
 from dodal.devices.undulator import Undulator
 
 
 @runtime_checkable
 class CheckUndulatorDevices(Protocol):
     undulator: Undulator
-    dcm: DCM
+    dcm: BaseDCM
 
 
 def verify_undulator_gap(devices: CheckUndulatorDevices):
