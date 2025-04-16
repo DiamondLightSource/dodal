@@ -59,7 +59,7 @@ class AbstractBaseRegion(ABC, JavaToPythonModel):
     iterations: int = 1
     # These ones we need subclasses to provide default values
     lens_mode: str
-    pass_energy: str
+    pass_energy: int
     acquisition_mode: str
     low_energy: float
     high_energy: float
