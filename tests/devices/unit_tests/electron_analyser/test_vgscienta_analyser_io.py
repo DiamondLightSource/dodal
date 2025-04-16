@@ -13,7 +13,7 @@ from dodal.devices.electron_analyser.vgscienta_region import (
     VGScientaRegion,
     VGScientaSequence,
 )
-from dodal.plan_stubs.electron_analyser.configure_controller import configure_vgscienta
+from dodal.plan_stubs.electron_analyser.configure_driver import configure_vgscienta
 from tests.devices.unit_tests.electron_analyser.test_util import (
     TEST_SEQUENCE_REGION_NAMES,
     TEST_VGSCIENTA_SEQUENCE,

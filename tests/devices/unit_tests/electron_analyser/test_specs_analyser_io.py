@@ -8,7 +8,7 @@ from dodal.devices.electron_analyser.specs_analyser_io import (
     SpecsAnalyserDriverIO,
 )
 from dodal.devices.electron_analyser.specs_region import SpecsRegion, SpecsSequence
-from dodal.plan_stubs.electron_analyser.configure_controller import configure_specs
+from dodal.plan_stubs.electron_analyser.configure_driver import configure_specs
 from tests.devices.unit_tests.electron_analyser.test_util import (
     TEST_SEQUENCE_REGION_NAMES,
     TEST_SPECS_SEQUENCE,
