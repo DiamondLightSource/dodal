@@ -87,6 +87,6 @@ def configure_vgscienta(
         analyser.x_channel_size, region.x_channel_size(),
         analyser.y_channel_size, region.y_channel_size(),
         analyser.detector_mode, region.detector_mode,
-        analyser.adbase_cam.image_mode, ADImageMode.SINGLE,
+        analyser.image_mode, ADImageMode.SINGLE,
     )
     # fmt: on

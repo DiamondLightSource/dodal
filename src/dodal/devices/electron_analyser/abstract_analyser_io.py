@@ -11,15 +11,13 @@ from dodal.devices.electron_analyser.abstract_region import EnergyMode
 from dodal.devices.electron_analyser.util import to_binding_energy
 
 
-class AbstractAnalyserDriverIO(ABC, StandardReadable):
+class AbstractAnalyserDriverIO(ABC, StandardReadable, ADBaseIO):
     """
     Generic device to configure electron analyser with new region settings.
     Electron analysers should inherit from this class for further specialisation.
     """
 
     def __init__(self, prefix: str, name: str = "") -> None:
-        self.adbase_cam = ADBaseIO(prefix)
-
         with self.add_children_as_readables():
             # Used for setting up region data acquisition
             self.low_energy = epics_signal_rw(float, prefix + "LOW_ENERGY")
@@ -41,7 +39,7 @@ class AbstractAnalyserDriverIO(ABC, StandardReadable):
             self.total_intensity = create_r_hardware_backed_soft_signal(
                 float, self._calculate_total_intensity
             )
-            self.step_time = epics_signal_r(float, self.adbase_cam.acquire_time.source)
+            self.step_time = epics_signal_r(float, prefix + "AcquireTime")
             self.total_steps = epics_signal_r(float, prefix + "TOTAL_POINTS_RBV")
 
         super().__init__(name)

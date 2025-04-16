@@ -51,7 +51,7 @@ async def test_given_region_that_analyser_sets_modes_correctly(
     await assert_reading_has_expected_value(
         sim_analyser_driver, "detector_mode", region.detector_mode
     )
-    get_mock_put(sim_analyser_driver.adbase_cam.image_mode).assert_called_once_with(
+    get_mock_put(sim_analyser_driver.image_mode).assert_called_once_with(
         ADImageMode.SINGLE, wait=True
     )
 
