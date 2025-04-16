@@ -41,7 +41,8 @@ class BaseDCM(StandardReadable, Generic[Xtal_1, Xtal_2]):
 
     This device should act as a parent for beamline-specific DCM's, in which any other missing signals can be added.
 
-    Bluesky plans using DCM's should be typed to specify which types of crystals are required
+    Bluesky plans using DCM's should be typed to specify which types of crystals are required. For example, a plan
+    which only requires one crystal which can roll should be typed 'def my_plan(dcm: BaseDCM[RollCrystal, StationaryCrystal])`
     """
 
     def __init__(
