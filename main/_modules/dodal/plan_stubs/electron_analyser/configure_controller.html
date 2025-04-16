@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.plan_stubs.electron_analyser.configure_controller &#8212; dodal 1.44.1.dev10+gc904495d8 documentation</title>
+    <title>dodal.plan_stubs.electron_analyser.configure_controller &#8212; dodal 1.44.1.dev11+g57f1138d1 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=6b32d398"></script>
+    <script src="../../../../_static/documentation_options.js?v=7bb8bb19"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -452,18 +452,18 @@ window.addEventListener("load", () => mermaid.run());
   <h1>Source code for dodal.plan_stubs.electron_analyser.configure_controller</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span><span class="w"> </span><span class="nn">bluesky</span><span class="w"> </span><span class="kn">import</span> <span class="n">plan_stubs</span> <span class="k">as</span> <span class="n">bps</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.electron_analyser.abstract_analyser_controller</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">AbstractAnalyserController</span><span class="p">,</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.electron_analyser.abstract_analyser_io</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AbstractAnalyserDriverIO</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.electron_analyser.abstract_region</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractBaseRegion</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.electron_analyser.specs_analyser_controller</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">SpecsAnalyserController</span><span class="p">,</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.electron_analyser.specs_analyser_io</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">SpecsAnalyserDriverIO</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.electron_analyser.specs_region</span><span class="w"> </span><span class="kn">import</span> <span class="n">SpecsRegion</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.electron_analyser.vgscienta_analyser_controller</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">VGScientaAnalyserController</span><span class="p">,</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.electron_analyser.vgscienta_analyser_io</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">VGScientaAnalyserDriverIO</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.electron_analyser.vgscienta_region</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">VGScientaRegion</span><span class="p">,</span>
@@ -474,13 +474,15 @@ window.addEventListener("load", () => mermaid.run());
 <div class="viewcode-block" id="configure_analyser">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.plan_stubs.electron_analyser.configure_controller.html#dodal.plan_stubs.electron_analyser.configure_controller.configure_analyser">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">configure_analyser</span><span class="p">(</span>
-    <span class="n">analyser</span><span class="p">:</span> <span class="n">AbstractAnalyserController</span><span class="p">,</span>
+    <span class="n">analyser</span><span class="p">:</span> <span class="n">AbstractAnalyserDriverIO</span><span class="p">,</span>
     <span class="n">region</span><span class="p">:</span> <span class="n">AbstractBaseRegion</span><span class="p">,</span>
     <span class="n">excitation_energy</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">):</span>
     <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Configuring analyser with region &quot;</span><span class="si">{</span><span class="n">region</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
     <span class="n">low_energy</span> <span class="o">=</span> <span class="n">region</span><span class="o">.</span><span class="n">to_kinetic_energy</span><span class="p">(</span><span class="n">region</span><span class="o">.</span><span class="n">low_energy</span><span class="p">,</span> <span class="n">excitation_energy</span><span class="p">)</span>
     <span class="n">high_energy</span> <span class="o">=</span> <span class="n">region</span><span class="o">.</span><span class="n">to_kinetic_energy</span><span class="p">(</span><span class="n">region</span><span class="o">.</span><span class="n">high_energy</span><span class="p">,</span> <span class="n">excitation_energy</span><span class="p">)</span>
+    <span class="n">pass_energy_type</span> <span class="o">=</span> <span class="n">analyser</span><span class="o">.</span><span class="n">pass_energy_type</span>
+    <span class="n">pass_energy</span> <span class="o">=</span> <span class="n">pass_energy_type</span><span class="p">(</span><span class="n">region</span><span class="o">.</span><span class="n">pass_energy</span><span class="p">)</span>
     <span class="c1"># Set detector settings, wait for them all to have completed</span>
     <span class="c1"># fmt: off</span>
     <span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">mv</span><span class="p">(</span>
@@ -488,7 +490,7 @@ window.addEventListener("load", () => mermaid.run());
         <span class="n">analyser</span><span class="o">.</span><span class="n">high_energy</span><span class="p">,</span> <span class="n">high_energy</span><span class="p">,</span>
         <span class="n">analyser</span><span class="o">.</span><span class="n">slices</span><span class="p">,</span> <span class="n">region</span><span class="o">.</span><span class="n">slices</span><span class="p">,</span>
         <span class="n">analyser</span><span class="o">.</span><span class="n">lens_mode</span><span class="p">,</span> <span class="n">region</span><span class="o">.</span><span class="n">lens_mode</span><span class="p">,</span>
-        <span class="n">analyser</span><span class="o">.</span><span class="n">pass_energy</span><span class="p">,</span> <span class="n">region</span><span class="o">.</span><span class="n">pass_energy</span><span class="p">,</span>
+        <span class="n">analyser</span><span class="o">.</span><span class="n">pass_energy</span><span class="p">,</span> <span class="n">pass_energy</span><span class="p">,</span>
         <span class="n">analyser</span><span class="o">.</span><span class="n">iterations</span><span class="p">,</span> <span class="n">region</span><span class="o">.</span><span class="n">iterations</span><span class="p">,</span>
         <span class="n">analyser</span><span class="o">.</span><span class="n">acquisition_mode</span><span class="p">,</span> <span class="n">region</span><span class="o">.</span><span class="n">acquisition_mode</span><span class="p">,</span>
     <span class="p">)</span></div>
@@ -499,7 +501,7 @@ window.addEventListener("load", () => mermaid.run());
 <div class="viewcode-block" id="configure_specs">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.plan_stubs.electron_analyser.configure_controller.html#dodal.plan_stubs.electron_analyser.configure_controller.configure_specs">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">configure_specs</span><span class="p">(</span>
-    <span class="n">analyser</span><span class="p">:</span> <span class="n">SpecsAnalyserController</span><span class="p">,</span> <span class="n">region</span><span class="p">:</span> <span class="n">SpecsRegion</span><span class="p">,</span> <span class="n">excitation_energy</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">analyser</span><span class="p">:</span> <span class="n">SpecsAnalyserDriverIO</span><span class="p">,</span> <span class="n">region</span><span class="p">:</span> <span class="n">SpecsRegion</span><span class="p">,</span> <span class="n">excitation_energy</span><span class="p">:</span> <span class="nb">float</span>
 <span class="p">):</span>
     <span class="k">yield from</span> <span class="n">configure_analyser</span><span class="p">(</span><span class="n">analyser</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span> <span class="n">excitation_energy</span><span class="p">)</span>
     <span class="c1"># fmt: off</span>
@@ -519,7 +521,7 @@ window.addEventListener("load", () => mermaid.run());
 <div class="viewcode-block" id="configure_vgscienta">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.plan_stubs.electron_analyser.configure_controller.html#dodal.plan_stubs.electron_analyser.configure_controller.configure_vgscienta">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">configure_vgscienta</span><span class="p">(</span>
-    <span class="n">analyser</span><span class="p">:</span> <span class="n">VGScientaAnalyserController</span><span class="p">,</span> <span class="n">region</span><span class="p">:</span> <span class="n">VGScientaRegion</span><span class="p">,</span> <span class="n">excitation_energy</span>
+    <span class="n">analyser</span><span class="p">:</span> <span class="n">VGScientaAnalyserDriverIO</span><span class="p">,</span> <span class="n">region</span><span class="p">:</span> <span class="n">VGScientaRegion</span><span class="p">,</span> <span class="n">excitation_energy</span>
 <span class="p">):</span>
     <span class="k">yield from</span> <span class="n">configure_analyser</span><span class="p">(</span><span class="n">analyser</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span> <span class="n">excitation_energy</span><span class="p">)</span>
     <span class="n">centre_energy</span> <span class="o">=</span> <span class="n">region</span><span class="o">.</span><span class="n">to_kinetic_energy</span><span class="p">(</span><span class="n">region</span><span class="o">.</span><span class="n">fix_energy</span><span class="p">,</span> <span class="n">excitation_energy</span><span class="p">)</span>

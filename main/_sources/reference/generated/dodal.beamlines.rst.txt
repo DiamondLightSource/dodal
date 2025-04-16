@@ -12,9 +12,13 @@
    dodal.beamlines.adsim
    dodal.beamlines.aithre
    dodal.beamlines.b01_1
+   dodal.beamlines.b07
+   dodal.beamlines.b07_1
    dodal.beamlines.i02_1
    dodal.beamlines.i03
    dodal.beamlines.i04
+   dodal.beamlines.i09
+   dodal.beamlines.i09_1
    dodal.beamlines.i10
    dodal.beamlines.i13_1
    dodal.beamlines.i18
@@ -27,6 +31,7 @@
    dodal.beamlines.i24
    dodal.beamlines.p38
    dodal.beamlines.p45
+   dodal.beamlines.p60
    dodal.beamlines.p99
    dodal.beamlines.training_rig
 

@@ -1,0 +1,46 @@
+dodal.devices.electron\_analyser.abstract\_analyser\_io.AbstractAnalyserDriverIO
+================================================================================
+
+.. currentmodule:: dodal.devices.electron_analyser.abstract_analyser_io
+
+.. autoclass:: AbstractAnalyserDriverIO
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~AbstractAnalyserDriverIO.to_kinetic_energy
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      ~AbstractAnalyserDriverIO.pass_energy_type
+      
+   
+   
