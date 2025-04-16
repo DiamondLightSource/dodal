@@ -33,4 +33,4 @@ class Goniometer(StandardReadable):
         omega = await self.omega.user_readback.get_value()
         z_component = value * math.cos(math.radians(omega))
         y_component = value * math.sin(math.radians(omega))
-        await asyncio.gather(self.y.set(y_component), self.z.set(z_component))
+        await asyncio.gather(self.sampy.set(y_component), self.sampz.set(z_component))
