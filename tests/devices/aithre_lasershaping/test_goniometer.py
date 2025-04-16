@@ -3,7 +3,6 @@ import math
 import pytest
 from bluesky.run_engine import RunEngine
 from ophyd_async.core import init_devices
-from ophyd_async.testing import set_mock_value
 
 from dodal.beamlines import aithre
 from dodal.devices.aithre_lasershaping.goniometer import Goniometer
