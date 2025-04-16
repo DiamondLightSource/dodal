@@ -1,5 +1,6 @@
 from dodal.common.beamlines.beamline_utils import device_factory
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
+from dodal.devices.motors import SixAxisGonio
 from dodal.devices.oav.pin_image_recognition import PinTipDetection
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name, get_hostname
@@ -27,4 +28,13 @@ def oav_pin_tip_detection() -> PinTipDetection:
     return PinTipDetection(
         f"{PREFIX.beamline_prefix}-DI-OAV-01:",
         "pin_tip_detection",
+    )
+
+
+@device_factory()
+def gonio() -> SixAxisGonio:
+    """Get the i23 goniometer"""
+
+    return SixAxisGonio(
+        f"{PREFIX.beamline_prefix}-MO-GONIO-01:",
     )
