@@ -1,7 +1,6 @@
 import asyncio
 import math
 
-import pytest
 from ophyd_async.core import StandardReadable, derived_signal_rw
 from ophyd_async.epics.motor import Motor
 
@@ -26,11 +25,9 @@ class Goniometer(StandardReadable):
         super().__init__(name)
 
     def _get(self, sampz: float, sampy: float, omega: float) -> float:
-        z_component = math.cos(math.radians(omega))
-        if z_component == pytest.approx(0):
-            return sampy
-
-        return sampz / math.cos(math.radians(omega))
+        z_component = sampz * math.cos(math.radians(omega))
+        y_component = sampy * math.sin(math.radians(omega))
+        return z_component + y_component
 
     async def _set(self, value: float) -> None:
         omega = await self.omega.user_readback.get_value()
