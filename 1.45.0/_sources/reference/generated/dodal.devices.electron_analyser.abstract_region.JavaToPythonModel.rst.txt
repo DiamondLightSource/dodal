@@ -1,0 +1,58 @@
+dodal.devices.electron\_analyser.abstract\_region.JavaToPythonModel
+===================================================================
+
+.. currentmodule:: dodal.devices.electron_analyser.abstract_region
+
+.. autoclass:: JavaToPythonModel
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      ~JavaToPythonModel.before_validation
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      ~JavaToPythonModel.model_config
+      
+      
+      
+      
+   
+   

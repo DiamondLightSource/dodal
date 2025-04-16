@@ -1,0 +1,40 @@
+dodal.devices.p45.SampleY
+=========================
+
+.. currentmodule:: dodal.devices.p45
+
+.. autoclass:: SampleY
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

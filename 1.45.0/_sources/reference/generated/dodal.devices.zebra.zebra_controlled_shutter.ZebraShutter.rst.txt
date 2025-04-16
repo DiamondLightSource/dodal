@@ -1,0 +1,43 @@
+dodal.devices.zebra.zebra\_controlled\_shutter.ZebraShutter
+===========================================================
+
+.. currentmodule:: dodal.devices.zebra.zebra_controlled_shutter
+
+.. autoclass:: ZebraShutter
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~ZebraShutter.set
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

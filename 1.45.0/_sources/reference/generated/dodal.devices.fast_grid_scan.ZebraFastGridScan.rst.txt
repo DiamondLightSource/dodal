@@ -1,0 +1,42 @@
+dodal.devices.fast\_grid\_scan.ZebraFastGridScan
+================================================
+
+.. currentmodule:: dodal.devices.fast_grid_scan
+
+.. autoclass:: ZebraFastGridScan
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

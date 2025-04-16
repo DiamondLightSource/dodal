@@ -1,0 +1,43 @@
+dodal.devices.i19.blueapi\_device.OpticsBlueAPIDevice
+=====================================================
+
+.. currentmodule:: dodal.devices.i19.blueapi_device
+
+.. autoclass:: OpticsBlueAPIDevice
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~OpticsBlueAPIDevice.set
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

@@ -1,0 +1,78 @@
+dodal.devices.electron\_analyser.vgscienta\_region.AcquisitionMode
+==================================================================
+
+.. currentmodule:: dodal.devices.electron_analyser.vgscienta_region
+
+.. autoclass:: AcquisitionMode
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~AcquisitionMode.SWEPT
+      
+      
+      ~AcquisitionMode.FIXED
+      
+   
+   

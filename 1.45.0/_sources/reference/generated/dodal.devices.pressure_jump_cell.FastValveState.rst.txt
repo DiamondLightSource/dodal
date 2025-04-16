@@ -1,0 +1,90 @@
+dodal.devices.pressure\_jump\_cell.FastValveState
+=================================================
+
+.. currentmodule:: dodal.devices.pressure_jump_cell
+
+.. autoclass:: FastValveState
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~FastValveState.FAULT
+      
+      
+      ~FastValveState.OPEN
+      
+      
+      ~FastValveState.OPEN_ARMED
+      
+      
+      ~FastValveState.CLOSED
+      
+      
+      ~FastValveState.CLOSED_ARMED
+      
+      
+      ~FastValveState.NONE
+      
+   
+   

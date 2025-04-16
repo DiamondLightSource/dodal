@@ -1,0 +1,37 @@
+dodal.devices.motors
+====================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~motors.SixAxisGonio
+   ~motors.XYZPositioner
+
+
+
+
+.. automodule:: dodal.devices.motors
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
