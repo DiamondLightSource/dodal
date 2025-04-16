@@ -9,8 +9,8 @@ from tests.constants import UNDULATOR_ID_GAP_LOOKUP_TABLE_PATH
 
 from conftest import MOCK_DAQ_CONFIG_PATH
 from dodal.devices.i03.dcm import DCM
+from dodal.devices.i03.undulator_dcm import UndulatorDCM
 from dodal.devices.undulator import AccessError, Undulator, UndulatorGapAccess
-from dodal.devices.undulator_dcm import UndulatorDCM
 from dodal.devices.util.test_utils import patch_motor
 from dodal.log import LOGGER
 
@@ -131,7 +131,7 @@ async def test_if_gap_is_already_correct_then_dont_move_gap(
     mock_load.return_value = np.array([[5700, 5.4606], [7000, 6.045], [9700, 6.404]])
     set_mock_value(fake_undulator_dcm.undulator_ref().current_gap, 5.4605)
 
-    await fake_undulator_dcm.set(5.7001)
+    await fake_undulator_dcm.set(5.8)
 
     # Verify undulator has not been asked to move
     assert (

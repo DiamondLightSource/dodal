@@ -26,6 +26,7 @@ from dodal.devices.flux import Flux
 from dodal.devices.focusing_mirror import FocusingMirrorWithStripes, MirrorVoltages
 from dodal.devices.i03.beamstop import Beamstop
 from dodal.devices.i03.dcm import DCM
+from dodal.devices.i03.undulator_dcm import UndulatorDCM
 from dodal.devices.motors import XYZPositioner
 from dodal.devices.oav.oav_detector import OAV
 from dodal.devices.oav.oav_parameters import OAVConfig
@@ -37,7 +38,6 @@ from dodal.devices.smargon import Smargon
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.thawer import Thawer
 from dodal.devices.undulator import Undulator
-from dodal.devices.undulator_dcm import UndulatorDCM
 from dodal.devices.webcam import Webcam
 from dodal.devices.xbpm_feedback import XBPMFeedback
 from dodal.devices.xspress3.xspress3 import Xspress3
