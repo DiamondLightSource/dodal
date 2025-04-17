@@ -11,8 +11,8 @@ from dodal.devices.i19.blueapi_device import HutchState, OpticsBlueAPIDevice
 
 
 class MotorPosition(StrEnum):
-    IN = "in"
-    OUT = "out"
+    IN = "IN"
+    OUT = "OUT"
 
 
 class AccessControlledOpticsMotors(OpticsBlueAPIDevice):
@@ -33,7 +33,7 @@ class AccessControlledOpticsMotors(OpticsBlueAPIDevice):
         await super().set(request_params)
 
 
-class FakeOpticsMotors(StandardReadable, Movable):
+class FakeOpticsMotors(StandardReadable, Movable[MotorPosition]):
     def __init__(self, name: str = "") -> None:
         self.motor1 = SimMotor("m1")
         self.motor2 = SimMotor("m2")

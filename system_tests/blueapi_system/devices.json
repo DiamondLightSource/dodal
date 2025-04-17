@@ -1,0 +1,15 @@
+{
+    "devices": [
+        {
+            "name": "optics_motors",
+            "protocols": [
+                {
+                    "name": "Movable",
+                    "types": [
+                        "MotorPositions"
+                    ]
+                }
+            ]
+        }
+    ]
+}

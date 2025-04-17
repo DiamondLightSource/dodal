@@ -1,0 +1,38 @@
+{
+    "plans": [
+        {
+            "name": "move_motors",
+            "description": null,
+            "schema": {
+                "$defs": {
+                    "MotorPosition": {
+                        "enum": [
+                        "IN",
+                        "OUT"
+                        ],
+                        "title": "MotorPosition",
+                        "type": "string"
+                    }
+                },
+                "additionalProperties": false,
+                "properties": {
+                    "position": {
+                        "$ref": "#/$defs/MotorPosition"
+                    },
+                    "motor": {
+                        "title": "Motor",
+                        "type": "bluesky.protocols.Movable",
+                        "types": [
+                            "MotorPosition"
+                        ]
+                    }
+                },
+                "required": [
+                    "position"
+                ],
+                "title": "move_motors",
+                "type": "object"
+            }
+        }
+    ]
+}
