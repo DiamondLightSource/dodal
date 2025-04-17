@@ -1,5 +1,5 @@
 import numpy as np
-from ophyd_async.core import Array1D, StandardReadable, soft_signal_r_and_setter
+from ophyd_async.core import Array1D, soft_signal_r_and_setter
 from ophyd_async.epics.core import epics_signal_r
 from ophyd_async.epics.motor import Motor
 
@@ -8,9 +8,14 @@ from dodal.common.crystal_metadata import (
     MaterialsEnum,
     make_crystal_metadata_from_material,
 )
+from dodal.devices.common_dcm import (
+    BaseDCM,
+    PitchAndRollCrystal,
+    StationaryCrystal,
+)
 
 
-class DCM(StandardReadable):
+class DCM(BaseDCM[PitchAndRollCrystal, StationaryCrystal]):
     """
     A double crystal monochromator (DCM), used to select the energy of the beam.
 
@@ -30,13 +35,7 @@ class DCM(StandardReadable):
             MaterialsEnum.Si, (1, 1, 1)
         )
         with self.add_children_as_readables():
-            self.bragg_in_degrees = Motor(prefix + "BRAGG")
-            self.roll_in_mrad = Motor(prefix + "ROLL")
-            self.offset_in_mm = Motor(prefix + "OFFSET")
             self.perp_in_mm = Motor(prefix + "PERP")
-            self.energy_in_kev = Motor(prefix + "ENERGY")
-            self.pitch_in_mrad = Motor(prefix + "PITCH")
-            self.wavelength = Motor(prefix + "WAVELENGTH")
 
             # temperatures
             self.xtal1_temp = epics_signal_r(float, prefix + "TEMP1")
@@ -58,7 +57,4 @@ class DCM(StandardReadable):
                 Array1D[np.uint64],
                 initial_value=reflection_array,
             )
-            self.crystal_metadata_d_spacing = epics_signal_r(
-                float, prefix + "DSPACING:RBV"
-            )
-        super().__init__(name)
+        super().__init__(prefix, PitchAndRollCrystal, StationaryCrystal, name)
