@@ -1,5 +1,5 @@
 from bluesky import plan_stubs as bps
-from bluesky.utils import MsgGenerator
+from bluesky.utils import MsgGenerator, plan
 from ophyd_async.epics.adcore import ADImageMode
 
 from dodal.common.types import MsgGenerator
@@ -23,6 +23,7 @@ from dodal.devices.electron_analyser.vgscienta_region import (
 from dodal.log import LOGGER
 
 
+@plan
 def configure_analyser(
     analyser: AbstractAnalyserDriverIO,
     region: AbstractBaseRegion,
@@ -56,6 +57,7 @@ def configure_analyser(
     # fmt: on
 
 
+@plan
 def configure_specs(
     analyser: SpecsAnalyserDriverIO, region: SpecsRegion, excitation_energy: float
 ) -> MsgGenerator:
@@ -73,6 +75,7 @@ def configure_specs(
         yield from bps.mv(analyser.energy_step, region.energy_step)
 
 
+@plan
 def configure_vgscienta(
     analyser: VGScientaAnalyserDriverIO, region: VGScientaRegion, excitation_energy
 ) -> MsgGenerator:
