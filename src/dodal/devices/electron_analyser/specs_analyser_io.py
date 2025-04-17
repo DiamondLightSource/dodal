@@ -19,9 +19,6 @@ class SpecsAnalyserDriverIO(AbstractAnalyserDriverIO):
             # Used to read detector data after acqusition. Per scan.
             self.min_angle_axis = epics_signal_r(float, prefix + "Y_MIN_RBV")
             self.max_angle_axis = epics_signal_r(float, prefix + "Y_MAX_RBV")
-            self.total_points_iteration = epics_signal_r(
-                float, prefix + "TOTAL_POINTS_ITERATIONS_RBV"
-            )
 
         super().__init__(prefix, name)
 

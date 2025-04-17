@@ -48,7 +48,7 @@ class AbstractAnalyserDriverIO(ABC, StandardReadable, ADBaseIO):
             )
             self.angle_axis = self._get_angle_axis_signal(prefix)
             self.step_time = epics_signal_r(float, prefix + "AcquireTime")
-            self.total_steps = epics_signal_r(float, prefix + "TOTAL_POINTS_RBV")
+            self.total_steps = epics_signal_r(int, prefix + "TOTAL_POINTS_RBV")
             self.total_time = create_r_hardware_backed_soft_signal(
                 float, self._calculate_total_time
             )
@@ -60,7 +60,7 @@ class AbstractAnalyserDriverIO(ABC, StandardReadable, ADBaseIO):
                 float, self._calculate_total_intensity
             )
 
-        super().__init__(name)
+        super().__init__(prefix=prefix, name=name)
 
     @abstractmethod
     def _get_angle_axis_signal(self, prefix: str = "") -> SignalR:
