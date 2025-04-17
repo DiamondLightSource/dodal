@@ -17,9 +17,9 @@
    dodal.devices.backlight
    dodal.devices.baton
    dodal.devices.bimorph_mirror
+   dodal.devices.common_dcm
    dodal.devices.cryostream
    dodal.devices.current_amplifiers
-   dodal.devices.dcm
    dodal.devices.detector
    dodal.devices.diamond_filter
    dodal.devices.eiger
@@ -58,7 +58,6 @@
    dodal.devices.training_rig
    dodal.devices.turbo_slit
    dodal.devices.undulator
-   dodal.devices.undulator_dcm
    dodal.devices.util
    dodal.devices.watsonmarlow323_pump
    dodal.devices.webcam

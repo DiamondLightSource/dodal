@@ -1,0 +1,43 @@
+dodal.devices.i03.undulator\_dcm.UndulatorDCM
+=============================================
+
+.. currentmodule:: dodal.devices.i03.undulator_dcm
+
+.. autoclass:: UndulatorDCM
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~UndulatorDCM.set
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

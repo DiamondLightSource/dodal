@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.i24.dcm &#8212; dodal 1.44.1.dev11+g57f1138d1 documentation</title>
+    <title>dodal.devices.i24.dcm &#8212; dodal 1.45.1.dev1+ge31405d54 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=7bb8bb19"></script>
+    <script src="../../../../_static/documentation_options.js?v=8191825b"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -450,33 +450,24 @@ window.addEventListener("load", () => mermaid.run());
                 <article class="bd-article">
                   
   <h1>Source code for dodal.devices.i24.dcm</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">StandardReadable</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">epics_signal_r</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.motor</span><span class="w"> </span><span class="kn">import</span> <span class="n">Motor</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">epics_signal_r</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.common_dcm</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">BaseDCM</span><span class="p">,</span>
+    <span class="n">PitchAndRollCrystal</span><span class="p">,</span>
+    <span class="n">RollCrystal</span><span class="p">,</span>
+<span class="p">)</span>
 
 
 <div class="viewcode-block" id="DCM">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i24.dcm.DCM.html#dodal.devices.i24.dcm.DCM">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">DCM</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">DCM</span><span class="p">(</span><span class="n">BaseDCM</span><span class="p">[</span><span class="n">RollCrystal</span><span class="p">,</span> <span class="n">PitchAndRollCrystal</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A double crystal monocromator device, used to select the beam energy.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
-            <span class="c1"># Motors</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">bragg_in_degrees</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;-MO-DCM-01:BRAGG&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">x_translation_in_mm</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;-MO-DCM-01:X&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">offset_in_mm</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;-MO-DCM-01:OFFSET&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">gap_in_mm</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;-MO-DCM-01:GAP&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">energy_in_kev</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;-MO-DCM-01:ENERGY&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">xtal1_roll</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;-MO-DCM-01:XTAL1:ROLL&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">xtal2_roll</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;-MO-DCM-01:XTAL2:ROLL&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">xtal2_pitch</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;-MO-DCM-01:XTAL2:PITCH&quot;</span><span class="p">)</span>
-
-            <span class="c1"># Wavelength is calculated in epics from the energy</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">wavelength_in_a</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;-MO-DCM-01:LAMBDA&quot;</span><span class="p">)</span>
-
             <span class="c1"># Temperatures</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">xtal1_temp</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;-DI-DCM-01:PT100-1&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">xtal1_heater_temp</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span>
@@ -493,7 +484,7 @@ window.addEventListener("load", () => mermaid.run());
             <span class="bp">self</span><span class="o">.</span><span class="n">b1_plate_temp</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;-DI-DCM-01:PT100-7&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">gap_temp</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;-DI-DCM-01:TC-1&quot;</span><span class="p">)</span>
 
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;-MO-DCM-01:&quot;</span><span class="p">,</span> <span class="n">RollCrystal</span><span class="p">,</span> <span class="n">PitchAndRollCrystal</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span></div>
 
 </pre></div>
 

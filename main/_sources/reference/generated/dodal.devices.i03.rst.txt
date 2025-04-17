@@ -10,6 +10,8 @@ dodal.devices.i03
    :recursive:
 
    dodal.devices.i03.beamstop
+   dodal.devices.i03.dcm
+   dodal.devices.i03.undulator_dcm
 
 
 
