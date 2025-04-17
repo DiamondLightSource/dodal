@@ -6,8 +6,6 @@ from dodal.common.signal_utils import create_r_hardware_backed_soft_signal
 from dodal.devices.electron_analyser.abstract_analyser_io import (
     AbstractAnalyserDriverIO,
 )
-from dodal.devices.electron_analyser.abstract_region import EnergyMode
-from dodal.devices.electron_analyser.util import to_binding_energy
 
 
 class SpecsAnalyserDriverIO(AbstractAnalyserDriverIO):
@@ -27,7 +25,7 @@ class SpecsAnalyserDriverIO(AbstractAnalyserDriverIO):
 
         super().__init__(prefix, name)
 
-    def _get_angle_axis_signal(self, prefix) -> SignalR:
+    def _get_angle_axis_signal(self, prefix: str = "") -> SignalR:
         """
         Override abstract and return soft signal that calculates angle axis
         """
@@ -50,7 +48,7 @@ class SpecsAnalyserDriverIO(AbstractAnalyserDriverIO):
         axis = np.array([min_angle + offset + i * width for i in range(slices)])
         return axis
 
-    def _get_energy_axis_signal(self, prefix) -> SignalR:
+    def _get_energy_axis_signal(self, prefix: str = "") -> SignalR:
         """
         Override abstract and return soft signal that calculates energy axis
         """
@@ -69,15 +67,6 @@ class SpecsAnalyserDriverIO(AbstractAnalyserDriverIO):
         step = (max_energy - min_energy) / total_points_iterations
         axis = np.array([min_energy + i * step for i in range(total_points_iterations)])
         return axis
-
-    async def binding_energy_axis(
-        self, excitation_energy: float
-    ) -> Array1D[np.float64]:
-        energy_axis_values = await self.energy_axis.get_value()
-        return np.array(
-            to_binding_energy(energy_value, EnergyMode.KINETIC, excitation_energy)
-            for energy_value in energy_axis_values
-        )
 
     @property
     def pass_energy_type(self) -> type:

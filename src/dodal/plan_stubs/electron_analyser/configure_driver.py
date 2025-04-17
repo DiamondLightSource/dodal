@@ -42,6 +42,9 @@ def configure_analyser(
     # Set detector settings, wait for them all to have completed
     # fmt: off
     yield from bps.mv(
+        analyser.region_name, region.name,
+        analyser.energy_mode, region.energy_mode,
+        analyser.excitation_energy, excitation_energy,
         analyser.low_energy, low_energy,
         analyser.high_energy, high_energy,
         analyser.slices, region.slices,
