@@ -11,12 +11,12 @@ from dodal.devices.electron_analyser.abstract_analyser_io import (
 class SpecsAnalyserDriverIO(AbstractAnalyserDriverIO):
     def __init__(self, prefix: str, name: str = "") -> None:
         with self.add_children_as_readables():
-            # Used for setting up region data acquisition
+            # Used for setting up region data acquisition. Per scan.
             self.psu_mode = epics_signal_rw(str, prefix + "SCAN_RANGE")
             self.values = epics_signal_rw(int, prefix + "VALUES")
             self.centre_energy = epics_signal_rw(float, prefix + "KINETIC_ENERGY")
 
-            # Used to read detector data after acqusition
+            # Used to read detector data after acqusition. Per scan.
             self.min_angle_axis = epics_signal_r(float, prefix + "Y_MIN_RBV")
             self.max_angle_axis = epics_signal_r(float, prefix + "Y_MAX_RBV")
             self.total_points_iteration = epics_signal_r(
