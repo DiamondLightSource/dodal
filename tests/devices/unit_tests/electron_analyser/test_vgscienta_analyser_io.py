@@ -1,10 +1,13 @@
+import numpy as np
 import pytest
 from bluesky.run_engine import RunEngine
 from ophyd_async.epics.adcore import ADImageMode
 from ophyd_async.testing import (
     get_mock_put,
+    set_mock_value,
 )
 
+from dodal.devices.electron_analyser.abstract_analyser_io import EnergyMode
 from dodal.devices.electron_analyser.util import to_kinetic_energy
 from dodal.devices.electron_analyser.vgscienta_analyser_io import (
     VGScientaAnalyserDriverIO,
@@ -119,4 +122,26 @@ async def test_given_region_that_vgscienta_sets_channel_correctly(
     )
     await assert_reading_has_expected_value(
         sim_analyser_driver, "y_channel_size", expected_size_y
+    )
+
+
+@pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
+async def test_that_data_to_read_is_correct(
+    sim_analyser_driver: VGScientaAnalyserDriverIO,
+    region: VGScientaRegion,
+    excitation_energy: float,
+    RE: RunEngine,
+):
+    RE(configure_vgscienta(sim_analyser_driver, region, excitation_energy))
+
+    # Check binding energy is correct
+    energy_axis = [1, 2, 3, 4, 5]
+    set_mock_value(sim_analyser_driver.energy_axis, np.array(energy_axis, dtype=float))
+    is_binding = await sim_analyser_driver.energy_mode.get_value() == EnergyMode.BINDING
+    expected_binding_energy_axis = np.array(
+        [excitation_energy - e if is_binding else e for e in energy_axis]
+    )
+    assert np.array_equal(
+        await sim_analyser_driver.binding_energy_axis.get_value(),
+        expected_binding_energy_axis,
     )

@@ -77,11 +77,14 @@ class AbstractAnalyserDriverIO(ABC, StandardReadable, ADBaseIO):
     async def _calculate_binding_energy_axis(self) -> Array1D[np.float64]:
         energy_axis_values = await self.energy_axis.get_value()
         excitation_energy_value = await self.excitation_energy.get_value()
+        is_binding = await self.energy_mode.get_value() == EnergyMode.BINDING
         return np.array(
             [
                 to_binding_energy(
                     i_energy_axis, EnergyMode.KINETIC, excitation_energy_value
                 )
+                if is_binding
+                else i_energy_axis
                 for i_energy_axis in energy_axis_values
             ]
         )
