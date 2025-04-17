@@ -2,7 +2,7 @@ from typing import Protocol, runtime_checkable
 
 from bluesky import plan_stubs as bps
 
-from dodal.devices.dcm import BaseDCM
+from dodal.devices.common_dcm import BaseDCM
 from dodal.devices.undulator import Undulator
 
 
