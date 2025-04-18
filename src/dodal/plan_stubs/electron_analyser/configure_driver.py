@@ -1,5 +1,8 @@
 from bluesky import plan_stubs as bps
+from bluesky.utils import MsgGenerator, plan
+from ophyd_async.epics.adcore import ADImageMode
 
+from dodal.common.types import MsgGenerator
 from dodal.devices.electron_analyser.abstract_analyser_io import (
     AbstractAnalyserDriverIO,
 )
@@ -10,6 +13,7 @@ from dodal.devices.electron_analyser.specs_analyser_io import (
     SpecsAnalyserDriverIO,
 )
 from dodal.devices.electron_analyser.specs_region import SpecsRegion
+from dodal.devices.electron_analyser.util import to_kinetic_energy
 from dodal.devices.electron_analyser.vgscienta_analyser_io import (
     VGScientaAnalyserDriverIO,
 )
@@ -19,19 +23,29 @@ from dodal.devices.electron_analyser.vgscienta_region import (
 from dodal.log import LOGGER
 
 
+@plan
 def configure_analyser(
     analyser: AbstractAnalyserDriverIO,
     region: AbstractBaseRegion,
     excitation_energy: float,
-):
+) -> MsgGenerator:
     LOGGER.info(f'Configuring analyser with region "{region.name}"')
-    low_energy = region.to_kinetic_energy(region.low_energy, excitation_energy)
-    high_energy = region.to_kinetic_energy(region.high_energy, excitation_energy)
+
+    low_energy = to_kinetic_energy(
+        region.low_energy, region.energy_mode, excitation_energy
+    )
+    high_energy = to_kinetic_energy(
+        region.high_energy, region.energy_mode, excitation_energy
+    )
     pass_energy_type = analyser.pass_energy_type
     pass_energy = pass_energy_type(region.pass_energy)
+
     # Set detector settings, wait for them all to have completed
     # fmt: off
     yield from bps.mv(
+        analyser.region_name, region.name,
+        analyser.energy_mode, region.energy_mode,
+        analyser.excitation_energy, excitation_energy,
         analyser.low_energy, low_energy,
         analyser.high_energy, high_energy,
         analyser.slices, region.slices,
@@ -43,9 +57,10 @@ def configure_analyser(
     # fmt: on
 
 
+@plan
 def configure_specs(
     analyser: SpecsAnalyserDriverIO, region: SpecsRegion, excitation_energy: float
-):
+) -> MsgGenerator:
     yield from configure_analyser(analyser, region, excitation_energy)
     # fmt: off
     yield from bps.mv(
@@ -60,11 +75,14 @@ def configure_specs(
         yield from bps.mv(analyser.energy_step, region.energy_step)
 
 
+@plan
 def configure_vgscienta(
     analyser: VGScientaAnalyserDriverIO, region: VGScientaRegion, excitation_energy
-):
+) -> MsgGenerator:
     yield from configure_analyser(analyser, region, excitation_energy)
-    centre_energy = region.to_kinetic_energy(region.fix_energy, excitation_energy)
+    centre_energy = to_kinetic_energy(
+        region.fix_energy, region.energy_mode, excitation_energy
+    )
 
     # fmt: off
     yield from bps.mv(
@@ -75,6 +93,6 @@ def configure_vgscienta(
         analyser.x_channel_size, region.x_channel_size(),
         analyser.y_channel_size, region.y_channel_size(),
         analyser.detector_mode, region.detector_mode,
-        analyser.image_mode, "Single",
+        analyser.image_mode, ADImageMode.SINGLE,
     )
     # fmt: on

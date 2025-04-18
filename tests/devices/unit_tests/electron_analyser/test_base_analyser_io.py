@@ -1,6 +1,7 @@
+import numpy as np
 import pytest
 from bluesky.run_engine import RunEngine
-from ophyd_async.testing import get_mock_put
+from ophyd_async.testing import get_mock_put, set_mock_value
 
 from dodal.devices.electron_analyser.abstract_analyser_io import (
     AbstractAnalyserDriverIO,
@@ -13,11 +14,12 @@ from dodal.devices.electron_analyser.specs_analyser_io import (
     SpecsAnalyserDriverIO,
 )
 from dodal.devices.electron_analyser.specs_region import SpecsSequence
+from dodal.devices.electron_analyser.util import to_kinetic_energy
 from dodal.devices.electron_analyser.vgscienta_analyser_io import (
     VGScientaAnalyserDriverIO,
 )
 from dodal.devices.electron_analyser.vgscienta_region import VGScientaSequence
-from dodal.plan_stubs.electron_analyser.configure_controller import configure_analyser
+from dodal.plan_stubs.electron_analyser.configure_driver import configure_analyser
 from tests.devices.unit_tests.electron_analyser.test_util import (
     TEST_SEQUENCE_REGION_NAMES,
     TEST_SPECS_SEQUENCE,
@@ -58,9 +60,7 @@ def test_analyser_to_kinetic_energy(
     excitation_energy: float,
 ) -> None:
     low_energy = region.low_energy
-    ke = sim_analyser_driver.to_kinetic_energy(
-        low_energy, excitation_energy, region.energy_mode
-    )
+    ke = to_kinetic_energy(low_energy, region.energy_mode, excitation_energy)
     if region.is_binding_energy():
         assert ke == (excitation_energy - low_energy)
     else:
@@ -76,6 +76,18 @@ async def test_given_region_that_analyser_sets_modes_correctly(
 ) -> None:
     RE(configure_analyser(sim_analyser_driver, region, excitation_energy))
 
+    get_mock_put(sim_analyser_driver.region_name).assert_called_once_with(
+        region.name, wait=True
+    )
+    await assert_reading_has_expected_value(
+        sim_analyser_driver, "region_name", region.name
+    )
+    get_mock_put(sim_analyser_driver.energy_mode).assert_called_once_with(
+        region.energy_mode, wait=True
+    )
+    await assert_reading_has_expected_value(
+        sim_analyser_driver, "energy_mode", region.energy_mode
+    )
     get_mock_put(sim_analyser_driver.acquisition_mode).assert_called_once_with(
         region.acquisition_mode, wait=True
     )
@@ -99,8 +111,12 @@ async def test_given_region_that_analyser_sets_energy_values_correctly(
 ) -> None:
     RE(configure_analyser(sim_analyser_driver, region, excitation_energy))
 
-    expected_low_e = region.to_kinetic_energy(region.low_energy, excitation_energy)
-    expected_high_e = region.to_kinetic_energy(region.high_energy, excitation_energy)
+    expected_low_e = to_kinetic_energy(
+        region.low_energy, region.energy_mode, excitation_energy
+    )
+    expected_high_e = to_kinetic_energy(
+        region.high_energy, region.energy_mode, excitation_energy
+    )
     expected_pass_e_type = sim_analyser_driver.pass_energy_type
     expected_pass_e = expected_pass_e_type(region.pass_energy)
 
@@ -121,6 +137,13 @@ async def test_given_region_that_analyser_sets_energy_values_correctly(
     )
     await assert_reading_has_expected_value(
         sim_analyser_driver, "pass_energy", expected_pass_e
+    )
+
+    get_mock_put(sim_analyser_driver.excitation_energy).assert_called_once_with(
+        excitation_energy, wait=True
+    )
+    await assert_reading_has_expected_value(
+        sim_analyser_driver, "excitation_energy", excitation_energy
     )
 
 
@@ -147,3 +170,34 @@ async def test_given_region_that_analyser_sets_channel_correctly(
     await assert_reading_has_expected_value(
         sim_analyser_driver, "iterations", expected_iterations
     )
+
+
+@pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
+async def test_that_data_to_read_is_correct(
+    sim_analyser_driver: AbstractAnalyserDriverIO,
+    region: AbstractBaseRegion,
+    excitation_energy: float,
+    RE: RunEngine,
+):
+    RE(configure_analyser(sim_analyser_driver, region, excitation_energy))
+
+    expected_total_time = (
+        await sim_analyser_driver.iterations.get_value()
+        * await sim_analyser_driver.total_steps.get_value()
+        * await sim_analyser_driver.step_time.get_value()
+    )
+    assert await sim_analyser_driver.total_time.get_value() == expected_total_time
+
+    spectrum = np.array([1, 2, 3, 4, 5], dtype=float)
+    expected_total_intensity = np.sum(spectrum)
+    set_mock_value(sim_analyser_driver.spectrum, spectrum)
+    assert (
+        await sim_analyser_driver.total_intensity.get_value()
+        == expected_total_intensity
+    )
+
+    # Check that angle and energy axis signals return the same reference every time
+    angle_axis_instance = sim_analyser_driver.angle_axis
+    assert angle_axis_instance is sim_analyser_driver._get_angle_axis_signal()
+    energy_axis_instance = sim_analyser_driver.energy_axis
+    assert energy_axis_instance is sim_analyser_driver._get_energy_axis_signal()
