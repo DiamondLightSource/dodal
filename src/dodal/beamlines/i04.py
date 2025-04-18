@@ -362,7 +362,5 @@ def diamond_filter() -> DiamondFilter[I04Filters]:
     If this is called when already instantiated in i03, it will return the existing object.
     """
     return DiamondFilter[I04Filters](
-        prefix=f"{PREFIX.beamline_prefix}-MO-FLTR-01:",
-        name="diamond_filter",
-        data_type=I04Filters,
+        f"{PREFIX.beamline_prefix}-MO-FLTR-01:Y", I04Filters
     )
