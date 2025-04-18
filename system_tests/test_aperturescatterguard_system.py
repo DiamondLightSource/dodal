@@ -41,25 +41,25 @@ async def ap_sg():
 @pytest.fixture
 def move_to_large(ap_sg: ApertureScatterguard):
     assert ap_sg._loaded_positions is not None
-    yield from bps.abs_set(ap_sg, ApertureValue.LARGE)
+    yield from bps.abs_set(ap_sg.selected_aperture, ApertureValue.LARGE)
 
 
 @pytest.fixture
 def move_to_medium(ap_sg: ApertureScatterguard):
     assert ap_sg._loaded_positions is not None
-    yield from bps.abs_set(ap_sg, ApertureValue.MEDIUM)
+    yield from bps.abs_set(ap_sg.selected_aperture, ApertureValue.MEDIUM)
 
 
 @pytest.fixture
 def move_to_small(ap_sg: ApertureScatterguard):
     assert ap_sg._loaded_positions is not None
-    yield from bps.abs_set(ap_sg, ApertureValue.SMALL)
+    yield from bps.abs_set(ap_sg.selected_aperture, ApertureValue.SMALL)
 
 
 @pytest.fixture
 def move_to_robotload(ap_sg: ApertureScatterguard):
     assert ap_sg._loaded_positions is not None
-    yield from bps.abs_set(ap_sg, ApertureValue.ROBOT_LOAD)
+    yield from bps.abs_set(ap_sg.selected_aperture, ApertureValue.ROBOT_LOAD)
 
 
 @pytest.mark.s03
