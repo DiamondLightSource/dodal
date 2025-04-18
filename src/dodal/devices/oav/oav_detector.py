@@ -1,24 +1,13 @@
-from enum import IntEnum
-
 from bluesky.protocols import Movable
 from ophyd_async.core import (
-    DEFAULT_TIMEOUT,
     AsyncStatus,
-    LazyMock,
     StandardReadable,
+    derived_signal_r,
 )
 from ophyd_async.epics.core import epics_signal_rw
 
-from dodal.common.signal_utils import create_r_hardware_backed_soft_signal
-from dodal.devices.areadetector.plugins.CAM import Cam
-from dodal.devices.oav.oav_parameters import DEFAULT_OAV_WINDOW, OAVConfig
-from dodal.devices.oav.snapshots.snapshot import Snapshot
-from dodal.devices.oav.snapshots.snapshot_with_grid import SnapshotWithGrid
-
-
-class Coords(IntEnum):
-    X = 0
-    Y = 1
+from dodal.devices.oav.oav_detector_base import OAVBase
+from dodal.devices.oav.oav_parameters import OAVConfig
 
 
 # Workaround to deal with the fact that beamlines may have slightly different string
@@ -36,7 +25,7 @@ class ZoomController(StandardReadable, Movable[str]):
         oav.zoom_controller.set("1.0x")
 
     Note that changing the zoom may change the AD wiring on the associated OAV, as such
-    you should wait on any zoom changs to finish before changing the OAV wiring.
+    you should wait on any zoom changes to finish before changing the OAV wiring.
     """
 
     def __init__(self, prefix: str, name: str = "") -> None:
@@ -51,66 +40,21 @@ class ZoomController(StandardReadable, Movable[str]):
         await self.level.set(value, wait=True)
 
 
-class OAV(StandardReadable):
+class OAV(OAVBase):
     def __init__(self, prefix: str, config: OAVConfig, name: str = ""):
-        self.oav_config = config
-        self._prefix = prefix
-        self._name = name
         _bl_prefix = prefix.split("-")[0]
         self.zoom_controller = ZoomController(f"{_bl_prefix}-EA-OAV-01:FZOOM:", name)
 
-        self.cam = Cam(f"{prefix}CAM:", name=name)
+        self.zoom_level = derived_signal_r(
+            self._get_zoom_level, zoom_level=self.zoom_controller.level
+        )
 
-        with self.add_children_as_readables():
-            self.grid_snapshot = SnapshotWithGrid(f"{prefix}MJPG:", name)
-            self.microns_per_pixel_x = create_r_hardware_backed_soft_signal(
-                float,
-                lambda: self._get_microns_per_pixel(Coords.X),
-            )
-            self.microns_per_pixel_y = create_r_hardware_backed_soft_signal(
-                float,
-                lambda: self._get_microns_per_pixel(Coords.Y),
-            )
-            self.beam_centre_i = create_r_hardware_backed_soft_signal(
-                int, lambda: self._get_beam_position(Coords.X)
-            )
-            self.beam_centre_j = create_r_hardware_backed_soft_signal(
-                int, lambda: self._get_beam_position(Coords.Y)
-            )
-            self.snapshot = Snapshot(
-                f"{self._prefix}MJPG:",
-                self._name,
-            )
+        super().__init__(
+            prefix=prefix,
+            config=config,
+            name=name,
+            zoom_level=self.zoom_level,
+        )
 
-        self.sizes = [self.grid_snapshot.x_size, self.grid_snapshot.y_size]
-
-        super().__init__(name)
-
-    async def _read_current_zoom(self) -> str:
-        _zoom = await self.zoom_controller.level.get_value()
-        return _get_correct_zoom_string(_zoom)
-
-    async def _get_microns_per_pixel(self, coord: int) -> float:
-        """Extracts the microns per x pixel and y pixel for a given zoom level."""
-        _zoom = await self._read_current_zoom()
-        value = self.parameters[_zoom].microns_per_pixel[coord]
-        size = await self.sizes[coord].get_value()
-        return value * DEFAULT_OAV_WINDOW[coord] / size
-
-    async def _get_beam_position(self, coord: int) -> int:
-        """Extracts the beam location in pixels `xCentre` `yCentre`, for a requested \
-        zoom level. """
-        _zoom = await self._read_current_zoom()
-        value = self.parameters[_zoom].crosshair[coord]
-        size = await self.sizes[coord].get_value()
-        return int(value * size / DEFAULT_OAV_WINDOW[coord])
-
-    async def connect(
-        self,
-        mock: bool | LazyMock = False,
-        timeout: float = DEFAULT_TIMEOUT,
-        force_reconnect: bool = False,
-    ):
-        self.parameters = self.oav_config.get_parameters()
-
-        return await super().connect(mock, timeout, force_reconnect)
+    def _get_zoom_level(self, zoom_level: str) -> str:
+        return _get_correct_zoom_string(zoom_level)

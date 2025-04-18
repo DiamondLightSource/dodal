@@ -40,6 +40,7 @@ mock_attributes_table = {
     "s04": mock_paths,
     "i19_1": mock_paths,
     "i24": mock_paths,
+    "aithre": mock_paths,
 }
 
 BANNED_PATHS = [Path("/dls"), Path("/dls_sw")]
