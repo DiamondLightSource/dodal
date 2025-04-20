@@ -2,6 +2,12 @@ from dodal.common.beamlines.beamline_utils import device_factory
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.devices.motors import SixAxisGonio
 from dodal.devices.oav.pin_image_recognition import PinTipDetection
+from dodal.devices.zebra.zebra import Zebra
+from dodal.devices.zebra.zebra_constants_mapping import (
+    ZebraMapping,
+    ZebraSources,
+    ZebraTTLOutputs,
+)
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name, get_hostname
 
@@ -10,6 +16,12 @@ set_log_beamline(BL)
 set_utils_beamline(BL)
 
 PREFIX = BeamlinePrefix(BL)
+
+I23_ZEBRA_MAPPING = ZebraMapping(
+    outputs=ZebraTTLOutputs(TTL_DETECTOR=1, TTL_SHUTTER=4),
+    sources=ZebraSources(),
+    AND_GATE_FOR_AUTO_SHUTTER=2,
+)
 
 
 def _is_i23_machine():
@@ -37,4 +49,24 @@ def gonio() -> SixAxisGonio:
 
     return SixAxisGonio(
         f"{PREFIX.beamline_prefix}-MO-GONIO-01:",
+    )
+
+
+@device_factory()
+def zebra() -> Zebra:
+    """Get the i23 zebra"""
+    return Zebra(
+        name="zebra",
+        prefix=f"{PREFIX.beamline_prefix}-EA-ZEBRA-01:ZEBRA:",
+        mapping=I23_ZEBRA_MAPPING,
+    )
+
+
+@device_factory()
+def zebra() -> Zebra:
+    """Get the i23 zebra"""
+    return Zebra(
+        name="zebra",
+        prefix=f"{PREFIX.beamline_prefix}-EA-ZEBRA-01:ZEBRA:",
+        mapping=I23_ZEBRA_MAPPING,
     )
