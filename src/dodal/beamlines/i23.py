@@ -1,5 +1,15 @@
-from dodal.common.beamlines.beamline_utils import device_factory
+from pathlib import Path
+
+from ophyd_async.epics.adpilatus import PilatusDetector
+
+from dodal.common.beamlines.beamline_utils import (
+    device_factory,
+    get_path_provider,
+    set_path_provider,
+)
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
+from dodal.common.beamlines.device_helpers import HDF5_SUFFIX
+from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitPathProvider
 from dodal.devices.motors import SixAxisGonio
 from dodal.devices.oav.pin_image_recognition import PinTipDetection
 from dodal.devices.zebra.zebra import Zebra
@@ -14,6 +24,14 @@ from dodal.utils import BeamlinePrefix, get_beamline_name, get_hostname
 BL = get_beamline_name("i23")
 set_log_beamline(BL)
 set_utils_beamline(BL)
+
+set_path_provider(
+    StaticVisitPathProvider(
+        BL,
+        Path("/tmp"),
+        client=LocalDirectoryServiceClient(),
+    )
+)
 
 PREFIX = BeamlinePrefix(BL)
 
@@ -63,10 +81,11 @@ def zebra() -> Zebra:
 
 
 @device_factory()
-def zebra() -> Zebra:
-    """Get the i23 zebra"""
-    return Zebra(
-        name="zebra",
-        prefix=f"{PREFIX.beamline_prefix}-EA-ZEBRA-01:ZEBRA:",
-        mapping=I23_ZEBRA_MAPPING,
+def pilatus() -> PilatusDetector:
+    """Get the i23 pilatus"""
+    return PilatusDetector(
+        prefix=f"{PREFIX.beamline_prefix}-EA-PILAT-01:",
+        path_provider=get_path_provider(),
+        drv_suffix="cam1:",
+        fileio_suffix=HDF5_SUFFIX,
     )
