@@ -18,8 +18,8 @@ params = DetectorParams(
     omega_start=0,
     omega_increment=0.2,
     num_images_per_trigger=1,
-    num_triggers=50,
-    use_roi_mode=True,
+    num_triggers=5,
+    use_roi_mode=False,
     det_dist_to_beam_converter_path="/dls_sw/i03/software/daq_configuration/lookup/DetDistToBeamXYConverter.txt",
 )
 
@@ -68,7 +68,7 @@ def set_cam_pvs(
         eiger.drv.detector.frame_time, detector_params.exposure_time_s, group=group
     )
     yield from bps.abs_set(eiger.drv.detector.nexpi, 1, group=group)
-    yield from bps.abs_set(eiger.drv.detector.trigger_mode, "ints", group=group)
+    # yield from bps.abs_set(eiger.drv.detector.trigger_mode, "ints", group=group)
     # Image mode not set...
 
     if wait:
