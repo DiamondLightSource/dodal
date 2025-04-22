@@ -183,8 +183,10 @@ def fastcs_eiger(mock: bool = False) -> FastEiger:
     If this is called when already instantiated in i03, it will return the existing object.
     """
 
-    file_name = StaticFilenameProvider("eiger_test_file")
-    path_provider = StaticPathProvider(file_name, Path("/scratch/qqh35939"))
+    file_name = StaticFilenameProvider("test_eiger_1")
+    path_provider = StaticPathProvider(
+        file_name, Path("/dls/i03/data/2025/cm40607-2/test_new_eiger/")
+    )
 
     return device_instantiation(
         device_factory=FastEiger,

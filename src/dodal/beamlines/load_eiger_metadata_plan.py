@@ -2,6 +2,7 @@ import time
 
 import bluesky.plan_stubs as bps
 from bluesky.run_engine import RunEngine
+from ophyd_async.core import DetectorTrigger
 from ophyd_async.fastcs.eiger import EigerDetector, EigerTriggerInfo
 
 from dodal.beamlines.i03 import fastcs_eiger
@@ -9,9 +10,9 @@ from dodal.devices.detector import DetectorParams
 from dodal.log import LOGGER, do_default_logging_setup
 
 params = DetectorParams(
-    expected_energy_ev=12700,
-    exposure_time_s=0.004,
-    directory="/dls/i03/data/2025/cm40607-2/test_new_eiger",
+    expected_energy_ev=12800,
+    exposure_time_s=0.01,
+    directory="/scratch/rye74444/test_eiger",
     prefix="",
     detector_distance=255,
     omega_start=0,
@@ -46,9 +47,11 @@ def load_metadata(
     trigger_info = EigerTriggerInfo(
         number_of_events=detector_params.num_triggers,
         energy_ev=detector_params.expected_energy_ev,
+        trigger=DetectorTrigger.INTERNAL,
+        deadtime=0.0001,
     )
 
-    yield from bps.prepare(eiger, trigger_info)
+    yield from bps.prepare(eiger, trigger_info, wait=True)
     LOGGER.info(f"Preparing Eiger: {time.time() - start}s")
 
 
@@ -65,7 +68,7 @@ def set_cam_pvs(
         eiger.drv.detector.frame_time, detector_params.exposure_time_s, group=group
     )
     yield from bps.abs_set(eiger.drv.detector.nexpi, 1, group=group)
-    yield from bps.abs_set(eiger.drv.detector.trigger_mode, "exts", group=group)
+    yield from bps.abs_set(eiger.drv.detector.trigger_mode, "ints", group=group)
     # Image mode not set...
 
     if wait:
