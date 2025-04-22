@@ -30,8 +30,7 @@ def load_metadata(
 ):
     start = time.time()
     assert detector_params.expected_energy_ev
-    yield from bps.abs_set(eiger.odin.file_writer.capture, 0)  # type: ignore
-    yield from bps.abs_set(eiger.odin.meta.stop_writing, 1)  # type: ignore
+    yield from bps.abs_set(eiger.odin.capture, 0)
     LOGGER.info(f"Stopping Odin: {time.time() - start}s")
     yield from set_cam_pvs(eiger, detector_params, wait=True)
     LOGGER.info(f"Setting CAM PVs: {time.time() - start}s")
@@ -39,7 +38,7 @@ def load_metadata(
     LOGGER.info(f"Setting Odin PVs: {time.time() - start}s")
     yield from change_roi_mode(eiger, enable, detector_params, wait=True)
     LOGGER.info(f"Changing ROI Mode: {time.time() - start}s")
-    yield from bps.abs_set(eiger.odin.file_writer.num_frames_chunks, 1)  # type: ignore
+    yield from bps.abs_set(eiger.odin.num_frames_chunks, 1)
     LOGGER.info(f"Setting # of Frame Chunks: {time.time() - start}s")
     yield from set_mx_settings_pvs(eiger, detector_params, wait=True)
     LOGGER.info(f"Setting MX PVs: {time.time() - start}s")
@@ -146,12 +145,12 @@ def set_odin_pvs(
     group="odin_pvs",
 ):
     yield from bps.abs_set(
-        eiger.odin.file_writer.file_path,  # type: ignore
+        eiger.odin.file_path,
         detector_params.directory,
         group=group,
     )
     yield from bps.abs_set(
-        eiger.odin.file_writer.file_name,  # type: ignore
+        eiger.odin.file_name,
         detector_params.full_filename,
         group=group,
     )
