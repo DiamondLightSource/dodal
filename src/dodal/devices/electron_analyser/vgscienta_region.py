@@ -32,7 +32,7 @@ class AcquisitionMode(str, Enum):
 class VGScientaRegion(AbstractBaseRegion):
     # Override defaults of base region class
     lens_mode: str = "Angular45"
-    pass_energy: str = "5"
+    pass_energy: int = 5
     acquisition_mode: str = AcquisitionMode.SWEPT
     low_energy: float = 8.0
     high_energy: float = 10.0
