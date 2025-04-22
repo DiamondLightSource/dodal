@@ -51,6 +51,10 @@ class I24Axes:
     VGON_YH = EncEnum.ENC4
 
 
+class I23Axes:
+    OMEGA = EncEnum.ENC1
+
+
 class RotationDirection(StrictEnum):
     """
     Defines for a swept angle whether the scan width (sweep) is to be added or subtracted from
