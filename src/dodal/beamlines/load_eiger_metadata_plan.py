@@ -12,7 +12,7 @@ from dodal.log import LOGGER, do_default_logging_setup
 params = DetectorParams(
     expected_energy_ev=12800,
     exposure_time_s=0.01,
-    directory="/scratch/rye74444/test_eiger",
+    directory="/dls/i03/data/2025/cm40607-2/test_new_eiger/",
     prefix="",
     detector_distance=255,
     omega_start=0,
@@ -68,8 +68,6 @@ def set_cam_pvs(
         eiger.drv.detector.frame_time, detector_params.exposure_time_s, group=group
     )
     yield from bps.abs_set(eiger.drv.detector.nexpi, 1, group=group)
-    # yield from bps.abs_set(eiger.drv.detector.trigger_mode, "ints", group=group)
-    # Image mode not set...
 
     if wait:
         yield from bps.wait(group)
