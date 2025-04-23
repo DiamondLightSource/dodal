@@ -1,3 +1,6 @@
+from ophyd_async.core import (
+    StandardReadableFormat,
+)
 from ophyd_async.epics.adandor import Andor2DriverIO
 from ophyd_async.epics.adcore import NDPluginBaseIO, SingleTriggerDetector
 from ophyd_async.epics.core import epics_signal_r
@@ -29,7 +32,7 @@ class Andor2Point(SingleTriggerDetector):
         plugins:: Optional[dict[str, NDPluginBaseIO] | None
             Dictionary containing plugin that are forward to the base class.
         """
-        with self.add_children_as_readables():
+        with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             for k, v in read_uncached.items():
                 setattr(self, k, epics_signal_r(float, prefix + v))
 
