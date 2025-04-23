@@ -8,6 +8,7 @@ from dodal.common.beamlines.beamline_utils import (
     set_beamline,
     set_path_provider,
 )
+from dodal.common.beamlines.device_helpers import CAM_SUFFIX, HDF5_SUFFIX
 from dodal.common.visit import (
     LocalDirectoryServiceClient,
     StaticVisitPathProvider,
@@ -61,13 +62,17 @@ def andor2_det() -> Andor2Detector:
     return Andor2Detector(
         prefix=f"{PREFIX.beamline_prefix}-EA-DET-03:",
         path_provider=get_path_provider(),
-        drv_suffix="CAM:",
-        fileio_suffix="HDF5:",
+        drv_suffix=CAM_SUFFIX,
+        fileio_suffix=HDF5_SUFFIX,
     )
 
 
 @device_factory()
 def andor2_point() -> Andor2Point:
-    """Using the andor2 as if it is a massive point detector, read the meanValue after
+    """Using the andor2 as if it is a massive point detector, read the meanValue and total after
     a picture is taken."""
-    return Andor2Point(prefix=PREFIX.beamline_prefix)
+    return Andor2Point(
+        prefix=f"{PREFIX.beamline_prefix}-EA-DET-03:",
+        drv_suffix=CAM_SUFFIX,
+        read_uncached={"mean": "STAT:MeanValue_RBV", "total": "STAT:Total_RBV"},
+    )
