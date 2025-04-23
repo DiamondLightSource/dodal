@@ -1,6 +1,3 @@
-from pathlib import Path
-
-from ophyd_async.core import StaticFilenameProvider, StaticPathProvider
 from ophyd_async.fastcs.eiger import EigerDetector as FastEiger
 from ophyd_async.fastcs.panda import HDFPanda
 
@@ -179,19 +176,14 @@ def eiger(mock: bool = False) -> EigerDetector:
 
 @device_factory(skip=BL == "s03")
 def fastcs_eiger(mock: bool = False) -> FastEiger:
-    """Get the i03 Eiger device, instantiate it if it hasn't already been.
+    """Get the i03 FastCS Eiger device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-
-    file_name = StaticFilenameProvider("test_eiger_2")
-    path_provider = StaticPathProvider(
-        file_name, Path("/dls/i03/data/2025/cm40607-2/test_new_eiger/")
-    )
 
     return device_instantiation(
         device_factory=FastEiger,
         name="fastcs_eiger",
-        path_provider=path_provider,
+        path_provider=get_path_provider(),
         prefix="",
         wait=False,
         fake=mock,
