@@ -1,14 +1,14 @@
 from ophyd_async.epics.core import epics_signal_rw
 
-from dodal.devices.electron_analyser.abstract_analyser_controller import (
-    AbstractAnalyserController,
+from dodal.devices.electron_analyser.abstract_analyser_io import (
+    AbstractAnalyserDriverIO,
 )
 from dodal.devices.electron_analyser.vgscienta_region import (
     DetectorMode,
 )
 
 
-class VGScientaAnalyserController(AbstractAnalyserController):
+class VGScientaAnalyserDriverIO(AbstractAnalyserDriverIO):
     def __init__(self, prefix: str, name: str = "") -> None:
         with self.add_children_as_readables():
             self.centre_energy = epics_signal_rw(float, prefix + "CENTRE_ENERGY")
@@ -20,3 +20,7 @@ class VGScientaAnalyserController(AbstractAnalyserController):
             self.image_mode = epics_signal_rw(str, prefix + "ImageMode")
 
         super().__init__(prefix, name)
+
+    @property
+    def pass_energy_type(self) -> type:
+        return str

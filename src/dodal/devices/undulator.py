@@ -2,7 +2,7 @@ import os
 
 import numpy as np
 from bluesky.protocols import Movable
-from numpy import argmin, ndarray
+from numpy import ndarray
 from ophyd_async.core import (
     AsyncStatus,
     StandardReadable,
@@ -38,12 +38,12 @@ class UndulatorGapAccess(StrictEnum):
     DISABLED = "DISABLED"
 
 
-def _get_closest_gap_for_energy(
+def _get_gap_for_energy(
     dcm_energy_ev: float, energy_to_distance_table: ndarray
 ) -> float:
-    table = energy_to_distance_table.transpose()
-    idx = argmin(np.abs(table[0] - dcm_energy_ev))
-    return table[1][idx]
+    return np.interp(
+        dcm_energy_ev, energy_to_distance_table[:, 0], energy_to_distance_table[:, 1]
+    )
 
 
 class Undulator(StandardReadable, Movable[float]):
@@ -115,8 +115,10 @@ class Undulator(StandardReadable, Movable[float]):
 
     async def _set_undulator_gap(self, energy_kev: float) -> None:
         await self.raise_if_not_enabled()
-        LOGGER.info(f"Setting undulator gap to {energy_kev:.2f} kev")
         target_gap = await self._get_gap_to_match_energy(energy_kev)
+        LOGGER.info(
+            f"Setting undulator gap to {target_gap:.3f}mm based on {energy_kev:.2f}kev"
+        )
 
         # Check if undulator gap is close enough to the value from the DCM
         current_gap = await self.current_gap.get_value()
@@ -152,7 +154,7 @@ class Undulator(StandardReadable, Movable[float]):
         )
 
         # Use the lookup table to get the undulator gap associated with this dcm energy
-        return _get_closest_gap_for_energy(
+        return _get_gap_for_energy(
             energy_kev * 1000,
             energy_to_distance_table,
         )

@@ -1,17 +1,17 @@
 from bluesky import plan_stubs as bps
 
-from dodal.devices.electron_analyser.abstract_analyser_controller import (
-    AbstractAnalyserController,
+from dodal.devices.electron_analyser.abstract_analyser_io import (
+    AbstractAnalyserDriverIO,
 )
 from dodal.devices.electron_analyser.abstract_region import (
     AbstractBaseRegion,
 )
-from dodal.devices.electron_analyser.specs_analyser_controller import (
-    SpecsAnalyserController,
+from dodal.devices.electron_analyser.specs_analyser_io import (
+    SpecsAnalyserDriverIO,
 )
 from dodal.devices.electron_analyser.specs_region import SpecsRegion
-from dodal.devices.electron_analyser.vgscienta_analyser_controller import (
-    VGScientaAnalyserController,
+from dodal.devices.electron_analyser.vgscienta_analyser_io import (
+    VGScientaAnalyserDriverIO,
 )
 from dodal.devices.electron_analyser.vgscienta_region import (
     VGScientaRegion,
@@ -20,13 +20,15 @@ from dodal.log import LOGGER
 
 
 def configure_analyser(
-    analyser: AbstractAnalyserController,
+    analyser: AbstractAnalyserDriverIO,
     region: AbstractBaseRegion,
     excitation_energy: float,
 ):
     LOGGER.info(f'Configuring analyser with region "{region.name}"')
     low_energy = region.to_kinetic_energy(region.low_energy, excitation_energy)
     high_energy = region.to_kinetic_energy(region.high_energy, excitation_energy)
+    pass_energy_type = analyser.pass_energy_type
+    pass_energy = pass_energy_type(region.pass_energy)
     # Set detector settings, wait for them all to have completed
     # fmt: off
     yield from bps.mv(
@@ -34,7 +36,7 @@ def configure_analyser(
         analyser.high_energy, high_energy,
         analyser.slices, region.slices,
         analyser.lens_mode, region.lens_mode,
-        analyser.pass_energy, region.pass_energy,
+        analyser.pass_energy, pass_energy,
         analyser.iterations, region.iterations,
         analyser.acquisition_mode, region.acquisition_mode,
     )
@@ -42,7 +44,7 @@ def configure_analyser(
 
 
 def configure_specs(
-    analyser: SpecsAnalyserController, region: SpecsRegion, excitation_energy: float
+    analyser: SpecsAnalyserDriverIO, region: SpecsRegion, excitation_energy: float
 ):
     yield from configure_analyser(analyser, region, excitation_energy)
     # fmt: off
@@ -59,7 +61,7 @@ def configure_specs(
 
 
 def configure_vgscienta(
-    analyser: VGScientaAnalyserController, region: VGScientaRegion, excitation_energy
+    analyser: VGScientaAnalyserDriverIO, region: VGScientaRegion, excitation_energy
 ):
     yield from configure_analyser(analyser, region, excitation_energy)
     centre_energy = region.to_kinetic_energy(region.fix_energy, excitation_energy)
