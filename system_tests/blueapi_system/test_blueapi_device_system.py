@@ -37,7 +37,7 @@ def blueapi_client() -> BlueapiClient:
 
 
 @pytest.fixture
-async def access_controlled_motors() -> AccessControlledOpticsMotors:
-    ac_motors = AccessControlledOpticsMotors(name="access_controlled_motors")
+async def motors_with_blueapi() -> AccessControlledOpticsMotors:
+    ac_motors = AccessControlledOpticsMotors(name="motors_with_blueapi")
     await ac_motors.connect()
     return ac_motors
