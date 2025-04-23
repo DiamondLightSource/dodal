@@ -29,8 +29,8 @@ class Andor2Point(SingleTriggerDetector):
         plugins:: Optional[dict[str, NDPluginBaseIO] | None
             Dictionary containing plugin that are forward to the base class.
         """
-        for k, v in read_uncached.items():
-            with self.add_children_as_readables():
+       with self.add_children_as_readables():
+            for k, v in read_uncached.items():
                 setattr(self, k, epics_signal_r(float, prefix + v))
 
         super().__init__(
