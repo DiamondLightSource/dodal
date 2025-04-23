@@ -8,11 +8,36 @@ HOWTO:
        tox -e system-test
 """
 
+import time
+
 import pytest
 from blueapi.client.client import BlueapiClient
 from blueapi.config import ApplicationConfig
+
+from .example_devices_and_plans import AccessControlledOpticsMotors
+
+
+@pytest.fixture(scope="module", autouse=True)
+def wait_for_server():
+    client = BlueapiClient.from_config(config=ApplicationConfig())
+
+    for _ in range(20):
+        try:
+            client.get_environment()
+            return
+        except ConnectionError:
+            ...
+        time.sleep(0.5)
+    raise TimeoutError("No connection to blueapi server")
 
 
 @pytest.fixture
 def blueapi_client() -> BlueapiClient:
     return BlueapiClient.from_config(config=ApplicationConfig())
+
+
+@pytest.fixture
+async def access_controlled_motors() -> AccessControlledOpticsMotors:
+    ac_motors = AccessControlledOpticsMotors(name="access_controlled_motors")
+    await ac_motors.connect()
+    return ac_motors

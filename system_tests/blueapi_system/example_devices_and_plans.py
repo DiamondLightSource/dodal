@@ -49,8 +49,10 @@ class FakeOpticsMotors(StandardReadable, Movable[MotorPosition]):
             await self.motor2.set(0.0)
 
 
-def optics_motors(name="optics_motors") -> FakeOpticsMotors:
-    return FakeOpticsMotors(name=name)
+async def optics_motors(name="optics_motors") -> FakeOpticsMotors:
+    motors = FakeOpticsMotors(name=name)
+    await motors.connect()
+    return motors
 
 
 MOTOR: FakeOpticsMotors = inject("optics_motors")
@@ -60,3 +62,8 @@ def move_motors(
     position: MotorPosition, motors: FakeOpticsMotors = MOTOR
 ) -> MsgGenerator:
     yield from bps.abs_set(motors, position, wait=True)
+
+
+# NOTE. Yeah, without access control I can't do a thing
+# Need one fixture for access allowed and one for access denied
+# And some way to decorate the plan? r maybe a different plan?
