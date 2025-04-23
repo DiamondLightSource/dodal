@@ -1,27 +1,11 @@
 import time
 
 import bluesky.plan_stubs as bps
-from bluesky.run_engine import RunEngine
 from ophyd_async.core import DetectorTrigger
 from ophyd_async.fastcs.eiger import EigerDetector, EigerTriggerInfo
 
-from dodal.beamlines.i03 import fastcs_eiger
 from dodal.devices.detector import DetectorParams
-from dodal.log import LOGGER, do_default_logging_setup
-
-params = DetectorParams(
-    expected_energy_ev=12800,
-    exposure_time_s=0.01,
-    directory="/dls/i03/data/2025/cm40607-2/test_new_eiger/",
-    prefix="",
-    detector_distance=255,
-    omega_start=0,
-    omega_increment=0.2,
-    num_images_per_trigger=1,
-    num_triggers=5,
-    use_roi_mode=False,
-    det_dist_to_beam_converter_path="/dls_sw/i03/software/daq_configuration/lookup/DetDistToBeamXYConverter.txt",
-)
+from dodal.log import LOGGER
 
 
 def load_metadata(
@@ -158,10 +142,3 @@ def set_odin_pvs(
 
     if wait:
         yield from bps.wait(group)
-
-
-if __name__ == "__main__":
-    RE = RunEngine()
-    do_default_logging_setup()
-    eiger = fastcs_eiger(connect_immediately=True)
-    RE(load_metadata(eiger=eiger, enable=True, detector_params=params))
