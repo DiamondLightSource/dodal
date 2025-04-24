@@ -18,6 +18,4 @@ def synchrotron() -> Synchrotron:
 
 @device_factory()
 def analyser_driver() -> SpecsAnalyserDriverIO:
-    return SpecsAnalyserDriverIO(
-        name="analyser_driver", prefix=f"{PREFIX.beamline_prefix}-EA-DET-01:CAM:"
-    )
+    return SpecsAnalyserDriverIO(prefix=f"{PREFIX.beamline_prefix}-EA-DET-01:CAM:")

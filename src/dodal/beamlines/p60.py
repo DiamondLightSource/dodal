@@ -12,6 +12,4 @@ set_utils_beamline(BL)
 
 @device_factory()
 def analyser_driver() -> VGScientaAnalyserDriverIO:
-    return VGScientaAnalyserDriverIO(
-        name="analyser_driver", prefix=f"{PREFIX.beamline_prefix}-EA-DET-01:CAM:"
-    )
+    return VGScientaAnalyserDriverIO(prefix=f"{PREFIX.beamline_prefix}-EA-DET-01:CAM:")
