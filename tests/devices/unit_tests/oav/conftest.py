@@ -5,6 +5,7 @@ from ophyd_async.core import init_devices
 from ophyd_async.testing import set_mock_value
 
 from dodal.devices.oav.oav_detector import OAV
+from dodal.devices.oav.oav_detector_base import OAVBase
 from dodal.devices.oav.oav_parameters import OAVConfig
 
 DISPLAY_CONFIGURATION = "tests/devices/unit_tests/test_display.configuration"
@@ -24,3 +25,13 @@ async def oav() -> OAV:
     set_mock_value(oav.grid_snapshot.y_size, 768)
     set_mock_value(oav.zoom_controller.level, "1.0x")
     return oav
+
+
+@pytest.fixture
+async def base_oav() -> OAVBase:
+    oav_config = OAVConfig(ZOOM_LEVELS_XML, DISPLAY_CONFIGURATION)
+    async with init_devices(mock=True, connect=True):
+        base_oav = OAVBase("", config=oav_config, name="fake_base_oav")
+    set_mock_value(base_oav.grid_snapshot.x_size, 1024)
+    set_mock_value(base_oav.grid_snapshot.y_size, 768)
+    return base_oav

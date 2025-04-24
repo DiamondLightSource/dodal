@@ -5,9 +5,9 @@ from ophyd_async.testing import set_mock_value
 
 from dodal.devices.oav.oav_detector import (
     OAV,
-    Cam,
     ZoomController,
 )
+from dodal.devices.oav.oav_detector_base import Cam
 
 
 async def test_zoom_controller():
