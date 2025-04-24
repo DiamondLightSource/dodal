@@ -198,7 +198,7 @@ async def test_sample_rate_scales_with_exposure_time(
             trigger=DetectorTrigger.EDGE_TRIGGER,
             deadtime=2e-5,
             livetime=exposure,
-            frame_timeout=None,
+            exposure_timeout=None,
         )
     )
     values_per_reading = await tetramm.drv.values_per_reading.get_value()
