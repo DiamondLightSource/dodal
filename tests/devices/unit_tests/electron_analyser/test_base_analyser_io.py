@@ -3,6 +3,13 @@ import pytest
 from bluesky.run_engine import RunEngine
 from ophyd_async.testing import get_mock_put, set_mock_value
 
+from dodal.devices.electron_analyser import (
+    SpecsAnalyserDriverIO,
+    SpecsSequence,
+    VGScientaAnalyserDriverIO,
+    VGScientaSequence,
+    to_kinetic_energy,
+)
 from dodal.devices.electron_analyser.abstract_analyser_io import (
     AbstractAnalyserDriverIO,
 )
@@ -10,16 +17,7 @@ from dodal.devices.electron_analyser.abstract_region import (
     AbstractBaseRegion,
     AbstractBaseSequence,
 )
-from dodal.devices.electron_analyser.specs_analyser_io import (
-    SpecsAnalyserDriverIO,
-)
-from dodal.devices.electron_analyser.specs_region import SpecsSequence
-from dodal.devices.electron_analyser.util import to_kinetic_energy
-from dodal.devices.electron_analyser.vgscienta_analyser_io import (
-    VGScientaAnalyserDriverIO,
-)
-from dodal.devices.electron_analyser.vgscienta_region import VGScientaSequence
-from dodal.plan_stubs.electron_analyser.configure_driver import configure_analyser
+from dodal.plan_stubs.electron_analyser import configure_analyser
 from tests.devices.unit_tests.electron_analyser.test_util import (
     TEST_SEQUENCE_REGION_NAMES,
     TEST_SPECS_SEQUENCE,

@@ -7,16 +7,14 @@ from ophyd_async.testing import (
     set_mock_value,
 )
 
-from dodal.devices.electron_analyser.abstract_analyser_io import EnergyMode
-from dodal.devices.electron_analyser.util import to_kinetic_energy
-from dodal.devices.electron_analyser.vgscienta_analyser_io import (
+from dodal.devices.electron_analyser import (
+    EnergyMode,
     VGScientaAnalyserDriverIO,
-)
-from dodal.devices.electron_analyser.vgscienta_region import (
     VGScientaRegion,
     VGScientaSequence,
+    to_kinetic_energy,
 )
-from dodal.plan_stubs.electron_analyser.configure_driver import configure_vgscienta
+from dodal.plan_stubs.electron_analyser import configure_vgscienta
 from tests.devices.unit_tests.electron_analyser.test_util import (
     TEST_SEQUENCE_REGION_NAMES,
     TEST_VGSCIENTA_SEQUENCE,

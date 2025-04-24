@@ -1,10 +1,6 @@
-from dodal.common.beamlines.beamline_utils import (
-    device_factory,
-)
+from dodal.common.beamlines.beamline_utils import device_factory
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.devices.electron_analyser.specs_analyser_io import (
-    SpecsAnalyserDriverIO,
-)
+from dodal.devices.electron_analyser import SpecsAnalyserDriverIO
 from dodal.devices.synchrotron import Synchrotron
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name

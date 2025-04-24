@@ -2,10 +2,8 @@ from typing import Any
 
 from ophyd_async.core import StandardReadable
 
-from dodal.devices.electron_analyser.abstract_region import (
-    AbstractBaseRegion,
-    EnergyMode,
-)
+from dodal.devices.electron_analyser import EnergyMode
+from dodal.devices.electron_analyser.abstract_region import AbstractBaseRegion
 
 TEST_VGSCIENTA_SEQUENCE = "vgscienta_sequence.seq"
 TEST_SPECS_SEQUENCE = "specs_sequence.seq"

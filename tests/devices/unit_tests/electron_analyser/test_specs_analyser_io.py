@@ -5,12 +5,13 @@ from ophyd_async.testing import (
     get_mock_put,
 )
 
-from dodal.devices.electron_analyser.abstract_analyser_io import EnergyMode
-from dodal.devices.electron_analyser.specs_analyser_io import (
+from dodal.devices.electron_analyser import (
+    EnergyMode,
     SpecsAnalyserDriverIO,
+    SpecsRegion,
+    SpecsSequence,
 )
-from dodal.devices.electron_analyser.specs_region import SpecsRegion, SpecsSequence
-from dodal.plan_stubs.electron_analyser.configure_driver import configure_specs
+from dodal.plan_stubs.electron_analyser import configure_specs
 from tests.devices.unit_tests.electron_analyser.test_util import (
     TEST_SEQUENCE_REGION_NAMES,
     TEST_SPECS_SEQUENCE,

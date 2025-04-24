@@ -2,10 +2,12 @@ from typing import Any
 
 import pytest
 
-from dodal.devices.electron_analyser.abstract_region import (
+from dodal.devices.electron_analyser import (
     EnergyMode,
-    TAbstractBaseRegion,
+    VGScientaRegion,
+    VGScientaSequence,
 )
+from dodal.devices.electron_analyser.abstract_region import TAbstractBaseRegion
 from dodal.devices.electron_analyser.vgscienta_region import (
     AcquisitionMode,
     DetectorMode,
