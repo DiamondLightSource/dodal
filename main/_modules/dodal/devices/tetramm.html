@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.tetramm &#8212; dodal 1.45.1.dev4+g7cf1ddee67 documentation</title>
+    <title>dodal.devices.tetramm &#8212; dodal 1.45.1.dev5+g5954f251ef documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=93c59f36"></script>
+    <script src="../../../_static/documentation_options.js?v=2e7565b7"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -725,10 +725,9 @@ window.addEventListener("load", () => mermaid.run());
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">controller</span><span class="p">,</span>
             <span class="n">ADHDFWriter</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">hdf</span><span class="p">,</span>
-                <span class="n">path_provider</span><span class="p">,</span>
-                <span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-                <span class="n">TetrammDatasetDescriber</span><span class="p">(</span><span class="n">controller</span><span class="p">),</span>
+                <span class="n">fileio</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hdf</span><span class="p">,</span>
+                <span class="n">path_provider</span><span class="o">=</span><span class="n">path_provider</span><span class="p">,</span>
+                <span class="n">dataset_describer</span><span class="o">=</span><span class="n">TetrammDatasetDescriber</span><span class="p">(</span><span class="n">controller</span><span class="p">),</span>
                 <span class="n">plugins</span><span class="o">=</span><span class="n">plugins</span><span class="p">,</span>
             <span class="p">),</span>
             <span class="n">config_signals</span><span class="p">,</span>
