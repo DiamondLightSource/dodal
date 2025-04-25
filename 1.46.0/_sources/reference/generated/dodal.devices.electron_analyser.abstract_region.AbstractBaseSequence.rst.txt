@@ -1,0 +1,74 @@
+dodal.devices.electron\_analyser.abstract\_region.AbstractBaseSequence
+======================================================================
+
+.. currentmodule:: dodal.devices.electron_analyser.abstract_region
+
+.. autoclass:: AbstractBaseSequence
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      ~AbstractBaseSequence.get_enabled_region_names
+      
+      
+      ~AbstractBaseSequence.get_enabled_regions
+      
+      
+      ~AbstractBaseSequence.get_region_by_name
+      
+      
+      ~AbstractBaseSequence.get_region_names
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      ~AbstractBaseSequence.model_config
+      
+      
+      
+      
+      
+      ~AbstractBaseSequence.version
+      
+      
+      ~AbstractBaseSequence.regions
+      
+   
+   

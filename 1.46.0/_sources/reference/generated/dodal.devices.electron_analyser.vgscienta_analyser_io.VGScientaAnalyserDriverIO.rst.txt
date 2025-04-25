@@ -1,0 +1,44 @@
+dodal.devices.electron\_analyser.vgscienta\_analyser\_io.VGScientaAnalyserDriverIO
+==================================================================================
+
+.. currentmodule:: dodal.devices.electron_analyser.vgscienta_analyser_io
+
+.. autoclass:: VGScientaAnalyserDriverIO
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      ~VGScientaAnalyserDriverIO.pass_energy_type
+      
+   
+   

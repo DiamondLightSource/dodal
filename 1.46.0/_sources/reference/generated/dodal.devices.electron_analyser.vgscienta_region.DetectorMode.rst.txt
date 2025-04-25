@@ -1,0 +1,78 @@
+dodal.devices.electron\_analyser.vgscienta\_region.DetectorMode
+===============================================================
+
+.. currentmodule:: dodal.devices.electron_analyser.vgscienta_region
+
+.. autoclass:: DetectorMode
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~DetectorMode.ADC
+      
+      
+      ~DetectorMode.PULSE_COUNTING
+      
+   
+   

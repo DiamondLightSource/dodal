@@ -1,0 +1,45 @@
+dodal.devices.robot
+===================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~robot.BartRobot
+   ~robot.ErrorStatus
+   ~robot.PinMounted
+   ~robot.SampleLocation
+
+
+
+
+.. automodule:: dodal.devices.robot
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Exceptions
+
+   .. autosummary::
+   
+      RobotLoadFailed
+   
+   
