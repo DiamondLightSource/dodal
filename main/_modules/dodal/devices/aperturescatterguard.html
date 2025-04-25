@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.aperturescatterguard &#8212; dodal 1.45.1.dev6+g5495b34080 documentation</title>
+    <title>dodal.devices.aperturescatterguard &#8212; dodal 1.46.1.dev1+g672e2db666 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=2e993eef"></script>
+    <script src="../../../_static/documentation_options.js?v=c658de6c"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -454,17 +454,18 @@ window.addEventListener("load", () => mermaid.run());
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">bluesky.protocols</span><span class="w"> </span><span class="kn">import</span> <span class="n">Movable</span><span class="p">,</span> <span class="n">Preparable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">bluesky.protocols</span><span class="w"> </span><span class="kn">import</span> <span class="n">Preparable</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">AsyncStatus</span><span class="p">,</span>
     <span class="n">StandardReadable</span><span class="p">,</span>
     <span class="n">StandardReadableFormat</span><span class="p">,</span>
     <span class="n">StrictEnum</span><span class="p">,</span>
+    <span class="n">derived_signal_r</span><span class="p">,</span>
+    <span class="n">derived_signal_rw</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">Field</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.common.beamlines.beamline_parameters</span><span class="w"> </span><span class="kn">import</span> <span class="n">GDABeamlineParameters</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.common.signal_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_r_hardware_backed_soft_signal</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.aperture</span><span class="w"> </span><span class="kn">import</span> <span class="n">Aperture</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.scatterguard</span><span class="w"> </span><span class="kn">import</span> <span class="n">Scatterguard</span>
 
@@ -586,21 +587,21 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="ApertureScatterguard">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.aperturescatterguard.ApertureScatterguard.html#dodal.devices.aperturescatterguard.ApertureScatterguard">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">ApertureScatterguard</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">,</span> <span class="n">Movable</span><span class="p">[</span><span class="n">ApertureValue</span><span class="p">],</span> <span class="n">Preparable</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ApertureScatterguard</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">,</span> <span class="n">Preparable</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Move the aperture and scatterguard assembly in a safe way. There are two ways to</span>
 <span class="sd">    interact with the device depending on if you want simplicity or move flexibility.</span>
 
 <span class="sd">    Examples:</span>
 <span class="sd">        The simple interface is using::</span>
 
-<span class="sd">            await aperture_scatterguard.set(ApertureValue.LARGE)</span>
+<span class="sd">            await aperture_scatterguard.selected_aperture.set(ApertureValue.LARGE)</span>
 
 <span class="sd">        This will move the assembly so that the large aperture is in the beam, regardless</span>
 <span class="sd">        of where the assembly currently is.</span>
 
 <span class="sd">        We may also want to move the assembly out of the beam with::</span>
 
-<span class="sd">            await aperture_scatterguard.set(ApertureValue.OUT_OF_BEAM)</span>
+<span class="sd">            await aperture_scatterguard.selected_aperture.set(ApertureValue.OUT_OF_BEAM)</span>
 
 <span class="sd">        Note, to make sure we do this as quickly as possible, the scatterguard will stay</span>
 <span class="sd">        in the same position relative to the aperture.</span>
@@ -612,7 +613,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <span class="sd">        Then, at a later time, move back into the beam::</span>
 
-<span class="sd">            await aperture_scatterguard.set(ApertureValue.LARGE)</span>
+<span class="sd">            await  aperture_scatterguard.selected_aperture.set(ApertureValue.LARGE)</span>
 
 <span class="sd">        Given the prepare has been done this move will now be faster as only the y is</span>
 <span class="sd">        left to move.</span>
@@ -627,11 +628,24 @@ window.addEventListener("load", () => mermaid.run());
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">aperture</span> <span class="o">=</span> <span class="n">Aperture</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;-MO-MAPT-01:&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">scatterguard</span> <span class="o">=</span> <span class="n">Scatterguard</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;-MO-SCAT-01:&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">radius</span> <span class="o">=</span> <span class="n">create_r_hardware_backed_soft_signal</span><span class="p">(</span>
-            <span class="nb">float</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_current_radius</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s2">&quot;µm&quot;</span>
-        <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_loaded_positions</span> <span class="o">=</span> <span class="n">loaded_positions</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_tolerances</span> <span class="o">=</span> <span class="n">tolerances</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">(</span><span class="n">StandardReadableFormat</span><span class="o">.</span><span class="n">HINTED_SIGNAL</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">selected_aperture</span> <span class="o">=</span> <span class="n">derived_signal_rw</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_get_current_aperture_position</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_set_current_aperture_position</span><span class="p">,</span>
+                <span class="n">large</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">aperture</span><span class="o">.</span><span class="n">large</span><span class="p">,</span>
+                <span class="n">medium</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">aperture</span><span class="o">.</span><span class="n">medium</span><span class="p">,</span>
+                <span class="n">small</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">aperture</span><span class="o">.</span><span class="n">small</span><span class="p">,</span>
+                <span class="n">current_ap_y</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">aperture</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">user_readback</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">radius</span> <span class="o">=</span> <span class="n">derived_signal_r</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_get_current_radius</span><span class="p">,</span>
+            <span class="n">current_aperture</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">selected_aperture</span><span class="p">,</span>
+            <span class="n">derived_units</span><span class="o">=</span><span class="s2">&quot;µm&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">add_readables</span><span class="p">(</span>
             <span class="p">[</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">aperture</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">user_readback</span><span class="p">,</span>
@@ -643,19 +657,9 @@ window.addEventListener("load", () => mermaid.run());
             <span class="p">],</span>
         <span class="p">)</span>
 
-        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">(</span><span class="n">StandardReadableFormat</span><span class="o">.</span><span class="n">HINTED_SIGNAL</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">selected_aperture</span> <span class="o">=</span> <span class="n">create_r_hardware_backed_soft_signal</span><span class="p">(</span>
-                <span class="n">ApertureValue</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_current_aperture_position</span>
-            <span class="p">)</span>
-
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
-<div class="viewcode-block" id="ApertureScatterguard.set">
-<a class="viewcode-back" href="../../../reference/generated/dodal.devices.aperturescatterguard.ApertureScatterguard.html#dodal.devices.aperturescatterguard.ApertureScatterguard.set">[docs]</a>
-    <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">ApertureValue</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;This set will move the aperture into the beam or move the whole assembly out&quot;&quot;&quot;</span>
-
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_set_current_aperture_position</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">ApertureValue</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">position</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loaded_positions</span><span class="p">[</span><span class="n">value</span><span class="p">]</span>
         <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_safe_to_move</span><span class="p">(</span><span class="n">position</span><span class="o">.</span><span class="n">aperture_z</span><span class="p">)</span>
 
@@ -663,8 +667,7 @@ window.addEventListener("load", () => mermaid.run());
             <span class="n">out_y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loaded_positions</span><span class="p">[</span><span class="n">ApertureValue</span><span class="o">.</span><span class="n">OUT_OF_BEAM</span><span class="p">]</span><span class="o">.</span><span class="n">aperture_y</span>
             <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">aperture</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">out_y</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_safe_move_whilst_in_beam</span><span class="p">(</span><span class="n">position</span><span class="p">)</span></div>
-
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_safe_move_whilst_in_beam</span><span class="p">(</span><span class="n">position</span><span class="p">)</span>
 
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_check_safe_to_move</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expected_z_position</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;The assembly is moved (in z) to be under the table when the beamline is not</span>
@@ -696,6 +699,27 @@ window.addEventListener("load", () => mermaid.run());
                     <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">axis</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> is still moving. Wait for it to finish before&quot;</span>
                     <span class="s2">&quot;triggering another move.&quot;</span>
                 <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_current_radius</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_aperture</span><span class="p">:</span> <span class="n">ApertureValue</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loaded_positions</span><span class="p">[</span><span class="n">current_aperture</span><span class="p">]</span><span class="o">.</span><span class="n">radius</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_is_out_of_beam</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_ap_y</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="n">out_ap_y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loaded_positions</span><span class="p">[</span><span class="n">ApertureValue</span><span class="o">.</span><span class="n">OUT_OF_BEAM</span><span class="p">]</span><span class="o">.</span><span class="n">aperture_y</span>
+        <span class="k">return</span> <span class="n">current_ap_y</span> <span class="o">&lt;=</span> <span class="n">out_ap_y</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tolerances</span><span class="o">.</span><span class="n">aperture_y</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_current_aperture_position</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">large</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">medium</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">small</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">current_ap_y</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ApertureValue</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">large</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">ApertureValue</span><span class="o">.</span><span class="n">LARGE</span>
+        <span class="k">elif</span> <span class="n">medium</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">ApertureValue</span><span class="o">.</span><span class="n">MEDIUM</span>
+        <span class="k">elif</span> <span class="n">small</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">ApertureValue</span><span class="o">.</span><span class="n">SMALL</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_out_of_beam</span><span class="p">(</span><span class="n">current_ap_y</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">ApertureValue</span><span class="o">.</span><span class="n">OUT_OF_BEAM</span>
+
+        <span class="k">raise</span> <span class="n">InvalidApertureMove</span><span class="p">(</span><span class="s2">&quot;Current aperture/scatterguard state unrecognised&quot;</span><span class="p">)</span>
 
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_safe_move_whilst_in_beam</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">position</span><span class="p">:</span> <span class="n">AperturePosition</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -748,33 +772,6 @@ window.addEventListener("load", () => mermaid.run());
             <span class="bp">self</span><span class="o">.</span><span class="n">scatterguard</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">scatterguard_y</span><span class="p">),</span>
         <span class="p">)</span>
 
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_is_out_of_beam</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-        <span class="n">current_ap_y</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">aperture</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">user_readback</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
-        <span class="n">out_ap_y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loaded_positions</span><span class="p">[</span><span class="n">ApertureValue</span><span class="o">.</span><span class="n">OUT_OF_BEAM</span><span class="p">]</span><span class="o">.</span><span class="n">aperture_y</span>
-        <span class="k">return</span> <span class="n">current_ap_y</span> <span class="o">&lt;=</span> <span class="n">out_ap_y</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tolerances</span><span class="o">.</span><span class="n">aperture_y</span>
-
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_get_current_aperture_position</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ApertureValue</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns the current aperture position using readback values</span>
-<span class="sd">        for SMALL, MEDIUM, LARGE. ROBOT_LOAD position defined when</span>
-<span class="sd">        mini aperture y &lt;= ROBOT_LOAD.location.aperture_y + tolerance.</span>
-<span class="sd">        If no position is found then raises InvalidApertureMove.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">aperture</span><span class="o">.</span><span class="n">large</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="n">cached</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">ApertureValue</span><span class="o">.</span><span class="n">LARGE</span>
-        <span class="k">elif</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">aperture</span><span class="o">.</span><span class="n">medium</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="n">cached</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">ApertureValue</span><span class="o">.</span><span class="n">MEDIUM</span>
-        <span class="k">elif</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">aperture</span><span class="o">.</span><span class="n">small</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="n">cached</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">ApertureValue</span><span class="o">.</span><span class="n">SMALL</span>
-        <span class="k">elif</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_out_of_beam</span><span class="p">():</span>
-            <span class="k">return</span> <span class="n">ApertureValue</span><span class="o">.</span><span class="n">OUT_OF_BEAM</span>
-
-        <span class="k">raise</span> <span class="n">InvalidApertureMove</span><span class="p">(</span><span class="s2">&quot;Current aperture/scatterguard state unrecognised&quot;</span><span class="p">)</span>
-
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_get_current_radius</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-        <span class="n">current_value</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_current_aperture_position</span><span class="p">()</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loaded_positions</span><span class="p">[</span><span class="n">current_value</span><span class="p">]</span><span class="o">.</span><span class="n">radius</span>
-
 <div class="viewcode-block" id="ApertureScatterguard.prepare">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.aperturescatterguard.ApertureScatterguard.html#dodal.devices.aperturescatterguard.ApertureScatterguard.prepare">[docs]</a>
     <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
@@ -785,7 +782,7 @@ window.addEventListener("load", () => mermaid.run());
 <span class="sd">        Moving the assembly whilst out of the beam has no collision risk so we can just</span>
 <span class="sd">        move all the motors together.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_out_of_beam</span><span class="p">():</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_out_of_beam</span><span class="p">(</span><span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">aperture</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">user_readback</span><span class="o">.</span><span class="n">get_value</span><span class="p">()):</span>
             <span class="n">aperture_x</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">aperture_z</span><span class="p">,</span> <span class="n">scatterguard_x</span><span class="p">,</span> <span class="n">scatterguard_y</span> <span class="o">=</span> <span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_loaded_positions</span><span class="p">[</span><span class="n">value</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
             <span class="p">)</span>
@@ -797,7 +794,7 @@ window.addEventListener("load", () => mermaid.run());
                 <span class="bp">self</span><span class="o">.</span><span class="n">scatterguard</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">scatterguard_y</span><span class="p">),</span>
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="p">)</span></div>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">selected_aperture</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="p">)</span></div>
 </div>
 
 </pre></div>

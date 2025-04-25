@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Device Standards &#8212; dodal 1.45.1.dev6+g5495b34080 documentation</title>
+    <title>Device Standards &#8212; dodal 1.46.1.dev1+g672e2db666 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=2e993eef"></script>
+    <script src="../_static/documentation_options.js?v=c658de6c"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -1007,10 +1007,9 @@ based on this and so this has the issues listed above. Instead you should make s
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">underlying_motor</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="s2">&quot;MOTOR&quot;</span><span class="p">)</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">in_out</span> <span class="o">=</span> <span class="n">create_r_hardware_backed_soft_signal</span><span class="p">(</span><span class="n">InOut</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_in_out_from_hardware</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">in_out</span> <span class="o">=</span> <span class="n">derived_signal_r</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_in_out_from_hardware</span><span class="p">,</span> <span class="n">current_position</span><span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">underlying_motor</span><span class="p">)</span>
 
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_get_in_out_from_hardware</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">current_position</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">underlying_motor</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_in_out_from_hardware</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_position</span><span class="p">:</span><span class="nb">float</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">InOut</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">isclose</span><span class="p">(</span><span class="n">current_position</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">InOut</span><span class="o">.</span><span class="n">IN</span>
         <span class="k">elif</span> <span class="n">isclose</span><span class="p">(</span><span class="n">current_position</span><span class="p">,</span> <span class="mi">100</span><span class="p">):</span>
@@ -1027,7 +1026,7 @@ based on this and so this has the issues listed above. Instead you should make s
             <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">underlying_motor</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>This will be simplified by <a class="github reference external" href="https://github.com/bluesky/ophyd-async/issues/525">bluesky/ophyd-async#525</a></p>
+<p>For detail on how to use derived signal see <a class="reference external" href="https://blueskyproject.io/ophyd-async/main/how-to/derive-one-signal-from-others.html">ophyd-async how to guide.</a></p>
 </section>
 </section>
 
