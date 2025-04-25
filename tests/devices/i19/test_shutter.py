@@ -1,76 +1,195 @@
-from unittest.mock import call, patch
+import json
+from unittest.mock import ANY, AsyncMock, MagicMock, patch
 
 import pytest
+from aiohttp.client import ClientConnectionError
 from bluesky.run_engine import RunEngine
-from ophyd_async.testing import callback_on_mock_put, get_mock_put, set_mock_value
+from ophyd_async.testing import set_mock_value
 
 from dodal.devices.hutch_shutter import (
     ShutterDemand,
-    ShutterNotSafeToOperateError,
     ShutterState,
 )
+from dodal.devices.i19.blueapi_device import HEADERS, HutchState
 from dodal.devices.i19.shutter import (
-    HutchConditionalShutter,
-    HutchInvalidError,
-    HutchState,
+    AccessControlledShutter,
 )
 
 
-@pytest.fixture
-async def eh2_shutter(RE: RunEngine) -> HutchConditionalShutter:
-    shutter = HutchConditionalShutter("", HutchState.EH2, name="mock_shutter")
+async def make_test_shutter(hutch: HutchState) -> AccessControlledShutter:
+    shutter = AccessControlledShutter("", hutch, name="mock_shutter")
     await shutter.connect(mock=True)
 
-    def set_status(value: ShutterDemand, *args, **kwargs):
-        value_sta = ShutterState.OPEN if value == "Open" else ShutterState.CLOSED
-        set_mock_value(shutter.shutter.status, value_sta)
-
-    callback_on_mock_put(shutter.shutter.control, set_status)
-
+    shutter.url = "http://test-blueapi.url"
+    set_mock_value(shutter.shutter_status, ShutterState.CLOSED)
     return shutter
 
 
-async def test_shutter_raises_error_on_set_if_hutch_invalid(
-    eh2_shutter: HutchConditionalShutter,
+@pytest.fixture
+async def eh1_shutter(RE: RunEngine) -> AccessControlledShutter:
+    return await make_test_shutter(HutchState.EH1)
+
+
+@pytest.fixture
+async def eh2_shutter(RE: RunEngine) -> AccessControlledShutter:
+    return await make_test_shutter(HutchState.EH2)
+
+
+@pytest.mark.parametrize("hutch_name", [HutchState.EH1, HutchState.EH2])
+def shutter_can_be_created_without_raising_errors(hutch_name: HutchState):
+    test_shutter = AccessControlledShutter("", hutch_name, "test_shutter")
+    assert isinstance(test_shutter, AccessControlledShutter)
+
+
+async def test_read_on_eh1_shutter_device_returns_correct_status(
+    eh1_shutter: AccessControlledShutter,
 ):
-    set_mock_value(eh2_shutter.hutch_state, "INVALID")
+    reading = await eh1_shutter.read()
+    assert reading == {
+        "mock_shutter-shutter_status": {
+            "alarm_severity": 0,
+            "timestamp": ANY,
+            "value": ShutterState.CLOSED,
+        }
+    }
 
-    with pytest.raises(HutchInvalidError):
-        await eh2_shutter.set(ShutterDemand.OPEN)
 
-
-@patch("dodal.devices.i19.shutter.LOGGER")
-async def test_shutter_does_not_operate_for_hutch_not_in_use_and_logs(
-    patch_log,
-    eh2_shutter: HutchConditionalShutter,
+async def test_read_on_eh2_shutter_device_returns_correct_status(
+    eh2_shutter: AccessControlledShutter,
 ):
-    set_mock_value(eh2_shutter.hutch_state, "EH1")
+    reading = await eh2_shutter.read()
+    assert reading == {
+        "mock_shutter-shutter_status": {
+            "alarm_severity": 0,
+            "timestamp": ANY,
+            "value": ShutterState.CLOSED,
+        }
+    }
 
-    await eh2_shutter.set(ShutterDemand.OPEN)
 
-    patch_log.warning.assert_called_once()
-
-
-async def test_shutter_raises_error_for_hutch_in_use_but_not_safe_to_operate(
-    eh2_shutter: HutchConditionalShutter,
+async def test_set_raises_error_if_post_not_successful(
+    eh2_shutter: AccessControlledShutter,
 ):
-    set_mock_value(eh2_shutter.hutch_state, "EH2")
-    set_mock_value(eh2_shutter.shutter.interlock.status, 1)
-    assert await eh2_shutter.shutter.interlock.shutter_safe_to_operate() is False
+    with pytest.raises(ClientConnectionError):
+        with patch("dodal.devices.i19.blueapi_device.ClientSession.post") as mock_post:
+            mock_post.return_value.__aenter__.return_value = (
+                mock_response := AsyncMock()
+            )
+            mock_response.ok = False
+            mock_response.json.return_value = {"task_id": "nope"}
 
-    with pytest.raises(ShutterNotSafeToOperateError):
-        await eh2_shutter.set(ShutterDemand.OPEN)
+            await eh2_shutter.set(ShutterDemand.OPEN)
 
 
-async def test_shutter_operates_correctly_for_hutch_in_use(
-    eh2_shutter: HutchConditionalShutter,
+@patch("dodal.devices.i19.blueapi_device.LOGGER")
+async def test_no_task_id_returned_from_post(
+    mock_logger: MagicMock, eh1_shutter: AccessControlledShutter
 ):
-    set_mock_value(eh2_shutter.hutch_state, "EH2")
-    set_mock_value(eh2_shutter.shutter.interlock.status, 0)
-    set_mock_value(eh2_shutter.shutter.status, ShutterState.OPEN)
+    with pytest.raises(KeyError):
+        with (
+            patch("dodal.devices.i19.blueapi_device.ClientSession.post") as mock_post,
+        ):
+            mock_post.return_value.__aenter__.return_value = (
+                mock_response := AsyncMock()
+            )
+            mock_response.ok = True
+            mock_response.json.return_value = {}
 
-    await eh2_shutter.set(ShutterDemand.CLOSE)
+            await eh1_shutter.set(ShutterDemand.CLOSE)
 
-    assert await eh2_shutter.shutter.status.get_value() == ShutterState.CLOSED
-    mock_shutter_control = get_mock_put(eh2_shutter.shutter.control)
-    mock_shutter_control.assert_has_calls([call(ShutterDemand.CLOSE, wait=True)])
+            mock_logger.error.assert_called_once()
+
+
+@pytest.mark.parametrize("shutter_demand", [ShutterDemand.OPEN, ShutterDemand.CLOSE])
+async def test_set_corrently_makes_rest_calls(
+    shutter_demand: ShutterDemand, eh2_shutter: AccessControlledShutter
+):
+    test_request = {
+        "name": "operate_shutter_plan",
+        "params": {
+            "experiment_hutch": "EH2",
+            "access_device": "access_control",
+            "shutter_demand": shutter_demand.value,
+        },
+    }
+    test_request_json = json.dumps(test_request)
+    with (
+        patch("dodal.devices.i19.blueapi_device.ClientSession.post") as mock_post,
+        patch("dodal.devices.i19.blueapi_device.ClientSession.put") as mock_put,
+        patch("dodal.devices.i19.blueapi_device.ClientSession.get") as mock_get,
+    ):
+        mock_post.return_value.__aenter__.return_value = (mock_response := AsyncMock())
+        mock_response.ok = True
+        mock_response.json.return_value = {"task_id": "1111"}
+        mock_put.return_value.__aenter__.return_value = (
+            mock_put_response := AsyncMock()
+        )
+        mock_put_response.ok = True
+        mock_get.return_value.__aenter__.return_value = (
+            mock_get_response := AsyncMock()
+        )
+        mock_get_response.json.return_value = {"is_complete": True, "errors": []}
+
+        await eh2_shutter.set(shutter_demand)
+
+        mock_post.assert_called_with("/tasks", data=test_request_json, headers=HEADERS)
+        mock_put.assert_called_with(
+            "/worker/task", data='{"task_id": "1111"}', headers=HEADERS
+        )
+
+
+@patch("dodal.devices.i19.blueapi_device.LOGGER")
+async def test_if_put_fails_log_error_and_return(
+    mock_logger: MagicMock, eh1_shutter: AccessControlledShutter
+):
+    with (
+        patch("dodal.devices.i19.blueapi_device.ClientSession.post") as mock_post,
+        patch("dodal.devices.i19.blueapi_device.ClientSession.put") as mock_put,
+    ):
+        mock_post.return_value.__aenter__.return_value = (mock_response := AsyncMock())
+        mock_response.ok = True
+        mock_response.json.return_value = {"task_id": "0101"}
+        mock_put.return_value.__aenter__.return_value = (
+            mock_put_response := AsyncMock()
+        )
+        mock_put_response.ok = False
+
+        await eh1_shutter.set(ShutterDemand.OPEN)
+
+        mock_logger.error.assert_called_once()
+
+
+@patch("dodal.devices.i19.blueapi_device.LOGGER")
+@patch("dodal.devices.i19.blueapi_device.asyncio.sleep")
+async def test_if_plan_fails_raise_error_with_message(
+    mock_sleep: MagicMock, mock_logger: MagicMock, eh2_shutter: AccessControlledShutter
+):
+    with pytest.raises(RuntimeError):
+        with (
+            patch("dodal.devices.i19.blueapi_device.ClientSession.post") as mock_post,
+            patch("dodal.devices.i19.blueapi_device.ClientSession.put") as mock_put,
+            patch("dodal.devices.i19.blueapi_device.ClientSession.get") as mock_get,
+        ):
+            mock_post.return_value.__aenter__.return_value = (
+                mock_response := AsyncMock()
+            )
+            mock_response.ok = True
+            mock_response.json.return_value = {"task_id": "0101"}
+            mock_put.return_value.__aenter__.return_value = (
+                mock_put_response := AsyncMock()
+            )
+            mock_put_response.ok = True
+            mock_get.return_value.__aenter__.return_value = (
+                mock_get_response := AsyncMock()
+            )
+            error_msg = "Oops, plan failed, couldn't close the shutter"
+            mock_get_response.json.return_value = {
+                "is_complete": False,
+                "errors": [error_msg],
+            }
+
+            await eh2_shutter.set(ShutterDemand.CLOSE)
+
+            mock_logger.error.assert_called_with(
+                f"Plan operate_shutter_plan failed: {error_msg}"
+            )
