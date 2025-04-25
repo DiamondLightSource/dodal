@@ -9,7 +9,7 @@ from dodal.devices.electron_analyser.abstract_region import (
 class SpecsRegion(AbstractBaseRegion):
     # Override base class with defaults
     lens_mode: str = "SmallArea"
-    pass_energy: str = "5.0"
+    pass_energy: int = 5
     acquisition_mode: str = "Fixed Transmission"
     low_energy: float = Field(default=800, alias="start_energy")
     high_energy: float = Field(default=850, alias="end_energy")
