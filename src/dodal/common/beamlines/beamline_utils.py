@@ -162,3 +162,8 @@ def set_path_provider(provider: PathProvider):
 
 def get_path_provider() -> PathProvider:
     return PATH_PROVIDER
+
+
+def clear_path_provider() -> None:
+    global PATH_PROVIDER
+    del PATH_PROVIDER
