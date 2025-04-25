@@ -7,7 +7,7 @@ There are instances when input-output operations are desired that do not work wi
 For example, many GDA-compatible features need disk IO as GDA relies heavily on XML files to define various variables.
 One may need a bluesky calibration plan to start with cached values - those could be in the filesystem or a key value store like Redis.
 
-At the moment direct IO inside plans is not allowed when inside the RunEngine context.
+Direct IO inside plans is not allowed when inside the RunEngine context.
 That means that all IO operations must happen through ophyd-async devices.
 
 ## Extant examples
