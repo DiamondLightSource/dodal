@@ -6,12 +6,12 @@ from ophyd_async.core import (
     Array1D,
     SignalR,
     StandardReadable,
+    derived_signal_r,
     soft_signal_rw,
 )
 from ophyd_async.epics.adcore import ADBaseIO
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
-from dodal.common.signal_utils import create_r_hardware_backed_soft_signal
 from dodal.devices.electron_analyser.abstract_region import EnergyMode
 from dodal.devices.electron_analyser.util import to_binding_energy
 
@@ -43,21 +43,29 @@ class AbstractAnalyserDriverIO(ABC, StandardReadable, ADBaseIO):
 
             # Read per scan
             self.energy_axis = self._get_energy_axis_signal(prefix)
-            self.binding_energy_axis = create_r_hardware_backed_soft_signal(
-                Array1D[np.float64], self._calculate_binding_energy_axis
+            self.binding_energy_axis = derived_signal_r(
+                self._calculate_binding_energy_axis,
+                "eV",
+                energy_axis=self.energy_axis,
+                excitation_energy=self.excitation_energy,
+                energy_mode=self.energy_mode,
             )
             self.angle_axis = self._get_angle_axis_signal(prefix)
             self.step_time = epics_signal_r(float, prefix + "AcquireTime")
             self.total_steps = epics_signal_r(int, prefix + "TOTAL_POINTS_RBV")
-            self.total_time = create_r_hardware_backed_soft_signal(
-                float, self._calculate_total_time
+            self.total_time = derived_signal_r(
+                self._calculate_total_time,
+                "s",
+                total_steps=self.total_steps,
+                step_time=self.step_time,
+                iterations=self.iterations,
             )
 
             # Read per point
             self.image = epics_signal_r(Array1D[np.float64], prefix + "IMAGE")
             self.spectrum = epics_signal_r(Array1D[np.float64], prefix + "INT_SPECTRUM")
-            self.total_intensity = create_r_hardware_backed_soft_signal(
-                float, self._calculate_total_intensity
+            self.total_intensity = derived_signal_r(
+                self._calculate_total_intensity, spectrum=self.spectrum
             )
 
         super().__init__(prefix=prefix, name=name)
@@ -74,30 +82,29 @@ class AbstractAnalyserDriverIO(ABC, StandardReadable, ADBaseIO):
         The signal that defines the energy axis. Depends on analyser model.
         """
 
-    async def _calculate_binding_energy_axis(self) -> Array1D[np.float64]:
-        energy_axis_values = await self.energy_axis.get_value()
-        excitation_energy_value = await self.excitation_energy.get_value()
-        is_binding = await self.energy_mode.get_value() == EnergyMode.BINDING
+    def _calculate_binding_energy_axis(
+        self,
+        energy_axis: Array1D[np.float64],
+        excitation_energy: float,
+        energy_mode: EnergyMode,
+    ) -> Array1D[np.float64]:
+        is_binding = energy_mode == EnergyMode.BINDING
         return np.array(
             [
-                to_binding_energy(
-                    i_energy_axis, EnergyMode.KINETIC, excitation_energy_value
-                )
+                to_binding_energy(i_energy_axis, EnergyMode.KINETIC, excitation_energy)
                 if is_binding
                 else i_energy_axis
-                for i_energy_axis in energy_axis_values
+                for i_energy_axis in energy_axis
             ]
         )
 
-    async def _calculate_total_intensity(self) -> float:
-        return np.sum(await self.spectrum.get_value())
+    def _calculate_total_time(
+        self, total_steps: int, step_time: float, iterations: int
+    ) -> float:
+        return total_steps * step_time * iterations
 
-    async def _calculate_total_time(self) -> float:
-        return (
-            await self.total_steps.get_value()
-            * await self.step_time.get_value()
-            * await self.iterations.get_value()
-        )
+    def _calculate_total_intensity(self, spectrum: Array1D[np.float64]) -> float:
+        return np.sum(spectrum)
 
     @property
     @abstractmethod
