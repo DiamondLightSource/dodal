@@ -10,6 +10,15 @@ from dodal.common.beamlines import beamline_parameters, beamline_utils
 from dodal.utils import collect_factories, make_all_devices
 
 
+@pytest.fixture(autouse=True)
+def i03_beamline_parameters():
+    with patch.dict(
+        "dodal.common.beamlines.beamline_parameters.BEAMLINE_PARAMETER_PATHS",
+        {"i03": "tests/test_data/test_beamline_parameters.txt"},
+    ) as params:
+        yield params
+
+
 @pytest.fixture(scope="function")
 def module_and_devices_for_beamline(request):
     beamline = request.param
