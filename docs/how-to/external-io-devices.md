@@ -20,6 +20,6 @@ That means that all IO operations must happen through ophyd-async devices.
 
 Those three devices have been mostly at the MX beamlines. To see a more up to date list, narrow down the search to the [beamlines folder](../../src/dodal/beamlines/) and search for a `dls` string. You will see `Path` calls that are about data writing, but also some ALL_CAPS constants such as `DISPLAY_CONFIG`.
 There are two cases, either the IO operation we're looking into is just on device start, or it's an ongoing thing. If it's just in the start as a config, the established pattern is to provide a Class for that object, and make a standlone function in the device file to load it from the filesystem, taking path as a parameter.
-Then inside the specific file in the beamlines folder, the device takes the product of calling the function  with a beamline-specific path. The fact the device just takes an object makes it easier to write mocks for testing.
+Then inside the specific file in the beamlines folder, the device takes the product of calling the function with a beamline-specific path. The fact the device just takes an object makes it easier to write mocks for testing.
 
 Conversely if the IO is ongoing throughout the lifetime of the device object, AsyncStatus logic must be implemented, as in the oav_to_redis_forwarder, mentioned earlier.
