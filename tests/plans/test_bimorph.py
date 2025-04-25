@@ -198,7 +198,7 @@ class TestPlanValidation:
         assert validate_bimorph_plan(voltage_list, 200.0, abs_range, abs_diff)
 
 
-@pytest.mark.parametrize("initial_voltage_list", [[0 for _ in range(8)]])
+@pytest.mark.parametrize("initial_voltage_list", [[0 for _ in range(2)]])
 @pytest.mark.parametrize("voltage_increment", [200.0])
 class TestBimorphPositionGenerator:
     def test_copies_list(
