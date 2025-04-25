@@ -150,10 +150,9 @@ based on this and so this has the issues listed above. Instead you should make s
         def __init__(self):
             self.underlying_motor = Motor("MOTOR")
             with self.add_children_as_readables():
-                self.in_out = create_r_hardware_backed_soft_signal(InOut, self._get_in_out_from_hardware)
+                self.in_out = derived_signal_r(self._get_in_out_from_hardware, current_position= self.underlying_motor)
                 
-        async def _get_in_out_from_hardware(self):
-            current_position = await self.underlying_motor.get_value()
+        def _get_in_out_from_hardware(self, current_position:float)->InOut:
             if isclose(current_position, 0):
                 return InOut.IN
             elif isclose(current_position, 100):
@@ -169,6 +168,6 @@ based on this and so this has the issues listed above. Instead you should make s
             else:
                 await self.underlying_motor.set(0)
 
-This will be simplified by https://github.com/bluesky/ophyd-async/issues/525
+For detail on how to use derived signal see `ophyd-async how to guide. <https://blueskyproject.io/ophyd-async/main/how-to/derive-one-signal-from-others.html>`__
 
 .. _flowchart: https://blueskyproject.io/ophyd-async/main/how-to/choose-interfaces-for-devices.html
