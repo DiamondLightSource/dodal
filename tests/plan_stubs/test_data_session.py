@@ -20,3 +20,15 @@ def test_attach_data_session_metadata_wrapper(caplog, RE: RunEngine):
         f"{path_provider} is not an UpdatingPathProvider, {attach_data_session_metadata_wrapper.__name__} will have no effect"
         in caplog.text
     )
+
+
+def test_attach_data_session_metadata_wrapper_with_no_provider_is_noop(
+    caplog, RE: RunEngine
+):
+    def fake_plan() -> MsgGenerator[None]:
+        yield from []
+
+    plan = attach_data_session_metadata_wrapper(plan=fake_plan())
+    RE(plan)
+
+    assert f"There is no PathProvider set, {attach_data_session_metadata_wrapper.__name__} will have no effect"
