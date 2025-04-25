@@ -120,6 +120,11 @@ class OAV(StandardReadable):
 
 
 class OAVBeamCentreFile(OAV):
+    """OAV device that reads its beam centre values from a file. The config parameter
+    must be a OAVConfigBeamCentre object, as this contains a filepath to where the beam
+    centre values are stored.
+    """
+
     def __init__(self, prefix: str, config: OAVConfigBeamCentre, name: str = ""):
         super().__init__(prefix, config, name)
 
@@ -133,6 +138,8 @@ class OAVBeamCentreFile(OAV):
 
 
 class OAVBeamCentrePV(OAV):
+    """OAV device that reads its beam centre values from PVs."""
+
     def __init__(
         self, prefix: str, config: OAVConfig, name: str = "", overlay_channel: int = 1
     ):
