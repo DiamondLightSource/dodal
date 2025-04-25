@@ -10,7 +10,10 @@ from dodal.common.beamlines.beamline_utils import (
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.beamlines.device_helpers import DET_SUFFIX, HDF5_SUFFIX
-from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitPathProvider
+from dodal.common.visit import (
+    LocalDirectoryServiceClient,
+    StaticVisitPathProvider,
+)
 from dodal.devices.training_rig.sample_stage import TrainingRigSampleStage
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
@@ -30,6 +33,7 @@ BL = get_beamline_name("p46")
 PREFIX = BeamlinePrefix(BL)
 set_log_beamline(BL)
 set_utils_beamline(BL)
+
 
 set_path_provider(
     StaticVisitPathProvider(

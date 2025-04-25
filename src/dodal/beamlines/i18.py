@@ -12,7 +12,7 @@ from dodal.common.visit import (
     LocalDirectoryServiceClient,
     StaticVisitPathProvider,
 )
-from dodal.devices.dcm import DCM
+from dodal.devices.common_dcm import BaseDCM, PitchAndRollCrystal, RollCrystal
 from dodal.devices.i18.diode import Diode
 from dodal.devices.i18.KBMirror import KBMirror
 from dodal.devices.i18.table import Table
@@ -54,12 +54,15 @@ def undulator() -> Undulator:
     return Undulator(f"{PREFIX.insertion_prefix}-MO-SERVC-01:")
 
 
-@device_factory()
-def dcm() -> DCM:
+# See https://github.com/DiamondLightSource/dodal/issues/1180
+@device_factory(skip=True)
+def dcm() -> BaseDCM[RollCrystal, PitchAndRollCrystal]:
     # once spacing is added Si111 d-spacing is 3.135 angsterm , and Si311 is 1.637
     # calculations are in gda/config/lookupTables/Si111/eV_Deg_converter.xml
-    return DCM(
+    return BaseDCM(
         prefix=f"{PREFIX.beamline_prefix}-MO-DCM-01:",
+        xtal_1=RollCrystal,
+        xtal_2=PitchAndRollCrystal,
     )
 
 

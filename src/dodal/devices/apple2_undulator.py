@@ -1,7 +1,7 @@
 import abc
 import asyncio
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Generic, TypeVar
 
 import numpy as np
 from bluesky.protocols import Movable
@@ -20,6 +20,8 @@ from pydantic import BaseModel, ConfigDict, RootModel
 
 from dodal.common.signal_utils import create_hardware_backed_soft_signal
 from dodal.log import LOGGER
+
+T = TypeVar("T")
 
 DEFAULT_MOTOR_MIN_TIMEOUT = 10
 
@@ -110,7 +112,7 @@ async def estimate_motor_timeout(
     return abs((target_pos - cur_pos) * 2.0 / vel) + DEFAULT_MOTOR_MIN_TIMEOUT
 
 
-class SafeUndulatorMover(StandardReadable, Movable):
+class SafeUndulatorMover(StandardReadable, Movable[T], Generic[T]):
     """A device that will check it's safe to move the undulator before moving it and
     wait for the undulator to be safe again before calling the move complete.
     """
@@ -126,7 +128,7 @@ class SafeUndulatorMover(StandardReadable, Movable):
         super().__init__(name)
 
     @AsyncStatus.wrap
-    async def set(self, value) -> None:
+    async def set(self, value: T) -> None:
         LOGGER.info(f"Setting {self.name} to {value}")
         await self.raise_if_cannot_move()
         await self._set_demand_positions(value)
@@ -136,7 +138,7 @@ class SafeUndulatorMover(StandardReadable, Movable):
         await wait_for_value(self.gate, UndulatorGateStatus.CLOSE, timeout=timeout)
 
     @abc.abstractmethod
-    async def _set_demand_positions(self, value) -> None:
+    async def _set_demand_positions(self, value: T) -> None:
         """Set the demand positions on the device without actually hitting move."""
 
     @abc.abstractmethod
@@ -150,7 +152,7 @@ class SafeUndulatorMover(StandardReadable, Movable):
             raise RuntimeError(f"{self.name} is already in motion.")
 
 
-class UndulatorGap(SafeUndulatorMover):
+class UndulatorGap(SafeUndulatorMover[float]):
     """A device with a collection of epics signals to set Apple 2 undulator gap motion.
     Only PV used by beamline are added the full list is here:
     /dls_sw/work/R3.14.12.7/support/insertionDevice/db/IDGapVelocityControl.template
@@ -196,7 +198,7 @@ class UndulatorGap(SafeUndulatorMover):
             self.user_readback = epics_signal_r(float, prefix + "CURRGAPD")
         super().__init__(self.set_move, prefix, name)
 
-    async def _set_demand_positions(self, value) -> None:
+    async def _set_demand_positions(self, value: float) -> None:
         await self.user_setpoint.set(str(value))
 
     async def get_timeout(self) -> float:
@@ -244,7 +246,7 @@ class UndulatorPhaseMotor(StandardReadable):
         super().__init__(name=name)
 
 
-class UndulatorPhaseAxes(SafeUndulatorMover):
+class UndulatorPhaseAxes(SafeUndulatorMover[Apple2PhasesVal]):
     """
     A collection of 4 phase Motor to make up the full id phase motion. We are using the diamond pv convention.
     e.g. top_outer == Q1
@@ -304,7 +306,7 @@ class UndulatorPhaseAxes(SafeUndulatorMover):
         return np.max(timeouts) * 2.0
 
 
-class UndulatorJawPhase(SafeUndulatorMover):
+class UndulatorJawPhase(SafeUndulatorMover[float]):
     """
     A JawPhase movable, this is use for moving the jaw phase which is use to control the
     linear arbitrary polarisation but only on some of the beamline.

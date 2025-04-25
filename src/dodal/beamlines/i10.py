@@ -9,6 +9,7 @@ note:
 from dodal.common.beamlines.beamline_utils import device_factory
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.devices.current_amplifiers import CurrentAmpDet
+from dodal.devices.i10.diagnostics import I10Diagnostic, I10Diagnostic5ADet
 from dodal.devices.i10.i10_apple2 import (
     I10Id,
 )
@@ -22,10 +23,9 @@ from dodal.devices.i10.rasor.rasor_motors import (
     PinHole,
 )
 from dodal.devices.i10.rasor.rasor_scaler_cards import RasorScalerCard1
-from dodal.devices.i10.slits import I10PrimarySlits, I10Slits
+from dodal.devices.i10.slits import I10Slits, I10SlitsDrainCurrent
 from dodal.devices.motors import XYZPositioner
 from dodal.devices.pgm import PGM
-from dodal.devices.slits import MinimalSlits
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
@@ -80,6 +80,9 @@ def idu() -> I10Id:
     )
 
 
+"""Mirrors"""
+
+
 @device_factory()
 def first_mirror() -> PiezoMirror:
     return PiezoMirror(prefix=f"{PREFIX.beamline_prefix}-OP-COL-01:")
@@ -91,58 +94,39 @@ def switching_mirror() -> PiezoMirror:
 
 
 @device_factory()
-def slit_1() -> I10PrimarySlits:
-    return I10PrimarySlits(
-        prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-01:",
-    )
-
-
-@device_factory()
-def slit_2() -> I10Slits:
-    return I10Slits(
-        prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-02:",
-    )
-
-
-@device_factory()
-def slit_3() -> I10Slits:
-    return I10Slits(
-        prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-03:",
-    )
-
-
-"""Rasor devices"""
-
-
-@device_factory()
 def focusing_mirror() -> PiezoMirror:
     return PiezoMirror(prefix=f"{PREFIX.beamline_prefix}-OP-FOCS-01:")
 
 
+"""Optic slits"""
+
+
 @device_factory()
-def slit_4() -> MinimalSlits:
-    return MinimalSlits(
-        prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-04:",
-        x_gap="XSIZE",
-        y_gap="YSIZE",
+def slits() -> I10Slits:
+    return I10Slits(prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-")
+
+
+@device_factory()
+def slits_current() -> I10SlitsDrainCurrent:
+    return I10SlitsDrainCurrent(prefix=f"{PREFIX.beamline_prefix}-")
+
+
+"""Diagnostics"""
+
+
+@device_factory()
+def diagnostics() -> I10Diagnostic:
+    return I10Diagnostic(
+        prefix=f"{PREFIX.beamline_prefix}-DI-",
     )
 
 
 @device_factory()
-def slit_5() -> I10Slits:
-    return I10Slits(
-        prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-05:",
-    )
+def d5a_det() -> I10Diagnostic5ADet:
+    return I10Diagnostic5ADet(prefix=f"{PREFIX.beamline_prefix}-DI-")
 
 
-@device_factory()
-def slit_6() -> I10Slits:
-    return I10Slits(
-        prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-06:",
-    )
-
-
-"Rasor devices"
+"""Rasor devices"""
 
 
 @device_factory()

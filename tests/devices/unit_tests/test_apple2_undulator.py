@@ -86,7 +86,7 @@ async def test_in_motion_error(
 ):
     set_mock_value(mock_id_gap.gate, UndulatorGateStatus.OPEN)
     with pytest.raises(RuntimeError):
-        await mock_id_gap.set("2")
+        await mock_id_gap.set(2)
     set_mock_value(mock_phaseAxes.gate, UndulatorGateStatus.OPEN)
     setValue = Apple2PhasesVal("3", "2", "5", "7")
     with pytest.raises(RuntimeError):
@@ -128,14 +128,13 @@ async def test_given_gate_never_closes_then_setting_gaps_times_out(
     mock_id_gap.get_timeout = AsyncMock(return_value=0.002)
 
     with pytest.raises(asyncio.TimeoutError):
-        await mock_id_gap.set("2")
+        await mock_id_gap.set(2)
 
 
 async def test_gap_status_error(mock_id_gap: UndulatorGap, RE: RunEngine):
-    setValue = Apple2PhasesVal("3", "2", "5", "7")
     set_mock_value(mock_id_gap.fault, 1.0)
     with pytest.raises(RuntimeError):
-        await mock_id_gap.set(setValue)
+        await mock_id_gap.set(2)
 
 
 async def test_gap_success_scan(mock_id_gap: UndulatorGap, RE: RunEngine):

@@ -9,10 +9,13 @@ from pathlib import Path
 # module name. Add any new beamlines whose name differs from their module name to this
 # dictionary, which maps ${BEAMLINE} to dodal.beamlines.<MODULE NAME>
 _BEAMLINE_NAME_OVERRIDES = {
+    "b07-1": "b07_1",
+    "i09-1": "i09_1",
     "i13-1": "i13_1",
     "i20-1": "i20_1",
     "i19-1": "i19_1",
     "i19-2": "i19_2",
+    "i19-optics": "i19_optics",
     "s03": "i03",
     "p46": "training_rig",
     "p47": "training_rig",

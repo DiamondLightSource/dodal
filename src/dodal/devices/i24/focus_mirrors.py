@@ -1,7 +1,5 @@
-from ophyd_async.core import StandardReadable, StrictEnum
+from ophyd_async.core import StandardReadable, StrictEnum, derived_signal_r
 from ophyd_async.epics.core import epics_signal_rw
-
-from dodal.common.signal_utils import create_hardware_backed_soft_signal
 
 
 class HFocusMode(StrictEnum):
@@ -40,21 +38,19 @@ class FocusMirrorsMode(StandardReadable):
         self.vertical = epics_signal_rw(VFocusMode, prefix + "G0:TARGETAPPLY")
 
         with self.add_children_as_readables():
-            self.beam_size_x = create_hardware_backed_soft_signal(
-                int, self._get_beam_size_x, units="um"
+            self.beam_size_x = derived_signal_r(
+                self._get_beam_size_x, horizontal=self.horizontal, derived_units="um"
             )
-            self.beam_size_y = create_hardware_backed_soft_signal(
-                int, self._get_beam_size_y, units="um"
+            self.beam_size_y = derived_signal_r(
+                self._get_beam_size_y, vertical=self.vertical, derived_units="um"
             )
 
         super().__init__(name)
 
-    async def _get_beam_size_x(self) -> int:
-        h_mode = await self.horizontal.get_value()
-        beam_x = BEAM_SIZES[h_mode.removeprefix("HMFM")][0]
+    def _get_beam_size_x(self, horizontal: HFocusMode) -> int:
+        beam_x = BEAM_SIZES[horizontal.removeprefix("HMFM")][0]
         return beam_x
 
-    async def _get_beam_size_y(self) -> int:
-        v_mode = await self.vertical.get_value()
-        beam_y = BEAM_SIZES[v_mode.removeprefix("VMFM")][1]
+    def _get_beam_size_y(self, vertical: VFocusMode) -> int:
+        beam_y = BEAM_SIZES[vertical.removeprefix("VMFM")][1]
         return beam_y

@@ -184,7 +184,7 @@ class I10Apple2(Apple2):
         self._available_pol = list(self.lookup_tables["Gap"].keys())
 
 
-class EnergySetter(StandardReadable, Movable):
+class EnergySetter(StandardReadable, Movable[float]):
     """
     Compound device to set both ID and PGM energy at the same time.
 
@@ -222,7 +222,7 @@ class EnergySetter(StandardReadable, Movable):
         )
 
 
-class I10Apple2Pol(StandardReadable, Movable):
+class I10Apple2Pol(StandardReadable, Movable[Pol]):
     """
     Compound device to set polorisation of ID.
     """
@@ -250,7 +250,7 @@ class I10Apple2Pol(StandardReadable, Movable):
         )  # Move id to new polarisation
 
 
-class LinearArbitraryAngle(StandardReadable, Movable):
+class LinearArbitraryAngle(StandardReadable, Movable[SupportsFloat]):
     """
     Device to set polorisation angle of the ID. Linear Arbitrary Angle (laa)
      is the direction of the magnetic field which can be change by varying the jaw_phase
