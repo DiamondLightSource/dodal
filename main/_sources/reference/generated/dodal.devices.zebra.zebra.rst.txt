@@ -21,6 +21,7 @@ dodal.devices.zebra.zebra
    ~zebra.GateControl
    ~zebra.GateType
    ~zebra.I03Axes
+   ~zebra.I23Axes
    ~zebra.I24Axes
    ~zebra.LogicGateConfiguration
    ~zebra.LogicGateConfigurer
