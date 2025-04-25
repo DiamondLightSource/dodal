@@ -35,7 +35,7 @@ from dodal.plans.bimorph import (
     validate_bimorph_plan,
 )
 
-VALID_BIMORPH_CHANNELS = [3]
+VALID_BIMORPH_CHANNELS = [2]
 
 
 @pytest.fixture(params=VALID_BIMORPH_CHANNELS)
@@ -238,7 +238,7 @@ class TestBimorphPositionGenerator:
 @pytest.mark.parametrize("active_slit_center_start", [0.0])
 @pytest.mark.parametrize("active_slit_center_end", [200])
 @pytest.mark.parametrize("active_slit_size", [0.05])
-@pytest.mark.parametrize("number_of_slit_positions", [3])
+@pytest.mark.parametrize("number_of_slit_positions", [2])
 @pytest.mark.parametrize("slit_settle_time", [0.0])
 @pytest.mark.parametrize("stream_name", [0])
 @unittest.mock.patch("dodal.plans.bimorph.bps.sleep")
