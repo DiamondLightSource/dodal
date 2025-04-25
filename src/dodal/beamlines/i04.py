@@ -10,13 +10,13 @@ from dodal.devices.aperturescatterguard import (
 )
 from dodal.devices.attenuator.attenuator import BinaryFilterAttenuator
 from dodal.devices.backlight import Backlight
-from dodal.devices.dcm import DCM
 from dodal.devices.detector import DetectorParams
 from dodal.devices.detector.detector_motion import DetectorMotion
 from dodal.devices.diamond_filter import DiamondFilter, I04Filters
 from dodal.devices.eiger import EigerDetector
 from dodal.devices.fast_grid_scan import ZebraFastGridScan
 from dodal.devices.flux import Flux
+from dodal.devices.i03.dcm import DCM
 from dodal.devices.i04.transfocator import Transfocator
 from dodal.devices.ipin import IPin
 from dodal.devices.motors import XYZPositioner
@@ -46,7 +46,7 @@ ZOOM_PARAMS_FILE = (
 DISPLAY_CONFIG = "/dls_sw/i04/software/gda_versions/var/display.configuration"
 DAQ_CONFIGURATION_PATH = "/dls_sw/i04/software/daq_configuration"
 
-REDIS_HOST = os.environ.get("VALKEY_PROD_SVC_SERVICE_HOST", "test_redis")
+REDIS_HOST = "i04-valkey-murko.diamond.ac.uk"
 REDIS_PASSWORD = os.environ.get("VALKEY_PASSWORD", "test_redis_password")
 MURKO_REDIS_DB = 7
 

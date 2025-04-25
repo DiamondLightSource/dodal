@@ -12,7 +12,7 @@ from ophyd_async.core import (
 from pydantic import BaseModel, Field
 
 from dodal.common.beamlines.beamline_parameters import GDABeamlineParameters
-from dodal.common.signal_utils import create_hardware_backed_soft_signal
+from dodal.common.signal_utils import create_r_hardware_backed_soft_signal
 from dodal.devices.aperture import Aperture
 from dodal.devices.scatterguard import Scatterguard
 
@@ -123,7 +123,7 @@ def load_positions_from_beamline_parameters(
     }
 
 
-class ApertureScatterguard(StandardReadable, Movable, Preparable):
+class ApertureScatterguard(StandardReadable, Movable[ApertureValue], Preparable):
     """Move the aperture and scatterguard assembly in a safe way. There are two ways to
     interact with the device depending on if you want simplicity or move flexibility.
 
@@ -164,7 +164,7 @@ class ApertureScatterguard(StandardReadable, Movable, Preparable):
     ) -> None:
         self.aperture = Aperture(prefix + "-MO-MAPT-01:")
         self.scatterguard = Scatterguard(prefix + "-MO-SCAT-01:")
-        self.radius = create_hardware_backed_soft_signal(
+        self.radius = create_r_hardware_backed_soft_signal(
             float, self._get_current_radius, units="µm"
         )
         self._loaded_positions = loaded_positions
@@ -181,7 +181,7 @@ class ApertureScatterguard(StandardReadable, Movable, Preparable):
         )
 
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
-            self.selected_aperture = create_hardware_backed_soft_signal(
+            self.selected_aperture = create_r_hardware_backed_soft_signal(
                 ApertureValue, self._get_current_aperture_position
             )
 
