@@ -54,7 +54,7 @@ def _is_i23_machine():
 
 @device_factory(skip=lambda: not _is_i23_machine())
 def oav_pin_tip_detection() -> PinTipDetection:
-    """Get the i23 OAV pin-tip detection device"""
+    """Get the i23 OAV pin-tip detection device."""
 
     return PinTipDetection(
         f"{PREFIX.beamline_prefix}-DI-OAV-01:",
@@ -64,7 +64,7 @@ def oav_pin_tip_detection() -> PinTipDetection:
 
 @device_factory()
 def shutter() -> ZebraShutter:
-    """Get the i23 zebra controlled shutter"""
+    """Get the i23 zebra controlled shutter."""
     return ZebraShutter(f"{PREFIX.beamline_prefix}-EA-SHTR-01:", "shutter")
 
 
