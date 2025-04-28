@@ -347,9 +347,9 @@ class Apple2(StandardReadable, Movable):
 
     The `Apple2` class represents an Apple 2 insertion device (undulator) used in synchrotron beamlines.
     This device provides additional degrees of freedom compared to standard undulators, allowing independent
-    movement of magnet banks to produce X-rays with various polarizations and energies.
+    movement of magnet banks to produce X-rays with various polarisations and energies.
 
-    The class is designed to manage the undulator's gap, phase motors, and polarization settings, while
+    The class is designed to manage the undulator's gap, phase motors, and polarisation settings, while
     abstracting hardware interactions and providing a high-level interface for beamline operations.
 
 
@@ -365,43 +365,43 @@ class Apple2(StandardReadable, Movable):
     energy : SignalR
         A soft signal for the current energy readback.
     polarisation_setpoint : SignalR
-        A soft signal for the polarization setpoint.
+        A soft signal for the polarisation setpoint.
     polarisation : SignalRW
-        A hardware-backed signal for polarization readback and control.
+        A hardware-backed signal for polarisation readback and control.
     lookup_tables : dict
-        A dictionary storing lookup tables for gap and phase motor positions, used for energy and polarization conversion.
+        A dictionary storing lookup tables for gap and phase motor positions, used for energy and polarisation conversion.
     _available_pol : list
-        A list of available polarizations supported by the device.
+        A list of available polarisations supported by the device.
 
     Abstract Methods
     ----------------
     _set_energy(value: float) -> None
-        Abstract method to set motor positions for a given energy and polarization.
+        Abstract method to set motor positions for a given energy and polarisation.
     update_lookuptable() -> None
         Abstract method to load and validate lookup tables from external sources.
 
     Methods
     -------
     set_pol_setpoint(pol: Pol) -> None
-        Sets the polarization setpoint without moving hardware.
+        Sets the polarisation setpoint without moving hardware.
     _set_pol(value: Pol) -> None
-        Sets the polarization and adjusts motor positions based on the current energy.
+        Sets the polarisation and adjusts motor positions based on the current energy.
     _read_pol_setpoint(pol: Pol, ...) -> Pol
-        Reads the polarization from hardware and updates the setpoint.
+        Reads the polarisation from hardware and updates the setpoint.
     _set(value: Apple2Val, energy: float) -> None
         Moves the undulator to the specified motor positions and energy.
     _get_id_gap_phase(energy: float) -> tuple[float, float]
-        Converts energy and polarization to gap and phase motor positions.
+        Converts energy and polarisation to gap and phase motor positions.
     _get_poly(new_energy: float, lookup_table: dict) -> np.poly1d
         Retrieves the polynomial for a given energy from the lookup table.
     determine_phase_from_hardware(...) -> tuple[Pol, float]
-        Determines the polarization and phase value based on motor positions.
+        Determines the polarisation and phase value based on motor positions.
 
     Notes
     -----
     - This class requires beamline-specific implementations of the abstract methods.
     - The lookup tables must follow the `Lookuptable` format and be validated before use.
-    - The device supports multiple polarization modes, including linear horizontal (LH), linear vertical (LV),
+    - The device supports multiple polarisation modes, including linear horizontal (LH), linear vertical (LV),
       positive circular (PC), negative circular (NC), and linear arbitrary (LA).
 
     For more detail see
@@ -495,7 +495,7 @@ class Apple2(StandardReadable, Movable):
         gap: float,
     ) -> Pol:
         LOGGER.info(
-            f"Reading polarization setpoint from hardware: "
+            f"Reading polarisation setpoint from hardware: "
             f"top_outer={top_outer}, top_inner={top_inner}, "
             f"btm_inner={btm_inner}, btm_outer={btm_outer}, gap={gap}."
         )
@@ -505,7 +505,7 @@ class Apple2(StandardReadable, Movable):
                 top_outer, top_inner, btm_inner, btm_outer, gap
             )
             if pol != Pol.NONE:
-                LOGGER.info(f"Determined polarization: {pol}.")
+                LOGGER.info(f"Determined polarisation: {pol}.")
                 self.set_pol_setpoint(pol=pol)
         return pol
 
@@ -601,7 +601,7 @@ class Apple2(StandardReadable, Movable):
         gap: float,
     ) -> tuple[Pol, float]:
         """
-        Determine polarization and phase value using motor position patterns.
+        Determine polarisation and phase value using motor position patterns.
         However there is no way to return lh3 polarisation or higher harmonic setting.
         (May be for future one can use the inverse poly to work out the energy and try to match it with the current energy
         to workout the polarisation but during my test the inverse poly is too unstable for general use.)
@@ -615,7 +615,7 @@ class Apple2(StandardReadable, Movable):
             motor_position_equal(x, 0.0)
             for x in [top_outer, top_inner, btm_inner, btm_outer]
         ):
-            LOGGER.info("Determined polarization: LH (Linear Horizontal).")
+            LOGGER.info("Determined polarisation: LH (Linear Horizontal).")
             return Pol("lh"), 0.0
         if (
             motor_position_equal(top_outer, MAXIMUM_ROW_PHASE_MOTOR_POSITION)
@@ -623,7 +623,7 @@ class Apple2(StandardReadable, Movable):
             and motor_position_equal(btm_inner, MAXIMUM_ROW_PHASE_MOTOR_POSITION)
             and motor_position_equal(btm_outer, 0.0)
         ):
-            LOGGER.info("Determined polarization: LV (Linear Vertical).")
+            LOGGER.info("Determined polarisation: LV (Linear Vertical).")
             return Pol.LV, MAXIMUM_ROW_PHASE_MOTOR_POSITION
         if (
             motor_position_equal(top_outer, btm_inner)
@@ -631,7 +631,7 @@ class Apple2(StandardReadable, Movable):
             and motor_position_equal(top_inner, 0.0)
             and motor_position_equal(btm_outer, 0.0)
         ):
-            LOGGER.info("Determined polarization: PC (Positive Circular).")
+            LOGGER.info("Determined polarisation: PC (Positive Circular).")
             return Pol.PC, top_outer
         if (
             motor_position_equal(top_outer, btm_inner)
@@ -639,24 +639,24 @@ class Apple2(StandardReadable, Movable):
             and motor_position_equal(top_inner, 0.0)
             and motor_position_equal(btm_outer, 0.0)
         ):
-            LOGGER.info("Determined polarization: NC (Negative Circular).")
+            LOGGER.info("Determined polarisation: NC (Negative Circular).")
             return Pol.NC, top_outer
         if (
             motor_position_equal(top_outer, -btm_inner)
             and motor_position_equal(top_inner, 0.0)
             and motor_position_equal(btm_outer, 0.0)
         ):
-            LOGGER.info("Determined polarization: LA (Positive Linear Arbitrary).")
+            LOGGER.info("Determined polarisation: LA (Positive Linear Arbitrary).")
             return Pol.LA, top_outer
         if (
             motor_position_equal(top_inner, -btm_outer)
             and motor_position_equal(top_outer, 0.0)
             and motor_position_equal(btm_inner, 0.0)
         ):
-            LOGGER.info("Determined polarization: LA (Negative Linear Arbitrary).")
+            LOGGER.info("Determined polarisation: LA (Negative Linear Arbitrary).")
             return Pol.LA, top_inner
 
-        LOGGER.warning("Unable to determine polarization. Defaulting to NONE.")
+        LOGGER.warning("Unable to determine polarisation. Defaulting to NONE.")
         return Pol.NONE, 0.0
 
 

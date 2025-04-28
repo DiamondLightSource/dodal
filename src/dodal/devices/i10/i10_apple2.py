@@ -159,7 +159,7 @@ class I10Apple2(Apple2):
                     f"Polarisation cannot be determine from hardware for {self.name}"
                 )
 
-            self._polarisation_setpoint_set(pol)
+            self.set_pol_setpoint(pol)
         gap, phase = await self._get_id_gap_phase(value)
         phase3 = phase * (-1 if pol == Pol.LA else 1)
         id_set_val = Apple2Val(
@@ -335,19 +335,21 @@ class I10Id(Device):
         angle_threshold_deg=30.0,
         name: str = "",
     ) -> None:
-        """A compound device to make up the full I10 insertion device.
-         This is in effect a single I10Apple2 with three different set methods for
-         energy, polarisation and linear arbitrary angle. See
-         `UML </_images/i10_id_design.png>`__ for detail.
-        .. figure:: /explanations/umls/i10_id_design.png
+        """I10Id is a compound device that combines the I10-specific Apple2 undulator,
+        energy setter, and polarization control.
+        This class provides a high-level interface for controlling the undulator's
+        energy, polarization, and linear arbitrary angle.
+
         Attributes
         ----------
-            energy: EnergySetter
-                Devices that move both pgm and id energy at the same time.
-            pol: I10Apple2Pol
-                Devices that control the x-ray polarisation.
-            laa: LinearArbitraryAngle
-                Devices that allow alteration of the beam polarisation angle in LA mode.
+        id : I10Apple2
+            The I10-specific Apple2 undulator device.
+        energy_setter : EnergySetter
+            A device for synchronizing the undulator and monochromator energy.
+        pol : I10Apple2Pol
+            A device for controlling the polarization of the undulator.
+        linear_arbitrary_angle : LinearArbitraryAngle
+            A device for controlling the linear arbitrary polarization angle.
         """
         self.energy = EnergySetter(
             id=I10Apple2(
@@ -415,13 +417,13 @@ def convert_csv_to_lookup(
             "b",
         ]
     lookup_table = {}
-    polarizations = set()
+    polarisations = set()
 
     def process_row(row: dict) -> None:
         """Process a single row from the CSV file and update the lookup table."""
         mode_value = row[mode]
-        if mode_value not in polarizations:
-            polarizations.add(mode_value)
+        if mode_value not in polarisations:
+            polarisations.add(mode_value)
             lookup_table[mode_value] = {
                 "Energies": {},
                 "Limit": {

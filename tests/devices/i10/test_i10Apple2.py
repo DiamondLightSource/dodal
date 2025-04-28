@@ -283,7 +283,7 @@ async def test_EnergySetter_RE_scan(mock_id_pgm: EnergySetter, RE: RunEngine):
     def capture_emitted(name, doc):
         docs[name].append(doc)
 
-    mock_id_pgm.id._polarisation_setpoint_set(Pol("lh3"))
+    mock_id_pgm.id.set_pol_setpoint(Pol("lh3"))
     RE(scan([], mock_id_pgm, 1700, 1800, num=11), capture_emitted)
     assert_emitted(docs, start=1, descriptor=1, event=11, stop=1)
     # with energy offset
@@ -420,7 +420,7 @@ async def test_I10Apple2_pol_read_leave_lh3_unchange(
     btm_outer: float,
 ):
     mock_id_pol.id_ref()._energy_setpoint(energy)
-    mock_id_pol.id_ref()._polarisation_setpoint_set(Pol("lh3"))
+    mock_id_pol.id_ref().set_pol_setpoint(Pol("lh3"))
     set_mock_value(mock_id_pol.id_ref().phase.top_inner.user_readback, top_inner)
     set_mock_value(mock_id_pol.id_ref().phase.top_outer.user_readback, top_outer)
     set_mock_value(mock_id_pol.id_ref().phase.btm_inner.user_readback, btm_inner)
