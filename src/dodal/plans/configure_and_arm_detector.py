@@ -9,24 +9,11 @@ from dodal.beamlines.i03 import fastcs_eiger
 from dodal.devices.detector import DetectorParams
 from dodal.log import LOGGER, do_default_logging_setup
 
-TEST_PARAMS = DetectorParams(
-    expected_energy_ev=12800,
-    exposure_time_s=0.01,
-    directory="/dls/i03/data/2025/cm40607-2/test_new_eiger/",
-    prefix="",
-    detector_distance=255,
-    omega_start=0,
-    omega_increment=0.2,
-    num_images_per_trigger=1,
-    num_triggers=5,
-    use_roi_mode=False,
-    det_dist_to_beam_converter_path="/dls_sw/i03/software/daq_configuration/lookup/DetDistToBeamXYConverter.txt",
-)
-
 
 def configure_and_arm_detector(
     eiger: EigerDetector,
     detector_params: DetectorParams,
+    trigger_info: EigerTriggerInfo,
 ):
     start = time.time()
     assert detector_params.expected_energy_ev
@@ -42,14 +29,6 @@ def configure_and_arm_detector(
     LOGGER.info(f"Setting # of Frame Chunks: {time.time() - start}s")
     yield from set_mx_settings_pvs(eiger, detector_params, wait=True)
     LOGGER.info(f"Setting MX PVs: {time.time() - start}s")
-
-    trigger_info = EigerTriggerInfo(
-        number_of_events=detector_params.num_triggers,
-        energy_ev=detector_params.expected_energy_ev,
-        trigger=DetectorTrigger.INTERNAL,
-        deadtime=0.0001,
-    )
-
     yield from bps.prepare(eiger, trigger_info, wait=True)
     LOGGER.info(f"Preparing Eiger: {time.time() - start}s")
 
@@ -166,4 +145,28 @@ if __name__ == "__main__":
     RE = RunEngine()
     do_default_logging_setup()
     eiger = fastcs_eiger(connect_immediately=True)
-    RE(configure_and_arm_detector(eiger=eiger, detector_params=TEST_PARAMS))
+
+    RE(
+        configure_and_arm_detector(
+            eiger=eiger,
+            detector_params=DetectorParams(
+                expected_energy_ev=12800,
+                exposure_time_s=0.01,
+                directory="/dls/i03/data/2025/cm40607-2/test_new_eiger/",
+                prefix="",
+                detector_distance=255,
+                omega_start=0,
+                omega_increment=0.2,
+                num_images_per_trigger=1,
+                num_triggers=5,
+                use_roi_mode=False,
+                det_dist_to_beam_converter_path="/dls_sw/i03/software/daq_configuration/lookup/DetDistToBeamXYConverter.txt",
+            ),
+            trigger_info=EigerTriggerInfo(
+                number_of_events=5,
+                energy_ev=12800,
+                trigger=DetectorTrigger.INTERNAL,
+                deadtime=0.0001,
+            ),
+        )
+    )

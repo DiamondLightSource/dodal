@@ -1,5 +1,6 @@
 import importlib
 import os
+from pathlib import Path
 from unittest.mock import patch
 
 import pytest
@@ -7,6 +8,8 @@ import pytest
 from conftest import mock_attributes_table
 from dodal.beamlines import i03
 from dodal.common.beamlines import beamline_parameters, beamline_utils
+from dodal.devices.detector import DetectorParams
+from dodal.devices.detector.det_dim_constants import EIGER2_X_16M_SIZE
 from dodal.utils import collect_factories, make_all_devices
 
 
@@ -44,3 +47,22 @@ def clear_device_factory_caches_after_every_test(i03_device_factories):
     yield None
     for f in i03_device_factories:
         f.cache_clear()  # type: ignore
+
+
+@pytest.fixture
+def eiger_params(tmp_path: Path) -> DetectorParams:
+    return DetectorParams(
+        expected_energy_ev=100.0,
+        exposure_time_s=1.0,
+        directory=str(tmp_path),
+        prefix="test",
+        run_number=0,
+        detector_distance=1.0,
+        omega_start=0.0,
+        omega_increment=1.0,
+        num_images_per_trigger=1,
+        num_triggers=2000,
+        use_roi_mode=False,
+        det_dist_to_beam_converter_path="tests/devices/unit_tests/test_lookup_table.txt",
+        detector_size_constants=EIGER2_X_16M_SIZE.det_type_string,  # type: ignore
+    )
