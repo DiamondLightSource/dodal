@@ -132,11 +132,15 @@ class I10Apple2(Apple2):
 
     @AsyncStatus.wrap
     async def set(self, value: float) -> None:
+        await self._set_energy(value=value)
+
+    async def _set_energy(self, value: float) -> None:
         """
         Check polarisation state and use it together with the energy(value)
         to calculate the required gap and phases before setting it.
         """
-        pol = await self.polarisation_setpoint.get_value()
+        pol = await self.polarisation.get_value()
+        print(pol)
         if pol.value == Pol.NONE:
             LOGGER.warning("Polarisation not set attempting to read from hardware")
 
@@ -152,7 +156,7 @@ class I10Apple2(Apple2):
                 raise ValueError(
                     f"Polarisation cannot be determine from hardware for {self.name}"
                 )
-            self._polarisation_setpoint_set(pol)
+            self._polarisation_set(pol)
         gap, phase = await self._get_id_gap_phase(value)
         phase3 = phase * (-1 if pol == "la" else (1))
         id_set_val = Apple2Val(
@@ -251,11 +255,11 @@ class I10Apple2Pol(StandardReadable, Movable[Pol]):
     @AsyncStatus.wrap
     async def set(self, value: Pol) -> None:
         # Check before set
-        self.id_ref().set_pol(value)
+        await self.id_ref().polarisation_readback.set(value)
         LOGGER.info(f"Changing f{self.name} polarisation to {value}.")
-        await self.id_ref().set(
-            await self.id_ref().energy.get_value()
-        )  # Move id to new polarisation
+        # await self.id_ref().set(
+        #     await self.id_ref().energy.get_value()
+        # )  # Move id to new polarisation
 
 
 class LinearArbitraryAngle(StandardReadable, Movable[SupportsFloat]):

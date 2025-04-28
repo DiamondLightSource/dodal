@@ -12,7 +12,7 @@ from ophyd_async.core import (
     StandardReadable,
     StandardReadableFormat,
     StrictEnum,
-    derived_signal_r,
+    derived_signal_rw,
     soft_signal_r_and_setter,
     wait_for_value,
 )
@@ -387,27 +387,23 @@ class Apple2(StandardReadable, Movable):
             )
 
         # Store the polarisation for setpoint.
-        self.polarisation_setpoint, self._polarisation_setpoint_set = (
-            soft_signal_r_and_setter(Pol)
-        )
+        self.polarisation, self._polarisation_set = soft_signal_r_and_setter(Pol)
         # This store two lookup tables, Gap and Phase in the Lookuptable format
         self.lookup_tables: dict[str, dict[str | None, dict[str, dict[str, Any]]]] = {
             "Gap": {},
             "Phase": {},
         }
+        self.polarisation_readback = derived_signal_rw(
+            raw_to_derived=self._read_pol_setpoint,
+            set_derived=self._set_pol,
+            pol=self.polarisation,
+            top_outer=self.phase.top_outer.user_readback,
+            top_inner=self.phase.top_inner.user_readback,
+            btm_inner=self.phase.btm_inner.user_readback,
+            btm_outer=self.phase.btm_outer.user_readback,
+            gap=id_gap.user_readback,
+        )
 
-        with self.add_children_as_readables():
-            # Hardware backed readback for polarisation.
-            self.polarisation_readback = derived_signal_r(
-                raw_to_derived=self.read_pol_setpoint,
-                pol=self.polarisation_setpoint,
-                top_outer=self.phase.top_outer.user_readback,
-                top_inner=self.phase.top_inner.user_readback,
-                btm_inner=self.phase.btm_inner.user_readback,
-                btm_outer=self.phase.btm_outer.user_readback,
-                gap=id_gap.user_readback,
-            )
-        # List of available polarisation according to the lookup table.
         self._available_pol = []
         """
         Abstract method that run at start up to load lookup tables into  self.lookup_tables
@@ -415,8 +411,22 @@ class Apple2(StandardReadable, Movable):
         """
         self.update_lookuptable()
 
+    def set_pol(self, pol: Pol) -> None:
+        # This set the polarisation but does not actually move hardware.
+        self._polarisation_set(pol)
+
+    async def _set_pol(
+        self,
+        value: Pol,
+    ) -> None:
+        self.set_pol(value)
+        await self._set_energy(await self.energy.get_value())
+
+    @abc.abstractmethod
+    async def _set_energy(self, value: float) -> None: ...
+
     # Hardward backed polarisation function,
-    def read_pol_setpoint(
+    def _read_pol_setpoint(
         self,
         pol: Pol,
         top_outer: float,
@@ -425,7 +435,7 @@ class Apple2(StandardReadable, Movable):
         btm_outer: float,
         gap: float,
     ) -> Pol:
-        # pol = await self.polarisation_setpoint.get_value()
+        # pol = await self.polarisation.get_value()
         # LH3 is not hardware readable as it is the same as lh but it is needed for energy.
         if pol.value != Pol.LH3:
             pol, _ = self.determine_phase_from_hardware(
@@ -434,10 +444,6 @@ class Apple2(StandardReadable, Movable):
             if pol != Pol.NONE:
                 self.set_pol(pol=pol)
         return pol
-
-    def set_pol(self, pol: Pol) -> None:
-        # This set the polarisation but does not actually move hardware.
-        self._polarisation_setpoint_set(pol)
 
     async def _set(self, value: Apple2Val, energy: float) -> None:
         """
@@ -457,7 +463,7 @@ class Apple2(StandardReadable, Movable):
             await asyncio.gather(self.gap.get_timeout(), self.phase.get_timeout())
         )
         LOGGER.info(
-            f"Moving f{self.name} energy and polorisation to {energy}, {await self.polarisation_setpoint.get_value()}"
+            f"Moving f{self.name} energy and polorisation to {energy}, {await self.polarisation.get_value()}"
             + f"with motor position {value}, timeout = {timeout}"
         )
         await asyncio.gather(
@@ -488,7 +494,7 @@ class Apple2(StandardReadable, Movable):
         Get the correct polynomial for a given energy form lookuptable
         for any given polarisation.
         """
-        pol = await self.polarisation_setpoint.get_value()
+        pol = await self.polarisation.get_value()
         if (
             new_energy < lookup_table[pol]["Limit"]["Minimum"]
             or new_energy > lookup_table[pol]["Limit"]["Maximum"]
