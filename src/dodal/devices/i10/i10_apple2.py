@@ -158,7 +158,7 @@ class I10Apple2(Apple2):
 
             self._polarisation_setpoint_set(pol)
         gap, phase = await self._get_id_gap_phase(value)
-        phase3 = phase * (-1 if pol == "la" else (1))
+        phase3 = phase * (-1 if pol == Pol.LA else (1))
         id_set_val = Apple2Val(
             top_outer=f"{phase:.6f}",
             top_inner="0.0",
@@ -169,7 +169,7 @@ class I10Apple2(Apple2):
         pol = await self.polarisation_setpoint.get_value()
         LOGGER.info(f"Setting polarisation to {pol}, with {id_set_val}")
         await self._set(value=id_set_val, energy=value)
-        if pol != "la":
+        if pol != Pol.LA:
             await self.id_jaw_phase.set(0)
             await self.id_jaw_phase.set_move.set(1)
 
@@ -303,7 +303,7 @@ class LinearArbitraryAngle(StandardReadable, Movable[SupportsFloat]):
     async def set(self, value: SupportsFloat) -> None:
         value = float(value)
         pol = await self.id_ref().polarisation.get_value()
-        if pol != "la":
+        if pol != Pol.LA:
             raise RuntimeError(
                 f"Angle control is not available in polarisation {pol} with {self.id_ref().name}"
             )

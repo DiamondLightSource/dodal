@@ -395,6 +395,7 @@ class Apple2(StandardReadable, Movable):
             "Gap": {},
             "Phase": {},
         }
+        # Hardware backed read/write for polarisation.
         self.polarisation = derived_signal_rw(
             raw_to_derived=self._read_pol_setpoint,
             set_derived=self._set_pol,
@@ -421,15 +422,16 @@ class Apple2(StandardReadable, Movable):
         self,
         value: Pol,
     ) -> None:
+        # This change the pol setpoint and then change polariastion via set energy.
         self.set_pol_setpoint(value)
         await self._set_energy(await self.energy.get_value())
 
     @abc.abstractmethod
     async def _set_energy(self, value: float) -> None:
-        """This should the position of all the motors for a given energy"""
+        """This change the position of all the motors for a given energy and
+        polarisation_setpoint"""
         ...
 
-    # Hardward backed polarisation function,
     def _read_pol_setpoint(
         self,
         pol: Pol,
@@ -439,6 +441,7 @@ class Apple2(StandardReadable, Movable):
         btm_outer: float,
         gap: float,
     ) -> Pol:
+        """Hardward backed polarisation function used to polorisation readback."""
         # LH3 is not hardware readable as it is the same as lh but it is needed for energy.
         if pol != Pol.LH3:
             pol, _ = self.determine_phase_from_hardware(

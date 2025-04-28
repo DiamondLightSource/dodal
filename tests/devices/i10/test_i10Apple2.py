@@ -159,15 +159,15 @@ async def mock_linear_arbitrary_angle(
 @pytest.mark.parametrize(
     "pol, top_outer_phase,top_inner_phase,btm_inner_phase, btm_outer_phase",
     [
-        ("lh", 0, 0, 0, 0),
-        ("lv", 24.0, 0, 24.0, 0),
-        ("pc", 12, 0, 12, 0),
-        ("nc", -12, 0, -12, 0),
-        ("la", 12, 0, -12, 0),
-        ("la", 0, 12, 0, -12),
-        ("la", -11, 0, 11, 0),
-        ("None", 8, 12, 2, -12),
-        ("None", 11, 0, 10, 0),
+        (Pol.LH, 0, 0, 0, 0),
+        (Pol.LV, 24.0, 0, 24.0, 0),
+        (Pol.PC, 12, 0, 12, 0),
+        (Pol.NC, -12, 0, -12, 0),
+        (Pol.LA, 12, 0, -12, 0),
+        (Pol.LA, 0, 12, 0, -12),
+        (Pol.LA, -11, 0, 11, 0),
+        (Pol.NONE, 8, 12, 2, -12),
+        (Pol.NONE, 11, 0, 10, 0),
     ],
 )
 async def test_I10Apple2_determine_pol(
@@ -378,11 +378,11 @@ async def test_I10Apple2_pol_set(
 @pytest.mark.parametrize(
     "pol,energy, top_outer, top_inner, btm_inner,btm_outer",
     [
-        ("lh", 500, 0.0, 0.0, 0.0, 0.0),
-        ("lv", 600, 24.0, 0.0, 24.0, 0.0),
-        ("pc", 500, 15.5, 0.0, 15.5, 0.0),
-        ("nc", 500, -15.5, 0.0, -15.5, 0.0),
-        ("la", 1300, -16.4, 0.0, 16.4, 0.0),
+        (Pol.LH, 500, 0.0, 0.0, 0.0, 0.0),
+        (Pol.LV, 600, 24.0, 0.0, 24.0, 0.0),
+        (Pol.PC, 500, 15.5, 0.0, 15.5, 0.0),
+        (Pol.NC, 500, -15.5, 0.0, -15.5, 0.0),
+        (Pol.LA, 1300, -16.4, 0.0, 16.4, 0.0),
     ],
 )
 async def test_I10Apple2_pol_read_check_pol_from_hardware(
