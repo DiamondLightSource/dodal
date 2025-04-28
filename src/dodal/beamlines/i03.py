@@ -180,13 +180,11 @@ def fastcs_eiger(mock: bool = False) -> FastEiger:
     If this is called when already instantiated in i03, it will return the existing object.
     """
 
-    return device_instantiation(
-        device_factory=FastEiger,
-        name="fastcs_eiger",
+    return FastEiger(
+        prefix=PREFIX.beamline_prefix,
         path_provider=get_path_provider(),
-        prefix="",
-        wait=False,
-        fake=mock,
+        drv_suffix="-EA-EIGER-02:",
+        hdf_suffix="-EA-EIGER-01:OD:",
     )
 
 
