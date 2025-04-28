@@ -2,17 +2,18 @@ from __future__ import annotations
 
 import asyncio
 
-from bluesky.protocols import Movable, Preparable
+from bluesky.protocols import Preparable
 from ophyd_async.core import (
     AsyncStatus,
     StandardReadable,
     StandardReadableFormat,
     StrictEnum,
+    derived_signal_r,
+    derived_signal_rw,
 )
 from pydantic import BaseModel, Field
 
 from dodal.common.beamlines.beamline_parameters import GDABeamlineParameters
-from dodal.common.signal_utils import create_r_hardware_backed_soft_signal
 from dodal.devices.aperture import Aperture
 from dodal.devices.scatterguard import Scatterguard
 
@@ -123,21 +124,21 @@ def load_positions_from_beamline_parameters(
     }
 
 
-class ApertureScatterguard(StandardReadable, Movable[ApertureValue], Preparable):
+class ApertureScatterguard(StandardReadable, Preparable):
     """Move the aperture and scatterguard assembly in a safe way. There are two ways to
     interact with the device depending on if you want simplicity or move flexibility.
 
     Examples:
         The simple interface is using::
 
-            await aperture_scatterguard.set(ApertureValue.LARGE)
+            await aperture_scatterguard.selected_aperture.set(ApertureValue.LARGE)
 
         This will move the assembly so that the large aperture is in the beam, regardless
         of where the assembly currently is.
 
         We may also want to move the assembly out of the beam with::
 
-            await aperture_scatterguard.set(ApertureValue.OUT_OF_BEAM)
+            await aperture_scatterguard.selected_aperture.set(ApertureValue.OUT_OF_BEAM)
 
         Note, to make sure we do this as quickly as possible, the scatterguard will stay
         in the same position relative to the aperture.
@@ -149,7 +150,7 @@ class ApertureScatterguard(StandardReadable, Movable[ApertureValue], Preparable)
 
         Then, at a later time, move back into the beam::
 
-            await aperture_scatterguard.set(ApertureValue.LARGE)
+            await  aperture_scatterguard.selected_aperture.set(ApertureValue.LARGE)
 
         Given the prepare has been done this move will now be faster as only the y is
         left to move.
@@ -164,11 +165,24 @@ class ApertureScatterguard(StandardReadable, Movable[ApertureValue], Preparable)
     ) -> None:
         self.aperture = Aperture(prefix + "-MO-MAPT-01:")
         self.scatterguard = Scatterguard(prefix + "-MO-SCAT-01:")
-        self.radius = create_r_hardware_backed_soft_signal(
-            float, self._get_current_radius, units="µm"
-        )
         self._loaded_positions = loaded_positions
         self._tolerances = tolerances
+        with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
+            self.selected_aperture = derived_signal_rw(
+                self._get_current_aperture_position,
+                self._set_current_aperture_position,
+                large=self.aperture.large,
+                medium=self.aperture.medium,
+                small=self.aperture.small,
+                current_ap_y=self.aperture.y.user_readback,
+            )
+
+        self.radius = derived_signal_r(
+            self._get_current_radius,
+            current_aperture=self.selected_aperture,
+            derived_units="µm",
+        )
+
         self.add_readables(
             [
                 self.aperture.x.user_readback,
@@ -180,17 +194,9 @@ class ApertureScatterguard(StandardReadable, Movable[ApertureValue], Preparable)
             ],
         )
 
-        with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
-            self.selected_aperture = create_r_hardware_backed_soft_signal(
-                ApertureValue, self._get_current_aperture_position
-            )
-
         super().__init__(name)
 
-    @AsyncStatus.wrap
-    async def set(self, value: ApertureValue):
-        """This set will move the aperture into the beam or move the whole assembly out"""
-
+    async def _set_current_aperture_position(self, value: ApertureValue) -> None:
         position = self._loaded_positions[value]
         await self._check_safe_to_move(position.aperture_z)
 
@@ -230,6 +236,27 @@ class ApertureScatterguard(StandardReadable, Movable[ApertureValue], Preparable)
                     f"{axis.name} is still moving. Wait for it to finish before"
                     "triggering another move."
                 )
+
+    def _get_current_radius(self, current_aperture: ApertureValue) -> float:
+        return self._loaded_positions[current_aperture].radius
+
+    def _is_out_of_beam(self, current_ap_y: float) -> bool:
+        out_ap_y = self._loaded_positions[ApertureValue.OUT_OF_BEAM].aperture_y
+        return current_ap_y <= out_ap_y + self._tolerances.aperture_y
+
+    def _get_current_aperture_position(
+        self, large: float, medium: float, small: float, current_ap_y: float
+    ) -> ApertureValue:
+        if large == 1:
+            return ApertureValue.LARGE
+        elif medium == 1:
+            return ApertureValue.MEDIUM
+        elif small == 1:
+            return ApertureValue.SMALL
+        elif self._is_out_of_beam(current_ap_y):
+            return ApertureValue.OUT_OF_BEAM
+
+        raise InvalidApertureMove("Current aperture/scatterguard state unrecognised")
 
     async def _safe_move_whilst_in_beam(self, position: AperturePosition):
         """
@@ -282,33 +309,6 @@ class ApertureScatterguard(StandardReadable, Movable[ApertureValue], Preparable)
             self.scatterguard.y.set(scatterguard_y),
         )
 
-    async def _is_out_of_beam(self) -> bool:
-        current_ap_y = await self.aperture.y.user_readback.get_value()
-        out_ap_y = self._loaded_positions[ApertureValue.OUT_OF_BEAM].aperture_y
-        return current_ap_y <= out_ap_y + self._tolerances.aperture_y
-
-    async def _get_current_aperture_position(self) -> ApertureValue:
-        """
-        Returns the current aperture position using readback values
-        for SMALL, MEDIUM, LARGE. ROBOT_LOAD position defined when
-        mini aperture y <= ROBOT_LOAD.location.aperture_y + tolerance.
-        If no position is found then raises InvalidApertureMove.
-        """
-        if await self.aperture.large.get_value(cached=False) == 1:
-            return ApertureValue.LARGE
-        elif await self.aperture.medium.get_value(cached=False) == 1:
-            return ApertureValue.MEDIUM
-        elif await self.aperture.small.get_value(cached=False) == 1:
-            return ApertureValue.SMALL
-        elif await self._is_out_of_beam():
-            return ApertureValue.OUT_OF_BEAM
-
-        raise InvalidApertureMove("Current aperture/scatterguard state unrecognised")
-
-    async def _get_current_radius(self) -> float:
-        current_value = await self._get_current_aperture_position()
-        return self._loaded_positions[current_value].radius
-
     @AsyncStatus.wrap
     async def prepare(self, value: ApertureValue):
         """Moves the assembly to the position for the specified aperture, whilst keeping
@@ -317,7 +317,7 @@ class ApertureScatterguard(StandardReadable, Movable[ApertureValue], Preparable)
         Moving the assembly whilst out of the beam has no collision risk so we can just
         move all the motors together.
         """
-        if await self._is_out_of_beam():
+        if self._is_out_of_beam(await self.aperture.y.user_readback.get_value()):
             aperture_x, _, aperture_z, scatterguard_x, scatterguard_y = (
                 self._loaded_positions[value].values
             )
@@ -329,4 +329,4 @@ class ApertureScatterguard(StandardReadable, Movable[ApertureValue], Preparable)
                 self.scatterguard.y.set(scatterguard_y),
             )
         else:
-            await self.set(value)
+            await self.selected_aperture.set(value)
