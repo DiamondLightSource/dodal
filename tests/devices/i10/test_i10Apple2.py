@@ -267,13 +267,13 @@ async def test_fail_I10Apple2_set_id_not_ready(mock_id: I10Apple2):
     assert str(e.value) == mock_id.gap.name + " is already in motion."
 
 
-async def test_I10Apple2_RE_scan(mock_id: I10Apple2, RE: RunEngine):
+async def test_I10Apple2_RE_scan(mock_id_pgm: EnergySetter, RE: RunEngine):
     docs = defaultdict(list)
 
     def capture_emitted(name, doc):
         docs[name].append(doc)
 
-    RE(scan([], mock_id, 500, 600, num=11), capture_emitted)
+    RE(scan([], mock_id_pgm.id, 500, 600, num=11), capture_emitted)
     assert_emitted(docs, start=1, descriptor=1, event=11, stop=1)
 
 
@@ -430,9 +430,9 @@ async def test_I10Apple2_pol_read_leave_lh3_unchange(
 async def test_linear_arbitrary_pol_fail(
     mock_linear_arbitrary_angle: LinearArbitraryAngle,
 ):
-    set_mock_value(
-        mock_linear_arbitrary_angle.id_ref().polarisation_readback, (Pol("la"))
-    )
+    # set_mock_value(
+    #     mock_linear_arbitrary_angle.id_ref().polarisation_readback, (Pol("la"))
+    # )
     with pytest.raises(RuntimeError) as e:
         await mock_linear_arbitrary_angle.set(20)
     assert str(e.value) == (

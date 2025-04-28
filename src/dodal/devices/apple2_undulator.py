@@ -12,13 +12,13 @@ from ophyd_async.core import (
     StandardReadable,
     StandardReadableFormat,
     StrictEnum,
+    derived_signal_r,
     soft_signal_r_and_setter,
     wait_for_value,
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw, epics_signal_w
 from pydantic import BaseModel, ConfigDict, RootModel
 
-from dodal.common.signal_utils import create_hardware_backed_soft_signal
 from dodal.log import LOGGER
 
 T = TypeVar("T")
@@ -395,10 +395,17 @@ class Apple2(StandardReadable, Movable):
             "Gap": {},
             "Phase": {},
         }
+
         with self.add_children_as_readables():
             # Hardware backed readback for polarisation.
-            self.polarisation_readback = create_hardware_backed_soft_signal(
-                datatype=Pol, get_from_hardware_func=self.read_pol_setpoint
+            self.polarisation_readback = derived_signal_r(
+                raw_to_derived=self.read_pol_setpoint,
+                pol=self.polarisation_setpoint,
+                top_outer=self.phase.top_outer.user_readback,
+                top_inner=self.phase.top_inner.user_readback,
+                btm_inner=self.phase.btm_inner.user_readback,
+                btm_outer=self.phase.btm_outer.user_readback,
+                gap=id_gap.user_readback,
             )
         # List of available polarisation according to the lookup table.
         self._available_pol = []
@@ -409,11 +416,21 @@ class Apple2(StandardReadable, Movable):
         self.update_lookuptable()
 
     # Hardward backed polarisation function,
-    async def read_pol_setpoint(self):
-        pol = await self.polarisation_setpoint.get_value()
+    def read_pol_setpoint(
+        self,
+        pol: Pol,
+        top_outer: float,
+        top_inner: float,
+        btm_inner: float,
+        btm_outer: float,
+        gap: float,
+    ) -> Pol:
+        # pol = await self.polarisation_setpoint.get_value()
         # LH3 is not hardware readable as it is the same as lh but it is needed for energy.
-        if pol.value != "lh3":
-            pol, _ = await self.determine_phase_from_hardware()
+        if pol.value != Pol.LH3:
+            pol, _ = self.determine_phase_from_hardware(
+                top_outer, top_inner, btm_inner, btm_outer, gap
+            )
             if pol != Pol.NONE:
                 self.set_pol(pol=pol)
         return pol
@@ -505,18 +522,20 @@ class Apple2(StandardReadable, Movable):
 
         """
 
-    async def determine_phase_from_hardware(self) -> tuple[Pol, float]:
+    def determine_phase_from_hardware(
+        self,
+        top_outer: float,
+        top_inner: float,
+        btm_inner: float,
+        btm_outer: float,
+        gap: float,
+    ) -> tuple[Pol, float]:
         """
         Try to determine polarisation and phase value using row phase motor position pattern.
         However there is no way to return lh3 polarisation or higher harmonic setting.
         (May be for future one can use the inverse poly to work out the energy and try to match it with the current energy
         to workout the polarisation but during my test the inverse poly is too unstable for general use.)
         """
-        top_outer = await self.phase.top_outer.user_readback.get_value()
-        top_inner = await self.phase.top_inner.user_readback.get_value()
-        btm_inner = await self.phase.btm_inner.user_readback.get_value()
-        btm_outer = await self.phase.btm_outer.user_readback.get_value()
-        gap = await self.gap.user_readback.get_value()
         if gap > MAXIMUM_GAP_MOTOR_POSITION:
             raise RuntimeError(
                 f"{self.name} is not in use, close gap or set polarisation to use this ID"

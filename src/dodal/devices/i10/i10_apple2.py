@@ -139,7 +139,15 @@ class I10Apple2(Apple2):
         pol = await self.polarisation_setpoint.get_value()
         if pol.value == Pol.NONE:
             LOGGER.warning("Polarisation not set attempting to read from hardware")
-            pol, phase = await self.determine_phase_from_hardware()
+
+            motors = await asyncio.gather(
+                self.phase.top_outer.user_readback.get_value(),
+                self.phase.top_inner.user_readback.get_value(),
+                self.phase.btm_inner.user_readback.get_value(),
+                self.phase.btm_outer.user_readback.get_value(),
+                self.gap.user_readback.get_value(),
+            )
+            pol, phase = self.determine_phase_from_hardware(*motors)
             if pol.value == "None":
                 raise ValueError(
                     f"Polarisation cannot be determine from hardware for {self.name}"
