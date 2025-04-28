@@ -58,7 +58,10 @@ class I10Apple2(Apple2):
     """I10Apple2 is the i10 version of Apple2 ID, set and update_lookuptable function
     should be the only part that is I10 specific.
 
-    A pair of look up tables are needed to provide the conversion between motor position and energy.
+    A pair of look up tables are needed to provide the conversion betwApple 2 ID/undulator has 4 extra degrees of freedom compare to the standard Undulator,
+    each bank of magnet can move independently to each other,
+    which allow the production of different x-ray polarisation as well as energy.
+    This type of ID is use on I10, I21, I09, I17 and I06 for soft x-ray.een motor position and energy.
 
     Set is in energy(eV).
     """
@@ -158,7 +161,7 @@ class I10Apple2(Apple2):
 
             self._polarisation_setpoint_set(pol)
         gap, phase = await self._get_id_gap_phase(value)
-        phase3 = phase * (-1 if pol == Pol.LA else (1))
+        phase3 = phase * (-1 if pol == Pol.LA else 1)
         id_set_val = Apple2Val(
             top_outer=f"{phase:.6f}",
             top_inner="0.0",
@@ -167,11 +170,12 @@ class I10Apple2(Apple2):
             gap=f"{gap:.6f}",
         )
         pol = await self.polarisation_setpoint.get_value()
-        LOGGER.info(f"Setting polarisation to {pol}, with {id_set_val}")
+        LOGGER.info(f"Setting polarisation to {pol}, with values: {id_set_val}")
         await self._set(value=id_set_val, energy=value)
         if pol != Pol.LA:
             await self.id_jaw_phase.set(0)
             await self.id_jaw_phase.set_move.set(1)
+        LOGGER.info(f"Energy set to {value} eV successfully.")
 
     def update_lookuptable(self):
         """
@@ -376,27 +380,28 @@ def convert_csv_to_lookup(
     poly_deg: list | None = None,
 ) -> dict[str | None, dict[str, dict[str, dict[str, Any]]]]:
     """
-    Convert csv to a dictionary that can be read by Apple2 ID device.
+    Convert a CSV file to a dictionary compatible with the Apple2 lookup table format.
 
     Parameters
-    -----------
-    file: str
-        File path.
-    source: tuple[str, str]
-        Tuple(column name, source name)
-        e.g. ("Source", "idu").
-    mode: str = "Mode"
-        Column name for the available modes, "lv","lh","pc","nc" etc
-    min_energy: str = "MinEnergy":
-        Column name for min energy for the polynomial.
-    max_energy: str = "MaxEnergy",
-        Column name for max energy for the polynomial.
-    poly_deg: list | None = None,
-        Column names for the parameters for the polynomial, starting with the least significant.
+    ----------
+    file : str
+        Path to the CSV file.
+    source : tuple[str, str]
+        Tuple specifying the column name and source name (e.g., ("Source", "idu")).
+    mode : str, optional
+        Column name for the available modes (e.g., "lv", "lh", "pc", "nc"), by default "Mode".
+    min_energy : str, optional
+        Column name for the minimum energy, by default "MinEnergy".
+    max_energy : str, optional
+        Column name for the maximum energy, by default "MaxEnergy".
+    poly_deg : list, optional
+        Column names for polynomial coefficients, starting with the least significant term.
 
-    return
-    ------
-        return a dictionary that conform to Apple2 lookup table format: Lookuptable
+    Returns
+    -------
+    dict
+        A dictionary conforming to the Apple2 lookup table format.
+
     """
     if poly_deg is None:
         poly_deg = [
@@ -409,15 +414,15 @@ def convert_csv_to_lookup(
             "1st-order",
             "b",
         ]
-    look_up_table = {}
-    pol = []
+    lookup_table = {}
+    polarizations = set()
 
-    def data2dict(row) -> None:
-        # logic for the conversion for each row of data.
-        if row[mode] not in pol:
-            pol.append(row[mode])
-            look_up_table[row[mode]] = {}
-            look_up_table[row[mode]] = {
+    def process_row(row: dict) -> None:
+        """Process a single row from the CSV file and update the lookup table."""
+        mode_value = row[mode]
+        if mode_value not in polarizations:
+            polarizations.add(mode_value)
+            lookup_table[mode_value] = {
                 "Energies": {},
                 "Limit": {
                     "Minimum": float(row[min_energy]),
@@ -425,20 +430,22 @@ def convert_csv_to_lookup(
                 },
             }
 
-        # create polynomial object for energy to gap/phase
-        cof = [float(row[x]) for x in poly_deg]
-        poly = np.poly1d(cof)
+        # Create polynomial object for energy-to-gap/phase conversion
+        coefficients = [float(row[coef]) for coef in poly_deg]
+        polynomial = np.poly1d(coefficients)
 
-        look_up_table[row[mode]]["Energies"][row[min_energy]] = {
+        lookup_table[mode_value]["Energies"][row[min_energy]] = {
             "Low": float(row[min_energy]),
             "High": float(row[max_energy]),
-            "Poly": poly,
+            "Poly": polynomial,
         }
-        look_up_table[row[mode]]["Limit"]["Minimum"] = min(
-            look_up_table[row[mode]]["Limit"]["Minimum"], float(row[min_energy])
+
+        # Update energy limits
+        lookup_table[mode_value]["Limit"]["Minimum"] = min(
+            lookup_table[mode_value]["Limit"]["Minimum"], float(row[min_energy])
         )
-        look_up_table[row[mode]]["Limit"]["Maximum"] = max(
-            look_up_table[row[mode]]["Limit"]["Maximum"], float(row[max_energy])
+        lookup_table[mode_value]["Limit"]["Maximum"] = max(
+            lookup_table[mode_value]["Limit"]["Maximum"], float(row[max_energy])
         )
 
     with open(file, newline="") as csvfile:
@@ -446,7 +453,7 @@ def convert_csv_to_lookup(
         for row in reader:
             # If there are multiple source only convert requested.
             if row[source[0]] == source[1]:
-                data2dict(row=row)
-    if not look_up_table:
+                process_row(row=row)
+    if not lookup_table:
         raise RuntimeError(f"Unable to convert lookup table:/n/t{file}")
-    return look_up_table
+    return lookup_table
