@@ -315,30 +315,30 @@ async def test_EnergySetter_RE_scan(mock_id_pgm: EnergySetter, RE: RunEngine):
 @pytest.mark.parametrize(
     "pol,energy, expect_top_outer, expect_top_inner, expect_btm_inner,expect_btm_outer, expect_gap",
     [
-        ("lh", 500, 0.0, 0.0, 0.0, 0.0, 23.0),
-        ("lh", 700, 0.0, 0.0, 0.0, 0.0, 26.0),
-        ("lh", 1000, 0.0, 0.0, 0.0, 0.0, 32.0),
-        ("lh3", 1000, 0.0, 0.0, 0.0, 0.0, 18.0),
-        ("lh3", 1400, 0.0, 0.0, 0.0, 0.0, 22.0),
-        ("lh3", 1900, 0.0, 0.0, 0.0, 0.0, 25.0),
-        ("lv", 600, 24.0, 0.0, 24.0, 0.0, 17.0),
-        ("lv", 900, 24.0, 0.0, 24.0, 0.0, 21.0),
-        ("lv", 1200, 24.0, 0.0, 24.0, 0.0, 25.0),
-        ("pc", 500, 15.5, 0.0, 15.5, 0.0, 17.0),
-        ("pc", 700, 16, 0.0, 16, 0.0, 21.0),
-        ("pc", 1000, 16.5, 0.0, 16.5, 0.0, 25.0),
-        ("nc", 500, -15.5, 0.0, -15.5, 0.0, 17.0),
-        ("nc", 800, -16, 0.0, -16, 0.0, 22.0),
-        ("nc", 1000, -16.5, 0.0, -16.5, 0.0, 25.0),
-        ("la", 700, -15.2, 0.0, 15.2, 0.0, 16.5),
-        ("la", 900, -15.6, 0.0, 15.6, 0.0, 19.0),
-        ("la", 1300, -16.4, 0.0, 16.4, 0.0, 25.0),
+        (Pol.LH, 500, 0.0, 0.0, 0.0, 0.0, 23.0),
+        (Pol.LH, 700, 0.0, 0.0, 0.0, 0.0, 26.0),
+        (Pol.LH, 1000, 0.0, 0.0, 0.0, 0.0, 32.0),
+        (Pol.LH3, 1000, 0.0, 0.0, 0.0, 0.0, 18.0),
+        (Pol.LH3, 1400, 0.0, 0.0, 0.0, 0.0, 22.0),
+        (Pol.LH3, 1900, 0.0, 0.0, 0.0, 0.0, 25.0),
+        (Pol.LV, 600, 24.0, 0.0, 24.0, 0.0, 17.0),
+        (Pol.LV, 900, 24.0, 0.0, 24.0, 0.0, 21.0),
+        (Pol.LV, 1200, 24.0, 0.0, 24.0, 0.0, 25.0),
+        (Pol.PC, 500, 15.5, 0.0, 15.5, 0.0, 17.0),
+        (Pol.PC, 700, 16, 0.0, 16, 0.0, 21.0),
+        (Pol.PC, 1000, 16.5, 0.0, 16.5, 0.0, 25.0),
+        (Pol.NC, 500, -15.5, 0.0, -15.5, 0.0, 17.0),
+        (Pol.NC, 800, -16, 0.0, -16, 0.0, 22.0),
+        (Pol.NC, 1000, -16.5, 0.0, -16.5, 0.0, 25.0),
+        (Pol.LA, 700, -15.2, 0.0, 15.2, 0.0, 16.5),
+        (Pol.LA, 900, -15.6, 0.0, 15.6, 0.0, 19.0),
+        (Pol.LA, 1300, -16.4, 0.0, 16.4, 0.0, 25.0),
         ("dsf", 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
     ],
 )
 async def test_I10Apple2_pol_set(
     mock_id_pol: I10Apple2Pol,
-    pol: str,
+    pol: Pol,
     energy: float,
     expect_top_inner: float,
     expect_top_outer: float,
@@ -349,9 +349,9 @@ async def test_I10Apple2_pol_set(
     mock_id_pol.id_ref()._energy_set(energy)
     if pol == "dsf":
         with pytest.raises(ValueError):
-            await mock_id_pol.set(Pol(pol))
+            await mock_id_pol.set(pol)
     else:
-        await mock_id_pol.set(Pol(pol))
+        await mock_id_pol.set(pol)
         # assert await mock_id_pol.id_ref().polarisation_readback.get_value() == pol
         top_inner = get_mock_put(mock_id_pol.id_ref().phase.top_inner.user_setpoint)
         # top_inner.assert_called_once()
