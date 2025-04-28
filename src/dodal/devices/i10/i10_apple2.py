@@ -139,7 +139,7 @@ class I10Apple2(Apple2):
         Check polarisation state and use it together with the energy(value)
         to calculate the required gap and phases before setting it.
         """
-        pol = await self.polarisation.get_value()
+        pol = await self.polarisation_setpoint.get_value()
         if pol == Pol.NONE:
             LOGGER.warning("Polarisation not set attempting to read from hardware")
 
@@ -155,7 +155,8 @@ class I10Apple2(Apple2):
                 raise ValueError(
                     f"Polarisation cannot be determine from hardware for {self.name}"
                 )
-            self._polarisation_set(pol)
+
+            self._polarisation_setpoint_set(pol)
         gap, phase = await self._get_id_gap_phase(value)
         phase3 = phase * (-1 if pol == "la" else (1))
         id_set_val = Apple2Val(
@@ -165,6 +166,7 @@ class I10Apple2(Apple2):
             btm_outer="0.0",
             gap=f"{gap:.6f}",
         )
+        pol = await self.polarisation_setpoint.get_value()
         LOGGER.info(f"Setting polarisation to {pol}, with {id_set_val}")
         await self._set(value=id_set_val, energy=value)
         if pol != "la":
@@ -249,16 +251,12 @@ class I10Apple2Pol(StandardReadable, Movable[Pol]):
         """
         super().__init__(name=name)
         self.id_ref = Reference(id)
-        self.add_readables([self.id_ref().polarisation_readback])
+        self.add_readables([self.id_ref().polarisation])
 
     @AsyncStatus.wrap
     async def set(self, value: Pol) -> None:
-        # Check before set
-        await self.id_ref().polarisation_readback.set(value)
         LOGGER.info(f"Changing f{self.name} polarisation to {value}.")
-        # await self.id_ref().set(
-        #     await self.id_ref().energy.get_value()
-        # )  # Move id to new polarisation
+        await self.id_ref().polarisation.set(value)
 
 
 class LinearArbitraryAngle(StandardReadable, Movable[SupportsFloat]):
@@ -304,7 +302,7 @@ class LinearArbitraryAngle(StandardReadable, Movable[SupportsFloat]):
     @AsyncStatus.wrap
     async def set(self, value: SupportsFloat) -> None:
         value = float(value)
-        pol = await self.id_ref().polarisation_readback.get_value()
+        pol = await self.id_ref().polarisation.get_value()
         if pol != "la":
             raise RuntimeError(
                 f"Angle control is not available in polarisation {pol} with {self.id_ref().name}"
