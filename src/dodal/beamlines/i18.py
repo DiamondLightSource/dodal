@@ -114,17 +114,17 @@ def hfm() -> KBMirror:
 
 
 @device_factory()
-def d7diode() -> Diode:
+def d7_diode() -> Diode:
     return Diode(f"{PREFIX.beamline_prefix}-DI-PHDGN-07:")
 
 
 @device_factory()
-def d7Positioner() -> D7Positioner:
+def d7_positioner() -> D7Positioner:
     return D7Positioner(f"{PREFIX.beamline_prefix}-DI-PHDGN-07:B:MP")
 
 
 @device_factory()
-def d7FilterPositioner() -> D7Positioner:
+def d7_filter_positioner() -> D7Positioner:
     return D7Positioner(f"{PREFIX.beamline_prefix}-DI-PHDGN-07:A:MP")
 
 
