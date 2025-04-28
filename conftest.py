@@ -4,7 +4,7 @@ import os
 import sys
 import time
 from collections.abc import Mapping
-from os import environ, getenv
+from os import environ
 from pathlib import Path
 from typing import Any
 from unittest.mock import MagicMock, patch
@@ -35,7 +35,6 @@ mock_paths = [
 mock_attributes_table = {
     "i03": mock_paths,
     "i10": mock_paths,
-    "s03": mock_paths,
     "i04": mock_paths,
     "s04": mock_paths,
     "i19_1": mock_paths,
@@ -97,16 +96,6 @@ def pytest_runtest_teardown():
     if "dodal.beamlines.beamline_utils" in sys.modules:
         sys.modules["dodal.beamlines.beamline_utils"].clear_devices()
 
-
-s03_epics_server_port = getenv("S03_EPICS_CA_SERVER_PORT")
-s03_epics_repeater_port = getenv("S03_EPICS_CA_REPEATER_PORT")
-
-if s03_epics_server_port is not None:
-    environ["EPICS_CA_SERVER_PORT"] = s03_epics_server_port
-    print(f"[EPICS_CA_SERVER_PORT] = {s03_epics_server_port}")
-if s03_epics_repeater_port is not None:
-    environ["EPICS_CA_REPEATER_PORT"] = s03_epics_repeater_port
-    print(f"[EPICS_CA_REPEATER_PORT] = {s03_epics_repeater_port}")
 
 PATH_INFO_FOR_TESTING: PathInfo = PathInfo(
     directory_path=Path("/does/not/exist"),

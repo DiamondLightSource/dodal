@@ -8,7 +8,6 @@ BEAMLINE_PARAMETER_KEYWORDS = ["FB", "FULL", "deadtime"]
 BEAMLINE_PARAMETER_PATHS = {
     "i03": "/dls_sw/i03/software/daq_configuration/domain/beamlineParameters",
     "i04": "/dls_sw/i04/software/gda_versions/gda_9_34/workspace_git/gda-mx.git/configurations/i04-config/scripts/beamlineParameters",
-    "s03": "tests/test_data/test_beamline_parameters.txt",
 }
 
 
@@ -92,7 +91,7 @@ def get_beamline_parameters(beamline_param_path: str | None = None):
     """Loads the beamline parameters from the specified path, or according to the
     environment variable if none is given"""
     if not beamline_param_path:
-        beamline_name = get_beamline_name("s03")
+        beamline_name = get_beamline_name("i03")
         beamline_param_path = BEAMLINE_PARAMETER_PATHS.get(beamline_name)
         if beamline_param_path is None:
             raise KeyError(
