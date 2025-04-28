@@ -6,7 +6,6 @@ from ophyd_async.core import (
     StandardReadable,
     StrictEnum,
 )
-from ophyd_async.core import StandardReadableFormat as Format
 from ophyd_async.epics.core import (
     epics_signal_rw,
 )
@@ -16,7 +15,10 @@ T = TypeVar("T", bound=StrictEnum)
 
 
 class Positioner1D(StandardReadable, Movable[T]):
-    """1D stage with a enum table to select positions."""
+    """1D stage with a enum table to select positions.
+
+    Use this when writing a device with an EPICS positioner on a single axis.
+    """
 
     def __init__(
         self,
@@ -26,7 +28,7 @@ class Positioner1D(StandardReadable, Movable[T]):
         name: str = "",
     ) -> None:
         self._stage_motion = Motor(prefix=prefix)
-        with self.add_children_as_readables(Format.CONFIG_SIGNAL):
+        with self.add_children_as_readables():
             self.stage_position = epics_signal_rw(
                 datatype,
                 read_pv=prefix + positioner_pv_suffix,

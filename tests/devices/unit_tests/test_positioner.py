@@ -17,9 +17,9 @@ class BadPositions(StrictEnum):
 
 
 @pytest.fixture
-async def mock_positioner(prefix: str = "BLXX-EA-007:") -> Positioner1D:
+async def mock_positioner() -> Positioner1D:
     async with init_devices(mock=True):
-        mock_positioner = create_positioner(Positions, prefix)
+        mock_positioner = create_positioner(Positions, "BLXX-EA-007:")
     assert mock_positioner.name == "mock_positioner"
     return mock_positioner
 
