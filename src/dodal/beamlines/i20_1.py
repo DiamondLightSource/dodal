@@ -11,6 +11,7 @@ from dodal.devices.turbo_slit import TurboSlit
 from dodal.devices.xspress3.xspress3 import Xspress3
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
+from ophyd_async.epics.motor import Motor
 
 BL = get_beamline_name("i20-1")
 PREFIX = BeamlinePrefix(BL, suffix="J")
@@ -41,6 +42,13 @@ def turbo_slit() -> TurboSlit:
 
     return TurboSlit(f"{PREFIX.beamline_prefix}-OP-PCHRO-01:TS:")
 
+@device_factory(mock=True)
+def alignment_x() ->  Motor :
+    return Motor(f"{PREFIX.beamline_prefix}-MO-STAGE-01:X")
+
+@device_factory(mock=True)
+def alignment_y() ->  Motor :
+    return Motor(f"{PREFIX.beamline_prefix}-MO-STAGE-01:Y")
 
 @device_factory(skip=True)
 def xspress3() -> Xspress3:
