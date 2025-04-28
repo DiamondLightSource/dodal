@@ -140,8 +140,7 @@ class I10Apple2(Apple2):
         to calculate the required gap and phases before setting it.
         """
         pol = await self.polarisation.get_value()
-        print(pol)
-        if pol.value == Pol.NONE:
+        if pol == Pol.NONE:
             LOGGER.warning("Polarisation not set attempting to read from hardware")
 
             motors = await asyncio.gather(
@@ -152,7 +151,7 @@ class I10Apple2(Apple2):
                 self.gap.user_readback.get_value(),
             )
             pol, phase = self.determine_phase_from_hardware(*motors)
-            if pol.value == "None":
+            if pol == "None":
                 raise ValueError(
                     f"Polarisation cannot be determine from hardware for {self.name}"
                 )

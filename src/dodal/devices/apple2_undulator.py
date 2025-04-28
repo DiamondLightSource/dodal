@@ -437,7 +437,7 @@ class Apple2(StandardReadable, Movable):
     ) -> Pol:
         # pol = await self.polarisation.get_value()
         # LH3 is not hardware readable as it is the same as lh but it is needed for energy.
-        if pol.value != Pol.LH3:
+        if pol != Pol.LH3:
             pol, _ = self.determine_phase_from_hardware(
                 top_outer, top_inner, btm_inner, btm_outer, gap
             )
