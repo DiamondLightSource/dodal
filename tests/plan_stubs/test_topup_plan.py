@@ -138,7 +138,7 @@ def test_topup_not_allowed_when_exceeds_threshold_percentage_of_topup_time(
 
     with patch(
         "dodal.common.beamlines.beamline_parameters.BEAMLINE_PARAMETER_PATHS",
-        {"s03": f"tests/test_data/{parameter_file}"},
+        {"i03": f"tests/test_data/{parameter_file}"},
     ):
         RE(
             check_topup_and_wait_if_necessary(

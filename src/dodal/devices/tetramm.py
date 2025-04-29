@@ -244,10 +244,9 @@ class TetrammDetector(StandardDetector):
         super().__init__(
             controller,
             ADHDFWriter(
-                self.hdf,
-                path_provider,
-                lambda: self.name,
-                TetrammDatasetDescriber(controller),
+                fileio=self.hdf,
+                path_provider=path_provider,
+                dataset_describer=TetrammDatasetDescriber(controller),
                 plugins=plugins,
             ),
             config_signals,
