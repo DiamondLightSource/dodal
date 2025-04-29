@@ -1,3 +1,4 @@
+from collections.abc import Generator
 from io import BytesIO
 from unittest.mock import AsyncMock, MagicMock, patch
 
@@ -9,8 +10,9 @@ from dodal.devices.webcam import Webcam, create_placeholder_image
 
 
 @pytest.fixture
-def webcam(RE) -> Webcam:
-    return i03.webcam(connect_immediately=True, mock=True)
+def webcam(RE) -> Generator[Webcam]:
+    yield i03.webcam(connect_immediately=True, mock=True)
+    i03.webcam.cache_clear()
 
 
 async def test_given_last_saved_path_when_device_read_then_returns_path(webcam: Webcam):

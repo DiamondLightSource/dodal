@@ -1,3 +1,4 @@
+from collections.abc import Generator
 from unittest.mock import MagicMock, patch
 
 import bluesky.plan_stubs as bps
@@ -14,8 +15,9 @@ from dodal.plan_stubs.check_topup import (
 
 
 @pytest.fixture
-def synchrotron(RE) -> Synchrotron:
-    return i03.synchrotron(connect_immediately=True, mock=True)
+def synchrotron(RE) -> Generator[Synchrotron]:
+    yield i03.synchrotron(connect_immediately=True, mock=True)
+    i03.synchrotron.cache_clear()
 
 
 @patch("dodal.plan_stubs.check_topup.wait_for_topup_complete")
