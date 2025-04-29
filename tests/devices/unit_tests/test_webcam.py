@@ -2,7 +2,6 @@ from io import BytesIO
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
-from bluesky.run_engine import RunEngine
 from PIL import Image
 
 from dodal.beamlines import i03
@@ -10,8 +9,7 @@ from dodal.devices.webcam import Webcam, create_placeholder_image
 
 
 @pytest.fixture
-def webcam() -> Webcam:
-    RunEngine()
+def webcam(RE) -> Webcam:
     return i03.webcam(connect_immediately=True, mock=True)
 
 

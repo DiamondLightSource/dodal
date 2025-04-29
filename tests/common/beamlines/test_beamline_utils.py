@@ -4,7 +4,6 @@ import os
 from unittest.mock import ANY, AsyncMock, MagicMock, patch
 
 import pytest
-from bluesky.run_engine import RunEngine as RE
 from ophyd import Device
 from ophyd.device import Device as OphydV1Device
 from ophyd.sim import FakeEpicsSignal
@@ -76,8 +75,7 @@ def test_instantiate_v1_function_fake_makes_fake():
     assert isinstance(eiger.stale_params, FakeEpicsSignal)
 
 
-def test_instantiate_v2_function_fake_makes_fake():
-    RE()
+def test_instantiate_v2_function_fake_makes_fake(RE):
     fake_smargon: Smargon = beamline_utils.device_instantiation(
         i03.Smargon, "smargon", "", True, True, None
     )
@@ -104,8 +102,9 @@ def test_wait_for_v1_device_connection_passes_through_timeout(kwargs, expected_t
     "dodal.common.beamlines.beamline_utils.v2_device_wait_for_connection",
     new=AsyncMock(),
 )
-def test_wait_for_v2_device_connection_passes_through_timeout(kwargs, expected_timeout):
-    RE()
+def test_wait_for_v2_device_connection_passes_through_timeout(
+    kwargs, expected_timeout, RE
+):
     device = OphydV2Device()
     device.connect = MagicMock()
 
