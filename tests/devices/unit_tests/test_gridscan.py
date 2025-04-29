@@ -255,7 +255,7 @@ def panda_grid_scan_params():
 
 
 @pytest.fixture(params=["zebra_grid_scan_params", "panda_grid_scan_params"])
-def common_grid_scan_params(request):
+def common_grid_scan_params(request: pytest.FixtureRequest):
     return request.getfixturevalue(request.param)
 
 
