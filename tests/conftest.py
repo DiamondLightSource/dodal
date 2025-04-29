@@ -7,7 +7,11 @@ import pytest
 
 from conftest import mock_attributes_table
 from dodal.common.beamlines import beamline_parameters, beamline_utils
-from dodal.utils import make_all_devices
+from dodal.utils import (
+    DeviceInitializationController,
+    collect_factories,
+    make_all_devices,
+)
 
 
 @pytest.fixture(scope="function")
@@ -23,6 +27,9 @@ def module_and_devices_for_beamline(request: pytest.FixtureRequest):
         )
         yield (bl_mod, devices, exceptions)
         beamline_utils.clear_devices()
+        for factory in collect_factories(bl_mod).values():
+            if isinstance(factory, DeviceInitializationController):
+                factory.cache_clear()
         del bl_mod
 
 
