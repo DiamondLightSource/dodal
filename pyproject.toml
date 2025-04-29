@@ -110,6 +110,7 @@ markers = [
 addopts = """
     --cov=dodal --cov-report term --cov-report xml:cov.xml
     --tb=native -vv --doctest-modules --doctest-glob="*.rst"
+    --random-order
     """
 # https://iscinumpy.gitlab.io/post/bound-version-constraints/#watch-for-warnings
 filterwarnings = [
@@ -154,12 +155,12 @@ allowlist_externals =
     sphinx-build
     sphinx-autobuild
 commands =
-    tests: pytest -m 'not (adsim)' --random-order --cov=dodal --cov-report term --cov-report xml:cov.xml {posargs}
+    tests: pytest -m 'not (system_test or adsim)' {posargs}
     type-checking: pyright src tests {posargs}
     pre-commit: pre-commit run --all-files --show-diff-on-failure {posargs}
     docs: sphinx-{posargs:build -E} -T docs build/html
-    unit-report: pytest -m 'not (adsim)'  --random-order --cov=dodal --cov-report term --cov-report xml:unit_cov.xml --json-report --json-report-file=unit-report.json tests {posargs}
-    system-report: pytest -m 'not (adsim or system_test)'  --random-order --cov=dodal --cov-report term --cov-report xml:system_cov.xml --json-report --json-report-file=system-report.json system_tests {posargs}
+    unit-report: pytest -m 'not (adsim)'  --cov-report xml:unit_cov.xml --json-report --json-report-file=unit-report.json tests {posargs}
+    system-report: pytest -m 'not (adsim or system_test)' --cov-report xml:system_cov.xml --json-report --json-report-file=system-report.json system_tests {posargs}
 """
 
 [tool.ruff]
