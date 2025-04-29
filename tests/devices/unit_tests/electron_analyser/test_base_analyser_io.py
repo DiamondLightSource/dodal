@@ -1,3 +1,6 @@
+import asyncio
+import math
+
 import numpy as np
 import pytest
 from bluesky.run_engine import RunEngine
@@ -179,10 +182,12 @@ async def test_that_data_to_read_is_correct(
 ):
     RE(configure_analyser(sim_analyser_driver, region, excitation_energy))
 
-    expected_total_time = (
-        await sim_analyser_driver.iterations.get_value()
-        * await sim_analyser_driver.total_steps.get_value()
-        * await sim_analyser_driver.step_time.get_value()
+    expected_total_time = math.prod(
+        await asyncio.gather(
+            sim_analyser_driver.iterations.get_value(),
+            sim_analyser_driver.total_steps.get_value(),
+            sim_analyser_driver.step_time.get_value(),
+        )
     )
     assert await sim_analyser_driver.total_time.get_value() == expected_total_time
 

@@ -1,8 +1,10 @@
 import numpy as np
 import pytest
+from bluesky.plan_stubs import mv
 from bluesky.run_engine import RunEngine
 from ophyd_async.testing import (
     get_mock_put,
+    set_mock_value,
 )
 
 from dodal.devices.electron_analyser import (
@@ -100,3 +102,37 @@ async def test_that_data_to_read_is_correct(
         await sim_analyser_driver.binding_energy_axis.get_value(),
         expected_binding_energy_axis,
     )
+
+
+async def test_specs_analyser_energy_axis(
+    sim_analyser_driver: SpecsAnalyserDriverIO,
+    RE: RunEngine,
+) -> None:
+    start_energy = 1
+    end_energy = 10
+    total_points_iterations = 11
+
+    RE(mv(sim_analyser_driver.low_energy, start_energy))
+    RE(mv(sim_analyser_driver.high_energy, end_energy))
+    RE(mv(sim_analyser_driver.slices, total_points_iterations))
+
+    energy_axis = await sim_analyser_driver.energy_axis.get_value()
+    expected_energy_axis = [1.0, 1.9, 2.8, 3.7, 4.6, 5.5, 6.4, 7.3, 8.2, 9.1, 10.0]
+    np.testing.assert_array_equal(energy_axis, expected_energy_axis)
+
+
+async def test_specs_analyser_angle_axis(
+    sim_analyser_driver: SpecsAnalyserDriverIO,
+    RE: RunEngine,
+) -> None:
+    max_angle = 21
+    min_angle = 1
+    slices = 10
+
+    set_mock_value(sim_analyser_driver.min_angle_axis, min_angle)
+    set_mock_value(sim_analyser_driver.max_angle_axis, max_angle)
+    RE(mv(sim_analyser_driver.slices, slices))
+
+    angle_axis = await sim_analyser_driver.angle_axis.get_value()
+    expected_angle_axis = [2.0, 4.0, 6.0, 8.0, 10.0, 12.0, 14.0, 16.0, 18.0, 20.0]
+    np.testing.assert_array_equal(angle_axis, expected_angle_axis)

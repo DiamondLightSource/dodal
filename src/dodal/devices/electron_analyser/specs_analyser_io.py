@@ -30,7 +30,6 @@ class SpecsAnalyserDriverIO(AbstractAnalyserDriverIO):
             return self.angle_axis
         angle_axis = derived_signal_r(
             self._calculate_angle_axis,
-            "eV",
             min_angle=self.min_angle_axis,
             max_angle=self.max_angle_axis,
             slices=self.slices,
@@ -62,7 +61,9 @@ class SpecsAnalyserDriverIO(AbstractAnalyserDriverIO):
     def _calculate_energy_axis(
         self, min_energy: float, max_energy: float, total_points_iterations: int
     ) -> Array1D[np.float64]:
-        step = (max_energy - min_energy) / total_points_iterations
+        # Note: Don't use the energy step because of the case where the step doesn't
+        # exactly fill the range
+        step = (max_energy - min_energy) / (total_points_iterations - 1)
         axis = np.array([min_energy + i * step for i in range(total_points_iterations)])
         return axis
 
