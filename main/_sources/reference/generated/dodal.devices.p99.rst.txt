@@ -9,6 +9,7 @@ dodal.devices.p99
    :toctree:
    :recursive:
 
+   dodal.devices.p99.andor2_point
    dodal.devices.p99.sample_stage
 
 
