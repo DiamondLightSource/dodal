@@ -34,6 +34,12 @@ def flush_event_loop_on_finish(event_loop):
 
 
 @pytest.fixture(autouse=True)
+def clear_cache_after_test():
+    yield None
+    dummy_mirror_as_device_factory.cache_clear()
+
+
+@pytest.fixture(autouse=True)
 def setup():
     beamline_utils.clear_devices()
     mock_beamline_module_filepaths("i03", i03)
