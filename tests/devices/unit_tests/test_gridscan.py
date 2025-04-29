@@ -13,6 +13,7 @@ from ophyd.status import DeviceStatus, Status
 from ophyd_async.core import init_devices
 from ophyd_async.testing import get_mock_put, set_mock_value
 
+from dodal.beamlines import i03
 from dodal.devices.fast_grid_scan import (
     FastGridScanCommon,
     GridScanParamsCommon,
@@ -23,6 +24,7 @@ from dodal.devices.fast_grid_scan import (
     set_fast_grid_scan_params,
 )
 from dodal.devices.smargon import Smargon
+from dodal.devices.util.test_utils import patch_motor
 
 
 def discard_status(st: Status | DeviceStatus):
@@ -46,6 +48,17 @@ async def panda_fast_grid_scan():
         panda_fast_grid_scan = PandAFastGridScan(name="fake_PGS", prefix="PGS")
 
     return panda_fast_grid_scan
+
+
+@pytest.fixture
+def smargon(RE: RunEngine):
+    smargon = i03.smargon(connect_immediately=True, mock=True)
+
+    for motor in [smargon.omega, smargon.x, smargon.y, smargon.z]:
+        patch_motor(motor)
+
+    yield smargon
+    i03.smargon.cache_clear()
 
 
 @pytest.mark.parametrize(

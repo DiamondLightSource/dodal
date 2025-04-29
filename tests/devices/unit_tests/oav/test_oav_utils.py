@@ -6,6 +6,7 @@ from bluesky.run_engine import RunEngine
 from ophyd.sim import instantiate_fake_device
 from ophyd_async.testing import set_mock_value
 
+from dodal.beamlines import i03
 from dodal.devices.oav.oav_calculations import calculate_beam_distance
 from dodal.devices.oav.oav_detector import OAV
 from dodal.devices.oav.pin_image_recognition import PinTipDetection
@@ -17,6 +18,7 @@ from dodal.devices.oav.utils import (
     wait_for_tip_to_be_found,
 )
 from dodal.devices.smargon import Smargon
+from dodal.devices.util.test_utils import patch_motor
 
 
 def test_bottom_right_from_top_left():
@@ -27,6 +29,17 @@ def test_bottom_right_from_top_left():
     assert bottom_right[0] == 863 and bottom_right[1] == 1788
     bottom_right = bottom_right_from_top_left(top_left, 15, 20, 0.005, 0.007, 1, 1)
     assert bottom_right[0] == 198 and bottom_right[1] == 263
+
+
+@pytest.fixture
+def smargon(RE: RunEngine):
+    smargon = i03.smargon(connect_immediately=True, mock=True)
+
+    for motor in [smargon.omega, smargon.x, smargon.y, smargon.z]:
+        patch_motor(motor)
+
+    yield smargon
+    i03.smargon.cache_clear()
 
 
 @pytest.mark.parametrize(
