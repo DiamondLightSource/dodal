@@ -23,6 +23,7 @@ from dodal.devices.fast_grid_scan import (
     set_fast_grid_scan_params,
 )
 from dodal.devices.smargon import Smargon
+from dodal.devices.util.test_utils import patch_motor
 
 
 def discard_status(st: Status | DeviceStatus):
@@ -46,6 +47,17 @@ async def panda_fast_grid_scan():
         panda_fast_grid_scan = PandAFastGridScan(name="fake_PGS", prefix="PGS")
 
     return panda_fast_grid_scan
+
+
+@pytest.fixture
+async def smargon(RE: RunEngine):
+    async with init_devices(mock=True):
+        smargon = Smargon()
+
+    for motor in [smargon.omega, smargon.x, smargon.y, smargon.z]:
+        patch_motor(motor)
+
+    return smargon
 
 
 @pytest.mark.parametrize(
@@ -255,7 +267,7 @@ def panda_grid_scan_params():
 
 
 @pytest.fixture(params=["zebra_grid_scan_params", "panda_grid_scan_params"])
-def common_grid_scan_params(request):
+def common_grid_scan_params(request: pytest.FixtureRequest):
     return request.getfixturevalue(request.param)
 
 

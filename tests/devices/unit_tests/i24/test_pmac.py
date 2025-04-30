@@ -3,7 +3,6 @@ from unittest.mock import call, patch
 
 import bluesky.plan_stubs as bps
 import pytest
-from bluesky.run_engine import RunEngine
 from ophyd_async.testing import callback_on_mock_put, get_mock_put, set_mock_value
 
 from dodal.devices.i24.pmac import (
@@ -16,8 +15,7 @@ from dodal.devices.util.test_utils import patch_motor
 
 
 @pytest.fixture
-async def fake_pmac():
-    RunEngine()
+async def fake_pmac(RE):
     pmac = PMAC("", name="fake_pmac")
     await pmac.connect(mock=True)
 
