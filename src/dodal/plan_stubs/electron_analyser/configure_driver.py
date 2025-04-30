@@ -60,7 +60,7 @@ def configure_specs(
     yield from configure_analyser(analyser, region, excitation_energy)
     # fmt: off
     yield from bps.mv(
-        analyser.values, region.values,
+        analyser.snapshot_values, region.values,
         analyser.psu_mode, region.psu_mode,
     )
     # fmt: on

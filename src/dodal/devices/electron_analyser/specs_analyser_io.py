@@ -12,7 +12,7 @@ class SpecsAnalyserDriverIO(AbstractAnalyserDriverIO):
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             # Used for setting up region data acquisition.
             self.psu_mode = epics_signal_rw(str, prefix + "SCAN_RANGE")
-            self.values = epics_signal_rw(int, prefix + "VALUES")
+            self.snapshot_values = epics_signal_rw(int, prefix + "VALUES")
             self.centre_energy = epics_signal_rw(float, prefix + "KINETIC_ENERGY")
 
             # Used to read detector data after acqusition.

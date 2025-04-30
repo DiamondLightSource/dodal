@@ -82,6 +82,13 @@ async def test_given_region_that_analyser_sets_modes_correctly(
         sim_analyser_driver, "psu_mode", region.psu_mode
     )
 
+    get_mock_put(sim_analyser_driver.snapshot_values).assert_called_once_with(
+        region.values, wait=True
+    )
+    await assert_read_configuration_has_expected_value(
+        sim_analyser_driver, "snapshot_values", region.values
+    )
+
 
 @pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
 async def test_that_data_to_read_is_correct(
