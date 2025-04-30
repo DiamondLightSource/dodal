@@ -27,7 +27,7 @@ class VGScientaAnalyserDriverIO(AbstractAnalyserDriverIO):
 
         super().__init__(prefix, name)
 
-    def _get_energy_axis_signal(self, prefix: str = "") -> SignalR:
+    def _get_energy_axis_signal(self, prefix: str = "") -> SignalR[Array1D[np.float64]]:
         """
         Override abstract and return epics signal
         """
@@ -35,7 +35,7 @@ class VGScientaAnalyserDriverIO(AbstractAnalyserDriverIO):
             return self.energy_axis
         return epics_signal_r(Array1D[np.float64], prefix + "X_SCALE_RBV")
 
-    def _get_angle_axis_signal(self, prefix: str = "") -> SignalR:
+    def _get_angle_axis_signal(self, prefix: str = "") -> SignalR[Array1D[np.float64]]:
         """
         Override abstract and return epics signal
         """
