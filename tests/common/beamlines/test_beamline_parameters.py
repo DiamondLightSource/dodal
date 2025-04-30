@@ -103,3 +103,12 @@ def test_get_beamline_parameters_raises_error_when_beamline_not_found(
     get_beamline_name.return_value = "invalid_beamline"
     with pytest.raises(KeyError):
         get_beamline_parameters()
+
+
+@pytest.fixture(autouse=True)
+def i03_beamline_parameters():
+    with patch.dict(
+        "dodal.common.beamlines.beamline_parameters.BEAMLINE_PARAMETER_PATHS",
+        {"i03": "tests/test_data/test_beamline_parameters.txt"},
+    ) as params:
+        yield params

@@ -152,13 +152,9 @@ def test_messages_logged_from_dodal_get_sent_to_graylog_and_file(
 
 @patch("dodal.log.logging.FileHandler.emit")
 def test_various_messages_to_graylog_get_beamline_filter(
-    mock_filehandler_emit: MagicMock,
+    mock_filehandler_emit: MagicMock, RE
 ):
     from os import environ
-
-    from bluesky.run_engine import RunEngine
-
-    RE = RunEngine()
 
     if environ.get("BEAMLINE"):
         del environ["BEAMLINE"]
