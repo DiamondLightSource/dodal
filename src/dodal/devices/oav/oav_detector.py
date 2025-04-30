@@ -152,10 +152,11 @@ class OAVBeamCentrePV(OAV):
     def __init__(
         self, prefix: str, config: OAVConfig, name: str = "", overlay_channel: int = 1
     ):
-        self.beam_centre_i = epics_signal_r(
-            int, prefix + f"OVER:{overlay_channel}:CenterX"
-        )
-        self.beam_centre_j = epics_signal_r(
-            int, prefix + f"OVER:{overlay_channel}:CenterY"
-        )
+        with self.add_children_as_readables():
+            self.beam_centre_i = epics_signal_r(
+                int, prefix + f"OVER:{overlay_channel}:CenterX"
+            )
+            self.beam_centre_j = epics_signal_r(
+                int, prefix + f"OVER:{overlay_channel}:CenterY"
+            )
         super().__init__(prefix, config, name)
