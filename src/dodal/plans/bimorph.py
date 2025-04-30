@@ -5,6 +5,7 @@ from enum import Enum
 import bluesky.plan_stubs as bps
 import bluesky.preprocessors as bpp
 from bluesky.protocols import Preparable, Readable
+from bluesky.utils import MsgGenerator
 from numpy import linspace
 from ophyd_async.core import TriggerInfo
 
@@ -186,7 +187,7 @@ def bimorph_optimisation(
     bimorph_settle_time: float,
     slit_settle_time: float,
     initial_voltage_list: list | None = None,
-):
+) -> MsgGenerator:
     """Plan for performing bimorph mirror optimisation.
 
     Bluesky plan that performs a series of pencil beam scans across one axis of a
