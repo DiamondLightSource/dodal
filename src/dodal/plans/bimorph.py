@@ -238,9 +238,7 @@ def bimorph_optimisation(
         """Outer plan stub, which moves mirror and calls inner_scan."""
         for detector in detectors:
             if isinstance(detector, Preparable):
-                yield from bps.prepare(
-                    detector, TriggerInfo(number_of_triggers=1), wait=True
-                )
+                yield from bps.prepare(detector, TriggerInfo(), wait=True)
 
         stream_name = "0"
         yield from bps.declare_stream(*detectors, mirror, slits, name=stream_name)
