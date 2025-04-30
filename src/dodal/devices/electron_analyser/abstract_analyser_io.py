@@ -72,13 +72,13 @@ class AbstractAnalyserDriverIO(ABC, StandardReadable, ADBaseIO):
         super().__init__(prefix=prefix, name=name)
 
     @abstractmethod
-    def _get_angle_axis_signal(self, prefix: str = "") -> SignalR:
+    def _get_angle_axis_signal(self, prefix: str = "") -> SignalR[Array1D[np.float64]]:
         """
         The signal that defines the angle axis. Depends on analyser model.
         """
 
     @abstractmethod
-    def _get_energy_axis_signal(self, prefix: str = "") -> SignalR:
+    def _get_energy_axis_signal(self, prefix: str = "") -> SignalR[Array1D[np.float64]]:
         """
         The signal that defines the energy axis. Depends on analyser model.
         """
@@ -105,7 +105,7 @@ class AbstractAnalyserDriverIO(ABC, StandardReadable, ADBaseIO):
         return total_steps * step_time * iterations
 
     def _calculate_total_intensity(self, spectrum: Array1D[np.float64]) -> float:
-        return np.sum(spectrum)
+        return float(np.sum(spectrum))
 
     @property
     @abstractmethod
