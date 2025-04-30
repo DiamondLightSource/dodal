@@ -1,4 +1,3 @@
-from abc import abstractmethod
 from enum import IntEnum
 
 from bluesky.protocols import Movable
@@ -6,11 +5,13 @@ from ophyd_async.core import (
     DEFAULT_TIMEOUT,
     AsyncStatus,
     LazyMock,
+    SignalR,
     StandardReadable,
+    derived_signal_r,
+    soft_signal_rw,
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
-from dodal.common.signal_utils import create_r_hardware_backed_soft_signal
 from dodal.devices.areadetector.plugins.CAM import Cam
 from dodal.devices.oav.oav_parameters import (
     DEFAULT_OAV_WINDOW,
@@ -58,6 +59,9 @@ class ZoomController(StandardReadable, Movable[str]):
 
 
 class OAV(StandardReadable):
+    beam_centre_i: SignalR[int]
+    beam_centre_j: SignalR[int]
+
     def __init__(self, prefix: str, config: OAVConfigBase, name: str = ""):
         self.oav_config = config
         self._prefix = prefix
@@ -66,47 +70,39 @@ class OAV(StandardReadable):
         self.zoom_controller = ZoomController(f"{_bl_prefix}-EA-OAV-01:FZOOM:", name)
 
         self.cam = Cam(f"{prefix}CAM:", name=name)
-
         with self.add_children_as_readables():
             self.grid_snapshot = SnapshotWithGrid(f"{prefix}MJPG:", name)
-            self.microns_per_pixel_x = create_r_hardware_backed_soft_signal(
-                float,
-                lambda: self._get_microns_per_pixel(Coords.X),
+
+        self.sizes = [self.grid_snapshot.x_size, self.grid_snapshot.y_size]
+
+        with self.add_children_as_readables():
+            self.microns_per_pixel_x = derived_signal_r(
+                self._get_microns_per_pixel,
+                zoom_level=self.zoom_controller.level,
+                size=self.sizes[Coords.X],
+                coord=soft_signal_rw(datatype=int, initial_value=Coords.X.value),
             )
-            self.microns_per_pixel_y = create_r_hardware_backed_soft_signal(
-                float,
-                lambda: self._get_microns_per_pixel(Coords.Y),
-            )
-            self.beam_centre_i = create_r_hardware_backed_soft_signal(
-                int, lambda: self._get_beam_position(Coords.X)
-            )
-            self.beam_centre_j = create_r_hardware_backed_soft_signal(
-                int, lambda: self._get_beam_position(Coords.Y)
+            self.microns_per_pixel_y = derived_signal_r(
+                self._get_microns_per_pixel,
+                zoom_level=self.zoom_controller.level,
+                size=self.sizes[Coords.Y],
+                coord=soft_signal_rw(datatype=int, initial_value=Coords.Y.value),
             )
             self.snapshot = Snapshot(
                 f"{self._prefix}MJPG:",
                 self._name,
             )
 
-        self.sizes = [self.grid_snapshot.x_size, self.grid_snapshot.y_size]
-
         super().__init__(name)
 
-    async def _read_current_zoom(self) -> str:
-        _zoom = await self.zoom_controller.level.get_value()
+    def _read_current_zoom(self, _zoom: str) -> str:
         return _get_correct_zoom_string(_zoom)
 
-    async def _get_microns_per_pixel(self, coord: int) -> float:
+    def _get_microns_per_pixel(self, zoom_level: str, size: int, coord: int) -> float:
         """Extracts the microns per x pixel and y pixel for a given zoom level."""
-        _zoom = await self._read_current_zoom()
+        _zoom = self._read_current_zoom(zoom_level)
         value = self.parameters[_zoom].microns_per_pixel[coord]
-        size = await self.sizes[coord].get_value()
         return value * DEFAULT_OAV_WINDOW[coord] / size
-
-    @abstractmethod
-    async def _get_beam_position(self, coord: int) -> int:
-        """Extracts the beam location in pixels `xCentre` `yCentre`, for a requested \
-        zoom level. """
 
     async def connect(
         self,
@@ -128,12 +124,25 @@ class OAVBeamCentreFile(OAV):
     def __init__(self, prefix: str, config: OAVConfigBeamCentre, name: str = ""):
         super().__init__(prefix, config, name)
 
-    async def _get_beam_position(self, coord: int) -> int:
+        with self.add_children_as_readables():
+            self.beam_centre_i = derived_signal_r(
+                self._get_beam_position,
+                zoom_level=self.zoom_controller.level,
+                size=self.sizes[Coords.X],
+                coord=soft_signal_rw(datatype=int, initial_value=Coords.X.value),
+            )
+            self.beam_centre_j = derived_signal_r(
+                self._get_beam_position,
+                zoom_level=self.zoom_controller.level,
+                size=self.sizes[Coords.Y],
+                coord=soft_signal_rw(datatype=int, initial_value=Coords.Y.value),
+            )
+
+    def _get_beam_position(self, zoom_level: str, size: int, coord: int) -> int:
         """Extracts the beam location in pixels `xCentre` `yCentre`, for a requested \
         zoom level. """
-        _zoom = await self._read_current_zoom()
+        _zoom = self._read_current_zoom(zoom_level)
         value = self.parameters[_zoom].crosshair[coord]
-        size = await self.sizes[coord].get_value()
         return int(value * size / DEFAULT_OAV_WINDOW[coord])
 
 
@@ -143,14 +152,10 @@ class OAVBeamCentrePV(OAV):
     def __init__(
         self, prefix: str, config: OAVConfig, name: str = "", overlay_channel: int = 1
     ):
-        self.beam_centre_x = epics_signal_r(
+        self.beam_centre_i = epics_signal_r(
             int, prefix + f"OVER:{overlay_channel}:CenterX"
         )
-        self.beam_centre_y = epics_signal_r(
+        self.beam_centre_j = epics_signal_r(
             int, prefix + f"OVER:{overlay_channel}:CenterY"
         )
         super().__init__(prefix, config, name)
-
-    async def _get_beam_position(self, coord: int) -> int:
-        """Extracts the beam location in pixels `xCentre` `yCentre`."""
-        return await (self.beam_centre_x, self.beam_centre_y)[coord].get_value()

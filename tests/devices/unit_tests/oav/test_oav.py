@@ -126,8 +126,8 @@ async def test_oav_beam_centre_gets_beam_centre_from_pvs_roi(
     oav_beam_centre_pv_roi: OAVBeamCentrePV,
 ):
     oav = oav_beam_centre_pv_roi
-    set_mock_value(oav.beam_centre_x, 100)
-    set_mock_value(oav.beam_centre_y, 150)
+    set_mock_value(oav.beam_centre_i, 100)
+    set_mock_value(oav.beam_centre_j, 150)
     beam_x = await oav.beam_centre_i.get_value()
     beam_y = await oav.beam_centre_j.get_value()
     assert beam_x == 100
@@ -138,8 +138,8 @@ async def test_oav_beam_centre_gets_beam_centre_from_pvs_fs(
     oav_beam_centre_pv_fs: OAVBeamCentrePV,
 ):
     oav = oav_beam_centre_pv_fs
-    set_mock_value(oav.beam_centre_x, 200)
-    set_mock_value(oav.beam_centre_y, 250)
+    set_mock_value(oav.beam_centre_i, 200)
+    set_mock_value(oav.beam_centre_j, 250)
     beam_x = await oav.beam_centre_i.get_value()
     beam_y = await oav.beam_centre_j.get_value()
     assert beam_x == 200
