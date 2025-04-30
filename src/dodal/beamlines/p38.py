@@ -84,6 +84,12 @@ def i0() -> TetrammDetector:
         path_provider=get_path_provider(),
     )
 
+@device_factory()
+def i1() -> TetrammDetector:
+    return TetrammDetector(
+        f"{PREFIX.beamline_prefix}-EA-XBPM-02:",
+        path_provider=get_path_provider(),
+    )
 
 #
 # The following devices are created as fake by default since P38 has no optics,
