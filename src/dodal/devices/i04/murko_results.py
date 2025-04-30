@@ -41,12 +41,19 @@ class Coord(Enum):
 
 
 class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
-    """Device that takes crystal centre coords from Murko and uses them to set the
+    """Device that takes crystal centre values from Murko and uses them to set the
     x, y, z coordinate of the sample to be in line with the beam centre.
-    (x, z) coords can be read at 90°, and (x, y) at 180° (or the closest omega angle to
-    90° and 180°). The average of the x values at these angles is taken, and sin(omega)z
-    and cosine(omega)y are taken to account for the rotation. This value is used to
-    calculate a number of mm the sample needs to move to be in line with the beam centre.
+    The most_likely_click[1] value from Murko corresponds with the x coordinate of the
+    sample. The most_likely_click[0] value from Murko corresponds with a component of
+    the y and z coordinates of the sample, depending on the omega angle, as the sample
+    is rotated around the x axis.
+
+    Given a most_liekly_click value at a certain omega angle θ:
+    most_likely_click[1] = x
+    most_likely_click[0] = cos(θ)y - sin(θ)z
+
+    A value for x can be found by averaging all most_likely_click[1] values, and
+    solutions for y and z can be calculated using numpy's linear algebra library.
     """
 
     TIMEOUT_S = 2
@@ -97,7 +104,7 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
         sample_id = await self.sample_id.get_value()
         while self._last_omega < self.stop_angle:
             # waits here for next batch to be recieved
-            message = await self.pubsub.get_message(timeout=self.TIMEOUT_S)  # type: ignore
+            message = await self.pubsub.get_message(timeout=self.TIMEOUT_S)
             if message is None:  # No more messages to process
                 break
             await self.process_batch(message, sample_id)
@@ -159,7 +166,7 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
             thetas_deg (list): List of omega angles in degrees.
 
         Returns:
-            tuple[float, float]: _description_
+            tuple[float, float]: y, z coordinates
         """
         thetas = np.radians(omegas)
         matrix = np.column_stack([np.cos(thetas), -np.sin(thetas)])
