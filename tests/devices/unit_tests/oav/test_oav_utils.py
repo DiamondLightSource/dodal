@@ -3,10 +3,9 @@ from unittest.mock import AsyncMock
 import numpy as np
 import pytest
 from bluesky.run_engine import RunEngine
-from ophyd.sim import instantiate_fake_device
+from ophyd_async.core import init_devices
 from ophyd_async.testing import set_mock_value
 
-from dodal.beamlines import i03
 from dodal.devices.oav.oav_calculations import calculate_beam_distance
 from dodal.devices.oav.oav_detector import OAV
 from dodal.devices.oav.pin_image_recognition import PinTipDetection
@@ -32,14 +31,14 @@ def test_bottom_right_from_top_left():
 
 
 @pytest.fixture
-def smargon(RE: RunEngine):
-    smargon = i03.smargon(connect_immediately=True, mock=True)
+async def smargon(RE: RunEngine):
+    async with init_devices(mock=True):
+        smargon = Smargon()
 
     for motor in [smargon.omega, smargon.x, smargon.y, smargon.z]:
         patch_motor(motor)
 
-    yield smargon
-    i03.smargon.cache_clear()
+    return smargon
 
 
 @pytest.mark.parametrize(
@@ -91,11 +90,12 @@ async def test_values_for_move_so_that_beam_is_at_pixel(
     assert pos == pytest.approx(expected_xyz, abs=1e-3)
 
 
-@pytest.mark.asyncio
-async def test_given_tip_found_when_wait_for_tip_to_be_found_called_then_tip_immediately_returned():
-    mock_pin_tip_detect: PinTipDetection = instantiate_fake_device(
-        PinTipDetection, name="pin_detect"
-    )
+async def test_given_tip_found_when_wait_for_tip_to_be_found_called_then_tip_immediately_returned(
+    RE,
+):
+    async with init_devices(mock=True):
+        mock_pin_tip_detect = PinTipDetection("")
+
     await mock_pin_tip_detect.connect(mock=True)
     mock_pin_tip_detect._get_tip_and_edge_data = AsyncMock(
         return_value=SampleLocation(100, 100, np.array([]), np.array([]))
@@ -106,11 +106,10 @@ async def test_given_tip_found_when_wait_for_tip_to_be_found_called_then_tip_imm
     mock_pin_tip_detect._get_tip_and_edge_data.assert_called_once()
 
 
-@pytest.mark.asyncio
 async def test_given_no_tip_when_wait_for_tip_to_be_found_called_then_exception_thrown():
-    mock_pin_tip_detect: PinTipDetection = instantiate_fake_device(
-        PinTipDetection, name="pin_detect"
-    )
+    async with init_devices(mock=True):
+        mock_pin_tip_detect = PinTipDetection("")
+
     await mock_pin_tip_detect.connect(mock=True)
     await mock_pin_tip_detect.validity_timeout.set(0.2)
     mock_pin_tip_detect._get_tip_and_edge_data = AsyncMock(

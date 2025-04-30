@@ -13,7 +13,6 @@ from ophyd.status import DeviceStatus, Status
 from ophyd_async.core import init_devices
 from ophyd_async.testing import get_mock_put, set_mock_value
 
-from dodal.beamlines import i03
 from dodal.devices.fast_grid_scan import (
     FastGridScanCommon,
     GridScanParamsCommon,
@@ -51,14 +50,14 @@ async def panda_fast_grid_scan():
 
 
 @pytest.fixture
-def smargon(RE: RunEngine):
-    smargon = i03.smargon(connect_immediately=True, mock=True)
+async def smargon(RE: RunEngine):
+    async with init_devices(mock=True):
+        smargon = Smargon()
 
     for motor in [smargon.omega, smargon.x, smargon.y, smargon.z]:
         patch_motor(motor)
 
-    yield smargon
-    i03.smargon.cache_clear()
+    return smargon
 
 
 @pytest.mark.parametrize(
