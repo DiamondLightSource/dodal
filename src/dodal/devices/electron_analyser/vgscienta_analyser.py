@@ -3,11 +3,15 @@ from ophyd_async.core import Array1D, SignalR, StandardReadableFormat, soft_sign
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
 from dodal.common.beamlines.device_helpers import CAM_SUFFIX
+from dodal.common.data_util import load_json_file_to_class
 from dodal.devices.electron_analyser.abstract_analyser import (
-    AbstractAnalyserDetector,
     AbstractAnalyserDriverIO,
+    AbstractElectronAnalyserDetector,
 )
-from dodal.devices.electron_analyser.vgscienta_region import DetectorMode
+from dodal.devices.electron_analyser.vgscienta_region import (
+    DetectorMode,
+    VGScientaSequence,
+)
 
 
 class VGScientaAnalyserDriverIO(AbstractAnalyserDriverIO):
@@ -28,7 +32,7 @@ class VGScientaAnalyserDriverIO(AbstractAnalyserDriverIO):
 
         super().__init__(prefix, name)
 
-    def _get_energy_axis_signal(self, prefix: str = "") -> SignalR:
+    def _get_energy_axis_signal(self, prefix: str = "") -> SignalR[Array1D[np.float64]]:
         """
         Override abstract and return epics signal
         """
@@ -36,7 +40,7 @@ class VGScientaAnalyserDriverIO(AbstractAnalyserDriverIO):
             return self.energy_axis
         return epics_signal_r(Array1D[np.float64], prefix + "X_SCALE_RBV")
 
-    def _get_angle_axis_signal(self, prefix: str = "") -> SignalR:
+    def _get_angle_axis_signal(self, prefix: str = "") -> SignalR[Array1D[np.float64]]:
         """
         Override abstract and return epics signal
         """
@@ -49,20 +53,12 @@ class VGScientaAnalyserDriverIO(AbstractAnalyserDriverIO):
         return str
 
 
-class VGScientaAnalyserDetector(AbstractAnalyserDetector[VGScientaAnalyserDriverIO]):
+class VGScientaAnalyserDetector(
+    AbstractElectronAnalyserDetector[VGScientaAnalyserDriverIO, VGScientaSequence]
+):
     def __init__(self, prefix: str, name: str):
         self.driver = VGScientaAnalyserDriverIO(prefix + CAM_SUFFIX)
-        super().__init__(prefix, name, self.driver)
+        super().__init__(name, self.driver)
 
-        self.per_scan_metadata: list[SignalR] = self.per_scan_metadata + [
-            self.driver.first_x_channel,
-            self.driver.x_channel_size,
-            self.driver.first_y_channel,
-            self.driver.y_channel_size,
-            self.driver.excitation_energy_source,
-            self.driver.centre_energy,
-            self.driver.detector_mode,
-        ]
-        self.per_point_metadata: list[SignalR] = self.per_point_metadata + [
-            self.driver.external_io,
-        ]
+    def get_sequence(self, filename: str) -> VGScientaSequence:
+        return load_json_file_to_class(VGScientaSequence, filename)

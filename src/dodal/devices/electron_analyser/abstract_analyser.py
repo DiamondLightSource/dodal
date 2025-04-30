@@ -22,7 +22,6 @@ from ophyd_async.core import (
     soft_signal_rw,
 )
 from ophyd_async.core._protocol import AsyncConfigurable, AsyncReadable
-from ophyd_async.core._utils import merge_gathered_dicts  # type: ignore
 from ophyd_async.epics.adcore import (
     DEFAULT_GOOD_STATES,
     ADBaseIO,
@@ -31,7 +30,10 @@ from ophyd_async.epics.adcore import (
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
-from dodal.devices.electron_analyser.abstract_region import EnergyMode
+from dodal.devices.electron_analyser.abstract_region import (
+    EnergyMode,
+    TAbstractBaseSequence,
+)
 from dodal.devices.electron_analyser.util import to_binding_energy
 
 
@@ -90,13 +92,13 @@ class AbstractAnalyserDriverIO(ABC, StandardReadable, ADBaseIO):
         super().__init__(prefix=prefix, name=name)
 
     @abstractmethod
-    def _get_angle_axis_signal(self, prefix: str = "") -> SignalR:
+    def _get_angle_axis_signal(self, prefix: str = "") -> SignalR[Array1D[np.float64]]:
         """
         The signal that defines the angle axis. Depends on analyser model.
         """
 
     @abstractmethod
-    def _get_energy_axis_signal(self, prefix: str = "") -> SignalR:
+    def _get_energy_axis_signal(self, prefix: str = "") -> SignalR[Array1D[np.float64]]:
         """
         The signal that defines the energy axis. Depends on analyser model.
         """
@@ -123,7 +125,7 @@ class AbstractAnalyserDriverIO(ABC, StandardReadable, ADBaseIO):
         return total_steps * step_time * iterations
 
     def _calculate_total_intensity(self, spectrum: Array1D[np.float64]) -> float:
-        return np.sum(spectrum)
+        return float(np.sum(spectrum, dtype=np.float64))
 
     @property
     @abstractmethod
@@ -139,10 +141,10 @@ TAbstractAnalyserDriverIO = TypeVar(
 )
 
 
-class AnalyserController(Generic[TAbstractAnalyserDriverIO]):
+class AnalyserController:
     def __init__(
         self,
-        driver: TAbstractAnalyserDriverIO,
+        driver: AbstractAnalyserDriverIO,
         good_states: frozenset[ADState] = DEFAULT_GOOD_STATES,
     ) -> None:
         self.driver = driver
@@ -193,43 +195,17 @@ class AnalyserController(Generic[TAbstractAnalyserDriverIO]):
         self._arm_status = None
 
 
-class AbstractAnalyserDetector(
+class AbstractElectronAnalyserDetector(
     Device,
     Stageable,
     Triggerable,
     AsyncReadable,
     AsyncConfigurable,
-    Generic[TAbstractAnalyserDriverIO],
+    Generic[TAbstractAnalyserDriverIO, TAbstractBaseSequence],
 ):
-    def __init__(self, prefix: str, name: str, driver: TAbstractAnalyserDriverIO):
+    def __init__(self, name: str, driver: TAbstractAnalyserDriverIO):
         self.driver = driver
         self.controller = AnalyserController(driver=self.driver)
-
-        self.per_scan_metadata: list[SignalR] = [
-            self.driver.region_name,
-            self.driver.excitation_energy,
-            self.driver.energy_mode,
-            self.driver.energy_step,
-            self.driver.high_energy,
-            self.driver.low_energy,
-            self.driver.iterations,
-            self.driver.slices,
-            self.driver.step_time,
-            self.driver.total_steps,
-            self.driver.total_time,
-            self.driver.lens_mode,
-            self.driver.pass_energy,
-            self.driver.energy_axis,
-            self.driver.binding_energy_axis,
-            self.driver.angle_axis,
-        ]
-        self.per_point_metadata: list[SignalR] = [
-            self.driver.spectrum,
-            self.driver.image,
-            self.driver.total_intensity,
-            self.driver.excitation_energy,
-        ]
-
         super().__init__(name)
 
     @AsyncStatus.wrap
@@ -249,9 +225,7 @@ class AbstractAnalyserDetector(
 
     # PER_POINT
     async def read(self) -> dict[str, Reading]:
-        data = await merge_gathered_dicts(
-            [signal.read() for signal in self.per_point_metadata]
-        )
+        data = await self.driver.read()
         # prefix = self.driver.name + "-"
         # is_binding_energy = (
         #     await self.driver.energy_mode.get_value() == EnergyMode.BINDING
@@ -263,25 +237,25 @@ class AbstractAnalyserDetector(
         return data
 
     async def describe(self) -> dict[str, DataKey]:
-        data = await merge_gathered_dicts(
-            [signal.describe() for signal in self.per_point_metadata]
-        )
-        # Correct the shape for image
+        data = await self.driver.describe()
+        # # Correct the shape for image
         prefix = self.driver.name + "-"
         energy_size = len(await self.driver.energy_axis.get_value())
         angle_size = len(await self.driver.angle_axis.get_value())
         data[prefix + "image"]["shape"] = [angle_size, energy_size]
         return data
 
-    # PER_SCAN
     async def read_configuration(self) -> dict[str, Reading]:
-        for signal in self.per_scan_metadata:
-            print(signal.source + ": " + str(await signal.get_value()))
-        return await merge_gathered_dicts(
-            [signal.read() for signal in self.per_scan_metadata]
-        )
+        return await self.driver.read_configuration()
 
     async def describe_configuration(self) -> dict[str, DataKey]:
-        return await merge_gathered_dicts(
-            [signal.describe() for signal in self.per_scan_metadata]
-        )
+        return await self.driver.describe_configuration()
+
+    @abstractmethod
+    def get_sequence(self, filename: str) -> TAbstractBaseSequence:
+        pass
+
+
+TAbstractElectronAnalyserDetector = TypeVar(
+    "TAbstractElectronAnalyserDetector", bound=AbstractElectronAnalyserDetector
+)
