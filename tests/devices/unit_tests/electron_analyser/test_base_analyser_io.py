@@ -25,7 +25,8 @@ from tests.devices.unit_tests.electron_analyser.test_util import (
     TEST_SEQUENCE_REGION_NAMES,
     TEST_SPECS_SEQUENCE,
     TEST_VGSCIENTA_SEQUENCE,
-    assert_reading_has_expected_value,
+    assert_read_configuration_has_expected_value,
+    assert_read_has_expected_value,
 )
 
 
@@ -80,25 +81,25 @@ async def test_given_region_that_analyser_sets_modes_correctly(
     get_mock_put(sim_analyser_driver.region_name).assert_called_once_with(
         region.name, wait=True
     )
-    await assert_reading_has_expected_value(
+    await assert_read_configuration_has_expected_value(
         sim_analyser_driver, "region_name", region.name
     )
     get_mock_put(sim_analyser_driver.energy_mode).assert_called_once_with(
         region.energy_mode, wait=True
     )
-    await assert_reading_has_expected_value(
+    await assert_read_configuration_has_expected_value(
         sim_analyser_driver, "energy_mode", region.energy_mode
     )
     get_mock_put(sim_analyser_driver.acquisition_mode).assert_called_once_with(
         region.acquisition_mode, wait=True
     )
-    await assert_reading_has_expected_value(
+    await assert_read_configuration_has_expected_value(
         sim_analyser_driver, "acquisition_mode", region.acquisition_mode
     )
     get_mock_put(sim_analyser_driver.lens_mode).assert_called_once_with(
         region.lens_mode, wait=True
     )
-    await assert_reading_has_expected_value(
+    await assert_read_configuration_has_expected_value(
         sim_analyser_driver, "lens_mode", region.lens_mode
     )
 
@@ -124,26 +125,26 @@ async def test_given_region_that_analyser_sets_energy_values_correctly(
     get_mock_put(sim_analyser_driver.low_energy).assert_called_once_with(
         expected_low_e, wait=True
     )
-    await assert_reading_has_expected_value(
+    await assert_read_configuration_has_expected_value(
         sim_analyser_driver, "low_energy", expected_low_e
     )
     get_mock_put(sim_analyser_driver.high_energy).assert_called_once_with(
         expected_high_e, wait=True
     )
-    await assert_reading_has_expected_value(
+    await assert_read_configuration_has_expected_value(
         sim_analyser_driver, "high_energy", expected_high_e
     )
     get_mock_put(sim_analyser_driver.pass_energy).assert_called_once_with(
         expected_pass_e, wait=True
     )
-    await assert_reading_has_expected_value(
+    await assert_read_configuration_has_expected_value(
         sim_analyser_driver, "pass_energy", expected_pass_e
     )
 
     get_mock_put(sim_analyser_driver.excitation_energy).assert_called_once_with(
         excitation_energy, wait=True
     )
-    await assert_reading_has_expected_value(
+    await assert_read_has_expected_value(
         sim_analyser_driver, "excitation_energy", excitation_energy
     )
 
@@ -162,13 +163,13 @@ async def test_given_region_that_analyser_sets_channel_correctly(
     get_mock_put(sim_analyser_driver.slices).assert_called_once_with(
         expected_slices, wait=True
     )
-    await assert_reading_has_expected_value(
+    await assert_read_configuration_has_expected_value(
         sim_analyser_driver, "slices", expected_slices
     )
     get_mock_put(sim_analyser_driver.iterations).assert_called_once_with(
         expected_iterations, wait=True
     )
-    await assert_reading_has_expected_value(
+    await assert_read_configuration_has_expected_value(
         sim_analyser_driver, "iterations", expected_iterations
     )
 

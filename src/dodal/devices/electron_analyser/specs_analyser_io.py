@@ -1,9 +1,5 @@
 import numpy as np
-from ophyd_async.core import (
-    Array1D,
-    SignalR,
-    derived_signal_r,
-)
+from ophyd_async.core import Array1D, SignalR, StandardReadableFormat, derived_signal_r
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
 from dodal.devices.electron_analyser.abstract_analyser_io import (
@@ -13,13 +9,13 @@ from dodal.devices.electron_analyser.abstract_analyser_io import (
 
 class SpecsAnalyserDriverIO(AbstractAnalyserDriverIO):
     def __init__(self, prefix: str, name: str = "") -> None:
-        with self.add_children_as_readables():
-            # Used for setting up region data acquisition. Per scan.
+        with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
+            # Used for setting up region data acquisition.
             self.psu_mode = epics_signal_rw(str, prefix + "SCAN_RANGE")
             self.values = epics_signal_rw(int, prefix + "VALUES")
             self.centre_energy = epics_signal_rw(float, prefix + "KINETIC_ENERGY")
 
-            # Used to read detector data after acqusition. Per scan.
+            # Used to read detector data after acqusition.
             self.min_angle_axis = epics_signal_r(float, prefix + "Y_MIN_RBV")
             self.max_angle_axis = epics_signal_r(float, prefix + "Y_MAX_RBV")
 
