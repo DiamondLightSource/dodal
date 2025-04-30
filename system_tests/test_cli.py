@@ -1,12 +1,16 @@
-import subprocess
-import sys
-
 import pytest
+from click.testing import CliRunner
 
 from dodal import __version__
+from dodal.cli import main
 
 
-@pytest.mark.skip_in_pycharm(reason="subprocess returns tty escape sequences")
-def test_cli_version():
-    cmd = [sys.executable, "-m", "dodal", "--version"]
-    assert subprocess.check_output(cmd).decode().strip() == __version__
+@pytest.fixture
+def runner() -> CliRunner:
+    return CliRunner()
+
+
+def test_cli_version(runner: CliRunner):
+    response = runner.invoke(main, "--version")
+    assert response.exit_code == 0
+    assert response.output.strip() == __version__
