@@ -21,7 +21,7 @@ class SpecsAnalyserDriverIO(AbstractAnalyserDriverIO):
 
         super().__init__(prefix, name)
 
-    def _get_angle_axis_signal(self, prefix: str = "") -> SignalR:
+    def _get_angle_axis_signal(self, prefix: str = "") -> SignalR[Array1D[np.float64]]:
         if hasattr(self, "angle_axis"):
             return self.angle_axis
         angle_axis = derived_signal_r(
@@ -42,7 +42,7 @@ class SpecsAnalyserDriverIO(AbstractAnalyserDriverIO):
         axis = np.array([min_angle + offset + i * width for i in range(slices)])
         return axis
 
-    def _get_energy_axis_signal(self, prefix: str = "") -> SignalR:
+    def _get_energy_axis_signal(self, prefix: str = "") -> SignalR[Array1D[np.float64]]:
         if hasattr(self, "energy_axis"):
             return self.energy_axis
         energy_axis = derived_signal_r(
