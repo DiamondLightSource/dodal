@@ -1,5 +1,10 @@
 import numpy as np
-from ophyd_async.core import Array1D, SignalR, StandardReadableFormat
+from ophyd_async.core import (
+    Array1D,
+    SignalR,
+    StandardReadableFormat,
+    soft_signal_rw,
+)
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
 from dodal.devices.electron_analyser.abstract_analyser_io import (
@@ -27,21 +32,19 @@ class VGScientaAnalyserDriverIO(AbstractAnalyserDriverIO):
 
         super().__init__(prefix, name)
 
-    def _get_energy_axis_signal(self, prefix: str = "") -> SignalR[Array1D[np.float64]]:
-        """
-        Override abstract and return epics signal
-        """
-        if hasattr(self, "energy_axis"):
-            return self.energy_axis
+    def _create_energy_axis_signal(self, prefix: str) -> SignalR[Array1D[np.float64]]:
         return epics_signal_r(Array1D[np.float64], prefix + "X_SCALE_RBV")
 
-    def _get_angle_axis_signal(self, prefix: str = "") -> SignalR[Array1D[np.float64]]:
-        """
-        Override abstract and return epics signal
-        """
-        if hasattr(self, "angle_axis"):
-            return self.angle_axis
+    def _create_angle_axis_signal(self, prefix: str) -> SignalR[Array1D[np.float64]]:
         return epics_signal_r(Array1D[np.float64], prefix + "Y_SCALE_RBV")
+
+    def _create_total_steps_signal(self, prefix: str) -> SignalR[int]:
+        # ToDo - This ideally needs to be read from EPICS using "TOTAL_POINTS_RBV".
+        # However, this is only known after the first point and blueksky / ophyd
+        # currently doesn't support config signals read after first point. Instead
+        # use estimated value from region instead. This also might be fixed with
+        # implementing PEAKS for analyser software.
+        return soft_signal_rw(int, initial_value=1)
 
     @property
     def pass_energy_type(self) -> type:

@@ -90,5 +90,8 @@ def configure_vgscienta(
         analyser.y_channel_size, region.y_channel_size(),
         analyser.detector_mode, region.detector_mode,
         analyser.image_mode, ADImageMode.SINGLE,
+        # The below should ideally be done read from epics.
+        # See issue https://github.com/bluesky/ophyd-async/issues/877
+        analyser.total_steps, region.total_steps
     )
     # fmt: on

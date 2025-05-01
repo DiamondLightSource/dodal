@@ -21,9 +21,7 @@ class SpecsAnalyserDriverIO(AbstractAnalyserDriverIO):
 
         super().__init__(prefix, name)
 
-    def _get_angle_axis_signal(self, prefix: str = "") -> SignalR[Array1D[np.float64]]:
-        if hasattr(self, "angle_axis"):
-            return self.angle_axis
+    def _create_angle_axis_signal(self, prefix: str) -> SignalR[Array1D[np.float64]]:
         angle_axis = derived_signal_r(
             self._calculate_angle_axis,
             min_angle=self.min_angle_axis,
@@ -42,9 +40,7 @@ class SpecsAnalyserDriverIO(AbstractAnalyserDriverIO):
         axis = np.array([min_angle + offset + i * width for i in range(slices)])
         return axis
 
-    def _get_energy_axis_signal(self, prefix: str = "") -> SignalR[Array1D[np.float64]]:
-        if hasattr(self, "energy_axis"):
-            return self.energy_axis
+    def _create_energy_axis_signal(self, prefix: str) -> SignalR[Array1D[np.float64]]:
         energy_axis = derived_signal_r(
             self._calculate_energy_axis,
             "eV",
@@ -62,6 +58,9 @@ class SpecsAnalyserDriverIO(AbstractAnalyserDriverIO):
         step = (max_energy - min_energy) / (total_points_iterations - 1)
         axis = np.array([min_energy + i * step for i in range(total_points_iterations)])
         return axis
+
+    def _create_total_steps_signal(self, prefix: str) -> SignalR[int]:
+        return epics_signal_r(int, prefix + "TOTAL_POINTS_RBV")
 
     @property
     def pass_energy_type(self) -> type:
