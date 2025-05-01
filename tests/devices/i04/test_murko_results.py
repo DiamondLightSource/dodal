@@ -382,3 +382,37 @@ async def test_trigger_stops_once_last_angle_found(
     assert mock_murko_results.pubsub.get_message.call_count == 2
     # 2 batches of 6 = 12
     assert mock_murko_results.redis_client.hget.call_count == 12
+
+
+@patch("dodal.devices.i04.murko_results.StrictRedis")
+async def test_stage_calls_setters_with_0(
+    mock_strict_redis, mock_murko_results, mock_setters
+):
+    mock_x_setter, mock_y_setter, mock_z_setter = mock_setters
+
+    mock_murko_results.pubsub.subscribe = patch.object(
+        mock_strict_redis.pubsub,
+        "subscribe",
+        new_callable=AsyncMock,
+    ).start()
+
+    await mock_murko_results.stage()
+
+    assert mock_murko_results.pubsub.subscribe.call_count == 1
+    assert mock_x_setter.call_args[0][0] == 0
+    assert mock_y_setter.call_args[0][0] == 0
+    assert mock_z_setter.call_args[0][0] == 0
+
+
+@patch("dodal.devices.i04.murko_results.StrictRedis")
+async def test_unstage_calls_unsubscribe(
+    mock_strict_redis, mock_murko_results, mock_setters
+):
+    mock_murko_results.pubsub.unsubscribe = patch.object(
+        mock_strict_redis.pubsub,
+        "unsubscribe",
+        new_callable=AsyncMock,
+    ).start()
+
+    await mock_murko_results.unstage()
+    assert mock_murko_results.pubsub.unsubscribe.call_count == 1
