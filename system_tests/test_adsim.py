@@ -1,3 +1,4 @@
+from collections.abc import Generator
 from typing import cast
 
 import pytest
@@ -21,13 +22,15 @@ from dodal.plans import count
 
 
 @pytest.fixture
-def det(RE) -> StandardDetector:
-    return adsim.det(connect_immediately=True)
+def det(RE) -> Generator[StandardDetector]:
+    yield adsim.det(connect_immediately=True)
+    adsim.det.cache_clear()
 
 
 @pytest.fixture
-def sim_stage(RE) -> SimStage:
-    return adsim.stage(connect_immediately=True)
+def sim_stage(RE) -> Generator[SimStage]:
+    yield adsim.stage(connect_immediately=True)
+    adsim.stage.cache_clear()
 
 
 @pytest.fixture

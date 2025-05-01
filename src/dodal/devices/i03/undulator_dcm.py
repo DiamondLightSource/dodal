@@ -4,10 +4,9 @@ from bluesky.protocols import Movable
 from ophyd_async.core import AsyncStatus, Reference, StandardReadable
 
 from dodal.common.beamlines.beamline_parameters import get_beamline_parameters
-
-from ..log import LOGGER
-from .dcm import DCM
-from .undulator import Undulator
+from dodal.devices.i03.dcm import DCM
+from dodal.devices.undulator import Undulator
+from dodal.log import LOGGER
 
 ENERGY_TIMEOUT_S: float = 30.0
 
@@ -23,6 +22,9 @@ class UndulatorDCM(StandardReadable, Movable[float]):
     Calling unulator_dcm.set(energy) will move the DCM motor, perform a table lookup
     and move the Undulator gap motor if needed. So the set method can be thought of as
     a comprehensive way to set beam energy.
+
+    This class will be removed in the future. Use the separate Undulator and DCM devices
+    instead. See https://github.com/DiamondLightSource/dodal/issues/1092
     """
 
     def __init__(
