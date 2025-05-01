@@ -37,7 +37,7 @@ class MerlinController(ADBaseController):
             DEFAULT_TIMEOUT + await self.driver.acquire_time.get_value()
         )
         await asyncio.gather(
-            self.driver.num_images.set(trigger_info.total_number_of_triggers),
+            self.driver.num_images.set(trigger_info.total_number_of_exposures),
             self.driver.image_mode.set(ADImageMode.MULTIPLE),
         )
 

@@ -37,7 +37,8 @@ def _set_url(mock_oav_to_redis_forwarder: OAVToRedisForwarder, url: str):
     set_mock_value(mock_oav_to_redis_forwarder.selected_source, Source.FULL_SCREEN)
 
 
-@pytest.mark.s03  # Doesn't actually depend on s03 but is a system test as it depends on external webpage. See https://github.com/DiamondLightSource/mx-bluesky/issues/183
+@pytest.mark.system_test  # depends on external webpage. See
+# https://github.com/DiamondLightSource/mx-bluesky/issues/183
 async def test_given_stream_url_is_not_a_real_webpage_when_kickoff_then_error(
     mock_oav_to_redis_forwarder: OAVToRedisForwarder,
 ):
@@ -46,7 +47,8 @@ async def test_given_stream_url_is_not_a_real_webpage_when_kickoff_then_error(
         await mock_oav_to_redis_forwarder.kickoff()
 
 
-@pytest.mark.s03  # Doesn't actually depend on s03 but is a system test as it depends on external webpage. See https://github.com/DiamondLightSource/mx-bluesky/issues/183
+@pytest.mark.system_test  # depends on external webpage.
+# See https://github.com/DiamondLightSource/mx-bluesky/issues/183
 async def test_given_stream_url_is_real_webpage_but_not_mjpg_when_kickoff_then_error(
     mock_oav_to_redis_forwarder: OAVToRedisForwarder,
 ):
@@ -57,7 +59,8 @@ async def test_given_stream_url_is_real_webpage_but_not_mjpg_when_kickoff_then_e
     assert URL in str(e.value)
 
 
-@pytest.mark.s03  # Doesn't actually depend on s03, instead connects to the real beamline. See https://github.com/DiamondLightSource/mx-bluesky/issues/183
+@pytest.mark.system_test  # connects to the real beamline. See
+# https://github.com/DiamondLightSource/mx-bluesky/issues/183
 async def test_given_valid_stream_when_kickoff_then_multiple_images_written_to_redis(
     oav_to_redis_forwarder: OAVToRedisForwarder,
 ):
