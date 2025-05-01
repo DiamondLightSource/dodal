@@ -92,17 +92,13 @@ class AbstractAnalyserDriverIO(ABC, StandardReadable, ADBaseIO):
         super().__init__(prefix=prefix, name=name)
 
     @abstractmethod
-    def _create_angle_axis_signal(
-        self, prefix: str = ""
-    ) -> SignalR[Array1D[np.float64]]:
+    def _create_angle_axis_signal(self, prefix: str) -> SignalR[Array1D[np.float64]]:
         """
         The signal that defines the angle axis. Depends on analyser model.
         """
 
     @abstractmethod
-    def _create_energy_axis_signal(
-        self, prefix: str = ""
-    ) -> SignalR[Array1D[np.float64]]:
+    def _create_energy_axis_signal(self, prefix: str) -> SignalR[Array1D[np.float64]]:
         """
         The signal that defines the energy axis. Depends on analyser model.
         """

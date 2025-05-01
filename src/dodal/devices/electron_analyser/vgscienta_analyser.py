@@ -32,14 +32,10 @@ class VGScientaAnalyserDriverIO(AbstractAnalyserDriverIO):
 
         super().__init__(prefix, name)
 
-    def _create_energy_axis_signal(
-        self, prefix: str = ""
-    ) -> SignalR[Array1D[np.float64]]:
+    def _create_energy_axis_signal(self, prefix: str) -> SignalR[Array1D[np.float64]]:
         return epics_signal_r(Array1D[np.float64], prefix + "X_SCALE_RBV")
 
-    def _create_angle_axis_signal(
-        self, prefix: str = ""
-    ) -> SignalR[Array1D[np.float64]]:
+    def _create_angle_axis_signal(self, prefix: str) -> SignalR[Array1D[np.float64]]:
         return epics_signal_r(Array1D[np.float64], prefix + "Y_SCALE_RBV")
 
     @property
