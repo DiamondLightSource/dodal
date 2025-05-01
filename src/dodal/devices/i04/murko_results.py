@@ -64,6 +64,7 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
         redis_password=RedisConstants.REDIS_PASSWORD,
         redis_db=RedisConstants.MURKO_REDIS_DB,
         name="",
+        stop_angle=270,
     ):
         self.redis_client = StrictRedis(
             host=redis_host,
@@ -73,9 +74,7 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
         self.pubsub = self.redis_client.pubsub()
         self._last_omega = 0
         self.sample_id = soft_signal_rw(str)  # Should get from redis
-        self.stop_angle = 270
-        self.sums = {"x": 0, "y": 0, "z": 0}
-        self.total = 0
+        self.stop_angle = stop_angle
         self.x_dists_mm = []
         self.y_dists_mm = []
         self.omegas = []
