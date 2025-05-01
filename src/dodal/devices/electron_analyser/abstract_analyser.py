@@ -223,22 +223,12 @@ class AbstractElectronAnalyserDetector(
         """Disarm the detector."""
         await asyncio.gather(self.controller.disarm())
 
-    # PER_POINT
     async def read(self) -> dict[str, Reading]:
-        data = await self.driver.read()
-        # prefix = self.driver.name + "-"
-        # is_binding_energy = (
-        #     await self.driver.energy_mode.get_value() == EnergyMode.BINDING
-        # )
-        # if is_binding_energy:
-        #     del data[prefix + "energy_axis"]
-        # else:
-        #     del data[prefix + "binding_energy_axis"]
-        return data
+        return await self.driver.read()
 
     async def describe(self) -> dict[str, DataKey]:
         data = await self.driver.describe()
-        # # Correct the shape for image
+        # Correct the shape for image
         prefix = self.driver.name + "-"
         energy_size = len(await self.driver.energy_axis.get_value())
         angle_size = len(await self.driver.angle_axis.get_value())
