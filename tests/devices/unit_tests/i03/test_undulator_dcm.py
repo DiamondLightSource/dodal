@@ -26,7 +26,7 @@ def flush_event_loop_on_finish(event_loop):
 
 
 @pytest.fixture
-async def fake_undulator_dcm() -> UndulatorDCM:
+async def fake_undulator_dcm(RE) -> UndulatorDCM:
     async with init_devices(mock=True):
         undulator = Undulator(
             "UND-01",

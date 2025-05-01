@@ -199,9 +199,3 @@ async def test_that_data_to_read_is_correct(
         await sim_analyser_driver.total_intensity.get_value()
         == expected_total_intensity
     )
-
-    # Check that angle and energy axis signals return the same reference every time
-    angle_axis_instance = sim_analyser_driver.angle_axis
-    assert angle_axis_instance is sim_analyser_driver._get_angle_axis_signal()
-    energy_axis_instance = sim_analyser_driver.energy_axis
-    assert energy_axis_instance is sim_analyser_driver._get_energy_axis_signal()

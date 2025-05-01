@@ -2,7 +2,6 @@ import os
 from typing import Any
 
 import pytest
-from bluesky.run_engine import RunEngine
 from ophyd_async.core import init_devices
 
 from dodal.common.data_util import load_json_file_to_class
@@ -83,8 +82,3 @@ async def sim_analyser_driver(
             name="analyser_driver",
         )
     return sim_analyser_driver
-
-
-@pytest.fixture
-def RE() -> RunEngine:
-    return RunEngine()
