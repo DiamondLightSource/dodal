@@ -156,6 +156,7 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
             -beam_dist_px[1] * metadata["microns_per_y_pixel"] / 1000
         )
         self.omegas.append(omega)
+        self._last_omega = omega
 
     @staticmethod
     def get_yz_least_squares(v_values: list, omegas: list) -> tuple[float, float]:
