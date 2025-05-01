@@ -70,7 +70,7 @@ class AbstractAnalyserDriverIO(ABC, StandardReadable, ADBaseIO):
             self.acquisition_mode = epics_signal_rw(str, prefix + "ACQ_MODE")
 
             # Read once per scan after data acquired
-            self.energy_axis = self._get_energy_axis_signal(prefix)
+            self.energy_axis = self._create_energy_axis_signal(prefix)
             self.binding_energy_axis = derived_signal_r(
                 self._calculate_binding_energy_axis,
                 "eV",
@@ -78,7 +78,7 @@ class AbstractAnalyserDriverIO(ABC, StandardReadable, ADBaseIO):
                 excitation_energy=self.excitation_energy,
                 energy_mode=self.energy_mode,
             )
-            self.angle_axis = self._get_angle_axis_signal(prefix)
+            self.angle_axis = self._create_angle_axis_signal(prefix)
             self.step_time = epics_signal_r(float, prefix + "AcquireTime")
             self.total_steps = epics_signal_r(int, prefix + "TOTAL_POINTS_RBV")
             self.total_time = derived_signal_r(
@@ -92,13 +92,17 @@ class AbstractAnalyserDriverIO(ABC, StandardReadable, ADBaseIO):
         super().__init__(prefix=prefix, name=name)
 
     @abstractmethod
-    def _get_angle_axis_signal(self, prefix: str = "") -> SignalR[Array1D[np.float64]]:
+    def _create_angle_axis_signal(
+        self, prefix: str = ""
+    ) -> SignalR[Array1D[np.float64]]:
         """
         The signal that defines the angle axis. Depends on analyser model.
         """
 
     @abstractmethod
-    def _get_energy_axis_signal(self, prefix: str = "") -> SignalR[Array1D[np.float64]]:
+    def _create_energy_axis_signal(
+        self, prefix: str = ""
+    ) -> SignalR[Array1D[np.float64]]:
         """
         The signal that defines the energy axis. Depends on analyser model.
         """
