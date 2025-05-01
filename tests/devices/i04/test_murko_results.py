@@ -8,7 +8,6 @@ import pytest
 from pytest import approx
 
 from dodal.devices.i04.murko_results import MurkoResultsDevice
-from dodal.devices.oav.oav_calculations import camera_coordinates_to_xyz_mm
 
 
 @pytest.fixture
