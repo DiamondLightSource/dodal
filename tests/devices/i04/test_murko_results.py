@@ -381,5 +381,5 @@ async def test_trigger_stops_once_last_angle_found(
     await mock_murko_results.trigger()
     # Takes 2 batches to find the last angle, 200°
     assert mock_murko_results.pubsub.get_message.call_count == 2
-    # 4 batches of 6 = 24
+    # 2 batches of 6 = 12
     assert mock_murko_results.redis_client.hget.call_count == 12
