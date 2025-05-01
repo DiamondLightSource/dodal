@@ -1,0 +1,82 @@
+dodal.devices.electron\_analyser.VGScientaAnalyserDriverIO
+==========================================================
+
+.. currentmodule:: dodal.devices.electron_analyser
+
+.. autoclass:: VGScientaAnalyserDriverIO
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      ~VGScientaAnalyserDriverIO.pass_energy_type
+      
+      
+      ~VGScientaAnalyserDriverIO.acquire_time
+      
+      
+      ~VGScientaAnalyserDriverIO.acquire_period
+      
+      
+      ~VGScientaAnalyserDriverIO.num_images
+      
+      
+      ~VGScientaAnalyserDriverIO.image_mode
+      
+      
+      ~VGScientaAnalyserDriverIO.detector_state
+      
+      
+      ~VGScientaAnalyserDriverIO.unique_id
+      
+      
+      ~VGScientaAnalyserDriverIO.nd_attributes_file
+      
+      
+      ~VGScientaAnalyserDriverIO.acquire
+      
+      
+      ~VGScientaAnalyserDriverIO.array_size_x
+      
+      
+      ~VGScientaAnalyserDriverIO.array_size_y
+      
+      
+      ~VGScientaAnalyserDriverIO.data_type
+      
+      
+      ~VGScientaAnalyserDriverIO.array_counter
+      
+      
+      ~VGScientaAnalyserDriverIO.wait_for_plugins
+      
+   
+   

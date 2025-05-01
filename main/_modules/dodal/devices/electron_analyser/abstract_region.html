@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.electron_analyser.abstract_region &#8212; dodal 1.46.1.dev5+gd977c1d75b documentation</title>
+    <title>dodal.devices.electron_analyser.abstract_region &#8212; dodal 1.46.1.dev6+g217a70c8b7 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=c13b37ef"></script>
+    <script src="../../../../_static/documentation_options.js?v=1b7016ca"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -453,14 +453,12 @@ window.addEventListener("load", () => mermaid.run());
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">ABC</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Generic</span><span class="p">,</span> <span class="n">TypeVar</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">StrictEnum</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">Field</span><span class="p">,</span> <span class="n">model_validator</span>
 
 
-<div class="viewcode-block" id="java_to_python_case">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.electron_analyser.abstract_region.html#dodal.devices.electron_analyser.abstract_region.java_to_python_case">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">java_to_python_case</span><span class="p">(</span><span class="n">java_str</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Convert a camelCase Java-style string to a snake_case Python-style string.</span>
@@ -470,30 +468,21 @@ window.addEventListener("load", () => mermaid.run());
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">new_value</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s2">&quot;(.)([A-Z][a-z]+)&quot;</span><span class="p">,</span> <span class="sa">r</span><span class="s2">&quot;\1_\2&quot;</span><span class="p">,</span> <span class="n">java_str</span><span class="p">)</span>
     <span class="n">new_value</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s2">&quot;([a-z0-9])([A-Z])&quot;</span><span class="p">,</span> <span class="sa">r</span><span class="s2">&quot;\1_\2&quot;</span><span class="p">,</span> <span class="n">new_value</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-    <span class="k">return</span> <span class="n">new_value</span></div>
+    <span class="k">return</span> <span class="n">new_value</span>
 
 
-
-<div class="viewcode-block" id="switch_case_validation">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.electron_analyser.abstract_region.html#dodal.devices.electron_analyser.abstract_region.switch_case_validation">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">switch_case_validation</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">f</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-    <span class="k">return</span> <span class="p">{</span><span class="n">f</span><span class="p">(</span><span class="n">key</span><span class="p">):</span> <span class="n">value</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span></div>
+    <span class="k">return</span> <span class="p">{</span><span class="n">f</span><span class="p">(</span><span class="n">key</span><span class="p">):</span> <span class="n">value</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
 
 
-
-<div class="viewcode-block" id="JavaToPythonModel">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.electron_analyser.abstract_region.JavaToPythonModel.html#dodal.devices.electron_analyser.abstract_region.JavaToPythonModel">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">JavaToPythonModel</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
     <span class="nd">@model_validator</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;before&quot;</span><span class="p">)</span>
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">before_validation</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">switch_case_validation</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">java_to_python_case</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">data</span></div>
+        <span class="k">return</span> <span class="n">data</span>
 
 
-
-<div class="viewcode-block" id="energy_mode_validation">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.electron_analyser.abstract_region.html#dodal.devices.electron_analyser.abstract_region.energy_mode_validation">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">energy_mode_validation</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
     <span class="c1"># Convert binding_energy to energy_mode to make base region more generic</span>
     <span class="k">if</span> <span class="s2">&quot;binding_energy&quot;</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
@@ -502,20 +491,17 @@ window.addEventListener("load", () => mermaid.run());
         <span class="n">data</span><span class="p">[</span><span class="s2">&quot;energy_mode&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
             <span class="n">EnergyMode</span><span class="o">.</span><span class="n">BINDING</span> <span class="k">if</span> <span class="n">is_binding_energy</span> <span class="k">else</span> <span class="n">EnergyMode</span><span class="o">.</span><span class="n">KINETIC</span>
         <span class="p">)</span>
-    <span class="k">return</span> <span class="n">data</span></div>
-
+    <span class="k">return</span> <span class="n">data</span>
 
 
 <div class="viewcode-block" id="EnergyMode">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.electron_analyser.abstract_region.EnergyMode.html#dodal.devices.electron_analyser.abstract_region.EnergyMode">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">EnergyMode</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.electron_analyser.EnergyMode.html#dodal.devices.electron_analyser.EnergyMode">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">EnergyMode</span><span class="p">(</span><span class="n">StrictEnum</span><span class="p">):</span>
     <span class="n">KINETIC</span> <span class="o">=</span> <span class="s2">&quot;Kinetic&quot;</span>
     <span class="n">BINDING</span> <span class="o">=</span> <span class="s2">&quot;Binding&quot;</span></div>
 
 
 
-<div class="viewcode-block" id="AbstractBaseRegion">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.electron_analyser.abstract_region.AbstractBaseRegion.html#dodal.devices.electron_analyser.abstract_region.AbstractBaseRegion">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">AbstractBaseRegion</span><span class="p">(</span><span class="n">ABC</span><span class="p">,</span> <span class="n">JavaToPythonModel</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generic region model that holds the data. Specialised region models should inherit</span>
@@ -542,22 +528,16 @@ window.addEventListener("load", () => mermaid.run());
     <span class="k">def</span><span class="w"> </span><span class="nf">is_kinetic_energy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy_mode</span> <span class="o">==</span> <span class="n">EnergyMode</span><span class="o">.</span><span class="n">KINETIC</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">to_kinetic_energy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">excitation_energy</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">value</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_binding_energy</span><span class="p">()</span> <span class="k">else</span> <span class="n">excitation_energy</span> <span class="o">-</span> <span class="n">value</span>
-
     <span class="nd">@model_validator</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;before&quot;</span><span class="p">)</span>
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">before_validation</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">switch_case_validation</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">java_to_python_case</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">energy_mode_validation</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></div>
-
+        <span class="k">return</span> <span class="n">energy_mode_validation</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 
 
 <span class="n">TAbstractBaseRegion</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;TAbstractBaseRegion&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">AbstractBaseRegion</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="AbstractBaseSequence">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.electron_analyser.abstract_region.AbstractBaseSequence.html#dodal.devices.electron_analyser.abstract_region.AbstractBaseSequence">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">AbstractBaseSequence</span><span class="p">(</span><span class="n">ABC</span><span class="p">,</span> <span class="n">JavaToPythonModel</span><span class="p">,</span> <span class="n">Generic</span><span class="p">[</span><span class="n">TAbstractBaseRegion</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generic sequence model that holds the list of region data. Specialised sequence</span>
@@ -578,8 +558,7 @@ window.addEventListener("load", () => mermaid.run());
         <span class="k">return</span> <span class="p">[</span><span class="n">r</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_enabled_regions</span><span class="p">()]</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">get_region_by_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TAbstractBaseRegion</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">return</span> <span class="nb">next</span><span class="p">((</span><span class="n">region</span> <span class="k">for</span> <span class="n">region</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">regions</span> <span class="k">if</span> <span class="n">region</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">name</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span></div>
-
+        <span class="k">return</span> <span class="nb">next</span><span class="p">((</span><span class="n">region</span> <span class="k">for</span> <span class="n">region</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">regions</span> <span class="k">if</span> <span class="n">region</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">name</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span>
 
 
 <span class="n">TAbstractBaseSequence</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;TAbstractBaseSequence&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">AbstractBaseSequence</span><span class="p">)</span>

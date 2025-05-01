@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.electron_analyser.vgscienta_region &#8212; dodal 1.46.1.dev5+gd977c1d75b documentation</title>
+    <title>dodal.devices.electron_analyser.vgscienta_region &#8212; dodal 1.46.1.dev6+g217a70c8b7 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=c13b37ef"></script>
+    <script src="../../../../_static/documentation_options.js?v=1b7016ca"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -463,35 +463,26 @@ window.addEventListener("load", () => mermaid.run());
 <span class="p">)</span>
 
 
-<div class="viewcode-block" id="Status">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.electron_analyser.vgscienta_region.Status.html#dodal.devices.electron_analyser.vgscienta_region.Status">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Status</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
     <span class="n">READY</span> <span class="o">=</span> <span class="s2">&quot;Ready&quot;</span>
     <span class="n">RUNNING</span> <span class="o">=</span> <span class="s2">&quot;Running&quot;</span>
     <span class="n">COMPLETED</span> <span class="o">=</span> <span class="s2">&quot;Completed&quot;</span>
     <span class="n">INVALID</span> <span class="o">=</span> <span class="s2">&quot;Invalid&quot;</span>
-    <span class="n">ABORTED</span> <span class="o">=</span> <span class="s2">&quot;Aborted&quot;</span></div>
+    <span class="n">ABORTED</span> <span class="o">=</span> <span class="s2">&quot;Aborted&quot;</span>
 
 
-
-<div class="viewcode-block" id="DetectorMode">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.electron_analyser.vgscienta_region.DetectorMode.html#dodal.devices.electron_analyser.vgscienta_region.DetectorMode">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">DetectorMode</span><span class="p">(</span><span class="n">StrictEnum</span><span class="p">):</span>
     <span class="n">ADC</span> <span class="o">=</span> <span class="s2">&quot;ADC&quot;</span>
-    <span class="n">PULSE_COUNTING</span> <span class="o">=</span> <span class="s2">&quot;Pulse Counting&quot;</span></div>
+    <span class="n">PULSE_COUNTING</span> <span class="o">=</span> <span class="s2">&quot;Pulse Counting&quot;</span>
 
 
-
-<div class="viewcode-block" id="AcquisitionMode">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.electron_analyser.vgscienta_region.AcquisitionMode.html#dodal.devices.electron_analyser.vgscienta_region.AcquisitionMode">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">AcquisitionMode</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
     <span class="n">SWEPT</span> <span class="o">=</span> <span class="s2">&quot;Swept&quot;</span>
-    <span class="n">FIXED</span> <span class="o">=</span> <span class="s2">&quot;Fixed&quot;</span></div>
-
+    <span class="n">FIXED</span> <span class="o">=</span> <span class="s2">&quot;Fixed&quot;</span>
 
 
 <div class="viewcode-block" id="VGScientaRegion">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.electron_analyser.vgscienta_region.VGScientaRegion.html#dodal.devices.electron_analyser.vgscienta_region.VGScientaRegion">[docs]</a>
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.electron_analyser.VGScientaRegion.html#dodal.devices.electron_analyser.VGScientaRegion">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">VGScientaRegion</span><span class="p">(</span><span class="n">AbstractBaseRegion</span><span class="p">):</span>
     <span class="c1"># Override defaults of base region class</span>
     <span class="n">lens_mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Angular45&quot;</span>
@@ -524,7 +515,7 @@ window.addEventListener("load", () => mermaid.run());
 
 
 <div class="viewcode-block" id="VGScientaExcitationEnergySource">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.electron_analyser.vgscienta_region.VGScientaExcitationEnergySource.html#dodal.devices.electron_analyser.vgscienta_region.VGScientaExcitationEnergySource">[docs]</a>
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.electron_analyser.VGScientaExcitationEnergySource.html#dodal.devices.electron_analyser.VGScientaExcitationEnergySource">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">VGScientaExcitationEnergySource</span><span class="p">(</span><span class="n">JavaToPythonModel</span><span class="p">):</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;source1&quot;</span>
     <span class="n">device_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s2">&quot;scannable_name&quot;</span><span class="p">)</span>
@@ -533,7 +524,7 @@ window.addEventListener("load", () => mermaid.run());
 
 
 <div class="viewcode-block" id="VGScientaSequence">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.electron_analyser.vgscienta_region.VGScientaSequence.html#dodal.devices.electron_analyser.vgscienta_region.VGScientaSequence">[docs]</a>
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.electron_analyser.VGScientaSequence.html#dodal.devices.electron_analyser.VGScientaSequence">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">VGScientaSequence</span><span class="p">(</span><span class="n">AbstractBaseSequence</span><span class="p">[</span><span class="n">VGScientaRegion</span><span class="p">]):</span>
     <span class="n">element_set</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;Unknown&quot;</span><span class="p">)</span>
     <span class="n">excitation_energy_sources</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">VGScientaExcitationEnergySource</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>

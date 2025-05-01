@@ -1,0 +1,82 @@
+dodal.devices.electron\_analyser.SpecsAnalyserDriverIO
+======================================================
+
+.. currentmodule:: dodal.devices.electron_analyser
+
+.. autoclass:: SpecsAnalyserDriverIO
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      ~SpecsAnalyserDriverIO.pass_energy_type
+      
+      
+      ~SpecsAnalyserDriverIO.acquire_time
+      
+      
+      ~SpecsAnalyserDriverIO.acquire_period
+      
+      
+      ~SpecsAnalyserDriverIO.num_images
+      
+      
+      ~SpecsAnalyserDriverIO.image_mode
+      
+      
+      ~SpecsAnalyserDriverIO.detector_state
+      
+      
+      ~SpecsAnalyserDriverIO.unique_id
+      
+      
+      ~SpecsAnalyserDriverIO.nd_attributes_file
+      
+      
+      ~SpecsAnalyserDriverIO.acquire
+      
+      
+      ~SpecsAnalyserDriverIO.array_size_x
+      
+      
+      ~SpecsAnalyserDriverIO.array_size_y
+      
+      
+      ~SpecsAnalyserDriverIO.data_type
+      
+      
+      ~SpecsAnalyserDriverIO.array_counter
+      
+      
+      ~SpecsAnalyserDriverIO.wait_for_plugins
+      
+   
+   

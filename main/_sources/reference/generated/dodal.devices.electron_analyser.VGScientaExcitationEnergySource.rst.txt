@@ -1,0 +1,65 @@
+dodal.devices.electron\_analyser.VGScientaExcitationEnergySource
+================================================================
+
+.. currentmodule:: dodal.devices.electron_analyser
+
+.. autoclass:: VGScientaExcitationEnergySource
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      ~VGScientaExcitationEnergySource.model_config
+      
+      
+      
+      
+      
+      ~VGScientaExcitationEnergySource.name
+      
+      
+      ~VGScientaExcitationEnergySource.device_name
+      
+      
+      ~VGScientaExcitationEnergySource.value
+      
+   
+   

@@ -1,0 +1,106 @@
+dodal.devices.electron\_analyser.SpecsRegion
+============================================
+
+.. currentmodule:: dodal.devices.electron_analyser
+
+.. autoclass:: SpecsRegion
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      ~SpecsRegion.model_config
+      
+      
+      
+      
+      
+      ~SpecsRegion.lens_mode
+      
+      
+      ~SpecsRegion.pass_energy
+      
+      
+      ~SpecsRegion.acquisition_mode
+      
+      
+      ~SpecsRegion.low_energy
+      
+      
+      ~SpecsRegion.high_energy
+      
+      
+      ~SpecsRegion.step_time
+      
+      
+      ~SpecsRegion.energy_step
+      
+      
+      ~SpecsRegion.values
+      
+      
+      ~SpecsRegion.centre_energy
+      
+      
+      ~SpecsRegion.psu_mode
+      
+      
+      ~SpecsRegion.estimated_time_in_ms
+      
+      
+      ~SpecsRegion.name
+      
+      
+      ~SpecsRegion.enabled
+      
+      
+      ~SpecsRegion.slices
+      
+      
+      ~SpecsRegion.iterations
+      
+      
+      ~SpecsRegion.energy_mode
+      
+   
+   

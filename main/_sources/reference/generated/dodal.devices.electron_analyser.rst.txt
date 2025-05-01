@@ -3,22 +3,25 @@ dodal.devices.electron\_analyser
 
 
 
-.. rubric:: Modules
+
+
+
+
+.. currentmodule:: dodal.devices
+.. rubric:: Classes
 
 .. autosummary::
    :toctree:
    :recursive:
 
-   dodal.devices.electron_analyser.abstract_analyser_io
-   dodal.devices.electron_analyser.abstract_region
-   dodal.devices.electron_analyser.specs_analyser_io
-   dodal.devices.electron_analyser.specs_region
-   dodal.devices.electron_analyser.vgscienta_analyser_io
-   dodal.devices.electron_analyser.vgscienta_region
-
-
-
-
+   ~electron_analyser.EnergyMode
+   ~electron_analyser.SpecsAnalyserDriverIO
+   ~electron_analyser.SpecsRegion
+   ~electron_analyser.SpecsSequence
+   ~electron_analyser.VGScientaAnalyserDriverIO
+   ~electron_analyser.VGScientaExcitationEnergySource
+   ~electron_analyser.VGScientaRegion
+   ~electron_analyser.VGScientaSequence
 
 
 
@@ -32,6 +35,13 @@ dodal.devices.electron\_analyser
    
 
    
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      to_binding_energy
+      to_kinetic_energy
    
    
 
