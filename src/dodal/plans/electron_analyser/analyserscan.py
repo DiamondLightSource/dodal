@@ -3,9 +3,8 @@ from collections.abc import Callable, Coroutine
 from typing import Any
 
 import bluesky.plan_stubs as bps
-from bluesky.utils import plan
+from bluesky.utils import MsgGenerator, plan
 
-from dodal.common.types import MsgGenerator
 from dodal.devices.electron_analyser.abstract_analyser import (
     AbstractAnalyserDriverIO,
     AbstractElectronAnalyserDetector,
