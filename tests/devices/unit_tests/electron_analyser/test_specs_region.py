@@ -2,6 +2,7 @@ from typing import Any
 
 import pytest
 
+from dodal.common.data_util import load_json_file_to_class
 from dodal.devices.electron_analyser import EnergyMode, SpecsRegion, SpecsSequence
 from dodal.devices.electron_analyser.abstract_region import TAbstractBaseRegion
 from tests.devices.unit_tests.electron_analyser.test_util import (
@@ -17,8 +18,8 @@ def sequence_file() -> str:
 
 
 @pytest.fixture
-def sequence_class() -> type[SpecsSequence]:
-    return SpecsSequence
+def sequence(sequence_file_path: str) -> SpecsSequence:
+    return load_json_file_to_class(SpecsSequence, sequence_file_path)
 
 
 @pytest.fixture

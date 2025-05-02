@@ -11,7 +11,6 @@ from dodal.devices.electron_analyser import (
     EnergyMode,
     SpecsAnalyserDriverIO,
     SpecsRegion,
-    SpecsSequence,
 )
 from dodal.plan_stubs.electron_analyser import configure_specs
 from tests.devices.unit_tests.electron_analyser.test_util import (
@@ -22,18 +21,13 @@ from tests.devices.unit_tests.electron_analyser.test_util import (
 
 
 @pytest.fixture
-def analyser_type() -> type[SpecsAnalyserDriverIO]:
+def analyser_class() -> type[SpecsAnalyserDriverIO]:
     return SpecsAnalyserDriverIO
 
 
 @pytest.fixture
 def sequence_file() -> str:
     return TEST_SPECS_SEQUENCE
-
-
-@pytest.fixture
-def sequence_class() -> type[SpecsSequence]:
-    return SpecsSequence
 
 
 @pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=["region"])

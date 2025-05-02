@@ -11,7 +11,6 @@ from dodal.devices.electron_analyser import (
     EnergyMode,
     VGScientaAnalyserDriverIO,
     VGScientaRegion,
-    VGScientaSequence,
     to_kinetic_energy,
 )
 from dodal.plan_stubs.electron_analyser import configure_vgscienta
@@ -28,12 +27,7 @@ def sequence_file() -> str:
 
 
 @pytest.fixture
-def sequence_class() -> type[VGScientaSequence]:
-    return VGScientaSequence
-
-
-@pytest.fixture
-def analyser_type() -> type[VGScientaAnalyserDriverIO]:
+def analyser_class() -> type[VGScientaAnalyserDriverIO]:
     return VGScientaAnalyserDriverIO
 
 

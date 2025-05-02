@@ -2,6 +2,7 @@ from typing import Any
 
 import pytest
 
+from dodal.common.data_util import load_json_file_to_class
 from dodal.devices.electron_analyser import (
     EnergyMode,
     VGScientaRegion,
@@ -28,8 +29,8 @@ def sequence_file() -> str:
 
 
 @pytest.fixture
-def sequence_class() -> type[VGScientaSequence]:
-    return VGScientaSequence
+def sequence(sequence_file_path: str) -> VGScientaSequence:
+    return load_json_file_to_class(VGScientaSequence, sequence_file_path)
 
 
 @pytest.fixture

@@ -2,16 +2,13 @@ import numpy as np
 from ophyd_async.core import Array1D, SignalR, StandardReadableFormat, derived_signal_r
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
-from dodal.common.beamlines.device_helpers import CAM_SUFFIX
-from dodal.common.data_util import load_json_file_to_class
-from dodal.devices.electron_analyser.abstract_analyser import (
+from dodal.devices.electron_analyser.abstract_analyser_io import (
     AbstractAnalyserDriverIO,
-    AbstractElectronAnalyserDetector,
 )
 from dodal.devices.electron_analyser.specs_region import SpecsSequence
 
 
-class SpecsAnalyserDriverIO(AbstractAnalyserDriverIO):
+class SpecsAnalyserDriverIO(AbstractAnalyserDriverIO[SpecsSequence]):
     def __init__(self, prefix: str, name: str = "") -> None:
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             # Used for setting up region data acquisition.
@@ -67,13 +64,5 @@ class SpecsAnalyserDriverIO(AbstractAnalyserDriverIO):
     def pass_energy_type(self) -> type:
         return float
 
-
-class SpecsAnalyserDetector(
-    AbstractElectronAnalyserDetector[SpecsAnalyserDriverIO, SpecsSequence]
-):
-    def __init__(self, prefix: str, name: str = ""):
-        self.driver = SpecsAnalyserDriverIO(prefix=prefix + CAM_SUFFIX, name="driver")
-        super().__init__(name, self.driver)
-
-    def get_sequence(self, filename: str) -> SpecsSequence:
-        return load_json_file_to_class(SpecsSequence, filename)
+    def sequence_type(self) -> type[SpecsSequence]:
+        return SpecsSequence

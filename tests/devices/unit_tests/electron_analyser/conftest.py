@@ -4,19 +4,25 @@ from typing import Any
 import pytest
 from ophyd_async.core import init_devices
 
-from dodal.common.data_util import load_json_file_to_class
 from dodal.devices.electron_analyser import (
+    ElectronAnalyserDetector,
+    SpecsAnalyserDriverIO,
+    VGScientaAnalyserDriverIO,
     VGScientaRegion,
     VGScientaSequence,
 )
-from dodal.devices.electron_analyser.abstract_analyser import (
+from dodal.devices.electron_analyser.abstract_analyser_io import (
+    AbstractAnalyserDriverIO,
     TAbstractAnalyserDriverIO,
 )
 from dodal.devices.electron_analyser.abstract_region import (
     AbstractBaseRegion,
     AbstractBaseSequence,
     TAbstractBaseRegion,
-    TAbstractBaseSequence,
+)
+from tests.devices.unit_tests.electron_analyser.test_util import (
+    TEST_SPECS_SEQUENCE,
+    TEST_VGSCIENTA_SEQUENCE,
 )
 
 TEST_DATA_PATH = "tests/test_data/electron_analyser/"
@@ -28,10 +34,42 @@ def sequence_file_path(sequence_file: str) -> str:
 
 
 @pytest.fixture
+def sequence_file(analyser_class: type[AbstractAnalyserDriverIO]) -> str:
+    if analyser_class == VGScientaAnalyserDriverIO:
+        return TEST_VGSCIENTA_SEQUENCE
+    elif analyser_class == SpecsAnalyserDriverIO:
+        return TEST_SPECS_SEQUENCE
+    raise Exception
+
+
+@pytest.fixture
+async def sim_analyser_driver(
+    analyser_class: type[TAbstractAnalyserDriverIO],
+) -> TAbstractAnalyserDriverIO:
+    async with init_devices(mock=True, connect=True):
+        sim_analyser_driver = analyser_class(
+            prefix="sim_analyser_driver:",
+            name="analyser_driver",
+        )
+    return sim_analyser_driver
+
+
+@pytest.fixture
+async def sim_analyser(
+    sim_analyser_driver: AbstractAnalyserDriverIO,
+) -> ElectronAnalyserDetector[AbstractBaseSequence, AbstractBaseRegion]:
+    async with init_devices(mock=True, connect=True):
+        sim_analyser = ElectronAnalyserDetector(
+            name="analyser", driver=sim_analyser_driver
+        )
+    return sim_analyser
+
+
+@pytest.fixture
 def sequence(
-    sequence_class: type[TAbstractBaseSequence], sequence_file_path: str
-) -> TAbstractBaseSequence:
-    return load_json_file_to_class(sequence_class, sequence_file_path)
+    sim_analyser: ElectronAnalyserDetector, sequence_file_path: str
+) -> AbstractBaseSequence[AbstractBaseRegion]:
+    return sim_analyser.load_sequence(sequence_file_path)
 
 
 @pytest.fixture
@@ -70,15 +108,3 @@ def expected_enabled_region_names(
         if expected_region_value["enabled"]:
             names.append(expected_region_value["name"])
     return names
-
-
-@pytest.fixture
-async def sim_analyser_driver(
-    analyser_type: type[TAbstractAnalyserDriverIO],
-) -> TAbstractAnalyserDriverIO:
-    async with init_devices(mock=True, connect=True):
-        sim_analyser_driver = analyser_type(
-            prefix="sim_analyser_driver:",
-            name="analyser_driver",
-        )
-    return sim_analyser_driver

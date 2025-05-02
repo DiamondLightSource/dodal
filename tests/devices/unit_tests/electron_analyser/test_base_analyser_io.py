@@ -8,51 +8,26 @@ from ophyd_async.testing import get_mock_put, set_mock_value
 
 from dodal.devices.electron_analyser import (
     SpecsAnalyserDriverIO,
-    SpecsSequence,
     VGScientaAnalyserDriverIO,
-    VGScientaSequence,
     to_kinetic_energy,
 )
-from dodal.devices.electron_analyser.abstract_analyser import (
+from dodal.devices.electron_analyser.abstract_analyser_io import (
     AbstractAnalyserDriverIO,
 )
 from dodal.devices.electron_analyser.abstract_region import (
     AbstractBaseRegion,
-    AbstractBaseSequence,
 )
 from dodal.plan_stubs.electron_analyser import configure_analyser
 from tests.devices.unit_tests.electron_analyser.test_util import (
     TEST_SEQUENCE_REGION_NAMES,
-    TEST_SPECS_SEQUENCE,
-    TEST_VGSCIENTA_SEQUENCE,
     assert_read_configuration_has_expected_value,
     assert_read_has_expected_value,
 )
 
 
-@pytest.fixture(params=[SpecsSequence, VGScientaSequence])
-def sequence_class(request: pytest.FixtureRequest) -> type[AbstractBaseSequence]:
+@pytest.fixture(params=[SpecsAnalyserDriverIO, VGScientaAnalyserDriverIO])
+def analyser_class(request: pytest.FixtureRequest) -> type[AbstractAnalyserDriverIO]:
     return request.param
-
-
-@pytest.fixture
-def sequence_file(sequence_class: type[AbstractBaseSequence]) -> str:
-    if sequence_class == VGScientaSequence:
-        return TEST_VGSCIENTA_SEQUENCE
-    elif sequence_class == SpecsSequence:
-        return TEST_SPECS_SEQUENCE
-    raise Exception
-
-
-@pytest.fixture
-def analyser_type(
-    sequence_class: type[AbstractBaseSequence],
-) -> type[AbstractAnalyserDriverIO]:
-    if sequence_class == VGScientaSequence:
-        return VGScientaAnalyserDriverIO
-    elif sequence_class == SpecsSequence:
-        return SpecsAnalyserDriverIO
-    raise Exception
 
 
 @pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=["region"])
