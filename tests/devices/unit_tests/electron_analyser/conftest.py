@@ -5,6 +5,10 @@ import pytest
 from ophyd_async.core import init_devices
 
 from dodal.common.data_util import load_json_file_to_class
+from dodal.devices.electron_analyser import (
+    VGScientaRegion,
+    VGScientaSequence,
+)
 from dodal.devices.electron_analyser.abstract_analyser_io import (
     TAbstractAnalyserDriverIO,
 )
@@ -13,10 +17,6 @@ from dodal.devices.electron_analyser.abstract_region import (
     AbstractBaseSequence,
     TAbstractBaseRegion,
     TAbstractBaseSequence,
-)
-from dodal.devices.electron_analyser.vgscienta_region import (
-    VGScientaRegion,
-    VGScientaSequence,
 )
 
 TEST_DATA_PATH = "tests/test_data/electron_analyser/"
