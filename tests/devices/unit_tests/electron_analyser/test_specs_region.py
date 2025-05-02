@@ -2,11 +2,8 @@ from typing import Any
 
 import pytest
 
-from dodal.devices.electron_analyser.abstract_region import (
-    EnergyMode,
-    TAbstractBaseRegion,
-)
-from dodal.devices.electron_analyser.specs_region import SpecsRegion, SpecsSequence
+from dodal.devices.electron_analyser import EnergyMode, SpecsRegion, SpecsSequence
+from dodal.devices.electron_analyser.abstract_region import TAbstractBaseRegion
 from tests.devices.unit_tests.electron_analyser.test_util import (
     TEST_SPECS_SEQUENCE,
     assert_region_has_expected_values,
