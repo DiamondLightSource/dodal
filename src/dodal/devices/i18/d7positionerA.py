@@ -33,4 +33,3 @@ class D7PositionerA(StandardReadable):
             self.stop = epics_signal_x(prefix + ":STOP")
         super().__init__(name=name)
 
-

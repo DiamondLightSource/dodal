@@ -1,5 +1,6 @@
 from pathlib import Path
 
+from dodal.devices.i18.d7positionerB import D7PositionerB
 from ophyd_async.fastcs.panda import HDFPanda
 
 from dodal.common.beamlines.beamline_utils import (
@@ -13,7 +14,7 @@ from dodal.common.visit import (
     StaticVisitPathProvider,
 )
 from dodal.devices.common_dcm import BaseDCM, PitchAndRollCrystal, RollCrystal
-from dodal.devices.i18.d7positioner import D7PositionerA
+from dodal.devices.i18.d7positionerA import D7PositionerA
 from dodal.devices.i18.diode import Diode
 from dodal.devices.i18.KBMirror import KBMirror
 from dodal.devices.i18.table import Table
@@ -119,8 +120,8 @@ def d7_diode() -> Diode:
 
 
 @device_factory()
-def d7_positioner() -> D7PositionerA:
-    return D7PositionerA(f"{PREFIX.beamline_prefix}-DI-PHDGN-07:B:MP")
+def d7_positioner_b() -> D7PositionerB:
+    return D7PositionerB(f"{PREFIX.beamline_prefix}-DI-PHDGN-07:B:MP")
 
 
 @device_factory()
