@@ -234,6 +234,7 @@ def bimorph_optimisation(
         "dimension": active_dimension,
         "slit_positions": number_of_slit_positions,
         "channels": len(mirror.channels),
+        "initial_voltage_list": initial_voltage_list,
     }
 
     @bpp.run_decorator(md=metadata)
