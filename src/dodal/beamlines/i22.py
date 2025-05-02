@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from ophyd_async.epics.adaravis import AravisDetector
+from ophyd_async.epics.adcore import NDPluginStatsIO
 from ophyd_async.epics.adpilatus import PilatusDetector
 from ophyd_async.fastcs.panda import HDFPanda
 
@@ -43,7 +44,7 @@ set_utils_beamline(BL)
 set_path_provider(
     StaticVisitPathProvider(
         BL,
-        Path("/dls/i22/data/2024/cm37271-2/bluesky"),
+        Path("/dls/i22/data/2025/nt42205-1/bluesky"),
         client=RemoteDirectoryServiceClient("http://i22-control:8088/api"),
     )
 )
@@ -264,3 +265,18 @@ def linkam() -> Linkam3:
 def ppump() -> WatsonMarlow323Pump:
     """Sample Environment Peristaltic Pump"""
     return WatsonMarlow323Pump(f"{PREFIX.beamline_prefix}-EA-PUMP-01:")
+
+
+@device_factory()
+def d8_camera() -> AravisDetector:
+    det = AravisDetector(
+        prefix=f"{PREFIX.beamline_prefix}-DI-PHDGN-08:",
+        path_provider=get_path_provider(),
+        drv_suffix=CAM_SUFFIX,
+        fileio_suffix=HDF5_SUFFIX,
+        plugins={
+            "stats": NDPluginStatsIO(f"{PREFIX.beamline_prefix}-DI-PHDGN-08:STAT:")
+        },
+    )
+    det.set_name("d8_camera")
+    return det
