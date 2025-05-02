@@ -13,7 +13,7 @@ from dodal.devices.bimorph_mirror import BimorphMirror
 from dodal.devices.slits import Slits
 
 
-class SlitDimension(Enum):
+class SlitDimension(Enum, str):
     """Enum representing the dimensions of a 2d slit
 
     Used to describe which dimension the pencil beam scan should move across.
