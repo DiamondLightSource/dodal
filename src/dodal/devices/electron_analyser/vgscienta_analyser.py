@@ -46,8 +46,10 @@ class VGScientaAnalyserDriverIO(AbstractAnalyserDriverIO):
 class VGScientaAnalyserDetector(
     AbstractElectronAnalyserDetector[VGScientaAnalyserDriverIO, VGScientaSequence]
 ):
-    def __init__(self, prefix: str, name: str):
-        self.driver = VGScientaAnalyserDriverIO(prefix + CAM_SUFFIX)
+    def __init__(self, prefix: str, name: str = ""):
+        self.driver = VGScientaAnalyserDriverIO(
+            prefix=prefix + CAM_SUFFIX, name="driver"
+        )
         super().__init__(name, self.driver)
 
     def get_sequence(self, filename: str) -> VGScientaSequence:

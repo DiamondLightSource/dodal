@@ -71,8 +71,8 @@ class SpecsAnalyserDriverIO(AbstractAnalyserDriverIO):
 class SpecsAnalyserDetector(
     AbstractElectronAnalyserDetector[SpecsAnalyserDriverIO, SpecsSequence]
 ):
-    def __init__(self, prefix: str, name: str):
-        self.driver = SpecsAnalyserDriverIO(prefix + CAM_SUFFIX)
+    def __init__(self, prefix: str, name: str = ""):
+        self.driver = SpecsAnalyserDriverIO(prefix=prefix + CAM_SUFFIX, name="driver")
         super().__init__(name, self.driver)
 
     def get_sequence(self, filename: str) -> SpecsSequence:
