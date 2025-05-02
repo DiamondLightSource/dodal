@@ -4,7 +4,6 @@ from typing import Generic, TypeVar
 import numpy as np
 from ophyd_async.core import (
     Array1D,
-    Reference,
     SignalR,
     StandardReadable,
     StandardReadableFormat,
@@ -31,9 +30,7 @@ class AbstractAnalyserDriverIO(
 
     def __init__(self, prefix: str, name: str = "") -> None:
         with self.add_children_as_readables():
-            self.image = Reference(
-                epics_signal_r(Array1D[np.float64], prefix + "IMAGE")
-            )
+            self.image = epics_signal_r(Array1D[np.float64], prefix + "IMAGE")
             self.spectrum = epics_signal_r(Array1D[np.float64], prefix + "INT_SPECTRUM")
             self.total_intensity = derived_signal_r(
                 self._calculate_total_intensity, spectrum=self.spectrum
