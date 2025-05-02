@@ -43,6 +43,7 @@
    dodal.devices.p45
    dodal.devices.p99
    dodal.devices.pgm
+   dodal.devices.positioner
    dodal.devices.pressure_jump_cell
    dodal.devices.qbpm
    dodal.devices.robot
