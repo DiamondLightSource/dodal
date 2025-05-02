@@ -8,7 +8,9 @@ For example, many GDA-compatible features need disk IO as GDA relies heavily on 
 One may need a bluesky calibration plan to start with cached values - those could be in the filesystem or a key value store like Redis.
 
 Direct IO inside plans is not allowed when inside the RunEngine context.
-That means that all IO operations must happen through ophyd-async devices.
+
+As far as is possible, we want our devices to only talk to EPICS PVs. The [config server](https://github.com/DiamondLightSource/daq-config-server) should fulfil the majority of use cases where we can't do that, it is possible to make a temporary ophyd-async devices, but heavily discouraged.
+It's not recommended to read from the filesystem going forward and instead development effort will be put into the config server.
 
 ## Extant examples
 
