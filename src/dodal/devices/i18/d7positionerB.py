@@ -15,7 +15,8 @@ class FilterBValues(StrictEnum):
     IN_LINE_DIODE = "in line diode"
 
     def __str__(self):
-      return self.name.capitalize()
+        return self.name.capitalize()
+
 
 class D7PositionerB(StandardReadable):
     def __init__(self, prefix: str, name: str = ""):
