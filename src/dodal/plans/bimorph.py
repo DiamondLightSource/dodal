@@ -244,9 +244,6 @@ def bimorph_optimisation(
             if isinstance(detector, Preparable):
                 yield from bps.prepare(detector, TriggerInfo(), wait=True)
 
-        stream_name = "0"
-        yield from bps.declare_stream(*detectors, mirror, slits, name=stream_name)
-
         # Move slits into starting position:
         yield from move_slits(
             slits, active_dimension, active_slit_size, active_slit_center_start
@@ -263,8 +260,6 @@ def bimorph_optimisation(
             )
             yield from bps.sleep(bimorph_settle_time)
 
-            yield from bps.declare_stream(*detectors, mirror, slits, name=stream_name)
-
             yield from inner_scan(
                 detectors,
                 mirror,
@@ -275,10 +270,7 @@ def bimorph_optimisation(
                 active_slit_size,
                 number_of_slit_positions,
                 slit_settle_time,
-                stream_name,
             )
-
-            stream_name = str(int(stream_name) + 1)
 
     yield from outer_scan()
 
@@ -295,7 +287,6 @@ def inner_scan(
     active_slit_size: float,
     number_of_slit_positions: int,
     slit_settle_time: float,
-    stream_name: str,
 ):
     """Inner plan stub, which moves Slits and performs a read.
 
@@ -309,11 +300,10 @@ def inner_scan(
         active_slit_size: float size of slit in active dimension
         number_of_slit_positions: int number of slit positions per pencil beam scan
         slit_settle_time: float time in seconds to wait after slit move
-        stream_name: str name to pass to trigger_and_read
     """
     for value in linspace(
         active_slit_center_start, active_slit_center_end, number_of_slit_positions
     ):
         yield from move_slits(slits, active_dimension, active_slit_size, value)
         yield from bps.sleep(slit_settle_time)
-        yield from bps.trigger_and_read([*detectors, mirror, slits], name=stream_name)
+        yield from bps.trigger_and_read([*detectors, mirror, slits])
