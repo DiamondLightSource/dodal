@@ -25,10 +25,12 @@ class FilterAValues(StrictEnum):
         return self.name.capitalize()
 
 
-class D7Positioner(StandardReadable):
+class D7PositionerA(StandardReadable):
     def __init__(self, prefix: str, name: str = ""):
         with self.add_children_as_readables():
             self.setpoint = epics_signal_rw(FilterAValues, prefix + ":SELECT")
             self.done = epics_signal_r(float, prefix + ":DMOV")
             self.stop = epics_signal_x(prefix + ":STOP")
         super().__init__(name=name)
+
+
