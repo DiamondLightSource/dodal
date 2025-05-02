@@ -8,18 +8,18 @@ from ophyd_async.epics.core import epics_signal_r, epics_signal_rw, epics_signal
 class FilterAValues(StrictEnum):
     """Maps from a short usable name to the string name in EPICS"""
 
-    Al_2MM = "2 mm Al"
-    Al_1_5MM = "1.5 mm Al"
-    Al_1_25MM = "1.25 mm Al"
-    Al_0_8MM = "0.8 mm Al"
-    Al_0_55MM = "0.55 mm Al"
-    Al_0_5MM = "0.5 mm Al"
-    Al_0_3MM = "0.3 mm Al"
-    Al_0_25MM = "0.25 mm Al"
-    Al_0_15MM = "0.15 mm Al"
-    Al_0_1MM = "0.1 mm Al"
-    Al_0_025MM = "0.025 mm Al"
-    Al_Gap = "Gap"
+    AL_2MM = "2 mm Al"
+    AL_1_5MM = "1.5 mm Al"
+    AL_1_25MM = "1.25 mm Al"
+    AL_0_8MM = "0.8 mm Al"
+    AL_0_55MM = "0.55 mm Al"
+    AL_0_5MM = "0.5 mm Al"
+    AL_0_3MM = "0.3 mm Al"
+    AL_0_25MM = "0.25 mm Al"
+    AL_0_15MM = "0.15 mm Al"
+    AL_0_1MM = "0.1 mm Al"
+    AL_0_025MM = "0.025 mm Al"
+    AL_GAP = "Gap"
 
     def __str__(self):
         return self.name.capitalize()
