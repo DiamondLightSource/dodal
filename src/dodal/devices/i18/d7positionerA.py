@@ -32,4 +32,3 @@ class D7PositionerA(StandardReadable):
             self.done = epics_signal_r(float, prefix + ":DMOV")
             self.stop = epics_signal_x(prefix + ":STOP")
         super().__init__(name=name)
-
