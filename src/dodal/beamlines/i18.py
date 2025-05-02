@@ -13,7 +13,7 @@ from dodal.common.visit import (
     StaticVisitPathProvider,
 )
 from dodal.devices.common_dcm import BaseDCM, PitchAndRollCrystal, RollCrystal
-from dodal.devices.i18.d7positioner import D7Positioner
+from dodal.devices.i18.d7positioner import D7PositionerA
 from dodal.devices.i18.diode import Diode
 from dodal.devices.i18.KBMirror import KBMirror
 from dodal.devices.i18.table import Table
@@ -119,13 +119,13 @@ def d7_diode() -> Diode:
 
 
 @device_factory()
-def d7_positioner() -> D7Positioner:
-    return D7Positioner(f"{PREFIX.beamline_prefix}-DI-PHDGN-07:B:MP")
+def d7_positioner() -> D7PositionerA:
+    return D7PositionerA(f"{PREFIX.beamline_prefix}-DI-PHDGN-07:B:MP")
 
 
 @device_factory()
-def d7_filter_positioner() -> D7Positioner:
-    return D7Positioner(f"{PREFIX.beamline_prefix}-DI-PHDGN-07:A:MP")
+def d7_filter_positioner() -> D7PositionerA:
+    return D7PositionerA(f"{PREFIX.beamline_prefix}-DI-PHDGN-07:A:MP")
 
 
 @device_factory()
