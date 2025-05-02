@@ -11,7 +11,7 @@ def load_json_file_to_class(
     file: str,
 ) -> TBaseModel:
     if not os.path.isfile(file):
-        raise FileNotFoundError
+        raise FileNotFoundError(f"Cannot find file {file}")
 
     with open(file) as f:
         json_obj = f.read()
