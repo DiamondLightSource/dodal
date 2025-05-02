@@ -8,9 +8,11 @@ from bluesky.protocols import Preparable, Readable
 from bluesky.utils import MsgGenerator
 from numpy import linspace
 from ophyd_async.core import TriggerInfo
+from pydantic import validate_call
 
 from dodal.devices.bimorph_mirror import BimorphMirror
 from dodal.devices.slits import Slits
+from dodal.plan_stubs.data_session import attach_data_session_metadata_decorator
 
 
 class SlitDimension(str, Enum):
@@ -172,6 +174,8 @@ def bimorph_position_generator(
         ]
 
 
+@attach_data_session_metadata_decorator()
+@validate_call(config={"arbitrary_types_allowed": True})
 def bimorph_optimisation(
     detectors: list[Readable],
     mirror: BimorphMirror,
