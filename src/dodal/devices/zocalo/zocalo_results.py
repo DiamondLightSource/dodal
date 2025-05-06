@@ -389,12 +389,12 @@ def get_full_processing_results(
     """A plan that will return the raw zocalo results, ranked in descending order according to the sort key.
     Returns empty list in the event no results found."""
     LOGGER.info("Retrieving raw zocalo processing results")
-    com = yield from bps.rd(zocalo.centre_of_mass, default_value=[])  # type: ignore
-    max_voxel = yield from bps.rd(zocalo.max_voxel, default_value=[])  # type: ignore
-    max_count = yield from bps.rd(zocalo.max_count, default_value=[])  # type: ignore
-    n_voxels = yield from bps.rd(zocalo.n_voxels, default_value=[])  # type: ignore
-    total_count = yield from bps.rd(zocalo.total_count, default_value=[])  # type: ignore
-    bounding_box = yield from bps.rd(zocalo.bounding_box, default_value=[])  # type: ignore
+    com = yield from bps.rd(zocalo.centre_of_mass, default_value=[])
+    max_voxel = yield from bps.rd(zocalo.max_voxel, default_value=[])
+    max_count = yield from bps.rd(zocalo.max_count, default_value=[])
+    n_voxels = yield from bps.rd(zocalo.n_voxels, default_value=[])
+    total_count = yield from bps.rd(zocalo.total_count, default_value=[])
+    bounding_box = yield from bps.rd(zocalo.bounding_box, default_value=[])
     return [
         _corrected_xrc_result(
             XrcResult(
