@@ -10,6 +10,7 @@ from ophyd_async.core import (
     SignalR,
     SignalRW,
     StandardReadable,
+    observe_signals_value,
     soft_signal_rw,
     wait_for_value,
 )
@@ -120,12 +121,14 @@ class ProgramRunner(Device, Flyable):
         self,
         pmac_str_sig: SignalRW,
         status_sig: SignalR,
+        counter_sig: SignalR,
         prog_num_sig: SignalRW,
         collection_time_sig: SignalRW,
         name: str = "",
     ) -> None:
         self._signal_ref = Reference(pmac_str_sig)
         self._status_ref = Reference(status_sig)
+        self._counter_ref = Reference(counter_sig)
         self._prog_num_ref = Reference(prog_num_sig)
 
         self._collection_time_ref = Reference(collection_time_sig)
@@ -152,16 +155,18 @@ class ProgramRunner(Device, Flyable):
     @AsyncStatus.wrap
     async def complete(self):
         """Stop collecting when the scan status PV goes to 0.
-
-        Args:
-            complete_time (float): total time required by the collection to \
-            finish correctly.
         """
-        scan_complete_time = await self._collection_time_ref().get_value()
-        await wait_for_value(
-            self._status_ref(), ScanState.DONE, timeout=scan_complete_time
-        )
-
+        counter_timeout = 30
+        try:
+            async for signal, value in observe_signals_value(
+                self._status_ref(), self._counter_ref(),
+                timeout = counter_timeout
+            ):
+                if signal is self._status_ref():
+                    if value == ScanState.DONE:
+                        break
+        except TimeoutError:
+            print("Counter hasn't updated within the last 30 seconds.")
 
 class ProgramAbort(Triggerable):
     """Abort a data collection by setting the PMAC string and then wait for the \
@@ -217,11 +222,12 @@ class PMAC(StandardReadable):
         # A couple of soft signals for running a collection: program number to send to
         # the PMAC_STRING and expected collection time.
         self.program_number = soft_signal_rw(int)
-        self.collection_time = soft_signal_rw(float, initial_value=3600.0, units="s")
+        self.collection_time = soft_signal_rw(float, initial_value=600.0, units="s")
 
         self.run_program = ProgramRunner(
             self.pmac_string,
             self.scanstatus,
+            self.counter,
             self.program_number,
             self.collection_time,
         )
