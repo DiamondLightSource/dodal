@@ -21,7 +21,7 @@ from tests.devices.unit_tests.electron_analyser.test_util import (
 
 
 @pytest.fixture
-def analyser_class() -> type[SpecsAnalyserDriverIO]:
+def analyser_driver_class() -> type[SpecsAnalyserDriverIO]:
     return SpecsAnalyserDriverIO
 
 

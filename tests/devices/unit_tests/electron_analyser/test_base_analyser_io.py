@@ -26,7 +26,9 @@ from tests.devices.unit_tests.electron_analyser.test_util import (
 
 
 @pytest.fixture(params=[SpecsAnalyserDriverIO, VGScientaAnalyserDriverIO])
-def analyser_class(request: pytest.FixtureRequest) -> type[AbstractAnalyserDriverIO]:
+def analyser_driver_class(
+    request: pytest.FixtureRequest,
+) -> type[AbstractAnalyserDriverIO]:
     return request.param
 
 

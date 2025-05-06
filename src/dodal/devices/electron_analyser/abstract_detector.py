@@ -1,5 +1,6 @@
 import asyncio
-from typing import Generic
+from abc import abstractmethod
+from typing import Generic, TypeVar
 
 from bluesky.protocols import (
     Reading,
@@ -21,9 +22,9 @@ from ophyd_async.epics.adcore import (
     stop_busy_record,
 )
 
-from dodal.common.data_util import load_json_file_to_class
 from dodal.devices.electron_analyser.abstract_analyser_io import (
     AbstractAnalyserDriverIO,
+    TAbstractAnalyserDriverIO,
 )
 from dodal.devices.electron_analyser.abstract_region import (
     TAbstractBaseRegion,
@@ -91,6 +92,7 @@ class BaseElectronAnalyserDetector(
     Triggerable,
     AsyncReadable,
     AsyncConfigurable,
+    Generic[TAbstractAnalyserDriverIO],
 ):
     """
     Detector for data acquisition of electron analyser. Can only acquire using settings
@@ -100,9 +102,9 @@ class BaseElectronAnalyserDetector(
     def __init__(
         self,
         name: str,
-        driver: AbstractAnalyserDriverIO,
+        driver: TAbstractAnalyserDriverIO,
     ):
-        self.driver_ref: Reference[AbstractAnalyserDriverIO] = Reference(driver)
+        self.driver_ref: Reference[TAbstractAnalyserDriverIO] = Reference(driver)
         self.controller: AnalyserController = AnalyserController(driver=driver)
         super().__init__(name)
 
@@ -140,10 +142,10 @@ class BaseElectronAnalyserDetector(
         return await self.driver_ref().describe_configuration()
 
 
-class ElectronAnalyserRegionDetector(
-    BaseElectronAnalyserDetector,
+class AbstractElectronAnalyserRegionDetector(
+    BaseElectronAnalyserDetector[TAbstractAnalyserDriverIO],
     Stageable,
-    Generic[TAbstractBaseRegion],
+    Generic[TAbstractAnalyserDriverIO, TAbstractBaseRegion],
 ):
     """
     Extends electron analyser detector to configure specific region settings before data
@@ -151,7 +153,7 @@ class ElectronAnalyserRegionDetector(
     """
 
     def __init__(
-        self, name: str, driver: AbstractAnalyserDriverIO, region: TAbstractBaseRegion
+        self, name: str, driver: TAbstractAnalyserDriverIO, region: TAbstractBaseRegion
     ):
         super().__init__(name, driver)
         self.region = region
@@ -159,12 +161,24 @@ class ElectronAnalyserRegionDetector(
     @AsyncStatus.wrap
     async def stage(self) -> None:
         super().stage()
-        # configure region here
+        self.configure_region()
+
+    @abstractmethod
+    def configure_region(self):
+        """
+        Setup analyser with configured region.
+        """
 
 
-class ElectronAnalyserDetector(
-    BaseElectronAnalyserDetector,
-    Generic[TAbstractBaseSequence, TAbstractBaseRegion],
+TAbstractElectronAnalyserRegionDetector = TypeVar(
+    "TAbstractElectronAnalyserRegionDetector",
+    bound=AbstractElectronAnalyserRegionDetector,
+)
+
+
+class AbstractElectronAnalyserDetector(
+    BaseElectronAnalyserDetector[TAbstractAnalyserDriverIO],
+    Generic[TAbstractAnalyserDriverIO, TAbstractBaseSequence, TAbstractBaseRegion],
 ):
     """
     Electron analyser detector with the additional functionality to load a sequence file
@@ -172,14 +186,41 @@ class ElectronAnalyserDetector(
     configured region settings before data acquisition.
     """
 
+    @abstractmethod
     def load_sequence(self, filename: str) -> TAbstractBaseSequence:
-        return load_json_file_to_class(self.driver_ref().sequence_type(), filename)
+        """
+        Method to read in sequence file into a sequence class.
+        """
 
-    def create_region_detectors(
+    @abstractmethod
+    def _create_region_detector(
+        self, driver: TAbstractAnalyserDriverIO, region: TAbstractBaseRegion
+    ) -> AbstractElectronAnalyserRegionDetector[
+        TAbstractAnalyserDriverIO, TAbstractBaseRegion
+    ]:
+        """
+        Define a way to create a detector that will configure to a specific region.
+        """
+
+    def create_region_detector_list(
         self, filename: str
-    ) -> list[ElectronAnalyserRegionDetector[TAbstractBaseRegion]]:
+    ) -> list[
+        AbstractElectronAnalyserRegionDetector[
+            TAbstractAnalyserDriverIO, TAbstractBaseRegion
+        ]
+    ]:
+        """
+        Create a list of detectors that will setup a specific region from the sequence
+        file when used.
+        """
         seq = self.load_sequence(filename)
         return [
-            ElectronAnalyserRegionDetector(self.name, self.driver_ref(), region)
-            for region in seq.get_enabled_regions()
+            self._create_region_detector(self.driver_ref(), r)
+            for r in seq.get_enabled_regions()
         ]
+
+
+TAbstractElectronAnalyserDetector = TypeVar(
+    "TAbstractElectronAnalyserDetector",
+    bound=AbstractElectronAnalyserDetector,
+)

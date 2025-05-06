@@ -120,10 +120,6 @@ class AbstractAnalyserDriverIO(
         for the underlying analyser software and cannot be changed on epics side.
         """
 
-    @abstractmethod
-    def sequence_type(self) -> type[TAbstractBaseSequence]:
-        pass
-
 
 TAbstractAnalyserDriverIO = TypeVar(
     "TAbstractAnalyserDriverIO", bound=AbstractAnalyserDriverIO

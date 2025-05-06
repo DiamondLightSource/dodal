@@ -4,6 +4,21 @@ from ophyd_async.core import StandardReadable
 
 from dodal.devices.electron_analyser import EnergyMode
 from dodal.devices.electron_analyser.abstract_region import AbstractBaseRegion
+from dodal.devices.electron_analyser.specs_analyser_io import SpecsDetector
+from dodal.devices.electron_analyser.vgscienta_analyser_io import VGScientaDetector
+
+TEST_VGSCIENTA = "VGSCIENTA"
+TEST_SPECS = "SPECS"
+
+SEQUENCE_FILE = "sequence_file"
+DETECTOR = "detector"
+
+TEST_VGSCIENTA_LOOKUP = {
+    DETECTOR: VGScientaDetector,
+    SEQUENCE_FILE: "vgscienta_sequence.seq",
+}
+
+TEST_SPECS_LOOKUP = {DETECTOR: SpecsDetector, SEQUENCE_FILE: "vgscienta_sequence.seq"}
 
 TEST_VGSCIENTA_SEQUENCE = "vgscienta_sequence.seq"
 TEST_SPECS_SEQUENCE = "specs_sequence.seq"

@@ -5,7 +5,6 @@ import pytest
 from ophyd_async.core import init_devices
 
 from dodal.devices.electron_analyser import (
-    ElectronAnalyserDetector,
     SpecsAnalyserDriverIO,
     VGScientaAnalyserDriverIO,
     VGScientaRegion,
@@ -15,11 +14,18 @@ from dodal.devices.electron_analyser.abstract_analyser_io import (
     AbstractAnalyserDriverIO,
     TAbstractAnalyserDriverIO,
 )
+from dodal.devices.electron_analyser.abstract_detector import (
+    AbstractElectronAnalyserDetector,
+    TAbstractElectronAnalyserDetector,
+)
 from dodal.devices.electron_analyser.abstract_region import (
     AbstractBaseRegion,
     AbstractBaseSequence,
     TAbstractBaseRegion,
+    # TAbstractBaseSequence,
 )
+from dodal.devices.electron_analyser.specs_analyser_io import SpecsDetector
+from dodal.devices.electron_analyser.vgscienta_analyser_io import VGScientaDetector
 from tests.devices.unit_tests.electron_analyser.test_util import (
     TEST_SPECS_SEQUENCE,
     TEST_VGSCIENTA_SEQUENCE,
@@ -34,20 +40,20 @@ def sequence_file_path(sequence_file: str) -> str:
 
 
 @pytest.fixture
-def sequence_file(analyser_class: type[AbstractAnalyserDriverIO]) -> str:
-    if analyser_class == VGScientaAnalyserDriverIO:
+def sequence_file(analyser_driver_class: type[AbstractAnalyserDriverIO]) -> str:
+    if analyser_driver_class == VGScientaAnalyserDriverIO:
         return TEST_VGSCIENTA_SEQUENCE
-    elif analyser_class == SpecsAnalyserDriverIO:
+    elif analyser_driver_class == SpecsAnalyserDriverIO:
         return TEST_SPECS_SEQUENCE
     raise Exception
 
 
 @pytest.fixture
 async def sim_analyser_driver(
-    analyser_class: type[TAbstractAnalyserDriverIO],
+    analyser_driver_class: type[TAbstractAnalyserDriverIO],
 ) -> TAbstractAnalyserDriverIO:
     async with init_devices(mock=True, connect=True):
-        sim_analyser_driver = analyser_class(
+        sim_analyser_driver = analyser_driver_class(
             prefix="sim_analyser_driver:",
             name="analyser_driver",
         )
@@ -56,18 +62,25 @@ async def sim_analyser_driver(
 
 @pytest.fixture
 async def sim_analyser(
-    sim_analyser_driver: AbstractAnalyserDriverIO,
-) -> ElectronAnalyserDetector[AbstractBaseSequence, AbstractBaseRegion]:
-    async with init_devices(mock=True, connect=True):
-        sim_analyser = ElectronAnalyserDetector(
-            name="analyser", driver=sim_analyser_driver
-        )
-    return sim_analyser
+    sim_analyser_driver: TAbstractAnalyserDriverIO,
+) -> AbstractElectronAnalyserDetector:
+    if isinstance(sim_analyser_driver, VGScientaAnalyserDriverIO):
+        async with init_devices(mock=True, connect=True):
+            sim_analyser = VGScientaDetector(
+                name="analyser", driver=sim_analyser_driver
+            )
+        return sim_analyser
+    elif isinstance(sim_analyser_driver, SpecsAnalyserDriverIO):
+        async with init_devices(mock=True, connect=True):
+            sim_analyser = SpecsDetector(name="analyser", driver=sim_analyser_driver)
+        return sim_analyser
+
+    raise Exception("")
 
 
 @pytest.fixture
 def sequence(
-    sim_analyser: ElectronAnalyserDetector, sequence_file_path: str
+    sim_analyser: TAbstractElectronAnalyserDetector, sequence_file_path: str
 ) -> AbstractBaseSequence[AbstractBaseRegion]:
     return sim_analyser.load_sequence(sequence_file_path)
 

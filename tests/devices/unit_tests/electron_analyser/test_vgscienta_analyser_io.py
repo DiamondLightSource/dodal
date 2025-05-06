@@ -27,7 +27,7 @@ def sequence_file() -> str:
 
 
 @pytest.fixture
-def analyser_class() -> type[VGScientaAnalyserDriverIO]:
+def analyser_driver_class() -> type[VGScientaAnalyserDriverIO]:
     return VGScientaAnalyserDriverIO
 
 
