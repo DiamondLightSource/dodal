@@ -8,10 +8,12 @@ from ophyd_async.testing import (
 )
 
 from dodal.devices.electron_analyser import (
-    EnergyMode,
+    to_kinetic_energy,
+)
+from dodal.devices.electron_analyser.abstract import EnergyMode
+from dodal.devices.electron_analyser.vgscienta import (
     VGScientaAnalyserDriverIO,
     VGScientaRegion,
-    to_kinetic_energy,
 )
 from dodal.plan_stubs.electron_analyser import configure_vgscienta
 from tests.devices.unit_tests.electron_analyser.test_util import (

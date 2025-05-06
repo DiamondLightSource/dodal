@@ -22,11 +22,9 @@ from ophyd_async.epics.adcore import (
     stop_busy_record,
 )
 
-from dodal.devices.electron_analyser.abstract_analyser_io import (
+from dodal.devices.electron_analyser.abstract import (
     AbstractAnalyserDriverIO,
     TAbstractAnalyserDriverIO,
-)
-from dodal.devices.electron_analyser.abstract_region import (
     TAbstractBaseRegion,
     TAbstractBaseSequence,
 )

@@ -3,23 +3,12 @@ import pytest
 from bluesky import RunEngine
 from ophyd_async.testing import set_mock_value
 
-from dodal.devices.electron_analyser import (
-    SpecsAnalyserDriverIO,
-    VGScientaAnalyserDriverIO,
-)
-from dodal.devices.electron_analyser.abstract_analyser_io import (
+from dodal.devices.electron_analyser.abstract import (
     AbstractAnalyserDriverIO,
-)
-from dodal.devices.electron_analyser.abstract_detector import (
     TAbstractElectronAnalyserDetector,
 )
-
-# from dodal.devices.electron_analyser.abstract_region import (
-#     AbstractBaseRegion,
-#     AbstractBaseSequence,
-#     TAbstractBaseRegion,
-#     TAbstractBaseSequence,
-# )
+from dodal.devices.electron_analyser.specs import SpecsAnalyserDriverIO
+from dodal.devices.electron_analyser.vgscienta import VGScientaAnalyserDriverIO
 from tests.devices.unit_tests.electron_analyser.test_util import (
     TEST_SPECS_SEQUENCE,
     TEST_VGSCIENTA_SEQUENCE,
@@ -84,30 +73,30 @@ async def test_analyser_vgscienta_detector_image_shape(
     ]
 
 
-# async def test_analyser_specs_detector_image_shape(
-#     sim_analyser: TAbstractElectronAnalyserDetector,
-#     sequence_file_path: str,
-#     RE: RunEngine,
-# ) -> None:
-#     driver = sim_analyser.driver_ref()
+async def test_analyser_specs_detector_image_shape(
+    sim_analyser: TAbstractElectronAnalyserDetector,
+    sequence_file_path: str,
+    RE: RunEngine,
+) -> None:
+    driver = sim_analyser.driver_ref()
 
-#     if driver is not isinstance(driver, SpecsAnalyserDriverIO):
-#         pytest.skip("This test only applies to SpecsAnalyserDriverIO")
+    if driver is not isinstance(driver, SpecsAnalyserDriverIO):
+        pytest.skip("This test only applies to SpecsAnalyserDriverIO")
 
-#     low_energy = 1
-#     high_energy = 10
-#     slices = 4
-#     set_mock_value(driver.low_energy, low_energy)
-#     set_mock_value(driver.high_energy, high_energy)
-#     set_mock_value(driver.slices, slices)
+    low_energy = 1
+    high_energy = 10
+    slices = 4
+    set_mock_value(driver.low_energy, low_energy)
+    set_mock_value(driver.high_energy, high_energy)
+    set_mock_value(driver.slices, slices)
 
-#     min_angle = 1
-#     max_angle = 10
-#     set_mock_value(driver.min_angle, min_angle)
-#     set_mock_value(driver.high_energy, high_energy)
+    # min_angle = 1
+    # max_angle = 10
+    # set_mock_value(driver.min_angle, min_angle)
+    # set_mock_value(driver.high_energy, high_energy)
 
-#     describe = await sim_analyser.describe()
-#     assert describe[driver.name + "-image"]["shape"] == [
-#         len(angle_axis),
-#         len(energy_axis),
-#     ]
+    # describe = await sim_analyser.describe()
+    # assert describe[driver.name + "-image"]["shape"] == [
+    #     len(angle_axis),
+    #     len(energy_axis),
+    # ]

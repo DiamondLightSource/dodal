@@ -2,18 +2,11 @@ import numpy as np
 from ophyd_async.core import Array1D, SignalR, StandardReadableFormat, soft_signal_rw
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
-from dodal.common.data_util import load_json_file_to_class
-from dodal.devices.electron_analyser.abstract_analyser_io import (
+from dodal.devices.electron_analyser.abstract.base_analyser_io import (
     AbstractAnalyserDriverIO,
 )
-from dodal.devices.electron_analyser.abstract_detector import (
-    AbstractElectronAnalyserDetector,
-    AbstractElectronAnalyserRegionDetector,
-)
-from dodal.devices.electron_analyser.vgscienta_region import (
+from dodal.devices.electron_analyser.vgscienta.region import (
     DetectorMode,
-    VGScientaRegion,
-    VGScientaSequence,
 )
 
 
@@ -44,25 +37,3 @@ class VGScientaAnalyserDriverIO(AbstractAnalyserDriverIO):
     @property
     def pass_energy_type(self) -> type:
         return str
-
-
-class VGScientaRegionDetector(
-    AbstractElectronAnalyserRegionDetector[VGScientaAnalyserDriverIO, VGScientaRegion]
-):
-    def configure_region(self):
-        # ToDo - Need to move configure plans to here and rewrite tests
-        pass
-
-
-class VGScientaDetector(
-    AbstractElectronAnalyserDetector[
-        VGScientaAnalyserDriverIO, VGScientaSequence, VGScientaRegion
-    ]
-):
-    def load_sequence(self, filename: str) -> VGScientaSequence:
-        return load_json_file_to_class(VGScientaSequence, filename)
-
-    def _create_region_detector(
-        self, driver: VGScientaAnalyserDriverIO, region: VGScientaRegion
-    ) -> VGScientaRegionDetector:
-        return VGScientaRegionDetector(self.name, driver, region)

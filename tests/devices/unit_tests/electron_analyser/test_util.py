@@ -2,10 +2,9 @@ from typing import Any
 
 from ophyd_async.core import StandardReadable
 
-from dodal.devices.electron_analyser import EnergyMode
-from dodal.devices.electron_analyser.abstract_region import AbstractBaseRegion
-from dodal.devices.electron_analyser.specs_analyser_io import SpecsDetector
-from dodal.devices.electron_analyser.vgscienta_analyser_io import VGScientaDetector
+from dodal.devices.electron_analyser.abstract import AbstractBaseRegion, EnergyMode
+from dodal.devices.electron_analyser.specs import SpecsDetector
+from dodal.devices.electron_analyser.vgscienta import VGScientaDetector
 
 TEST_VGSCIENTA = "VGSCIENTA"
 TEST_SPECS = "SPECS"

@@ -7,8 +7,8 @@ from ophyd_async.testing import (
     set_mock_value,
 )
 
-from dodal.devices.electron_analyser import (
-    EnergyMode,
+from dodal.devices.electron_analyser.abstract import EnergyMode
+from dodal.devices.electron_analyser.specs import (
     SpecsAnalyserDriverIO,
     SpecsRegion,
 )
