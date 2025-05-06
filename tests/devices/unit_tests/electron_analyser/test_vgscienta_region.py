@@ -2,10 +2,12 @@ from typing import Any
 
 import pytest
 
-from dodal.devices.electron_analyser.abstract_region import (
+from dodal.devices.electron_analyser import (
     EnergyMode,
-    TAbstractBaseRegion,
+    VGScientaRegion,
+    VGScientaSequence,
 )
+from dodal.devices.electron_analyser.abstract_region import TAbstractBaseRegion
 from dodal.devices.electron_analyser.vgscienta_region import (
     AcquisitionMode,
     DetectorMode,
@@ -55,7 +57,7 @@ def expected_region_values() -> list[dict[str, Any]]:
             "step_time": 1.0,
             "total_steps": 8.0,
             "total_time": 8.0,
-            "energy_step": 200.0,
+            "energy_step": 0.2,
             "exposure_time": 1.0,
             "first_x_channel": 1,
             "last_x_channel": 1000,
@@ -81,7 +83,7 @@ def expected_region_values() -> list[dict[str, Any]]:
             "step_time": 0.882,
             "total_steps": 1.0,
             "total_time": 4.41,
-            "energy_step": 0.877,
+            "energy_step": 8.77e-4,
             "exposure_time": 1.0,
             "first_x_channel": 4,
             "last_x_channel": 990,

@@ -1,6 +1,4 @@
-from bluesky.protocols import Movable
 from ophyd_async.core import (
-    AsyncStatus,
     Device,
     StandardReadable,
     StrictEnum,
@@ -13,7 +11,6 @@ from ophyd_async.epics.core import (
     epics_signal_r,
     epics_signal_rw,
 )
-from ophyd_async.epics.motor import Motor
 
 from dodal.devices.current_amplifiers import (
     CurrentAmpDet,
@@ -23,6 +20,7 @@ from dodal.devices.current_amplifiers import (
     FemtoDDPCA,
     StruckScaler,
 )
+from dodal.devices.positioner import create_positioner
 
 
 class D3Position(StrictEnum):
@@ -68,36 +66,6 @@ class InOutReadBackTable(StrictEnum):
     IN_BEAM = "In Beam"
     FAULT = "Fault"
     OUT_OF_BEAM = "Out of Beam"
-
-
-class Positioner(StandardReadable, Movable):
-    """1D stage with a enum table to select positions."""
-
-    def __init__(
-        self,
-        prefix: str,
-        positioner_enum: type[StrictEnum],
-        positioner_suffix: str = "",
-        Positioner_pv_suffix: str = ":MP:SELECT",
-        name: str = "",
-    ) -> None:
-        self._stage_motion = Motor(prefix=prefix + positioner_suffix)
-        with self.add_children_as_readables(Format.CONFIG_SIGNAL):
-            self.stage_position = epics_signal_rw(
-                positioner_enum,
-                read_pv=prefix + positioner_suffix + Positioner_pv_suffix,
-            )
-        super().__init__(name=name)
-        self.positioner_enum = positioner_enum
-
-    @AsyncStatus.wrap
-    async def set(self, value: StrictEnum) -> None:
-        if value in self.positioner_enum:
-            await self.stage_position.set(value=value)
-        else:
-            raise ValueError(
-                f"{value} is not an allow position. Position must be: {self.positioner_enum}"
-            )
 
 
 class I10PneumaticStage(StandardReadable):
@@ -154,16 +122,13 @@ class FullDiagnostic(Device):
         self,
         prefix: str,
         positioner_enum: type[StrictEnum],
-        positioner_suffix: str = "",
-        Positioner_pv_suffix: str = ":MP:SELECT",
+        positioner_suffix: str,
         cam_infix: str = "DCAM:",
         name: str = "",
     ) -> None:
-        self.positioner = Positioner(
-            prefix=prefix,
-            positioner_enum=positioner_enum,
-            positioner_suffix=positioner_suffix,
-            Positioner_pv_suffix=Positioner_pv_suffix,
+        self.positioner = create_positioner(
+            positioner_enum,
+            prefix + positioner_suffix,
         )
         self.screen = ScreenCam(
             prefix,
@@ -185,28 +150,11 @@ class I10Diagnostic(Device):
             positioner_suffix="DET:X",
         )
         self.d4 = ScreenCam(prefix=prefix + "PHDGN-04:")
-        self.d5 = Positioner(
-            prefix=prefix + "IONC-01:",
-            positioner_enum=D5Position,
-            positioner_suffix="Y",
-        )
+        self.d5 = create_positioner(D5Position, f"{prefix}IONC-01:Y")
+        self.d5A = create_positioner(D5APosition, f"{prefix}PHDGN-06:DET:X")
+        self.d6 = FullDiagnostic(f"{prefix}PHDGN-05:", D6Position, "DET:X")
+        self.d7 = create_positioner(D7Position, f"{prefix}PHDGN-07:Y")
 
-        self.d5A = Positioner(
-            prefix=prefix + "PHDGN-06:",
-            positioner_enum=D5APosition,
-            positioner_suffix="DET:X",
-        )
-
-        self.d6 = FullDiagnostic(
-            prefix=prefix + "PHDGN-05:",
-            positioner_enum=D6Position,
-            positioner_suffix="DET:X",
-        )
-        self.d7 = Positioner(
-            prefix=prefix + "PHDGN-07:",
-            positioner_enum=D7Position,
-            positioner_suffix="Y",
-        )
         super().__init__(name)
 
 
