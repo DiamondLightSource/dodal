@@ -379,10 +379,10 @@ def zocalo() -> ZocaloResults:
     """Get the i04 ZocaloResults device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
     """
-    return ZocaloResults()
+    return ZocaloResults("xrc.i04")
 
 
-@device_factory(skip=BL == "s03")
+@device_factory()
 def pin_tip_detection() -> PinTipDetection:
     """Get the i04 pin tip detection device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
