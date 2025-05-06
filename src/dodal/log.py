@@ -253,15 +253,15 @@ def do_default_logging_setup(dev_mode=False, graylog_port: int | None = None):
 
 
 def get_logging_file_paths() -> tuple[Path, Path]:
-    """Get the directory to write log files to.
+    """Get the directories to write log files to.
 
     If on a beamline, this will return '/dls_sw/$BEAMLINE/logs/bluesky' based on the
-    BEAMLINE envrionment variable. If no envrionment variable is found it will default
+    BEAMLINE environment variable. If no environment variable is found it will default
     to the tmp/dev directory.
 
     Returns:
-        logging_path (Path): Path to the log directory for the file handlers to write to.
-        debug_logging_path (Path): Path to the log directory for the debug log file handlers to write to.
+        tuple[Path, Path]: Paths to the standard log file and to the debug log file,
+                           for the file handlers to write to
     """
     beamline: str | None = environ.get("BEAMLINE")
 
