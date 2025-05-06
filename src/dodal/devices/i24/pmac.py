@@ -153,10 +153,10 @@ class ProgramRunner(Device, Flyable):
         )
 
     @AsyncStatus.wrap
-    async def complete(self):
-        """Stop collecting when the scan status PV goes to 0.
+    async def complete(self, counter_timeout:float = 30):
+        """Stop collecting when the scan status PV goes to 0 or when counter PV hasn't \
+            updated for 30 seconds.
         """
-        counter_timeout = 30
         try:
             async for signal, value in observe_signals_value(
                 self._status_ref(), self._counter_ref(),
@@ -166,7 +166,7 @@ class ProgramRunner(Device, Flyable):
                     if value == ScanState.DONE:
                         break
         except TimeoutError:
-            print("Counter hasn't updated within the last 30 seconds.")
+            pass
 
 class ProgramAbort(Triggerable):
     """Abort a data collection by setting the PMAC string and then wait for the \
