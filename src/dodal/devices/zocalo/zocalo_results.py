@@ -46,7 +46,6 @@ class ZocaloSource(str, Enum):
 
 DEFAULT_TIMEOUT = 180
 DEFAULT_SORT_KEY = SortKeys.max_count
-ZOCALO_READING_PLAN_NAME = "zocalo reading"
 CLEAR_QUEUE_WAIT_S = 2.0
 ZOCALO_STAGE_GROUP = "clear zocalo queue"
 

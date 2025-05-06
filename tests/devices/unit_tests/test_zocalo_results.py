@@ -11,7 +11,6 @@ from ophyd_async.core import AsyncStatus
 
 from dodal.devices.zocalo.zocalo_constants import ZOCALO_ENV
 from dodal.devices.zocalo.zocalo_results import (
-    ZOCALO_READING_PLAN_NAME,
     NoResultsFromZocalo,
     NoZocaloSubscription,
     XrcResult,
@@ -110,24 +109,13 @@ async def zocalo_results():
 
 @pytest.fixture
 async def mocked_zocalo_device(RE: RunEngine, zocalo_results: ZocaloResults):
-    async def device(results, run_setup=False):
+    async def device(results):
         @AsyncStatus.wrap
         async def mock_trigger(results):
             await zocalo_results._put_results(results, test_recipe_parameters)
 
         zocalo_results.trigger = MagicMock(side_effect=partial(mock_trigger, results))  # type: ignore
         await zocalo_results.connect()
-
-        if run_setup:
-
-            def plan():
-                yield from bps.open_run()
-                yield from bps.trigger_and_read(
-                    [zocalo_results], name=ZOCALO_READING_PLAN_NAME
-                )
-                yield from bps.close_run()
-
-            RE(plan())
         return zocalo_results
 
     return device
@@ -141,19 +129,12 @@ async def test_trigger_and_wait_puts_results(
     zocalo_device._put_results = AsyncMock()
     zocalo_device._put_results.assert_not_called()
 
-    def plan():
-        yield from bps.open_run()
-        yield from bps.trigger_and_read([zocalo_device], name=ZOCALO_READING_PLAN_NAME)
-        yield from bps.close_run()
-
-    RE(plan())
+    RE(bps.trigger(zocalo_device))
     zocalo_device._put_results.assert_called()
 
 
 async def test_get_full_processing_results(mocked_zocalo_device, RE) -> None:
-    zocalo_device: ZocaloResults = await mocked_zocalo_device(
-        TEST_RESULTS, run_setup=False
-    )
+    zocalo_device: ZocaloResults = await mocked_zocalo_device(TEST_RESULTS)
 
     def plan():
         yield from bps.trigger(zocalo_device)
