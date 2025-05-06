@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.zocalo.zocalo_results &#8212; dodal 1.46.1.dev9+gd906da672f documentation</title>
+    <title>dodal.devices.zocalo.zocalo_results &#8212; dodal 1.46.1.dev10+ge9d26fc498 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=f26ed27f"></script>
+    <script src="../../../../_static/documentation_options.js?v=b5212e1e"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -855,12 +855,12 @@ window.addEventListener("load", () => mermaid.run());
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A plan that will return the raw zocalo results, ranked in descending order according to the sort key.</span>
 <span class="sd">    Returns empty list in the event no results found.&quot;&quot;&quot;</span>
     <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Retrieving raw zocalo processing results&quot;</span><span class="p">)</span>
-    <span class="n">com</span> <span class="o">=</span> <span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">rd</span><span class="p">(</span><span class="n">zocalo</span><span class="o">.</span><span class="n">centre_of_mass</span><span class="p">,</span> <span class="n">default_value</span><span class="o">=</span><span class="p">[])</span>  <span class="c1"># type: ignore</span>
-    <span class="n">max_voxel</span> <span class="o">=</span> <span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">rd</span><span class="p">(</span><span class="n">zocalo</span><span class="o">.</span><span class="n">max_voxel</span><span class="p">,</span> <span class="n">default_value</span><span class="o">=</span><span class="p">[])</span>  <span class="c1"># type: ignore</span>
-    <span class="n">max_count</span> <span class="o">=</span> <span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">rd</span><span class="p">(</span><span class="n">zocalo</span><span class="o">.</span><span class="n">max_count</span><span class="p">,</span> <span class="n">default_value</span><span class="o">=</span><span class="p">[])</span>  <span class="c1"># type: ignore</span>
-    <span class="n">n_voxels</span> <span class="o">=</span> <span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">rd</span><span class="p">(</span><span class="n">zocalo</span><span class="o">.</span><span class="n">n_voxels</span><span class="p">,</span> <span class="n">default_value</span><span class="o">=</span><span class="p">[])</span>  <span class="c1"># type: ignore</span>
-    <span class="n">total_count</span> <span class="o">=</span> <span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">rd</span><span class="p">(</span><span class="n">zocalo</span><span class="o">.</span><span class="n">total_count</span><span class="p">,</span> <span class="n">default_value</span><span class="o">=</span><span class="p">[])</span>  <span class="c1"># type: ignore</span>
-    <span class="n">bounding_box</span> <span class="o">=</span> <span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">rd</span><span class="p">(</span><span class="n">zocalo</span><span class="o">.</span><span class="n">bounding_box</span><span class="p">,</span> <span class="n">default_value</span><span class="o">=</span><span class="p">[])</span>  <span class="c1"># type: ignore</span>
+    <span class="n">com</span> <span class="o">=</span> <span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">rd</span><span class="p">(</span><span class="n">zocalo</span><span class="o">.</span><span class="n">centre_of_mass</span><span class="p">,</span> <span class="n">default_value</span><span class="o">=</span><span class="p">[])</span>
+    <span class="n">max_voxel</span> <span class="o">=</span> <span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">rd</span><span class="p">(</span><span class="n">zocalo</span><span class="o">.</span><span class="n">max_voxel</span><span class="p">,</span> <span class="n">default_value</span><span class="o">=</span><span class="p">[])</span>
+    <span class="n">max_count</span> <span class="o">=</span> <span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">rd</span><span class="p">(</span><span class="n">zocalo</span><span class="o">.</span><span class="n">max_count</span><span class="p">,</span> <span class="n">default_value</span><span class="o">=</span><span class="p">[])</span>
+    <span class="n">n_voxels</span> <span class="o">=</span> <span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">rd</span><span class="p">(</span><span class="n">zocalo</span><span class="o">.</span><span class="n">n_voxels</span><span class="p">,</span> <span class="n">default_value</span><span class="o">=</span><span class="p">[])</span>
+    <span class="n">total_count</span> <span class="o">=</span> <span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">rd</span><span class="p">(</span><span class="n">zocalo</span><span class="o">.</span><span class="n">total_count</span><span class="p">,</span> <span class="n">default_value</span><span class="o">=</span><span class="p">[])</span>
+    <span class="n">bounding_box</span> <span class="o">=</span> <span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">rd</span><span class="p">(</span><span class="n">zocalo</span><span class="o">.</span><span class="n">bounding_box</span><span class="p">,</span> <span class="n">default_value</span><span class="o">=</span><span class="p">[])</span>
     <span class="k">return</span> <span class="p">[</span>
         <span class="n">_corrected_xrc_result</span><span class="p">(</span>
             <span class="n">XrcResult</span><span class="p">(</span>
