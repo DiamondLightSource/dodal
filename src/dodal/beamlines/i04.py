@@ -377,7 +377,7 @@ def zocalo() -> ZocaloResults:
     """Get the i04 ZocaloResults device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
     """
-    return ZocaloResults("xrc.i04")
+    return ZocaloResults(channel="xrc.i04")
 
 
 @device_factory()
