@@ -87,6 +87,7 @@ async def test_run_program(fake_pmac: PMAC, RE):
 
     assert await fake_pmac.pmac_string.get_value() == "&2b11r"
 
+
 async def test_counter_refresh_timeout(fake_pmac: PMAC, RE):
     async def update_counter():
         set_mock_value(fake_pmac.scanstatus, 1)
@@ -104,9 +105,10 @@ async def test_counter_refresh_timeout(fake_pmac: PMAC, RE):
     )
 
     await fake_pmac.run_program.kickoff()
-    await fake_pmac.run_program.complete(counter_timeout = 0.1)
+    await fake_pmac.run_program.complete(counter_timeout=0.1)
 
     assert await fake_pmac.counter.get_value() == 2
+
 
 @patch("dodal.devices.i24.pmac.sleep")
 async def test_abort_program(mock_sleep, fake_pmac: PMAC, RE):

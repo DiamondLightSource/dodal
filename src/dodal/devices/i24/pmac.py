@@ -1,4 +1,5 @@
 from asyncio import sleep
+from asyncio.exceptions import TimeoutError as TE
 from enum import Enum, IntEnum
 
 from bluesky.protocols import Flyable, Movable, Triggerable
@@ -16,7 +17,6 @@ from ophyd_async.core import (
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 from ophyd_async.epics.motor import Motor
-from asyncio.exceptions import TimeoutError as TE
 
 HOME_STR = r"\#1hmz\#2hmz\#3hmz"  # Command to home the PMAC motors
 ZERO_STR = "!x0y0z0"  # Command to blend any ongoing move into new position
@@ -160,13 +160,14 @@ class ProgramRunner(Device, Flyable):
         """
         try:
             async for signal, value in observe_signals_value(
-                self._status_ref(), self._counter_ref(), timeout = counter_timeout
+                self._status_ref(), self._counter_ref(), timeout=counter_timeout
             ):
                 if signal is self._status_ref():
                     if value == ScanState.DONE:
                         break
-        except TimeoutError:
+        except TE:
             pass
+
 
 class ProgramAbort(Triggerable):
     """Abort a data collection by setting the PMAC string and then wait for the \
