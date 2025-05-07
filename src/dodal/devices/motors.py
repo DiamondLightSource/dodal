@@ -1,12 +1,12 @@
 import asyncio
 import math
-from enum import StrEnum
+from enum import Enum
 
 from ophyd_async.core import StandardReadable, derived_signal_rw
 from ophyd_async.epics.motor import Motor
 
 
-class Axis(StrEnum):
+class Axis(Enum):
     X = "X"
     Y = "Y"
     Z = "Z"
