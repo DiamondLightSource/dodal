@@ -70,7 +70,9 @@ async def sim_analyser(
             sim_analyser = SpecsDetector(name="analyser", driver=sim_analyser_driver)
         return sim_analyser
 
-    raise Exception("")
+    raise Exception(
+        f"Type {type(sim_analyser_driver)} is not supported for sim_analyser."
+    )
 
 
 @pytest.fixture

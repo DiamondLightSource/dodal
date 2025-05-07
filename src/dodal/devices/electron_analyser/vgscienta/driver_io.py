@@ -2,7 +2,7 @@ import numpy as np
 from ophyd_async.core import Array1D, SignalR, StandardReadableFormat, soft_signal_rw
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
-from dodal.devices.electron_analyser.abstract.base_analyser_io import (
+from dodal.devices.electron_analyser.abstract.base_driver_io import (
     AbstractAnalyserDriverIO,
 )
 from dodal.devices.electron_analyser.vgscienta.region import (
