@@ -23,7 +23,7 @@ def six_axis_gonio(RE: RunEngine) -> SixAxisGonio:
 
 
 @pytest.fixture
-def rotated_six_axis_gonio(RE: RunEngine) -> SixAxisGonio:
+def y_up_six_axis_gonio(RE: RunEngine) -> SixAxisGonio:
     with init_devices(mock=True):
         gonio = SixAxisGonio(
             "", upward_axis_at_0=Axis.Y, upward_axis_at_minus_90=Axis.Z
@@ -36,9 +36,9 @@ def rotated_six_axis_gonio(RE: RunEngine) -> SixAxisGonio:
     return gonio
 
 
-async def test_reading_six_axis_gonio(rotated_six_axis_gonio: SixAxisGonio):
+async def test_reading_six_axis_gonio(six_axis_gonio: SixAxisGonio):
     await assert_reading(
-        rotated_six_axis_gonio,
+        six_axis_gonio,
         {
             "gonio-omega": {
                 "value": 0.0,
@@ -146,19 +146,19 @@ async def test_j_signal_for_default_axes(
     [[2, 60, 2, 0], [-10, -45, -10, 0]],
 )
 async def test_i_signal_for_rotated_axes(
-    rotated_six_axis_gonio: SixAxisGonio,
+    y_up_six_axis_gonio: SixAxisGonio,
     i_set_value: float,
     omega_set_value: float,
     expected_horz: float,
     expected_vert: float,
 ):
-    await rotated_six_axis_gonio.omega.set(omega_set_value)
-    await rotated_six_axis_gonio.i.set(i_set_value)
+    await y_up_six_axis_gonio.omega.set(omega_set_value)
+    await y_up_six_axis_gonio.i.set(i_set_value)
 
-    assert await rotated_six_axis_gonio.x.user_readback.get_value() == pytest.approx(
+    assert await y_up_six_axis_gonio.x.user_readback.get_value() == pytest.approx(
         expected_horz
     )
-    assert await rotated_six_axis_gonio.z.user_readback.get_value() == pytest.approx(
+    assert await y_up_six_axis_gonio.z.user_readback.get_value() == pytest.approx(
         expected_vert
     )
 
@@ -173,26 +173,52 @@ async def test_i_signal_for_rotated_axes(
     ],
 )
 async def test_j_signal_for_rotated_axes(
-    rotated_six_axis_gonio: SixAxisGonio,
+    y_up_six_axis_gonio: SixAxisGonio,
     j_set_value: float,
     omega_set_value: float,
     expected_horz: float,
     expected_vert: float,
 ):
-    await rotated_six_axis_gonio.omega.set(omega_set_value)
-    await rotated_six_axis_gonio.j.set(j_set_value)
+    await y_up_six_axis_gonio.omega.set(omega_set_value)
+    await y_up_six_axis_gonio.j.set(j_set_value)
 
-    assert await rotated_six_axis_gonio.y.user_readback.get_value() == pytest.approx(
+    assert await y_up_six_axis_gonio.y.user_readback.get_value() == pytest.approx(
         expected_horz
     )
-    assert await rotated_six_axis_gonio.z.user_readback.get_value() == pytest.approx(
+    assert await y_up_six_axis_gonio.z.user_readback.get_value() == pytest.approx(
         expected_vert
     )
 
-    await rotated_six_axis_gonio.j.set(j_set_value * 2)
-    assert await rotated_six_axis_gonio.y.user_readback.get_value() == pytest.approx(
+    await y_up_six_axis_gonio.j.set(j_set_value * 2)
+    assert await y_up_six_axis_gonio.y.user_readback.get_value() == pytest.approx(
         expected_horz * 2
     )
-    assert await rotated_six_axis_gonio.z.user_readback.get_value() == pytest.approx(
+    assert await y_up_six_axis_gonio.z.user_readback.get_value() == pytest.approx(
         expected_vert * 2
+    )
+
+
+async def test_get_j(y_up_six_axis_gonio: SixAxisGonio):
+    await y_up_six_axis_gonio.j.set(5)
+    assert await y_up_six_axis_gonio.j.get_value() == 5
+
+
+async def test_get_i(y_up_six_axis_gonio: SixAxisGonio):
+    await y_up_six_axis_gonio.i.set(5)
+    assert await y_up_six_axis_gonio.i.get_value() == 5
+
+
+@pytest.mark.parametrize(
+    "input_axis, expected_axis",
+    [
+        [Axis.X, "x"],
+        [Axis.Y, "y"],
+        [Axis.Z, "z"],
+    ],
+)
+async def test_get_axis_signal(
+    six_axis_gonio: SixAxisGonio, input_axis: Axis, expected_axis: str
+):
+    assert six_axis_gonio._get_axis_signal(input_axis) == getattr(
+        six_axis_gonio, expected_axis
     )
