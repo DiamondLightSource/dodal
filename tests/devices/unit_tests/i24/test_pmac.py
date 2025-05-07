@@ -88,7 +88,8 @@ async def test_run_program(fake_pmac: PMAC, RE):
     assert await fake_pmac.pmac_string.get_value() == "&2b11r"
 
 
-async def test_counter_refresh_timeout(fake_pmac: PMAC, RE):
+@pytest.mark.parametrize("sleepTime, expected", [(0.05, 3), (0.2, 2)])
+async def test_counter_refresh_timeout(sleepTime, expected, fake_pmac: PMAC, RE):
     async def update_counter():
         set_mock_value(fake_pmac.scanstatus, 1)
         set_mock_value(fake_pmac.counter, 0)
@@ -96,8 +97,9 @@ async def test_counter_refresh_timeout(fake_pmac: PMAC, RE):
         set_mock_value(fake_pmac.counter, 1)
         await asyncio.sleep(0.05)
         set_mock_value(fake_pmac.counter, 2)
-        await asyncio.sleep(0.2)
+        await asyncio.sleep(sleepTime)
         set_mock_value(fake_pmac.counter, 3)
+        set_mock_value(fake_pmac.scanstatus, 0)
 
     callback_on_mock_put(
         fake_pmac.pmac_string,
@@ -107,7 +109,7 @@ async def test_counter_refresh_timeout(fake_pmac: PMAC, RE):
     await fake_pmac.run_program.kickoff()
     await fake_pmac.run_program.complete(counter_timeout=0.1)
 
-    assert await fake_pmac.counter.get_value() == 2
+    assert await fake_pmac.counter.get_value() == expected
 
 
 @patch("dodal.devices.i24.pmac.sleep")
