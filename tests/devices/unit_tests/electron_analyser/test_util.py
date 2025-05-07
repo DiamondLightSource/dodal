@@ -3,21 +3,6 @@ from typing import Any
 from ophyd_async.core import StandardReadable
 
 from dodal.devices.electron_analyser.abstract import AbstractBaseRegion, EnergyMode
-from dodal.devices.electron_analyser.specs import SpecsDetector
-from dodal.devices.electron_analyser.vgscienta import VGScientaDetector
-
-TEST_VGSCIENTA = "VGSCIENTA"
-TEST_SPECS = "SPECS"
-
-SEQUENCE_FILE = "sequence_file"
-DETECTOR = "detector"
-
-TEST_VGSCIENTA_LOOKUP = {
-    DETECTOR: VGScientaDetector,
-    SEQUENCE_FILE: "vgscienta_sequence.seq",
-}
-
-TEST_SPECS_LOOKUP = {DETECTOR: SpecsDetector, SEQUENCE_FILE: "vgscienta_sequence.seq"}
 
 TEST_VGSCIENTA_SEQUENCE = "vgscienta_sequence.seq"
 TEST_SPECS_SEQUENCE = "specs_sequence.seq"

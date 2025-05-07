@@ -52,3 +52,7 @@ def test_analyser_detector_creates_region_detectors(
     assert len(region_detectors) == len(seq.get_enabled_regions())
     for det in region_detectors:
         assert det.region.enabled is True
+
+
+# ToDo - Add tests for BaseElectronAnalyserDetector class + controller
+# ToDo - Add test that data being read is correct from plan
