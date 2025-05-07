@@ -1,10 +1,8 @@
-from asyncio import get_running_loop
 from functools import partial
 from queue import Empty
 from unittest.mock import AsyncMock, MagicMock, call, patch
 
 import bluesky.plan_stubs as bps
-import bluesky.preprocessors as bpp
 import numpy as np
 import pytest
 from bluesky.run_engine import RunEngine
@@ -20,7 +18,6 @@ from dodal.devices.zocalo.zocalo_results import (
     ZocaloResults,
     ZocaloSource,
     get_full_processing_results,
-    get_processing_results_from_event,
 )
 
 TEST_RESULTS: list[XrcResult] = [
@@ -187,25 +184,6 @@ async def test_get_full_processing_results(mocked_zocalo_device, RE) -> None:
             assert [r[prop] for r in full_results] == [r[prop] for r in TEST_RESULTS]  # type: ignore
 
     RE(plan())
-
-
-async def test_get_processing_results_from_event(mocked_zocalo_device, RE) -> None:
-    zocalo_device: ZocaloResults = await mocked_zocalo_device(
-        TEST_RESULTS, run_setup=False
-    )
-
-    xrc_results_fut = get_running_loop().create_future()
-
-    def handle_zocalo_result(name: str, doc: dict):
-        xrc_results_fut.set_result(get_processing_results_from_event("zocalo", doc))
-
-    @bpp.subs_decorator({"event": handle_zocalo_result})
-    @bpp.run_decorator()
-    def plan():
-        yield from bps.trigger_and_read([zocalo_device])
-
-    RE(plan())
-    assert xrc_results_fut.result() == TEST_RESULTS
 
 
 @patch(
