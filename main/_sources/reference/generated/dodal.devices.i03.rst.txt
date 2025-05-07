@@ -3,19 +3,19 @@ dodal.devices.i03
 
 
 
-.. rubric:: Modules
+
+
+
+
+.. currentmodule:: dodal.devices
+.. rubric:: Classes
 
 .. autosummary::
    :toctree:
    :recursive:
 
-   dodal.devices.i03.beamstop
-   dodal.devices.i03.dcm
-   dodal.devices.i03.undulator_dcm
-
-
-
-
+   ~i03.Beamstop
+   ~i03.BeamstopPositions
 
 
 
