@@ -1,5 +1,4 @@
 from asyncio import sleep
-from asyncio import exceptions
 from enum import Enum, IntEnum
 
 from bluesky.protocols import Flyable, Movable, Triggerable
@@ -161,17 +160,14 @@ class ProgramRunner(Device, Flyable):
             updated for 30 seconds.
         """
         counter_time = await self._counter_time_ref().get_value()
-        try:
-            async for signal, value in observe_signals_value(
-                self._status_ref(),
-                self._counter_ref(),
-                timeout=counter_time,
-            ):
-                if signal is self._status_ref():
-                    if value == ScanState.DONE:
-                        break
-        except exceptions.TimeoutError:
-            raise exceptions.TimeoutError
+        async for signal, value in observe_signals_value(
+            self._status_ref(),
+            self._counter_ref(),
+            timeout=counter_time,
+        ):
+            if signal is self._status_ref():
+                if value == ScanState.DONE:
+                    break
 
 
 class ProgramAbort(Triggerable):
