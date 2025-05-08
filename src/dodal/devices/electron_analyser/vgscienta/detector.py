@@ -1,4 +1,3 @@
-from dodal.common.data_util import load_json_file_to_class
 from dodal.devices.electron_analyser.abstract.base_detector import (
     AbstractElectronAnalyserDetector,
     AbstractElectronAnalyserRegionDetector,
@@ -25,11 +24,11 @@ class VGScientaDetector(
         VGScientaAnalyserDriverIO, VGScientaSequence, VGScientaRegion
     ]
 ):
+    def __init__(self, prefix: str, name: str):
+        super().__init__(prefix, name, VGScientaSequence)
+
     def _create_driver(self, prefix: str) -> VGScientaAnalyserDriverIO:
         return VGScientaAnalyserDriverIO(prefix, "driver")
-
-    def load_sequence(self, filename: str) -> VGScientaSequence:
-        return load_json_file_to_class(VGScientaSequence, filename)
 
     def _create_region_detector(
         self, driver: VGScientaAnalyserDriverIO, region: VGScientaRegion

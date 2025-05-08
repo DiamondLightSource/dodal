@@ -1,4 +1,3 @@
-from dodal.common.data_util import load_json_file_to_class
 from dodal.devices.electron_analyser.abstract.base_detector import (
     AbstractElectronAnalyserDetector,
     AbstractElectronAnalyserRegionDetector,
@@ -18,11 +17,11 @@ class SpecsRegionDetector(
 class SpecsDetector(
     AbstractElectronAnalyserDetector[SpecsAnalyserDriverIO, SpecsSequence, SpecsRegion]
 ):
+    def __init__(self, prefix: str, name: str):
+        super().__init__(prefix, name, SpecsSequence)
+
     def _create_driver(self, prefix: str) -> SpecsAnalyserDriverIO:
         return SpecsAnalyserDriverIO(prefix, "driver")
-
-    def load_sequence(self, filename: str) -> SpecsSequence:
-        return load_json_file_to_class(SpecsSequence, filename)
 
     def _create_region_detector(
         self, driver: SpecsAnalyserDriverIO, region: SpecsRegion

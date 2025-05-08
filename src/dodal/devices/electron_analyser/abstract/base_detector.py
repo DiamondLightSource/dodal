@@ -18,6 +18,7 @@ from ophyd_async.epics.adcore import (
     ADBaseController,
 )
 
+from dodal.common.data_util import load_json_file_to_class
 from dodal.devices.electron_analyser.abstract.base_driver_io import (
     AbstractAnalyserDriverIO,
     TAbstractAnalyserDriverIO,
@@ -44,6 +45,10 @@ class BaseElectronAnalyserDetector(
     """
     Detector for data acquisition of electron analyser. Can only acquire using settings
     already configured for the device.
+
+    If possible, this should be changed to inheirt from a StandardDetector. Currently,
+    StandardDetector forces you to use a file writer which doesn't apply here.
+    See issue https://github.com/bluesky/ophyd-async/issues/888
     """
 
     def __init__(
@@ -148,8 +153,11 @@ class AbstractElectronAnalyserDetector(
     setup configured region settings before data acquisition.
     """
 
-    def __init__(self, prefix: str, name: str):
+    def __init__(
+        self, prefix: str, name: str, sequence_class: type[TAbstractBaseSequence]
+    ):
         self._driver = self._create_driver(prefix)
+        self._sequence_class = sequence_class
         super().__init__(name, self.driver)
 
     @property
@@ -158,16 +166,13 @@ class AbstractElectronAnalyserDetector(
         # can be used with connect() method.
         return self._driver
 
+    def load_sequence(self, filename: str) -> TAbstractBaseSequence:
+        return load_json_file_to_class(self._sequence_class, filename)
+
     @abstractmethod
     def _create_driver(self, prefix: str) -> TAbstractAnalyserDriverIO:
         """
         Define implementation of the driver used for this detector.
-        """
-
-    @abstractmethod
-    def load_sequence(self, filename: str) -> TAbstractBaseSequence:
-        """
-        Method to read in sequence file into a sequence class.
         """
 
     @abstractmethod
