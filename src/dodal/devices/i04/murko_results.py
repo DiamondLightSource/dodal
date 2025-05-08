@@ -1,6 +1,5 @@
 import json
 import pickle
-from collections import OrderedDict
 from enum import Enum
 from typing import TypedDict
 
@@ -70,14 +69,12 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
         self._last_result = None
         self.sample_id = soft_signal_rw(str)  # Should get from redis
         self.coords = {"x": {}, "y": {}, "z": {}}
-        self.search_angles = OrderedDict(
-            [  # Angles to search and dimensions to gather at each angle
-                (90, ("x", "z")),
-                (180, ("x", "y")),
-                (270, ()),  # Stop searching here
-            ]
-        )
-        self.angles_to_search = list(self.search_angles.keys())
+
+        self.search_angles = [  # Angles to search and dimensions to gather at each angle
+            (90, ("x", "z")),
+            (180, ("x", "y")),
+            (270, ()),  # Stop searching here
+        ]
 
         with self.add_children_as_readables():
             # Diffs from current x/y/z
@@ -102,7 +99,7 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
         # Wait for results
         sample_id = await self.sample_id.get_value()
         final_message = None
-        while self.angles_to_search:
+        while self.search_angles:
             # waits here for next batch to be recieved
             message = await self.pubsub.get_message(timeout=self.TIMEOUT_S)
             if message is None:  # No more messages to process
@@ -131,12 +128,10 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
                     metadata_str = await self.redis_client.hget(  # type: ignore
                         f"murko:{sample_id}:metadata", uuid
                     )
-                    if metadata_str and self.angles_to_search:
+                    if metadata_str and self.search_angles:
                         self.process_result(result, uuid, metadata_str)
 
-    def process_result(
-        self, result: dict, uuid: int, metadata_str: str
-    ) -> float | None:
+    def process_result(self, result: dict, uuid: int, metadata_str: str):
         metadata = MurkoMetadata(json.loads(metadata_str))
         omega_angle = metadata["omega_angle"]
         LOGGER.info(f"Got angle {omega_angle}")
@@ -144,8 +139,8 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
         movement = self.get_coords_if_at_angle(metadata, result, omega_angle)
         if movement is not None:
             LOGGER.info(f"Using result {uuid}, {metadata_str}, {result}")
-            search_angle = self.angles_to_search.pop(0)
-            for coord in self.search_angles[search_angle]:
+            _, axes = self.search_angles.pop(0)
+            for coord in axes:
                 self.coords[coord][omega_angle] = movement[Coord[coord].value]
                 LOGGER.info(f"Found {coord} at {movement}, angle = {omega_angle}")
         self._last_omega = omega_angle
@@ -154,10 +149,11 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
     def get_coords_if_at_angle(
         self, metadata: MurkoMetadata, result: MurkoResult, omega: float
     ) -> np.ndarray | None:
-        """Gets the 'most_likely_click' coordinates from Murko if omega or the last
-        omega are the closest angle to the search angle. Otherwise returns None.
+        """Gets the 'most_likely_click' coordinates (in mm to move the sample) from
+        Murko if omega or the last omega are the closest angle to the search angle.
+        Otherwise returns None.
         """
-        search_angle = self.angles_to_search[0]
+        search_angle = self.search_angles[0][0]
         LOGGER.info(f"Compare {omega}, {search_angle}, {self._last_omega}")
         if (  # if last omega is closest
             abs(omega - search_angle) >= abs(self._last_omega - search_angle)
