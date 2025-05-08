@@ -20,13 +20,8 @@ from tests.devices.unit_tests.electron_analyser.test_util import (
 
 
 @pytest.fixture
-def sequence_file() -> str:
-    return TEST_VGSCIENTA_SEQUENCE
-
-
-@pytest.fixture
-def sequence(sequence_file_path: str) -> VGScientaSequence:
-    return load_json_file_to_class(VGScientaSequence, sequence_file_path)
+def sequence() -> VGScientaSequence:
+    return load_json_file_to_class(VGScientaSequence, TEST_VGSCIENTA_SEQUENCE)
 
 
 @pytest.fixture

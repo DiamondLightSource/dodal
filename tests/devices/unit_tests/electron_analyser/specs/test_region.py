@@ -16,13 +16,8 @@ from tests.devices.unit_tests.electron_analyser.test_util import (
 
 
 @pytest.fixture
-def sequence_file() -> str:
-    return TEST_SPECS_SEQUENCE
-
-
-@pytest.fixture
-def sequence(sequence_file_path: str) -> SpecsSequence:
-    return load_json_file_to_class(SpecsSequence, sequence_file_path)
+def sequence() -> SpecsSequence:
+    return load_json_file_to_class(SpecsSequence, TEST_SPECS_SEQUENCE)
 
 
 @pytest.fixture
