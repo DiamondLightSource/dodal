@@ -8,12 +8,15 @@ from dodal.devices.electron_analyser.abstract import (
     AbstractBaseSequence,
     TAbstractAnalyserDriverIO,
     TAbstractBaseRegion,
-    TAbstractElectronAnalyserDetector,
 )
+from dodal.devices.electron_analyser.specs import SpecsDetector
 from dodal.devices.electron_analyser.vgscienta import (
+    VGScientaDetector,
     VGScientaRegion,
     VGScientaSequence,
 )
+
+ElectronAnalyserDetectorImpl = SpecsDetector | VGScientaDetector
 
 
 @pytest.fixture
@@ -30,8 +33,8 @@ async def sim_driver(
 
 @pytest.fixture
 async def sim_detector(
-    detector_class: type[TAbstractElectronAnalyserDetector],
-) -> TAbstractElectronAnalyserDetector:
+    detector_class: type[ElectronAnalyserDetectorImpl],
+) -> ElectronAnalyserDetectorImpl:
     async with init_devices(mock=True, connect=True):
         sim_detector = detector_class(
             prefix="sim_driver:",
