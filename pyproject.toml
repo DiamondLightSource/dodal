@@ -33,6 +33,7 @@ dependencies = [
     "redis",
     "deepdiff",
     "scanspec>=0.7.3",
+    "snowballstemmer<3" # Remove once https://github.com/sphinx-doc/sphinx/issues/13533 is resolved
 ]
 
 dynamic = ["version"]
