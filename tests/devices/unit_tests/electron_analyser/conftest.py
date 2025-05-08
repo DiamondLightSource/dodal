@@ -38,7 +38,7 @@ async def sim_detector(
     async with init_devices(mock=True, connect=True):
         sim_detector = detector_class(
             prefix="TEST:",
-            name="analyser",
+            name="sim_detector",
         )
     return sim_detector
 
