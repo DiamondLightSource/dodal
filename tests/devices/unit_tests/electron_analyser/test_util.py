@@ -6,13 +6,13 @@ from ophyd_async.core import StandardReadable
 from dodal.devices.electron_analyser.abstract import (
     AbstractBaseRegion,
     AbstractBaseSequence,
-    EnergyMode,
 )
 from dodal.devices.electron_analyser.specs import (
     SpecsAnalyserDriverIO,
     SpecsDetector,
     SpecsSequence,
 )
+from dodal.devices.electron_analyser.types import EnergyMode
 from dodal.devices.electron_analyser.vgscienta import (
     VGScientaAnalyserDriverIO,
     VGScientaDetector,

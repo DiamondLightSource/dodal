@@ -9,9 +9,9 @@ from ophyd_async.testing import (
 
 from dodal.common.data_util import load_json_file_to_class
 from dodal.devices.electron_analyser import (
+    EnergyMode,
     to_kinetic_energy,
 )
-from dodal.devices.electron_analyser.abstract import EnergyMode
 from dodal.devices.electron_analyser.vgscienta import (
     VGScientaAnalyserDriverIO,
     VGScientaRegion,

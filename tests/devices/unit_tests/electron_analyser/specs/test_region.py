@@ -3,10 +3,8 @@ from typing import Any
 import pytest
 
 from dodal.common.data_util import load_json_file_to_class
-from dodal.devices.electron_analyser.abstract.base_region import (
-    EnergyMode,
-    TAbstractBaseRegion,
-)
+from dodal.devices.electron_analyser import EnergyMode
+from dodal.devices.electron_analyser.abstract.base_region import TAbstractBaseRegion
 from dodal.devices.electron_analyser.specs import SpecsRegion, SpecsSequence
 from tests.devices.unit_tests.electron_analyser.test_util import (
     TEST_SPECS_SEQUENCE,

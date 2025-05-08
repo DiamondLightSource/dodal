@@ -9,7 +9,6 @@ from .base_driver_io import AbstractAnalyserDriverIO, TAbstractAnalyserDriverIO
 from .base_region import (
     AbstractBaseRegion,
     AbstractBaseSequence,
-    EnergyMode,
     TAbstractBaseRegion,
     TAbstractBaseSequence,
 )
@@ -17,7 +16,6 @@ from .base_region import (
 __all__ = [
     "AbstractBaseRegion",
     "AbstractBaseSequence",
-    "EnergyMode",
     "TAbstractBaseRegion",
     "TAbstractBaseSequence",
     "AbstractAnalyserDriverIO",

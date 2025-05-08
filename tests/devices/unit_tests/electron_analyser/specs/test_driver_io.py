@@ -8,12 +8,12 @@ from ophyd_async.testing import (
 )
 
 from dodal.common.data_util import load_json_file_to_class
-from dodal.devices.electron_analyser.abstract import EnergyMode
 from dodal.devices.electron_analyser.specs import (
     SpecsAnalyserDriverIO,
     SpecsRegion,
     SpecsSequence,
 )
+from dodal.devices.electron_analyser.types import EnergyMode
 from dodal.plan_stubs.electron_analyser import configure_specs
 from tests.devices.unit_tests.electron_analyser.test_util import (
     TEST_SEQUENCE_REGION_NAMES,

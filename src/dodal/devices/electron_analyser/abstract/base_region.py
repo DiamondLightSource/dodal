@@ -3,8 +3,9 @@ from abc import ABC
 from collections.abc import Callable
 from typing import Generic, TypeVar
 
-from ophyd_async.core import StrictEnum
 from pydantic import BaseModel, Field, model_validator
+
+from dodal.devices.electron_analyser.types import EnergyMode
 
 
 def java_to_python_case(java_str: str) -> str:
@@ -40,11 +41,6 @@ def energy_mode_validation(data: dict) -> dict:
             EnergyMode.BINDING if is_binding_energy else EnergyMode.KINETIC
         )
     return data
-
-
-class EnergyMode(StrictEnum):
-    KINETIC = "Kinetic"
-    BINDING = "Binding"
 
 
 class AbstractBaseRegion(ABC, JavaToPythonModel):

@@ -3,12 +3,12 @@ from bluesky.utils import MsgGenerator, plan
 from ophyd_async.epics.adcore import ADImageMode
 
 from dodal.common.types import MsgGenerator
-from dodal.devices.electron_analyser import to_kinetic_energy
 from dodal.devices.electron_analyser.abstract import (
     AbstractAnalyserDriverIO,
     AbstractBaseRegion,
 )
 from dodal.devices.electron_analyser.specs import SpecsAnalyserDriverIO, SpecsRegion
+from dodal.devices.electron_analyser.util import to_kinetic_energy
 from dodal.devices.electron_analyser.vgscienta import (
     VGScientaAnalyserDriverIO,
     VGScientaRegion,

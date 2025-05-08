@@ -3,12 +3,12 @@ from typing import Any
 import pytest
 from ophyd_async.core import init_devices
 
-from dodal.devices.electron_analyser import TElectronAnalyserDetectorImpl
 from dodal.devices.electron_analyser.abstract import (
     AbstractBaseRegion,
     AbstractBaseSequence,
     TAbstractAnalyserDriverIO,
     TAbstractBaseRegion,
+    TAbstractElectronAnalyserDetector,
 )
 from dodal.devices.electron_analyser.vgscienta import (
     VGScientaRegion,
@@ -30,8 +30,8 @@ async def sim_driver(
 
 @pytest.fixture
 async def sim_detector(
-    detector_class: type[TElectronAnalyserDetectorImpl],
-) -> TElectronAnalyserDetectorImpl:
+    detector_class: type[TAbstractElectronAnalyserDetector],
+) -> TAbstractElectronAnalyserDetector:
     async with init_devices(mock=True, connect=True):
         sim_detector = detector_class(
             prefix="sim_driver:",
