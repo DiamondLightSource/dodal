@@ -25,7 +25,7 @@ dodal.devices.oav.oav\_calculations
    .. autosummary::
    
       calculate_beam_distance
-      camera_coordinates_to_xyz
+      camera_coordinates_to_xyz_mm
    
    
 

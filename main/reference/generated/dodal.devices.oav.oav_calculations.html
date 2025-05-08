@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.oav.oav_calculations &#8212; dodal 1.46.1.dev13+gb7597ec53d documentation</title>
+    <title>dodal.devices.oav.oav_calculations &#8212; dodal 1.46.1.dev16+g913c0a3c0c documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=90eefe44"></script>
+    <script src="../../_static/documentation_options.js?v=c3e3fa3f"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -904,16 +904,16 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="#dodal.devices.oav.oav_calculations.calculate_beam_distance" title="dodal.devices.oav.oav_calculations.calculate_beam_distance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">calculate_beam_distance</span></code></a>(beam_centre, ...)</p></td>
 <td><p>Calculates the distance between the beam centre and the given (horizontal, vertical).</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#dodal.devices.oav.oav_calculations.camera_coordinates_to_xyz" title="dodal.devices.oav.oav_calculations.camera_coordinates_to_xyz"><code class="xref py py-obj docutils literal notranslate"><span class="pre">camera_coordinates_to_xyz</span></code></a>(horizontal, ...)</p></td>
-<td><p>Converts from (horizontal,vertical) pixel measurements from the OAV camera into to (x, y, z) motor coordinates in millmeters.</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#dodal.devices.oav.oav_calculations.camera_coordinates_to_xyz_mm" title="dodal.devices.oav.oav_calculations.camera_coordinates_to_xyz_mm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">camera_coordinates_to_xyz_mm</span></code></a>(horizontal, ...)</p></td>
+<td><p>Converts from (horizontal,vertical) pixel measurements from the OAV camera into to (x, y, z) motor coordinates in millimetres.</p></td>
 </tr>
 </tbody>
 </table>
 </div>
 <dl class="py function">
-<dt class="sig sig-object py" id="dodal.devices.oav.oav_calculations.camera_coordinates_to_xyz">
-<span class="sig-prename descclassname"><span class="pre">dodal.devices.oav.oav_calculations.</span></span><span class="sig-name descname"><span class="pre">camera_coordinates_to_xyz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">horizontal</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertical</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">omega</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">microns_per_i_pixel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">microns_per_j_pixel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="../../_modules/dodal/devices/oav/oav_calculations.html#camera_coordinates_to_xyz"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.oav.oav_calculations.camera_coordinates_to_xyz" title="Link to this definition">#</a></dt>
-<dd><p>Converts from (horizontal,vertical) pixel measurements from the OAV camera into to (x, y, z) motor coordinates in millmeters.
+<dt class="sig sig-object py" id="dodal.devices.oav.oav_calculations.camera_coordinates_to_xyz_mm">
+<span class="sig-prename descclassname"><span class="pre">dodal.devices.oav.oav_calculations.</span></span><span class="sig-name descname"><span class="pre">camera_coordinates_to_xyz_mm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">horizontal</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertical</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">omega</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">microns_per_i_pixel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">microns_per_j_pixel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="../../_modules/dodal/devices/oav/oav_calculations.html#camera_coordinates_to_xyz_mm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.oav.oav_calculations.camera_coordinates_to_xyz_mm" title="Link to this definition">#</a></dt>
+<dd><p>Converts from (horizontal,vertical) pixel measurements from the OAV camera into to (x, y, z) motor coordinates in millimetres.
 For an overview of the coordinate system for I03 see <a class="github reference external" href="https://github.com/DiamondLightSource/hyperion/wiki/Gridscan-Coordinate-System">DiamondLightSource/hyperion</a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1002,7 +1002,7 @@ For an overview of the coordinate system for I03 see <a class="github reference 
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.oav.oav_calculations.camera_coordinates_to_xyz"><code class="docutils literal notranslate"><span class="pre">camera_coordinates_to_xyz()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.oav.oav_calculations.camera_coordinates_to_xyz_mm"><code class="docutils literal notranslate"><span class="pre">camera_coordinates_to_xyz_mm()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.oav.oav_calculations.calculate_beam_distance"><code class="docutils literal notranslate"><span class="pre">calculate_beam_distance()</span></code></a></li>
 </ul>
   </nav></div>
