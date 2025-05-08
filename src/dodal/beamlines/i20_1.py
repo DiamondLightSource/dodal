@@ -1,7 +1,11 @@
 from pathlib import Path
 
+from ophyd_async.epics.motor import Motor
+from ophyd_async.fastcs.panda import HDFPanda
+
 from dodal.common.beamlines.beamline_utils import (
     device_factory,
+    get_path_provider,
     set_path_provider,
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
@@ -33,7 +37,7 @@ set_path_provider(
 
 
 # NOTE this is mock as we cannot move items on the beamline until we get sign-off to do so
-@device_factory(mock=True)
+@device_factory()
 def turbo_slit() -> TurboSlit:
     """
     turboslit for selecting energy from the polychromator
@@ -42,12 +46,36 @@ def turbo_slit() -> TurboSlit:
     return TurboSlit(f"{PREFIX.beamline_prefix}-OP-PCHRO-01:TS:")
 
 
+@device_factory()
+def turbo_slit_x() -> Motor:
+    """
+    turbo slit x motor
+    """
+    return Motor(f"{PREFIX.beamline_prefix}-OP-PCHRO-01:TS:XFINE")
+
+
+@device_factory()
+def panda() -> HDFPanda:
+    return HDFPanda(
+        f"{PREFIX.beamline_prefix}-EA-PANDA-02:", path_provider=get_path_provider(), name="panda"
+    )
+
+
+@device_factory(mock=True)
+def alignment_x() -> Motor:
+    return Motor(f"{PREFIX.beamline_prefix}-MO-STAGE-01:X")
+
+
+@device_factory(mock=True)
+def alignment_y() -> Motor:
+    return Motor(f"{PREFIX.beamline_prefix}-MO-STAGE-01:Y")
+
+
 @device_factory(skip=True)
 def xspress3() -> Xspress3:
     """
     16 channels Xspress3 detector
     """
-
     return Xspress3(
         f"{PREFIX.beamline_prefix}-EA-DET-03:",
         num_channels=16,
