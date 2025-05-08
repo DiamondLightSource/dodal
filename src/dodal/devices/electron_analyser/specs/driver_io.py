@@ -5,10 +5,9 @@ from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 from dodal.devices.electron_analyser.abstract.base_driver_io import (
     AbstractAnalyserDriverIO,
 )
-from dodal.devices.electron_analyser.specs.region import SpecsSequence
 
 
-class SpecsAnalyserDriverIO(AbstractAnalyserDriverIO[SpecsSequence]):
+class SpecsAnalyserDriverIO(AbstractAnalyserDriverIO):
     def __init__(self, prefix: str, name: str = "") -> None:
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             # Used for setting up region data acquisition.

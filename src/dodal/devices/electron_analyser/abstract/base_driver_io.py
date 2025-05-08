@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Generic, TypeVar
+from typing import TypeVar
 
 import numpy as np
 from ophyd_async.core import (
@@ -13,14 +13,11 @@ from ophyd_async.core import (
 from ophyd_async.epics.adcore import ADBaseIO
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
-from dodal.devices.electron_analyser.abstract.base_region import TAbstractBaseSequence
 from dodal.devices.electron_analyser.types import EnergyMode
 from dodal.devices.electron_analyser.util import to_binding_energy
 
 
-class AbstractAnalyserDriverIO(
-    ABC, StandardReadable, ADBaseIO, Generic[TAbstractBaseSequence]
-):
+class AbstractAnalyserDriverIO(ABC, StandardReadable, ADBaseIO):
     """
     Generic device to configure electron analyser with new region settings.
     Electron analysers should inherit from this class for further specialisation.
