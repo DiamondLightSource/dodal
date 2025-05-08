@@ -25,14 +25,14 @@ async def oav() -> OAV:
 
 
 def take_snapshot_with_grid(oav: OAV, snapshot_filename, snapshot_directory):
-    yield from bps.abs_set(oav.grid_snapshot.top_left_x, TEST_GRID_TOP_LEFT_X)  # type: ignore # See: https://github.com/DiamondLightSource/dodal/issues/827
-    yield from bps.abs_set(oav.grid_snapshot.top_left_y, TEST_GRID_TOP_LEFT_Y)  # type: ignore # See: https://github.com/DiamondLightSource/dodal/issues/827
-    yield from bps.abs_set(oav.grid_snapshot.box_width, TEST_GRID_BOX_WIDTH)  # type: ignore # See: https://github.com/DiamondLightSource/dodal/issues/827
-    yield from bps.abs_set(oav.grid_snapshot.num_boxes_x, TEST_GRID_NUM_BOXES_X)  # type: ignore # See: https://github.com/DiamondLightSource/dodal/issues/827
-    yield from bps.abs_set(oav.grid_snapshot.num_boxes_y, TEST_GRID_NUM_BOXES_Y)  # type: ignore # See: https://github.com/DiamondLightSource/dodal/issues/827
-    yield from bps.abs_set(oav.grid_snapshot.filename, snapshot_filename)  # type: ignore # See: https://github.com/DiamondLightSource/dodal/issues/827
-    yield from bps.abs_set(oav.grid_snapshot.directory, snapshot_directory)  # type: ignore # See: https://github.com/DiamondLightSource/dodal/issues/827
-    yield from bps.trigger(oav.grid_snapshot, wait=True)  # type: ignore # See: https://github.com/DiamondLightSource/dodal/issues/827
+    yield from bps.abs_set(oav.grid_snapshot.top_left_x, TEST_GRID_TOP_LEFT_X)
+    yield from bps.abs_set(oav.grid_snapshot.top_left_y, TEST_GRID_TOP_LEFT_Y)
+    yield from bps.abs_set(oav.grid_snapshot.box_width, TEST_GRID_BOX_WIDTH)
+    yield from bps.abs_set(oav.grid_snapshot.num_boxes_x, TEST_GRID_NUM_BOXES_X)
+    yield from bps.abs_set(oav.grid_snapshot.num_boxes_y, TEST_GRID_NUM_BOXES_Y)
+    yield from bps.abs_set(oav.grid_snapshot.filename, snapshot_filename)
+    yield from bps.abs_set(oav.grid_snapshot.directory, snapshot_directory)
+    yield from bps.trigger(oav.grid_snapshot, wait=True)
 
 
 # We need to find a better way of integrating this, see https://github.com/DiamondLightSource/mx-bluesky/issues/183

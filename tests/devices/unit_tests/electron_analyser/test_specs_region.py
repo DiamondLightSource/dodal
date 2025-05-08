@@ -2,11 +2,8 @@ from typing import Any
 
 import pytest
 
-from dodal.devices.electron_analyser.abstract_region import (
-    EnergyMode,
-    TAbstractBaseRegion,
-)
-from dodal.devices.electron_analyser.specs_region import SpecsRegion, SpecsSequence
+from dodal.devices.electron_analyser import EnergyMode, SpecsRegion, SpecsSequence
+from dodal.devices.electron_analyser.abstract_region import TAbstractBaseRegion
 from tests.devices.unit_tests.electron_analyser.test_util import (
     TEST_SPECS_SEQUENCE,
     assert_region_has_expected_values,
@@ -40,7 +37,7 @@ def expected_region_values() -> list[dict[str, Any]]:
             "low_energy": 800.0,
             "high_energy": 850.0,
             "energy_step": 0.1,
-            "pass_energy": "5.0",
+            "pass_energy": 5.0,
             "iterations": 1,
             "step_time": 1.0,
             "enabled": False,
@@ -58,7 +55,7 @@ def expected_region_values() -> list[dict[str, Any]]:
             "low_energy": 599.866,
             "high_energy": 600.134,
             "energy_step": 0.2680000000000291,
-            "pass_energy": "2.0",
+            "pass_energy": 2.0,
             "iterations": 5,
             "step_time": 2.0,
             "enabled": True,

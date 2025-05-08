@@ -3,7 +3,6 @@ from unittest.mock import call, patch
 
 import bluesky.plan_stubs as bps
 import pytest
-from bluesky.run_engine import RunEngine
 from ophyd_async.testing import callback_on_mock_put, get_mock_put, set_mock_value
 
 from dodal.devices.i24.pmac import (
@@ -16,8 +15,7 @@ from dodal.devices.util.test_utils import patch_motor
 
 
 @pytest.fixture
-async def fake_pmac():
-    RunEngine()
+async def fake_pmac(RE):
     pmac = PMAC("", name="fake_pmac")
     await pmac.connect(mock=True)
 
@@ -35,7 +33,7 @@ def test_pmac_can_be_created(fake_pmac: PMAC):
 
 async def test_pmac_motor_move(fake_pmac: PMAC, RE):
     pos = (1.0, 0.5)
-    RE(bps.mv(fake_pmac.x, pos[0], fake_pmac.y, pos[1]))  # type: ignore # See: https://github.com/DiamondLightSource/dodal/issues/827
+    RE(bps.mv(fake_pmac.x, pos[0], fake_pmac.y, pos[1]))
 
     assert await fake_pmac.x.user_readback.get_value() == 1.0
     assert await fake_pmac.y.user_readback.get_value() == 0.5

@@ -1,9 +1,9 @@
 import re
 from abc import ABC
 from collections.abc import Callable
-from enum import Enum
 from typing import Generic, TypeVar
 
+from ophyd_async.core import StrictEnum
 from pydantic import BaseModel, Field, model_validator
 
 
@@ -42,7 +42,7 @@ def energy_mode_validation(data: dict) -> dict:
     return data
 
 
-class EnergyMode(str, Enum):
+class EnergyMode(StrictEnum):
     KINETIC = "Kinetic"
     BINDING = "Binding"
 
@@ -59,7 +59,7 @@ class AbstractBaseRegion(ABC, JavaToPythonModel):
     iterations: int = 1
     # These ones we need subclasses to provide default values
     lens_mode: str
-    pass_energy: str
+    pass_energy: int
     acquisition_mode: str
     low_energy: float
     high_energy: float
@@ -72,9 +72,6 @@ class AbstractBaseRegion(ABC, JavaToPythonModel):
 
     def is_kinetic_energy(self) -> bool:
         return self.energy_mode == EnergyMode.KINETIC
-
-    def to_kinetic_energy(self, value: float, excitation_energy: float) -> float:
-        return value if self.is_binding_energy() else excitation_energy - value
 
     @model_validator(mode="before")
     @classmethod
