@@ -18,6 +18,9 @@ class SpecsRegionDetector(
 class SpecsDetector(
     AbstractElectronAnalyserDetector[SpecsAnalyserDriverIO, SpecsSequence, SpecsRegion]
 ):
+    def _create_driver(self, prefix: str) -> SpecsAnalyserDriverIO:
+        return SpecsAnalyserDriverIO(prefix, "driver")
+
     def load_sequence(self, filename: str) -> SpecsSequence:
         return load_json_file_to_class(SpecsSequence, filename)
 

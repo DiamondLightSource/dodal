@@ -9,17 +9,13 @@ from bluesky.protocols import (
 )
 from event_model import DataKey
 from ophyd_async.core import (
-    DEFAULT_TIMEOUT,
     AsyncStatus,
     Device,
     Reference,
-    set_and_wait_for_value,
 )
 from ophyd_async.core._protocol import AsyncConfigurable, AsyncReadable
 from ophyd_async.epics.adcore import (
-    DEFAULT_GOOD_STATES,
-    ADState,
-    stop_busy_record,
+    ADBaseController,
 )
 
 from dodal.devices.electron_analyser.abstract.base_driver_io import (
@@ -32,58 +28,9 @@ from dodal.devices.electron_analyser.abstract.base_region import (
 )
 
 
-class AnalyserController:
-    def __init__(
-        self,
-        driver: AbstractAnalyserDriverIO,
-        good_states: frozenset[ADState] = DEFAULT_GOOD_STATES,
-    ) -> None:
-        self.driver = driver
-        self.good_states = good_states
-        self.frame_timeout = DEFAULT_TIMEOUT
-        self._arm_status: AsyncStatus | None = None
-
-    async def arm(self):
-        self._arm_status = await self.start_acquiring_driver_and_ensure_status()
-
-    async def disarm(self):
-        # We can't use caput callback as we already used it in arm() and we can't have
-        # 2 or they will deadlock
-        await stop_busy_record(self.driver.acquire, False, timeout=1)
-
-    async def start_acquiring_driver_and_ensure_status(self) -> AsyncStatus:
-        """Start acquiring driver, raising ValueError if the detector is in a bad state.
-        This sets driver.acquire to True, and waits for it to be True up to a timeout.
-        Then, it checks that the DetectorState PV is in DEFAULT_GOOD_STATES,
-        and otherwise raises a ValueError.
-        :returns AsyncStatus:
-            An AsyncStatus that can be awaited to set driver.acquire to True and perform
-            subsequent raising (if applicable) due to detector state.
-        """
-        status = await set_and_wait_for_value(
-            self.driver.acquire,
-            True,
-            timeout=DEFAULT_TIMEOUT,
-            wait_for_set_completion=False,
-        )
-
-        async def complete_acquisition() -> None:
-            # NOTE: possible race condition here between the callback from
-            # set_and_wait_for_value and the detector state updating.
-            await status
-            state = await self.driver.detector_state.get_value()
-            if state not in self.good_states:
-                raise ValueError(
-                    f"Final detector state {state.value} not "
-                    "in valid end states: {self.good_states}"
-                )
-
-        return AsyncStatus(complete_acquisition())
-
-    async def wait_for_idle(self):
-        if self._arm_status and not self._arm_status.done:
-            await self._arm_status
-        self._arm_status = None
+class AnalyserController(ADBaseController[AbstractAnalyserDriverIO]):
+    def get_deadtime(self, exposure: float | None) -> float:
+        return 0
 
 
 class BaseElectronAnalyserDetector(
@@ -104,7 +51,6 @@ class BaseElectronAnalyserDetector(
         name: str,
         driver: TAbstractAnalyserDriverIO,
     ):
-        self.driver_ref: Reference[TAbstractAnalyserDriverIO] = Reference(driver)
         self.controller: AnalyserController = AnalyserController(driver=driver)
         super().__init__(name)
 
@@ -124,22 +70,30 @@ class BaseElectronAnalyserDetector(
         await asyncio.gather(self.controller.disarm())
 
     async def read(self) -> dict[str, Reading]:
-        return await self.driver_ref().read()
+        return await self.driver.read()
 
     async def describe(self) -> dict[str, DataKey]:
-        data = await self.driver_ref().describe()
+        data = await self.driver.describe()
         # Correct the shape for image
-        prefix = self.driver_ref().name + "-"
-        energy_size = len(await self.driver_ref().energy_axis.get_value())
-        angle_size = len(await self.driver_ref().angle_axis.get_value())
+        prefix = self.driver.name + "-"
+        energy_size = len(await self.driver.energy_axis.get_value())
+        angle_size = len(await self.driver.angle_axis.get_value())
         data[prefix + "image"]["shape"] = [angle_size, energy_size]
         return data
 
     async def read_configuration(self) -> dict[str, Reading]:
-        return await self.driver_ref().read_configuration()
+        return await self.driver.read_configuration()
 
     async def describe_configuration(self) -> dict[str, DataKey]:
-        return await self.driver_ref().describe_configuration()
+        return await self.driver.describe_configuration()
+
+    @property
+    @abstractmethod
+    def driver(self) -> TAbstractAnalyserDriverIO:
+        """
+        Define property for the driver. Some implementations will store this as a
+        reference so it doesn't run into errors with conflicting parents.
+        """
 
 
 class AbstractElectronAnalyserRegionDetector(
@@ -149,14 +103,22 @@ class AbstractElectronAnalyserRegionDetector(
 ):
     """
     Extends electron analyser detector to configure specific region settings before data
-    acqusition.
+    acqusition. This object must be passed in a driver and store it as a reference. It
+    is designed to only exist inside a plan.
     """
 
     def __init__(
         self, name: str, driver: TAbstractAnalyserDriverIO, region: TAbstractBaseRegion
     ):
-        super().__init__(name, driver)
+        self._driver_ref = Reference(driver)
         self.region = region
+        super().__init__(name, driver)
+
+    @property
+    def driver(self) -> TAbstractAnalyserDriverIO:
+        # Store as a reference, this implementation will be given a driver so needs to
+        # make sure we don't get conflicting parents.
+        return self._driver_ref()
 
     @AsyncStatus.wrap
     async def stage(self) -> None:
@@ -182,9 +144,25 @@ class AbstractElectronAnalyserDetector(
 ):
     """
     Electron analyser detector with the additional functionality to load a sequence file
-    and create a list of ElectronAnalyserRegionDetector objects. These will setup
-    configured region settings before data acquisition.
+    and create a list of temporary ElectronAnalyserRegionDetector objects. These will
+    setup configured region settings before data acquisition.
     """
+
+    def __init__(self, prefix: str, name: str):
+        self._driver = self._create_driver(prefix)
+        super().__init__(name, self.driver)
+
+    @property
+    def driver(self) -> TAbstractAnalyserDriverIO:
+        # This implementation creates the driver and wants this to be the parent so it
+        # can be used with connect() method.
+        return self._driver
+
+    @abstractmethod
+    def _create_driver(self, prefix: str) -> TAbstractAnalyserDriverIO:
+        """
+        Define implementation of the driver used for this detector.
+        """
 
     @abstractmethod
     def load_sequence(self, filename: str) -> TAbstractBaseSequence:
@@ -199,7 +177,8 @@ class AbstractElectronAnalyserDetector(
         TAbstractAnalyserDriverIO, TAbstractBaseRegion
     ]:
         """
-        Define a way to create a detector that will configure to a specific region.
+        Define a way to create a temporary detector object that will always setup a
+        specific region before acquiring.
         """
 
     def create_region_detector_list(
@@ -215,7 +194,7 @@ class AbstractElectronAnalyserDetector(
         """
         seq = self.load_sequence(filename)
         return [
-            self._create_region_detector(self.driver_ref(), r)
+            self._create_region_detector(self.driver, r)
             for r in seq.get_enabled_regions()
         ]
 

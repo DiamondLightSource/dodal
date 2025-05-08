@@ -25,6 +25,9 @@ class VGScientaDetector(
         VGScientaAnalyserDriverIO, VGScientaSequence, VGScientaRegion
     ]
 ):
+    def _create_driver(self, prefix: str) -> VGScientaAnalyserDriverIO:
+        return VGScientaAnalyserDriverIO(prefix, "driver")
+
     def load_sequence(self, filename: str) -> VGScientaSequence:
         return load_json_file_to_class(VGScientaSequence, filename)
 
