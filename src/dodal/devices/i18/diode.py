@@ -17,6 +17,7 @@ class FilterAValues(StrictEnum):
     AL_0_25MM = "0.25 mm Al"
     AL_0_15MM = "0.15 mm Al"
     AL_0_1MM = "0.1 mm Al"
+    AL_0_05MM = "0.05 mm Al"
     AL_0_025MM = "0.025 mm Al"
     AL_GAP = "Gap"
 
@@ -37,10 +38,9 @@ class Diode(StandardReadable):
         prefix: str,
         name: str = "",
     ):
-        self._prefix = prefix
-        self.positioner_a = create_positioner(FilterAValues, prefix + ":A:MP")
-        self.positioner_b = create_positioner(FilterBValues, prefix + ":B:MP")
         with self.add_children_as_readables():
             self.signal = epics_signal_r(float, prefix + "B:DIODE:I")
+            self.positioner_a = create_positioner(FilterAValues, prefix + "A:MP")
+            self.positioner_b = create_positioner(FilterBValues, prefix + "B:MP")
 
         super().__init__(name=name)
