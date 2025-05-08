@@ -25,8 +25,8 @@ async def sim_driver(
 ) -> TAbstractAnalyserDriverIO:
     async with init_devices(mock=True, connect=True):
         sim_driver = driver_class(
-            prefix="sim_driver:",
-            name="analyser_driver",
+            prefix="TEST:",
+            name="sim_driver",
         )
     return sim_driver
 
@@ -37,7 +37,7 @@ async def sim_detector(
 ) -> ElectronAnalyserDetectorImpl:
     async with init_devices(mock=True, connect=True):
         sim_detector = detector_class(
-            prefix="sim_driver:",
+            prefix="TEST:",
             name="analyser",
         )
     return sim_detector
