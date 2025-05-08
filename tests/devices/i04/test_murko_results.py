@@ -352,3 +352,10 @@ async def test_trigger_stops_once_last_angle_found(
     assert mock_camera_coordinates.call_args_list[0][0][2] == 90
     assert mock_camera_coordinates.call_args_list[1][0][2] == 180
     assert mock_camera_coordinates.call_args_list[2][0][2] == 270
+
+
+async def test_stage_and_unstage():
+    murko_results = MurkoResultsDevice(name="murko_results")
+    murko_results.pubsub = AsyncMock()
+    await murko_results.stage()
+    await murko_results.unstage()
