@@ -126,13 +126,12 @@ async def test_pjumpcell_set_valve_sets_valve_fields(
     )
 
     # Set new values
-
-    await cell.all_valves_control.set_valve(1, ValveControlRequest.CLOSE)
-    await cell.all_valves_control.set_valve(6, FastValveControlRequest.ARM)
+    await cell.all_valves_control.valve_control[1].set(ValveControlRequest.CLOSE)
+    await cell.all_valves_control.fast_valve_control[6].set(FastValveControlRequest.ARM)
 
     opening_status = asyncio.gather(
-        cell.all_valves_control.set_valve(1, ValveControlRequest.OPEN),
-        cell.all_valves_control.set_valve(6, FastValveControlRequest.OPEN),
+        cell.all_valves_control.valve_control[1].set(ValveControlRequest.OPEN),
+        cell.all_valves_control.fast_valve_control[6].set(FastValveControlRequest.OPEN),
     )
 
     # During openseq pulse
@@ -317,112 +316,3 @@ async def test_reading_pjumpcell_includes_read_fields(
     )
 
 
-async def test_all_valves_can_be_set(
-    cell: PressureJumpCell,
-):
-    # Set some initial values
-    set_mock_value(
-        cell.all_valves_control.valve_control[1].close, ValveControlRequest.OPEN
-    )
-    set_mock_value(
-        cell.all_valves_control.valve_control[3].close, ValveControlRequest.OPEN
-    )
-    set_mock_value(
-        cell.all_valves_control.valve_control[1].open,
-        ValveOpenSeqRequest.INACTIVE.value,
-    )
-    set_mock_value(
-        cell.all_valves_control.valve_control[3].open,
-        ValveOpenSeqRequest.INACTIVE.value,
-    )
-
-    set_mock_value(
-        cell.all_valves_control.fast_valve_control[5].close,
-        FastValveControlRequest.OPEN,
-    )
-    set_mock_value(
-        cell.all_valves_control.fast_valve_control[6].close,
-        FastValveControlRequest.OPEN,
-    )
-    set_mock_value(
-        cell.all_valves_control.fast_valve_control[5].open,
-        ValveOpenSeqRequest.INACTIVE.value,
-    )
-    set_mock_value(
-        cell.all_valves_control.fast_valve_control[6].open,
-        ValveOpenSeqRequest.INACTIVE.value,
-    )
-
-    # Set new values
-    all_valve_request = {
-        1: ValveControlRequest.CLOSE,
-        3: ValveControlRequest.CLOSE,
-        5: FastValveControlRequest.CLOSE,
-        6: FastValveControlRequest.CLOSE,
-    }
-
-    await cell.all_valves_control.set(all_valve_request)
-
-    await assert_reading(
-        cell.all_valves_control.valve_control[1],
-        {
-            "pjump-all_valves_control-valve_control-1-close": {
-                "value": ValveControlRequest.CLOSE,
-                "timestamp": ANY,
-                "alarm_severity": 0,
-            },
-            "pjump-all_valves_control-valve_control-1-open": {
-                "value": int(ValveOpenSeqRequest.INACTIVE.value),
-                "timestamp": ANY,
-                "alarm_severity": 0,
-            },
-        },
-    )
-
-    await assert_reading(
-        cell.all_valves_control.valve_control[3],
-        {
-            "pjump-all_valves_control-valve_control-3-close": {
-                "value": ValveControlRequest.CLOSE,
-                "timestamp": ANY,
-                "alarm_severity": 0,
-            },
-            "pjump-all_valves_control-valve_control-3-open": {
-                "value": int(ValveOpenSeqRequest.INACTIVE.value),
-                "timestamp": ANY,
-                "alarm_severity": 0,
-            },
-        },
-    )
-
-    await assert_reading(
-        cell.all_valves_control.fast_valve_control[5],
-        {
-            "pjump-all_valves_control-fast_valve_control-5-close": {
-                "value": FastValveControlRequest.CLOSE,
-                "timestamp": ANY,
-                "alarm_severity": 0,
-            },
-            "pjump-all_valves_control-fast_valve_control-5-open": {
-                "value": int(ValveOpenSeqRequest.INACTIVE.value),
-                "timestamp": ANY,
-                "alarm_severity": 0,
-            },
-        },
-    )
-
-    await assert_reading(
-        cell.all_valves_control.fast_valve_control[6],
-        {
-            "pjump-all_valves_control-fast_valve_control-6-close": {
-                "value": FastValveControlRequest.CLOSE,
-                "timestamp": ANY,
-                "alarm_severity": 0,
-            },
-            "pjump-all_valves_control-fast_valve_control-6-open": {
-                "value": int(ValveOpenSeqRequest.INACTIVE.value),
-                "timestamp": ANY,
-                "alarm_severity": 0,
-            },
-        },
-    )
