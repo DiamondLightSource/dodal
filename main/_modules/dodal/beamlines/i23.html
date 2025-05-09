@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.beamlines.i23 &#8212; dodal 1.40.1.dev1+ga2003819e documentation</title>
+    <title>dodal.beamlines.i23 &#8212; dodal 1.46.1.dev17+g55a8851a2e documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=8c1469c9"></script>
+    <script src="../../../_static/documentation_options.js?v=030badc6"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -453,15 +453,60 @@ window.addEventListener("load", () => mermaid.run());
                 <article class="bd-article">
                   
   <h1>Source code for dodal.beamlines.i23</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">dodal.common.beamlines.beamline_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">device_instantiation</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">StrictEnum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.adpilatus</span><span class="w"> </span><span class="kn">import</span> <span class="n">PilatusDetector</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.common.beamlines.beamline_utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">device_factory</span><span class="p">,</span>
+    <span class="n">get_path_provider</span><span class="p">,</span>
+    <span class="n">set_path_provider</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.common.beamlines.beamline_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">set_beamline</span> <span class="k">as</span> <span class="n">set_utils_beamline</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.common.beamlines.device_helpers</span><span class="w"> </span><span class="kn">import</span> <span class="n">HDF5_SUFFIX</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.common.visit</span><span class="w"> </span><span class="kn">import</span> <span class="n">LocalDirectoryServiceClient</span><span class="p">,</span> <span class="n">StaticVisitPathProvider</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.motors</span><span class="w"> </span><span class="kn">import</span> <span class="n">SixAxisGonio</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.oav.pin_image_recognition</span><span class="w"> </span><span class="kn">import</span> <span class="n">PinTipDetection</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.positioner</span><span class="w"> </span><span class="kn">import</span> <span class="n">Positioner1D</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.zebra.zebra</span><span class="w"> </span><span class="kn">import</span> <span class="n">Zebra</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.zebra.zebra_constants_mapping</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ZebraMapping</span><span class="p">,</span>
+    <span class="n">ZebraSources</span><span class="p">,</span>
+    <span class="n">ZebraTTLOutputs</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.zebra.zebra_controlled_shutter</span><span class="w"> </span><span class="kn">import</span> <span class="n">ZebraShutter</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.log</span><span class="w"> </span><span class="kn">import</span> <span class="n">set_beamline</span> <span class="k">as</span> <span class="n">set_log_beamline</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_beamline_name</span><span class="p">,</span> <span class="n">get_hostname</span><span class="p">,</span> <span class="n">skip_device</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">BeamlinePrefix</span><span class="p">,</span> <span class="n">get_beamline_name</span><span class="p">,</span> <span class="n">get_hostname</span>
 
 <span class="n">BL</span> <span class="o">=</span> <span class="n">get_beamline_name</span><span class="p">(</span><span class="s2">&quot;i23&quot;</span><span class="p">)</span>
 <span class="n">set_log_beamline</span><span class="p">(</span><span class="n">BL</span><span class="p">)</span>
 <span class="n">set_utils_beamline</span><span class="p">(</span><span class="n">BL</span><span class="p">)</span>
+
+<span class="n">set_path_provider</span><span class="p">(</span>
+    <span class="n">StaticVisitPathProvider</span><span class="p">(</span>
+        <span class="n">BL</span><span class="p">,</span>
+        <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;/tmp&quot;</span><span class="p">),</span>
+        <span class="n">client</span><span class="o">=</span><span class="n">LocalDirectoryServiceClient</span><span class="p">(),</span>
+    <span class="p">)</span>
+<span class="p">)</span>
+
+<span class="n">PREFIX</span> <span class="o">=</span> <span class="n">BeamlinePrefix</span><span class="p">(</span><span class="n">BL</span><span class="p">)</span>
+
+<span class="n">I23_ZEBRA_MAPPING</span> <span class="o">=</span> <span class="n">ZebraMapping</span><span class="p">(</span>
+    <span class="n">outputs</span><span class="o">=</span><span class="n">ZebraTTLOutputs</span><span class="p">(</span><span class="n">TTL_DETECTOR</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">TTL_SHUTTER</span><span class="o">=</span><span class="mi">4</span><span class="p">),</span>
+    <span class="n">sources</span><span class="o">=</span><span class="n">ZebraSources</span><span class="p">(),</span>
+    <span class="n">AND_GATE_FOR_AUTO_SHUTTER</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<div class="viewcode-block" id="I23DetectorPositions">
+<a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i23.I23DetectorPositions.html#dodal.beamlines.i23.I23DetectorPositions">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">I23DetectorPositions</span><span class="p">(</span><span class="n">StrictEnum</span><span class="p">):</span>
+    <span class="n">IN</span> <span class="o">=</span> <span class="s2">&quot;In&quot;</span>
+    <span class="n">OUT</span> <span class="o">=</span> <span class="s2">&quot;Out&quot;</span>
+    <span class="n">SAMPLE_CHANGE</span> <span class="o">=</span> <span class="s2">&quot;sample change&quot;</span></div>
+
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_is_i23_machine</span><span class="p">():</span>
@@ -473,22 +518,56 @@ window.addEventListener("load", () => mermaid.run());
     <span class="k">return</span> <span class="n">hostname</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;i23-ws&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">hostname</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;i23-control&quot;</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="oav_pin_tip_detection">
-<a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i23.html#dodal.beamlines.i23.oav_pin_tip_detection">[docs]</a>
-<span class="nd">@skip_device</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="ow">not</span> <span class="n">_is_i23_machine</span><span class="p">())</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">oav_pin_tip_detection</span><span class="p">(</span>
-    <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PinTipDetection</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the i23 OAV pin-tip detection device&quot;&quot;&quot;</span>
+<span class="nd">@device_factory</span><span class="p">(</span><span class="n">skip</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="ow">not</span> <span class="n">_is_i23_machine</span><span class="p">())</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">oav_pin_tip_detection</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">PinTipDetection</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the i23 OAV pin-tip detection device.&quot;&quot;&quot;</span>
 
-    <span class="k">return</span> <span class="n">device_instantiation</span><span class="p">(</span>
-        <span class="n">PinTipDetection</span><span class="p">,</span>
+    <span class="k">return</span> <span class="n">PinTipDetection</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">PREFIX</span><span class="o">.</span><span class="n">beamline_prefix</span><span class="si">}</span><span class="s2">-DI-OAV-01:&quot;</span><span class="p">,</span>
         <span class="s2">&quot;pin_tip_detection&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;-DI-OAV-01:&quot;</span><span class="p">,</span>
-        <span class="n">wait_for_connection</span><span class="p">,</span>
-        <span class="n">fake_with_ophyd_sim</span><span class="p">,</span>
-    <span class="p">)</span></div>
+    <span class="p">)</span>
 
+
+<span class="nd">@device_factory</span><span class="p">()</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">shutter</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">ZebraShutter</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the i23 zebra controlled shutter.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">ZebraShutter</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">PREFIX</span><span class="o">.</span><span class="n">beamline_prefix</span><span class="si">}</span><span class="s2">-EA-SHTR-01:&quot;</span><span class="p">,</span> <span class="s2">&quot;shutter&quot;</span><span class="p">)</span>
+
+
+<span class="nd">@device_factory</span><span class="p">()</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">gonio</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">SixAxisGonio</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the i23 goniometer&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">SixAxisGonio</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">PREFIX</span><span class="o">.</span><span class="n">beamline_prefix</span><span class="si">}</span><span class="s2">-MO-GONIO-01:&quot;</span><span class="p">)</span>
+
+
+<span class="nd">@device_factory</span><span class="p">()</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">zebra</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Zebra</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the i23 zebra&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">Zebra</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;zebra&quot;</span><span class="p">,</span>
+        <span class="n">prefix</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">PREFIX</span><span class="o">.</span><span class="n">beamline_prefix</span><span class="si">}</span><span class="s2">-EA-ZEBRA-01:ZEBRA:&quot;</span><span class="p">,</span>
+        <span class="n">mapping</span><span class="o">=</span><span class="n">I23_ZEBRA_MAPPING</span><span class="p">,</span>
+    <span class="p">)</span>
+
+
+<span class="nd">@device_factory</span><span class="p">()</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">pilatus</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">PilatusDetector</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the i23 pilatus&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">PilatusDetector</span><span class="p">(</span>
+        <span class="n">prefix</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">PREFIX</span><span class="o">.</span><span class="n">beamline_prefix</span><span class="si">}</span><span class="s2">-EA-PILAT-01:&quot;</span><span class="p">,</span>
+        <span class="n">path_provider</span><span class="o">=</span><span class="n">get_path_provider</span><span class="p">(),</span>
+        <span class="n">drv_suffix</span><span class="o">=</span><span class="s2">&quot;cam1:&quot;</span><span class="p">,</span>
+        <span class="n">fileio_suffix</span><span class="o">=</span><span class="n">HDF5_SUFFIX</span><span class="p">,</span>
+    <span class="p">)</span>
+
+
+<span class="nd">@device_factory</span><span class="p">()</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">detector_motion</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Positioner1D</span><span class="p">[</span><span class="n">I23DetectorPositions</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the i23 detector&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">Positioner1D</span><span class="p">[</span><span class="n">I23DetectorPositions</span><span class="p">](</span>
+        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">PREFIX</span><span class="o">.</span><span class="n">beamline_prefix</span><span class="si">}</span><span class="s2">-EA-DET-01:Z&quot;</span><span class="p">,</span>
+        <span class="n">datatype</span><span class="o">=</span><span class="n">I23DetectorPositions</span><span class="p">,</span>
+    <span class="p">)</span>
 </pre></div>
 
                 </article>
