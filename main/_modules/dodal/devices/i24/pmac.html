@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.i24.pmac &#8212; dodal 1.46.1.dev18+g2fa657dbc0 documentation</title>
+    <title>dodal.devices.i24.pmac &#8212; dodal 1.46.1.dev19+g25a150e5a0 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=fc3c68ae"></script>
+    <script src="../../../../_static/documentation_options.js?v=9d71f07a"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -462,6 +462,7 @@ window.addEventListener("load", () => mermaid.run());
     <span class="n">SignalR</span><span class="p">,</span>
     <span class="n">SignalRW</span><span class="p">,</span>
     <span class="n">StandardReadable</span><span class="p">,</span>
+    <span class="n">observe_signals_value</span><span class="p">,</span>
     <span class="n">soft_signal_rw</span><span class="p">,</span>
     <span class="n">wait_for_value</span><span class="p">,</span>
 <span class="p">)</span>
@@ -592,15 +593,19 @@ window.addEventListener("load", () => mermaid.run());
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">pmac_str_sig</span><span class="p">:</span> <span class="n">SignalRW</span><span class="p">,</span>
         <span class="n">status_sig</span><span class="p">:</span> <span class="n">SignalR</span><span class="p">,</span>
+        <span class="n">counter_sig</span><span class="p">:</span> <span class="n">SignalR</span><span class="p">,</span>
         <span class="n">prog_num_sig</span><span class="p">:</span> <span class="n">SignalRW</span><span class="p">,</span>
         <span class="n">collection_time_sig</span><span class="p">:</span> <span class="n">SignalRW</span><span class="p">,</span>
+        <span class="n">counter_time_sig</span><span class="p">:</span> <span class="n">SignalRW</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_signal_ref</span> <span class="o">=</span> <span class="n">Reference</span><span class="p">(</span><span class="n">pmac_str_sig</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_status_ref</span> <span class="o">=</span> <span class="n">Reference</span><span class="p">(</span><span class="n">status_sig</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_counter_ref</span> <span class="o">=</span> <span class="n">Reference</span><span class="p">(</span><span class="n">counter_sig</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_prog_num_ref</span> <span class="o">=</span> <span class="n">Reference</span><span class="p">(</span><span class="n">prog_num_sig</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_collection_time_ref</span> <span class="o">=</span> <span class="n">Reference</span><span class="p">(</span><span class="n">collection_time_sig</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_counter_time_ref</span> <span class="o">=</span> <span class="n">Reference</span><span class="p">(</span><span class="n">counter_time_sig</span><span class="p">)</span>
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
@@ -628,16 +633,18 @@ window.addEventListener("load", () => mermaid.run());
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i24.pmac.ProgramRunner.html#dodal.devices.i24.pmac.ProgramRunner.complete">[docs]</a>
     <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">complete</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Stop collecting when the scan status PV goes to 0.</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            complete_time (float): total time required by the collection to \</span>
-<span class="sd">            finish correctly.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Stop collecting when the scan status PV goes to 0 or when counter PV hasn&#39;t \</span>
+<span class="sd">            updated for 30 seconds.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">scan_complete_time</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_collection_time_ref</span><span class="p">()</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
-        <span class="k">await</span> <span class="n">wait_for_value</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_status_ref</span><span class="p">(),</span> <span class="n">ScanState</span><span class="o">.</span><span class="n">DONE</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">scan_complete_time</span>
-        <span class="p">)</span></div>
+        <span class="n">counter_time</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_counter_time_ref</span><span class="p">()</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
+        <span class="k">async</span> <span class="k">for</span> <span class="n">signal</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">observe_signals_value</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_status_ref</span><span class="p">(),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_counter_ref</span><span class="p">(),</span>
+            <span class="n">timeout</span><span class="o">=</span><span class="n">counter_time</span><span class="p">,</span>
+        <span class="p">):</span>
+            <span class="k">if</span> <span class="n">signal</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">_status_ref</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">value</span> <span class="o">==</span> <span class="n">ScanState</span><span class="o">.</span><span class="n">DONE</span><span class="p">:</span>
+                    <span class="k">break</span></div>
 </div>
 
 
@@ -701,13 +708,16 @@ window.addEventListener("load", () => mermaid.run());
         <span class="c1"># A couple of soft signals for running a collection: program number to send to</span>
         <span class="c1"># the PMAC_STRING and expected collection time.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">program_number</span> <span class="o">=</span> <span class="n">soft_signal_rw</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">collection_time</span> <span class="o">=</span> <span class="n">soft_signal_rw</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">initial_value</span><span class="o">=</span><span class="mf">3600.0</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s2">&quot;s&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">collection_time</span> <span class="o">=</span> <span class="n">soft_signal_rw</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">initial_value</span><span class="o">=</span><span class="mf">600.0</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s2">&quot;s&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">counter_time</span> <span class="o">=</span> <span class="n">soft_signal_rw</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">initial_value</span><span class="o">=</span><span class="mf">30.0</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s2">&quot;s&quot;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">run_program</span> <span class="o">=</span> <span class="n">ProgramRunner</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">pmac_string</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">scanstatus</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">counter</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">program_number</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">collection_time</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">counter_time</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">abort_program</span> <span class="o">=</span> <span class="n">ProgramAbort</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pmac_string</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">scanstatus</span><span class="p">)</span>
 
