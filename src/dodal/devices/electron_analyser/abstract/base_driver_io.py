@@ -13,7 +13,7 @@ from ophyd_async.core import (
 from ophyd_async.epics.adcore import ADBaseIO
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
-from dodal.devices.electron_analyser.abstract_region import EnergyMode
+from dodal.devices.electron_analyser.types import EnergyMode
 from dodal.devices.electron_analyser.util import to_binding_energy
 
 
@@ -24,6 +24,14 @@ class AbstractAnalyserDriverIO(ABC, StandardReadable, ADBaseIO):
     """
 
     def __init__(self, prefix: str, name: str = "") -> None:
+        with self.add_children_as_readables():
+            self.image = epics_signal_r(Array1D[np.float64], prefix + "IMAGE")
+            self.spectrum = epics_signal_r(Array1D[np.float64], prefix + "INT_SPECTRUM")
+            self.total_intensity = derived_signal_r(
+                self._calculate_total_intensity, spectrum=self.spectrum
+            )
+            self.excitation_energy = soft_signal_rw(float, initial_value=0, units="eV")
+
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             # Used for setting up region data acquisition.
             self.region_name = soft_signal_rw(str, initial_value="null")
@@ -40,28 +48,8 @@ class AbstractAnalyserDriverIO(ABC, StandardReadable, ADBaseIO):
             self.energy_step = epics_signal_rw(float, prefix + "STEP_SIZE")
             self.iterations = epics_signal_rw(int, prefix + "NumExposures")
             self.acquisition_mode = epics_signal_rw(str, prefix + "ACQ_MODE")
-            self.step_time = epics_signal_r(float, prefix + "AcquireTime")
 
-            self.total_steps = self._create_total_steps_signal(prefix)
-            self.total_time = derived_signal_r(
-                self._calculate_total_time,
-                "s",
-                total_steps=self.total_steps,
-                step_time=self.step_time,
-                iterations=self.iterations,
-            )
-
-        with self.add_children_as_readables():
-            self.image = epics_signal_r(Array1D[np.float64], prefix + "IMAGE")
-            self.spectrum = epics_signal_r(Array1D[np.float64], prefix + "INT_SPECTRUM")
-            self.total_intensity = derived_signal_r(
-                self._calculate_total_intensity, spectrum=self.spectrum
-            )
-            # ToDo - Ideally the below are only collected once per region. However, they
-            # need to be read after the first point of a region (stream). Bluesky /
-            # ophyd currently doesn't support this and therefore must be read per point
-            # as a workaround, otherwise they return the previous region values.
-            self.excitation_energy = soft_signal_rw(float, initial_value=0, units="eV")
+            # Read once per scan after data acquired
             self.energy_axis = self._create_energy_axis_signal(prefix)
             self.binding_energy_axis = derived_signal_r(
                 self._calculate_binding_energy_axis,
@@ -71,6 +59,16 @@ class AbstractAnalyserDriverIO(ABC, StandardReadable, ADBaseIO):
                 energy_mode=self.energy_mode,
             )
             self.angle_axis = self._create_angle_axis_signal(prefix)
+            self.step_time = epics_signal_r(float, prefix + "AcquireTime")
+            self.total_steps = epics_signal_r(int, prefix + "TOTAL_POINTS_RBV")
+            self.total_time = derived_signal_r(
+                self._calculate_total_time,
+                "s",
+                total_steps=self.total_steps,
+                step_time=self.step_time,
+                iterations=self.iterations,
+            )
+
         super().__init__(prefix=prefix, name=name)
 
     @abstractmethod
@@ -101,20 +99,13 @@ class AbstractAnalyserDriverIO(ABC, StandardReadable, ADBaseIO):
             ]
         )
 
-    @abstractmethod
-    def _create_total_steps_signal(self, prefix: str) -> SignalR[int]:
-        """
-        The signal that defines the total steps. Depends if analyser knows this
-        information before the first point.
-        """
-
     def _calculate_total_time(
         self, total_steps: int, step_time: float, iterations: int
     ) -> float:
         return total_steps * step_time * iterations
 
     def _calculate_total_intensity(self, spectrum: Array1D[np.float64]) -> float:
-        return float(np.sum(spectrum))
+        return float(np.sum(spectrum, dtype=np.float64))
 
     @property
     @abstractmethod

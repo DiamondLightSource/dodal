@@ -2,7 +2,7 @@ import numpy as np
 from ophyd_async.core import Array1D, SignalR, StandardReadableFormat, derived_signal_r
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
-from dodal.devices.electron_analyser.abstract_analyser_io import (
+from dodal.devices.electron_analyser.abstract.base_driver_io import (
     AbstractAnalyserDriverIO,
 )
 
@@ -58,9 +58,6 @@ class SpecsAnalyserDriverIO(AbstractAnalyserDriverIO):
         step = (max_energy - min_energy) / (total_points_iterations - 1)
         axis = np.array([min_energy + i * step for i in range(total_points_iterations)])
         return axis
-
-    def _create_total_steps_signal(self, prefix: str) -> SignalR[int]:
-        return epics_signal_r(int, prefix + "TOTAL_POINTS_RBV")
 
     @property
     def pass_energy_type(self) -> type:
