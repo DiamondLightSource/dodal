@@ -118,7 +118,7 @@ class FastValveControl(ValveControlBase):
         return set_status
 
 
-class AllValvesControl(StandardReadable, Movable):
+class AllValvesControl(StandardReadable):
     """
     valves 2, 4, 7, 8 are not controlled by the IOC,
     as they are under manual control.
@@ -160,28 +160,6 @@ class AllValvesControl(StandardReadable, Movable):
         )
 
         super().__init__(name)
-
-    async def set_valve(
-        self,
-        valve: int,
-        value: ValveControlRequest | FastValveControlRequest,
-    ):
-        if valve in self.slow_valves and (isinstance(value, ValveControlRequest)):
-            await self.valve_control[valve].set(value)
-
-        elif valve in self.fast_valves and (isinstance(value, FastValveControlRequest)):
-            await self.fast_valve_control[valve].set(value)
-
-    @AsyncStatus.wrap
-    async def set(
-        self, value: Mapping[int, ValveControlRequest | FastValveControlRequest]
-    ):
-        await asyncio.gather(
-            *(
-                self.set_valve(valve_number, value[valve_number])
-                for valve_number in value
-            )
-        )
 
 
 class Pump(StandardReadable):
