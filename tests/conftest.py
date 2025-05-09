@@ -56,7 +56,7 @@ def eiger_params(tmp_path: Path) -> DetectorParams:
         omega_start=0.0,
         omega_increment=1.0,
         num_images_per_trigger=1,
-        num_triggers=1,
+        num_triggers=2000,
         use_roi_mode=False,
         det_dist_to_beam_converter_path="tests/devices/unit_tests/test_lookup_table.txt",
         detector_size_constants=EIGER2_X_16M_SIZE.det_type_string,  # type: ignore

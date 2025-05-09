@@ -29,7 +29,8 @@ async def fake_observe_indices_written(timeout: float) -> AsyncGenerator[int, No
 
 async def test_configure_and_arm_detector(fake_eiger, eiger_params, RE: RunEngine):
     trigger_info = EigerTriggerInfo(
-        number_of_events=eiger_params.num_triggers,
+        # Manual trigger, so setting number of triggers to 1.
+        number_of_events=1,
         energy_ev=eiger_params.expected_energy_ev,
         trigger=DetectorTrigger.INTERNAL,
         deadtime=0.0001,
