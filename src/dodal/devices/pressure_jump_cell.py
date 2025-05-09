@@ -71,7 +71,7 @@ class FastValveState(StrictEnum):
 
 class ValveControlBase(StandardReadable, Movable):
     open: SignalRW[ValveControlRequest | FastValveControlRequest | int]
-    close: SignalRW[ValveControlRequest | FastValveControlRequest | int]
+    control: SignalRW[ValveControlRequest | FastValveControlRequest | int]
 
     @AsyncStatus.wrap
     async def _set_open_seq(self):
@@ -83,7 +83,7 @@ class ValveControlBase(StandardReadable, Movable):
 class ValveControl(ValveControlBase):
     def __init__(self, prefix: str, name: str = "") -> None:
         with self.add_children_as_readables():
-            self.close = epics_signal_rw(ValveControlRequest, prefix + ":CON")
+            self.control = epics_signal_rw(ValveControlRequest, prefix + ":CON")
             self.open = epics_signal_rw(int, prefix + ":OPENSEQ")
 
         super().__init__(name)
@@ -94,7 +94,7 @@ class ValveControl(ValveControlBase):
         if value == ValveControlRequest.OPEN:
             set_status = self._set_open_seq()
         else:
-            set_status = self.close.set(value)
+            set_status = self.control.set(value)
 
         return set_status
 
@@ -102,7 +102,7 @@ class ValveControl(ValveControlBase):
 class FastValveControl(ValveControlBase):
     def __init__(self, prefix: str, name: str = "") -> None:
         with self.add_children_as_readables():
-            self.close = epics_signal_rw(FastValveControlRequest, prefix + ":CON")
+            self.control = epics_signal_rw(FastValveControlRequest, prefix + ":CON")
             self.open = epics_signal_rw(int, prefix + ":OPENSEQ")
 
         super().__init__(name)
@@ -113,7 +113,7 @@ class FastValveControl(ValveControlBase):
         if value == FastValveControlRequest.OPEN:
             set_status = self._set_open_seq()
         else:
-            set_status = self.close.set(value)
+            set_status = self.control.set(value)
 
         return set_status
 
