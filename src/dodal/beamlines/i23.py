@@ -48,7 +48,7 @@ I23_ZEBRA_MAPPING = ZebraMapping(
 class I23DetectorPositions(StrictEnum):
     IN = "In"
     OUT = "Out"
-    CHANGE = "sample change"
+    SAMPLE_CHANGE = "sample change"
 
 
 def _is_i23_machine():
@@ -104,7 +104,7 @@ def pilatus() -> PilatusDetector:
 
 
 @device_factory()
-def detector() -> Positioner1D[I23DetectorPositions]:
+def detector_motion() -> Positioner1D[I23DetectorPositions]:
     """Get the i23 detector"""
     return Positioner1D[I23DetectorPositions](
         f"{PREFIX.beamline_prefix}-EA-DET-01:Z",
