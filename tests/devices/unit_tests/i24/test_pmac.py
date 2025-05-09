@@ -88,21 +88,22 @@ async def test_run_program(fake_pmac: PMAC, RE):
     assert await fake_pmac.pmac_string.get_value() == "&2b11r"
 
 
-async def test_counter_refresh(fake_pmac: PMAC, RE):
-    async def update_counter():
-        set_mock_value(fake_pmac.scanstatus, 1)
-        set_mock_value(fake_pmac.counter, 0)
-        await asyncio.sleep(0.05)
-        set_mock_value(fake_pmac.counter, 1)
-        await asyncio.sleep(0.05)
-        set_mock_value(fake_pmac.counter, 2)
-        await asyncio.sleep(0.05)
-        set_mock_value(fake_pmac.counter, 3)
-        set_mock_value(fake_pmac.scanstatus, 0)
+async def update_counter(sleep_time: float, fake_pmac: PMAC):
+    set_mock_value(fake_pmac.scanstatus, 1)
+    set_mock_value(fake_pmac.counter, 0)
+    await asyncio.sleep(0.05)
+    set_mock_value(fake_pmac.counter, 1)
+    await asyncio.sleep(0.05)
+    set_mock_value(fake_pmac.counter, 2)
+    await asyncio.sleep(sleep_time)
+    set_mock_value(fake_pmac.counter, 3)
+    set_mock_value(fake_pmac.scanstatus, 0)
 
+
+async def test_counter_refresh(fake_pmac: PMAC, RE):
     callback_on_mock_put(
         fake_pmac.pmac_string,
-        lambda *args, **kwargs: asyncio.create_task(update_counter()),  # type: ignore
+        lambda *args, **kwargs: asyncio.create_task(update_counter(0.05, fake_pmac)),  # type: ignore
     )
 
     set_mock_value(fake_pmac.counter_time, 0.1)
@@ -113,20 +114,9 @@ async def test_counter_refresh(fake_pmac: PMAC, RE):
 
 
 async def test_counter_refresh_timeout(fake_pmac: PMAC, RE):
-    async def update_counter():
-        set_mock_value(fake_pmac.scanstatus, 1)
-        set_mock_value(fake_pmac.counter, 0)
-        await asyncio.sleep(0.05)
-        set_mock_value(fake_pmac.counter, 1)
-        await asyncio.sleep(0.05)
-        set_mock_value(fake_pmac.counter, 2)
-        await asyncio.sleep(0.2)
-        set_mock_value(fake_pmac.counter, 3)
-        set_mock_value(fake_pmac.scanstatus, 0)
-
     callback_on_mock_put(
         fake_pmac.pmac_string,
-        lambda *args, **kwargs: asyncio.create_task(update_counter()),  # type: ignore
+        lambda *args, **kwargs: asyncio.create_task(update_counter(0.2, fake_pmac)),  # type: ignore
     )
 
     set_mock_value(fake_pmac.counter_time, 0.1)
