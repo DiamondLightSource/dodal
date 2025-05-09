@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.plan_stubs.electron_analyser.configure_driver &#8212; dodal 1.46.1.dev17+g55a8851a2e documentation</title>
+    <title>dodal.plan_stubs.electron_analyser.configure_driver &#8212; dodal 1.46.1.dev18+g2fa657dbc0 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=030badc6"></script>
+    <script src="../../../../_static/documentation_options.js?v=fc3c68ae"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -455,19 +455,16 @@ window.addEventListener("load", () => mermaid.run());
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.adcore</span><span class="w"> </span><span class="kn">import</span> <span class="n">ADImageMode</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.common.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">MsgGenerator</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.electron_analyser.abstract_analyser_io</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.electron_analyser.abstract</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractAnalyserDriverIO</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.electron_analyser.abstract_region</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractBaseRegion</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.electron_analyser.specs_analyser_io</span><span class="w"> </span><span class="kn">import</span> <span class="n">SpecsAnalyserDriverIO</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.electron_analyser.specs_region</span><span class="w"> </span><span class="kn">import</span> <span class="n">SpecsRegion</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.electron_analyser.specs</span><span class="w"> </span><span class="kn">import</span> <span class="n">SpecsAnalyserDriverIO</span><span class="p">,</span> <span class="n">SpecsRegion</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.electron_analyser.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">to_kinetic_energy</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.electron_analyser.vgscienta_analyser_io</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.electron_analyser.vgscienta</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">VGScientaAnalyserDriverIO</span><span class="p">,</span>
+    <span class="n">VGScientaRegion</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.electron_analyser.vgscienta_region</span><span class="w"> </span><span class="kn">import</span> <span class="n">VGScientaRegion</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.log</span><span class="w"> </span><span class="kn">import</span> <span class="n">LOGGER</span>
 
 
@@ -549,10 +546,8 @@ window.addEventListener("load", () => mermaid.run());
         <span class="n">analyser</span><span class="o">.</span><span class="n">x_channel_size</span><span class="p">,</span> <span class="n">region</span><span class="o">.</span><span class="n">x_channel_size</span><span class="p">(),</span>
         <span class="n">analyser</span><span class="o">.</span><span class="n">y_channel_size</span><span class="p">,</span> <span class="n">region</span><span class="o">.</span><span class="n">y_channel_size</span><span class="p">(),</span>
         <span class="n">analyser</span><span class="o">.</span><span class="n">detector_mode</span><span class="p">,</span> <span class="n">region</span><span class="o">.</span><span class="n">detector_mode</span><span class="p">,</span>
+        <span class="n">analyser</span><span class="o">.</span><span class="n">excitation_energy_source</span><span class="p">,</span> <span class="n">region</span><span class="o">.</span><span class="n">excitation_energy_source</span><span class="p">,</span>
         <span class="n">analyser</span><span class="o">.</span><span class="n">image_mode</span><span class="p">,</span> <span class="n">ADImageMode</span><span class="o">.</span><span class="n">SINGLE</span><span class="p">,</span>
-        <span class="c1"># The below should ideally be done read from epics.</span>
-        <span class="c1"># See issue https://github.com/bluesky/ophyd-async/issues/877</span>
-        <span class="n">analyser</span><span class="o">.</span><span class="n">total_steps</span><span class="p">,</span> <span class="n">region</span><span class="o">.</span><span class="n">total_steps</span>
     <span class="p">)</span></div>
 
     <span class="c1"># fmt: on</span>

@@ -15,13 +15,6 @@ dodal.devices.electron\_analyser
    :recursive:
 
    ~electron_analyser.EnergyMode
-   ~electron_analyser.SpecsAnalyserDriverIO
-   ~electron_analyser.SpecsRegion
-   ~electron_analyser.SpecsSequence
-   ~electron_analyser.VGScientaAnalyserDriverIO
-   ~electron_analyser.VGScientaExcitationEnergySource
-   ~electron_analyser.VGScientaRegion
-   ~electron_analyser.VGScientaSequence
 
 
 
