@@ -7,9 +7,9 @@ from ophyd_async.core import AsyncStatus, init_devices
 from ophyd_async.testing import get_mock_put, set_mock_value
 
 from conftest import MOCK_DAQ_CONFIG_PATH
-from dodal.devices.dcm import DCM
+from dodal.devices.i03.dcm import DCM
+from dodal.devices.i03.undulator_dcm import UndulatorDCM
 from dodal.devices.undulator import AccessError, Undulator, UndulatorGapAccess
-from dodal.devices.undulator_dcm import UndulatorDCM
 from dodal.devices.util.test_utils import patch_motor
 from dodal.log import LOGGER
 from tests.constants import UNDULATOR_ID_GAP_LOOKUP_TABLE_PATH
@@ -26,7 +26,7 @@ def flush_event_loop_on_finish(event_loop):
 
 
 @pytest.fixture
-async def fake_undulator_dcm() -> UndulatorDCM:
+async def fake_undulator_dcm(RE) -> UndulatorDCM:
     async with init_devices(mock=True):
         undulator = Undulator(
             "UND-01",

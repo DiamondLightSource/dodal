@@ -33,7 +33,11 @@ def attach_data_session_metadata_wrapper(
     Yields:
         Iterator[Msg]: Plan messages
     """
-    provider = provider or get_path_provider()
+    try:
+        provider = provider or get_path_provider()
+    except NameError:
+        provider = None
+
     if isinstance(provider, UpdatingPathProvider):
         yield from bps.wait_for([provider.update])
         ress = yield from bps.wait_for([provider.data_session])
@@ -41,6 +45,11 @@ def attach_data_session_metadata_wrapper(
         # https://github.com/DiamondLightSource/dodal/issues/452
         # As part of 452, write each dataCollection into their own folder, then can use resource_dir directly
         yield from bpp.inject_md_wrapper(plan, md={DATA_SESSION: data_session})
+    elif provider is None:
+        logging.warning(
+            f"There is no PathProvider set, {attach_data_session_metadata_wrapper.__name__} will have no effect"
+        )
+        yield from plan
     else:
         logging.warning(
             f"{provider} is not an UpdatingPathProvider, {attach_data_session_metadata_wrapper.__name__} will have no effect"

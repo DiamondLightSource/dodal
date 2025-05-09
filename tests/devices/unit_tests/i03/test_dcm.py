@@ -3,7 +3,7 @@ from ophyd_async.core import (
     init_devices,
 )
 
-from dodal.devices.dcm import DCM
+from dodal.devices.i03.dcm import DCM
 
 
 @pytest.fixture
@@ -29,7 +29,7 @@ async def test_metadata_reflection(dcm: DCM):
         "dcm-crystal_metadata_usage",
         "dcm-crystal_metadata_type",
         "dcm-crystal_metadata_reflection",
-        "dcm-crystal_metadata_d_spacing",
+        "dcm-crystal_metadata_d_spacing_a",
     ],
 )
 async def test_read_and_describe_includes(

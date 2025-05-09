@@ -18,14 +18,15 @@ from dodal.devices.attenuator.attenuator import BinaryFilterAttenuator
 from dodal.devices.backlight import Backlight
 from dodal.devices.baton import Baton
 from dodal.devices.cryostream import CryoStream
-from dodal.devices.dcm import DCM
 from dodal.devices.detector.detector_motion import DetectorMotion
 from dodal.devices.diamond_filter import DiamondFilter, I03Filters
 from dodal.devices.eiger import EigerDetector
 from dodal.devices.fast_grid_scan import PandAFastGridScan, ZebraFastGridScan
 from dodal.devices.flux import Flux
 from dodal.devices.focusing_mirror import FocusingMirrorWithStripes, MirrorVoltages
-from dodal.devices.i03.beamstop import Beamstop
+from dodal.devices.i03 import Beamstop
+from dodal.devices.i03.dcm import DCM
+from dodal.devices.i03.undulator_dcm import UndulatorDCM
 from dodal.devices.motors import XYZPositioner
 from dodal.devices.oav.oav_detector import OAV
 from dodal.devices.oav.oav_parameters import OAVConfig
@@ -37,7 +38,6 @@ from dodal.devices.smargon import Smargon
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.thawer import Thawer
 from dodal.devices.undulator import Undulator
-from dodal.devices.undulator_dcm import UndulatorDCM
 from dodal.devices.webcam import Webcam
 from dodal.devices.xbpm_feedback import XBPMFeedback
 from dodal.devices.xspress3.xspress3 import Xspress3
@@ -58,7 +58,7 @@ ZOOM_PARAMS_FILE = (
 DISPLAY_CONFIG = "/dls_sw/i03/software/gda_versions/var/display.configuration"
 DAQ_CONFIGURATION_PATH = "/dls_sw/i03/software/daq_configuration"
 
-BL = get_beamline_name("s03")
+BL = get_beamline_name("i03")
 set_log_beamline(BL)
 set_utils_beamline(BL)
 
@@ -113,12 +113,12 @@ def dcm() -> DCM:
     If this is called when already instantiated in i03, it will return the existing object.
     """
     return DCM(
-        f"{PREFIX.beamline_prefix}-MO-DCM-01:",
-        "dcm",
+        prefix=f"{PREFIX.beamline_prefix}-MO-DCM-01:",
+        name="dcm",
     )
 
 
-@device_factory(skip=BL == "s03")
+@device_factory()
 def vfm() -> FocusingMirrorWithStripes:
     return FocusingMirrorWithStripes(
         prefix=f"{PREFIX.beamline_prefix}-OP-VFM-01:",
@@ -130,7 +130,7 @@ def vfm() -> FocusingMirrorWithStripes:
     )
 
 
-@device_factory(skip=BL == "s03")
+@device_factory()
 def mirror_voltages() -> MirrorVoltages:
     return MirrorVoltages(
         name="mirror_voltages",
@@ -147,7 +147,7 @@ def backlight() -> Backlight:
     return Backlight(prefix=PREFIX.beamline_prefix, name="backlight")
 
 
-@device_factory(skip=BL == "s03")
+@device_factory()
 def detector_motion() -> DetectorMotion:
     """Get the i03 detector motion device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
@@ -158,7 +158,7 @@ def detector_motion() -> DetectorMotion:
     )
 
 
-@device_factory(skip=BL == "s03")
+@device_factory()
 def eiger(mock: bool = False) -> EigerDetector:
     """Get the i03 Eiger device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
@@ -196,7 +196,7 @@ def panda_fast_grid_scan() -> PandAFastGridScan:
     )
 
 
-@device_factory(skip=BL == "s03")
+@device_factory()
 def oav(
     params: OAVConfig | None = None,
 ) -> OAV:
@@ -210,7 +210,7 @@ def oav(
     )
 
 
-@device_factory(skip=BL == "s03")
+@device_factory()
 def pin_tip_detection() -> PinTipDetection:
     """Get the i03 pin tip detection device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
@@ -240,7 +240,7 @@ def s4_slit_gaps() -> S4SlitGaps:
     )
 
 
-@device_factory(skip=BL == "s03")
+@device_factory()
 def synchrotron() -> Synchrotron:
     """Get the i03 synchrotron device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
@@ -316,7 +316,7 @@ def panda() -> HDFPanda:
     )
 
 
-@device_factory(skip=BL == "s03")
+@device_factory()
 def sample_shutter() -> ZebraShutter:
     """Get the i03 sample shutter device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
@@ -327,7 +327,7 @@ def sample_shutter() -> ZebraShutter:
     )
 
 
-@device_factory(skip=BL == "s03")
+@device_factory()
 def flux() -> Flux:
     """Get the i03 flux device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
@@ -422,9 +422,7 @@ def diamond_filter() -> DiamondFilter[I03Filters]:
     If this is called when already instantiated in i03, it will return the existing object.
     """
     return DiamondFilter[I03Filters](
-        prefix=f"{PREFIX.beamline_prefix}-MO-FLTR-01:",
-        name="diamond_filter",
-        data_type=I03Filters,
+        f"{PREFIX.beamline_prefix}-MO-FLTR-01:Y", I03Filters
     )
 
 
