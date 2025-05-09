@@ -1,10 +1,5 @@
 import numpy as np
-from ophyd_async.core import (
-    Array1D,
-    SignalR,
-    StandardReadableFormat,
-    soft_signal_rw,
-)
+from ophyd_async.core import Array1D, SignalR, StandardReadableFormat, soft_signal_rw
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
 from dodal.devices.electron_analyser.abstract_analyser_io import (
@@ -12,12 +7,14 @@ from dodal.devices.electron_analyser.abstract_analyser_io import (
 )
 from dodal.devices.electron_analyser.vgscienta_region import (
     DetectorMode,
+    VGScientaSequence,
 )
 
 
-class VGScientaAnalyserDriverIO(AbstractAnalyserDriverIO):
+class VGScientaAnalyserDriverIO(AbstractAnalyserDriverIO[VGScientaSequence]):
     def __init__(self, prefix: str, name: str = "") -> None:
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
+            self.excitation_energy_source = soft_signal_rw(str, initial_value=None)
             # Used for setting up region data acquisition.
             self.centre_energy = epics_signal_rw(float, prefix + "CENTRE_ENERGY")
             self.first_x_channel = epics_signal_rw(int, prefix + "MinX")
@@ -38,14 +35,9 @@ class VGScientaAnalyserDriverIO(AbstractAnalyserDriverIO):
     def _create_angle_axis_signal(self, prefix: str) -> SignalR[Array1D[np.float64]]:
         return epics_signal_r(Array1D[np.float64], prefix + "Y_SCALE_RBV")
 
-    def _create_total_steps_signal(self, prefix: str) -> SignalR[int]:
-        # ToDo - This ideally needs to be read from EPICS using "TOTAL_POINTS_RBV".
-        # However, this is only known after the first point and blueksky / ophyd
-        # currently doesn't support config signals read after first point. Instead
-        # use estimated value from region instead. This also might be fixed with
-        # implementing PEAKS for analyser software.
-        return soft_signal_rw(int, initial_value=1)
-
     @property
     def pass_energy_type(self) -> type:
         return str
+
+    def sequence_type(self) -> type[VGScientaSequence]:
+        return VGScientaSequence

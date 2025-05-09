@@ -11,7 +11,6 @@ from dodal.devices.electron_analyser import (
     EnergyMode,
     VGScientaAnalyserDriverIO,
     VGScientaRegion,
-    VGScientaSequence,
     to_kinetic_energy,
 )
 from dodal.plan_stubs.electron_analyser import configure_vgscienta
@@ -28,12 +27,7 @@ def sequence_file() -> str:
 
 
 @pytest.fixture
-def sequence_class() -> type[VGScientaSequence]:
-    return VGScientaSequence
-
-
-@pytest.fixture
-def analyser_type() -> type[VGScientaAnalyserDriverIO]:
+def analyser_class() -> type[VGScientaAnalyserDriverIO]:
     return VGScientaAnalyserDriverIO
 
 
@@ -142,12 +136,4 @@ async def test_that_data_to_read_is_correct(
     assert np.array_equal(
         await sim_analyser_driver.binding_energy_axis.get_value(),
         expected_binding_energy_axis,
-    )
-
-    expected_total_steps = region.total_steps
-    get_mock_put(sim_analyser_driver.total_steps).assert_called_once_with(
-        expected_total_steps, wait=True
-    )
-    await assert_read_configuration_has_expected_value(
-        sim_analyser_driver, "total_steps", expected_total_steps
     )

@@ -1,4 +1,5 @@
 from .abstract_region import EnergyMode
+from .detector import ElectronAnalyserDetector, ElectronAnalyserRegionDetector
 from .specs_analyser_io import SpecsAnalyserDriverIO
 from .specs_region import SpecsRegion, SpecsSequence
 from .util import to_binding_energy, to_kinetic_energy
@@ -11,6 +12,8 @@ from .vgscienta_region import (
 
 __all__ = [
     "EnergyMode",
+    "ElectronAnalyserDetector",
+    "ElectronAnalyserRegionDetector",
     "SpecsAnalyserDriverIO",
     "SpecsRegion",
     "SpecsSequence",

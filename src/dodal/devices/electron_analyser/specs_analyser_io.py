@@ -5,9 +5,10 @@ from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 from dodal.devices.electron_analyser.abstract_analyser_io import (
     AbstractAnalyserDriverIO,
 )
+from dodal.devices.electron_analyser.specs_region import SpecsSequence
 
 
-class SpecsAnalyserDriverIO(AbstractAnalyserDriverIO):
+class SpecsAnalyserDriverIO(AbstractAnalyserDriverIO[SpecsSequence]):
     def __init__(self, prefix: str, name: str = "") -> None:
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             # Used for setting up region data acquisition.
@@ -59,9 +60,9 @@ class SpecsAnalyserDriverIO(AbstractAnalyserDriverIO):
         axis = np.array([min_energy + i * step for i in range(total_points_iterations)])
         return axis
 
-    def _create_total_steps_signal(self, prefix: str) -> SignalR[int]:
-        return epics_signal_r(int, prefix + "TOTAL_POINTS_RBV")
-
     @property
     def pass_energy_type(self) -> type:
         return float
+
+    def sequence_type(self) -> type[SpecsSequence]:
+        return SpecsSequence
