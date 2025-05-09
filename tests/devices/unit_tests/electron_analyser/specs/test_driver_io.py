@@ -1,5 +1,8 @@
+from collections.abc import Sequence
+
 import numpy as np
 import pytest
+from bluesky import plan_stubs as bps
 from bluesky.plan_stubs import mv
 from bluesky.run_engine import RunEngine
 from ophyd_async.testing import (
@@ -7,15 +10,13 @@ from ophyd_async.testing import (
     set_mock_value,
 )
 
-from dodal.common.data_util import load_json_file_to_class
 from dodal.devices.electron_analyser.specs import (
     SpecsAnalyserDriverIO,
-    SpecsRegion,
-    SpecsSequence,
+    SpecsDetector,
+    SpecsRegionDetector,
 )
 from dodal.devices.electron_analyser.types import EnergyMode
-from dodal.plan_stubs.electron_analyser import configure_specs
-from tests.devices.unit_tests.electron_analyser.test_util import (
+from tests.devices.unit_tests.electron_analyser.util import (
     TEST_SEQUENCE_REGION_NAMES,
     TEST_SPECS_SEQUENCE,
     assert_read_configuration_has_expected_value,
@@ -23,88 +24,113 @@ from tests.devices.unit_tests.electron_analyser.test_util import (
 
 
 @pytest.fixture
-def driver_class() -> type[SpecsAnalyserDriverIO]:
-    return SpecsAnalyserDriverIO
+def detector_class() -> type[SpecsDetector]:
+    return SpecsDetector
 
 
 @pytest.fixture
-def sequence() -> SpecsSequence:
-    return load_json_file_to_class(SpecsSequence, TEST_SPECS_SEQUENCE)
+def region_detector_list(
+    sim_detector: SpecsDetector,
+) -> Sequence[SpecsRegionDetector]:
+    return sim_detector.create_region_detector_list(
+        TEST_SPECS_SEQUENCE, enabled_only=False
+    )
 
 
-@pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=["region"])
+@pytest.fixture
+def region_detector(
+    request: pytest.FixtureRequest,
+    region_detector_list: Sequence[SpecsRegionDetector],
+) -> SpecsRegionDetector:
+    name = request.param
+    region = next(
+        (r_det for r_det in region_detector_list if r_det.region.name == name),
+        None,
+    )
+    if region is None:
+        raise ValueError("Region " + request.param + " is not found.")
+    return region
+
+
+@pytest.mark.parametrize("region_detector", TEST_SEQUENCE_REGION_NAMES, indirect=True)
 async def test_given_region_that_analyser_sets_energy_values_correctly(
-    sim_driver: SpecsAnalyserDriverIO,
-    region: SpecsRegion,
-    excitation_energy: float,
+    region_detector: SpecsRegionDetector,
     RE: RunEngine,
 ) -> None:
-    RE(configure_specs(sim_driver, region, excitation_energy))
+    RE(bps.stage(region_detector, wait=True))
 
-    if region.acquisition_mode == "Fixed Energy":
-        get_mock_put(sim_driver.energy_step).assert_called_once_with(
+    region = region_detector.region
+    driver = region_detector.driver
+
+    if region_detector.region.acquisition_mode == "Fixed Energy":
+        get_mock_put(driver.energy_step).assert_called_once_with(
             region.energy_step, wait=True
         )
         await assert_read_configuration_has_expected_value(
-            sim_driver, "energy_step", region.energy_step
+            driver, "energy_step", region.energy_step
         )
     else:
-        get_mock_put(sim_driver.energy_step).assert_not_called()
+        get_mock_put(driver.energy_step).assert_not_called()
 
     if region.acquisition_mode == "Fixed Transmission":
-        get_mock_put(sim_driver.centre_energy).assert_called_once_with(
+        get_mock_put(driver.centre_energy).assert_called_once_with(
             region.centre_energy, wait=True
         )
         await assert_read_configuration_has_expected_value(
-            sim_driver, "centre_energy", region.centre_energy
+            driver, "centre_energy", region.centre_energy
         )
     else:
-        get_mock_put(sim_driver.centre_energy).assert_not_called()
+        get_mock_put(driver.centre_energy).assert_not_called()
 
 
-@pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=["region"])
+@pytest.mark.parametrize("region_detector", TEST_SEQUENCE_REGION_NAMES, indirect=True)
 async def test_given_region_that_analyser_sets_modes_correctly(
-    sim_driver: SpecsAnalyserDriverIO,
-    region: SpecsRegion,
-    excitation_energy: float,
+    region_detector: SpecsRegionDetector,
     RE: RunEngine,
 ) -> None:
-    RE(configure_specs(sim_driver, region, excitation_energy))
+    RE(bps.stage(region_detector, wait=True))
 
-    get_mock_put(sim_driver.psu_mode).assert_called_once_with(
-        region.psu_mode, wait=True
-    )
+    region = region_detector.region
+    driver = region_detector.driver
+
+    get_mock_put(driver.psu_mode).assert_called_once_with(region.psu_mode, wait=True)
     await assert_read_configuration_has_expected_value(
-        sim_driver, "psu_mode", region.psu_mode
+        driver, "psu_mode", region.psu_mode
     )
 
-    get_mock_put(sim_driver.snapshot_values).assert_called_once_with(
+    get_mock_put(driver.snapshot_values).assert_called_once_with(
         region.values, wait=True
     )
     await assert_read_configuration_has_expected_value(
-        sim_driver, "snapshot_values", region.values
+        driver, "snapshot_values", region.values
     )
 
 
-@pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
+@pytest.mark.parametrize("region_detector", TEST_SEQUENCE_REGION_NAMES, indirect=True)
 async def test_that_data_to_read_is_correct(
-    sim_driver: SpecsAnalyserDriverIO,
-    region: SpecsRegion,
+    region_detector: SpecsRegionDetector,
     excitation_energy: float,
     RE: RunEngine,
 ):
-    RE(configure_specs(sim_driver, region, excitation_energy))
+    RE(bps.stage(region_detector, wait=True))
+
+    driver = region_detector.driver
 
     # Check binding energy is correct
-    is_binding = await sim_driver.energy_mode.get_value() == EnergyMode.BINDING
-    energy_axis = await sim_driver.energy_axis.get_value()
+    is_binding = await driver.energy_mode.get_value() == EnergyMode.BINDING
+    energy_axis = await driver.energy_axis.get_value()
     expected_binding_energy_axis = np.array(
         [excitation_energy - e if is_binding else e for e in energy_axis]
     )
     assert np.array_equal(
-        await sim_driver.binding_energy_axis.get_value(),
+        await driver.binding_energy_axis.get_value(),
         expected_binding_energy_axis,
     )
+
+
+@pytest.fixture
+def driver_class() -> type[SpecsAnalyserDriverIO]:
+    return SpecsAnalyserDriverIO
 
 
 async def test_specs_analyser_energy_axis(
