@@ -35,7 +35,7 @@ class InternalEigerTriggerMode(Enum):
 AVAILABLE_TIMEOUTS = {
     "i03": EigerTimeouts(
         stale_params_timeout=60,
-        general_status_timeout=10,
+        general_status_timeout=20,
         meta_file_ready_timeout=30,
         all_frames_timeout=120,  # Long timeout for meta file to compensate for filesystem issues
         arming_timeout=60,

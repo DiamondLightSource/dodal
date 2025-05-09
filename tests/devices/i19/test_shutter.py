@@ -160,7 +160,7 @@ async def test_if_put_fails_log_error_and_return(
 
 
 @patch("dodal.devices.i19.blueapi_device.LOGGER")
-@patch("dodal.devices.i19.blueapi_device.time.sleep")
+@patch("dodal.devices.i19.blueapi_device.asyncio.sleep")
 async def test_if_plan_fails_raise_error_with_message(
     mock_sleep: MagicMock, mock_logger: MagicMock, eh2_shutter: AccessControlledShutter
 ):
