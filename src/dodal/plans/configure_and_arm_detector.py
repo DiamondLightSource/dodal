@@ -31,6 +31,10 @@ def configure_and_arm_detector(
     LOGGER.info(f"Setting MX PVs: {time.time() - start}s")
     yield from bps.prepare(eiger, trigger_info, wait=True)
     LOGGER.info(f"Preparing Eiger: {time.time() - start}s")
+    yield from bps.trigger(eiger, wait=True)
+    LOGGER.info(f"Triggering Eiger: {time.time() - start}s")
+    yield from bps.unstage(eiger, wait=True)
+    LOGGER.info(f"Disarming Eiger: {time.time() - start}s")
 
 
 def set_cam_pvs(
