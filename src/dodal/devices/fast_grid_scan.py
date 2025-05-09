@@ -199,7 +199,7 @@ class FastGridScanCommon(StandardReadable, Flyable, ABC, Generic[ParamType]):
 
         self.scan_invalid = epics_signal_r(float, f"{prefix}SCAN_INVALID")
 
-        self.run_cmd = epics_signal_x(f"{prefix}RUN.PROC")
+        self.run_cmd = epics_signal_x(f"BL04I-MO-SGON-01:FGS2:RUN.PROC")
         self.stop_cmd = epics_signal_x(f"{prefix}STOP.PROC")
         self.status = epics_signal_r(int, f"{prefix}SCAN_STATUS")
 

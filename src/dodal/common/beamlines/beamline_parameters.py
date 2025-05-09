@@ -97,4 +97,5 @@ def get_beamline_parameters(beamline_param_path: str | None = None):
             raise KeyError(
                 "No beamline parameter path found, maybe 'BEAMLINE' environment variable is not set!"
             )
+    print(beamline_param_path)
     return GDABeamlineParameters.from_file(beamline_param_path)
