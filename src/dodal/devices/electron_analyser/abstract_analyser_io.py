@@ -1,20 +1,35 @@
 from abc import ABC, abstractmethod
 from typing import TypeVar
 
-from ophyd_async.core import StandardReadable
-from ophyd_async.epics.core import epics_signal_rw
+import numpy as np
+from ophyd_async.core import (
+    Array1D,
+    SignalR,
+    StandardReadable,
+    StandardReadableFormat,
+    derived_signal_r,
+    soft_signal_rw,
+)
+from ophyd_async.epics.adcore import ADBaseIO
+from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
 from dodal.devices.electron_analyser.abstract_region import EnergyMode
+from dodal.devices.electron_analyser.util import to_binding_energy
 
 
-class AbstractAnalyserDriverIO(ABC, StandardReadable):
+class AbstractAnalyserDriverIO(ABC, StandardReadable, ADBaseIO):
     """
     Generic device to configure electron analyser with new region settings.
     Electron analysers should inherit from this class for further specialisation.
     """
 
     def __init__(self, prefix: str, name: str = "") -> None:
-        with self.add_children_as_readables():
+        with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
+            # Used for setting up region data acquisition.
+            self.region_name = soft_signal_rw(str, initial_value="null")
+            self.energy_mode = soft_signal_rw(
+                EnergyMode, initial_value=EnergyMode.KINETIC
+            )
             self.low_energy = epics_signal_rw(float, prefix + "LOW_ENERGY")
             self.high_energy = epics_signal_rw(float, prefix + "HIGH_ENERGY")
             self.slices = epics_signal_rw(int, prefix + "SLICES")
@@ -25,13 +40,81 @@ class AbstractAnalyserDriverIO(ABC, StandardReadable):
             self.energy_step = epics_signal_rw(float, prefix + "STEP_SIZE")
             self.iterations = epics_signal_rw(int, prefix + "NumExposures")
             self.acquisition_mode = epics_signal_rw(str, prefix + "ACQ_MODE")
+            self.step_time = epics_signal_r(float, prefix + "AcquireTime")
 
-        super().__init__(name)
+            self.total_steps = self._create_total_steps_signal(prefix)
+            self.total_time = derived_signal_r(
+                self._calculate_total_time,
+                "s",
+                total_steps=self.total_steps,
+                step_time=self.step_time,
+                iterations=self.iterations,
+            )
 
-    def to_kinetic_energy(
-        self, value: float, excitation_energy: float, mode: EnergyMode
+        with self.add_children_as_readables():
+            self.image = epics_signal_r(Array1D[np.float64], prefix + "IMAGE")
+            self.spectrum = epics_signal_r(Array1D[np.float64], prefix + "INT_SPECTRUM")
+            self.total_intensity = derived_signal_r(
+                self._calculate_total_intensity, spectrum=self.spectrum
+            )
+            # ToDo - Ideally the below are only collected once per region. However, they
+            # need to be read after the first point of a region (stream). Bluesky /
+            # ophyd currently doesn't support this and therefore must be read per point
+            # as a workaround, otherwise they return the previous region values.
+            self.excitation_energy = soft_signal_rw(float, initial_value=0, units="eV")
+            self.energy_axis = self._create_energy_axis_signal(prefix)
+            self.binding_energy_axis = derived_signal_r(
+                self._calculate_binding_energy_axis,
+                "eV",
+                energy_axis=self.energy_axis,
+                excitation_energy=self.excitation_energy,
+                energy_mode=self.energy_mode,
+            )
+            self.angle_axis = self._create_angle_axis_signal(prefix)
+        super().__init__(prefix=prefix, name=name)
+
+    @abstractmethod
+    def _create_angle_axis_signal(self, prefix: str) -> SignalR[Array1D[np.float64]]:
+        """
+        The signal that defines the angle axis. Depends on analyser model.
+        """
+
+    @abstractmethod
+    def _create_energy_axis_signal(self, prefix: str) -> SignalR[Array1D[np.float64]]:
+        """
+        The signal that defines the energy axis. Depends on analyser model.
+        """
+
+    def _calculate_binding_energy_axis(
+        self,
+        energy_axis: Array1D[np.float64],
+        excitation_energy: float,
+        energy_mode: EnergyMode,
+    ) -> Array1D[np.float64]:
+        is_binding = energy_mode == EnergyMode.BINDING
+        return np.array(
+            [
+                to_binding_energy(i_energy_axis, EnergyMode.KINETIC, excitation_energy)
+                if is_binding
+                else i_energy_axis
+                for i_energy_axis in energy_axis
+            ]
+        )
+
+    @abstractmethod
+    def _create_total_steps_signal(self, prefix: str) -> SignalR[int]:
+        """
+        The signal that defines the total steps. Depends if analyser knows this
+        information before the first point.
+        """
+
+    def _calculate_total_time(
+        self, total_steps: int, step_time: float, iterations: int
     ) -> float:
-        return excitation_energy - value if mode == EnergyMode.BINDING else value
+        return total_steps * step_time * iterations
+
+    def _calculate_total_intensity(self, spectrum: Array1D[np.float64]) -> float:
+        return float(np.sum(spectrum))
 
     @property
     @abstractmethod

@@ -19,7 +19,7 @@ from tests.constants import UNDULATOR_ID_GAP_LOOKUP_TABLE_PATH
 
 
 @pytest.fixture
-async def undulator() -> Undulator:
+async def undulator(RE) -> Undulator:
     async with init_devices(mock=True):
         undulator = Undulator(
             "UND-01",

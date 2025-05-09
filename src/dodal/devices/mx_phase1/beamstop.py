@@ -31,7 +31,7 @@ class BeamstopPositions(StrictEnum):
 
 class Beamstop(StandardReadable):
     """
-    Beamstop for I03.
+    Beamstop for I03 and I04.
 
     Attributes:
         x: beamstop x position in mm
