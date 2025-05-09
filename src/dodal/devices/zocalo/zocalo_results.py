@@ -1,7 +1,6 @@
 import asyncio
 from collections.abc import Generator, Sequence
 from enum import Enum
-from inspect import get_annotations
 from queue import Empty, Queue
 from typing import Any, TypedDict
 
@@ -47,7 +46,6 @@ class ZocaloSource(str, Enum):
 
 DEFAULT_TIMEOUT = 180
 DEFAULT_SORT_KEY = SortKeys.max_count
-ZOCALO_READING_PLAN_NAME = "zocalo reading"
 CLEAR_QUEUE_WAIT_S = 2.0
 ZOCALO_STAGE_GROUP = "clear zocalo queue"
 
@@ -410,27 +408,3 @@ def get_full_processing_results(
             com, max_voxel, max_count, n_voxels, total_count, bounding_box, strict=True
         )
     ]
-
-
-def get_processing_results_from_event(
-    device_name: str, doc: dict
-) -> Sequence[XrcResult]:
-    """
-    Decode an event document into the corresponding x-ray centring results
-
-    Args:
-    doc         A bluesky event document containing the signals read from the ZocaloResults
-    device_name The device name prefix to prepend to the document keys
-
-    Returns:
-        The list of XrcResults decoded from the event document
-    """
-    results_keys = get_annotations(XrcResult).keys()
-    results_dict = {k: doc["data"][f"{device_name}-{k}"] for k in results_keys}
-    results_values = [results_dict[k].tolist() for k in results_keys]
-
-    def create_result(*argv):
-        kwargs = dict(zip(results_keys, argv, strict=False))
-        return XrcResult(**kwargs)
-
-    return list(map(create_result, *results_values))
