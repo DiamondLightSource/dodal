@@ -1,7 +1,8 @@
-import os
-
 from dodal.common.beamlines.beamline_parameters import get_beamline_parameters
-from dodal.common.beamlines.beamline_utils import device_factory, device_instantiation
+from dodal.common.beamlines.beamline_utils import (
+    device_factory,
+    device_instantiation,
+)
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.devices.aperturescatterguard import (
     AperturePosition,
@@ -17,12 +18,16 @@ from dodal.devices.eiger import EigerDetector
 from dodal.devices.fast_grid_scan import ZebraFastGridScan
 from dodal.devices.flux import Flux
 from dodal.devices.i03.dcm import DCM
+from dodal.devices.i04.constants import RedisConstants
+from dodal.devices.i04.murko_results import MurkoResultsDevice
 from dodal.devices.i04.transfocator import Transfocator
 from dodal.devices.ipin import IPin
 from dodal.devices.motors import XYZPositioner
+from dodal.devices.mx_phase1.beamstop import Beamstop
 from dodal.devices.oav.oav_detector import OAV
 from dodal.devices.oav.oav_parameters import OAVConfig
 from dodal.devices.oav.oav_to_redis_forwarder import OAVToRedisForwarder
+from dodal.devices.oav.pin_image_recognition import PinTipDetection
 from dodal.devices.robot import BartRobot
 from dodal.devices.s4_slit_gaps import S4SlitGaps
 from dodal.devices.smargon import Smargon
@@ -37,6 +42,7 @@ from dodal.devices.zebra.zebra_constants_mapping import (
     ZebraTTLOutputs,
 )
 from dodal.devices.zebra.zebra_controlled_shutter import ZebraShutter
+from dodal.devices.zocalo import ZocaloResults
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
@@ -46,9 +52,6 @@ ZOOM_PARAMS_FILE = (
 DISPLAY_CONFIG = "/dls_sw/i04/software/gda_versions/var/display.configuration"
 DAQ_CONFIGURATION_PATH = "/dls_sw/i04/software/daq_configuration"
 
-REDIS_HOST = "i04-valkey-murko.diamond.ac.uk"
-REDIS_PASSWORD = os.environ.get("VALKEY_PASSWORD", "test_redis_password")
-MURKO_REDIS_DB = 7
 
 BL = get_beamline_name("s04")
 set_log_beamline(BL)
@@ -107,13 +110,13 @@ def ipin() -> IPin:
 
 
 @device_factory()
-def beamstop() -> XYZPositioner:
+def beamstop() -> Beamstop:
     """Get the i04 beamstop device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
     """
-    return XYZPositioner(
+    return Beamstop(
         f"{PREFIX.beamline_prefix}-MO-BS-01:",
-        "beamstop",
+        beamline_parameters=get_beamline_parameters(),
     )
 
 
@@ -350,19 +353,48 @@ def oav_to_redis_forwarder() -> OAVToRedisForwarder:
     return OAVToRedisForwarder(
         f"{PREFIX.beamline_prefix}-DI-OAV-01:",
         name="oav_to_redis_forwarder",
-        redis_host=REDIS_HOST,
-        redis_password=REDIS_PASSWORD,
-        redis_db=7,
+        redis_host=RedisConstants.REDIS_HOST,
+        redis_password=RedisConstants.REDIS_PASSWORD,
+        redis_db=RedisConstants.MURKO_REDIS_DB,
+    )
+
+
+@device_factory()
+def murko_results() -> MurkoResultsDevice:
+    """Get the i04 OAV to redis forwarder, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i04, it will return the existing object.
+    """
+    return MurkoResultsDevice(
+        name="murko_results",
+        redis_host=RedisConstants.REDIS_HOST,
+        redis_password=RedisConstants.REDIS_PASSWORD,
+        redis_db=RedisConstants.MURKO_REDIS_DB,
     )
 
 
 @device_factory()
 def diamond_filter() -> DiamondFilter[I04Filters]:
     """Get the i04 diamond filter device, instantiate it if it hasn't already been.
-    If this is called when already instantiated in i03, it will return the existing object.
+    If this is called when already instantiated in i04, it will return the existing object.
     """
     return DiamondFilter[I04Filters](
-        prefix=f"{PREFIX.beamline_prefix}-MO-FLTR-01:",
-        name="diamond_filter",
-        data_type=I04Filters,
+        f"{PREFIX.beamline_prefix}-MO-FLTR-01:Y", I04Filters
+    )
+
+
+@device_factory()
+def zocalo() -> ZocaloResults:
+    """Get the i04 ZocaloResults device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i04, it will return the existing object.
+    """
+    return ZocaloResults(channel="xrc.i04")
+
+
+@device_factory()
+def pin_tip_detection() -> PinTipDetection:
+    """Get the i04 pin tip detection device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i04, it will return the existing object.
+    """
+    return PinTipDetection(
+        f"{PREFIX.beamline_prefix}-DI-OAV-01:",
     )
