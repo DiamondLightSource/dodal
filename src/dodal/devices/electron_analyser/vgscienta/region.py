@@ -4,7 +4,7 @@ from enum import Enum
 from ophyd_async.core import StrictEnum
 from pydantic import Field
 
-from dodal.devices.electron_analyser.abstract_region import (
+from dodal.devices.electron_analyser.abstract.base_region import (
     AbstractBaseRegion,
     AbstractBaseSequence,
     JavaToPythonModel,
