@@ -13,7 +13,7 @@ from dodal.devices.electron_analyser.vgscienta.region import (
     VGScientaRegion,
     VGScientaSequence,
 )
-from tests.devices.unit_tests.electron_analyser.test_util import (
+from tests.devices.unit_tests.electron_analyser.util import (
     TEST_VGSCIENTA_SEQUENCE,
     assert_region_has_expected_values,
     assert_region_kinetic_and_binding_energy,

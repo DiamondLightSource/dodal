@@ -1,3 +1,5 @@
+import asyncio
+
 from dodal.devices.electron_analyser.abstract.base_detector import (
     AbstractElectronAnalyserDetector,
     AbstractElectronAnalyserRegionDetector,
@@ -9,13 +11,22 @@ from dodal.devices.electron_analyser.specs.region import SpecsRegion, SpecsSeque
 class SpecsRegionDetector(
     AbstractElectronAnalyserRegionDetector[SpecsAnalyserDriverIO, SpecsRegion]
 ):
-    def configure_region(self):
-        # ToDo - Need to move configure plans to here and rewrite tests
-        pass
+    async def configure_specific_region(self, excitation_energy) -> None:
+        await asyncio.gather(
+            self.driver.snapshot_values.set(self.region.values),
+            self.driver.psu_mode.set(self.region.psu_mode),
+        )
+        if self.region.acquisition_mode == "Fixed Transmission":
+            self.driver.centre_energy.set(self.region.centre_energy)
+
+        if self.region.acquisition_mode == "Fixed Energy":
+            self.driver.energy_step.set(self.region.energy_step)
 
 
 class SpecsDetector(
-    AbstractElectronAnalyserDetector[SpecsAnalyserDriverIO, SpecsSequence, SpecsRegion]
+    AbstractElectronAnalyserDetector[
+        SpecsRegionDetector, SpecsAnalyserDriverIO, SpecsSequence, SpecsRegion
+    ]
 ):
     def __init__(self, prefix: str, name: str):
         super().__init__(prefix, name, SpecsSequence)
