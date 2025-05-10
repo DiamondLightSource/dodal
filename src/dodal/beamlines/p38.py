@@ -20,6 +20,7 @@ from dodal.devices.i22.dcm import DCM
 from dodal.devices.i22.fswitch import FSwitch
 from dodal.devices.linkam3 import Linkam3
 from dodal.devices.pressure_jump_cell import PressureJumpCell
+from dodal.devices.areadetector import PressureJumpCellDetector
 from dodal.devices.slits import Slits
 from dodal.devices.tetramm import TetrammDetector
 from dodal.devices.undulator import Undulator
@@ -207,4 +208,19 @@ def high_pressure_xray_cell() -> PressureJumpCell:
         f"{PREFIX.beamline_prefix}-EA",
         cell_prefix="-HPXC-01:",
         adc_prefix="-ADC",
+    )
+
+def high_pressure_xray_cell_adc(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> PressureJumpCellDetector:
+    return device_instantiation(
+        PressureJumpCellDetector,
+        "high_pressure_xray_cell_adc",
+        "-EA-HPXC-01:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+        adc_suffix="TRIG:",
+        drv_suffix="DET:",
+        hdf_suffix="FILE:", 
+        path_provider=get_path_provider(),
     )
