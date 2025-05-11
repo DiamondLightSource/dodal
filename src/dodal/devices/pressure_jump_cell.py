@@ -107,13 +107,31 @@ class FastValveControl(ValveControlBase):
 
         super().__init__(name)
 
-    def set(self, value: FastValveControlRequest) -> AsyncStatus:
-        set_status = None
+    def _valve_request_to_fast_valve_request(self, request:ValveControlRequest) -> FastValveControlRequest:
+        match request:
+            case ValveControlRequest.OPEN:
+                return FastValveControlRequest.OPEN
 
-        if value == FastValveControlRequest.OPEN:
+            case ValveControlRequest.CLOSE:
+                return FastValveControlRequest.CLOSE
+
+            case ValveControlRequest.RESET:
+                return FastValveControlRequest.RESET
+
+    def set(self, value: FastValveControlRequest|ValveControlRequest) -> AsyncStatus:
+        set_status = None
+        value_fast_request = None
+
+        if isinstance(value, ValveControlRequest):
+            value_fast_request = self._valve_request_to_fast_valve_request(value)
+        else:
+            assert isinstance(value, FastValveControlRequest)
+            value_fast_request = value
+
+        if value_fast_request == FastValveControlRequest.OPEN:
             set_status = self._set_open_seq()
         else:
-            set_status = self.control.set(value)
+            set_status = self.control.set(value_fast_request)
 
         return set_status
 

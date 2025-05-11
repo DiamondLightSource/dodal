@@ -204,6 +204,52 @@ async def test_pjumpcell_set_valve_sets_valve_fields(
     )
 
 
+testdata_set_valve_control_requests = [
+    (ValveControlRequest.CLOSE, FastValveControlRequest.CLOSE),
+    (ValveControlRequest.RESET, FastValveControlRequest.RESET),
+    (ValveControlRequest.OPEN, FastValveControlRequest.ARM),    # Unchanged as openseq
+]
+@pytest.mark.parametrize("valve_request,expected", testdata_set_valve_control_requests)
+async def test_pjumpcell_set_valve_sets_control_request_for_all_valve_types(
+    cell: PressureJumpCell,
+    valve_request: ValveControlRequest,
+    expected: FastValveControlRequest,
+):
+    # Set some initial values
+    set_mock_value(
+        cell.all_valves_control.fast_valve_control[5].control,
+        FastValveControlRequest.ARM.value,
+    )
+
+    set_mock_value(
+        cell.all_valves_control.fast_valve_control[5].open,
+        ValveOpenSeqRequest.INACTIVE.value,
+    )
+
+    # Set new values
+    await asyncio.gather(
+        cell.all_valves_control.fast_valve_control[5].set(valve_request),
+    )
+
+    # Check the fast valve value has been set to the equivalent FastValveControlRequest
+    # value
+    await assert_reading(
+        cell.all_valves_control.fast_valve_control[5],
+        {
+            "pjump-all_valves_control-fast_valve_control-5-open": {
+                "value": int(ValveOpenSeqRequest.INACTIVE.value),
+                "timestamp": ANY,
+                "alarm_severity": 0,
+            },
+            "pjump-all_valves_control-fast_valve_control-5-control": {
+                "value": expected,
+                "timestamp": ANY,
+                "alarm_severity": 0,
+            },
+        },
+    )
+
+
 async def test_reading_pjumpcell_includes_read_fields_pump(
     cell: PressureJumpCell,
 ):
