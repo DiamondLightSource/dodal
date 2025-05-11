@@ -27,18 +27,18 @@ class StopState(StrictEnum):
     STOP = "STOP"
 
 
-class FastValveControlRequest(StrictEnum):
-    OPEN = "Open"
-    CLOSE = "Close"
-    RESET = "Reset"
-    ARM = "Arm"
-    DISARM = "Disarm"
-
-
 class ValveControlRequest(StrictEnum):
     OPEN = "Open"
     CLOSE = "Close"
     RESET = "Reset"
+
+
+class FastValveControlRequest(StrictEnum):
+    OPEN = ValveControlRequest.OPEN.value
+    CLOSE = ValveControlRequest.CLOSE.value
+    RESET = ValveControlRequest.RESET.value
+    ARM = "Arm"
+    DISARM = "Disarm"
 
 
 class ValveOpenSeqRequest(StrictEnum):
@@ -61,10 +61,10 @@ class ValveState(StrictEnum):
 
 
 class FastValveState(StrictEnum):
-    FAULT = "Fault"
-    OPEN = "Open"
+    FAULT = ValveState.FAULT.value
+    OPEN = ValveState.OPEN.value
     OPEN_ARMED = "Open Armed"
-    CLOSED = "Closed"
+    CLOSED = ValveState.CLOSED.value
     CLOSED_ARMED = "Closed Armed"
     NONE = "Unused"
 
