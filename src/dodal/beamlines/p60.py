@@ -2,7 +2,7 @@ from dodal.common.beamlines.beamline_utils import (
     device_factory,
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.devices.electron_analyser import VGScientaAnalyserDriverIO
+from dodal.devices.electron_analyser.vgscienta import VGScientaAnalyserDriverIO
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 

@@ -88,6 +88,45 @@ async def test_run_program(fake_pmac: PMAC, RE):
     assert await fake_pmac.pmac_string.get_value() == "&2b11r"
 
 
+async def update_counter(sleep_time: float, fake_pmac: PMAC):
+    set_mock_value(fake_pmac.scanstatus, 1)
+    set_mock_value(fake_pmac.counter, 0)
+    await asyncio.sleep(0.05)
+    set_mock_value(fake_pmac.counter, 1)
+    await asyncio.sleep(0.05)
+    set_mock_value(fake_pmac.counter, 2)
+    await asyncio.sleep(sleep_time)
+    set_mock_value(fake_pmac.counter, 3)
+    set_mock_value(fake_pmac.scanstatus, 0)
+
+
+async def test_counter_refresh(fake_pmac: PMAC, RE):
+    callback_on_mock_put(
+        fake_pmac.pmac_string,
+        lambda *args, **kwargs: asyncio.create_task(update_counter(0.05, fake_pmac)),  # type: ignore
+    )
+
+    set_mock_value(fake_pmac.counter_time, 0.1)
+    await fake_pmac.run_program.kickoff()
+    await fake_pmac.run_program.complete()
+
+    assert await fake_pmac.counter.get_value() == 3
+
+
+async def test_counter_refresh_timeout(fake_pmac: PMAC, RE):
+    callback_on_mock_put(
+        fake_pmac.pmac_string,
+        lambda *args, **kwargs: asyncio.create_task(update_counter(0.2, fake_pmac)),  # type: ignore
+    )
+
+    set_mock_value(fake_pmac.counter_time, 0.1)
+    with pytest.raises(asyncio.exceptions.TimeoutError):
+        await fake_pmac.run_program.kickoff()
+        await fake_pmac.run_program.complete()
+
+    assert await fake_pmac.counter.get_value() == 2
+
+
 @patch("dodal.devices.i24.pmac.sleep")
 async def test_abort_program(mock_sleep, fake_pmac: PMAC, RE):
     set_mock_value(fake_pmac.scanstatus, 0)
