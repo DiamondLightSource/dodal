@@ -1,5 +1,4 @@
 import asyncio
-from collections.abc import Mapping
 
 from bluesky.protocols import HasName, Movable
 from ophyd_async.core import (
@@ -107,7 +106,9 @@ class FastValveControl(ValveControlBase):
 
         super().__init__(name)
 
-    def _valve_request_to_fast_valve_request(self, request:ValveControlRequest) -> FastValveControlRequest:
+    def _valve_request_to_fast_valve_request(
+        self, request: ValveControlRequest
+    ) -> FastValveControlRequest:
         match request:
             case ValveControlRequest.OPEN:
                 return FastValveControlRequest.OPEN
@@ -118,7 +119,7 @@ class FastValveControl(ValveControlBase):
             case ValveControlRequest.RESET:
                 return FastValveControlRequest.RESET
 
-    def set(self, value: FastValveControlRequest|ValveControlRequest) -> AsyncStatus:
+    def set(self, value: FastValveControlRequest | ValveControlRequest) -> AsyncStatus:
         set_status = None
         value_fast_request = None
 
@@ -179,8 +180,8 @@ class AllValvesControl(StandardReadable):
 
         all_valves = self.fast_valve_control | self.slow_valve_control
 
-        self.valve_control: DeviceVector[ValveControl|FastValveControl] = DeviceVector(
-            all_valves
+        self.valve_control: DeviceVector[ValveControl | FastValveControl] = (
+            DeviceVector(all_valves)
         )
 
         super().__init__(name)

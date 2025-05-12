@@ -207,8 +207,10 @@ async def test_pjumpcell_set_valve_sets_valve_fields(
 testdata_set_valve_control_requests = [
     (ValveControlRequest.CLOSE, FastValveControlRequest.CLOSE),
     (ValveControlRequest.RESET, FastValveControlRequest.RESET),
-    (ValveControlRequest.OPEN, FastValveControlRequest.ARM),    # Unchanged as openseq
+    (ValveControlRequest.OPEN, FastValveControlRequest.ARM),  # Unchanged as openseq
 ]
+
+
 @pytest.mark.parametrize("valve_request,expected", testdata_set_valve_control_requests)
 async def test_pjumpcell_set_valve_sets_control_request_for_all_valve_types(
     cell: PressureJumpCell,
@@ -402,11 +404,9 @@ async def test_setting_all_pressure_cell_valves(
         ValveOpenSeqRequest.INACTIVE.value,
     )
 
-
     # Set new values
     for valve in cell.all_valves_control.valve_control.values():
-          valve.set(ValveControlRequest.CLOSE)
-
+        valve.set(ValveControlRequest.CLOSE)
 
     # Check valves have been set to the new values
     await assert_reading(
