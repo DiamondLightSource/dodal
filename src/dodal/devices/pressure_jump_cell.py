@@ -148,11 +148,11 @@ class AllValvesControl(StandardReadable):
         self,
         prefix: str,
         name: str = "",
-        fast_valves: tuple[int, ...] = (5, 6),
-        slow_valves: tuple[int, ...] = (1, 3),
+        fast_valves_numbers: tuple[int, ...] = (5, 6),
+        slow_valves_numbers: tuple[int, ...] = (1, 3),
     ) -> None:
-        self._fast_valves_numbers = fast_valves
-        self._slow_valves_numbers = slow_valves
+        self._fast_valves_numbers = fast_valves_numbers
+        self._slow_valves_numbers = slow_valves_numbers
         with self.add_children_as_readables():
             self.valve_states: DeviceVector[SignalR[ValveState]] = DeviceVector(
                 {
@@ -169,12 +169,18 @@ class AllValvesControl(StandardReadable):
                 )
             )
 
-        self.fast_valve_control: DeviceVector[FastValveControl] = DeviceVector(
-            {i: FastValveControl(f"{prefix}V{i}") for i in self._fast_valves_numbers}
-        )
+        self.fast_valve_control = {
+            i: FastValveControl(f"{prefix}V{i}") for i in self._fast_valves_numbers
+        }
 
-        self.valve_control: DeviceVector[ValveControl] = DeviceVector(
-            {i: ValveControl(f"{prefix}V{i}") for i in self._slow_valves_numbers}
+        self.slow_valves_control = {
+            i: ValveControl(f"{prefix}V{i}") for i in self._slow_valves_numbers
+        }
+
+        all_valves = self.fast_valve_control | self.slow_valves_control
+
+        self.valve_control: DeviceVector[ValveControl|FastValveControl] = DeviceVector(
+            all_valves
         )
 
         super().__init__(name)
