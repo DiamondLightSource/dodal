@@ -123,7 +123,6 @@ class ProgramRunner(Device, Flyable):
         status_sig: SignalR,
         counter_sig: SignalR,
         prog_num_sig: SignalRW,
-        collection_time_sig: SignalRW,
         counter_time_sig: SignalRW,
         name: str = "",
     ) -> None:
@@ -131,8 +130,6 @@ class ProgramRunner(Device, Flyable):
         self._status_ref = Reference(status_sig)
         self._counter_ref = Reference(counter_sig)
         self._prog_num_ref = Reference(prog_num_sig)
-
-        self._collection_time_ref = Reference(collection_time_sig)
         self._counter_time_ref = Reference(counter_time_sig)
 
         super().__init__(name)
@@ -224,7 +221,6 @@ class PMAC(StandardReadable):
         # A couple of soft signals for running a collection: program number to send to
         # the PMAC_STRING and expected collection time.
         self.program_number = soft_signal_rw(int)
-        self.collection_time = soft_signal_rw(float, initial_value=600.0, units="s")
         self.counter_time = soft_signal_rw(float, initial_value=30.0, units="s")
 
         self.run_program = ProgramRunner(
@@ -232,7 +228,6 @@ class PMAC(StandardReadable):
             self.scanstatus,
             self.counter,
             self.program_number,
-            self.collection_time,
             self.counter_time,
         )
         self.abort_program = ProgramAbort(self.pmac_string, self.scanstatus)
