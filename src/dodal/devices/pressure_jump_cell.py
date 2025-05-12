@@ -70,8 +70,8 @@ class FastValveState(StrictEnum):
 
 
 class ValveControlBase(StandardReadable, Movable):
-    open: SignalRW[ValveControlRequest | FastValveControlRequest | int]
-    control: SignalRW[ValveControlRequest | FastValveControlRequest | int]
+    open: SignalRW[int]
+    control: SignalRW[ValveControlRequest | FastValveControlRequest]
 
     @AsyncStatus.wrap
     async def _set_open_seq(self):
