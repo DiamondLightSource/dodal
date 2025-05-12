@@ -39,6 +39,8 @@ class Beamstop(StandardReadable):
         z: beamstop z position in mm
         selected_pos: Get the current position of the beamstop as an enum. Currently this
             is read-only.
+        in_beam_position_mm: Dictionary containing the x, y, z positions in mm for when
+            the beamstop is in beam.
     """
 
     def __init__(
@@ -54,7 +56,6 @@ class Beamstop(StandardReadable):
             self.selected_pos = derived_signal_r(
                 self._get_selected_position, x=self.x_mm, y=self.y_mm, z=self.z_mm
             )
-
         self._in_beam_xyz_mm = [
             float(beamline_parameters[f"in_beam_{axis}_STANDARD"])
             for axis in ("x", "y", "z")
@@ -63,6 +64,11 @@ class Beamstop(StandardReadable):
             float(beamline_parameters[f"bs_{axis}_tolerance"])
             for axis in ("x", "y", "z")
         ]
+        self.in_beam_position_mm = {
+            "x": self._in_beam_xyz_mm[0],
+            "y": self._in_beam_xyz_mm[1],
+            "z": self._in_beam_xyz_mm[2],
+        }
 
         super().__init__(name)
 
