@@ -173,11 +173,11 @@ class AllValvesControl(StandardReadable):
             i: FastValveControl(f"{prefix}V{i}") for i in self._fast_valves_numbers
         }
 
-        self.slow_valves_control = {
+        self.slow_valve_control = {
             i: ValveControl(f"{prefix}V{i}") for i in self._slow_valves_numbers
         }
 
-        all_valves = self.fast_valve_control | self.slow_valves_control
+        all_valves = self.fast_valve_control | self.slow_valve_control
 
         self.valve_control: DeviceVector[ValveControl|FastValveControl] = DeviceVector(
             all_valves
