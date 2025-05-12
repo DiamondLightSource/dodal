@@ -12,6 +12,7 @@ from ophyd_async.core import (
     Signal,
     SignalRW,
     StandardReadable,
+    derived_signal_r,
     wait_for_value,
 )
 from ophyd_async.epics.core import (
@@ -23,7 +24,6 @@ from ophyd_async.epics.core import (
 from pydantic import field_validator
 from pydantic.dataclasses import dataclass
 
-from dodal.common.signal_utils import create_hardware_backed_soft_signal
 from dodal.log import LOGGER
 from dodal.parameters.experiment_parameter_base import AbstractExperimentWithBeamParams
 
@@ -203,8 +203,11 @@ class FastGridScanCommon(StandardReadable, Flyable, ABC, Generic[ParamType]):
         self.stop_cmd = epics_signal_x(f"{prefix}STOP.PROC")
         self.status = epics_signal_r(int, f"{prefix}SCAN_STATUS")
 
-        self.expected_images = create_hardware_backed_soft_signal(
-            float, self._calculate_expected_images
+        self.expected_images = derived_signal_r(
+            self._calculate_expected_images,
+            x=self.x_steps,
+            y=self.y_steps,
+            z=self.z_steps,
         )
 
         self.motion_program = MotionProgram(smargon_prefix)
@@ -231,12 +234,7 @@ class FastGridScanCommon(StandardReadable, Flyable, ABC, Generic[ParamType]):
         }
         super().__init__(name)
 
-    async def _calculate_expected_images(self):
-        x, y, z = await asyncio.gather(
-            self.x_steps.get_value(),
-            self.y_steps.get_value(),
-            self.z_steps.get_value(),
-        )
+    def _calculate_expected_images(self, x: float, y: float, z: float) -> float:
         LOGGER.info(f"Reading num of images found {x, y, z} images in each axis")
         first_grid = x * y
         second_grid = x * z

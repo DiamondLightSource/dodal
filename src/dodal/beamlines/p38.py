@@ -16,7 +16,7 @@ from dodal.common.crystal_metadata import (
 )
 from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitPathProvider
 from dodal.devices.focusing_mirror import FocusingMirror
-from dodal.devices.i22.dcm import DoubleCrystalMonochromator
+from dodal.devices.i22.dcm import DCM
 from dodal.devices.i22.fswitch import FSwitch
 from dodal.devices.linkam3 import Linkam3
 from dodal.devices.pressure_jump_cell import PressureJumpCell
@@ -40,7 +40,7 @@ set_utils_beamline(BL)
 set_path_provider(
     StaticVisitPathProvider(
         BL,
-        Path("/dls/p38/data/2024/cm37282-2/bluesky"),
+        Path("/dls/p38/data/2025/cm40650-2/bluesky"),
         client=LocalDirectoryServiceClient(),
     )
 )
@@ -143,8 +143,8 @@ def hfm() -> FocusingMirror:
 
 
 @device_factory(mock=True)
-def dcm() -> DoubleCrystalMonochromator:
-    return DoubleCrystalMonochromator(
+def dcm() -> DCM:
+    return DCM(
         temperature_prefix=f"{PREFIX.beamline_prefix}-DI-DCM-01:",
         crystal_1_metadata=make_crystal_metadata_from_material(
             MaterialsEnum.Si, (1, 1, 1)
