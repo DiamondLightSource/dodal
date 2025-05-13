@@ -1,9 +1,15 @@
 from math import isclose
 
-from ophyd_async.core import StandardReadable, StrictEnum, derived_signal_r
+import bluesky.plan_stubs as bps
+from ophyd_async.core import (
+    StandardReadable,
+    StrictEnum,
+    derived_signal_rw,
+)
 from ophyd_async.epics.motor import Motor
 
 from dodal.common.beamlines.beamline_parameters import GDABeamlineParameters
+from dodal.log import LOGGER
 
 
 class BeamstopPositions(StrictEnum):
@@ -53,8 +59,12 @@ class Beamstop(StandardReadable):
             self.x_mm = Motor(prefix + "X")
             self.y_mm = Motor(prefix + "Y")
             self.z_mm = Motor(prefix + "Z")
-            self.selected_pos = derived_signal_r(
-                self._get_selected_position, x=self.x_mm, y=self.y_mm, z=self.z_mm
+            self.selected_pos = derived_signal_rw(
+                self._get_selected_position,
+                self._set_selected_position,
+                x=self.x_mm,
+                y=self.y_mm,
+                z=self.z_mm,
             )
         self._in_beam_xyz_mm = [
             float(beamline_parameters[f"in_beam_{axis}_STANDARD"])
@@ -64,11 +74,6 @@ class Beamstop(StandardReadable):
             float(beamline_parameters[f"bs_{axis}_tolerance"])
             for axis in ("x", "y", "z")
         ]
-        self.in_beam_position_mm = {
-            "x": self._in_beam_xyz_mm[0],
-            "y": self._in_beam_xyz_mm[1],
-            "z": self._in_beam_xyz_mm[2],
-        }
 
         super().__init__(name)
 
@@ -83,3 +88,9 @@ class Beamstop(StandardReadable):
             return BeamstopPositions.DATA_COLLECTION
         else:
             return BeamstopPositions.UNKNOWN
+
+    async def _set_selected_position(self, position: BeamstopPositions) -> None:
+        if position == BeamstopPositions.DATA_COLLECTION:
+            await self.x_mm.set(self._in_beam_xyz_mm[0])
+            await self.y_mm.set(self._in_beam_xyz_mm[1])
+            await self.z_mm.set(self._in_beam_xyz_mm[2])
