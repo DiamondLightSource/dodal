@@ -1,6 +1,5 @@
 from math import isclose
 
-import bluesky.plan_stubs as bps
 from ophyd_async.core import (
     StandardReadable,
     StrictEnum,
@@ -9,7 +8,6 @@ from ophyd_async.core import (
 from ophyd_async.epics.motor import Motor
 
 from dodal.common.beamlines.beamline_parameters import GDABeamlineParameters
-from dodal.log import LOGGER
 
 
 class BeamstopPositions(StrictEnum):
@@ -94,3 +92,5 @@ class Beamstop(StandardReadable):
             await self.x_mm.set(self._in_beam_xyz_mm[0])
             await self.y_mm.set(self._in_beam_xyz_mm[1])
             await self.z_mm.set(self._in_beam_xyz_mm[2])
+        elif position == BeamstopPositions.UNKNOWN:
+            raise ValueError(f"Cannot set beamstop to position {position}")
