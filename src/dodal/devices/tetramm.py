@@ -131,11 +131,14 @@ class TetrammController(DetectorController):
         )
 
     async def arm(self):
-        self._arm_status = set_and_wait_for_value(self._drv.acquire, True)
+        self._arm_status = await set_and_wait_for_value(
+            self._drv.acquire, True, wait_for_set_completion=False
+        )
 
     async def wait_for_idle(self):
-        if self._arm_status:
+        if self._arm_status and not self._arm_status.done:
             await self._arm_status
+        self._arm_status = None
 
     def _validate_trigger(self, trigger: DetectorTrigger) -> None:
         supported_trigger_types = {
