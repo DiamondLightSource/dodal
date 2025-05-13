@@ -60,7 +60,6 @@ set_utils_beamline(BL)
 I04_ZEBRA_MAPPING = ZebraMapping(
     outputs=(ZebraTTLOutputs(TTL_DETECTOR=1, TTL_FAST_SHUTTER=2, TTL_XSPRESS3=3)),
     sources=ZebraSources(),
-    AND_GATE_FOR_AUTO_SHUTTER=2,
 )
 
 PREFIX = BeamlinePrefix(BL)
