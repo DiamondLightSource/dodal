@@ -40,6 +40,7 @@ dodal.devices.eiger\_odin.EigerFan
       
       
       
+      
    
    
 
@@ -53,6 +54,7 @@ dodal.devices.eiger\_odin.EigerFan
       
       
       ~EigerFan.component_names
+      
       
       
       

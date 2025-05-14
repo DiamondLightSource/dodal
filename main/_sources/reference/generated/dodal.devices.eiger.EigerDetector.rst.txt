@@ -58,6 +58,7 @@ dodal.devices.eiger.EigerDetector
       ~EigerDetector.set_cam_pvs
       
       
+      
       ~EigerDetector.set_detector_parameters
       
       
@@ -125,6 +126,7 @@ dodal.devices.eiger.EigerDetector
       
       
       ~EigerDetector.component_names
+      
       
       
       

@@ -36,6 +36,7 @@ dodal.devices.logging\_ophyd\_device.InfoLoggingDevice
       
       
       
+      
       ~InfoLoggingDevice.wait_for_connection
       
       
@@ -55,6 +56,7 @@ dodal.devices.logging\_ophyd\_device.InfoLoggingDevice
       
       
       ~InfoLoggingDevice.component_names
+      
       
       
       

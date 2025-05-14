@@ -49,6 +49,7 @@ dodal.devices.eiger\_odin.OdinNodesStatus
       
       
       
+      
       ~OdinNodesStatus.wait_for_no_errors
       
       
@@ -68,6 +69,7 @@ dodal.devices.eiger\_odin.OdinNodesStatus
       
       
       ~OdinNodesStatus.component_names
+      
       
       
       
