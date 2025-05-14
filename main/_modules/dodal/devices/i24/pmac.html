@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.i24.pmac &#8212; dodal 1.46.1.dev22+gebcd6ac377 documentation</title>
+    <title>dodal.devices.i24.pmac &#8212; dodal 1.46.1.dev23+g00a00fe004 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=73735f2e"></script>
+    <script src="../../../../_static/documentation_options.js?v=d3fdfe53"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -595,7 +595,6 @@ window.addEventListener("load", () => mermaid.run());
         <span class="n">status_sig</span><span class="p">:</span> <span class="n">SignalR</span><span class="p">,</span>
         <span class="n">counter_sig</span><span class="p">:</span> <span class="n">SignalR</span><span class="p">,</span>
         <span class="n">prog_num_sig</span><span class="p">:</span> <span class="n">SignalRW</span><span class="p">,</span>
-        <span class="n">collection_time_sig</span><span class="p">:</span> <span class="n">SignalRW</span><span class="p">,</span>
         <span class="n">counter_time_sig</span><span class="p">:</span> <span class="n">SignalRW</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -603,8 +602,6 @@ window.addEventListener("load", () => mermaid.run());
         <span class="bp">self</span><span class="o">.</span><span class="n">_status_ref</span> <span class="o">=</span> <span class="n">Reference</span><span class="p">(</span><span class="n">status_sig</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_counter_ref</span> <span class="o">=</span> <span class="n">Reference</span><span class="p">(</span><span class="n">counter_sig</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_prog_num_ref</span> <span class="o">=</span> <span class="n">Reference</span><span class="p">(</span><span class="n">prog_num_sig</span><span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">_collection_time_ref</span> <span class="o">=</span> <span class="n">Reference</span><span class="p">(</span><span class="n">collection_time_sig</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_counter_time_ref</span> <span class="o">=</span> <span class="n">Reference</span><span class="p">(</span><span class="n">counter_time_sig</span><span class="p">)</span>
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
@@ -708,7 +705,6 @@ window.addEventListener("load", () => mermaid.run());
         <span class="c1"># A couple of soft signals for running a collection: program number to send to</span>
         <span class="c1"># the PMAC_STRING and expected collection time.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">program_number</span> <span class="o">=</span> <span class="n">soft_signal_rw</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">collection_time</span> <span class="o">=</span> <span class="n">soft_signal_rw</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">initial_value</span><span class="o">=</span><span class="mf">600.0</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s2">&quot;s&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">counter_time</span> <span class="o">=</span> <span class="n">soft_signal_rw</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">initial_value</span><span class="o">=</span><span class="mf">30.0</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s2">&quot;s&quot;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">run_program</span> <span class="o">=</span> <span class="n">ProgramRunner</span><span class="p">(</span>
@@ -716,7 +712,6 @@ window.addEventListener("load", () => mermaid.run());
             <span class="bp">self</span><span class="o">.</span><span class="n">scanstatus</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">counter</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">program_number</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">collection_time</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">counter_time</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">abort_program</span> <span class="o">=</span> <span class="n">ProgramAbort</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pmac_string</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">scanstatus</span><span class="p">)</span>
