@@ -41,10 +41,7 @@ class Beamstop(StandardReadable):
         x: beamstop x position in mm
         y: beamstop y position in mm
         z: beamstop z position in mm
-        selected_pos: Get the current position of the beamstop as an enum. Currently this
-            is read-only.
-        in_beam_position_mm: Dictionary containing the x, y, z positions in mm for when
-            the beamstop is in beam.
+        selected_pos: Get or set the current position of the beamstop as an enum.
     """
 
     def __init__(
