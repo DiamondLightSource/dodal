@@ -1,5 +1,3 @@
-import os
-
 from dodal.common.beamlines.beamline_parameters import get_beamline_parameters
 from dodal.common.beamlines.beamline_utils import (
     device_factory,
@@ -20,6 +18,8 @@ from dodal.devices.eiger import EigerDetector
 from dodal.devices.fast_grid_scan import ZebraFastGridScan
 from dodal.devices.flux import Flux
 from dodal.devices.i03.dcm import DCM
+from dodal.devices.i04.constants import RedisConstants
+from dodal.devices.i04.murko_results import MurkoResultsDevice
 from dodal.devices.i04.transfocator import Transfocator
 from dodal.devices.ipin import IPin
 from dodal.devices.motors import XYZPositioner
@@ -52,9 +52,6 @@ ZOOM_PARAMS_FILE = (
 DISPLAY_CONFIG = "/dls_sw/i04/software/gda_versions/var/display.configuration"
 DAQ_CONFIGURATION_PATH = "/dls_sw/i04/software/daq_configuration"
 
-REDIS_HOST = "i04-valkey-murko.diamond.ac.uk"
-REDIS_PASSWORD = os.environ.get("VALKEY_PASSWORD", "test_redis_password")
-MURKO_REDIS_DB = 7
 
 BL = get_beamline_name("i04")
 set_log_beamline(BL)
@@ -363,9 +360,22 @@ def oav_to_redis_forwarder() -> OAVToRedisForwarder:
     return OAVToRedisForwarder(
         f"{PREFIX.beamline_prefix}-DI-OAV-01:",
         name="oav_to_redis_forwarder",
-        redis_host=REDIS_HOST,
-        redis_password=REDIS_PASSWORD,
-        redis_db=7,
+        redis_host=RedisConstants.REDIS_HOST,
+        redis_password=RedisConstants.REDIS_PASSWORD,
+        redis_db=RedisConstants.MURKO_REDIS_DB,
+    )
+
+
+@device_factory()
+def murko_results() -> MurkoResultsDevice:
+    """Get the i04 OAV to redis forwarder, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i04, it will return the existing object.
+    """
+    return MurkoResultsDevice(
+        name="murko_results",
+        redis_host=RedisConstants.REDIS_HOST,
+        redis_password=RedisConstants.REDIS_PASSWORD,
+        redis_db=RedisConstants.MURKO_REDIS_DB,
     )
 
 

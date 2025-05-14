@@ -2,13 +2,11 @@ from typing import Any
 
 import pytest
 
-from dodal.devices.electron_analyser import (
-    EnergyMode,
-    VGScientaRegion,
-    VGScientaSequence,
-)
-from dodal.devices.electron_analyser.abstract_region import TAbstractBaseRegion
-from dodal.devices.electron_analyser.vgscienta_region import (
+from dodal.common.data_util import load_json_file_to_class
+from dodal.devices.electron_analyser.abstract import TAbstractBaseRegion
+from dodal.devices.electron_analyser.types import EnergyMode
+from dodal.devices.electron_analyser.vgscienta import VGScientaRegion, VGScientaSequence
+from dodal.devices.electron_analyser.vgscienta.region import (
     AcquisitionMode,
     DetectorMode,
     Status,
@@ -23,13 +21,8 @@ from tests.devices.unit_tests.electron_analyser.test_util import (
 
 
 @pytest.fixture
-def sequence_file() -> str:
-    return TEST_VGSCIENTA_SEQUENCE
-
-
-@pytest.fixture
-def sequence_class() -> type[VGScientaSequence]:
-    return VGScientaSequence
+def sequence() -> VGScientaSequence:
+    return load_json_file_to_class(VGScientaSequence, TEST_VGSCIENTA_SEQUENCE)
 
 
 @pytest.fixture
