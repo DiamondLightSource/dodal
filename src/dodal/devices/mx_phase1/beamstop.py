@@ -1,3 +1,4 @@
+import asyncio
 from math import isclose
 
 from ophyd_async.core import (
@@ -86,8 +87,10 @@ class Beamstop(StandardReadable):
 
     async def _set_selected_position(self, position: BeamstopPositions) -> None:
         if position == BeamstopPositions.DATA_COLLECTION:
-            await self.x_mm.set(self._in_beam_xyz_mm[0])
-            await self.y_mm.set(self._in_beam_xyz_mm[1])
-            await self.z_mm.set(self._in_beam_xyz_mm[2])
+            await asyncio.gather(
+                self.x_mm.set(self._in_beam_xyz_mm[0]),
+                self.y_mm.set(self._in_beam_xyz_mm[1]),
+                self.z_mm.set(self._in_beam_xyz_mm[2]),
+            )
         elif position == BeamstopPositions.UNKNOWN:
             raise ValueError(f"Cannot set beamstop to position {position}")
