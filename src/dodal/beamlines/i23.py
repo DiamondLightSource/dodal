@@ -41,7 +41,6 @@ PREFIX = BeamlinePrefix(BL)
 I23_ZEBRA_MAPPING = ZebraMapping(
     outputs=ZebraTTLOutputs(TTL_DETECTOR=1, TTL_SHUTTER=4),
     sources=ZebraSources(),
-    AND_GATE_FOR_AUTO_SHUTTER=2,
 )
 
 
