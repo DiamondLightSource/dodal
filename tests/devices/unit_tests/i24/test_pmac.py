@@ -81,7 +81,6 @@ async def test_run_program(fake_pmac: PMAC, RE):
     )
 
     set_mock_value(fake_pmac.program_number, 11)
-    set_mock_value(fake_pmac.collection_time, 2.0)
     await fake_pmac.run_program.kickoff()
     await fake_pmac.run_program.complete()
 
