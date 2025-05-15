@@ -50,57 +50,22 @@ class XYZPositioner(StandardReadable):
         super().__init__(name=name)
 
 
-class SixAxisGonio(XYZPositioner):
-    """
-
-    Six-axis goniometer with a standard xyz stage and three axes of rotation: kappa, phi
-    and omega.
-
-        Parameters
-    ----------
-    prefix:
-        EPICS PV (Common part up to and including :).
-    name:
-        name for the stage.
-    infix:
-        EPICS PV, default is the ("X", "Y", "Z", "KAPPA", "PHI", "OMEGA").
-    upward_axis_at_0:
-        Axis as an enum (Axis.X, Axis.Y or Axis.Z), that points upwards when ω = 0°.
-        Default is Axis.Y
-    upward_axis_at_minus_90:
-        Axis as an enum (Axis.X, Axis.Y or Axis.Z), that points upwards when ω = -90°.
-        Default is Axis.Z
-    Notes
-    -----
-    Example usage::
-        async with init_devices():
-            xyz_stage = XYZPositioner("BLXX-MO-STAGE-XX:")
-    Or::
-        with init_devices():
-            xyz_stage = XYZPositioner("BLXX-MO-STAGE-XX:", infix = ("A", "B", "C", \
-            "KAPPA", "PHI", "OMEGA"))
-
-    """
-
+class FourAxisGonio(XYZPositioner):
     def __init__(
         self,
         prefix: str,
         name: str = "",
-        infix: tuple[str, str, str, str, str, str] = (
+        infix: tuple[str, str, str, str] = (
             "X",
             "Y",
             "Z",
-            "KAPPA",
-            "PHI",
             "OMEGA",
         ),
         upward_axis_at_0: Axis = Axis.Y,
         upward_axis_at_minus_90: Axis = Axis.Z,
     ):
         with self.add_children_as_readables():
-            self.kappa = Motor(prefix + infix[3])
-            self.phi = Motor(prefix + infix[4])
-            self.omega = Motor(prefix + infix[5])
+            self.omega = Motor(prefix + infix[3])
 
         super().__init__(name=name, prefix=prefix, infix=infix[0:3])
 
@@ -155,6 +120,66 @@ class SixAxisGonio(XYZPositioner):
                 return self.y
             case Axis.Z:
                 return self.z
+
+
+class SixAxisGonio(FourAxisGonio):
+    """
+
+    Six-axis goniometer with a standard xyz stage and three axes of rotation: kappa, phi
+    and omega.
+
+        Parameters
+    ----------
+    prefix:
+        EPICS PV (Common part up to and including :).
+    name:
+        name for the stage.
+    infix:
+        EPICS PV, default is the ("X", "Y", "Z", "KAPPA", "PHI", "OMEGA").
+    upward_axis_at_0:
+        Axis as an enum (Axis.X, Axis.Y or Axis.Z), that points upwards when ω = 0°.
+        Default is Axis.Y
+    upward_axis_at_minus_90:
+        Axis as an enum (Axis.X, Axis.Y or Axis.Z), that points upwards when ω = -90°.
+        Default is Axis.Z
+    Notes
+    -----
+    Example usage::
+        async with init_devices():
+            xyz_stage = XYZPositioner("BLXX-MO-STAGE-XX:")
+    Or::
+        with init_devices():
+            xyz_stage = XYZPositioner("BLXX-MO-STAGE-XX:", infix = ("A", "B", "C", \
+            "KAPPA", "PHI", "OMEGA"))
+
+    """
+
+    def __init__(
+        self,
+        prefix: str,
+        name: str = "",
+        infix: tuple[str, str, str, str, str, str] = (
+            "X",
+            "Y",
+            "Z",
+            "OMEGA",
+            "KAPPA",
+            "PHI",
+        ),
+        upward_axis_at_0: Axis = Axis.Y,
+        upward_axis_at_minus_90: Axis = Axis.Z,
+    ):
+        with self.add_children_as_readables():
+            self.kappa = Motor(prefix + infix[4])
+            self.phi = Motor(prefix + infix[5])
+
+        super().__init__(
+            name=name,
+            prefix=prefix,
+            infix=infix[0:4],
+            upward_axis_at_0=upward_axis_at_0,
+            upward_axis_at_minus_90=upward_axis_at_minus_90,
+        )
 
 
 def calculate_vertical_j_component(length: float, angle: float):
