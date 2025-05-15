@@ -1,0 +1,34 @@
+dodal.devices.smargon.AxisLimit
+===============================
+
+.. currentmodule:: dodal.devices.smargon
+
+.. autoclass:: AxisLimit
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      ~AxisLimit.contains
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~AxisLimit.min_value
+      
+      
+      ~AxisLimit.max_value
+      
+   
+   

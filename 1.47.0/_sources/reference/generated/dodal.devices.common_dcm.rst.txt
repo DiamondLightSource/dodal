@@ -1,0 +1,39 @@
+dodal.devices.common\_dcm
+=========================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~common_dcm.BaseDCM
+   ~common_dcm.PitchAndRollCrystal
+   ~common_dcm.RollCrystal
+   ~common_dcm.StationaryCrystal
+
+
+
+
+.. automodule:: dodal.devices.common_dcm
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

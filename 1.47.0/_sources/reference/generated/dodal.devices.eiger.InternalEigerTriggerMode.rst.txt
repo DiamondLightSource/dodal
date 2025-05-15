@@ -1,0 +1,32 @@
+dodal.devices.eiger.InternalEigerTriggerMode
+============================================
+
+.. currentmodule:: dodal.devices.eiger
+
+.. autoclass:: InternalEigerTriggerMode
+   :members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~InternalEigerTriggerMode.INTERNAL_SERIES
+      
+      
+      ~InternalEigerTriggerMode.INTERNAL_ENABLE
+      
+      
+      ~InternalEigerTriggerMode.EXTERNAL_SERIES
+      
+      
+      ~InternalEigerTriggerMode.EXTERNAL_ENABLE
+      
+   
+   

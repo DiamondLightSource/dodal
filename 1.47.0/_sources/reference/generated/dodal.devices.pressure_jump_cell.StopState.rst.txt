@@ -1,0 +1,78 @@
+dodal.devices.pressure\_jump\_cell.StopState
+============================================
+
+.. currentmodule:: dodal.devices.pressure_jump_cell
+
+.. autoclass:: StopState
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~StopState.CONTINUE
+      
+      
+      ~StopState.STOP
+      
+   
+   

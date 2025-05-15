@@ -1,0 +1,37 @@
+dodal.devices.i04
+=================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~i04.Beamstop
+   ~i04.BeamstopPositions
+
+
+
+
+.. automodule:: dodal.devices.i04
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

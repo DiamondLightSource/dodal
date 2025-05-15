@@ -1,0 +1,36 @@
+﻿dodal.common
+============
+
+
+
+
+
+
+
+
+
+
+.. automodule:: dodal.common
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      group_uuid
+      inject
+      in_micros
+      step_to_num
+   
+   
+
+   
+   
+   

@@ -1,0 +1,43 @@
+dodal.devices.positioner.Positioner1D
+=====================================
+
+.. currentmodule:: dodal.devices.positioner
+
+.. autoclass:: Positioner1D
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~Positioner1D.set
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

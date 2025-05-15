@@ -1,0 +1,35 @@
+dodal.devices.eiger.EigerTimeouts
+=================================
+
+.. currentmodule:: dodal.devices.eiger
+
+.. autoclass:: EigerTimeouts
+   :members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~EigerTimeouts.all_frames_timeout
+      
+      
+      ~EigerTimeouts.arming_timeout
+      
+      
+      ~EigerTimeouts.general_status_timeout
+      
+      
+      ~EigerTimeouts.meta_file_ready_timeout
+      
+      
+      ~EigerTimeouts.stale_params_timeout
+      
+   
+   

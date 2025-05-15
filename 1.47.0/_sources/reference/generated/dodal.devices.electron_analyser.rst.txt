@@ -1,0 +1,43 @@
+dodal.devices.electron\_analyser
+================================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~electron_analyser.EnergyMode
+
+
+
+
+.. automodule:: dodal.devices.electron_analyser
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      to_binding_energy
+      to_kinetic_energy
+   
+   
+
+   
+   
+   

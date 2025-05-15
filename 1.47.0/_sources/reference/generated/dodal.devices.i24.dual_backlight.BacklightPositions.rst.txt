@@ -1,0 +1,90 @@
+dodal.devices.i24.dual\_backlight.BacklightPositions
+====================================================
+
+.. currentmodule:: dodal.devices.i24.dual_backlight
+
+.. autoclass:: BacklightPositions
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~BacklightPositions.OUT
+      
+      
+      ~BacklightPositions.IN
+      
+      
+      ~BacklightPositions.LOAD_CHECK
+      
+      
+      ~BacklightPositions.OAV2
+      
+      
+      ~BacklightPositions.DIODE
+      
+      
+      ~BacklightPositions.WHITE_IN
+      
+   
+   

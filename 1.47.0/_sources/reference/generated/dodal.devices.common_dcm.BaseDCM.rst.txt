@@ -1,0 +1,40 @@
+dodal.devices.common\_dcm.BaseDCM
+=================================
+
+.. currentmodule:: dodal.devices.common_dcm
+
+.. autoclass:: BaseDCM
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

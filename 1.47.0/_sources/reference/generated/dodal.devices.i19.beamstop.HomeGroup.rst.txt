@@ -1,0 +1,87 @@
+dodal.devices.i19.beamstop.HomeGroup
+====================================
+
+.. currentmodule:: dodal.devices.i19.beamstop
+
+.. autoclass:: HomeGroup
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~HomeGroup.NONE
+      
+      
+      ~HomeGroup.ALL
+      
+      
+      ~HomeGroup.X
+      
+      
+      ~HomeGroup.Y
+      
+      
+      ~HomeGroup.Z
+      
+   
+   
