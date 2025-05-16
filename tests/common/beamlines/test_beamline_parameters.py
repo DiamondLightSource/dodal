@@ -105,6 +105,30 @@ def test_get_beamline_parameters_raises_error_when_beamline_not_found(
         get_beamline_parameters()
 
 
+def test_parse_nested_list():
+    actual = GDABeamlineParameters.parse_value("[[1, 2], [3, 4]]")
+    expected = [[1, 2], [3, 4]]
+    assert actual == expected
+
+
+def test_parse_nested_nested_list():
+    actual = GDABeamlineParameters.parse_value("[[[1, 2], [3, 4]], [[5, 6], [7, 8]]]")
+    expected = [[[1, 2], [3, 4]], [[5, 6], [7, 8]]]
+    assert actual == expected
+
+
+def test_leading_comma_in_list_causes_error():
+    with pytest.raises(ValueError):
+        GDABeamlineParameters.parse_value("[,1, 2, 3, 4]")
+    with pytest.raises(ValueError):
+        GDABeamlineParameters.parse_value("[[1, 2], [ ,3, 4]]")
+
+
+def test_find_close_bracket_raises_error():
+    with pytest.raises(ValueError):
+        GDABeamlineParameters.find_close_square_bracket("a[")
+
+
 @pytest.fixture(autouse=True)
 def i03_beamline_parameters():
     with patch.dict(
