@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.mx_phase1.beamstop &#8212; dodal 1.46.1.dev24+ge6776dc37e documentation</title>
+    <title>dodal.devices.mx_phase1.beamstop &#8212; dodal 1.47.1.dev1+g5ab67ae600 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=b675dc4b"></script>
+    <script src="../../../../_static/documentation_options.js?v=d2002554"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -450,9 +450,14 @@ window.addEventListener("load", () => mermaid.run());
                 <article class="bd-article">
                   
   <h1>Source code for dodal.devices.mx_phase1.beamstop</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">math</span><span class="w"> </span><span class="kn">import</span> <span class="n">isclose</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">math</span><span class="w"> </span><span class="kn">import</span> <span class="n">isclose</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">StandardReadable</span><span class="p">,</span> <span class="n">StrictEnum</span><span class="p">,</span> <span class="n">derived_signal_r</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">StandardReadable</span><span class="p">,</span>
+    <span class="n">StrictEnum</span><span class="p">,</span>
+    <span class="n">derived_signal_rw</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.motor</span><span class="w"> </span><span class="kn">import</span> <span class="n">Motor</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.common.beamlines.beamline_parameters</span><span class="w"> </span><span class="kn">import</span> <span class="n">GDABeamlineParameters</span>
@@ -494,8 +499,7 @@ window.addEventListener("load", () => mermaid.run());
 <span class="sd">        x: beamstop x position in mm</span>
 <span class="sd">        y: beamstop y position in mm</span>
 <span class="sd">        z: beamstop z position in mm</span>
-<span class="sd">        selected_pos: Get the current position of the beamstop as an enum. Currently this</span>
-<span class="sd">            is read-only.</span>
+<span class="sd">        selected_pos: Get or set the current position of the beamstop as an enum.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -508,10 +512,13 @@ window.addEventListener("load", () => mermaid.run());
             <span class="bp">self</span><span class="o">.</span><span class="n">x_mm</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;X&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">y_mm</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;Y&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">z_mm</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;Z&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">selected_pos</span> <span class="o">=</span> <span class="n">derived_signal_r</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_get_selected_position</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">x_mm</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">y_mm</span><span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">z_mm</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">selected_pos</span> <span class="o">=</span> <span class="n">derived_signal_rw</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_get_selected_position</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_set_selected_position</span><span class="p">,</span>
+                <span class="n">x</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">x_mm</span><span class="p">,</span>
+                <span class="n">y</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">y_mm</span><span class="p">,</span>
+                <span class="n">z</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">z_mm</span><span class="p">,</span>
             <span class="p">)</span>
-
         <span class="bp">self</span><span class="o">.</span><span class="n">_in_beam_xyz_mm</span> <span class="o">=</span> <span class="p">[</span>
             <span class="nb">float</span><span class="p">(</span><span class="n">beamline_parameters</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;in_beam_</span><span class="si">{</span><span class="n">axis</span><span class="si">}</span><span class="s2">_STANDARD&quot;</span><span class="p">])</span>
             <span class="k">for</span> <span class="n">axis</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;z&quot;</span><span class="p">)</span>
@@ -533,7 +540,17 @@ window.addEventListener("load", () => mermaid.run());
         <span class="p">):</span>
             <span class="k">return</span> <span class="n">BeamstopPositions</span><span class="o">.</span><span class="n">DATA_COLLECTION</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">BeamstopPositions</span><span class="o">.</span><span class="n">UNKNOWN</span></div>
+            <span class="k">return</span> <span class="n">BeamstopPositions</span><span class="o">.</span><span class="n">UNKNOWN</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_set_selected_position</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">position</span><span class="p">:</span> <span class="n">BeamstopPositions</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">position</span> <span class="o">==</span> <span class="n">BeamstopPositions</span><span class="o">.</span><span class="n">DATA_COLLECTION</span><span class="p">:</span>
+            <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">x_mm</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_in_beam_xyz_mm</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">y_mm</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_in_beam_xyz_mm</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">z_mm</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_in_beam_xyz_mm</span><span class="p">[</span><span class="mi">2</span><span class="p">]),</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">position</span> <span class="o">==</span> <span class="n">BeamstopPositions</span><span class="o">.</span><span class="n">UNKNOWN</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cannot set beamstop to position </span><span class="si">{</span><span class="n">position</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
 </pre></div>
 
