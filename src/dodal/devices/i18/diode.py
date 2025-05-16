@@ -40,11 +40,11 @@ class Diode(StandardReadable):
     ):
         with self.add_children_as_readables():
             self.signal = epics_signal_r(float, prefix + "B:DIODE:I")
-            # self.positioner_a = create_positioner(FilterAValues, prefix + "A:POSN", positioner_pv_suffix=":MP.SELECT")
-            # self.positioner_b = create_positioner(FilterBValues, prefix + "B:POSN", positioner_pv_suffix=":MP.SELECT")
-            self.positioner_a = create_positioner(FilterAValues, prefix + "A:POSN") # this one connects in all but the MP:SELECT setup
-            self.positioner_b = create_positioner(FilterBValues, prefix + "B:POSN") # this one connects in all but the MP:SELECT setup
-            # self.positioner_a = create_positioner(FilterAValues, prefix + "A:MP", positioner_pv_suffix="")
-            # self.positioner_b = create_positioner(FilterBValues, prefix + "B:MP")
+            self.positioner_a = create_positioner(
+                FilterAValues, prefix + "A:MP", positioner_pv_suffix=":SELECT"
+            )  # more complex, will be fixed on Tuesday 20.05.2025
+            self.positioner_b = create_positioner(
+                FilterBValues, prefix + "B:MP", positioner_pv_suffix=":SELECT"
+            )  
 
         super().__init__(name=name)
