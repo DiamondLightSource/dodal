@@ -73,8 +73,23 @@ class GDABeamlineParameters:
             return float(value)
 
     @classmethod
-    def find_first_index(cls, s: str, chars: Iterable):
-        return min((s.find(c) for c in chars if c in s), default=-1)
+    def find_first_index(cls, value: str, chars: Iterable):
+        return min((value.find(c) for c in chars if c in value), default=-1)
+
+    @classmethod
+    def find_close_square_bracket(cls, value: str):
+        index = 0
+        open = 1
+        close = 0
+        if not value[0] == "[":
+            raise ValueError(f"List must start with '[': {value}")
+        while open > close:
+            index += 1
+            if value[index] == "[":
+                open += 1
+            elif value[index] == "]":
+                close += 1
+        return index
 
     @classmethod
     def parse_list(cls, value: str):
@@ -89,7 +104,7 @@ class GDABeamlineParameters:
             if remaining[i] == ",":
                 remaining = remaining[i + 1 :].lstrip()
             elif remaining[i] == "[":
-                j = remaining.index("]")
+                j = cls.find_close_square_bracket(remaining[i:])
                 list_output.append(cls.parse_list(remaining[i + 1 : j + 1]))
                 remaining = remaining[j + 1 :].lstrip()
         if (i := remaining.find("]")) != -1:
