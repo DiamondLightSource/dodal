@@ -124,6 +124,11 @@ def test_leading_comma_in_list_causes_error():
         GDABeamlineParameters.parse_value("[[1, 2], [ ,3, 4]]")
 
 
+def test_find_close_bracket_raises_error():
+    with pytest.raises(ValueError):
+        GDABeamlineParameters.find_close_square_bracket("a[")
+
+
 @pytest.fixture(autouse=True)
 def i03_beamline_parameters():
     with patch.dict(
