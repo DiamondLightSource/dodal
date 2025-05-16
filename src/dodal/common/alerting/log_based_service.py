@@ -21,4 +21,8 @@ class LoggingAlertService:
 
     def raise_alert(self, summary: str, content: str):
         message = f"***ALERT*** summary={summary} content={content}"
-        LOGGER.log(self._level, message)
+        LOGGER.log(
+            self._level,
+            message,
+            extra={"alert_summary": summary, "alert_content": content},
+        )
