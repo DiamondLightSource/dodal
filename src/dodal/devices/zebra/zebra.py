@@ -68,6 +68,14 @@ class RotationDirection(StrictEnum):
     def multiplier(self):
         return 1 if self == RotationDirection.POSITIVE else -1
 
+    @property
+    def opposite(self) -> RotationDirection:
+        return (
+            RotationDirection.POSITIVE
+            if self == RotationDirection.NEGATIVE
+            else RotationDirection.NEGATIVE
+        )
+
 
 class ArmDemand(Enum):
     ARM = 1
