@@ -24,12 +24,20 @@ from dodal.devices.electron_analyser.abstract.base_driver_io import (
     TAbstractAnalyserDriverIO,
 )
 from dodal.devices.electron_analyser.abstract.base_region import (
+    AbstractBaseRegion,
+    AbstractBaseSequence,
     TAbstractBaseRegion,
     TAbstractBaseSequence,
 )
+from dodal.devices.electron_analyser.util import to_kinetic_energy
 
 
 class AnalyserController(ADBaseController[AbstractAnalyserDriverIO]):
+    """
+    Use the standard controller. We have to implenement deadtime method. I think this is
+    safe to return 0.
+    """
+
     def get_deadtime(self, exposure: float | None) -> float:
         return 0
 
@@ -43,7 +51,7 @@ class BaseElectronAnalyserDetector(
     Generic[TAbstractAnalyserDriverIO],
 ):
     """
-    Detector for data acquisition of electron analyser. Can only acquire using settings
+    Detector for data acquisition of electron self.driver. Can only acquire using settings
     already configured for the device.
 
     If possible, this should be changed to inheirt from a StandardDetector. Currently,
@@ -128,12 +136,45 @@ class AbstractElectronAnalyserRegionDetector(
     @AsyncStatus.wrap
     async def stage(self) -> None:
         super().stage()
-        self.configure_region()
+        await self.configure_region()
+
+    async def configure_region(self) -> None:
+        # ToDo - Add way to get excitation energy from dcm / pgm device
+        excitation_energy = 0
+        await self.configure_base_region(excitation_energy)
+        await self.configure_specific_region(excitation_energy)
+
+    async def configure_base_region(self, excitation_energy: float) -> None:
+        """
+        This should encompass all core region logic which is common to every electron
+        analyser.
+        """
+        low_energy = to_kinetic_energy(
+            self.region.low_energy, self.region.energy_mode, excitation_energy
+        )
+        high_energy = to_kinetic_energy(
+            self.region.high_energy, self.region.energy_mode, excitation_energy
+        )
+        pass_energy_type = self.driver.pass_energy_type
+        pass_energy = pass_energy_type(self.region.pass_energy)
+
+        await asyncio.gather(
+            self.driver.region_name.set(self.region.name),
+            self.driver.energy_mode.set(self.region.energy_mode),
+            self.driver.excitation_energy.set(excitation_energy),
+            self.driver.low_energy.set(low_energy),
+            self.driver.high_energy.set(high_energy),
+            self.driver.slices.set(self.region.slices),
+            self.driver.lens_mode.set(self.region.lens_mode),
+            self.driver.pass_energy.set(pass_energy),
+            self.driver.iterations.set(self.region.iterations),
+            self.driver.acquisition_mode.set(self.region.acquisition_mode),
+        )
 
     @abstractmethod
-    def configure_region(self):
+    async def configure_specific_region(self, excitation_energy: float) -> None:
         """
-        Setup analyser with configured region.
+        Method to perform any specialised region setup logic.
         """
 
 
@@ -142,13 +183,23 @@ TAbstractElectronAnalyserRegionDetector = TypeVar(
     bound=AbstractElectronAnalyserRegionDetector,
 )
 
+ElectronAnalyserRegionDetector = AbstractElectronAnalyserRegionDetector[
+    AbstractAnalyserDriverIO,
+    AbstractBaseRegion,
+]
+
 
 class AbstractElectronAnalyserDetector(
     BaseElectronAnalyserDetector[TAbstractAnalyserDriverIO],
-    Generic[TAbstractAnalyserDriverIO, TAbstractBaseSequence, TAbstractBaseRegion],
+    Generic[
+        TAbstractElectronAnalyserRegionDetector,
+        TAbstractAnalyserDriverIO,
+        TAbstractBaseSequence,
+        TAbstractBaseRegion,
+    ],
 ):
     """
-    Electron analyser detector with the additional functionality to load a sequence file
+    Electron self.driver detector with the additional functionality to load a sequence file
     and create a list of temporary ElectronAnalyserRegionDetector objects. These will
     setup configured region settings before data acquisition.
     """
@@ -178,33 +229,34 @@ class AbstractElectronAnalyserDetector(
     @abstractmethod
     def _create_region_detector(
         self, driver: TAbstractAnalyserDriverIO, region: TAbstractBaseRegion
-    ) -> AbstractElectronAnalyserRegionDetector[
-        TAbstractAnalyserDriverIO, TAbstractBaseRegion
-    ]:
+    ) -> TAbstractElectronAnalyserRegionDetector:
         """
         Define a way to create a temporary detector object that will always setup a
         specific region before acquiring.
         """
 
     def create_region_detector_list(
-        self, filename: str
-    ) -> list[
-        AbstractElectronAnalyserRegionDetector[
-            TAbstractAnalyserDriverIO, TAbstractBaseRegion
-        ]
-    ]:
+        self, filename: str, enabled_only=True
+    ) -> list[TAbstractElectronAnalyserRegionDetector]:
         """
         Create a list of detectors that will setup a specific region from the sequence
         file when used.
         """
         seq = self.load_sequence(filename)
-        return [
-            self._create_region_detector(self.driver, r)
-            for r in seq.get_enabled_regions()
-        ]
+        regions = seq.get_enabled_regions() if enabled_only else seq.regions
+        return [self._create_region_detector(self.driver, r) for r in regions]
 
 
 TAbstractElectronAnalyserDetector = TypeVar(
     "TAbstractElectronAnalyserDetector",
     bound=AbstractElectronAnalyserDetector,
 )
+
+ElectronAnalyserDetector = AbstractElectronAnalyserDetector[
+    AbstractElectronAnalyserRegionDetector[
+        AbstractAnalyserDriverIO, AbstractBaseRegion
+    ],
+    AbstractAnalyserDriverIO,
+    AbstractBaseSequence[AbstractBaseRegion],
+    AbstractBaseRegion,
+]

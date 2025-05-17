@@ -4,7 +4,6 @@ import pytest
 from ophyd_async.core import init_devices
 
 from dodal.devices.electron_analyser.abstract import (
-    AbstractBaseRegion,
     AbstractBaseSequence,
     TAbstractAnalyserDriverIO,
     TAbstractBaseRegion,
@@ -12,8 +11,6 @@ from dodal.devices.electron_analyser.abstract import (
 from dodal.devices.electron_analyser.specs import SpecsDetector
 from dodal.devices.electron_analyser.vgscienta import (
     VGScientaDetector,
-    VGScientaRegion,
-    VGScientaSequence,
 )
 
 ElectronAnalyserDetectorImpl = SpecsDetector | VGScientaDetector
@@ -53,13 +50,10 @@ def region(
     return region
 
 
+# ToDo - This needs to come from a device
 @pytest.fixture
-def excitation_energy(
-    sequence: AbstractBaseSequence, region: AbstractBaseRegion
-) -> float:
-    if isinstance(sequence, VGScientaSequence) and isinstance(region, VGScientaRegion):
-        return sequence.get_excitation_energy_source_by_region(region).value
-    return 1000
+def excitation_energy() -> float:
+    return 0
 
 
 @pytest.fixture

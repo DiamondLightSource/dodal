@@ -1,14 +1,12 @@
 import pytest
 
 from dodal.devices.electron_analyser.abstract import (
-    AbstractAnalyserDriverIO,
-    AbstractBaseRegion,
-    AbstractBaseSequence,
     AbstractElectronAnalyserDetector,
+    ElectronAnalyserDetector,
 )
 from dodal.devices.electron_analyser.specs import SpecsDetector
 from dodal.devices.electron_analyser.vgscienta import VGScientaDetector
-from tests.devices.unit_tests.electron_analyser.test_util import get_test_sequence
+from tests.devices.unit_tests.electron_analyser.util import get_test_sequence
 
 
 @pytest.fixture(params=[SpecsDetector, VGScientaDetector])
@@ -19,18 +17,12 @@ def detector_class(
 
 
 @pytest.fixture
-def sequence_file_path(
-    sim_detector: AbstractElectronAnalyserDetector[
-        AbstractAnalyserDriverIO, AbstractBaseSequence, AbstractBaseRegion
-    ],
-) -> str:
+def sequence_file_path(sim_detector: ElectronAnalyserDetector) -> str:
     return get_test_sequence(type(sim_detector))
 
 
 def test_analyser_detector_loads_sequence_correctly(
-    sim_detector: AbstractElectronAnalyserDetector[
-        AbstractAnalyserDriverIO, AbstractBaseSequence, AbstractBaseRegion
-    ],
+    sim_detector: ElectronAnalyserDetector,
     sequence_file_path: str,
 ) -> None:
     seq = sim_detector.load_sequence(sequence_file_path)
@@ -38,9 +30,7 @@ def test_analyser_detector_loads_sequence_correctly(
 
 
 def test_analyser_detector_creates_region_detectors(
-    sim_detector: AbstractElectronAnalyserDetector[
-        AbstractAnalyserDriverIO, AbstractBaseSequence, AbstractBaseRegion
-    ],
+    sim_detector: ElectronAnalyserDetector,
     sequence_file_path: str,
 ) -> None:
     seq = sim_detector.load_sequence(sequence_file_path)
@@ -52,9 +42,7 @@ def test_analyser_detector_creates_region_detectors(
 
 
 def test_analyser_detector_has_driver_as_child_and_region_detector_does_not(
-    sim_detector: AbstractElectronAnalyserDetector[
-        AbstractAnalyserDriverIO, AbstractBaseSequence, AbstractBaseRegion
-    ],
+    sim_detector: ElectronAnalyserDetector,
     sequence_file_path: str,
 ) -> None:
     # Remove parent name from driver name so it can be checked it exists in
