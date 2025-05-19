@@ -19,10 +19,37 @@ def goniometer(RE: RunEngine) -> Goniometer:
     return gonio
 
 
-async def test_vertical_position_set(goniometer: Goniometer):
-    await goniometer._set(value=5)
-    assert await goniometer.vertical_position.get_value() == 5
+@pytest.mark.parametrize(
+    "vertical_set_value, omega_set_value, expected_horz, expected_vert",
+    [
+        [2, 60, 1, math.sqrt(3)],
+        [-10, 390, -5 * math.sqrt(3), -5],
+        [0.5, -135, -math.sqrt(2) / 4, -math.sqrt(2) / 4],
+        [1, 0, 1, 0],
+        [-1.5, 90, 0, -1.5],
+    ],
+)
+async def test_vertical_signal_set(
+    goniometer: Goniometer,
+    vertical_set_value: float,
+    omega_set_value: float,
+    expected_horz: float,
+    expected_vert: float,
+):
+    await goniometer.omega.set(omega_set_value)
+    await goniometer.vertical_position.set(vertical_set_value)
 
+    assert await goniometer.sampz.user_readback.get_value() == pytest.approx(
+        expected_horz
+    )
+    assert await goniometer.sampy.user_readback.get_value() == pytest.approx(
+        expected_vert
+    )
 
-async def test_vertical_position_get(goniometer: Goniometer):
-    assert goniometer._get(math.sqrt(3), 1, 30) == pytest.approx(2)
+    await goniometer.vertical_position.set(vertical_set_value * 2)
+    assert await goniometer.sampz.user_readback.get_value() == pytest.approx(
+        expected_horz * 2
+    )
+    assert await goniometer.sampy.user_readback.get_value() == pytest.approx(
+        expected_vert * 2
+    )
