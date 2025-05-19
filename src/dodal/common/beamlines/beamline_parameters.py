@@ -1,3 +1,4 @@
+import ast
 from collections.abc import Iterable
 from typing import Any, cast
 
@@ -58,62 +59,7 @@ class GDABeamlineParameters:
 
     @classmethod
     def parse_value(cls, value: str):
-        if value[0] == "[":
-            return cls.parse_list(value[1:].strip())
-        else:
-            return cls.parse_list_element(value)
-
-    @classmethod
-    def parse_list_element(cls, value: str):
-        if value == "Yes":
-            return True
-        elif value == "No":
-            return False
-        else:
-            return float(value)
-
-    @classmethod
-    def find_first_index(cls, value: str, chars: Iterable):
-        return min((value.find(c) for c in chars if c in value), default=-1)
-
-    @classmethod
-    def find_close_square_bracket(cls, value: str):
-        index = 0
-        open = 1
-        close = 0
-        if not value[0] == "[":
-            raise ValueError(f"List must start with '[': {value}")
-        while open > close:
-            index += 1
-            if value[index] == "[":
-                open += 1
-            elif value[index] == "]":
-                close += 1
-        return index
-
-    @classmethod
-    def parse_list(cls, value: str):
-        list_output = []
-        remaining = value.strip()
-        if remaining[0] == ",":
-            raise ValueError(f"List has a leading comma: {value}.")
-        i = 0
-        while (i := cls.find_first_index(remaining, (",", "["))) != -1:
-            if remaining[:i]:
-                list_output.append(cls.parse_list_element(remaining[:i]))
-            if remaining[i] == ",":
-                remaining = remaining[i + 1 :].lstrip()
-            elif remaining[i] == "[":
-                j = cls.find_close_square_bracket(remaining[i:])
-                list_output.append(cls.parse_list(remaining[i + 1 : j + 1]))
-                remaining = remaining[j + 1 :].lstrip()
-        if (i := remaining.find("]")) != -1:
-            if remaining[:i]:
-                list_output.append(cls.parse_list_element(remaining[:i]))
-                remaining = remaining[i + 1 :].lstrip()
-        else:
-            raise ValueError("Missing closing ']' in list expression")
-        return list_output
+        return ast.literal_eval(value.replace("Yes", "True").replace("No", "False"))
 
 
 def get_beamline_parameters(beamline_param_path: str | None = None):
