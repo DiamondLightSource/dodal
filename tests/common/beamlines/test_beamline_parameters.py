@@ -61,7 +61,7 @@ def test_parse_list():
 
 
 def test_parse_list_raises_exception():
-    with pytest.raises(ValueError):
+    with pytest.raises(SyntaxError):
         GDABeamlineParameters.parse_value("[1, 2")
 
 
@@ -118,15 +118,17 @@ def test_parse_nested_nested_list():
 
 
 def test_leading_comma_in_list_causes_error():
-    with pytest.raises(ValueError):
+    with pytest.raises(SyntaxError):
         GDABeamlineParameters.parse_value("[,1, 2, 3, 4]")
-    with pytest.raises(ValueError):
+    with pytest.raises(SyntaxError):
         GDABeamlineParameters.parse_value("[[1, 2], [ ,3, 4]]")
 
 
-def test_find_close_bracket_raises_error():
-    with pytest.raises(ValueError):
-        GDABeamlineParameters.find_close_square_bracket("a[")
+def test_Yes_and_No_replaced_with_bool_values():
+    value = "[Yes, No, True, False, 0, 1]"
+    expected = [True, False, True, False, 0, 1]
+    actual = GDABeamlineParameters.parse_value(value)
+    assert actual == expected
 
 
 @pytest.fixture(autouse=True)
