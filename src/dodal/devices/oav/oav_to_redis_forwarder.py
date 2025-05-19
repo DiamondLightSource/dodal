@@ -1,7 +1,7 @@
 import asyncio
 from collections.abc import Awaitable, Callable
 from datetime import timedelta
-from enum import Enum
+from enum import IntEnum
 from uuid import uuid4
 
 from aiohttp import ClientResponse, ClientSession
@@ -29,7 +29,7 @@ async def get_next_jpeg(response: ClientResponse) -> bytes:
             return line + await response.content.readuntil(JPEG_STOP_BYTE)
 
 
-class Source(int, Enum):
+class Source(IntEnum):
     FULL_SCREEN = 0
     ROI = 1
 
