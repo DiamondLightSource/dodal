@@ -1,6 +1,11 @@
+import asyncio
 from math import isclose
 
-from ophyd_async.core import StandardReadable, StrictEnum, derived_signal_r
+from ophyd_async.core import (
+    StandardReadable,
+    StrictEnum,
+    derived_signal_rw,
+)
 from ophyd_async.epics.motor import Motor
 
 from dodal.common.beamlines.beamline_parameters import GDABeamlineParameters
@@ -37,8 +42,7 @@ class Beamstop(StandardReadable):
         x: beamstop x position in mm
         y: beamstop y position in mm
         z: beamstop z position in mm
-        selected_pos: Get the current position of the beamstop as an enum. Currently this
-            is read-only.
+        selected_pos: Get or set the current position of the beamstop as an enum.
     """
 
     def __init__(
@@ -51,10 +55,13 @@ class Beamstop(StandardReadable):
             self.x_mm = Motor(prefix + "X")
             self.y_mm = Motor(prefix + "Y")
             self.z_mm = Motor(prefix + "Z")
-            self.selected_pos = derived_signal_r(
-                self._get_selected_position, x=self.x_mm, y=self.y_mm, z=self.z_mm
+            self.selected_pos = derived_signal_rw(
+                self._get_selected_position,
+                self._set_selected_position,
+                x=self.x_mm,
+                y=self.y_mm,
+                z=self.z_mm,
             )
-
         self._in_beam_xyz_mm = [
             float(beamline_parameters[f"in_beam_{axis}_STANDARD"])
             for axis in ("x", "y", "z")
@@ -77,3 +84,13 @@ class Beamstop(StandardReadable):
             return BeamstopPositions.DATA_COLLECTION
         else:
             return BeamstopPositions.UNKNOWN
+
+    async def _set_selected_position(self, position: BeamstopPositions) -> None:
+        if position == BeamstopPositions.DATA_COLLECTION:
+            await asyncio.gather(
+                self.x_mm.set(self._in_beam_xyz_mm[0]),
+                self.y_mm.set(self._in_beam_xyz_mm[1]),
+                self.z_mm.set(self._in_beam_xyz_mm[2]),
+            )
+        elif position == BeamstopPositions.UNKNOWN:
+            raise ValueError(f"Cannot set beamstop to position {position}")

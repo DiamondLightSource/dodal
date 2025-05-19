@@ -3,19 +3,16 @@ from bluesky.utils import MsgGenerator, plan
 from ophyd_async.epics.adcore import ADImageMode
 
 from dodal.common.types import MsgGenerator
-from dodal.devices.electron_analyser.abstract_analyser_io import (
+from dodal.devices.electron_analyser.abstract import (
     AbstractAnalyserDriverIO,
-)
-from dodal.devices.electron_analyser.abstract_region import (
     AbstractBaseRegion,
 )
-from dodal.devices.electron_analyser.specs_analyser_io import SpecsAnalyserDriverIO
-from dodal.devices.electron_analyser.specs_region import SpecsRegion
+from dodal.devices.electron_analyser.specs import SpecsAnalyserDriverIO, SpecsRegion
 from dodal.devices.electron_analyser.util import to_kinetic_energy
-from dodal.devices.electron_analyser.vgscienta_analyser_io import (
+from dodal.devices.electron_analyser.vgscienta import (
     VGScientaAnalyserDriverIO,
+    VGScientaRegion,
 )
-from dodal.devices.electron_analyser.vgscienta_region import VGScientaRegion
 from dodal.log import LOGGER
 
 
@@ -89,9 +86,7 @@ def configure_vgscienta(
         analyser.x_channel_size, region.x_channel_size(),
         analyser.y_channel_size, region.y_channel_size(),
         analyser.detector_mode, region.detector_mode,
+        analyser.excitation_energy_source, region.excitation_energy_source,
         analyser.image_mode, ADImageMode.SINGLE,
-        # The below should ideally be done read from epics.
-        # See issue https://github.com/bluesky/ophyd-async/issues/877
-        analyser.total_steps, region.total_steps
     )
     # fmt: on
