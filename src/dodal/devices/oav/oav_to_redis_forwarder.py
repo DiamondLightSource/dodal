@@ -29,7 +29,7 @@ async def get_next_jpeg(response: ClientResponse) -> bytes:
             return line + await response.content.readuntil(JPEG_STOP_BYTE)
 
 
-class Source(Enum):
+class Source(int, Enum):
     FULL_SCREEN = 0
     ROI = 1
 
