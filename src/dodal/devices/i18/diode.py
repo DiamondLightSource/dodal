@@ -45,6 +45,6 @@ class Diode(StandardReadable):
             )  # more complex, will be fixed on Tuesday 20.05.2025
             self.positioner_b = create_positioner(
                 FilterBValues, prefix + "B:MP", positioner_pv_suffix=":SELECT"
-            )  
+            )
 
         super().__init__(name=name)
