@@ -1,6 +1,7 @@
 import time
 
 import bluesky.plan_stubs as bps
+from bluesky import preprocessors as bpp
 from bluesky.run_engine import RunEngine
 from ophyd_async.core import DetectorTrigger
 from ophyd_async.fastcs.eiger import EigerDetector, EigerTriggerInfo
@@ -10,29 +11,41 @@ from dodal.devices.detector import DetectorParams
 from dodal.log import LOGGER, do_default_logging_setup
 
 
+@bpp.run_decorator()
 def configure_and_arm_detector(
     eiger: EigerDetector,
     detector_params: DetectorParams,
     trigger_info: EigerTriggerInfo,
 ):
-    start = time.time()
     assert detector_params.expected_energy_ev
-    yield from bps.abs_set(eiger.odin.capture, 0)
-    LOGGER.info(f"Stopping Odin: {time.time() - start}s")
+    start = time.time()
+    yield from bps.unstage(eiger, wait=True)
+    LOGGER.info(f"Stopping Eiger-Odin: {time.time() - start}s")
+    start = time.time()
     yield from set_cam_pvs(eiger, detector_params, wait=True)
     LOGGER.info(f"Setting CAM PVs: {time.time() - start}s")
-    yield from set_odin_pvs(eiger, detector_params, wait=True)
-    LOGGER.info(f"Setting Odin PVs: {time.time() - start}s")
+    start = time.time()
     yield from change_roi_mode(eiger, detector_params, wait=True)
     LOGGER.info(f"Changing ROI Mode: {time.time() - start}s")
+    start = time.time()
     yield from bps.abs_set(eiger.odin.num_frames_chunks, 1)
     LOGGER.info(f"Setting # of Frame Chunks: {time.time() - start}s")
+    start = time.time()
     yield from set_mx_settings_pvs(eiger, detector_params, wait=True)
     LOGGER.info(f"Setting MX PVs: {time.time() - start}s")
+    start = time.time()
     yield from bps.prepare(eiger, trigger_info, wait=True)
     LOGGER.info(f"Preparing Eiger: {time.time() - start}s")
-    yield from bps.trigger(eiger, wait=True)
+    start = time.time()
+    yield from bps.kickoff(eiger, wait=True)
+    LOGGER.info(f"Kickoff Eiger: {time.time() - start}s")
+    start = time.time()
+    yield from bps.trigger(eiger.drv.detector.trigger)  # type: ignore
     LOGGER.info(f"Triggering Eiger: {time.time() - start}s")
+    start = time.time()
+    yield from bps.complete(eiger, wait=True)
+    LOGGER.info(f"Completing Capture: {time.time() - start}s")
+    start = time.time()
     yield from bps.unstage(eiger, wait=True)
     LOGGER.info(f"Disarming Eiger: {time.time() - start}s")
 
@@ -124,32 +137,10 @@ def set_mx_settings_pvs(
         yield from bps.wait(group)
 
 
-def set_odin_pvs(
-    eiger: EigerDetector,
-    detector_params: DetectorParams,
-    wait: bool,
-    group="odin_pvs",
-):
-    yield from bps.abs_set(
-        eiger.odin.file_path,
-        detector_params.directory,
-        group=group,
-    )
-    yield from bps.abs_set(
-        eiger.odin.file_name,
-        detector_params.full_filename,
-        group=group,
-    )
-
-    if wait:
-        yield from bps.wait(group)
-
-
 if __name__ == "__main__":
     RE = RunEngine()
     do_default_logging_setup()
     eiger = fastcs_eiger(connect_immediately=True)
-
     RE(
         configure_and_arm_detector(
             eiger=eiger,
@@ -160,14 +151,14 @@ if __name__ == "__main__":
                 prefix="",
                 detector_distance=255,
                 omega_start=0,
-                omega_increment=0.2,
+                omega_increment=0.1,
                 num_images_per_trigger=1,
-                num_triggers=5,
+                num_triggers=1,
                 use_roi_mode=False,
                 det_dist_to_beam_converter_path="/dls_sw/i03/software/daq_configuration/lookup/DetDistToBeamXYConverter.txt",
             ),
             trigger_info=EigerTriggerInfo(
-                number_of_events=5,
+                number_of_events=1,
                 energy_ev=12800,
                 trigger=DetectorTrigger.INTERNAL,
                 deadtime=0.0001,
