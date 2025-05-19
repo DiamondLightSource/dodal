@@ -7,6 +7,7 @@ from ophyd_async.core import (
     AsyncStatus,
     Device,
     StandardReadable,
+    StandardReadableFormat,
     StrictEnum,
     set_and_wait_for_value,
     wait_for_value,
@@ -69,18 +70,21 @@ class BartRobot(StandardReadable, Movable[SampleLocation]):
     LOAD_TOLERANCE_MM = 0.02
 
     def __init__(self, name: str, prefix: str) -> None:
-        self.barcode = epics_signal_r(str, prefix + "BARCODE")
-        self.gonio_pin_sensor = epics_signal_r(PinMounted, prefix + "PIN_MOUNTED")
+        with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
+            self.barcode = epics_signal_r(str, prefix + "BARCODE")
+            self.gonio_pin_sensor = epics_signal_r(PinMounted, prefix + "PIN_MOUNTED")
+
+            self.current_puck = epics_signal_r(float, prefix + "CURRENT_PUCK_RBV")
+            self.current_pin = epics_signal_r(float, prefix + "CURRENT_PIN_RBV")
 
         self.next_pin = epics_signal_rw_rbv(float, prefix + "NEXT_PIN")
         self.next_puck = epics_signal_rw_rbv(float, prefix + "NEXT_PUCK")
-        self.current_puck = epics_signal_r(float, prefix + "CURRENT_PUCK_RBV")
-        self.current_pin = epics_signal_r(float, prefix + "CURRENT_PIN_RBV")
 
-        self.next_sample_id = epics_signal_rw_rbv(int, prefix + "NEXT_ID")
         self.sample_id = epics_signal_r(int, prefix + "CURRENT_ID_RBV")
+        self.next_sample_id = epics_signal_rw_rbv(int, prefix + "NEXT_ID")
 
         self.load = epics_signal_x(prefix + "LOAD.PROC")
+        self.unload = epics_signal_x(prefix + "UNLD.PROC")
         self.program_running = epics_signal_r(bool, prefix + "PROGRAM_RUNNING")
         self.program_name = epics_signal_r(str, prefix + "PROGRAM_NAME")
 
