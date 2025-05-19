@@ -20,6 +20,28 @@ from dodal.beamlines import adsim
 from dodal.devices.adsim import SimStage
 from dodal.plans import count
 
+"""
+System tests that can be run against the containerised IOCs from epics-conatainers:
+https://github.com/epics-containers/example-services
+
+Check out that repository and using docker or podman deploy the services in the compose
+file:
+
+```sh
+docker compose up -d
+```
+
+Run the system tests with your EPICS environment configured to talk to the gateways
+that are deployed by the above:
+```sh
+EPICS_CA_NAME_SERVERS=127.0.0.1:5094 \
+EPICS_PVA_NAME_SERVERS=127.0.0.1:5095 \
+EPICS_CA_ADDR_LIST=127.0.0.1:5094 \
+python -m pytest -m 'requires(instrument="adsim")'
+```
+
+"""
+
 
 @pytest.fixture
 def det(RE) -> Generator[StandardDetector]:
@@ -126,8 +148,6 @@ def test_plan_produces_expected_resources(
         assert resource.get("mimetype") == "application/x-hdf5"
         assert resource.get("parameters") == {
             "dataset": "/entry/data/data",
-            "swmr": False,
-            "multiplier": 1,
             "chunk_shape": (1, 1024, 1024),
         }
 

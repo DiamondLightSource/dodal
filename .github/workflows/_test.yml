@@ -57,8 +57,27 @@ jobs:
         run: |
           python .github/scripts/check_test_durations.py unit-report.json 1
 
+      - name: Checkout simulated devices
+        uses: actions/checkout@v4
+        with:
+          repository: epics-containers/example-services
+          path: example-services
+
+      - name: Run docker compose
+        uses: hoverkraft-tech/compose-action@v2.2.0
+        with:
+          compose-file: "./example-services/compose.yaml"
+          services: |
+            bl01t-di-cam-01
+            bl01t-mo-sim-01
+            ca-gateway
+
       - name: Run system tests
         run: tox -e system-report
+        env:
+          EPICS_CA_NAME_SERVERS: 127.0.0.1:5094
+          EPICS_PVA_NAME_SERVERS: 127.0.0.1:5095
+          EPICS_CA_ADDR_LIST: 127.0.0.1:5094
 
       - name: Check system test durations
         run: |
