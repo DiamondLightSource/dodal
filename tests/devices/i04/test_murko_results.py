@@ -354,8 +354,26 @@ async def test_trigger_stops_once_last_angle_found(
     assert mock_camera_coordinates.call_args_list[2][0][2] == 270
 
 
-async def test_stage_and_unstage():
-    murko_results = MurkoResultsDevice(name="murko_results")
-    murko_results.pubsub = AsyncMock()
-    await murko_results.stage()
-    await murko_results.unstage()
+async def test_assert_subscribes_to_queue_and_clears_results_on_stage(
+    mock_murko_results: MurkoResultsDevice,
+):
+    mock_murko_results._x_mm_setter(1)
+    mock_murko_results._y_mm_setter(2)
+    mock_murko_results._z_mm_setter(3)
+
+    mock_murko_results.pubsub = (mock_pubsub := AsyncMock())
+    await mock_murko_results.stage()
+
+    mock_pubsub.subscribe.assert_called_once_with("murko-results")
+    assert await mock_murko_results.x_mm.get_value() == 0
+    assert await mock_murko_results.y_mm.get_value() == 0
+    assert await mock_murko_results.z_mm.get_value() == 0
+
+
+async def test_assert_unsubscribes_to_queue_on_unstage(
+    mock_murko_results: MurkoResultsDevice,
+):
+    mock_murko_results.pubsub = (mock_pubsub := AsyncMock())
+    await mock_murko_results.unstage()
+
+    mock_pubsub.unsubscribe.assert_called_once()
