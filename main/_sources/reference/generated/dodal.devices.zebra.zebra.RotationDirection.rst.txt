@@ -72,6 +72,9 @@ dodal.devices.zebra.zebra.RotationDirection
       ~RotationDirection.multiplier
       
       
+      ~RotationDirection.opposite
+      
+      
       ~RotationDirection.POSITIVE
       
       
