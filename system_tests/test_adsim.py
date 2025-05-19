@@ -45,7 +45,7 @@ def documents_from_num(
     return docs
 
 
-@pytest.mark.adsim
+@pytest.mark.requires(instrument="adsim")
 @pytest.mark.parametrize(
     "documents_from_num, shape", ([1, (1,)], [3, (3,)]), indirect=["documents_from_num"]
 )
@@ -67,7 +67,7 @@ def test_plan_produces_expected_start_document(
     )
 
 
-@pytest.mark.adsim
+@pytest.mark.requires(instrument="adsim")
 @pytest.mark.parametrize(
     "documents_from_num, length", ([1, 1], [3, 3]), indirect=["documents_from_num"]
 )
@@ -81,7 +81,7 @@ def test_plan_produces_expected_stop_document(
     assert stop.get("exit_status") == "success"
 
 
-@pytest.mark.adsim
+@pytest.mark.requires(instrument="adsim")
 @pytest.mark.parametrize("documents_from_num", [1], indirect=True)
 def test_plan_produces_expected_descriptor(
     documents_from_num: dict[str, list[DocumentType]], det: StandardDetector
@@ -94,7 +94,7 @@ def test_plan_produces_expected_descriptor(
     assert descriptor.get("name") == "primary"
 
 
-@pytest.mark.adsim
+@pytest.mark.requires(instrument="adsim")
 @pytest.mark.parametrize(
     "documents_from_num, length", ([1, 1], [3, 3]), indirect=["documents_from_num"]
 )
@@ -111,7 +111,7 @@ def test_plan_produces_expected_events(
         assert event.get("seq_num") == i + 1
 
 
-@pytest.mark.adsim
+@pytest.mark.requires(instrument="adsim")
 @pytest.mark.parametrize("documents_from_num", [1, 3], indirect=True)
 def test_plan_produces_expected_resources(
     documents_from_num: dict[str, list[DocumentType]],
@@ -132,7 +132,7 @@ def test_plan_produces_expected_resources(
         }
 
 
-@pytest.mark.adsim
+@pytest.mark.requires(instrument="adsim")
 @pytest.mark.parametrize(
     "documents_from_num, length", ([1, 1], [3, 3]), indirect=["documents_from_num"]
 )
