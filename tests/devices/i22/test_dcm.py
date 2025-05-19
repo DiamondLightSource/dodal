@@ -1,5 +1,3 @@
-from unittest.mock import ANY
-
 import bluesky.plans as bp
 import pytest
 from bluesky.run_engine import RunEngine
@@ -15,15 +13,15 @@ from dodal.common.crystal_metadata import (
     MaterialsEnum,
     make_crystal_metadata_from_material,
 )
-from dodal.devices.i22.dcm import DoubleCrystalMonochromator
+from dodal.devices.i22.dcm import DCM
 
 
 @pytest.fixture
-async def dcm() -> DoubleCrystalMonochromator:
+async def dcm() -> DCM:
     metadata_1 = make_crystal_metadata_from_material(MaterialsEnum.Si, (1, 1, 1))
     metadata_2 = make_crystal_metadata_from_material(MaterialsEnum.Si, (1, 1, 1))
     async with init_devices(mock=True):
-        dcm = DoubleCrystalMonochromator(
+        dcm = DCM(
             prefix="FOO-MO",
             temperature_prefix="FOO-DI",
             crystal_1_metadata=metadata_1,
@@ -36,7 +34,7 @@ async def dcm() -> DoubleCrystalMonochromator:
 def test_count_dcm(
     RE: RunEngine,
     run_engine_documents: dict[str, list[dict]],
-    dcm: DoubleCrystalMonochromator,
+    dcm: DCM,
 ):
     RE(bp.count([dcm]))
     assert_emitted(
@@ -57,210 +55,163 @@ def test_count_dcm(
     ],
 )
 async def test_wavelength(
-    dcm: DoubleCrystalMonochromator,
+    dcm: DCM,
     energy: float,
     wavelength: float,
 ):
-    set_mock_value(dcm.energy.user_readback, energy)
+    set_mock_value(dcm.energy_in_kev.user_readback, energy)
     reading = await dcm.read()
-    assert reading["dcm-wavelength"]["value"] == wavelength
+    assert reading["dcm-wavelength_in_a"]["value"] == wavelength
 
 
-@pytest.mark.skip("See https://github.com/bluesky/ophyd-async/issues/839")
-async def test_reading(dcm: DoubleCrystalMonochromator):
+async def test_reading(dcm: DCM):
     await assert_reading(
         dcm,
         {
             "dcm-backplate_temp": {
-                "alarm_severity": 0,
-                "timestamp": ANY,
                 "value": 0.0,
             },
-            "dcm-bragg": {
-                "alarm_severity": 0,
-                "timestamp": ANY,
+            "dcm-bragg_in_degrees": {
                 "value": 0.0,
             },
             "dcm-crystal_1_heater_temp": {
-                "alarm_severity": 0,
-                "timestamp": ANY,
-                "value": 0.0,
-            },
-            "dcm-crystal_1_roll": {
-                "alarm_severity": 0,
-                "timestamp": ANY,
                 "value": 0.0,
             },
             "dcm-crystal_1_temp": {
-                "alarm_severity": 0,
-                "timestamp": ANY,
                 "value": 0.0,
             },
             "dcm-crystal_2_heater_temp": {
-                "alarm_severity": 0,
-                "timestamp": ANY,
-                "value": 0.0,
-            },
-            "dcm-crystal_2_pitch": {
-                "alarm_severity": 0,
-                "timestamp": ANY,
-                "value": 0.0,
-            },
-            "dcm-crystal_2_roll": {
-                "alarm_severity": 0,
-                "timestamp": ANY,
                 "value": 0.0,
             },
             "dcm-crystal_2_temp": {
-                "alarm_severity": 0,
-                "timestamp": ANY,
                 "value": 0.0,
             },
-            "dcm-energy": {
-                "alarm_severity": 0,
-                "timestamp": ANY,
+            "dcm-crystal_metadata_d_spacing_a": {
                 "value": 0.0,
             },
-            "dcm-offset": {
-                "alarm_severity": 0,
-                "timestamp": ANY,
+            "dcm-energy_in_kev": {
+                "value": 0.0,
+            },
+            "dcm-offset_in_mm": {
                 "value": 0.0,
             },
             "dcm-perp": {
-                "alarm_severity": 0,
-                "timestamp": ANY,
                 "value": 0.0,
             },
             "dcm-perp_temp": {
-                "alarm_severity": 0,
-                "timestamp": ANY,
                 "value": 0.0,
             },
-            "dcm-wavelength": {
-                "timestamp": ANY,
+            "dcm-wavelength_in_a": {
+                "value": 0.0,
+            },
+            "dcm-xtal_1-roll_in_mrad": {
+                "value": 0.0,
+            },
+            "dcm-xtal_2-pitch_in_mrad": {
+                "value": 0.0,
+            },
+            "dcm-xtal_2-roll_in_mrad": {
                 "value": 0.0,
             },
         },
     )
 
 
-@pytest.mark.skip(
-    reason="https://github.com/bluesky/ophyd-async/issues/618 assert_configuration() on numpy arrays is "
-    "broken"
-)
-async def test_configuration(dcm: DoubleCrystalMonochromator):
+async def test_configuration(dcm: DCM):
     await assert_configuration(
         dcm,
         {
-            "dcm-bragg-motor_egu": {
+            "dcm-bragg_in_degrees-motor_egu": {
                 "value": "",
-                "timestamp": ANY,
-                "alarm_severity": 0,
             },
-            "dcm-bragg-velocity": {
+            "dcm-bragg_in_degrees-offset": {
                 "value": 0.0,
-                "timestamp": ANY,
-                "alarm_severity": 0,
             },
-            "dcm-energy-motor_egu": {
-                "value": "",
-                "timestamp": ANY,
-                "alarm_severity": 0,
-            },
-            "dcm-energy-velocity": {
+            "dcm-bragg_in_degrees-velocity": {
                 "value": 0.0,
-                "timestamp": ANY,
-                "alarm_severity": 0,
-            },
-            "dcm-crystal_1_roll-motor_egu": {
-                "value": "",
-                "timestamp": ANY,
-                "alarm_severity": 0,
-            },
-            "dcm-crystal_1_roll-velocity": {
-                "value": 0.0,
-                "timestamp": ANY,
-                "alarm_severity": 0,
-            },
-            "dcm-offset-motor_egu": {
-                "value": "",
-                "timestamp": ANY,
-                "alarm_severity": 0,
-            },
-            "dcm-offset-velocity": {
-                "value": 0.0,
-                "timestamp": ANY,
-                "alarm_severity": 0,
-            },
-            "dcm-crystal_2_pitch-motor_egu": {
-                "value": "",
-                "timestamp": ANY,
-                "alarm_severity": 0,
-            },
-            "dcm-crystal_2_pitch-velocity": {
-                "value": 0.0,
-                "timestamp": ANY,
-                "alarm_severity": 0,
-            },
-            "dcm-crystal_2_roll-motor_egu": {
-                "value": "",
-                "timestamp": ANY,
-                "alarm_severity": 0,
-            },
-            "dcm-crystal_2_roll-velocity": {
-                "value": 0.0,
-                "timestamp": ANY,
-                "alarm_severity": 0,
-            },
-            "dcm-perp-motor_egu": {
-                "value": "",
-                "timestamp": ANY,
-                "alarm_severity": 0,
-            },
-            "dcm-perp-velocity": {
-                "value": 0.0,
-                "timestamp": ANY,
-                "alarm_severity": 0,
-            },
-            "dcm-crystal_2_d_spacing": {
-                "value": 0.31356,
-                "timestamp": ANY,
-                "alarm_severity": 0,
-            },
-            "dcm-crystal_2_usage": {
-                "value": "Bragg",
-                "timestamp": ANY,
-                "alarm_severity": 0,
-            },
-            "dcm-crystal_2_type": {
-                "value": "silicon",
-                "timestamp": ANY,
-                "alarm_severity": 0,
-            },
-            "dcm-crystal_1_reflection": {
-                "value": [1, 1, 1],
-                "timestamp": ANY,
-                "alarm_severity": 0,
-            },
-            "dcm-crystal_2_reflection": {
-                "value": [1, 1, 1],
-                "timestamp": ANY,
-                "alarm_severity": 0,
             },
             "dcm-crystal_1_d_spacing": {
                 "value": 0.31356,
-                "timestamp": ANY,
-                "alarm_severity": 0,
+            },
+            "dcm-crystal_1_reflection": {"value": [1, 1, 1]},
+            "dcm-crystal_1_type": {
+                "value": "silicon",
             },
             "dcm-crystal_1_usage": {
                 "value": "Bragg",
-                "timestamp": ANY,
-                "alarm_severity": 0,
             },
-            "dcm-crystal_1_type": {
+            "dcm-crystal_2_d_spacing": {
+                "value": 0.31356,
+            },
+            "dcm-crystal_2_reflection": {"value": [1, 1, 1]},
+            "dcm-crystal_2_type": {
                 "value": "silicon",
-                "timestamp": ANY,
-                "alarm_severity": 0,
+            },
+            "dcm-crystal_2_usage": {
+                "value": "Bragg",
+            },
+            "dcm-energy_in_kev-motor_egu": {
+                "value": "",
+            },
+            "dcm-energy_in_kev-offset": {
+                "value": 0.0,
+            },
+            "dcm-energy_in_kev-velocity": {
+                "value": 0.0,
+            },
+            "dcm-offset_in_mm-motor_egu": {
+                "value": "",
+            },
+            "dcm-offset_in_mm-offset": {
+                "value": 0.0,
+            },
+            "dcm-offset_in_mm-velocity": {
+                "value": 0.0,
+            },
+            "dcm-perp-motor_egu": {
+                "value": "",
+            },
+            "dcm-perp-offset": {
+                "value": 0.0,
+            },
+            "dcm-perp-velocity": {
+                "value": 0.0,
+            },
+            "dcm-wavelength_in_a-motor_egu": {
+                "value": "",
+            },
+            "dcm-wavelength_in_a-offset": {
+                "value": 0.0,
+            },
+            "dcm-wavelength_in_a-velocity": {
+                "value": 0.0,
+            },
+            "dcm-xtal_1-roll_in_mrad-motor_egu": {
+                "value": "",
+            },
+            "dcm-xtal_1-roll_in_mrad-offset": {
+                "value": 0.0,
+            },
+            "dcm-xtal_1-roll_in_mrad-velocity": {
+                "value": 0.0,
+            },
+            "dcm-xtal_2-pitch_in_mrad-motor_egu": {
+                "value": "",
+            },
+            "dcm-xtal_2-pitch_in_mrad-offset": {
+                "value": 0.0,
+            },
+            "dcm-xtal_2-pitch_in_mrad-velocity": {
+                "value": 0.0,
+            },
+            "dcm-xtal_2-roll_in_mrad-motor_egu": {
+                "value": "",
+            },
+            "dcm-xtal_2-roll_in_mrad-offset": {
+                "value": 0.0,
+            },
+            "dcm-xtal_2-roll_in_mrad-velocity": {
+                "value": 0.0,
             },
         },
     )

@@ -12,10 +12,7 @@ __all__ = [
     "XrcResult",
     "ZocaloTrigger",
     "get_full_processing_results",
-    "ZOCALO_READING_PLAN_NAME",
     "NoResultsFromZocalo",
     "NoZocaloSubscription",
     "ZocaloStartInfo",
 ]
-
-ZOCALO_READING_PLAN_NAME = "zocalo reading"

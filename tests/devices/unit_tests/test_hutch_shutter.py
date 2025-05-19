@@ -18,8 +18,7 @@ from dodal.devices.hutch_shutter import (
 
 
 @pytest.fixture
-async def fake_shutter() -> HutchShutter:
-    RunEngine()
+async def fake_shutter(RE) -> HutchShutter:
     shutter = HutchShutter("", name="fake_shutter")
     await shutter.connect(mock=True)
 

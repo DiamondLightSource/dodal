@@ -7,12 +7,13 @@ from ophyd_async.core import PathProvider, StandardDetector, init_devices
 from ophyd_async.sim import PatternGenerator, SimBlobDetector, SimMotor
 from tests.constants import UNDULATOR_ID_GAP_LOOKUP_TABLE_PATH
 
-from dodal.devices.dcm import DCM
+from dodal.devices.common_dcm import BaseDCM
+from dodal.devices.i03.dcm import DCM
 from dodal.devices.undulator import Undulator
 
 
 class UndulatorGapCheckDevices:
-    def __init__(self, undulator: Undulator, dcm: DCM):
+    def __init__(self, undulator: Undulator, dcm: BaseDCM):
         self.undulator = undulator
         self.dcm = dcm
 

@@ -17,7 +17,7 @@ from dodal.log import (
     DodalLogHandlers,
     clear_all_loggers_and_handlers,
     do_default_logging_setup,
-    get_logging_file_path,
+    get_logging_file_paths,
     integrate_bluesky_and_ophyd_logging,
     set_up_all_logging_handlers,
 )
@@ -107,8 +107,14 @@ def test_no_env_variable_sets_correct_file_handler(
     mock_file_handler.return_value.level = logging.INFO
     mock_GELFTCPHandler.return_value.level = logging.INFO
     clear_all_loggers_and_handlers()
+    logging_file_path, debug_logging_file_path = get_logging_file_paths()
     handler_config = set_up_all_logging_handlers(
-        LOGGER, get_logging_file_path(), "dodal.log", True, ERROR_LOG_BUFFER_LINES
+        LOGGER,
+        logging_file_path,
+        "dodal.log",
+        True,
+        ERROR_LOG_BUFFER_LINES,
+        debug_logging_path=debug_logging_file_path,
     )
     integrate_bluesky_and_ophyd_logging(LOGGER)
 
@@ -152,13 +158,9 @@ def test_messages_logged_from_dodal_get_sent_to_graylog_and_file(
 
 @patch("dodal.log.logging.FileHandler.emit")
 def test_various_messages_to_graylog_get_beamline_filter(
-    mock_filehandler_emit: MagicMock,
+    mock_filehandler_emit: MagicMock, RE
 ):
     from os import environ
-
-    from bluesky.run_engine import RunEngine
-
-    RE = RunEngine()
 
     if environ.get("BEAMLINE"):
         del environ["BEAMLINE"]

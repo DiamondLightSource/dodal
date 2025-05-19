@@ -3,7 +3,6 @@ from unittest.mock import call, patch
 
 import bluesky.plan_stubs as bps
 import pytest
-from bluesky.run_engine import RunEngine
 from ophyd_async.testing import callback_on_mock_put, get_mock_put, set_mock_value
 
 from dodal.devices.i24.pmac import (
@@ -16,8 +15,7 @@ from dodal.devices.util.test_utils import patch_motor
 
 
 @pytest.fixture
-async def fake_pmac():
-    RunEngine()
+async def fake_pmac(RE):
     pmac = PMAC("", name="fake_pmac")
     await pmac.connect(mock=True)
 
@@ -35,7 +33,7 @@ def test_pmac_can_be_created(fake_pmac: PMAC):
 
 async def test_pmac_motor_move(fake_pmac: PMAC, RE):
     pos = (1.0, 0.5)
-    RE(bps.mv(fake_pmac.x, pos[0], fake_pmac.y, pos[1]))  # type: ignore # See: https://github.com/DiamondLightSource/dodal/issues/827
+    RE(bps.mv(fake_pmac.x, pos[0], fake_pmac.y, pos[1]))
 
     assert await fake_pmac.x.user_readback.get_value() == 1.0
     assert await fake_pmac.y.user_readback.get_value() == 0.5
@@ -83,11 +81,49 @@ async def test_run_program(fake_pmac: PMAC, RE):
     )
 
     set_mock_value(fake_pmac.program_number, 11)
-    set_mock_value(fake_pmac.collection_time, 2.0)
     await fake_pmac.run_program.kickoff()
     await fake_pmac.run_program.complete()
 
     assert await fake_pmac.pmac_string.get_value() == "&2b11r"
+
+
+async def update_counter(sleep_time: float, fake_pmac: PMAC):
+    set_mock_value(fake_pmac.scanstatus, 1)
+    set_mock_value(fake_pmac.counter, 0)
+    await asyncio.sleep(0.05)
+    set_mock_value(fake_pmac.counter, 1)
+    await asyncio.sleep(0.05)
+    set_mock_value(fake_pmac.counter, 2)
+    await asyncio.sleep(sleep_time)
+    set_mock_value(fake_pmac.counter, 3)
+    set_mock_value(fake_pmac.scanstatus, 0)
+
+
+async def test_counter_refresh(fake_pmac: PMAC, RE):
+    callback_on_mock_put(
+        fake_pmac.pmac_string,
+        lambda *args, **kwargs: asyncio.create_task(update_counter(0.05, fake_pmac)),  # type: ignore
+    )
+
+    set_mock_value(fake_pmac.counter_time, 0.1)
+    await fake_pmac.run_program.kickoff()
+    await fake_pmac.run_program.complete()
+
+    assert await fake_pmac.counter.get_value() == 3
+
+
+async def test_counter_refresh_timeout(fake_pmac: PMAC, RE):
+    callback_on_mock_put(
+        fake_pmac.pmac_string,
+        lambda *args, **kwargs: asyncio.create_task(update_counter(0.2, fake_pmac)),  # type: ignore
+    )
+
+    set_mock_value(fake_pmac.counter_time, 0.1)
+    with pytest.raises(asyncio.exceptions.TimeoutError):
+        await fake_pmac.run_program.kickoff()
+        await fake_pmac.run_program.complete()
+
+    assert await fake_pmac.counter.get_value() == 2
 
 
 @patch("dodal.devices.i24.pmac.sleep")
