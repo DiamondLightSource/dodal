@@ -2,11 +2,11 @@ from typing import Any
 
 import pytest
 
-from dodal.devices.electron_analyser.abstract_region import (
-    EnergyMode,
-    TAbstractBaseRegion,
-)
-from dodal.devices.electron_analyser.vgscienta_region import (
+from dodal.common.data_util import load_json_file_to_class
+from dodal.devices.electron_analyser.abstract import TAbstractBaseRegion
+from dodal.devices.electron_analyser.types import EnergyMode
+from dodal.devices.electron_analyser.vgscienta import VGScientaRegion, VGScientaSequence
+from dodal.devices.electron_analyser.vgscienta.region import (
     AcquisitionMode,
     DetectorMode,
     Status,
@@ -21,13 +21,8 @@ from tests.devices.unit_tests.electron_analyser.test_util import (
 
 
 @pytest.fixture
-def sequence_file() -> str:
-    return TEST_VGSCIENTA_SEQUENCE
-
-
-@pytest.fixture
-def sequence_class() -> type[VGScientaSequence]:
-    return VGScientaSequence
+def sequence() -> VGScientaSequence:
+    return load_json_file_to_class(VGScientaSequence, TEST_VGSCIENTA_SEQUENCE)
 
 
 @pytest.fixture
@@ -55,7 +50,7 @@ def expected_region_values() -> list[dict[str, Any]]:
             "step_time": 1.0,
             "total_steps": 8.0,
             "total_time": 8.0,
-            "energy_step": 200.0,
+            "energy_step": 0.2,
             "exposure_time": 1.0,
             "first_x_channel": 1,
             "last_x_channel": 1000,
@@ -81,7 +76,7 @@ def expected_region_values() -> list[dict[str, Any]]:
             "step_time": 0.882,
             "total_steps": 1.0,
             "total_time": 4.41,
-            "energy_step": 0.877,
+            "energy_step": 8.77e-4,
             "exposure_time": 1.0,
             "first_x_channel": 4,
             "last_x_channel": 990,

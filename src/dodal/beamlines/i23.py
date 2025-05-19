@@ -1,5 +1,6 @@
 from pathlib import Path
 
+from ophyd_async.core import StrictEnum
 from ophyd_async.epics.adpilatus import PilatusDetector
 
 from dodal.common.beamlines.beamline_utils import (
@@ -12,6 +13,7 @@ from dodal.common.beamlines.device_helpers import HDF5_SUFFIX
 from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitPathProvider
 from dodal.devices.motors import SixAxisGonio
 from dodal.devices.oav.pin_image_recognition import PinTipDetection
+from dodal.devices.positioner import Positioner1D
 from dodal.devices.zebra.zebra import Zebra
 from dodal.devices.zebra.zebra_constants_mapping import (
     ZebraMapping,
@@ -39,8 +41,13 @@ PREFIX = BeamlinePrefix(BL)
 I23_ZEBRA_MAPPING = ZebraMapping(
     outputs=ZebraTTLOutputs(TTL_DETECTOR=1, TTL_SHUTTER=4),
     sources=ZebraSources(),
-    AND_GATE_FOR_AUTO_SHUTTER=2,
 )
+
+
+class I23DetectorPositions(StrictEnum):
+    IN = "In"
+    OUT = "Out"
+    SAMPLE_CHANGE = "sample change"
 
 
 def _is_i23_machine():
@@ -92,4 +99,13 @@ def pilatus() -> PilatusDetector:
         path_provider=get_path_provider(),
         drv_suffix="cam1:",
         fileio_suffix=HDF5_SUFFIX,
+    )
+
+
+@device_factory()
+def detector_motion() -> Positioner1D[I23DetectorPositions]:
+    """Get the i23 detector"""
+    return Positioner1D[I23DetectorPositions](
+        f"{PREFIX.beamline_prefix}-EA-DET-01:Z",
+        datatype=I23DetectorPositions,
     )

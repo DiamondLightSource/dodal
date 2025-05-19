@@ -1,37 +1,46 @@
-import os
 from typing import Any
 
 import pytest
 from ophyd_async.core import init_devices
 
-from dodal.common.data_util import load_json_file_to_class
-from dodal.devices.electron_analyser.abstract_analyser_io import (
-    TAbstractAnalyserDriverIO,
-)
-from dodal.devices.electron_analyser.abstract_region import (
+from dodal.devices.electron_analyser.abstract import (
     AbstractBaseRegion,
     AbstractBaseSequence,
+    TAbstractAnalyserDriverIO,
     TAbstractBaseRegion,
-    TAbstractBaseSequence,
 )
-from dodal.devices.electron_analyser.vgscienta_region import (
+from dodal.devices.electron_analyser.specs import SpecsDetector
+from dodal.devices.electron_analyser.vgscienta import (
+    VGScientaDetector,
     VGScientaRegion,
     VGScientaSequence,
 )
 
-TEST_DATA_PATH = "tests/test_data/electron_analyser/"
+ElectronAnalyserDetectorImpl = SpecsDetector | VGScientaDetector
 
 
 @pytest.fixture
-def sequence_file_path(sequence_file: str) -> str:
-    return os.path.join(TEST_DATA_PATH, sequence_file)
+async def sim_driver(
+    driver_class: type[TAbstractAnalyserDriverIO],
+) -> TAbstractAnalyserDriverIO:
+    async with init_devices(mock=True, connect=True):
+        sim_driver = driver_class(
+            prefix="TEST:",
+            name="sim_driver",
+        )
+    return sim_driver
 
 
 @pytest.fixture
-def sequence(
-    sequence_class: type[TAbstractBaseSequence], sequence_file_path: str
-) -> TAbstractBaseSequence:
-    return load_json_file_to_class(sequence_class, sequence_file_path)
+async def sim_detector(
+    detector_class: type[ElectronAnalyserDetectorImpl],
+) -> ElectronAnalyserDetectorImpl:
+    async with init_devices(mock=True, connect=True):
+        sim_detector = detector_class(
+            prefix="TEST:",
+            name="sim_detector",
+        )
+    return sim_detector
 
 
 @pytest.fixture
@@ -70,15 +79,3 @@ def expected_enabled_region_names(
         if expected_region_value["enabled"]:
             names.append(expected_region_value["name"])
     return names
-
-
-@pytest.fixture
-async def sim_analyser_driver(
-    analyser_type: type[TAbstractAnalyserDriverIO],
-) -> TAbstractAnalyserDriverIO:
-    async with init_devices(mock=True, connect=True):
-        sim_analyser_driver = analyser_type(
-            prefix="sim_analyser_driver:",
-            name="analyser_driver",
-        )
-    return sim_analyser_driver
