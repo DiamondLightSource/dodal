@@ -74,10 +74,6 @@ jobs:
 
       - name: Run system tests
         run: tox -e system-report
-        env:
-          EPICS_CA_NAME_SERVERS: 127.0.0.1:5094
-          EPICS_PVA_NAME_SERVERS: 127.0.0.1:5095
-          EPICS_CA_ADDR_LIST: 127.0.0.1:5094
 
       - name: Check system test durations
         run: |

@@ -1,3 +1,4 @@
+import os
 from collections.abc import Generator
 from typing import cast
 
@@ -31,16 +32,23 @@ file:
 docker compose up -d
 ```
 
-Run the system tests with your EPICS environment configured to talk to the gateways
-that are deployed by the above:
+Run these system tests, with your EPICS environment configured to talk to the gateways:
 ```sh
-EPICS_CA_NAME_SERVERS=127.0.0.1:5094 \
-EPICS_PVA_NAME_SERVERS=127.0.0.1:5095 \
-EPICS_CA_ADDR_LIST=127.0.0.1:5094 \
 python -m pytest -m 'requires(instrument="adsim")'
 ```
 
 """
+
+
+@pytest.fixture(scope="module", autouse=True)
+def with_env():
+    os.environ["EPICS_CA_NAME_SERVERS"] = "127.0.0.1:5094"
+    os.environ["EPICS_PVA_NAME_SERVERS"] = "127.0.0.1:5095"
+    os.environ["EPICS_CA_ADDR_LIST"] = "127.0.0.1:5094"
+    yield
+    del os.environ["EPICS_CA_NAME_SERVERS"]
+    del os.environ["EPICS_PVA_NAME_SERVERS"]
+    del os.environ["EPICS_CA_ADDR_LIST"]
 
 
 @pytest.fixture
