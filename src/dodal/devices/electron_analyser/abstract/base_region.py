@@ -1,10 +1,11 @@
 import re
 from abc import ABC
 from collections.abc import Callable
-from enum import Enum
 from typing import Generic, TypeVar
 
 from pydantic import BaseModel, Field, model_validator
+
+from dodal.devices.electron_analyser.types import EnergyMode
 
 
 def java_to_python_case(java_str: str) -> str:
@@ -42,11 +43,6 @@ def energy_mode_validation(data: dict) -> dict:
     return data
 
 
-class EnergyMode(str, Enum):
-    KINETIC = "Kinetic"
-    BINDING = "Binding"
-
-
 class AbstractBaseRegion(ABC, JavaToPythonModel):
     """
     Generic region model that holds the data. Specialised region models should inherit
@@ -72,9 +68,6 @@ class AbstractBaseRegion(ABC, JavaToPythonModel):
 
     def is_kinetic_energy(self) -> bool:
         return self.energy_mode == EnergyMode.KINETIC
-
-    def to_kinetic_energy(self, value: float, excitation_energy: float) -> float:
-        return value if self.is_binding_energy() else excitation_energy - value
 
     @model_validator(mode="before")
     @classmethod
