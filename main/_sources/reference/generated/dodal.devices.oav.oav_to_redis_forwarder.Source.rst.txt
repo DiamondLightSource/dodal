@@ -8,6 +8,17 @@ dodal.devices.oav.oav\_to\_redis\_forwarder.Source
 
    
    
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+   
    
 
    
@@ -16,6 +27,10 @@ dodal.devices.oav.oav\_to\_redis\_forwarder.Source
 
    .. autosummary::
    
+      
+      
+      
+      
       
       ~Source.FULL_SCREEN
       
