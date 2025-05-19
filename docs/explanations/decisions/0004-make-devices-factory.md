@@ -1,4 +1,4 @@
-# 3. Add device factory decorator with lazy connect support
+# 4. Add device factory decorator with lazy connect support
 
 Date: 2024-04-26
 

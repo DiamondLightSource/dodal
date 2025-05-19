@@ -24,7 +24,7 @@ from dodal.devices.eiger import EigerDetector
 from dodal.devices.fast_grid_scan import PandAFastGridScan, ZebraFastGridScan
 from dodal.devices.flux import Flux
 from dodal.devices.focusing_mirror import FocusingMirrorWithStripes, MirrorVoltages
-from dodal.devices.i03.beamstop import Beamstop
+from dodal.devices.i03 import Beamstop
 from dodal.devices.i03.dcm import DCM
 from dodal.devices.i03.undulator_dcm import UndulatorDCM
 from dodal.devices.motors import XYZPositioner
@@ -67,7 +67,6 @@ set_path_provider(PandASubpathProvider())
 I03_ZEBRA_MAPPING = ZebraMapping(
     outputs=ZebraTTLOutputs(TTL_DETECTOR=1, TTL_SHUTTER=2, TTL_XSPRESS3=3, TTL_PANDA=4),
     sources=ZebraSources(),
-    AND_GATE_FOR_AUTO_SHUTTER=2,
 )
 
 PREFIX = BeamlinePrefix(BL)
