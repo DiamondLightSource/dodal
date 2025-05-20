@@ -144,3 +144,12 @@ async def test_oav_beam_centre_gets_beam_centre_from_pvs_fs(
     beam_y = await oav.beam_centre_j.get_value()
     assert beam_x == 200
     assert beam_y == 250
+
+
+async def test_beam_centre_signals_have_same_names(
+    oav: OAV, oav_beam_centre_pv_fs: OAV
+):
+    for specific_oav in [oav, oav_beam_centre_pv_fs]:
+        reading = await specific_oav.read()
+        assert "oav-beam_centre_i" in reading.keys()
+        assert "oav-beam_centre_j" in reading.keys()

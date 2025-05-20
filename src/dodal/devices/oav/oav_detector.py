@@ -137,6 +137,8 @@ class OAVBeamCentreFile(OAV):
                 size=self.sizes[Coords.Y],
                 coord=soft_signal_rw(datatype=int, initial_value=Coords.Y.value),
             )
+        # Set name so that new child signals get correct name
+        self.set_name(self.name)
 
     def _get_beam_position(self, zoom_level: str, size: int, coord: int) -> int:
         """Extracts the beam location in pixels `xCentre` `yCentre`, for a requested \
