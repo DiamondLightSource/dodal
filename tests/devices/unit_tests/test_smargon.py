@@ -100,6 +100,16 @@ async def test_given_set_with_single_value_then_that_motor_moves(smargon: Smargo
     )
 
 
+async def test_given_set_with_none_then_that_motor_does_not_move(smargon: Smargon):
+    await smargon.set(CombinedMove(x=10, y=None))
+
+    get_mock_put(smargon.x.user_setpoint).assert_called_once_with(10, wait=True)
+    get_mock_put(smargon.y.user_setpoint).assert_not_called()
+    get_mock_put(smargon.defer_move).assert_has_calls(
+        [call(DeferMoves.ON, wait=True), call(DeferMoves.OFF, wait=True)]
+    )
+
+
 async def test_given_set_with_all_values_then_motors_move(smargon: Smargon):
     await smargon.set(CombinedMove(x=10, y=20, z=30, omega=5, chi=15, phi=25))
 

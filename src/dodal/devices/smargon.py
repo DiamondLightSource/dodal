@@ -107,12 +107,12 @@ class DeferMoves(StrictEnum):
 class CombinedMove(TypedDict):
     """A move on multiple axes at once using a deferred move"""
 
-    x: NotRequired[float]
-    y: NotRequired[float]
-    z: NotRequired[float]
-    omega: NotRequired[float]
-    phi: NotRequired[float]
-    chi: NotRequired[float]
+    x: NotRequired[float | None]
+    y: NotRequired[float | None]
+    z: NotRequired[float | None]
+    omega: NotRequired[float | None]
+    phi: NotRequired[float | None]
+    chi: NotRequired[float | None]
 
 
 class Smargon(StandardReadable, Movable):
@@ -168,7 +168,8 @@ class Smargon(StandardReadable, Movable):
         try:
             tasks = []
             for k, v in value.items():
-                tasks.append(getattr(self, k).set(v))
+                if v is not None:
+                    tasks.append(getattr(self, k).set(v))
             await asyncio.gather(*tasks)
         finally:
             await self.defer_move.set(DeferMoves.OFF)
