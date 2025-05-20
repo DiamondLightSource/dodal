@@ -10,9 +10,14 @@ class BeamlineSafe(StrictEnum):
     OFF = "Off"
 
 
+class LidHeatEnable(StrictEnum):
+    ENABLED = "Enabled"
+    DISABLED = "Disabled"
+
+
 class LaserRobot(BartRobot):
     def __init__(self, name: str, prefix: str) -> None:
-        self.dewar_lid_heater = epics_signal_rw(str, prefix + "DW_1_CTRL")
+        self.dewar_lid_heater = epics_signal_rw(LidHeatEnable, prefix + "DW_1_CTRL")
 
         self.cryojet_retract = epics_signal_rw(str, prefix + "OP_24_FORCE_OPTION")
         self.set_beamline_safe = epics_signal_w(
