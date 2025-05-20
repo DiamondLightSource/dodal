@@ -16,6 +16,8 @@ dodal.devices.oav.oav\_detector
 
    ~oav_detector.Coords
    ~oav_detector.OAV
+   ~oav_detector.OAVBeamCentreFile
+   ~oav_detector.OAVBeamCentrePV
    ~oav_detector.ZoomController
 
 

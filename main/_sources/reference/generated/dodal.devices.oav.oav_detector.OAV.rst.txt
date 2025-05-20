@@ -38,5 +38,11 @@ dodal.devices.oav.oav\_detector.OAV
       
       
       
+      
+      ~OAV.beam_centre_i
+      
+      
+      ~OAV.beam_centre_j
+      
    
    

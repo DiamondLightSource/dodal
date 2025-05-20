@@ -15,8 +15,11 @@ dodal.devices.oav.oav\_parameters
    :recursive:
 
    ~oav_parameters.OAVConfig
+   ~oav_parameters.OAVConfigBase
+   ~oav_parameters.OAVConfigBeamCentre
    ~oav_parameters.OAVParameters
    ~oav_parameters.ZoomParams
+   ~oav_parameters.ZoomParamsCrosshair
 
 
 

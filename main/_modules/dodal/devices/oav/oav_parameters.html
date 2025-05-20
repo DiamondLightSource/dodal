@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.oav.oav_parameters &#8212; dodal 1.47.1.dev7+g64c5d4a34c documentation</title>
+    <title>dodal.devices.oav.oav_parameters &#8212; dodal 1.47.1.dev8+gd21544f122 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=385c3cfa"></script>
+    <script src="../../../../_static/documentation_options.js?v=15b871e4"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -452,9 +452,10 @@ window.addEventListener("load", () => mermaid.run());
   <h1>Source code for dodal.devices.oav.oav_parameters</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">xml.etree.ElementTree</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">et</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">abstractmethod</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">ChainMap</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Generic</span><span class="p">,</span> <span class="n">TypeVar</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">xml.etree.ElementTree</span><span class="w"> </span><span class="kn">import</span> <span class="n">Element</span>
 
 <span class="c1"># GDA currently assumes this aspect ratio for the OAV window size.</span>
@@ -569,26 +570,26 @@ window.addEventListener("load", () => mermaid.run());
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.oav.oav_parameters.ZoomParams.html#dodal.devices.oav.oav_parameters.ZoomParams">[docs]</a>
 <span class="nd">@dataclass</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">ZoomParams</span><span class="p">:</span>
-    <span class="n">microns_per_pixel</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span>
+    <span class="n">microns_per_pixel</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="ZoomParamsCrosshair">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.oav.oav_parameters.ZoomParamsCrosshair.html#dodal.devices.oav.oav_parameters.ZoomParamsCrosshair">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ZoomParamsCrosshair</span><span class="p">(</span><span class="n">ZoomParams</span><span class="p">):</span>
     <span class="n">crosshair</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span></div>
 
 
 
-<div class="viewcode-block" id="OAVConfig">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.oav.oav_parameters.OAVConfig.html#dodal.devices.oav.oav_parameters.OAVConfig">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">OAVConfig</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Read the OAV config files and return a dictionary of {&#39;zoom_level&#39;: ZoomParams}\</span>
-<span class="sd">    with information about microns per pixels and crosshairs.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="n">ParamType</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;ParamType&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="s2">&quot;ZoomParams&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zoom_params_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">display_config_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+
+<div class="viewcode-block" id="OAVConfigBase">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.oav.oav_parameters.OAVConfigBase.html#dodal.devices.oav.oav_parameters.OAVConfigBase">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">OAVConfigBase</span><span class="p">(</span><span class="n">Generic</span><span class="p">[</span><span class="n">ParamType</span><span class="p">]):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zoom_params_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">zoom_params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_zoom_params</span><span class="p">(</span><span class="n">zoom_params_file</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">display_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_display_config</span><span class="p">(</span><span class="n">display_config_file</span><span class="p">)</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">_get_display_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">display_config_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">display_config_file</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="n">file_lines</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
-        <span class="k">return</span> <span class="n">file_lines</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_get_zoom_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zoom_params_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="n">tree</span> <span class="o">=</span> <span class="n">et</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">zoom_params_file</span><span class="p">)</span>
@@ -604,6 +605,45 @@ window.addEventListener("load", () => mermaid.run());
             <span class="n">um_per_pix</span><span class="p">[</span><span class="n">zoom</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">um_pix_x</span><span class="p">,</span> <span class="n">um_pix_y</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">um_per_pix</span>
 
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ParamType</span><span class="p">]:</span> <span class="o">...</span></div>
+
+
+
+<div class="viewcode-block" id="OAVConfig">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.oav.oav_parameters.OAVConfig.html#dodal.devices.oav.oav_parameters.OAVConfig">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">OAVConfig</span><span class="p">(</span><span class="n">OAVConfigBase</span><span class="p">[</span><span class="n">ZoomParams</span><span class="p">]):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ZoomParams</span><span class="p">]:</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">um_xy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_zoom_params</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">zoom_key</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">um_xy</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+            <span class="n">config</span><span class="p">[</span><span class="n">zoom_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">ZoomParams</span><span class="p">(</span>
+                <span class="n">microns_per_pixel</span><span class="o">=</span><span class="n">um_xy</span><span class="p">[</span><span class="n">zoom_key</span><span class="p">],</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">config</span></div>
+
+
+
+<div class="viewcode-block" id="OAVConfigBeamCentre">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.oav.oav_parameters.OAVConfigBeamCentre.html#dodal.devices.oav.oav_parameters.OAVConfigBeamCentre">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">OAVConfigBeamCentre</span><span class="p">(</span><span class="n">OAVConfigBase</span><span class="p">[</span><span class="n">ZoomParamsCrosshair</span><span class="p">]):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Read the OAV config files and return a dictionary of {&#39;zoom_level&#39;: ZoomParams}\</span>
+<span class="sd">    with information about microns per pixels and crosshairs.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">zoom_params_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">display_config_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">display_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_display_config</span><span class="p">(</span><span class="n">display_config_file</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">zoom_params_file</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_display_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">display_config_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">display_config_file</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">file_lines</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">file_lines</span>
+
     <span class="k">def</span><span class="w"> </span><span class="nf">_read_display_config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
         <span class="n">crosshairs</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">display_config</span><span class="p">)):</span>
@@ -614,14 +654,13 @@ window.addEventListener("load", () => mermaid.run());
                 <span class="n">crosshairs</span><span class="p">[</span><span class="n">zoom</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">crosshairs</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">get_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ZoomParams</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ZoomParamsCrosshair</span><span class="p">]:</span>
         <span class="n">config</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">um_xy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_zoom_params</span><span class="p">()</span>
         <span class="n">bc_xy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_display_config</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">zoom_key</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">bc_xy</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
-            <span class="n">config</span><span class="p">[</span><span class="n">zoom_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">ZoomParams</span><span class="p">(</span>
-                <span class="n">microns_per_pixel</span><span class="o">=</span><span class="n">um_xy</span><span class="p">[</span><span class="n">zoom_key</span><span class="p">],</span>
-                <span class="n">crosshair</span><span class="o">=</span><span class="n">bc_xy</span><span class="p">[</span><span class="n">zoom_key</span><span class="p">],</span>
+            <span class="n">config</span><span class="p">[</span><span class="n">zoom_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">ZoomParamsCrosshair</span><span class="p">(</span>
+                <span class="n">microns_per_pixel</span><span class="o">=</span><span class="n">um_xy</span><span class="p">[</span><span class="n">zoom_key</span><span class="p">],</span> <span class="n">crosshair</span><span class="o">=</span><span class="n">bc_xy</span><span class="p">[</span><span class="n">zoom_key</span><span class="p">]</span>
             <span class="p">)</span>
         <span class="k">return</span> <span class="n">config</span></div>
 

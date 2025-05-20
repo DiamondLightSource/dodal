@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.oav.oav_parameters.ZoomParams &#8212; dodal 1.47.1.dev7+g64c5d4a34c documentation</title>
+    <title>dodal.devices.oav.oav_parameters.ZoomParams &#8212; dodal 1.47.1.dev8+gd21544f122 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=385c3cfa"></script>
+    <script src="../../_static/documentation_options.js?v=15b871e4"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -58,7 +58,7 @@
     <link rel="icon" href="../../_static/dls-logo.svg"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="dodal.devices.oav.oav_to_redis_forwarder" href="dodal.devices.oav.oav_to_redis_forwarder.html" />
+    <link rel="next" title="dodal.devices.oav.oav_parameters.ZoomParamsCrosshair" href="dodal.devices.oav.oav_parameters.ZoomParamsCrosshair.html" />
     <link rel="prev" title="dodal.devices.oav.oav_parameters.OAVParameters" href="dodal.devices.oav.oav_parameters.OAVParameters.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -896,22 +896,16 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="dodal.devices.oav.oav_parameters.ZoomParams">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dodal.devices.oav.oav_parameters.</span></span><span class="sig-name descname"><span class="pre">ZoomParams</span></span><a class="reference internal" href="../../_modules/dodal/devices/oav/oav_parameters.html#ZoomParams"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.oav.oav_parameters.ZoomParams" title="Link to this definition">#</a></dt>
-<dd><p>ZoomParams(microns_per_pixel: tuple[float, float], crosshair: tuple[int, int])</p>
+<dd><p>ZoomParams(microns_per_pixel: tuple[float, float])</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>microns_per_pixel</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>]</span>)</p></li>
-<li><p><strong>crosshair</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>]</span>)</p></li>
-</ul>
+<dd class="field-odd"><p><strong>microns_per_pixel</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>]</span>)</p>
 </dd>
 </dl>
 <p class="rubric">Attributes</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">microns_per_pixel</span></code></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">crosshair</span></code></p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -941,11 +935,11 @@
       </div>
     </a>
     <a class="right-next"
-       href="dodal.devices.oav.oav_to_redis_forwarder.html"
+       href="dodal.devices.oav.oav_parameters.ZoomParamsCrosshair.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">dodal.devices.oav.oav_to_redis_forwarder</p>
+        <p class="prev-next-title">dodal.devices.oav.oav_parameters.ZoomParamsCrosshair</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.oav.oav_detector &#8212; dodal 1.47.1.dev7+g64c5d4a34c documentation</title>
+    <title>dodal.devices.oav.oav_detector &#8212; dodal 1.47.1.dev8+gd21544f122 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=385c3cfa"></script>
+    <script src="../../../../_static/documentation_options.js?v=15b871e4"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -457,14 +457,20 @@ window.addEventListener("load", () => mermaid.run());
     <span class="n">DEFAULT_TIMEOUT</span><span class="p">,</span>
     <span class="n">AsyncStatus</span><span class="p">,</span>
     <span class="n">LazyMock</span><span class="p">,</span>
+    <span class="n">SignalR</span><span class="p">,</span>
     <span class="n">StandardReadable</span><span class="p">,</span>
     <span class="n">derived_signal_r</span><span class="p">,</span>
     <span class="n">soft_signal_rw</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">epics_signal_rw</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">epics_signal_r</span><span class="p">,</span> <span class="n">epics_signal_rw</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.areadetector.plugins.CAM</span><span class="w"> </span><span class="kn">import</span> <span class="n">Cam</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.oav.oav_parameters</span><span class="w"> </span><span class="kn">import</span> <span class="n">DEFAULT_OAV_WINDOW</span><span class="p">,</span> <span class="n">OAVConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.oav.oav_parameters</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">DEFAULT_OAV_WINDOW</span><span class="p">,</span>
+    <span class="n">OAVConfig</span><span class="p">,</span>
+    <span class="n">OAVConfigBase</span><span class="p">,</span>
+    <span class="n">OAVConfigBeamCentre</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.oav.snapshots.snapshot</span><span class="w"> </span><span class="kn">import</span> <span class="n">Snapshot</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.oav.snapshots.snapshot_with_grid</span><span class="w"> </span><span class="kn">import</span> <span class="n">SnapshotWithGrid</span>
 
@@ -513,7 +519,10 @@ window.addEventListener("load", () => mermaid.run());
 <div class="viewcode-block" id="OAV">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.oav.oav_detector.OAV.html#dodal.devices.oav.oav_detector.OAV">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">OAV</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">):</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">OAVConfig</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+    <span class="n">beam_centre_i</span><span class="p">:</span> <span class="n">SignalR</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
+    <span class="n">beam_centre_j</span><span class="p">:</span> <span class="n">SignalR</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">OAVConfigBase</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">oav_config</span> <span class="o">=</span> <span class="n">config</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_prefix</span> <span class="o">=</span> <span class="n">prefix</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">name</span>
@@ -539,18 +548,6 @@ window.addEventListener("load", () => mermaid.run());
                 <span class="n">size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sizes</span><span class="p">[</span><span class="n">Coords</span><span class="o">.</span><span class="n">Y</span><span class="p">],</span>
                 <span class="n">coord</span><span class="o">=</span><span class="n">soft_signal_rw</span><span class="p">(</span><span class="n">datatype</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">initial_value</span><span class="o">=</span><span class="n">Coords</span><span class="o">.</span><span class="n">Y</span><span class="o">.</span><span class="n">value</span><span class="p">),</span>
             <span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">beam_centre_i</span> <span class="o">=</span> <span class="n">derived_signal_r</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_get_beam_position</span><span class="p">,</span>
-                <span class="n">zoom_level</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">zoom_controller</span><span class="o">.</span><span class="n">level</span><span class="p">,</span>
-                <span class="n">size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sizes</span><span class="p">[</span><span class="n">Coords</span><span class="o">.</span><span class="n">X</span><span class="p">],</span>
-                <span class="n">coord</span><span class="o">=</span><span class="n">soft_signal_rw</span><span class="p">(</span><span class="n">datatype</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">initial_value</span><span class="o">=</span><span class="n">Coords</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">value</span><span class="p">),</span>
-            <span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">beam_centre_j</span> <span class="o">=</span> <span class="n">derived_signal_r</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_get_beam_position</span><span class="p">,</span>
-                <span class="n">zoom_level</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">zoom_controller</span><span class="o">.</span><span class="n">level</span><span class="p">,</span>
-                <span class="n">size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sizes</span><span class="p">[</span><span class="n">Coords</span><span class="o">.</span><span class="n">Y</span><span class="p">],</span>
-                <span class="n">coord</span><span class="o">=</span><span class="n">soft_signal_rw</span><span class="p">(</span><span class="n">datatype</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">initial_value</span><span class="o">=</span><span class="n">Coords</span><span class="o">.</span><span class="n">Y</span><span class="o">.</span><span class="n">value</span><span class="p">),</span>
-            <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">snapshot</span> <span class="o">=</span> <span class="n">Snapshot</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_prefix</span><span class="si">}</span><span class="s2">MJPG:&quot;</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">,</span>
@@ -567,14 +564,6 @@ window.addEventListener("load", () => mermaid.run());
         <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="n">_zoom</span><span class="p">]</span><span class="o">.</span><span class="n">microns_per_pixel</span><span class="p">[</span><span class="n">coord</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">value</span> <span class="o">*</span> <span class="n">DEFAULT_OAV_WINDOW</span><span class="p">[</span><span class="n">coord</span><span class="p">]</span> <span class="o">/</span> <span class="n">size</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_get_beam_position</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zoom_level</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">coord</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Extracts the beam location in pixels `xCentre` `yCentre`, for a requested \</span>
-<span class="sd">        zoom level. &quot;&quot;&quot;</span>
-        <span class="n">_zoom</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_current_zoom</span><span class="p">(</span><span class="n">zoom_level</span><span class="p">)</span>
-        <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="n">_zoom</span><span class="p">]</span><span class="o">.</span><span class="n">crosshair</span><span class="p">[</span><span class="n">coord</span><span class="p">]</span>
-
-        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">value</span> <span class="o">*</span> <span class="n">size</span> <span class="o">/</span> <span class="n">DEFAULT_OAV_WINDOW</span><span class="p">[</span><span class="n">coord</span><span class="p">])</span>
-
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">connect</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">mock</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="n">LazyMock</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -584,6 +573,61 @@ window.addEventListener("load", () => mermaid.run());
         <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">oav_config</span><span class="o">.</span><span class="n">get_parameters</span><span class="p">()</span>
 
         <span class="k">return</span> <span class="k">await</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">mock</span><span class="p">,</span> <span class="n">timeout</span><span class="p">,</span> <span class="n">force_reconnect</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="OAVBeamCentreFile">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.oav.oav_detector.OAVBeamCentreFile.html#dodal.devices.oav.oav_detector.OAVBeamCentreFile">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">OAVBeamCentreFile</span><span class="p">(</span><span class="n">OAV</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;OAV device that reads its beam centre values from a file. The config parameter</span>
+<span class="sd">    must be a OAVConfigBeamCentre object, as this contains a filepath to where the beam</span>
+<span class="sd">    centre values are stored.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">OAVConfigBeamCentre</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">beam_centre_i</span> <span class="o">=</span> <span class="n">derived_signal_r</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_get_beam_position</span><span class="p">,</span>
+                <span class="n">zoom_level</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">zoom_controller</span><span class="o">.</span><span class="n">level</span><span class="p">,</span>
+                <span class="n">size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sizes</span><span class="p">[</span><span class="n">Coords</span><span class="o">.</span><span class="n">X</span><span class="p">],</span>
+                <span class="n">coord</span><span class="o">=</span><span class="n">soft_signal_rw</span><span class="p">(</span><span class="n">datatype</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">initial_value</span><span class="o">=</span><span class="n">Coords</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">value</span><span class="p">),</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">beam_centre_j</span> <span class="o">=</span> <span class="n">derived_signal_r</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_get_beam_position</span><span class="p">,</span>
+                <span class="n">zoom_level</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">zoom_controller</span><span class="o">.</span><span class="n">level</span><span class="p">,</span>
+                <span class="n">size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sizes</span><span class="p">[</span><span class="n">Coords</span><span class="o">.</span><span class="n">Y</span><span class="p">],</span>
+                <span class="n">coord</span><span class="o">=</span><span class="n">soft_signal_rw</span><span class="p">(</span><span class="n">datatype</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">initial_value</span><span class="o">=</span><span class="n">Coords</span><span class="o">.</span><span class="n">Y</span><span class="o">.</span><span class="n">value</span><span class="p">),</span>
+            <span class="p">)</span>
+        <span class="c1"># Set name so that new child signals get correct name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_name</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_beam_position</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zoom_level</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">coord</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Extracts the beam location in pixels `xCentre` `yCentre`, for a requested \</span>
+<span class="sd">        zoom level. &quot;&quot;&quot;</span>
+        <span class="n">_zoom</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_current_zoom</span><span class="p">(</span><span class="n">zoom_level</span><span class="p">)</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="n">_zoom</span><span class="p">]</span><span class="o">.</span><span class="n">crosshair</span><span class="p">[</span><span class="n">coord</span><span class="p">]</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">value</span> <span class="o">*</span> <span class="n">size</span> <span class="o">/</span> <span class="n">DEFAULT_OAV_WINDOW</span><span class="p">[</span><span class="n">coord</span><span class="p">])</span></div>
+
+
+
+<div class="viewcode-block" id="OAVBeamCentrePV">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.oav.oav_detector.OAVBeamCentrePV.html#dodal.devices.oav.oav_detector.OAVBeamCentrePV">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">OAVBeamCentrePV</span><span class="p">(</span><span class="n">OAV</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;OAV device that reads its beam centre values from PVs.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">OAVConfig</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">overlay_channel</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="p">):</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">beam_centre_i</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span>
+                <span class="nb">int</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;OVER:</span><span class="si">{</span><span class="n">overlay_channel</span><span class="si">}</span><span class="s2">:CenterX&quot;</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">beam_centre_j</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span>
+                <span class="nb">int</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;OVER:</span><span class="si">{</span><span class="n">overlay_channel</span><span class="si">}</span><span class="s2">:CenterY&quot;</span>
+            <span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span></div>
 
 </pre></div>
 

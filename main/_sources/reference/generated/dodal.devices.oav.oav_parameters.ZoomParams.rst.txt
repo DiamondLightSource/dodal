@@ -19,8 +19,5 @@ dodal.devices.oav.oav\_parameters.ZoomParams
       
       ~ZoomParams.microns_per_pixel
       
-      
-      ~ZoomParams.crosshair
-      
    
    
