@@ -3,7 +3,7 @@ from collections.abc import Collection, Generator
 from dataclasses import dataclass
 from enum import Enum
 from math import isclose
-from typing import NotRequired, TypedDict, cast
+from typing import TypedDict, cast
 
 from bluesky import plan_stubs as bps
 from bluesky.protocols import Movable
@@ -17,6 +17,7 @@ from ophyd_async.core import (
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 from ophyd_async.epics.motor import Motor
+from typing_extensions import NotRequired
 
 from dodal.devices.util.epics_util import SetWhenEnabled
 
