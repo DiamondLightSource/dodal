@@ -41,12 +41,16 @@ async def test_configure_arm_trigger_and_disarm_detector(
     def set_meta_active(*args, **kwargs) -> None:
         set_mock_value(fake_eiger.odin.meta_active, "Active")
 
-    def set_capture_rbv_and_meta_writing(*args, **kwargs) -> None:
+    def set_capture_rbv_meta_writing_and_detector_state(*args, **kwargs) -> None:
+        # Mimics capturing and immediete completion status on Eiger.
         set_mock_value(fake_eiger.odin.capture_rbv, "Capturing")
         set_mock_value(fake_eiger.odin.meta_writing, "Writing")
+        set_mock_value(fake_eiger.drv.detector.state, "idle")
 
     callback_on_mock_put(fake_eiger.odin.num_to_capture, set_meta_active)
-    callback_on_mock_put(fake_eiger.odin.capture, set_capture_rbv_and_meta_writing)
+    callback_on_mock_put(
+        fake_eiger.odin.capture, set_capture_rbv_meta_writing_and_detector_state
+    )
 
     RE(
         configure_arm_trigger_and_disarm_detector(
@@ -54,8 +58,8 @@ async def test_configure_arm_trigger_and_disarm_detector(
         )
     )
     fake_eiger.drv.detector.arm.trigger.assert_called_once()
-    # Disarm occurs after a trigger in the plan.
-    fake_eiger.drv.detector.disarm.trigger.assert_called_once()
+    # Disarm occurs at the start and end of the plan.
+    assert len(fake_eiger.drv.detector.disarm.trigger.call_args_list) == 2
     assert (
         await fake_eiger.drv.detector.photon_energy.get_value()
         == eiger_params.expected_energy_ev
