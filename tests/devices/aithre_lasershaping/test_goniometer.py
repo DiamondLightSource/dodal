@@ -53,3 +53,9 @@ async def test_vertical_signal_set(
     assert await goniometer.sampy.user_readback.get_value() == pytest.approx(
         expected_vert * 2
     )
+
+
+@pytest.mark.parametrize("set_value", [-5, 2.7, 0])
+async def test_vertical_position_get(goniometer: Goniometer, set_value: float):
+    await goniometer.vertical_position.set(set_value)
+    assert await goniometer.vertical_position.get_value() == set_value
