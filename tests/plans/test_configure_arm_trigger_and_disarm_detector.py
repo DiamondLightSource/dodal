@@ -8,8 +8,8 @@ from ophyd_async.fastcs.eiger import EigerDetector as FastEiger
 from ophyd_async.fastcs.eiger import EigerTriggerInfo
 from ophyd_async.testing import callback_on_mock_put, set_mock_value
 
-from dodal.plans.configure_and_arm_detector import (
-    configure_and_arm_detector,
+from dodal.plans.configure_arm_trigger_and_disarm_detector import (
+    configure_arm_trigger_and_disarm_detector,
 )
 
 
@@ -27,7 +27,9 @@ async def fake_observe_indices_written(timeout: float) -> AsyncGenerator[int, No
     yield 1
 
 
-async def test_configure_and_arm_detector(fake_eiger, eiger_params, RE: RunEngine):
+async def test_configure_arm_trigger_and_disarm_detector(
+    fake_eiger, eiger_params, RE: RunEngine
+):
     trigger_info = EigerTriggerInfo(
         # Manual trigger, so setting number of triggers to 1.
         number_of_events=1,
@@ -46,7 +48,11 @@ async def test_configure_and_arm_detector(fake_eiger, eiger_params, RE: RunEngin
     callback_on_mock_put(fake_eiger.odin.num_to_capture, set_meta_active)
     callback_on_mock_put(fake_eiger.odin.capture, set_capture_rbv_and_meta_writing)
 
-    RE(configure_and_arm_detector(fake_eiger, eiger_params, trigger_info))
+    RE(
+        configure_arm_trigger_and_disarm_detector(
+            fake_eiger, eiger_params, trigger_info
+        )
+    )
     fake_eiger.drv.detector.arm.trigger.assert_called_once()
     # Disarm occurs after a trigger in the plan.
     fake_eiger.drv.detector.disarm.trigger.assert_called_once()

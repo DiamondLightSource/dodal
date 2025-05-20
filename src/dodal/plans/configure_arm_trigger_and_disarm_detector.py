@@ -12,7 +12,7 @@ from dodal.log import LOGGER, do_default_logging_setup
 
 
 @bpp.run_decorator()
-def configure_and_arm_detector(
+def configure_arm_trigger_and_disarm_detector(
     eiger: EigerDetector,
     detector_params: DetectorParams,
     trigger_info: EigerTriggerInfo,
@@ -142,7 +142,7 @@ if __name__ == "__main__":
     do_default_logging_setup()
     eiger = fastcs_eiger(connect_immediately=True)
     RE(
-        configure_and_arm_detector(
+        configure_arm_trigger_and_disarm_detector(
             eiger=eiger,
             detector_params=DetectorParams(
                 expected_energy_ev=12800,
