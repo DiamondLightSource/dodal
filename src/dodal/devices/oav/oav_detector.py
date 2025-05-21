@@ -6,6 +6,7 @@ from ophyd_async.core import (
     AsyncStatus,
     LazyMock,
     SignalR,
+    SignalRW,
     StandardReadable,
     derived_signal_r,
     soft_signal_rw,
@@ -36,7 +37,19 @@ def _get_correct_zoom_string(zoom: str) -> str:
     return zoom
 
 
-class ZoomController(StandardReadable, Movable[str]):
+class BaseZoomController(StandardReadable, Movable[str]):
+    level: SignalRW[str]
+
+
+class NullZoomController(BaseZoomController):
+    def __init__(self):
+        self.level = soft_signal_rw(str, "1.0x")
+
+    def set(self, value):
+        raise Exception("Attempting to set zoom level of a null zoom controller")
+
+
+class ZoomController(BaseZoomController):
     """
     Device to control the zoom level. This should be set like
         o = OAV(name="oav")
@@ -62,12 +75,24 @@ class OAV(StandardReadable):
     beam_centre_i: SignalR[int]
     beam_centre_j: SignalR[int]
 
-    def __init__(self, prefix: str, config: OAVConfigBase, name: str = ""):
+    def __init__(
+        self,
+        prefix: str,
+        config: OAVConfigBase,
+        name: str = "",
+        zoom_controller: BaseZoomController | None = None,
+    ):
         self.oav_config = config
         self._prefix = prefix
         self._name = name
         _bl_prefix = prefix.split("-")[0]
-        self.zoom_controller = ZoomController(f"{_bl_prefix}-EA-OAV-01:FZOOM:", name)
+
+        if not zoom_controller:
+            self.zoom_controller = ZoomController(
+                f"{_bl_prefix}-EA-OAV-01:FZOOM:", name
+            )
+        else:
+            self.zoom_controller = zoom_controller
 
         self.cam = Cam(f"{prefix}CAM:", name=name)
         with self.add_children_as_readables():
@@ -121,8 +146,14 @@ class OAVBeamCentreFile(OAV):
     centre values are stored.
     """
 
-    def __init__(self, prefix: str, config: OAVConfigBeamCentre, name: str = ""):
-        super().__init__(prefix, config, name)
+    def __init__(
+        self,
+        prefix: str,
+        config: OAVConfigBeamCentre,
+        name: str = "",
+        zoom_controller: BaseZoomController | None = None,
+    ):
+        super().__init__(prefix, config, name, zoom_controller)
 
         with self.add_children_as_readables():
             self.beam_centre_i = derived_signal_r(
@@ -152,7 +183,12 @@ class OAVBeamCentrePV(OAV):
     """OAV device that reads its beam centre values from PVs."""
 
     def __init__(
-        self, prefix: str, config: OAVConfig, name: str = "", overlay_channel: int = 1
+        self,
+        prefix: str,
+        config: OAVConfig,
+        name: str = "",
+        zoom_controller: BaseZoomController | None = None,
+        overlay_channel: int = 1,
     ):
         with self.add_children_as_readables():
             self.beam_centre_i = epics_signal_r(
@@ -161,4 +197,4 @@ class OAVBeamCentrePV(OAV):
             self.beam_centre_j = epics_signal_r(
                 int, prefix + f"OVER:{overlay_channel}:CenterY"
             )
-        super().__init__(prefix, config, name)
+        super().__init__(prefix, config, name, zoom_controller)
