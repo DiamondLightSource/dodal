@@ -29,8 +29,8 @@ from dodal.devices.i03 import Beamstop
 from dodal.devices.i03.dcm import DCM
 from dodal.devices.i03.undulator_dcm import UndulatorDCM
 from dodal.devices.motors import XYZPositioner
-from dodal.devices.oav.oav_detector import OAV
-from dodal.devices.oav.oav_parameters import OAVConfig
+from dodal.devices.oav.oav_detector import OAVBeamCentreFile
+from dodal.devices.oav.oav_parameters import OAVConfigBeamCentre
 from dodal.devices.oav.pin_image_recognition import PinTipDetection
 from dodal.devices.qbpm import QBPM
 from dodal.devices.robot import BartRobot
@@ -68,7 +68,6 @@ set_path_provider(PandASubpathProvider())
 I03_ZEBRA_MAPPING = ZebraMapping(
     outputs=ZebraTTLOutputs(TTL_DETECTOR=1, TTL_SHUTTER=2, TTL_XSPRESS3=3, TTL_PANDA=4),
     sources=ZebraSources(),
-    AND_GATE_FOR_AUTO_SHUTTER=2,
 )
 
 PREFIX = BeamlinePrefix(BL)
@@ -213,15 +212,15 @@ def panda_fast_grid_scan() -> PandAFastGridScan:
 
 @device_factory()
 def oav(
-    params: OAVConfig | None = None,
-) -> OAV:
+    params: OAVConfigBeamCentre | None = None,
+) -> OAVBeamCentreFile:
     """Get the i03 OAV device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return OAV(
+    return OAVBeamCentreFile(
         prefix=f"{PREFIX.beamline_prefix}-DI-OAV-01:",
         name="oav",
-        config=params or OAVConfig(ZOOM_PARAMS_FILE, DISPLAY_CONFIG),
+        config=params or OAVConfigBeamCentre(ZOOM_PARAMS_FILE, DISPLAY_CONFIG),
     )
 
 
