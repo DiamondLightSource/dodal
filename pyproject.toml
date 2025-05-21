@@ -15,7 +15,7 @@ description = "Ophyd devices and other utils that could be used across DLS beaml
 dependencies = [
     "click",
     "ophyd",
-    "ophyd-async@git+https://github.com/bluesky/ophyd-async.git@amend_eiger_odin_for_dodal",
+    "ophyd-async>=0.10.0a4",
     "bluesky",
     "pyepics",
     "dataclasses-json",
@@ -24,9 +24,9 @@ dependencies = [
     "requests",
     "graypy",
     "pydantic>=2.0",
-    "opencv-python-headless",                                          # For pin-tip detection.
-    "aioca",                                                           # Required for CA support with ophyd-async.
-    "p4p",                                                             # Required for PVA support with ophyd-async.
+    "opencv-python-headless", # For pin-tip detection.
+    "aioca",                  # Required for CA support with ophyd-async.
+    "p4p",                    # Required for PVA support with ophyd-async.
     "numpy",
     "aiofiles",
     "aiohttp",
@@ -105,7 +105,7 @@ asyncio_mode = "auto"
 markers = [
     "adsim: marks tests as requiring the containerised AreaDetector simulator running (deselect with '-m \"not adsim\"')",
     "skip_in_pycharm: marks test as not working in pycharm testrunner",
-    "system_test: marks test as other system test that requires infrastructure"
+    "system_test: marks test as other system test that requires infrastructure",
 ]
 addopts = """
     --cov=dodal --cov-report term --cov-report xml:cov.xml
