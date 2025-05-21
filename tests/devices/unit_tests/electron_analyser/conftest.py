@@ -51,6 +51,7 @@ def region(
 
 
 # ToDo - This needs to come from a device
+# https://github.com/DiamondLightSource/dodal/issues/1224
 @pytest.fixture
 def excitation_energy() -> float:
     return 0
