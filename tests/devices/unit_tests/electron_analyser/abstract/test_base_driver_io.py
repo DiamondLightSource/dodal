@@ -60,6 +60,7 @@ def region_detector(
 
 
 # ToDo - Need to remove excitation energy and be read in from device
+# https://github.com/DiamondLightSource/dodal/issues/1224
 
 
 @pytest.mark.parametrize("region_detector", TEST_SEQUENCE_REGION_NAMES, indirect=True)
