@@ -6,9 +6,12 @@ from dodal.common.beamlines.beamline_utils import (
 )
 from dodal.devices.i19.beamstop import BeamStop
 from dodal.devices.i19.blueapi_device import HutchState
-from dodal.devices.i19.shutter import AccessControlledShutter
-from dodal.devices.oav.oav_detector import OAV
-from dodal.devices.oav.oav_parameters import OAVConfig
+from dodal.devices.i19.shutter import (
+    AccessControlledShutter,
+    HutchState,
+)
+from dodal.devices.oav.oav_detector import OAVBeamCentreFile
+from dodal.devices.oav.oav_parameters import OAVConfigBeamCentre
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.zebra.zebra import Zebra
 from dodal.devices.zebra.zebra_constants_mapping import (
@@ -48,10 +51,10 @@ def beamstop() -> BeamStop:
 
 
 @device_factory()
-def oav() -> OAV:
-    return OAV(
+def oav() -> OAVBeamCentreFile:
+    return OAVBeamCentreFile(
         prefix=f"{PREFIX.beamline_prefix}-EA-OAV-01:",
-        config=OAVConfig(ZOOM_PARAMS_FILE, DISPLAY_CONFIG),
+        config=OAVConfigBeamCentre(ZOOM_PARAMS_FILE, DISPLAY_CONFIG),
     )
 
 
