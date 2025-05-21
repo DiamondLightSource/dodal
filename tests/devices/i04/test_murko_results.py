@@ -156,7 +156,7 @@ async def test_no_movement_given_sample_centre_matches_beam_centre(
     mock_x_setter, mock_y_setter, mock_z_setter = mock_setters
     messages, metadata = get_messages(
         images_per_message=10, omega_start=50, omega_step=5
-    )  # Crystal alligned with beam centre
+    )  # Crystal aligned with beam centre
     mock_murko_results.pubsub.get_message, mock_murko_results.redis_client.hget = (
         mock_redis_calls(mock_strict_redis, messages, metadata)
     )
@@ -167,7 +167,7 @@ async def test_no_movement_given_sample_centre_matches_beam_centre(
 
 
 @patch("dodal.devices.i04.murko_results.StrictRedis")
-async def test_given_correct_movement_given_90_and_180_angles_with_0_z(
+async def test_correct_movement_given_90_and_180_angles_with_0_z(
     mock_strict_redis, mock_murko_results, mock_setters
 ):
     x = 0.5

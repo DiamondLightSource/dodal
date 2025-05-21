@@ -48,7 +48,7 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
     the y and z coordinates of the sample, depending on the omega angle, as the sample
     is rotated around the x axis.
 
-    Given a most_liekly_click value at a certain omega angle θ:
+    Given a most_likely_click value at a certain omega angle θ:
     most_likely_click[1] = x
     most_likely_click[0] = cos(θ)y - sin(θ)z
 
@@ -102,7 +102,7 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
         # Wait for results
         sample_id = await self.sample_id.get_value()
         while self._last_omega < self.stop_angle:
-            # waits here for next batch to be recieved
+            # waits here for next batch to be received
             message = await self.pubsub.get_message(timeout=self.TIMEOUT_S)
             if message is None:  # No more messages to process
                 break
@@ -110,7 +110,7 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
         LOGGER.info(f"Using average of x beam distances: {self.x_dists_mm}")
         avg_x = float(np.mean(self.x_dists_mm))
         LOGGER.info(f"Finding least square y and z from y distances: {self.y_dists_mm}")
-        best_y, best_z = self.get_yz_least_squares(self.y_dists_mm, self.omegas)
+        best_y, best_z = get_yz_least_squares(self.y_dists_mm, self.omegas)
         self._x_mm_setter(avg_x)
         self._y_mm_setter(best_y)
         self._z_mm_setter(best_z)
@@ -157,20 +157,20 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
         self.omegas.append(omega)
         self._last_omega = omega
 
-    @staticmethod
-    def get_yz_least_squares(v_values: list, omegas: list) -> tuple[float, float]:
-        """Get the least squares solution for y and z from the vertical distances and omega angles.
 
-        Args:
-            v_values (list): List of vertical distances from beam centre in mm.
-            thetas_deg (list): List of omega angles in degrees.
+def get_yz_least_squares(v_values: list, omegas: list) -> tuple[float, float]:
+    """Get the least squares solution for y and z from the vertical distances and omega angles.
 
-        Returns:
-            tuple[float, float]: y, z coordinates
-        """
-        thetas = np.radians(omegas)
-        matrix = np.column_stack([np.cos(thetas), -np.sin(thetas)])
+    Args:
+        v_values (list): List of vertical distances from beam centre in mm.
+        thetas_deg (list): List of omega angles in degrees.
 
-        yz, residuals, rank, s = np.linalg.lstsq(matrix, v_values, rcond=None)
-        y, z = yz
-        return y, z
+    Returns:
+        tuple[float, float]: y, z coordinates
+    """
+    thetas = np.radians(omegas)
+    matrix = np.column_stack([np.cos(thetas), -np.sin(thetas)])
+
+    yz, residuals, rank, s = np.linalg.lstsq(matrix, v_values, rcond=None)
+    y, z = yz
+    return y, z
