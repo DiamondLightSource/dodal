@@ -19,12 +19,13 @@ class AlertManagerAlertService(AlertService):
         self._password = password
         self._endpoint = f"{alertmanager_url}/api/v2"
 
-    def raise_alert(self, summary: str, content: str):
+    def raise_alert(self, summary: str, content: str, metadata: dict[str, str]):
         """
         Raise an alertmanager alert
         Args:
             summary: This will be used as the alert_summary annotation in the alert
             content: This will be used as the alert_content annotation in the alert
+            metadata: This will be included as additional labels in the alert
         """
         # start = datetime.now()
         # now = start.isoformat(timespec="milliseconds")
@@ -36,7 +37,8 @@ class AlertManagerAlertService(AlertService):
                 "labels": {
                     "alertname": "email-beamline-staff",
                     "alert_id": id,
-                },
+                }
+                | metadata,
                 "generatorURL": self._generatorUrl(),
             }
         ]

@@ -11,9 +11,8 @@ class AlertService(Protocol):
     service that is capable of disseminating them via any of a variety of media such
     as email, SMS, instant messaging, etc etc.
     """
-    def raise_alert(self,
-                    summary: str,
-                    content: str):
+
+    def raise_alert(self, summary: str, content: str, metadata: dict[str, str]):
         """
         Raise an alert that will be forwarded to beamline support staff, which might
         for example be used as the basis for an incident in an incident reporting system.
@@ -21,6 +20,9 @@ class AlertService(Protocol):
             summary: One line summary of the alert, that might for instance be used
                 in an email subject line.
             content: Plain text content detailing the nature of the incident.
+            metadata: A dict of strings that can be included as metadata in the alert for
+                those backends that support it. The summary and content will be included
+                by default.
         """
         pass
 

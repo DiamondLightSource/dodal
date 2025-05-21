@@ -19,10 +19,10 @@ class LoggingAlertService:
         super().__init__()
         self._level = level
 
-    def raise_alert(self, summary: str, content: str):
+    def raise_alert(self, summary: str, content: str, metadata: dict[str, str]):
         message = f"***ALERT*** summary={summary} content={content}"
         LOGGER.log(
             self._level,
             message,
-            extra={"alert_summary": summary, "alert_content": content},
+            extra={"alert_summary": summary, "alert_content": content} | metadata,
         )

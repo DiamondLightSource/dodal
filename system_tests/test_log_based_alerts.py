@@ -12,4 +12,4 @@ def test_alert_to_graylog():
     host, port = get_graylog_configuration(False)
     set_up_graylog_handler(logger, host, port)
     alert_service = LoggingAlertService()
-    alert_service.raise_alert("Test alert", "This is a test.")
+    alert_service.raise_alert("Test alert", "This is a test.", {"alert_type": "Test"})

@@ -15,10 +15,16 @@ def test_default_alerting_service_exists():
 @patch("dodal.common.alerting.log_based_service.LOGGER")
 def test_logging_alerting_service_raises_a_log_message(mock_logger: MagicMock, level):
     set_alerting_service(LoggingAlertService(level))
-    get_alerting_service().raise_alert("Test summary", "Test message")
+    get_alerting_service().raise_alert(
+        "Test summary", "Test message", {"alert_type": "Test"}
+    )
 
     mock_logger.log.assert_called_once_with(
         level,
         "***ALERT*** summary=Test summary content=Test message",
-        extra={"alert_summary": "Test summary", "alert_content": "Test message"},
+        extra={
+            "alert_summary": "Test summary",
+            "alert_content": "Test message",
+            "alert_type": "Test",
+        },
     )
