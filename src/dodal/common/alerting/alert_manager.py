@@ -12,10 +12,12 @@ class AlertManagerAlertService(AlertService):
     Raises an alert by calling the Alert Manager API.
     """
 
-    def __init__(self, username: str, password: str, helmchart_url: str):
+    def __init__(
+        self, alertmanager_url: str, username: str = None, password: str = None
+    ):
         self._username = username
         self._password = password
-        self._endpoint = f"{helmchart_url}/api/v2"
+        self._endpoint = f"{alertmanager_url}/api/v2"
 
     def raise_alert(self, summary: str, content: str):
         """
@@ -51,7 +53,8 @@ class AlertManagerAlertService(AlertService):
 
     def _session(self) -> requests.Session:
         session = requests.Session()
-        session.auth = HTTPBasicAuth(self._username, self._password)
+        if self._username:
+            session.auth = HTTPBasicAuth(self._username, self._password)
         session.headers["Accept"] = "application/json"
         return session
 
