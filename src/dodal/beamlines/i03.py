@@ -1,3 +1,4 @@
+from ophyd_async.fastcs.eiger import EigerDetector as FastEiger
 from ophyd_async.fastcs.panda import HDFPanda
 
 from dodal.common.beamlines.beamline_parameters import get_beamline_parameters
@@ -169,6 +170,20 @@ def eiger(mock: bool = False) -> EigerDetector:
         prefix="-EA-EIGER-01:",
         wait=False,
         fake=mock,
+    )
+
+
+@device_factory()
+def fastcs_eiger() -> FastEiger:
+    """Get the i03 FastCS Eiger device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i03, it will return the existing object.
+    """
+
+    return FastEiger(
+        prefix=PREFIX.beamline_prefix,
+        path_provider=get_path_provider(),
+        drv_suffix="-EA-EIGER-02:",
+        hdf_suffix="-EA-EIGER-01:OD:",
     )
 
 
