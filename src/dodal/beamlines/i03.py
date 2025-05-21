@@ -174,7 +174,8 @@ def eiger(mock: bool = False) -> EigerDetector:
     )
 
 
-def fastcs_eiger(mock: bool = False) -> FastEiger:
+@device_factory()
+def fastcs_eiger() -> FastEiger:
     """Get the i03 FastCS Eiger device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
