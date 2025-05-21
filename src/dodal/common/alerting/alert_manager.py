@@ -4,6 +4,7 @@ import requests
 from requests.auth import HTTPBasicAuth
 
 from dodal.common.alerting import AlertService
+from dodal.log import LOGGER
 
 
 class AlertManagerAlertService(AlertService):
@@ -17,6 +18,12 @@ class AlertManagerAlertService(AlertService):
         self._endpoint = f"{helmchart_url}/api/v2"
 
     def raise_alert(self, summary: str, content: str):
+        """
+        Raise an alertmanager alert
+        Args:
+            summary: This will be used as the alert_summary annotation in the alert
+            content: This will be used as the alert_content annotation in the alert
+        """
         # start = datetime.now()
         # now = start.isoformat(timespec="milliseconds")
         # expiry = (start + timedelta(hours=24)).isoformat(timespec="milliseconds")
@@ -31,6 +38,7 @@ class AlertManagerAlertService(AlertService):
                 "generatorURL": self._generatorUrl(),
             }
         ]
+        LOGGER.info(f"Raised alert id {id}")
         with self._session() as session:
             response = session.post(f"{self._endpoint}/alerts", json=payload)
             response.raise_for_status()

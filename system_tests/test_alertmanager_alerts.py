@@ -2,7 +2,7 @@ import pytest
 
 from dodal.common.alerting.alert_manager import AlertManagerAlertService
 
-ENDPOINT = "http://172.23.169.36:9093"
+ENDPOINT = "https://yqf46943-alertmanager.diamond.ac.uk"
 
 
 @pytest.mark.system_test
