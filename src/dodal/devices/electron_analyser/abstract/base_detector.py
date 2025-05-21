@@ -9,11 +9,12 @@ from bluesky.protocols import (
 )
 from event_model import DataKey
 from ophyd_async.core import (
+    AsyncConfigurable,
+    AsyncReadable,
     AsyncStatus,
     Device,
     Reference,
 )
-from ophyd_async.core._protocol import AsyncConfigurable, AsyncReadable
 from ophyd_async.epics.adcore import (
     ADBaseController,
 )
@@ -32,12 +33,7 @@ from dodal.devices.electron_analyser.abstract.base_region import (
 from dodal.devices.electron_analyser.util import to_kinetic_energy
 
 
-class AnalyserController(ADBaseController[AbstractAnalyserDriverIO]):
-    """
-    Use the standard controller. We have to implenement deadtime method. I think this is
-    safe to return 0.
-    """
-
+class ElectronAnalyserController(ADBaseController[AbstractAnalyserDriverIO]):
     def get_deadtime(self, exposure: float | None) -> float:
         return 0
 
@@ -51,7 +47,7 @@ class BaseElectronAnalyserDetector(
     Generic[TAbstractAnalyserDriverIO],
 ):
     """
-    Detector for data acquisition of electron self.driver. Can only acquire using settings
+    Detector for data acquisition of electron analyser. Can only acquire using settings
     already configured for the device.
 
     If possible, this should be changed to inheirt from a StandardDetector. Currently,
@@ -64,7 +60,9 @@ class BaseElectronAnalyserDetector(
         name: str,
         driver: TAbstractAnalyserDriverIO,
     ):
-        self.controller: AnalyserController = AnalyserController(driver=driver)
+        self.controller: ElectronAnalyserController = ElectronAnalyserController(
+            driver=driver
+        )
         super().__init__(name)
 
     @AsyncStatus.wrap
@@ -135,11 +133,12 @@ class AbstractElectronAnalyserRegionDetector(
 
     @AsyncStatus.wrap
     async def stage(self) -> None:
-        super().stage()
+        await super().stage()
         await self.configure_region()
 
     async def configure_region(self) -> None:
         # ToDo - Add way to get excitation energy from dcm / pgm device
+        # https://github.com/DiamondLightSource/dodal/issues/1224
         excitation_energy = 0
         await self.configure_base_region(excitation_energy)
         await self.configure_specific_region(excitation_energy)
@@ -199,7 +198,7 @@ class AbstractElectronAnalyserDetector(
     ],
 ):
     """
-    Electron self.driver detector with the additional functionality to load a sequence file
+    Electron analyser detector with the additional functionality to load a sequence file
     and create a list of temporary ElectronAnalyserRegionDetector objects. These will
     setup configured region settings before data acquisition.
     """
