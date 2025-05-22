@@ -113,7 +113,7 @@ def hfm() -> KBMirror:
 
 
 @device_factory()
-def d7diode() -> Diode:
+def d7_diode() -> Diode:
     return Diode(f"{PREFIX.beamline_prefix}-DI-PHDGN-07:")
 
 
