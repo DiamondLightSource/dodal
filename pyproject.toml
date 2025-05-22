@@ -15,7 +15,7 @@ description = "Ophyd devices and other utils that could be used across DLS beaml
 dependencies = [
     "click",
     "ophyd",
-    "ophyd-async>=0.10.0a3",
+    "ophyd-async>=0.10.0a4",
     "bluesky",
     "pyepics",
     "dataclasses-json",
@@ -24,9 +24,9 @@ dependencies = [
     "requests",
     "graypy",
     "pydantic>=2.0",
-    "opencv-python-headless",                                          # For pin-tip detection.
-    "aioca",                                                           # Required for CA support with ophyd-async.
-    "p4p",                                                             # Required for PVA support with ophyd-async.
+    "opencv-python-headless", # For pin-tip detection.
+    "aioca",                  # Required for CA support with ophyd-async.
+    "p4p",                    # Required for PVA support with ophyd-async.
     "numpy",
     "aiofiles",
     "aiohttp",
@@ -103,9 +103,8 @@ reportMissingImports = false  # Ignore missing stubs in imported modules
 # Run pytest with all our checkers, and don't spam us with massive tracebacks on error
 asyncio_mode = "auto"
 markers = [
-    "adsim: marks tests as requiring the containerised AreaDetector simulator running (deselect with '-m \"not adsim\"')",
+    "requires: marks tests as requiring other infrastructure",
     "skip_in_pycharm: marks test as not working in pycharm testrunner",
-    "system_test: marks test as other system test that requires infrastructure"
 ]
 addopts = """
     --cov=dodal --cov-report term --cov-report xml:cov.xml
@@ -154,12 +153,12 @@ allowlist_externals =
     sphinx-build
     sphinx-autobuild
 commands =
-    tests: pytest -m 'not (adsim)' --cov=dodal --cov-report term --cov-report xml:cov.xml {posargs}
+    tests: pytest -m 'not requires' --cov=dodal --cov-report term --cov-report xml:cov.xml {posargs}
     type-checking: pyright src tests {posargs}
     pre-commit: pre-commit run --all-files --show-diff-on-failure {posargs}
     docs: sphinx-{posargs:build -E} -T docs build/html
-    unit-report: pytest -m 'not (adsim)' --cov=dodal --cov-report term --cov-report xml:unit_cov.xml --json-report --json-report-file=unit-report.json tests {posargs}
-    system-report: pytest -m 'not (adsim or system_test)' --cov=dodal --cov-report term --cov-report xml:system_cov.xml --json-report --json-report-file=system-report.json system_tests {posargs}
+    unit-report: pytest -m 'not requires' --cov=dodal --cov-report term --cov-report xml:unit_cov.xml --json-report --json-report-file=unit-report.json tests {posargs}
+    system-report: pytest -m 'not requires or requires(external="internet")' --cov=dodal --cov-report term --cov-report xml:system_cov.xml --json-report --json-report-file=system-report.json system_tests {posargs}
 """
 
 [tool.ruff]

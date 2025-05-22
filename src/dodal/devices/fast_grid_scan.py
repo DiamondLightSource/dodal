@@ -234,7 +234,7 @@ class FastGridScanCommon(StandardReadable, Flyable, ABC, Generic[ParamType]):
         }
         super().__init__(name)
 
-    def _calculate_expected_images(self, x: float, y: float, z: float) -> float:
+    def _calculate_expected_images(self, x: int, y: int, z: int) -> int:
         LOGGER.info(f"Reading num of images found {x, y, z} images in each axis")
         first_grid = x * y
         second_grid = x * z
