@@ -40,6 +40,12 @@ class Coord(Enum):
     z = 2
 
 
+def smallest_part_of_list(data, factor=2):
+    sorted_data = sorted(data)
+    half_length = len(data) // factor
+    return sorted_data[:half_length]
+
+
 class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
     """Device that takes crystal centre values from Murko and uses them to set the
     x, y, z coordinate of the sample to be in line with the beam centre.
@@ -64,7 +70,7 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
         redis_password=RedisConstants.REDIS_PASSWORD,
         redis_db=RedisConstants.MURKO_REDIS_DB,
         name="",
-        stop_angle=270,
+        stop_angle=350,
     ):
         self.redis_client = StrictRedis(
             host=redis_host,
@@ -101,29 +107,48 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
     async def trigger(self):
         # Wait for results
         sample_id = await self.sample_id.get_value()
-        while self._last_omega < self.stop_angle:
-            # waits here for next batch to be received
-            message = await self.pubsub.get_message(timeout=self.TIMEOUT_S)
-            if message is None:  # No more messages to process
-                break
-            await self.process_batch(message, sample_id)
-        LOGGER.info(f"Using average of x beam distances: {self.x_dists_mm}")
-        avg_x = float(np.mean(self.x_dists_mm))
-        LOGGER.info(f"Finding least square y and z from y distances: {self.y_dists_mm}")
-        best_y, best_z = get_yz_least_squares(self.y_dists_mm, self.omegas)
-        self._x_mm_setter(avg_x)
-        self._y_mm_setter(best_y)
-        self._z_mm_setter(best_z)
+        sample_id = sample_id if sample_id else "0"
+        for rotation in range(2):
+            LOGGER.info(f"ROUND {rotation + 1}")
+            while self._last_omega < self.stop_angle:
+                # waits here for next batch to be received
+                message = await self.pubsub.get_message(timeout=self.TIMEOUT_S)
+                if message is None:  # No more messages to process
+                    break
+                await self.process_batch(message, sample_id)
+            LOGGER.info("Finding average of x beam distances")
+            avg_x = float(np.mean(smallest_part_of_list(self.x_dists_mm, 4)))
+            LOGGER.info("Finding least square y and z from y beam distances")
+            best_y, best_z = get_yz_least_squares(self.y_dists_mm, self.omegas)
+
+            # LOGGER.info(f"Setting x, y, z to ({avg_x}, {best_y}, {best_z})")
+            for i in range(len(self.omegas)):
+                LOGGER.info(
+                    f"omega: {round(self.omegas[i], 2)}, x: {round(self.x_dists_mm[i], 2)}, y: {round(self.y_dists_mm[i], 2)}"
+                )
+            LOGGER.info(f"END OF ROUND {rotation + 1}")
+            self._x_mm_setter(avg_x)
+            self._y_mm_setter(best_y)
+            self._z_mm_setter(best_z)
+            self.x_dists_mm = []
+            self.y_dists_mm = []
+            self.omegas = []
+            self.stop_angle += 360
 
     async def process_batch(self, message: dict | None, sample_id: str):
         if message and message["type"] == "message":
             batch_results = pickle.loads(message["data"])
+            LOGGER.info(f"Got a batch of length {len(batch_results)}")
             for results in batch_results:
-                LOGGER.info(f"Got {results} from redis")
+                # LOGGER.info(f"Got {results} from redis")
                 for uuid, result in results.items():
-                    if metadata_str := await self.redis_client.hget(  # type: ignore
+                    LOGGER.info(f"Using uuid of {uuid}")
+                    LOGGER.info(f"Using sample_id of {sample_id}")
+                    metadata_str = await self.redis_client.hget(  # type: ignore
                         f"murko:{sample_id}:metadata", uuid
-                    ):
+                    )
+                    LOGGER.info(f"Has metadata of {metadata_str}")
+                    if metadata_str:
                         self.process_result(result, uuid, metadata_str)
 
     def process_result(self, result: dict, uuid: int, metadata_str: str):
@@ -131,31 +156,41 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
         horizontal and vertical distances from the beam centre, and store these values
         as well as the omega angle the image was taken at.
         """
-        LOGGER.info(f"Using result {uuid}, {metadata_str}, {result}")
+        LOGGER.info(f"Using result {uuid}, {metadata_str}")
         metadata = MurkoMetadata(json.loads(metadata_str))
         omega = metadata["omega_angle"]
         LOGGER.info(f"Got angle {omega}")
         coords = result["most_likely_click"]  # As proportion from top, left of image
-        shape = result["original_shape"]  # Dimensions of image in pixels
-        # Murko returns coords as y, x
-        centre_px = (coords[1] * shape[1], coords[0] * shape[0])
-        LOGGER.info(f"Using image taken at {omega}, which found xtal at {centre_px}")
+        LOGGER.info(f"Got most_likely_click: {coords}")
+        if tuple(coords) == (-1, -1):
+            LOGGER.info("Got no results from Murko, moving on")
+        else:
+            shape = result["original_shape"]  # Dimensions of image in pixels
+            # Murko returns coords as y, x
+            centre_px = (coords[1] * shape[1], coords[0] * shape[0])
+            LOGGER.info(
+                f"Using image taken at {omega}, which found xtal at {centre_px}"
+            )
 
-        beam_dist_px = calculate_beam_distance(
-            (metadata["beam_centre_i"], metadata["beam_centre_j"]),
-            centre_px[0],
-            centre_px[1],
-        )
-        LOGGER.info(f"Found horizontal distance at {beam_dist_px[0]}, angle = {omega}")
-        LOGGER.info(f"Found vertical distance at {beam_dist_px[1]}, angle = {omega}")
-        self.x_dists_mm.append(
-            -beam_dist_px[0] * metadata["microns_per_x_pixel"] / 1000
-        )
-        self.y_dists_mm.append(
-            -beam_dist_px[1] * metadata["microns_per_y_pixel"] / 1000
-        )
-        self.omegas.append(omega)
-        self._last_omega = omega
+            beam_dist_px = calculate_beam_distance(
+                (metadata["beam_centre_i"], metadata["beam_centre_j"]),
+                centre_px[0],
+                centre_px[1],
+            )
+            LOGGER.info(
+                f"Found horizontal distance at {beam_dist_px[0]}, angle = {omega}"
+            )
+            LOGGER.info(
+                f"Found vertical distance at {beam_dist_px[1]}, angle = {omega}"
+            )
+            self.x_dists_mm.append(
+                -beam_dist_px[0] * metadata["microns_per_x_pixel"] / 1000
+            )
+            self.y_dists_mm.append(
+                -beam_dist_px[1] * metadata["microns_per_y_pixel"] / 1000
+            )
+            self.omegas.append(omega)
+            self._last_omega = omega
 
 
 def get_yz_least_squares(v_values: list, omegas: list) -> tuple[float, float]:
