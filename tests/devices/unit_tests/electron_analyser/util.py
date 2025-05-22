@@ -19,6 +19,8 @@ from dodal.devices.electron_analyser.vgscienta import (
     VGScientaSequence,
 )
 
+ElectronAnalyserDetectorImpl = SpecsDetector | VGScientaDetector
+
 TEST_DATA_PATH = "tests/test_data/electron_analyser/"
 
 TEST_VGSCIENTA_SEQUENCE = os.path.join(TEST_DATA_PATH, "vgscienta_sequence.seq")

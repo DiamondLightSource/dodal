@@ -1,9 +1,12 @@
+import asyncio
 from abc import ABC, abstractmethod
-from typing import TypeVar
+from typing import Generic, TypeVar
 
 import numpy as np
+from bluesky.protocols import Preparable
 from ophyd_async.core import (
     Array1D,
+    AsyncStatus,
     SignalR,
     StandardReadable,
     StandardReadableFormat,
@@ -13,11 +16,16 @@ from ophyd_async.core import (
 from ophyd_async.epics.adcore import ADBaseIO
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
+from dodal.devices.electron_analyser.abstract.base_region import (
+    TAbstractBaseRegion,
+)
 from dodal.devices.electron_analyser.types import EnergyMode
-from dodal.devices.electron_analyser.util import to_binding_energy
+from dodal.devices.electron_analyser.util import to_binding_energy, to_kinetic_energy
 
 
-class AbstractAnalyserDriverIO(ABC, StandardReadable, ADBaseIO):
+class AbstractAnalyserDriverIO(
+    ABC, StandardReadable, ADBaseIO, Preparable, Generic[TAbstractBaseRegion]
+):
     """
     Generic device to configure electron analyser with new region settings.
     Electron analysers should inherit from this class for further specialisation.
@@ -70,6 +78,44 @@ class AbstractAnalyserDriverIO(ABC, StandardReadable, ADBaseIO):
             )
 
         super().__init__(prefix=prefix, name=name)
+
+    @AsyncStatus.wrap
+    async def prepare(self, value: TAbstractBaseRegion) -> None:
+        """
+        This should encompass all core region logic which is common to every electron
+        analyser.
+        """
+        region = value
+        excitation_energy = await self._get_excitation_energy(region)
+
+        low_energy = to_kinetic_energy(
+            region.low_energy, region.energy_mode, excitation_energy
+        )
+        high_energy = to_kinetic_energy(
+            region.high_energy, region.energy_mode, excitation_energy
+        )
+        pass_energy_type = self.pass_energy_type
+        pass_energy = pass_energy_type(region.pass_energy)
+
+        await asyncio.gather(
+            self.region_name.set(region.name),
+            self.energy_mode.set(region.energy_mode),
+            self.excitation_energy.set(excitation_energy),
+            self.low_energy.set(low_energy),
+            self.high_energy.set(high_energy),
+            self.slices.set(region.slices),
+            self.lens_mode.set(region.lens_mode),
+            self.pass_energy.set(pass_energy),
+            self.iterations.set(region.iterations),
+            self.acquisition_mode.set(region.acquisition_mode),
+        )
+
+    @abstractmethod
+    async def _get_excitation_energy(self, region: TAbstractBaseRegion) -> float:
+        """
+        Define how to get the excitation energy. Depends on beamline setup and configured
+        region.
+        """
 
     @abstractmethod
     def _create_angle_axis_signal(self, prefix: str) -> SignalR[Array1D[np.float64]]:

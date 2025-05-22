@@ -3,29 +3,26 @@ from typing import Any
 import pytest
 from ophyd_async.core import init_devices
 
+from dodal.devices.electron_analyser import ElectronAnalyserDetector
 from dodal.devices.electron_analyser.abstract import (
+    AbstractAnalyserDriverIO,
     AbstractBaseSequence,
     TAbstractAnalyserDriverIO,
     TAbstractBaseRegion,
+    TAbstractBaseSequence,
 )
-from dodal.devices.electron_analyser.specs import SpecsDetector
+from dodal.devices.electron_analyser.specs import (
+    SpecsAnalyserDriverIO,
+    SpecsSequence,
+)
 from dodal.devices.electron_analyser.vgscienta import (
-    VGScientaDetector,
+    VGScientaAnalyserDriverIO,
+    VGScientaSequence,
 )
-
-ElectronAnalyserDetectorImpl = SpecsDetector | VGScientaDetector
-
-
-@pytest.fixture
-async def sim_driver(
-    driver_class: type[TAbstractAnalyserDriverIO],
-) -> TAbstractAnalyserDriverIO:
-    async with init_devices(mock=True, connect=True):
-        sim_driver = driver_class(
-            prefix="TEST:",
-            name="sim_driver",
-        )
-    return sim_driver
+from tests.devices.unit_tests.electron_analyser.util import (
+    ElectronAnalyserDetectorImpl,
+    get_test_sequence,
+)
 
 
 @pytest.fixture
@@ -41,6 +38,43 @@ async def sim_detector(
 
 
 @pytest.fixture
+async def sim_driver(
+    driver_class: type[TAbstractAnalyserDriverIO],
+) -> TAbstractAnalyserDriverIO:
+    async with init_devices(mock=True, connect=True):
+        sim_driver = driver_class(
+            prefix="TEST:",
+            name="sim_driver",
+        )
+    return sim_driver
+
+
+@pytest.fixture
+def sequence_class(
+    driver_class: type[AbstractAnalyserDriverIO],
+) -> type[AbstractBaseSequence]:
+    if driver_class == VGScientaAnalyserDriverIO:
+        return VGScientaSequence
+    elif driver_class == SpecsAnalyserDriverIO:
+        return SpecsSequence
+    raise ValueError("class " + str(driver_class) + " not recognised")
+
+
+@pytest.fixture
+def sequence(
+    driver_class: type[TAbstractAnalyserDriverIO],
+    sequence_class: type[TAbstractBaseSequence],
+):
+    det = ElectronAnalyserDetector(
+        prefix="SIM:",
+        name="sim_analyser",
+        driver_class=driver_class,
+        sequence_class=sequence_class,
+    )
+    return det.load_sequence(get_test_sequence(driver_class))
+
+
+@pytest.fixture
 def region(
     request: pytest.FixtureRequest, sequence: AbstractBaseSequence[TAbstractBaseRegion]
 ) -> TAbstractBaseRegion:
@@ -48,13 +82,6 @@ def region(
     if region is None:
         raise ValueError("Region " + request.param + " is not found.")
     return region
-
-
-# ToDo - This needs to come from a device
-# https://github.com/DiamondLightSource/dodal/issues/1224
-@pytest.fixture
-def excitation_energy() -> float:
-    return 0
 
 
 @pytest.fixture

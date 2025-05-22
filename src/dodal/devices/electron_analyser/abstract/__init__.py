@@ -1,11 +1,6 @@
 from .base_detector import (
     AbstractAnalyserDriverIO,
     AbstractElectronAnalyserDetector,
-    AbstractElectronAnalyserRegionDetector,
-    ElectronAnalyserDetector,
-    ElectronAnalyserRegionDetector,
-    TAbstractElectronAnalyserDetector,
-    TAbstractElectronAnalyserRegionDetector,
 )
 from .base_driver_io import AbstractAnalyserDriverIO, TAbstractAnalyserDriverIO
 from .base_region import (
@@ -22,11 +17,6 @@ __all__ = [
     "TAbstractBaseSequence",
     "AbstractAnalyserDriverIO",
     "AbstractElectronAnalyserDetector",
-    "AbstractElectronAnalyserRegionDetector",
-    "ElectronAnalyserDetector",
-    "ElectronAnalyserRegionDetector",
-    "TAbstractElectronAnalyserDetector",
-    "TAbstractElectronAnalyserRegionDetector",
     "AbstractAnalyserDriverIO",
     "TAbstractAnalyserDriverIO",
 ]

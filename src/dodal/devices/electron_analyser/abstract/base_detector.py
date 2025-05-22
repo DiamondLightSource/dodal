@@ -25,12 +25,9 @@ from dodal.devices.electron_analyser.abstract.base_driver_io import (
     TAbstractAnalyserDriverIO,
 )
 from dodal.devices.electron_analyser.abstract.base_region import (
-    AbstractBaseRegion,
-    AbstractBaseSequence,
     TAbstractBaseRegion,
     TAbstractBaseSequence,
 )
-from dodal.devices.electron_analyser.util import to_kinetic_energy
 
 
 class ElectronAnalyserController(ADBaseController[AbstractAnalyserDriverIO]):
@@ -38,7 +35,7 @@ class ElectronAnalyserController(ADBaseController[AbstractAnalyserDriverIO]):
         return 0
 
 
-class BaseElectronAnalyserDetector(
+class AbstractElectronAnalyserDetector(
     Device,
     Stageable,
     Triggerable,
@@ -107,8 +104,8 @@ class BaseElectronAnalyserDetector(
         """
 
 
-class AbstractElectronAnalyserRegionDetector(
-    BaseElectronAnalyserDetector[TAbstractAnalyserDriverIO],
+class ElectronAnalyserRegionDetector(
+    AbstractElectronAnalyserDetector[TAbstractAnalyserDriverIO],
     Stageable,
     Generic[TAbstractAnalyserDriverIO, TAbstractBaseRegion],
 ):
@@ -134,64 +131,19 @@ class AbstractElectronAnalyserRegionDetector(
     @AsyncStatus.wrap
     async def stage(self) -> None:
         await super().stage()
-        await self.configure_region()
-
-    async def configure_region(self) -> None:
-        # ToDo - Add way to get excitation energy from dcm / pgm device
-        # https://github.com/DiamondLightSource/dodal/issues/1224
-        excitation_energy = 0
-        await self.configure_base_region(excitation_energy)
-        await self.configure_specific_region(excitation_energy)
-
-    async def configure_base_region(self, excitation_energy: float) -> None:
-        """
-        This should encompass all core region logic which is common to every electron
-        analyser.
-        """
-        low_energy = to_kinetic_energy(
-            self.region.low_energy, self.region.energy_mode, excitation_energy
-        )
-        high_energy = to_kinetic_energy(
-            self.region.high_energy, self.region.energy_mode, excitation_energy
-        )
-        pass_energy_type = self.driver.pass_energy_type
-        pass_energy = pass_energy_type(self.region.pass_energy)
-
-        await asyncio.gather(
-            self.driver.region_name.set(self.region.name),
-            self.driver.energy_mode.set(self.region.energy_mode),
-            self.driver.excitation_energy.set(excitation_energy),
-            self.driver.low_energy.set(low_energy),
-            self.driver.high_energy.set(high_energy),
-            self.driver.slices.set(self.region.slices),
-            self.driver.lens_mode.set(self.region.lens_mode),
-            self.driver.pass_energy.set(pass_energy),
-            self.driver.iterations.set(self.region.iterations),
-            self.driver.acquisition_mode.set(self.region.acquisition_mode),
-        )
-
-    @abstractmethod
-    async def configure_specific_region(self, excitation_energy: float) -> None:
-        """
-        Method to perform any specialised region setup logic.
-        """
+        # Setup the detector by passing the region to the driver to configure
+        await self.driver.prepare(self.region)
 
 
-TAbstractElectronAnalyserRegionDetector = TypeVar(
-    "TAbstractElectronAnalyserRegionDetector",
-    bound=AbstractElectronAnalyserRegionDetector,
+TElectronAnalyserRegionDetector = TypeVar(
+    "TElectronAnalyserRegionDetector",
+    bound=ElectronAnalyserRegionDetector,
 )
 
-ElectronAnalyserRegionDetector = AbstractElectronAnalyserRegionDetector[
-    AbstractAnalyserDriverIO,
-    AbstractBaseRegion,
-]
 
-
-class AbstractElectronAnalyserDetector(
-    BaseElectronAnalyserDetector[TAbstractAnalyserDriverIO],
+class ElectronAnalyserDetector(
+    AbstractElectronAnalyserDetector[TAbstractAnalyserDriverIO],
     Generic[
-        TAbstractElectronAnalyserRegionDetector,
         TAbstractAnalyserDriverIO,
         TAbstractBaseSequence,
         TAbstractBaseRegion,
@@ -204,9 +156,13 @@ class AbstractElectronAnalyserDetector(
     """
 
     def __init__(
-        self, prefix: str, name: str, sequence_class: type[TAbstractBaseSequence]
+        self,
+        prefix: str,
+        name: str,
+        sequence_class: type[TAbstractBaseSequence],
+        driver_class: type[TAbstractAnalyserDriverIO],
     ):
-        self._driver = self._create_driver(prefix)
+        self._driver = driver_class(prefix, name)
         self._sequence_class = sequence_class
         super().__init__(name, self.driver)
 
@@ -219,43 +175,23 @@ class AbstractElectronAnalyserDetector(
     def load_sequence(self, filename: str) -> TAbstractBaseSequence:
         return load_json_file_to_class(self._sequence_class, filename)
 
-    @abstractmethod
-    def _create_driver(self, prefix: str) -> TAbstractAnalyserDriverIO:
-        """
-        Define implementation of the driver used for this detector.
-        """
-
-    @abstractmethod
-    def _create_region_detector(
-        self, driver: TAbstractAnalyserDriverIO, region: TAbstractBaseRegion
-    ) -> TAbstractElectronAnalyserRegionDetector:
-        """
-        Define a way to create a temporary detector object that will always setup a
-        specific region before acquiring.
-        """
-
     def create_region_detector_list(
         self, filename: str, enabled_only=True
-    ) -> list[TAbstractElectronAnalyserRegionDetector]:
+    ) -> list[
+        ElectronAnalyserRegionDetector[TAbstractAnalyserDriverIO, TAbstractBaseRegion]
+    ]:
         """
         Create a list of detectors that will setup a specific region from the sequence
         file when used.
         """
         seq = self.load_sequence(filename)
         regions = seq.get_enabled_regions() if enabled_only else seq.regions
-        return [self._create_region_detector(self.driver, r) for r in regions]
+        return [
+            ElectronAnalyserRegionDetector(self.name, self.driver, r) for r in regions
+        ]
 
 
-TAbstractElectronAnalyserDetector = TypeVar(
-    "TAbstractElectronAnalyserDetector",
-    bound=AbstractElectronAnalyserDetector,
+TElectronAnalyserDetector = TypeVar(
+    "TElectronAnalyserDetector",
+    bound=ElectronAnalyserDetector,
 )
-
-ElectronAnalyserDetector = AbstractElectronAnalyserDetector[
-    AbstractElectronAnalyserRegionDetector[
-        AbstractAnalyserDriverIO, AbstractBaseRegion
-    ],
-    AbstractAnalyserDriverIO,
-    AbstractBaseSequence[AbstractBaseRegion],
-    AbstractBaseRegion,
-]
