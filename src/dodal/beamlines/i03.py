@@ -1,3 +1,4 @@
+from ophyd_async.fastcs.eiger import EigerDetector as FastEiger
 from ophyd_async.fastcs.panda import HDFPanda
 
 from dodal.common.beamlines.beamline_parameters import get_beamline_parameters
@@ -28,8 +29,8 @@ from dodal.devices.i03 import Beamstop
 from dodal.devices.i03.dcm import DCM
 from dodal.devices.i03.undulator_dcm import UndulatorDCM
 from dodal.devices.motors import XYZPositioner
-from dodal.devices.oav.oav_detector import OAV
-from dodal.devices.oav.oav_parameters import OAVConfig
+from dodal.devices.oav.oav_detector import OAVBeamCentreFile
+from dodal.devices.oav.oav_parameters import OAVConfigBeamCentre
 from dodal.devices.oav.pin_image_recognition import PinTipDetection
 from dodal.devices.qbpm import QBPM
 from dodal.devices.robot import BartRobot
@@ -173,6 +174,20 @@ def eiger(mock: bool = False) -> EigerDetector:
 
 
 @device_factory()
+def fastcs_eiger() -> FastEiger:
+    """Get the i03 FastCS Eiger device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i03, it will return the existing object.
+    """
+
+    return FastEiger(
+        prefix=PREFIX.beamline_prefix,
+        path_provider=get_path_provider(),
+        drv_suffix="-EA-EIGER-02:",
+        hdf_suffix="-EA-EIGER-01:OD:",
+    )
+
+
+@device_factory()
 def zebra_fast_grid_scan() -> ZebraFastGridScan:
     """Get the i03 zebra_fast_grid_scan device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
@@ -197,15 +212,15 @@ def panda_fast_grid_scan() -> PandAFastGridScan:
 
 @device_factory()
 def oav(
-    params: OAVConfig | None = None,
-) -> OAV:
+    params: OAVConfigBeamCentre | None = None,
+) -> OAVBeamCentreFile:
     """Get the i03 OAV device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return OAV(
+    return OAVBeamCentreFile(
         prefix=f"{PREFIX.beamline_prefix}-DI-OAV-01:",
         name="oav",
-        config=params or OAVConfig(ZOOM_PARAMS_FILE, DISPLAY_CONFIG),
+        config=params or OAVConfigBeamCentre(ZOOM_PARAMS_FILE, DISPLAY_CONFIG),
     )
 
 

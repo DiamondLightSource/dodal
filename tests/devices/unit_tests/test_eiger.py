@@ -1,6 +1,5 @@
 # type: ignore # Eiger will soon be ophyd-async https://github.com/DiamondLightSource/dodal/issues/700
 import threading
-from pathlib import Path
 from unittest.mock import ANY, MagicMock, Mock, call, create_autospec, patch
 
 import pytest
@@ -16,19 +15,8 @@ from dodal.devices.status import await_value
 from dodal.devices.util.epics_util import run_functions_without_blocking
 from dodal.log import LOGGER
 
-TEST_DETECTOR_SIZE_CONSTANTS = EIGER2_X_16M_SIZE
-
-TEST_EXPECTED_ENERGY = 100.0
-TEST_EXPOSURE_TIME = 1.0
 TEST_PREFIX = "test"
 TEST_RUN_NUMBER = 0
-TEST_DETECTOR_DISTANCE = 1.0
-TEST_OMEGA_START = 0.0
-TEST_OMEGA_INCREMENT = 1.0
-TEST_NUM_IMAGES_PER_TRIGGER = 1
-TEST_NUM_TRIGGERS = 2000
-TEST_USE_ROI_MODE = False
-TEST_DET_DIST_TO_BEAM_CONVERTER_PATH = "tests/devices/unit_tests/test_lookup_table.txt"
 
 
 class StatusException(Exception):
@@ -36,29 +24,10 @@ class StatusException(Exception):
 
 
 @pytest.fixture
-def params(tmp_path: Path) -> DetectorParams:
-    return DetectorParams(
-        expected_energy_ev=TEST_EXPECTED_ENERGY,
-        exposure_time_s=TEST_EXPOSURE_TIME,
-        directory=str(tmp_path),
-        prefix=TEST_PREFIX,
-        run_number=TEST_RUN_NUMBER,
-        detector_distance=TEST_DETECTOR_DISTANCE,
-        omega_start=TEST_OMEGA_START,
-        omega_increment=TEST_OMEGA_INCREMENT,
-        num_images_per_trigger=TEST_NUM_IMAGES_PER_TRIGGER,
-        num_triggers=TEST_NUM_TRIGGERS,
-        use_roi_mode=TEST_USE_ROI_MODE,
-        det_dist_to_beam_converter_path=TEST_DET_DIST_TO_BEAM_CONVERTER_PATH,
-        detector_size_constants=TEST_DETECTOR_SIZE_CONSTANTS.det_type_string,
-    )
-
-
-@pytest.fixture
-def fake_eiger(request, params: DetectorParams):
+def fake_eiger(request, eiger_params: DetectorParams):
     FakeEigerDetector: EigerDetector = make_fake_device(EigerDetector)
     fake_eiger: EigerDetector = FakeEigerDetector.with_params(
-        params=params, name=f"test fake Eiger: {request.node.name}"
+        params=eiger_params, name=f"test fake Eiger: {request.node.name}"
     )
     return fake_eiger
 
@@ -255,8 +224,8 @@ def test_disable_roi_mode_sets_correct_roi_mode(fake_eiger):
 @pytest.mark.parametrize(
     "roi_mode, expected_detector_dimensions",
     [
-        (True, TEST_DETECTOR_SIZE_CONSTANTS.roi_size_pixels),
-        (False, TEST_DETECTOR_SIZE_CONSTANTS.det_size_pixels),
+        (True, EIGER2_X_16M_SIZE.roi_size_pixels),
+        (False, EIGER2_X_16M_SIZE.det_size_pixels),
     ],
 )
 def test_change_roi_mode_sets_correct_detector_size_constants(
@@ -733,10 +702,10 @@ def test_when_eiger_is_stopped_then_dev_shm_disabled(fake_eiger: EigerDetector):
     assert fake_eiger.odin.fan.dev_shm_enable.get() == 0
 
 
-def test_for_other_beamlines_i03_used_as_default(params: DetectorParams):
+def test_for_other_beamlines_i03_used_as_default(eiger_params: DetectorParams):
     FakeEigerDetector: EigerDetector = make_fake_device(EigerDetector)
     fake_eiger: EigerDetector = FakeEigerDetector.with_params(
-        params=params, beamline="ixx"
+        params=eiger_params, beamline="ixx"
     )
     assert fake_eiger.beamline == "ixx"
     assert fake_eiger.timeouts == AVAILABLE_TIMEOUTS["i03"]
