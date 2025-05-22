@@ -44,6 +44,7 @@ class BaseZoomController(StandardReadable, Movable[str]):
 class NullZoomController(BaseZoomController):
     def __init__(self):
         self.level = soft_signal_rw(str, "1.0x")
+        self.percentage = soft_signal_rw(float)
 
     def set(self, value):
         raise Exception("Attempting to set zoom level of a null zoom controller")
