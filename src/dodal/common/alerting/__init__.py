@@ -4,8 +4,9 @@ Contains functionality for notifying beamline staff of events needing their atte
 
 from dodal.common.alerting._service import (
     AlertService,
+    Metadata,
     get_alerting_service,
     set_alerting_service,
 )
 
-__all__ = ["AlertService", "get_alerting_service", "set_alerting_service"]
+__all__ = ["AlertService", "Metadata", "get_alerting_service", "set_alerting_service"]

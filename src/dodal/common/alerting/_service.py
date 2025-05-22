@@ -1,8 +1,16 @@
+from enum import StrEnum
 from typing import Protocol
 
 from dodal.common.alerting.log_based_service import LoggingAlertService
 
 _alert_service = LoggingAlertService()
+
+
+class Metadata(StrEnum):
+    SAMPLE_ID = "sample_id"
+    VISIT = "visit"
+    CONTAINER = "container"
+    BEAMLINE = "beamline"
 
 
 class AlertService(Protocol):

@@ -1,9 +1,11 @@
 import uuid
+from datetime import datetime, timedelta, timezone
+from urllib.parse import quote
 
 import requests
 from requests.auth import HTTPBasicAuth
 
-from dodal.common.alerting import AlertService
+from dodal.common.alerting import AlertService, Metadata
 from dodal.log import LOGGER
 
 
@@ -13,10 +15,15 @@ class AlertManagerAlertService(AlertService):
     """
 
     def __init__(
-        self, alertmanager_url: str, username: str = None, password: str = None
+        self,
+        alertmanager_url: str,
+        graylog_stream: str = "66264f5519ccca6d1c9e4e03",
+        username: str = None,
+        password: str = None,
     ):
         self._username = username
         self._password = password
+        self._graylog_stream = graylog_stream
         self._endpoint = f"{alertmanager_url}/api/v2"
 
     def raise_alert(self, summary: str, content: str, metadata: dict[str, str]):
@@ -33,15 +40,21 @@ class AlertManagerAlertService(AlertService):
         id = str(uuid.uuid4())
         payload = [
             {
-                "annotations": {"alert_summary": summary, "alert_content": content},
+                "annotations": {
+                    "alert_summary": summary,
+                    "alert_content": content,
+                },
                 "labels": {
                     "alertname": "email-beamline-staff",
                     "alert_id": id,
                 }
                 | metadata,
-                "generatorURL": self._generatorUrl(),
+                "generatorURL": self._generator_url(),
             }
         ]
+        if sample_id := metadata.get(Metadata.SAMPLE_ID):
+            payload[0]["annotations"]["ispyb_url"] = self._ispybUrl(sample_id)
+
         LOGGER.info(f"Raised alert id {id}")
         with self._session() as session:
             response = session.post(f"{self._endpoint}/alerts", json=payload)
@@ -60,6 +73,14 @@ class AlertManagerAlertService(AlertService):
         session.headers["Accept"] = "application/json"
         return session
 
-    def _generatorUrl(self):
-        """TODO Obtain the generator url"""
-        return "http://172.23.169.36:9093/#/alerts"
+    def _ispybUrl(self, sample_id: str):
+        return f"https://ispyb.diamond.ac.uk/samples/sid/{quote(sample_id)}"
+
+    def _generator_url(self):
+        to_time = datetime.now(timezone.utc)
+        from_time = to_time - timedelta(minutes=15)
+        return (
+            f"https://graylog.diamond.ac.uk/streams/{quote(self._graylog_stream)}/search?q=&rangetype=absolute&"
+            f"from={quote(from_time.isoformat(timespec='milliseconds'))}&to="
+            f"{quote(to_time.isoformat(timespec='milliseconds'))}"
+        )
