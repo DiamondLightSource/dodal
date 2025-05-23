@@ -214,6 +214,7 @@ def test_process_result_appends_lists_with_correct_values(
 def test_process_result_skips_when_no_result_from_murko(
     mock_calculate_beam_distance: MagicMock,
     murko_results: MurkoResultsDevice,
+    caplog: pytest.LogCaptureFixture,
 ):
     result = {
         "most_likely_click": (-1, -1),  #  Murko could not find a most_likely_click
@@ -230,16 +231,19 @@ def test_process_result_skips_when_no_result_from_murko(
         sample_id="test",
     )
 
-    murko_results.process_result(result, metadata)
+    with caplog.at_level("INFO"):
+        murko_results.process_result(result, metadata)
+
     assert murko_results.x_dists_mm == []
     assert murko_results.y_dists_mm == []
     assert murko_results.omegas == []
     assert mock_calculate_beam_distance.call_count == 0
+    assert "Murko didn't produce a result, moving on" in caplog.text
 
 
 @patch("dodal.devices.i04.murko_results.MurkoResultsDevice.process_result")
 @patch("dodal.devices.i04.murko_results.StrictRedis")
-async def test_process_batch(
+async def test_process_batch_makes_correct_calls(
     mock_strict_redis: MagicMock,
     mock_process_result: MagicMock,
     murko_results: MurkoResultsDevice,
@@ -271,7 +275,10 @@ async def test_process_batch(
     _, murko_results.redis_client.hget = mock_redis_calls(
         mock_strict_redis, None, metadata
     )
+    mock_hget = cast(MagicMock, murko_results.redis_client.hget)
+
     await murko_results.process_batch(message, sample_id="0")
+    assert mock_hget.call_count == 6
     assert mock_process_result.call_count == 6
     assert mock_process_result.call_args_list[-1] == call(
         {"most_likely_click": (0.5, 0.5), "original_shape": (100, 100)},
@@ -283,6 +290,41 @@ async def test_process_batch(
             "beam_centre_j": 50,
         },
     )
+
+
+@patch("dodal.devices.i04.murko_results.MurkoResultsDevice.process_result")
+async def test_process_batch_doesnt_process_result_if_no_metadata_for_certain_uuid(
+    mock_process_result: MagicMock,
+    murko_results: MurkoResultsDevice,
+    caplog: pytest.LogCaptureFixture,
+):
+    batch = [
+        {
+            0: {
+                "most_likely_click": (0.5, 0.5),
+                "original_shape": (100, 100),
+            },
+            1: {
+                "most_likely_click": (0.7, 0.7),
+                "original_shape": (100, 100),
+            },
+        }
+    ]
+    message = {"data": pickle.dumps(batch), "type": "message"}
+
+    murko_results.redis_client.hget = patch.object(
+        murko_results.redis_client,
+        "hget",
+        new_callable=AsyncMock,
+        side_effect=lambda *_: None,
+    ).start()
+
+    with caplog.at_level("INFO"):
+        await murko_results.process_batch(message, sample_id="0")
+
+    assert mock_process_result.call_count == 0
+    assert "Found no metadata for uuid 0" in caplog.text
+    assert "Found no metadata for uuid 1" in caplog.text
 
 
 @patch("dodal.devices.i04.murko_results.StrictRedis")
