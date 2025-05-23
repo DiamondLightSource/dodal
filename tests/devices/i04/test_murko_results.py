@@ -1,54 +1,67 @@
 import json
 import pickle
 from collections.abc import Iterable
-from unittest.mock import AsyncMock, MagicMock, patch
+from typing import cast
+from unittest.mock import AsyncMock, MagicMock, call, patch
 
 import numpy as np
 import pytest
 from pytest import approx
 
-from dodal.devices.i04.murko_results import MurkoResultsDevice
+from dodal.devices.i04.murko_results import (
+    MurkoMetadata,
+    MurkoResultsDevice,
+    get_yz_least_squares,
+)
 
 
 @pytest.fixture
 @patch("dodal.devices.i04.murko_results.StrictRedis")
-async def mock_murko_results(mock_strict_redis) -> MurkoResultsDevice:
+async def murko_results(mock_strict_redis: MagicMock) -> MurkoResultsDevice:
     murko_results = MurkoResultsDevice(name="murko_results")
     return murko_results
 
 
 @pytest.fixture
 async def mock_setters(
-    mock_murko_results: MurkoResultsDevice,
+    murko_results: MurkoResultsDevice,
 ) -> tuple[MagicMock, MagicMock, MagicMock]:
     mock_x_setter = MagicMock()
     mock_y_setter = MagicMock()
     mock_z_setter = MagicMock()
-    mock_murko_results._x_mm_setter = mock_x_setter
-    mock_murko_results._y_mm_setter = mock_y_setter
-    mock_murko_results._z_mm_setter = mock_z_setter
+    murko_results._x_mm_setter = mock_x_setter
+    murko_results._y_mm_setter = mock_y_setter
+    murko_results._z_mm_setter = mock_z_setter
     return mock_x_setter, mock_y_setter, mock_z_setter
 
 
-def mock_redis_calls(mock_strict_redis, messages, metadata):
-    mock_get_message = patch.object(
-        mock_strict_redis.pubsub,
-        "get_message",
-        new_callable=AsyncMock,
-        side_effect=lambda *args, **kwargs: next(messages),
-    ).start()
-    mock_hget = patch.object(
-        mock_strict_redis,
-        "hget",
-        new_callable=AsyncMock,
-        side_effect=lambda _, uuid: metadata[uuid],
-    ).start()
+def mock_redis_calls(mock_strict_redis: MagicMock, messages, metadata):
+    mock_get_message = (
+        patch.object(
+            mock_strict_redis.pubsub,
+            "get_message",
+            new_callable=AsyncMock,
+            side_effect=lambda *args, **kwargs: next(messages),
+        ).start()
+        if messages
+        else None
+    )
+    mock_hget = (
+        patch.object(
+            mock_strict_redis,
+            "hget",
+            new_callable=AsyncMock,
+            side_effect=lambda _, uuid: metadata[uuid],
+        ).start()
+        if metadata
+        else None
+    )
     return mock_get_message, mock_hget
 
 
-def mock_get_beam_centre(mock_murko_results, x, y):
+def mock_get_beam_centre(murko_results, x, y):
     return patch.object(
-        mock_murko_results,
+        murko_results,
         "get_beam_centre",
         side_effect=lambda *args, **kwargs: (x, y),
     ).start()
@@ -100,11 +113,11 @@ def get_messages(
     omega = omega_start
     x, y, z = xyz
     for _ in range(batches):
-        data = []
+        batch = []
         for _ in range(messages_per_batch):
-            data_point = {}
+            results = {}
             for _ in range(images_per_message):
-                data_point[uuid] = {
+                results[uuid] = {
                     "most_likely_click": (
                         get_y_after_rotation(omega, y, z, beam_centre_j, shape_y),
                         x + x_drift * uuid,  # Murko returns coords as y, x
@@ -113,8 +126,8 @@ def get_messages(
                 }
                 uuid += 1
                 omega += omega_step
-            data.append(data_point)
-        messages.append({"type": "message", "data": data})
+            batch.append(results)
+        messages.append({"type": "message", "data": batch})
     metadata = json_metadata(
         n=batches * messages_per_batch * images_per_message,
         start=omega_start,
@@ -149,52 +162,153 @@ def json_metadata(
     return metadatas
 
 
+def get_test_data(y, z, theta_step, theta_end=360):
+    for theta in range(0, theta_end, theta_step):
+        print(f"omega: {theta}, result: {get_y_after_rotation(theta, y, z, 0, 1)}")
+
+
+def test_get_yz_least_squares():
+    v_dists = [1, -2, -1, 2, 1, -2]
+    omegas = [0, 90, 180, 270, 360, 450]
+    result = get_yz_least_squares(v_dists, omegas)
+    assert result[0] == approx(1)
+    assert result[1] == approx(2)
+
+
+def test_get_yz_least_squares_with_more_angles():
+    v_dists = [1, -0.707, -2, -2.121, -1, 0.707, 2, 2.121, 1]
+    omegas = [0, 45, 90, 135, 180, 225, 270, 315, 360]
+    result = get_yz_least_squares(v_dists, omegas)
+    assert result[0] == approx(1, abs=0.01)
+    assert result[1] == approx(2, abs=0.01)
+
+
+def test_process_result_appends_lists_with_correct_values(
+    murko_results: MurkoResultsDevice,
+):
+    result = {
+        "most_likely_click": (0.5, 0.3),  # (y, x)
+        "original_shape": (100, 100),
+    }
+    metadata = MurkoMetadata(
+        zoom_percentage=100.0,
+        omega_angle=60.0,
+        microns_per_x_pixel=5.0,
+        microns_per_y_pixel=5.0,
+        beam_centre_i=50,
+        beam_centre_j=50,
+        uuid="uuid",
+        sample_id="test",
+    )
+
+    assert murko_results.x_dists_mm == []
+    assert murko_results.y_dists_mm == []
+    assert murko_results.omegas == []
+    murko_results.process_result(result, metadata)
+    assert murko_results.x_dists_mm == [0.2 * 100 * 5 / 1000]
+    assert murko_results.y_dists_mm == [0]
+    assert murko_results.omegas == [60]
+
+
+@patch("dodal.devices.i04.murko_results.calculate_beam_distance")
+def test_process_result_skips_when_no_result_from_murko(
+    mock_calculate_beam_distance: MagicMock,
+    murko_results: MurkoResultsDevice,
+):
+    result = {
+        "most_likely_click": (-1, -1),  #  Murko could not find a most_likely_click
+        "original_shape": (100, 100),
+    }
+    metadata = MurkoMetadata(
+        zoom_percentage=100.0,
+        omega_angle=60.0,
+        microns_per_x_pixel=5.0,
+        microns_per_y_pixel=5.0,
+        beam_centre_i=50,
+        beam_centre_j=50,
+        uuid="uuid",
+        sample_id="test",
+    )
+
+    murko_results.process_result(result, metadata)
+    assert murko_results.x_dists_mm == []
+    assert murko_results.y_dists_mm == []
+    assert murko_results.omegas == []
+    assert mock_calculate_beam_distance.call_count == 0
+
+
+@patch("dodal.devices.i04.murko_results.MurkoResultsDevice.process_result")
+@patch("dodal.devices.i04.murko_results.StrictRedis")
+async def test_process_batch(
+    mock_strict_redis: MagicMock,
+    mock_process_result: MagicMock,
+    murko_results: MurkoResultsDevice,
+):
+    uuid = 0
+    omega = 0
+    batch = []
+
+    for _ in range(2):
+        results = {}
+        for _ in range(3):
+            results[uuid] = {
+                "most_likely_click": (0.5, 0.5),
+                "original_shape": (100, 100),  # (y, x) to match Murko
+            }
+            uuid += 1
+            omega += 20
+        batch.append(results)
+    message = {"data": pickle.dumps(batch), "type": "message"}
+    metadata = json_metadata(
+        n=6,
+        start=0,
+        step=20,
+        microns_pxp=10,
+        microns_pyp=10,
+        beam_centre_i=50,
+        beam_centre_j=50,
+    )
+    _, murko_results.redis_client.hget = mock_redis_calls(
+        mock_strict_redis, None, metadata
+    )
+    await murko_results.process_batch(message, sample_id="0")
+    assert mock_process_result.call_count == 6
+    assert mock_process_result.call_args_list[-1] == call(
+        {"most_likely_click": (0.5, 0.5), "original_shape": (100, 100)},
+        {
+            "omega_angle": 100,
+            "microns_per_x_pixel": 10,
+            "microns_per_y_pixel": 10,
+            "beam_centre_i": 50,
+            "beam_centre_j": 50,
+        },
+    )
+
+
 @patch("dodal.devices.i04.murko_results.StrictRedis")
 async def test_no_movement_given_sample_centre_matches_beam_centre(
-    mock_strict_redis, mock_murko_results, mock_setters
+    mock_strict_redis: MagicMock,
+    murko_results: MurkoResultsDevice,
+    mock_setters: tuple[MagicMock, MagicMock, MagicMock],
 ):
     mock_x_setter, mock_y_setter, mock_z_setter = mock_setters
     messages, metadata = get_messages(
         images_per_message=10, omega_start=50, omega_step=5
     )  # Crystal aligned with beam centre
-    mock_murko_results.pubsub.get_message, mock_murko_results.redis_client.hget = (
+    murko_results.pubsub.get_message, murko_results.redis_client.hget = (
         mock_redis_calls(mock_strict_redis, messages, metadata)
     )
-    await mock_murko_results.trigger()
+    await murko_results.trigger()
     assert mock_x_setter.call_args[0][0] == 0, "wrong x"
     assert mock_y_setter.call_args[0][0] == 0, "wrong y"
     assert mock_z_setter.call_args[0][0] == 0, "wrong z"
 
 
 @patch("dodal.devices.i04.murko_results.StrictRedis")
-async def test_correct_movement_given_90_and_180_angles_with_0_z(
-    mock_strict_redis, mock_murko_results, mock_setters
-):
-    x = 0.5
-    y = 0.4
-    z = 0
-    mock_x_setter, mock_y_setter, mock_z_setter = mock_setters
-    messages, metadata = get_messages(
-        xyz=(x, y, z), beam_centre_i=75, beam_centre_j=70
-    )  # 2 messages
-    mock_murko_results.pubsub.get_message, mock_murko_results.redis_client.hget = (
-        mock_redis_calls(mock_strict_redis, messages, metadata)
-    )
-    await mock_murko_results.trigger()
-
-    expected_x = x - 0.75  # beam_centre_i / shape_x = 0.75
-    assert mock_x_setter.call_args[0][0] == expected_x, "wrong x"
-
-    expected_y = y - 0.7  # beam_centre_j / shape_y = 0.7
-    assert mock_y_setter.call_args[0][0] == approx(expected_y), "wrong y"
-
-    expected_z = z
-    assert mock_z_setter.call_args[0][0] == approx(expected_z), "wrong z"
-
-
-@patch("dodal.devices.i04.murko_results.StrictRedis")
 async def test_correct_movement_given_90_180_degrees(
-    mock_strict_redis, mock_murko_results, mock_setters
+    mock_strict_redis: MagicMock,
+    murko_results: MurkoResultsDevice,
+    mock_setters: tuple[MagicMock, MagicMock, MagicMock],
 ):
     x = 0.5
     y = 0.6
@@ -203,10 +317,10 @@ async def test_correct_movement_given_90_180_degrees(
     messages, metadata = get_messages(
         xyz=(x, y, z), beam_centre_i=90, beam_centre_j=40, shape_x=100, shape_y=100
     )
-    mock_murko_results.pubsub.get_message, mock_murko_results.redis_client.hget = (
+    murko_results.pubsub.get_message, murko_results.redis_client.hget = (
         mock_redis_calls(mock_strict_redis, messages, metadata)
     )
-    await mock_murko_results.trigger()
+    await murko_results.trigger()
 
     assert mock_x_setter.call_args[0][0] == x - 0.9, "wrong x"
     assert mock_y_setter.call_args[0][0] == approx(y - 0.4), "wrong y"
@@ -215,7 +329,9 @@ async def test_correct_movement_given_90_180_degrees(
 
 @patch("dodal.devices.i04.murko_results.StrictRedis")
 async def test_correct_movement_given_45_and_135_angles(
-    mock_strict_redis, mock_murko_results, mock_setters
+    mock_strict_redis: MagicMock,
+    murko_results: MurkoResultsDevice,
+    mock_setters: tuple[MagicMock, MagicMock, MagicMock],
 ):
     x = 0.5
     y = 0.3
@@ -225,96 +341,21 @@ async def test_correct_movement_given_45_and_135_angles(
     messages, metadata = get_messages(
         xyz=xyz, omega_start=45, omega_step=90, beam_centre_i=75, beam_centre_j=70
     )
-    mock_murko_results.pubsub.get_message, mock_murko_results.redis_client.hget = (
+    murko_results.pubsub.get_message, murko_results.redis_client.hget = (
         mock_redis_calls(mock_strict_redis, messages, metadata)
     )
-    await mock_murko_results.trigger()
+    await murko_results.trigger()
 
     assert mock_x_setter.call_args[0][0] == x - 0.75, "wrong x"
-    assert mock_y_setter.call_args[0][0] == approx(y - 0.7), "wrong y"
-    assert mock_z_setter.call_args[0][0] == approx(z), "wrong z"
-
-
-@patch("dodal.devices.i04.murko_results.StrictRedis")
-async def test_correct_movement_given_30_and_120_angles(
-    mock_strict_redis, mock_murko_results, mock_setters
-):
-    x = 1
-    y = 1
-    z = 1
-    xyz = (x, y, z)
-    mock_x_setter, mock_y_setter, mock_z_setter = mock_setters
-    messages, metadata = get_messages(
-        xyz=xyz, omega_start=30, omega_step=90, beam_centre_i=75, beam_centre_j=70
-    )
-    mock_murko_results.pubsub.get_message, mock_murko_results.redis_client.hget = (
-        mock_redis_calls(mock_strict_redis, messages, metadata)
-    )
-    await mock_murko_results.trigger()
-
-    assert mock_x_setter.call_args[0][0] == x - 0.75, "wrong x"
-    assert mock_y_setter.call_args[0][0] == approx(y - 0.7), "wrong y"
-    assert mock_z_setter.call_args[0][0] == approx(z), "wrong z"
-
-
-@patch("dodal.devices.i04.murko_results.StrictRedis")
-async def test_correct_movement_given_30_and_150_angles_with_x_drift(
-    mock_strict_redis, mock_murko_results, mock_setters
-):
-    x = 1
-    y = 1
-    z = 1
-    xyz = (x, y, z)
-    mock_x_setter, mock_y_setter, mock_z_setter = mock_setters
-    messages, metadata = get_messages(
-        xyz=xyz,
-        omega_start=30,
-        omega_step=120,
-        beam_centre_i=75,
-        beam_centre_j=70,
-        x_drift=0.1,
-    )
-    mock_murko_results.pubsub.get_message, mock_murko_results.redis_client.hget = (
-        mock_redis_calls(mock_strict_redis, messages, metadata)
-    )
-    await mock_murko_results.trigger()
-
-    assert mock_x_setter.call_args[0][0] == np.mean([x, x + 0.1]) - 0.75, "wrong x"
-    assert mock_y_setter.call_args[0][0] == approx(y - 0.7), "wrong y"
-    assert mock_z_setter.call_args[0][0] == approx(z), "wrong z"
-
-
-@patch("dodal.devices.i04.murko_results.StrictRedis")
-async def test_correct_movement_given_multiple_angles(
-    mock_strict_redis, mock_murko_results, mock_setters
-):
-    x = 0.1
-    y = 0.2
-    z = 0.3
-    xyz = (x, y, z)
-    mock_x_setter, mock_y_setter, mock_z_setter = mock_setters
-    messages, metadata = get_messages(
-        batches=2,
-        messages_per_batch=2,
-        images_per_message=3,
-        xyz=xyz,
-        omega_start=22.4,
-        omega_step=20.7,
-        beam_centre_i=75,
-        beam_centre_j=70,
-    )
-    mock_murko_results.pubsub.get_message, mock_murko_results.redis_client.hget = (
-        mock_redis_calls(mock_strict_redis, messages, metadata)
-    )
-    await mock_murko_results.trigger()
-    assert mock_x_setter.call_args[0][0] == approx(x - 0.75), "wrong x"
     assert mock_y_setter.call_args[0][0] == approx(y - 0.7), "wrong y"
     assert mock_z_setter.call_args[0][0] == approx(z), "wrong z"
 
 
 @patch("dodal.devices.i04.murko_results.StrictRedis")
 async def test_correct_movement_given_multiple_angles_and_x_drift(
-    mock_strict_redis, mock_murko_results, mock_setters
+    mock_strict_redis: MagicMock,
+    murko_results: MurkoResultsDevice,
+    mock_setters: tuple[MagicMock, MagicMock, MagicMock],
 ):
     x = 0.1
     y = 0.2
@@ -332,10 +373,10 @@ async def test_correct_movement_given_multiple_angles_and_x_drift(
         beam_centre_j=70,
         x_drift=0.01,
     )
-    mock_murko_results.pubsub.get_message, mock_murko_results.redis_client.hget = (
+    murko_results.pubsub.get_message, murko_results.redis_client.hget = (
         mock_redis_calls(mock_strict_redis, messages, metadata)
     )
-    await mock_murko_results.trigger()
+    await murko_results.trigger()
     assert mock_x_setter.call_args[0][0] == approx(x + 0.055 - 0.75), "wrong x"
     assert mock_y_setter.call_args[0][0] == approx(y - 0.7), "wrong y"
     assert mock_z_setter.call_args[0][0] == approx(z), "wrong z"
@@ -343,27 +384,31 @@ async def test_correct_movement_given_multiple_angles_and_x_drift(
 
 @patch("dodal.devices.i04.murko_results.StrictRedis")
 async def test_trigger_calls_get_message_and_hget(
-    mock_strict_redis,
-    mock_murko_results,
+    mock_strict_redis: MagicMock,
+    murko_results: MurkoResultsDevice,
 ):
     messages, metadata = get_messages(
         batches=4, messages_per_batch=3, images_per_message=2, omega_step=5
     )
 
-    mock_murko_results.pubsub.get_message, mock_murko_results.redis_client.hget = (
+    murko_results.pubsub.get_message, murko_results.redis_client.hget = (
         mock_redis_calls(mock_strict_redis, messages, metadata)
     )
-    await mock_murko_results.trigger()
+    await murko_results.trigger()
+
+    mock_get_message = cast(MagicMock, murko_results.pubsub.get_message)
+    mock_hget = cast(MagicMock, murko_results.redis_client.hget)
+
     # 4 messages to find, plus one None message
-    assert mock_murko_results.pubsub.get_message.call_count == 5
+    assert mock_get_message.call_count == 5
     # 4 * 3 * 2 metadata messages
-    assert mock_murko_results.redis_client.hget.call_count == 24
+    assert mock_hget.call_count == 24
 
 
 @patch("dodal.devices.i04.murko_results.StrictRedis")
 async def test_trigger_stops_once_last_angle_found(
-    mock_strict_redis,
-    mock_murko_results,
+    mock_strict_redis: MagicMock,
+    murko_results: MurkoResultsDevice,
 ):
     messages, metadata = get_messages(
         batches=5,
@@ -373,46 +418,41 @@ async def test_trigger_stops_once_last_angle_found(
         omega_step=10,
     )
 
-    mock_murko_results.pubsub.get_message, mock_murko_results.redis_client.hget = (
+    murko_results.pubsub.get_message, murko_results.redis_client.hget = (
         mock_redis_calls(mock_strict_redis, messages, metadata)
     )
-    mock_murko_results.stop_angle = 200
-    await mock_murko_results.trigger()
+    murko_results.stop_angle = 200
+    await murko_results.trigger()
+
+    mock_get_message = cast(MagicMock, murko_results.pubsub.get_message)
+    mock_hget = cast(MagicMock, murko_results.redis_client.hget)
+
     # Takes 2 batches to find the last angle, 200°
-    assert mock_murko_results.pubsub.get_message.call_count == 2
+    assert mock_get_message.call_count == 2
     # 2 batches of 6 = 12
-    assert mock_murko_results.redis_client.hget.call_count == 12
+    assert mock_hget.call_count == 12
 
 
-@patch("dodal.devices.i04.murko_results.StrictRedis")
-async def test_stage_calls_setters_with_0(
-    mock_strict_redis, mock_murko_results, mock_setters
+async def test_assert_subscribes_to_queue_and_clears_results_on_stage(
+    murko_results: MurkoResultsDevice,
 ):
-    mock_x_setter, mock_y_setter, mock_z_setter = mock_setters
+    murko_results._x_mm_setter(1)
+    murko_results._y_mm_setter(2)
+    murko_results._z_mm_setter(3)
 
-    mock_murko_results.pubsub.subscribe = patch.object(
-        mock_strict_redis.pubsub,
-        "subscribe",
-        new_callable=AsyncMock,
-    ).start()
+    murko_results.pubsub = (mock_pubsub := AsyncMock())
+    await murko_results.stage()
 
-    await mock_murko_results.stage()
-
-    assert mock_murko_results.pubsub.subscribe.call_count == 1
-    assert mock_x_setter.call_args[0][0] == 0
-    assert mock_y_setter.call_args[0][0] == 0
-    assert mock_z_setter.call_args[0][0] == 0
+    mock_pubsub.subscribe.assert_called_once_with("murko-results")
+    assert await murko_results.x_mm.get_value() == 0
+    assert await murko_results.y_mm.get_value() == 0
+    assert await murko_results.z_mm.get_value() == 0
 
 
-@patch("dodal.devices.i04.murko_results.StrictRedis")
-async def test_unstage_calls_unsubscribe(
-    mock_strict_redis, mock_murko_results, mock_setters
+async def test_assert_unsubscribes_to_queue_on_unstage(
+    murko_results: MurkoResultsDevice,
 ):
-    mock_murko_results.pubsub.unsubscribe = patch.object(
-        mock_strict_redis.pubsub,
-        "unsubscribe",
-        new_callable=AsyncMock,
-    ).start()
+    murko_results.pubsub = (mock_pubsub := AsyncMock())
+    await murko_results.unstage()
 
-    await mock_murko_results.unstage()
-    assert mock_murko_results.pubsub.unsubscribe.call_count == 1
+    mock_pubsub.unsubscribe.assert_called_once()
