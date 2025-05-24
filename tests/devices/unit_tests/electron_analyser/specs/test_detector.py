@@ -36,6 +36,3 @@ async def test_analyser_specs_detector_image_shape(
         len(angle_axis),
         len(energy_axis),
     ]
-
-
-# ToDo - Check detector configures region correctly when implemented.

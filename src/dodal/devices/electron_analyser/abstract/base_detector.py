@@ -9,11 +9,12 @@ from bluesky.protocols import (
 )
 from event_model import DataKey
 from ophyd_async.core import (
+    AsyncConfigurable,
+    AsyncReadable,
     AsyncStatus,
     Device,
     Reference,
 )
-from ophyd_async.core._protocol import AsyncConfigurable, AsyncReadable
 from ophyd_async.epics.adcore import (
     ADBaseController,
 )
@@ -29,12 +30,12 @@ from dodal.devices.electron_analyser.abstract.base_region import (
 )
 
 
-class AnalyserController(ADBaseController[AbstractAnalyserDriverIO]):
+class ElectronAnalyserController(ADBaseController[AbstractAnalyserDriverIO]):
     def get_deadtime(self, exposure: float | None) -> float:
         return 0
 
 
-class BaseElectronAnalyserDetector(
+class AbstractElectronAnalyserDetector(
     Device,
     Stageable,
     Triggerable,
@@ -56,7 +57,9 @@ class BaseElectronAnalyserDetector(
         name: str,
         driver: TAbstractAnalyserDriverIO,
     ):
-        self.controller: AnalyserController = AnalyserController(driver=driver)
+        self.controller: ElectronAnalyserController = ElectronAnalyserController(
+            driver=driver
+        )
         super().__init__(name)
 
     @AsyncStatus.wrap
@@ -101,8 +104,8 @@ class BaseElectronAnalyserDetector(
         """
 
 
-class AbstractElectronAnalyserRegionDetector(
-    BaseElectronAnalyserDetector[TAbstractAnalyserDriverIO],
+class ElectronAnalyserRegionDetector(
+    AbstractElectronAnalyserDetector[TAbstractAnalyserDriverIO],
     Stageable,
     Generic[TAbstractAnalyserDriverIO, TAbstractBaseRegion],
 ):
@@ -127,25 +130,24 @@ class AbstractElectronAnalyserRegionDetector(
 
     @AsyncStatus.wrap
     async def stage(self) -> None:
-        super().stage()
-        self.configure_region()
-
-    @abstractmethod
-    def configure_region(self):
-        """
-        Setup analyser with configured region.
-        """
+        await super().stage()
+        # Setup the detector by passing the region to the driver to configure
+        await self.driver.prepare(self.region)
 
 
-TAbstractElectronAnalyserRegionDetector = TypeVar(
-    "TAbstractElectronAnalyserRegionDetector",
-    bound=AbstractElectronAnalyserRegionDetector,
+TElectronAnalyserRegionDetector = TypeVar(
+    "TElectronAnalyserRegionDetector",
+    bound=ElectronAnalyserRegionDetector,
 )
 
 
-class AbstractElectronAnalyserDetector(
-    BaseElectronAnalyserDetector[TAbstractAnalyserDriverIO],
-    Generic[TAbstractAnalyserDriverIO, TAbstractBaseSequence, TAbstractBaseRegion],
+class ElectronAnalyserDetector(
+    AbstractElectronAnalyserDetector[TAbstractAnalyserDriverIO],
+    Generic[
+        TAbstractAnalyserDriverIO,
+        TAbstractBaseSequence,
+        TAbstractBaseRegion,
+    ],
 ):
     """
     Electron analyser detector with the additional functionality to load a sequence file
@@ -154,9 +156,13 @@ class AbstractElectronAnalyserDetector(
     """
 
     def __init__(
-        self, prefix: str, name: str, sequence_class: type[TAbstractBaseSequence]
+        self,
+        prefix: str,
+        name: str,
+        sequence_class: type[TAbstractBaseSequence],
+        driver_class: type[TAbstractAnalyserDriverIO],
     ):
-        self._driver = self._create_driver(prefix)
+        self._driver = driver_class(prefix, name)
         self._sequence_class = sequence_class
         super().__init__(name, self.driver)
 
@@ -169,42 +175,23 @@ class AbstractElectronAnalyserDetector(
     def load_sequence(self, filename: str) -> TAbstractBaseSequence:
         return load_json_file_to_class(self._sequence_class, filename)
 
-    @abstractmethod
-    def _create_driver(self, prefix: str) -> TAbstractAnalyserDriverIO:
-        """
-        Define implementation of the driver used for this detector.
-        """
-
-    @abstractmethod
-    def _create_region_detector(
-        self, driver: TAbstractAnalyserDriverIO, region: TAbstractBaseRegion
-    ) -> AbstractElectronAnalyserRegionDetector[
-        TAbstractAnalyserDriverIO, TAbstractBaseRegion
-    ]:
-        """
-        Define a way to create a temporary detector object that will always setup a
-        specific region before acquiring.
-        """
-
     def create_region_detector_list(
-        self, filename: str
+        self, filename: str, enabled_only=True
     ) -> list[
-        AbstractElectronAnalyserRegionDetector[
-            TAbstractAnalyserDriverIO, TAbstractBaseRegion
-        ]
+        ElectronAnalyserRegionDetector[TAbstractAnalyserDriverIO, TAbstractBaseRegion]
     ]:
         """
         Create a list of detectors that will setup a specific region from the sequence
         file when used.
         """
         seq = self.load_sequence(filename)
+        regions = seq.get_enabled_regions() if enabled_only else seq.regions
         return [
-            self._create_region_detector(self.driver, r)
-            for r in seq.get_enabled_regions()
+            ElectronAnalyserRegionDetector(self.name, self.driver, r) for r in regions
         ]
 
 
-TAbstractElectronAnalyserDetector = TypeVar(
-    "TAbstractElectronAnalyserDetector",
-    bound=AbstractElectronAnalyserDetector,
+TElectronAnalyserDetector = TypeVar(
+    "TElectronAnalyserDetector",
+    bound=ElectronAnalyserDetector,
 )
