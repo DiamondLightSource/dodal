@@ -183,7 +183,7 @@ lint.select = [
     "PT006",   # pytest parametrize names wrong type - https://docs.astral.sh/ruff/rules/pytest-parametrize-names-wrong-type/
     "PT007",   # pytest parametrize values wrong type - https://docs.astral.sh/ruff/rules/pytest-parametrize-values-wrong-type/
     "D413",    # missing blank line after last section - https://docs.astral.sh/ruff/rules/missing-blank-line-after-last-section/
-    "RET504",  # unnecessary assign - https://docs.astral.sh/ruff/rules/unnecessary-assign/
+#    "RET504",  # unnecessary assign - https://docs.astral.sh/ruff/rules/unnecessary-assign/
     "D202",    # blank line after function - https://docs.astral.sh/ruff/rules/blank-line-after-function/
     "D200",    # unnecessary multiline docstring - https://docs.astral.sh/ruff/rules/unnecessary-multiline-docstring/
     "D209",    # new line after last paragraph - https://docs.astral.sh/ruff/rules/new-line-after-last-paragraph/
