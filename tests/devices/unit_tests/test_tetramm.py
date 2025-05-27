@@ -1,7 +1,7 @@
 import pytest
 from bluesky.run_engine import RunEngine
 from ophyd_async.core import DetectorTrigger, PathProvider, TriggerInfo, init_devices
-from ophyd_async.epics.adcore import ADFileWriteMode
+from ophyd_async.epics.adcore import ADFileWriteMode, NDFileHDFIO
 from ophyd_async.testing import set_mock_value
 
 from dodal.devices.tetramm import (
@@ -24,11 +24,12 @@ async def tetramm_driver(RE: RunEngine) -> TetrammDriver:
 
 @pytest.fixture
 async def tetramm_controller(
-    RE: RunEngine, tetramm_driver: TetrammDriver
+    RE: RunEngine, tetramm_driver: TetrammDriver, tetramm_hdfio: NDFileHDFIO
 ) -> TetrammController:
     async with init_devices(mock=True):
         controller = TetrammController(
             tetramm_driver,
+            tetramm_hdfio,
             maximum_readings_per_frame=2_000,
         )
 

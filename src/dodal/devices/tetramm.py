@@ -2,6 +2,7 @@ import asyncio
 
 from bluesky.protocols import Hints
 from ophyd_async.core import (
+    DEFAULT_TIMEOUT,
     DatasetDescriber,
     DetectorController,
     DetectorTrigger,
@@ -143,12 +144,13 @@ class TetrammController(DetectorController):
         )
 
     async def arm(self):
-        await stop_busy_record(self._drv.acquire, True, timeout=1)
+        await self._drv.acquire.set(True, wait=False, timeout=1)
+        await wait_for_value(self._drv.acquire, True, timeout=DEFAULT_TIMEOUT)
 
     async def wait_for_idle(self):
         # tetramm never goes idle really, actually it is always acquiring
         # so need to wait for the capture to finish instead
-        await wait_for_value(self._hdf.capture, False, timeout=30)
+        await wait_for_value(self._hdf.capture, False, timeout=DEFAULT_TIMEOUT)
 
     def _validate_trigger(self, trigger: DetectorTrigger) -> None:
         supported_trigger_types = {
