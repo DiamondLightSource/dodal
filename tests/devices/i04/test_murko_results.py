@@ -162,11 +162,6 @@ def json_metadata(
     return metadatas
 
 
-def get_test_data(y, z, theta_step, theta_end=360):
-    for theta in range(0, theta_end, theta_step):
-        print(f"omega: {theta}, result: {get_y_after_rotation(theta, y, z, 0, 1)}")
-
-
 def test_get_yz_least_squares():
     v_dists = [1, -2, -1, 2, 1, -2]
     omegas = [0, 90, 180, 270, 360, 450]
