@@ -76,6 +76,7 @@ class XrcResult(TypedDict):
     n_voxels: int
     total_count: int
     bounding_box: list[list[int]]
+    sample_id: int | None
 
 
 def bbox_size(result: XrcResult):
@@ -119,6 +120,8 @@ class ZocaloResults(StandardReadable, Triggerable):
 
     """
 
+    NO_SAMPLE_ID = -1
+
     def __init__(
         self,
         name: str = "zocalo",
@@ -156,6 +159,9 @@ class ZocaloResults(StandardReadable, Triggerable):
         self.total_count, self._total_count_setter = soft_signal_r_and_setter(
             Array1D[np.uint64], name="total_count"
         )
+        self.sample_id, self._sample_id_setter = soft_signal_r_and_setter(
+            Array1D[np.int64], name="sample_id"
+        )
         self.ispyb_dcid, self._ispyb_dcid_setter = soft_signal_r_and_setter(
             int, name="ispyb_dcid"
         )
@@ -170,6 +176,7 @@ class ZocaloResults(StandardReadable, Triggerable):
                 self.total_count,
                 self.centre_of_mass,
                 self.bounding_box,
+                self.sample_id,
                 self.ispyb_dcid,
                 self.ispyb_dcgid,
             ],
@@ -178,13 +185,15 @@ class ZocaloResults(StandardReadable, Triggerable):
         super().__init__(name)
 
     async def _put_results(self, results: Sequence[XrcResult], recipe_parameters):
-        centres_of_mass = np.array([r["centre_of_mass"] for r in results])
-        self._com_setter(centres_of_mass)
+        self._com_setter(np.array([r["centre_of_mass"] for r in results]))
         self._bounding_box_setter(np.array([r["bounding_box"] for r in results]))
         self._max_voxel_setter(np.array([r["max_voxel"] for r in results]))
         self._max_count_setter(np.array([r["max_count"] for r in results]))
         self._n_voxels_setter(np.array([r["n_voxels"] for r in results]))
         self._total_count_setter(np.array([r["total_count"] for r in results]))
+        self._sample_id_setter(
+            np.array([r["sample_id"] or self.NO_SAMPLE_ID for r in results])
+        )
         self._ispyb_dcid_setter(recipe_parameters["dcid"])
         self._ispyb_dcgid_setter(recipe_parameters["dcgid"])
 
@@ -322,6 +331,7 @@ def get_full_processing_results(
     n_voxels = yield from bps.rd(zocalo.n_voxels, default_value=[])
     total_count = yield from bps.rd(zocalo.total_count, default_value=[])
     bounding_box = yield from bps.rd(zocalo.bounding_box, default_value=[])
+    sample_id = yield from bps.rd(zocalo.sample_id, default_value=[])
     return [
         _corrected_xrc_result(
             XrcResult(
@@ -331,9 +341,17 @@ def get_full_processing_results(
                 n_voxels=int(n),
                 total_count=int(tc),
                 bounding_box=bb.tolist(),
+                sample_id=int(s_id) if s_id else None,
             )
         )
-        for com, mv, mc, n, tc, bb in zip(
-            com, max_voxel, max_count, n_voxels, total_count, bounding_box, strict=True
+        for com, mv, mc, n, tc, bb, s_id in zip(
+            com,
+            max_voxel,
+            max_count,
+            n_voxels,
+            total_count,
+            bounding_box,
+            sample_id,
+            strict=True,
         )
     ]
