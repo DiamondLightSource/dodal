@@ -52,8 +52,7 @@ def test_save_panda_failure_to_create_device_exits_with_failure_code(mock_exit, 
 
 @patch("dodal.plans.save_panda._save_panda")
 @pytest.mark.parametrize(
-    "beamline, args, expected_beamline, expected_device_name, expected_output_dir, expected_output_file, "
-    "expected_return_value",
+    ("beamline", "args", "expected_beamline", "expected_device_name", "expected_output_dir", "expected_output_file", "expected_return_value"),
     [
         (
             "i03",
@@ -143,12 +142,11 @@ def test_main(
 
 
 @pytest.mark.parametrize(
-    "file_exists, force, save_panda_called, expected_return_value",
+    ("file_exists", "force", "save_panda_called", "expected_return_value"),
     [
         (True, True, True, 0),
         (False, False, True, 0),
         (True, False, False, 1),
-        (True, True, True, 0),
     ],
 )
 @patch("dodal.plans.save_panda._save_panda")

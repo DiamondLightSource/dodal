@@ -97,8 +97,7 @@ def test_no_waiting_when_mode_does_not_allow_gating(
 
 
 @pytest.mark.parametrize(
-    "topup_start_countdown, topup_end_countdown, total_exposure_time, ops_time,"
-    "expected_wait, parameter_file",
+    ("topup_start_countdown", "topup_end_countdown", "total_exposure_time", "ops_time", "expected_wait", "parameter_file"),
     # limit = 120, delay = 1
     [
         (100, 108, 121, 1, 0, "test_beamline_parameters.txt"),

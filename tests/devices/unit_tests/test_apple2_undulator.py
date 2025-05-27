@@ -96,7 +96,7 @@ async def test_in_motion_error(
 
 
 @pytest.mark.parametrize(
-    "velocity, readback,target, expected_timeout",
+    ("velocity", "readback", "target", "expected_timeout"),
     [
         (0.7, 20.1, 5.2, 42.5),
         (0.2, 2, 8, 60.0),
@@ -186,7 +186,7 @@ async def test_phase_status_error(mock_phaseAxes: UndulatorPhaseAxes, RE: RunEng
 
 
 @pytest.mark.parametrize(
-    "velocity, readback,target, expected_timeout",
+    ("velocity", "readback", "target", "expected_timeout"),
     [
         ([-1, 2, 3, 4], [5, 2, 3, 4], [-2, 2, 3, 4], 14.0),
         ([-1, 0.8, 3, 4], [5, -8.5, 3, 4], [-2, 0, 3, 4], 21.2),
@@ -311,7 +311,7 @@ async def test_jaw_phase_status_error(mock_jaw_phase: UndulatorJawPhase):
 
 
 @pytest.mark.parametrize(
-    "velocity, readback,target, expected_timeout",
+    ("velocity", "readback", "target", "expected_timeout"),
     [
         (0.7, 20.1, 5.2, 42.5),
         (0.2, 2, 8, 60.0),

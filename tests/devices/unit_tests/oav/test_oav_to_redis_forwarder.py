@@ -141,7 +141,7 @@ async def test_when_get_frame_and_put_to_redis_called_then_data_put_in_redis_wit
 
 
 @pytest.mark.parametrize(
-    "source, expected_url",
+    ("source", "expected_url"),
     [
         (Source.FULL_SCREEN, "test-full-screen-stream-url"),
         (Source.ROI, "test-roi-stream-url"),
@@ -160,7 +160,7 @@ async def test_when_different_sources_selected_then_different_urls_used(
 
 
 @pytest.mark.parametrize(
-    "source, expected_uuid_prefix",
+    ("source", "expected_uuid_prefix"),
     [
         (Source.FULL_SCREEN, "fullscreen"),
         (Source.ROI, "roi"),
@@ -181,7 +181,7 @@ async def test_when_different_sources_selected_then_different_uuids_used(
 
 
 @pytest.mark.parametrize(
-    "source, expected_uuid_prefix",
+    ("source", "expected_uuid_prefix"),
     [
         (Source.FULL_SCREEN, "fullscreen"),
         (Source.ROI, "roi"),

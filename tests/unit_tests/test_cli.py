@@ -127,7 +127,7 @@ def test_cli_connect_in_sim_mode(runner: CliRunner):
 
 @patch.dict(os.environ, clear=True)
 @pytest.mark.parametrize(
-    "devices,expected_connections",
+    ("devices", "expected_connections"),
     [
         # Ophyd-Async Only
         (device_results(ophyd_async_happy_devices=6), 6),
@@ -302,7 +302,7 @@ def _mock_connect(
     ):
         result = runner.invoke(
             main,
-            ["connect"] + list(args),
+            ["connect", *list(args)],
             catch_exceptions=catch_exceptions,
         )
     return result

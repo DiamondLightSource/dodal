@@ -23,7 +23,7 @@ def not_a_device() -> None:
     """Importing DisconnectedError is enough to cause issue, but we
     use it here to prevent linting from removing it from the imports.
     """
-    raise DisconnectedError()
+    raise DisconnectedError
 
 
 def also_not_a_device() -> float:
@@ -38,7 +38,6 @@ b = Exception
 
 
 class B(TypedDict):
-    """Causes issue only if a class that extends TypedDict exists.
-    """
+    """Causes issue only if a class that extends TypedDict exists."""
 
     foo: int

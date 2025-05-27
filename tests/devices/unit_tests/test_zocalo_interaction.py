@@ -74,7 +74,7 @@ zc = ZocaloTrigger(environment=SIM_ZOCALO_ENV)
 
 
 @mark.parametrize(
-    "function_wrapper,expected_message",
+    ("function_wrapper", "expected_message"),
     [
         (normally, EXPECTED_RUN_START_MESSAGE),
         (
@@ -96,7 +96,7 @@ def test_run_start(function_wrapper: Callable, expected_message: dict):
 
 
 @mark.parametrize(
-    "function_wrapper,expected_message",
+    ("function_wrapper", "expected_message"),
     [
         (normally, EXPECTED_RUN_END_MESSAGE),
         (with_exception, EXPECTED_RUN_END_MESSAGE),

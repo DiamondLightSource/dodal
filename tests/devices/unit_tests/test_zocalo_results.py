@@ -361,7 +361,7 @@ async def test_given_comparing_results_if_cpu_results_arrive_before_gpu_then_war
 
 
 @pytest.mark.parametrize(
-    "dict1,dict2,output",
+    ("dict1", "dict2", "output"),
     [
         (
             {"recipe_parameters": {"gpu": True}, "results": [{"test": 0}]},

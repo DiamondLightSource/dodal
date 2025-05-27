@@ -77,13 +77,13 @@ async def mock_femto_struck_scaler_detector(
 
 
 @pytest.mark.parametrize(
-    "gain, wait_time, gain_value",
+    ("gain", "wait_time", "gain_value"),
     [
-        ([1e4, 0.8e-3, "10^4"]),
-        ([1e6, 0.8e-3, "10^6"]),
-        ([1e8, 2.3e-3, "10^8"]),
-        ([1e10, 17e-3, "10^10"]),
-        ([1e13, 350e-3, "10^13"]),
+        ((1e4, 0.8e-3, "10^4")),
+        ((1e6, 0.8e-3, "10^6")),
+        ((1e8, 2.3e-3, "10^8")),
+        ((1e10, 17e-3, "10^10")),
+        ((1e13, 350e-3, "10^13")),
     ],
 )
 @mock.patch("asyncio.sleep")
@@ -124,11 +124,11 @@ async def test_femto_set_fail_out_of_range(
 
 
 @pytest.mark.parametrize(
-    "starting_gain, gain_change_count, final_gain",
+    ("starting_gain", "gain_change_count", "final_gain"),
     [
-        (["SEN_1", 1, "SEN_2"]),
-        (["SEN_3", 5, "SEN_8"]),
-        (["SEN_5", 3, "SEN_8"]),
+        (("SEN_1", 1, "SEN_2")),
+        (("SEN_3", 5, "SEN_8")),
+        (("SEN_5", 3, "SEN_8")),
     ],
 )
 @mock.patch("asyncio.sleep")
@@ -164,11 +164,11 @@ async def test_femto_increase_gain_fail_at_max_gain(
 
 
 @pytest.mark.parametrize(
-    "starting_gain, gain_change_count, final_gain",
+    ("starting_gain", "gain_change_count", "final_gain"),
     [
-        (["SEN_6", 2, "SEN_4"]),
-        (["SEN_8", 3, "SEN_5"]),
-        (["SEN_10", 9, "SEN_1"]),
+        (("SEN_6", 2, "SEN_4")),
+        (("SEN_8", 3, "SEN_5")),
+        (("SEN_10", 9, "SEN_1")),
     ],
 )
 @mock.patch("asyncio.sleep")
@@ -219,7 +219,7 @@ class MockFemto3xxRaiseTime(float, Enum):
 
 
 @pytest.mark.parametrize(
-    "gain,raw_voltage, expected_current",
+    ("gain", "raw_voltage", "expected_current"),
     [
         ("SEN_1", 0.51e5, 0.51e-4),
         ("SEN_3", -10e5, -10e-6),
@@ -256,7 +256,7 @@ async def test_femto_struck_scaler_read(
 
 
 @pytest.mark.parametrize(
-    "gain,raw_voltage, expected_current",
+    ("gain", "raw_voltage", "expected_current"),
     [
         ("SEN_10", [1e9, 1e8, 1e7, 1e6] + [1e5] * 2, 1e-9),
         ("SEN_1", [4e2, 4e3, 4e4] + [4e5] * 2, 4e-7),

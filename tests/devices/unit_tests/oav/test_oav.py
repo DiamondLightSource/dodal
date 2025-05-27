@@ -44,7 +44,7 @@ async def test_cam():
 
 
 @pytest.mark.parametrize(
-    "zoom_level,expected_microns_x,expected_microns_y",
+    ("zoom_level", "expected_microns_x", "expected_microns_y"),
     [
         ("1.0x", 2.87, 2.87),
         ("2.5", 2.31, 2.31),
@@ -66,7 +66,7 @@ async def test_get_micronsperpixel_from_oav(
 
 
 @pytest.mark.parametrize(
-    "zoom_level,expected_xCentre,expected_yCentre",
+    ("zoom_level", "expected_xCentre", "expected_yCentre"),
     [("1.0", 477, 359), ("5.0", 517, 350), ("10.0x", 613, 344)],
 )
 async def test_extract_beam_position_given_different_zoom_levels(

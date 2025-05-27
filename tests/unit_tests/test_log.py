@@ -200,7 +200,7 @@ def test_various_messages_to_graylog_get_beamline_filter(
 
 
 @pytest.mark.parametrize(
-    "num_info_messages,expected_messages_start_idx",
+    ("num_info_messages", "expected_messages_start_idx"),
     [(5, 0), (20, 11), (500, 491)],
 )
 def test_given_circular_memory_handler_with_varying_number_of_messages_when_record_of_correct_level_comes_in_then_flushed_with_expected_messages(

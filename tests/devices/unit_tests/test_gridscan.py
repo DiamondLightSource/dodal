@@ -1,6 +1,6 @@
 import asyncio
 from asyncio import TimeoutError, wait_for
-from contextlib import nullcontext
+from contextlib import nullcontext, suppress
 from dataclasses import dataclass
 from unittest.mock import AsyncMock, MagicMock, patch
 
@@ -27,10 +27,8 @@ from dodal.devices.util.test_utils import patch_motor
 
 
 def discard_status(st: Status | DeviceStatus):
-    try:
+    with suppress(BaseException):
         st.wait(0.01)
-    except BaseException:
-        pass
 
 
 @pytest.fixture
@@ -109,7 +107,7 @@ async def test_waits_for_running_motion(
 
 
 @pytest.mark.parametrize(
-    "steps, expected_images",
+    ("steps", "expected_images"),
     [
         ((10, 10, 0), 100),
         ((30, 5, 10), 450),
@@ -198,7 +196,7 @@ def composite_with_smargon(motor_bundle_with_limits):
 
 
 @pytest.mark.parametrize(
-    "position, expected_in_limit",
+    ("position", "expected_in_limit"),
     [
         (-1, False),
         (20, False),
@@ -272,46 +270,46 @@ def common_grid_scan_params(request: pytest.FixtureRequest):
 
 
 @pytest.mark.parametrize(
-    "grid_position, expected",
+    ("grid_position", "expected"),
     [
-        [np.array([-1, 2, 4]), pytest.raises(IndexError)],
-        [np.array([11, 2, 4]), pytest.raises(IndexError)],
-        [np.array([1, 17, 4]), pytest.raises(IndexError)],
-        [np.array([1, 5, 22]), pytest.raises(IndexError)],
-        [np.array([0, 0, 0]), nullcontext(np.array([0, 1, 4]))],
-        [np.array([1, 1, 1]), nullcontext(np.array([0.3, 1.2, 4.1]))],
-        [np.array([2, 11, 16]), nullcontext(np.array([0.6, 3.2, 5.6]))],
-        [np.array([6, 5, 5]), nullcontext(np.array([1.8, 2.0, 4.5]))],
-        [np.array([-0.51, 5, 5]), pytest.raises(IndexError)],
-        [
+        (np.array([-1, 2, 4]), pytest.raises(IndexError)),
+        (np.array([11, 2, 4]), pytest.raises(IndexError)),
+        (np.array([1, 17, 4]), pytest.raises(IndexError)),
+        (np.array([1, 5, 22]), pytest.raises(IndexError)),
+        (np.array([0, 0, 0]), nullcontext(np.array([0, 1, 4]))),
+        (np.array([1, 1, 1]), nullcontext(np.array([0.3, 1.2, 4.1]))),
+        (np.array([2, 11, 16]), nullcontext(np.array([0.6, 3.2, 5.6]))),
+        (np.array([6, 5, 5]), nullcontext(np.array([1.8, 2.0, 4.5]))),
+        (np.array([-0.51, 5, 5]), pytest.raises(IndexError)),
+        (
             np.array([-0.5, 5, 5]),
             nullcontext(np.array([-0.5 * 0.3, 1 + 5 * 0.2, 4 + 5 * 0.1])),
-        ],
-        [np.array([5, -0.51, 5]), pytest.raises(IndexError)],
-        [
+        ),
+        (np.array([5, -0.51, 5]), pytest.raises(IndexError)),
+        (
             np.array([5, -0.5, 5]),
             nullcontext(np.array([5 * 0.3, 1 - 0.5 * 0.2, 4 + 5 * 0.1])),
-        ],
-        [np.array([5, 5, -0.51]), pytest.raises(IndexError)],
-        [
+        ),
+        (np.array([5, 5, -0.51]), pytest.raises(IndexError)),
+        (
             np.array([5, 5, -0.5]),
             nullcontext(np.array([5 * 0.3, 1 + 5 * 0.2, 4 - 0.5 * 0.1])),
-        ],
-        [np.array([9.51, 5, 5]), pytest.raises(IndexError)],
-        [
+        ),
+        (np.array([9.51, 5, 5]), pytest.raises(IndexError)),
+        (
             np.array([9.5, 5, 5]),
             nullcontext(np.array([9.5 * 0.3, 1 + 5 * 0.2, 4 + 5 * 0.1])),
-        ],
-        [np.array([5, 14.51, 5]), pytest.raises(IndexError)],
-        [
+        ),
+        (np.array([5, 14.51, 5]), pytest.raises(IndexError)),
+        (
             np.array([5, 14.5, 5]),
             nullcontext(np.array([5 * 0.3, 1 + 14.5 * 0.2, 4 + 5 * 0.1])),
-        ],
-        [np.array([5, 5, 19.51]), pytest.raises(IndexError)],
-        [
+        ),
+        (np.array([5, 5, 19.51]), pytest.raises(IndexError)),
+        (
             np.array([5, 5, 19.5]),
             nullcontext(np.array([5 * 0.3, 1 + 5 * 0.2, 4 + 19.5 * 0.1])),
-        ],
+        ),
     ],
 )
 def test_given_x_y_z_out_of_range_then_converting_to_motor_coords_raises(
@@ -358,7 +356,7 @@ def test_given_x_y_z_steps_when_full_number_calculated_then_answer_is_as_expecte
 
 
 @pytest.mark.parametrize(
-    "test_dwell_times, expected_dwell_time_is_integer",
+    ("test_dwell_times", "expected_dwell_time_is_integer"),
     [
         (9000, True),
         (1000, True),

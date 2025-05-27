@@ -170,7 +170,7 @@ async def test_set_invalid_exposure_for_number_of_values_per_reading(
 
 
 @pytest.mark.parametrize(
-    "exposure,expected_values_per_reading",
+    ("exposure", "expected_values_per_reading"),
     [
         (20.0, 2000),
         (10.0, 1000),

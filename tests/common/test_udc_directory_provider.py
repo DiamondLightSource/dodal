@@ -7,13 +7,13 @@ from dodal.common.udc_directory_provider import PandASubpathProvider
 
 
 @pytest.mark.parametrize(
-    "root, expected",
+    ("root", "expected"),
     [
-        [Path("/foo"), Path("/foo/panda")],
-        [
+        (Path("/foo"), Path("/foo/panda")),
+        (
             Path("/tmp/dls/i03/data/2024/cm31105-4/xraycentring/123456/"),
             Path("/tmp/dls/i03/data/2024/cm31105-4/xraycentring/123456/panda"),
-        ],
+        ),
     ],
 )
 def test_udc_path_provider_get_and_set(root, expected):

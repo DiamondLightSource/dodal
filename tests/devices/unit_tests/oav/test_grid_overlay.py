@@ -17,7 +17,7 @@ def _test_expected_calls_to_image_draw_line(mock_image_draw: MagicMock, expected
 
 
 @pytest.mark.parametrize(
-    "top_left_x, top_left_y, box_width, num_boxes_x, num_boxes_y, expected_lines",
+    ("top_left_x", "top_left_y", "box_width", "num_boxes_x", "num_boxes_y", "expected_lines"),
     [
         (
             5,
@@ -65,7 +65,7 @@ def test_add_grid_border_overlay_to_image_makes_correct_calls_to_imagedraw(
 
 
 @pytest.mark.parametrize(
-    "top_left_x, top_left_y, box_width, num_boxes_x, num_boxes_y, expected_lines",
+    ("top_left_x", "top_left_y", "box_width", "num_boxes_x", "num_boxes_y", "expected_lines"),
     [
         (
             3,

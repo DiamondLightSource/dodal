@@ -73,7 +73,7 @@ def test_instantiate_v2_function_fake_makes_fake(RE):
 
 
 @pytest.mark.parametrize(
-    "kwargs,expected_timeout", [({}, 5.0), ({"timeout": 15.0}, 15.0)]
+    ("kwargs", "expected_timeout"), [({}, 5.0), ({"timeout": 15.0}, 15.0)]
 )
 def test_wait_for_v1_device_connection_passes_through_timeout(kwargs, expected_timeout):
     device = OphydV1Device(name="")
@@ -85,7 +85,7 @@ def test_wait_for_v1_device_connection_passes_through_timeout(kwargs, expected_t
 
 
 @pytest.mark.parametrize(
-    "kwargs,expected_timeout", [({}, 5.0), ({"timeout": 15.0}, 15.0)]
+    ("kwargs", "expected_timeout"), [({}, 5.0), ({"timeout": 15.0}, 15.0)]
 )
 @patch(
     "dodal.common.beamlines.beamline_utils.v2_device_wait_for_connection",

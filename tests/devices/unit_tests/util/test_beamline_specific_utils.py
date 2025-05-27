@@ -14,7 +14,7 @@ RADII_AND_SIZES = [
 ]
 
 
-@pytest.mark.parametrize(["aperture_radius", "beam_size"], RADII_AND_SIZES)
+@pytest.mark.parametrize(("aperture_radius", "beam_size"), RADII_AND_SIZES)
 def test_beam_size_from_aperture(aperture_radius, beam_size):
     beamsize = beam_size_from_aperture(
         aperture_radius,

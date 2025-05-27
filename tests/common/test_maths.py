@@ -4,7 +4,7 @@ from dodal.common import in_micros, step_to_num
 
 
 @pytest.mark.parametrize(
-    "s,us",
+    ("s", "us"),
     [
         (4.000_001, 4_000_001),
         (4.999_999, 4_999_999),
@@ -29,7 +29,7 @@ def test_in_micros_negative(s: float):
 
 
 @pytest.mark.parametrize(
-    "start,stop,step,expected_num,truncated_stop",
+    ("start", "stop", "step", "expected_num", "truncated_stop"),
     [
         (0, 0, 1, 1, None),  # start=stop, 1 point at start
         (0, 0.5, 1, 1, 0),  # step>length, 1 point at start

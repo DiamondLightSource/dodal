@@ -59,7 +59,7 @@ async def test_position_compare_sets_signals(RE: RunEngine):
 
 
 @pytest.mark.parametrize(
-    "boolean_array,expected_integer",
+    ("boolean_array", "expected_integer"),
     [
         ([True, False, False], 1),
         ([True, False, True, False], 5),

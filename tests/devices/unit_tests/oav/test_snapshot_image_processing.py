@@ -20,11 +20,11 @@ def test_snapshot_draws_expected_crosshair(tmp_path: Path):
 
 
 @pytest.mark.parametrize(
-    "sample_pos_mm, beam_pos_at_origin_px, microns_per_pixel, expected_centre_px",
+    ("sample_pos_mm", "beam_pos_at_origin_px", "microns_per_pixel", "expected_centre_px"),
     [
-        [(0.0, 0.0), (100, 200), (1.0, 0.5), (100, 200)],
-        [(0.5, 0.1), (100, 200), (1.0, 0.5), (600, 400)],
-        [(0.5, 0.1), (20, 40), (1.0, 0.5), (520, 240)],
+        ((0.0, 0.0), (100, 200), (1.0, 0.5), (100, 200)),
+        ((0.5, 0.1), (100, 200), (1.0, 0.5), (600, 400)),
+        ((0.5, 0.1), (20, 40), (1.0, 0.5), (520, 240)),
     ],
 )
 def test_compute_beam_centre(

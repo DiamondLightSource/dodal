@@ -319,7 +319,7 @@ def test_invalid_beamline_variable_causes_get_device_module_to_raise(bl):
         get_beamline_based_on_environment_variable()
 
 
-@pytest.mark.parametrize("bl,module", [("i03", i03), ("i23", i23)])
+@pytest.mark.parametrize(("bl", "module"), [("i03", i03), ("i23", i23)])
 def test_valid_beamline_variable_causes_get_device_module_to_return_module(bl, module):
     with patch.dict(os.environ, {"BEAMLINE": bl}):
         assert get_beamline_based_on_environment_variable() == module
@@ -454,7 +454,7 @@ def _filtering_test_cases() -> Iterable[
 
 
 @pytest.mark.parametrize(
-    "all_devices,expected_ophyd_devices,expected_ophyd_async_devices",
+    ("all_devices", "expected_ophyd_devices", "expected_ophyd_async_devices"),
     list(_filtering_test_cases()),
 )
 def test_filter_ophyd_devices_filters_ophyd_devices(
@@ -479,14 +479,14 @@ def test_filter_ophyd_devices_raises_for_extra_types():
 
 
 @pytest.mark.parametrize(
-    "input, expected_result",
+    ("input", "expected_result"),
     [
-        [Readable, False],
-        [OphydV1Device, False],
-        [OphydV2Device, True],
-        [DiamondFilter[I03Filters], True],
-        [None, False],
-        [1, False],
+        (Readable, False),
+        (OphydV1Device, False),
+        (OphydV2Device, True),
+        (DiamondFilter[I03Filters], True),
+        (None, False),
+        (1, False),
     ],
 )
 def test_is_v2_device_type(input: Any, expected_result: bool):

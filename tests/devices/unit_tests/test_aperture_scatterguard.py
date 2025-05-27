@@ -276,7 +276,7 @@ def set_underlying_motors(ap_sg: ApertureScatterguard, position: AperturePositio
 
 
 @pytest.mark.parametrize(
-    "read_pv, aperture",
+    ("read_pv", "aperture"),
     [
         ("large", ApertureValue.LARGE),
         ("medium", ApertureValue.MEDIUM),

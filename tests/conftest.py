@@ -17,7 +17,7 @@ from dodal.utils import (
 )
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 def module_and_devices_for_beamline(request: pytest.FixtureRequest):
     beamline = request.param
     with patch.dict(os.environ, {"BEAMLINE": beamline}, clear=True):

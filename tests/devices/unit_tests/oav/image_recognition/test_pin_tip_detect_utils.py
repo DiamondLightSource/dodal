@@ -97,7 +97,7 @@ def test_locate_sample_no_edges():
 
 
 @pytest.mark.parametrize(
-    "direction,x_centre", [(ScanDirections.FORWARD, 0), (ScanDirections.REVERSE, 4)]
+    ("direction", "x_centre"), [(ScanDirections.FORWARD, 0), (ScanDirections.REVERSE, 4)]
 )
 def test_locate_sample_tip_off_screen(direction, x_centre):
     test_arr = np.array(
@@ -131,7 +131,7 @@ def test_locate_sample_tip_off_screen(direction, x_centre):
 
 
 @pytest.mark.parametrize(
-    "min_tip_width,sample_x_location,expected_top_edge,expected_bottom_edge",
+    ("min_tip_width", "sample_x_location", "expected_top_edge", "expected_bottom_edge"),
     [
         (1, 0, [2, NONE_VALUE, 1, 0, 0], [2, NONE_VALUE, 3, 4, 4]),
         (3, 2, [NONE_VALUE, NONE_VALUE, 1, 0, 0], [NONE_VALUE, NONE_VALUE, 3, 4, 4]),

@@ -16,8 +16,7 @@ async def table() -> Table:
 
 
 async def test_setting_xy_position_table(table: Table):
-    """Test setting x and y positions on the Table using the ophyd_async mock tools.
-    """
+    """Test setting x and y positions on the Table using the ophyd_async mock tools."""
     reading = await table.read()
     expected_reading = {
         "table-y": {
@@ -68,8 +67,7 @@ async def test_setting_xy_position_table(table: Table):
 
 
 async def test_setting_xyztheta_position_table(table: Table):
-    """Test setting x and y positions on the Table using the ophyd_async mock tools.
-    """
+    """Test setting x and y positions on the Table using the ophyd_async mock tools."""
     reading = await table.read()
     expected_reading = {
         "table-y": {

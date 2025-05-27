@@ -58,7 +58,7 @@ def length_from_shape(shape: tuple[int, ...]) -> int:
 
 
 @pytest.mark.parametrize(
-    "documents_from_expected_shape, shape",
+    ("documents_from_expected_shape", "shape"),
     spec_and_shape,
     indirect=["documents_from_expected_shape"],
 )
@@ -88,7 +88,7 @@ def test_plan_produces_expected_start_document(
 
 
 @pytest.mark.parametrize(
-    "documents_from_expected_shape, shape",
+    ("documents_from_expected_shape", "shape"),
     spec_and_shape,
     indirect=["documents_from_expected_shape"],
 )
@@ -103,7 +103,7 @@ def test_plan_produces_expected_stop_document(
 
 
 @pytest.mark.parametrize(
-    "documents_from_expected_shape, shape",
+    ("documents_from_expected_shape", "shape"),
     spec_and_shape,
     indirect=["documents_from_expected_shape"],
 )
@@ -121,7 +121,7 @@ def test_plan_produces_expected_descriptor(
 
 
 @pytest.mark.parametrize(
-    "documents_from_expected_shape, shape",
+    ("documents_from_expected_shape", "shape"),
     spec_and_shape,
     indirect=["documents_from_expected_shape"],
 )
@@ -151,7 +151,7 @@ def test_plan_produces_expected_events(
 
 
 @pytest.mark.parametrize(
-    "documents_from_expected_shape, shape",
+    ("documents_from_expected_shape", "shape"),
     spec_and_shape,
     indirect=["documents_from_expected_shape"],
 )
@@ -169,7 +169,7 @@ def test_plan_produces_expected_resources(
 
 
 @pytest.mark.parametrize(
-    "documents_from_expected_shape, shape",
+    ("documents_from_expected_shape", "shape"),
     spec_and_shape,
     indirect=["documents_from_expected_shape"],
 )

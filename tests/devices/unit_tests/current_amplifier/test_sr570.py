@@ -79,14 +79,14 @@ async def mock_sr570_struck_scaler_detector(
 
 
 @pytest.mark.parametrize(
-    "gain, wait_time, gain_value",
+    ("gain", "wait_time", "gain_value"),
     [
-        ([1e3, 1e-4, "SEN_1"]),
-        ([1e6, 1e-4, SR570FullGainTable.SEN_10.name]),
-        ([2e6, 0.15, SR570FullGainTable.SEN_11.name]),
-        ([2e7, 0.15, SR570FullGainTable.SEN_14.name]),
-        ([2e9, 0.2, SR570FullGainTable.SEN_20.name]),
-        ([1e12, 0.2, SR570FullGainTable.SEN_28.name]),
+        ((1e3, 1e-4, "SEN_1")),
+        ((1e6, 1e-4, SR570FullGainTable.SEN_10.name)),
+        ((2e6, 0.15, SR570FullGainTable.SEN_11.name)),
+        ((2e7, 0.15, SR570FullGainTable.SEN_14.name)),
+        ((2e9, 0.2, SR570FullGainTable.SEN_20.name)),
+        ((1e12, 0.2, SR570FullGainTable.SEN_28.name)),
     ],
 )
 @mock.patch("asyncio.sleep")
@@ -125,12 +125,12 @@ async def test_sr570_set_fail_out_of_range(sleep: AsyncMock, mock_sr570: SR570, 
 
 
 @pytest.mark.parametrize(
-    "starting_gain, gain_change_count, final_gain",
+    ("starting_gain", "gain_change_count", "final_gain"),
     [
-        ([1e3, 1, 1e4]),
-        ([5e3, 5, 5e8]),
-        ([2e4, 3, 2e7]),
-        ([1e5, 6, 1e11]),
+        ((1e3, 1, 1e4)),
+        ((5e3, 5, 5e8)),
+        ((2e4, 3, 2e7)),
+        ((1e5, 6, 1e11)),
     ],
 )
 @mock.patch("asyncio.sleep")
@@ -162,12 +162,12 @@ async def test_SR570_increase_gain_top_out_fail(
 
 
 @pytest.mark.parametrize(
-    "starting_gain, gain_change_count, final_gain",
+    ("starting_gain", "gain_change_count", "final_gain"),
     [
-        ([1e8, 5, 1e3]),
-        ([5e9, 3, 5e6]),
-        ([2e11, 3, 2e8]),
-        ([1e12, 8, 1e4]),
+        ((1e8, 5, 1e3)),
+        ((5e9, 3, 5e6)),
+        ((2e11, 3, 2e8)),
+        ((1e12, 8, 1e4)),
     ],
 )
 @mock.patch("asyncio.sleep")
@@ -210,7 +210,7 @@ class MockSR570RaiseTimeTable(float, Enum):
 
 
 @pytest.mark.parametrize(
-    "gain,raw_count, expected_current",
+    ("gain", "raw_count", "expected_current"),
     [
         ("SEN_1", 0.51e5, 0.51e-3),
         ("SEN_3", -10e5, -2e-3),
@@ -248,7 +248,7 @@ async def test_SR570_struck_scaler_read(
 
 
 @pytest.mark.parametrize(
-    "gain,raw_count, expected_current",
+    ("gain", "raw_count", "expected_current"),
     [
         (
             "SEN_10",

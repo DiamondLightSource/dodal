@@ -42,7 +42,7 @@ async def smargon(RE: RunEngine):
 
 
 @pytest.mark.parametrize(
-    "h, v, expected_x, expected_y",
+    ("h", "v", "expected_x", "expected_y"),
     [
         (54, 100, 517 - 54, 350 - 100),
         (0, 0, 517, 350),
@@ -61,7 +61,7 @@ def test_calculate_beam_distance(h, v, expected_x, expected_y, oav: OAV):
 
 
 @pytest.mark.parametrize(
-    "zoom_level, angle, pixel_to_move_to, expected_xyz",
+    ("zoom_level", "angle", "pixel_to_move_to", "expected_xyz"),
     [
         # Different zoom levels -> different um_per_pix and beam_centre
         ("5.0x", 0, (100, 190), (-0.659, -0.253, 0)),

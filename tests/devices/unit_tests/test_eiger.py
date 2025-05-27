@@ -68,7 +68,7 @@ def mock_set_odin_filewriter(fake_eiger: EigerDetector):
 
 
 @pytest.mark.parametrize(
-    "current_energy_ev, request_energy, is_energy_change",
+    ("current_energy_ev", "request_energy", "is_energy_change"),
     [
         (100.0, 100.0, False),
         (100.0, 200.0, True),
@@ -102,7 +102,7 @@ def test_detector_threshold(
 
 
 @pytest.mark.parametrize(
-    "detector_params, detector_size_constants, beam_xy_converter, expected_error_number",
+    ("detector_params", "detector_size_constants", "beam_xy_converter", "expected_error_number"),
     [
         (Mock(), Mock(), Mock(), 0),
         (None, Mock(), Mock(), 1),
@@ -188,7 +188,7 @@ def test_stage_raises_exception_if_odin_initialisation_status_not_ok(fake_eiger)
 
 
 @pytest.mark.parametrize(
-    "roi_mode, expected_num_change_roi_calls, expected_exception",
+    ("roi_mode", "expected_num_change_roi_calls", "expected_exception"),
     [(True, 1, "Test Exception 2"), (False, 0, "Test Exception 1")],
 )
 @patch("dodal.devices.eiger.await_value")
@@ -222,7 +222,7 @@ def test_disable_roi_mode_sets_correct_roi_mode(fake_eiger):
 
 
 @pytest.mark.parametrize(
-    "roi_mode, expected_detector_dimensions",
+    ("roi_mode", "expected_detector_dimensions"),
     [
         (True, EIGER2_X_16M_SIZE.roi_size_pixels),
         (False, EIGER2_X_16M_SIZE.det_size_pixels),
@@ -246,7 +246,7 @@ def test_change_roi_mode_sets_correct_detector_size_constants(
 
 
 @pytest.mark.parametrize(
-    "roi_mode, expected_cam_roi_mode_call", [(True, 1), (False, 0)]
+    ("roi_mode", "expected_cam_roi_mode_call"), [(True, 1), (False, 0)]
 )
 def test_change_roi_mode_sets_cam_roi_mode_correctly(
     fake_eiger, roi_mode, expected_cam_roi_mode_call
@@ -671,7 +671,7 @@ def test_stop_eiger_waits_for_status_functions_to_complete(
 
 
 @pytest.mark.parametrize(
-    "enable_dev_shm, expected_set",
+    ("enable_dev_shm", "expected_set"),
     [
         (True, 1),
         (False, 0),
