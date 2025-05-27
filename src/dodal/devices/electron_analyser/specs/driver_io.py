@@ -3,12 +3,12 @@ import asyncio
 import numpy as np
 from ophyd_async.core import (
     Array1D,
-    AsyncStatus,
     SignalR,
     StandardReadableFormat,
     derived_signal_r,
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
+from ophyd_async.epics.motor import Motor
 
 from dodal.devices.electron_analyser.abstract.base_driver_io import (
     AbstractAnalyserDriverIO,
@@ -30,25 +30,18 @@ class SpecsAnalyserDriverIO(AbstractAnalyserDriverIO[SpecsRegion]):
 
         super().__init__(prefix, name)
 
-    @AsyncStatus.wrap
-    async def prepare(self, value: SpecsRegion):
-        region = value
-        await super().prepare(region)
+    async def configure_region(self, region: SpecsRegion, energy_source: Motor) -> None:
+        await super().configure_region(region, energy_source)
 
         await asyncio.gather(
             self.snapshot_values.set(region.values),
             self.psu_mode.set(region.psu_mode),
         )
         if region.acquisition_mode == "Fixed Transmission":
-            self.centre_energy.set(region.centre_energy)
+            await self.centre_energy.set(region.centre_energy)
 
         if self.acquisition_mode == "Fixed Energy":
-            self.energy_step.set(region.energy_step)
-
-    async def _get_excitation_energy(self, region: SpecsRegion) -> float:
-        # ToDo - Add way to get excitation energy from dcm / pgm device
-        # https://github.com/DiamondLightSource/dodal/issues/1224.
-        return 0
+            await self.energy_step.set(region.energy_step)
 
     def _create_angle_axis_signal(self, prefix: str) -> SignalR[Array1D[np.float64]]:
         angle_axis = derived_signal_r(

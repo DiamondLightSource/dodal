@@ -1,8 +1,7 @@
-import bluesky.plan_stubs as bps
 import numpy as np
 import pytest
-from bluesky.run_engine import RunEngine
 from ophyd_async.epics.adcore import ADImageMode
+from ophyd_async.epics.motor import Motor
 from ophyd_async.testing import (
     get_mock_put,
     set_mock_value,
@@ -31,9 +30,9 @@ def driver_class() -> type[VGScientaAnalyserDriverIO]:
 async def test_given_region_that_analyser_sets_modes_correctly(
     sim_driver: VGScientaAnalyserDriverIO,
     region: VGScientaRegion,
-    RE: RunEngine,
+    sim_energy_source: Motor,
 ) -> None:
-    RE(bps.prepare(sim_driver, region, wait=True))
+    await sim_driver.configure_region(region, sim_energy_source)
 
     get_mock_put(sim_driver.detector_mode).assert_called_once_with(
         region.detector_mode, wait=True
@@ -50,11 +49,11 @@ async def test_given_region_that_analyser_sets_modes_correctly(
 async def test_given_region_that_analyser_sets_energy_values_correctly(
     sim_driver: VGScientaAnalyserDriverIO,
     region: VGScientaRegion,
-    RE: RunEngine,
+    sim_energy_source: Motor,
 ) -> None:
-    RE(bps.prepare(sim_driver, region, wait=True))
+    await sim_driver.configure_region(region, sim_energy_source)
 
-    excitation_energy = await sim_driver._get_excitation_energy(region)
+    excitation_energy = await sim_energy_source.user_readback.get_value()
 
     expected_centre_e = to_kinetic_energy(
         region.fix_energy,
@@ -79,9 +78,9 @@ async def test_given_region_that_analyser_sets_energy_values_correctly(
 async def test_given_region_that_vgscienta_sets_channel_correctly(
     sim_driver: VGScientaAnalyserDriverIO,
     region: VGScientaRegion,
-    RE: RunEngine,
+    sim_energy_source: Motor,
 ) -> None:
-    RE(bps.prepare(sim_driver, region, wait=True))
+    await sim_driver.configure_region(region, sim_energy_source)
 
     expected_first_x = region.first_x_channel
     expected_size_x = region.x_channel_size()
@@ -118,9 +117,10 @@ async def test_given_region_that_vgscienta_sets_channel_correctly(
 async def test_that_data_to_read_is_correct(
     sim_driver: VGScientaAnalyserDriverIO,
     region: VGScientaRegion,
-    RE: RunEngine,
+    sim_energy_source: Motor,
 ) -> None:
-    excitation_energy = await sim_driver._get_excitation_energy(region)
+    await sim_driver.configure_region(region, sim_energy_source)
+    excitation_energy = await sim_energy_source.user_readback.get_value()
 
     # Check binding energy is correct
     energy_axis = [1, 2, 3, 4, 5]

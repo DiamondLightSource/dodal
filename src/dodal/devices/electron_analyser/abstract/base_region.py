@@ -1,11 +1,12 @@
 import re
 from abc import ABC
 from collections.abc import Callable
-from typing import Generic, TypeVar
+from typing import Generic, Self, TypeVar
 
 from pydantic import BaseModel, Field, model_validator
 
 from dodal.devices.electron_analyser.types import EnergyMode
+from dodal.devices.electron_analyser.util import to_kinetic_energy
 
 
 def java_to_python_case(java_str: str) -> str:
@@ -53,6 +54,7 @@ class AbstractBaseRegion(ABC, JavaToPythonModel):
     enabled: bool = False
     slices: int = 1
     iterations: int = 1
+    excitation_energy_source: str = "source1"
     # These ones we need subclasses to provide default values
     lens_mode: str
     pass_energy: int
@@ -74,6 +76,24 @@ class AbstractBaseRegion(ABC, JavaToPythonModel):
     def before_validation(cls, data: dict) -> dict:
         data = switch_case_validation(data, java_to_python_case)
         return energy_mode_validation(data)
+
+    def prepare_for_epics(self, excitation_energy: float) -> Self:
+        """
+        EPICS doesn't support binding energy, so return a region where energy values are
+        converted back to kinetic when supplied an excitation_energy value.
+        """
+        if self.is_kinetic_energy():
+            return self
+        epics_region = self.model_copy()
+        low_energy = to_kinetic_energy(
+            epics_region.low_energy, epics_region.energy_mode, excitation_energy
+        )
+        high_energy = to_kinetic_energy(
+            epics_region.high_energy, epics_region.energy_mode, excitation_energy
+        )
+        epics_region.low_energy = low_energy
+        epics_region.high_energy = high_energy
+        return epics_region
 
 
 TAbstractBaseRegion = TypeVar("TAbstractBaseRegion", bound=AbstractBaseRegion)

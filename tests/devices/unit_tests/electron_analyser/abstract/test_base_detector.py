@@ -3,6 +3,7 @@ from unittest.mock import AsyncMock
 import pytest
 from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
+from ophyd_async.epics.motor import Motor
 
 from dodal.devices.electron_analyser import ElectronAnalyserDetector
 from dodal.devices.electron_analyser.specs import SpecsDetector
@@ -68,6 +69,7 @@ def test_analyser_detector_has_driver_as_child_and_region_detector_does_not(
 def test_analyser_region_detector_stage_prepares_driver_with_region(
     sim_detector: ElectronAnalyserDetectorImpl,
     sequence_file_path: str,
+    sim_energy_source: Motor,
     RE: RunEngine,
 ) -> None:
     region_detectors = sim_detector.create_region_detector_list(
@@ -75,10 +77,12 @@ def test_analyser_region_detector_stage_prepares_driver_with_region(
     )
 
     for reg_det in region_detectors:
-        reg_det.driver.prepare = AsyncMock()
+        reg_det.driver.configure_region = AsyncMock()
 
-        RE(bps.stage(reg_det, wait=True))
-        reg_det.driver.prepare.assert_called_once_with(reg_det.region)
+        RE(bps.prepare(reg_det, sim_energy_source, wait=True))
+        reg_det.driver.configure_region.assert_called_once_with(
+            reg_det.region, sim_energy_source
+        )
 
 
 # ToDo - Add tests for BaseElectronAnalyserDetector class + controller

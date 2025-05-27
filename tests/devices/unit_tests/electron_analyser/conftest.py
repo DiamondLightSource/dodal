@@ -2,6 +2,7 @@ from typing import Any
 
 import pytest
 from ophyd_async.core import init_devices
+from ophyd_async.epics.motor import Motor
 
 from dodal.devices.electron_analyser import ElectronAnalyserDetector
 from dodal.devices.electron_analyser.abstract import (
@@ -45,6 +46,16 @@ async def sim_driver(
         sim_driver = driver_class(
             prefix="TEST:",
             name="sim_driver",
+        )
+    return sim_driver
+
+
+@pytest.fixture
+async def sim_energy_source() -> Motor:
+    async with init_devices(mock=True, connect=True):
+        sim_driver = Motor(
+            prefix="TEST:",
+            name="sim_motor",
         )
     return sim_driver
 

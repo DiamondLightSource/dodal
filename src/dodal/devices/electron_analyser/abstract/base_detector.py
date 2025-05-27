@@ -2,11 +2,7 @@ import asyncio
 from abc import abstractmethod
 from typing import Generic, TypeVar
 
-from bluesky.protocols import (
-    Reading,
-    Stageable,
-    Triggerable,
-)
+from bluesky.protocols import Preparable, Reading, Stageable, Triggerable
 from event_model import DataKey
 from ophyd_async.core import (
     AsyncConfigurable,
@@ -18,6 +14,7 @@ from ophyd_async.core import (
 from ophyd_async.epics.adcore import (
     ADBaseController,
 )
+from ophyd_async.epics.motor import Motor
 
 from dodal.common.data_util import load_json_file_to_class
 from dodal.devices.electron_analyser.abstract.base_driver_io import (
@@ -106,7 +103,7 @@ class AbstractElectronAnalyserDetector(
 
 class ElectronAnalyserRegionDetector(
     AbstractElectronAnalyserDetector[TAbstractAnalyserDriverIO],
-    Stageable,
+    Preparable,
     Generic[TAbstractAnalyserDriverIO, TAbstractBaseRegion],
 ):
     """
@@ -129,10 +126,13 @@ class ElectronAnalyserRegionDetector(
         return self._driver_ref()
 
     @AsyncStatus.wrap
-    async def stage(self) -> None:
-        await super().stage()
-        # Setup the detector by passing the region to the driver to configure
-        await self.driver.prepare(self.region)
+    async def prepare(self, value: Motor) -> None:
+        """
+        Provide the excitation energy source motor, configure driver with region and
+        current excitation energy.
+        """
+        excitation_energy_source = value
+        await self.driver.configure_region(self.region, excitation_energy_source)
 
 
 TElectronAnalyserRegionDetector = TypeVar(

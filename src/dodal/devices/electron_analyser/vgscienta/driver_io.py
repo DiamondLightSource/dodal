@@ -3,13 +3,13 @@ import asyncio
 import numpy as np
 from ophyd_async.core import (
     Array1D,
-    AsyncStatus,
     SignalR,
     StandardReadableFormat,
     soft_signal_rw,
 )
 from ophyd_async.epics.adcore import ADImageMode
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
+from ophyd_async.epics.motor import Motor
 
 from dodal.devices.electron_analyser.abstract.base_driver_io import (
     AbstractAnalyserDriverIO,
@@ -39,12 +39,11 @@ class VGScientaAnalyserDriverIO(AbstractAnalyserDriverIO[VGScientaRegion]):
 
         super().__init__(prefix, name)
 
-    @AsyncStatus.wrap
-    async def prepare(self, value: VGScientaRegion):
-        region = value
-
-        await super().prepare(region)
-        excitation_energy = await self._get_excitation_energy(region)
+    async def configure_region(
+        self, region: VGScientaRegion, energy_source: Motor
+    ) -> None:
+        await super().configure_region(region, energy_source)
+        excitation_energy = await energy_source.user_readback.get_value()
 
         centre_energy = to_kinetic_energy(
             region.fix_energy, region.energy_mode, excitation_energy
@@ -60,11 +59,6 @@ class VGScientaAnalyserDriverIO(AbstractAnalyserDriverIO[VGScientaRegion]):
             self.excitation_energy_source.set(region.excitation_energy_source),
             self.image_mode.set(ADImageMode.SINGLE),
         )
-
-    async def _get_excitation_energy(self, region: VGScientaRegion) -> float:
-        # ToDo - Add way to get excitation energy from dcm / pgm device
-        # https://github.com/DiamondLightSource/dodal/issues/1224.
-        return 0
 
     def _create_energy_axis_signal(self, prefix: str) -> SignalR[Array1D[np.float64]]:
         return epics_signal_r(Array1D[np.float64], prefix + "X_SCALE_RBV")

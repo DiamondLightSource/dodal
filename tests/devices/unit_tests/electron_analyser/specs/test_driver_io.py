@@ -1,8 +1,8 @@
 import numpy as np
 import pytest
-from bluesky import plan_stubs as bps
 from bluesky.plan_stubs import mv
 from bluesky.run_engine import RunEngine
+from ophyd_async.epics.motor import Motor
 from ophyd_async.testing import (
     get_mock_put,
     set_mock_value,
@@ -28,19 +28,9 @@ def driver_class() -> type[SpecsAnalyserDriverIO]:
 async def test_given_region_that_analyser_sets_energy_values_correctly(
     sim_driver: SpecsAnalyserDriverIO,
     region: SpecsRegion,
-    RE: RunEngine,
+    sim_energy_source: Motor,
 ) -> None:
-    RE(bps.prepare(sim_driver, region, wait=True))
-
-    if region.acquisition_mode == "Fixed Energy":
-        get_mock_put(sim_driver.energy_step).assert_called_once_with(
-            region.energy_step, wait=True
-        )
-        await assert_read_configuration_has_expected_value(
-            sim_driver, "energy_step", region.energy_step
-        )
-    else:
-        get_mock_put(sim_driver.energy_step).assert_not_called()
+    await sim_driver.configure_region(region, sim_energy_source)
 
     if region.acquisition_mode == "Fixed Transmission":
         get_mock_put(sim_driver.centre_energy).assert_called_once_with(
@@ -52,14 +42,24 @@ async def test_given_region_that_analyser_sets_energy_values_correctly(
     else:
         get_mock_put(sim_driver.centre_energy).assert_not_called()
 
+    if region.acquisition_mode == "Fixed Energy":
+        get_mock_put(sim_driver.energy_step).assert_called_once_with(
+            region.energy_step, wait=True
+        )
+        await assert_read_configuration_has_expected_value(
+            sim_driver, "energy_step", region.energy_step
+        )
+    else:
+        get_mock_put(sim_driver.energy_step).assert_not_called()
+
 
 @pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
 async def test_given_region_that_analyser_sets_modes_correctly(
     sim_driver: SpecsAnalyserDriverIO,
     region: SpecsRegion,
-    RE: RunEngine,
+    sim_energy_source: Motor,
 ) -> None:
-    RE(bps.prepare(sim_driver, region, wait=True))
+    await sim_driver.configure_region(region, sim_energy_source)
 
     get_mock_put(sim_driver.psu_mode).assert_called_once_with(
         region.psu_mode, wait=True
@@ -80,11 +80,11 @@ async def test_given_region_that_analyser_sets_modes_correctly(
 async def test_that_data_to_read_is_correct(
     sim_driver: SpecsAnalyserDriverIO,
     region: SpecsRegion,
-    RE: RunEngine,
+    sim_energy_source: Motor,
 ) -> None:
-    RE(bps.prepare(sim_driver, region, wait=True))
+    await sim_driver.configure_region(region, sim_energy_source)
 
-    excitation_energy = await sim_driver._get_excitation_energy(region)
+    excitation_energy = await sim_energy_source.user_readback.get_value()
 
     # Check binding energy is correct
     is_binding = await sim_driver.energy_mode.get_value() == EnergyMode.BINDING
