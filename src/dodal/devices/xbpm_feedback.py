@@ -1,6 +1,10 @@
+import asyncio
+
 from bluesky.protocols import Triggerable
 from ophyd_async.core import AsyncStatus, Device, StrictEnum, observe_value
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
+
+from dodal.log import LOGGER
 
 
 class Pause(StrictEnum):
@@ -22,6 +26,29 @@ class XBPMFeedback(Device, Triggerable):
 
     @AsyncStatus.wrap
     async def trigger(self):
-        async for value in observe_value(self.pos_stable):
-            if value:
-                return
+        async def periodic_reminder():
+            schedule = [  # seconds, frequency
+                (0.1, 3),
+                (5, 3),
+                (60, 5),
+                (300, 5),
+                (1800, 5),
+                (3600, None),
+            ]
+
+            for delay, count in schedule:
+                n = 0
+                while count is None or n < count:
+                    LOGGER.info("Waiting for XBPM")
+                    await asyncio.sleep(delay)
+                    n += 1
+
+        log_task = asyncio.create_task(periodic_reminder())
+
+        try:
+            async for value in observe_value(self.pos_stable):
+                if value:
+                    log_task.cancel()
+                    return
+        finally:
+            log_task.cancel()
