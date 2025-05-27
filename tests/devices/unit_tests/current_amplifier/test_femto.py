@@ -204,7 +204,7 @@ async def test_femto_decrease_gain_fail_at_min_gain(
 
 
 class MockFemto3xxRaiseTime(float, Enum):
-    """Mock zero raise time(s) for Femto 3xx current amplifier"""
+    """Mock zero raise time(s) for Femto 3xx current amplifier."""
 
     SEN_1 = 0.0
     SEN_2 = 0.0

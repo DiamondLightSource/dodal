@@ -59,7 +59,7 @@ class StubOffsets(Device):
 
 @dataclass
 class AxisLimit:
-    """Represents the minimum and maximum allowable values on an axis"""
+    """Represents the minimum and maximum allowable values on an axis."""
 
     min_value: float
     max_value: float
@@ -119,7 +119,7 @@ class Smargon(StandardReadable):
         super().__init__(name)
 
     def get_xyz_limits(self) -> Generator[Msg, None, XYZLimits]:
-        """Obtain a plan stub that returns the smargon XYZ axis limits
+        """Obtain a plan stub that returns the smargon XYZ axis limits.
 
         Yields:
             Bluesky messages

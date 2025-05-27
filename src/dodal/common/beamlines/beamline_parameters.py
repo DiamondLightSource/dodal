@@ -63,7 +63,7 @@ class GDABeamlineParameters:
 
 def get_beamline_parameters(beamline_param_path: str | None = None):
     """Loads the beamline parameters from the specified path, or according to the
-    environment variable if none is given
+    environment variable if none is given.
     """
     if not beamline_param_path:
         beamline_name = get_beamline_name("i03")

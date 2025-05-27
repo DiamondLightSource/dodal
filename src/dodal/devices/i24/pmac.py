@@ -162,9 +162,8 @@ class ProgramRunner(Device, Flyable):
             self._counter_ref(),
             timeout=counter_time,
         ):
-            if signal is self._status_ref():
-                if value == ScanState.DONE:
-                    break
+            if signal is self._status_ref() and value == ScanState.DONE:
+                break
 
 
 class ProgramAbort(Triggerable):

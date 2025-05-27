@@ -82,7 +82,7 @@ def _report_successful_devices(
 ) -> None:
     sim_statement = " (sim mode)" if sim_backend else ""
     connected_devices = "\n".join(
-        sorted([f"\t{device_name}" for device_name in devices.keys()])
+        sorted([f"\t{device_name}" for device_name in devices])
     )
 
     print(f"{len(devices)} devices connected{sim_statement}:")

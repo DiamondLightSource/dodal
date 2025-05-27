@@ -144,7 +144,7 @@ class UndulatorGap(SafeUndulatorMover[float]):
     """A device with a collection of epics signals to set Apple 2 undulator gap motion.
     Only PV used by beamline are added the full list is here:
     /dls_sw/work/R3.14.12.7/support/insertionDevice/db/IDGapVelocityControl.template
-    /dls_sw/work/R3.14.12.7/support/insertionDevice/db/IDPhaseSoftMotor.template
+    /dls_sw/work/R3.14.12.7/support/insertionDevice/db/IDPhaseSoftMotor.template.
     """
 
     def __init__(self, prefix: str, name: str = ""):
@@ -195,7 +195,7 @@ class UndulatorGap(SafeUndulatorMover[float]):
 class UndulatorPhaseMotor(StandardReadable):
     """A collection of epics signals for ID phase motion.
     Only PV used by beamline are added the full list is here:
-    /dls_sw/work/R3.14.12.7/support/insertionDevice/db/IDPhaseSoftMotor.template
+    /dls_sw/work/R3.14.12.7/support/insertionDevice/db/IDPhaseSoftMotor.template.
     """
 
     def __init__(self, prefix: str, infix: str, name: str = ""):
@@ -236,7 +236,7 @@ class UndulatorPhaseAxes(SafeUndulatorMover[Apple2PhasesVal]):
     e.g. top_outer == Q1
          top_inner == Q2
          btm_inner == q3
-         btm_outer == q4
+         btm_outer == q4.
 
     """
 
@@ -437,7 +437,7 @@ class Apple2(StandardReadable, Movable):
         lookup_table: dict[str | None, dict[str, dict[str, Any]]],
     ) -> np.poly1d:
         """Get the correct polynomial for a given energy form lookuptable
-         for any given polarisation.
+        for any given polarisation.
         """
         if (
             new_energy < lookup_table[self.pol]["Limit"]["Minimum"]
@@ -467,7 +467,7 @@ class Apple2(StandardReadable, Movable):
         """Abstract method to update the stored lookup tabled from file.
         This function should include check to ensure the lookuptable is in the correct format:
             # ensure the importing lookup table is the correct format
-            Lookuptable.model_validate(<loockuptable>)
+            Lookuptable.model_validate(<loockuptable>).
 
         """
 
@@ -475,7 +475,7 @@ class Apple2(StandardReadable, Movable):
         """Try to determine polarisation and phase value using row phase motor position pattern.
         However there is no way to return lh3 polarisation or higher harmonic setting.
         (May be for future one can use the inverse poly to work out the energy and try to match it with the current energy
-        to workout the polarisation but during my test the inverse poly is too unstable for general use.)
+        to workout the polarisation but during my test the inverse poly is too unstable for general use.).
         """
         top_outer = await self.phase().top_outer.user_setpoint_readback.get_value()
         top_inner = await self.phase().top_inner.user_setpoint_readback.get_value()

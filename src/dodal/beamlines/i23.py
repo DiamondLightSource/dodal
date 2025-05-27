@@ -75,13 +75,13 @@ def shutter() -> ZebraShutter:
 
 @device_factory()
 def gonio() -> SixAxisGonio:
-    """Get the i23 goniometer"""
+    """Get the i23 goniometer."""
     return SixAxisGonio(f"{PREFIX.beamline_prefix}-MO-GONIO-01:")
 
 
 @device_factory()
 def zebra() -> Zebra:
-    """Get the i23 zebra"""
+    """Get the i23 zebra."""
     return Zebra(
         name="zebra",
         prefix=f"{PREFIX.beamline_prefix}-EA-ZEBRA-01:ZEBRA:",
@@ -91,7 +91,7 @@ def zebra() -> Zebra:
 
 @device_factory()
 def pilatus() -> PilatusDetector:
-    """Get the i23 pilatus"""
+    """Get the i23 pilatus."""
     return PilatusDetector(
         prefix=f"{PREFIX.beamline_prefix}-EA-PILAT-01:",
         path_provider=get_path_provider(),
@@ -102,7 +102,7 @@ def pilatus() -> PilatusDetector:
 
 @device_factory()
 def detector_motion() -> Positioner1D[I23DetectorPositions]:
-    """Get the i23 detector"""
+    """Get the i23 detector."""
     return Positioner1D[I23DetectorPositions](
         f"{PREFIX.beamline_prefix}-EA-DET-01:Z",
         datatype=I23DetectorPositions,

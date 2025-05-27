@@ -1,5 +1,5 @@
 """A small temporary device to get the beam center positions from \
-    eiger or pilatus detector on i24
+    eiger or pilatus detector on i24.
 """
 
 from ophyd_async.core import StandardReadable

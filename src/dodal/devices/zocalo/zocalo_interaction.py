@@ -83,7 +83,7 @@ class ZocaloTrigger:
         start_data: ZocaloStartInfo,
     ):
         """Tells the data analysis pipeline we have started a run.
-        Assumes that appropriate data has already been put into ISPyB
+        Assumes that appropriate data has already been put into ISPyB.
 
         Args:
             start_data (ZocaloStartInfo): Data about the collection to send to zocalo
@@ -96,7 +96,7 @@ class ZocaloTrigger:
 
     def run_end(self, data_collection_id: int):
         """Tells the data analysis pipeline we have finished a run.
-        Assumes that appropriate data has already been put into ISPyB
+        Assumes that appropriate data has already been put into ISPyB.
 
         Args:
             data_collection_id (int): The ID of the data collection representing the

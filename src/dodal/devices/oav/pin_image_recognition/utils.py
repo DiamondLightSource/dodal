@@ -220,7 +220,7 @@ class MxSampleDetect:
         # Move backwards to where there were no edges at all...
         while top[x] != NONE_VALUE:
             x += -self.scan_direction.value
-            if x == -1 or x == width:
+            if x in (-1, width):
                 # (In this case the sample is off the edge of the picture.)
                 LOGGER.warning(
                     "pin-tip detection: Pin tip may be outside image area - assuming at edge."
@@ -229,7 +229,7 @@ class MxSampleDetect:
         x += self.scan_direction.value  # ...and forward one step. x is now at the tip.
 
         tip_x = x
-        tip_y = int(round(0.5 * (top[x] + bottom[x])))
+        tip_y = round(0.5 * (top[x] + bottom[x]))
 
         # clear edges to the left (right) of the tip.
         if self.scan_direction.value == 1:

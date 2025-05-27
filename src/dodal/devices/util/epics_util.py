@@ -31,7 +31,7 @@ def run_functions_without_blocking(
     timeout: float = 60.0,
     associated_obj: OphydDevice | None = None,
 ) -> Status:
-    """Creates and initiates an asynchronous chaining of functions which return a status
+    """Creates and initiates an asynchronous chaining of functions which return a status.
 
     Usage:
     This function can be used to take a series of status-returning functions and run

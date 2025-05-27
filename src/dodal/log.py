@@ -166,7 +166,7 @@ def set_up_DEBUG_memory_handler(
 ):
     """Set up a Memory handler which holds 200k lines, and writes them to an hourly
     log file when it sees a message of severity ERROR. Creates the directory if
-    necessary
+    necessary.
     """
     debug_path = path / "debug"
     print(f"Logging to DEBUG handler {debug_path / filename}")

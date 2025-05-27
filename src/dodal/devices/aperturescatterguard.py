@@ -23,7 +23,7 @@ class InvalidApertureMove(Exception):
 
 
 class _GDAParamApertureValue(StrictEnum):
-    """Maps from a short usable name to the value name in the GDA Beamline parameters"""
+    """Maps from a short usable name to the value name in the GDA Beamline parameters."""
 
     ROBOT_LOAD = "ROBOT_LOAD"
     SMALL = "SMALL_APERTURE"

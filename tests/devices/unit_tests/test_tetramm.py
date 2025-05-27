@@ -154,7 +154,7 @@ async def test_set_invalid_exposure_for_number_of_values_per_reading(
     base_sample_rate = 100_000
     minimum_values_per_reading = 5
     readings_per_frame = 5
-    exposure >= 5 * 5 / 100_000 = 1/4000
+    exposure >= 5 * 5 / 100_000 = 1/4000.
     """
     with pytest.raises(
         ValueError,

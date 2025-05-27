@@ -31,7 +31,7 @@ class ReadOnlyAttenuator(StandardReadable):
 
 class BinaryFilterAttenuator(ReadOnlyAttenuator, Movable[float]):
     """The attenuator will insert filters into the beam to reduce its transmission.
-    In this attenuator, each filter can be in one of two states: IN or OUT
+    In this attenuator, each filter can be in one of two states: IN or OUT.
 
     This device should be set with:
         yield from bps.set(attenuator, desired_transmission)

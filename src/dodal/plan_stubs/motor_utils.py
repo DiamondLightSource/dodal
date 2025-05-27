@@ -30,7 +30,7 @@ def check_and_cache_values(
 ) -> Generator[Msg, Any, dict[Motor, float]]:
     """Caches the positions of all Motors on specified device if they are within
     smallest_move of home_position. Throws MoveTooLarge if they are outside maximum_move
-    of the home_position
+    of the home_position.
     """
     positions = {}
     for axis, new_position in devices_and_positions.items():
@@ -71,7 +71,7 @@ def move_and_reset_wrapper(
        2. Throws a MoveTooLarge exception if any positions are maximum_move away from home_position
        2. Moves any motor that is more than smallest_move away from the home_position to home_position
        3. Runs the specified plan
-       4. Moves all motors back to their cached positions
+       4. Moves all motors back to their cached positions.
 
     Args:
         plan (Callable[[], MsgGenerator]): The plan to move between homing and returning to the cache
@@ -95,7 +95,7 @@ def move_and_reset_wrapper(
     def move_to_home():
         home_group = f"home-{group if group else str(uuid.uuid4())[:6]}"
         for axis, position in device_and_positions.items():
-            if axis in initial_positions.keys():
+            if axis in initial_positions:
                 yield from bps.abs_set(axis, position, group=home_group)
         if wait_for_all:
             yield from bps.wait(home_group)

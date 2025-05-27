@@ -80,7 +80,7 @@ class AllValvesControl(StandardReadable, Movable[AllValvesControlState]):
     """valves 2, 4, 7, 8 are not controlled by the IOC,
     as they are under manual control.
     fast_valves: tuple[int, ...] = (5, 6)
-    slow_valves: tuple[int, ...] = (1, 3)
+    slow_valves: tuple[int, ...] = (1, 3).
     """
 
     def __init__(
@@ -271,7 +271,7 @@ class PressureJumpCellController(HasName):
 class PressureJumpCell(StandardReadable):
     """High pressure X-ray cell, used to apply pressure or pressure jumps to a sample.
     prefix: str
-        The prefix of beamline - SPECIAL - unusual that the cell prefix is computed separately
+        The prefix of beamline - SPECIAL - unusual that the cell prefix is computed separately.
     """
 
     def __init__(

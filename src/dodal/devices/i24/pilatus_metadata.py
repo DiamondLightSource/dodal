@@ -1,4 +1,4 @@
-"""A small temporary device to set and read the filename template from the pilatus"""
+"""A small temporary device to set and read the filename template from the pilatus."""
 
 import re
 

@@ -14,7 +14,7 @@ def numbered_slits(
     fake_with_ophyd_sim: bool = False,
 ) -> Slits:
     """Create a slits object following the {beamline}-AL-SLITS-{slit_number} PV
-    convention
+    convention.
 
     Args:
         slit_number: The number assigned to the slits in the control system, usually

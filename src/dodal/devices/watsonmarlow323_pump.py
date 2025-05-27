@@ -18,7 +18,7 @@ class WatsonMarlow323PumpState(StrictEnum):
 
 
 class WatsonMarlow323Pump(StandardReadable):
-    """Watson Marlow 323 Peristaltic Pump device"""
+    """Watson Marlow 323 Peristaltic Pump device."""
 
     def __init__(self, prefix: str, name: str = "") -> None:
         with self.add_children_as_readables():

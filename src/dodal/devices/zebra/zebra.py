@@ -88,7 +88,7 @@ class SoftInState(StrictEnum):
 
 class ArmingDevice(StandardReadable, Movable[ArmDemand]):
     """A useful device that can abstract some of the logic of arming.
-    Allows a user to just call arm.set(ArmDemand.ARM)
+    Allows a user to just call arm.set(ArmDemand.ARM).
     """
 
     TIMEOUT: float = 3

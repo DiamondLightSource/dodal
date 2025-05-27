@@ -79,7 +79,8 @@ def test_plan_produces_expected_start_document(
     )
     dimensions = [([data_key], "primary") for data_key in expected_data_keys]
     docs = documents_from_expected_shape.get("start")
-    assert docs and len(docs) == 1
+    assert docs
+    assert len(docs) == 1
     start = cast(RunStart, docs[0])
     assert start.get("shape") == shape
     assert (hints := start.get("hints"))
@@ -96,7 +97,8 @@ def test_plan_produces_expected_stop_document(
     documents_from_expected_shape: dict[str, list[DocumentType]], shape: tuple[int, ...]
 ):
     docs = documents_from_expected_shape.get("stop")
-    assert docs and len(docs) == 1
+    assert docs
+    assert len(docs) == 1
     stop = cast(RunStop, docs[0])
     assert stop.get("num_events") == {"primary": length_from_shape(shape)}
     assert stop.get("exit_status") == "success"
@@ -113,10 +115,12 @@ def test_plan_produces_expected_descriptor(
     shape: tuple[int, ...],
 ):
     docs = documents_from_expected_shape.get("descriptor")
-    assert docs and len(docs) == 1
+    assert docs
+    assert len(docs) == 1
     descriptor = cast(EventDescriptor, docs[0])
     object_keys = descriptor.get("object_keys")
-    assert object_keys is not None and det.name in object_keys
+    assert object_keys is not None
+    assert det.name in object_keys
     assert descriptor.get("name") == "primary"
 
 
@@ -142,7 +146,8 @@ def test_plan_produces_expected_events(
         else {x_axis.hints.get("fields", [])[0]}
     )
     docs = documents_from_expected_shape.get("event")
-    assert docs and len(docs) == length_from_shape(shape)
+    assert docs
+    assert len(docs) == length_from_shape(shape)
     for i in range(len(docs)):
         event = cast(Event, docs[i])
         assert len(event.get("data")) == axes
@@ -162,7 +167,8 @@ def test_plan_produces_expected_resources(
 ):
     docs = documents_from_expected_shape.get("stream_resource")
     data_keys = [det.name, f"{det.name}-sum"]
-    assert docs and len(docs) == len(data_keys)
+    assert docs
+    assert len(docs) == len(data_keys)
     for i in range(len(docs)):
         resource = cast(StreamResource, docs[i])
         assert resource.get("data_key") == data_keys[i]
@@ -180,4 +186,5 @@ def test_plan_produces_expected_datums(
 ):
     docs = documents_from_expected_shape.get("stream_datum")
     data_keys = [det.name, f"{det.name}-sum"]
-    assert docs and len(docs) == len(data_keys) * length_from_shape(shape)
+    assert docs
+    assert len(docs) == len(data_keys) * length_from_shape(shape)

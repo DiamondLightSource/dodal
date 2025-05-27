@@ -86,7 +86,7 @@ class TetrammDriver(Device):
 
 
 class TetrammController(DetectorController):
-    """Controller for a TetrAMM current monitor
+    """Controller for a TetrAMM current monitor.
 
     Attributes:
         base_sample_rate (int): Fixed in hardware
@@ -183,7 +183,7 @@ class TetrammController(DetectorController):
 
     @property
     def max_frame_rate(self) -> float:
-        """Max frame rate in Hz for the current configuration"""
+        """Max frame rate in Hz for the current configuration."""
         return 1 / self.minimum_exposure
 
     @max_frame_rate.setter
@@ -192,7 +192,7 @@ class TetrammController(DetectorController):
 
     @property
     def minimum_exposure(self) -> float:
-        """Smallest amount of time needed to take a frame"""
+        """Smallest amount of time needed to take a frame."""
         time_per_reading = self.minimum_values_per_reading / self.base_sample_rate
         return self.readings_per_frame * time_per_reading
 

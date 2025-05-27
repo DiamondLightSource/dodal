@@ -50,7 +50,7 @@ class CurrentAmpDet(StandardReadable, Preparable):
 
     async def read(self) -> dict[str, Reading]:
         """Read is modified so that if auto_mode is true it will optimise gain before
-         taking the final reading
+        taking the final reading.
         """
         if await self.auto_mode.get_value():
             LOGGER.info(f"{self.name}-Attempting auto-gain")

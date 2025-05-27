@@ -35,12 +35,12 @@ class GridAxis:
     full_steps: int
 
     def steps_to_motor_position(self, steps):
-        """Gives the motor position based on steps, where steps are 0 indexed"""
+        """Gives the motor position based on steps, where steps are 0 indexed."""
         return self.start + self.step_size_mm * steps
 
     @property
     def end(self):
-        """Gives the point where the final frame is taken"""
+        """Gives the point where the final frame is taken."""
         # Note that full_steps is one indexed e.g. if there is one step then the end is
         # refering to the first position
         return self.steps_to_motor_position(self.full_steps - 1)
@@ -136,7 +136,7 @@ ParamType = TypeVar("ParamType", bound=GridScanParamsCommon)
 
 
 class ZebraGridScanParams(GridScanParamsCommon):
-    """Params for standard Zebra FGS. Adds on the dwell time"""
+    """Params for standard Zebra FGS. Adds on the dwell time."""
 
     dwell_time_ms: float = 10
 
@@ -155,7 +155,7 @@ class ZebraGridScanParams(GridScanParamsCommon):
 
 
 class PandAGridScanParams(GridScanParamsCommon):
-    """Params for panda constant-motion scan. Adds on the goniometer run-up distance"""
+    """Params for panda constant-motion scan. Adds on the goniometer run-up distance."""
 
     run_up_distance_mm: float = 0.17
 
@@ -168,7 +168,7 @@ class MotionProgram(Device):
 
 
 class FastGridScanCommon(StandardReadable, Flyable, ABC, Generic[ParamType]):
-    """Device for a general fast grid scan
+    """Device for a general fast grid scan.
 
     When the motion program is started, the goniometer will move in a snake-like grid trajectory,
     with X as the fast axis and Y as the slow axis. If Z steps isn't 0, the goniometer will
@@ -292,7 +292,7 @@ class ZebraFastGridScan(FastGridScanCommon[ZebraGridScanParams]):
 
 
 class PandAFastGridScan(FastGridScanCommon[PandAGridScanParams]):
-    """Device for panda constant-motion scan"""
+    """Device for panda constant-motion scan."""
 
     def __init__(self, prefix: str, name: str = "") -> None:
         full_prefix = prefix + "PGS:"
@@ -319,7 +319,7 @@ def set_fast_grid_scan_params(scan: FastGridScanCommon[ParamType], params: Param
     to_move = []
 
     # Create arguments for bps.mv
-    for key in scan.movable_params.keys():
+    for key in scan.movable_params:
         to_move.extend([scan.movable_params[key], params.__dict__[key]])
 
     # Counter should always start at 0

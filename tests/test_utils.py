@@ -33,7 +33,7 @@ MOCK_DAQ_CONFIG_PATH = "tests/devices/unit_tests/test_daq_configuration"
 @pytest.fixture
 def alternate_config(tmp_path) -> str:
     """Alternate config dir as MOCK_DAQ_CONFIG_PATH replaces i03.DAQ_CONFIGURATION_PATH
-    in conftest.py
+    in conftest.py.
     """
     alt_config_path = tmp_path / "alt_daq_configuration"
     copytree(MOCK_DAQ_CONFIG_PATH, alt_config_path)
@@ -86,21 +86,24 @@ def test_makes_devices() -> None:
         "cryo",
         "diamond_filter",
         "ophyd_v2_device",
-    } == devices.keys() and len(exceptions) == 0
+    } == devices.keys()
+    assert len(exceptions) == 0
 
 
 def test_makes_devices_with_dependencies() -> None:
     import tests.fake_beamline_dependencies as fake_beamline
 
     devices, exceptions = make_all_devices(fake_beamline)
-    assert {"readable", "motor", "cryo"} == devices.keys() and len(exceptions) == 0
+    assert {"readable", "motor", "cryo"} == devices.keys()
+    assert len(exceptions) == 0
 
 
 def test_makes_devices_with_disordered_dependencies() -> None:
     import tests.fake_beamline_disordered_dependencies as fake_beamline
 
     devices, exceptions = make_all_devices(fake_beamline)
-    assert {"readable", "motor", "cryo"} == devices.keys() and len(exceptions) == 0
+    assert {"readable", "motor", "cryo"} == devices.keys()
+    assert len(exceptions) == 0
 
 
 def test_makes_devices_with_module_name() -> None:
@@ -111,7 +114,8 @@ def test_makes_devices_with_module_name() -> None:
         "cryo",
         "diamond_filter",
         "ophyd_v2_device",
-    } == devices.keys() and len(exceptions) == 0
+    } == devices.keys()
+    assert len(exceptions) == 0
 
 
 def test_get_hostname() -> None:
@@ -133,7 +137,8 @@ def test_no_devices_when_all_factories_raise_exceptions() -> None:
 
     devices, exceptions = make_all_devices(fake_beamline)
     assert len(devices) == 0
-    assert len(exceptions) == 3 and all(
+    assert len(exceptions) == 3
+    assert all(
         isinstance(e, Exception) for e in exceptions.values()
     )
 
@@ -143,7 +148,8 @@ def test_some_devices_when_some_factories_raise_exceptions() -> None:
 
     devices, exceptions = make_all_devices(fake_beamline)
     assert len(devices) == 2
-    assert len(exceptions) == 1 and all(
+    assert len(exceptions) == 1
+    assert all(
         isinstance(e, Exception) for e in exceptions.values()
     )
 

@@ -170,7 +170,7 @@ class I10Apple2(Apple2):
 
 
 class I10Apple2PGM(StandardReadable, Movable[float]):
-    """Compound device to set both ID and PGM energy at the sample time,poly_deg"""
+    """Compound device to set both ID and PGM energy at the sample time,poly_deg."""
 
     def __init__(
         self, id: I10Apple2, pgm: PGM, prefix: str = "", name: str = ""

@@ -89,7 +89,7 @@ async def test_given_program_not_running_and_pin_unmounting_but_new_pin_not_moun
 
 
 async def set_with_happy_path(device: BartRobot) -> AsyncStatus:
-    """Mocks the logic that the robot would do on a successful load"""
+    """Mocks the logic that the robot would do on a successful load."""
     device.LOAD_TIMEOUT = 0.05  # type: ignore
     set_mock_value(device.program_running, False)
     set_mock_value(device.gonio_pin_sensor, PinMounted.PIN_MOUNTED)

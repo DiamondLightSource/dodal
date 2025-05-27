@@ -5,7 +5,7 @@ from pydantic import BaseModel, Field, model_validator
 
 class ZebraMappingValidations(BaseModel):
     """Raises an exception if field set to -1 is accessed, and validate against
-    multiple fields mapping to the same integer
+    multiple fields mapping to the same integer.
     """
 
     def __getattribute__(self, name: str):
@@ -22,7 +22,7 @@ class ZebraMappingValidations(BaseModel):
 
     @model_validator(mode="after")
     def ensure_no_duplicate_connections(self):
-        """Check that TTL outputs and sources are mapped to unique integers"""
+        """Check that TTL outputs and sources are mapped to unique integers."""
         integer_fields = {
             key: value
             for key, value in self.model_dump().items()
@@ -32,7 +32,7 @@ class ZebraMappingValidations(BaseModel):
         integer_fields_with_duplicates = {
             k: v for k, v in integer_fields.items() if counted_vals[v] > 1
         }
-        if len(integer_fields_with_duplicates):
+        if integer_fields_with_duplicates:
             raise ValueError(
                 f"Each field in {type(self)} must be mapped to a unique integer. Duplicate fields: {integer_fields_with_duplicates}"
             )
@@ -54,7 +54,7 @@ class ZebraTTLOutputs(ZebraMappingValidations):
 
 
 class ZebraSources(ZebraMappingValidations):
-    """Maps internal Zebra signal source to their integer PV value"""
+    """Maps internal Zebra signal source to their integer PV value."""
 
     DISCONNECT: int = Field(default=0, ge=0, le=63)
     IN1_TTL: int = Field(default=1, ge=0, le=63)

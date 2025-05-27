@@ -23,15 +23,15 @@ class DataCollectionIdentifier(BaseModel):
 
 
 class DirectoryServiceClient(ABC):
-    """Object responsible for I/O in determining collection number"""
+    """Object responsible for I/O in determining collection number."""
 
     @abstractmethod
     async def create_new_collection(self) -> DataCollectionIdentifier:
-        """Create new collection"""
+        """Create new collection."""
 
     @abstractmethod
     async def get_current_collection(self) -> DataCollectionIdentifier:
-        """Get current collection"""
+        """Get current collection."""
 
 
 class DiamondFilenameProvider(FilenameProvider):
@@ -49,7 +49,7 @@ class DiamondFilenameProvider(FilenameProvider):
 class RemoteDirectoryServiceClient(DirectoryServiceClient):
     """Client for the VisitService REST API
     Currently exposed by the GDA Server to co-ordinate unique filenames.
-    While VisitService is embedded in GDA, url is likely to be `ixx-control:8088/api`
+    While VisitService is embedded in GDA, url is likely to be `ixx-control:8088/api`.
     """
 
     def __init__(self, url: str) -> None:
@@ -100,7 +100,7 @@ class StaticVisitPathProvider(UpdatingPathProvider):
     update() queries a visit service to get the next DataCollectionIdentifier to increment the suffix of all file writers' next files.
     Requires that all detectors are running with a mutual view on the filesystem.
     Supports a single Visit which should be passed as a Path relative to the root of the Detector IOC mounting.
-    i.e. to write to visit /dls/ixx/data/YYYY/cm12345-1
+    i.e. to write to visit /dls/ixx/data/YYYY/cm12345-1.
     """
 
     def __init__(

@@ -92,7 +92,7 @@ class I10PneumaticStage(StandardReadable):
 
 
 class ScreenCam(Device):
-    """Compound device of pneumatic stage(fluorescent screen) and webcam"""
+    """Compound device of pneumatic stage(fluorescent screen) and webcam."""
 
     def __init__(
         self,
@@ -160,7 +160,7 @@ class I10Diagnostic(Device):
 
 
 class I10Diagnostic5ADet(Device):
-    """Diagnostic 5a detection with drain current and photo diode"""
+    """Diagnostic 5a detection with drain current and photo diode."""
 
     def __init__(
         self, prefix: str, name: str = "", connector: DeviceConnector | None = None

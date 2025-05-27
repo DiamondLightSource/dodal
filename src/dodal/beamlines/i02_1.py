@@ -1,4 +1,4 @@
-"""Beamline i02-1 is also known as VMXm, or I02J"""
+"""Beamline i02-1 is also known as VMXm, or I02J."""
 
 from dodal.common.beamlines.beamline_utils import (
     device_factory,

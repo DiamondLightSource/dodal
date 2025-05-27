@@ -59,7 +59,7 @@ class Undulator(StandardReadable, Movable[float]):
         poles: int | None = None,
         length: float | None = None,
     ) -> None:
-        """Constructor
+        """Constructor.
 
         Args:
             prefix: PV prefix
@@ -99,7 +99,7 @@ class Undulator(StandardReadable, Movable[float]):
 
     @AsyncStatus.wrap
     async def set(self, value: float):
-        """Set the undulator gap to a given energy in keV
+        """Set the undulator gap to a given energy in keV.
 
         Args:
             value: energy in keV
@@ -145,7 +145,7 @@ class Undulator(StandardReadable, Movable[float]):
 
     async def _get_gap_to_match_energy(self, energy_kev: float) -> float:
         """Get a 2d np.array from lookup table that
-        converts energies to undulator gap distance
+        converts energies to undulator gap distance.
         """
         energy_to_distance_table: np.ndarray = await energy_distance_table(
             self.id_gap_lookup_table_path

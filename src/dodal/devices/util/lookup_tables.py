@@ -71,7 +71,7 @@ def linear_extrapolation_lut(
 ) -> Callable[[float], float]:
     """Return a callable that implements f(s) = t according to the conversion table data
     supplied, with linear extrapolation outside that range. Inside the range of the table,
-    the function is equivalent to that returned by linear_interpolation_lut
+    the function is equivalent to that returned by linear_interpolation_lut.
 
     Args:
         s_values:  Values of the independent axis

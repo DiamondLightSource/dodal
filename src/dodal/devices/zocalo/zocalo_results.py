@@ -91,7 +91,7 @@ def get_dict_differences(
     dict1: dict, dict1_source: str, dict2: dict, dict2_source: str
 ) -> str | None:
     """Returns a string containing dict1 and dict2 if there are differences between them, greater than a
-    1e-5 tolerance. If dictionaries are identical, return None
+    1e-5 tolerance. If dictionaries are identical, return None.
     """
     diff = DeepDiff(dict1, dict2, math_epsilon=1e-5, ignore_numeric_type_changes=True)
 
@@ -218,7 +218,7 @@ class ZocaloResults(StandardReadable, Triggerable):
         """Stages the Zocalo device by: subscribing to the queue, doing a background
         sleep for a few seconds to wait for any stale messages to be received, then
         clearing the queue. Plans using this device should wait on ZOCALO_STAGE_GROUP
-        before triggering processing for the experiment
+        before triggering processing for the experiment.
         """
         if self.use_cpu_and_gpu and self.use_gpu:
             raise ValueError(
@@ -352,12 +352,7 @@ class ZocaloResults(StandardReadable, Triggerable):
 
             results = message.get("results", [])
 
-            if self.use_cpu_and_gpu or self.use_gpu:
-                self._raw_results_received.put(
-                    {"results": results, "recipe_parameters": recipe_parameters}
-                )
-            # Only add to queue if results are from CPU
-            elif not recipe_parameters.get("gpu"):
+            if self.use_cpu_and_gpu or self.use_gpu or not recipe_parameters.get("gpu"):
                 self._raw_results_received.put(
                     {"results": results, "recipe_parameters": recipe_parameters}
                 )

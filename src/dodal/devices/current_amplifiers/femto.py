@@ -13,7 +13,7 @@ from dodal.log import LOGGER
 
 
 class Femto3xxGainTable(StrictEnum):
-    """These are the sensitivity setting for Femto 3xx current amplifier"""
+    """These are the sensitivity setting for Femto 3xx current amplifier."""
 
     SEN_1 = "10^4"
     SEN_2 = "10^5"
@@ -28,7 +28,7 @@ class Femto3xxGainTable(StrictEnum):
 
 
 class Femto3xxGainToCurrentTable(float, Enum):
-    """These are the voltage to current setting for Femto 3xx current amplifier"""
+    """These are the voltage to current setting for Femto 3xx current amplifier."""
 
     SEN_1 = 1e4
     SEN_2 = 1e5
@@ -43,7 +43,7 @@ class Femto3xxGainToCurrentTable(float, Enum):
 
 
 class Femto3xxRaiseTime(float, Enum):
-    """These are the gain dependent raise time(s) for Femto 3xx current amplifier"""
+    """These are the gain dependent raise time(s) for Femto 3xx current amplifier."""
 
     SEN_1 = 0.8e-3
     SEN_2 = 0.8e-3

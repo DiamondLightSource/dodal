@@ -43,9 +43,8 @@ def test_save_panda_failure_to_create_device_exits_with_failure_code(mock_exit, 
     with patch(
         "dodal.plans.save_panda.make_device",
         side_effect=ValueError("device does not exist"),
-    ):
-        with pytest.raises(AssertionError):
-            _save_panda("i03", "panda", tmpdir, "filename")
+    ), pytest.raises(AssertionError):
+        _save_panda("i03", "panda", tmpdir, "filename")
 
     mock_exit.assert_called_once_with(1)
 

@@ -135,8 +135,8 @@ def test_given_a_device_where_one_move_too_small_when_check_and_cache_values_the
     cached_positions = motors_and_positions.values()
 
     assert len(cached_positions) == 1
-    assert list(motors_and_positions.keys())[0] == my_device.y
-    assert list(cached_positions)[0] == 200
+    assert next(iter(motors_and_positions.keys())) == my_device.y
+    assert next(iter(cached_positions)) == 200
 
 
 def test_given_a_device_where_all_moves_too_small_when_check_and_cache_values_then_no_positions_returned(

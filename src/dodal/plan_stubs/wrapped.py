@@ -104,7 +104,7 @@ def move_relative(
 
 
 def sleep(time: float) -> MsgGenerator:
-    """Suspend all action for a given time, wrapper for `bp.sleep`
+    """Suspend all action for a given time, wrapper for `bp.sleep`.
 
     Args:
         time (float): Time to wait in seconds

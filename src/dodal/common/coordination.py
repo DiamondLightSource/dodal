@@ -24,7 +24,7 @@ def inject(name: str) -> Any:  # type: ignore
     argument, leaving handling to the context from which the plan is called.
     Assumes that device.name is unique.
     e.g. For a 1-dimensional scan, that is usually performed on a Movable with
-    name "stage_x"
+    name "stage_x".
 
     def scan(x: Movable = inject("stage_x"), start: float = 0.0 ...)
 

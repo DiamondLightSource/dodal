@@ -82,7 +82,7 @@ class AbstractBaseSequence(ABC, JavaToPythonModel, Generic[TAbstractBaseRegion])
     """
 
     version: float = 0.1  # If file format changes within prod, increment this number!
-    regions: list[TAbstractBaseRegion] = Field(default_factory=lambda: [])
+    regions: list[TAbstractBaseRegion] = Field(default_factory=list)
 
     def get_enabled_regions(self) -> list[TAbstractBaseRegion]:
         return [r for r in self.regions if r.enabled]

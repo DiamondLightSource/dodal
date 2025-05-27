@@ -108,7 +108,7 @@ def test_given_node_in_error_node_error_status_gives_message_and_node_number(
     error = fake_odin.nodes.wait_for_no_errors(None)
     error_messages = list(error.values())
 
-    assert any(status.exception for status in error.keys())
+    assert any(status.exception for status in error)
     assert any("0" in message for message in error_messages)
     assert any(ERR_MESSAGE in message for message in error_messages)
 

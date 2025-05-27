@@ -20,7 +20,7 @@ class MaterialsEnum(Enum):
 @dataclass(frozen=True)
 class CrystalMetadata:
     """Metadata used in the NeXus format,
-    see https://manual.nexusformat.org/classes/base_classes/NXcrystal.html
+    see https://manual.nexusformat.org/classes/base_classes/NXcrystal.html.
     """
 
     usage: Literal["Bragg", "Laue"]

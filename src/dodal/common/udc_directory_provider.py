@@ -16,7 +16,7 @@ class PandAFilenameProvider(FilenameProvider):
 
 class PandASubpathProvider(UpdatingPathProvider):
     """Directory provider for the HDFPanda. Points to a panda subdirectory within the
-    directory path provided
+    directory path provided.
     """
 
     resource_dir = Path("panda")

@@ -294,7 +294,7 @@ def invoke_factories(
     # Compute tree of dependencies,
     dependencies = {
         factory_name: set(extract_dependencies(factories, factory_name))
-        for factory_name in factories.keys()
+        for factory_name in factories
     }
     while (len(devices) + len(exceptions)) < len(factories):
         leaves = [

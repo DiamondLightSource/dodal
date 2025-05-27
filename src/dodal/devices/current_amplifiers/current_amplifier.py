@@ -42,7 +42,7 @@ class CurrentAmp(ABC, StandardReadable, Movable):
 
     @abstractmethod
     async def get_gain(self) -> Enum:
-        """Get the current gain setting
+        """Get the current gain setting.
 
         Returns:
             Enum: The member name of the current gain setting in gain_conversion_table.
@@ -51,11 +51,11 @@ class CurrentAmp(ABC, StandardReadable, Movable):
 
     @abstractmethod
     async def get_upperlimit(self) -> float:
-        """Get the upper limit of the current amplifier"""
+        """Get the upper limit of the current amplifier."""
 
     @abstractmethod
     async def get_lowerlimit(self) -> float:
-        """Get the lower limit of the current amplifier"""
+        """Get the lower limit of the current amplifier."""
 
 
 class CurrentAmpCounter(ABC, StandardReadable, Preparable):
@@ -73,7 +73,7 @@ class CurrentAmpCounter(ABC, StandardReadable, Preparable):
 
     @abstractmethod
     async def get_count(self) -> float:
-        """ "Get count
+        """ "Get count.
 
         Returns:
             float: Current count
@@ -82,7 +82,7 @@ class CurrentAmpCounter(ABC, StandardReadable, Preparable):
 
     @abstractmethod
     async def get_count_per_sec(self) -> float:
-        """Get count per second
+        """Get count per second.
 
         Returns:
             float: Current count per second
@@ -91,7 +91,7 @@ class CurrentAmpCounter(ABC, StandardReadable, Preparable):
 
     @abstractmethod
     async def get_voltage_per_sec(self) -> float:
-        """Get count per second in voltage
+        """Get count per second in voltage.
 
         Returns:
             float: Current count in volt per second
@@ -101,4 +101,4 @@ class CurrentAmpCounter(ABC, StandardReadable, Preparable):
     @abstractmethod
     @AsyncStatus.wrap
     async def prepare(self, value: float) -> None:
-        """Prepare method for setting up the counter"""
+        """Prepare method for setting up the counter."""

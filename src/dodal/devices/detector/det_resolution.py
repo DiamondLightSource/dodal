@@ -45,7 +45,7 @@ def _calc_useful_radius(detector_radius_mm, beam_x_mm, beam_y_mm):
 
 
 def _calc_res_at_angle(wavelength_angstroms, angular_shift_radians):
-    """Base definition of maximum resolution (from Bragg's Law with n=1)"""
+    """Base definition of maximum resolution (from Bragg's Law with n=1)."""
     return 0.5 * wavelength_angstroms / sin(angular_shift_radians)
 
 
@@ -54,7 +54,7 @@ def _calc_res_off_axis_detector(
 ):
     """Calculate maximum resolution given detector distance and extent (radius) that detector face extends
     No correction for position of beam centre on detector face at twoTheta=0
-    Here radius and distance parameters can be in any length unit, provided it is the same, millimetres is the convention
+    Here radius and distance parameters can be in any length unit, provided it is the same, millimetres is the convention.
     """
     angular_shift_radians = atan(usable_radius / det_distance_mm)
     return _calc_res_at_angle(
@@ -66,7 +66,7 @@ def _max_res_for_mx(
     wavelength_angstroms, detector_radius_mm, det_distance_mm, beam_x_mm, beam_y_mm
 ):
     """Calculate maximum resolution given MX Use Case (detector at twoTheta=0) and beam centre on detector face
-    Correct the radius for position of beam centre on detector face at twoTheta=0
+    Correct the radius for position of beam centre on detector face at twoTheta=0.
     """
     usable_radius = _calc_useful_radius(detector_radius_mm, beam_x_mm, beam_y_mm)
     return _calc_res_off_axis_detector(

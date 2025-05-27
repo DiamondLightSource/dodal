@@ -15,7 +15,7 @@ from ophyd_async.epics.core import epics_signal_r
 
 class FilterState(StrictEnum):
     """Note that the in/out here refers to the internal rocker
-    position so a PV value of IN implies a filter OUT of beam
+    position so a PV value of IN implies a filter OUT of beam.
     """
 
     IN_BEAM = "OUT"

@@ -68,9 +68,9 @@ class VGScientaExcitationEnergySource(JavaToPythonModel):
 class VGScientaSequence(AbstractBaseSequence[VGScientaRegion]):
     element_set: str = Field(default="Unknown")
     excitation_energy_sources: list[VGScientaExcitationEnergySource] = Field(
-        default_factory=lambda: []
+        default_factory=list
     )
-    regions: list[VGScientaRegion] = Field(default_factory=lambda: [])
+    regions: list[VGScientaRegion] = Field(default_factory=list)
 
     def get_excitation_energy_source_by_region(
         self, region: VGScientaRegion

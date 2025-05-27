@@ -31,7 +31,8 @@ def test_parse_lookup_table_returns_list_of_the_same_length_as_num_of_columns(
 ):
     lut_values = parse_lookup_table(lut_path)
 
-    assert isinstance(lut_values, list) and len(lut_values) == num_columns
+    assert isinstance(lut_values, list)
+    assert len(lut_values) == num_columns
 
 
 @mark.parametrize(("s", "expected_t"), [(2.0, 1.0), (3.0, 1.5), (5.0, 4.0), (5.25, 6.0)])

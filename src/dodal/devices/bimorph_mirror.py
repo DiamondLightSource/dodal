@@ -84,7 +84,7 @@ class BimorphMirror(StandardReadable, Movable[Mapping[int, float]]):
         """Args:
             prefix: str PV prefix
             number_of_channels: int number of channels on bimorph mirror (can be zero)
-            name: str name of device
+            name: str name of device.
 
         Raises:
             ValueError: number_of_channels is less than zero

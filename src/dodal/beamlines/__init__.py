@@ -25,7 +25,7 @@ _BEAMLINE_NAME_OVERRIDES = {
 
 
 def all_beamline_modules() -> Iterable[str]:
-    """Get the names of all importable modules in beamlines
+    """Get the names of all importable modules in beamlines.
 
     Returns:
         Iterable[str]: Generator of beamline module names
@@ -50,7 +50,7 @@ def all_beamline_modules() -> Iterable[str]:
 
 
 def all_beamline_names() -> Iterable[str]:
-    """Get the names of all beamlines as per the ${BEAMLINE} environment variable
+    """Get the names of all beamlines as per the ${BEAMLINE} environment variable.
 
     Returns:
         Iterable[str]: Generator of beamline names that dodal supports
@@ -80,7 +80,7 @@ def _module_name_overrides() -> Mapping[str, set[str]]:
 
 def module_name_for_beamline(beamline: str) -> str:
     """Get the module name for a particular beamline, it may differ from the beamline
-    name e.g. i20-1 -> i20_1
+    name e.g. i20-1 -> i20_1.
 
     Args:
         beamline: The beamline name as per the ${BEAMLINE} environment variable

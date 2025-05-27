@@ -25,9 +25,11 @@ def test_bottom_right_from_top_left():
     bottom_right = bottom_right_from_top_left(
         top_left, 20, 30, 0.1, 0.15, 2.7027, 2.7027
     )
-    assert bottom_right[0] == 863 and bottom_right[1] == 1788
+    assert bottom_right[0] == 863
+    assert bottom_right[1] == 1788
     bottom_right = bottom_right_from_top_left(top_left, 15, 20, 0.005, 0.007, 1, 1)
-    assert bottom_right[0] == 198 and bottom_right[1] == 263
+    assert bottom_right[0] == 198
+    assert bottom_right[1] == 263
 
 
 @pytest.fixture
