@@ -19,6 +19,8 @@ from dodal.devices.oav.oav_calculations import (
 )
 from dodal.log import LOGGER
 
+NO_MURKO_RESULT = (-1, -1)
+
 MurkoResult = dict
 FullMurkoResults = dict[str, list[MurkoResult]]
 
@@ -117,6 +119,7 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
         avg_x = float(np.mean(self.x_dists_mm))
         LOGGER.info(f"Finding least square y and z from y distances: {self.y_dists_mm}")
         best_y, best_z = get_yz_least_squares(self.y_dists_mm, self.omegas)
+        # x, y, z are relative to beam centre. Need to move negative these values to get centred.
         self._x_mm_setter(-avg_x)
         self._y_mm_setter(-best_y)
         self._z_mm_setter(-best_z)
@@ -124,7 +127,6 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
     async def process_batch(self, message: dict | None, sample_id: str):
         if message and message["type"] == "message":
             batch_results: list[dict] = pickle.loads(message["data"])
-            LOGGER.info(f"Got a batch of length {len(batch_results)}")
             for results in batch_results:
                 for uuid, result in results.items():
                     if metadata_str := await self.redis_client.hget(  # type: ignore
@@ -145,29 +147,19 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
         as well as the omega angle the image was taken at.
         """
         omega = metadata["omega_angle"]
-        LOGGER.info(f"Got angle {omega}")
         coords = result["most_likely_click"]  # As proportion from top, left of image
-        LOGGER.info(f"Got most_likely_click: {coords}")
-        if tuple(coords) == (-1, -1):
+        LOGGER.info(f"Got most_likely_click: {coords} at angle {omega}")
+        if tuple(coords) == NO_MURKO_RESULT:  # See https://github.com/MartinSavko/murko/issues/9
             LOGGER.info("Murko didn't produce a result, moving on")
         else:
             shape = result["original_shape"]  # Dimensions of image in pixels
             # Murko returns coords as y, x
             centre_px = (coords[1] * shape[1], coords[0] * shape[0])
-            LOGGER.info(
-                f"Using image taken at {omega}, which found xtal at {centre_px}"
-            )
 
             beam_dist_px = calculate_beam_distance(
                 (metadata["beam_centre_i"], metadata["beam_centre_j"]),
                 centre_px[0],
                 centre_px[1],
-            )
-            LOGGER.info(
-                f"Found horizontal distance at {beam_dist_px[0]}, angle = {omega}"
-            )
-            LOGGER.info(
-                f"Found vertical distance at {beam_dist_px[1]}, angle = {omega}"
             )
             self.x_dists_mm.append(
                 beam_dist_px[0] * metadata["microns_per_x_pixel"] / 1000
@@ -179,7 +171,7 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
             self._last_omega = omega
 
 
-def get_yz_least_squares(v_dists: list, omegas: list) -> tuple[float, float]:
+def get_yz_least_squares(vertical_dists: list, omegas: list) -> tuple[float, float]:
     """Get the least squares solution for y and z from the vertical distances and omega angles.
 
     Args:
@@ -193,6 +185,6 @@ def get_yz_least_squares(v_dists: list, omegas: list) -> tuple[float, float]:
     thetas = np.radians(omegas)
     matrix = np.column_stack([np.cos(thetas), -np.sin(thetas)])
 
-    yz, residuals, rank, s = np.linalg.lstsq(matrix, v_dists, rcond=None)
+    yz, residuals, rank, s = np.linalg.lstsq(matrix, vertical_dists, rcond=None)
     y, z = yz
     return y, z
