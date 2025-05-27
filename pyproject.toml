@@ -169,53 +169,37 @@ lint.extend-ignore = [
     "F811", # support typing.overload decorator
 ]
 lint.select = [
-    "B",       # flake8-bugbear - https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
-    "C4",      # flake8-comprehensions - https://docs.astral.sh/ruff/rules/#flake8-comprehensions-c4
+    "RUF",     # ruff-specific - https://docs.astral.sh/ruff/rules/#ruff-specific-rules-ruf
+    "B",       # flake8 bugbear - https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
+    "C4",      # flake8 comprehensions - https://docs.astral.sh/ruff/rules/#flake8-comprehensions-c4
+    "SIM",     # flake8 simplify - https://docs.astral.sh/ruff/rules/#flake8-simplify-sim
+    "RSE",     # flake8 raises - https://docs.astral.sh/ruff/rules/#flake8-raise-rse
+    "TID",     # flake8 tidy imports - https://docs.astral.sh/ruff/rules/#flake8-slots-slot
+    "ICN",     # flake8 import conventions - https://docs.astral.sh/ruff/rules/#flake8-import-conventions-icn
+    "PIE",     # flake8 pie - https://docs.astral.sh/ruff/rules/#flake8-no-pep420-inp
+    "PLC",     # pylint - https://docs.astral.sh/ruff/rules/#pylint-pl
+    "UP",      # pyupgrade - https://docs.astral.sh/ruff/rules/#pyupgrade-up
     "E",       # pycodestyle errors - https://docs.astral.sh/ruff/rules/#error-e
     "F",       # pyflakes rules - https://docs.astral.sh/ruff/rules/#pyflakes-f
     "W",       # pycodestyle warnings - https://docs.astral.sh/ruff/rules/#warning-w
     "I",       # isort - https://docs.astral.sh/ruff/rules/#isort-i
     "UP",      # pyupgrade - https://docs.astral.sh/ruff/rules/#pyupgrade-up
     "SLF",     # self - https://docs.astral.sh/ruff/settings/#lintflake8-self
-    "RUF018",  # walrus operators in asserts - https://docs.astral.sh/ruff/rules/assignment-in-assert/
-    "TID251",  # banned api - https://docs.astral.sh/ruff/rules/banned-api/
-    "D212",    # multi line summary first line - https://docs.astral.sh/ruff/rules/multi-line-summary-first-line/
-    "PT006",   # pytest parametrize names wrong type - https://docs.astral.sh/ruff/rules/pytest-parametrize-names-wrong-type/
-    "PT007",   # pytest parametrize values wrong type - https://docs.astral.sh/ruff/rules/pytest-parametrize-values-wrong-type/
-    "D413",    # missing blank line after last section - https://docs.astral.sh/ruff/rules/missing-blank-line-after-last-section/
-    "D202",    # blank line after function - https://docs.astral.sh/ruff/rules/blank-line-after-function/
-    "D200",    # unnecessary multiline docstring - https://docs.astral.sh/ruff/rules/unnecessary-multiline-docstring/
-    "D209",    # new line after last paragraph - https://docs.astral.sh/ruff/rules/new-line-after-last-paragraph/
-    "D411",    # no blank line before section - https://docs.astral.sh/ruff/rules/no-blank-line-before-section/
-    "PT022",   # pytest useless yield fixture - https://docs.astral.sh/ruff/rules/pytest-useless-yield-fixture/
-    "PT001",   # pytest fixture incorrect parentheses style - https://docs.astral.sh/ruff/rules/pytest-fixture-incorrect-parentheses-style/
-    "SIM300",  # yoda conditions - https://docs.astral.sh/ruff/rules/yoda-conditions/
-    "RSE102",  # unnecessary paren on raise exception - https://docs.astral.sh/ruff/rules/unnecessary-paren-on-raise-exception/
-    "D403",    # first word uncapitalized - https://docs.astral.sh/ruff/rules/first-word-uncapitalized/
-    "RUF022",  # unsorted dunder all - https://docs.astral.sh/ruff/rules/unsorted-dunder-all/
     "PT003",   # pytest extraneous scope function - https://docs.astral.sh/ruff/rules/pytest-extraneous-scope-function/
-    "RET503",  # implicit return - https://docs.astral.sh/ruff/rules/implicit-return/
-    "SIM105",  # suppressible exception - https://docs.astral.sh/ruff/rules/suppressible-exception/
-    "TID252",  # relative imports - https://docs.astral.sh/ruff/rules/relative-imports/
+    "D209",    # new line after last paragraph - https://docs.astral.sh/ruff/rules/new-line-after-last-paragraph/
+    "D214",    # overindented section - https://docs.astral.sh/ruff/rules/overindented-section/
+    "D403",    # first word uncapitalised - https://docs.astral.sh/ruff/rules/first-word-uncapitalized/
+    "D410",    # no blank line after section - https://docs.astral.sh/ruff/rules/no-blank-line-after-section/
+    "D411",    # no blank line before section - https://docs.astral.sh/ruff/rules/no-blank-line-before-section/
+    "D413",    # missing blank line after last section - https://docs.astral.sh/ruff/rules/missing-blank-line-after-last-section/
     "PTH201",  # path constructor current directory - https://docs.astral.sh/ruff/rules/path-constructor-current-directory/
     "PLR0402", # manual from import - https://docs.astral.sh/ruff/rules/manual-from-import/
-    "RUF005",  # collection literal concatenation - https://docs.astral.sh/ruff/rules/collection-literal-concatenation/
-    "RUF100",  # unused noqa - https://docs.astral.sh/ruff/rules/unused-noqa/
-    "ICN001",  # unconventional import alias - https://docs.astral.sh/ruff/rules/unconventional-import-alias/
-    "PIE790",  # unnecessary placeholder - https://docs.astral.sh/ruff/rules/unnecessary-placeholder/
-    "PIE810",  # multiple starts ends with - https://docs.astral.sh/ruff/rules/multiple-starts-ends-with/
-    "PT014",   # pytest duplicate parametrize test cases - https://docs.astral.sh/ruff/rules/pytest-duplicate-parametrize-test-cases/
-    "SIM103",  # needless bool - https://docs.astral.sh/ruff/rules/needless-bool/
-    "SIM108",  # if else block instead of if exp - https://docs.astral.sh/ruff/rules/if-else-block-instead-of-if-exp/
-    "D214",    # overindented section - https://docs.astral.sh/ruff/rules/overindented-section/
-    "D409",    # mismatched section underline length - https://docs.astral.sh/ruff/rules/mismatched-section-underline-length/
-    "D412",    # blank lines between header and content - https://docs.astral.sh/ruff/rules/blank-lines-between-header-and-content/
-    "PLC0208", # iteration over set - https://docs.astral.sh/ruff/rules/iteration-over-set/
     "PLR1722", # sys exit alias - https://docs.astral.sh/ruff/rules/sys-exit-alias/
-    "PLR5501", # collapsible else if - https://docs.astral.sh/ruff/rules/collapsible-else-if/
-    "UP015",   # redundant open modes - https://docs.astral.sh/ruff/rules/redundant-open-modes/
-
+    "PLR5501", # collapsible else if - https://docs.astral.sh/ruff/rules/sys-exit-alias/
+    "TID251",  # banned api - https://docs.astral.sh/ruff/rules/banned-api/
+    "RET503",  # implicit return - https://docs.astral.sh/ruff/rules/implicit-return/
 ]
+lint.ignore = ["RUF003", "RUF006", "RUF012", "PIE796", "SIM117"]
 
 [tool.ruff.lint.per-file-ignores]
 # By default, private member access is allowed in tests
