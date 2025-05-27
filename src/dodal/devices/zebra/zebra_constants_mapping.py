@@ -13,11 +13,10 @@ class ZebraMappingValidations(BaseModel):
         been instantiated, raise exception if a field which has been set to -1 is accessed.
         """
         value = object.__getattribute__(self, name)
-        if not name.startswith("__"):
-            if value == -1:
-                raise UnmappedZebraException(
-                    f"'{type(self).__name__}.{name}' was accessed but is set to -1. Please check the zebra mappings against the zebra's physical configuration"
-                )
+        if not name.startswith("__") and value == -1:
+            raise UnmappedZebraException(
+                f"'{type(self).__name__}.{name}' was accessed but is set to -1. Please check the zebra mappings against the zebra's physical configuration"
+            )
         return value
 
     @model_validator(mode="after")

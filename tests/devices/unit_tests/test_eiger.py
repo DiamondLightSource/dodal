@@ -603,9 +603,8 @@ def test_given_not_all_frames_done_when_eiger_stopped_then_do_not_wait_for_frame
 
 def lambda_in_calls(f, mock_calls):
     for _call in mock_calls:
-        if hasattr(_call.args[0], "__name__") and _call.args[0].__name__ == "<lambda>":
-            if f._extract_mock_name() in _call.args[0].__code__.co_names:
-                return True
+        if hasattr(_call.args[0], "__name__") and _call.args[0].__name__ == "<lambda>" and f._extract_mock_name() in _call.args[0].__code__.co_names:
+            return True
     return False
 
 
