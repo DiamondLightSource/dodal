@@ -148,4 +148,4 @@ async def RE():
         await asyncio.sleep(0)
         if time.monotonic() > timeout:
             raise TimeoutError("This really shouldn't happen but just in case...")
-    yield RE
+    return RE

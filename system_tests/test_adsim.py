@@ -47,7 +47,7 @@ def documents_from_num(
 
 @pytest.mark.requires(instrument="adsim")
 @pytest.mark.parametrize(
-    "documents_from_num, shape", ([1, (1,)], [3, (3,)]), indirect=["documents_from_num"]
+    ("documents_from_num", "shape"), [(1, (1,)), (3, (3,))], indirect=["documents_from_num"]
 )
 def test_plan_produces_expected_start_document(
     documents_from_num: dict[str, list[DocumentType]], shape: tuple[int, ...]
@@ -69,7 +69,7 @@ def test_plan_produces_expected_start_document(
 
 @pytest.mark.requires(instrument="adsim")
 @pytest.mark.parametrize(
-    "documents_from_num, length", ([1, 1], [3, 3]), indirect=["documents_from_num"]
+    ("documents_from_num", "length"), [(1, 1), (3, 3)], indirect=["documents_from_num"]
 )
 def test_plan_produces_expected_stop_document(
     documents_from_num: dict[str, list[DocumentType]], length: int
@@ -96,7 +96,7 @@ def test_plan_produces_expected_descriptor(
 
 @pytest.mark.requires(instrument="adsim")
 @pytest.mark.parametrize(
-    "documents_from_num, length", ([1, 1], [3, 3]), indirect=["documents_from_num"]
+    ("documents_from_num", "length"), [(1, 1), (3, 3)], indirect=["documents_from_num"]
 )
 def test_plan_produces_expected_events(
     documents_from_num: dict[str, list[DocumentType]],
@@ -134,7 +134,7 @@ def test_plan_produces_expected_resources(
 
 @pytest.mark.requires(instrument="adsim")
 @pytest.mark.parametrize(
-    "documents_from_num, length", ([1, 1], [3, 3]), indirect=["documents_from_num"]
+    ("documents_from_num", "length"), [(1, 1), (3, 3)], indirect=["documents_from_num"]
 )
 def test_plan_produces_expected_datums(
     documents_from_num: dict[str, list[DocumentType]],
