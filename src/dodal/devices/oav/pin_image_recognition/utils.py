@@ -94,9 +94,7 @@ NONE_VALUE: Final[int] = -1
 
 @dataclass
 class SampleLocation:
-    """
-    Holder type for results from sample detection.
-    """
+    """Holder type for results from sample detection."""
 
     tip_x: int | None
     tip_y: int | None
@@ -116,8 +114,7 @@ class MxSampleDetect:
         scan_direction: ScanDirections = ScanDirections.FORWARD,
         min_tip_height: int = 5,
     ):
-        """
-        Configures sample detection parameters.
+        """Configures sample detection parameters.
 
         Args:
             preprocess: A preprocessing function applied to the array after conversion to grayscale.
@@ -129,8 +126,8 @@ class MxSampleDetect:
             close_iterations: number of iterations for "close" operation
             scan_direction: ScanDirections.FORWARD for left-to-right, ScanDirections.REVERSE for right-to-left
             min_tip_height: minimum height of pin tip
-        """
 
+        """
         self.preprocess = preprocess
         self.canny_upper = canny_upper
         self.canny_lower = canny_lower
@@ -163,8 +160,7 @@ class MxSampleDetect:
     def _first_and_last_nonzero_by_columns(
         arr: np.ndarray,
     ) -> tuple[np.ndarray, np.ndarray]:
-        """
-        Finds the indexes of the first & last non-zero values by column in a 2d array.
+        """Finds the indexes of the first & last non-zero values by column in a 2d array.
 
         Outputs will contain NONE_VALUE if no non-zero values exist in a column.
 

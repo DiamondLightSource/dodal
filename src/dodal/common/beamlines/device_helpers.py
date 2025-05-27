@@ -13,8 +13,7 @@ def numbered_slits(
     wait_for_connection: bool = True,
     fake_with_ophyd_sim: bool = False,
 ) -> Slits:
-    """
-    Create a slits object following the {beamline}-AL-SLITS-{slit_number} PV
+    """Create a slits object following the {beamline}-AL-SLITS-{slit_number} PV
     convention
 
     Args:
@@ -25,8 +24,8 @@ def numbered_slits(
 
     Returns:
         Slits: A new slits object
-    """
 
+    """
     return device_instantiation(
         Slits,
         f"slits_{slit_number}",

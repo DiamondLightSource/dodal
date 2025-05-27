@@ -8,11 +8,11 @@ from dodal.devices.zocalo.zocalo_results import (
 )
 
 __all__ = [
-    "ZocaloResults",
-    "XrcResult",
-    "ZocaloTrigger",
-    "get_full_processing_results",
     "NoResultsFromZocalo",
     "NoZocaloSubscription",
+    "XrcResult",
+    "ZocaloResults",
     "ZocaloStartInfo",
+    "ZocaloTrigger",
+    "get_full_processing_results",
 ]

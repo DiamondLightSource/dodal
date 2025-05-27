@@ -51,12 +51,12 @@ ZOCALO_STAGE_GROUP = "clear zocalo queue"
 
 
 class XrcResult(TypedDict):
-    """
-    Information about a diffracting centre.
+    """Information about a diffracting centre.
 
     NOTE: the coordinate systems of centre_of_mass and max_voxel/bounding_box are not
         the same; centre_of_mass coordinates are continuous whereas max_voxel and bounding_box
         coordinates are discrete.
+
     Attributes:
          centre_of_mass: The position of the centre of mass of the crystal, adjusted so that
          grid box centres lie on integer grid coordinates, such that a 1x1x1 crystal detected in
@@ -69,6 +69,7 @@ class XrcResult(TypedDict):
             as the volume of whole boxes as a half-open range i.e such that
             p1 = (x1, y1, z1) <= p < p2 = (x2, y2, z2) and
             p2 - p1 gives the dimensions in whole voxels.
+
     """
 
     centre_of_mass: list[float]
@@ -90,12 +91,13 @@ def get_dict_differences(
     dict1: dict, dict1_source: str, dict2: dict, dict2_source: str
 ) -> str | None:
     """Returns a string containing dict1 and dict2 if there are differences between them, greater than a
-    1e-5 tolerance. If dictionaries are identical, return None"""
-
+    1e-5 tolerance. If dictionaries are identical, return None
+    """
     diff = DeepDiff(dict1, dict2, math_epsilon=1e-5, ignore_numeric_type_changes=True)
 
     if diff:
         return f"Zocalo results from {dict1_source} and {dict2_source} are not identical.\n Results from {dict1_source}: {dict1}\n Results from {dict2_source}: {dict2}"
+    return None
 
 
 def source_from_results(results):
@@ -216,8 +218,8 @@ class ZocaloResults(StandardReadable, Triggerable):
         """Stages the Zocalo device by: subscribing to the queue, doing a background
         sleep for a few seconds to wait for any stale messages to be received, then
         clearing the queue. Plans using this device should wait on ZOCALO_STAGE_GROUP
-        before triggering processing for the experiment"""
-
+        before triggering processing for the experiment
+        """
         if self.use_cpu_and_gpu and self.use_gpu:
             raise ValueError(
                 "Cannot compare GPU and CPU results and use GPU results at the same time."
@@ -354,12 +356,11 @@ class ZocaloResults(StandardReadable, Triggerable):
                 self._raw_results_received.put(
                     {"results": results, "recipe_parameters": recipe_parameters}
                 )
-            else:
-                # Only add to queue if results are from CPU
-                if not recipe_parameters.get("gpu"):
-                    self._raw_results_received.put(
-                        {"results": results, "recipe_parameters": recipe_parameters}
-                    )
+            # Only add to queue if results are from CPU
+            elif not recipe_parameters.get("gpu"):
+                self._raw_results_received.put(
+                    {"results": results, "recipe_parameters": recipe_parameters}
+                )
 
         subscription = workflows.recipe.wrap_subscribe(
             self.transport,
@@ -385,7 +386,8 @@ def get_full_processing_results(
     zocalo: ZocaloResults,
 ) -> Generator[Msg, Any, Sequence[XrcResult]]:
     """A plan that will return the raw zocalo results, ranked in descending order according to the sort key.
-    Returns empty list in the event no results found."""
+    Returns empty list in the event no results found.
+    """
     LOGGER.info("Retrieving raw zocalo processing results")
     com = yield from bps.rd(zocalo.centre_of_mass, default_value=[])
     max_voxel = yield from bps.rd(zocalo.max_voxel, default_value=[])

@@ -46,7 +46,8 @@ class SR570RaiseTimeTable(float, Enum):
 
 class SR570FullGainTable(Enum):
     """Combined gain table, as each gain step is a combination of both coarse gain and
-    fine gain setting"""
+    fine gain setting
+    """
 
     SEN_1 = [SR570GainTable.SEN_1, SR570FineGainTable.SEN_1]
     SEN_2 = [SR570GainTable.SEN_2, SR570FineGainTable.SEN_9]
@@ -112,10 +113,10 @@ class SR570GainToCurrentTable(float, Enum):
 
 
 class SR570(CurrentAmp):
-    """
-    SR570 current amplifier device. This is similar to Femto with the only different
+    """SR570 current amplifier device. This is similar to Femto with the only different
      is SR570 has two gain setting fine and coarse, therefore it requires extra
      gain tables.
+
     Attributes:
         fine_gain (SignalRW): This is the epic signal that control SR570 fine gain.
         coarse_gain (SignalRW): This is the epic signal that control SR570 coarse gain.

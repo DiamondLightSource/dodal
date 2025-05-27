@@ -103,3 +103,4 @@ class HutchShutter(StandardReadable, Movable[ShutterDemand]):
             LOGGER.warning(
                 "Running in test mode, will not operate the experiment shutter."
             )
+            return None

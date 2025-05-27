@@ -14,8 +14,7 @@ from ophyd_async.epics.core import epics_signal_r
 
 
 class FilterState(StrictEnum):
-    """
-    Note that the in/out here refers to the internal rocker
+    """Note that the in/out here refers to the internal rocker
     position so a PV value of IN implies a filter OUT of beam
     """
 
@@ -24,8 +23,7 @@ class FilterState(StrictEnum):
 
 
 class FSwitch(StandardReadable):
-    """
-    Device for i22's fswitch. A filter switch for manipulating
+    """Device for i22's fswitch. A filter switch for manipulating
     compound refractive lenses. Also referred to as a transfocator.
 
     This currently only implements the minimum

@@ -9,15 +9,13 @@ from dodal.devices.electron_analyser.types import EnergyMode
 
 
 def java_to_python_case(java_str: str) -> str:
-    """
-    Convert a camelCase Java-style string to a snake_case Python-style string.
+    """Convert a camelCase Java-style string to a snake_case Python-style string.
 
     :param java_str: The Java-style camelCase string.
     :return: The Python-style snake_case string.
     """
     new_value = re.sub("(.)([A-Z][a-z]+)", r"\1_\2", java_str)
-    new_value = re.sub("([a-z0-9])([A-Z])", r"\1_\2", new_value).lower()
-    return new_value
+    return re.sub("([a-z0-9])([A-Z])", r"\1_\2", new_value).lower()
 
 
 def switch_case_validation(data: dict, f: Callable[[str], str]) -> dict:
@@ -28,8 +26,7 @@ class JavaToPythonModel(BaseModel):
     @model_validator(mode="before")
     @classmethod
     def before_validation(cls, data: dict) -> dict:
-        data = switch_case_validation(data, java_to_python_case)
-        return data
+        return switch_case_validation(data, java_to_python_case)
 
 
 def energy_mode_validation(data: dict) -> dict:
@@ -44,8 +41,7 @@ def energy_mode_validation(data: dict) -> dict:
 
 
 class AbstractBaseRegion(ABC, JavaToPythonModel):
-    """
-    Generic region model that holds the data. Specialised region models should inherit
+    """Generic region model that holds the data. Specialised region models should inherit
     this to extend functionality. All energy units are assumed to be in eV.
     """
 
@@ -80,8 +76,7 @@ TAbstractBaseRegion = TypeVar("TAbstractBaseRegion", bound=AbstractBaseRegion)
 
 
 class AbstractBaseSequence(ABC, JavaToPythonModel, Generic[TAbstractBaseRegion]):
-    """
-    Generic sequence model that holds the list of region data. Specialised sequence
+    """Generic sequence model that holds the list of region data. Specialised sequence
     models should inherit this to extend functionality and define type of region to
     hold.
     """

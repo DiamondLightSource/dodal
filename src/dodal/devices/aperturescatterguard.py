@@ -32,8 +32,8 @@ class _GDAParamApertureValue(StrictEnum):
 
 
 class AperturePosition(BaseModel):
-    """
-    Represents one of the available positions for the Aperture-Scatterguard.
+    """Represents one of the available positions for the Aperture-Scatterguard.
+
     Attributes:
         aperture_x: The x position of the aperture component in mm
         aperture_y: The y position of the aperture component in mm
@@ -42,6 +42,7 @@ class AperturePosition(BaseModel):
         scatterguard_y: The y position of the scatterguard component in mm
         radius: Radius of the selected aperture. When in the Robot Load position, the
             radius is defined to be 0
+
     """
 
     aperture_x: float
@@ -154,6 +155,7 @@ class ApertureScatterguard(StandardReadable, Preparable):
 
         Given the prepare has been done this move will now be faster as only the y is
         left to move.
+
     """
 
     def __init__(
@@ -259,8 +261,7 @@ class ApertureScatterguard(StandardReadable, Preparable):
         raise InvalidApertureMove("Current aperture/scatterguard state unrecognised")
 
     async def _safe_move_whilst_in_beam(self, position: AperturePosition):
-        """
-        Move the aperture and scatterguard combo safely to a new position.
+        """Move the aperture and scatterguard combo safely to a new position.
         See https://github.com/DiamondLightSource/hyperion/wiki/Aperture-Scatterguard-Collisions
         for why this is required. TLDR is that we have a collision at the top of y so we need
         to make sure we move the assembly down before we move the scatterguard up.

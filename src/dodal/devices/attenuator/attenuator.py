@@ -37,7 +37,8 @@ class BinaryFilterAttenuator(ReadOnlyAttenuator, Movable[float]):
         yield from bps.set(attenuator, desired_transmission)
 
     Where desired_transmission is fraction e.g. 0-1. When the actual_transmission is
-    read from the device it is also fractional"""
+    read from the device it is also fractional
+    """
 
     def __init__(self, prefix: str, name: str = ""):
         self._calculated_filter_states: DeviceVector[SignalR[int]] = DeviceVector(
@@ -68,7 +69,6 @@ class BinaryFilterAttenuator(ReadOnlyAttenuator, Movable[float]):
         the current beamline energy, the set will only complete when they have all been
         applied.
         """
-
         LOGGER.debug("Using current energy ")
         await self._use_current_energy.trigger()
         LOGGER.info(f"Setting desired transmission to {value}")

@@ -58,10 +58,10 @@ class Femto3xxRaiseTime(float, Enum):
 
 
 class FemtoDDPCA(CurrentAmp):
-    """
-    Femto current amplifier device, this class should cover all DDPCA Femto current
+    """Femto current amplifier device, this class should cover all DDPCA Femto current
       amplifiers, As the main different between all the DDPCA Femto is their gain table
         and response time table.
+
     Attributes:
         gain (SignalRW): This is the epic signal that control current amplifier gain.
         gain_table (strictEnum): The table epic use to set gain.

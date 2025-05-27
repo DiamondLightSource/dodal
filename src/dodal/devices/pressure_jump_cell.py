@@ -77,8 +77,7 @@ class AllValvesControlState:
 
 
 class AllValvesControl(StandardReadable, Movable[AllValvesControlState]):
-    """
-    valves 2, 4, 7, 8 are not controlled by the IOC,
+    """valves 2, 4, 7, 8 are not controlled by the IOC,
     as they are under manual control.
     fast_valves: tuple[int, ...] = (5, 6)
     slow_valves: tuple[int, ...] = (1, 3)
@@ -211,8 +210,7 @@ class Pump(StandardReadable):
 
 
 class PressureTransducer(StandardReadable):
-    """
-    Pressure transducer for a high pressure X-ray cell.
+    """Pressure transducer for a high pressure X-ray cell.
     This is the chamber and there are three of them.
     1 is the start, 3 is where the sample is.
     NOTE: the distinction between the adc prefix and the cell prefix is kept here.
@@ -271,8 +269,7 @@ class PressureJumpCellController(HasName):
 
 
 class PressureJumpCell(StandardReadable):
-    """
-    High pressure X-ray cell, used to apply pressure or pressure jumps to a sample.
+    """High pressure X-ray cell, used to apply pressure or pressure jumps to a sample.
     prefix: str
         The prefix of beamline - SPECIAL - unusual that the cell prefix is computed separately
     """

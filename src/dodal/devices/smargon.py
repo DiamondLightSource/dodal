@@ -72,6 +72,7 @@ class AxisLimit:
 
         Returns:
             True if the value does not exceed the limits
+
         """
         return self.min_value <= pos <= self.max_value
 
@@ -92,8 +93,7 @@ class XYZLimits:
 
 
 class Smargon(StandardReadable):
-    """
-    Real motors added to allow stops following pin load (e.g. real_x1.stop() )
+    """Real motors added to allow stops following pin load (e.g. real_x1.stop() )
     X1 and X2 real motors provide compound chi motion as well as the compound X travel,
     increasing the gap between x1 and x2 changes chi, moving together changes virtual x.
     Robot loading can nudge these and lead to errors.
@@ -126,6 +126,7 @@ class Smargon(StandardReadable):
 
         Returns:
             the axis limits
+
         """
         limits = {}
         for name, pv in [

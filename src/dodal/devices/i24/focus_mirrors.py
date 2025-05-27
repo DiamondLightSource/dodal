@@ -48,9 +48,7 @@ class FocusMirrorsMode(StandardReadable):
         super().__init__(name)
 
     def _get_beam_size_x(self, horizontal: HFocusMode) -> int:
-        beam_x = BEAM_SIZES[horizontal.removeprefix("HMFM")][0]
-        return beam_x
+        return BEAM_SIZES[horizontal.removeprefix("HMFM")][0]
 
     def _get_beam_size_y(self, vertical: VFocusMode) -> int:
-        beam_y = BEAM_SIZES[vertical.removeprefix("VMFM")][1]
-        return beam_y
+        return BEAM_SIZES[vertical.removeprefix("VMFM")][1]

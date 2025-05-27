@@ -23,8 +23,7 @@ class PilatusMetadata(StandardReadable):
     def _get_full_filename_template(
         self, filename: str, filename_template: str, file_number: int
     ) -> str:
-        """
-        Get the template file path by querying the detector PVs.
+        """Get the template file path by querying the detector PVs.
         Mirror the construction that the PPU does.
 
         Returns: A template string, with the image numbers replaced with '#'

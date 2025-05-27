@@ -14,6 +14,5 @@ class CheckUndulatorDevices(Protocol):
 
 def verify_undulator_gap(devices: CheckUndulatorDevices):
     """Verify Undulator gap is correct - it may not be after a beam dump"""
-
     energy_in_kev = yield from bps.rd(devices.dcm.energy_in_kev.user_readback)
     yield from bps.abs_set(devices.undulator, energy_in_kev, wait=True)

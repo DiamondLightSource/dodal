@@ -31,8 +31,7 @@ class InvalidPinException(Exception):
 
 
 class PinTipDetection(StandardReadable):
-    """
-    A device which will read from an on-axis view and calculate the location of the
+    """A device which will read from an on-axis view and calculate the location of the
     pin-tip (in pixels) of that frame.
 
     Used for pin tip centring workflow.
@@ -100,9 +99,7 @@ class PinTipDetection(StandardReadable):
         self._bottom_edge_setter(results.edge_bottom)
 
     async def _get_tip_and_edge_data(self, array_data: np.ndarray) -> SampleLocation:
-        """
-        Gets the location of the pin tip and the top and bottom edges.
-        """
+        """Gets the location of the pin tip and the top and bottom edges."""
         preprocess_key = await self.preprocess_operation.get_value()
         preprocess_iter = await self.preprocess_iterations.get_value()
         preprocess_ksize = await self.preprocess_ksize.get_value()

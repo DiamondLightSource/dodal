@@ -69,7 +69,6 @@ class SingleMirrorVoltage(Device):
         3. Wait until demand is accepted
         4. When either demand is accepted or DEFAULT_SETTLE_TIME expires, signal the result on the Status
         """
-
         setpoint_v = self._setpoint_v
         demand_accepted = self._demand_accepted
 
@@ -99,9 +98,9 @@ class SingleMirrorVoltage(Device):
         accepted_value = await anext(demand_accepted_iterator)
         assert accepted_value == MirrorVoltageDemand.SLEW
         LOGGER.debug(f"Waiting for {setpoint_v.name} to set")
-        while MirrorVoltageDemand.SLEW == (
+        while (
             accepted_value := await anext(demand_accepted_iterator)
-        ):
+        ) == MirrorVoltageDemand.SLEW:
             pass
 
         if accepted_value != MirrorVoltageDemand.OK:
@@ -172,7 +171,8 @@ class FocusingMirror(StandardReadable):
 
 class FocusingMirrorWithStripes(FocusingMirror):
     """A focusing mirror where the stripe material can be changed. This is usually done
-    based on the energy of the beamline."""
+    based on the energy of the beamline.
+    """
 
     def __init__(self, prefix: str, name: str = "", *args, **kwargs):
         self.stripe = epics_signal_rw(MirrorStripe, prefix + "STRP:DVAL")

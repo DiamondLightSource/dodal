@@ -14,15 +14,15 @@ from .base_region import (
 )
 
 __all__ = [
+    "AbstractAnalyserDriverIO",
+    "AbstractAnalyserDriverIO",
     "AbstractBaseRegion",
     "AbstractBaseSequence",
-    "TAbstractBaseRegion",
-    "TAbstractBaseSequence",
-    "AbstractAnalyserDriverIO",
     "AbstractElectronAnalyserDetector",
     "AbstractElectronAnalyserRegionDetector",
+    "TAbstractAnalyserDriverIO",
+    "TAbstractBaseRegion",
+    "TAbstractBaseSequence",
     "TAbstractElectronAnalyserDetector",
     "TAbstractElectronAnalyserRegionDetector",
-    "AbstractAnalyserDriverIO",
-    "TAbstractAnalyserDriverIO",
 ]

@@ -18,17 +18,18 @@ from dodal.log import LOGGER
 
 
 class CurrentAmpDet(StandardReadable, Preparable):
-    """
-    CurrentAmpDet composed of a CurrentAmp and a CurrentAmpCounter. It provides
+    """CurrentAmpDet composed of a CurrentAmp and a CurrentAmpCounter. It provides
       the option for automatically changing the CurrentAmp gain to within the optimal
       range. It also converts the currentAmp/counter output back into the detector
       current output in Amp.
+
     Attributes:
         current_amp (currentAmp): Current amplifier type device.
         counter (CurrentAmpCounter): Counter that capture the current amplifier output.
         current (SignalRW([float]): Soft signal to store the corrected current.
         auto_mode (signalR([bool])): Soft signal to store the flag for auto gain.
         name (str): Name of the device.
+
     """
 
     def __init__(
@@ -48,8 +49,7 @@ class CurrentAmpDet(StandardReadable, Preparable):
         super().__init__(name)
 
     async def read(self) -> dict[str, Reading]:
-        """
-        Read is modified so that if auto_mode is true it will optimise gain before
+        """Read is modified so that if auto_mode is true it will optimise gain before
          taking the final reading
         """
         if await self.auto_mode.get_value():
@@ -85,16 +85,13 @@ class CurrentAmpDet(StandardReadable, Preparable):
                 within_limits = True
 
     async def get_corrected_current(self) -> float:
-        """
-        Convert the output(count and gain) back into the read detector output in Amp.
-        """
+        """Convert the output(count and gain) back into the read detector output in Amp."""
         current_gain, voltage_per_sec = await asyncio.gather(
             self.current_amp().get_gain(),
             self.counter().get_voltage_per_sec(),
         )
         assert isinstance(current_gain.value, float)
-        corrected_current = voltage_per_sec / current_gain.value
-        return corrected_current
+        return voltage_per_sec / current_gain.value
 
     @AsyncStatus.wrap
     async def stage(self) -> None:

@@ -86,6 +86,7 @@ def move_and_reset_wrapper(
         wait_for_all (bool, optional): If true the home and reset to cache will be waited
                                        on. If false it is left up to the caller to wait on
                                        them. Defaults to True.
+
     """
     initial_positions = yield from check_and_cache_values(
         device_and_positions, smallest_move, maximum_move

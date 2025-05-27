@@ -21,6 +21,7 @@ def epics_signal_put_wait(pv_name: str, wait: float = 3.0) -> Component[EpicsSig
 
     Returns:
         EpicsSignal: An EpicsSignal that will wait for a callback.
+
     """
     return Component(EpicsSignal, pv_name, put_complete=True, write_timeout=wait)
 
@@ -46,8 +47,8 @@ def run_functions_without_blocking(
     Returns:
     Status: A status object which is marked as complete once all of the Status objects
     returned by the unwrapped functions have completed.
-    """
 
+    """
     # The returned status - marked as finished at the end of the callback chain. If any
     # intermediate statuses have an exception, the full_status will timeout.
     full_status = Status(obj=associated_obj, timeout=timeout)

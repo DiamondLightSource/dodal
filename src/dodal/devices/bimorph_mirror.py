@@ -49,6 +49,7 @@ class BimorphMirrorChannel(StandardReadable, Movable[float], EpicsDevice):
         output_voltage: Float RW_RBV for current voltage on bimorph
         status: BimorphMirrorOnOff readable for ON/OFF status of channel
         shift: Float writeable shifting channel voltage
+
     """
 
     target_voltage: A[SignalRW[float], PvSuffix.rbv("VTRGT"), Format.CONFIG_SIGNAL]
@@ -62,6 +63,7 @@ class BimorphMirrorChannel(StandardReadable, Movable[float], EpicsDevice):
 
         Args:
             value: float to set VOUT to
+
         """
         await self.output_voltage.set(value)
 
@@ -74,18 +76,20 @@ class BimorphMirror(StandardReadable, Movable[Mapping[int, float]]):
         enabled: Writeable BimorphOnOff
         commit_target_voltages: Procable signal that writes values in each channel's VTRGT to VOUT
         status: Readable BimorphMirrorStatus Busy/Idle status
-        err: Alarm status"""
+        err: Alarm status
+
+    """
 
     def __init__(self, prefix: str, number_of_channels: int, name=""):
-        """
-        Args:
+        """Args:
             prefix: str PV prefix
             number_of_channels: int number of channels on bimorph mirror (can be zero)
             name: str name of device
 
         Raises:
-            ValueError: number_of_channels is less than zero"""
+            ValueError: number_of_channels is less than zero
 
+        """
         if number_of_channels < 0:
             raise ValueError(f"Number of channels is below zero: {number_of_channels}")
 
@@ -110,8 +114,9 @@ class BimorphMirror(StandardReadable, Movable[Mapping[int, float]]):
             value: Dict of channel numbers to target voltages
 
         Raises:
-            ValueError: On set to non-existent channel"""
+            ValueError: On set to non-existent channel
 
+        """
         if any(key not in self.channels for key in value):
             raise ValueError(
                 f"Attempting to put to non-existent channels: {[key for key in value if (key not in self.channels)]}"

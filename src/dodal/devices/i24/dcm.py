@@ -8,9 +8,7 @@ from dodal.devices.common_dcm import (
 
 
 class DCM(BaseDCM[RollCrystal, PitchAndRollCrystal]):
-    """
-    A double crystal monocromator device, used to select the beam energy.
-    """
+    """A double crystal monocromator device, used to select the beam energy."""
 
     def __init__(self, prefix: str, name: str = "") -> None:
         with self.add_children_as_readables():

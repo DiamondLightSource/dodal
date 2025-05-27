@@ -56,8 +56,7 @@ class I23Axes:
 
 
 class RotationDirection(StrictEnum):
-    """
-    Defines for a swept angle whether the scan width (sweep) is to be added or subtracted from
+    """Defines for a swept angle whether the scan width (sweep) is to be added or subtracted from
     the initial angle to obtain the final angle.
     """
 
@@ -89,7 +88,8 @@ class SoftInState(StrictEnum):
 
 class ArmingDevice(StandardReadable, Movable[ArmDemand]):
     """A useful device that can abstract some of the logic of arming.
-    Allows a user to just call arm.set(ArmDemand.ARM)"""
+    Allows a user to just call arm.set(ArmDemand.ARM)
+    """
 
     TIMEOUT: float = 3
 
@@ -170,6 +170,7 @@ def boolean_array_to_integer(values: list[bool]) -> int:
 
     Returns:
         int: The interpretted integer.
+
     """
     return sum(v << i for i, v in enumerate(values))
 
@@ -217,6 +218,7 @@ class LogicGateConfigurer(StandardReadable):
             type (GateType): The type of gate e.g. AND/OR
             gate_number (int): Which gate to configure.
             config (LogicGateConfiguration): A configuration for the gate.
+
         """
         gate: GateControl = self.all_gates[type][gate_number - 1]
 
@@ -257,6 +259,7 @@ class LogicGateConfiguration:
 
         Returns:
             LogicGateConfiguration: A description of the gate configuration.
+
         """
         assert len(self.sources) < 4
         assert 0 <= input_source <= 63

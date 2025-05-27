@@ -32,8 +32,7 @@ Xtal_2 = TypeVar("Xtal_2", bound=StationaryCrystal)
 
 
 class BaseDCM(StandardReadable, Generic[Xtal_1, Xtal_2]):
-    """
-    Common device for the double crystal monochromator (DCM), used to select the energy of the beam.
+    """Common device for the double crystal monochromator (DCM), used to select the energy of the beam.
 
     Features common across all DCM's should include virtual motors to set energy/wavelength and contain two crystals,
     each of which can be movable. Some DCM's contain crystals with roll motors, and some contain crystals with roll and pitch motors.

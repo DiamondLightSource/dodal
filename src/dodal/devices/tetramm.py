@@ -170,8 +170,8 @@ class TetrammController(DetectorController):
         Raises:
             ValueError: If exposure is too low to collect the required number
             of readings per frame.
-        """
 
+        """
         # Set up the number of readings across the exposure period to scale with
         # the exposure time
         self._set_minimum_exposure(exposure)

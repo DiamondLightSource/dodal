@@ -71,7 +71,8 @@ class InOutReadBackTable(StrictEnum):
 class I10PneumaticStage(StandardReadable):
     """Pneumatic stage only has two real positions in or out.
     Use for fluorescent screen which can be insert into the x-ray beam.
-    Most often use in conjunction with a webcam to locate the x-ray beam."""
+    Most often use in conjunction with a webcam to locate the x-ray beam.
+    """
 
     def __init__(
         self,

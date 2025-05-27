@@ -28,6 +28,7 @@ class Linkam3(StandardReadable):
     Args:
         prefix (str): PV prefix for this device
         name (str): unique name for this device
+
     """
 
     tolerance: float = 0.5

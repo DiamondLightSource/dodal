@@ -16,8 +16,7 @@ from dodal.devices.common_dcm import (
 
 
 class DCM(BaseDCM[PitchAndRollCrystal, StationaryCrystal]):
-    """
-    A double crystal monochromator (DCM), used to select the energy of the beam.
+    """A double crystal monochromator (DCM), used to select the energy of the beam.
 
     perp describes the gap between the 2 DCM crystals which has to change as you alter
     the angle to select the requested energy.

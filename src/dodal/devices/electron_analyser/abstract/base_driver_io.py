@@ -18,8 +18,7 @@ from dodal.devices.electron_analyser.util import to_binding_energy
 
 
 class AbstractAnalyserDriverIO(ABC, StandardReadable, ADBaseIO):
-    """
-    Generic device to configure electron analyser with new region settings.
+    """Generic device to configure electron analyser with new region settings.
     Electron analysers should inherit from this class for further specialisation.
     """
 
@@ -73,15 +72,11 @@ class AbstractAnalyserDriverIO(ABC, StandardReadable, ADBaseIO):
 
     @abstractmethod
     def _create_angle_axis_signal(self, prefix: str) -> SignalR[Array1D[np.float64]]:
-        """
-        The signal that defines the angle axis. Depends on analyser model.
-        """
+        """The signal that defines the angle axis. Depends on analyser model."""
 
     @abstractmethod
     def _create_energy_axis_signal(self, prefix: str) -> SignalR[Array1D[np.float64]]:
-        """
-        The signal that defines the energy axis. Depends on analyser model.
-        """
+        """The signal that defines the energy axis. Depends on analyser model."""
 
     def _calculate_binding_energy_axis(
         self,
@@ -110,8 +105,7 @@ class AbstractAnalyserDriverIO(ABC, StandardReadable, ADBaseIO):
     @property
     @abstractmethod
     def pass_energy_type(self) -> type:
-        """
-        Return the type the pass_energy should be. Each one is unfortunately different
+        """Return the type the pass_energy should be. Each one is unfortunately different
         for the underlying analyser software and cannot be changed on epics side.
         """
 

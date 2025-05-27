@@ -51,8 +51,7 @@ class LookupTableConfig:
 
 
 class I10Apple2(Apple2):
-    """
-    I10Apple2 is the i10 version of Apple2 ID.
+    """I10Apple2 is the i10 version of Apple2 ID.
     The set and update_lookuptable should be the only part that is I10 specific.
 
     A pair of look up tables are needed to provide the conversion
@@ -75,8 +74,7 @@ class I10Apple2(Apple2):
         poly_deg: list | None = None,
         name: str = "",
     ) -> None:
-        """
-        Parameters
+        """Parameters
         ----------
         id_gap:
             An UndulatorGap device.
@@ -100,8 +98,8 @@ class I10Apple2(Apple2):
             Not in use but needed for device_instantiation.
         Name:
             Name of the device
-        """
 
+        """
         # A dataclass contains the path to the look up table and the expected column names.
         self.lookup_table_config = LookupTableConfig(
             path=LookupPath(Gap=energy_gap_table_path, Phase=energy_phase_table_path),
@@ -123,8 +121,7 @@ class I10Apple2(Apple2):
 
     @AsyncStatus.wrap
     async def set(self, value: SupportsFloat) -> None:
-        """
-        Check polarisation state and use it together with the energy(value)
+        """Check polarisation state and use it together with the energy(value)
         to calculate the required gap and phases before setting it.
         """
         value = float(value)
@@ -152,10 +149,7 @@ class I10Apple2(Apple2):
             await self.id_jaw_phase().set_move.set(1)
 
     def update_lookuptable(self):
-        """
-        Update the stored lookup tabled from file.
-
-        """
+        """Update the stored lookup tabled from file."""
         LOGGER.info("Updating lookup dictionary from file.")
         for key, path in self.lookup_table_config.path.__dict__.items():
             if path.exists():
@@ -176,16 +170,12 @@ class I10Apple2(Apple2):
 
 
 class I10Apple2PGM(StandardReadable, Movable[float]):
-    """
-    Compound device to set both ID and PGM energy at the sample time,poly_deg
-
-    """
+    """Compound device to set both ID and PGM energy at the sample time,poly_deg"""
 
     def __init__(
         self, id: I10Apple2, pgm: PGM, prefix: str = "", name: str = ""
     ) -> None:
-        """
-        Parameters
+        """Parameters
         ----------
         id:
             An Apple2 device.
@@ -195,6 +185,7 @@ class I10Apple2PGM(StandardReadable, Movable[float]):
             Not in use but needed for device_instantiation.
         name:
             New device name.
+
         """
         super().__init__(name=name)
         self.id_ref = Reference(id)
@@ -212,13 +203,10 @@ class I10Apple2PGM(StandardReadable, Movable[float]):
 
 
 class I10Apple2Pol(StandardReadable, Movable[str]):
-    """
-    Compound device to set polorisation of ID.
-    """
+    """Compound device to set polorisation of ID."""
 
     def __init__(self, id: I10Apple2, prefix: str = "", name: str = "") -> None:
-        """
-        Parameters
+        """Parameters
         ----------
         id:
             An I10Apple2 device.
@@ -226,6 +214,7 @@ class I10Apple2Pol(StandardReadable, Movable[str]):
             Not in use but needed for device_instantiation.
         name:
             New device name.
+
         """
         super().__init__(name=name)
         with self.add_children_as_readables():
@@ -241,8 +230,7 @@ class I10Apple2Pol(StandardReadable, Movable[str]):
 
 
 class LinearArbitraryAngle(StandardReadable, Movable[SupportsFloat]):
-    """
-    Device to set polorisation angle of the ID. Linear Arbitrary Angle (laa)
+    """Device to set polorisation angle of the ID. Linear Arbitrary Angle (laa)
      is the direction of the magnetic field which can be change by varying the jaw_phase
      in (linear arbitrary (la) mode,
      The angle of 0 is equivalent to linear horizontal "lh" (sigma) and
@@ -259,8 +247,7 @@ class LinearArbitraryAngle(StandardReadable, Movable[SupportsFloat]):
         jaw_phase_poly_param: list[float] = DEFAULT_JAW_PHASE_POLY_PARAMS,
         angle_threshold_deg=30.0,
     ) -> None:
-        """
-        Parameters
+        """Parameters
         ----------
         id: I10Apple2
             An I10Apple2 device.
@@ -272,6 +259,7 @@ class LinearArbitraryAngle(StandardReadable, Movable[SupportsFloat]):
             The maximum allowed jaw_phase movement.
         jaw_phase_poly_param: list
             polynomial parameters highest power first.
+
         """
         super().__init__(name=name)
         self.id_ref = Reference(id)
@@ -311,11 +299,10 @@ def convert_csv_to_lookup(
     max_energy: str | None = "MaxEnergy",
     poly_deg: list | None = None,
 ) -> dict[str | None, dict[str, dict[str, dict[str, Any]]]]:
-    """
-    Convert csv to a dictionary that can be read by Apple2 ID device.
+    """Convert csv to a dictionary that can be read by Apple2 ID device.
 
     Parameters
-    -----------
+    ----------
     file: str
         File path.
     source: tuple[str, str]
@@ -344,6 +331,7 @@ def convert_csv_to_lookup(
                         }
             }
         }
+
     """
     if poly_deg is None:
         poly_deg = [

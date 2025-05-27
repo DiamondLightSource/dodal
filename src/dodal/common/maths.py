@@ -2,8 +2,7 @@ import numpy as np
 
 
 def step_to_num(start: float, stop: float, step: float) -> tuple[float, float, int]:
-    """
-    Standard handling for converting from start, stop, step to start, stop, num
+    """Standard handling for converting from start, stop, step to start, stop, num
     Forces step to be same direction as length
     Includes a final point if it is within 1% of the final step, prevents floating
     point arithmatic errors from giving inconsistent shaped scans between steps of an
@@ -34,8 +33,7 @@ def step_to_num(start: float, stop: float, step: float) -> tuple[float, float, i
 
 
 def in_micros(t: float) -> int:
-    """
-    Converts between a positive number of seconds and an equivalent
+    """Converts between a positive number of seconds and an equivalent
     number of microseconds.
 
     Args:
@@ -44,6 +42,7 @@ def in_micros(t: float) -> int:
         ValueError: if t < 0
     Returns:
         t (int): A time in microseconds, rounded up to the nearest whole microsecond,
+
     """
     if t < 0:
         raise ValueError(f"Expected a positive time in seconds, got {t!r}")

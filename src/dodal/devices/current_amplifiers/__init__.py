@@ -17,17 +17,17 @@ from .sr570 import (
 from .struck_scaler_counter import StruckScaler
 
 __all__ = [
-    "FemtoDDPCA",
-    "Femto3xxGainTable",
-    "Femto3xxRaiseTime",
+    "SR570",
     "CurrentAmp",
-    "Femto3xxGainToCurrentTable",
     "CurrentAmpCounter",
     "CurrentAmpDet",
-    "SR570",
-    "SR570GainTable",
+    "Femto3xxGainTable",
+    "Femto3xxGainToCurrentTable",
+    "Femto3xxRaiseTime",
+    "FemtoDDPCA",
     "SR570FineGainTable",
     "SR570FullGainTable",
+    "SR570GainTable",
     "SR570GainToCurrentTable",
     "SR570RaiseTimeTable",
     "StruckScaler",

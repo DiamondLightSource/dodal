@@ -68,8 +68,7 @@ class LookupTableEntries(BaseModel):
 
 
 class Lookuptable(RootModel):
-    """
-    BaseModel class for the lookup table.
+    """BaseModel class for the lookup table.
     Apple2 lookup table should be in this format.
 
     {mode: {'Energies': {Any: {'Low': float,
@@ -149,9 +148,7 @@ class UndulatorGap(SafeUndulatorMover[float]):
     """
 
     def __init__(self, prefix: str, name: str = ""):
-        """
-
-        Parameters
+        """Parameters
         ----------
             prefix : str
                 Beamline specific part of the PV
@@ -159,7 +156,6 @@ class UndulatorGap(SafeUndulatorMover[float]):
                 Name of the Id device
 
         """
-
         # Gap demand set point and readback
         self.user_setpoint = epics_signal_rw(
             str, prefix + "GAPSET.B", prefix + "BLGSET"
@@ -203,16 +199,15 @@ class UndulatorPhaseMotor(StandardReadable):
     """
 
     def __init__(self, prefix: str, infix: str, name: str = ""):
-        """
-        Parameters
+        """Parameters
         ----------
-
         prefix : str
             The setting prefix PV.
         infix: str
             Collection of pv that are different between beamlines
         name : str
             Name of the Id phase device
+
         """
         fullPV = f"{prefix}BL{infix}"
         self.user_setpoint = epics_signal_w(str, fullPV + "SET")
@@ -237,8 +232,7 @@ class UndulatorPhaseMotor(StandardReadable):
 
 
 class UndulatorPhaseAxes(SafeUndulatorMover[Apple2PhasesVal]):
-    """
-    A collection of 4 phase Motor to make up the full id phase motion. We are using the diamond pv convention.
+    """A collection of 4 phase Motor to make up the full id phase motion. We are using the diamond pv convention.
     e.g. top_outer == Q1
          top_inner == Q2
          btm_inner == q3
@@ -275,9 +269,7 @@ class UndulatorPhaseAxes(SafeUndulatorMover[Apple2PhasesVal]):
         )
 
     async def get_timeout(self) -> float:
-        """
-        Get all four motor speed, current positions and target positions to calculate required timeout.
-        """
+        """Get all four motor speed, current positions and target positions to calculate required timeout."""
         axes = [self.top_outer, self.top_inner, self.btm_inner, self.btm_outer]
         timeouts = await asyncio.gather(
             *[
@@ -293,8 +285,7 @@ class UndulatorPhaseAxes(SafeUndulatorMover[Apple2PhasesVal]):
 
 
 class UndulatorJawPhase(SafeUndulatorMover[float]):
-    """
-    A JawPhase movable, this is use for moving the jaw phase which is use to control the
+    """A JawPhase movable, this is use for moving the jaw phase which is use to control the
     linear arbitrary polarisation but only one some of the beamline.
     """
 
@@ -317,9 +308,7 @@ class UndulatorJawPhase(SafeUndulatorMover[float]):
         await self.jaw_phase.user_setpoint.set(value=str(value))
 
     async def get_timeout(self) -> float:
-        """
-        Get motor speed, current position and target position to calculate required timeout.
-        """
+        """Get motor speed, current position and target position to calculate required timeout."""
         return await estimate_motor_timeout(
             self.jaw_phase.user_setpoint_demand_readback,
             self.jaw_phase.user_setpoint_readback,
@@ -328,8 +317,7 @@ class UndulatorJawPhase(SafeUndulatorMover[float]):
 
 
 class Apple2(StandardReadable, Movable):
-    """
-    Apple 2 ID/undulator has 4 extra degrees of freedom compare to the standard Undulator,
+    """Apple 2 ID/undulator has 4 extra degrees of freedom compare to the standard Undulator,
      each bank of magnet can move independently to each other,
      which allow the production of different x-ray polarisation as well as energy.
      This type of ID is use on I10, I21, I09, I17 and I06 for soft x-ray.
@@ -347,8 +335,7 @@ class Apple2(StandardReadable, Movable):
         prefix: str = "",
         name: str = "",
     ) -> None:
-        """
-        Parameters
+        """Parameters
         ----------
         id_gap:
             An UndulatorGap device.
@@ -358,6 +345,7 @@ class Apple2(StandardReadable, Movable):
             Not in use but needed for device_instantiation.
         name:
             Name of the device.
+
         """
         super().__init__(name)
 
@@ -406,11 +394,7 @@ class Apple2(StandardReadable, Movable):
             )
 
     async def _set(self, value: Apple2Val, energy: float) -> None:
-        """
-        Check ID is in a movable state and set all the demand value before moving.
-
-        """
-
+        """Check ID is in a movable state and set all the demand value before moving."""
         # Only need to check gap as the phase motors share both fault and gate with gap.
         await self.gap().raise_if_cannot_move()
         await asyncio.gather(
@@ -438,9 +422,7 @@ class Apple2(StandardReadable, Movable):
         self._energy_set(energy)  # Update energy for after move for readback.
 
     def _get_id_gap_phase(self, energy: float) -> tuple[float, float]:
-        """
-        Converts energy and polarisation to gap and phase.
-        """
+        """Converts energy and polarisation to gap and phase."""
         gap_poly = self._get_poly(
             lookup_table=self.lookup_tables["Gap"], new_energy=energy
         )
@@ -454,11 +436,9 @@ class Apple2(StandardReadable, Movable):
         new_energy: float,
         lookup_table: dict[str | None, dict[str, dict[str, Any]]],
     ) -> np.poly1d:
-        """
-        Get the correct polynomial for a given energy form lookuptable
+        """Get the correct polynomial for a given energy form lookuptable
          for any given polarisation.
         """
-
         if (
             new_energy < lookup_table[self.pol]["Limit"]["Minimum"]
             or new_energy > lookup_table[self.pol]["Limit"]["Maximum"]
@@ -484,8 +464,7 @@ class Apple2(StandardReadable, Movable):
 
     @abc.abstractmethod
     def update_lookuptable(self) -> None:
-        """
-        Abstract method to update the stored lookup tabled from file.
+        """Abstract method to update the stored lookup tabled from file.
         This function should include check to ensure the lookuptable is in the correct format:
             # ensure the importing lookup table is the correct format
             Lookuptable.model_validate(<loockuptable>)
@@ -493,8 +472,7 @@ class Apple2(StandardReadable, Movable):
         """
 
     async def determinePhaseFromHardware(self) -> tuple[str | None, float]:
-        """
-        Try to determine polarisation and phase value using row phase motor position pattern.
+        """Try to determine polarisation and phase value using row phase motor position pattern.
         However there is no way to return lh3 polarisation or higher harmonic setting.
         (May be for future one can use the inverse poly to work out the energy and try to match it with the current energy
         to workout the polarisation but during my test the inverse poly is too unstable for general use.)
@@ -572,7 +550,5 @@ class Apple2(StandardReadable, Movable):
 
 
 def motor_position_equal(a, b) -> bool:
-    """
-    Check motor is within tolerance.
-    """
+    """Check motor is within tolerance."""
     return abs(a - b) < ROW_PHASE_MOTOR_TOLERANCE

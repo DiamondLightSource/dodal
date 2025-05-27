@@ -46,8 +46,7 @@ class GridAxis:
         return self.steps_to_motor_position(self.full_steps - 1)
 
     def is_within(self, steps: float):
-        """
-        Determine whether a single axis coordinate is within the grid.
+        """Determine whether a single axis coordinate is within the grid.
         The coordinate is from a continuous coordinate space based on the
         XRC grid where the origin corresponds to the centre of the first grid box.
 
@@ -56,13 +55,13 @@ class GridAxis:
 
         Returns:
             True if the coordinate falls within the grid.
+
         """
         return -0.5 <= steps <= self.full_steps - 0.5
 
 
 class GridScanParamsCommon(AbstractExperimentWithBeamParams):
-    """
-    Common holder class for the parameters of a grid scan in a similar
+    """Common holder class for the parameters of a grid scan in a similar
     layout to EPICS. The parameters and functions of this class are common
     to both the zebra and panda triggered fast grid scans.
 
@@ -113,8 +112,10 @@ class GridScanParamsCommon(AbstractExperimentWithBeamParams):
                 centre of the first grid box
         Returns:
             The motor position this corresponds to.
+
         Raises:
             IndexError if the desired position is outside the grid.
+
         """
         for position, axis in zip(
             grid_position, [self.x_axis, self.y_axis, self.z_axis], strict=False
@@ -135,9 +136,7 @@ ParamType = TypeVar("ParamType", bound=GridScanParamsCommon)
 
 
 class ZebraGridScanParams(GridScanParamsCommon):
-    """
-    Params for standard Zebra FGS. Adds on the dwell time
-    """
+    """Params for standard Zebra FGS. Adds on the dwell time"""
 
     dwell_time_ms: float = 10
 
@@ -156,9 +155,7 @@ class ZebraGridScanParams(GridScanParamsCommon):
 
 
 class PandAGridScanParams(GridScanParamsCommon):
-    """
-    Params for panda constant-motion scan. Adds on the goniometer run-up distance
-    """
+    """Params for panda constant-motion scan. Adds on the goniometer run-up distance"""
 
     run_up_distance_mm: float = 0.17
 

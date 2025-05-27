@@ -76,6 +76,7 @@ class OAVToRedisForwarder(StandardReadable, Flyable, Stoppable):
             redis_password: str     the password for the redis database
             redis_db: int           which redis database to connect to, defaults to 0
             name: str               the name of this device
+
         """
         self.counter = epics_signal_r(int, f"{prefix}CAM:ArrayCounter_RBV")
 
@@ -108,7 +109,8 @@ class OAVToRedisForwarder(StandardReadable, Flyable, Stoppable):
     ):
         """Stores the raw bytes of the jpeg image in redis. Murko ultimately wants a
         pickled numpy array of pixel values but raw byes are more space efficient. There
-        may be better ways of doing this, see https://github.com/DiamondLightSource/mx-bluesky/issues/592"""
+        may be better ways of doing this, see https://github.com/DiamondLightSource/mx-bluesky/issues/592
+        """
         jpeg_bytes = await get_next_jpeg(response)
         self.uuid_setter(redis_uuid)
         sample_id = await self.sample_id.get_value()

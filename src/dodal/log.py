@@ -76,9 +76,7 @@ class CircularMemoryHandler(logging.Handler):
             self.flush()
 
     def flush(self):
-        """
-        Pass the contents of the buffer forward to the target.
-        """
+        """Pass the contents of the buffer forward to the target."""
         self.acquire()
         try:
             if self.target:
@@ -151,7 +149,8 @@ def set_up_graylog_handler(logger: Logger, host: str, port: int):
 
 def set_up_INFO_file_handler(logger, path: Path, filename: str):
     """Set up a file handler for the logger, at INFO level, which will keep 30 days
-    of logs, rotating once per day. Creates the directory if necessary."""
+    of logs, rotating once per day. Creates the directory if necessary.
+    """
     print(f"Logging to INFO file handler {path / filename}")
     path.mkdir(parents=True, exist_ok=True)
     file_handler = TimedRotatingFileHandler(
@@ -167,7 +166,8 @@ def set_up_DEBUG_memory_handler(
 ):
     """Set up a Memory handler which holds 200k lines, and writes them to an hourly
     log file when it sees a message of severity ERROR. Creates the directory if
-    necessary"""
+    necessary
+    """
     debug_path = path / "debug"
     print(f"Logging to DEBUG handler {debug_path / filename}")
     debug_path.mkdir(parents=True, exist_ok=True)
@@ -204,6 +204,7 @@ def set_up_all_logging_handlers(
     debug_logging_path: Path | None = None,
 ) -> DodalLogHandlers:
     """Set up the default logging environment.
+
     Args:
         logger:                 the logging.Logger object to apply all the handlers to.
         logging_path:           The location to store log files.
@@ -217,6 +218,7 @@ def set_up_all_logging_handlers(
         debug_logging_path:     The location to store debug log files, if None uses `logging_path`
     Returns:
         A DodaLogHandlers TypedDict with the created handlers.
+
     """
     handlers: DodalLogHandlers = {
         "stream_handler": set_up_stream_handler(logger),
@@ -262,6 +264,7 @@ def get_logging_file_paths() -> tuple[Path, Path]:
     Returns:
         tuple[Path, Path]: Paths to the standard log file and to the debug log file,
                            for the file handlers to write to
+
     """
     beamline: str | None = environ.get("BEAMLINE")
 
@@ -284,6 +287,7 @@ def get_graylog_configuration(
 
     Returns:
         (host, port): A tuple of the relevant host and port for graylog.
+
     """
     if dev_mode:
         return "localhost", 5555

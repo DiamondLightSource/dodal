@@ -52,8 +52,7 @@ def _calc_res_at_angle(wavelength_angstroms, angular_shift_radians):
 def _calc_res_off_axis_detector(
     wavelength_angstroms, usable_radius, det_distance_mm, two_theta_radians
 ):
-    """
-    Calculate maximum resolution given detector distance and extent (radius) that detector face extends
+    """Calculate maximum resolution given detector distance and extent (radius) that detector face extends
     No correction for position of beam centre on detector face at twoTheta=0
     Here radius and distance parameters can be in any length unit, provided it is the same, millimetres is the convention
     """
@@ -66,8 +65,7 @@ def _calc_res_off_axis_detector(
 def _max_res_for_mx(
     wavelength_angstroms, detector_radius_mm, det_distance_mm, beam_x_mm, beam_y_mm
 ):
-    """
-    Calculate maximum resolution given MX Use Case (detector at twoTheta=0) and beam centre on detector face
+    """Calculate maximum resolution given MX Use Case (detector at twoTheta=0) and beam centre on detector face
     Correct the radius for position of beam centre on detector face at twoTheta=0
     """
     usable_radius = _calc_useful_radius(detector_radius_mm, beam_x_mm, beam_y_mm)

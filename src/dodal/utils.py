@@ -129,8 +129,8 @@ class DeviceInitializationController(Generic[T]):
 
     def cache_clear(self) -> None:
         """Clears the controller's internal cached instance of the device, if present.
-        Noop if not."""
-
+        Noop if not.
+        """
         # Functools adds the cache_clear function via setattr so the type checker
         # does not pick it up.
         self._factory.cache_clear()  # type: ignore
@@ -177,6 +177,7 @@ class DeviceInitializationController(Generic[T]):
         Raises:
             RuntimeError:   If the device factory was invoked again with different
              keyword arguments, without previously invoking cache_clear()
+
         """
         is_v2_device = is_v2_device_factory(self._factory)
         is_mock = mock if mock is not None else self._mock
@@ -225,6 +226,7 @@ def make_device(
 
     Returns:
         dict[str, AnyDevice]: A dict mapping device names to the constructed devices
+
     """
     if isinstance(module, str):
         module = import_module(module)
@@ -254,6 +256,7 @@ def make_all_devices(
 
     A dictionary where the keys are device names and the values are devices.
     A dictionary where the keys are device names and the values are exceptions.
+
     """
     if isinstance(module, str) or module is None:
         module = import_module(module or __name__)
@@ -283,8 +286,8 @@ def invoke_factories(
         Tuple[Dict[str, AnyDevice], Dict[str, Exception]]: Tuple of two dictionaries.
         One mapping device name to device, one mapping device name to exception for
         any failed devices
-    """
 
+    """
     devices: dict[str, AnyDevice] = {}
     exceptions: dict[str, Exception] = {}
 
@@ -356,8 +359,8 @@ def extract_dependencies(
 
     Yields:
         Iterator[Iterable[str]]: Factory names
-    """
 
+    """
     for name, param in inspect.signature(factories[factory_name]).parameters.items():
         if param.default is inspect.Parameter.empty and name in factories:
             yield name
@@ -376,8 +379,8 @@ def collect_factories(
 
     Returns:
         dict[str, AnyDeviceFactory]: Mapping of factory name -> factory.
-    """
 
+    """
     factories: dict[str, AnyDeviceFactory] = {}
 
     for var in module.__dict__.values():
@@ -449,8 +452,7 @@ def is_v1_device_type(obj: type[Any]) -> bool:
 def filter_ophyd_devices(
     devices: Mapping[str, AnyDevice],
 ) -> tuple[Mapping[str, OphydV1Device], Mapping[str, OphydV2Device]]:
-    """
-    Split a dictionary of ophyd and ophyd-async devices
+    """Split a dictionary of ophyd and ophyd-async devices
     (i.e. the output of make_all_devices) into 2 separate dictionaries of the
     different types. Useful when special handling is needed for each type of device.
 
@@ -463,8 +465,8 @@ def filter_ophyd_devices(
     Returns:
         Tuple of two dictionaries, one mapping names to ophyd devices and one mapping
         names to ophyd-async devices.
-    """
 
+    """
     ophyd_devices = {}
     ophyd_async_devices = {}
     for name, device in devices.items():
@@ -478,8 +480,7 @@ def filter_ophyd_devices(
 
 
 def get_beamline_based_on_environment_variable() -> ModuleType:
-    """
-    Gets the dodal module for the current beamline, as specified by the
+    """Gets the dodal module for the current beamline, as specified by the
     BEAMLINE environment variable.
     """
     beamline = get_beamline_name("")
@@ -529,7 +530,8 @@ def _find_next_run_number_from_files(file_names: list[str]) -> int:
 def get_run_number(directory: str, prefix: str = "") -> int:
     """Looks at the numbers coming from all nexus files with the format
     "{prefix}_(any number}.nxs", and returns the highest number + 1, or 1 if there are
-    no matching numbers found. If no prefix is given, considers all files in the dir."""
+    no matching numbers found. If no prefix is given, considers all files in the dir.
+    """
     nexus_file_names = [
         file
         for file in os.listdir(directory)
