@@ -232,7 +232,7 @@ def check_parameter_validation(params, composite, expected_in_limits):
 
 @pytest.fixture
 def zebra_grid_scan_params():
-    yield ZebraGridScanParams(
+    return ZebraGridScanParams(
         transmission_fraction=0.01,
         x_steps=10,
         y_steps=15,
@@ -250,7 +250,7 @@ def zebra_grid_scan_params():
 
 @pytest.fixture
 def panda_grid_scan_params():
-    yield PandAGridScanParams(
+    return PandAGridScanParams(
         transmission_fraction=0.01,
         x_steps=10,
         y_steps=15,

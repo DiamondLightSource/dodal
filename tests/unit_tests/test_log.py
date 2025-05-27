@@ -23,13 +23,13 @@ from dodal.log import (
 )
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_logger():
     with patch("dodal.log.LOGGER") as mock_LOGGER:
         yield mock_LOGGER
 
 
-@pytest.fixture()
+@pytest.fixture
 def dodal_logger_for_tests():
     logger = logging.getLogger("Dodal")
     for handler in list(logger.handlers):
@@ -54,7 +54,7 @@ def test_handlers_set_at_correct_default_level(
     mock_file_handler.return_value.level = logging.INFO
     mock_GELFTCPHandler.return_value.level = logging.INFO
     mock_stream_handler.return_value.level = logging.DEBUG
-    handlers = set_up_all_logging_handlers(mock_logger, Path(""), "", True, 10000)
+    handlers = set_up_all_logging_handlers(mock_logger, Path(), "", True, 10000)
 
     for handler in handlers.values():
         mock_logger.addHandler.assert_any_call(handler)

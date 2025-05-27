@@ -271,7 +271,7 @@ def test_given_home_and_reset_inner_plan_fails_reset_still(RE, my_device):
 
     def my_plan():
         yield from bps.null()
-        raise MyException()
+        raise MyException
 
     patch_motor(my_device.x, initial_x)
     patch_motor(my_device.y, initial_y)

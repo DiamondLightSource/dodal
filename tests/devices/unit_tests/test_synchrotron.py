@@ -204,7 +204,6 @@ async def verify(
 
 def count_sim(det: StandardReadable, times: int = 1):
     """Test plan to do equivalent of bp.count for a sim detector (no file writing)."""
-
     yield from bps.stage_all(det)
     yield from bps.open_run()
     yield from bps.declare_stream(det, name="primary", collect=False)

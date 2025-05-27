@@ -202,4 +202,3 @@ def test_given_no_frames_dropped_then_check_frames_timed_out_returns_no_error(
     error, message = fake_odin.nodes.check_frames_timed_out()
     assert not error
     assert not message
-    pass

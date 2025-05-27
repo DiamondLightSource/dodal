@@ -132,7 +132,7 @@ async def aperture_in_medium_pos_w_call_log(
 
     set_mock_value(ap_sg.aperture.medium, 1)
 
-    yield ap_sg, call_log
+    return ap_sg, call_log
 
 
 @pytest.fixture

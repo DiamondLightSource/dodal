@@ -39,7 +39,7 @@ def test_instantiate_function_makes_supplied_device():
 
 
 def test_instantiating_different_device_with_same_name():
-    dev1 = beamline_utils.device_instantiation(  # noqa
+    dev1 = beamline_utils.device_instantiation(
         XYZPositioner, "device", "", False, True, None
     )
     with pytest.raises(TypeError):
@@ -47,7 +47,7 @@ def test_instantiating_different_device_with_same_name():
             Smargon, "device", "", False, True, None
         )
     beamline_utils.clear_device("device")
-    dev2 = beamline_utils.device_instantiation(  # noqa
+    dev2 = beamline_utils.device_instantiation(
         Smargon, "device", "", False, True, None
     )
     assert dev1.name == dev2.name

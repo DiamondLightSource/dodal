@@ -30,10 +30,9 @@ from dodal.utils import (
 MOCK_DAQ_CONFIG_PATH = "tests/devices/unit_tests/test_daq_configuration"
 
 
-@pytest.fixture()
+@pytest.fixture
 def alternate_config(tmp_path) -> str:
-    """
-    Alternate config dir as MOCK_DAQ_CONFIG_PATH replaces i03.DAQ_CONFIGURATION_PATH
+    """Alternate config dir as MOCK_DAQ_CONFIG_PATH replaces i03.DAQ_CONFIGURATION_PATH
     in conftest.py
     """
     alt_config_path = tmp_path / "alt_daq_configuration"
@@ -41,7 +40,7 @@ def alternate_config(tmp_path) -> str:
     return str(alt_config_path)
 
 
-@pytest.fixture()
+@pytest.fixture
 def fake_device_factory_beamline():
     import tests.fake_device_factory_beamline as beamline
 
@@ -56,7 +55,7 @@ def fake_device_factory_beamline():
 
 
 def test_finds_device_factories() -> None:
-    import tests.fake_beamline as fake_beamline
+    from tests import fake_beamline
 
     factories = collect_factories(fake_beamline)
 
@@ -78,7 +77,7 @@ def test_finds_device_factories() -> None:
 
 
 def test_makes_devices() -> None:
-    import tests.fake_beamline as fake_beamline
+    from tests import fake_beamline
 
     devices, exceptions = make_all_devices(fake_beamline)
     assert {

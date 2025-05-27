@@ -16,10 +16,8 @@ async def thor_labs_stage():
 
 
 async def test_setting(thor_labs_stage: ThorLabsStage):
+    """Test setting x and y positions on the ThorLabsStage using ophyd_async mock tools.
     """
-    Test setting x and y positions on the ThorLabsStage using ophyd_async mock tools.
-    """
-
     reading = await thor_labs_stage.read()
 
     expected_reading = {

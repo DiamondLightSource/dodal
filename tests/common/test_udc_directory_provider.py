@@ -35,7 +35,7 @@ def test_udc_path_provider_excepts_before_update():
 
 @pytest.mark.parametrize(
     "initial",
-    [Path("."), None],
+    [Path(), None],
 )
 async def test_udc_path_provider_after_update(initial, tmp_path):
     provider = PandASubpathProvider(initial)

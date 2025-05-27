@@ -149,15 +149,13 @@ async def test_set_exposure_updates_values_per_reading(
 async def test_set_invalid_exposure_for_number_of_values_per_reading(
     tetramm_controller: TetrammController,
 ):
-    """
-    exposure >= readings_per_frame * values_per_reading / sample_rate
+    """Exposure >= readings_per_frame * values_per_reading / sample_rate
     With the default values:
     base_sample_rate = 100_000
     minimum_values_per_reading = 5
     readings_per_frame = 5
     exposure >= 5 * 5 / 100_000 = 1/4000
     """
-
     with pytest.raises(
         ValueError,
         match="Tetramm exposure time must be at least 5e-05s, asked to set it to 4e-05s",
