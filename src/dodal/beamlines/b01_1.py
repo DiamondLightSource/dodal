@@ -24,7 +24,7 @@ set_utils_beamline(BL)
 set_path_provider(
     StaticVisitPathProvider(
         BL,
-        Path("/dls/b01-1/data/"),
+        Path("/dls/b01-1/data/2025/cm40661-1/"),
         client=LocalDirectoryServiceClient(),
     )
 )
