@@ -149,7 +149,9 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
         omega = metadata["omega_angle"]
         coords = result["most_likely_click"]  # As proportion from top, left of image
         LOGGER.info(f"Got most_likely_click: {coords} at angle {omega}")
-        if tuple(coords) == NO_MURKO_RESULT:  # See https://github.com/MartinSavko/murko/issues/9
+        if (
+            tuple(coords) == NO_MURKO_RESULT
+        ):  # See https://github.com/MartinSavko/murko/issues/9
             LOGGER.info("Murko didn't produce a result, moving on")
         else:
             shape = result["original_shape"]  # Dimensions of image in pixels
