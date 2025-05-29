@@ -90,14 +90,14 @@ def test_move(x_axis: SimMotor, y_axis: SimMotor):
     msgs = list(move({x_axis: 0.5, y_axis: 1.0}))
     assert msgs[0] == Msg("set", x_axis, 0.5, group=ANY)
     assert msgs[1] == Msg("set", y_axis, 1.0, group=msgs[0].kwargs["group"])
-    assert msgs[2] == Msg("wait", group=msgs[0].kwargs["group"])
+    assert msgs[2] == Msg("wait", group=msgs[0].kwargs["group"], timeout=None)
 
 
 def test_move_group(x_axis: SimMotor, y_axis: SimMotor):
     msgs = list(move({x_axis: 0.5, y_axis: 1.0}, group="foo"))
     assert msgs[0] == Msg("set", x_axis, 0.5, group="foo")
     assert msgs[1] == Msg("set", y_axis, 1.0, group="foo")
-    assert msgs[2] == Msg("wait", group="foo")
+    assert msgs[2] == Msg("wait", group="foo", timeout=None)
 
 
 def test_move_relative(x_axis: SimMotor, y_axis: SimMotor):
@@ -107,7 +107,7 @@ def test_move_relative(x_axis: SimMotor, y_axis: SimMotor):
     group = msgs[1].kwargs["group"]
     assert msgs[2] == Msg("locate", y_axis)
     assert msgs[3] == Msg("set", y_axis, 1.0, group=group)
-    assert msgs[4] == Msg("wait", group=group)
+    assert msgs[4] == Msg("wait", group=group, timeout=None)
 
 
 def test_move_relative_group(x_axis: SimMotor, y_axis: SimMotor):
@@ -116,7 +116,7 @@ def test_move_relative_group(x_axis: SimMotor, y_axis: SimMotor):
     assert msgs[1] == Msg("set", x_axis, 0.5, group="foo")
     assert msgs[2] == Msg("locate", y_axis)
     assert msgs[3] == Msg("set", y_axis, 1.0, group="foo")
-    assert msgs[4] == Msg("wait", group="foo")
+    assert msgs[4] == Msg("wait", group="foo", timeout=None)
 
 
 def test_sleep():
