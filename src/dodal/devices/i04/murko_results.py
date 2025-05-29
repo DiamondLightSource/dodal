@@ -1,5 +1,6 @@
 import json
 import pickle
+import time
 from enum import Enum
 from typing import TypedDict
 
@@ -80,6 +81,11 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
         self.x_dists_mm = []
         self.y_dists_mm = []
         self.omegas = []
+        self.timestamps: list[dict] = []
+        self.beam_centre_i = None
+        self.beam_centre_j = None
+        self.microns_per_x_pixel = None
+        self.microns_per_y_pixel = None
 
         with self.add_children_as_readables():
             # Diffs from current x/y/z
@@ -129,24 +135,33 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
             batch_results: list[dict] = pickle.loads(message["data"])
             for results in batch_results:
                 for uuid, result in results.items():
-                    if metadata_str := await self.redis_client.hget(  # type: ignore
+                    metadata_str = await self.redis_client.hget(  # type: ignore
                         f"murko:{sample_id}:metadata", uuid
-                    ):
-                        LOGGER.info(
-                            f"Found metadata for uuid {uuid}, processing result"
-                        )
-                        self.process_result(
-                            result, MurkoMetadata(json.loads(metadata_str))
-                        )
-                    else:
-                        LOGGER.info(f"Found no metadata for uuid {uuid}")
+                    )
+                    self.process_result(result, metadata_str, uuid)
 
-    def process_result(self, result: dict, metadata: MurkoMetadata):
+    def process_result(self, result: dict, metadata_str: str | None, uuid):
         """Uses the 'most_likely_click' coordinates from Murko to calculate the
         horizontal and vertical distances from the beam centre, and store these values
         as well as the omega angle the image was taken at.
         """
-        omega = metadata["omega_angle"]
+        if metadata_str:
+            metadata = MurkoMetadata(json.loads(metadata_str))
+            LOGGER.info(f"Found metadata for uuid {uuid}, processing result")
+            omega = metadata["omega_angle"]
+            self.timestamps.append({"time": time.time(), "omega": omega})
+            if self.beam_centre_i is None:
+                self.beam_centre_i = metadata["beam_centre_i"]
+                self.beam_centre_j = metadata["beam_centre_j"]
+                self.microns_per_x_pixel = metadata["microns_per_x_pixel"]
+                self.microns_per_y_pixel = metadata["microns_per_y_pixel"]
+        else:
+            LOGGER.info(
+                f"Found no metadata for uuid {uuid}, attempting to interpolate omega"
+            )
+            omega = self.interpolate_omega()
+            if omega is None:
+                return
         coords = result["most_likely_click"]  # As proportion from top, left of image
         LOGGER.info(f"Got most_likely_click: {coords} at angle {omega}")
         if (
@@ -159,18 +174,29 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
             centre_px = (coords[1] * shape[1], coords[0] * shape[0])
 
             beam_dist_px = calculate_beam_distance(
-                (metadata["beam_centre_i"], metadata["beam_centre_j"]),
+                (self.beam_centre_i, self.beam_centre_j),
                 centre_px[0],
                 centre_px[1],
             )
-            self.x_dists_mm.append(
-                beam_dist_px[0] * metadata["microns_per_x_pixel"] / 1000
-            )
-            self.y_dists_mm.append(
-                beam_dist_px[1] * metadata["microns_per_y_pixel"] / 1000
-            )
+            self.x_dists_mm.append(beam_dist_px[0] * self.microns_per_x_pixel / 1000)
+            self.y_dists_mm.append(beam_dist_px[1] * self.microns_per_y_pixel / 1000)
             self.omegas.append(omega)
             self._last_omega = omega
+
+    def interpolate_omega(self) -> float | None:
+        ts = time.time()
+        if len(self.timestamps) >= 2:
+            omega_per_second = (
+                self.timestamps[-1]["omega"] - self.timestamps[-2]["omega"]
+            ) / (self.timestamps[-1]["time"] - self.timestamps[-2]["time"])
+            time_elapsed = ts - self.timestamps[-1]["time"]
+            interpolated_omega = (
+                self.timestamps[-1]["omega"] + time_elapsed * omega_per_second
+            )
+            return interpolated_omega
+        else:
+            LOGGER.info("Not enough information to interpolate omega")
+            return None
 
 
 def get_yz_least_squares(vertical_dists: list, omegas: list) -> tuple[float, float]:

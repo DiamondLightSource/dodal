@@ -178,6 +178,40 @@ def test_get_yz_least_squares_with_more_angles():
     assert result[1] == approx(2, abs=0.01)
 
 
+@patch("dodal.devices.i04.murko_results.time.time")
+def test_interpolate_omega_returns_correct_value(
+    mock_time: MagicMock, murko_results: MurkoResultsDevice
+):
+    mock_time.return_value = 25
+    murko_results.timestamps = [{"time": 10, "omega": 50}, {"time": 20, "omega": 90}]
+    interpolated_omega = murko_results.interpolate_omega()
+    assert interpolated_omega == 110
+
+
+@patch("dodal.devices.i04.murko_results.time.time")
+def test_interpolate_omega_returns_none_when_not_enough_timestamps(
+    mock_time: MagicMock, murko_results: MurkoResultsDevice
+):
+    mock_time.return_value = 25
+    murko_results.timestamps = [{"time": 10, "omega": 50}]
+    interpolated_omega = murko_results.interpolate_omega()
+    assert interpolated_omega is None
+
+
+@patch("dodal.devices.i04.murko_results.time.time")
+def test_interpolate_omega_uses_most_recent_timestamps(
+    mock_time: MagicMock, murko_results: MurkoResultsDevice
+):
+    mock_time.return_value = 25
+    murko_results.timestamps = [
+        {"time": 10.098, "omega": 50},
+        {"time": 20.34, "omega": 90},
+        {"time": 21, "omega": 100},
+    ]
+    interpolated_omega = murko_results.interpolate_omega()
+    assert interpolated_omega == approx(60.606 + 100)
+
+
 def test_process_result_appends_lists_with_correct_values(
     murko_results: MurkoResultsDevice,
 ):
@@ -199,7 +233,7 @@ def test_process_result_appends_lists_with_correct_values(
     assert murko_results.x_dists_mm == []
     assert murko_results.y_dists_mm == []
     assert murko_results.omegas == []
-    murko_results.process_result(result, metadata)
+    murko_results.process_result(result, json.dumps(metadata), "uuid")
     assert murko_results.x_dists_mm == [0.2 * 100 * 5 / 1000]
     assert murko_results.y_dists_mm == [0]
     assert murko_results.omegas == [60]
@@ -227,7 +261,7 @@ def test_process_result_skips_when_no_result_from_murko(
     )
 
     with caplog.at_level("INFO"):
-        murko_results.process_result(result, metadata)
+        murko_results.process_result(result, json.dumps(metadata), "uuid")
 
     assert murko_results.x_dists_mm == []
     assert murko_results.y_dists_mm == []
@@ -277,18 +311,21 @@ async def test_process_batch_makes_correct_calls(
     assert mock_process_result.call_count == 6
     assert mock_process_result.call_args_list[-1] == call(
         {"most_likely_click": (0.5, 0.5), "original_shape": (100, 100)},
-        {
-            "omega_angle": 100,
-            "microns_per_x_pixel": 10,
-            "microns_per_y_pixel": 10,
-            "beam_centre_i": 50,
-            "beam_centre_j": 50,
-        },
+        json.dumps(
+            {
+                "omega_angle": 100,
+                "microns_per_x_pixel": 10,
+                "microns_per_y_pixel": 10,
+                "beam_centre_i": 50,
+                "beam_centre_j": 50,
+            }
+        ),
+        5,
     )
 
 
 @patch("dodal.devices.i04.murko_results.MurkoResultsDevice.process_result")
-async def test_process_batch_doesnt_process_result_if_no_metadata_for_certain_uuid(
+async def test_process_batch_processes_result_even_if_no_metadata_for_certain_uuid(
     mock_process_result: MagicMock,
     murko_results: MurkoResultsDevice,
     caplog: pytest.LogCaptureFixture,
@@ -317,9 +354,7 @@ async def test_process_batch_doesnt_process_result_if_no_metadata_for_certain_uu
     with caplog.at_level("INFO"):
         await murko_results.process_batch(message, sample_id="0")
 
-    assert mock_process_result.call_count == 0
-    assert "Found no metadata for uuid 0" in caplog.text
-    assert "Found no metadata for uuid 1" in caplog.text
+    assert mock_process_result.call_count == 2
 
 
 @patch("dodal.devices.i04.murko_results.StrictRedis")
