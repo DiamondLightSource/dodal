@@ -1,6 +1,7 @@
 import os
 from collections.abc import Generator
 from typing import cast
+from unittest.mock import patch
 
 import pytest
 from bluesky.run_engine import RunEngine
@@ -42,13 +43,16 @@ python -m pytest -m 'requires(instrument="adsim")'
 
 @pytest.fixture(scope="module", autouse=True)
 def with_env():
-    os.environ["EPICS_CA_NAME_SERVERS"] = "127.0.0.1:5094"
-    os.environ["EPICS_PVA_NAME_SERVERS"] = "127.0.0.1:5095"
-    os.environ["EPICS_CA_ADDR_LIST"] = "127.0.0.1:5094"
-    yield
-    del os.environ["EPICS_CA_NAME_SERVERS"]
-    del os.environ["EPICS_PVA_NAME_SERVERS"]
-    del os.environ["EPICS_CA_ADDR_LIST"]
+    with patch.dict(
+        os.environ,
+        {
+            "EPICS_CA_NAME_SERVERS": "127.0.0.1:5094",
+            "EPICS_PVA_NAME_SERVERS": "127.0.0.1:5095",
+            "EPICS_CA_ADDR_LIST": "127.0.0.1:5094",
+        },
+        clear=True,
+    ):
+        yield
 
 
 @pytest.fixture
