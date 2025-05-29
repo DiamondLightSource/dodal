@@ -127,10 +127,6 @@ class ZocaloResults(StandardReadable, Triggerable):
 
         prefix (str): EPICS PV prefix for the device
 
-        use_cpu_and_gpu (bool): When True, ZocaloResults will wait for results from the
-        CPU and the GPU, compare them, and provide a warning if the results differ. When
-        False, ZocaloResults will only use results from the CPU
-
         use_gpu (bool): When True, ZocaloResults will take the first set of
         results that it receives (which are likely the GPU results)
 
@@ -144,7 +140,6 @@ class ZocaloResults(StandardReadable, Triggerable):
         sort_key: str = DEFAULT_SORT_KEY.value,
         timeout_s: float = DEFAULT_TIMEOUT,
         prefix: str = "",
-        use_cpu_and_gpu: bool = False,
         use_gpu: bool = False,
     ) -> None:
         self.zocalo_environment = zocalo_environment
@@ -154,7 +149,6 @@ class ZocaloResults(StandardReadable, Triggerable):
         self._prefix = prefix
         self._raw_results_received: Queue = Queue()
         self.transport: CommonTransport | None = None
-        self.use_cpu_and_gpu = use_cpu_and_gpu
         self.use_gpu = use_gpu
 
         self.centre_of_mass, self._com_setter = soft_signal_r_and_setter(
@@ -218,11 +212,6 @@ class ZocaloResults(StandardReadable, Triggerable):
         clearing the queue. Plans using this device should wait on ZOCALO_STAGE_GROUP
         before triggering processing for the experiment"""
 
-        if self.use_cpu_and_gpu and self.use_gpu:
-            raise ValueError(
-                "Cannot compare GPU and CPU results and use GPU results at the same time."
-            )
-
         LOGGER.info("Subscribing to results queue")
         try:
             self._subscribe_to_results()
@@ -268,55 +257,6 @@ class ZocaloResults(StandardReadable, Triggerable):
                     "Configured to use GPU results but CPU came first, using CPU results."
                 )
 
-            if self.use_cpu_and_gpu:
-                # Wait for results from CPU and GPU, warn and continue if only GPU times out. Error if CPU times out
-                if source_of_first_results == ZocaloSource.CPU:
-                    LOGGER.warning("Received zocalo results from CPU before GPU")
-                raw_results_two_sources = [raw_results]
-                try:
-                    raw_results_two_sources.append(
-                        self._raw_results_received.get(timeout=self.timeout_s / 2)
-                    )
-                    source_of_second_results = source_from_results(
-                        raw_results_two_sources[1]
-                    )
-                    first_results = raw_results_two_sources[0]["results"]
-                    second_results = raw_results_two_sources[1]["results"]
-
-                    if first_results and second_results:
-                        # Compare results from both sources and warn if they aren't the same
-                        differences_str = get_dict_differences(
-                            first_results[0],
-                            source_of_first_results,
-                            second_results[0],
-                            source_of_second_results,
-                        )
-                        if differences_str:
-                            LOGGER.warning(differences_str)
-
-                    # Always use CPU results
-                    raw_results = (
-                        raw_results_two_sources[0]
-                        if source_of_first_results == ZocaloSource.CPU
-                        else raw_results_two_sources[1]
-                    )
-
-                except Empty as err:
-                    source_of_missing_results = (
-                        ZocaloSource.CPU.value
-                        if source_of_first_results == ZocaloSource.GPU.value
-                        else ZocaloSource.GPU.value
-                    )
-                    if source_of_missing_results == ZocaloSource.GPU.value:
-                        LOGGER.warning(
-                            f"Zocalo results from {source_of_missing_results} timed out. Using results from {source_of_first_results}"
-                        )
-                    else:
-                        LOGGER.error(
-                            f"Zocalo results from {source_of_missing_results} timed out and GPU results not yet reliable"
-                        )
-                        raise err
-
             LOGGER.info(
                 f"Zocalo results from {source_from_results(raw_results)} processing: found {len(raw_results['results'])} crystals."
             )
@@ -350,7 +290,7 @@ class ZocaloResults(StandardReadable, Triggerable):
 
             results = message.get("results", [])
 
-            if self.use_cpu_and_gpu or self.use_gpu:
+            if self.use_gpu:
                 self._raw_results_received.put(
                     {"results": results, "recipe_parameters": recipe_parameters}
                 )
