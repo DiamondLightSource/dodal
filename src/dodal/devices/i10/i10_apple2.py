@@ -18,7 +18,6 @@ from ophyd_async.core import (
 
 from dodal.log import LOGGER
 
-# from dodal.beamlines.i10 import pgm
 from ..apple2_undulator import (
     Apple2,
     Apple2Val,

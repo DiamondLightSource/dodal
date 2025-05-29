@@ -431,9 +431,6 @@ async def test_I10Apple2_pol_read_leave_lh3_unchange(
 async def test_linear_arbitrary_pol_fail(
     mock_linear_arbitrary_angle: LinearArbitraryAngle,
 ):
-    # set_mock_value(
-    #     mock_linear_arbitrary_angle.id_ref().polarisation, (Pol("la"))
-    # )
     with pytest.raises(RuntimeError) as e:
         await mock_linear_arbitrary_angle.set(20)
     assert str(e.value) == (

@@ -341,7 +341,7 @@ class UndulatorJawPhase(SafeUndulatorMover[float]):
         )
 
 
-class Apple2(StandardReadable, Movable):
+class Apple2(abc.ABC, StandardReadable, Movable):
     """
     Apple2 Undulator Device
 
@@ -379,23 +379,17 @@ class Apple2(StandardReadable, Movable):
         Abstract method to set motor positions for a given energy and polarisation.
     update_lookuptable() -> None
         Abstract method to load and validate lookup tables from external sources.
+    set (value: float) -> Status
+        Abstract method to move the id energy.
 
     Methods
     -------
     set_pol_setpoint(pol: Pol) -> None
         Sets the polarisation setpoint without moving hardware.
-    _set_pol(value: Pol) -> None
-        Sets the polarisation and adjusts motor positions based on the current energy.
-    _read_pol_setpoint(pol: Pol, ...) -> Pol
-        Reads the polarisation from hardware and updates the setpoint.
-    _set(value: Apple2Val, energy: float) -> None
-        Moves the undulator to the specified motor positions and energy.
-    _get_id_gap_phase(energy: float) -> tuple[float, float]
-        Converts energy and polarisation to gap and phase motor positions.
-    _get_poly(new_energy: float, lookup_table: dict) -> np.poly1d
-        Retrieves the polynomial for a given energy from the lookup table.
     determine_phase_from_hardware(...) -> tuple[Pol, float]
         Determines the polarisation and phase value based on motor positions.
+    set(value: float) -> Status
+        Set the energy of this ID.
 
     Notes
     -----
@@ -451,7 +445,7 @@ class Apple2(StandardReadable, Movable):
         }
         # Hardware backed read/write for polarisation.
         self.polarisation = derived_signal_rw(
-            raw_to_derived=self._read_pol_setpoint,
+            raw_to_derived=self._read_pol,
             set_derived=self._set_pol,
             pol=self.polarisation_setpoint,
             top_outer=self.phase.top_outer.user_readback,
@@ -476,7 +470,7 @@ class Apple2(StandardReadable, Movable):
         self,
         value: Pol,
     ) -> None:
-        # This change the pol setpoint and then change polariastion via set energy.
+        # This changes the pol setpoint and then changes polariastion via set energy.
         self.set_pol_setpoint(value)
         await self._set_energy(await self.energy.get_value())
 
@@ -485,7 +479,7 @@ class Apple2(StandardReadable, Movable):
         """This change the position of all the motors for a given energy and
         polarisation_setpoint"""
 
-    def _read_pol_setpoint(
+    def _read_pol(
         self,
         pol: Pol,
         top_outer: float,
@@ -499,14 +493,12 @@ class Apple2(StandardReadable, Movable):
             f"top_outer={top_outer}, top_inner={top_inner}, "
             f"btm_inner={btm_inner}, btm_outer={btm_outer}, gap={gap}."
         )
-
+        # LH3 is indistinishable from LH see determine_phase_from_hardware's docString
+        # for detail
         if pol != Pol.LH3:
             pol, _ = self.determine_phase_from_hardware(
                 top_outer, top_inner, btm_inner, btm_outer, gap
             )
-            if pol != Pol.NONE:
-                LOGGER.info(f"Determined polarisation: {pol}.")
-                self.set_pol_setpoint(pol=pol)
         return pol
 
     async def _set(self, value: Apple2Val, energy: float) -> None:
@@ -616,7 +608,7 @@ class Apple2(StandardReadable, Movable):
             for x in [top_outer, top_inner, btm_inner, btm_outer]
         ):
             LOGGER.info("Determined polarisation: LH (Linear Horizontal).")
-            return Pol("lh"), 0.0
+            return Pol.LH3, 0.0
         if (
             motor_position_equal(top_outer, MAXIMUM_ROW_PHASE_MOTOR_POSITION)
             and motor_position_equal(top_inner, 0.0)
