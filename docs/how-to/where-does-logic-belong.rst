@@ -1,7 +1,7 @@
 How to decide where to put your code
 ===========================
 
-There are three broad options as to where to put a new piece of logic: EPICS, dodal, or your bluesky plan repository. To determine this part, think about which of the options best describe what is being added:
+There are three broad options as to where to put a new piece of logic: EPICS, dodal, or your bluesky plan repository. To determine this part, think about which of these options best describes what is being added:
 
 1. It only affects one device, is simple, won't change often, and/or is useful for scientists to be able to run outside of any DAQ framework. In this situation, it should go into EPICS. For example, zeroing a motor.
 
@@ -17,7 +17,7 @@ The ophyd-async documentation also has a similar `section on this topic <https:/
 But where in dodal?!
 ---------------------------
 
-For devices, ideally, we would like every device which is used across different beamlines to have a base device in dodal/devices. If a beamline has a modified version of this device, they can subclass the base class into ``dodal/devices/ixx``. The base device should be the best attempt to contain the minimum signals + logic that any variation of that device might contain. See `BaseDCM` as an example here.
+For devices, ideally we would like every device which is used across different beamlines to have a base device in dodal/devices. If a beamline has a modified version of this device, they can subclass the base class into ``dodal/devices/ixx``. The base device should be the best attempt to contain the minimum signals + logic that any variation of that device might contain. See `BaseDCM` as an example here.
 
 
 .. image:: ../assets/where-to-put-dodal-logic.png
