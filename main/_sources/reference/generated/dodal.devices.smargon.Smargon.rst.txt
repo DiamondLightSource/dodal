@@ -24,6 +24,9 @@ dodal.devices.smargon.Smargon
       
       
       
+      ~Smargon.set
+      
+      
       
       
    
