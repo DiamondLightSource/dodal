@@ -3,10 +3,10 @@ import time
 import bluesky.plan_stubs as bps
 from bluesky import preprocessors as bpp
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import DetectorTrigger
+from ophyd_async.core import DetectorTrigger, StaticFilenameProvider, StaticPathProvider
 from ophyd_async.fastcs.eiger import EigerDetector, EigerTriggerInfo
 
-from dodal.beamlines.i03 import fastcs_eiger
+from dodal.beamlines.i03 import fastcs_eiger, set_path_provider
 from dodal.devices.detector import DetectorParams
 from dodal.log import LOGGER, do_default_logging_setup
 
@@ -40,7 +40,7 @@ def configure_arm_trigger_and_disarm_detector(
     yield from bps.kickoff(eiger, wait=True)
     LOGGER.info(f"Kickoff Eiger: {time.time() - start}s")
     start = time.time()
-    yield from bps.trigger(eiger.drv.detector.trigger)  # type: ignore
+    yield from bps.trigger(eiger.drv.detector.trigger, wait=True)  # type: ignore
     LOGGER.info(f"Triggering Eiger: {time.time() - start}s")
     start = time.time()
     yield from bps.complete(eiger, wait=True)
@@ -82,7 +82,7 @@ def change_roi_mode(
 
     yield from bps.abs_set(
         eiger.drv.detector.roi_mode,
-        1 if detector_params.use_roi_mode else 0,
+        "4M" if detector_params.use_roi_mode else "disabled",
         group=group,
     )
     yield from bps.abs_set(
@@ -140,6 +140,14 @@ def set_mx_settings_pvs(
 if __name__ == "__main__":
     RE = RunEngine()
     do_default_logging_setup()
+
+    path_provider = StaticPathProvider(
+        StaticFilenameProvider("eiger_test_file12.h5"),
+        "/dls/i03/data/2025/cm40607-2/test_new_eiger/",
+    )
+
+    set_path_provider(path_provider)
+
     eiger = fastcs_eiger(connect_immediately=True)
     RE(
         configure_arm_trigger_and_disarm_detector(
