@@ -608,7 +608,7 @@ class Apple2(abc.ABC, StandardReadable, Movable):
             for x in [top_outer, top_inner, btm_inner, btm_outer]
         ):
             LOGGER.info("Determined polarisation: LH (Linear Horizontal).")
-            return Pol.LH3, 0.0
+            return Pol.LH, 0.0
         if (
             motor_position_equal(top_outer, MAXIMUM_ROW_PHASE_MOTOR_POSITION)
             and motor_position_equal(top_inner, 0.0)
