@@ -469,7 +469,7 @@ class Apple2(StandardReadable, Movable):
         self.update_lookuptable()
 
     def set_pol_setpoint(self, pol: Pol) -> None:
-        # This set the polarisation but does not actually move hardware.
+        # This sets the polarisation but does not actually move hardware.
         self._polarisation_setpoint_set(pol)
 
     async def _set_pol(
