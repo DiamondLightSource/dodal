@@ -46,7 +46,7 @@ async def test_shutter_raises_error_on_set_if_hutch_not_interlocked(
 
 
 @pytest.mark.parametrize(
-    "demand, expected_calls, expected_state",
+    ("demand", "expected_calls", "expected_state"),
     [
         (
             ShutterDemand.OPEN,

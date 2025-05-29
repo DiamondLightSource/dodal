@@ -88,7 +88,7 @@ def test_given_a_device_when_check_and_cache_values_then_motor_values_returned(
 
 
 @pytest.mark.parametrize(
-    "initial, max, new_position",
+    ("initial", "max", "new_position"),
     [
         (200, 100, 0),
         (-200, 100, 0),
@@ -111,7 +111,7 @@ def test_given_a_device_with_a_too_large_move_when_check_and_cache_values_then_e
 
 
 @pytest.mark.parametrize(
-    "initial, min, new_position",
+    ("initial", "min", "new_position"),
     [
         (50, 5, 49),
         (48, 5, 49),
@@ -135,8 +135,8 @@ def test_given_a_device_where_one_move_too_small_when_check_and_cache_values_the
     cached_positions = motors_and_positions.values()
 
     assert len(cached_positions) == 1
-    assert list(motors_and_positions.keys())[0] == my_device.y
-    assert list(cached_positions)[0] == 200
+    assert next(iter(motors_and_positions.keys())) == my_device.y
+    assert next(iter(cached_positions)) == 200
 
 
 def test_given_a_device_where_all_moves_too_small_when_check_and_cache_values_then_no_positions_returned(
@@ -158,7 +158,7 @@ def test_given_a_device_where_all_moves_too_small_when_check_and_cache_values_th
 
 
 @pytest.mark.parametrize(
-    "initial_x, initial_y",
+    ("initial_x", "initial_y"),
     [
         (10, 20),
         (150, 40),
@@ -197,7 +197,7 @@ def test_when_home_and_reset_wrapper_called_with_null_plan_then_motors_homed_and
 
 
 @pytest.mark.parametrize(
-    "initial, min",
+    ("initial", "min"),
     [
         (1, 5),
         (-1, 5),
@@ -228,7 +228,7 @@ def test_given_motors_already_close_to_home_when_home_and_reset_wrapper_called_t
 
 
 @pytest.mark.parametrize(
-    "initial_x, initial_y, max, home",
+    ("initial_x", "initial_y", "max", "home"),
     [
         (1000, 2, 5, 0),
         (2, -1000, 5, 0),
@@ -271,7 +271,7 @@ def test_given_home_and_reset_inner_plan_fails_reset_still(RE, my_device):
 
     def my_plan():
         yield from bps.null()
-        raise MyException()
+        raise MyException
 
     patch_motor(my_device.x, initial_x)
     patch_motor(my_device.y, initial_y)

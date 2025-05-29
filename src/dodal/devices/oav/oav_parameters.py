@@ -1,5 +1,5 @@
 import json
-import xml.etree.ElementTree as et
+import xml.etree.ElementTree as ET
 from abc import abstractmethod
 from collections import ChainMap
 from dataclasses import dataclass
@@ -25,9 +25,7 @@ def _get_element_as_float(node: Element, element_name: str) -> float:
 
 
 class OAVParameters:
-    """
-    The parameters to set up the OAV depending on the context.
-    """
+    """The parameters to set up the OAV depending on the context."""
 
     def __init__(
         self,
@@ -45,8 +43,7 @@ class OAVParameters:
 
     @staticmethod
     def load_json(filename: str) -> tuple[dict[str, Any], dict[str, dict]]:
-        """
-        Loads the json from the specified file, and returns a dict with all the
+        """Loads the json from the specified file, and returns a dict with all the
         individual top-level k-v pairs, and one with all the subdicts.
         """
         with open(filename) as f:
@@ -67,8 +64,7 @@ class OAVParameters:
         def update(name, param_type, default=None):
             param = self.active_params.get(name, default)
             try:
-                param = param_type(param)
-                return param
+                return param_type(param)
             except AssertionError as e:
                 raise TypeError(
                     f"OAV param {name} from the OAV centring params json file has the "
@@ -99,9 +95,7 @@ class OAVParameters:
         self.max_tip_distance: float = update("max_tip_distance", float, default=300)
 
     def get_max_tip_distance_in_pixels(self, micronsPerPixel: float) -> float:
-        """
-        Get the maximum tip distance in pixels.
-        """
+        """Get the maximum tip distance in pixels."""
         return self.max_tip_distance / micronsPerPixel
 
 
@@ -123,7 +117,7 @@ class OAVConfigBase(Generic[ParamType]):
         self.zoom_params = self._get_zoom_params(zoom_params_file)
 
     def _get_zoom_params(self, zoom_params_file: str):
-        tree = et.parse(zoom_params_file)
+        tree = ET.parse(zoom_params_file)
         root = tree.getroot()
         return root.findall(".//zoomLevel")
 
@@ -166,8 +160,7 @@ class OAVConfigBeamCentre(OAVConfigBase[ZoomParamsCrosshair]):
 
     def _get_display_config(self, display_config_file: str):
         with open(display_config_file) as f:
-            file_lines = f.readlines()
-        return file_lines
+            return f.readlines()
 
     def _read_display_config(self) -> dict:
         crosshairs = {}

@@ -52,6 +52,7 @@ class OpticsBlueAPIDevice(StandardReadable, Movable[D]):
                         ...
                     }
                 }
+
         """
         # Value here vould be request params dictionary.
         request_params = json.dumps(value)

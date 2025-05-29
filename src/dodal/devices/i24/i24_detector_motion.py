@@ -3,7 +3,7 @@ from ophyd_async.epics.motor import Motor
 
 
 class DetectorMotion(StandardReadable):
-    """Physical motion for detector travel"""
+    """Physical motion for detector travel."""
 
     def __init__(self, prefix: str, name: str = "") -> None:
         self.y = Motor(prefix + "Y")  # Vertical

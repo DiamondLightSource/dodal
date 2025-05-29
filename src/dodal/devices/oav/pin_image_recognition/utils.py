@@ -94,9 +94,7 @@ NONE_VALUE: Final[int] = -1
 
 @dataclass
 class SampleLocation:
-    """
-    Holder type for results from sample detection.
-    """
+    """Holder type for results from sample detection."""
 
     tip_x: int | None
     tip_y: int | None
@@ -116,8 +114,7 @@ class MxSampleDetect:
         scan_direction: ScanDirections = ScanDirections.FORWARD,
         min_tip_height: int = 5,
     ):
-        """
-        Configures sample detection parameters.
+        """Configures sample detection parameters.
 
         Args:
             preprocess: A preprocessing function applied to the array after conversion to grayscale.
@@ -129,8 +126,8 @@ class MxSampleDetect:
             close_iterations: number of iterations for "close" operation
             scan_direction: ScanDirections.FORWARD for left-to-right, ScanDirections.REVERSE for right-to-left
             min_tip_height: minimum height of pin tip
-        """
 
+        """
         self.preprocess = preprocess
         self.canny_upper = canny_upper
         self.canny_lower = canny_lower
@@ -163,8 +160,7 @@ class MxSampleDetect:
     def _first_and_last_nonzero_by_columns(
         arr: np.ndarray,
     ) -> tuple[np.ndarray, np.ndarray]:
-        """
-        Finds the indexes of the first & last non-zero values by column in a 2d array.
+        """Finds the indexes of the first & last non-zero values by column in a 2d array.
 
         Outputs will contain NONE_VALUE if no non-zero values exist in a column.
 
@@ -224,7 +220,7 @@ class MxSampleDetect:
         # Move backwards to where there were no edges at all...
         while top[x] != NONE_VALUE:
             x += -self.scan_direction.value
-            if x == -1 or x == width:
+            if x in (-1, width):
                 # (In this case the sample is off the edge of the picture.)
                 LOGGER.warning(
                     "pin-tip detection: Pin tip may be outside image area - assuming at edge."
@@ -233,7 +229,7 @@ class MxSampleDetect:
         x += self.scan_direction.value  # ...and forward one step. x is now at the tip.
 
         tip_x = x
-        tip_y = int(round(0.5 * (top[x] + bottom[x])))
+        tip_y = round(0.5 * (top[x] + bottom[x]))
 
         # clear edges to the left (right) of the tip.
         if self.scan_direction.value == 1:

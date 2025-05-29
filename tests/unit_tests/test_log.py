@@ -23,13 +23,13 @@ from dodal.log import (
 )
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_logger():
     with patch("dodal.log.LOGGER") as mock_LOGGER:
         yield mock_LOGGER
 
 
-@pytest.fixture()
+@pytest.fixture
 def dodal_logger_for_tests():
     logger = logging.getLogger("Dodal")
     for handler in list(logger.handlers):
@@ -54,7 +54,7 @@ def test_handlers_set_at_correct_default_level(
     mock_file_handler.return_value.level = logging.INFO
     mock_GELFTCPHandler.return_value.level = logging.INFO
     mock_stream_handler.return_value.level = logging.DEBUG
-    handlers = set_up_all_logging_handlers(mock_logger, Path(""), "", True, 10000)
+    handlers = set_up_all_logging_handlers(mock_logger, Path(), "", True, 10000)
 
     for handler in handlers.values():
         mock_logger.addHandler.assert_any_call(handler)
@@ -200,7 +200,7 @@ def test_various_messages_to_graylog_get_beamline_filter(
 
 
 @pytest.mark.parametrize(
-    "num_info_messages,expected_messages_start_idx",
+    ("num_info_messages", "expected_messages_start_idx"),
     [(5, 0), (20, 11), (500, 491)],
 )
 def test_given_circular_memory_handler_with_varying_number_of_messages_when_record_of_correct_level_comes_in_then_flushed_with_expected_messages(

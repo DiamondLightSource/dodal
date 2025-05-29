@@ -20,13 +20,13 @@ def goniometer(RE: RunEngine) -> Goniometer:
 
 
 @pytest.mark.parametrize(
-    "vertical_set_value, omega_set_value, expected_horz, expected_vert",
+    ("vertical_set_value", "omega_set_value", "expected_horz", "expected_vert"),
     [
-        [2, 60, 1, math.sqrt(3)],
-        [-10, 390, -5 * math.sqrt(3), -5],
-        [0.5, -135, -math.sqrt(2) / 4, -math.sqrt(2) / 4],
-        [1, 0, 1, 0],
-        [-1.5, 90, 0, -1.5],
+        (2, 60, 1, math.sqrt(3)),
+        (-10, 390, -5 * math.sqrt(3), -5),
+        (0.5, -135, -math.sqrt(2) / 4, -math.sqrt(2) / 4),
+        (1, 0, 1, 0),
+        (-1.5, 90, 0, -1.5),
     ],
 )
 async def test_vertical_signal_set(

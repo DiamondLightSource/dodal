@@ -1,3 +1,4 @@
+import contextlib
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
@@ -17,10 +18,8 @@ class StatusException(Exception):
 
 
 def discard_status(status: Status):
-    try:
+    with contextlib.suppress(BaseException):
         status.wait(0.1)
-    except BaseException:
-        pass
 
 
 def reset_logs():

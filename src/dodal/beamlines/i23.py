@@ -51,18 +51,16 @@ class I23DetectorPositions(StrictEnum):
 
 
 def _is_i23_machine():
-    """
-    Devices using PVA can only connect from i23 machines, due to the absence of
+    """Devices using PVA can only connect from i23 machines, due to the absence of
     PVA gateways at present.
     """
     hostname = get_hostname()
-    return hostname.startswith("i23-ws") or hostname.startswith("i23-control")
+    return hostname.startswith(("i23-ws", "i23-control"))
 
 
 @device_factory(skip=lambda: not _is_i23_machine())
 def oav_pin_tip_detection() -> PinTipDetection:
     """Get the i23 OAV pin-tip detection device."""
-
     return PinTipDetection(
         f"{PREFIX.beamline_prefix}-DI-OAV-01:",
         "pin_tip_detection",
@@ -77,13 +75,13 @@ def shutter() -> ZebraShutter:
 
 @device_factory()
 def gonio() -> SixAxisGonio:
-    """Get the i23 goniometer"""
+    """Get the i23 goniometer."""
     return SixAxisGonio(f"{PREFIX.beamline_prefix}-MO-GONIO-01:")
 
 
 @device_factory()
 def zebra() -> Zebra:
-    """Get the i23 zebra"""
+    """Get the i23 zebra."""
     return Zebra(
         name="zebra",
         prefix=f"{PREFIX.beamline_prefix}-EA-ZEBRA-01:ZEBRA:",
@@ -93,7 +91,7 @@ def zebra() -> Zebra:
 
 @device_factory()
 def pilatus() -> PilatusDetector:
-    """Get the i23 pilatus"""
+    """Get the i23 pilatus."""
     return PilatusDetector(
         prefix=f"{PREFIX.beamline_prefix}-EA-PILAT-01:",
         path_provider=get_path_provider(),
@@ -104,7 +102,7 @@ def pilatus() -> PilatusDetector:
 
 @device_factory()
 def detector_motion() -> Positioner1D[I23DetectorPositions]:
-    """Get the i23 detector"""
+    """Get the i23 detector."""
     return Positioner1D[I23DetectorPositions](
         f"{PREFIX.beamline_prefix}-EA-DET-01:Z",
         datatype=I23DetectorPositions,

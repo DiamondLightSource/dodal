@@ -252,10 +252,10 @@ def test_mirror_populates_voltage_channels(RE):
 
 
 @pytest.mark.parametrize(
-    "energy_kev, expected_config",
+    ("energy_kev", "expected_config"),
     [
-        [1, {"stripe": MirrorStripe.BARE, "yaw_mrad": 6.2, "lat_mm": 0.0}],
-        [14, {"stripe": MirrorStripe.RHODIUM, "yaw_mrad": 0.0, "lat_mm": 10.0}],
+        (1, {"stripe": MirrorStripe.BARE, "yaw_mrad": 6.2, "lat_mm": 0.0}),
+        (14, {"stripe": MirrorStripe.RHODIUM, "yaw_mrad": 0.0, "lat_mm": 10.0}),
     ],
 )
 async def test_given_striped_focussing_mirror_then_energy_to_stripe_returns_expected(

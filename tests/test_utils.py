@@ -30,18 +30,17 @@ from dodal.utils import (
 MOCK_DAQ_CONFIG_PATH = "tests/devices/unit_tests/test_daq_configuration"
 
 
-@pytest.fixture()
+@pytest.fixture
 def alternate_config(tmp_path) -> str:
-    """
-    Alternate config dir as MOCK_DAQ_CONFIG_PATH replaces i03.DAQ_CONFIGURATION_PATH
-    in conftest.py
+    """Alternate config dir as MOCK_DAQ_CONFIG_PATH replaces i03.DAQ_CONFIGURATION_PATH
+    in conftest.py.
     """
     alt_config_path = tmp_path / "alt_daq_configuration"
     copytree(MOCK_DAQ_CONFIG_PATH, alt_config_path)
     return str(alt_config_path)
 
 
-@pytest.fixture()
+@pytest.fixture
 def fake_device_factory_beamline():
     import tests.fake_device_factory_beamline as beamline
 
@@ -56,7 +55,7 @@ def fake_device_factory_beamline():
 
 
 def test_finds_device_factories() -> None:
-    import tests.fake_beamline as fake_beamline
+    from tests import fake_beamline
 
     factories = collect_factories(fake_beamline)
 
@@ -78,7 +77,7 @@ def test_finds_device_factories() -> None:
 
 
 def test_makes_devices() -> None:
-    import tests.fake_beamline as fake_beamline
+    from tests import fake_beamline
 
     devices, exceptions = make_all_devices(fake_beamline)
     assert {
@@ -87,21 +86,24 @@ def test_makes_devices() -> None:
         "cryo",
         "diamond_filter",
         "ophyd_v2_device",
-    } == devices.keys() and len(exceptions) == 0
+    } == devices.keys()
+    assert len(exceptions) == 0
 
 
 def test_makes_devices_with_dependencies() -> None:
     import tests.fake_beamline_dependencies as fake_beamline
 
     devices, exceptions = make_all_devices(fake_beamline)
-    assert {"readable", "motor", "cryo"} == devices.keys() and len(exceptions) == 0
+    assert {"readable", "motor", "cryo"} == devices.keys()
+    assert len(exceptions) == 0
 
 
 def test_makes_devices_with_disordered_dependencies() -> None:
     import tests.fake_beamline_disordered_dependencies as fake_beamline
 
     devices, exceptions = make_all_devices(fake_beamline)
-    assert {"readable", "motor", "cryo"} == devices.keys() and len(exceptions) == 0
+    assert {"readable", "motor", "cryo"} == devices.keys()
+    assert len(exceptions) == 0
 
 
 def test_makes_devices_with_module_name() -> None:
@@ -112,7 +114,8 @@ def test_makes_devices_with_module_name() -> None:
         "cryo",
         "diamond_filter",
         "ophyd_v2_device",
-    } == devices.keys() and len(exceptions) == 0
+    } == devices.keys()
+    assert len(exceptions) == 0
 
 
 def test_get_hostname() -> None:
@@ -134,7 +137,8 @@ def test_no_devices_when_all_factories_raise_exceptions() -> None:
 
     devices, exceptions = make_all_devices(fake_beamline)
     assert len(devices) == 0
-    assert len(exceptions) == 3 and all(
+    assert len(exceptions) == 3
+    assert all(
         isinstance(e, Exception) for e in exceptions.values()
     )
 
@@ -144,7 +148,8 @@ def test_some_devices_when_some_factories_raise_exceptions() -> None:
 
     devices, exceptions = make_all_devices(fake_beamline)
     assert len(devices) == 2
-    assert len(exceptions) == 1 and all(
+    assert len(exceptions) == 1
+    assert all(
         isinstance(e, Exception) for e in exceptions.values()
     )
 
@@ -320,7 +325,7 @@ def test_invalid_beamline_variable_causes_get_device_module_to_raise(bl):
         get_beamline_based_on_environment_variable()
 
 
-@pytest.mark.parametrize("bl,module", [("i03", i03), ("i23", i23)])
+@pytest.mark.parametrize(("bl", "module"), [("i03", i03), ("i23", i23)])
 def test_valid_beamline_variable_causes_get_device_module_to_return_module(bl, module):
     with patch.dict(os.environ, {"BEAMLINE": bl}):
         assert get_beamline_based_on_environment_variable() == module
@@ -455,7 +460,7 @@ def _filtering_test_cases() -> Iterable[
 
 
 @pytest.mark.parametrize(
-    "all_devices,expected_ophyd_devices,expected_ophyd_async_devices",
+    ("all_devices", "expected_ophyd_devices", "expected_ophyd_async_devices"),
     list(_filtering_test_cases()),
 )
 def test_filter_ophyd_devices_filters_ophyd_devices(
@@ -480,14 +485,14 @@ def test_filter_ophyd_devices_raises_for_extra_types():
 
 
 @pytest.mark.parametrize(
-    "input, expected_result",
+    ("input", "expected_result"),
     [
-        [Readable, False],
-        [OphydV1Device, False],
-        [OphydV2Device, True],
-        [DiamondFilter[I03Filters], True],
-        [None, False],
-        [1, False],
+        (Readable, False),
+        (OphydV1Device, False),
+        (OphydV2Device, True),
+        (DiamondFilter[I03Filters], True),
+        (None, False),
+        (1, False),
     ],
 )
 def test_is_v2_device_type(input: Any, expected_result: bool):

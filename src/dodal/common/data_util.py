@@ -15,8 +15,7 @@ def load_json_file_to_class(
 
     with open(file) as f:
         json_obj = f.read()
-    cls = t.model_validate_json(json_obj)
-    return cls
+    return t.model_validate_json(json_obj)
 
 
 def save_class_to_json_file(model: BaseModel, file: str) -> None:

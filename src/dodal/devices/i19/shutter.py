@@ -7,7 +7,7 @@ from dodal.devices.i19.hutch_access import ACCESS_DEVICE_NAME
 
 
 class AccessControlledShutter(OpticsBlueAPIDevice):
-    """ I19-specific device to operate the hutch shutter.
+    """I19-specific device to operate the hutch shutter.
 
     This device will send a REST call to the blueapi instance controlling the optics \
     hutch running on the I19 cluster, which will evaluate the current hutch in use vs \

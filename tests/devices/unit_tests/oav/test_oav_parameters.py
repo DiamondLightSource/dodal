@@ -56,7 +56,7 @@ def test_given_key_in_context_and_default_when_load_parameters_then_value_found_
 
 
 @pytest.mark.parametrize(
-    "zoom_level, expected_microns, expected_crosshair",
+    ("zoom_level", "expected_microns", "expected_crosshair"),
     [
         ("2.5", (2.31, 2.31), (493, 355)),
         ("10.0", (0.438, 0.438), (613, 344)),
@@ -74,7 +74,7 @@ def test_oav_config_with_beam_centre(
 
 
 @pytest.mark.parametrize(
-    "zoom_level, expected_microns",
+    ("zoom_level", "expected_microns"),
     [
         ("2.5", (2.31, 2.31)),
         ("10.0", (0.438, 0.438)),

@@ -37,10 +37,9 @@ def _get_correct_zoom_string(zoom: str) -> str:
 
 
 class ZoomController(StandardReadable, Movable[str]):
-    """
-    Device to control the zoom level. This should be set like
+    """Device to control the zoom level. This should be set like
         o = OAV(name="oav")
-        oav.zoom_controller.set("1.0x")
+        oav.zoom_controller.set("1.0x").
 
     Note that changing the zoom may change the AD wiring on the associated OAV, as such
     you should wait on any zoom changs to finish before changing the OAV wiring.
@@ -142,7 +141,8 @@ class OAVBeamCentreFile(OAV):
 
     def _get_beam_position(self, zoom_level: str, size: int, coord: int) -> int:
         """Extracts the beam location in pixels `xCentre` `yCentre`, for a requested \
-        zoom level. """
+        zoom level.
+        """
         _zoom = self._read_current_zoom(zoom_level)
         value = self.parameters[_zoom].crosshair[coord]
         return int(value * size / DEFAULT_OAV_WINDOW[coord])

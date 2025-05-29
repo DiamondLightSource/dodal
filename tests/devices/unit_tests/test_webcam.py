@@ -22,7 +22,7 @@ async def test_given_last_saved_path_when_device_read_then_returns_path(webcam: 
 
 
 @pytest.mark.parametrize(
-    "directory, filename, expected_path",
+    ("directory", "filename", "expected_path"),
     [
         ("/tmp", "test", "/tmp/test.png"),
         ("/tmp/", "other", "/tmp/other.png"),

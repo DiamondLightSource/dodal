@@ -20,7 +20,7 @@ async def sim_sampleAngleStage():
             "p99-MO-TABLE-01:", name="sim_sampleAngleStage"
         )
         # Signals connected here
-    yield sim_sampleAngleStage
+    return sim_sampleAngleStage
 
 
 @pytest.fixture
@@ -30,7 +30,7 @@ async def sim_filter_wheel():
             "p99-MO-TABLE-01:",
             P99FilterSelections,
         )
-    yield sim_filter_wheel
+    return sim_filter_wheel
 
 
 async def test_sampleAngleStage(sim_sampleAngleStage: SampleAngleStage) -> None:

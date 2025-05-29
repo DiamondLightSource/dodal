@@ -24,8 +24,7 @@ _CONVERSION_CONSTANT = 12.3984
 
 
 class DCM(BaseDCM[RollCrystal, PitchAndRollCrystal]):
-    """
-    A double crystal monochromator (DCM), used to select the energy of the beam.
+    """A double crystal monochromator (DCM), used to select the energy of the beam.
 
     perp describes the gap between the 2 DCM crystals which has to change as you alter
     the angle to select the requested energy.
@@ -108,10 +107,7 @@ class DCM(BaseDCM[RollCrystal, PitchAndRollCrystal]):
     async def read(self) -> dict[str, Reading]:
         default_reading = await super().read()
         energy: float = default_reading[f"{self.name}-energy_in_kev"]["value"]
-        if energy > 0.0:
-            wavelength = _CONVERSION_CONSTANT / energy
-        else:
-            wavelength = 0.0
+        wavelength = _CONVERSION_CONSTANT / energy if energy > 0.0 else 0.0
 
         return {
             **default_reading,

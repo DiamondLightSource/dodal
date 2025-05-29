@@ -1,5 +1,4 @@
-"""
-All the methods in this module return a bluesky plan generator that adjusts a value
+"""All the methods in this module return a bluesky plan generator that adjusts a value
 according to some criteria either via feedback, preset positions, lookup tables etc.
 """
 
@@ -15,7 +14,7 @@ from dodal.log import LOGGER
 def lookup_table_adjuster(
     lookup_table: Callable[[float], float], output_device: Motor, input
 ):
-    """Returns a callable that adjusts a value according to a lookup table"""
+    """Returns a callable that adjusts a value according to a lookup table."""
 
     def adjust(group=None) -> Generator[Msg, None, None]:
         setpoint = lookup_table(input)

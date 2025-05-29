@@ -23,4 +23,4 @@ class SpecsRegion(AbstractBaseRegion):
 
 
 class SpecsSequence(AbstractBaseSequence[SpecsRegion]):
-    regions: list[SpecsRegion] = Field(default_factory=lambda: [])
+    regions: list[SpecsRegion] = Field(default_factory=list)

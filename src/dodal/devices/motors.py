@@ -3,9 +3,7 @@ from ophyd_async.epics.motor import Motor
 
 
 class XYZPositioner(StandardReadable):
-    """
-
-    Standard ophyd_async xyz motor stage, by combining 3 Motors,
+    """Standard ophyd_async xyz motor stage, by combining 3 Motors,
     with added infix for extra flexibliy to allow different axes other than x,y,z.
 
     Parameters
@@ -16,6 +14,7 @@ class XYZPositioner(StandardReadable):
         name for the stage.
     infix:
         EPICS PV, default is the ("X", "Y", "Z").
+
     Notes
     -----
     Example usage::

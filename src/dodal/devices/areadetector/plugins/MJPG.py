@@ -46,7 +46,7 @@ class MJPG(StandardReadable, Triggerable, ABC):
     async def _save_image(self, image: Image.Image):
         """A helper function to save a given image to the path supplied by the \
             directory and filename signals. The full resultant path is put on the \
-            last_saved_path signal
+            last_saved_path signal.
         """
         filename_str = await self.filename.get_value()
         directory_str = await self.directory.get_value()

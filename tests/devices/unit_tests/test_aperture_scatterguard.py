@@ -132,7 +132,7 @@ async def aperture_in_medium_pos_w_call_log(
 
     set_mock_value(ap_sg.aperture.medium, 1)
 
-    yield ap_sg, call_log
+    return ap_sg, call_log
 
 
 @pytest.fixture
@@ -276,7 +276,7 @@ def set_underlying_motors(ap_sg: ApertureScatterguard, position: AperturePositio
 
 
 @pytest.mark.parametrize(
-    "read_pv, aperture",
+    ("read_pv", "aperture"),
     [
         ("large", ApertureValue.LARGE),
         ("medium", ApertureValue.MEDIUM),

@@ -15,8 +15,7 @@ Functionality required for/from the API of a DirectoryService which exposes the 
 
 
 class DataCollectionIdentifier(BaseModel):
-    """
-    Equivalent to a `Scan Number` or `scan_id`, non-globally unique scan identifier.
+    """Equivalent to a `Scan Number` or `scan_id`, non-globally unique scan identifier.
     Should be always incrementing, unique per-visit, co-ordinated with any other scan engines.
     """
 
@@ -24,17 +23,15 @@ class DataCollectionIdentifier(BaseModel):
 
 
 class DirectoryServiceClient(ABC):
-    """
-    Object responsible for I/O in determining collection number
-    """
+    """Object responsible for I/O in determining collection number."""
 
     @abstractmethod
     async def create_new_collection(self) -> DataCollectionIdentifier:
-        """Create new collection"""
+        """Create new collection."""
 
     @abstractmethod
     async def get_current_collection(self) -> DataCollectionIdentifier:
-        """Get current collection"""
+        """Get current collection."""
 
 
 class DiamondFilenameProvider(FilenameProvider):
@@ -52,7 +49,7 @@ class DiamondFilenameProvider(FilenameProvider):
 class RemoteDirectoryServiceClient(DirectoryServiceClient):
     """Client for the VisitService REST API
     Currently exposed by the GDA Server to co-ordinate unique filenames.
-    While VisitService is embedded in GDA, url is likely to be `ixx-control:8088/api`
+    While VisitService is embedded in GDA, url is likely to be `ixx-control:8088/api`.
     """
 
     def __init__(self, url: str) -> None:
@@ -98,13 +95,12 @@ class LocalDirectoryServiceClient(DirectoryServiceClient):
 
 
 class StaticVisitPathProvider(UpdatingPathProvider):
-    """
-    Static (single visit) implementation of PathProvider whilst awaiting auth infrastructure to generate necessary information per-scan.
+    """Static (single visit) implementation of PathProvider whilst awaiting auth infrastructure to generate necessary information per-scan.
     Allows setting a singular visit into which all run files will be saved.
     update() queries a visit service to get the next DataCollectionIdentifier to increment the suffix of all file writers' next files.
     Requires that all detectors are running with a mutual view on the filesystem.
     Supports a single Visit which should be passed as a Path relative to the root of the Detector IOC mounting.
-    i.e. to write to visit /dls/ixx/data/YYYY/cm12345-1
+    i.e. to write to visit /dls/ixx/data/YYYY/cm12345-1.
     """
 
     def __init__(
@@ -123,9 +119,7 @@ class StaticVisitPathProvider(UpdatingPathProvider):
         self._session: ClientSession | None
 
     async def update(self, **kwargs) -> None:
-        """
-        Creates a new data collection in the current visit.
-        """
+        """Creates a new data collection in the current visit."""
         # https://github.com/DiamondLightSource/dodal/issues/452
         # TODO: Allow selecting visit as part of a request
         # TODO: DAQ-4827: Pass AuthN information as part of request

@@ -117,7 +117,7 @@ async def test_length_not_propagated_if_not_supplied():
 
 
 @pytest.mark.parametrize(
-    "energy, expected_output",
+    ("energy", "expected_output"),
     [(0, 10), (5, 55), (20, 160), (36, 100), (39, 250)],
 )
 def test_correct_closest_distance_to_energy_from_table(energy, expected_output):

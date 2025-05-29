@@ -12,8 +12,7 @@ from dodal.common.beamlines.beamline_parameters import GDABeamlineParameters
 
 
 class BeamstopPositions(StrictEnum):
-    """
-    Beamstop positions.
+    """Beamstop positions.
     GDA supports Standard/High/Low resolution positions, as well as parked and
     robot load however all 3 resolution positions are the same. We also
     do not use the robot load position in Hyperion.
@@ -28,6 +27,7 @@ class BeamstopPositions(StrictEnum):
         DATA_COLLECTION: The beamstop is in beam ready for data collection
         UNKNOWN: The beamstop is in some other position, check the device motor
             positions to determine it.
+
     """
 
     DATA_COLLECTION = "Data Collection"
@@ -35,14 +35,14 @@ class BeamstopPositions(StrictEnum):
 
 
 class Beamstop(StandardReadable):
-    """
-    Beamstop for I03 and I04.
+    """Beamstop for I03 and I04.
 
     Attributes:
         x: beamstop x position in mm
         y: beamstop y position in mm
         z: beamstop z position in mm
         selected_pos: Get or set the current position of the beamstop as an enum.
+
     """
 
     def __init__(

@@ -25,9 +25,11 @@ def test_bottom_right_from_top_left():
     bottom_right = bottom_right_from_top_left(
         top_left, 20, 30, 0.1, 0.15, 2.7027, 2.7027
     )
-    assert bottom_right[0] == 863 and bottom_right[1] == 1788
+    assert bottom_right[0] == 863
+    assert bottom_right[1] == 1788
     bottom_right = bottom_right_from_top_left(top_left, 15, 20, 0.005, 0.007, 1, 1)
-    assert bottom_right[0] == 198 and bottom_right[1] == 263
+    assert bottom_right[0] == 198
+    assert bottom_right[1] == 263
 
 
 @pytest.fixture
@@ -42,7 +44,7 @@ async def smargon(RE: RunEngine):
 
 
 @pytest.mark.parametrize(
-    "h, v, expected_x, expected_y",
+    ("h", "v", "expected_x", "expected_y"),
     [
         (54, 100, 517 - 54, 350 - 100),
         (0, 0, 517, 350),
@@ -61,7 +63,7 @@ def test_calculate_beam_distance(h, v, expected_x, expected_y, oav: OAV):
 
 
 @pytest.mark.parametrize(
-    "zoom_level, angle, pixel_to_move_to, expected_xyz",
+    ("zoom_level", "angle", "pixel_to_move_to", "expected_xyz"),
     [
         # Different zoom levels -> different um_per_pix and beam_centre
         ("5.0x", 0, (100, 190), (-0.659, -0.253, 0)),

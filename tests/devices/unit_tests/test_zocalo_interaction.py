@@ -74,7 +74,7 @@ zc = ZocaloTrigger(environment=SIM_ZOCALO_ENV)
 
 
 @mark.parametrize(
-    "function_wrapper,expected_message",
+    ("function_wrapper", "expected_message"),
     [
         (normally, EXPECTED_RUN_START_MESSAGE),
         (
@@ -84,10 +84,10 @@ zc = ZocaloTrigger(environment=SIM_ZOCALO_ENV)
     ],
 )
 def test_run_start(function_wrapper: Callable, expected_message: dict):
-    """
-    Args:
-        function_wrapper (Callable): A wrapper used to test for expected exceptions
-        expected_message (Dict): The expected dictionary sent to zocalo
+    """Args:
+    function_wrapper (Callable): A wrapper used to test for expected exceptions
+    expected_message (Dict): The expected dictionary sent to zocalo.
+
     """
     data = ZocaloStartInfo(EXPECTED_DCID, EXPECTED_FILENAME, 0, 100, 0)
     function_to_run = partial(zc.run_start, data)
@@ -96,17 +96,17 @@ def test_run_start(function_wrapper: Callable, expected_message: dict):
 
 
 @mark.parametrize(
-    "function_wrapper,expected_message",
+    ("function_wrapper", "expected_message"),
     [
         (normally, EXPECTED_RUN_END_MESSAGE),
         (with_exception, EXPECTED_RUN_END_MESSAGE),
     ],
 )
 def test__run_start_and_end(function_wrapper: Callable, expected_message: dict):
-    """
-    Args:
-        function_wrapper (Callable): A wrapper used to test for expected exceptions
-        expected_message (Dict): The expected dictionary sent to zocalo
+    """Args:
+    function_wrapper (Callable): A wrapper used to test for expected exceptions
+    expected_message (Dict): The expected dictionary sent to zocalo.
+
     """
     function_to_run = partial(zc.run_end, EXPECTED_DCID)
     function_to_run = partial(function_wrapper, function_to_run)

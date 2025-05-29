@@ -143,7 +143,7 @@ async def mock_linear_arbitrary_angle(
 
 
 @pytest.mark.parametrize(
-    "pol, top_outer_phase,top_inner_phase,btm_inner_phase, btm_outer_phase",
+    ("pol", "top_outer_phase", "top_inner_phase", "btm_inner_phase", "btm_outer_phase"),
     [
         ("lh", 0, 0, 0, 0),
         ("lv", 24.0, 0, 24.0, 0),
@@ -301,7 +301,7 @@ async def test_I10Apple2_pgm_RE_scan(mock_id_pgm: I10Apple2PGM, RE: RunEngine):
 
 
 @pytest.mark.parametrize(
-    "pol,energy, expect_top_outer, expect_top_inner, expect_btm_inner,expect_btm_outer, expect_gap",
+    ("pol", "energy", "expect_top_outer", "expect_top_inner", "expect_btm_inner", "expect_btm_outer", "expect_gap"),
     [
         ("lh", 500, 0.0, 0.0, 0.0, 0.0, 23.0),
         ("lh", 700, 0.0, 0.0, 0.0, 0.0, 26.0),
@@ -393,7 +393,7 @@ async def test_linear_arbitrary_limit_fail(
 
 
 @pytest.mark.parametrize(
-    "start, stop, num_point",
+    ("start", "stop", "num_point"),
     [
         (0, 180, 11),
         (-20, 170, 31),
@@ -448,7 +448,7 @@ async def test_linear_arbitrary_RE_scan(
 
 
 @pytest.mark.parametrize(
-    "fileName, expected_dict_file_name, source",
+    ("fileName", "expected_dict_file_name", "source"),
     [
         (
             ID_GAP_LOOKUP_TABLE,

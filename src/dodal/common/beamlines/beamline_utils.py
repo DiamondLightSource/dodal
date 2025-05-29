@@ -101,6 +101,7 @@ def device_instantiation(
         bl_prefix: bool             if true, add the beamline prefix when instantiating
     Returns:
         The instance of the device.
+
     """
     already_existing_device: AnyDevice | None = ACTIVE_DEVICES.get(name)
     if fake:

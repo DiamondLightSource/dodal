@@ -48,8 +48,7 @@ def spec_scan(
 
 
 def _as_cycler(spec: Spec[Movable]) -> Cycler:
-    """
-    Convert a scanspec to a cycler for compatibility with legacy Bluesky plans such as
+    """Convert a scanspec to a cycler for compatibility with legacy Bluesky plans such as
     `bp.scan_nd`. Use the midpoints of the scanspec since cyclers are normally used
     for software triggered scans.
 
@@ -58,8 +57,8 @@ def _as_cycler(spec: Spec[Movable]) -> Cycler:
 
     Returns:
         Cycler: A new cycler
-    """
 
+    """
     midpoints = spec.frames().midpoints
     # Need to "add" the cyclers for all the axes together. The code below is
     # effectively: cycler(motor1, [...]) + cycler(motor2, [...]) + ...

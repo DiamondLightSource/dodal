@@ -20,14 +20,14 @@ def beamline_parameters() -> GDABeamlineParameters:
 
 
 @pytest.mark.parametrize(
-    "x, y, z, expected_pos",
+    ("x", "y", "z", "expected_pos"),
     [
-        [0, 0, 0, BeamstopPositions.UNKNOWN],
-        [1.52, 44.78, 30.0, BeamstopPositions.DATA_COLLECTION],
-        [1.501, 44.776, 29.71, BeamstopPositions.DATA_COLLECTION],
-        [1.499, 44.776, 29.71, BeamstopPositions.UNKNOWN],
-        [1.501, 44.774, 29.71, BeamstopPositions.UNKNOWN],
-        [1.501, 44.776, 29.69, BeamstopPositions.UNKNOWN],
+        (0, 0, 0, BeamstopPositions.UNKNOWN),
+        (1.52, 44.78, 30.0, BeamstopPositions.DATA_COLLECTION),
+        (1.501, 44.776, 29.71, BeamstopPositions.DATA_COLLECTION),
+        (1.499, 44.776, 29.71, BeamstopPositions.UNKNOWN),
+        (1.501, 44.774, 29.71, BeamstopPositions.UNKNOWN),
+        (1.501, 44.776, 29.69, BeamstopPositions.UNKNOWN),
     ],
 )
 async def test_beamstop_pos_select(

@@ -12,8 +12,7 @@ ENERGY_TIMEOUT_S: float = 30.0
 
 
 class UndulatorDCM(StandardReadable, Movable[float]):
-    """
-    Composite device to handle changing beamline energies, wraps the Undulator and the
+    """Composite device to handle changing beamline energies, wraps the Undulator and the
     DCM. The DCM has a motor which controls the beam energy, when it moves, the
     Undulator gap may also have to change to enable emission at the new energy.
     The relationship between the two motor motor positions is provided via a lookup

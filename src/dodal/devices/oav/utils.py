@@ -40,9 +40,7 @@ def bottom_right_from_top_left(
 
 
 class EdgeOutputArrayImageType(IntEnum):
-    """
-    Enum to store the types of image to tweak the output array. We use Original.
-    """
+    """Enum to store the types of image to tweak the output array. We use Original."""
 
     ORIGINAL = 0
     GREYSCALE = 1
@@ -55,7 +53,6 @@ def get_move_required_so_that_beam_is_at_pixel(
     smargon: Smargon, pixel: Pixel, oav: OAV
 ) -> Generator[Msg, None, np.ndarray]:
     """Calculate the required move so that the given pixel is in the centre of the beam."""
-
     current_motor_xyz = np.array(
         [
             (yield from bps.rd(smargon.x)),
@@ -87,7 +84,7 @@ def calculate_x_y_z_of_pixel(
     beam_centre: tuple[int, int],
     microns_per_pixel: tuple[float, float],
 ) -> np.ndarray:
-    """Get the x, y, z position of a pixel in mm"""
+    """Get the x, y, z position of a pixel in mm."""
     beam_distance_px: Pixel = calculate_beam_distance(beam_centre, *pixel)
 
     return current_x_y_z + camera_coordinates_to_xyz_mm(

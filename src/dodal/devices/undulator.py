@@ -47,8 +47,7 @@ def _get_gap_for_energy(
 
 
 class Undulator(StandardReadable, Movable[float]):
-    """
-    An Undulator-type insertion device, used to control photon emission at a given
+    """An Undulator-type insertion device, used to control photon emission at a given
     beam energy.
     """
 
@@ -60,15 +59,15 @@ class Undulator(StandardReadable, Movable[float]):
         poles: int | None = None,
         length: float | None = None,
     ) -> None:
-        """Constructor
+        """Constructor.
 
         Args:
             prefix: PV prefix
             poles (int): Number of magnetic poles built into the undulator
             length (float): Length of the undulator in meters
             name (str, optional): Name for device. Defaults to "".
-        """
 
+        """
         self.id_gap_lookup_table_path = id_gap_lookup_table_path
         with self.add_children_as_readables():
             self.gap_motor = Motor(prefix + "BLGAPMTR")
@@ -100,11 +99,11 @@ class Undulator(StandardReadable, Movable[float]):
 
     @AsyncStatus.wrap
     async def set(self, value: float):
-        """
-        Set the undulator gap to a given energy in keV
+        """Set the undulator gap to a given energy in keV.
 
         Args:
             value: energy in keV
+
         """
         await self._set_undulator_gap(value)
 
@@ -145,9 +144,8 @@ class Undulator(StandardReadable, Movable[float]):
             )
 
     async def _get_gap_to_match_energy(self, energy_kev: float) -> float:
-        """
-        get a 2d np.array from lookup table that
-        converts energies to undulator gap distance
+        """Get a 2d np.array from lookup table that
+        converts energies to undulator gap distance.
         """
         energy_to_distance_table: np.ndarray = await energy_distance_table(
             self.id_gap_lookup_table_path

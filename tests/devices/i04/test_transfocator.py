@@ -61,7 +61,8 @@ async def test_when_beamsize_set_then_set_correctly_on_device_and_waited_on(
     )
 
     await set_status
-    assert set_status.done and set_status.success
+    assert set_status.done
+    assert set_status.success
 
 
 async def test_if_timeout_exceeded_and_start_rbv_not_equal_to_set_value_then_timeout_exception(

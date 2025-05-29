@@ -28,7 +28,7 @@ def saxs(static_path_provider: PathProvider, RE) -> PilatusDetector:
 
 async def test_config_data_present(saxs: PilatusDetector):
     dc = await saxs.describe_configuration()
-    for config_field in {"x_pixel_size", "y_pixel_size", "distance"}:
+    for config_field in ("x_pixel_size", "y_pixel_size", "distance"):
         config = dc[f"{saxs.name}-{config_field}"]
         assert config["units"] is not None  # type: ignore
         assert config["shape"] == []

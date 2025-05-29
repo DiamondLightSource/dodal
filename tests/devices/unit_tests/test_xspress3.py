@@ -59,7 +59,7 @@ async def test_stage_in_RE_success_in_busy_state(
         TriggerMode.BURST, wait=ANY
     )
     await asyncio.sleep(0.2)
-    assert 2 == get_mock_put(mock_xspress3mini.acquire).call_count
+    assert get_mock_put(mock_xspress3mini.acquire).call_count == 2
 
 
 async def test_stage_fail_on_detector_not_busy_state(
@@ -73,9 +73,9 @@ async def test_stage_fail_on_detector_not_busy_state(
     with pytest.raises(FailedStatus):
         RE(bps.stage(mock_xspress3mini, wait=True))
     await asyncio.sleep(0.2)
-    assert 2 == get_mock_put(mock_xspress3mini.trigger_mode).call_count
+    assert get_mock_put(mock_xspress3mini.trigger_mode).call_count == 2
     # unstage is call even when staging failed
-    assert 1 == get_mock_put(mock_xspress3mini.acquire).call_count
+    assert get_mock_put(mock_xspress3mini.acquire).call_count == 1
 
 
 async def test_stage_fail_to_acquire_timeout(
@@ -89,5 +89,5 @@ async def test_stage_fail_to_acquire_timeout(
     with pytest.raises(FailedStatus):
         RE(bps.stage(mock_xspress3mini, wait=True))
     await asyncio.sleep(0.2)
-    assert 2 == get_mock_put(mock_xspress3mini.trigger_mode).call_count
-    assert 3 == get_mock_put(mock_xspress3mini.acquire).call_count
+    assert get_mock_put(mock_xspress3mini.trigger_mode).call_count == 2
+    assert get_mock_put(mock_xspress3mini.acquire).call_count == 3

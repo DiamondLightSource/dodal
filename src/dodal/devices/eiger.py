@@ -242,10 +242,9 @@ class EigerDetector(Device, Stageable):
 
     def set_odin_number_of_frame_chunks(self) -> Status:
         assert self.detector_params is not None
-        status = self.odin.file_writer.num_frames_chunks.set(
+        return self.odin.file_writer.num_frames_chunks.set(
             1, timeout=self.timeouts.general_status_timeout
         )
-        return status
 
     def set_odin_pvs(self) -> StatusBase:
         assert self.detector_params is not None
@@ -296,12 +295,13 @@ class EigerDetector(Device, Stageable):
     def set_detector_threshold(self, energy: float, tolerance: float = 0.1) -> Status:
         """Ensures the energy threshold on the detector is set to the specified energy (in eV),
         within the specified tolerance.
+
         Args:
             energy (float): The energy to set (in eV)
             tolerance (float, optional): If the energy is already set to within
                 this tolerance it is not set again. Defaults to 0.1eV.
-        """
 
+        """
         current_energy = self.cam.photon_energy.get()
         if abs(current_energy - energy) > tolerance:
             return self.cam.photon_energy.set(
@@ -317,7 +317,6 @@ class EigerDetector(Device, Stageable):
         during the datacollection. The number of images is the number of images per
         trigger.
         """
-
         assert self.detector_params is not None
         status = self.cam.num_images.set(
             self.detector_params.num_images_per_trigger,

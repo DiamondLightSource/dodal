@@ -3,10 +3,10 @@ from .maths import in_micros, step_to_num
 from .types import MsgGenerator, PlanGenerator
 
 __all__ = [
-    "group_uuid",
-    "inject",
-    "in_micros",
     "MsgGenerator",
     "PlanGenerator",
+    "group_uuid",
+    "in_micros",
+    "inject",
     "step_to_num",
 ]

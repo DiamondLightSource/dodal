@@ -79,10 +79,12 @@ def test_sequence_get_expected_region_type(
 ) -> None:
     regions = sequence.regions
     enabled_regions = sequence.get_enabled_regions()
-    assert isinstance(regions, list) and all(
+    assert isinstance(regions, list)
+    assert all(
         isinstance(r, expected_region_class) for r in regions
     )
-    assert isinstance(enabled_regions, list) and all(
+    assert isinstance(enabled_regions, list)
+    assert all(
         isinstance(r, expected_region_class) for r in enabled_regions
     )
 

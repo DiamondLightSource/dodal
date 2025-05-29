@@ -7,7 +7,7 @@ from dodal.beamlines import (
 
 
 @pytest.mark.parametrize(
-    "beamline,expected_module",
+    ("beamline", "expected_module"),
     {
         "i03": "i03",
         "i20-1": "i20_1",

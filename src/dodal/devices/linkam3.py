@@ -19,7 +19,7 @@ class PumpControl(StrictEnum):
 
 
 class Linkam3(StandardReadable):
-    """Device to represent a Linkam3 temperature controller
+    """Device to represent a Linkam3 temperature controller.
 
     Attributes:
         tolerance (float): Deadband around the setpoint within which the position is assumed to have been reached
@@ -28,6 +28,7 @@ class Linkam3(StandardReadable):
     Args:
         prefix (str): PV prefix for this device
         name (str): unique name for this device
+
     """
 
     tolerance: float = 0.5

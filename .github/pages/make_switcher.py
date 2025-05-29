@@ -44,7 +44,7 @@ def get_versions(ref: str, add: str | None) -> list[str]:
 
     # Make the sorted versions list from main branches and tags
     versions: list[str] = []
-    for version in ["master", "main"] + tags:
+    for version in ["master", "main", *tags]:
         if version in builds:
             versions.append(version)
             builds.remove(version)

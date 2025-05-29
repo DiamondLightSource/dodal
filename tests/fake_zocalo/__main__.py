@@ -1,5 +1,6 @@
 import json
 import os
+import sys
 import time
 from collections import defaultdict
 from pathlib import Path
@@ -131,7 +132,7 @@ def main() -> None:
             print("Unable to connect, retrying...")
             if time.time() - start > RABBITMQ_START_TIMEOUT_S:
                 print(f"RabbitMQ did not start after {RABBITMQ_START_TIMEOUT_S}s")
-                exit(1)
+                sys.exit(1)
             time.sleep(1)
         else:
             break

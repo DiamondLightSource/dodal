@@ -42,8 +42,7 @@ class BaseElectronAnalyserDetector(
     AsyncConfigurable,
     Generic[TAbstractAnalyserDriverIO],
 ):
-    """
-    Detector for data acquisition of electron analyser. Can only acquire using settings
+    """Detector for data acquisition of electron analyser. Can only acquire using settings
     already configured for the device.
 
     If possible, this should be changed to inheirt from a StandardDetector. Currently,
@@ -95,8 +94,7 @@ class BaseElectronAnalyserDetector(
     @property
     @abstractmethod
     def driver(self) -> TAbstractAnalyserDriverIO:
-        """
-        Define property for the driver. Some implementations will store this as a
+        """Define property for the driver. Some implementations will store this as a
         reference so it doesn't run into errors with conflicting parents.
         """
 
@@ -106,8 +104,7 @@ class AbstractElectronAnalyserRegionDetector(
     Stageable,
     Generic[TAbstractAnalyserDriverIO, TAbstractBaseRegion],
 ):
-    """
-    Extends electron analyser detector to configure specific region settings before data
+    """Extends electron analyser detector to configure specific region settings before data
     acqusition. This object must be passed in a driver and store it as a reference. It
     is designed to only exist inside a plan.
     """
@@ -132,9 +129,7 @@ class AbstractElectronAnalyserRegionDetector(
 
     @abstractmethod
     def configure_region(self):
-        """
-        Setup analyser with configured region.
-        """
+        """Setup analyser with configured region."""
 
 
 TAbstractElectronAnalyserRegionDetector = TypeVar(
@@ -147,8 +142,7 @@ class AbstractElectronAnalyserDetector(
     BaseElectronAnalyserDetector[TAbstractAnalyserDriverIO],
     Generic[TAbstractAnalyserDriverIO, TAbstractBaseSequence, TAbstractBaseRegion],
 ):
-    """
-    Electron analyser detector with the additional functionality to load a sequence file
+    """Electron analyser detector with the additional functionality to load a sequence file
     and create a list of temporary ElectronAnalyserRegionDetector objects. These will
     setup configured region settings before data acquisition.
     """
@@ -171,9 +165,7 @@ class AbstractElectronAnalyserDetector(
 
     @abstractmethod
     def _create_driver(self, prefix: str) -> TAbstractAnalyserDriverIO:
-        """
-        Define implementation of the driver used for this detector.
-        """
+        """Define implementation of the driver used for this detector."""
 
     @abstractmethod
     def _create_region_detector(
@@ -181,8 +173,7 @@ class AbstractElectronAnalyserDetector(
     ) -> AbstractElectronAnalyserRegionDetector[
         TAbstractAnalyserDriverIO, TAbstractBaseRegion
     ]:
-        """
-        Define a way to create a temporary detector object that will always setup a
+        """Define a way to create a temporary detector object that will always setup a
         specific region before acquiring.
         """
 
@@ -193,8 +184,7 @@ class AbstractElectronAnalyserDetector(
             TAbstractAnalyserDriverIO, TAbstractBaseRegion
         ]
     ]:
-        """
-        Create a list of detectors that will setup a specific region from the sequence
+        """Create a list of detectors that will setup a specific region from the sequence
         file when used.
         """
         seq = self.load_sequence(filename)

@@ -11,7 +11,7 @@ from dodal.devices.detector.det_resolution import (
 )
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 def detector_params(request, tmp_path: Path):
     return DetectorParams(
         expected_energy_ev=100,
@@ -31,7 +31,7 @@ def detector_params(request, tmp_path: Path):
 
 
 @pytest.mark.parametrize(
-    "detector_params, roi, wavelength_angstroms, det_distance_mm, expected_res",
+    ("detector_params", "roi", "wavelength_angstroms", "det_distance_mm", "expected_res"),
     [("EIGER2_X_16M", False, 0.9795, 289.3, 1.5722)],
     indirect=["detector_params"],
 )
@@ -61,7 +61,7 @@ def test_resolution(
 
 
 @pytest.mark.parametrize(
-    "detector_params, roi, wavelength_angstroms, det_distance_mm, expected_res",
+    ("detector_params", "roi", "wavelength_angstroms", "det_distance_mm", "expected_res"),
     [
         ("EIGER2_X_16M", True, 0.9795, 289.3, 2.26847),
     ],
@@ -95,7 +95,7 @@ def test_resolution_with_roi(
 
 
 @pytest.mark.parametrize(
-    "detector_params, roi, wavelength_angstroms, det_distance_mm, expected_res",
+    ("detector_params", "roi", "wavelength_angstroms", "det_distance_mm", "expected_res"),
     [
         ("EIGER2_X_16M", True, 0.976238, 289.289, 3.831388),
         ("EIGER2_X_16M", True, 0.976277, 285.82, 3.787823),

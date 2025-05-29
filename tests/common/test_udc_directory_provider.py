@@ -7,13 +7,13 @@ from dodal.common.udc_directory_provider import PandASubpathProvider
 
 
 @pytest.mark.parametrize(
-    "root, expected",
+    ("root", "expected"),
     [
-        [Path("/foo"), Path("/foo/panda")],
-        [
+        (Path("/foo"), Path("/foo/panda")),
+        (
             Path("/tmp/dls/i03/data/2024/cm31105-4/xraycentring/123456/"),
             Path("/tmp/dls/i03/data/2024/cm31105-4/xraycentring/123456/panda"),
-        ],
+        ),
     ],
 )
 def test_udc_path_provider_get_and_set(root, expected):
@@ -35,7 +35,7 @@ def test_udc_path_provider_excepts_before_update():
 
 @pytest.mark.parametrize(
     "initial",
-    [Path("."), None],
+    [Path(), None],
 )
 async def test_udc_path_provider_after_update(initial, tmp_path):
     provider = PandASubpathProvider(initial)

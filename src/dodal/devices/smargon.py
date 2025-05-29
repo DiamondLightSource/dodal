@@ -59,7 +59,7 @@ class StubOffsets(Device):
 
 @dataclass
 class AxisLimit:
-    """Represents the minimum and maximum allowable values on an axis"""
+    """Represents the minimum and maximum allowable values on an axis."""
 
     min_value: float
     max_value: float
@@ -72,6 +72,7 @@ class AxisLimit:
 
         Returns:
             True if the value does not exceed the limits
+
         """
         return self.min_value <= pos <= self.max_value
 
@@ -92,8 +93,7 @@ class XYZLimits:
 
 
 class Smargon(StandardReadable):
-    """
-    Real motors added to allow stops following pin load (e.g. real_x1.stop() )
+    """Real motors added to allow stops following pin load (e.g. real_x1.stop() )
     X1 and X2 real motors provide compound chi motion as well as the compound X travel,
     increasing the gap between x1 and x2 changes chi, moving together changes virtual x.
     Robot loading can nudge these and lead to errors.
@@ -119,13 +119,14 @@ class Smargon(StandardReadable):
         super().__init__(name)
 
     def get_xyz_limits(self) -> Generator[Msg, None, XYZLimits]:
-        """Obtain a plan stub that returns the smargon XYZ axis limits
+        """Obtain a plan stub that returns the smargon XYZ axis limits.
 
         Yields:
             Bluesky messages
 
         Returns:
             the axis limits
+
         """
         limits = {}
         for name, pv in [

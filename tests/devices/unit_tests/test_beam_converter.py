@@ -27,7 +27,7 @@ def fake_converter():
 
 
 @pytest.mark.parametrize(
-    "detector_distance, axis, expected_value",
+    ("detector_distance", "axis", "expected_value"),
     [
         (100.0, Axis.Y_AXIS, 160.0),
         (200.0, Axis.X_AXIS, 151.0),
@@ -52,7 +52,7 @@ def test_interpolate_beam_xy_from_det_distance(
 
 
 @pytest.mark.parametrize(
-    "detector_distance, axis, expected_value",
+    ("detector_distance", "axis", "expected_value"),
     [
         (95.0, Axis.X_AXIS, 149.95),
         (205.0, Axis.X_AXIS, 151.05),

@@ -57,7 +57,7 @@ class Transfocator(StandardReadable):
         2. Get the predicted number of lenses needed from this calculator
         3. Enter this back into the device
         4. Start the device moving
-        5. Wait for the start_rbv goes high and low again
+        5. Wait for the start_rbv goes high and low again.
         """
         self.latest_pred_vertical_num_lenses = (
             await self.predicted_vertical_num_lenses.get_value()

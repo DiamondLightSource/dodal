@@ -83,13 +83,13 @@ class MockDirectoryServiceClient(LocalDirectoryServiceClient):
 
     async def create_new_collection(self) -> DataCollectionIdentifier:
         if self.fail:
-            raise ValueError()
+            raise ValueError
 
         return await super().create_new_collection()
 
     async def get_current_collection(self) -> DataCollectionIdentifier:
         if self.fail:
-            raise ValueError()
+            raise ValueError
 
         return await super().get_current_collection()
 

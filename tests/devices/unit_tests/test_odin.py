@@ -26,7 +26,7 @@ def fake_odin():
 
 
 @pytest.mark.parametrize(
-    "is_initialised, frames_dropped, frames_timed_out, expected_state",
+    ("is_initialised", "frames_dropped", "frames_timed_out", "expected_state"),
     [
         (True, False, False, True),
         (False, True, True, False),
@@ -53,7 +53,7 @@ def test_check_and_wait_for_odin_state(
 
 
 @pytest.mark.parametrize(
-    "fan_connected, fan_on, meta_init, node_error, node_init, expected_error_num, expected_state",
+    ("fan_connected", "fan_on", "meta_init", "node_error", "node_init", "expected_error_num", "expected_state"),
     [
         (True, True, True, False, True, 0, True),
         (False, True, True, False, True, 1, False),
@@ -108,13 +108,13 @@ def test_given_node_in_error_node_error_status_gives_message_and_node_number(
     error = fake_odin.nodes.wait_for_no_errors(None)
     error_messages = list(error.values())
 
-    assert any(status.exception for status in error.keys())
+    assert any(status.exception for status in error)
     assert any("0" in message for message in error_messages)
     assert any(ERR_MESSAGE in message for message in error_messages)
 
 
 @pytest.mark.parametrize(
-    "meta_writing, OD1_writing, OD2_writing",
+    ("meta_writing", "OD1_writing", "OD2_writing"),
     [
         (True, False, False),
         (True, True, True),
@@ -202,4 +202,3 @@ def test_given_no_frames_dropped_then_check_frames_timed_out_returns_no_error(
     error, message = fake_odin.nodes.check_frames_timed_out()
     assert not error
     assert not message
-    pass

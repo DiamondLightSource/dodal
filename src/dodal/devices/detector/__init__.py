@@ -6,8 +6,8 @@ from dodal.devices.detector.detector import (
 )
 
 __all__ = [
-    "DetectorParams",
     "EIGER2_X_16M_SIZE",
-    "TriggerMode",
     "DetectorDistanceToBeamXYConverter",
+    "DetectorParams",
+    "TriggerMode",
 ]

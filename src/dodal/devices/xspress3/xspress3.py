@@ -74,6 +74,7 @@ class Xspress3(Device, Stageable):
         Number of channel xspress3 has, default is 1 for mini.
     timeout:
         How long to wait for before timing out for staging/arming of detector default is 1 sec
+
     """
 
     def __init__(
