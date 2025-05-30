@@ -1,5 +1,6 @@
 import numpy as np
 import pytest
+from bluesky.run_engine import RunEngine
 from ophyd_async.epics.adcore import ADImageMode
 from ophyd_async.epics.motor import Motor
 from ophyd_async.testing import (
@@ -18,6 +19,7 @@ from dodal.devices.electron_analyser.vgscienta import (
 from tests.devices.unit_tests.electron_analyser.util import (
     TEST_SEQUENCE_REGION_NAMES,
     assert_read_configuration_has_expected_value,
+    configure_driver_with_region,
 )
 
 
@@ -31,8 +33,9 @@ async def test_given_region_that_analyser_sets_modes_correctly(
     sim_driver: VGScientaAnalyserDriverIO,
     region: VGScientaRegion,
     sim_energy_source: Motor,
+    RE: RunEngine,
 ) -> None:
-    await sim_driver.configure_region(region, sim_energy_source)
+    RE(configure_driver_with_region(sim_driver, region, sim_energy_source))
 
     get_mock_put(sim_driver.detector_mode).assert_called_once_with(
         region.detector_mode, wait=True
@@ -50,8 +53,9 @@ async def test_given_region_that_analyser_sets_energy_values_correctly(
     sim_driver: VGScientaAnalyserDriverIO,
     region: VGScientaRegion,
     sim_energy_source: Motor,
+    RE: RunEngine,
 ) -> None:
-    await sim_driver.configure_region(region, sim_energy_source)
+    RE(configure_driver_with_region(sim_driver, region, sim_energy_source))
 
     excitation_energy = await sim_energy_source.user_readback.get_value()
 
@@ -79,8 +83,9 @@ async def test_given_region_that_vgscienta_sets_channel_correctly(
     sim_driver: VGScientaAnalyserDriverIO,
     region: VGScientaRegion,
     sim_energy_source: Motor,
+    RE: RunEngine,
 ) -> None:
-    await sim_driver.configure_region(region, sim_energy_source)
+    RE(configure_driver_with_region(sim_driver, region, sim_energy_source))
 
     expected_first_x = region.first_x_channel
     expected_size_x = region.x_channel_size()
@@ -119,7 +124,6 @@ async def test_that_data_to_read_is_correct(
     region: VGScientaRegion,
     sim_energy_source: Motor,
 ) -> None:
-    await sim_driver.configure_region(region, sim_energy_source)
     excitation_energy = await sim_energy_source.user_readback.get_value()
 
     # Check binding energy is correct

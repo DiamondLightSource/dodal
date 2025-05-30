@@ -77,12 +77,12 @@ def test_analyser_region_detector_stage_prepares_driver_with_region(
     )
 
     for reg_det in region_detectors:
-        reg_det.driver.configure_region = AsyncMock()
+        reg_det.driver.prepare = AsyncMock()
+        reg_det.driver.set = AsyncMock()
 
         RE(bps.prepare(reg_det, sim_energy_source, wait=True))
-        reg_det.driver.configure_region.assert_called_once_with(
-            reg_det.region, sim_energy_source
-        )
+        reg_det.driver.prepare.assert_called_once_with(sim_energy_source)
+        reg_det.driver.set.assert_called_once_with(reg_det.region)
 
 
 # ToDo - Add tests for BaseElectronAnalyserDetector class + controller

@@ -3,12 +3,12 @@ import asyncio
 import numpy as np
 from ophyd_async.core import (
     Array1D,
+    AsyncStatus,
     SignalR,
     StandardReadableFormat,
     derived_signal_r,
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
-from ophyd_async.epics.motor import Motor
 
 from dodal.devices.electron_analyser.abstract.base_driver_io import (
     AbstractAnalyserDriverIO,
@@ -30,8 +30,9 @@ class SpecsAnalyserDriverIO(AbstractAnalyserDriverIO[SpecsRegion]):
 
         super().__init__(prefix, name)
 
-    async def configure_region(self, region: SpecsRegion, energy_source: Motor) -> None:
-        await super().configure_region(region, energy_source)
+    @AsyncStatus.wrap
+    async def set(self, region: SpecsRegion):
+        await super().set(region)
 
         await asyncio.gather(
             self.snapshot_values.set(region.values),

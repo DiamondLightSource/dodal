@@ -138,7 +138,8 @@ class ElectronAnalyserRegionDetector(
             value: The excitation energy source that the region has selected.
         """
         excitation_energy_source = value
-        await self.driver.configure_region(self.region, excitation_energy_source)
+        await self.driver.prepare(excitation_energy_source)
+        await self.driver.set(self.region)
 
 
 TElectronAnalyserRegionDetector = TypeVar(

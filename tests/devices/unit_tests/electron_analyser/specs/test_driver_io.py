@@ -16,6 +16,7 @@ from dodal.devices.electron_analyser.types import EnergyMode
 from tests.devices.unit_tests.electron_analyser.util import (
     TEST_SEQUENCE_REGION_NAMES,
     assert_read_configuration_has_expected_value,
+    configure_driver_with_region,
 )
 
 
@@ -29,8 +30,9 @@ async def test_given_region_that_analyser_sets_energy_values_correctly(
     sim_driver: SpecsAnalyserDriverIO,
     region: SpecsRegion,
     sim_energy_source: Motor,
+    RE: RunEngine,
 ) -> None:
-    await sim_driver.configure_region(region, sim_energy_source)
+    RE(configure_driver_with_region(sim_driver, region, sim_energy_source))
 
     if region.acquisition_mode == "Fixed Transmission":
         get_mock_put(sim_driver.centre_energy).assert_called_once_with(
@@ -58,8 +60,9 @@ async def test_given_region_that_analyser_sets_modes_correctly(
     sim_driver: SpecsAnalyserDriverIO,
     region: SpecsRegion,
     sim_energy_source: Motor,
+    RE: RunEngine,
 ) -> None:
-    await sim_driver.configure_region(region, sim_energy_source)
+    RE(configure_driver_with_region(sim_driver, region, sim_energy_source))
 
     get_mock_put(sim_driver.psu_mode).assert_called_once_with(
         region.psu_mode, wait=True
@@ -81,8 +84,9 @@ async def test_that_data_to_read_is_correct(
     sim_driver: SpecsAnalyserDriverIO,
     region: SpecsRegion,
     sim_energy_source: Motor,
+    RE: RunEngine,
 ) -> None:
-    await sim_driver.configure_region(region, sim_energy_source)
+    RE(configure_driver_with_region(sim_driver, region, sim_energy_source))
 
     excitation_energy = await sim_energy_source.user_readback.get_value()
 

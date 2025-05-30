@@ -3,13 +3,12 @@ import asyncio
 import numpy as np
 from ophyd_async.core import (
     Array1D,
+    AsyncStatus,
     SignalR,
     StandardReadableFormat,
-    soft_signal_rw,
 )
 from ophyd_async.epics.adcore import ADImageMode
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
-from ophyd_async.epics.motor import Motor
 
 from dodal.devices.electron_analyser.abstract.base_driver_io import (
     AbstractAnalyserDriverIO,
@@ -24,7 +23,6 @@ from dodal.devices.electron_analyser.vgscienta.region import (
 class VGScientaAnalyserDriverIO(AbstractAnalyserDriverIO[VGScientaRegion]):
     def __init__(self, prefix: str, name: str = "") -> None:
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
-            self.excitation_energy_source = soft_signal_rw(str, initial_value=None)
             # Used for setting up region data acquisition.
             self.centre_energy = epics_signal_rw(float, prefix + "CENTRE_ENERGY")
             self.first_x_channel = epics_signal_rw(int, prefix + "MinX")
@@ -39,12 +37,11 @@ class VGScientaAnalyserDriverIO(AbstractAnalyserDriverIO[VGScientaRegion]):
 
         super().__init__(prefix, name)
 
-    async def configure_region(
-        self, region: VGScientaRegion, energy_source: Motor
-    ) -> None:
-        await super().configure_region(region, energy_source)
-        excitation_energy = await energy_source.user_readback.get_value()
+    @AsyncStatus.wrap
+    async def set(self, region: VGScientaRegion):
+        await super().set(region)
 
+        excitation_energy = await self.excitation_energy.get_value()
         centre_energy = to_kinetic_energy(
             region.fix_energy, region.energy_mode, excitation_energy
         )
@@ -56,7 +53,6 @@ class VGScientaAnalyserDriverIO(AbstractAnalyserDriverIO[VGScientaRegion]):
             self.x_channel_size.set(region.x_channel_size()),
             self.y_channel_size.set(region.y_channel_size()),
             self.detector_mode.set(region.detector_mode),
-            self.excitation_energy_source.set(region.excitation_energy_source),
             self.image_mode.set(ADImageMode.SINGLE),
         )
 

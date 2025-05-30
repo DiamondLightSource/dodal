@@ -3,8 +3,10 @@ from abc import ABC, abstractmethod
 from typing import Generic, TypeVar
 
 import numpy as np
+from bluesky.protocols import Movable, Preparable
 from ophyd_async.core import (
     Array1D,
+    AsyncStatus,
     SignalR,
     StandardReadable,
     StandardReadableFormat,
@@ -23,7 +25,12 @@ from dodal.devices.electron_analyser.util import to_binding_energy, to_kinetic_e
 
 
 class AbstractAnalyserDriverIO(
-    ABC, StandardReadable, ADBaseIO, Generic[TAbstractBaseRegion]
+    ABC,
+    StandardReadable,
+    ADBaseIO,
+    Preparable,
+    Movable[TAbstractBaseRegion],
+    Generic[TAbstractBaseRegion],
 ):
     """
     Generic device to configure electron analyser with new region settings.
@@ -55,7 +62,9 @@ class AbstractAnalyserDriverIO(
             self.energy_step = epics_signal_rw(float, prefix + "STEP_SIZE")
             self.iterations = epics_signal_rw(int, prefix + "NumExposures")
             self.acquisition_mode = epics_signal_rw(str, prefix + "ACQ_MODE")
+            self.excitation_energy_source = soft_signal_rw(str, initial_value="")
 
+        with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             # Read once per scan after data acquired
             self.energy_axis = self._create_energy_axis_signal(prefix)
             self.binding_energy_axis = derived_signal_r(
@@ -78,36 +87,51 @@ class AbstractAnalyserDriverIO(
 
         super().__init__(prefix=prefix, name=name)
 
-    async def configure_region(
-        self, region: TAbstractBaseRegion, energy_source: Motor
-    ) -> None:
+    @AsyncStatus.wrap
+    async def prepare(self, value: Motor):
+        """
+        Prepare the driver for a region by passing in the energy source motor selected
+        by a region.
+
+        Args:
+            value: The motor that contains the information on the current excitation
+                   energy. Needed to prepare region for epics to accuratly calculate
+                   kinetic energy for an energy scan when in binding energy mode.
+        """
+        energy_source = value
+        excitation_energy_value = await energy_source.user_readback.get_value()  # eV
+        excitation_energy_source_name = (
+            energy_source.parent.name
+            if energy_source.parent is not None
+            else energy_source.name
+        )
+        await asyncio.gather(
+            self.excitation_energy.set(excitation_energy_value),
+            self.excitation_energy_source.set(excitation_energy_source_name),
+        )
+
+    @AsyncStatus.wrap
+    async def set(self, region: TAbstractBaseRegion):
         """
         This should encompass all core region logic which is common to every electron
         analyser for setting up the driver.
 
         Args:
-            region:        The region containing the parameters to setup the detector
-                           for a scan.
-            energy_source: The motor that contains the information on the current
-                           excitation energy. Needed to prepare region for epics to
-                           accuratly calculate kinetic energy in an energy scan when in
-                           binding energy mode.
+            region: Contains the parameters to setup the driver for a scan.
         """
         pass_energy_type = self.pass_energy_type
         pass_energy = pass_energy_type(region.pass_energy)
-        excitation_energy = await energy_source.user_readback.get_value()
 
+        excitation_energy = await self.excitation_energy.get_value()
         low_energy = to_kinetic_energy(
             region.low_energy, region.energy_mode, excitation_energy
         )
         high_energy = to_kinetic_energy(
             region.high_energy, region.energy_mode, excitation_energy
         )
-
         await asyncio.gather(
             self.region_name.set(region.name),
             self.energy_mode.set(region.energy_mode),
-            self.excitation_energy.set(excitation_energy),
             self.low_energy.set(low_energy),
             self.high_energy.set(high_energy),
             self.slices.set(region.slices),
