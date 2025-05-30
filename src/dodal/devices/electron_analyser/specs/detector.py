@@ -8,5 +8,5 @@ from dodal.devices.electron_analyser.specs.region import SpecsRegion, SpecsSeque
 class SpecsDetector(
     ElectronAnalyserDetector[SpecsAnalyserDriverIO, SpecsSequence, SpecsRegion]
 ):
-    def __init__(self, prefix: str, name: str):
-        super().__init__(prefix, name, SpecsSequence, SpecsAnalyserDriverIO)
+    def __init__(self, prefix: str, name: str = ""):
+        super().__init__(prefix, SpecsSequence, SpecsAnalyserDriverIO, name)

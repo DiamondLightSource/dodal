@@ -83,7 +83,15 @@ class AbstractAnalyserDriverIO(
     ) -> None:
         """
         This should encompass all core region logic which is common to every electron
-        analyser.
+        analyser for setting up the driver.
+
+        Args:
+            region:        The region containing the parameters to setup the detector
+                           for a scan.
+            energy_source: The motor that contains the information on the current
+                           excitation energy. Needed to prepare region for epics to
+                           accuratly calculate kinetic energy in an energy scan when in
+                           binding energy mode.
         """
         pass_energy_type = self.pass_energy_type
         pass_energy = pass_energy_type(region.pass_energy)
@@ -113,12 +121,24 @@ class AbstractAnalyserDriverIO(
     def _create_angle_axis_signal(self, prefix: str) -> SignalR[Array1D[np.float64]]:
         """
         The signal that defines the angle axis. Depends on analyser model.
+
+        Args:
+            prefix: PV string used for connecting to angle axis.
+
+        Returns:
+            Signal that can give us angle axis array data.
         """
 
     @abstractmethod
     def _create_energy_axis_signal(self, prefix: str) -> SignalR[Array1D[np.float64]]:
         """
         The signal that defines the energy axis. Depends on analyser model.
+
+        Args:
+            prefix: PV string used for connecting to energy axis.
+
+        Returns:
+            Signal that can give us energy axis array data.
         """
 
     def _calculate_binding_energy_axis(
@@ -127,6 +147,20 @@ class AbstractAnalyserDriverIO(
         excitation_energy: float,
         energy_mode: EnergyMode,
     ) -> Array1D[np.float64]:
+        """
+        Calculate the binding energy axis to calibrate the spectra data. Function for a
+        derived signal.
+
+        Args:
+            energy_axis:       Array data of the original energy_axis from epics.
+            excitation_energy: The excitation energy value used for the scan of this
+                               region.
+            energy_mode:       The energy_mode of the region that was used for the scan
+                               of this region.
+
+        Returns:
+            Array that is the correct axis for the spectra data.
+        """
         is_binding = energy_mode == EnergyMode.BINDING
         return np.array(
             [
@@ -140,6 +174,18 @@ class AbstractAnalyserDriverIO(
     def _calculate_total_time(
         self, total_steps: int, step_time: float, iterations: int
     ) -> float:
+        """
+        Calulcate the total time the scan takes for this region. Function for a derived
+        signal.
+
+        Args:
+            total_steps: Number of steps for the region.
+            step_time: Time for each step for the region.
+            iterations: The number of iterations the region collected data for.
+
+        Returns:
+            Calculated total time in seconds.
+        """
         return total_steps * step_time * iterations
 
     def _calculate_total_intensity(self, spectrum: Array1D[np.float64]) -> float:
@@ -149,8 +195,12 @@ class AbstractAnalyserDriverIO(
     @abstractmethod
     def pass_energy_type(self) -> type:
         """
-        Return the type the pass_energy should be. Each one is unfortunately different
-        for the underlying analyser software and cannot be changed on epics side.
+        Return the type the pass_energy should be. Depends on underlying analyser
+        software.
+
+        Returns:
+            Type the pass energy parameter from a region needs to be cast to so it can
+            be set correctly on the signal.
         """
 
 
