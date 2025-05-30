@@ -33,7 +33,6 @@ async def sim_detector(
     async with init_devices(mock=True, connect=True):
         sim_detector = detector_class(
             prefix="TEST:",
-            name="sim_detector",
         )
     return sim_detector
 
@@ -45,7 +44,6 @@ async def sim_driver(
     async with init_devices(mock=True, connect=True):
         sim_driver = driver_class(
             prefix="TEST:",
-            name="sim_driver",
         )
     return sim_driver
 
@@ -55,7 +53,6 @@ async def sim_energy_source() -> Motor:
     async with init_devices(mock=True, connect=True):
         sim_driver = Motor(
             prefix="TEST:",
-            name="sim_motor",
         )
     return sim_driver
 
@@ -78,7 +75,6 @@ def sequence(
 ):
     det = ElectronAnalyserDetector(
         prefix="SIM:",
-        name="sim_analyser",
         driver_class=driver_class,
         sequence_class=sequence_class,
     )
