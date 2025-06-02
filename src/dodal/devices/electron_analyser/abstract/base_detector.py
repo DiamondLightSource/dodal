@@ -211,7 +211,8 @@ class ElectronAnalyserDetector(
         seq = self.load_sequence(filename)
         regions = seq.get_enabled_regions() if enabled_only else seq.regions
         return [
-            ElectronAnalyserRegionDetector(self.name, self.driver, r) for r in regions
+            ElectronAnalyserRegionDetector(self.name + "_" + r.name, self.driver, r)
+            for r in regions
         ]
 
 

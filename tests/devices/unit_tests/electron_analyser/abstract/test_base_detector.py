@@ -44,6 +44,7 @@ def test_analyser_detector_creates_region_detectors(
     assert len(region_detectors) == len(seq.get_enabled_regions())
     for det in region_detectors:
         assert det.region.enabled is True
+        assert det.name == sim_detector.name + "_" + det.region.name
 
 
 def test_analyser_detector_has_driver_as_child_and_region_detector_does_not(
