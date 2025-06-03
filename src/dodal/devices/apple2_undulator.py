@@ -504,7 +504,7 @@ class Apple2(abc.ABC, StandardReadable, Movable):
             f"top_outer={top_outer}, top_inner={top_inner}, "
             f"btm_inner={btm_inner}, btm_outer={btm_outer}, gap={gap}."
         )
-        # LH3 is indistinishable from LH see determine_phase_from_hardware's docString
+        # LH3 is indistinguishable from LH see determine_phase_from_hardware's docString
         # for detail
         if pol != Pol.LH3:
             pol, _ = self.determine_phase_from_hardware(
@@ -515,7 +515,7 @@ class Apple2(abc.ABC, StandardReadable, Movable):
     async def _set(self, value: Apple2Val, energy: float) -> None:
         """
         Check ID is in a movable state and set all the demand value before moving them
-        all at the same time. This should be moditfied by the beamline specific ID class
+        all at the same time. This should be modified by the beamline specific ID class
         , if the ID motors has to move in a specific order.
         """
 
@@ -562,6 +562,22 @@ class Apple2(abc.ABC, StandardReadable, Movable):
         """
         Get the correct polynomial for a given energy form lookuptable
         for any given polarisation.
+        Parameters
+        ----------
+        new_energy : float
+            The energy in eV for which the polynomial is requested.
+        lookup_table : dict[str | None, dict[str, dict[str, Any]]]
+            The lookup table containing polynomial coefficients for different energies
+            and polarisations.
+        Returns
+        -------
+        np.poly1d
+            The polynomial coefficients for the requested energy and polarisation.
+        Raises
+        ------
+        ValueError
+            If the requested energy is outside the limits defined in the lookup table
+            or if no polynomial coefficients are found for the requested energy.
         """
         pol = await self.polarisation_setpoint.get_value()
         if (
