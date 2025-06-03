@@ -431,7 +431,8 @@ class Apple2(abc.ABC, StandardReadable, Movable):
                 float, initial_value=None
             )
 
-        # Store the polarisation for setpoint.
+        # Store the polarisation for setpoint. And provide readback for LH3.
+        # LH3 is a special case as it is indistinguishable from LH in the hardware.
         self.polarisation_setpoint, self._polarisation_setpoint_set = (
             soft_signal_r_and_setter(Pol)
         )
@@ -460,14 +461,16 @@ class Apple2(abc.ABC, StandardReadable, Movable):
         self.update_lookuptable()
 
     def set_pol_setpoint(self, pol: Pol) -> None:
-        # This sets the polarisation but does not actually move hardware.
+        """Set the polarisation setpoint without moving hardware. The polarisation
+        setpoint is used to determine the gap and phase motor positions when
+        setting the energy/polarisation of the undulator."""
         self._polarisation_setpoint_set(pol)
 
     async def _set_pol(
         self,
         value: Pol,
     ) -> None:
-        # This changes the pol setpoint and then changes polariastion via set energy.
+        # This changes the pol setpoint and then changes polarisation via set energy.
         self.set_pol_setpoint(value)
         await self.set(await self.energy.get_value())
 
