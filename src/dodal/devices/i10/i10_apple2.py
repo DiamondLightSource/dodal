@@ -138,7 +138,9 @@ class I10Apple2(Apple2):
         Check polarisation state and use it together with the energy(value)
         to calculate the required gap and phases before setting it.
         """
+
         pol = await self.polarisation_setpoint.get_value()
+
         if pol == Pol.NONE:
             LOGGER.warning("Polarisation not set attempting to read from hardware")
 
@@ -165,7 +167,7 @@ class I10Apple2(Apple2):
             btm_outer="0.0",
             gap=f"{gap:.6f}",
         )
-        pol = await self.polarisation_setpoint.get_value()
+
         LOGGER.info(f"Setting polarisation to {pol}, with values: {id_set_val}")
         await self._set(value=id_set_val, energy=value)
         if pol != Pol.LA:
