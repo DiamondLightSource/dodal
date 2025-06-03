@@ -134,9 +134,6 @@ class I10Apple2(Apple2):
 
     @AsyncStatus.wrap
     async def set(self, value: float) -> None:
-        await self._set_energy(value=value)
-
-    async def _set_energy(self, value: float) -> None:
         """
         Check polarisation state and use it together with the energy(value)
         to calculate the required gap and phases before setting it.

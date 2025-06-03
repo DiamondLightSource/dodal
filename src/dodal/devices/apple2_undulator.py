@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from typing import Any, Generic, TypeVar
 
 import numpy as np
-from bluesky.protocols import Movable, Status
+from bluesky.protocols import Movable
 from ophyd_async.core import (
     AsyncStatus,
     SignalR,
@@ -375,12 +375,10 @@ class Apple2(abc.ABC, StandardReadable, Movable):
 
     Abstract Methods
     ----------------
-    _set_energy(value: float) -> None
+    set(value: float) -> None
         Abstract method to set motor positions for a given energy and polarisation.
     update_lookuptable() -> None
         Abstract method to load and validate lookup tables from external sources.
-    set (value: float) -> Status
-        Abstract method to move the id energy.
 
     Methods
     -------
@@ -470,15 +468,11 @@ class Apple2(abc.ABC, StandardReadable, Movable):
     ) -> None:
         # This changes the pol setpoint and then changes polariastion via set energy.
         self.set_pol_setpoint(value)
-        await self._set_energy(await self.energy.get_value())
+        await self.set(await self.energy.get_value())
 
     @abc.abstractmethod
-    async def _set_energy(self, value: float) -> None:
-        """This change the position of all the motors for a given energy and
-        polarisation_setpoint"""
-
-    @abc.abstractmethod
-    def set(self, value: float) -> Status:
+    @AsyncStatus.wrap
+    async def set(self, value: float) -> None:
         """
         Set should be in energy units, this will set the energy of the ID by setting the
         gap and phase motors to the correct position for the given energy
