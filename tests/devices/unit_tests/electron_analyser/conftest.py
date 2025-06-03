@@ -1,6 +1,7 @@
 from typing import Any
 
 import pytest
+from bluesky.run_engine import RunEngine
 from ophyd_async.core import init_devices
 from ophyd_async.epics.motor import Motor
 
@@ -28,7 +29,7 @@ from tests.devices.unit_tests.electron_analyser.util import (
 
 @pytest.fixture
 async def sim_detector(
-    detector_class: type[ElectronAnalyserDetectorImpl],
+    detector_class: type[ElectronAnalyserDetectorImpl], RE: RunEngine
 ) -> ElectronAnalyserDetectorImpl:
     async with init_devices(mock=True, connect=True):
         sim_detector = detector_class(
@@ -39,7 +40,7 @@ async def sim_detector(
 
 @pytest.fixture
 async def sim_driver(
-    driver_class: type[TAbstractAnalyserDriverIO],
+    driver_class: type[TAbstractAnalyserDriverIO], RE: RunEngine
 ) -> TAbstractAnalyserDriverIO:
     async with init_devices(mock=True, connect=True):
         sim_driver = driver_class(
@@ -49,7 +50,7 @@ async def sim_driver(
 
 
 @pytest.fixture
-async def sim_energy_source() -> Motor:
+async def sim_energy_source(RE: RunEngine) -> Motor:
     async with init_devices(mock=True, connect=True):
         sim_driver = Motor(
             prefix="TEST:",
@@ -72,6 +73,7 @@ def sequence_class(
 def sequence(
     driver_class: type[TAbstractAnalyserDriverIO],
     sequence_class: type[TAbstractBaseSequence],
+    RE: RunEngine,
 ):
     det = ElectronAnalyserDetector(
         prefix="SIM:",
