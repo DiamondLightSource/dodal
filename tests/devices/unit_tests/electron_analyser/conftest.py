@@ -71,16 +71,16 @@ def sequence_class(
 
 @pytest.fixture
 def sequence(
-    driver_class: type[TAbstractAnalyserDriverIO],
+    sim_driver: AbstractAnalyserDriverIO,
     sequence_class: type[TAbstractBaseSequence],
     RE: RunEngine,
 ):
     det = ElectronAnalyserDetector(
         prefix="SIM:",
-        driver_class=driver_class,
+        driver=sim_driver,
         sequence_class=sequence_class,
     )
-    return det.load_sequence(get_test_sequence(driver_class))
+    return det.load_sequence(get_test_sequence(type(sim_driver)))
 
 
 @pytest.fixture

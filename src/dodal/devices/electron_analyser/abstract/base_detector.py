@@ -44,7 +44,7 @@ class AbstractElectronAnalyserDetector(
     Detector for data acquisition of electron analyser. Can only acquire using settings
     already configured for the device.
 
-    If possible, this should be changed to inheirt from a StandardDetector. Currently,
+    If possible, this should be changed to inherit from a StandardDetector. Currently,
     StandardDetector forces you to use a file writer which doesn't apply here.
     See issue https://github.com/bluesky/ophyd-async/issues/888
     """
@@ -166,10 +166,11 @@ class ElectronAnalyserDetector(
         self,
         prefix: str,
         sequence_class: type[TAbstractBaseSequence],
-        driver_class: type[TAbstractAnalyserDriverIO],
+        driver: TAbstractAnalyserDriverIO,
         name: str = "",
     ):
-        self._driver = driver_class(prefix, name)
+        # Pass in driver
+        self._driver = driver
         self._sequence_class = sequence_class
         super().__init__(name, self.driver)
 

@@ -9,4 +9,5 @@ class SpecsDetector(
     ElectronAnalyserDetector[SpecsAnalyserDriverIO, SpecsSequence, SpecsRegion]
 ):
     def __init__(self, prefix: str, name: str = ""):
-        super().__init__(prefix, SpecsSequence, SpecsAnalyserDriverIO, name)
+        driver = SpecsAnalyserDriverIO(prefix=prefix)
+        super().__init__(prefix, SpecsSequence, driver, name)

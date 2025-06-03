@@ -18,4 +18,5 @@ class VGScientaDetector(
     ]
 ):
     def __init__(self, prefix: str, name: str = ""):
-        super().__init__(prefix, VGScientaSequence, VGScientaAnalyserDriverIO, name)
+        driver = VGScientaAnalyserDriverIO(prefix)
+        super().__init__(prefix, VGScientaSequence, driver, name)
