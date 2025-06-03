@@ -68,6 +68,7 @@ class XrcResult(TypedDict):
             as the volume of whole boxes as a half-open range i.e such that
             p1 = (x1, y1, z1) <= p < p2 = (x2, y2, z2) and
             p2 - p1 gives the dimensions in whole voxels.
+         sample_id: The sample id associated with the centre.
     """
 
     centre_of_mass: list[float]
@@ -76,7 +77,7 @@ class XrcResult(TypedDict):
     n_voxels: int
     total_count: int
     bounding_box: list[list[int]]
-    sample_id: int | None
+    sample_id: int
 
 
 def bbox_size(result: XrcResult):
