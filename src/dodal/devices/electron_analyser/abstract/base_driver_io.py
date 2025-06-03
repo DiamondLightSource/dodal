@@ -100,11 +100,8 @@ class AbstractAnalyserDriverIO(
         """
         energy_source = value
         excitation_energy_value = await energy_source.user_readback.get_value()  # eV
-        excitation_energy_source_name = (
-            energy_source.parent.name
-            if energy_source.parent is not None
-            else energy_source.name
-        )
+        excitation_energy_source_name = energy_source.name
+
         await asyncio.gather(
             self.excitation_energy.set(excitation_energy_value),
             self.excitation_energy_source.set(excitation_energy_source_name),
