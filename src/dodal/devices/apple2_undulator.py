@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from typing import Any, Generic, TypeVar
 
 import numpy as np
-from bluesky.protocols import Movable
+from bluesky.protocols import Movable, Status
 from ophyd_async.core import (
     AsyncStatus,
     SignalR,
@@ -388,8 +388,6 @@ class Apple2(abc.ABC, StandardReadable, Movable):
         Sets the polarisation setpoint without moving hardware.
     determine_phase_from_hardware(...) -> tuple[Pol, float]
         Determines the polarisation and phase value based on motor positions.
-    set(value: float) -> Status
-        Set the energy of this ID.
 
     Notes
     -----
@@ -479,6 +477,24 @@ class Apple2(abc.ABC, StandardReadable, Movable):
         """This change the position of all the motors for a given energy and
         polarisation_setpoint"""
 
+    @abc.abstractmethod
+    def set(self, value: float) -> Status:
+        """
+        Set should be in energy units, this will set the energy of the ID by setting the
+        gap and phase motors to the correct position for the given energy
+        and polarisation.
+        This method should be implemented by the beamline specific ID class as the
+        motor positions will be different for each beamline depending on the
+        undulator design and the lookup table used.
+        _set can be used to set the motor positions for the given energy and
+        polarisation provided that all motors can be moved at the same time.
+
+        Examples
+        --------
+        >>> RE( id.set(888.0)) # This will set the ID to 888 eV
+        >>> RE(scan([detector], id,600,700,100)) # This will scan the ID from 600 to 700 eV in 100 steps.
+        """
+
     def _read_pol(
         self,
         pol: Pol,
@@ -503,7 +519,9 @@ class Apple2(abc.ABC, StandardReadable, Movable):
 
     async def _set(self, value: Apple2Val, energy: float) -> None:
         """
-        Check ID is in a movable state and set all the demand value before moving.
+        Check ID is in a movable state and set all the demand value before moving them
+        all at the same time. This should be moditfied by the beamline specific ID class
+        , if the ID motors has to move in a specific order.
         """
 
         # Only need to check gap as the phase motors share both fault and gate with gap.
