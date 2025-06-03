@@ -1,7 +1,6 @@
 from typing import Any
 
 import pytest
-from bluesky.run_engine import RunEngine
 from ophyd_async.core import init_devices
 from ophyd_async.epics.motor import Motor
 
@@ -25,11 +24,6 @@ from tests.devices.unit_tests.electron_analyser.util import (
     ElectronAnalyserDetectorImpl,
     get_test_sequence,
 )
-
-
-@pytest.fixture
-def RE() -> RunEngine:
-    return RunEngine()
 
 
 @pytest.fixture
