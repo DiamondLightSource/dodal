@@ -107,7 +107,7 @@ markers = [
     "skip_in_pycharm: marks test as not working in pycharm testrunner",
 ]
 addopts = """
-    --cov=src/dodal --cov-report term
+    --cov=src/dodal --cov=dodal --cov-report term
     --tb=native -vv --doctest-modules --doctest-glob="*.rst"
     """
 # https://iscinumpy.gitlab.io/post/bound-version-constraints/#watch-for-warnings
