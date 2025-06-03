@@ -61,7 +61,7 @@ def test_parse_list():
 
 
 def test_parse_list_raises_exception():
-    with pytest.raises(ValueError):
+    with pytest.raises(SyntaxError):
         GDABeamlineParameters.parse_value("[1, 2")
 
 
@@ -103,6 +103,32 @@ def test_get_beamline_parameters_raises_error_when_beamline_not_found(
     get_beamline_name.return_value = "invalid_beamline"
     with pytest.raises(KeyError):
         get_beamline_parameters()
+
+
+def test_parse_nested_list():
+    actual = GDABeamlineParameters.parse_value("[[1, 2], [3, 4]]")
+    expected = [[1, 2], [3, 4]]
+    assert actual == expected
+
+
+def test_parse_nested_nested_list():
+    actual = GDABeamlineParameters.parse_value("[[[1, 2], [3, 4]], [[5, 6], [7, 8]]]")
+    expected = [[[1, 2], [3, 4]], [[5, 6], [7, 8]]]
+    assert actual == expected
+
+
+def test_leading_comma_in_list_causes_error():
+    with pytest.raises(SyntaxError):
+        GDABeamlineParameters.parse_value("[,1, 2, 3, 4]")
+    with pytest.raises(SyntaxError):
+        GDABeamlineParameters.parse_value("[[1, 2], [ ,3, 4]]")
+
+
+def test_Yes_and_No_replaced_with_bool_values():
+    value = "[Yes, No, True, False, 0, 1]"
+    expected = [True, False, True, False, 0, 1]
+    actual = GDABeamlineParameters.parse_value(value)
+    assert actual == expected
 
 
 @pytest.fixture(autouse=True)

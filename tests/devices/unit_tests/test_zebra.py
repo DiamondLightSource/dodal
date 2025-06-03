@@ -154,3 +154,8 @@ def test_logic_gate_configuration_with_too_many_sources_then_error():
 def test_direction_multiplier():
     assert RotationDirection.NEGATIVE.multiplier == -1
     assert RotationDirection.POSITIVE.multiplier == 1
+
+
+def test_opposite():
+    assert RotationDirection.POSITIVE.opposite == RotationDirection.NEGATIVE
+    assert RotationDirection.NEGATIVE.opposite == RotationDirection.POSITIVE
