@@ -1,6 +1,7 @@
 import abc
 import asyncio
 from dataclasses import dataclass
+from math import isclose
 from typing import Any, Generic, TypeVar
 
 import numpy as np
@@ -668,4 +669,4 @@ def motor_position_equal(a, b) -> bool:
     """
     Check motor is within tolerance.
     """
-    return abs(a - b) < ROW_PHASE_MOTOR_TOLERANCE
+    return isclose(a, b, abs_tol=ROW_PHASE_MOTOR_TOLERANCE)
