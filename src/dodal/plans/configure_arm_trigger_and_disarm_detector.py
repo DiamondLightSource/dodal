@@ -1,9 +1,15 @@
+import functools
 import time
 
 import bluesky.plan_stubs as bps
 from bluesky import preprocessors as bpp
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import DetectorTrigger, StaticFilenameProvider, StaticPathProvider
+from ophyd_async.core import (
+    DetectorTrigger,
+    StaticFilenameProvider,
+    StaticPathProvider,
+    wait_for_value,
+)
 from ophyd_async.fastcs.eiger import EigerDetector, EigerTriggerInfo
 
 from dodal.beamlines.i03 import fastcs_eiger, set_path_provider
@@ -28,7 +34,7 @@ def configure_arm_trigger_and_disarm_detector(
     yield from change_roi_mode(eiger, detector_params, wait=True)
     LOGGER.info(f"Changing ROI Mode: {time.time() - start}s")
     start = time.time()
-    yield from bps.abs_set(eiger.odin.num_frames_chunks, 1)
+    yield from bps.abs_set(eiger.odin.num_frames_chunks, 1, wait=True)
     LOGGER.info(f"Setting # of Frame Chunks: {time.time() - start}s")
     start = time.time()
     yield from set_mx_settings_pvs(eiger, detector_params, wait=True)
@@ -38,9 +44,11 @@ def configure_arm_trigger_and_disarm_detector(
     LOGGER.info(f"Preparing Eiger: {time.time() - start}s")
     start = time.time()
     yield from bps.kickoff(eiger, wait=True)
+    func = functools.partial(wait_for_value, eiger.odin.fan_ready, 1, 10)
+    yield from bps.wait_for([func])
     LOGGER.info(f"Kickoff Eiger: {time.time() - start}s")
     start = time.time()
-    yield from bps.trigger(eiger.drv.detector.trigger, wait=True)  # type: ignore
+    yield from bps.trigger(eiger.drv.detector.trigger, wait=True)
     LOGGER.info(f"Triggering Eiger: {time.time() - start}s")
     start = time.time()
     yield from bps.complete(eiger, wait=True)
