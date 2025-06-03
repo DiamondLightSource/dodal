@@ -38,6 +38,8 @@ class SpecsAnalyserDriverIO(AbstractAnalyserDriverIO[SpecsRegion]):
             self.snapshot_values.set(region.values),
             self.psu_mode.set(region.psu_mode),
         )
+        # ToDo - This needs to be changed to an Enum
+        # https://github.com/DiamondLightSource/dodal/issues/1258
         if region.acquisition_mode == "Fixed Transmission":
             await self.centre_energy.set(region.centre_energy)
 
