@@ -427,7 +427,7 @@ class Apple2(abc.ABC, StandardReadable, Movable):
 
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             # Store the set energy for readback.
-            self.energy, self._energy_setpoint = soft_signal_r_and_setter(
+            self.energy, self._set_energy_rbv = soft_signal_r_and_setter(
                 float, initial_value=None
             )
 
@@ -547,7 +547,7 @@ class Apple2(abc.ABC, StandardReadable, Movable):
             self.phase.set_move.set(value=1, wait=False, timeout=timeout),
         )
         await wait_for_value(self.gap.gate, UndulatorGateStatus.CLOSE, timeout=timeout)
-        self._energy_setpoint(energy)  # Update energy after move for readback.
+        self._set_energy_rbv(energy)  # Update energy after move for readback.
 
     async def _get_id_gap_phase(self, energy: float) -> tuple[float, float]:
         """

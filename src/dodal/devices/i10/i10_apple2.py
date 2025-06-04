@@ -147,7 +147,7 @@ class I10Apple2(Apple2):
                 " determine polarisation from hardware..."
             )
             pol = await self.polarisation.get_value()
-            if pol == "None":
+            if pol == Pol.NONE:
                 raise ValueError(
                     f"Polarisation cannot be determine from hardware for {self.name}"
                 )

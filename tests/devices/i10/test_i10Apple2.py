@@ -349,7 +349,7 @@ async def test_I10Apple2_pol_set(
     expect_btm_outer: float,
     expect_gap: float,
 ):
-    mock_id_pol.id_ref()._energy_setpoint(energy)
+    mock_id_pol.id_ref()._set_energy_rbv(energy)
 
     if pol == "dsf":
         with pytest.raises(ValueError):
@@ -397,7 +397,7 @@ async def test_I10Apple2_pol_read_check_pol_from_hardware(
     btm_inner: float,
     btm_outer: float,
 ):
-    mock_id_pol.id_ref()._energy_setpoint(energy)
+    mock_id_pol.id_ref()._set_energy_rbv(energy)
 
     set_mock_value(mock_id_pol.id_ref().phase.top_inner.user_readback, top_inner)
     set_mock_value(mock_id_pol.id_ref().phase.top_outer.user_readback, top_outer)
@@ -422,7 +422,7 @@ async def test_I10Apple2_pol_read_leave_lh3_unchange_when_hardware_match(
     btm_inner: float,
     btm_outer: float,
 ):
-    mock_id_pol.id_ref()._energy_setpoint(energy)
+    mock_id_pol.id_ref()._set_energy_rbv(energy)
     mock_id_pol.id_ref().set_pol_setpoint(Pol("lh3"))
     set_mock_value(mock_id_pol.id_ref().phase.top_inner.user_readback, top_inner)
     set_mock_value(mock_id_pol.id_ref().phase.top_outer.user_readback, top_outer)
