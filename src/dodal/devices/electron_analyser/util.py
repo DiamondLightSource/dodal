@@ -1,4 +1,4 @@
-from dodal.devices.electron_analyser import EnergyMode
+from dodal.devices.electron_analyser.types import EnergyMode
 
 
 def to_kinetic_energy(

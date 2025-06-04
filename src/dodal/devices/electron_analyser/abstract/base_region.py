@@ -3,8 +3,9 @@ from abc import ABC
 from collections.abc import Callable
 from typing import Generic, TypeVar
 
-from ophyd_async.core import StrictEnum
 from pydantic import BaseModel, Field, model_validator
+
+from dodal.devices.electron_analyser.types import EnergyMode
 
 
 def java_to_python_case(java_str: str) -> str:
@@ -42,11 +43,6 @@ def energy_mode_validation(data: dict) -> dict:
     return data
 
 
-class EnergyMode(StrictEnum):
-    KINETIC = "Kinetic"
-    BINDING = "Binding"
-
-
 class AbstractBaseRegion(ABC, JavaToPythonModel):
     """
     Generic region model that holds the data. Specialised region models should inherit
@@ -57,6 +53,7 @@ class AbstractBaseRegion(ABC, JavaToPythonModel):
     enabled: bool = False
     slices: int = 1
     iterations: int = 1
+    excitation_energy_source: str = "source1"
     # These ones we need subclasses to provide default values
     lens_mode: str
     pass_energy: int

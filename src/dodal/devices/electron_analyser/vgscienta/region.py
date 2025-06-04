@@ -4,7 +4,7 @@ from enum import Enum
 from ophyd_async.core import StrictEnum
 from pydantic import Field
 
-from dodal.devices.electron_analyser.abstract_region import (
+from dodal.devices.electron_analyser.abstract.base_region import (
     AbstractBaseRegion,
     AbstractBaseSequence,
     JavaToPythonModel,
@@ -40,7 +40,6 @@ class VGScientaRegion(AbstractBaseRegion):
     energy_step: float = Field(default=200.0)
     # Specific to this class
     id: str = Field(default=str(uuid.uuid4()), alias="region_id")
-    excitation_energy_source: str = "source1"
     fix_energy: float = 9.0
     total_steps: float = 13.0
     total_time: float = 13.0

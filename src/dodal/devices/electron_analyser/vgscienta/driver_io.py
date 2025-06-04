@@ -1,21 +1,26 @@
+import asyncio
+
 import numpy as np
 from ophyd_async.core import (
     Array1D,
+    AsyncStatus,
     SignalR,
     StandardReadableFormat,
-    soft_signal_rw,
 )
+from ophyd_async.epics.adcore import ADImageMode
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
-from dodal.devices.electron_analyser.abstract_analyser_io import (
+from dodal.devices.electron_analyser.abstract.base_driver_io import (
     AbstractAnalyserDriverIO,
 )
-from dodal.devices.electron_analyser.vgscienta_region import (
+from dodal.devices.electron_analyser.util import to_kinetic_energy
+from dodal.devices.electron_analyser.vgscienta.region import (
     DetectorMode,
+    VGScientaRegion,
 )
 
 
-class VGScientaAnalyserDriverIO(AbstractAnalyserDriverIO):
+class VGScientaAnalyserDriverIO(AbstractAnalyserDriverIO[VGScientaRegion]):
     def __init__(self, prefix: str, name: str = "") -> None:
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             # Used for setting up region data acquisition.
@@ -32,19 +37,30 @@ class VGScientaAnalyserDriverIO(AbstractAnalyserDriverIO):
 
         super().__init__(prefix, name)
 
+    @AsyncStatus.wrap
+    async def set(self, region: VGScientaRegion):
+        await super().set(region)
+
+        excitation_energy = await self.excitation_energy.get_value()
+        centre_energy = to_kinetic_energy(
+            region.fix_energy, region.energy_mode, excitation_energy
+        )
+        await asyncio.gather(
+            self.centre_energy.set(centre_energy),
+            self.energy_step.set(region.energy_step),
+            self.first_x_channel.set(region.first_x_channel),
+            self.first_y_channel.set(region.first_y_channel),
+            self.x_channel_size.set(region.x_channel_size()),
+            self.y_channel_size.set(region.y_channel_size()),
+            self.detector_mode.set(region.detector_mode),
+            self.image_mode.set(ADImageMode.SINGLE),
+        )
+
     def _create_energy_axis_signal(self, prefix: str) -> SignalR[Array1D[np.float64]]:
         return epics_signal_r(Array1D[np.float64], prefix + "X_SCALE_RBV")
 
     def _create_angle_axis_signal(self, prefix: str) -> SignalR[Array1D[np.float64]]:
         return epics_signal_r(Array1D[np.float64], prefix + "Y_SCALE_RBV")
-
-    def _create_total_steps_signal(self, prefix: str) -> SignalR[int]:
-        # ToDo - This ideally needs to be read from EPICS using "TOTAL_POINTS_RBV".
-        # However, this is only known after the first point and blueksky / ophyd
-        # currently doesn't support config signals read after first point. Instead
-        # use estimated value from region instead. This also might be fixed with
-        # implementing PEAKS for analyser software.
-        return soft_signal_rw(int, initial_value=1)
 
     @property
     def pass_energy_type(self) -> type:

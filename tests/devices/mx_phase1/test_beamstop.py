@@ -1,14 +1,15 @@
 from itertools import dropwhile
-from unittest.mock import Mock
+from unittest.mock import AsyncMock, Mock
 
 import pytest
+from bluesky import FailedStatus
 from bluesky import plan_stubs as bps
 from bluesky.preprocessors import run_decorator
 from bluesky.run_engine import RunEngine
 from ophyd_async.testing import set_mock_value
 
 from dodal.common.beamlines.beamline_parameters import GDABeamlineParameters
-from dodal.devices.i03.beamstop import Beamstop, BeamstopPositions
+from dodal.devices.i03 import Beamstop, BeamstopPositions
 
 
 @pytest.fixture
@@ -64,3 +65,38 @@ async def test_beamstop_pos_select(
     assert data["beamstop-y_mm"] == y
     assert data["beamstop-z_mm"] == z
     assert data["beamstop-selected_pos"] == expected_pos
+
+
+async def test_set_beamstop_position_to_data_collection_moves_beamstop_into_beam(
+    beamline_parameters: GDABeamlineParameters, RE: RunEngine
+):
+    beamstop = Beamstop("-MO-BS-01:", beamline_parameters, name="beamstop")
+    await beamstop.connect(mock=True)
+
+    beamstop.x_mm.set = AsyncMock()
+    beamstop.y_mm.set = AsyncMock()
+    beamstop.z_mm.set = AsyncMock()
+    set_mock_value(beamstop.x_mm.user_readback, 0)
+    set_mock_value(beamstop.y_mm.user_readback, 0)
+    set_mock_value(beamstop.z_mm.user_readback, 0)
+
+    RE(bps.abs_set(beamstop.selected_pos, BeamstopPositions.DATA_COLLECTION))
+
+    assert beamstop.x_mm.set.call_count == 1
+    assert beamstop.x_mm.set.call_args[0][0] == 1.52
+
+    assert beamstop.y_mm.set.call_count == 1
+    assert beamstop.y_mm.set.call_args[0][0] == 44.78
+
+    assert beamstop.z_mm.set.call_count == 1
+    assert beamstop.z_mm.set.call_args[0][0] == 30.0
+
+
+async def test_set_beamstop_position_to_unknown_raises_error(
+    beamline_parameters: GDABeamlineParameters, RE: RunEngine
+):
+    beamstop = Beamstop("-MO-BS-01:", beamline_parameters, name="beamstop")
+    await beamstop.connect(mock=True)
+    with pytest.raises(FailedStatus) as e:
+        RE(bps.abs_set(beamstop.selected_pos, BeamstopPositions.UNKNOWN, wait=True))
+        assert isinstance(e.value.args[0].exception(), ValueError)
