@@ -507,13 +507,17 @@ class Apple2(abc.ABC, StandardReadable, Movable):
             f"top_outer={top_outer}, top_inner={top_inner}, "
             f"btm_inner={btm_inner}, btm_outer={btm_outer}, gap={gap}."
         )
-        # LH3 is indistinguishable from LH see determine_phase_from_hardware's docString
-        # for detail
 
-        pol, _ = self.determine_phase_from_hardware(
+        read_pol, _ = self.determine_phase_from_hardware(
             top_outer, top_inner, btm_inner, btm_outer, gap
         )
-        return pol
+        # LH3 is indistinguishable from LH see determine_phase_from_hardware's docString
+        # so we return LH3 if the setpoint is LH3 and the readback is LH.
+        if pol == Pol.LH3 and read_pol == Pol.LH:
+            LOGGER.info("Returning LH3 polarisation.")
+            return Pol.LH3
+
+        return read_pol
 
     async def _set(self, value: Apple2Val, energy: float) -> None:
         """

@@ -178,11 +178,12 @@ async def test_I10Apple2_determine_pol(
     btm_inner_phase: float,
     btm_outer_phase: float,
 ):
+    assert await mock_id.polarisation_setpoint.get_value() == Pol.NONE
     set_mock_value(mock_id.phase.top_inner.user_readback, top_inner_phase)
     set_mock_value(mock_id.phase.top_outer.user_readback, top_outer_phase)
     set_mock_value(mock_id.phase.btm_inner.user_readback, btm_inner_phase)
     set_mock_value(mock_id.phase.btm_outer.user_readback, btm_outer_phase)
-    if pol == "None":
+    if pol == Pol.NONE:
         with pytest.raises(ValueError):
             await mock_id.set(800)
     else:
@@ -321,8 +322,8 @@ async def test_EnergySetter_RE_scan(mock_id_pgm: EnergySetter, RE: RunEngine):
         (Pol.LH, 1400, 0.0, 0.0, 0.0, 0.0, 40.11),
         (Pol.LH3, 1400, 0.0, 0.0, 0.0, 0.0, 21.8),  # force LH3 lookup table to be used
         (Pol.LH3, 1700, 0.0, 0.0, 0.0, 0.0, 23.93),
-        (Pol.LH, 1900, 0.0, 0.0, 0.0, 0.0, 25.0),
-        (Pol.LH, 2090, 0.0, 0.0, 0.0, 0.0, 26.0),
+        (Pol.LH3, 1900, 0.0, 0.0, 0.0, 0.0, 25.0),
+        (Pol.LH3, 2090, 0.0, 0.0, 0.0, 0.0, 26.0),
         (Pol.LV, 600, 24.0, 0.0, 24.0, 0.0, 17.0),
         (Pol.LV, 900, 24.0, 0.0, 24.0, 0.0, 21.0),
         (Pol.LV, 1200, 24.0, 0.0, 24.0, 0.0, 25.0),
@@ -403,6 +404,30 @@ async def test_I10Apple2_pol_read_check_pol_from_hardware(
     set_mock_value(mock_id_pol.id_ref().phase.btm_inner.user_readback, btm_inner)
     set_mock_value(mock_id_pol.id_ref().phase.btm_outer.user_readback, btm_outer)
 
+    assert (await mock_id_pol.read())["mock_id-polarisation"]["value"] == pol
+
+
+@pytest.mark.parametrize(
+    "pol,energy, top_outer, top_inner, btm_inner,btm_outer",
+    [
+        ("lh3", 500, 0.0, 0.0, 0.0, 0.0),
+    ],
+)
+async def test_I10Apple2_pol_read_leave_lh3_unchange_when_hardware_match(
+    mock_id_pol: I10Apple2Pol,
+    pol: str,
+    energy: float,
+    top_inner: float,
+    top_outer: float,
+    btm_inner: float,
+    btm_outer: float,
+):
+    mock_id_pol.id_ref()._energy_setpoint(energy)
+    mock_id_pol.id_ref().set_pol_setpoint(Pol("lh3"))
+    set_mock_value(mock_id_pol.id_ref().phase.top_inner.user_readback, top_inner)
+    set_mock_value(mock_id_pol.id_ref().phase.top_outer.user_readback, top_outer)
+    set_mock_value(mock_id_pol.id_ref().phase.btm_inner.user_readback, btm_inner)
+    set_mock_value(mock_id_pol.id_ref().phase.btm_outer.user_readback, btm_outer)
     assert (await mock_id_pol.read())["mock_id-polarisation"]["value"] == pol
 
 

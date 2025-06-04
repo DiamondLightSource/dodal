@@ -146,25 +146,12 @@ class I10Apple2(Apple2):
                 "Found no setpoint for polarisation. Attempting to"
                 " determine polarisation from hardware..."
             )
-
-            motors = await asyncio.gather(
-                self.phase.top_outer.user_readback.get_value(),
-                self.phase.top_inner.user_readback.get_value(),
-                self.phase.btm_inner.user_readback.get_value(),
-                self.phase.btm_outer.user_readback.get_value(),
-                self.gap.user_readback.get_value(),
-            )
-            pol, phase = self.determine_phase_from_hardware(*motors)
+            pol = await self.polarisation.get_value()
             if pol == "None":
                 raise ValueError(
                     f"Polarisation cannot be determine from hardware for {self.name}"
                 )
 
-            self.set_pol_setpoint(pol)
-
-        # Change pol to Lh3 for high energy, as LH mode is only available < 1700 eV.
-        if value > self.lookup_tables["Gap"][pol]["Limit"]["Maximum"] and pol == Pol.LH:
-            pol = Pol.LH3
             self.set_pol_setpoint(pol)
         gap, phase = await self._get_id_gap_phase(value)
         phase3 = phase * (-1 if pol == Pol.LA else 1)
