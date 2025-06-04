@@ -1,0 +1,50 @@
+dodal.devices.apple2\_undulator.Apple2
+======================================
+
+.. currentmodule:: dodal.devices.apple2_undulator
+
+.. autoclass:: Apple2
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      ~Apple2.determinePhaseFromHardware
+      
+      
+      
+      
+      
+      
+      
+      
+      ~Apple2.update_lookuptable
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      ~Apple2.pol
+      
+   
+   

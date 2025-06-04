@@ -1,0 +1,46 @@
+dodal.devices.bimorph\_mirror
+=============================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~bimorph_mirror.BimorphMirror
+   ~bimorph_mirror.BimorphMirrorChannel
+   ~bimorph_mirror.BimorphMirrorMode
+   ~bimorph_mirror.BimorphMirrorOnOff
+   ~bimorph_mirror.BimorphMirrorStatus
+
+
+
+
+.. automodule:: dodal.devices.bimorph_mirror
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      tolerance_func_builder
+   
+   
+
+   
+   
+   

@@ -1,0 +1,40 @@
+dodal.devices.p99.sample\_stage.SampleAngleStage
+================================================
+
+.. currentmodule:: dodal.devices.p99.sample_stage
+
+.. autoclass:: SampleAngleStage
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

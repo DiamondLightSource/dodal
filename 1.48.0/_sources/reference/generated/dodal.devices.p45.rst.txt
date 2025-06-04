@@ -1,0 +1,39 @@
+dodal.devices.p45
+=================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~p45.Choppers
+   ~p45.SampleTheta
+   ~p45.SampleY
+   ~p45.TomoStageWithStretchAndSkew
+
+
+
+
+.. automodule:: dodal.devices.p45
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

@@ -1,0 +1,87 @@
+dodal.devices.hutch\_shutter.ShutterState
+=========================================
+
+.. currentmodule:: dodal.devices.hutch_shutter
+
+.. autoclass:: ShutterState
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~ShutterState.FAULT
+      
+      
+      ~ShutterState.OPEN
+      
+      
+      ~ShutterState.OPENING
+      
+      
+      ~ShutterState.CLOSED
+      
+      
+      ~ShutterState.CLOSING
+      
+   
+   
