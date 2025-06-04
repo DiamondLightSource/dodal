@@ -5,6 +5,7 @@ import bluesky.plan_stubs as bps
 from bluesky import preprocessors as bpp
 from bluesky.run_engine import RunEngine
 from ophyd_async.core import (
+    DEFAULT_TIMEOUT,
     DetectorTrigger,
     StaticFilenameProvider,
     StaticPathProvider,
@@ -44,8 +45,10 @@ def configure_arm_trigger_and_disarm_detector(
     LOGGER.info(f"Preparing Eiger: {time.time() - start}s")
     start = time.time()
     yield from bps.kickoff(eiger, wait=True)
-    func = functools.partial(wait_for_value, eiger.odin.fan_ready, 1, 10)
-    yield from bps.wait_for([func])
+    wait_odin_fan = functools.partial(
+        wait_for_value, eiger.odin.fan_ready, 1, DEFAULT_TIMEOUT
+    )
+    yield from bps.wait_for([wait_odin_fan])
     LOGGER.info(f"Kickoff Eiger: {time.time() - start}s")
     start = time.time()
     yield from bps.trigger(eiger.drv.detector.trigger, wait=True)
