@@ -161,6 +161,11 @@ class I10Apple2(Apple2):
                 )
 
             self.set_pol_setpoint(pol)
+
+        # Change pol to Lh3 for high energy, as LH mode is only available < 1700 eV.
+        if value > self.lookup_tables["Gap"][pol]["Limit"]["Maximum"] and pol == Pol.LH:
+            pol = Pol.LH3
+            self.set_pol_setpoint(pol)
         gap, phase = await self._get_id_gap_phase(value)
         phase3 = phase * (-1 if pol == Pol.LA else 1)
         id_set_val = Apple2Val(

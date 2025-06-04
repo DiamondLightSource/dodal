@@ -509,10 +509,10 @@ class Apple2(abc.ABC, StandardReadable, Movable):
         )
         # LH3 is indistinguishable from LH see determine_phase_from_hardware's docString
         # for detail
-        if pol != Pol.LH3:
-            pol, _ = self.determine_phase_from_hardware(
-                top_outer, top_inner, btm_inner, btm_outer, gap
-            )
+
+        pol, _ = self.determine_phase_from_hardware(
+            top_outer, top_inner, btm_inner, btm_outer, gap
+        )
         return pol
 
     async def _set(self, value: Apple2Val, energy: float) -> None:

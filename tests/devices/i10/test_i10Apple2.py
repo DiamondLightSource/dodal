@@ -204,19 +204,19 @@ async def test_fail_I10Apple2_no_lookup():
     )
 
 
-@pytest.mark.parametrize("energy", [(100), (2500), (-299)])
+@pytest.mark.parametrize("energy", [(100), (5500), (-299)])
 async def test_fail_I10Apple2_set_outside_energy_limits(
     mock_id: I10Apple2, energy: float
 ):
     with pytest.raises(ValueError) as e:
         await mock_id.set(energy)
     assert str(e.value) == "Demanding energy must lie between {} and {} eV!".format(
-        mock_id.lookup_tables["Gap"][await mock_id.polarisation.get_value()]["Limit"][
-            "Minimum"
-        ],
-        mock_id.lookup_tables["Gap"][await mock_id.polarisation.get_value()]["Limit"][
-            "Maximum"
-        ],
+        mock_id.lookup_tables["Gap"][await mock_id.polarisation_setpoint.get_value()][
+            "Limit"
+        ]["Minimum"],
+        mock_id.lookup_tables["Gap"][await mock_id.polarisation_setpoint.get_value()][
+            "Limit"
+        ]["Maximum"],
     )
 
 
@@ -318,9 +318,11 @@ async def test_EnergySetter_RE_scan(mock_id_pgm: EnergySetter, RE: RunEngine):
         (Pol.LH, 500, 0.0, 0.0, 0.0, 0.0, 23.0),
         (Pol.LH, 700, 0.0, 0.0, 0.0, 0.0, 26.0),
         (Pol.LH, 1000, 0.0, 0.0, 0.0, 0.0, 32.0),
-        (Pol.LH3, 1000, 0.0, 0.0, 0.0, 0.0, 18.0),
-        (Pol.LH3, 1400, 0.0, 0.0, 0.0, 0.0, 22.0),
-        (Pol.LH3, 1900, 0.0, 0.0, 0.0, 0.0, 25.0),
+        (Pol.LH, 1400, 0.0, 0.0, 0.0, 0.0, 40.11),
+        (Pol.LH3, 1400, 0.0, 0.0, 0.0, 0.0, 21.8),  # force LH3 lookup table to be used
+        (Pol.LH3, 1700, 0.0, 0.0, 0.0, 0.0, 23.93),
+        (Pol.LH, 1900, 0.0, 0.0, 0.0, 0.0, 25.0),
+        (Pol.LH, 2090, 0.0, 0.0, 0.0, 0.0, 26.0),
         (Pol.LV, 600, 24.0, 0.0, 24.0, 0.0, 17.0),
         (Pol.LV, 900, 24.0, 0.0, 24.0, 0.0, 21.0),
         (Pol.LV, 1200, 24.0, 0.0, 24.0, 0.0, 25.0),
@@ -401,30 +403,6 @@ async def test_I10Apple2_pol_read_check_pol_from_hardware(
     set_mock_value(mock_id_pol.id_ref().phase.btm_inner.user_readback, btm_inner)
     set_mock_value(mock_id_pol.id_ref().phase.btm_outer.user_readback, btm_outer)
 
-    assert (await mock_id_pol.read())["mock_id-polarisation"]["value"] == pol
-
-
-@pytest.mark.parametrize(
-    "pol,energy, top_outer, top_inner, btm_inner,btm_outer",
-    [
-        ("lh3", 500, 24.0, 0.0, 24.0, 0.0),
-    ],
-)
-async def test_I10Apple2_pol_read_leave_lh3_unchange(
-    mock_id_pol: I10Apple2Pol,
-    pol: str,
-    energy: float,
-    top_inner: float,
-    top_outer: float,
-    btm_inner: float,
-    btm_outer: float,
-):
-    mock_id_pol.id_ref()._energy_setpoint(energy)
-    mock_id_pol.id_ref().set_pol_setpoint(Pol("lh3"))
-    set_mock_value(mock_id_pol.id_ref().phase.top_inner.user_readback, top_inner)
-    set_mock_value(mock_id_pol.id_ref().phase.top_outer.user_readback, top_outer)
-    set_mock_value(mock_id_pol.id_ref().phase.btm_inner.user_readback, btm_inner)
-    set_mock_value(mock_id_pol.id_ref().phase.btm_outer.user_readback, btm_outer)
     assert (await mock_id_pol.read())["mock_id-polarisation"]["value"] == pol
 
 
