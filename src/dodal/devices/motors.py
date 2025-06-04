@@ -1,15 +1,55 @@
 import asyncio
 import math
-from enum import Enum
 
 from ophyd_async.core import StandardReadable, derived_signal_rw
 from ophyd_async.epics.motor import Motor
 
 
-class Axis(Enum):
-    X = "X"
-    Y = "Y"
-    Z = "Z"
+def create_axis_perp_to_rotation(
+    parallel_to_0: Motor, parallel_to_minus_90: Motor, rotation: Motor
+):
+    """Create a new derived signal that moves perpendicular to a rotation axis.
+
+    The usual use case for this is translating from sample space to lab space. For
+    example, if you have a sample that is mounted on a goniometer to the right hand side
+    of an OAV view this can provide an axis that will move the sample up/down in that
+    view regardless of the omega orientation of the sample.
+
+    Args:
+        parallel_to_0 (Motor): this is the axis that, when the sample is at 0 deg rotation,
+                               a move here is entirely parallel with the derived axis.
+        parallel_to_minus_90 (Motor): this is the axis that, when the sample is at 90 deg
+                                      rotation, a move here is entirely parallel with the
+                                      derived axis.
+        rotation (Motor): this is the rotation axis of the sample.
+    """
+    # By convention use y/z internally as that is what is used on most beamlines but the
+    # function is actually indifferent to this
+    y_mot = parallel_to_0
+    z_mot = parallel_to_minus_90
+
+    def _get(z_val: float, y_val: float, rot_value: float) -> float:
+        y_component = y_val * math.cos(math.radians(rot_value))
+        z_component = z_val * math.sin(math.radians(rot_value))
+        return z_component + y_component
+
+    async def _set(vertical_value: float) -> None:
+        rot_value = await rotation.user_readback.get_value()
+        y_component = vertical_value * math.cos(math.radians(rot_value))
+        z_component = vertical_value * math.sin(math.radians(rot_value))
+        await asyncio.gather(
+            y_mot.set(y_component),
+            z_mot.set(z_component),
+            rotation.set(rot_value),
+        )
+
+    return derived_signal_rw(
+        _get,
+        _set,
+        y_val=y_mot,
+        z_val=z_mot,
+        rot_value=rotation,
+    )
 
 
 class XYZPositioner(StandardReadable):
@@ -64,12 +104,6 @@ class SixAxisGonio(XYZPositioner):
         name for the stage.
     infix:
         EPICS PV, default is the ("X", "Y", "Z", "KAPPA", "PHI", "OMEGA").
-    upward_axis_at_0:
-        Axis as an enum (Axis.X, Axis.Y or Axis.Z), that points upwards when ω = 0°.
-        Default is Axis.Y
-    upward_axis_at_minus_90:
-        Axis as an enum (Axis.X, Axis.Y or Axis.Z), that points upwards when ω = -90°.
-        Default is Axis.Z
     Notes
     -----
     Example usage::
@@ -94,8 +128,6 @@ class SixAxisGonio(XYZPositioner):
             "PHI",
             "OMEGA",
         ),
-        upward_axis_at_0: Axis = Axis.Y,
-        upward_axis_at_minus_90: Axis = Axis.Z,
     ):
         with self.add_children_as_readables():
             self.kappa = Motor(prefix + infix[3])
@@ -104,62 +136,6 @@ class SixAxisGonio(XYZPositioner):
 
         super().__init__(name=name, prefix=prefix, infix=infix[0:3])
 
-        # Axes corresponding to the co-ordinate axis signals that move the stage
-        # upwards when omega = 0 and omega = -90 respectively i.e. vertical and
-        # horizontal movement in the rotating frame of reference of the stage
-        self._vertical_stage_axis = self._get_axis_signal(upward_axis_at_0)
-        self._horizontal_stage_axis = self._get_axis_signal(upward_axis_at_minus_90)
-
-        # i and j in the plane of the OAV
-        self.i = derived_signal_rw(self._get_i, self._set_i, x=self.x)
-        self.j = derived_signal_rw(
-            self._get_j,
-            self._set_j,
-            vertical_stage_axis=self._vertical_stage_axis,
-            horizontal_stage_axis=self._horizontal_stage_axis,
-            omega=self.omega,
+        self.vertical_in_lab_space = create_axis_perp_to_rotation(
+            self.y, self.z, self.omega
         )
-
-    def _get_j(
-        self, vertical_stage_axis: float, horizontal_stage_axis: float, omega: float
-    ) -> float:
-        vertical_axis_component = calculate_vertical_j_component(
-            vertical_stage_axis, omega
-        )
-        horizontal_axis_component = calculate_horizontal_j_component(
-            horizontal_stage_axis, omega
-        )
-        return vertical_axis_component + horizontal_axis_component
-
-    async def _set_j(self, value: float) -> None:
-        omega = await self.omega.user_readback.get_value()
-        vertical_component = calculate_vertical_j_component(value, omega)
-        horizontal_component = calculate_horizontal_j_component(value, omega)
-        await asyncio.gather(
-            self._vertical_stage_axis.set(vertical_component),
-            self._horizontal_stage_axis.set(horizontal_component),
-            self.omega.set(omega),
-        )
-
-    def _get_i(self, x: float) -> float:
-        return x
-
-    async def _set_i(self, value: float) -> None:
-        await self.x.set(value)
-
-    def _get_axis_signal(self, axis: Axis) -> Motor:
-        match axis:
-            case Axis.X:
-                return self.x
-            case Axis.Y:
-                return self.y
-            case Axis.Z:
-                return self.z
-
-
-def calculate_vertical_j_component(length: float, angle: float):
-    return length * math.cos(math.radians(angle))
-
-
-def calculate_horizontal_j_component(length: float, angle: float):
-    return length * math.sin(math.radians(angle))
