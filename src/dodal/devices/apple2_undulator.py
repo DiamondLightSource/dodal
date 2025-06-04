@@ -564,7 +564,7 @@ class Apple2(abc.ABC, StandardReadable, Movable):
     ) -> np.poly1d:
         """
         Get the correct polynomial for a given energy form lookuptable
-        for any given polarisation.
+        for the current polarisation setpoint.
         Parameters
         ----------
         new_energy : float
