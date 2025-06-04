@@ -135,7 +135,7 @@ class TetrammController(DetectorController):
             else int(trigger_info.number_of_events)
         )
         self._total_triggers = total_triggers
-        self._averaging_time = trigger_info.livetime / self._total_triggers
+        averaging_time = trigger_info.livetime / self._total_triggers
 
         await asyncio.gather(
             self._drv.averaging_time.set(self._averaging_time),
