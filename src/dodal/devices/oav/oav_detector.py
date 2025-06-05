@@ -39,12 +39,13 @@ def _get_correct_zoom_string(zoom: str) -> str:
 
 class BaseZoomController(StandardReadable, Movable[str]):
     level: SignalRW[str]
+    percentage: SignalRW[float]
 
 
 class NullZoomController(BaseZoomController):
     def __init__(self):
         self.level = soft_signal_rw(str, "1.0x")
-        self.percentage = soft_signal_rw(float)
+        self.percentage = soft_signal_rw(float, 100)
 
     def set(self, value):
         raise Exception("Attempting to set zoom level of a null zoom controller")
