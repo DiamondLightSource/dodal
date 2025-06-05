@@ -12,7 +12,7 @@ from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
 beamline = get_beamline_name("k11")
-prefix = BeamlinePrefix(beamline)
+PREFIX = BeamlinePrefix(beamline)
 set_log_beamline(beamline)
 set_utils_beamline(beamline)
 
@@ -27,9 +27,9 @@ set_path_provider(
 
 @device_factory()
 def kb_cs_x() -> Motor:
-    return Motor("BL11K-OP-KBM-01:CS:X")
+    return Motor(f"{PREFIX.beamline_prefix}-OP-KBM-01:CS:X")
 
 
 @device_factory()
 def kb_cs_y() -> Motor:
-    return Motor("BL11K-OP-KBM-01:CS:Y")
+    return Motor(f"{PREFIX.beamline_prefix}-OP-KBM-01:CS:Y")
