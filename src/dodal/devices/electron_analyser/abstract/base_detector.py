@@ -44,8 +44,8 @@ class AbstractElectronAnalyserDetector(
 
     def __init__(
         self,
-        name: str,
         driver: TAbstractAnalyserDriverIO,
+        name: str = "",
     ):
         self.controller: ElectronAnalyserController = ElectronAnalyserController(
             driver=driver

@@ -32,11 +32,14 @@ class ElectronAnalyserRegionDetector(
     """
 
     def __init__(
-        self, name: str, driver: TAbstractAnalyserDriverIO, region: TAbstractBaseRegion
+        self,
+        driver: TAbstractAnalyserDriverIO,
+        region: TAbstractBaseRegion,
+        name: str = "",
     ):
         self._driver_ref = Reference(driver)
         self.region = region
-        super().__init__(name, driver)
+        super().__init__(driver, name)
 
     @property
     def driver(self) -> TAbstractAnalyserDriverIO:
@@ -87,7 +90,7 @@ class ElectronAnalyserDetector(
         # Pass in driver
         self._driver = driver
         self._sequence_class = sequence_class
-        super().__init__(name, self.driver)
+        super().__init__(self.driver, name)
 
     @property
     def driver(self) -> TAbstractAnalyserDriverIO:
@@ -127,7 +130,7 @@ class ElectronAnalyserDetector(
         seq = self.load_sequence(filename)
         regions = seq.get_enabled_regions() if enabled_only else seq.regions
         return [
-            ElectronAnalyserRegionDetector(self.name + "_" + r.name, self.driver, r)
+            ElectronAnalyserRegionDetector(self.driver, r, self.name + "_" + r.name)
             for r in regions
         ]
 
