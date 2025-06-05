@@ -138,8 +138,8 @@ class TetrammController(DetectorController):
         averaging_time = trigger_info.livetime / self._total_triggers
 
         await asyncio.gather(
-            self._drv.averaging_time.set(self._averaging_time),
-            self.set_exposure(self._averaging_time),
+            self._drv.averaging_time.set(averaging_time),
+            self.set_exposure(averaging_time),
             self._hdf.num_capture.set(self._total_triggers),
         )
 

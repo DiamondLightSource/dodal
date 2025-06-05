@@ -43,7 +43,7 @@ set_utils_beamline(BL)
 set_path_provider(
     StaticVisitPathProvider(
         BL,
-        Path("/dls/i22/data/2025/cm40643-3/bluesky"),
+        Path("/dls/i22/data/2024/cm37271-2/bluesky"),
         client=RemoteDirectoryServiceClient("http://i22-control:8088/api"),
     )
 )
@@ -260,7 +260,7 @@ def linkam() -> Linkam3:
     return Linkam3(prefix=f"{PREFIX.beamline_prefix}-EA-TEMPC-05:")
 
 
-@device_factory(skip=True)
+@device_factory()
 def ppump() -> WatsonMarlow323Pump:
     """Sample Environment Peristaltic Pump"""
     return WatsonMarlow323Pump(f"{PREFIX.beamline_prefix}-EA-PUMP-01:")
