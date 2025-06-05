@@ -6,7 +6,7 @@ from dodal.common.data_util import load_json_file_to_class
 from dodal.devices.electron_analyser import EnergyMode
 from dodal.devices.electron_analyser.abstract.base_region import TAbstractBaseRegion
 from dodal.devices.electron_analyser.specs import SpecsRegion, SpecsSequence
-from tests.devices.unit_tests.electron_analyser.test_util import (
+from tests.devices.unit_tests.electron_analyser.util import (
     TEST_SPECS_SEQUENCE,
     assert_region_has_expected_values,
     assert_region_kinetic_and_binding_energy,
@@ -43,6 +43,7 @@ def expected_region_values() -> list[dict[str, Any]]:
             "slices": 100,
             "centre_energy": 0.0,
             "estimated_time_in_ms": 0,
+            "excitation_energy_source": "source1",
         },
         {
             "name": "New_Region1",
@@ -61,6 +62,7 @@ def expected_region_values() -> list[dict[str, Any]]:
             "slices": 110,
             "centre_energy": 0.0,
             "estimated_time_in_ms": 13718,
+            "excitation_energy_source": "source1",
         },
     ]
 

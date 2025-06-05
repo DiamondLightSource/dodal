@@ -3,6 +3,7 @@ from dodal.devices.slits import Slits
 from dodal.utils import skip_device
 
 HDF5_SUFFIX = "HDF5:"
+TIFF_SUFFIX = "TIFF:"
 CAM_SUFFIX = "CAM:"
 DET_SUFFIX = "DET:"
 

@@ -16,7 +16,8 @@ from tests.constants import UNDULATOR_ID_GAP_LOOKUP_TABLE_PATH
 
 
 @pytest.fixture(autouse=True)
-def flush_event_loop_on_finish(event_loop):
+def flush_event_loop_on_finish():
+    event_loop = asyncio.get_event_loop()
     # wait for the test function to complete
     yield None
 

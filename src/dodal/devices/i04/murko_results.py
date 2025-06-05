@@ -16,9 +16,10 @@ from redis.asyncio import StrictRedis
 from dodal.devices.i04.constants import RedisConstants
 from dodal.devices.oav.oav_calculations import (
     calculate_beam_distance,
-    camera_coordinates_to_xyz_mm,
 )
 from dodal.log import LOGGER
+
+NO_MURKO_RESULT = (-1, -1)
 
 MurkoResult = dict
 FullMurkoResults = dict[str, list[MurkoResult]]
@@ -42,12 +43,19 @@ class Coord(Enum):
 
 
 class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
-    """Device that takes crystal centre coords from Murko and uses them to set the
+    """Device that takes crystal centre values from Murko and uses them to set the
     x, y, z coordinate of the sample to be in line with the beam centre.
-    (x, z) coords can be read at 90°, and (x, y) at 180° (or the closest omega angle to
-    90° and 180°). The average of the x values at these angles is taken, and sin(omega)z
-    and cosine(omega)y are taken to account for the rotation. This value is used to
-    calculate a number of mm the sample needs to move to be in line with the beam centre.
+    The most_likely_click[1] value from Murko corresponds with the x coordinate of the
+    sample. The most_likely_click[0] value from Murko corresponds with a component of
+    the y and z coordinates of the sample, depending on the omega angle, as the sample
+    is rotated around the x axis.
+
+    Given a most_likely_click value at a certain omega angle θ:
+    most_likely_click[1] = x
+    most_likely_click[0] = cos(θ)y - sin(θ)z
+
+    A value for x can be found by averaging all most_likely_click[1] values, and
+    solutions for y and z can be calculated using numpy's linear algebra library.
     """
 
     TIMEOUT_S = 2
@@ -58,6 +66,7 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
         redis_password=RedisConstants.REDIS_PASSWORD,
         redis_db=RedisConstants.MURKO_REDIS_DB,
         name="",
+        stop_angle=350,
     ):
         self.redis_client = StrictRedis(
             host=redis_host,
@@ -66,15 +75,11 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
         )
         self.pubsub = self.redis_client.pubsub()
         self._last_omega = 0
-        self._last_result = None
         self.sample_id = soft_signal_rw(str)  # Should get from redis
-        self.coords = {"x": {}, "y": {}, "z": {}}
-
-        self.search_angles = [  # Angles to search and dimensions to gather at each angle
-            (90, ("x", "z")),
-            (180, ("x", "y")),
-            (270, ()),  # Stop searching here
-        ]
+        self.stop_angle = stop_angle
+        self.x_dists_mm = []
+        self.y_dists_mm = []
+        self.omegas = []
 
         with self.add_children_as_readables():
             # Diffs from current x/y/z
@@ -98,94 +103,90 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
     async def trigger(self):
         # Wait for results
         sample_id = await self.sample_id.get_value()
-        final_message = None
-        while self.search_angles:
-            # waits here for next batch to be recieved
+        while self._last_omega < self.stop_angle:
+            # waits here for next batch to be received
             message = await self.pubsub.get_message(timeout=self.TIMEOUT_S)
             if message is None:  # No more messages to process
-                await self.process_batch(
-                    final_message, sample_id
-                )  # Process final message again
                 break
             await self.process_batch(message, sample_id)
-            final_message = message
-        x_values = list(self.coords["x"].values())
-        y_values = list(self.coords["y"].values())
-        z_values = list(self.coords["z"].values())
-        assert x_values, "No x values"
-        assert z_values, "No z values"
-        assert y_values, "No y values"
-        self._x_mm_setter(float(np.mean(x_values)))
-        self._y_mm_setter(float(np.mean(y_values)))
-        self._z_mm_setter(float(np.mean(z_values)))
+
+        for i in range(len(self.omegas)):
+            LOGGER.debug(
+                f"omega: {round(self.omegas[i], 2)}, x: {round(self.x_dists_mm[i], 2)}, y: {round(self.y_dists_mm[i], 2)}"
+            )
+
+        LOGGER.info(f"Using average of x beam distances: {self.x_dists_mm}")
+        avg_x = float(np.mean(self.x_dists_mm))
+        LOGGER.info(f"Finding least square y and z from y distances: {self.y_dists_mm}")
+        best_y, best_z = get_yz_least_squares(self.y_dists_mm, self.omegas)
+        # x, y, z are relative to beam centre. Need to move negative these values to get centred.
+        self._x_mm_setter(-avg_x)
+        self._y_mm_setter(-best_y)
+        self._z_mm_setter(-best_z)
 
     async def process_batch(self, message: dict | None, sample_id: str):
         if message and message["type"] == "message":
-            batch_results = pickle.loads(message["data"])
+            batch_results: list[dict] = pickle.loads(message["data"])
             for results in batch_results:
-                LOGGER.info(f"Got {results} from redis")
                 for uuid, result in results.items():
-                    metadata_str = await self.redis_client.hget(  # type: ignore
+                    if metadata_str := await self.redis_client.hget(  # type: ignore
                         f"murko:{sample_id}:metadata", uuid
-                    )
-                    if metadata_str and self.search_angles:
-                        self.process_result(result, uuid, metadata_str)
+                    ):
+                        LOGGER.info(
+                            f"Found metadata for uuid {uuid}, processing result"
+                        )
+                        self.process_result(
+                            result, MurkoMetadata(json.loads(metadata_str))
+                        )
+                    else:
+                        LOGGER.info(f"Found no metadata for uuid {uuid}")
 
-    def process_result(self, result: dict, uuid: int, metadata_str: str):
-        metadata = MurkoMetadata(json.loads(metadata_str))
-        omega_angle = metadata["omega_angle"]
-        LOGGER.info(f"Got angle {omega_angle}")
-        # Find closest to next search angle
-        movement = self.get_coords_if_at_angle(metadata, result, omega_angle)
-        if movement is not None:
-            LOGGER.info(f"Using result {uuid}, {metadata_str}, {result}")
-            _, axes = self.search_angles.pop(0)
-            for coord in axes:
-                self.coords[coord][omega_angle] = movement[Coord[coord].value]
-                LOGGER.info(f"Found {coord} at {movement}, angle = {omega_angle}")
-        self._last_omega = omega_angle
-        self._last_result = result
-
-    def get_coords_if_at_angle(
-        self, metadata: MurkoMetadata, result: MurkoResult, omega: float
-    ) -> np.ndarray | None:
-        """Gets the 'most_likely_click' coordinates (in mm to move the sample) from
-        Murko if omega or the last omega are the closest angle to the search angle.
-        Otherwise returns None.
+    def process_result(self, result: dict, metadata: MurkoMetadata):
+        """Uses the 'most_likely_click' coordinates from Murko to calculate the
+        horizontal and vertical distances from the beam centre, and store these values
+        as well as the omega angle the image was taken at.
         """
-        search_angle = self.search_angles[0][0]
-        LOGGER.info(f"Compare {omega}, {search_angle}, {self._last_omega}")
-        if (  # if last omega is closest
-            abs(omega - search_angle) >= abs(self._last_omega - search_angle)
-            and self._last_result is not None
-        ):
-            closest_result = self._last_result
-            closest_omega = self._last_omega
-        elif omega - search_angle >= 0:  # if this omega is closest
-            closest_result = result
-            closest_omega = omega
+        omega = metadata["omega_angle"]
+        coords = result["most_likely_click"]  # As proportion from top, left of image
+        LOGGER.info(f"Got most_likely_click: {coords} at angle {omega}")
+        if (
+            tuple(coords) == NO_MURKO_RESULT
+        ):  # See https://github.com/MartinSavko/murko/issues/9
+            LOGGER.info("Murko didn't produce a result, moving on")
         else:
-            return None
-        coords = closest_result[
-            "most_likely_click"
-        ]  # As proportion from top, left of image
-        shape = closest_result["original_shape"]  # Dimensions of image in pixels
-        # Murko returns coords as y, x
-        centre_px = (coords[1] * shape[1], coords[0] * shape[0])
-        LOGGER.info(
-            f"Using image taken at {closest_omega}, which found xtal at {centre_px}"
-        )
+            shape = result["original_shape"]  # Dimensions of image in pixels
+            # Murko returns coords as y, x
+            centre_px = (coords[1] * shape[1], coords[0] * shape[0])
 
-        beam_dist_px = calculate_beam_distance(
-            (metadata["beam_centre_i"], metadata["beam_centre_j"]),
-            centre_px[0],
-            centre_px[1],
-        )
+            beam_dist_px = calculate_beam_distance(
+                (metadata["beam_centre_i"], metadata["beam_centre_j"]),
+                centre_px[0],
+                centre_px[1],
+            )
+            self.x_dists_mm.append(
+                beam_dist_px[0] * metadata["microns_per_x_pixel"] / 1000
+            )
+            self.y_dists_mm.append(
+                beam_dist_px[1] * metadata["microns_per_y_pixel"] / 1000
+            )
+            self.omegas.append(omega)
+            self._last_omega = omega
 
-        return camera_coordinates_to_xyz_mm(
-            beam_dist_px[0],
-            beam_dist_px[1],
-            closest_omega,
-            metadata["microns_per_x_pixel"],
-            metadata["microns_per_y_pixel"],
-        )
+
+def get_yz_least_squares(vertical_dists: list, omegas: list) -> tuple[float, float]:
+    """Get the least squares solution for y and z from the vertical distances and omega angles.
+
+    Args:
+        v_dists (list): List of vertical distances from beam centre. Any units
+        omegas (list): List of omega angles in degrees.
+
+    Returns:
+        tuple[float, float]: y, z distances from centre, in whichever units
+        v_dists came as.
+    """
+    thetas = np.radians(omegas)
+    matrix = np.column_stack([np.cos(thetas), -np.sin(thetas)])
+
+    yz, residuals, rank, s = np.linalg.lstsq(matrix, vertical_dists, rcond=None)
+    y, z = yz
+    return y, z
