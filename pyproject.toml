@@ -107,7 +107,7 @@ markers = [
     "skip_in_pycharm: marks test as not working in pycharm testrunner",
 ]
 addopts = """
-    --cov=dodal --cov-report term --cov-report xml:cov.xml
+    --cov=src/dodal --cov=dodal --cov-report term
     --tb=native -vv --doctest-modules --doctest-glob="*.rst"
     """
 # https://iscinumpy.gitlab.io/post/bound-version-constraints/#watch-for-warnings
@@ -117,8 +117,6 @@ filterwarnings = [
     "ignore:dep_util is Deprecated. Use functions from setuptools instead.:DeprecationWarning",
     # Ignore deprecation warning from zocalo
     "ignore:.*pkg_resources.*:DeprecationWarning",
-    # Ignore deprecation warning from setuptools_dso (remove when https://github.com/epics-base/setuptools_dso/issues/36 is released)
-    "ignore::DeprecationWarning:wheel",
 ]
 # Doctest python code in docs, python code in src docstrings, test functions in tests
 testpaths = "docs src tests system_tests"
@@ -153,12 +151,12 @@ allowlist_externals =
     sphinx-build
     sphinx-autobuild
 commands =
-    tests: pytest -m 'not requires' --cov=dodal --cov-report term --cov-report xml:cov.xml {posargs}
+    tests: pytest -m 'not requires' {posargs}
     type-checking: pyright src tests {posargs}
     pre-commit: pre-commit run --all-files --show-diff-on-failure {posargs}
     docs: sphinx-{posargs:build -E} -T docs build/html
-    unit-report: pytest -m 'not requires' --cov=dodal --cov-report term --cov-report xml:unit_cov.xml --json-report --json-report-file=unit-report.json tests {posargs}
-    system-report: pytest -m 'not requires or requires(external="internet")' --cov=dodal --cov-report term --cov-report xml:system_cov.xml --json-report --json-report-file=system-report.json system_tests {posargs}
+    unit-report: pytest --cov-report xml:unit_cov.xml --json-report --json-report-file=unit-report.json tests {posargs}
+    system-report: pytest -m 'not requires(instrument="i04")' --cov-report xml:system_cov.xml --json-report --json-report-file=system-report.json system_tests {posargs}
 """
 
 [tool.ruff]

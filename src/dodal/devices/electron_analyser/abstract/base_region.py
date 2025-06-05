@@ -53,6 +53,7 @@ class AbstractBaseRegion(ABC, JavaToPythonModel):
     enabled: bool = False
     slices: int = 1
     iterations: int = 1
+    excitation_energy_source: str = "source1"
     # These ones we need subclasses to provide default values
     lens_mode: str
     pass_energy: int
