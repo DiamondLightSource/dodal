@@ -34,22 +34,22 @@ set_path_provider(
 
 @device_factory()
 def attol1() -> Motor:
-    return Motor("BL16B-EA-ECC-03:ACT0")
+    return Motor(f"{PREFIX.beamline_prefix}-EA-ECC-03:ACT0")
 
 
 @device_factory()
 def attol2() -> Motor:
-    return Motor("BL16B-EA-ECC-03:ACT1")
+    return Motor(f"{PREFIX.beamline_prefix}-EA-ECC-03:ACT1")
 
 
 @device_factory()
 def attol3() -> Motor:
-    return Motor("BL16B-EA-ECC-03:ACT2")
+    return Motor(f"{PREFIX.beamline_prefix}-EA-ECC-03:ACT2")
 
 
 @device_factory()
 def attorot1() -> Motor:
-    return Motor("BL16B-EA-ECC-02:ACT2")
+    return Motor(f"{PREFIX.beamline_prefix}-EA-ECC-02:ACT2")
 
 
 @device_factory()

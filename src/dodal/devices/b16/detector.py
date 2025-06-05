@@ -10,7 +10,7 @@ from dodal.common.beamlines.device_helpers import CAM_SUFFIX, TIFF_SUFFIX
 
 
 class ConstantDeadTimeController(ADBaseController):
-    def __init__(self, driver: ADBaseIO, deadtime: float = 0.0):
+    def __init__(self, driver: ADBaseIO, deadtime: float):
         super().__init__(driver)
         self.deadtime = deadtime
 
