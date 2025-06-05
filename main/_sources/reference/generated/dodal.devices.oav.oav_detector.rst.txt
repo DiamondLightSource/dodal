@@ -14,7 +14,9 @@ dodal.devices.oav.oav\_detector
    :toctree:
    :recursive:
 
+   ~oav_detector.BaseZoomController
    ~oav_detector.Coords
+   ~oav_detector.NullZoomController
    ~oav_detector.OAV
    ~oav_detector.OAVBeamCentreFile
    ~oav_detector.OAVBeamCentrePV
