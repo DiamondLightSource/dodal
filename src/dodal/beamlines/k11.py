@@ -26,10 +26,10 @@ set_path_provider(
 
 
 @device_factory()
-def kb_cs_x() -> Motor:
+def kb_x() -> Motor:
     return Motor(f"{PREFIX.beamline_prefix}-OP-KBM-01:CS:X")
 
 
 @device_factory()
-def kb_cs_y() -> Motor:
+def kb_y() -> Motor:
     return Motor(f"{PREFIX.beamline_prefix}-OP-KBM-01:CS:Y")
