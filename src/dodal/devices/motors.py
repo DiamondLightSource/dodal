@@ -1,5 +1,3 @@
-import re
-
 from ophyd_async.core import StandardReadable
 from ophyd_async.epics.motor import Motor
 
@@ -61,24 +59,3 @@ class SixAxisGonio(XYZPositioner):
             self.phi = Motor(prefix + infix[4])
             self.omega = Motor(prefix + infix[5])
         super().__init__(name=name, prefix=prefix, infix=infix[0:3])
-
-
-class MotorGroup(StandardReadable):
-    """
-    Generic group of motors, dynamically created from a name -> PV dictionary
-    """
-
-    def __init__(self, motor_name_to_pv: dict[str, str], name=""):
-        with self.add_children_as_readables():
-            for raw_motor_name, pv in motor_name_to_pv.items():
-                motor_name = safe_identifier(raw_motor_name)
-                setattr(self, motor_name, Motor(pv, motor_name))
-        super().__init__(name=name)
-
-
-def safe_identifier(name: str) -> str:
-    # Replace leading non-word chars or digits with a single underscore
-    name = re.sub(r"\W|^(?=\d)", "_", name)
-    # Avoid name manging: replace two or more leading or trailing underscores with one
-    name = re.sub(r"^_+|_+$", "_", name)
-    return name
