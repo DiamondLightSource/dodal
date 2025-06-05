@@ -15,9 +15,11 @@ from dodal.devices.electron_analyser.vgscienta.detector import VGScientaDetector
 ElectronAnalyserDetectorImpl = VGScientaDetector | SpecsDetector
 
 GenericElectronAnalyserDetector = ElectronAnalyserDetector[
-    AbstractAnalyserDriverIO, AbstractBaseSequence, AbstractBaseRegion
+    AbstractAnalyserDriverIO[AbstractBaseRegion],
+    AbstractBaseSequence,
+    AbstractBaseRegion,
 ]
 
 GenericElectronAnalyserRegionDetector = ElectronAnalyserRegionDetector[
-    AbstractAnalyserDriverIO, AbstractBaseRegion
+    AbstractAnalyserDriverIO[AbstractBaseRegion], AbstractBaseRegion
 ]
