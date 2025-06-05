@@ -1,29 +1,22 @@
 import asyncio
 from abc import abstractmethod
-from typing import Generic, TypeVar
+from typing import Generic
 
-from bluesky.protocols import Preparable, Reading, Stageable, Triggerable
+from bluesky.protocols import Reading, Stageable, Triggerable
 from event_model import DataKey
 from ophyd_async.core import (
     AsyncConfigurable,
     AsyncReadable,
     AsyncStatus,
     Device,
-    Reference,
 )
 from ophyd_async.epics.adcore import (
     ADBaseController,
 )
-from ophyd_async.epics.motor import Motor
 
-from dodal.common.data_util import load_json_file_to_class
 from dodal.devices.electron_analyser.abstract.base_driver_io import (
     AbstractAnalyserDriverIO,
     TAbstractAnalyserDriverIO,
-)
-from dodal.devices.electron_analyser.abstract.base_region import (
-    TAbstractBaseRegion,
-    TAbstractBaseSequence,
 )
 
 
@@ -103,121 +96,3 @@ class AbstractElectronAnalyserDetector(
         Returns:
             instance of the driver.
         """
-
-
-class ElectronAnalyserRegionDetector(
-    AbstractElectronAnalyserDetector[TAbstractAnalyserDriverIO],
-    Preparable,
-    Generic[TAbstractAnalyserDriverIO, TAbstractBaseRegion],
-):
-    """
-    Extends electron analyser detector to configure specific region settings before data
-    acqusition. This object must be passed in a driver and store it as a reference. It
-    is designed to only exist inside a plan.
-    """
-
-    def __init__(
-        self, name: str, driver: TAbstractAnalyserDriverIO, region: TAbstractBaseRegion
-    ):
-        self._driver_ref = Reference(driver)
-        self.region = region
-        super().__init__(name, driver)
-
-    @property
-    def driver(self) -> TAbstractAnalyserDriverIO:
-        # Store as a reference, this implementation will be given a driver so needs to
-        # make sure we don't get conflicting parents.
-        return self._driver_ref()
-
-    @AsyncStatus.wrap
-    async def prepare(self, value: Motor) -> None:
-        """
-        Prepare driver with the region stored and energy_source motor.
-
-        Args:
-            value: The excitation energy source that the region has selected.
-        """
-        excitation_energy_source = value
-        await self.driver.prepare(excitation_energy_source)
-        await self.driver.set(self.region)
-
-
-TElectronAnalyserRegionDetector = TypeVar(
-    "TElectronAnalyserRegionDetector",
-    bound=ElectronAnalyserRegionDetector,
-)
-
-
-class ElectronAnalyserDetector(
-    AbstractElectronAnalyserDetector[TAbstractAnalyserDriverIO],
-    Generic[
-        TAbstractAnalyserDriverIO,
-        TAbstractBaseSequence,
-        TAbstractBaseRegion,
-    ],
-):
-    """
-    Electron analyser detector with the additional functionality to load a sequence file
-    and create a list of temporary ElectronAnalyserRegionDetector objects. These will
-    setup configured region settings before data acquisition.
-    """
-
-    def __init__(
-        self,
-        prefix: str,
-        sequence_class: type[TAbstractBaseSequence],
-        driver: TAbstractAnalyserDriverIO,
-        name: str = "",
-    ):
-        # Pass in driver
-        self._driver = driver
-        self._sequence_class = sequence_class
-        super().__init__(name, self.driver)
-
-    @property
-    def driver(self) -> TAbstractAnalyserDriverIO:
-        # This implementation creates the driver and wants this to be the parent so it
-        # can be used with connect() method.
-        return self._driver
-
-    def load_sequence(self, filename: str) -> TAbstractBaseSequence:
-        """
-        Load the sequence data from a provided json file into a sequence class.
-
-        Args:
-            filename: Path to the sequence file containing the region data.
-
-        Returns:
-            Pydantic model representing the sequence file.
-        """
-        return load_json_file_to_class(self._sequence_class, filename)
-
-    def create_region_detector_list(
-        self, filename: str, enabled_only=True
-    ) -> list[
-        ElectronAnalyserRegionDetector[TAbstractAnalyserDriverIO, TAbstractBaseRegion]
-    ]:
-        """
-        Create a list of detectors equal to the number of regions in a sequence file.
-        Each detector is responsible for setting up a specific region.
-
-        Args:
-            filename:     Path to the sequence file containing the region data.
-            enabled_only: If true, only include the region if enabled is True.
-
-        Returns:
-            List of ElectronAnalyserRegionDetector, equal to the number of regions in
-            the sequence file.
-        """
-        seq = self.load_sequence(filename)
-        regions = seq.get_enabled_regions() if enabled_only else seq.regions
-        return [
-            ElectronAnalyserRegionDetector(self.name + "_" + r.name, self.driver, r)
-            for r in regions
-        ]
-
-
-TElectronAnalyserDetector = TypeVar(
-    "TElectronAnalyserDetector",
-    bound=ElectronAnalyserDetector,
-)

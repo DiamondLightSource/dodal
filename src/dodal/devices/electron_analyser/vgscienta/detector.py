@@ -1,4 +1,4 @@
-from dodal.devices.electron_analyser.abstract.base_detector import (
+from dodal.devices.electron_analyser.detector import (
     ElectronAnalyserDetector,
 )
 from dodal.devices.electron_analyser.vgscienta.driver_io import (

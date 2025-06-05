@@ -8,11 +8,11 @@ from ophyd_async.testing import (
     set_mock_value,
 )
 
+from dodal.devices.electron_analyser import EnergyMode
 from dodal.devices.electron_analyser.specs import (
     SpecsAnalyserDriverIO,
     SpecsRegion,
 )
-from dodal.devices.electron_analyser.types import EnergyMode
 from tests.devices.unit_tests.electron_analyser.util import (
     TEST_SEQUENCE_REGION_NAMES,
     assert_read_configuration_has_expected_value,

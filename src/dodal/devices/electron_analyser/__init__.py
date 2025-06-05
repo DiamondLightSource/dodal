@@ -1,10 +1,15 @@
-from .abstract.base_detector import (
+from .detector import (
     ElectronAnalyserDetector,
     ElectronAnalyserRegionDetector,
     TElectronAnalyserDetector,
     TElectronAnalyserRegionDetector,
 )
-from .types import EnergyMode
+from .enums import EnergyMode
+from .types import (
+    ElectronAnalyserDetectorImpl,
+    GenericElectronAnalyserDetector,
+    GenericElectronAnalyserRegionDetector,
+)
 from .util import to_binding_energy, to_kinetic_energy
 
 __all__ = [
@@ -12,7 +17,10 @@ __all__ = [
     "to_kinetic_energy",
     "EnergyMode",
     "ElectronAnalyserDetector",
+    "ElectronAnalyserDetectorImpl",
     "TElectronAnalyserDetector",
     "ElectronAnalyserRegionDetector",
     "TElectronAnalyserRegionDetector",
+    "GenericElectronAnalyserDetector",
+    "GenericElectronAnalyserRegionDetector",
 ]
