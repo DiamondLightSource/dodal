@@ -52,7 +52,7 @@ def det(
         def generate_point(self, channel: int = 1, high_energy: bool = False) -> float:
             return 0.0
 
-        def wait_for_next_index(self, timeout: float):
+        async def wait_for_next_index(self, timeout: float):
             pass
 
         def get_last_index(self) -> int:
