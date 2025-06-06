@@ -37,7 +37,9 @@ class AbstractAnalyserDriverIO(
     Electron analysers should inherit from this class for further specialisation.
     """
 
-    def __init__(self, prefix: str, name: str = "") -> None:
+    def __init__(
+        self, prefix: str, acquisition_mode_type: type, name: str = ""
+    ) -> None:
         with self.add_children_as_readables():
             self.image = epics_signal_r(Array1D[np.float64], prefix + "IMAGE")
             self.spectrum = epics_signal_r(Array1D[np.float64], prefix + "INT_SPECTRUM")
@@ -61,7 +63,9 @@ class AbstractAnalyserDriverIO(
             )
             self.energy_step = epics_signal_rw(float, prefix + "STEP_SIZE")
             self.iterations = epics_signal_rw(int, prefix + "NumExposures")
-            self.acquisition_mode = epics_signal_rw(str, prefix + "ACQ_MODE")
+            self.acquisition_mode = epics_signal_rw(
+                acquisition_mode_type, prefix + "ACQ_MODE"
+            )
             self.excitation_energy_source = soft_signal_rw(str, initial_value="")
 
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
