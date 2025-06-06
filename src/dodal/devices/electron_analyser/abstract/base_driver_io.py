@@ -20,7 +20,7 @@ from ophyd_async.epics.motor import Motor
 from dodal.devices.electron_analyser.abstract.base_region import (
     TAbstractBaseRegion,
 )
-from dodal.devices.electron_analyser.types import EnergyMode
+from dodal.devices.electron_analyser.enums import EnergyMode
 from dodal.devices.electron_analyser.util import to_binding_energy, to_kinetic_energy
 
 

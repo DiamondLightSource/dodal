@@ -5,7 +5,7 @@ from typing import Generic, TypeVar
 
 from pydantic import BaseModel, Field, model_validator
 
-from dodal.devices.electron_analyser.types import EnergyMode
+from dodal.devices.electron_analyser.enums import EnergyMode
 
 
 def java_to_python_case(java_str: str) -> str:
