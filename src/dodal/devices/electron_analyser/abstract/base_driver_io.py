@@ -10,6 +10,7 @@ from ophyd_async.core import (
     SignalR,
     StandardReadable,
     StandardReadableFormat,
+    StrictEnum,
     derived_signal_r,
     soft_signal_rw,
 )
@@ -38,7 +39,7 @@ class AbstractAnalyserDriverIO(
     """
 
     def __init__(
-        self, prefix: str, acquisition_mode_type: type, name: str = ""
+        self, prefix: str, acquisition_mode_type: type[StrictEnum], name: str = ""
     ) -> None:
         with self.add_children_as_readables():
             self.image = epics_signal_r(Array1D[np.float64], prefix + "IMAGE")
