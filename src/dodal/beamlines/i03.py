@@ -451,11 +451,9 @@ def qbpm() -> QBPM:
     )
 
 
-@device_factory(
-    skip=True
-)  # Skipping as not yet on the beamline, see https://jira.diamond.ac.uk/browse/I03-894
+@device_factory()
 def baton() -> Baton:
     """Get the i03 baton device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return Baton(f"{PREFIX.beamline_prefix}:")
+    return Baton(f"{PREFIX.beamline_prefix}-CS-BATON-01:")
