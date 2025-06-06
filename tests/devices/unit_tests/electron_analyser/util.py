@@ -5,6 +5,7 @@ from bluesky import plan_stubs as bps
 from ophyd_async.core import StandardReadable
 from ophyd_async.epics.motor import Motor
 
+from dodal.devices.electron_analyser import EnergyMode
 from dodal.devices.electron_analyser.abstract import (
     AbstractAnalyserDriverIO,
     AbstractBaseRegion,
@@ -15,14 +16,11 @@ from dodal.devices.electron_analyser.specs import (
     SpecsDetector,
     SpecsSequence,
 )
-from dodal.devices.electron_analyser.types import EnergyMode
 from dodal.devices.electron_analyser.vgscienta import (
     VGScientaAnalyserDriverIO,
     VGScientaDetector,
     VGScientaSequence,
 )
-
-ElectronAnalyserDetectorImpl = SpecsDetector | VGScientaDetector
 
 TEST_DATA_PATH = "tests/test_data/electron_analyser/"
 
