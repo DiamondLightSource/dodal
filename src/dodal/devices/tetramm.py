@@ -2,6 +2,7 @@ import asyncio
 
 from bluesky.protocols import Hints
 from ophyd_async.core import (
+    DEFAULT_TIMEOUT,
     DatasetDescriber,
     DetectorController,
     DetectorTrigger,
@@ -10,8 +11,8 @@ from ophyd_async.core import (
     StandardDetector,
     StrictEnum,
     TriggerInfo,
-    set_and_wait_for_value,
     soft_signal_r_and_setter,
+    wait_for_value,
 )
 from ophyd_async.epics.adcore import (
     ADHDFWriter,
@@ -104,12 +105,14 @@ class TetrammController(DetectorController):
     def __init__(
         self,
         drv: TetrammDriver,
+        hdf: NDFileHDFIO,
         minimum_values_per_reading: int = 5,
         maximum_readings_per_frame: int = 1_000,
         readings_per_frame: int = 1_000,
     ):
         # TODO: Are any of these also fixed by hardware constraints?
         self._drv = drv
+        self._hdf = hdf
         self.maximum_readings_per_frame = maximum_readings_per_frame
         self.minimum_values_per_reading = minimum_values_per_reading
         self.readings_per_frame = readings_per_frame
@@ -125,20 +128,29 @@ class TetrammController(DetectorController):
         # trigger mode must be set first and on its own!
         await self._drv.trigger_mode.set(TetrammTrigger.EXT_TRIGGER)
 
+        # ensure trigger_info.number_of_events is iterable of numbers
+        total_triggers = (
+            sum(trigger_info.number_of_events)
+            if isinstance(trigger_info.number_of_events, list | tuple)
+            else int(trigger_info.number_of_events)
+        )
+        self._total_triggers = total_triggers
+        averaging_time = trigger_info.livetime / self._total_triggers
+
         await asyncio.gather(
-            self._drv.averaging_time.set(trigger_info.livetime),
-            self.set_exposure(trigger_info.livetime),
+            self._drv.averaging_time.set(averaging_time),
+            self.set_exposure(averaging_time),
+            self._hdf.num_capture.set(self._total_triggers),
         )
 
     async def arm(self):
-        self._arm_status = await set_and_wait_for_value(
-            self._drv.acquire, True, wait_for_set_completion=False
-        )
+        await self._drv.acquire.set(True, wait=False, timeout=1)
+        await wait_for_value(self._drv.acquire, True, timeout=DEFAULT_TIMEOUT)
 
     async def wait_for_idle(self):
-        if self._arm_status and not self._arm_status.done:
-            await self._arm_status
-        self._arm_status = None
+        # tetramm never goes idle really, actually it is always acquiring
+        # so need to wait for the capture to finish instead
+        await wait_for_value(self._hdf.capture, False, timeout=DEFAULT_TIMEOUT)
 
     def _validate_trigger(self, trigger: DetectorTrigger) -> None:
         supported_trigger_types = {
@@ -233,7 +245,7 @@ class TetrammDetector(StandardDetector):
     ) -> None:
         self.drv = TetrammDriver(prefix + "DRV:")
         self.hdf = NDFileHDFIO(prefix + "HDF5:")
-        controller = TetrammController(self.drv)
+        controller = TetrammController(self.drv, self.hdf)
         config_signals = [
             self.drv.values_per_reading,
             self.drv.averaging_time,
