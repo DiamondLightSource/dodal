@@ -5,7 +5,11 @@ import pytest
 from dodal.common.data_util import load_json_file_to_class
 from dodal.devices.electron_analyser import EnergyMode
 from dodal.devices.electron_analyser.abstract.base_region import TAbstractBaseRegion
-from dodal.devices.electron_analyser.specs import SpecsRegion, SpecsSequence
+from dodal.devices.electron_analyser.specs import (
+    AcquisitionMode,
+    SpecsRegion,
+    SpecsSequence,
+)
 from tests.devices.unit_tests.electron_analyser.util import (
     TEST_SPECS_SEQUENCE,
     assert_region_has_expected_values,
@@ -28,7 +32,7 @@ def expected_region_values() -> list[dict[str, Any]]:
     return [
         {
             "name": "New_Region",
-            "acquisition_mode": "Fixed Transmission",
+            "acquisition_mode": AcquisitionMode.FIXED_TRANSMISSION,
             "psu_mode": "3.5kV",
             "lens_mode": "SmallArea",
             "low_energy": 800.0,
@@ -47,7 +51,7 @@ def expected_region_values() -> list[dict[str, Any]]:
         },
         {
             "name": "New_Region1",
-            "acquisition_mode": "Snapshot",
+            "acquisition_mode": AcquisitionMode.SNAPSHOT,
             "psu_mode": "1.5kV",
             "lens_mode": "LargeArea",
             "low_energy": 599.866,

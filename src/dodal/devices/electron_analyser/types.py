@@ -9,10 +9,17 @@ from dodal.devices.electron_analyser.detector import (
     ElectronAnalyserDetector,
     ElectronAnalyserRegionDetector,
 )
-from dodal.devices.electron_analyser.specs.detector import SpecsDetector
-from dodal.devices.electron_analyser.vgscienta.detector import VGScientaDetector
+from dodal.devices.electron_analyser.specs.detector import (
+    SpecsAnalyserDriverIO,
+    SpecsDetector,
+)
+from dodal.devices.electron_analyser.vgscienta.detector import (
+    VGScientaAnalyserDriverIO,
+    VGScientaDetector,
+)
 
 ElectronAnalyserDetectorImpl = VGScientaDetector | SpecsDetector
+ElectronAnalyserDriverImpl = VGScientaAnalyserDriverIO | SpecsAnalyserDriverIO
 
 GenericElectronAnalyserDetector = ElectronAnalyserDetector[
     AbstractAnalyserDriverIO[AbstractBaseRegion],

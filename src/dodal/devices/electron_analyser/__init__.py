@@ -7,6 +7,7 @@ from .detector import (
 from .enums import EnergyMode
 from .types import (
     ElectronAnalyserDetectorImpl,
+    ElectronAnalyserDriverImpl,
     GenericElectronAnalyserDetector,
     GenericElectronAnalyserRegionDetector,
 )
@@ -18,6 +19,7 @@ __all__ = [
     "EnergyMode",
     "ElectronAnalyserDetector",
     "ElectronAnalyserDetectorImpl",
+    "ElectronAnalyserDriverImpl",
     "TElectronAnalyserDetector",
     "ElectronAnalyserRegionDetector",
     "TElectronAnalyserRegionDetector",
