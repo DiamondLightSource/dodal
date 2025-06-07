@@ -41,3 +41,26 @@ def test_given_pos_not_stable_and_goes_stable_when_xbpm_feedback_kickoff_then_re
         yield from bps.wait(0.1)
 
     RE(plan())
+
+
+def test_logging_while_waiting_for_XBPM(
+    RE: RunEngine, fake_xbpm_feedback: XBPMFeedback, caplog
+):
+    set_mock_value(fake_xbpm_feedback.pos_stable, False)
+
+    def plan():
+        yield from bps.trigger(fake_xbpm_feedback)
+        with pytest.raises(expected_exception=TimeoutError):
+            yield from bps.wait(timeout=0.4)
+
+        set_mock_value(fake_xbpm_feedback.pos_stable, True)
+        yield from bps.wait(0.1)
+
+    with caplog.at_level("INFO"):
+        RE(plan())
+
+    def messageFilter(x):
+        if x.message == "Waiting for XBPM":
+            return True
+
+    assert len(list(filter(messageFilter, caplog.records))) > 3
