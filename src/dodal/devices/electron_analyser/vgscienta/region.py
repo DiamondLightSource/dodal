@@ -40,7 +40,6 @@ class VGScientaRegion(AbstractBaseRegion):
     energy_step: float = Field(default=200.0)
     # Specific to this class
     id: str = Field(default=str(uuid.uuid4()), alias="region_id")
-    excitation_energy_source: str = "source1"
     fix_energy: float = 9.0
     total_steps: float = 13.0
     total_time: float = 13.0
