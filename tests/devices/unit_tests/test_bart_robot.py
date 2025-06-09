@@ -1,3 +1,6 @@
+"""PYTEST_DONT_REWRITE"""
+
+import traceback
 from asyncio import create_task, sleep
 from unittest.mock import ANY, AsyncMock, MagicMock, call, patch
 
@@ -81,11 +84,16 @@ async def test_given_program_not_running_and_pin_unmounting_but_new_pin_not_moun
     set_mock_value(device.program_running, False)
     set_mock_value(device.gonio_pin_sensor, PinMounted.NO_PIN_MOUNTED)
     device.load = AsyncMock(side_effect=device.load)
-    with pytest.raises(RobotLoadFailed):
+    with pytest.raises(RobotLoadFailed) as exc_info:
         await device.set(SampleLocation(15, 10))
-    device.load.trigger.assert_called_once()  # type:ignore
-    last_log = patch_logger.mock_calls[1].args[0]
-    assert "Waiting on new pin loaded" in last_log
+
+    try:
+        device.load.trigger.assert_called_once()  # type:ignore
+        last_log = patch_logger.mock_calls[1].args[0]
+        assert "Waiting on new pin loaded" in last_log
+    except AssertionError:
+        traceback.print_exception(exc_info.value)
+        raise
 
 
 async def set_with_happy_path(device: BartRobot) -> AsyncStatus:
