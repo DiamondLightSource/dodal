@@ -12,7 +12,7 @@ def create_axis_perp_to_rotation(motor_theta: Motor, motor_i: Motor, motor_j: Mo
     that is a projection of the two axes in the non-rotating frame of reference.
 
     The projection is onto the axis defined by i when the rotation angle is 0 and
-    defined by j when the angle is minus 90.
+    defined by j when the angle is at 90.
 
     The usual use case for this is translating from sample space to lab space. For
     example, if you have a sample that is mounted on a goniometer to the right hand side
@@ -23,7 +23,7 @@ def create_axis_perp_to_rotation(motor_theta: Motor, motor_i: Motor, motor_j: Mo
         motor_theta (Motor): this is the rotation axis of the sample.
         motor_i (Motor): this is the axis that, when the sample is at 0 deg rotation,
                          a move here is entirely parallel with the derived axis.
-        motor_j (Motor): this is the axis that, when the sample is at -90 deg rotation,
+        motor_j (Motor): this is the axis that, when the sample is at 90 deg rotation,
                          a move here is entirely parallel with the derived axis.
     """
 
