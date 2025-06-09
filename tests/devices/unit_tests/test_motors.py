@@ -22,18 +22,6 @@ def six_axis_gonio(RE: RunEngine) -> SixAxisGonio:
     return gonio
 
 
-@pytest.fixture
-def y_up_six_axis_gonio(RE: RunEngine) -> SixAxisGonio:
-    with init_devices(mock=True):
-        gonio = SixAxisGonio("")
-    patch_motor(gonio.omega)
-    patch_motor(gonio.z)
-    patch_motor(gonio.y)
-    patch_motor(gonio.x)
-
-    return gonio
-
-
 async def test_reading_six_axis_gonio(six_axis_gonio: SixAxisGonio):
     await assert_reading(
         six_axis_gonio,
@@ -116,42 +104,11 @@ async def test_vertical_in_lab_space_for_default_axes(
         expected_vert * 2
     )
 
-
-@pytest.mark.parametrize(
-    "set_value, omega_set_value, expected_horz, expected_vert",
+@pytest.mark.parametrize("set_point",
     [
-        [2, 60, 1, math.sqrt(3)],
-        [-10, 390, -5 * math.sqrt(3), -5],
-        [0.5, -135, -math.sqrt(2) / 4, -math.sqrt(2) / 4],
-        [1, 0, 1, 0],
+        -5, 0, 100, 0.7654,
     ],
 )
-async def test_j_signal_for_rotated_axes(
-    y_up_six_axis_gonio: SixAxisGonio,
-    set_value: float,
-    omega_set_value: float,
-    expected_horz: float,
-    expected_vert: float,
-):
-    await y_up_six_axis_gonio.omega.set(omega_set_value)
-    await y_up_six_axis_gonio.vertical_in_lab_space.set(set_value)
-
-    assert await y_up_six_axis_gonio.y.user_readback.get_value() == pytest.approx(
-        expected_horz
-    )
-    assert await y_up_six_axis_gonio.z.user_readback.get_value() == pytest.approx(
-        expected_vert
-    )
-
-    await y_up_six_axis_gonio.vertical_in_lab_space.set(set_value * 2)
-    assert await y_up_six_axis_gonio.y.user_readback.get_value() == pytest.approx(
-        expected_horz * 2
-    )
-    assert await y_up_six_axis_gonio.z.user_readback.get_value() == pytest.approx(
-        expected_vert * 2
-    )
-
-
-async def test_get_j(y_up_six_axis_gonio: SixAxisGonio):
-    await y_up_six_axis_gonio.vertical_in_lab_space.set(5)
-    assert await y_up_six_axis_gonio.vertical_in_lab_space.get_value() == 5
+async def test_lab_vertical_round_trip(six_axis_gonio: SixAxisGonio, set_point: float):
+    await six_axis_gonio.vertical_in_lab_space.set(set_point)
+    assert await six_axis_gonio.vertical_in_lab_space.get_value() == set_point

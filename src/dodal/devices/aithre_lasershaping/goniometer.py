@@ -24,6 +24,6 @@ class Goniometer(StandardReadable):
         self.sampz = Motor(prefix + "SAMPZ")
         self.omega = Motor(prefix + "OMEGA")
         self.vertical_position = create_axis_perp_to_rotation(
-            self.sampz, self.sampy, self.omega
+            self.omega, self.sampz, self.sampy
         )
         super().__init__(name)
