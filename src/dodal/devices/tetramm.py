@@ -15,6 +15,7 @@ from ophyd_async.core import (
     StrictEnum,
     TriggerInfo,
     set_and_wait_for_value,
+    soft_signal_r_and_setter,
 )
 from ophyd_async.epics.adcore import (
     ADHDFWriter,
@@ -205,6 +206,7 @@ class TetrammDetector(StandardDetector):
         name: str = "",
         plugins: dict[str, NDPluginBaseIO] | None = None,
         config_sigs: Sequence[SignalR] = (),
+        type: str | None = None,
     ):
         driver = TetrammDriver(prefix + drv_suffix)
         file_io = NDFileHDFIO(prefix + fileio_suffix)
@@ -216,6 +218,18 @@ class TetrammDetector(StandardDetector):
             dataset_describer=TetrammDatasetDescriber(driver),
             plugins=plugins,
         )
+
+        config_sigs = [
+            driver.values_per_reading,
+            driver.averaging_time,
+            driver.sample_time,
+            *config_sigs,
+        ]
+
+        if type:
+            self.type, _ = soft_signal_r_and_setter(str, type)
+        else:
+            self.type = None
 
         if plugins is not None:
             for plugin_name, plugin in plugins.items():
