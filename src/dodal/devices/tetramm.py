@@ -84,6 +84,7 @@ class TetrammController(DetectorController):
     https://millenia.cars.aps.anl.gov/software/epics/quadEMDoc.html
     """
     _minimal_values_per_reading = {0: 5, 1: 500}
+    """The TetrAMM always digitizes at 100 kHz"""
     _base_sample_rate: int = 100_000
 
     def __init__(
@@ -101,11 +102,11 @@ class TetrammController(DetectorController):
         if trigger_info.trigger not in self._supported_trigger_types:
             raise TypeError(
                 f"{self.__class__.__name__} only supports the following trigger "
-                f"types: {self._supported_trigger_types} but was asked to "
+                f"types: {[k.name for k in self._supported_trigger_types]} but was asked to "
                 f"use {trigger_info.trigger}"
             )
         if trigger_info.livetime is None:
-            raise ValueError()
+            raise ValueError(f"{self.__class__.__name__} requires that livetime is set")
 
         # trigger mode must be set first and on its own!
         await self.driver.trigger_mode.set(
@@ -208,26 +209,27 @@ class TetrammDetector(StandardDetector):
         config_sigs: Sequence[SignalR] = (),
         type: str | None = None,
     ):
-        driver = TetrammDriver(prefix + drv_suffix)
-        file_io = NDFileHDFIO(prefix + fileio_suffix)
-        controller = TetrammController(driver)
+        self._driver = TetrammDriver(prefix + drv_suffix)
+        self._file_io = NDFileHDFIO(prefix + fileio_suffix)
+        controller = TetrammController(self._driver)
 
         writer = ADHDFWriter(
-            fileio=file_io,
+            fileio=self._file_io,
             path_provider=path_provider,
-            dataset_describer=TetrammDatasetDescriber(driver),
+            dataset_describer=TetrammDatasetDescriber(self._driver),
             plugins=plugins,
         )
 
         config_sigs = [
-            driver.values_per_reading,
-            driver.averaging_time,
-            driver.sample_time,
+            self._driver.values_per_reading,
+            self._driver.averaging_time,
+            self._driver.sample_time,
             *config_sigs,
         ]
 
         if type:
             self.type, _ = soft_signal_r_and_setter(str, type)
+            config_sigs.append(self.type)
         else:
             self.type = None
 
