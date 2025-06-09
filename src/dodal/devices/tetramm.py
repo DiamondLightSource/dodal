@@ -1,12 +1,14 @@
 import asyncio
+from typing import Annotated as A
 
 from bluesky.protocols import Hints
 from ophyd_async.core import (
     DatasetDescriber,
     DetectorController,
     DetectorTrigger,
-    Device,
     PathProvider,
+    SignalR,
+    SignalRW,
     StandardDetector,
     StrictEnum,
     TriggerInfo,
@@ -15,15 +17,12 @@ from ophyd_async.core import (
 )
 from ophyd_async.epics.adcore import (
     ADHDFWriter,
+    NDArrayBaseIO,
     NDFileHDFIO,
     NDPluginBaseIO,
     stop_busy_record,
 )
-from ophyd_async.epics.core import (
-    epics_signal_r,
-    epics_signal_rw,
-    epics_signal_rw_rbv,
-)
+from ophyd_async.epics.core import PvSuffix
 
 
 class TetrammRange(StrictEnum):
@@ -54,35 +53,20 @@ class TetrammGeometry(StrictEnum):
     SQUARE = "Square"
 
 
-class TetrammDriver(Device):
-    def __init__(
-        self,
-        prefix: str,
-        name: str = "",
-    ):
-        self._prefix = prefix
-        self.range = epics_signal_rw_rbv(TetrammRange, prefix + "Range")
-        self.sample_time = epics_signal_r(float, prefix + "SampleTime_RBV")
-
-        self.values_per_reading = epics_signal_rw_rbv(int, prefix + "ValuesPerRead")
-        self.averaging_time = epics_signal_rw_rbv(float, prefix + "AveragingTime")
-        self.to_average = epics_signal_r(int, prefix + "NumAverage_RBV")
-        self.averaged = epics_signal_r(int, prefix + "NumAveraged_RBV")
-
-        self.acquire = epics_signal_rw_rbv(bool, prefix + "Acquire")
-
-        # this PV is special, for some reason it doesn't have a _RBV suffix...
-        self.overflows = epics_signal_r(int, prefix + "RingOverflows")
-
-        self.num_channels = epics_signal_rw_rbv(TetrammChannels, prefix + "NumChannels")
-        self.resolution = epics_signal_rw_rbv(TetrammResolution, prefix + "Resolution")
-        self.trigger_mode = epics_signal_rw_rbv(TetrammTrigger, prefix + "TriggerMode")
-        self.bias = epics_signal_rw_rbv(bool, prefix + "BiasState")
-        self.bias_volts = epics_signal_rw_rbv(float, prefix + "BiasVoltage")
-        self.geometry = epics_signal_rw_rbv(TetrammGeometry, prefix + "Geometry")
-        self.nd_attributes_file = epics_signal_rw(str, prefix + "NDAttributesFile")
-
-        super().__init__(name=name)
+class TetrammDriver(NDArrayBaseIO):
+    range = A[SignalRW[TetrammRange], PvSuffix.rbv("Range")]
+    sample_time: A[SignalR[float], PvSuffix.rbv("SampleTime_RBV")]
+    values_per_reading: A[SignalRW[int], PvSuffix.rbv("ValuesPerRead")]
+    averaging_time: A[SignalRW[float], PvSuffix.rbv("AveragingTime")]
+    to_average: A[SignalR[int], PvSuffix("NumAverage_RBV")]
+    averaged: A[SignalR[int], PvSuffix("NumAveraged_RBV")]
+    overflows: A[SignalR[int], PvSuffix("RingOverflows")]
+    num_channels: A[SignalRW[TetrammChannels], PvSuffix.rbv("NumChannels")]
+    resolution: A[SignalRW[TetrammResolution], PvSuffix.rbv("Resolution")]
+    trigger_mode: A[SignalRW[TetrammTrigger], PvSuffix.rbv("TriggerMode")]
+    bias: A[SignalRW[bool], PvSuffix.rbv("BiasState")]
+    bias_volts: A[SignalRW[float], PvSuffix.rbv("BiasVoltage")]
+    geometry: A[SignalRW[TetrammGeometry], PvSuffix.rbv("Geometry")]
 
 
 class TetrammController(DetectorController):
