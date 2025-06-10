@@ -1,3 +1,5 @@
+from ophyd_async.epics.motor import Motor
+
 from dodal.common.beamlines.beamline_utils import (
     device_factory,
 )
