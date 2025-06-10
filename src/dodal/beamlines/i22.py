@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from ophyd_async.epics.adaravis import AravisDetector
+from ophyd_async.epics.adcore import NDPluginStatsIO
 from ophyd_async.epics.adpilatus import PilatusDetector
 from ophyd_async.fastcs.panda import HDFPanda
 
@@ -24,7 +25,7 @@ from dodal.devices.i22.nxsas import NXSasMetadataHolder, NXSasOAV, NXSasPilatus
 from dodal.devices.linkam3 import Linkam3
 from dodal.devices.slits import Slits
 from dodal.devices.synchrotron import Synchrotron
-from dodal.devices.tetramm import TetrammDetector, TetrammPluginStatsIO
+from dodal.devices.tetramm import TetrammDetector
 from dodal.devices.undulator import Undulator
 from dodal.devices.watsonmarlow323_pump import WatsonMarlow323Pump
 from dodal.log import set_beamline as set_log_beamline
@@ -101,7 +102,7 @@ def i0() -> TetrammDetector:
         path_provider=get_path_provider(),
         type="Cividec Diamond XBPM",
         plugins={
-            "stats": TetrammPluginStatsIO(
+            "stats": NDPluginStatsIO(
                 prefix=f"{PREFIX.beamline_prefix}-EA-XBPM-02:SumAll:"
             )
         },
@@ -115,7 +116,7 @@ def it() -> TetrammDetector:
         path_provider=get_path_provider(),
         type="PIN Diode",
         plugins={
-            "stats": TetrammPluginStatsIO(
+            "stats": NDPluginStatsIO(
                 prefix=f"{PREFIX.beamline_prefix}-EA-TTRM-02:SumAll:"
             )
         },

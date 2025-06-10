@@ -55,28 +55,6 @@ class TetrammGeometry(StrictEnum):
     SQUARE = "Square"
 
 
-class TetrammPluginStatsIO(NDPluginBaseIO):
-    """TetrAMM does not have profile_size_x or profile_size_y
-    but has all other channels"""
-
-    # Basic statistics
-    compute_statistics: A[SignalRW[bool], PvSuffix.rbv("ComputeStatistics")]
-    bgd_width: A[SignalRW[int], PvSuffix.rbv("BgdWidth")]
-    total: A[SignalR[float], PvSuffix.rbv("Total")]
-    # Centroid statistics
-    compute_centroid: A[SignalRW[bool], PvSuffix.rbv("ComputeCentroid")]
-    centroid_threshold: A[SignalRW[float], PvSuffix.rbv("CentroidThreshold")]
-    # X and Y Profiles
-    compute_profiles: A[SignalRW[bool], PvSuffix.rbv("ComputeProfiles")]
-    cursor_x: A[SignalRW[int], PvSuffix.rbv("CursorX")]
-    cursor_y: A[SignalRW[int], PvSuffix.rbv("CursorY")]
-    # Array Histogram
-    compute_histogram: A[SignalRW[bool], PvSuffix.rbv("ComputeHistogram")]
-    hist_size: A[SignalRW[int], PvSuffix.rbv("HistSize")]
-    hist_min: A[SignalRW[float], PvSuffix.rbv("HistMin")]
-    hist_max: A[SignalRW[float], PvSuffix.rbv("HistMax")]
-
-
 class TetrammDriver(NDArrayBaseIO):
     range = A[SignalRW[TetrammRange], PvSuffix.rbv("Range")]
     sample_time: A[SignalR[float], PvSuffix("SampleTime_RBV")]
