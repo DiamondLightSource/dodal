@@ -209,21 +209,21 @@ class TetrammDetector(StandardDetector):
         config_sigs: Sequence[SignalR] = (),
         type: str | None = None,
     ):
-        self._driver = TetrammDriver(prefix + drv_suffix)
-        self._file_io = NDFileHDFIO(prefix + fileio_suffix)
-        controller = TetrammController(self._driver)
+        self.driver = TetrammDriver(prefix + drv_suffix)
+        self.file_io = NDFileHDFIO(prefix + fileio_suffix)
+        controller = TetrammController(self.driver)
 
         writer = ADHDFWriter(
-            fileio=self._file_io,
+            fileio=self.file_io,
             path_provider=path_provider,
-            dataset_describer=TetrammDatasetDescriber(self._driver),
+            dataset_describer=TetrammDatasetDescriber(self.driver),
             plugins=plugins,
         )
 
         config_sigs = [
-            self._driver.values_per_reading,
-            self._driver.averaging_time,
-            self._driver.sample_time,
+            self.driver.values_per_reading,
+            self.driver.averaging_time,
+            self.driver.sample_time,
             *config_sigs,
         ]
 
