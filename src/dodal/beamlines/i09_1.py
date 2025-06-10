@@ -2,6 +2,7 @@ from dodal.common.beamlines.beamline_utils import (
     device_factory,
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
+from dodal.devices.common_dcm import BaseDCM, PitchAndRollCrystal, StationaryCrystal
 from dodal.devices.electron_analyser.specs import SpecsAnalyserDriverIO
 from dodal.devices.i09.dcm import DCM
 from dodal.devices.synchrotron import Synchrotron
