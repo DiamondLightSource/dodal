@@ -514,7 +514,10 @@ class Apple2(abc.ABC, StandardReadable, Movable):
         # LH3 is indistinguishable from LH see determine_phase_from_hardware's docString
         # so we return LH3 if the setpoint is LH3 and the readback is LH.
         if pol == Pol.LH3 and read_pol == Pol.LH:
-            LOGGER.info("Returning LH3 polarisation.")
+            LOGGER.info(
+                "The hardware cannot distinguish between LH and LH3."
+                " Returning the last commanded polarisation value"
+            )
             return Pol.LH3
 
         return read_pol
