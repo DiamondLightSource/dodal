@@ -2,7 +2,10 @@ from dodal.common.beamlines.beamline_utils import (
     device_factory,
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
+from dodal.devices.common_dcm import BaseDCM, PitchAndRollCrystal, StationaryCrystal
 from dodal.devices.electron_analyser.vgscienta import VGScientaAnalyserDriverIO
+from dodal.devices.i09.grating import I09Grating
+from dodal.devices.pgm import PGM
 from dodal.devices.synchrotron import Synchrotron
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
@@ -21,3 +24,21 @@ def synchrotron() -> Synchrotron:
 @device_factory()
 def analyser_driver() -> VGScientaAnalyserDriverIO:
     return VGScientaAnalyserDriverIO(prefix=f"{PREFIX.beamline_prefix}-EA-DET-01:CAM:")
+
+
+@device_factory()
+def pgm_device() -> PGM:
+    return PGM(
+        prefix=f"{PREFIX.beamline_prefix}J-MO-PGM-01:",
+        grating=I09Grating,
+        gratingPv="GRAINGSELECT",
+    )
+
+
+@device_factory()
+def dcm_device() -> BaseDCM:
+    return BaseDCM(
+        prefix=f"{PREFIX.beamline_prefix}I-MO-DCM-01:",
+        xtal_1=PitchAndRollCrystal,
+        xtal_2=StationaryCrystal,
+    )

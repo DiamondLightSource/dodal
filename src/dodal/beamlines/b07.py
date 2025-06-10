@@ -26,7 +26,7 @@ def analyser_driver() -> SpecsAnalyserDriverIO:
 
 
 @device_factory()
-def pgm_energy() -> PGM:
+def pgm_device() -> PGM:
     return PGM(
         prefix=f"{PREFIX.beamline_prefix}-OP-PGM-01:",
         grating=B07BGrating,
