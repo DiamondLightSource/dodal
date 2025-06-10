@@ -1,11 +1,9 @@
 from typing import Generic, TypeVar
 
-from bluesky.protocols import Preparable
 from ophyd_async.core import (
     AsyncStatus,
     Reference,
 )
-from ophyd_async.epics.motor import Motor
 
 from dodal.common.data_util import load_json_file_to_class
 from dodal.devices.electron_analyser.abstract.base_detector import (
@@ -22,7 +20,6 @@ from dodal.devices.electron_analyser.abstract.base_region import (
 
 class ElectronAnalyserRegionDetector(
     AbstractElectronAnalyserDetector[TAbstractAnalyserDriverIO],
-    Preparable,
     Generic[TAbstractAnalyserDriverIO, TAbstractBaseRegion],
 ):
     """
@@ -48,16 +45,15 @@ class ElectronAnalyserRegionDetector(
         return self._driver_ref()
 
     @AsyncStatus.wrap
-    async def prepare(self, value: Motor) -> None:
+    async def trigger(self) -> None:
         """
         Prepare driver with the region stored and energy_source motor.
 
         Args:
             value: The excitation energy source that the region has selected.
         """
-        excitation_energy_source = value
-        await self.driver.prepare(excitation_energy_source)
         await self.driver.set(self.region)
+        super().trigger()
 
 
 TElectronAnalyserRegionDetector = TypeVar(
@@ -82,7 +78,6 @@ class ElectronAnalyserDetector(
 
     def __init__(
         self,
-        prefix: str,
         sequence_class: type[TAbstractBaseSequence],
         driver: TAbstractAnalyserDriverIO,
         name: str = "",
