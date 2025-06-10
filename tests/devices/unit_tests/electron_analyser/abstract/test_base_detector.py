@@ -5,10 +5,7 @@ from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
 from ophyd_async.epics.motor import Motor
 
-from dodal.devices.electron_analyser import (
-    ElectronAnalyserDetector,
-    GenericElectronAnalyserDetector,
-)
+from dodal.devices.electron_analyser import GenericElectronAnalyserDetector
 from dodal.devices.electron_analyser.specs import SpecsDetector
 from dodal.devices.electron_analyser.vgscienta import VGScientaDetector
 from tests.devices.unit_tests.electron_analyser.util import get_test_sequence
@@ -17,17 +14,17 @@ from tests.devices.unit_tests.electron_analyser.util import get_test_sequence
 @pytest.fixture(params=[SpecsDetector, VGScientaDetector])
 def detector_class(
     request: pytest.FixtureRequest,
-) -> type[ElectronAnalyserDetector]:
+) -> type[GenericElectronAnalyserDetector]:
     return request.param
 
 
 @pytest.fixture
-def sequence_file_path(sim_detector: ElectronAnalyserDetector) -> str:
+def sequence_file_path(sim_detector: GenericElectronAnalyserDetector) -> str:
     return get_test_sequence(type(sim_detector))
 
 
 def test_analyser_detector_loads_sequence_correctly(
-    sim_detector: ElectronAnalyserDetector,
+    sim_detector: GenericElectronAnalyserDetector,
     sequence_file_path: str,
 ) -> None:
     seq = sim_detector.load_sequence(sequence_file_path)
