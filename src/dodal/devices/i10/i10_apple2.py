@@ -149,10 +149,10 @@ class I10Apple2(Apple2):
             pol = await self.polarisation.get_value()
             if pol == Pol.NONE:
                 raise ValueError(
-                    f"Polarisation cannot be determine from hardware for {self.name}"
+                    f"Polarisation cannot be determined from hardware for {self.name}"
                 )
 
-            self.set_pol_setpoint(pol)
+            self._set_pol_setpoint(pol)
         gap, phase = await self._get_id_gap_phase(value)
         phase3 = phase * (-1 if pol == Pol.LA else 1)
         id_set_val = Apple2Val(

@@ -383,7 +383,7 @@ class Apple2(abc.ABC, StandardReadable, Movable):
 
     Methods
     -------
-    set_pol_setpoint(pol: Pol) -> None
+    _set_pol_setpoint(pol: Pol) -> None
         Sets the polarisation setpoint without moving hardware.
     determine_phase_from_hardware(...) -> tuple[Pol, float]
         Determines the polarisation and phase value based on motor positions.
@@ -460,7 +460,7 @@ class Apple2(abc.ABC, StandardReadable, Movable):
         """
         self.update_lookuptable()
 
-    def set_pol_setpoint(self, pol: Pol) -> None:
+    def _set_pol_setpoint(self, pol: Pol) -> None:
         """Set the polarisation setpoint without moving hardware. The polarisation
         setpoint is used to determine the gap and phase motor positions when
         setting the energy/polarisation of the undulator."""
@@ -471,7 +471,7 @@ class Apple2(abc.ABC, StandardReadable, Movable):
         value: Pol,
     ) -> None:
         # This changes the pol setpoint and then changes polarisation via set energy.
-        self.set_pol_setpoint(value)
+        self._set_pol_setpoint(value)
         await self.set(await self.energy.get_value())
 
     @abc.abstractmethod
@@ -640,56 +640,57 @@ class Apple2(abc.ABC, StandardReadable, Movable):
             )
 
         if all(
-            motor_position_equal(x, 0.0)
+            isclose(x, 0.0, abs_tol=ROW_PHASE_MOTOR_TOLERANCE)
             for x in [top_outer, top_inner, btm_inner, btm_outer]
         ):
             LOGGER.info("Determined polarisation: LH (Linear Horizontal).")
             return Pol.LH, 0.0
         if (
-            motor_position_equal(top_outer, MAXIMUM_ROW_PHASE_MOTOR_POSITION)
-            and motor_position_equal(top_inner, 0.0)
-            and motor_position_equal(btm_inner, MAXIMUM_ROW_PHASE_MOTOR_POSITION)
-            and motor_position_equal(btm_outer, 0.0)
+            isclose(
+                top_outer,
+                MAXIMUM_ROW_PHASE_MOTOR_POSITION,
+                abs_tol=ROW_PHASE_MOTOR_TOLERANCE,
+            )
+            and isclose(top_inner, 0.0, abs_tol=ROW_PHASE_MOTOR_TOLERANCE)
+            and isclose(
+                btm_inner,
+                MAXIMUM_ROW_PHASE_MOTOR_POSITION,
+                abs_tol=ROW_PHASE_MOTOR_TOLERANCE,
+            )
+            and isclose(btm_outer, 0.0, abs_tol=ROW_PHASE_MOTOR_TOLERANCE)
         ):
             LOGGER.info("Determined polarisation: LV (Linear Vertical).")
             return Pol.LV, MAXIMUM_ROW_PHASE_MOTOR_POSITION
         if (
-            motor_position_equal(top_outer, btm_inner)
+            isclose(top_outer, btm_inner, abs_tol=ROW_PHASE_MOTOR_TOLERANCE)
             and top_outer > 0.0
-            and motor_position_equal(top_inner, 0.0)
-            and motor_position_equal(btm_outer, 0.0)
+            and isclose(top_inner, 0.0, abs_tol=ROW_PHASE_MOTOR_TOLERANCE)
+            and isclose(btm_outer, 0.0, abs_tol=ROW_PHASE_MOTOR_TOLERANCE)
         ):
             LOGGER.info("Determined polarisation: PC (Positive Circular).")
             return Pol.PC, top_outer
         if (
-            motor_position_equal(top_outer, btm_inner)
+            isclose(top_outer, btm_inner, abs_tol=ROW_PHASE_MOTOR_TOLERANCE)
             and top_outer < 0.0
-            and motor_position_equal(top_inner, 0.0)
-            and motor_position_equal(btm_outer, 0.0)
+            and isclose(top_inner, 0.0, abs_tol=ROW_PHASE_MOTOR_TOLERANCE)
+            and isclose(btm_outer, 0.0, abs_tol=ROW_PHASE_MOTOR_TOLERANCE)
         ):
             LOGGER.info("Determined polarisation: NC (Negative Circular).")
             return Pol.NC, top_outer
         if (
-            motor_position_equal(top_outer, -btm_inner)
-            and motor_position_equal(top_inner, 0.0)
-            and motor_position_equal(btm_outer, 0.0)
+            isclose(top_outer, -btm_inner, abs_tol=ROW_PHASE_MOTOR_TOLERANCE)
+            and isclose(top_inner, 0.0, abs_tol=ROW_PHASE_MOTOR_TOLERANCE)
+            and isclose(btm_outer, 0.0, abs_tol=ROW_PHASE_MOTOR_TOLERANCE)
         ):
             LOGGER.info("Determined polarisation: LA (Positive Linear Arbitrary).")
             return Pol.LA, top_outer
         if (
-            motor_position_equal(top_inner, -btm_outer)
-            and motor_position_equal(top_outer, 0.0)
-            and motor_position_equal(btm_inner, 0.0)
+            isclose(top_inner, -btm_outer, abs_tol=ROW_PHASE_MOTOR_TOLERANCE)
+            and isclose(top_outer, 0.0, abs_tol=ROW_PHASE_MOTOR_TOLERANCE)
+            and isclose(btm_inner, 0.0, abs_tol=ROW_PHASE_MOTOR_TOLERANCE)
         ):
             LOGGER.info("Determined polarisation: LA (Negative Linear Arbitrary).")
             return Pol.LA, top_inner
 
         LOGGER.warning("Unable to determine polarisation. Defaulting to NONE.")
         return Pol.NONE, 0.0
-
-
-def motor_position_equal(a, b) -> bool:
-    """
-    Check motor is within tolerance.
-    """
-    return isclose(a, b, abs_tol=ROW_PHASE_MOTOR_TOLERANCE)
