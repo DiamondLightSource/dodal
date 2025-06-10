@@ -8,11 +8,11 @@ from ophyd_async.epics.motor import Motor
 from dodal.devices.electron_analyser import (
     ElectronAnalyserDetector,
     ElectronAnalyserDetectorImpl,
+    ElectronAnalyserDriverImpl,
 )
 from dodal.devices.electron_analyser.abstract import (
     AbstractAnalyserDriverIO,
     AbstractBaseSequence,
-    TAbstractAnalyserDriverIO,
     TAbstractBaseRegion,
     TAbstractBaseSequence,
 )
@@ -42,8 +42,8 @@ async def sim_detector(
 
 @pytest.fixture
 async def sim_driver(
-    driver_class: type[TAbstractAnalyserDriverIO], RE: RunEngine
-) -> TAbstractAnalyserDriverIO:
+    driver_class: type[ElectronAnalyserDriverImpl], RE: RunEngine
+) -> ElectronAnalyserDriverImpl:
     async with init_devices(mock=True, connect=True):
         sim_driver = driver_class(
             prefix="TEST:",
