@@ -94,6 +94,7 @@ class TetrammController(DetectorController):
 
     Args:
         drv (TetrammDriver): A configured driver for the device
+        hdf (NDFileHDFIO): A plugin for storing HDF5 format
         maximum_readings_per_frame (int): Maximum number of readings per frame: actual readings may be lower if higher frame rate is required
         minimum_values_per_reading (int): Lower bound on the values that will be averaged to create a single reading
         readings_per_frame (int): Actual number of readings per frame.
@@ -134,13 +135,15 @@ class TetrammController(DetectorController):
             if isinstance(trigger_info.number_of_events, list | tuple)
             else int(trigger_info.number_of_events)
         )
-        self._total_triggers = total_triggers
-        averaging_time = trigger_info.livetime / self._total_triggers
+
+        # Tetramms do not use a typical cam plugin, so we need to work out
+        # the time per trigger
+        averaging_time = trigger_info.livetime / total_triggers
 
         await asyncio.gather(
             self._drv.averaging_time.set(averaging_time),
             self.set_exposure(averaging_time),
-            self._hdf.num_capture.set(self._total_triggers),
+            self._hdf.num_capture.set(total_triggers),
         )
 
     async def arm(self):
