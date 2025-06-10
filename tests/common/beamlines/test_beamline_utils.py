@@ -19,6 +19,12 @@ from dodal.utils import DeviceInitializationController
 
 
 @pytest.fixture(autouse=True)
+def i03_beamline():
+    with patch("dodal.common.beamlines.beamline_utils.BL", "i03") as bl:
+        yield bl
+
+
+@pytest.fixture(autouse=True)
 def flush_event_loop_on_finish():
     event_loop = asyncio.get_event_loop()
     # wait for the test function to complete
@@ -183,3 +189,25 @@ def test_skip(RE):
 
     skip = False
     assert not controller.skip
+
+
+def test_clear_devices_destroys_ophyd_v1_devices():
+    dev1 = beamline_utils.device_instantiation(
+        EigerDetector, "eiger", "", True, True, None
+    )
+    dev1.destroy = MagicMock()
+
+    beamline_utils.clear_devices()
+
+    dev1.destroy.assert_called_once()
+
+
+def test_clear_device_destroys_ophyd_v1_device():
+    dev1 = beamline_utils.device_instantiation(
+        EigerDetector, "eiger", "", True, True, None
+    )
+    dev1.destroy = MagicMock()
+
+    beamline_utils.clear_device("eiger")
+
+    dev1.destroy.assert_called_once()
