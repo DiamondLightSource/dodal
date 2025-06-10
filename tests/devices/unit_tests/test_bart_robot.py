@@ -1,5 +1,3 @@
-"""PYTEST_DONT_REWRITE"""
-
 import traceback
 from asyncio import create_task, sleep
 from unittest.mock import ANY, AsyncMock, MagicMock, call, patch
