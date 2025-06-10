@@ -2,7 +2,7 @@ from typing import Any
 
 import pytest
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import init_devices
+from ophyd_async.core import SignalR, init_devices
 from ophyd_async.epics.motor import Motor
 
 from dodal.devices.electron_analyser import (
@@ -30,32 +30,49 @@ from tests.devices.unit_tests.electron_analyser.util import (
 
 
 @pytest.fixture
-async def sim_detector(
-    detector_class: type[ElectronAnalyserDetectorImpl], RE: RunEngine
-) -> ElectronAnalyserDetectorImpl:
+async def pgm_energy(RE: RunEngine) -> Motor:
     async with init_devices(mock=True, connect=True):
-        sim_detector = detector_class(
+        pgm_energy = Motor(
             prefix="TEST:",
         )
+    return pgm_energy
+
+
+@pytest.fixture
+async def dcm_energy(RE: RunEngine) -> Motor:
+    async with init_devices(mock=True, connect=True):
+        dcm_energy = Motor(
+            prefix="TEST:",
+        )
+    return dcm_energy
+
+
+@pytest.fixture
+async def energy_sources(dcm_energy: Motor, pgm_energy: Motor) -> dict[str, SignalR]:
+    return {"source1": dcm_energy.user_readback, "source2": pgm_energy.user_readback}
+
+
+@pytest.fixture
+async def sim_detector(
+    detector_class: type[ElectronAnalyserDetectorImpl],
+    energy_sources: dict[str, SignalR],
+    RE: RunEngine,
+) -> ElectronAnalyserDetectorImpl:
+    async with init_devices(mock=True, connect=True):
+        sim_detector = detector_class(prefix="TEST:", energy_sources=energy_sources)
     return sim_detector
 
 
 @pytest.fixture
 async def sim_driver(
-    driver_class: type[ElectronAnalyserDriverImpl], RE: RunEngine
+    driver_class: type[ElectronAnalyserDriverImpl],
+    energy_sources: dict[str, SignalR],
+    RE: RunEngine,
 ) -> ElectronAnalyserDriverImpl:
     async with init_devices(mock=True, connect=True):
         sim_driver = driver_class(
             prefix="TEST:",
-        )
-    return sim_driver
-
-
-@pytest.fixture
-async def sim_energy_source(RE: RunEngine) -> Motor:
-    async with init_devices(mock=True, connect=True):
-        sim_driver = Motor(
-            prefix="TEST:",
+            energy_sources=energy_sources,
         )
     return sim_driver
 
@@ -78,7 +95,6 @@ def sequence(
     RE: RunEngine,
 ):
     det = ElectronAnalyserDetector(
-        prefix="SIM:",
         driver=sim_driver,
         sequence_class=sequence_class,
     )
