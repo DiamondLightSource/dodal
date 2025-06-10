@@ -1,3 +1,5 @@
+from ophyd_async.core import SignalR
+
 from dodal.devices.electron_analyser.detector import (
     ElectronAnalyserDetector,
 )
@@ -17,6 +19,6 @@ class VGScientaDetector(
         VGScientaRegion,
     ]
 ):
-    def __init__(self, prefix: str, name: str = ""):
-        driver = VGScientaAnalyserDriverIO(prefix)
-        super().__init__(prefix, VGScientaSequence, driver, name)
+    def __init__(self, prefix: str, energy_sources: dict[str, SignalR], name: str = ""):
+        driver = VGScientaAnalyserDriverIO(prefix, energy_sources)
+        super().__init__(VGScientaSequence, driver, name)

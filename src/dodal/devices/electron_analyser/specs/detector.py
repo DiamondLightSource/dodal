@@ -1,3 +1,5 @@
+from ophyd_async.core import SignalR
+
 from dodal.devices.electron_analyser.detector import (
     ElectronAnalyserDetector,
 )
@@ -8,6 +10,6 @@ from dodal.devices.electron_analyser.specs.region import SpecsRegion, SpecsSeque
 class SpecsDetector(
     ElectronAnalyserDetector[SpecsAnalyserDriverIO, SpecsSequence, SpecsRegion]
 ):
-    def __init__(self, prefix: str, name: str = ""):
-        driver = SpecsAnalyserDriverIO(prefix=prefix)
-        super().__init__(prefix, SpecsSequence, driver, name)
+    def __init__(self, prefix: str, energy_sources: dict[str, SignalR], name: str = ""):
+        driver = SpecsAnalyserDriverIO(prefix, energy_sources)
+        super().__init__(SpecsSequence, driver, name)

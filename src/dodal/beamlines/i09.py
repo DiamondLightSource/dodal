@@ -1,3 +1,6 @@
+from ophyd_async.core import StrictEnum
+from ophyd_async.epics.motor import Motor
+
 from dodal.common.beamlines.beamline_utils import (
     device_factory,
 )
@@ -8,6 +11,12 @@ from dodal.devices.pgm import PGM
 from dodal.devices.synchrotron import Synchrotron
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
+
+
+class EnergyMode(StrictEnum):
+    KINETIC = "Kinetic"
+    BINDING = "Binding"
+
 
 BL = get_beamline_name("i09")
 PREFIX = BeamlinePrefix(BL)
@@ -21,11 +30,6 @@ def synchrotron() -> Synchrotron:
 
 
 @device_factory()
-def analyser_driver() -> VGScientaAnalyserDriverIO:
-    return VGScientaAnalyserDriverIO(prefix=f"{PREFIX.beamline_prefix}-EA-DET-01:CAM:")
-
-
-@device_factory()
 def pgm() -> PGM:
     return PGM(
         prefix=f"{BeamlinePrefix(BL, suffix='J').beamline_prefix}-MO-PGM-01:",
@@ -36,3 +40,14 @@ def pgm() -> PGM:
 @device_factory()
 def dcm() -> DCM:
     return DCM(prefix=f"{PREFIX.beamline_prefix}-MO-DCM-01:")
+
+
+@device_factory()
+def analyser_driver() -> VGScientaAnalyserDriverIO:
+    energy_sources = {
+        "source1": pgm().energy.user_readback,
+        "source2": dcm().energy_in_ev,
+    }
+    return VGScientaAnalyserDriverIO(
+        f"{PREFIX.beamline_prefix}-EA-DET-01:CAM:", energy_sources
+    )

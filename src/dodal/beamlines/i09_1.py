@@ -1,3 +1,5 @@
+from ophyd_async.epics.motor import Motor
+
 from dodal.common.beamlines.beamline_utils import (
     device_factory,
 )
@@ -20,10 +22,12 @@ def synchrotron() -> Synchrotron:
 
 
 @device_factory()
-def analyser_driver() -> SpecsAnalyserDriverIO:
-    return SpecsAnalyserDriverIO(prefix=f"{PREFIX.beamline_prefix}-EA-DET-02:CAM:")
+def dcm() -> DCM:
+    return DCM(prefix=f"{PREFIX.beamline_prefix}-MO-DCM-01:")
 
 
 @device_factory()
-def dcm() -> DCM:
-    return DCM(prefix=f"{PREFIX.beamline_prefix}-MO-DCM-01:")
+def analyser_driver() -> SpecsAnalyserDriverIO:
+    return SpecsAnalyserDriverIO(
+        f"{PREFIX.beamline_prefix}-EA-DET-02:CAM:", {"source1": dcm().energy_in_ev}
+    )
