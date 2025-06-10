@@ -5,7 +5,7 @@ from typing import Generic, TypeVar
 
 from pydantic import BaseModel, Field, model_validator
 
-from dodal.devices.electron_analyser.types import EnergyMode
+from dodal.devices.electron_analyser.enums import EnergyMode
 
 
 def java_to_python_case(java_str: str) -> str:
@@ -53,6 +53,7 @@ class AbstractBaseRegion(ABC, JavaToPythonModel):
     enabled: bool = False
     slices: int = 1
     iterations: int = 1
+    excitation_energy_source: str = "source1"
     # These ones we need subclasses to provide default values
     lens_mode: str
     pass_energy: int
