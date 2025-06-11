@@ -25,5 +25,5 @@ def analyser_driver() -> SpecsAnalyserDriverIO:
 
 
 @device_factory()
-def dcm_device() -> DCM:
-    return DCM(prefix=f"{PREFIX.beamline_prefix}-MO-DCM-01:", name="dcm")
+def dcm() -> DCM:
+    return DCM(prefix=f"{PREFIX.beamline_prefix}-MO-DCM-01:")

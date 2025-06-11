@@ -20,7 +20,7 @@ def synchrotron() -> Synchrotron:
 
 
 @device_factory()
-def pgm_device() -> PGM:
+def pgm() -> PGM:
     return PGM(
         prefix=f"{PREFIX.beamline_prefix}-MO-PGM-01:",
         grating=I09Grating,

@@ -27,15 +27,14 @@ def analyser_driver() -> VGScientaAnalyserDriverIO:
 
 
 @device_factory()
-def pgm_device() -> PGM:
+def pgm() -> PGM:
     return PGM(
         prefix=f"{BeamlinePrefix(BL, suffix='J').beamline_prefix}-MO-PGM-01:",
         grating=I09Grating,
         gratingPv="GRATINGSELECT:SELECT",
-        name="pgm",
     )
 
 
 @device_factory()
-def dcm_device() -> DCM:
-    return DCM(prefix=f"{PREFIX.beamline_prefix}-MO-DCM-01:", name="dcm")
+def dcm() -> DCM:
+    return DCM(prefix=f"{PREFIX.beamline_prefix}-MO-DCM-01:")

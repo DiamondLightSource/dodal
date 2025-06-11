@@ -19,10 +19,10 @@ def analyser_driver() -> VGScientaAnalyserDriverIO:
 
 
 @device_factory()
-def AlKa_source() -> LabXraySourceReadable:
-    return LabXraySourceReadable(LabXraySource.AlKa, "AlKa_source")
+def al_kalpha_source() -> LabXraySourceReadable:
+    return LabXraySourceReadable(LabXraySource.AL_KALPHA)
 
 
 @device_factory()
-def MgKa_source() -> LabXraySourceReadable:
-    return LabXraySourceReadable(LabXraySource.MgKa, "MgKa_source")
+def mg_kalpha_source() -> LabXraySourceReadable:
+    return LabXraySourceReadable(LabXraySource.MG_KALPHA)
