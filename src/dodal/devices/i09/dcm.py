@@ -18,8 +18,6 @@ class DCM(BaseDCM[PitchAndRollCrystal, StationaryCrystal]):
         super().__init__(prefix, PitchAndRollCrystal, StationaryCrystal, name)
         with self.add_children_as_readables():
             self.energy_in_ev = derived_signal_r(
-                self._convert_keV_to_eV, energy_signal=self.energy_in_kev.user_readback
+                lambda energy_signal: energy_signal * 1000,
+                energy_signal=self.energy_in_kev.user_readback,
             )
-
-    def _convert_keV_to_eV(self, energy_signal: float) -> float:
-        return energy_signal * 1000
