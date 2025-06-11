@@ -79,8 +79,19 @@ class HutchShutter(StandardReadable, Movable[ShutterDemand]):
 
         super().__init__(name)
 
+    async def _check_current_state_against_demand(self, demand: ShutterDemand) -> bool:
+        current_state = await self.status.get_value()
+        if current_state == demand:
+            return True
+        return False
+
     @AsyncStatus.wrap
     async def set(self, value: ShutterDemand):
+        state_check = await self._check_current_state_against_demand(value)
+        if state_check:
+            LOGGER.info(f"Shutter already in {value.value} position.")
+            return
+
         interlock_state = await self.interlock.shutter_safe_to_operate()
         if not interlock_state and not TEST_MODE:
             # If not in test mode, fail. If in test mode, the optics hutch may be open.
