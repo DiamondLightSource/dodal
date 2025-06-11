@@ -24,5 +24,5 @@ def pgm_device() -> PGM:
     return PGM(
         prefix=f"{PREFIX.beamline_prefix}-MO-PGM-01:",
         grating=I09Grating,
-        gratingPv="GRAINGSELECT",
+        gratingPv="GRATINGSELECT:SELECT",
     )

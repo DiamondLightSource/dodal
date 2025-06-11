@@ -2,8 +2,8 @@ from dodal.common.beamlines.beamline_utils import (
     device_factory,
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.devices.common_dcm import BaseDCM, PitchAndRollCrystal, StationaryCrystal
 from dodal.devices.electron_analyser.specs import SpecsAnalyserDriverIO
+from dodal.devices.i09.dcm import DCM
 from dodal.devices.synchrotron import Synchrotron
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
@@ -25,9 +25,5 @@ def analyser_driver() -> SpecsAnalyserDriverIO:
 
 
 @device_factory()
-def dcm_device() -> BaseDCM:
-    return BaseDCM(
-        prefix=f"{PREFIX.beamline_prefix}-MO-DCM-01:",
-        xtal_1=PitchAndRollCrystal,
-        xtal_2=StationaryCrystal,
-    )
+def dcm_device() -> DCM:
+    return DCM(prefix=f"{PREFIX.beamline_prefix}-MO-DCM-01:", name="dcm")
