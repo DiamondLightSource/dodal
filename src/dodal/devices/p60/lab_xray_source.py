@@ -2,7 +2,7 @@ from enum import Enum
 
 from ophyd_async.core import (
     StandardReadable,
-    soft_signal_rw,
+    soft_signal_r_and_setter,
 )
 from ophyd_async.core import StandardReadableFormat as Format
 
@@ -19,5 +19,7 @@ class LabXraySourceReadable(StandardReadable):
 
     def __init__(self, xraysource: Enum, name: str) -> None:
         with self.add_children_as_readables(Format.HINTED_SIGNAL):
-            self.user_readback = soft_signal_rw(float, initial_value=xraysource.value)
+            self.user_readback, _ = soft_signal_r_and_setter(
+                float, initial_value=xraysource.value
+            )
         super().__init__(name=name)
