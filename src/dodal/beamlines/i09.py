@@ -3,8 +3,7 @@ from dodal.common.beamlines.beamline_utils import (
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.devices.electron_analyser.vgscienta import VGScientaAnalyserDriverIO
-from dodal.devices.i09.dcm import DCM
-from dodal.devices.i09.grating import I09Grating
+from dodal.devices.i09 import DCM, I09Grating
 from dodal.devices.pgm import PGM
 from dodal.devices.synchrotron import Synchrotron
 from dodal.log import set_beamline as set_log_beamline

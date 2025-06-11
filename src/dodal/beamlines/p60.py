@@ -3,7 +3,7 @@ from dodal.common.beamlines.beamline_utils import (
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.devices.electron_analyser.vgscienta import VGScientaAnalyserDriverIO
-from dodal.devices.p60.lab_xray_source import LabXraySource, LabXraySourceReadable
+from dodal.devices.p60 import LabXraySource, LabXraySourceReadable
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 

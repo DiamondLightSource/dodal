@@ -2,7 +2,7 @@ from dodal.common.beamlines.beamline_utils import (
     device_factory,
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.devices.b07.grating import B07BGrating
+from dodal.devices.b07 import B07BGrating
 from dodal.devices.electron_analyser.specs import SpecsAnalyserDriverIO
 from dodal.devices.pgm import PGM
 from dodal.devices.synchrotron import Synchrotron
