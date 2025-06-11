@@ -19,10 +19,12 @@ dodal.devices.apple2\_undulator.Apple2
       
       
       
-      ~Apple2.determinePhaseFromHardware
+      ~Apple2.determine_phase_from_hardware
       
       
       
+      
+      ~Apple2.set
       
       
       
@@ -42,9 +44,6 @@ dodal.devices.apple2\_undulator.Apple2
       
       
       
-      
-      
-      ~Apple2.pol
       
    
    
