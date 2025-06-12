@@ -1,10 +1,9 @@
-import asyncio
-
 from ophyd_async.core import (
     Device,
     Signal,
     SignalR,
     StandardReadable,
+    derived_signal_r,
     soft_signal_r_and_setter,
 )
 from ophyd_async.epics.core import (
@@ -13,7 +12,6 @@ from ophyd_async.epics.core import (
     epics_signal_x,
 )
 
-from dodal.common.signal_utils import create_hardware_backed_soft_signal
 from dodal.devices.fast_grid_scan import (
     GridScanParamsCommon,
     ZebraFastGridScan,
@@ -44,13 +42,14 @@ class MotionProgram(Device):
 
 
 class TwoDFastGridScan(ZebraFastGridScan):
-    """The EPICS interface 2D FGS's differs slightly from the standard Hyperion version:
-    No Z steps or Z step size, exposure_time instead of dwell_time, no scan valid PV
+    """The EPICS interface for that 2D FGS's differs slightly from the standard
+    Hyperion version: no Z steps or Z step size, exposure_time instead of dwell_time,
+    no scan valid PV.
 
-    This device messily abstracts away the differences by adding empty signals to the missing PV's.
+    This device abstracts away the differences by adding empty signals to the missing PV's.
     Plans which expect the 3D grid scan device can then also use this.
 
-    Need to create an issue for standardising these on EPICS - or just wait for PPMAC ticket?
+    See https://github.com/DiamondLightSource/mx-bluesky/issues/1112 for long term solution
     """
 
     def __init__(self, prefix: str, name: str = "") -> None:
@@ -64,7 +63,7 @@ class TwoDFastGridScan(ZebraFastGridScan):
         self.motion_program = MotionProgram("BL02J-MO-STEP-11:")
         self.position_counter = self._create_position_counter(prefix)
 
-        # Z movement and second start position doesn't exist in EPICS for 2D scan.
+        # Z movement and second start position don't exist in EPICS for 2D scan.
         # Create soft signals for these so the class is structured like the common device.
         self.z_steps, _ = soft_signal_r_and_setter(int, 0)
         self.z_step_size, _ = soft_signal_r_and_setter(float, 0)
@@ -74,8 +73,10 @@ class TwoDFastGridScan(ZebraFastGridScan):
 
         self.run_cmd = epics_signal_x(f"{prefix}RUN.PROC")
         self.status = epics_signal_r(int, f"{prefix}SCAN_STATUS")
-        self.expected_images = create_hardware_backed_soft_signal(
-            float, self._calculate_expected_images
+        self.expected_images = derived_signal_r(
+            self._calculate_expected_images,
+            x=self.x_steps,
+            y=self.y_steps,
         )
 
         self.x_counter = epics_signal_r(int, f"{prefix}X_COUNTER")
@@ -99,11 +100,7 @@ class TwoDFastGridScan(ZebraFastGridScan):
         # Skip the FGSCommon init function as we have already overriden all the signals
         StandardReadable.__init__(self, name)
 
-    async def _calculate_expected_images(self):
-        x, y = await asyncio.gather(
-            self.x_steps.get_value(),
-            self.y_steps.get_value(),
-        )
+    async def _calculate_expected_images(self, x: int, y: int) -> int:
         LOGGER.info(f"Reading num of images found {x, y} images in each axis")
         return x * y
 

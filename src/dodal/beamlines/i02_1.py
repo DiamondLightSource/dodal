@@ -6,7 +6,6 @@ from dodal.common.beamlines.beamline_utils import (
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.devices.eiger import EigerDetector
-from dodal.devices.i02_1.backlight import Backlight
 from dodal.devices.i02_1.fast_grid_scan import TwoDFastGridScan
 from dodal.devices.i02_1.sample_motors import SampleMotors
 from dodal.devices.synchrotron import Synchrotron
@@ -32,17 +31,6 @@ I02_1_ZEBRA_MAPPING = ZebraMapping(
     ),
     sources=ZebraSources(),
 )
-
-
-@device_factory()
-def backlight() -> Backlight:
-    """Get the i02-1 backlight device, instantiate it if it hasn't already been.
-    If this is called when already instantiated in i02-1, it will return the existing object.
-    """
-    return Backlight(
-        prefix=PREFIX.beamline_prefix,
-        name="backlight",
-    )
 
 
 @device_factory()
