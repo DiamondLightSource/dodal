@@ -46,12 +46,7 @@ class ElectronAnalyserRegionDetector(
 
     @AsyncStatus.wrap
     async def trigger(self) -> None:
-        """
-        Prepare driver with the region stored and energy_source motor.
-
-        Args:
-            value: The excitation energy source that the region has selected.
-        """
+        # Configure region parameters on the driver first before data collection.
         await self.driver.set(self.region)
         super().trigger()
 
