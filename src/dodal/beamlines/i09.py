@@ -1,6 +1,3 @@
-from ophyd_async.core import StrictEnum
-from ophyd_async.epics.motor import Motor
-
 from dodal.common.beamlines.beamline_utils import (
     device_factory,
 )
@@ -11,12 +8,6 @@ from dodal.devices.pgm import PGM
 from dodal.devices.synchrotron import Synchrotron
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
-
-
-class EnergyMode(StrictEnum):
-    KINETIC = "Kinetic"
-    BINDING = "Binding"
-
 
 BL = get_beamline_name("i09")
 PREFIX = BeamlinePrefix(BL)
