@@ -289,7 +289,9 @@ class ZebraFastGridScan(FastGridScanCommon[ZebraGridScanParams]):
         self.movable_params["dwell_time_ms"] = self.dwell_time_ms
 
     def _create_position_counter(self, prefix: str):
-        return epics_signal_rw_rbv(int, f"{prefix}POS_COUNTER")
+        return epics_signal_rw(
+            int, f"{prefix}POS_COUNTER", write_pv=f"{prefix}POS_COUNTER_WRITE"
+        )
 
 
 class PandAFastGridScan(FastGridScanCommon[PandAGridScanParams]):
