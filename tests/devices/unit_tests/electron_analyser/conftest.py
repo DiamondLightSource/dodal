@@ -5,7 +5,10 @@ from bluesky.run_engine import RunEngine
 from ophyd_async.core import init_devices
 from ophyd_async.epics.motor import Motor
 
-from dodal.devices.electron_analyser import ElectronAnalyserDetector
+from dodal.devices.electron_analyser import (
+    ElectronAnalyserDetector,
+    ElectronAnalyserDetectorImpl,
+)
 from dodal.devices.electron_analyser.abstract import (
     AbstractAnalyserDriverIO,
     AbstractBaseSequence,
@@ -22,7 +25,6 @@ from dodal.devices.electron_analyser.vgscienta import (
     VGScientaSequence,
 )
 from tests.devices.unit_tests.electron_analyser.util import (
-    ElectronAnalyserDetectorImpl,
     get_test_sequence,
 )
 
