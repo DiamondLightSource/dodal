@@ -107,17 +107,16 @@ class AbstractAnalyserDriverIO(
         """
 
         source = self.get_energy_source(region.excitation_energy_source)
-        excitation_energy_value = await source.get_value()  # eV
-        excitation_energy_source_name = source.name
+        excitation_energy = await source.get_value()  # eV
 
         pass_energy_type = self.pass_energy_type
         pass_energy = pass_energy_type(region.pass_energy)
 
         low_energy = to_kinetic_energy(
-            region.low_energy, region.energy_mode, excitation_energy_value
+            region.low_energy, region.energy_mode, excitation_energy
         )
         high_energy = to_kinetic_energy(
-            region.high_energy, region.energy_mode, excitation_energy_value
+            region.high_energy, region.energy_mode, excitation_energy
         )
         await asyncio.gather(
             self.region_name.set(region.name),
@@ -129,8 +128,8 @@ class AbstractAnalyserDriverIO(
             self.pass_energy.set(pass_energy),
             self.iterations.set(region.iterations),
             self.acquisition_mode.set(region.acquisition_mode),
-            self.excitation_energy.set(excitation_energy_value),
-            self.excitation_energy_source.set(excitation_energy_source_name),
+            self.excitation_energy.set(excitation_energy),
+            self.excitation_energy_source.set(source.name),
         )
 
     def get_energy_source(self, alias_name: str = "") -> SignalR:
