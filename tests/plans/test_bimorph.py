@@ -8,7 +8,7 @@ from unittest.mock import ANY, Mock, call
 import bluesky.plan_stubs as bps
 import pytest
 from bluesky.protocols import Readable
-from bluesky.run_engine import RunEngine
+from bluesky.run_engine import RunEngine, call_in_bluesky_event_loop
 from bluesky.utils import Msg
 from numpy import linspace
 from ophyd_async.core import (
@@ -429,31 +429,13 @@ class TestBimorphOptimisation:
         slit_settle_time: float,
         initial_voltage_list: list[float],
     ):
+        async def make_future():
+            return asyncio.Future()
+
+        future = call_in_bluesky_event_loop(make_future())
+
         def start_subscription(name, doc):
-            assert {
-                "plan_args": {
-                    "detectors": {det.name for det in detectors},
-                    "mirror": mirror_with_mocked_put.name,
-                    "slits": slits.name,
-                    "voltage_increment": voltage_increment,
-                    "active_dimension": active_dimension,
-                    "active_slit_center_start": active_slit_center_start,
-                    "active_slit_center_end": active_slit_center_end,
-                    "active_slit_size": active_slit_size,
-                    "inactive_slit_center": inactive_slit_center,
-                    "inactive_slit_size": inactive_slit_size,
-                    "number_of_slit_positions": number_of_slit_positions,
-                    "bimorph_settle_time": bimorph_settle_time,
-                    "slit_settle_time": slit_settle_time,
-                    "initial_voltage_list": initial_voltage_list,
-                },
-                "plan_name": "bimorph_optimisation",
-                "shape": [
-                    len(mirror_with_mocked_put.channels),
-                    number_of_slit_positions,
-                ],
-                "foo": "bar",
-            }.items() <= doc.items()
+            future.set_result(doc)
 
         RE(
             bimorph_optimisation(
@@ -475,6 +457,33 @@ class TestBimorphOptimisation:
             ),
             {"start": start_subscription},
         )
+
+        start_doc = future.result()
+
+        assert {
+            "plan_args": {
+                "detectors": {det.name for det in detectors},
+                "mirror": mirror_with_mocked_put.name,
+                "slits": slits.name,
+                "voltage_increment": voltage_increment,
+                "active_dimension": active_dimension,
+                "active_slit_center_start": active_slit_center_start,
+                "active_slit_center_end": active_slit_center_end,
+                "active_slit_size": active_slit_size,
+                "inactive_slit_center": inactive_slit_center,
+                "inactive_slit_size": inactive_slit_size,
+                "number_of_slit_positions": number_of_slit_positions,
+                "bimorph_settle_time": bimorph_settle_time,
+                "slit_settle_time": slit_settle_time,
+                "initial_voltage_list": initial_voltage_list,
+            },
+            "plan_name": "bimorph_optimisation",
+            "shape": [
+                len(mirror_with_mocked_put.channels),
+                number_of_slit_positions,
+            ],
+            "foo": "bar",
+        }.items() <= start_doc.items()
 
     async def test_settle_time_called(
         self,
