@@ -27,7 +27,7 @@ class SpecsAnalyserDriverIO(
         self,
         prefix: str,
         lens_mode_type,
-        energy_sources: dict[str, SignalR],
+        energy_sources: dict[str, SignalR[float]],
         name: str = "",
     ) -> None:
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):

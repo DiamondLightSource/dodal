@@ -22,7 +22,7 @@ class SpecsDetector(
         self,
         prefix: str,
         lens_mode_type: type[StrictEnum],
-        energy_sources: dict[str, SignalR],
+        energy_sources: dict[str, SignalR[float]],
         name: str = "",
     ):
         driver = SpecsAnalyserDriverIO[TLensMode](
