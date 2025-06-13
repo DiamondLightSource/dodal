@@ -196,9 +196,9 @@ def bimorph_optimisation(
     bimorph mirror, of using a 2-dimensional slit.
 
     Args:
+        detectors: list[Readable] detectors
         bimorph: BimorphMirror to move
         slit: Slits
-        oav: oav on-axis viewer
         voltage_increment: float voltage increment applied to each bimorph electrode
         active_dimension: SlitDimension that slit will move in (X or Y)
         active_slit_center_start: float start position of center of slit in active dimension
