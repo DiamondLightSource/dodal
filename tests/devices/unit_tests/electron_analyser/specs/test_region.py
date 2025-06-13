@@ -3,6 +3,7 @@ from typing import Any
 import pytest
 
 from dodal.common.data_util import load_json_file_to_class
+from dodal.devices.b07 import LensMode
 from dodal.devices.electron_analyser import EnergyMode
 from dodal.devices.electron_analyser.abstract.base_region import TAbstractBaseRegion
 from dodal.devices.electron_analyser.specs import (
@@ -34,7 +35,7 @@ def expected_region_values() -> list[dict[str, Any]]:
             "name": "New_Region",
             "acquisition_mode": AcquisitionMode.FIXED_TRANSMISSION,
             "psu_mode": "3.5kV",
-            "lens_mode": "SmallArea",
+            "lens_mode": LensMode.SMALL_AREA,
             "low_energy": 800.0,
             "high_energy": 850.0,
             "energy_step": 0.1,
@@ -53,7 +54,7 @@ def expected_region_values() -> list[dict[str, Any]]:
             "name": "New_Region1",
             "acquisition_mode": AcquisitionMode.SNAPSHOT,
             "psu_mode": "1.5kV",
-            "lens_mode": "LargeArea",
+            "lens_mode": LensMode.LARGE_AREA,
             "low_energy": 599.866,
             "high_energy": 600.134,
             "energy_step": 0.2680000000000291,

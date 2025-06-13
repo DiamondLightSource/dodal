@@ -1,4 +1,5 @@
 import asyncio
+from typing import Generic
 
 import numpy as np
 from ophyd_async.core import (
@@ -12,14 +13,22 @@ from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
 from dodal.devices.electron_analyser.abstract.base_driver_io import (
     AbstractAnalyserDriverIO,
+    TLensMode,
 )
 from dodal.devices.electron_analyser.specs.enums import AcquisitionMode
 from dodal.devices.electron_analyser.specs.region import SpecsRegion
 
 
-class SpecsAnalyserDriverIO(AbstractAnalyserDriverIO[SpecsRegion]):
+class SpecsAnalyserDriverIO(
+    AbstractAnalyserDriverIO[SpecsRegion, AcquisitionMode, TLensMode],
+    Generic[TLensMode],
+):
     def __init__(
-        self, prefix: str, energy_sources: dict[str, SignalR], name: str = ""
+        self,
+        prefix: str,
+        lens_mode_type,
+        energy_sources: dict[str, SignalR],
+        name: str = "",
     ) -> None:
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             # Used for setting up region data acquisition.
@@ -31,7 +40,7 @@ class SpecsAnalyserDriverIO(AbstractAnalyserDriverIO[SpecsRegion]):
             self.min_angle_axis = epics_signal_r(float, prefix + "Y_MIN_RBV")
             self.max_angle_axis = epics_signal_r(float, prefix + "Y_MAX_RBV")
 
-        super().__init__(prefix, AcquisitionMode, energy_sources, name)
+        super().__init__(prefix, AcquisitionMode, lens_mode_type, energy_sources, name)
 
     @AsyncStatus.wrap
     async def set(self, region: SpecsRegion):
