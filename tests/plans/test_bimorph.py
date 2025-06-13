@@ -135,9 +135,9 @@ async def test_move_slits(
 
     assert [
         Msg("set", gap_signal, gap, group=ANY),
-        Msg("wait", None, group=ANY),
+        Msg("wait", None, group=ANY, timeout=None),
         Msg("set", centre_signal, center, group=ANY),
-        Msg("wait", None, group=ANY),
+        Msg("wait", None, group=ANY, timeout=None),
     ] == messages
 
 
