@@ -33,12 +33,6 @@ dodal.devices.bimorph\_mirror
 
    
    
-   .. rubric:: Functions
-
-   .. autosummary::
-   
-      tolerance_func_builder
-   
    
 
    
