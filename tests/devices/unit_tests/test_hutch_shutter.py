@@ -45,6 +45,15 @@ async def test_shutter_raises_error_on_set_if_hutch_not_interlocked_on_open(
         await fake_shutter.set(ShutterDemand.OPEN)
 
 
+async def test_shutter_does_not_error_on_close_even_if_hutch_not_interlocked(
+    fake_shutter: HutchShutter,
+):
+    set_mock_value(fake_shutter.interlock.status, 1)
+    assert await fake_shutter.interlock.shutter_safe_to_operate() is False
+
+    await fake_shutter.set(ShutterDemand.CLOSE)
+
+
 @pytest.mark.parametrize(
     "demand, expected_calls, expected_state",
     [
