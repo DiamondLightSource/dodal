@@ -1,6 +1,7 @@
 from collections.abc import Generator
 from dataclasses import dataclass
 from enum import Enum
+from typing import Any
 
 import bluesky.plan_stubs as bps
 import bluesky.preprocessors as bpp
@@ -187,6 +188,7 @@ def bimorph_optimisation(
     bimorph_settle_time: float,
     slit_settle_time: float,
     initial_voltage_list: list | None = None,
+    metadata: dict[str, Any] | None = None,
 ) -> MsgGenerator:
     """Plan for performing bimorph mirror optimisation.
 
@@ -208,6 +210,7 @@ def bimorph_optimisation(
         bimorph_settle_time: float time in seconds to wait after bimorph move
         slit_settle_time: float time in seconds to wait after slit move
         initial_voltage_list: optional list[float] starting voltages for bimorph (defaults to current voltages)
+        metadata: optional dict[str, Any] metadata to add to start document
     """
 
     state = yield from capture_bimorph_state(mirror, slits)
@@ -225,7 +228,9 @@ def bimorph_optimisation(
         SlitDimension.Y if active_dimension == SlitDimension.X else SlitDimension.X
     )
 
-    metadata = {
+    if metadata is None:
+        metadata = {}
+    metadata = metadata | {
         "voltage_increment": voltage_increment,
         "dimension": active_dimension,
         "slit_positions": number_of_slit_positions,
