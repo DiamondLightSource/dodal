@@ -19,7 +19,7 @@ class ZebraShutterControl(StrictEnum):
     AUTO = "Auto"
 
 
-class ZebraShutter(StandardReadable, Movable):
+class ZebraShutter(StandardReadable, Movable[ZebraShutterState]):
     """The shutter on most MX beamlines is controlled by the zebra.
 
     Internally in the zebra there are two AND gates, one for manual control and one for

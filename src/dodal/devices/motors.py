@@ -38,3 +38,24 @@ class XYZPositioner(StandardReadable):
             self.y = Motor(prefix + infix[1])
             self.z = Motor(prefix + infix[2])
         super().__init__(name=name)
+
+
+class SixAxisGonio(XYZPositioner):
+    def __init__(
+        self,
+        prefix: str,
+        name: str = "",
+        infix: tuple[str, str, str, str, str, str] = (
+            "X",
+            "Y",
+            "Z",
+            "KAPPA",
+            "PHI",
+            "OMEGA",
+        ),
+    ):
+        with self.add_children_as_readables():
+            self.kappa = Motor(prefix + infix[3])
+            self.phi = Motor(prefix + infix[4])
+            self.omega = Motor(prefix + infix[5])
+        super().__init__(name=name, prefix=prefix, infix=infix[0:3])

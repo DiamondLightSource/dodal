@@ -6,7 +6,7 @@ from typing import TypeVar
 from bluesky.protocols import Reading
 from event_model.documents.event_descriptor import DataKey
 from ophyd_async.core import PathProvider
-from ophyd_async.epics.adaravis import AravisController, AravisDetector
+from ophyd_async.epics.adaravis import AravisDetector
 from ophyd_async.epics.adpilatus import PilatusDetector
 
 ValueAndUnits = tuple[float, str]
@@ -149,7 +149,6 @@ class NXSasOAV(AravisDetector):
         fileio_suffix: str,
         metadata_holder: NXSasMetadataHolder,
         name: str = "",
-        gpio_number: AravisController.GPIO_NUMBER = 1,
     ):
         """Extends detector with configuration metadata required or desired
         to comply with the NXsas application definition.
@@ -162,7 +161,6 @@ class NXSasOAV(AravisDetector):
             drv_suffix=drv_suffix,
             fileio_suffix=fileio_suffix,
             name=name,
-            gpio_number=gpio_number,
         )
         self._metadata_holder = metadata_holder
 

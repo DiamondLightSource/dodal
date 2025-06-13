@@ -5,7 +5,7 @@ from dodal.common.visit import RemoteDirectoryServiceClient
 
 def create_valid_response(mock_request):
     mock_request.return_value.__aenter__.return_value = (mock_response := MagicMock())
-    mock_response.json = AsyncMock(return_value='{"collectionNumber": 1}')
+    mock_response.json = AsyncMock(return_value={"collectionNumber": 1})
 
 
 @patch("dodal.common.visit.ClientSession.request")

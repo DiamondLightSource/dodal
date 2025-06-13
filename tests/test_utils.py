@@ -7,7 +7,7 @@ from unittest.mock import ANY, MagicMock, Mock, patch
 import pytest
 from bluesky.protocols import Readable
 from bluesky.run_engine import RunEngine
-from ophyd import EpicsMotor
+from ophyd_async.epics.motor import Motor
 
 from dodal.beamlines import i03, i23
 from dodal.devices.diamond_filter import DiamondFilter, I03Filters
@@ -310,7 +310,7 @@ def device_a() -> Readable:
     return MagicMock()
 
 
-def device_b() -> EpicsMotor:
+def device_b() -> Motor:
     return MagicMock()
 
 
@@ -501,14 +501,16 @@ def test_calling_factory_with_different_args_raises_an_exception():
         match="Device factory method called multiple times with different parameters",
     ):
         i03.undulator(daq_configuration_path=MOCK_DAQ_CONFIG_PATH + "x")
+    i03.undulator.cache_clear()
 
 
 def test_calling_factory_with_different_args_does_not_raise_an_exception_after_cache_clear(
     alternate_config,
 ):
     i03.undulator(daq_configuration_path=MOCK_DAQ_CONFIG_PATH)
-    i03.undulator.cache_clear()  # type: ignore
+    i03.undulator.cache_clear()
     i03.undulator(daq_configuration_path=alternate_config)
+    i03.undulator.cache_clear()
 
 
 def test_factories_can_be_called_in_any_order(alternate_config):
@@ -521,8 +523,12 @@ def test_factories_can_be_called_in_any_order(alternate_config):
     i03.undulator(daq_configuration_path=alternate_config)
     i03.undulator_dcm(daq_configuration_path=alternate_config)
 
+    i03.undulator.cache_clear()
+    i03.undulator_dcm.cache_clear()
+
 
 def test_factory_calls_are_cached(alternate_config):
     undulator1 = i03.undulator(daq_configuration_path=alternate_config)
     undulator2 = i03.undulator(daq_configuration_path=alternate_config)
     assert undulator1 is undulator2
+    i03.undulator.cache_clear()

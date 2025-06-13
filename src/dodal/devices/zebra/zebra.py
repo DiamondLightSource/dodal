@@ -4,6 +4,7 @@ import asyncio
 from enum import Enum
 from functools import partialmethod
 
+from bluesky.protocols import Movable
 from ophyd_async.core import (
     AsyncStatus,
     DeviceVector,
@@ -50,6 +51,10 @@ class I24Axes:
     VGON_YH = EncEnum.ENC4
 
 
+class I23Axes:
+    OMEGA = EncEnum.ENC1
+
+
 class RotationDirection(StrictEnum):
     """
     Defines for a swept angle whether the scan width (sweep) is to be added or subtracted from
@@ -63,6 +68,14 @@ class RotationDirection(StrictEnum):
     def multiplier(self):
         return 1 if self == RotationDirection.POSITIVE else -1
 
+    @property
+    def opposite(self) -> RotationDirection:
+        return (
+            RotationDirection.POSITIVE
+            if self == RotationDirection.NEGATIVE
+            else RotationDirection.NEGATIVE
+        )
+
 
 class ArmDemand(Enum):
     ARM = 1
@@ -74,7 +87,7 @@ class SoftInState(StrictEnum):
     NO = "No"
 
 
-class ArmingDevice(StandardReadable):
+class ArmingDevice(StandardReadable, Movable[ArmDemand]):
     """A useful device that can abstract some of the logic of arming.
     Allows a user to just call arm.set(ArmDemand.ARM)"""
 
@@ -94,8 +107,8 @@ class ArmingDevice(StandardReadable):
                 return
 
     @AsyncStatus.wrap
-    async def set(self, demand: ArmDemand):
-        await asyncio.wait_for(self._set_armed(demand), timeout=self.TIMEOUT)
+    async def set(self, value: ArmDemand):
+        await asyncio.wait_for(self._set_armed(value), timeout=self.TIMEOUT)
 
 
 class PositionCompare(StandardReadable):

@@ -29,7 +29,7 @@ class ReadOnlyAttenuator(StandardReadable):
         super().__init__(name)
 
 
-class BinaryFilterAttenuator(ReadOnlyAttenuator, Movable):
+class BinaryFilterAttenuator(ReadOnlyAttenuator, Movable[float]):
     """The attenuator will insert filters into the beam to reduce its transmission.
     In this attenuator, each filter can be in one of two states: IN or OUT
 

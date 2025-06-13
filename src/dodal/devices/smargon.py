@@ -1,14 +1,23 @@
+import asyncio
 from collections.abc import Collection, Generator
 from dataclasses import dataclass
 from enum import Enum
 from math import isclose
-from typing import cast
+from typing import TypedDict, cast
 
 from bluesky import plan_stubs as bps
+from bluesky.protocols import Movable
 from bluesky.utils import Msg
-from ophyd_async.core import AsyncStatus, Device, StandardReadable, wait_for_value
-from ophyd_async.epics.core import epics_signal_r
+from ophyd_async.core import (
+    AsyncStatus,
+    Device,
+    StandardReadable,
+    StrictEnum,
+    wait_for_value,
+)
+from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 from ophyd_async.epics.motor import Motor
+from typing_extensions import NotRequired
 
 from dodal.devices.util.epics_util import SetWhenEnabled
 
@@ -91,7 +100,23 @@ class XYZLimits:
         )
 
 
-class Smargon(StandardReadable):
+class DeferMoves(StrictEnum):
+    ON = "Defer On"
+    OFF = "Defer Off"
+
+
+class CombinedMove(TypedDict):
+    """A move on multiple axes at once using a deferred move"""
+
+    x: NotRequired[float | None]
+    y: NotRequired[float | None]
+    z: NotRequired[float | None]
+    omega: NotRequired[float | None]
+    phi: NotRequired[float | None]
+    chi: NotRequired[float | None]
+
+
+class Smargon(StandardReadable, Movable):
     """
     Real motors added to allow stops following pin load (e.g. real_x1.stop() )
     X1 and X2 real motors provide compound chi motion as well as the compound X travel,
@@ -116,6 +141,8 @@ class Smargon(StandardReadable):
             self.stub_offsets = StubOffsets(prefix=prefix)
             self.disabled = epics_signal_r(int, prefix + "DISABLED")
 
+        self.defer_move = epics_signal_rw(DeferMoves, prefix + "CS1:DeferMoves")
+
         super().__init__(name)
 
     def get_xyz_limits(self) -> Generator[Msg, None, XYZLimits]:
@@ -135,3 +162,15 @@ class Smargon(StandardReadable):
             max_value = yield from bps.rd(pv.high_limit_travel)
             limits[name] = AxisLimit(min_value, max_value)
         return XYZLimits(**limits)
+
+    @AsyncStatus.wrap
+    async def set(self, value: CombinedMove):
+        await self.defer_move.set(DeferMoves.ON)
+        try:
+            tasks = []
+            for k, v in value.items():
+                if v is not None:
+                    tasks.append(getattr(self, k).set(v))
+            await asyncio.gather(*tasks)
+        finally:
+            await self.defer_move.set(DeferMoves.OFF)

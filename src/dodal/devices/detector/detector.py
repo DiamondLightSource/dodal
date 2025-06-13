@@ -1,4 +1,5 @@
 from enum import Enum, auto
+from functools import cached_property
 from pathlib import Path
 
 from pydantic import BaseModel, Field, field_serializer, field_validator
@@ -32,7 +33,7 @@ class DetectorParams(BaseModel):
     # Must use model_dump(by_alias=True) if serialising!
 
     expected_energy_ev: float | None = None
-    exposure_time: float
+    exposure_time_s: float
     directory: str  # : Path https://github.com/DiamondLightSource/dodal/issues/774
     prefix: str
     detector_distance: float
@@ -49,7 +50,7 @@ class DetectorParams(BaseModel):
         False  # Remove in https://github.com/DiamondLightSource/hyperion/issues/1395
     )
 
-    @property
+    @cached_property
     def beam_xy_converter(self) -> DetectorDistanceToBeamXYConverter:
         return DetectorDistanceToBeamXYConverter(self.det_dist_to_beam_converter_path)
 

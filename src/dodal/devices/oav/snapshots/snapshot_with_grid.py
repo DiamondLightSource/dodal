@@ -34,9 +34,10 @@ class SnapshotWithGrid(MJPG):
         box_width = await self.box_width.get_value()
         num_boxes_x = await self.num_boxes_x.get_value()
         num_boxes_y = await self.num_boxes_y.get_value()
-
-        assert isinstance(filename_str := await self.filename.get_value(), str)
-        assert isinstance(directory_str := await self.directory.get_value(), str)
+        filename_str = await self.filename.get_value()
+        assert isinstance(filename_str, str)
+        directory_str = await self.directory.get_value()
+        assert isinstance(directory_str, str)
 
         add_grid_border_overlay_to_image(
             image, int(top_left_x), int(top_left_y), box_width, num_boxes_x, num_boxes_y

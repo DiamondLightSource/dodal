@@ -16,10 +16,10 @@ from dodal.devices.i13_1.merlin import Merlin
 @pytest.fixture
 def one_shot_trigger_info() -> TriggerInfo:
     return TriggerInfo(
-        frame_timeout=None,
-        number_of_triggers=1,
+        exposure_timeout=None,
+        number_of_events=1,
         trigger=DetectorTrigger.INTERNAL,
-        deadtime=None,
+        deadtime=0.0,
         livetime=None,
     )
 
@@ -76,8 +76,6 @@ async def test_can_collect(
     assert stream_resource["uri"] == "file://localhost/foo/bar.hdf"
     assert stream_resource["parameters"] == {
         "dataset": "/entry/data/data",
-        "swmr": False,
-        "multiplier": 1,
         "chunk_shape": (1, 20, 10),
     }
     assert docs[1][0] == "stream_datum"
@@ -98,7 +96,7 @@ async def test_can_decribe_collect(merlin: Merlin, one_shot_trigger_info: Trigge
     assert (await merlin.describe_collect()) == {
         "merlin": {
             "source": "mock+ca://BL13J-EA-DET-04HDF5:FullFileName_RBV",
-            "shape": [20, 10],
+            "shape": [1, 20, 10],
             "dtype": "array",
             "dtype_numpy": "|i1",
             "external": "STREAM:",

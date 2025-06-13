@@ -15,8 +15,8 @@ description = "Ophyd devices and other utils that could be used across DLS beaml
 dependencies = [
     "click",
     "ophyd",
-    "ophyd-async >= 0.9.0a2",
-    "bluesky == 1.13.0",
+    "ophyd-async>=0.10.0a4",
+    "bluesky",
     "pyepics",
     "dataclasses-json",
     "pillow",
@@ -55,7 +55,7 @@ dev = [
     "pre-commit",
     "psutil",
     "pydata-sphinx-theme>=0.12",
-    "pyright==1.1.394",          # See https://github.com/DiamondLightSource/dodal/issues/1079
+    "pyright",
     "pytest",
     "pytest-asyncio",
     "pytest-cov",
@@ -103,12 +103,11 @@ reportMissingImports = false  # Ignore missing stubs in imported modules
 # Run pytest with all our checkers, and don't spam us with massive tracebacks on error
 asyncio_mode = "auto"
 markers = [
-    "s03: marks tests as requiring the s03 simulator running (deselect with '-m \"not s03\"')",
-    "adsim: marks tests as requiring the containerised AreaDetector simulator running (deselect with '-m \"not adsim\"')",
+    "requires: marks tests as requiring other infrastructure",
     "skip_in_pycharm: marks test as not working in pycharm testrunner",
 ]
 addopts = """
-    --cov=dodal --cov-report term --cov-report xml:cov.xml
+    --cov=src/dodal --cov=dodal --cov-report term
     --tb=native -vv --doctest-modules --doctest-glob="*.rst"
     """
 # https://iscinumpy.gitlab.io/post/bound-version-constraints/#watch-for-warnings
@@ -118,8 +117,6 @@ filterwarnings = [
     "ignore:dep_util is Deprecated. Use functions from setuptools instead.:DeprecationWarning",
     # Ignore deprecation warning from zocalo
     "ignore:.*pkg_resources.*:DeprecationWarning",
-    # Ignore deprecation warning from setuptools_dso (remove when https://github.com/epics-base/setuptools_dso/issues/36 is released)
-    "ignore::DeprecationWarning:wheel",
 ]
 # Doctest python code in docs, python code in src docstrings, test functions in tests
 testpaths = "docs src tests system_tests"
@@ -154,12 +151,12 @@ allowlist_externals =
     sphinx-build
     sphinx-autobuild
 commands =
-    tests: pytest -m 'not (s03 or adsim)' --cov=dodal --cov-report term --cov-report xml:cov.xml {posargs}
+    tests: pytest -m 'not requires' {posargs}
     type-checking: pyright src tests {posargs}
     pre-commit: pre-commit run --all-files --show-diff-on-failure {posargs}
     docs: sphinx-{posargs:build -E} -T docs build/html
-    unit-report: pytest -m 'not (s03 or adsim)' --cov=dodal --cov-report term --cov-report xml:unit_cov.xml --json-report --json-report-file=unit-report.json tests {posargs}
-    system-report: pytest -m 'not (s03 or adsim)' --cov=dodal --cov-report term --cov-report xml:system_cov.xml --json-report --json-report-file=system-report.json system_tests {posargs}
+    unit-report: pytest --cov-report xml:unit_cov.xml --json-report --json-report-file=unit-report.json tests {posargs}
+    system-report: pytest -m 'not requires(instrument="i04")' --cov-report xml:system_cov.xml --json-report --json-report-file=system-report.json system_tests {posargs}
 """
 
 [tool.ruff]
@@ -170,22 +167,27 @@ lint.extend-ignore = [
     "F811", # support typing.overload decorator
 ]
 lint.select = [
-    "B",   # flake8-bugbear - https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
-    "C4",  # flake8-comprehensions - https://docs.astral.sh/ruff/rules/#flake8-comprehensions-c4
-    "E",   # pycodestyle errors - https://docs.astral.sh/ruff/rules/#error-e
-    "F",   # pyflakes rules - https://docs.astral.sh/ruff/rules/#pyflakes-f
-    "W",   # pycodestyle warnings - https://docs.astral.sh/ruff/rules/#warning-w
-    "I",   # isort - https://docs.astral.sh/ruff/rules/#isort-i
-    "UP",  # pyupgrade - https://docs.astral.sh/ruff/rules/#pyupgrade-up
-    "SLF", # self - https://docs.astral.sh/ruff/settings/#lintflake8-self
+    "B",      # flake8-bugbear - https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
+    "C4",     # flake8-comprehensions - https://docs.astral.sh/ruff/rules/#flake8-comprehensions-c4
+    "E",      # pycodestyle errors - https://docs.astral.sh/ruff/rules/#error-e
+    "F",      # pyflakes rules - https://docs.astral.sh/ruff/rules/#pyflakes-f
+    "W",      # pycodestyle warnings - https://docs.astral.sh/ruff/rules/#warning-w
+    "I",      # isort - https://docs.astral.sh/ruff/rules/#isort-i
+    "UP",     # pyupgrade - https://docs.astral.sh/ruff/rules/#pyupgrade-up
+    "SLF",    # self - https://docs.astral.sh/ruff/settings/#lintflake8-self
+    "RUF018", # walrus operators in asserts - https://docs.astral.sh/ruff/rules/assignment-in-assert/
+    "TID251", # banned api - https://docs.astral.sh/ruff/rules/banned-api/
 ]
 
 [tool.ruff.lint.per-file-ignores]
 # By default, private member access is allowed in tests
 # See https://github.com/DiamondLightSource/python-copier-template/issues/154
-# Remove this line to forbid private member access in tests
-"tests/**/*" = ["SLF001"]
-"system_tests/**/*" = ["SLF001"]
+# Remove this line to forbid private member access, walrus operators, banned api in asserts in tests 
+"tests/**/*" = ["SLF001", "RUF018", "TID251"]
+"system_tests/**/*" = ["SLF001", "RUF018", "TID251"]
+
+[tool.ruff.lint.flake8-tidy-imports.banned-api]
+"time.sleep".msg = "Use bps.sleep or asyncio.sleep instead. # noqa will disable this rule for that line. See https://github.com/DiamondLightSource/mx-bluesky/issues/925"
 
 [tool.importlinter]
 root_package = "dodal"

@@ -89,7 +89,7 @@ class ZebraMapping(ZebraMappingValidations):
     # Which of the Zebra's four AND gates is used to control the automatic shutter, if it's being used.
     # After defining, the correct GateControl device can be accessed with, eg,
     # zebra.logic_gates.and_gates[zebra.mapping.AND_GATE_FOR_AUTO_SHUTTER]. Set to -1 if not being used.
-    AND_GATE_FOR_AUTO_SHUTTER: int = Field(default=-1, ge=-1, le=4)
+    AND_GATE_FOR_AUTO_SHUTTER: int = Field(default=2, ge=-1, le=4)
 
 
 class UnmappedZebraException(Exception):

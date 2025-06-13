@@ -78,7 +78,7 @@ class RemoteDirectoryServiceClient(DirectoryServiceClient):
         ):
             response.raise_for_status()
             json = await response.json()
-            return DataCollectionIdentifier.model_validate_json(json)
+            return DataCollectionIdentifier.model_validate(json)
 
 
 class LocalDirectoryServiceClient(DirectoryServiceClient):

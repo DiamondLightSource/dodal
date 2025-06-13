@@ -15,7 +15,7 @@ class BacklightPosition(StrictEnum):
     OUT = "Out"
 
 
-class Backlight(StandardReadable, Movable):
+class Backlight(StandardReadable, Movable[BacklightPosition]):
     """Simple device to trigger the pneumatic in/out."""
 
     TIME_TO_MOVE_S = 1.0  # Tested using a stopwatch on the beamline 09/2024

@@ -6,17 +6,21 @@ from ophyd_async.core import (
     AsyncStatus,
     TriggerInfo,
 )
-from ophyd_async.epics import adcore
-from ophyd_async.epics.adcore import ADBaseController
-
-from dodal.devices.i13_1.merlin_io import MerlinDriverIO, MerlinImageMode
+from ophyd_async.epics.adcore import (
+    DEFAULT_GOOD_STATES,
+    ADBaseController,
+    ADBaseIO,
+    ADImageMode,
+    ADState,
+    stop_busy_record,
+)
 
 
 class MerlinController(ADBaseController):
     def __init__(
         self,
-        driver: MerlinDriverIO,
-        good_states: frozenset[adcore.DetectorState] = adcore.DEFAULT_GOOD_STATES,
+        driver: ADBaseIO,
+        good_states: frozenset[ADState] = DEFAULT_GOOD_STATES,
     ) -> None:
         self.driver = driver
         self.good_states = good_states
@@ -33,8 +37,8 @@ class MerlinController(ADBaseController):
             DEFAULT_TIMEOUT + await self.driver.acquire_time.get_value()
         )
         await asyncio.gather(
-            self.driver.num_images.set(trigger_info.total_number_of_triggers),
-            self.driver.image_mode.set(MerlinImageMode.MULTIPLE),
+            self.driver.num_images.set(trigger_info.total_number_of_exposures),
+            self.driver.image_mode.set(ADImageMode.MULTIPLE),
         )
 
     async def wait_for_idle(self):
@@ -44,4 +48,4 @@ class MerlinController(ADBaseController):
     async def disarm(self):
         # We can't use caput callback as we already used it in arm() and we can't have
         # 2 or they will deadlock
-        await adcore.stop_busy_record(self.driver.acquire, False, timeout=1)
+        await stop_busy_record(self.driver.acquire, False, timeout=1)

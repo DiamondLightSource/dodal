@@ -1,3 +1,4 @@
+import ast
 from typing import Any, cast
 
 from dodal.log import LOGGER
@@ -8,7 +9,6 @@ BEAMLINE_PARAMETER_KEYWORDS = ["FB", "FULL", "deadtime"]
 BEAMLINE_PARAMETER_PATHS = {
     "i03": "/dls_sw/i03/software/daq_configuration/domain/beamlineParameters",
     "i04": "/dls_sw/i04/software/gda_versions/gda_9_34/workspace_git/gda-mx.git/configurations/i04-config/scripts/beamlineParameters",
-    "s03": "tests/test_data/test_beamline_parameters.txt",
 }
 
 
@@ -58,41 +58,14 @@ class GDABeamlineParameters:
 
     @classmethod
     def parse_value(cls, value: str):
-        if value[0] == "[":
-            return cls.parse_list(value[1:].strip())
-        else:
-            return cls.parse_list_element(value)
-
-    @classmethod
-    def parse_list_element(cls, value: str):
-        if value == "Yes":
-            return True
-        elif value == "No":
-            return False
-        else:
-            return float(value)
-
-    @classmethod
-    def parse_list(cls, value: str):
-        list_output = []
-        remaining = value.strip()
-        i = 0
-        while (i := remaining.find(",")) != -1:
-            list_output.append(cls.parse_list_element(remaining[:i]))
-            remaining = remaining[i + 1 :].lstrip()
-        if (i := remaining.find("]")) != -1:
-            list_output.append(cls.parse_list_element(remaining[:i]))
-            remaining = remaining[i + 1 :].lstrip()
-        else:
-            raise ValueError("Missing closing ']' in list expression")
-        return list_output
+        return ast.literal_eval(value.replace("Yes", "True").replace("No", "False"))
 
 
 def get_beamline_parameters(beamline_param_path: str | None = None):
     """Loads the beamline parameters from the specified path, or according to the
     environment variable if none is given"""
     if not beamline_param_path:
-        beamline_name = get_beamline_name("s03")
+        beamline_name = get_beamline_name("i03")
         beamline_param_path = BEAMLINE_PARAMETER_PATHS.get(beamline_name)
         if beamline_param_path is None:
             raise KeyError(

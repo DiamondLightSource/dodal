@@ -201,6 +201,7 @@ def set_up_all_logging_handlers(
     dev_mode: bool,
     error_log_buffer_lines: int,
     graylog_port: int | None = None,
+    debug_logging_path: Path | None = None,
 ) -> DodalLogHandlers:
     """Set up the default logging environment.
     Args:
@@ -213,10 +214,10 @@ def set_up_all_logging_handlers(
                                 buffer and write to file when encountering an error message.
         graylog_port:           The port to send graylog messages to, if None uses the
                                 default dodal port
+        debug_logging_path:     The location to store debug log files, if None uses `logging_path`
     Returns:
         A DodaLogHandlers TypedDict with the created handlers.
     """
-
     handlers: DodalLogHandlers = {
         "stream_handler": set_up_stream_handler(logger),
         "graylog_handler": set_up_graylog_handler(
@@ -224,7 +225,7 @@ def set_up_all_logging_handlers(
         ),
         "info_file_handler": set_up_INFO_file_handler(logger, logging_path, filename),
         "debug_memory_handler": set_up_DEBUG_memory_handler(
-            logger, logging_path, filename, error_log_buffer_lines
+            logger, debug_logging_path or logging_path, filename, error_log_buffer_lines
         ),
     }
 
@@ -238,35 +239,39 @@ def integrate_bluesky_and_ophyd_logging(parent_logger: logging.Logger):
 
 
 def do_default_logging_setup(dev_mode=False, graylog_port: int | None = None):
+    logging_path, debug_logging_path = get_logging_file_paths()
     set_up_all_logging_handlers(
         LOGGER,
-        get_logging_file_path(),
+        logging_path,
         "dodal.log",
         dev_mode,
         ERROR_LOG_BUFFER_LINES,
         graylog_port,
+        debug_logging_path,
     )
     integrate_bluesky_and_ophyd_logging(LOGGER)
 
 
-def get_logging_file_path() -> Path:
-    """Get the directory to write log files to.
+def get_logging_file_paths() -> tuple[Path, Path]:
+    """Get the directories to write log files to.
 
     If on a beamline, this will return '/dls_sw/$BEAMLINE/logs/bluesky' based on the
-    BEAMLINE envrionment variable. If no envrionment variable is found it will default
+    BEAMLINE environment variable. If no environment variable is found it will default
     to the tmp/dev directory.
 
     Returns:
-        logging_path (Path): Path to the log directory for the file handlers to write to.
+        tuple[Path, Path]: Paths to the standard log file and to the debug log file,
+                           for the file handlers to write to
     """
     beamline: str | None = environ.get("BEAMLINE")
-    logging_path: Path
 
     if beamline:
         logging_path = Path("/dls_sw/" + beamline + "/logs/bluesky/")
+        debug_logging_path = Path("/dls/tmp/" + beamline + "/logs/bluesky/")
     else:
         logging_path = Path("./tmp/dev/")
-    return logging_path
+        debug_logging_path = Path("./tmp/dev/")
+    return logging_path, debug_logging_path
 
 
 def get_graylog_configuration(
@@ -284,8 +289,3 @@ def get_graylog_configuration(
         return "localhost", 5555
     else:
         return "graylog-log-target.diamond.ac.uk", graylog_port or DEFAULT_GRAYLOG_PORT
-
-
-class _NoOpFileHandler:
-    def write(*args, **kwargs):
-        pass
