@@ -2,15 +2,14 @@ from dodal.common.beamlines.beamline_utils import (
     device_factory,
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.devices.b07_1 import B07CGrating
-from dodal.devices.electron_analyser.specs import SpecsAnalyserDriverIO
+from dodal.devices.i09.grating import I09Grating
 from dodal.devices.pgm import PGM
 from dodal.devices.synchrotron import Synchrotron
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
-BL = get_beamline_name("b07-1")
-PREFIX = BeamlinePrefix(BL, suffix="C")
+BL = get_beamline_name("i09-2")
+PREFIX = BeamlinePrefix(BL, suffix="J")
 set_log_beamline(BL)
 set_utils_beamline(BL)
 
@@ -21,14 +20,9 @@ def synchrotron() -> Synchrotron:
 
 
 @device_factory()
-def analyser_driver() -> SpecsAnalyserDriverIO:
-    return SpecsAnalyserDriverIO(prefix=f"{PREFIX.beamline_prefix}-EA-DET-01:CAM:")
-
-
-@device_factory()
 def pgm() -> PGM:
     return PGM(
-        prefix=f"{PREFIX.beamline_prefix}-OP-PGM-01:",
-        grating=B07CGrating,
+        prefix=f"{PREFIX.beamline_prefix}-MO-PGM-01:",
+        grating=I09Grating,
         gratingPv="GRATINGSELECT:SELECT",
     )
