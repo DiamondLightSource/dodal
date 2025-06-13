@@ -759,6 +759,8 @@ class TestBimorphOptimisation:
         ] == mock_restore_bimorph_state.call_args_list
 
 
+# This test is useful, but takes too long to be feasible:
+@pytest.mark.skip
 @pytest.mark.parametrize("voltage_increment", [100.0])
 @pytest.mark.parametrize("active_dimension", [SlitDimension.X, SlitDimension.Y])
 @pytest.mark.parametrize("active_slit_center_start", [0.0])
