@@ -43,12 +43,14 @@ class AbstractAnalyserDriverIO(
     def __init__(
         self,
         prefix: str,
-        acquisition_mode_type: type,
-        lens_mode_type: type,
+        acquisition_mode_type: type[StrictEnum],
+        lens_mode_type: type[StrictEnum],
         energy_sources: Mapping[str, SignalR[float]],
         name: str = "",
     ) -> None:
         self.energy_sources = energy_sources
+        self.acquisition_mode_type = acquisition_mode_type
+        self.lens_mode_type = lens_mode_type
 
         with self.add_children_as_readables():
             self.image = epics_signal_r(Array1D[np.float64], prefix + "IMAGE")
@@ -129,10 +131,12 @@ class AbstractAnalyserDriverIO(
             self.low_energy.set(low_energy),
             self.high_energy.set(high_energy),
             self.slices.set(region.slices),
-            self.lens_mode.set(region.lens_mode),
+            self.lens_mode.set(self.lens_mode_type(region.lens_mode)),
             self.pass_energy.set(pass_energy),
             self.iterations.set(region.iterations),
-            self.acquisition_mode.set(region.acquisition_mode),
+            self.acquisition_mode.set(
+                self.acquisition_mode_type(region.acquisition_mode)
+            ),
             self.excitation_energy.set(excitation_energy),
             self.excitation_energy_source.set(source.name),
         )
