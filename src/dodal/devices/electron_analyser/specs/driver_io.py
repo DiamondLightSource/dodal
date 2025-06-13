@@ -8,6 +8,7 @@ from ophyd_async.core import (
     AsyncStatus,
     SignalR,
     StandardReadableFormat,
+    StrictEnum,
     derived_signal_r,
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
@@ -27,7 +28,7 @@ class SpecsAnalyserDriverIO(
     def __init__(
         self,
         prefix: str,
-        lens_mode_type,
+        lens_mode_type: type[StrictEnum],
         energy_sources: Mapping[str, SignalR[float]],
         name: str = "",
     ) -> None:
