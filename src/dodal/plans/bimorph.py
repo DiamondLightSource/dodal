@@ -213,6 +213,28 @@ def bimorph_optimisation(
         metadata: optional dict[str, Any] metadata to add to start document
     """
 
+    _metadata = {
+        "plan_args": {
+            "detectors": {det.name for det in detectors},
+            "mirror": mirror.name,
+            "slits": slits.name,
+            "voltage_increment": voltage_increment,
+            "active_dimension": active_dimension,
+            "active_slit_center_start": active_slit_center_start,
+            "active_slit_center_end": active_slit_center_end,
+            "active_slit_size": active_slit_size,
+            "inactive_slit_center": inactive_slit_center,
+            "inactive_slit_size": inactive_slit_size,
+            "number_of_slit_positions": number_of_slit_positions,
+            "bimorph_settle_time": bimorph_settle_time,
+            "slit_settle_time": slit_settle_time,
+            "initial_voltage_list": initial_voltage_list,
+        },
+        "plan_name": "bimorph_optimisation",
+        "shape": [len(mirror.channels), number_of_slit_positions],
+        **(metadata or {}),
+    }
+
     state = yield from capture_bimorph_state(mirror, slits)
 
     # If a starting set of voltages is not provided, default to current:
@@ -228,16 +250,7 @@ def bimorph_optimisation(
         SlitDimension.Y if active_dimension == SlitDimension.X else SlitDimension.X
     )
 
-    if metadata is None:
-        metadata = {}
-    metadata = metadata | {
-        "voltage_increment": voltage_increment,
-        "dimension": active_dimension,
-        "slit_positions": number_of_slit_positions,
-        "channels": len(mirror.channels),
-    }
-
-    @bpp.run_decorator(md=metadata)
+    @bpp.run_decorator(md=_metadata)
     @bpp.stage_decorator((*detectors, mirror, slits))
     def outer_scan():
         """Outer plan stub, which moves mirror and calls inner_scan."""
