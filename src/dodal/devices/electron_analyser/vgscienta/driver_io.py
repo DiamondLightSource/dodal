@@ -7,6 +7,7 @@ from ophyd_async.core import (
     AsyncStatus,
     SignalR,
     StandardReadableFormat,
+    StrictEnum,
 )
 from ophyd_async.epics.adcore import ADImageMode
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
@@ -30,7 +31,7 @@ class VGScientaAnalyserDriverIO(
     def __init__(
         self,
         prefix: str,
-        lens_mode_type,
+        lens_mode_type: type[StrictEnum],
         energy_sources: dict[str, SignalR[float]],
         name: str = "",
     ) -> None:
