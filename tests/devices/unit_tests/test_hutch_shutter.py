@@ -35,14 +35,14 @@ def test_shutter_can_be_created(fake_shutter: HutchShutter):
     assert isinstance(fake_shutter, HutchShutter)
 
 
-async def test_shutter_raises_error_on_set_if_hutch_not_interlocked(
+async def test_shutter_raises_error_on_set_if_hutch_not_interlocked_on_open(
     fake_shutter: HutchShutter,
 ):
     set_mock_value(fake_shutter.interlock.status, 1)
     assert await fake_shutter.interlock.shutter_safe_to_operate() is False
 
     with pytest.raises(ShutterNotSafeToOperateError):
-        await fake_shutter.set(ShutterDemand.CLOSE)
+        await fake_shutter.set(ShutterDemand.OPEN)
 
 
 @pytest.mark.parametrize(
