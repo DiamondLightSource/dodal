@@ -1,7 +1,6 @@
 from ophyd_async.core import (
     Device,
     Signal,
-    SignalR,
     StandardReadable,
     derived_signal_r,
     soft_signal_r_and_setter,
@@ -13,37 +12,22 @@ from ophyd_async.epics.core import (
 )
 
 from dodal.devices.fast_grid_scan import (
-    GridScanParamsCommon,
     ZebraFastGridScan,
 )
 from dodal.log import LOGGER
 
 
-class TwoDGridScanParams(GridScanParamsCommon):
-    pass
-
-
-def _create_soft_signal_and_set_to_zero(
-    dtype: type[int | float], prefix: str
-) -> SignalR:
-    signal, _setter = soft_signal_r_and_setter(dtype, prefix)
-    _setter(0)
-    return signal
-
-
-# Need to create motion controller too as PV for prog num doesnt exist
-# It's okay though, we don't really need it
 class MotionProgram(Device):
     def __init__(self, prefix: str, name: str = "") -> None:
         self.running = epics_signal_r(int, prefix + "PROGBITS")
         # Prog number PV doesn't exist for i02-1, but it's currently only used for logging
-        self.program_number = soft_signal_r_and_setter(float, -1)
+        self.program_number, _ = soft_signal_r_and_setter(float, -1)
         super().__init__(name)
 
 
 class TwoDFastGridScan(ZebraFastGridScan):
-    """The EPICS interface for that 2D FGS's differs slightly from the standard
-    Hyperion version: no Z steps or Z step size, exposure_time instead of dwell_time,
+    """The EPICS interface for the 2D FGS differs slightly from the standard
+    version: no Z steps or Z step size, exposure_time instead of dwell_time,
     no scan valid PV.
 
     This device abstracts away the differences by adding empty signals to the missing PV's.
@@ -68,7 +52,8 @@ class TwoDFastGridScan(ZebraFastGridScan):
         self.z_steps, _ = soft_signal_r_and_setter(int, 0)
         self.z_step_size, _ = soft_signal_r_and_setter(float, 0)
         self.z2_start, _ = soft_signal_r_and_setter(float, 0)
-        # Should ask controls to add this PV
+
+        # TODO ask controls to add this PV
         self.scan_invalid = soft_signal_r_and_setter(float, 0)
 
         self.run_cmd = epics_signal_x(f"{prefix}RUN.PROC")
@@ -100,7 +85,7 @@ class TwoDFastGridScan(ZebraFastGridScan):
         # Skip the FGSCommon init function as we have already overriden all the signals
         StandardReadable.__init__(self, name)
 
-    async def _calculate_expected_images(self, x: int, y: int) -> int:
+    def _calculate_expected_images(self, x: int, y: int) -> int:
         LOGGER.info(f"Reading num of images found {x, y} images in each axis")
         return x * y
 
