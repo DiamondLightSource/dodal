@@ -1,4 +1,8 @@
+from unittest.mock import AsyncMock
+
 import pytest
+from bluesky import plan_stubs as bps
+from bluesky.run_engine import RunEngine
 
 from dodal.devices.electron_analyser import GenericElectronAnalyserDetector
 from dodal.devices.electron_analyser.specs import SpecsDetector
@@ -57,6 +61,21 @@ def test_analyser_detector_has_driver_as_child_and_region_detector_does_not(
     for det in region_detectors:
         assert det._child_devices.get(driver_name) is None
         assert det.driver.parent == sim_detector
+
+
+def test_analyser_region_detector_trigger_sets_driver_with_region(
+    sim_detector: GenericElectronAnalyserDetector,
+    sequence_file_path: str,
+    RE: RunEngine,
+) -> None:
+    region_detectors = sim_detector.create_region_detector_list(
+        sequence_file_path, enabled_only=False
+    )
+    for reg_det in region_detectors:
+        reg_det.driver.set = AsyncMock()
+
+        RE(bps.trigger(reg_det, wait=True))
+        reg_det.driver.set.assert_called_once_with(reg_det.region)
 
 
 # ToDo - Add tests for BaseElectronAnalyserDetector class + controller

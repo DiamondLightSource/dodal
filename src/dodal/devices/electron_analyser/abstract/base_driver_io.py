@@ -139,7 +139,7 @@ class AbstractAnalyserDriverIO(
 
         energy_source = self.energy_sources.get(alias_name)
         if energy_source is None:
-            raise RuntimeError(
+            raise KeyError(
                 f"'{energy_source}' is an invalid energy source. Avaliable energy "
                 + f"sources are '{list(self.energy_sources.keys())}'"
             )
