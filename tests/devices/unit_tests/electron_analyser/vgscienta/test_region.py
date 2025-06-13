@@ -13,6 +13,7 @@ from dodal.devices.electron_analyser.vgscienta.region import (
     VGScientaRegion,
     VGScientaSequence,
 )
+from dodal.devices.i09 import LensMode as LensMode
 from tests.devices.unit_tests.electron_analyser.util import (
     TEST_VGSCIENTA_SEQUENCE,
     assert_region_has_expected_values,
@@ -37,7 +38,7 @@ def expected_region_values() -> list[dict[str, Any]]:
             "name": "New_Region",
             "enabled": True,
             "id": "_aQOmgPsmEe6w2YUF3bV-LA",
-            "lens_mode": "Angular56",
+            "lens_mode": LensMode.ANGULAR56,
             "pass_energy": 5,
             "slices": 1,
             "iterations": 1,
@@ -133,7 +134,9 @@ def test_sequence_get_expected_excitation_energy_source(
     )
     with pytest.raises(ValueError):
         sequence.get_excitation_energy_source_by_region(
-            VGScientaRegion(excitation_energy_source="invalid_source")
+            VGScientaRegion(
+                excitation_energy_source="invalid_source", lens_mode=LensMode.ANGULAR45
+            )
         )
 
 

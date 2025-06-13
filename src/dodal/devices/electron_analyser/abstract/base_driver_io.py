@@ -24,13 +24,16 @@ from dodal.devices.electron_analyser.abstract.base_region import (
 from dodal.devices.electron_analyser.enums import EnergyMode
 from dodal.devices.electron_analyser.util import to_binding_energy, to_kinetic_energy
 
+TAcquisitionMode = TypeVar("TAcquisitionMode", bound=StrictEnum)
+TLensMode = TypeVar("TLensMode", bound=StrictEnum)
+
 
 class AbstractAnalyserDriverIO(
     ABC,
     StandardReadable,
     ADBaseIO,
     Movable[TAbstractBaseRegion],
-    Generic[TAbstractBaseRegion],
+    Generic[TAbstractBaseRegion, TAcquisitionMode, TLensMode],
 ):
     """
     Generic device to configure electron analyser with new region settings.
@@ -40,7 +43,8 @@ class AbstractAnalyserDriverIO(
     def __init__(
         self,
         prefix: str,
-        acquisition_mode_type: type[StrictEnum],
+        acquisition_mode_type: type,
+        lens_mode_type: type,
         energy_sources: Mapping[str, SignalR[float]],
         name: str = "",
     ) -> None:
@@ -63,7 +67,7 @@ class AbstractAnalyserDriverIO(
             self.low_energy = epics_signal_rw(float, prefix + "LOW_ENERGY")
             self.high_energy = epics_signal_rw(float, prefix + "HIGH_ENERGY")
             self.slices = epics_signal_rw(int, prefix + "SLICES")
-            self.lens_mode = epics_signal_rw(str, prefix + "LENS_MODE")
+            self.lens_mode = epics_signal_rw(lens_mode_type, prefix + "LENS_MODE")
             self.pass_energy = epics_signal_rw(
                 self.pass_energy_type, prefix + "PASS_ENERGY"
             )

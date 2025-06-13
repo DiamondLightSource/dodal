@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, get_args
 
 import pytest
 from bluesky.run_engine import RunEngine
@@ -52,8 +52,9 @@ async def sim_detector(
     energy_sources: dict[str, SignalR[float]],
     RE: RunEngine,
 ) -> ElectronAnalyserDetectorImpl:
+    lens_mode_class = get_args(detector_class)[0]
     async with init_devices(mock=True, connect=True):
-        sim_detector = detector_class(prefix="TEST:", energy_sources=energy_sources)
+        sim_detector = detector_class("TEST:", lens_mode_class, energy_sources)
     return sim_detector
 
 
@@ -63,10 +64,12 @@ async def sim_driver(
     energy_sources: dict[str, SignalR[float]],
     RE: RunEngine,
 ) -> ElectronAnalyserDriverImpl:
+    lens_mode_class = get_args(driver_class)[0]
     async with init_devices(mock=True, connect=True):
         sim_driver = driver_class(
-            prefix="TEST:",
-            energy_sources=energy_sources,
+            "TEST:",
+            lens_mode_class,
+            energy_sources,
         )
     return sim_driver
 
@@ -75,9 +78,11 @@ async def sim_driver(
 def sequence_class(
     driver_class: type[AbstractAnalyserDriverIO],
 ) -> type[AbstractBaseSequence]:
-    if driver_class == VGScientaAnalyserDriverIO:
+    base_class = getattr(driver_class, "__origin__", driver_class)
+
+    if base_class is VGScientaAnalyserDriverIO:
         return VGScientaSequence
-    elif driver_class == SpecsAnalyserDriverIO:
+    elif base_class is SpecsAnalyserDriverIO:
         return SpecsSequence
     raise ValueError("class " + str(driver_class) + " not recognised")
 
