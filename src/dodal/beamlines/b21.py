@@ -13,8 +13,6 @@ from ophyd_async.fastcs.eiger import EigerDetector
 from dodal.devices.linkam3 import Linkam3
 from dodal.devices.slits import Slits
 from dodal.devices.synchrotron import Synchrotron
-# from dodal.devices.tetramm import TetrammDetector
-# from dodal.devices.undulator import Undulator
 
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
@@ -111,6 +109,6 @@ def linkam() -> Linkam3:
     return Linkam3(prefix=f"{PREFIX.beamline_prefix}-EA-HPLC-01:")
 
 
-# @device_factory()
-# def dmm() -> DMM: #b21 uses a dmm so, should write a device for that
-#     return DMM(
+# TODO: https://github.com/DiamondLightSource/dodal/issues/1286
+# def dmm() -> DMM: #b21 uses a dmm so
+#     return DMM()
