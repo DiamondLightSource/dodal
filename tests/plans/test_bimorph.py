@@ -431,10 +431,28 @@ class TestBimorphOptimisation:
     ):
         def start_subscription(name, doc):
             assert {
-                "voltage_increment": voltage_increment,
-                "dimension": active_dimension,
-                "slit_positions": number_of_slit_positions,
-                "channels": len(mirror_with_mocked_put.channels),
+                "plan_args": {
+                    "detectors": {det.name for det in detectors},
+                    "mirror": mirror_with_mocked_put.name,
+                    "slits": slits.name,
+                    "voltage_increment": voltage_increment,
+                    "active_dimension": active_dimension,
+                    "active_slit_center_start": active_slit_center_start,
+                    "active_slit_center_end": active_slit_center_end,
+                    "active_slit_size": active_slit_size,
+                    "inactive_slit_center": inactive_slit_center,
+                    "inactive_slit_size": inactive_slit_size,
+                    "number_of_slit_positions": number_of_slit_positions,
+                    "bimorph_settle_time": bimorph_settle_time,
+                    "slit_settle_time": slit_settle_time,
+                    "initial_voltage_list": initial_voltage_list,
+                },
+                "plan_name": "bimorph_optimisation",
+                "shape": [
+                    len(mirror_with_mocked_put.channels),
+                    number_of_slit_positions,
+                ],
+                "foo": "bar",
             }.items() <= doc.items()
 
         RE(
@@ -453,6 +471,7 @@ class TestBimorphOptimisation:
                 bimorph_settle_time,
                 slit_settle_time,
                 initial_voltage_list,
+                {"foo": "bar"},
             ),
             {"start": start_subscription},
         )
