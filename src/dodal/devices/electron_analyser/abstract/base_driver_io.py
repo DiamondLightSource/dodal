@@ -23,13 +23,16 @@ from dodal.devices.electron_analyser.abstract.base_region import (
 from dodal.devices.electron_analyser.enums import EnergyMode
 from dodal.devices.electron_analyser.util import to_binding_energy, to_kinetic_energy
 
+TAcquisitionMode = TypeVar("TAcquisitionMode", bound=StrictEnum)
+TLensMode = TypeVar("TLensMode", bound=StrictEnum)
+
 
 class AbstractAnalyserDriverIO(
     ABC,
     StandardReadable,
     ADBaseIO,
     Movable[TAbstractBaseRegion],
-    Generic[TAbstractBaseRegion],
+    Generic[TAbstractBaseRegion, TAcquisitionMode, TLensMode],
 ):
     """
     Generic device to configure electron analyser with new region settings.
@@ -40,10 +43,13 @@ class AbstractAnalyserDriverIO(
         self,
         prefix: str,
         acquisition_mode_type: type[StrictEnum],
-        energy_sources: dict[str, SignalR],
+        lens_mode_type: type[StrictEnum],
+        energy_sources: dict[str, SignalR[float]],
         name: str = "",
     ) -> None:
         self.energy_sources = energy_sources
+        self.acquisition_mode_type = acquisition_mode_type
+        self.lens_mode_type = lens_mode_type
 
         with self.add_children_as_readables():
             self.image = epics_signal_r(Array1D[np.float64], prefix + "IMAGE")
@@ -62,7 +68,7 @@ class AbstractAnalyserDriverIO(
             self.low_energy = epics_signal_rw(float, prefix + "LOW_ENERGY")
             self.high_energy = epics_signal_rw(float, prefix + "HIGH_ENERGY")
             self.slices = epics_signal_rw(int, prefix + "SLICES")
-            self.lens_mode = epics_signal_rw(str, prefix + "LENS_MODE")
+            self.lens_mode = epics_signal_rw(lens_mode_type, prefix + "LENS_MODE")
             self.pass_energy = epics_signal_rw(
                 self.pass_energy_type, prefix + "PASS_ENERGY"
             )
@@ -124,10 +130,12 @@ class AbstractAnalyserDriverIO(
             self.low_energy.set(low_energy),
             self.high_energy.set(high_energy),
             self.slices.set(region.slices),
-            self.lens_mode.set(region.lens_mode),
+            self.lens_mode.set(self.lens_mode_type(region.lens_mode)),
             self.pass_energy.set(pass_energy),
             self.iterations.set(region.iterations),
-            self.acquisition_mode.set(region.acquisition_mode),
+            self.acquisition_mode.set(
+                self.acquisition_mode_type(region.acquisition_mode)
+            ),
             self.excitation_energy.set(excitation_energy),
             self.excitation_energy_source.set(source.name),
         )

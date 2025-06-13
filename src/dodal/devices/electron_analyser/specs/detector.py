@@ -1,5 +1,8 @@
-from ophyd_async.core import SignalR
+from typing import Generic
 
+from ophyd_async.core import SignalR, StrictEnum
+
+from dodal.devices.electron_analyser.abstract.base_driver_io import TLensMode
 from dodal.devices.electron_analyser.detector import (
     ElectronAnalyserDetector,
 )
@@ -8,8 +11,21 @@ from dodal.devices.electron_analyser.specs.region import SpecsRegion, SpecsSeque
 
 
 class SpecsDetector(
-    ElectronAnalyserDetector[SpecsAnalyserDriverIO, SpecsSequence, SpecsRegion]
+    ElectronAnalyserDetector[
+        SpecsAnalyserDriverIO[TLensMode],
+        SpecsSequence,
+        SpecsRegion,
+    ],
+    Generic[TLensMode],
 ):
-    def __init__(self, prefix: str, energy_sources: dict[str, SignalR], name: str = ""):
-        driver = SpecsAnalyserDriverIO(prefix, energy_sources)
+    def __init__(
+        self,
+        prefix: str,
+        lens_mode_type: type[StrictEnum],
+        energy_sources: dict[str, SignalR[float]],
+        name: str = "",
+    ):
+        driver = SpecsAnalyserDriverIO[TLensMode](
+            prefix, lens_mode_type, energy_sources
+        )
         super().__init__(SpecsSequence, driver, name)
