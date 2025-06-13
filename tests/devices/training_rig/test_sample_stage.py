@@ -3,18 +3,18 @@ from unittest import mock
 import pytest
 from ophyd_async.core import init_devices
 
-from dodal.devices.training_rig.sample_stage import TrainingRigSampleStage
+from dodal.devices.motors import XThetaStage
 
 
 @pytest.fixture
-async def stage() -> TrainingRigSampleStage:
+async def stage() -> XThetaStage:
     async with init_devices(mock=True):
-        stage = TrainingRigSampleStage(prefix="DEMO-STAGE-01:")
+        stage = XThetaStage(prefix="DEMO-STAGE-01:")
 
     return stage
 
 
-async def test_reading_training_rig(stage: TrainingRigSampleStage):
+async def test_reading_training_rig(stage: XThetaStage):
     reading = await stage.read()
     assert reading == {
         "stage-theta": {

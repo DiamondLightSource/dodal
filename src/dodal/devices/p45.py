@@ -41,15 +41,3 @@ class TomoStageWithStretchAndSkew(StandardReadable):
             self.y = SampleY(prefix)
             self.theta = SampleTheta(prefix)
         super().__init__(name)
-
-
-class Choppers(StandardReadable):
-    """
-    Grouping for the P45 chopper motors
-    """
-
-    def __init__(self, prefix: str, name: str = ""):
-        with self.add_children_as_readables():
-            self.x = Motor(prefix + "ENDAT")
-            self.y = Motor(prefix + "BISS")
-        super().__init__(name)
