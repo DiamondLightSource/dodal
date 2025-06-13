@@ -3,7 +3,7 @@ from typing import Any
 import pytest
 from bluesky.run_engine import RunEngine
 from ophyd_async.core import SignalR, init_devices
-from ophyd_async.epics.motor import Motor
+from ophyd_async.sim import SimMotor
 
 from dodal.devices.electron_analyser import (
     ElectronAnalyserDetector,
@@ -30,32 +30,26 @@ from tests.devices.unit_tests.electron_analyser.util import (
 
 
 @pytest.fixture
-async def pgm_energy(RE: RunEngine) -> Motor:
-    async with init_devices(mock=True, connect=True):
-        pgm_energy = Motor(
-            prefix="TEST:",
-        )
-    return pgm_energy
+async def pgm_energy(RE: RunEngine) -> SimMotor:
+    return SimMotor("pgm_energy")
 
 
 @pytest.fixture
-async def dcm_energy(RE: RunEngine) -> Motor:
-    async with init_devices(mock=True, connect=True):
-        dcm_energy = Motor(
-            prefix="TEST:",
-        )
-    return dcm_energy
+async def dcm_energy(RE: RunEngine) -> SimMotor:
+    return SimMotor("dcm_energy")
 
 
 @pytest.fixture
-async def energy_sources(dcm_energy: Motor, pgm_energy: Motor) -> dict[str, SignalR]:
+async def energy_sources(
+    dcm_energy: SimMotor, pgm_energy: SimMotor
+) -> dict[str, SignalR[float]]:
     return {"source1": dcm_energy.user_readback, "source2": pgm_energy.user_readback}
 
 
 @pytest.fixture
 async def sim_detector(
     detector_class: type[ElectronAnalyserDetectorImpl],
-    energy_sources: dict[str, SignalR],
+    energy_sources: dict[str, SignalR[float]],
     RE: RunEngine,
 ) -> ElectronAnalyserDetectorImpl:
     async with init_devices(mock=True, connect=True):
@@ -66,7 +60,7 @@ async def sim_detector(
 @pytest.fixture
 async def sim_driver(
     driver_class: type[ElectronAnalyserDriverImpl],
-    energy_sources: dict[str, SignalR],
+    energy_sources: dict[str, SignalR[float]],
     RE: RunEngine,
 ) -> ElectronAnalyserDriverImpl:
     async with init_devices(mock=True, connect=True):
