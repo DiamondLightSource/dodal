@@ -58,7 +58,7 @@ class BimorphMirrorChannel(StandardReadable, EpicsDevice):
     shift: A[SignalW[float], PvSuffix("SHIFT")]
 
 
-class BimorphMirror(StandardReadable, Movable):
+class BimorphMirror(StandardReadable, Movable[list[float]]):
     """Class to represent CAENels Bimorph Mirrors.
 
     Attributes:
