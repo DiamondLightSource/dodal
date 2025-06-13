@@ -53,28 +53,19 @@ class XYStage(StandardReadable):
         super().__init__(name=name)
 
 
-class XYZPositioner(StandardReadable):
+class XYZStage(XYStage):
     """
 
-    Standard ophyd_async xyz motor stage, by combining 3 Motors,
-    with added infix for extra flexibliy to allow different axes other than x,y,z.
+    ophyd_async x y z motor stage, combining 3  mutually perpendicular Motors.
 
     Parameters
     ----------
     prefix:
-        EPICS PV (Common part up to and including :).
+        Common part of the EPICS PV for all motors, including ":".
     name:
-        name for the stage.
-    infix:
-        EPICS PV, default is the ("X", "Y", "Z").
-    Notes
-    -----
-    Example usage::
-        async with init_devices():
-            xyz_stage = XYZPositioner("BLXX-MO-STAGE-XX:")
-    Or::
-        with init_devices():
-            xyz_stage = XYZPositioner("BLXX-MO-STAGE-XX:", infix = ("A", "B", "C"))
+        Name of the stage, each child motor will be named "{name}-{field_name}"
+    *_infix:
+        Infix between the common prefix and the EPICS motor record fields for the field.
 
     """
 
@@ -82,31 +73,29 @@ class XYZPositioner(StandardReadable):
         self,
         prefix: str,
         name: str = "",
-        infix: tuple[str, str, str] = ("X", "Y", "Z"),
+        x_infix: str = "X",
+        y_infix: str = "Y",
+        z_infix: str = "Z",
     ):
         with self.add_children_as_readables():
-            self.x = Motor(prefix + infix[0])
-            self.y = Motor(prefix + infix[1])
-            self.z = Motor(prefix + infix[2])
-        super().__init__(name=name)
+            self.z = Motor(prefix + z_infix)
+        super().__init__(prefix, name, x_infix, y_infix)
 
 
-class SixAxisGonio(XYZPositioner):
+class SixAxisGonio(XYZStage):
     def __init__(
         self,
         prefix: str,
         name: str = "",
-        infix: tuple[str, str, str, str, str, str] = (
-            "X",
-            "Y",
-            "Z",
-            "KAPPA",
-            "PHI",
-            "OMEGA",
-        ),
+        x_infix: str = "X",
+        y_infix: str = "Y",
+        z_infix: str = "Z",
+        kappa_infix: str = "KAPPA",
+        phi_infix: str = "PHI",
+        omega_infix: str = "OMEGA",
     ):
         with self.add_children_as_readables():
-            self.kappa = Motor(prefix + infix[3])
-            self.phi = Motor(prefix + infix[4])
-            self.omega = Motor(prefix + infix[5])
-        super().__init__(name=name, prefix=prefix, infix=infix[0:3])
+            self.kappa = Motor(prefix + kappa_infix)
+            self.phi = Motor(prefix + phi_infix)
+            self.omega = Motor(prefix + omega_infix)
+        super().__init__(prefix, name, x_infix, y_infix, z_infix)
