@@ -1,37 +1,88 @@
-import os
 from typing import Any
 
 import pytest
+from bluesky.run_engine import RunEngine
 from ophyd_async.core import init_devices
+from ophyd_async.epics.motor import Motor
 
-from dodal.common.data_util import load_json_file_to_class
-from dodal.devices.electron_analyser.abstract_analyser_io import (
-    TAbstractAnalyserDriverIO,
+from dodal.devices.electron_analyser import (
+    ElectronAnalyserDetector,
+    ElectronAnalyserDetectorImpl,
+    ElectronAnalyserDriverImpl,
 )
-from dodal.devices.electron_analyser.abstract_region import (
-    AbstractBaseRegion,
+from dodal.devices.electron_analyser.abstract import (
+    AbstractAnalyserDriverIO,
     AbstractBaseSequence,
     TAbstractBaseRegion,
     TAbstractBaseSequence,
 )
-from dodal.devices.electron_analyser.vgscienta_region import (
-    VGScientaRegion,
+from dodal.devices.electron_analyser.specs import (
+    SpecsAnalyserDriverIO,
+    SpecsSequence,
+)
+from dodal.devices.electron_analyser.vgscienta import (
+    VGScientaAnalyserDriverIO,
     VGScientaSequence,
 )
-
-TEST_DATA_PATH = "tests/test_data/electron_analyser/"
+from tests.devices.unit_tests.electron_analyser.util import (
+    get_test_sequence,
+)
 
 
 @pytest.fixture
-def sequence_file_path(sequence_file: str) -> str:
-    return os.path.join(TEST_DATA_PATH, sequence_file)
+async def sim_detector(
+    detector_class: type[ElectronAnalyserDetectorImpl], RE: RunEngine
+) -> ElectronAnalyserDetectorImpl:
+    async with init_devices(mock=True, connect=True):
+        sim_detector = detector_class(
+            prefix="TEST:",
+        )
+    return sim_detector
+
+
+@pytest.fixture
+async def sim_driver(
+    driver_class: type[ElectronAnalyserDriverImpl], RE: RunEngine
+) -> ElectronAnalyserDriverImpl:
+    async with init_devices(mock=True, connect=True):
+        sim_driver = driver_class(
+            prefix="TEST:",
+        )
+    return sim_driver
+
+
+@pytest.fixture
+async def sim_energy_source(RE: RunEngine) -> Motor:
+    async with init_devices(mock=True, connect=True):
+        sim_driver = Motor(
+            prefix="TEST:",
+        )
+    return sim_driver
+
+
+@pytest.fixture
+def sequence_class(
+    driver_class: type[AbstractAnalyserDriverIO],
+) -> type[AbstractBaseSequence]:
+    if driver_class == VGScientaAnalyserDriverIO:
+        return VGScientaSequence
+    elif driver_class == SpecsAnalyserDriverIO:
+        return SpecsSequence
+    raise ValueError("class " + str(driver_class) + " not recognised")
 
 
 @pytest.fixture
 def sequence(
-    sequence_class: type[TAbstractBaseSequence], sequence_file_path: str
-) -> TAbstractBaseSequence:
-    return load_json_file_to_class(sequence_class, sequence_file_path)
+    sim_driver: AbstractAnalyserDriverIO,
+    sequence_class: type[TAbstractBaseSequence],
+    RE: RunEngine,
+):
+    det = ElectronAnalyserDetector(
+        prefix="SIM:",
+        driver=sim_driver,
+        sequence_class=sequence_class,
+    )
+    return det.load_sequence(get_test_sequence(type(sim_driver)))
 
 
 @pytest.fixture
@@ -42,15 +93,6 @@ def region(
     if region is None:
         raise ValueError("Region " + request.param + " is not found.")
     return region
-
-
-@pytest.fixture
-def excitation_energy(
-    sequence: AbstractBaseSequence, region: AbstractBaseRegion
-) -> float:
-    if isinstance(sequence, VGScientaSequence) and isinstance(region, VGScientaRegion):
-        return sequence.get_excitation_energy_source_by_region(region).value
-    return 1000
 
 
 @pytest.fixture
@@ -70,15 +112,3 @@ def expected_enabled_region_names(
         if expected_region_value["enabled"]:
             names.append(expected_region_value["name"])
     return names
-
-
-@pytest.fixture
-async def sim_analyser_driver(
-    analyser_type: type[TAbstractAnalyserDriverIO],
-) -> TAbstractAnalyserDriverIO:
-    async with init_devices(mock=True, connect=True):
-        sim_analyser_driver = analyser_type(
-            prefix="sim_analyser_driver:",
-            name="analyser_driver",
-        )
-    return sim_analyser_driver
