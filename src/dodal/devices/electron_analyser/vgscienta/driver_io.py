@@ -22,7 +22,9 @@ from dodal.devices.electron_analyser.vgscienta.region import (
 
 
 class VGScientaAnalyserDriverIO(AbstractAnalyserDriverIO[VGScientaRegion]):
-    def __init__(self, prefix: str, name: str = "") -> None:
+    def __init__(
+        self, prefix: str, energy_sources: dict[str, SignalR], name: str = ""
+    ) -> None:
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             # Used for setting up region data acquisition.
             self.centre_energy = epics_signal_rw(float, prefix + "CENTRE_ENERGY")
@@ -36,7 +38,7 @@ class VGScientaAnalyserDriverIO(AbstractAnalyserDriverIO[VGScientaRegion]):
             # Used to read detector data after acqusition.
             self.external_io = epics_signal_r(Array1D[np.float64], prefix + "EXTIO")
 
-        super().__init__(prefix, AcquisitionMode, name)
+        super().__init__(prefix, AcquisitionMode, energy_sources, name)
 
     @AsyncStatus.wrap
     async def set(self, region: VGScientaRegion):
