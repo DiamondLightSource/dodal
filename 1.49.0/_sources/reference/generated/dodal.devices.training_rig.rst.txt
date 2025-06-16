@@ -1,0 +1,35 @@
+dodal.devices.training\_rig
+===========================
+
+
+
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   dodal.devices.training_rig.sample_stage
+
+
+
+
+
+
+
+
+.. automodule:: dodal.devices.training_rig
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

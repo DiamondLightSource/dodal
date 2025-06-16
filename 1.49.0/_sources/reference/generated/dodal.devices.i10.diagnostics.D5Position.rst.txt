@@ -1,0 +1,78 @@
+dodal.devices.i10.diagnostics.D5Position
+========================================
+
+.. currentmodule:: dodal.devices.i10.diagnostics
+
+.. autoclass:: D5Position
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~D5Position.CELL_IN
+      
+      
+      ~D5Position.CELL_OUT
+      
+   
+   

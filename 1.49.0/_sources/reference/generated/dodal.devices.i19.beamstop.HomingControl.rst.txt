@@ -1,0 +1,40 @@
+dodal.devices.i19.beamstop.HomingControl
+========================================
+
+.. currentmodule:: dodal.devices.i19.beamstop
+
+.. autoclass:: HomingControl
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

@@ -1,0 +1,36 @@
+dodal.devices.i24.pilatus\_metadata
+===================================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices.i24
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~pilatus_metadata.PilatusMetadata
+
+
+
+
+.. automodule:: dodal.devices.i24.pilatus_metadata
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
