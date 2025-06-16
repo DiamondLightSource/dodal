@@ -39,11 +39,11 @@ def move_slits(slits: Slits, dimension: SlitDimension, gap: float, center: float
         center: float position of center
     """
     if dimension == SlitDimension.X:
-        yield from bps.mv(slits.x_gap, gap)  # type: ignore
-        yield from bps.mv(slits.x_centre, center)  # type: ignore
+        yield from bps.mv(slits.x_gap, gap)
+        yield from bps.mv(slits.x_centre, center)
     else:
-        yield from bps.mv(slits.y_gap, gap)  # type: ignore
-        yield from bps.mv(slits.y_centre, center)  # type: ignore
+        yield from bps.mv(slits.y_gap, gap)
+        yield from bps.mv(slits.y_centre, center)
 
 
 def check_valid_bimorph_state(
