@@ -127,7 +127,7 @@ def test_correct_closest_distance_to_energy_from_table(energy, expected_output):
     assert _get_gap_for_energy(energy, energy_to_distance_table) == expected_output
 
 
-async def test_when_gap_access_is_disabled_set_energy_then_error_is_raised(
+async def test_when_gap_access_is_disabled_set_then_error_is_raised(
     undulator,
 ):
     set_mock_value(undulator.gap_access, UndulatorGapAccess.DISABLED)
