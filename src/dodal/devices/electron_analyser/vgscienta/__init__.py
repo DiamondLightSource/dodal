@@ -1,11 +1,12 @@
-from .detector import VGScientaDetector, VGScientaRegionDetector
+from .detector import VGScientaDetector
 from .driver_io import VGScientaAnalyserDriverIO
+from .enums import AcquisitionMode
 from .region import VGScientaExcitationEnergySource, VGScientaRegion, VGScientaSequence
 
 __all__ = [
     "VGScientaDetector",
-    "VGScientaRegionDetector",
     "VGScientaAnalyserDriverIO",
+    "AcquisitionMode",
     "VGScientaExcitationEnergySource",
     "VGScientaRegion",
     "VGScientaSequence",
