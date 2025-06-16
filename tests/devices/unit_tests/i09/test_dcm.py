@@ -1,4 +1,5 @@
 import pytest
+from bluesky.run_engine import RunEngine
 from ophyd_async.core import init_devices
 from ophyd_async.testing import (
     assert_value,
@@ -9,9 +10,9 @@ from dodal.devices.i09.dcm import DCM
 
 
 @pytest.fixture
-async def dcm() -> DCM:
+async def dcm(RE: RunEngine) -> DCM:
     async with init_devices(mock=True):
-        dcm = DCM("DCM-01", name="dcm")
+        dcm = DCM("DCM-01")
     return dcm
 
 
@@ -35,14 +36,14 @@ async def test_ev_to_kev(
 @pytest.mark.parametrize(
     "key",
     [
-        "dcm-bragg_in_degrees",
-        "dcm-energy_in_kev",
-        "dcm-energy_in_ev",
-        "dcm-offset_in_mm",
-        "dcm-wavelength_in_a",
-        "dcm-xtal_1-roll_in_mrad",
-        "dcm-xtal_1-pitch_in_mrad",
-        "dcm-crystal_metadata_d_spacing_a",
+        "bragg_in_degrees",
+        "energy_in_kev",
+        "energy_in_ev",
+        "offset_in_mm",
+        "wavelength_in_a",
+        "xtal_1-roll_in_mrad",
+        "xtal_1-pitch_in_mrad",
+        "crystal_metadata_d_spacing_a",
     ],
 )
 async def test_read_and_describe_includes(
@@ -52,5 +53,5 @@ async def test_read_and_describe_includes(
     description = await dcm.describe()
     reading = await dcm.read()
 
-    assert key in description
-    assert key in reading
+    assert f"{dcm.name}-{key}" in description
+    assert f"{dcm.name}-{key}" in reading
