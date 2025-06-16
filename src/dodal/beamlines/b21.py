@@ -46,7 +46,7 @@ def saxs() -> EigerDetector:
     )
 
 
-@device_factory()
+@device_factory(skip=True)
 def waxs() -> EigerDetector:
     return EigerDetector(
         prefix=PREFIX.beamline_prefix,
@@ -84,9 +84,9 @@ def slits_3() -> Slits:
     return Slits(prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-03:")
 
 
-@device_factory()
-def slits_4() -> Slits:
-    return Slits(prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-04:")
+"""
+Slits 4 was removed from B21 after the camera length was fixed, it is not used anymore.
+"""
 
 
 @device_factory()
@@ -101,7 +101,17 @@ def slits_6() -> Slits:
 
 @device_factory()
 def slits_7() -> Slits:
-    return Slits(prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-07:")
+    """
+    Compact JJ slits device is used for B21 slits 7. PV's operate in same way
+    but physically different to other slits, and uses X:GAP nomenclature.
+    """
+    return Slits(
+        prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-07:",
+        x_gap="X:GAP",
+        y_gap="Y:GAP",
+        x_centre="X:CENTRE",
+        y_centre="Y:CENTRE",
+    )
 
 
 @device_factory(skip=True)
