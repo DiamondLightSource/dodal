@@ -86,18 +86,6 @@ def bbox_size(result: XrcResult):
     ]
 
 
-def get_dict_differences(
-    dict1: dict, dict1_source: str, dict2: dict, dict2_source: str
-) -> str | None:
-    """Returns a string containing dict1 and dict2 if there are differences between them, greater than a
-    1e-5 tolerance. If dictionaries are identical, return None"""
-
-    diff = DeepDiff(dict1, dict2, math_epsilon=1e-5, ignore_numeric_type_changes=True)
-
-    if diff:
-        return f"Zocalo results from {dict1_source} and {dict2_source} are not identical.\n Results from {dict1_source}: {dict1}\n Results from {dict2_source}: {dict2}"
-
-
 def source_from_results(results):
     return (
         ZocaloSource.GPU.value
