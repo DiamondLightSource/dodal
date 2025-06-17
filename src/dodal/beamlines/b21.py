@@ -39,26 +39,16 @@ set_path_provider(
 
 
 # TODO: https://github.com/bluesky/ophyd-async/issues/923
+# TODO: https://github.com/DiamondLightSource/dodal/issues/1287
 # To be able to specify the number of OdinNodes Odin, and then on the EigerDetector
-@device_factory()
+@device_factory(skip=True)
 def saxs() -> EigerDetector:
-    odin_suffix = "-EA-EIGER-01:OD:"
-    node_prefix = PREFIX.beamline_prefix + odin_suffix
-
-    saxs_detector = EigerDetector(
+    return = EigerDetector(
         prefix=PREFIX.beamline_prefix,
         path_provider=get_path_provider(),
         drv_suffix="-EA-EIGER-01:",
         hdf_suffix=odin_suffix,
     )
-
-    # TODO: https://github.com/DiamondLightSource/dodal/issues/1287
-    saxs_detector.odin.nodes = DeviceVector(
-        {i: OdinNode(f"{node_prefix[:-1]}{i + 1}:") for i in range(1)}
-    )
-
-    return saxs_detector
-
 
 @device_factory(skip=True)
 def waxs() -> EigerDetector:
