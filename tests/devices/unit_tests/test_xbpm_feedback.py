@@ -45,7 +45,7 @@ def test_given_pos_not_stable_and_goes_stable_when_xbpm_feedback_kickoff_then_re
     RE(plan())
 
 
-@patch("dodal.devices.xbpm_feedback.asyncio.sleep")
+@patch("dodal.common.device_utils.asyncio.sleep")
 def test_logging_while_waiting_for_XBPM(
     asyncio_sleep: MagicMock, RE: RunEngine, fake_xbpm_feedback: XBPMFeedback, caplog
 ):
