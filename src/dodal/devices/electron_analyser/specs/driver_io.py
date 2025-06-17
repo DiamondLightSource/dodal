@@ -13,6 +13,7 @@ from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 from dodal.devices.electron_analyser.abstract.base_driver_io import (
     AbstractAnalyserDriverIO,
 )
+from dodal.devices.electron_analyser.specs.enums import AcquisitionMode
 from dodal.devices.electron_analyser.specs.region import SpecsRegion
 
 
@@ -28,7 +29,7 @@ class SpecsAnalyserDriverIO(AbstractAnalyserDriverIO[SpecsRegion]):
             self.min_angle_axis = epics_signal_r(float, prefix + "Y_MIN_RBV")
             self.max_angle_axis = epics_signal_r(float, prefix + "Y_MAX_RBV")
 
-        super().__init__(prefix, name)
+        super().__init__(prefix, AcquisitionMode, name)
 
     @AsyncStatus.wrap
     async def set(self, region: SpecsRegion):
@@ -38,12 +39,10 @@ class SpecsAnalyserDriverIO(AbstractAnalyserDriverIO[SpecsRegion]):
             self.snapshot_values.set(region.values),
             self.psu_mode.set(region.psu_mode),
         )
-        # ToDo - This needs to be changed to an Enum
-        # https://github.com/DiamondLightSource/dodal/issues/1258
-        if region.acquisition_mode == "Fixed Transmission":
+        if region.acquisition_mode == AcquisitionMode.FIXED_TRANSMISSION:
             await self.centre_energy.set(region.centre_energy)
 
-        if self.acquisition_mode == "Fixed Energy":
+        if self.acquisition_mode == AcquisitionMode.FIXED_ENERGY:
             await self.energy_step.set(region.energy_step)
 
     def _create_angle_axis_signal(self, prefix: str) -> SignalR[Array1D[np.float64]]:

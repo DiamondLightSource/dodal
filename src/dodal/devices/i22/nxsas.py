@@ -38,7 +38,7 @@ class MetadataHolder:
             if isinstance(value, tuple):
                 return {"units": value[1], **datakey(value[0])}
             dtype = "string"
-            shape = []
+            shape: list[int | None] = []
             match value:
                 case bool():
                     dtype = "boolean"

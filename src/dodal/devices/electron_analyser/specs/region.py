@@ -4,13 +4,14 @@ from dodal.devices.electron_analyser.abstract.base_region import (
     AbstractBaseRegion,
     AbstractBaseSequence,
 )
+from dodal.devices.electron_analyser.specs.enums import AcquisitionMode
 
 
-class SpecsRegion(AbstractBaseRegion):
+class SpecsRegion(AbstractBaseRegion[AcquisitionMode]):
     # Override base class with defaults
     lens_mode: str = "SmallArea"
     pass_energy: int = 5
-    acquisition_mode: str = "Fixed Transmission"
+    acquisition_mode: AcquisitionMode = AcquisitionMode.FIXED_TRANSMISSION
     low_energy: float = Field(default=800, alias="start_energy")
     high_energy: float = Field(default=850, alias="end_energy")
     step_time: float = Field(default=1.0, alias="exposure_time")
