@@ -88,13 +88,13 @@ def validate_bimorph_plan(
     voltage_list = initial_voltage_list.copy()
 
     if not check_valid_bimorph_state(voltage_list, abs_range, abs_diff):
-        raise Exception(f"Bimorph plan reaches invalid state at: {voltage_list}")
+        raise ValueError(f"Bimorph plan reaches invalid state at: {voltage_list}")
 
     for i in range(len(initial_voltage_list)):
         voltage_list[i] += voltage_increment
 
         if not check_valid_bimorph_state(voltage_list, abs_range, abs_diff):
-            raise Exception(f"Bimorph plan reaches invalid state at: {voltage_list}")
+            raise ValueError(f"Bimorph plan reaches invalid state at: {voltage_list}")
 
     return True
 

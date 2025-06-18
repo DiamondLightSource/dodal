@@ -189,7 +189,7 @@ class TestPlanValidation:
     def test_invalid_plan(
         self, voltage_list: list[float], abs_range: float, abs_diff: float
     ):
-        with pytest.raises(Exception):  # noqa: B017
+        with pytest.raises(ValueError):
             validate_bimorph_plan([1000.0, 0.0], 200.0, abs_range, abs_diff)
 
     def test_valid_plan(
