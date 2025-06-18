@@ -1,0 +1,36 @@
+dodal.devices.training\_rig.sample\_stage
+=========================================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices.training_rig
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~sample_stage.TrainingRigSampleStage
+
+
+
+
+.. automodule:: dodal.devices.training_rig.sample_stage
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

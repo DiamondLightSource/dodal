@@ -1,0 +1,47 @@
+dodal.devices.tetramm.TetrammDetector
+=====================================
+
+.. currentmodule:: dodal.devices.tetramm
+
+.. autoclass:: TetrammDetector
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~TetrammDetector.hints
+      
+      
+      
+      
+   
+   

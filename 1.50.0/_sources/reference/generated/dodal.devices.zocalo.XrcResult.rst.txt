@@ -1,0 +1,54 @@
+dodal.devices.zocalo.XrcResult
+==============================
+
+.. currentmodule:: dodal.devices.zocalo
+
+.. autoclass:: XrcResult
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~XrcResult.centre_of_mass
+      
+      
+      ~XrcResult.max_voxel
+      
+      
+      ~XrcResult.max_count
+      
+      
+      ~XrcResult.n_voxels
+      
+      
+      ~XrcResult.total_count
+      
+      
+      ~XrcResult.bounding_box
+      
+   
+   

@@ -1,0 +1,36 @@
+dodal.devices.i24.i24\_detector\_motion
+=======================================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices.i24
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~i24_detector_motion.DetectorMotion
+
+
+
+
+.. automodule:: dodal.devices.i24.i24_detector_motion
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

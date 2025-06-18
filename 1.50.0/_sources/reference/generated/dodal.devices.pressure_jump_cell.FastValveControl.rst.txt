@@ -1,0 +1,43 @@
+dodal.devices.pressure\_jump\_cell.FastValveControl
+===================================================
+
+.. currentmodule:: dodal.devices.pressure_jump_cell
+
+.. autoclass:: FastValveControl
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~FastValveControl.set
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

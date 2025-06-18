@@ -1,0 +1,82 @@
+dodal.devices.aperturescatterguard.AperturePosition
+===================================================
+
+.. currentmodule:: dodal.devices.aperturescatterguard
+
+.. autoclass:: AperturePosition
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      ~AperturePosition.from_gda_params
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~AperturePosition.tolerances_from_gda_params
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      ~AperturePosition.model_config
+      
+      
+      
+      
+      
+      ~AperturePosition.values
+      
+      
+      ~AperturePosition.aperture_x
+      
+      
+      ~AperturePosition.aperture_y
+      
+      
+      ~AperturePosition.aperture_z
+      
+      
+      ~AperturePosition.scatterguard_x
+      
+      
+      ~AperturePosition.scatterguard_y
+      
+      
+      ~AperturePosition.radius
+      
+   
+   
