@@ -26,8 +26,8 @@ def mg_kalpha_source() -> LabXraySourceReadable:
 @device_factory()
 def analyser_driver() -> VGScientaAnalyserDriverIO:
     energy_sources = {
-        "source1": al_kalpha_source().user_readback,
-        "source2": mg_kalpha_source().user_readback,
+        "source1": al_kalpha_source().energy_ev,
+        "source2": mg_kalpha_source().energy_ev,
     }
     return VGScientaAnalyserDriverIO(
         f"{PREFIX.beamline_prefix}-EA-DET-01:CAM:", energy_sources
