@@ -136,7 +136,7 @@ def bimorph_hfm() -> BimorphMirror:
 @device_factory()
 def bimorph_vfm() -> BimorphMirror:
     return BimorphMirror(
-        prefix=f"{PREFIX.beamline_prefix}-OP-KBM-01:G1:", number_of_channels=16
+        prefix=f"{PREFIX.beamline_prefix}-OP-KBM-01:G1:", number_of_channels=32
     )
 
 
