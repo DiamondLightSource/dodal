@@ -192,6 +192,12 @@ class TestPlanValidation:
         with pytest.raises(ValueError):
             validate_bimorph_plan([1000.0, 0.0], 200.0, abs_range, abs_diff)
 
+    def test_late_invalid_plan(
+        self, voltage_list: list[float], abs_range: float, abs_diff: float
+    ):
+        with pytest.raises(ValueError):
+            validate_bimorph_plan([abs_diff, 0], abs_diff, abs_range, abs_diff)
+
     def test_valid_plan(
         self, voltage_list: list[float], abs_range: float, abs_diff: float
     ):
