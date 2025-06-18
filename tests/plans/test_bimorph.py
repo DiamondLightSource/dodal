@@ -186,7 +186,7 @@ class TestPlanValidation:
     ):
         assert not check_valid_bimorph_state([abs_diff, -abs_diff], abs_range, abs_diff)
 
-    def test_invalid_plan(
+    def test_invalid_initial_voltage_list(
         self, voltage_list: list[float], abs_range: float, abs_diff: float
     ):
         with pytest.raises(ValueError):
