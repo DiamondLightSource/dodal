@@ -1,8 +1,6 @@
-from dodal.common.beamlines.beamline_utils import (
-    device_factory,
-)
+from dodal.common.beamlines.beamline_utils import device_factory
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.devices.b07_1 import B07CGrating
+from dodal.devices.b07_1 import B07CGrating, Ccmc
 from dodal.devices.electron_analyser.specs import SpecsAnalyserDriverIO
 from dodal.devices.pgm import PGM
 from dodal.devices.synchrotron import Synchrotron
@@ -28,3 +26,10 @@ def analyser_driver() -> SpecsAnalyserDriverIO:
 @device_factory()
 def pgm() -> PGM:
     return PGM(prefix=f"{PREFIX.beamline_prefix}-OP-PGM-01:", grating=B07CGrating)
+
+
+@device_factory()
+def ccmc() -> Ccmc:
+    return Ccmc(
+        prefix=f"{PREFIX.beamline_prefix}-OP-CCM-01:",
+    )
