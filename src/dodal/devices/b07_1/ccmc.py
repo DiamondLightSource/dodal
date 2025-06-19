@@ -21,17 +21,20 @@ class Ccmc(StandardReadable):
     """
 
     def __init__(self, prefix: str, name: str = "") -> None:
-        self.x = Motor(prefix + "X")
-        self.y = Motor(prefix + "Y")
-        self.z = Motor(prefix + "Z")
+        with self.add_children_as_readables():
+            self.x = Motor(prefix + "X")
+            self.y = Motor(prefix + "Y")
+            self.z = Motor(prefix + "Z")
 
-        # ToDo this is piezo motor, so need to have correct class as PVs are different
-        self.y_rotation = epics_signal_rw(
-            float,
-            read_pv=prefix + "ROTY:POS:RD",
-            write_pv=prefix + "ROTY:MOV:WR",
-        )
+            # ToDo this is piezo motor, so need to have correct class as PVs are different
+            self.y_rotation = epics_signal_rw(
+                float,
+                read_pv=prefix + "ROTY:POS:RD",
+                write_pv=prefix + "ROTY:MOV:WR",
+            )
 
-        self.pos_select = epics_signal_rw(CcmcPositions, prefix + "CRYSTAL:MP:SELECT")
+            self.pos_select = epics_signal_rw(
+                CcmcPositions, prefix + "CRYSTAL:MP:SELECT"
+            )
 
         super().__init__(name)
