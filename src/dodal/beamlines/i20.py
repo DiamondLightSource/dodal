@@ -35,8 +35,9 @@ set_path_provider(
 def synchrotron() -> Synchrotron:
     return Synchrotron()
 
+
 @device_factory()
-def gas_injector()->GasInjector:
+def gas_injector() -> GasInjector:
     return GasInjector(
         prefix=f"{PREFIX.insertion_prefix}-EA-GIT-01:",
     )
