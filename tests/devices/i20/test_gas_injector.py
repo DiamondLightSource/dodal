@@ -19,9 +19,10 @@ def injector():
         patch(
             "dodal.devices.i20.gas_injector.epics_signal_rw",
             side_effect=lambda *a, **k: AsyncMock(),
-        ) as rw,
+        ) as _,
         patch(
-            "dodal.devices.i20.gas_injector.epics_signal_r", side_effect=lambda *a, **k: AsyncMock()
+            "dodal.devices.i20.gas_injector.epics_signal_r",
+            side_effect=lambda *a, **k: AsyncMock(),
         ),
     ):
         yield GasInjector("BLXX:")
@@ -94,6 +95,18 @@ async def test_inject_gas_sequence(monkeypatch, injector):
 async def test_purge_chamber_no_leak(monkeypatch, injector):
     # Patch sleep
     monkeypatch.setattr("dodal.devices.i20.gas_injector.sleep", AsyncMock())
+
+    # Patch observe_value to simulate pressure readings for equilibration
+    equil_pressures = [0.5, 0.3, 0.15, 0.05, 0.01, 0.01, 0.01]
+
+    async def fake_observe_value(signal):
+        for p in equil_pressures:
+            yield p
+
+    monkeypatch.setattr(
+        "dodal.devices.i20.gas_injector.observe_value", fake_observe_value
+    )
+
     # Patch all set methods
     for v in injector.chambers.values():
         v.set = AsyncMock()
@@ -134,6 +147,18 @@ async def test_purge_chamber_no_leak(monkeypatch, injector):
 @pytest.mark.asyncio
 async def test_purge_chamber_with_leak(monkeypatch, injector, capsys):
     monkeypatch.setattr("dodal.devices.i20.gas_injector.sleep", AsyncMock())
+
+    # Patch observe_value to simulate pressure readings for equilibration
+    equil_pressures = [0.5, 0.3, 0.15, 0.05, 0.01, 0.01, 0.01]
+
+    async def fake_observe_value(signal):
+        for p in equil_pressures:
+            yield p
+
+    monkeypatch.setattr(
+        "dodal.devices.i20.gas_injector.observe_value", fake_observe_value
+    )
+
     for v in injector.chambers.values():
         v.set = AsyncMock()
     injector.vacuum_pump.set = AsyncMock()

@@ -11,14 +11,6 @@
                 "cwd": "${workspaceRoot}"
             },
             "problemMatcher": [],
-        },
-        {
-            "label": "load_dials_env",
-            "command": "module",
-            "args": [
-                "load dials/latest"
-            ],
-            "type": "shell"
         }
     ]
 }
