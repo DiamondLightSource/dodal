@@ -1,11 +1,9 @@
 import enum
 import time
-from asyncio import sleep
+from collections import deque
 
 from ophyd_async.core import StandardReadable, WatcherUpdate, observe_value
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
-
-ionchamber_leak_wait_time = 10.0
 
 
 class GasToInject(enum.Enum):
@@ -84,6 +82,33 @@ class GasInjector(StandardReadable):
     def get_chamber_valve(self, chamber: IonChamberToFill):
         return self.chambers[chamber]
 
+    async def wait_for_equilibration(
+        self,
+        signal,
+        window_size: int = 5,
+        tolerance: float = 0.02,
+        max_wait: float = 60.0,
+    ):
+        """
+        Wait until the moving average of the last `window_size` values
+        changes by less than `tolerance` between windows.
+        """
+        window: deque[float] = deque(maxlen=window_size)
+        prev_avg = None
+        start = time.monotonic()
+        async for value in observe_value(signal):
+            window.append(value)
+            if len(window) < window_size:
+                continue
+            avg = sum(window) / window_size
+            if prev_avg is not None and abs(avg - prev_avg) < tolerance:
+                break
+            prev_avg = avg
+            if time.monotonic() - start > max_wait:
+                print("WARNING: Equilibration timed out.")
+                break
+        return list(window)
+
     async def inject_gas(
         self,
         target_pressure: float,
@@ -91,7 +116,6 @@ class GasInjector(StandardReadable):
         gas: GasToInject = GasToInject.ARGON,
     ):
         chamber_valve = self.get_chamber_valve(chamber)
-
         gas_valve = self.get_gas_valve(gas)
         chamber_pressure = self.pressure_controller_2
         await chamber_pressure.setpoint.set(target_pressure)
@@ -100,7 +124,6 @@ class GasInjector(StandardReadable):
         await chamber_pressure.mode.set(PressureMode.PRESSURE_CONTROL.value)
         start = time.monotonic()
         print(f"Injecting {gas.value} into {chamber} at {target_pressure} mbar...")
-        # todo check empirically if this is enough time
         async for current_pressure in observe_value(chamber_pressure.readout):
             yield WatcherUpdate(
                 name="chamber_pressure",
@@ -111,6 +134,11 @@ class GasInjector(StandardReadable):
             )
             if abs(current_pressure - target_pressure) < 0.1:
                 break
+        # Wait for equilibration near zero after injection
+        print("Waiting for pressure to equilibrate near zero...")
+        await self.wait_for_equilibration(
+            chamber_pressure.readout, window_size=5, tolerance=0.02, max_wait=60.0
+        )
         await chamber_valve.set(ValveCommands.CLOSE.value)
         await chamber_pressure.mode.set(PressureMode.HOLD.value)
         await gas_valve.set(ValveCommands.CLOSE.value)
@@ -121,20 +149,23 @@ class GasInjector(StandardReadable):
         await self.vacuum_pump.set(VacuumPumpCommands.ON.value)
         await self.line_valve.set(ValveCommands.RESET.value)
         await self.line_valve.set(ValveCommands.OPEN.value)
+        print(f"Purging {chamber} chamber...")
         await chamber_valve.set(ValveCommands.RESET.value)
         await chamber_valve.set(ValveCommands.OPEN.value)
         base_pressure = (await chamber_pressure.readout.read())["value"]
         await chamber_valve.set(ValveCommands.CLOSE.value)
 
-        print(f"Purging {chamber} chamber...")
-        # wait for leak check
-        await sleep(ionchamber_leak_wait_time)
+        # Wait for pressure to equilibrate near zero after purging
+        print("Waiting for chamber pressure to equilibrate near zero after purge...")
+        await self.wait_for_equilibration(
+            chamber_pressure.readout, window_size=5, tolerance=0.02, max_wait=60.0
+        )
         check_pressure = (await chamber_pressure.readout.read())["value"]
         print(
             f"Base pressure in {chamber} is {base_pressure} mbar, "
             f"check pressure after leak check is {check_pressure} mbar"
         )
-        if check_pressure["value"] - base_pressure > 3:
+        if check_pressure - base_pressure > 3:
             print(f"WARNING, suspected leak in {chamber}, stopping here!!!")
 
         await chamber_valve.set(ValveCommands.CLOSE.value)
