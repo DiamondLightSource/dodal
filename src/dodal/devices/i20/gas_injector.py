@@ -1,8 +1,8 @@
-import time
 import enum
+import time
 from asyncio import sleep
 
-from ophyd_async.core import StandardReadable, observe_value, WatcherUpdate
+from ophyd_async.core import StandardReadable, WatcherUpdate, observe_value
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
 ionchamber_leak_wait_time = 10.0
