@@ -5,11 +5,14 @@ from bluesky.run_engine import RunEngine
 from ophyd_async.core import init_devices
 from ophyd_async.epics.motor import Motor
 
-from dodal.devices.electron_analyser import ElectronAnalyserDetector
+from dodal.devices.electron_analyser import (
+    ElectronAnalyserDetector,
+    ElectronAnalyserDetectorImpl,
+    ElectronAnalyserDriverImpl,
+)
 from dodal.devices.electron_analyser.abstract import (
     AbstractAnalyserDriverIO,
     AbstractBaseSequence,
-    TAbstractAnalyserDriverIO,
     TAbstractBaseRegion,
     TAbstractBaseSequence,
 )
@@ -22,7 +25,6 @@ from dodal.devices.electron_analyser.vgscienta import (
     VGScientaSequence,
 )
 from tests.devices.unit_tests.electron_analyser.util import (
-    ElectronAnalyserDetectorImpl,
     get_test_sequence,
 )
 
@@ -40,8 +42,8 @@ async def sim_detector(
 
 @pytest.fixture
 async def sim_driver(
-    driver_class: type[TAbstractAnalyserDriverIO], RE: RunEngine
-) -> TAbstractAnalyserDriverIO:
+    driver_class: type[ElectronAnalyserDriverImpl], RE: RunEngine
+) -> ElectronAnalyserDriverImpl:
     async with init_devices(mock=True, connect=True):
         sim_driver = driver_class(
             prefix="TEST:",

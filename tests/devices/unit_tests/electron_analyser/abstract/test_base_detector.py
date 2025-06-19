@@ -5,29 +5,26 @@ from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
 from ophyd_async.epics.motor import Motor
 
-from dodal.devices.electron_analyser import ElectronAnalyserDetector
+from dodal.devices.electron_analyser import GenericElectronAnalyserDetector
 from dodal.devices.electron_analyser.specs import SpecsDetector
 from dodal.devices.electron_analyser.vgscienta import VGScientaDetector
-from tests.devices.unit_tests.electron_analyser.util import (
-    ElectronAnalyserDetectorImpl,
-    get_test_sequence,
-)
+from tests.devices.unit_tests.electron_analyser.util import get_test_sequence
 
 
 @pytest.fixture(params=[SpecsDetector, VGScientaDetector])
 def detector_class(
     request: pytest.FixtureRequest,
-) -> type[ElectronAnalyserDetector]:
+) -> type[GenericElectronAnalyserDetector]:
     return request.param
 
 
 @pytest.fixture
-def sequence_file_path(sim_detector: ElectronAnalyserDetector) -> str:
+def sequence_file_path(sim_detector: GenericElectronAnalyserDetector) -> str:
     return get_test_sequence(type(sim_detector))
 
 
 def test_analyser_detector_loads_sequence_correctly(
-    sim_detector: ElectronAnalyserDetector,
+    sim_detector: GenericElectronAnalyserDetector,
     sequence_file_path: str,
 ) -> None:
     seq = sim_detector.load_sequence(sequence_file_path)
@@ -35,7 +32,7 @@ def test_analyser_detector_loads_sequence_correctly(
 
 
 def test_analyser_detector_creates_region_detectors(
-    sim_detector: ElectronAnalyserDetectorImpl,
+    sim_detector: GenericElectronAnalyserDetector,
     sequence_file_path: str,
 ) -> None:
     seq = sim_detector.load_sequence(sequence_file_path)
@@ -48,7 +45,7 @@ def test_analyser_detector_creates_region_detectors(
 
 
 def test_analyser_detector_has_driver_as_child_and_region_detector_does_not(
-    sim_detector: ElectronAnalyserDetectorImpl,
+    sim_detector: GenericElectronAnalyserDetector,
     sequence_file_path: str,
 ) -> None:
     # Remove parent name from driver name so it can be checked it exists in
@@ -68,7 +65,7 @@ def test_analyser_detector_has_driver_as_child_and_region_detector_does_not(
 
 
 def test_analyser_region_detector_stage_prepares_driver_with_region(
-    sim_detector: ElectronAnalyserDetectorImpl,
+    sim_detector: GenericElectronAnalyserDetector,
     sequence_file_path: str,
     sim_energy_source: Motor,
     RE: RunEngine,

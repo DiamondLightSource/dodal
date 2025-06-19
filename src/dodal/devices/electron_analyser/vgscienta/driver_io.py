@@ -14,6 +14,7 @@ from dodal.devices.electron_analyser.abstract.base_driver_io import (
     AbstractAnalyserDriverIO,
 )
 from dodal.devices.electron_analyser.util import to_kinetic_energy
+from dodal.devices.electron_analyser.vgscienta.enums import AcquisitionMode
 from dodal.devices.electron_analyser.vgscienta.region import (
     DetectorMode,
     VGScientaRegion,
@@ -35,7 +36,7 @@ class VGScientaAnalyserDriverIO(AbstractAnalyserDriverIO[VGScientaRegion]):
             # Used to read detector data after acqusition.
             self.external_io = epics_signal_r(Array1D[np.float64], prefix + "EXTIO")
 
-        super().__init__(prefix, name)
+        super().__init__(prefix, AcquisitionMode, name)
 
     @AsyncStatus.wrap
     async def set(self, region: VGScientaRegion):

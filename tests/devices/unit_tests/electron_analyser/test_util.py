@@ -1,7 +1,10 @@
 import pytest
 
-from dodal.devices.electron_analyser import to_binding_energy, to_kinetic_energy
-from dodal.devices.electron_analyser.types import EnergyMode
+from dodal.devices.electron_analyser import (
+    EnergyMode,
+    to_binding_energy,
+    to_kinetic_energy,
+)
 
 ENERGY_MODE_PARAMS = [EnergyMode.KINETIC, EnergyMode.BINDING]
 

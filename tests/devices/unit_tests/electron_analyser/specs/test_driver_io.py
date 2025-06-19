@@ -8,11 +8,12 @@ from ophyd_async.testing import (
     set_mock_value,
 )
 
+from dodal.devices.electron_analyser import EnergyMode
 from dodal.devices.electron_analyser.specs import (
+    AcquisitionMode,
     SpecsAnalyserDriverIO,
     SpecsRegion,
 )
-from dodal.devices.electron_analyser.types import EnergyMode
 from tests.devices.unit_tests.electron_analyser.util import (
     TEST_SEQUENCE_REGION_NAMES,
     assert_read_configuration_has_expected_value,
@@ -34,7 +35,7 @@ async def test_given_region_that_analyser_sets_energy_values_correctly(
 ) -> None:
     RE(configure_driver_with_region(sim_driver, region, sim_energy_source))
 
-    if region.acquisition_mode == "Fixed Transmission":
+    if region.acquisition_mode == AcquisitionMode.FIXED_TRANSMISSION:
         get_mock_put(sim_driver.centre_energy).assert_called_once_with(
             region.centre_energy, wait=True
         )
@@ -44,7 +45,7 @@ async def test_given_region_that_analyser_sets_energy_values_correctly(
     else:
         get_mock_put(sim_driver.centre_energy).assert_not_called()
 
-    if region.acquisition_mode == "Fixed Energy":
+    if region.acquisition_mode == AcquisitionMode.FIXED_ENERGY:
         get_mock_put(sim_driver.energy_step).assert_called_once_with(
             region.energy_step, wait=True
         )
