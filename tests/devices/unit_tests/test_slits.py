@@ -1,6 +1,5 @@
 from collections.abc import Mapping
 from typing import Any
-from unittest.mock import ANY
 
 import pytest
 from ophyd_async.core import StandardReadable, init_devices
@@ -26,23 +25,15 @@ async def test_reading_slits_reads_gaps_and_centres(slits: Slits):
         slits,
         {
             "slits-x_centre": {
-                "alarm_severity": 0,
-                "timestamp": ANY,
                 "value": 0.0,
             },
             "slits-x_gap": {
-                "alarm_severity": 0,
-                "timestamp": ANY,
                 "value": 0.5,
             },
             "slits-y_centre": {
-                "alarm_severity": 0,
-                "timestamp": ANY,
                 "value": 1.0,
             },
             "slits-y_gap": {
-                "alarm_severity": 0,
-                "timestamp": ANY,
                 "value": 1.5,
             },
         },

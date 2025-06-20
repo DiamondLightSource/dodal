@@ -1,5 +1,3 @@
-from unittest.mock import ANY
-
 import pytest
 from ophyd_async.core import init_devices
 from ophyd_async.testing import assert_reading, set_mock_value
@@ -31,18 +29,12 @@ async def test_reading_pump_reads_state_speed_and_direction(
         {
             "wm_pump-state": {
                 "value": WatsonMarlow323PumpState.STOPPED,
-                "timestamp": ANY,
-                "alarm_severity": 0,
             },
             "wm_pump-speed": {
                 "value": 25,
-                "timestamp": ANY,
-                "alarm_severity": 0,
             },
             "wm_pump-direction": {
                 "value": WatsonMarlow323PumpDirection.CLOCKWISE,
-                "timestamp": ANY,
-                "alarm_severity": 0,
             },
         },
     )
