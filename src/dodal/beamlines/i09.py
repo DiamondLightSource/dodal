@@ -30,7 +30,6 @@ def pgm() -> PGM:
     return PGM(
         prefix=f"{BeamlinePrefix(BL, suffix='J').beamline_prefix}-MO-PGM-01:",
         grating=I09Grating,
-        gratingPv="GRATINGSELECT:SELECT",
     )
 
 
