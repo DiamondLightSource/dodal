@@ -1,6 +1,6 @@
 import asyncio
 from collections import defaultdict
-from unittest.mock import ANY, AsyncMock
+from unittest.mock import AsyncMock
 
 import bluesky.plan_stubs as bps
 import pytest
@@ -9,6 +9,7 @@ from bluesky.run_engine import RunEngine
 from ophyd_async.core import init_devices
 from ophyd_async.testing import (
     assert_emitted,
+    assert_reading,
     callback_on_mock_put,
     get_mock_put,
     set_mock_value,
@@ -286,30 +287,23 @@ async def test_phase_success_set(mock_phaseAxes: UndulatorPhaseAxes, RE: RunEngi
         set_value.btm_outer, wait=True
     )
 
-    expected_in_reading = {
-        "mock_phaseAxes-top_inner-user_readback": {
-            "value": 3,
-            "timestamp": ANY,
-            "alarm_severity": 0,
+    await assert_reading(
+        mock_phaseAxes,
+        {
+            "mock_phaseAxes-top_inner-user_readback": {
+                "value": 3,
+            },
+            "mock_phaseAxes-top_outer-user_readback": {
+                "value": 2,
+            },
+            "mock_phaseAxes-btm_inner-user_readback": {
+                "value": 5,
+            },
+            "mock_phaseAxes-btm_outer-user_readback": {
+                "value": 7,
+            },
         },
-        "mock_phaseAxes-top_outer-user_readback": {
-            "value": 2,
-            "timestamp": ANY,
-            "alarm_severity": 0,
-        },
-        "mock_phaseAxes-btm_inner-user_readback": {
-            "value": 5,
-            "timestamp": ANY,
-            "alarm_severity": 0,
-        },
-        "mock_phaseAxes-btm_outer-user_readback": {
-            "value": 7,
-            "timestamp": ANY,
-            "alarm_severity": 0,
-        },
-    }
-    actual_reading = await mock_phaseAxes.read()
-    assert expected_in_reading.items() <= actual_reading.items()
+    )
 
 
 async def test_given_gate_never_closes_then_setting_jaw_phases_times_out(

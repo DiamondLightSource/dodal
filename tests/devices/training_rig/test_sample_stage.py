@@ -1,7 +1,6 @@
-from unittest import mock
-
 import pytest
 from ophyd_async.core import init_devices
+from ophyd_async.testing import assert_reading
 
 from dodal.devices.training_rig.sample_stage import TrainingRigSampleStage
 
@@ -15,16 +14,14 @@ async def stage() -> TrainingRigSampleStage:
 
 
 async def test_reading_training_rig(stage: TrainingRigSampleStage):
-    reading = await stage.read()
-    assert reading == {
-        "stage-theta": {
-            "alarm_severity": mock.ANY,
-            "timestamp": mock.ANY,
-            "value": 0.0,
+    await assert_reading(
+        stage,
+        {
+            "stage-theta": {
+                "value": 0.0,
+            },
+            "stage-x": {
+                "value": 0.0,
+            },
         },
-        "stage-x": {
-            "alarm_severity": mock.ANY,
-            "timestamp": mock.ANY,
-            "value": 0.0,
-        },
-    }
+    )
