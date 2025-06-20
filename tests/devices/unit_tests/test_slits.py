@@ -1,9 +1,6 @@
-from collections.abc import Mapping
-from typing import Any
-
 import pytest
-from ophyd_async.core import StandardReadable, init_devices
-from ophyd_async.testing import set_mock_value
+from ophyd_async.core import init_devices
+from ophyd_async.testing import assert_reading, set_mock_value
 
 from dodal.devices.slits import Slits
 
@@ -38,12 +35,3 @@ async def test_reading_slits_reads_gaps_and_centres(slits: Slits):
             },
         },
     )
-
-
-async def assert_reading(
-    device: StandardReadable,
-    expected_reading: Mapping[str, Any],
-) -> None:
-    reading = await device.read()
-
-    assert reading == expected_reading

@@ -140,6 +140,9 @@ async def test_pjumpcell_set_valve_sets_valve_fields(
                 "pjump-all_valves_control-valve_control-1-open": {
                     "value": int(ValveOpenSeqRequest.OPEN_SEQ.value),
                 },
+                "pjump-all_valves_control-valve_control-1-close": {
+                    "value": ValveControlRequest.CLOSE,
+                },
             },
         ),
         assert_reading(
@@ -147,6 +150,9 @@ async def test_pjumpcell_set_valve_sets_valve_fields(
             {
                 "pjump-all_valves_control-fast_valve_control-6-open": {
                     "value": int(ValveOpenSeqRequest.OPEN_SEQ.value),
+                },
+                "pjump-all_valves_control-fast_valve_control-6-close": {
+                    "value": FastValveControlRequest.ARM,
                 },
             },
         ),
