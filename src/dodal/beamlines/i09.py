@@ -21,11 +21,6 @@ def synchrotron() -> Synchrotron:
 
 
 @device_factory()
-def analyser_driver() -> VGScientaAnalyserDriverIO:
-    return VGScientaAnalyserDriverIO(prefix=f"{PREFIX.beamline_prefix}-EA-DET-01:CAM:")
-
-
-@device_factory()
 def pgm() -> PGM:
     return PGM(
         prefix=f"{BeamlinePrefix(BL, suffix='J').beamline_prefix}-MO-PGM-01:",
@@ -36,3 +31,14 @@ def pgm() -> PGM:
 @device_factory()
 def dcm() -> DCM:
     return DCM(prefix=f"{PREFIX.beamline_prefix}-MO-DCM-01:")
+
+
+@device_factory()
+def analyser_driver() -> VGScientaAnalyserDriverIO:
+    energy_sources = {
+        "source1": pgm().energy.user_readback,
+        "source2": dcm().energy_in_ev,
+    }
+    return VGScientaAnalyserDriverIO(
+        f"{PREFIX.beamline_prefix}-EA-DET-01:CAM:", energy_sources
+    )

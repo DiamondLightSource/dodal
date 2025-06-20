@@ -18,7 +18,9 @@ from dodal.devices.electron_analyser.specs.region import SpecsRegion
 
 
 class SpecsAnalyserDriverIO(AbstractAnalyserDriverIO[SpecsRegion]):
-    def __init__(self, prefix: str, name: str = "") -> None:
+    def __init__(
+        self, prefix: str, energy_sources: dict[str, SignalR], name: str = ""
+    ) -> None:
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             # Used for setting up region data acquisition.
             self.psu_mode = epics_signal_rw(str, prefix + "SCAN_RANGE")
@@ -29,7 +31,7 @@ class SpecsAnalyserDriverIO(AbstractAnalyserDriverIO[SpecsRegion]):
             self.min_angle_axis = epics_signal_r(float, prefix + "Y_MIN_RBV")
             self.max_angle_axis = epics_signal_r(float, prefix + "Y_MAX_RBV")
 
-        super().__init__(prefix, AcquisitionMode, name)
+        super().__init__(prefix, AcquisitionMode, energy_sources, name)
 
     @AsyncStatus.wrap
     async def set(self, region: SpecsRegion):
