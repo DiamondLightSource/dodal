@@ -161,12 +161,7 @@ def flux(mock: bool = False) -> Flux:
     """Get the i04 flux device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
     """
-    return device_instantiation(
-        Flux,
-        "-MO-FLUX-01:",
-        wait=False,
-        fake=mock,
-    )
+    return Flux(f"{PREFIX.beamline_prefix}-MO-FLUX-01:")
 
 
 @device_factory()
@@ -216,6 +211,7 @@ def eiger(mock: bool = False, params: DetectorParams | None = None) -> EigerDete
 
     return device_instantiation(
         device_factory=EigerDetector,
+        name="eiger",
         prefix="-EA-EIGER-01:",
         wait=False,
         fake=mock,
@@ -238,12 +234,7 @@ def s4_slit_gaps(mock: bool = False) -> S4SlitGaps:
     """Get the i04 s4_slit_gaps device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
     """
-    return device_instantiation(
-        S4SlitGaps,
-        "-AL-SLITS-04:",
-        wait=False,
-        fake=mock,
-    )
+    return S4SlitGaps(f"{PREFIX.beamline_prefix}-AL-SLITS-04:")
 
 
 @device_factory()

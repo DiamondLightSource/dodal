@@ -1,5 +1,6 @@
 from ophyd_async.fastcs.eiger import EigerDetector as FastEiger
 from ophyd_async.fastcs.panda import HDFPanda
+from pydantic import HttpUrl
 
 from dodal.common.beamlines.beamline_parameters import get_beamline_parameters
 from dodal.common.beamlines.beamline_utils import (
@@ -161,6 +162,7 @@ def eiger(mock: bool = False) -> EigerDetector:
 
     return device_instantiation(
         device_factory=EigerDetector,
+        name="eiger",
         prefix="-EA-EIGER-01:",
         wait=False,
         fake=mock,
@@ -370,8 +372,7 @@ def webcam() -> Webcam:
     If this is called when already instantiated in i03, it will return the existing object.
     """
     return Webcam(
-        PREFIX.beamline_prefix,
-        url="http://i03-webcam1/axis-cgi/jpg/image.cgi",
+        url=HttpUrl("http://i03-webcam1/axis-cgi/jpg/image.cgi"),
     )
 
 
