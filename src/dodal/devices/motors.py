@@ -146,3 +146,29 @@ class SixAxisGonio(XYZStage):
             self.phi = Motor(prefix + phi_infix)
             self.omega = Motor(prefix + omega_infix)
         super().__init__(prefix, name, x_infix, y_infix, z_infix)
+
+
+class YZStage(StandardReadable):
+    """Physical motion for detector travel
+
+    ophyd_async y z motor stage, combining 2 Motors: a horizontal stage parallel to the
+    beam and a vertical stage perpendicular to it.
+
+    Parameters
+    ----------
+    prefix:
+        Common part of the EPICS PV for all motors, including ":".
+    name:
+        Name of the stage, each child motor will be named "{name}-{field_name}"
+    *_infix:
+        Infix between the common prefix and the EPICS motor record fields for the field.
+
+    """
+
+    def __init__(
+        self, prefix: str, name: str = "", y_infix: str = "Y", z_infix: str = "Z"
+    ) -> None:
+        self.y = Motor(prefix + y_infix)  # Vertical
+        self.z = Motor(prefix + z_infix)  # Beam
+
+        super().__init__(name)
