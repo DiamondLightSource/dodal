@@ -1,4 +1,4 @@
-from unittest.mock import ANY, AsyncMock, patch
+from unittest.mock import AsyncMock, patch
 
 import pytest
 from bluesky import plan_stubs as bps
@@ -24,13 +24,9 @@ async def test_backlight_can_be_written_and_read_from(fake_backlight: Backlight)
         {
             "backlight-power": {
                 "value": BacklightPower.ON,
-                "alarm_severity": 0,
-                "timestamp": ANY,
             },
             "backlight-position": {
                 "value": BacklightPosition.IN,
-                "alarm_severity": 0,
-                "timestamp": ANY,
             },
         },
     )
