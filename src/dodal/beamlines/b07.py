@@ -22,11 +22,7 @@ def synchrotron() -> Synchrotron:
 
 @device_factory()
 def pgm() -> PGM:
-    return PGM(
-        prefix=f"{PREFIX.beamline_prefix}-OP-PGM-01:",
-        grating=B07BGrating,
-        gratingPv="GRATINGSELECT:SELECT",
-    )
+    return PGM(prefix=f"{PREFIX.beamline_prefix}-OP-PGM-01:", grating=B07BGrating)
 
 
 @device_factory()
