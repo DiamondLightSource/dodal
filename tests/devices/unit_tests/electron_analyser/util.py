@@ -76,6 +76,9 @@ def assert_region_has_expected_values(
         else:
             raise KeyError('key "' + key + '" is not in the expected values.')
 
+    for key in expected_region_values.keys():
+        assert r.__dict__.get(key) is not None
+
 
 async def assert_read_has_expected_value(
     device: StandardReadable, key: str, expected_value
