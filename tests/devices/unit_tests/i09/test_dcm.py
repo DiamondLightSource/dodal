@@ -33,25 +33,21 @@ async def test_ev_to_kev(
     await assert_value(dcm.energy_in_ev, energy_ev)
 
 
-@pytest.mark.parametrize(
-    "key",
-    [
+async def test_read_and_describe_includes(
+    dcm: DCM,
+):
+    description = await dcm.describe()
+    reading = await dcm.read()
+
+    expected_keys: list[str] = [
         "bragg_in_degrees",
         "energy_in_kev",
-        "energy_in_ev",
         "offset_in_mm",
         "wavelength_in_a",
         "xtal_1-roll_in_mrad",
         "xtal_1-pitch_in_mrad",
         "crystal_metadata_d_spacing_a",
-    ],
-)
-async def test_read_and_describe_includes(
-    dcm: DCM,
-    key: str,
-):
-    description = await dcm.describe()
-    reading = await dcm.read()
-
-    assert f"{dcm.name}-{key}" in description
-    assert f"{dcm.name}-{key}" in reading
+    ]
+    for key in expected_keys:
+        assert f"{dcm.name}-{key}" in reading
+        assert f"{dcm.name}-{key}" in description
