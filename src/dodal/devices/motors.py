@@ -82,7 +82,54 @@ class XYZStage(XYStage):
         super().__init__(prefix, name, x_infix, y_infix)
 
 
+class XYZThetaStage(XYZStage):
+    """
+
+    ophyd_async x y z theta motor stage, combining 3  mutually perpendicular Motors and
+    a rotational stage in theta.
+
+    Parameters
+    ----------
+    prefix:
+        Common part of the EPICS PV for all motors, including ":".
+    name:
+        Name of the stage, each child motor will be named "{name}-{field_name}"
+    *_infix:
+        Infix between the common prefix and the EPICS motor record fields for the field.
+
+    """
+
+    def __init__(
+        self,
+        prefix: str,
+        name: str = "",
+        x_infix: str = "X",
+        y_infix: str = "Y",
+        z_infix: str = "Z",
+        theta_infix: str = "Z",
+    ) -> None:
+        with self.add_children_as_readables():
+            self.theta = Motor(prefix + theta_infix)
+        super().__init__(prefix, name, x_infix, y_infix, z_infix)
+
+
 class SixAxisGonio(XYZStage):
+    """
+
+    ophyd_async x y z kappa phi omega motor stage, combining 3  mutually perpendicular
+    Motors and 3 mutually perpendicular rotational stages.
+
+    Parameters
+    ----------
+    prefix:
+        Common part of the EPICS PV for all motors, including ":".
+    name:
+        Name of the stage, each child motor will be named "{name}-{field_name}"
+    *_infix:
+        Infix between the common prefix and the EPICS motor record fields for the field.
+
+    """
+
     def __init__(
         self,
         prefix: str,
