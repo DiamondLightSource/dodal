@@ -102,7 +102,6 @@ def beamstop() -> Beamstop:
     """
     return Beamstop(
         prefix=f"{PREFIX.beamline_prefix}-MO-BS-01:",
-        name="beamstop",
         beamline_parameters=get_beamline_parameters(),
     )
 
@@ -114,7 +113,6 @@ def dcm() -> DCM:
     """
     return DCM(
         prefix=f"{PREFIX.beamline_prefix}-MO-DCM-01:",
-        name="dcm",
     )
 
 
@@ -122,7 +120,6 @@ def dcm() -> DCM:
 def vfm() -> FocusingMirrorWithStripes:
     return FocusingMirrorWithStripes(
         prefix=f"{PREFIX.beamline_prefix}-OP-VFM-01:",
-        name="vfm",
         bragg_to_lat_lut_path=DAQ_CONFIGURATION_PATH
         + "/lookup/BeamLineEnergy_DCM_VFM_x_converter.txt",
         x_suffix="LAT",
@@ -133,7 +130,6 @@ def vfm() -> FocusingMirrorWithStripes:
 @device_factory()
 def mirror_voltages() -> MirrorVoltages:
     return MirrorVoltages(
-        name="mirror_voltages",
         prefix=f"{PREFIX.beamline_prefix}-MO-PSU-01:",
         daq_configuration_path=DAQ_CONFIGURATION_PATH,
     )
@@ -144,7 +140,7 @@ def backlight() -> Backlight:
     """Get the i03 backlight device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return Backlight(prefix=PREFIX.beamline_prefix, name="backlight")
+    return Backlight(prefix=PREFIX.beamline_prefix)
 
 
 @device_factory()
@@ -154,7 +150,6 @@ def detector_motion() -> DetectorMotion:
     """
     return DetectorMotion(
         prefix=PREFIX.beamline_prefix,
-        name="detector_motion",
     )
 
 
@@ -166,7 +161,6 @@ def eiger(mock: bool = False) -> EigerDetector:
 
     return device_instantiation(
         device_factory=EigerDetector,
-        name="eiger",
         prefix="-EA-EIGER-01:",
         wait=False,
         fake=mock,
@@ -194,7 +188,6 @@ def zebra_fast_grid_scan() -> ZebraFastGridScan:
     """
     return ZebraFastGridScan(
         prefix=f"{PREFIX.beamline_prefix}-MO-SGON-01:",
-        name="zebra_fast_grid_scan",
     )
 
 
@@ -206,7 +199,6 @@ def panda_fast_grid_scan() -> PandAFastGridScan:
     """
     return PandAFastGridScan(
         prefix=f"{PREFIX.beamline_prefix}-MO-SGON-01:",
-        name="panda_fast_grid_scan",
     )
 
 
@@ -219,7 +211,6 @@ def oav(
     """
     return OAVBeamCentreFile(
         prefix=f"{PREFIX.beamline_prefix}-DI-OAV-01:",
-        name="oav",
         config=params or OAVConfigBeamCentre(ZOOM_PARAMS_FILE, DISPLAY_CONFIG),
     )
 
@@ -231,7 +222,6 @@ def pin_tip_detection() -> PinTipDetection:
     """
     return PinTipDetection(
         f"{PREFIX.beamline_prefix}-DI-OAV-01:",
-        "pin_tip_detection",
     )
 
 
@@ -240,7 +230,7 @@ def smargon() -> Smargon:
     """Get the i03 Smargon device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return Smargon(f"{PREFIX.beamline_prefix}-MO-SGON-01:", "smargon")
+    return Smargon(f"{PREFIX.beamline_prefix}-MO-SGON-01:")
 
 
 @device_factory()
@@ -250,7 +240,6 @@ def s4_slit_gaps() -> S4SlitGaps:
     """
     return S4SlitGaps(
         f"{PREFIX.beamline_prefix}-AL-SLITS-04:",
-        "s4_slit_gaps",
     )
 
 
@@ -259,7 +248,7 @@ def synchrotron() -> Synchrotron:
     """Get the i03 synchrotron device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return Synchrotron("", "synchrotron")
+    return Synchrotron()
 
 
 @device_factory()
@@ -269,7 +258,6 @@ def undulator(daq_configuration_path: str | None = None) -> Undulator:
     """
     return Undulator(
         f"{BeamlinePrefix(BL).insertion_prefix}-MO-SERVC-01:",
-        name="undulator",
         # evaluate here not as parameter default to enable post-import mocking
         id_gap_lookup_table_path=f"{daq_configuration_path or DAQ_CONFIGURATION_PATH}/lookup/BeamLine_Undulator_toGap.txt",
     )
@@ -287,7 +275,6 @@ def undulator_dcm(daq_configuration_path: str | None = None) -> UndulatorDCM:
         else undulator()
     )
     return UndulatorDCM(
-        name="undulator_dcm",
         prefix=PREFIX.beamline_prefix,
         undulator=undulator_singleton,
         dcm=dcm(),
@@ -301,7 +288,6 @@ def zebra() -> Zebra:
     If this is called when already instantiated in i03, it will return the existing object.
     """
     return Zebra(
-        name="zebra",
         prefix=f"{PREFIX.beamline_prefix}-EA-ZEBRA-01:",
         mapping=I03_ZEBRA_MAPPING,
     )
@@ -314,7 +300,6 @@ def xspress3mini() -> Xspress3:
     """
     return Xspress3(
         f"{PREFIX.beamline_prefix}-EA-XSP3-01:",
-        "xspress3mini",
     )
 
 
@@ -326,7 +311,6 @@ def panda() -> HDFPanda:
     return HDFPanda(
         f"{PREFIX.beamline_prefix}-EA-PANDA-01:",
         path_provider=get_path_provider(),
-        name="panda",
     )
 
 
@@ -337,7 +321,6 @@ def sample_shutter() -> ZebraShutter:
     """
     return ZebraShutter(
         f"{PREFIX.beamline_prefix}-EA-SHTR-01:",
-        "sample_shutter",
     )
 
 
@@ -348,7 +331,6 @@ def flux() -> Flux:
     """
     return Flux(
         f"{PREFIX.beamline_prefix}-MO-FLUX-01:",
-        "flux",
     )
 
 
@@ -359,7 +341,6 @@ def xbpm_feedback() -> XBPMFeedback:
     """
     return XBPMFeedback(
         PREFIX.beamline_prefix,
-        "xbpm_feedback",
     )
 
 
@@ -369,7 +350,6 @@ def zocalo() -> ZocaloResults:
     If this is called when already instantiated in i03, it will return the existing object.
     """
     return ZocaloResults(
-        name="zocalo",
         prefix=PREFIX.beamline_prefix,
     )
 
@@ -380,7 +360,6 @@ def robot() -> BartRobot:
     If this is called when already instantiated in i03, it will return the existing object.
     """
     return BartRobot(
-        "robot",
         f"{PREFIX.beamline_prefix}-MO-ROBOT-01:",
     )
 
@@ -391,7 +370,6 @@ def webcam() -> Webcam:
     If this is called when already instantiated in i03, it will return the existing object.
     """
     return Webcam(
-        "webcam",
         PREFIX.beamline_prefix,
         url="http://i03-webcam1/axis-cgi/jpg/image.cgi",
     )
@@ -404,7 +382,6 @@ def thawer() -> Thawer:
     """
     return Thawer(
         f"{PREFIX.beamline_prefix}-EA-THAW-01",
-        "thawer",
     )
 
 
@@ -415,7 +392,6 @@ def lower_gonio() -> XYZStage:
     """
     return XYZStage(
         f"{PREFIX.beamline_prefix}-MO-GONP-01:",
-        "lower_gonio",
     )
 
 
@@ -426,7 +402,6 @@ def cryo_stream() -> CryoStream:
     """
     return CryoStream(
         PREFIX.beamline_prefix,
-        "cryo_stream",
     )
 
 
@@ -447,7 +422,6 @@ def qbpm() -> QBPM:
     """
     return QBPM(
         f"{PREFIX.beamline_prefix}-DI-QBPM-01:",
-        "qbpm",
     )
 
 

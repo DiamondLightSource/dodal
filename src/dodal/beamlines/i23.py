@@ -65,14 +65,13 @@ def oav_pin_tip_detection() -> PinTipDetection:
 
     return PinTipDetection(
         f"{PREFIX.beamline_prefix}-DI-OAV-01:",
-        "pin_tip_detection",
     )
 
 
 @device_factory()
 def shutter() -> ZebraShutter:
     """Get the i23 zebra controlled shutter."""
-    return ZebraShutter(f"{PREFIX.beamline_prefix}-EA-SHTR-01:", "shutter")
+    return ZebraShutter(f"{PREFIX.beamline_prefix}-EA-SHTR-01:")
 
 
 @device_factory()
@@ -85,7 +84,6 @@ def gonio() -> SixAxisGonio:
 def zebra() -> Zebra:
     """Get the i23 zebra"""
     return Zebra(
-        name="zebra",
         prefix=f"{PREFIX.beamline_prefix}-EA-ZEBRA-01:ZEBRA:",
         mapping=I23_ZEBRA_MAPPING,
     )
