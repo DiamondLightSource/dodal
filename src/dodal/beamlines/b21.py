@@ -62,7 +62,7 @@ def waxs() -> EigerDetector:
 @device_factory()
 def panda1() -> HDFPanda:
     return HDFPanda(
-        prefix=f"{PREFIX.beamline_prefix}-EA-PANDA-01:",
+        prefix=f"{PREFIX.beamline_prefix}-MO-PANDA-01:",
         path_provider=get_path_provider(),
     )
 
