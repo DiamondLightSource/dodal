@@ -3,14 +3,14 @@ from ophyd_async.epics.core import epics_signal_rw
 from ophyd_async.epics.motor import Motor
 
 
-class CcmcPositions(StrictEnum):
+class CCMCPositions(StrictEnum):
     OUT = "Out of Beam"
     XTAL_2000 = "Xtal_2000"
     XTAL_2250 = "Xtal_2250"
     XTAL_2500 = "Xtal_2500"
 
 
-class Ccmc(StandardReadable):
+class CCMC(StandardReadable):
     """
     Device to move the channel cut monochromator (ccmc). CCMC has three
     choices of crystal (Xtal for short). Setting energy is by means of a
@@ -34,7 +34,7 @@ class Ccmc(StandardReadable):
             )
 
             self.pos_select = epics_signal_rw(
-                CcmcPositions, prefix + "CRYSTAL:MP:SELECT"
+                CCMCPositions, prefix + "CRYSTAL:MP:SELECT"
             )
 
         super().__init__(name)

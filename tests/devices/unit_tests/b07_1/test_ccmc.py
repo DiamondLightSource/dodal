@@ -5,62 +5,60 @@ from bluesky.run_engine import RunEngine
 from ophyd_async.core import init_devices
 from ophyd_async.testing import assert_reading, assert_value, set_mock_value
 
-from dodal.devices.b07_1.ccmc import Ccmc, CcmcPositions
+from dodal.devices.b07_1.ccmc import CCMC, CCMCPositions
 
 
 @pytest.fixture
-async def mock_ccmc(RE: RunEngine) -> Ccmc:
+async def mock_CCMC(RE: RunEngine) -> CCMC:
     async with init_devices(mock=True):
-        ccmc = Ccmc(prefix="CCM-01")
-    return ccmc
+        mock_CCMC = CCMC(prefix="CCM-01")
+    return mock_CCMC
 
 
-@pytest.mark.parametrize(
-    "key",
-    [
+async def test_describe_includes(
+    mock_CCMC: CCMC,
+):
+    description = await mock_CCMC.describe()
+    reading = await mock_CCMC.read()
+
+    expected_keys: list[str] = [
         "pos_select",
         "x",
         "y",
         "z",
         "y_rotation",
-    ],
-)
-async def test_describe_includes(
-    mock_ccmc: Ccmc,
-    key: str,
-):
-    description = await mock_ccmc.describe()
-    reading = await mock_ccmc.read()
+    ]
 
-    assert f"{mock_ccmc.name}-{key}" in description
-    assert f"{mock_ccmc.name}-{key}" in reading
+    for key in expected_keys:
+        assert f"{mock_CCMC.name}-{key}" in reading
+        assert f"{mock_CCMC.name}-{key}" in description
 
 
-async def test_reading(mock_ccmc: Ccmc):
+async def test_reading(mock_CCMC: CCMC):
     await assert_reading(
-        mock_ccmc,
+        mock_CCMC,
         {
-            f"{mock_ccmc.name}-pos_select": {
+            f"{mock_CCMC.name}-pos_select": {
                 "alarm_severity": 0,
                 "timestamp": ANY,
-                "value": CcmcPositions.OUT.value,
+                "value": CCMCPositions.OUT.value,
             },
-            f"{mock_ccmc.name}-x": {
-                "alarm_severity": 0,
-                "timestamp": ANY,
-                "value": 0.0,
-            },
-            f"{mock_ccmc.name}-y": {
+            f"{mock_CCMC.name}-x": {
                 "alarm_severity": 0,
                 "timestamp": ANY,
                 "value": 0.0,
             },
-            f"{mock_ccmc.name}-y_rotation": {
+            f"{mock_CCMC.name}-y": {
                 "alarm_severity": 0,
                 "timestamp": ANY,
                 "value": 0.0,
             },
-            f"{mock_ccmc.name}-z": {
+            f"{mock_CCMC.name}-y_rotation": {
+                "alarm_severity": 0,
+                "timestamp": ANY,
+                "value": 0.0,
+            },
+            f"{mock_CCMC.name}-z": {
                 "alarm_severity": 0,
                 "timestamp": ANY,
                 "value": 0.0,
@@ -69,7 +67,7 @@ async def test_reading(mock_ccmc: Ccmc):
     )
 
 
-async def test_move_crystal(mock_ccmc: Ccmc):
-    await assert_value(mock_ccmc.pos_select, CcmcPositions.OUT.value)
-    set_mock_value(mock_ccmc.pos_select, CcmcPositions.XTAL_2000.value)
-    await assert_value(mock_ccmc.pos_select, CcmcPositions.XTAL_2000.value)
+async def test_move_crystal(mock_CCMC: CCMC):
+    await assert_value(mock_CCMC.pos_select, CCMCPositions.OUT.value)
+    set_mock_value(mock_CCMC.pos_select, CCMCPositions.XTAL_2000.value)
+    await assert_value(mock_CCMC.pos_select, CCMCPositions.XTAL_2000.value)
