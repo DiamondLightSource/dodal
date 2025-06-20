@@ -1,3 +1,5 @@
+from typing import Any
+
 import numpy as np
 import pytest
 from bluesky.run_engine import RunEngine
@@ -16,7 +18,6 @@ from dodal.devices.electron_analyser.vgscienta import (
 from tests.devices.unit_tests.electron_analyser.util import (
     TEST_SEQUENCE_REGION_NAMES,
     configure_driver_with_region,
-    expected_config,
 )
 
 
@@ -29,6 +30,7 @@ def driver_class() -> type[VGScientaAnalyserDriverIO]:
 async def test_given_region_that_analyser_sets_modes_correctly(
     sim_driver: VGScientaAnalyserDriverIO,
     region: VGScientaRegion,
+    expected_config: dict[str, dict[str, Any]],
     sim_energy_source: Motor,
     RE: RunEngine,
 ) -> None:
@@ -40,13 +42,14 @@ async def test_given_region_that_analyser_sets_modes_correctly(
     get_mock_put(sim_driver.image_mode).assert_called_once_with(
         ADImageMode.SINGLE, wait=True
     )
-    await assert_configuration(sim_driver, expected_config(sim_driver, region))
+    await assert_configuration(sim_driver, expected_config)
 
 
 @pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
 async def test_given_region_that_analyser_sets_energy_values_correctly(
     sim_driver: VGScientaAnalyserDriverIO,
     region: VGScientaRegion,
+    expected_config: dict[str, dict[str, Any]],
     sim_energy_source: Motor,
     RE: RunEngine,
 ) -> None:
@@ -65,13 +68,14 @@ async def test_given_region_that_analyser_sets_energy_values_correctly(
     get_mock_put(sim_driver.energy_step).assert_called_once_with(
         region.energy_step, wait=True
     )
-    await assert_configuration(sim_driver, expected_config(sim_driver, region))
+    await assert_configuration(sim_driver, expected_config)
 
 
 @pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
 async def test_given_region_that_vgscienta_sets_channel_correctly(
     sim_driver: VGScientaAnalyserDriverIO,
     region: VGScientaRegion,
+    expected_config: dict[str, dict[str, Any]],
     sim_energy_source: Motor,
     RE: RunEngine,
 ) -> None:
@@ -93,7 +97,7 @@ async def test_given_region_that_vgscienta_sets_channel_correctly(
     get_mock_put(sim_driver.y_channel_size).assert_called_once_with(
         expected_size_y, wait=True
     )
-    await assert_configuration(sim_driver, expected_config(sim_driver, region))
+    await assert_configuration(sim_driver, expected_config)
 
 
 @pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)

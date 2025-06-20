@@ -1,5 +1,6 @@
 import asyncio
 import math
+from typing import Any
 
 import numpy as np
 import pytest
@@ -28,7 +29,6 @@ from dodal.devices.electron_analyser.vgscienta import (
 from tests.devices.unit_tests.electron_analyser.util import (
     TEST_SEQUENCE_REGION_NAMES,
     configure_driver_with_region,
-    expected_config,
 )
 
 
@@ -43,6 +43,7 @@ def driver_class(
 async def test_given_region_that_analyser_sets_modes_correctly(
     sim_driver: AbstractAnalyserDriverIO,
     region: AbstractBaseRegion,
+    expected_config: dict[str, dict[str, Any]],
     sim_energy_source: Motor,
     RE: RunEngine,
 ) -> None:
@@ -58,13 +59,14 @@ async def test_given_region_that_analyser_sets_modes_correctly(
     get_mock_put(sim_driver.lens_mode).assert_called_once_with(
         region.lens_mode, wait=True
     )
-    await assert_configuration(sim_driver, expected_config(sim_driver, region))
+    await assert_configuration(sim_driver, expected_config)
 
 
 @pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
 async def test_given_region_that_analyser_sets_energy_values_correctly(
     sim_driver: AbstractAnalyserDriverIO,
     region: AbstractBaseRegion,
+    expected_config: dict[str, dict[str, Any]],
     sim_energy_source: Motor,
     RE: RunEngine,
 ) -> None:
@@ -97,7 +99,7 @@ async def test_given_region_that_analyser_sets_energy_values_correctly(
     get_mock_put(sim_driver.excitation_energy_source).assert_called_once_with(
         expected_energy_source, wait=True
     )
-    await assert_configuration(sim_driver, expected_config(sim_driver, region))
+    await assert_configuration(sim_driver, expected_config)
     await assert_reading(
         sim_driver,
         {
@@ -114,6 +116,7 @@ async def test_given_region_that_analyser_sets_energy_values_correctly(
 async def test_given_region_that_analyser_sets_channel_correctly(
     sim_driver: AbstractAnalyserDriverIO,
     region: AbstractBaseRegion,
+    expected_config: dict[str, dict[str, Any]],
     sim_energy_source: Motor,
     RE: RunEngine,
 ) -> None:
@@ -125,7 +128,7 @@ async def test_given_region_that_analyser_sets_channel_correctly(
     get_mock_put(sim_driver.iterations).assert_called_once_with(
         expected_iterations, wait=True
     )
-    await assert_configuration(sim_driver, expected_config(sim_driver, region))
+    await assert_configuration(sim_driver, expected_config)
 
 
 @pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
