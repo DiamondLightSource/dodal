@@ -18,6 +18,7 @@ from dodal.devices.electron_analyser.specs import (
 from tests.devices.unit_tests.electron_analyser.util import (
     TEST_SEQUENCE_REGION_NAMES,
     configure_driver_with_region,
+    expected_config,
 )
 
 
@@ -39,9 +40,6 @@ async def test_given_region_that_analyser_sets_energy_values_correctly(
         get_mock_put(sim_driver.centre_energy).assert_called_once_with(
             region.centre_energy, wait=True
         )
-        await assert_configuration(
-            sim_driver, {"centre_energy": {"value": region.centre_energy}}
-        )
     else:
         get_mock_put(sim_driver.centre_energy).assert_not_called()
 
@@ -49,11 +47,10 @@ async def test_given_region_that_analyser_sets_energy_values_correctly(
         get_mock_put(sim_driver.energy_step).assert_called_once_with(
             region.energy_step, wait=True
         )
-        await assert_configuration(
-            sim_driver, {"energy_step": {"value": region.energy_step}}
-        )
     else:
         get_mock_put(sim_driver.energy_step).assert_not_called()
+
+    await assert_configuration(sim_driver, expected_config(sim_driver, region))
 
 
 @pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
@@ -68,14 +65,10 @@ async def test_given_region_that_analyser_sets_modes_correctly(
     get_mock_put(sim_driver.psu_mode).assert_called_once_with(
         region.psu_mode, wait=True
     )
-    await assert_configuration(sim_driver, {"psu_mode": {"value": region.psu_mode}})
-
     get_mock_put(sim_driver.snapshot_values).assert_called_once_with(
         region.values, wait=True
     )
-    await assert_configuration(
-        sim_driver, {"snapshot_values": {"value": region.values}}
-    )
+    await assert_configuration(sim_driver, expected_config(sim_driver, region))
 
 
 @pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
