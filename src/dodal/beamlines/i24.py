@@ -11,10 +11,10 @@ from dodal.devices.i24.beamstop import Beamstop
 from dodal.devices.i24.dcm import DCM
 from dodal.devices.i24.dual_backlight import DualBacklight
 from dodal.devices.i24.focus_mirrors import FocusMirrorsMode
-from dodal.devices.i24.i24_detector_motion import DetectorMotion
 from dodal.devices.i24.pilatus_metadata import PilatusMetadata
 from dodal.devices.i24.pmac import PMAC
 from dodal.devices.i24.vgonio import VerticalGoniometer
+from dodal.devices.motors import YZStage
 from dodal.devices.oav.oav_detector import OAVBeamCentreFile
 from dodal.devices.oav.oav_parameters import OAVConfigBeamCentre
 from dodal.devices.zebra.zebra import Zebra
@@ -89,11 +89,11 @@ def backlight() -> DualBacklight:
 
 
 @device_factory()
-def detector_motion() -> DetectorMotion:
+def detector_motion() -> YZStage:
     """Get the i24 detector motion device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i24, it will return the existing object.
     """
-    return DetectorMotion(
+    return YZStage(
         name="detector_motion",
         prefix=f"{PREFIX.beamline_prefix}-EA-DET-01:",
     )
