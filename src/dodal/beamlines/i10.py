@@ -23,7 +23,7 @@ from dodal.devices.i10.rasor.rasor_motors import (
 )
 from dodal.devices.i10.rasor.rasor_scaler_cards import RasorScalerCard1
 from dodal.devices.i10.slits import I10Slits, I10SlitsDrainCurrent
-from dodal.devices.motors import XYStage, XYZPositioner
+from dodal.devices.motors import XYStage, XYZStage
 from dodal.devices.pgm import PGM
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
@@ -149,8 +149,8 @@ def pa_stage() -> PaStage:
 
 
 @device_factory()
-def sample_stage() -> XYZPositioner:
-    return XYZPositioner(prefix="ME01D-MO-CRYO-01:")
+def sample_stage() -> XYZStage:
+    return XYZStage(prefix="ME01D-MO-CRYO-01:")
 
 
 @device_factory()

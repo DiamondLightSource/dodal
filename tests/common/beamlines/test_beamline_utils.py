@@ -12,7 +12,7 @@ from ophyd_async.core import StandardReadable
 from dodal.common.beamlines import beamline_utils
 from dodal.devices.eiger import EigerDetector
 from dodal.devices.focusing_mirror import FocusingMirror
-from dodal.devices.motors import XYZPositioner
+from dodal.devices.motors import XYZStage
 from dodal.devices.smargon import Smargon
 from dodal.log import LOGGER
 from dodal.utils import DeviceInitializationController
@@ -36,7 +36,7 @@ def flush_event_loop_on_finish():
 
 
 def test_instantiate_function_makes_supplied_device():
-    device_types = [XYZPositioner, Smargon]
+    device_types = [XYZStage, Smargon]
     for device in device_types:
         dev = beamline_utils.device_instantiation(
             device, device.__name__, "", False, True, None
@@ -46,7 +46,7 @@ def test_instantiate_function_makes_supplied_device():
 
 def test_instantiating_different_device_with_same_name():
     dev1 = beamline_utils.device_instantiation(  # noqa
-        XYZPositioner, "device", "", False, True, None
+        XYZStage, "device", "", False, True, None
     )
     with pytest.raises(TypeError):
         dev2 = beamline_utils.device_instantiation(
