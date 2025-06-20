@@ -2,6 +2,32 @@ from ophyd_async.core import StandardReadable
 from ophyd_async.epics.motor import Motor
 
 
+class XThetaStage(StandardReadable):
+    """
+
+    ophyd_async x theta motor stage, combining 2 Motors: a horizontal stage and a
+    rotational stage mutually perpendicular to each other and the beam.
+
+    Parameters
+    ----------
+    prefix:
+        Common part of the EPICS PV for all motors, including ":".
+    name:
+        Name of the stage, each child motor will be named "{name}-{field_name}"
+    *_infix:
+        Infix between the common prefix and the EPICS motor record fields for the field.
+
+    """
+
+    def __init__(
+        self, prefix: str, name: str = "", x_infix: str = "X", theta_infix: str = "A"
+    ):
+        with self.add_children_as_readables():
+            self.x = Motor(prefix + x_infix)
+            self.theta = Motor(prefix + theta_infix)
+        super().__init__(name=name)
+
+
 class XYZPositioner(StandardReadable):
     """
 
