@@ -9,8 +9,7 @@ from dodal.common.beamlines.beamline_utils import (
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.visit import RemoteDirectoryServiceClient, StaticVisitPathProvider
 from ophyd_async.fastcs.eiger import EigerDetector
-from ophyd_async.core import DeviceVector
-from ophyd_async.epics.eiger._odin_io import OdinNode
+
 
 from dodal.devices.linkam3 import Linkam3
 from dodal.devices.slits import Slits
@@ -38,17 +37,16 @@ set_path_provider(
 )
 
 
-# TODO: https://github.com/bluesky/ophyd-async/issues/923
-# TODO: https://github.com/DiamondLightSource/dodal/issues/1287
-# To be able to specify the number of OdinNodes Odin, and then on the EigerDetector
 @device_factory(skip=True)
 def saxs() -> EigerDetector:
-    return = EigerDetector(
+    return EigerDetector(
         prefix=PREFIX.beamline_prefix,
         path_provider=get_path_provider(),
         drv_suffix="-EA-EIGER-01:",
-        hdf_suffix=odin_suffix,
+        hdf_suffix="-EA-EIGER-01:OD:",
+        # odin_nodes=1, # TODO: https://github.com/bluesky/ophyd-async/issues/923
     )
+
 
 @device_factory(skip=True)
 def waxs() -> EigerDetector:
@@ -57,6 +55,7 @@ def waxs() -> EigerDetector:
         path_provider=get_path_provider(),
         drv_suffix="-EA-EIGER-02:",
         hdf_suffix="-EA-EIGER-02:OD:",
+        # odin_nodes=1, # TODO: https://github.com/bluesky/ophyd-async/issues/923
     )
 
 
