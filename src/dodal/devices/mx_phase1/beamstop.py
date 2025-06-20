@@ -2,13 +2,13 @@ import asyncio
 from math import isclose
 
 from ophyd_async.core import (
-    StandardReadable,
     StrictEnum,
     derived_signal_rw,
 )
 from ophyd_async.epics.motor import Motor
 
 from dodal.common.beamlines.beamline_parameters import GDABeamlineParameters
+from dodal.devices.motors import XYZStage
 
 
 class BeamstopPositions(StrictEnum):
@@ -34,7 +34,7 @@ class BeamstopPositions(StrictEnum):
     UNKNOWN = "Unknown"
 
 
-class Beamstop(StandardReadable):
+class Beamstop(XYZStage):
     """
     Beamstop for I03 and I04.
 
@@ -52,15 +52,12 @@ class Beamstop(StandardReadable):
         name: str = "",
     ):
         with self.add_children_as_readables():
-            self.x_mm = Motor(prefix + "X")
-            self.y_mm = Motor(prefix + "Y")
-            self.z_mm = Motor(prefix + "Z")
             self.selected_pos = derived_signal_rw(
                 self._get_selected_position,
                 self._set_selected_position,
-                x=self.x_mm,
-                y=self.y_mm,
-                z=self.z_mm,
+                x=self.x,
+                y=self.y,
+                z=self.z,
             )
         self._in_beam_xyz_mm = [
             float(beamline_parameters[f"in_beam_{axis}_STANDARD"])
@@ -71,7 +68,19 @@ class Beamstop(StandardReadable):
             for axis in ("x", "y", "z")
         ]
 
-        super().__init__(name)
+        super().__init__(prefix, name)
+
+    @property
+    def x_mm(self) -> Motor:
+        return self.x
+
+    @property
+    def y_mm(self) -> Motor:
+        return self.y
+
+    @property
+    def z_mm(self) -> Motor:
+        return self.z
 
     def _get_selected_position(self, x: float, y: float, z: float) -> BeamstopPositions:
         current_pos = [x, y, z]
@@ -88,9 +97,9 @@ class Beamstop(StandardReadable):
     async def _set_selected_position(self, position: BeamstopPositions) -> None:
         if position == BeamstopPositions.DATA_COLLECTION:
             await asyncio.gather(
-                self.x_mm.set(self._in_beam_xyz_mm[0]),
-                self.y_mm.set(self._in_beam_xyz_mm[1]),
-                self.z_mm.set(self._in_beam_xyz_mm[2]),
+                self.x.set(self._in_beam_xyz_mm[0]),
+                self.y.set(self._in_beam_xyz_mm[1]),
+                self.z.set(self._in_beam_xyz_mm[2]),
             )
         elif position == BeamstopPositions.UNKNOWN:
             raise ValueError(f"Cannot set beamstop to position {position}")
