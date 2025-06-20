@@ -15,8 +15,7 @@ from dodal.common.visit import (
 from dodal.devices.common_dcm import BaseDCM, PitchAndRollCrystal, RollCrystal
 from dodal.devices.i18.diode import Diode
 from dodal.devices.i18.KBMirror import KBMirror
-from dodal.devices.i18.table import Table
-from dodal.devices.motors import XYStage
+from dodal.devices.motors import XYStage, XYZThetaStage
 from dodal.devices.slits import Slits
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.tetramm import TetrammDetector
@@ -118,8 +117,8 @@ def d7_diode() -> Diode:
 
 
 @device_factory()
-def main_table() -> Table:
-    return Table(f"{PREFIX.beamline_prefix}-MO-TABLE-01:")
+def main_table() -> XYZThetaStage:
+    return XYZThetaStage(f"{PREFIX.beamline_prefix}-MO-TABLE-01:")
 
 
 @device_factory()
