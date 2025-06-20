@@ -16,7 +16,7 @@ from dodal.devices.common_dcm import BaseDCM, PitchAndRollCrystal, RollCrystal
 from dodal.devices.i18.diode import Diode
 from dodal.devices.i18.KBMirror import KBMirror
 from dodal.devices.i18.table import Table
-from dodal.devices.i18.thor_labs_stage import ThorLabsStage
+from dodal.devices.motors import XYStage
 from dodal.devices.slits import Slits
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.tetramm import TetrammDetector
@@ -123,5 +123,5 @@ def main_table() -> Table:
 
 
 @device_factory()
-def thor_labs_stage() -> ThorLabsStage:
-    return ThorLabsStage(f"{PREFIX.beamline_prefix}-MO-TABLE-02:")
+def thor_labs_stage() -> XYStage:
+    return XYStage(f"{PREFIX.beamline_prefix}-MO-TABLE-02:")
