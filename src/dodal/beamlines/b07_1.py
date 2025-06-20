@@ -30,6 +30,4 @@ def pgm() -> PGM:
 
 @device_factory()
 def ccmc() -> Ccmc:
-    return Ccmc(
-        prefix=f"{PREFIX.beamline_prefix}-OP-CCM-01:",
-    )
+    return Ccmc(prefix=f"{PREFIX.beamline_prefix}-OP-CCM-01:")
