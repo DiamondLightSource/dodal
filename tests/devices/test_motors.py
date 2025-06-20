@@ -34,16 +34,16 @@ async def test_setting_xy_position_table(xyzt_stage: XYZThetaStage):
     await assert_reading(
         xyzt_stage,
         {
-            "table-y": {
+            "xyzt_stage-x": {
                 "value": 0.0,
             },
-            "table-x": {
+            "xyzt_stage-y": {
                 "value": 0.0,
             },
-            "table-theta": {
+            "xyzt_stage-z": {
                 "value": 0.0,
             },
-            "table-z": {
+            "xyzt_stage-theta": {
                 "value": 0.0,
             },
         },
@@ -56,17 +56,17 @@ async def test_setting_xy_position_table(xyzt_stage: XYZThetaStage):
     await assert_reading(
         xyzt_stage,
         {
-            "table-y": {
-                "value": 4.56,
-            },
-            "table-x": {
+            "xyzt_stage-x": {
                 "value": 1.23,
             },
-            "table-theta": {
-                "value": 0.0,
+            "xyzt_stage-y": {
+                "value": 4.56,
             },
-            "table-z": {
+            "xyzt_stage-z": {
                 "value": 0,
+            },
+            "xyzt_stage-theta": {
+                "value": 0.0,
             },
         },
     )
@@ -79,16 +79,16 @@ async def test_setting_xyztheta_position_table(xyzt_stage: XYZThetaStage):
     await assert_reading(
         xyzt_stage,
         {
-            "table-y": {
+            "xyzt_stage-x": {
                 "value": 0.0,
             },
-            "table-x": {
+            "xyzt_stage-y": {
                 "value": 0.0,
             },
-            "table-theta": {
+            "xyzt_stage-z": {
                 "value": 0.0,
             },
-            "table-z": {
+            "xyzt_stage-theta": {
                 "value": 0.0,
             },
         },
@@ -103,17 +103,17 @@ async def test_setting_xyztheta_position_table(xyzt_stage: XYZThetaStage):
     await assert_reading(
         xyzt_stage,
         {
-            "table-y": {
-                "value": 4.56,
-            },
-            "table-x": {
+            "xyzt_stage-x": {
                 "value": 1.23,
             },
-            "table-theta": {
-                "value": 10.11,
+            "xyzt_stage-y": {
+                "value": 4.56,
             },
-            "table-z": {
+            "xyzt_stage-z": {
                 "value": 7.89,
+            },
+            "xyzt_stage-theta": {
+                "value": 10.11,
             },
         },
     )
@@ -126,7 +126,7 @@ async def test_setting(xy_stage: XYStage):
 
     await assert_reading(
         xy_stage,
-        {"stage-x": {"value": 0.0}, "stage-y": {"value": 0.0}},
+        {"xy_stage-x": {"value": 0.0}, "xy_stage-y": {"value": 0.0}},
     )
 
     # Call set to update the position
@@ -135,7 +135,7 @@ async def test_setting(xy_stage: XYStage):
 
     await assert_reading(
         xy_stage,
-        {"stage-x": {"value": 5.0}, "stage-y": {"value": 5.0}},
+        {"xy_stage-x": {"value": 5.0}, "xy_stage-y": {"value": 5.0}},
     )
 
 
@@ -143,10 +143,10 @@ async def test_reading_training_rig(xtheta_stage: XThetaStage):
     await assert_reading(
         xtheta_stage,
         {
-            "stage-theta": {
+            "xtheta_stage-x": {
                 "value": 0.0,
             },
-            "stage-x": {
+            "xtheta_stage-theta": {
                 "value": 0.0,
             },
         },
