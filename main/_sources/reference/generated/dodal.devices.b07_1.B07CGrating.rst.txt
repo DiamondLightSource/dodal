@@ -1,0 +1,90 @@
+dodal.devices.b07\_1.B07CGrating
+================================
+
+.. currentmodule:: dodal.devices.b07_1
+
+.. autoclass:: B07CGrating
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~B07CGrating.AU_400
+      
+      
+      ~B07CGrating.AU_600
+      
+      
+      ~B07CGrating.PT_600
+      
+      
+      ~B07CGrating.AU_1200
+      
+      
+      ~B07CGrating.ML_1200
+      
+      
+      ~B07CGrating.NO_GRATING
+      
+   
+   
