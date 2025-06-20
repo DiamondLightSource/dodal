@@ -32,12 +32,12 @@ async def test_reading_basetable_reads_pos_and_pitch(
                 "timestamp": ANY,
                 "value": 0.0,
             },
-            "slits-y": {
+            "basetable-y": {
                 "alarm_severity": 0,
                 "timestamp": ANY,
                 "value": 20.0,
             },
-            "slits-pitch": {
+            "basetable-pitch": {
                 "alarm_severity": 0,
                 "timestamp": ANY,
                 "value": 0.5,
