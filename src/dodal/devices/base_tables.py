@@ -3,7 +3,7 @@ from ophyd_async.epics.motor import Motor
 
 
 class BaseTable(StandardReadable):
-    """Base class for a table with two motors representing gaps in X and Y directions."""
+    """Base class for a sample table with two motors representing X and Y directions."""
 
     def __init__(
         self,
@@ -19,7 +19,8 @@ class BaseTable(StandardReadable):
 
 
 class PitchedBaseTable(BaseTable):
-    """Base class for a table with two motors representing gaps in X and Y directions, with additional motors for pitch."""
+    """Base class for a sample table with two motors representing gaps
+    in X and Y directions, with additional motor for pitch."""
 
     def __init__(
         self,
