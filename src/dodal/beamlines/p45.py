@@ -11,7 +11,8 @@ from dodal.common.beamlines.beamline_utils import (
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.beamlines.device_helpers import DET_SUFFIX, HDF5_SUFFIX
 from dodal.common.visit import StaticVisitPathProvider
-from dodal.devices.p45 import Choppers, TomoStageWithStretchAndSkew
+from dodal.devices.motors import XYStage
+from dodal.devices.p45 import TomoStageWithStretchAndSkew
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
@@ -34,8 +35,8 @@ def sample() -> TomoStageWithStretchAndSkew:
 
 
 @device_factory()
-def choppers() -> Choppers:
-    return Choppers(f"{PREFIX.beamline_prefix}-MO-CHOP-01:")
+def choppers() -> XYStage:
+    return XYStage(f"{PREFIX.beamline_prefix}-MO-CHOP-01:")
 
 
 # Disconnected

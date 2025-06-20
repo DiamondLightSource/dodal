@@ -1,11 +1,13 @@
 import asyncio
 import math
 
-from ophyd_async.core import StandardReadable, derived_signal_rw
+from ophyd_async.core import derived_signal_rw
 from ophyd_async.epics.motor import Motor
 
+from dodal.devices.motors import XYZStage
 
-class Goniometer(StandardReadable):
+
+class Goniometer(XYZStage):
     """The Aithre lab goniometer and the XYZ stage it sits on.
 
     `x`, `y` and `z` control the axes of the positioner at the base, while `sampy` and
@@ -18,9 +20,6 @@ class Goniometer(StandardReadable):
     """
 
     def __init__(self, prefix: str, name: str = "") -> None:
-        self.x = Motor(prefix + "X")
-        self.y = Motor(prefix + "Y")
-        self.z = Motor(prefix + "Z")
         self.sampy = Motor(prefix + "SAMPY")
         self.sampz = Motor(prefix + "SAMPZ")
         self.omega = Motor(prefix + "OMEGA")
