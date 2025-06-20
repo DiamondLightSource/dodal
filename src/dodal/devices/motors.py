@@ -75,6 +75,20 @@ class XYZThetaStage(XYZStage):
         super().__init__(prefix, name, x_infix, y_infix, z_infix)
 
 
+class XYPitchStage(XYStage):
+    def __init__(
+        self,
+        prefix: str,
+        x_infix: str = _X,
+        y_infix: str = _Y,
+        pitch_infix: str = "PITCH",
+        name: str = "",
+    ) -> None:
+        with self.add_children_as_readables():
+            self.pitch = Motor(prefix + pitch_infix)
+        super().__init__(prefix, name, x_infix, y_infix)
+
+
 class SixAxisGonio(XYZStage):
     def __init__(
         self,
