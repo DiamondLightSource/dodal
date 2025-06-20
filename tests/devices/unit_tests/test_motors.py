@@ -1,5 +1,3 @@
-from unittest.mock import ANY
-
 import pytest
 from bluesky.run_engine import RunEngine
 from ophyd_async.core import init_devices
@@ -22,33 +20,21 @@ async def test_reading_six_axis_gonio(six_axis_gonio: SixAxisGonio):
         {
             "gonio-omega": {
                 "value": 0.0,
-                "timestamp": ANY,
-                "alarm_severity": 0,
             },
             "gonio-kappa": {
                 "value": 0.0,
-                "timestamp": ANY,
-                "alarm_severity": 0,
             },
             "gonio-phi": {
                 "value": 0.0,
-                "timestamp": ANY,
-                "alarm_severity": 0,
             },
             "gonio-z": {
                 "value": 0.0,
-                "timestamp": ANY,
-                "alarm_severity": 0,
             },
             "gonio-y": {
                 "value": 0.0,
-                "timestamp": ANY,
-                "alarm_severity": 0,
             },
             "gonio-x": {
                 "value": 0.0,
-                "timestamp": ANY,
-                "alarm_severity": 0,
             },
         },
     )

@@ -63,14 +63,14 @@ The following example creates a fictitious beamline ``w41``, with a simulated tw
     """
 
     """
-    A valid factory function which:
-    - may be instantiated automatically, selectively on live beamline
-        - caches and re-uses the result for subsequent calls
-    - automatically names the device
-    - may be skipped when make_all_devices is called on this module
-    - must be explicitly connected (may be automated by tools)
-        - when connected may connect to a simulated backend
-        - may be connected concurrently (when automated by tools)
+    This decorator gives extra desirable behaviour to this factory function:
+    - it may be instantiated automatically, selectively on live beamline
+        - caching and re-using the result for subsequent calls
+    - it automatically names the device if no name is explicitly set
+    - it may be skipped when make_all_devices is called on this module
+    - it must be explicitly connected (which may be automated by tools)
+        - when connected it may connect to a simulated backend
+        - it may be connected concurrently (when automated by tools)
     """"
     @device_factory(skip = BL == "s41")
     def synchrotron() -> Synchrotron:
@@ -85,9 +85,3 @@ The following example creates a fictitious beamline ``w41``, with a simulated tw
             drv_suffix=CAM_SUFFIX,
             fileio_suffix=HDF5_SUFFIX,
         )
-
-
-``w41`` should also be added to the list of ``ALL_BEAMLINES`` in ``tests/beamlines/test_device_instantiation``.
-This test checks that the function returns a type that conforms to Bluesky protocols, 
-that it always returns the same instance of the device and that the arguments passed 
-into the Device class constructor are valid.

@@ -3,10 +3,7 @@ import pytest
 from bluesky.run_engine import RunEngine
 from ophyd_async.epics.adcore import ADImageMode
 from ophyd_async.epics.motor import Motor
-from ophyd_async.testing import (
-    get_mock_put,
-    set_mock_value,
-)
+from ophyd_async.testing import assert_configuration, get_mock_put, set_mock_value
 
 from dodal.devices.electron_analyser import (
     EnergyMode,
@@ -18,8 +15,8 @@ from dodal.devices.electron_analyser.vgscienta import (
 )
 from tests.devices.unit_tests.electron_analyser.util import (
     TEST_SEQUENCE_REGION_NAMES,
-    assert_read_configuration_has_expected_value,
     configure_driver_with_region,
+    expected_config,
 )
 
 
@@ -40,12 +37,10 @@ async def test_given_region_that_analyser_sets_modes_correctly(
     get_mock_put(sim_driver.detector_mode).assert_called_once_with(
         region.detector_mode, wait=True
     )
-    await assert_read_configuration_has_expected_value(
-        sim_driver, "detector_mode", region.detector_mode
-    )
     get_mock_put(sim_driver.image_mode).assert_called_once_with(
         ADImageMode.SINGLE, wait=True
     )
+    await assert_configuration(sim_driver, expected_config(sim_driver, region))
 
 
 @pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
@@ -67,15 +62,10 @@ async def test_given_region_that_analyser_sets_energy_values_correctly(
     get_mock_put(sim_driver.centre_energy).assert_called_once_with(
         expected_centre_e, wait=True
     )
-    await assert_read_configuration_has_expected_value(
-        sim_driver, "centre_energy", expected_centre_e
-    )
     get_mock_put(sim_driver.energy_step).assert_called_once_with(
         region.energy_step, wait=True
     )
-    await assert_read_configuration_has_expected_value(
-        sim_driver, "energy_step", region.energy_step
-    )
+    await assert_configuration(sim_driver, expected_config(sim_driver, region))
 
 
 @pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
@@ -92,30 +82,18 @@ async def test_given_region_that_vgscienta_sets_channel_correctly(
     get_mock_put(sim_driver.first_x_channel).assert_called_once_with(
         expected_first_x, wait=True
     )
-    await assert_read_configuration_has_expected_value(
-        sim_driver, "first_x_channel", expected_first_x
-    )
     get_mock_put(sim_driver.x_channel_size).assert_called_once_with(
         expected_size_x, wait=True
     )
-    await assert_read_configuration_has_expected_value(
-        sim_driver, "x_channel_size", expected_size_x
-    )
-
     expected_first_y = region.first_y_channel
     expected_size_y = region.y_channel_size()
     get_mock_put(sim_driver.first_y_channel).assert_called_once_with(
         expected_first_y, wait=True
     )
-    await assert_read_configuration_has_expected_value(
-        sim_driver, "first_y_channel", expected_first_y
-    )
     get_mock_put(sim_driver.y_channel_size).assert_called_once_with(
         expected_size_y, wait=True
     )
-    await assert_read_configuration_has_expected_value(
-        sim_driver, "y_channel_size", expected_size_y
-    )
+    await assert_configuration(sim_driver, expected_config(sim_driver, region))
 
 
 @pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
