@@ -27,17 +27,17 @@ async def test_reading_basetable_reads_pos_and_pitch(
     await assert_reading(
         pitched_base_table,
         {
-            "basetable-x": {
+            "pitched_base_table-x": {
                 "alarm_severity": 0,
                 "timestamp": ANY,
                 "value": 0.0,
             },
-            "basetable-y": {
+            "pitched_base_table-y": {
                 "alarm_severity": 0,
                 "timestamp": ANY,
                 "value": 20.0,
             },
-            "basetable-pitch": {
+            "pitched_base_table-pitch": {
                 "alarm_severity": 0,
                 "timestamp": ANY,
                 "value": 0.5,
