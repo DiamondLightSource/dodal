@@ -20,11 +20,10 @@ from dodal.devices.i10.rasor.rasor_motors import (
     DetSlits,
     Diffractometer,
     PaStage,
-    PinHole,
 )
 from dodal.devices.i10.rasor.rasor_scaler_cards import RasorScalerCard1
 from dodal.devices.i10.slits import I10Slits, I10SlitsDrainCurrent
-from dodal.devices.motors import XYZPositioner
+from dodal.devices.motors import XYStage, XYZPositioner
 from dodal.devices.pgm import PGM
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
@@ -130,8 +129,8 @@ def d5a_det() -> I10Diagnostic5ADet:
 
 
 @device_factory()
-def pin_hole() -> PinHole:
-    return PinHole(prefix="ME01D-EA-PINH-01:")
+def pin_hole() -> XYStage:
+    return XYStage(prefix="ME01D-EA-PINH-01:")
 
 
 @device_factory()

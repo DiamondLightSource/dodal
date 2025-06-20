@@ -15,7 +15,7 @@ from pydantic import BaseModel, Field
 
 from dodal.common.beamlines.beamline_parameters import GDABeamlineParameters
 from dodal.devices.aperture import Aperture
-from dodal.devices.scatterguard import Scatterguard
+from dodal.devices.motors import XYStage
 
 
 class InvalidApertureMove(Exception):
@@ -164,7 +164,7 @@ class ApertureScatterguard(StandardReadable, Preparable):
         name: str = "",
     ) -> None:
         self.aperture = Aperture(prefix + "-MO-MAPT-01:")
-        self.scatterguard = Scatterguard(prefix + "-MO-SCAT-01:")
+        self.scatterguard = XYStage(prefix + "-MO-SCAT-01:")
         self._loaded_positions = loaded_positions
         self._tolerances = tolerances
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
