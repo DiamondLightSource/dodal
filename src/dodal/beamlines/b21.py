@@ -1,5 +1,9 @@
 from pathlib import Path  # noqa
 from ophyd_async.fastcs.panda import HDFPanda
+from ophyd_async.epics.adaravis import AravisDetector
+from dodal.devices.i22.nxsas import NXSasMetadataHolder, NXSasOAV
+from dodal.common.beamlines.device_helpers import CAM_SUFFIX, HDF5_SUFFIX
+
 
 from dodal.common.beamlines.beamline_utils import (
     device_factory,
@@ -114,6 +118,23 @@ def slits_7() -> Slits:
         y_gap="Y:GAP",
         x_centre="X:CENTRE",
         y_centre="Y:CENTRE",
+    )
+
+
+@device_factory()
+def wbscam() -> AravisDetector:
+    metadata_holder = NXSasMetadataHolder(
+        x_pixel_size=(1292, "pixels"),  # Double check this figure
+        y_pixel_size=(964, "pixels"),
+        description="Manta_G-125B",
+        distance=(-1.0, "m"),
+    )
+    return NXSasOAV(
+        prefix=f"{PREFIX.beamline_prefix}-RS-ABSB-02:CAM:",
+        drv_suffix=CAM_SUFFIX,
+        fileio_suffix=HDF5_SUFFIX,
+        path_provider=get_path_provider(),
+        metadata_holder=metadata_holder,
     )
 
 
