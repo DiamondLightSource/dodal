@@ -1,6 +1,9 @@
-from ophyd_async.core import StandardReadable, StrictEnum
+from ophyd_async.core import (
+    StandardReadable,
+    StandardReadableFormat,
+    StrictEnum,
+)
 from ophyd_async.epics.core import epics_signal_rw
-from ophyd_async.epics.motor import Motor
 
 
 class CCMCPositions(StrictEnum):
@@ -20,21 +23,36 @@ class CCMC(StandardReadable):
     correctly.
     """
 
-    def __init__(self, prefix: str, name: str = "") -> None:
-        with self.add_children_as_readables():
-            self.x = Motor(prefix + "X")
-            self.y = Motor(prefix + "Y")
-            self.z = Motor(prefix + "Z")
-
-            # ToDo this is piezo motor, so need to have correct class as PVs are different
+    def __init__(
+        self,
+        prefix: str,
+        positions: type[StrictEnum],
+        name: str = "",
+    ) -> None:
+        """
+        Parameters
+        ----------
+        prefix:
+            Beamline specific part of the PV
+        positions:
+            The Enum for the positions names.
+        name:
+            Name of the device
+        """
+        with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
+            # normal motors in epics
+            self.x = epics_signal_rw(float, prefix + "X")
+            self.y = epics_signal_rw(float, prefix + "Y")
+            self.z = epics_signal_rw(float, prefix + "Z")
+            # piezo motor in epics
             self.y_rotation = epics_signal_rw(
                 float,
                 read_pv=prefix + "ROTY:POS:RD",
                 write_pv=prefix + "ROTY:MOV:WR",
             )
 
-            self.pos_select = epics_signal_rw(
-                CCMCPositions, prefix + "CRYSTAL:MP:SELECT"
-            )
+        with self.add_children_as_readables():
+            # Must be a CHILD as read() must return this signal
+            self.pos_select = epics_signal_rw(positions, prefix + "CRYSTAL:MP:SELECT")
 
         super().__init__(name)
