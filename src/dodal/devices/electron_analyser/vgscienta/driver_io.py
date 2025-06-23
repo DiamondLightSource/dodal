@@ -32,10 +32,6 @@ class VGScientaAnalyserDriverIO(AbstractAnalyserDriverIO[VGScientaRegion]):
             self.y_channel_size = epics_signal_rw(int, prefix + "SizeY")
             self.detector_mode = epics_signal_rw(DetectorMode, prefix + "DETECTOR_MODE")
 
-        with self.add_children_as_readables():
-            # Used to read detector data after acqusition.
-            self.external_io = epics_signal_r(Array1D[np.float64], prefix + "EXTIO")
-
         super().__init__(prefix, AcquisitionMode, name)
 
     @AsyncStatus.wrap
