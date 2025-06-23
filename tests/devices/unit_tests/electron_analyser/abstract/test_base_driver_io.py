@@ -120,7 +120,6 @@ async def test_given_region_that_analyser_sets_energy_values_correctly(
         sim_driver,
         {
             "sim_driver-excitation_energy": {"value": excitation_energy},
-            "sim_driver-external_io": {"value": []},
             "sim_driver-image": {"value": []},
             "sim_driver-spectrum": {"value": []},
             "sim_driver-total_intensity": {"value": 0.0},
