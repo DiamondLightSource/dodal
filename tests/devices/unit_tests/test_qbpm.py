@@ -1,5 +1,3 @@
-from unittest.mock import ANY
-
 import pytest
 from ophyd_async.core import init_devices
 from ophyd_async.testing import assert_reading
@@ -20,8 +18,6 @@ async def test_reading_includes_read_fields(qbpm: QBPM):
         {
             "qbpm-intensity_uA": {
                 "value": 0.0,
-                "timestamp": ANY,
-                "alarm_severity": 0,
             },
         },
     )
