@@ -1,10 +1,8 @@
-from unittest.mock import ANY
-
 import pytest
 from bluesky.plan_stubs import mv
 from bluesky.run_engine import RunEngine
 from ophyd_async.core import init_devices
-from ophyd_async.testing import assert_reading, assert_value
+from ophyd_async.testing import assert_configuration, assert_reading, assert_value
 
 from dodal.devices.b07_1.ccmc import CCMC, CCMCPositions
 
@@ -17,17 +15,23 @@ async def mock_CCMC(RE: RunEngine) -> CCMC:
 
 
 async def test_read_config_includes(mock_CCMC: CCMC):
-    description = await mock_CCMC.read_configuration()
-
-    expected_keys: list[str] = [
-        "x",
-        "y",
-        "z",
-        "y_rotation",
-    ]
-
-    for key in expected_keys:
-        assert f"{mock_CCMC.name}-{key}" in description
+    await assert_configuration(
+        mock_CCMC,
+        {
+            f"{mock_CCMC.name}-y_rotation": {
+                "value": 0.0,
+            },
+            f"{mock_CCMC.name}-x": {
+                "value": 0.0,
+            },
+            f"{mock_CCMC.name}-y": {
+                "value": 0.0,
+            },
+            f"{mock_CCMC.name}-z": {
+                "value": 0.0,
+            },
+        },
+    )
 
 
 async def test_reading(mock_CCMC: CCMC):
@@ -35,32 +39,7 @@ async def test_reading(mock_CCMC: CCMC):
         mock_CCMC,
         {
             f"{mock_CCMC.name}-pos_select": {
-                "alarm_severity": 0,
-                "timestamp": ANY,
                 "value": CCMCPositions.OUT.value,
-            },
-            f"{mock_CCMC.name}-x": {
-                "alarm_severity": 0,
-                "timestamp": ANY,
-                "value": 0.0,
-            },
-            f"{mock_CCMC.name}-y": {
-                "alarm_severity": 0,
-                "timestamp": ANY,
-                "value": 0.0,
-            },
-            f"{mock_CCMC.name}-y_rotation": {
-                "alarm_severity": 0,
-                "timestamp": ANY,
-                "value": 0.0,
-            },
-            f"{mock_CCMC.name}-z": {
-                "alarm_severity": 0,
-                "timestamp": ANY,
-                "value": 0.0,
-            },
-            "foo": {
-                "bar": 0.0,
             },
         },
     )
