@@ -1,5 +1,6 @@
 import asyncio
 from abc import ABC, abstractmethod
+from collections.abc import Mapping
 from typing import Generic, TypeVar
 
 import numpy as np
@@ -40,7 +41,7 @@ class AbstractAnalyserDriverIO(
         self,
         prefix: str,
         acquisition_mode_type: type[StrictEnum],
-        energy_sources: dict[str, SignalR],
+        energy_sources: Mapping[str, SignalR[float]],
         name: str = "",
     ) -> None:
         self.energy_sources = energy_sources
@@ -132,7 +133,7 @@ class AbstractAnalyserDriverIO(
             self.excitation_energy_source.set(source.name),
         )
 
-    def get_energy_source(self, alias_name: str = "") -> SignalR:
+    def get_energy_source(self, alias_name: str = "") -> SignalR[float]:
         # If dict is single key, return the only energy source configured
         if len(self.energy_sources) == 1:
             return next(iter(self.energy_sources.values()))

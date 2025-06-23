@@ -1,4 +1,5 @@
 import asyncio
+from collections.abc import Mapping
 
 import numpy as np
 from ophyd_async.core import (
@@ -23,7 +24,7 @@ from dodal.devices.electron_analyser.vgscienta.region import (
 
 class VGScientaAnalyserDriverIO(AbstractAnalyserDriverIO[VGScientaRegion]):
     def __init__(
-        self, prefix: str, energy_sources: dict[str, SignalR], name: str = ""
+        self, prefix: str, energy_sources: Mapping[str, SignalR[float]], name: str = ""
     ) -> None:
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             # Used for setting up region data acquisition.
