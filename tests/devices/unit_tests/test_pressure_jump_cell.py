@@ -1,5 +1,4 @@
 import asyncio
-from unittest.mock import ANY
 
 import pytest
 from ophyd_async.core import init_devices
@@ -42,23 +41,15 @@ async def test_reading_pjumpcell_includes_read_fields_valves(
         {
             "pjump-all_valves_control-valve_states-1": {
                 "value": ValveState.CLOSED,
-                "timestamp": ANY,
-                "alarm_severity": 0,
             },
             "pjump-all_valves_control-valve_states-3": {
                 "value": ValveState.OPEN,
-                "timestamp": ANY,
-                "alarm_severity": 0,
             },
             "pjump-all_valves_control-fast_valve_states-5": {
                 "value": FastValveState.CLOSED_ARMED,
-                "timestamp": ANY,
-                "alarm_severity": 0,
             },
             "pjump-all_valves_control-fast_valve_states-6": {
                 "value": FastValveState.OPEN_ARMED,
-                "timestamp": ANY,
-                "alarm_severity": 0,
             },
         },
     )
@@ -103,13 +94,9 @@ async def test_reading_pjumpcell_includes_config_fields_valves(
         {
             "pjump-all_valves_control-valve_control-1-open": {
                 "value": int(ValveOpenSeqRequest.INACTIVE.value),
-                "timestamp": ANY,
-                "alarm_severity": 0,
             },
             "pjump-all_valves_control-valve_control-1-close": {
                 "value": ValveControlRequest.CLOSE,
-                "timestamp": ANY,
-                "alarm_severity": 0,
             },
         },
     )
@@ -152,13 +139,9 @@ async def test_pjumpcell_set_valve_sets_valve_fields(
             {
                 "pjump-all_valves_control-valve_control-1-open": {
                     "value": int(ValveOpenSeqRequest.OPEN_SEQ.value),
-                    "timestamp": ANY,
-                    "alarm_severity": 0,
                 },
                 "pjump-all_valves_control-valve_control-1-close": {
-                    "value": ANY,
-                    "timestamp": ANY,
-                    "alarm_severity": 0,
+                    "value": ValveControlRequest.CLOSE,
                 },
             },
         ),
@@ -167,13 +150,9 @@ async def test_pjumpcell_set_valve_sets_valve_fields(
             {
                 "pjump-all_valves_control-fast_valve_control-6-open": {
                     "value": int(ValveOpenSeqRequest.OPEN_SEQ.value),
-                    "timestamp": ANY,
-                    "alarm_severity": 0,
                 },
                 "pjump-all_valves_control-fast_valve_control-6-close": {
-                    "value": ANY,
-                    "timestamp": ANY,
-                    "alarm_severity": 0,
+                    "value": FastValveControlRequest.ARM,
                 },
             },
         ),
@@ -186,13 +165,9 @@ async def test_pjumpcell_set_valve_sets_valve_fields(
         {
             "pjump-all_valves_control-valve_control-1-open": {
                 "value": int(ValveOpenSeqRequest.INACTIVE.value),
-                "timestamp": ANY,
-                "alarm_severity": 0,
             },
             "pjump-all_valves_control-valve_control-1-close": {
                 "value": ValveControlRequest.CLOSE,
-                "timestamp": ANY,
-                "alarm_severity": 0,
             },
         },
     )
@@ -204,13 +179,9 @@ async def test_pjumpcell_set_valve_sets_valve_fields(
         {
             "pjump-all_valves_control-fast_valve_control-6-close": {
                 "value": FastValveControlRequest.ARM,
-                "timestamp": ANY,
-                "alarm_severity": 0,
             },
             "pjump-all_valves_control-fast_valve_control-6-open": {
                 "value": int(ValveOpenSeqRequest.INACTIVE.value),
-                "timestamp": ANY,
-                "alarm_severity": 0,
             },
         },
     )
@@ -231,18 +202,12 @@ async def test_reading_pjumpcell_includes_read_fields_pump(
         {
             "pjump-pump-pump_position": {
                 "value": 100,
-                "timestamp": ANY,
-                "alarm_severity": 0,
             },
             "pjump-pump-pump_motor_direction": {
                 "value": PumpMotorDirectionState.FORWARD,
-                "timestamp": ANY,
-                "alarm_severity": 0,
             },
             "pjump-pump-pump_speed": {
                 "value": 100,
-                "timestamp": ANY,
-                "alarm_severity": 0,
             },
         },
     )
@@ -271,23 +236,15 @@ async def test_reading_pjumpcell_includes_read_fields_transducers(
         {
             "pjump-pressure_transducers-1-omron_pressure": {
                 "value": 1001,
-                "timestamp": ANY,
-                "alarm_severity": 0,
             },
             "pjump-pressure_transducers-1-omron_voltage": {
                 "value": 2.51,
-                "timestamp": ANY,
-                "alarm_severity": 0,
             },
             "pjump-pressure_transducers-1-beckhoff_pressure": {
                 "value": 1001.1,
-                "timestamp": ANY,
-                "alarm_severity": 0,
             },
             "pjump-pressure_transducers-1-slow_beckhoff_voltage_readout": {
                 "value": 2.51,
-                "timestamp": ANY,
-                "alarm_severity": 0,
             },
         },
     )
@@ -296,23 +253,15 @@ async def test_reading_pjumpcell_includes_read_fields_transducers(
         {
             "pjump-pressure_transducers-2-omron_pressure": {
                 "value": 1002,
-                "timestamp": ANY,
-                "alarm_severity": 0,
             },
             "pjump-pressure_transducers-2-omron_voltage": {
                 "value": 2.52,
-                "timestamp": ANY,
-                "alarm_severity": 0,
             },
             "pjump-pressure_transducers-2-beckhoff_pressure": {
                 "value": 1002.2,
-                "timestamp": ANY,
-                "alarm_severity": 0,
             },
             "pjump-pressure_transducers-2-slow_beckhoff_voltage_readout": {
                 "value": 2.52,
-                "timestamp": ANY,
-                "alarm_severity": 0,
             },
         },
     )
@@ -321,23 +270,15 @@ async def test_reading_pjumpcell_includes_read_fields_transducers(
         {
             "pjump-pressure_transducers-3-omron_pressure": {
                 "value": 1003,
-                "timestamp": ANY,
-                "alarm_severity": 0,
             },
             "pjump-pressure_transducers-3-omron_voltage": {
                 "value": 2.53,
-                "timestamp": ANY,
-                "alarm_severity": 0,
             },
             "pjump-pressure_transducers-3-beckhoff_pressure": {
                 "value": 1003.3,
-                "timestamp": ANY,
-                "alarm_severity": 0,
             },
             "pjump-pressure_transducers-3-slow_beckhoff_voltage_readout": {
                 "value": 2.53,
-                "timestamp": ANY,
-                "alarm_severity": 0,
             },
         },
     )
@@ -353,8 +294,6 @@ async def test_reading_pjumpcell_includes_read_fields(
         {
             "pjump-cell_temperature": {
                 "value": 12.3,
-                "timestamp": ANY,
-                "alarm_severity": 0,
             },
         },
     )

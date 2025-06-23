@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 from bluesky.run_engine import RunEngine
 from ophyd_async.epics.motor import Motor
-from ophyd_async.testing import get_mock_put, set_mock_value
+from ophyd_async.testing import assert_reading, get_mock_put, set_mock_value
 
 from dodal.devices.electron_analyser import (
     to_kinetic_energy,
@@ -23,7 +23,6 @@ from dodal.devices.electron_analyser.vgscienta import (
 from tests.devices.unit_tests.electron_analyser.util import (
     TEST_SEQUENCE_REGION_NAMES,
     assert_read_configuration_has_expected_value,
-    assert_read_has_expected_value,
     configure_driver_with_region,
 )
 
@@ -111,14 +110,21 @@ async def test_given_region_that_analyser_sets_energy_values_correctly(
     get_mock_put(sim_driver.excitation_energy).assert_called_once_with(
         excitation_energy, wait=True
     )
-    await assert_read_has_expected_value(
-        sim_driver, "excitation_energy", excitation_energy
-    )
     get_mock_put(sim_driver.excitation_energy_source).assert_called_once_with(
         expected_energy_source, wait=True
     )
     await assert_read_configuration_has_expected_value(
         sim_driver, "excitation_energy_source", expected_energy_source
+    )
+    await assert_reading(
+        sim_driver,
+        {
+            "sim_driver-excitation_energy": {"value": excitation_energy},
+            "sim_driver-external_io": {"value": []},
+            "sim_driver-image": {"value": []},
+            "sim_driver-spectrum": {"value": []},
+            "sim_driver-total_intensity": {"value": 0.0},
+        },
     )
 
 

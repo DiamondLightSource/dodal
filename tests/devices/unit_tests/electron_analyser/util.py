@@ -80,22 +80,6 @@ def assert_region_has_expected_values(
         assert r.__dict__.get(key) is not None
 
 
-async def assert_read_has_expected_value(
-    device: StandardReadable, key: str, expected_value
-) -> None:
-    reading = await device.read()
-    try:
-        assert (
-            reading[device.name + device._child_name_separator + key]["value"]
-            == expected_value
-        )
-    except KeyError as e:
-        raise KeyError(
-            f'Cannot find key "{key}" in read method. Following keys '
-            + f"are {reading.keys()}"
-        ) from e
-
-
 async def assert_read_configuration_has_expected_value(
     device: StandardReadable, key: str, expected_value
 ) -> None:
