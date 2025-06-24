@@ -1,4 +1,5 @@
 import asyncio
+from collections.abc import Mapping
 
 import numpy as np
 from ophyd_async.core import (
@@ -22,7 +23,9 @@ from dodal.devices.electron_analyser.vgscienta.region import (
 
 
 class VGScientaAnalyserDriverIO(AbstractAnalyserDriverIO[VGScientaRegion]):
-    def __init__(self, prefix: str, name: str = "") -> None:
+    def __init__(
+        self, prefix: str, energy_sources: Mapping[str, SignalR[float]], name: str = ""
+    ) -> None:
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             # Used for setting up region data acquisition.
             self.centre_energy = epics_signal_rw(float, prefix + "CENTRE_ENERGY")
@@ -32,7 +35,7 @@ class VGScientaAnalyserDriverIO(AbstractAnalyserDriverIO[VGScientaRegion]):
             self.y_channel_size = epics_signal_rw(int, prefix + "SizeY")
             self.detector_mode = epics_signal_rw(DetectorMode, prefix + "DETECTOR_MODE")
 
-        super().__init__(prefix, AcquisitionMode, name)
+        super().__init__(prefix, AcquisitionMode, energy_sources, name)
 
     @AsyncStatus.wrap
     async def set(self, region: VGScientaRegion):
