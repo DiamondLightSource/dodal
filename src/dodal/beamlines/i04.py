@@ -22,7 +22,7 @@ from dodal.devices.i04.constants import RedisConstants
 from dodal.devices.i04.murko_results import MurkoResultsDevice
 from dodal.devices.i04.transfocator import Transfocator
 from dodal.devices.ipin import IPin
-from dodal.devices.motors import XYZPositioner
+from dodal.devices.motors import XYZStage
 from dodal.devices.mx_phase1.beamstop import Beamstop
 from dodal.devices.oav.oav_detector import OAVBeamCentrePV
 from dodal.devices.oav.oav_parameters import OAVConfig
@@ -77,22 +77,22 @@ def smargon() -> Smargon:
 
 
 @device_factory()
-def gonio_positioner() -> XYZPositioner:
+def gonio_positioner() -> XYZStage:
     """Get the i04 lower_gonio_stages device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
     """
-    return XYZPositioner(
+    return XYZStage(
         f"{PREFIX.beamline_prefix}-MO-GONIO-01:",
         "lower_gonio_stages",
     )
 
 
 @device_factory()
-def sample_delivery_system() -> XYZPositioner:
+def sample_delivery_system() -> XYZStage:
     """Get the i04 sample_delivery_system device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
     """
-    return XYZPositioner(
+    return XYZStage(
         f"{PREFIX.beamline_prefix}-MO-SDE-01:",
         "sample_delivery_system",
     )
