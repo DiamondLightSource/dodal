@@ -11,13 +11,13 @@ from bluesky.utils import Msg
 from ophyd_async.core import (
     AsyncStatus,
     Device,
-    StandardReadable,
     StrictEnum,
     wait_for_value,
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 from ophyd_async.epics.motor import Motor
 
+from dodal.devices.motors import XYZStage
 from dodal.devices.util.epics_util import SetWhenEnabled
 
 
@@ -115,7 +115,7 @@ class CombinedMove(TypedDict):
     chi: NotRequired[float | None]
 
 
-class Smargon(StandardReadable, Movable):
+class Smargon(XYZStage, Movable):
     """
     Real motors added to allow stops following pin load (e.g. real_x1.stop() )
     X1 and X2 real motors provide compound chi motion as well as the compound X travel,
@@ -125,9 +125,6 @@ class Smargon(StandardReadable, Movable):
 
     def __init__(self, prefix: str = "", name: str = ""):
         with self.add_children_as_readables():
-            self.x = Motor(prefix + "X")
-            self.y = Motor(prefix + "Y")
-            self.z = Motor(prefix + "Z")
             self.chi = Motor(prefix + "CHI")
             self.phi = Motor(prefix + "PHI")
             self.omega = Motor(prefix + "OMEGA")
@@ -142,7 +139,7 @@ class Smargon(StandardReadable, Movable):
 
         self.defer_move = epics_signal_rw(DeferMoves, prefix + "CS1:DeferMoves")
 
-        super().__init__(name)
+        super().__init__(prefix, name)
 
     def get_xyz_limits(self) -> Generator[Msg, None, XYZLimits]:
         """Obtain a plan stub that returns the smargon XYZ axis limits
