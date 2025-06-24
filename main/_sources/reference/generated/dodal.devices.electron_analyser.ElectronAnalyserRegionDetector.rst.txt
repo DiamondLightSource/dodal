@@ -17,12 +17,11 @@ dodal.devices.electron\_analyser.ElectronAnalyserRegionDetector
       
       
       
-      ~ElectronAnalyserRegionDetector.prepare
       
       
       
       
-      
+      ~ElectronAnalyserRegionDetector.trigger
       
       
    
