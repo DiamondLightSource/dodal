@@ -18,6 +18,7 @@ from dodal.devices.electron_analyser.abstract.base_driver_io import (
 from dodal.devices.electron_analyser.abstract.types import TLensMode, TPsuMode
 from dodal.devices.electron_analyser.specs.enums import AcquisitionMode
 from dodal.devices.electron_analyser.specs.region import PassEnergy, SpecsRegion
+from dodal.devices.electron_analyser.util import to_kinetic_energy
 
 
 class SpecsAnalyserDriverIO(
@@ -69,10 +70,15 @@ class SpecsAnalyserDriverIO(
             self.psu_mode.set(region.psu_mode),
         )
         if region.acquisition_mode == AcquisitionMode.FIXED_TRANSMISSION:
-            await self.centre_energy.set(region.centre_energy)
+            await self.energy_step.set(region.energy_step)
 
         if self.acquisition_mode == AcquisitionMode.FIXED_ENERGY:
-            await self.energy_step.set(region.energy_step)
+            source = self._get_energy_source(region.excitation_energy_source)
+            excitation_energy = await source.get_value()
+            centre_energy = to_kinetic_energy(
+                region.centre_energy, region.energy_mode, excitation_energy
+            )
+            await self.centre_energy.set(centre_energy)
 
     def _create_angle_axis_signal(self, prefix: str) -> SignalR[Array1D[np.float64]]:
         angle_axis = derived_signal_r(

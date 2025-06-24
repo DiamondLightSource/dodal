@@ -1,8 +1,6 @@
 import os
 from typing import Any
 
-from ophyd_async.core import StandardReadable
-
 from dodal.devices.electron_analyser import EnergyMode
 from dodal.devices.electron_analyser.abstract import (
     AbstractBaseRegion,
@@ -66,19 +64,3 @@ def assert_region_has_expected_values(
 
     for key in expected_region_values.keys():
         assert r.__dict__.get(key) is not None
-
-
-async def assert_read_configuration_has_expected_value(
-    device: StandardReadable, key: str, expected_value
-) -> None:
-    read_config = await device.read_configuration()
-    try:
-        assert (
-            read_config[device.name + device._child_name_separator + key]["value"]
-            == expected_value
-        )
-    except KeyError as e:
-        raise KeyError(
-            f'Cannot find key "{key}" in read_configuration method. Following keys '
-            + f"are {read_config.keys()}"
-        ) from e

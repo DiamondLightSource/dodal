@@ -1,14 +1,13 @@
+from typing import Any
+
 import numpy as np
 import pytest
 from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
-from ophyd_async.testing import (
-    get_mock_put,
-    set_mock_value,
-)
+from ophyd_async.testing import assert_configuration, get_mock_put, set_mock_value
 
 from dodal.devices.b07 import LensMode, PsuMode
-from dodal.devices.electron_analyser import EnergyMode
+from dodal.devices.electron_analyser import EnergyMode, to_kinetic_energy
 from dodal.devices.electron_analyser.specs import (
     AcquisitionMode,
     SpecsAnalyserDriverIO,
@@ -16,7 +15,6 @@ from dodal.devices.electron_analyser.specs import (
 )
 from tests.devices.unit_tests.electron_analyser.util import (
     TEST_SEQUENCE_REGION_NAMES,
-    assert_read_configuration_has_expected_value,
 )
 
 
@@ -26,59 +24,55 @@ def driver_class() -> type[SpecsAnalyserDriverIO[LensMode, PsuMode]]:
 
 
 @pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
-async def test_given_region_that_analyser_sets_energy_values_correctly(
-    sim_driver: SpecsAnalyserDriverIO,
-    region: SpecsRegion,
-    RE: RunEngine,
-) -> None:
-    RE(bps.mv(sim_driver, region))
-
-    if region.acquisition_mode == AcquisitionMode.FIXED_TRANSMISSION:
-        get_mock_put(sim_driver.centre_energy).assert_called_once_with(
-            region.centre_energy, wait=True
-        )
-        await assert_read_configuration_has_expected_value(
-            sim_driver, "centre_energy", region.centre_energy
-        )
-    else:
-        get_mock_put(sim_driver.centre_energy).assert_not_called()
-
-    if region.acquisition_mode == AcquisitionMode.FIXED_ENERGY:
-        get_mock_put(sim_driver.energy_step).assert_called_once_with(
-            region.energy_step, wait=True
-        )
-        await assert_read_configuration_has_expected_value(
-            sim_driver, "energy_step", region.energy_step
-        )
-    else:
-        get_mock_put(sim_driver.energy_step).assert_not_called()
-
-
-@pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
-async def test_given_region_that_analyser_sets_modes_correctly(
+async def test_analyser_sets_region_and_configuration_is_correct(
     sim_driver: SpecsAnalyserDriverIO[LensMode, PsuMode],
     region: SpecsRegion[LensMode, PsuMode],
     RE: RunEngine,
 ) -> None:
     RE(bps.mv(sim_driver, region))
+    # ToDo - Put energy step and centre energy into abstract, remove if statements.
+    if region.acquisition_mode == AcquisitionMode.FIXED_TRANSMISSION:
+        get_mock_put(sim_driver.energy_step).assert_called_once_with(
+            region.energy_step, wait=True
+        )
+    else:
+        get_mock_put(sim_driver.energy_step).assert_not_called()
+
+    if region.acquisition_mode == AcquisitionMode.FIXED_ENERGY:
+        source = sim_driver._get_energy_source(region.excitation_energy_source)
+        excitation_energy = await source.get_value()
+        expected_centre_e = to_kinetic_energy(
+            region.centre_energy, region.energy_mode, excitation_energy
+        )
+        get_mock_put(sim_driver.centre_energy).assert_called_once_with(
+            expected_centre_e, wait=True
+        )
+    else:
+        get_mock_put(sim_driver.centre_energy).assert_not_called()
 
     get_mock_put(sim_driver.psu_mode).assert_called_once_with(
         region.psu_mode, wait=True
-    )
-    await assert_read_configuration_has_expected_value(
-        sim_driver, "psu_mode", region.psu_mode
     )
 
     get_mock_put(sim_driver.snapshot_values).assert_called_once_with(
         region.values, wait=True
     )
-    await assert_read_configuration_has_expected_value(
-        sim_driver, "snapshot_values", region.values
+
+    # Check partial match, check only specific fields not covered by abstract class
+    await assert_configuration(
+        sim_driver,
+        {
+            "sim_driver-centre_energy": {"value": Any},
+            "sim_driver-energy_step": {"value": region.energy_step},
+            "sim_driver-psu_mode": {"value": region.psu_mode},
+            "sim_driver-snapshot_values": {"value": region.values},
+        },
+        # full_match=False
     )
 
 
 @pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
-async def test_that_data_to_read_is_correct(
+async def test_specs_analyser_binding_energy_axis(
     sim_driver: SpecsAnalyserDriverIO[LensMode, PsuMode],
     region: SpecsRegion[LensMode, PsuMode],
     RE: RunEngine,
