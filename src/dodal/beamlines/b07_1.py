@@ -19,11 +19,6 @@ def synchrotron() -> Synchrotron:
 
 
 @device_factory()
-def analyser_driver() -> SpecsAnalyserDriverIO:
-    return SpecsAnalyserDriverIO(prefix=f"{PREFIX.beamline_prefix}-EA-DET-01:CAM:")
-
-
-@device_factory()
 def pgm() -> PGM:
     return PGM(prefix=f"{PREFIX.beamline_prefix}-OP-PGM-01:", grating=B07CGrating)
 
@@ -31,3 +26,10 @@ def pgm() -> PGM:
 @device_factory()
 def ccmc() -> CCMC:
     return CCMC(prefix=f"{PREFIX.beamline_prefix}-OP-CCM-01:", positions=CCMCPositions)
+
+
+def analyser_driver() -> SpecsAnalyserDriverIO:
+    return SpecsAnalyserDriverIO(
+        f"{PREFIX.beamline_prefix}-EA-DET-01:CAM:",
+        {"source1": pgm().energy.user_readback},
+    )

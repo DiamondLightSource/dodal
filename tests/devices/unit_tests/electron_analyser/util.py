@@ -1,13 +1,10 @@
 import os
 from typing import Any
 
-from bluesky import plan_stubs as bps
 from ophyd_async.core import StandardReadable
-from ophyd_async.epics.motor import Motor
 
 from dodal.devices.electron_analyser import EnergyMode
 from dodal.devices.electron_analyser.abstract import (
-    AbstractAnalyserDriverIO,
     AbstractBaseRegion,
     AbstractBaseSequence,
 )
@@ -36,15 +33,6 @@ TEST_SEQUENCES = {
     SpecsDetector: [TEST_SPECS_SEQUENCE, SpecsSequence],
     SpecsAnalyserDriverIO: [TEST_SPECS_SEQUENCE, SpecsSequence],
 }
-
-
-def configure_driver_with_region(
-    sim_driver: AbstractAnalyserDriverIO,
-    region: AbstractBaseRegion,
-    sim_energy_source: Motor,
-):
-    yield from bps.prepare(sim_driver, sim_energy_source)
-    yield from bps.mv(sim_driver, region)
 
 
 def get_test_sequence(key: type) -> str:
@@ -78,22 +66,6 @@ def assert_region_has_expected_values(
 
     for key in expected_region_values.keys():
         assert r.__dict__.get(key) is not None
-
-
-async def assert_read_has_expected_value(
-    device: StandardReadable, key: str, expected_value
-) -> None:
-    reading = await device.read()
-    try:
-        assert (
-            reading[device.name + device._child_name_separator + key]["value"]
-            == expected_value
-        )
-    except KeyError as e:
-        raise KeyError(
-            f'Cannot find key "{key}" in read method. Following keys '
-            + f"are {reading.keys()}"
-        ) from e
 
 
 async def assert_read_configuration_has_expected_value(
