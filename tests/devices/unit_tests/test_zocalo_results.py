@@ -133,7 +133,7 @@ async def test_get_full_processing_results(mocked_zocalo_device, RE) -> None:
             [[0, 1, 1], [1, 2, 4]],
             [[2, 2, 3], [4, 5, 6]],
         ]
-        for prop in ["max_voxel", "max_count", "n_voxels", "total_count"]:
+        for prop in ["max_voxel", "max_count", "n_voxels", "total_count", "sample_id"]:
             assert [r[prop] for r in full_results] == [r[prop] for r in TEST_RESULTS]  # type: ignore
 
     RE(plan())
