@@ -1,4 +1,3 @@
-import asyncio
 from abc import ABC, abstractmethod
 from typing import Generic, TypeVar
 
@@ -258,7 +257,7 @@ class FastGridScanCommon(StandardReadable, Flyable, ABC, Generic[ParamType]):
     async def complete(self):
         try:
             await wait_for_value(self.status, 0, self.COMPLETE_STATUS)
-        except asyncio.TimeoutError:
+        except TimeoutError:
             LOGGER.error(
                 "Hyperion timed out waiting for FGS motion to complete. This may have been caused by a goniometer stage getting stuck.\n\
                 Forcibly stopping the FGS motion program..."

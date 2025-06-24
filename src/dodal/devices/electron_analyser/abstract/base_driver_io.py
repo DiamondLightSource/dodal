@@ -1,9 +1,10 @@
 import asyncio
 from abc import ABC, abstractmethod
+from collections.abc import Mapping
 from typing import Generic, TypeVar
 
 import numpy as np
-from bluesky.protocols import Movable, Preparable
+from bluesky.protocols import Movable
 from ophyd_async.core import (
     Array1D,
     AsyncStatus,
@@ -16,7 +17,6 @@ from ophyd_async.core import (
 )
 from ophyd_async.epics.adcore import ADBaseIO
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
-from ophyd_async.epics.motor import Motor
 
 from dodal.devices.electron_analyser.abstract.base_region import (
     TAbstractBaseRegion,
@@ -29,7 +29,6 @@ class AbstractAnalyserDriverIO(
     ABC,
     StandardReadable,
     ADBaseIO,
-    Preparable,
     Movable[TAbstractBaseRegion],
     Generic[TAbstractBaseRegion],
 ):
@@ -39,8 +38,14 @@ class AbstractAnalyserDriverIO(
     """
 
     def __init__(
-        self, prefix: str, acquisition_mode_type: type[StrictEnum], name: str = ""
+        self,
+        prefix: str,
+        acquisition_mode_type: type[StrictEnum],
+        energy_sources: Mapping[str, SignalR[float]],
+        name: str = "",
     ) -> None:
+        self.energy_sources = energy_sources
+
         with self.add_children_as_readables():
             self.image = epics_signal_r(Array1D[np.float64], prefix + "IMAGE")
             self.spectrum = epics_signal_r(Array1D[np.float64], prefix + "INT_SPECTRUM")
@@ -93,26 +98,6 @@ class AbstractAnalyserDriverIO(
         super().__init__(prefix=prefix, name=name)
 
     @AsyncStatus.wrap
-    async def prepare(self, value: Motor):
-        """
-        Prepare the driver for a region by passing in the energy source motor selected
-        by a region.
-
-        Args:
-            value: The motor that contains the information on the current excitation
-                   energy. Needed to prepare region for epics to accuratly calculate
-                   kinetic energy for an energy scan when in binding energy mode.
-        """
-        energy_source = value
-        excitation_energy_value = await energy_source.user_readback.get_value()  # eV
-        excitation_energy_source_name = energy_source.name
-
-        await asyncio.gather(
-            self.excitation_energy.set(excitation_energy_value),
-            self.excitation_energy_source.set(excitation_energy_source_name),
-        )
-
-    @AsyncStatus.wrap
     async def set(self, region: TAbstractBaseRegion):
         """
         This should encompass all core region logic which is common to every electron
@@ -121,10 +106,13 @@ class AbstractAnalyserDriverIO(
         Args:
             region: Contains the parameters to setup the driver for a scan.
         """
+
+        source = self._get_energy_source(region.excitation_energy_source)
+        excitation_energy = await source.get_value()  # eV
+
         pass_energy_type = self.pass_energy_type
         pass_energy = pass_energy_type(region.pass_energy)
 
-        excitation_energy = await self.excitation_energy.get_value()
         low_energy = to_kinetic_energy(
             region.low_energy, region.energy_mode, excitation_energy
         )
@@ -141,7 +129,18 @@ class AbstractAnalyserDriverIO(
             self.pass_energy.set(pass_energy),
             self.iterations.set(region.iterations),
             self.acquisition_mode.set(region.acquisition_mode),
+            self.excitation_energy.set(excitation_energy),
+            self.excitation_energy_source.set(source.name),
         )
+
+    def _get_energy_source(self, alias_name: str) -> SignalR[float]:
+        energy_source = self.energy_sources.get(alias_name)
+        if energy_source is None:
+            raise KeyError(
+                f"'{energy_source}' is an invalid energy source. Avaliable energy "
+                + f"sources are '{list(self.energy_sources.keys())}'"
+            )
+        return energy_source
 
     @abstractmethod
     def _create_angle_axis_signal(self, prefix: str) -> SignalR[Array1D[np.float64]]:

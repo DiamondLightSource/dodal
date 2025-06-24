@@ -1,6 +1,6 @@
 # Changes here will be overwritten by Copier
-_commit: 2.5.0
-_src_path: gh:DiamondLightSource/python-copier-template
+_commit: 4.0.1
+_src_path: https://github.com/DiamondLightSource/python-copier-template
 author_email: dominic.oram@diamond.ac.uk
 author_name: Dominic Oram
 component_lifecycle: production
@@ -15,4 +15,5 @@ github_org: DiamondLightSource
 package_name: dodal
 pypi: true
 repo_name: dodal
+strict_typing: false
 type_checker: pyright
