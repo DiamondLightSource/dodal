@@ -2,6 +2,7 @@ from ophyd_async.core import (
     StandardReadable,
     StandardReadableFormat,
     StrictEnum,
+    derived_signal_r,
 )
 from ophyd_async.epics.core import epics_signal_rw
 
@@ -54,5 +55,13 @@ class CCMC(StandardReadable):
         with self.add_children_as_readables():
             # Must be a CHILD as read() must return this signal
             self.pos_select = epics_signal_rw(positions, prefix + "CRYSTAL:MP:SELECT")
+            self.energy_in_ev = derived_signal_r(
+                self._convert_pos_to_eV, pos_signal=self.pos_select
+            )
 
         super().__init__(name)
+
+    def _convert_pos_to_eV(self, pos_signal: CCMCPositions) -> float:
+        if pos_signal != CCMCPositions.OUT:
+            return float(str(pos_signal.value).split("Xtal_")[1])
+        return 0.0

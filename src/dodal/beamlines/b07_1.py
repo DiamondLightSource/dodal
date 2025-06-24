@@ -29,7 +29,10 @@ def ccmc() -> CCMC:
 
 
 def analyser_driver() -> SpecsAnalyserDriverIO:
+    energy_sources = {
+        "source1": pgm().energy.user_readback,
+        "source2": ccmc().energy_in_ev,
+    }
     return SpecsAnalyserDriverIO(
-        f"{PREFIX.beamline_prefix}-EA-DET-01:CAM:",
-        {"source1": pgm().energy.user_readback},
+        f"{PREFIX.beamline_prefix}-EA-DET-01:CAM:", energy_sources
     )

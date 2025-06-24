@@ -39,7 +39,10 @@ async def test_reading(mock_CCMC: CCMC):
         mock_CCMC,
         {
             f"{mock_CCMC.name}-pos_select": {
-                "value": CCMCPositions.OUT.value,
+                "value": CCMCPositions.OUT,
+            },
+            f"{mock_CCMC.name}-energy_in_ev": {
+                "value": 0.0,
             },
         },
     )
@@ -52,3 +55,4 @@ async def test_move_crystal(
     await assert_value(mock_CCMC.pos_select, CCMCPositions.OUT.value)
     RE(mv(mock_CCMC.pos_select, CCMCPositions.XTAL_2000.value))
     await assert_value(mock_CCMC.pos_select, CCMCPositions.XTAL_2000.value)
+    await assert_value(mock_CCMC.energy_in_ev, 2000.0)
