@@ -84,7 +84,7 @@ async def test_that_data_to_read_is_correct(
 ) -> None:
     RE(bps.mv(sim_driver, region))
 
-    source = sim_driver.get_energy_source(region.excitation_energy_source)
+    source = sim_driver._get_energy_source(region.excitation_energy_source)
     excitation_energy = await source.get_value()
 
     # Check binding energy is correct

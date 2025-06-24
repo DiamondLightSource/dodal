@@ -107,7 +107,7 @@ class AbstractAnalyserDriverIO(
             region: Contains the parameters to setup the driver for a scan.
         """
 
-        source = self.get_energy_source(region.excitation_energy_source)
+        source = self._get_energy_source(region.excitation_energy_source)
         excitation_energy = await source.get_value()  # eV
 
         pass_energy_type = self.pass_energy_type
@@ -133,11 +133,7 @@ class AbstractAnalyserDriverIO(
             self.excitation_energy_source.set(source.name),
         )
 
-    def get_energy_source(self, alias_name: str = "") -> SignalR[float]:
-        # If dict is single key, return the only energy source configured
-        if len(self.energy_sources) == 1:
-            return next(iter(self.energy_sources.values()))
-
+    def _get_energy_source(self, alias_name: str) -> SignalR[float]:
         energy_source = self.energy_sources.get(alias_name)
         if energy_source is None:
             raise KeyError(

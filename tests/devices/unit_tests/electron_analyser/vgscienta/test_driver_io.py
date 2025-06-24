@@ -54,7 +54,7 @@ async def test_given_region_that_analyser_sets_energy_values_correctly(
 ) -> None:
     RE(bps.mv(sim_driver, region))
 
-    excitation_energy = await sim_driver.get_energy_source(
+    excitation_energy = await sim_driver._get_energy_source(
         region.excitation_energy_source
     ).get_value()
 
@@ -121,7 +121,7 @@ async def test_that_data_to_read_is_correct(
     sim_driver: VGScientaAnalyserDriverIO,
     region: VGScientaRegion,
 ) -> None:
-    excitation_energy = await sim_driver.get_energy_source(
+    excitation_energy = await sim_driver._get_energy_source(
         region.excitation_energy_source
     ).get_value()
 

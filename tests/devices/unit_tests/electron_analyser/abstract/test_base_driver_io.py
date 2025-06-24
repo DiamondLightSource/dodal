@@ -5,7 +5,6 @@ import numpy as np
 import pytest
 from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import SignalR
 from ophyd_async.testing import assert_reading, get_mock_put, set_mock_value
 
 from dodal.devices.electron_analyser import (
@@ -74,7 +73,7 @@ async def test_given_region_that_analyser_sets_energy_values_correctly(
 ) -> None:
     RE(bps.mv(sim_driver, region))
 
-    energy_source = sim_driver.get_energy_source(region.excitation_energy_source)
+    energy_source = sim_driver._get_energy_source(region.excitation_energy_source)
     excitation_energy = await energy_source.get_value()
 
     expected_low_e = to_kinetic_energy(
@@ -178,23 +177,13 @@ def test_analyser_correctly_selects_energy_source_from_region_input(
     region: AbstractBaseRegion,
 ) -> None:
     source_alias_name = region.excitation_energy_source
-    energy_source = sim_driver.get_energy_source(source_alias_name)
+    energy_source = sim_driver._get_energy_source(source_alias_name)
 
     assert energy_source == sim_driver.energy_sources[source_alias_name]
-
-
-def test_analyser_can_get_single_configured_energy_source_without_parameters(
-    sim_driver: AbstractAnalyserDriverIO, energy_sources: dict[str, SignalR[float]]
-) -> None:
-    first_key = next(iter(energy_sources))
-    single_energy_source = {first_key: energy_sources[first_key]}
-    sim_driver.energy_sources = single_energy_source
-
-    assert sim_driver.get_energy_source() == energy_sources[first_key]
 
 
 def test_analyser_raise_error_on_invalid_energy_source_selected(
     sim_driver: AbstractAnalyserDriverIO,
 ) -> None:
     with pytest.raises(KeyError):
-        sim_driver.get_energy_source("invalid_name")
+        sim_driver._get_energy_source("invalid_name")
