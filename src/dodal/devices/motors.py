@@ -26,7 +26,7 @@ class Stage(StandardReadable, ABC):
     ...
 
 
-class XThetaStage(StandardReadable):
+class XThetaStage(Stage):
     def __init__(
         self, prefix: str, name: str = "", x_infix: str = _X, theta_infix: str = "A"
     ):
@@ -36,7 +36,7 @@ class XThetaStage(StandardReadable):
         super().__init__(name=name)
 
 
-class XYStage(StandardReadable):
+class XYStage(Stage):
     def __init__(
         self, prefix: str, name: str = "", x_infix: str = _X, y_infix: str = _Y
     ):
@@ -108,11 +108,11 @@ class SixAxisGonio(XYZStage):
         super().__init__(prefix, name, x_infix, y_infix, z_infix)
 
 
-class YZStage(StandardReadable):
+class YZStage(Stage):
     def __init__(
         self, prefix: str, name: str = "", y_infix: str = _Y, z_infix: str = _Z
     ) -> None:
-        self.y = Motor(prefix + y_infix)
-        self.z = Motor(prefix + z_infix)
-
+        with self.add_children_as_readables():
+            self.y = Motor(prefix + y_infix)
+            self.z = Motor(prefix + z_infix)
         super().__init__(name)
