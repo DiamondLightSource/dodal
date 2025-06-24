@@ -344,7 +344,7 @@ async def test_given_using_gpu_results_if_results_from_cpu_first_then_warn_and_u
     )
 
 
-async def test_given_no_sample_id_from_zocalo_then_returns_no_sample_id(
+async def test_given_no_sample_id_from_zocalo_then_returns_none(
     mocked_zocalo_device, RE
 ):
     zocalo_device: ZocaloResults = await mocked_zocalo_device(
@@ -364,6 +364,6 @@ async def test_given_no_sample_id_from_zocalo_then_returns_no_sample_id(
     def plan():
         yield from bps.trigger(zocalo_device)
         full_results = yield from get_full_processing_results(zocalo_device)
-        assert full_results[0]["sample_id"] is zocalo_device.NO_SAMPLE_ID
+        assert full_results[0]["sample_id"] is None
 
     RE(plan())

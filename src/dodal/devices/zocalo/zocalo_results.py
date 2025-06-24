@@ -47,6 +47,7 @@ DEFAULT_TIMEOUT = 180
 DEFAULT_SORT_KEY = SortKeys.max_count
 CLEAR_QUEUE_WAIT_S = 2.0
 ZOCALO_STAGE_GROUP = "clear zocalo queue"
+_NO_SAMPLE_ID = -1
 
 
 class XrcResult(TypedDict):
@@ -77,7 +78,7 @@ class XrcResult(TypedDict):
     n_voxels: int
     total_count: int
     bounding_box: list[list[int]]
-    sample_id: int
+    sample_id: int | None
 
 
 def bbox_size(result: XrcResult):
@@ -120,8 +121,6 @@ class ZocaloResults(StandardReadable, Triggerable):
         results that it receives (which are likely the GPU results)
 
     """
-
-    NO_SAMPLE_ID = -1
 
     def __init__(
         self,
@@ -193,7 +192,7 @@ class ZocaloResults(StandardReadable, Triggerable):
         self._n_voxels_setter(np.array([r["n_voxels"] for r in results]))
         self._total_count_setter(np.array([r["total_count"] for r in results]))
         self._sample_id_setter(
-            np.array([r["sample_id"] or self.NO_SAMPLE_ID for r in results])
+            np.array([r.get("sample_id") or _NO_SAMPLE_ID for r in results])
         )
         self._ispyb_dcid_setter(recipe_parameters["dcid"])
         self._ispyb_dcgid_setter(recipe_parameters["dcgid"])
@@ -342,7 +341,7 @@ def get_full_processing_results(
                 n_voxels=int(n),
                 total_count=int(tc),
                 bounding_box=bb.tolist(),
-                sample_id=int(s_id) if s_id else None,
+                sample_id=int(s_id) if s_id != _NO_SAMPLE_ID else None,
             )
         )
         for com, mv, mc, n, tc, bb, s_id in zip(
