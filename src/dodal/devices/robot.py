@@ -173,7 +173,7 @@ class BartRobot(StandardReadable, Movable[SampleLocation]):
                 self._load_pin_and_puck(value),
                 timeout=self.LOAD_TIMEOUT + self.NOT_BUSY_TIMEOUT,
             )
-        except (asyncio.TimeoutError, TimeoutError) as e:
+        except TimeoutError as e:
             # Will only need to catch asyncio.TimeoutError after https://github.com/bluesky/ophyd-async/issues/572
             await self.prog_error.raise_if_error(e)
             await self.controller_error.raise_if_error(e)

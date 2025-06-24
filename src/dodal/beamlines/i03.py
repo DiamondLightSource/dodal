@@ -28,7 +28,7 @@ from dodal.devices.focusing_mirror import FocusingMirrorWithStripes, MirrorVolta
 from dodal.devices.i03 import Beamstop
 from dodal.devices.i03.dcm import DCM
 from dodal.devices.i03.undulator_dcm import UndulatorDCM
-from dodal.devices.motors import XYZPositioner
+from dodal.devices.motors import XYZStage
 from dodal.devices.oav.oav_detector import OAVBeamCentreFile
 from dodal.devices.oav.oav_parameters import OAVConfigBeamCentre
 from dodal.devices.oav.pin_image_recognition import PinTipDetection
@@ -409,11 +409,11 @@ def thawer() -> Thawer:
 
 
 @device_factory()
-def lower_gonio() -> XYZPositioner:
+def lower_gonio() -> XYZStage:
     """Get the i03 lower gonio device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return XYZPositioner(
+    return XYZStage(
         f"{PREFIX.beamline_prefix}-MO-GONP-01:",
         "lower_gonio",
     )
@@ -451,11 +451,9 @@ def qbpm() -> QBPM:
     )
 
 
-@device_factory(
-    skip=True
-)  # Skipping as not yet on the beamline, see https://jira.diamond.ac.uk/browse/I03-894
+@device_factory()
 def baton() -> Baton:
     """Get the i03 baton device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return Baton(f"{PREFIX.beamline_prefix}:")
+    return Baton(f"{PREFIX.beamline_prefix}-CS-BATON-01:")
