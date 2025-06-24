@@ -14,7 +14,6 @@ dodal.devices.p45
    :toctree:
    :recursive:
 
-   ~p45.Choppers
    ~p45.SampleTheta
    ~p45.SampleY
    ~p45.TomoStageWithStretchAndSkew

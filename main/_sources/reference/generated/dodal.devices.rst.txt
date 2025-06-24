@@ -10,7 +10,6 @@
    :recursive:
 
    dodal.devices.CTAB
-   dodal.devices.adsim
    dodal.devices.aperture
    dodal.devices.aperturescatterguard
    dodal.devices.apple2_undulator
@@ -54,7 +53,6 @@
    dodal.devices.qbpm
    dodal.devices.robot
    dodal.devices.s4_slit_gaps
-   dodal.devices.scatterguard
    dodal.devices.scintillator
    dodal.devices.slits
    dodal.devices.smargon
@@ -62,7 +60,6 @@
    dodal.devices.synchrotron
    dodal.devices.tetramm
    dodal.devices.thawer
-   dodal.devices.training_rig
    dodal.devices.turbo_slit
    dodal.devices.undulator
    dodal.devices.util

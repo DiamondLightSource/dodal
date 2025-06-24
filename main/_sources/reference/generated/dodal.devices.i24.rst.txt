@@ -15,7 +15,6 @@ dodal.devices.i24
    dodal.devices.i24.dcm
    dodal.devices.i24.dual_backlight
    dodal.devices.i24.focus_mirrors
-   dodal.devices.i24.i24_detector_motion
    dodal.devices.i24.pilatus_metadata
    dodal.devices.i24.pmac
    dodal.devices.i24.vgonio
