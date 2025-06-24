@@ -1,5 +1,3 @@
-from typing import Any
-
 import numpy as np
 import pytest
 from bluesky import plan_stubs as bps
@@ -15,6 +13,7 @@ from dodal.devices.electron_analyser.specs import (
 )
 from tests.devices.unit_tests.electron_analyser.util import (
     TEST_SEQUENCE_REGION_NAMES,
+    value,
 )
 
 
@@ -58,16 +57,17 @@ async def test_analyser_sets_region_and_configuration_is_correct(
         region.values, wait=True
     )
 
+    prefix = sim_driver.name + "-"
     # Check partial match, check only specific fields not covered by abstract class
     await assert_configuration(
         sim_driver,
         {
-            "sim_driver-centre_energy": {"value": Any},
-            "sim_driver-energy_step": {"value": region.energy_step},
-            "sim_driver-psu_mode": {"value": region.psu_mode},
-            "sim_driver-snapshot_values": {"value": region.values},
+            f"{prefix}centre_energy": value(await sim_driver.centre_energy.get_value()),
+            f"{prefix}energy_step": value(await sim_driver.energy_step.get_value()),
+            f"{prefix}psu_mode": value(region.psu_mode),
+            f"{prefix}snapshot_values": value(region.values),
         },
-        # full_match=False
+        full_match=False,
     )
 
 
