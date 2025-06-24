@@ -30,6 +30,7 @@ from dodal.devices.electron_analyser.vgscienta import (
 )
 from tests.devices.unit_tests.electron_analyser.util import (
     TEST_SEQUENCE_REGION_NAMES,
+    value,
 )
 
 
@@ -111,32 +112,30 @@ async def test_analyser_sets_region_and_configuration_is_correct(
     binding_axis = await sim_driver.binding_energy_axis.get_value()
     angle_axis = await sim_driver.angle_axis.get_value()
 
+    prefix = sim_driver.name + "-"
+
     # Check partial match as different analysers will have more fields
     await assert_configuration(
         sim_driver,
         {
-            "sim_driver-region_name": {"value": region.name},
-            "sim_driver-energy_mode": {"value": region.energy_mode},
-            "sim_driver-acquisition_mode": {"value": region.acquisition_mode},
-            "sim_driver-lens_mode": {"value": region.lens_mode},
-            "sim_driver-low_energy": {"value": expected_low_e},
-            "sim_driver-high_energy": {"value": expected_high_e},
-            "sim_driver-pass_energy": {"value": expected_pass_e},
-            "sim_driver-excitation_energy": {"value": excitation_energy},
-            "sim_driver-excitation_energy_source": {"value": energy_source.name},
-            "sim_driver-energy_step": {
-                "value": region.energy_step
-            },  # Wont work with Specs
-            "sim_driver-slices": {"value": region.slices},
-            "sim_driver-iterations": {"value": region.iterations},
-            "sim_driver-total_steps": {"value": mock_values},
-            "sim_driver-step_time": {"value": mock_values},
-            "sim_driver-total_time": {"value": expected_total_time},
-            "sim_driver-energy_axis": {"value": energy_axis},
-            "sim_driver-binding_energy_axis": {"value": binding_axis},
-            "sim_driver-angle_axis": {"value": angle_axis},
+            f"{prefix}region_name": value(region.name),
+            f"{prefix}energy_mode": value(region.energy_mode),
+            f"{prefix}acquisition_mode": value(region.acquisition_mode),
+            f"{prefix}lens_mode": value(region.lens_mode),
+            f"{prefix}low_energy": value(expected_low_e),
+            f"{prefix}high_energy": value(expected_high_e),
+            f"{prefix}pass_energy": value(expected_pass_e),
+            f"{prefix}excitation_energy_source": value(energy_source.name),
+            f"{prefix}slices": value(region.slices),
+            f"{prefix}iterations": value(region.iterations),
+            f"{prefix}total_steps": value(mock_values),
+            f"{prefix}step_time": value(mock_values),
+            f"{prefix}total_time": value(expected_total_time),
+            f"{prefix}energy_axis": value(energy_axis),
+            f"{prefix}binding_energy_axis": value(binding_axis),
+            f"{prefix}angle_axis": value(angle_axis),
         },
-        # full_match=False
+        full_match=False,
     )
 
 
@@ -153,14 +152,16 @@ async def test_analyser_reading_is_correct(
     expected_total_intensity = np.sum(spectrum)
     set_mock_value(sim_driver.spectrum, spectrum)
 
+    prefix = sim_driver.name + "-"
     await assert_reading(
         sim_driver,
         {
-            "sim_driver-excitation_energy": {"value": excitation_energy},
-            "sim_driver-image": {"value": []},
-            "sim_driver-spectrum": {"value": spectrum},
-            "sim_driver-total_intensity": {"value": expected_total_intensity},
+            f"{prefix}excitation_energy": value(excitation_energy),
+            f"{prefix}image": value([]),
+            f"{prefix}spectrum": value(spectrum),
+            f"{prefix}total_intensity": value(expected_total_intensity),
         },
+        full_match=True,
     )
 
 

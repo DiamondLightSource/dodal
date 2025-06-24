@@ -41,6 +41,10 @@ def get_test_sequence_type(key: type) -> type[AbstractBaseSequence]:
     return TEST_SEQUENCES[key][SEQUENCE_TYPE_KEY]
 
 
+def value(val: Any) -> dict[str, Any]:
+    return {"value": val}
+
+
 TEST_SEQUENCE_REGION_NAMES = ["New_Region", "New_Region1"]
 
 
