@@ -197,6 +197,7 @@ def test_analyser_raise_error_on_invalid_energy_source_selected(
         sim_driver._get_energy_source("invalid_name")
 
 
+@pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
 def test_driver_throws_error_with_wrong_typed_modes(
     sim_driver: AbstractAnalyserDriverIO,
     region: AbstractBaseRegion,
