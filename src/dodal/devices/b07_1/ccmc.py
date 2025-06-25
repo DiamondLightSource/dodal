@@ -17,6 +17,7 @@ class CCMCPositions(StrictEnum):
 
 ccmc_lower_limit = 1500.0
 ccmc_upper_limit = 3000.0
+error_message = "Can not get energy value in ev from ccmc position: "
 
 
 class CCMC(XYZStage):
@@ -56,9 +57,10 @@ class CCMC(XYZStage):
         with self.add_children_as_readables():
             # Must be a CHILD as read() must return this signal
             self.crystal = epics_signal_rw(positions, prefix + "CRYSTAL:MP:SELECT")
-            self.energy_in_ev = derived_signal_r(
-                self._convert_pos_to_eV, pos_signal=self.crystal
-            )
+
+        self.energy_in_ev = derived_signal_r(
+            self._convert_pos_to_eV, pos_signal=self.crystal
+        )
 
         super().__init__(prefix, name)
 
@@ -67,4 +69,4 @@ class CCMC(XYZStage):
             energy = float(str(pos_signal.value).split("Xtal_")[1])
             if ccmc_lower_limit < energy < ccmc_upper_limit:
                 return energy
-        return 0.0
+        raise ValueError(error_message + pos_signal.name)

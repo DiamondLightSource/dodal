@@ -43,7 +43,6 @@ async def test_reading(mock_ccmc: CCMC):
         mock_ccmc,
         {
             f"{mock_ccmc.name}-crystal": {"value": CCMCPositions.OUT},
-            f"{mock_ccmc.name}-energy_in_ev": {"value": 0.0},
             f"{mock_ccmc.name}-x": {"value": 0.0},
             f"{mock_ccmc.name}-y": {"value": 0.0},
             f"{mock_ccmc.name}-z": {"value": 0.0},
@@ -65,17 +64,19 @@ async def test_move_crystal(
         await mock_ccmc.crystal.set(TestEnum.POS_100)
 
 
-@pytest.mark.parametrize("position", list(CCMCPositions))
+@pytest.mark.parametrize(
+    "position", list(CCMCPositions), ids=[c.name for c in CCMCPositions]
+)
 async def test_get_energy_in_ev(
     position: CCMCPositions,
     mock_ccmc: CCMC,
-    RE: RunEngine,
 ):
     if position == CCMCPositions.OUT:
-        RE(mv(mock_ccmc.crystal, position))
-        await assert_value(mock_ccmc.energy_in_ev, 0.0)
+        await mock_ccmc.crystal.set(position)
+        with pytest.raises(ValueError):
+            await mock_ccmc.energy_in_ev.get_value()
     else:
-        RE(mv(mock_ccmc.crystal, position))
+        await mock_ccmc.crystal.set(position)
         await assert_value(
             mock_ccmc.energy_in_ev, float(str(position.value).split("Xtal_")[1])
         )
