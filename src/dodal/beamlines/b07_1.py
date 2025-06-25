@@ -28,6 +28,7 @@ def ccmc() -> CCMC:
     return CCMC(prefix=f"{PREFIX.beamline_prefix}-OP-CCM-01:", positions=CCMCPositions)
 
 
+@device_factory()
 def analyser_driver() -> SpecsAnalyserDriverIO:
     energy_sources = {
         "source1": pgm().energy.user_readback,
