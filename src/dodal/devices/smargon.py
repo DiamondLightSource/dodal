@@ -171,6 +171,6 @@ class Smargon(StandardReadable, Movable):
             for k, v in value.items():
                 if v is not None:
                     tasks.append(getattr(self, k).set(v))
-            await asyncio.gather(*tasks)
         finally:
             await self.defer_move.set(DeferMoves.OFF)
+        await asyncio.gather(*tasks)
