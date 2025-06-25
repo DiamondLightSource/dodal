@@ -12,6 +12,7 @@ from ophyd_async.testing import (
     assert_reading,
     callback_on_mock_put,
     get_mock_put,
+    partial_reading,
     set_mock_value,
 )
 
@@ -290,18 +291,10 @@ async def test_phase_success_set(mock_phaseAxes: UndulatorPhaseAxes, RE: RunEngi
     await assert_reading(
         mock_phaseAxes,
         {
-            "mock_phaseAxes-top_inner-user_readback": {
-                "value": 3,
-            },
-            "mock_phaseAxes-top_outer-user_readback": {
-                "value": 2,
-            },
-            "mock_phaseAxes-btm_inner-user_readback": {
-                "value": 5,
-            },
-            "mock_phaseAxes-btm_outer-user_readback": {
-                "value": 7,
-            },
+            "mock_phaseAxes-top_inner-user_readback": partial_reading(3),
+            "mock_phaseAxes-top_outer-user_readback": partial_reading(2),
+            "mock_phaseAxes-btm_inner-user_readback": partial_reading(5),
+            "mock_phaseAxes-btm_outer-user_readback": partial_reading(7),
         },
     )
 
