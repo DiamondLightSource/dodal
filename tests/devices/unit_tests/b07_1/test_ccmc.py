@@ -65,11 +65,17 @@ async def test_move_crystal(
         await mock_ccmc.crystal.set(TestEnum.POS_100)
 
 
+@pytest.mark.parametrize("position", list(CCMCPositions))
 async def test_get_energy_in_ev(
+    position: CCMCPositions,
     mock_ccmc: CCMC,
     RE: RunEngine,
 ):
-    await assert_value(mock_ccmc.crystal, CCMCPositions.OUT)
-    await assert_value(mock_ccmc.energy_in_ev, 0.0)
-    RE(mv(mock_ccmc.crystal, CCMCPositions.XTAL_2250))
-    await assert_value(mock_ccmc.energy_in_ev, 2250.0)
+    if position == CCMCPositions.OUT:
+        RE(mv(mock_ccmc.crystal, position))
+        await assert_value(mock_ccmc.energy_in_ev, 0.0)
+    else:
+        RE(mv(mock_ccmc.crystal, position))
+        await assert_value(
+            mock_ccmc.energy_in_ev, float(str(position.value).split("Xtal_")[1])
+        )

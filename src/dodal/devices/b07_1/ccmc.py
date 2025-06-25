@@ -15,6 +15,10 @@ class CCMCPositions(StrictEnum):
     XTAL_2500 = "Xtal_2500"
 
 
+ccmc_lower_limit = 1500.0
+ccmc_upper_limit = 3000.0
+
+
 class CCMC(XYZStage):
     """
     Device to move the channel cut monochromator (ccmc). CCMC has three
@@ -60,5 +64,7 @@ class CCMC(XYZStage):
 
     def _convert_pos_to_eV(self, pos_signal: CCMCPositions) -> float:
         if pos_signal != CCMCPositions.OUT:
-            return float(str(pos_signal.value).split("Xtal_")[1])
+            energy = float(str(pos_signal.value).split("Xtal_")[1])
+            if ccmc_lower_limit < energy < ccmc_upper_limit:
+                return energy
         return 0.0
