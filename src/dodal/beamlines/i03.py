@@ -371,6 +371,7 @@ def zocalo() -> ZocaloResults:
     return ZocaloResults(
         name="zocalo",
         prefix=PREFIX.beamline_prefix,
+        use_gpu=True
     )
 
 
