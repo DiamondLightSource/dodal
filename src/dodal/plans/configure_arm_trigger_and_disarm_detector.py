@@ -3,8 +3,8 @@ import time
 import bluesky.plan_stubs as bps
 from bluesky import preprocessors as bpp
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import DetectorTrigger
-from ophyd_async.fastcs.eiger import EigerDetector, EigerTriggerInfo
+from ophyd_async.core import DetectorTrigger, TriggerInfo
+from ophyd_async.fastcs.eiger import EigerDetector
 
 from dodal.beamlines.i03 import fastcs_eiger
 from dodal.devices.detector import DetectorParams
@@ -15,7 +15,7 @@ from dodal.log import LOGGER, do_default_logging_setup
 def configure_arm_trigger_and_disarm_detector(
     eiger: EigerDetector,
     detector_params: DetectorParams,
-    trigger_info: EigerTriggerInfo,
+    trigger_info: TriggerInfo,
 ):
     assert detector_params.expected_energy_ev
     start = time.time()
@@ -157,9 +157,8 @@ if __name__ == "__main__":
                 use_roi_mode=False,
                 det_dist_to_beam_converter_path="/dls_sw/i03/software/daq_configuration/lookup/DetDistToBeamXYConverter.txt",
             ),
-            trigger_info=EigerTriggerInfo(
+            trigger_info=TriggerInfo(
                 number_of_events=1,
-                energy_ev=12800,
                 trigger=DetectorTrigger.INTERNAL,
                 deadtime=0.0001,
             ),
