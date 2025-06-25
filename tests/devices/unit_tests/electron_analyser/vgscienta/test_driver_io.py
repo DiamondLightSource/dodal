@@ -9,6 +9,7 @@ from ophyd_async.testing import (
     assert_configuration,
     assert_value,
     get_mock_put,
+    partial_reading,
     set_mock_value,
 )
 
@@ -23,7 +24,6 @@ from dodal.devices.electron_analyser.vgscienta import (
 from dodal.devices.i09 import LensMode, PassEnergy, PsuMode
 from tests.devices.unit_tests.electron_analyser.util import (
     TEST_SEQUENCE_REGION_NAMES,
-    value,
 )
 
 
@@ -87,13 +87,13 @@ async def test_analyser_sets_region_and_reads_correctly(
     await assert_configuration(
         sim_driver,
         {
-            f"{prefix}centre_energy": value(expected_centre_e),
-            f"{prefix}detector_mode": value(region.detector_mode),
-            f"{prefix}energy_step": value(region.energy_step),
-            f"{prefix}first_x_channel": value(region.first_x_channel),
-            f"{prefix}x_channel_size": value(region.x_channel_size()),
-            f"{prefix}first_y_channel": value(region.first_y_channel),
-            f"{prefix}y_channel_size": value(region.y_channel_size()),
+            f"{prefix}centre_energy": partial_reading(expected_centre_e),
+            f"{prefix}detector_mode": partial_reading(region.detector_mode),
+            f"{prefix}energy_step": partial_reading(region.energy_step),
+            f"{prefix}first_x_channel": partial_reading(region.first_x_channel),
+            f"{prefix}x_channel_size": partial_reading(region.x_channel_size()),
+            f"{prefix}first_y_channel": partial_reading(region.first_y_channel),
+            f"{prefix}y_channel_size": partial_reading(region.y_channel_size()),
         },
         full_match=False,
     )

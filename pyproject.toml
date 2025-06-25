@@ -14,7 +14,7 @@ description = "Ophyd devices and other utils that could be used across DLS beaml
 dependencies = [
     "click",
     "ophyd",
-    "ophyd-async@git+https://github.com/bluesky/ophyd-async.git@fix_assert_resading_test",
+    "ophyd-async@git+https://github.com/bluesky/ophyd-async.git@add_partial_reading",
     "bluesky",
     "pyepics",
     "dataclasses-json",

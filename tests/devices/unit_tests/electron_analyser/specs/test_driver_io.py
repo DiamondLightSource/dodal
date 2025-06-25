@@ -6,6 +6,7 @@ from ophyd_async.testing import (
     assert_configuration,
     assert_value,
     get_mock_put,
+    partial_reading,
     set_mock_value,
 )
 
@@ -18,7 +19,6 @@ from dodal.devices.electron_analyser.specs import (
 )
 from tests.devices.unit_tests.electron_analyser.util import (
     TEST_SEQUENCE_REGION_NAMES,
-    value,
 )
 
 
@@ -67,10 +67,14 @@ async def test_analyser_sets_region_and_configuration_is_correct(
     await assert_configuration(
         sim_driver,
         {
-            f"{prefix}centre_energy": value(await sim_driver.centre_energy.get_value()),
-            f"{prefix}energy_step": value(await sim_driver.energy_step.get_value()),
-            f"{prefix}psu_mode": value(region.psu_mode),
-            f"{prefix}snapshot_values": value(region.values),
+            f"{prefix}centre_energy": partial_reading(
+                await sim_driver.centre_energy.get_value()
+            ),
+            f"{prefix}energy_step": partial_reading(
+                await sim_driver.energy_step.get_value()
+            ),
+            f"{prefix}psu_mode": partial_reading(region.psu_mode),
+            f"{prefix}snapshot_values": partial_reading(region.values),
         },
         full_match=False,
     )
