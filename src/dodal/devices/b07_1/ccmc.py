@@ -59,12 +59,12 @@ class CCMC(XYZStage):
             self.crystal = epics_signal_rw(positions, prefix + "CRYSTAL:MP:SELECT")
 
         self.energy_in_ev = derived_signal_r(
-            self._convert_pos_to_eV, pos_signal=self.crystal
+            self._convert_pos_to_ev, pos_signal=self.crystal
         )
 
         super().__init__(prefix, name)
 
-    def _convert_pos_to_eV(self, pos_signal: CCMCPositions) -> float:
+    def _convert_pos_to_ev(self, pos_signal: CCMCPositions) -> float:
         if pos_signal != CCMCPositions.OUT:
             energy = float(str(pos_signal.value).split("Xtal_")[1])
             if ccmc_lower_limit < energy < ccmc_upper_limit:

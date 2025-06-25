@@ -9,7 +9,7 @@ from ophyd_async.testing import assert_configuration, assert_reading, assert_val
 from dodal.devices.b07_1.ccmc import CCMC, CCMCPositions
 
 
-class TestEnum(StrictEnum):
+class WrongEnum(StrictEnum):
     POS_100 = 100.0
 
 
@@ -59,9 +59,9 @@ async def test_move_crystal(
     await assert_value(mock_ccmc.crystal, CCMCPositions.XTAL_2000)
     with pytest.raises(
         ValueError,
-        match=re.escape(" is not a valid CCMCPositions"),
+        match=re.escape("is not a valid CCMCPositions"),
     ):
-        await mock_ccmc.crystal.set(TestEnum.POS_100)
+        await mock_ccmc.crystal.set(WrongEnum.POS_100)
 
 
 @pytest.mark.parametrize(
