@@ -1,58 +1,75 @@
+import re
+
 import pytest
 from bluesky.plan_stubs import mv
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import init_devices
+from ophyd_async.core import StrictEnum, init_devices
 from ophyd_async.testing import assert_configuration, assert_reading, assert_value
 
 from dodal.devices.b07_1.ccmc import CCMC, CCMCPositions
 
 
+class TestEnum(StrictEnum):
+    POS_100 = 100.0
+
+
 @pytest.fixture
-async def mock_CCMC(RE: RunEngine) -> CCMC:
+async def mock_ccmc(RE: RunEngine) -> CCMC:
     async with init_devices(mock=True):
-        mock_CCMC = CCMC(prefix="", positions=CCMCPositions)
-    return mock_CCMC
+        mock_ccmc = CCMC(prefix="", positions=CCMCPositions)
+    return mock_ccmc
 
 
-async def test_read_config_includes(mock_CCMC: CCMC):
+async def test_read_config_includes(mock_ccmc: CCMC):
     await assert_configuration(
-        mock_CCMC,
+        mock_ccmc,
         {
-            f"{mock_CCMC.name}-y_rotation": {
-                "value": 0.0,
-            },
-            f"{mock_CCMC.name}-x": {
-                "value": 0.0,
-            },
-            f"{mock_CCMC.name}-y": {
-                "value": 0.0,
-            },
-            f"{mock_CCMC.name}-z": {
-                "value": 0.0,
-            },
+            f"{mock_ccmc.name}-y_rotation": {"value": 0.0},
+            f"{mock_ccmc.name}-x-motor_egu": {"value": ""},
+            f"{mock_ccmc.name}-x-offset": {"value": 0.0},
+            f"{mock_ccmc.name}-x-velocity": {"value": 0.0},
+            f"{mock_ccmc.name}-y-motor_egu": {"value": ""},
+            f"{mock_ccmc.name}-y-offset": {"value": 0.0},
+            f"{mock_ccmc.name}-y-velocity": {"value": 0.0},
+            f"{mock_ccmc.name}-z-motor_egu": {"value": ""},
+            f"{mock_ccmc.name}-z-offset": {"value": 0.0},
+            f"{mock_ccmc.name}-z-velocity": {"value": 0.0},
         },
     )
 
 
-async def test_reading(mock_CCMC: CCMC):
+async def test_reading(mock_ccmc: CCMC):
     await assert_reading(
-        mock_CCMC,
+        mock_ccmc,
         {
-            f"{mock_CCMC.name}-pos_select": {
-                "value": CCMCPositions.OUT,
-            },
-            f"{mock_CCMC.name}-energy_in_ev": {
-                "value": 0.0,
-            },
+            f"{mock_ccmc.name}-crystal": {"value": CCMCPositions.OUT},
+            f"{mock_ccmc.name}-energy_in_ev": {"value": 0.0},
+            f"{mock_ccmc.name}-x": {"value": 0.0},
+            f"{mock_ccmc.name}-y": {"value": 0.0},
+            f"{mock_ccmc.name}-z": {"value": 0.0},
         },
     )
 
 
 async def test_move_crystal(
-    mock_CCMC: CCMC,
+    mock_ccmc: CCMC,
     RE: RunEngine,
 ):
-    await assert_value(mock_CCMC.pos_select, CCMCPositions.OUT.value)
-    RE(mv(mock_CCMC.pos_select, CCMCPositions.XTAL_2000.value))
-    await assert_value(mock_CCMC.pos_select, CCMCPositions.XTAL_2000.value)
-    await assert_value(mock_CCMC.energy_in_ev, 2000.0)
+    await assert_value(mock_ccmc.crystal, CCMCPositions.OUT)
+    RE(mv(mock_ccmc.crystal, CCMCPositions.XTAL_2000))
+    await assert_value(mock_ccmc.crystal, CCMCPositions.XTAL_2000)
+    with pytest.raises(
+        ValueError,
+        match=re.escape(" is not a valid CCMCPositions"),
+    ):
+        await mock_ccmc.crystal.set(TestEnum.POS_100)
+
+
+async def test_get_energy_in_ev(
+    mock_ccmc: CCMC,
+    RE: RunEngine,
+):
+    await assert_value(mock_ccmc.crystal, CCMCPositions.OUT)
+    await assert_value(mock_ccmc.energy_in_ev, 0.0)
+    RE(mv(mock_ccmc.crystal, CCMCPositions.XTAL_2250))
+    await assert_value(mock_ccmc.energy_in_ev, 2250.0)

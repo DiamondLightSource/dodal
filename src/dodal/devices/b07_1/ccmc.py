@@ -1,10 +1,11 @@
 from ophyd_async.core import (
-    StandardReadable,
     StandardReadableFormat,
     StrictEnum,
     derived_signal_r,
 )
 from ophyd_async.epics.core import epics_signal_rw
+
+from dodal.devices.motors import XYZStage
 
 
 class CCMCPositions(StrictEnum):
@@ -14,7 +15,7 @@ class CCMCPositions(StrictEnum):
     XTAL_2500 = "Xtal_2500"
 
 
-class CCMC(StandardReadable):
+class CCMC(XYZStage):
     """
     Device to move the channel cut monochromator (ccmc). CCMC has three
     choices of crystal (Xtal for short). Setting energy is by means of a
@@ -41,10 +42,6 @@ class CCMC(StandardReadable):
             Name of the device
         """
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
-            # normal motors in epics
-            self.x = epics_signal_rw(float, prefix + "X")
-            self.y = epics_signal_rw(float, prefix + "Y")
-            self.z = epics_signal_rw(float, prefix + "Z")
             # piezo motor in epics
             self.y_rotation = epics_signal_rw(
                 float,
@@ -54,12 +51,12 @@ class CCMC(StandardReadable):
 
         with self.add_children_as_readables():
             # Must be a CHILD as read() must return this signal
-            self.pos_select = epics_signal_rw(positions, prefix + "CRYSTAL:MP:SELECT")
+            self.crystal = epics_signal_rw(positions, prefix + "CRYSTAL:MP:SELECT")
             self.energy_in_ev = derived_signal_r(
-                self._convert_pos_to_eV, pos_signal=self.pos_select
+                self._convert_pos_to_eV, pos_signal=self.crystal
             )
 
-        super().__init__(name)
+        super().__init__(prefix, name)
 
     def _convert_pos_to_eV(self, pos_signal: CCMCPositions) -> float:
         if pos_signal != CCMCPositions.OUT:
