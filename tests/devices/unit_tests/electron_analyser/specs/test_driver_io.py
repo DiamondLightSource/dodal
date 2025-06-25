@@ -2,7 +2,12 @@ import numpy as np
 import pytest
 from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
-from ophyd_async.testing import assert_configuration, get_mock_put, set_mock_value
+from ophyd_async.testing import (
+    assert_configuration,
+    assert_value,
+    get_mock_put,
+    set_mock_value,
+)
 
 from dodal.devices.b07 import LensMode, PsuMode
 from dodal.devices.electron_analyser import EnergyMode, to_kinetic_energy
@@ -88,10 +93,7 @@ async def test_specs_analyser_binding_energy_axis(
     expected_binding_energy_axis = np.array(
         [excitation_energy - e if is_binding else e for e in energy_axis]
     )
-    assert np.array_equal(
-        await sim_driver.binding_energy_axis.get_value(),
-        expected_binding_energy_axis,
-    )
+    await assert_value(sim_driver.binding_energy_axis, expected_binding_energy_axis)
 
 
 async def test_specs_analyser_energy_axis(
@@ -106,9 +108,8 @@ async def test_specs_analyser_energy_axis(
     RE(bps.mv(sim_driver.high_energy, end_energy))
     set_mock_value(sim_driver.energy_channels, total_points_iterations)
 
-    energy_axis = await sim_driver.energy_axis.get_value()
     expected_energy_axis = [1.0, 1.9, 2.8, 3.7, 4.6, 5.5, 6.4, 7.3, 8.2, 9.1, 10.0]
-    np.testing.assert_array_equal(energy_axis, expected_energy_axis)
+    await assert_value(sim_driver.energy_axis, expected_energy_axis)
 
 
 async def test_specs_analyser_angle_axis(
@@ -123,6 +124,5 @@ async def test_specs_analyser_angle_axis(
     set_mock_value(sim_driver.max_angle_axis, max_angle)
     RE(bps.mv(sim_driver.slices, slices))
 
-    angle_axis = await sim_driver.angle_axis.get_value()
     expected_angle_axis = [2.0, 4.0, 6.0, 8.0, 10.0, 12.0, 14.0, 16.0, 18.0, 20.0]
-    np.testing.assert_array_equal(angle_axis, expected_angle_axis)
+    await assert_value(sim_driver.angle_axis, expected_angle_axis)

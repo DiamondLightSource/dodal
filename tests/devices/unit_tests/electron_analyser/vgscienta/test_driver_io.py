@@ -3,7 +3,12 @@ import pytest
 from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
 from ophyd_async.epics.adcore import ADImageMode
-from ophyd_async.testing import assert_configuration, get_mock_put, set_mock_value
+from ophyd_async.testing import (
+    assert_configuration,
+    assert_value,
+    get_mock_put,
+    set_mock_value,
+)
 
 from dodal.devices.electron_analyser import (
     EnergyMode,
@@ -108,7 +113,4 @@ async def test_analayser_binding_energy_is_correct(
     expected_binding_energy_axis = np.array(
         [excitation_energy - e if is_binding else e for e in energy_axis]
     )
-    assert np.array_equal(
-        await sim_driver.binding_energy_axis.get_value(),
-        expected_binding_energy_axis,
-    )
+    await assert_value(sim_driver.binding_energy_axis, expected_binding_energy_axis)
