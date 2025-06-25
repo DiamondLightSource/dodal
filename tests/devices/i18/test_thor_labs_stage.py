@@ -1,6 +1,6 @@
 import pytest
 from ophyd_async.core import init_devices
-from ophyd_async.testing import assert_reading, set_mock_value
+from ophyd_async.testing import assert_reading, partial_reading, set_mock_value
 
 from dodal.devices.i18.thor_labs_stage import ThorLabsStage
 
@@ -21,12 +21,8 @@ async def test_setting(thor_labs_stage: ThorLabsStage):
     await assert_reading(
         thor_labs_stage,
         {
-            "thor_labs_stage-x": {
-                "value": 0.0,
-            },
-            "thor_labs_stage-y": {
-                "value": 0.0,
-            },
+            "thor_labs_stage-x": partial_reading(0.0),
+            "thor_labs_stage-y": partial_reading(0.0),
         },
     )
 
@@ -38,11 +34,7 @@ async def test_setting(thor_labs_stage: ThorLabsStage):
     await assert_reading(
         thor_labs_stage,
         {
-            "thor_labs_stage-x": {
-                "value": 5.0,
-            },
-            "thor_labs_stage-y": {
-                "value": 5.0,
-            },
+            "thor_labs_stage-x": partial_reading(5.0),
+            "thor_labs_stage-y": partial_reading(5.0),
         },
     )

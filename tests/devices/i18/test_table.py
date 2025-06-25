@@ -1,6 +1,6 @@
 import pytest
 from ophyd_async.core import init_devices
-from ophyd_async.testing import assert_reading, set_mock_value
+from ophyd_async.testing import assert_reading, partial_reading, set_mock_value
 
 from dodal.devices.i18.table import Table
 
@@ -21,18 +21,10 @@ async def test_setting_xy_position_table(table: Table):
     await assert_reading(
         table,
         {
-            "table-y": {
-                "value": 0.0,
-            },
-            "table-x": {
-                "value": 0.0,
-            },
-            "table-theta": {
-                "value": 0.0,
-            },
-            "table-z": {
-                "value": 0.0,
-            },
+            "table-y": partial_reading(0.0),
+            "table-x": partial_reading(0.0),
+            "table-theta": partial_reading(0.0),
+            "table-z": partial_reading(0.0),
         },
     )
 
@@ -43,18 +35,10 @@ async def test_setting_xy_position_table(table: Table):
     await assert_reading(
         table,
         {
-            "table-y": {
-                "value": 4.56,
-            },
-            "table-x": {
-                "value": 1.23,
-            },
-            "table-theta": {
-                "value": 0.0,
-            },
-            "table-z": {
-                "value": 0,
-            },
+            "table-y": partial_reading(4.56),
+            "table-x": partial_reading(1.23),
+            "table-theta": partial_reading(0.0),
+            "table-z": partial_reading(0),
         },
     )
 
@@ -66,18 +50,10 @@ async def test_setting_xyztheta_position_table(table: Table):
     await assert_reading(
         table,
         {
-            "table-y": {
-                "value": 0.0,
-            },
-            "table-x": {
-                "value": 0.0,
-            },
-            "table-theta": {
-                "value": 0.0,
-            },
-            "table-z": {
-                "value": 0.0,
-            },
+            "table-y": partial_reading(0.0),
+            "table-x": partial_reading(0.0),
+            "table-theta": partial_reading(0.0),
+            "table-z": partial_reading(0.0),
         },
     )
 
@@ -90,17 +66,9 @@ async def test_setting_xyztheta_position_table(table: Table):
     await assert_reading(
         table,
         {
-            "table-y": {
-                "value": 4.56,
-            },
-            "table-x": {
-                "value": 1.23,
-            },
-            "table-theta": {
-                "value": 10.11,
-            },
-            "table-z": {
-                "value": 7.89,
-            },
+            "table-y": partial_reading(4.56),
+            "table-x": partial_reading(1.23),
+            "table-theta": partial_reading(10.11),
+            "table-z": partial_reading(7.89),
         },
     )

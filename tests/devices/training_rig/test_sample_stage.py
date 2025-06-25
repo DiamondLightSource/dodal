@@ -1,6 +1,6 @@
 import pytest
 from ophyd_async.core import init_devices
-from ophyd_async.testing import assert_reading
+from ophyd_async.testing import assert_reading, partial_reading
 
 from dodal.devices.training_rig.sample_stage import TrainingRigSampleStage
 
@@ -17,11 +17,7 @@ async def test_reading_training_rig(stage: TrainingRigSampleStage):
     await assert_reading(
         stage,
         {
-            "stage-theta": {
-                "value": 0.0,
-            },
-            "stage-x": {
-                "value": 0.0,
-            },
+            "stage-theta": partial_reading(0.0),
+            "stage-x": partial_reading(0.0),
         },
     )
