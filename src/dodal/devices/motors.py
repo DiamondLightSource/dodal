@@ -108,6 +108,7 @@ class SixAxisGonio(XYZStage):
         super().__init__(prefix, name, x_infix, y_infix, z_infix)
 
 
+
 class YZStage(Stage):
     def __init__(
         self, prefix: str, name: str = "", y_infix: str = _Y, z_infix: str = _Z

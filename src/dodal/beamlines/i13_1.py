@@ -52,7 +52,6 @@ def side_camera() -> AravisDetector:
 def merlin() -> Merlin:
     return Merlin(
         prefix=f"{PREFIX}-EA-DET-04:",
-        name="merlin",
         drv_suffix="CAM:",
         fileio_suffix="HDF5:",
         path_provider=get_path_provider(),

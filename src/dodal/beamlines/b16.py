@@ -62,7 +62,6 @@ def fds2() -> AreaDetector:
 def sim_stage() -> XYZStage:
     return XYZStage(
         f"{PREFIX.beamline_prefix}-MO-SIM-01:",
-        "sim_stage",
         x_infix="M1",
         y_infix="M2",
         z_infix="M3",

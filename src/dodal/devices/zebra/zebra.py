@@ -286,7 +286,7 @@ class SoftInputs(StandardReadable):
 class Zebra(StandardReadable):
     """The Zebra device."""
 
-    def __init__(self, mapping: ZebraMapping, name: str, prefix: str) -> None:
+    def __init__(self, mapping: ZebraMapping, prefix: str, name: str = "") -> None:
         self.mapping = mapping
         self.pc = PositionCompare(prefix, name)
         self.output = ZebraOutputPanel(prefix, name)

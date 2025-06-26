@@ -12,6 +12,7 @@ from ophyd_async.core import (
     soft_signal_rw,
 )
 from PIL import Image
+from yarl import URL
 
 from dodal.log import LOGGER
 
@@ -26,7 +27,7 @@ def create_placeholder_image() -> ByteString:
 
 
 class Webcam(StandardReadable, Triggerable):
-    def __init__(self, name, prefix, url):
+    def __init__(self, url: URL, name: str = ""):
         self.url = url
         self.filename = soft_signal_rw(str, name="filename")
         self.directory = soft_signal_rw(str, name="directory")
