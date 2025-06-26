@@ -249,17 +249,17 @@ async def test_ophyd_async_logger_configured(dodal_logger_for_tests):
     stream_handler: logging.StreamHandler = dodal_logger_for_tests.handlers[0]
     stream_handler.level = logging.DEBUG
     stream_handler.stream.write = MagicMock()
-    test_signal_name = "TEST SIGNAL NAME"
+    test_signal_name = "my_signal"
     test_device_name = "TEST DEVICE NAME"
 
     class _Device(Device):
         def __init__(self, name: str = test_device_name) -> None:
             super().__init__(name)
-            self.test_signal = soft_signal_rw(int, 0, test_signal_name)
+            self.my_signal = soft_signal_rw(int, 0)
 
     device = _Device()
     await device.connect()
-    assert f"[{test_signal_name}]" in stream_handler.stream.write.call_args.args[0]
+    assert f"{test_signal_name}" in stream_handler.stream.write.call_args.args[0]
     device.log.debug("test message")
     assert f"[{test_device_name}]" in stream_handler.stream.write.call_args.args[0]
 
