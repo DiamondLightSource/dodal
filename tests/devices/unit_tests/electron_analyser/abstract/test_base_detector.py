@@ -3,12 +3,8 @@ from unittest.mock import AsyncMock
 import pytest
 from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
-from ophyd_async.epics.motor import Motor
 
-from dodal.devices.electron_analyser import (
-    ElectronAnalyserDetector,
-    GenericElectronAnalyserDetector,
-)
+from dodal.devices.electron_analyser import GenericElectronAnalyserDetector
 from dodal.devices.electron_analyser.specs import SpecsDetector
 from dodal.devices.electron_analyser.vgscienta import VGScientaDetector
 from tests.devices.unit_tests.electron_analyser.util import get_test_sequence
@@ -17,17 +13,17 @@ from tests.devices.unit_tests.electron_analyser.util import get_test_sequence
 @pytest.fixture(params=[SpecsDetector, VGScientaDetector])
 def detector_class(
     request: pytest.FixtureRequest,
-) -> type[ElectronAnalyserDetector]:
+) -> type[GenericElectronAnalyserDetector]:
     return request.param
 
 
 @pytest.fixture
-def sequence_file_path(sim_detector: ElectronAnalyserDetector) -> str:
+def sequence_file_path(sim_detector: GenericElectronAnalyserDetector) -> str:
     return get_test_sequence(type(sim_detector))
 
 
 def test_analyser_detector_loads_sequence_correctly(
-    sim_detector: ElectronAnalyserDetector,
+    sim_detector: GenericElectronAnalyserDetector,
     sequence_file_path: str,
 ) -> None:
     seq = sim_detector.load_sequence(sequence_file_path)
@@ -67,22 +63,18 @@ def test_analyser_detector_has_driver_as_child_and_region_detector_does_not(
         assert det.driver.parent == sim_detector
 
 
-def test_analyser_region_detector_stage_prepares_driver_with_region(
+def test_analyser_region_detector_trigger_sets_driver_with_region(
     sim_detector: GenericElectronAnalyserDetector,
     sequence_file_path: str,
-    sim_energy_source: Motor,
     RE: RunEngine,
 ) -> None:
     region_detectors = sim_detector.create_region_detector_list(
         sequence_file_path, enabled_only=False
     )
-
     for reg_det in region_detectors:
-        reg_det.driver.prepare = AsyncMock()
         reg_det.driver.set = AsyncMock()
 
-        RE(bps.prepare(reg_det, sim_energy_source, wait=True))
-        reg_det.driver.prepare.assert_called_once_with(sim_energy_source)
+        RE(bps.trigger(reg_det, wait=True))
         reg_det.driver.set.assert_called_once_with(reg_det.region)
 
 

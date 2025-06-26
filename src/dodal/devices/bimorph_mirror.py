@@ -1,10 +1,8 @@
 import asyncio
-from collections.abc import Mapping
 from typing import Annotated as A
 
 from bluesky.protocols import Movable
 from ophyd_async.core import (
-    DEFAULT_TIMEOUT,
     AsyncStatus,
     DeviceVector,
     SignalR,
@@ -12,6 +10,7 @@ from ophyd_async.core import (
     SignalW,
     StandardReadable,
     StrictEnum,
+    set_and_wait_for_other_value,
     wait_for_value,
 )
 from ophyd_async.core import StandardReadableFormat as Format
@@ -22,6 +21,8 @@ from ophyd_async.epics.core import (
     epics_signal_w,
     epics_signal_x,
 )
+
+DEFAULT_TIMEOUT = 60
 
 
 class BimorphMirrorOnOff(StrictEnum):
@@ -41,7 +42,7 @@ class BimorphMirrorStatus(StrictEnum):
     ERROR = "Error"
 
 
-class BimorphMirrorChannel(StandardReadable, Movable[float], EpicsDevice):
+class BimorphMirrorChannel(StandardReadable, EpicsDevice):
     """Collection of PVs comprising a single bimorph channel.
 
     Attributes:
@@ -56,23 +57,13 @@ class BimorphMirrorChannel(StandardReadable, Movable[float], EpicsDevice):
     status: A[SignalR[BimorphMirrorOnOff], PvSuffix("STATUS"), Format.CONFIG_SIGNAL]
     shift: A[SignalW[float], PvSuffix("SHIFT")]
 
-    @AsyncStatus.wrap
-    async def set(self, value: float):
-        """Sets channel's VOUT to given value.
 
-        Args:
-            value: float to set VOUT to
-        """
-        await self.output_voltage.set(value)
-
-
-class BimorphMirror(StandardReadable, Movable[Mapping[int, float]]):
+class BimorphMirror(StandardReadable, Movable[list[float]]):
     """Class to represent CAENels Bimorph Mirrors.
 
     Attributes:
         channels: DeviceVector of BimorphMirrorChannel, indexed from 1, for each channel
         enabled: Writeable BimorphOnOff
-        commit_target_voltages: Procable signal that writes values in each channel's VTRGT to VOUT
         status: Readable BimorphMirrorStatus Busy/Idle status
         err: Alarm status"""
 
@@ -103,49 +94,51 @@ class BimorphMirror(StandardReadable, Movable[Mapping[int, float]]):
         super().__init__(name=name)
 
     @AsyncStatus.wrap
-    async def set(self, value: Mapping[int, float], tolerance: float = 0.0001) -> None:
-        """Sets bimorph voltages in parrallel via target voltage and all proc.
+    async def set(self, value: list[float]) -> None:
+        """Sets bimorph voltages in parallel via target voltage and all proc.
 
         Args:
-            value: Dict of channel numbers to target voltages
+            value: List of float target voltages
 
         Raises:
             ValueError: On set to non-existent channel"""
 
-        if any(key not in self.channels for key in value):
+        if len(value) != len(self.channels):
             raise ValueError(
-                f"Attempting to put to non-existent channels: {[key for key in value if (key not in self.channels)]}"
+                f"Length of value input array does not match number of \
+                             channels: {len(value)} and {len(self.channels)}"
             )
 
-        # Write target voltages:
-        await asyncio.gather(
-            *[
-                self.channels[i].target_voltage.set(target, wait=True)
-                for i, target in value.items()
-            ]
-        )
+        # Write target voltages in serial
+        # Voltages are written in serial as bimorph PSU cannot handle simultaneous sets
+        for i, target in enumerate(value):
+            await wait_for_value(
+                self.status, BimorphMirrorStatus.IDLE, timeout=DEFAULT_TIMEOUT
+            )
+            await set_and_wait_for_other_value(
+                self.channels[i + 1].target_voltage,
+                target,
+                self.status,
+                BimorphMirrorStatus.BUSY,
+            )
 
         # Trigger set target voltages:
+        await wait_for_value(
+            self.status, BimorphMirrorStatus.IDLE, timeout=DEFAULT_TIMEOUT
+        )
         await self.commit_target_voltages.trigger()
 
         # Wait for values to propogate to voltage out rbv:
         await asyncio.gather(
             *[
                 wait_for_value(
-                    self.channels[i].output_voltage,
-                    tolerance_func_builder(tolerance, target),
+                    self.channels[i + 1].output_voltage,
+                    target,
                     timeout=DEFAULT_TIMEOUT,
                 )
-                for i, target in value.items()
+                for i, target in enumerate(value)
             ],
             wait_for_value(
                 self.status, BimorphMirrorStatus.IDLE, timeout=DEFAULT_TIMEOUT
             ),
         )
-
-
-def tolerance_func_builder(tolerance: float, target_value: float):
-    def is_within_value(x):
-        return abs(x - target_value) <= tolerance
-
-    return is_within_value
