@@ -55,20 +55,16 @@ class GasInjector(StandardReadable):
         with self.add_children_as_readables():
             self.vacuum_pump = epics_signal_rw(int, prefix + "VACP1:CON")
             self.line_valve = epics_signal_rw(int, prefix + "V5:CON")
-            # Gas valves as a dict
-            self.gas_valves = {
-                GasToInject.KRYPTON: epics_signal_rw(int, prefix + "V1:CON"),
-                GasToInject.NITROGEN: epics_signal_rw(int, prefix + "V2:CON"),
-                GasToInject.ARGON: epics_signal_rw(int, prefix + "V3:CON"),
-                GasToInject.HELIUM: epics_signal_rw(int, prefix + "V4:CON"),
-            }
-            # Chamber valves as a dict
-            self.chambers = {
-                IonChamberToFill.i0: epics_signal_rw(int, prefix + "V6:CON"),
-                IonChamberToFill.iT: epics_signal_rw(int, prefix + "V7:CON"),
-                IonChamberToFill.iRef: epics_signal_rw(int, prefix + "V8:CON"),
-                IonChamberToFill.i1: epics_signal_rw(int, prefix + "V9:CON"),
-            }
+            # Gas valves as flat signals
+            self.gas_valve_krypton = epics_signal_rw(int, prefix + "V1:CON")
+            self.gas_valve_nitrogen = epics_signal_rw(int, prefix + "V2:CON")
+            self.gas_valve_argon = epics_signal_rw(int, prefix + "V3:CON")
+            self.gas_valve_helium = epics_signal_rw(int, prefix + "V4:CON")
+            # Chamber valves as flat signals
+            self.chamber_i0 = epics_signal_rw(int, prefix + "V6:CON")
+            self.chamber_it = epics_signal_rw(int, prefix + "V7:CON")
+            self.chamber_iref = epics_signal_rw(int, prefix + "V8:CON")
+            self.chamber_i1 = epics_signal_rw(int, prefix + "V9:CON")
             self.pressure_controller_1 = PressureController(
                 prefix + "PCTRL1:", name="pressure_controller_1"
             )
@@ -77,10 +73,30 @@ class GasInjector(StandardReadable):
             )
 
     def get_gas_valve(self, gas: GasToInject):
-        return self.gas_valves[gas]
+        match gas:
+            case GasToInject.KRYPTON:
+                return self.gas_valve_krypton
+            case GasToInject.NITROGEN:
+                return self.gas_valve_nitrogen
+            case GasToInject.ARGON:
+                return self.gas_valve_argon
+            case GasToInject.HELIUM:
+                return self.gas_valve_helium
+            case _:
+                raise ValueError(f"Unknown gas: {gas}")
 
     def get_chamber_valve(self, chamber: IonChamberToFill):
-        return self.chambers[chamber]
+        match chamber:
+            case IonChamberToFill.i0:
+                return self.chamber_i0
+            case IonChamberToFill.iT:
+                return self.chamber_it
+            case IonChamberToFill.iRef:
+                return self.chamber_iref
+            case IonChamberToFill.i1:
+                return self.chamber_i1
+            case _:
+                raise ValueError(f"Unknown chamber: {chamber}")
 
     async def wait_for_equilibration(
         self,
