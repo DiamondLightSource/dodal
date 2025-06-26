@@ -97,7 +97,7 @@ class BartRobot(StandardReadable, Movable[SampleLocation]):
         self.controller_error = ErrorStatus(prefix + "CNTL")
 
         self.reset = epics_signal_x(prefix + "RESET.PROC")
-        self.stop = epics_signal_x(prefix + "ABORT.PROC")
+        self.abort = epics_signal_x(prefix + "ABORT.PROC")
         self.init = epics_signal_x(prefix + "INIT.PROC")
         self.soak = epics_signal_x(prefix + "SOAK.PROC")
         self.home = epics_signal_x(prefix + "GOHM.PROC")
