@@ -4,13 +4,17 @@ import pytest
 from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
 
-from dodal.devices.electron_analyser import GenericElectronAnalyserDetector
+import dodal.devices.b07 as b07
+import dodal.devices.i09 as i09
+from dodal.devices.electron_analyser import (
+    GenericElectronAnalyserDetector,
+)
 from dodal.devices.electron_analyser.specs import SpecsDetector
 from dodal.devices.electron_analyser.vgscienta import VGScientaDetector
 from tests.devices.unit_tests.electron_analyser.util import get_test_sequence
 
 
-@pytest.fixture(params=[SpecsDetector, VGScientaDetector])
+@pytest.fixture(params=[SpecsDetector[b07.LensMode], VGScientaDetector[i09.LensMode]])
 def detector_class(
     request: pytest.FixtureRequest,
 ) -> type[GenericElectronAnalyserDetector]:
@@ -18,7 +22,9 @@ def detector_class(
 
 
 @pytest.fixture
-def sequence_file_path(sim_detector: GenericElectronAnalyserDetector) -> str:
+def sequence_file_path(
+    sim_detector: GenericElectronAnalyserDetector,
+) -> str:
     return get_test_sequence(type(sim_detector))
 
 

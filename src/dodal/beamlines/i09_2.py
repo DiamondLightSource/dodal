@@ -2,7 +2,7 @@ from dodal.common.beamlines.beamline_utils import (
     device_factory,
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.devices.i09.grating import I09Grating
+from dodal.devices.i09.enums import Grating
 from dodal.devices.pgm import PGM
 from dodal.devices.synchrotron import Synchrotron
 from dodal.log import set_beamline as set_log_beamline
@@ -21,4 +21,4 @@ def synchrotron() -> Synchrotron:
 
 @device_factory()
 def pgm() -> PGM:
-    return PGM(prefix=f"{PREFIX.beamline_prefix}-MO-PGM-01:", grating=I09Grating)
+    return PGM(prefix=f"{PREFIX.beamline_prefix}-MO-PGM-01:", grating=Grating)
