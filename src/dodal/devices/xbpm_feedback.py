@@ -2,6 +2,8 @@ from bluesky.protocols import Triggerable
 from ophyd_async.core import AsyncStatus, Device, StrictEnum, observe_value
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
+from dodal.common.device_utils import periodic_reminder
+
 
 class Pause(StrictEnum):
     PAUSE = "Paused"  # 0
@@ -22,6 +24,7 @@ class XBPMFeedback(Device, Triggerable):
 
     @AsyncStatus.wrap
     async def trigger(self):
-        async for value in observe_value(self.pos_stable):
-            if value:
-                return
+        async with periodic_reminder("Waiting for XBPM"):
+            async for value in observe_value(self.pos_stable):
+                if value:
+                    return
