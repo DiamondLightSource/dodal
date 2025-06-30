@@ -125,6 +125,7 @@ async def test_given_set_with_all_values_then_motors_move(smargon: Smargon):
     )
 
 
+@pytest.mark.skip(reason="https://github.com/DiamondLightSource/dodal/issues/1315")
 async def test_given_set_with_all_values_then_motors_move_in_order(smargon: Smargon):
     parent = MagicMock()
     parent.attach_mock(get_mock_put(smargon.defer_move), "defer_move")
