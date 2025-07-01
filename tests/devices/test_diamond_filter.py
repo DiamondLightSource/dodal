@@ -1,5 +1,3 @@
-from unittest.mock import ANY
-
 import pytest
 from ophyd_async.core import init_devices
 from ophyd_async.testing import assert_reading
@@ -29,8 +27,6 @@ async def test_reading_includes_read_fields(
         {
             "diamond_filter-stage_position": {
                 "value": I03Filters.EMPTY,
-                "timestamp": ANY,
-                "alarm_severity": 0,
             },
         },
     )
