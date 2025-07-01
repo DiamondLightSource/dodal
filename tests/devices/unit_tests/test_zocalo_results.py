@@ -203,7 +203,6 @@ async def test_zocalo_results_trigger_log_message(
         name="zocalo",
         zocalo_environment=ZOCALO_ENV,
         timeout_s=0,
-        use_cpu_and_gpu=True,
     )
 
     recipe_wrapper = MagicMock()
@@ -247,18 +246,6 @@ async def test_when_exception_caused_by_zocalo_message_then_exception_propagated
     assert isinstance(e.value.__cause__, NoZocaloSubscription)
 
 
-async def test_if_use_cpu_and_gpu_zocalos_then_wait_twice_for_results(
-    zocalo_results: ZocaloResults, RE: RunEngine
-):
-    zocalo_results.use_cpu_and_gpu = True
-    await zocalo_results.stage()
-    zocalo_results._raw_results_received.put([])
-    zocalo_results._raw_results_received.put([])
-    zocalo_results._raw_results_received.get = MagicMock()
-    RE(bps.trigger(zocalo_results, wait=False))
-    assert zocalo_results._raw_results_received.get.call_count == 2
-
-
 async def test_if_use_gpu_then_only_use_first_result(
     zocalo_results: ZocaloResults, RE: RunEngine
 ):
@@ -275,7 +262,6 @@ async def test_if_use_gpu_then_only_use_first_result(
 async def test_source_of_zocalo_results_correctly_identified(
     mock_logger, zocalo_results: ZocaloResults, RE: RunEngine
 ):
-    zocalo_results.use_cpu_and_gpu = False
     await zocalo_results.stage()
 
     zocalo_results._raw_results_received.get = MagicMock(
@@ -289,42 +275,6 @@ async def test_source_of_zocalo_results_correctly_identified(
             )
         ]
     )
-
-
-@patch("dodal.devices.zocalo.zocalo_results.LOGGER")
-async def test_if_zocalo_results_timeout_from_gpu_then_warn(
-    mock_logger, zocalo_results: ZocaloResults, RE: RunEngine
-):
-    zocalo_results.use_cpu_and_gpu = True
-    await zocalo_results.stage()
-    zocalo_results._raw_results_received.get = MagicMock(
-        side_effect=[
-            {"recipe_parameters": {"test": 0}, "results": []},
-            Empty,
-        ]
-    )
-    RE(bps.trigger(zocalo_results, wait=False))
-    mock_logger.warning.assert_called_with(
-        f"Zocalo results from GPU timed out. Using results from {ZocaloSource.CPU.value}"
-    )
-
-
-async def test_given_comparing_results_if_zocalo_results_from_gpu_but_not_cpu_then_error(
-    zocalo_results: ZocaloResults, RE: RunEngine
-):
-    zocalo_results.use_cpu_and_gpu = True
-    await zocalo_results.stage()
-    zocalo_results._raw_results_received.get = MagicMock(
-        side_effect=[
-            {
-                "recipe_parameters": {"test": 0, "gpu": True},
-                "results": [TEST_RESULTS[0]],
-            },
-            Empty,
-        ]
-    )
-    with pytest.raises(NoResultsFromZocalo):
-        await zocalo_results.trigger()
 
 
 async def test_given_using_gpu_results_if_zocalo_results_from_gpu_but_not_cpu_then_uses_gpu(
@@ -345,80 +295,9 @@ async def test_given_using_gpu_results_if_zocalo_results_from_gpu_but_not_cpu_th
     assert len(await zocalo_results.centre_of_mass.get_value())
 
 
-@patch("dodal.devices.zocalo.zocalo_results.LOGGER")
-async def test_given_comparing_results_if_cpu_results_arrive_before_gpu_then_warn(
-    mock_logger, zocalo_results: ZocaloResults, RE: RunEngine
-):
-    zocalo_results.use_cpu_and_gpu = True
-    await zocalo_results.stage()
-    zocalo_results._raw_results_received.get = MagicMock(
-        return_value={"recipe_parameters": {"test": 0}, "results": []}
-    )
-    RE(bps.trigger(zocalo_results, wait=False))
-    mock_logger.warning.assert_called_with(
-        f"Received zocalo results from {ZocaloSource.CPU.value} before {ZocaloSource.GPU.value}"
-    )
-
-
-@pytest.mark.parametrize(
-    "dict1,dict2,output",
-    [
-        (
-            {"recipe_parameters": {"gpu": True}, "results": [{"test": 0}]},
-            {"recipe_parameters": {}, "results": [{"test": 1}]},
-            "Zocalo results from GPU and CPU are not identical.\n Results from GPU: {'test': 0}\n Results from CPU: {'test': 1}",
-        ),
-        (
-            {
-                "recipe_parameters": {"gpu": True},
-                "results": [{"test": [[1, 2 + 1e-6, 3], [1, 2, 3]]}],
-            },
-            {"recipe_parameters": {}, "results": [{"test": [[1, 2, 3], [1, 2, 3]]}]},
-            None,
-        ),
-        (
-            {
-                "recipe_parameters": {"gpu": True},
-                "results": [
-                    {"test": [[1, 2 + 1e-6, 3], [1, 2, 3]], "extra_key": "test"}
-                ],
-            },
-            {"recipe_parameters": {}, "results": [{"test": [[1, 2, 3], [1, 2, 3]]}]},
-            "Zocalo results from GPU and CPU are not identical.\n Results from GPU: {'test': [[1, 2.000001, 3], [1, 2, 3]], 'extra_key': 'test'}\n Results from CPU: {'test': [[1, 2, 3], [1, 2, 3]]}",
-        ),
-        (
-            {
-                "recipe_parameters": {"gpu": False},
-                "results": [{"test": [[1, 2 + 1e-6, 3], [1, 2, 3]]}],
-            },
-            {"recipe_parameters": {}, "results": [{"test": [[1, 3, 3], [1, 2, 3]]}]},
-            "Zocalo results from CPU and CPU are not identical.\n Results from CPU: {'test': [[1, 2.000001, 3], [1, 2, 3]]}\n Results from CPU: {'test': [[1, 3, 3], [1, 2, 3]]}",
-        ),
-    ],
-)
-@patch("dodal.devices.zocalo.zocalo_results.LOGGER")
-async def test_given_comparing_results_then_warning_if_results_are_different(
-    mock_logger, zocalo_results: ZocaloResults, RE: RunEngine, dict1, dict2, output
-):
-    zocalo_results.use_cpu_and_gpu = True
-
-    await zocalo_results.stage()
-    zocalo_results._raw_results_received.get = MagicMock(
-        side_effect=[
-            dict1,
-            dict2,
-        ]
-    )
-    RE(bps.trigger(zocalo_results, wait=False))
-    mock_logger.warning.assert_called_with(
-        output
-    ) if output else mock_logger.warning.assert_not_called()
-
-
 async def test_if_zocalo_results_timeout_before_any_results_then_error(
     zocalo_results: ZocaloResults,
 ):
-    zocalo_results.use_cpu_and_gpu = True
     await zocalo_results.stage()
     zocalo_results._raw_results_received.get = MagicMock(side_effect=Empty)
     with pytest.raises(NoResultsFromZocalo):
@@ -442,7 +321,6 @@ async def test_gpu_results_ignored_and_cpu_results_used_if_toggle_disabled(
         name="zocalo",
         zocalo_environment=ZOCALO_ENV,
         timeout_s=0,
-        use_cpu_and_gpu=False,
     )
 
     recipe_wrapper = MagicMock()
@@ -473,21 +351,6 @@ async def test_gpu_results_ignored_and_cpu_results_used_if_toggle_disabled(
     RE(zocalo_plan())
 
 
-async def test_given_comparing_results_when_no_results_found_then_returns_no_results(
-    zocalo_results: ZocaloResults,
-):
-    zocalo_results.use_cpu_and_gpu = True
-    await zocalo_results.stage()
-    zocalo_results._raw_results_received.get = MagicMock(
-        side_effect=[
-            {"recipe_parameters": {"dcgid": 0, "dcid": 0, "gpu": True}, "results": []},
-            {"recipe_parameters": {"dcgid": 0, "dcid": 0}, "results": []},
-        ]
-    )
-    await zocalo_results.trigger()
-    assert len(await zocalo_results.centre_of_mass.get_value()) == 0
-
-
 @patch("dodal.devices.zocalo.zocalo_results.LOGGER")
 async def test_given_using_gpu_results_if_results_from_cpu_first_then_warn_and_use(
     mock_logger: MagicMock, zocalo_results: ZocaloResults
@@ -507,12 +370,3 @@ async def test_given_using_gpu_results_if_results_from_cpu_first_then_warn_and_u
     mock_logger.warning.assert_called_with(
         "Configured to use GPU results but CPU came first, using CPU results."
     )
-
-
-async def test_given_using_gpu_results_and_comparing_results_both_on_then_error_when_staged(
-    zocalo_results: ZocaloResults,
-):
-    zocalo_results.use_gpu = True
-    zocalo_results.use_cpu_and_gpu = True
-    with pytest.raises(ValueError):
-        await zocalo_results.stage()
