@@ -167,6 +167,9 @@ class Smargon(XYZStage, Movable):
             for k, v in value.items():
                 if v is not None:
                     tasks.append(getattr(self, k).set(v))
-            await asyncio.gather(*tasks)
         finally:
             await self.defer_move.set(DeferMoves.OFF)
+        # The set() coroutines will not complete until after defer moves has been
+        # switched back off so we cannot wait for them until this point.
+        # see https://github.com/DiamondLightSource/dodal/issues/1315
+        await asyncio.gather(*tasks)

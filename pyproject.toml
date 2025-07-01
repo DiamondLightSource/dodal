@@ -32,7 +32,8 @@ dependencies = [
     "redis",
     "deepdiff",
     "scanspec>=0.7.3",
-    "event-model>=1.23",  # Until bluesky pins it https://github.com/DiamondLightSource/dodal/issues/1278
+    "event-model>=1.23",      # Until bluesky pins it https://github.com/DiamondLightSource/dodal/issues/1278
+    "pyzmq==26.3.0",          # Until we can move to RHEL 8 https://github.com/DiamondLightSource/mx-bluesky/issues/1139
 ]
 
 dynamic = ["version"]
