@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.smargon &#8212; dodal 1.50.1.dev13+ga94cabded4 documentation</title>
+    <title>dodal.devices.smargon &#8212; dodal 1.50.1.dev14+gb866857e59 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=d241bf12"></script>
+    <script src="../../../_static/documentation_options.js?v=ff91ae11"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -648,9 +648,12 @@ window.addEventListener("load", () => mermaid.run());
             <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">value</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="n">tasks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
-            <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="o">*</span><span class="n">tasks</span><span class="p">)</span>
         <span class="k">finally</span><span class="p">:</span>
-            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">defer_move</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">DeferMoves</span><span class="o">.</span><span class="n">OFF</span><span class="p">)</span></div>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">defer_move</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">DeferMoves</span><span class="o">.</span><span class="n">OFF</span><span class="p">)</span>
+        <span class="c1"># The set() coroutines will not complete until after defer moves has been</span>
+        <span class="c1"># switched back off so we cannot wait for them until this point.</span>
+        <span class="c1"># see https://github.com/DiamondLightSource/dodal/issues/1315</span>
+        <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="o">*</span><span class="n">tasks</span><span class="p">)</span></div>
 
 </pre></div>
 

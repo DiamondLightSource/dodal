@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Run the tests using pytest &#8212; dodal 1.50.1.dev13+ga94cabded4 documentation</title>
+    <title>Run the tests using pytest &#8212; dodal 1.50.1.dev14+gb866857e59 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=d241bf12"></script>
+    <script src="../_static/documentation_options.js?v=ff91ae11"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -413,6 +413,7 @@
 <li class="toctree-l1"><a class="reference internal" href="move-code.html">Moving code from another repo</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pypi.html">Setting up PyPI publishing</a></li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">Run the tests using pytest</a></li>
+
 <li class="toctree-l1"><a class="reference internal" href="static-analysis.html">Run static analysis using pyright or mypy</a></li>
 <li class="toctree-l1"><a class="reference internal" href="update-template.html">How to update to the latest template structure</a></li>
 <li class="toctree-l1"><a class="reference internal" href="write-tests.html">Writing Tests in This Python Project</a></li>
@@ -490,6 +491,25 @@
 </div>
 <p>It will also report coverage to the commandline and to <code class="docutils literal notranslate"><span class="pre">cov.xml</span></code>.</p>
 </section>
+<section id="run-the-system-tests-locally">
+<h1>Run the system tests locally<a class="headerlink" href="#run-the-system-tests-locally" title="Link to this heading">#</a></h1>
+<p>The system tests require the <code class="docutils literal notranslate"><span class="pre">example-services</span></code> project:</p>
+<div class="highlight-commandline notranslate"><div class="highlight"><pre><span></span>git clone git@github.com:epics-containers/example-services.git
+</pre></div>
+</div>
+<p>Then you need to launch some of the example ioc containers. Please note, this requires docker-compose not
+podman-compose:</p>
+<div class="highlight-commandline notranslate"><div class="highlight"><pre><span></span>module load docker-compose
+cd example-services
+. ./environment.sh
+podman compose up -d bl01t-di-cam-01 bl01t-mo-sim-01 ca-gateway
+</pre></div>
+</div>
+<p>Once this is done, then the system tests can be run:</p>
+<div class="highlight-commandline notranslate"><div class="highlight"><pre><span></span>tox -e system-report
+</pre></div>
+</div>
+</section>
 
 
                 </article>
@@ -529,6 +549,20 @@
                 <dialog id="pst-secondary-sidebar-modal"></dialog>
                 <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
 
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Run the tests using pytest</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#run-the-system-tests-locally">Run the system tests locally</a></li>
+</ul>
+
+  </nav></div>
 
   <div class="sidebar-secondary-item">
 
