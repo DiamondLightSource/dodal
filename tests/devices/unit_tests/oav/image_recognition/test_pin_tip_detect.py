@@ -143,7 +143,7 @@ async def test_given_find_tip_fails_twice_when_triggered_then_tip_invalid_and_tr
     async def get_array_data(*_, **__):
         yield np.array([1, 2, 3])
         yield np.array([1, 2])
-        raise asyncio.TimeoutError()
+        raise TimeoutError()
 
     mock_image_read.side_effect = get_array_data
     device = await _get_pin_tip_detection_device()
