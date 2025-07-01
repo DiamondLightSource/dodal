@@ -287,6 +287,8 @@ class ZocaloResults(StandardReadable, Triggerable):
                     self._raw_results_received.put(
                         {"results": results, "recipe_parameters": recipe_parameters}
                     )
+                else:
+                    LOGGER.warning("Discarding results as they are from GPU")
 
         subscription = workflows.recipe.wrap_subscribe(
             self.transport,

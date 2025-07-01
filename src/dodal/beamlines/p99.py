@@ -15,7 +15,7 @@ from dodal.common.visit import (
 )
 from dodal.devices.attenuator.filter import FilterMotor
 from dodal.devices.attenuator.filter_selections import P99FilterSelections
-from dodal.devices.motors import XYZPositioner
+from dodal.devices.motors import XYZStage
 from dodal.devices.p99.andor2_point import Andor2Point
 from dodal.devices.p99.sample_stage import SampleAngleStage
 from dodal.log import set_beamline as set_log_beamline
@@ -38,13 +38,13 @@ def filter() -> FilterMotor:
 
 
 @device_factory()
-def sample_stage() -> XYZPositioner:
-    return XYZPositioner(f"{PREFIX.beamline_prefix}-MO-STAGE-02:")
+def sample_stage() -> XYZStage:
+    return XYZStage(f"{PREFIX.beamline_prefix}-MO-STAGE-02:")
 
 
 @device_factory()
-def lab_stage() -> XYZPositioner:
-    return XYZPositioner(f"{PREFIX.beamline_prefix}-MO-STAGE-02:LAB:")
+def lab_stage() -> XYZStage:
+    return XYZStage(f"{PREFIX.beamline_prefix}-MO-STAGE-02:LAB:")
 
 
 set_path_provider(

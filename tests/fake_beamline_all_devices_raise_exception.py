@@ -1,5 +1,3 @@
-import asyncio
-
 from bluesky.protocols import Readable
 from ophyd_async.epics.motor import Motor
 
@@ -11,7 +9,7 @@ def device_a() -> Readable:
 
 
 def device_b() -> Motor:
-    raise asyncio.TimeoutError
+    raise TimeoutError
 
 
 def device_c() -> CryoStream:
