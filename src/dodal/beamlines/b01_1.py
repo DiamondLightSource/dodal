@@ -43,7 +43,7 @@ https://argocd.diamond.ac.uk/applications?showFavorites=false&proj=&sync=&autoSy
 @device_factory()
 def panda() -> HDFPanda:
     return HDFPanda(
-        f"{PREFIX.beamline_prefix}-EA-PANDA-01:",
+        f"{PREFIX.beamline_prefix}-MO-PANDA-01:",
         path_provider=get_path_provider(),
     )
 
