@@ -64,6 +64,20 @@ def manta() -> AravisDetector:
 
 
 @device_factory()
+def mako() -> AravisDetector:
+    """
+    The camera for the imaging experiment,
+    looking at the on-axis viewing screen
+    """
+    return AravisDetector(
+        f"{PREFIX.beamline_prefix}-DI-DCAM-01:",
+        path_provider=get_path_provider(),
+        drv_suffix=CAM_SUFFIX,
+        fileio_suffix=HDF5_SUFFIX,
+    )
+
+
+@device_factory()
 def sample_stage() -> XYZStage:
     return XYZStage(
         f"{PREFIX.beamline_prefix}-MO-PPMAC-01:",
