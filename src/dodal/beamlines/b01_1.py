@@ -43,7 +43,7 @@ https://argocd.diamond.ac.uk/applications?showFavorites=false&proj=&sync=&autoSy
 @device_factory()
 def panda() -> HDFPanda:
     return HDFPanda(
-        f"{PREFIX.beamline_prefix}-EA-PANDA-01:",
+        f"{PREFIX.beamline_prefix}-MO-PANDA-01:",
         path_provider=get_path_provider(),
     )
 
@@ -57,6 +57,20 @@ def synchrotron() -> Synchrotron:
 def manta() -> AravisDetector:
     return AravisDetector(
         f"{PREFIX.beamline_prefix}-DI-DCAM-02:",
+        path_provider=get_path_provider(),
+        drv_suffix=CAM_SUFFIX,
+        fileio_suffix=HDF5_SUFFIX,
+    )
+
+
+@device_factory()
+def mako() -> AravisDetector:
+    """
+    The camera for the imaging experiment,
+    looking at the on-axis viewing screen
+    """
+    return AravisDetector(
+        f"{PREFIX.beamline_prefix}-DI-DCAM-01:",
         path_provider=get_path_provider(),
         drv_suffix=CAM_SUFFIX,
         fileio_suffix=HDF5_SUFFIX,
