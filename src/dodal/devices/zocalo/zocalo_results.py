@@ -47,6 +47,8 @@ DEFAULT_TIMEOUT = 180
 DEFAULT_SORT_KEY = SortKeys.max_count
 CLEAR_QUEUE_WAIT_S = 2.0
 ZOCALO_STAGE_GROUP = "clear zocalo queue"
+
+# Sentinel value required for inserting into the soft signal array
 _NO_SAMPLE_ID = -1
 
 
