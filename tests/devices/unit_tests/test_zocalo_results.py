@@ -27,6 +27,7 @@ TEST_RESULTS: list[XrcResult] = [
         "n_voxels": 38,
         "total_count": 2387574,
         "bounding_box": [[1, 2, 3], [3, 4, 4]],
+        "sample_id": 123,
     },
     {
         "centre_of_mass": [2, 3, 4],
@@ -35,6 +36,7 @@ TEST_RESULTS: list[XrcResult] = [
         "n_voxels": 35,
         "total_count": 2387574,
         "bounding_box": [[1, 2, 3], [3, 4, 4]],
+        "sample_id": 123,
     },
     {
         "centre_of_mass": [4, 5, 6],
@@ -43,6 +45,7 @@ TEST_RESULTS: list[XrcResult] = [
         "n_voxels": 31,
         "total_count": 2387574,
         "bounding_box": [[1, 2, 3], [3, 4, 4]],
+        "sample_id": 123,
     },
     {
         "centre_of_mass": [0.5, 1, 2],
@@ -51,6 +54,7 @@ TEST_RESULTS: list[XrcResult] = [
         "n_voxels": 3,
         "total_count": 1800,
         "bounding_box": [[0, 1, 1], [1, 2, 4]],
+        "sample_id": 123,
     },
     {
         "centre_of_mass": [2.2, 3.5, 4.7],
@@ -59,41 +63,9 @@ TEST_RESULTS: list[XrcResult] = [
         "n_voxels": 14,
         "total_count": 1800000,
         "bounding_box": [[2, 2, 3], [4, 5, 6]],
+        "sample_id": 456,
     },
 ]
-
-TEST_READING = {
-    "zocalo_results-centre_of_mass": {
-        "value": np.array([2, 3, 4]),
-        "timestamp": 11250827.378482452,
-        "alarm_severity": 0,
-    },
-    "zocalo_results-max_voxel": {
-        "value": np.array([2, 4, 5]),
-        "timestamp": 11250827.378502235,
-        "alarm_severity": 0,
-    },
-    "zocalo_results-max_count": {
-        "value": 105123,
-        "timestamp": 11250827.378515247,
-        "alarm_severity": 0,
-    },
-    "zocalo_results-n_voxels": {
-        "value": 35,
-        "timestamp": 11250827.37852733,
-        "alarm_severity": 0,
-    },
-    "zocalo_results-total_count": {
-        "value": 2387574,
-        "timestamp": 11250827.378539408,
-        "alarm_severity": 0,
-    },
-    "zocalo_results-bounding_box": {
-        "value": np.array([[1, 2, 3], [3, 4, 4]]),
-        "timestamp": 11250827.378558964,
-        "alarm_severity": 0,
-    },
-}
 
 test_recipe_parameters = {"dcid": 0, "dcgid": 0}
 
@@ -161,7 +133,7 @@ async def test_get_full_processing_results(mocked_zocalo_device, RE) -> None:
             [[0, 1, 1], [1, 2, 4]],
             [[2, 2, 3], [4, 5, 6]],
         ]
-        for prop in ["max_voxel", "max_count", "n_voxels", "total_count"]:
+        for prop in ["max_voxel", "max_count", "n_voxels", "total_count", "sample_id"]:
             assert [r[prop] for r in full_results] == [r[prop] for r in TEST_RESULTS]  # type: ignore
 
     RE(plan())
@@ -370,3 +342,28 @@ async def test_given_using_gpu_results_if_results_from_cpu_first_then_warn_and_u
     mock_logger.warning.assert_called_with(
         "Configured to use GPU results but CPU came first, using CPU results."
     )
+
+
+async def test_given_no_sample_id_from_zocalo_then_returns_none(
+    mocked_zocalo_device, RE
+):
+    zocalo_device: ZocaloResults = await mocked_zocalo_device(
+        [
+            {
+                "centre_of_mass": [1, 2, 3],
+                "max_voxel": [2, 4, 5],
+                "max_count": 105062,
+                "n_voxels": 38,
+                "total_count": 2387574,
+                "bounding_box": [[1, 2, 3], [3, 4, 4]],
+                "sample_id": None,
+            }
+        ]
+    )
+
+    def plan():
+        yield from bps.trigger(zocalo_device)
+        full_results = yield from get_full_processing_results(zocalo_device)
+        assert full_results[0]["sample_id"] is None
+
+    RE(plan())
