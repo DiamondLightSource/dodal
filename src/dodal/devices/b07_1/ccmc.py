@@ -1,5 +1,9 @@
+from typing import TypeVar
+
+from bluesky.protocols import Movable
 from ophyd_async.core import (
-    StandardReadableFormat,
+    AsyncStatus,
+    StandardReadable,
     StrictEnum,
     derived_signal_r,
 )
@@ -20,14 +24,17 @@ ccmc_upper_limit = 3000.0
 error_message = "Can not get energy value in ev from ccmc position: "
 
 
-class CCMC(XYZStage):
+T = TypeVar("T", bound=StrictEnum)
+
+
+class CCMC(StandardReadable, Movable[T]):
     """
     Device to move the channel cut monochromator (ccmc). CCMC has three
     choices of crystal (Xtal for short). Setting energy is by means of a
     multi-positioner. The positions are named after the nominal energies of the
-    crystals. Select one of the crystals from the list. This causes the Y motor
-    to move that crystal into the beam and other motors have to align the angles
-    correctly.
+    crystals. To change energy select one of the crystals from the list.
+    This causes the Y motor to move that crystal into the beam and other
+    motors have to align the angles correctly.
     """
 
     def __init__(
@@ -46,27 +53,33 @@ class CCMC(XYZStage):
         name:
             Name of the device
         """
-        with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
-            # piezo motor in epics
-            self.y_rotation = epics_signal_rw(
-                float,
-                read_pv=prefix + "ROTY:POS:RD",
-                write_pv=prefix + "ROTY:MOV:WR",
-            )
+        # crystal motors internal
+        self._xyz = XYZStage(prefix)
+        # piezo motor in epics
+        self._y_rotation = epics_signal_rw(
+            float,
+            read_pv=prefix + "ROTY:POS:RD",
+            write_pv=prefix + "ROTY:MOV:WR",
+        )
 
         with self.add_children_as_readables():
             # Must be a CHILD as read() must return this signal
             self.crystal = epics_signal_rw(positions, prefix + "CRYSTAL:MP:SELECT")
 
+        # energy derived signal as property
         self.energy_in_ev = derived_signal_r(
             self._convert_pos_to_ev, pos_signal=self.crystal
         )
 
-        super().__init__(prefix, name)
+        super().__init__(name=name)
 
     def _convert_pos_to_ev(self, pos_signal: CCMCPositions) -> float:
         if pos_signal != CCMCPositions.OUT:
             energy = float(str(pos_signal.value).split("Xtal_")[1])
             if ccmc_lower_limit < energy < ccmc_upper_limit:
                 return energy
-        raise ValueError(error_message + pos_signal.name)
+        raise ValueError(error_message)
+
+    @AsyncStatus.wrap
+    async def set(self, demand: T) -> None:
+        await self.crystal.set(demand, wait=True)
