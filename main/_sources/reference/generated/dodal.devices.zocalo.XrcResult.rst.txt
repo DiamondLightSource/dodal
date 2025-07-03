@@ -50,5 +50,8 @@ dodal.devices.zocalo.XrcResult
       
       ~XrcResult.bounding_box
       
+      
+      ~XrcResult.sample_id
+      
    
    

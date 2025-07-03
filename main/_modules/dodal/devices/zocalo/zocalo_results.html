@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.zocalo.zocalo_results &#8212; dodal 1.50.1.dev18+g933d32e4cd documentation</title>
+    <title>dodal.devices.zocalo.zocalo_results &#8212; dodal 1.50.1.dev19+gdd68923aa0 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=02d7a5aa"></script>
+    <script src="../../../../_static/documentation_options.js?v=975a8aed"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -500,6 +500,9 @@ window.addEventListener("load", () => mermaid.run());
 <span class="n">CLEAR_QUEUE_WAIT_S</span> <span class="o">=</span> <span class="mf">2.0</span>
 <span class="n">ZOCALO_STAGE_GROUP</span> <span class="o">=</span> <span class="s2">&quot;clear zocalo queue&quot;</span>
 
+<span class="c1"># Sentinel value required for inserting into the soft signal array</span>
+<span class="n">_NO_SAMPLE_ID</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+
 
 <div class="viewcode-block" id="XrcResult">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.zocalo.XrcResult.html#dodal.devices.zocalo.XrcResult">[docs]</a>
@@ -522,6 +525,7 @@ window.addEventListener("load", () => mermaid.run());
 <span class="sd">            as the volume of whole boxes as a half-open range i.e such that</span>
 <span class="sd">            p1 = (x1, y1, z1) &lt;= p &lt; p2 = (x2, y2, z2) and</span>
 <span class="sd">            p2 - p1 gives the dimensions in whole voxels.</span>
+<span class="sd">         sample_id: The sample id associated with the centre.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">centre_of_mass</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span>
@@ -529,7 +533,8 @@ window.addEventListener("load", () => mermaid.run());
     <span class="n">max_count</span><span class="p">:</span> <span class="nb">int</span>
     <span class="n">n_voxels</span><span class="p">:</span> <span class="nb">int</span>
     <span class="n">total_count</span><span class="p">:</span> <span class="nb">int</span>
-    <span class="n">bounding_box</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span></div>
+    <span class="n">bounding_box</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span>
+    <span class="n">sample_id</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span></div>
 
 
 
@@ -613,6 +618,9 @@ window.addEventListener("load", () => mermaid.run());
         <span class="bp">self</span><span class="o">.</span><span class="n">total_count</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_total_count_setter</span> <span class="o">=</span> <span class="n">soft_signal_r_and_setter</span><span class="p">(</span>
             <span class="n">Array1D</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">uint64</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;total_count&quot;</span>
         <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sample_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample_id_setter</span> <span class="o">=</span> <span class="n">soft_signal_r_and_setter</span><span class="p">(</span>
+            <span class="n">Array1D</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;sample_id&quot;</span>
+        <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ispyb_dcid</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ispyb_dcid_setter</span> <span class="o">=</span> <span class="n">soft_signal_r_and_setter</span><span class="p">(</span>
             <span class="nb">int</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;ispyb_dcid&quot;</span>
         <span class="p">)</span>
@@ -627,6 +635,7 @@ window.addEventListener("load", () => mermaid.run());
                 <span class="bp">self</span><span class="o">.</span><span class="n">total_count</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">centre_of_mass</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">bounding_box</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sample_id</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">ispyb_dcid</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">ispyb_dcgid</span><span class="p">,</span>
             <span class="p">],</span>
@@ -635,13 +644,15 @@ window.addEventListener("load", () => mermaid.run());
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_put_results</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">XrcResult</span><span class="p">],</span> <span class="n">recipe_parameters</span><span class="p">):</span>
-        <span class="n">centres_of_mass</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">r</span><span class="p">[</span><span class="s2">&quot;centre_of_mass&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">results</span><span class="p">])</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_com_setter</span><span class="p">(</span><span class="n">centres_of_mass</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_com_setter</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">r</span><span class="p">[</span><span class="s2">&quot;centre_of_mass&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">results</span><span class="p">]))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_bounding_box_setter</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">r</span><span class="p">[</span><span class="s2">&quot;bounding_box&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">results</span><span class="p">]))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_max_voxel_setter</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">r</span><span class="p">[</span><span class="s2">&quot;max_voxel&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">results</span><span class="p">]))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_max_count_setter</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">r</span><span class="p">[</span><span class="s2">&quot;max_count&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">results</span><span class="p">]))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_n_voxels_setter</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">r</span><span class="p">[</span><span class="s2">&quot;n_voxels&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">results</span><span class="p">]))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_total_count_setter</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">r</span><span class="p">[</span><span class="s2">&quot;total_count&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">results</span><span class="p">]))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sample_id_setter</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">r</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;sample_id&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">_NO_SAMPLE_ID</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">results</span><span class="p">])</span>
+        <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_ispyb_dcid_setter</span><span class="p">(</span><span class="n">recipe_parameters</span><span class="p">[</span><span class="s2">&quot;dcid&quot;</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_ispyb_dcgid_setter</span><span class="p">(</span><span class="n">recipe_parameters</span><span class="p">[</span><span class="s2">&quot;dcgid&quot;</span><span class="p">])</span>
 
@@ -788,6 +799,7 @@ window.addEventListener("load", () => mermaid.run());
     <span class="n">n_voxels</span> <span class="o">=</span> <span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">rd</span><span class="p">(</span><span class="n">zocalo</span><span class="o">.</span><span class="n">n_voxels</span><span class="p">,</span> <span class="n">default_value</span><span class="o">=</span><span class="p">[])</span>
     <span class="n">total_count</span> <span class="o">=</span> <span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">rd</span><span class="p">(</span><span class="n">zocalo</span><span class="o">.</span><span class="n">total_count</span><span class="p">,</span> <span class="n">default_value</span><span class="o">=</span><span class="p">[])</span>
     <span class="n">bounding_box</span> <span class="o">=</span> <span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">rd</span><span class="p">(</span><span class="n">zocalo</span><span class="o">.</span><span class="n">bounding_box</span><span class="p">,</span> <span class="n">default_value</span><span class="o">=</span><span class="p">[])</span>
+    <span class="n">sample_id</span> <span class="o">=</span> <span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">rd</span><span class="p">(</span><span class="n">zocalo</span><span class="o">.</span><span class="n">sample_id</span><span class="p">,</span> <span class="n">default_value</span><span class="o">=</span><span class="p">[])</span>
     <span class="k">return</span> <span class="p">[</span>
         <span class="n">_corrected_xrc_result</span><span class="p">(</span>
             <span class="n">XrcResult</span><span class="p">(</span>
@@ -797,10 +809,18 @@ window.addEventListener("load", () => mermaid.run());
                 <span class="n">n_voxels</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">n</span><span class="p">),</span>
                 <span class="n">total_count</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">tc</span><span class="p">),</span>
                 <span class="n">bounding_box</span><span class="o">=</span><span class="n">bb</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
+                <span class="n">sample_id</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">s_id</span><span class="p">)</span> <span class="k">if</span> <span class="n">s_id</span> <span class="o">!=</span> <span class="n">_NO_SAMPLE_ID</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="p">)</span>
-        <span class="k">for</span> <span class="n">com</span><span class="p">,</span> <span class="n">mv</span><span class="p">,</span> <span class="n">mc</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">tc</span><span class="p">,</span> <span class="n">bb</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
-            <span class="n">com</span><span class="p">,</span> <span class="n">max_voxel</span><span class="p">,</span> <span class="n">max_count</span><span class="p">,</span> <span class="n">n_voxels</span><span class="p">,</span> <span class="n">total_count</span><span class="p">,</span> <span class="n">bounding_box</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span>
+        <span class="k">for</span> <span class="n">com</span><span class="p">,</span> <span class="n">mv</span><span class="p">,</span> <span class="n">mc</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">tc</span><span class="p">,</span> <span class="n">bb</span><span class="p">,</span> <span class="n">s_id</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+            <span class="n">com</span><span class="p">,</span>
+            <span class="n">max_voxel</span><span class="p">,</span>
+            <span class="n">max_count</span><span class="p">,</span>
+            <span class="n">n_voxels</span><span class="p">,</span>
+            <span class="n">total_count</span><span class="p">,</span>
+            <span class="n">bounding_box</span><span class="p">,</span>
+            <span class="n">sample_id</span><span class="p">,</span>
+            <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="p">)</span>
     <span class="p">]</span></div>
 
