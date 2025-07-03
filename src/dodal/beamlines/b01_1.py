@@ -42,6 +42,11 @@ https://argocd.diamond.ac.uk/applications?showFavorites=false&proj=&sync=&autoSy
 
 @device_factory()
 def panda() -> HDFPanda:
+    """Provides triggering of the detectors.
+
+    Returns:
+        HDFPanda: The HDF5-based detector trigger device.
+    """
     return HDFPanda(
         f"{PREFIX.beamline_prefix}-MO-PANDA-01:",
         path_provider=get_path_provider(),
@@ -54,7 +59,16 @@ def synchrotron() -> Synchrotron:
 
 
 @device_factory()
-def manta() -> AravisDetector:
+def oav() -> AravisDetector:
+    """The Manta camera for the spectroscopy experiment.
+
+    Looks at the spectroscopy screen and visualises light
+    transmitted through the sample after it has gone through
+    the diffraction grating.
+
+    Returns:
+        AravisDetector: The spectroscopy camera device.
+    """
     return AravisDetector(
         f"{PREFIX.beamline_prefix}-DI-DCAM-02:",
         path_provider=get_path_provider(),
@@ -64,10 +78,13 @@ def manta() -> AravisDetector:
 
 
 @device_factory()
-def mako() -> AravisDetector:
-    """
-    The camera for the imaging experiment,
-    looking at the on-axis viewing screen
+def sample_det() -> AravisDetector:
+    """The Mako camera for the imaging experiment.
+
+    Looks at the on-axis viewing screen.
+
+    Returns:
+        AravisDetector: The imaging camera device.
     """
     return AravisDetector(
         f"{PREFIX.beamline_prefix}-DI-DCAM-01:",
@@ -79,6 +96,11 @@ def mako() -> AravisDetector:
 
 @device_factory()
 def sample_stage() -> XYZStage:
+    """An XYZ stage holding the sample.
+
+    Returns:
+        XYZStage: The XYZ sample stage device.
+    """
     return XYZStage(
         f"{PREFIX.beamline_prefix}-MO-PPMAC-01:",
     )
