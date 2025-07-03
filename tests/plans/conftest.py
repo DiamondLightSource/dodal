@@ -1,3 +1,4 @@
+import asyncio
 from pathlib import Path
 from unittest.mock import patch
 
@@ -35,7 +36,32 @@ def det(
     tmp_path: Path,
     path_provider,
 ) -> StandardDetector:
-    pattern_generator = PatternGenerator()
+    class DevNullPatternGenerator(PatternGenerator):
+        def __init__(self, sleep=asyncio.sleep):
+            super().__init__(sleep)
+            self.n_images = 0
+
+        def open_file(self, path: Path, width: int, height: int):
+            pass
+
+        async def write_images_to_file(
+            self, exposure: float, period: float, number_of_frames: int
+        ):
+            self.n_images += number_of_frames
+
+        def generate_point(self, channel: int = 1, high_energy: bool = False) -> float:
+            return 0.0
+
+        async def wait_for_next_index(self, timeout: float):
+            pass
+
+        def get_last_index(self) -> int:
+            return self.n_images
+
+        def close_file(self):
+            pass
+
+    pattern_generator = DevNullPatternGenerator()
     with init_devices(mock=True):
         det = SimBlobDetector(path_provider, pattern_generator)
     return det
