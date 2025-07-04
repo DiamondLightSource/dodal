@@ -3,9 +3,9 @@ import math
 
 import numpy as np
 import pytest
+from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
-from ophyd_async.epics.motor import Motor
-from ophyd_async.testing import get_mock_put, set_mock_value
+from ophyd_async.testing import assert_reading, get_mock_put, set_mock_value
 
 from dodal.devices.electron_analyser import (
     to_kinetic_energy,
@@ -23,8 +23,6 @@ from dodal.devices.electron_analyser.vgscienta import (
 from tests.devices.unit_tests.electron_analyser.util import (
     TEST_SEQUENCE_REGION_NAMES,
     assert_read_configuration_has_expected_value,
-    assert_read_has_expected_value,
-    configure_driver_with_region,
 )
 
 
@@ -39,10 +37,9 @@ def driver_class(
 async def test_given_region_that_analyser_sets_modes_correctly(
     sim_driver: AbstractAnalyserDriverIO,
     region: AbstractBaseRegion,
-    sim_energy_source: Motor,
     RE: RunEngine,
 ) -> None:
-    RE(configure_driver_with_region(sim_driver, region, sim_energy_source))
+    RE(bps.mv(sim_driver, region))
 
     get_mock_put(sim_driver.region_name).assert_called_once_with(region.name, wait=True)
     await assert_read_configuration_has_expected_value(
@@ -72,11 +69,12 @@ async def test_given_region_that_analyser_sets_modes_correctly(
 async def test_given_region_that_analyser_sets_energy_values_correctly(
     sim_driver: AbstractAnalyserDriverIO,
     region: AbstractBaseRegion,
-    sim_energy_source: Motor,
     RE: RunEngine,
 ) -> None:
-    RE(configure_driver_with_region(sim_driver, region, sim_energy_source))
-    excitation_energy = await sim_energy_source.user_readback.get_value()
+    RE(bps.mv(sim_driver, region))
+
+    energy_source = sim_driver._get_energy_source(region.excitation_energy_source)
+    excitation_energy = await energy_source.get_value()
 
     expected_low_e = to_kinetic_energy(
         region.low_energy, region.energy_mode, excitation_energy
@@ -87,7 +85,7 @@ async def test_given_region_that_analyser_sets_energy_values_correctly(
     expected_pass_e_type = sim_driver.pass_energy_type
     expected_pass_e = expected_pass_e_type(region.pass_energy)
 
-    expected_energy_source = sim_energy_source.name
+    expected_energy_source = energy_source.name
 
     get_mock_put(sim_driver.low_energy).assert_called_once_with(
         expected_low_e, wait=True
@@ -111,14 +109,20 @@ async def test_given_region_that_analyser_sets_energy_values_correctly(
     get_mock_put(sim_driver.excitation_energy).assert_called_once_with(
         excitation_energy, wait=True
     )
-    await assert_read_has_expected_value(
-        sim_driver, "excitation_energy", excitation_energy
-    )
     get_mock_put(sim_driver.excitation_energy_source).assert_called_once_with(
         expected_energy_source, wait=True
     )
     await assert_read_configuration_has_expected_value(
         sim_driver, "excitation_energy_source", expected_energy_source
+    )
+    await assert_reading(
+        sim_driver,
+        {
+            "sim_driver-excitation_energy": {"value": excitation_energy},
+            "sim_driver-image": {"value": []},
+            "sim_driver-spectrum": {"value": []},
+            "sim_driver-total_intensity": {"value": 0.0},
+        },
     )
 
 
@@ -126,10 +130,9 @@ async def test_given_region_that_analyser_sets_energy_values_correctly(
 async def test_given_region_that_analyser_sets_channel_correctly(
     sim_driver: AbstractAnalyserDriverIO,
     region: AbstractBaseRegion,
-    sim_energy_source: Motor,
     RE: RunEngine,
 ) -> None:
-    RE(configure_driver_with_region(sim_driver, region, sim_energy_source))
+    RE(bps.mv(sim_driver, region))
 
     expected_slices = region.slices
     expected_iterations = region.iterations
@@ -149,10 +152,9 @@ async def test_given_region_that_analyser_sets_channel_correctly(
 async def test_that_data_to_read_is_correct(
     sim_driver: AbstractAnalyserDriverIO,
     region: AbstractBaseRegion,
-    sim_energy_source: Motor,
     RE: RunEngine,
 ) -> None:
-    RE(configure_driver_with_region(sim_driver, region, sim_energy_source))
+    RE(bps.mv(sim_driver, region))
 
     expected_total_time = math.prod(
         await asyncio.gather(
@@ -167,3 +169,21 @@ async def test_that_data_to_read_is_correct(
     expected_total_intensity = np.sum(spectrum)
     set_mock_value(sim_driver.spectrum, spectrum)
     assert await sim_driver.total_intensity.get_value() == expected_total_intensity
+
+
+@pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
+def test_analyser_correctly_selects_energy_source_from_region_input(
+    sim_driver: AbstractAnalyserDriverIO,
+    region: AbstractBaseRegion,
+) -> None:
+    source_alias_name = region.excitation_energy_source
+    energy_source = sim_driver._get_energy_source(source_alias_name)
+
+    assert energy_source == sim_driver.energy_sources[source_alias_name]
+
+
+def test_analyser_raise_error_on_invalid_energy_source_selected(
+    sim_driver: AbstractAnalyserDriverIO,
+) -> None:
+    with pytest.raises(KeyError):
+        sim_driver._get_energy_source("invalid_name")
