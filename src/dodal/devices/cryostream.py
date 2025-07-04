@@ -19,6 +19,13 @@ class CryoStream(StandardReadable):
         super().__init__(name)
 
 
+class OxfordCryoStreamControl(StandardReadable):
+    def __init__(self, prefix: str, name: str = ""):
+        self.purge = epics_signal_rw(float, f"{prefix}PURGE")
+
+        super().__init__(name)
+
+
 class OxfordCryoStreamStatus(StandardReadable):
     def __init__(self, prefix: str, name: str = ""):
         self.setpoint = epics_signal_r(float, f"{prefix}SETPOINT")
@@ -41,5 +48,7 @@ class OxfordCryoStreamStatus(StandardReadable):
         self.controller_number = epics_signal_r(float, f"{prefix}CTRLNUM")
         self.software_version = epics_signal_r(float, f"{prefix}VER")
         self.evap_adjust = epics_signal_r(float, f"{prefix}EVAPADJUST")
+
+        # control = OxfordCryoStreamControl(prefix)
 
         super().__init__(name)
