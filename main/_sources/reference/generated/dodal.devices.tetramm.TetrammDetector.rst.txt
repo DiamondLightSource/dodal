@@ -38,8 +38,6 @@ dodal.devices.tetramm.TetrammDetector
    .. autosummary::
    
       
-      ~TetrammDetector.hints
-      
       
       
       

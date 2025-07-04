@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.tetramm &#8212; dodal 1.50.1.dev20+gb5eb676183 documentation</title>
+    <title>dodal.devices.tetramm &#8212; dodal 1.51.1.dev1+g10a9a12493 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=d86e18c1"></script>
+    <script src="../../../_static/documentation_options.js?v=8cec5b5a"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -451,14 +451,18 @@ window.addEventListener("load", () => mermaid.run());
                   
   <h1>Source code for dodal.devices.tetramm</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Sequence</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Annotated</span> <span class="k">as</span> <span class="n">A</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">bluesky.protocols</span><span class="w"> </span><span class="kn">import</span> <span class="n">Hints</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">DEFAULT_TIMEOUT</span><span class="p">,</span>
+    <span class="n">AsyncStatus</span><span class="p">,</span>
     <span class="n">DatasetDescriber</span><span class="p">,</span>
     <span class="n">DetectorController</span><span class="p">,</span>
     <span class="n">DetectorTrigger</span><span class="p">,</span>
-    <span class="n">Device</span><span class="p">,</span>
     <span class="n">PathProvider</span><span class="p">,</span>
+    <span class="n">SignalR</span><span class="p">,</span>
+    <span class="n">SignalRW</span><span class="p">,</span>
     <span class="n">StandardDetector</span><span class="p">,</span>
     <span class="n">StrictEnum</span><span class="p">,</span>
     <span class="n">TriggerInfo</span><span class="p">,</span>
@@ -467,15 +471,12 @@ window.addEventListener("load", () => mermaid.run());
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.adcore</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">ADHDFWriter</span><span class="p">,</span>
+    <span class="n">NDArrayBaseIO</span><span class="p">,</span>
     <span class="n">NDFileHDFIO</span><span class="p">,</span>
     <span class="n">NDPluginBaseIO</span><span class="p">,</span>
     <span class="n">stop_busy_record</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">epics_signal_r</span><span class="p">,</span>
-    <span class="n">epics_signal_rw</span><span class="p">,</span>
-    <span class="n">epics_signal_rw_rbv</span><span class="p">,</span>
-<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">PvSuffix</span>
 
 
 <div class="viewcode-block" id="TetrammRange">
@@ -523,184 +524,161 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="TetrammDriver">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.tetramm.TetrammDriver.html#dodal.devices.tetramm.TetrammDriver">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">TetrammDriver</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-    <span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_prefix</span> <span class="o">=</span> <span class="n">prefix</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">range</span> <span class="o">=</span> <span class="n">epics_signal_rw_rbv</span><span class="p">(</span><span class="n">TetrammRange</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;Range&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">sample_time</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;SampleTime_RBV&quot;</span><span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">values_per_reading</span> <span class="o">=</span> <span class="n">epics_signal_rw_rbv</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;ValuesPerRead&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">averaging_time</span> <span class="o">=</span> <span class="n">epics_signal_rw_rbv</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;AveragingTime&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">to_average</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;NumAverage_RBV&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">averaged</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;NumAveraged_RBV&quot;</span><span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">acquire</span> <span class="o">=</span> <span class="n">epics_signal_rw_rbv</span><span class="p">(</span><span class="nb">bool</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;Acquire&quot;</span><span class="p">)</span>
-
-        <span class="c1"># this PV is special, for some reason it doesn&#39;t have a _RBV suffix...</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">overflows</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;RingOverflows&quot;</span><span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">num_channels</span> <span class="o">=</span> <span class="n">epics_signal_rw_rbv</span><span class="p">(</span><span class="n">TetrammChannels</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;NumChannels&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">resolution</span> <span class="o">=</span> <span class="n">epics_signal_rw_rbv</span><span class="p">(</span><span class="n">TetrammResolution</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;Resolution&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">trigger_mode</span> <span class="o">=</span> <span class="n">epics_signal_rw_rbv</span><span class="p">(</span><span class="n">TetrammTrigger</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;TriggerMode&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">bias</span> <span class="o">=</span> <span class="n">epics_signal_rw_rbv</span><span class="p">(</span><span class="nb">bool</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;BiasState&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">bias_volts</span> <span class="o">=</span> <span class="n">epics_signal_rw_rbv</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;BiasVoltage&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">geometry</span> <span class="o">=</span> <span class="n">epics_signal_rw_rbv</span><span class="p">(</span><span class="n">TetrammGeometry</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;Geometry&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">nd_attributes_file</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;NDAttributesFile&quot;</span><span class="p">)</span>
-
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span></div>
+<span class="k">class</span><span class="w"> </span><span class="nc">TetrammDriver</span><span class="p">(</span><span class="n">NDArrayBaseIO</span><span class="p">):</span>
+    <span class="nb">range</span> <span class="o">=</span> <span class="n">A</span><span class="p">[</span><span class="n">SignalRW</span><span class="p">[</span><span class="n">TetrammRange</span><span class="p">],</span> <span class="n">PvSuffix</span><span class="o">.</span><span class="n">rbv</span><span class="p">(</span><span class="s2">&quot;Range&quot;</span><span class="p">)]</span>
+    <span class="n">sample_time</span><span class="p">:</span> <span class="n">A</span><span class="p">[</span><span class="n">SignalR</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">PvSuffix</span><span class="p">(</span><span class="s2">&quot;SampleTime_RBV&quot;</span><span class="p">)]</span>
+    <span class="n">values_per_reading</span><span class="p">:</span> <span class="n">A</span><span class="p">[</span><span class="n">SignalRW</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">PvSuffix</span><span class="o">.</span><span class="n">rbv</span><span class="p">(</span><span class="s2">&quot;ValuesPerRead&quot;</span><span class="p">)]</span>
+    <span class="n">averaging_time</span><span class="p">:</span> <span class="n">A</span><span class="p">[</span><span class="n">SignalRW</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">PvSuffix</span><span class="o">.</span><span class="n">rbv</span><span class="p">(</span><span class="s2">&quot;AveragingTime&quot;</span><span class="p">)]</span>
+    <span class="n">to_average</span><span class="p">:</span> <span class="n">A</span><span class="p">[</span><span class="n">SignalR</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">PvSuffix</span><span class="p">(</span><span class="s2">&quot;NumAverage_RBV&quot;</span><span class="p">)]</span>
+    <span class="n">averaged</span><span class="p">:</span> <span class="n">A</span><span class="p">[</span><span class="n">SignalR</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">PvSuffix</span><span class="p">(</span><span class="s2">&quot;NumAveraged_RBV&quot;</span><span class="p">)]</span>
+    <span class="n">overflows</span><span class="p">:</span> <span class="n">A</span><span class="p">[</span><span class="n">SignalR</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">PvSuffix</span><span class="p">(</span><span class="s2">&quot;RingOverflows&quot;</span><span class="p">)]</span>
+    <span class="n">num_channels</span><span class="p">:</span> <span class="n">A</span><span class="p">[</span><span class="n">SignalRW</span><span class="p">[</span><span class="n">TetrammChannels</span><span class="p">],</span> <span class="n">PvSuffix</span><span class="o">.</span><span class="n">rbv</span><span class="p">(</span><span class="s2">&quot;NumChannels&quot;</span><span class="p">)]</span>
+    <span class="n">resolution</span><span class="p">:</span> <span class="n">A</span><span class="p">[</span><span class="n">SignalRW</span><span class="p">[</span><span class="n">TetrammResolution</span><span class="p">],</span> <span class="n">PvSuffix</span><span class="o">.</span><span class="n">rbv</span><span class="p">(</span><span class="s2">&quot;Resolution&quot;</span><span class="p">)]</span>
+    <span class="n">trigger_mode</span><span class="p">:</span> <span class="n">A</span><span class="p">[</span><span class="n">SignalRW</span><span class="p">[</span><span class="n">TetrammTrigger</span><span class="p">],</span> <span class="n">PvSuffix</span><span class="o">.</span><span class="n">rbv</span><span class="p">(</span><span class="s2">&quot;TriggerMode&quot;</span><span class="p">)]</span>
+    <span class="n">bias</span><span class="p">:</span> <span class="n">A</span><span class="p">[</span><span class="n">SignalRW</span><span class="p">[</span><span class="nb">bool</span><span class="p">],</span> <span class="n">PvSuffix</span><span class="o">.</span><span class="n">rbv</span><span class="p">(</span><span class="s2">&quot;BiasState&quot;</span><span class="p">)]</span>
+    <span class="n">bias_volts</span><span class="p">:</span> <span class="n">A</span><span class="p">[</span><span class="n">SignalRW</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">PvSuffix</span><span class="o">.</span><span class="n">rbv</span><span class="p">(</span><span class="s2">&quot;BiasVoltage&quot;</span><span class="p">)]</span>
+    <span class="n">geometry</span><span class="p">:</span> <span class="n">A</span><span class="p">[</span><span class="n">SignalRW</span><span class="p">[</span><span class="n">TetrammGeometry</span><span class="p">],</span> <span class="n">PvSuffix</span><span class="o">.</span><span class="n">rbv</span><span class="p">(</span><span class="s2">&quot;Geometry&quot;</span><span class="p">)]</span>
+    <span class="n">read_format</span><span class="p">:</span> <span class="n">A</span><span class="p">[</span><span class="n">SignalRW</span><span class="p">[</span><span class="nb">bool</span><span class="p">],</span> <span class="n">PvSuffix</span><span class="o">.</span><span class="n">rbv</span><span class="p">(</span><span class="s2">&quot;ReadFormat&quot;</span><span class="p">)]</span></div>
 
 
 
 <div class="viewcode-block" id="TetrammController">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.tetramm.TetrammController.html#dodal.devices.tetramm.TetrammController">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">TetrammController</span><span class="p">(</span><span class="n">DetectorController</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Controller for a TetrAMM current monitor</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Controller for a TetrAMM current monitor&quot;&quot;&quot;</span>
 
-<span class="sd">    Attributes:</span>
-<span class="sd">        base_sample_rate (int): Fixed in hardware</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        drv (TetrammDriver): A configured driver for the device</span>
-<span class="sd">        maximum_readings_per_frame (int): Maximum number of readings per frame: actual readings may be lower if higher frame rate is required</span>
-<span class="sd">        minimum_values_per_reading (int): Lower bound on the values that will be averaged to create a single reading</span>
-<span class="sd">        readings_per_frame (int): Actual number of readings per frame.</span>
-
+    <span class="n">_supported_trigger_types</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">DetectorTrigger</span><span class="o">.</span><span class="n">EDGE_TRIGGER</span><span class="p">:</span> <span class="n">TetrammTrigger</span><span class="o">.</span><span class="n">EXT_TRIGGER</span><span class="p">,</span>
+        <span class="n">DetectorTrigger</span><span class="o">.</span><span class="n">CONSTANT_GATE</span><span class="p">:</span> <span class="n">TetrammTrigger</span><span class="o">.</span><span class="n">EXT_TRIGGER</span><span class="p">,</span>
+    <span class="p">}</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;&quot;On the TetrAMM ASCII mode requires a minimum value of ValuesPerRead of 500,</span>
+<span class="sd">    [...] binary mode the minimum value of ValuesPerRead is 5.&quot;</span>
+<span class="sd">    https://millenia.cars.aps.anl.gov/software/epics/quadEMDoc.html</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="n">base_sample_rate</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100_000</span>
+    <span class="n">_minimal_values_per_reading</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">500</span><span class="p">}</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The TetrAMM always digitizes at 100 kHz&quot;&quot;&quot;</span>
+    <span class="n">_base_sample_rate</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100_000</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">drv</span><span class="p">:</span> <span class="n">TetrammDriver</span><span class="p">,</span>
-        <span class="n">minimum_values_per_reading</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
-        <span class="n">maximum_readings_per_frame</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1_000</span><span class="p">,</span>
-        <span class="n">readings_per_frame</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1_000</span><span class="p">,</span>
-    <span class="p">):</span>
-        <span class="c1"># TODO: Are any of these also fixed by hardware constraints?</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_drv</span> <span class="o">=</span> <span class="n">drv</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">maximum_readings_per_frame</span> <span class="o">=</span> <span class="n">maximum_readings_per_frame</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">minimum_values_per_reading</span> <span class="o">=</span> <span class="n">minimum_values_per_reading</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">readings_per_frame</span> <span class="o">=</span> <span class="n">readings_per_frame</span>
+        <span class="n">driver</span><span class="p">:</span> <span class="n">TetrammDriver</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">driver</span> <span class="o">=</span> <span class="n">driver</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_arm_status</span><span class="p">:</span> <span class="n">AsyncStatus</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">get_deadtime</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exposure</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
         <span class="c1"># 2 internal clock cycles. Best effort approximation</span>
-        <span class="k">return</span> <span class="mi">2</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_sample_rate</span>
+        <span class="k">return</span> <span class="mi">2</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_base_sample_rate</span>
 
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">prepare</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trigger_info</span><span class="p">:</span> <span class="n">TriggerInfo</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_trigger</span><span class="p">(</span><span class="n">trigger_info</span><span class="o">.</span><span class="n">trigger</span><span class="p">)</span>
-        <span class="k">assert</span> <span class="n">trigger_info</span><span class="o">.</span><span class="n">livetime</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">prepare</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trigger_info</span><span class="p">:</span> <span class="n">TriggerInfo</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">trigger_info</span><span class="o">.</span><span class="n">trigger</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_supported_trigger_types</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> only supports the following trigger &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;types: </span><span class="si">{</span><span class="p">[</span><span class="n">k</span><span class="o">.</span><span class="n">name</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">k</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="bp">self</span><span class="o">.</span><span class="n">_supported_trigger_types</span><span class="p">]</span><span class="si">}</span><span class="s2"> but was asked to &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;use </span><span class="si">{</span><span class="n">trigger_info</span><span class="o">.</span><span class="n">trigger</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">trigger_info</span><span class="o">.</span><span class="n">livetime</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> requires that livetime is set&quot;</span><span class="p">)</span>
 
         <span class="c1"># trigger mode must be set first and on its own!</span>
-        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_drv</span><span class="o">.</span><span class="n">trigger_mode</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">TetrammTrigger</span><span class="o">.</span><span class="n">EXT_TRIGGER</span><span class="p">)</span>
-
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">trigger_mode</span><span class="o">.</span><span class="n">set</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_supported_trigger_types</span><span class="p">[</span><span class="n">trigger_info</span><span class="o">.</span><span class="n">trigger</span><span class="p">]</span>
+        <span class="p">)</span>
         <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_drv</span><span class="o">.</span><span class="n">averaging_time</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">trigger_info</span><span class="o">.</span><span class="n">livetime</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">averaging_time</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">trigger_info</span><span class="o">.</span><span class="n">livetime</span><span class="p">),</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">set_exposure</span><span class="p">(</span><span class="n">trigger_info</span><span class="o">.</span><span class="n">livetime</span><span class="p">),</span>
         <span class="p">)</span>
 
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">arm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_arm_status</span> <span class="o">=</span> <span class="k">await</span> <span class="n">set_and_wait_for_value</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_drv</span><span class="o">.</span><span class="n">acquire</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="n">wait_for_set_completion</span><span class="o">=</span><span class="kc">False</span>
-        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_arm_status</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_acquiring_driver_and_ensure_status</span><span class="p">()</span>
 
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">wait_for_idle</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_arm_status</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_arm_status</span><span class="o">.</span><span class="n">done</span><span class="p">:</span>
             <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_arm_status</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_arm_status</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trigger</span><span class="p">:</span> <span class="n">DetectorTrigger</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">supported_trigger_types</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="n">DetectorTrigger</span><span class="o">.</span><span class="n">EDGE_TRIGGER</span><span class="p">,</span>
-            <span class="n">DetectorTrigger</span><span class="o">.</span><span class="n">CONSTANT_GATE</span><span class="p">,</span>
-        <span class="p">}</span>
-
-        <span class="k">if</span> <span class="n">trigger</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">supported_trigger_types</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> only supports the following trigger &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;types: </span><span class="si">{</span><span class="n">supported_trigger_types</span><span class="si">}</span><span class="s2"> but was asked to &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;use </span><span class="si">{</span><span class="n">trigger</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="p">)</span>
-
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">disarm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">await</span> <span class="n">stop_busy_record</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_drv</span><span class="o">.</span><span class="n">acquire</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="c1"># We can&#39;t use caput callback as we already used it in arm() and we can&#39;t have</span>
+        <span class="c1"># 2 or they will deadlock</span>
+        <span class="k">await</span> <span class="n">stop_busy_record</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">acquire</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
 <div class="viewcode-block" id="TetrammController.set_exposure">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.tetramm.TetrammController.html#dodal.devices.tetramm.TetrammController.set_exposure">[docs]</a>
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set_exposure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exposure</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Tries to set the exposure time of a single frame.</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set_exposure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exposure</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the exposure time and acquire period.</span>
 
 <span class="sd">        As during the  exposure time, the device must collect an integer number</span>
 <span class="sd">        of readings, in the case where the exposure is not a multiple of the base</span>
 <span class="sd">        sample rate, it will be lowered to the prior multiple ot ensure triggers</span>
 <span class="sd">        are not missed.</span>
 
-<span class="sd">        Args:</span>
-<span class="sd">            exposure (float): The time for a single frame in seconds</span>
-
-<span class="sd">        Raises:</span>
-<span class="sd">            ValueError: If exposure is too low to collect the required number</span>
-<span class="sd">            of readings per frame.</span>
+<span class="sd">        :param exposure: Desired exposure time.</span>
+<span class="sd">        :type exposure: How long to wait for the exposure time and acquire</span>
+<span class="sd">            period to be set.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="c1"># Set up the number of readings across the exposure period to scale with</span>
-        <span class="c1"># the exposure time</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_set_minimum_exposure</span><span class="p">(</span><span class="n">exposure</span><span class="p">)</span>
-        <span class="n">values_per_reading</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span>
-            <span class="n">exposure</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_sample_rate</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">readings_per_frame</span>
-        <span class="p">)</span>
-
-        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_drv</span><span class="o">.</span><span class="n">values_per_reading</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">values_per_reading</span><span class="p">)</span></div>
-
-
-    <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">max_frame_rate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Max frame rate in Hz for the current configuration&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="mi">1</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">minimum_exposure</span>
-
-    <span class="nd">@max_frame_rate</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">max_frame_rate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mfr</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_set_minimum_exposure</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">mfr</span><span class="p">)</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">minimum_exposure</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Smallest amount of time needed to take a frame&quot;&quot;&quot;</span>
-        <span class="n">time_per_reading</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">minimum_values_per_reading</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_sample_rate</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">readings_per_frame</span> <span class="o">*</span> <span class="n">time_per_reading</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">_set_minimum_exposure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exposure</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
-        <span class="n">time_per_reading</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">minimum_values_per_reading</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_sample_rate</span>
-        <span class="k">if</span> <span class="n">exposure</span> <span class="o">&lt;</span> <span class="n">time_per_reading</span><span class="p">:</span>
+        <span class="n">sample_time</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">sample_time</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
+        <span class="n">minimum_samples</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_minimal_values_per_reading</span><span class="p">[</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">read_format</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
+        <span class="p">]</span>
+        <span class="n">samples_per_reading</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">exposure</span> <span class="o">/</span> <span class="n">sample_time</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">samples_per_reading</span> <span class="o">&lt;</span> <span class="n">minimum_samples</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="s2">&quot;Tetramm exposure time must be at least &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">time_per_reading</span><span class="si">}</span><span class="s2">s, asked to set it to </span><span class="si">{</span><span class="n">exposure</span><span class="si">}</span><span class="s2">s&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">minimum_samples</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">sample_time</span><span class="si">}</span><span class="s2">s, asked to set it to </span><span class="si">{</span><span class="n">exposure</span><span class="si">}</span><span class="s2">s&quot;</span>
             <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">readings_per_frame</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span>
-            <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">maximum_readings_per_frame</span><span class="p">,</span> <span class="n">exposure</span> <span class="o">/</span> <span class="n">time_per_reading</span><span class="p">)</span>
-        <span class="p">)</span></div>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">averaging_time</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">samples_per_reading</span> <span class="o">*</span> <span class="n">sample_time</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TetrammController.start_acquiring_driver_and_ensure_status">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.tetramm.TetrammController.html#dodal.devices.tetramm.TetrammController.start_acquiring_driver_and_ensure_status">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">start_acquiring_driver_and_ensure_status</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AsyncStatus</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Start acquiring driver, raising ValueError if the detector is in a bad state.</span>
+
+<span class="sd">        This sets driver.acquire to True, and waits for it to be True up to a timeout.</span>
+<span class="sd">        Then, it checks that the DetectorState PV is in DEFAULT_GOOD_STATES,</span>
+<span class="sd">        and otherwise raises a ValueError.</span>
+
+<span class="sd">        :returns AsyncStatus:</span>
+<span class="sd">            An AsyncStatus that can be awaited to set driver.acquire to True and perform</span>
+<span class="sd">            subsequent raising (if applicable) due to detector state.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">status</span> <span class="o">=</span> <span class="k">await</span> <span class="n">set_and_wait_for_value</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">acquire</span><span class="p">,</span>
+            <span class="kc">True</span><span class="p">,</span>
+            <span class="n">timeout</span><span class="o">=</span><span class="n">DEFAULT_TIMEOUT</span><span class="p">,</span>
+            <span class="n">wait_for_set_completion</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">complete_acquisition</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># NOTE: possible race condition here between the callback from</span>
+            <span class="c1"># set_and_wait_for_value and the detector state updating.</span>
+            <span class="k">await</span> <span class="n">status</span>
+
+        <span class="k">return</span> <span class="n">AsyncStatus</span><span class="p">(</span><span class="n">complete_acquisition</span><span class="p">())</span></div>
+</div>
 
 
 
 <div class="viewcode-block" id="TetrammDatasetDescriber">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.tetramm.TetrammDatasetDescriber.html#dodal.devices.tetramm.TetrammDatasetDescriber">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">TetrammDatasetDescriber</span><span class="p">(</span><span class="n">DatasetDescriber</span><span class="p">):</span>
-    <span class="n">max_channels</span> <span class="o">=</span> <span class="mi">11</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">:</span> <span class="n">TetrammController</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">controller</span> <span class="o">=</span> <span class="n">controller</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="p">:</span> <span class="n">TetrammDriver</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_driver</span> <span class="o">=</span> <span class="n">driver</span>
 
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">np_datatype</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="s2">&quot;&lt;f8&quot;</span>  <span class="c1"># IEEE 754 double precision floating point</span>
 
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">shape</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
-        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_channels</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">controller</span><span class="o">.</span><span class="n">readings_per_frame</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="nb">int</span><span class="p">(</span><span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_driver</span><span class="o">.</span><span class="n">num_channels</span><span class="o">.</span><span class="n">get_value</span><span class="p">()),</span>
+            <span class="nb">int</span><span class="p">(</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_driver</span><span class="o">.</span><span class="n">averaging_time</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
+                <span class="o">/</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_driver</span><span class="o">.</span><span class="n">sample_time</span><span class="o">.</span><span class="n">get_value</span><span class="p">(),</span>
+            <span class="p">),</span>
+        <span class="p">)</span></div>
 
 
 
-<span class="c1"># TODO: Support MeanValue signals https://github.com/DiamondLightSource/dodal/issues/337</span>
 <div class="viewcode-block" id="TetrammDetector">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.tetramm.TetrammDetector.html#dodal.devices.tetramm.TetrammDetector">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">TetrammDetector</span><span class="p">(</span><span class="n">StandardDetector</span><span class="p">):</span>
@@ -708,38 +686,47 @@ window.addEventListener("load", () => mermaid.run());
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">path_provider</span><span class="p">:</span> <span class="n">PathProvider</span><span class="p">,</span>
+        <span class="n">drv_suffix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;DRV:&quot;</span><span class="p">,</span>
+        <span class="n">fileio_suffix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;HDF5:&quot;</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-        <span class="nb">type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">plugins</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NDPluginBaseIO</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">drv</span> <span class="o">=</span> <span class="n">TetrammDriver</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;DRV:&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">hdf</span> <span class="o">=</span> <span class="n">NDFileHDFIO</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;HDF5:&quot;</span><span class="p">)</span>
-        <span class="n">controller</span> <span class="o">=</span> <span class="n">TetrammController</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">drv</span><span class="p">)</span>
-        <span class="n">config_signals</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">drv</span><span class="o">.</span><span class="n">values_per_reading</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">drv</span><span class="o">.</span><span class="n">averaging_time</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">drv</span><span class="o">.</span><span class="n">sample_time</span><span class="p">,</span>
-        <span class="p">]</span>
-        <span class="k">if</span> <span class="nb">type</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">soft_signal_r_and_setter</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">)</span>
-            <span class="n">config_signals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="n">controller</span><span class="p">,</span>
-            <span class="n">ADHDFWriter</span><span class="p">(</span>
-                <span class="n">fileio</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hdf</span><span class="p">,</span>
-                <span class="n">path_provider</span><span class="o">=</span><span class="n">path_provider</span><span class="p">,</span>
-                <span class="n">dataset_describer</span><span class="o">=</span><span class="n">TetrammDatasetDescriber</span><span class="p">(</span><span class="n">controller</span><span class="p">),</span>
-                <span class="n">plugins</span><span class="o">=</span><span class="n">plugins</span><span class="p">,</span>
-            <span class="p">),</span>
-            <span class="n">config_signals</span><span class="p">,</span>
-            <span class="n">name</span><span class="p">,</span>
+        <span class="n">config_sigs</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">SignalR</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span>
+        <span class="nb">type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">driver</span> <span class="o">=</span> <span class="n">TetrammDriver</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="n">drv_suffix</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_io</span> <span class="o">=</span> <span class="n">NDFileHDFIO</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="n">fileio_suffix</span><span class="p">)</span>
+        <span class="n">controller</span> <span class="o">=</span> <span class="n">TetrammController</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="p">)</span>
+
+        <span class="n">writer</span> <span class="o">=</span> <span class="n">ADHDFWriter</span><span class="p">(</span>
+            <span class="n">fileio</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">file_io</span><span class="p">,</span>
+            <span class="n">path_provider</span><span class="o">=</span><span class="n">path_provider</span><span class="p">,</span>
+            <span class="n">dataset_describer</span><span class="o">=</span><span class="n">TetrammDatasetDescriber</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="p">),</span>
+            <span class="n">plugins</span><span class="o">=</span><span class="n">plugins</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">hints</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Hints</span><span class="p">:</span>
-        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;fields&quot;</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">]}</span></div>
+        <span class="n">config_sigs</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">values_per_reading</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">averaging_time</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">sample_time</span><span class="p">,</span>
+            <span class="o">*</span><span class="n">config_sigs</span><span class="p">,</span>
+        <span class="p">]</span>
+
+        <span class="k">if</span> <span class="nb">type</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">soft_signal_r_and_setter</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">)</span>
+            <span class="n">config_sigs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="n">plugins</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">plugin_name</span><span class="p">,</span> <span class="n">plugin</span> <span class="ow">in</span> <span class="n">plugins</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plugin_name</span><span class="p">,</span> <span class="n">plugin</span><span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">controller</span><span class="o">=</span><span class="n">controller</span><span class="p">,</span>
+            <span class="n">writer</span><span class="o">=</span><span class="n">writer</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">config_sigs</span><span class="o">=</span><span class="n">config_sigs</span><span class="p">,</span>
+        <span class="p">)</span></div>
 
 </pre></div>
 

@@ -28,25 +28,14 @@ dodal.devices.tetramm.TetrammController
       ~TetrammController.set_exposure
       
       
+      ~TetrammController.start_acquiring_driver_and_ensure_status
+      
+      
       ~TetrammController.wait_for_idle
       
    
    
 
    
-   
-   .. rubric:: Attributes
-
-   .. autosummary::
-   
-      
-      ~TetrammController.base_sample_rate
-      
-      
-      ~TetrammController.max_frame_rate
-      
-      
-      ~TetrammController.minimum_exposure
-      
    
    

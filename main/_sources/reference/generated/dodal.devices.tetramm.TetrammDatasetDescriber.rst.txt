@@ -23,12 +23,4 @@ dodal.devices.tetramm.TetrammDatasetDescriber
 
    
    
-   .. rubric:: Attributes
-
-   .. autosummary::
-   
-      
-      ~TetrammDatasetDescriber.max_channels
-      
-   
    
