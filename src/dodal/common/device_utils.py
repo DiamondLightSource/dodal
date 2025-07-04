@@ -1,4 +1,4 @@
-import asyncio
+from asyncio import CancelledError, create_task, sleep
 from contextlib import asynccontextmanager
 
 from dodal.log import LOGGER
@@ -31,15 +31,15 @@ async def periodic_reminder(
             n = 0
             while count is None or n < count:
                 LOGGER.info(message)
-                await asyncio.sleep(delay)
+                await sleep(delay)
                 n += 1
 
-    task = asyncio.create_task(_log_loop())
+    task = create_task(_log_loop())
     try:
         yield
     finally:
         task.cancel()
         try:
             await task
-        except asyncio.CancelledError:
+        except CancelledError:
             pass
