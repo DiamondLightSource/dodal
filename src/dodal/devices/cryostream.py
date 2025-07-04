@@ -17,3 +17,29 @@ class CryoStream(StandardReadable):
         )
 
         super().__init__(name)
+
+
+class OxfordCryoStreamStatus(StandardReadable):
+    def __init__(self, prefix: str, name: str = ""):
+        self.setpoint = epics_signal_r(float, f"{prefix}SETPOINT")
+        self.temp = epics_signal_r(float, f"{prefix}TEMP")
+        self.error = epics_signal_r(float, f"{prefix}ERROR")
+        self.mode = epics_signal_r(str, f"{prefix}RUNMODE")
+        self.phase = epics_signal_r(str, f"{prefix}PHASE")
+        self.ramp_rate = epics_signal_r(float, f"{prefix}RAMPRATE")
+        self.target_temp = epics_signal_r(float, f"{prefix}TARGETTEMP")
+        self.evap_temp = epics_signal_r(float, f"{prefix}EVAPTEMP")
+        self.time_remaining = epics_signal_r(float, f"{prefix}REMAINING")
+        self.gas_flow = epics_signal_r(float, f"{prefix}GASFLOW")
+        self.gas_heat = epics_signal_r(float, f"{prefix}GASHEAT")
+        self.evap_heat = epics_signal_r(float, f"{prefix}EVAPHEAT")
+        self.suct_temp = epics_signal_r(float, f"{prefix}SUCTTEMP")
+        self.suct_heat = epics_signal_r(float, f"{prefix}SUCTHEAT")
+        self.back_pressure = epics_signal_r(float, f"{prefix}BACKPRESS")
+
+        self.pump_uptime = epics_signal_r(float, f"{prefix}RUNTIME")
+        self.controller_number = epics_signal_r(float, f"{prefix}CTRLNUM")
+        self.software_version = epics_signal_r(float, f"{prefix}VER")
+        self.evap_adjust = epics_signal_r(float, f"{prefix}EVAPADJUST")
+
+        super().__init__(name)
