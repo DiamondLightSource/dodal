@@ -14,11 +14,11 @@ from dodal.devices.electron_analyser.vgscienta.enums import (
 )
 
 
-class VGScientaRegion(AbstractBaseRegion[AcquisitionMode]):
+class VGScientaRegion(AbstractBaseRegion):
     # Override defaults of base region class
-    lens_mode: str = "Angular45"
+    lens_mode: str
     pass_energy: int = 5
-    acquisition_mode: AcquisitionMode = AcquisitionMode.SWEPT
+    acquisition_mode: str = AcquisitionMode.SWEPT
     low_energy: float = 8.0
     high_energy: float = 10.0
     step_time: float = 1.0

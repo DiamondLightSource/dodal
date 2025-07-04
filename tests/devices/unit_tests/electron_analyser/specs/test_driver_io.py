@@ -7,6 +7,7 @@ from ophyd_async.testing import (
     set_mock_value,
 )
 
+from dodal.devices.b07 import LensMode
 from dodal.devices.electron_analyser import EnergyMode
 from dodal.devices.electron_analyser.specs import (
     AcquisitionMode,
@@ -20,8 +21,8 @@ from tests.devices.unit_tests.electron_analyser.util import (
 
 
 @pytest.fixture
-def driver_class() -> type[SpecsAnalyserDriverIO]:
-    return SpecsAnalyserDriverIO
+def driver_class() -> type[SpecsAnalyserDriverIO[LensMode]]:
+    return SpecsAnalyserDriverIO[LensMode]
 
 
 @pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
@@ -55,7 +56,7 @@ async def test_given_region_that_analyser_sets_energy_values_correctly(
 
 @pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
 async def test_given_region_that_analyser_sets_modes_correctly(
-    sim_driver: SpecsAnalyserDriverIO,
+    sim_driver: SpecsAnalyserDriverIO[LensMode],
     region: SpecsRegion,
     RE: RunEngine,
 ) -> None:
