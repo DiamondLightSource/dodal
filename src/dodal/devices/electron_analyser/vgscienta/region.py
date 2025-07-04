@@ -28,7 +28,6 @@ class VGScientaRegion(AbstractBaseRegion[AcquisitionMode]):
     fix_energy: float = 9.0
     total_steps: float = 13.0
     total_time: float = 13.0
-    exposure_time: float = 1.0
     first_x_channel: int = 1
     last_x_channel: int = 1000
     first_y_channel: int = 101
