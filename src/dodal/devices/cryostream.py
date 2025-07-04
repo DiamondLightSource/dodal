@@ -22,6 +22,7 @@ class CryoStream(StandardReadable):
 class OxfordCryoStreamControl(StandardReadable):
     def __init__(self, prefix: str, name: str = ""):
         self.purge = epics_signal_rw(float, f"{prefix}PURGE")
+        self.dsdsd = epics_signal_rw(float, f"{prefix}dfdf")
 
         super().__init__(name)
 
