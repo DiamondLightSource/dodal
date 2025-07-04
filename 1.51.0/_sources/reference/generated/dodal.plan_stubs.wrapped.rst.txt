@@ -1,0 +1,38 @@
+dodal.plan\_stubs.wrapped
+=========================
+
+
+
+
+
+
+
+
+
+
+.. automodule:: dodal.plan_stubs.wrapped
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      move
+      move_relative
+      set_absolute
+      set_relative
+      sleep
+      wait
+   
+   
+
+   
+   
+   

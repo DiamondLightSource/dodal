@@ -1,0 +1,36 @@
+dodal.devices.i10.i10\_setting\_data
+====================================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices.i10
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~i10_setting_data.I10Grating
+
+
+
+
+.. automodule:: dodal.devices.i10.i10_setting_data
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

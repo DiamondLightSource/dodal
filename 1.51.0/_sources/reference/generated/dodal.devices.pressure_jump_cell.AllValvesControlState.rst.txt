@@ -1,0 +1,32 @@
+dodal.devices.pressure\_jump\_cell.AllValvesControlState
+========================================================
+
+.. currentmodule:: dodal.devices.pressure_jump_cell
+
+.. autoclass:: AllValvesControlState
+   :members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~AllValvesControlState.valve_1
+      
+      
+      ~AllValvesControlState.valve_3
+      
+      
+      ~AllValvesControlState.valve_5
+      
+      
+      ~AllValvesControlState.valve_6
+      
+   
+   

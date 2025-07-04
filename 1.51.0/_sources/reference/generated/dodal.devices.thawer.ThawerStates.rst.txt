@@ -1,0 +1,78 @@
+dodal.devices.thawer.ThawerStates
+=================================
+
+.. currentmodule:: dodal.devices.thawer
+
+.. autoclass:: ThawerStates
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~ThawerStates.OFF
+      
+      
+      ~ThawerStates.ON
+      
+   
+   

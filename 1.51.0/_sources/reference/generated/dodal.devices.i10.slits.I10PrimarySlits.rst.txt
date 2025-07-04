@@ -1,0 +1,40 @@
+dodal.devices.i10.slits.I10PrimarySlits
+=======================================
+
+.. currentmodule:: dodal.devices.i10.slits
+
+.. autoclass:: I10PrimarySlits
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   
