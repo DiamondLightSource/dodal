@@ -1,0 +1,217 @@
+import enum
+import time
+from collections import deque
+
+from ophyd_async.core import StandardReadable, WatcherUpdate, observe_value
+from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
+
+
+class GasToInject(enum.Enum):
+    ARGON = "argon"
+    HELIUM = "helium"
+    KRYPTON = "krypton"
+    NITROGEN = "nitrogen"
+
+
+class IonChamberToFill(enum.Enum):
+    i0 = "I0"
+    i1 = "I1"
+    iT = "iT"
+    iRef = "iRef"
+
+
+class VacuumPumpCommands(enum.Enum):
+    ON = 0
+    OFF = 1
+
+
+class ValveCommands(enum.Enum):
+    RESET = 2
+    OPEN = 0
+    CLOSE = 1
+
+
+class PressureMode(enum.Enum):
+    HOLD = 0
+    PRESSURE_CONTROL = 1
+
+
+class PressureController(StandardReadable):
+    """
+    Pressure controller for gas injection system.
+    in the old system, it was called MFC1 and MFC2.
+    That stood for Mass Flow Controller.
+    """
+
+    def __init__(self, prefix: str, name: str = ""):
+        with self.add_children_as_readables():
+            self.mode = epics_signal_rw(int, prefix + "MODE:RD")
+            self.readout = epics_signal_r(float, prefix + "P:RD")
+            self.setpoint = epics_signal_rw(float, prefix + "SETPOINT:WR")
+
+
+class GasInjector(StandardReadable):
+    def __init__(self, prefix: str, name: str = ""):
+        with self.add_children_as_readables():
+            self.vacuum_pump = epics_signal_rw(int, prefix + "VACP1:CON")
+            self.line_valve = epics_signal_rw(int, prefix + "V5:CON")
+            # Gas valves as flat signals
+            self.gas_valve_krypton = epics_signal_rw(int, prefix + "V1:CON")
+            self.gas_valve_nitrogen = epics_signal_rw(int, prefix + "V2:CON")
+            self.gas_valve_argon = epics_signal_rw(int, prefix + "V3:CON")
+            self.gas_valve_helium = epics_signal_rw(int, prefix + "V4:CON")
+            # Chamber valves as flat signals
+            self.chamber_i0 = epics_signal_rw(int, prefix + "V6:CON")
+            self.chamber_it = epics_signal_rw(int, prefix + "V7:CON")
+            self.chamber_iref = epics_signal_rw(int, prefix + "V8:CON")
+            self.chamber_i1 = epics_signal_rw(int, prefix + "V9:CON")
+            self.pressure_controller_1 = PressureController(
+                prefix + "PCTRL1:", name="pressure_controller_1"
+            )
+            self.pressure_controller_2 = PressureController(
+                prefix + "PCTRL2:", name="pressure_controller_2"
+            )
+
+    def get_gas_valve(self, gas: GasToInject):
+        match gas:
+            case GasToInject.KRYPTON:
+                return self.gas_valve_krypton
+            case GasToInject.NITROGEN:
+                return self.gas_valve_nitrogen
+            case GasToInject.ARGON:
+                return self.gas_valve_argon
+            case GasToInject.HELIUM:
+                return self.gas_valve_helium
+            case _:
+                raise ValueError(f"Unknown gas: {gas}")
+
+    def get_chamber_valve(self, chamber: IonChamberToFill):
+        match chamber:
+            case IonChamberToFill.i0:
+                return self.chamber_i0
+            case IonChamberToFill.iT:
+                return self.chamber_it
+            case IonChamberToFill.iRef:
+                return self.chamber_iref
+            case IonChamberToFill.i1:
+                return self.chamber_i1
+            case _:
+                raise ValueError(f"Unknown chamber: {chamber}")
+
+    async def wait_for_equilibration(
+        self,
+        signal,
+        window_size: int = 5,
+        tolerance: float = 0.02,
+        max_wait: float = 60.0,
+    ):
+        """
+        Wait until the moving average of the last `window_size` values
+        changes by less than `tolerance` between windows.
+        """
+        window: deque[float] = deque(maxlen=window_size)
+        prev_avg = None
+        start = time.monotonic()
+        async for value in observe_value(signal):
+            window.append(value)
+            if len(window) < window_size:
+                continue
+            avg = sum(window) / window_size
+            if prev_avg is not None and abs(avg - prev_avg) < tolerance:
+                break
+            prev_avg = avg
+            if time.monotonic() - start > max_wait:
+                print("WARNING: Equilibration timed out.")
+                break
+        return list(window)
+
+    async def inject_gas(
+        self,
+        target_pressure: float,
+        chamber: IonChamberToFill,
+        gas: GasToInject = GasToInject.ARGON,
+    ):
+        chamber_valve = self.get_chamber_valve(chamber)
+        gas_valve = self.get_gas_valve(gas)
+        chamber_pressure = self.pressure_controller_2
+        await chamber_pressure.setpoint.set(target_pressure)
+        await gas_valve.set(ValveCommands.RESET.value)
+        await gas_valve.set(ValveCommands.OPEN.value)
+        await chamber_pressure.mode.set(PressureMode.PRESSURE_CONTROL.value)
+        start = time.monotonic()
+        print(f"Injecting {gas.value} into {chamber} at {target_pressure} mbar...")
+        async for current_pressure in observe_value(chamber_pressure.readout):
+            yield WatcherUpdate(
+                name="chamber_pressure",
+                current=current_pressure,
+                initial=target_pressure,
+                target=target_pressure,
+                time_elapsed=time.monotonic() - start,
+            )
+            if abs(current_pressure - target_pressure) < 0.1:
+                break
+        # Wait for equilibration near zero after injection
+        print("Waiting for pressure to equilibrate near zero...")
+        await self.wait_for_equilibration(
+            chamber_pressure.readout, window_size=5, tolerance=0.02, max_wait=60.0
+        )
+        await chamber_valve.set(ValveCommands.CLOSE.value)
+        await chamber_pressure.mode.set(PressureMode.HOLD.value)
+        await gas_valve.set(ValveCommands.CLOSE.value)
+
+    async def purge_chamber(self, chamber: IonChamberToFill):
+        chamber_valve = self.get_chamber_valve(chamber)
+        chamber_pressure = self.pressure_controller_2
+        await self.vacuum_pump.set(VacuumPumpCommands.ON.value)
+        await self.line_valve.set(ValveCommands.RESET.value)
+        await self.line_valve.set(ValveCommands.OPEN.value)
+        print(f"Purging {chamber} chamber...")
+        await chamber_valve.set(ValveCommands.RESET.value)
+        await chamber_valve.set(ValveCommands.OPEN.value)
+        base_pressure = (await chamber_pressure.readout.read())["value"]
+        await chamber_valve.set(ValveCommands.CLOSE.value)
+
+        # Wait for pressure to equilibrate near zero after purging
+        print("Waiting for chamber pressure to equilibrate near zero after purge...")
+        await self.wait_for_equilibration(
+            chamber_pressure.readout, window_size=5, tolerance=0.02, max_wait=60.0
+        )
+        check_pressure = (await chamber_pressure.readout.read())["value"]
+        print(
+            f"Base pressure in {chamber} is {base_pressure} mbar, "
+            f"check pressure after leak check is {check_pressure} mbar"
+        )
+        if check_pressure - base_pressure > 3:
+            print(f"WARNING, suspected leak in {chamber}, stopping here!!!")
+
+        await chamber_valve.set(ValveCommands.CLOSE.value)
+        await self.line_valve.set(ValveCommands.CLOSE.value)
+        await self.vacuum_pump.set(VacuumPumpCommands.OFF.value)
+
+    async def purge_line(self):
+        """
+        Purge the gas-supply line.
+        This is done by opening the line valve and waiting for the pressure to drop below a certain limit.
+        """
+        tolerance = 0.1
+        await self.vacuum_pump.set(VacuumPumpCommands.ON.value)
+        await self.line_valve.set(ValveCommands.RESET.value)
+        await self.line_valve.set(ValveCommands.OPEN.value)
+        line_pressure = (await self.pressure_controller_1.readout.read())["value"]
+        LIMIT_PRESSURE = 8.5
+        start = time.monotonic()
+        print("Purging the gas-supply line...")
+
+        async for current_pressure in observe_value(self.pressure_controller_1.readout):
+            yield WatcherUpdate(
+                name="line_pressure",
+                current=current_pressure,
+                initial=line_pressure,
+                target=LIMIT_PRESSURE,
+                time_elapsed=time.monotonic() - start,
+            )
+            if abs(current_pressure - LIMIT_PRESSURE) < tolerance:
+                break
+
+        await self.line_valve.set(ValveCommands.CLOSE.value)
+        await self.vacuum_pump.set(VacuumPumpCommands.OFF.value)
