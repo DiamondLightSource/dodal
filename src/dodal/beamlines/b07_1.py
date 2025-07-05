@@ -1,8 +1,6 @@
-from dodal.common.beamlines.beamline_utils import (
-    device_factory,
-)
+from dodal.common.beamlines.beamline_utils import device_factory
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.devices.b07_1 import B07CGrating
+from dodal.devices.b07_1 import CCMC, B07CGrating, CCMCPositions
 from dodal.devices.electron_analyser.specs import SpecsAnalyserDriverIO
 from dodal.devices.pgm import PGM
 from dodal.devices.synchrotron import Synchrotron
@@ -26,8 +24,16 @@ def pgm() -> PGM:
 
 
 @device_factory()
+def ccmc() -> CCMC:
+    return CCMC(prefix=f"{PREFIX.beamline_prefix}-OP-CCM-01:", positions=CCMCPositions)
+
+
+@device_factory()
 def analyser_driver() -> SpecsAnalyserDriverIO:
+    energy_sources = {
+        "source1": pgm().energy.user_readback,
+        "source2": ccmc().energy_in_ev,
+    }
     return SpecsAnalyserDriverIO(
-        f"{PREFIX.beamline_prefix}-EA-DET-01:CAM:",
-        {"source1": pgm().energy.user_readback},
+        f"{PREFIX.beamline_prefix}-EA-DET-01:CAM:", energy_sources
     )
