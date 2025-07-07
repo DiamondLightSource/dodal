@@ -30,5 +30,7 @@ def analyser_driver() -> VGScientaAnalyserDriverIO[LensMode]:
         "source2": mg_kalpha_source().energy_ev,
     }
     return VGScientaAnalyserDriverIO[LensMode](
-        f"{PREFIX.beamline_prefix}-EA-DET-01:CAM:", LensMode, energy_sources
+        prefix=f"{PREFIX.beamline_prefix}-EA-DET-01:CAM:",
+        lens_mode_type=LensMode,
+        energy_sources=energy_sources,
     )

@@ -28,7 +28,7 @@ def pgm() -> PGM:
 @device_factory()
 def analyser_driver() -> SpecsAnalyserDriverIO[LensMode]:
     return SpecsAnalyserDriverIO[LensMode](
-        f"{PREFIX.beamline_prefix}-EA-DET-01:CAM:",
-        LensMode,
-        {"source1": pgm().energy.user_readback},
+        prefix=f"{PREFIX.beamline_prefix}-EA-DET-01:CAM:",
+        lens_mode_type=LensMode,
+        energy_sources={"source1": pgm().energy.user_readback},
     )
