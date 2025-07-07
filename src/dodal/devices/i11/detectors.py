@@ -1,6 +1,11 @@
-class Mythen3:
-    pass
+from ophyd_async.core import StandardDetector
 
 
-class MAC:
-    pass
+class Mythen3(StandardDetector):
+    def __init__(self, name=""):
+        pass
+
+
+class MAC(StandardDetector):
+    def __init__(self, name=""):
+        pass

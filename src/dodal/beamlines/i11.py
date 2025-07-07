@@ -34,8 +34,14 @@ set_path_provider(
 
 @device_factory()
 def cstrm1() -> OxfordCryoStream:
-    """Get the i11 Oxford Cryostream 700 device, instantiate it."""
+    """i11 Oxford Cryostream 700 plus without cryoshutter"""
     return OxfordCryoStream(f"{PREFIX.beamline_prefix}-CG-CSTRM-01:")
+
+
+@device_factory()
+def cstrm2() -> OxfordCryoStream:
+    """i11 Oxford Cryostream 700 standard without cryoshutter"""
+    return OxfordCryoStream(f"{PREFIX.beamline_prefix}-CG-CSTRM-02:")
 
 
 @device_factory()

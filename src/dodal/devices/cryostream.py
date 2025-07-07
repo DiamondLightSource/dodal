@@ -24,7 +24,30 @@ class CryoStream(StandardReadable):
 class OxfordCryoStreamController(StandardReadable):
     def __init__(self, prefix: str, name: str = ""):
         self.purge = epics_signal_rw(float, f"{prefix}PURGE")
-        self.dsdsd = epics_signal_rw(float, f"{prefix}dfdf")
+        self.hold = epics_signal_rw(float, f"{prefix}HOLD")
+        self.restart = epics_signal_rw(float, f"{prefix}RESTART")
+        self.pause = epics_signal_rw(float, f"{prefix}PAUSE")
+        self.resume = epics_signal_rw(float, f"{prefix}RESUME")
+        self.end = epics_signal_rw(float, f"{prefix}END")
+        self.stop = epics_signal_rw(float, f"{prefix}STOP")
+
+        self.ramp_rate = epics_signal_rw(float, f"{prefix}RRATE")
+        self.ramp_temp = epics_signal_rw(float, f"{prefix}RTEMP")
+        self.ramp = epics_signal_rw(float, f"{prefix}RAMP")
+
+        self.plat_time = epics_signal_rw(float, f"{prefix}PTIME")
+        self.plat = epics_signal_rw(float, f"{prefix}PLAT")
+
+        self.cool_temp = epics_signal_rw(float, f"{prefix}CTEMP")
+        self.cool = epics_signal_rw(float, f"{prefix}COOL")
+
+        self.turbo = epics_signal_rw(str, f"{prefix}TURBO")
+        self.turbo_mode = epics_signal_rw(str, f"{prefix}TURBOMODE")
+
+        self.end_rate = epics_signal_rw(float, f"{prefix}ERATE")
+
+        self.serial_comms = epics_signal_rw(str, f"{prefix}DISABLE")
+        self.status = epics_signal_rw(float, f"{prefix}STATUS")
 
         super().__init__(name)
 
@@ -36,7 +59,7 @@ class OxfordCryoStreamStatus(StandardReadable):
         self.error = epics_signal_r(float, f"{prefix}ERROR")
         self.mode = epics_signal_r(str, f"{prefix}RUNMODE")
         self.phase = epics_signal_r(str, f"{prefix}PHASE")
-        self.ramp_rate = epics_signal_r(float, f"{prefix}RAMPRATE")
+        self.ramp_rate_setpoint = epics_signal_r(float, f"{prefix}RAMPRATE")
         self.target_temp = epics_signal_r(float, f"{prefix}TARGETTEMP")
         self.evap_temp = epics_signal_r(float, f"{prefix}EVAPTEMP")
         self.time_remaining = epics_signal_r(float, f"{prefix}REMAINING")
