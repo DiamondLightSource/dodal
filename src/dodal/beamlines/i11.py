@@ -6,7 +6,7 @@ from dodal.common.beamlines.beamline_utils import (
     set_path_provider,
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.common.beamlines.device_helpers import DET_SUFFIX, HDF5_SUFFIX
+from dodal.common.beamlines.device_helpers import DET_SUFFIX
 from dodal.common.visit import RemoteDirectoryServiceClient, StaticVisitPathProvider
 from dodal.devices.cryostream import OxfordCryoStream
 from dodal.devices.i11.detectors import Mythen3
@@ -42,7 +42,7 @@ def mythen3() -> Mythen3:
         prefix=f"{PREFIX.beamline_prefix}-EA-DET-07:",
         path_provider=get_path_provider(),
         drv_suffix=DET_SUFFIX,
-        fileio_suffix=HDF5_SUFFIX,
+        fileio_suffix="HDF:",
     )
 
 

@@ -20,7 +20,7 @@ from ophyd_async.epics.adcore import (
 )
 from ophyd_async.epics.core import PvSuffix
 
-from dodal.common.beamlines.device_helpers import DET_SUFFIX, HDF5_SUFFIX
+from dodal.common.beamlines.device_helpers import DET_SUFFIX
 
 
 class Mythen3TriggerMode(StrictEnum):
@@ -104,7 +104,7 @@ class Mythen3(AreaDetector):
         path_provider: PathProvider,
         drv_suffix=DET_SUFFIX,
         writer_cls: type[ADWriter] = ADHDFWriter,
-        fileio_suffix: str | None = HDF5_SUFFIX,
+        fileio_suffix: str | None = "HDF:",
         name: str = "",
     ):
         driver = Mythen3Driver(prefix + drv_suffix)
