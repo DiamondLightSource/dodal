@@ -43,8 +43,8 @@ class AbstractAnalyserDriverIO(
     def __init__(
         self,
         prefix: str,
-        acquisition_mode_type: type[StrictEnum],
-        lens_mode_type: type[StrictEnum],
+        acquisition_mode_type: type[TAcquisitionMode],
+        lens_mode_type: type[TLensMode],
         energy_sources: Mapping[str, SignalR[float]],
         name: str = "",
     ) -> None:

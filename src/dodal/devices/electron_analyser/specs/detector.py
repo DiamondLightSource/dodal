@@ -1,7 +1,7 @@
 from collections.abc import Mapping
 from typing import Generic
 
-from ophyd_async.core import SignalR, StrictEnum
+from ophyd_async.core import SignalR
 
 from dodal.devices.electron_analyser.abstract.base_driver_io import TLensMode
 from dodal.devices.electron_analyser.detector import (
@@ -22,7 +22,7 @@ class SpecsDetector(
     def __init__(
         self,
         prefix: str,
-        lens_mode_type: type[StrictEnum],
+        lens_mode_type: type[TLensMode],
         energy_sources: Mapping[str, SignalR[float]],
         name: str = "",
     ):
