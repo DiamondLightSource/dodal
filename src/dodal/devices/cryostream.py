@@ -8,6 +8,8 @@ class InOut(StrictEnum):
 
 
 class CryoStream(StandardReadable):
+    """This is an i03 specific device"""
+
     def __init__(self, prefix: str, name: str = ""):
         self.course = epics_signal_rw(InOut, f"{prefix}-EA-CJET-01:COARSE:CTRL")
         self.fine = epics_signal_rw(InOut, f"{prefix}-EA-CJET-01:FINE:CTRL")
@@ -19,7 +21,7 @@ class CryoStream(StandardReadable):
         super().__init__(name)
 
 
-class OxfordCryoStreamControl(StandardReadable):
+class OxfordCryoStreamController(StandardReadable):
     def __init__(self, prefix: str, name: str = ""):
         self.purge = epics_signal_rw(float, f"{prefix}PURGE")
         self.dsdsd = epics_signal_rw(float, f"{prefix}dfdf")
@@ -50,6 +52,12 @@ class OxfordCryoStreamStatus(StandardReadable):
         self.software_version = epics_signal_r(float, f"{prefix}VER")
         self.evap_adjust = epics_signal_r(float, f"{prefix}EVAPADJUST")
 
-        # control = OxfordCryoStreamControl(prefix)
+        super().__init__(name)
+
+
+class OxfordCryoStream(StandardReadable):
+    def __init__(self, prefix: str, name=""):
+        self.controller = OxfordCryoStreamController(prefix=prefix)
+        self.status = OxfordCryoStreamStatus(prefix=prefix)
 
         super().__init__(name)

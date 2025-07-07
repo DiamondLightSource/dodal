@@ -6,7 +6,7 @@ from dodal.common.beamlines.beamline_utils import (
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.visit import RemoteDirectoryServiceClient, StaticVisitPathProvider
-from dodal.devices.cryostream import OxfordCryoStreamStatus
+from dodal.devices.cryostream import OxfordCryoStream
 from dodal.devices.i11.diff_stages import DiffractometerBase, DiffractometerStage
 from dodal.devices.slits import Slits
 from dodal.devices.synchrotron import Synchrotron
@@ -33,11 +33,9 @@ set_path_provider(
 
 
 @device_factory()
-def cstrm1() -> OxfordCryoStreamStatus:
-    """Get the i03 cryostream device, instantiate it if it hasn't already been.
-    If this is called when already instantiated in i03, it will return the existing object.
-    """
-    return OxfordCryoStreamStatus(f"{PREFIX.beamline_prefix}-CG-CSTRM-01:")
+def cstrm1() -> OxfordCryoStream:
+    """Get the i11 Oxford Cryostream 700 device, instantiate it."""
+    return OxfordCryoStream(f"{PREFIX.beamline_prefix}-CG-CSTRM-01:")
 
 
 @device_factory()
