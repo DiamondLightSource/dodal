@@ -19,7 +19,8 @@ class SpecsRegion(AbstractBaseRegion):
     # Specific to this class
     values: int = 1
     centre_energy: float = 0
-    psu_mode: str = "1.5keV"
+    # ToDo - Update to an enum https://github.com/DiamondLightSource/dodal/issues/1328
+    psu_mode: str = "1.5kV"
     estimated_time_in_ms: float = 0
 
 
