@@ -10,7 +10,7 @@ from dodal.common.beamlines.beamline_utils import (
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.beamlines.device_helpers import DET_SUFFIX, HDF5_SUFFIX
 from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitPathProvider
-from dodal.devices.adsim import SimStage
+from dodal.devices.motors import XThetaStage
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix
 
@@ -62,8 +62,10 @@ RE(count([d], num=10))
 
 
 @device_factory()
-def stage() -> SimStage:
-    return SimStage(f"{PREFIX.beamline_prefix}-MO-SIMC-01:")
+def stage() -> XThetaStage:
+    return XThetaStage(
+        f"{PREFIX.beamline_prefix}-MO-SIMC-01:", x_infix="M1", theta_infix="M2"
+    )
 
 
 @device_factory()

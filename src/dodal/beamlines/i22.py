@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from ophyd_async.epics.adaravis import AravisDetector
+from ophyd_async.epics.adcore import NDPluginStatsIO
 from ophyd_async.epics.adpilatus import PilatusDetector
 from ophyd_async.fastcs.panda import HDFPanda
 
@@ -22,6 +23,7 @@ from dodal.devices.i22.dcm import DCM
 from dodal.devices.i22.fswitch import FSwitch
 from dodal.devices.i22.nxsas import NXSasMetadataHolder, NXSasOAV, NXSasPilatus
 from dodal.devices.linkam3 import Linkam3
+from dodal.devices.motors import XYPitchStage
 from dodal.devices.slits import Slits
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.tetramm import TetrammDetector
@@ -100,6 +102,11 @@ def i0() -> TetrammDetector:
         prefix=f"{PREFIX.beamline_prefix}-EA-XBPM-02:",
         path_provider=get_path_provider(),
         type="Cividec Diamond XBPM",
+        plugins={
+            "stats": NDPluginStatsIO(
+                prefix=f"{PREFIX.beamline_prefix}-EA-XBPM-02:SumAll:"
+            )
+        },
     )
 
 
@@ -109,6 +116,11 @@ def it() -> TetrammDetector:
         prefix=f"{PREFIX.beamline_prefix}-EA-TTRM-02:",
         path_provider=get_path_provider(),
         type="PIN Diode",
+        plugins={
+            "stats": NDPluginStatsIO(
+                prefix=f"{PREFIX.beamline_prefix}-EA-TTRM-02:SumAll:"
+            )
+        },
     )
 
 
@@ -264,3 +276,8 @@ def linkam() -> Linkam3:
 def ppump() -> WatsonMarlow323Pump:
     """Sample Environment Peristaltic Pump"""
     return WatsonMarlow323Pump(f"{PREFIX.beamline_prefix}-EA-PUMP-01:")
+
+
+@device_factory()
+def base_top() -> XYPitchStage:
+    return XYPitchStage(f"{PREFIX.beamline_prefix}-MO-STABL-01:")

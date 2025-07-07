@@ -19,7 +19,7 @@ from ophyd_async.core import (
 )
 
 from dodal.beamlines import adsim
-from dodal.devices.adsim import SimStage
+from dodal.devices.motors import XThetaStage
 from dodal.plans import count
 
 """
@@ -62,7 +62,7 @@ def det(RE) -> Generator[StandardDetector]:
 
 
 @pytest.fixture
-def sim_stage(RE) -> Generator[SimStage]:
+def sim_stage(RE) -> Generator[XThetaStage]:
     yield adsim.stage(connect_immediately=True)
     adsim.stage.cache_clear()
 

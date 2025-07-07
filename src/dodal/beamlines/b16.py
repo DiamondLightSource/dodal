@@ -14,7 +14,7 @@ from dodal.common.visit import RemoteDirectoryServiceClient, StaticVisitPathProv
 from dodal.devices.b16.detector import (
     software_triggered_tiff_area_detector,
 )
-from dodal.devices.motors import XYZPositioner
+from dodal.devices.motors import XYZStage
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
@@ -59,7 +59,11 @@ def fds2() -> AreaDetector:
 
 
 @device_factory()
-def sim_stage() -> XYZPositioner:
-    return XYZPositioner(
-        f"{PREFIX.beamline_prefix}-MO-SIM-01:", "sim_stage", infix=("M1", "M2", "M3")
+def sim_stage() -> XYZStage:
+    return XYZStage(
+        f"{PREFIX.beamline_prefix}-MO-SIM-01:",
+        "sim_stage",
+        x_infix="M1",
+        y_infix="M2",
+        z_infix="M3",
     )
