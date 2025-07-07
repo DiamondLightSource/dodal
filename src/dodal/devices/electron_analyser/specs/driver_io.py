@@ -16,7 +16,7 @@ from dodal.devices.electron_analyser.abstract.base_driver_io import (
     AbstractAnalyserDriverIO,
 )
 from dodal.devices.electron_analyser.abstract.base_region import TLensMode
-from dodal.devices.electron_analyser.specs.enums import AcquisitionMode
+from dodal.devices.electron_analyser.specs.enums import AcquisitionMode, PsuMode
 from dodal.devices.electron_analyser.specs.region import SpecsRegion
 
 
@@ -33,7 +33,7 @@ class SpecsAnalyserDriverIO(
     ) -> None:
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             # Used for setting up region data acquisition.
-            self.psu_mode = epics_signal_rw(str, prefix + "SCAN_RANGE")
+            self.psu_mode = epics_signal_rw(PsuMode, prefix + "SCAN_RANGE")
             self.snapshot_values = epics_signal_rw(int, prefix + "VALUES")
             self.centre_energy = epics_signal_rw(float, prefix + "KINETIC_ENERGY")
 

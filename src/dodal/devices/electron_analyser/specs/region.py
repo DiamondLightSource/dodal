@@ -7,7 +7,7 @@ from dodal.devices.electron_analyser.abstract.base_region import (
     AbstractBaseSequence,
     TLensMode,
 )
-from dodal.devices.electron_analyser.specs.enums import AcquisitionMode
+from dodal.devices.electron_analyser.specs.enums import AcquisitionMode, PsuMode
 
 
 class SpecsRegion(AbstractBaseRegion[AcquisitionMode, TLensMode], Generic[TLensMode]):
@@ -22,8 +22,7 @@ class SpecsRegion(AbstractBaseRegion[AcquisitionMode, TLensMode], Generic[TLensM
     # Specific to this class
     values: int = 1
     centre_energy: float = 0
-    # ToDo - Update to an enum https://github.com/DiamondLightSource/dodal/issues/1328
-    psu_mode: str = "1.5kV"
+    psu_mode: PsuMode = PsuMode.V1500
     estimated_time_in_ms: float = 0
 
 

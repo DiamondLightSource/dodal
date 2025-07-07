@@ -8,6 +8,7 @@ from dodal.devices.electron_analyser import EnergyMode
 from dodal.devices.electron_analyser.abstract.base_region import TAbstractBaseRegion
 from dodal.devices.electron_analyser.specs import (
     AcquisitionMode,
+    PsuMode,
     SpecsRegion,
     SpecsSequence,
 )
@@ -34,8 +35,8 @@ def expected_region_values() -> list[dict[str, Any]]:
         {
             "name": "New_Region",
             "acquisition_mode": AcquisitionMode.FIXED_TRANSMISSION,
-            "psu_mode": "3.5kV",
             "lens_mode": LensMode.SMALL_AREA,
+            "psu_mode": PsuMode.V3500,
             "low_energy": 800.0,
             "high_energy": 850.0,
             "energy_step": 0.1,
@@ -53,8 +54,8 @@ def expected_region_values() -> list[dict[str, Any]]:
         {
             "name": "New_Region1",
             "acquisition_mode": AcquisitionMode.SNAPSHOT,
-            "psu_mode": "1.5kV",
             "lens_mode": LensMode.LARGE_AREA,
+            "psu_mode": PsuMode.V1500,
             "low_energy": 599.866,
             "high_energy": 600.134,
             "energy_step": 0.2680000000000291,
