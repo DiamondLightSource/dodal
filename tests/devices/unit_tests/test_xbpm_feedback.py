@@ -57,7 +57,8 @@ def test_logging_while_waiting_for_XBPM(
 
     async def go_stable_after_a_number_of_sleep_calls(*args, **kwargs):
         nonlocal current_number_of_sleep_calls
-        if current_number_of_sleep_calls > number_of_sleep_calls_before_stable:
+        if current_number_of_sleep_calls >= number_of_sleep_calls_before_stable:
+            assert current_number_of_sleep_calls == number_of_sleep_calls_before_stable
             set_mock_value(fake_xbpm_feedback.pos_stable, True)
             await asyncio.sleep(0)
         current_number_of_sleep_calls += 1
@@ -66,3 +67,7 @@ def test_logging_while_waiting_for_XBPM(
 
     with caplog.at_level("INFO"):
         RE(bps.trigger(fake_xbpm_feedback, wait=True))
+        log_messages = sum(
+            record.getMessage() == "Waiting for XBPM" for record in caplog.records
+        )
+        assert log_messages == number_of_sleep_calls_before_stable + 1
