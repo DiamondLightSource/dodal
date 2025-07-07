@@ -6,7 +6,6 @@ from ophyd_async.core import (
     PathProvider,
     SignalR,
     SignalRW,
-    StandardDetector,
     StrictEnum,
     TriggerInfo,
 )
@@ -124,8 +123,3 @@ class Mythen3(AreaDetector):
             name=name,
             # config_sigs=config_sigs,
         )
-
-
-class MAC(StandardDetector):
-    def __init__(self, name=""):
-        pass

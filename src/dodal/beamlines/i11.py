@@ -9,8 +9,8 @@ from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beam
 from dodal.common.beamlines.device_helpers import DET_SUFFIX
 from dodal.common.visit import RemoteDirectoryServiceClient, StaticVisitPathProvider
 from dodal.devices.cryostream import OxfordCryoStream
-from dodal.devices.i11.detectors import Mythen3
 from dodal.devices.i11.diff_stages import DiffractometerBase, DiffractometerStage
+from dodal.devices.i11.mythen import Mythen3
 from dodal.devices.slits import Slits
 from dodal.devices.synchrotron import Synchrotron
 from dodal.log import set_beamline as set_log_beamline
