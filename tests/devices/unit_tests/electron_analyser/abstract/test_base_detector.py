@@ -73,7 +73,7 @@ def assert_detector_trigger_uses_controller_correctly(
     controller.arm = AsyncMock()
     controller.wait_for_idle = AsyncMock()
 
-    RE(bps.trigger(detector))
+    RE(bps.trigger(detector), wait=True)
 
     controller.arm.assert_awaited_once()
     controller.wait_for_idle.assert_awaited_once()
