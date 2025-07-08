@@ -53,17 +53,52 @@ class Mythen3Driver(NDArrayBaseIO):
     acquire_period: A[SignalRW[float], PvSuffix.rbv("AcquirePeriod")]
     num_images: A[SignalRW[int], PvSuffix.rbv("NumImages")]
     image_mode: A[SignalRW[ADImageMode], PvSuffix.rbv("ImageMode")]
-    detector_state: A[SignalR[Mythen3DetectorState], PvSuffix("DetectorState_RBV")]
 
+    # Non-specific PV's but with mythen3 specific values
+    detector_state: A[SignalR[Mythen3DetectorState], PvSuffix("DetectorState_RBV")]
     trigger_mode: A[SignalRW[Mythen3TriggerMode], PvSuffix.rbv("TriggerMode")]
+
+    # mythen3 specific PV's
     mode_setting: A[SignalRW[Mythen3ModeSetting], PvSuffix.rbv("Setting")]
+    bit_depth: A[SignalRW[int], PvSuffix.rbv("BitDepth")]
+    beam_energy: A[SignalRW[int], PvSuffix.rbv("BeamEnergy")]
+    threshold: A[SignalRW[int], PvSuffix.rbv("Counter1Threshold")]
+    threshold2: A[SignalRW[int], PvSuffix.rbv("Counter2Threshold")]
+    threshold3: A[SignalRW[int], PvSuffix.rbv("Counter3Threshold")]
+    global_threshold: A[SignalRW[int], PvSuffix.rbv("ThresholdEnergy")]
+
+
+"""
+Re. _DEADTIMES
+
+see: https://doi.org/10.1107/S1600577525000438
+Journal of Synchrotron Radiation, Volume 32, Part 2, March 2025, Pages 365-377
+See Section 3.3, Table 2, Section 3.4 and Table 3
+
+Note: Maximum frame rate of MYTHEN III is a function of the number of counters and of
+the bit depth.
+
+These numbers neglect possible limitations arising from the DAQ computing and network
+system. Expect ~1 order of magnitude less
+
+Our mythen3 is currently set up to use 3 counters, and 32bit depth. The deadtimes are
+for 3 counters only
+"""
+_DEADTIMES = {
+    32: 1 / (30 * 1000),
+    24: 1 / (40 * 1000),
+    16: 1 / (60 * 1000),
+    8: 1 / (120 * 1000),
+}
+
+_BIT_DEPTH = 32
 
 
 class Mythen3Controller(ADBaseController):
-    """ADBaseController` for an `Mythen3"""
+    """ADBaseController` for a Mythen3"""
 
     def get_deadtime(self, exposure: float | None) -> float:
-        return 5e-6
+        return _DEADTIMES[_BIT_DEPTH]
 
     async def prepare(self, trigger_info: TriggerInfo) -> None:
         if (exposure := trigger_info.livetime) is not None:
@@ -89,7 +124,7 @@ class Mythen3Controller(ADBaseController):
         )
 
 
-class Mythen3(AreaDetector):
+class Mythen3(AreaDetector[Mythen3Controller]):
     """
     The detector may be configured for an external trigger on a GPIO port,
     which must be done prior to preparing the detector
@@ -105,7 +140,7 @@ class Mythen3(AreaDetector):
         name: str = "",
     ):
         driver = Mythen3Driver(prefix + drv_suffix)
-        controller = Mythen3Controller(driver)
+        controller = Mythen3Controller(driver=driver)
 
         writer = writer_cls.with_io(
             prefix,
