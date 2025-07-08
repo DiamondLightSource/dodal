@@ -211,8 +211,8 @@ class PMAC(XYZStage):
 
         # These next signals are readback values on PVARS which are set by the motion
         # program.
-        self.scanstatus = epics_signal_r(float, "BL24I-MO-STEP-14:signal:P2401")
-        self.counter = epics_signal_r(float, "BL24I-MO-STEP-14:signal:P2402")
+        self.scanstatus = epics_signal_r(float, "BL24I-MO-STEP-13:pmac:read:P2401")
+        self.counter = epics_signal_r(float, "BL24I-MO-STEP-13:pmac:read:P2402")
 
         # A couple of soft signals for running a collection: program number to send to
         # the PMAC_STRING and expected collection time.

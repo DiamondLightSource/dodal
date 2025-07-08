@@ -142,9 +142,8 @@ def pmac() -> PMAC:
     """Get the i24 PMAC device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i24, it will return the existing object.
     """
-    # prefix not BL but ME14E
     return PMAC(
-        "ME14E-MO-CHIP-01:",
+        "BL14I-MO-CHIP-01:",
         "pmac",
     )
 
