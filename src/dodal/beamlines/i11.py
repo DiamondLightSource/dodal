@@ -47,13 +47,13 @@ def mythen3() -> Mythen3:
 
 
 @device_factory()
-def cstrm1() -> OxfordCryoStream:
+def ocs1() -> OxfordCryoStream:
     """i11 Oxford Cryostream 700 plus without cryoshutter"""
     return OxfordCryoStream(f"{PREFIX.beamline_prefix}-CG-CSTRM-01:")
 
 
 @device_factory()
-def cstrm2() -> OxfordCryoStream:
+def ocs2() -> OxfordCryoStream:
     """i11 Oxford Cryostream 700 standard without cryoshutter"""
     return OxfordCryoStream(f"{PREFIX.beamline_prefix}-CG-CSTRM-02:")
 

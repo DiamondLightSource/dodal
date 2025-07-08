@@ -48,15 +48,13 @@ class Mythen3DetectorState(StrictEnum):
     ABORTED = "Aborted"
 
 
-class Mythen3BaseIO(NDArrayBaseIO):
+class Mythen3Driver(NDArrayBaseIO):
     acquire_time: A[SignalRW[float], PvSuffix.rbv("AcquireTime")]
     acquire_period: A[SignalRW[float], PvSuffix.rbv("AcquirePeriod")]
     num_images: A[SignalRW[int], PvSuffix.rbv("NumImages")]
     image_mode: A[SignalRW[ADImageMode], PvSuffix.rbv("ImageMode")]
     detector_state: A[SignalR[Mythen3DetectorState], PvSuffix("DetectorState_RBV")]
 
-
-class Mythen3Driver(Mythen3BaseIO):
     trigger_mode: A[SignalRW[Mythen3TriggerMode], PvSuffix.rbv("TriggerMode")]
     mode_setting: A[SignalRW[Mythen3ModeSetting], PvSuffix.rbv("Setting")]
 

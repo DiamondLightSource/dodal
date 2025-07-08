@@ -8,7 +8,7 @@ class InOut(StrictEnum):
 
 
 class CryoStream(StandardReadable):
-    """This is an i03 specific device"""
+    """This is an unused i03 specific device"""
 
     def __init__(self, prefix: str, name: str = ""):
         self.course = epics_signal_rw(InOut, f"{prefix}-EA-CJET-01:COARSE:CTRL")
