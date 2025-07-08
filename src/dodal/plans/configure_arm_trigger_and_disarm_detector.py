@@ -9,9 +9,10 @@ from ophyd_async.core import (
     DetectorTrigger,
     StaticFilenameProvider,
     StaticPathProvider,
+    TriggerInfo,
     wait_for_value,
 )
-from ophyd_async.fastcs.eiger import EigerDetector, EigerTriggerInfo
+from ophyd_async.fastcs.eiger import EigerDetector
 
 from dodal.beamlines.i03 import fastcs_eiger, set_path_provider
 from dodal.devices.detector import DetectorParams
@@ -22,7 +23,7 @@ from dodal.log import LOGGER, do_default_logging_setup
 def configure_arm_trigger_and_disarm_detector(
     eiger: EigerDetector,
     detector_params: DetectorParams,
-    trigger_info: EigerTriggerInfo,
+    trigger_info: TriggerInfo,
 ):
     assert detector_params.expected_energy_ev
     start = time.time()
@@ -37,6 +38,11 @@ def configure_arm_trigger_and_disarm_detector(
     start = time.time()
     yield from bps.abs_set(eiger.odin.num_frames_chunks, 1, wait=True)
     LOGGER.info(f"Setting # of Frame Chunks: {time.time() - start}s")
+    start = time.time()
+    yield from bps.abs_set(
+        eiger.drv.detector.photon_energy, detector_params.expected_energy_ev, wait=True
+    )
+    LOGGER.info(f"Setting Photon Energy: {time.time() - start}s")
     start = time.time()
     yield from set_mx_settings_pvs(eiger, detector_params, wait=True)
     LOGGER.info(f"Setting MX PVs: {time.time() - start}s")
@@ -176,9 +182,8 @@ if __name__ == "__main__":
                 use_roi_mode=False,
                 det_dist_to_beam_converter_path="/dls_sw/i03/software/daq_configuration/lookup/DetDistToBeamXYConverter.txt",
             ),
-            trigger_info=EigerTriggerInfo(
+            trigger_info=TriggerInfo(
                 number_of_events=1,
-                energy_ev=12800,
                 trigger=DetectorTrigger.INTERNAL,
                 deadtime=0.0001,
             ),
