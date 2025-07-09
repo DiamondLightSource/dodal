@@ -1,6 +1,12 @@
+from ophyd_async.core import StrictEnum, set_and_wait_for_value
 from ophyd_async.epics.core import epics_signal_rw
 
 from dodal.devices.eurotherm import EurothermAutotune, EurothermGeneral, EurothermPID
+
+
+class CyberstarBlowerEnable(StrictEnum):
+    ON = "Enabled"
+    OFF = "Disabled"
 
 
 class CyberstarBlower(EurothermGeneral):
@@ -14,10 +20,24 @@ class CyberstarBlower(EurothermGeneral):
         autotune=False,
     ):
         with self.add_children_as_readables():
-            self.enable = epics_signal_rw(str, f"{prefix}{enable_suffix}")
+            self.enable = epics_signal_rw(
+                CyberstarBlowerEnable, f"{prefix}{enable_suffix}"
+            )
             self.tune = EurothermPID(prefix=prefix + infix, update=update)
 
             if autotune:
                 self.autotune = EurothermAutotune(prefix=prefix + infix)
 
         super().__init__(prefix=prefix + infix, name=name, update=update)
+
+    async def on(self):
+        await set_and_wait_for_value(self.enable, CyberstarBlowerEnable.ON)
+
+    async def off(self):
+        await set_and_wait_for_value(self.enable, CyberstarBlowerEnable.OFF)
+
+    async def set_ramp_rate(self, rate: float):
+        await set_and_wait_for_value(self.ramprate, rate)
+
+    async def set_setpoint(self, temp: float):
+        await set_and_wait_for_value(self.setpoint, temp)
