@@ -137,8 +137,8 @@ def attenuator() -> BinaryFilterAttenuator:
     If this is called when already instantiated in i04, it will return the existing object.
     """
     return BinaryFilterAttenuator(
-        f"{PREFIX.beamline_prefix}-EA-ATTN-01:",
-        "attenuator",
+        prefix=f"{PREFIX.beamline_prefix}-EA-ATTN-01:",
+        num_filters=16,
     )
 
 
