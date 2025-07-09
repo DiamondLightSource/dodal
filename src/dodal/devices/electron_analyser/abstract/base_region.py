@@ -45,9 +45,9 @@ def energy_mode_validation(data: dict) -> dict:
 
 
 TAcquisitionMode = TypeVar("TAcquisitionMode", bound=StrictEnum)
-# Allow SupersetEnum. Specs analysers can connect Lens mode separetly to the analyser
-# which leaves the enum to either be "Not connected" OR the avaliable enums when
-# connected.
+# Allow SupersetEnum. Specs analysers can connect to Lens mode separately to the
+# analyser which leaves the enum to either be "Not connected" OR the available enums
+# when connected.
 TLensMode = TypeVar("TLensMode", SupersetEnum, StrictEnum)
 
 
