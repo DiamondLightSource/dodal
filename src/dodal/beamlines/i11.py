@@ -75,13 +75,13 @@ def diff_base() -> DiffractometerBase:
 
 
 @device_factory()
-def blower1() -> CyberstarBlower:
+def csb1() -> CyberstarBlower:
     """Cyberstar hot air blower 1 with Eurotherm Controller"""
     return CyberstarBlower(prefix=f"{PREFIX.beamline_prefix}-EA-BLOW-01:", update=True)
 
 
 @device_factory()
-def blower2() -> CyberstarBlower:
+def csb2() -> CyberstarBlower:
     """Cyberstar hot air blower 2 with Eurotherm Controller"""
     return CyberstarBlower(
         prefix=f"{PREFIX.beamline_prefix}-EA-BLOW-02:", infix="LOOP1:", autotune=True
