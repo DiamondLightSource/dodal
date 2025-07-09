@@ -80,9 +80,6 @@ class ElectronAnalyserDetector(
         # Pass in driver
         self._driver = driver
         self._sequence_class = sequence_class
-        print("ElectronAnalyserDetector,", type(self))
-        print("ElectronAnalyserDetector, Sequence class", sequence_class)
-        print("ElectronAnalyserDetector, driver class", type(driver))
         super().__init__(self.driver, name)
 
     @property

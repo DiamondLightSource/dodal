@@ -51,7 +51,7 @@ class AbstractAnalyserDriverIO(
 
         Args:
             prefix: Base PV to connect to EPICS for this device.
-            acquisition_mode_type: Enum that determines the avaliable acquisition modes
+            acquisition_mode_type: Enum that determines the available acquisition modes
                                    for this device.
             lens_mode_type: Enum that determines the available lens mode for this
                             device.
