@@ -48,7 +48,7 @@ TAcquisitionMode = TypeVar("TAcquisitionMode", bound=StrictEnum)
 # Allow SupersetEnum. Specs analysers can connect to Lens mode separately to the
 # analyser which leaves the enum to either be "Not connected" OR the available enums
 # when connected.
-TLensMode = TypeVar("TLensMode", SupersetEnum, StrictEnum)
+TLensMode = TypeVar("TLensMode", bound=SupersetEnum | StrictEnum)
 
 
 class AbstractBaseRegion(
