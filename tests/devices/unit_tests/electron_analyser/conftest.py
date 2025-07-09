@@ -65,7 +65,6 @@ async def sim_driver(
     RE: RunEngine,
 ) -> ElectronAnalyserDriverImpl:
     lens_mode_class = get_args(driver_class)[0]
-    print("sim_driver,", driver_class)
     async with init_devices(mock=True, connect=True):
         sim_driver = driver_class(
             "TEST:",
