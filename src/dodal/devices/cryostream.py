@@ -85,6 +85,7 @@ class OxfordCryoStreamStatus(StandardReadable):
         self.controller_number = epics_signal_r(float, f"{prefix}CTRLNUM")
         self.software_version = epics_signal_r(float, f"{prefix}VER")
         self.evap_adjust = epics_signal_r(float, f"{prefix}EVAPADJUST")
+        self.series = epics_signal_r(str, f"{prefix}SERIES")
 
         super().__init__(name)
 
