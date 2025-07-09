@@ -1,5 +1,5 @@
 from ophyd_async.core import StandardReadable, StrictEnum
-from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
+from ophyd_async.epics.core import epics_signal_r, epics_signal_rw, epics_signal_rw_rbv
 
 """
 Note: See i11 cyberstar blower for implementation of Eurotherm Controller
@@ -39,13 +39,22 @@ class EurothermGeneral(StandardReadable):
         output_suffix: str = "O",
         manual_suffix: str = "MAN",
         temp_suffix: str = "PV:RBV",
+        rbv_suffix: str = ":RBV",
         update=False,
     ):
         with self.add_children_as_readables():
-            self.setpoint = epics_signal_rw(float, f"{prefix}{setpoint_suffix}")
-            self.ramprate = epics_signal_rw(float, f"{prefix}{ramprate_suffix}")
-            self.output = epics_signal_rw(float, f"{prefix}{output_suffix}")
-            self.mode = epics_signal_rw(ManualMode, f"{prefix}{manual_suffix}")
+            self.setpoint = epics_signal_rw_rbv(
+                float, f"{prefix}{setpoint_suffix}", rbv_suffix
+            )
+            self.ramprate = epics_signal_rw_rbv(
+                float, f"{prefix}{ramprate_suffix}", rbv_suffix
+            )
+            self.output = epics_signal_rw_rbv(
+                float, f"{prefix}{output_suffix}", rbv_suffix
+            )
+            self.mode = epics_signal_rw_rbv(
+                ManualMode, f"{prefix}{manual_suffix}", rbv_suffix
+            )
             self.temp = epics_signal_r(float, f"{prefix}{temp_suffix}")
 
             if update:
@@ -72,11 +81,11 @@ class EurothermAutotune(StandardReadable):
 
 
 class EurothermPID(StandardReadable):
-    def __init__(self, prefix: str, name: str = "", update=False):
+    def __init__(self, prefix: str, name: str = "", rbv_suffix=":RBV", update=False):
         with self.add_children_as_readables():
-            self.P = epics_signal_rw(float, f"{prefix}P")
-            self.I = epics_signal_rw(float, f"{prefix}I")
-            self.D = epics_signal_rw(float, f"{prefix}D")
+            self.P = epics_signal_rw_rbv(float, f"{prefix}P", rbv_suffix)
+            self.I = epics_signal_rw_rbv(float, f"{prefix}I", rbv_suffix)
+            self.D = epics_signal_rw_rbv(float, f"{prefix}D", rbv_suffix)
 
             if update:
                 self.update = epics_signal_rw(EurothermUpdate, f"{prefix}PID.SCAN")
