@@ -48,6 +48,19 @@ class AbstractAnalyserDriverIO(
         energy_sources: Mapping[str, SignalR[float]],
         name: str = "",
     ) -> None:
+        """
+        Constructor method for setting up electron analyser.
+
+        Args:
+            prefix: Base PV to connect to EPICS for this device.
+            acquisition_mode_type: Enum that determines the avaliable acquisition modes
+                                   for this device.
+            lens_mode_type: Enum that determines the available lens mode for this
+                            device.
+            energy_sources: Map that pairs a source name to an energy value signal
+                            (in eV).
+            name: Name of the device.
+        """
         self.energy_sources = energy_sources
         self.acquisition_mode_type = acquisition_mode_type
         self.lens_mode_type = lens_mode_type
