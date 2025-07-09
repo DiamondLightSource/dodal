@@ -110,7 +110,7 @@ async def test_specs_analyser_energy_axis(
 
     RE(bps.mv(sim_driver.low_energy, start_energy))
     RE(bps.mv(sim_driver.high_energy, end_energy))
-    RE(bps.mv(sim_driver.slices, total_points_iterations))
+    set_mock_value(sim_driver.energy_channels, total_points_iterations)
 
     energy_axis = await sim_driver.energy_axis.get_value()
     expected_energy_axis = [1.0, 1.9, 2.8, 3.7, 4.6, 5.5, 6.4, 7.3, 8.2, 9.1, 10.0]

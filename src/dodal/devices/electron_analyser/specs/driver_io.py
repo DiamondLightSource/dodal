@@ -40,6 +40,9 @@ class SpecsAnalyserDriverIO(
             # Used to read detector data after acqusition.
             self.min_angle_axis = epics_signal_r(float, prefix + "Y_MIN_RBV")
             self.max_angle_axis = epics_signal_r(float, prefix + "Y_MAX_RBV")
+            self.energy_channels = epics_signal_r(
+                int, prefix + "TOTAL_POINTS_ITERATION_RBV"
+            )
 
         super().__init__(
             prefix, AcquisitionMode, lens_mode_type, psu_mode_type, energy_sources, name
@@ -84,7 +87,7 @@ class SpecsAnalyserDriverIO(
             "eV",
             min_energy=self.low_energy,
             max_energy=self.high_energy,
-            total_points_iterations=self.slices,
+            total_points_iterations=self.energy_channels,
         )
         return energy_axis
 
