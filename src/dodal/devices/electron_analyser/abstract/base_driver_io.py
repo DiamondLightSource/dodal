@@ -142,12 +142,10 @@ class AbstractAnalyserDriverIO(
             self.low_energy.set(low_energy),
             self.high_energy.set(high_energy),
             self.slices.set(region.slices),
-            self.lens_mode.set(self.lens_mode_type(region.lens_mode)),
+            self.lens_mode.set(region.lens_mode),
             self.pass_energy.set(pass_energy),
             self.iterations.set(region.iterations),
-            self.acquisition_mode.set(
-                self.acquisition_mode_type(region.acquisition_mode)
-            ),
+            self.acquisition_mode.set(region.acquisition_mode),
             self.excitation_energy.set(excitation_energy),
             self.excitation_energy_source.set(source.name),
         )
