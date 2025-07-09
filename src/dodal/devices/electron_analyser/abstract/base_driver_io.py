@@ -11,7 +11,6 @@ from ophyd_async.core import (
     SignalR,
     StandardReadable,
     StandardReadableFormat,
-    StrictEnum,
     derived_signal_r,
     soft_signal_rw,
 )
@@ -20,12 +19,11 @@ from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
 from dodal.devices.electron_analyser.abstract.base_region import (
     TAbstractBaseRegion,
+    TAcquisitionMode,
+    TLensMode,
 )
 from dodal.devices.electron_analyser.enums import EnergyMode
 from dodal.devices.electron_analyser.util import to_binding_energy, to_kinetic_energy
-
-TAcquisitionMode = TypeVar("TAcquisitionMode", bound=StrictEnum)
-TLensMode = TypeVar("TLensMode", bound=StrictEnum)
 
 
 class AbstractAnalyserDriverIO(

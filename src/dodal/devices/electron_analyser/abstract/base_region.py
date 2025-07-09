@@ -3,6 +3,7 @@ from abc import ABC
 from collections.abc import Callable
 from typing import Generic, TypeVar
 
+from ophyd_async.core import StrictEnum, SupersetEnum
 from pydantic import BaseModel, Field, model_validator
 
 from dodal.devices.electron_analyser.enums import EnergyMode
@@ -43,7 +44,18 @@ def energy_mode_validation(data: dict) -> dict:
     return data
 
 
-class AbstractBaseRegion(ABC, JavaToPythonModel):
+TAcquisitionMode = TypeVar("TAcquisitionMode", bound=StrictEnum)
+# Allow SupersetEnum. Specs analysers can connect Lens mode separetly to the analyser
+# which leaves the enum to either be "Not connected" OR the avaliable enums when
+# connected.
+TLensMode = TypeVar("TLensMode", SupersetEnum, StrictEnum)
+
+
+class AbstractBaseRegion(
+    ABC,
+    JavaToPythonModel,
+    Generic[TAcquisitionMode, TLensMode],
+):
     """
     Generic region model that holds the data. Specialised region models should inherit
     this to extend functionality. All energy units are assumed to be in eV.
@@ -55,9 +67,9 @@ class AbstractBaseRegion(ABC, JavaToPythonModel):
     iterations: int = 1
     excitation_energy_source: str = "source1"
     # These ones we need subclasses to provide default values
-    lens_mode: str
+    lens_mode: TLensMode
     pass_energy: int
-    acquisition_mode: str
+    acquisition_mode: TAcquisitionMode
     low_energy: float
     high_energy: float
     step_time: float
@@ -80,7 +92,11 @@ class AbstractBaseRegion(ABC, JavaToPythonModel):
 TAbstractBaseRegion = TypeVar("TAbstractBaseRegion", bound=AbstractBaseRegion)
 
 
-class AbstractBaseSequence(ABC, JavaToPythonModel, Generic[TAbstractBaseRegion]):
+class AbstractBaseSequence(
+    ABC,
+    JavaToPythonModel,
+    Generic[TAbstractBaseRegion, TLensMode],
+):
     """
     Generic sequence model that holds the list of region data. Specialised sequence
     models should inherit this to extend functionality and define type of region to

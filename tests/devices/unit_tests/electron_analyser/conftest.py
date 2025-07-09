@@ -12,8 +12,8 @@ from dodal.devices.electron_analyser import (
 )
 from dodal.devices.electron_analyser.abstract import (
     AbstractAnalyserDriverIO,
+    AbstractBaseRegion,
     AbstractBaseSequence,
-    TAbstractBaseRegion,
     TAbstractBaseSequence,
 )
 from dodal.devices.electron_analyser.specs import (
@@ -65,6 +65,7 @@ async def sim_driver(
     RE: RunEngine,
 ) -> ElectronAnalyserDriverImpl:
     lens_mode_class = get_args(driver_class)[0]
+    print("sim_driver,", driver_class)
     async with init_devices(mock=True, connect=True):
         sim_driver = driver_class(
             "TEST:",
@@ -76,15 +77,15 @@ async def sim_driver(
 
 @pytest.fixture
 def sequence_class(
-    driver_class: type[AbstractAnalyserDriverIO],
+    sim_driver: AbstractAnalyserDriverIO,
 ) -> type[AbstractBaseSequence]:
-    base_class = getattr(driver_class, "__origin__", driver_class)
-
-    if base_class is VGScientaAnalyserDriverIO:
-        return VGScientaSequence
-    elif base_class is SpecsAnalyserDriverIO:
-        return SpecsSequence
-    raise ValueError("class " + str(driver_class) + " not recognised")
+    # We must include the lens mode type here, otherwise the sequence file can't be
+    # loaded as pydantic won't be able to resolve the lens mode enum.
+    if isinstance(sim_driver, VGScientaAnalyserDriverIO):
+        return VGScientaSequence[sim_driver.lens_mode_type]
+    elif isinstance(sim_driver, SpecsAnalyserDriverIO):
+        return SpecsSequence[sim_driver.lens_mode_type]
+    raise ValueError("class " + str(sim_driver) + " not recognised")
 
 
 @pytest.fixture
@@ -92,7 +93,7 @@ def sequence(
     sim_driver: AbstractAnalyserDriverIO,
     sequence_class: type[TAbstractBaseSequence],
     RE: RunEngine,
-):
+) -> AbstractBaseSequence:
     det = ElectronAnalyserDetector(
         driver=sim_driver,
         sequence_class=sequence_class,
@@ -102,8 +103,9 @@ def sequence(
 
 @pytest.fixture
 def region(
-    request: pytest.FixtureRequest, sequence: AbstractBaseSequence[TAbstractBaseRegion]
-) -> TAbstractBaseRegion:
+    request: pytest.FixtureRequest,
+    sequence: AbstractBaseSequence,
+) -> AbstractBaseRegion:
     region = sequence.get_region_by_name(request.param)
     if region is None:
         raise ValueError("Region " + request.param + " is not found.")

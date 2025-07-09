@@ -1,4 +1,4 @@
-from ophyd_async.core import StrictEnum
+from ophyd_async.core import StrictEnum, SupersetEnum
 
 from dodal.devices.electron_analyser.abstract.base_driver_io import (
     AbstractAnalyserDriverIO,
@@ -22,15 +22,17 @@ from dodal.devices.electron_analyser.vgscienta.detector import (
 
 # Alias names so can read the type placements easier
 AcquisitionMode = StrictEnum
-LensMode = StrictEnum
+LensMode = SupersetEnum
 ElectronAnalyserDetectorImpl = VGScientaDetector[LensMode] | SpecsDetector[LensMode]
 ElectronAnalyserDriverImpl = (
     VGScientaAnalyserDriverIO[LensMode] | SpecsAnalyserDriverIO[LensMode]
 )
 
+AbstractBaseRegion = AbstractBaseRegion[AcquisitionMode, LensMode]
+
 GenericElectronAnalyserDetector = ElectronAnalyserDetector[
     AbstractAnalyserDriverIO[AbstractBaseRegion, AcquisitionMode, LensMode],
-    AbstractBaseSequence[AbstractBaseRegion],
+    AbstractBaseSequence[AbstractBaseRegion, LensMode],
     AbstractBaseRegion,
 ]
 

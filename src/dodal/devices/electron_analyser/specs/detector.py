@@ -14,8 +14,8 @@ from dodal.devices.electron_analyser.specs.region import SpecsRegion, SpecsSeque
 class SpecsDetector(
     ElectronAnalyserDetector[
         SpecsAnalyserDriverIO[TLensMode],
-        SpecsSequence,
-        SpecsRegion,
+        SpecsSequence[TLensMode],
+        SpecsRegion[TLensMode],
     ],
     Generic[TLensMode],
 ):
@@ -29,4 +29,5 @@ class SpecsDetector(
         driver = SpecsAnalyserDriverIO[TLensMode](
             prefix, lens_mode_type, energy_sources
         )
-        super().__init__(SpecsSequence, driver, name)
+        seq = SpecsSequence[lens_mode_type]
+        super().__init__(seq, driver, name)

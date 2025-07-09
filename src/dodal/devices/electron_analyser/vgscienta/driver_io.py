@@ -14,8 +14,8 @@ from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
 from dodal.devices.electron_analyser.abstract.base_driver_io import (
     AbstractAnalyserDriverIO,
-    TLensMode,
 )
+from dodal.devices.electron_analyser.abstract.base_region import TLensMode
 from dodal.devices.electron_analyser.util import to_kinetic_energy
 from dodal.devices.electron_analyser.vgscienta.enums import AcquisitionMode
 from dodal.devices.electron_analyser.vgscienta.region import (
@@ -47,7 +47,7 @@ class VGScientaAnalyserDriverIO(
         super().__init__(prefix, AcquisitionMode, lens_mode_type, energy_sources, name)
 
     @AsyncStatus.wrap
-    async def set(self, region: VGScientaRegion):
+    async def set(self, region: VGScientaRegion[TLensMode]):
         await super().set(region)
 
         excitation_energy = await self.excitation_energy.get_value()

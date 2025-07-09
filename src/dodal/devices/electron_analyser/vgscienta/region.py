@@ -1,4 +1,5 @@
 import uuid
+from typing import Generic
 
 from pydantic import Field
 
@@ -6,6 +7,7 @@ from dodal.devices.electron_analyser.abstract.base_region import (
     AbstractBaseRegion,
     AbstractBaseSequence,
     JavaToPythonModel,
+    TLensMode,
 )
 from dodal.devices.electron_analyser.vgscienta.enums import (
     AcquisitionMode,
@@ -14,11 +16,13 @@ from dodal.devices.electron_analyser.vgscienta.enums import (
 )
 
 
-class VGScientaRegion(AbstractBaseRegion):
+class VGScientaRegion(
+    AbstractBaseRegion[AcquisitionMode, TLensMode], Generic[TLensMode]
+):
     # Override defaults of base region class
-    lens_mode: str
+    lens_mode: TLensMode
     pass_energy: int = 5
-    acquisition_mode: str = AcquisitionMode.SWEPT
+    acquisition_mode: AcquisitionMode = AcquisitionMode.SWEPT
     low_energy: float = 8.0
     high_energy: float = 10.0
     step_time: float = 1.0
@@ -48,15 +52,17 @@ class VGScientaExcitationEnergySource(JavaToPythonModel):
     value: float = 0
 
 
-class VGScientaSequence(AbstractBaseSequence[VGScientaRegion]):
+class VGScientaSequence(
+    AbstractBaseSequence[VGScientaRegion, TLensMode], Generic[TLensMode]
+):
     element_set: str = Field(default="Unknown")
     excitation_energy_sources: list[VGScientaExcitationEnergySource] = Field(
         default_factory=lambda: []
     )
-    regions: list[VGScientaRegion] = Field(default_factory=lambda: [])
+    regions: list[VGScientaRegion[TLensMode]] = Field(default_factory=lambda: [])
 
     def get_excitation_energy_source_by_region(
-        self, region: VGScientaRegion
+        self, region: VGScientaRegion[TLensMode]
     ) -> VGScientaExcitationEnergySource:
         value = next(
             (

@@ -14,8 +14,8 @@ from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
 from dodal.devices.electron_analyser.abstract.base_driver_io import (
     AbstractAnalyserDriverIO,
-    TLensMode,
 )
+from dodal.devices.electron_analyser.abstract.base_region import TLensMode
 from dodal.devices.electron_analyser.specs.enums import AcquisitionMode
 from dodal.devices.electron_analyser.specs.region import SpecsRegion
 
@@ -44,7 +44,7 @@ class SpecsAnalyserDriverIO(
         super().__init__(prefix, AcquisitionMode, lens_mode_type, energy_sources, name)
 
     @AsyncStatus.wrap
-    async def set(self, region: SpecsRegion):
+    async def set(self, region: SpecsRegion[TLensMode]):
         await super().set(region)
 
         await asyncio.gather(

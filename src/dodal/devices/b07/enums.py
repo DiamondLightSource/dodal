@@ -1,4 +1,4 @@
-from ophyd_async.core import StrictEnum
+from ophyd_async.core import StrictEnum, SupersetEnum
 
 
 class Grating(StrictEnum):
@@ -9,7 +9,7 @@ class Grating(StrictEnum):
     NO_GRATING = "No Grating"
 
 
-class LensMode(StrictEnum):
+class LensMode(SupersetEnum):
     LARGE_AREA = "LargeArea"
     HIGH_MAGNIFICATION = "HighMagnification"
     MEDIUM_MAGNIFICATION = "MediumMagnification"
@@ -21,3 +21,4 @@ class LensMode(StrictEnum):
     MEDIUM_AREA = "MediumArea"
     SMALL_AREA = "SmallArea"
     HIGH_MAGNIFICATION2 = "HighMagnification2"
+    NOT_CONNECTED = "Not connected"

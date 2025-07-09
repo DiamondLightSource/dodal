@@ -3,7 +3,7 @@ from typing import Generic
 
 from ophyd_async.core import SignalR
 
-from dodal.devices.electron_analyser.abstract.base_driver_io import TLensMode
+from dodal.devices.electron_analyser.abstract.base_region import TLensMode
 from dodal.devices.electron_analyser.detector import (
     ElectronAnalyserDetector,
 )
@@ -19,8 +19,8 @@ from dodal.devices.electron_analyser.vgscienta.region import (
 class VGScientaDetector(
     ElectronAnalyserDetector[
         VGScientaAnalyserDriverIO[TLensMode],
-        VGScientaSequence,
-        VGScientaRegion,
+        VGScientaSequence[TLensMode],
+        VGScientaRegion[TLensMode],
     ],
     Generic[TLensMode],
 ):
@@ -34,4 +34,5 @@ class VGScientaDetector(
         driver = VGScientaAnalyserDriverIO[TLensMode](
             prefix, lens_mode_type, energy_sources
         )
-        super().__init__(VGScientaSequence, driver, name)
+        seq = VGScientaSequence[lens_mode_type]
+        super().__init__(seq, driver, name)
