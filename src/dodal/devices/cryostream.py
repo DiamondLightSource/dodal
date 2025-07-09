@@ -1,5 +1,5 @@
 from ophyd_async.core import StandardReadable, StrictEnum
-from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
+from ophyd_async.epics.core import epics_signal_r, epics_signal_rw, epics_signal_x
 
 
 class InOut(StrictEnum):
@@ -21,33 +21,44 @@ class CryoStream(StandardReadable):
         super().__init__(name)
 
 
+class TurboEnum(StrictEnum):
+    OFF = "Off"
+    ON = "On"
+    AUTO = "Auto"
+
+
+class CryoStreamEnable(StrictEnum):
+    ON = "Enabled"
+    OFF = "Disabled"
+
+
 class OxfordCryoStreamController(StandardReadable):
     def __init__(self, prefix: str, name: str = ""):
-        self.purge = epics_signal_rw(float, f"{prefix}PURGE")
-        self.hold = epics_signal_rw(float, f"{prefix}HOLD")
-        self.restart = epics_signal_rw(float, f"{prefix}RESTART")
-        self.pause = epics_signal_rw(float, f"{prefix}PAUSE")
-        self.resume = epics_signal_rw(float, f"{prefix}RESUME")
-        self.end = epics_signal_rw(float, f"{prefix}END")
-        self.stop = epics_signal_rw(float, f"{prefix}STOP")
+        self.purge = epics_signal_x(f"{prefix}PURGE.PROC")
+        self.hold = epics_signal_x(f"{prefix}HOLD.PROC")
+        self.start = epics_signal_x(f"{prefix}RESTART.PROC")
+        self.pause = epics_signal_x(f"{prefix}PAUSE.PROC")
+        self.resume = epics_signal_x(f"{prefix}RESUME.PROC")
+        self.end = epics_signal_x(f"{prefix}END.PROC")
+        self.stop = epics_signal_x(f"{prefix}STOP.PROC")
 
         self.ramp_rate = epics_signal_rw(float, f"{prefix}RRATE")
         self.ramp_temp = epics_signal_rw(float, f"{prefix}RTEMP")
-        self.ramp = epics_signal_rw(float, f"{prefix}RAMP")
+        self.ramp = epics_signal_x(f"{prefix}RAMP.PROC")
 
         self.plat_time = epics_signal_rw(float, f"{prefix}PTIME")
-        self.plat = epics_signal_rw(float, f"{prefix}PLAT")
+        self.plat = epics_signal_x(f"{prefix}PLAT.PROC")
 
         self.cool_temp = epics_signal_rw(float, f"{prefix}CTEMP")
-        self.cool = epics_signal_rw(float, f"{prefix}COOL")
+        self.cool = epics_signal_x(f"{prefix}COOL.PROC")
 
         self.turbo = epics_signal_rw(str, f"{prefix}TURBO")
-        self.turbo_mode = epics_signal_rw(str, f"{prefix}TURBOMODE")
+        self.turbo_mode = epics_signal_rw(TurboEnum, f"{prefix}TURBOMODE")
 
         self.end_rate = epics_signal_rw(float, f"{prefix}ERATE")
 
-        self.serial_comms = epics_signal_rw(str, f"{prefix}DISABLE")
-        self.status = epics_signal_rw(float, f"{prefix}STATUS")
+        self.serial_comms = epics_signal_rw(CryoStreamEnable, f"{prefix}DISABLE")
+        self.status = epics_signal_r(str, f"{prefix}STATUS.SEVR")
 
         super().__init__(name)
 
