@@ -82,7 +82,12 @@ These numbers neglect possible limitations arising from the DAQ computing and ne
 system. Expect ~1 order of magnitude less
 
 Our mythen3 is currently set up to use 3 counters, and 32bit depth. The deadtimes are
-for 3 counters only
+for 3 counters only. We can run faster with less counters/bit depth
+
+The maximum frame rate of the detector scales both with the number of counters being
+read out and with the bit depth, which can be configured to 24 (streamed out as 32 bit),
+16 or 8 bits see Table 3.
+
 """
 _DEADTIMES = {
     32: 1 / (30 * 1000),
@@ -152,7 +157,5 @@ class Mythen3(AreaDetector[Mythen3Controller]):
         super().__init__(
             controller=controller,
             writer=writer,
-            # plugins=plugins,
             name=name,
-            # config_sigs=config_sigs,
-        )
+        )  # plugins=plugins # config_sigs=config_sigs

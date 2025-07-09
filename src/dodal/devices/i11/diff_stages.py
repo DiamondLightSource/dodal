@@ -27,6 +27,12 @@ class DiffractometerStage(Stage):
 
 
 class DiffractometerBase(Stage):
+    """
+    This is the diffractometer stage which contains both detectors,
+    it allows for translation about x and y and also sample position. Contains:
+    x1, x2, y1, y2, y3. Used for aligning the detector to the beam/sample
+    """
+
     def __init__(
         self,
         prefix: str,

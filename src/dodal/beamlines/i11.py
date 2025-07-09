@@ -9,8 +9,12 @@ from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beam
 from dodal.common.beamlines.device_helpers import DET_SUFFIX
 from dodal.common.visit import RemoteDirectoryServiceClient, StaticVisitPathProvider
 from dodal.devices.cryostream import OxfordCryoStream
-from dodal.devices.i11.diff_stages import DiffractometerBase, DiffractometerStage
+from dodal.devices.i11.diff_stages import (
+    DiffractometerBase,
+    DiffractometerStage,
+)
 from dodal.devices.i11.mythen import Mythen3
+from dodal.devices.i11.sample_env import Spinner
 from dodal.devices.slits import Slits
 from dodal.devices.synchrotron import Synchrotron
 from dodal.log import set_beamline as set_log_beamline
@@ -59,14 +63,19 @@ def ocs2() -> OxfordCryoStream:
 
 
 @device_factory()
-def diffractometer_stage() -> DiffractometerStage:
+def diff_stage() -> DiffractometerStage:
     """Stage that contains the rotation axes, theta, two_theta, delta, spos"""
     return DiffractometerStage(prefix=f"{PREFIX.beamline_prefix}-MO-DIFF-01:")
 
 
 @device_factory()
-def diffractometer_base() -> DiffractometerBase:
+def diff_base() -> DiffractometerBase:
     return DiffractometerBase(prefix=f"{PREFIX.beamline_prefix}-MO-DIFF-01:BASE:")
+
+
+@device_factory()
+def spinner() -> Spinner:
+    return Spinner(prefix=f"{PREFIX.beamline_prefix}-EA-ENV-01:")
 
 
 @device_factory()
