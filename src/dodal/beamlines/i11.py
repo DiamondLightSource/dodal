@@ -14,6 +14,7 @@ from dodal.devices.i11.diff_stages import (
     DiffractometerBase,
     DiffractometerStage,
 )
+from dodal.devices.i11.i11_robot import I11Robot
 from dodal.devices.i11.mythen import Mythen3
 from dodal.devices.i11.sample_env import Spinner
 from dodal.devices.slits import Slits
@@ -78,6 +79,13 @@ def diff_base() -> DiffractometerBase:
 def csb1() -> CyberstarBlower:
     """Cyberstar hot air blower 1 with Eurotherm Controller"""
     return CyberstarBlower(prefix=f"{PREFIX.beamline_prefix}-EA-BLOW-01:", update=True)
+
+
+@device_factory()
+def sample_robot() -> I11Robot:
+    """The sample robot arm and carosel on i11 that moves
+    and loads samples on/off the spinner"""
+    return I11Robot(prefix=f"{PREFIX.beamline_prefix}-EA-ROBOT-01:")
 
 
 @device_factory()
