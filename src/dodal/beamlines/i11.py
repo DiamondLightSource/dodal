@@ -9,6 +9,7 @@ from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beam
 from dodal.common.beamlines.device_helpers import DET_SUFFIX
 from dodal.common.visit import RemoteDirectoryServiceClient, StaticVisitPathProvider
 from dodal.devices.cryostream import OxfordCryoStream
+from dodal.devices.i11.cyberstar_blower import CyberstarBlower
 from dodal.devices.i11.diff_stages import (
     DiffractometerBase,
     DiffractometerStage,
@@ -74,7 +75,22 @@ def diff_base() -> DiffractometerBase:
 
 
 @device_factory()
+def blower1() -> CyberstarBlower:
+    """Cyberstar hot air blower 1 with Eurotherm Controller"""
+    return CyberstarBlower(prefix=f"{PREFIX.beamline_prefix}-EA-BLOW-01:", update=True)
+
+
+@device_factory()
+def blower2() -> CyberstarBlower:
+    """Cyberstar hot air blower 2 with Eurotherm Controller"""
+    return CyberstarBlower(
+        prefix=f"{PREFIX.beamline_prefix}-EA-BLOW-02:", infix="LOOP1:", autotune=True
+    )
+
+
+@device_factory()
 def spinner() -> Spinner:
+    """Sample spinner for powder averaging"""
     return Spinner(prefix=f"{PREFIX.beamline_prefix}-EA-ENV-01:")
 
 
