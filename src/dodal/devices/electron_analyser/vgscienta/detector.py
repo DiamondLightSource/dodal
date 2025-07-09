@@ -34,5 +34,4 @@ class VGScientaDetector(
         driver = VGScientaAnalyserDriverIO[TLensMode](
             prefix, lens_mode_type, energy_sources
         )
-        seq = VGScientaSequence[lens_mode_type]
-        super().__init__(seq, driver, name)
+        super().__init__(VGScientaSequence[lens_mode_type], driver, name)

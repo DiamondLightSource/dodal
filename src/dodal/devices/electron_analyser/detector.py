@@ -73,7 +73,7 @@ class ElectronAnalyserDetector(
 
     def __init__(
         self,
-        sequence_class: type,
+        sequence_class: type[TAbstractBaseSequence],
         driver: TAbstractAnalyserDriverIO,
         name: str = "",
     ):
