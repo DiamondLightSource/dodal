@@ -41,14 +41,15 @@ class EurothermGeneral(StandardReadable):
         temp_suffix: str = "PV:RBV",
         update=False,
     ):
-        self.setpoint = epics_signal_rw(float, f"{prefix}{setpoint_suffix}")
-        self.ramprate = epics_signal_rw(float, f"{prefix}{ramprate_suffix}")
-        self.output = epics_signal_rw(float, f"{prefix}{output_suffix}")
-        self.mode = epics_signal_rw(ManualMode, f"{prefix}{manual_suffix}")
-        self.temp = epics_signal_r(float, f"{prefix}{temp_suffix}")
+        with self.add_children_as_readables():
+            self.setpoint = epics_signal_rw(float, f"{prefix}{setpoint_suffix}")
+            self.ramprate = epics_signal_rw(float, f"{prefix}{ramprate_suffix}")
+            self.output = epics_signal_rw(float, f"{prefix}{output_suffix}")
+            self.mode = epics_signal_rw(ManualMode, f"{prefix}{manual_suffix}")
+            self.temp = epics_signal_r(float, f"{prefix}{temp_suffix}")
 
-        if update:
-            self.update = epics_signal_rw(EurothermUpdate, f"{prefix}UPDATE.SCAN")
+            if update:
+                self.update = epics_signal_rw(EurothermUpdate, f"{prefix}UPDATE.SCAN")
 
         super().__init__(name)
 
@@ -62,20 +63,22 @@ class EurothermAutotune(StandardReadable):
         high_suffix: str = "OUTPHI",
         low_suffix: str = "OUTPLO",
     ):
-        self.control = epics_signal_rw(AutotuneControl, f"{prefix}{control_suffix}")
-        self.high_limit = epics_signal_rw(float, f"{prefix}{high_suffix}")
-        self.low_limit = epics_signal_rw(float, f"{prefix}{low_suffix}")
+        with self.add_children_as_readables():
+            self.control = epics_signal_rw(AutotuneControl, f"{prefix}{control_suffix}")
+            self.high_limit = epics_signal_rw(float, f"{prefix}{high_suffix}")
+            self.low_limit = epics_signal_rw(float, f"{prefix}{low_suffix}")
 
         super().__init__(name)
 
 
 class EurothermPID(StandardReadable):
     def __init__(self, prefix: str, name: str = "", update=False):
-        self.P = epics_signal_rw(float, f"{prefix}P")
-        self.I = epics_signal_rw(float, f"{prefix}I")
-        self.D = epics_signal_rw(float, f"{prefix}D")
+        with self.add_children_as_readables():
+            self.P = epics_signal_rw(float, f"{prefix}P")
+            self.I = epics_signal_rw(float, f"{prefix}I")
+            self.D = epics_signal_rw(float, f"{prefix}D")
 
-        if update:
-            self.update = epics_signal_rw(EurothermUpdate, f"{prefix}PID.SCAN")
+            if update:
+                self.update = epics_signal_rw(EurothermUpdate, f"{prefix}PID.SCAN")
 
         super().__init__(name)
