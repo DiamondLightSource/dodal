@@ -42,7 +42,7 @@ set_path_provider(
 
 @device_factory()
 def mythen3() -> Mythen3:
-    """i11 Oxford Cryostream 700 plus without cryoshutter"""
+    """Mythen3 Detector from PSI"""
     return Mythen3(
         prefix=f"{PREFIX.beamline_prefix}-EA-DET-07:",
         path_provider=get_path_provider(),
