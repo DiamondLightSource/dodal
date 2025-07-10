@@ -1,5 +1,6 @@
 import os
 from collections.abc import Generator
+from pathlib import Path
 from typing import cast
 from unittest.mock import patch
 
@@ -15,10 +16,14 @@ from event_model.documents import (
     StreamResource,
 )
 from ophyd_async.core import (
+    PathProvider,
     StandardDetector,
+    StaticPathProvider,
+    UUIDFilenameProvider,
 )
 
 from dodal.beamlines import adsim
+from dodal.common.beamlines.beamline_utils import clear_path_provider, set_path_provider
 from dodal.devices.motors import XThetaStage
 from dodal.plans import count
 
@@ -56,7 +61,15 @@ def with_env():
 
 
 @pytest.fixture
-def det(RE) -> Generator[StandardDetector]:
+def path_provider(tmp_path: Path) -> Generator[PathProvider]:
+    path_provider = StaticPathProvider(UUIDFilenameProvider(), tmp_path)
+    set_path_provider(path_provider)
+    yield path_provider
+    clear_path_provider()
+
+
+@pytest.fixture
+def det(RE, path_provider: PathProvider) -> Generator[StandardDetector]:
     yield adsim.det(connect_immediately=True)
     adsim.det.cache_clear()
 
