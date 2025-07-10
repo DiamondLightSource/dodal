@@ -1,5 +1,5 @@
 from ophyd_async.core import StrictEnum
-from ophyd_async.epics.core import epics_signal_rw, epics_signal_x
+from ophyd_async.epics.core import epics_signal_rw
 
 from dodal.devices.motors import StandardReadable
 
@@ -20,7 +20,7 @@ class Spinner(StandardReadable):
         speed_suffix: str = "SPIN:SPEED",
     ):
         with self.add_children_as_readables():
-            self.enable = epics_signal_x(SpinEnable, prefix + disable_suffix)
+            self.enable = epics_signal_rw(SpinEnable, prefix + disable_suffix)
             self.speed = epics_signal_rw(float, prefix + speed_suffix)
 
         super().__init__(name=name)
