@@ -12,7 +12,7 @@ from ophyd_async.epics.core import epics_signal_rw
 from dodal.devices.motors import XYZStage
 
 
-class CCMCPositions(StrictEnum):
+class ChannelCutMonochromatorPositions(StrictEnum):
     OUT = "Out of Beam"
     XTAL_2000 = "Xtal_2000"
     XTAL_2250 = "Xtal_2250"
@@ -27,7 +27,7 @@ error_message = "Can not get energy value in ev from ccmc position: "
 T = TypeVar("T", bound=StrictEnum)
 
 
-class CCMC(StandardReadable, Movable[T]):
+class ChannelCutMonochromator(StandardReadable, Movable[T]):
     """
     Device to move the channel cut monochromator (ccmc). CCMC has three
     choices of crystal (Xtal for short). Setting energy is by means of a
@@ -73,8 +73,8 @@ class CCMC(StandardReadable, Movable[T]):
 
         super().__init__(name=name)
 
-    def _convert_pos_to_ev(self, pos_signal: CCMCPositions) -> float:
-        if pos_signal != CCMCPositions.OUT:
+    def _convert_pos_to_ev(self, pos_signal: ChannelCutMonochromatorPositions) -> float:
+        if pos_signal != ChannelCutMonochromatorPositions.OUT:
             energy = float(str(pos_signal.value).split("Xtal_")[1])
             if ccmc_lower_limit < energy < ccmc_upper_limit:
                 return energy
