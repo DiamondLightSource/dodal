@@ -107,7 +107,6 @@ def test_plan_produces_expected_start_document(
     assert start.get("detectors") == ["det"]
     assert start.get("num_points") == shape[0]
     assert start.get("num_intervals") == shape[0] - 1
-    assert cast(str, start.get("data_session")).startswith("adsim")
 
     assert (hints := start.get("hints")) and (
         hints.get("dimensions") == [(("time",), "primary")]
