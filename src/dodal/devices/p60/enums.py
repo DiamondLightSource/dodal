@@ -8,3 +8,8 @@ class LensMode(StrictEnum):
     ANGULAR30 = "Angular30"
     ANGULAR30_SMALLSPOT = "Angular30_SmallSpot"
     ANGULAR14_SMALLSPOT = "Angular14_SmallSpot"
+
+
+class PsuMode(StrictEnum):
+    HIGH = "High Pass (XPS)"
+    LOW = "Low Pass (UPS)"

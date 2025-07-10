@@ -53,8 +53,11 @@ async def sim_detector(
     RE: RunEngine,
 ) -> ElectronAnalyserDetectorImpl:
     lens_mode_class = get_args(detector_class)[0]
+    psu_mode_class = get_args(detector_class)[1]
     async with init_devices(mock=True, connect=True):
-        sim_detector = detector_class("TEST:", lens_mode_class, energy_sources)
+        sim_detector = detector_class(
+            "TEST:", lens_mode_class, psu_mode_class, energy_sources
+        )
     return sim_detector
 
 
@@ -65,10 +68,12 @@ async def sim_driver(
     RE: RunEngine,
 ) -> ElectronAnalyserDriverImpl:
     lens_mode_class = get_args(driver_class)[0]
+    psu_mode_class = get_args(driver_class)[1]
     async with init_devices(mock=True, connect=True):
         sim_driver = driver_class(
             "TEST:",
             lens_mode_class,
+            psu_mode_class,
             energy_sources,
         )
     return sim_driver
@@ -78,12 +83,12 @@ async def sim_driver(
 def sequence_class(
     sim_driver: AbstractAnalyserDriverIO,
 ) -> type[AbstractBaseSequence]:
-    # We must include the lens mode type here, otherwise the sequence file can't be
-    # loaded as pydantic won't be able to resolve the lens mode enum.
+    # We must include the lens and psu mode types here, otherwise the sequence file
+    # can't be loaded as pydantic won't be able to resolve the enums.
     if isinstance(sim_driver, VGScientaAnalyserDriverIO):
-        return VGScientaSequence[sim_driver.lens_mode_type]
+        return VGScientaSequence[sim_driver.lens_mode_type, sim_driver.psu_mode_type]
     elif isinstance(sim_driver, SpecsAnalyserDriverIO):
-        return SpecsSequence[sim_driver.lens_mode_type]
+        return SpecsSequence[sim_driver.lens_mode_type, sim_driver.psu_mode_type]
     raise ValueError("class " + str(sim_driver) + " not recognised")
 
 

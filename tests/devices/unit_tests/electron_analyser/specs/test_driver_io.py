@@ -7,7 +7,7 @@ from ophyd_async.testing import (
     set_mock_value,
 )
 
-from dodal.devices.b07 import LensMode
+from dodal.devices.b07 import LensMode, PsuMode
 from dodal.devices.electron_analyser import EnergyMode
 from dodal.devices.electron_analyser.specs import (
     AcquisitionMode,
@@ -21,8 +21,8 @@ from tests.devices.unit_tests.electron_analyser.util import (
 
 
 @pytest.fixture
-def driver_class() -> type[SpecsAnalyserDriverIO[LensMode]]:
-    return SpecsAnalyserDriverIO[LensMode]
+def driver_class() -> type[SpecsAnalyserDriverIO[LensMode, PsuMode]]:
+    return SpecsAnalyserDriverIO[LensMode, PsuMode]
 
 
 @pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
@@ -56,8 +56,8 @@ async def test_given_region_that_analyser_sets_energy_values_correctly(
 
 @pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
 async def test_given_region_that_analyser_sets_modes_correctly(
-    sim_driver: SpecsAnalyserDriverIO[LensMode],
-    region: SpecsRegion,
+    sim_driver: SpecsAnalyserDriverIO[LensMode, PsuMode],
+    region: SpecsRegion[LensMode, PsuMode],
     RE: RunEngine,
 ) -> None:
     RE(bps.mv(sim_driver, region))
@@ -79,8 +79,8 @@ async def test_given_region_that_analyser_sets_modes_correctly(
 
 @pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
 async def test_that_data_to_read_is_correct(
-    sim_driver: SpecsAnalyserDriverIO,
-    region: SpecsRegion,
+    sim_driver: SpecsAnalyserDriverIO[LensMode, PsuMode],
+    region: SpecsRegion[LensMode, PsuMode],
     RE: RunEngine,
 ) -> None:
     RE(bps.mv(sim_driver, region))
@@ -101,7 +101,7 @@ async def test_that_data_to_read_is_correct(
 
 
 async def test_specs_analyser_energy_axis(
-    sim_driver: SpecsAnalyserDriverIO,
+    sim_driver: SpecsAnalyserDriverIO[LensMode, PsuMode],
     RE: RunEngine,
 ) -> None:
     start_energy = 1
@@ -118,7 +118,7 @@ async def test_specs_analyser_energy_axis(
 
 
 async def test_specs_analyser_angle_axis(
-    sim_driver: SpecsAnalyserDriverIO,
+    sim_driver: SpecsAnalyserDriverIO[LensMode, PsuMode],
     RE: RunEngine,
 ) -> None:
     max_angle = 21

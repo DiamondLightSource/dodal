@@ -22,21 +22,25 @@ from dodal.devices.electron_analyser.vgscienta.detector import (
 
 # Alias names so can read the type placements easier
 AcquisitionMode = StrictEnum
-LensMode = SupersetEnum
-ElectronAnalyserDetectorImpl = VGScientaDetector[LensMode] | SpecsDetector[LensMode]
+LensMode = SupersetEnum | StrictEnum
+PsuMode = SupersetEnum | StrictEnum
+ElectronAnalyserDetectorImpl = (
+    VGScientaDetector[LensMode, PsuMode] | SpecsDetector[LensMode, PsuMode]
+)
 ElectronAnalyserDriverImpl = (
-    VGScientaAnalyserDriverIO[LensMode] | SpecsAnalyserDriverIO[LensMode]
+    VGScientaAnalyserDriverIO[LensMode, PsuMode]
+    | SpecsAnalyserDriverIO[LensMode, PsuMode]
 )
 
 AbstractBaseRegion = AbstractBaseRegion[AcquisitionMode, LensMode]
 
 GenericElectronAnalyserDetector = ElectronAnalyserDetector[
-    AbstractAnalyserDriverIO[AbstractBaseRegion, AcquisitionMode, LensMode],
+    AbstractAnalyserDriverIO[AbstractBaseRegion, AcquisitionMode, LensMode, PsuMode],
     AbstractBaseSequence[AbstractBaseRegion, LensMode],
     AbstractBaseRegion,
 ]
 
 GenericElectronAnalyserRegionDetector = ElectronAnalyserRegionDetector[
-    AbstractAnalyserDriverIO[AbstractBaseRegion, AcquisitionMode, LensMode],
+    AbstractAnalyserDriverIO[AbstractBaseRegion, AcquisitionMode, LensMode, PsuMode],
     AbstractBaseRegion,
 ]

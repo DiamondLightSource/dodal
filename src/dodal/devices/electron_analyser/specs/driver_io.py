@@ -15,25 +15,25 @@ from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 from dodal.devices.electron_analyser.abstract.base_driver_io import (
     AbstractAnalyserDriverIO,
 )
-from dodal.devices.electron_analyser.abstract.base_region import TLensMode
-from dodal.devices.electron_analyser.specs.enums import AcquisitionMode, PsuMode
+from dodal.devices.electron_analyser.abstract.base_region import TLensMode, TPsuMode
+from dodal.devices.electron_analyser.specs.enums import AcquisitionMode
 from dodal.devices.electron_analyser.specs.region import SpecsRegion
 
 
 class SpecsAnalyserDriverIO(
-    AbstractAnalyserDriverIO[SpecsRegion, AcquisitionMode, TLensMode],
-    Generic[TLensMode],
+    AbstractAnalyserDriverIO[SpecsRegion, AcquisitionMode, TLensMode, TPsuMode],
+    Generic[TLensMode, TPsuMode],
 ):
     def __init__(
         self,
         prefix: str,
         lens_mode_type: type[TLensMode],
+        psu_mode_type: type[TPsuMode],
         energy_sources: Mapping[str, SignalR[float]],
         name: str = "",
     ) -> None:
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             # Used for setting up region data acquisition.
-            self.psu_mode = epics_signal_rw(PsuMode, prefix + "SCAN_RANGE")
             self.snapshot_values = epics_signal_rw(int, prefix + "VALUES")
             self.centre_energy = epics_signal_rw(float, prefix + "KINETIC_ENERGY")
 
@@ -41,10 +41,12 @@ class SpecsAnalyserDriverIO(
             self.min_angle_axis = epics_signal_r(float, prefix + "Y_MIN_RBV")
             self.max_angle_axis = epics_signal_r(float, prefix + "Y_MAX_RBV")
 
-        super().__init__(prefix, AcquisitionMode, lens_mode_type, energy_sources, name)
+        super().__init__(
+            prefix, AcquisitionMode, lens_mode_type, psu_mode_type, energy_sources, name
+        )
 
     @AsyncStatus.wrap
-    async def set(self, region: SpecsRegion[TLensMode]):
+    async def set(self, region: SpecsRegion[TLensMode, TPsuMode]):
         await super().set(region)
 
         await asyncio.gather(

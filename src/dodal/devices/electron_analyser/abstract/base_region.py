@@ -49,6 +49,7 @@ TAcquisitionMode = TypeVar("TAcquisitionMode", bound=StrictEnum)
 # analyser which leaves the enum to either be "Not connected" OR the available enums
 # when connected.
 TLensMode = TypeVar("TLensMode", bound=SupersetEnum | StrictEnum)
+TPsuMode = TypeVar("TPsuMode", bound=SupersetEnum | StrictEnum)
 
 
 class AbstractBaseRegion(

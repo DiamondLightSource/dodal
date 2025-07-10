@@ -8,6 +8,7 @@ from dodal.devices.electron_analyser.abstract.base_region import (
     AbstractBaseSequence,
     JavaToPythonModel,
     TLensMode,
+    TPsuMode,
 )
 from dodal.devices.electron_analyser.vgscienta.enums import (
     AcquisitionMode,
@@ -20,7 +21,7 @@ class VGScientaRegion(
     AbstractBaseRegion[AcquisitionMode, TLensMode], Generic[TLensMode]
 ):
     # Override defaults of base region class
-    lens_mode: TLensMode
+    lens_mode: TLensMode = Field(alias="element_set")
     pass_energy: int = 5
     acquisition_mode: AcquisitionMode = AcquisitionMode.SWEPT
     low_energy: float = 8.0
@@ -53,9 +54,10 @@ class VGScientaExcitationEnergySource(JavaToPythonModel):
 
 
 class VGScientaSequence(
-    AbstractBaseSequence[VGScientaRegion, TLensMode], Generic[TLensMode]
+    AbstractBaseSequence[VGScientaRegion[TLensMode], TLensMode],
+    Generic[TLensMode, TPsuMode],
 ):
-    element_set: str = Field(default="Unknown")
+    psu_mode: TPsuMode
     excitation_energy_sources: list[VGScientaExcitationEnergySource] = Field(
         default_factory=lambda: []
     )
