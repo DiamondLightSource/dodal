@@ -14,7 +14,8 @@ dodal.devices.b07
    :toctree:
    :recursive:
 
-   ~b07.B07BGrating
+   ~b07.Grating
+   ~b07.LensMode
 
 
 

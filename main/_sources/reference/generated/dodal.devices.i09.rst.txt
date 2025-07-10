@@ -15,7 +15,8 @@ dodal.devices.i09
    :recursive:
 
    ~i09.DCM
-   ~i09.I09Grating
+   ~i09.Grating
+   ~i09.LensMode
 
 
 

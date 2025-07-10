@@ -14,6 +14,7 @@ dodal.devices.p60
    :toctree:
    :recursive:
 
+   ~p60.LensMode
    ~p60.LabXraySource
    ~p60.LabXraySourceReadable
 

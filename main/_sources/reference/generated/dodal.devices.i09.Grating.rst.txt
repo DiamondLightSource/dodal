@@ -1,0 +1,81 @@
+dodal.devices.i09.Grating
+=========================
+
+.. currentmodule:: dodal.devices.i09
+
+.. autoclass:: Grating
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~Grating.G_300
+      
+      
+      ~Grating.G_400
+      
+      
+      ~Grating.G_800
+      
+   
+   
