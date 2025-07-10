@@ -16,7 +16,7 @@ from dodal.devices.electron_analyser.vgscienta import (
     VGScientaAnalyserDriverIO,
     VGScientaRegion,
 )
-from dodal.devices.i09 import LensMode
+from dodal.devices.i09 import LensMode, PsuMode
 from tests.devices.unit_tests.electron_analyser.util import (
     TEST_SEQUENCE_REGION_NAMES,
     assert_read_configuration_has_expected_value,
@@ -24,8 +24,8 @@ from tests.devices.unit_tests.electron_analyser.util import (
 
 
 @pytest.fixture
-def driver_class() -> type[VGScientaAnalyserDriverIO[LensMode]]:
-    return VGScientaAnalyserDriverIO[LensMode]
+def driver_class() -> type[VGScientaAnalyserDriverIO[LensMode, PsuMode]]:
+    return VGScientaAnalyserDriverIO[LensMode, PsuMode]
 
 
 @pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)

@@ -21,7 +21,7 @@ class VGScientaRegion(
     AbstractBaseRegion[AcquisitionMode, TLensMode], Generic[TLensMode]
 ):
     # Override defaults of base region class
-    lens_mode: TLensMode = Field(alias="element_set")
+    lens_mode: TLensMode
     pass_energy: int = 5
     acquisition_mode: AcquisitionMode = AcquisitionMode.SWEPT
     low_energy: float = 8.0
@@ -57,7 +57,7 @@ class VGScientaSequence(
     AbstractBaseSequence[VGScientaRegion[TLensMode], TLensMode],
     Generic[TLensMode, TPsuMode],
 ):
-    psu_mode: TPsuMode
+    psu_mode: TPsuMode = Field(alias="element_set")
     excitation_energy_sources: list[VGScientaExcitationEnergySource] = Field(
         default_factory=lambda: []
     )
