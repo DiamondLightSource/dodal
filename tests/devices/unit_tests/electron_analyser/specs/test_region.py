@@ -36,8 +36,8 @@ def expected_region_values() -> list[dict[str, Any]]:
         {
             "name": "New_Region",
             "acquisition_mode": AcquisitionMode.FIXED_TRANSMISSION,
-            "lens_mode": LensMode.SMALL_AREA,
             "psu_mode": PsuMode.V3500,
+            "lens_mode": LensMode.SMALL_AREA,
             "low_energy": 800.0,
             "high_energy": 850.0,
             "energy_step": 0.1,
@@ -55,8 +55,8 @@ def expected_region_values() -> list[dict[str, Any]]:
         {
             "name": "New_Region1",
             "acquisition_mode": AcquisitionMode.SNAPSHOT,
-            "lens_mode": LensMode.LARGE_AREA,
             "psu_mode": PsuMode.V1500,
+            "lens_mode": LensMode.LARGE_AREA,
             "low_energy": 599.866,
             "high_energy": 600.134,
             "energy_step": 0.2680000000000291,

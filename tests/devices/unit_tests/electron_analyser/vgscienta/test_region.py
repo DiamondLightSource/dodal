@@ -23,7 +23,7 @@ from tests.devices.unit_tests.electron_analyser.util import (
 
 
 @pytest.fixture
-def sequence() -> VGScientaSequence:
+def sequence() -> VGScientaSequence[LensMode, PsuMode]:
     return load_json_file_to_class(
         VGScientaSequence[LensMode, PsuMode], TEST_VGSCIENTA_SEQUENCE
     )
