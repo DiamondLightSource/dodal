@@ -53,7 +53,7 @@ class VGScientaExcitationEnergySource(JavaToPythonModel):
 
 
 class VGScientaSequence(
-    AbstractBaseSequence[VGScientaRegion[TLensMode], TLensMode],
+    AbstractBaseSequence[VGScientaRegion[TLensMode]],
     Generic[TLensMode, TPsuMode],
 ):
     psu_mode: TPsuMode = Field(alias="element_set")

@@ -21,7 +21,9 @@ from dodal.devices.electron_analyser.specs.region import SpecsRegion
 
 
 class SpecsAnalyserDriverIO(
-    AbstractAnalyserDriverIO[SpecsRegion, AcquisitionMode, TLensMode, TPsuMode],
+    AbstractAnalyserDriverIO[
+        SpecsRegion[TLensMode, TPsuMode], AcquisitionMode, TLensMode, TPsuMode
+    ],
     Generic[TLensMode, TPsuMode],
 ):
     def __init__(

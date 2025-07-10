@@ -5,7 +5,10 @@ from typing import Generic, TypeVar
 
 from pydantic import BaseModel, Field, model_validator
 
-from dodal.devices.electron_analyser.abstract.types import TAcquisitionMode, TLensMode
+from dodal.devices.electron_analyser.abstract.types import (
+    TAcquisitionMode,
+    TLensMode,
+)
 from dodal.devices.electron_analyser.enums import EnergyMode
 
 
@@ -88,7 +91,7 @@ TAbstractBaseRegion = TypeVar("TAbstractBaseRegion", bound=AbstractBaseRegion)
 class AbstractBaseSequence(
     ABC,
     JavaToPythonModel,
-    Generic[TAbstractBaseRegion, TLensMode],
+    Generic[TAbstractBaseRegion],
 ):
     """
     Generic sequence model that holds the list of region data. Specialised sequence

@@ -40,7 +40,7 @@ AbstractBaseRegion = AbstractBaseRegion[AnyAcqMode, AnyLensMode]
 # Generic electron analyser types that supports full typing with the abstract classes.
 GenericElectronAnalyserDetector = ElectronAnalyserDetector[
     AbstractAnalyserDriverIO[AbstractBaseRegion, AnyAcqMode, AnyLensMode, AnyPsuMode],
-    AbstractBaseSequence[AbstractBaseRegion, AnyLensMode],
+    AbstractBaseSequence[AbstractBaseRegion],
     AbstractBaseRegion,
 ]
 

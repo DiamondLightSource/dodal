@@ -29,6 +29,6 @@ class SpecsRegion(
 
 
 class SpecsSequence(
-    AbstractBaseSequence[SpecsRegion, TLensMode], Generic[TLensMode, TPsuMode]
+    AbstractBaseSequence[SpecsRegion[TLensMode, TPsuMode]], Generic[TLensMode, TPsuMode]
 ):
     regions: list[SpecsRegion[TLensMode, TPsuMode]] = Field(default_factory=lambda: [])
