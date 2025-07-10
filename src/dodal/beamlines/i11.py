@@ -16,7 +16,7 @@ from dodal.devices.i11.diff_stages import (
 )
 from dodal.devices.i11.i11_robot import I11Robot
 from dodal.devices.i11.mythen import Mythen3
-from dodal.devices.i11.sample_env import Spinner
+from dodal.devices.i11.spinner import Spinner
 from dodal.devices.slits import Slits
 from dodal.devices.synchrotron import Synchrotron
 from dodal.log import set_beamline as set_log_beamline
