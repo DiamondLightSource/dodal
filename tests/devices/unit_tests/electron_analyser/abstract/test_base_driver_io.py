@@ -5,8 +5,11 @@ import numpy as np
 import pytest
 from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
+from bluesky.utils import FailedStatus
+from ophyd_async.core import StrictEnum
 from ophyd_async.testing import assert_reading, get_mock_put, set_mock_value
 
+from dodal.devices import b07, i09
 from dodal.devices.electron_analyser import (
     to_kinetic_energy,
 )
@@ -26,7 +29,12 @@ from tests.devices.unit_tests.electron_analyser.util import (
 )
 
 
-@pytest.fixture(params=[VGScientaAnalyserDriverIO, SpecsAnalyserDriverIO])
+@pytest.fixture(
+    params=[
+        VGScientaAnalyserDriverIO[i09.LensMode],
+        SpecsAnalyserDriverIO[b07.LensMode],
+    ]
+)
 def driver_class(
     request: pytest.FixtureRequest,
 ) -> type[AbstractAnalyserDriverIO]:
@@ -187,3 +195,27 @@ def test_analyser_raise_error_on_invalid_energy_source_selected(
 ) -> None:
     with pytest.raises(KeyError):
         sim_driver._get_energy_source("invalid_name")
+
+
+@pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
+def test_driver_throws_error_with_wrong_typed_modes(
+    sim_driver: AbstractAnalyserDriverIO,
+    region: AbstractBaseRegion,
+    RE: RunEngine,
+) -> None:
+    class TestEnum(StrictEnum):
+        TEST_1 = "Invalid mode"
+
+    region.lens_mode = TestEnum.TEST_1
+    region.acquisition_mode = TestEnum.TEST_1
+
+    acq_datatype = sim_driver.acquisition_mode.datatype
+    acq_datatype_name = acq_datatype.__name__ if acq_datatype is not None else ""
+
+    with pytest.raises(FailedStatus, match=f"is not a valid {acq_datatype_name}"):
+        RE(bps.mv(sim_driver.acquisition_mode, region.acquisition_mode))
+
+    lens_datatype = sim_driver.lens_mode.datatype
+    lens_datatype_name = lens_datatype.__name__ if lens_datatype is not None else ""
+    with pytest.raises(FailedStatus, match=f"is not a valid {lens_datatype_name}"):
+        RE(bps.mv(sim_driver.lens_mode, region.lens_mode))
