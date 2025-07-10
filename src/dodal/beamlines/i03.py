@@ -92,7 +92,10 @@ def attenuator() -> BinaryFilterAttenuator:
     """Get the i03 attenuator device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return BinaryFilterAttenuator(f"{PREFIX.beamline_prefix}-EA-ATTN-01:")
+    return BinaryFilterAttenuator(
+        prefix=f"{PREFIX.beamline_prefix}-EA-ATTN-01:",
+        num_filters=16,
+    )
 
 
 @device_factory()
