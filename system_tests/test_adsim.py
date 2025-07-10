@@ -1,6 +1,5 @@
 import os
 from collections.abc import Generator
-from pathlib import Path
 from typing import cast
 from unittest.mock import patch
 
@@ -61,8 +60,9 @@ def with_env():
 
 
 @pytest.fixture
-def path_provider(tmp_path: Path) -> Generator[PathProvider]:
-    path_provider = StaticPathProvider(UUIDFilenameProvider(), tmp_path)
+def path_provider() -> Generator[PathProvider]:
+    # path must be available to the `det` container, so cannot use tmp_path
+    path_provider = StaticPathProvider(UUIDFilenameProvider(), "/tmp")
     set_path_provider(path_provider)
     yield path_provider
     clear_path_provider()
