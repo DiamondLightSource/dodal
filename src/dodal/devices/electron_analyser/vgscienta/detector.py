@@ -3,7 +3,7 @@ from typing import Generic
 
 from ophyd_async.core import SignalR
 
-from dodal.devices.electron_analyser.abstract.base_region import TLensMode, TPsuMode
+from dodal.devices.electron_analyser.abstract.types import TLensMode, TPsuMode
 from dodal.devices.electron_analyser.detector import (
     ElectronAnalyserDetector,
 )

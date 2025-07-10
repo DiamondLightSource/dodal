@@ -3,9 +3,9 @@ from abc import ABC
 from collections.abc import Callable
 from typing import Generic, TypeVar
 
-from ophyd_async.core import StrictEnum, SupersetEnum
 from pydantic import BaseModel, Field, model_validator
 
+from dodal.devices.electron_analyser.abstract.types import TAcquisitionMode, TLensMode
 from dodal.devices.electron_analyser.enums import EnergyMode
 
 
@@ -42,14 +42,6 @@ def energy_mode_validation(data: dict) -> dict:
             EnergyMode.BINDING if is_binding_energy else EnergyMode.KINETIC
         )
     return data
-
-
-TAcquisitionMode = TypeVar("TAcquisitionMode", bound=StrictEnum)
-# Allow SupersetEnum. Specs analysers can connect to Lens mode separately to the
-# analyser which leaves the enum to either be "Not connected" OR the available enums
-# when connected.
-TLensMode = TypeVar("TLensMode", bound=SupersetEnum | StrictEnum)
-TPsuMode = TypeVar("TPsuMode", bound=SupersetEnum | StrictEnum)
 
 
 class AbstractBaseRegion(

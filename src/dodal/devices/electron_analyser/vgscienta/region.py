@@ -7,9 +7,8 @@ from dodal.devices.electron_analyser.abstract.base_region import (
     AbstractBaseRegion,
     AbstractBaseSequence,
     JavaToPythonModel,
-    TLensMode,
-    TPsuMode,
 )
+from dodal.devices.electron_analyser.abstract.types import TLensMode, TPsuMode
 from dodal.devices.electron_analyser.vgscienta.enums import (
     AcquisitionMode,
     DetectorMode,
