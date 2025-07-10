@@ -21,6 +21,9 @@ class LensMode(SupersetEnum):
     MEDIUM_AREA = "MediumArea"
     SMALL_AREA = "SmallArea"
     HIGH_MAGNIFICATION2 = "HighMagnification2"
+    # This is connected to the device separately and will only have "Not connected" as
+    # option if disconnected. Once it is connected, "Not connected" is replaced with the
+    # options above. This is also why this must be a SupersetEnum.
     NOT_CONNECTED = "Not connected"
 
 
