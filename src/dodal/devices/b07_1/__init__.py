@@ -2,6 +2,6 @@ from dodal.devices.b07_1.ccmc import (
     ChannelCutMonochromator,
     ChannelCutMonochromatorPositions,
 )
-from dodal.devices.b07_1.grating import B07CGrating
+from dodal.devices.b07_1.enums import Grating, LensMode
 
-__all__ = ["B07CGrating", "ChannelCutMonochromator", "ChannelCutMonochromatorPositions"]
+__all__ = ["Grating", "LensMode", "ChannelCutMonochromator", "ChannelCutMonochromatorPositions"]
