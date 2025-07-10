@@ -1,5 +1,3 @@
-from typing import TypeVar
-
 from bluesky.protocols import Movable
 from ophyd_async.core import (
     AsyncStatus,
@@ -24,10 +22,9 @@ ccmc_upper_limit = 3000.0
 error_message = "Can not get energy value in ev from ccmc position: "
 
 
-T = TypeVar("T", bound=StrictEnum)
-
-
-class ChannelCutMonochromator(StandardReadable, Movable[T]):
+class ChannelCutMonochromator(
+    StandardReadable, Movable[ChannelCutMonochromatorPositions]
+):
     """
     Device to move the channel cut monochromator (ccmc). CCMC has three
     choices of crystal (Xtal for short). Setting energy is by means of a
@@ -40,7 +37,7 @@ class ChannelCutMonochromator(StandardReadable, Movable[T]):
     def __init__(
         self,
         prefix: str,
-        positions: type[StrictEnum],
+        positions: type[ChannelCutMonochromatorPositions],
         name: str = "",
     ) -> None:
         """
@@ -81,5 +78,5 @@ class ChannelCutMonochromator(StandardReadable, Movable[T]):
         raise ValueError(error_message)
 
     @AsyncStatus.wrap
-    async def set(self, demand: T) -> None:
+    async def set(self, demand: ChannelCutMonochromatorPositions) -> None:
         await self.crystal.set(demand, wait=True)

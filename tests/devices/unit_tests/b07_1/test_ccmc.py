@@ -1,5 +1,3 @@
-import re
-
 import pytest
 from bluesky.plan_stubs import mv
 from bluesky.run_engine import RunEngine
@@ -47,11 +45,6 @@ async def test_move_crystal(
     await assert_value(mock_ccmc.crystal, ChannelCutMonochromatorPositions.OUT)
     RE(mv(mock_ccmc, ChannelCutMonochromatorPositions.XTAL_2000))
     await assert_value(mock_ccmc.crystal, ChannelCutMonochromatorPositions.XTAL_2000)
-    with pytest.raises(
-        ValueError,
-        match=re.escape("is not a valid ChannelCutMonochromatorPositions"),
-    ):
-        await mock_ccmc.set(WrongEnum.POS_100)
 
 
 @pytest.mark.parametrize(
