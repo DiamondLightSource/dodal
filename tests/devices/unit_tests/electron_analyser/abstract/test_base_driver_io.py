@@ -1,7 +1,5 @@
-import asyncio
-import math
+from typing import Any
 
-import numpy as np
 import pytest
 from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
@@ -11,14 +9,9 @@ from ophyd_async.testing import (
     assert_configuration,
     assert_reading,
     get_mock_put,
-    partial_reading,
-    set_mock_value,
 )
 
 from dodal.devices import b07, i09
-from dodal.devices.electron_analyser import (
-    to_kinetic_energy,
-)
 from dodal.devices.electron_analyser.abstract import (
     AbstractAnalyserDriverIO,
     AbstractBaseRegion,
@@ -47,13 +40,13 @@ def driver_class(
 
 
 @pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
-async def test_analyser_sets_region_and_configuration_is_correct(
+async def test_abstract_analyser_sets_region_and_configuration_is_correct(
     sim_driver: AbstractAnalyserDriverIO,
     region: AbstractBaseRegion,
+    expected_abstract_driver_config_reading: dict[str, dict[str, Any]],
     RE: RunEngine,
 ) -> None:
-    RE(bps.mv(sim_driver, region))
-
+    expected_config = expected_abstract_driver_config_reading
     get_mock_put(sim_driver.region_name).assert_called_once_with(region.name, wait=True)
     get_mock_put(sim_driver.energy_mode).assert_called_once_with(
         region.energy_mode, wait=True
@@ -65,16 +58,14 @@ async def test_analyser_sets_region_and_configuration_is_correct(
         region.lens_mode, wait=True
     )
 
-    energy_source = sim_driver._get_energy_source(region.excitation_energy_source)
-    excitation_energy = await energy_source.get_value()
-
-    expected_low_e = to_kinetic_energy(
-        region.low_energy, region.energy_mode, excitation_energy
-    )
-    expected_high_e = to_kinetic_energy(
-        region.high_energy, region.energy_mode, excitation_energy
-    )
-    expected_pass_e = region.pass_energy
+    prefix = sim_driver.name + "-"
+    VAL = "value"
+    expected_low_e = expected_config[prefix + "low_energy"][VAL]
+    expected_high_e = expected_config[prefix + "high_energy"][VAL]
+    expected_pass_e = expected_config[prefix + "pass_energy"][VAL]
+    expected_excitation_e_source = expected_config[prefix + "excitation_energy_source"][
+        VAL
+    ]
 
     get_mock_put(sim_driver.low_energy).assert_called_once_with(
         expected_low_e, wait=True
@@ -85,82 +76,39 @@ async def test_analyser_sets_region_and_configuration_is_correct(
     get_mock_put(sim_driver.pass_energy).assert_called_once_with(
         expected_pass_e, wait=True
     )
-    get_mock_put(sim_driver.excitation_energy).assert_called_once_with(
-        excitation_energy, wait=True
-    )
     get_mock_put(sim_driver.excitation_energy_source).assert_called_once_with(
-        energy_source.name, wait=True
+        expected_excitation_e_source, wait=True
     )
     get_mock_put(sim_driver.slices).assert_called_once_with(region.slices, wait=True)
     get_mock_put(sim_driver.iterations).assert_called_once_with(
         region.iterations, wait=True
     )
-    mock_values = 10
-    set_mock_value(sim_driver.total_steps, mock_values)
-    set_mock_value(sim_driver.step_time, mock_values)
-
-    expected_total_time = math.prod(
-        await asyncio.gather(
-            sim_driver.iterations.get_value(),
-            sim_driver.total_steps.get_value(),
-            sim_driver.step_time.get_value(),
-        )
-    )
-
-    # Depends on implementation, so get directly from device.
-    energy_axis = await sim_driver.energy_axis.get_value()
-    binding_axis = await sim_driver.binding_energy_axis.get_value()
-    angle_axis = await sim_driver.angle_axis.get_value()
-
-    prefix = sim_driver.name + "-"
 
     # Check partial match as different analysers will have more fields
     await assert_configuration(
         sim_driver,
-        {
-            f"{prefix}region_name": partial_reading(region.name),
-            f"{prefix}energy_mode": partial_reading(region.energy_mode),
-            f"{prefix}acquisition_mode": partial_reading(region.acquisition_mode),
-            f"{prefix}lens_mode": partial_reading(region.lens_mode),
-            f"{prefix}low_energy": partial_reading(expected_low_e),
-            f"{prefix}high_energy": partial_reading(expected_high_e),
-            f"{prefix}pass_energy": partial_reading(expected_pass_e),
-            f"{prefix}excitation_energy_source": partial_reading(energy_source.name),
-            f"{prefix}slices": partial_reading(region.slices),
-            f"{prefix}iterations": partial_reading(region.iterations),
-            f"{prefix}total_steps": partial_reading(mock_values),
-            f"{prefix}step_time": partial_reading(mock_values),
-            f"{prefix}total_time": partial_reading(expected_total_time),
-            f"{prefix}energy_axis": partial_reading(energy_axis),
-            f"{prefix}binding_energy_axis": partial_reading(binding_axis),
-            f"{prefix}angle_axis": partial_reading(angle_axis),
-        },
+        expected_abstract_driver_config_reading,
         full_match=False,
     )
 
 
 @pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
-async def test_analyser_reading_is_correct(
+async def test_abstract_analyser_sets_region_and_reading_is_correct(
     sim_driver: AbstractAnalyserDriverIO,
     region: AbstractBaseRegion,
+    expected_abstract_driver_describe_reading,
     RE: RunEngine,
 ) -> None:
     energy_source = sim_driver._get_energy_source(region.excitation_energy_source)
     excitation_energy = await energy_source.get_value()
 
-    spectrum = np.array([1, 2, 3, 4, 5], dtype=float)
-    expected_total_intensity = np.sum(spectrum)
-    set_mock_value(sim_driver.spectrum, spectrum)
+    get_mock_put(sim_driver.excitation_energy).assert_called_once_with(
+        excitation_energy, wait=True
+    )
 
-    prefix = sim_driver.name + "-"
     await assert_reading(
         sim_driver,
-        {
-            f"{prefix}excitation_energy": partial_reading(excitation_energy),
-            f"{prefix}image": partial_reading([]),
-            f"{prefix}spectrum": partial_reading(spectrum),
-            f"{prefix}total_intensity": partial_reading(expected_total_intensity),
-        },
+        expected_abstract_driver_describe_reading,
         full_match=True,
     )
 

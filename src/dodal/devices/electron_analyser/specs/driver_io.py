@@ -44,12 +44,14 @@ class SpecsAnalyserDriverIO(
             self.snapshot_values = epics_signal_rw(int, prefix + "VALUES")
             self.centre_energy = epics_signal_rw(float, prefix + "KINETIC_ENERGY")
 
-            # Used to read detector data after acqusition.
-            self.min_angle_axis = epics_signal_r(float, prefix + "Y_MIN_RBV")
-            self.max_angle_axis = epics_signal_r(float, prefix + "Y_MAX_RBV")
-            self.energy_channels = epics_signal_r(
-                int, prefix + "TOTAL_POINTS_ITERATION_RBV"
-            )
+        # Used to calculate the angle axis.
+        self.min_angle_axis = epics_signal_r(float, prefix + "Y_MIN_RBV")
+        self.max_angle_axis = epics_signal_r(float, prefix + "Y_MAX_RBV")
+
+        # Used to calculate the energy axis.
+        self.energy_channels = epics_signal_r(
+            int, prefix + "TOTAL_POINTS_ITERATION_RBV"
+        )
 
         super().__init__(
             prefix=prefix,
