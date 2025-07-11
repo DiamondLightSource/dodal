@@ -1,14 +1,22 @@
+import math
 from typing import Any, get_args, get_origin
 
+import numpy as np
 import pytest
+from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
 from ophyd_async.core import SignalR, init_devices
 from ophyd_async.sim import SimMotor
+from ophyd_async.testing import (
+    partial_reading,
+    set_mock_value,
+)
 
 from dodal.devices.electron_analyser import (
     ElectronAnalyserDetector,
     ElectronAnalyserDetectorImpl,
     ElectronAnalyserDriverImpl,
+    to_kinetic_energy,
 )
 from dodal.devices.electron_analyser.abstract import (
     AbstractAnalyserDriverIO,
@@ -166,3 +174,85 @@ def expected_enabled_region_names(
         if expected_region_value["enabled"]:
             names.append(expected_region_value["name"])
     return names
+
+
+@pytest.fixture
+async def expected_abstract_driver_config_reading(
+    sim_driver: AbstractAnalyserDriverIO,
+    region: AbstractBaseRegion,
+    RE: RunEngine,
+) -> dict[str, dict[str, Any]]:
+    RE(bps.mv(sim_driver, region), wait=True)
+
+    energy_source = sim_driver._get_energy_source(region.excitation_energy_source)
+    excitation_energy = await energy_source.get_value()
+
+    expected_low_e = to_kinetic_energy(
+        region.low_energy, region.energy_mode, excitation_energy
+    )
+    expected_high_e = to_kinetic_energy(
+        region.high_energy, region.energy_mode, excitation_energy
+    )
+    expected_pass_e = region.pass_energy
+
+    mock_values = 10
+    set_mock_value(sim_driver.total_steps, mock_values)
+    set_mock_value(sim_driver.step_time, mock_values)
+
+    expected_total_time = math.prod(
+        [
+            region.iterations,
+            await sim_driver.total_steps.get_value(),
+            await sim_driver.step_time.get_value(),
+        ]
+    )
+
+    # Depends on implementation, so get directly from device.
+    energy_axis = await sim_driver.energy_axis.get_value()
+    binding_axis = await sim_driver.binding_energy_axis.get_value()
+    angle_axis = await sim_driver.angle_axis.get_value()
+
+    prefix = sim_driver.name + "-"
+
+    return {
+        f"{prefix}region_name": partial_reading(region.name),
+        f"{prefix}energy_mode": partial_reading(region.energy_mode),
+        f"{prefix}acquisition_mode": partial_reading(region.acquisition_mode),
+        f"{prefix}lens_mode": partial_reading(region.lens_mode),
+        f"{prefix}low_energy": partial_reading(expected_low_e),
+        f"{prefix}high_energy": partial_reading(expected_high_e),
+        f"{prefix}pass_energy": partial_reading(expected_pass_e),
+        f"{prefix}excitation_energy_source": partial_reading(energy_source.name),
+        f"{prefix}slices": partial_reading(region.slices),
+        f"{prefix}iterations": partial_reading(region.iterations),
+        f"{prefix}total_steps": partial_reading(mock_values),
+        f"{prefix}step_time": partial_reading(mock_values),
+        f"{prefix}total_time": partial_reading(expected_total_time),
+        f"{prefix}energy_axis": partial_reading(energy_axis),
+        f"{prefix}binding_energy_axis": partial_reading(binding_axis),
+        f"{prefix}angle_axis": partial_reading(angle_axis),
+    }
+
+
+@pytest.fixture
+async def expected_abstract_driver_describe_reading(
+    sim_driver: AbstractAnalyserDriverIO,
+    region: AbstractBaseRegion,
+    RE: RunEngine,
+) -> dict[str, dict[str, Any]]:
+    RE(bps.mv(sim_driver, region), wait=True)
+
+    energy_source = sim_driver._get_energy_source(region.excitation_energy_source)
+    excitation_energy = await energy_source.get_value()
+
+    spectrum = np.array([1, 2, 3, 4, 5], dtype=float)
+    expected_total_intensity = np.sum(spectrum)
+    set_mock_value(sim_driver.spectrum, spectrum)
+
+    prefix = sim_driver.name + "-"
+    return {
+        f"{prefix}excitation_energy": partial_reading(excitation_energy),
+        f"{prefix}image": partial_reading([]),
+        f"{prefix}spectrum": partial_reading(spectrum),
+        f"{prefix}total_intensity": partial_reading(expected_total_intensity),
+    }

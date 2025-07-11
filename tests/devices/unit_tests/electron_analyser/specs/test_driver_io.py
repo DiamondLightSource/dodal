@@ -1,3 +1,5 @@
+from typing import Any
+
 import numpy as np
 import pytest
 from bluesky import plan_stubs as bps
@@ -31,10 +33,9 @@ def driver_class() -> type[SpecsAnalyserDriverIO[LensMode, PsuMode]]:
 async def test_analyser_sets_region_and_configuration_is_correct(
     sim_driver: SpecsAnalyserDriverIO[LensMode, PsuMode],
     region: SpecsRegion[LensMode, PsuMode],
+    expected_abstract_driver_config_reading: dict[str, dict[str, Any]],
     RE: RunEngine,
 ) -> None:
-    RE(bps.mv(sim_driver, region))
-    # ToDo - Put energy step and centre energy into abstract, remove if statements.
     if region.acquisition_mode == AcquisitionMode.FIXED_TRANSMISSION:
         get_mock_put(sim_driver.energy_step).assert_called_once_with(
             region.energy_step, wait=True
@@ -63,20 +64,27 @@ async def test_analyser_sets_region_and_configuration_is_correct(
     )
 
     prefix = sim_driver.name + "-"
-    # Check partial match, check only specific fields not covered by abstract class
+    specs_expected_config_reading = {
+        f"{prefix}centre_energy": partial_reading(
+            await sim_driver.centre_energy.get_value()
+        ),
+        f"{prefix}energy_step": partial_reading(
+            await sim_driver.energy_step.get_value()
+        ),
+        f"{prefix}snapshot_values": partial_reading(region.values),
+        f"{prefix}psu_mode": partial_reading(region.psu_mode),
+    }
+
+    full_expected_config = (
+        expected_abstract_driver_config_reading | specs_expected_config_reading
+    )
+
+    # Check exact match by combining expected specs specific config reading with
+    # abstract one
     await assert_configuration(
         sim_driver,
-        {
-            f"{prefix}centre_energy": partial_reading(
-                await sim_driver.centre_energy.get_value()
-            ),
-            f"{prefix}energy_step": partial_reading(
-                await sim_driver.energy_step.get_value()
-            ),
-            f"{prefix}psu_mode": partial_reading(region.psu_mode),
-            f"{prefix}snapshot_values": partial_reading(region.values),
-        },
-        full_match=False,
+        full_expected_config,
+        full_match=True,
     )
 
 

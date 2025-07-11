@@ -1,6 +1,7 @@
+from typing import Any
+
 import numpy as np
 import pytest
-from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
 from bluesky.utils import FailedStatus
 from ophyd_async.core import StrictEnum
@@ -20,6 +21,7 @@ from dodal.devices.electron_analyser import (
 from dodal.devices.electron_analyser.vgscienta import (
     VGScientaAnalyserDriverIO,
     VGScientaRegion,
+    VGScientaSequence,
 )
 from dodal.devices.i09 import LensMode, PassEnergy, PsuMode
 from tests.devices.unit_tests.electron_analyser.util import (
@@ -35,11 +37,11 @@ def driver_class() -> type[VGScientaAnalyserDriverIO[LensMode, PsuMode, PassEner
 @pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
 async def test_analyser_sets_region_and_reads_correctly(
     sim_driver: VGScientaAnalyserDriverIO,
+    sequence: VGScientaSequence,
     region: VGScientaRegion,
+    expected_abstract_driver_config_reading: dict[str, dict[str, Any]],
     RE: RunEngine,
 ) -> None:
-    RE(bps.mv(sim_driver, region))
-
     get_mock_put(sim_driver.image_mode).assert_called_once_with(
         ADImageMode.SINGLE, wait=True
     )
@@ -81,21 +83,31 @@ async def test_analyser_sets_region_and_reads_correctly(
         expected_size_y, wait=True
     )
 
-    prefix = sim_driver.name + "-"
+    expected_psu_mode = sequence.psu_mode
+    set_mock_value(sim_driver.psu_mode, expected_psu_mode)
 
-    # Check partial match, check only specific fields not covered by abstract class
+    prefix = sim_driver.name + "-"
+    vgscienta_expected_config_reading = {
+        f"{prefix}centre_energy": partial_reading(expected_centre_e),
+        f"{prefix}detector_mode": partial_reading(region.detector_mode),
+        f"{prefix}energy_step": partial_reading(region.energy_step),
+        f"{prefix}first_x_channel": partial_reading(region.first_x_channel),
+        f"{prefix}x_channel_size": partial_reading(region.x_channel_size()),
+        f"{prefix}first_y_channel": partial_reading(region.first_y_channel),
+        f"{prefix}y_channel_size": partial_reading(region.y_channel_size()),
+        f"{prefix}psu_mode": partial_reading(expected_psu_mode),
+    }
+
+    full_expected_config = (
+        expected_abstract_driver_config_reading | vgscienta_expected_config_reading
+    )
+
+    # Check exact match by combining expected vgscienta specific config reading with
+    # abstract one
     await assert_configuration(
         sim_driver,
-        {
-            f"{prefix}centre_energy": partial_reading(expected_centre_e),
-            f"{prefix}detector_mode": partial_reading(region.detector_mode),
-            f"{prefix}energy_step": partial_reading(region.energy_step),
-            f"{prefix}first_x_channel": partial_reading(region.first_x_channel),
-            f"{prefix}x_channel_size": partial_reading(region.x_channel_size()),
-            f"{prefix}first_y_channel": partial_reading(region.first_y_channel),
-            f"{prefix}y_channel_size": partial_reading(region.y_channel_size()),
-        },
-        full_match=False,
+        full_expected_config,
+        full_match=True,
     )
 
 
