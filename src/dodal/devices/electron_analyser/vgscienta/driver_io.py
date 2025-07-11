@@ -21,11 +21,11 @@ from dodal.devices.electron_analyser.abstract.types import (
     TPsuMode,
 )
 from dodal.devices.electron_analyser.util import to_kinetic_energy
-from dodal.devices.electron_analyser.vgscienta.enums import AcquisitionMode
-from dodal.devices.electron_analyser.vgscienta.region import (
+from dodal.devices.electron_analyser.vgscienta.enums import (
+    AcquisitionMode,
     DetectorMode,
-    VGScientaRegion,
 )
+from dodal.devices.electron_analyser.vgscienta.region import VGScientaRegion
 
 
 class VGScientaAnalyserDriverIO(
