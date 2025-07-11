@@ -30,29 +30,29 @@ class Linkam3(StandardReadable):
 
     def __init__(self, prefix: str, name: str = ""):
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
-            self.temp = epics_signal_r(float, prefix + "TEMP:")
+            self.temp = epics_signal_r(float, prefix + "TEMP")
         with self.add_children_as_readables():
-            self.dsc = epics_signal_r(float, prefix + "DSC:")
-            self.start_heat = epics_signal_rw(bool, prefix + "STARTHEAT:")
+            self.dsc = epics_signal_r(float, prefix + "DSC")
+            self.start_heat = epics_signal_rw(bool, prefix + "STARTHEAT")
 
             self.ramp_rate = epics_signal_rw(
-                float, prefix + "RAMPRATE:", prefix + "RAMPRATE:SET:"
+                float, prefix + "RAMPRATE", prefix + "RAMPRATE:SET"
             )
-            self.ramp_time = epics_signal_r(float, prefix + "RAMPTIME:")
+            self.ramp_time = epics_signal_r(float, prefix + "RAMPTIME")
             self.set_point = epics_signal_rw(
-                float, prefix + "SETPOINT:", prefix + "SETPOINT:SET:"
+                float, prefix + "SETPOINT", prefix + "SETPOINT:SET"
             )
             self.pump_control = epics_signal_r(
                 PumpControl,
-                prefix + "LNP_MODE:SET:",
+                prefix + "LNP_MODE:SET",
             )
             self.speed = epics_signal_rw(
-                float, prefix + "LNP_SPEED:", prefix + "LNP_SPEED:SET:"
+                float, prefix + "LNP_SPEED", prefix + "LNP_SPEED:SET"
             )
 
-            self.chamber_vac = epics_signal_r(float, prefix + "VAC_CHAMBER:")
-            self.sensor_vac = epics_signal_r(float, prefix + "VAC_DATA1:")
+            self.chamber_vac = epics_signal_r(float, prefix + "VAC_CHAMBER")
+            self.sensor_vac = epics_signal_r(float, prefix + "VAC_DATA1")
 
-            self.error = epics_signal_r(str, prefix + "CTRLLR:ERR:")
+            self.error = epics_signal_r(str, prefix + "CTRLLR:ERR")
 
         super().__init__(name=name)
