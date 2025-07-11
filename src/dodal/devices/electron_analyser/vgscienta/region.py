@@ -53,7 +53,7 @@ class VGScientaRegion(
     @field_validator("pass_energy", mode="before")
     @classmethod
     def validate_pass_energy(cls, val):
-        # This is needed because if the value is an integer, it can't be casted to the
+        # This is needed because if the value is a number, it can't be casted to the
         # enum correctly.
         return str(val)
 
