@@ -1,15 +1,11 @@
-from pathlib import Path
-
 from ophyd_async.epics.adsimdetector import SimDetector
 
 from dodal.common.beamlines.beamline_utils import (
     device_factory,
     get_path_provider,
-    set_path_provider,
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.beamlines.device_helpers import DET_SUFFIX, HDF5_SUFFIX
-from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitPathProvider
 from dodal.devices.motors import XThetaStage
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix
@@ -19,13 +15,6 @@ PREFIX = BeamlinePrefix("t01")
 set_log_beamline(BL)
 set_utils_beamline(BL)
 
-set_path_provider(
-    StaticVisitPathProvider(
-        BL,
-        Path("/tmp"),
-        client=LocalDirectoryServiceClient(),
-    )
-)
 
 """
 Beamline module for use with the simulated AreaDetector and motors.
@@ -47,10 +36,22 @@ How to use the devices in a plan:
 In an ipython terminal run:
 
 ```python
+from pathlib import Path
+
 from bluesky.run_engine import RunEngine
+from ophyd_async.core import StaticPathProvider, UUIDFilenameProvider
 
 from dodal.beamlines.adsim import det, stage
+from dodal.common.beamlines.beamline_utils import set_path_provider
 from dodal.plans import count
+
+
+set_path_provider(
+    StaticPathProvider(
+        UUIDFilenameProvider(),
+        "/tmp", # The directory for `det` to write to- may be mounted as a volume
+    )
+)
 
 RE = RunEngine()
 d = det(connect_immediately=True)
