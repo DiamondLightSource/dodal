@@ -9,13 +9,16 @@ from dodal.devices.electron_analyser.abstract.base_region import (
 from dodal.devices.electron_analyser.abstract.types import TLensMode, TPsuMode
 from dodal.devices.electron_analyser.specs.enums import AcquisitionMode
 
+PassEnergy = float
+
 
 class SpecsRegion(
-    AbstractBaseRegion[AcquisitionMode, TLensMode, int], Generic[TLensMode, TPsuMode]
+    AbstractBaseRegion[AcquisitionMode, TLensMode, PassEnergy],
+    Generic[TLensMode, TPsuMode],
 ):
     # Override base class with defaults
     lens_mode: TLensMode
-    pass_energy: int = 5
+    pass_energy: PassEnergy = 5
     acquisition_mode: AcquisitionMode = AcquisitionMode.FIXED_TRANSMISSION
     low_energy: float = Field(default=800, alias="start_energy")
     high_energy: float = Field(default=850, alias="end_energy")

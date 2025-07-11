@@ -17,9 +17,7 @@ from dodal.devices.electron_analyser.abstract.base_driver_io import (
 )
 from dodal.devices.electron_analyser.abstract.types import TLensMode, TPsuMode
 from dodal.devices.electron_analyser.specs.enums import AcquisitionMode
-from dodal.devices.electron_analyser.specs.region import SpecsRegion
-
-PassEnergy = float
+from dodal.devices.electron_analyser.specs.region import PassEnergy, SpecsRegion
 
 
 class SpecsAnalyserDriverIO(
