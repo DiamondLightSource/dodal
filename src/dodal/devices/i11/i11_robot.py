@@ -1,11 +1,9 @@
-import time
+# import time
 from typing import Annotated as A
 
 from bluesky.protocols import Locatable, Location
 from ophyd_async.core import AsyncStatus, SignalRW, StandardReadable
 from ophyd_async.epics.core import PvSuffix, epics_signal_x
-
-from dodal.log import Logger
 
 # class RobotJobs(StrictEnum):
 
@@ -41,6 +39,5 @@ class I11Robot(StandardReadable, Locatable):
         # setpoint readback
         return Location(setpoint=1, readback=1)
 
-    def start():
-        start_time = time.time()
-        Logger.debug(f"Robot Started: {start_time}")
+    # def start_robot(self) -> None:
+    #     start_time = time.time()

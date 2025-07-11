@@ -102,6 +102,10 @@ _BIT_DEPTH = 32
 class Mythen3Controller(ADBaseController):
     """ADBaseController` for a Mythen3"""
 
+    def __init__(self, driver):
+        self.driver = driver
+        super().__init__(driver=self.driver)
+
     def get_deadtime(self, exposure: float | None) -> float:
         return _DEADTIMES[_BIT_DEPTH]
 
