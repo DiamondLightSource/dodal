@@ -13,3 +13,8 @@ class LensMode(StrictEnum):
     ANGULAR60 = "Angular60"
     ANGULAR56 = "Angular56"
     ANGULAR45VUV = "Angular45VUV"
+
+
+class PsuMode(StrictEnum):
+    HIGH = "High"
+    LOW = "Low"

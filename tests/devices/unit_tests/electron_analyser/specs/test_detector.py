@@ -2,13 +2,13 @@ import pytest
 from bluesky import RunEngine
 from ophyd_async.testing import set_mock_value
 
-from dodal.devices.b07_1 import LensMode
+from dodal.devices.b07 import LensMode, PsuMode
 from dodal.devices.electron_analyser.specs import SpecsDetector
 
 
 @pytest.fixture
-def detector_class() -> type[SpecsDetector[LensMode]]:
-    return SpecsDetector[LensMode]
+def detector_class() -> type[SpecsDetector[LensMode, PsuMode]]:
+    return SpecsDetector[LensMode, PsuMode]
 
 
 async def test_analyser_specs_detector_image_shape(

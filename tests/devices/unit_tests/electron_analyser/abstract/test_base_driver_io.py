@@ -31,8 +31,8 @@ from tests.devices.unit_tests.electron_analyser.util import (
 
 @pytest.fixture(
     params=[
-        VGScientaAnalyserDriverIO[i09.LensMode],
-        SpecsAnalyserDriverIO[b07.LensMode],
+        VGScientaAnalyserDriverIO[i09.LensMode, i09.PsuMode],
+        SpecsAnalyserDriverIO[b07.LensMode, b07.PsuMode],
     ]
 )
 def driver_class(

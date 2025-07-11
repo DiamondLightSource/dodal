@@ -14,6 +14,7 @@ from dodal.devices.electron_analyser.vgscienta.region import (
     VGScientaSequence,
 )
 from dodal.devices.i09 import LensMode as LensMode
+from dodal.devices.i09 import PsuMode
 from tests.devices.unit_tests.electron_analyser.util import (
     TEST_VGSCIENTA_SEQUENCE,
     assert_region_has_expected_values,
@@ -22,8 +23,10 @@ from tests.devices.unit_tests.electron_analyser.util import (
 
 
 @pytest.fixture
-def sequence() -> VGScientaSequence:
-    return load_json_file_to_class(VGScientaSequence[LensMode], TEST_VGSCIENTA_SEQUENCE)
+def sequence() -> VGScientaSequence[LensMode, PsuMode]:
+    return load_json_file_to_class(
+        VGScientaSequence[LensMode, PsuMode], TEST_VGSCIENTA_SEQUENCE
+    )
 
 
 @pytest.fixture
@@ -88,7 +91,7 @@ def expected_region_values() -> list[dict[str, Any]]:
 
 
 def test_sequence_get_expected_region_from_name(
-    sequence: VGScientaSequence[LensMode], expected_region_names: list[str]
+    sequence: VGScientaSequence[LensMode, PsuMode], expected_region_names: list[str]
 ) -> None:
     for name in expected_region_names:
         assert sequence.get_region_by_name(name) is not None
@@ -96,7 +99,7 @@ def test_sequence_get_expected_region_from_name(
 
 
 def test_sequence_get_expected_region_type(
-    sequence: VGScientaSequence[LensMode],
+    sequence: VGScientaSequence[LensMode, PsuMode],
     expected_region_class: type[TAbstractBaseRegion],
 ) -> None:
     regions = sequence.regions
@@ -110,19 +113,20 @@ def test_sequence_get_expected_region_type(
 
 
 def test_sequence_get_expected_region_names(
-    sequence: VGScientaSequence[LensMode], expected_region_names: list[str]
+    sequence: VGScientaSequence[LensMode, PsuMode], expected_region_names: list[str]
 ) -> None:
     assert sequence.get_region_names() == expected_region_names
 
 
 def test_sequence_get_expected_enabled_region_names(
-    sequence: VGScientaSequence[LensMode], expected_enabled_region_names: list[str]
+    sequence: VGScientaSequence[LensMode, PsuMode],
+    expected_enabled_region_names: list[str],
 ) -> None:
     assert sequence.get_enabled_region_names() == expected_enabled_region_names
 
 
 def test_sequence_get_expected_excitation_energy_source(
-    sequence: VGScientaSequence[LensMode],
+    sequence: VGScientaSequence[LensMode, PsuMode],
 ) -> None:
     assert (
         sequence.get_excitation_energy_source_by_region(sequence.regions[0])
@@ -141,14 +145,14 @@ def test_sequence_get_expected_excitation_energy_source(
 
 
 def test_region_kinetic_and_binding_energy(
-    sequence: VGScientaSequence[LensMode],
+    sequence: VGScientaSequence[LensMode, PsuMode],
 ) -> None:
     for r in sequence.regions:
         assert_region_kinetic_and_binding_energy(r)
 
 
 def test_file_loads_into_class_with_expected_values(
-    sequence: VGScientaSequence[LensMode],
+    sequence: VGScientaSequence[LensMode, PsuMode],
     expected_region_values: list[dict[str, Any]],
 ) -> None:
     assert len(sequence.regions) == len(expected_region_values)

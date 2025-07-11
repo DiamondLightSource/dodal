@@ -2,6 +2,7 @@ from dodal.common.beamlines.beamline_utils import (
     device_factory,
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
+from dodal.devices.b07 import PsuMode
 from dodal.devices.b07_1 import Grating, LensMode
 from dodal.devices.electron_analyser.specs import SpecsAnalyserDriverIO
 from dodal.devices.pgm import PGM
@@ -26,9 +27,10 @@ def pgm() -> PGM:
 
 
 @device_factory()
-def analyser_driver() -> SpecsAnalyserDriverIO[LensMode]:
-    return SpecsAnalyserDriverIO[LensMode](
+def analyser_driver() -> SpecsAnalyserDriverIO[LensMode, PsuMode]:
+    return SpecsAnalyserDriverIO[LensMode, PsuMode](
         prefix=f"{PREFIX.beamline_prefix}-EA-DET-01:CAM:",
         lens_mode_type=LensMode,
+        psu_mode_type=PsuMode,
         energy_sources={"source1": pgm().energy.user_readback},
     )
