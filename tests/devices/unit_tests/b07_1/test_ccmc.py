@@ -17,9 +17,7 @@ class WrongEnum(StrictEnum):
 @pytest.fixture
 async def mock_ccmc(RE: RunEngine) -> ChannelCutMonochromator:
     async with init_devices(mock=True):
-        mock_ccmc = ChannelCutMonochromator(
-            prefix="", positions=ChannelCutMonochromatorPositions
-        )
+        mock_ccmc = ChannelCutMonochromator(prefix="")
     return mock_ccmc
 
 

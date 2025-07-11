@@ -2,7 +2,6 @@ from dodal.common.beamlines.beamline_utils import device_factory
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.devices.b07_1 import (
     ChannelCutMonochromator,
-    ChannelCutMonochromatorPositions,
     Grating,
     LensMode,
 )
@@ -30,10 +29,7 @@ def pgm() -> PGM:
 
 @device_factory()
 def ccmc() -> ChannelCutMonochromator:
-    return ChannelCutMonochromator(
-        prefix=f"{PREFIX.beamline_prefix}-OP-CCM-01:",
-        positions=ChannelCutMonochromatorPositions,
-    )
+    return ChannelCutMonochromator(prefix=f"{PREFIX.beamline_prefix}-OP-CCM-01:")
 
 
 @device_factory()

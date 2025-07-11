@@ -37,7 +37,6 @@ class ChannelCutMonochromator(
     def __init__(
         self,
         prefix: str,
-        positions: type[ChannelCutMonochromatorPositions],
         name: str = "",
     ) -> None:
         """
@@ -45,8 +44,6 @@ class ChannelCutMonochromator(
         ----------
         prefix:
             Beamline specific part of the PV
-        positions:
-            The Enum for the positions names.
         name:
             Name of the device
         """
@@ -61,7 +58,9 @@ class ChannelCutMonochromator(
 
         with self.add_children_as_readables():
             # Must be a CHILD as read() must return this signal
-            self.crystal = epics_signal_rw(positions, prefix + "CRYSTAL:MP:SELECT")
+            self.crystal = epics_signal_rw(
+                ChannelCutMonochromatorPositions, prefix + "CRYSTAL:MP:SELECT"
+            )
 
         # energy derived signal as property
         self.energy_in_ev = derived_signal_r(
