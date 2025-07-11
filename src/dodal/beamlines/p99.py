@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from ophyd_async.epics.adandor import Andor2Detector
+from ophyd_async.fastcs.panda import HDFPanda
 
 from dodal.common.beamlines.beamline_utils import (
     device_factory,
@@ -75,4 +76,17 @@ def andor2_point() -> Andor2Point:
         prefix=f"{PREFIX.beamline_prefix}-EA-DET-03:",
         drv_suffix=CAM_SUFFIX,
         read_uncached={"mean": "STAT:MeanValue_RBV", "total": "STAT:Total_RBV"},
+    )
+
+
+@device_factory()
+def panda() -> HDFPanda:
+    """
+    The Panda device is connected to two PMAC motors for position comparison under
+     the pcomp[1] and pcomp[2] blocks, which handle positive and negative directions.
+    This setup is used for triggering detectors during a flyscan.
+    """
+    return HDFPanda(
+        f"{PREFIX.beamline_prefix}-MO-PANDA-01:",
+        path_provider=get_path_provider(),
     )
