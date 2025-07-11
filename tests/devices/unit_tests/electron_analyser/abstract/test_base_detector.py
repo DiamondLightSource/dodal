@@ -19,7 +19,7 @@ from tests.devices.unit_tests.electron_analyser.util import get_test_sequence
 @pytest.fixture(
     params=[
         SpecsDetector[b07.LensMode, b07.PsuMode],
-        VGScientaDetector[i09.LensMode, i09.PsuMode],
+        VGScientaDetector[i09.LensMode, i09.PsuMode, i09.PassEnergy],
     ]
 )
 def detector_class(

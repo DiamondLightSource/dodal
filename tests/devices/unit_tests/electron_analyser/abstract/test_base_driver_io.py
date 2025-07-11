@@ -31,7 +31,7 @@ from tests.devices.unit_tests.electron_analyser.util import (
 
 @pytest.fixture(
     params=[
-        VGScientaAnalyserDriverIO[i09.LensMode, i09.PsuMode],
+        VGScientaAnalyserDriverIO[i09.LensMode, i09.PsuMode, i09.PassEnergy],
         SpecsAnalyserDriverIO[b07.LensMode, b07.PsuMode],
     ]
 )
@@ -90,8 +90,7 @@ async def test_given_region_that_analyser_sets_energy_values_correctly(
     expected_high_e = to_kinetic_energy(
         region.high_energy, region.energy_mode, excitation_energy
     )
-    expected_pass_e_type = sim_driver.pass_energy_type
-    expected_pass_e = expected_pass_e_type(region.pass_energy)
+    expected_pass_e = region.pass_energy
 
     expected_energy_source = energy_source.name
 
@@ -123,6 +122,7 @@ async def test_given_region_that_analyser_sets_energy_values_correctly(
     await assert_read_configuration_has_expected_value(
         sim_driver, "excitation_energy_source", expected_energy_source
     )
+    print("MY READING =", await sim_driver.read())
     await assert_reading(
         sim_driver,
         {
