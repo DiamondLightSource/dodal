@@ -8,3 +8,5 @@ TAcquisitionMode = TypeVar("TAcquisitionMode", bound=StrictEnum)
 # when connected.
 TLensMode = TypeVar("TLensMode", bound=SupersetEnum | StrictEnum)
 TPsuMode = TypeVar("TPsuMode", bound=SupersetEnum | StrictEnum)
+TPassEnergy = TypeVar("TPassEnergy", bound=StrictEnum | float)
+TPassEnergyEnum = TypeVar("TPassEnergyEnum", bound=StrictEnum)

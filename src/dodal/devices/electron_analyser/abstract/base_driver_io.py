@@ -24,6 +24,7 @@ from dodal.devices.electron_analyser.abstract.base_region import (
 from dodal.devices.electron_analyser.abstract.types import (
     TAcquisitionMode,
     TLensMode,
+    TPassEnergy,
     TPsuMode,
 )
 from dodal.devices.electron_analyser.enums import EnergyMode
@@ -35,7 +36,7 @@ class AbstractAnalyserDriverIO(
     StandardReadable,
     ADBaseIO,
     Movable[TAbstractBaseRegion],
-    Generic[TAbstractBaseRegion, TAcquisitionMode, TLensMode, TPsuMode],
+    Generic[TAbstractBaseRegion, TAcquisitionMode, TLensMode, TPsuMode, TPassEnergy],
 ):
     """
     Generic device to configure electron analyser with new region settings.
@@ -48,6 +49,7 @@ class AbstractAnalyserDriverIO(
         acquisition_mode_type: type[TAcquisitionMode],
         lens_mode_type: type[TLensMode],
         psu_mode_type: type[TPsuMode],
+        pass_energy_type: type[TPassEnergy],
         energy_sources: Mapping[str, SignalR[float]],
         name: str = "",
     ) -> None:
@@ -69,6 +71,7 @@ class AbstractAnalyserDriverIO(
         self.acquisition_mode_type = acquisition_mode_type
         self.lens_mode_type = lens_mode_type
         self.psu_mode_type = psu_mode_type
+        self.pass_energy_type = pass_energy_type
 
         with self.add_children_as_readables():
             self.image = epics_signal_r(Array1D[np.float64], prefix + "IMAGE")
@@ -88,9 +91,7 @@ class AbstractAnalyserDriverIO(
             self.high_energy = epics_signal_rw(float, prefix + "HIGH_ENERGY")
             self.slices = epics_signal_rw(int, prefix + "SLICES")
             self.lens_mode = epics_signal_rw(lens_mode_type, prefix + "LENS_MODE")
-            self.pass_energy = epics_signal_rw(
-                self.pass_energy_type, prefix + "PASS_ENERGY"
-            )
+            self.pass_energy = epics_signal_rw(pass_energy_type, prefix + "PASS_ENERGY")
             self.energy_step = epics_signal_rw(float, prefix + "STEP_SIZE")
             self.iterations = epics_signal_rw(int, prefix + "NumExposures")
             self.acquisition_mode = epics_signal_rw(
@@ -99,7 +100,7 @@ class AbstractAnalyserDriverIO(
             self.excitation_energy_source = soft_signal_rw(str, initial_value="")
             # This is used by each electron analyser, however it depends on the electron
             # analyser type to know if is moved with region settings.
-            self.psu_mode = epics_signal_rw(psu_mode_type, prefix + "PSU_MODE")
+            self.psu_mode = epics_signal_rw(psu_mode_type, prefix + "SCAN_RANGE")
 
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             # Read once per scan after data acquired
@@ -137,9 +138,6 @@ class AbstractAnalyserDriverIO(
         source = self._get_energy_source(region.excitation_energy_source)
         excitation_energy = await source.get_value()  # eV
 
-        pass_energy_type = self.pass_energy_type
-        pass_energy = pass_energy_type(region.pass_energy)
-
         low_energy = to_kinetic_energy(
             region.low_energy, region.energy_mode, excitation_energy
         )
@@ -153,7 +151,7 @@ class AbstractAnalyserDriverIO(
             self.high_energy.set(high_energy),
             self.slices.set(region.slices),
             self.lens_mode.set(region.lens_mode),
-            self.pass_energy.set(pass_energy),
+            self.pass_energy.set(region.pass_energy),
             self.iterations.set(region.iterations),
             self.acquisition_mode.set(region.acquisition_mode),
             self.excitation_energy.set(excitation_energy),
@@ -242,18 +240,6 @@ class AbstractAnalyserDriverIO(
 
     def _calculate_total_intensity(self, spectrum: Array1D[np.float64]) -> float:
         return float(np.sum(spectrum, dtype=np.float64))
-
-    @property
-    @abstractmethod
-    def pass_energy_type(self) -> type:
-        """
-        Return the type the pass_energy should be. Depends on underlying analyser
-        software.
-
-        Returns:
-            Type the pass energy parameter from a region needs to be cast to so it can
-            be set correctly on the signal.
-        """
 
 
 TAbstractAnalyserDriverIO = TypeVar(

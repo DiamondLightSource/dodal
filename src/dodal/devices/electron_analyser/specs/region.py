@@ -11,7 +11,7 @@ from dodal.devices.electron_analyser.specs.enums import AcquisitionMode
 
 
 class SpecsRegion(
-    AbstractBaseRegion[AcquisitionMode, TLensMode], Generic[TLensMode, TPsuMode]
+    AbstractBaseRegion[AcquisitionMode, TLensMode, int], Generic[TLensMode, TPsuMode]
 ):
     # Override base class with defaults
     lens_mode: TLensMode

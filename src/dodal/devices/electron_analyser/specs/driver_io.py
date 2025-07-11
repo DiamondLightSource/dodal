@@ -19,10 +19,16 @@ from dodal.devices.electron_analyser.abstract.types import TLensMode, TPsuMode
 from dodal.devices.electron_analyser.specs.enums import AcquisitionMode
 from dodal.devices.electron_analyser.specs.region import SpecsRegion
 
+PassEnergy = float
+
 
 class SpecsAnalyserDriverIO(
     AbstractAnalyserDriverIO[
-        SpecsRegion[TLensMode, TPsuMode], AcquisitionMode, TLensMode, TPsuMode
+        SpecsRegion[TLensMode, TPsuMode],
+        AcquisitionMode,
+        TLensMode,
+        TPsuMode,
+        PassEnergy,
     ],
     Generic[TLensMode, TPsuMode],
 ):
@@ -47,7 +53,13 @@ class SpecsAnalyserDriverIO(
             )
 
         super().__init__(
-            prefix, AcquisitionMode, lens_mode_type, psu_mode_type, energy_sources, name
+            prefix=prefix,
+            acquisition_mode_type=AcquisitionMode,
+            lens_mode_type=lens_mode_type,
+            psu_mode_type=psu_mode_type,
+            pass_energy_type=PassEnergy,
+            energy_sources=energy_sources,
+            name=name,
         )
 
     @AsyncStatus.wrap
@@ -101,7 +113,3 @@ class SpecsAnalyserDriverIO(
         step = (max_energy - min_energy) / (total_points_iterations - 1)
         axis = np.array([min_energy + i * step for i in range(total_points_iterations)])
         return axis
-
-    @property
-    def pass_energy_type(self) -> type:
-        return float

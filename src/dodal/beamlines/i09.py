@@ -3,7 +3,7 @@ from dodal.common.beamlines.beamline_utils import (
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.devices.electron_analyser.vgscienta import VGScientaAnalyserDriverIO
-from dodal.devices.i09 import DCM, Grating, LensMode, PsuMode
+from dodal.devices.i09 import DCM, Grating, LensMode, PassEnergy, PsuMode
 from dodal.devices.pgm import PGM
 from dodal.devices.synchrotron import Synchrotron
 from dodal.log import set_beamline as set_log_beamline
@@ -34,14 +34,15 @@ def dcm() -> DCM:
 
 
 @device_factory()
-def analyser_driver() -> VGScientaAnalyserDriverIO[LensMode, PsuMode]:
+def analyser_driver() -> VGScientaAnalyserDriverIO[LensMode, PsuMode, PassEnergy]:
     energy_sources = {
         "source1": pgm().energy.user_readback,
         "source2": dcm().energy_in_ev,
     }
-    return VGScientaAnalyserDriverIO[LensMode, PsuMode](
+    return VGScientaAnalyserDriverIO[LensMode, PsuMode, PassEnergy](
         prefix=f"{PREFIX.beamline_prefix}-EA-DET-01:CAM:",
         lens_mode_type=LensMode,
         psu_mode_type=PsuMode,
+        pass_energy_type=PassEnergy,
         energy_sources=energy_sources,
     )
