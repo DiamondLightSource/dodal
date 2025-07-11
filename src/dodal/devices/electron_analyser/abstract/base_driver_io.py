@@ -100,7 +100,7 @@ class AbstractAnalyserDriverIO(
             self.excitation_energy_source = soft_signal_rw(str, initial_value="")
             # This is used by each electron analyser, however it depends on the electron
             # analyser type to know if is moved with region settings.
-            self.psu_mode = epics_signal_rw(psu_mode_type, prefix + "SCAN_RANGE")
+            self.psu_mode = epics_signal_rw(psu_mode_type, prefix + "PSU_MODE")
 
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             # Read once per scan after data acquired
