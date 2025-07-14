@@ -122,7 +122,6 @@ async def test_given_region_that_analyser_sets_energy_values_correctly(
     await assert_read_configuration_has_expected_value(
         sim_driver, "excitation_energy_source", expected_energy_source
     )
-    print("MY READING =", await sim_driver.read())
     await assert_reading(
         sim_driver,
         {
