@@ -7,6 +7,7 @@ from ophyd_async.testing import (
     set_mock_value,
 )
 
+from dodal.devices.b07 import LensMode
 from dodal.devices.electron_analyser import EnergyMode
 from dodal.devices.electron_analyser.specs import (
     AcquisitionMode,
@@ -20,8 +21,8 @@ from tests.devices.unit_tests.electron_analyser.util import (
 
 
 @pytest.fixture
-def driver_class() -> type[SpecsAnalyserDriverIO]:
-    return SpecsAnalyserDriverIO
+def driver_class() -> type[SpecsAnalyserDriverIO[LensMode]]:
+    return SpecsAnalyserDriverIO[LensMode]
 
 
 @pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
@@ -55,7 +56,7 @@ async def test_given_region_that_analyser_sets_energy_values_correctly(
 
 @pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
 async def test_given_region_that_analyser_sets_modes_correctly(
-    sim_driver: SpecsAnalyserDriverIO,
+    sim_driver: SpecsAnalyserDriverIO[LensMode],
     region: SpecsRegion,
     RE: RunEngine,
 ) -> None:
@@ -109,7 +110,7 @@ async def test_specs_analyser_energy_axis(
 
     RE(bps.mv(sim_driver.low_energy, start_energy))
     RE(bps.mv(sim_driver.high_energy, end_energy))
-    RE(bps.mv(sim_driver.slices, total_points_iterations))
+    set_mock_value(sim_driver.energy_channels, total_points_iterations)
 
     energy_axis = await sim_driver.energy_axis.get_value()
     expected_energy_axis = [1.0, 1.9, 2.8, 3.7, 4.6, 5.5, 6.4, 7.3, 8.2, 9.1, 10.0]

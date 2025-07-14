@@ -149,6 +149,9 @@ def set_mx_settings_pvs(
     yield from bps.abs_set(
         eiger.drv.detector.omega_increment, detector_params.omega_increment, group
     )
+    yield from bps.abs_set(
+        eiger.drv.detector.photon_energy, detector_params.expected_energy_ev, group
+    )
 
     if wait:
         yield from bps.wait(group)

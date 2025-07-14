@@ -39,10 +39,12 @@ class BinaryFilterAttenuator(ReadOnlyAttenuator, Movable[float]):
     Where desired_transmission is fraction e.g. 0-1. When the actual_transmission is
     read from the device it is also fractional"""
 
-    def __init__(self, prefix: str, name: str = ""):
+    def __init__(self, prefix: str, num_filters: int, name: str = ""):
         self._calculated_filter_states: DeviceVector[SignalR[int]] = DeviceVector(
             {
-                int(digit, 16): epics_signal_r(int, f"{prefix}DEC_TO_BIN.B{digit}")
+                int(digit, num_filters): epics_signal_r(
+                    int, f"{prefix}DEC_TO_BIN.B{digit}"
+                )
                 for digit in string.hexdigits
                 if not digit.islower()
             }
@@ -50,7 +52,7 @@ class BinaryFilterAttenuator(ReadOnlyAttenuator, Movable[float]):
         self._filters_in_position: DeviceVector[SignalR[bool]] = DeviceVector(
             {
                 i - 1: epics_signal_r(bool, f"{prefix}FILTER{i}:INLIM")
-                for i in range(1, 17)
+                for i in range(1, num_filters + 1)
             }
         )
 
