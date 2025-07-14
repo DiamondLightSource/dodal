@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.oav.pin_image_recognition &#8212; dodal 1.51.1.dev10+g6a145fb111 documentation</title>
+    <title>dodal.devices.oav.pin_image_recognition &#8212; dodal 1.51.1.dev11+gd84da51299 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=8cb2d7a5"></script>
+    <script src="../../../../_static/documentation_options.js?v=b70a59b1"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -593,16 +593,20 @@ window.addEventListener("load", () => mermaid.run());
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">location</span>
 
+<div class="viewcode-block" id="PinTipDetection.trigger">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.oav.pin_image_recognition.PinTipDetection.html#dodal.devices.oav.pin_image_recognition.PinTipDetection.trigger">[docs]</a>
     <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_set_triggered_tip</span><span class="p">():</span>
-<span class="w">            </span><span class="sd">&quot;&quot;&quot;Monitors the camera data and updates the triggered_tip signal.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Monitors the camera data and updates the triggered_tip signal.</span>
 
-<span class="sd">            If a tip is found it will update the signal and stop monitoring</span>
-<span class="sd">            If no tip is found it will retry with the next monitored value</span>
-<span class="sd">            This loop will serve as a good example of using &#39;observe_value&#39; in the ophyd_async documentation</span>
-<span class="sd">            &quot;&quot;&quot;</span>
-            <span class="k">async</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">observe_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">array_data</span><span class="p">):</span>
+<span class="sd">        * If a tip is found it will update the signal and stop monitoring</span>
+<span class="sd">        * If no tip is found it will retry with the next monitored value, if this</span>
+<span class="sd">            continues for {validity_timeout} seconds it will timeout.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">async</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">observe_value</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">array_data</span><span class="p">,</span> <span class="n">done_timeout</span><span class="o">=</span><span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">validity_timeout</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
+            <span class="p">):</span>
                 <span class="k">try</span><span class="p">:</span>
                     <span class="n">location</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_tip_and_edge_data</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_set_triggered_values</span><span class="p">(</span><span class="n">location</span><span class="p">)</span>
@@ -611,12 +615,7 @@ window.addEventListener("load", () => mermaid.run());
                         <span class="sa">f</span><span class="s2">&quot;Failed to detect pin-tip location, will retry with next image: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
                     <span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="k">return</span>
-
-        <span class="k">try</span><span class="p">:</span>
-            <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">wait_for</span><span class="p">(</span>
-                <span class="n">_set_triggered_tip</span><span class="p">(),</span> <span class="n">timeout</span><span class="o">=</span><span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">validity_timeout</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
-            <span class="p">)</span>
+                    <span class="k">break</span>
         <span class="k">except</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">TimeoutError</span><span class="p">:</span>
             <span class="n">LOGGER</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;No tip found in </span><span class="si">{</span><span class="k">await</span><span class="w"> </span><span class="bp">self</span><span class="o">.</span><span class="n">validity_timeout</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span><span class="si">}</span><span class="s2"> seconds.&quot;</span>
@@ -624,6 +623,7 @@ window.addEventListener("load", () => mermaid.run());
             <span class="bp">self</span><span class="o">.</span><span class="n">_tip_setter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">INVALID_POSITION</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_bottom_edge_setter</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([]))</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_top_edge_setter</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([]))</span></div>
+</div>
 
 </pre></div>
 

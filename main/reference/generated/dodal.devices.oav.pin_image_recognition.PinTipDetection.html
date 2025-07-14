@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.oav.pin_image_recognition.PinTipDetection &#8212; dodal 1.51.1.dev10+g6a145fb111 documentation</title>
+    <title>dodal.devices.oav.pin_image_recognition.PinTipDetection &#8212; dodal 1.51.1.dev11+gd84da51299 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=8cb2d7a5"></script>
+    <script src="../../_static/documentation_options.js?v=b70a59b1"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -955,8 +955,8 @@ no tip is found after this time it will not error but instead return {INVALID_PO
 <p class="rubric">Methods</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">trigger</span></code>()</p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dodal.devices.oav.pin_image_recognition.PinTipDetection.trigger" title="dodal.devices.oav.pin_image_recognition.PinTipDetection.trigger"><code class="xref py py-obj docutils literal notranslate"><span class="pre">trigger</span></code></a>()</p></td>
+<td><p>Monitors the camera data and updates the triggered_tip signal.</p></td>
 </tr>
 </tbody>
 </table>
@@ -970,6 +970,20 @@ no tip is found after this time it will not error but instead return {INVALID_PO
 </tbody>
 </table>
 </div>
+<dl class="py method">
+<dt class="sig sig-object py" id="dodal.devices.oav.pin_image_recognition.PinTipDetection.trigger">
+<span class="sig-name descname"><span class="pre">trigger</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dodal/devices/oav/pin_image_recognition.html#PinTipDetection.trigger"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.oav.pin_image_recognition.PinTipDetection.trigger" title="Link to this definition">#</a></dt>
+<dd><p>Monitors the camera data and updates the triggered_tip signal.</p>
+<ul class="simple">
+<li><p>If a tip is found it will update the signal and stop monitoring</p></li>
+<li><dl class="simple">
+<dt>If no tip is found it will retry with the next monitored value, if this</dt><dd><p>continues for {validity_timeout} seconds it will timeout.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd></dl>
+
 </dd></dl>
 
 </section>
@@ -1021,7 +1035,10 @@ no tip is found after this time it will not error but instead return {INVALID_PO
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.oav.pin_image_recognition.PinTipDetection"><code class="docutils literal notranslate"><span class="pre">PinTipDetection</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.oav.pin_image_recognition.PinTipDetection"><code class="docutils literal notranslate"><span class="pre">PinTipDetection</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.oav.pin_image_recognition.PinTipDetection.trigger"><code class="docutils literal notranslate"><span class="pre">PinTipDetection.trigger()</span></code></a></li>
+</ul>
+</li>
 </ul>
   </nav></div>
 
