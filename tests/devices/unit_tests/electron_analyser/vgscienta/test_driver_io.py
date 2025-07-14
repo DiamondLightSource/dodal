@@ -71,37 +71,34 @@ async def test_analyser_sets_region_and_reads_correctly(
         region.energy_step, wait=True
     )
 
-    expected_first_x = region.first_x_channel
-    expected_size_x = region.x_channel_size()
-    get_mock_put(sim_driver.first_x_channel).assert_called_once_with(
-        expected_first_x, wait=True
+    get_mock_put(sim_driver.region_min_x).assert_called_once_with(
+        region.min_x, wait=True
     )
-    get_mock_put(sim_driver.x_channel_size).assert_called_once_with(
-        expected_size_x, wait=True
+    get_mock_put(sim_driver.region_size_x).assert_called_once_with(
+        region.size_x, wait=True
     )
 
-    expected_first_y = region.first_y_channel
-    expected_size_y = region.y_channel_size()
-    get_mock_put(sim_driver.first_y_channel).assert_called_once_with(
-        expected_first_y, wait=True
+    get_mock_put(sim_driver.region_min_y).assert_called_once_with(
+        region.min_y, wait=True
     )
-    get_mock_put(sim_driver.y_channel_size).assert_called_once_with(
-        expected_size_y, wait=True
+    get_mock_put(sim_driver.region_size_y).assert_called_once_with(
+        region.size_y, wait=True
     )
 
-    expected_psu_mode = sequence.psu_mode
-    set_mock_value(sim_driver.psu_mode, expected_psu_mode)
+    set_mock_value(sim_driver.psu_mode, sequence.psu_mode)
 
     prefix = sim_driver.name + "-"
     vgscienta_expected_config_reading = {
         f"{prefix}centre_energy": {"value": expected_centre_e},
         f"{prefix}detector_mode": {"value": region.detector_mode},
         f"{prefix}energy_step": {"value": region.energy_step},
-        f"{prefix}first_x_channel": {"value": region.first_x_channel},
-        f"{prefix}x_channel_size": {"value": region.x_channel_size()},
-        f"{prefix}first_y_channel": {"value": region.first_y_channel},
-        f"{prefix}y_channel_size": {"value": region.y_channel_size()},
-        f"{prefix}psu_mode": {"value": expected_psu_mode},
+        f"{prefix}region_min_x": {"value": region.min_x},
+        f"{prefix}region_size_x": {"value": region.size_x},
+        f"{prefix}sensor_max_size_x": {"value": 0},  # ToDo
+        f"{prefix}region_min_y": {"value": region.min_y},
+        f"{prefix}region_size_y": {"value": region.size_y},
+        f"{prefix}sensor_max_size_y": {"value": 0},  # ToDo
+        f"{prefix}psu_mode": {"value": sequence.psu_mode},
     }
 
     full_expected_config = (

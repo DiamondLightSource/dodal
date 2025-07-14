@@ -52,11 +52,16 @@ class VGScientaAnalyserDriverIO(
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             # Used for setting up region data acquisition.
             self.centre_energy = epics_signal_rw(float, prefix + "CENTRE_ENERGY")
-            self.first_x_channel = epics_signal_rw(int, prefix + "MinX")
-            self.first_y_channel = epics_signal_rw(int, prefix + "MinY")
-            self.x_channel_size = epics_signal_rw(int, prefix + "SizeX")
-            self.y_channel_size = epics_signal_rw(int, prefix + "SizeY")
+
             self.detector_mode = epics_signal_rw(DetectorMode, prefix + "DETECTOR_MODE")
+
+            self.region_min_x = epics_signal_rw(int, prefix + "MinX")
+            self.region_size_x = epics_signal_rw(int, prefix + "SizeX")
+            self.sensor_max_size_x = epics_signal_rw(int, prefix + "MaxSizeX")
+
+            self.region_min_y = epics_signal_rw(int, prefix + "MinY")
+            self.region_size_y = epics_signal_rw(int, prefix + "SizeY")
+            self.sensor_max_size_y = epics_signal_rw(int, prefix + "MaxSizeY")
 
         super().__init__(
             prefix,
@@ -77,14 +82,14 @@ class VGScientaAnalyserDriverIO(
             region.fix_energy, region.energy_mode, excitation_energy
         )
         await asyncio.gather(
+            self.image_mode.set(ADImageMode.SINGLE),
             self.centre_energy.set(centre_energy),
             self.energy_step.set(region.energy_step),
-            self.first_x_channel.set(region.first_x_channel),
-            self.first_y_channel.set(region.first_y_channel),
-            self.x_channel_size.set(region.x_channel_size()),
-            self.y_channel_size.set(region.y_channel_size()),
             self.detector_mode.set(region.detector_mode),
-            self.image_mode.set(ADImageMode.SINGLE),
+            self.region_min_x.set(region.min_x),
+            self.region_size_x.set(region.size_x),
+            self.region_min_y.set(region.min_y),
+            self.region_size_y.set(region.size_y),
         )
 
     def _create_energy_axis_signal(self, prefix: str) -> SignalR[Array1D[np.float64]]:
