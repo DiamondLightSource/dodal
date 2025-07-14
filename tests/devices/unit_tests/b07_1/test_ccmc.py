@@ -1,4 +1,7 @@
+import re
+
 import pytest
+from bluesky import FailedStatus
 from bluesky.plan_stubs import mv
 from bluesky.run_engine import RunEngine
 from ophyd_async.core import StrictEnum, init_devices
@@ -86,3 +89,24 @@ async def test_y_rotation_reading(
         mock_ccmc._y_rotation,
         {f"{mock_ccmc.name}-_y_rotation": {"value": 0.0}},
     )
+
+
+async def test_move_crystal_wrong_position_ignored(
+    mock_ccmc: ChannelCutMonochromator,
+    RE: RunEngine,
+):
+    await assert_value(mock_ccmc.crystal, ChannelCutMonochromatorPositions.OUT)
+    mock_ccmc.set(WrongEnum.POS_100)  # type: ignore
+    await assert_value(mock_ccmc.crystal, ChannelCutMonochromatorPositions.OUT)
+
+
+async def test_move_crystal_wrong_position_re_error(
+    mock_ccmc: ChannelCutMonochromator,
+    RE: RunEngine,
+):
+    await assert_value(mock_ccmc.crystal, ChannelCutMonochromatorPositions.OUT)
+    with pytest.raises(
+        FailedStatus,
+        match=re.escape("is not a valid ChannelCutMonochromatorPositions"),
+    ):
+        RE(mv(mock_ccmc, WrongEnum.POS_100))
