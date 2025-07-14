@@ -48,7 +48,7 @@ class ElectronAnalyserRegionDetector(
     async def trigger(self) -> None:
         # Configure region parameters on the driver first before data collection.
         await self.driver.set(self.region)
-        super().trigger()
+        await super().trigger()
 
 
 TElectronAnalyserRegionDetector = TypeVar(
