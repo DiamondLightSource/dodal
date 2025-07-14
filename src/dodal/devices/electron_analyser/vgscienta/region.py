@@ -1,7 +1,5 @@
 import uuid
-from enum import Enum
 
-from ophyd_async.core import StrictEnum
 from pydantic import Field
 
 from dodal.devices.electron_analyser.abstract.base_region import (
@@ -9,42 +7,27 @@ from dodal.devices.electron_analyser.abstract.base_region import (
     AbstractBaseSequence,
     JavaToPythonModel,
 )
+from dodal.devices.electron_analyser.vgscienta.enums import (
+    AcquisitionMode,
+    DetectorMode,
+    Status,
+)
 
 
-class Status(str, Enum):
-    READY = "Ready"
-    RUNNING = "Running"
-    COMPLETED = "Completed"
-    INVALID = "Invalid"
-    ABORTED = "Aborted"
-
-
-class DetectorMode(StrictEnum):
-    ADC = "ADC"
-    PULSE_COUNTING = "Pulse Counting"
-
-
-class AcquisitionMode(str, Enum):
-    SWEPT = "Swept"
-    FIXED = "Fixed"
-
-
-class VGScientaRegion(AbstractBaseRegion):
+class VGScientaRegion(AbstractBaseRegion[AcquisitionMode]):
     # Override defaults of base region class
     lens_mode: str = "Angular45"
     pass_energy: int = 5
-    acquisition_mode: str = AcquisitionMode.SWEPT
+    acquisition_mode: AcquisitionMode = AcquisitionMode.SWEPT
     low_energy: float = 8.0
     high_energy: float = 10.0
     step_time: float = 1.0
     energy_step: float = Field(default=200.0)
     # Specific to this class
     id: str = Field(default=str(uuid.uuid4()), alias="region_id")
-    excitation_energy_source: str = "source1"
     fix_energy: float = 9.0
     total_steps: float = 13.0
     total_time: float = 13.0
-    exposure_time: float = 1.0
     first_x_channel: int = 1
     last_x_channel: int = 1000
     first_y_channel: int = 101

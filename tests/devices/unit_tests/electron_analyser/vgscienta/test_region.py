@@ -3,8 +3,8 @@ from typing import Any
 import pytest
 
 from dodal.common.data_util import load_json_file_to_class
+from dodal.devices.electron_analyser import EnergyMode
 from dodal.devices.electron_analyser.abstract import TAbstractBaseRegion
-from dodal.devices.electron_analyser.types import EnergyMode
 from dodal.devices.electron_analyser.vgscienta import VGScientaRegion, VGScientaSequence
 from dodal.devices.electron_analyser.vgscienta.region import (
     AcquisitionMode,
@@ -13,7 +13,7 @@ from dodal.devices.electron_analyser.vgscienta.region import (
     VGScientaRegion,
     VGScientaSequence,
 )
-from tests.devices.unit_tests.electron_analyser.test_util import (
+from tests.devices.unit_tests.electron_analyser.util import (
     TEST_VGSCIENTA_SEQUENCE,
     assert_region_has_expected_values,
     assert_region_kinetic_and_binding_energy,
@@ -51,7 +51,6 @@ def expected_region_values() -> list[dict[str, Any]]:
             "total_steps": 8.0,
             "total_time": 8.0,
             "energy_step": 0.2,
-            "exposure_time": 1.0,
             "first_x_channel": 1,
             "last_x_channel": 1000,
             "first_y_channel": 101,
@@ -77,7 +76,6 @@ def expected_region_values() -> list[dict[str, Any]]:
             "total_steps": 1.0,
             "total_time": 4.41,
             "energy_step": 8.77e-4,
-            "exposure_time": 1.0,
             "first_x_channel": 4,
             "last_x_channel": 990,
             "first_y_channel": 110,

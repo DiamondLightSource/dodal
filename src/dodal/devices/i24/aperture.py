@@ -1,6 +1,7 @@
-from ophyd_async.core import StandardReadable, StrictEnum
+from ophyd_async.core import StrictEnum
 from ophyd_async.epics.core import epics_signal_rw
-from ophyd_async.epics.motor import Motor
+
+from dodal.devices.motors import XYStage
 
 
 class AperturePositions(StrictEnum):
@@ -10,7 +11,7 @@ class AperturePositions(StrictEnum):
     MANUAL = "Manual Mounting"
 
 
-class Aperture(StandardReadable):
+class Aperture(XYStage):
     """Device to trigger the aperture motor move on I24.
 
     The aperture positioner has 4 possible positions: In, Out, Robot and Manual.
@@ -20,8 +21,5 @@ class Aperture(StandardReadable):
     """
 
     def __init__(self, prefix: str, name: str = "") -> None:
-        self.x = Motor(prefix + "X")
-        self.y = Motor(prefix + "Y")
-
         self.position = epics_signal_rw(AperturePositions, prefix + "MP:SELECT")
         super().__init__(name)
