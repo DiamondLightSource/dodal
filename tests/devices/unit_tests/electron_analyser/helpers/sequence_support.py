@@ -46,7 +46,14 @@ def assert_region_has_expected_values(
 ) -> None:
     for key in r.__dict__:
         if key in expected_region_values:
-            assert r.__dict__[key] == expected_region_values[key]
+            actual = r.__dict__[key]
+            expected = expected_region_values[key]
+            try:
+                assert actual == expected
+            except AssertionError as e:
+                raise AssertionError(
+                    f"Mismatch on key '{key}': actual={actual}, expected={expected}"
+                ) from e
         else:
             raise KeyError('key "' + key + '" is not in the expected values.')
 
