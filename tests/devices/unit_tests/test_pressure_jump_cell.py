@@ -1,6 +1,5 @@
-from unittest.mock import ANY
-
 import asyncio
+from unittest.mock import ANY
 
 import pytest
 from ophyd_async.core import init_devices
@@ -408,7 +407,7 @@ async def test_setting_all_pressure_cell_valves(
 
     # Set new values
     for valve in cell.all_valves_control.valve_control.values():
-        valve.set(ValveControlRequest.CLOSE)
+        await valve.set(ValveControlRequest.CLOSE)
 
     # Check valves have been set to the new values
     await assert_reading(
