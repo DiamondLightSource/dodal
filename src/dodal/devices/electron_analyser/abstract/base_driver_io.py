@@ -64,7 +64,7 @@ class AbstractAnalyserDriverIO(
         self.lens_mode_type = lens_mode_type
 
         with self.add_children_as_readables():
-            self.image = epics_signal_r(Array1D[np.float64], prefix + "IMAGE")
+            # self.image = epics_signal_r(Array1D[np.float64], prefix + "IMAGE")
             self.spectrum = epics_signal_r(Array1D[np.float64], prefix + "INT_SPECTRUM")
             self.total_intensity = derived_signal_r(
                 self._calculate_total_intensity, spectrum=self.spectrum
@@ -102,17 +102,21 @@ class AbstractAnalyserDriverIO(
                 energy_mode=self.energy_mode,
             )
             self.angle_axis = self._create_angle_axis_signal(prefix)
-            self.step_time = epics_signal_r(float, prefix + "AcquireTime")
+
+        super().__init__(prefix=prefix, name=name)
+
+        # use self.acquire_time from ADCore parent class
+        self.add_readables([self.acquire_time], StandardReadableFormat.CONFIG_SIGNAL)
+        with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
+            # Read once per scan after data acquired
             self.total_steps = epics_signal_r(int, prefix + "TOTAL_POINTS_RBV")
             self.total_time = derived_signal_r(
                 self._calculate_total_time,
                 "s",
                 total_steps=self.total_steps,
-                step_time=self.step_time,
+                step_time=self.acquire_time,
                 iterations=self.iterations,
             )
-
-        super().__init__(prefix=prefix, name=name)
 
     @AsyncStatus.wrap
     async def set(self, region: TAbstractBaseRegion):
@@ -148,6 +152,7 @@ class AbstractAnalyserDriverIO(
             self.acquisition_mode.set(region.acquisition_mode),
             self.excitation_energy.set(excitation_energy),
             self.excitation_energy_source.set(source.name),
+            self.acquire_time.set(region.step_time),
         )
 
     def _get_energy_source(self, alias_name: str) -> SignalR[float]:

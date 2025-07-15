@@ -74,6 +74,8 @@ dev = [
     "types-mock",
     "types-PyYAML",
     "types-aiofiles",
+    "databroker",
+    "matplotlib",
 ]
 
 [project.scripts]
