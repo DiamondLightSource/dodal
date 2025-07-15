@@ -1,0 +1,38 @@
+dodal.devices.p60
+=================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~p60.LensMode
+   ~p60.LabXraySource
+   ~p60.LabXraySourceReadable
+
+
+
+
+.. automodule:: dodal.devices.p60
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

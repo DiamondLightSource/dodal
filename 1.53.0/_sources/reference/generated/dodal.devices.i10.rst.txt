@@ -1,0 +1,39 @@
+dodal.devices.i10
+=================
+
+
+
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   dodal.devices.i10.diagnostics
+   dodal.devices.i10.i10_apple2
+   dodal.devices.i10.i10_setting_data
+   dodal.devices.i10.mirrors
+   dodal.devices.i10.slits
+
+
+
+
+
+
+
+
+.. automodule:: dodal.devices.i10
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

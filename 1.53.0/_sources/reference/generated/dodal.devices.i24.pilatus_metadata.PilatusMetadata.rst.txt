@@ -1,0 +1,40 @@
+dodal.devices.i24.pilatus\_metadata.PilatusMetadata
+===================================================
+
+.. currentmodule:: dodal.devices.i24.pilatus_metadata
+
+.. autoclass:: PilatusMetadata
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

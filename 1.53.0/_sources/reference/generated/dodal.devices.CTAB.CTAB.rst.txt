@@ -1,0 +1,40 @@
+dodal.devices.CTAB.CTAB
+=======================
+
+.. currentmodule:: dodal.devices.CTAB
+
+.. autoclass:: CTAB
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   
