@@ -1,6 +1,7 @@
 import asyncio
 from abc import ABC, abstractmethod
 from collections.abc import Mapping
+from typing import Annotated as A
 from typing import Generic, TypeVar
 
 import numpy as np
@@ -9,13 +10,18 @@ from ophyd_async.core import (
     Array1D,
     AsyncStatus,
     SignalR,
+    SignalRW,
     StandardReadable,
     StandardReadableFormat,
     derived_signal_r,
     soft_signal_rw,
 )
 from ophyd_async.epics.adcore import ADBaseIO
-from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
+from ophyd_async.epics.core import (
+    PvSuffix,
+    epics_signal_r,
+    epics_signal_rw,
+)
 
 from dodal.devices.electron_analyser.abstract.base_region import (
     TAbstractBaseRegion,
@@ -26,10 +32,24 @@ from dodal.devices.electron_analyser.enums import EnergyMode
 from dodal.devices.electron_analyser.util import to_binding_energy, to_kinetic_energy
 
 
+class AnalyserBaseIO:
+    """
+    Base class from which electron analyser drivers are derived.
+    """
+
+    spectrum: A[SignalR[Array1D[np.float64]], PvSuffix("INT_SPECTRUM")]
+    image: A[SignalR[Array1D[np.float64]], PvSuffix("IMAGE")]
+    low_energy: A[SignalRW[float], PvSuffix.rbv("LOW_ENERGY")]
+    high_energy: A[SignalRW[float], PvSuffix.rbv("HIGH_ENERGY")]
+    step_size: A[SignalRW[float], PvSuffix.rbv("STEP_SIZE")]
+    slices: A[SignalRW[int], PvSuffix.rbv("SLICES")]
+
+
 class AbstractAnalyserDriverIO(
     ABC,
     StandardReadable,
     ADBaseIO,
+    AnalyserBaseIO,
     Movable[TAbstractBaseRegion],
     Generic[TAbstractBaseRegion, TAcquisitionMode, TLensMode],
 ):
@@ -63,9 +83,11 @@ class AbstractAnalyserDriverIO(
         self.acquisition_mode_type = acquisition_mode_type
         self.lens_mode_type = lens_mode_type
 
+        super().__init__(prefix=prefix, name=name)
+
         with self.add_children_as_readables():
-            # self.image = epics_signal_r(Array1D[np.float64], prefix + "IMAGE")
-            self.spectrum = epics_signal_r(Array1D[np.float64], prefix + "INT_SPECTRUM")
+            self.image = self.image
+            self.spectrum = self.spectrum
             self.total_intensity = derived_signal_r(
                 self._calculate_total_intensity, spectrum=self.spectrum
             )
@@ -73,18 +95,20 @@ class AbstractAnalyserDriverIO(
 
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             # Used for setting up region data acquisition.
+            self.low_energy = self.low_energy
+            self.high_energy = self.high_energy
+            self.step_size = self.step_size
+            self.slices = self.slices
+            self.acquire_time = self.acquire_time
+            self.image_mode = self.image_mode
             self.region_name = soft_signal_rw(str, initial_value="null")
             self.energy_mode = soft_signal_rw(
                 EnergyMode, initial_value=EnergyMode.KINETIC
             )
-            self.low_energy = epics_signal_rw(float, prefix + "LOW_ENERGY")
-            self.high_energy = epics_signal_rw(float, prefix + "HIGH_ENERGY")
-            self.slices = epics_signal_rw(int, prefix + "SLICES")
             self.lens_mode = epics_signal_rw(lens_mode_type, prefix + "LENS_MODE")
             self.pass_energy = epics_signal_rw(
                 self.pass_energy_type, prefix + "PASS_ENERGY"
             )
-            self.energy_step = epics_signal_rw(float, prefix + "STEP_SIZE")
             self.iterations = epics_signal_rw(int, prefix + "NumExposures")
             self.acquisition_mode = epics_signal_rw(
                 acquisition_mode_type, prefix + "ACQ_MODE"
@@ -103,10 +127,8 @@ class AbstractAnalyserDriverIO(
             )
             self.angle_axis = self._create_angle_axis_signal(prefix)
 
-        super().__init__(prefix=prefix, name=name)
-
         # use self.acquire_time from ADCore parent class
-        self.add_readables([self.acquire_time], StandardReadableFormat.CONFIG_SIGNAL)
+        # self.add_readables([self.acquire_time], StandardReadableFormat.CONFIG_SIGNAL)
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             # Read once per scan after data acquired
             self.total_steps = epics_signal_r(int, prefix + "TOTAL_POINTS_RBV")
