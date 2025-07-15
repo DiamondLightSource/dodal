@@ -1,0 +1,90 @@
+dodal.devices.i24.beamstop.BeamstopPositions
+============================================
+
+.. currentmodule:: dodal.devices.i24.beamstop
+
+.. autoclass:: BeamstopPositions
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~BeamstopPositions.CHECK_BEAM
+      
+      
+      ~BeamstopPositions.DATA_COLLECTION
+      
+      
+      ~BeamstopPositions.DATA_COLLECTION_FAR
+      
+      
+      ~BeamstopPositions.TRAY_MOUNT
+      
+      
+      ~BeamstopPositions.ROTATABLE
+      
+      
+      ~BeamstopPositions.ROBOT
+      
+   
+   

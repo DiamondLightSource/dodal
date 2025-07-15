@@ -1,0 +1,81 @@
+dodal.devices.tetramm.TetrammChannels
+=====================================
+
+.. currentmodule:: dodal.devices.tetramm
+
+.. autoclass:: TetrammChannels
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~TetrammChannels.ONE
+      
+      
+      ~TetrammChannels.TWO
+      
+      
+      ~TetrammChannels.FOUR
+      
+   
+   
