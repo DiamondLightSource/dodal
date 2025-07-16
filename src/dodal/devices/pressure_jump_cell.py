@@ -74,8 +74,10 @@ class ValveControlBase(StandardReadable, Movable):
 
     def __init__(self, name):
         if not hasattr(self, "open") or not hasattr(self, "control"):
-            raise TypeError(f"Class {ValveControlBase} requires signals open and control to be defined")
-        
+            raise TypeError(
+                f"Class {ValveControlBase} requires signals open and control to be defined"
+            )
+
         super().__init__(name)
 
     @AsyncStatus.wrap
