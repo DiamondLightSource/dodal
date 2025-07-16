@@ -4,6 +4,7 @@ import numpy as np
 import pytest
 from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
+from ophyd_async.core import SignalR
 from ophyd_async.testing import (
     assert_configuration,
     assert_value,
@@ -21,12 +22,18 @@ from dodal.devices.electron_analyser.specs import (
 )
 from tests.devices.unit_tests.electron_analyser.util import (
     TEST_SEQUENCE_REGION_NAMES,
+    create_analyser_device,
 )
 
 
 @pytest.fixture
-def driver_class() -> type[SpecsAnalyserDriverIO[LensMode, PsuMode]]:
-    return SpecsAnalyserDriverIO[LensMode, PsuMode]
+async def sim_driver(
+    energy_sources: dict[str, SignalR[float]],
+) -> SpecsAnalyserDriverIO[LensMode, PsuMode]:
+    return await create_analyser_device(
+        SpecsAnalyserDriverIO[LensMode, PsuMode],
+        energy_sources,
+    )
 
 
 @pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)

@@ -5,7 +5,7 @@ import pytest
 from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
 from bluesky.utils import FailedStatus
-from ophyd_async.core import StrictEnum
+from ophyd_async.core import SignalR, StrictEnum
 from ophyd_async.epics.adcore import ADImageMode
 from ophyd_async.testing import (
     assert_configuration,
@@ -27,12 +27,18 @@ from dodal.devices.electron_analyser.vgscienta import (
 from dodal.devices.i09 import LensMode, PassEnergy, PsuMode
 from tests.devices.unit_tests.electron_analyser.util import (
     TEST_SEQUENCE_REGION_NAMES,
+    create_analyser_device,
 )
 
 
 @pytest.fixture
-def driver_class() -> type[VGScientaAnalyserDriverIO[LensMode, PsuMode, PassEnergy]]:
-    return VGScientaAnalyserDriverIO[LensMode, PsuMode, PassEnergy]
+async def sim_driver(
+    energy_sources: dict[str, SignalR[float]],
+) -> VGScientaAnalyserDriverIO[LensMode, PsuMode, PassEnergy]:
+    return await create_analyser_device(
+        VGScientaAnalyserDriverIO[LensMode, PsuMode, PassEnergy],
+        energy_sources,
+    )
 
 
 @pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)

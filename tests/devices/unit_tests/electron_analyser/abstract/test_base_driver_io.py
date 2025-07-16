@@ -4,7 +4,7 @@ import pytest
 from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
 from bluesky.utils import FailedStatus
-from ophyd_async.core import StrictEnum
+from ophyd_async.core import SignalR, StrictEnum
 from ophyd_async.testing import (
     assert_configuration,
     assert_reading,
@@ -24,6 +24,7 @@ from dodal.devices.electron_analyser.vgscienta import (
 )
 from tests.devices.unit_tests.electron_analyser.util import (
     TEST_SEQUENCE_REGION_NAMES,
+    create_analyser_device,
 )
 
 
@@ -33,10 +34,13 @@ from tests.devices.unit_tests.electron_analyser.util import (
         SpecsAnalyserDriverIO[b07.LensMode, b07.PsuMode],
     ]
 )
-def driver_class(
-    request: pytest.FixtureRequest,
-) -> type[AbstractAnalyserDriverIO]:
-    return request.param
+async def sim_driver(
+    request: pytest.FixtureRequest, energy_sources: dict[str, SignalR[float]]
+) -> AbstractAnalyserDriverIO:
+    return await create_analyser_device(
+        request.param,
+        energy_sources,
+    )
 
 
 @pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)

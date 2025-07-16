@@ -62,6 +62,9 @@ class AbstractAnalyserDriverIO(
             lens_mode_type: Enum that determines the available lens mode for this
                             device.
             psu_mode_type: Enum that determines the available psu modes for this device.
+            pass_energy_type: Can be enum or float, depends on electron analyser model.
+                              If enum, it determines the available pass energies for
+                              this device.
             energy_sources: Map that pairs a source name to an energy value signal
                             (in eV).
             name: Name of the device.
