@@ -23,6 +23,8 @@ def mg_kalpha_source() -> LabXraySourceReadable:
     return LabXraySourceReadable(LabXraySource.MG_KALPHA)
 
 
+# Connect will work again after this work completed
+# https://jira.diamond.ac.uk/browse/P60-13
 @device_factory()
 def analyser_driver() -> VGScientaAnalyserDriverIO[LensMode, PsuMode]:
     energy_sources = {
