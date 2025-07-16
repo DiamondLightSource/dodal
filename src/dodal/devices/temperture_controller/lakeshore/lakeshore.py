@@ -1,15 +1,17 @@
 from bluesky.protocols import Movable
 from ophyd_async.core import (
     AsyncStatus,
+    SignalDatatypeT,
     StandardReadable,
     StandardReadableFormat,
-    StrictEnum,
     derived_signal_rw,
     soft_signal_rw,
 )
 
-from .pid_io import PID_INPUT_CHANNEL, Lakeshore336_PID_MODE, PIDBaseIO
-from .temperature_io import LakeshoreBaseIO
+from .lakeshore_io import (
+    LakeshoreBaseIO,
+    PIDBaseIO,
+)
 
 
 class Lakeshore(StandardReadable, Movable):
@@ -51,24 +53,24 @@ class Lakeshore(StandardReadable, Movable):
         self,
         prefix: str,
         no_channels: int,
-        heater_table: type[StrictEnum],
-        mode_table: type[StrictEnum] = Lakeshore336_PID_MODE,
-        input_channel_table: type[StrictEnum] = PID_INPUT_CHANNEL,
+        heater_setting: type[SignalDatatypeT],
+        pid_mode: type[SignalDatatypeT],
+        input_signal_type: type[SignalDatatypeT],
         control_channel: int = 1,
         name: str = "",
     ):
         self.temperature = LakeshoreBaseIO(
             prefix=prefix,
             no_channels=no_channels,
-            heater_setting=heater_table,
+            heater_setting=heater_setting,
             name=name,
         )
 
         self.PID = PIDBaseIO(
             prefix=prefix,
             no_channels=no_channels,
-            mode_table=mode_table,
-            input_channel_table=input_channel_table,
+            pid_mode=pid_mode,
+            input_signal_type=input_signal_type,
             name=name,
         )
         self._control_channel = soft_signal_rw(int, initial_value=control_channel)

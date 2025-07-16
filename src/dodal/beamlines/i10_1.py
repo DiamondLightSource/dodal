@@ -1,8 +1,10 @@
 from dodal.common.beamlines.beamline_utils import device_factory
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.devices.temperture_controller.lakeshore_controller import (
+from dodal.devices.temperture_controller import (
+    LAKESHORE336,
+    LAKESHORE336_PID_MODE,
+    PID_INPUT_CHANNEL,
     Lakeshore,
-    Lakeshore336,
 )
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
@@ -21,5 +23,7 @@ def temperature_controller() -> Lakeshore:
     return Lakeshore(
         f"{PREFIX.beamline_prefix}-EA-TCTRL-41:",
         no_channels=4,
-        heater_table=Lakeshore336,
+        heater_setting=LAKESHORE336,
+        pid_mode=LAKESHORE336_PID_MODE,
+        input_signal_type=PID_INPUT_CHANNEL,
     )
