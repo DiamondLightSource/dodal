@@ -23,7 +23,7 @@ from dodal.devices.electron_analyser.vgscienta.detector import (
 AnyAcqMode = StrictEnum
 AnyLensMode = SupersetEnum | StrictEnum
 AnyPsuMode = SupersetEnum | StrictEnum
-AnyPassEnergy = StrictEnum | int
+AnyPassEnergy = StrictEnum | float
 PassEnergyEnum = StrictEnum
 
 # Electron analyser types that encompasses all implementations, useful for tests and
