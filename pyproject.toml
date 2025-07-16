@@ -15,7 +15,7 @@ dependencies = [
     "click",
     "ophyd",
     "ophyd-async>=0.11",
-    "epicscorelibs<=7.0.7.99.1.2a1", # Pending https://github.com/epics-base/epicscorelibs/issues/41
+    "epicscorelibs<=7.0.7.99.1.2a1",  # Pending https://github.com/epics-base/epicscorelibs/issues/41
     "bluesky",
     "pyepics",
     "dataclasses-json",
@@ -24,16 +24,16 @@ dependencies = [
     "requests",
     "graypy",
     "pydantic>=2.0",
-    "opencv-python-headless",        # For pin-tip detection.
-    "aioca",                         # Required for CA support with ophyd-async.
-    "p4p",                           # Required for PVA support with ophyd-async.
+    "opencv-python-headless", # For pin-tip detection.
+    "aioca",                  # Required for CA support with ophyd-async.
+    "p4p",                    # Required for PVA support with ophyd-async.
     "numpy",
     "aiofiles",
     "aiohttp",
     "redis",
     "scanspec>=0.7.3",
-    "event-model>=1.23",             # Until bluesky pins it https://github.com/DiamondLightSource/dodal/issues/1278
-    "pyzmq==26.3.0",                 # Until we can move to RHEL 8 https://github.com/DiamondLightSource/mx-bluesky/issues/1139
+    "event-model>=1.23",      # Until bluesky pins it https://github.com/DiamondLightSource/dodal/issues/1278
+    "pyzmq==26.3.0",          # Until we can move to RHEL 8 https://github.com/DiamondLightSource/mx-bluesky/issues/1139
 ]
 
 dynamic = ["version"]
