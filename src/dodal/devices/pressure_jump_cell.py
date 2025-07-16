@@ -72,6 +72,12 @@ class ValveControlBase(StandardReadable, Movable):
     open: SignalRW[int]
     control: SignalRW[ValveControlRequest | FastValveControlRequest]
 
+    def __init__(self, name):
+        if not hasattr(self, "open") or not hasattr(self, "control"):
+            raise TypeError(f"Class {ValveControlBase} requires signals open and control to be defined")
+        
+        super().__init__(name)
+
     @AsyncStatus.wrap
     async def _set_open_seq(self):
         await self.open.set(ValveOpenSeqRequest.OPEN_SEQ.value)
