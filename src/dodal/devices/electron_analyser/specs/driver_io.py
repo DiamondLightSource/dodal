@@ -8,45 +8,63 @@ from ophyd_async.core import (
     AsyncStatus,
     SignalR,
     StandardReadableFormat,
-    StrictEnum,
     derived_signal_r,
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
 from dodal.devices.electron_analyser.abstract.base_driver_io import (
     AbstractAnalyserDriverIO,
-    TLensMode,
 )
+from dodal.devices.electron_analyser.abstract.types import TLensMode, TPsuMode
 from dodal.devices.electron_analyser.specs.enums import AcquisitionMode
-from dodal.devices.electron_analyser.specs.region import SpecsRegion
+from dodal.devices.electron_analyser.specs.region import PassEnergy, SpecsRegion
 from dodal.devices.electron_analyser.util import to_kinetic_energy
 
 
 class SpecsAnalyserDriverIO(
-    AbstractAnalyserDriverIO[SpecsRegion, AcquisitionMode, TLensMode],
-    Generic[TLensMode],
+    AbstractAnalyserDriverIO[
+        SpecsRegion[TLensMode, TPsuMode],
+        AcquisitionMode,
+        TLensMode,
+        TPsuMode,
+        PassEnergy,
+    ],
+    Generic[TLensMode, TPsuMode],
 ):
     def __init__(
         self,
         prefix: str,
-        lens_mode_type: type[StrictEnum],
+        lens_mode_type: type[TLensMode],
+        psu_mode_type: type[TPsuMode],
         energy_sources: Mapping[str, SignalR[float]],
         name: str = "",
     ) -> None:
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             # Used for setting up region data acquisition.
-            self.psu_mode = epics_signal_rw(str, prefix + "SCAN_RANGE")
             self.snapshot_values = epics_signal_rw(int, prefix + "VALUES")
             self.centre_energy = epics_signal_rw(float, prefix + "KINETIC_ENERGY")
 
-            # Used to read detector data after acqusition.
-            self.min_angle_axis = epics_signal_r(float, prefix + "Y_MIN_RBV")
-            self.max_angle_axis = epics_signal_r(float, prefix + "Y_MAX_RBV")
+        # Used to calculate the angle axis.
+        self.min_angle_axis = epics_signal_r(float, prefix + "Y_MIN_RBV")
+        self.max_angle_axis = epics_signal_r(float, prefix + "Y_MAX_RBV")
 
-        super().__init__(prefix, AcquisitionMode, lens_mode_type, energy_sources, name)
+        # Used to calculate the energy axis.
+        self.energy_channels = epics_signal_r(
+            int, prefix + "TOTAL_POINTS_ITERATION_RBV"
+        )
+
+        super().__init__(
+            prefix=prefix,
+            acquisition_mode_type=AcquisitionMode,
+            lens_mode_type=lens_mode_type,
+            psu_mode_type=psu_mode_type,
+            pass_energy_type=PassEnergy,
+            energy_sources=energy_sources,
+            name=name,
+        )
 
     @AsyncStatus.wrap
-    async def set(self, region: SpecsRegion):
+    async def set(self, region: SpecsRegion[TLensMode, TPsuMode]):
         await super().set(region)
 
         await asyncio.gather(
@@ -89,7 +107,7 @@ class SpecsAnalyserDriverIO(
             "eV",
             min_energy=self.low_energy,
             max_energy=self.high_energy,
-            total_points_iterations=self.slices,
+            total_points_iterations=self.energy_channels,
         )
         return energy_axis
 
@@ -101,7 +119,3 @@ class SpecsAnalyserDriverIO(
         step = (max_energy - min_energy) / (total_points_iterations - 1)
         axis = np.array([min_energy + i * step for i in range(total_points_iterations)])
         return axis
-
-    @property
-    def pass_energy_type(self) -> type:
-        return float

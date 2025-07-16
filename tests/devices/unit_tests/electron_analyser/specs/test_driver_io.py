@@ -1,3 +1,5 @@
+from typing import Any
+
 import numpy as np
 import pytest
 from bluesky import plan_stubs as bps
@@ -10,7 +12,7 @@ from ophyd_async.testing import (
     set_mock_value,
 )
 
-from dodal.devices.b07 import LensMode
+from dodal.devices.b07 import LensMode, PsuMode
 from dodal.devices.electron_analyser import EnergyMode, to_kinetic_energy
 from dodal.devices.electron_analyser.specs import (
     AcquisitionMode,
@@ -23,19 +25,17 @@ from tests.devices.unit_tests.electron_analyser.util import (
 
 
 @pytest.fixture
-def driver_class() -> type[SpecsAnalyserDriverIO[LensMode]]:
-    return SpecsAnalyserDriverIO[LensMode]
+def driver_class() -> type[SpecsAnalyserDriverIO[LensMode, PsuMode]]:
+    return SpecsAnalyserDriverIO[LensMode, PsuMode]
 
 
 @pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
 async def test_analyser_sets_region_and_configuration_is_correct(
-    sim_driver: SpecsAnalyserDriverIO,
-    region: SpecsRegion,
+    sim_driver: SpecsAnalyserDriverIO[LensMode, PsuMode],
+    region: SpecsRegion[LensMode, PsuMode],
+    expected_abstract_driver_config_reading: dict[str, dict[str, Any]],
     RE: RunEngine,
 ) -> None:
-    RE(bps.mv(sim_driver, region))
-
-    # ToDo - Put energy step and centre energy into abstract, remove if statements.
     if region.acquisition_mode == AcquisitionMode.FIXED_TRANSMISSION:
         get_mock_put(sim_driver.energy_step).assert_called_once_with(
             region.energy_step, wait=True
@@ -64,27 +64,34 @@ async def test_analyser_sets_region_and_configuration_is_correct(
     )
 
     prefix = sim_driver.name + "-"
-    # Check partial match, check only specific fields not covered by abstract class
+    specs_expected_config_reading = {
+        f"{prefix}centre_energy": partial_reading(
+            await sim_driver.centre_energy.get_value()
+        ),
+        f"{prefix}energy_step": partial_reading(
+            await sim_driver.energy_step.get_value()
+        ),
+        f"{prefix}snapshot_values": partial_reading(region.values),
+        f"{prefix}psu_mode": partial_reading(region.psu_mode),
+    }
+
+    full_expected_config = (
+        expected_abstract_driver_config_reading | specs_expected_config_reading
+    )
+
+    # Check exact match by combining expected specs specific config reading with
+    # abstract one
     await assert_configuration(
         sim_driver,
-        {
-            f"{prefix}centre_energy": partial_reading(
-                await sim_driver.centre_energy.get_value()
-            ),
-            f"{prefix}energy_step": partial_reading(
-                await sim_driver.energy_step.get_value()
-            ),
-            f"{prefix}psu_mode": partial_reading(region.psu_mode),
-            f"{prefix}snapshot_values": partial_reading(region.values),
-        },
-        full_match=False,
+        full_expected_config,
+        full_match=True,
     )
 
 
 @pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
 async def test_specs_analyser_binding_energy_axis(
-    sim_driver: SpecsAnalyserDriverIO,
-    region: SpecsRegion,
+    sim_driver: SpecsAnalyserDriverIO[LensMode, PsuMode],
+    region: SpecsRegion[LensMode, PsuMode],
     RE: RunEngine,
 ) -> None:
     RE(bps.mv(sim_driver, region))
@@ -102,7 +109,7 @@ async def test_specs_analyser_binding_energy_axis(
 
 
 async def test_specs_analyser_energy_axis(
-    sim_driver: SpecsAnalyserDriverIO,
+    sim_driver: SpecsAnalyserDriverIO[LensMode, PsuMode],
     RE: RunEngine,
 ) -> None:
     start_energy = 1
@@ -111,14 +118,14 @@ async def test_specs_analyser_energy_axis(
 
     RE(bps.mv(sim_driver.low_energy, start_energy))
     RE(bps.mv(sim_driver.high_energy, end_energy))
-    RE(bps.mv(sim_driver.slices, total_points_iterations))
+    set_mock_value(sim_driver.energy_channels, total_points_iterations)
 
     expected_energy_axis = [1.0, 1.9, 2.8, 3.7, 4.6, 5.5, 6.4, 7.3, 8.2, 9.1, 10.0]
     await assert_value(sim_driver.energy_axis, expected_energy_axis)
 
 
 async def test_specs_analyser_angle_axis(
-    sim_driver: SpecsAnalyserDriverIO,
+    sim_driver: SpecsAnalyserDriverIO[LensMode, PsuMode],
     RE: RunEngine,
 ) -> None:
     max_angle = 21

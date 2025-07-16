@@ -1,4 +1,4 @@
-from ophyd_async.core import StrictEnum
+from ophyd_async.core import StrictEnum, SupersetEnum
 
 
 class Grating(StrictEnum):
@@ -10,8 +10,12 @@ class Grating(StrictEnum):
     NO_GRATING = "No Grating"
 
 
-class LensMode(StrictEnum):
+class LensMode(SupersetEnum):
     SMALL_AREA = "SmallArea"
     ANGLE_RESOLVED_MODE_22 = "AngleResolvedMode22"
     ANGLE_RESOLVED_MODE_30 = "AngleResolvedMode30"
     LARGE_AREA = "LargeArea"
+    # This is connected to the device separately and will only have "Not connected" as
+    # option if disconnected. Once it is connected, "Not connected" is replaced with the
+    # options above. This is also why this must be a SupersetEnum.
+    NOT_CONNECTED = "Not connected"

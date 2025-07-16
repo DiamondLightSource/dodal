@@ -28,7 +28,7 @@ from dodal.devices.focusing_mirror import FocusingMirrorWithStripes, MirrorVolta
 from dodal.devices.i03 import Beamstop
 from dodal.devices.i03.dcm import DCM
 from dodal.devices.i03.undulator_dcm import UndulatorDCM
-from dodal.devices.motors import XYZPositioner
+from dodal.devices.motors import XYZStage
 from dodal.devices.oav.oav_detector import OAVBeamCentreFile
 from dodal.devices.oav.oav_parameters import OAVConfigBeamCentre
 from dodal.devices.oav.pin_image_recognition import PinTipDetection
@@ -92,7 +92,10 @@ def attenuator() -> BinaryFilterAttenuator:
     """Get the i03 attenuator device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return BinaryFilterAttenuator(f"{PREFIX.beamline_prefix}-EA-ATTN-01:")
+    return BinaryFilterAttenuator(
+        prefix=f"{PREFIX.beamline_prefix}-EA-ATTN-01:",
+        num_filters=16,
+    )
 
 
 @device_factory()
@@ -368,10 +371,7 @@ def zocalo() -> ZocaloResults:
     """Get the i03 ZocaloResults device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return ZocaloResults(
-        name="zocalo",
-        prefix=PREFIX.beamline_prefix,
-    )
+    return ZocaloResults(name="zocalo", prefix=PREFIX.beamline_prefix, use_gpu=True)
 
 
 @device_factory()
@@ -409,11 +409,11 @@ def thawer() -> Thawer:
 
 
 @device_factory()
-def lower_gonio() -> XYZPositioner:
+def lower_gonio() -> XYZStage:
     """Get the i03 lower gonio device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return XYZPositioner(
+    return XYZStage(
         f"{PREFIX.beamline_prefix}-MO-GONP-01:",
         "lower_gonio",
     )

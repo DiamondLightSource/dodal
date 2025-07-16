@@ -8,31 +8,42 @@ from ophyd_async.core import (
     AsyncStatus,
     SignalR,
     StandardReadableFormat,
-    StrictEnum,
 )
 from ophyd_async.epics.adcore import ADImageMode
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
 from dodal.devices.electron_analyser.abstract.base_driver_io import (
     AbstractAnalyserDriverIO,
+)
+from dodal.devices.electron_analyser.abstract.types import (
     TLensMode,
+    TPassEnergyEnum,
+    TPsuMode,
 )
 from dodal.devices.electron_analyser.util import to_kinetic_energy
-from dodal.devices.electron_analyser.vgscienta.enums import AcquisitionMode
-from dodal.devices.electron_analyser.vgscienta.region import (
+from dodal.devices.electron_analyser.vgscienta.enums import (
+    AcquisitionMode,
     DetectorMode,
-    VGScientaRegion,
 )
+from dodal.devices.electron_analyser.vgscienta.region import VGScientaRegion
 
 
 class VGScientaAnalyserDriverIO(
-    AbstractAnalyserDriverIO[VGScientaRegion, AcquisitionMode, TLensMode],
-    Generic[TLensMode],
+    AbstractAnalyserDriverIO[
+        VGScientaRegion[TLensMode, TPassEnergyEnum],
+        AcquisitionMode,
+        TLensMode,
+        TPsuMode,
+        TPassEnergyEnum,
+    ],
+    Generic[TLensMode, TPsuMode, TPassEnergyEnum],
 ):
     def __init__(
         self,
         prefix: str,
-        lens_mode_type: type[StrictEnum],
+        lens_mode_type: type[TLensMode],
+        psu_mode_type: type[TPsuMode],
+        pass_energy_type: type[TPassEnergyEnum],
         energy_sources: Mapping[str, SignalR[float]],
         name: str = "",
     ) -> None:
@@ -45,10 +56,18 @@ class VGScientaAnalyserDriverIO(
             self.y_channel_size = epics_signal_rw(int, prefix + "SizeY")
             self.detector_mode = epics_signal_rw(DetectorMode, prefix + "DETECTOR_MODE")
 
-        super().__init__(prefix, AcquisitionMode, lens_mode_type, energy_sources, name)
+        super().__init__(
+            prefix,
+            AcquisitionMode,
+            lens_mode_type,
+            psu_mode_type,
+            pass_energy_type,
+            energy_sources,
+            name,
+        )
 
     @AsyncStatus.wrap
-    async def set(self, region: VGScientaRegion):
+    async def set(self, region: VGScientaRegion[TLensMode, TPassEnergyEnum]):
         await super().set(region)
 
         excitation_energy = await self.excitation_energy.get_value()
@@ -71,7 +90,3 @@ class VGScientaAnalyserDriverIO(
 
     def _create_angle_axis_signal(self, prefix: str) -> SignalR[Array1D[np.float64]]:
         return epics_signal_r(Array1D[np.float64], prefix + "Y_SCALE_RBV")
-
-    @property
-    def pass_energy_type(self) -> type:
-        return str

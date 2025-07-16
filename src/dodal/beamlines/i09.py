@@ -1,21 +1,13 @@
-from ophyd_async.core import StrictEnum
-
 from dodal.common.beamlines.beamline_utils import (
     device_factory,
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.devices.electron_analyser.vgscienta import VGScientaAnalyserDriverIO
-from dodal.devices.i09 import DCM, Grating, LensMode
+from dodal.devices.i09 import DCM, Grating, LensMode, PassEnergy, PsuMode
 from dodal.devices.pgm import PGM
 from dodal.devices.synchrotron import Synchrotron
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
-
-
-class EnergyMode(StrictEnum):
-    KINETIC = "Kinetic"
-    BINDING = "Binding"
-
 
 BL = get_beamline_name("i09")
 PREFIX = BeamlinePrefix(BL)
@@ -42,11 +34,15 @@ def dcm() -> DCM:
 
 
 @device_factory()
-def analyser_driver() -> VGScientaAnalyserDriverIO[LensMode]:
+def analyser_driver() -> VGScientaAnalyserDriverIO[LensMode, PsuMode, PassEnergy]:
     energy_sources = {
         "source1": pgm().energy.user_readback,
         "source2": dcm().energy_in_ev,
     }
-    return VGScientaAnalyserDriverIO[LensMode](
-        f"{PREFIX.beamline_prefix}-EA-DET-01:CAM:", LensMode, energy_sources
+    return VGScientaAnalyserDriverIO[LensMode, PsuMode, PassEnergy](
+        prefix=f"{PREFIX.beamline_prefix}-EA-DET-01:CAM:",
+        lens_mode_type=LensMode,
+        psu_mode_type=PsuMode,
+        pass_energy_type=PassEnergy,
+        energy_sources=energy_sources,
     )

@@ -6,12 +6,12 @@ from ophyd_async.testing import set_mock_value
 from dodal.devices.electron_analyser.vgscienta import (
     VGScientaDetector,
 )
-from dodal.devices.i09 import LensMode
+from dodal.devices.i09 import LensMode, PassEnergy, PsuMode
 
 
 @pytest.fixture
-def detector_class() -> type[VGScientaDetector[LensMode]]:
-    return VGScientaDetector[LensMode]
+def detector_class() -> type[VGScientaDetector[LensMode, PsuMode, PassEnergy]]:
+    return VGScientaDetector[LensMode, PsuMode, PassEnergy]
 
 
 async def test_analyser_vgscienta_detector_image_shape(
