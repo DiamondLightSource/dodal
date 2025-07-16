@@ -8,7 +8,11 @@ from ophyd_async.core import (
     soft_signal_rw,
 )
 
+from ..device_helper import create_rw_device_vector
 from .lakeshore_io import (
+    LAKESHORE336_HEATER_SETTING,
+    LAKESHORE336_PID_INPUT_CHANNEL,
+    LAKESHORE336_PID_MODE,
     LakeshoreBaseIO,
     PIDBaseIO,
 )
@@ -54,23 +58,22 @@ class Lakeshore(StandardReadable, Movable):
         prefix: str,
         no_channels: int,
         heater_setting: type[SignalDatatypeT],
-        pid_mode: type[SignalDatatypeT],
-        input_signal_type: type[SignalDatatypeT],
         control_channel: int = 1,
+        single_control_channel: bool = False,
         name: str = "",
     ):
         self.temperature = LakeshoreBaseIO(
             prefix=prefix,
             no_channels=no_channels,
             heater_setting=heater_setting,
+            single_control_channel=single_control_channel,
             name=name,
         )
 
         self.PID = PIDBaseIO(
             prefix=prefix,
             no_channels=no_channels,
-            pid_mode=pid_mode,
-            input_signal_type=input_signal_type,
+            single_control_channel=single_control_channel,
             name=name,
         )
         self._control_channel = soft_signal_rw(int, initial_value=control_channel)
@@ -111,7 +114,10 @@ class Lakeshore(StandardReadable, Movable):
     def _get_control_channel(self, current_channel: int) -> int:
         return current_channel
 
-    async def _set_control_channel(self, value: int) -> None:
+    async def _set_control_channel(
+        self, value: int, readback: int | None = None
+    ) -> None:
+        readback = readback if readback else value
         """
         Set the number of control channels.
         This method allows dynamic adjustment of the number of control channels.
@@ -134,6 +140,91 @@ class Lakeshore(StandardReadable, Movable):
         )
 
         self.add_readables(
-            [self.temperature.readback[value], self.temperature.setpoint[value]],
+            [self.temperature.readback[readback], self.temperature.setpoint[value]],
             StandardReadableFormat.HINTED_SIGNAL,
+        )
+
+
+class Lakeshore336(Lakeshore):
+    """
+    Lakeshore 336 temperature controller.
+
+    This class is a specific implementation for the Lakeshore 336 model.
+    It inherits from the Lakeshore class and sets the heater setting to LAKESHORE336.
+    """
+
+    def __init__(
+        self,
+        prefix: str,
+        no_channels: int = 4,
+        control_channel: int = 1,
+        heater_setting: type[SignalDatatypeT] = LAKESHORE336_HEATER_SETTING,
+        pid_mode: type[SignalDatatypeT] = LAKESHORE336_PID_MODE,
+        input_channel_type: type[SignalDatatypeT] = LAKESHORE336_PID_INPUT_CHANNEL,
+        single_control_channel: bool = False,
+        name: str = "",
+    ):
+        self.pid_mode = create_rw_device_vector(
+            prefix=prefix,
+            no_channels=no_channels,
+            write_pv="OMMODE_S",
+            read_pv="OMMODE",
+            signal_type=pid_mode,
+        )
+        self.pid_input_channel = create_rw_device_vector(
+            prefix=prefix,
+            no_channels=no_channels,
+            write_pv="OMINPUT_S",
+            read_pv="OMINPUT",
+            signal_type=input_channel_type,
+        )
+
+        super().__init__(
+            prefix=prefix,
+            no_channels=no_channels,
+            heater_setting=heater_setting,
+            control_channel=control_channel,
+            single_control_channel=single_control_channel,
+            name=name,
+        )
+
+
+class Lakeshore340(Lakeshore):
+    """ """
+
+    def __init__(
+        self,
+        prefix: str,
+        no_channels: int = 4,
+        control_channel: int = 1,
+        heater_setting: type[SignalDatatypeT] = int,
+        pid_mode: type[SignalDatatypeT] = int,
+        input_channel_type: type[SignalDatatypeT] = LAKESHORE336_PID_INPUT_CHANNEL,
+        single_control_channel: bool = True,
+        name: str = "",
+    ):
+        self.pid_mode = create_rw_device_vector(
+            prefix=prefix,
+            no_channels=no_channels,
+            write_pv="CMODE_S",
+            read_pv="CMODE",
+            signal_type=pid_mode,
+            single_control_channel=single_control_channel,
+        )
+        self.pid_input_channel = create_rw_device_vector(
+            prefix=prefix,
+            no_channels=no_channels,
+            write_pv="LOOP",
+            read_pv="LOOP",
+            signal_type=input_channel_type,
+            single_control_channel=single_control_channel,
+        )
+
+        super().__init__(
+            prefix=prefix,
+            no_channels=no_channels,
+            heater_setting=heater_setting,
+            control_channel=control_channel,
+            single_control_channel=single_control_channel,
+            name=name,
         )

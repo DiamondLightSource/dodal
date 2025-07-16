@@ -25,6 +25,10 @@ from dodal.devices.i10.rasor.rasor_scaler_cards import RasorScalerCard1
 from dodal.devices.i10.slits import I10Slits, I10SlitsDrainCurrent
 from dodal.devices.motors import XYStage, XYZStage
 from dodal.devices.pgm import PGM
+from dodal.devices.temperture_controller import (
+    LAKESHORE400_PID_INPUT_CHANNEL,
+    Lakeshore340,
+)
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
@@ -217,4 +221,18 @@ def rasor_femto_drain_scaler_det() -> CurrentAmpDet:
     return CurrentAmpDet(
         current_amp=rasor_femto().ca3,
         counter=rasor_det_scalers().drain,
+    )
+
+
+@device_factory()
+def temperature_controller() -> Lakeshore340:
+    """Lakeshore temperature controller, it can control temperature via
+    temperature_controller.temperature.set(<temperature>).
+    """
+    return Lakeshore340(
+        prefix="ME01D-EA-TCTRL-01:",
+        no_channels=4,
+        heater_setting=int,
+        pid_mode=int,
+        input_channel_type=LAKESHORE400_PID_INPUT_CHANNEL,
     )
