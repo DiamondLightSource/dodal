@@ -1,30 +1,50 @@
-from bluesky.protocols import Movable, Reading
+from bluesky.protocols import Movable
 from ophyd_async.core import (
     AsyncStatus,
     StandardReadable,
     StandardReadableFormat,
     StrictEnum,
+    derived_signal_rw,
     soft_signal_rw,
 )
 
-from .pid_io import PIDBaseIO
+from .pid_io import PID_INPUT_CHANNEL, Lakeshore336_PID_MODE, PIDBaseIO
 from .temperature_io import LakeshoreBaseIO
-
-
-class Lakeshore336(StrictEnum):
-    """These are the sensitivity setting for Femto 3xx current amplifier"""
-
-    OFF = "Off"
-    LOW = "Low"
-    MEDIUM = "Medium"
-    HIGH = "High"
 
 
 class Lakeshore(StandardReadable, Movable):
     """
-    Lakeshore temperature controller that combines PID control and temperature reading.
-    This class inherits from PIDBaseIO for PID control and TemperatureBaseIO for temperature
-    reading functionalities.
+    Lakeshore temperature controller device.
+
+    This class provides an interface for controlling and reading from a Lakeshore temperature controller.
+    It supports multiple channels and PID control.
+
+    Parameters
+    ----------
+    prefix : str
+        The EPICS prefix for the device.
+    no_channels : int
+        Number of temperature channels.
+    heater_table : type[StrictEnum]
+        Enum type for heater settings.
+    control_channel : int, optional
+        The initial control channel (default is 1).
+    name : str, optional
+        Name of the device.
+
+    Attributes
+    ----------
+    temperature : LakeshoreBaseIO
+        Temperature IO interface.
+    PID : PIDBaseIO
+        PID IO interface.
+    control_channel : derived_signal_rw
+        Signal for selecting the control channel.
+
+    Methods
+    -------
+    set(value: float)
+        Set the temperature setpoint for the selected control channel.
     """
 
     def __init__(
@@ -32,22 +52,46 @@ class Lakeshore(StandardReadable, Movable):
         prefix: str,
         no_channels: int,
         heater_table: type[StrictEnum],
-        control_channels: int = 1,
+        mode_table: type[StrictEnum] = Lakeshore336_PID_MODE,
+        input_channel_table: type[StrictEnum] = PID_INPUT_CHANNEL,
+        control_channel: int = 1,
         name: str = "",
     ):
         self.temperature = LakeshoreBaseIO(
             prefix=prefix,
             no_channels=no_channels,
-            heater_table=heater_table,
+            heater_setting=heater_table,
             name=name,
         )
+
+        self.PID = PIDBaseIO(
+            prefix=prefix,
+            no_channels=no_channels,
+            mode_table=mode_table,
+            input_channel_table=input_channel_table,
+            name=name,
+        )
+        self._control_channel = soft_signal_rw(int, initial_value=control_channel)
         self.add_readables(
             list(self.temperature.setpoint.values())
             + list(self.temperature.readback.values())
         )
-        self.PID = PIDBaseIO(prefix=prefix, no_channels=no_channels, name=name)
-        self.control_channels = soft_signal_rw(int, initial_value=control_channels)
-        self.set_control_channels(control_channels)
+
+        self.add_readables(
+            [
+                self._control_channel,
+                self.PID.p[control_channel],
+                self.PID.i[control_channel],
+                self.PID.d[control_channel],
+            ],
+            StandardReadableFormat.CONFIG_SIGNAL,
+        )
+
+        self.control_channel = derived_signal_rw(
+            raw_to_derived=self._get_control_channel,
+            set_derived=self._set_control_channel,
+            current_channel=self._control_channel,
+        )
 
         super().__init__(name=name)
 
@@ -58,14 +102,14 @@ class Lakeshore(StandardReadable, Movable):
         This method overrides the Movable interface's set method.
         """
 
-        await self.temperature.setpoint[await self.control_channels.get_value()].set(
+        await self.temperature.setpoint[await self.control_channel.get_value()].set(
             value
         )
 
-    async def read(self) -> dict[str, Reading]:
-        return await super().read()
+    def _get_control_channel(self, current_channel: int) -> int:
+        return current_channel
 
-    def set_control_channels(self, value: int) -> None:
+    async def _set_control_channel(self, value: int) -> None:
         """
         Set the number of control channels.
         This method allows dynamic adjustment of the number of control channels.
@@ -74,12 +118,12 @@ class Lakeshore(StandardReadable, Movable):
             raise ValueError(
                 f"Control channels must be between 1 and {len(self.PID.p)}."
             )
-        self.control_channels.set(value)
+        await self._control_channel.set(value)
         self._read_config_funcs = ()
         self._has_hints = ()
         self.add_readables(
             [
-                self.control_channels,
+                self._control_channel,
                 self.PID.p[value],
                 self.PID.i[value],
                 self.PID.d[value],
