@@ -19,7 +19,6 @@ from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
 from dodal.devices.electron_analyser.abstract.base_region import (
     TAbstractBaseRegion,
-    TAcquisitionMode,
 )
 from dodal.devices.electron_analyser.abstract.types import (
     TAcquisitionMode,
