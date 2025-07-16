@@ -12,11 +12,6 @@ from tests.devices.unit_tests.electron_analyser.util import create_analyser_devi
 
 
 @pytest.fixture
-def detector_class() -> type[VGScientaDetector[LensMode, PsuMode, PassEnergy]]:
-    return VGScientaDetector[LensMode, PsuMode, PassEnergy]
-
-
-@pytest.fixture
 async def sim_detector(
     energy_sources: dict[str, SignalR[float]],
 ) -> VGScientaDetector[LensMode, PsuMode, PassEnergy]:
