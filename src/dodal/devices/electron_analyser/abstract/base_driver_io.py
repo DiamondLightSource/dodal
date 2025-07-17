@@ -16,7 +16,7 @@ from ophyd_async.core import (
     derived_signal_r,
     soft_signal_rw,
 )
-from ophyd_async.epics.adcore import ADBaseIO, ADImageMode
+from ophyd_async.epics.adcore import ADBaseIO
 from ophyd_async.epics.core import (
     PvSuffix,
     epics_signal_rw,
@@ -173,7 +173,6 @@ class AbstractAnalyserDriverIO(
             region.high_energy, region.energy_mode, excitation_energy
         )
         await asyncio.gather(
-            self.image_mode.set(ADImageMode.SINGLE),
             self.region_name.set(region.name),
             self.energy_mode.set(region.energy_mode),
             self.low_energy.set(low_energy),
