@@ -15,7 +15,10 @@ from ophyd_async.core import (
     soft_signal_rw,
 )
 from ophyd_async.epics.adcore import ADBaseIO
-from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
+from ophyd_async.epics.core import (
+    epics_signal_r,
+    epics_signal_rw,
+)
 
 from dodal.devices.electron_analyser.abstract.base_region import (
     TAbstractBaseRegion,
@@ -48,21 +51,23 @@ class AbstractAnalyserDriverIO(
     ) -> None:
         """
         Constructor method for setting up electron analyser.
-
         Args:
             prefix: Base PV to connect to EPICS for this device.
             acquisition_mode_type: Enum that determines the available acquisition modes
-                                   for this device.
+                                for this device.
             lens_mode_type: Enum that determines the available lens mode for this
                             device.
             energy_sources: Map that pairs a source name to an energy value signal
                             (in eV).
             name: Name of the device.
         """
+
+        # called first to initiate all pydantic parents classes
+        super().__init__(prefix=prefix, name=name)
+
         self.energy_sources = energy_sources
         self.acquisition_mode_type = acquisition_mode_type
         self.lens_mode_type = lens_mode_type
-
         with self.add_children_as_readables():
             self.image = epics_signal_r(Array1D[np.float64], prefix + "IMAGE")
             self.spectrum = epics_signal_r(Array1D[np.float64], prefix + "INT_SPECTRUM")
@@ -93,6 +98,7 @@ class AbstractAnalyserDriverIO(
 
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             # Read once per scan after data acquired
+            self.acquire_time = self.acquire_time
             self.energy_axis = self._create_energy_axis_signal(prefix)
             self.binding_energy_axis = derived_signal_r(
                 self._calculate_binding_energy_axis,
@@ -102,17 +108,14 @@ class AbstractAnalyserDriverIO(
                 energy_mode=self.energy_mode,
             )
             self.angle_axis = self._create_angle_axis_signal(prefix)
-            self.step_time = epics_signal_r(float, prefix + "AcquireTime")
             self.total_steps = epics_signal_r(int, prefix + "TOTAL_POINTS_RBV")
             self.total_time = derived_signal_r(
                 self._calculate_total_time,
                 "s",
                 total_steps=self.total_steps,
-                step_time=self.step_time,
+                step_time=self.acquire_time,
                 iterations=self.iterations,
             )
-
-        super().__init__(prefix=prefix, name=name)
 
     @AsyncStatus.wrap
     async def set(self, region: TAbstractBaseRegion):
@@ -148,6 +151,7 @@ class AbstractAnalyserDriverIO(
             self.acquisition_mode.set(region.acquisition_mode),
             self.excitation_energy.set(excitation_energy),
             self.excitation_energy_source.set(source.name),
+            self.acquire_time.set(region.acquire_time),
         )
 
     def _get_energy_source(self, alias_name: str) -> SignalR[float]:

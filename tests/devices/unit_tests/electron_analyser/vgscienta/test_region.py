@@ -15,7 +15,8 @@ from dodal.devices.electron_analyser.vgscienta.region import (
 )
 from dodal.devices.i09 import LensMode as LensMode
 from tests.devices.unit_tests.electron_analyser.util import (
-    TEST_VGSCIENTA_SEQUENCE,
+    TEST_LEGACY_VGSCIENTA_SEQUENCE,
+    TEST_NEW_SCIENTA_SEQUENCE,
     assert_region_has_expected_values,
     assert_region_kinetic_and_binding_energy,
 )
@@ -23,7 +24,16 @@ from tests.devices.unit_tests.electron_analyser.util import (
 
 @pytest.fixture
 def sequence() -> VGScientaSequence:
-    return load_json_file_to_class(VGScientaSequence[LensMode], TEST_VGSCIENTA_SEQUENCE)
+    return load_json_file_to_class(
+        VGScientaSequence[LensMode], TEST_LEGACY_VGSCIENTA_SEQUENCE
+    )
+
+
+@pytest.fixture
+def new_sequence() -> VGScientaSequence:
+    return load_json_file_to_class(
+        VGScientaSequence[LensMode], TEST_NEW_SCIENTA_SEQUENCE
+    )
 
 
 @pytest.fixture
@@ -48,7 +58,7 @@ def expected_region_values() -> list[dict[str, Any]]:
             "low_energy": 100.0,
             "high_energy": 101.0,
             "fix_energy": 9.0,
-            "step_time": 1.0,
+            "acquire_time": 1.0,
             "total_steps": 8.0,
             "total_time": 8.0,
             "energy_step": 0.2,
@@ -73,7 +83,7 @@ def expected_region_values() -> list[dict[str, Any]]:
             "low_energy": 4899.5615,
             "high_energy": 4900.4385,
             "fix_energy": 4900.0,
-            "step_time": 0.882,
+            "acquire_time": 0.882,
             "total_steps": 1.0,
             "total_time": 4.41,
             "energy_step": 8.77e-4,
@@ -147,10 +157,19 @@ def test_region_kinetic_and_binding_energy(
         assert_region_kinetic_and_binding_energy(r)
 
 
-def test_file_loads_into_class_with_expected_values(
+def test_legacy_file_loads_into_class_with_expected_values(
     sequence: VGScientaSequence[LensMode],
     expected_region_values: list[dict[str, Any]],
 ) -> None:
     assert len(sequence.regions) == len(expected_region_values)
     for i, r in enumerate(sequence.regions):
+        assert_region_has_expected_values(r, expected_region_values[i])
+
+
+def test_new_file_loads_into_class_with_expected_values(
+    new_sequence: VGScientaSequence[LensMode],
+    expected_region_values: list[dict[str, Any]],
+) -> None:
+    assert len(new_sequence.regions) == len(expected_region_values)
+    for i, r in enumerate(new_sequence.regions):
         assert_region_has_expected_values(r, expected_region_values[i])

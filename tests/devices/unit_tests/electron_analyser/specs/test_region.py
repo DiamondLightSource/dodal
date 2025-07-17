@@ -12,7 +12,8 @@ from dodal.devices.electron_analyser.specs import (
     SpecsSequence,
 )
 from tests.devices.unit_tests.electron_analyser.util import (
-    TEST_SPECS_SEQUENCE,
+    TEST_LEGACY_SPECS_SEQUENCE,
+    TEST_NEW_SPECS_SEQUENCE,
     assert_region_has_expected_values,
     assert_region_kinetic_and_binding_energy,
 )
@@ -20,7 +21,12 @@ from tests.devices.unit_tests.electron_analyser.util import (
 
 @pytest.fixture
 def sequence() -> SpecsSequence[LensMode]:
-    return load_json_file_to_class(SpecsSequence[LensMode], TEST_SPECS_SEQUENCE)
+    return load_json_file_to_class(SpecsSequence[LensMode], TEST_LEGACY_SPECS_SEQUENCE)
+
+
+@pytest.fixture
+def new_sequence() -> SpecsSequence[LensMode]:
+    return load_json_file_to_class(SpecsSequence[LensMode], TEST_NEW_SPECS_SEQUENCE)
 
 
 @pytest.fixture
@@ -41,7 +47,7 @@ def expected_region_values() -> list[dict[str, Any]]:
             "energy_step": 0.1,
             "pass_energy": 5.0,
             "iterations": 1,
-            "step_time": 1.0,
+            "acquire_time": 0.25,
             "enabled": False,
             "energy_mode": EnergyMode.KINETIC,
             "values": 1,
@@ -60,7 +66,7 @@ def expected_region_values() -> list[dict[str, Any]]:
             "energy_step": 0.2680000000000291,
             "pass_energy": 2.0,
             "iterations": 5,
-            "step_time": 2.0,
+            "acquire_time": 2.0,
             "enabled": True,
             "energy_mode": EnergyMode.BINDING,
             "values": 1,
@@ -111,10 +117,19 @@ def test_region_kinetic_and_binding_energy(sequence: SpecsSequence[LensMode]) ->
         assert_region_kinetic_and_binding_energy(r)
 
 
-def test_file_loads_into_class_with_expected_values(
+def test_legacy_file_loads_into_class_with_expected_values(
     sequence: SpecsSequence[LensMode],
     expected_region_values: list[dict[str, Any]],
 ) -> None:
     assert len(sequence.regions) == len(expected_region_values)
     for i, r in enumerate(sequence.regions):
+        assert_region_has_expected_values(r, expected_region_values[i])
+
+
+def test_new_file_loads_into_class_with_expected_values(
+    new_sequence: SpecsSequence[LensMode],
+    expected_region_values: list[dict[str, Any]],
+) -> None:
+    assert len(new_sequence.regions) == len(expected_region_values)
+    for i, r in enumerate(new_sequence.regions):
         assert_region_has_expected_values(r, expected_region_values[i])
