@@ -16,7 +16,7 @@ from ophyd_async.core import (
     derived_signal_r,
     soft_signal_rw,
 )
-from ophyd_async.epics.adcore import ADBaseIO
+from ophyd_async.epics.adcore import ADBaseIO, ADImageMode
 from ophyd_async.epics.core import (
     PvSuffix,
     epics_signal_rw,
@@ -31,12 +31,12 @@ from dodal.devices.electron_analyser.enums import EnergyMode
 from dodal.devices.electron_analyser.util import to_binding_energy, to_kinetic_energy
 
 
-class AnalyserBaseIO:
+class AnalyserDriverBaseIO:
     """
     Base class with PVs common for all electron analyser drivers.
     """
 
-    image: A[SignalR[Array1D[np.float64]], PvSuffix("IMAGE")]
+    image: A[SignalR[Array1D[np.double]], PvSuffix("IMAGE")]
     spectrum: A[SignalR[Array1D[np.float64]], PvSuffix("INT_SPECTRUM")]
     total_steps: A[SignalR[int], PvSuffix("TOTAL_POINTS_RBV")]
     low_energy: A[SignalRW[float], PvSuffix.rbv("LOW_ENERGY")]
@@ -49,7 +49,7 @@ class AbstractAnalyserDriverIO(
     ABC,
     StandardReadable,
     ADBaseIO,
-    AnalyserBaseIO,
+    AnalyserDriverBaseIO,
     Movable[TAbstractBaseRegion],
     Generic[TAbstractBaseRegion, TAcquisitionMode, TLensMode],
 ):
@@ -99,11 +99,9 @@ class AbstractAnalyserDriverIO(
         self.region_name = soft_signal_rw(str, initial_value="null")
         self.energy_mode = soft_signal_rw(EnergyMode, initial_value=EnergyMode.KINETIC)
         self.excitation_energy_source = soft_signal_rw(str, initial_value="")
-        self.total_intensity = derived_signal_r(
-            self._calculate_total_intensity, spectrum=self.spectrum
-        )
         self.excitation_energy = soft_signal_rw(float, initial_value=0, units="eV")
         self.energy_axis = self._create_energy_axis_signal(prefix)
+        self.angle_axis = self._create_angle_axis_signal(prefix)
         self.binding_energy_axis = derived_signal_r(
             self._calculate_binding_energy_axis,
             "eV",
@@ -111,8 +109,9 @@ class AbstractAnalyserDriverIO(
             excitation_energy=self.excitation_energy,
             energy_mode=self.energy_mode,
         )
-        self.angle_axis = self._create_angle_axis_signal(prefix)
-
+        self.total_intensity = derived_signal_r(
+            self._calculate_total_intensity, spectrum=self.spectrum
+        )
         self.total_time = derived_signal_r(
             self._calculate_total_time,
             "s",
@@ -174,6 +173,7 @@ class AbstractAnalyserDriverIO(
             region.high_energy, region.energy_mode, excitation_energy
         )
         await asyncio.gather(
+            self.image_mode.set(ADImageMode.SINGLE),
             self.region_name.set(region.name),
             self.energy_mode.set(region.energy_mode),
             self.low_energy.set(low_energy),
