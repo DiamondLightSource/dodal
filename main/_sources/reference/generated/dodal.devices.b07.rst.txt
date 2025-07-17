@@ -16,6 +16,7 @@ dodal.devices.b07
 
    ~b07.Grating
    ~b07.LensMode
+   ~b07.PsuMode
 
 
 

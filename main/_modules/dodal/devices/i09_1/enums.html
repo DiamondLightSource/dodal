@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.i09_1.enums &#8212; dodal 1.53.1.dev3+g9669296989 documentation</title>
+    <title>dodal.devices.i09_1.enums &#8212; dodal 1.53.1.dev4+g02bdb3d61e documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=6f4f1842"></script>
+    <script src="../../../../_static/documentation_options.js?v=436e6b72"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -470,6 +470,22 @@ window.addEventListener("load", () => mermaid.run());
     <span class="n">LOW_MAGNIFICATION</span> <span class="o">=</span> <span class="s2">&quot;LowMagnification&quot;</span>
     <span class="n">HIGH_MAGNIFICATION2</span> <span class="o">=</span> <span class="s2">&quot;HighMagnification2&quot;</span>
     <span class="n">RAMP_MODE</span> <span class="o">=</span> <span class="s2">&quot;RampMode&quot;</span>
+    <span class="c1"># This is connected to the device separately and will only have &quot;Not connected&quot; as</span>
+    <span class="c1"># option if disconnected. Once it is connected, &quot;Not connected&quot; is replaced with the</span>
+    <span class="c1"># options above. This is also why this must be a SupersetEnum.</span>
+    <span class="n">NOT_CONNECTED</span> <span class="o">=</span> <span class="s2">&quot;Not connected&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="PsuMode">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i09_1.PsuMode.html#dodal.devices.i09_1.PsuMode">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">PsuMode</span><span class="p">(</span><span class="n">SupersetEnum</span><span class="p">):</span>
+    <span class="n">V3500</span> <span class="o">=</span> <span class="s2">&quot;3.5kV&quot;</span>
+    <span class="n">V1500</span> <span class="o">=</span> <span class="s2">&quot;1.5kV&quot;</span>
+    <span class="n">V400</span> <span class="o">=</span> <span class="s2">&quot;400V&quot;</span>
+    <span class="c1"># This is connected to the device separately and will only have &quot;Not connected&quot; as</span>
+    <span class="c1"># option if disconnected. Once it is connected, &quot;Not connected&quot; is replaced with the</span>
+    <span class="c1"># options above. This is also why this must be a SupersetEnum.</span>
     <span class="n">NOT_CONNECTED</span> <span class="o">=</span> <span class="s2">&quot;Not connected&quot;</span></div>
 
 </pre></div>

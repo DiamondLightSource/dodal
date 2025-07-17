@@ -15,6 +15,7 @@ dodal.devices.i09\_1
    :recursive:
 
    ~i09_1.LensMode
+   ~i09_1.PsuMode
 
 
 
