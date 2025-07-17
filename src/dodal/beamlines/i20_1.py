@@ -41,8 +41,6 @@ set_path_provider(
     )
 )
 
-
-# NOTE this is mock as we cannot move items on the beamline until we get sign-off to do so
 @device_factory()
 def turbo_slit() -> TurboSlit:
     """
@@ -50,7 +48,6 @@ def turbo_slit() -> TurboSlit:
     """
 
     return TurboSlit(f"{PREFIX.beamline_prefix}-OP-PCHRO-01:TS:")
-
 
 @device_factory()
 def turbo_slit_x() -> Motor:
@@ -63,24 +60,26 @@ def turbo_slit_x() -> Motor:
 @device_factory()
 def panda() -> HDFPanda:
     return HDFPanda(
-        f"{PREFIX.beamline_prefix}-EA-PANDA-02:", path_provider=get_path_provider()) #, name="panda")
+        f"{PREFIX.beamline_prefix}-EA-PANDA-02:", path_provider=get_path_provider())
 
 
 @device_factory() 
 def pmac() -> Pmac :
-    return Pmac(f"{PREFIX.beamline_prefix}-MO-STEP-06", name="pmac")
+    return Pmac(f"{PREFIX.beamline_prefix}-MO-STEP-06")
 
 
 @device_factory()
 def turbo_slit_x_pmacmotor() -> PmacMotor :
-    return PmacMotor(prefix=f"{PREFIX.beamline_prefix}-OP-PCHRO-01:TS:XFINE") # , name="turbo_slit_x_pmacmotor")
+    return PmacMotor(prefix=f"{PREFIX.beamline_prefix}-OP-PCHRO-01:TS:XFINE")
 
 
+# Use mock device until motors are reconnected on the beamline
 @device_factory(mock=True)
 def alignment_x() -> Motor:
     return Motor(f"{PREFIX.beamline_prefix}-MO-STAGE-01:X")
 
 
+# Use mock device until motors are reconnected on the beamline
 @device_factory(mock=True)
 def alignment_y() -> Motor:
     return Motor(f"{PREFIX.beamline_prefix}-MO-STAGE-01:Y")
@@ -97,6 +96,7 @@ def xspress3() -> Xspress3:
     )
 
 
+# Skip device - synchrotron PVs are not available (CA gateway machine has been removed)
 @device_factory(skip=True)
 def synchrotron() -> Synchrotron:
     return Synchrotron()
