@@ -7,8 +7,8 @@ from dodal.devices.electron_analyser.abstract.base_region import (
     AbstractBaseRegion,
     AbstractBaseSequence,
     JavaToPythonModel,
-    TLensMode,
 )
+from dodal.devices.electron_analyser.abstract.types import TLensMode, TPsuMode
 from dodal.devices.electron_analyser.vgscienta.enums import (
     AcquisitionMode,
     DetectorMode,
@@ -53,9 +53,10 @@ class VGScientaExcitationEnergySource(JavaToPythonModel):
 
 
 class VGScientaSequence(
-    AbstractBaseSequence[VGScientaRegion, TLensMode], Generic[TLensMode]
+    AbstractBaseSequence[VGScientaRegion[TLensMode]],
+    Generic[TLensMode, TPsuMode],
 ):
-    element_set: str = Field(default="Unknown")
+    psu_mode: TPsuMode = Field(alias="element_set")
     excitation_energy_sources: list[VGScientaExcitationEnergySource] = Field(
         default_factory=lambda: []
     )

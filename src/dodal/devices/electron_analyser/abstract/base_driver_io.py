@@ -19,8 +19,11 @@ from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
 from dodal.devices.electron_analyser.abstract.base_region import (
     TAbstractBaseRegion,
+)
+from dodal.devices.electron_analyser.abstract.types import (
     TAcquisitionMode,
     TLensMode,
+    TPsuMode,
 )
 from dodal.devices.electron_analyser.enums import EnergyMode
 from dodal.devices.electron_analyser.util import to_binding_energy, to_kinetic_energy
@@ -31,7 +34,7 @@ class AbstractAnalyserDriverIO(
     StandardReadable,
     ADBaseIO,
     Movable[TAbstractBaseRegion],
-    Generic[TAbstractBaseRegion, TAcquisitionMode, TLensMode],
+    Generic[TAbstractBaseRegion, TAcquisitionMode, TLensMode, TPsuMode],
 ):
     """
     Generic device to configure electron analyser with new region settings.
@@ -43,6 +46,7 @@ class AbstractAnalyserDriverIO(
         prefix: str,
         acquisition_mode_type: type[TAcquisitionMode],
         lens_mode_type: type[TLensMode],
+        psu_mode_type: type[TPsuMode],
         energy_sources: Mapping[str, SignalR[float]],
         name: str = "",
     ) -> None:
@@ -55,6 +59,7 @@ class AbstractAnalyserDriverIO(
                                    for this device.
             lens_mode_type: Enum that determines the available lens mode for this
                             device.
+            psu_mode_type: Enum that determines the available psu modes for this device.
             energy_sources: Map that pairs a source name to an energy value signal
                             (in eV).
             name: Name of the device.
@@ -62,6 +67,7 @@ class AbstractAnalyserDriverIO(
         self.energy_sources = energy_sources
         self.acquisition_mode_type = acquisition_mode_type
         self.lens_mode_type = lens_mode_type
+        self.psu_mode_type = psu_mode_type
 
         with self.add_children_as_readables():
             self.image = epics_signal_r(Array1D[np.float64], prefix + "IMAGE")
@@ -90,6 +96,9 @@ class AbstractAnalyserDriverIO(
                 acquisition_mode_type, prefix + "ACQ_MODE"
             )
             self.excitation_energy_source = soft_signal_rw(str, initial_value="")
+            # This is used by each electron analyser, however it depends on the electron
+            # analyser type to know if is moved with region settings.
+            self.psu_mode = epics_signal_rw(psu_mode_type, prefix + "PSU_MODE")
 
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             # Read once per scan after data acquired

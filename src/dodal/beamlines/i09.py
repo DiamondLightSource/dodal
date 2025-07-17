@@ -3,7 +3,7 @@ from dodal.common.beamlines.beamline_utils import (
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.devices.electron_analyser.vgscienta import VGScientaAnalyserDriverIO
-from dodal.devices.i09 import DCM, Grating, LensMode
+from dodal.devices.i09 import DCM, Grating, LensMode, PsuMode
 from dodal.devices.pgm import PGM
 from dodal.devices.synchrotron import Synchrotron
 from dodal.log import set_beamline as set_log_beamline
@@ -33,14 +33,17 @@ def dcm() -> DCM:
     return DCM(prefix=f"{PREFIX.beamline_prefix}-MO-DCM-01:")
 
 
+# Connect will work again after this work completed
+# https://jira.diamond.ac.uk/browse/I09-651
 @device_factory()
-def analyser_driver() -> VGScientaAnalyserDriverIO[LensMode]:
+def analyser_driver() -> VGScientaAnalyserDriverIO[LensMode, PsuMode]:
     energy_sources = {
         "source1": pgm().energy.user_readback,
         "source2": dcm().energy_in_ev,
     }
-    return VGScientaAnalyserDriverIO[LensMode](
+    return VGScientaAnalyserDriverIO[LensMode, PsuMode](
         prefix=f"{PREFIX.beamline_prefix}-EA-DET-01:CAM:",
         lens_mode_type=LensMode,
+        psu_mode_type=PsuMode,
         energy_sources=energy_sources,
     )
