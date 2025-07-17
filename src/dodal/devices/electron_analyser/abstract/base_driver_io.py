@@ -132,7 +132,6 @@ class AbstractAnalyserDriverIO(
                 self.high_energy,
                 self.energy_step,
                 self.slices,
-                self.acquire_time,
                 self.image_mode,
                 self.region_name,
                 self.energy_mode,
@@ -144,6 +143,7 @@ class AbstractAnalyserDriverIO(
                 self.energy_axis,
                 self.binding_energy_axis,
                 self.angle_axis,
+                self.acquire_time,
                 self.total_steps,
                 self.total_time,
             ],
@@ -184,7 +184,7 @@ class AbstractAnalyserDriverIO(
             self.acquisition_mode.set(region.acquisition_mode),
             self.excitation_energy.set(excitation_energy),
             self.excitation_energy_source.set(source.name),
-            self.acquire_time.set(region.step_time),
+            self.acquire_time.set(region.acquire_time),
         )
 
     def _get_energy_source(self, alias_name: str) -> SignalR[float]:
