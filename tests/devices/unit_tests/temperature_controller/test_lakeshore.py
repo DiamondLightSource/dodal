@@ -35,9 +35,9 @@ async def lakeshore():
 async def test_lakeshore_set_success(
     lakeshore: Lakeshore, RE: RunEngine, control_channel: int
 ):
-    RE(abs_set(lakeshore.control_channel, control_channel))
+    RE(abs_set(lakeshore.control_channel, control_channel, wait=True))
     temperature = np.random.uniform(10, 400)
-    RE(abs_set(lakeshore, temperature), wait=True)
+    RE(abs_set(lakeshore, temperature, wait=True))
 
     assert (
         await lakeshore.temperature.setpoint[
@@ -85,7 +85,7 @@ async def test_lakeshore_set_success_fail_unavailable_channel(
 async def test_lakeshore__set_control_channel_correctly_set_up_readableFormat(
     lakeshore: Lakeshore, RE: RunEngine, control_channel: int
 ):
-    RE(abs_set(lakeshore.control_channel, control_channel), wait=True)
+    RE(abs_set(lakeshore.control_channel, control_channel, wait=True))
     assert lakeshore.hints == {
         "fields": [
             f"lakeshore-temperature-readback-{control_channel}",
