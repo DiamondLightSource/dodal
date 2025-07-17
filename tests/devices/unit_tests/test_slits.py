@@ -1,6 +1,6 @@
 import pytest
 from ophyd_async.core import init_devices
-from ophyd_async.testing import assert_reading, set_mock_value
+from ophyd_async.testing import assert_reading, partial_reading, set_mock_value
 
 from dodal.devices.slits import Slits
 
@@ -21,17 +21,9 @@ async def test_reading_slits_reads_gaps_and_centres(slits: Slits):
     await assert_reading(
         slits,
         {
-            "slits-x_centre": {
-                "value": 0.0,
-            },
-            "slits-x_gap": {
-                "value": 0.5,
-            },
-            "slits-y_centre": {
-                "value": 1.0,
-            },
-            "slits-y_gap": {
-                "value": 1.5,
-            },
+            "slits-x_centre": partial_reading(0.0),
+            "slits-x_gap": partial_reading(0.5),
+            "slits-y_centre": partial_reading(1.0),
+            "slits-y_gap": partial_reading(1.5),
         },
     )
