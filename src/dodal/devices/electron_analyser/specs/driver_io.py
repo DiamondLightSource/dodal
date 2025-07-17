@@ -62,15 +62,11 @@ class SpecsAnalyserDriverIO(
         )
 
     def _can_set_centre_energy(self, region: SpecsRegion[TLensMode, TPsuMode]) -> bool:
-        """
-        Overwritten abstract class method to add condition on setting centre energy
-        """
+        # Overwritten abstract class method to add condition on setting centre energy
         return region.acquisition_mode == AcquisitionMode.FIXED_ENERGY
 
     def _can_set_energy_step(self, region: SpecsRegion[TLensMode, TPsuMode]) -> bool:
-        """
-        Overwritten abstract class method to add condition on setting energy_step
-        """
+        # Overwritten abstract class method to add condition on setting energy_step
         return region.acquisition_mode == AcquisitionMode.FIXED_TRANSMISSION
 
     @AsyncStatus.wrap
