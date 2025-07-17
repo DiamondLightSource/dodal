@@ -26,7 +26,7 @@ class SpecsAnalyserDriverIO(
         AcquisitionMode,
         TLensMode,
         TPsuMode,
-        int,
+        float,
     ],
     Generic[TLensMode, TPsuMode],
 ):
@@ -55,7 +55,7 @@ class SpecsAnalyserDriverIO(
             acquisition_mode_type=AcquisitionMode,
             lens_mode_type=lens_mode_type,
             psu_mode_type=psu_mode_type,
-            pass_energy_type=int,
+            pass_energy_type=float,
             energy_sources=energy_sources,
             name=name,
         )
