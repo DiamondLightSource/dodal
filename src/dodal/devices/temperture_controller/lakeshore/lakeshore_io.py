@@ -27,7 +27,7 @@ class LAKESHORE336_PID_INPUT_CHANNEL(StrictEnum):
     INPUT_4 = "Input 4"
 
 
-class LAKESHORE400_PID_INPUT_CHANNEL(StrictEnum):
+class LAKESHORE340_PID_INPUT_CHANNEL(StrictEnum):
     INPUT_1 = "Loop 1"
     INPUT_2 = "Loop 2"
 

@@ -26,7 +26,7 @@ from dodal.devices.i10.slits import I10Slits, I10SlitsDrainCurrent
 from dodal.devices.motors import XYStage, XYZStage
 from dodal.devices.pgm import PGM
 from dodal.devices.temperture_controller import (
-    LAKESHORE400_PID_INPUT_CHANNEL,
+    LAKESHORE340_PID_INPUT_CHANNEL,
     Lakeshore340,
 )
 from dodal.log import set_beamline as set_log_beamline
@@ -234,5 +234,5 @@ def temperature_controller() -> Lakeshore340:
         no_channels=4,
         heater_setting=int,
         pid_mode=int,
-        input_channel_type=LAKESHORE400_PID_INPUT_CHANNEL,
+        input_channel_type=LAKESHORE340_PID_INPUT_CHANNEL,
     )
