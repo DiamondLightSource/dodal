@@ -50,6 +50,11 @@ class Lakeshore(StandardReadable, Movable[float]):
         PID IO interface.
     control_channel : derived_signal_rw
         Signal for selecting the control channel.
+    temperature_high_limit: soft_signal_rw
+        Signal to store the soft high temperature limit.
+    temperature_low_limit: soft_signal_rw
+        Signal to store the soft low temperature limit.
+
 
     Methods
     -------
