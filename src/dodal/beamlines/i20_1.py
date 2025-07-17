@@ -16,6 +16,12 @@ from dodal.devices.xspress3.xspress3 import Xspress3
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
+# introduces dependency on 'velocityprofile' package 
+from ophyd_async.epics.pmac import (
+    Pmac,
+    PmacMotor,
+)
+
 BL = get_beamline_name("i20-1")
 PREFIX = BeamlinePrefix(BL, suffix="J")
 set_log_beamline(BL)
@@ -57,8 +63,17 @@ def turbo_slit_x() -> Motor:
 @device_factory()
 def panda() -> HDFPanda:
     return HDFPanda(
-        f"{PREFIX.beamline_prefix}-EA-PANDA-02:", path_provider=get_path_provider(), name="panda"
-    )
+        f"{PREFIX.beamline_prefix}-EA-PANDA-02:", path_provider=get_path_provider()) #, name="panda")
+
+
+@device_factory() 
+def pmac() -> Pmac :
+    return Pmac(f"{PREFIX.beamline_prefix}-MO-STEP-06", name="pmac")
+
+
+@device_factory()
+def turbo_slit_x_pmacmotor() -> PmacMotor :
+    return PmacMotor(prefix=f"{PREFIX.beamline_prefix}-OP-PCHRO-01:TS:XFINE") # , name="turbo_slit_x_pmacmotor")
 
 
 @device_factory(mock=True)
@@ -82,6 +97,6 @@ def xspress3() -> Xspress3:
     )
 
 
-@device_factory()
+@device_factory(skip=True)
 def synchrotron() -> Synchrotron:
     return Synchrotron()
