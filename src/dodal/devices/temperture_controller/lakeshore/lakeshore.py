@@ -1,3 +1,5 @@
+from asyncio import gather
+
 from bluesky.protocols import Movable
 from ophyd_async.core import (
     AsyncStatus,
@@ -18,7 +20,7 @@ from .lakeshore_io import (
 )
 
 
-class Lakeshore(StandardReadable, Movable):
+class Lakeshore(StandardReadable, Movable[float]):
     """
     Lakeshore temperature controller device.
 
@@ -31,10 +33,12 @@ class Lakeshore(StandardReadable, Movable):
         The EPICS prefix for the device.
     no_channels : int
         Number of temperature channels.
-    heater_table : type[StrictEnum]
+    heater_setting : type[SignalDatatypeT]
         Enum type for heater settings.
     control_channel : int, optional
         The initial control channel (default is 1).
+    single_control_channel : bool, optional
+        Whether to use a single control channel (default is False).
     name : str, optional
         Name of the device.
 
@@ -51,6 +55,10 @@ class Lakeshore(StandardReadable, Movable):
     -------
     set(value: float)
         Set the temperature setpoint for the selected control channel.
+    _get_control_channel(current_channel: int) -> int
+        Get the current control channel.
+    _set_control_channel(value: int, readback: int | None = None)
+        Set the control channel and update readable signals.
     """
 
     def __init__(
@@ -77,6 +85,9 @@ class Lakeshore(StandardReadable, Movable):
             name=name,
         )
         self._control_channel = soft_signal_rw(int, initial_value=control_channel)
+        self.temperature_high_limit = soft_signal_rw(float, initial_value=400)
+        self.temperature_low_limit = soft_signal_rw(float, initial_value=0)
+
         self.add_readables(
             list(self.temperature.setpoint.values())
             + list(self.temperature.readback.values())
@@ -103,13 +114,18 @@ class Lakeshore(StandardReadable, Movable):
     @AsyncStatus.wrap
     async def set(self, value: float) -> None:
         """
-        Set the temperature setpoint for all channels.
-        This method overrides the Movable interface's set method.
+        Set the temperature setpoint for the active control channel.
         """
-
-        await self.temperature.setpoint[await self.control_channel.get_value()].set(
-            value
+        high, low = await gather(
+            self.temperature_high_limit.get_value(),
+            self.temperature_low_limit.get_value(),
         )
+        if high >= value >= low:
+            await self.temperature.setpoint[await self.control_channel.get_value()].set(
+                value
+            )
+        else:
+            raise ValueError(f"Requested temperature must be withing {high} and {low}")
 
     def _get_control_channel(self, current_channel: int) -> int:
         return current_channel
@@ -118,10 +134,6 @@ class Lakeshore(StandardReadable, Movable):
         self, value: int, readback: int | None = None
     ) -> None:
         readback = readback if readback else value
-        """
-        Set the number of control channels.
-        This method allows dynamic adjustment of the number of control channels.
-        """
         if value < 1 or value > len(self.PID.p):
             raise ValueError(
                 f"Control channels must be between 1 and {len(self.PID.p)}."
@@ -150,7 +162,8 @@ class Lakeshore336(Lakeshore):
     Lakeshore 336 temperature controller.
 
     This class is a specific implementation for the Lakeshore 336 model.
-    It inherits from the Lakeshore class and sets the heater setting to LAKESHORE336.
+    It inherits from the Lakeshore class and sets the heater mode, pid mode and
+     input channel type to LAKESHORE336 setting.
     """
 
     def __init__(
@@ -190,7 +203,14 @@ class Lakeshore336(Lakeshore):
 
 
 class Lakeshore340(Lakeshore):
-    """ """
+    """
+    Lakeshore 340 temperature controller.
+
+    This class is a specific implementation for the Lakeshore 340 model.
+    It inherits from the Lakeshore class and sets the heater mode, pid mode and
+     input channel type to LAKESHORE340 setting.
+    The main different for 340 is that it only has a shared control channel.
+    """
 
     def __init__(
         self,
@@ -211,7 +231,7 @@ class Lakeshore340(Lakeshore):
             signal_type=pid_mode,
             single_control_channel=single_control_channel,
         )
-        self.pid_input_channel = create_rw_device_vector(
+        self.pid_input_loop = create_rw_device_vector(
             prefix=prefix,
             no_channels=no_channels,
             write_pv="LOOP",
