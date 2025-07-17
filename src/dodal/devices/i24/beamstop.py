@@ -1,6 +1,8 @@
-from ophyd_async.core import StandardReadable, StrictEnum
+from ophyd_async.core import StrictEnum
 from ophyd_async.epics.core import epics_signal_rw
 from ophyd_async.epics.motor import Motor
+
+from dodal.devices.motors import XYZStage
 
 
 class BeamstopPositions(StrictEnum):
@@ -12,7 +14,7 @@ class BeamstopPositions(StrictEnum):
     ROBOT = "Robot"
 
 
-class Beamstop(StandardReadable):
+class Beamstop(XYZStage):
     """Device to move the beamstop.
 
     The positioner moves the x,y,z motors when a position is selected.
@@ -25,12 +27,7 @@ class Beamstop(StandardReadable):
     """
 
     def __init__(self, prefix: str, name: str = "") -> None:
-        self.x = Motor(prefix + "X")
-        self.y = Motor(prefix + "Y")
-        self.z = Motor(prefix + "Z")
-
         self.y_rotation = Motor(prefix + "ROTY")
-
         self.pos_select = epics_signal_rw(BeamstopPositions, prefix + "MP:SELECT")
 
-        super().__init__(name)
+        super().__init__(prefix, name)

@@ -33,12 +33,15 @@ def set_beamline(beamline: str):
 
 def clear_devices():
     global ACTIVE_DEVICES
-    for d in list(ACTIVE_DEVICES):
-        del ACTIVE_DEVICES[d]
+    for name in list(ACTIVE_DEVICES):
+        clear_device(name)
 
 
 def clear_device(name: str):
     global ACTIVE_DEVICES
+    device = ACTIVE_DEVICES[name]
+    if isinstance(device, OphydV1Device):
+        device.destroy()
     del ACTIVE_DEVICES[name]
 
 
@@ -162,3 +165,8 @@ def set_path_provider(provider: PathProvider):
 
 def get_path_provider() -> PathProvider:
     return PATH_PROVIDER
+
+
+def clear_path_provider() -> None:
+    global PATH_PROVIDER
+    del PATH_PROVIDER

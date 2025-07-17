@@ -7,11 +7,17 @@ from ophyd_async.core import (
     AsyncStatus,
     Device,
     StandardReadable,
+    StandardReadableFormat,
     StrictEnum,
     set_and_wait_for_value,
     wait_for_value,
 )
-from ophyd_async.epics.core import epics_signal_r, epics_signal_rw_rbv, epics_signal_x
+from ophyd_async.epics.core import (
+    epics_signal_r,
+    epics_signal_rw,
+    epics_signal_rw_rbv,
+    epics_signal_x,
+)
 
 from dodal.log import LOGGER
 
@@ -69,18 +75,21 @@ class BartRobot(StandardReadable, Movable[SampleLocation]):
     LOAD_TOLERANCE_MM = 0.02
 
     def __init__(self, name: str, prefix: str) -> None:
-        self.barcode = epics_signal_r(str, prefix + "BARCODE")
-        self.gonio_pin_sensor = epics_signal_r(PinMounted, prefix + "PIN_MOUNTED")
+        with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
+            self.barcode = epics_signal_r(str, prefix + "BARCODE")
+            self.gonio_pin_sensor = epics_signal_r(PinMounted, prefix + "PIN_MOUNTED")
+
+            self.current_puck = epics_signal_r(float, prefix + "CURRENT_PUCK_RBV")
+            self.current_pin = epics_signal_r(float, prefix + "CURRENT_PIN_RBV")
 
         self.next_pin = epics_signal_rw_rbv(float, prefix + "NEXT_PIN")
         self.next_puck = epics_signal_rw_rbv(float, prefix + "NEXT_PUCK")
-        self.current_puck = epics_signal_r(float, prefix + "CURRENT_PUCK_RBV")
-        self.current_pin = epics_signal_r(float, prefix + "CURRENT_PIN_RBV")
 
-        self.next_sample_id = epics_signal_rw_rbv(int, prefix + "NEXT_ID")
         self.sample_id = epics_signal_r(int, prefix + "CURRENT_ID_RBV")
+        self.next_sample_id = epics_signal_rw_rbv(int, prefix + "NEXT_ID")
 
         self.load = epics_signal_x(prefix + "LOAD.PROC")
+        self.unload = epics_signal_x(prefix + "UNLD.PROC")
         self.program_running = epics_signal_r(bool, prefix + "PROGRAM_RUNNING")
         self.program_name = epics_signal_r(str, prefix + "PROGRAM_NAME")
 
@@ -88,6 +97,20 @@ class BartRobot(StandardReadable, Movable[SampleLocation]):
         self.controller_error = ErrorStatus(prefix + "CNTL")
 
         self.reset = epics_signal_x(prefix + "RESET.PROC")
+        self.abort = epics_signal_x(prefix + "ABORT.PROC")
+        self.init = epics_signal_x(prefix + "INIT.PROC")
+        self.soak = epics_signal_x(prefix + "SOAK.PROC")
+        self.home = epics_signal_x(prefix + "GOHM.PROC")
+        self.unload = epics_signal_x(prefix + "UNLD.PROC")
+        self.dry = epics_signal_x(prefix + "DRY.PROC")
+        self.open = epics_signal_x(prefix + "COLO.PROC")
+        self.close = epics_signal_x(prefix + "COLC.PROC")
+        self.cryomode_rbv = epics_signal_r(float, prefix + "CRYO_MODE_RBV")
+        self.cryomode = epics_signal_rw(str, prefix + "CRYO_MODE_CTRL")
+        self.gripper_temp = epics_signal_r(float, prefix + "GRIPPER_TEMP")
+        self.dewar_lid_temperature = epics_signal_rw(
+            float, prefix + "DW_1_TEMP", prefix + "DW_1_SET_POINT"
+        )
         super().__init__(name=name)
 
     async def pin_mounted_or_no_pin_found(self):
@@ -154,7 +177,7 @@ class BartRobot(StandardReadable, Movable[SampleLocation]):
                 self._load_pin_and_puck(value),
                 timeout=self.LOAD_TIMEOUT + self.NOT_BUSY_TIMEOUT,
             )
-        except (asyncio.TimeoutError, TimeoutError) as e:
+        except TimeoutError as e:
             # Will only need to catch asyncio.TimeoutError after https://github.com/bluesky/ophyd-async/issues/572
             await self.prog_error.raise_if_error(e)
             await self.controller_error.raise_if_error(e)

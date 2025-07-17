@@ -11,8 +11,7 @@ from dodal.devices.i24.dual_backlight import (
 
 
 @pytest.fixture
-async def fake_backlight() -> DualBacklight:
-    RunEngine()
+async def fake_backlight(RE) -> DualBacklight:
     fake_backlight = DualBacklight("", name="fake_backlight")
     await fake_backlight.connect(mock=True)
     return fake_backlight

@@ -15,7 +15,7 @@ CALCULATED_VALUE = [True, False, True] * 6  # Some "random" values
 async def fake_attenuator():
     async with init_devices(mock=True):
         fake_attenuator: BinaryFilterAttenuator = BinaryFilterAttenuator(
-            "", "attenuator"
+            prefix="", num_filters=16
         )
 
     return fake_attenuator

@@ -1,30 +1,32 @@
 import asyncio
 import functools
-import os
 from unittest.mock import ANY, AsyncMock, MagicMock, patch
 
 import pytest
-from bluesky.run_engine import RunEngine as RE
 from ophyd import Device
 from ophyd.device import Device as OphydV1Device
 from ophyd.sim import FakeEpicsSignal
 from ophyd_async.core import Device as OphydV2Device
 from ophyd_async.core import StandardReadable
 
-from dodal.beamlines import i03
 from dodal.common.beamlines import beamline_utils
 from dodal.devices.eiger import EigerDetector
 from dodal.devices.focusing_mirror import FocusingMirror
-from dodal.devices.motors import XYZPositioner
+from dodal.devices.motors import XYZStage
 from dodal.devices.smargon import Smargon
 from dodal.log import LOGGER
 from dodal.utils import DeviceInitializationController
 
-from ...conftest import mock_beamline_module_filepaths
+
+@pytest.fixture(autouse=True)
+def i03_beamline():
+    with patch("dodal.common.beamlines.beamline_utils.BL", "i03") as bl:
+        yield bl
 
 
 @pytest.fixture(autouse=True)
-def flush_event_loop_on_finish(event_loop):
+def flush_event_loop_on_finish():
+    event_loop = asyncio.get_event_loop()
     # wait for the test function to complete
     yield None
 
@@ -33,16 +35,8 @@ def flush_event_loop_on_finish(event_loop):
         event_loop.run_until_complete(asyncio.gather(*pending_tasks))
 
 
-@pytest.fixture(autouse=True)
-def setup():
-    beamline_utils.clear_devices()
-    mock_beamline_module_filepaths("i03", i03)
-    with patch.dict(os.environ, {"BEAMLINE": "i03"}):
-        yield
-
-
 def test_instantiate_function_makes_supplied_device():
-    device_types = [XYZPositioner, Smargon]
+    device_types = [XYZStage, Smargon]
     for device in device_types:
         dev = beamline_utils.device_instantiation(
             device, device.__name__, "", False, True, None
@@ -52,7 +46,7 @@ def test_instantiate_function_makes_supplied_device():
 
 def test_instantiating_different_device_with_same_name():
     dev1 = beamline_utils.device_instantiation(  # noqa
-        XYZPositioner, "device", "", False, True, None
+        XYZStage, "device", "", False, True, None
     )
     with pytest.raises(TypeError):
         dev2 = beamline_utils.device_instantiation(
@@ -76,10 +70,9 @@ def test_instantiate_v1_function_fake_makes_fake():
     assert isinstance(eiger.stale_params, FakeEpicsSignal)
 
 
-def test_instantiate_v2_function_fake_makes_fake():
-    RE()
+def test_instantiate_v2_function_fake_makes_fake(RE):
     fake_smargon: Smargon = beamline_utils.device_instantiation(
-        i03.Smargon, "smargon", "", True, True, None
+        Smargon, "smargon", "", True, True, None
     )
     assert isinstance(fake_smargon, StandardReadable)
     assert fake_smargon.omega.user_setpoint.source.startswith("mock+ca")
@@ -104,8 +97,9 @@ def test_wait_for_v1_device_connection_passes_through_timeout(kwargs, expected_t
     "dodal.common.beamlines.beamline_utils.v2_device_wait_for_connection",
     new=AsyncMock(),
 )
-def test_wait_for_v2_device_connection_passes_through_timeout(kwargs, expected_timeout):
-    RE()
+def test_wait_for_v2_device_connection_passes_through_timeout(
+    kwargs, expected_timeout, RE
+):
     device = OphydV2Device()
     device.connect = MagicMock()
 
@@ -195,3 +189,25 @@ def test_skip(RE):
 
     skip = False
     assert not controller.skip
+
+
+def test_clear_devices_destroys_ophyd_v1_devices():
+    dev1 = beamline_utils.device_instantiation(
+        EigerDetector, "eiger", "", True, True, None
+    )
+    dev1.destroy = MagicMock()
+
+    beamline_utils.clear_devices()
+
+    dev1.destroy.assert_called_once()
+
+
+def test_clear_device_destroys_ophyd_v1_device():
+    dev1 = beamline_utils.device_instantiation(
+        EigerDetector, "eiger", "", True, True, None
+    )
+    dev1.destroy = MagicMock()
+
+    beamline_utils.clear_device("eiger")
+
+    dev1.destroy.assert_called_once()

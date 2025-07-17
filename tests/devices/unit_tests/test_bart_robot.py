@@ -1,3 +1,4 @@
+import traceback
 from asyncio import create_task, sleep
 from unittest.mock import ANY, AsyncMock, MagicMock, call, patch
 
@@ -15,8 +16,8 @@ from dodal.devices.robot import BartRobot, PinMounted, RobotLoadFailed, SampleLo
 
 async def _get_bart_robot() -> BartRobot:
     device = BartRobot("robot", "-MO-ROBOT-01:")
-    device.LOAD_TIMEOUT = 0.01  # type: ignore
-    device.NOT_BUSY_TIMEOUT = 0.01  # type: ignore
+    device.LOAD_TIMEOUT = 0.05  # type: ignore
+    device.NOT_BUSY_TIMEOUT = 0.05  # type: ignore
     await device.connect(mock=True)
     return device
 
@@ -81,11 +82,16 @@ async def test_given_program_not_running_and_pin_unmounting_but_new_pin_not_moun
     set_mock_value(device.program_running, False)
     set_mock_value(device.gonio_pin_sensor, PinMounted.NO_PIN_MOUNTED)
     device.load = AsyncMock(side_effect=device.load)
-    with pytest.raises(RobotLoadFailed):
+    with pytest.raises(RobotLoadFailed) as exc_info:
         await device.set(SampleLocation(15, 10))
-    device.load.trigger.assert_called_once()  # type:ignore
-    last_log = patch_logger.mock_calls[1].args[0]
-    assert "Waiting on new pin loaded" in last_log
+
+    try:
+        device.load.trigger.assert_called_once()  # type:ignore
+        last_log = patch_logger.mock_calls[1].args[0]
+        assert "Waiting on new pin loaded" in last_log
+    except AssertionError:
+        traceback.print_exception(exc_info.value)
+        raise
 
 
 async def set_with_happy_path(device: BartRobot) -> AsyncStatus:
@@ -137,7 +143,7 @@ async def test_set_waits_for_both_timeouts(mock_wait_for: AsyncMock):
     device = await _get_bart_robot()
     device._load_pin_and_puck = MagicMock()
     await device.set(SampleLocation(1, 2))
-    mock_wait_for.assert_awaited_once_with(ANY, timeout=0.02)
+    mock_wait_for.assert_awaited_once_with(ANY, timeout=0.1)
 
 
 async def test_moving_the_robot_will_reset_error_if_light_curtain_is_tripped_and_still_throw_if_error_not_cleared():

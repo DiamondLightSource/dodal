@@ -16,7 +16,7 @@ class PGM(StandardReadable):
         self,
         prefix: str,
         grating: type[StrictEnum],
-        gratingPv: str,
+        gratingPv: str = "GRATINGSELECT:SELECT",
         name: str = "",
     ) -> None:
         """

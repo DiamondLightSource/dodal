@@ -9,12 +9,13 @@ from ophyd_async.core import (
     Reference,
     SignalR,
     SignalRW,
-    StandardReadable,
+    observe_signals_value,
     soft_signal_rw,
     wait_for_value,
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
-from ophyd_async.epics.motor import Motor
+
+from dodal.devices.motors import XYZStage
 
 HOME_STR = r"\#1hmz\#2hmz\#3hmz"  # Command to home the PMAC motors
 ZERO_STR = "!x0y0z0"  # Command to blend any ongoing move into new position
@@ -120,15 +121,16 @@ class ProgramRunner(Device, Flyable):
         self,
         pmac_str_sig: SignalRW,
         status_sig: SignalR,
+        counter_sig: SignalR,
         prog_num_sig: SignalRW,
-        collection_time_sig: SignalRW,
+        counter_time_sig: SignalRW,
         name: str = "",
     ) -> None:
         self._signal_ref = Reference(pmac_str_sig)
         self._status_ref = Reference(status_sig)
+        self._counter_ref = Reference(counter_sig)
         self._prog_num_ref = Reference(prog_num_sig)
-
-        self._collection_time_ref = Reference(collection_time_sig)
+        self._counter_time_ref = Reference(counter_time_sig)
 
         super().__init__(name)
 
@@ -151,16 +153,18 @@ class ProgramRunner(Device, Flyable):
 
     @AsyncStatus.wrap
     async def complete(self):
-        """Stop collecting when the scan status PV goes to 0.
-
-        Args:
-            complete_time (float): total time required by the collection to \
-            finish correctly.
+        """Stop collecting when the scan status PV goes to 0 or when counter PV hasn't \
+            updated for 30 seconds.
         """
-        scan_complete_time = await self._collection_time_ref().get_value()
-        await wait_for_value(
-            self._status_ref(), ScanState.DONE, timeout=scan_complete_time
-        )
+        counter_time = await self._counter_time_ref().get_value()
+        async for signal, value in observe_signals_value(
+            self._status_ref(),
+            self._counter_ref(),
+            timeout=counter_time,
+        ):
+            if signal is self._status_ref():
+                if value == ScanState.DONE:
+                    break
 
 
 class ProgramAbort(Triggerable):
@@ -188,7 +192,7 @@ class ProgramAbort(Triggerable):
         )
 
 
-class PMAC(StandardReadable):
+class PMAC(XYZStage):
     """Device to control the chip stage on I24."""
 
     def __init__(self, prefix: str, name: str = "") -> None:
@@ -205,10 +209,6 @@ class PMAC(StandardReadable):
             self.pmac_string,
         )
 
-        self.x = Motor(prefix + "X")
-        self.y = Motor(prefix + "Y")
-        self.z = Motor(prefix + "Z")
-
         # These next signals are readback values on PVARS which are set by the motion
         # program.
         self.scanstatus = epics_signal_r(float, "BL24I-MO-STEP-14:signal:P2401")
@@ -217,14 +217,15 @@ class PMAC(StandardReadable):
         # A couple of soft signals for running a collection: program number to send to
         # the PMAC_STRING and expected collection time.
         self.program_number = soft_signal_rw(int)
-        self.collection_time = soft_signal_rw(float, initial_value=600.0, units="s")
+        self.counter_time = soft_signal_rw(float, initial_value=30.0, units="s")
 
         self.run_program = ProgramRunner(
             self.pmac_string,
             self.scanstatus,
+            self.counter,
             self.program_number,
-            self.collection_time,
+            self.counter_time,
         )
         self.abort_program = ProgramAbort(self.pmac_string, self.scanstatus)
 
-        super().__init__(name)
+        super().__init__(prefix, name)

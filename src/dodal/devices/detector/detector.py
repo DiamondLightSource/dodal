@@ -1,4 +1,5 @@
 from enum import Enum, auto
+from functools import cached_property
 from pathlib import Path
 
 from pydantic import BaseModel, Field, field_serializer, field_validator
@@ -49,7 +50,7 @@ class DetectorParams(BaseModel):
         False  # Remove in https://github.com/DiamondLightSource/hyperion/issues/1395
     )
 
-    @property
+    @cached_property
     def beam_xy_converter(self) -> DetectorDistanceToBeamXYConverter:
         return DetectorDistanceToBeamXYConverter(self.det_dist_to_beam_converter_path)
 

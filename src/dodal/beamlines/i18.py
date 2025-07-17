@@ -12,11 +12,10 @@ from dodal.common.visit import (
     LocalDirectoryServiceClient,
     StaticVisitPathProvider,
 )
-from dodal.devices.dcm import DCM
+from dodal.devices.common_dcm import BaseDCM, PitchAndRollCrystal, RollCrystal
 from dodal.devices.i18.diode import Diode
 from dodal.devices.i18.KBMirror import KBMirror
-from dodal.devices.i18.table import Table
-from dodal.devices.i18.thor_labs_stage import ThorLabsStage
+from dodal.devices.motors import XYStage, XYZThetaStage
 from dodal.devices.slits import Slits
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.tetramm import TetrammDetector
@@ -54,12 +53,15 @@ def undulator() -> Undulator:
     return Undulator(f"{PREFIX.insertion_prefix}-MO-SERVC-01:")
 
 
-@device_factory()
-def dcm() -> DCM:
+# See https://github.com/DiamondLightSource/dodal/issues/1180
+@device_factory(skip=True)
+def dcm() -> BaseDCM[RollCrystal, PitchAndRollCrystal]:
     # once spacing is added Si111 d-spacing is 3.135 angsterm , and Si311 is 1.637
     # calculations are in gda/config/lookupTables/Si111/eV_Deg_converter.xml
-    return DCM(
+    return BaseDCM(
         prefix=f"{PREFIX.beamline_prefix}-MO-DCM-01:",
+        xtal_1=RollCrystal,
+        xtal_2=PitchAndRollCrystal,
     )
 
 
@@ -110,15 +112,15 @@ def hfm() -> KBMirror:
 
 
 @device_factory()
-def d7diode() -> Diode:
+def d7_diode() -> Diode:
     return Diode(f"{PREFIX.beamline_prefix}-DI-PHDGN-07:")
 
 
 @device_factory()
-def main_table() -> Table:
-    return Table(f"{PREFIX.beamline_prefix}-MO-TABLE-01:")
+def main_table() -> XYZThetaStage:
+    return XYZThetaStage(f"{PREFIX.beamline_prefix}-MO-TABLE-01:")
 
 
 @device_factory()
-def thor_labs_stage() -> ThorLabsStage:
-    return ThorLabsStage(f"{PREFIX.beamline_prefix}-MO-TABLE-02:")
+def thor_labs_stage() -> XYStage:
+    return XYStage(f"{PREFIX.beamline_prefix}-MO-TABLE-02:")

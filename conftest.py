@@ -1,12 +1,10 @@
 import asyncio
 import logging
-import os
 import sys
 import time
 from collections.abc import Mapping
-from os import environ, getenv
+from os import environ
 from pathlib import Path
-from typing import Any
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -35,11 +33,11 @@ mock_paths = [
 mock_attributes_table = {
     "i03": mock_paths,
     "i10": mock_paths,
-    "s03": mock_paths,
     "i04": mock_paths,
     "s04": mock_paths,
     "i19_1": mock_paths,
     "i24": mock_paths,
+    "aithre": mock_paths,
 }
 
 BANNED_PATHS = [Path("/dls"), Path("/dls_sw")]
@@ -63,24 +61,6 @@ def patch_open_to_prevent_dls_reads_in_tests():
         yield []
 
 
-# Prevent pytest from catching exceptions when debugging in vscode so that break on
-# exception works correctly (see: https://github.com/pytest-dev/pytest/issues/7409)
-if os.getenv("PYTEST_RAISE", "0") == "1":
-
-    @pytest.hookimpl(tryfirst=True)
-    def pytest_exception_interact(call: pytest.CallInfo[Any]):
-        if call.excinfo is not None:
-            raise call.excinfo.value
-        else:
-            raise RuntimeError(
-                f"{call} has no exception data, an unknown error has occurred"
-            )
-
-    @pytest.hookimpl(tryfirst=True)
-    def pytest_internalerror(excinfo: pytest.ExceptionInfo[Any]):
-        raise excinfo.value
-
-
 def pytest_runtest_setup(item):
     beamline_utils.clear_devices()
     if LOGGER.handlers == []:
@@ -97,16 +77,6 @@ def pytest_runtest_teardown():
     if "dodal.beamlines.beamline_utils" in sys.modules:
         sys.modules["dodal.beamlines.beamline_utils"].clear_devices()
 
-
-s03_epics_server_port = getenv("S03_EPICS_CA_SERVER_PORT")
-s03_epics_repeater_port = getenv("S03_EPICS_CA_REPEATER_PORT")
-
-if s03_epics_server_port is not None:
-    environ["EPICS_CA_SERVER_PORT"] = s03_epics_server_port
-    print(f"[EPICS_CA_SERVER_PORT] = {s03_epics_server_port}")
-if s03_epics_repeater_port is not None:
-    environ["EPICS_CA_REPEATER_PORT"] = s03_epics_repeater_port
-    print(f"[EPICS_CA_REPEATER_PORT] = {s03_epics_repeater_port}")
 
 PATH_INFO_FOR_TESTING: PathInfo = PathInfo(
     directory_path=Path("/does/not/exist"),

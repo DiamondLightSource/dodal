@@ -51,6 +51,10 @@ class I24Axes:
     VGON_YH = EncEnum.ENC4
 
 
+class I23Axes:
+    OMEGA = EncEnum.ENC1
+
+
 class RotationDirection(StrictEnum):
     """
     Defines for a swept angle whether the scan width (sweep) is to be added or subtracted from
@@ -63,6 +67,14 @@ class RotationDirection(StrictEnum):
     @property
     def multiplier(self):
         return 1 if self == RotationDirection.POSITIVE else -1
+
+    @property
+    def opposite(self) -> RotationDirection:
+        return (
+            RotationDirection.POSITIVE
+            if self == RotationDirection.NEGATIVE
+            else RotationDirection.NEGATIVE
+        )
 
 
 class ArmDemand(Enum):

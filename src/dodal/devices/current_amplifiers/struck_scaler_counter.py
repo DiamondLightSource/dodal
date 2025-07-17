@@ -18,7 +18,7 @@ class CountMode(StrictEnum):
 
 class CountState(StrictEnum):
     DONE = "Done"
-    COUNT = "Count"  # type: ignore
+    COUNT = "Count"
 
 
 COUNT_PER_VOLTAGE = 100000

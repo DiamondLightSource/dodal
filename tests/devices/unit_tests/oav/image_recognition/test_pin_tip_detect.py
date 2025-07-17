@@ -140,14 +140,13 @@ async def test_given_find_tip_fails_when_triggered_then_tip_invalid():
 async def test_given_find_tip_fails_twice_when_triggered_then_tip_invalid_and_tried_twice(
     mock_image_read,
 ):
-    async def get_array_data(_):
+    async def get_array_data(*_, **__):
         yield np.array([1, 2, 3])
         yield np.array([1, 2])
-        await asyncio.sleep(100)
+        raise TimeoutError()
 
     mock_image_read.side_effect = get_array_data
     device = await _get_pin_tip_detection_device()
-    await device.validity_timeout.set(0.1)
 
     with (
         patch.object(MxSampleDetect, "__init__", return_value=None),
@@ -167,10 +166,9 @@ async def test_given_tip_invalid_then_loop_keeps_retrying_until_valid(
     mock_image_read: MagicMock,
     mock_logger: MagicMock,
 ):
-    async def get_array_data(_):
+    async def get_array_data(*_, **__):
         yield np.array([1, 2, 3])
         yield np.array([1, 2])
-        await asyncio.sleep(100)
 
     mock_image_read.side_effect = get_array_data
     device = await _get_pin_tip_detection_device()

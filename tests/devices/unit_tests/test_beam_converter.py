@@ -1,3 +1,4 @@
+from math import isclose
 from unittest.mock import Mock, patch
 
 import pytest
@@ -7,32 +8,22 @@ from dodal.devices.detector.det_dist_to_beam_converter import (
     DetectorDistanceToBeamXYConverter,
 )
 
-LOOKUP_TABLE_TEST_VALUES = [(100.0, 200.0), (150.0, 151.0), (160.0, 165.0)]
+# fmt: off
+LOOKUP_TABLE_TEST_VALUES = [
+    (100.0, 200.0),  # distance
+    (150.0, 151.0),  # x
+    (160.0, 165.0),  # y
+]
+# fmt: on
 
 
 @pytest.fixture
 def fake_converter():
-    with patch.object(
-        DetectorDistanceToBeamXYConverter,
-        "parse_table",
+    with patch(
+        "dodal.devices.detector.det_dist_to_beam_converter.parse_lookup_table",
         return_value=LOOKUP_TABLE_TEST_VALUES,
     ):
         yield DetectorDistanceToBeamXYConverter("test.txt")
-
-
-def test_converter_eq():
-    test_file = "tests/devices/unit_tests/test_lookup_table.txt"
-    test_converter = DetectorDistanceToBeamXYConverter(test_file)
-    test_converter_dupe = DetectorDistanceToBeamXYConverter(test_file)
-    test_file_2 = "tests/devices/unit_tests/test_lookup_table_2.txt"
-    test_converter_2 = DetectorDistanceToBeamXYConverter(test_file_2)
-    assert test_converter != 1
-    assert test_converter == test_converter_dupe
-    assert test_converter != test_converter_2
-    previous_value = test_converter_dupe.lookup_table_values[0]
-    test_converter_dupe.lookup_table_values[0] = (7.5, 23.5)
-    assert test_converter != test_converter_dupe
-    test_converter_dupe.lookup_table_values[0] = previous_value
 
 
 @pytest.mark.parametrize(
@@ -58,6 +49,25 @@ def test_interpolate_beam_xy_from_det_distance(
         fake_converter.get_beam_xy_from_det_dist(detector_distance, axis)
         == expected_value
     )
+
+
+@pytest.mark.parametrize(
+    "detector_distance, axis, expected_value",
+    [
+        (95.0, Axis.X_AXIS, 149.95),
+        (205.0, Axis.X_AXIS, 151.05),
+        (95.0, Axis.Y_AXIS, 159.75),
+        (205.0, Axis.Y_AXIS, 165.25),
+    ],
+)
+def test_extrapolate_beam_xy_from_det_distance(
+    fake_converter: DetectorDistanceToBeamXYConverter,
+    detector_distance: float,
+    axis: Axis,
+    expected_value: float,
+):
+    actual = fake_converter.get_beam_xy_from_det_dist(detector_distance, axis)
+    assert isclose(actual, expected_value), f"was {actual} expected {expected_value}"
 
 
 def test_get_beam_in_pixels(fake_converter: DetectorDistanceToBeamXYConverter):
@@ -90,17 +100,3 @@ def test_get_beam_in_pixels(fake_converter: DetectorDistanceToBeamXYConverter):
         )
         == expected_x_value
     )
-
-
-def test_parse_table():
-    test_file = "tests/devices/unit_tests/test_lookup_table.txt"
-    test_converter = DetectorDistanceToBeamXYConverter(test_file)
-
-    assert test_converter.lookup_file == test_file
-    assert test_converter.lookup_table_values == LOOKUP_TABLE_TEST_VALUES
-    assert test_converter.parse_table() == LOOKUP_TABLE_TEST_VALUES
-
-    test_converter.reload_lookup_table()
-
-    assert test_converter.lookup_file == test_file
-    assert test_converter.lookup_table_values == LOOKUP_TABLE_TEST_VALUES

@@ -57,6 +57,21 @@ jobs:
         run: |
           python .github/scripts/check_test_durations.py unit-report.json 1
 
+      - name: Checkout simulated devices
+        uses: actions/checkout@v4
+        with:
+          repository: epics-containers/example-services
+          path: example-services
+
+      - name: Run docker compose
+        uses: hoverkraft-tech/compose-action@v2.2.0
+        with:
+          compose-file: "./example-services/compose.yaml"
+          services: |
+            bl01t-di-cam-01
+            bl01t-mo-sim-01
+            ca-gateway
+
       - name: Run system tests
         run: tox -e system-report
 
@@ -65,7 +80,7 @@ jobs:
           python .github/scripts/check_test_durations.py system-report.json 5
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
           name: ${{ inputs.python-version }}/${{ inputs.runs-on }}
           files: ./unit_cov.xml,./system_cov.xml

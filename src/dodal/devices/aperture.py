@@ -1,14 +1,11 @@
-from ophyd_async.core import StandardReadable
 from ophyd_async.epics.core import epics_signal_r
-from ophyd_async.epics.motor import Motor
+
+from dodal.devices.motors import XYZStage
 
 
-class Aperture(StandardReadable):
+class Aperture(XYZStage):
     def __init__(self, prefix: str, name: str = "") -> None:
-        self.x = Motor(prefix + "X")
-        self.y = Motor(prefix + "Y")
-        self.z = Motor(prefix + "Z")
         self.small = epics_signal_r(float, prefix + "Y:SMALL_CALC")
         self.medium = epics_signal_r(float, prefix + "Y:MEDIUM_CALC")
         self.large = epics_signal_r(float, prefix + "Y:LARGE_CALC")
-        super().__init__(name)
+        super().__init__(prefix, name)

@@ -23,10 +23,9 @@ class Merlin(StandardDetector):
         super().__init__(
             MerlinController(self.drv),
             adcore.ADHDFWriter(
-                self.hdf,
-                path_provider,
-                lambda: self.name,
-                adcore.ADBaseDatasetDescriber(self.drv),
+                fileio=self.hdf,
+                path_provider=path_provider,
+                dataset_describer=adcore.ADBaseDatasetDescriber(self.drv),
             ),
             config_sigs=(self.drv.acquire_period, self.drv.acquire_time),
             name=name,
