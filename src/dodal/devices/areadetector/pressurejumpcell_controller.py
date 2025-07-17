@@ -39,9 +39,9 @@ class PressureJumpCellController(DetectorController):
         exposure: Optional[float] = None,
     ) -> AsyncStatus:
         if num == 0:
-            image_mode = adcore.ImageMode.CONTINUOUS
+            image_mode = adcore.ADImageMode.CONTINUOUS
         else:
-            image_mode = adcore.ImageMode.MULTIPLE
+            image_mode = adcore.ADImageMode.MULTIPLE
         if exposure is not None:
             await self._drv.acquire_time.set(exposure)
 
