@@ -33,6 +33,8 @@ def dcm() -> DCM:
     return DCM(prefix=f"{PREFIX.beamline_prefix}-MO-DCM-01:")
 
 
+# Connect will work again after this work completed
+# https://jira.diamond.ac.uk/browse/I09-651
 @device_factory()
 def analyser_driver() -> VGScientaAnalyserDriverIO[LensMode, PsuMode, PassEnergy]:
     energy_sources = {
