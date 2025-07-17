@@ -8,7 +8,7 @@ from dodal.devices.electron_analyser.vgscienta import (
     VGScientaDetector,
 )
 from dodal.devices.i09 import LensMode, PassEnergy, PsuMode
-from tests.devices.unit_tests.electron_analyser.util import create_analyser_device
+from tests.devices.unit_tests.electron_analyser.helpers import create_analyser_device
 
 
 @pytest.fixture

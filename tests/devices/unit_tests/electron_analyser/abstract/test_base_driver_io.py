@@ -22,7 +22,7 @@ from dodal.devices.electron_analyser.specs import (
 from dodal.devices.electron_analyser.vgscienta import (
     VGScientaAnalyserDriverIO,
 )
-from tests.devices.unit_tests.electron_analyser.util import (
+from tests.devices.unit_tests.electron_analyser.helpers import (
     TEST_SEQUENCE_REGION_NAMES,
     create_analyser_device,
 )
