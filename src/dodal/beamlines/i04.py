@@ -65,7 +65,7 @@ PREFIX = BeamlinePrefix(BL)
 
 
 @device_factory()
-def smargon(mock=True) -> Smargon:
+def smargon() -> Smargon:
     """Get the i04 Smargon device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
     """
@@ -76,7 +76,7 @@ def smargon(mock=True) -> Smargon:
 
 
 @device_factory()
-def gonio_positioner(mock=True) -> XYZStage:
+def gonio_positioner() -> XYZStage:
     """Get the i04 lower_gonio_stages device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
     """
@@ -87,7 +87,7 @@ def gonio_positioner(mock=True) -> XYZStage:
 
 
 @device_factory()
-def sample_delivery_system(mock=True) -> XYZStage:
+def sample_delivery_system() -> XYZStage:
     """Get the i04 sample_delivery_system device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
     """
@@ -97,7 +97,7 @@ def sample_delivery_system(mock=True) -> XYZStage:
     )
 
 
-@device_factory(mock=True)
+@device_factory()
 def ipin() -> IPin:
     """Get the i04 ipin device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
@@ -108,7 +108,7 @@ def ipin() -> IPin:
     )
 
 
-@device_factory(mock=True)
+@device_factory()
 def beamstop() -> Beamstop:
     """Get the i04 beamstop device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
@@ -119,7 +119,7 @@ def beamstop() -> Beamstop:
     )
 
 
-@device_factory(mock=True)
+@device_factory()
 def sample_shutter() -> ZebraShutter:
     """Get the i04 sample shutter device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
@@ -130,7 +130,7 @@ def sample_shutter() -> ZebraShutter:
     )
 
 
-@device_factory(mock=True)
+@device_factory()
 def attenuator() -> BinaryFilterAttenuator:
     """Get the i04 attenuator device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
@@ -152,7 +152,7 @@ def transfocator() -> Transfocator:
     )
 
 
-@device_factory(mock=True)
+@device_factory()
 def xbpm_feedback() -> XBPMFeedback:
     """Get the i04 xbpm_feedback device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
@@ -163,7 +163,7 @@ def xbpm_feedback() -> XBPMFeedback:
     )
 
 
-@device_factory(mock=True)
+@device_factory()
 def flux(mock: bool = False) -> Flux:
     """Get the i04 flux device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
@@ -177,7 +177,7 @@ def flux(mock: bool = False) -> Flux:
     )
 
 
-@device_factory(mock=True)
+@device_factory()
 def dcm() -> DCM:
     """Get the i04 DCM device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
@@ -188,7 +188,7 @@ def dcm() -> DCM:
     )
 
 
-@device_factory(mock=True)
+@device_factory()
 def backlight() -> Backlight:
     """Get the i04 backlight device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
@@ -199,7 +199,7 @@ def backlight() -> Backlight:
     )
 
 
-@device_factory(mock=True)
+@device_factory()
 def aperture_scatterguard() -> ApertureScatterguard:
     """Get the i04 aperture and scatterguard device, instantiate it if it hasn't already
     been. If this is called when already instantiated in i04, it will return the existing
@@ -235,7 +235,7 @@ def eiger(mock: bool = False, params: DetectorParams | None = None) -> EigerDete
     )
 
 
-@device_factory(mock=True)
+@device_factory()
 def zebra_fast_grid_scan() -> ZebraFastGridScan:
     """Get the i04 zebra_fast_grid_scan device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
@@ -246,7 +246,7 @@ def zebra_fast_grid_scan() -> ZebraFastGridScan:
     )
 
 
-@device_factory(mock=True)
+@device_factory()
 def s4_slit_gaps(mock: bool = False) -> S4SlitGaps:
     """Get the i04 s4_slit_gaps device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
@@ -260,7 +260,7 @@ def s4_slit_gaps(mock: bool = False) -> S4SlitGaps:
     )
 
 
-@device_factory(mock=True)
+@device_factory()
 def undulator() -> Undulator:
     """Get the i04 undulator device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
@@ -272,7 +272,7 @@ def undulator() -> Undulator:
     )
 
 
-@device_factory(skip=BL == "s04", mock=True)
+@device_factory(skip=BL == "s04")
 def synchrotron() -> Synchrotron:
     """Get the i04 synchrotron device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
@@ -283,7 +283,7 @@ def synchrotron() -> Synchrotron:
     )
 
 
-@device_factory(mock=True)
+@device_factory()
 def zebra() -> Zebra:
     """Get the i04 zebra device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
@@ -295,7 +295,9 @@ def zebra() -> Zebra:
     )
 
 
-@device_factory(skip=BL == "s04", mock=True)
+@device_factory(
+    skip=BL == "s04",
+)
 def oav(params: OAVConfig | None = None) -> OAVBeamCentrePV:
     """Get the i04 OAV device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
@@ -306,7 +308,9 @@ def oav(params: OAVConfig | None = None) -> OAVBeamCentrePV:
     )
 
 
-@device_factory(skip=BL == "s04", mock=True)
+@device_factory(
+    skip=BL == "s04",
+)
 def oav_full_screen(params: OAVConfig | None = None) -> OAVBeamCentrePV:
     """Get the i04 OAV device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
@@ -318,7 +322,9 @@ def oav_full_screen(params: OAVConfig | None = None) -> OAVBeamCentrePV:
     )
 
 
-@device_factory(skip=BL == "s04", mock=True)
+@device_factory(
+    skip=BL == "s04",
+)
 def detector_motion() -> DetectorMotion:
     """Get the i04 detector motion device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
@@ -329,7 +335,7 @@ def detector_motion() -> DetectorMotion:
     )
 
 
-@device_factory(mock=True)
+@device_factory()
 def thawer() -> Thawer:
     """Get the i04 thawer, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
@@ -340,7 +346,7 @@ def thawer() -> Thawer:
     )
 
 
-@device_factory(mock=True)
+@device_factory()
 def robot() -> BartRobot:
     """Get the i04 robot device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
@@ -352,7 +358,7 @@ def robot() -> BartRobot:
 
 
 @device_factory()
-def oav_to_redis_forwarder(mock=True) -> OAVToRedisForwarder:
+def oav_to_redis_forwarder() -> OAVToRedisForwarder:
     """Get the i04 OAV to redis forwarder, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
     """
@@ -365,7 +371,7 @@ def oav_to_redis_forwarder(mock=True) -> OAVToRedisForwarder:
     )
 
 
-@device_factory(mock=True)
+@device_factory()
 def murko_results() -> MurkoResultsDevice:
     """Get the i04 OAV to redis forwarder, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
@@ -378,7 +384,7 @@ def murko_results() -> MurkoResultsDevice:
     )
 
 
-@device_factory(mock=True)
+@device_factory()
 def diamond_filter() -> DiamondFilter[I04Filters]:
     """Get the i04 diamond filter device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
@@ -388,7 +394,7 @@ def diamond_filter() -> DiamondFilter[I04Filters]:
     )
 
 
-@device_factory(mock=True)
+@device_factory()
 def zocalo() -> ZocaloResults:
     """Get the i04 ZocaloResults device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
@@ -396,8 +402,8 @@ def zocalo() -> ZocaloResults:
     return ZocaloResults(channel="xrc.i04")
 
 
-@device_factory(mock=True)
-def pin_tip_detection(mock=True) -> PinTipDetection:
+@device_factory()
+def pin_tip_detection() -> PinTipDetection:
     """Get the i04 pin tip detection device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
     """
