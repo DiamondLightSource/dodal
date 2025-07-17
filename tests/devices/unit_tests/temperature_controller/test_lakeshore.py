@@ -1,8 +1,11 @@
+from unittest.mock import ANY
+
 import numpy as np
 import pytest
 from bluesky.plan_stubs import abs_set
 from bluesky.run_engine import RunEngine
 from ophyd_async.core import init_devices
+from ophyd_async.testing import assert_configuration
 
 from dodal.devices.temperture_controller import (
     LAKESHORE336_HEATER_SETTING,
@@ -34,7 +37,7 @@ async def test_lakeshore_set_success(
 ):
     RE(abs_set(lakeshore.control_channel, control_channel))
     temperature = np.random.uniform(10, 400)
-    RE(abs_set(lakeshore, temperature))
+    RE(abs_set(lakeshore, temperature), wait=True)
 
     assert (
         await lakeshore.temperature.setpoint[
@@ -60,7 +63,7 @@ async def test_lakeshore_set_success_fail_outside_limit(
         await lakeshore.set(temperature)
 
 
-async def test_lakeshore_set_success_fail_unavaiable_channel(
+async def test_lakeshore_set_success_fail_unavailable_channel(
     lakeshore: Lakeshore, RE: RunEngine
 ):
     with pytest.raises(
@@ -68,3 +71,39 @@ async def test_lakeshore_set_success_fail_unavaiable_channel(
         match=f"Control channels must be between 1 and {len(lakeshore.PID.p)}.",
     ):
         await lakeshore._set_control_channel(0)
+
+
+@pytest.mark.parametrize(
+    "control_channel",
+    [
+        1,
+        2,
+        3,
+        4,
+    ],
+)
+async def test_lakeshore__set_control_channel_correctly_set_up_readableFormat(
+    lakeshore: Lakeshore, RE: RunEngine, control_channel: int
+):
+    RE(abs_set(lakeshore.control_channel, control_channel), wait=True)
+    assert lakeshore.hints == {
+        "fields": [
+            f"lakeshore-temperature-readback-{control_channel}",
+            f"lakeshore-temperature-setpoint-{control_channel}",
+        ],
+    }
+    expected_config = {
+        f"lakeshore-PID-d-{control_channel}": {
+            "value": ANY,
+        },
+        f"lakeshore-PID-i-{control_channel}": {
+            "value": ANY,
+        },
+        f"lakeshore-PID-p-{control_channel}": {
+            "value": ANY,
+        },
+        "lakeshore-_control_channel": {
+            "value": control_channel,
+        },
+    }
+    await assert_configuration(lakeshore, expected_config, full_match=False)
