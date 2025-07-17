@@ -46,10 +46,9 @@ from dodal.devices.zocalo import ZocaloResults
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
-ZOOM_PARAMS_FILE = (
-    "/dls_sw/i04/software/gda/configurations/i04-config/xml/jCameraManZoomLevels.xml"
-)
-DISPLAY_CONFIG = "/dls_sw/i04/software/gda_versions/var/display.configuration"
+# Use BlueAPI scratch until https://github.com/DiamondLightSource/mx-bluesky/issues/1097 is done
+ZOOM_PARAMS_FILE = "/dls_sw/i04/software/bluesky/scratch/jCameraManZoomLevels.xml"
+DISPLAY_CONFIG = "/dls_sw/i04/software/bluesky/scratch/display.configuration"
 DAQ_CONFIGURATION_PATH = "/dls_sw/i04/software/daq_configuration"
 
 
@@ -296,7 +295,9 @@ def zebra() -> Zebra:
     )
 
 
-@device_factory(skip=BL == "s04")
+@device_factory(
+    skip=BL == "s04",
+)
 def oav(params: OAVConfig | None = None) -> OAVBeamCentrePV:
     """Get the i04 OAV device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
@@ -307,7 +308,9 @@ def oav(params: OAVConfig | None = None) -> OAVBeamCentrePV:
     )
 
 
-@device_factory(skip=BL == "s04")
+@device_factory(
+    skip=BL == "s04",
+)
 def oav_full_screen(params: OAVConfig | None = None) -> OAVBeamCentrePV:
     """Get the i04 OAV device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
@@ -319,7 +322,9 @@ def oav_full_screen(params: OAVConfig | None = None) -> OAVBeamCentrePV:
     )
 
 
-@device_factory(skip=BL == "s04")
+@device_factory(
+    skip=BL == "s04",
+)
 def detector_motion() -> DetectorMotion:
     """Get the i04 detector motion device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
