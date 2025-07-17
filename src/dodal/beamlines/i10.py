@@ -226,9 +226,7 @@ def rasor_femto_drain_scaler_det() -> CurrentAmpDet:
 
 @device_factory()
 def temperature_controller() -> Lakeshore340:
-    """Lakeshore temperature controller, it can control temperature via
-    temperature_controller.temperature.set(<temperature>).
-    """
+    """Lakeshore 340 temperature controller(Rasor sample)"""
     return Lakeshore340(
         prefix="ME01D-EA-TCTRL-01:",
         no_channels=4,

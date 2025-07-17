@@ -17,9 +17,8 @@ PREFIX = BeamlinePrefix(BL)
 
 @device_factory()
 def temperature_controller() -> Lakeshore336:
-    """Lakeshore temperature controller, it can control temperature via
-    temperature_controller.temperature.set(<temperature>).
-    """
+    """Lakeshore 336 controller (Sample stage)"""
+
     return Lakeshore336(
         prefix=f"{PREFIX.beamline_prefix}-EA-TCTRL-01:",
         no_channels=4,
