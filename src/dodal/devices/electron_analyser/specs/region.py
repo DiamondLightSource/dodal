@@ -14,10 +14,10 @@ class SpecsRegion(AbstractBaseRegion[AcquisitionMode, TLensMode], Generic[TLensM
     # Override base class with defaults
     lens_mode: TLensMode
     pass_energy: int = 5
+    acquire_time: float = 1.0
     acquisition_mode: AcquisitionMode = AcquisitionMode.FIXED_TRANSMISSION
     low_energy: float = Field(default=800, alias="start_energy")
     high_energy: float = Field(default=850, alias="end_energy")
-    step_time: float = Field(default=1.0, alias="exposure_time")
     energy_step: float = Field(default=0.1, alias="step_energy")
     # Specific to this class
     values: int = 1

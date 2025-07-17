@@ -25,7 +25,7 @@ class VGScientaRegion(
     acquisition_mode: AcquisitionMode = AcquisitionMode.SWEPT
     low_energy: float = 8.0
     high_energy: float = 10.0
-    step_time: float = 1.0
+    acquire_time: float = 1.0
     energy_step: float = Field(default=200.0)
     # Specific to this class
     id: str = Field(default=str(uuid.uuid4()), alias="region_id")
