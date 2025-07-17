@@ -8,7 +8,7 @@ from dodal.devices.electron_analyser.vgscienta import (
     VGScientaDetector,
 )
 from dodal.devices.i09 import LensMode, PassEnergy, PsuMode
-from tests.devices.unit_tests.electron_analyser.util import create_analyser_device
+from tests.devices.unit_tests.electron_analyser.helpers import create_analyser_device
 
 
 @pytest.fixture
@@ -26,6 +26,7 @@ async def test_analyser_vgscienta_detector_image_shape(
     RE: RunEngine,
 ) -> None:
     driver = sim_detector.driver
+    prefix = driver.name + "-"
 
     energy_axis = np.array([1, 2, 3, 4, 5])
     angle_axis = np.array([1, 2])
@@ -33,7 +34,7 @@ async def test_analyser_vgscienta_detector_image_shape(
     set_mock_value(driver.angle_axis, angle_axis)
 
     describe = await sim_detector.describe()
-    assert describe[driver.name + "-image"]["shape"] == [
+    assert describe[f"{prefix}image"]["shape"] == [
         len(angle_axis),
         len(energy_axis),
     ]
