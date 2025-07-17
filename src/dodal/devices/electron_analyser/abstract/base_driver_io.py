@@ -1,7 +1,6 @@
 import asyncio
 from abc import ABC, abstractmethod
 from collections.abc import Mapping
-from typing import Annotated as A
 from typing import Generic, TypeVar
 
 import numpy as np
@@ -10,7 +9,6 @@ from ophyd_async.core import (
     Array1D,
     AsyncStatus,
     SignalR,
-    SignalRW,
     StandardReadable,
     StandardReadableFormat,
     derived_signal_r,
@@ -18,7 +16,7 @@ from ophyd_async.core import (
 )
 from ophyd_async.epics.adcore import ADBaseIO
 from ophyd_async.epics.core import (
-    PvSuffix,
+    epics_signal_r,
     epics_signal_rw,
 )
 
@@ -31,25 +29,10 @@ from dodal.devices.electron_analyser.enums import EnergyMode
 from dodal.devices.electron_analyser.util import to_binding_energy, to_kinetic_energy
 
 
-class AnalyserDriverBaseIO:
-    """
-    Base class with PVs common for all electron analyser drivers.
-    """
-
-    image: A[SignalR[Array1D[np.double]], PvSuffix("IMAGE")]
-    spectrum: A[SignalR[Array1D[np.float64]], PvSuffix("INT_SPECTRUM")]
-    total_steps: A[SignalR[int], PvSuffix("TOTAL_POINTS_RBV")]
-    low_energy: A[SignalRW[float], PvSuffix.rbv("LOW_ENERGY")]
-    high_energy: A[SignalRW[float], PvSuffix.rbv("HIGH_ENERGY")]
-    energy_step: A[SignalRW[float], PvSuffix.rbv("STEP_SIZE")]
-    slices: A[SignalRW[int], PvSuffix.rbv("SLICES")]
-
-
 class AbstractAnalyserDriverIO(
     ABC,
     StandardReadable,
     ADBaseIO,
-    AnalyserDriverBaseIO,
     Movable[TAbstractBaseRegion],
     Generic[TAbstractBaseRegion, TAcquisitionMode, TLensMode],
 ):
@@ -68,87 +51,71 @@ class AbstractAnalyserDriverIO(
     ) -> None:
         """
         Constructor method for setting up electron analyser.
-
         Args:
             prefix: Base PV to connect to EPICS for this device.
             acquisition_mode_type: Enum that determines the available acquisition modes
-                                   for this device.
+                                for this device.
             lens_mode_type: Enum that determines the available lens mode for this
                             device.
             energy_sources: Map that pairs a source name to an energy value signal
                             (in eV).
             name: Name of the device.
         """
-        self.energy_sources = energy_sources
-        self.acquisition_mode_type = acquisition_mode_type
-        self.lens_mode_type = lens_mode_type
 
         # called first to initiate all pydantic parents classes
         super().__init__(prefix=prefix, name=name)
 
-        # add all necessary analyser signals
-        self.iterations = epics_signal_rw(int, prefix + "NumExposures")
-        self.lens_mode = epics_signal_rw(lens_mode_type, prefix + "LENS_MODE")
-        self.pass_energy = epics_signal_rw(
-            self.pass_energy_type, prefix + "PASS_ENERGY"
-        )
+        self.energy_sources = energy_sources
+        self.acquisition_mode_type = acquisition_mode_type
+        self.lens_mode_type = lens_mode_type
+        with self.add_children_as_readables():
+            self.image = epics_signal_r(Array1D[np.float64], prefix + "IMAGE")
+            self.spectrum = epics_signal_r(Array1D[np.float64], prefix + "INT_SPECTRUM")
+            self.total_intensity = derived_signal_r(
+                self._calculate_total_intensity, spectrum=self.spectrum
+            )
+            self.excitation_energy = soft_signal_rw(float, initial_value=0, units="eV")
 
-        self.acquisition_mode = epics_signal_rw(
-            acquisition_mode_type, prefix + "ACQ_MODE"
-        )
-        self.region_name = soft_signal_rw(str, initial_value="null")
-        self.energy_mode = soft_signal_rw(EnergyMode, initial_value=EnergyMode.KINETIC)
-        self.excitation_energy_source = soft_signal_rw(str, initial_value="")
-        self.excitation_energy = soft_signal_rw(float, initial_value=0, units="eV")
-        self.energy_axis = self._create_energy_axis_signal(prefix)
-        self.angle_axis = self._create_angle_axis_signal(prefix)
-        self.binding_energy_axis = derived_signal_r(
-            self._calculate_binding_energy_axis,
-            "eV",
-            energy_axis=self.energy_axis,
-            excitation_energy=self.excitation_energy,
-            energy_mode=self.energy_mode,
-        )
-        self.total_intensity = derived_signal_r(
-            self._calculate_total_intensity, spectrum=self.spectrum
-        )
-        self.total_time = derived_signal_r(
-            self._calculate_total_time,
-            "s",
-            total_steps=self.total_steps,
-            step_time=self.acquire_time,
-            iterations=self.iterations,
-        )
+        with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
+            # Used for setting up region data acquisition.
+            self.region_name = soft_signal_rw(str, initial_value="null")
+            self.energy_mode = soft_signal_rw(
+                EnergyMode, initial_value=EnergyMode.KINETIC
+            )
+            self.low_energy = epics_signal_rw(float, prefix + "LOW_ENERGY")
+            self.high_energy = epics_signal_rw(float, prefix + "HIGH_ENERGY")
+            self.slices = epics_signal_rw(int, prefix + "SLICES")
+            self.lens_mode = epics_signal_rw(lens_mode_type, prefix + "LENS_MODE")
+            self.pass_energy = epics_signal_rw(
+                self.pass_energy_type, prefix + "PASS_ENERGY"
+            )
+            self.energy_step = epics_signal_rw(float, prefix + "STEP_SIZE")
+            self.iterations = epics_signal_rw(int, prefix + "NumExposures")
+            self.acquisition_mode = epics_signal_rw(
+                acquisition_mode_type, prefix + "ACQ_MODE"
+            )
+            self.excitation_energy_source = soft_signal_rw(str, initial_value="")
 
-        # configure per point signals
-        self.add_readables(
-            [self.image, self.spectrum, self.total_intensity, self.excitation_energy]
-        )
-
-        # configure per scan signals
-        self.add_readables(
-            [
-                self.low_energy,
-                self.high_energy,
-                self.energy_step,
-                self.slices,
-                self.image_mode,
-                self.region_name,
-                self.energy_mode,
-                self.lens_mode,
-                self.pass_energy,
-                self.iterations,
-                self.acquisition_mode,
-                self.excitation_energy_source,
-                self.energy_axis,
-                self.binding_energy_axis,
-                self.angle_axis,
-                self.acquire_time,
-                self.total_steps,
-                self.total_time,
-            ],
-            StandardReadableFormat.CONFIG_SIGNAL,
-        )
+        with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
+            # Read once per scan after data acquired
+            self.acquire_time = self.acquire_time
+            self.energy_axis = self._create_energy_axis_signal(prefix)
+            self.binding_energy_axis = derived_signal_r(
+                self._calculate_binding_energy_axis,
+                "eV",
+                energy_axis=self.energy_axis,
+                excitation_energy=self.excitation_energy,
+                energy_mode=self.energy_mode,
+            )
+            self.angle_axis = self._create_angle_axis_signal(prefix)
+            self.total_steps = epics_signal_r(int, prefix + "TOTAL_POINTS_RBV")
+            self.total_time = derived_signal_r(
+                self._calculate_total_time,
+                "s",
+                total_steps=self.total_steps,
+                step_time=self.acquire_time,
+                iterations=self.iterations,
+            )
 
     @AsyncStatus.wrap
     async def set(self, region: TAbstractBaseRegion):

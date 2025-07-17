@@ -21,17 +21,21 @@ from dodal.devices.electron_analyser.vgscienta import (
 
 TEST_DATA_PATH = "tests/test_data/electron_analyser/"
 
-TEST_VGSCIENTA_SEQUENCE = os.path.join(TEST_DATA_PATH, "vgscienta_sequence.seq")
-TEST_SPECS_SEQUENCE = os.path.join(TEST_DATA_PATH, "specs_sequence.seq")
+TEST_LEGACY_VGSCIENTA_SEQUENCE = os.path.join(
+    TEST_DATA_PATH, "vgscienta_legacy_sequence.seq"
+)
+TEST_NEW_SCIENTA_SEQUENCE = os.path.join(TEST_DATA_PATH, "vgscienta_new_sequence.seq")
+TEST_LEGACY_SPECS_SEQUENCE = os.path.join(TEST_DATA_PATH, "specs_legacy_sequence.seq")
+TEST_NEW_SPECS_SEQUENCE = os.path.join(TEST_DATA_PATH, "specs_new_sequence.seq")
 
 SEQUENCE_KEY = 0
 SEQUENCE_TYPE_KEY = 1
 
 TEST_SEQUENCES = {
-    VGScientaDetector: [TEST_VGSCIENTA_SEQUENCE, VGScientaSequence],
-    VGScientaAnalyserDriverIO: [TEST_VGSCIENTA_SEQUENCE, VGScientaSequence],
-    SpecsDetector: [TEST_SPECS_SEQUENCE, SpecsSequence],
-    SpecsAnalyserDriverIO: [TEST_SPECS_SEQUENCE, SpecsSequence],
+    VGScientaDetector: [TEST_LEGACY_VGSCIENTA_SEQUENCE, VGScientaSequence],
+    VGScientaAnalyserDriverIO: [TEST_LEGACY_VGSCIENTA_SEQUENCE, VGScientaSequence],
+    SpecsDetector: [TEST_LEGACY_SPECS_SEQUENCE, SpecsSequence],
+    SpecsAnalyserDriverIO: [TEST_LEGACY_SPECS_SEQUENCE, SpecsSequence],
 }
 
 
@@ -60,6 +64,9 @@ def assert_region_has_expected_values(
 ) -> None:
     for key in r.__dict__:
         if key in expected_region_values:
+            print(key)
+            print(f" Region value from file: {r.__dict__[key]}")
+            print(f" Expected value: {expected_region_values[key]}")
             assert r.__dict__[key] == expected_region_values[key]
         else:
             raise KeyError('key "' + key + '" is not in the expected values.')
