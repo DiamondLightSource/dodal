@@ -9,7 +9,6 @@ from ophyd_async.testing import (
     assert_configuration,
     assert_value,
     get_mock_put,
-    partial_reading,
     set_mock_value,
 )
 
@@ -72,27 +71,18 @@ async def test_analyser_sets_region_and_configuration_is_correct(
 
     prefix = sim_driver.name + "-"
     specs_expected_config_reading = {
-        f"{prefix}centre_energy": partial_reading(
-            await sim_driver.centre_energy.get_value()
-        ),
-        f"{prefix}energy_step": partial_reading(
-            await sim_driver.energy_step.get_value()
-        ),
-        f"{prefix}snapshot_values": partial_reading(region.values),
-        f"{prefix}psu_mode": partial_reading(region.psu_mode),
+        f"{prefix}centre_energy": {"value": await sim_driver.centre_energy.get_value()},
+        f"{prefix}energy_step": {"value": await sim_driver.energy_step.get_value()},
+        f"{prefix}snapshot_values": {"value": region.values},
+        f"{prefix}psu_mode": {"value": region.psu_mode},
     }
 
     full_expected_config = (
         expected_abstract_driver_config_reading | specs_expected_config_reading
     )
 
-    # Check exact match by combining expected specs specific config reading with
-    # abstract one
-    await assert_configuration(
-        sim_driver,
-        full_expected_config,
-        full_match=True,
-    )
+    # Check match by combining expected specs specific config reading with abstract one
+    await assert_configuration(sim_driver, full_expected_config)
 
 
 @pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)

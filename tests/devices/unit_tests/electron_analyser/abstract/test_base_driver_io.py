@@ -6,7 +6,6 @@ from bluesky.run_engine import RunEngine
 from bluesky.utils import FailedStatus
 from ophyd_async.core import SignalR, StrictEnum
 from ophyd_async.testing import (
-    assert_configuration,
     assert_reading,
     get_mock_put,
 )
@@ -88,12 +87,13 @@ async def test_abstract_analyser_sets_region_and_configuration_is_correct(
         region.iterations, wait=True
     )
 
+    # With next ophyd-async release, uncomment below
     # Check partial match as different analysers will have more fields
-    await assert_configuration(
-        sim_driver,
-        expected_abstract_driver_config_reading,
-        full_match=False,
-    )
+    # await assert_configuration(
+    #     sim_driver,
+    #     expected_abstract_driver_config_reading,
+    #     full_match=False,
+    # )
 
 
 @pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
@@ -113,7 +113,6 @@ async def test_abstract_analyser_sets_region_and_reading_is_correct(
     await assert_reading(
         sim_driver,
         expected_abstract_driver_describe_reading,
-        full_match=True,
     )
 
 
