@@ -60,7 +60,7 @@ async def test_analyser_sets_region_and_reads_correctly(
     ).get_value()
 
     expected_centre_e = to_kinetic_energy(
-        region.fix_energy,
+        region.centre_energy,
         region.energy_mode,
         excitation_energy,
     )

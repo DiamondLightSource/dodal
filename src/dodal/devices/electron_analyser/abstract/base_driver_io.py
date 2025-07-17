@@ -90,6 +90,7 @@ class AbstractAnalyserDriverIO(
                 EnergyMode, initial_value=EnergyMode.KINETIC
             )
             self.low_energy = epics_signal_rw(float, prefix + "LOW_ENERGY")
+            self.centre_energy = epics_signal_rw(float, prefix + "CENTRE_ENERGY")
             self.high_energy = epics_signal_rw(float, prefix + "HIGH_ENERGY")
             self.slices = epics_signal_rw(int, prefix + "SLICES")
             self.lens_mode = epics_signal_rw(lens_mode_type, prefix + "LENS_MODE")
@@ -127,6 +128,18 @@ class AbstractAnalyserDriverIO(
 
         super().__init__(prefix=prefix, name=name)
 
+    def _can_set_centre_energy(self, region: TAbstractBaseRegion) -> bool:
+        """
+        Determine if we can set the centre energy, can be overwritten by sub classes.
+        """
+        return True
+
+    def _can_set_energy_step(self, region: TAbstractBaseRegion) -> bool:
+        """
+        Determine if we can set the energy step, can be overwritten by sub classes.
+        """
+        return True
+
     @AsyncStatus.wrap
     async def set(self, region: TAbstractBaseRegion):
         """
@@ -143,10 +156,13 @@ class AbstractAnalyserDriverIO(
         low_energy = to_kinetic_energy(
             region.low_energy, region.energy_mode, excitation_energy
         )
+        centre_energy = to_kinetic_energy(
+            region.centre_energy, region.energy_mode, excitation_energy
+        )
         high_energy = to_kinetic_energy(
             region.high_energy, region.energy_mode, excitation_energy
         )
-        await asyncio.gather(
+        signals_to_set = [
             self.region_name.set(region.name),
             self.energy_mode.set(region.energy_mode),
             self.low_energy.set(low_energy),
@@ -158,7 +174,16 @@ class AbstractAnalyserDriverIO(
             self.acquisition_mode.set(region.acquisition_mode),
             self.excitation_energy.set(excitation_energy),
             self.excitation_energy_source.set(source.name),
-        )
+        ]
+
+        # Check if we can move below signals as depends on certain implementations
+        if self._can_set_centre_energy(region):
+            signals_to_set.append(self.centre_energy.set(centre_energy))
+
+        if self._can_set_energy_step(region):
+            signals_to_set.append(self.energy_step.set(region.energy_step))
+
+        await asyncio.gather(*signals_to_set)
 
     def _get_energy_source(self, alias_name: str) -> SignalR[float]:
         energy_source = self.energy_sources.get(alias_name)

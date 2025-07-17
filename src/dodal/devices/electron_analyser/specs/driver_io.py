@@ -18,7 +18,6 @@ from dodal.devices.electron_analyser.abstract.base_driver_io import (
 from dodal.devices.electron_analyser.abstract.types import TLensMode, TPsuMode
 from dodal.devices.electron_analyser.specs.enums import AcquisitionMode
 from dodal.devices.electron_analyser.specs.region import SpecsRegion
-from dodal.devices.electron_analyser.util import to_kinetic_energy
 
 
 class SpecsAnalyserDriverIO(
@@ -42,7 +41,6 @@ class SpecsAnalyserDriverIO(
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             # Used for setting up region data acquisition.
             self.snapshot_values = epics_signal_rw(int, prefix + "VALUES")
-            self.centre_energy = epics_signal_rw(float, prefix + "KINETIC_ENERGY")
 
         # Used to calculate the angle axis.
         self.min_angle_axis = epics_signal_r(float, prefix + "Y_MIN_RBV")
@@ -63,24 +61,25 @@ class SpecsAnalyserDriverIO(
             name=name,
         )
 
+    def _can_set_centre_energy(self, region: SpecsRegion[TLensMode, TPsuMode]) -> bool:
+        """
+        Overwritten abstract class method to add condition on setting centre energy
+        """
+        return region.acquisition_mode == AcquisitionMode.FIXED_ENERGY
+
+    def _can_set_energy_step(self, region: SpecsRegion[TLensMode, TPsuMode]) -> bool:
+        """
+        Overwritten abstract class method to add condition on setting energy_step
+        """
+        return region.acquisition_mode == AcquisitionMode.FIXED_TRANSMISSION
+
     @AsyncStatus.wrap
     async def set(self, region: SpecsRegion[TLensMode, TPsuMode]):
-        await super().set(region)
-
         await asyncio.gather(
+            super().set(region),
             self.snapshot_values.set(region.values),
             self.psu_mode.set(region.psu_mode),
         )
-        if region.acquisition_mode == AcquisitionMode.FIXED_TRANSMISSION:
-            await self.energy_step.set(region.energy_step)
-
-        if self.acquisition_mode == AcquisitionMode.FIXED_ENERGY:
-            source = self._get_energy_source(region.excitation_energy_source)
-            excitation_energy = await source.get_value()
-            centre_energy = to_kinetic_energy(
-                region.centre_energy, region.energy_mode, excitation_energy
-            )
-            await self.centre_energy.set(centre_energy)
 
     def _create_angle_axis_signal(self, prefix: str) -> SignalR[Array1D[np.float64]]:
         angle_axis = derived_signal_r(
