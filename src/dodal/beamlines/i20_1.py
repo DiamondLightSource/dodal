@@ -16,12 +16,6 @@ from dodal.devices.xspress3.xspress3 import Xspress3
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
-# introduces dependency on 'velocityprofile' package 
-from ophyd_async.epics.pmac import (
-    Pmac,
-    PmacMotor,
-)
-
 BL = get_beamline_name("i20-1")
 PREFIX = BeamlinePrefix(BL, suffix="J")
 set_log_beamline(BL)
@@ -40,6 +34,12 @@ set_path_provider(
         client=RemoteDirectoryServiceClient("http://i20-1-control:8088/api"),
     )
 )
+
+"""
+NOTE: Due to the CA gateway machine being switched off, PVs are not available remotely
+and you need to be on the beamline network to access them.
+The simplest way to do this is to `ssh i20-1-ws001` and run dodal connect i20_1 from there.
+"""
 
 @device_factory()
 def turbo_slit() -> TurboSlit:
@@ -63,16 +63,6 @@ def panda() -> HDFPanda:
         f"{PREFIX.beamline_prefix}-EA-PANDA-02:", path_provider=get_path_provider())
 
 
-@device_factory() 
-def pmac() -> Pmac :
-    return Pmac(f"{PREFIX.beamline_prefix}-MO-STEP-06")
-
-
-@device_factory()
-def turbo_slit_x_pmacmotor() -> PmacMotor :
-    return PmacMotor(prefix=f"{PREFIX.beamline_prefix}-OP-PCHRO-01:TS:XFINE")
-
-
 # Use mock device until motors are reconnected on the beamline
 @device_factory(mock=True)
 def alignment_x() -> Motor:
@@ -94,9 +84,3 @@ def xspress3() -> Xspress3:
         f"{PREFIX.beamline_prefix}-EA-DET-03:",
         num_channels=16,
     )
-
-
-# Skip device - synchrotron PVs are not available (CA gateway machine has been removed)
-@device_factory(skip=True)
-def synchrotron() -> Synchrotron:
-    return Synchrotron()
