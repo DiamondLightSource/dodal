@@ -1,6 +1,6 @@
 import asyncio
 from datetime import timedelta
-from unittest.mock import ANY, AsyncMock, MagicMock, patch
+from unittest.mock import ANY, AsyncMock, MagicMock, call, patch
 
 import pytest
 from ophyd_async.core import init_devices
@@ -138,6 +138,17 @@ async def test_when_get_frame_and_put_to_redis_called_then_data_put_in_redis_wit
     redis_expire_call = oav_forwarder.redis_client.expire.call_args[0]
     assert redis_expire_call[0] == "murko:100:raw"
     assert redis_expire_call[1] == timedelta(days=oav_forwarder.DATA_EXPIRY_DAYS)
+
+
+async def test_when_get_frame_and_put_to_redis_called_then_data_put_in_redis_before_uuid_set(
+    oav_forwarder,
+):
+    # The uuid being set produces an event that downstream processing relies on to know data is valid
+    parent_mock = MagicMock()
+    parent_mock.attach_mock(oav_forwarder.redis_client.hset, "redis")
+    oav_forwarder.uuid_setter = MagicMock(name="uuid", parent=parent_mock)
+    await oav_forwarder._get_frame_and_put_to_redis(ANY, get_mock_response())
+    assert parent_mock.method_calls == [call.redis(ANY, ANY, ANY), call.uuid(ANY)]
 
 
 @pytest.mark.parametrize(
