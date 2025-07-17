@@ -17,7 +17,7 @@ from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
 from dodal.devices.motors import XYZStage
 
-HOME_STR = r"\#1hmz\#2hmz\#3hmz"  # Command to home the PMAC motors
+HOME_STR = r"\#5hmz\#6hmz\#7hmz"  # Command to home the PMAC motors
 ZERO_STR = "!x0y0z0"  # Command to blend any ongoing move into new position
 
 
@@ -211,8 +211,8 @@ class PMAC(XYZStage):
 
         # These next signals are readback values on PVARS which are set by the motion
         # program.
-        self.scanstatus = epics_signal_r(float, "BL24I-MO-STEP-14:signal:P2401")
-        self.counter = epics_signal_r(float, "BL24I-MO-STEP-14:signal:P2402")
+        self.scanstatus = epics_signal_r(float, "BL24I-MO-STEP-13:pmac:read:P2401")
+        self.counter = epics_signal_r(float, "BL24I-MO-STEP-13:pmac:read:P2402")
 
         # A couple of soft signals for running a collection: program number to send to
         # the PMAC_STRING and expected collection time.
