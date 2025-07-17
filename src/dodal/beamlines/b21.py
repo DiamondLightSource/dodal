@@ -41,25 +41,25 @@ set_path_provider(
 )
 
 
-@device_factory(skip=True)
+@device_factory()
 def saxs() -> EigerDetector:
     return EigerDetector(
         prefix=PREFIX.beamline_prefix,
         path_provider=get_path_provider(),
         drv_suffix="-EA-EIGER-01:",
         hdf_suffix="-EA-EIGER-01:OD:",
-        # odin_nodes=1, # TODO: https://github.com/bluesky/ophyd-async/issues/923
+        odin_nodes=1,
     )
 
 
-@device_factory(skip=True)
+@device_factory()
 def waxs() -> EigerDetector:
     return EigerDetector(
         prefix=PREFIX.beamline_prefix,
         path_provider=get_path_provider(),
         drv_suffix="-EA-EIGER-02:",
         hdf_suffix="-EA-EIGER-02:OD:",
-        # odin_nodes=1, # TODO: https://github.com/bluesky/ophyd-async/issues/923
+        odin_nodes=1,
     )
 
 
