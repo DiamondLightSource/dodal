@@ -18,6 +18,7 @@ dodal.devices.i09
    ~i09.Grating
    ~i09.LensMode
    ~i09.PsuMode
+   ~i09.PassEnergy
 
 
 
