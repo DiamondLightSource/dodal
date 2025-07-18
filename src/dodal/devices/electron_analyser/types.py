@@ -23,28 +23,35 @@ from dodal.devices.electron_analyser.vgscienta.detector import (
 AnyAcqMode = StrictEnum
 AnyLensMode = SupersetEnum | StrictEnum
 AnyPsuMode = SupersetEnum | StrictEnum
+AnyPassEnergy = StrictEnum | float
+AnyPassEnergyEnum = StrictEnum
 
 # Electron analyser types that encompasses all implementations, useful for tests and
 # plans
 ElectronAnalyserDetectorImpl = (
-    VGScientaDetector[AnyLensMode, AnyPsuMode] | SpecsDetector[AnyLensMode, AnyPsuMode]
+    VGScientaDetector[AnyLensMode, AnyPsuMode, AnyPassEnergyEnum]
+    | SpecsDetector[AnyLensMode, AnyPsuMode]
 )
 ElectronAnalyserDriverImpl = (
-    VGScientaAnalyserDriverIO[AnyLensMode, AnyPsuMode]
+    VGScientaAnalyserDriverIO[AnyLensMode, AnyPsuMode, AnyPassEnergyEnum]
     | SpecsAnalyserDriverIO[AnyLensMode, AnyPsuMode]
 )
 
 # Short hand the type so less verbose
-AbstractBaseRegion = AbstractBaseRegion[AnyAcqMode, AnyLensMode]
+AbstractBaseRegion = AbstractBaseRegion[AnyAcqMode, AnyLensMode, AnyPassEnergy]
 
 # Generic electron analyser types that supports full typing with the abstract classes.
 GenericElectronAnalyserDetector = ElectronAnalyserDetector[
-    AbstractAnalyserDriverIO[AbstractBaseRegion, AnyAcqMode, AnyLensMode, AnyPsuMode],
+    AbstractAnalyserDriverIO[
+        AbstractBaseRegion, AnyAcqMode, AnyLensMode, AnyPsuMode, AnyPassEnergy
+    ],
     AbstractBaseSequence[AbstractBaseRegion],
     AbstractBaseRegion,
 ]
 
 GenericElectronAnalyserRegionDetector = ElectronAnalyserRegionDetector[
-    AbstractAnalyserDriverIO[AbstractBaseRegion, AnyAcqMode, AnyLensMode, AnyPsuMode],
+    AbstractAnalyserDriverIO[
+        AbstractBaseRegion, AnyAcqMode, AnyLensMode, AnyPsuMode, AnyPassEnergy
+    ],
     AbstractBaseRegion,
 ]
