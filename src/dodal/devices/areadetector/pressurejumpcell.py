@@ -1,48 +1,51 @@
-from typing import get_args
+from collections.abc import Sequence
 
-from bluesky.protocols import HasHints, Hints
+from ophyd_async.core import PathProvider, SignalR
+from ophyd_async.epics.adcore import ADHDFWriter, ADWriter, AreaDetector, NDPluginBaseIO
 
-from ophyd_async.core import PathProvider, StandardDetector
-from ophyd_async.epics import adcore
+from .pressurejumpcell_controller import (
+    PRESSURE_CELL_READAOUT_TIME,
+    PressureJumpCellController,
+)
+from .pressurejumpcell_io import PressureJumpCellDriverIO
 
-from .pressurejumpcell_controller import PressureJumpCellController
-from .pressurejumpcell_io import PressureJumpCellDriverIO, PressureJumpCellAdcIO
 
-
-class PressureJumpCellDetector(StandardDetector, HasHints):
+class PressureJumpCellDetector(AreaDetector[PressureJumpCellController]):
     """
     Ophyd-async implementation of a Pressure Jump Cell ADC Detector for fast pressure jumps.
     The detector may be configured for an external trigger on the TTL Trig input.
     """
 
-    _controller: PressureJumpCellController
-    _writer: adcore.ADHDFWriter
-
     def __init__(
         self,
         prefix: str,
         path_provider: PathProvider,
+        readout_time: float = PRESSURE_CELL_READAOUT_TIME,
         drv_suffix="cam1:",
         adc_suffix="TRIG",
-        hdf_suffix="HDF1:",
+        writer_cls: type[ADWriter] = ADHDFWriter,
+        fileio_suffix: str | None = None,
         name="",
+        plugins: dict[str, NDPluginBaseIO] | None = None,
+        config_sigs: Sequence[SignalR] = (),
     ):
-        self.drv = PressureJumpCellDriverIO(prefix + drv_suffix)
-        self.adc = PressureJumpCellAdcIO(prefix + adc_suffix)
-        self.hdf = adcore.NDFileHDFIO(prefix + hdf_suffix)
 
-        super().__init__(
-            PressureJumpCellController(self.drv, self.adc),
-            adcore.ADHDFWriter(
-                self.hdf,
-                path_provider,
-                lambda: self.name,
-                adcore.ADBaseDatasetDescriber(self.drv),
-            ),
-            config_sigs=(self.drv.acquire_time,),
-            name=name,
+        driver = PressureJumpCellDriverIO(prefix + drv_suffix)
+        controller = PressureJumpCellController(driver, readout_time=readout_time)
+
+        writer = writer_cls.with_io(
+            prefix,
+            path_provider,
+            dataset_source=driver,
+            fileio_suffix=fileio_suffix,
+            plugins=plugins,
         )
 
-    @property
-    def hints(self) -> Hints:
-        return self._writer.hints
+        super().__init__(
+            controller=controller,
+            writer=writer,
+            plugins=plugins,
+            name=name,
+            config_sigs=config_sigs,
+        )
+

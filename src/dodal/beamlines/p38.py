@@ -15,12 +15,12 @@ from dodal.common.crystal_metadata import (
     make_crystal_metadata_from_material,
 )
 from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitPathProvider
+from dodal.devices.areadetector import PressureJumpCellDetector
 from dodal.devices.focusing_mirror import FocusingMirror
 from dodal.devices.i22.dcm import DCM
 from dodal.devices.i22.fswitch import FSwitch
 from dodal.devices.linkam3 import Linkam3
 from dodal.devices.pressure_jump_cell import PressureJumpCell
-from dodal.devices.areadetector import PressureJumpCellDetector
 from dodal.devices.slits import Slits
 from dodal.devices.tetramm import TetrammDetector
 from dodal.devices.undulator import UndulatorInKeV
@@ -222,6 +222,6 @@ def high_pressure_xray_cell_adc(
         fake_with_ophyd_sim,
         adc_suffix="TRIG:",
         drv_suffix="DET:",
-        hdf_suffix="FILE:", 
+        hdf_suffix="FILE:",
         path_provider=get_path_provider(),
     )
