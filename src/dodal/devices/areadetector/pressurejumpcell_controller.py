@@ -1,84 +1,59 @@
 import asyncio
-from typing import Optional, Tuple
 
 from ophyd_async.core import (
-    AsyncStatus,
-    DetectorController,
     DetectorTrigger,
-    set_and_wait_for_value,
+    TriggerInfo,
 )
 from ophyd_async.epics import adcore
 
 from .pressurejumpcell_io import (
-     PressureJumpCellDriverIO,
-     PressureJumpCellAdcIO, 
-     PressureJumpCellTriggerMode,
-     PressureJumpCellAdcTriggerMode,
+    PressureJumpCellDriverIO,
+    PressureJumpCellTriggerMode,
 )
 
+#TODO Find out what the readout time is and if it can be retrieved from the device
+PRESSURE_CELL_READAOUT_TIME = 1e-3
 
-#TODO Find out what the deadtime should be and if it can be retrieved from the device
-_HIGHEST_POSSIBLE_DEADTIME = 1e-3
 
+class PressureJumpCellController(adcore.ADBaseController[PressureJumpCellDriverIO]):
+    """`DetectorController` for a `PressureJumpCellDriverIO`."""
 
-class PressureJumpCellController(DetectorController):
     _supported_trigger_types = {
+        DetectorTrigger.INTERNAL: PressureJumpCellTriggerMode.INTERNAL,
+        DetectorTrigger.CONSTANT_GATE: PressureJumpCellTriggerMode.EXTERNAL,
+        DetectorTrigger.EDGE_TRIGGER: PressureJumpCellTriggerMode.EXTERNAL,
+        DetectorTrigger.VARIABLE_GATE: PressureJumpCellTriggerMode.EXTERNAL,
     }
-    
-    def __init__(self, driver: PressureJumpCellDriverIO, adc: PressureJumpCellAdcIO) -> None:
-        self._drv = driver
-        self._adc = adc
+
+    def __init__(
+        self,
+        driver: PressureJumpCellDriverIO,
+        good_states: frozenset[adcore.ADState] = adcore.DEFAULT_GOOD_STATES,
+        readout_time: float = PRESSURE_CELL_READAOUT_TIME,
+    ) -> None:
+        super().__init__(driver, good_states=good_states)
+        self._readout_time = readout_time
 
     def get_deadtime(self, exposure: float | None) -> float:
-        return _HIGHEST_POSSIBLE_DEADTIME
+        return self._readout_time
 
-    async def arm(
-        self,
-        num: int = 0,
-        trigger: DetectorTrigger = DetectorTrigger.INTERNAL,
-        exposure: Optional[float] = None,
-    ) -> AsyncStatus:
-        if num == 0:
-            image_mode = adcore.ADImageMode.CONTINUOUS
-        else:
-            image_mode = adcore.ADImageMode.MULTIPLE
-        if exposure is not None:
-            await self._drv.acquire_time.set(exposure)
-
-        trigger_mode, adc_trigger_mode = self._get_trigger_info(trigger)
-        
-        # trigger mode must be set first and on it's own!
-        await self._drv.trigger_mode.set(trigger_mode)
-        await self._adc.adc_trigger_mode.set(adc_trigger_mode)
-
-        await asyncio.gather(
-            self._drv.num_images.set(num),
-            self._drv.image_mode.set(image_mode),
-        )
-
-        status = await set_and_wait_for_value(self._drv.acquire, True)
-        return status
-
-    def _get_trigger_info(
-        self, trigger: DetectorTrigger
-    ) -> Tuple[PressureJumpCellTriggerMode, PressureJumpCellAdcTriggerMode]:
-        supported_trigger_types = (
-            DetectorTrigger.EDGE_TRIGGER,
-            DetectorTrigger.INTERNAL,
-        )
-        if trigger not in supported_trigger_types:
-            raise ValueError(
-                f"{self.__class__.__name__} only supports the following trigger "
-                f"types: {supported_trigger_types} but was asked to "
-                f"use {trigger}"
+    async def prepare(self, trigger_info: TriggerInfo):
+        if trigger_info.livetime is not None:
+            await self.set_exposure_time_and_acquire_period_if_supplied(
+                trigger_info.livetime
             )
-        if trigger == DetectorTrigger.INTERNAL:
-            return (PressureJumpCellTriggerMode.INTERNAL, PressureJumpCellAdcTriggerMode.CONTINUOUS)
-        else:
-            return (PressureJumpCellTriggerMode.EXTERNAL, PressureJumpCellAdcTriggerMode.SINGLE)
-
-    async def disarm(self):
-        await asyncio.gather( 
-            adcore.stop_busy_record(self._drv.acquire, False, timeout=1),
-            adcore.stop_busy_record(self._adc.acquire, False, timeout=1)
+        await asyncio.gather(
+            self.driver.trigger_mode.set(
+                self._supported_trigger_types[trigger_info.trigger]
+            ),
+            self.driver.num_images.set(
+                999_999
+                if trigger_info.total_number_of_exposures == 0
+                else trigger_info.total_number_of_exposures
+            ),
+            self.driver.image_mode.set(adcore.ADImageMode.MULTIPLE),
         )
+
+    async def arm(self):
+        # Standard arm the detector and wait for the acquire PV to be True
+        self._arm_status = await self.start_acquiring_driver_and_ensure_status()
