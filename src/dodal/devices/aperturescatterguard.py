@@ -202,13 +202,26 @@ class ApertureScatterguard(StandardReadable, Preparable):
 
         super().__init__(name)
 
+    async def _if_parked_then_unpark(self, position_to_move_to: ApertureValue):
+        current_ap_y = await self.aperture.y.user_readback.get_value()
+        current_ap_z = await self.aperture.z.user_readback.get_value()
+        if self._is_in_position(ApertureValue.PARKED, current_ap_y, current_ap_z):
+            position = self._loaded_positions[position_to_move_to]
+            await self.aperture.z.set(position.aperture_z)
+            await self._safe_move_whilst_in_beam(position)
+            return True
+        return False
+
     async def _set_current_aperture_position(self, value: ApertureValue) -> None:
         position = self._loaded_positions[value]
+
+        if await self._if_parked_then_unpark(value):
+            return
+
         await self._check_safe_to_move(position.aperture_z)
 
         if value == ApertureValue.OUT_OF_BEAM:
-            out_y = self._loaded_positions[ApertureValue.OUT_OF_BEAM].aperture_y
-            await self.aperture.y.set(out_y)
+            await self.aperture.y.set(position.aperture_y)
         else:
             await self._safe_move_whilst_in_beam(position)
 
@@ -337,6 +350,8 @@ class ApertureScatterguard(StandardReadable, Preparable):
         Moving the assembly whilst out of the beam has no collision risk so we can just
         move all the motors together.
         """
+        if await self._if_parked_then_unpark(value):
+            return
         current_y = await self.aperture.y.user_readback.get_value()
         current_z = await self.aperture.z.user_readback.get_value()
         if self._is_in_position(ApertureValue.OUT_OF_BEAM, current_y, current_z):

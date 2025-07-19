@@ -587,6 +587,68 @@ async def test_given_out_and_aperture_selected_when_move_in_then_correct_y_selec
     assert await y_setpoint.get_value() == aperture_position.aperture_y
 
 
+@pytest.mark.parametrize(
+    "selected_aperture",
+    [
+        ApertureValue.SMALL,
+        ApertureValue.MEDIUM,
+        ApertureValue.LARGE,
+        ApertureValue.OUT_OF_BEAM,
+    ],
+)
+async def test_given_parked_and_aperture_selected_when_move_in_then_z_moved_out_first(
+    selected_aperture: ApertureValue,
+    ap_sg: ApertureScatterguard,
+    aperture_positions: dict[ApertureValue, AperturePosition],
+):
+    # Ophyd-async should make this parent out the box?
+    parent_mock = MagicMock()
+    parent_mock.attach_mock(get_mock_put(ap_sg.aperture.x.user_setpoint), "ap_x")
+    parent_mock.attach_mock(get_mock_put(ap_sg.aperture.y.user_setpoint), "ap_y")
+    parent_mock.attach_mock(get_mock_put(ap_sg.aperture.z.user_setpoint), "ap_z")
+
+    parked_position = aperture_positions[ApertureValue.PARKED]
+    set_mock_value(ap_sg.aperture.y.user_readback, parked_position.aperture_y)
+    set_mock_value(ap_sg.aperture.z.user_readback, parked_position.aperture_z)
+
+    await ap_sg.selected_aperture.set(selected_aperture)
+
+    assert parent_mock.method_calls[0] == call.ap_z(
+        aperture_positions[selected_aperture].aperture_z, wait=True
+    )
+
+
+@pytest.mark.parametrize(
+    "selected_aperture",
+    [
+        ApertureValue.SMALL,
+        ApertureValue.MEDIUM,
+        ApertureValue.LARGE,
+        ApertureValue.OUT_OF_BEAM,
+    ],
+)
+async def test_given_parked_and_ap_sg_prepared_when_move_in_then_z_moved_out_first(
+    selected_aperture: ApertureValue,
+    ap_sg: ApertureScatterguard,
+    aperture_positions: dict[ApertureValue, AperturePosition],
+):
+    # Ophyd-async should make this parent out the box?
+    parent_mock = MagicMock()
+    parent_mock.attach_mock(get_mock_put(ap_sg.aperture.x.user_setpoint), "ap_x")
+    parent_mock.attach_mock(get_mock_put(ap_sg.aperture.y.user_setpoint), "ap_y")
+    parent_mock.attach_mock(get_mock_put(ap_sg.aperture.z.user_setpoint), "ap_z")
+
+    parked_position = aperture_positions[ApertureValue.PARKED]
+    set_mock_value(ap_sg.aperture.y.user_readback, parked_position.aperture_y)
+    set_mock_value(ap_sg.aperture.z.user_readback, parked_position.aperture_z)
+
+    await ap_sg.prepare(selected_aperture)
+
+    assert parent_mock.method_calls[0] == call.ap_z(
+        aperture_positions[selected_aperture].aperture_z, wait=True
+    )
+
+
 def test_aperture_enum_name_formatting():
     assert f"{ApertureValue.SMALL}" == "Small"
     assert f"{ApertureValue.MEDIUM}" == "Medium"
