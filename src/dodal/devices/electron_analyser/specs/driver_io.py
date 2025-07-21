@@ -74,7 +74,7 @@ class SpecsAnalyserDriverIO(
         if region.acquisition_mode == AcquisitionMode.FIXED_TRANSMISSION:
             await self.energy_step.set(region.energy_step)
 
-        if self.acquisition_mode == AcquisitionMode.FIXED_ENERGY:
+        if region.acquisition_mode == AcquisitionMode.FIXED_ENERGY:
             source = self._get_energy_source(region.excitation_energy_source)
             excitation_energy = await source.get_value()
             centre_energy = to_kinetic_energy(
