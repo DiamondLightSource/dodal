@@ -51,8 +51,8 @@ class Lakeshore(StandardReadable, Movable[float]):
         PID IO interface.
     control_channel : derived_signal_rw
         Signal for selecting the control channel,
-        optional readback to set a different readback channel as hinted signal
-        (default is readback channge is the same as control channel).
+        optional readback as hinted signal
+        (default readback channel is the same as control channel).
 
     temperature_high_limit: soft_signal_rw
         Signal to store the soft high temperature limit.
