@@ -171,7 +171,7 @@ async def test_that_data_to_read_is_correct(
         await asyncio.gather(
             sim_driver.iterations.get_value(),
             sim_driver.total_steps.get_value(),
-            sim_driver.step_time.get_value(),
+            sim_driver.acquire_time.get_value(),
         )
     )
     assert await sim_driver.total_time.get_value() == expected_total_time

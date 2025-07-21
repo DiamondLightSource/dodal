@@ -1,7 +1,7 @@
 import uuid
 from typing import Generic
 
-from pydantic import Field, field_validator
+from pydantic import AliasChoices, Field, field_validator
 
 from dodal.devices.electron_analyser.abstract.base_region import (
     AbstractBaseRegion,
@@ -30,10 +30,14 @@ class VGScientaRegion(
     acquisition_mode: AcquisitionMode = AcquisitionMode.SWEPT
     low_energy: float = 8.0
     high_energy: float = 10.0
-    step_time: float = 1.0
+    acquire_time: float = Field(
+        default=1.0, validation_alias=AliasChoices("step_time", "acquire_time")
+    )
     energy_step: float = Field(default=200.0)
     # Specific to this class
-    id: str = Field(default=str(uuid.uuid4()), alias="region_id")
+    id: str = Field(
+        default=str(uuid.uuid4()), validation_alias=AliasChoices("region_id", "id")
+    )
     fix_energy: float = 9.0
     total_steps: float = 13.0
     total_time: float = 13.0

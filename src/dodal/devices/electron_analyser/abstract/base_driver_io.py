@@ -75,6 +75,8 @@ class AbstractAnalyserDriverIO(
         self.psu_mode_type = psu_mode_type
         self.pass_energy_type = pass_energy_type
 
+        super().__init__(prefix=prefix, name=name)
+
         with self.add_children_as_readables():
             self.image = epics_signal_r(Array1D[np.float64], prefix + "IMAGE")
             self.spectrum = epics_signal_r(Array1D[np.float64], prefix + "INT_SPECTRUM")
@@ -106,6 +108,7 @@ class AbstractAnalyserDriverIO(
 
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             # Read once per scan after data acquired
+            self.acquire_time = self.acquire_time
             self.energy_axis = self._create_energy_axis_signal(prefix)
             self.binding_energy_axis = derived_signal_r(
                 self._calculate_binding_energy_axis,
@@ -124,8 +127,6 @@ class AbstractAnalyserDriverIO(
                 step_time=self.step_time,
                 iterations=self.iterations,
             )
-
-        super().__init__(prefix=prefix, name=name)
 
     @AsyncStatus.wrap
     async def set(self, region: TAbstractBaseRegion):
@@ -158,6 +159,7 @@ class AbstractAnalyserDriverIO(
             self.acquisition_mode.set(region.acquisition_mode),
             self.excitation_energy.set(excitation_energy),
             self.excitation_energy_source.set(source.name),
+            self.acquire_time.set(region.acquire_time),
         )
 
     def _get_energy_source(self, alias_name: str) -> SignalR[float]:
