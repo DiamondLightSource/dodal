@@ -85,7 +85,10 @@ async def test_analyser_sets_region_and_reads_correctly(
         region.size_y, wait=True
     )
 
+    # Set mock values for reading as aren't directly set via region.
     set_mock_value(sim_driver.psu_mode, sequence.psu_mode)
+    set_mock_value(sim_driver.sensor_max_size_x, region.sensor_max_size_x)
+    set_mock_value(sim_driver.sensor_max_size_y, region.sensor_max_size_y)
 
     prefix = sim_driver.name + "-"
     vgscienta_expected_config_reading = {
@@ -94,10 +97,10 @@ async def test_analyser_sets_region_and_reads_correctly(
         f"{prefix}energy_step": {"value": region.energy_step},
         f"{prefix}region_min_x": {"value": region.min_x},
         f"{prefix}region_size_x": {"value": region.size_x},
-        f"{prefix}sensor_max_size_x": {"value": 0},  # ToDo
+        f"{prefix}sensor_max_size_x": {"value": region.sensor_max_size_x},
         f"{prefix}region_min_y": {"value": region.min_y},
         f"{prefix}region_size_y": {"value": region.size_y},
-        f"{prefix}sensor_max_size_y": {"value": 0},  # ToDo
+        f"{prefix}sensor_max_size_y": {"value": region.sensor_max_size_y},
         f"{prefix}psu_mode": {"value": sequence.psu_mode},
     }
 
