@@ -7,7 +7,7 @@ from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
 from ophyd_async.core import SignalR
 from ophyd_async.sim import SimMotor
-from ophyd_async.testing import set_mock_value
+from ophyd_async.testing import partial_reading, set_mock_value
 
 from dodal.devices.electron_analyser import (
     ElectronAnalyserDetector,
@@ -147,22 +147,22 @@ async def expected_abstract_driver_config_reading(
 
     prefix = sim_driver.name + "-"
     return {
-        f"{prefix}region_name": {"value": region.name},
-        f"{prefix}energy_mode": {"value": region.energy_mode},
-        f"{prefix}acquisition_mode": {"value": region.acquisition_mode},
-        f"{prefix}lens_mode": {"value": region.lens_mode},
-        f"{prefix}low_energy": {"value": expected_low_e},
-        f"{prefix}high_energy": {"value": expected_high_e},
-        f"{prefix}pass_energy": {"value": expected_pass_e},
-        f"{prefix}excitation_energy_source": {"value": energy_source.name},
-        f"{prefix}slices": {"value": region.slices},
-        f"{prefix}iterations": {"value": region.iterations},
-        f"{prefix}total_steps": {"value": mock_values},
-        f"{prefix}step_time": {"value": mock_values},
-        f"{prefix}total_time": {"value": expected_total_time},
-        f"{prefix}energy_axis": {"value": energy_axis},
-        f"{prefix}binding_energy_axis": {"value": binding_axis},
-        f"{prefix}angle_axis": {"value": angle_axis},
+        f"{prefix}region_name": partial_reading(region.name),
+        f"{prefix}energy_mode": partial_reading(region.energy_mode),
+        f"{prefix}acquisition_mode": partial_reading(region.acquisition_mode),
+        f"{prefix}lens_mode": partial_reading(region.lens_mode),
+        f"{prefix}low_energy": partial_reading(expected_low_e),
+        f"{prefix}high_energy": partial_reading(expected_high_e),
+        f"{prefix}pass_energy": partial_reading(expected_pass_e),
+        f"{prefix}excitation_energy_source": partial_reading(energy_source.name),
+        f"{prefix}slices": partial_reading(region.slices),
+        f"{prefix}iterations": partial_reading(region.iterations),
+        f"{prefix}total_steps": partial_reading(mock_values),
+        f"{prefix}step_time": partial_reading(mock_values),
+        f"{prefix}total_time": partial_reading(expected_total_time),
+        f"{prefix}energy_axis": partial_reading(energy_axis),
+        f"{prefix}binding_energy_axis": partial_reading(binding_axis),
+        f"{prefix}angle_axis": partial_reading(angle_axis),
     }
 
 
@@ -183,8 +183,8 @@ async def expected_abstract_driver_describe_reading(
 
     prefix = sim_driver.name + "-"
     return {
-        f"{prefix}excitation_energy": {"value": excitation_energy},
-        f"{prefix}image": {"value": []},
-        f"{prefix}spectrum": {"value": spectrum},
-        f"{prefix}total_intensity": {"value": expected_total_intensity},
+        f"{prefix}excitation_energy": partial_reading(excitation_energy),
+        f"{prefix}image": partial_reading([]),
+        f"{prefix}spectrum": partial_reading(spectrum),
+        f"{prefix}total_intensity": partial_reading(expected_total_intensity),
     }
