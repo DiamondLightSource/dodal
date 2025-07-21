@@ -25,7 +25,10 @@ from dodal.devices.electron_analyser.vgscienta.enums import (
     AcquisitionMode,
     DetectorMode,
 )
-from dodal.devices.electron_analyser.vgscienta.region import VGScientaRegion
+from dodal.devices.electron_analyser.vgscienta.region import (
+    DetectorMode,
+    VGScientaRegion,
+)
 
 
 class VGScientaAnalyserDriverIO(

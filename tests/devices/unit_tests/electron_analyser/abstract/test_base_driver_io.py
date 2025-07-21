@@ -5,10 +5,7 @@ from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
 from bluesky.utils import FailedStatus
 from ophyd_async.core import SignalR, StrictEnum
-from ophyd_async.testing import (
-    assert_reading,
-    get_mock_put,
-)
+from ophyd_async.testing import assert_reading, get_mock_put
 
 from dodal.devices import b07, i09
 from dodal.devices.electron_analyser.abstract import (
