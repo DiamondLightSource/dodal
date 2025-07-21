@@ -1,5 +1,4 @@
 from ophyd_async.core import StandardReadable
-from ophyd_async.epics.core import epics_signal_r
 from ophyd_async.epics.motor import Motor
 
 
@@ -20,22 +19,18 @@ class CollimationTable(StandardReadable):
 
     def __init__(self, prefix: str, name: str = ""):
         with self.add_children_as_readables():
-            self.inboard_y = Motor(prefix + "-MO-TABLE-01:INBOARDY")
-            self.outboard_y = Motor(prefix + "-MO-TABLE-01:OUTBOARDY")
-            self.upstream_y = Motor(prefix + "-MO-TABLE-01:UPSTREAMY")
-            self.combined_downstream_y = Motor(prefix + "-MO-TABLE-01:DOWNSTREAMY")
-            self.combined_all_y = Motor(prefix + "-MO-TABLE-01:Y")
+            self.inboard_y = Motor(f"{prefix}:INBOARDY")
+            self.outboard_y = Motor(f"{prefix}:OUTBOARDY")
+            self.upstream_y = Motor(f"{prefix}:UPSTREAMY")
+            self.combined_downstream_y = Motor(f"{prefix}:DOWNSTREAMY")
+            self.combined_all_y = Motor(f"{prefix}:Y")
 
-            self.downstream_x = Motor(prefix + "-MO-TABLE-01:DOWNSTREAMX")
-            self.upstream_x = Motor(prefix + "-MO-TABLE-01:UPSTREAMX")
-            self.combined_all_x = Motor(prefix + "-MO-TABLE-01:X")
+            self.downstream_x = Motor(f"{prefix}:DOWNSTREAMX")
+            self.upstream_x = Motor(f"{prefix}:UPSTREAMX")
+            self.combined_all_x = Motor(f"{prefix}:X")
 
-            self.pitch = Motor(prefix + "-MO-TABLE-01:PITCH")
-            self.roll = Motor(prefix + "-MO-TABLE-01:ROLL")
-            self.yaw = Motor(prefix + "-MO-TABLE-01:YAW")
-
-            self.crate_power = epics_signal_r(
-                int, prefix + "-MO-PMAC-02:CRATE2_HEALTHY"
-            )  # returns 0 if no power
+            self.pitch = Motor(f"{prefix}:PITCH")
+            self.roll = Motor(f"{prefix}:ROLL")
+            self.yaw = Motor(f"{prefix}:YAW")
 
             super().__init__(name)

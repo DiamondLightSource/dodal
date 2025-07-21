@@ -10,5 +10,5 @@ class InOut(StrictEnum):
 class FluorescenceDetector(StandardReadable):
     def __init__(self, prefix: str, name: str = ""):
         with self.add_children_as_readables():
-            self.pos = epics_signal_rw(InOut, prefix + "-EA-FLU-01:CTRL")
+            self.pos = epics_signal_rw(InOut, f"{prefix}CTRL")
         super().__init__(name)

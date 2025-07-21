@@ -32,8 +32,8 @@ class Scintillator(StandardReadable):
         name: str = "",
     ):
         with self.add_children_as_readables():
-            self.y_mm = Motor(prefix + "-MO-SCIN-01:Y")
-            self.z_mm = Motor(prefix + "-MO-SCIN-01:Z")
+            self.y_mm = Motor(f"{prefix}Y")
+            self.z_mm = Motor(f"{prefix}Z")
             self.selected_pos = derived_signal_rw(
                 self._get_selected_position,
                 self._set_selected_position,

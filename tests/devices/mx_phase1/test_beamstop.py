@@ -87,7 +87,7 @@ async def test_set_beamstop_position_to_data_collection_moves_beamstop_into_beam
     parent_mock.attach_mock(get_mock_put(y_mock), "beamstop_y")
     parent_mock.attach_mock(get_mock_put(z_mock), "beamstop_z")
 
-    RE(bps.abs_set(beamstop.selected_pos, BeamstopPositions.DATA_COLLECTION))
+    RE(bps.abs_set(beamstop.selected_pos, BeamstopPositions.DATA_COLLECTION, wait=True))
 
     assert get_mock_put(x_mock).call_args_list == [call(1.52, wait=True)]
     assert get_mock_put(y_mock).call_args_list == [call(44.78, wait=True)]

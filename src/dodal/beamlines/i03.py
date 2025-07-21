@@ -465,7 +465,7 @@ def fluorescence_det_motion() -> FluorescenceDetector:
     """Get the i03 device for moving the fluorescence detector, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return FluorescenceDetector(PREFIX.beamline_prefix)
+    return FluorescenceDetector(f"{PREFIX.beamline_prefix}-EA-FLU-01:")
 
 
 @device_factory()
@@ -474,7 +474,7 @@ def scintillator() -> Scintillator:
     If this is called when already instantiated in i03, it will return the existing object.
     """
     return Scintillator(
-        PREFIX.beamline_prefix,
+        f"{PREFIX.beamline_prefix}-MO-SCIN-01:",
         Reference(aperture_scatterguard()),
         get_beamline_parameters(),
     )
@@ -485,4 +485,4 @@ def collimation_table() -> CollimationTable:
     """Get the i03 device for moving the collimation table, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return CollimationTable(PREFIX.beamline_prefix)
+    return CollimationTable(prefix=f"{PREFIX.beamline_prefix}-MO-TABLE-01")
