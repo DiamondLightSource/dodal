@@ -26,8 +26,7 @@ from tests.devices.unit_tests.electron_analyser.helpers import (
     ]
 )
 def sequence(request: pytest.FixtureRequest) -> AbstractBaseSequence:
-    seq = request.param
-    return load_json_file_to_class(seq, get_test_sequence(seq))
+    return load_json_file_to_class(request.param, get_test_sequence(request.param))
 
 
 @pytest.fixture

@@ -26,7 +26,6 @@ from dodal.devices.electron_analyser.vgscienta.enums import (
     DetectorMode,
 )
 from dodal.devices.electron_analyser.vgscienta.region import (
-    DetectorMode,
     VGScientaRegion,
 )
 
