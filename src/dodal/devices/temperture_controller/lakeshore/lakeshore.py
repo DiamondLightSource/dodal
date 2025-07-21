@@ -50,7 +50,10 @@ class Lakeshore(StandardReadable, Movable[float]):
     PID : PIDBaseIO
         PID IO interface.
     control_channel : derived_signal_rw
-        Signal for selecting the control channel.
+        Signal for selecting the control channel,
+        optional readback to set a different readback channel as hinted signal
+        (default is readback channge is the same as control channel).
+
     temperature_high_limit: soft_signal_rw
         Signal to store the soft high temperature limit.
     temperature_low_limit: soft_signal_rw
@@ -61,10 +64,6 @@ class Lakeshore(StandardReadable, Movable[float]):
     -------
     set(value: float)
         Set the temperature setpoint for the selected control channel.
-    _get_control_channel(current_channel: int) -> int
-        Get the current control channel.
-    _set_control_channel(value: int, readback: int | None = None)
-        Set the control channel and update readable signals.
     """
 
     def __init__(
