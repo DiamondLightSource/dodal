@@ -25,7 +25,20 @@ async def mock_ccmc(RE: RunEngine) -> ChannelCutMonochromator:
 
 
 async def test_read_config_includes(mock_ccmc: ChannelCutMonochromator):
-    await assert_configuration(mock_ccmc, {})
+    await assert_configuration(
+        mock_ccmc,
+        {
+            f"{mock_ccmc.name}-_xyz-x-motor_egu": {"value": ""},
+            f"{mock_ccmc.name}-_xyz-x-offset": {"value": 0.0},
+            f"{mock_ccmc.name}-_xyz-x-velocity": {"value": 0.0},
+            f"{mock_ccmc.name}-_xyz-y-motor_egu": {"value": ""},
+            f"{mock_ccmc.name}-_xyz-y-offset": {"value": 0.0},
+            f"{mock_ccmc.name}-_xyz-y-velocity": {"value": 0.0},
+            f"{mock_ccmc.name}-_xyz-z-motor_egu": {"value": ""},
+            f"{mock_ccmc.name}-_xyz-z-offset": {"value": 0.0},
+            f"{mock_ccmc.name}-_xyz-z-velocity": {"value": 0.0},
+        },
+    )
 
 
 async def test_reading(mock_ccmc: ChannelCutMonochromator):
@@ -35,6 +48,10 @@ async def test_reading(mock_ccmc: ChannelCutMonochromator):
             f"{mock_ccmc.name}-crystal": {
                 "value": ChannelCutMonochromatorPositions.OUT
             },
+            f"{mock_ccmc.name}-_xyz-x": {"value": 0.0},
+            f"{mock_ccmc.name}-_xyz-y": {"value": 0.0},
+            f"{mock_ccmc.name}-_xyz-z": {"value": 0.0},
+            f"{mock_ccmc.name}-_y_rotation": {"value": 0.0},
         },
     )
 
@@ -66,29 +83,6 @@ async def test_get_energy_in_ev(
         await assert_value(
             mock_ccmc.energy_in_ev, float(str(position.value).split("Xtal_")[1])
         )
-
-
-async def test_xyz_reading(
-    mock_ccmc: ChannelCutMonochromator,
-):
-    await assert_reading(
-        mock_ccmc._xyz,
-        {
-            f"{mock_ccmc.name}-_xyz-x": {"value": 0.0},
-            f"{mock_ccmc.name}-_xyz-y": {"value": 0.0},
-            f"{mock_ccmc.name}-_xyz-z": {"value": 0.0},
-        },
-    )
-
-
-async def test_y_rotation_reading(
-    mock_ccmc: ChannelCutMonochromator,
-    RE: RunEngine,
-):
-    await assert_reading(
-        mock_ccmc._y_rotation,
-        {f"{mock_ccmc.name}-_y_rotation": {"value": 0.0}},
-    )
 
 
 async def test_move_crystal_wrong_position_ignored(

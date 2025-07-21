@@ -37,4 +37,4 @@ class PGM(StandardReadable):
             self.grating = epics_signal_rw(grating, prefix + gratingPv)
             self.cff = epics_signal_rw(float, prefix + "CFF")
 
-        super().__init__(name)
+        super().__init__(name=name)

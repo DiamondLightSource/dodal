@@ -19,7 +19,7 @@ class ChannelCutMonochromatorPositions(StrictEnum):
 
 ccmc_lower_limit = 1500.0
 ccmc_upper_limit = 3000.0
-error_message = "Can not get energy value in ev from ccmc position: "
+error_message = "Can not get energy value in eV from ccmc position: "
 
 
 class ChannelCutMonochromator(
@@ -47,16 +47,15 @@ class ChannelCutMonochromator(
         name:
             Name of the device
         """
-        # crystal motors internal
-        self._xyz = XYZStage(prefix)
-        # piezo motor in epics
-        self._y_rotation = epics_signal_rw(
-            float,
-            read_pv=prefix + "ROTY:POS:RD",
-            write_pv=prefix + "ROTY:MOV:WR",
-        )
-
         with self.add_children_as_readables():
+            # crystal motors
+            self._xyz = XYZStage(prefix)
+            # piezo motor in epics
+            self._y_rotation = epics_signal_rw(
+                float,
+                read_pv=prefix + "ROTY:POS:RD",
+                write_pv=prefix + "ROTY:MOV:WR",
+            )
             # Must be a CHILD as read() must return this signal
             self.crystal = epics_signal_rw(
                 ChannelCutMonochromatorPositions, prefix + "CRYSTAL:MP:SELECT"
@@ -66,7 +65,6 @@ class ChannelCutMonochromator(
         self.energy_in_ev = derived_signal_r(
             self._convert_pos_to_ev, pos_signal=self.crystal
         )
-
         super().__init__(name=name)
 
     def _convert_pos_to_ev(self, pos_signal: ChannelCutMonochromatorPositions) -> float:
