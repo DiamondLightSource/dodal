@@ -21,12 +21,16 @@ from tests.devices.unit_tests.electron_analyser.util import (
 
 @pytest.fixture
 def sequence() -> SpecsSequence[LensMode, PsuMode]:
-    return load_json_file_to_class(SpecsSequence[LensMode, PsuMode], TEST_LEGACY_SPECS_SEQUENCE)
+    return load_json_file_to_class(
+        SpecsSequence[LensMode, PsuMode], TEST_LEGACY_SPECS_SEQUENCE
+    )
 
 
 @pytest.fixture
-def new_sequence() -> SpecsSequence[LensMode,PsuMode]:
-    return load_json_file_to_class(SpecsSequence[LensMode, PsuMode], TEST_NEW_SPECS_SEQUENCE)
+def new_sequence() -> SpecsSequence[LensMode, PsuMode]:
+    return load_json_file_to_class(
+        SpecsSequence[LensMode, PsuMode], TEST_NEW_SPECS_SEQUENCE
+    )
 
 
 @pytest.fixture
