@@ -3,18 +3,18 @@ from ophyd_async.epics.core import epics_signal_r
 from ophyd_async.epics.motor import Motor
 
 
-class CTAB(StandardReadable):
-    """Basic collimantion table (CTAB) device for motion plus the motion disable signal
+class CollimationTable(StandardReadable):
+    """Basic collimation table device for motion plus the motion disable signal
     when laser curtain triggered and hutch not locked.
 
-    CTAB has 3 physical vertical motors, the jacks. 1 upstream and 2 downstream.
+    The table has 3 physical vertical motors, the jacks. 1 upstream and 2 downstream.
     The two downstream jacks are labelled as outboard (away from the ring) and
     inboard (towards the ring).
     Together these 3 jacks provide compound motion for vertical motion and pitch/roll.
     There are 2 physical horizontal motors 1 upstream, 1 downstream. These provide yaw.
 
-    CTAB motion is disabled by an object being within the laser curtain area and can be
-    overriden by use of the dead man's handle device or locking the hutch. The effect of
+    Table motion is disabled by an object being within the laser curtain area and can be
+    overridden by use of the dead man's handle device or locking the hutch. The effect of
     these disabling systems is to cut power to the motors - signal for this is crate_power
     """
 
