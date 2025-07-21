@@ -75,5 +75,5 @@ class ChannelCutMonochromator(
         raise ValueError(error_message)
 
     @AsyncStatus.wrap
-    async def set(self, demand: ChannelCutMonochromatorPositions) -> None:
-        await self.crystal.set(demand, wait=True)
+    async def set(self, value: ChannelCutMonochromatorPositions) -> None:
+        await self.crystal.set(value, wait=True)
