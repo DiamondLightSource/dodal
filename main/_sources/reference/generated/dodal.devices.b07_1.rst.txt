@@ -16,6 +16,8 @@ dodal.devices.b07\_1
 
    ~b07_1.Grating
    ~b07_1.LensMode
+   ~b07_1.ChannelCutMonochromator
+   ~b07_1.ChannelCutMonochromatorPositions
 
 
 
