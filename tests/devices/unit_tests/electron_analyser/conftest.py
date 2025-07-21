@@ -1,22 +1,16 @@
 import math
-from typing import Any, get_args, get_origin
+from typing import Any
 
 import numpy as np
 import pytest
 from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import SignalR, init_devices
+from ophyd_async.core import SignalR
 from ophyd_async.sim import SimMotor
-from ophyd_async.testing import (
-    partial_reading,
-    set_mock_value,
-)
+from ophyd_async.testing import set_mock_value
 
 from dodal.devices.electron_analyser import (
     ElectronAnalyserDetector,
-    ElectronAnalyserDetectorImpl,
-    ElectronAnalyserDriverImpl,
-    to_kinetic_energy,
 )
 from dodal.devices.electron_analyser.abstract import (
     AbstractAnalyserDriverIO,
@@ -26,15 +20,14 @@ from dodal.devices.electron_analyser.abstract import (
 )
 from dodal.devices.electron_analyser.specs import (
     SpecsAnalyserDriverIO,
-    SpecsDetector,
     SpecsSequence,
 )
+from dodal.devices.electron_analyser.util import to_kinetic_energy
 from dodal.devices.electron_analyser.vgscienta import (
     VGScientaAnalyserDriverIO,
-    VGScientaDetector,
     VGScientaSequence,
 )
-from tests.devices.unit_tests.electron_analyser.util import (
+from tests.devices.unit_tests.electron_analyser.helpers import (
     get_test_sequence,
 )
 
@@ -54,66 +47,6 @@ async def energy_sources(
     dcm_energy: SimMotor, pgm_energy: SimMotor
 ) -> dict[str, SignalR[float]]:
     return {"source1": dcm_energy.user_readback, "source2": pgm_energy.user_readback}
-
-
-@pytest.fixture
-async def sim_detector(
-    detector_class: type[ElectronAnalyserDetectorImpl],
-    energy_sources: dict[str, SignalR[float]],
-    RE: RunEngine,
-) -> ElectronAnalyserDetectorImpl:
-    lens_mode_class = get_args(detector_class)[0]
-    psu_mode_class = get_args(detector_class)[1]
-
-    if get_origin(detector_class) == VGScientaDetector:
-        pass_energy_class = get_args(detector_class)[2]
-        async with init_devices(mock=True, connect=True):
-            sim_detector = VGScientaDetector(
-                "TEST:",
-                lens_mode_class,
-                psu_mode_class,
-                pass_energy_class,
-                energy_sources,
-            )
-    else:
-        async with init_devices(mock=True, connect=True):
-            sim_detector = SpecsDetector(
-                "TEST:",
-                lens_mode_class,
-                psu_mode_class,
-                energy_sources,
-            )
-    return sim_detector
-
-
-@pytest.fixture
-async def sim_driver(
-    driver_class: type[ElectronAnalyserDriverImpl],
-    energy_sources: dict[str, SignalR[float]],
-    RE: RunEngine,
-) -> ElectronAnalyserDriverImpl:
-    lens_mode_class = get_args(driver_class)[0]
-    psu_mode_class = get_args(driver_class)[1]
-
-    if get_origin(driver_class) == VGScientaAnalyserDriverIO:
-        pass_energy_class = get_args(driver_class)[2]
-        async with init_devices(mock=True, connect=True):
-            sim_driver = VGScientaAnalyserDriverIO(
-                "TEST:",
-                lens_mode_class,
-                psu_mode_class,
-                pass_energy_class,
-                energy_sources,
-            )
-    else:
-        async with init_devices(mock=True, connect=True):
-            sim_driver = SpecsAnalyserDriverIO(
-                "TEST:",
-                lens_mode_class,
-                psu_mode_class,
-                energy_sources,
-            )
-    return sim_driver
 
 
 @pytest.fixture
@@ -213,24 +146,23 @@ async def expected_abstract_driver_config_reading(
     angle_axis = await sim_driver.angle_axis.get_value()
 
     prefix = sim_driver.name + "-"
-
     return {
-        f"{prefix}region_name": partial_reading(region.name),
-        f"{prefix}energy_mode": partial_reading(region.energy_mode),
-        f"{prefix}acquisition_mode": partial_reading(region.acquisition_mode),
-        f"{prefix}lens_mode": partial_reading(region.lens_mode),
-        f"{prefix}low_energy": partial_reading(expected_low_e),
-        f"{prefix}high_energy": partial_reading(expected_high_e),
-        f"{prefix}pass_energy": partial_reading(expected_pass_e),
-        f"{prefix}excitation_energy_source": partial_reading(energy_source.name),
-        f"{prefix}slices": partial_reading(region.slices),
-        f"{prefix}iterations": partial_reading(region.iterations),
-        f"{prefix}total_steps": partial_reading(mock_values),
-        f"{prefix}step_time": partial_reading(mock_values),
-        f"{prefix}total_time": partial_reading(expected_total_time),
-        f"{prefix}energy_axis": partial_reading(energy_axis),
-        f"{prefix}binding_energy_axis": partial_reading(binding_axis),
-        f"{prefix}angle_axis": partial_reading(angle_axis),
+        f"{prefix}region_name": {"value": region.name},
+        f"{prefix}energy_mode": {"value": region.energy_mode},
+        f"{prefix}acquisition_mode": {"value": region.acquisition_mode},
+        f"{prefix}lens_mode": {"value": region.lens_mode},
+        f"{prefix}low_energy": {"value": expected_low_e},
+        f"{prefix}high_energy": {"value": expected_high_e},
+        f"{prefix}pass_energy": {"value": expected_pass_e},
+        f"{prefix}excitation_energy_source": {"value": energy_source.name},
+        f"{prefix}slices": {"value": region.slices},
+        f"{prefix}iterations": {"value": region.iterations},
+        f"{prefix}total_steps": {"value": mock_values},
+        f"{prefix}step_time": {"value": mock_values},
+        f"{prefix}total_time": {"value": expected_total_time},
+        f"{prefix}energy_axis": {"value": energy_axis},
+        f"{prefix}binding_energy_axis": {"value": binding_axis},
+        f"{prefix}angle_axis": {"value": angle_axis},
     }
 
 
@@ -251,8 +183,8 @@ async def expected_abstract_driver_describe_reading(
 
     prefix = sim_driver.name + "-"
     return {
-        f"{prefix}excitation_energy": partial_reading(excitation_energy),
-        f"{prefix}image": partial_reading([]),
-        f"{prefix}spectrum": partial_reading(spectrum),
-        f"{prefix}total_intensity": partial_reading(expected_total_intensity),
+        f"{prefix}excitation_energy": {"value": excitation_energy},
+        f"{prefix}image": {"value": []},
+        f"{prefix}spectrum": {"value": spectrum},
+        f"{prefix}total_intensity": {"value": expected_total_intensity},
     }

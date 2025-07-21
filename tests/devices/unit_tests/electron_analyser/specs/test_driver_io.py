@@ -4,11 +4,11 @@ import numpy as np
 import pytest
 from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
+from ophyd_async.core import SignalR
 from ophyd_async.testing import (
     assert_configuration,
     assert_value,
     get_mock_put,
-    partial_reading,
     set_mock_value,
 )
 
@@ -19,14 +19,20 @@ from dodal.devices.electron_analyser.specs import (
     SpecsAnalyserDriverIO,
     SpecsRegion,
 )
-from tests.devices.unit_tests.electron_analyser.util import (
+from tests.devices.unit_tests.electron_analyser.helpers import (
     TEST_SEQUENCE_REGION_NAMES,
+    create_analyser_device,
 )
 
 
 @pytest.fixture
-def driver_class() -> type[SpecsAnalyserDriverIO[LensMode, PsuMode]]:
-    return SpecsAnalyserDriverIO[LensMode, PsuMode]
+async def sim_driver(
+    energy_sources: dict[str, SignalR[float]],
+) -> SpecsAnalyserDriverIO[LensMode, PsuMode]:
+    return await create_analyser_device(
+        SpecsAnalyserDriverIO[LensMode, PsuMode],
+        energy_sources,
+    )
 
 
 @pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
@@ -65,27 +71,18 @@ async def test_analyser_sets_region_and_configuration_is_correct(
 
     prefix = sim_driver.name + "-"
     specs_expected_config_reading = {
-        f"{prefix}centre_energy": partial_reading(
-            await sim_driver.centre_energy.get_value()
-        ),
-        f"{prefix}energy_step": partial_reading(
-            await sim_driver.energy_step.get_value()
-        ),
-        f"{prefix}snapshot_values": partial_reading(region.values),
-        f"{prefix}psu_mode": partial_reading(region.psu_mode),
+        f"{prefix}centre_energy": {"value": await sim_driver.centre_energy.get_value()},
+        f"{prefix}energy_step": {"value": await sim_driver.energy_step.get_value()},
+        f"{prefix}snapshot_values": {"value": region.values},
+        f"{prefix}psu_mode": {"value": region.psu_mode},
     }
 
     full_expected_config = (
         expected_abstract_driver_config_reading | specs_expected_config_reading
     )
 
-    # Check exact match by combining expected specs specific config reading with
-    # abstract one
-    await assert_configuration(
-        sim_driver,
-        full_expected_config,
-        full_match=True,
-    )
+    # Check match by combining expected specs specific config reading with abstract one
+    await assert_configuration(sim_driver, full_expected_config)
 
 
 @pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)

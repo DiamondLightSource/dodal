@@ -17,7 +17,7 @@ from dodal.devices.electron_analyser.abstract.base_driver_io import (
 )
 from dodal.devices.electron_analyser.abstract.types import TLensMode, TPsuMode
 from dodal.devices.electron_analyser.specs.enums import AcquisitionMode
-from dodal.devices.electron_analyser.specs.region import PassEnergy, SpecsRegion
+from dodal.devices.electron_analyser.specs.region import SpecsRegion
 from dodal.devices.electron_analyser.util import to_kinetic_energy
 
 
@@ -27,7 +27,7 @@ class SpecsAnalyserDriverIO(
         AcquisitionMode,
         TLensMode,
         TPsuMode,
-        PassEnergy,
+        float,
     ],
     Generic[TLensMode, TPsuMode],
 ):
@@ -58,7 +58,7 @@ class SpecsAnalyserDriverIO(
             acquisition_mode_type=AcquisitionMode,
             lens_mode_type=lens_mode_type,
             psu_mode_type=psu_mode_type,
-            pass_energy_type=PassEnergy,
+            pass_energy_type=float,
             energy_sources=energy_sources,
             name=name,
         )

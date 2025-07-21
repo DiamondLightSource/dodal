@@ -26,6 +26,8 @@ def pgm() -> PGM:
     return PGM(prefix=f"{PREFIX.beamline_prefix}-OP-PGM-01:", grating=Grating)
 
 
+# Connect will work again after this work completed
+# https://jira.diamond.ac.uk/browse/B07-1104
 @device_factory()
 def analyser_driver() -> SpecsAnalyserDriverIO[LensMode, PsuMode]:
     return SpecsAnalyserDriverIO[LensMode, PsuMode](

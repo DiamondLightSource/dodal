@@ -23,17 +23,17 @@ from dodal.devices.electron_analyser.vgscienta.detector import (
 AnyAcqMode = StrictEnum
 AnyLensMode = SupersetEnum | StrictEnum
 AnyPsuMode = SupersetEnum | StrictEnum
-AnyPassEnergy = StrictEnum | int
-PassEnergyEnum = StrictEnum
+AnyPassEnergy = StrictEnum | float
+AnyPassEnergyEnum = StrictEnum
 
 # Electron analyser types that encompasses all implementations, useful for tests and
 # plans
 ElectronAnalyserDetectorImpl = (
-    VGScientaDetector[AnyLensMode, AnyPsuMode, PassEnergyEnum]
+    VGScientaDetector[AnyLensMode, AnyPsuMode, AnyPassEnergyEnum]
     | SpecsDetector[AnyLensMode, AnyPsuMode]
 )
 ElectronAnalyserDriverImpl = (
-    VGScientaAnalyserDriverIO[AnyLensMode, AnyPsuMode, PassEnergyEnum]
+    VGScientaAnalyserDriverIO[AnyLensMode, AnyPsuMode, AnyPassEnergyEnum]
     | SpecsAnalyserDriverIO[AnyLensMode, AnyPsuMode]
 )
 
