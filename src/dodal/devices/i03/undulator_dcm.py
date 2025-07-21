@@ -27,6 +27,8 @@ class UndulatorDCM(StandardReadable, Movable[float]):
     instead. See https://github.com/DiamondLightSource/dodal/issues/1092
     """
 
+    DCM_PERP_TOLERANCE = 0.01
+
     def __init__(
         self,
         undulator: Undulator,
@@ -60,6 +62,9 @@ class UndulatorDCM(StandardReadable, Movable[float]):
             self.dcm_ref().energy_in_kev.set(value, timeout=ENERGY_TIMEOUT_S),
             self.undulator_ref().set(value),
         )
-        # DCM Perp pitch
-        LOGGER.info(f"Adjusting DCM offset to {self.dcm_fixed_offset_mm} mm")
-        await self.dcm_ref().offset_in_mm.set(self.dcm_fixed_offset_mm)
+
+        # The DCM perp is under vacuum so for heat management it's best to only change it when required
+        current_offset = await self.dcm_ref().offset_in_mm.user_readback.get_value()
+        if abs(current_offset - self.dcm_fixed_offset_mm) > self.DCM_PERP_TOLERANCE:
+            LOGGER.info(f"Adjusting DCM offset to {self.dcm_fixed_offset_mm} mm")
+            await self.dcm_ref().offset_in_mm.set(self.dcm_fixed_offset_mm)
