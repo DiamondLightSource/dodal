@@ -1,8 +1,7 @@
 import uuid
 from typing import Generic
 
-from pydantic import AliasChoices, Field
-
+from pydantic import AliasChoices, Field, field_validator
 
 from dodal.devices.electron_analyser.abstract.base_region import (
     AbstractBaseRegion,
@@ -55,11 +54,7 @@ class VGScientaRegion(
     def y_channel_size(self) -> int:
         return self.last_y_channel - self.first_y_channel + 1
 
-    @
-    
-    
-    
-    ("pass_energy", mode="before")
+    @field_validator("pass_energy", mode="before")
     @classmethod
     def validate_pass_energy(cls, val):
         # This is needed because if the value is a number, it can't be casted to the
