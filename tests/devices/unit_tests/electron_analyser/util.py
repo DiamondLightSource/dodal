@@ -1,12 +1,16 @@
 import os
-from typing import Any
+from typing import Any, TypeVar, get_args, get_origin
 
-from ophyd_async.core import StandardReadable
+from ophyd_async.core import SignalR, StandardReadable, init_devices
 
-from dodal.devices.electron_analyser import EnergyMode
+from dodal.devices.electron_analyser import (
+    EnergyMode,
+)
 from dodal.devices.electron_analyser.abstract import (
+    AbstractAnalyserDriverIO,
     AbstractBaseRegion,
     AbstractBaseSequence,
+    AbstractElectronAnalyserDetector,
 )
 from dodal.devices.electron_analyser.specs import (
     SpecsAnalyserDriverIO,
@@ -48,6 +52,32 @@ def get_test_sequence_type(key: type) -> type[AbstractBaseSequence]:
 
 
 TEST_SEQUENCE_REGION_NAMES = ["New_Region", "New_Region1"]
+
+_TDevice = TypeVar(
+    "_TDevice", bound=AbstractElectronAnalyserDetector | AbstractAnalyserDriverIO
+)
+
+
+async def create_analyser_device(
+    device_class: type[_TDevice],
+    energy_sources: dict[str, SignalR[float]],
+) -> _TDevice:
+    parameters = {
+        "prefix": "TEST:",
+        "lens_mode_type": get_args(device_class)[0],
+        "psu_mode_type": get_args(device_class)[1],
+        "energy_sources": energy_sources,
+    }
+    origin = get_origin(device_class)
+    if origin in (VGScientaDetector, VGScientaAnalyserDriverIO):
+        parameters["pass_energy_type"] = get_args(device_class)[2]
+
+    is_detector = isinstance(device_class, AbstractElectronAnalyserDetector)
+    parameters["name"] = "sim_detector" if is_detector else "sim_driver"
+
+    async with init_devices(mock=True, connect=True):
+        device = device_class(**parameters)
+    return device
 
 
 def assert_region_kinetic_and_binding_energy(r: AbstractBaseRegion) -> None:

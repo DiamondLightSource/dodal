@@ -3,11 +3,16 @@ from typing import Generic
 
 from pydantic import AliasChoices, Field
 
+
 from dodal.devices.electron_analyser.abstract.base_region import (
     AbstractBaseRegion,
     AbstractBaseSequence,
     JavaToPythonModel,
+)
+from dodal.devices.electron_analyser.abstract.types import (
     TLensMode,
+    TPassEnergyEnum,
+    TPsuMode,
 )
 from dodal.devices.electron_analyser.vgscienta.enums import (
     AcquisitionMode,
@@ -17,11 +22,12 @@ from dodal.devices.electron_analyser.vgscienta.enums import (
 
 
 class VGScientaRegion(
-    AbstractBaseRegion[AcquisitionMode, TLensMode], Generic[TLensMode]
+    AbstractBaseRegion[AcquisitionMode, TLensMode, TPassEnergyEnum],
+    Generic[TLensMode, TPassEnergyEnum],
 ):
     # Override defaults of base region class
     lens_mode: TLensMode
-    pass_energy: int = 5
+    pass_energy: TPassEnergyEnum
     acquisition_mode: AcquisitionMode = AcquisitionMode.SWEPT
     low_energy: float = 8.0
     high_energy: float = 10.0
@@ -49,6 +55,17 @@ class VGScientaRegion(
     def y_channel_size(self) -> int:
         return self.last_y_channel - self.first_y_channel + 1
 
+    @
+    
+    
+    
+    ("pass_energy", mode="before")
+    @classmethod
+    def validate_pass_energy(cls, val):
+        # This is needed because if the value is a number, it can't be casted to the
+        # enum correctly.
+        return str(val)
+
 
 class VGScientaExcitationEnergySource(JavaToPythonModel):
     name: str = "source1"
@@ -57,16 +74,19 @@ class VGScientaExcitationEnergySource(JavaToPythonModel):
 
 
 class VGScientaSequence(
-    AbstractBaseSequence[VGScientaRegion, TLensMode], Generic[TLensMode]
+    AbstractBaseSequence[VGScientaRegion[TLensMode, TPassEnergyEnum]],
+    Generic[TLensMode, TPsuMode, TPassEnergyEnum],
 ):
-    element_set: str = Field(default="Unknown")
+    psu_mode: TPsuMode = Field(alias="element_set")
     excitation_energy_sources: list[VGScientaExcitationEnergySource] = Field(
         default_factory=lambda: []
     )
-    regions: list[VGScientaRegion[TLensMode]] = Field(default_factory=lambda: [])
+    regions: list[VGScientaRegion[TLensMode, TPassEnergyEnum]] = Field(
+        default_factory=lambda: []
+    )
 
     def get_excitation_energy_source_by_region(
-        self, region: VGScientaRegion[TLensMode]
+        self, region: VGScientaRegion[TLensMode, TPassEnergyEnum]
     ) -> VGScientaExcitationEnergySource:
         value = next(
             (

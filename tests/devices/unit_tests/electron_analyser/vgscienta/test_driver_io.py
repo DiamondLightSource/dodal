@@ -2,6 +2,8 @@ import numpy as np
 import pytest
 from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
+from bluesky.utils import FailedStatus
+from ophyd_async.core import SignalR, StrictEnum
 from ophyd_async.epics.adcore import ADImageMode
 from ophyd_async.testing import (
     get_mock_put,
@@ -16,16 +18,22 @@ from dodal.devices.electron_analyser.vgscienta import (
     VGScientaAnalyserDriverIO,
     VGScientaRegion,
 )
-from dodal.devices.i09 import LensMode
+from dodal.devices.i09 import LensMode, PassEnergy, PsuMode
 from tests.devices.unit_tests.electron_analyser.util import (
     TEST_SEQUENCE_REGION_NAMES,
     assert_read_configuration_has_expected_value,
+    create_analyser_device,
 )
 
 
 @pytest.fixture
-def driver_class() -> type[VGScientaAnalyserDriverIO[LensMode]]:
-    return VGScientaAnalyserDriverIO[LensMode]
+async def sim_driver(
+    energy_sources: dict[str, SignalR[float]],
+) -> VGScientaAnalyserDriverIO[LensMode, PsuMode, PassEnergy]:
+    return await create_analyser_device(
+        VGScientaAnalyserDriverIO[LensMode, PsuMode, PassEnergy],
+        energy_sources,
+    )
 
 
 @pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
@@ -137,3 +145,37 @@ async def test_that_data_to_read_is_correct(
         await sim_driver.binding_energy_axis.get_value(),
         expected_binding_energy_axis,
     )
+
+
+def test_driver_throws_error_with_wrong_pass_energy(
+    sim_driver: VGScientaAnalyserDriverIO[LensMode, PsuMode, PassEnergy],
+    RE: RunEngine,
+) -> None:
+    class PassEnergyTestEnum(StrictEnum):
+        TEST_1 = "INVALID_PASS_ENERGY"
+
+    pass_energy_datatype = sim_driver.pass_energy.datatype
+    pass_energy_datatype_name = (
+        pass_energy_datatype.__name__ if pass_energy_datatype is not None else ""
+    )
+    with pytest.raises(
+        FailedStatus, match=f"is not a valid {pass_energy_datatype_name}"
+    ):
+        RE(bps.mv(sim_driver.pass_energy, PassEnergyTestEnum.TEST_1))
+
+
+def test_driver_throws_error_with_wrong_detector_mode(
+    sim_driver: VGScientaAnalyserDriverIO[LensMode, PsuMode, PassEnergy],
+    RE: RunEngine,
+) -> None:
+    class DetectorModeTestEnum(StrictEnum):
+        TEST_1 = "INVALID_DETECTOR_MODE"
+
+    detector_mode_datatype = sim_driver.detector_mode.datatype
+    pass_energy_datatype_name = (
+        detector_mode_datatype.__name__ if detector_mode_datatype is not None else ""
+    )
+    with pytest.raises(
+        FailedStatus, match=f"is not a valid {pass_energy_datatype_name}"
+    ):
+        RE(bps.mv(sim_driver.detector_mode, DetectorModeTestEnum.TEST_1))
