@@ -34,7 +34,7 @@ class LAKESHORE340_PID_INPUT_CHANNEL(StrictEnum):
 
 class LakeshoreTemperatureIO(Device):
     """.
-    Base class for Lakeshore temperature IO. It provides readback signals for temperature channels.
+    Base class for Lakeshore temperature readback IO. It provides readback signals for temperature channels.
     """
 
     def __init__(
@@ -62,6 +62,7 @@ class LakeshoreBaseIO(LakeshoreTemperatureIO):
         name: str = "",
         single_control_channel: bool = False,
     ):
+        """Base class for Lakeshore IO including setpoint ramp_ramp and heater."""
         self.setpoint = create_rw_device_vector(
             prefix=prefix,
             no_channels=no_channels,
@@ -121,6 +122,8 @@ class PIDBaseIO(Device):
         name: str = "",
         single_control_channel: bool = False,
     ):
+        """Basic pid and manual output signals for lakeshore channels"""
+
         self.p = create_rw_device_vector(
             prefix=prefix,
             no_channels=no_channels,
