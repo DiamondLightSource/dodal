@@ -15,6 +15,7 @@ from .lakeshore_io import (
     LAKESHORE336_HEATER_SETTING,
     LAKESHORE336_PID_INPUT_CHANNEL,
     LAKESHORE336_PID_MODE,
+    LAKESHORE340_PID_INPUT_CHANNEL,
     LakeshoreBaseIO,
     PIDBaseIO,
 )
@@ -224,7 +225,7 @@ class Lakeshore340(Lakeshore):
         control_channel: int = 1,
         heater_setting: type[SignalDatatypeT] = int,
         pid_mode: type[SignalDatatypeT] = int,
-        input_channel_type: type[SignalDatatypeT] = LAKESHORE336_PID_INPUT_CHANNEL,
+        input_channel_type: type[SignalDatatypeT] = LAKESHORE340_PID_INPUT_CHANNEL,
         single_control_channel: bool = True,
         name: str = "",
     ):
