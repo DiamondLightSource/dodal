@@ -1,15 +1,16 @@
 from itertools import dropwhile
-from unittest.mock import AsyncMock, Mock
+from unittest.mock import MagicMock, Mock, call
 
 import pytest
 from bluesky import FailedStatus
 from bluesky import plan_stubs as bps
 from bluesky.preprocessors import run_decorator
 from bluesky.run_engine import RunEngine
-from ophyd_async.testing import set_mock_value
+from ophyd_async.testing import get_mock_put, set_mock_value
 
 from dodal.common.beamlines.beamline_parameters import GDABeamlineParameters
 from dodal.devices.i03 import Beamstop, BeamstopPositions
+from dodal.devices.util.test_utils import patch_motor
 
 
 @pytest.fixture
@@ -73,23 +74,26 @@ async def test_set_beamstop_position_to_data_collection_moves_beamstop_into_beam
     beamstop = Beamstop("-MO-BS-01:", beamline_parameters, name="beamstop")
     await beamstop.connect(mock=True)
 
-    beamstop.x_mm.set = AsyncMock()
-    beamstop.y_mm.set = AsyncMock()
-    beamstop.z_mm.set = AsyncMock()
-    set_mock_value(beamstop.x_mm.user_readback, 0)
-    set_mock_value(beamstop.y_mm.user_readback, 0)
-    set_mock_value(beamstop.z_mm.user_readback, 0)
+    patch_motor(beamstop.x_mm)
+    patch_motor(beamstop.y_mm)
+    patch_motor(beamstop.z_mm)
+
+    x_mock = beamstop.x_mm.user_setpoint
+    y_mock = beamstop.y_mm.user_setpoint
+    z_mock = beamstop.z_mm.user_setpoint
+
+    parent_mock = MagicMock()
+    parent_mock.attach_mock(get_mock_put(x_mock), "beamstop_x")
+    parent_mock.attach_mock(get_mock_put(y_mock), "beamstop_y")
+    parent_mock.attach_mock(get_mock_put(z_mock), "beamstop_z")
 
     RE(bps.abs_set(beamstop.selected_pos, BeamstopPositions.DATA_COLLECTION))
 
-    assert beamstop.x_mm.set.call_count == 1
-    assert beamstop.x_mm.set.call_args[0][0] == 1.52
+    assert get_mock_put(x_mock).call_args_list == [call(1.52, wait=True)]
+    assert get_mock_put(y_mock).call_args_list == [call(44.78, wait=True)]
+    assert get_mock_put(z_mock).call_args_list == [call(30.0, wait=True)]
 
-    assert beamstop.y_mm.set.call_count == 1
-    assert beamstop.y_mm.set.call_args[0][0] == 44.78
-
-    assert beamstop.z_mm.set.call_count == 1
-    assert beamstop.z_mm.set.call_args[0][0] == 30.0
+    assert parent_mock.method_calls[0] == call.beamstop_z(30.0, wait=True)
 
 
 async def test_set_beamstop_position_to_unknown_raises_error(
