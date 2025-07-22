@@ -1,6 +1,6 @@
 from typing import Generic
 
-from pydantic import AliasChoices, Field
+from pydantic import Field
 
 from dodal.devices.electron_analyser.abstract.base_region import (
     AbstractBaseRegion,
@@ -18,18 +18,10 @@ class SpecsRegion(
     lens_mode: TLensMode
     pass_energy: float = 5
     acquisition_mode: AcquisitionMode = AcquisitionMode.FIXED_TRANSMISSION
-    acquire_time: float = Field(
-        default=1.0, validation_alias=AliasChoices("exposure_time", "acquire_time")
-    )
-    low_energy: float = Field(
-        default=500, validation_alias=AliasChoices("start_energy", "low_energy")
-    )
-    high_energy: float = Field(
-        default=510, validation_alias=AliasChoices("end_energy", "high_energy")
-    )
-    energy_step: float = Field(
-        default=0.15, validation_alias=AliasChoices("step_energy", "energy_step")
-    )
+    low_energy: float = Field(default=800, alias="start_energy")
+    high_energy: float = Field(default=850, alias="end_energy")
+    acquire_time: float = Field(default=1.0, alias="exposure_time")
+    energy_step: float = Field(default=0.1, alias="step_energy")
     # Specific to this class
     values: int = 1
     centre_energy: float = 0

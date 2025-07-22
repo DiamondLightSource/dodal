@@ -87,7 +87,8 @@ class AbstractAnalyserDriverIO(
             self.excitation_energy = soft_signal_rw(float, initial_value=0, units="eV")
 
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
-            # Used for setting up region data acquisition.
+            # Read once per scan after data acquired
+            # Used for setting up region data acquisition
             self.region_name = soft_signal_rw(str, initial_value="null")
             self.energy_mode = soft_signal_rw(
                 EnergyMode, initial_value=EnergyMode.KINETIC
@@ -107,9 +108,10 @@ class AbstractAnalyserDriverIO(
             # analyser type to know if is moved with region settings.
             self.psu_mode = epics_signal_rw(psu_mode_type, prefix + "PSU_MODE")
 
+        self.add_readables([self.acquire_time], StandardReadableFormat.CONFIG_SIGNAL)
+
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
-            # Read once per scan after data acquired
-            self.acquire_time = self.acquire_time
+            # NOT used for setting up region data acquisition.
             self.energy_axis = self._create_energy_axis_signal(prefix)
             self.binding_energy_axis = derived_signal_r(
                 self._calculate_binding_energy_axis,

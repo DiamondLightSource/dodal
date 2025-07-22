@@ -32,6 +32,7 @@ class PsuMode(SupersetEnum):
     V1500 = "1.5kV"
     V400 = "400V"
     V100 = "100V"
+    V40 = "40V"
     V10 = "10V"
     # This is connected to the device separately and will only have "Not connected" as
     # option if disconnected. Once it is connected, "Not connected" is replaced with the
