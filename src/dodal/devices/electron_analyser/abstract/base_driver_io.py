@@ -118,13 +118,12 @@ class AbstractAnalyserDriverIO(
                 energy_mode=self.energy_mode,
             )
             self.angle_axis = self._create_angle_axis_signal(prefix)
-            self.step_time = epics_signal_r(float, prefix + "AcquireTime")
             self.total_steps = epics_signal_r(int, prefix + "TOTAL_POINTS_RBV")
             self.total_time = derived_signal_r(
                 self._calculate_total_time,
                 "s",
                 total_steps=self.total_steps,
-                step_time=self.step_time,
+                step_time=self.acquire_time,
                 iterations=self.iterations,
             )
 
