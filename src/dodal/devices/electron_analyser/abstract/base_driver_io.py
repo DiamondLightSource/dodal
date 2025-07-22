@@ -75,6 +75,7 @@ class AbstractAnalyserDriverIO(
         self.psu_mode_type = psu_mode_type
         self.pass_energy_type = pass_energy_type
 
+        # must call first to initiate parent pydantic fields
         super().__init__(prefix=prefix, name=name)
 
         with self.add_children_as_readables():
