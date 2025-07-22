@@ -30,6 +30,8 @@ class EurothermUpdate(StrictEnum):
 
 
 class EurothermGeneral(StandardReadable):
+    """A base class for any eurotherm controller."""
+
     def __init__(
         self,
         prefix: str,
@@ -64,6 +66,9 @@ class EurothermGeneral(StandardReadable):
 
 
 class EurothermAutotune(StandardReadable):
+    """Newer versions of Eurotherm controllers have the ability to Autotune the
+    PID values, and this is the device"""
+
     def __init__(
         self,
         prefix: str,
@@ -81,6 +86,8 @@ class EurothermAutotune(StandardReadable):
 
 
 class EurothermPID(StandardReadable):
+    """The class for the Eurotherm PID values"""
+
     def __init__(self, prefix: str, name: str = "", rbv_suffix=":RBV", update=False):
         with self.add_children_as_readables():
             self.P = epics_signal_rw_rbv(float, f"{prefix}P", rbv_suffix)

@@ -10,6 +10,8 @@ class CyberstarBlowerEnable(StrictEnum):
 
 
 class CyberstarBlower(EurothermGeneral):
+    """This is a specific device that uses a Eurotherm controller"""
+
     def __init__(
         self,
         prefix: str,
