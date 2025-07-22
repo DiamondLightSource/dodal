@@ -77,6 +77,20 @@ class XYZThetaStage(XYZStage):
         super().__init__(prefix, name, x_infix, y_infix, z_infix)
 
 
+class XYPhiStage(XYStage):
+    def __init__(
+        self,
+        prefix: str,
+        x_infix: str = _X,
+        y_infix: str = _Y,
+        phi_infix: str = "PHI",
+        name: str = "",
+    ) -> None:
+        with self.add_children_as_readables():
+            self.phi = Motor(prefix + phi_infix)
+        super().__init__(prefix, name, x_infix, y_infix)
+
+
 class XYPitchStage(XYStage):
     def __init__(
         self,
@@ -134,6 +148,27 @@ class SixAxisGonio(XYZStage):
         self.vertical_in_lab_space = create_axis_perp_to_rotation(
             self.omega, self.y, self.z
         )
+
+
+class SixAxisGonioKappaGeometry(XYZStage):
+    def __init__(
+        self,
+        prefix: str,
+        name: str = "",
+        x_infix: str = _X,
+        y_infix: str = _Y,
+        z_infix: str = _Z,
+        kappa_infix: str = "KAPPA",
+        phi_infix: str = "PHI",
+        theta_infix: str = "THETA",
+        mu_infix: str = "MU",
+    ):
+        with self.add_children_as_readables():
+            self.kappa = Motor(prefix + kappa_infix)
+            self.phi = Motor(prefix + phi_infix)
+            self.theta = Motor(prefix + theta_infix)
+            self.mu = Motor(prefix + mu_infix)
+        super().__init__(prefix, name, x_infix, y_infix, z_infix)
 
 
 class YZStage(Stage):
