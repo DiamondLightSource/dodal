@@ -8,16 +8,20 @@ First clone the repository locally using [Git](https://git-scm.com/downloads). T
 
 ## Install dependencies
 
-You can choose to either develop on the host machine using a `venv` (which requires python 3.10 or later) or to run 
+You can choose to either develop on the host machine using a `venv` (which requires python 3.11 or later) or to run 
 in a container under [VSCode](https://code.visualstudio.com/)
 
 <!-- https://sphinx-design.readthedocs.io/en/latest/tabs.html# -->
 ::::{tab-set}
 
 :::{tab-item} Local virtualenv
+
+If on a DLS machine make sure you have python >3.11 running by doing `module load python/3.11`
+
 ```
-python3 -m venv venv
+python -m venv venv
 source venv/bin/activate
+pip install --upgrade pip
 pip install -e '.[dev]'
 ```
 
