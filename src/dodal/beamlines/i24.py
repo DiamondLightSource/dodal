@@ -32,7 +32,7 @@ ZOOM_PARAMS_FILE = (
 DISPLAY_CONFIG = "/dls_sw/i24/software/gda_versions/var/display.configuration"
 
 
-BL = get_beamline_name("s24")
+BL = get_beamline_name("i24")
 set_log_beamline(BL)
 set_utils_beamline(BL)
 
@@ -149,7 +149,7 @@ def pmac() -> PMAC:
     )
 
 
-@device_factory(skip=BL == "s24")
+@device_factory()
 def oav() -> OAVBeamCentreFile:
     return OAVBeamCentreFile(
         prefix=f"{PREFIX.beamline_prefix}-DI-OAV-01:",

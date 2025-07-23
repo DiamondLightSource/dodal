@@ -5,8 +5,11 @@ import numpy as np
 import pytest
 from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
+from bluesky.utils import FailedStatus
+from ophyd_async.core import SignalR, StrictEnum
 from ophyd_async.testing import assert_reading, get_mock_put, set_mock_value
 
+from dodal.devices import b07, i09
 from dodal.devices.electron_analyser import (
     to_kinetic_energy,
 )
@@ -23,14 +26,23 @@ from dodal.devices.electron_analyser.vgscienta import (
 from tests.devices.unit_tests.electron_analyser.util import (
     TEST_SEQUENCE_REGION_NAMES,
     assert_read_configuration_has_expected_value,
+    create_analyser_device,
 )
 
 
-@pytest.fixture(params=[VGScientaAnalyserDriverIO, SpecsAnalyserDriverIO])
-def driver_class(
-    request: pytest.FixtureRequest,
-) -> type[AbstractAnalyserDriverIO]:
-    return request.param
+@pytest.fixture(
+    params=[
+        VGScientaAnalyserDriverIO[i09.LensMode, i09.PsuMode, i09.PassEnergy],
+        SpecsAnalyserDriverIO[b07.LensMode, b07.PsuMode],
+    ]
+)
+async def sim_driver(
+    request: pytest.FixtureRequest, energy_sources: dict[str, SignalR[float]]
+) -> AbstractAnalyserDriverIO:
+    return await create_analyser_device(
+        request.param,
+        energy_sources,
+    )
 
 
 @pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
@@ -82,8 +94,7 @@ async def test_given_region_that_analyser_sets_energy_values_correctly(
     expected_high_e = to_kinetic_energy(
         region.high_energy, region.energy_mode, excitation_energy
     )
-    expected_pass_e_type = sim_driver.pass_energy_type
-    expected_pass_e = expected_pass_e_type(region.pass_energy)
+    expected_pass_e = region.pass_energy
 
     expected_energy_source = energy_source.name
 
@@ -187,3 +198,42 @@ def test_analyser_raise_error_on_invalid_energy_source_selected(
 ) -> None:
     with pytest.raises(KeyError):
         sim_driver._get_energy_source("invalid_name")
+
+
+def test_driver_throws_error_with_wrong_lens_mode(
+    sim_driver: AbstractAnalyserDriverIO,
+    RE: RunEngine,
+) -> None:
+    class LensModeTestEnum(StrictEnum):
+        TEST_1 = "Invalid mode"
+
+    lens_datatype = sim_driver.lens_mode.datatype
+    lens_datatype_name = lens_datatype.__name__ if lens_datatype is not None else ""
+    with pytest.raises(FailedStatus, match=f"is not a valid {lens_datatype_name}"):
+        RE(bps.mv(sim_driver.lens_mode, LensModeTestEnum.TEST_1))
+
+
+def test_driver_throws_error_with_wrong_acquisition_mode(
+    sim_driver: AbstractAnalyserDriverIO,
+    RE: RunEngine,
+) -> None:
+    class AcquisitionModeTestEnum(StrictEnum):
+        TEST_1 = "Invalid mode"
+
+    acq_datatype = sim_driver.acquisition_mode.datatype
+    acq_datatype_name = acq_datatype.__name__ if acq_datatype is not None else ""
+    with pytest.raises(FailedStatus, match=f"is not a valid {acq_datatype_name}"):
+        RE(bps.mv(sim_driver.acquisition_mode, AcquisitionModeTestEnum.TEST_1))
+
+
+def test_driver_throws_error_with_wrong_psu_mode(
+    sim_driver: AbstractAnalyserDriverIO,
+    RE: RunEngine,
+) -> None:
+    class PsuModeTestEnum(StrictEnum):
+        TEST_1 = "Invalid mode"
+
+    psu_datatype = sim_driver.psu_mode.datatype
+    psu_datatype_name = psu_datatype.__name__ if psu_datatype is not None else ""
+    with pytest.raises(FailedStatus, match=f"is not a valid {psu_datatype_name}"):
+        RE(bps.mv(sim_driver.psu_mode, PsuModeTestEnum.TEST_1))

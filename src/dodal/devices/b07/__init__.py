@@ -1,3 +1,3 @@
-from dodal.devices.b07.grating import B07BGrating
+from dodal.devices.b07.enums import Grating, LensMode, PsuMode
 
-__all__ = ["B07BGrating"]
+__all__ = ["Grating", "LensMode", "PsuMode"]

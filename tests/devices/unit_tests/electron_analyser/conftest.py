@@ -2,18 +2,16 @@ from typing import Any
 
 import pytest
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import SignalR, init_devices
+from ophyd_async.core import SignalR
 from ophyd_async.sim import SimMotor
 
 from dodal.devices.electron_analyser import (
     ElectronAnalyserDetector,
-    ElectronAnalyserDetectorImpl,
-    ElectronAnalyserDriverImpl,
 )
 from dodal.devices.electron_analyser.abstract import (
     AbstractAnalyserDriverIO,
+    AbstractBaseRegion,
     AbstractBaseSequence,
-    TAbstractBaseRegion,
     TAbstractBaseSequence,
 )
 from dodal.devices.electron_analyser.specs import (
@@ -47,39 +45,20 @@ async def energy_sources(
 
 
 @pytest.fixture
-async def sim_detector(
-    detector_class: type[ElectronAnalyserDetectorImpl],
-    energy_sources: dict[str, SignalR[float]],
-    RE: RunEngine,
-) -> ElectronAnalyserDetectorImpl:
-    async with init_devices(mock=True, connect=True):
-        sim_detector = detector_class(prefix="TEST:", energy_sources=energy_sources)
-    return sim_detector
-
-
-@pytest.fixture
-async def sim_driver(
-    driver_class: type[ElectronAnalyserDriverImpl],
-    energy_sources: dict[str, SignalR[float]],
-    RE: RunEngine,
-) -> ElectronAnalyserDriverImpl:
-    async with init_devices(mock=True, connect=True):
-        sim_driver = driver_class(
-            prefix="TEST:",
-            energy_sources=energy_sources,
-        )
-    return sim_driver
-
-
-@pytest.fixture
 def sequence_class(
-    driver_class: type[AbstractAnalyserDriverIO],
+    sim_driver: AbstractAnalyserDriverIO,
 ) -> type[AbstractBaseSequence]:
-    if driver_class == VGScientaAnalyserDriverIO:
-        return VGScientaSequence
-    elif driver_class == SpecsAnalyserDriverIO:
-        return SpecsSequence
-    raise ValueError("class " + str(driver_class) + " not recognised")
+    # We must include the pass energy, lens and psu mode types here, otherwise the
+    # sequence file can't be loaded as pydantic won't be able to resolve the enums.
+    if isinstance(sim_driver, VGScientaAnalyserDriverIO):
+        return VGScientaSequence[
+            sim_driver.lens_mode_type,
+            sim_driver.psu_mode_type,
+            sim_driver.pass_energy_type,
+        ]
+    elif isinstance(sim_driver, SpecsAnalyserDriverIO):
+        return SpecsSequence[sim_driver.lens_mode_type, sim_driver.psu_mode_type]
+    raise ValueError("class " + str(sim_driver) + " not recognised")
 
 
 @pytest.fixture
@@ -87,7 +66,7 @@ def sequence(
     sim_driver: AbstractAnalyserDriverIO,
     sequence_class: type[TAbstractBaseSequence],
     RE: RunEngine,
-):
+) -> AbstractBaseSequence:
     det = ElectronAnalyserDetector(
         driver=sim_driver,
         sequence_class=sequence_class,
@@ -97,8 +76,9 @@ def sequence(
 
 @pytest.fixture
 def region(
-    request: pytest.FixtureRequest, sequence: AbstractBaseSequence[TAbstractBaseRegion]
-) -> TAbstractBaseRegion:
+    request: pytest.FixtureRequest,
+    sequence: AbstractBaseSequence,
+) -> AbstractBaseRegion:
     region = sequence.get_region_by_name(request.param)
     if region is None:
         raise ValueError("Region " + request.param + " is not found.")
