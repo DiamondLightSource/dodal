@@ -2,6 +2,15 @@ from ophyd_async.epics.motor import Motor
 
 from dodal.common.beamlines.beamline_utils import device_factory
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
+from dodal.devices.i15.dcm import DCM
+from dodal.devices.i15.focussing_mirror import (
+    FocusingMirror,
+    FocusingMirrorHorizontal,
+    FocusingMirrorVertical,
+    FocusingMirrorWithRoll,
+)
+from dodal.devices.i15.jack import JackX, JackY
+from dodal.devices.i15.motors import UpstreamDownstreamPair, XYZPitchYawStage
 from dodal.devices.motors import (
     SixAxisGonioKappaGeometry,
     XYStage,
@@ -25,13 +34,8 @@ to one or more Bluesky Protocols.
 
 
 @device_factory()
-def armds() -> Motor:
-    return Motor(f"{PREFIX.beamline_prefix}-MO-LHEAT-01:ARM:DS")
-
-
-@device_factory()
-def armus() -> Motor:
-    return Motor(f"{PREFIX.beamline_prefix}-MO-LHEAT-01:ARM:US")
+def arm() -> UpstreamDownstreamPair:
+    return UpstreamDownstreamPair(f"{PREFIX.beamline_prefix}-MO-LHEAT-01:ARM:")
 
 
 @device_factory()
@@ -45,53 +49,13 @@ def bs2() -> XYStage:
 
 
 @device_factory()
-def bs3() -> XYStage:
+def bs3() -> XYZStage:
     return XYZStage(f"{PREFIX.beamline_prefix}-RS-ABSB-09:")
 
 
 @device_factory()
-def dcmbragg1() -> Motor:
-    return Motor(f"{PREFIX.beamline_prefix}-OP-DCM-01:XTAL1:THETA")
-
-
-@device_factory()
-def dcmbragg2() -> Motor:
-    return Motor(f"{PREFIX.beamline_prefix}-OP-DCM-01:XTAL2:THETA")
-
-
-@device_factory()
-def dcmenergy() -> Motor:
-    return Motor(f"{PREFIX.beamline_prefix}-OP-DCM-01:ENERGY")
-
-
-@device_factory()
-def dcmenergy_cal() -> Motor:
-    return Motor(f"{PREFIX.beamline_prefix}-OP-DCM-01:CAL")
-
-
-@device_factory()
-def dcmx1() -> Motor:
-    return Motor(f"{PREFIX.beamline_prefix}-OP-DCM-01:X1")
-
-
-@device_factory()
-def dcmxtl1roll() -> Motor:
-    return Motor(f"{PREFIX.beamline_prefix}-OP-DCM-01:XTAL1:ROLL")
-
-
-@device_factory()
-def dcmxtl1y() -> Motor:
-    return Motor(f"{PREFIX.beamline_prefix}-OP-DCM-01:XTAL1:Y")
-
-
-@device_factory()
-def dcmxtl1z() -> Motor:
-    return Motor(f"{PREFIX.beamline_prefix}-OP-DCM-01:XTAL1:Z")
-
-
-@device_factory()
-def dcmxtl2y() -> Motor:
-    return Motor(f"{PREFIX.beamline_prefix}-OP-DCM-01:XTAL2:Y")
+def dcm() -> DCM:
+    return DCM(f"{PREFIX.beamline_prefix}-OP-DCM-01:")
 
 
 @device_factory()
@@ -101,6 +65,7 @@ def det1z() -> Motor:
 
 @device_factory()
 def det2z() -> Motor:
+    """Deliberately the same as eht2dtx"""
     return Motor(f"{PREFIX.beamline_prefix}-MO-TABLE-03:DETECTOR2:Z")
 
 
@@ -114,32 +79,13 @@ def diffractometer() -> SixAxisGonioKappaGeometry:
 
 
 @device_factory()
-def djack1() -> Motor:
-    return Motor(f"{PREFIX.beamline_prefix}-MO-DIFF-01:BASE:Y1")
-
-
-@device_factory()
-def djack2() -> Motor:
-    return Motor(f"{PREFIX.beamline_prefix}-MO-DIFF-01:BASE:Y2")
-
-
-@device_factory()
-def djack3() -> Motor:
-    return Motor(f"{PREFIX.beamline_prefix}-MO-DIFF-01:BASE:Y3")
-
-
-@device_factory()
-def drotation() -> Motor:
-    return Motor(f"{PREFIX.beamline_prefix}-MO-DIFF-01:BASE:Ry")
-
-
-@device_factory()
-def dtransx() -> Motor:
-    return Motor(f"{PREFIX.beamline_prefix}-MO-DIFF-01:BASE:X")
+def djack1() -> JackX:
+    return JackX(f"{PREFIX.beamline_prefix}-MO-DIFF-01:BASE:")
 
 
 @device_factory()
 def eht2dtx() -> Motor:
+    """Deliberately the same as det2z"""
     return Motor(f"{PREFIX.beamline_prefix}-MO-TABLE-03:DETECTOR2:Z")
 
 
@@ -159,38 +105,8 @@ def fs2() -> XYStage:
 
 
 @device_factory()
-def hfm_curve() -> Motor:
-    return Motor(f"{PREFIX.beamline_prefix}-OP-HFM-01:CURVE")
-
-
-@device_factory()
-def hfm_ellipticity() -> Motor:
-    return Motor(f"{PREFIX.beamline_prefix}-OP-HFM-01:ELLIP")
-
-
-@device_factory()
-def hfm_pitch() -> Motor:
-    return Motor(f"{PREFIX.beamline_prefix}-OP-HFM-01:PITCH")
-
-
-@device_factory()
-def hfm_roll() -> Motor:
-    return Motor(f"{PREFIX.beamline_prefix}-OP-HFM-01:ROLL")
-
-
-@device_factory()
-def hfm_yaw() -> Motor:
-    return Motor(f"{PREFIX.beamline_prefix}-OP-HFM-01:YAW")
-
-
-@device_factory()
-def hfm_x() -> Motor:
-    return Motor(f"{PREFIX.beamline_prefix}-OP-HFM-01:X")
-
-
-@device_factory()
-def hfm_y() -> Motor:
-    return Motor(f"{PREFIX.beamline_prefix}-OP-HFM-01:Y")
+def hfm() -> FocusingMirrorWithRoll:
+    return FocusingMirrorWithRoll(f"{PREFIX.beamline_prefix}-OP-HFM-01:")
 
 
 @device_factory()
@@ -199,33 +115,18 @@ def laserboard() -> XYZStage:
 
 
 @device_factory()
-def objds() -> Motor:
-    return Motor(f"{PREFIX.beamline_prefix}-MO-LHEAT-01:OBJ:DS")
+def obj() -> UpstreamDownstreamPair:
+    return UpstreamDownstreamPair(f"{PREFIX.beamline_prefix}-MO-LHEAT-01:OBJ:")
 
 
 @device_factory()
-def objus() -> Motor:
-    return Motor(f"{PREFIX.beamline_prefix}-MO-LHEAT-01:OBJ:US")
+def opticds() -> XYStage:
+    return XYStage(f"{PREFIX.beamline_prefix}-MO-LHEAT-01:OPTIC:DS:")
 
 
 @device_factory()
-def opticxds() -> Motor:
-    return Motor(f"{PREFIX.beamline_prefix}-MO-LHEAT-01:OPTIC:DS:X")
-
-
-@device_factory()
-def opticxus() -> Motor:
-    return Motor(f"{PREFIX.beamline_prefix}-MO-LHEAT-01:OPTIC:US:X")
-
-
-@device_factory()
-def opticyds() -> Motor:
-    return Motor(f"{PREFIX.beamline_prefix}-MO-LHEAT-01:OPTIC:DS:Y")
-
-
-@device_factory()
-def opticyus() -> Motor:
-    return Motor(f"{PREFIX.beamline_prefix}-MO-LHEAT-01:OPTIC:US:Y")
+def opticus() -> XYStage:
+    return XYStage(f"{PREFIX.beamline_prefix}-MO-LHEAT-01:OPTIC:US:")
 
 
 @device_factory()
@@ -234,28 +135,8 @@ def pin3() -> XYStage:
 
 
 @device_factory()
-def pinpitch() -> Motor:
-    return Motor(f"{PREFIX.beamline_prefix}-AL-APTR-02:PITCH")
-
-
-@device_factory()
-def pinx() -> Motor:
-    return Motor(f"{PREFIX.beamline_prefix}-AL-APTR-02:X")
-
-
-@device_factory()
-def piny() -> Motor:
-    return Motor(f"{PREFIX.beamline_prefix}-AL-APTR-02:Y")
-
-
-@device_factory()
-def pinyaw() -> Motor:
-    return Motor(f"{PREFIX.beamline_prefix}-AL-APTR-02:YAW")
-
-
-@device_factory()
-def pinz() -> Motor:
-    return Motor(f"{PREFIX.beamline_prefix}-AL-APTR-02:Z")
+def pin() -> XYZPitchYawStage:
+    return XYZPitchYawStage(f"{PREFIX.beamline_prefix}-AL-APTR-02:")
 
 
 @device_factory()
@@ -332,130 +213,30 @@ def shd2() -> XYZStage:
 
 
 @device_factory()
-def shfmcurve() -> Motor:
-    return Motor(f"{PREFIX.beamline_prefix}-OP-MIRR-03:HFM:CURVE")
+def shfm() -> FocusingMirrorHorizontal:
+    return FocusingMirrorHorizontal(f"{PREFIX.beamline_prefix}-OP-MIRR-03:HFM:")
 
 
 @device_factory()
-def shfmellip() -> Motor:
-    return Motor(f"{PREFIX.beamline_prefix}-OP-MIRR-03:HFM:ELLIP")
+def skb() -> JackY:
+    return JackY(f"{PREFIX.beamline_prefix}-OP-MIRR-03:BASE:")
 
 
 @device_factory()
-def shfmpitch() -> Motor:
-    return Motor(f"{PREFIX.beamline_prefix}-OP-MIRR-03:HFM:PITCH")
+def svfm() -> FocusingMirrorVertical:
+    return FocusingMirrorVertical(f"{PREFIX.beamline_prefix}-OP-MIRR-03:VFM:")
 
 
 @device_factory()
-def shfmx() -> Motor:
-    return Motor(f"{PREFIX.beamline_prefix}-OP-MIRR-03:HFM:X")
+def tab2jack() -> JackX:
+    return JackX(f"{PREFIX.beamline_prefix}-MO-TABLE-03:BASE:")
 
 
 @device_factory()
-def skbjack1() -> Motor:
-    return Motor(f"{PREFIX.beamline_prefix}-OP-MIRR-03:BASE:J1")
+def vfm() -> FocusingMirror:
+    return FocusingMirror(f"{PREFIX.beamline_prefix}-OP-VFM-01:")
 
 
 @device_factory()
-def skbjack2() -> Motor:
-    return Motor(f"{PREFIX.beamline_prefix}-OP-MIRR-03:BASE:J2")
-
-
-@device_factory()
-def skbjack3() -> Motor:
-    return Motor(f"{PREFIX.beamline_prefix}-OP-MIRR-03:BASE:J3")
-
-
-@device_factory()
-def skbpitch() -> Motor:
-    return Motor(f"{PREFIX.beamline_prefix}-OP-MIRR-03:BASE:PITCH")
-
-
-@device_factory()
-def skbroll() -> Motor:
-    return Motor(f"{PREFIX.beamline_prefix}-OP-MIRR-03:BASE:ROLL")
-
-
-@device_factory()
-def skby() -> Motor:
-    return Motor(f"{PREFIX.beamline_prefix}-OP-MIRR-03:BASE:Y")
-
-
-@device_factory()
-def svfmcurve() -> Motor:
-    return Motor(f"{PREFIX.beamline_prefix}-OP-MIRR-03:VFM:CURVE")
-
-
-@device_factory()
-def svfmellip() -> Motor:
-    return Motor(f"{PREFIX.beamline_prefix}-OP-MIRR-03:VFM:ELLIP")
-
-
-@device_factory()
-def svfmpitch() -> Motor:
-    return Motor(f"{PREFIX.beamline_prefix}-OP-MIRR-03:VFM:PITCH")
-
-
-@device_factory()
-def svfmy() -> Motor:
-    return Motor(f"{PREFIX.beamline_prefix}-OP-MIRR-03:VFM:Y")
-
-
-@device_factory()
-def tab2jack1() -> Motor:
-    return Motor(f"{PREFIX.beamline_prefix}-MO-TABLE-03:BASE:Y1")
-
-
-@device_factory()
-def tab2jack2() -> Motor:
-    return Motor(f"{PREFIX.beamline_prefix}-MO-TABLE-03:BASE:Y2")
-
-
-@device_factory()
-def tab2jack3() -> Motor:
-    return Motor(f"{PREFIX.beamline_prefix}-MO-TABLE-03:BASE:Y3")
-
-
-@device_factory()
-def tab2rotation() -> Motor:
-    return Motor(f"{PREFIX.beamline_prefix}-MO-TABLE-03:BASE:Ry")
-
-
-@device_factory()
-def tab2transx() -> Motor:
-    return Motor(f"{PREFIX.beamline_prefix}-MO-TABLE-03:BASE:X")
-
-
-@device_factory()
-def vfm_curve() -> Motor:
-    return Motor(f"{PREFIX.beamline_prefix}-OP-VFM-01:CURVE")
-
-
-@device_factory()
-def vfm_ellipticity() -> Motor:
-    return Motor(f"{PREFIX.beamline_prefix}-OP-VFM-01:ELLIP")
-
-
-@device_factory()
-def vfm_pitch() -> Motor:
-    return Motor(f"{PREFIX.beamline_prefix}-OP-VFM-01:PITCH")
-
-
-@device_factory()
-def vfm_x() -> Motor:
-    return Motor(f"{PREFIX.beamline_prefix}-OP-VFM-01:X")
-
-
-@device_factory()
-def vfm_y() -> Motor:
-    return Motor(f"{PREFIX.beamline_prefix}-OP-VFM-01:Y")
-
-
-@device_factory()
-def vfm_yaw() -> Motor:
-    return Motor(f"{PREFIX.beamline_prefix}-OP-VFM-01:YAW")
-
-
-@device_factory(skip=BL == "i15")
 def synchrotron() -> Synchrotron:
     return Synchrotron()
