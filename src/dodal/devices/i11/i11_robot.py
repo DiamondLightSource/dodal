@@ -13,11 +13,11 @@ from dodal.log import LOGGER
 
 
 class RobotJobs(StrictEnum):
-    RECOVER = "RECOVER"
-    PICKC = "PICKC"
-    PLACEC = "PLACEC"
-    PICKD = "PICKD"
-    PLACED = "PLACED"
+    RECOVER = "RECOVER"  # Recover from unknown state
+    PICKC = "PICKC"  # Pick a sample from the carousel.
+    PLACEC = "PLACEC"  # Place a sample onto the carousel
+    PICKD = "PICKD"  # Pick a sample from the diffractometer.
+    PLACED = "PLACED"  # Place a sample onto the diffractometer.
     GRIPO = "GRIPO"
     GRIPC = "GRIPC"
     TABLEIN = "TABLEIN"
@@ -27,7 +27,7 @@ class RobotJobs(StrictEnum):
 
 class RobotSampleState:
     CAROSEL = 0.0
-    INJAWS = 1.0
+    ONGRIP = 1.0
     DIFF = 2.0
     UNKNOWN = 3.0
 
@@ -46,6 +46,8 @@ class I11Robot(StandardReadable, Locatable):
     """
 
     MAX_ROBOT_NEXT_POSITION_ATTEMPTS = 3
+    MAX_NUMBER_OF_SAMPLES = 200
+    MIN_NUMBER_OF_SAMPLES = 1
     LOAD_TIMEOUT = 300
 
     def __init__(self, prefix: str, name=""):
@@ -76,7 +78,7 @@ class I11Robot(StandardReadable, Locatable):
                 set_and_wait_for_value(self.job, RobotJobs.PICKD),
                 set_and_wait_for_value(self.job, RobotJobs.PLACEC),
             )
-        elif sample_state == RobotSampleState.INJAWS:
+        elif sample_state == RobotSampleState.ONGRIP:
             await set_and_wait_for_value(self.job, RobotJobs.PLACEC)
         elif sample_state == RobotSampleState.CAROSEL:
             pass
@@ -106,7 +108,7 @@ class I11Robot(StandardReadable, Locatable):
                 await self.set(sample_location)
                 await set_and_wait_for_value(self.job, RobotJobs.PICKC)
 
-                if sample_state == RobotSampleState.INJAWS:
+                if sample_state == RobotSampleState.ONGRIP:
                     await set_and_wait_for_value(self.job, RobotJobs.PLACED)
                     success = True
                 else:
