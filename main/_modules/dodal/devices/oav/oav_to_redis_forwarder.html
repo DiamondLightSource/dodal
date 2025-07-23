@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.oav.oav_to_redis_forwarder &#8212; dodal 1.53.1.dev7+g193e9fce66 documentation</title>
+    <title>dodal.devices.oav.oav_to_redis_forwarder &#8212; dodal 1.53.1.dev8+g6fbbefcae1 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=b70f54d6"></script>
+    <script src="../../../../_static/documentation_options.js?v=2326d692"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -573,11 +573,11 @@ window.addEventListener("load", () => mermaid.run());
 <span class="sd">        pickled numpy array of pixel values but raw byes are more space efficient. There</span>
 <span class="sd">        may be better ways of doing this, see https://github.com/DiamondLightSource/mx-bluesky/issues/592&quot;&quot;&quot;</span>
         <span class="n">jpeg_bytes</span> <span class="o">=</span> <span class="k">await</span> <span class="n">get_next_jpeg</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">uuid_setter</span><span class="p">(</span><span class="n">redis_uuid</span><span class="p">)</span>
         <span class="n">sample_id</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_id</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
         <span class="n">redis_key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;murko:</span><span class="si">{</span><span class="n">sample_id</span><span class="si">}</span><span class="s2">:raw&quot;</span>
         <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">redis_client</span><span class="o">.</span><span class="n">hset</span><span class="p">(</span><span class="n">redis_key</span><span class="p">,</span> <span class="n">redis_uuid</span><span class="p">,</span> <span class="n">jpeg_bytes</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
         <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">redis_client</span><span class="o">.</span><span class="n">expire</span><span class="p">(</span><span class="n">redis_key</span><span class="p">,</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">DATA_EXPIRY_DAYS</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uuid_setter</span><span class="p">(</span><span class="n">redis_uuid</span><span class="p">)</span>
 
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_open_connection_and_do_function</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">function_to_do</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">ClientResponse</span><span class="p">,</span> <span class="n">OAVSource</span><span class="p">],</span> <span class="n">Awaitable</span><span class="p">]</span>
