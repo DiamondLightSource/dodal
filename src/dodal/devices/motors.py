@@ -70,7 +70,7 @@ class XYZThetaStage(XYZStage):
         x_infix: str = _X,
         y_infix: str = _Y,
         z_infix: str = _Z,
-        theta_infix: str = _Z,
+        theta_infix: str = "THETA",
     ) -> None:
         with self.add_children_as_readables():
             self.theta = Motor(prefix + theta_infix)
