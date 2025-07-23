@@ -94,8 +94,8 @@ class Lakeshore(StandardReadable, Movable[float]):
         self.temperature_low_limit = soft_signal_rw(float, initial_value=0)
 
         self.add_readables(
-            list(self.temperature.setpoint.values())
-            + list(self.temperature.readback.values())
+            list(self.temperature.user_setpoint.values())
+            + list(self.temperature.user_readback.values())
         )
 
         self.add_readables(
@@ -126,9 +126,9 @@ class Lakeshore(StandardReadable, Movable[float]):
             self.temperature_low_limit.get_value(),
         )
         if high >= value >= low:
-            await self.temperature.setpoint[await self.control_channel.get_value()].set(
-                value
-            )
+            await self.temperature.user_setpoint[
+                await self.control_channel.get_value()
+            ].set(value)
         else:
             raise ValueError(f"Requested temperature must be withing {high} and {low}")
 
@@ -157,7 +157,10 @@ class Lakeshore(StandardReadable, Movable[float]):
         )
 
         self.add_readables(
-            [self.temperature.readback[readback], self.temperature.setpoint[value]],
+            [
+                self.temperature.user_readback[readback],
+                self.temperature.user_setpoint[value],
+            ],
             StandardReadableFormat.HINTED_SIGNAL,
         )
 

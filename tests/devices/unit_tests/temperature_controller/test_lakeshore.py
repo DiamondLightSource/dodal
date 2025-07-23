@@ -40,7 +40,7 @@ async def test_lakeshore_set_success(
     RE(abs_set(lakeshore, temperature, wait=True))
 
     assert (
-        await lakeshore.temperature.setpoint[
+        await lakeshore.temperature.user_setpoint[
             await lakeshore.control_channel.get_value()
         ].get_value()
         == temperature
@@ -88,8 +88,8 @@ async def test_lakeshore__set_control_channel_correctly_set_up_readableFormat(
     RE(abs_set(lakeshore.control_channel, control_channel, wait=True))
     assert lakeshore.hints == {
         "fields": [
-            f"lakeshore-temperature-readback-{control_channel}",
-            f"lakeshore-temperature-setpoint-{control_channel}",
+            f"lakeshore-temperature-user_readback-{control_channel}",
+            f"lakeshore-temperature-user_setpoint-{control_channel}",
         ],
     }
     expected_config = {

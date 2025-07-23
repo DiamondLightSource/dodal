@@ -43,7 +43,7 @@ class LakeshoreTemperatureIO(Device):
         no_channels: int,
         name: str = "",
     ):
-        self.readback = create_r_device_vector(
+        self.user_readback = create_r_device_vector(
             prefix=prefix,
             no_channels=no_channels,
             read_pv="KRDG",
@@ -63,7 +63,7 @@ class LakeshoreBaseIO(LakeshoreTemperatureIO):
         single_control_channel: bool = False,
     ):
         """Base class for Lakeshore IO including setpoint ramp_ramp and heater."""
-        self.setpoint = create_rw_device_vector(
+        self.user_setpoint = create_rw_device_vector(
             prefix=prefix,
             no_channels=no_channels,
             write_pv="SETP_S",
