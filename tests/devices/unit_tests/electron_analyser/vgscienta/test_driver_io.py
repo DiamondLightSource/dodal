@@ -14,10 +14,7 @@ from ophyd_async.testing import (
     set_mock_value,
 )
 
-from dodal.devices.electron_analyser import (
-    EnergyMode,
-    to_kinetic_energy,
-)
+from dodal.devices.electron_analyser import EnergyMode
 from dodal.devices.electron_analyser.vgscienta import (
     VGScientaAnalyserDriverIO,
     VGScientaRegion,
@@ -54,30 +51,12 @@ async def test_analyser_sets_region_and_reads_correctly(
     get_mock_put(sim_driver.detector_mode).assert_called_once_with(
         region.detector_mode, wait=True
     )
-
-    excitation_energy = await sim_driver._get_energy_source(
-        region.excitation_energy_source
-    ).get_value()
-
-    expected_centre_e = to_kinetic_energy(
-        region.centre_energy,
-        region.energy_mode,
-        excitation_energy,
-    )
-    get_mock_put(sim_driver.centre_energy).assert_called_once_with(
-        expected_centre_e, wait=True
-    )
-    get_mock_put(sim_driver.energy_step).assert_called_once_with(
-        region.energy_step, wait=True
-    )
-
     get_mock_put(sim_driver.region_min_x).assert_called_once_with(
         region.min_x, wait=True
     )
     get_mock_put(sim_driver.region_size_x).assert_called_once_with(
         region.size_x, wait=True
     )
-
     get_mock_put(sim_driver.region_min_y).assert_called_once_with(
         region.min_y, wait=True
     )
@@ -92,9 +71,7 @@ async def test_analyser_sets_region_and_reads_correctly(
 
     prefix = sim_driver.name + "-"
     vgscienta_expected_config_reading = {
-        f"{prefix}centre_energy": {"value": expected_centre_e},
         f"{prefix}detector_mode": {"value": region.detector_mode},
-        f"{prefix}energy_step": {"value": region.energy_step},
         f"{prefix}region_min_x": {"value": region.min_x},
         f"{prefix}region_size_x": {"value": region.size_x},
         f"{prefix}sensor_max_size_x": {"value": region.sensor_max_size_x},

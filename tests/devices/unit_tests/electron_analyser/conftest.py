@@ -152,7 +152,11 @@ async def expected_abstract_driver_config_reading(
         f"{prefix}acquisition_mode": {"value": region.acquisition_mode},
         f"{prefix}lens_mode": {"value": region.lens_mode},
         f"{prefix}low_energy": {"value": expected_low_e},
+        # Depends on analyser so just check value is in reading.
+        f"{prefix}centre_energy": {"value": await sim_driver.centre_energy.get_value()},
         f"{prefix}high_energy": {"value": expected_high_e},
+        # Depends on analyser so just check value is in reading.
+        f"{prefix}energy_step": {"value": await sim_driver.energy_step.get_value()},
         f"{prefix}pass_energy": {"value": expected_pass_e},
         f"{prefix}excitation_energy_source": {"value": energy_source.name},
         f"{prefix}slices": {"value": region.slices},

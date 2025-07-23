@@ -15,7 +15,6 @@ from ophyd_async.testing import (
 from dodal.devices.b07 import LensMode, PsuMode
 from dodal.devices.electron_analyser import EnergyMode
 from dodal.devices.electron_analyser.specs import (
-    AcquisitionMode,
     SpecsAnalyserDriverIO,
     SpecsRegion,
 )
@@ -42,20 +41,6 @@ async def test_analyser_sets_region_and_configuration_is_correct(
     expected_abstract_driver_config_reading: dict[str, dict[str, Any]],
     RE: RunEngine,
 ) -> None:
-    if region.acquisition_mode == AcquisitionMode.FIXED_TRANSMISSION:
-        get_mock_put(sim_driver.centre_energy).assert_called_once_with(
-            region.centre_energy, wait=True
-        )
-    else:
-        get_mock_put(sim_driver.energy_step).assert_not_called()
-
-    if region.acquisition_mode == AcquisitionMode.FIXED_ENERGY:
-        get_mock_put(sim_driver.energy_step).assert_called_once_with(
-            region.energy_step, wait=True
-        )
-    else:
-        get_mock_put(sim_driver.energy_step).assert_not_called()
-
     get_mock_put(sim_driver.psu_mode).assert_called_once_with(
         region.psu_mode, wait=True
     )
@@ -66,8 +51,6 @@ async def test_analyser_sets_region_and_configuration_is_correct(
 
     prefix = sim_driver.name + "-"
     specs_expected_config_reading = {
-        f"{prefix}centre_energy": {"value": await sim_driver.centre_energy.get_value()},
-        f"{prefix}energy_step": {"value": await sim_driver.energy_step.get_value()},
         f"{prefix}snapshot_values": {"value": region.values},
         f"{prefix}psu_mode": {"value": region.psu_mode},
     }

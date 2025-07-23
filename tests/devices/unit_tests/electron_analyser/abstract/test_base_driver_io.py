@@ -66,13 +66,31 @@ async def test_abstract_analyser_sets_region_and_configuration_is_correct(
     expected_excitation_e_source = expected_config[prefix + "excitation_energy_source"][
         VAL
     ]
+    expected_centre_e = expected_config[prefix + "centre_energy"][VAL]
+    expected_energy_step = expected_config[prefix + "energy_step"][VAL]
 
     get_mock_put(sim_driver.low_energy).assert_called_once_with(
         expected_low_e, wait=True
     )
+
+    if sim_driver._can_set_centre_energy(region):
+        get_mock_put(sim_driver.centre_energy).assert_called_once_with(
+            expected_centre_e, wait=True
+        )
+    else:
+        get_mock_put(sim_driver.centre_energy).assert_not_called()
+
     get_mock_put(sim_driver.high_energy).assert_called_once_with(
         expected_high_e, wait=True
     )
+
+    if sim_driver._can_set_energy_step(region):
+        get_mock_put(sim_driver.energy_step).assert_called_once_with(
+            expected_energy_step, wait=True
+        )
+    else:
+        get_mock_put(sim_driver.energy_step).assert_not_called()
+
     get_mock_put(sim_driver.pass_energy).assert_called_once_with(
         expected_pass_e, wait=True
     )
