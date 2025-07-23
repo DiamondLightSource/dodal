@@ -15,7 +15,7 @@ dependencies = [
     "click",
     "ophyd",
     "ophyd-async==0.11.0",  # Pending https://github.com/bluesky/ophyd-async/issues/976
-    "epicscorelibs<=7.0.7.99.1.2a1",  # Pending https://github.com/epics-base/epicscorelibs/issues/41
+    "epicscorelibs>=7.0.7.99.1.2a3",
     "bluesky",
     "pyepics",
     "dataclasses-json",
