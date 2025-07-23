@@ -1,9 +1,11 @@
-from dodal.common.beamlines.beamline_utils import (
-    device_factory,
-)
+from dodal.common.beamlines.beamline_utils import device_factory
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.devices.b07 import PsuMode
-from dodal.devices.b07_1 import Grating, LensMode
+from dodal.devices.b07_1 import (
+    ChannelCutMonochromator,
+    Grating,
+    LensMode,
+)
 from dodal.devices.electron_analyser.specs import SpecsAnalyserDriverIO
 from dodal.devices.pgm import PGM
 from dodal.devices.synchrotron import Synchrotron
@@ -28,6 +30,11 @@ def pgm() -> PGM:
 
 # Connect will work again after this work completed
 # https://jira.diamond.ac.uk/browse/B07-1104
+@device_factory()
+def ccmc() -> ChannelCutMonochromator:
+    return ChannelCutMonochromator(prefix=f"{PREFIX.beamline_prefix}-OP-CCM-01:")
+
+
 @device_factory()
 def analyser_driver() -> SpecsAnalyserDriverIO[LensMode, PsuMode]:
     return SpecsAnalyserDriverIO[LensMode, PsuMode](

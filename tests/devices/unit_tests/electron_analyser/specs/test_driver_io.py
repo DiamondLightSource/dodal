@@ -13,7 +13,7 @@ from ophyd_async.testing import (
 )
 
 from dodal.devices.b07 import LensMode, PsuMode
-from dodal.devices.electron_analyser import EnergyMode, to_kinetic_energy
+from dodal.devices.electron_analyser import EnergyMode
 from dodal.devices.electron_analyser.specs import (
     AcquisitionMode,
     SpecsAnalyserDriverIO,
@@ -43,23 +43,18 @@ async def test_analyser_sets_region_and_configuration_is_correct(
     RE: RunEngine,
 ) -> None:
     if region.acquisition_mode == AcquisitionMode.FIXED_TRANSMISSION:
-        get_mock_put(sim_driver.energy_step).assert_called_once_with(
-            region.energy_step, wait=True
+        get_mock_put(sim_driver.centre_energy).assert_called_once_with(
+            region.centre_energy, wait=True
         )
     else:
         get_mock_put(sim_driver.energy_step).assert_not_called()
 
     if region.acquisition_mode == AcquisitionMode.FIXED_ENERGY:
-        source = sim_driver._get_energy_source(region.excitation_energy_source)
-        excitation_energy = await source.get_value()
-        expected_centre_e = to_kinetic_energy(
-            region.centre_energy, region.energy_mode, excitation_energy
-        )
-        get_mock_put(sim_driver.centre_energy).assert_called_once_with(
-            expected_centre_e, wait=True
+        get_mock_put(sim_driver.energy_step).assert_called_once_with(
+            region.energy_step, wait=True
         )
     else:
-        get_mock_put(sim_driver.centre_energy).assert_not_called()
+        get_mock_put(sim_driver.energy_step).assert_not_called()
 
     get_mock_put(sim_driver.psu_mode).assert_called_once_with(
         region.psu_mode, wait=True
