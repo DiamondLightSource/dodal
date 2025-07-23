@@ -52,10 +52,10 @@ class I11Robot(StandardReadable, Locatable):
 
     def __init__(self, prefix: str, name=""):
         self.start = epics_signal_x(prefix + "START")
-        self.hold = epics_signal_x(prefix + "HOLD")
+        self.hold = epics_signal_rw(bool, prefix + "HOLD")
         self.job = epics_signal_rw(RobotJobs, prefix + "JOB")
-        self.servo_on = epics_signal_x(prefix + "SVON")  # Servo on/off
-        self.err = epics_signal_x(prefix + "ERR")
+        self.servo_on = epics_signal_rw(bool, prefix + "SVON")  # Servo on/off
+        self.err = epics_signal_rw(int, prefix + "ERR")
 
         self.robot_sample_state = epics_signal_rw(float, prefix + "D010")
         self.next_sample_position = epics_signal_rw_rbv(
@@ -69,7 +69,11 @@ class I11Robot(StandardReadable, Locatable):
         super().__init__(name=name)
 
     async def recover(self):
-        await set_and_wait_for_value(self.job, RobotJobs.RECOVER)
+        await asyncio.gather(
+            self.start.trigger(),
+            set_and_wait_for_value(self.job, RobotJobs.RECOVER),
+            set_and_wait_for_value(self.err, False),
+        )
 
     async def clear_sample(self, table_in=True):
         sample_state = await self.robot_sample_state.get_value()
@@ -91,6 +95,24 @@ class I11Robot(StandardReadable, Locatable):
             await set_and_wait_for_value(self.job, RobotJobs.TABLEIN)
 
         LOGGER.info("Sample cleared from diffractometer")
+
+    async def start_robot(self):
+        await asyncio.gather(
+            self.start.trigger(),
+            set_and_wait_for_value(self.servo_on, True),
+            set_and_wait_for_value(self.hold, False),
+        )
+
+    async def stop_robot(self):
+        await asyncio.gather(
+            set_and_wait_for_value(self.hold, True),
+            set_and_wait_for_value(self.hold, False),
+        )
+
+        await self.clear_sample()
+
+    async def clear_error(self):
+        await self.err.set(0)
 
     async def load_sample(self, sample_location: int):
         attempts = 0
@@ -114,7 +136,7 @@ class I11Robot(StandardReadable, Locatable):
                 else:
                     await set_and_wait_for_value(self.job, RobotJobs.TABLEIN)
                     LOGGER.warning(
-                        f"No sample at sample golder position {sample_location}"
+                        f"No sample at sample holder position {sample_location}"
                     )
                     LOGGER.warning(
                         f"Attempt {attempts} of {self.MAX_ROBOT_NEXT_POSITION_ATTEMPTS}"
