@@ -22,4 +22,4 @@ class Aperture(XYStage):
 
     def __init__(self, prefix: str, name: str = "") -> None:
         self.position = epics_signal_rw(AperturePositions, prefix + "MP:SELECT")
-        super().__init__(name)
+        super().__init__(prefix, name)
