@@ -9,7 +9,7 @@ from dodal.devices.electron_analyser.specs import (
     AcquisitionMode,
     SpecsSequence,
 )
-from tests.devices.unit_tests.electron_analyser.helpers import (
+from tests.devices.unit_tests.electron_analyser.util import (
     assert_region_has_expected_values,
     get_test_sequence,
 )

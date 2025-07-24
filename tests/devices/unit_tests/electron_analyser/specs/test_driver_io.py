@@ -21,7 +21,7 @@ from dodal.devices.electron_analyser.specs import (
     SpecsAnalyserDriverIO,
     SpecsRegion,
 )
-from tests.devices.unit_tests.electron_analyser.helpers import (
+from tests.devices.unit_tests.electron_analyser.util import (
     TEST_SEQUENCE_REGION_NAMES,
     create_analyser_device,
 )
