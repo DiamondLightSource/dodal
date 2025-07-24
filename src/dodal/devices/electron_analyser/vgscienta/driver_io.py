@@ -20,6 +20,7 @@ from dodal.devices.electron_analyser.abstract.types import (
     TPassEnergyEnum,
     TPsuMode,
 )
+from dodal.devices.electron_analyser.util import to_kinetic_energy
 from dodal.devices.electron_analyser.vgscienta.enums import (
     AcquisitionMode,
     DetectorMode,
@@ -72,8 +73,14 @@ class VGScientaAnalyserDriverIO(
 
     @AsyncStatus.wrap
     async def set(self, region: VGScientaRegion[TLensMode, TPassEnergyEnum]):
+        excitation_energy = await self.excitation_energy.get_value()
+        centre_energy = to_kinetic_energy(
+            region.centre_energy, region.energy_mode, excitation_energy
+        )
         await asyncio.gather(
             super().set(region),
+            self.centre_energy.set(centre_energy),
+            self.energy_step.set(region.energy_step),
             self.image_mode.set(ADImageMode.SINGLE),
             self.detector_mode.set(region.detector_mode),
             self.region_min_x.set(region.min_x),

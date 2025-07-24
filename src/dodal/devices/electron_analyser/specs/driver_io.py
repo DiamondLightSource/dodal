@@ -61,14 +61,6 @@ class SpecsAnalyserDriverIO(
             name=name,
         )
 
-    def _can_set_centre_energy(self, region: SpecsRegion[TLensMode, TPsuMode]) -> bool:
-        # Overwritten abstract class method to add condition on setting centre energy
-        return region.acquisition_mode == AcquisitionMode.FIXED_ENERGY
-
-    def _can_set_energy_step(self, region: SpecsRegion[TLensMode, TPsuMode]) -> bool:
-        # Overwritten abstract class method to add condition on setting energy_step
-        return region.acquisition_mode == AcquisitionMode.FIXED_TRANSMISSION
-
     @AsyncStatus.wrap
     async def set(self, region: SpecsRegion[TLensMode, TPsuMode]):
         await asyncio.gather(
@@ -76,6 +68,11 @@ class SpecsAnalyserDriverIO(
             self.snapshot_values.set(region.values),
             self.psu_mode.set(region.psu_mode),
         )
+        if region.acquisition_mode == AcquisitionMode.FIXED_ENERGY:
+            await self.centre_energy.set(region.centre_energy)
+
+        if region.acquisition_mode == AcquisitionMode.FIXED_TRANSMISSION:
+            await self.energy_step.set(region.energy_step)
 
     def _create_angle_axis_signal(self, prefix: str) -> SignalR[Array1D[np.float64]]:
         angle_axis = derived_signal_r(
