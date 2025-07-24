@@ -6,7 +6,6 @@ from ophyd_async.core import SignalR, init_devices
 from dodal.devices.electron_analyser.abstract import (
     AbstractAnalyserDriverIO,
     AbstractBaseRegion,
-    AbstractBaseSequence,
     AbstractElectronAnalyserDetector,
 )
 from dodal.devices.electron_analyser.specs import (
@@ -29,19 +28,21 @@ SEQUENCE_KEY = 0
 SEQUENCE_TYPE_KEY = 1
 
 TEST_SEQUENCES = {
-    VGScientaDetector: [TEST_VGSCIENTA_SEQUENCE, VGScientaSequence],
-    VGScientaAnalyserDriverIO: [TEST_VGSCIENTA_SEQUENCE, VGScientaSequence],
-    SpecsDetector: [TEST_SPECS_SEQUENCE, SpecsSequence],
-    SpecsAnalyserDriverIO: [TEST_SPECS_SEQUENCE, SpecsSequence],
+    VGScientaSequence: TEST_VGSCIENTA_SEQUENCE,
+    VGScientaDetector: TEST_VGSCIENTA_SEQUENCE,
+    VGScientaAnalyserDriverIO: TEST_VGSCIENTA_SEQUENCE,
+    SpecsSequence: TEST_SPECS_SEQUENCE,
+    SpecsDetector: TEST_SPECS_SEQUENCE,
+    SpecsAnalyserDriverIO: TEST_SPECS_SEQUENCE,
 }
 
 
 def get_test_sequence(key: type) -> str:
-    return TEST_SEQUENCES[key][SEQUENCE_KEY]
-
-
-def get_test_sequence_type(key: type) -> type[AbstractBaseSequence]:
-    return TEST_SEQUENCES[key][SEQUENCE_TYPE_KEY]
+    for cls in key.__mro__:
+        # Check for unscripted class only
+        if cls in TEST_SEQUENCES:
+            return TEST_SEQUENCES[cls]
+    raise KeyError(f"Found no match with type {key}")
 
 
 TEST_SEQUENCE_REGION_NAMES = ["New_Region", "New_Region1"]
