@@ -1,11 +1,8 @@
-from typing import Any
-
 import pytest
 from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
 from bluesky.utils import FailedStatus
 from ophyd_async.core import SignalR, StrictEnum
-from ophyd_async.testing import assert_reading, get_mock_put
 
 from dodal.devices import b07, i09
 from dodal.devices.electron_analyser.abstract import (
@@ -36,80 +33,6 @@ async def sim_driver(
     return await create_analyser_device(
         request.param,
         energy_sources,
-    )
-
-
-@pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
-async def test_abstract_analyser_sets_region_and_configuration_is_correct(
-    sim_driver: AbstractAnalyserDriverIO,
-    region: AbstractBaseRegion,
-    expected_abstract_driver_config_reading: dict[str, dict[str, Any]],
-    RE: RunEngine,
-) -> None:
-    expected_config = expected_abstract_driver_config_reading
-    get_mock_put(sim_driver.region_name).assert_called_once_with(region.name, wait=True)
-    get_mock_put(sim_driver.energy_mode).assert_called_once_with(
-        region.energy_mode, wait=True
-    )
-    get_mock_put(sim_driver.acquisition_mode).assert_called_once_with(
-        region.acquisition_mode, wait=True
-    )
-    get_mock_put(sim_driver.lens_mode).assert_called_once_with(
-        region.lens_mode, wait=True
-    )
-
-    prefix = sim_driver.name + "-"
-    VAL = "value"
-    expected_low_e = expected_config[prefix + "low_energy"][VAL]
-    expected_high_e = expected_config[prefix + "high_energy"][VAL]
-    expected_pass_e = expected_config[prefix + "pass_energy"][VAL]
-    expected_excitation_e_source = expected_config[prefix + "excitation_energy_source"][
-        VAL
-    ]
-
-    get_mock_put(sim_driver.low_energy).assert_called_once_with(
-        expected_low_e, wait=True
-    )
-    get_mock_put(sim_driver.high_energy).assert_called_once_with(
-        expected_high_e, wait=True
-    )
-    get_mock_put(sim_driver.pass_energy).assert_called_once_with(
-        expected_pass_e, wait=True
-    )
-    get_mock_put(sim_driver.excitation_energy_source).assert_called_once_with(
-        expected_excitation_e_source, wait=True
-    )
-    get_mock_put(sim_driver.slices).assert_called_once_with(region.slices, wait=True)
-    get_mock_put(sim_driver.iterations).assert_called_once_with(
-        region.iterations, wait=True
-    )
-
-    # With next ophyd-async release, uncomment below
-    # Check partial match as different analysers will have more fields
-    # await assert_configuration(
-    #     sim_driver,
-    #     expected_abstract_driver_config_reading,
-    #     full_match=False,
-    # )
-
-
-@pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
-async def test_abstract_analyser_sets_region_and_reading_is_correct(
-    sim_driver: AbstractAnalyserDriverIO,
-    region: AbstractBaseRegion,
-    expected_abstract_driver_describe_reading,
-    RE: RunEngine,
-) -> None:
-    energy_source = sim_driver._get_energy_source(region.excitation_energy_source)
-    excitation_energy = await energy_source.get_value()
-
-    get_mock_put(sim_driver.excitation_energy).assert_called_once_with(
-        excitation_energy, wait=True
-    )
-
-    await assert_reading(
-        sim_driver,
-        expected_abstract_driver_describe_reading,
     )
 
 
