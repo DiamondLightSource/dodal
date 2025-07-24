@@ -90,13 +90,13 @@ read out and with the bit depth, which can be configured to 24 (streamed out as 
 
 """
 _DEADTIMES = {
-    32: 1 / (30 * 1000),
+    32: 1 / (30 * 1000),  # values reported in frame rate (kHz)
     24: 1 / (40 * 1000),
     16: 1 / (60 * 1000),
     8: 1 / (120 * 1000),
 }
 
-_BIT_DEPTH = 32
+_BIT_DEPTH = 24
 
 
 class Mythen3Controller(ADBaseController):
