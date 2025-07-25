@@ -69,7 +69,7 @@ class I10Apple2(Apple2):
         self,
         look_up_table_dir: str,
         source: tuple[str, str],
-        prefix: str = "",
+        prefix: str,
         mode: str = "Mode",
         min_energy: str = "MinEnergy",
         max_energy: str = "MaxEnergy",
