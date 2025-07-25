@@ -1,4 +1,3 @@
-import asyncio
 import time
 
 import numpy as np
@@ -160,7 +159,7 @@ class PinTipDetection(StandardReadable):
                     )
                 else:
                     break
-        except asyncio.exceptions.TimeoutError:
+        except TimeoutError:
             LOGGER.error(
                 f"No tip found in {await self.validity_timeout.get_value()} seconds."
             )
