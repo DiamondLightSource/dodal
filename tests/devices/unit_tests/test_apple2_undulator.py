@@ -1,3 +1,4 @@
+import asyncio
 from collections import defaultdict
 from unittest.mock import AsyncMock
 
@@ -127,7 +128,7 @@ async def test_given_gate_never_closes_then_setting_gaps_times_out(
     )
     mock_id_gap.get_timeout = AsyncMock(return_value=0.002)
 
-    with pytest.raises(TimeoutError):
+    with pytest.raises(asyncio.TimeoutError):
         await mock_id_gap.set(2)
 
 
@@ -175,7 +176,7 @@ async def test_given_gate_never_closes_then_setting_phases_times_out(
         lambda *_, **__: set_mock_value(mock_phaseAxes.gate, UndulatorGateStatus.OPEN),
     )
     mock_phaseAxes.get_timeout = AsyncMock(return_value=0.002)
-    with pytest.raises(TimeoutError):
+    with pytest.raises(asyncio.TimeoutError):
         await mock_phaseAxes.set(setValue)
 
 
@@ -313,7 +314,7 @@ async def test_given_gate_never_closes_then_setting_jaw_phases_times_out(
         lambda *_, **__: set_mock_value(mock_jaw_phase.gate, UndulatorGateStatus.OPEN),
     )
     mock_jaw_phase.get_timeout = AsyncMock(return_value=0.002)
-    with pytest.raises(TimeoutError):
+    with pytest.raises(asyncio.TimeoutError):
         await mock_jaw_phase.set(2)
 
 

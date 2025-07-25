@@ -1,4 +1,5 @@
-from asyncio import wait_for
+import asyncio
+from asyncio import TimeoutError, wait_for
 from contextlib import nullcontext
 from dataclasses import dataclass
 from unittest.mock import AsyncMock, MagicMock, patch
@@ -400,7 +401,7 @@ async def test_timeout_on_complete_triggers_stop_and_logs_error(
     zebra_fast_grid_scan.COMPLETE_STATUS = 0.01
     zebra_fast_grid_scan.stop_cmd = AsyncMock()
     set_mock_value(zebra_fast_grid_scan.status, 1)
-    with pytest.raises(TimeoutError):
+    with pytest.raises(asyncio.TimeoutError):
         await zebra_fast_grid_scan.complete()
     mock_log_error.assert_called_once()
     zebra_fast_grid_scan.stop_cmd.trigger.assert_awaited_once()

@@ -57,5 +57,5 @@ async def test_given_attenuator_fails_to_set_filters_then_set_timeout(
 
     callback_on_mock_put(fake_attenuator._change, mock_apply_values)
 
-    with pytest.raises(TimeoutError):
+    with pytest.raises(asyncio.exceptions.TimeoutError):
         await asyncio.wait_for(fake_attenuator.set(0.65), timeout=0.01)

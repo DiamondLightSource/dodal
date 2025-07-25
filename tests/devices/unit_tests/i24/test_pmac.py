@@ -119,7 +119,7 @@ async def test_counter_refresh_timeout(fake_pmac: PMAC, RE):
     )
 
     set_mock_value(fake_pmac.counter_time, 0.1)
-    with pytest.raises(TimeoutError):
+    with pytest.raises(asyncio.exceptions.TimeoutError):
         await fake_pmac.run_program.kickoff()
         await fake_pmac.run_program.complete()
 
