@@ -1,11 +1,11 @@
 import asyncio
+from typing import Generic, TypeVar
 
 from bluesky.protocols import HasName, Movable
 from ophyd_async.core import (
     AsyncStatus,
     DeviceVector,
     SignalR,
-    SignalRW,
     StandardReadable,
     StandardReadableFormat,
     StrictEnum,
@@ -68,76 +68,33 @@ class FastValveState(StrictEnum):
     NONE = "Unused"
 
 
-class ValveControlBase(StandardReadable, Movable):
-    open: SignalRW[int]
-    control: SignalRW[ValveControlRequest | FastValveControlRequest]
-
-    def __init__(self, name):
-        if not hasattr(self, "open") or not hasattr(self, "control"):
-            raise TypeError(
-                f"Class {ValveControlBase} requires signals open and control to be defined"
-            )
-
-        super().__init__(name)
-
-    @AsyncStatus.wrap
-    async def _set_open_seq(self):
-        await self.open.set(ValveOpenSeqRequest.OPEN_SEQ.value)
-        await asyncio.sleep(OPENSEQ_PULSE_LENGTH)
-        await self.open.set(ValveOpenSeqRequest.INACTIVE.value)
+TValveControlRequest = TypeVar(
+    "TValveControlRequest", bound=ValveControlRequest | FastValveControlRequest
+)
 
 
-class ValveControl(ValveControlBase):
-    def __init__(self, prefix: str, name: str = "") -> None:
+class ValveControl(
+    StandardReadable, Movable[TValveControlRequest], Generic[TValveControlRequest]
+):
+    def __init__(
+        self,
+        prefix: str,
+        valve_control_type: type[TValveControlRequest],
+        name: str = "",
+    ):
         with self.add_children_as_readables():
-            self.control = epics_signal_rw(ValveControlRequest, prefix + ":CON")
+            self.control = epics_signal_rw(valve_control_type, prefix + ":CON")
             self.open = epics_signal_rw(int, prefix + ":OPENSEQ")
-
         super().__init__(name)
 
     @AsyncStatus.wrap
-    async def set(self, value: ValveControlRequest) -> None:
-        if value == ValveControlRequest.OPEN:
-            await self._set_open_seq()
+    async def set(self, value: TValveControlRequest):
+        if value.value == "Open":
+            await self.open.set(ValveOpenSeqRequest.OPEN_SEQ.value)
+            await asyncio.sleep(OPENSEQ_PULSE_LENGTH)
+            await self.open.set(ValveOpenSeqRequest.INACTIVE.value)
         else:
             await self.control.set(value)
-
-
-class FastValveControl(ValveControlBase):
-    def __init__(self, prefix: str, name: str = "") -> None:
-        with self.add_children_as_readables():
-            self.control = epics_signal_rw(FastValveControlRequest, prefix + ":CON")
-            self.open = epics_signal_rw(int, prefix + ":OPENSEQ")
-
-        super().__init__(name)
-
-    def _valve_request_to_fast_valve_request(
-        self, request: ValveControlRequest
-    ) -> FastValveControlRequest:
-        match request:
-            case ValveControlRequest.OPEN:
-                return FastValveControlRequest.OPEN
-
-            case ValveControlRequest.CLOSE:
-                return FastValveControlRequest.CLOSE
-
-            case ValveControlRequest.RESET:
-                return FastValveControlRequest.RESET
-
-    @AsyncStatus.wrap
-    async def set(self, value: FastValveControlRequest | ValveControlRequest) -> None:
-        value_fast_request = None
-
-        if isinstance(value, ValveControlRequest):
-            value_fast_request = self._valve_request_to_fast_valve_request(value)
-        else:
-            assert isinstance(value, FastValveControlRequest)
-            value_fast_request = value
-
-        if value_fast_request == FastValveControlRequest.OPEN:
-            await self._set_open_seq()
-        else:
-            await self.control.set(value_fast_request)
 
 
 class AllValvesControl(StandardReadable):
@@ -154,37 +111,35 @@ class AllValvesControl(StandardReadable):
         fast_valves_numbers: tuple[int, ...] = (5, 6),
         slow_valves_numbers: tuple[int, ...] = (1, 3),
     ) -> None:
-        self._fast_valves_numbers = fast_valves_numbers
-        self._slow_valves_numbers = slow_valves_numbers
         with self.add_children_as_readables():
             self.valve_states: DeviceVector[SignalR[ValveState]] = DeviceVector(
                 {
                     i: epics_signal_r(ValveState, f"{prefix}V{i}:STA")
-                    for i in self._slow_valves_numbers
+                    for i in slow_valves_numbers
                 }
             )
             self.fast_valve_states: DeviceVector[SignalR[FastValveState]] = (
                 DeviceVector(
                     {
                         i: epics_signal_r(FastValveState, f"{prefix}V{i}:STA")
-                        for i in self._fast_valves_numbers
+                        for i in fast_valves_numbers
                     }
                 )
             )
 
         self.fast_valve_control = {
-            i: FastValveControl(f"{prefix}V{i}") for i in self._fast_valves_numbers
+            i: ValveControl(f"{prefix}V{i}", FastValveControlRequest)
+            for i in fast_valves_numbers
         }
 
         self.slow_valve_control = {
-            i: ValveControl(f"{prefix}V{i}") for i in self._slow_valves_numbers
+            i: ValveControl(f"{prefix}V{i}", ValveControlRequest)
+            for i in slow_valves_numbers
         }
 
         all_valves = self.fast_valve_control | self.slow_valve_control
 
-        self.valve_control: DeviceVector[ValveControl | FastValveControl] = (
-            DeviceVector(all_valves)
-        )
+        self.valve_control: DeviceVector[ValveControl] = DeviceVector(all_valves)
 
         super().__init__(name)
 
