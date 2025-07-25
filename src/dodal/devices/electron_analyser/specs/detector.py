@@ -1,29 +1,33 @@
-from dodal.devices.electron_analyser.abstract.base_detector import (
-    AbstractElectronAnalyserDetector,
-    AbstractElectronAnalyserRegionDetector,
+from collections.abc import Mapping
+from typing import Generic
+
+from ophyd_async.core import SignalR
+
+from dodal.devices.electron_analyser.abstract.types import TLensMode, TPsuMode
+from dodal.devices.electron_analyser.detector import (
+    ElectronAnalyserDetector,
 )
 from dodal.devices.electron_analyser.specs.driver_io import SpecsAnalyserDriverIO
 from dodal.devices.electron_analyser.specs.region import SpecsRegion, SpecsSequence
 
 
-class SpecsRegionDetector(
-    AbstractElectronAnalyserRegionDetector[SpecsAnalyserDriverIO, SpecsRegion]
-):
-    def configure_region(self):
-        # ToDo - Need to move configure plans to here and rewrite tests
-        pass
-
-
 class SpecsDetector(
-    AbstractElectronAnalyserDetector[SpecsAnalyserDriverIO, SpecsSequence, SpecsRegion]
+    ElectronAnalyserDetector[
+        SpecsAnalyserDriverIO[TLensMode, TPsuMode],
+        SpecsSequence[TLensMode, TPsuMode],
+        SpecsRegion[TLensMode, TPsuMode],
+    ],
+    Generic[TLensMode, TPsuMode],
 ):
-    def __init__(self, prefix: str, name: str):
-        super().__init__(prefix, name, SpecsSequence)
-
-    def _create_driver(self, prefix: str) -> SpecsAnalyserDriverIO:
-        return SpecsAnalyserDriverIO(prefix, "driver")
-
-    def _create_region_detector(
-        self, driver: SpecsAnalyserDriverIO, region: SpecsRegion
-    ) -> SpecsRegionDetector:
-        return SpecsRegionDetector(self.name, driver, region)
+    def __init__(
+        self,
+        prefix: str,
+        lens_mode_type: type[TLensMode],
+        psu_mode_type: type[TPsuMode],
+        energy_sources: Mapping[str, SignalR[float]],
+        name: str = "",
+    ):
+        driver = SpecsAnalyserDriverIO[TLensMode, TPsuMode](
+            prefix, lens_mode_type, psu_mode_type, energy_sources
+        )
+        super().__init__(SpecsSequence[lens_mode_type, psu_mode_type], driver, name)

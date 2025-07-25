@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from ophyd_async.epics.adandor import Andor2Detector
+from ophyd_async.fastcs.panda import HDFPanda
 
 from dodal.common.beamlines.beamline_utils import (
     device_factory,
@@ -15,7 +16,7 @@ from dodal.common.visit import (
 )
 from dodal.devices.attenuator.filter import FilterMotor
 from dodal.devices.attenuator.filter_selections import P99FilterSelections
-from dodal.devices.motors import XYZPositioner
+from dodal.devices.motors import XYZStage
 from dodal.devices.p99.andor2_point import Andor2Point
 from dodal.devices.p99.sample_stage import SampleAngleStage
 from dodal.log import set_beamline as set_log_beamline
@@ -38,13 +39,13 @@ def filter() -> FilterMotor:
 
 
 @device_factory()
-def sample_stage() -> XYZPositioner:
-    return XYZPositioner(f"{PREFIX.beamline_prefix}-MO-STAGE-02:")
+def sample_stage() -> XYZStage:
+    return XYZStage(f"{PREFIX.beamline_prefix}-MO-STAGE-02:")
 
 
 @device_factory()
-def lab_stage() -> XYZPositioner:
-    return XYZPositioner(f"{PREFIX.beamline_prefix}-MO-STAGE-02:LAB:")
+def lab_stage() -> XYZStage:
+    return XYZStage(f"{PREFIX.beamline_prefix}-MO-STAGE-02:LAB:")
 
 
 set_path_provider(
@@ -75,4 +76,17 @@ def andor2_point() -> Andor2Point:
         prefix=f"{PREFIX.beamline_prefix}-EA-DET-03:",
         drv_suffix=CAM_SUFFIX,
         read_uncached={"mean": "STAT:MeanValue_RBV", "total": "STAT:Total_RBV"},
+    )
+
+
+@device_factory()
+def panda() -> HDFPanda:
+    """
+    The Panda device is connected to two PMAC motors for position comparison under
+     the pcomp[1] and pcomp[2] blocks, which handle positive and negative directions.
+    This setup is used for triggering detectors during a flyscan.
+    """
+    return HDFPanda(
+        f"{PREFIX.beamline_prefix}-MO-PANDA-01:",
+        path_provider=get_path_provider(),
     )
