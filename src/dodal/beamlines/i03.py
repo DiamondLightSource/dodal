@@ -82,7 +82,8 @@ def aperture_scatterguard() -> ApertureScatterguard:
     """
     params = get_beamline_parameters()
     return ApertureScatterguard(
-        prefix=PREFIX.beamline_prefix,
+        aperture_prefix=f"{PREFIX.beamline_prefix}-MO-MAPT-01:",
+        scatterguard_prefix=f"{PREFIX.beamline_prefix}-MO-SCAT-01:",
         loaded_positions=load_positions_from_beamline_parameters(params),
         tolerances=AperturePosition.tolerances_from_gda_params(params),
     )
@@ -153,7 +154,8 @@ def detector_motion() -> DetectorMotion:
     If this is called when already instantiated in i03, it will return the existing object.
     """
     return DetectorMotion(
-        prefix=PREFIX.beamline_prefix,
+        device_prefix=f"{PREFIX.beamline_prefix}-MO-DET-01:",
+        pmac_prefix=f"{PREFIX.beamline_prefix}-MO-PMAC-02:",
     )
 
 
@@ -280,7 +282,6 @@ def undulator_dcm(daq_configuration_path: str | None = None) -> UndulatorDCM:
         else undulator()
     )
     return UndulatorDCM(
-        prefix=PREFIX.beamline_prefix,
         undulator=undulator_singleton,
         dcm=dcm(),
         daq_configuration_path=daq_configuration_path or DAQ_CONFIGURATION_PATH,
@@ -354,7 +355,7 @@ def zocalo() -> ZocaloResults:
     """Get the i03 ZocaloResults device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return ZocaloResults(prefix=PREFIX.beamline_prefix, use_gpu=True)
+    return ZocaloResults(use_gpu=True)
 
 
 @device_factory()

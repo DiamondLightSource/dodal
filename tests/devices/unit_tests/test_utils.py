@@ -111,7 +111,7 @@ def test_status_points_to_provided_device_object():
 
 
 async def test_given_disp_high_when_set_SetWhenEnabled_then_proc_not_set_until_disp_low():
-    device: SetWhenEnabled = SetWhenEnabled(name="test")
+    device: SetWhenEnabled = SetWhenEnabled("", name="test")
     await device.connect(True)
     set_mock_value(device.disp, 1)
     proc_mock = get_mock_put(device.proc)

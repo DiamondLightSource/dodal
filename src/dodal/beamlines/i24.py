@@ -100,7 +100,8 @@ def dcm() -> DCM:
     If this is called when already instantiated in i24, it will return the existing object.
     """
     return DCM(
-        prefix=PREFIX.beamline_prefix,
+        prefix=f"{PREFIX.beamline_prefix}-DI-DCM-01",
+        base_prefix=f"{PREFIX.beamline_prefix}-MO-DCM-01",
     )
 
 
