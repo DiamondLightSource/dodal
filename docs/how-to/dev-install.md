@@ -19,7 +19,7 @@ in a container under [VSCode](https://code.visualstudio.com/)
 If on a DLS machine make sure you have python >3.11 running by doing `module load python/3.11`
 
 ```
-python -m venv venv
+python3 -m venv venv
 source venv/bin/activate
 pip install --upgrade pip
 pip install -e '.[dev]'
