@@ -142,8 +142,9 @@ class FastValveControl(ValveControlBase):
 
 class AllValvesControl(StandardReadable):
     """
-    valves 2, 4, 7, 8 are not controlled by the IOC,
-    as they are under manual control.
+    The default IOC for this device only controls
+    specific valves. Other valves are under manual
+    control.
     fast_valves: tuple[int, ...] = (5, 6)
     slow_valves: tuple[int, ...] = (1, 3)
     """
