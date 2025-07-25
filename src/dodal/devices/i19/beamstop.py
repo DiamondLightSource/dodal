@@ -6,7 +6,7 @@ from dodal.devices.motors import XYZStage
 
 class HomeGroup(StrictEnum):
     NONE = "none"
-    ALL = "All"
+    ALL = "ALL"
     X = "X"
     Y = "Y"
     Z = "Z"
@@ -23,4 +23,4 @@ class BeamStop(XYZStage):
     def __init__(self, prefix: str, name: str = "") -> None:
         self.homing = HomingControl(f"{prefix}HM", name)
 
-        super().__init__(name)
+        super().__init__(prefix, name)
