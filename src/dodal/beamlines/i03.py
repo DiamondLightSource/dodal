@@ -82,7 +82,8 @@ def aperture_scatterguard() -> ApertureScatterguard:
     """
     params = get_beamline_parameters()
     return ApertureScatterguard(
-        prefix=PREFIX.beamline_prefix,
+        aperture_prefix=f"{PREFIX.beamline_prefix}-MO-MAPT-01:",
+        scatterguard_prefix=f"{PREFIX.beamline_prefix}-MO-SCAT-01:",
         loaded_positions=load_positions_from_beamline_parameters(params),
         tolerances=AperturePosition.tolerances_from_gda_params(params),
     )
