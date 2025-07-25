@@ -126,7 +126,7 @@ class ZocaloResults(StandardReadable, Triggerable):
 
     def __init__(
         self,
-        name: str = "zocalo",
+        name: str = "",
         zocalo_environment: str = ZOCALO_ENV,
         channel: str = "xrc.i03",
         sort_key: str = DEFAULT_SORT_KEY.value,
