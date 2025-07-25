@@ -124,7 +124,6 @@ class I10Apple2(Apple2):
                     btm_inner="RPQ3",
                     btm_outer="RPQ4",
                 ),
-                prefix=prefix,
                 name=name,
             )
             self.id_jaw_phase = UndulatorJawPhase(
