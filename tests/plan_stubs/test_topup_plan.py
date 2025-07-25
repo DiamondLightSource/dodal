@@ -6,6 +6,7 @@ from bluesky.run_engine import RunEngine
 from ophyd_async.core import init_devices
 from ophyd_async.testing import set_mock_value
 
+from dodal.common.beamlines.beamline_parameters import GDABeamlineParameters
 from dodal.devices.synchrotron import Synchrotron, SynchrotronMode
 from dodal.plan_stubs.check_topup import (
     check_topup_and_wait_if_necessary,
@@ -20,10 +21,23 @@ async def synchrotron(RE) -> Synchrotron:
     return synchrotron
 
 
+@pytest.fixture
+def beamline_params() -> GDABeamlineParameters:
+    with patch(
+        "dodal.common.beamlines.beamline_parameters.get_beamline_parameters",
+    ) as mock:
+        mock.return_value = GDABeamlineParameters({})
+        return mock
+
+
 @patch("dodal.plan_stubs.check_topup.wait_for_topup_complete")
 @patch("dodal.plan_stubs.check_topup.bps.sleep")
 def test_when_topup_before_end_of_collection_wait(
-    fake_sleep: MagicMock, fake_wait: MagicMock, synchrotron: Synchrotron, RE: RunEngine
+    fake_sleep: MagicMock,
+    fake_wait: MagicMock,
+    beamline_params: GDABeamlineParameters,
+    synchrotron: Synchrotron,
+    RE: RunEngine,
 ):
     set_mock_value(synchrotron.synchrotron_mode, SynchrotronMode.USER)
     set_mock_value(synchrotron.top_up_start_countdown, 20.0)
@@ -64,7 +78,11 @@ def test_wait_for_topup_complete(
 @patch("dodal.plan_stubs.check_topup.bps.sleep")
 @patch("dodal.plan_stubs.check_topup.bps.null")
 def test_no_waiting_if_decay_mode(
-    fake_null: MagicMock, fake_sleep: MagicMock, synchrotron: Synchrotron, RE: RunEngine
+    fake_null: MagicMock,
+    fake_sleep: MagicMock,
+    beamline_params: GDABeamlineParameters,
+    synchrotron: Synchrotron,
+    RE: RunEngine,
 ):
     set_mock_value(synchrotron.top_up_start_countdown, -1)
 
@@ -81,7 +99,10 @@ def test_no_waiting_if_decay_mode(
 
 @patch("dodal.plan_stubs.check_topup.bps.null")
 def test_no_waiting_when_mode_does_not_allow_gating(
-    fake_null: MagicMock, synchrotron: Synchrotron, RE: RunEngine
+    fake_null: MagicMock,
+    beamline_params: GDABeamlineParameters,
+    synchrotron: Synchrotron,
+    RE: RunEngine,
 ):
     set_mock_value(synchrotron.top_up_start_countdown, 1.0)
     set_mock_value(synchrotron.synchrotron_mode, SynchrotronMode.SHUTDOWN)
