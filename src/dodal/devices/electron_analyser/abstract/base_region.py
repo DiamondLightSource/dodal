@@ -69,7 +69,7 @@ class AbstractBaseRegion(
     acquisition_mode: TAcquisitionMode
     low_energy: float
     high_energy: float
-    step_time: float
+    acquire_time: float
     energy_step: float  # in eV
     energy_mode: EnergyMode = EnergyMode.KINETIC
 
