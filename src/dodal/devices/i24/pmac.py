@@ -229,4 +229,4 @@ class PMAC(XYZStage):
         )
         self.abort_program = ProgramAbort(self.pmac_string, self.scanstatus)
 
-        super().__init__(prefix, name)
+        super().__init__(f"{prefix}-MO-CHIP-01:", name)
