@@ -194,6 +194,7 @@ def eiger_beam_center() -> DetectorBeamCenter:
     """A device for setting/reading the beamcenter from the eiger on i24."""
     return DetectorBeamCenter(
         f"{PREFIX.beamline_prefix}-EA-EIGER-01:CAM:",
+        "pilatus_bc",
     )
 
 
@@ -202,6 +203,7 @@ def pilatus_beam_center() -> DetectorBeamCenter:
     """A device for setting/reading the beamcenter from the pilatus on i24."""
     return DetectorBeamCenter(
         f"{PREFIX.beamline_prefix}-EA-PILAT-01:cam1:",
+        "pilatus_bc",
     )
 
 
