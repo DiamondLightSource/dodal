@@ -1,9 +1,13 @@
+import asyncio
 from abc import ABC, abstractmethod
-from typing import TypeVar
+from collections.abc import Mapping
+from typing import Generic, TypeVar
 
 import numpy as np
+from bluesky.protocols import Movable
 from ophyd_async.core import (
     Array1D,
+    AsyncStatus,
     SignalR,
     StandardReadable,
     StandardReadableFormat,
@@ -13,17 +17,64 @@ from ophyd_async.core import (
 from ophyd_async.epics.adcore import ADBaseIO
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
-from dodal.devices.electron_analyser.types import EnergyMode
-from dodal.devices.electron_analyser.util import to_binding_energy
+from dodal.devices.electron_analyser.abstract.base_region import (
+    TAbstractBaseRegion,
+)
+from dodal.devices.electron_analyser.abstract.types import (
+    TAcquisitionMode,
+    TLensMode,
+    TPassEnergy,
+    TPsuMode,
+)
+from dodal.devices.electron_analyser.enums import EnergyMode
+from dodal.devices.electron_analyser.util import to_binding_energy, to_kinetic_energy
 
 
-class AbstractAnalyserDriverIO(ABC, StandardReadable, ADBaseIO):
+class AbstractAnalyserDriverIO(
+    ABC,
+    StandardReadable,
+    ADBaseIO,
+    Movable[TAbstractBaseRegion],
+    Generic[TAbstractBaseRegion, TAcquisitionMode, TLensMode, TPsuMode, TPassEnergy],
+):
     """
     Generic device to configure electron analyser with new region settings.
     Electron analysers should inherit from this class for further specialisation.
     """
 
-    def __init__(self, prefix: str, name: str = "") -> None:
+    def __init__(
+        self,
+        prefix: str,
+        acquisition_mode_type: type[TAcquisitionMode],
+        lens_mode_type: type[TLensMode],
+        psu_mode_type: type[TPsuMode],
+        pass_energy_type: type[TPassEnergy],
+        energy_sources: Mapping[str, SignalR[float]],
+        name: str = "",
+    ) -> None:
+        """
+        Constructor method for setting up electron analyser.
+
+        Args:
+            prefix: Base PV to connect to EPICS for this device.
+            acquisition_mode_type: Enum that determines the available acquisition modes
+                                   for this device.
+            lens_mode_type: Enum that determines the available lens mode for this
+                            device.
+            psu_mode_type: Enum that determines the available psu modes for this device.
+            pass_energy_type: Can be enum or float, depends on electron analyser model.
+                              If enum, it determines the available pass energies for
+                              this device.
+            energy_sources: Map that pairs a source name to an energy value signal
+                            (in eV).
+            name: Name of the device.
+        """
+        self.energy_sources = energy_sources
+        self.acquisition_mode_type = acquisition_mode_type
+        self.lens_mode_type = lens_mode_type
+        self.psu_mode_type = psu_mode_type
+        self.pass_energy_type = pass_energy_type
+
         with self.add_children_as_readables():
             self.image = epics_signal_r(Array1D[np.float64], prefix + "IMAGE")
             self.spectrum = epics_signal_r(Array1D[np.float64], prefix + "INT_SPECTRUM")
@@ -41,14 +92,19 @@ class AbstractAnalyserDriverIO(ABC, StandardReadable, ADBaseIO):
             self.low_energy = epics_signal_rw(float, prefix + "LOW_ENERGY")
             self.high_energy = epics_signal_rw(float, prefix + "HIGH_ENERGY")
             self.slices = epics_signal_rw(int, prefix + "SLICES")
-            self.lens_mode = epics_signal_rw(str, prefix + "LENS_MODE")
-            self.pass_energy = epics_signal_rw(
-                self.pass_energy_type, prefix + "PASS_ENERGY"
-            )
+            self.lens_mode = epics_signal_rw(lens_mode_type, prefix + "LENS_MODE")
+            self.pass_energy = epics_signal_rw(pass_energy_type, prefix + "PASS_ENERGY")
             self.energy_step = epics_signal_rw(float, prefix + "STEP_SIZE")
             self.iterations = epics_signal_rw(int, prefix + "NumExposures")
-            self.acquisition_mode = epics_signal_rw(str, prefix + "ACQ_MODE")
+            self.acquisition_mode = epics_signal_rw(
+                acquisition_mode_type, prefix + "ACQ_MODE"
+            )
+            self.excitation_energy_source = soft_signal_rw(str, initial_value="")
+            # This is used by each electron analyser, however it depends on the electron
+            # analyser type to know if is moved with region settings.
+            self.psu_mode = epics_signal_rw(psu_mode_type, prefix + "PSU_MODE")
 
+        with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             # Read once per scan after data acquired
             self.energy_axis = self._create_energy_axis_signal(prefix)
             self.binding_energy_axis = derived_signal_r(
@@ -71,16 +127,70 @@ class AbstractAnalyserDriverIO(ABC, StandardReadable, ADBaseIO):
 
         super().__init__(prefix=prefix, name=name)
 
+    @AsyncStatus.wrap
+    async def set(self, region: TAbstractBaseRegion):
+        """
+        This should encompass all core region logic which is common to every electron
+        analyser for setting up the driver.
+
+        Args:
+            region: Contains the parameters to setup the driver for a scan.
+        """
+
+        source = self._get_energy_source(region.excitation_energy_source)
+        excitation_energy = await source.get_value()  # eV
+
+        low_energy = to_kinetic_energy(
+            region.low_energy, region.energy_mode, excitation_energy
+        )
+        high_energy = to_kinetic_energy(
+            region.high_energy, region.energy_mode, excitation_energy
+        )
+        await asyncio.gather(
+            self.region_name.set(region.name),
+            self.energy_mode.set(region.energy_mode),
+            self.low_energy.set(low_energy),
+            self.high_energy.set(high_energy),
+            self.slices.set(region.slices),
+            self.lens_mode.set(region.lens_mode),
+            self.pass_energy.set(region.pass_energy),
+            self.iterations.set(region.iterations),
+            self.acquisition_mode.set(region.acquisition_mode),
+            self.excitation_energy.set(excitation_energy),
+            self.excitation_energy_source.set(source.name),
+        )
+
+    def _get_energy_source(self, alias_name: str) -> SignalR[float]:
+        energy_source = self.energy_sources.get(alias_name)
+        if energy_source is None:
+            raise KeyError(
+                f"'{energy_source}' is an invalid energy source. Avaliable energy "
+                + f"sources are '{list(self.energy_sources.keys())}'"
+            )
+        return energy_source
+
     @abstractmethod
     def _create_angle_axis_signal(self, prefix: str) -> SignalR[Array1D[np.float64]]:
         """
         The signal that defines the angle axis. Depends on analyser model.
+
+        Args:
+            prefix: PV string used for connecting to angle axis.
+
+        Returns:
+            Signal that can give us angle axis array data.
         """
 
     @abstractmethod
     def _create_energy_axis_signal(self, prefix: str) -> SignalR[Array1D[np.float64]]:
         """
         The signal that defines the energy axis. Depends on analyser model.
+
+        Args:
+            prefix: PV string used for connecting to energy axis.
+
+        Returns:
+            Signal that can give us energy axis array data.
         """
 
     def _calculate_binding_energy_axis(
@@ -89,6 +199,20 @@ class AbstractAnalyserDriverIO(ABC, StandardReadable, ADBaseIO):
         excitation_energy: float,
         energy_mode: EnergyMode,
     ) -> Array1D[np.float64]:
+        """
+        Calculate the binding energy axis to calibrate the spectra data. Function for a
+        derived signal.
+
+        Args:
+            energy_axis:       Array data of the original energy_axis from epics.
+            excitation_energy: The excitation energy value used for the scan of this
+                               region.
+            energy_mode:       The energy_mode of the region that was used for the scan
+                               of this region.
+
+        Returns:
+            Array that is the correct axis for the spectra data.
+        """
         is_binding = energy_mode == EnergyMode.BINDING
         return np.array(
             [
@@ -102,18 +226,22 @@ class AbstractAnalyserDriverIO(ABC, StandardReadable, ADBaseIO):
     def _calculate_total_time(
         self, total_steps: int, step_time: float, iterations: int
     ) -> float:
+        """
+        Calulcate the total time the scan takes for this region. Function for a derived
+        signal.
+
+        Args:
+            total_steps: Number of steps for the region.
+            step_time: Time for each step for the region.
+            iterations: The number of iterations the region collected data for.
+
+        Returns:
+            Calculated total time in seconds.
+        """
         return total_steps * step_time * iterations
 
     def _calculate_total_intensity(self, spectrum: Array1D[np.float64]) -> float:
         return float(np.sum(spectrum, dtype=np.float64))
-
-    @property
-    @abstractmethod
-    def pass_energy_type(self) -> type:
-        """
-        Return the type the pass_energy should be. Each one is unfortunately different
-        for the underlying analyser software and cannot be changed on epics side.
-        """
 
 
 TAbstractAnalyserDriverIO = TypeVar(

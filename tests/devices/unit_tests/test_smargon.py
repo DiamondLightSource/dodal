@@ -1,16 +1,25 @@
+from unittest.mock import MagicMock, call
+
 import pytest
 from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
 from ophyd_async.core import init_devices, observe_value
-from ophyd_async.testing import set_mock_value
+from ophyd_async.testing import get_mock_put, set_mock_value
 
-from dodal.devices.smargon import Smargon, StubPosition
+from dodal.devices.smargon import CombinedMove, DeferMoves, Smargon, StubPosition
+from dodal.devices.util.test_utils import patch_motor
 
 
 @pytest.fixture
 async def smargon() -> Smargon:
     async with init_devices(mock=True):
         smargon = Smargon(name="smargon")
+    patch_motor(smargon.x)
+    patch_motor(smargon.y)
+    patch_motor(smargon.z)
+    patch_motor(smargon.omega)
+    patch_motor(smargon.phi)
+    patch_motor(smargon.chi)
     return smargon
 
 
@@ -80,3 +89,78 @@ async def test_given_center_disp_low_when_stub_offsets_set_to_center_and_moved_t
     set_smargon_pos(smargon, (0, 0, 0))
 
     assert await smargon.stub_offsets.to_robot_load.proc.get_value() == 0
+
+
+async def test_given_set_with_single_value_then_that_motor_moves(smargon: Smargon):
+    await smargon.set(CombinedMove(x=10))
+
+    get_mock_put(smargon.x.user_setpoint).assert_called_once_with(10, wait=True)
+    get_mock_put(smargon.defer_move).assert_has_calls(
+        [call(DeferMoves.ON, wait=True), call(DeferMoves.OFF, wait=True)]
+    )
+
+
+async def test_given_set_with_none_then_that_motor_does_not_move(smargon: Smargon):
+    await smargon.set(CombinedMove(x=10, y=None))
+
+    get_mock_put(smargon.x.user_setpoint).assert_called_once_with(10, wait=True)
+    get_mock_put(smargon.y.user_setpoint).assert_not_called()
+    get_mock_put(smargon.defer_move).assert_has_calls(
+        [call(DeferMoves.ON, wait=True), call(DeferMoves.OFF, wait=True)]
+    )
+
+
+async def test_given_set_with_all_values_then_motors_move(smargon: Smargon):
+    await smargon.set(CombinedMove(x=10, y=20, z=30, omega=5, chi=15, phi=25))
+
+    get_mock_put(smargon.x.user_setpoint).assert_called_once_with(10, wait=True)
+    get_mock_put(smargon.y.user_setpoint).assert_called_once_with(20, wait=True)
+    get_mock_put(smargon.z.user_setpoint).assert_called_once_with(30, wait=True)
+    get_mock_put(smargon.omega.user_setpoint).assert_called_once_with(5, wait=True)
+    get_mock_put(smargon.chi.user_setpoint).assert_called_once_with(15, wait=True)
+    get_mock_put(smargon.phi.user_setpoint).assert_called_once_with(25, wait=True)
+
+    get_mock_put(smargon.defer_move).assert_has_calls(
+        [call(DeferMoves.ON, wait=True), call(DeferMoves.OFF, wait=True)]
+    )
+
+
+@pytest.mark.skip(reason="https://github.com/DiamondLightSource/dodal/issues/1315")
+async def test_given_set_with_all_values_then_motors_move_in_order(smargon: Smargon):
+    parent = MagicMock()
+    parent.attach_mock(get_mock_put(smargon.defer_move), "defer_move")
+    parent.attach_mock(get_mock_put(smargon.x.user_setpoint), "x")
+    parent.attach_mock(get_mock_put(smargon.y.user_setpoint), "y")
+    parent.attach_mock(get_mock_put(smargon.z.user_setpoint), "z")
+    parent.attach_mock(get_mock_put(smargon.omega.user_setpoint), "omega")
+    parent.attach_mock(get_mock_put(smargon.chi.user_setpoint), "chi")
+    parent.attach_mock(get_mock_put(smargon.phi.user_setpoint), "phi")
+
+    await smargon.set(CombinedMove(x=10, y=20, z=30, omega=5, chi=15, phi=25))
+
+    assert len(parent.mock_calls) == 8
+    assert parent.mock_calls[0] == call.defer_move(DeferMoves.ON, wait=True)
+    parent.assert_has_calls(
+        [
+            call.x(10, wait=True),
+            call.y(20, wait=True),
+            call.z(30, wait=True),
+            call.omega(5, wait=True),
+            call.chi(15, wait=True),
+            call.phi(25, wait=True),
+        ],
+        any_order=True,
+    )
+    assert parent.mock_calls[-1] == call.defer_move(DeferMoves.OFF, wait=True)
+
+
+async def test_given_set_fails_then_defer_moves_turned_back_off(smargon: Smargon):
+    class MyException(Exception): ...
+
+    get_mock_put(smargon.x.user_setpoint).side_effect = MyException()
+    with pytest.raises(MyException):
+        await smargon.set(CombinedMove(x=10))
+
+    get_mock_put(smargon.defer_move).assert_has_calls(
+        [call(DeferMoves.ON, wait=True), call(DeferMoves.OFF, wait=True)]
+    )

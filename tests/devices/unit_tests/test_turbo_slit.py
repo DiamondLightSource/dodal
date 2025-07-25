@@ -1,9 +1,9 @@
-from unittest.mock import ANY, AsyncMock
+from unittest.mock import AsyncMock
 
 import pytest
 from bluesky import RunEngine
 from ophyd_async.core import init_devices
-from ophyd_async.testing import set_mock_value
+from ophyd_async.testing import assert_reading, set_mock_value
 
 from dodal.devices.turbo_slit import TurboSlit
 
@@ -33,22 +33,17 @@ async def test_turbo_slit_read(slit: TurboSlit, RE: RunEngine):
     set_mock_value(slit.arc.user_readback, 1.0)
     set_mock_value(slit.xfine.user_readback, 1.5)
 
-    reading = await slit.read()
-
-    assert reading == {
-        "turbo_slit-gap": {
-            "alarm_severity": 0,
-            "timestamp": ANY,
-            "value": 0.5,
+    await assert_reading(
+        slit,
+        {
+            "turbo_slit-gap": {
+                "value": 0.5,
+            },
+            "turbo_slit-arc": {
+                "value": 1.0,
+            },
+            "turbo_slit-xfine": {
+                "value": 1.5,
+            },
         },
-        "turbo_slit-arc": {
-            "alarm_severity": 0,
-            "timestamp": ANY,
-            "value": 1.0,
-        },
-        "turbo_slit-xfine": {
-            "alarm_severity": 0,
-            "timestamp": ANY,
-            "value": 1.5,
-        },
-    }
+    )

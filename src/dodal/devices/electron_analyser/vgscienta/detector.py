@@ -1,6 +1,15 @@
-from dodal.devices.electron_analyser.abstract.base_detector import (
-    AbstractElectronAnalyserDetector,
-    AbstractElectronAnalyserRegionDetector,
+from collections.abc import Mapping
+from typing import Generic
+
+from ophyd_async.core import SignalR
+
+from dodal.devices.electron_analyser.abstract.types import (
+    TLensMode,
+    TPassEnergyEnum,
+    TPsuMode,
+)
+from dodal.devices.electron_analyser.detector import (
+    ElectronAnalyserDetector,
 )
 from dodal.devices.electron_analyser.vgscienta.driver_io import (
     VGScientaAnalyserDriverIO,
@@ -11,26 +20,28 @@ from dodal.devices.electron_analyser.vgscienta.region import (
 )
 
 
-class VGScientaRegionDetector(
-    AbstractElectronAnalyserRegionDetector[VGScientaAnalyserDriverIO, VGScientaRegion]
-):
-    def configure_region(self):
-        # ToDo - Need to move configure plans to here and rewrite tests
-        pass
-
-
 class VGScientaDetector(
-    AbstractElectronAnalyserDetector[
-        VGScientaAnalyserDriverIO, VGScientaSequence, VGScientaRegion
-    ]
+    ElectronAnalyserDetector[
+        VGScientaAnalyserDriverIO[TLensMode, TPsuMode, TPassEnergyEnum],
+        VGScientaSequence[TLensMode, TPsuMode, TPassEnergyEnum],
+        VGScientaRegion[TLensMode, TPassEnergyEnum],
+    ],
+    Generic[TLensMode, TPsuMode, TPassEnergyEnum],
 ):
-    def __init__(self, prefix: str, name: str):
-        super().__init__(prefix, name, VGScientaSequence)
-
-    def _create_driver(self, prefix: str) -> VGScientaAnalyserDriverIO:
-        return VGScientaAnalyserDriverIO(prefix, "driver")
-
-    def _create_region_detector(
-        self, driver: VGScientaAnalyserDriverIO, region: VGScientaRegion
-    ) -> VGScientaRegionDetector:
-        return VGScientaRegionDetector(self.name, driver, region)
+    def __init__(
+        self,
+        prefix: str,
+        lens_mode_type: type[TLensMode],
+        psu_mode_type: type[TPsuMode],
+        pass_energy_type: type[TPassEnergyEnum],
+        energy_sources: Mapping[str, SignalR[float]],
+        name: str = "",
+    ):
+        driver = VGScientaAnalyserDriverIO[TLensMode, TPsuMode, TPassEnergyEnum](
+            prefix, lens_mode_type, psu_mode_type, pass_energy_type, energy_sources
+        )
+        super().__init__(
+            VGScientaSequence[lens_mode_type, psu_mode_type, pass_energy_type],
+            driver,
+            name,
+        )

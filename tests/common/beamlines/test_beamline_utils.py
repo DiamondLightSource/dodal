@@ -12,14 +12,21 @@ from ophyd_async.core import StandardReadable
 from dodal.common.beamlines import beamline_utils
 from dodal.devices.eiger import EigerDetector
 from dodal.devices.focusing_mirror import FocusingMirror
-from dodal.devices.motors import XYZPositioner
+from dodal.devices.motors import XYZStage
 from dodal.devices.smargon import Smargon
 from dodal.log import LOGGER
 from dodal.utils import DeviceInitializationController
 
 
 @pytest.fixture(autouse=True)
-def flush_event_loop_on_finish(event_loop):
+def i03_beamline():
+    with patch("dodal.common.beamlines.beamline_utils.BL", "i03") as bl:
+        yield bl
+
+
+@pytest.fixture(autouse=True)
+def flush_event_loop_on_finish():
+    event_loop = asyncio.get_event_loop()
     # wait for the test function to complete
     yield None
 
@@ -29,7 +36,7 @@ def flush_event_loop_on_finish(event_loop):
 
 
 def test_instantiate_function_makes_supplied_device():
-    device_types = [XYZPositioner, Smargon]
+    device_types = [XYZStage, Smargon]
     for device in device_types:
         dev = beamline_utils.device_instantiation(
             device, device.__name__, "", False, True, None
@@ -39,7 +46,7 @@ def test_instantiate_function_makes_supplied_device():
 
 def test_instantiating_different_device_with_same_name():
     dev1 = beamline_utils.device_instantiation(  # noqa
-        XYZPositioner, "device", "", False, True, None
+        XYZStage, "device", "", False, True, None
     )
     with pytest.raises(TypeError):
         dev2 = beamline_utils.device_instantiation(
@@ -182,3 +189,25 @@ def test_skip(RE):
 
     skip = False
     assert not controller.skip
+
+
+def test_clear_devices_destroys_ophyd_v1_devices():
+    dev1 = beamline_utils.device_instantiation(
+        EigerDetector, "eiger", "", True, True, None
+    )
+    dev1.destroy = MagicMock()
+
+    beamline_utils.clear_devices()
+
+    dev1.destroy.assert_called_once()
+
+
+def test_clear_device_destroys_ophyd_v1_device():
+    dev1 = beamline_utils.device_instantiation(
+        EigerDetector, "eiger", "", True, True, None
+    )
+    dev1.destroy = MagicMock()
+
+    beamline_utils.clear_device("eiger")
+
+    dev1.destroy.assert_called_once()

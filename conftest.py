@@ -1,12 +1,10 @@
 import asyncio
 import logging
-import os
 import sys
 import time
 from collections.abc import Mapping
 from os import environ
 from pathlib import Path
-from typing import Any
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -39,6 +37,7 @@ mock_attributes_table = {
     "s04": mock_paths,
     "i19_1": mock_paths,
     "i24": mock_paths,
+    "aithre": mock_paths,
 }
 
 BANNED_PATHS = [Path("/dls"), Path("/dls_sw")]
@@ -60,24 +59,6 @@ def patch_open_to_prevent_dls_reads_in_tests():
 
     with patch("builtins.open", side_effect=patched_open):
         yield []
-
-
-# Prevent pytest from catching exceptions when debugging in vscode so that break on
-# exception works correctly (see: https://github.com/pytest-dev/pytest/issues/7409)
-if os.getenv("PYTEST_RAISE", "0") == "1":
-
-    @pytest.hookimpl(tryfirst=True)
-    def pytest_exception_interact(call: pytest.CallInfo[Any]):
-        if call.excinfo is not None:
-            raise call.excinfo.value
-        else:
-            raise RuntimeError(
-                f"{call} has no exception data, an unknown error has occurred"
-            )
-
-    @pytest.hookimpl(tryfirst=True)
-    def pytest_internalerror(excinfo: pytest.ExceptionInfo[Any]):
-        raise excinfo.value
 
 
 def pytest_runtest_setup(item):
