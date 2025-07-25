@@ -159,7 +159,7 @@ def xbpm_feedback() -> XBPMFeedback:
 
 
 @device_factory()
-def flux(mock: bool = False) -> Flux:
+def flux() -> Flux:
     """Get the i04 flux device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
     """
@@ -232,7 +232,7 @@ def zebra_fast_grid_scan() -> ZebraFastGridScan:
 
 
 @device_factory()
-def s4_slit_gaps(mock: bool = False) -> S4SlitGaps:
+def s4_slit_gaps() -> S4SlitGaps:
     """Get the i04 s4_slit_gaps device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
     """

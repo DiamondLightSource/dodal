@@ -194,7 +194,7 @@ def eiger_beam_center() -> DetectorBeamCenter:
     """A device for setting/reading the beamcenter from the eiger on i24."""
     return DetectorBeamCenter(
         f"{PREFIX.beamline_prefix}-EA-EIGER-01:CAM:",
-        "pilatus_bc",
+        "eiger_bc",
     )
 
 
@@ -212,4 +212,5 @@ def pilatus_metadata() -> PilatusMetadata:
     """A small pilatus driver device for figuring out the filename template."""
     return PilatusMetadata(
         f"{PREFIX.beamline_prefix}-EA-PILAT-01:",
+        "pilatus_meta",
     )
