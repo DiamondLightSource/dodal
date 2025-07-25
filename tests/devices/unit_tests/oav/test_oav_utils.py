@@ -33,7 +33,7 @@ def test_bottom_right_from_top_left():
 @pytest.fixture
 async def smargon(RE: RunEngine):
     async with init_devices(mock=True):
-        smargon = Smargon()
+        smargon = Smargon("")
 
     for motor in [smargon.omega, smargon.x, smargon.y, smargon.z]:
         patch_motor(motor)
