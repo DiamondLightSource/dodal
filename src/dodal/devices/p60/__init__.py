@@ -1,3 +1,10 @@
-from dodal.devices.p60.lab_xray_source import LabXraySource, LabXraySourceReadable
+from .enums import LensMode, PassEnergy, PsuMode
+from .lab_xray_source import LabXraySource, LabXraySourceReadable
 
-__all__ = ["LabXraySource", "LabXraySourceReadable"]
+__all__ = [
+    "LensMode",
+    "PsuMode",
+    "PassEnergy",
+    "LabXraySource",
+    "LabXraySourceReadable",
+]

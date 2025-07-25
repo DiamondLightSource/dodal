@@ -4,23 +4,38 @@ import pytest
 from bluesky import plan_stubs as bps
 from bluesky.protocols import Triggerable
 from bluesky.run_engine import RunEngine
+from ophyd_async.core import SignalR
 from ophyd_async.epics.adcore import ADBaseController
 
-from dodal.devices.electron_analyser import GenericElectronAnalyserDetector
+import dodal.devices.b07 as b07
+import dodal.devices.i09 as i09
+from dodal.devices.electron_analyser import (
+    GenericElectronAnalyserDetector,
+)
 from dodal.devices.electron_analyser.specs import SpecsDetector
 from dodal.devices.electron_analyser.vgscienta import VGScientaDetector
-from tests.devices.unit_tests.electron_analyser.util import get_test_sequence
+from tests.devices.unit_tests.electron_analyser.util import (
+    create_analyser_device,
+    get_test_sequence,
+)
 
 
-@pytest.fixture(params=[SpecsDetector, VGScientaDetector])
-def detector_class(
-    request: pytest.FixtureRequest,
-) -> type[GenericElectronAnalyserDetector]:
-    return request.param
+@pytest.fixture(
+    params=[
+        SpecsDetector[b07.LensMode, b07.PsuMode],
+        VGScientaDetector[i09.LensMode, i09.PsuMode, i09.PassEnergy],
+    ]
+)
+async def sim_detector(
+    request: pytest.FixtureRequest, energy_sources: dict[str, SignalR[float]]
+) -> GenericElectronAnalyserDetector:
+    return await create_analyser_device(request.param, energy_sources)
 
 
 @pytest.fixture
-def sequence_file_path(sim_detector: GenericElectronAnalyserDetector) -> str:
+def sequence_file_path(
+    sim_detector: GenericElectronAnalyserDetector,
+) -> str:
     return get_test_sequence(type(sim_detector))
 
 

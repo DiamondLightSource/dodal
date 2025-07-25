@@ -59,7 +59,7 @@ def synchrotron() -> Synchrotron:
 
 
 @device_factory()
-def oav() -> AravisDetector:
+def spectroscopy_detector() -> AravisDetector:
     """The Manta camera for the spectroscopy experiment.
 
     Looks at the spectroscopy screen and visualises light
@@ -78,7 +78,7 @@ def oav() -> AravisDetector:
 
 
 @device_factory()
-def sample_det() -> AravisDetector:
+def imaging_detector() -> AravisDetector:
     """The Mako camera for the imaging experiment.
 
     Looks at the on-axis viewing screen.

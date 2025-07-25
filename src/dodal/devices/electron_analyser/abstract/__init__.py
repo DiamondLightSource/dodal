@@ -8,6 +8,8 @@ from .base_region import (
     AbstractBaseSequence,
     TAbstractBaseRegion,
     TAbstractBaseSequence,
+    TAcquisitionMode,
+    TLensMode,
 )
 
 __all__ = [
@@ -15,6 +17,8 @@ __all__ = [
     "AbstractBaseSequence",
     "TAbstractBaseRegion",
     "TAbstractBaseSequence",
+    "TAcquisitionMode",
+    "TLensMode",
     "AbstractAnalyserDriverIO",
     "AbstractElectronAnalyserDetector",
     "AbstractAnalyserDriverIO",

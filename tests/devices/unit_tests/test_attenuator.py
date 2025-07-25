@@ -15,7 +15,7 @@ CALCULATED_VALUE = [True, False, True] * 6  # Some "random" values
 async def fake_attenuator():
     async with init_devices(mock=True):
         fake_attenuator: BinaryFilterAttenuator = BinaryFilterAttenuator(
-            "", "attenuator"
+            prefix="", num_filters=16
         )
 
     return fake_attenuator
@@ -57,5 +57,5 @@ async def test_given_attenuator_fails_to_set_filters_then_set_timeout(
 
     callback_on_mock_put(fake_attenuator._change, mock_apply_values)
 
-    with pytest.raises(asyncio.exceptions.TimeoutError):
+    with pytest.raises(TimeoutError):
         await asyncio.wait_for(fake_attenuator.set(0.65), timeout=0.01)

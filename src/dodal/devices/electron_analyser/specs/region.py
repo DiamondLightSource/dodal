@@ -1,16 +1,22 @@
+from typing import Generic
+
 from pydantic import Field
 
 from dodal.devices.electron_analyser.abstract.base_region import (
     AbstractBaseRegion,
     AbstractBaseSequence,
 )
+from dodal.devices.electron_analyser.abstract.types import TLensMode, TPsuMode
 from dodal.devices.electron_analyser.specs.enums import AcquisitionMode
 
 
-class SpecsRegion(AbstractBaseRegion[AcquisitionMode]):
+class SpecsRegion(
+    AbstractBaseRegion[AcquisitionMode, TLensMode, float],
+    Generic[TLensMode, TPsuMode],
+):
     # Override base class with defaults
-    lens_mode: str = "SmallArea"
-    pass_energy: int = 5
+    lens_mode: TLensMode
+    pass_energy: float = 5
     acquisition_mode: AcquisitionMode = AcquisitionMode.FIXED_TRANSMISSION
     low_energy: float = Field(default=800, alias="start_energy")
     high_energy: float = Field(default=850, alias="end_energy")
@@ -19,9 +25,11 @@ class SpecsRegion(AbstractBaseRegion[AcquisitionMode]):
     # Specific to this class
     values: int = 1
     centre_energy: float = 0
-    psu_mode: str = "1.5keV"
+    psu_mode: TPsuMode
     estimated_time_in_ms: float = 0
 
 
-class SpecsSequence(AbstractBaseSequence[SpecsRegion]):
-    regions: list[SpecsRegion] = Field(default_factory=lambda: [])
+class SpecsSequence(
+    AbstractBaseSequence[SpecsRegion[TLensMode, TPsuMode]], Generic[TLensMode, TPsuMode]
+):
+    regions: list[SpecsRegion[TLensMode, TPsuMode]] = Field(default_factory=lambda: [])
