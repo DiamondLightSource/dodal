@@ -11,7 +11,7 @@ from .pressurejumpcell_io import (
     PressureJumpCellTriggerMode,
 )
 
-#TODO Find out what the readout time is and if it can be retrieved from the device
+# TODO Find out what the readout time is and if it can be retrieved from the device
 PRESSURE_CELL_READAOUT_TIME = 1e-3
 
 
