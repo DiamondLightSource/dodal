@@ -45,6 +45,7 @@ When a device is named in this way, all of its child devices are named appropria
     class MyDevice(Device):
         def __init__(self, prefix: str, name: str = "")
             x = Motor(prefix + "X")
+            super().__init__(name)
 
     @device_factory()
     def foo() -> MyDevice:
@@ -77,7 +78,7 @@ is preferred over
             self.bragg = Motor(prefix + "-MO-DCM-01:BRAGG")
             super().__init__(name)        
 
-    MyDevice("BLXXI")      
+    MyDevice("BLXXI")
 
 This is so that a new device on say ``-MO-DCM-02`` can be easily created.
 
