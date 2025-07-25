@@ -21,5 +21,6 @@ class PressureJumpCellDriverIO(adcore.ADBaseIO):
 
 
 class PressureJumpCellAdcIO(adcore.ADBaseIO):
-    trigger_mode: A[SignalRW[PressureJumpCellAdcTriggerMode], PvSuffix.rbv("TriggerMode")]
-
+    trigger_mode: A[
+        SignalRW[PressureJumpCellAdcTriggerMode], PvSuffix.rbv("TriggerMode")
+    ]
