@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.i19.beamstop &#8212; dodal 1.53.1.dev13+g88edd2d01b documentation</title>
+    <title>dodal.devices.i19.beamstop &#8212; dodal 1.53.1.dev14+g336c81c687 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=869406e4"></script>
+    <script src="../../../../_static/documentation_options.js?v=cbaef40b"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -460,7 +460,7 @@ window.addEventListener("load", () => mermaid.run());
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i19.beamstop.HomeGroup.html#dodal.devices.i19.beamstop.HomeGroup">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">HomeGroup</span><span class="p">(</span><span class="n">StrictEnum</span><span class="p">):</span>
     <span class="n">NONE</span> <span class="o">=</span> <span class="s2">&quot;none&quot;</span>
-    <span class="n">ALL</span> <span class="o">=</span> <span class="s2">&quot;All&quot;</span>
+    <span class="n">ALL</span> <span class="o">=</span> <span class="s2">&quot;ALL&quot;</span>
     <span class="n">X</span> <span class="o">=</span> <span class="s2">&quot;X&quot;</span>
     <span class="n">Y</span> <span class="o">=</span> <span class="s2">&quot;Y&quot;</span>
     <span class="n">Z</span> <span class="o">=</span> <span class="s2">&quot;Z&quot;</span></div>
@@ -483,7 +483,7 @@ window.addEventListener("load", () => mermaid.run());
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">homing</span> <span class="o">=</span> <span class="n">HomingControl</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">HM&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
 
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span></div>
 
 </pre></div>
 
