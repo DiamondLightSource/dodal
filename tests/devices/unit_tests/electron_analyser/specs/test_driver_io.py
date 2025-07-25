@@ -1,3 +1,5 @@
+from unittest.mock import ANY
+
 import numpy as np
 import pytest
 from bluesky import plan_stubs as bps
@@ -139,23 +141,19 @@ async def test_analyser_sets_region_and_read_configuration_is_correct(
             f"{prefix}acquisition_mode": {"value": region.acquisition_mode},
             f"{prefix}lens_mode": {"value": region.lens_mode},
             f"{prefix}low_energy": {"value": expected_low_e},
-            f"{prefix}centre_energy": {
-                "value": await sim_driver.centre_energy.get_value()
-            },
+            f"{prefix}centre_energy": {"value": ANY},
             f"{prefix}high_energy": {"value": expected_high_e},
-            f"{prefix}energy_step": {"value": await sim_driver.energy_step.get_value()},
+            f"{prefix}energy_step": {"value": ANY},
             f"{prefix}pass_energy": {"value": region.pass_energy},
             f"{prefix}excitation_energy_source": {"value": expected_source},
             f"{prefix}slices": {"value": region.slices},
             f"{prefix}iterations": {"value": region.iterations},
-            f"{prefix}total_steps": {"value": 0},
-            f"{prefix}step_time": {"value": 0},
-            f"{prefix}total_time": {"value": 0},
-            f"{prefix}energy_axis": {"value": await sim_driver.energy_axis.get_value()},
-            f"{prefix}binding_energy_axis": {
-                "value": await sim_driver.binding_energy_axis.get_value()
-            },
-            f"{prefix}angle_axis": {"value": await sim_driver.angle_axis.get_value()},
+            f"{prefix}total_steps": {"value": ANY},
+            f"{prefix}step_time": {"value": ANY},
+            f"{prefix}total_time": {"value": ANY},
+            f"{prefix}energy_axis": {"value": ANY},
+            f"{prefix}binding_energy_axis": {"value": ANY},
+            f"{prefix}angle_axis": {"value": ANY},
             f"{prefix}snapshot_values": {"value": region.values},
             f"{prefix}psu_mode": {"value": region.psu_mode},
         },

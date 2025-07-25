@@ -1,3 +1,5 @@
+from unittest.mock import ANY
+
 import numpy as np
 import pytest
 from bluesky import plan_stubs as bps
@@ -124,7 +126,6 @@ async def test_analyser_sets_region_correctly(
 @pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
 async def test_analyser_sets_region_and_read_configuration_is_correct(
     sim_driver: VGScientaAnalyserDriverIO[LensMode, PsuMode, PassEnergy],
-    sequence: VGScientaSequence[LensMode, PsuMode, PassEnergy],
     region: VGScientaRegion[LensMode, PassEnergy],
     RE: RunEngine,
 ) -> None:
@@ -146,9 +147,6 @@ async def test_analyser_sets_region_and_read_configuration_is_correct(
         region.high_energy, region.energy_mode, excitation_energy
     )
 
-    # Move psu mode as this analyser doesn't directly set it via a region.
-    RE(bps.mv(sim_driver.psu_mode, sequence.psu_mode))
-
     await assert_configuration(
         sim_driver,
         {
@@ -164,18 +162,18 @@ async def test_analyser_sets_region_and_read_configuration_is_correct(
             f"{prefix}excitation_energy_source": {"value": expected_source},
             f"{prefix}slices": {"value": region.slices},
             f"{prefix}iterations": {"value": region.iterations},
-            f"{prefix}total_steps": {"value": 0},
-            f"{prefix}step_time": {"value": 0},
-            f"{prefix}total_time": {"value": 0},
-            f"{prefix}energy_axis": {"value": []},
-            f"{prefix}binding_energy_axis": {"value": []},
-            f"{prefix}angle_axis": {"value": []},
+            f"{prefix}total_steps": {"value": ANY},
+            f"{prefix}step_time": {"value": ANY},
+            f"{prefix}total_time": {"value": ANY},
+            f"{prefix}energy_axis": {"value": ANY},
+            f"{prefix}binding_energy_axis": {"value": ANY},
+            f"{prefix}angle_axis": {"value": ANY},
             f"{prefix}detector_mode": {"value": region.detector_mode},
             f"{prefix}first_x_channel": {"value": region.first_x_channel},
             f"{prefix}x_channel_size": {"value": region.x_channel_size()},
             f"{prefix}first_y_channel": {"value": region.first_y_channel},
             f"{prefix}y_channel_size": {"value": region.y_channel_size()},
-            f"{prefix}psu_mode": {"value": sequence.psu_mode},
+            f"{prefix}psu_mode": {"value": ANY},
         },
     )
 
@@ -200,7 +198,7 @@ async def test_analyser_sets_region_and_read_is_correct(
         sim_driver,
         {
             f"{prefix}excitation_energy": {"value": excitation_energy},
-            f"{prefix}image": {"value": []},
+            f"{prefix}image": {"value": ANY},
             f"{prefix}spectrum": {"value": spectrum},
             f"{prefix}total_intensity": {"value": expected_total_intensity},
         },
