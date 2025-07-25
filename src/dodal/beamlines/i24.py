@@ -51,7 +51,6 @@ def attenuator() -> ReadOnlyAttenuator:
     existing object."""
     return ReadOnlyAttenuator(
         f"{PREFIX.beamline_prefix}-OP-ATTN-01:",
-        "attenuator",
     )
 
 
@@ -62,7 +61,6 @@ def aperture() -> Aperture:
     """
     return Aperture(
         f"{PREFIX.beamline_prefix}-AL-APTR-01:",
-        "aperture",
     )
 
 
@@ -73,7 +71,6 @@ def beamstop() -> Beamstop:
     """
     return Beamstop(
         f"{PREFIX.beamline_prefix}-MO-BS-01:",
-        "beamstop",
     )
 
 
@@ -84,7 +81,6 @@ def backlight() -> DualBacklight:
     """
     return DualBacklight(
         prefix=PREFIX.beamline_prefix,
-        name="backlight",
     )
 
 
@@ -94,7 +90,6 @@ def detector_motion() -> YZStage:
     If this is called when already instantiated in i24, it will return the existing object.
     """
     return YZStage(
-        name="detector_motion",
         prefix=f"{PREFIX.beamline_prefix}-EA-DET-01:",
     )
 
@@ -105,7 +100,6 @@ def dcm() -> DCM:
     If this is called when already instantiated in i24, it will return the existing object.
     """
     return DCM(
-        name="dcm",
         prefix=PREFIX.beamline_prefix,
     )
 
@@ -145,7 +139,6 @@ def pmac() -> PMAC:
     # prefix not BL but ME14E
     return PMAC(
         "ME14E-MO-CHIP-01:",
-        "pmac",
     )
 
 
@@ -153,7 +146,6 @@ def pmac() -> PMAC:
 def oav() -> OAVBeamCentreFile:
     return OAVBeamCentreFile(
         prefix=f"{PREFIX.beamline_prefix}-DI-OAV-01:",
-        name="oav",
         config=OAVConfigBeamCentre(ZOOM_PARAMS_FILE, DISPLAY_CONFIG),
     )
 
@@ -165,7 +157,6 @@ def vgonio() -> VerticalGoniometer:
     """
     return VerticalGoniometer(
         f"{PREFIX.beamline_prefix}-MO-VGON-01:",
-        "vgonio",
     )
 
 
@@ -175,7 +166,6 @@ def zebra() -> Zebra:
     If this is called when already instantiated in i24, it will return the existing object.
     """
     return Zebra(
-        name="zebra",
         prefix=f"{PREFIX.beamline_prefix}-EA-ZEBRA-01:",
         mapping=I24_ZEBRA_MAPPING,
     )
@@ -188,7 +178,6 @@ def shutter() -> HutchShutter:
     """
     return HutchShutter(
         f"{PREFIX.beamline_prefix}-PS-SHTR-01:",
-        "shutter",
     )
 
 
@@ -197,7 +186,6 @@ def focus_mirrors() -> FocusMirrorsMode:
     """Get the i24 focus mirror devise to find the beam size."""
     return FocusMirrorsMode(
         f"{PREFIX.beamline_prefix}-OP-MFM-01:",
-        "focus_mirrors",
     )
 
 
@@ -206,7 +194,6 @@ def eiger_beam_center() -> DetectorBeamCenter:
     """A device for setting/reading the beamcenter from the eiger on i24."""
     return DetectorBeamCenter(
         f"{PREFIX.beamline_prefix}-EA-EIGER-01:CAM:",
-        "eiger_bc",
     )
 
 
@@ -215,7 +202,6 @@ def pilatus_beam_center() -> DetectorBeamCenter:
     """A device for setting/reading the beamcenter from the pilatus on i24."""
     return DetectorBeamCenter(
         f"{PREFIX.beamline_prefix}-EA-PILAT-01:cam1:",
-        "pilatus_bc",
     )
 
 
@@ -224,5 +210,4 @@ def pilatus_metadata() -> PilatusMetadata:
     """A small pilatus driver device for figuring out the filename template."""
     return PilatusMetadata(
         f"{PREFIX.beamline_prefix}-EA-PILAT-01:",
-        "pilatus_meta",
     )

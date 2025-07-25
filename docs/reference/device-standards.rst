@@ -27,10 +27,32 @@ Device Best Practices
 Ophyd-async directory contains a flowchart_ for a simplified decision tree about what interfaces
 should a given device implement. In addition to this the following guidelines are strongly recommended:
 
+#. Device should have their name as an optional str parameter with a default of ""- this allows ophyd-async to automatically name the device
 #. Devices should contain only the PV suffixes that are generic for any instance of the device. See `PV Suffixes`_
 #. Anything in a device that is expected to be set externally should be a signal. See `Use of signals`_
 #. Devices should not hold state, when they are read they should read the hardware. See `Holding State`_
 
+Defaulting Names
+----------------
+
+Device should provide the ability to override their name while maintaining a default name of ""-
+this allows the device to be named on connection from the name of its factory function when using
+the device_factory decorator.
+
+When a device is named in this way, all of its child devices are named appropriately.
+
+.. code-block:: python
+    class MyDevice(Device):
+        def __init__(self, prefix: str, name: str = "")
+            x = Motor(prefix + "X")
+
+    @device_factory()
+    def foo() -> MyDevice:
+        return MyDevice("FOO:")
+
+    f = foo()
+    f.name == "foo"
+    f.x.name == "foo-x"
 
 PV Suffixes
 -----------
@@ -40,23 +62,22 @@ In general devices should contain only the PV suffixes that are generic for any 
 .. code-block:: python
 
     class MyDevice(Device):
-        def __init__(self, name: str, prefix: str)
+        def __init__(self, prefix: str, name: str = "")
             self.bragg = Motor(prefix + "BRAGG")
-            super().__init__(name)        
-    
-    device_instantiation(MyDevice, "dcm", "-MO-DCM-01:")
+            super().__init__(name)  
 
+    MyDevice("BLXXI-MO-DCM-01:")      
 
 is preferred over
 
 .. code-block:: python
 
     class MyDevice(Device):
-        def __init__(self, name: str, prefix: str)
+        def __init__(self, prefix: str, name: str = "")
             self.bragg = Motor(prefix + "-MO-DCM-01:BRAGG")
             super().__init__(name)        
 
-    device_instantiation(MyDevice, "dcm", "")
+    MyDevice("BLXXI")      
 
 This is so that a new device on say ``-MO-DCM-02`` can be easily created.
 
