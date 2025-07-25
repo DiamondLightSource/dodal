@@ -6,6 +6,7 @@ from dodal.common.beamlines.beamline_utils import (
 )
 from dodal.devices.i19.beamstop import BeamStop
 from dodal.devices.i19.blueapi_device import HutchState
+from dodal.devices.i19.diffractometer import FourCircleDiffractometer
 from dodal.devices.i19.shutter import AccessControlledShutter
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.zebra.zebra import Zebra
@@ -32,9 +33,9 @@ I19_2_ZEBRA_MAPPING = ZebraMapping(
 )
 
 
-# @device_factory()
-# def diffractometer() -> FourCircleDiffractometer:
-#     return FourCircleDiffractometer(prefix=f"{PREFIX.beamline_prefix}-MO-CIRC-02:SAM:")
+@device_factory()
+def diffractometer() -> FourCircleDiffractometer:
+    return FourCircleDiffractometer(prefix=PREFIX.beamline_prefix)
 
 
 @device_factory()
