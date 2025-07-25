@@ -154,7 +154,8 @@ def detector_motion() -> DetectorMotion:
     If this is called when already instantiated in i03, it will return the existing object.
     """
     return DetectorMotion(
-        prefix=PREFIX.beamline_prefix,
+        device_prefix=f"{PREFIX.beamline_prefix}-MO-DET-01:",
+        pmac_prefix=f"{PREFIX.beamline_prefix}-MO-PMAC-02:",
     )
 
 
