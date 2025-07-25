@@ -1,4 +1,6 @@
-from dodal.devices.motors import Motor, Stage
+from ophyd_async.epics.motor import Motor
+
+from dodal.devices.motors import Stage
 
 
 class DiffractometerStage(Stage):
