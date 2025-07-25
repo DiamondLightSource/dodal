@@ -14,7 +14,7 @@ class XBPMFeedback(Device, Triggerable):
     """The XBPM feedback device is an IOC that moves the DCM, HFM and VFM to automatically
     hold the beam into place, as measured by the XBPM sensor."""
 
-    def __init__(self, prefix: str = "", name: str = "xbpm_feedback") -> None:
+    def __init__(self, prefix: str, name: str = "xbpm_feedback") -> None:
         self.pos_ok = epics_signal_r(float, prefix + "-EA-FDBK-01:XBPM2POSITION_OK")
         self.pos_stable = epics_signal_r(float, prefix + "-EA-FDBK-01:XBPM2_STABLE")
         self.pause_feedback = epics_signal_rw(Pause, prefix + "-EA-FDBK-01:FB_PAUSE")
