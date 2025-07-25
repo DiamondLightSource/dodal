@@ -2,7 +2,9 @@ from ophyd_async.epics.motor import Motor
 
 from dodal.devices.motors import SixAxisGonio, Stage
 
-# prefix: BL19I-MO-CIRC-02:SAM:
+# prefix: BL19I-MO-CIRC-02:SAM: for phi, kappa, omega, 2theta and det_z
+# prefix: BL19I-MO-SAMP-02:SAM: for x,y,z
+# beacause of course... facepalm
 
 
 class DetectorMotion(Stage):

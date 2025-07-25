@@ -32,6 +32,11 @@ I19_2_ZEBRA_MAPPING = ZebraMapping(
 )
 
 
+# @device_factory()
+# def diffractometer() -> FourCircleDiffractometer:
+#     return FourCircleDiffractometer(prefix=f"{PREFIX.beamline_prefix}-MO-CIRC-02:SAM:")
+
+
 @device_factory()
 def beamstop() -> BeamStop:
     """Get the i19-2 beamstop device, instantiate it if it hasn't already been.
