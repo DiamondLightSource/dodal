@@ -1,7 +1,6 @@
-from ophyd_async.core import StrictEnum
+from bluesky.protocols import Pausable
+from ophyd_async.core import StandardReadable, StrictEnum, set_and_wait_for_value
 from ophyd_async.epics.core import epics_signal_rw
-
-from dodal.devices.motors import StandardReadable
 
 
 class SpinEnable(StrictEnum):
@@ -9,7 +8,7 @@ class SpinEnable(StrictEnum):
     ENABLE = "Enabled"
 
 
-class Spinner(StandardReadable):
+class Spinner(StandardReadable, Pausable):
     """This is a simple sample spinner, that has enable and speed (%)"""
 
     def __init__(
@@ -24,3 +23,9 @@ class Spinner(StandardReadable):
             self.speed = epics_signal_rw(float, prefix + speed_suffix)
 
         super().__init__(name=name)
+
+    async def pause(self):
+        await set_and_wait_for_value(self.enable, SpinEnable.DISABLE)
+
+    async def resume(self):
+        await set_and_wait_for_value(self.enable, SpinEnable.ENABLE)

@@ -14,7 +14,7 @@ from dodal.devices.i11.diff_stages import (
     DiffractometerBase,
     DiffractometerStage,
 )
-from dodal.devices.i11.i11_robot import I11Robot
+from dodal.devices.i11.i11_robot import NX100Robot
 from dodal.devices.i11.mythen import Mythen3
 from dodal.devices.i11.spinner import Spinner
 from dodal.devices.slits import Slits
@@ -82,10 +82,10 @@ def csb1() -> CyberstarBlower:
 
 
 @device_factory()
-def sample_robot() -> I11Robot:
+def sample_robot() -> NX100Robot:
     """The sample robot arm and carosel on i11 that moves
     and loads samples on/off the spinner"""
-    return I11Robot(prefix=f"{PREFIX.beamline_prefix}-EA-ROBOT-01:")
+    return NX100Robot(prefix=f"{PREFIX.beamline_prefix}-EA-ROBOT-01:")
 
 
 @device_factory()

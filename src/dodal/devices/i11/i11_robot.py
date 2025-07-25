@@ -1,6 +1,6 @@
 import asyncio
 
-from bluesky.protocols import Locatable, Location
+from bluesky.protocols import Locatable, Location, Pausable, Stoppable
 from ophyd_async.core import (
     AsyncStatus,
     StandardReadable,
@@ -26,17 +26,16 @@ class RobotJobs(StrictEnum):
 
 
 class RobotSampleState:
-    CAROSEL = 0.0
-    ONGRIP = 1.0
-    DIFF = 2.0
+    CAROSEL = 0.0  # Sample is on carousel
+    ONGRIP = 1.0  # Sample is on the gripper
+    DIFF = 2.0  # Sample is on the diffractometer
     UNKNOWN = 3.0
 
 
-class I11Robot(StandardReadable, Locatable):
+class NX100Robot(StandardReadable, Locatable, Stoppable, Pausable):
     # TODO: Test this
 
     """
-
     This is a Yaskawa Motoman that uses an NX100 controller
 
     The following PV's are related to the robot and may be needed for some functionality
@@ -45,10 +44,8 @@ class I11Robot(StandardReadable, Locatable):
     self.robot_feedrate_limit = "BL11I-MO-STEP-19:FEEDRATE_LIMIT"
     """
 
-    MAX_ROBOT_NEXT_POSITION_ATTEMPTS = 3
     MAX_NUMBER_OF_SAMPLES = 200
     MIN_NUMBER_OF_SAMPLES = 1
-    LOAD_TIMEOUT = 300
 
     def __init__(self, prefix: str, name=""):
         self.start = epics_signal_x(prefix + "START")
@@ -88,8 +85,6 @@ class I11Robot(StandardReadable, Locatable):
             pass
         elif sample_state == RobotSampleState.UNKNOWN:
             LOGGER.error("UNKNOWN sample state from robot, exit")
-        else:
-            raise Exception
 
         if table_in:
             await set_and_wait_for_value(self.job, RobotJobs.TABLEIN)
@@ -98,64 +93,57 @@ class I11Robot(StandardReadable, Locatable):
 
     async def start_robot(self):
         await asyncio.gather(
-            self.start.trigger(),
             set_and_wait_for_value(self.servo_on, True),
             set_and_wait_for_value(self.hold, False),
+            self.start.trigger(),
         )
-
-    async def stop_robot(self):
-        await asyncio.gather(
-            set_and_wait_for_value(self.hold, True),
-            set_and_wait_for_value(self.hold, False),
-        )
-
-        await self.clear_sample()
-
-    async def clear_error(self):
-        await self.err.set(0)
 
     async def load_sample(self, sample_location: int):
-        attempts = 0
-        success = False
-
-        while (attempts < self.MAX_ROBOT_NEXT_POSITION_ATTEMPTS) and (not success):
-            attempts += 1
-            # poll sample state before changing sample as event update not
-            # reliable anymore.
-            sample_state = await self.robot_sample_state.get_value()
-            # clear sample from diffractometer before putting on next sample
-            await self.clear_sample(table_in=False)
-
-            if sample_state == RobotSampleState.CAROSEL:
-                await self.set(sample_location)
-                await set_and_wait_for_value(self.job, RobotJobs.PICKC)
-
-                if sample_state == RobotSampleState.ONGRIP:
-                    await set_and_wait_for_value(self.job, RobotJobs.PLACED)
-                    success = True
-                else:
-                    await set_and_wait_for_value(self.job, RobotJobs.TABLEIN)
-                    LOGGER.warning(
-                        f"No sample at sample holder position {sample_location}"
-                    )
-                    LOGGER.warning(
-                        f"Attempt {attempts} of {self.MAX_ROBOT_NEXT_POSITION_ATTEMPTS}"
-                    )
-
-        if not success:
-            LOGGER.warning(
-                f"Still no sample at sample holder position {sample_location} after {attempts} attempts"
-            )
+        sample_state = await self.robot_sample_state.get_value()
+        if sample_state == RobotSampleState.CAROSEL:
+            await set_and_wait_for_value(self.job, RobotJobs.PICKC)
+            await set_and_wait_for_value(self.job, RobotJobs.PLACED)
+        elif sample_state == RobotSampleState.ONGRIP:
+            await set_and_wait_for_value(self.job, RobotJobs.PLACED)
+        elif sample_state == RobotSampleState.DIFF:
+            pass
+        elif sample_state == RobotSampleState.UNKNOWN:
+            LOGGER.warning(f"No sample at sample holder position {sample_location}")
+            LOGGER.error("UNKNOWN sample state from robot, exit")
 
     @AsyncStatus.wrap
-    async def set(self, value: int) -> None:
-        if await self.current_sample_position.get_value() == value:
-            LOGGER.info(f"Robot already at position {value}")
+    async def set(self, sample_location: int) -> None:
+        if not (
+            self.MIN_NUMBER_OF_SAMPLES <= sample_location <= self.MAX_NUMBER_OF_SAMPLES
+        ):
+            raise ValueError(
+                f"Sample location must be between {self.MIN_NUMBER_OF_SAMPLES} and {self.MAX_NUMBER_OF_SAMPLES}, got {sample_location}"
+            )
+        if await self.current_sample_position.get_value() == sample_location:
+            LOGGER.info(f"Robot already at position {sample_location}")
         else:
-            await self.next_sample_position.set(value=value)
+            await self.clear_sample(table_in=False)
+            await self.next_sample_position.set(sample_location, wait=True)
+            await self.load_sample(sample_location)
+
+    async def pause(self):
+        await set_and_wait_for_value(self.hold, True)
+
+    async def resume(self):
+        await set_and_wait_for_value(self.hold, False)
+
+    async def stop(self, success=True):
+        await set_and_wait_for_value(self.hold, True)
+        if not success:
+            await set_and_wait_for_value(self.hold, False)
+            await self.clear_sample()
+
+    @AsyncStatus.wrap
+    async def stage(self) -> None:
+        """Set up the device for acquisition."""
+        await self.start_robot()
 
     # @AsyncStatus.wrap
     async def locate(self) -> Location:
-        # setpoint readback
         location = await self.current_sample_position.locate()
         return location
