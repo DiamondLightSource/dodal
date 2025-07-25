@@ -143,7 +143,7 @@ def pmac() -> PMAC:
     If this is called when already instantiated in i24, it will return the existing object.
     """
     return PMAC(
-        "BL24I-MO-CHIP-01:",
+        PREFIX.beamline_prefix,
         "pmac",
     )
 

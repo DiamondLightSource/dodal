@@ -19,6 +19,7 @@ from dodal.devices.motors import XYZStage
 
 HOME_STR = r"\#5hmz\#6hmz\#7hmz"  # Command to home the PMAC motors
 ZERO_STR = "!x0y0z0"  # Command to blend any ongoing move into new position
+CS_STR = "&2"
 
 
 class ScanState(IntEnum):
@@ -196,12 +197,12 @@ class PMAC(XYZStage):
     """Device to control the chip stage on I24."""
 
     def __init__(self, prefix: str, name: str = "") -> None:
-        self.pmac_string = epics_signal_rw(str, prefix + "PMAC_STRING")
+        self.pmac_string = epics_signal_rw(str, f"{prefix}-MO-IOC-13:PMAC:console")
         self.home = PMACStringMove(
             self.pmac_string,
-            HOME_STR,
+            f"{CS_STR}{HOME_STR}",
         )
-        self.to_xyz_zero = PMACStringMove(self.pmac_string, ZERO_STR)
+        self.to_xyz_zero = PMACStringMove(self.pmac_string, f"{CS_STR}{ZERO_STR}")
 
         self.laser = PMACStringLaser(self.pmac_string)
 
@@ -211,8 +212,8 @@ class PMAC(XYZStage):
 
         # These next signals are readback values on PVARS which are set by the motion
         # program.
-        self.scanstatus = epics_signal_r(float, "BL24I-MO-STEP-13:pmac:read:P2401")
-        self.counter = epics_signal_r(float, "BL24I-MO-STEP-13:pmac:read:P2402")
+        self.scanstatus = epics_signal_r(float, f"{prefix}-MO-STEP-13:pmac:read:P2401")
+        self.counter = epics_signal_r(float, f"{prefix}-MO-STEP-13:pmac:read:P2402")
 
         # A couple of soft signals for running a collection: program number to send to
         # the PMAC_STRING and expected collection time.
