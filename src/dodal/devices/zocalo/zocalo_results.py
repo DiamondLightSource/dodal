@@ -131,14 +131,12 @@ class ZocaloResults(StandardReadable, Triggerable):
         channel: str = "xrc.i03",
         sort_key: str = DEFAULT_SORT_KEY.value,
         timeout_s: float = DEFAULT_TIMEOUT,
-        prefix: str = "",
         use_gpu: bool = False,
     ) -> None:
         self.zocalo_environment = zocalo_environment
         self.sort_key = SortKeys[sort_key]
         self.channel = channel
         self.timeout_s = timeout_s
-        self._prefix = prefix
         self._raw_results_received: Queue = Queue()
         self.transport: CommonTransport | None = None
         self.use_gpu = use_gpu

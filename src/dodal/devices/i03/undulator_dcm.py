@@ -32,7 +32,6 @@ class UndulatorDCM(StandardReadable, Movable[float]):
         undulator: Undulator,
         dcm: DCM,
         daq_configuration_path: str,
-        prefix: str = "",
         name: str = "",
     ):
         self.undulator_ref = Reference(undulator)

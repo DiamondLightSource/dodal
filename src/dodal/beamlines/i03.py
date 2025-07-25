@@ -282,7 +282,6 @@ def undulator_dcm(daq_configuration_path: str | None = None) -> UndulatorDCM:
         else undulator()
     )
     return UndulatorDCM(
-        prefix=PREFIX.beamline_prefix,
         undulator=undulator_singleton,
         dcm=dcm(),
         daq_configuration_path=daq_configuration_path or DAQ_CONFIGURATION_PATH,
@@ -356,7 +355,7 @@ def zocalo() -> ZocaloResults:
     """Get the i03 ZocaloResults device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return ZocaloResults(prefix=PREFIX.beamline_prefix, use_gpu=True)
+    return ZocaloResults(use_gpu=True)
 
 
 @device_factory()

@@ -406,7 +406,6 @@ class Apple2(abc.ABC, StandardReadable, Movable):
         self,
         id_gap: UndulatorGap,
         id_phase: UndulatorPhaseAxes,
-        prefix: str = "",
         name: str = "",
     ) -> None:
         """

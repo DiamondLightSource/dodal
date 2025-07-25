@@ -38,7 +38,6 @@ class SynchrotronMode(StrictEnum):
 class Synchrotron(StandardReadable):
     def __init__(
         self,
-        prefix: str = "",
         name: str = "synchrotron",
         *,
         signal_prefix=Prefix.SIGNAL,
