@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.robot &#8212; dodal 1.53.1.dev10+g0e8e1e819e documentation</title>
+    <title>dodal.devices.robot &#8212; dodal 1.53.1.dev11+gdc74486d58 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=abbc8c67"></script>
+    <script src="../../../_static/documentation_options.js?v=d6245a99"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -644,7 +644,6 @@ window.addEventListener("load", () => mermaid.run());
                 <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">LOAD_TIMEOUT</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">NOT_BUSY_TIMEOUT</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="k">except</span> <span class="ne">TimeoutError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="c1"># Will only need to catch asyncio.TimeoutError after https://github.com/bluesky/ophyd-async/issues/572</span>
             <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">prog_error</span><span class="o">.</span><span class="n">raise_if_error</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
             <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">controller_error</span><span class="o">.</span><span class="n">raise_if_error</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
             <span class="k">raise</span> <span class="n">RobotLoadFailed</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Robot timed out&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span></div>
