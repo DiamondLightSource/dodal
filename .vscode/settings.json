@@ -19,5 +19,6 @@
     "python.analysis.extraPaths": [
         "./src"
     ],
-    "python.analysis.typeCheckingMode": "basic"
+    "python.analysis.typeCheckingMode": "basic",
+    "python-envs.pythonProjects": []
 }

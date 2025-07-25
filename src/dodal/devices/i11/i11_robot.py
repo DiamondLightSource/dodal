@@ -1,0 +1,149 @@
+import asyncio
+
+from bluesky.protocols import Locatable, Location, Pausable, Stoppable
+from ophyd_async.core import (
+    AsyncStatus,
+    StandardReadable,
+    StrictEnum,
+    set_and_wait_for_value,
+)
+from ophyd_async.epics.core import epics_signal_rw, epics_signal_rw_rbv, epics_signal_x
+
+from dodal.log import LOGGER
+
+
+class RobotJobs(StrictEnum):
+    RECOVER = "RECOVER"  # Recover from unknown state
+    PICKC = "PICKC"  # Pick a sample from the carousel.
+    PLACEC = "PLACEC"  # Place a sample onto the carousel
+    PICKD = "PICKD"  # Pick a sample from the diffractometer.
+    PLACED = "PLACED"  # Place a sample onto the diffractometer.
+    GRIPO = "GRIPO"
+    GRIPC = "GRIPC"
+    TABLEIN = "TABLEIN"
+    TABLEOUT = "TABLEOUT"
+    UNLOAD = "UNLOAD"
+
+
+class RobotSampleState:
+    CAROSEL = 0.0  # Sample is on carousel
+    ONGRIP = 1.0  # Sample is on the gripper
+    DIFF = 2.0  # Sample is on the diffractometer
+    UNKNOWN = 3.0
+
+
+class NX100Robot(StandardReadable, Locatable, Stoppable, Pausable):
+    # TODO: Test this
+
+    """
+    This is a Yaskawa Motoman that uses an NX100 controller
+
+    The following PV's are related to the robot and may be needed for some functionality
+    self.robot_plc_check = "BL11I-MO-STEP-19:PLCSTATUS_OK"
+    self.robot_feedrate_check = "BL11I-MO-STEP-19:FEEDRATE"
+    self.robot_feedrate_limit = "BL11I-MO-STEP-19:FEEDRATE_LIMIT"
+    """
+
+    MAX_NUMBER_OF_SAMPLES = 200
+    MIN_NUMBER_OF_SAMPLES = 1
+
+    def __init__(self, prefix: str, name=""):
+        self.start = epics_signal_x(prefix + "START")
+        self.hold = epics_signal_rw(bool, prefix + "HOLD")
+        self.job = epics_signal_rw(RobotJobs, prefix + "JOB")
+        self.servo_on = epics_signal_rw(bool, prefix + "SVON")  # Servo on/off
+        self.err = epics_signal_rw(int, prefix + "ERR")
+
+        self.robot_sample_state = epics_signal_rw(float, prefix + "D010")
+        self.next_sample_position = epics_signal_rw_rbv(
+            int, prefix + "D011", read_suffix=":RBV"
+        )
+        self.current_sample_position = epics_signal_rw_rbv(
+            int, prefix + "D012", read_suffix=":RBV"
+        )
+        self.door_latch_state = epics_signal_rw(int, prefix + "NEEDRECOVER")
+
+        super().__init__(name=name)
+
+    async def recover(self):
+        await asyncio.gather(
+            self.start.trigger(),
+            set_and_wait_for_value(self.job, RobotJobs.RECOVER),
+            set_and_wait_for_value(self.err, False),
+        )
+
+    async def clear_sample(self, table_in=True):
+        sample_state = await self.robot_sample_state.get_value()
+        if sample_state == RobotSampleState.DIFF:
+            await asyncio.gather(
+                set_and_wait_for_value(self.job, RobotJobs.PICKD),
+                set_and_wait_for_value(self.job, RobotJobs.PLACEC),
+            )
+        elif sample_state == RobotSampleState.ONGRIP:
+            await set_and_wait_for_value(self.job, RobotJobs.PLACEC)
+        elif sample_state == RobotSampleState.CAROSEL:
+            pass
+        elif sample_state == RobotSampleState.UNKNOWN:
+            LOGGER.error("UNKNOWN sample state from robot, exit")
+
+        if table_in:
+            await set_and_wait_for_value(self.job, RobotJobs.TABLEIN)
+
+        LOGGER.info("Sample cleared from diffractometer")
+
+    async def start_robot(self):
+        await asyncio.gather(
+            set_and_wait_for_value(self.servo_on, True),
+            set_and_wait_for_value(self.hold, False),
+            self.start.trigger(),
+        )
+
+    async def load_sample(self, sample_location: int):
+        sample_state = await self.robot_sample_state.get_value()
+        if sample_state == RobotSampleState.CAROSEL:
+            await set_and_wait_for_value(self.job, RobotJobs.PICKC)
+            await set_and_wait_for_value(self.job, RobotJobs.PLACED)
+        elif sample_state == RobotSampleState.ONGRIP:
+            await set_and_wait_for_value(self.job, RobotJobs.PLACED)
+        elif sample_state == RobotSampleState.DIFF:
+            pass
+        elif sample_state == RobotSampleState.UNKNOWN:
+            LOGGER.warning(f"No sample at sample holder position {sample_location}")
+            LOGGER.error("UNKNOWN sample state from robot, exit")
+
+    @AsyncStatus.wrap
+    async def set(self, sample_location: int) -> None:
+        if not (
+            self.MIN_NUMBER_OF_SAMPLES <= sample_location <= self.MAX_NUMBER_OF_SAMPLES
+        ):
+            raise ValueError(
+                f"Sample location must be between {self.MIN_NUMBER_OF_SAMPLES} and {self.MAX_NUMBER_OF_SAMPLES}, got {sample_location}"
+            )
+        if await self.current_sample_position.get_value() == sample_location:
+            LOGGER.info(f"Robot already at position {sample_location}")
+        else:
+            await self.clear_sample(table_in=False)
+            await self.next_sample_position.set(sample_location, wait=True)
+            await self.load_sample(sample_location)
+
+    async def pause(self):
+        await set_and_wait_for_value(self.hold, True)
+
+    async def resume(self):
+        await set_and_wait_for_value(self.hold, False)
+
+    async def stop(self, success=True):
+        await set_and_wait_for_value(self.hold, True)
+        if not success:
+            await set_and_wait_for_value(self.hold, False)
+            await self.clear_sample()
+
+    @AsyncStatus.wrap
+    async def stage(self) -> None:
+        """Set up the device for acquisition."""
+        await self.start_robot()
+
+    # @AsyncStatus.wrap
+    async def locate(self) -> Location:
+        location = await self.current_sample_position.locate()
+        return location
