@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from ophyd_async.epics.adaravis import AravisDetector
+from ophyd_async.epics.adcore import NDROIStatIO
 from ophyd_async.fastcs.panda import HDFPanda
 
 from dodal.common.beamlines.beamline_utils import (
@@ -69,11 +70,15 @@ def spectroscopy_detector() -> AravisDetector:
     Returns:
         AravisDetector: The spectroscopy camera device.
     """
+    pv_prefix = f"{PREFIX.beamline_prefix}-DI-DCAM-02:"
     return AravisDetector(
-        f"{PREFIX.beamline_prefix}-DI-DCAM-02:",
+        pv_prefix,
         path_provider=get_path_provider(),
         drv_suffix=CAM_SUFFIX,
         fileio_suffix=HDF5_SUFFIX,
+        plugins={
+            "roistat": NDROIStatIO(f"{pv_prefix}ROISTAT:", num_channels=3),
+        },
     )
 
 
