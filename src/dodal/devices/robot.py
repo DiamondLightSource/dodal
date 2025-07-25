@@ -74,7 +74,7 @@ class BartRobot(StandardReadable, Movable[SampleLocation]):
     # How far the gonio position can be out before loading will fail
     LOAD_TOLERANCE_MM = 0.02
 
-    def __init__(self, name: str, prefix: str) -> None:
+    def __init__(self, prefix: str, name: str = "") -> None:
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             self.barcode = epics_signal_r(str, prefix + "BARCODE")
             self.gonio_pin_sensor = epics_signal_r(PinMounted, prefix + "PIN_MOUNTED")
