@@ -145,6 +145,7 @@ def hfm() -> FocusingMirror:
 @device_factory(mock=True)
 def dcm() -> DCM:
     return DCM(
+        prefix="",
         temperature_prefix=f"{PREFIX.beamline_prefix}-DI-DCM-01:",
         crystal_1_metadata=make_crystal_metadata_from_material(
             MaterialsEnum.Si, (1, 1, 1)
