@@ -145,8 +145,6 @@ class AllValvesControl(StandardReadable):
     The default IOC for this device only controls
     specific valves. Other valves are under manual
     control.
-    fast_valves: tuple[int, ...] = (5, 6)
-    slow_valves: tuple[int, ...] = (1, 3)
     """
 
     def __init__(
