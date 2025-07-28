@@ -7,7 +7,7 @@ from ophyd_async.epics.core import PvSuffix
 
 class PressureJumpCellTriggerMode(StrictEnum):
     INTERNAL = "Internal"
-    EXTERNAL = "Exernal"
+    EXTERNAL = "External"
 
 
 class AdcTriggerCondition(StrictEnum):
@@ -53,11 +53,11 @@ class PressureJumpCellAdcTriggerIO(adcore.NDPluginBaseIO):
 
     # Trigger Control
     capture: A[SignalRW[bool], PvSuffix("Capture")]
-    state: A[SignalRW[AdcTriggerState], PvSuffix.rbv("Mode")]
+    state: A[SignalRW[AdcTriggerState], PvSuffix("Mode_RBV")]
     soft_trigger: A[SignalRW[bool], PvSuffix("Soft_Trigger")]
 
     buffered_frames: A[SignalRW[int], PvSuffix("BufferFrames")]
     buffered_samples: A[SignalRW[int], PvSuffix("BufferSamples")]
-    output_triggers: A[SignalRW[int], PvSuffix.rbv("OutputCount")]
-    ignored_triggers: A[SignalRW[int], PvSuffix.rbv("IgnoredCount")]
+    output_triggers: A[SignalRW[int], PvSuffix("OutputCount_RBV")]
+    ignored_triggers: A[SignalRW[int], PvSuffix("IgnoredCount_RBV")]
     status: A[SignalRW[str], PvSuffix("StatusMessage")]
