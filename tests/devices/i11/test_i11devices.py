@@ -132,7 +132,7 @@ async def test_robot_clear_load_when_state_is_invalid(i11_robot: NX100Robot) -> 
     with pytest.raises(ValueError):
         await i11_robot.load_sample(10)  # Load sample at position 10
     with pytest.raises(ValueError):
-        await i11_robot.clear_sample(10)  # Load sample at position 10
+        await i11_robot.clear_sample()  # Load sample at position 10
 
 
 async def test_when_robot_must_stop_and_success_false(
