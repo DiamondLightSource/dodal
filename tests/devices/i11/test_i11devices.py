@@ -35,7 +35,7 @@ async def test_robot_set_when_on_grip_moves_to_position(
 
 @pytest.mark.parametrize("value_to_set", [-1000, 9999])
 async def test_robot_set_fails_when_value_out_of_range(
-    i11_robot: NX100Robot, value_to_set: float
+    i11_robot: NX100Robot, value_to_set: int
 ) -> None:
     with pytest.raises(ValueError):
         await i11_robot.set(value_to_set)  # Should raise ValueError for out of range
