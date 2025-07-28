@@ -14,7 +14,11 @@ class DetectorMotion(Stage):
         super().__init__(name=name)
 
 
+# Collision model needs to be included
+# See https://github.com/DiamondLightSource/dodal/issues/1073
 class FourCircleDiffractometer(XYZStage):
+    """Newport 4-circle diffractometer device."""
+
     def __init__(self, prefix: str, name: str = ""):
         with self.add_children_as_readables():
             self.phi = Motor(f"{prefix}{CIRC}PHI")
