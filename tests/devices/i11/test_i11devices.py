@@ -14,7 +14,7 @@ async def i11_robot() -> NX100Robot:
     return i11_robot
 
 
-async def test_robot_moves_to_position(i11_robot: NX100Robot):
+async def test_robot_moves_to_position(i11_robot: NX100Robot) -> None:
     set_mock_value(i11_robot.robot_sample_state, 1.0)  # Set to CAROSEL state
     set_mock_value(i11_robot.job, RobotJobs.GRIPC)  # Set to CAROSEL state
 
@@ -30,7 +30,7 @@ async def i11_spinner() -> Spinner:
     return i11_spinner
 
 
-async def test_spinner_pause_resume(i11_spinner: Spinner):
+async def test_spinner_pause_resume(i11_spinner: Spinner) -> None:
     await i11_spinner.pause()
     assert await i11_spinner.enable.get_value() == "Disabled"
 
@@ -38,21 +38,17 @@ async def test_spinner_pause_resume(i11_spinner: Spinner):
     assert await i11_spinner.enable.get_value() == "Enabled"
 
 
-async def test_robot(i11_robot: NX100Robot):
-    set_mock_value(i11_robot.robot_sample_state, 1.0)  # Set to CAROSEL state
-    set_mock_value(i11_robot.job, RobotJobs.GRIPC)  # Set to CAROSEL state
-
-    await i11_robot.set(10)
-    location = await i11_robot.locate()
-    assert location["readback"] == 10
-
-
 @pytest.fixture
 async def i11_cyberstar() -> CyberstarBlower:
     async with init_devices(mock=True):
-        i11_cyberstar = CyberstarBlower(prefix="BL11I-EA-BLOW-01:")
+        i11_cyberstar = CyberstarBlower(
+            prefix="BL11I-EA-BLOW-01:", update=True, autotune=True
+        )
     return i11_cyberstar
 
 
-# async def test_blower(i11_cyberstar: CyberstarBlower):
-#     return blower
+async def test_blower_setpoint_and_locate(i11_cyberstar: CyberstarBlower) -> None:
+    await i11_cyberstar.set(100.0)
+    assert await i11_cyberstar.setpoint.get_value() == 100.0
+    location = await i11_cyberstar.locate()
+    assert location["setpoint"] == 100.0
