@@ -29,5 +29,7 @@ class CyberstarBlower(EurothermGeneral):
 
             if autotune:
                 self.autotune = EurothermAutotune(prefix=prefix + infix)
+            else:
+                self.autotune = None
 
         super().__init__(prefix=prefix + infix, name=name, update=update)

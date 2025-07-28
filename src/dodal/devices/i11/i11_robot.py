@@ -26,7 +26,7 @@ class RobotJobs(StrictEnum):
     UNLOAD = "UNLOAD"
 
 
-class RobotSampleState(Enum):
+class RobotSampleState(float, Enum):
     CAROSEL = 0.0  # Sample is on carousel
     ONGRIP = 1.0  # Sample is on the gripper
     DIFF = 2.0  # Sample is on the diffractometer
@@ -150,7 +150,6 @@ class NX100Robot(StandardReadable, Locatable[int], Stoppable, Pausable):
         """Set up the device for acquisition."""
         await self.start_robot()
 
-    # @AsyncStatus.wrap
-    async def locate(self) -> Location:
+    async def locate(self) -> Location[int]:
         location = await self.current_sample_position.locate()
         return location

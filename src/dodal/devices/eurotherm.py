@@ -35,7 +35,7 @@ class EurothermUpdate(StrictEnum):
     S0_1 = ".1 second"
 
 
-class EurothermGeneral(StandardReadable, Locatable):
+class EurothermGeneral(StandardReadable, Locatable[float]):
     """A base class for any eurotherm controller."""
 
     def __init__(
@@ -48,7 +48,7 @@ class EurothermGeneral(StandardReadable, Locatable):
         manual_suffix: str = "MAN",
         temp_suffix: str = "PV:RBV",
         rbv_suffix: str = ":RBV",
-        update=False,
+        update: bool = False,
     ):
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             self.temp = epics_signal_r(float, f"{prefix}{temp_suffix}")
@@ -69,6 +69,8 @@ class EurothermGeneral(StandardReadable, Locatable):
 
             if update:
                 self.update = epics_signal_rw(EurothermUpdate, f"{prefix}UPDATE.SCAN")
+            else:
+                self.update = None
 
         super().__init__(name)
 
@@ -77,8 +79,7 @@ class EurothermGeneral(StandardReadable, Locatable):
         """Set the blower to enabled"""
         await self.setpoint.set(value, wait=True)
 
-    # @AsyncStatus.wrap
-    async def locate(self) -> Location:
+    async def locate(self) -> Location[float]:
         setpoint = await self.setpoint.get_value()
         current_temp = await self.temp.get_value()
         location = Location(setpoint=setpoint, readback=current_temp)
