@@ -85,6 +85,8 @@ class NX100Robot(StandardReadable, Locatable, Stoppable, Pausable):
             pass
         elif sample_state == RobotSampleState.UNKNOWN:
             LOGGER.error("UNKNOWN sample state from robot, exit")
+        else:
+            raise ValueError(f"Unknown sample state: {sample_state}")
 
         if table_in:
             await set_and_wait_for_value(self.job, RobotJobs.TABLEIN)
@@ -110,6 +112,8 @@ class NX100Robot(StandardReadable, Locatable, Stoppable, Pausable):
         elif sample_state == RobotSampleState.UNKNOWN:
             LOGGER.warning(f"No sample at sample holder position {sample_location}")
             LOGGER.error("UNKNOWN sample state from robot, exit")
+        else:
+            raise ValueError(f"Unknown sample state: {sample_state}")
 
     @AsyncStatus.wrap
     async def set(self, sample_location: int) -> None:
@@ -125,6 +129,7 @@ class NX100Robot(StandardReadable, Locatable, Stoppable, Pausable):
             await self.clear_sample(table_in=False)
             await self.next_sample_position.set(sample_location, wait=True)
             await self.load_sample(sample_location)
+            await self.current_sample_position.set(sample_location)
 
     async def pause(self):
         await set_and_wait_for_value(self.hold, True)
