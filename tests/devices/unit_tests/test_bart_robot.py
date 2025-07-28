@@ -12,7 +12,14 @@ from ophyd_async.testing import (
     set_mock_value,
 )
 
-from dodal.devices.robot import BartRobot, PinMounted, RobotLoadFailed, SampleLocation
+from dodal.devices.robot import (
+    WAIT_FOR_NEW_PIN_MSG,
+    WAIT_FOR_OLD_PIN_MSG,
+    BartRobot,
+    PinMounted,
+    RobotLoadFailed,
+    SampleLocation,
+)
 
 
 async def _get_bart_robot() -> BartRobot:
@@ -23,6 +30,12 @@ async def _get_bart_robot() -> BartRobot:
     return device
 
 
+# For tests which are intentionally triggering a timeout error
+def _set_fast_robot_timeouts(robot: BartRobot):
+    robot.LOAD_TIMEOUT = 0.01  # type: ignore
+    robot.NOT_BUSY_TIMEOUT = 0.01  # type: ignore
+
+
 async def test_bart_robot_can_be_connected_in_sim_mode():
     device = await _get_bart_robot()
     await device.connect(mock=True)
@@ -30,9 +43,7 @@ async def test_bart_robot_can_be_connected_in_sim_mode():
 
 async def test_given_robot_load_times_out_when_load_called_then_exception_contains_error_info():
     device = await _get_bart_robot()
-    device.LOAD_TIMEOUT = 0.01  # type: ignore
-    device.NOT_BUSY_TIMEOUT = 0.01  # type: ignore
-
+    _set_fast_robot_timeouts(device)
     device._load_pin_and_puck = AsyncMock(side_effect=TimeoutError)
 
     set_mock_value(device.prog_error.code, (expected_error_code := 10))
@@ -50,8 +61,7 @@ async def test_given_program_running_when_load_pin_then_logs_the_program_name_an
     patch_logger: MagicMock,
 ):
     device = await _get_bart_robot()
-    device.LOAD_TIMEOUT = 0.01  # type: ignore
-    device.NOT_BUSY_TIMEOUT = 0.01  # type: ignore
+    _set_fast_robot_timeouts(device)
     program_name = "BAD_PROGRAM"
     set_mock_value(device.program_running, True)
     set_mock_value(device.program_name, program_name)
@@ -66,8 +76,7 @@ async def test_given_program_not_running_but_pin_not_unmounting_when_load_pin_th
     patch_logger: MagicMock,
 ):
     device = await _get_bart_robot()
-    device.LOAD_TIMEOUT = 0.01  # type: ignore
-    device.NOT_BUSY_TIMEOUT = 0.01  # type: ignore
+    _set_fast_robot_timeouts(device)
     set_mock_value(device.program_running, False)
     set_mock_value(device.gonio_pin_sensor, PinMounted.PIN_MOUNTED)
     device.load = AsyncMock(side_effect=device.load)
@@ -83,8 +92,7 @@ async def test_given_program_not_running_and_pin_unmounting_but_new_pin_not_moun
     patch_logger: MagicMock,
 ):
     device = await _get_bart_robot()
-    device.LOAD_TIMEOUT = 0.01  # type: ignore
-    device.NOT_BUSY_TIMEOUT = 0.01  # type: ignore
+    _set_fast_robot_timeouts(device)
     set_mock_value(device.program_running, False)
     set_mock_value(device.gonio_pin_sensor, PinMounted.NO_PIN_MOUNTED)
     device.load = AsyncMock(side_effect=device.load)
@@ -101,9 +109,9 @@ async def test_given_program_not_running_and_pin_unmounting_but_new_pin_not_moun
 
 
 def _set_pin_sensor_on_log_messages(device: BartRobot, msg: str):
-    if msg == "Waiting on old pin unloaded":
+    if msg == WAIT_FOR_OLD_PIN_MSG:
         set_mock_value(device.gonio_pin_sensor, PinMounted.NO_PIN_MOUNTED)
-    elif msg == "Waiting on new pin loaded":
+    elif msg == WAIT_FOR_NEW_PIN_MSG:
         set_mock_value(device.gonio_pin_sensor, PinMounted.PIN_MOUNTED)
 
 
@@ -114,8 +122,6 @@ async def set_with_happy_path(
     """Mocks the logic that the robot would do on a successful load"""
 
     mock_log_info.side_effect = partial(_set_pin_sensor_on_log_messages, device)
-    device.LOAD_TIMEOUT = 1  # type: ignore
-    device.NOT_BUSY_TIMEOUT = 1  # type: ignore
     set_mock_value(device.program_running, False)
     set_mock_value(device.gonio_pin_sensor, PinMounted.PIN_MOUNTED)
     status = device.set(SampleLocation(15, 10))
@@ -138,7 +144,7 @@ async def test_given_program_not_running_and_pin_unmounts_then_mounts_when_load_
 async def test_given_waiting_for_pin_to_mount_when_no_pin_mounted_then_error_raised():
     device = await _get_bart_robot()
     set_mock_value(device.prog_error.code, 25)
-    status = create_task(device.pin_mounted_or_no_pin_found())
+    status = device.pin_mounted_or_no_pin_found()
     with pytest.raises(RobotLoadFailed):
         await status
 
@@ -153,8 +159,7 @@ async def test_given_waiting_for_pin_to_mount_when_pin_mounted_then_no_error_rai
 @patch("dodal.devices.robot.wait_for")
 async def test_set_waits_for_both_timeouts(mock_wait_for: AsyncMock):
     device = await _get_bart_robot()
-    device.LOAD_TIMEOUT = 0.01  # type: ignore
-    device.NOT_BUSY_TIMEOUT = 0.01  # type: ignore
+    _set_fast_robot_timeouts(device)
     device._load_pin_and_puck = MagicMock()  # type: ignore
     await device.set(SampleLocation(1, 2))
     mock_wait_for.assert_awaited_once_with(ANY, timeout=0.02)
@@ -162,8 +167,7 @@ async def test_set_waits_for_both_timeouts(mock_wait_for: AsyncMock):
 
 async def test_moving_the_robot_will_reset_error_if_light_curtain_is_tripped_and_still_throw_if_error_not_cleared():
     device = await _get_bart_robot()
-    device.LOAD_TIMEOUT = 0.01  # type: ignore
-    device.NOT_BUSY_TIMEOUT = 0.01  # type: ignore
+    _set_fast_robot_timeouts(device)
     set_mock_value(device.controller_error.code, BartRobot.LIGHT_CURTAIN_TRIPPED)
 
     with pytest.raises(RobotLoadFailed) as e:
