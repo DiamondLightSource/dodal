@@ -14,13 +14,37 @@ async def i11_robot() -> NX100Robot:
     return i11_robot
 
 
-async def test_robot_moves_to_position(i11_robot: NX100Robot) -> None:
-    set_mock_value(i11_robot.robot_sample_state, 1.0)  # Set to CAROSEL state
-    set_mock_value(i11_robot.job, RobotJobs.GRIPC)  # Set to CAROSEL state
+@pytest.mark.parametrize(
+    "state",
+    [
+        RobotSampleState.CAROSEL,
+        RobotSampleState.ONGRIP,
+        RobotSampleState.DIFF,
+    ],
+)
+async def test_robot_set_when_on_grip_moves_to_position(
+    i11_robot: NX100Robot, state
+) -> None:
+    set_mock_value(i11_robot.robot_sample_state, state)  # Set to state
+    set_mock_value(i11_robot.job, RobotJobs.GRIPC)  # Set to GRIPC state
 
     await i11_robot.set(10)
     location = await i11_robot.locate()
     assert location["readback"] == 10
+
+
+@pytest.mark.parametrize("value_to_set", [-1000, 9999])
+async def test_robot_set_fails_when_value_out_of_range(
+    i11_robot: NX100Robot, value_to_set: float
+) -> None:
+    with pytest.raises(ValueError):
+        await i11_robot.set(value_to_set)  # Should raise ValueError for out of range
+
+
+async def test_robot_set_when_already_at_location(i11_robot: NX100Robot) -> None:
+    set_mock_value(i11_robot.current_sample_position, 10)  # Set pos to 10
+    await i11_robot.set(10)  # shouldn't do anything since already at position
+    assert await i11_robot.current_sample_position.get_value() == 10
 
 
 async def test_robot_recover(i11_robot: NX100Robot) -> None:
@@ -53,13 +77,45 @@ async def test_robot_pause_resume(i11_robot: NX100Robot) -> None:
     assert await i11_robot.hold.get_value() == 0
 
 
-async def test_when_sample_state_clear_sample_tablein(i11_robot: NX100Robot) -> None:
-    set_mock_value(
-        i11_robot.robot_sample_state, RobotSampleState.ONGRIP
-    )  # Set to not ongrip state
+@pytest.mark.parametrize(
+    "state",
+    [
+        RobotSampleState.CAROSEL,
+        RobotSampleState.ONGRIP,
+        RobotSampleState.DIFF,
+    ],
+)
+async def test_when_sample_state_clear_sample_tablein(
+    i11_robot: NX100Robot, state
+) -> None:
+    set_mock_value(i11_robot.robot_sample_state, state)  # Set to not ongrip state
 
     await i11_robot.clear_sample(table_in=True)
     assert await i11_robot.job.get_value() == RobotJobs.TABLEIN
+
+
+async def test_robot_clear_sample_when_sample_on_carousel(
+    i11_robot: NX100Robot,
+) -> None:
+    set_mock_value(
+        i11_robot.robot_sample_state, RobotSampleState.CAROSEL
+    )  # Set to not ongrip state
+
+    await i11_robot.clear_sample(table_in=False)
+    assert await i11_robot.robot_sample_state.get_value() == RobotSampleState.CAROSEL
+
+
+async def test_robot_clear_sample_when_sample_unknown(
+    i11_robot: NX100Robot,
+) -> None:
+    set_mock_value(
+        i11_robot.robot_sample_state, RobotSampleState.UNKNOWN
+    )  # Set to not ongrip state
+
+    await i11_robot.clear_sample(table_in=False)
+    assert (
+        not await i11_robot.robot_sample_state.get_value() == RobotSampleState.CAROSEL
+    )
 
 
 async def test_when_robot_must_stop_and_success_false(
