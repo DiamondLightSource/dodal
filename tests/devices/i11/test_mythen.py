@@ -1,29 +1,50 @@
+from pathlib import Path
+
 import pytest
+from ophyd_async.core import DetectorTrigger, TriggerInfo, init_devices
+from ophyd_async.epics.adcore import ADImageMode
 
 # from ophyd_async.testing import set_mock_value
-from dodal.common.beamlines.beamline_utils import (
-    get_path_provider,
-)
+from dodal.common.beamlines.beamline_utils import get_path_provider, set_path_provider
+from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitPathProvider
 from dodal.devices.i11.mythen import Mythen3
-
-# def test_mythen3_prepare(RE: RunEngine, mythen3: Mythen3):
-#     def _inner_prepare(mythen3: Mythen3):
-#         m = mythen3()
-#         yield from bps.prepare(m)
-
-#     RE(_inner_prepare(mythen3))
 
 
 @pytest.fixture
-async def test_mythen() -> Mythen3:
-    mythen = Mythen3(
-        prefix="BL11I-EA-DET-07:",
-        path_provider=get_path_provider(),
-        drv_suffix="DET",
-        fileio_suffix="HDF:",
+async def i11_mythen() -> Mythen3:
+    set_path_provider(
+        StaticVisitPathProvider(
+            "i11",
+            Path("/dls/i11/data/2025/cm12356-1/"),
+            client=LocalDirectoryServiceClient(),
+        )
     )
-    await mythen.connect(mock=True)
 
-    # set_mock_value(mythen.x_mm.user_readback, x)
+    async with init_devices(mock=True):
+        i11_mythen = Mythen3(
+            prefix="BL11I-EA-DET-07:",
+            path_provider=get_path_provider(),
+            drv_suffix="DET",
+            fileio_suffix="HDF:",
+        )
 
-    return mythen
+    return i11_mythen
+
+
+def test_mythen_deadtime(i11_mythen: Mythen3) -> None:
+    # deadtime is constant for Mythen3, so we can just check it
+    assert i11_mythen.controller.get_deadtime(10.0) == (1 / (40 * 1000))
+
+
+async def test_mythen_prepare_when_image_mode_multiple(i11_mythen: Mythen3) -> None:
+    trigger_info = TriggerInfo(
+        number_of_events=1,
+        trigger=DetectorTrigger.INTERNAL,
+        deadtime=1,
+        livetime=10.0,
+        exposure_timeout=30.0,
+        exposures_per_event=1,
+    )
+
+    await i11_mythen.controller.prepare(trigger_info)
+    assert await i11_mythen.driver.image_mode.get_value() == ADImageMode.MULTIPLE

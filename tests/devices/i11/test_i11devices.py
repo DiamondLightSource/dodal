@@ -130,9 +130,9 @@ async def test_robot_load_sample_when_sample_unknown(i11_robot: NX100Robot) -> N
 async def test_robot_clear_load_when_state_is_invalid(i11_robot: NX100Robot) -> None:
     set_mock_value(i11_robot.robot_sample_state, 99)  # to invalid state
     with pytest.raises(ValueError):
-        await i11_robot.load_sample(10)  # Load sample at position 10
+        await i11_robot.load_sample(10)  # Load sample at position 10 and fail
     with pytest.raises(ValueError):
-        await i11_robot.clear_sample()  # Load sample at position 10
+        await i11_robot.clear_sample()  # clear sample and fail
 
 
 async def test_when_robot_must_stop_and_success_false(

@@ -102,7 +102,7 @@ _BIT_DEPTH = 24
 class Mythen3Controller(ADBaseController):
     """ADBaseController` for a Mythen3"""
 
-    def __init__(self, driver):
+    def __init__(self, driver: Mythen3Driver):
         self.driver = driver
         super().__init__(driver=self.driver)
 
@@ -148,18 +148,18 @@ class Mythen3(AreaDetector[Mythen3Controller]):
         fileio_suffix: str | None = "HDF:",
         name: str = "",
     ):
-        driver = Mythen3Driver(prefix + drv_suffix)
-        controller = Mythen3Controller(driver=driver)
+        self.driver = Mythen3Driver(prefix + drv_suffix)
+        self.controller = Mythen3Controller(driver=self.driver)
 
-        writer = writer_cls.with_io(
+        self.writer = writer_cls.with_io(
             prefix,
             path_provider,
-            dataset_source=driver,
+            dataset_source=self.driver,
             fileio_suffix=fileio_suffix,
         )
 
         super().__init__(
-            controller=controller,
-            writer=writer,
+            controller=self.controller,
+            writer=self.writer,
             name=name,
         )  # plugins=plugins # config_sigs=config_sigs
