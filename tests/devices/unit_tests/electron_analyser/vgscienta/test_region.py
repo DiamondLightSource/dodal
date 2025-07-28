@@ -4,7 +4,6 @@ import pytest
 
 from dodal.common.data_util import load_json_file_to_class
 from dodal.devices.electron_analyser import EnergyMode
-from dodal.devices.electron_analyser.abstract import TAbstractBaseRegion
 from dodal.devices.electron_analyser.vgscienta import VGScientaRegion, VGScientaSequence
 from dodal.devices.electron_analyser.vgscienta.region import (
     AcquisitionMode,
@@ -15,17 +14,15 @@ from dodal.devices.electron_analyser.vgscienta.region import (
 )
 from dodal.devices.i09 import LensMode, PassEnergy, PsuMode
 from tests.devices.unit_tests.electron_analyser.util import (
-    TEST_VGSCIENTA_SEQUENCE,
     assert_region_has_expected_values,
-    assert_region_kinetic_and_binding_energy,
+    get_test_sequence,
 )
 
 
 @pytest.fixture
 def sequence() -> VGScientaSequence[LensMode, PsuMode, PassEnergy]:
-    return load_json_file_to_class(
-        VGScientaSequence[LensMode, PsuMode, PassEnergy], TEST_VGSCIENTA_SEQUENCE
-    )
+    seq = VGScientaSequence[LensMode, PsuMode, PassEnergy]
+    return load_json_file_to_class(seq, get_test_sequence(seq))
 
 
 @pytest.fixture
@@ -89,41 +86,13 @@ def expected_region_values() -> list[dict[str, Any]]:
     ]
 
 
-def test_sequence_get_expected_region_from_name(
-    sequence: VGScientaSequence[LensMode, PsuMode, PassEnergy],
-    expected_region_names: list[str],
-) -> None:
-    for name in expected_region_names:
-        assert sequence.get_region_by_name(name) is not None
-    assert sequence.get_region_by_name("region name should not be in sequence") is None
-
-
-def test_sequence_get_expected_region_type(
-    sequence: VGScientaSequence[LensMode, PsuMode, PassEnergy],
-    expected_region_class: type[TAbstractBaseRegion],
-) -> None:
-    regions = sequence.regions
-    enabled_regions = sequence.get_enabled_regions()
-    assert isinstance(regions, list) and all(
-        isinstance(r, expected_region_class) for r in regions
-    )
-    assert isinstance(enabled_regions, list) and all(
-        isinstance(r, expected_region_class) for r in enabled_regions
-    )
-
-
-def test_sequence_get_expected_region_names(
-    sequence: VGScientaSequence[LensMode, PsuMode, PassEnergy],
-    expected_region_names: list[str],
-) -> None:
-    assert sequence.get_region_names() == expected_region_names
-
-
 def test_sequence_get_expected_enabled_region_names(
     sequence: VGScientaSequence[LensMode, PsuMode, PassEnergy],
     expected_enabled_region_names: list[str],
 ) -> None:
     assert sequence.get_enabled_region_names() == expected_enabled_region_names
+    for i, region in enumerate(sequence.get_enabled_regions()):
+        assert region.name == expected_enabled_region_names[i]
 
 
 def test_sequence_get_expected_excitation_energy_source(
@@ -145,13 +114,6 @@ def test_sequence_get_expected_excitation_energy_source(
                 pass_energy=PassEnergy.E5,
             )
         )
-
-
-def test_region_kinetic_and_binding_energy(
-    sequence: VGScientaSequence[LensMode, PsuMode, PassEnergy],
-) -> None:
-    for r in sequence.regions:
-        assert_region_kinetic_and_binding_energy(r)
 
 
 def test_file_loads_into_class_with_expected_values(
