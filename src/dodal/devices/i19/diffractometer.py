@@ -2,12 +2,8 @@ from ophyd_async.epics.motor import Motor
 
 from dodal.devices.motors import Stage, XYZStage
 
-# prefix: BL19I-MO-CIRC-02:SAM: for phi, kappa, omega, 2theta and det_z
-# prefix: BL19I-MO-SAMP-02:SAM: for x,y,z
-# beacause of course... facepalm
-
-CIRC = "-MO-CIRC-02:SAM:"
-SAMP = "-MO-SAMP-02:SAM:"
+CIRC = "-MO-CIRC-02:SAM:"  # for phi, kappa, omega, 2theta and det_z
+SAMP = "-MO-SAMP-02:SAM:"  # for x,y,z
 
 
 class DetectorMotion(Stage):
