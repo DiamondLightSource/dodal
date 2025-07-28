@@ -93,10 +93,10 @@ class SpecsAnalyserDriverIO(
             self.psu_mode.set(region.psu_mode),
         )
         if region.acquisition_mode == AcquisitionMode.FIXED_TRANSMISSION:
-            await self.centre_energy.set(centre_energy)
+            await self.energy_step.set(region.energy_step)
 
         if region.acquisition_mode == AcquisitionMode.FIXED_ENERGY:
-            await self.energy_step.set(region.energy_step)
+            await self.centre_energy.set(centre_energy)
 
     def _create_angle_axis_signal(self, prefix: str) -> SignalR[Array1D[np.float64]]:
         angle_axis = derived_signal_r(
