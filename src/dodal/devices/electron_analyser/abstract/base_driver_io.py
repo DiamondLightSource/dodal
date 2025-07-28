@@ -1,4 +1,3 @@
-import asyncio
 from abc import ABC, abstractmethod
 from collections.abc import Mapping
 from typing import Generic, TypeVar
@@ -27,7 +26,7 @@ from dodal.devices.electron_analyser.abstract.types import (
     TPsuMode,
 )
 from dodal.devices.electron_analyser.enums import EnergyMode
-from dodal.devices.electron_analyser.util import to_binding_energy, to_kinetic_energy
+from dodal.devices.electron_analyser.util import to_binding_energy
 
 
 class AbstractAnalyserDriverIO(
@@ -38,8 +37,9 @@ class AbstractAnalyserDriverIO(
     Generic[TAbstractBaseRegion, TAcquisitionMode, TLensMode, TPsuMode, TPassEnergy],
 ):
     """
-    Generic device to configure electron analyser with new region settings.
-    Electron analysers should inherit from this class for further specialisation.
+    Driver device that defines signals and readables that should be common to all
+    electron analysers. Implementations of electron analyser devices should inherit
+    from this class and define additional specialised signals and methods.
     """
 
     def __init__(
@@ -128,38 +128,16 @@ class AbstractAnalyserDriverIO(
 
         super().__init__(prefix=prefix, name=name)
 
+    @abstractmethod
     @AsyncStatus.wrap
     async def set(self, region: TAbstractBaseRegion):
         """
-        This should encompass all core region logic which is common to every electron
-        analyser for setting up the driver.
+        Move a group of signals defined in a region. Each implementation of this class
+        is responsible for implementing this method correctly.
 
         Args:
             region: Contains the parameters to setup the driver for a scan.
         """
-
-        source = self._get_energy_source(region.excitation_energy_source)
-        excitation_energy = await source.get_value()  # eV
-
-        low_energy = to_kinetic_energy(
-            region.low_energy, region.energy_mode, excitation_energy
-        )
-        high_energy = to_kinetic_energy(
-            region.high_energy, region.energy_mode, excitation_energy
-        )
-        await asyncio.gather(
-            self.region_name.set(region.name),
-            self.energy_mode.set(region.energy_mode),
-            self.low_energy.set(low_energy),
-            self.high_energy.set(high_energy),
-            self.slices.set(region.slices),
-            self.lens_mode.set(region.lens_mode),
-            self.pass_energy.set(region.pass_energy),
-            self.iterations.set(region.iterations),
-            self.acquisition_mode.set(region.acquisition_mode),
-            self.excitation_energy.set(excitation_energy),
-            self.excitation_energy_source.set(source.name),
-        )
 
     def _get_energy_source(self, alias_name: str) -> SignalR[float]:
         energy_source = self.energy_sources.get(alias_name)
