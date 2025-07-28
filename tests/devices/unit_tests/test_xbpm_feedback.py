@@ -13,8 +13,8 @@ from dodal.devices.xbpm_feedback import XBPMFeedback
 @pytest.fixture
 async def fake_xbpm_feedback() -> XBPMFeedback:
     async with init_devices(mock=True):
-        xbpm = XBPMFeedback("", stage_prefix="")
-    return xbpm
+        xbpm_feedback = XBPMFeedback("", stage_prefix="")
+    return xbpm_feedback
 
 
 def test_given_pos_stable_when_xbpm_feedback_kickoff_then_return_immediately(
