@@ -24,7 +24,7 @@ class PressureJumpCellDetector(AreaDetector[PressureJumpCellController]):
         drv_suffix="cam1:",
         adc_trig_suffix="TRIG:",
         writer_cls: type[ADWriter] = ADHDFWriter,
-        fileio_suffix: str | None = None,
+        fileio_suffix = "FILE:",
         name: str = "",
         plugins: dict[str, NDPluginBaseIO] | None = None,
         config_sigs: Sequence[SignalR] = (),
