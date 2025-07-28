@@ -66,6 +66,8 @@ async def test_given_program_not_running_but_pin_not_unmounting_when_load_pin_th
     patch_logger: MagicMock,
 ):
     device = await _get_bart_robot()
+    device.LOAD_TIMEOUT = 0.01  # type: ignore
+    device.NOT_BUSY_TIMEOUT = 0.01  # type: ignore
     set_mock_value(device.program_running, False)
     set_mock_value(device.gonio_pin_sensor, PinMounted.PIN_MOUNTED)
     device.load = AsyncMock(side_effect=device.load)
@@ -81,6 +83,8 @@ async def test_given_program_not_running_and_pin_unmounting_but_new_pin_not_moun
     patch_logger: MagicMock,
 ):
     device = await _get_bart_robot()
+    device.LOAD_TIMEOUT = 0.01  # type: ignore
+    device.NOT_BUSY_TIMEOUT = 0.01  # type: ignore
     set_mock_value(device.program_running, False)
     set_mock_value(device.gonio_pin_sensor, PinMounted.NO_PIN_MOUNTED)
     device.load = AsyncMock(side_effect=device.load)
@@ -158,6 +162,8 @@ async def test_set_waits_for_both_timeouts(mock_wait_for: AsyncMock):
 
 async def test_moving_the_robot_will_reset_error_if_light_curtain_is_tripped_and_still_throw_if_error_not_cleared():
     device = await _get_bart_robot()
+    device.LOAD_TIMEOUT = 0.01  # type: ignore
+    device.NOT_BUSY_TIMEOUT = 0.01  # type: ignore
     set_mock_value(device.controller_error.code, BartRobot.LIGHT_CURTAIN_TRIPPED)
 
     with pytest.raises(RobotLoadFailed) as e:
