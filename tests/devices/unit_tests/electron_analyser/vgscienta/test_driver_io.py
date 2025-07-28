@@ -165,7 +165,7 @@ async def test_analyser_sets_region_and_read_configuration_is_correct(
             f"{prefix}slices": {"value": region.slices},
             f"{prefix}iterations": {"value": region.iterations},
             f"{prefix}total_steps": {"value": ANY},
-            f"{prefix}acquire_time": {"value": ANY},
+            f"{prefix}acquire_time": {"value": region.acquire_time},
             f"{prefix}total_time": {"value": ANY},
             f"{prefix}energy_axis": {"value": ANY},
             f"{prefix}binding_energy_axis": {"value": ANY},
