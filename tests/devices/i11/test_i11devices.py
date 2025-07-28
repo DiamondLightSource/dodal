@@ -118,6 +118,23 @@ async def test_robot_clear_sample_when_sample_unknown(
     )
 
 
+async def test_robot_load_sample_when_sample_unknown(i11_robot: NX100Robot) -> None:
+    set_mock_value(
+        i11_robot.robot_sample_state, RobotSampleState.UNKNOWN
+    )  # Set to not ongrip state
+
+    await i11_robot.load_sample(10)  # Load sample at position 10
+    assert not await i11_robot.job.get_value() == RobotJobs.PLACED
+
+
+async def test_robot_clear_load_when_state_is_invalid(i11_robot: NX100Robot) -> None:
+    set_mock_value(i11_robot.robot_sample_state, 99)  # to invalid state
+    with pytest.raises(ValueError):
+        await i11_robot.load_sample(10)  # Load sample at position 10
+    with pytest.raises(ValueError):
+        await i11_robot.clear_sample(10)  # Load sample at position 10
+
+
 async def test_when_robot_must_stop_and_success_false(
     i11_robot: NX100Robot,
 ) -> None:
