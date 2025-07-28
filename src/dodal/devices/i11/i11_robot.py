@@ -1,4 +1,5 @@
 import asyncio
+from enum import Enum
 
 from bluesky.protocols import Locatable, Location, Pausable, Stoppable
 from ophyd_async.core import (
@@ -25,14 +26,14 @@ class RobotJobs(StrictEnum):
     UNLOAD = "UNLOAD"
 
 
-class RobotSampleState:
+class RobotSampleState(Enum):
     CAROSEL = 0.0  # Sample is on carousel
     ONGRIP = 1.0  # Sample is on the gripper
     DIFF = 2.0  # Sample is on the diffractometer
     UNKNOWN = 3.0
 
 
-class NX100Robot(StandardReadable, Locatable, Stoppable, Pausable):
+class NX100Robot(StandardReadable, Locatable[int], Stoppable, Pausable):
     # TODO: Test this
 
     """
@@ -117,8 +118,9 @@ class NX100Robot(StandardReadable, Locatable, Stoppable, Pausable):
 
     @AsyncStatus.wrap
     async def set(self, sample_location: int) -> None:
-        if not (
-            self.MIN_NUMBER_OF_SAMPLES <= sample_location <= self.MAX_NUMBER_OF_SAMPLES
+        if (
+            sample_location < self.MIN_NUMBER_OF_SAMPLES
+            or sample_location > self.MAX_NUMBER_OF_SAMPLES
         ):
             raise ValueError(
                 f"Sample location must be between {self.MIN_NUMBER_OF_SAMPLES} and {self.MAX_NUMBER_OF_SAMPLES}, got {sample_location}"
