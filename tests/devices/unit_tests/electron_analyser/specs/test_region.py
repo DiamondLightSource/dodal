@@ -3,29 +3,22 @@ from typing import Any
 import pytest
 
 from dodal.common.data_util import load_json_file_to_class
-from dodal.devices.b07 import LensMode
+from dodal.devices.b07 import LensMode, PsuMode
 from dodal.devices.electron_analyser import EnergyMode
-from dodal.devices.electron_analyser.abstract.base_region import TAbstractBaseRegion
 from dodal.devices.electron_analyser.specs import (
     AcquisitionMode,
-    SpecsRegion,
     SpecsSequence,
 )
 from tests.devices.unit_tests.electron_analyser.util import (
-    TEST_SPECS_SEQUENCE,
     assert_region_has_expected_values,
-    assert_region_kinetic_and_binding_energy,
+    get_test_sequence,
 )
 
 
 @pytest.fixture
-def sequence() -> SpecsSequence[LensMode]:
-    return load_json_file_to_class(SpecsSequence[LensMode], TEST_SPECS_SEQUENCE)
-
-
-@pytest.fixture
-def expected_region_class() -> type[SpecsRegion[LensMode]]:
-    return SpecsRegion[LensMode]
+def sequence() -> SpecsSequence[LensMode, PsuMode]:
+    seq = SpecsSequence[LensMode, PsuMode]
+    return load_json_file_to_class(seq, get_test_sequence(seq))
 
 
 @pytest.fixture
@@ -34,7 +27,7 @@ def expected_region_values() -> list[dict[str, Any]]:
         {
             "name": "New_Region",
             "acquisition_mode": AcquisitionMode.FIXED_TRANSMISSION,
-            "psu_mode": "3.5kV",
+            "psu_mode": PsuMode.V3500,
             "lens_mode": LensMode.SMALL_AREA,
             "low_energy": 800.0,
             "high_energy": 850.0,
@@ -53,7 +46,7 @@ def expected_region_values() -> list[dict[str, Any]]:
         {
             "name": "New_Region1",
             "acquisition_mode": AcquisitionMode.SNAPSHOT,
-            "psu_mode": "1.5kV",
+            "psu_mode": PsuMode.V1500,
             "lens_mode": LensMode.LARGE_AREA,
             "low_energy": 599.866,
             "high_energy": 600.134,
@@ -72,47 +65,17 @@ def expected_region_values() -> list[dict[str, Any]]:
     ]
 
 
-def test_sequence_get_expected_region_from_name(
-    sequence: SpecsSequence[LensMode], expected_region_names: list[str]
-) -> None:
-    for name in expected_region_names:
-        assert sequence.get_region_by_name(name) is not None
-    assert sequence.get_region_by_name("region name should not be in sequence") is None
-
-
-def test_sequence_get_expected_region_type(
-    sequence: SpecsSequence[LensMode],
-    expected_region_class: type[TAbstractBaseRegion],
-) -> None:
-    regions = sequence.regions
-    enabled_regions = sequence.get_enabled_regions()
-    assert isinstance(regions, list) and all(
-        isinstance(r, expected_region_class) for r in regions
-    )
-    assert isinstance(enabled_regions, list) and all(
-        isinstance(r, expected_region_class) for r in enabled_regions
-    )
-
-
-def test_sequence_get_expected_region_names(
-    sequence: SpecsSequence[LensMode], expected_region_names: list[str]
-) -> None:
-    assert sequence.get_region_names() == expected_region_names
-
-
 def test_sequence_get_expected_enabled_region_names(
-    sequence: SpecsSequence[LensMode], expected_enabled_region_names: list[str]
+    sequence: SpecsSequence[LensMode, PsuMode],
+    expected_enabled_region_names: list[str],
 ) -> None:
     assert sequence.get_enabled_region_names() == expected_enabled_region_names
-
-
-def test_region_kinetic_and_binding_energy(sequence: SpecsSequence[LensMode]) -> None:
-    for r in sequence.regions:
-        assert_region_kinetic_and_binding_energy(r)
+    for i, region in enumerate(sequence.get_enabled_regions()):
+        assert region.name == expected_enabled_region_names[i]
 
 
 def test_file_loads_into_class_with_expected_values(
-    sequence: SpecsSequence[LensMode],
+    sequence: SpecsSequence[LensMode, PsuMode],
     expected_region_values: list[dict[str, Any]],
 ) -> None:
     assert len(sequence.regions) == len(expected_region_values)

@@ -1,17 +1,24 @@
 import numpy as np
 import pytest
 from bluesky import RunEngine
+from ophyd_async.core import SignalR
 from ophyd_async.testing import set_mock_value
 
 from dodal.devices.electron_analyser.vgscienta import (
     VGScientaDetector,
 )
-from dodal.devices.i09 import LensMode
+from dodal.devices.i09 import LensMode, PassEnergy, PsuMode
+from tests.devices.unit_tests.electron_analyser.util import create_analyser_device
 
 
 @pytest.fixture
-def detector_class() -> type[VGScientaDetector[LensMode]]:
-    return VGScientaDetector[LensMode]
+async def sim_detector(
+    energy_sources: dict[str, SignalR[float]],
+) -> VGScientaDetector[LensMode, PsuMode, PassEnergy]:
+    return await create_analyser_device(
+        VGScientaDetector[LensMode, PsuMode, PassEnergy],
+        energy_sources,
+    )
 
 
 async def test_analyser_vgscienta_detector_image_shape(
@@ -19,6 +26,7 @@ async def test_analyser_vgscienta_detector_image_shape(
     RE: RunEngine,
 ) -> None:
     driver = sim_detector.driver
+    prefix = driver.name + "-"
 
     energy_axis = np.array([1, 2, 3, 4, 5])
     angle_axis = np.array([1, 2])
@@ -26,7 +34,7 @@ async def test_analyser_vgscienta_detector_image_shape(
     set_mock_value(driver.angle_axis, angle_axis)
 
     describe = await sim_detector.describe()
-    assert describe[driver.name + "-image"]["shape"] == [
+    assert describe[f"{prefix}image"]["shape"] == [
         len(angle_axis),
         len(energy_axis),
     ]

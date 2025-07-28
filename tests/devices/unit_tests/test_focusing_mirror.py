@@ -1,9 +1,4 @@
 import asyncio
-
-# prevent python 3.10 exception doppelganger stupidity
-# see https://docs.python.org/3.10/library/asyncio-exceptions.html
-# https://github.com/python/cpython/issues?q=is%3Aissue+timeouterror++alias+
-from asyncio import TimeoutError
 from unittest.mock import ANY, DEFAULT, patch
 
 import pytest

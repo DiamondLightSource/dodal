@@ -1,14 +1,12 @@
-from typing import Any, get_args
+from typing import Any
 
 import pytest
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import SignalR, init_devices
+from ophyd_async.core import SignalR
 from ophyd_async.sim import SimMotor
 
 from dodal.devices.electron_analyser import (
     ElectronAnalyserDetector,
-    ElectronAnalyserDetectorImpl,
-    ElectronAnalyserDriverImpl,
 )
 from dodal.devices.electron_analyser.abstract import (
     AbstractAnalyserDriverIO,
@@ -47,43 +45,19 @@ async def energy_sources(
 
 
 @pytest.fixture
-async def sim_detector(
-    detector_class: type[ElectronAnalyserDetectorImpl],
-    energy_sources: dict[str, SignalR[float]],
-    RE: RunEngine,
-) -> ElectronAnalyserDetectorImpl:
-    lens_mode_class = get_args(detector_class)[0]
-    async with init_devices(mock=True, connect=True):
-        sim_detector = detector_class("TEST:", lens_mode_class, energy_sources)
-    return sim_detector
-
-
-@pytest.fixture
-async def sim_driver(
-    driver_class: type[ElectronAnalyserDriverImpl],
-    energy_sources: dict[str, SignalR[float]],
-    RE: RunEngine,
-) -> ElectronAnalyserDriverImpl:
-    lens_mode_class = get_args(driver_class)[0]
-    async with init_devices(mock=True, connect=True):
-        sim_driver = driver_class(
-            "TEST:",
-            lens_mode_class,
-            energy_sources,
-        )
-    return sim_driver
-
-
-@pytest.fixture
 def sequence_class(
     sim_driver: AbstractAnalyserDriverIO,
 ) -> type[AbstractBaseSequence]:
-    # We must include the lens mode type here, otherwise the sequence file can't be
-    # loaded as pydantic won't be able to resolve the lens mode enum.
+    # We must include the pass energy, lens and psu mode types here, otherwise the
+    # sequence file can't be loaded as pydantic won't be able to resolve the enums.
     if isinstance(sim_driver, VGScientaAnalyserDriverIO):
-        return VGScientaSequence[sim_driver.lens_mode_type]
+        return VGScientaSequence[
+            sim_driver.lens_mode_type,
+            sim_driver.psu_mode_type,
+            sim_driver.pass_energy_type,
+        ]
     elif isinstance(sim_driver, SpecsAnalyserDriverIO):
-        return SpecsSequence[sim_driver.lens_mode_type]
+        return SpecsSequence[sim_driver.lens_mode_type, sim_driver.psu_mode_type]
     raise ValueError("class " + str(sim_driver) + " not recognised")
 
 
