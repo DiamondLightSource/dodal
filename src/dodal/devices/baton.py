@@ -1,6 +1,7 @@
 from typing import Annotated as A
 
 from ophyd_async.core import (
+    SignalR,
     SignalRW,
     StandardReadable,
 )
@@ -15,3 +16,7 @@ class Baton(StandardReadable, EpicsDevice):
     current_user: A[
         SignalRW[str], PvSuffix("CURRENT_USER"), Format.HINTED_UNCACHED_SIGNAL
     ]
+    commissioning: A[
+        SignalR[bool], PvSuffix("COMMISSIONING"), Format.HINTED_UNCACHED_SIGNAL
+    ]
+
