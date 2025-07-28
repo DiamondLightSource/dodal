@@ -20,6 +20,12 @@ class AdcTriggerCondition(StrictEnum):
 
 
 class AdcTriggerMode(StrictEnum):
+    SINGLE = "Single"
+    MULTIPLE = "Multiple"
+    CONTINUOUS = "Continuous"
+
+
+class AdcTriggerState(StrictEnum):
     IDLE = "Idle"
     ARMED = "Armed"
     GATING = "Gating"
@@ -47,7 +53,7 @@ class PressureJumpCellAdcTriggerIO(adcore.NDPluginBaseIO):
 
     # Trigger Control
     capture: A[SignalRW[bool], PvSuffix("Capture")]
-    mode: A[SignalRW[AdcTriggerMode], PvSuffix.rbv("Mode")]
+    state: A[SignalRW[AdcTriggerState], PvSuffix.rbv("Mode")]
     soft_trigger: A[SignalRW[bool], PvSuffix("Soft_Trigger")]
 
     buffered_frames: A[SignalRW[int], PvSuffix("BufferFrames")]
