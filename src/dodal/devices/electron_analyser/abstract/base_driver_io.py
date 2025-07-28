@@ -3,9 +3,10 @@ from collections.abc import Mapping
 from typing import Generic, TypeVar
 
 import numpy as np
-from bluesky.protocols import Movable, Status
+from bluesky.protocols import Movable
 from ophyd_async.core import (
     Array1D,
+    AsyncStatus,
     SignalR,
     StandardReadable,
     StandardReadableFormat,
@@ -127,7 +128,8 @@ class AbstractAnalyserDriverIO(
         super().__init__(prefix=prefix, name=name)
 
     @abstractmethod
-    def set(self, region: TAbstractBaseRegion) -> Status:
+    @AsyncStatus.wrap
+    async def set(self, region: TAbstractBaseRegion):
         """
         Move a group of signals defined in a region. Each implementation of this class
         is responsible for implementing this method correctly.
