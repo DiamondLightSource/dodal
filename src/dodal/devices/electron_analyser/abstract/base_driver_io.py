@@ -108,6 +108,7 @@ class AbstractAnalyserDriverIO(
             # analyser type to know if is moved with region settings.
             self.psu_mode = epics_signal_rw(psu_mode_type, prefix + "PSU_MODE")
 
+        # This is defined in the parent class, add it as readable configuration.
         self.add_readables([self.acquire_time], StandardReadableFormat.CONFIG_SIGNAL)
 
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
