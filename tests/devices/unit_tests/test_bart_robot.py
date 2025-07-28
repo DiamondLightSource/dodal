@@ -100,7 +100,7 @@ async def test_given_program_not_running_and_pin_unmounting_but_new_pin_not_moun
         raise
 
 
-def _set_pin_sensor_on_log_messages(device: BartRobot, msg):
+def _set_pin_sensor_on_log_messages(device: BartRobot, msg: str):
     if msg == "Waiting on old pin unloaded":
         set_mock_value(device.gonio_pin_sensor, PinMounted.NO_PIN_MOUNTED)
     elif msg == "Waiting on new pin loaded":
