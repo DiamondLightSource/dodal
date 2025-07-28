@@ -50,7 +50,7 @@ class PressureJumpCellDetector(AreaDetector[PressureJumpCellController]):
         super().__init__(
             controller=controller,
             writer=writer,
-            plugins=plugins,
+            plugins=pressure_cell_plugins,
             name=name,
             config_sigs=config_sigs,
         )
