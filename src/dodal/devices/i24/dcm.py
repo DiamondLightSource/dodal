@@ -16,13 +16,9 @@ class DCM(BaseDCM[RollCrystal, PitchAndRollCrystal]):
         with self.add_children_as_readables():
             # Temperatures
             self.xtal1_temp = epics_signal_r(float, prefix + "PT100-1")
-            self.xtal1_heater_temp = epics_signal_r(
-                float, prefix + "-DI-DCM-01:PT100-2"
-            )
+            self.xtal1_heater_temp = epics_signal_r(float, prefix + "PT100-2")
             self.xtal2_temp = epics_signal_r(float, prefix + "PT100-4")
-            self.xtal2_heater_temp = epics_signal_r(
-                float, prefix + "-DI-DCM-01:PT100-5"
-            )
+            self.xtal2_heater_temp = epics_signal_r(float, prefix + "PT100-5")
 
             self.roll_plate_temp = epics_signal_r(float, prefix + "PT100-3")
             self.pitch_plate_temp = epics_signal_r(float, prefix + "PT100-6")
