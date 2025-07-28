@@ -211,17 +211,12 @@ def high_pressure_xray_cell() -> PressureJumpCell:
         adc_prefix="-ADC",
     )
 
-def high_pressure_xray_cell_adc(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> PressureJumpCellDetector:
-    return device_instantiation(
-        PressureJumpCellDetector,
-        "high_pressure_xray_cell_adc",
-        "-EA-HPXC-01:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
-        adc_suffix="TRIG:",
-        drv_suffix="DET:",
-        hdf_suffix="FILE:",
+
+def high_pressure_xray_cell_adc() -> PressureJumpCellDetector:
+    """high_pressure_xray_cell_adc"""
+    return PressureJumpCellDetector(
+        f"{PREFIX.beamline_prefix}-EA-HPXC-01:",
         path_provider=get_path_provider(),
+        adc_trig_suffix="TRIG:",
+        drv_suffix="CAM:",
     )
