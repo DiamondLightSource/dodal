@@ -5,7 +5,7 @@ from ophyd_async.testing import set_mock_value
 
 from dodal.devices.b07 import LensMode, PsuMode
 from dodal.devices.electron_analyser.specs import SpecsDetector
-from tests.devices.unit_tests.electron_analyser.util import create_analyser_device
+from dodal.testing.electron_analyser import create_analyser_device
 
 
 @pytest.fixture

@@ -13,7 +13,7 @@ from dodal.devices.electron_analyser.specs import (
     SpecsSequence,
 )
 from dodal.devices.electron_analyser.vgscienta import VGScientaRegion, VGScientaSequence
-from tests.devices.unit_tests.electron_analyser.util import (
+from tests.devices.unit_tests.electron_analyser.helper_util import (
     TEST_SEQUENCE_REGION_NAMES,
     get_test_sequence,
 )

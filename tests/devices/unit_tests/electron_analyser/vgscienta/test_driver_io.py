@@ -24,9 +24,9 @@ from dodal.devices.electron_analyser.vgscienta import (
     VGScientaRegion,
 )
 from dodal.devices.i09 import LensMode, PassEnergy, PsuMode
-from tests.devices.unit_tests.electron_analyser.util import (
+from dodal.testing.electron_analyser import create_analyser_device
+from tests.devices.unit_tests.electron_analyser.helper_util import (
     TEST_SEQUENCE_REGION_NAMES,
-    create_analyser_device,
 )
 
 
