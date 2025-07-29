@@ -97,7 +97,7 @@ def expected_region_values() -> list[dict[str, Any]]:
             "low_energy": 149.1905,
             "high_energy": 150.8095,
             "fix_energy": 150.0,
-            "step_time": 0.0625,
+            "acquire_time": 0.0625,
             "total_steps": 1.0,
             "total_time": 0.126,
             "energy_step": 0.001619,

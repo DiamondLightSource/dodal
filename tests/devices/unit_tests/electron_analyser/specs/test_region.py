@@ -72,7 +72,7 @@ def expected_region_values() -> list[dict[str, Any]]:
             "energy_step": 0.4,
             "pass_energy": 5.0,
             "iterations": 1,
-            "step_time": 1.0,
+            "acquire_time": 1.0,
             "enabled": True,
             "energy_mode": EnergyMode.KINETIC,
             "values": 2,
