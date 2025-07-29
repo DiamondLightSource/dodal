@@ -1,0 +1,23 @@
+{
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true,
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+        "source.organizeImports": "explicit"
+    },
+    "files.insertFinalNewline": true,
+    "[python]": {
+        "editor.defaultFormatter": "charliermarsh.ruff",
+        "editor.rulers": [
+            88
+        ],
+        "editor.codeActionsOnSave": {
+            "source.fixAll.ruff": "never",
+            "source.organizeImports.ruff": "explicit"
+        }
+    },
+    "python.analysis.extraPaths": [
+        "./src"
+    ],
+    "python.analysis.typeCheckingMode": "basic"
+}
