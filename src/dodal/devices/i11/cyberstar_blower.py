@@ -18,8 +18,8 @@ class CyberstarBlower(EurothermGeneral):
         name="",
         enable_suffix: str = "DISABLE",
         infix: str = "",
-        update=False,
-        autotune=False,
+        update: bool = False,
+        autotune: bool = False,
     ):
         with self.add_children_as_readables():
             self.enable = epics_signal_rw(

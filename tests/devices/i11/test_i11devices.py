@@ -22,11 +22,10 @@ async def i11_robot() -> NX100Robot:
         RobotSampleState.DIFF,
     ],
 )
-async def test_robot_set_when_on_grip_moves_to_position(
-    i11_robot: NX100Robot, state
+async def test_robot_set_moves_to_position(
+    i11_robot: NX100Robot, state: RobotSampleState
 ) -> None:
     set_mock_value(i11_robot.robot_sample_state, state)  # Set to state
-    set_mock_value(i11_robot.job, RobotJobs.GRIPC)  # Set to GRIPC state
 
     await i11_robot.set(10)
     location = await i11_robot.locate()
@@ -37,7 +36,10 @@ async def test_robot_set_when_on_grip_moves_to_position(
 async def test_robot_set_fails_when_value_out_of_range(
     i11_robot: NX100Robot, value_to_set: int
 ) -> None:
-    with pytest.raises(ValueError):
+    with pytest.raises(
+        ValueError,
+        match=f"Sample location must be between {i11_robot.MIN_NUMBER_OF_SAMPLES} and {i11_robot.MAX_NUMBER_OF_SAMPLES}, got {value_to_set}",
+    ):
         await i11_robot.set(value_to_set)  # Should raise ValueError for out of range
 
 
@@ -161,11 +163,6 @@ async def test_spinner_pause_resume(i11_spinner: Spinner) -> None:
 
     await i11_spinner.resume()
     assert await i11_spinner.enable.get_value() == "Enabled"
-
-
-async def test_spinner_speed(i11_spinner: Spinner) -> None:
-    await i11_spinner.set(50.0)
-    assert await i11_spinner.speed.get_value() == 50.0
 
 
 @pytest.fixture

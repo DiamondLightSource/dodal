@@ -34,8 +34,6 @@ class RobotSampleState(float, Enum):
 
 
 class NX100Robot(StandardReadable, Locatable[int], Stoppable, Pausable):
-    # TODO: Test this
-
     """
     This is a Yaskawa Motoman that uses an NX100 controller
 
@@ -48,7 +46,7 @@ class NX100Robot(StandardReadable, Locatable[int], Stoppable, Pausable):
     MAX_NUMBER_OF_SAMPLES = 200
     MIN_NUMBER_OF_SAMPLES = 1
 
-    def __init__(self, prefix: str, name=""):
+    def __init__(self, prefix: str, name: str = ""):
         self.start = epics_signal_x(prefix + "START")
         self.hold = epics_signal_rw(bool, prefix + "HOLD")
         self.job = epics_signal_rw(RobotJobs, prefix + "JOB")
@@ -73,7 +71,7 @@ class NX100Robot(StandardReadable, Locatable[int], Stoppable, Pausable):
             set_and_wait_for_value(self.err, False),
         )
 
-    async def clear_sample(self, table_in=True):
+    async def clear_sample(self, table_in: bool = True):
         sample_state = await self.robot_sample_state.get_value()
         if sample_state == RobotSampleState.DIFF:
             await asyncio.gather(
@@ -93,13 +91,6 @@ class NX100Robot(StandardReadable, Locatable[int], Stoppable, Pausable):
             await set_and_wait_for_value(self.job, RobotJobs.TABLEIN)
 
         LOGGER.info("Sample cleared from diffractometer")
-
-    async def start_robot(self):
-        await asyncio.gather(
-            set_and_wait_for_value(self.servo_on, True),
-            set_and_wait_for_value(self.hold, False),
-            self.start.trigger(),
-        )
 
     async def load_sample(self, sample_location: int):
         sample_state = await self.robot_sample_state.get_value()
@@ -139,7 +130,7 @@ class NX100Robot(StandardReadable, Locatable[int], Stoppable, Pausable):
     async def resume(self):
         await set_and_wait_for_value(self.hold, False)
 
-    async def stop(self, success=True):
+    async def stop(self, success: bool = True):
         await set_and_wait_for_value(self.hold, True)
         if not success:
             await set_and_wait_for_value(self.hold, False)
@@ -148,7 +139,11 @@ class NX100Robot(StandardReadable, Locatable[int], Stoppable, Pausable):
     @AsyncStatus.wrap
     async def stage(self) -> None:
         """Set up the device for acquisition."""
-        await self.start_robot()
+        await asyncio.gather(
+            set_and_wait_for_value(self.servo_on, True),
+            set_and_wait_for_value(self.hold, False),
+            self.start.trigger(),
+        )
 
     async def locate(self) -> Location[int]:
         location = await self.current_sample_position.locate()

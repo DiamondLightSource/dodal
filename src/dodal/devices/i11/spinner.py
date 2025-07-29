@@ -1,6 +1,5 @@
-from bluesky.protocols import Movable, Pausable
+from bluesky.protocols import Pausable
 from ophyd_async.core import (
-    AsyncStatus,
     StandardReadable,
     StrictEnum,
     set_and_wait_for_value,
@@ -13,7 +12,7 @@ class SpinEnable(StrictEnum):
     ENABLE = "Enabled"
 
 
-class Spinner(StandardReadable, Pausable, Movable):
+class Spinner(StandardReadable, Pausable):
     """This is a simple sample spinner, that has enable and speed (%)"""
 
     def __init__(
@@ -34,8 +33,3 @@ class Spinner(StandardReadable, Pausable, Movable):
 
     async def resume(self):
         await set_and_wait_for_value(self.enable, SpinEnable.ENABLE)
-
-    @AsyncStatus.wrap
-    async def set(self, value: float):
-        """Set the spinner speed"""
-        await self.speed.set(value)

@@ -4,7 +4,6 @@ from typing import Annotated as A
 from ophyd_async.core import (
     DetectorTrigger,
     PathProvider,
-    SignalR,
     SignalRW,
     StrictEnum,
     TriggerInfo,
@@ -55,7 +54,7 @@ class Mythen3Driver(NDArrayBaseIO):
     image_mode: A[SignalRW[ADImageMode], PvSuffix.rbv("ImageMode")]
 
     # Non-specific PV's but with mythen3 specific values
-    detector_state: A[SignalR[Mythen3DetectorState], PvSuffix("DetectorState_RBV")]
+    detector_state: A[SignalRW[Mythen3DetectorState], PvSuffix("DetectorState_RBV")]
     trigger_mode: A[SignalRW[Mythen3TriggerMode], PvSuffix.rbv("TriggerMode")]
 
     # mythen3 specific PV's
@@ -104,11 +103,10 @@ class Mythen3Controller(ADBaseController):
 
     def __init__(self, driver: Mythen3Driver):
         self._driver = driver
-        self._BIT_DEPTH = _BIT_DEPTH
         super().__init__(driver=self._driver)
 
     def get_deadtime(self, exposure: float | None) -> float:
-        return _DEADTIMES[self._BIT_DEPTH]
+        return _DEADTIMES[_BIT_DEPTH]
 
     async def prepare(self, trigger_info: TriggerInfo) -> None:
         if (exposure := trigger_info.livetime) is not None:
