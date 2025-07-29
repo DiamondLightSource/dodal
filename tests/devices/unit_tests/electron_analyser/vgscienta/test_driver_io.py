@@ -20,7 +20,6 @@ from dodal.devices.electron_analyser.util import to_kinetic_energy
 from dodal.devices.electron_analyser.vgscienta import (
     VGScientaAnalyserDriverIO,
     VGScientaRegion,
-    VGScientaSequence,
 )
 from dodal.devices.i09 import LensMode, PassEnergy, PsuMode
 from tests.devices.unit_tests.electron_analyser.util import (
@@ -119,7 +118,6 @@ async def test_analyser_sets_region_correctly(
 @pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
 async def test_analyser_sets_region_and_read_configuration_is_correct(
     sim_driver: VGScientaAnalyserDriverIO[LensMode, PsuMode, PassEnergy],
-    sequence: VGScientaSequence[LensMode, PsuMode, PassEnergy],
     region: VGScientaRegion[LensMode, PassEnergy],
     RE: RunEngine,
 ) -> None:
