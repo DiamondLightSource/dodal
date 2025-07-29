@@ -119,8 +119,7 @@ class ZocaloResults(StandardReadable, Triggerable):
 
         prefix (str): EPICS PV prefix for the device
 
-        use_gpu (bool): When True, ZocaloResults will take the first set of
-        results that it receives (which are likely the GPU results)
+        results_source (ZocaloSource): Where to get results from, GPU or CPU analysis
 
     """
 
