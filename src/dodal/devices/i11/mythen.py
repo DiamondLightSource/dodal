@@ -103,23 +103,25 @@ class Mythen3Controller(ADBaseController):
     """ADBaseController` for a Mythen3"""
 
     def __init__(self, driver: Mythen3Driver):
-        self.driver = driver
-        super().__init__(driver=self.driver)
+        self._driver = driver
+        self._BIT_DEPTH = _BIT_DEPTH
+        super().__init__(driver=self._driver)
 
     def get_deadtime(self, exposure: float | None) -> float:
-        return _DEADTIMES[_BIT_DEPTH]
+        return _DEADTIMES[self._BIT_DEPTH]
 
     async def prepare(self, trigger_info: TriggerInfo) -> None:
         if (exposure := trigger_info.livetime) is not None:
-            await self.driver.acquire_time.set(exposure)
+            await self._driver.acquire_time.set(exposure)
 
         if trigger_info.trigger is DetectorTrigger.INTERNAL:
-            await self.driver.trigger_mode.set(Mythen3TriggerMode.INTERNAL)
+            await self._driver.trigger_mode.set(Mythen3TriggerMode.INTERNAL)
         elif trigger_info.trigger in {
             DetectorTrigger.CONSTANT_GATE,
             DetectorTrigger.EDGE_TRIGGER,
+            DetectorTrigger.VARIABLE_GATE,
         }:
-            await self.driver.trigger_mode.set(Mythen3TriggerMode.EXTERNAL)
+            await self._driver.trigger_mode.set(Mythen3TriggerMode.EXTERNAL)
         else:
             raise ValueError(f"Mythen3 does not support {trigger_info.trigger}")
 
@@ -128,8 +130,8 @@ class Mythen3Controller(ADBaseController):
         else:
             image_mode = ADImageMode.MULTIPLE
         await asyncio.gather(
-            self.driver.num_images.set(trigger_info.total_number_of_exposures),
-            self.driver.image_mode.set(image_mode),
+            self._driver.num_images.set(trigger_info.total_number_of_exposures),
+            self._driver.image_mode.set(image_mode),
         )
 
 
