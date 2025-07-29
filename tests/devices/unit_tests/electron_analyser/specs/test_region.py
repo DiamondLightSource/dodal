@@ -62,6 +62,25 @@ def expected_region_values() -> list[dict[str, Any]]:
             "estimated_time_in_ms": 13718,
             "excitation_energy_source": "source1",
         },
+        {
+            "name": "New_Region2",
+            "acquisition_mode": AcquisitionMode.FIXED_ENERGY,
+            "psu_mode": PsuMode.V400,
+            "lens_mode": LensMode.HIGH_ANGULAR_DISPERSION,
+            "low_energy": 299.665,
+            "high_energy": 300.335,
+            "energy_step": 0.4,
+            "pass_energy": 5.0,
+            "iterations": 1,
+            "step_time": 1.0,
+            "enabled": True,
+            "energy_mode": EnergyMode.KINETIC,
+            "values": 2,
+            "slices": 100,
+            "centre_energy": 300.0,
+            "estimated_time_in_ms": 4125,
+            "excitation_energy_source": "source1",
+        },
     ]
 
 

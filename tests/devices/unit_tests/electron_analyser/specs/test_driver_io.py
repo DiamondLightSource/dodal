@@ -72,7 +72,7 @@ async def test_analyser_sets_region_correctly(
     get_mock_put(sim_driver.low_energy).assert_called_once_with(
         expected_low_e, wait=True
     )
-    if region.acquisition_mode == AcquisitionMode.FIXED_TRANSMISSION:
+    if region.acquisition_mode == AcquisitionMode.FIXED_ENERGY:
         expected_centre_e = to_kinetic_energy(
             region.centre_energy, region.energy_mode, excitation_energy
         )
@@ -99,7 +99,7 @@ async def test_analyser_sets_region_correctly(
         region.iterations, wait=True
     )
 
-    if region.acquisition_mode == AcquisitionMode.FIXED_ENERGY:
+    if region.acquisition_mode == AcquisitionMode.FIXED_TRANSMISSION:
         get_mock_put(sim_driver.energy_step).assert_called_once_with(
             region.energy_step, wait=True
         )
