@@ -176,7 +176,7 @@ class Smargon(XYZStage, Movable):
             for motor_name, new_setpoint in value.items():
                 if new_setpoint is not None:
                     axis: Motor = getattr(self, motor_name)
-                    finished_moving.append(axis.set(new_setpoint))
+                    finished_moving.append(axis.set(new_setpoint))  # type: ignore
                     await wait_for_value(
                         axis.motor_done_move, False, self.DEFERRED_MOVE_SET_TIMEOUT
                     )
