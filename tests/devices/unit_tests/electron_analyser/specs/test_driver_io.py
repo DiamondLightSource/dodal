@@ -10,7 +10,6 @@ from ophyd_async.testing import (
     assert_reading,
     assert_value,
     get_mock_put,
-    partial_reading,
     set_mock_value,
 )
 
@@ -24,7 +23,7 @@ from dodal.devices.electron_analyser.specs import (
     SpecsAnalyserDriverIO,
     SpecsRegion,
 )
-from tests.devices.unit_tests.electron_analyser.helpers import (
+from tests.devices.unit_tests.electron_analyser.util import (
     TEST_SEQUENCE_REGION_NAMES,
     create_analyser_device,
 )

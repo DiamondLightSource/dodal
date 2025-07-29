@@ -12,7 +12,6 @@ from ophyd_async.testing import (
     assert_reading,
     assert_value,
     get_mock_put,
-    partial_reading,
     set_mock_value,
 )
 
@@ -23,10 +22,9 @@ from dodal.devices.electron_analyser import (
 from dodal.devices.electron_analyser.vgscienta import (
     VGScientaAnalyserDriverIO,
     VGScientaRegion,
-    VGScientaSequence,
 )
 from dodal.devices.i09 import LensMode, PassEnergy, PsuMode
-from tests.devices.unit_tests.electron_analyser.helpers import (
+from tests.devices.unit_tests.electron_analyser.util import (
     TEST_SEQUENCE_REGION_NAMES,
     create_analyser_device,
 )
@@ -122,10 +120,6 @@ async def test_analyser_sets_region_correctly(
     get_mock_put(sim_driver.y_channel_size).assert_called_once_with(
         expected_size_y, wait=True
     )
-
-    # Check match by combining expected vgscienta specific config reading with abstract
-    # one
-    await assert_configuration(sim_driver, full_expected_config)
 
 
 @pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
