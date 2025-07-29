@@ -45,7 +45,7 @@ def get_test_sequence(key: type) -> str:
     raise KeyError(f"Found no match with type {key}")
 
 
-TEST_SEQUENCE_REGION_NAMES = ["New_Region", "New_Region1"]
+TEST_SEQUENCE_REGION_NAMES = ["New_Region", "New_Region1", "New_Region2"]
 
 _TDevice = TypeVar(
     "_TDevice", bound=AbstractElectronAnalyserDetector | AbstractAnalyserDriverIO
