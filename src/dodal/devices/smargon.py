@@ -3,7 +3,7 @@ from collections.abc import Collection, Generator
 from dataclasses import dataclass
 from enum import Enum
 from math import isclose
-from typing import NotRequired, TypedDict, cast
+from typing import TypedDict, cast
 
 from bluesky import plan_stubs as bps
 from bluesky.protocols import Movable
@@ -104,15 +104,15 @@ class DeferMoves(StrictEnum):
     OFF = "Defer Off"
 
 
-class CombinedMove(TypedDict):
+class CombinedMove(TypedDict, total=False):
     """A move on multiple axes at once using a deferred move"""
 
-    x: NotRequired[float | None]
-    y: NotRequired[float | None]
-    z: NotRequired[float | None]
-    omega: NotRequired[float | None]
-    phi: NotRequired[float | None]
-    chi: NotRequired[float | None]
+    x: float | None
+    y: float | None
+    z: float | None
+    omega: float | None
+    phi: float | None
+    chi: float | None
 
 
 class Smargon(XYZStage, Movable):
@@ -122,6 +122,8 @@ class Smargon(XYZStage, Movable):
     increasing the gap between x1 and x2 changes chi, moving together changes virtual x.
     Robot loading can nudge these and lead to errors.
     """
+
+    DEFERRED_MOVE_SET_TIMEOUT = 5
 
     def __init__(self, prefix: str = "", name: str = ""):
         with self.add_children_as_readables():
@@ -161,15 +163,24 @@ class Smargon(XYZStage, Movable):
 
     @AsyncStatus.wrap
     async def set(self, value: CombinedMove):
+        """This will move all motion together in a deferred move.
+
+        Once defer_move is on, sets to any axis do not immediately move the axis. Instead
+        the axis done moving flag will go False to show it has got the move. Then, when
+        defer_move is switched off all axes will move at the same time. The put callbacks
+        on the axes themselves will only come back after the motion on that axis finished.
+        """
         await self.defer_move.set(DeferMoves.ON)
         try:
-            tasks = []
-            for k, v in value.items():
-                if v is not None:
-                    tasks.append(getattr(self, k).set(v))
+            finished_moving = []
+            for motor_name, new_setpoint in value.items():
+                if new_setpoint is not None:
+                    axis: Motor = getattr(self, motor_name)
+                    finished_moving.append(axis.set(new_setpoint))
+                    await wait_for_value(
+                        axis.motor_done_move, False, self.DEFERRED_MOVE_SET_TIMEOUT
+                    )
         finally:
             await self.defer_move.set(DeferMoves.OFF)
-        # The set() coroutines will not complete until after defer moves has been
-        # switched back off so we cannot wait for them until this point.
-        # see https://github.com/DiamondLightSource/dodal/issues/1315
-        await asyncio.gather(*tasks)
+
+        await asyncio.gather(*finished_moving)
