@@ -94,6 +94,7 @@ class AbstractAnalyserDriverIO(
                 EnergyMode, initial_value=EnergyMode.KINETIC
             )
             self.low_energy = epics_signal_rw(float, prefix + "LOW_ENERGY")
+            self.centre_energy = epics_signal_rw(float, prefix + "CENTRE_ENERGY")
             self.high_energy = epics_signal_rw(float, prefix + "HIGH_ENERGY")
             self.slices = epics_signal_rw(int, prefix + "SLICES")
             self.lens_mode = epics_signal_rw(lens_mode_type, prefix + "LENS_MODE")

@@ -32,23 +32,25 @@ class VGScientaRegion(
     high_energy: float = 10.0
     acquire_time: float = Field(default=1.0, alias="step_time")
     energy_step: float = Field(default=200.0)
+    centre_energy: float = Field(alias="fix_energy", default=9)
     # Specific to this class
     id: str = Field(default=str(uuid.uuid4()), alias="region_id")
-    fix_energy: float = 9.0
     total_steps: float = 13.0
     total_time: float = 13.0
-    first_x_channel: int = 1
-    last_x_channel: int = 1000
-    first_y_channel: int = 101
-    last_y_channel: int = 800
+    min_x: int = Field(alias="first_x_channel", default=1)
+    sensor_max_size_x: int = Field(alias="last_x_channel", default=1000)
+    min_y: int = Field(alias="first_y_channel", default=101)
+    sensor_max_size_y: int = Field(alias="last_y_channel", default=800)
     detector_mode: DetectorMode = DetectorMode.ADC
     status: Status = Status.READY
 
-    def x_channel_size(self) -> int:
-        return self.last_x_channel - self.first_x_channel + 1
+    @property
+    def size_x(self) -> int:
+        return self.sensor_max_size_x - self.min_x + 1
 
-    def y_channel_size(self) -> int:
-        return self.last_y_channel - self.first_y_channel + 1
+    @property
+    def size_y(self) -> int:
+        return self.sensor_max_size_y - self.min_y + 1
 
     @field_validator("pass_energy", mode="before")
     @classmethod

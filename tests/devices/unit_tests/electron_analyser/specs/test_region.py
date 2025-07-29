@@ -40,7 +40,7 @@ def expected_region_values() -> list[dict[str, Any]]:
             "values": 1,
             "slices": 100,
             "centre_energy": 0.0,
-            "estimated_time_in_ms": 0,
+            "estimated_time_in_ms": 0.0,
             "excitation_energy_source": "source1",
         },
         {
@@ -59,7 +59,7 @@ def expected_region_values() -> list[dict[str, Any]]:
             "values": 1,
             "slices": 110,
             "centre_energy": 0.0,
-            "estimated_time_in_ms": 13718,
+            "estimated_time_in_ms": 13718.0,
             "excitation_energy_source": "source1",
         },
         {
@@ -78,7 +78,7 @@ def expected_region_values() -> list[dict[str, Any]]:
             "values": 2,
             "slices": 100,
             "centre_energy": 300.0,
-            "estimated_time_in_ms": 4125,
+            "estimated_time_in_ms": 4125.0,
             "excitation_energy_source": "source1",
         },
     ]

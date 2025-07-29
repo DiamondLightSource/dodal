@@ -15,10 +15,8 @@ from ophyd_async.testing import (
     set_mock_value,
 )
 
-from dodal.devices.electron_analyser import (
-    EnergyMode,
-    to_kinetic_energy,
-)
+from dodal.devices.electron_analyser import EnergyMode
+from dodal.devices.electron_analyser.util import to_kinetic_energy
 from dodal.devices.electron_analyser.vgscienta import (
     VGScientaAnalyserDriverIO,
     VGScientaRegion,
@@ -69,7 +67,7 @@ async def test_analyser_sets_region_correctly(
         expected_low_e, wait=True
     )
     expected_centre_e = to_kinetic_energy(
-        region.fix_energy, region.energy_mode, excitation_energy
+        region.centre_energy, region.energy_mode, excitation_energy
     )
     get_mock_put(sim_driver.centre_energy).assert_called_once_with(
         expected_centre_e, wait=True
@@ -106,22 +104,17 @@ async def test_analyser_sets_region_correctly(
         region.energy_step, wait=True
     )
 
-    expected_first_x = region.first_x_channel
-    expected_size_x = region.x_channel_size()
-    get_mock_put(sim_driver.first_x_channel).assert_called_once_with(
-        expected_first_x, wait=True
+    get_mock_put(sim_driver.region_min_x).assert_called_once_with(
+        region.min_x, wait=True
     )
-    get_mock_put(sim_driver.x_channel_size).assert_called_once_with(
-        expected_size_x, wait=True
+    get_mock_put(sim_driver.region_size_x).assert_called_once_with(
+        region.size_x, wait=True
     )
-
-    expected_first_y = region.first_y_channel
-    expected_size_y = region.y_channel_size()
-    get_mock_put(sim_driver.first_y_channel).assert_called_once_with(
-        expected_first_y, wait=True
+    get_mock_put(sim_driver.region_min_y).assert_called_once_with(
+        region.min_y, wait=True
     )
-    get_mock_put(sim_driver.y_channel_size).assert_called_once_with(
-        expected_size_y, wait=True
+    get_mock_put(sim_driver.region_size_y).assert_called_once_with(
+        region.size_y, wait=True
     )
 
 
@@ -143,7 +136,7 @@ async def test_analyser_sets_region_and_read_configuration_is_correct(
         region.low_energy, region.energy_mode, excitation_energy
     )
     expected_centre_e = to_kinetic_energy(
-        region.fix_energy, region.energy_mode, excitation_energy
+        region.centre_energy, region.energy_mode, excitation_energy
     )
     expected_high_e = to_kinetic_energy(
         region.high_energy, region.energy_mode, excitation_energy
@@ -171,10 +164,12 @@ async def test_analyser_sets_region_and_read_configuration_is_correct(
             f"{prefix}binding_energy_axis": {"value": ANY},
             f"{prefix}angle_axis": {"value": ANY},
             f"{prefix}detector_mode": {"value": region.detector_mode},
-            f"{prefix}first_x_channel": {"value": region.first_x_channel},
-            f"{prefix}x_channel_size": {"value": region.x_channel_size()},
-            f"{prefix}first_y_channel": {"value": region.first_y_channel},
-            f"{prefix}y_channel_size": {"value": region.y_channel_size()},
+            f"{prefix}region_min_x": {"value": region.min_x},
+            f"{prefix}region_size_x": {"value": region.size_x},
+            f"{prefix}sensor_max_size_x": {"value": ANY},
+            f"{prefix}region_min_y": {"value": region.min_y},
+            f"{prefix}region_size_y": {"value": region.size_y},
+            f"{prefix}sensor_max_size_y": {"value": ANY},
             f"{prefix}psu_mode": {"value": ANY},
         },
     )

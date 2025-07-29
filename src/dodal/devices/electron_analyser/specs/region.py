@@ -19,12 +19,13 @@ class SpecsRegion(
     pass_energy: float = 5
     acquisition_mode: AcquisitionMode = AcquisitionMode.FIXED_TRANSMISSION
     low_energy: float = Field(default=800, alias="start_energy")
+    centre_energy: float = 0
     high_energy: float = Field(default=850, alias="end_energy")
     acquire_time: float = Field(default=1.0, alias="exposure_time")
     energy_step: float = Field(default=0.1, alias="step_energy")
+
     # Specific to this class
     values: int = 1
-    centre_energy: float = 0
     psu_mode: TPsuMode
     estimated_time_in_ms: float = 0
 
