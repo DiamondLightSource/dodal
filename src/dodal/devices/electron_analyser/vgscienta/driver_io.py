@@ -70,14 +70,31 @@ class VGScientaAnalyserDriverIO(
 
     @AsyncStatus.wrap
     async def set(self, region: VGScientaRegion[TLensMode, TPassEnergyEnum]):
-        await super().set(region)
+        source = self._get_energy_source(region.excitation_energy_source)
+        excitation_energy = await source.get_value()  # eV
 
-        excitation_energy = await self.excitation_energy.get_value()
+        low_energy = to_kinetic_energy(
+            region.low_energy, region.energy_mode, excitation_energy
+        )
         centre_energy = to_kinetic_energy(
             region.fix_energy, region.energy_mode, excitation_energy
         )
+        high_energy = to_kinetic_energy(
+            region.high_energy, region.energy_mode, excitation_energy
+        )
         await asyncio.gather(
+            self.region_name.set(region.name),
+            self.energy_mode.set(region.energy_mode),
+            self.low_energy.set(low_energy),
             self.centre_energy.set(centre_energy),
+            self.high_energy.set(high_energy),
+            self.slices.set(region.slices),
+            self.lens_mode.set(region.lens_mode),
+            self.pass_energy.set(region.pass_energy),
+            self.iterations.set(region.iterations),
+            self.acquisition_mode.set(region.acquisition_mode),
+            self.excitation_energy.set(excitation_energy),
+            self.excitation_energy_source.set(source.name),
             self.energy_step.set(region.energy_step),
             self.first_x_channel.set(region.first_x_channel),
             self.first_y_channel.set(region.first_y_channel),
