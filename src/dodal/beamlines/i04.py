@@ -155,7 +155,6 @@ def xbpm_feedback() -> XBPMFeedback:
     """
     return XBPMFeedback(
         f"{PREFIX.beamline_prefix}-EA-FDBK-01:",
-        stage_prefix=f"{PREFIX.beamline_prefix}-EA-XBPM-02:",
     )
 
 
