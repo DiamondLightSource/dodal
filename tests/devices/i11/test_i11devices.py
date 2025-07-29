@@ -163,6 +163,11 @@ async def test_spinner_pause_resume(i11_spinner: Spinner) -> None:
     assert await i11_spinner.enable.get_value() == "Enabled"
 
 
+async def test_spinner_speed(i11_spinner: Spinner) -> None:
+    await i11_spinner.set(50.0)
+    assert await i11_spinner.speed.get_value() == 50.0
+
+
 @pytest.fixture
 async def i11_cyberstar() -> CyberstarBlower:
     async with init_devices(mock=True):
