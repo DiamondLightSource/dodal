@@ -101,7 +101,7 @@ def dcm() -> DCM:
     """
     return DCM(
         prefix=f"{PREFIX.beamline_prefix}-DI-DCM-01",
-        base_prefix=f"{PREFIX.beamline_prefix}-MO-DCM-01",
+        motion_prefix=f"{PREFIX.beamline_prefix}-MO-DCM-01",
     )
 
 

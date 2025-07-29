@@ -117,8 +117,6 @@ class ZocaloResults(StandardReadable, Triggerable):
         timeout_s (float): Maximum time to wait for the Queue to be filled by an object, starting
         from when the ZocaloResults device is triggered
 
-        prefix (str): EPICS PV prefix for the device
-
         use_gpu (bool): When True, ZocaloResults will take the first set of
         results that it receives (which are likely the GPU results)
 

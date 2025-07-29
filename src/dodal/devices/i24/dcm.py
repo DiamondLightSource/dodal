@@ -12,7 +12,7 @@ class DCM(BaseDCM[RollCrystal, PitchAndRollCrystal]):
     A double crystal monocromator device, used to select the beam energy.
     """
 
-    def __init__(self, prefix: str, base_prefix: str, name: str = "") -> None:
+    def __init__(self, prefix: str, motion_prefix: str, name: str = "") -> None:
         with self.add_children_as_readables():
             # Temperatures
             self.xtal1_temp = epics_signal_r(float, prefix + "PT100-1")
@@ -26,4 +26,4 @@ class DCM(BaseDCM[RollCrystal, PitchAndRollCrystal]):
             self.b1_plate_temp = epics_signal_r(float, prefix + "PT100-7")
             self.gap_temp = epics_signal_r(float, prefix + "TC-1")
 
-        super().__init__(base_prefix, RollCrystal, PitchAndRollCrystal, name)
+        super().__init__(motion_prefix, RollCrystal, PitchAndRollCrystal, name)
