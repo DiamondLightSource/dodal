@@ -1,13 +1,13 @@
 from ophyd_async.core import StrictEnum
 
 
-class OnStateCaptilised(StrictEnum):
-    ON = "ON"
+class OnState(StrictEnum):
+    ON = "On"
     OFF = "OFF"
 
 
-class OnState(StrictEnum):
-    ON = "On"
+class OnStateCaptilised(StrictEnum):
+    ON = "ON"
     OFF = "OFF"
 
 
