@@ -40,7 +40,7 @@ class LakeshoreBaseIO(LakeshoreTemperatureIO):
             write_pv="SETP_S",
             read_pv="SETP",
             signal_type=float,
-            single_control_channel=single_control_channel,
+            no_pv_suffix_index=single_control_channel,
         )
 
         self.ramp_rate = create_rw_device_vector(
@@ -49,7 +49,7 @@ class LakeshoreBaseIO(LakeshoreTemperatureIO):
             write_pv="RAMP_S",
             read_pv="RAMP",
             signal_type=float,
-            single_control_channel=single_control_channel,
+            no_pv_suffix_index=single_control_channel,
         )
 
         self.ramp_enable = create_rw_device_vector(
@@ -58,7 +58,7 @@ class LakeshoreBaseIO(LakeshoreTemperatureIO):
             write_pv="RAMPST_S",
             read_pv="RAMPST",
             signal_type=int,
-            single_control_channel=single_control_channel,
+            no_pv_suffix_index=single_control_channel,
         )
 
         self.heater_output = create_r_device_vector(
@@ -66,7 +66,7 @@ class LakeshoreBaseIO(LakeshoreTemperatureIO):
             no_channels=no_channels,
             read_pv="HTR",
             signal_type=float,
-            single_control_channel=single_control_channel,
+            no_pv_suffix_index=single_control_channel,
         )
 
         self.heater_output_range = create_rw_device_vector(
@@ -75,7 +75,7 @@ class LakeshoreBaseIO(LakeshoreTemperatureIO):
             write_pv="RANGE_S",
             read_pv="RANGE",
             signal_type=heater_setting,
-            single_control_channel=single_control_channel,
+            no_pv_suffix_index=single_control_channel,
         )
 
         super().__init__(
@@ -101,7 +101,7 @@ class PIDBaseIO(Device):
             write_pv="P_S",
             read_pv="P",
             signal_type=float,
-            single_control_channel=single_control_channel,
+            no_pv_suffix_index=single_control_channel,
         )
         self.i = create_rw_device_vector(
             prefix=prefix,
@@ -109,7 +109,7 @@ class PIDBaseIO(Device):
             write_pv="I_S",
             read_pv="I",
             signal_type=float,
-            single_control_channel=single_control_channel,
+            no_pv_suffix_index=single_control_channel,
         )
         self.d = create_rw_device_vector(
             prefix=prefix,
@@ -117,7 +117,7 @@ class PIDBaseIO(Device):
             write_pv="D_S",
             read_pv="D",
             signal_type=float,
-            single_control_channel=single_control_channel,
+            no_pv_suffix_index=single_control_channel,
         )
 
         self.manual_output = create_rw_device_vector(
@@ -126,7 +126,7 @@ class PIDBaseIO(Device):
             write_pv="MOUT_S",
             read_pv="MOUT",
             signal_type=float,
-            single_control_channel=single_control_channel,
+            no_pv_suffix_index=single_control_channel,
         )
 
         super().__init__(name=name)

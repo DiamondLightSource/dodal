@@ -9,9 +9,11 @@ def create_rw_device_vector(
     read_pv: str,
     signal_type: type[SignalDatatypeT],
     pv_index_offset: int = 0,
-    single_control_channel: bool = False,
+    no_pv_suffix_index: bool = False,
 ) -> DeviceVector:
-    if single_control_channel:
+    if no_pv_suffix_index:
+        if no_channels > 1:
+            raise (ValueError("Multi-channels require pv_suffix_index."))
         return DeviceVector(
             {
                 1: epics_signal_rw(
@@ -40,9 +42,11 @@ def create_r_device_vector(
     read_pv: str,
     signal_type: type[SignalDatatypeT],
     pv_index_offset: int = 0,
-    single_control_channel: bool = False,
+    no_pv_suffix_index: bool = False,
 ) -> DeviceVector:
-    if single_control_channel:
+    if no_pv_suffix_index:
+        if no_channels > 1:
+            raise (ValueError("Multi-channels require pv_suffix_index."))
         return DeviceVector(
             {
                 1: epics_signal_r(
@@ -51,13 +55,13 @@ def create_r_device_vector(
                 )
             }
         )
-    else:
-        return DeviceVector(
-            {
-                i: epics_signal_r(
-                    signal_type,
-                    read_pv=f"{prefix}{read_pv}{i + pv_index_offset}",
-                )
-                for i in range(1, no_channels + 1)
-            }
-        )
+
+    return DeviceVector(
+        {
+            i: epics_signal_r(
+                signal_type,
+                read_pv=f"{prefix}{read_pv}{i + pv_index_offset}",
+            )
+            for i in range(1, no_channels + 1)
+        }
+    )

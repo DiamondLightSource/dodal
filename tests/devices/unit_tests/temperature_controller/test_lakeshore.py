@@ -68,7 +68,7 @@ async def test_lakeshore_set_success_fail_outside_limit(
         await lakeshore.set(temperature)
 
 
-async def test_lakeshore_set_success_fail_unavailable_channel(
+async def test_lakeshore_set_fail_unavailable_channel(
     lakeshore: Lakeshore, RE: RunEngine
 ):
     with pytest.raises(
