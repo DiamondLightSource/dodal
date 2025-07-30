@@ -203,11 +203,14 @@ async def test_pjumpcell_set_valve_sets_valve_fields(
     )
 
 
-@pytest.mark.parametrize("valve_request,expected", [
-    (ValveControlRequest.CLOSE, FastValveControlRequest.CLOSE),
-    (ValveControlRequest.RESET, FastValveControlRequest.RESET),
-    (ValveControlRequest.OPEN, FastValveControlRequest.ARM),  # Unchanged as openseq
-])
+@pytest.mark.parametrize(
+    "valve_request,expected",
+    [
+        (ValveControlRequest.CLOSE, FastValveControlRequest.CLOSE),
+        (ValveControlRequest.RESET, FastValveControlRequest.RESET),
+        (ValveControlRequest.OPEN, FastValveControlRequest.ARM),  # Unchanged as openseq
+    ],
+)
 async def test_pjumpcell_set_valve_sets_control_request_for_all_valve_types(
     cell: PressureJumpCell,
     valve_request: ValveControlRequest,
