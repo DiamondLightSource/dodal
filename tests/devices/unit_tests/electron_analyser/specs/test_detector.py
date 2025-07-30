@@ -22,6 +22,7 @@ async def test_analyser_specs_detector_image_shape(
     RE: RunEngine,
 ) -> None:
     driver = sim_detector.driver
+    prefix = driver.name + "-"
 
     low_energy = 1
     high_energy = 10
@@ -39,7 +40,7 @@ async def test_analyser_specs_detector_image_shape(
     energy_axis = await driver.energy_axis.get_value()
 
     describe = await sim_detector.describe()
-    assert describe[driver.name + "-image"]["shape"] == [
+    assert describe[f"{prefix}image"]["shape"] == [
         len(angle_axis),
         len(energy_axis),
     ]
