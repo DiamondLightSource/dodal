@@ -1,7 +1,5 @@
 from dodal.beamlines.i05_shared import pgm as i05_pgm
-from dodal.common.beamlines.beamline_utils import (
-    device_factory,
-)
+from dodal.common.beamlines.beamline_utils import device_factory
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.devices.pgm import PGM
 from dodal.devices.synchrotron import Synchrotron
