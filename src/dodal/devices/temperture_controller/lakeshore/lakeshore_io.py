@@ -48,7 +48,7 @@ class LakeshoreTemperatureIO(Device):
             no_channels=no_channels,
             read_pv="KRDG",
             signal_type=float,
-            zero_pv_index=True,
+            pv_index_offset=-1,
         )
         super().__init__(name=name)
 
