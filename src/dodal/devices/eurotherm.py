@@ -42,10 +42,6 @@ class EurothermGeneral(StandardReadable, Locatable[float]):
         self,
         prefix: str,
         name: str = "",
-        setpoint_suffix: str = "SP",
-        ramprate_suffix: str = "RR",
-        output_suffix: str = "O",
-        manual_suffix: str = "MAN",
         temp_suffix: str = "PV:RBV",
         rbv_suffix: str = ":RBV",
         update: bool = False,
@@ -54,18 +50,10 @@ class EurothermGeneral(StandardReadable, Locatable[float]):
             self.temp = epics_signal_r(float, f"{prefix}{temp_suffix}")
 
         with self.add_children_as_readables():
-            self.setpoint = epics_signal_rw_rbv(
-                float, f"{prefix}{setpoint_suffix}", rbv_suffix
-            )
-            self.ramprate = epics_signal_rw_rbv(
-                float, f"{prefix}{ramprate_suffix}", rbv_suffix
-            )
-            self.output = epics_signal_rw_rbv(
-                float, f"{prefix}{output_suffix}", rbv_suffix
-            )
-            self.mode = epics_signal_rw_rbv(
-                ManualMode, f"{prefix}{manual_suffix}", rbv_suffix
-            )
+            self.setpoint = epics_signal_rw_rbv(float, f"{prefix}SP", rbv_suffix)
+            self.ramprate = epics_signal_rw_rbv(float, f"{prefix}RR", rbv_suffix)
+            self.output = epics_signal_rw_rbv(float, f"{prefix}O", rbv_suffix)
+            self.mode = epics_signal_rw_rbv(ManualMode, f"{prefix}MAN", rbv_suffix)
 
             if update:
                 self.update = epics_signal_rw(EurothermUpdate, f"{prefix}UPDATE.SCAN")

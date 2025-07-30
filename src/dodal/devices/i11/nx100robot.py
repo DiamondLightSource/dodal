@@ -35,12 +35,11 @@ class RobotSampleState(float, Enum):
 
 class NX100Robot(StandardReadable, Locatable[int], Stoppable, Pausable):
     """
-    This is a Yaskawa Motoman that uses an NX100 controller
+    This is a Yaskawa Motoman that uses an NX100 controller. It consists of a robot arm
+    with a gripper and a carousel for sample handling. It can pick and place samples
+    from the carousel to the diffractometer and vice versa.
 
-    The following PV's are related to the robot and may be needed for some functionality
-    self.robot_plc_check = "BL11I-MO-STEP-19:PLCSTATUS_OK"
-    self.robot_feedrate_check = "BL11I-MO-STEP-19:FEEDRATE"
-    self.robot_feedrate_limit = "BL11I-MO-STEP-19:FEEDRATE_LIMIT"
+    Has set, pause, resume, stop, locate, stage methods.
     """
 
     MAX_NUMBER_OF_SAMPLES = 200
