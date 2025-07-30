@@ -4,7 +4,7 @@ from bluesky.protocols import Movable
 from ophyd_async.core import AsyncStatus, StandardReadable
 from ophyd_async.epics.core import epics_signal_rw
 
-from dodal.common.enums import InOut, OnStateCaptilised
+from dodal.common.enums import InOut, OnState
 
 
 class Backlight(StandardReadable, Movable[InOut]):
@@ -14,9 +14,7 @@ class Backlight(StandardReadable, Movable[InOut]):
 
     def __init__(self, prefix: str, name: str = "") -> None:
         with self.add_children_as_readables():
-            self.power = epics_signal_rw(
-                OnStateCaptilised, prefix + "-EA-BLIT-01:TOGGLE"
-            )
+            self.power = epics_signal_rw(OnState, prefix + "-EA-BLIT-01:TOGGLE")
             self.position = epics_signal_rw(InOut, prefix + "-EA-BL-01:CTRL")
         super().__init__(name)
 
@@ -32,8 +30,8 @@ class Backlight(StandardReadable, Movable[InOut]):
         old_position = await self.position.get_value()
         await self.position.set(value)
         if value == InOut.OUT:
-            await self.power.set(OnStateCaptilised.OFF)
+            await self.power.set(OnState.OFF)
         else:
-            await self.power.set(OnStateCaptilised.ON)
+            await self.power.set(OnState.ON)
         if old_position != value:
             await sleep(self.TIME_TO_MOVE_S)

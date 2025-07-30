@@ -6,7 +6,7 @@ from bluesky.run_engine import RunEngine
 from ophyd_async.core import init_devices
 from ophyd_async.testing import assert_reading, set_mock_value
 
-from dodal.common.enums import InOut, OnStateCaptilised
+from dodal.common.enums import InOut, OnState
 from dodal.devices.backlight import Backlight
 
 
@@ -19,12 +19,12 @@ def fake_backlight(RE: RunEngine):
 
 async def test_backlight_can_be_written_and_read_from(fake_backlight: Backlight):
     set_mock_value(fake_backlight.position, InOut.IN)
-    set_mock_value(fake_backlight.power, OnStateCaptilised.ON)
+    set_mock_value(fake_backlight.power, OnState.ON)
     await assert_reading(
         fake_backlight,
         {
             "backlight-power": {
-                "value": OnStateCaptilised.ON,
+                "value": OnState.ON,
             },
             "backlight-position": {
                 "value": InOut.IN,
@@ -39,7 +39,7 @@ async def test_when_backlight_moved_out_it_switches_off(
 ):
     RE(bps.mv(fake_backlight, InOut.OUT))
     assert await fake_backlight.position.get_value() == InOut.OUT
-    assert await fake_backlight.power.get_value() == OnStateCaptilised.OFF
+    assert await fake_backlight.power.get_value() == OnState.OFF
 
 
 @patch("dodal.devices.backlight.sleep", autospec=True)
@@ -48,7 +48,7 @@ async def test_when_backlight_moved_in_it_switches_on(
 ):
     RE(bps.mv(fake_backlight, InOut.IN))
     assert await fake_backlight.position.get_value() == InOut.IN
-    assert await fake_backlight.power.get_value() == OnStateCaptilised.ON
+    assert await fake_backlight.power.get_value() == OnState.ON
 
 
 @patch("dodal.devices.backlight.sleep", autospec=True)
