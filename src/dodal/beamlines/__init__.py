@@ -10,6 +10,7 @@ from pathlib import Path
 # dictionary, which maps ${BEAMLINE} to dodal.beamlines.<MODULE NAME>
 _BEAMLINE_NAME_OVERRIDES = {
     "i05-1": "i05_1",
+    "i05-shared": "i05_shared",
     "b07-1": "b07_1",
     "i09-1": "i09_1",
     "i13-1": "i13_1",
