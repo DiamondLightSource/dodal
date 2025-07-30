@@ -1,20 +1,23 @@
 import pytest
 from bluesky import RunEngine
-from ophyd_async.core import SignalR
+from ophyd_async.core import SignalR, init_devices
 from ophyd_async.testing import set_mock_value
 
 from dodal.devices.b07 import LensMode, PsuMode
 from dodal.devices.electron_analyser.specs import SpecsDetector
-from dodal.testing.electron_analyser import create_analyser_device
+from dodal.testing.electron_analyser import create_detector
 
 
 @pytest.fixture
 async def sim_detector(
     energy_sources: dict[str, SignalR[float]],
 ) -> SpecsDetector[LensMode, PsuMode]:
-    return await create_analyser_device(
-        SpecsDetector[LensMode, PsuMode], energy_sources
-    )
+    async with init_devices(mock=True, connect=True):
+        sim_driver = await create_detector(
+            SpecsDetector[LensMode, PsuMode],
+            energy_sources=energy_sources,
+        )
+    return sim_driver
 
 
 async def test_analyser_specs_detector_image_shape(

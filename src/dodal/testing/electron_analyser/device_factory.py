@@ -1,38 +1,61 @@
-from typing import TypeVar, get_args, get_origin
-
-from ophyd_async.core import SignalR, init_devices
+from typing import Any, get_args, get_origin
 
 from dodal.devices.electron_analyser.abstract import (
-    AbstractAnalyserDriverIO,
-    AbstractElectronAnalyserDetector,
+    TAbstractAnalyserDriverIO,
 )
+from dodal.devices.electron_analyser.detector import TElectronAnalyserDetector
 from dodal.devices.electron_analyser.vgscienta import (
     VGScientaAnalyserDriverIO,
     VGScientaDetector,
 )
 
-_TDevice = TypeVar(
-    "_TDevice", bound=AbstractElectronAnalyserDetector | AbstractAnalyserDriverIO
-)
 
+async def create_driver(
+    driver_class: type[TAbstractAnalyserDriverIO],
+    **kwargs: Any,
+) -> TAbstractAnalyserDriverIO:
+    """
+    Helper function that helps to reduce the code to setup an analyser driver. The
+    parameters used for the enum types are taken directly from the subscripts of the
+    class so the user only needs to provide it in one place.
 
-async def create_analyser_device(
-    device_class: type[_TDevice],
-    energy_sources: dict[str, SignalR[float]],
-) -> _TDevice:
+    Args:
+        driver_class: The class for the driver which must include the enums in the
+                      subscript, for example MyDriverClass[MyLensMode, ...]
+        kwargs: Additional key worded arguments that the driver needs for initalisation.
+    """
     parameters = {
         "prefix": "TEST:",
-        "lens_mode_type": get_args(device_class)[0],
-        "psu_mode_type": get_args(device_class)[1],
-        "energy_sources": energy_sources,
+        "lens_mode_type": get_args(driver_class)[0],
+        "psu_mode_type": get_args(driver_class)[1],
     }
-    origin = get_origin(device_class)
-    if origin in (VGScientaDetector, VGScientaAnalyserDriverIO):
-        parameters["pass_energy_type"] = get_args(device_class)[2]
+    if get_origin(driver_class) is VGScientaAnalyserDriverIO:
+        parameters["pass_energy_type"] = get_args(driver_class)[2]
 
-    is_detector = isinstance(device_class, AbstractElectronAnalyserDetector)
-    parameters["name"] = "sim_detector" if is_detector else "sim_driver"
+    return driver_class(**(parameters | kwargs))
 
-    async with init_devices(mock=True, connect=True):
-        device = device_class(**parameters)
-    return device
+
+async def create_detector(
+    detector_class: type[TElectronAnalyserDetector],
+    **kwargs: Any,
+) -> TElectronAnalyserDetector:
+    """
+    Helper function that helps to reduce the code to setup an analyser driver. The
+    parameters used for the enum types are taken directly from the subscripts of the
+    class so the user only needs to provide it in one place.
+
+    Args:
+        detector_class: The class for the detector which must include the enums in the
+                        subscript, for example MyDetectorClass[MyLensMode, ...]
+        kwargs: Additional key worded arguments that the detector needs for
+                initalisation.
+    """
+    parameters = {
+        "prefix": "TEST:",
+        "lens_mode_type": get_args(detector_class)[0],
+        "psu_mode_type": get_args(detector_class)[1],
+    }
+    if get_origin(detector_class) is VGScientaDetector:
+        parameters["pass_energy_type"] = get_args(detector_class)[2]
+
+    return detector_class(**(parameters | kwargs))

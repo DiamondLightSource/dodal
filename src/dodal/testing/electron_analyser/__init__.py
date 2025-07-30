@@ -1,5 +1,6 @@
-from .device_factory import create_analyser_device
+from .device_factory import create_detector, create_driver
 
 __all__ = [
-    "create_analyser_device",
+    "create_detector",
+    "create_driver",
 ]
