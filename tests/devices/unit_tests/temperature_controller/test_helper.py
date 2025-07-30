@@ -8,17 +8,23 @@ from dodal.devices.temperture_controller.device_helper import (
 
 
 async def test_create_rw_device_vector():
+    pv_index_offset = 1
+    no_channels = 3
     async with init_devices(mock=True):
         lakeshore = create_rw_device_vector(
             prefix="888",
-            no_channels=4,
+            no_channels=no_channels,
             write_pv="wpv",
             read_pv="rpv",
             signal_type=int,
-            pv_index_offset=2,
+            pv_index_offset=pv_index_offset,
             no_pv_suffix_index=False,
         )
-    assert len(lakeshore) == 4
+
+    assert len(lakeshore) == no_channels
+
+    for channel in lakeshore:
+        assert lakeshore[channel].source[-1] == f"{channel + pv_index_offset}"
 
 
 async def test_create_rw_device_vector_fail_multi_channel_with_no_pv_index():
@@ -36,16 +42,21 @@ async def test_create_rw_device_vector_fail_multi_channel_with_no_pv_index():
 
 
 async def test_create_r_device_vector():
+    pv_index_offset = 1
+    no_channels = 3
     async with init_devices(mock=True):
         lakeshore = create_r_device_vector(
             prefix="888",
-            no_channels=4,
+            no_channels=no_channels,
             read_pv="rpv",
             signal_type=int,
-            pv_index_offset=2,
+            pv_index_offset=pv_index_offset,
             no_pv_suffix_index=False,
         )
-    assert len(lakeshore) == 4
+    assert len(lakeshore) == no_channels
+
+    for channel in lakeshore:
+        assert lakeshore[channel].source[-1] == f"{channel + pv_index_offset}"
 
 
 async def test_create_r_device_vector_fail_multi_channel_with_no_pv_index():
