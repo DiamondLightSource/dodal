@@ -20,7 +20,7 @@ from dodal.devices.electron_analyser.abstract.types import (
     TPassEnergyEnum,
     TPsuMode,
 )
-from dodal.devices.electron_analyser.util import to_kinetic_energy
+from dodal.devices.electron_analyser.enums import EnergyMode
 from dodal.devices.electron_analyser.vgscienta.enums import AcquisitionMode
 from dodal.devices.electron_analyser.vgscienta.region import (
     DetectorMode,
@@ -73,22 +73,14 @@ class VGScientaAnalyserDriverIO(
     async def set(self, region: VGScientaRegion[TLensMode, TPassEnergyEnum]):
         source = self._get_energy_source(region.excitation_energy_source)
         excitation_energy = await source.get_value()  # eV
+        region.switch_energy_mode(EnergyMode.KINETIC, excitation_energy)
 
-        low_energy = to_kinetic_energy(
-            region.low_energy, region.energy_mode, excitation_energy
-        )
-        centre_energy = to_kinetic_energy(
-            region.centre_energy, region.energy_mode, excitation_energy
-        )
-        high_energy = to_kinetic_energy(
-            region.high_energy, region.energy_mode, excitation_energy
-        )
         await asyncio.gather(
             self.region_name.set(region.name),
             self.energy_mode.set(region.energy_mode),
-            self.low_energy.set(low_energy),
-            self.centre_energy.set(centre_energy),
-            self.high_energy.set(high_energy),
+            self.low_energy.set(region.low_energy),
+            self.centre_energy.set(region.centre_energy),
+            self.high_energy.set(region.high_energy),
             self.slices.set(region.slices),
             self.lens_mode.set(region.lens_mode),
             self.pass_energy.set(region.pass_energy),

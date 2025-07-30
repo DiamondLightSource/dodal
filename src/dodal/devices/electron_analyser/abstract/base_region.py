@@ -11,6 +11,7 @@ from dodal.devices.electron_analyser.abstract.types import (
     TPassEnergy,
 )
 from dodal.devices.electron_analyser.enums import EnergyMode
+from dodal.devices.electron_analyser.util import to_binding_energy, to_kinetic_energy
 
 
 def java_to_python_case(java_str: str) -> str:
@@ -79,6 +80,21 @@ class AbstractBaseRegion(
 
     def is_kinetic_energy(self) -> bool:
         return self.energy_mode == EnergyMode.KINETIC
+
+    def switch_energy_mode(
+        self, energy_mode: EnergyMode, excitation_energy: float
+    ) -> None:
+        conv = (
+            to_binding_energy
+            if energy_mode == EnergyMode.BINDING
+            else to_kinetic_energy
+        )
+        self.low_energy = conv(self.low_energy, self.energy_mode, excitation_energy)
+        self.centre_energy = conv(
+            self.centre_energy, self.energy_mode, excitation_energy
+        )
+        self.high_energy = conv(self.high_energy, self.energy_mode, excitation_energy)
+        self.energy_mode = energy_mode
 
     @model_validator(mode="before")
     @classmethod
