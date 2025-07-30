@@ -76,7 +76,7 @@ class EurothermGeneral(StandardReadable, Locatable[float]):
 
     @AsyncStatus.wrap
     async def set(self, value: float):
-        """Set the blower to enabled"""
+        """Set the blower to a specific temperature."""
         await self.setpoint.set(value, wait=True)
 
     async def locate(self) -> Location[float]:
@@ -117,5 +117,7 @@ class EurothermPID(StandardReadable):
 
             if update:
                 self.update = epics_signal_rw(EurothermUpdate, f"{prefix}PID.SCAN")
+            else:
+                self.update = None
 
         super().__init__(name)

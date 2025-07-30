@@ -15,7 +15,7 @@ from dodal.devices.i11.diff_stages import (
     DiffractometerStage,
 )
 from dodal.devices.i11.mythen import Mythen3
-from dodal.devices.i11.NX100Robot import NX100Robot
+from dodal.devices.i11.nx100robot import NX100Robot
 from dodal.devices.i11.spinner import Spinner
 from dodal.devices.slits import Slits
 from dodal.devices.synchrotron import Synchrotron

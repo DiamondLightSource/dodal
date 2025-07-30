@@ -5,7 +5,7 @@ from ophyd_async.core import init_devices
 from ophyd_async.testing import set_mock_value
 
 from dodal.devices.i11.cyberstar_blower import CyberstarBlower
-from dodal.devices.i11.i11_robot import NX100Robot, RobotJobs, RobotSampleState
+from dodal.devices.i11.nx100robot import NX100Robot, RobotJobs, RobotSampleState
 from dodal.devices.i11.spinner import Spinner
 
 
@@ -45,7 +45,7 @@ async def test_robot_set_fails_when_value_out_of_range(
         await i11_robot.set(value_to_set)  # Should raise ValueError for out of range
 
 
-@patch("dodal.devices.i11.i11_robot.LOGGER")
+@patch("dodal.devices.i11.nx100robot.LOGGER")
 async def test_robot_set_when_already_at_location(
     patch_logger: MagicMock,
     i11_robot: NX100Robot,
@@ -167,10 +167,12 @@ async def i11_spinner() -> Spinner:
     return i11_spinner
 
 
-async def test_spinner_pause_resume(i11_spinner: Spinner) -> None:
+async def test_spinner_pause_(i11_spinner: Spinner) -> None:
     await i11_spinner.pause()
     assert await i11_spinner.enable.get_value() == "Disabled"
 
+
+async def test_spinner_resume(i11_spinner: Spinner) -> None:
     await i11_spinner.resume()
     assert await i11_spinner.enable.get_value() == "Enabled"
 
