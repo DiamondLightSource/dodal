@@ -9,12 +9,6 @@ from dodal.devices.i11.i11_robot import NX100Robot, RobotJobs, RobotSampleState
 from dodal.devices.i11.spinner import Spinner
 
 
-async def _get_i11_robot() -> NX100Robot:
-    device = NX100Robot(prefix="BL11I-EA-ROBOT-01:")
-    await device.connect(mock=True)
-    return device
-
-
 @pytest.fixture
 async def i11_robot() -> NX100Robot:
     async with init_devices(mock=True):
@@ -54,8 +48,8 @@ async def test_robot_set_fails_when_value_out_of_range(
 @patch("dodal.devices.i11.i11_robot.LOGGER")
 async def test_robot_set_when_already_at_location(
     patch_logger: MagicMock,
+    i11_robot: NX100Robot,
 ):
-    i11_robot = await _get_i11_robot()
     set_mock_value(i11_robot.current_sample_position, 10)  # Set pos to 10
     await i11_robot.set(10)  # shouldn't do anything since already at position
     assert await i11_robot.current_sample_position.get_value() == 10
