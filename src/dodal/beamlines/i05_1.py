@@ -1,4 +1,4 @@
-from dodal.beamlines.i05_shared import pgm as i05pgm
+from dodal.beamlines.i05_shared import pgm as i05_pgm
 from dodal.common.beamlines.beamline_utils import (
     device_factory,
 )
@@ -16,7 +16,7 @@ set_utils_beamline(BL)
 
 @device_factory()
 def pgm() -> PGM:
-    return i05pgm()
+    return i05_pgm()
 
 
 @device_factory()
