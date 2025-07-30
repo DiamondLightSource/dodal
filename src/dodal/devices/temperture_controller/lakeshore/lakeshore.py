@@ -10,12 +10,7 @@ from ophyd_async.core import (
     soft_signal_rw,
 )
 
-from ..device_helper import create_rw_device_vector
 from .lakeshore_io import (
-    LAKESHORE336_HEATER_SETTING,
-    LAKESHORE336_PID_INPUT_CHANNEL,
-    LAKESHORE336_PID_MODE,
-    LAKESHORE340_PID_INPUT_CHANNEL,
     LakeshoreBaseIO,
     PIDBaseIO,
 )
@@ -162,97 +157,4 @@ class Lakeshore(StandardReadable, Movable[float]):
                 self.temperature.user_setpoint[value],
             ],
             StandardReadableFormat.HINTED_SIGNAL,
-        )
-
-
-class Lakeshore336(Lakeshore):
-    """
-    Lakeshore 336 temperature controller.
-
-    This class is a specific implementation for the Lakeshore 336 model.
-    It inherits from the Lakeshore class and sets the heater mode, pid mode and
-     input channel type to LAKESHORE336 setting.
-    """
-
-    def __init__(
-        self,
-        prefix: str,
-        no_channels: int = 4,
-        control_channel: int = 1,
-        heater_setting: type[SignalDatatypeT] = LAKESHORE336_HEATER_SETTING,
-        pid_mode: type[SignalDatatypeT] = LAKESHORE336_PID_MODE,
-        input_channel_type: type[SignalDatatypeT] = LAKESHORE336_PID_INPUT_CHANNEL,
-        single_control_channel: bool = False,
-        name: str = "",
-    ):
-        self.pid_mode = create_rw_device_vector(
-            prefix=prefix,
-            no_channels=no_channels,
-            write_pv="OMMODE_S",
-            read_pv="OMMODE",
-            signal_type=pid_mode,
-        )
-        self.pid_input_channel = create_rw_device_vector(
-            prefix=prefix,
-            no_channels=no_channels,
-            write_pv="OMINPUT_S",
-            read_pv="OMINPUT",
-            signal_type=input_channel_type,
-        )
-
-        super().__init__(
-            prefix=prefix,
-            no_channels=no_channels,
-            heater_setting=heater_setting,
-            control_channel=control_channel,
-            single_control_channel=single_control_channel,
-            name=name,
-        )
-
-
-class Lakeshore340(Lakeshore):
-    """
-    Lakeshore 340 temperature controller.
-
-    This class is a specific implementation for the Lakeshore 340 model.
-    It inherits from the Lakeshore class and sets the heater mode, pid mode and
-     input channel type to LAKESHORE340 setting.
-    The main different for 340 is that it only has a shared control channel.
-    """
-
-    def __init__(
-        self,
-        prefix: str,
-        no_channels: int = 4,
-        control_channel: int = 1,
-        heater_setting: type[SignalDatatypeT] = int,
-        pid_mode: type[SignalDatatypeT] = int,
-        input_channel_type: type[SignalDatatypeT] = LAKESHORE340_PID_INPUT_CHANNEL,
-        single_control_channel: bool = True,
-        name: str = "",
-    ):
-        self.pid_mode = create_rw_device_vector(
-            prefix=prefix,
-            no_channels=no_channels,
-            write_pv="CMODE_S",
-            read_pv="CMODE",
-            signal_type=pid_mode,
-            single_control_channel=single_control_channel,
-        )
-        self.pid_input_loop = create_rw_device_vector(
-            prefix=prefix,
-            no_channels=no_channels,
-            write_pv="LOOP",
-            read_pv="LOOP",
-            signal_type=input_channel_type,
-            single_control_channel=single_control_channel,
-        )
-
-        super().__init__(
-            prefix=prefix,
-            no_channels=no_channels,
-            heater_setting=heater_setting,
-            control_channel=control_channel,
-            single_control_channel=single_control_channel,
-            name=name,
         )
