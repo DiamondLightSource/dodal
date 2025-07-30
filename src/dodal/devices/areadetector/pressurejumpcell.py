@@ -16,6 +16,8 @@ class PressureJumpCellDetector(AreaDetector[PressureJumpCellController]):
     The detector may be configured for an external trigger on the TTL Trig input.
     """
 
+    trig: PressureJumpCellAdcTriggerIO
+
     def __init__(
         self,
         prefix: str,
