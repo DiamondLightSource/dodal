@@ -16,7 +16,6 @@ from ophyd_async.testing import (
 )
 
 from dodal.devices.electron_analyser import EnergyMode
-from dodal.devices.electron_analyser.util import to_kinetic_energy
 from dodal.devices.electron_analyser.vgscienta import (
     VGScientaAnalyserDriverIO,
     VGScientaRegion,
@@ -47,7 +46,7 @@ async def test_analyser_sets_region_correctly(
     RE(bps.mv(sim_driver, region), wait=True)
 
     energy_source = sim_driver._get_energy_source(region.excitation_energy_source)
-    excitation_energy = await energy_source.get_value()
+    region.switch_energy_mode(EnergyMode.KINETIC, await energy_source.get_value())
 
     get_mock_put(sim_driver.region_name).assert_called_once_with(region.name, wait=True)
     get_mock_put(sim_driver.energy_mode).assert_called_once_with(
@@ -59,48 +58,34 @@ async def test_analyser_sets_region_correctly(
     get_mock_put(sim_driver.lens_mode).assert_called_once_with(
         region.lens_mode, wait=True
     )
-
-    expected_low_e = to_kinetic_energy(
-        region.low_energy, region.energy_mode, excitation_energy
-    )
     get_mock_put(sim_driver.low_energy).assert_called_once_with(
-        expected_low_e, wait=True
-    )
-    expected_centre_e = to_kinetic_energy(
-        region.centre_energy, region.energy_mode, excitation_energy
+        region.low_energy, wait=True
     )
     get_mock_put(sim_driver.centre_energy).assert_called_once_with(
-        expected_centre_e, wait=True
-    )
-    expected_high_e = to_kinetic_energy(
-        region.high_energy, region.energy_mode, excitation_energy
+        region.centre_energy, wait=True
     )
     get_mock_put(sim_driver.high_energy).assert_called_once_with(
-        expected_high_e, wait=True
+        region.high_energy, wait=True
     )
     get_mock_put(sim_driver.pass_energy).assert_called_once_with(
         region.pass_energy, wait=True
     )
-    expected_source = energy_source.name
     get_mock_put(sim_driver.excitation_energy_source).assert_called_once_with(
-        expected_source, wait=True
+        energy_source.name, wait=True
     )
     get_mock_put(sim_driver.slices).assert_called_once_with(region.slices, wait=True)
     get_mock_put(sim_driver.iterations).assert_called_once_with(
         region.iterations, wait=True
     )
-
     get_mock_put(sim_driver.image_mode).assert_called_once_with(
         ADImageMode.SINGLE, wait=True
     )
     get_mock_put(sim_driver.detector_mode).assert_called_once_with(
         region.detector_mode, wait=True
     )
-
     get_mock_put(sim_driver.energy_step).assert_called_once_with(
         region.energy_step, wait=True
     )
-
     get_mock_put(sim_driver.region_min_x).assert_called_once_with(
         region.min_x, wait=True
     )
@@ -124,20 +109,9 @@ async def test_analyser_sets_region_and_read_configuration_is_correct(
     RE(bps.mv(sim_driver, region), wait=True)
 
     prefix = sim_driver.name + "-"
-
     energy_source = sim_driver._get_energy_source(region.excitation_energy_source)
     excitation_energy = await energy_source.get_value()
-    expected_source = energy_source.name
-
-    expected_low_e = to_kinetic_energy(
-        region.low_energy, region.energy_mode, excitation_energy
-    )
-    expected_centre_e = to_kinetic_energy(
-        region.centre_energy, region.energy_mode, excitation_energy
-    )
-    expected_high_e = to_kinetic_energy(
-        region.high_energy, region.energy_mode, excitation_energy
-    )
+    region.switch_energy_mode(EnergyMode.KINETIC, excitation_energy)
 
     await assert_configuration(
         sim_driver,
@@ -146,12 +120,12 @@ async def test_analyser_sets_region_and_read_configuration_is_correct(
             f"{prefix}energy_mode": {"value": region.energy_mode},
             f"{prefix}acquisition_mode": {"value": region.acquisition_mode},
             f"{prefix}lens_mode": {"value": region.lens_mode},
-            f"{prefix}low_energy": {"value": expected_low_e},
-            f"{prefix}centre_energy": {"value": expected_centre_e},
-            f"{prefix}high_energy": {"value": expected_high_e},
+            f"{prefix}low_energy": {"value": region.low_energy},
+            f"{prefix}centre_energy": {"value": region.centre_energy},
+            f"{prefix}high_energy": {"value": region.high_energy},
             f"{prefix}energy_step": {"value": region.energy_step},
             f"{prefix}pass_energy": {"value": region.pass_energy},
-            f"{prefix}excitation_energy_source": {"value": expected_source},
+            f"{prefix}excitation_energy_source": {"value": energy_source.name},
             f"{prefix}slices": {"value": region.slices},
             f"{prefix}iterations": {"value": region.iterations},
             f"{prefix}total_steps": {"value": ANY},
