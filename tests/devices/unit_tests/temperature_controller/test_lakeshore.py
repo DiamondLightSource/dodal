@@ -4,22 +4,27 @@ import numpy as np
 import pytest
 from bluesky.plan_stubs import abs_set
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import init_devices
+from ophyd_async.core import StrictEnum, init_devices
 from ophyd_async.testing import assert_configuration
 
 from dodal.devices.temperture_controller import (
-    LAKESHORE336_HEATER_SETTING,
     Lakeshore,
 )
+
+
+class HEATER_SETTING(StrictEnum):
+    OFF = "Off"
+    LOW = "Low"
+    MEDIUM = "Medium"
+    HIGH = "High"
 
 
 @pytest.fixture
 async def lakeshore():
     async with init_devices(mock=True):
         lakeshore = Lakeshore(
-            prefix="007", no_channels=4, heater_setting=LAKESHORE336_HEATER_SETTING
+            prefix="007", no_channels=4, heater_setting=HEATER_SETTING
         )
-
     yield lakeshore
 
 

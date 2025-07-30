@@ -1,35 +1,6 @@
-from ophyd_async.core import Device, SignalDatatypeT, StrictEnum
+from ophyd_async.core import Device, SignalDatatypeT
 
 from ..device_helper import create_r_device_vector, create_rw_device_vector
-
-
-class LAKESHORE336_HEATER_SETTING(StrictEnum):
-    OFF = "Off"
-    LOW = "Low"
-    MEDIUM = "Medium"
-    HIGH = "High"
-
-
-class LAKESHORE336_PID_MODE(StrictEnum):
-    OFF = "Off"
-    CLOSED_LOOP_PID = "Closed Loop PID"
-    ZONE = "Zone"
-    OPEN_LOOP = "Open Loop"
-    MONITOR_OUT = "Monitor Out"
-    WARMUP_SUPPLY = "Warmup Supply"
-
-
-class LAKESHORE336_PID_INPUT_CHANNEL(StrictEnum):
-    NONE = "None"
-    INPUT_1 = "Input 1"
-    INPUT_2 = "Input 2"
-    INPUT_3 = "Input 3"
-    INPUT_4 = "Input 4"
-
-
-class LAKESHORE340_PID_INPUT_CHANNEL(StrictEnum):
-    INPUT_1 = "Loop 1"
-    INPUT_2 = "Loop 2"
 
 
 class LakeshoreTemperatureIO(Device):
