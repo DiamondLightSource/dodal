@@ -1,10 +1,7 @@
-from ophyd_async.core import StandardReadable, StrictEnum
+from ophyd_async.core import StandardReadable
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
-
-class InOut(StrictEnum):
-    IN = "In"
-    OUT = "Out"
+from dodal.common.enums import InOut
 
 
 class CryoStream(StandardReadable):
@@ -15,5 +12,4 @@ class CryoStream(StandardReadable):
         self.back_pressure_bar = epics_signal_r(
             float, f"{prefix}-EA-CSTRM-01:BACKPRESS"
         )
-
         super().__init__(name)

@@ -1,35 +1,27 @@
 from asyncio import sleep
 
 from bluesky.protocols import Movable
-from ophyd_async.core import AsyncStatus, StandardReadable, StrictEnum
+from ophyd_async.core import AsyncStatus, StandardReadable
 from ophyd_async.epics.core import epics_signal_rw
 
-
-class BacklightPower(StrictEnum):
-    ON = "On"
-    OFF = "Off"
+from dodal.common.enums import InOut, OnStateCaptilised
 
 
-class BacklightPosition(StrictEnum):
-    IN = "In"
-    OUT = "Out"
-
-
-class Backlight(StandardReadable, Movable[BacklightPosition]):
+class Backlight(StandardReadable, Movable[InOut]):
     """Simple device to trigger the pneumatic in/out."""
 
     TIME_TO_MOVE_S = 1.0  # Tested using a stopwatch on the beamline 09/2024
 
     def __init__(self, prefix: str, name: str = "") -> None:
         with self.add_children_as_readables():
-            self.power = epics_signal_rw(BacklightPower, prefix + "-EA-BLIT-01:TOGGLE")
-            self.position = epics_signal_rw(
-                BacklightPosition, prefix + "-EA-BL-01:CTRL"
+            self.power = epics_signal_rw(
+                OnStateCaptilised, prefix + "-EA-BLIT-01:TOGGLE"
             )
+            self.position = epics_signal_rw(InOut, prefix + "-EA-BL-01:CTRL")
         super().__init__(name)
 
     @AsyncStatus.wrap
-    async def set(self, value: BacklightPosition):
+    async def set(self, value: InOut):
         """This setter will turn the backlight on when we move it in to the beam and off
         when we move it out.
 
@@ -39,9 +31,9 @@ class Backlight(StandardReadable, Movable[BacklightPosition]):
         """
         old_position = await self.position.get_value()
         await self.position.set(value)
-        if value == BacklightPosition.OUT:
-            await self.power.set(BacklightPower.OFF)
+        if value == InOut.OUT:
+            await self.power.set(OnStateCaptilised.OFF)
         else:
-            await self.power.set(BacklightPower.ON)
+            await self.power.set(OnStateCaptilised.ON)
         if old_position != value:
             await sleep(self.TIME_TO_MOVE_S)

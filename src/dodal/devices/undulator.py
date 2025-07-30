@@ -7,12 +7,12 @@ from ophyd_async.core import (
     AsyncStatus,
     StandardReadable,
     StandardReadableFormat,
-    StrictEnum,
     soft_signal_r_and_setter,
 )
 from ophyd_async.epics.core import epics_signal_r
 from ophyd_async.epics.motor import Motor
 
+from dodal.common.enums import EnabledStateCaptilised
 from dodal.log import LOGGER
 
 from .util.lookup_tables import energy_distance_table
@@ -31,11 +31,6 @@ TEST_MODE = False
 # energy, when the latter is converted to mm using lookup tables
 UNDULATOR_DISCREPANCY_THRESHOLD_MM = 2e-3
 STATUS_TIMEOUT_S: float = 10.0
-
-
-class UndulatorGapAccess(StrictEnum):
-    ENABLED = "ENABLED"
-    DISABLED = "DISABLED"
 
 
 def _get_gap_for_energy(
@@ -73,7 +68,7 @@ class Undulator(StandardReadable, Movable[float]):
         with self.add_children_as_readables():
             self.gap_motor = Motor(prefix + "BLGAPMTR")
             self.current_gap = epics_signal_r(float, prefix + "CURRGAPD")
-            self.gap_access = epics_signal_r(UndulatorGapAccess, prefix + "IDBLENA")
+            self.gap_access = epics_signal_r(EnabledStateCaptilised, prefix + "IDBLENA")
 
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             self.gap_discrepancy_tolerance_mm, _ = soft_signal_r_and_setter(
@@ -110,7 +105,7 @@ class Undulator(StandardReadable, Movable[float]):
 
     async def raise_if_not_enabled(self):
         access_level = await self.gap_access.get_value()
-        if access_level is UndulatorGapAccess.DISABLED and not TEST_MODE:
+        if access_level is EnabledStateCaptilised.DISABLED and not TEST_MODE:
             raise AccessError("Undulator gap access is disabled. Contact Control Room")
 
     async def _set_undulator_gap(self, energy_kev: float) -> None:

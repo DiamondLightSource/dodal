@@ -7,20 +7,11 @@ from ophyd_async.core import (
     DeviceVector,
     StandardReadable,
     StandardReadableFormat,
-    StrictEnum,
     soft_signal_r_and_setter,
 )
 from ophyd_async.epics.core import epics_signal_r
 
-
-class FilterState(StrictEnum):
-    """
-    Note that the in/out here refers to the internal rocker
-    position so a PV value of IN implies a filter OUT of beam
-    """
-
-    IN_BEAM = "OUT"
-    OUT_BEAM = "IN"
+from dodal.common.enums import InOutCapitlised
 
 
 class FSwitch(StandardReadable):
@@ -50,7 +41,7 @@ class FSwitch(StandardReadable):
     ) -> None:
         self.filters = DeviceVector(
             {
-                i: epics_signal_r(FilterState, f"{prefix}FILTER-{i:03}:STATUS_RBV")
+                i: epics_signal_r(InOutCapitlised, f"{prefix}FILTER-{i:03}:STATUS_RBV")
                 for i in range(FSwitch.NUM_FILTERS)
             }
         )
@@ -91,7 +82,7 @@ class FSwitch(StandardReadable):
         result = await asyncio.gather(
             *(filter.get_value() for filter in self.filters.values())
         )
-        num_in = sum(r.value == FilterState.IN_BEAM for r in result)
+        num_in = sum(r.value == InOutCapitlised.IN for r in result)
         default_reading = await super().read()
         return {
             FSwitch.NUM_LENSES_FIELD_NAME: Reading(value=num_in, timestamp=time.time()),

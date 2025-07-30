@@ -7,10 +7,10 @@ from ophyd_async.testing import (
     set_mock_value,
 )
 
+from dodal.common.enums import EnabledStateCaptilised
 from dodal.devices.undulator import (
     AccessError,
     Undulator,
-    UndulatorGapAccess,
     _get_gap_for_energy,
 )
 from tests.constants import UNDULATOR_ID_GAP_LOOKUP_TABLE_PATH
@@ -34,7 +34,7 @@ async def test_reading_includes_read_fields(undulator: Undulator):
         undulator,
         {
             "undulator-gap_access": {
-                "value": UndulatorGapAccess.ENABLED,
+                "value": EnabledStateCaptilised.ENABLED,
             },
             "undulator-gap_motor": {
                 "value": 0.0,
@@ -110,6 +110,6 @@ def test_correct_closest_distance_to_energy_from_table(energy, expected_output):
 async def test_when_gap_access_is_disabled_set_then_error_is_raised(
     undulator,
 ):
-    set_mock_value(undulator.gap_access, UndulatorGapAccess.DISABLED)
+    set_mock_value(undulator.gap_access, EnabledStateCaptilised.DISABLED)
     with pytest.raises(AccessError):
         await undulator.set(5)
