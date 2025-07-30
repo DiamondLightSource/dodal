@@ -42,7 +42,7 @@ DISPLAY_CONFIG = "/dls_sw/i19-1/software/daq_configuration/domain/display.config
 
 # Needs to wait until enum is fixed on the beamline
 # See https://github.com/DiamondLightSource/dodal/issues/1150
-@device_factory(skip=True)
+@device_factory()
 def beamstop() -> BeamStop:
     """Get the i19-1 beamstop device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i19-1, it will return the existing object.
