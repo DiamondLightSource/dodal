@@ -1,15 +1,10 @@
 from dodal.common.beamlines.beamline_utils import device_factory
-from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.devices.common_mirror import XYZCollMirror, XYZPiezoCollMirror
 from dodal.devices.i05.enums import Grating
 from dodal.devices.pgm import PGM
-from dodal.log import set_beamline as set_log_beamline
-from dodal.utils import BeamlinePrefix, get_beamline_name
+from dodal.utils import BeamlinePrefix
 
-BL = get_beamline_name("i05-shared")
 PREFIX = BeamlinePrefix("i05", "I")
-set_log_beamline(BL)
-set_utils_beamline(BL)
 
 
 @device_factory()

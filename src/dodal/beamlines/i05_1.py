@@ -1,6 +1,6 @@
-from dodal.beamlines.i05_shared import m1 as i05_m1
-from dodal.beamlines.i05_shared import m3mj6 as i05_m3mj6
-from dodal.beamlines.i05_shared import pgm as i05_pgm
+from dodal.beamline_specific_utils.i05_shared import m1 as i05_m1
+from dodal.beamline_specific_utils.i05_shared import m3mj6 as i05_m3mj6
+from dodal.beamline_specific_utils.i05_shared import pgm as i05_pgm
 from dodal.common.beamlines.beamline_utils import device_factory
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.devices.common_mirror import XYZCollMirror, XYZPiezoCollMirror
