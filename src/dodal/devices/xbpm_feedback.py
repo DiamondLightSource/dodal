@@ -18,6 +18,7 @@ class XBPMFeedback(Device, Triggerable):
         self.pos_ok = epics_signal_r(float, prefix + "XBPM2POSITION_OK")
         self.pos_stable = epics_signal_r(float, prefix + "XBPM2_STABLE")
         self.pause_feedback = epics_signal_rw(Pause, prefix + "FB_PAUSE")
+        self.threshold_pc = epics_signal_rw(float, prefix + "THRESHOLDPC_XBPM2")
         super().__init__(name=name)
 
     @AsyncStatus.wrap
