@@ -10,6 +10,12 @@ class LakeshoreControlChannel(Device):
         heater_type: type[SignalDatatypeT],
         name: str = "",
     ):
+        """
+        Single control channel for a Lakeshore temperature controller.
+
+        Provides access to setpoint, ramp rate, ramp enable, heater output, heater output range,
+        PID parameters (P, I, D), and manual output for the channel.
+        """
         self.user_setpoint = epics_signal_rw(
             float, f"{prefix}SETP{suffix}", f"{prefix}SETP_S{suffix}"
         )
@@ -50,7 +56,11 @@ class LakeshoreBaseIO(Device):
         name: str = "",
         single_control_channel: bool = False,
     ):
-        """Base class for Lakeshore IO including setpoint ramp_ramp and heater."""
+        """Base class for Lakeshore temperature controller IO.
+
+        Provides access to control channels and readback channels for setpoint, ramp rate, heater output,
+        and PID parameters. Supports both single and multiple control channel configurations.
+        """
         if single_control_channel:
             self.control_channels = DeviceVector(
                 {
