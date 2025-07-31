@@ -231,6 +231,13 @@ class PressureJumpCellController(StandardReadable, Movable):
 
     @AsyncStatus.wrap
     async def set(self, value: int | PressureJumpParameters):
+        """
+        Sets the desired pressure waiting for the device to complete the operation.
+
+        If value is of type int, the pressure is set to the given fixed value.
+        If value is is of type PressureJumpParameters, a pressure jump is performed
+        given by its pressure_from and pressure_to.
+        """
         timeout = await self.timeout.get_value()
 
         if isinstance(value, int):
