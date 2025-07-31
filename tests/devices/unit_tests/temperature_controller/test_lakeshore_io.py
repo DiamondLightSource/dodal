@@ -26,8 +26,6 @@ async def test_lakeshoreIO_creation_success():
         "ramp_enable",
         "heater_output",
         "heater_output_range",
-    ]
-    pid_attribute = [
         "p",
         "i",
         "d",
@@ -46,12 +44,9 @@ async def test_lakeshoreIO_creation_success():
 
         for attr in control_attribute:
             assert attr in lakeshore.control_channels[i].__dict__["_child_devices"]
-        for attr in pid_attribute:
-            assert attr in lakeshore.pid_channels[i].__dict__["_child_devices"]
 
     assert len(lakeshore.control_channels) == no_channels
     assert len(lakeshore.readBack_channel) == no_channels
-    assert len(lakeshore.pid_channels) == no_channels
 
 
 async def test_lakeshoreIO_single_control_creation_success():
@@ -71,8 +66,6 @@ async def test_lakeshoreIO_single_control_creation_success():
         "ramp_enable",
         "heater_output",
         "heater_output_range",
-    ]
-    pid_attribute = [
         "p",
         "i",
         "d",
@@ -81,8 +74,6 @@ async def test_lakeshoreIO_single_control_creation_success():
 
     for attr in control_attribute:
         assert attr in lakeshore.control_channels[1].__dict__["_child_devices"]
-    for attr in pid_attribute:
-        assert attr in lakeshore.pid_channels[1].__dict__["_child_devices"]
 
     assert (
         lakeshore.control_channels[1].user_setpoint.source.split("ca://")[-1]
@@ -95,4 +86,3 @@ async def test_lakeshoreIO_single_control_creation_success():
         )
     assert len(lakeshore.control_channels) == 1
     assert len(lakeshore.readBack_channel) == no_channels
-    assert len(lakeshore.pid_channels) == 1

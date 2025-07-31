@@ -24,16 +24,6 @@ class LakeshoreControlChannel(Device):
             heater_type, f"{prefix}RANGE{suffix}", f"{prefix}RANGE_S{suffix}"
         )
 
-        super().__init__(name=name)
-
-
-class LakeshorePIDChannel(Device):
-    def __init__(
-        self,
-        prefix: str,
-        suffix: str,
-        name: str = "",
-    ):
         self.p = epics_signal_rw(
             float, read_pv=f"{prefix}P{suffix}", write_pv="{prefix}P_S{suffix}"
         )
@@ -48,7 +38,7 @@ class LakeshorePIDChannel(Device):
             float, read_pv=f"{prefix}MOUT{suffix}", write_pv="{prefix}MOUT_S{suffix}"
         )
 
-        super().__init__(name)
+        super().__init__(name=name)
 
 
 class LakeshoreBaseIO(Device):
@@ -69,22 +59,12 @@ class LakeshoreBaseIO(Device):
                     )
                 }
             )
-            self.pid_channels = DeviceVector(
-                {1: LakeshorePIDChannel(prefix=prefix, suffix="")}
-            )
         else:
             self.control_channels = DeviceVector(
                 {
                     i: LakeshoreControlChannel(
                         prefix=prefix, suffix=str(i), heater_type=heater_setting
                     )
-                    for i in range(1, no_channels + 1)
-                }
-            )
-
-            self.pid_channels = DeviceVector(
-                {
-                    i: LakeshorePIDChannel(prefix=prefix, suffix=str(i))
                     for i in range(1, no_channels + 1)
                 }
             )
