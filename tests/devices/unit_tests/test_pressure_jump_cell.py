@@ -1,13 +1,16 @@
 import asyncio
+from unittest.mock import ANY
 
 import pytest
 from ophyd_async.core import init_devices
 from ophyd_async.testing import assert_reading, set_mock_value
 
 from dodal.devices.pressure_jump_cell import (
+    OPENSEQ_PULSE_LENGTH,
     FastValveControlRequest,
     FastValveState,
     PressureJumpCell,
+    PressureJumpParameters,
     PumpMotorDirectionState,
     ValveControlRequest,
     ValveOpenSeqRequest,
@@ -59,10 +62,10 @@ async def test_reading_pjumpcell_includes_config_fields_valves(
     cell: PressureJumpCell,
 ):
     set_mock_value(
-        cell.all_valves_control.valve_control[1].close, ValveControlRequest.CLOSE
+        cell.all_valves_control.valve_control[1].control, ValveControlRequest.CLOSE
     )
     set_mock_value(
-        cell.all_valves_control.valve_control[3].close, ValveControlRequest.OPEN
+        cell.all_valves_control.valve_control[3].control, ValveControlRequest.OPEN
     )
     set_mock_value(
         cell.all_valves_control.valve_control[1].open,
@@ -74,18 +77,18 @@ async def test_reading_pjumpcell_includes_config_fields_valves(
     )
 
     set_mock_value(
-        cell.all_valves_control.fast_valve_control[5].close,
+        cell.all_valves_control.valve_control[5].control,
         FastValveControlRequest.DISARM,
     )
     set_mock_value(
-        cell.all_valves_control.fast_valve_control[6].close, FastValveControlRequest.ARM
+        cell.all_valves_control.valve_control[6].control, FastValveControlRequest.ARM
     )
     set_mock_value(
-        cell.all_valves_control.fast_valve_control[5].open,
+        cell.all_valves_control.valve_control[5].open,
         ValveOpenSeqRequest.INACTIVE.value,
     )
     set_mock_value(
-        cell.all_valves_control.fast_valve_control[6].open,
+        cell.all_valves_control.valve_control[6].open,
         ValveOpenSeqRequest.OPEN_SEQ.value,
     )
 
@@ -95,7 +98,7 @@ async def test_reading_pjumpcell_includes_config_fields_valves(
             "pjump-all_valves_control-valve_control-1-open": {
                 "value": int(ValveOpenSeqRequest.INACTIVE.value),
             },
-            "pjump-all_valves_control-valve_control-1-close": {
+            "pjump-all_valves_control-valve_control-1-control": {
                 "value": ValveControlRequest.CLOSE,
             },
         },
@@ -107,7 +110,7 @@ async def test_pjumpcell_set_valve_sets_valve_fields(
 ):
     # Set some initial values
     set_mock_value(
-        cell.all_valves_control.valve_control[1].close, ValveControlRequest.RESET
+        cell.all_valves_control.valve_control[1].control, ValveControlRequest.RESET
     )
     set_mock_value(
         cell.all_valves_control.valve_control[1].open,
@@ -115,48 +118,58 @@ async def test_pjumpcell_set_valve_sets_valve_fields(
     )
 
     set_mock_value(
-        cell.all_valves_control.fast_valve_control[6].close,
+        cell.all_valves_control.valve_control[6].control,
         FastValveControlRequest.RESET,
     )
 
     set_mock_value(
-        cell.all_valves_control.fast_valve_control[6].open,
+        cell.all_valves_control.valve_control[6].open,
         ValveOpenSeqRequest.INACTIVE.value,
     )
 
     # Set new values
+    await cell.all_valves_control.valve_control[1].set(ValveControlRequest.CLOSE)
+    await cell.all_valves_control.fast_valve_control[6].set(FastValveControlRequest.ARM)
 
-    await cell.all_valves_control.set_valve(1, ValveControlRequest.CLOSE)
-    await cell.all_valves_control.set_valve(6, FastValveControlRequest.ARM)
-
-    await asyncio.gather(
-        cell.all_valves_control.set_valve(1, ValveControlRequest.OPEN),
-        cell.all_valves_control.set_valve(6, FastValveControlRequest.OPEN),
-        # Check valves requested to open are set to OPEN_SEQ on initially calling
-        # set_valve()
-        assert_reading(
-            cell.all_valves_control.valve_control[1],
-            {
-                "pjump-all_valves_control-valve_control-1-open": {
-                    "value": int(ValveOpenSeqRequest.OPEN_SEQ.value),
-                },
-                "pjump-all_valves_control-valve_control-1-close": {
-                    "value": ValveControlRequest.CLOSE,
-                },
-            },
-        ),
-        assert_reading(
-            cell.all_valves_control.fast_valve_control[6],
-            {
-                "pjump-all_valves_control-fast_valve_control-6-open": {
-                    "value": int(ValveOpenSeqRequest.OPEN_SEQ.value),
-                },
-                "pjump-all_valves_control-fast_valve_control-6-close": {
-                    "value": FastValveControlRequest.ARM,
-                },
-            },
-        ),
+    opening_status = asyncio.gather(
+        cell.all_valves_control.valve_control[1].set(ValveControlRequest.OPEN),
+        cell.all_valves_control.fast_valve_control[6].set(FastValveControlRequest.OPEN),
     )
+
+    # During openseq pulse
+    await asyncio.sleep(OPENSEQ_PULSE_LENGTH / 2)
+
+    # Check valves requested to open are set to OPEN_SEQ after calling set_valve()
+    await assert_reading(
+        cell.all_valves_control.valve_control[1],
+        {
+            "pjump-all_valves_control-valve_control-1-open": {
+                "value": int(ValveOpenSeqRequest.OPEN_SEQ.value),
+            },
+            "pjump-all_valves_control-valve_control-1-control": {
+                "value": ValveControlRequest.CLOSE,
+                "timestamp": ANY,
+                "alarm_severity": 0,
+            },
+        },
+    )
+    await assert_reading(
+        cell.all_valves_control.valve_control[6],
+        {
+            "pjump-all_valves_control-valve_control-6-open": {
+                "value": int(ValveOpenSeqRequest.OPEN_SEQ.value),
+                "timestamp": ANY,
+                "alarm_severity": 0,
+            },
+            "pjump-all_valves_control-valve_control-6-control": {
+                "value": FastValveControlRequest.ARM,
+                "timestamp": ANY,
+                "alarm_severity": 0,
+            },
+        },
+    )
+    # After openseq pulse
+    await opening_status
 
     # Check slow valves have been set to the new value and valves requested to open are
     # set to INACTIVE after set_valve() completes
@@ -166,7 +179,7 @@ async def test_pjumpcell_set_valve_sets_valve_fields(
             "pjump-all_valves_control-valve_control-1-open": {
                 "value": int(ValveOpenSeqRequest.INACTIVE.value),
             },
-            "pjump-all_valves_control-valve_control-1-close": {
+            "pjump-all_valves_control-valve_control-1-control": {
                 "value": ValveControlRequest.CLOSE,
             },
         },
@@ -175,13 +188,65 @@ async def test_pjumpcell_set_valve_sets_valve_fields(
     # Check fast valves have been set to the new value and valves requested to open are
     # set to INACTIVE after set_valve() completes
     await assert_reading(
-        cell.all_valves_control.fast_valve_control[6],
+        cell.all_valves_control.valve_control[6],
         {
-            "pjump-all_valves_control-fast_valve_control-6-close": {
-                "value": FastValveControlRequest.ARM,
-            },
-            "pjump-all_valves_control-fast_valve_control-6-open": {
+            "pjump-all_valves_control-valve_control-6-open": {
                 "value": int(ValveOpenSeqRequest.INACTIVE.value),
+                "timestamp": ANY,
+                "alarm_severity": 0,
+            },
+            "pjump-all_valves_control-valve_control-6-control": {
+                "value": FastValveControlRequest.ARM,
+                "timestamp": ANY,
+                "alarm_severity": 0,
+            },
+        },
+    )
+
+
+@pytest.mark.parametrize(
+    "valve_request,expected",
+    [
+        (ValveControlRequest.CLOSE, FastValveControlRequest.CLOSE),
+        (ValveControlRequest.RESET, FastValveControlRequest.RESET),
+        (ValveControlRequest.OPEN, FastValveControlRequest.ARM),  # Unchanged as openseq
+    ],
+)
+async def test_pjumpcell_set_valve_sets_control_request_for_all_valve_types(
+    cell: PressureJumpCell,
+    valve_request: ValveControlRequest,
+    expected: FastValveControlRequest,
+):
+    # Set some initial values
+    set_mock_value(
+        cell.all_valves_control.valve_control[5].control,
+        FastValveControlRequest.ARM.value,
+    )
+
+    set_mock_value(
+        cell.all_valves_control.valve_control[5].open,
+        ValveOpenSeqRequest.INACTIVE.value,
+    )
+
+    # Set new values
+    await asyncio.gather(
+        cell.all_valves_control.valve_control[5].set(valve_request),
+    )
+
+    # Check the fast valve value has been set to the equivalent FastValveControlRequest
+    # value
+    await assert_reading(
+        cell.all_valves_control.valve_control[5],
+        {
+            "pjump-all_valves_control-valve_control-5-open": {
+                "value": int(ValveOpenSeqRequest.INACTIVE.value),
+                "timestamp": ANY,
+                "alarm_severity": 0,
+            },
+            "pjump-all_valves_control-valve_control-5-control": {
+                "value": expected,
+                "timestamp": ANY,
+                "alarm_severity": 0,
             },
         },
     )
@@ -297,3 +362,312 @@ async def test_reading_pjumpcell_includes_read_fields(
             },
         },
     )
+
+
+async def test_setting_all_pressure_cell_valves(
+    cell: PressureJumpCell,
+):
+    # Set some initial values
+    set_mock_value(
+        cell.all_valves_control.valve_control[1].control, ValveControlRequest.RESET
+    )
+    set_mock_value(
+        cell.all_valves_control.valve_control[1].open,
+        ValveOpenSeqRequest.INACTIVE.value,
+    )
+
+    set_mock_value(
+        cell.all_valves_control.valve_control[3].control, ValveControlRequest.RESET
+    )
+    set_mock_value(
+        cell.all_valves_control.valve_control[3].open,
+        ValveOpenSeqRequest.INACTIVE.value,
+    )
+
+    set_mock_value(
+        cell.all_valves_control.valve_control[5].control,
+        FastValveControlRequest.RESET,
+    )
+
+    set_mock_value(
+        cell.all_valves_control.valve_control[5].open,
+        ValveOpenSeqRequest.INACTIVE.value,
+    )
+
+    set_mock_value(
+        cell.all_valves_control.valve_control[6].control,
+        FastValveControlRequest.RESET,
+    )
+
+    set_mock_value(
+        cell.all_valves_control.valve_control[6].open,
+        ValveOpenSeqRequest.INACTIVE.value,
+    )
+
+    # Set new values
+    for valve in cell.all_valves_control.valve_control.values():
+        await valve.set(ValveControlRequest.CLOSE)
+
+    # Check valves have been set to the new values
+    await assert_reading(
+        cell.all_valves_control.valve_control[1],
+        {
+            "pjump-all_valves_control-valve_control-1-open": {
+                "value": int(ValveOpenSeqRequest.INACTIVE.value),
+                "timestamp": ANY,
+                "alarm_severity": 0,
+            },
+            "pjump-all_valves_control-valve_control-1-control": {
+                "value": ValveControlRequest.CLOSE,
+                "timestamp": ANY,
+                "alarm_severity": 0,
+            },
+        },
+    )
+
+    await assert_reading(
+        cell.all_valves_control.valve_control[3],
+        {
+            "pjump-all_valves_control-valve_control-3-open": {
+                "value": int(ValveOpenSeqRequest.INACTIVE.value),
+                "timestamp": ANY,
+                "alarm_severity": 0,
+            },
+            "pjump-all_valves_control-valve_control-3-control": {
+                "value": ValveControlRequest.CLOSE,
+                "timestamp": ANY,
+                "alarm_severity": 0,
+            },
+        },
+    )
+
+    await assert_reading(
+        cell.all_valves_control.valve_control[5],
+        {
+            "pjump-all_valves_control-valve_control-5-open": {
+                "value": int(ValveOpenSeqRequest.INACTIVE.value),
+                "timestamp": ANY,
+                "alarm_severity": 0,
+            },
+            "pjump-all_valves_control-valve_control-5-control": {
+                "value": FastValveControlRequest.CLOSE,
+                "timestamp": ANY,
+                "alarm_severity": 0,
+            },
+        },
+    )
+
+    await assert_reading(
+        cell.all_valves_control.valve_control[6],
+        {
+            "pjump-all_valves_control-valve_control-6-open": {
+                "value": int(ValveOpenSeqRequest.INACTIVE.value),
+                "timestamp": ANY,
+                "alarm_severity": 0,
+            },
+            "pjump-all_valves_control-valve_control-6-control": {
+                "value": FastValveControlRequest.CLOSE,
+                "timestamp": ANY,
+                "alarm_severity": 0,
+            },
+        },
+    )
+
+
+async def test_reading_pjumpcell_includes_fields_control(
+    cell: PressureJumpCell,
+):
+    set_mock_value(cell.control.go, False)
+    set_mock_value(cell.control.stop, False)
+    set_mock_value(cell.control.busy, False)
+    set_mock_value(cell.control.target_pressure, 0)
+    set_mock_value(cell.control.timeout, 0.0)
+    set_mock_value(cell.control.result, "SP_SUCCESS")
+
+    await assert_reading(
+        cell.control,
+        {
+            "pjump-control-busy": {
+                "value": False,
+            },
+            "pjump-control-go": {
+                "value": False,
+            },
+            "pjump-control-result": {
+                "value": "SP_SUCCESS",
+            },
+            "pjump-control-target_pressure": {
+                "value": 0,
+            },
+            "pjump-control-timeout": {
+                "value": 0.0,
+            },
+            "pjump-control-stop": {
+                "value": False,
+            },
+            "pjump-control-from_pressure": {
+                "value": ANY,
+            },
+            "pjump-control-to_pressure": {
+                "value": ANY,
+            },
+            "pjump-control-set_jump": {
+                "value": ANY,
+            },
+        },
+    )
+
+
+async def test_reading_pjumpcell_includes_fields_control_jump(
+    cell: PressureJumpCell,
+):
+    set_mock_value(cell.control.set_jump, False)
+    set_mock_value(cell.control.stop, False)
+    set_mock_value(cell.control.busy, False)
+    set_mock_value(cell.control.from_pressure, 0)
+    set_mock_value(cell.control.to_pressure, 0)
+    set_mock_value(cell.control.timeout, 0.0)
+    set_mock_value(cell.control.result, "SP_SUCCESS")
+
+    await assert_reading(
+        cell.control,
+        {
+            "pjump-control-busy": {
+                "value": False,
+            },
+            "pjump-control-go": {
+                "value": False,
+            },
+            "pjump-control-result": {
+                "value": "SP_SUCCESS",
+            },
+            "pjump-control-target_pressure": {
+                "value": ANY,
+            },
+            "pjump-control-timeout": {
+                "value": 0.0,
+            },
+            "pjump-control-stop": {
+                "value": False,
+            },
+            "pjump-control-from_pressure": {
+                "value": 0.0,
+            },
+            "pjump-control-to_pressure": {
+                "value": 0.0,
+            },
+            "pjump-control-set_jump": {
+                "value": ANY,
+            },
+        },
+    )
+
+
+async def test_pjumpcell_toplevel_pressure_control(
+    cell: PressureJumpCell,
+):
+    TARGET_PRESSURE = 250
+    set_mock_value(cell.control.go, False)
+    set_mock_value(cell.control.stop, False)
+    set_mock_value(cell.control.busy, False)
+    set_mock_value(cell.control.target_pressure, 0)
+    set_mock_value(cell.control.timeout, 1)
+    set_mock_value(cell.control.result, "SP_SUCCESS")
+
+    await cell.control.set(TARGET_PRESSURE)
+
+    await assert_reading(
+        cell.control,
+        {
+            "pjump-control-busy": {
+                "value": False,
+            },
+            "pjump-control-go": {
+                "value": True,
+            },
+            "pjump-control-result": {
+                "value": "SP_SUCCESS",
+            },
+            "pjump-control-target_pressure": {
+                "value": TARGET_PRESSURE,
+            },
+            "pjump-control-timeout": {
+                "value": ANY,
+            },
+            "pjump-control-stop": {
+                "value": False,
+            },
+            "pjump-control-from_pressure": {
+                "value": ANY,
+            },
+            "pjump-control-to_pressure": {
+                "value": ANY,
+            },
+            "pjump-control-set_jump": {
+                "value": ANY,
+            },
+        },
+    )
+
+
+async def test_pjumpcell_toplevel_pressure_jump_control(
+    cell: PressureJumpCell,
+):
+    TARGET_JUMP = PressureJumpParameters(500, 1000)
+    set_mock_value(cell.control.go, False)
+    set_mock_value(cell.control.stop, False)
+    set_mock_value(cell.control.busy, False)
+    set_mock_value(cell.control.target_pressure, 0)
+    set_mock_value(cell.control.timeout, 1)
+    set_mock_value(cell.control.result, "SP_SUCCESS")
+
+    await cell.control.set(TARGET_JUMP)
+
+    await assert_reading(
+        cell.control,
+        {
+            "pjump-control-busy": {
+                "value": False,
+            },
+            "pjump-control-set_jump": {
+                "value": True,
+            },
+            "pjump-control-result": {
+                "value": "SP_SUCCESS",
+            },
+            "pjump-control-timeout": {
+                "value": ANY,
+            },
+            "pjump-control-stop": {
+                "value": False,
+            },
+            "pjump-control-from_pressure": {
+                "value": TARGET_JUMP.pressure_from,
+            },
+            "pjump-control-to_pressure": {
+                "value": TARGET_JUMP.pressure_to,
+            },
+            "pjump-control-go": {
+                "value": False,
+            },
+            "pjump-control-target_pressure": {
+                "value": ANY,
+            },
+        },
+    )
+
+
+async def test_pjumpcell_toplevel_pressure_control_waits_on_busy(
+    cell: PressureJumpCell,
+):
+    TARGET_JUMP = PressureJumpParameters(500, 1000)
+    set_mock_value(cell.control.go, False)
+    set_mock_value(cell.control.stop, False)
+    set_mock_value(cell.control.busy, True)
+    set_mock_value(cell.control.target_pressure, 0)
+    set_mock_value(cell.control.timeout, 1)
+    set_mock_value(cell.control.result, "SP_SUCCESS")
+
+    with pytest.raises(TimeoutError):
+        async with asyncio.timeout(0.05):
+            await cell.control.set(TARGET_JUMP)
