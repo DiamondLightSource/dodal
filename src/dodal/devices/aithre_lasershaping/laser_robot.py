@@ -1,14 +1,14 @@
 from ophyd_async.core import StrictEnum
 from ophyd_async.epics.core import epics_signal_rw
 
-from dodal.common.enums import EnabledState
+from dodal.common.enums import EnabledState, OnState
 from dodal.devices.robot import BartRobot
 
 
 class ForceBit(StrictEnum):
-    ON = "On"
+    ON = OnState.ON
     NO = "No"
-    OFF = "Off"
+    OFF = OnState.OFF
 
 
 class LaserRobot(BartRobot):

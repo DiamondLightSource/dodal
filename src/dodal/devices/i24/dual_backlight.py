@@ -1,12 +1,12 @@
 from ophyd_async.core import AsyncStatus, StandardReadable, StrictEnum
 from ophyd_async.epics.core import epics_signal_rw
 
-from dodal.common.enums import OnStateCapitalised
+from dodal.common.enums import InOut, OnStateCapitalised
 
 
 class BacklightPositions(StrictEnum):
-    OUT = "Out"
-    IN = "In"
+    OUT = InOut.OUT
+    IN = InOut.IN
     LOAD_CHECK = "LoadCheck"
     OAV2 = "OAV2"
     DIODE = "Diode"
