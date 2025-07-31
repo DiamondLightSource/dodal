@@ -1,5 +1,6 @@
 import importlib
 import os
+from collections.abc import AsyncGenerator
 from pathlib import Path
 from types import ModuleType
 from unittest.mock import patch
@@ -68,7 +69,7 @@ def eiger_params(tmp_path: Path) -> DetectorParams:
 
 
 @pytest.fixture
-async def baton_in_commissioning_mode() -> Baton:
+async def baton_in_commissioning_mode() -> AsyncGenerator[Baton]:
     async with init_devices(mock=True):
         baton = Baton("BATON-01")
     set_commissioning_signal(baton.commissioning)
