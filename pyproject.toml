@@ -14,8 +14,7 @@ description = "Ophyd devices and other utils that could be used across DLS beaml
 dependencies = [
     "click",
     "ophyd",
-    "ophyd-async>=0.12.3",
-    "epicscorelibs<=7.0.7.99.1.2a1", # Pending https://github.com/epics-base/epicscorelibs/issues/41
+    "ophyd-async[ca,pva]>=0.12.3",
     "bluesky",
     "pyepics",
     "dataclasses-json",
@@ -25,8 +24,6 @@ dependencies = [
     "graypy",
     "pydantic>=2.0",
     "opencv-python-headless",        # For pin-tip detection.
-    "aioca",                         # Required for CA support with ophyd-async.
-    "p4p",                           # Required for PVA support with ophyd-async.
     "numpy",
     "aiofiles",
     "aiohttp",
