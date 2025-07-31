@@ -40,6 +40,7 @@ and you need to be on the beamline network to access them.
 The simplest way to do this is to `ssh i20-1-ws001` and run dodal connect i20_1 from there.
 """
 
+
 @device_factory()
 def turbo_slit() -> TurboSlit:
     """
@@ -47,6 +48,7 @@ def turbo_slit() -> TurboSlit:
     """
 
     return TurboSlit(f"{PREFIX.beamline_prefix}-OP-PCHRO-01:TS:")
+
 
 @device_factory()
 def turbo_slit_x() -> Motor:
@@ -59,7 +61,8 @@ def turbo_slit_x() -> Motor:
 @device_factory()
 def panda() -> HDFPanda:
     return HDFPanda(
-        f"{PREFIX.beamline_prefix}-EA-PANDA-02:", path_provider=get_path_provider())
+        f"{PREFIX.beamline_prefix}-EA-PANDA-02:", path_provider=get_path_provider()
+    )
 
 
 # Use mock device until motors are reconnected on the beamline
