@@ -10,7 +10,7 @@ from dodal.common.beamlines.beamline_utils import (
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.beamlines.device_helpers import HDF5_SUFFIX
-from dodal.common.enums import InOut
+from dodal.common.enums import InState
 from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitPathProvider
 from dodal.devices.motors import SixAxisGonio
 from dodal.devices.oav.pin_image_recognition import PinTipDetection
@@ -46,8 +46,8 @@ I23_ZEBRA_MAPPING = ZebraMapping(
 
 
 class I23DetectorPositions(StrictEnum):
-    IN = InOut.IN
-    OUT = InOut.OUT
+    IN = InState.IN
+    OUT = InState.OUT
     SAMPLE_CHANGE = "sample change"
 
 

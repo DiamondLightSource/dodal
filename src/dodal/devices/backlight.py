@@ -4,10 +4,10 @@ from bluesky.protocols import Movable
 from ophyd_async.core import AsyncStatus, StandardReadable
 from ophyd_async.epics.core import epics_signal_rw
 
-from dodal.common.enums import InOut, OnState
+from dodal.common.enums import InState, OnState
 
 
-class Backlight(StandardReadable, Movable[InOut]):
+class Backlight(StandardReadable, Movable[InState]):
     """Simple device to trigger the pneumatic in/out."""
 
     TIME_TO_MOVE_S = 1.0  # Tested using a stopwatch on the beamline 09/2024
@@ -15,11 +15,11 @@ class Backlight(StandardReadable, Movable[InOut]):
     def __init__(self, prefix: str, name: str = "") -> None:
         with self.add_children_as_readables():
             self.power = epics_signal_rw(OnState, prefix + "-EA-BLIT-01:TOGGLE")
-            self.position = epics_signal_rw(InOut, prefix + "-EA-BL-01:CTRL")
+            self.position = epics_signal_rw(InState, prefix + "-EA-BL-01:CTRL")
         super().__init__(name)
 
     @AsyncStatus.wrap
-    async def set(self, value: InOut):
+    async def set(self, value: InState):
         """This setter will turn the backlight on when we move it in to the beam and off
         when we move it out.
 
@@ -29,7 +29,7 @@ class Backlight(StandardReadable, Movable[InOut]):
         """
         old_position = await self.position.get_value()
         await self.position.set(value)
-        if value == InOut.OUT:
+        if value == InState.OUT:
             await self.power.set(OnState.OFF)
         else:
             await self.power.set(OnState.ON)

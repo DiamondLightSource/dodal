@@ -3,7 +3,7 @@ from ophyd_async.core import StrictEnum
 
 class OnState(StrictEnum):
     ON = "On"
-    OFF = "OFF"
+    OFF = "Off"
 
 
 class OnStateCapitalised(StrictEnum):
@@ -21,11 +21,11 @@ class EnabledStateCapitalised(StrictEnum):
     DISABLED = "DISABLED"
 
 
-class InOut(StrictEnum):
+class InState(StrictEnum):
     IN = "In"
     OUT = "Out"
 
 
-class InOutCapitalised(StrictEnum):
+class InStateCapitalised(StrictEnum):
     IN = "IN"
     OUT = "OUT"
