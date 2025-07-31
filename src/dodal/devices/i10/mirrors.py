@@ -1,6 +1,6 @@
 from ophyd_async.epics.core import epics_signal_rw
 
-from dodal.devices.common_mirror import BaseMirror
+from dodal.devices.collimating_mirror import BaseMirror
 
 
 class PiezoMirror(BaseMirror):
