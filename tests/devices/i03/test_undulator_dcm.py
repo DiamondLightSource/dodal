@@ -100,9 +100,11 @@ async def test_if_gap_is_wrong_then_logger_info_is_called_and_gap_is_set_correct
 
 @patch("dodal.devices.util.lookup_tables.loadtxt")
 @patch("dodal.devices.undulator.LOGGER")
-@patch("dodal.devices.undulator.TEST_MODE", True)
-async def test_when_gap_access_is_not_checked_if_test_mode_enabled(
-    mock_logger: MagicMock, mock_load: MagicMock, fake_undulator_dcm: UndulatorDCM
+async def test_when_gap_access_is_not_checked_if_commissioning_mode_enabled(
+    mock_logger: MagicMock,
+    mock_load: MagicMock,
+    fake_undulator_dcm: UndulatorDCM,
+    baton_in_commissioning_mode,
 ):
     set_mock_value(
         fake_undulator_dcm.undulator_ref().gap_access, EnabledDisabledUpper.DISABLED
