@@ -104,8 +104,8 @@ class Undulator(StandardReadable, Movable[float]):
 
     async def raise_if_not_enabled(self):
         access_level = await self.gap_access.get_value()
-        test_mode = await is_commissioning_mode_enabled()
-        if access_level is EnabledDisabledUpper.DISABLED and not test_mode:
+        commissioning_mode = await is_commissioning_mode_enabled()
+        if access_level is EnabledDisabledUpper.DISABLED and not commissioning_mode:
             raise AccessError("Undulator gap access is disabled. Contact Control Room")
 
     async def _set_undulator_gap(self, energy_kev: float) -> None:
@@ -124,10 +124,10 @@ class Undulator(StandardReadable, Movable[float]):
                 f"Undulator gap mismatch. {difference:.3f}mm is outside tolerance.\
                 Moving gap to nominal value, {target_gap:.3f}mm"
             )
-            test_mode = await is_commissioning_mode_enabled()
-            if not test_mode:
+            commissioning_mode = await is_commissioning_mode_enabled()
+            if not commissioning_mode:
                 # Only move if the gap is sufficiently different to the value from the
-                # DCM lookup table AND we're not in TEST_MODE
+                # DCM lookup table AND we're not in commissioning mode
                 await self.gap_motor.set(
                     target_gap,
                     timeout=STATUS_TIMEOUT_S,

@@ -1,14 +1,18 @@
+from unittest.mock import AsyncMock, patch
+
 import numpy as np
 import pytest
 from ophyd_async.core import init_devices
 from ophyd_async.testing import (
     assert_configuration,
     assert_reading,
+    get_mock_put,
     partial_reading,
     set_mock_value,
 )
 
 from dodal.common.enums import EnabledDisabledUpper
+from dodal.devices.baton import Baton
 from dodal.devices.undulator import (
     AccessError,
     Undulator,
@@ -98,3 +102,32 @@ async def test_when_gap_access_is_disabled_set_then_error_is_raised(
     set_mock_value(undulator.gap_access, EnabledDisabledUpper.DISABLED)
     with pytest.raises(AccessError):
         await undulator.set(5)
+
+
+@patch(
+    "dodal.devices.undulator.energy_distance_table",
+    AsyncMock(return_value=np.array([[0, 10], [10, 20]])),
+)
+async def test_gap_access_check_disabled_and_move_inhibited_when_commissioning_mode_enabled(
+    undulator: Undulator, baton_in_commissioning_mode: Baton
+):
+    set_mock_value(undulator.gap_access, UndulatorGapAccess.DISABLED)
+    await undulator.set(5)
+
+    get_mock_put(undulator.gap_motor.user_setpoint).assert_not_called()
+
+
+@patch(
+    "dodal.devices.undulator.energy_distance_table",
+    AsyncMock(return_value=np.array([[0, 10], [10000, 20]])),
+)
+async def test_gap_access_check_move_inhibited_when_commissioning_mode_enabled(
+    undulator: Undulator, baton_in_commissioning_mode: Baton
+):
+    set_mock_value(baton_in_commissioning_mode.commissioning, False)
+    set_mock_value(undulator.gap_access, UndulatorGapAccess.ENABLED)
+    await undulator.set(5)
+
+    get_mock_put(undulator.gap_motor.user_setpoint).assert_called_once_with(
+        15.0, wait=True
+    )
