@@ -9,6 +9,7 @@ from dodal.devices.pressure_jump_cell import (
     FastValveControlRequest,
     FastValveState,
     PressureJumpCell,
+    PressureJumpParameters,
     PumpMotorDirectionState,
     ValveControlRequest,
     ValveOpenSeqRequest,
@@ -466,8 +467,8 @@ async def test_reading_pjumpcell_includes_fields_control_jump(
     set_mock_value(cell.control.set_jump, False)
     set_mock_value(cell.control.stop, False)
     set_mock_value(cell.control.busy, False)
-    set_mock_value(cell.control.from_pressure, 0.0)
-    set_mock_value(cell.control.to_pressure, 0.0)
+    set_mock_value(cell.control.from_pressure, 0)
+    set_mock_value(cell.control.to_pressure, 0)
     set_mock_value(cell.control.timeout, 0.0)
     set_mock_value(cell.control.result, "SP_SUCCESS")
 
@@ -503,3 +504,113 @@ async def test_reading_pjumpcell_includes_fields_control_jump(
             },
         },
     )
+
+
+async def test_pjumpcell_toplevel_pressure_control(
+    cell: PressureJumpCell,
+):
+    TARGET_PRESSURE = 250
+    set_mock_value(cell.control.go, False)
+    set_mock_value(cell.control.stop, False)
+    set_mock_value(cell.control.busy, False)
+    set_mock_value(cell.control.target_pressure, 0)
+    set_mock_value(cell.control.timeout, 1)
+    set_mock_value(cell.control.result, "SP_SUCCESS")
+
+    await cell.control.set(TARGET_PRESSURE)
+
+    await assert_reading(
+        cell.control,
+        {
+            "pjump-control-busy": {
+                "value": False,
+            },
+            "pjump-control-go": {
+                "value": True,
+            },
+            "pjump-control-result": {
+                "value": "SP_SUCCESS",
+            },
+            "pjump-control-target_pressure": {
+                "value": TARGET_PRESSURE,
+            },
+            "pjump-control-timeout": {
+                "value": ANY,
+            },
+            "pjump-control-stop": {
+                "value": False,
+            },
+            "pjump-control-from_pressure": {
+                "value": ANY,
+            },
+            "pjump-control-to_pressure": {
+                "value": ANY,
+            },
+            "pjump-control-set_jump": {
+                "value": ANY,
+            },
+        },
+    )
+
+
+async def test_pjumpcell_toplevel_pressure_jump_control(
+    cell: PressureJumpCell,
+):
+    TARGET_JUMP = PressureJumpParameters(500, 1000)
+    set_mock_value(cell.control.go, False)
+    set_mock_value(cell.control.stop, False)
+    set_mock_value(cell.control.busy, False)
+    set_mock_value(cell.control.target_pressure, 0)
+    set_mock_value(cell.control.timeout, 1)
+    set_mock_value(cell.control.result, "SP_SUCCESS")
+
+    await cell.control.set(TARGET_JUMP)
+
+    await assert_reading(
+        cell.control,
+        {
+            "pjump-control-busy": {
+                "value": False,
+            },
+            "pjump-control-set_jump": {
+                "value": True,
+            },
+            "pjump-control-result": {
+                "value": "SP_SUCCESS",
+            },
+            "pjump-control-timeout": {
+                "value": ANY,
+            },
+            "pjump-control-stop": {
+                "value": False,
+            },
+            "pjump-control-from_pressure": {
+                "value": TARGET_JUMP.pressure_from,
+            },
+            "pjump-control-to_pressure": {
+                "value": TARGET_JUMP.pressure_to,
+            },
+            "pjump-control-go": {
+                "value": False,
+            },
+            "pjump-control-target_pressure": {
+                "value": ANY,
+            },
+        },
+    )
+
+
+async def test_pjumpcell_toplevel_pressure_control_waits_on_busy(
+    cell: PressureJumpCell,
+):
+    TARGET_JUMP = PressureJumpParameters(500, 1000)
+    set_mock_value(cell.control.go, False)
+    set_mock_value(cell.control.stop, False)
+    set_mock_value(cell.control.busy, True)
+    set_mock_value(cell.control.target_pressure, 0)
+    set_mock_value(cell.control.timeout, 1)
+    set_mock_value(cell.control.result, "SP_SUCCESS")
+
+    with pytest.raises(TimeoutError):
+        async with asyncio.timeout(0.05):
+            await cell.control.set(TARGET_JUMP)

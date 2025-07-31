@@ -10,6 +10,7 @@ from ophyd_async.core import (
     StandardReadable,
     StandardReadableFormat,
     StrictEnum,
+    wait_for_value,
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
@@ -67,6 +68,12 @@ class FastValveState(StrictEnum):
 TValveControlRequest = TypeVar(
     "TValveControlRequest", bound=ValveControlRequest | FastValveControlRequest
 )
+
+
+@dataclass
+class PressureJumpParameters:
+    pressure_from: int
+    pressure_to: int
 
 
 class ValveControl(
@@ -196,16 +203,20 @@ class PressureTransducer(StandardReadable):
         super().__init__(name)
 
 
-class PressureJumpCellController(StandardReadable):
+class PressureJumpCellController(StandardReadable, Movable):
+    """
+    Top-level control for a fixed pressure or pressure jumps.
+    """
+
     def __init__(self, prefix: str, name: str = "") -> None:
         with self.add_children_as_readables():
             # Consant pressure
-            self.target_pressure = epics_signal_rw(float, f"{prefix}TARGET")
+            self.target_pressure = epics_signal_rw(int, f"{prefix}TARGET")
             self.go = epics_signal_rw(bool, f"{prefix}GO")
 
             # Pressure jump
-            self.from_pressure = epics_signal_rw(float, f"{prefix}JUMPF")
-            self.to_pressure = epics_signal_rw(float, f"{prefix}JUMPT")
+            self.from_pressure = epics_signal_rw(int, f"{prefix}JUMPF")
+            self.to_pressure = epics_signal_rw(int, f"{prefix}JUMPT")
             self.set_jump = epics_signal_rw(bool, f"{prefix}SETJUMP")
 
             # Common
@@ -217,6 +228,25 @@ class PressureJumpCellController(StandardReadable):
             self._name = name
 
         super().__init__(name)
+
+    @AsyncStatus.wrap
+    async def set(self, value: int | PressureJumpParameters):
+        timeout = await self.timeout.get_value()
+
+        if isinstance(value, int):
+            # Static press requested
+            await self.target_pressure.set(value)
+            await self.go.set(True)
+
+        elif isinstance(value, PressureJumpParameters):
+            # Pressure jump requested
+            await self.from_pressure.set(value.pressure_from)
+            await self.to_pressure.set(value.pressure_to)
+            await self.set_jump.set(True)
+        else:
+            raise TypeError(f"Unsupported value type of {type(value)} provided.")
+
+        await wait_for_value(self.busy, False, timeout)
 
 
 class PressureJumpCell(StandardReadable):
