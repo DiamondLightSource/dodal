@@ -10,7 +10,6 @@ from dodal.common.beamlines.beamline_utils import (
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.visit import RemoteDirectoryServiceClient, StaticVisitPathProvider
-from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.turbo_slit import TurboSlit
 from dodal.devices.xspress3.xspress3 import Xspress3
 from dodal.log import set_beamline as set_log_beamline
