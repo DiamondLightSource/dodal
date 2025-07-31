@@ -414,3 +414,92 @@ async def test_setting_all_pressure_cell_valves(
             ),
         },
     )
+
+
+async def test_reading_pjumpcell_includes_fields_control(
+    cell: PressureJumpCell,
+):
+    set_mock_value(cell.control.go, False)
+    set_mock_value(cell.control.stop, False)
+    set_mock_value(cell.control.busy, False)
+    set_mock_value(cell.control.target_pressure, 0)
+    set_mock_value(cell.control.timeout, 0.0)
+    set_mock_value(cell.control.result, "SP_SUCCESS")
+
+    await assert_reading(
+        cell.control,
+        {
+            "pjump-control-busy": {
+                "value": False,
+            },
+            "pjump-control-go": {
+                "value": False,
+            },
+            "pjump-control-result": {
+                "value": "SP_SUCCESS",
+            },
+            "pjump-control-target_pressure": {
+                "value": 0,
+            },
+            "pjump-control-timeout": {
+                "value": 0.0,
+            },
+            "pjump-control-stop": {
+                "value": False,
+            },
+            "pjump-control-from_pressure": {
+                "value": ANY,
+            },
+            "pjump-control-to_pressure": {
+                "value": ANY,
+            },
+            "pjump-control-set_jump": {
+                "value": ANY,
+            },
+        },
+    )
+
+
+async def test_reading_pjumpcell_includes_fields_control_jump(
+    cell: PressureJumpCell,
+):
+    set_mock_value(cell.control.set_jump, False)
+    set_mock_value(cell.control.stop, False)
+    set_mock_value(cell.control.busy, False)
+    set_mock_value(cell.control.from_pressure, 0.0)
+    set_mock_value(cell.control.to_pressure, 0.0)
+    set_mock_value(cell.control.timeout, 0.0)
+    set_mock_value(cell.control.result, "SP_SUCCESS")
+
+    await assert_reading(
+        cell.control,
+        {
+            "pjump-control-busy": {
+                "value": False,
+            },
+            "pjump-control-go": {
+                "value": False,
+            },
+            "pjump-control-result": {
+                "value": "SP_SUCCESS",
+            },
+            "pjump-control-target_pressure": {
+                "value": ANY,
+            },
+            "pjump-control-timeout": {
+                "value": 0.0,
+            },
+            "pjump-control-stop": {
+                "value": False,
+            },
+            "pjump-control-from_pressure": {
+                "value": 0.0,
+            },
+            "pjump-control-to_pressure": {
+                "value": 0.0,
+            },
+            "pjump-control-set_jump": {
+                "value": ANY,
+            },
+        },
+    )

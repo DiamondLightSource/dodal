@@ -1,7 +1,8 @@
 import asyncio
+from dataclasses import dataclass
 from typing import Generic, TypeVar
 
-from bluesky.protocols import HasName, Movable
+from bluesky.protocols import Movable
 from ophyd_async.core import (
     AsyncStatus,
     DeviceVector,
@@ -19,11 +20,6 @@ class PumpState(StrictEnum):
     MANUAL = "Manual"
     AUTO_PRESSURE = "Auto Pressure"
     AUTO_POSITION = "Auto Position"
-
-
-class StopState(StrictEnum):
-    CONTINUE = "CONTINUE"
-    STOP = "STOP"
 
 
 class ValveControlRequest(StrictEnum):
@@ -200,25 +196,27 @@ class PressureTransducer(StandardReadable):
         super().__init__(name)
 
 
-class PressureJumpCellController(HasName):
+class PressureJumpCellController(StandardReadable):
     def __init__(self, prefix: str, name: str = "") -> None:
-        self.stop = epics_signal_rw(StopState, f"{prefix}STOP")
+        with self.add_children_as_readables():
+            # Consant pressure
+            self.target_pressure = epics_signal_rw(float, f"{prefix}TARGET")
+            self.go = epics_signal_rw(bool, f"{prefix}GO")
 
-        self.target_pressure = epics_signal_rw(float, f"{prefix}TARGET")
-        self.timeout = epics_signal_rw(float, f"{prefix}TIMER.HIGH")
-        self.go = epics_signal_rw(bool, f"{prefix}GO")
+            # Pressure jump
+            self.from_pressure = epics_signal_rw(float, f"{prefix}JUMPF")
+            self.to_pressure = epics_signal_rw(float, f"{prefix}JUMPT")
+            self.set_jump = epics_signal_rw(bool, f"{prefix}SETJUMP")
 
-        ## Jump logic ##
-        self.start_pressure = epics_signal_rw(float, f"{prefix}JUMPF")
-        self.target_pressure = epics_signal_rw(float, f"{prefix}JUMPT")
-        self.jump_ready = epics_signal_rw(bool, f"{prefix}SETJUMP")
+            # Common
+            self.busy = epics_signal_r(bool, f"{prefix}GOTOBUSY")
+            self.stop = epics_signal_rw(bool, f"{prefix}STOP")
+            self.result = epics_signal_r(str, f"{prefix}RESULT")
+            self.timeout = epics_signal_rw(float, f"{prefix}TIMER.HIGH")
 
-        self._name = name
-        super().__init__()
+            self._name = name
 
-    @property
-    def name(self):
-        return self._name
+        super().__init__(name)
 
 
 class PressureJumpCell(StandardReadable):
@@ -238,9 +236,7 @@ class PressureJumpCell(StandardReadable):
         self.all_valves_control = AllValvesControl(f"{prefix}{cell_prefix}", name)
         self.pump = Pump(f"{prefix}{cell_prefix}", name)
 
-        self.controller = PressureJumpCellController(
-            f"{prefix}{cell_prefix}CTRL:", name
-        )
+        self.control = PressureJumpCellController(f"{prefix}{cell_prefix}CTRL:", name)
 
         with self.add_children_as_readables():
             self.pressure_transducers: DeviceVector[PressureTransducer] = DeviceVector(
