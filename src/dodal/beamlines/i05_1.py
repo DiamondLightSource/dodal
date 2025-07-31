@@ -16,13 +16,16 @@ set_utils_beamline(BL)
 
 
 @device_factory()
-def pgm() -> PGM:
-    return i05_pgm()
+def synchrotron() -> Synchrotron:
+    return Synchrotron()
+
+
+# BL05 shared devices
 
 
 @device_factory()
-def synchrotron() -> Synchrotron:
-    return Synchrotron()
+def pgm() -> PGM:
+    return i05_pgm()
 
 
 @device_factory()
@@ -33,3 +36,11 @@ def m1() -> XYZCollMirror:
 @device_factory()
 def m3mj6() -> XYZPiezoCollMirror:
     return i05_m3mj6()
+
+
+# beamline specific devices
+
+
+@device_factory()
+def mj7j8() -> XYZPiezoCollMirror:
+    return XYZPiezoCollMirror(prefix=f"{PREFIX.beamline_prefix}-OP-RFM-01:")
