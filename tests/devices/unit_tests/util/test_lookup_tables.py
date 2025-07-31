@@ -1,3 +1,5 @@
+from os.path import join
+
 import pytest
 from pytest import mark
 
@@ -8,10 +10,16 @@ from dodal.devices.util.lookup_tables import (
     parse_lookup_table,
 )
 
-TEST_DCM_LUT = "tests/test_data/test_beamline_dcm_roll_converter.txt"
-TEST_DCM_LUT_REVERSED = "tests/test_data/test_beamline_dcm_roll_converter_reversed.txt"
-TEST_BAD_DCM_LUT = "tests/test_data/test_beamline_dcm_roll_converter_non_monotonic.txt"
-TEST_DET_DIST_CONVERTER_LUT = "tests/test_data/test_det_dist_converter.txt"
+TEST_DATA_PATH = "tests/devices/unit_tests/util/test_data"
+
+TEST_DCM_LUT = join(TEST_DATA_PATH, "test_beamline_dcm_roll_converter.txt")
+TEST_DCM_LUT_REVERSED = join(
+    TEST_DATA_PATH, "test_beamline_dcm_roll_converter_reversed.txt"
+)
+TEST_BAD_DCM_LUT = join(
+    TEST_DATA_PATH, "test_beamline_dcm_roll_converter_non_monotonic.txt"
+)
+TEST_DET_DIST_CONVERTER_LUT = join(TEST_DATA_PATH, "test_det_dist_converter.txt")
 
 
 async def test_energy_to_distance_table_correct_format():
