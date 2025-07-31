@@ -6,7 +6,7 @@ class OnState(StrictEnum):
     OFF = "OFF"
 
 
-class OnStateCaptilised(StrictEnum):
+class OnStateCapitalised(StrictEnum):
     ON = "ON"
     OFF = "OFF"
 
@@ -16,7 +16,7 @@ class EnabledState(StrictEnum):
     DISABLED = "Disabled"
 
 
-class EnabledStateCaptilised(StrictEnum):
+class EnabledStateCapitalised(StrictEnum):
     ENABLED = "ENABLED"
     DISABLED = "DISABLED"
 
@@ -26,6 +26,6 @@ class InOut(StrictEnum):
     OUT = "Out"
 
 
-class InOutCapitlised(StrictEnum):
+class InOutCapitalised(StrictEnum):
     IN = "IN"
     OUT = "OUT"

@@ -1,7 +1,7 @@
 from ophyd_async.core import AsyncStatus, StandardReadable, StrictEnum
 from ophyd_async.epics.core import epics_signal_rw
 
-from dodal.common.enums import OnStateCaptilised
+from dodal.common.enums import OnStateCapitalised
 
 
 class BacklightPositions(StrictEnum):
@@ -43,12 +43,12 @@ class DualBacklight(StandardReadable):
 
     def __init__(self, prefix: str, name: str = "") -> None:
         self.backlight_state = epics_signal_rw(
-            OnStateCaptilised, prefix + "-DI-LED-01:TOGGLE"
+            OnStateCapitalised, prefix + "-DI-LED-01:TOGGLE"
         )
         self.backlight_position = BacklightPositioner(prefix + "-MO-BL-01:", name)
 
         self.frontlight_state = epics_signal_rw(
-            OnStateCaptilised, prefix + "-DI-LED-02:TOGGLE"
+            OnStateCapitalised, prefix + "-DI-LED-02:TOGGLE"
         )
         super().__init__(name)
 
@@ -56,6 +56,6 @@ class DualBacklight(StandardReadable):
     async def set(self, value: BacklightPositions):
         await self.backlight_position.set(value)
         if value == BacklightPositions.OUT:
-            await self.backlight_state.set(OnStateCaptilised.OFF, wait=True)
+            await self.backlight_state.set(OnStateCapitalised.OFF, wait=True)
         else:
-            await self.backlight_state.set(OnStateCaptilised.ON, wait=True)
+            await self.backlight_state.set(OnStateCapitalised.ON, wait=True)

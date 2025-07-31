@@ -7,7 +7,7 @@ from ophyd_async.core import AsyncStatus, init_devices
 from ophyd_async.testing import get_mock_put, set_mock_value
 
 from conftest import MOCK_DAQ_CONFIG_PATH
-from dodal.common.enums import EnabledStateCaptilised
+from dodal.common.enums import EnabledStateCapitalised
 from dodal.devices.i03.dcm import DCM
 from dodal.devices.i03.undulator_dcm import UndulatorDCM
 from dodal.devices.undulator import AccessError, Undulator
@@ -98,7 +98,7 @@ async def test_when_gap_access_is_not_checked_if_test_mode_enabled(
     mock_logger: MagicMock, mock_load: MagicMock, fake_undulator_dcm: UndulatorDCM
 ):
     set_mock_value(
-        fake_undulator_dcm.undulator_ref().gap_access, EnabledStateCaptilised.DISABLED
+        fake_undulator_dcm.undulator_ref().gap_access, EnabledStateCapitalised.DISABLED
     )
     set_mock_value(fake_undulator_dcm.undulator_ref().current_gap, 5.3)
     set_mock_value(fake_undulator_dcm.dcm_ref().energy_in_kev.user_readback, 5.7)
@@ -201,7 +201,7 @@ async def test_when_undulator_gap_is_disabled_setting_energy_errors_and_dcm_ener
     fake_undulator_dcm: UndulatorDCM,
 ):
     set_mock_value(
-        fake_undulator_dcm.undulator_ref().gap_access, EnabledStateCaptilised.DISABLED
+        fake_undulator_dcm.undulator_ref().gap_access, EnabledStateCapitalised.DISABLED
     )
 
     with pytest.raises(AccessError):

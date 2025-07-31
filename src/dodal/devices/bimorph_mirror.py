@@ -22,7 +22,7 @@ from ophyd_async.epics.core import (
     epics_signal_x,
 )
 
-from dodal.common.enums import OnStateCaptilised
+from dodal.common.enums import OnStateCapitalised
 
 DEFAULT_TIMEOUT = 60
 
@@ -51,7 +51,7 @@ class BimorphMirrorChannel(StandardReadable, EpicsDevice):
 
     target_voltage: A[SignalRW[float], PvSuffix.rbv("VTRGT"), Format.CONFIG_SIGNAL]
     output_voltage: A[SignalRW[float], PvSuffix.rbv("VOUT"), Format.HINTED_SIGNAL]
-    status: A[SignalR[OnStateCaptilised], PvSuffix("STATUS"), Format.CONFIG_SIGNAL]
+    status: A[SignalR[OnStateCapitalised], PvSuffix("STATUS"), Format.CONFIG_SIGNAL]
     shift: A[SignalW[float], PvSuffix("SHIFT")]
 
 
@@ -84,7 +84,7 @@ class BimorphMirror(StandardReadable, Movable[list[float]]):
                     for i in range(1, number_of_channels + 1)
                 }
             )
-        self.enabled = epics_signal_w(OnStateCaptilised, f"{prefix}ONOFF")
+        self.enabled = epics_signal_w(OnStateCapitalised, f"{prefix}ONOFF")
         self.commit_target_voltages = epics_signal_x(f"{prefix}ALLTRGT.PROC")
         self.status = epics_signal_r(BimorphMirrorStatus, f"{prefix}STATUS")
         self.err = epics_signal_r(str, f"{prefix}ERR")
