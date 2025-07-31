@@ -1,30 +1,57 @@
-from ophyd_async.core import Device, SignalDatatypeT
+from ophyd_async.core import Device, DeviceVector, SignalDatatypeT
+from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
-from ..device_helper import create_r_device_vector, create_rw_device_vector
 
-
-class LakeshoreTemperatureIO(Device):
-    """.
-    Base class for Lakeshore temperature readback IO. It provides readback signals for temperature channels.
-    """
-
+class LakeshoreControlChannel(Device):
     def __init__(
         self,
         prefix: str,
-        no_channels: int,
+        suffix: str,
+        heater_type: type[SignalDatatypeT],
         name: str = "",
     ):
-        self.user_readback = create_r_device_vector(
-            prefix=prefix,
-            no_channels=no_channels,
-            read_pv="KRDG",
-            signal_type=float,
-            pv_index_offset=-1,
+        self.user_setpoint = epics_signal_rw(
+            float, f"{prefix}SETP{suffix}", f"{prefix}SETP_S{suffix}"
         )
+        self.ramp_rate = epics_signal_rw(
+            float, f"{prefix}RAMP{suffix}", f"{prefix}RAMP_S{suffix}"
+        )
+        self.ramp_enable = epics_signal_rw(
+            int, f"{prefix}RAMPST{suffix}", f"{prefix}RAMPST_S{suffix}"
+        )
+        self.heater_output = epics_signal_r(float, f"{prefix}HTR{suffix}")
+        self.heater_output_range = epics_signal_rw(
+            heater_type, f"{prefix}RANGE{suffix}", f"{prefix}RANGE_S{suffix}"
+        )
+
         super().__init__(name=name)
 
 
-class LakeshoreBaseIO(LakeshoreTemperatureIO):
+class LakeshorePIDChannel(Device):
+    def __init__(
+        self,
+        prefix: str,
+        suffix: str,
+        name: str = "",
+    ):
+        self.p = epics_signal_rw(
+            float, read_pv=f"{prefix}P{suffix}", write_pv="{prefix}P_S{suffix}"
+        )
+
+        self.i = epics_signal_rw(
+            float, read_pv=f"{prefix}I{suffix}", write_pv="{prefix}I_S{suffix}"
+        )
+        self.d = epics_signal_rw(
+            float, read_pv=f"{prefix}D{suffix}", write_pv="{prefix}D_S{suffix}"
+        )
+        self.manual_output = epics_signal_rw(
+            float, read_pv=f"{prefix}MOUT{suffix}", write_pv="{prefix}MOUT_S{suffix}"
+        )
+
+        super().__init__(name)
+
+
+class LakeshoreBaseIO(Device):
     def __init__(
         self,
         prefix: str,
@@ -34,99 +61,43 @@ class LakeshoreBaseIO(LakeshoreTemperatureIO):
         single_control_channel: bool = False,
     ):
         """Base class for Lakeshore IO including setpoint ramp_ramp and heater."""
-        self.user_setpoint = create_rw_device_vector(
-            prefix=prefix,
-            no_channels=no_channels,
-            write_pv="SETP_S",
-            read_pv="SETP",
-            signal_type=float,
-            no_pv_suffix_index=single_control_channel,
-        )
+        if single_control_channel:
+            self.control_channels = DeviceVector(
+                {
+                    1: LakeshoreControlChannel(
+                        prefix=prefix, suffix="", heater_type=heater_setting
+                    )
+                }
+            )
+            self.pid_channels = DeviceVector(
+                {1: LakeshorePIDChannel(prefix=prefix, suffix="")}
+            )
+        else:
+            self.control_channels = DeviceVector(
+                {
+                    i: LakeshoreControlChannel(
+                        prefix=prefix, suffix=str(i), heater_type=heater_setting
+                    )
+                    for i in range(1, no_channels + 1)
+                }
+            )
 
-        self.ramp_rate = create_rw_device_vector(
-            prefix=prefix,
-            no_channels=no_channels,
-            write_pv="RAMP_S",
-            read_pv="RAMP",
-            signal_type=float,
-            no_pv_suffix_index=single_control_channel,
-        )
+            self.pid_channels = DeviceVector(
+                {
+                    i: LakeshorePIDChannel(prefix=prefix, suffix=str(i))
+                    for i in range(1, no_channels + 1)
+                }
+            )
 
-        self.ramp_enable = create_rw_device_vector(
-            prefix=prefix,
-            no_channels=no_channels,
-            write_pv="RAMPST_S",
-            read_pv="RAMPST",
-            signal_type=int,
-            no_pv_suffix_index=single_control_channel,
+        self.readBack_channel = DeviceVector(
+            {
+                i: epics_signal_r(
+                    float,
+                    read_pv=f"{prefix}KRDG{i - 1}",
+                )
+                for i in range(1, no_channels + 1)
+            }
         )
-
-        self.heater_output = create_r_device_vector(
-            prefix=prefix,
-            no_channels=no_channels,
-            read_pv="HTR",
-            signal_type=float,
-            no_pv_suffix_index=single_control_channel,
-        )
-
-        self.heater_output_range = create_rw_device_vector(
-            prefix=prefix,
-            no_channels=no_channels,
-            write_pv="RANGE_S",
-            read_pv="RANGE",
-            signal_type=heater_setting,
-            no_pv_suffix_index=single_control_channel,
-        )
-
         super().__init__(
-            prefix=prefix,
-            no_channels=no_channels,
             name=name,
         )
-
-
-class PIDBaseIO(Device):
-    def __init__(
-        self,
-        prefix: str,
-        no_channels: int,
-        name: str = "",
-        single_control_channel: bool = False,
-    ):
-        """Basic pid and manual output signals for lakeshore channels"""
-
-        self.p = create_rw_device_vector(
-            prefix=prefix,
-            no_channels=no_channels,
-            write_pv="P_S",
-            read_pv="P",
-            signal_type=float,
-            no_pv_suffix_index=single_control_channel,
-        )
-        self.i = create_rw_device_vector(
-            prefix=prefix,
-            no_channels=no_channels,
-            write_pv="I_S",
-            read_pv="I",
-            signal_type=float,
-            no_pv_suffix_index=single_control_channel,
-        )
-        self.d = create_rw_device_vector(
-            prefix=prefix,
-            no_channels=no_channels,
-            write_pv="D_S",
-            read_pv="D",
-            signal_type=float,
-            no_pv_suffix_index=single_control_channel,
-        )
-
-        self.manual_output = create_rw_device_vector(
-            prefix=prefix,
-            no_channels=no_channels,
-            write_pv="MOUT_S",
-            read_pv="MOUT",
-            signal_type=float,
-            no_pv_suffix_index=single_control_channel,
-        )
-
-        super().__init__(name=name)
