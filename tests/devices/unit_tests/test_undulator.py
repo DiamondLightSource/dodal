@@ -121,7 +121,7 @@ async def test_gap_access_check_disabled_and_move_inhibited_when_commissioning_m
     "dodal.devices.undulator.energy_distance_table",
     AsyncMock(return_value=np.array([[0, 10], [10000, 20]])),
 )
-async def test_gap_access_check_move_inhibited_when_commissioning_mode_enabled(
+async def test_gap_access_check_move_not_inhibited_when_commissioning_mode_disabled(
     undulator: Undulator, baton_in_commissioning_mode: Baton
 ):
     set_mock_value(baton_in_commissioning_mode.commissioning, False)
