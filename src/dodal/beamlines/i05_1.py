@@ -1,7 +1,7 @@
 from dodal.beamline_specific_utils.i05_shared import (
-    i05_pgm,
     m1_collimating_mirror,
     m3mj6_switching_mirror,
+    pgm,
 )
 from dodal.common.beamlines.beamline_utils import device_factory
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
@@ -27,8 +27,8 @@ def synchrotron() -> Synchrotron:
 
 
 @device_factory()
-def pgm() -> PGM:
-    return i05_pgm()
+def pgm_i05() -> PGM:
+    return pgm()
 
 
 @device_factory()

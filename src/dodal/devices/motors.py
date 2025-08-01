@@ -94,12 +94,18 @@ class XYZPitchYawRollStage(XYZStage):
         self,
         prefix: str,
         name: str = "",
+        x_infix: str = _X,
+        y_infix: str = _Y,
+        z_infix: str = _Z,
+        pitch_infix: str = "PITCH",
+        yaw_infix: str = "YAW",
+        roll_infix: str = "ROLL",
     ):
         with self.add_children_as_readables():
-            self.yaw = Motor(prefix + "YAW")
-            self.pitch = Motor(prefix + "PITCH")
-            self.roll = Motor(prefix + "ROLL")
-        super().__init__(prefix, name)
+            self.pitch = Motor(prefix + pitch_infix)
+            self.yaw = Motor(prefix + yaw_infix)
+            self.roll = Motor(prefix + roll_infix)
+        super().__init__(prefix, name, x_infix, y_infix, z_infix)
 
 
 class SixAxisGonio(XYZStage):
