@@ -4,7 +4,7 @@ from ophyd_async.epics.motor import Motor
 from dodal.devices.motors import XYZStage
 
 
-class XYZCollMirror(XYZStage):
+class XYZCollimatingMirror(XYZStage):
     def __init__(
         self,
         prefix: str,
@@ -17,7 +17,7 @@ class XYZCollMirror(XYZStage):
         super().__init__(prefix, name)
 
 
-class XYZPiezoCollMirror(XYZCollMirror):
+class XYZPiezoCollimatingMirror(XYZCollimatingMirror):
     def __init__(
         self,
         prefix: str,

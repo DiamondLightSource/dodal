@@ -1,5 +1,5 @@
 from dodal.common.beamlines.beamline_utils import device_factory
-from dodal.devices.common_mirror import XYZCollMirror, XYZPiezoCollMirror
+from dodal.devices.common_mirror import XYZCollimatingMirror, XYZPiezoCollimatingMirror
 from dodal.devices.i05.enums import Grating
 from dodal.devices.pgm import PGM
 from dodal.utils import BeamlinePrefix
@@ -13,10 +13,10 @@ def pgm() -> PGM:
 
 
 @device_factory()
-def m1() -> XYZCollMirror:
-    return XYZCollMirror(prefix=f"{PREFIX.beamline_prefix}-OP-COL-01:")
+def m1() -> XYZCollimatingMirror:
+    return XYZCollimatingMirror(prefix=f"{PREFIX.beamline_prefix}-OP-COL-01:")
 
 
 @device_factory()
-def m3mj6() -> XYZPiezoCollMirror:
-    return XYZPiezoCollMirror(prefix=f"{PREFIX.beamline_prefix}-OP-SWTCH-01:")
+def m3mj6() -> XYZPiezoCollimatingMirror:
+    return XYZPiezoCollimatingMirror(prefix=f"{PREFIX.beamline_prefix}-OP-SWTCH-01:")
