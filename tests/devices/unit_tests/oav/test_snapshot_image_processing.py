@@ -1,4 +1,3 @@
-from os.path import join
 from pathlib import Path
 
 import pytest
@@ -8,17 +7,17 @@ from dodal.devices.oav.snapshots.snapshot_image_processing import (
     compute_beam_centre_pixel_xy_for_mm_position,
     draw_crosshair,
 )
-
-TEST_IMAGES_PATH = "tests/devices/unit_tests/oav/test_images"
-SNAPSHOT_IMAGE = join(TEST_IMAGES_PATH, "oav_snapshot_test.png")
-SNAPSHOT_EXPECTED_IMAGE = join(TEST_IMAGES_PATH, "oav_snapshot_expected.png")
+from tests.devices.unit_tests.oav.constants import (
+    OAV_SNAPSHOT_EXPECTED_PNG,
+    OAV_SNAPSHOT_TEST_PNG,
+)
 
 
 def test_snapshot_draws_expected_crosshair(tmp_path: Path):
-    image = Image.open(SNAPSHOT_IMAGE)
+    image = Image.open(OAV_SNAPSHOT_TEST_PNG)
     draw_crosshair(image, 510, 380)
     image.save(tmp_path / "output_image.png")
-    expected_image = Image.open(SNAPSHOT_EXPECTED_IMAGE)
+    expected_image = Image.open(OAV_SNAPSHOT_EXPECTED_PNG)
     image_bytes = image.tobytes()
     expected_bytes = expected_image.tobytes()
     assert image_bytes == expected_bytes, "Actual and expected images differ"
