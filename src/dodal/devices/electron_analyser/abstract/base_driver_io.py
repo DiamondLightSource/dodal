@@ -1,46 +1,80 @@
-import asyncio
 from abc import ABC, abstractmethod
+from collections.abc import Mapping
 from typing import Generic, TypeVar
 
 import numpy as np
-from bluesky.protocols import Movable, Preparable
+from bluesky.protocols import Movable
 from ophyd_async.core import (
     Array1D,
     AsyncStatus,
     SignalR,
     StandardReadable,
     StandardReadableFormat,
-    StrictEnum,
     derived_signal_r,
     soft_signal_rw,
 )
 from ophyd_async.epics.adcore import ADBaseIO
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
-from ophyd_async.epics.motor import Motor
 
 from dodal.devices.electron_analyser.abstract.base_region import (
     TAbstractBaseRegion,
 )
+from dodal.devices.electron_analyser.abstract.types import (
+    TAcquisitionMode,
+    TLensMode,
+    TPassEnergy,
+    TPsuMode,
+)
 from dodal.devices.electron_analyser.enums import EnergyMode
-from dodal.devices.electron_analyser.util import to_binding_energy, to_kinetic_energy
+from dodal.devices.electron_analyser.util import to_binding_energy
 
 
 class AbstractAnalyserDriverIO(
     ABC,
     StandardReadable,
     ADBaseIO,
-    Preparable,
     Movable[TAbstractBaseRegion],
-    Generic[TAbstractBaseRegion],
+    Generic[TAbstractBaseRegion, TAcquisitionMode, TLensMode, TPsuMode, TPassEnergy],
 ):
     """
-    Generic device to configure electron analyser with new region settings.
-    Electron analysers should inherit from this class for further specialisation.
+    Driver device that defines signals and readables that should be common to all
+    electron analysers. Implementations of electron analyser devices should inherit
+    from this class and define additional specialised signals and methods.
     """
 
     def __init__(
-        self, prefix: str, acquisition_mode_type: type[StrictEnum], name: str = ""
+        self,
+        prefix: str,
+        acquisition_mode_type: type[TAcquisitionMode],
+        lens_mode_type: type[TLensMode],
+        psu_mode_type: type[TPsuMode],
+        pass_energy_type: type[TPassEnergy],
+        energy_sources: Mapping[str, SignalR[float]],
+        name: str = "",
     ) -> None:
+        """
+        Constructor method for setting up electron analyser.
+
+        Args:
+            prefix: Base PV to connect to EPICS for this device.
+            acquisition_mode_type: Enum that determines the available acquisition modes
+                                   for this device.
+            lens_mode_type: Enum that determines the available lens mode for this
+                            device.
+            psu_mode_type: Enum that determines the available psu modes for this device.
+            pass_energy_type: Can be enum or float, depends on electron analyser model.
+                              If enum, it determines the available pass energies for
+                              this device.
+            energy_sources: Map that pairs a source name to an energy value signal
+                            (in eV).
+            name: Name of the device.
+        """
+        self.energy_sources = energy_sources
+        self.acquisition_mode_type = acquisition_mode_type
+        self.lens_mode_type = lens_mode_type
+        self.psu_mode_type = psu_mode_type
+        self.pass_energy_type = pass_energy_type
+
         with self.add_children_as_readables():
             self.image = epics_signal_r(Array1D[np.float64], prefix + "IMAGE")
             self.spectrum = epics_signal_r(Array1D[np.float64], prefix + "INT_SPECTRUM")
@@ -56,18 +90,20 @@ class AbstractAnalyserDriverIO(
                 EnergyMode, initial_value=EnergyMode.KINETIC
             )
             self.low_energy = epics_signal_rw(float, prefix + "LOW_ENERGY")
+            self.centre_energy = epics_signal_rw(float, prefix + "CENTRE_ENERGY")
             self.high_energy = epics_signal_rw(float, prefix + "HIGH_ENERGY")
             self.slices = epics_signal_rw(int, prefix + "SLICES")
-            self.lens_mode = epics_signal_rw(str, prefix + "LENS_MODE")
-            self.pass_energy = epics_signal_rw(
-                self.pass_energy_type, prefix + "PASS_ENERGY"
-            )
+            self.lens_mode = epics_signal_rw(lens_mode_type, prefix + "LENS_MODE")
+            self.pass_energy = epics_signal_rw(pass_energy_type, prefix + "PASS_ENERGY")
             self.energy_step = epics_signal_rw(float, prefix + "STEP_SIZE")
             self.iterations = epics_signal_rw(int, prefix + "NumExposures")
             self.acquisition_mode = epics_signal_rw(
                 acquisition_mode_type, prefix + "ACQ_MODE"
             )
             self.excitation_energy_source = soft_signal_rw(str, initial_value="")
+            # This is used by each electron analyser, however it depends on the electron
+            # analyser type to know if is moved with region settings.
+            self.psu_mode = epics_signal_rw(psu_mode_type, prefix + "PSU_MODE")
 
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             # Read once per scan after data acquired
@@ -92,56 +128,25 @@ class AbstractAnalyserDriverIO(
 
         super().__init__(prefix=prefix, name=name)
 
-    @AsyncStatus.wrap
-    async def prepare(self, value: Motor):
-        """
-        Prepare the driver for a region by passing in the energy source motor selected
-        by a region.
-
-        Args:
-            value: The motor that contains the information on the current excitation
-                   energy. Needed to prepare region for epics to accuratly calculate
-                   kinetic energy for an energy scan when in binding energy mode.
-        """
-        energy_source = value
-        excitation_energy_value = await energy_source.user_readback.get_value()  # eV
-        excitation_energy_source_name = energy_source.name
-
-        await asyncio.gather(
-            self.excitation_energy.set(excitation_energy_value),
-            self.excitation_energy_source.set(excitation_energy_source_name),
-        )
-
+    @abstractmethod
     @AsyncStatus.wrap
     async def set(self, region: TAbstractBaseRegion):
         """
-        This should encompass all core region logic which is common to every electron
-        analyser for setting up the driver.
+        Move a group of signals defined in a region. Each implementation of this class
+        is responsible for implementing this method correctly.
 
         Args:
             region: Contains the parameters to setup the driver for a scan.
         """
-        pass_energy_type = self.pass_energy_type
-        pass_energy = pass_energy_type(region.pass_energy)
 
-        excitation_energy = await self.excitation_energy.get_value()
-        low_energy = to_kinetic_energy(
-            region.low_energy, region.energy_mode, excitation_energy
-        )
-        high_energy = to_kinetic_energy(
-            region.high_energy, region.energy_mode, excitation_energy
-        )
-        await asyncio.gather(
-            self.region_name.set(region.name),
-            self.energy_mode.set(region.energy_mode),
-            self.low_energy.set(low_energy),
-            self.high_energy.set(high_energy),
-            self.slices.set(region.slices),
-            self.lens_mode.set(region.lens_mode),
-            self.pass_energy.set(pass_energy),
-            self.iterations.set(region.iterations),
-            self.acquisition_mode.set(region.acquisition_mode),
-        )
+    def _get_energy_source(self, alias_name: str) -> SignalR[float]:
+        energy_source = self.energy_sources.get(alias_name)
+        if energy_source is None:
+            raise KeyError(
+                f"'{energy_source}' is an invalid energy source. Avaliable energy "
+                + f"sources are '{list(self.energy_sources.keys())}'"
+            )
+        return energy_source
 
     @abstractmethod
     def _create_angle_axis_signal(self, prefix: str) -> SignalR[Array1D[np.float64]]:
@@ -216,18 +221,6 @@ class AbstractAnalyserDriverIO(
 
     def _calculate_total_intensity(self, spectrum: Array1D[np.float64]) -> float:
         return float(np.sum(spectrum, dtype=np.float64))
-
-    @property
-    @abstractmethod
-    def pass_energy_type(self) -> type:
-        """
-        Return the type the pass_energy should be. Depends on underlying analyser
-        software.
-
-        Returns:
-            Type the pass energy parameter from a region needs to be cast to so it can
-            be set correctly on the signal.
-        """
 
 
 TAbstractAnalyserDriverIO = TypeVar(

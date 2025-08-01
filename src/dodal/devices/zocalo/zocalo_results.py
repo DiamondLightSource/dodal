@@ -10,7 +10,6 @@ import workflows.recipe
 import workflows.transport
 from bluesky.protocols import Triggerable
 from bluesky.utils import Msg
-from deepdiff.diff import DeepDiff
 from ophyd_async.core import (
     Array1D,
     AsyncStatus,
@@ -49,6 +48,9 @@ DEFAULT_SORT_KEY = SortKeys.max_count
 CLEAR_QUEUE_WAIT_S = 2.0
 ZOCALO_STAGE_GROUP = "clear zocalo queue"
 
+# Sentinel value required for inserting into the soft signal array
+_NO_SAMPLE_ID = -1
+
 
 class XrcResult(TypedDict):
     """
@@ -69,6 +71,7 @@ class XrcResult(TypedDict):
             as the volume of whole boxes as a half-open range i.e such that
             p1 = (x1, y1, z1) <= p < p2 = (x2, y2, z2) and
             p2 - p1 gives the dimensions in whole voxels.
+         sample_id: The sample id associated with the centre.
     """
 
     centre_of_mass: list[float]
@@ -77,6 +80,7 @@ class XrcResult(TypedDict):
     n_voxels: int
     total_count: int
     bounding_box: list[list[int]]
+    sample_id: int | None
 
 
 def bbox_size(result: XrcResult):
@@ -84,18 +88,6 @@ def bbox_size(result: XrcResult):
         abs(result["bounding_box"][1][i] - result["bounding_box"][0][i])
         for i in range(3)
     ]
-
-
-def get_dict_differences(
-    dict1: dict, dict1_source: str, dict2: dict, dict2_source: str
-) -> str | None:
-    """Returns a string containing dict1 and dict2 if there are differences between them, greater than a
-    1e-5 tolerance. If dictionaries are identical, return None"""
-
-    diff = DeepDiff(dict1, dict2, math_epsilon=1e-5, ignore_numeric_type_changes=True)
-
-    if diff:
-        return f"Zocalo results from {dict1_source} and {dict2_source} are not identical.\n Results from {dict1_source}: {dict1}\n Results from {dict2_source}: {dict2}"
 
 
 def source_from_results(results):
@@ -127,12 +119,7 @@ class ZocaloResults(StandardReadable, Triggerable):
 
         prefix (str): EPICS PV prefix for the device
 
-        use_cpu_and_gpu (bool): When True, ZocaloResults will wait for results from the
-        CPU and the GPU, compare them, and provide a warning if the results differ. When
-        False, ZocaloResults will only use results from the CPU
-
-        use_gpu (bool): When True, ZocaloResults will take the first set of
-        results that it receives (which are likely the GPU results)
+        results_source (ZocaloSource): Where to get results from, GPU or CPU analysis
 
     """
 
@@ -144,8 +131,7 @@ class ZocaloResults(StandardReadable, Triggerable):
         sort_key: str = DEFAULT_SORT_KEY.value,
         timeout_s: float = DEFAULT_TIMEOUT,
         prefix: str = "",
-        use_cpu_and_gpu: bool = False,
-        use_gpu: bool = False,
+        results_source: ZocaloSource = ZocaloSource.CPU,
     ) -> None:
         self.zocalo_environment = zocalo_environment
         self.sort_key = SortKeys[sort_key]
@@ -154,8 +140,7 @@ class ZocaloResults(StandardReadable, Triggerable):
         self._prefix = prefix
         self._raw_results_received: Queue = Queue()
         self.transport: CommonTransport | None = None
-        self.use_cpu_and_gpu = use_cpu_and_gpu
-        self.use_gpu = use_gpu
+        self.results_source = results_source
 
         self.centre_of_mass, self._com_setter = soft_signal_r_and_setter(
             Array1D[np.float64], name="centre_of_mass"
@@ -175,6 +160,9 @@ class ZocaloResults(StandardReadable, Triggerable):
         self.total_count, self._total_count_setter = soft_signal_r_and_setter(
             Array1D[np.uint64], name="total_count"
         )
+        self.sample_id, self._sample_id_setter = soft_signal_r_and_setter(
+            Array1D[np.int64], name="sample_id"
+        )
         self.ispyb_dcid, self._ispyb_dcid_setter = soft_signal_r_and_setter(
             int, name="ispyb_dcid"
         )
@@ -189,6 +177,7 @@ class ZocaloResults(StandardReadable, Triggerable):
                 self.total_count,
                 self.centre_of_mass,
                 self.bounding_box,
+                self.sample_id,
                 self.ispyb_dcid,
                 self.ispyb_dcgid,
             ],
@@ -197,13 +186,15 @@ class ZocaloResults(StandardReadable, Triggerable):
         super().__init__(name)
 
     async def _put_results(self, results: Sequence[XrcResult], recipe_parameters):
-        centres_of_mass = np.array([r["centre_of_mass"] for r in results])
-        self._com_setter(centres_of_mass)
+        self._com_setter(np.array([r["centre_of_mass"] for r in results]))
         self._bounding_box_setter(np.array([r["bounding_box"] for r in results]))
         self._max_voxel_setter(np.array([r["max_voxel"] for r in results]))
         self._max_count_setter(np.array([r["max_count"] for r in results]))
         self._n_voxels_setter(np.array([r["n_voxels"] for r in results]))
         self._total_count_setter(np.array([r["total_count"] for r in results]))
+        self._sample_id_setter(
+            np.array([r.get("sample_id") or _NO_SAMPLE_ID for r in results])
+        )
         self._ispyb_dcid_setter(recipe_parameters["dcid"])
         self._ispyb_dcgid_setter(recipe_parameters["dcgid"])
 
@@ -217,11 +208,6 @@ class ZocaloResults(StandardReadable, Triggerable):
         sleep for a few seconds to wait for any stale messages to be received, then
         clearing the queue. Plans using this device should wait on ZOCALO_STAGE_GROUP
         before triggering processing for the experiment"""
-
-        if self.use_cpu_and_gpu and self.use_gpu:
-            raise ValueError(
-                "Cannot compare GPU and CPU results and use GPU results at the same time."
-            )
 
         LOGGER.info("Subscribing to results queue")
         try:
@@ -250,9 +236,6 @@ class ZocaloResults(StandardReadable, Triggerable):
             "meant for it"
         )
         if not self.transport:
-            LOGGER.warning(
-                msg  # AsyncStatus exception messages are poorly propagated, remove after https://github.com/bluesky/ophyd-async/issues/103
-            )
             raise NoZocaloSubscription(msg)
 
         try:
@@ -260,65 +243,19 @@ class ZocaloResults(StandardReadable, Triggerable):
                 f"waiting for results in queue - currently {self._raw_results_received.qsize()} items"
             )
 
-            raw_results = self._raw_results_received.get(timeout=self.timeout_s)
-            source_of_first_results = source_from_results(raw_results)
+            while True:
+                raw_results = self._raw_results_received.get(timeout=self.timeout_s)
+                source_of_results = source_from_results(raw_results)
 
-            if self.use_gpu and source_of_first_results == ZocaloSource.CPU:
-                LOGGER.warning(
-                    "Configured to use GPU results but CPU came first, using CPU results."
-                )
-
-            if self.use_cpu_and_gpu:
-                # Wait for results from CPU and GPU, warn and continue if only GPU times out. Error if CPU times out
-                if source_of_first_results == ZocaloSource.CPU:
-                    LOGGER.warning("Received zocalo results from CPU before GPU")
-                raw_results_two_sources = [raw_results]
-                try:
-                    raw_results_two_sources.append(
-                        self._raw_results_received.get(timeout=self.timeout_s / 2)
+                if source_of_results != self.results_source:
+                    LOGGER.warning(
+                        f"Configured to use {self.results_source} results but {source_of_results} came first, waiting for further results."
                     )
-                    source_of_second_results = source_from_results(
-                        raw_results_two_sources[1]
-                    )
-                    first_results = raw_results_two_sources[0]["results"]
-                    second_results = raw_results_two_sources[1]["results"]
-
-                    if first_results and second_results:
-                        # Compare results from both sources and warn if they aren't the same
-                        differences_str = get_dict_differences(
-                            first_results[0],
-                            source_of_first_results,
-                            second_results[0],
-                            source_of_second_results,
-                        )
-                        if differences_str:
-                            LOGGER.warning(differences_str)
-
-                    # Always use CPU results
-                    raw_results = (
-                        raw_results_two_sources[0]
-                        if source_of_first_results == ZocaloSource.CPU
-                        else raw_results_two_sources[1]
-                    )
-
-                except Empty as err:
-                    source_of_missing_results = (
-                        ZocaloSource.CPU.value
-                        if source_of_first_results == ZocaloSource.GPU.value
-                        else ZocaloSource.GPU.value
-                    )
-                    if source_of_missing_results == ZocaloSource.GPU.value:
-                        LOGGER.warning(
-                            f"Zocalo results from {source_of_missing_results} timed out. Using results from {source_of_first_results}"
-                        )
-                    else:
-                        LOGGER.error(
-                            f"Zocalo results from {source_of_missing_results} timed out and GPU results not yet reliable"
-                        )
-                        raise err
+                else:
+                    break
 
             LOGGER.info(
-                f"Zocalo results from {source_from_results(raw_results)} processing: found {len(raw_results['results'])} crystals."
+                f"Zocalo results: found {len(raw_results['results'])} crystals."
             )
             # Sort from strongest to weakest in case of multiple crystals
             await self._put_results(
@@ -350,16 +287,9 @@ class ZocaloResults(StandardReadable, Triggerable):
 
             results = message.get("results", [])
 
-            if self.use_cpu_and_gpu or self.use_gpu:
-                self._raw_results_received.put(
-                    {"results": results, "recipe_parameters": recipe_parameters}
-                )
-            else:
-                # Only add to queue if results are from CPU
-                if not recipe_parameters.get("gpu"):
-                    self._raw_results_received.put(
-                        {"results": results, "recipe_parameters": recipe_parameters}
-                    )
+            self._raw_results_received.put(
+                {"results": results, "recipe_parameters": recipe_parameters}
+            )
 
         subscription = workflows.recipe.wrap_subscribe(
             self.transport,
@@ -393,6 +323,7 @@ def get_full_processing_results(
     n_voxels = yield from bps.rd(zocalo.n_voxels, default_value=[])
     total_count = yield from bps.rd(zocalo.total_count, default_value=[])
     bounding_box = yield from bps.rd(zocalo.bounding_box, default_value=[])
+    sample_id = yield from bps.rd(zocalo.sample_id, default_value=[])
     return [
         _corrected_xrc_result(
             XrcResult(
@@ -402,9 +333,17 @@ def get_full_processing_results(
                 n_voxels=int(n),
                 total_count=int(tc),
                 bounding_box=bb.tolist(),
+                sample_id=int(s_id) if s_id != _NO_SAMPLE_ID else None,
             )
         )
-        for com, mv, mc, n, tc, bb in zip(
-            com, max_voxel, max_count, n_voxels, total_count, bounding_box, strict=True
+        for com, mv, mc, n, tc, bb, s_id in zip(
+            com,
+            max_voxel,
+            max_count,
+            n_voxels,
+            total_count,
+            bounding_box,
+            sample_id,
+            strict=True,
         )
     ]

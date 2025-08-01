@@ -1,11 +1,17 @@
 import uuid
+from typing import Generic
 
-from pydantic import Field
+from pydantic import Field, field_validator
 
 from dodal.devices.electron_analyser.abstract.base_region import (
     AbstractBaseRegion,
     AbstractBaseSequence,
     JavaToPythonModel,
+)
+from dodal.devices.electron_analyser.abstract.types import (
+    TLensMode,
+    TPassEnergyEnum,
+    TPsuMode,
 )
 from dodal.devices.electron_analyser.vgscienta.enums import (
     AcquisitionMode,
@@ -14,33 +20,44 @@ from dodal.devices.electron_analyser.vgscienta.enums import (
 )
 
 
-class VGScientaRegion(AbstractBaseRegion[AcquisitionMode]):
+class VGScientaRegion(
+    AbstractBaseRegion[AcquisitionMode, TLensMode, TPassEnergyEnum],
+    Generic[TLensMode, TPassEnergyEnum],
+):
     # Override defaults of base region class
-    lens_mode: str = "Angular45"
-    pass_energy: int = 5
+    lens_mode: TLensMode
+    pass_energy: TPassEnergyEnum
     acquisition_mode: AcquisitionMode = AcquisitionMode.SWEPT
     low_energy: float = 8.0
     high_energy: float = 10.0
     step_time: float = 1.0
     energy_step: float = Field(default=200.0)
+    centre_energy: float = Field(alias="fix_energy", default=9)
     # Specific to this class
     id: str = Field(default=str(uuid.uuid4()), alias="region_id")
-    fix_energy: float = 9.0
     total_steps: float = 13.0
     total_time: float = 13.0
-    exposure_time: float = 1.0
-    first_x_channel: int = 1
-    last_x_channel: int = 1000
-    first_y_channel: int = 101
-    last_y_channel: int = 800
+    min_x: int = Field(alias="first_x_channel", default=1)
+    sensor_max_size_x: int = Field(alias="last_x_channel", default=1000)
+    min_y: int = Field(alias="first_y_channel", default=101)
+    sensor_max_size_y: int = Field(alias="last_y_channel", default=800)
     detector_mode: DetectorMode = DetectorMode.ADC
     status: Status = Status.READY
 
-    def x_channel_size(self) -> int:
-        return self.last_x_channel - self.first_x_channel + 1
+    @property
+    def size_x(self) -> int:
+        return self.sensor_max_size_x - self.min_x + 1
 
-    def y_channel_size(self) -> int:
-        return self.last_y_channel - self.first_y_channel + 1
+    @property
+    def size_y(self) -> int:
+        return self.sensor_max_size_y - self.min_y + 1
+
+    @field_validator("pass_energy", mode="before")
+    @classmethod
+    def validate_pass_energy(cls, val):
+        # This is needed because if the value is a number, it can't be casted to the
+        # enum correctly.
+        return str(val)
 
 
 class VGScientaExcitationEnergySource(JavaToPythonModel):
@@ -49,15 +66,20 @@ class VGScientaExcitationEnergySource(JavaToPythonModel):
     value: float = 0
 
 
-class VGScientaSequence(AbstractBaseSequence[VGScientaRegion]):
-    element_set: str = Field(default="Unknown")
+class VGScientaSequence(
+    AbstractBaseSequence[VGScientaRegion[TLensMode, TPassEnergyEnum]],
+    Generic[TLensMode, TPsuMode, TPassEnergyEnum],
+):
+    psu_mode: TPsuMode = Field(alias="element_set")
     excitation_energy_sources: list[VGScientaExcitationEnergySource] = Field(
         default_factory=lambda: []
     )
-    regions: list[VGScientaRegion] = Field(default_factory=lambda: [])
+    regions: list[VGScientaRegion[TLensMode, TPassEnergyEnum]] = Field(
+        default_factory=lambda: []
+    )
 
     def get_excitation_energy_source_by_region(
-        self, region: VGScientaRegion
+        self, region: VGScientaRegion[TLensMode, TPassEnergyEnum]
     ) -> VGScientaExcitationEnergySource:
         value = next(
             (

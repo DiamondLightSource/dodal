@@ -22,7 +22,7 @@ from dodal.devices.i04.constants import RedisConstants
 from dodal.devices.i04.murko_results import MurkoResultsDevice
 from dodal.devices.i04.transfocator import Transfocator
 from dodal.devices.ipin import IPin
-from dodal.devices.motors import XYZPositioner
+from dodal.devices.motors import XYZStage
 from dodal.devices.mx_phase1.beamstop import Beamstop
 from dodal.devices.oav.oav_detector import OAVBeamCentrePV
 from dodal.devices.oav.oav_parameters import OAVConfig
@@ -43,13 +43,13 @@ from dodal.devices.zebra.zebra_constants_mapping import (
 )
 from dodal.devices.zebra.zebra_controlled_shutter import ZebraShutter
 from dodal.devices.zocalo import ZocaloResults
+from dodal.devices.zocalo.zocalo_results import ZocaloSource
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
-ZOOM_PARAMS_FILE = (
-    "/dls_sw/i04/software/gda/configurations/i04-config/xml/jCameraManZoomLevels.xml"
-)
-DISPLAY_CONFIG = "/dls_sw/i04/software/gda_versions/var/display.configuration"
+# Use BlueAPI scratch until https://github.com/DiamondLightSource/mx-bluesky/issues/1097 is done
+ZOOM_PARAMS_FILE = "/dls_sw/i04/software/bluesky/scratch/jCameraManZoomLevels.xml"
+DISPLAY_CONFIG = "/dls_sw/i04/software/bluesky/scratch/display.configuration"
 DAQ_CONFIGURATION_PATH = "/dls_sw/i04/software/daq_configuration"
 
 
@@ -77,22 +77,22 @@ def smargon() -> Smargon:
 
 
 @device_factory()
-def gonio_positioner() -> XYZPositioner:
+def gonio_positioner() -> XYZStage:
     """Get the i04 lower_gonio_stages device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
     """
-    return XYZPositioner(
+    return XYZStage(
         f"{PREFIX.beamline_prefix}-MO-GONIO-01:",
         "lower_gonio_stages",
     )
 
 
 @device_factory()
-def sample_delivery_system() -> XYZPositioner:
+def sample_delivery_system() -> XYZStage:
     """Get the i04 sample_delivery_system device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
     """
-    return XYZPositioner(
+    return XYZStage(
         f"{PREFIX.beamline_prefix}-MO-SDE-01:",
         "sample_delivery_system",
     )
@@ -137,8 +137,8 @@ def attenuator() -> BinaryFilterAttenuator:
     If this is called when already instantiated in i04, it will return the existing object.
     """
     return BinaryFilterAttenuator(
-        f"{PREFIX.beamline_prefix}-EA-ATTN-01:",
-        "attenuator",
+        prefix=f"{PREFIX.beamline_prefix}-EA-ATTN-01:",
+        num_filters=16,
     )
 
 
@@ -296,7 +296,9 @@ def zebra() -> Zebra:
     )
 
 
-@device_factory(skip=BL == "s04")
+@device_factory(
+    skip=BL == "s04",
+)
 def oav(params: OAVConfig | None = None) -> OAVBeamCentrePV:
     """Get the i04 OAV device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
@@ -307,7 +309,9 @@ def oav(params: OAVConfig | None = None) -> OAVBeamCentrePV:
     )
 
 
-@device_factory(skip=BL == "s04")
+@device_factory(
+    skip=BL == "s04",
+)
 def oav_full_screen(params: OAVConfig | None = None) -> OAVBeamCentrePV:
     """Get the i04 OAV device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
@@ -319,7 +323,9 @@ def oav_full_screen(params: OAVConfig | None = None) -> OAVBeamCentrePV:
     )
 
 
-@device_factory(skip=BL == "s04")
+@device_factory(
+    skip=BL == "s04",
+)
 def detector_motion() -> DetectorMotion:
     """Get the i04 detector motion device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
@@ -394,7 +400,7 @@ def zocalo() -> ZocaloResults:
     """Get the i04 ZocaloResults device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
     """
-    return ZocaloResults(channel="xrc.i04")
+    return ZocaloResults(channel="xrc.i04", results_source=ZocaloSource.CPU)
 
 
 @device_factory()

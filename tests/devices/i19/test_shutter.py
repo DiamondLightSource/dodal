@@ -1,10 +1,10 @@
 import json
-from unittest.mock import ANY, AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 from aiohttp.client import ClientConnectionError
 from bluesky.run_engine import RunEngine
-from ophyd_async.testing import set_mock_value
+from ophyd_async.testing import assert_reading, partial_reading, set_mock_value
 
 from dodal.devices.hutch_shutter import (
     ShutterDemand,
@@ -44,27 +44,23 @@ def shutter_can_be_created_without_raising_errors(hutch_name: HutchState):
 async def test_read_on_eh1_shutter_device_returns_correct_status(
     eh1_shutter: AccessControlledShutter,
 ):
-    reading = await eh1_shutter.read()
-    assert reading == {
-        "mock_shutter-shutter_status": {
-            "alarm_severity": 0,
-            "timestamp": ANY,
-            "value": ShutterState.CLOSED,
-        }
-    }
+    await assert_reading(
+        eh1_shutter,
+        {
+            "mock_shutter-shutter_status": partial_reading(ShutterState.CLOSED),
+        },
+    )
 
 
 async def test_read_on_eh2_shutter_device_returns_correct_status(
     eh2_shutter: AccessControlledShutter,
 ):
-    reading = await eh2_shutter.read()
-    assert reading == {
-        "mock_shutter-shutter_status": {
-            "alarm_severity": 0,
-            "timestamp": ANY,
-            "value": ShutterState.CLOSED,
-        }
-    }
+    await assert_reading(
+        eh2_shutter,
+        {
+            "mock_shutter-shutter_status": partial_reading(ShutterState.CLOSED),
+        },
+    )
 
 
 async def test_set_raises_error_if_post_not_successful(

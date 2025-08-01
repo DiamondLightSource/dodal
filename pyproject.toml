@@ -7,7 +7,6 @@ name = "dls-dodal"
 classifiers = [
     "Development Status :: 3 - Alpha",
     "License :: OSI Approved :: Apache Software License",
-    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
 ]
@@ -15,7 +14,7 @@ description = "Ophyd devices and other utils that could be used across DLS beaml
 dependencies = [
     "click",
     "ophyd",
-    "ophyd-async>=0.10.0a4",
+    "ophyd-async[ca,pva]>=0.12.3",
     "bluesky",
     "pyepics",
     "dataclasses-json",
@@ -24,22 +23,21 @@ dependencies = [
     "requests",
     "graypy",
     "pydantic>=2.0",
-    "opencv-python-headless", # For pin-tip detection.
-    "aioca",                  # Required for CA support with ophyd-async.
-    "p4p",                    # Required for PVA support with ophyd-async.
+    "opencv-python-headless",        # For pin-tip detection.
     "numpy",
     "aiofiles",
     "aiohttp",
     "redis",
-    "deepdiff",
     "scanspec>=0.7.3",
-    "event-model>=1.23",  # Until bluesky pins it https://github.com/DiamondLightSource/dodal/issues/1278
+    "event-model>=1.23",             # Until bluesky pins it https://github.com/DiamondLightSource/dodal/issues/1278
+    "pyzmq==26.3.0",                 # Until we can move to RHEL 8 https://github.com/DiamondLightSource/mx-bluesky/issues/1139
+    "deepdiff",
 ]
 
 dynamic = ["version"]
 license.file = "LICENSE"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 
 [project.optional-dependencies]
 dev = [
@@ -83,9 +81,21 @@ save-panda = "dodal.devices.util.save_panda:main"
 [project.urls]
 GitHub = "https://github.com/DiamondLightSource/dodal"
 
-[[project.authors]] # Further authors may be added by duplicating this section
+[[project.authors]]
 email = "dominic.oram@diamond.ac.uk"
 name = "Dominic Oram"
+
+[[project.authors]]
+email = "joseph.ware@diamond.ac.uk"
+name = "Joseph Ware"
+
+[[project.authors]]
+email = "Oliver.Silvester@diamond.ac.uk"
+name = "Oliver Silvester"
+
+[[project.authors]]
+email = "noemi.frisina@diamond.ac.uk"
+name = "Noemi Frisina"
 
 [tool.setuptools.packages.find]
 where = ["src"]

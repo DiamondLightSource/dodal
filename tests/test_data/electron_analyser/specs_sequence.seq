@@ -35,6 +35,24 @@
       "slices": 110,
       "centreEnergy": 0.0,
       "estimatedTimeInMs": 13718
+    },
+    {
+      "name": "New_Region2",
+      "acquisitionMode": "Fixed Energy",
+      "psuMode": "400V",
+      "lensMode": "HighAngularDispersion",
+      "startEnergy": 299.665,
+      "endEnergy": 300.335,
+      "stepEnergy": 0.4,
+      "passEnergy": 5.0,
+      "iterations": 1,
+      "exposureTime": 1.0,
+      "enabled": true,
+      "bindingEnergy": false,
+      "values": 2,
+      "slices": 100,
+      "centreEnergy": 300.0,
+      "estimatedTimeInMs": 4125
     }
   ]
 }

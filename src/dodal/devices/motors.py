@@ -1,8 +1,31 @@
 import asyncio
 import math
+from abc import ABC
 
 from ophyd_async.core import StandardReadable, derived_signal_rw
 from ophyd_async.epics.motor import Motor
+
+_X, _Y, _Z = "X", "Y", "Z"
+
+
+class Stage(StandardReadable, ABC):
+    """
+    For these devices, the following co-ordinates are typical but not enforced:
+    - z is horizontal & parallel to the direction of beam travel
+    - y is vertical and antiparallel to the force of gravity
+    - x is the cross product of y🞬z
+
+    Parameters
+    ----------
+    prefix:
+        Common part of the EPICS PV for all motors, including ":".
+    name:
+        Name of the stage, each child motor will be named "{name}-{field_name}"
+    *_infix:
+        Infix between the common prefix and the EPICS motor record fields for the field.
+    """
+
+    ...
 
 
 def create_axis_perp_to_rotation(motor_theta: Motor, motor_i: Motor, motor_j: Motor):
@@ -53,10 +76,7 @@ def create_axis_perp_to_rotation(motor_theta: Motor, motor_i: Motor, motor_j: Mo
 
 class XYZPositioner(StandardReadable):
     def __init__(
-        self,
-        prefix: str,
-        name: str = "",
-        infix: tuple[str, str, str] = ("X", "Y", "Z"),
+        self, prefix: str, name: str = "", x_infix: str = _X, theta_infix: str = "A"
     ):
         """Standard ophyd_async xyz motor stage, by combining 3 Motors,
         with added infix for extra flexibility to allow different axes other than x,y,z.
@@ -68,41 +88,91 @@ class XYZPositioner(StandardReadable):
 
         """
         with self.add_children_as_readables():
-            self.x = Motor(prefix + infix[0])
-            self.y = Motor(prefix + infix[1])
-            self.z = Motor(prefix + infix[2])
+            self.x = Motor(prefix + x_infix)
+            self.theta = Motor(prefix + theta_infix)
         super().__init__(name=name)
 
 
-class SixAxisGonio(XYZPositioner):
+class XYStage(Stage):
+    def __init__(
+        self, prefix: str, name: str = "", x_infix: str = _X, y_infix: str = _Y
+    ):
+        with self.add_children_as_readables():
+            self.x = Motor(prefix + x_infix)
+            self.y = Motor(prefix + y_infix)
+        super().__init__(name=name)
+
+
+class XYZStage(XYStage):
     def __init__(
         self,
         prefix: str,
         name: str = "",
-        infix: tuple[str, str, str, str, str, str] = (
-            "X",
-            "Y",
-            "Z",
-            "KAPPA",
-            "PHI",
-            "OMEGA",
-        ),
+        x_infix: str = _X,
+        y_infix: str = _Y,
+        z_infix: str = _Z,
     ):
-        """Six-axis goniometer with a standard xyz stage and three axes of rotation:
-        kappa, phi and omega.
-
-        Args:
-            prefix: EPICS PV (Common part up to and including :).
-            name: name for the device.
-            infix: EPICS PV suffix, default is the ("X", "Y", "Z", "KAPPA", "PHI", "OMEGA").
-        """
         with self.add_children_as_readables():
-            self.kappa = Motor(prefix + infix[3])
-            self.phi = Motor(prefix + infix[4])
-            self.omega = Motor(prefix + infix[5])
+            self.z = Motor(prefix + z_infix)
+            self.vertical_in_lab_space = create_axis_perp_to_rotation(
+                self.omega, self.y, self.z
+            )
+        super().__init__(prefix, name, x_infix, y_infix)
 
-        super().__init__(name=name, prefix=prefix, infix=infix[0:3])
 
-        self.vertical_in_lab_space = create_axis_perp_to_rotation(
-            self.omega, self.y, self.z
-        )
+class XYZThetaStage(XYZStage):
+    def __init__(
+        self,
+        prefix: str,
+        name: str = "",
+        x_infix: str = _X,
+        y_infix: str = _Y,
+        z_infix: str = _Z,
+        theta_infix: str = _Z,
+    ) -> None:
+        with self.add_children_as_readables():
+            self.theta = Motor(prefix + theta_infix)
+        super().__init__(prefix, name, x_infix, y_infix, z_infix)
+
+
+class XYPitchStage(XYStage):
+    def __init__(
+        self,
+        prefix: str,
+        x_infix: str = _X,
+        y_infix: str = _Y,
+        pitch_infix: str = "PITCH",
+        name: str = "",
+    ) -> None:
+        with self.add_children_as_readables():
+            self.pitch = Motor(prefix + pitch_infix)
+        super().__init__(prefix, name, x_infix, y_infix)
+
+
+class SixAxisGonio(XYZStage):
+    def __init__(
+        self,
+        prefix: str,
+        name: str = "",
+        x_infix: str = _X,
+        y_infix: str = _Y,
+        z_infix: str = _Z,
+        kappa_infix: str = "KAPPA",
+        phi_infix: str = "PHI",
+        omega_infix: str = "OMEGA",
+    ):
+        with self.add_children_as_readables():
+            self.kappa = Motor(prefix + kappa_infix)
+            self.phi = Motor(prefix + phi_infix)
+            self.omega = Motor(prefix + omega_infix)
+        super().__init__(prefix, name, x_infix, y_infix, z_infix)
+
+
+class YZStage(Stage):
+    def __init__(
+        self, prefix: str, name: str = "", y_infix: str = _Y, z_infix: str = _Z
+    ) -> None:
+        with self.add_children_as_readables():
+            self.y = Motor(prefix + y_infix)
+            self.z = Motor(prefix + z_infix)
+        super().__init__(name)

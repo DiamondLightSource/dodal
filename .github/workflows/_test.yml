@@ -64,7 +64,7 @@ jobs:
           path: example-services
 
       - name: Run docker compose
-        uses: hoverkraft-tech/compose-action@v2.2.0
+        uses: hoverkraft-tech/compose-action@v2.3.0
         with:
           compose-file: "./example-services/compose.yaml"
           services: |
@@ -80,7 +80,7 @@ jobs:
           python .github/scripts/check_test_durations.py system-report.json 5
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
           name: ${{ inputs.python-version }}/${{ inputs.runs-on }}
           files: ./unit_cov.xml,./system_cov.xml

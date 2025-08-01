@@ -1,11 +1,12 @@
 from ophyd_async.core import StandardReadable, StrictEnum
 from ophyd_async.epics.core import epics_signal_rw, epics_signal_x
-from ophyd_async.epics.motor import Motor
+
+from dodal.devices.motors import XYZStage
 
 
 class HomeGroup(StrictEnum):
     NONE = "none"
-    ALL = "All"
+    ALL = "ALL"
     X = "X"
     Y = "Y"
     Z = "Z"
@@ -18,13 +19,8 @@ class HomingControl(StandardReadable):
         super().__init__(name)
 
 
-class BeamStop(StandardReadable):
+class BeamStop(XYZStage):
     def __init__(self, prefix: str, name: str = "") -> None:
-        with self.add_children_as_readables():
-            self.x = Motor(f"{prefix}X")
-            self.y = Motor(f"{prefix}Y")
-            self.z = Motor(f"{prefix}Z")
-
         self.homing = HomingControl(f"{prefix}HM", name)
 
-        super().__init__(name)
+        super().__init__(prefix, name)

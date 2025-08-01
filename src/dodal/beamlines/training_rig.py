@@ -14,7 +14,7 @@ from dodal.common.visit import (
     LocalDirectoryServiceClient,
     StaticVisitPathProvider,
 )
-from dodal.devices.training_rig.sample_stage import TrainingRigSampleStage
+from dodal.devices.motors import XThetaStage
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
@@ -45,8 +45,8 @@ set_path_provider(
 
 
 @device_factory()
-def sample_stage() -> TrainingRigSampleStage:
-    return TrainingRigSampleStage(f"{PREFIX.beamline_prefix}-MO-MAP-01:STAGE:")
+def sample_stage() -> XThetaStage:
+    return XThetaStage(f"{PREFIX.beamline_prefix}-MO-MAP-01:STAGE:")
 
 
 @device_factory()

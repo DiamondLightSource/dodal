@@ -1,5 +1,6 @@
 import os
 from collections.abc import Generator
+from pathlib import PurePath
 from typing import cast
 from unittest.mock import patch
 
@@ -15,11 +16,15 @@ from event_model.documents import (
     StreamResource,
 )
 from ophyd_async.core import (
+    PathProvider,
     StandardDetector,
+    StaticPathProvider,
+    UUIDFilenameProvider,
 )
 
 from dodal.beamlines import adsim
-from dodal.devices.adsim import SimStage
+from dodal.common.beamlines.beamline_utils import clear_path_provider, set_path_provider
+from dodal.devices.motors import XThetaStage
 from dodal.plans import count
 
 """
@@ -56,13 +61,22 @@ def with_env():
 
 
 @pytest.fixture
-def det(RE) -> Generator[StandardDetector]:
+def path_provider() -> Generator[PathProvider]:
+    # path must be available to the `det` container, so cannot use tmp_path
+    path_provider = StaticPathProvider(UUIDFilenameProvider(), PurePath("/tmp"))
+    set_path_provider(path_provider)
+    yield path_provider
+    clear_path_provider()
+
+
+@pytest.fixture
+def det(RE, path_provider: PathProvider) -> Generator[StandardDetector]:
     yield adsim.det(connect_immediately=True)
     adsim.det.cache_clear()
 
 
 @pytest.fixture
-def sim_stage(RE) -> Generator[SimStage]:
+def sim_stage(RE) -> Generator[XThetaStage]:
     yield adsim.stage(connect_immediately=True)
     adsim.stage.cache_clear()
 
@@ -94,7 +108,6 @@ def test_plan_produces_expected_start_document(
     assert start.get("detectors") == ["det"]
     assert start.get("num_points") == shape[0]
     assert start.get("num_intervals") == shape[0] - 1
-    assert cast(str, start.get("data_session")).startswith("adsim")
 
     assert (hints := start.get("hints")) and (
         hints.get("dimensions") == [(("time",), "primary")]
