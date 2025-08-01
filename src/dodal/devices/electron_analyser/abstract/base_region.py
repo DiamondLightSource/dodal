@@ -68,6 +68,7 @@ class AbstractBaseRegion(
     pass_energy: TPassEnergy
     acquisition_mode: TAcquisitionMode
     low_energy: float
+    centre_energy: float
     high_energy: float
     step_time: float
     energy_step: float  # in eV
