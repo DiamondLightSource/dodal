@@ -122,5 +122,35 @@ async def test_analyser_region_detector_trigger_sets_driver_with_region(
         reg_det.driver.set.assert_awaited_once_with(reg_det.region)
 
 
+async def test_analyser_detector_config_read(
+    sim_detector: GenericElectronAnalyserDetector,
+) -> None:
+    # avoid division by zero in angle axis calculation
+    await sim_detector.driver.slices.set(1)
+    configuration_read = await sim_detector.read_configuration()
+    expected_config_keys = [
+        f"{sim_detector.name}-_driver-centre_energy",
+        f"{sim_detector.name}-_driver-lens_mode",
+        f"{sim_detector.name}-_driver-excitation_energy_source",
+        f"{sim_detector.name}-_driver-acquisition_mode",
+        f"{sim_detector.name}-_driver-psu_mode",
+        f"{sim_detector.name}-_driver-energy_mode",
+        f"{sim_detector.name}-_driver-region_name",
+        f"{sim_detector.name}-_driver-energy_step",
+        f"{sim_detector.name}-_driver-slices",
+        f"{sim_detector.name}-_driver-pass_energy",
+        f"{sim_detector.name}-_driver-high_energy",
+        f"{sim_detector.name}-_driver-iterations",
+        f"{sim_detector.name}-_driver-low_energy",
+        f"{sim_detector.name}-_driver-acquire_time",
+        f"{sim_detector.name}-_driver-total_steps",
+        f"{sim_detector.name}-_driver-total_time",
+        f"{sim_detector.name}-_driver-energy_axis",
+        f"{sim_detector.name}-_driver-binding_energy_axis",
+        f"{sim_detector.name}-_driver-angle_axis",
+    ]
+    assert all(item in configuration_read for item in expected_config_keys)
+
+
 # ToDo - Add tests for BaseElectronAnalyserDetector class + controller
 # ToDo - Add test that data being read is correct from plan
