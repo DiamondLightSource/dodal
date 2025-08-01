@@ -105,10 +105,6 @@ class SixAxisGonio(XYZStage):
     ):
         """Six-axis goniometer with a standard xyz stage and three axes of rotation:
         kappa, phi and omega.
-        Args:
-            prefix: EPICS PV (Common part up to and including :).
-            name: name for the device.
-            infix: EPICS PV suffix, default is the ("X", "Y", "Z", "KAPPA", "PHI", "OMEGA").
         """
         with self.add_children_as_readables():
             self.kappa = Motor(prefix + kappa_infix)
