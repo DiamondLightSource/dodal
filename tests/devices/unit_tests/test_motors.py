@@ -1,7 +1,7 @@
 import pytest
 from bluesky.run_engine import RunEngine
 from ophyd_async.core import init_devices
-from ophyd_async.testing import assert_reading
+from ophyd_async.testing import assert_reading, partial_reading
 
 from dodal.devices.motors import SixAxisGonio
 
@@ -18,23 +18,11 @@ async def test_reading_six_axis_gonio(six_axis_gonio: SixAxisGonio):
     await assert_reading(
         six_axis_gonio,
         {
-            "gonio-omega": {
-                "value": 0.0,
-            },
-            "gonio-kappa": {
-                "value": 0.0,
-            },
-            "gonio-phi": {
-                "value": 0.0,
-            },
-            "gonio-z": {
-                "value": 0.0,
-            },
-            "gonio-y": {
-                "value": 0.0,
-            },
-            "gonio-x": {
-                "value": 0.0,
-            },
+            "gonio-omega": partial_reading(0.0),
+            "gonio-kappa": partial_reading(0.0),
+            "gonio-phi": partial_reading(0.0),
+            "gonio-z": partial_reading(0.0),
+            "gonio-y": partial_reading(0.0),
+            "gonio-x": partial_reading(0.0),
         },
     )

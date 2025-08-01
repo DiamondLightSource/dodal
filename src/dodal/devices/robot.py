@@ -21,6 +21,9 @@ from ophyd_async.epics.core import (
 
 from dodal.log import LOGGER
 
+WAIT_FOR_OLD_PIN_MSG = "Waiting on old pin unloaded"
+WAIT_FOR_NEW_PIN_MSG = "Waiting on new pin loaded"
+
 
 class RobotLoadFailed(Exception):
     error_code: int
@@ -144,6 +147,7 @@ class BartRobot(StandardReadable, Movable[SampleLocation]):
             # in the current task, when it propagates to here we should cancel all pending tasks before bubbling up
             for task in tasks:
                 task.cancel()
+
             raise
 
     async def _load_pin_and_puck(self, sample_location: SampleLocation):
@@ -164,9 +168,9 @@ class BartRobot(StandardReadable, Movable[SampleLocation]):
         )
         await self.load.trigger()
         if await self.gonio_pin_sensor.get_value() == PinMounted.PIN_MOUNTED:
-            LOGGER.info("Waiting on old pin unloaded")
+            LOGGER.info(WAIT_FOR_OLD_PIN_MSG)
             await wait_for_value(self.gonio_pin_sensor, PinMounted.NO_PIN_MOUNTED, None)
-        LOGGER.info("Waiting on new pin loaded")
+        LOGGER.info(WAIT_FOR_NEW_PIN_MSG)
 
         await self.pin_mounted_or_no_pin_found()
 
@@ -178,7 +182,6 @@ class BartRobot(StandardReadable, Movable[SampleLocation]):
                 timeout=self.LOAD_TIMEOUT + self.NOT_BUSY_TIMEOUT,
             )
         except TimeoutError as e:
-            # Will only need to catch asyncio.TimeoutError after https://github.com/bluesky/ophyd-async/issues/572
             await self.prog_error.raise_if_error(e)
             await self.controller_error.raise_if_error(e)
             raise RobotLoadFailed(0, "Robot timed out") from e
