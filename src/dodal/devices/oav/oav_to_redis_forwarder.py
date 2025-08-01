@@ -110,11 +110,11 @@ class OAVToRedisForwarder(StandardReadable, Flyable, Stoppable):
         pickled numpy array of pixel values but raw byes are more space efficient. There
         may be better ways of doing this, see https://github.com/DiamondLightSource/mx-bluesky/issues/592"""
         jpeg_bytes = await get_next_jpeg(response)
-        self.uuid_setter(redis_uuid)
         sample_id = await self.sample_id.get_value()
         redis_key = f"murko:{sample_id}:raw"
         await self.redis_client.hset(redis_key, redis_uuid, jpeg_bytes)  # type: ignore
         await self.redis_client.expire(redis_key, timedelta(days=self.DATA_EXPIRY_DAYS))
+        self.uuid_setter(redis_uuid)
 
     async def _open_connection_and_do_function(
         self, function_to_do: Callable[[ClientResponse, OAVSource], Awaitable]

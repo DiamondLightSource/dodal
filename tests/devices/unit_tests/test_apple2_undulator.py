@@ -1,4 +1,3 @@
-import asyncio
 from collections import defaultdict
 from unittest.mock import AsyncMock
 
@@ -12,6 +11,7 @@ from ophyd_async.testing import (
     assert_reading,
     callback_on_mock_put,
     get_mock_put,
+    partial_reading,
     set_mock_value,
 )
 
@@ -128,7 +128,7 @@ async def test_given_gate_never_closes_then_setting_gaps_times_out(
     )
     mock_id_gap.get_timeout = AsyncMock(return_value=0.002)
 
-    with pytest.raises(asyncio.TimeoutError):
+    with pytest.raises(TimeoutError):
         await mock_id_gap.set(2)
 
 
@@ -176,7 +176,7 @@ async def test_given_gate_never_closes_then_setting_phases_times_out(
         lambda *_, **__: set_mock_value(mock_phaseAxes.gate, UndulatorGateStatus.OPEN),
     )
     mock_phaseAxes.get_timeout = AsyncMock(return_value=0.002)
-    with pytest.raises(asyncio.TimeoutError):
+    with pytest.raises(TimeoutError):
         await mock_phaseAxes.set(setValue)
 
 
@@ -290,18 +290,10 @@ async def test_phase_success_set(mock_phaseAxes: UndulatorPhaseAxes, RE: RunEngi
     await assert_reading(
         mock_phaseAxes,
         {
-            "mock_phaseAxes-top_inner-user_readback": {
-                "value": 3,
-            },
-            "mock_phaseAxes-top_outer-user_readback": {
-                "value": 2,
-            },
-            "mock_phaseAxes-btm_inner-user_readback": {
-                "value": 5,
-            },
-            "mock_phaseAxes-btm_outer-user_readback": {
-                "value": 7,
-            },
+            "mock_phaseAxes-top_inner-user_readback": partial_reading(3),
+            "mock_phaseAxes-top_outer-user_readback": partial_reading(2),
+            "mock_phaseAxes-btm_inner-user_readback": partial_reading(5),
+            "mock_phaseAxes-btm_outer-user_readback": partial_reading(7),
         },
     )
 
@@ -314,7 +306,7 @@ async def test_given_gate_never_closes_then_setting_jaw_phases_times_out(
         lambda *_, **__: set_mock_value(mock_jaw_phase.gate, UndulatorGateStatus.OPEN),
     )
     mock_jaw_phase.get_timeout = AsyncMock(return_value=0.002)
-    with pytest.raises(asyncio.TimeoutError):
+    with pytest.raises(TimeoutError):
         await mock_jaw_phase.set(2)
 
 
