@@ -26,13 +26,15 @@ class PressureJumpCellDetector(AreaDetector[PressureJumpCellController]):
         drv_suffix="cam1:",
         adc_trig_suffix="TRIG:",
         writer_cls: type[ADWriter] = ADHDFWriter,
-        fileio_suffix = "FILE:",
+        fileio_suffix="FILE:",
         name: str = "",
         plugins: dict[str, NDPluginBaseIO] | None = None,
         config_sigs: Sequence[SignalR] = (),
     ):
         driver = PressureJumpCellDriverIO(prefix + drv_suffix)
-        controller = PressureJumpCellController(driver, readout_time=readout_time)
+        controller = PressureJumpCellController(
+            driver, self.trig, readout_time=readout_time
+        )
 
         pressure_cell_plugins: dict[str, NDPluginBaseIO] = {
             "trig": PressureJumpCellAdcTriggerIO(prefix=f"{prefix}{adc_trig_suffix}")
