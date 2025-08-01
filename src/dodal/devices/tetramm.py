@@ -22,9 +22,8 @@ from ophyd_async.epics.adcore import (
     NDArrayBaseIO,
     NDFileHDFIO,
     NDPluginBaseIO,
-    stop_busy_record,
 )
-from ophyd_async.epics.core import PvSuffix
+from ophyd_async.epics.core import PvSuffix, stop_busy_record
 
 
 class TetrammRange(StrictEnum):
