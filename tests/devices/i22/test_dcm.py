@@ -6,6 +6,7 @@ from ophyd_async.testing import (
     assert_configuration,
     assert_emitted,
     assert_reading,
+    partial_reading,
     set_mock_value,
 )
 
@@ -68,51 +69,21 @@ async def test_reading(dcm: DCM):
     await assert_reading(
         dcm,
         {
-            "dcm-backplate_temp": {
-                "value": 0.0,
-            },
-            "dcm-bragg_in_degrees": {
-                "value": 0.0,
-            },
-            "dcm-crystal_1_heater_temp": {
-                "value": 0.0,
-            },
-            "dcm-crystal_1_temp": {
-                "value": 0.0,
-            },
-            "dcm-crystal_2_heater_temp": {
-                "value": 0.0,
-            },
-            "dcm-crystal_2_temp": {
-                "value": 0.0,
-            },
-            "dcm-crystal_metadata_d_spacing_a": {
-                "value": 0.0,
-            },
-            "dcm-energy_in_kev": {
-                "value": 0.0,
-            },
-            "dcm-offset_in_mm": {
-                "value": 0.0,
-            },
-            "dcm-perp": {
-                "value": 0.0,
-            },
-            "dcm-perp_temp": {
-                "value": 0.0,
-            },
-            "dcm-wavelength_in_a": {
-                "value": 0.0,
-            },
-            "dcm-xtal_1-roll_in_mrad": {
-                "value": 0.0,
-            },
-            "dcm-xtal_2-pitch_in_mrad": {
-                "value": 0.0,
-            },
-            "dcm-xtal_2-roll_in_mrad": {
-                "value": 0.0,
-            },
+            "dcm-backplate_temp": partial_reading(0.0),
+            "dcm-bragg_in_degrees": partial_reading(0.0),
+            "dcm-crystal_1_heater_temp": partial_reading(0.0),
+            "dcm-crystal_1_temp": partial_reading(0.0),
+            "dcm-crystal_2_heater_temp": partial_reading(0.0),
+            "dcm-crystal_2_temp": partial_reading(0.0),
+            "dcm-crystal_metadata_d_spacing_a": partial_reading(0.0),
+            "dcm-energy_in_kev": partial_reading(0.0),
+            "dcm-offset_in_mm": partial_reading(0.0),
+            "dcm-perp": partial_reading(0.0),
+            "dcm-perp_temp": partial_reading(0.0),
+            "dcm-wavelength_in_a": partial_reading(0.0),
+            "dcm-xtal_1-roll_in_mrad": partial_reading(0.0),
+            "dcm-xtal_2-pitch_in_mrad": partial_reading(0.0),
+            "dcm-xtal_2-roll_in_mrad": partial_reading(0.0),
         },
     )
 
@@ -121,97 +92,37 @@ async def test_configuration(dcm: DCM):
     await assert_configuration(
         dcm,
         {
-            "dcm-bragg_in_degrees-motor_egu": {
-                "value": "",
-            },
-            "dcm-bragg_in_degrees-offset": {
-                "value": 0.0,
-            },
-            "dcm-bragg_in_degrees-velocity": {
-                "value": 0.0,
-            },
-            "dcm-crystal_1_d_spacing": {
-                "value": 0.31356,
-            },
-            "dcm-crystal_1_reflection": {"value": [1, 1, 1]},
-            "dcm-crystal_1_type": {
-                "value": "silicon",
-            },
-            "dcm-crystal_1_usage": {
-                "value": "Bragg",
-            },
-            "dcm-crystal_2_d_spacing": {
-                "value": 0.31356,
-            },
-            "dcm-crystal_2_reflection": {"value": [1, 1, 1]},
-            "dcm-crystal_2_type": {
-                "value": "silicon",
-            },
-            "dcm-crystal_2_usage": {
-                "value": "Bragg",
-            },
-            "dcm-energy_in_kev-motor_egu": {
-                "value": "",
-            },
-            "dcm-energy_in_kev-offset": {
-                "value": 0.0,
-            },
-            "dcm-energy_in_kev-velocity": {
-                "value": 0.0,
-            },
-            "dcm-offset_in_mm-motor_egu": {
-                "value": "",
-            },
-            "dcm-offset_in_mm-offset": {
-                "value": 0.0,
-            },
-            "dcm-offset_in_mm-velocity": {
-                "value": 0.0,
-            },
-            "dcm-perp-motor_egu": {
-                "value": "",
-            },
-            "dcm-perp-offset": {
-                "value": 0.0,
-            },
-            "dcm-perp-velocity": {
-                "value": 0.0,
-            },
-            "dcm-wavelength_in_a-motor_egu": {
-                "value": "",
-            },
-            "dcm-wavelength_in_a-offset": {
-                "value": 0.0,
-            },
-            "dcm-wavelength_in_a-velocity": {
-                "value": 0.0,
-            },
-            "dcm-xtal_1-roll_in_mrad-motor_egu": {
-                "value": "",
-            },
-            "dcm-xtal_1-roll_in_mrad-offset": {
-                "value": 0.0,
-            },
-            "dcm-xtal_1-roll_in_mrad-velocity": {
-                "value": 0.0,
-            },
-            "dcm-xtal_2-pitch_in_mrad-motor_egu": {
-                "value": "",
-            },
-            "dcm-xtal_2-pitch_in_mrad-offset": {
-                "value": 0.0,
-            },
-            "dcm-xtal_2-pitch_in_mrad-velocity": {
-                "value": 0.0,
-            },
-            "dcm-xtal_2-roll_in_mrad-motor_egu": {
-                "value": "",
-            },
-            "dcm-xtal_2-roll_in_mrad-offset": {
-                "value": 0.0,
-            },
-            "dcm-xtal_2-roll_in_mrad-velocity": {
-                "value": 0.0,
-            },
+            "dcm-bragg_in_degrees-motor_egu": partial_reading(""),
+            "dcm-bragg_in_degrees-offset": partial_reading(0.0),
+            "dcm-bragg_in_degrees-velocity": partial_reading(0.0),
+            "dcm-crystal_1_d_spacing": partial_reading(0.31356),
+            "dcm-crystal_1_reflection": partial_reading([1, 1, 1]),
+            "dcm-crystal_1_type": partial_reading("silicon"),
+            "dcm-crystal_1_usage": partial_reading("Bragg"),
+            "dcm-crystal_2_d_spacing": partial_reading(0.31356),
+            "dcm-crystal_2_reflection": partial_reading([1, 1, 1]),
+            "dcm-crystal_2_type": partial_reading("silicon"),
+            "dcm-crystal_2_usage": partial_reading("Bragg"),
+            "dcm-energy_in_kev-motor_egu": partial_reading(""),
+            "dcm-energy_in_kev-offset": partial_reading(0.0),
+            "dcm-energy_in_kev-velocity": partial_reading(0.0),
+            "dcm-offset_in_mm-motor_egu": partial_reading(""),
+            "dcm-offset_in_mm-offset": partial_reading(0.0),
+            "dcm-offset_in_mm-velocity": partial_reading(0.0),
+            "dcm-perp-motor_egu": partial_reading(""),
+            "dcm-perp-offset": partial_reading(0.0),
+            "dcm-perp-velocity": partial_reading(0.0),
+            "dcm-wavelength_in_a-motor_egu": partial_reading(""),
+            "dcm-wavelength_in_a-offset": partial_reading(0.0),
+            "dcm-wavelength_in_a-velocity": partial_reading(0.0),
+            "dcm-xtal_1-roll_in_mrad-motor_egu": partial_reading(""),
+            "dcm-xtal_1-roll_in_mrad-offset": partial_reading(0.0),
+            "dcm-xtal_1-roll_in_mrad-velocity": partial_reading(0.0),
+            "dcm-xtal_2-pitch_in_mrad-motor_egu": partial_reading(""),
+            "dcm-xtal_2-pitch_in_mrad-offset": partial_reading(0.0),
+            "dcm-xtal_2-pitch_in_mrad-velocity": partial_reading(0.0),
+            "dcm-xtal_2-roll_in_mrad-motor_egu": partial_reading(""),
+            "dcm-xtal_2-roll_in_mrad-offset": partial_reading(0.0),
+            "dcm-xtal_2-roll_in_mrad-velocity": partial_reading(0.0),
         },
     )
