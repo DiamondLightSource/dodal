@@ -38,25 +38,6 @@ class XThetaStage(Stage):
         super().__init__(name=name)
 
 
-class XYZPositioner(StandardReadable):
-    def __init__(
-        self, prefix: str, name: str = "", x_infix: str = _X, theta_infix: str = "A"
-    ):
-        """Standard ophyd_async xyz motor stage, by combining 3 Motors,
-        with added infix for extra flexibility to allow different axes other than x,y,z.
-
-        Args:
-            prefix: EPICS PV (Common part up to and including :).
-            name: name for the device.
-            infix: EPICS PV suffix, default is the ("X", "Y", "Z").
-
-        """
-        with self.add_children_as_readables():
-            self.x = Motor(prefix + x_infix)
-            self.theta = Motor(prefix + theta_infix)
-        super().__init__(name=name)
-
-
 class XYStage(Stage):
     def __init__(
         self, prefix: str, name: str = "", x_infix: str = _X, y_infix: str = _Y
