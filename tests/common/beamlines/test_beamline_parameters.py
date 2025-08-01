@@ -1,5 +1,4 @@
 from os import environ
-from os.path import join
 from unittest.mock import patch
 
 import pytest
@@ -8,12 +7,11 @@ from dodal.common.beamlines.beamline_parameters import (
     GDABeamlineParameters,
     get_beamline_parameters,
 )
-
-TEST_DATA_PATH = "tests/test_data"
-
-TEST_BEAMLINE_PARAMETERS_TXT = join(TEST_DATA_PATH, "test_beamline_parameters.txt")
-TEST_I04_BEAMLINE_PARAMETERS = join(TEST_DATA_PATH, "i04_beamlineParameters")
-TEST_BAD_BEAMLINE_PARAMETERS = join(TEST_DATA_PATH, "bad_beamlineParameters")
+from tests.constants import (
+    BAD_BEAMLINE_PARAMETERS,
+    I04_BEAMLINE_PARAMETERS,
+    TEST_BEAMLINE_PARAMETERS_TXT,
+)
 
 
 def test_beamline_parameters():
@@ -26,7 +24,7 @@ def test_beamline_parameters():
 
 
 def test_i03_beamline_parameters():
-    params = GDABeamlineParameters.from_file(TEST_I04_BEAMLINE_PARAMETERS)
+    params = GDABeamlineParameters.from_file(I04_BEAMLINE_PARAMETERS)
     assert params["flux_predict_polynomial_coefficients_5"] == [
         -0.0000707134131045123,
         7.0205491504418,
@@ -38,7 +36,7 @@ def test_i03_beamline_parameters():
 
 @patch("dodal.common.beamlines.beamline_parameters.LOGGER")
 def test_parse_exception_causes_warning(mock_logger):
-    params = GDABeamlineParameters.from_file(TEST_BAD_BEAMLINE_PARAMETERS)
+    params = GDABeamlineParameters.from_file(BAD_BEAMLINE_PARAMETERS)
     assert params["flux_predict_polynomial_coefficients_5"] == [
         -0.0000707134131045123,
         7.0205491504418,
@@ -48,7 +46,7 @@ def test_parse_exception_causes_warning(mock_logger):
     ]
     mock_logger.warning.assert_called_once()
 
-    params = GDABeamlineParameters.from_file(TEST_BAD_BEAMLINE_PARAMETERS)
+    params = GDABeamlineParameters.from_file(BAD_BEAMLINE_PARAMETERS)
     assert params["flux_predict_polynomial_coefficients_5"] == [
         -0.0000707134131045123,
         7.0205491504418,

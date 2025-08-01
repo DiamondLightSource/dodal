@@ -1,3 +1,9 @@
-UNDULATOR_ID_GAP_LOOKUP_TABLE_PATH: str = (
-    "./tests/devices/unit_tests/test_beamline_undulator_to_gap_lookup_table.txt"
-)
+from os.path import join
+
+TEST_DATA_PATH = "tests/test_data"
+
+BAD_BEAMLINE_PARAMETERS = join(TEST_DATA_PATH, "bad_beamlineParameters")
+
+I04_BEAMLINE_PARAMETERS = join(TEST_DATA_PATH, "i04_beamlineParameters")
+
+TEST_BEAMLINE_PARAMETERS_TXT = join(TEST_DATA_PATH, "test_beamline_parameters.txt")

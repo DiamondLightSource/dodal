@@ -13,7 +13,7 @@ from dodal.devices.undulator import (
     UndulatorGapAccess,
     _get_gap_for_energy,
 )
-from tests.constants import UNDULATOR_ID_GAP_LOOKUP_TABLE_PATH
+from tests.devices.unit_tests.constants import TEST_BEAMLINE_UNDULATOR_TO_GAP_LUT
 
 
 @pytest.fixture
@@ -24,7 +24,7 @@ async def undulator(RE) -> Undulator:
             name="undulator",
             poles=80,
             length=2.0,
-            id_gap_lookup_table_path=UNDULATOR_ID_GAP_LOOKUP_TABLE_PATH,
+            id_gap_lookup_table_path=TEST_BEAMLINE_UNDULATOR_TO_GAP_LUT,
         )
     return undulator
 
@@ -78,7 +78,7 @@ async def test_poles_not_propagated_if_not_supplied():
             "UND-01",
             name="undulator",
             length=2.0,
-            id_gap_lookup_table_path=UNDULATOR_ID_GAP_LOOKUP_TABLE_PATH,
+            id_gap_lookup_table_path=TEST_BEAMLINE_UNDULATOR_TO_GAP_LUT,
         )
     assert undulator.poles is None
     assert "undulator-poles" not in (await undulator.read_configuration())
@@ -90,7 +90,7 @@ async def test_length_not_propagated_if_not_supplied():
             "UND-01",
             name="undulator",
             poles=80,
-            id_gap_lookup_table_path=UNDULATOR_ID_GAP_LOOKUP_TABLE_PATH,
+            id_gap_lookup_table_path=TEST_BEAMLINE_UNDULATOR_TO_GAP_LUT,
         )
     assert undulator.length is None
     assert "undulator-length" not in (await undulator.read_configuration())
