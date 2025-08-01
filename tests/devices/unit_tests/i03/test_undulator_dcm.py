@@ -12,7 +12,9 @@ from dodal.devices.i03.undulator_dcm import UndulatorDCM
 from dodal.devices.undulator import AccessError, Undulator, UndulatorGapAccess
 from dodal.devices.util.test_utils import patch_motor
 from dodal.log import LOGGER
-from tests.devices.unit_tests.constants import TEST_BEAMLINE_UNDULATOR_TO_GAP_LUT
+from tests.devices.unit_tests.test_data import (
+    TEST_BEAMLINE_UNDULATOR_TO_GAP_LUT,
+)
 
 
 @pytest.fixture(autouse=True)

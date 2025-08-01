@@ -12,7 +12,7 @@ from dodal.devices.oav.oav_detector import (
     OAVConfigBeamCentre,
     ZoomController,
 )
-from tests.constants import (
+from tests.test_data import (
     TEST_DISPLAY_CONFIG,
     TEST_J_CAMERA_MAN_ZOOM_LEVELS_XML,
 )

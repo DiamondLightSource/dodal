@@ -7,7 +7,7 @@ from dodal.common.beamlines.beamline_parameters import (
     GDABeamlineParameters,
     get_beamline_parameters,
 )
-from tests.constants import (
+from tests.test_data import (
     BAD_BEAMLINE_PARAMETERS,
     I04_BEAMLINE_PARAMETERS,
     TEST_BEAMLINE_PARAMETERS_TXT,

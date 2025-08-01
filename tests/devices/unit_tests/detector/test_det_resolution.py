@@ -1,18 +1,17 @@
-from os.path import join
 from pathlib import Path
 from unittest import mock
 from unittest.mock import MagicMock, PropertyMock, patch
 
 import pytest
 from numpy import isclose
+from tests.devices.unit_tests.detector.test_data import (
+    TEST_DET_DIST_CONVERTER_LUT,
+)
 
 from dodal.devices.detector import DetectorParams
 from dodal.devices.detector.det_resolution import (
     resolution,
 )
-
-TEST_DATA_PATH = "tests/devices/unit_tests/detector/test_data"
-TEST_DET_DIST_CONVERTER_LUT = join(TEST_DATA_PATH, "test_det_dist_converter.txt")
 
 
 @pytest.fixture(scope="function")

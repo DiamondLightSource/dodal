@@ -1,4 +1,3 @@
-from os.path import join
 from typing import Any, TypeVar, get_args, get_origin
 
 from deepdiff import DeepDiff
@@ -19,11 +18,10 @@ from dodal.devices.electron_analyser.vgscienta import (
     VGScientaDetector,
     VGScientaSequence,
 )
-
-TEST_DATA_PATH = "tests/devices/unit_tests/electron_analyser/test_data"
-
-TEST_VGSCIENTA_SEQUENCE = join(TEST_DATA_PATH, "vgscienta_sequence.seq")
-TEST_SPECS_SEQUENCE = join(TEST_DATA_PATH, "specs_sequence.seq")
+from tests.devices.unit_tests.electron_analyser.test_data import (
+    TEST_SPECS_SEQUENCE,
+    TEST_VGSCIENTA_SEQUENCE,
+)
 
 SEQUENCE_KEY = 0
 SEQUENCE_TYPE_KEY = 1

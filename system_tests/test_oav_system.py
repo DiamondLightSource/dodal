@@ -2,7 +2,10 @@ import bluesky.plan_stubs as bps
 import pytest
 from bluesky.run_engine import RunEngine
 from ophyd_async.core import init_devices
-from tests.constants import TEST_DISPLAY_CONFIG, TEST_J_CAMERA_MAN_ZOOM_LEVELS_XML
+from tests.test_data import (
+    TEST_DISPLAY_CONFIG,
+    TEST_J_CAMERA_MAN_ZOOM_LEVELS_XML,
+)
 
 from dodal.devices.oav.oav_detector import OAV, OAVConfig
 

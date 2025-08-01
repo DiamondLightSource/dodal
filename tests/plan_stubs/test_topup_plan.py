@@ -1,4 +1,3 @@
-from os.path import join
 from unittest.mock import MagicMock, patch
 
 import bluesky.plan_stubs as bps
@@ -6,17 +5,17 @@ import pytest
 from bluesky.run_engine import RunEngine
 from ophyd_async.core import init_devices
 from ophyd_async.testing import set_mock_value
-from tests.common.beamlines.test_beamline_parameters import TEST_BEAMLINE_PARAMETERS_TXT
 
 from dodal.devices.synchrotron import Synchrotron, SynchrotronMode
 from dodal.plan_stubs.check_topup import (
     check_topup_and_wait_if_necessary,
     wait_for_topup_complete,
 )
-
-TEST_DATA_PATH = "tests/plan_stubs/test_data"
-TEST_TOPUP_SHORT_PARAMS_TXT = join(TEST_DATA_PATH, "topup_short_params.txt")
-TEST_TOPUP_LONG_DELAY_TXT = join(TEST_DATA_PATH, "topup_long_delay.txt")
+from tests.common.beamlines.test_beamline_parameters import TEST_BEAMLINE_PARAMETERS_TXT
+from tests.plan_stubs.test_data import (
+    TEST_TOPUP_LONG_DELAY_TXT,
+    TEST_TOPUP_SHORT_PARAMS_TXT,
+)
 
 
 @pytest.fixture

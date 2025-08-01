@@ -6,7 +6,7 @@ from ophyd_async.testing import set_mock_value
 
 from dodal.devices.oav.oav_detector import OAVBeamCentreFile, OAVBeamCentrePV
 from dodal.devices.oav.oav_parameters import OAVConfig, OAVConfigBeamCentre
-from tests.constants import TEST_DISPLAY_CONFIG, TEST_J_CAMERA_MAN_ZOOM_LEVELS_XML
+from tests.test_data import TEST_DISPLAY_CONFIG, TEST_J_CAMERA_MAN_ZOOM_LEVELS_XML
 
 
 @pytest.fixture

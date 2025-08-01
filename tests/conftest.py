@@ -15,8 +15,8 @@ from dodal.utils import (
     collect_factories,
     make_all_devices,
 )
-from tests.constants import I04_BEAMLINE_PARAMETERS
-from tests.devices.unit_tests.constants import TEST_LUT_TXT
+from tests.devices.unit_tests.test_data import TEST_LUT_TXT
+from tests.test_data import I04_BEAMLINE_PARAMETERS
 
 
 @pytest.fixture(scope="function")

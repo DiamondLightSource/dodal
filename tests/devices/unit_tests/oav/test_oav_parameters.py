@@ -9,8 +9,11 @@ from dodal.devices.oav.oav_parameters import (
     ZoomParams,
     ZoomParamsCrosshair,
 )
-from tests.constants import TEST_DISPLAY_CONFIG, TEST_J_CAMERA_MAN_ZOOM_LEVELS_XML
-from tests.devices.unit_tests.oav.constants import TEST_OAV_CENTRING_JSON
+from tests.devices.unit_tests.oav.test_data import TEST_OAV_CENTRING_JSON
+from tests.test_data import (
+    TEST_DISPLAY_CONFIG,
+    TEST_J_CAMERA_MAN_ZOOM_LEVELS_XML,
+)
 
 
 @pytest.fixture

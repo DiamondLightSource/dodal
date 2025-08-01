@@ -7,7 +7,7 @@ from dodal.devices.oav.snapshots.snapshot_image_processing import (
     compute_beam_centre_pixel_xy_for_mm_position,
     draw_crosshair,
 )
-from tests.devices.unit_tests.oav.constants import (
+from tests.devices.unit_tests.oav.test_data import (
     OAV_SNAPSHOT_EXPECTED_PNG,
     OAV_SNAPSHOT_TEST_PNG,
 )
