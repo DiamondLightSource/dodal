@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Device Standards &#8212; dodal 1.54.1.dev4+g5f88941420 documentation</title>
+    <title>Device Standards &#8212; dodal 1.54.1.dev5+gd61e50edad documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=3ef5d64e"></script>
+    <script src="../_static/documentation_options.js?v=9b8dfdd6"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -966,29 +966,37 @@ complex device (e.g. multiple files) it should have a folder of its own e.g. <co
 <p>Ophyd-async directory contains a <a class="reference external" href="https://blueskyproject.io/ophyd-async/main/how-to/choose-interfaces-for-devices.html">flowchart</a> for a simplified decision tree about what interfaces
 should a given device implement. In addition to this the following guidelines are strongly recommended:</p>
 <ol class="arabic simple">
+<li><p>Device should have their name as an optional str parameter with a default of “”- this allows ophyd-async to automatically name the device</p></li>
 <li><p>Devices should contain only the PV suffixes that are generic for any instance of the device. See <a class="reference internal" href="#pv-suffixes">PV Suffixes</a></p></li>
 <li><p>Anything in a device that is expected to be set externally should be a signal. See <a class="reference internal" href="#use-of-signals">Use of signals</a></p></li>
 <li><p>Devices should not hold state, when they are read they should read the hardware. See <a class="reference internal" href="#holding-state">Holding State</a></p></li>
 </ol>
 </section>
+<section id="defaulting-names">
+<h2>Defaulting Names<a class="headerlink" href="#defaulting-names" title="Link to this heading">#</a></h2>
+<p>Device should provide the ability to override their name while maintaining a default name of “”-
+this allows the device to be named on connection from the name of its factory function when using
+the device_factory decorator.</p>
+<p>When a device is named in this way, all of its child devices are named appropriately.</p>
+</section>
 <section id="pv-suffixes">
 <h2>PV Suffixes<a class="headerlink" href="#pv-suffixes" title="Link to this heading">#</a></h2>
 <p>In general devices should contain only the PV suffixes that are generic for any instance of the device e.g.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">MyDevice</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">bragg</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;BRAGG&quot;</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
-<span class="n">device_instantiation</span><span class="p">(</span><span class="n">MyDevice</span><span class="p">,</span> <span class="s2">&quot;dcm&quot;</span><span class="p">,</span> <span class="s2">&quot;-MO-DCM-01:&quot;</span><span class="p">)</span>
+<span class="n">MyDevice</span><span class="p">(</span><span class="s2">&quot;BLXXI-MO-DCM-01:&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>is preferred over</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">MyDevice</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">bragg</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;-MO-DCM-01:BRAGG&quot;</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
-<span class="n">device_instantiation</span><span class="p">(</span><span class="n">MyDevice</span><span class="p">,</span> <span class="s2">&quot;dcm&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+<span class="n">MyDevice</span><span class="p">(</span><span class="s2">&quot;BLXXI&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>This is so that a new device on say <code class="docutils literal notranslate"><span class="pre">-MO-DCM-02</span></code> can be easily created.</p>
@@ -1141,6 +1149,7 @@ based on this and so this has the issues listed above. Instead you should make s
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ophyd-vs-ophyd-async">Ophyd vs Ophyd-async</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#where-to-put-devices">Where to put devices</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#device-best-practices">Device Best Practices</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#defaulting-names">Defaulting Names</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pv-suffixes">PV Suffixes</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#beamline-prefix">Beamline Prefix</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#use-of-signals">Use of signals</a></li>

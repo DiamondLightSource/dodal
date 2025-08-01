@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Creating a new beamline &#8212; dodal 1.54.1.dev4+g5f88941420 documentation</title>
+    <title>Creating a new beamline &#8212; dodal 1.54.1.dev5+gd61e50edad documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=3ef5d64e"></script>
+    <script src="../_static/documentation_options.js?v=9b8dfdd6"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -537,14 +537,14 @@ go somewhere else e.g. <code class="docutils literal notranslate"><span class="p
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">A valid factory function which:</span>
-<span class="sd">- may be instantiated automatically, selectively on live beamline</span>
-<span class="sd">    - caches and re-uses the result for subsequent calls</span>
-<span class="sd">- automatically names the device</span>
-<span class="sd">- may be skipped when make_all_devices is called on this module</span>
-<span class="sd">- must be explicitly connected (may be automated by tools)</span>
-<span class="sd">    - when connected may connect to a simulated backend</span>
-<span class="sd">    - may be connected concurrently (when automated by tools)</span>
+<span class="sd">This decorator gives extra desirable behaviour to this factory function:</span>
+<span class="sd">- it may be instantiated automatically, selectively on live beamline</span>
+<span class="sd">    - caching and re-using the result for subsequent calls</span>
+<span class="sd">- it automatically names the device if no name is explicitly set</span>
+<span class="sd">- it may be skipped when make_all_devices is called on this module</span>
+<span class="sd">- it must be explicitly connected (which may be automated by tools)</span>
+<span class="sd">    - when connected it may connect to a simulated backend</span>
+<span class="sd">    - it may be connected concurrently (when automated by tools)</span>
 <span class="sd">&quot;&quot;&quot;</span><span class="s2">&quot;</span>
 <span class="nd">@device_factory</span><span class="p">(</span><span class="n">skip</span> <span class="o">=</span> <span class="n">BL</span> <span class="o">==</span> <span class="s2">&quot;s41&quot;</span><span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">synchrotron</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Synchrotron</span><span class="p">:</span>
@@ -561,10 +561,6 @@ go somewhere else e.g. <code class="docutils literal notranslate"><span class="p
     <span class="p">)</span>
 </pre></div>
 </div>
-<p><code class="docutils literal notranslate"><span class="pre">w41</span></code> should also be added to the list of <code class="docutils literal notranslate"><span class="pre">ALL_BEAMLINES</span></code> in <code class="docutils literal notranslate"><span class="pre">tests/beamlines/test_device_instantiation</span></code>.
-This test checks that the function returns a type that conforms to Bluesky protocols,
-that it always returns the same instance of the device and that the arguments passed
-into the Device class constructor are valid.</p>
 </section>
 </section>
 

@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.focusing_mirror &#8212; dodal 1.54.1.dev4+g5f88941420 documentation</title>
+    <title>dodal.devices.focusing_mirror &#8212; dodal 1.54.1.dev5+gd61e50edad documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=3ef5d64e"></script>
+    <script src="../../../_static/documentation_options.js?v=9b8dfdd6"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -585,7 +585,7 @@ window.addEventListener("load", () => mermaid.run());
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.focusing_mirror.MirrorVoltages.html#dodal.devices.focusing_mirror.MirrorVoltages">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">MirrorVoltages</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">):</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">daq_configuration_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">daq_configuration_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">voltage_lookup_table_path</span> <span class="o">=</span> <span class="p">(</span>
             <span class="n">daq_configuration_path</span> <span class="o">+</span> <span class="s2">&quot;/json/mirrorFocus.json&quot;</span>

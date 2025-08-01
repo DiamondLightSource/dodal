@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.beamlines.i23 &#8212; dodal 1.54.1.dev4+g5f88941420 documentation</title>
+    <title>dodal.beamlines.i23 &#8212; dodal 1.54.1.dev5+gd61e50edad documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=3ef5d64e"></script>
+    <script src="../../../_static/documentation_options.js?v=9b8dfdd6"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -530,7 +530,7 @@ window.addEventListener("load", () => mermaid.run());
 <span class="nd">@device_factory</span><span class="p">()</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">shutter</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">ZebraShutter</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the i23 zebra controlled shutter.&quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">ZebraShutter</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">PREFIX</span><span class="o">.</span><span class="n">beamline_prefix</span><span class="si">}</span><span class="s2">-EA-SHTR-01:&quot;</span><span class="p">,</span> <span class="s2">&quot;shutter&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ZebraShutter</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">PREFIX</span><span class="o">.</span><span class="n">beamline_prefix</span><span class="si">}</span><span class="s2">-EA-SHTR-01:&quot;</span><span class="p">)</span>
 
 
 <span class="nd">@device_factory</span><span class="p">()</span>
@@ -543,7 +543,6 @@ window.addEventListener("load", () => mermaid.run());
 <span class="k">def</span><span class="w"> </span><span class="nf">zebra</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Zebra</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the i23 zebra&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">Zebra</span><span class="p">(</span>
-        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;zebra&quot;</span><span class="p">,</span>
         <span class="n">prefix</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">PREFIX</span><span class="o">.</span><span class="n">beamline_prefix</span><span class="si">}</span><span class="s2">-EA-ZEBRA-01:ZEBRA:&quot;</span><span class="p">,</span>
         <span class="n">mapping</span><span class="o">=</span><span class="n">I23_ZEBRA_MAPPING</span><span class="p">,</span>
     <span class="p">)</span>
