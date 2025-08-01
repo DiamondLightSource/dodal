@@ -36,6 +36,12 @@ dodal.devices.motors
 
    
    
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      create_axis_perp_to_rotation
+   
    
 
    

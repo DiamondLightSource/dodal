@@ -10,6 +10,7 @@
    :recursive:
 
    dodal.devices.CTAB
+   dodal.devices.aithre_lasershaping
    dodal.devices.aperture
    dodal.devices.aperturescatterguard
    dodal.devices.apple2_undulator
