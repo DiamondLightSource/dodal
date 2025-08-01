@@ -62,7 +62,7 @@ class PressureJumpCellController(adcore.ADBaseController[PressureJumpCellDriverI
                 if trigger_info.total_number_of_exposures == 0
                 else trigger_info.total_number_of_exposures
             ),
-            self.driver.image_mode.set(adcore.ADImageMode.MULTIPLE),
+            self.driver.image_mode.set(adcore.ADImageMode.CONTINUOUS),
         )
 
     async def arm(self):
