@@ -1,9 +1,12 @@
-from dodal.beamline_specific_utils.i05_shared import m1 as i05_m1
-from dodal.beamline_specific_utils.i05_shared import m3mj6 as i05_m3mj6
+from dodal.beamline_specific_utils.i05_shared import (
+    m1_collimating_mirror,
+    m3mj6_switching_mirror,
+)
 from dodal.beamline_specific_utils.i05_shared import pgm as i05_pgm
 from dodal.common.beamlines.beamline_utils import device_factory
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.devices.common_mirror import XYZCollimatingMirror, XYZPiezoCollimatingMirror
+from dodal.devices.common_mirror import XYZPiezoSwitchingMirror, XYZSwitchingMirror
+from dodal.devices.motors import XYZPitchYawRollStage
 from dodal.devices.pgm import PGM
 from dodal.devices.synchrotron import Synchrotron
 from dodal.log import set_beamline as set_log_beamline
@@ -29,18 +32,18 @@ def pgm() -> PGM:
 
 
 @device_factory()
-def m1() -> XYZCollimatingMirror:
-    return i05_m1()
+def m1() -> XYZPitchYawRollStage:
+    return m1_collimating_mirror()
 
 
 @device_factory()
-def m3mj6() -> XYZPiezoCollimatingMirror:
-    return i05_m3mj6()
+def m3mj6() -> XYZPiezoSwitchingMirror:
+    return m3mj6_switching_mirror()
 
 
 # beamline specific devices
 
 
 @device_factory()
-def m4m5() -> XYZCollimatingMirror:
-    return XYZCollimatingMirror(prefix=f"{PREFIX.beamline_prefix}-OP-RFM-01:")
+def m4m5() -> XYZSwitchingMirror:
+    return XYZSwitchingMirror(prefix=f"{PREFIX.beamline_prefix}-OP-RFM-01:")
