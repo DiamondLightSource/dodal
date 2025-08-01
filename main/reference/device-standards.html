@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Device Standards &#8212; dodal 1.54.1.dev2+g0141d63152 documentation</title>
+    <title>Device Standards &#8212; dodal 1.54.1.dev3+gb16e9de992 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=9058190c"></script>
+    <script src="../_static/documentation_options.js?v=82b31b2d"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -942,7 +942,7 @@
 conversion to <code class="docutils literal notranslate"><span class="pre">ophyd-async</span></code>.</p>
 </section>
 <section id="where-to-put-devices">
-<h2>Where to put devices<a class="headerlink" href="#where-to-put-devices" title="Link to this heading">#</a></h2>
+<span id="id1"></span><h2>Where to put devices<a class="headerlink" href="#where-to-put-devices" title="Link to this heading">#</a></h2>
 <p>Dodal is written with the philosophy that Ophyd devices should be assumed to be as generic as possible. I.e. you
 should think about where to place them in the following order:</p>
 <ol class="arabic simple">
@@ -952,7 +952,9 @@ standard IOC, should go in <a class="github reference external" href="https://gi
 complex device (e.g. multiple files) it should have a folder of its own e.g. <code class="docutils literal notranslate"><span class="pre">oav</span></code></p></li>
 <li><p>A device that is very specific to a particular beamline should go in the <code class="docutils literal notranslate"><span class="pre">devices/ixx</span></code> folder</p></li>
 </ol>
-<p>This is in an effort to avoid duplication across facilities/beamlines.</p>
+<p>This is in an effort to avoid duplication across facilities/beamlines. You should also consider whether it is best for a piece of logic is better suited to the control system or a bluesky plan - see <a class="reference external" href="https://blueskyproject.io/ophyd-async/main/explanations/where-device-logic.html">ophyd-async’s guide</a> on that.</p>
+<p>Determining where in dodal a device should live can be summarised below:</p>
+<img alt="../_images/where-to-put-dodal-logic.png" src="../_images/where-to-put-dodal-logic.png" />
 </section>
 <section id="device-best-practices">
 <h2>Device Best Practices<a class="headerlink" href="#device-best-practices" title="Link to this heading">#</a></h2>
