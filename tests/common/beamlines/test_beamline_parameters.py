@@ -9,9 +9,9 @@ from dodal.common.beamlines.beamline_parameters import (
     get_beamline_parameters,
 )
 
-TEST_DATA_PATH = "tests/common/beamlines/test_data"
+TEST_DATA_PATH = "tests/test_data"
 
-TEST_BEAMLINE_PARAMETERS_TXT = "tests/test_data/test_beamline_parameters.txt"
+TEST_BEAMLINE_PARAMETERS_TXT = join(TEST_DATA_PATH, "test_beamline_parameters.txt")
 TEST_I04_BEAMLINE_PARAMETERS = join(TEST_DATA_PATH, "i04_beamlineParameters")
 TEST_BAD_BEAMLINE_PARAMETERS = join(TEST_DATA_PATH, "bad_beamlineParameters")
 
