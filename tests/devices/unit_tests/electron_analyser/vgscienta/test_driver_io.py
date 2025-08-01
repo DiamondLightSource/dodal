@@ -111,8 +111,7 @@ async def test_analyser_sets_region_and_read_configuration_is_correct(
 
     prefix = sim_driver.name + "-"
     energy_source = sim_driver._get_energy_source(region.excitation_energy_source)
-    excitation_energy = await energy_source.get_value()
-    region.switch_energy_mode(EnergyMode.KINETIC, excitation_energy)
+    region.switch_energy_mode(EnergyMode.KINETIC, await energy_source.get_value())
 
     await assert_configuration(
         sim_driver,
@@ -121,12 +120,12 @@ async def test_analyser_sets_region_and_read_configuration_is_correct(
             f"{prefix}energy_mode": partial_reading(region.energy_mode),
             f"{prefix}acquisition_mode": partial_reading(region.acquisition_mode),
             f"{prefix}lens_mode": partial_reading(region.lens_mode),
-            f"{prefix}low_energy": partial_reading(expected_low_e),
-            f"{prefix}centre_energy": partial_reading(expected_centre_e),
-            f"{prefix}high_energy": partial_reading(expected_high_e),
+            f"{prefix}low_energy": partial_reading(region.low_energy),
+            f"{prefix}centre_energy": partial_reading(region.centre_energy),
+            f"{prefix}high_energy": partial_reading(region.high_energy),
             f"{prefix}energy_step": partial_reading(region.energy_step),
             f"{prefix}pass_energy": partial_reading(region.pass_energy),
-            f"{prefix}excitation_energy_source": partial_reading(expected_source),
+            f"{prefix}excitation_energy_source": partial_reading(energy_source.name),
             f"{prefix}slices": partial_reading(region.slices),
             f"{prefix}iterations": partial_reading(region.iterations),
             f"{prefix}total_steps": partial_reading(ANY),
