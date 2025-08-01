@@ -32,49 +32,54 @@ def documents_from_num(
     return docs
 
 
-def test_count_delay_validation(det: StandardDetector, RE):
-    args: dict[float | Sequence[float], str] = {  # type: ignore
-        # List wrong length
-        (1,): "Number of delays given must be 2: was given 1",
-        (1, 2, 3): "Number of delays given must be 2: was given 3",
+@pytest.mark.parametrize(
+    ("delay", "reason"),
+    (
+        # Wrong length
+        ((1,), "Number of delays given must be 2: was given 1"),
+        ((1, 2, 3), "Number of delays given must be 2: was given 3"),
         # Delay non-physical
         # negative time
-        -1: "Input should be greater than or equal to 0",
-        (-1, 2): "Input should be greater than or equal to 0",
-        # # null time
-        None: "Input should be a valid number",
-        (None, 2): "Input should be a valid number",
-        # # NaN time
-        "foo": "Input should be a valid number",
-        ("foo", 2): "Input should be a valid number",
-    }
-    for delay, reason in args.items():
-        with pytest.raises((ValidationError, AssertionError), match=reason):
-            RE(count({det}, num=3, delay=delay))
-        print(delay)
+        (-1, "Input should be greater than or equal to 0"),
+        ((-1, 2), "Input should be greater than or equal to 0"),
+        # null time
+        (None, "Input should be a valid number"),
+        ((None, 2), "Input should be a valid number"),
+        # NaN time
+        ("foo", "Input should be a valid number"),
+        (("foo", 2), "Input should be a valid number"),
+    ),
+)
+def test_count_delay_validation(
+    delay: float | Sequence[float], reason: str, det: StandardDetector, RE
+):
+    with pytest.raises((ValidationError, AssertionError), match=reason):
+        RE(count({det}, num=3, delay=delay))
 
 
-def test_count_detectors_validation(RE):
-    args: dict[str, set[Readable]] = {
-        # No device to read
-        "Set should have at least 1 item after validation, not 0": set(),
-        # Not Readable
-        "Input should be an instance of Readable": set("foo"),  # type: ignore
-    }
-    for reason, dets in args.items():
-        with pytest.raises(ValidationError, match=reason):
-            RE(count(dets))
+@pytest.mark.parametrize(
+    ("dets", "reason"),
+    (
+        (set(), "Set should have at least 1 item after validation, not 0"),
+        (set("foo"), "Input should be an instance of Readable"),
+    ),
+)
+def test_count_detectors_validation(dets: set[Readable], reason: str, RE):
+    with pytest.raises(ValidationError, match=reason):
+        RE(count(dets))
 
 
-def test_count_num_validation(det: StandardDetector, RE):
-    args: dict[int, str] = {
-        -1: "Input should be greater than or equal to 1",
-        0: "Input should be greater than or equal to 1",
-        "str": "Input should be a valid integer",  # type: ignore
-    }
-    for num, reason in args.items():
-        with pytest.raises(ValidationError, match=reason):
-            RE(count({det}, num=num))
+@pytest.mark.parametrize(
+    ("num", "reason"),
+    (
+        (-1, "Input should be greater than or equal to 1"),
+        (0, "Input should be greater than or equal to 1"),
+        ("str", "Input should be a valid integer"),
+    ),
+)
+def test_count_num_validation(num: int, reason: str, det: StandardDetector, RE):
+    with pytest.raises(ValidationError, match=reason):
+        RE(count({det}, num=num))
 
 
 @pytest.mark.parametrize(
