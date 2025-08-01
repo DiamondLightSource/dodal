@@ -7,6 +7,9 @@ Some devices have been written in ``ophyd`` for historic reasons. However, all n
 ``ophyd-async`` and any old ``ophyd`` devices undergoing a large re-write should be considered for 
 conversion to ``ophyd-async``. 
 
+
+.. _where_to_put_devices:
+
 Where to put devices
 --------------------
 
@@ -19,7 +22,11 @@ should think about where to place them in the following order:
    complex device (e.g. multiple files) it should have a folder of its own e.g. ``oav``
 #. A device that is very specific to a particular beamline should go in the ``devices/ixx`` folder
 
-This is in an effort to avoid duplication across facilities/beamlines. 
+This is in an effort to avoid duplication across facilities/beamlines. You should also consider whether it is best for a piece of logic is better suited to the control system or a bluesky plan - see `ophyd-async's guide <https://blueskyproject.io/ophyd-async/main/explanations/where-device-logic.html>`_ on that.
+
+Determining where in dodal a device should live can be summarised below:
+
+.. image:: ../assets/where-to-put-dodal-logic.png
 
 Device Best Practices
 ----------------------------
