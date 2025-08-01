@@ -23,7 +23,7 @@ class HEATER_SETTING(StrictEnum):
 async def lakeshore():
     async with init_devices(mock=True):
         lakeshore = Lakeshore(
-            prefix="007", no_channels=4, heater_setting=HEATER_SETTING
+            prefix="007", num_readback_channel=4, heater_setting=HEATER_SETTING
         )
     yield lakeshore
 
@@ -45,9 +45,9 @@ async def test_lakeshore_set_success(
     RE(abs_set(lakeshore, temperature, wait=True))
 
     assert (
-        await lakeshore.temperature.user_setpoint[
+        await lakeshore.control_channels[
             await lakeshore.control_channel.get_value()
-        ].get_value()
+        ].user_setpoint.get_value()
         == temperature
     )
 
@@ -73,7 +73,7 @@ async def test_lakeshore_set_fail_unavailable_channel(
 ):
     with pytest.raises(
         ValueError,
-        match=f"Control channels must be between 1 and {len(lakeshore.PID.p)}.",
+        match=f"Control channels must be between 1 and {len(lakeshore.control_channels)}.",
     ):
         await lakeshore._set_control_channel(0)
 
@@ -93,18 +93,18 @@ async def test_lakeshore__set_control_channel_correctly_set_up_readableFormat(
     RE(abs_set(lakeshore.control_channel, control_channel, wait=True))
     assert lakeshore.hints == {
         "fields": [
-            f"lakeshore-temperature-user_readback-{control_channel}",
-            f"lakeshore-temperature-user_setpoint-{control_channel}",
+            f"lakeshore-readback-{control_channel}",
+            f"lakeshore-control_channels-{control_channel}-user_setpoint",
         ],
     }
     expected_config = {
-        f"lakeshore-PID-d-{control_channel}": {
+        f"lakeshore-control_channels-{control_channel}-d": {
             "value": ANY,
         },
-        f"lakeshore-PID-i-{control_channel}": {
+        f"lakeshore-control_channels-{control_channel}-i": {
             "value": ANY,
         },
-        f"lakeshore-PID-p-{control_channel}": {
+        f"lakeshore-control_channels-{control_channel}-p": {
             "value": ANY,
         },
         "lakeshore-_control_channel": {

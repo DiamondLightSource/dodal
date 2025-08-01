@@ -15,7 +15,7 @@ from .lakeshore_io import (
 )
 
 
-class Lakeshore(StandardReadable, Movable[float], LakeshoreBaseIO):
+class Lakeshore(LakeshoreBaseIO, StandardReadable, Movable[float]):
     """
     Lakeshore temperature controller device.
 
@@ -73,6 +73,20 @@ class Lakeshore(StandardReadable, Movable[float], LakeshoreBaseIO):
         self.temperature_high_limit = soft_signal_rw(float, initial_value=400)
         self.temperature_low_limit = soft_signal_rw(float, initial_value=0)
 
+        self.control_channel = derived_signal_rw(
+            raw_to_derived=self._get_control_channel,
+            set_derived=self._set_control_channel,
+            current_channel=self._control_channel,
+        )
+
+        super().__init__(
+            prefix=prefix,
+            num_readback_channel=num_readback_channel,
+            heater_setting=heater_setting,
+            name=name,
+            single_control_channel=single_control_channel,
+        )
+
         self.add_readables(
             [setpoint.user_setpoint for setpoint in self.control_channels.values()]
             + list(self.readback.values())
@@ -87,20 +101,6 @@ class Lakeshore(StandardReadable, Movable[float], LakeshoreBaseIO):
                 self.control_channels[control_channel].heater_output_range,
             ],
             StandardReadableFormat.CONFIG_SIGNAL,
-        )
-
-        self.control_channel = derived_signal_rw(
-            raw_to_derived=self._get_control_channel,
-            set_derived=self._set_control_channel,
-            current_channel=self._control_channel,
-        )
-
-        super().__init__(
-            prefix=prefix,
-            num_readback_channel=num_readback_channel,
-            heater_setting=heater_setting,
-            name=name,
-            single_control_channel=single_control_channel,
         )
 
     @AsyncStatus.wrap
