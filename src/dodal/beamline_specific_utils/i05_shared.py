@@ -9,7 +9,7 @@ PREFIX = BeamlinePrefix("i05", "I")
 
 
 @device_factory()
-def pgm() -> PGM:
+def i05_pgm() -> PGM:
     return PGM(prefix=f"{PREFIX.beamline_prefix}-OP-PGM-01:", grating=Grating)
 
 
