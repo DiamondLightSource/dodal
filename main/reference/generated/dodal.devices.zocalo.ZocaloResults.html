@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.zocalo.ZocaloResults &#8212; dodal 1.53.1.dev23+gc656d80513 documentation</title>
+    <title>dodal.devices.zocalo.ZocaloResults &#8212; dodal 1.54.1.dev1+g2a35a94c15 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=cbd512b2"></script>
+    <script src="../../_static/documentation_options.js?v=701db4bf"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -843,6 +843,7 @@
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.zocalo.XrcResult.html">dodal.devices.zocalo.XrcResult</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.zocalo.ZocaloTrigger.html">dodal.devices.zocalo.ZocaloTrigger</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.zocalo.ZocaloStartInfo.html">dodal.devices.zocalo.ZocaloStartInfo</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.zocalo.ZocaloSource.html">dodal.devices.zocalo.ZocaloSource</a></li>
 </ul>
 </details></li>
 </ul>
@@ -960,8 +961,7 @@ methods on dodal.devices.zocalo.ZocaloTrigger.</p>
 <li><p><strong>timeout_s</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a>) – Maximum time to wait for the Queue to be filled by an object, starting</p></li>
 <li><p><strong>triggered</strong> (<em>from when the ZocaloResults device is</em>)</p></li>
 <li><p><strong>prefix</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – EPICS PV prefix for the device</p></li>
-<li><p><strong>use_gpu</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – When True, ZocaloResults will take the first set of</p></li>
-<li><p><strong>receives</strong> (<em>results that it</em>)</p></li>
+<li><p><strong>results_source</strong> (<a class="reference internal" href="dodal.devices.zocalo.ZocaloSource.html#dodal.devices.zocalo.ZocaloSource" title="dodal.devices.zocalo.ZocaloSource"><em>ZocaloSource</em></a>) – Where to get results from, GPU or CPU analysis</p></li>
 </ul>
 </dd>
 </dl>

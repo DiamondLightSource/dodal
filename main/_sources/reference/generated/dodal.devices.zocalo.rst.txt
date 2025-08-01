@@ -18,6 +18,7 @@ dodal.devices.zocalo
    ~zocalo.XrcResult
    ~zocalo.ZocaloTrigger
    ~zocalo.ZocaloStartInfo
+   ~zocalo.ZocaloSource
 
 
 
