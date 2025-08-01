@@ -1,6 +1,7 @@
 from os.path import join
+from pathlib import Path
 
-TEST_DATA_PATH = "tests/test_data"
+TEST_DATA_PATH = Path(__file__).parent
 BAD_BEAMLINE_PARAMETERS = join(TEST_DATA_PATH, "bad_beamlineParameters")
 I04_BEAMLINE_PARAMETERS = join(TEST_DATA_PATH, "i04_beamlineParameters")
 TEST_BEAMLINE_PARAMETERS_TXT = join(TEST_DATA_PATH, "test_beamline_parameters.txt")
