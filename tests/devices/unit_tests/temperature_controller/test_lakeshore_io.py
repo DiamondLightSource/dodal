@@ -17,7 +17,9 @@ async def test_lakeshoreIO_creation_success():
     prefix = "888"
     async with init_devices(mock=True):
         lakeshore = LakeshoreBaseIO(
-            prefix=prefix, no_channels=no_channels, heater_setting=HEATER_SETTING
+            prefix=prefix,
+            num_readback_channel=no_channels,
+            heater_setting=HEATER_SETTING,
         )
 
     control_attribute = [
@@ -38,7 +40,7 @@ async def test_lakeshoreIO_creation_success():
             == f"{prefix}SETP{i}"
         )
         assert (
-            lakeshore.readBack_channel[i].source.split("ca://")[-1]
+            lakeshore.readback_channel[i].source.split("ca://")[-1]
             == f"{prefix}KRDG{i - 1}"
         )
 
@@ -46,7 +48,7 @@ async def test_lakeshoreIO_creation_success():
             assert attr in lakeshore.control_channels[i].__dict__["_child_devices"]
 
     assert len(lakeshore.control_channels) == no_channels
-    assert len(lakeshore.readBack_channel) == no_channels
+    assert len(lakeshore.readback_channel) == no_channels
 
 
 async def test_lakeshoreIO_single_control_creation_success():
@@ -55,7 +57,7 @@ async def test_lakeshoreIO_single_control_creation_success():
     async with init_devices(mock=True):
         lakeshore = LakeshoreBaseIO(
             prefix=prefix,
-            no_channels=no_channels,
+            num_readback_channel=no_channels,
             heater_setting=HEATER_SETTING,
             single_control_channel=True,
         )
@@ -81,8 +83,8 @@ async def test_lakeshoreIO_single_control_creation_success():
     )
     for i in range(1, no_channels + 1):
         assert (
-            lakeshore.readBack_channel[i].source.split("ca://")[-1]
+            lakeshore.readback_channel[i].source.split("ca://")[-1]
             == f"{prefix}KRDG{i - 1}"
         )
     assert len(lakeshore.control_channels) == 1
-    assert len(lakeshore.readBack_channel) == no_channels
+    assert len(lakeshore.readback_channel) == no_channels

@@ -51,7 +51,7 @@ class LakeshoreBaseIO(Device):
     def __init__(
         self,
         prefix: str,
-        no_channels: int,
+        num_readback_channel: int,
         heater_setting: type[SignalDatatypeT],
         name: str = "",
         single_control_channel: bool = False,
@@ -60,6 +60,9 @@ class LakeshoreBaseIO(Device):
 
         Provides access to control channels and readback channels for setpoint, ramp rate, heater output,
         and PID parameters. Supports both single and multiple control channel configurations.
+        Note:
+            Almost all model has a controller for each readback channel but some model
+             only has a single controller for multiple readback channels.
         """
         if single_control_channel:
             self.control_channels = DeviceVector(
@@ -75,17 +78,17 @@ class LakeshoreBaseIO(Device):
                     i: LakeshoreControlChannel(
                         prefix=prefix, suffix=str(i), heater_type=heater_setting
                     )
-                    for i in range(1, no_channels + 1)
+                    for i in range(1, num_readback_channel + 1)
                 }
             )
 
-        self.readBack_channel = DeviceVector(
+        self.readback_channel = DeviceVector(
             {
                 i: epics_signal_r(
                     float,
                     read_pv=f"{prefix}KRDG{i - 1}",
                 )
-                for i in range(1, no_channels + 1)
+                for i in range(1, num_readback_channel + 1)
             }
         )
         super().__init__(
