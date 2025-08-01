@@ -6,17 +6,17 @@ from dodal.devices.synchrotron import Synchrotron
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
-BL = get_beamline_name("i05-1")
-PREFIX = BeamlinePrefix(BL, suffix="J")
+BL = get_beamline_name("i05")
+PREFIX = BeamlinePrefix(BL)
 set_log_beamline(BL)
 set_utils_beamline(BL)
 
 
 @device_factory()
-def pgm() -> PGM:
-    return i05_pgm()
+def synchrotron() -> Synchrotron:
+    return Synchrotron()
 
 
 @device_factory()
-def synchrotron() -> Synchrotron:
-    return Synchrotron()
+def pgm() -> PGM:
+    return i05_pgm()
