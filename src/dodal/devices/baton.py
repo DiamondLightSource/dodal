@@ -19,4 +19,3 @@ class Baton(StandardReadable, EpicsDevice):
     commissioning: A[
         SignalR[bool], PvSuffix("COMMISSIONING"), Format.HINTED_UNCACHED_SIGNAL
     ]
-
