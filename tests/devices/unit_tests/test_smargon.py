@@ -13,7 +13,7 @@ from dodal.devices.util.test_utils import patch_motor
 @pytest.fixture
 async def smargon() -> Smargon:
     async with init_devices(mock=True):
-        smargon = Smargon(name="smargon")
+        smargon = Smargon("")
     patch_motor(smargon.x)
     patch_motor(smargon.y)
     patch_motor(smargon.z)

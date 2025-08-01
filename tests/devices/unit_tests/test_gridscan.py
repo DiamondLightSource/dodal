@@ -51,7 +51,7 @@ async def panda_fast_grid_scan():
 @pytest.fixture
 async def smargon(RE: RunEngine):
     async with init_devices(mock=True):
-        smargon = Smargon()
+        smargon = Smargon("")
 
     for motor in [smargon.omega, smargon.x, smargon.y, smargon.z]:
         patch_motor(motor)
