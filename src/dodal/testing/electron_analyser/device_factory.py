@@ -40,7 +40,7 @@ async def create_detector(
     **kwargs: Any,
 ) -> TElectronAnalyserDetector:
     """
-    Helper function that helps to reduce the code to setup an analyser driver. The
+    Helper function that helps to reduce the code to setup an analyser detector. The
     parameters used for the enum types are taken directly from the subscripts of the
     class so the user only needs to provide it in one place.
 
