@@ -1,4 +1,4 @@
-import os
+from os.path import join
 from pathlib import Path
 
 import pytest
@@ -10,8 +10,8 @@ from dodal.devices.oav.snapshots.snapshot_image_processing import (
 )
 
 TEST_IMAGES_PATH = "tests/devices/unit_tests/oav/test_images"
-SNAPSHOT_IMAGE = os.path.join(TEST_IMAGES_PATH, "oav_snapshot_test.png")
-SNAPSHOT_EXPECTED_IMAGE = os.path.join(TEST_IMAGES_PATH, "oav_snapshot_expected.png")
+SNAPSHOT_IMAGE = join(TEST_IMAGES_PATH, "oav_snapshot_test.png")
+SNAPSHOT_EXPECTED_IMAGE = join(TEST_IMAGES_PATH, "oav_snapshot_expected.png")
 
 
 def test_snapshot_draws_expected_crosshair(tmp_path: Path):
