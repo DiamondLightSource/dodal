@@ -151,7 +151,7 @@ async def test_analyser_sets_region_and_read_configuration_is_correct(
             f"{prefix}pass_energy": partial_reading(region.pass_energy),
             f"{prefix}excitation_energy_source": partial_reading(expected_source),
             f"{prefix}slices": partial_reading(region.slices),
-            f"{prefix}acquire_time": partial_reading(region.acquire_time}),
+            f"{prefix}acquire_time": partial_reading(region.acquire_time),
             f"{prefix}iterations": partial_reading(region.iterations),
             f"{prefix}total_steps": partial_reading(ANY),
             f"{prefix}step_time": partial_reading(ANY),
