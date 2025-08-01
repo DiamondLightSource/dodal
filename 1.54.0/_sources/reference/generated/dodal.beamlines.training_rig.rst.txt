@@ -1,0 +1,27 @@
+dodal.beamlines.training\_rig
+=============================
+
+
+
+
+
+
+
+
+
+
+.. automodule:: dodal.beamlines.training_rig
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

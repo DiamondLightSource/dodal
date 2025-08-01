@@ -1,0 +1,46 @@
+dodal.devices.baton.Baton
+=========================
+
+.. currentmodule:: dodal.devices.baton
+
+.. autoclass:: Baton
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      ~Baton.requested_user
+      
+      
+      ~Baton.current_user
+      
+   
+   

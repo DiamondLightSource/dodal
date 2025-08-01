@@ -1,0 +1,31 @@
+dodal.devices.i10.diagnostics.I10Diagnostic
+===========================================
+
+.. currentmodule:: dodal.devices.i10.diagnostics
+
+.. autoclass:: I10Diagnostic
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+   
+   

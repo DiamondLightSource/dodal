@@ -1,0 +1,32 @@
+dodal.devices.apple2\_undulator.Apple2PhasesVal
+===============================================
+
+.. currentmodule:: dodal.devices.apple2_undulator
+
+.. autoclass:: Apple2PhasesVal
+   :members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~Apple2PhasesVal.top_outer
+      
+      
+      ~Apple2PhasesVal.top_inner
+      
+      
+      ~Apple2PhasesVal.btm_inner
+      
+      
+      ~Apple2PhasesVal.btm_outer
+      
+   
+   

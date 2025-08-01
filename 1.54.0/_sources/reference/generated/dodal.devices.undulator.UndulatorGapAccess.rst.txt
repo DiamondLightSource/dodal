@@ -1,0 +1,78 @@
+dodal.devices.undulator.UndulatorGapAccess
+==========================================
+
+.. currentmodule:: dodal.devices.undulator
+
+.. autoclass:: UndulatorGapAccess
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~UndulatorGapAccess.ENABLED
+      
+      
+      ~UndulatorGapAccess.DISABLED
+      
+   
+   
