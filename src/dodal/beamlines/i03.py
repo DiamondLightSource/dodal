@@ -346,7 +346,7 @@ def xbpm_feedback() -> XBPMFeedback:
     If this is called when already instantiated in i03, it will return the existing object.
     """
     return XBPMFeedback(
-        PREFIX.beamline_prefix,
+        f"{PREFIX.beamline_prefix}-EA-FDBK-01:",
     )
 
 
