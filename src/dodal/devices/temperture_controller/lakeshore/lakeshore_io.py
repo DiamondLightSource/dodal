@@ -72,7 +72,7 @@ class LakeshoreBaseIO(Device):
                 }
             )
 
-        self.readback_channel = DeviceVector(
+        self.readback = DeviceVector(
             {
                 i: epics_signal_r(
                     float,

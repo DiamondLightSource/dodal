@@ -39,16 +39,13 @@ async def test_lakeshoreIO_creation_success():
             lakeshore.control_channels[i].user_setpoint.source.split("ca://")[-1]
             == f"{prefix}SETP{i}"
         )
-        assert (
-            lakeshore.readback_channel[i].source.split("ca://")[-1]
-            == f"{prefix}KRDG{i - 1}"
-        )
+        assert lakeshore.readback[i].source.split("ca://")[-1] == f"{prefix}KRDG{i - 1}"
 
         for attr in control_attribute:
             assert attr in lakeshore.control_channels[i].__dict__["_child_devices"]
 
     assert len(lakeshore.control_channels) == no_channels
-    assert len(lakeshore.readback_channel) == no_channels
+    assert len(lakeshore.readback) == no_channels
 
 
 async def test_lakeshoreIO_single_control_creation_success():
@@ -82,9 +79,6 @@ async def test_lakeshoreIO_single_control_creation_success():
         == f"{prefix}SETP"
     )
     for i in range(1, no_channels + 1):
-        assert (
-            lakeshore.readback_channel[i].source.split("ca://")[-1]
-            == f"{prefix}KRDG{i - 1}"
-        )
+        assert lakeshore.readback[i].source.split("ca://")[-1] == f"{prefix}KRDG{i - 1}"
     assert len(lakeshore.control_channels) == 1
-    assert len(lakeshore.readback_channel) == no_channels
+    assert len(lakeshore.readback) == no_channels
