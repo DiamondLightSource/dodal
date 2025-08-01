@@ -1,6 +1,7 @@
 import os
 from typing import Any, TypeVar, get_args, get_origin
 
+from deepdiff import DeepDiff
 from ophyd_async.core import SignalR, init_devices
 
 from dodal.devices.electron_analyser.abstract import (
@@ -45,7 +46,7 @@ def get_test_sequence(key: type) -> str:
     raise KeyError(f"Found no match with type {key}")
 
 
-TEST_SEQUENCE_REGION_NAMES = ["New_Region", "New_Region1"]
+TEST_SEQUENCE_REGION_NAMES = ["New_Region", "New_Region1", "New_Region2"]
 
 _TDevice = TypeVar(
     "_TDevice", bound=AbstractElectronAnalyserDetector | AbstractAnalyserDriverIO
@@ -77,11 +78,9 @@ async def create_analyser_device(
 def assert_region_has_expected_values(
     r: AbstractBaseRegion, expected_region_values: dict[str, Any]
 ) -> None:
-    for key in r.__dict__:
-        if key in expected_region_values:
-            assert r.__dict__[key] == expected_region_values[key]
-        else:
-            raise KeyError('key "' + key + '" is not in the expected values.')
-
+    actual_values = r.__dict__
+    diff = DeepDiff(expected_region_values, actual_values)
+    if diff:
+        raise AssertionError(f"Region does not match expected values:\n{diff}")
     for key in expected_region_values.keys():
-        assert r.__dict__.get(key) is not None
+        assert actual_values.get(key) is not None
