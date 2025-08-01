@@ -1,18 +1,27 @@
 import asyncio
 
 from ophyd_async.core import (
+    DEFAULT_TIMEOUT,
+    AsyncStatus,
     DetectorTrigger,
+    observe_value,
+    set_and_wait_for_value,
+    set_and_wait_for_other_value,
     TriggerInfo,
+    wait_for_value,
 )
 from ophyd_async.epics import adcore
 
 from .pressurejumpcell_io import (
+    PressureJumpCellAdcTriggerIO,
     PressureJumpCellDriverIO,
     PressureJumpCellTriggerMode,
+    AdcTriggerState,
 )
 
 # TODO Find out what the readout time is and if it can be retrieved from the device
 PRESSURE_CELL_READAOUT_TIME = 1e-3
+TRIG_GOOD_STATES: frozenset[AdcTriggerState] = frozenset([AdcTriggerState.IDLE])
 
 
 class PressureJumpCellController(adcore.ADBaseController[PressureJumpCellDriverIO]):
@@ -28,11 +37,13 @@ class PressureJumpCellController(adcore.ADBaseController[PressureJumpCellDriverI
     def __init__(
         self,
         driver: PressureJumpCellDriverIO,
+        trig: PressureJumpCellAdcTriggerIO,
         good_states: frozenset[adcore.ADState] = adcore.DEFAULT_GOOD_STATES,
         readout_time: float = PRESSURE_CELL_READAOUT_TIME,
     ) -> None:
         super().__init__(driver, good_states=good_states)
         self._readout_time = readout_time
+        self.trig: PressureJumpCellAdcTriggerIO = trig
 
     def get_deadtime(self, exposure: float | None) -> float:
         return self._readout_time
@@ -57,3 +68,50 @@ class PressureJumpCellController(adcore.ADBaseController[PressureJumpCellDriverI
     async def arm(self):
         # Standard arm the detector and wait for the acquire PV to be True
         self._arm_status = await self.start_acquiring_driver_and_ensure_status()
+
+    async def start_acquiring_driver_and_ensure_status(
+        self,
+        start_timeout: float = DEFAULT_TIMEOUT,
+        state_timeout: float = DEFAULT_TIMEOUT,
+    ) -> AsyncStatus:
+        # Set Main ADC to acquire
+        await set_and_wait_for_value(
+            self.driver.acquire,
+            True,
+            timeout=start_timeout,
+            wait_for_set_completion=False,
+        )
+
+        # Set trigger to capture
+        status = await set_and_wait_for_other_value(
+            self.trig.capture,
+            True,
+            self.trig.state,
+            AdcTriggerState.ARMED,
+            timeout=start_timeout,
+            wait_for_set_completion=False,
+        )
+
+        async def complete_acquisition() -> None:
+            await status
+            state = None
+            try:
+                async for state in observe_value(
+                    self.trig.state, done_timeout=state_timeout
+                ):
+                    if state in TRIG_GOOD_STATES:
+                        return
+            except asyncio.TimeoutError as exc:
+                if state is not None:
+                    raise ValueError(
+                        f"Final detector state {state.value} not in valid end "
+                        f"states: {self.good_states}"
+                    ) from exc
+                else:
+                    # No updates from the detector, something else is wrong
+                    raise asyncio.TimeoutError(
+                        "Could not monitor detector state: "
+                        + self.driver.detector_state.source
+                    ) from exc
+
+        return AsyncStatus(complete_acquisition())

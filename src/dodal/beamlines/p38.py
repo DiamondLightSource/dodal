@@ -211,6 +211,7 @@ def high_pressure_xray_cell() -> PressureJumpCell:
         adc_prefix="-ADC",
     )
 
+
 @device_factory()
 def high_pressure_xray_cell_adc() -> PressureJumpCellDetector:
     """high_pressure_xray_cell_adc"""
