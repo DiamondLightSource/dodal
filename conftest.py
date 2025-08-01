@@ -14,7 +14,7 @@ from ophyd_async.core import (
     PathInfo,
     PathProvider,
 )
-from tests.devices.unit_tests.constants import (
+from tests.constants import (
     TEST_DISPLAY_CONFIG,
     TEST_J_CAMERA_MAN_ZOOM_LEVELS_XML,
 )

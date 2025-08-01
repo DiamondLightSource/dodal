@@ -7,6 +7,7 @@ from dodal.devices.util.lookup_tables import (
     linear_interpolation_lut,
     parse_lookup_table,
 )
+from tests.devices.unit_tests.constants import TEST_BEAMLINE_UNDULATOR_TO_GAP_LUT
 from tests.devices.unit_tests.detector.test_det_resolution import (
     TEST_DET_DIST_CONVERTER_LUT,
 )
@@ -18,9 +19,7 @@ from tests.devices.unit_tests.util.constants import (
 
 
 async def test_energy_to_distance_table_correct_format():
-    table = await energy_distance_table(
-        "./tests/devices/unit_tests/test_beamline_undulator_to_gap_lookup_table.txt"
-    )
+    table = await energy_distance_table(TEST_BEAMLINE_UNDULATOR_TO_GAP_LUT)
     assert table[0][0] == 5700
     assert table[49][1] == 6.264
     assert table.shape == (50, 2)
