@@ -35,8 +35,12 @@ async def test_configure_arm_trigger_and_disarm_detector(
         trigger=DetectorTrigger.INTERNAL,
         deadtime=0.0001,
     )
+    filename: str = "filename.h5"
+    fake_eiger._writer._path_provider.return_value.filename = filename
 
     def set_meta_active(*args, **kwargs) -> None:
+        set_mock_value(fake_eiger.odin.meta_file_name, filename)
+        set_mock_value(fake_eiger.odin.id, filename)
         set_mock_value(fake_eiger.odin.meta_active, "Active")
 
     def set_capture_rbv_meta_writing_and_detector_state(*args, **kwargs) -> None:
