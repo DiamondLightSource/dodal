@@ -12,11 +12,10 @@ from ophyd_async.core import (
 
 from .lakeshore_io import (
     LakeshoreBaseIO,
-    PIDBaseIO,
 )
 
 
-class Lakeshore(StandardReadable, Movable[float]):
+class Lakeshore(StandardReadable, Movable[float], LakeshoreBaseIO):
     """
     Lakeshore temperature controller device.
 
@@ -64,41 +63,28 @@ class Lakeshore(StandardReadable, Movable[float]):
     def __init__(
         self,
         prefix: str,
-        no_channels: int,
+        num_readback_channel: int,
         heater_setting: type[SignalDatatypeT],
         control_channel: int = 1,
         single_control_channel: bool = False,
         name: str = "",
     ):
-        self.temperature = LakeshoreBaseIO(
-            prefix=prefix,
-            no_channels=no_channels,
-            heater_setting=heater_setting,
-            single_control_channel=single_control_channel,
-            name=name,
-        )
-
-        self.PID = PIDBaseIO(
-            prefix=prefix,
-            no_channels=no_channels,
-            single_control_channel=single_control_channel,
-            name=name,
-        )
         self._control_channel = soft_signal_rw(int, initial_value=control_channel)
         self.temperature_high_limit = soft_signal_rw(float, initial_value=400)
         self.temperature_low_limit = soft_signal_rw(float, initial_value=0)
 
         self.add_readables(
-            list(self.temperature.user_setpoint.values())
-            + list(self.temperature.user_readback.values())
+            [setpoint.user_setpoint for setpoint in self.control_channels.values()]
+            + list(self.readback.values())
         )
 
         self.add_readables(
             [
                 self._control_channel,
-                self.PID.p[control_channel],
-                self.PID.i[control_channel],
-                self.PID.d[control_channel],
+                self.control_channels[control_channel].p,
+                self.control_channels[control_channel].i,
+                self.control_channels[control_channel].d,
+                self.control_channels[control_channel].heater_output_range,
             ],
             StandardReadableFormat.CONFIG_SIGNAL,
         )
@@ -109,7 +95,13 @@ class Lakeshore(StandardReadable, Movable[float]):
             current_channel=self._control_channel,
         )
 
-        super().__init__(name=name)
+        super().__init__(
+            prefix=prefix,
+            num_readback_channel=num_readback_channel,
+            heater_setting=heater_setting,
+            name=name,
+            single_control_channel=single_control_channel,
+        )
 
     @AsyncStatus.wrap
     async def set(self, value: float) -> None:
@@ -121,9 +113,9 @@ class Lakeshore(StandardReadable, Movable[float]):
             self.temperature_low_limit.get_value(),
         )
         if high >= value >= low:
-            await self.temperature.user_setpoint[
+            await self.control_channels[
                 await self.control_channel.get_value()
-            ].set(value)
+            ].user_setpoint.set(value)
         else:
             raise ValueError(f"Requested temperature must be withing {high} and {low}")
 
@@ -134,9 +126,9 @@ class Lakeshore(StandardReadable, Movable[float]):
         self, value: int, readback: int | None = None
     ) -> None:
         readback = readback if readback else value
-        if value < 1 or value > len(self.PID.p):
+        if value < 1 or value > len(self.control_channels):
             raise ValueError(
-                f"Control channels must be between 1 and {len(self.PID.p)}."
+                f"Control channels must be between 1 and {len(self.control_channels)}."
             )
         await self._control_channel.set(value)
         self._read_config_funcs = ()
@@ -144,17 +136,18 @@ class Lakeshore(StandardReadable, Movable[float]):
         self.add_readables(
             [
                 self._control_channel,
-                self.PID.p[value],
-                self.PID.i[value],
-                self.PID.d[value],
+                self.control_channels[value].p,
+                self.control_channels[value].i,
+                self.control_channels[value].d,
+                self.control_channels[value].heater_output_range,
             ],
             StandardReadableFormat.CONFIG_SIGNAL,
         )
 
         self.add_readables(
             [
-                self.temperature.user_readback[readback],
-                self.temperature.user_setpoint[value],
+                self.readback[readback],
+                self.control_channels[value].user_setpoint,
             ],
             StandardReadableFormat.HINTED_SIGNAL,
         )
