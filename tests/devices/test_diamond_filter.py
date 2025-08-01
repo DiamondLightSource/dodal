@@ -1,6 +1,6 @@
 import pytest
 from ophyd_async.core import init_devices
-from ophyd_async.testing import assert_reading
+from ophyd_async.testing import assert_reading, partial_reading
 
 from dodal.devices.diamond_filter import DiamondFilter, I03Filters, I04Filters
 
@@ -25,9 +25,7 @@ async def test_reading_includes_read_fields(
     await assert_reading(
         i03_diamond_filter,
         {
-            "diamond_filter-stage_position": {
-                "value": I03Filters.EMPTY,
-            },
+            "diamond_filter-stage_position": partial_reading(I03Filters.EMPTY),
         },
     )
 
