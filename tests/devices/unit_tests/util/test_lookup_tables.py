@@ -9,6 +9,9 @@ from dodal.devices.util.lookup_tables import (
     linear_interpolation_lut,
     parse_lookup_table,
 )
+from tests.devices.unit_tests.detector.test_det_resolution import (
+    TEST_DET_DIST_CONVERTER_LUT,
+)
 
 TEST_DATA_PATH = "tests/devices/unit_tests/util/test_data"
 
@@ -19,7 +22,6 @@ TEST_DCM_LUT_REVERSED = join(
 TEST_BAD_DCM_LUT = join(
     TEST_DATA_PATH, "test_beamline_dcm_roll_converter_non_monotonic.txt"
 )
-TEST_DET_DIST_CONVERTER_LUT = join(TEST_DATA_PATH, "test_det_dist_converter.txt")
 
 
 async def test_energy_to_distance_table_correct_format():

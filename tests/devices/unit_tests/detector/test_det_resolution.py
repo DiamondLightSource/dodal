@@ -1,3 +1,4 @@
+from os.path import join
 from pathlib import Path
 from unittest import mock
 from unittest.mock import MagicMock, PropertyMock, patch
@@ -9,6 +10,9 @@ from dodal.devices.detector import DetectorParams
 from dodal.devices.detector.det_resolution import (
     resolution,
 )
+
+TEST_DATA_PATH = "tests/devices/unit_tests/detector/test_data"
+TEST_DET_DIST_CONVERTER_LUT = join(TEST_DATA_PATH, "test_det_dist_converter.txt")
 
 
 @pytest.fixture(scope="function")
@@ -25,7 +29,7 @@ def detector_params(request, tmp_path: Path):
         num_images_per_trigger=1,
         num_triggers=1,
         use_roi_mode=True,
-        det_dist_to_beam_converter_path="tests/test_data/test_det_dist_converter.txt",
+        det_dist_to_beam_converter_path=TEST_DET_DIST_CONVERTER_LUT,
         detector_size_constants=request.param,  # type: ignore
     )
 

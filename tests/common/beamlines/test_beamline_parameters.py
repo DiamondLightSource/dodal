@@ -11,13 +11,13 @@ from dodal.common.beamlines.beamline_parameters import (
 
 TEST_DATA_PATH = "tests/common/beamlines/test_data"
 
-TEST_BEAMLINE_PARAMETERS = join(TEST_DATA_PATH, "test_beamline_parameters.txt")
+TEST_BEAMLINE_PARAMETERS_TXT = "tests/test_data/test_beamline_parameters.txt"
 TEST_I04_BEAMLINE_PARAMETERS = join(TEST_DATA_PATH, "i04_beamlineParameters")
 TEST_BAD_BEAMLINE_PARAMETERS = join(TEST_DATA_PATH, "bad_beamlineParameters")
 
 
 def test_beamline_parameters():
-    params = GDABeamlineParameters.from_file(TEST_BEAMLINE_PARAMETERS)
+    params = GDABeamlineParameters.from_file(TEST_BEAMLINE_PARAMETERS_TXT)
     assert params["sg_x_MEDIUM_APERTURE"] == 5.285
     assert params["col_parked_downstream_x"] == 0
     assert params["beamLineEnergy__pitchStep"] == 0.002
@@ -81,7 +81,7 @@ def test_get_beamline_parameters():
     environ["BEAMLINE"] = "i03"
     with patch.dict(
         "dodal.common.beamlines.beamline_parameters.BEAMLINE_PARAMETER_PATHS",
-        {"i03": TEST_BEAMLINE_PARAMETERS},
+        {"i03": TEST_BEAMLINE_PARAMETERS_TXT},
     ):
         params = get_beamline_parameters()
     assert params["col_parked_downstream_x"] == 0
@@ -140,6 +140,6 @@ def test_Yes_and_No_replaced_with_bool_values():
 def i03_beamline_parameters():
     with patch.dict(
         "dodal.common.beamlines.beamline_parameters.BEAMLINE_PARAMETER_PATHS",
-        {"i03": TEST_BEAMLINE_PARAMETERS},
+        {"i03": TEST_BEAMLINE_PARAMETERS_TXT},
     ) as params:
         yield params
