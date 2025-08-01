@@ -244,6 +244,7 @@ async def test_if_expecting_GPU_then_read_until_GPU_result_found(
     zocalo_results._put_results = AsyncMock()
     RE(bps.trigger(zocalo_results, wait=True))
     assert zocalo_results._put_results.call_args[0][0] == [TEST_RESULTS[1]]
+    assert zocalo_results._put_results.await_count == 1
 
 
 async def test_if_expecting_CPU_then_read_until_CPU_result_found(
@@ -256,6 +257,7 @@ async def test_if_expecting_CPU_then_read_until_CPU_result_found(
     zocalo_results._put_results = AsyncMock()
     RE(bps.trigger(zocalo_results, wait=True))
     assert zocalo_results._put_results.call_args[0][0] == [TEST_RESULTS[0]]
+    assert zocalo_results._put_results.await_count == 1
 
 
 async def test_if_zocalo_results_timeout_before_any_results_then_error(
