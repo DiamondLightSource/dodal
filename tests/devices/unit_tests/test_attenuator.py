@@ -44,3 +44,24 @@ async def test_given_attenuator_sets_filters_to_expected_value_then_set_returns(
     callback_on_mock_put(fake_attenuator._change, mock_apply_values)
 
     await asyncio.wait_for(fake_attenuator.set(0.65), timeout=0.1)
+
+
+async def test_attenuator_set_only_complete_once_all_filters_in_position(
+    fake_attenuator: BinaryFilterAttenuator,
+):
+    fake_set_complete = asyncio.Event()
+
+    async def mock_apply_values(*args, **kwargs):
+        for i in range(16):
+            set_mock_value(
+                fake_attenuator._calculated_filter_states[i], CALCULATED_VALUE[i]
+            )
+        await fake_set_complete.wait()
+        for i in range(16):
+            set_mock_value(fake_attenuator._filters_in_position[i], CALCULATED_VALUE[i])
+
+    callback_on_mock_put(fake_attenuator._change, mock_apply_values)
+    status = fake_attenuator.set(0.65)
+    assert not status.done
+    fake_set_complete.set()
+    await status
