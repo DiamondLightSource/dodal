@@ -1,6 +1,6 @@
 import pytest
 from ophyd_async.core import init_devices
-from ophyd_async.testing import assert_reading, set_mock_value
+from ophyd_async.testing import assert_reading, partial_reading, set_mock_value
 
 from dodal.devices.motors import XThetaStage, XYStage, XYZThetaStage
 
@@ -34,18 +34,10 @@ async def test_setting_xy_position_table(xyzt_stage: XYZThetaStage):
     await assert_reading(
         xyzt_stage,
         {
-            "xyzt_stage-x": {
-                "value": 0.0,
-            },
-            "xyzt_stage-y": {
-                "value": 0.0,
-            },
-            "xyzt_stage-z": {
-                "value": 0.0,
-            },
-            "xyzt_stage-theta": {
-                "value": 0.0,
-            },
+            "xyzt_stage-x": partial_reading(0.0),
+            "xyzt_stage-y": partial_reading(0.0),
+            "xyzt_stage-z": partial_reading(0.0),
+            "xyzt_stage-theta": partial_reading(0.0),
         },
     )
 
@@ -56,18 +48,10 @@ async def test_setting_xy_position_table(xyzt_stage: XYZThetaStage):
     await assert_reading(
         xyzt_stage,
         {
-            "xyzt_stage-x": {
-                "value": 1.23,
-            },
-            "xyzt_stage-y": {
-                "value": 4.56,
-            },
-            "xyzt_stage-z": {
-                "value": 0,
-            },
-            "xyzt_stage-theta": {
-                "value": 0.0,
-            },
+            "xyzt_stage-x": partial_reading(1.23),
+            "xyzt_stage-y": partial_reading(4.56),
+            "xyzt_stage-z": partial_reading(0),
+            "xyzt_stage-theta": partial_reading(0.0),
         },
     )
 
@@ -79,18 +63,10 @@ async def test_setting_xyztheta_position_table(xyzt_stage: XYZThetaStage):
     await assert_reading(
         xyzt_stage,
         {
-            "xyzt_stage-x": {
-                "value": 0.0,
-            },
-            "xyzt_stage-y": {
-                "value": 0.0,
-            },
-            "xyzt_stage-z": {
-                "value": 0.0,
-            },
-            "xyzt_stage-theta": {
-                "value": 0.0,
-            },
+            "xyzt_stage-x": partial_reading(0.0),
+            "xyzt_stage-y": partial_reading(0.0),
+            "xyzt_stage-z": partial_reading(0.0),
+            "xyzt_stage-theta": partial_reading(0.0),
         },
     )
 
@@ -103,18 +79,10 @@ async def test_setting_xyztheta_position_table(xyzt_stage: XYZThetaStage):
     await assert_reading(
         xyzt_stage,
         {
-            "xyzt_stage-x": {
-                "value": 1.23,
-            },
-            "xyzt_stage-y": {
-                "value": 4.56,
-            },
-            "xyzt_stage-z": {
-                "value": 7.89,
-            },
-            "xyzt_stage-theta": {
-                "value": 10.11,
-            },
+            "xyzt_stage-x": partial_reading(1.23),
+            "xyzt_stage-y": partial_reading(4.56),
+            "xyzt_stage-z": partial_reading(7.89),
+            "xyzt_stage-theta": partial_reading(10.11),
         },
     )
 
@@ -126,7 +94,7 @@ async def test_setting(xy_stage: XYStage):
 
     await assert_reading(
         xy_stage,
-        {"xy_stage-x": {"value": 0.0}, "xy_stage-y": {"value": 0.0}},
+        {"xy_stage-x": partial_reading(0.0), "xy_stage-y": partial_reading(0.0)},
     )
 
     # Call set to update the position
@@ -135,7 +103,7 @@ async def test_setting(xy_stage: XYStage):
 
     await assert_reading(
         xy_stage,
-        {"xy_stage-x": {"value": 5.0}, "xy_stage-y": {"value": 5.0}},
+        {"xy_stage-x": partial_reading(5.0), "xy_stage-y": partial_reading(5.0)},
     )
 
 
@@ -143,11 +111,7 @@ async def test_reading_training_rig(xtheta_stage: XThetaStage):
     await assert_reading(
         xtheta_stage,
         {
-            "xtheta_stage-x": {
-                "value": 0.0,
-            },
-            "xtheta_stage-theta": {
-                "value": 0.0,
-            },
+            "xtheta_stage-x": partial_reading(0.0),
+            "xtheta_stage-theta": partial_reading(0.0),
         },
     )
