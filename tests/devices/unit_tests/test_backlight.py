@@ -4,7 +4,7 @@ import pytest
 from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
 from ophyd_async.core import init_devices
-from ophyd_async.testing import assert_reading, set_mock_value
+from ophyd_async.testing import assert_reading, partial_reading, set_mock_value
 
 from dodal.devices.backlight import Backlight, BacklightPosition, BacklightPower
 
@@ -22,12 +22,8 @@ async def test_backlight_can_be_written_and_read_from(fake_backlight: Backlight)
     await assert_reading(
         fake_backlight,
         {
-            "backlight-power": {
-                "value": BacklightPower.ON,
-            },
-            "backlight-position": {
-                "value": BacklightPosition.IN,
-            },
+            "backlight-power": partial_reading(BacklightPower.ON),
+            "backlight-position": partial_reading(BacklightPosition.IN),
         },
     )
 

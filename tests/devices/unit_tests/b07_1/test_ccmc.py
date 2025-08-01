@@ -5,7 +5,12 @@ from bluesky import FailedStatus
 from bluesky.plan_stubs import mv
 from bluesky.run_engine import RunEngine
 from ophyd_async.core import StrictEnum, init_devices
-from ophyd_async.testing import assert_configuration, assert_reading, assert_value
+from ophyd_async.testing import (
+    assert_configuration,
+    assert_reading,
+    assert_value,
+    partial_reading,
+)
 
 from dodal.devices.b07_1.ccmc import (
     ChannelCutMonochromator,
@@ -28,15 +33,15 @@ async def test_read_config_includes(mock_ccmc: ChannelCutMonochromator):
     await assert_configuration(
         mock_ccmc,
         {
-            f"{mock_ccmc.name}-_xyz-x-motor_egu": {"value": ""},
-            f"{mock_ccmc.name}-_xyz-x-offset": {"value": 0.0},
-            f"{mock_ccmc.name}-_xyz-x-velocity": {"value": 0.0},
-            f"{mock_ccmc.name}-_xyz-y-motor_egu": {"value": ""},
-            f"{mock_ccmc.name}-_xyz-y-offset": {"value": 0.0},
-            f"{mock_ccmc.name}-_xyz-y-velocity": {"value": 0.0},
-            f"{mock_ccmc.name}-_xyz-z-motor_egu": {"value": ""},
-            f"{mock_ccmc.name}-_xyz-z-offset": {"value": 0.0},
-            f"{mock_ccmc.name}-_xyz-z-velocity": {"value": 0.0},
+            f"{mock_ccmc.name}-_xyz-x-motor_egu": partial_reading(""),
+            f"{mock_ccmc.name}-_xyz-x-offset": partial_reading(0.0),
+            f"{mock_ccmc.name}-_xyz-x-velocity": partial_reading(0.0),
+            f"{mock_ccmc.name}-_xyz-y-motor_egu": partial_reading(""),
+            f"{mock_ccmc.name}-_xyz-y-offset": partial_reading(0.0),
+            f"{mock_ccmc.name}-_xyz-y-velocity": partial_reading(0.0),
+            f"{mock_ccmc.name}-_xyz-z-motor_egu": partial_reading(""),
+            f"{mock_ccmc.name}-_xyz-z-offset": partial_reading(0.0),
+            f"{mock_ccmc.name}-_xyz-z-velocity": partial_reading(0.0),
         },
     )
 
@@ -45,13 +50,13 @@ async def test_reading(mock_ccmc: ChannelCutMonochromator):
     await assert_reading(
         mock_ccmc,
         {
-            f"{mock_ccmc.name}-crystal": {
-                "value": ChannelCutMonochromatorPositions.OUT
-            },
-            f"{mock_ccmc.name}-_xyz-x": {"value": 0.0},
-            f"{mock_ccmc.name}-_xyz-y": {"value": 0.0},
-            f"{mock_ccmc.name}-_xyz-z": {"value": 0.0},
-            f"{mock_ccmc.name}-_y_rotation": {"value": 0.0},
+            f"{mock_ccmc.name}-crystal": partial_reading(
+                ChannelCutMonochromatorPositions.OUT
+            ),
+            f"{mock_ccmc.name}-_xyz-x": partial_reading(0.0),
+            f"{mock_ccmc.name}-_xyz-y": partial_reading(0.0),
+            f"{mock_ccmc.name}-_xyz-z": partial_reading(0.0),
+            f"{mock_ccmc.name}-_y_rotation": partial_reading(0.0),
         },
     )
 

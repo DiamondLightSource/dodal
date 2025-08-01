@@ -16,6 +16,11 @@ set_utils_beamline(BL)
 
 
 @device_factory()
+def pgm() -> PGM:
+    return i05_pgm()
+
+
+@device_factory()
 def synchrotron() -> Synchrotron:
     return Synchrotron()
 

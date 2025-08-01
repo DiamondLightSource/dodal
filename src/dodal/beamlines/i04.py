@@ -43,6 +43,7 @@ from dodal.devices.zebra.zebra_constants_mapping import (
 )
 from dodal.devices.zebra.zebra_controlled_shutter import ZebraShutter
 from dodal.devices.zocalo import ZocaloResults
+from dodal.devices.zocalo.zocalo_results import ZocaloSource
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
@@ -399,7 +400,7 @@ def zocalo() -> ZocaloResults:
     """Get the i04 ZocaloResults device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
     """
-    return ZocaloResults(channel="xrc.i04")
+    return ZocaloResults(channel="xrc.i04", results_source=ZocaloSource.CPU)
 
 
 @device_factory()
