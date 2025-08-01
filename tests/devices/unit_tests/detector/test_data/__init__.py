@@ -1,0 +1,3 @@
+from .paths import TEST_DET_DIST_CONVERTER_LUT
+
+__all__ = ["TEST_DET_DIST_CONVERTER_LUT"]
