@@ -113,7 +113,7 @@ class SingleMirrorVoltage(Device):
 
 class MirrorVoltages(StandardReadable):
     def __init__(
-        self, name: str, prefix: str, *args, daq_configuration_path: str, **kwargs
+        self, prefix: str, name: str = "", *args, daq_configuration_path: str, **kwargs
     ):
         self.voltage_lookup_table_path = (
             daq_configuration_path + "/json/mirrorFocus.json"
