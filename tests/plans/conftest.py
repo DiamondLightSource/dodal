@@ -1,5 +1,5 @@
 import asyncio
-from pathlib import Path
+from pathlib import Path, PurePath
 from unittest.mock import patch
 
 import pytest
@@ -41,7 +41,7 @@ def det(
             super().__init__(sleep)
             self.n_images = 0
 
-        def open_file(self, path: Path, width: int, height: int):
+        def open_file(self, path: PurePath, width: int, height: int):
             pass
 
         async def write_images_to_file(
