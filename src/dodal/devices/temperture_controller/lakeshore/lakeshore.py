@@ -9,6 +9,7 @@ from ophyd_async.core import (
     derived_signal_rw,
     soft_signal_rw,
 )
+from ophyd_async.core._readable import _HintsFromName
 
 from .lakeshore_io import (
     LakeshoreBaseIO,
@@ -131,23 +132,15 @@ class Lakeshore(LakeshoreBaseIO, StandardReadable, Movable[float]):
                 f"Control channels must be between 1 and {len(self.control_channels)}."
             )
         await self._control_channel.set(value)
-        self._read_config_funcs = ()
-        self._has_hints = ()
-        self.add_readables(
-            [
-                self._control_channel,
-                self.control_channels[value].p,
-                self.control_channels[value].i,
-                self.control_channels[value].d,
-                self.control_channels[value].heater_output_range,
-            ],
-            StandardReadableFormat.CONFIG_SIGNAL,
+        self._read_config_funcs = (
+            self._control_channel.read,
+            self.control_channels[value].p.read,
+            self.control_channels[value].i.read,
+            self.control_channels[value].d.read,
+            self.control_channels[value].heater_output_range.read,
         )
 
-        self.add_readables(
-            [
-                self.readback[readback],
-                self.control_channels[value].user_setpoint,
-            ],
-            StandardReadableFormat.HINTED_SIGNAL,
+        self._has_hints = (
+            _HintsFromName(self.readback[readback]),
+            _HintsFromName(self.control_channels[value].user_setpoint),
         )

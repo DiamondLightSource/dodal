@@ -87,10 +87,10 @@ async def test_lakeshore_set_fail_unavailable_channel(
         4,
     ],
 )
-async def test_lakeshore__set_control_channel_correctly_set_up_readableFormat(
+async def test_lakeshore__set_control_channel_correctly_set_up_config_and_hints(
     lakeshore: Lakeshore, RE: RunEngine, control_channel: int
 ):
-    RE(abs_set(lakeshore.control_channel, control_channel, wait=True))
+    RE(abs_set(lakeshore.control_channel, control_channel))
     assert lakeshore.hints == {
         "fields": [
             f"lakeshore-readback-{control_channel}",
@@ -105,6 +105,9 @@ async def test_lakeshore__set_control_channel_correctly_set_up_readableFormat(
             "value": ANY,
         },
         f"lakeshore-control_channels-{control_channel}-p": {
+            "value": ANY,
+        },
+        f"lakeshore-control_channels-{control_channel}-heater_output_range": {
             "value": ANY,
         },
         "lakeshore-_control_channel": {
