@@ -1,19 +1,16 @@
 from ophyd_async.core import AsyncStatus, StandardReadable, StrictEnum
 from ophyd_async.epics.core import epics_signal_rw
 
+from dodal.common.enums import InState, OnStateCapitalised
+
 
 class BacklightPositions(StrictEnum):
-    OUT = "Out"
-    IN = "In"
+    OUT = InState.OUT
+    IN = InState.IN
     LOAD_CHECK = "LoadCheck"
     OAV2 = "OAV2"
     DIODE = "Diode"
     WHITE_IN = "White In"
-
-
-class LEDStatus(StrictEnum):
-    OFF = "OFF"
-    ON = "ON"
 
 
 class BacklightPositioner(StandardReadable):
@@ -45,16 +42,20 @@ class DualBacklight(StandardReadable):
     """
 
     def __init__(self, prefix: str, name: str = "") -> None:
-        self.backlight_state = epics_signal_rw(LEDStatus, prefix + "-DI-LED-01:TOGGLE")
+        self.backlight_state = epics_signal_rw(
+            OnStateCapitalised, prefix + "-DI-LED-01:TOGGLE"
+        )
         self.backlight_position = BacklightPositioner(prefix + "-MO-BL-01:", name)
 
-        self.frontlight_state = epics_signal_rw(LEDStatus, prefix + "-DI-LED-02:TOGGLE")
+        self.frontlight_state = epics_signal_rw(
+            OnStateCapitalised, prefix + "-DI-LED-02:TOGGLE"
+        )
         super().__init__(name)
 
     @AsyncStatus.wrap
     async def set(self, value: BacklightPositions):
         await self.backlight_position.set(value)
         if value == BacklightPositions.OUT:
-            await self.backlight_state.set(LEDStatus.OFF, wait=True)
+            await self.backlight_state.set(OnStateCapitalised.OFF, wait=True)
         else:
-            await self.backlight_state.set(LEDStatus.ON, wait=True)
+            await self.backlight_state.set(OnStateCapitalised.ON, wait=True)

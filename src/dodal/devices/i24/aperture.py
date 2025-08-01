@@ -1,12 +1,13 @@
 from ophyd_async.core import StrictEnum
 from ophyd_async.epics.core import epics_signal_rw
 
+from dodal.common.enums import InState
 from dodal.devices.motors import XYStage
 
 
 class AperturePositions(StrictEnum):
-    IN = "In"
-    OUT = "Out"
+    IN = InState.IN
+    OUT = InState.OUT
     ROBOT = "Robot"
     MANUAL = "Manual Mounting"
 
