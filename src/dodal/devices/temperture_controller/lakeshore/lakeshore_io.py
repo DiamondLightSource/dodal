@@ -16,33 +16,23 @@ class LakeshoreControlChannel(Device):
         Provides access to setpoint, ramp rate, ramp enable, heater output, heater output range,
         PID parameters (P, I, D), and manual output for the channel.
         """
-        self.user_setpoint = epics_signal_rw(
-            float, f"{prefix}SETP{suffix}", f"{prefix}SETP_S{suffix}"
-        )
-        self.ramp_rate = epics_signal_rw(
-            float, f"{prefix}RAMP{suffix}", f"{prefix}RAMP_S{suffix}"
-        )
-        self.ramp_enable = epics_signal_rw(
-            int, f"{prefix}RAMPST{suffix}", f"{prefix}RAMPST_S{suffix}"
-        )
-        self.heater_output = epics_signal_r(float, f"{prefix}HTR{suffix}")
-        self.heater_output_range = epics_signal_rw(
-            heater_type, f"{prefix}RANGE{suffix}", f"{prefix}RANGE_S{suffix}"
-        )
 
-        self.p = epics_signal_rw(
-            float, read_pv=f"{prefix}P{suffix}", write_pv="{prefix}P_S{suffix}"
-        )
+        def channel_rw(channel_type, pv_name):
+            return epics_signal_rw(
+                channel_type,
+                f"{prefix}{pv_name}{suffix}",
+                f"{prefix}{pv_name}_S{suffix}",
+            )
 
-        self.i = epics_signal_rw(
-            float, read_pv=f"{prefix}I{suffix}", write_pv="{prefix}I_S{suffix}"
-        )
-        self.d = epics_signal_rw(
-            float, read_pv=f"{prefix}D{suffix}", write_pv="{prefix}D_S{suffix}"
-        )
-        self.manual_output = epics_signal_rw(
-            float, read_pv=f"{prefix}MOUT{suffix}", write_pv="{prefix}MOUT_S{suffix}"
-        )
+        self.user_setpoint = channel_rw(channel_type=float, pv_name="SETP")
+        self.ramp_rate = channel_rw(channel_type=float, pv_name="RAMP")
+        self.ramp_enable = channel_rw(channel_type=float, pv_name="RAMPST")
+        self.heater_output = channel_rw(channel_type=float, pv_name="HTR")
+        self.heater_output_range = channel_rw(channel_type=heater_type, pv_name="RANGE")
+        self.p = channel_rw(float, "P")
+        self.i = channel_rw(float, "I")
+        self.d = channel_rw(float, "D")
+        self.manual_output = channel_rw(float, "MOUT")
 
         super().__init__(name=name)
 
