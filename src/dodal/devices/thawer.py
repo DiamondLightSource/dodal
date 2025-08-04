@@ -4,13 +4,12 @@ from bluesky.protocols import Movable, Stoppable
 from ophyd_async.core import (
     AsyncStatus,
     Device,
+    OnOff,
     Reference,
     SignalRW,
     StandardReadable,
 )
 from ophyd_async.epics.core import epics_signal_rw
-
-from dodal.common.enums import OnState
 
 
 class ThawingException(Exception):
@@ -18,21 +17,21 @@ class ThawingException(Exception):
 
 
 class ThawingTimer(Device, Stoppable, Movable[float]):
-    def __init__(self, control_signal: SignalRW[OnState]) -> None:
+    def __init__(self, control_signal: SignalRW[OnOff]) -> None:
         self._control_signal_ref = Reference(control_signal)
         self._thawing_task: Task | None = None
         super().__init__("thaw_for_time_s")
 
     @AsyncStatus.wrap
     async def set(self, value: float):
-        await self._control_signal_ref().set(OnState.ON)
+        await self._control_signal_ref().set(OnOff.ON)
         if self._thawing_task and not self._thawing_task.done():
             raise ThawingException("Thawing task already in progress")
         self._thawing_task = create_task(sleep(value))
         try:
             await self._thawing_task
         finally:
-            await self._control_signal_ref().set(OnState.OFF)
+            await self._control_signal_ref().set(OnOff.OFF)
 
     @AsyncStatus.wrap
     async def stop(self, *args, **kwargs):
@@ -42,11 +41,11 @@ class ThawingTimer(Device, Stoppable, Movable[float]):
 
 class Thawer(StandardReadable, Stoppable):
     def __init__(self, prefix: str, name: str = "") -> None:
-        self.control = epics_signal_rw(OnState, prefix + ":CTRL")
+        self.control = epics_signal_rw(OnOff, prefix + ":CTRL")
         self.thaw_for_time_s = ThawingTimer(self.control)
         super().__init__(name)
 
     @AsyncStatus.wrap
     async def stop(self, *args, **kwargs):
         await self.thaw_for_time_s.stop()
-        await self.control.set(OnState.OFF)
+        await self.control.set(OnOff.OFF)

@@ -1,20 +1,19 @@
-from ophyd_async.core import StrictEnum
+from ophyd_async.core import EnabledDisabled, OnOff, StrictEnum
 from ophyd_async.epics.core import epics_signal_rw
 
-from dodal.common.enums import EnabledState, OnState
 from dodal.devices.robot import BartRobot
 
 
 class ForceBit(StrictEnum):
-    ON = OnState.ON
+    ON = OnOff.ON
     NO = "No"
-    OFF = OnState.OFF
+    OFF = OnOff.OFF
 
 
 class LaserRobot(BartRobot):
     def __init__(self, name: str, prefix: str) -> None:
         self.dewar_lid_heater = epics_signal_rw(
-            EnabledState, prefix + "DW_1_ENABLED", prefix + "DW_1_CTRL"
+            EnabledDisabled, prefix + "DW_1_ENABLED", prefix + "DW_1_CTRL"
         )
         self.cryojet_retract = epics_signal_rw(ForceBit, prefix + "OP_24_FORCE_OPTION")
         self.set_beamline_safe = epics_signal_rw(

@@ -1,7 +1,10 @@
-from ophyd_async.core import StandardReadable, StandardReadableFormat, StrictEnum
+from ophyd_async.core import (
+    EnabledDisabled,
+    StandardReadable,
+    StandardReadableFormat,
+    StrictEnum,
+)
 from ophyd_async.epics.core import epics_signal_rw
-
-from dodal.common.enums import EnabledState
 
 
 class WatsonMarlow323PumpDirection(StrictEnum):
@@ -35,7 +38,7 @@ class WatsonMarlow323Pump(StandardReadable):
 
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             self.enabled = epics_signal_rw(
-                EnabledState,
+                EnabledDisabled,
                 prefix + "DISABLE",
             )
 
