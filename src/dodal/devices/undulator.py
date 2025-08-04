@@ -12,7 +12,7 @@ from ophyd_async.core import (
 from ophyd_async.epics.core import epics_signal_r
 from ophyd_async.epics.motor import Motor
 
-from dodal.common.enums import EnabledStateCapitalised
+from dodal.common.enums import EnabledDisabledUpper
 from dodal.log import LOGGER
 
 from .util.lookup_tables import energy_distance_table
@@ -68,9 +68,7 @@ class Undulator(StandardReadable, Movable[float]):
         with self.add_children_as_readables():
             self.gap_motor = Motor(prefix + "BLGAPMTR")
             self.current_gap = epics_signal_r(float, prefix + "CURRGAPD")
-            self.gap_access = epics_signal_r(
-                EnabledStateCapitalised, prefix + "IDBLENA"
-            )
+            self.gap_access = epics_signal_r(EnabledDisabledUpper, prefix + "IDBLENA")
 
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             self.gap_discrepancy_tolerance_mm, _ = soft_signal_r_and_setter(
@@ -107,7 +105,7 @@ class Undulator(StandardReadable, Movable[float]):
 
     async def raise_if_not_enabled(self):
         access_level = await self.gap_access.get_value()
-        if access_level is EnabledStateCapitalised.DISABLED and not TEST_MODE:
+        if access_level is EnabledDisabledUpper.DISABLED and not TEST_MODE:
             raise AccessError("Undulator gap access is disabled. Contact Control Room")
 
     async def _set_undulator_gap(self, energy_kev: float) -> None:

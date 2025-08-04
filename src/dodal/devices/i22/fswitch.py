@@ -11,7 +11,7 @@ from ophyd_async.core import (
 )
 from ophyd_async.epics.core import epics_signal_r
 
-from dodal.common.enums import InStateCapitalised
+from dodal.common.enums import InOutUpper
 
 
 class FSwitch(StandardReadable):
@@ -41,9 +41,7 @@ class FSwitch(StandardReadable):
     ) -> None:
         self.filters = DeviceVector(
             {
-                i: epics_signal_r(
-                    InStateCapitalised, f"{prefix}FILTER-{i:03}:STATUS_RBV"
-                )
+                i: epics_signal_r(InOutUpper, f"{prefix}FILTER-{i:03}:STATUS_RBV")
                 for i in range(FSwitch.NUM_FILTERS)
             }
         )
@@ -84,7 +82,7 @@ class FSwitch(StandardReadable):
         result = await asyncio.gather(
             *(filter.get_value() for filter in self.filters.values())
         )
-        num_in = sum(r.value == InStateCapitalised.IN for r in result)
+        num_in = sum(r.value == InOutUpper.IN for r in result)
         default_reading = await super().read()
         return {
             FSwitch.NUM_LENSES_FIELD_NAME: Reading(value=num_in, timestamp=time.time()),
