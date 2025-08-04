@@ -7,6 +7,9 @@ Some devices have been written in ``ophyd`` for historic reasons. However, all n
 ``ophyd-async`` and any old ``ophyd`` devices undergoing a large re-write should be considered for 
 conversion to ``ophyd-async``. 
 
+
+.. _where_to_put_devices:
+
 Where to put devices
 --------------------
 
@@ -19,7 +22,11 @@ should think about where to place them in the following order:
    complex device (e.g. multiple files) it should have a folder of its own e.g. ``oav``
 #. A device that is very specific to a particular beamline should go in the ``devices/ixx`` folder
 
-This is in an effort to avoid duplication across facilities/beamlines. 
+This is in an effort to avoid duplication across facilities/beamlines. You should also consider whether it is best for a piece of logic is better suited to the control system or a bluesky plan - see `ophyd-async's guide <https://blueskyproject.io/ophyd-async/main/explanations/where-device-logic.html>`_ on that.
+
+Determining where in dodal a device should live can be summarised below:
+
+.. image:: ../assets/where-to-put-dodal-logic.png
 
 Device Best Practices
 ----------------------------
@@ -27,10 +34,33 @@ Device Best Practices
 Ophyd-async directory contains a flowchart_ for a simplified decision tree about what interfaces
 should a given device implement. In addition to this the following guidelines are strongly recommended:
 
+#. Device should have their name as an optional str parameter with a default of ""- this allows ophyd-async to automatically name the device
 #. Devices should contain only the PV suffixes that are generic for any instance of the device. See `PV Suffixes`_
 #. Anything in a device that is expected to be set externally should be a signal. See `Use of signals`_
 #. Devices should not hold state, when they are read they should read the hardware. See `Holding State`_
 
+Defaulting Names
+----------------
+
+Device should provide the ability to override their name while maintaining a default name of ""-
+this allows the device to be named on connection from the name of its factory function when using
+the device_factory decorator.
+
+When a device is named in this way, all of its child devices are named appropriately.
+
+.. code-block:: python
+    class MyDevice(Device):
+        def __init__(self, prefix: str, name: str = "")
+            x = Motor(prefix + "X")
+            super().__init__(name)
+
+    @device_factory()
+    def foo() -> MyDevice:
+        return MyDevice("FOO:")
+
+    f = foo()
+    f.name == "foo"
+    f.x.name == "foo-x"
 
 PV Suffixes
 -----------
@@ -40,23 +70,22 @@ In general devices should contain only the PV suffixes that are generic for any 
 .. code-block:: python
 
     class MyDevice(Device):
-        def __init__(self, name: str, prefix: str)
+        def __init__(self, prefix: str, name: str = "")
             self.bragg = Motor(prefix + "BRAGG")
-            super().__init__(name)        
-    
-    device_instantiation(MyDevice, "dcm", "-MO-DCM-01:")
+            super().__init__(name)  
 
+    MyDevice("BLXXI-MO-DCM-01:")      
 
 is preferred over
 
 .. code-block:: python
 
     class MyDevice(Device):
-        def __init__(self, name: str, prefix: str)
+        def __init__(self, prefix: str, name: str = "")
             self.bragg = Motor(prefix + "-MO-DCM-01:BRAGG")
             super().__init__(name)        
 
-    device_instantiation(MyDevice, "dcm", "")
+    MyDevice("BLXXI")
 
 This is so that a new device on say ``-MO-DCM-02`` can be easily created.
 
