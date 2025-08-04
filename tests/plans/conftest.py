@@ -6,7 +6,7 @@ import pytest
 from bluesky.run_engine import RunEngine
 from ophyd_async.core import PathProvider, StandardDetector, init_devices
 from ophyd_async.sim import PatternGenerator, SimBlobDetector, SimMotor
-from tests.devices.unit_tests.test_data import (
+from tests.devices.test_data import (
     TEST_BEAMLINE_UNDULATOR_TO_GAP_LUT,
 )
 

@@ -14,7 +14,7 @@ from dodal.devices.electron_analyser import (
 )
 from dodal.devices.electron_analyser.specs import SpecsDetector
 from dodal.devices.electron_analyser.vgscienta import VGScientaDetector
-from tests.devices.unit_tests.electron_analyser.util import (
+from tests.devices.electron_analyser.util import (
     create_analyser_device,
     get_test_sequence,
 )

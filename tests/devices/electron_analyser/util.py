@@ -18,7 +18,7 @@ from dodal.devices.electron_analyser.vgscienta import (
     VGScientaDetector,
     VGScientaSequence,
 )
-from tests.devices.unit_tests.electron_analyser.test_data import (
+from tests.devices.electron_analyser.test_data import (
     TEST_SPECS_SEQUENCE,
     TEST_VGSCIENTA_SEQUENCE,
 )

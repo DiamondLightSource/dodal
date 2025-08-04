@@ -4,7 +4,7 @@ from unittest.mock import MagicMock, PropertyMock, patch
 
 import pytest
 from numpy import isclose
-from tests.devices.unit_tests.detector.test_data import (
+from tests.devices.detector.test_data import (
     TEST_DET_DIST_CONVERTER_LUT,
 )
 

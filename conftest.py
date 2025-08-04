@@ -14,7 +14,7 @@ from ophyd_async.core import (
     PathInfo,
     PathProvider,
 )
-from tests.devices.unit_tests.test_daq_configuration import MOCK_DAQ_CONFIG_PATH
+from tests.devices.test_daq_configuration import MOCK_DAQ_CONFIG_PATH
 from tests.test_data import (
     TEST_DISPLAY_CONFIG,
     TEST_J_CAMERA_MAN_ZOOM_LEVELS_XML,
