@@ -1,11 +1,10 @@
-from unittest.mock import ANY
-
 import numpy as np
 import pytest
 from ophyd_async.core import init_devices
 from ophyd_async.testing import (
     assert_configuration,
     assert_reading,
+    partial_reading,
     set_mock_value,
 )
 
@@ -35,21 +34,9 @@ async def test_reading_includes_read_fields(undulator: Undulator):
     await assert_reading(
         undulator,
         {
-            "undulator-gap_access": {
-                "value": UndulatorGapAccess.ENABLED,
-                "timestamp": ANY,
-                "alarm_severity": 0,
-            },
-            "undulator-gap_motor": {
-                "value": 0.0,
-                "timestamp": ANY,
-                "alarm_severity": 0,
-            },
-            "undulator-current_gap": {
-                "value": 0.0,
-                "timestamp": ANY,
-                "alarm_severity": 0,
-            },
+            "undulator-gap_access": partial_reading(UndulatorGapAccess.ENABLED),
+            "undulator-gap_motor": partial_reading(0.0),
+            "undulator-current_gap": partial_reading(0.0),
         },
     )
 
@@ -58,36 +45,12 @@ async def test_configuration_includes_configuration_fields(undulator: Undulator)
     await assert_configuration(
         undulator,
         {
-            "undulator-gap_motor-motor_egu": {
-                "value": "",
-                "timestamp": ANY,
-                "alarm_severity": 0,
-            },
-            "undulator-gap_motor-velocity": {
-                "value": 0.0,
-                "timestamp": ANY,
-                "alarm_severity": 0,
-            },
-            "undulator-length": {
-                "value": 2.0,
-                "timestamp": ANY,
-                "alarm_severity": 0,
-            },
-            "undulator-poles": {
-                "value": 80,
-                "timestamp": ANY,
-                "alarm_severity": 0,
-            },
-            "undulator-gap_discrepancy_tolerance_mm": {
-                "value": 0.002,
-                "timestamp": ANY,
-                "alarm_severity": 0,
-            },
-            "undulator-gap_motor-offset": {
-                "alarm_severity": 0,
-                "timestamp": ANY,
-                "value": 0.0,
-            },
+            "undulator-gap_motor-motor_egu": partial_reading(""),
+            "undulator-gap_motor-velocity": partial_reading(0.0),
+            "undulator-length": partial_reading(2.0),
+            "undulator-poles": partial_reading(80),
+            "undulator-gap_discrepancy_tolerance_mm": partial_reading(0.002),
+            "undulator-gap_motor-offset": partial_reading(0.0),
         },
     )
 

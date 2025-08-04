@@ -1,4 +1,3 @@
-import asyncio
 import time
 
 import numpy as np
@@ -141,14 +140,16 @@ class PinTipDetection(StandardReadable):
 
     @AsyncStatus.wrap
     async def trigger(self):
-        async def _set_triggered_tip():
-            """Monitors the camera data and updates the triggered_tip signal.
+        """Monitors the camera data and updates the triggered_tip signal.
 
-            If a tip is found it will update the signal and stop monitoring
-            If no tip is found it will retry with the next monitored value
-            This loop will serve as a good example of using 'observe_value' in the ophyd_async documentation
-            """
-            async for value in observe_value(self.array_data):
+        * If a tip is found it will update the signal and stop monitoring
+        * If no tip is found it will retry with the next monitored value, if this
+            continues for {validity_timeout} seconds it will timeout.
+        """
+        try:
+            async for value in observe_value(
+                self.array_data, done_timeout=await self.validity_timeout.get_value()
+            ):
                 try:
                     location = await self._get_tip_and_edge_data(value)
                     self._set_triggered_values(location)
@@ -157,13 +158,8 @@ class PinTipDetection(StandardReadable):
                         f"Failed to detect pin-tip location, will retry with next image: {e}"
                     )
                 else:
-                    return
-
-        try:
-            await asyncio.wait_for(
-                _set_triggered_tip(), timeout=await self.validity_timeout.get_value()
-            )
-        except asyncio.exceptions.TimeoutError:
+                    break
+        except TimeoutError:
             LOGGER.error(
                 f"No tip found in {await self.validity_timeout.get_value()} seconds."
             )

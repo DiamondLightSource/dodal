@@ -9,13 +9,13 @@ from ophyd_async.core import (
     Reference,
     SignalR,
     SignalRW,
-    StandardReadable,
     observe_signals_value,
     soft_signal_rw,
     wait_for_value,
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
-from ophyd_async.epics.motor import Motor
+
+from dodal.devices.motors import XYZStage
 
 HOME_STR = r"\#1hmz\#2hmz\#3hmz"  # Command to home the PMAC motors
 ZERO_STR = "!x0y0z0"  # Command to blend any ongoing move into new position
@@ -192,7 +192,7 @@ class ProgramAbort(Triggerable):
         )
 
 
-class PMAC(StandardReadable):
+class PMAC(XYZStage):
     """Device to control the chip stage on I24."""
 
     def __init__(self, prefix: str, name: str = "") -> None:
@@ -208,10 +208,6 @@ class PMAC(StandardReadable):
         self.enc_reset = PMACStringEncReset(
             self.pmac_string,
         )
-
-        self.x = Motor(prefix + "X")
-        self.y = Motor(prefix + "Y")
-        self.z = Motor(prefix + "Z")
 
         # These next signals are readback values on PVARS which are set by the motion
         # program.
@@ -232,4 +228,4 @@ class PMAC(StandardReadable):
         )
         self.abort_program = ProgramAbort(self.pmac_string, self.scanstatus)
 
-        super().__init__(name)
+        super().__init__(prefix, name)

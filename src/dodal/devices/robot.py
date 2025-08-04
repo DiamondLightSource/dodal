@@ -7,6 +7,7 @@ from ophyd_async.core import (
     AsyncStatus,
     Device,
     StandardReadable,
+    StandardReadableFormat,
     StrictEnum,
     set_and_wait_for_value,
     wait_for_value,
@@ -19,6 +20,9 @@ from ophyd_async.epics.core import (
 )
 
 from dodal.log import LOGGER
+
+WAIT_FOR_OLD_PIN_MSG = "Waiting on old pin unloaded"
+WAIT_FOR_NEW_PIN_MSG = "Waiting on new pin loaded"
 
 
 class RobotLoadFailed(Exception):
@@ -73,19 +77,22 @@ class BartRobot(StandardReadable, Movable[SampleLocation]):
     # How far the gonio position can be out before loading will fail
     LOAD_TOLERANCE_MM = 0.02
 
-    def __init__(self, name: str, prefix: str) -> None:
-        self.barcode = epics_signal_r(str, prefix + "BARCODE")
-        self.gonio_pin_sensor = epics_signal_r(PinMounted, prefix + "PIN_MOUNTED")
+    def __init__(self, prefix: str, name: str = "") -> None:
+        with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
+            self.barcode = epics_signal_r(str, prefix + "BARCODE")
+            self.gonio_pin_sensor = epics_signal_r(PinMounted, prefix + "PIN_MOUNTED")
+
+            self.current_puck = epics_signal_r(float, prefix + "CURRENT_PUCK_RBV")
+            self.current_pin = epics_signal_r(float, prefix + "CURRENT_PIN_RBV")
 
         self.next_pin = epics_signal_rw_rbv(float, prefix + "NEXT_PIN")
         self.next_puck = epics_signal_rw_rbv(float, prefix + "NEXT_PUCK")
-        self.current_puck = epics_signal_r(float, prefix + "CURRENT_PUCK_RBV")
-        self.current_pin = epics_signal_r(float, prefix + "CURRENT_PIN_RBV")
 
-        self.next_sample_id = epics_signal_rw_rbv(int, prefix + "NEXT_ID")
         self.sample_id = epics_signal_r(int, prefix + "CURRENT_ID_RBV")
+        self.next_sample_id = epics_signal_rw_rbv(int, prefix + "NEXT_ID")
 
         self.load = epics_signal_x(prefix + "LOAD.PROC")
+        self.unload = epics_signal_x(prefix + "UNLD.PROC")
         self.program_running = epics_signal_r(bool, prefix + "PROGRAM_RUNNING")
         self.program_name = epics_signal_r(str, prefix + "PROGRAM_NAME")
 
@@ -93,7 +100,7 @@ class BartRobot(StandardReadable, Movable[SampleLocation]):
         self.controller_error = ErrorStatus(prefix + "CNTL")
 
         self.reset = epics_signal_x(prefix + "RESET.PROC")
-        self.stop = epics_signal_x(prefix + "ABORT.PROC")
+        self.abort = epics_signal_x(prefix + "ABORT.PROC")
         self.init = epics_signal_x(prefix + "INIT.PROC")
         self.soak = epics_signal_x(prefix + "SOAK.PROC")
         self.home = epics_signal_x(prefix + "GOHM.PROC")
@@ -140,6 +147,7 @@ class BartRobot(StandardReadable, Movable[SampleLocation]):
             # in the current task, when it propagates to here we should cancel all pending tasks before bubbling up
             for task in tasks:
                 task.cancel()
+
             raise
 
     async def _load_pin_and_puck(self, sample_location: SampleLocation):
@@ -160,9 +168,9 @@ class BartRobot(StandardReadable, Movable[SampleLocation]):
         )
         await self.load.trigger()
         if await self.gonio_pin_sensor.get_value() == PinMounted.PIN_MOUNTED:
-            LOGGER.info("Waiting on old pin unloaded")
+            LOGGER.info(WAIT_FOR_OLD_PIN_MSG)
             await wait_for_value(self.gonio_pin_sensor, PinMounted.NO_PIN_MOUNTED, None)
-        LOGGER.info("Waiting on new pin loaded")
+        LOGGER.info(WAIT_FOR_NEW_PIN_MSG)
 
         await self.pin_mounted_or_no_pin_found()
 
@@ -173,8 +181,7 @@ class BartRobot(StandardReadable, Movable[SampleLocation]):
                 self._load_pin_and_puck(value),
                 timeout=self.LOAD_TIMEOUT + self.NOT_BUSY_TIMEOUT,
             )
-        except (asyncio.TimeoutError, TimeoutError) as e:
-            # Will only need to catch asyncio.TimeoutError after https://github.com/bluesky/ophyd-async/issues/572
+        except TimeoutError as e:
             await self.prog_error.raise_if_error(e)
             await self.controller_error.raise_if_error(e)
             raise RobotLoadFailed(0, "Robot timed out") from e

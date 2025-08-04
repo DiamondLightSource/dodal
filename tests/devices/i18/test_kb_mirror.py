@@ -1,8 +1,6 @@
-from unittest.mock import ANY
-
 import pytest
 from ophyd_async.core import init_devices
-from ophyd_async.testing import set_mock_value
+from ophyd_async.testing import assert_reading, partial_reading, set_mock_value
 
 from dodal.devices.i18.KBMirror import KBMirror
 
@@ -27,38 +25,14 @@ async def test_setting_xy_position_kbmirror(kbmirror: KBMirror):
     await kbmirror.x.set(1.23)
     await kbmirror.y.set(4.56)
 
-    reading = await kbmirror.read()
-    expected_reading = {
-        "kbmirror-y": {
-            "value": 4.56,
-            "timestamp": ANY,
-            "alarm_severity": 0,
+    await assert_reading(
+        kbmirror,
+        {
+            "kbmirror-y": partial_reading(4.56),
+            "kbmirror-bend1": partial_reading(0.0),
+            "kbmirror-ellip": partial_reading(0.0),
+            "kbmirror-x": partial_reading(1.23),
+            "kbmirror-bend2": partial_reading(0.0),
+            "kbmirror-curve": partial_reading(0.0),
         },
-        "kbmirror-bend1": {
-            "value": 0.0,
-            "timestamp": ANY,
-            "alarm_severity": 0,
-        },
-        "kbmirror-ellip": {
-            "value": 0.0,
-            "timestamp": ANY,
-            "alarm_severity": 0,
-        },
-        "kbmirror-x": {
-            "value": 1.23,
-            "timestamp": ANY,
-            "alarm_severity": 0,
-        },
-        "kbmirror-bend2": {
-            "value": 0.0,
-            "timestamp": ANY,
-            "alarm_severity": 0,
-        },
-        "kbmirror-curve": {
-            "value": 0.0,
-            "timestamp": ANY,
-            "alarm_severity": 0,
-        },
-    }
-
-    assert reading == expected_reading
+    )

@@ -1,13 +1,20 @@
 import pytest
 from bluesky import RunEngine
+from ophyd_async.core import SignalR
 from ophyd_async.testing import set_mock_value
 
+from dodal.devices.b07 import LensMode, PsuMode
 from dodal.devices.electron_analyser.specs import SpecsDetector
+from tests.devices.unit_tests.electron_analyser.util import create_analyser_device
 
 
 @pytest.fixture
-def detector_class() -> type[SpecsDetector]:
-    return SpecsDetector
+async def sim_detector(
+    energy_sources: dict[str, SignalR[float]],
+) -> SpecsDetector[LensMode, PsuMode]:
+    return await create_analyser_device(
+        SpecsDetector[LensMode, PsuMode], energy_sources
+    )
 
 
 async def test_analyser_specs_detector_image_shape(
@@ -15,6 +22,7 @@ async def test_analyser_specs_detector_image_shape(
     RE: RunEngine,
 ) -> None:
     driver = sim_detector.driver
+    prefix = driver.name + "-"
 
     low_energy = 1
     high_energy = 10
@@ -32,7 +40,7 @@ async def test_analyser_specs_detector_image_shape(
     energy_axis = await driver.energy_axis.get_value()
 
     describe = await sim_detector.describe()
-    assert describe[driver.name + "-image"]["shape"] == [
+    assert describe[f"{prefix}image"]["shape"] == [
         len(angle_axis),
         len(energy_axis),
     ]
