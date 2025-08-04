@@ -75,7 +75,7 @@ async def test_when_set_to_unknown_position_then_error_raised(
         await scintillator.selected_pos.set(InOut.UNKNOWN)
 
 
-async def test_given_aperture_scatterguard_parked_when_set_to_out_position_then_(
+async def test_given_aperture_scatterguard_parked_when_set_to_out_position_then_returns_expected(
     scintillator_and_ap_sg: tuple[Scintillator, ApertureScatterguard],
 ):
     scintillator, ap_sg = scintillator_and_ap_sg
