@@ -11,11 +11,11 @@ from dodal.plan_stubs.check_topup import (
     check_topup_and_wait_if_necessary,
     wait_for_topup_complete,
 )
-from tests.common.beamlines.test_beamline_parameters import TEST_BEAMLINE_PARAMETERS_TXT
 from tests.plan_stubs.test_data import (
     TEST_TOPUP_LONG_DELAY_TXT,
     TEST_TOPUP_SHORT_PARAMS_TXT,
 )
+from tests.test_data import TEST_BEAMLINE_PARAMETERS_TXT
 
 
 @pytest.fixture

@@ -7,7 +7,7 @@ from dodal.devices.util.lookup_tables import (
     linear_interpolation_lut,
     parse_lookup_table,
 )
-from tests.devices.unit_tests.detector.test_det_resolution import (
+from tests.devices.unit_tests.detector.test_data import (
     TEST_DET_DIST_CONVERTER_LUT,
 )
 from tests.devices.unit_tests.test_data import (
