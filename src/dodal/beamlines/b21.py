@@ -116,8 +116,6 @@ def slits_7() -> Slits:
         prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-07:",
         x_gap="X:GAP",
         y_gap="Y:GAP",
-        x_centre="X:CENTRE",
-        y_centre="Y:CENTRE",
     )
 
 
