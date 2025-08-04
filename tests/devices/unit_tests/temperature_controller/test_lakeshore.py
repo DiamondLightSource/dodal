@@ -1,11 +1,13 @@
+from collections import defaultdict
 from unittest.mock import ANY
 
 import numpy as np
 import pytest
 from bluesky.plan_stubs import abs_set
+from bluesky.plans import count
 from bluesky.run_engine import RunEngine
 from ophyd_async.core import StrictEnum, init_devices
-from ophyd_async.testing import assert_configuration
+from ophyd_async.testing import assert_configuration, assert_reading
 
 from dodal.devices.temperture_controller import (
     Lakeshore,
@@ -80,38 +82,57 @@ async def test_lakeshore_set_fail_unavailable_channel(
 
 @pytest.mark.parametrize(
     "control_channel",
-    [
-        1,
-        2,
-        3,
-        4,
-    ],
+    [1, 2, 3, 4],
 )
-async def test_lakeshore__set_control_channel_correctly_set_up_config_and_hints(
-    lakeshore: Lakeshore, RE: RunEngine, control_channel: int
+async def test_lakeshore_set_control_channel_correctly_set_up_config(
+    lakeshore: Lakeshore,
+    RE: RunEngine,
+    control_channel: int,
 ):
     RE(abs_set(lakeshore.control_channel, control_channel))
-    assert lakeshore.hints == {
-        "fields": [
-            f"lakeshore-readback-{control_channel}",
-            f"lakeshore-control_channels-{control_channel}-user_setpoint",
-        ],
-    }
+
+    config = ["user_setpoint", "p", "i", "d", "heater_output_range"]
     expected_config = {
-        f"lakeshore-control_channels-{control_channel}-d": {
-            "value": ANY,
-        },
-        f"lakeshore-control_channels-{control_channel}-i": {
-            "value": ANY,
-        },
-        f"lakeshore-control_channels-{control_channel}-p": {
-            "value": ANY,
-        },
-        f"lakeshore-control_channels-{control_channel}-heater_output_range": {
-            "value": ANY,
-        },
-        "lakeshore-_control_channel": {
-            "value": control_channel,
-        },
+        f"lakeshore-control_channels-{control_channel}-{pv}": {"value": ANY}
+        for pv in config
+    }
+    expected_config["lakeshore-_control_channel"] = {
+        "value": control_channel,
     }
     await assert_configuration(lakeshore, expected_config, full_match=False)
+
+
+async def test_lakeshore_read(
+    lakeshore: Lakeshore,
+):
+    expected_reading = {}
+
+    for control_channel in range(1, 5):
+        expected_reading[
+            f"lakeshore-control_channels-{control_channel}-user_setpoint"
+        ] = {"value": ANY}
+
+        expected_reading[f"lakeshore-readback-{control_channel}"] = {
+            "value": ANY,
+        }
+    await assert_reading(lakeshore, expected_reading, full_match=False)
+
+
+@pytest.mark.parametrize(
+    "readback_channel",
+    [3, 2, 1, 4],
+)
+async def test_lakeshore_count_with_hints(
+    lakeshore: Lakeshore, RE: RunEngine, readback_channel: int
+):
+    docs = defaultdict(list)
+
+    def capture_emitted(name, doc):
+        docs[name].append(doc)
+
+    RE(abs_set(lakeshore.hints_channel, readback_channel))
+    RE(count([lakeshore]), capture_emitted)
+    assert (
+        docs["descriptor"][0]["hints"]["lakeshore"]["fields"][0]
+        == f"lakeshore-readback-{readback_channel}"
+    )

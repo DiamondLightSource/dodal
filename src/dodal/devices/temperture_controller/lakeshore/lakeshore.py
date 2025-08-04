@@ -80,6 +80,14 @@ class Lakeshore(LakeshoreBaseIO, StandardReadable, Movable[float]):
             current_channel=self._control_channel,
         )
 
+        self._hints_channel = soft_signal_rw(int, initial_value=control_channel)
+
+        self.hints_channel = derived_signal_rw(
+            raw_to_derived=self._get_hints_channel,
+            set_derived=self._set_hints_channel,
+            current_channel=self._hints_channel,
+        )
+
         super().__init__(
             prefix=prefix,
             num_readback_channel=num_readback_channel,
@@ -92,6 +100,7 @@ class Lakeshore(LakeshoreBaseIO, StandardReadable, Movable[float]):
             [setpoint.user_setpoint for setpoint in self.control_channels.values()]
             + list(self.readback.values())
         )
+        self._has_hints = (_HintsFromName(self.readback[control_channel]),)
 
         self.add_readables(
             [
@@ -123,10 +132,7 @@ class Lakeshore(LakeshoreBaseIO, StandardReadable, Movable[float]):
     def _get_control_channel(self, current_channel: int) -> int:
         return current_channel
 
-    async def _set_control_channel(
-        self, value: int, readback: int | None = None
-    ) -> None:
-        readback = readback if readback else value
+    async def _set_control_channel(self, value: int) -> None:
         if value < 1 or value > len(self.control_channels):
             raise ValueError(
                 f"Control channels must be between 1 and {len(self.control_channels)}."
@@ -134,13 +140,15 @@ class Lakeshore(LakeshoreBaseIO, StandardReadable, Movable[float]):
         await self._control_channel.set(value)
         self._read_config_funcs = (
             self._control_channel.read,
+            self.control_channels[value].user_setpoint.read,
             self.control_channels[value].p.read,
             self.control_channels[value].i.read,
             self.control_channels[value].d.read,
             self.control_channels[value].heater_output_range.read,
         )
 
-        self._has_hints = (
-            _HintsFromName(self.readback[readback]),
-            _HintsFromName(self.control_channels[value].user_setpoint),
-        )
+    async def _set_hints_channel(self, readback_channel: int) -> None:
+        self._has_hints = (_HintsFromName(self.readback[readback_channel]),)
+
+    def _get_hints_channel(self, current_channel: int) -> int:
+        return current_channel
