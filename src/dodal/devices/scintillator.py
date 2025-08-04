@@ -67,15 +67,16 @@ class Scintillator(StandardReadable):
             return InOut.UNKNOWN
 
     async def _set_selected_position(self, position: InOut) -> None:
-        if position == InOut.OUT:
-            if (
-                self._aperture_scatterguard().selected_aperture.get_value()
-                != ApertureValue.PARKED
-            ):
-                raise ValueError(
-                    "Cannot move scintillator out if aperture/scatterguard is not parked"
-                )
-            await self.y_mm.set(self._scintillator_out_yz_mm[0])
-            await self.z_mm.set(self._scintillator_out_yz_mm[1])
-        elif position == InOut.UNKNOWN:
-            raise ValueError(f"Cannot set scintillator to position {position}")
+        match position:
+            case InOut.OUT:
+                if (
+                    self._aperture_scatterguard().selected_aperture.get_value()
+                    != ApertureValue.PARKED
+                ):
+                    raise ValueError(
+                        "Cannot move scintillator out if aperture/scatterguard is not parked"
+                    )
+                await self.y_mm.set(self._scintillator_out_yz_mm[0])
+                await self.z_mm.set(self._scintillator_out_yz_mm[1])
+            case _:
+                raise ValueError(f"Cannot set scintillator to position {position}")

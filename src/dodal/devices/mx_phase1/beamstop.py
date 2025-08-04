@@ -83,12 +83,13 @@ class Beamstop(StandardReadable):
             return BeamstopPositions.UNKNOWN
 
     async def _set_selected_position(self, position: BeamstopPositions) -> None:
-        if position == BeamstopPositions.DATA_COLLECTION:
-            # Move z first as it could be under the table
-            await self.z_mm.set(self._in_beam_xyz_mm[2])
-            await asyncio.gather(
-                self.x_mm.set(self._in_beam_xyz_mm[0]),
-                self.y_mm.set(self._in_beam_xyz_mm[1]),
-            )
-        elif position == BeamstopPositions.UNKNOWN:
-            raise ValueError(f"Cannot set beamstop to position {position}")
+        match position:
+            case BeamstopPositions.DATA_COLLECTION:
+                # Move z first as it could be under the table
+                await self.z_mm.set(self._in_beam_xyz_mm[2])
+                await asyncio.gather(
+                    self.x_mm.set(self._in_beam_xyz_mm[0]),
+                    self.y_mm.set(self._in_beam_xyz_mm[1]),
+                )
+            case _:
+                raise ValueError(f"Cannot set beamstop to position {position}")

@@ -93,7 +93,7 @@ class AperturePosition(BaseModel):
 class ApertureValue(StrictEnum):
     """The possible apertures that can be selected.
 
-    Changing these means changing the external paramter model of Hyperion.
+    Changing these means changing the external parameter model of Hyperion.
     See https://github.com/DiamondLightSource/mx-bluesky/issues/760
     """
 
@@ -101,7 +101,7 @@ class ApertureValue(StrictEnum):
     MEDIUM = "MEDIUM_APERTURE"
     LARGE = "LARGE_APERTURE"
     OUT_OF_BEAM = "Out of beam"
-    PARKED = "Parked"
+    PARKED = "Parked"  # Parked under the collimation table for manual load
 
     def __str__(self):
         return self.name.capitalize()
@@ -202,21 +202,20 @@ class ApertureScatterguard(StandardReadable, Preparable):
 
         super().__init__(name)
 
-    async def _if_parked_then_unpark(self, position_to_move_to: ApertureValue):
-        current_ap_y = await self.aperture.y.user_readback.get_value()
-        current_ap_z = await self.aperture.z.user_readback.get_value()
-        if self._is_in_position(ApertureValue.PARKED, current_ap_y, current_ap_z):
-            position = self._loaded_positions[position_to_move_to]
-            await self.aperture.z.set(position.aperture_z)
-            await self._safe_move_whilst_in_beam(position)
-            return True
-        return False
+    async def _unpark(self, position_to_move_to: ApertureValue):
+        """When the aperture is parked it is under the collimation table. It needs to be
+        moved out from under the table before it is moved up to beam height.
+        """
+        position = self._loaded_positions[position_to_move_to]
+        await self.aperture.z.set(position.aperture_z)
 
     async def _set_current_aperture_position(self, value: ApertureValue) -> None:
         position = self._loaded_positions[value]
 
-        if await self._if_parked_then_unpark(value):
-            return
+        current_ap_y = await self.aperture.y.user_readback.get_value()
+        current_ap_z = await self.aperture.z.user_readback.get_value()
+        if self._is_in_position(ApertureValue.PARKED, current_ap_y, current_ap_z):
+            await self._unpark(value)
 
         await self._check_safe_to_move(position.aperture_z)
 
@@ -350,8 +349,6 @@ class ApertureScatterguard(StandardReadable, Preparable):
         Moving the assembly whilst out of the beam has no collision risk so we can just
         move all the motors together.
         """
-        if await self._if_parked_then_unpark(value):
-            return
         current_y = await self.aperture.y.user_readback.get_value()
         current_z = await self.aperture.z.user_readback.get_value()
         if self._is_in_position(ApertureValue.OUT_OF_BEAM, current_y, current_z):
