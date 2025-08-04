@@ -14,6 +14,7 @@ from ophyd_async.core import (
     PathInfo,
     PathProvider,
 )
+from tests.devices.unit_tests.test_daq_configuration import MOCK_DAQ_CONFIG_PATH
 from tests.test_data import (
     TEST_DISPLAY_CONFIG,
     TEST_J_CAMERA_MAN_ZOOM_LEVELS_XML,
@@ -27,7 +28,6 @@ from dodal.common.visit import (
 )
 from dodal.log import LOGGER, GELFTCPHandler, set_up_all_logging_handlers
 
-MOCK_DAQ_CONFIG_PATH = "tests/devices/unit_tests/test_daq_configuration"
 mock_paths = [
     ("DAQ_CONFIGURATION_PATH", MOCK_DAQ_CONFIG_PATH),
     ("ZOOM_PARAMS_FILE", TEST_J_CAMERA_MAN_ZOOM_LEVELS_XML),
