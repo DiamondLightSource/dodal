@@ -1,3 +1,5 @@
+from ophyd_async.core import StrictEnum
+
 from dodal.beamline_specific_utils.i05_shared import (
     m1_collimating_mirror,
     m3mj6_switching_mirror,
@@ -44,6 +46,16 @@ def m3mj6() -> XYZPiezoSwitchingMirror:
 # beamline specific devices
 
 
+class Mj7j8Mirror(StrictEnum):
+    UNKNOWN = "Unknown"
+    MJ6 = "MJ8"
+    M3 = "MJ7"
+    REFERENCE = "Reference"
+
+
 @device_factory()
 def mj7j8() -> XYZPiezoSwitchingMirror:
-    return XYZPiezoSwitchingMirror(prefix=f"{PREFIX.beamline_prefix}-OP-RFM-01:")
+    return XYZPiezoSwitchingMirror(
+        prefix=f"{PREFIX.beamline_prefix}-OP-RFM-01:",
+        mirrors=Mj7j8Mirror,
+    )

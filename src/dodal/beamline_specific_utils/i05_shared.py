@@ -1,11 +1,26 @@
+from ophyd_async.core import StrictEnum
+
 from dodal.common.beamlines.beamline_utils import device_factory
 from dodal.devices.common_mirror import XYZPiezoSwitchingMirror
-from dodal.devices.i05.enums import Grating
 from dodal.devices.motors import XYZPitchYawRollStage
 from dodal.devices.pgm import PGM
 from dodal.utils import BeamlinePrefix
 
 PREFIX = BeamlinePrefix("i05", "I")
+
+
+class M3MJ6Mirror(StrictEnum):
+    UNKNOWN = "Unknown"
+    MJ6 = "MJ6"
+    M3 = "M3"
+    REFERENCE = "Reference"
+
+
+class Grating(StrictEnum):
+    PT_400 = "400 lines/mm"
+    C_1600 = "C 1600 lines/mm"
+    RH_1600 = "Rh 1600 lines/mm"
+    PT_800 = "B 800 lines/mm"
 
 
 @device_factory()
@@ -20,4 +35,7 @@ def m1_collimating_mirror() -> XYZPitchYawRollStage:
 
 @device_factory()
 def m3mj6_switching_mirror() -> XYZPiezoSwitchingMirror:
-    return XYZPiezoSwitchingMirror(prefix=f"{PREFIX.beamline_prefix}-OP-SWTCH-01:")
+    return XYZPiezoSwitchingMirror(
+        prefix=f"{PREFIX.beamline_prefix}-OP-SWTCH-01:",
+        mirrors=M3MJ6Mirror,
+    )
