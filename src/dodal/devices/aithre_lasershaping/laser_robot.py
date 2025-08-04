@@ -11,7 +11,7 @@ class ForceBit(StrictEnum):
 
 
 class LaserRobot(BartRobot):
-    def __init__(self, name: str, prefix: str) -> None:
+    def __init__(self, prefix: str, name: str = "") -> None:
         self.dewar_lid_heater = epics_signal_rw(
             EnabledDisabled, prefix + "DW_1_ENABLED", prefix + "DW_1_CTRL"
         )
@@ -19,4 +19,4 @@ class LaserRobot(BartRobot):
         self.set_beamline_safe = epics_signal_rw(
             ForceBit, prefix + "IP_16_FORCE_OPTION"
         )
-        super().__init__(name=name, prefix=prefix)
+        super().__init__(prefix, name)
