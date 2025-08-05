@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.util.test_utils &#8212; dodal 1.55.1.dev1+g539154699 documentation</title>
+    <title>dodal.devices.util.test_utils &#8212; dodal 1.55.1.dev2+g97b436c07 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=4205debd"></script>
+    <script src="../../_static/documentation_options.js?v=2bb38636"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -953,7 +953,10 @@
 <p class="rubric">Functions</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#dodal.devices.util.test_utils.patch_motor" title="dodal.devices.util.test_utils.patch_motor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">patch_motor</span></code></a>(motor[, initial_position])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dodal.devices.util.test_utils.patch_all_motors" title="dodal.devices.util.test_utils.patch_all_motors"><code class="xref py py-obj docutils literal notranslate"><span class="pre">patch_all_motors</span></code></a>(parent_device)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#dodal.devices.util.test_utils.patch_motor" title="dodal.devices.util.test_utils.patch_motor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">patch_motor</span></code></a>(motor[, initial_position])</p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -965,6 +968,16 @@
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>motor</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Motor</span></code></span>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dodal.devices.util.test_utils.patch_all_motors">
+<span class="sig-prename descclassname"><span class="pre">dodal.devices.util.test_utils.</span></span><span class="sig-name descname"><span class="pre">patch_all_motors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent_device</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Device</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dodal/devices/util/test_utils.html#patch_all_motors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.util.test_utils.patch_all_motors" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>parent_device</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Device</span></code></span>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1019,6 +1032,7 @@
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.util.test_utils.patch_motor"><code class="docutils literal notranslate"><span class="pre">patch_motor()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.util.test_utils.patch_all_motors"><code class="docutils literal notranslate"><span class="pre">patch_all_motors()</span></code></a></li>
 </ul>
   </nav></div>
 

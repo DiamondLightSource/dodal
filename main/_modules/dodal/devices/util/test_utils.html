@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.util.test_utils &#8212; dodal 1.55.1.dev1+g539154699 documentation</title>
+    <title>dodal.devices.util.test_utils &#8212; dodal 1.55.1.dev2+g97b436c07 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=4205debd"></script>
+    <script src="../../../../_static/documentation_options.js?v=2bb38636"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -450,7 +450,10 @@ window.addEventListener("load", () => mermaid.run());
                 <article class="bd-article">
                   
   <h1>Source code for dodal.devices.util.test_utils</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.motor</span><span class="w"> </span><span class="kn">import</span> <span class="n">Motor</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">contextlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExitStack</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">Device</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.motor</span><span class="w"> </span><span class="kn">import</span> <span class="n">Motor</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.testing</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">callback_on_mock_put</span><span class="p">,</span>
     <span class="n">set_mock_value</span><span class="p">,</span>
@@ -470,6 +473,25 @@ window.addEventListener("load", () => mermaid.run());
         <span class="n">motor</span><span class="o">.</span><span class="n">user_setpoint</span><span class="p">,</span>
         <span class="k">lambda</span> <span class="n">pos</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">set_mock_value</span><span class="p">(</span><span class="n">motor</span><span class="o">.</span><span class="n">user_readback</span><span class="p">,</span> <span class="n">pos</span><span class="p">),</span>
     <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="patch_all_motors">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.util.test_utils.html#dodal.devices.util.test_utils.patch_all_motors">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">patch_all_motors</span><span class="p">(</span><span class="n">parent_device</span><span class="p">:</span> <span class="n">Device</span><span class="p">):</span>
+    <span class="n">motors</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">recursively_find_motors</span><span class="p">(</span><span class="n">device</span><span class="p">:</span> <span class="n">Device</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">child_device</span> <span class="ow">in</span> <span class="n">device</span><span class="o">.</span><span class="n">children</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">child_device</span><span class="p">,</span> <span class="n">Motor</span><span class="p">):</span>
+                <span class="n">motors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">child_device</span><span class="p">)</span>
+            <span class="n">recursively_find_motors</span><span class="p">(</span><span class="n">child_device</span><span class="p">)</span>
+
+    <span class="n">recursively_find_motors</span><span class="p">(</span><span class="n">parent_device</span><span class="p">)</span>
+    <span class="n">motor_patch_stack</span> <span class="o">=</span> <span class="n">ExitStack</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">motor</span> <span class="ow">in</span> <span class="n">motors</span><span class="p">:</span>
+        <span class="n">motor_patch_stack</span><span class="o">.</span><span class="n">enter_context</span><span class="p">(</span><span class="n">patch_motor</span><span class="p">(</span><span class="n">motor</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">motor_patch_stack</span></div>
 
 </pre></div>
 

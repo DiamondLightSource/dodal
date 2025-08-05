@@ -24,6 +24,7 @@ dodal.devices.util.test\_utils
 
    .. autosummary::
    
+      patch_all_motors
       patch_motor
    
    
