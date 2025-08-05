@@ -70,6 +70,8 @@ async def create_analyser_device(
     is_detector = isinstance(device_class, AbstractElectronAnalyserDetector)
     parameters["name"] = "sim_detector" if is_detector else "sim_driver"
 
+    print(get_args(device_class)[0])
+
     async with init_devices(mock=True, connect=True):
         device = device_class(**parameters)
     return device
