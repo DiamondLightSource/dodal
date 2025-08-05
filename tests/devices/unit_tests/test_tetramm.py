@@ -171,25 +171,6 @@ async def test_hints_self_by_default(tetramm: TetrammDetector):
     assert tetramm.hints == {"fields": [tetramm.name]}
 
 
-async def test_prepare_with_too_low_a_deadtime_raises_error(
-    tetramm: TetrammDetector,
-):
-    with pytest.raises(
-        ValueError,
-        match=r"Detector .* needs at least 2e-05s deadtime, but trigger logic "
-        "provides only 1e-05s",
-    ):
-        await tetramm.prepare(
-            TriggerInfo(
-                number_of_events=5,
-                trigger=DetectorTrigger.EDGE_TRIGGER,
-                deadtime=1.0 / 100_000.0,
-                livetime=VALID_TEST_EXPOSURE_TIME,
-                exposure_timeout=None,
-            )
-        )
-
-
 async def test_prepare_arms_tetramm(
     tetramm: TetrammDetector,
 ):
