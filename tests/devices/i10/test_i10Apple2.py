@@ -209,12 +209,8 @@ async def test_fail_I10Apple2_no_lookup():
             source=("Source", "idu"),
             prefix="BLWOW-MO-SERVC-01:",
         )
-    assert (
-        str(e.value)
-        == f"Gap look up table is not in path: {
-            os.path.join(wrong_path, ID_ENERGY_2_GAP_CALIBRATIONS_FILE_CSV)
-        }"
-    )
+    file_path = os.path.join(wrong_path, ID_ENERGY_2_GAP_CALIBRATIONS_FILE_CSV)
+    assert str(e.value) == f"Gap look up table is not in path: {file_path}"
 
 
 @pytest.mark.parametrize("energy", [(100), (5500), (-299)])
