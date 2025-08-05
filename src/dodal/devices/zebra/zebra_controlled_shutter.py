@@ -28,7 +28,7 @@ class ZebraShutter(StandardReadable, Movable[ZebraShutterState]):
     by a different soft input (aliased to manual_position_setpoint). Both these AND
     gates then feed into an OR gate, which then feeds to the shutter."""
 
-    def __init__(self, prefix: str, name: str):
+    def __init__(self, prefix: str, name: str = ""):
         self._manual_position_setpoint = epics_signal_w(
             ZebraShutterState, prefix + "CTRL2"
         )

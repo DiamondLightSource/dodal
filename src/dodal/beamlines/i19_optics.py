@@ -20,10 +20,7 @@ def shutter() -> HutchShutter:
     """Get the i19 hutch shutter device, instantiate it if it hasn't already been.
     If this is called when already instantiated, it will return the existing object.
     """
-    return HutchShutter(
-        f"{PREFIX.beamline_prefix}-PS-SHTR-01:",
-        "shutter",
-    )
+    return HutchShutter(f"{PREFIX.beamline_prefix}-PS-SHTR-01:")
 
 
 @device_factory()
