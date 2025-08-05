@@ -1,0 +1,36 @@
+dodal.devices.i24.beam\_center
+==============================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices.i24
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~beam_center.DetectorBeamCenter
+
+
+
+
+.. automodule:: dodal.devices.i24.beam_center
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

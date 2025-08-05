@@ -1,0 +1,81 @@
+dodal.devices.i10.diagnostics.D6Position
+========================================
+
+.. currentmodule:: dodal.devices.i10.diagnostics
+
+.. autoclass:: D6Position
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~D6Position.DIODE_OUT
+      
+      
+      ~D6Position.DIODE_IN
+      
+      
+      ~D6Position.AU_MESH
+      
+   
+   

@@ -1,0 +1,23 @@
+dodal.devices.i24.pmac.PMACStringMove
+=====================================
+
+.. currentmodule:: dodal.devices.i24.pmac
+
+.. autoclass:: PMACStringMove
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      ~PMACStringMove.trigger
+      
+   
+   
+
+   
+   
+   

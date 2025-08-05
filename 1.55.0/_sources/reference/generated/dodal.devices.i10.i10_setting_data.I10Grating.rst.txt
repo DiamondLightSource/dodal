@@ -1,0 +1,81 @@
+dodal.devices.i10.i10\_setting\_data.I10Grating
+===============================================
+
+.. currentmodule:: dodal.devices.i10.i10_setting_data
+
+.. autoclass:: I10Grating
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~I10Grating.AU_400
+      
+      
+      ~I10Grating.SI_400
+      
+      
+      ~I10Grating.AU_1200
+      
+   
+   
