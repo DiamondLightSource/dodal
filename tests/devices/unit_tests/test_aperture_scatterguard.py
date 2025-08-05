@@ -1,6 +1,5 @@
 import asyncio
 from collections.abc import Sequence
-from contextlib import ExitStack
 from typing import Any
 from unittest.mock import AsyncMock, MagicMock, call
 
@@ -22,7 +21,7 @@ from dodal.devices.aperturescatterguard import (
     InvalidApertureMove,
     load_positions_from_beamline_parameters,
 )
-from dodal.devices.util.test_utils import patch_motor
+from dodal.devices.util.test_utils import patch_all_motors
 
 ApSgAndLog = tuple[ApertureScatterguard, MagicMock]
 
@@ -95,10 +94,7 @@ async def ap_sg_and_call_log(
             loaded_positions=aperture_positions,
             tolerances=aperture_tolerances,
         )
-    with ExitStack() as motor_patch_stack:
-        for motor in get_all_motors(ap_sg):
-            motor_patch_stack.enter_context(patch_motor(motor))
-            call_log.attach_mock(get_mock_put(motor.user_setpoint), "setpoint")
+    with patch_all_motors(ap_sg):
         yield ap_sg, call_log
 
 
