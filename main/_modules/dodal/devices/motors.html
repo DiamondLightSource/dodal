@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.motors &#8212; dodal 1.54.1.dev7+gaea522a14 documentation</title>
+    <title>dodal.devices.motors &#8212; dodal 1.54.1.dev8+g6604464ae3 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=577ba37d"></script>
+    <script src="../../../_static/documentation_options.js?v=082ba88d"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -558,6 +558,28 @@ window.addEventListener("load", () => mermaid.run());
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">pitch</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="n">pitch_infix</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">x_infix</span><span class="p">,</span> <span class="n">y_infix</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="XYZPitchYawRollStage">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.motors.XYZPitchYawRollStage.html#dodal.devices.motors.XYZPitchYawRollStage">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">XYZPitchYawRollStage</span><span class="p">(</span><span class="n">XYZStage</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">x_infix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">_X</span><span class="p">,</span>
+        <span class="n">y_infix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">_Y</span><span class="p">,</span>
+        <span class="n">z_infix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">_Z</span><span class="p">,</span>
+        <span class="n">pitch_infix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;PITCH&quot;</span><span class="p">,</span>
+        <span class="n">yaw_infix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;YAW&quot;</span><span class="p">,</span>
+        <span class="n">roll_infix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;ROLL&quot;</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pitch</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="n">pitch_infix</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">yaw</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="n">yaw_infix</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">roll</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="n">roll_infix</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">x_infix</span><span class="p">,</span> <span class="n">y_infix</span><span class="p">,</span> <span class="n">z_infix</span><span class="p">)</span></div>
 
 
 
