@@ -154,6 +154,8 @@ async def test_aperture_scatterguard_select_bottom_moves_sg_down_then_assembly_u
     aperture_in_medium_pos: ApertureScatterguard,
 ):
     parent_mock = get_mock(aperture_in_medium_pos)
+
+    # Reset mock to clean up sets done in the test fixture
     parent_mock.reset_mock()
     await aperture_in_medium_pos.selected_aperture.set(ApertureValue.SMALL)
 
