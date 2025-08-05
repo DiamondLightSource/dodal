@@ -1,8 +1,7 @@
 import asyncio
-from collections.abc import Sequence
-from contextlib import ExitStack
+from collections.abc import AsyncGenerator
 from typing import Any
-from unittest.mock import AsyncMock, MagicMock, call
+from unittest.mock import AsyncMock, call
 
 import bluesky.plan_stubs as bps
 import pytest
@@ -10,6 +9,7 @@ from bluesky.run_engine import RunEngine
 from ophyd_async.core import init_devices
 from ophyd_async.testing import (
     callback_on_mock_put,
+    get_mock,
     get_mock_put,
     set_mock_value,
 )
@@ -22,9 +22,7 @@ from dodal.devices.aperturescatterguard import (
     InvalidApertureMove,
     load_positions_from_beamline_parameters,
 )
-from dodal.devices.util.test_utils import patch_motor
-
-ApSgAndLog = tuple[ApertureScatterguard, MagicMock]
+from dodal.devices.util.test_utils import patch_all_motors
 
 
 @pytest.fixture
@@ -88,12 +86,11 @@ def get_all_motors(ap_sg: ApertureScatterguard):
 
 
 @pytest.fixture
-async def ap_sg_and_call_log(
+async def ap_sg(
     RE: RunEngine,
     aperture_positions: dict[ApertureValue, AperturePosition],
     aperture_tolerances: AperturePosition,
-):
-    call_log = MagicMock()
+) -> AsyncGenerator[ApertureScatterguard]:
     async with init_devices(mock=True):
         ap_sg = ApertureScatterguard(
             name="test_ap_sg",
@@ -101,21 +98,8 @@ async def ap_sg_and_call_log(
             tolerances=aperture_tolerances,
         )
 
-    with ExitStack() as motor_patch_stack:
-        for motor in get_all_motors(ap_sg):
-            motor_patch_stack.enter_context(patch_motor(motor))
-            call_log.attach_mock(get_mock_put(motor.user_setpoint), "setpoint")
-
-        robot_load = aperture_positions[ApertureValue.OUT_OF_BEAM]
-        set_mock_value(ap_sg.aperture.z.user_readback, robot_load.aperture_z)
-        set_mock_value(ap_sg.aperture.y.user_readback, robot_load.aperture_y)
-        yield ap_sg, call_log
-
-
-@pytest.fixture
-async def ap_sg(ap_sg_and_call_log: ApSgAndLog):
-    ap_sg, _ = ap_sg_and_call_log
-    return ap_sg
+    with patch_all_motors(ap_sg):
+        yield ap_sg
 
 
 async def set_to_position(
@@ -133,22 +117,15 @@ async def set_to_position(
 
 
 @pytest.fixture
-async def aperture_in_medium_pos_w_call_log(
-    ap_sg_and_call_log: ApSgAndLog,
+async def aperture_in_medium_pos(
+    ap_sg: ApertureScatterguard,
     aperture_positions: dict[ApertureValue, AperturePosition],
-):
-    ap_sg, call_log = ap_sg_and_call_log
+) -> AsyncGenerator[ApertureScatterguard, None]:
     await set_to_position(ap_sg, aperture_positions[ApertureValue.MEDIUM])
 
     set_mock_value(ap_sg.aperture.medium, 1)
 
-    yield ap_sg, call_log
-
-
-@pytest.fixture
-async def aperture_in_medium_pos(aperture_in_medium_pos_w_call_log: ApSgAndLog):
-    ap_sg, _ = aperture_in_medium_pos_w_call_log
-    return ap_sg
+    yield ap_sg
 
 
 def _assert_patched_ap_sg_has_call(
@@ -176,18 +153,24 @@ def _assert_position_in_reading(
     assert reading[f"{device_name}-scatterguard-y"]["value"] == position.scatterguard_y
 
 
-def _call_list(calls: Sequence[float]):
-    return [call.setpoint(v, wait=True) for v in calls]
-
-
 async def test_aperture_scatterguard_select_bottom_moves_sg_down_then_assembly_up(
-    aperture_in_medium_pos_w_call_log: ApSgAndLog,
+    aperture_in_medium_pos: ApertureScatterguard,
 ):
-    ap_sg, call_log = aperture_in_medium_pos_w_call_log
+    parent_mock = get_mock(aperture_in_medium_pos)
 
-    await ap_sg.selected_aperture.set(ApertureValue.SMALL)
+    # Reset mock to clean up sets done in the test fixture
+    parent_mock.reset_mock()
+    await aperture_in_medium_pos.selected_aperture.set(ApertureValue.SMALL)
 
-    call_log.assert_has_calls(_call_list((5.3375, -3.55, 2.43, 48.974, 15.8)))
+    parent_mock.assert_has_calls(
+        [
+            call.scatterguard.x.user_setpoint.put(5.3375, wait=True),
+            call.scatterguard.y.user_setpoint.put(-3.55, wait=True),
+            call.aperture.x.user_setpoint.put(2.43, wait=True),
+            call.aperture.y.user_setpoint.put(48.974, wait=True),
+            call.aperture.z.user_setpoint.put(15.8, wait=True),
+        ]
+    )
 
 
 async def test_aperture_unsafe_move(
@@ -601,19 +584,19 @@ async def test_given_parked_and_aperture_selected_when_move_in_then_z_moved_out_
     ap_sg: ApertureScatterguard,
     aperture_positions: dict[ApertureValue, AperturePosition],
 ):
-    # Ophyd-async should make this parent out the box?
-    parent_mock = MagicMock()
-    parent_mock.attach_mock(get_mock_put(ap_sg.aperture.x.user_setpoint), "ap_x")
-    parent_mock.attach_mock(get_mock_put(ap_sg.aperture.y.user_setpoint), "ap_y")
-    parent_mock.attach_mock(get_mock_put(ap_sg.aperture.z.user_setpoint), "ap_z")
-
     parked_position = aperture_positions[ApertureValue.PARKED]
     set_mock_value(ap_sg.aperture.y.user_readback, parked_position.aperture_y)
     set_mock_value(ap_sg.aperture.z.user_readback, parked_position.aperture_z)
 
+    parent_mock = get_mock(ap_sg)
+    parent_mock.reset_mock()
+
     await ap_sg.selected_aperture.set(selected_aperture)
 
-    assert parent_mock.method_calls[0] == call.ap_z(
+    assert parent_mock.method_calls[0] == call.selected_aperture.put(
+        selected_aperture, wait=True
+    )
+    assert parent_mock.method_calls[1] == call.aperture.z.user_setpoint.put(
         aperture_positions[selected_aperture].aperture_z, wait=True
     )
 
@@ -632,19 +615,19 @@ async def test_given_parked_and_ap_sg_prepared_when_move_in_then_z_moved_out_fir
     ap_sg: ApertureScatterguard,
     aperture_positions: dict[ApertureValue, AperturePosition],
 ):
-    # Ophyd-async should make this parent out the box?
-    parent_mock = MagicMock()
-    parent_mock.attach_mock(get_mock_put(ap_sg.aperture.x.user_setpoint), "ap_x")
-    parent_mock.attach_mock(get_mock_put(ap_sg.aperture.y.user_setpoint), "ap_y")
-    parent_mock.attach_mock(get_mock_put(ap_sg.aperture.z.user_setpoint), "ap_z")
-
     parked_position = aperture_positions[ApertureValue.PARKED]
     set_mock_value(ap_sg.aperture.y.user_readback, parked_position.aperture_y)
     set_mock_value(ap_sg.aperture.z.user_readback, parked_position.aperture_z)
 
+    parent_mock = get_mock(ap_sg)
+    parent_mock.reset_mock()
+
     await ap_sg.prepare(selected_aperture)
 
-    assert parent_mock.method_calls[0] == call.ap_z(
+    assert parent_mock.method_calls[0] == call.selected_aperture.put(
+        selected_aperture, wait=True
+    )
+    assert parent_mock.method_calls[1] == call.aperture.z.user_setpoint.put(
         aperture_positions[selected_aperture].aperture_z, wait=True
     )
 
