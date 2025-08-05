@@ -14,6 +14,7 @@ from ophyd_async.core import (
     PathInfo,
     PathProvider,
 )
+from tests.devices.i10.test_data import LOOKUP_TABLE_PATH
 from tests.devices.unit_tests.test_daq_configuration import MOCK_DAQ_CONFIG_PATH
 from tests.test_data import (
     TEST_DISPLAY_CONFIG,
@@ -32,7 +33,7 @@ mock_paths = [
     ("DAQ_CONFIGURATION_PATH", MOCK_DAQ_CONFIG_PATH),
     ("ZOOM_PARAMS_FILE", TEST_J_CAMERA_MAN_ZOOM_LEVELS_XML),
     ("DISPLAY_CONFIG", TEST_DISPLAY_CONFIG),
-    ("LOOK_UPTABLE_DIR", "tests/devices/i10/lookupTables/"),
+    ("LOOK_UPTABLE_DIR", LOOKUP_TABLE_PATH),
 ]
 mock_attributes_table = {
     "i03": mock_paths,

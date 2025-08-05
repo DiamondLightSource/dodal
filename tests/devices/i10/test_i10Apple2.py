@@ -16,7 +16,7 @@ from ophyd_async.testing import (
     get_mock_put,
     set_mock_value,
 )
-from tests.devices.i10.lookupTables import (
+from tests.devices.i10.test_data import (
     EXPECTED_ID_ENERGY_2_GAP_CALIBRATIONS_IDD_PKL,
     EXPECTED_ID_ENERGY_2_GAP_CALIBRATIONS_IDU_PKL,
     EXPECTED_ID_ENERGY_2_PHASE_CALIBRATIONS_IDD_PKL,
