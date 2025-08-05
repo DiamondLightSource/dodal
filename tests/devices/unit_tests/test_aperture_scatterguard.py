@@ -640,13 +640,15 @@ def test_aperture_enum_name_formatting():
 
 
 async def test_calling_prepare_then_set_in_quick_succession_throws_an_error(
-    ap_sg: ApertureScatterguard,
+    aperture_in_medium_pos: ApertureScatterguard,
 ):
     async def set_motor_moving(value, *args, **kwargs):
-        set_mock_value(ap_sg.aperture.x.motor_done_move, 0)
+        set_mock_value(aperture_in_medium_pos.aperture.x.motor_done_move, 0)
 
-    callback_on_mock_put(ap_sg.aperture.x.user_setpoint, set_motor_moving)
-    await ap_sg.prepare(ApertureValue.SMALL)
+    callback_on_mock_put(
+        aperture_in_medium_pos.aperture.x.user_setpoint, set_motor_moving
+    )
+    await aperture_in_medium_pos.prepare(ApertureValue.SMALL)
 
     with pytest.raises(InvalidApertureMove):
-        await ap_sg.selected_aperture.set(ApertureValue.SMALL)
+        await aperture_in_medium_pos.selected_aperture.set(ApertureValue.SMALL)
