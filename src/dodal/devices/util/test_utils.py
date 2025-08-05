@@ -25,8 +25,7 @@ def patch_all_motors(parent_device: Device):
     motors = []
 
     def recursively_find_motors(device: Device):
-        for child in device.children():
-            child_device = child[1]
+        for _, child_device in device.children():
             if isinstance(child_device, Motor):
                 motors.append(child_device)
             recursively_find_motors(child_device)
