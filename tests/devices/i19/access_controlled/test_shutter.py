@@ -38,7 +38,7 @@ async def eh2_shutter() -> AccessControlledShutter:
 
 
 @pytest.mark.parametrize("hutch_name", [HutchState.EH1, HutchState.EH2])
-def shutter_can_be_created_without_raising_errors(hutch_name: HutchState):
+def test_that_shutter_can_be_created(hutch_name: HutchState):
     test_shutter = AccessControlledShutter("", hutch_name, "cm12345-1", "test_shutter")
     assert isinstance(test_shutter, AccessControlledShutter)
 
@@ -103,7 +103,7 @@ async def test_no_task_id_returned_from_post(
 
 
 @pytest.mark.parametrize("shutter_demand", [ShutterDemand.OPEN, ShutterDemand.CLOSE])
-async def test_set_corrently_makes_rest_calls(
+async def test_set_correctly_makes_rest_calls(
     shutter_demand: ShutterDemand, eh2_shutter: AccessControlledShutter
 ):
     test_request = {
