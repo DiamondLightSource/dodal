@@ -4,19 +4,18 @@ from ophyd_async.core import (
     DEFAULT_TIMEOUT,
     AsyncStatus,
     DetectorTrigger,
-    observe_value,
-    set_and_wait_for_value,
-    set_and_wait_for_other_value,
     TriggerInfo,
-    wait_for_value,
+    observe_value,
+    set_and_wait_for_other_value,
+    set_and_wait_for_value,
 )
 from ophyd_async.epics import adcore
 
 from .pressurejumpcell_io import (
+    AdcTriggerState,
     PressureJumpCellAdcTriggerIO,
     PressureJumpCellDriverIO,
     PressureJumpCellTriggerMode,
-    AdcTriggerState,
 )
 
 # TODO Find out what the readout time is and if it can be retrieved from the device
@@ -101,7 +100,7 @@ class PressureJumpCellController(adcore.ADBaseController[PressureJumpCellDriverI
                 ):
                     if state in TRIG_GOOD_STATES:
                         return
-            except asyncio.TimeoutError as exc:
+            except TimeoutError as exc:
                 if state is not None:
                     raise ValueError(
                         f"Final detector state {state.value} not in valid end "
@@ -109,7 +108,7 @@ class PressureJumpCellController(adcore.ADBaseController[PressureJumpCellDriverI
                     ) from exc
                 else:
                     # No updates from the detector, something else is wrong
-                    raise asyncio.TimeoutError(
+                    raise TimeoutError(
                         "Could not monitor detector state: "
                         + self.driver.detector_state.source
                     ) from exc

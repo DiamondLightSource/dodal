@@ -16,8 +16,6 @@ class PressureJumpCellDetector(AreaDetector[PressureJumpCellController]):
     The detector may be configured for an external trigger on the TTL Trig input.
     """
 
-    trig: PressureJumpCellAdcTriggerIO
-
     def __init__(
         self,
         prefix: str,
@@ -32,29 +30,24 @@ class PressureJumpCellDetector(AreaDetector[PressureJumpCellController]):
         config_sigs: Sequence[SignalR] = (),
     ):
         driver = PressureJumpCellDriverIO(prefix + drv_suffix)
+        self.trig = PressureJumpCellAdcTriggerIO(prefix + adc_trig_suffix)
+
         controller = PressureJumpCellController(
             driver, self.trig, readout_time=readout_time
         )
-
-        pressure_cell_plugins: dict[str, NDPluginBaseIO] = {
-            "trig": PressureJumpCellAdcTriggerIO(prefix=f"{prefix}{adc_trig_suffix}")
-        }
-
-        if isinstance(plugins, dict):
-            pressure_cell_plugins |= plugins
 
         writer = writer_cls.with_io(
             prefix,
             path_provider,
             dataset_source=driver,
             fileio_suffix=fileio_suffix,
-            plugins=pressure_cell_plugins,
+            plugins=plugins,
         )
 
         super().__init__(
             controller=controller,
             writer=writer,
-            plugins=pressure_cell_plugins,
+            plugins=plugins,
             name=name,
             config_sigs=config_sigs,
         )
