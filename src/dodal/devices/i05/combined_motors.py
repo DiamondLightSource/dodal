@@ -29,8 +29,8 @@ class PolynomCombinedMotors(StandardReadable):
         # need to initialize all motors from PV string?
         # or make it not class but plan, function?
         self.master = master_motor
-        # self.slave1 = slave_motor1
-        # self.slave2 = slave_motor2
+        self.slave1 = slave_motor1
+        self.slave2 = slave_motor2
 
         # self.add_readables([self.master.user_readback])
 
