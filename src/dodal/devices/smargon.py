@@ -177,16 +177,15 @@ class Smargon(XYZStage, Movable):
             for motor_name, new_setpoint in value.items():
                 if new_setpoint is not None:
                     axis: Motor = getattr(self, motor_name)
-                    finished_moving.append(
-                        await set_and_wait_for_other_value(
-                            axis,
-                            new_setpoint,
-                            axis.user_readback,
-                            new_setpoint,
-                            wait_for_set_completion=False,
-                        )
+                    put_completion = await set_and_wait_for_other_value(
+                        axis,
+                        new_setpoint,
+                        axis.user_setpoint,
+                        new_setpoint,
+                        timeout=self.DEFERRED_MOVE_SET_TIMEOUT,
+                        wait_for_set_completion=False,
                     )
+                    finished_moving.append(put_completion)
         finally:
             await self.defer_move.set(DeferMoves.OFF)
-
         await asyncio.gather(*finished_moving)

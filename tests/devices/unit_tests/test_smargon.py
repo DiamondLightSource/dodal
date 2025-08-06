@@ -4,7 +4,7 @@ import pytest
 from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
 from ophyd_async.core import init_devices, observe_value
-from ophyd_async.testing import callback_on_mock_put, get_mock_put, set_mock_value
+from ophyd_async.testing import get_mock_put, set_mock_value
 
 from dodal.devices.smargon import CombinedMove, DeferMoves, Smargon, StubPosition
 from dodal.devices.util.test_utils import patch_motor
@@ -165,13 +165,13 @@ async def test_given_set_fails_then_defer_moves_turned_back_off(smargon: Smargon
     )
 
 
-async def test_given_motor_done_move_does_not_go_low_then_deferred_moves_fails(
+async def test_given_motor_does_not_change_setpoint_then_deferred_move_times_out(
     smargon: Smargon,
 ):
     smargon.DEFERRED_MOVE_SET_TIMEOUT = 0.01  # type: ignore
 
-    # Override the callback so it doesn't set dmov to False
-    callback_on_mock_put(smargon.x.user_setpoint, MagicMock())
+    # Override the callback so it doesn't change the `user_setpoint`
+    smargon.x.set = MagicMock()
 
     with pytest.raises(TimeoutError):
         await smargon.set(CombinedMove(x=10))
