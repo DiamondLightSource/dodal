@@ -9,8 +9,11 @@ from dodal.devices.hutch_shutter import (
     ShutterDemand,
     ShutterState,
 )
-from dodal.devices.i19.blueapi_device import HEADERS, HutchState
-from dodal.devices.i19.shutter import (
+from dodal.devices.i19.access_controlled.optics_blueapi_device import (
+    HEADERS,
+    HutchState,
+)
+from dodal.devices.i19.access_controlled.shutter import (
     AccessControlledShutter,
 )
 
@@ -66,7 +69,9 @@ async def test_set_raises_error_if_post_not_successful(
     eh2_shutter: AccessControlledShutter,
 ):
     with pytest.raises(ClientConnectionError):
-        with patch("dodal.devices.i19.blueapi_device.ClientSession.post") as mock_post:
+        with patch(
+            "dodal.devices.i19.access_controlled.optics_blueapi_device.ClientSession.post"
+        ) as mock_post:
             mock_post.return_value.__aenter__.return_value = (
                 mock_response := AsyncMock()
             )
@@ -76,13 +81,15 @@ async def test_set_raises_error_if_post_not_successful(
             await eh2_shutter.set(ShutterDemand.OPEN)
 
 
-@patch("dodal.devices.i19.blueapi_device.LOGGER")
+@patch("dodal.devices.i19.access_controlled.optics_blueapi_device.LOGGER")
 async def test_no_task_id_returned_from_post(
     mock_logger: MagicMock, eh1_shutter: AccessControlledShutter
 ):
     with pytest.raises(KeyError):
         with (
-            patch("dodal.devices.i19.blueapi_device.ClientSession.post") as mock_post,
+            patch(
+                "dodal.devices.i19.access_controlled.optics_blueapi_device.ClientSession.post"
+            ) as mock_post,
         ):
             mock_post.return_value.__aenter__.return_value = (
                 mock_response := AsyncMock()
@@ -110,9 +117,15 @@ async def test_set_corrently_makes_rest_calls(
     }
     test_request_json = json.dumps(test_request)
     with (
-        patch("dodal.devices.i19.blueapi_device.ClientSession.post") as mock_post,
-        patch("dodal.devices.i19.blueapi_device.ClientSession.put") as mock_put,
-        patch("dodal.devices.i19.blueapi_device.ClientSession.get") as mock_get,
+        patch(
+            "dodal.devices.i19.access_controlled.optics_blueapi_device.ClientSession.post"
+        ) as mock_post,
+        patch(
+            "dodal.devices.i19.access_controlled.optics_blueapi_device.ClientSession.put"
+        ) as mock_put,
+        patch(
+            "dodal.devices.i19.access_controlled.optics_blueapi_device.ClientSession.get"
+        ) as mock_get,
     ):
         mock_post.return_value.__aenter__.return_value = (mock_response := AsyncMock())
         mock_response.ok = True
@@ -134,13 +147,17 @@ async def test_set_corrently_makes_rest_calls(
         )
 
 
-@patch("dodal.devices.i19.blueapi_device.LOGGER")
+@patch("dodal.devices.i19.access_controlled.optics_blueapi_device.LOGGER")
 async def test_if_put_fails_log_error_and_return(
     mock_logger: MagicMock, eh1_shutter: AccessControlledShutter
 ):
     with (
-        patch("dodal.devices.i19.blueapi_device.ClientSession.post") as mock_post,
-        patch("dodal.devices.i19.blueapi_device.ClientSession.put") as mock_put,
+        patch(
+            "dodal.devices.i19.access_controlled.optics_blueapi_device.ClientSession.post"
+        ) as mock_post,
+        patch(
+            "dodal.devices.i19.access_controlled.optics_blueapi_device.ClientSession.put"
+        ) as mock_put,
     ):
         mock_post.return_value.__aenter__.return_value = (mock_response := AsyncMock())
         mock_response.ok = True
@@ -155,16 +172,22 @@ async def test_if_put_fails_log_error_and_return(
         mock_logger.error.assert_called_once()
 
 
-@patch("dodal.devices.i19.blueapi_device.LOGGER")
-@patch("dodal.devices.i19.blueapi_device.asyncio.sleep")
+@patch("dodal.devices.i19.access_controlled.optics_blueapi_device.LOGGER")
+@patch("dodal.devices.i19.access_controlled.optics_blueapi_device.asyncio.sleep")
 async def test_if_plan_fails_raise_error_with_message(
     mock_sleep: MagicMock, mock_logger: MagicMock, eh2_shutter: AccessControlledShutter
 ):
     with pytest.raises(RuntimeError):
         with (
-            patch("dodal.devices.i19.blueapi_device.ClientSession.post") as mock_post,
-            patch("dodal.devices.i19.blueapi_device.ClientSession.put") as mock_put,
-            patch("dodal.devices.i19.blueapi_device.ClientSession.get") as mock_get,
+            patch(
+                "dodal.devices.i19.access_controlled.optics_blueapi_device.ClientSession.post"
+            ) as mock_post,
+            patch(
+                "dodal.devices.i19.access_controlled.optics_blueapi_device.ClientSession.put"
+            ) as mock_put,
+            patch(
+                "dodal.devices.i19.access_controlled.optics_blueapi_device.ClientSession.get"
+            ) as mock_get,
         ):
             mock_post.return_value.__aenter__.return_value = (
                 mock_response := AsyncMock()

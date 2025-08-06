@@ -1,7 +1,7 @@
 from ophyd_async.core import StandardReadable
 from ophyd_async.epics.core import epics_signal_r
 
-ACCESS_DEVICE_NAME = "access_control"  # Device name in i19-blueapi
+ACCESS_DEVICE_NAME: str = "access_control"  # Device name in i19-blueapi
 
 
 class HutchAccessControl(StandardReadable):
