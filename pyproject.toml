@@ -130,7 +130,7 @@ filterwarnings = [
     "ignore:.*pkg_resources.*:DeprecationWarning",
 ]
 # Doctest python code in docs, python code in src docstrings, test functions in tests
-testpaths = "docs src tests system_tests"
+testpaths = "docs src tests/unit_tests"
 
 [tool.coverage.report]
 exclude_also = [
@@ -167,7 +167,7 @@ commands =
     pre-commit: pre-commit run --all-files --show-diff-on-failure {posargs}
     docs: sphinx-{posargs:build -E} -T docs build/html
     unit-report: pytest --cov-report xml:unit_cov.xml --json-report --json-report-file=unit-report.json tests {posargs}
-    system-report: pytest -m 'not requires(instrument="i04")' --cov-report xml:system_cov.xml --json-report --json-report-file=system-report.json system_tests {posargs}
+    system-report: pytest -m 'not requires(instrument="i04")' --cov-report xml:system_cov.xml --json-report --json-report-file=system-report.json tests/system_tests {posargs}
 """
 
 [tool.ruff]
