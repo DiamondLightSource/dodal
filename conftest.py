@@ -20,7 +20,7 @@ from tests.unit_tests.devices.test_daq_configuration import (
 )
 from tests.unit_tests.test_data import (
     TEST_DISPLAY_CONFIG,
-    TEST_J_CAMERA_MAN_ZOOM_LEVELS_XML,
+    TEST_OAV_ZOOM_LEVELS_XML,
 )
 
 from dodal.common.beamlines import beamline_utils
@@ -33,7 +33,7 @@ from dodal.log import LOGGER, GELFTCPHandler, set_up_all_logging_handlers
 
 mock_paths = [
     ("DAQ_CONFIGURATION_PATH", MOCK_DAQ_CONFIG_PATH),
-    ("ZOOM_PARAMS_FILE", TEST_J_CAMERA_MAN_ZOOM_LEVELS_XML),
+    ("ZOOM_PARAMS_FILE", TEST_OAV_ZOOM_LEVELS_XML),
     ("DISPLAY_CONFIG", TEST_DISPLAY_CONFIG),
     ("LOOK_UPTABLE_DIR", LOOKUP_TABLE_PATH),
 ]
