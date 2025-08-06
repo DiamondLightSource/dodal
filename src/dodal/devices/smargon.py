@@ -12,6 +12,7 @@ from ophyd_async.core import (
     AsyncStatus,
     Device,
     StrictEnum,
+    set_and_wait_for_other_value,
     wait_for_value,
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
@@ -166,9 +167,9 @@ class Smargon(XYZStage, Movable):
         """This will move all motion together in a deferred move.
 
         Once defer_move is on, sets to any axis do not immediately move the axis. Instead
-        the axis done moving flag will go False to show it has got the move. Then, when
-        defer_move is switched off all axes will move at the same time. The put callbacks
-        on the axes themselves will only come back after the motion on that axis finished.
+        the setpoint will go to that value. Then, when defer_move is switched off all
+        axes will move at the same time. The put callbacks on the axes themselves will
+        only come back after the motion on that axis finished.
         """
         await self.defer_move.set(DeferMoves.ON)
         try:
@@ -176,9 +177,14 @@ class Smargon(XYZStage, Movable):
             for motor_name, new_setpoint in value.items():
                 if new_setpoint is not None:
                     axis: Motor = getattr(self, motor_name)
-                    finished_moving.append(axis.set(new_setpoint))  # type: ignore
-                    await wait_for_value(
-                        axis.motor_done_move, False, self.DEFERRED_MOVE_SET_TIMEOUT
+                    finished_moving.append(
+                        await set_and_wait_for_other_value(
+                            axis,
+                            new_setpoint,
+                            axis.user_readback,
+                            new_setpoint,
+                            wait_for_set_completion=False,
+                        )
                     )
         finally:
             await self.defer_move.set(DeferMoves.OFF)
