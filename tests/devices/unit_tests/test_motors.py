@@ -1,4 +1,5 @@
 import math
+from collections.abc import Generator
 
 import pytest
 from bluesky.run_engine import RunEngine
@@ -6,19 +7,16 @@ from ophyd_async.core import init_devices
 from ophyd_async.testing import assert_reading, partial_reading
 
 from dodal.devices.motors import SixAxisGonio
-from dodal.devices.util.test_utils import patch_motor
+from dodal.devices.util.test_utils import patch_all_motors
 
 
 @pytest.fixture
-def six_axis_gonio(RE: RunEngine) -> SixAxisGonio:
+def six_axis_gonio(RE: RunEngine) -> Generator[SixAxisGonio]:
     with init_devices(mock=True):
         gonio = SixAxisGonio("")
-    patch_motor(gonio.omega)
-    patch_motor(gonio.z)
-    patch_motor(gonio.y)
-    patch_motor(gonio.x)
 
-    return gonio
+    with patch_all_motors(gonio):
+        yield gonio
 
 
 async def test_reading_six_axis_gonio(six_axis_gonio: SixAxisGonio):
