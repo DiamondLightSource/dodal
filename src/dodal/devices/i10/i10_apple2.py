@@ -1,6 +1,5 @@
 import asyncio
 import csv
-import os
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, SupportsFloat
@@ -98,11 +97,9 @@ class I10Apple2(Apple2):
             Name of the device
         """
 
-        energy_gap_table_path = Path(
-            os.path.join(look_up_table_dir, "IDEnergy2GapCalibrations.csv"),
-        )
+        energy_gap_table_path = Path(look_up_table_dir, "IDEnergy2GapCalibrations.csv")
         energy_phase_table_path = Path(
-            os.path.join(look_up_table_dir, "IDEnergy2PhaseCalibrations.csv"),
+            look_up_table_dir, "IDEnergy2PhaseCalibrations.csv"
         )
         # A dataclass contains the path to the look up table and the expected column names.
         self.lookup_table_config = LookupTableConfig(

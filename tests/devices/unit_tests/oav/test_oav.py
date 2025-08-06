@@ -14,7 +14,7 @@ from dodal.devices.oav.oav_detector import (
 )
 from tests.test_data import (
     TEST_DISPLAY_CONFIG,
-    TEST_J_CAMERA_MAN_ZOOM_LEVELS_XML,
+    TEST_OAV_ZOOM_LEVELS_XML,
 )
 
 
@@ -167,9 +167,7 @@ async def test_beam_centre_signals_have_same_names(
 
 
 async def test_oav_with_null_zoom_controller(null_controller: NullZoomController):
-    oav_config = OAVConfigBeamCentre(
-        TEST_J_CAMERA_MAN_ZOOM_LEVELS_XML, TEST_DISPLAY_CONFIG
-    )
+    oav_config = OAVConfigBeamCentre(TEST_OAV_ZOOM_LEVELS_XML, TEST_DISPLAY_CONFIG)
     oav = OAVBeamCentreFile("", oav_config, "", zoom_controller=null_controller)
 
     assert await oav.zoom_controller.level.get_value() == "1.0x"
