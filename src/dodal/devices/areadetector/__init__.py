@@ -1,7 +1,7 @@
 from .pressurejumpcell import PressureJumpCellDetector
 from .pressurejumpcell_io import (
-    AdcTriggerMode,
     AdcTriggerCondition,
+    AdcTriggerMode,
     AdcTriggerState,
     PressureJumpCellTriggerMode,
 )
