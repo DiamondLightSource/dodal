@@ -25,7 +25,6 @@ async def create_driver(
         kwargs: Additional key worded arguments that the driver needs for initalisation.
     """
     parameters = {
-        "prefix": "TEST:",
         "lens_mode_type": get_args(driver_class)[0],
         "psu_mode_type": get_args(driver_class)[1],
     }
@@ -51,7 +50,6 @@ async def create_detector(
                 initalisation.
     """
     parameters = {
-        "prefix": "TEST:",
         "lens_mode_type": get_args(detector_class)[0],
         "psu_mode_type": get_args(detector_class)[1],
     }

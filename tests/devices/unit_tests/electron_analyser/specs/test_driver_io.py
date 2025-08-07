@@ -37,6 +37,7 @@ async def sim_driver(
     async with init_devices(mock=True, connect=True):
         sim_driver = await create_driver(
             SpecsAnalyserDriverIO[LensMode, PsuMode],
+            prefix="TEST:",
             energy_sources=energy_sources,
         )
     return sim_driver

@@ -30,6 +30,7 @@ async def sim_detector(
     async with init_devices(mock=True, connect=True):
         sim_detector = await create_detector(
             request.param,
+            prefix="TEST:",
             energy_sources=energy_sources,
         )
     return sim_detector

@@ -31,7 +31,9 @@ async def sim_driver(
     request: pytest.FixtureRequest, energy_sources: dict[str, SignalR[float]]
 ) -> AbstractAnalyserDriverIO:
     async with init_devices(mock=True, connect=True):
-        sim_driver = await create_driver(request.param, energy_sources=energy_sources)
+        sim_driver = await create_driver(
+            request.param, prefix="TEST:", energy_sources=energy_sources
+        )
     return sim_driver
 
 
