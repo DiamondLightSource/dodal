@@ -25,7 +25,7 @@ async def i11_robot() -> NX100Robot:
     ],
 )
 @pytest.mark.parametrize(
-    "location",
+    "set_location",
     [10, 20, 30],
 )
 async def test_robot_set_moves_to_position(
