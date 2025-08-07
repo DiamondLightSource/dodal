@@ -31,8 +31,8 @@ from dodal.plans import count
 System tests that can be run against the containerised IOCs from epics-containers:
 https://github.com/epics-containers/example-services
 
-Check out that repository and using docker or podman deploy the services in the compose
-file:
+Check out that repository at ref '2025.8.1' and using docker or podman deploy the
+services in the compose file:
 
 ```sh
 docker compose up -d

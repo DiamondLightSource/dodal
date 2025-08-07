@@ -12,7 +12,7 @@ from dodal.devices.i24.pmac import (
     EncReset,
     LaserSettings,
 )
-from dodal.devices.util.test_utils import patch_motor
+from dodal.devices.util.test_utils import patch_all_motors
 
 
 @pytest.fixture
@@ -20,11 +20,7 @@ async def fake_pmac(RE):
     pmac = PMAC("", name="fake_pmac")
     await pmac.connect(mock=True)
 
-    with (
-        patch_motor(pmac.x),
-        patch_motor(pmac.y),
-        patch_motor(pmac.z),
-    ):
+    with patch_all_motors(pmac):
         yield pmac
 
 
