@@ -1,6 +1,5 @@
 import asyncio
 from collections.abc import AsyncGenerator
-from contextlib import ExitStack
 from typing import Any
 from unittest.mock import AsyncMock, call
 
@@ -23,7 +22,7 @@ from dodal.devices.aperturescatterguard import (
     InvalidApertureMove,
     load_positions_from_beamline_parameters,
 )
-from dodal.devices.util.test_utils import patch_motor
+from dodal.devices.util.test_utils import patch_all_motors
 
 
 @pytest.fixture
@@ -86,16 +85,14 @@ async def ap_sg(
     RE: RunEngine,
     aperture_positions: dict[ApertureValue, AperturePosition],
     aperture_tolerances: AperturePosition,
-) -> AsyncGenerator[ApertureScatterguard, None]:
+) -> AsyncGenerator[ApertureScatterguard]:
     async with init_devices(mock=True):
         ap_sg = ApertureScatterguard(
             name="test_ap_sg",
             loaded_positions=aperture_positions,
             tolerances=aperture_tolerances,
         )
-    with ExitStack() as motor_patch_stack:
-        for motor in get_all_motors(ap_sg):
-            motor_patch_stack.enter_context(patch_motor(motor))
+    with patch_all_motors(ap_sg):
         yield ap_sg
 
 
