@@ -6,6 +6,7 @@ import pytest
 from ophyd_async.testing import callback_on_mock_put, get_mock_put, set_mock_value
 
 from dodal.devices.i24.pmac import (
+    CS_STR,
     HOME_STR,
     PMAC,
     EncReset,
@@ -44,13 +45,13 @@ async def test_pmac_set_pmac_string(fake_pmac: PMAC, RE):
 async def test_pmac_pmac_to_zero(fake_pmac: PMAC, RE):
     RE(bps.trigger(fake_pmac.to_xyz_zero, wait=True))
 
-    assert await fake_pmac.pmac_string.get_value() == "!x0y0z0"
+    assert await fake_pmac.pmac_string.get_value() == "&2!x0y0z0"
 
 
 async def test_pmac_home(fake_pmac: PMAC, RE):
     RE(bps.trigger(fake_pmac.home, wait=True))
 
-    assert await fake_pmac.pmac_string.get_value() == HOME_STR
+    assert await fake_pmac.pmac_string.get_value() == f"{CS_STR}{HOME_STR}"
 
 
 async def test_set_pmac_string_for_laser(fake_pmac: PMAC, RE):
