@@ -24,14 +24,19 @@ async def i11_robot() -> NX100Robot:
         RobotSampleState.DIFF,
     ],
 )
+@pytest.mark.parametrize(
+    "location",
+    [10, 20, 30],
+)
 async def test_robot_set_moves_to_position(
-    i11_robot: NX100Robot, state: RobotSampleState
+    i11_robot: NX100Robot, state: RobotSampleState, set_location: int
 ) -> None:
+    set_mock_value(i11_robot.current_sample_position, 10)  # Set initial position
     set_mock_value(i11_robot.robot_sample_state, state)  # Set to state
 
-    await i11_robot.set(10)
-    location = await i11_robot.locate()
-    assert location["readback"] == 10
+    await i11_robot.set(set_location)
+    located_position = await i11_robot.locate()
+    assert located_position["readback"] == set_location
 
 
 @pytest.mark.parametrize("value_to_set", [-1000, 9999])
