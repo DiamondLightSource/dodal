@@ -76,9 +76,15 @@ class AbstractBaseRegion(
     energy_mode: EnergyMode = EnergyMode.KINETIC
 
     def is_binding_energy(self) -> bool:
+        """
+        Returns true if the energy_mode is binding.
+        """
         return self.energy_mode == EnergyMode.BINDING
 
     def is_kinetic_energy(self) -> bool:
+        """
+        Returns true if the energy_mode is kinetic.
+        """
         return self.energy_mode == EnergyMode.KINETIC
 
     def switch_energy_mode(
