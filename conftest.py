@@ -14,6 +14,12 @@ from ophyd_async.core import (
     PathInfo,
     PathProvider,
 )
+from tests.devices.i10.test_data import LOOKUP_TABLE_PATH
+from tests.devices.unit_tests.test_daq_configuration import MOCK_DAQ_CONFIG_PATH
+from tests.test_data import (
+    TEST_DISPLAY_CONFIG,
+    TEST_OAV_ZOOM_LEVELS_XML,
+)
 
 from dodal.common.beamlines import beamline_utils
 from dodal.common.visit import (
@@ -23,12 +29,11 @@ from dodal.common.visit import (
 )
 from dodal.log import LOGGER, GELFTCPHandler, set_up_all_logging_handlers
 
-MOCK_DAQ_CONFIG_PATH = "tests/devices/unit_tests/test_daq_configuration"
 mock_paths = [
     ("DAQ_CONFIGURATION_PATH", MOCK_DAQ_CONFIG_PATH),
-    ("ZOOM_PARAMS_FILE", "tests/devices/unit_tests/test_jCameraManZoomLevels.xml"),
-    ("DISPLAY_CONFIG", "tests/devices/unit_tests/test_display.configuration"),
-    ("LOOK_UPTABLE_DIR", "tests/devices/i10/lookupTables/"),
+    ("ZOOM_PARAMS_FILE", TEST_OAV_ZOOM_LEVELS_XML),
+    ("DISPLAY_CONFIG", TEST_DISPLAY_CONFIG),
+    ("LOOK_UPTABLE_DIR", LOOKUP_TABLE_PATH),
 ]
 mock_attributes_table = {
     "i03": mock_paths,
