@@ -1,0 +1,78 @@
+dodal.devices.i10.diagnostics.D3Position
+========================================
+
+.. currentmodule:: dodal.devices.i10.diagnostics
+
+.. autoclass:: D3Position
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~D3Position.NOTHING
+      
+      
+      ~D3Position.GRID
+      
+   
+   

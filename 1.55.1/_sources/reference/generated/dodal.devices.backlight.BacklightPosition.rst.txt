@@ -1,0 +1,78 @@
+dodal.devices.backlight.BacklightPosition
+=========================================
+
+.. currentmodule:: dodal.devices.backlight
+
+.. autoclass:: BacklightPosition
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~BacklightPosition.IN
+      
+      
+      ~BacklightPosition.OUT
+      
+   
+   

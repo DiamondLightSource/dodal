@@ -1,0 +1,41 @@
+dodal.devices.i24.pmac.ScanState
+================================
+
+.. currentmodule:: dodal.devices.i24.pmac
+
+.. autoclass:: ScanState
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      ~ScanState.RUNNING
+      
+      
+      ~ScanState.DONE
+      
+   
+   

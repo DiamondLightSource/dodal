@@ -1,0 +1,23 @@
+dodal.devices.i24.pmac.ProgramAbort
+===================================
+
+.. currentmodule:: dodal.devices.i24.pmac
+
+.. autoclass:: ProgramAbort
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      ~ProgramAbort.trigger
+      
+   
+   
+
+   
+   
+   
