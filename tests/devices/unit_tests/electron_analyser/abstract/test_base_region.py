@@ -101,7 +101,7 @@ def assert_region_field_energy_from_switching_energy_modes_is_correct(
     original_energy_mode = region.energy_mode
     conversion_func = conversion_func_map[region.energy_mode]
     converted_energy = conversion_func(
-        getattr(region, field), region.energy_mode, excitation_energy
+        original_energy, region.energy_mode, excitation_energy
     )
 
     e_mode_sequence = [
