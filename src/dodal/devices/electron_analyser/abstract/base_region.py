@@ -91,7 +91,7 @@ class AbstractBaseRegion(
         self, energy_mode: EnergyMode, excitation_energy: float
     ) -> None:
         """
-        Switch to nregion to new energy mode, Kinetic or Binding. Updates the low_energy,
+        Switch region to new energy mode: Kinetic or Binding. Updates the low_energy,
         centre_energy, high_energy, and energy_mode, only if it switches to a new one.
 
         Parameters:
