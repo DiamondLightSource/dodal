@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.i24.pmac &#8212; dodal 1.55.2.dev1+g2e86c8d51a documentation</title>
+    <title>dodal.devices.i24.pmac &#8212; dodal 1.55.2.dev2+gd34b2381e9 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=016ada35"></script>
+    <script src="../../../../_static/documentation_options.js?v=5c29a2e0"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -469,8 +469,9 @@ window.addEventListener("load", () => mermaid.run());
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.motors</span><span class="w"> </span><span class="kn">import</span> <span class="n">XYZStage</span>
 
-<span class="n">HOME_STR</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;\#1hmz\#2hmz\#3hmz&quot;</span>  <span class="c1"># Command to home the PMAC motors</span>
+<span class="n">HOME_STR</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;\#5hmz\#6hmz\#7hmz&quot;</span>  <span class="c1"># Command to home the PMAC motors</span>
 <span class="n">ZERO_STR</span> <span class="o">=</span> <span class="s2">&quot;!x0y0z0&quot;</span>  <span class="c1"># Command to blend any ongoing move into new position</span>
+<span class="n">CS_STR</span> <span class="o">=</span> <span class="s2">&quot;&amp;2&quot;</span>
 
 
 <div class="viewcode-block" id="ScanState">
@@ -680,12 +681,12 @@ window.addEventListener("load", () => mermaid.run());
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Device to control the chip stage on I24.&quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">pmac_string</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;PMAC_STRING&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pmac_string</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">-MO-IOC-13:PMAC:console&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">home</span> <span class="o">=</span> <span class="n">PMACStringMove</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">pmac_string</span><span class="p">,</span>
-            <span class="n">HOME_STR</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">CS_STR</span><span class="si">}{</span><span class="n">HOME_STR</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">to_xyz_zero</span> <span class="o">=</span> <span class="n">PMACStringMove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pmac_string</span><span class="p">,</span> <span class="n">ZERO_STR</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">to_xyz_zero</span> <span class="o">=</span> <span class="n">PMACStringMove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pmac_string</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">CS_STR</span><span class="si">}{</span><span class="n">ZERO_STR</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">laser</span> <span class="o">=</span> <span class="n">PMACStringLaser</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pmac_string</span><span class="p">)</span>
 
@@ -695,8 +696,8 @@ window.addEventListener("load", () => mermaid.run());
 
         <span class="c1"># These next signals are readback values on PVARS which are set by the motion</span>
         <span class="c1"># program.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">scanstatus</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="s2">&quot;BL24I-MO-STEP-14:signal:P2401&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">counter</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="s2">&quot;BL24I-MO-STEP-14:signal:P2402&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scanstatus</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">-MO-STEP-13:pmac:read:P2401&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">counter</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">-MO-STEP-13:pmac:read:P2402&quot;</span><span class="p">)</span>
 
         <span class="c1"># A couple of soft signals for running a collection: program number to send to</span>
         <span class="c1"># the PMAC_STRING and expected collection time.</span>
@@ -712,7 +713,7 @@ window.addEventListener("load", () => mermaid.run());
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">abort_program</span> <span class="o">=</span> <span class="n">ProgramAbort</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pmac_string</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">scanstatus</span><span class="p">)</span>
 
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span></div>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">-MO-CHIP-01:&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span></div>
 
 </pre></div>
 
