@@ -210,6 +210,11 @@ class ApertureScatterguard(StandardReadable, Preparable):
         await self.aperture.z.set(position.aperture_z)
 
     async def _set_current_aperture_position(self, value: ApertureValue) -> None:
+        if value == ApertureValue.PARKED:
+            raise NotImplementedError(
+                "Currently not able to park aperture/scatterguard, see https://github.com/DiamondLightSource/mx-bluesky/issues/1197"
+            )
+
         position = self._loaded_positions[value]
 
         current_ap_y = await self.aperture.y.user_readback.get_value()
