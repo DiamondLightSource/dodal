@@ -80,5 +80,8 @@ dodal.devices.aperturescatterguard.ApertureValue
       
       ~ApertureValue.OUT_OF_BEAM
       
+      
+      ~ApertureValue.PARKED
+      
    
    

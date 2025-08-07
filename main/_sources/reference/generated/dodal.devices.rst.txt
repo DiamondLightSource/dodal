@@ -9,7 +9,6 @@
    :toctree:
    :recursive:
 
-   dodal.devices.CTAB
    dodal.devices.aithre_lasershaping
    dodal.devices.aperture
    dodal.devices.aperturescatterguard
@@ -20,6 +19,7 @@
    dodal.devices.backlight
    dodal.devices.baton
    dodal.devices.bimorph_mirror
+   dodal.devices.collimation_table
    dodal.devices.common_dcm
    dodal.devices.cryostream
    dodal.devices.current_amplifiers

@@ -33,6 +33,12 @@ dodal.devices.cryostream.CryoStream
    .. autosummary::
    
       
+      ~CryoStream.MAX_PRESSURE_BAR
+      
+      
+      ~CryoStream.MAX_TEMP_K
+      
+      
       
       
       

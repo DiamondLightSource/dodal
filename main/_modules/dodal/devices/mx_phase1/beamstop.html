@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.mx_phase1.beamstop &#8212; dodal 1.55.2.dev2+gd34b2381e9 documentation</title>
+    <title>dodal.devices.mx_phase1.beamstop &#8212; dodal 1.55.2.dev3+g1d75ce6dcc documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=5c29a2e0"></script>
+    <script src="../../../../_static/documentation_options.js?v=b9988e91"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -472,9 +472,6 @@ window.addEventListener("load", () => mermaid.run());
 <span class="sd">    robot load however all 3 resolution positions are the same. We also</span>
 <span class="sd">    do not use the robot load position in Hyperion.</span>
 
-<span class="sd">    Until we support moving the beamstop it is only necessary to check whether the</span>
-<span class="sd">    beamstop is in beam or not.</span>
-
 <span class="sd">    See Also:</span>
 <span class="sd">        https://github.com/DiamondLightSource/mx-bluesky/issues/484</span>
 
@@ -543,14 +540,16 @@ window.addEventListener("load", () => mermaid.run());
             <span class="k">return</span> <span class="n">BeamstopPositions</span><span class="o">.</span><span class="n">UNKNOWN</span>
 
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_set_selected_position</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">position</span><span class="p">:</span> <span class="n">BeamstopPositions</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">position</span> <span class="o">==</span> <span class="n">BeamstopPositions</span><span class="o">.</span><span class="n">DATA_COLLECTION</span><span class="p">:</span>
-            <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">x_mm</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_in_beam_xyz_mm</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">y_mm</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_in_beam_xyz_mm</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">z_mm</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_in_beam_xyz_mm</span><span class="p">[</span><span class="mi">2</span><span class="p">]),</span>
-            <span class="p">)</span>
-        <span class="k">elif</span> <span class="n">position</span> <span class="o">==</span> <span class="n">BeamstopPositions</span><span class="o">.</span><span class="n">UNKNOWN</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cannot set beamstop to position </span><span class="si">{</span><span class="n">position</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+        <span class="k">match</span> <span class="n">position</span><span class="p">:</span>
+            <span class="k">case</span> <span class="n">BeamstopPositions</span><span class="o">.</span><span class="n">DATA_COLLECTION</span><span class="p">:</span>
+                <span class="c1"># Move z first as it could be under the table</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">z_mm</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_in_beam_xyz_mm</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+                <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">x_mm</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_in_beam_xyz_mm</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">y_mm</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_in_beam_xyz_mm</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span>
+                <span class="p">)</span>
+            <span class="k">case</span><span class="w"> </span><span class="k">_</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cannot set beamstop to position </span><span class="si">{</span><span class="n">position</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
 </pre></div>
 

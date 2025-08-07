@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.scintillator.Scintillator &#8212; dodal 1.55.2.dev2+gd34b2381e9 documentation</title>
+    <title>dodal.devices.scintillator.Scintillator &#8212; dodal 1.55.2.dev3+g1d75ce6dcc documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=5c29a2e0"></script>
+    <script src="../../_static/documentation_options.js?v=b9988e91"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -59,7 +59,7 @@
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="dodal.devices.slits" href="dodal.devices.slits.html" />
-    <link rel="prev" title="dodal.devices.scintillator" href="dodal.devices.scintillator.html" />
+    <link rel="prev" title="dodal.devices.scintillator.InOut" href="dodal.devices.scintillator.InOut.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="main" />
@@ -438,10 +438,6 @@
 </details></li>
 <li class="toctree-l2"><a class="reference internal" href="dodal.common.html">dodal.common</a></li>
 <li class="toctree-l2 current active has-children"><a class="reference internal" href="dodal.devices.html">dodal.devices</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
-<li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.CTAB.html">dodal.devices.CTAB</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.CTAB.CTAB.html">dodal.devices.CTAB.CTAB</a></li>
-</ul>
-</details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.aithre_lasershaping.html">dodal.devices.aithre_lasershaping</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.aithre_lasershaping.goniometer.html">dodal.devices.aithre_lasershaping.goniometer</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.aithre_lasershaping.laser_robot.html">dodal.devices.aithre_lasershaping.laser_robot</a></li>
@@ -508,6 +504,10 @@
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.bimorph_mirror.BimorphMirrorMode.html">dodal.devices.bimorph_mirror.BimorphMirrorMode</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.bimorph_mirror.BimorphMirrorOnOff.html">dodal.devices.bimorph_mirror.BimorphMirrorOnOff</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.bimorph_mirror.BimorphMirrorStatus.html">dodal.devices.bimorph_mirror.BimorphMirrorStatus</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.collimation_table.html">dodal.devices.collimation_table</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.collimation_table.CollimationTable.html">dodal.devices.collimation_table.CollimationTable</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.common_dcm.html">dodal.devices.common_dcm</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -585,7 +585,7 @@
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.fluorescence_detector_motion.html">dodal.devices.fluorescence_detector_motion</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.fluorescence_detector_motion.FluorescenceDetector.html">dodal.devices.fluorescence_detector_motion.FluorescenceDetector</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.fluorescence_detector_motion.FluorescenceDetectorControlState.html">dodal.devices.fluorescence_detector_motion.FluorescenceDetectorControlState</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.fluorescence_detector_motion.InOut.html">dodal.devices.fluorescence_detector_motion.InOut</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.flux.html">dodal.devices.flux</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -762,6 +762,7 @@
 </ul>
 </details></li>
 <li class="toctree-l3 current active has-children"><a class="reference internal" href="dodal.devices.scintillator.html">dodal.devices.scintillator</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.scintillator.InOut.html">dodal.devices.scintillator.InOut</a></li>
 <li class="toctree-l4 current active"><a class="current reference internal" href="#">dodal.devices.scintillator.Scintillator</a></li>
 </ul>
 </details></li>
@@ -953,10 +954,17 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="dodal.devices.scintillator.Scintillator">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dodal.devices.scintillator.</span></span><span class="sig-name descname"><span class="pre">Scintillator</span></span><a class="reference internal" href="../../_modules/dodal/devices/scintillator.html#Scintillator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.scintillator.Scintillator" title="Link to this definition">#</a></dt>
-<dd><dl class="field-list simple">
+<dd><p>Moves a scintillator into and out of the beam.</p>
+<p>The scintillator will light up when hit with xrays, this allows scientists to use it
+in conjunction with the optical OAV camera to commission the beamline.</p>
+<p>When moved out of the beam it is parked under the table. This parking has a potential
+to collide with the aperture/scatterguard if that is not correctly parked already.</p>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>prefix</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>aperture_scatterguard</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Reference</span></code>[<a class="reference internal" href="dodal.devices.aperturescatterguard.ApertureScatterguard.html#dodal.devices.aperturescatterguard.ApertureScatterguard" title="dodal.devices.aperturescatterguard.ApertureScatterguard"><code class="xref py py-class docutils literal notranslate"><span class="pre">ApertureScatterguard</span></code></a>]</span>)</p></li>
+<li><p><strong>beamline_parameters</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">GDABeamlineParameters</span></code></span>)</p></li>
 <li><p><strong>name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">''</span></code>)</p></li>
 </ul>
 </dd>
@@ -988,12 +996,12 @@
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="dodal.devices.scintillator.html"
+       href="dodal.devices.scintillator.InOut.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">dodal.devices.scintillator</p>
+        <p class="prev-next-title">dodal.devices.scintillator.InOut</p>
       </div>
     </a>
     <a class="right-next"

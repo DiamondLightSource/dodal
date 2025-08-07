@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.scintillator &#8212; dodal 1.55.2.dev2+gd34b2381e9 documentation</title>
+    <title>dodal.devices.scintillator &#8212; dodal 1.55.2.dev3+g1d75ce6dcc documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=5c29a2e0"></script>
+    <script src="../../../_static/documentation_options.js?v=b9988e91"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -450,18 +450,93 @@ window.addEventListener("load", () => mermaid.run());
                 <article class="bd-article">
                   
   <h1>Source code for dodal.devices.scintillator</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">StandardReadable</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">math</span><span class="w"> </span><span class="kn">import</span> <span class="n">isclose</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">Reference</span><span class="p">,</span> <span class="n">StandardReadable</span><span class="p">,</span> <span class="n">StrictEnum</span><span class="p">,</span> <span class="n">derived_signal_rw</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.motor</span><span class="w"> </span><span class="kn">import</span> <span class="n">Motor</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.common.beamlines.beamline_parameters</span><span class="w"> </span><span class="kn">import</span> <span class="n">GDABeamlineParameters</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.aperturescatterguard</span><span class="w"> </span><span class="kn">import</span> <span class="n">ApertureScatterguard</span><span class="p">,</span> <span class="n">ApertureValue</span>
+
+
+<div class="viewcode-block" id="InOut">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.scintillator.InOut.html#dodal.devices.scintillator.InOut">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">InOut</span><span class="p">(</span><span class="n">StrictEnum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Currently Hyperion only needs to move the scintillator out for data collection.&quot;&quot;&quot;</span>
+
+    <span class="n">OUT</span> <span class="o">=</span> <span class="s2">&quot;Out&quot;</span>
+    <span class="n">UNKNOWN</span> <span class="o">=</span> <span class="s2">&quot;Unknown&quot;</span></div>
+
 
 
 <div class="viewcode-block" id="Scintillator">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.scintillator.Scintillator.html#dodal.devices.scintillator.Scintillator">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Scintillator</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">):</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Moves a scintillator into and out of the beam.</span>
+
+<span class="sd">    The scintillator will light up when hit with xrays, this allows scientists to use it</span>
+<span class="sd">    in conjunction with the optical OAV camera to commission the beamline.</span>
+
+<span class="sd">    When moved out of the beam it is parked under the table. This parking has a potential</span>
+<span class="sd">    to collide with the aperture/scatterguard if that is not correctly parked already.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">aperture_scatterguard</span><span class="p">:</span> <span class="n">Reference</span><span class="p">[</span><span class="n">ApertureScatterguard</span><span class="p">],</span>
+        <span class="n">beamline_parameters</span><span class="p">:</span> <span class="n">GDABeamlineParameters</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="p">):</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;-MO-SCIN-01:Y&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">z</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;-MO-SCIN-01:Z&quot;</span><span class="p">)</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">y_mm</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">Y&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">z_mm</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">Z&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">selected_pos</span> <span class="o">=</span> <span class="n">derived_signal_rw</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_get_selected_position</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_set_selected_position</span><span class="p">,</span>
+                <span class="n">y</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">y_mm</span><span class="p">,</span>
+                <span class="n">z</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">z_mm</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_aperture_scatterguard</span> <span class="o">=</span> <span class="n">aperture_scatterguard</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_scintillator_out_yz_mm</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="nb">float</span><span class="p">(</span><span class="n">beamline_parameters</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;scin_</span><span class="si">{</span><span class="n">axis</span><span class="si">}</span><span class="s2">_SCIN_OUT&quot;</span><span class="p">])</span> <span class="k">for</span> <span class="n">axis</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;z&quot;</span><span class="p">)</span>
+        <span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_yz_tolerance_mm</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="nb">float</span><span class="p">(</span><span class="n">beamline_parameters</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;scin_</span><span class="si">{</span><span class="n">axis</span><span class="si">}</span><span class="s2">_tolerance&quot;</span><span class="p">])</span> <span class="k">for</span> <span class="n">axis</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;z&quot;</span><span class="p">)</span>
+        <span class="p">]</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_selected_position</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">z</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">InOut</span><span class="p">:</span>
+        <span class="n">current_pos</span> <span class="o">=</span> <span class="p">[</span><span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">all</span><span class="p">(</span>
+            <span class="n">isclose</span><span class="p">(</span><span class="n">axis_pos</span><span class="p">,</span> <span class="n">axis_in_beam</span><span class="p">,</span> <span class="n">abs_tol</span><span class="o">=</span><span class="n">axis_tolerance</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">axis_pos</span><span class="p">,</span> <span class="n">axis_in_beam</span><span class="p">,</span> <span class="n">axis_tolerance</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+                <span class="n">current_pos</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_scintillator_out_yz_mm</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_yz_tolerance_mm</span><span class="p">,</span>
+                <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">):</span>
+            <span class="k">return</span> <span class="n">InOut</span><span class="o">.</span><span class="n">OUT</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">InOut</span><span class="o">.</span><span class="n">UNKNOWN</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_set_selected_position</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">position</span><span class="p">:</span> <span class="n">InOut</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">match</span> <span class="n">position</span><span class="p">:</span>
+            <span class="k">case</span> <span class="n">InOut</span><span class="o">.</span><span class="n">OUT</span><span class="p">:</span>
+                <span class="k">if</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_aperture_scatterguard</span><span class="p">()</span><span class="o">.</span><span class="n">selected_aperture</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
+                    <span class="o">!=</span> <span class="n">ApertureValue</span><span class="o">.</span><span class="n">PARKED</span>
+                <span class="p">):</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                        <span class="s2">&quot;Cannot move scintillator out if aperture/scatterguard is not parked&quot;</span>
+                    <span class="p">)</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_mm</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_scintillator_out_yz_mm</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">z_mm</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_scintillator_out_yz_mm</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">case</span><span class="w"> </span><span class="k">_</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cannot set scintillator to position </span><span class="si">{</span><span class="n">position</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
 </pre></div>
 

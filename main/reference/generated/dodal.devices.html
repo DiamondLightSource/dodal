@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices &#8212; dodal 1.55.2.dev2+gd34b2381e9 documentation</title>
+    <title>dodal.devices &#8212; dodal 1.55.2.dev3+g1d75ce6dcc documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=5c29a2e0"></script>
+    <script src="../../_static/documentation_options.js?v=b9988e91"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -58,7 +58,7 @@
     <link rel="icon" href="../../_static/dls-logo.svg"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="dodal.devices.CTAB" href="dodal.devices.CTAB.html" />
+    <link rel="next" title="dodal.devices.aithre_lasershaping" href="dodal.devices.aithre_lasershaping.html" />
     <link rel="prev" title="dodal.common" href="dodal.common.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -438,10 +438,6 @@
 </details></li>
 <li class="toctree-l2"><a class="reference internal" href="dodal.common.html">dodal.common</a></li>
 <li class="toctree-l2 current active has-children"><a class="current reference internal" href="#">dodal.devices</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.CTAB.html">dodal.devices.CTAB</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.CTAB.CTAB.html">dodal.devices.CTAB.CTAB</a></li>
-</ul>
-</details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.aithre_lasershaping.html">dodal.devices.aithre_lasershaping</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.aithre_lasershaping.goniometer.html">dodal.devices.aithre_lasershaping.goniometer</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.aithre_lasershaping.laser_robot.html">dodal.devices.aithre_lasershaping.laser_robot</a></li>
@@ -508,6 +504,10 @@
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.bimorph_mirror.BimorphMirrorMode.html">dodal.devices.bimorph_mirror.BimorphMirrorMode</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.bimorph_mirror.BimorphMirrorOnOff.html">dodal.devices.bimorph_mirror.BimorphMirrorOnOff</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.bimorph_mirror.BimorphMirrorStatus.html">dodal.devices.bimorph_mirror.BimorphMirrorStatus</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.collimation_table.html">dodal.devices.collimation_table</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.collimation_table.CollimationTable.html">dodal.devices.collimation_table.CollimationTable</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.common_dcm.html">dodal.devices.common_dcm</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -585,7 +585,7 @@
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.fluorescence_detector_motion.html">dodal.devices.fluorescence_detector_motion</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.fluorescence_detector_motion.FluorescenceDetector.html">dodal.devices.fluorescence_detector_motion.FluorescenceDetector</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.fluorescence_detector_motion.FluorescenceDetectorControlState.html">dodal.devices.fluorescence_detector_motion.FluorescenceDetectorControlState</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.fluorescence_detector_motion.InOut.html">dodal.devices.fluorescence_detector_motion.InOut</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.flux.html">dodal.devices.flux</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -762,6 +762,7 @@
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.scintillator.html">dodal.devices.scintillator</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.scintillator.InOut.html">dodal.devices.scintillator.InOut</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.scintillator.Scintillator.html">dodal.devices.scintillator.Scintillator</a></li>
 </ul>
 </details></li>
@@ -947,37 +948,37 @@
 <p class="rubric">Modules</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.CTAB.html#module-dodal.devices.CTAB" title="dodal.devices.CTAB"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dodal.devices.CTAB</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.aithre_lasershaping.html#module-dodal.devices.aithre_lasershaping" title="dodal.devices.aithre_lasershaping"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dodal.devices.aithre_lasershaping</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.aithre_lasershaping.html#module-dodal.devices.aithre_lasershaping" title="dodal.devices.aithre_lasershaping"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dodal.devices.aithre_lasershaping</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.aperture.html#module-dodal.devices.aperture" title="dodal.devices.aperture"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dodal.devices.aperture</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.aperture.html#module-dodal.devices.aperture" title="dodal.devices.aperture"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dodal.devices.aperture</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.aperturescatterguard.html#module-dodal.devices.aperturescatterguard" title="dodal.devices.aperturescatterguard"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dodal.devices.aperturescatterguard</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.aperturescatterguard.html#module-dodal.devices.aperturescatterguard" title="dodal.devices.aperturescatterguard"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dodal.devices.aperturescatterguard</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.apple2_undulator.html#module-dodal.devices.apple2_undulator" title="dodal.devices.apple2_undulator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dodal.devices.apple2_undulator</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.apple2_undulator.html#module-dodal.devices.apple2_undulator" title="dodal.devices.apple2_undulator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dodal.devices.apple2_undulator</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.b07.html#module-dodal.devices.b07" title="dodal.devices.b07"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dodal.devices.b07</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.b07.html#module-dodal.devices.b07" title="dodal.devices.b07"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dodal.devices.b07</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.b07_1.html#module-dodal.devices.b07_1" title="dodal.devices.b07_1"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dodal.devices.b07_1</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.b07_1.html#module-dodal.devices.b07_1" title="dodal.devices.b07_1"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dodal.devices.b07_1</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.b16.html#module-dodal.devices.b16" title="dodal.devices.b16"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dodal.devices.b16</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.b16.html#module-dodal.devices.b16" title="dodal.devices.b16"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dodal.devices.b16</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.backlight.html#module-dodal.devices.backlight" title="dodal.devices.backlight"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dodal.devices.backlight</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.backlight.html#module-dodal.devices.backlight" title="dodal.devices.backlight"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dodal.devices.backlight</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.baton.html#module-dodal.devices.baton" title="dodal.devices.baton"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dodal.devices.baton</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.baton.html#module-dodal.devices.baton" title="dodal.devices.baton"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dodal.devices.baton</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.bimorph_mirror.html#module-dodal.devices.bimorph_mirror" title="dodal.devices.bimorph_mirror"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dodal.devices.bimorph_mirror</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.bimorph_mirror.html#module-dodal.devices.bimorph_mirror" title="dodal.devices.bimorph_mirror"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dodal.devices.bimorph_mirror</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.collimation_table.html#module-dodal.devices.collimation_table" title="dodal.devices.collimation_table"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dodal.devices.collimation_table</span></code></a></p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.common_dcm.html#module-dodal.devices.common_dcm" title="dodal.devices.common_dcm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dodal.devices.common_dcm</span></code></a></p></td>
@@ -1158,11 +1159,11 @@
       </div>
     </a>
     <a class="right-next"
-       href="dodal.devices.CTAB.html"
+       href="dodal.devices.aithre_lasershaping.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">dodal.devices.CTAB</p>
+        <p class="prev-next-title">dodal.devices.aithre_lasershaping</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
