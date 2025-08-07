@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.electron_analyser.util &#8212; dodal 1.55.1.dev4+g1170eb5672 documentation</title>
+    <title>dodal.devices.electron_analyser.util &#8212; dodal 1.55.2.dev1+g2e86c8d51a documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=0cc7c043"></script>
+    <script src="../../../../_static/documentation_options.js?v=016ada35"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -458,6 +458,16 @@ window.addEventListener("load", () => mermaid.run());
 <span class="k">def</span><span class="w"> </span><span class="nf">to_kinetic_energy</span><span class="p">(</span>
     <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">value_mode</span><span class="p">:</span> <span class="n">EnergyMode</span><span class="p">,</span> <span class="n">excitation_energy</span><span class="p">:</span> <span class="nb">float</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert a value that is binding energy to kinetic energy.</span>
+<span class="sd">    Parameters:</span>
+<span class="sd">        value: The value to convert.</span>
+<span class="sd">        value_mode: Energy mode of the value. If it is already kinetic, return the</span>
+<span class="sd">                    same value. If it is binding, convert to kinetic.</span>
+<span class="sd">        excitation_energy: Value to calculate the conversion.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        Caluclated kinetic energy value</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">value</span> <span class="k">if</span> <span class="n">value_mode</span> <span class="o">==</span> <span class="n">EnergyMode</span><span class="o">.</span><span class="n">KINETIC</span> <span class="k">else</span> <span class="n">excitation_energy</span> <span class="o">-</span> <span class="n">value</span></div>
 
 
@@ -467,6 +477,16 @@ window.addEventListener("load", () => mermaid.run());
 <span class="k">def</span><span class="w"> </span><span class="nf">to_binding_energy</span><span class="p">(</span>
     <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">value_mode</span><span class="p">:</span> <span class="n">EnergyMode</span><span class="p">,</span> <span class="n">excitation_energy</span><span class="p">:</span> <span class="nb">float</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert a value that is kinetic energy to binding energy.</span>
+<span class="sd">    Parameters:</span>
+<span class="sd">        value: The value to convert.</span>
+<span class="sd">        value_mode: Energy mode of the value. If it is already binding, return the</span>
+<span class="sd">                    same value. If it is kinetic, convert to binding.</span>
+<span class="sd">        excitation_energy: Value to calculate the conversion.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        Caluclated binding energy value</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">value</span> <span class="k">if</span> <span class="n">value_mode</span> <span class="o">==</span> <span class="n">EnergyMode</span><span class="o">.</span><span class="n">BINDING</span> <span class="k">else</span> <span class="n">excitation_energy</span> <span class="o">-</span> <span class="n">value</span></div>
 
 </pre></div>
