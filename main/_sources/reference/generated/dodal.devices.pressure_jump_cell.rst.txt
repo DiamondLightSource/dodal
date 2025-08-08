@@ -15,8 +15,6 @@ dodal.devices.pressure\_jump\_cell
    :recursive:
 
    ~pressure_jump_cell.AllValvesControl
-   ~pressure_jump_cell.AllValvesControlState
-   ~pressure_jump_cell.FastValveControl
    ~pressure_jump_cell.FastValveControlRequest
    ~pressure_jump_cell.FastValveState
    ~pressure_jump_cell.PressureJumpCell

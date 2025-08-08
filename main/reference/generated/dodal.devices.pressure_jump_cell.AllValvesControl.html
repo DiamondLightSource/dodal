@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.pressure_jump_cell.AllValvesControl &#8212; dodal 1.55.2.dev4+g321c785e50 documentation</title>
+    <title>dodal.devices.pressure_jump_cell.AllValvesControl &#8212; dodal 1.55.2.dev5+g440b816b1b documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=5d0a30e5"></script>
+    <script src="../../_static/documentation_options.js?v=3d26547e"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -58,7 +58,7 @@
     <link rel="icon" href="../../_static/dls-logo.svg"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="dodal.devices.pressure_jump_cell.AllValvesControlState" href="dodal.devices.pressure_jump_cell.AllValvesControlState.html" />
+    <link rel="next" title="dodal.devices.pressure_jump_cell.FastValveControlRequest" href="dodal.devices.pressure_jump_cell.FastValveControlRequest.html" />
     <link rel="prev" title="dodal.devices.pressure_jump_cell" href="dodal.devices.pressure_jump_cell.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -729,8 +729,6 @@
 </details></li>
 <li class="toctree-l3 current active has-children"><a class="reference internal" href="dodal.devices.pressure_jump_cell.html">dodal.devices.pressure_jump_cell</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l4 current active"><a class="current reference internal" href="#">dodal.devices.pressure_jump_cell.AllValvesControl</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.pressure_jump_cell.AllValvesControlState.html">dodal.devices.pressure_jump_cell.AllValvesControlState</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.pressure_jump_cell.FastValveControl.html">dodal.devices.pressure_jump_cell.FastValveControl</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.pressure_jump_cell.FastValveControlRequest.html">dodal.devices.pressure_jump_cell.FastValveControlRequest</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.pressure_jump_cell.FastValveState.html">dodal.devices.pressure_jump_cell.FastValveState</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.pressure_jump_cell.PressureJumpCell.html">dodal.devices.pressure_jump_cell.PressureJumpCell</a></li>
@@ -954,29 +952,22 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="dodal.devices.pressure_jump_cell.AllValvesControl">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dodal.devices.pressure_jump_cell.</span></span><span class="sig-name descname"><span class="pre">AllValvesControl</span></span><a class="reference internal" href="../../_modules/dodal/devices/pressure_jump_cell.html#AllValvesControl"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.pressure_jump_cell.AllValvesControl" title="Link to this definition">#</a></dt>
-<dd><p>valves 2, 4, 7, 8 are not controlled by the IOC,
-as they are under manual control.
-fast_valves: tuple[int, …] = (5, 6)
-slow_valves: tuple[int, …] = (1, 3)</p>
+<dd><p>The default IOC for this device only controls
+specific valves. Other valves are under manual
+control.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>prefix</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
 <li><p><strong>name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">''</span></code>)</p></li>
-<li><p><strong>fast_valves</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/constants.html#Ellipsis" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">...</span></code></a>]</span>, default: <code class="docutils literal notranslate"><span class="pre">(5,</span> <span class="pre">6)</span></code>)</p></li>
-<li><p><strong>slow_valves</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/constants.html#Ellipsis" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">...</span></code></a>]</span>, default: <code class="docutils literal notranslate"><span class="pre">(1,</span> <span class="pre">3)</span></code>)</p></li>
+<li><p><strong>fast_valves_numbers</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/constants.html#Ellipsis" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">...</span></code></a>]</span>, default: <code class="docutils literal notranslate"><span class="pre">(5,</span> <span class="pre">6)</span></code>)</p></li>
+<li><p><strong>slow_valves_numbers</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/constants.html#Ellipsis" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">...</span></code></a>]</span>, default: <code class="docutils literal notranslate"><span class="pre">(1,</span> <span class="pre">3)</span></code>)</p></li>
 </ul>
 </dd>
 </dl>
 <p class="rubric">Methods</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">set</span></code>(value)</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_valve</span></code>(valve, value)</p></td>
-<td><p></p></td>
-</tr>
 </tbody>
 </table>
 </div>
@@ -1010,11 +1001,11 @@ slow_valves: tuple[int, …] = (1, 3)</p>
       </div>
     </a>
     <a class="right-next"
-       href="dodal.devices.pressure_jump_cell.AllValvesControlState.html"
+       href="dodal.devices.pressure_jump_cell.FastValveControlRequest.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">dodal.devices.pressure_jump_cell.AllValvesControlState</p>
+        <p class="prev-next-title">dodal.devices.pressure_jump_cell.FastValveControlRequest</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

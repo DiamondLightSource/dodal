@@ -21,12 +21,6 @@ dodal.devices.pressure\_jump\_cell.AllValvesControl
       
       
       
-      ~AllValvesControl.set
-      
-      
-      
-      ~AllValvesControl.set_valve
-      
       
       
    
