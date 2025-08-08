@@ -28,7 +28,9 @@ from tests.devices.unit_tests.electron_analyser.helper_util import (
     ]
 )
 async def sim_driver(
-    request: pytest.FixtureRequest, energy_sources: dict[str, SignalR[float]]
+    request: pytest.FixtureRequest,
+    energy_sources: dict[str, SignalR[float]],
+    RE: RunEngine,
 ) -> AbstractAnalyserDriverIO:
     async with init_devices(mock=True, connect=True):
         sim_driver = await create_driver(

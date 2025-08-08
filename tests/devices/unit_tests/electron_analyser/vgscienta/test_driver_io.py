@@ -31,6 +31,7 @@ from tests.devices.unit_tests.electron_analyser.helper_util import (
 @pytest.fixture
 async def sim_driver(
     energy_sources: dict[str, SignalR[float]],
+    RE: RunEngine,
 ) -> VGScientaAnalyserDriverIO[LensMode, PsuMode, PassEnergy]:
     async with init_devices(mock=True, connect=True):
         sim_driver = await create_driver(

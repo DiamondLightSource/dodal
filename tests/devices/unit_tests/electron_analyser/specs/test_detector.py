@@ -11,6 +11,7 @@ from dodal.testing.electron_analyser import create_detector
 @pytest.fixture
 async def sim_detector(
     energy_sources: dict[str, SignalR[float]],
+    RE: RunEngine,
 ) -> SpecsDetector[LensMode, PsuMode]:
     async with init_devices(mock=True, connect=True):
         sim_driver = await create_detector(
