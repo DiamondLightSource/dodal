@@ -1,9 +1,8 @@
 import asyncio
-from unittest.mock import ANY
 
 import pytest
 from ophyd_async.core import init_devices
-from ophyd_async.testing import assert_reading, set_mock_value
+from ophyd_async.testing import assert_reading, partial_reading, set_mock_value
 
 from dodal.devices.pressure_jump_cell import (
     OPENSEQ_PULSE_LENGTH,
@@ -41,18 +40,16 @@ async def test_reading_pjumpcell_includes_read_fields_valves(
     await assert_reading(
         cell.all_valves_control,
         {
-            "pjump-all_valves_control-valve_states-1": {
-                "value": ValveState.CLOSED,
-            },
-            "pjump-all_valves_control-valve_states-3": {
-                "value": ValveState.OPEN,
-            },
-            "pjump-all_valves_control-fast_valve_states-5": {
-                "value": FastValveState.CLOSED_ARMED,
-            },
-            "pjump-all_valves_control-fast_valve_states-6": {
-                "value": FastValveState.OPEN_ARMED,
-            },
+            "pjump-all_valves_control-valve_states-1": partial_reading(
+                ValveState.CLOSED
+            ),
+            "pjump-all_valves_control-valve_states-3": partial_reading(ValveState.OPEN),
+            "pjump-all_valves_control-fast_valve_states-5": partial_reading(
+                FastValveState.CLOSED_ARMED
+            ),
+            "pjump-all_valves_control-fast_valve_states-6": partial_reading(
+                FastValveState.OPEN_ARMED
+            ),
         },
     )
 
@@ -94,12 +91,12 @@ async def test_reading_pjumpcell_includes_config_fields_valves(
     await assert_reading(
         cell.all_valves_control.valve_control[1],
         {
-            "pjump-all_valves_control-valve_control-1-open": {
-                "value": int(ValveOpenSeqRequest.INACTIVE.value),
-            },
-            "pjump-all_valves_control-valve_control-1-control": {
-                "value": ValveControlRequest.CLOSE,
-            },
+            "pjump-all_valves_control-valve_control-1-open": partial_reading(
+                int(ValveOpenSeqRequest.INACTIVE.value)
+            ),
+            "pjump-all_valves_control-valve_control-1-control": partial_reading(
+                ValveControlRequest.CLOSE
+            ),
         },
     )
 
@@ -142,29 +139,23 @@ async def test_pjumpcell_set_valve_sets_valve_fields(
     await assert_reading(
         cell.all_valves_control.valve_control[1],
         {
-            "pjump-all_valves_control-valve_control-1-open": {
-                "value": int(ValveOpenSeqRequest.OPEN_SEQ.value),
-            },
-            "pjump-all_valves_control-valve_control-1-control": {
-                "value": ValveControlRequest.CLOSE,
-                "timestamp": ANY,
-                "alarm_severity": 0,
-            },
+            "pjump-all_valves_control-valve_control-1-open": partial_reading(
+                int(ValveOpenSeqRequest.OPEN_SEQ.value)
+            ),
+            "pjump-all_valves_control-valve_control-1-control": partial_reading(
+                ValveControlRequest.CLOSE
+            ),
         },
     )
     await assert_reading(
         cell.all_valves_control.valve_control[6],
         {
-            "pjump-all_valves_control-valve_control-6-open": {
-                "value": int(ValveOpenSeqRequest.OPEN_SEQ.value),
-                "timestamp": ANY,
-                "alarm_severity": 0,
-            },
-            "pjump-all_valves_control-valve_control-6-control": {
-                "value": FastValveControlRequest.ARM,
-                "timestamp": ANY,
-                "alarm_severity": 0,
-            },
+            "pjump-all_valves_control-valve_control-6-open": partial_reading(
+                int(ValveOpenSeqRequest.OPEN_SEQ.value)
+            ),
+            "pjump-all_valves_control-valve_control-6-control": partial_reading(
+                FastValveControlRequest.ARM
+            ),
         },
     )
     # After openseq pulse
@@ -175,12 +166,12 @@ async def test_pjumpcell_set_valve_sets_valve_fields(
     await assert_reading(
         cell.all_valves_control.valve_control[1],
         {
-            "pjump-all_valves_control-valve_control-1-open": {
-                "value": int(ValveOpenSeqRequest.INACTIVE.value),
-            },
-            "pjump-all_valves_control-valve_control-1-control": {
-                "value": ValveControlRequest.CLOSE,
-            },
+            "pjump-all_valves_control-valve_control-1-open": partial_reading(
+                int(ValveOpenSeqRequest.INACTIVE.value)
+            ),
+            "pjump-all_valves_control-valve_control-1-control": partial_reading(
+                ValveControlRequest.CLOSE
+            ),
         },
     )
 
@@ -189,16 +180,12 @@ async def test_pjumpcell_set_valve_sets_valve_fields(
     await assert_reading(
         cell.all_valves_control.valve_control[6],
         {
-            "pjump-all_valves_control-valve_control-6-open": {
-                "value": int(ValveOpenSeqRequest.INACTIVE.value),
-                "timestamp": ANY,
-                "alarm_severity": 0,
-            },
-            "pjump-all_valves_control-valve_control-6-control": {
-                "value": FastValveControlRequest.ARM,
-                "timestamp": ANY,
-                "alarm_severity": 0,
-            },
+            "pjump-all_valves_control-valve_control-6-open": partial_reading(
+                int(ValveOpenSeqRequest.INACTIVE.value)
+            ),
+            "pjump-all_valves_control-valve_control-6-control": partial_reading(
+                FastValveControlRequest.ARM
+            ),
         },
     )
 
@@ -237,16 +224,12 @@ async def test_pjumpcell_set_valve_sets_control_request_for_all_valve_types(
     await assert_reading(
         cell.all_valves_control.valve_control[5],
         {
-            "pjump-all_valves_control-valve_control-5-open": {
-                "value": int(ValveOpenSeqRequest.INACTIVE.value),
-                "timestamp": ANY,
-                "alarm_severity": 0,
-            },
-            "pjump-all_valves_control-valve_control-5-control": {
-                "value": expected,
-                "timestamp": ANY,
-                "alarm_severity": 0,
-            },
+            "pjump-all_valves_control-valve_control-5-open": partial_reading(
+                int(ValveOpenSeqRequest.INACTIVE.value)
+            ),
+            "pjump-all_valves_control-valve_control-5-control": partial_reading(
+                expected
+            ),
         },
     )
 
@@ -264,15 +247,11 @@ async def test_reading_pjumpcell_includes_read_fields_pump(
     await assert_reading(
         cell.pump,
         {
-            "pjump-pump-pump_position": {
-                "value": 100,
-            },
-            "pjump-pump-pump_motor_direction": {
-                "value": PumpMotorDirectionState.FORWARD,
-            },
-            "pjump-pump-pump_speed": {
-                "value": 100,
-            },
+            "pjump-pump-pump_position": partial_reading(100),
+            "pjump-pump-pump_motor_direction": partial_reading(
+                PumpMotorDirectionState.FORWARD
+            ),
+            "pjump-pump-pump_speed": partial_reading(100),
         },
     )
 
@@ -298,52 +277,34 @@ async def test_reading_pjumpcell_includes_read_fields_transducers(
     await assert_reading(
         cell.pressure_transducers[1],
         {
-            "pjump-pressure_transducers-1-omron_pressure": {
-                "value": 1001,
-            },
-            "pjump-pressure_transducers-1-omron_voltage": {
-                "value": 2.51,
-            },
-            "pjump-pressure_transducers-1-beckhoff_pressure": {
-                "value": 1001.1,
-            },
-            "pjump-pressure_transducers-1-slow_beckhoff_voltage_readout": {
-                "value": 2.51,
-            },
+            "pjump-pressure_transducers-1-omron_pressure": partial_reading(1001),
+            "pjump-pressure_transducers-1-omron_voltage": partial_reading(2.51),
+            "pjump-pressure_transducers-1-beckhoff_pressure": partial_reading(1001.1),
+            "pjump-pressure_transducers-1-slow_beckhoff_voltage_readout": partial_reading(
+                2.51
+            ),
         },
     )
     await assert_reading(
         cell.pressure_transducers[2],
         {
-            "pjump-pressure_transducers-2-omron_pressure": {
-                "value": 1002,
-            },
-            "pjump-pressure_transducers-2-omron_voltage": {
-                "value": 2.52,
-            },
-            "pjump-pressure_transducers-2-beckhoff_pressure": {
-                "value": 1002.2,
-            },
-            "pjump-pressure_transducers-2-slow_beckhoff_voltage_readout": {
-                "value": 2.52,
-            },
+            "pjump-pressure_transducers-2-omron_pressure": partial_reading(1002),
+            "pjump-pressure_transducers-2-omron_voltage": partial_reading(2.52),
+            "pjump-pressure_transducers-2-beckhoff_pressure": partial_reading(1002.2),
+            "pjump-pressure_transducers-2-slow_beckhoff_voltage_readout": partial_reading(
+                2.52
+            ),
         },
     )
     await assert_reading(
         cell.pressure_transducers[3],
         {
-            "pjump-pressure_transducers-3-omron_pressure": {
-                "value": 1003,
-            },
-            "pjump-pressure_transducers-3-omron_voltage": {
-                "value": 2.53,
-            },
-            "pjump-pressure_transducers-3-beckhoff_pressure": {
-                "value": 1003.3,
-            },
-            "pjump-pressure_transducers-3-slow_beckhoff_voltage_readout": {
-                "value": 2.53,
-            },
+            "pjump-pressure_transducers-3-omron_pressure": partial_reading(1003),
+            "pjump-pressure_transducers-3-omron_voltage": partial_reading(2.53),
+            "pjump-pressure_transducers-3-beckhoff_pressure": partial_reading(1003.3),
+            "pjump-pressure_transducers-3-slow_beckhoff_voltage_readout": partial_reading(
+                2.53
+            ),
         },
     )
 
@@ -356,9 +317,7 @@ async def test_reading_pjumpcell_includes_read_fields(
     await assert_reading(
         cell.cell_temperature,
         {
-            "pjump-cell_temperature": {
-                "value": 12.3,
-            },
+            "pjump-cell_temperature": partial_reading(12.3),
         },
     )
 
@@ -411,63 +370,47 @@ async def test_setting_all_pressure_cell_valves(
     await assert_reading(
         cell.all_valves_control.valve_control[1],
         {
-            "pjump-all_valves_control-valve_control-1-open": {
-                "value": int(ValveOpenSeqRequest.INACTIVE.value),
-                "timestamp": ANY,
-                "alarm_severity": 0,
-            },
-            "pjump-all_valves_control-valve_control-1-control": {
-                "value": ValveControlRequest.CLOSE,
-                "timestamp": ANY,
-                "alarm_severity": 0,
-            },
+            "pjump-all_valves_control-valve_control-1-open": partial_reading(
+                int(ValveOpenSeqRequest.INACTIVE.value)
+            ),
+            "pjump-all_valves_control-valve_control-1-control": partial_reading(
+                ValveControlRequest.CLOSE,
+            ),
         },
     )
 
     await assert_reading(
         cell.all_valves_control.valve_control[3],
         {
-            "pjump-all_valves_control-valve_control-3-open": {
-                "value": int(ValveOpenSeqRequest.INACTIVE.value),
-                "timestamp": ANY,
-                "alarm_severity": 0,
-            },
-            "pjump-all_valves_control-valve_control-3-control": {
-                "value": ValveControlRequest.CLOSE,
-                "timestamp": ANY,
-                "alarm_severity": 0,
-            },
+            "pjump-all_valves_control-valve_control-3-open": partial_reading(
+                int(ValveOpenSeqRequest.INACTIVE.value)
+            ),
+            "pjump-all_valves_control-valve_control-3-control": partial_reading(
+                ValveControlRequest.CLOSE
+            ),
         },
     )
 
     await assert_reading(
         cell.all_valves_control.valve_control[5],
         {
-            "pjump-all_valves_control-valve_control-5-open": {
-                "value": int(ValveOpenSeqRequest.INACTIVE.value),
-                "timestamp": ANY,
-                "alarm_severity": 0,
-            },
-            "pjump-all_valves_control-valve_control-5-control": {
-                "value": FastValveControlRequest.CLOSE,
-                "timestamp": ANY,
-                "alarm_severity": 0,
-            },
+            "pjump-all_valves_control-valve_control-5-open": partial_reading(
+                int(ValveOpenSeqRequest.INACTIVE.value),
+            ),
+            "pjump-all_valves_control-valve_control-5-control": partial_reading(
+                FastValveControlRequest.CLOSE,
+            ),
         },
     )
 
     await assert_reading(
         cell.all_valves_control.valve_control[6],
         {
-            "pjump-all_valves_control-valve_control-6-open": {
-                "value": int(ValveOpenSeqRequest.INACTIVE.value),
-                "timestamp": ANY,
-                "alarm_severity": 0,
-            },
-            "pjump-all_valves_control-valve_control-6-control": {
-                "value": FastValveControlRequest.CLOSE,
-                "timestamp": ANY,
-                "alarm_severity": 0,
-            },
+            "pjump-all_valves_control-valve_control-6-open": partial_reading(
+                int(ValveOpenSeqRequest.INACTIVE.value),
+            ),
+            "pjump-all_valves_control-valve_control-6-control": partial_reading(
+                FastValveControlRequest.CLOSE,
+            ),
         },
     )

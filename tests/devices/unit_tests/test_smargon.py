@@ -1,3 +1,4 @@
+from collections.abc import AsyncGenerator
 from unittest.mock import MagicMock, call
 
 import pytest
@@ -7,20 +8,15 @@ from ophyd_async.core import init_devices, observe_value
 from ophyd_async.testing import get_mock_put, set_mock_value
 
 from dodal.devices.smargon import CombinedMove, DeferMoves, Smargon, StubPosition
-from dodal.devices.util.test_utils import patch_motor
+from dodal.devices.util.test_utils import patch_all_motors
 
 
 @pytest.fixture
-async def smargon() -> Smargon:
+async def smargon() -> AsyncGenerator[Smargon]:
     async with init_devices(mock=True):
         smargon = Smargon(name="smargon")
-    patch_motor(smargon.x)
-    patch_motor(smargon.y)
-    patch_motor(smargon.z)
-    patch_motor(smargon.omega)
-    patch_motor(smargon.phi)
-    patch_motor(smargon.chi)
-    return smargon
+    with patch_all_motors(smargon):
+        yield smargon
 
 
 def set_smargon_pos(smargon: Smargon, pos: tuple[float, float, float]):

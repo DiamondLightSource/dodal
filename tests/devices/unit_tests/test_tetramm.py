@@ -176,7 +176,7 @@ async def test_prepare_with_too_low_a_deadtime_raises_error(
 ):
     with pytest.raises(
         ValueError,
-        match=r"Detector .* needs at least 2e-05s deadtime, but trigger logic "
+        match=r"Tetramm .* needs at least 2e-05s deadtime, but trigger logic "
         "provides only 1e-05s",
     ):
         await tetramm.prepare(
