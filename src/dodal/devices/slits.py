@@ -37,3 +37,21 @@ class Slits(MinimalSlits):
             self.x_centre = Motor(prefix + x_centre)
             self.y_centre = Motor(prefix + y_centre)
         super().__init__(prefix=prefix, x_gap=x_gap, y_gap=y_gap, name=name)
+
+
+class SlitsY(StandardReadable):
+    """
+    Representation of a 2-blade slits.
+    """
+
+    def __init__(
+        self,
+        prefix: str,
+        y_gap: str = "Y:SIZE",
+        y_centre: str = "Y:CENTRE",
+        name: str = "",
+    ) -> None:
+        with self.add_children_as_readables():
+            self.y_gap = Motor(prefix + y_gap)
+            self.y_centre = Motor(prefix + y_centre)
+        super().__init__(name=name)
