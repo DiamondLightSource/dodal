@@ -3,6 +3,9 @@ from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
 
 class CryoStream(StandardReadable):
+    MAX_TEMP_K = 110
+    MAX_PRESSURE_BAR = 0.1
+
     def __init__(self, prefix: str, name: str = ""):
         self.course = epics_signal_rw(InOut, f"{prefix}-EA-CJET-01:COARSE:CTRL")
         self.fine = epics_signal_rw(InOut, f"{prefix}-EA-CJET-01:FINE:CTRL")
