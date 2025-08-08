@@ -18,9 +18,6 @@ class BeamstopPositions(StrictEnum):
     robot load however all 3 resolution positions are the same. We also
     do not use the robot load position in Hyperion.
 
-    Until we support moving the beamstop it is only necessary to check whether the
-    beamstop is in beam or not.
-
     See Also:
         https://github.com/DiamondLightSource/mx-bluesky/issues/484
 
@@ -86,11 +83,13 @@ class Beamstop(StandardReadable):
             return BeamstopPositions.UNKNOWN
 
     async def _set_selected_position(self, position: BeamstopPositions) -> None:
-        if position == BeamstopPositions.DATA_COLLECTION:
-            await asyncio.gather(
-                self.x_mm.set(self._in_beam_xyz_mm[0]),
-                self.y_mm.set(self._in_beam_xyz_mm[1]),
-                self.z_mm.set(self._in_beam_xyz_mm[2]),
-            )
-        elif position == BeamstopPositions.UNKNOWN:
-            raise ValueError(f"Cannot set beamstop to position {position}")
+        match position:
+            case BeamstopPositions.DATA_COLLECTION:
+                # Move z first as it could be under the table
+                await self.z_mm.set(self._in_beam_xyz_mm[2])
+                await asyncio.gather(
+                    self.x_mm.set(self._in_beam_xyz_mm[0]),
+                    self.y_mm.set(self._in_beam_xyz_mm[1]),
+                )
+            case _:
+                raise ValueError(f"Cannot set beamstop to position {position}")
