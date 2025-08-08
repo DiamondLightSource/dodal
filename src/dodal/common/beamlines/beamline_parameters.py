@@ -61,7 +61,9 @@ class GDABeamlineParameters:
         return ast.literal_eval(value.replace("Yes", "True").replace("No", "False"))
 
 
-def get_beamline_parameters(beamline_param_path: str | None = None):
+def get_beamline_parameters(
+    beamline_param_path: str | None = None,
+) -> GDABeamlineParameters:
     """Loads the beamline parameters from the specified path, or according to the
     environment variable if none is given"""
     if not beamline_param_path:

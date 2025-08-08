@@ -120,6 +120,7 @@ markers = [
 addopts = """
     --cov=src/dodal --cov=dodal --cov-report term
     --tb=native -vv --doctest-modules --doctest-glob="*.rst"
+    --random-order
     """
 # https://iscinumpy.gitlab.io/post/bound-version-constraints/#watch-for-warnings
 filterwarnings = [
