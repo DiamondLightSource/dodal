@@ -32,7 +32,7 @@ async def sim_driver(
     energy_sources: dict[str, SignalR[float]],
     RE: RunEngine,
 ) -> AbstractAnalyserDriverIO:
-    async with init_devices(mock=True, connect=True):
+    async with init_devices(mock=True):
         sim_driver = await create_driver(
             request.param, prefix="TEST:", energy_sources=energy_sources
         )

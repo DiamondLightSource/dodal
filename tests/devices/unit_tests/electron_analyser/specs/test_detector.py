@@ -13,7 +13,7 @@ async def sim_detector(
     energy_sources: dict[str, SignalR[float]],
     RE: RunEngine,
 ) -> SpecsDetector[LensMode, PsuMode]:
-    async with init_devices(mock=True, connect=True):
+    async with init_devices(mock=True):
         sim_driver = await create_detector(
             SpecsDetector[LensMode, PsuMode],
             prefix="TEST:",
