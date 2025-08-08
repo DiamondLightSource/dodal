@@ -34,11 +34,6 @@ class TriggerMode(StrictEnum):
     LVDS_BOTH = "LVDS Both"
 
 
-class UpdateRBV(StrictEnum):
-    DISABLED = "Disabled"
-    ENABLED = "Enabled"
-
-
 class AcquireRBVState(StrictEnum):
     DONE = "Done"
     ACQUIRE = "Acquiring"

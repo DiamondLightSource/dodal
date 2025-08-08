@@ -1,10 +1,5 @@
-from ophyd_async.core import StandardReadable, StrictEnum
+from ophyd_async.core import InOut, StandardReadable
 from ophyd_async.epics.core import epics_signal_rw
-
-
-class InOut(StrictEnum):
-    OUT = "Out"
-    IN = "In"
 
 
 class FluorescenceDetector(StandardReadable):

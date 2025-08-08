@@ -2,10 +2,10 @@ import asyncio
 from unittest.mock import ANY, AsyncMock, call, patch
 
 import pytest
-from ophyd_async.core import init_devices
+from ophyd_async.core import OnOff, init_devices
 from ophyd_async.testing import get_mock_put
 
-from dodal.devices.thawer import Thawer, ThawerStates, ThawingException, ThawingTimer
+from dodal.devices.thawer import Thawer, ThawingException, ThawingTimer
 
 
 @pytest.fixture
@@ -36,13 +36,13 @@ async def test_when_thawing_triggered_then_turn_on_sleep_and_turn_off(
     triggering_status = thawer.thaw_for_time_s.set(10)
 
     await asyncio.sleep(0.01)
-    mock_thawer_control.assert_called_once_with(ThawerStates.ON, wait=ANY)
+    mock_thawer_control.assert_called_once_with(OnOff.ON, wait=ANY)
     mock_sleep.assert_called_once_with(10)
     mock_sleep.assert_awaited_once()
     mock_thawer_control.reset_mock()
     release_sleep.set()
     await asyncio.sleep(0.01)
-    mock_thawer_control.assert_called_once_with(ThawerStates.OFF, wait=ANY)
+    mock_thawer_control.assert_called_once_with(OnOff.OFF, wait=ANY)
     assert triggering_status.done
 
 
@@ -83,8 +83,8 @@ async def test_given_thawing_already_triggered_when_stop_called_then_stop_thawin
 
     mock_thawer_control.assert_has_calls(
         [
-            call(ThawerStates.ON, wait=ANY),
-            call(ThawerStates.OFF, wait=ANY),
+            call(OnOff.ON, wait=ANY),
+            call(OnOff.OFF, wait=ANY),
         ]
     )
 
@@ -95,7 +95,7 @@ async def test_calling_stop_on_thawer_stops_thawing_timer_and_turns_thawer_off(
     thawer.thaw_for_time_s.stop = AsyncMock(spec=ThawingTimer)
     await thawer.stop()
     thawer.thaw_for_time_s.stop.assert_called_once()
-    get_mock_put(thawer.control).assert_called_once_with(ThawerStates.OFF, wait=ANY)
+    get_mock_put(thawer.control).assert_called_once_with(OnOff.OFF, wait=ANY)
 
 
 @pytest.mark.skip(

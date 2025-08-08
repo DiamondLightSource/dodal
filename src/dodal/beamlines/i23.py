@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from ophyd_async.core import StrictEnum
+from ophyd_async.core import InOut, StrictEnum
 from ophyd_async.epics.adpilatus import PilatusDetector
 
 from dodal.common.beamlines.beamline_utils import (
@@ -45,8 +45,8 @@ I23_ZEBRA_MAPPING = ZebraMapping(
 
 
 class I23DetectorPositions(StrictEnum):
-    IN = "In"
-    OUT = "Out"
+    IN = InOut.IN
+    OUT = InOut.OUT
     SAMPLE_CHANGE = "sample change"
 
 

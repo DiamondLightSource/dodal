@@ -5,7 +5,8 @@ from event_model import DataKey
 from ophyd_async.core import init_devices
 from ophyd_async.testing import assert_reading, partial_reading, set_mock_value
 
-from dodal.devices.i22.fswitch import FilterState, FSwitch
+from dodal.common.enums import InOutUpper
+from dodal.devices.i22.fswitch import FSwitch
 
 
 @pytest.fixture
@@ -22,9 +23,9 @@ async def fswitch() -> FSwitch:
 
 
 async def test_reading_fswitch(fswitch: FSwitch):
-    set_mock_value(fswitch.filters[0], FilterState.OUT_BEAM)
-    set_mock_value(fswitch.filters[1], FilterState.OUT_BEAM)
-    set_mock_value(fswitch.filters[2], FilterState.OUT_BEAM)
+    set_mock_value(fswitch.filters[0], InOutUpper.OUT)
+    set_mock_value(fswitch.filters[1], InOutUpper.OUT)
+    set_mock_value(fswitch.filters[2], InOutUpper.OUT)
 
     await assert_reading(
         fswitch,
