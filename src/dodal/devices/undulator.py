@@ -23,9 +23,6 @@ class AccessError(Exception):
     pass
 
 
-# will be made more generic in https://github.com/DiamondLightSource/dodal/issues/754
-
-
 # The acceptable difference, in mm, between the undulator gap and the DCM
 # energy, when the latter is converted to mm using lookup tables
 UNDULATOR_DISCREPANCY_THRESHOLD_MM = 2e-3
@@ -133,7 +130,7 @@ class Undulator(StandardReadable, Movable[float]):
                     timeout=STATUS_TIMEOUT_S,
                 )
             else:
-                LOGGER.debug("In test mode, not moving ID gap")
+                LOGGER.warning("In test mode, not moving ID gap")
         else:
             LOGGER.debug(
                 "Gap is already in the correct place for the new energy value "
