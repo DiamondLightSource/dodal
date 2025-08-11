@@ -5,11 +5,8 @@ from dodal.devices.temperture_controller.lakeshore.lakeshore_io import (
 )
 
 
-class HEATER_SETTING(StrictEnum):
+class HeaterSetting(StrictEnum):
     OFF = "Off"
-    LOW = "Low"
-    MEDIUM = "Medium"
-    HIGH = "High"
 
 
 async def test_lakeshoreIO_creation_success():
@@ -19,7 +16,7 @@ async def test_lakeshoreIO_creation_success():
         lakeshore = LakeshoreBaseIO(
             prefix=prefix,
             num_readback_channel=no_channels,
-            heater_setting=HEATER_SETTING,
+            heater_setting=HeaterSetting,
         )
 
     control_attribute = [
@@ -55,7 +52,7 @@ async def test_lakeshoreIO_single_control_creation_success():
         lakeshore = LakeshoreBaseIO(
             prefix=prefix,
             num_readback_channel=no_channels,
-            heater_setting=HEATER_SETTING,
+            heater_setting=float,
             single_control_channel=True,
         )
 
