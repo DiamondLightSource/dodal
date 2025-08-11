@@ -55,9 +55,9 @@ class AbstractElectronAnalyserDetector(
 
     @AsyncStatus.wrap
     async def trigger(self) -> None:
+        await self.driver.image_mode.set(ADImageMode.SINGLE)
         await self.controller.arm()
         await self.controller.wait_for_idle()
-        await self.driver.image_mode.set(ADImageMode.SINGLE)
 
     @AsyncStatus.wrap
     async def stage(self) -> None:
