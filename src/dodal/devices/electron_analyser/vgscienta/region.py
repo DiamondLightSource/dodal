@@ -29,10 +29,10 @@ class VGScientaRegion(
     pass_energy: TPassEnergyEnum
     acquisition_mode: AcquisitionMode = AcquisitionMode.SWEPT
     low_energy: float = 8.0
+    centre_energy: float = Field(alias="fix_energy", default=9)
     high_energy: float = 10.0
     step_time: float = 1.0
     energy_step: float = Field(default=200.0)
-    centre_energy: float = Field(alias="fix_energy", default=9)
     # Specific to this class
     id: str = Field(default=str(uuid.uuid4()), alias="region_id")
     total_steps: float = 13.0
