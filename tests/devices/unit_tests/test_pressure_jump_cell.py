@@ -1,4 +1,5 @@
 import asyncio
+from unittest.mock import ANY
 
 import pytest
 from ophyd_async.core import init_devices
@@ -506,6 +507,15 @@ async def test_reading_pjumpcell_includes_fields_control_jump(
     )
 
 
+async def simulate_pressure_cell_control_busy_clear(cell: PressureJumpCell):
+    # The pressure cell device sets the busy status while a requested pressure
+    # change is in progress and clears the busy status when the requested
+    # pressure has been set.
+    set_mock_value(cell.control.busy, True)
+    await asyncio.sleep(0.01)
+    set_mock_value(cell.control.busy, False)
+
+
 async def test_pjumpcell_toplevel_pressure_control(
     cell: PressureJumpCell,
 ):
@@ -517,38 +527,22 @@ async def test_pjumpcell_toplevel_pressure_control(
     set_mock_value(cell.control.timeout, 1)
     set_mock_value(cell.control.result, "SP_SUCCESS")
 
-    await cell.control.set(TARGET_PRESSURE)
+    control_set = cell.control.set(TARGET_PRESSURE)
+    await simulate_pressure_cell_control_busy_clear(cell)
+    await control_set
 
     await assert_reading(
         cell.control,
         {
-            "pjump-control-busy": {
-                "value": False,
-            },
-            "pjump-control-go": {
-                "value": True,
-            },
-            "pjump-control-result": {
-                "value": "SP_SUCCESS",
-            },
-            "pjump-control-target_pressure": {
-                "value": TARGET_PRESSURE,
-            },
-            "pjump-control-timeout": {
-                "value": ANY,
-            },
-            "pjump-control-stop": {
-                "value": False,
-            },
-            "pjump-control-from_pressure": {
-                "value": ANY,
-            },
-            "pjump-control-to_pressure": {
-                "value": ANY,
-            },
-            "pjump-control-set_jump": {
-                "value": ANY,
-            },
+            "pjump-control-busy": partial_reading(False),
+            "pjump-control-go": partial_reading(True),
+            "pjump-control-result": partial_reading("SP_SUCCESS"),
+            "pjump-control-target_pressure": partial_reading(TARGET_PRESSURE),
+            "pjump-control-timeout": partial_reading(ANY),
+            "pjump-control-stop": partial_reading(False),
+            "pjump-control-from_pressure": partial_reading(ANY),
+            "pjump-control-to_pressure": partial_reading(ANY),
+            "pjump-control-set_jump": partial_reading(ANY),
         },
     )
 
@@ -564,38 +558,22 @@ async def test_pjumpcell_toplevel_pressure_jump_control(
     set_mock_value(cell.control.timeout, 1)
     set_mock_value(cell.control.result, "SP_SUCCESS")
 
-    await cell.control.set(TARGET_JUMP)
+    control_set = cell.control.set(TARGET_JUMP)
+    await simulate_pressure_cell_control_busy_clear(cell)
+    await control_set
 
     await assert_reading(
         cell.control,
         {
-            "pjump-control-busy": {
-                "value": False,
-            },
-            "pjump-control-set_jump": {
-                "value": True,
-            },
-            "pjump-control-result": {
-                "value": "SP_SUCCESS",
-            },
-            "pjump-control-timeout": {
-                "value": ANY,
-            },
-            "pjump-control-stop": {
-                "value": False,
-            },
-            "pjump-control-from_pressure": {
-                "value": TARGET_JUMP.pressure_from,
-            },
-            "pjump-control-to_pressure": {
-                "value": TARGET_JUMP.pressure_to,
-            },
-            "pjump-control-go": {
-                "value": False,
-            },
-            "pjump-control-target_pressure": {
-                "value": ANY,
-            },
+            "pjump-control-busy": partial_reading(False),
+            "pjump-control-set_jump": partial_reading(True),
+            "pjump-control-result": partial_reading("SP_SUCCESS"),
+            "pjump-control-timeout": partial_reading(ANY),
+            "pjump-control-stop": partial_reading(False),
+            "pjump-control-from_pressure": partial_reading(TARGET_JUMP.pressure_from),
+            "pjump-control-to_pressure": partial_reading(TARGET_JUMP.pressure_to),
+            "pjump-control-go": partial_reading(False),
+            "pjump-control-target_pressure": partial_reading(ANY),
         },
     )
 
