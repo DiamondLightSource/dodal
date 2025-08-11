@@ -8,6 +8,22 @@ dodal.devices.pressure\_jump\_cell.PressureJumpCellController
 
    
    
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
    
 
    
@@ -17,7 +33,8 @@ dodal.devices.pressure\_jump\_cell.PressureJumpCellController
    .. autosummary::
    
       
-      ~PressureJumpCellController.name
+      
+      
       
    
    
