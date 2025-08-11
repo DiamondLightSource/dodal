@@ -9,7 +9,6 @@ from ophyd_async.core import (
     SignalR,
     StandardReadableFormat,
 )
-from ophyd_async.epics.adcore import ADImageMode
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
 from dodal.devices.electron_analyser.abstract.base_driver_io import (
@@ -73,6 +72,7 @@ class VGScientaAnalyserDriverIO(
 
     @AsyncStatus.wrap
     async def set(self, region: VGScientaRegion[TLensMode, TPassEnergyEnum]):
+        await super().set(region)
         source = self._get_energy_source(region.excitation_energy_source)
         excitation_energy = await source.get_value()  # eV
         # Copy region so doesn't alter the actual region and switch to kinetic energy
@@ -92,7 +92,6 @@ class VGScientaAnalyserDriverIO(
             self.excitation_energy.set(excitation_energy),
             self.excitation_energy_source.set(source.name),
             self.energy_step.set(ke_region.energy_step),
-            self.image_mode.set(ADImageMode.SINGLE),
             self.detector_mode.set(ke_region.detector_mode),
             self.region_min_x.set(ke_region.min_x),
             self.region_size_x.set(ke_region.size_x),

@@ -13,7 +13,7 @@ from ophyd_async.core import (
     derived_signal_r,
     soft_signal_rw,
 )
-from ophyd_async.epics.adcore import ADBaseIO
+from ophyd_async.epics.adcore import ADBaseIO, ADImageMode
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
 from dodal.devices.electron_analyser.abstract.base_region import (
@@ -138,6 +138,8 @@ class AbstractAnalyserDriverIO(
         Args:
             region: Contains the parameters to setup the driver for a scan.
         """
+        # Set image_mode to SINGLE by default for all analysers
+        await self.image_mode.set(ADImageMode.SINGLE)
 
     def _get_energy_source(self, alias_name: str) -> SignalR[float]:
         energy_source = self.energy_sources.get(alias_name)
