@@ -204,6 +204,7 @@ class PressureJumpCellController(StandardReadable):
     """
     Top-level control for a fixed pressure or pressure jumps.
     """
+
     def __init__(self, prefix: str, name: str = "") -> None:
         with self.add_children_as_readables():
             self.stop = epics_signal_rw(StopState, f"{prefix}STOP")
