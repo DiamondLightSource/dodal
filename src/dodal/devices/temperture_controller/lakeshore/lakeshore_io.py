@@ -3,6 +3,13 @@ from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
 
 class LakeshoreControlChannel(Device):
+    """
+    Single control channel for a Lakeshore temperature controller.
+
+    Provides access to setpoint, ramp rate, ramp enable, heater output, heater output range,
+    PID parameters (P, I, D), and manual output for the channel.
+    """
+
     def __init__(
         self,
         prefix: str,
@@ -10,13 +17,6 @@ class LakeshoreControlChannel(Device):
         heater_type: type[SignalDatatypeT],
         name: str = "",
     ):
-        """
-        Single control channel for a Lakeshore temperature controller.
-
-        Provides access to setpoint, ramp rate, ramp enable, heater output, heater output range,
-        PID parameters (P, I, D), and manual output for the channel.
-        """
-
         def channel_rw(channel_type, pv_name):
             return epics_signal_rw(
                 channel_type,
@@ -38,6 +38,15 @@ class LakeshoreControlChannel(Device):
 
 
 class LakeshoreBaseIO(Device):
+    """Base class for Lakeshore temperature controller IO.
+
+    Provides access to control channels and readback channels for setpoint, ramp rate, heater output,
+    and PID parameters. Supports both single and multiple control channel configurations.
+    Note:
+        Almost all model has a controller for each readback channel but some model
+            only has a single controller for multiple readback channels.
+    """
+
     def __init__(
         self,
         prefix: str,
@@ -46,14 +55,6 @@ class LakeshoreBaseIO(Device):
         name: str = "",
         single_control_channel: bool = False,
     ):
-        """Base class for Lakeshore temperature controller IO.
-
-        Provides access to control channels and readback channels for setpoint, ramp rate, heater output,
-        and PID parameters. Supports both single and multiple control channel configurations.
-        Note:
-            Almost all model has a controller for each readback channel but some model
-             only has a single controller for multiple readback channels.
-        """
         if single_control_channel:
             self.control_channels = DeviceVector(
                 {
