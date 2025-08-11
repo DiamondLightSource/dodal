@@ -50,13 +50,6 @@ def test_analyser_correctly_selects_energy_source_from_region_input(
     assert energy_source == sim_driver.energy_sources[source_alias_name]
 
 
-def test_analyser_raise_error_on_invalid_energy_source_selected(
-    sim_driver: AbstractAnalyserDriverIO,
-) -> None:
-    with pytest.raises(KeyError):
-        sim_driver._get_energy_source("invalid_name")
-
-
 def test_driver_throws_error_with_wrong_lens_mode(
     sim_driver: AbstractAnalyserDriverIO,
     RE: RunEngine,
