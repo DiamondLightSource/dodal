@@ -253,7 +253,8 @@ class PressureJumpCellController(StandardReadable, Movable):
         else:
             raise TypeError(f"Unsupported value type of {type(value)} provided.")
 
-        await wait_for_value(self.busy, False, timeout)
+        await wait_for_value(self.busy, True, timeout)  # Change started
+        await wait_for_value(self.busy, False, timeout) # Change complete
 
 
 class PressureJumpCell(StandardReadable):
