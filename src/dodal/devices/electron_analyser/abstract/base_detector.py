@@ -12,6 +12,7 @@ from ophyd_async.core import (
 )
 from ophyd_async.epics.adcore import (
     ADBaseController,
+    ADImageMode,
 )
 
 from dodal.devices.electron_analyser.abstract.base_driver_io import (
@@ -56,6 +57,7 @@ class AbstractElectronAnalyserDetector(
     async def trigger(self) -> None:
         await self.controller.arm()
         await self.controller.wait_for_idle()
+        await self.driver.image_mode.set(ADImageMode.SINGLE)
 
     @AsyncStatus.wrap
     async def stage(self) -> None:
