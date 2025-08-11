@@ -128,7 +128,7 @@ async def test_when_gap_access_is_not_checked_if_commissioning_mode_enabled(
     ) == 0.0
 
     mock_logger.info.assert_called()
-    mock_logger.debug.assert_called_once()
+    mock_logger.warning.assert_called_once()
 
 
 @patch("dodal.devices.util.lookup_tables.loadtxt")
