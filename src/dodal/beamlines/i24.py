@@ -1,3 +1,8 @@
+from pathlib import PurePath
+
+from ophyd_async.core import AutoIncrementFilenameProvider, YMDPathProvider
+from ophyd_async.fastcs.jungfrau import Jungfrau
+
 from dodal.common.beamlines.beamline_utils import (
     BL,
     device_factory,
@@ -213,4 +218,21 @@ def pilatus_metadata() -> PilatusMetadata:
     return PilatusMetadata(
         f"{PREFIX.beamline_prefix}-EA-PILAT-01:",
         "pilatus_meta",
+    )
+
+
+@device_factory()
+def jungfrau(path_to_dir: str = "/tmp/jf", filename: str = "jf_file") -> Jungfrau:
+    """Get the Jungfrau 9M device, instantiate it if it hasn't already been.
+    If this is called when already instantiated, it will return the existing object."""
+    file_provider = AutoIncrementFilenameProvider(filename)
+
+    # TODO find the prefixes + odin nodes
+    return Jungfrau(
+        "prefix",
+        YMDPathProvider(file_provider, PurePath(path_to_dir)),
+        "drv_suffix",
+        "hdf_suffix",
+        odin_nodes=4,
+        name="jungfrau",
     )
