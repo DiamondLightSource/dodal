@@ -55,23 +55,19 @@ class LakeshoreBaseIO(Device):
         name: str = "",
         single_control_channel: bool = False,
     ):
-        if single_control_channel:
-            self.control_channels = DeviceVector(
-                {
-                    1: LakeshoreControlChannel(
-                        prefix=prefix, suffix="", heater_type=heater_setting
-                    )
-                }
-            )
-        else:
-            self.control_channels = DeviceVector(
-                {
-                    i: LakeshoreControlChannel(
-                        prefix=prefix, suffix=str(i), heater_type=heater_setting
-                    )
-                    for i in range(1, num_readback_channel + 1)
-                }
-            )
+        suffixes = (
+            [""]
+            if single_control_channel
+            else map(str, range(1, num_readback_channel + 1))
+        )
+        self.control_channels = DeviceVector(
+            {
+                i: LakeshoreControlChannel(
+                    prefix=prefix, suffix=suffix, heater_type=heater_setting
+                )
+                for i, suffix in enumerate(suffixes, start=1)
+            }
+        )
 
         self.readback = DeviceVector(
             {
