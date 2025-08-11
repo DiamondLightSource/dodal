@@ -6,16 +6,14 @@ from ophyd_async.core import init_devices
 
 from dodal.beamlines import aithre
 from dodal.devices.aithre_lasershaping.goniometer import Goniometer
-from dodal.devices.util.test_utils import patch_motor
+from dodal.devices.util.test_utils import patch_all_motors
 
 
 @pytest.fixture
 def goniometer(RE: RunEngine) -> Goniometer:
     with init_devices(mock=True):
         gonio = aithre.goniometer(connect_immediately=True, mock=True)
-    patch_motor(gonio.omega)
-    patch_motor(gonio.sampy)
-    patch_motor(gonio.sampz)
+    patch_all_motors(gonio)
     return gonio
 
 
