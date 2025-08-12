@@ -1,6 +1,7 @@
 import asyncio
 import contextlib
 
+import pytest
 from ophyd_async.core import (
     AsyncStatus,
     WatchableAsyncStatus,
@@ -50,3 +51,13 @@ async def test_log_on_percentage_complete(caplog, RE):
     finally:
         test_watchable.complete_event.set()
         assert sum(s.startswith(message_prefix) for s in caplog.messages) == 5
+
+
+async def test_log_on_percentage_complete_valuerror_on_bad_input():
+    test_watchable = MockWatchable()
+    status = test_watchable.get_watchable_status()
+    with pytest.raises(
+        ValueError,
+        match="Percent interval on class _LogOnPercentageProgressWatcher must be a positive number, but recieved 0",
+    ):
+        log_on_percentage_complete(status, "", 0)

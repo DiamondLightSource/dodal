@@ -10,12 +10,16 @@ class _LogOnPercentageProgressWatcher(Watcher[Number]):
         self,
         status: WatchableAsyncStatus[Number],
         message_prefix: str,
-        percent_interval: int = 25,
+        percent_interval: Number = 25,
     ):
         status.watch(self)
         self.percent_interval = percent_interval
         self._current_percent_interval = 0
         self.message_prefix = message_prefix
+        if self.percent_interval <= 0:
+            raise ValueError(
+                f"Percent interval on class _LogOnPercentageProgressWatcher must be a positive number, but recieved {self.percent_interval}"
+            )
 
     def __call__(
         self,
