@@ -592,3 +592,19 @@ async def test_pjumpcell_toplevel_pressure_control_waits_on_busy(
     with pytest.raises(TimeoutError):
         async with asyncio.timeout(0.05):
             await cell.control.set(TARGET_JUMP)
+
+
+async def test_pjumpcell_toplevel_pressure_control_error_on_unsupported_type(
+    cell: PressureJumpCell,
+):
+    UNSUPPORTED_INPUT = "100"
+
+    set_mock_value(cell.control.go, False)
+    set_mock_value(cell.control.stop, False)
+    set_mock_value(cell.control.busy, True)
+    set_mock_value(cell.control.target_pressure, 0)
+    set_mock_value(cell.control.timeout, 1)
+    set_mock_value(cell.control.result, "SP_SUCCESS")
+
+    with pytest.raises(TypeError):
+        await cell.control.set(UNSUPPORTED_INPUT)  # type: ignore
