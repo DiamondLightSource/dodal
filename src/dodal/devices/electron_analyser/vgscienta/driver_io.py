@@ -58,11 +58,11 @@ class VGScientaAnalyserDriverIO(
 
             self.region_min_x = epics_signal_rw(int, prefix + "MinX")
             self.region_size_x = epics_signal_rw(int, prefix + "SizeX")
-            self.sensor_max_size_x = epics_signal_rw(int, prefix + "MaxSizeX")
+            self.sensor_max_size_x = epics_signal_r(int, prefix + "MaxSizeX_RBV")
 
             self.region_min_y = epics_signal_rw(int, prefix + "MinY")
             self.region_size_y = epics_signal_rw(int, prefix + "SizeY")
-            self.sensor_max_size_y = epics_signal_rw(int, prefix + "MaxSizeY")
+            self.sensor_max_size_y = epics_signal_r(int, prefix + "MaxSizeY_RBV")
 
         super().__init__(
             prefix,

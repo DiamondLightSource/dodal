@@ -8,6 +8,7 @@ from dodal.devices.electron_analyser import (
     DualEnergySource,
     ElectronAnalyserDetector,
     SingleEnergySource,
+    SelectedSource,
 )
 from dodal.devices.electron_analyser.abstract import (
     AbstractAnalyserDriverIO,
