@@ -1,5 +1,4 @@
 import asyncio
-from collections.abc import Mapping
 from typing import Generic
 
 import numpy as np
@@ -16,7 +15,11 @@ from dodal.devices.electron_analyser.abstract.base_driver_io import (
     AbstractAnalyserDriverIO,
 )
 from dodal.devices.electron_analyser.abstract.types import TLensMode, TPsuMode
-from dodal.devices.electron_analyser.enums import EnergyMode, SelectedSource
+from dodal.devices.electron_analyser.energy_sources import (
+    DualEnergySource,
+    SingleEnergySource,
+)
+from dodal.devices.electron_analyser.enums import EnergyMode
 from dodal.devices.electron_analyser.specs.enums import AcquisitionMode
 from dodal.devices.electron_analyser.specs.region import SpecsRegion
 
@@ -36,7 +39,7 @@ class SpecsAnalyserDriverIO(
         prefix: str,
         lens_mode_type: type[TLensMode],
         psu_mode_type: type[TPsuMode],
-        energy_sources: Mapping[SelectedSource, SignalR[float]],
+        energy_source: SingleEnergySource | DualEnergySource,
         name: str = "",
     ) -> None:
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
@@ -58,18 +61,16 @@ class SpecsAnalyserDriverIO(
             lens_mode_type=lens_mode_type,
             psu_mode_type=psu_mode_type,
             pass_energy_type=float,
-            energy_sources=energy_sources,
+            energy_source=energy_source,
             name=name,
         )
 
     @AsyncStatus.wrap
     async def set(self, region: SpecsRegion[TLensMode, TPsuMode]):
-        source = self._get_energy_source(region.excitation_energy_source)
-        excitation_energy = await source.get_value()  # eV
+        excitation_energy = await self.get_energy_from_source(region)
         # Copy region so doesn't alter the actual region and switch to kinetic energy
         ke_region = region.model_copy()
         ke_region.switch_energy_mode(EnergyMode.KINETIC, excitation_energy)
-
         await asyncio.gather(
             self.region_name.set(ke_region.name),
             self.energy_mode.set(ke_region.energy_mode),
@@ -80,8 +81,6 @@ class SpecsAnalyserDriverIO(
             self.pass_energy.set(ke_region.pass_energy),
             self.iterations.set(ke_region.iterations),
             self.acquisition_mode.set(ke_region.acquisition_mode),
-            self.excitation_energy.set(excitation_energy),
-            self.excitation_energy_source.set(source.name),
             self.snapshot_values.set(ke_region.values),
             self.psu_mode.set(ke_region.psu_mode),
         )

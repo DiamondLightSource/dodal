@@ -63,13 +63,6 @@ async def dual_energy_source(
 
 
 @pytest.fixture
-async def energy_sources(
-    dcm_energy: SignalR[float], pgm_energy: SignalR[float]
-) -> dict[str, SignalR[float]]:
-    return {"source1": dcm_energy, "source2": pgm_energy}
-
-
-@pytest.fixture
 def sequence_class(
     sim_driver: AbstractAnalyserDriverIO,
 ) -> type[AbstractBaseSequence]:
