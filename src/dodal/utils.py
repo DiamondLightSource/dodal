@@ -110,7 +110,7 @@ def skip_device(precondition=lambda: True):
 class DeviceInitializationController(Generic[T]):
     def __init__(
         self,
-        factory: Callable[[], T],
+        factory: Callable[..., T],
         use_factory_name: bool,
         timeout: float,
         mock: bool,
@@ -237,6 +237,93 @@ def make_device(
     return device_collector
 
 
+from dataclasses import field
+from pathlib import PurePath
+from typing import Annotated
+
+from bluesky.run_engine import RunEngine
+from ophyd_async.core import (
+    DEFAULT_TIMEOUT,
+    NotConnected,
+    PathProvider,
+    StaticPathProvider,
+    UUIDFilenameProvider,
+)
+from ophyd_async.plan_stubs import ensure_connected
+
+
+@dataclass(frozen=True)
+class DeviceContext:
+    run_engine: RunEngine = field(default_factory=RunEngine)
+    path_provider: PathProvider = field(
+        default_factory=lambda: StaticPathProvider(
+            filename_provider=UUIDFilenameProvider(),
+            directory_path=PurePath("/tmp"),
+        )
+    )
+    mock: bool = False
+
+
+class DeviceManager:
+    def __init__(self) -> None:
+        self._factories: dict[str, DeviceInitializationController] = {}
+
+    def build_and_connect_all(
+        self, context: DeviceContext | None = None
+    ) -> tuple[dict[str, AnyDevice], dict[str, Exception]]:
+        context = context or DeviceContext()
+
+        unconnected_devices, instantiation_errors = invoke_factories(
+            self._factories,
+            context=context,
+        )
+        exceptions = {}
+
+        # Connect ophyd-async devices
+        try:
+            context.run_engine(
+                ensure_connected(*unconnected_devices.values(), mock=context.mock)
+            )
+        except NotConnected as ex:
+            exceptions = {**exceptions, **ex.sub_errors}
+
+        # Only return the subset of devices that haven't raised an exception
+        successful_devices = {
+            name: device
+            for name, device in unconnected_devices.items()
+            if name not in exceptions
+        }
+        return successful_devices, {**exceptions, **instantiation_errors}
+
+    def factory(
+        self,
+        *,
+        use_factory_name: Annotated[bool, "Use factory name as name of device"] = True,
+        timeout: Annotated[
+            float, "Timeout for connecting to the device"
+        ] = DEFAULT_TIMEOUT,
+        mock: Annotated[bool, "Use Signals with mock backends for device"] = False,
+        skip: Annotated[
+            SkipType,
+            "mark the factory to be (conditionally) skipped when beamline is imported by external program",
+        ] = False,
+    ) -> Callable[[Callable[[DeviceContext], T]], DeviceInitializationController[T]]:
+        def decorator(
+            factory: Callable[[DeviceContext], T],
+        ) -> DeviceInitializationController[T]:
+            controller = DeviceInitializationController(
+                factory,
+                use_factory_name,
+                timeout,
+                mock,
+                skip,
+            )
+            self._factories[factory.__name__] = controller
+            return controller
+
+        return decorator
+
+
 def make_all_devices(
     module: str | ModuleType | None = None, include_skipped: bool = False, **kwargs
 ) -> tuple[dict[str, AnyDevice], dict[str, Exception]]:
@@ -327,6 +414,7 @@ def invoke_factories(
                 devices[dependent_name] = factory(
                     mock=mock,
                     connect_immediately=connect_immediately,
+                    **kwargs,
                 )
             else:
                 devices[dependent_name] = factory(**params, **kwargs)
