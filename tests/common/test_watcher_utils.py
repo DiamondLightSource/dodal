@@ -12,7 +12,7 @@ from ophyd_async.core import (
 from dodal.common.watcher_utils import log_on_percentage_complete
 
 
-class TestWatchable:
+class MockWatchable:
     def __init__(self):
         self.initial = 0
         self.final = 100
@@ -35,7 +35,7 @@ class TestWatchable:
 
 
 async def test_log_on_percentage_complete(caplog, RE):
-    test_watchable = TestWatchable()
+    test_watchable = MockWatchable()
     status = test_watchable.get_watchable_status()
     interval = 20
     message_prefix = "Test status"
