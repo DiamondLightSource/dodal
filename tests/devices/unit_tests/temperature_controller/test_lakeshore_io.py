@@ -9,7 +9,7 @@ class HeaterSetting(StrictEnum):
     OFF = "Off"
 
 
-async def test_lakeshoreIO_creation_success():
+async def test_lakeshore_io_creation_success():
     no_channels = 4
     prefix = "888"
     async with init_devices(mock=True):

@@ -17,6 +17,19 @@ class LakeshoreControlChannel(Device):
         heater_type: type[SignalDatatypeT],
         name: str = "",
     ):
+        """Initialize the LakeshoreControlChannel device.
+        Parameters
+        ----------
+            prefix: str
+                The EPICS prefix for the Lakeshore device.
+            suffix: str
+                Suffix for the channel, used to differentiate multiple channels.
+            heater_type: SignalDatatypeT
+                Type of the heater output range.
+            name: str
+                Optional name for the device.
+        """
+
         def channel_rw(channel_type, pv_name):
             return epics_signal_rw(
                 channel_type,
@@ -29,10 +42,10 @@ class LakeshoreControlChannel(Device):
         self.ramp_enable = channel_rw(channel_type=int, pv_name="RAMPST")
         self.heater_output = channel_rw(channel_type=float, pv_name="HTR")
         self.heater_output_range = channel_rw(channel_type=heater_type, pv_name="RANGE")
-        self.p = channel_rw(float, "P")
-        self.i = channel_rw(float, "I")
-        self.d = channel_rw(float, "D")
-        self.manual_output = channel_rw(float, "MOUT")
+        self.p = channel_rw(channel_type=float, pv_name="P")
+        self.i = channel_rw(channel_type=float, pv_name="I")
+        self.d = channel_rw(channel_type=float, pv_name="D")
+        self.manual_output = channel_rw(channel_type=float, pv_name="MOUT")
 
         super().__init__(name=name)
 
@@ -55,6 +68,22 @@ class LakeshoreBaseIO(Device):
         name: str = "",
         single_control_channel: bool = False,
     ):
+        """Initialize the LakeshoreBaseIO device.
+
+        Parameters
+        -----------
+            prefix: str
+                The EPICS prefix for the Lakeshore device.
+            num_readback_channel: int
+                Number of readback channels to create.
+            heater_setting: SignalDatatypeT
+                Type of the heater setting.
+            name: str
+                Optional name for the device.
+            single_control_channel: bool
+                If True, use a single control channel for all readback.
+        """
+
         suffixes = (
             [""]
             if single_control_channel
