@@ -1,5 +1,5 @@
 import asyncio
-from unittest.mock import ANY
+from unittest.mock import ANY, MagicMock, patch
 
 import pytest
 from ophyd_async.core import init_devices
@@ -507,18 +507,14 @@ async def test_reading_pjumpcell_includes_fields_control_jump(
     )
 
 
-async def simulate_pressure_cell_control_busy_clear(cell: PressureJumpCell):
-    # The pressure cell device sets the busy status while a requested pressure
-    # change is in progress and clears the busy status when the requested
-    # pressure has been set.
-    set_mock_value(cell.control.busy, True)
-    await asyncio.sleep(0.01)
-    set_mock_value(cell.control.busy, False)
-
-
+@patch("dodal.devices.pressure_jump_cell.wait_for_value")
 async def test_pjumpcell_toplevel_pressure_control(
+    mock_wait_for_device: MagicMock,
     cell: PressureJumpCell,
 ):
+    # Override device wait to complete successfully
+    mock_wait_for_device.side_effect = [None, None]
+
     TARGET_PRESSURE = 250
     set_mock_value(cell.control.go, False)
     set_mock_value(cell.control.stop, False)
@@ -527,9 +523,7 @@ async def test_pjumpcell_toplevel_pressure_control(
     set_mock_value(cell.control.timeout, 1)
     set_mock_value(cell.control.result, "SP_SUCCESS")
 
-    control_set = cell.control.set(TARGET_PRESSURE)
-    await simulate_pressure_cell_control_busy_clear(cell)
-    await control_set
+    await cell.control.set(TARGET_PRESSURE)
 
     await assert_reading(
         cell.control,
@@ -547,9 +541,14 @@ async def test_pjumpcell_toplevel_pressure_control(
     )
 
 
+@patch("dodal.devices.pressure_jump_cell.wait_for_value")
 async def test_pjumpcell_toplevel_pressure_jump_control(
+    mock_wait_for_device: MagicMock,
     cell: PressureJumpCell,
 ):
+    # Override device wait to complete successfully
+    mock_wait_for_device.side_effect = [None, None]
+
     TARGET_JUMP = PressureJumpParameters(500, 1000)
     set_mock_value(cell.control.go, False)
     set_mock_value(cell.control.stop, False)
@@ -558,9 +557,7 @@ async def test_pjumpcell_toplevel_pressure_jump_control(
     set_mock_value(cell.control.timeout, 1)
     set_mock_value(cell.control.result, "SP_SUCCESS")
 
-    control_set = cell.control.set(TARGET_JUMP)
-    await simulate_pressure_cell_control_busy_clear(cell)
-    await control_set
+    await cell.control.set(TARGET_JUMP)
 
     await assert_reading(
         cell.control,
