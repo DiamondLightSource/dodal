@@ -2,11 +2,12 @@ from typing import Any
 
 import pytest
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import SignalR
-from ophyd_async.sim import SimMotor
+from ophyd_async.core import SignalR, init_devices, soft_signal_rw
 
 from dodal.devices.electron_analyser import (
+    DualEnergySource,
     ElectronAnalyserDetector,
+    SingleEnergySource,
 )
 from dodal.devices.electron_analyser.abstract import (
     AbstractAnalyserDriverIO,
@@ -28,20 +29,44 @@ from tests.devices.unit_tests.electron_analyser.helper_util import (
 
 
 @pytest.fixture
-async def pgm_energy(RE: RunEngine) -> SimMotor:
-    return SimMotor("pgm_energy")
+def pgm_energy(RE: RunEngine) -> SignalR[float]:
+    with init_devices(mock=True):
+        pgm_energy = soft_signal_rw(float, initial_value=100, units="eV")
+    return pgm_energy
 
 
 @pytest.fixture
-async def dcm_energy(RE: RunEngine) -> SimMotor:
-    return SimMotor("dcm_energy")
+def dcm_energy(RE: RunEngine) -> SignalR[float]:
+    with init_devices(mock=True):
+        dcm_energy = soft_signal_rw(float, initial_value=2200, units="eV")
+    return dcm_energy
+
+
+@pytest.fixture
+async def single_energy_source(
+    dcm_energy: SignalR[float], RE: RunEngine
+) -> SingleEnergySource:
+    async with init_devices(mock=True):
+        single_energy_source = SingleEnergySource(
+            dcm_energy,
+        )
+    return single_energy_source
+
+
+@pytest.fixture
+async def dual_energy_source(
+    dcm_energy: SignalR[float], pgm_energy: SignalR[float], RE: RunEngine
+) -> DualEnergySource:
+    async with init_devices(mock=True):
+        dual_energy_source = DualEnergySource(dcm_energy, pgm_energy)
+    return dual_energy_source
 
 
 @pytest.fixture
 async def energy_sources(
-    dcm_energy: SimMotor, pgm_energy: SimMotor
+    dcm_energy: SignalR[float], pgm_energy: SignalR[float]
 ) -> dict[str, SignalR[float]]:
-    return {"source1": dcm_energy.user_readback, "source2": pgm_energy.user_readback}
+    return {"source1": dcm_energy, "source2": pgm_energy}
 
 
 @pytest.fixture
