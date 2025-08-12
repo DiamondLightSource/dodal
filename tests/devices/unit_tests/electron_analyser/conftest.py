@@ -62,6 +62,8 @@ async def dual_energy_source(
     return dual_energy_source
 
 
+# ToDo - This will be removed once existing devices use the energy source device rather
+# than dict.
 @pytest.fixture
 async def energy_sources(
     dcm_energy: SignalR[float], pgm_energy: SignalR[float]
