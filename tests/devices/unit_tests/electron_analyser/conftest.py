@@ -8,6 +8,7 @@ from dodal.devices.electron_analyser import (
     DualEnergySource,
     ElectronAnalyserDetector,
     SingleEnergySource,
+    SelectedSource,
 )
 from dodal.devices.electron_analyser.abstract import (
     AbstractAnalyserDriverIO,
@@ -68,7 +69,10 @@ async def dual_energy_source(
 async def energy_sources(
     dcm_energy: SignalR[float], pgm_energy: SignalR[float]
 ) -> dict[str, SignalR[float]]:
-    return {"source1": dcm_energy, "source2": pgm_energy}
+    return {
+        SelectedSource.SOURCE1: dcm_energy.user_readback,
+        SelectedSource.SOURCE2: pgm_energy.user_readback,
+    }
 
 
 @pytest.fixture
