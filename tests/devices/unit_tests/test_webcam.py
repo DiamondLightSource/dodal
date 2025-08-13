@@ -4,6 +4,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 from ophyd_async.core import init_devices
 from PIL import Image
+from yarl import URL
 
 from dodal.devices.webcam import Webcam, create_placeholder_image
 
@@ -11,7 +12,7 @@ from dodal.devices.webcam import Webcam, create_placeholder_image
 @pytest.fixture
 async def webcam(RE) -> Webcam:
     async with init_devices(mock=True):
-        webcam = Webcam("", "", "")
+        webcam = Webcam(URL("http://example.com"))
     return webcam
 
 

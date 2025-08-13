@@ -1,8 +1,6 @@
-from unittest.mock import ANY
-
 import pytest
 from ophyd_async.core import init_devices
-from ophyd_async.testing import assert_reading, set_mock_value
+from ophyd_async.testing import assert_reading, partial_reading, set_mock_value
 
 from dodal.devices.watsonmarlow323_pump import (
     WatsonMarlow323Pump,
@@ -29,20 +27,10 @@ async def test_reading_pump_reads_state_speed_and_direction(
     await assert_reading(
         watsonmarlow323,
         {
-            "wm_pump-state": {
-                "value": WatsonMarlow323PumpState.STOPPED,
-                "timestamp": ANY,
-                "alarm_severity": 0,
-            },
-            "wm_pump-speed": {
-                "value": 25,
-                "timestamp": ANY,
-                "alarm_severity": 0,
-            },
-            "wm_pump-direction": {
-                "value": WatsonMarlow323PumpDirection.CLOCKWISE,
-                "timestamp": ANY,
-                "alarm_severity": 0,
-            },
+            "wm_pump-state": partial_reading(WatsonMarlow323PumpState.STOPPED),
+            "wm_pump-speed": partial_reading(25),
+            "wm_pump-direction": partial_reading(
+                WatsonMarlow323PumpDirection.CLOCKWISE
+            ),
         },
     )

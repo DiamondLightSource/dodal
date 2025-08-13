@@ -15,7 +15,7 @@ CALCULATED_VALUE = [True, False, True] * 6  # Some "random" values
 async def fake_attenuator():
     async with init_devices(mock=True):
         fake_attenuator: BinaryFilterAttenuator = BinaryFilterAttenuator(
-            "", "attenuator"
+            prefix="", num_filters=16
         )
 
     return fake_attenuator
@@ -43,19 +43,25 @@ async def test_given_attenuator_sets_filters_to_expected_value_then_set_returns(
 
     callback_on_mock_put(fake_attenuator._change, mock_apply_values)
 
-    await asyncio.wait_for(fake_attenuator.set(0.65), timeout=0.1)
+    await fake_attenuator.set(0.65)
 
 
-async def test_given_attenuator_fails_to_set_filters_then_set_timeout(
+async def test_attenuator_set_only_complete_once_all_filters_in_position(
     fake_attenuator: BinaryFilterAttenuator,
 ):
-    def mock_apply_values(*args, **kwargs):
+    fake_set_complete = asyncio.Event()
+
+    async def mock_apply_values(*args, **kwargs):
         for i in range(16):
             set_mock_value(
                 fake_attenuator._calculated_filter_states[i], CALCULATED_VALUE[i]
             )
+        await fake_set_complete.wait()
+        for i in range(16):
+            set_mock_value(fake_attenuator._filters_in_position[i], CALCULATED_VALUE[i])
 
     callback_on_mock_put(fake_attenuator._change, mock_apply_values)
-
-    with pytest.raises(asyncio.exceptions.TimeoutError):
-        await asyncio.wait_for(fake_attenuator.set(0.65), timeout=0.01)
+    status = fake_attenuator.set(0.65)
+    assert not status.done
+    fake_set_complete.set()
+    await status

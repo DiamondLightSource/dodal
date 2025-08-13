@@ -426,16 +426,9 @@ def is_v2_device_type(obj: type[Any]) -> bool:
             # This is all very badly documented and possibly prone to change in future versions of Python
             non_parameterized_class = obj.__origin__
         if non_parameterized_class:
-            try:
-                return non_parameterized_class and issubclass(
-                    non_parameterized_class, OphydV2Device
-                )
-            except TypeError:
-                # Python 3.10 will return inspect.isclass(t) == True but then
-                # raise TypeError: issubclass() arg 1 must be a class
-                # when inspecting device_factory decorator function itself
-                # Later versions of Python seem not to be affected
-                pass
+            return non_parameterized_class and issubclass(
+                non_parameterized_class, OphydV2Device
+            )
 
     return False
 

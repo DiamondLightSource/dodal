@@ -1,4 +1,6 @@
 import asyncio
+from collections.abc import Mapping
+from typing import Generic
 
 import numpy as np
 from ophyd_async.core import (
@@ -13,37 +15,81 @@ from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 from dodal.devices.electron_analyser.abstract.base_driver_io import (
     AbstractAnalyserDriverIO,
 )
+from dodal.devices.electron_analyser.abstract.types import TLensMode, TPsuMode
+from dodal.devices.electron_analyser.enums import EnergyMode
 from dodal.devices.electron_analyser.specs.enums import AcquisitionMode
 from dodal.devices.electron_analyser.specs.region import SpecsRegion
 
 
-class SpecsAnalyserDriverIO(AbstractAnalyserDriverIO[SpecsRegion]):
-    def __init__(self, prefix: str, name: str = "") -> None:
+class SpecsAnalyserDriverIO(
+    AbstractAnalyserDriverIO[
+        SpecsRegion[TLensMode, TPsuMode],
+        AcquisitionMode,
+        TLensMode,
+        TPsuMode,
+        float,
+    ],
+    Generic[TLensMode, TPsuMode],
+):
+    def __init__(
+        self,
+        prefix: str,
+        lens_mode_type: type[TLensMode],
+        psu_mode_type: type[TPsuMode],
+        energy_sources: Mapping[str, SignalR[float]],
+        name: str = "",
+    ) -> None:
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             # Used for setting up region data acquisition.
-            self.psu_mode = epics_signal_rw(str, prefix + "SCAN_RANGE")
             self.snapshot_values = epics_signal_rw(int, prefix + "VALUES")
-            self.centre_energy = epics_signal_rw(float, prefix + "KINETIC_ENERGY")
 
-            # Used to read detector data after acqusition.
-            self.min_angle_axis = epics_signal_r(float, prefix + "Y_MIN_RBV")
-            self.max_angle_axis = epics_signal_r(float, prefix + "Y_MAX_RBV")
+        # Used to calculate the angle axis.
+        self.min_angle_axis = epics_signal_r(float, prefix + "Y_MIN_RBV")
+        self.max_angle_axis = epics_signal_r(float, prefix + "Y_MAX_RBV")
 
-        super().__init__(prefix, AcquisitionMode, name)
+        # Used to calculate the energy axis.
+        self.energy_channels = epics_signal_r(
+            int, prefix + "TOTAL_POINTS_ITERATION_RBV"
+        )
+
+        super().__init__(
+            prefix=prefix,
+            acquisition_mode_type=AcquisitionMode,
+            lens_mode_type=lens_mode_type,
+            psu_mode_type=psu_mode_type,
+            pass_energy_type=float,
+            energy_sources=energy_sources,
+            name=name,
+        )
 
     @AsyncStatus.wrap
-    async def set(self, region: SpecsRegion):
-        await super().set(region)
+    async def set(self, region: SpecsRegion[TLensMode, TPsuMode]):
+        source = self._get_energy_source(region.excitation_energy_source)
+        excitation_energy = await source.get_value()  # eV
+        # Copy region so doesn't alter the actual region and switch to kinetic energy
+        ke_region = region.model_copy()
+        ke_region.switch_energy_mode(EnergyMode.KINETIC, excitation_energy)
 
         await asyncio.gather(
-            self.snapshot_values.set(region.values),
-            self.psu_mode.set(region.psu_mode),
+            self.region_name.set(ke_region.name),
+            self.energy_mode.set(ke_region.energy_mode),
+            self.low_energy.set(ke_region.low_energy),
+            self.high_energy.set(ke_region.high_energy),
+            self.slices.set(ke_region.slices),
+            self.lens_mode.set(ke_region.lens_mode),
+            self.pass_energy.set(ke_region.pass_energy),
+            self.iterations.set(ke_region.iterations),
+            self.acquisition_mode.set(ke_region.acquisition_mode),
+            self.excitation_energy.set(excitation_energy),
+            self.excitation_energy_source.set(source.name),
+            self.snapshot_values.set(ke_region.values),
+            self.psu_mode.set(ke_region.psu_mode),
         )
-        if region.acquisition_mode == AcquisitionMode.FIXED_TRANSMISSION:
-            await self.centre_energy.set(region.centre_energy)
+        if ke_region.acquisition_mode == AcquisitionMode.FIXED_TRANSMISSION:
+            await self.energy_step.set(ke_region.energy_step)
 
-        if self.acquisition_mode == AcquisitionMode.FIXED_ENERGY:
-            await self.energy_step.set(region.energy_step)
+        if ke_region.acquisition_mode == AcquisitionMode.FIXED_ENERGY:
+            await self.centre_energy.set(ke_region.centre_energy)
 
     def _create_angle_axis_signal(self, prefix: str) -> SignalR[Array1D[np.float64]]:
         angle_axis = derived_signal_r(
@@ -70,7 +116,7 @@ class SpecsAnalyserDriverIO(AbstractAnalyserDriverIO[SpecsRegion]):
             "eV",
             min_energy=self.low_energy,
             max_energy=self.high_energy,
-            total_points_iterations=self.slices,
+            total_points_iterations=self.energy_channels,
         )
         return energy_axis
 
@@ -82,7 +128,3 @@ class SpecsAnalyserDriverIO(AbstractAnalyserDriverIO[SpecsRegion]):
         step = (max_energy - min_energy) / (total_points_iterations - 1)
         axis = np.array([min_energy + i * step for i in range(total_points_iterations)])
         return axis
-
-    @property
-    def pass_energy_type(self) -> type:
-        return float

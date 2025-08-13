@@ -6,12 +6,13 @@ import pytest
 from ophyd_async.testing import callback_on_mock_put, get_mock_put, set_mock_value
 
 from dodal.devices.i24.pmac import (
+    CS_STR,
     HOME_STR,
     PMAC,
     EncReset,
     LaserSettings,
 )
-from dodal.devices.util.test_utils import patch_motor
+from dodal.devices.util.test_utils import patch_all_motors
 
 
 @pytest.fixture
@@ -19,11 +20,7 @@ async def fake_pmac(RE):
     pmac = PMAC("", name="fake_pmac")
     await pmac.connect(mock=True)
 
-    with (
-        patch_motor(pmac.x),
-        patch_motor(pmac.y),
-        patch_motor(pmac.z),
-    ):
+    with patch_all_motors(pmac):
         yield pmac
 
 
@@ -48,13 +45,13 @@ async def test_pmac_set_pmac_string(fake_pmac: PMAC, RE):
 async def test_pmac_pmac_to_zero(fake_pmac: PMAC, RE):
     RE(bps.trigger(fake_pmac.to_xyz_zero, wait=True))
 
-    assert await fake_pmac.pmac_string.get_value() == "!x0y0z0"
+    assert await fake_pmac.pmac_string.get_value() == "&2!x0y0z0"
 
 
 async def test_pmac_home(fake_pmac: PMAC, RE):
     RE(bps.trigger(fake_pmac.home, wait=True))
 
-    assert await fake_pmac.pmac_string.get_value() == HOME_STR
+    assert await fake_pmac.pmac_string.get_value() == f"{CS_STR}{HOME_STR}"
 
 
 async def test_set_pmac_string_for_laser(fake_pmac: PMAC, RE):
@@ -119,7 +116,7 @@ async def test_counter_refresh_timeout(fake_pmac: PMAC, RE):
     )
 
     set_mock_value(fake_pmac.counter_time, 0.1)
-    with pytest.raises(asyncio.exceptions.TimeoutError):
+    with pytest.raises(TimeoutError):
         await fake_pmac.run_program.kickoff()
         await fake_pmac.run_program.complete()
 

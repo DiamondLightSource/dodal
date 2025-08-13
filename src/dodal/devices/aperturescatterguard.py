@@ -15,7 +15,7 @@ from pydantic import BaseModel, Field
 
 from dodal.common.beamlines.beamline_parameters import GDABeamlineParameters
 from dodal.devices.aperture import Aperture
-from dodal.devices.scatterguard import Scatterguard
+from dodal.devices.motors import XYStage
 
 
 class InvalidApertureMove(Exception):
@@ -29,6 +29,7 @@ class _GDAParamApertureValue(StrictEnum):
     SMALL = "SMALL_APERTURE"
     MEDIUM = "MEDIUM_APERTURE"
     LARGE = "LARGE_APERTURE"
+    MANUAL_LOAD = "MANUAL_LOAD"
 
 
 class AperturePosition(BaseModel):
@@ -92,7 +93,7 @@ class AperturePosition(BaseModel):
 class ApertureValue(StrictEnum):
     """The possible apertures that can be selected.
 
-    Changing these means changing the external paramter model of Hyperion.
+    Changing these means changing the external parameter model of Hyperion.
     See https://github.com/DiamondLightSource/mx-bluesky/issues/760
     """
 
@@ -100,6 +101,7 @@ class ApertureValue(StrictEnum):
     MEDIUM = "MEDIUM_APERTURE"
     LARGE = "LARGE_APERTURE"
     OUT_OF_BEAM = "Out of beam"
+    PARKED = "Parked"  # Parked under the collimation table for manual load
 
     def __str__(self):
         return self.name.capitalize()
@@ -120,6 +122,9 @@ def load_positions_from_beamline_parameters(
         ),
         ApertureValue.LARGE: AperturePosition.from_gda_params(
             _GDAParamApertureValue.LARGE, 100, params
+        ),
+        ApertureValue.PARKED: AperturePosition.from_gda_params(
+            _GDAParamApertureValue.MANUAL_LOAD, 0, params
         ),
     }
 
@@ -164,7 +169,7 @@ class ApertureScatterguard(StandardReadable, Preparable):
         name: str = "",
     ) -> None:
         self.aperture = Aperture(prefix + "-MO-MAPT-01:")
-        self.scatterguard = Scatterguard(prefix + "-MO-SCAT-01:")
+        self.scatterguard = XYStage(prefix + "-MO-SCAT-01:")
         self._loaded_positions = loaded_positions
         self._tolerances = tolerances
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
@@ -175,6 +180,7 @@ class ApertureScatterguard(StandardReadable, Preparable):
                 medium=self.aperture.medium,
                 small=self.aperture.small,
                 current_ap_y=self.aperture.y.user_readback,
+                current_ap_z=self.aperture.z.user_readback,
             )
 
         self.radius = derived_signal_r(
@@ -196,13 +202,30 @@ class ApertureScatterguard(StandardReadable, Preparable):
 
         super().__init__(name)
 
+    async def _unpark(self, position_to_move_to: ApertureValue):
+        """When the aperture is parked it is under the collimation table. It needs to be
+        moved out from under the table before it is moved up to beam height.
+        """
+        position = self._loaded_positions[position_to_move_to]
+        await self.aperture.z.set(position.aperture_z)
+
     async def _set_current_aperture_position(self, value: ApertureValue) -> None:
+        if value == ApertureValue.PARKED:
+            raise NotImplementedError(
+                "Currently not able to park aperture/scatterguard, see https://github.com/DiamondLightSource/mx-bluesky/issues/1197"
+            )
+
         position = self._loaded_positions[value]
+
+        current_ap_y = await self.aperture.y.user_readback.get_value()
+        current_ap_z = await self.aperture.z.user_readback.get_value()
+        if self._is_in_position(ApertureValue.PARKED, current_ap_y, current_ap_z):
+            await self._unpark(value)
+
         await self._check_safe_to_move(position.aperture_z)
 
         if value == ApertureValue.OUT_OF_BEAM:
-            out_y = self._loaded_positions[ApertureValue.OUT_OF_BEAM].aperture_y
-            await self.aperture.y.set(out_y)
+            await self.aperture.y.set(position.aperture_y)
         else:
             await self._safe_move_whilst_in_beam(position)
 
@@ -240,12 +263,22 @@ class ApertureScatterguard(StandardReadable, Preparable):
     def _get_current_radius(self, current_aperture: ApertureValue) -> float:
         return self._loaded_positions[current_aperture].radius
 
-    def _is_out_of_beam(self, current_ap_y: float) -> bool:
-        out_ap_y = self._loaded_positions[ApertureValue.OUT_OF_BEAM].aperture_y
-        return current_ap_y <= out_ap_y + self._tolerances.aperture_y
+    def _is_in_position(
+        self, position: ApertureValue, current_ap_y: float, current_ap_z: float
+    ) -> bool:
+        position_y = self._loaded_positions[position].aperture_y
+        position_z = self._loaded_positions[position].aperture_z
+        y_matches = abs(current_ap_y - position_y) <= self._tolerances.aperture_y
+        z_matches = abs(current_ap_z - position_z) <= self._tolerances.aperture_z
+        return y_matches and z_matches
 
     def _get_current_aperture_position(
-        self, large: float, medium: float, small: float, current_ap_y: float
+        self,
+        large: float,
+        medium: float,
+        small: float,
+        current_ap_y: float,
+        current_ap_z: float,
     ) -> ApertureValue:
         if large == 1:
             return ApertureValue.LARGE
@@ -253,7 +286,11 @@ class ApertureScatterguard(StandardReadable, Preparable):
             return ApertureValue.MEDIUM
         elif small == 1:
             return ApertureValue.SMALL
-        elif self._is_out_of_beam(current_ap_y):
+        elif self._is_in_position(ApertureValue.PARKED, current_ap_y, current_ap_z):
+            return ApertureValue.PARKED
+        elif self._is_in_position(
+            ApertureValue.OUT_OF_BEAM, current_ap_y, current_ap_z
+        ):
             return ApertureValue.OUT_OF_BEAM
 
         raise InvalidApertureMove("Current aperture/scatterguard state unrecognised")
@@ -317,7 +354,9 @@ class ApertureScatterguard(StandardReadable, Preparable):
         Moving the assembly whilst out of the beam has no collision risk so we can just
         move all the motors together.
         """
-        if self._is_out_of_beam(await self.aperture.y.user_readback.get_value()):
+        current_y = await self.aperture.y.user_readback.get_value()
+        current_z = await self.aperture.z.user_readback.get_value()
+        if self._is_in_position(ApertureValue.OUT_OF_BEAM, current_y, current_z):
             aperture_x, _, aperture_z, scatterguard_x, scatterguard_y = (
                 self._loaded_positions[value].values
             )

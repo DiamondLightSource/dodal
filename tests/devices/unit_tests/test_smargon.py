@@ -1,4 +1,5 @@
-from unittest.mock import call
+from collections.abc import AsyncGenerator
+from unittest.mock import MagicMock, call
 
 import pytest
 from bluesky import plan_stubs as bps
@@ -7,20 +8,15 @@ from ophyd_async.core import init_devices, observe_value
 from ophyd_async.testing import get_mock_put, set_mock_value
 
 from dodal.devices.smargon import CombinedMove, DeferMoves, Smargon, StubPosition
-from dodal.devices.util.test_utils import patch_motor
+from dodal.devices.util.test_utils import patch_all_motors
 
 
 @pytest.fixture
-async def smargon() -> Smargon:
+async def smargon() -> AsyncGenerator[Smargon]:
     async with init_devices(mock=True):
         smargon = Smargon(name="smargon")
-    patch_motor(smargon.x)
-    patch_motor(smargon.y)
-    patch_motor(smargon.z)
-    patch_motor(smargon.omega)
-    patch_motor(smargon.phi)
-    patch_motor(smargon.chi)
-    return smargon
+    with patch_all_motors(smargon):
+        yield smargon
 
 
 def set_smargon_pos(smargon: Smargon, pos: tuple[float, float, float]):
@@ -123,6 +119,35 @@ async def test_given_set_with_all_values_then_motors_move(smargon: Smargon):
     get_mock_put(smargon.defer_move).assert_has_calls(
         [call(DeferMoves.ON, wait=True), call(DeferMoves.OFF, wait=True)]
     )
+
+
+@pytest.mark.skip(reason="https://github.com/DiamondLightSource/dodal/issues/1315")
+async def test_given_set_with_all_values_then_motors_move_in_order(smargon: Smargon):
+    parent = MagicMock()
+    parent.attach_mock(get_mock_put(smargon.defer_move), "defer_move")
+    parent.attach_mock(get_mock_put(smargon.x.user_setpoint), "x")
+    parent.attach_mock(get_mock_put(smargon.y.user_setpoint), "y")
+    parent.attach_mock(get_mock_put(smargon.z.user_setpoint), "z")
+    parent.attach_mock(get_mock_put(smargon.omega.user_setpoint), "omega")
+    parent.attach_mock(get_mock_put(smargon.chi.user_setpoint), "chi")
+    parent.attach_mock(get_mock_put(smargon.phi.user_setpoint), "phi")
+
+    await smargon.set(CombinedMove(x=10, y=20, z=30, omega=5, chi=15, phi=25))
+
+    assert len(parent.mock_calls) == 8
+    assert parent.mock_calls[0] == call.defer_move(DeferMoves.ON, wait=True)
+    parent.assert_has_calls(
+        [
+            call.x(10, wait=True),
+            call.y(20, wait=True),
+            call.z(30, wait=True),
+            call.omega(5, wait=True),
+            call.chi(15, wait=True),
+            call.phi(25, wait=True),
+        ],
+        any_order=True,
+    )
+    assert parent.mock_calls[-1] == call.defer_move(DeferMoves.OFF, wait=True)
 
 
 async def test_given_set_fails_then_defer_moves_turned_back_off(smargon: Smargon):

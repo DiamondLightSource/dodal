@@ -1,12 +1,16 @@
 Creating a new device
 ---------------------
 
-Devices are written using the ophyd-async framework, the hardware abstraction library at Diamond. 
+Devices are written using the ophyd-async framework, the hardware abstraction library at Diamond. Before creating your device, you should [consider where the new code should live](../reference/device-standards.rst#where_to_put_devices).
 
 Reusing an existing class
 =========================
 
 When creating a new device, first check if there is a device class that claims to support the device: e.g. all EPICS Motor records should use the [Motor](https://github.com/bluesky/ophyd-async/blob/main/src/ophyd_async/epics/motor.py) type; for reading or monitoring signals from the storage ring the [Synchrotron](https://github.com/DiamondLightSource/dodal/blob/main/src/dodal/devices/synchrotron.py) device should be used; AreaDetectors should use the [StandardDetector](https://github.com/bluesky/ophyd-async/blob/main/src/ophyd_async/core/_detector.py) type- of which there are examples in ophyd_async and in dodal.
+
+The module `dodal.devices.motors` defines a series of `Stage`s or groups of motors- a `Stage` represents a physical relationship between motors. For example, an `XYStage` is two perpendicular motors and should not be used for two motors that run parallel to each other (e.g. a coarse motor and a fine adjustment motor in the same axis) or that are unrelated (e.g. attached to different stages with no common frame of reference). Already defined are some relationships with linear and rotational stages. Any device that is a groups of motors only should be additionally defined there, if possible making re-use of the existing classes. Classes that define physical stages but also define additional signals may then extend the `Stage` class outside of the `motors` module for additional behaviour.
+
+Device classes that take a list of devices of a type may make use of the ophyd-async `DeviceVector`, and those that use other collections (e.g. a dict of Motors) to set attributes on themselves at runtime should be avoided- these device classes may appear tempting for their genericness and extensibility, but they will be a hindrance when trying to write plans. When writing plans, the device class is all that is available to the IDE, not the instance that you "just know" has specific fields. Making use of type checking and hints should make writing plans and debugging them a much less frustrating experience, while also enabling discoverability of the devices that are in use.
 
 If there is a compatible device class it should be used- adding it to the [the beamline](./create-beamline.rst)- this prevents reimplementing the device, and allows improvements to be shared. Improving the device to meet your use case is better than starting again.
 

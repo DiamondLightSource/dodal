@@ -22,7 +22,7 @@ from dodal.devices.i04.constants import RedisConstants
 from dodal.devices.i04.murko_results import MurkoResultsDevice
 from dodal.devices.i04.transfocator import Transfocator
 from dodal.devices.ipin import IPin
-from dodal.devices.motors import XYZPositioner
+from dodal.devices.motors import XYZStage
 from dodal.devices.mx_phase1.beamstop import Beamstop
 from dodal.devices.oav.oav_detector import OAVBeamCentrePV
 from dodal.devices.oav.oav_parameters import OAVConfig
@@ -43,13 +43,13 @@ from dodal.devices.zebra.zebra_constants_mapping import (
 )
 from dodal.devices.zebra.zebra_controlled_shutter import ZebraShutter
 from dodal.devices.zocalo import ZocaloResults
+from dodal.devices.zocalo.zocalo_results import ZocaloSource
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
-ZOOM_PARAMS_FILE = (
-    "/dls_sw/i04/software/gda/configurations/i04-config/xml/jCameraManZoomLevels.xml"
-)
-DISPLAY_CONFIG = "/dls_sw/i04/software/gda_versions/var/display.configuration"
+# Use BlueAPI scratch until https://github.com/DiamondLightSource/mx-bluesky/issues/1097 is done
+ZOOM_PARAMS_FILE = "/dls_sw/i04/software/bluesky/scratch/jCameraManZoomLevels.xml"
+DISPLAY_CONFIG = "/dls_sw/i04/software/bluesky/scratch/display.configuration"
 DAQ_CONFIGURATION_PATH = "/dls_sw/i04/software/daq_configuration"
 
 
@@ -72,29 +72,27 @@ def smargon() -> Smargon:
     """
     return Smargon(
         f"{PREFIX.beamline_prefix}-MO-SGON-01:",
-        "smargon",
     )
 
 
 @device_factory()
-def gonio_positioner() -> XYZPositioner:
+def gonio_positioner() -> XYZStage:
     """Get the i04 lower_gonio_stages device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
     """
-    return XYZPositioner(
+    return XYZStage(
         f"{PREFIX.beamline_prefix}-MO-GONIO-01:",
         "lower_gonio_stages",
     )
 
 
 @device_factory()
-def sample_delivery_system() -> XYZPositioner:
+def sample_delivery_system() -> XYZStage:
     """Get the i04 sample_delivery_system device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
     """
-    return XYZPositioner(
+    return XYZStage(
         f"{PREFIX.beamline_prefix}-MO-SDE-01:",
-        "sample_delivery_system",
     )
 
 
@@ -105,7 +103,6 @@ def ipin() -> IPin:
     """
     return IPin(
         f"{PREFIX.beamline_prefix}-EA-PIN-01:",
-        "ipin",
     )
 
 
@@ -127,7 +124,6 @@ def sample_shutter() -> ZebraShutter:
     """
     return ZebraShutter(
         f"{PREFIX.beamline_prefix}-EA-SHTR-01:",
-        "sample_shutter",
     )
 
 
@@ -137,8 +133,8 @@ def attenuator() -> BinaryFilterAttenuator:
     If this is called when already instantiated in i04, it will return the existing object.
     """
     return BinaryFilterAttenuator(
-        f"{PREFIX.beamline_prefix}-EA-ATTN-01:",
-        "attenuator",
+        prefix=f"{PREFIX.beamline_prefix}-EA-ATTN-01:",
+        num_filters=16,
     )
 
 
@@ -149,7 +145,6 @@ def transfocator() -> Transfocator:
     """
     return Transfocator(
         f"{PREFIX.beamline_prefix}-MO-FSWT-01:",
-        "transfocator",
     )
 
 
@@ -160,22 +155,15 @@ def xbpm_feedback() -> XBPMFeedback:
     """
     return XBPMFeedback(
         PREFIX.beamline_prefix,
-        "xbpm_feedback",
     )
 
 
 @device_factory()
-def flux(mock: bool = False) -> Flux:
+def flux() -> Flux:
     """Get the i04 flux device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
     """
-    return device_instantiation(
-        Flux,
-        "flux",
-        "-MO-FLUX-01:",
-        wait=False,
-        fake=mock,
-    )
+    return Flux(f"{PREFIX.beamline_prefix}-MO-FLUX-01:")
 
 
 @device_factory()
@@ -185,7 +173,6 @@ def dcm() -> DCM:
     """
     return DCM(
         f"{PREFIX.beamline_prefix}-MO-DCM-01:",
-        "dcm",
     )
 
 
@@ -196,7 +183,6 @@ def backlight() -> Backlight:
     """
     return Backlight(
         PREFIX.beamline_prefix,
-        "backlight",
     )
 
 
@@ -209,7 +195,6 @@ def aperture_scatterguard() -> ApertureScatterguard:
     params = get_beamline_parameters()
     return ApertureScatterguard(
         prefix=PREFIX.beamline_prefix,
-        name="aperture_scatterguard",
         loaded_positions=load_positions_from_beamline_parameters(params),
         tolerances=AperturePosition.tolerances_from_gda_params(params),
     )
@@ -242,23 +227,16 @@ def zebra_fast_grid_scan() -> ZebraFastGridScan:
     If this is called when already instantiated in i04, it will return the existing object.
     """
     return ZebraFastGridScan(
-        name="zebra_fast_grid_scan",
         prefix=f"{PREFIX.beamline_prefix}-MO-SGON-01:",
     )
 
 
 @device_factory()
-def s4_slit_gaps(mock: bool = False) -> S4SlitGaps:
+def s4_slit_gaps() -> S4SlitGaps:
     """Get the i04 s4_slit_gaps device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
     """
-    return device_instantiation(
-        S4SlitGaps,
-        "s4_slit_gaps",
-        "-AL-SLITS-04:",
-        wait=False,
-        fake=mock,
-    )
+    return S4SlitGaps(f"{PREFIX.beamline_prefix}-AL-SLITS-04:")
 
 
 @device_factory()
@@ -267,7 +245,6 @@ def undulator() -> Undulator:
     If this is called when already instantiated in i04, it will return the existing object.
     """
     return Undulator(
-        name="undulator",
         prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:",
         id_gap_lookup_table_path="/dls_sw/i04/software/gda/config/lookupTables/BeamLine_Undulator_toGap.txt",
     )
@@ -278,10 +255,7 @@ def synchrotron() -> Synchrotron:
     """Get the i04 synchrotron device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
     """
-    return Synchrotron(
-        "",
-        "synchrotron",
-    )
+    return Synchrotron()
 
 
 @device_factory()
@@ -290,13 +264,14 @@ def zebra() -> Zebra:
     If this is called when already instantiated in i04, it will return the existing object.
     """
     return Zebra(
-        name="zebra",
         prefix=f"{PREFIX.beamline_prefix}-EA-ZEBRA-01:",
         mapping=I04_ZEBRA_MAPPING,
     )
 
 
-@device_factory(skip=BL == "s04")
+@device_factory(
+    skip=BL == "s04",
+)
 def oav(params: OAVConfig | None = None) -> OAVBeamCentrePV:
     """Get the i04 OAV device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
@@ -307,7 +282,9 @@ def oav(params: OAVConfig | None = None) -> OAVBeamCentrePV:
     )
 
 
-@device_factory(skip=BL == "s04")
+@device_factory(
+    skip=BL == "s04",
+)
 def oav_full_screen(params: OAVConfig | None = None) -> OAVBeamCentrePV:
     """Get the i04 OAV device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
@@ -319,13 +296,14 @@ def oav_full_screen(params: OAVConfig | None = None) -> OAVBeamCentrePV:
     )
 
 
-@device_factory(skip=BL == "s04")
+@device_factory(
+    skip=BL == "s04",
+)
 def detector_motion() -> DetectorMotion:
     """Get the i04 detector motion device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
     """
     return DetectorMotion(
-        name="detector_motion",
         prefix=PREFIX.beamline_prefix,
     )
 
@@ -337,7 +315,6 @@ def thawer() -> Thawer:
     """
     return Thawer(
         f"{PREFIX.beamline_prefix}-EA-THAW-01",
-        "thawer",
     )
 
 
@@ -347,7 +324,6 @@ def robot() -> BartRobot:
     If this is called when already instantiated in i04, it will return the existing object.
     """
     return BartRobot(
-        "robot",
         f"{PREFIX.beamline_prefix}-MO-ROBOT-01:",
     )
 
@@ -359,7 +335,6 @@ def oav_to_redis_forwarder() -> OAVToRedisForwarder:
     """
     return OAVToRedisForwarder(
         f"{PREFIX.beamline_prefix}-DI-OAV-01:",
-        name="oav_to_redis_forwarder",
         redis_host=RedisConstants.REDIS_HOST,
         redis_password=RedisConstants.REDIS_PASSWORD,
         redis_db=RedisConstants.MURKO_REDIS_DB,
@@ -372,7 +347,6 @@ def murko_results() -> MurkoResultsDevice:
     If this is called when already instantiated in i04, it will return the existing object.
     """
     return MurkoResultsDevice(
-        name="murko_results",
         redis_host=RedisConstants.REDIS_HOST,
         redis_password=RedisConstants.REDIS_PASSWORD,
         redis_db=RedisConstants.MURKO_REDIS_DB,
@@ -394,7 +368,7 @@ def zocalo() -> ZocaloResults:
     """Get the i04 ZocaloResults device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
     """
-    return ZocaloResults(channel="xrc.i04")
+    return ZocaloResults(channel="xrc.i04", results_source=ZocaloSource.CPU)
 
 
 @device_factory()

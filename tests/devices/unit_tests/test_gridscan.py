@@ -1,5 +1,4 @@
-import asyncio
-from asyncio import TimeoutError, wait_for
+from asyncio import wait_for
 from contextlib import nullcontext
 from dataclasses import dataclass
 from unittest.mock import AsyncMock, MagicMock, patch
@@ -23,7 +22,7 @@ from dodal.devices.fast_grid_scan import (
     set_fast_grid_scan_params,
 )
 from dodal.devices.smargon import Smargon
-from dodal.devices.util.test_utils import patch_motor
+from dodal.devices.util.test_utils import patch_all_motors
 
 
 def discard_status(st: Status | DeviceStatus):
@@ -54,10 +53,8 @@ async def smargon(RE: RunEngine):
     async with init_devices(mock=True):
         smargon = Smargon()
 
-    for motor in [smargon.omega, smargon.x, smargon.y, smargon.z]:
-        patch_motor(motor)
-
-    return smargon
+    with patch_all_motors(smargon):
+        yield smargon
 
 
 @pytest.mark.parametrize(
@@ -401,7 +398,7 @@ async def test_timeout_on_complete_triggers_stop_and_logs_error(
     zebra_fast_grid_scan.COMPLETE_STATUS = 0.01
     zebra_fast_grid_scan.stop_cmd = AsyncMock()
     set_mock_value(zebra_fast_grid_scan.status, 1)
-    with pytest.raises(asyncio.TimeoutError):
+    with pytest.raises(TimeoutError):
         await zebra_fast_grid_scan.complete()
     mock_log_error.assert_called_once()
     zebra_fast_grid_scan.stop_cmd.trigger.assert_awaited_once()
