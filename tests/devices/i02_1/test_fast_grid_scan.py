@@ -15,3 +15,9 @@ def test_fast_grid_scan_has_same_attributes_as_parent(RE):
     parent_fgs_attrs = set(vars(parent_fgs).keys())
 
     assert vmxm_fgs_attrs == parent_fgs_attrs
+
+
+def test_calc_expected_images(RE):
+    with init_devices(mock=True):
+        vmxm_fgs = TwoDFastGridScan("vmxm")
+    assert vmxm_fgs._calculate_expected_images(5, 10, 100) == 50
