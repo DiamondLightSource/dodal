@@ -7,8 +7,8 @@ from ophyd_async.core import SignalR, init_devices, soft_signal_rw
 from dodal.devices.electron_analyser import (
     DualEnergySource,
     ElectronAnalyserDetector,
-    SingleEnergySource,
     SelectedSource,
+    SingleEnergySource,
 )
 from dodal.devices.electron_analyser.abstract import (
     AbstractAnalyserDriverIO,
@@ -69,10 +69,7 @@ async def dual_energy_source(
 async def energy_sources(
     dcm_energy: SignalR[float], pgm_energy: SignalR[float]
 ) -> dict[str, SignalR[float]]:
-    return {
-        SelectedSource.SOURCE1: dcm_energy.user_readback,
-        SelectedSource.SOURCE2: pgm_energy.user_readback,
-    }
+    return {SelectedSource.SOURCE1: dcm_energy, SelectedSource.SOURCE2: pgm_energy}
 
 
 @pytest.fixture
