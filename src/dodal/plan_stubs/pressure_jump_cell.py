@@ -22,6 +22,7 @@ def set_pressure_jump(
 
 from dodal.devices.pressure_jump_cell import (
     FastValveControlRequest,
+    FastValveState,
     PressureJumpCell,
     ValveControlRequest,
     ValveState,
@@ -43,14 +44,14 @@ def prepare_fast_pressure_jump(
     # Check inital condition
     v1 = yield from bps.rd(pressure_cell.all_valves_control.valve_states[1])
     v3 = yield from bps.rd(pressure_cell.all_valves_control.valve_states[3])
-    v5 = yield from bps.rd(pressure_cell.all_valves_control.valve_states[5])
-    v6 = yield from bps.rd(pressure_cell.all_valves_control.valve_states[6])
+    v5 = yield from bps.rd(pressure_cell.all_valves_control.fast_valve_states[5])
+    v6 = yield from bps.rd(pressure_cell.all_valves_control.fast_valve_states[6])
 
     if not (
         v1 == ValveState.CLOSED
         and v3 == ValveState.OPEN
-        and v5 == ValveState.OPEN
-        and v6 == ValveState.OPEN
+        and v5 == FastValveState.OPEN
+        and v6 == FastValveState.OPEN
     ):
         raise Exception(
             "Exception valves not in the expected states - check V1 is closed and V3, V5 and V6 are open."
@@ -62,7 +63,7 @@ def prepare_fast_pressure_jump(
         pressure_cell.all_valves_control.valve_control[5],
         ValveControlRequest.CLOSE,
         pressure_cell.all_valves_control.valve_control[6],
-        ValveControlRequest.CLOSE,
+        ValveControlRequest.CLOSE
     )
 
     # Bring the reservoir section upto the jump to pressure
@@ -75,10 +76,10 @@ def prepare_fast_pressure_jump(
     if jump_direction_up:
         yield from bps.mv(
             pressure_cell.all_valves_control.valve_control[5],
-            FastValveControlRequest.ARM,
+            FastValveControlRequest.ARM
         )
     else:
         yield from bps.mv(
             pressure_cell.all_valves_control.valve_control[6],
-            FastValveControlRequest.ARM,
+            FastValveControlRequest.ARM
         )
