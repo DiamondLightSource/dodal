@@ -1,4 +1,5 @@
 import asyncio
+from unittest.mock import ANY, MagicMock, patch
 
 import pytest
 from ophyd_async.core import init_devices
@@ -9,6 +10,7 @@ from dodal.devices.pressure_jump_cell import (
     FastValveControlRequest,
     FastValveState,
     PressureJumpCell,
+    PressureJumpParameters,
     PumpMotorDirectionState,
     ValveControlRequest,
     ValveOpenSeqRequest,
@@ -412,5 +414,222 @@ async def test_setting_all_pressure_cell_valves(
             "pjump-all_valves_control-valve_control-6-control": partial_reading(
                 FastValveControlRequest.CLOSE,
             ),
+        },
+    )
+
+
+async def test_reading_pjumpcell_includes_fields_control(
+    cell: PressureJumpCell,
+):
+    set_mock_value(cell.control.go, False)
+    set_mock_value(cell.control._stop, False)
+    set_mock_value(cell.control.busy, False)
+    set_mock_value(cell.control.target_pressure, 0)
+    set_mock_value(cell.control.timeout, 0.0)
+    set_mock_value(cell.control.result, "SP_SUCCESS")
+
+    await assert_reading(
+        cell.control,
+        {
+            "pjump-control-busy": {
+                "value": False,
+            },
+            "pjump-control-go": {
+                "value": False,
+            },
+            "pjump-control-result": {
+                "value": "SP_SUCCESS",
+            },
+            "pjump-control-target_pressure": {
+                "value": 0,
+            },
+            "pjump-control-timeout": {
+                "value": 0.0,
+            },
+            "pjump-control-_stop": {
+                "value": False,
+            },
+            "pjump-control-from_pressure": {
+                "value": ANY,
+            },
+            "pjump-control-to_pressure": {
+                "value": ANY,
+            },
+            "pjump-control-set_jump": {
+                "value": ANY,
+            },
+        },
+    )
+
+
+async def test_reading_pjumpcell_includes_fields_control_jump(
+    cell: PressureJumpCell,
+):
+    set_mock_value(cell.control.set_jump, False)
+    set_mock_value(cell.control._stop, False)
+    set_mock_value(cell.control.busy, False)
+    set_mock_value(cell.control.from_pressure, 0)
+    set_mock_value(cell.control.to_pressure, 0)
+    set_mock_value(cell.control.timeout, 0.0)
+    set_mock_value(cell.control.result, "SP_SUCCESS")
+
+    await assert_reading(
+        cell.control,
+        {
+            "pjump-control-busy": {
+                "value": False,
+            },
+            "pjump-control-go": {
+                "value": False,
+            },
+            "pjump-control-result": {
+                "value": "SP_SUCCESS",
+            },
+            "pjump-control-target_pressure": {
+                "value": ANY,
+            },
+            "pjump-control-timeout": {
+                "value": 0.0,
+            },
+            "pjump-control-_stop": {
+                "value": False,
+            },
+            "pjump-control-from_pressure": {
+                "value": 0.0,
+            },
+            "pjump-control-to_pressure": {
+                "value": 0.0,
+            },
+            "pjump-control-set_jump": {
+                "value": ANY,
+            },
+        },
+    )
+
+
+@patch("dodal.devices.pressure_jump_cell.wait_for_value")
+async def test_pjumpcell_toplevel_pressure_control(
+    mock_wait_for_device: MagicMock,
+    cell: PressureJumpCell,
+):
+    # Override device wait to complete successfully
+    mock_wait_for_device.side_effect = [None, None]
+
+    TARGET_PRESSURE = 250
+    set_mock_value(cell.control.go, False)
+    set_mock_value(cell.control._stop, False)
+    set_mock_value(cell.control.busy, False)
+    set_mock_value(cell.control.target_pressure, 0)
+    set_mock_value(cell.control.timeout, 1)
+    set_mock_value(cell.control.result, "SP_SUCCESS")
+
+    await cell.control.set(TARGET_PRESSURE)
+
+    await assert_reading(
+        cell.control,
+        {
+            "pjump-control-busy": partial_reading(False),
+            "pjump-control-go": partial_reading(True),
+            "pjump-control-result": partial_reading("SP_SUCCESS"),
+            "pjump-control-target_pressure": partial_reading(TARGET_PRESSURE),
+            "pjump-control-timeout": partial_reading(ANY),
+            "pjump-control-_stop": partial_reading(False),
+            "pjump-control-from_pressure": partial_reading(ANY),
+            "pjump-control-to_pressure": partial_reading(ANY),
+            "pjump-control-set_jump": partial_reading(ANY),
+        },
+    )
+
+
+@patch("dodal.devices.pressure_jump_cell.wait_for_value")
+async def test_pjumpcell_toplevel_pressure_jump_control(
+    mock_wait_for_device: MagicMock,
+    cell: PressureJumpCell,
+):
+    # Override device wait to complete successfully
+    mock_wait_for_device.side_effect = [None, None]
+
+    TARGET_JUMP = PressureJumpParameters(500, 1000)
+    set_mock_value(cell.control.go, False)
+    set_mock_value(cell.control._stop, False)
+    set_mock_value(cell.control.busy, False)
+    set_mock_value(cell.control.target_pressure, 0)
+    set_mock_value(cell.control.timeout, 1)
+    set_mock_value(cell.control.result, "SP_SUCCESS")
+
+    await cell.control.set(TARGET_JUMP)
+
+    await assert_reading(
+        cell.control,
+        {
+            "pjump-control-busy": partial_reading(False),
+            "pjump-control-set_jump": partial_reading(True),
+            "pjump-control-result": partial_reading("SP_SUCCESS"),
+            "pjump-control-timeout": partial_reading(ANY),
+            "pjump-control-_stop": partial_reading(False),
+            "pjump-control-from_pressure": partial_reading(TARGET_JUMP.pressure_from),
+            "pjump-control-to_pressure": partial_reading(TARGET_JUMP.pressure_to),
+            "pjump-control-go": partial_reading(False),
+            "pjump-control-target_pressure": partial_reading(ANY),
+        },
+    )
+
+
+async def test_pjumpcell_toplevel_pressure_control_waits_on_busy(
+    cell: PressureJumpCell,
+):
+    TARGET_JUMP = PressureJumpParameters(500, 1000)
+    set_mock_value(cell.control.go, False)
+    set_mock_value(cell.control._stop, False)
+    set_mock_value(cell.control.busy, True)
+    set_mock_value(cell.control.target_pressure, 0)
+    set_mock_value(cell.control.timeout, 1)
+    set_mock_value(cell.control.result, "SP_SUCCESS")
+
+    with pytest.raises(TimeoutError):
+        async with asyncio.timeout(0.05):
+            await cell.control.set(TARGET_JUMP)
+
+
+async def test_pjumpcell_toplevel_pressure_control_error_on_unsupported_type(
+    cell: PressureJumpCell,
+):
+    UNSUPPORTED_INPUT = "100"
+
+    set_mock_value(cell.control.go, False)
+    set_mock_value(cell.control._stop, False)
+    set_mock_value(cell.control.busy, True)
+    set_mock_value(cell.control.target_pressure, 0)
+    set_mock_value(cell.control.timeout, 1)
+    set_mock_value(cell.control.result, "SP_SUCCESS")
+
+    with pytest.raises(TypeError):
+        await cell.control.set(UNSUPPORTED_INPUT)  # type: ignore
+
+
+async def test_pjumpcell_toplevel_pressure_control_stops(
+    cell: PressureJumpCell,
+):
+    set_mock_value(cell.control.go, False)
+    set_mock_value(cell.control._stop, False)
+    set_mock_value(cell.control.busy, True)
+    set_mock_value(cell.control.target_pressure, 0)
+    set_mock_value(cell.control.timeout, 1)
+    set_mock_value(cell.control.result, "SP_SUCCESS")
+
+    await cell.control.stop()
+
+    await assert_reading(
+        cell.control,
+        {
+            "pjump-control-busy": partial_reading(ANY),
+            "pjump-control-set_jump": partial_reading(ANY),
+            "pjump-control-result": partial_reading(ANY),
+            "pjump-control-timeout": partial_reading(ANY),
+            "pjump-control-_stop": partial_reading(True),
+            "pjump-control-from_pressure": partial_reading(ANY),
+            "pjump-control-to_pressure": partial_reading(ANY),
+            "pjump-control-go": partial_reading(ANY),
+            "pjump-control-target_pressure": partial_reading(ANY),
         },
     )
