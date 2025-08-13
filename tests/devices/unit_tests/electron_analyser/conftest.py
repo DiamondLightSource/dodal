@@ -7,8 +7,8 @@ from ophyd_async.core import SignalR, init_devices, soft_signal_rw
 from dodal.devices.electron_analyser import (
     DualEnergySource,
     ElectronAnalyserDetector,
-    SingleEnergySource,
     SelectedSource,
+    SingleEnergySource,
 )
 from dodal.devices.electron_analyser.abstract import (
     AbstractAnalyserDriverIO,
