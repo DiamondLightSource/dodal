@@ -35,6 +35,9 @@ class EurothermUpdate(StrictEnum):
     S0_1 = ".1 second"
 
 
+_EUROTHERM_RBV: str = ":RBV"
+
+
 class EurothermGeneral(StandardReadable, Locatable[float]):
     """A base class for any eurotherm controller."""
 
@@ -43,17 +46,16 @@ class EurothermGeneral(StandardReadable, Locatable[float]):
         prefix: str,
         name: str = "",
         temp_suffix: str = "PV:RBV",
-        rbv_suffix: str = ":RBV",
         update: bool = False,
     ):
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             self.temp = epics_signal_r(float, f"{prefix}{temp_suffix}")
 
         with self.add_children_as_readables():
-            self.setpoint = epics_signal_rw_rbv(float, f"{prefix}SP", rbv_suffix)
-            self.ramprate = epics_signal_rw_rbv(float, f"{prefix}RR", rbv_suffix)
-            self.output = epics_signal_rw_rbv(float, f"{prefix}O", rbv_suffix)
-            self.mode = epics_signal_rw_rbv(ManualMode, f"{prefix}MAN", rbv_suffix)
+            self.setpoint = epics_signal_rw_rbv(float, f"{prefix}SP", _EUROTHERM_RBV)
+            self.ramprate = epics_signal_rw_rbv(float, f"{prefix}RR", _EUROTHERM_RBV)
+            self.output = epics_signal_rw_rbv(float, f"{prefix}O", _EUROTHERM_RBV)
+            self.mode = epics_signal_rw_rbv(ManualMode, f"{prefix}MAN", _EUROTHERM_RBV)
 
             if update:
                 self.update = epics_signal_rw(EurothermUpdate, f"{prefix}UPDATE.SCAN")
@@ -82,14 +84,11 @@ class EurothermAutotune(StandardReadable):
         self,
         prefix: str,
         name: str = "",
-        control_suffix: str = "AUTOTUNE",
-        high_suffix: str = "OUTPHI",
-        low_suffix: str = "OUTPLO",
     ):
         with self.add_children_as_readables():
-            self.control = epics_signal_rw(AutotuneControl, f"{prefix}{control_suffix}")
-            self.high_limit = epics_signal_rw(float, f"{prefix}{high_suffix}")
-            self.low_limit = epics_signal_rw(float, f"{prefix}{low_suffix}")
+            self.control = epics_signal_rw(AutotuneControl, f"{prefix}AUTOTUNE")
+            self.high_limit = epics_signal_rw(float, f"{prefix}OUTPHI")
+            self.low_limit = epics_signal_rw(float, f"{prefix}OUTPLO")
 
         super().__init__(name)
 
@@ -101,13 +100,12 @@ class EurothermPID(StandardReadable):
         self,
         prefix: str,
         name: str = "",
-        rbv_suffix: str = ":RBV",
         update: bool = False,
     ):
         with self.add_children_as_readables():
-            self.P = epics_signal_rw_rbv(float, f"{prefix}P", rbv_suffix)
-            self.I = epics_signal_rw_rbv(float, f"{prefix}I", rbv_suffix)
-            self.D = epics_signal_rw_rbv(float, f"{prefix}D", rbv_suffix)
+            self.P = epics_signal_rw_rbv(float, f"{prefix}P", _EUROTHERM_RBV)
+            self.I = epics_signal_rw_rbv(float, f"{prefix}I", _EUROTHERM_RBV)
+            self.D = epics_signal_rw_rbv(float, f"{prefix}D", _EUROTHERM_RBV)
 
             if update:
                 self.update = epics_signal_rw(EurothermUpdate, f"{prefix}PID.SCAN")
