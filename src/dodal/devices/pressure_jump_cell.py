@@ -2,7 +2,7 @@ import asyncio
 from dataclasses import dataclass
 from typing import Generic, TypeVar
 
-from bluesky.protocols import Movable
+from bluesky.protocols import Movable, Stoppable
 from ophyd_async.core import (
     AsyncStatus,
     DeviceVector,
@@ -203,7 +203,7 @@ class PressureTransducer(StandardReadable):
         super().__init__(name)
 
 
-class PressureJumpCellController(StandardReadable, Movable):
+class PressureJumpCellController(StandardReadable, Movable, Stoppable):
     """
     Top-level control for a fixed pressure or pressure jumps.
     """
@@ -221,9 +221,11 @@ class PressureJumpCellController(StandardReadable, Movable):
 
             # Common
             self.busy = epics_signal_r(bool, f"{prefix}GOTOBUSY")
-            self.stop = epics_signal_rw(bool, f"{prefix}STOP")
             self.result = epics_signal_r(str, f"{prefix}RESULT")
             self.timeout = epics_signal_rw(float, f"{prefix}TIMER.HIGH")
+
+            # Internal
+            self._stop = epics_signal_rw(bool, f"{prefix}STOP")
 
             self._name = name
 
@@ -255,6 +257,10 @@ class PressureJumpCellController(StandardReadable, Movable):
 
         await wait_for_value(self.busy, True, timeout)  # Change started
         await wait_for_value(self.busy, False, timeout)  # Change complete
+
+    @AsyncStatus.wrap
+    async def stop(self, success=True):
+        await self._stop.set(True)
 
 
 class PressureJumpCell(StandardReadable):
