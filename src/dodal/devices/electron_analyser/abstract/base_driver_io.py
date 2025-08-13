@@ -131,17 +131,8 @@ class AbstractAnalyserDriverIO(
 
     @AsyncStatus.wrap
     async def stage(self) -> None:
-        """
-        Stage the driver. This is used to prepare the driver for data acquisition.
-        It should be called before any data acquisition starts.
-        """
         await self.image_mode.set(ADImageMode.SINGLE)
         await super().stage()
-
-    @AsyncStatus.wrap
-    async def unstage(self) -> None:
-        """Unstage the driver. This is used to clean up after data acquisition."""
-        await super().unstage()
 
     @abstractmethod
     @AsyncStatus.wrap
@@ -153,8 +144,6 @@ class AbstractAnalyserDriverIO(
         Args:
             region: Contains the parameters to setup the driver for a scan.
         """
-        # Set image_mode to SINGLE by default for all analysers
-        await self.image_mode.set(ADImageMode.SINGLE)
 
     def _get_energy_source(self, alias_name: str) -> SignalR[float]:
         energy_source = self.energy_sources.get(alias_name)
