@@ -222,7 +222,7 @@ def pilatus_metadata() -> PilatusMetadata:
 
 
 @device_factory()
-def jungfrau(path_to_dir: str = "/tmp/jf", filename: str = "jf_file") -> Jungfrau:
+def jungfrau(path_to_dir: str = "/tmp/jf", filename: str = "jf_output") -> Jungfrau:
     """Get the Jungfrau 9M device, instantiate it if it hasn't already been.
     If this is called when already instantiated, it will return the existing object."""
     file_provider = AutoIncrementFilenameProvider(filename)
