@@ -21,7 +21,7 @@ async def i11_robot() -> NX100Robot:
     [
         RobotSampleState.CAROSEL,
         RobotSampleState.ONGRIP,
-        RobotSampleState.DIFF,
+        RobotSampleState.DIFFRACTOMETER,
     ],
 )
 @pytest.mark.parametrize(
@@ -99,7 +99,7 @@ async def test_robot_pause_resume(i11_robot: NX100Robot) -> None:
     [
         RobotSampleState.CAROSEL,
         RobotSampleState.ONGRIP,
-        RobotSampleState.DIFF,
+        RobotSampleState.DIFFRACTOMETER,
     ],
 )
 async def test_when_sample_state_clear_sample_tablein(
@@ -141,7 +141,7 @@ async def test_robot_load_sample_when_sample_unknown(i11_robot: NX100Robot) -> N
     )  # Set to not ongrip state
 
     await i11_robot.load_sample(10)  # Load sample at position 10
-    assert not await i11_robot.job.get_value() == RobotJobs.PLACED
+    assert not await i11_robot.job.get_value() == RobotJobs.PLACE_DIFFRACTOMETER
 
 
 async def test_robot_clear_load_when_state_is_invalid(i11_robot: NX100Robot) -> None:

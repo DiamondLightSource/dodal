@@ -15,10 +15,10 @@ from dodal.log import LOGGER
 
 class RobotJobs(StrictEnum):
     RECOVER = "RECOVER"  # Recover from unknown state
-    PICKC = "PICKC"  # Pick a sample from the carousel.
-    PLACEC = "PLACEC"  # Place a sample onto the carousel
-    PICKD = "PICKD"  # Pick a sample from the diffractometer.
-    PLACED = "PLACED"  # Place a sample onto the diffractometer.
+    PICK_CAOUSEL = "PICKC"  # Pick a sample from the carousel.
+    PLACE_CAROSEL = "PLACEC"  # Place a sample onto the carousel
+    PICK_DIFFRACTOMETER = "PICKD"  # Pick a sample from the diffractometer.
+    PLACE_DIFFRACTOMETER = "PLACED"  # Place a sample onto the diffractometer.
     GRIPO = "GRIPO"
     GRIPC = "GRIPC"
     TABLEIN = "TABLEIN"
@@ -29,7 +29,7 @@ class RobotJobs(StrictEnum):
 class RobotSampleState(float, Enum):
     CAROSEL = 0.0  # Sample is on carousel
     ONGRIP = 1.0  # Sample is on the gripper
-    DIFF = 2.0  # Sample is on the diffractometer
+    DIFFRACTOMETER = 2.0  # Sample is on the diffractometer
     UNKNOWN = 3.0
 
 
@@ -72,13 +72,13 @@ class NX100Robot(StandardReadable, Locatable[int], Stoppable, Pausable):
 
     async def clear_sample(self, table_in: bool = True):
         sample_state = await self.robot_sample_state.get_value()
-        if sample_state == RobotSampleState.DIFF:
+        if sample_state == RobotSampleState.DIFFRACTOMETER:
             await asyncio.gather(
-                set_and_wait_for_value(self.job, RobotJobs.PICKD),
-                set_and_wait_for_value(self.job, RobotJobs.PLACEC),
+                set_and_wait_for_value(self.job, RobotJobs.PICK_DIFFRACTOMETER),
+                set_and_wait_for_value(self.job, RobotJobs.PLACE_CAROSEL),
             )
         elif sample_state == RobotSampleState.ONGRIP:
-            await set_and_wait_for_value(self.job, RobotJobs.PLACEC)
+            await set_and_wait_for_value(self.job, RobotJobs.PLACE_CAROSEL)
         elif sample_state == RobotSampleState.CAROSEL:
             pass
         elif sample_state == RobotSampleState.UNKNOWN:
@@ -94,11 +94,11 @@ class NX100Robot(StandardReadable, Locatable[int], Stoppable, Pausable):
     async def load_sample(self, sample_location: int):
         sample_state = await self.robot_sample_state.get_value()
         if sample_state == RobotSampleState.CAROSEL:
-            await set_and_wait_for_value(self.job, RobotJobs.PICKC)
-            await set_and_wait_for_value(self.job, RobotJobs.PLACED)
+            await set_and_wait_for_value(self.job, RobotJobs.PICK_CAOUSEL)
+            await set_and_wait_for_value(self.job, RobotJobs.PLACE_DIFFRACTOMETER)
         elif sample_state == RobotSampleState.ONGRIP:
-            await set_and_wait_for_value(self.job, RobotJobs.PLACED)
-        elif sample_state == RobotSampleState.DIFF:
+            await set_and_wait_for_value(self.job, RobotJobs.PLACE_DIFFRACTOMETER)
+        elif sample_state == RobotSampleState.DIFFRACTOMETER:
             pass
         elif sample_state == RobotSampleState.UNKNOWN:
             LOGGER.warning(f"No sample at sample holder position {sample_location}")
