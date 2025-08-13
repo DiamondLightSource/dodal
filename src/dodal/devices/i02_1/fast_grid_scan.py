@@ -91,19 +91,3 @@ class TwoDFastGridScan(ZebraFastGridScan):
     def _calculate_expected_images(self, x: int, y: int, z: int) -> int:
         LOGGER.info(f"Reading num of images found {x, y} images in each axis")
         return x * y
-
-
-# todo: add test which checks this device has same signals as zebra one
-# add test to use this device in the FGS and make sure it works
-"""
-def test_attributes_match(eggs_instance, other_instance):
-    # Get attribute names of both instances
-    eggs_attrs = set(vars(eggs_instance).keys())
-    other_attrs = set(vars(other_instance).keys())
-
-    # The attributes should be the same
-    assert eggs_attrs == other_attrs, f"Attributes differ: {eggs_attrs} vs {other_attrs}"
-
-
-    do another test to check datatypes of each signals are the same
-"""
