@@ -19,7 +19,7 @@ async def i11_robot() -> NX100Robot:
 @pytest.mark.parametrize(
     "state",
     [
-        RobotSampleState.CAROSEL,
+        RobotSampleState.CAROUSEL,
         RobotSampleState.ONGRIP,
         RobotSampleState.DIFFRACTOMETER,
     ],
@@ -97,7 +97,7 @@ async def test_robot_pause_resume(i11_robot: NX100Robot) -> None:
 @pytest.mark.parametrize(
     "state",
     [
-        RobotSampleState.CAROSEL,
+        RobotSampleState.CAROUSEL,
         RobotSampleState.ONGRIP,
         RobotSampleState.DIFFRACTOMETER,
     ],
@@ -115,11 +115,11 @@ async def test_robot_clear_sample_when_sample_on_carousel(
     i11_robot: NX100Robot,
 ) -> None:
     set_mock_value(
-        i11_robot.robot_sample_state, RobotSampleState.CAROSEL
+        i11_robot.robot_sample_state, RobotSampleState.CAROUSEL
     )  # Set to not ongrip state
 
     await i11_robot.clear_sample(table_in=False)
-    assert await i11_robot.robot_sample_state.get_value() == RobotSampleState.CAROSEL
+    assert await i11_robot.robot_sample_state.get_value() == RobotSampleState.CAROUSEL
 
 
 async def test_robot_clear_sample_when_sample_unknown(
@@ -131,7 +131,7 @@ async def test_robot_clear_sample_when_sample_unknown(
 
     await i11_robot.clear_sample(table_in=False)
     assert (
-        not await i11_robot.robot_sample_state.get_value() == RobotSampleState.CAROSEL
+        not await i11_robot.robot_sample_state.get_value() == RobotSampleState.CAROUSEL
     )
 
 

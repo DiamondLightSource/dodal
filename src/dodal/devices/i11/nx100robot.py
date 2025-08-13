@@ -15,8 +15,8 @@ from dodal.log import LOGGER
 
 class RobotJobs(StrictEnum):
     RECOVER = "RECOVER"  # Recover from unknown state
-    PICK_CAOUSEL = "PICKC"  # Pick a sample from the carousel.
-    PLACE_CAROSEL = "PLACEC"  # Place a sample onto the carousel
+    PICK_CAROUSEL = "PICKC"  # Pick a sample from the carousel.
+    PLACE_CAROUSEL = "PLACEC"  # Place a sample onto the carousel
     PICK_DIFFRACTOMETER = "PICKD"  # Pick a sample from the diffractometer.
     PLACE_DIFFRACTOMETER = "PLACED"  # Place a sample onto the diffractometer.
     GRIPO = "GRIPO"
@@ -27,7 +27,7 @@ class RobotJobs(StrictEnum):
 
 
 class RobotSampleState(float, Enum):
-    CAROSEL = 0.0  # Sample is on carousel
+    CAROUSEL = 0.0  # Sample is on carousel
     ONGRIP = 1.0  # Sample is on the gripper
     DIFFRACTOMETER = 2.0  # Sample is on the diffractometer
     UNKNOWN = 3.0
@@ -75,11 +75,11 @@ class NX100Robot(StandardReadable, Locatable[int], Stoppable, Pausable):
         if sample_state == RobotSampleState.DIFFRACTOMETER:
             await asyncio.gather(
                 set_and_wait_for_value(self.job, RobotJobs.PICK_DIFFRACTOMETER),
-                set_and_wait_for_value(self.job, RobotJobs.PLACE_CAROSEL),
+                set_and_wait_for_value(self.job, RobotJobs.PLACE_CAROUSEL),
             )
         elif sample_state == RobotSampleState.ONGRIP:
-            await set_and_wait_for_value(self.job, RobotJobs.PLACE_CAROSEL)
-        elif sample_state == RobotSampleState.CAROSEL:
+            await set_and_wait_for_value(self.job, RobotJobs.PLACE_CAROUSEL)
+        elif sample_state == RobotSampleState.CAROUSEL:
             pass
         elif sample_state == RobotSampleState.UNKNOWN:
             LOGGER.error("UNKNOWN sample state from robot, exit")
@@ -93,8 +93,8 @@ class NX100Robot(StandardReadable, Locatable[int], Stoppable, Pausable):
 
     async def load_sample(self, sample_location: int):
         sample_state = await self.robot_sample_state.get_value()
-        if sample_state == RobotSampleState.CAROSEL:
-            await set_and_wait_for_value(self.job, RobotJobs.PICK_CAOUSEL)
+        if sample_state == RobotSampleState.CAROUSEL:
+            await set_and_wait_for_value(self.job, RobotJobs.PICK_CAROUSEL)
             await set_and_wait_for_value(self.job, RobotJobs.PLACE_DIFFRACTOMETER)
         elif sample_state == RobotSampleState.ONGRIP:
             await set_and_wait_for_value(self.job, RobotJobs.PLACE_DIFFRACTOMETER)
