@@ -62,6 +62,7 @@ class AbstractElectronAnalyserDetector(
     @AsyncStatus.wrap
     async def stage(self) -> None:
         """Make sure the detector is idle and ready to be used."""
+        await self.driver.stage()
         await asyncio.gather(self.controller.disarm())
 
     @AsyncStatus.wrap

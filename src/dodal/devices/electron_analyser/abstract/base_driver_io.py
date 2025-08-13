@@ -3,7 +3,7 @@ from collections.abc import Mapping
 from typing import Generic, TypeVar
 
 import numpy as np
-from bluesky.protocols import Movable
+from bluesky.protocols import Movable, Stageable
 from ophyd_async.core import (
     Array1D,
     AsyncStatus,
@@ -33,6 +33,7 @@ class AbstractAnalyserDriverIO(
     ABC,
     StandardReadable,
     ADBaseIO,
+    Stageable,
     Movable[TAbstractBaseRegion],
     Generic[TAbstractBaseRegion, TAcquisitionMode, TLensMode, TPsuMode, TPassEnergy],
 ):
@@ -127,6 +128,20 @@ class AbstractAnalyserDriverIO(
             )
 
         super().__init__(prefix=prefix, name=name)
+
+    @AsyncStatus.wrap
+    async def stage(self) -> None:
+        """
+        Stage the driver. This is used to prepare the driver for data acquisition.
+        It should be called before any data acquisition starts.
+        """
+        await self.image_mode.set(ADImageMode.SINGLE)
+        await super().stage()
+
+    @AsyncStatus.wrap
+    async def unstage(self) -> None:
+        """Unstage the driver. This is used to clean up after data acquisition."""
+        await super().unstage()
 
     @abstractmethod
     @AsyncStatus.wrap
