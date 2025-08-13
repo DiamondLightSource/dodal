@@ -71,6 +71,9 @@ class NX100Robot(StandardReadable, Locatable[int], Stoppable, Pausable):
         )
 
     async def clear_sample(self, table_in: bool = True):
+        """clears the sample from the diffractometer and places it on the carousel.
+        if table_in is True, it will also move the sample holder to the table in position."""
+
         sample_state = await self.robot_sample_state.get_value()
         if sample_state == RobotSampleState.DIFFRACTOMETER:
             await asyncio.gather(
@@ -92,6 +95,7 @@ class NX100Robot(StandardReadable, Locatable[int], Stoppable, Pausable):
         LOGGER.info("Sample cleared from diffractometer")
 
     async def load_sample(self, sample_location: int):
+        """Loads a sample from the carousel to the diffractometer."""
         sample_state = await self.robot_sample_state.get_value()
         if sample_state == RobotSampleState.CAROUSEL:
             await set_and_wait_for_value(self.job, RobotJobs.PICK_CAROUSEL)
