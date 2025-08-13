@@ -5,6 +5,13 @@ from dodal.common.beamlines.beamline_utils import (
     device_instantiation,
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
+from dodal.devices.attenuator.attenuator import EnumFilterAttenuator
+from dodal.devices.attenuator.filter_selections import (
+    I02_1FilterFourSelections,
+    I02_1FilterOneSelections,
+    I02_1FilterThreeSelections,
+    I02_1FilterTwoSelections,
+)
 from dodal.devices.eiger import EigerDetector
 from dodal.devices.i02_1.fast_grid_scan import TwoDFastGridScan
 from dodal.devices.i02_1.sample_motors import SampleMotors
@@ -96,3 +103,20 @@ def goniometer() -> SampleMotors:
     If this is called when already instantiated in i03, it will return the existing object.
     """
     return SampleMotors(f"{PREFIX.beamline_prefix}-MO-SAMP-01:", "goniometer")
+
+
+@device_factory()
+def attenuator() -> EnumFilterAttenuator:
+    """Get the i02-1 attenuator device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i02-1, it will return the existing object.
+    """
+
+    return EnumFilterAttenuator(
+        f"{PREFIX.beamline_prefix}-OP-ATTN-01:",
+        (
+            I02_1FilterOneSelections,
+            I02_1FilterTwoSelections,
+            I02_1FilterThreeSelections,
+            I02_1FilterFourSelections,
+        ),
+    )

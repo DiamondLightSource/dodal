@@ -45,7 +45,6 @@ class TwoDFastGridScan(ZebraFastGridScan):
         self.y1_start = epics_signal_rw_rbv(float, f"{prefix}Y_START")
         self.z1_start = epics_signal_rw_rbv(float, f"{prefix}Z_START")
         self.motion_program = MotionProgram("BL02J-MO-STEP-11:")
-        self.position_counter = self._create_position_counter(prefix)
 
         # Z movement and second start position don't exist in EPICS for 2D scan.
         # Create soft signals for these so the class is structured like the common device.
@@ -53,15 +52,14 @@ class TwoDFastGridScan(ZebraFastGridScan):
         self.z_step_size, _ = soft_signal_r_and_setter(float, 0)
         self.z2_start, _ = soft_signal_r_and_setter(float, 0)
 
-        # TODO ask controls to add this PV
+        # VMXm will trigger the grid scan through GDA, which has its own validity check.
+        # However, we should still ask controls to add this PV
         self.scan_invalid = soft_signal_r_and_setter(float, 0)
 
         self.run_cmd = epics_signal_x(f"{prefix}RUN.PROC")
         self.status = epics_signal_r(int, f"{prefix}SCAN_STATUS")
         self.expected_images = derived_signal_r(
-            self._calculate_expected_images,
-            x=self.x_steps,
-            y=self.y_steps,
+            self._calculate_expected_images, x=self.x_steps, y=self.y_steps, z=0
         )
 
         self.x_counter = epics_signal_r(int, f"{prefix}X_COUNTER")
@@ -85,7 +83,12 @@ class TwoDFastGridScan(ZebraFastGridScan):
         # Skip the FGSCommon init function as we have already overriden all the signals
         StandardReadable.__init__(self, name)
 
-    def _calculate_expected_images(self, x: int, y: int) -> int:
+    def _create_position_counter(self, prefix: str):
+        return epics_signal_rw_rbv(
+            int, f"{prefix}POS_COUNTER", write_pv=f"{prefix}POS_COUNTER_WRITE"
+        )
+
+    def _calculate_expected_images(self, x: int, y: int, z: int) -> int:
         LOGGER.info(f"Reading num of images found {x, y} images in each axis")
         return x * y
 

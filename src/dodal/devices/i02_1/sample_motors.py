@@ -2,7 +2,6 @@ from ophyd_async.core import StandardReadable
 from ophyd_async.epics.motor import Motor
 
 
-# See https://github.com/DiamondLightSource/dodal/pull/1277/ and extend from one of these classes once merged
 class SampleMotors(StandardReadable):
     """Virtual Smaract motors on i02-1 (VMXm)"""
 
