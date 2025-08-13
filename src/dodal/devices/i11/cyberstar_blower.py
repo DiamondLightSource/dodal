@@ -1,32 +1,39 @@
-from ophyd_async.core import StrictEnum
+from typing import Generic, TypeVar
+
+from ophyd_async.core import StandardReadable, StrictEnum
 from ophyd_async.epics.core import epics_signal_rw
 
-from dodal.devices.eurotherm import EurothermAutotune, EurothermGeneral, EurothermPID
+from dodal.devices.eurotherm import EurothermAutotune, EurothermGeneral
+
+EU = TypeVar("EU", bound=EurothermGeneral)
 
 
 class CyberstarBlowerEnable(StrictEnum):
-    ON = "Enabled"
-    OFF = "Disabled"
+    ENABLE = "Enabled"
+    DISABLE = "Disabled"
 
 
-class CyberstarBlower(EurothermGeneral):
+class CyberstarBlower(StandardReadable, Generic[EU]):
     """This is a specific device that uses a Eurotherm controller"""
 
     def __init__(
         self,
         prefix: str,
         name: str = "",
-        infix: str = "",
-        update: bool = False,
-        autotune: bool = False,
+        controller_type: type[EU] = EurothermGeneral,
     ):
-        with self.add_children_as_readables():
-            self.enable = epics_signal_rw(CyberstarBlowerEnable, f"{prefix}DISABLE")
-            self.tune = EurothermPID(prefix=prefix + infix, update=update)
+        self.enable = epics_signal_rw(CyberstarBlowerEnable, f"{prefix}DISABLE")
+        self.controller = controller_type(prefix, name)
 
-            if autotune:
-                self.autotune = EurothermAutotune(prefix=prefix + infix)
-            else:
-                self.autotune = None
+        super().__init__(name=name)
 
-        super().__init__(prefix=prefix + infix, name=name, update=update)
+
+class AutotunedCyberstarBlower(CyberstarBlower[EurothermGeneral]):
+    def __init__(
+        self,
+        prefix: str,
+        name: str = "",
+        controller_type: type[EU] = EurothermGeneral,
+    ):
+        self.autotune = EurothermAutotune(prefix)
+        super().__init__(prefix, name=name, controller_type=controller_type)

@@ -4,7 +4,8 @@ import pytest
 from ophyd_async.core import init_devices
 from ophyd_async.testing import set_mock_value
 
-from dodal.devices.i11.cyberstar_blower import CyberstarBlower
+from dodal.devices.eurotherm import UpdatingEurothermGeneral
+from dodal.devices.i11.cyberstar_blower import AutotunedCyberstarBlower
 from dodal.devices.i11.nx100robot import NX100Robot, RobotJobs, RobotSampleState
 from dodal.devices.i11.spinner import Spinner
 
@@ -183,16 +184,18 @@ async def test_spinner_resume(i11_spinner: Spinner) -> None:
 
 
 @pytest.fixture
-async def i11_cyberstar() -> CyberstarBlower:
+async def i11_cyberstar() -> AutotunedCyberstarBlower:
     async with init_devices(mock=True):
-        i11_cyberstar = CyberstarBlower(
-            prefix="BL11I-EA-BLOW-01:", update=True, autotune=True
+        i11_cyberstar = AutotunedCyberstarBlower(
+            prefix="BL11I-EA-BLOW-01:", controller_type=UpdatingEurothermGeneral
         )
     return i11_cyberstar
 
 
-async def test_blower_setpoint_and_locate(i11_cyberstar: CyberstarBlower) -> None:
-    await i11_cyberstar.set(100.0)
-    assert await i11_cyberstar.setpoint.get_value() == 100.0
-    location = await i11_cyberstar.locate()
+async def test_blower_setpoint_and_locate(
+    i11_cyberstar: AutotunedCyberstarBlower,
+) -> None:
+    await i11_cyberstar.controller.set(100.0)
+    assert await i11_cyberstar.controller.setpoint.get_value() == 100.0
+    location = await i11_cyberstar.controller.locate()
     assert location["setpoint"] == 100.0

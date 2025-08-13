@@ -38,6 +38,32 @@ class EurothermUpdate(StrictEnum):
 _EUROTHERM_RBV: str = ":RBV"
 
 
+class EurothermPID(StandardReadable):
+    """The class for the Eurotherm PID values"""
+
+    def __init__(
+        self,
+        prefix: str,
+        name: str = "",
+    ):
+        with self.add_children_as_readables():
+            self.P = epics_signal_rw_rbv(float, f"{prefix}P", _EUROTHERM_RBV)
+            self.I = epics_signal_rw_rbv(float, f"{prefix}I", _EUROTHERM_RBV)
+            self.D = epics_signal_rw_rbv(float, f"{prefix}D", _EUROTHERM_RBV)
+
+        super().__init__(name)
+
+
+class UpdatingEurothermPID(EurothermPID):
+    """A Eurotherm PID controller that updates the PID values."""
+
+    def __init__(self, prefix: str, name: str = ""):
+        with self.add_children_as_readables():
+            self.update = epics_signal_rw(EurothermUpdate, f"{prefix}UPDATE.SCAN")
+
+        super().__init__(prefix=prefix, name=name)
+
+
 class EurothermGeneral(StandardReadable, Locatable[float]):
     """A base class for any eurotherm controller."""
 
@@ -46,7 +72,6 @@ class EurothermGeneral(StandardReadable, Locatable[float]):
         prefix: str,
         name: str = "",
         temp_suffix: str = "PV:RBV",
-        update: bool = False,
     ):
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             self.temp = epics_signal_r(float, f"{prefix}{temp_suffix}")
@@ -57,10 +82,7 @@ class EurothermGeneral(StandardReadable, Locatable[float]):
             self.output = epics_signal_rw_rbv(float, f"{prefix}O", _EUROTHERM_RBV)
             self.mode = epics_signal_rw_rbv(ManualMode, f"{prefix}MAN", _EUROTHERM_RBV)
 
-            if update:
-                self.update = epics_signal_rw(EurothermUpdate, f"{prefix}UPDATE.SCAN")
-            else:
-                self.update = None
+        self.tune = EurothermPID(prefix=prefix)
 
         super().__init__(name)
 
@@ -76,6 +98,17 @@ class EurothermGeneral(StandardReadable, Locatable[float]):
         return location
 
 
+class UpdatingEurothermGeneral(EurothermGeneral):
+    """A Eurotherm controller that updates the setpoint and readback."""
+
+    def __init__(self, prefix: str, name: str = ""):
+        self.update = epics_signal_rw(EurothermUpdate, f"{prefix}UPDATE.SCAN")
+
+        super().__init__(prefix=prefix, name=name)
+
+        self.tune = UpdatingEurothermPID(prefix=prefix)
+
+
 class EurothermAutotune(StandardReadable):
     """Newer versions of Eurotherm controllers have the ability to Autotune the
     PID values, and this is the device"""
@@ -89,27 +122,5 @@ class EurothermAutotune(StandardReadable):
             self.control = epics_signal_rw(AutotuneControl, f"{prefix}AUTOTUNE")
             self.high_limit = epics_signal_rw(float, f"{prefix}OUTPHI")
             self.low_limit = epics_signal_rw(float, f"{prefix}OUTPLO")
-
-        super().__init__(name)
-
-
-class EurothermPID(StandardReadable):
-    """The class for the Eurotherm PID values"""
-
-    def __init__(
-        self,
-        prefix: str,
-        name: str = "",
-        update: bool = False,
-    ):
-        with self.add_children_as_readables():
-            self.P = epics_signal_rw_rbv(float, f"{prefix}P", _EUROTHERM_RBV)
-            self.I = epics_signal_rw_rbv(float, f"{prefix}I", _EUROTHERM_RBV)
-            self.D = epics_signal_rw_rbv(float, f"{prefix}D", _EUROTHERM_RBV)
-
-            if update:
-                self.update = epics_signal_rw(EurothermUpdate, f"{prefix}PID.SCAN")
-            else:
-                self.update = None
 
         super().__init__(name)

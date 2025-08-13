@@ -9,7 +9,14 @@ from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beam
 from dodal.common.beamlines.device_helpers import DET_SUFFIX
 from dodal.common.visit import RemoteDirectoryServiceClient, StaticVisitPathProvider
 from dodal.devices.cryostream import OxfordCryoStream
-from dodal.devices.i11.cyberstar_blower import CyberstarBlower
+from dodal.devices.eurotherm import (
+    EurothermGeneral,
+    UpdatingEurothermGeneral,
+)
+from dodal.devices.i11.cyberstar_blower import (
+    AutotunedCyberstarBlower,
+    CyberstarBlower,
+)
 from dodal.devices.i11.diff_stages import (
     DiffractometerBase,
     DiffractometerStage,
@@ -76,9 +83,21 @@ def diff_base() -> DiffractometerBase:
 
 
 @device_factory()
-def csb1() -> CyberstarBlower:
-    """Cyberstar hot air blower 1 with Eurotherm Controller"""
-    return CyberstarBlower(prefix=f"{PREFIX.beamline_prefix}-EA-BLOW-01:", update=True)
+def csb1() -> CyberstarBlower[UpdatingEurothermGeneral]:
+    """Cyberstar hot air blower 1 with Eurotherm Controller and updating PID"""
+    return CyberstarBlower(
+        prefix=f"{PREFIX.beamline_prefix}-EA-BLOW-01:",
+        controller_type=UpdatingEurothermGeneral,
+    )
+
+
+@device_factory()
+def csb2() -> AutotunedCyberstarBlower:
+    """Cyberstar hot air blower 2 with autotuneable Eurotherm Controller"""
+    return AutotunedCyberstarBlower(
+        prefix=f"{PREFIX.beamline_prefix}-EA-BLOW-02:LOOP1:",
+        controller_type=EurothermGeneral,
+    )
 
 
 @device_factory()
@@ -86,14 +105,6 @@ def sample_robot() -> NX100Robot:
     """The sample robot arm and carosel on i11 that moves
     and loads samples on/off the spinner"""
     return NX100Robot(prefix=f"{PREFIX.beamline_prefix}-EA-ROBOT-01:")
-
-
-@device_factory()
-def csb2() -> CyberstarBlower:
-    """Cyberstar hot air blower 2 with Eurotherm Controller"""
-    return CyberstarBlower(
-        prefix=f"{PREFIX.beamline_prefix}-EA-BLOW-02:", infix="LOOP1:", autotune=True
-    )
 
 
 @device_factory()
