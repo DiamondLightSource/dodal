@@ -15,7 +15,7 @@ class CyberstarBlower(EurothermGeneral):
     def __init__(
         self,
         prefix: str,
-        name="",
+        name: str = "",
         enable_suffix: str = "DISABLE",
         infix: str = "",
         update: bool = False,

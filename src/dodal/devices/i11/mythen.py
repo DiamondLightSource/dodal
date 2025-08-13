@@ -143,7 +143,7 @@ class Mythen3(AreaDetector[Mythen3Controller]):
         self,
         prefix: str,
         path_provider: PathProvider,
-        drv_suffix=DET_SUFFIX,
+        drv_suffix: str = DET_SUFFIX,
         writer_cls: type[ADWriter] = ADHDFWriter,
         fileio_suffix: str | None = "HDF:",
         name: str = "",

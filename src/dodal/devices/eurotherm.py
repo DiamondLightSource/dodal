@@ -97,7 +97,13 @@ class EurothermAutotune(StandardReadable):
 class EurothermPID(StandardReadable):
     """The class for the Eurotherm PID values"""
 
-    def __init__(self, prefix: str, name: str = "", rbv_suffix=":RBV", update=False):
+    def __init__(
+        self,
+        prefix: str,
+        name: str = "",
+        rbv_suffix: str = ":RBV",
+        update: bool = False,
+    ):
         with self.add_children_as_readables():
             self.P = epics_signal_rw_rbv(float, f"{prefix}P", rbv_suffix)
             self.I = epics_signal_rw_rbv(float, f"{prefix}I", rbv_suffix)
