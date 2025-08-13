@@ -16,15 +16,12 @@ class CyberstarBlower(EurothermGeneral):
         self,
         prefix: str,
         name: str = "",
-        enable_suffix: str = "DISABLE",
         infix: str = "",
         update: bool = False,
         autotune: bool = False,
     ):
         with self.add_children_as_readables():
-            self.enable = epics_signal_rw(
-                CyberstarBlowerEnable, f"{prefix}{enable_suffix}"
-            )
+            self.enable = epics_signal_rw(CyberstarBlowerEnable, f"{prefix}DISABLE")
             self.tune = EurothermPID(prefix=prefix + infix, update=update)
 
             if autotune:
