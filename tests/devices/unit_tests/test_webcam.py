@@ -53,7 +53,7 @@ async def test_given_data_returned_from_url_when_trigger_then_data_written(
     mock_get: MagicMock, mock_aiofiles, webcam: Webcam
 ):
     mock_get.return_value.__aenter__.return_value = (mock_response := AsyncMock())
-    mock_response.read.return_value = (test_web_data := "TEST")
+    mock_response.read.return_value = (test_web_data := b"TEST")
     mock_open = mock_aiofiles.open
     mock_open.return_value.__aenter__.return_value = (mock_file := AsyncMock())
     await webcam.filename.set("file")
@@ -96,6 +96,14 @@ async def test_given_response_read_fails_then_placeholder_image_written(
     await webcam.trigger()
 
     mock_write.assert_called_once_with("/tmp/file.png", test_placeholder_data)
+
+
+@patch("dodal.devices.webcam.create_placeholder_image", autospec=True)
+@patch("dodal.devices.webcam.ClientSession.get", autospec=True)
+async def test_given_response_read_passes_but_image_is_invalid(
+    mock_get: MagicMock, mock_placeholder_image: MagicMock, webcam: Webcam
+):
+    pass
 
 
 def test_create_place_holder_image_gives_expected_bytes():
