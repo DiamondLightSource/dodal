@@ -33,8 +33,13 @@ class _LogOnPercentageProgressWatcher(Watcher[Number]):
         time_elapsed: float | None = None,
         time_remaining: float | None = None,
     ):
-        if isinstance(current, Number) and isinstance(target, Number) and target:
-            current_percent = int((current / target) * 100)
+        if (
+            isinstance(current, Number)
+            and isinstance(target, Number)
+            and isinstance(initial, Number)
+            and target - initial
+        ):
+            current_percent = int(((current - initial) / (target - initial)) * 100)
             if (
                 current_percent
                 >= (self._current_percent_interval + 1) * self.percent_interval

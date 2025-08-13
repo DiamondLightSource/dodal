@@ -53,7 +53,7 @@ async def test_log_on_percentage_complete(caplog, RE):
         assert sum(s.startswith(message_prefix) for s in caplog.messages) == 5
 
 
-async def test_log_on_percentage_complete_valuerror_on_bad_input():
+async def test_log_on_percentage_complete_value_error_on_bad_input():
     test_watchable = MockWatchable()
     status = test_watchable.get_watchable_status()
     with pytest.raises(
