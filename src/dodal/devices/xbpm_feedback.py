@@ -2,7 +2,9 @@ from bluesky.protocols import Triggerable
 from ophyd_async.core import AsyncStatus, Device, StrictEnum, observe_value
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
+from dodal.common.beamlines.commissioning_mode import is_commissioning_mode_enabled
 from dodal.common.device_utils import periodic_reminder
+from dodal.log import LOGGER
 
 
 class Pause(StrictEnum):
@@ -23,7 +25,10 @@ class XBPMFeedback(Device, Triggerable):
 
     @AsyncStatus.wrap
     async def trigger(self):
-        async with periodic_reminder("Waiting for XBPM"):
-            async for value in observe_value(self.pos_stable):
-                if value:
-                    return
+        if await is_commissioning_mode_enabled():
+            LOGGER.info("Commissioning mode enabled, ignoring feedback")
+        else:
+            async with periodic_reminder("Waiting for XBPM"):
+                async for value in observe_value(self.pos_stable):
+                    if value:
+                        return
