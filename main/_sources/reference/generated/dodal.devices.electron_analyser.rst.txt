@@ -15,6 +15,7 @@ dodal.devices.electron\_analyser
    :recursive:
 
    ~electron_analyser.EnergyMode
+   ~electron_analyser.SelectedSource
    ~electron_analyser.ElectronAnalyserDetector
    ~electron_analyser.ElectronAnalyserRegionDetector
 
