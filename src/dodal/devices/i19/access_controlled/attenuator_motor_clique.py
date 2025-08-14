@@ -100,7 +100,7 @@ class AttenuatorMotorClique(OpticsBlueApiDevice):
     async def set(self, value: AttenuatorPositionDemand):
         invoking_hutch = str(self._get_invoking_hutch().value)
         request_params = {
-            "name": "operate_attenuator_plan",
+            "name": "operate_motor_clique_plan",
             "params": {
                 "experiment_hutch": invoking_hutch,
                 "access_device": ACCESS_DEVICE_NAME,

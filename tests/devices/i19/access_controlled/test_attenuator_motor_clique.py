@@ -55,16 +55,18 @@ async def test_that_motor_clique_can_be_instantiated(invoking_hutch):
 
 @pytest.mark.parametrize("invoking_hutch", [HutchState.EH1, HutchState.EH2])
 @patch(
-    "dodal.devices.i19.access_controlled.optics_blueapi_device.OpticsBlueApiDevice.set"
+    "dodal.devices.i19.access_controlled.attenuator_motor_clique.OpticsBlueApiDevice.set",
+    new_callable=AsyncMock,
 )
 async def test_when_motor_clique_is_set_that_expected_request_params_are_passed(
-    patched_setter, invoking_hutch
+    internal_setter, invoking_hutch
 ):
     motors: AttenuatorMotorClique = await given_a_clique_of_attenuator_motors(
         invoking_hutch
     )
     position_demand: AttenuatorPositionDemand = given_a_position_demand()
-    motors.set(position_demand)  # when motor position demand is set
+    await motors.set(position_demand)  # when motor position demand is set
+
     expected_hutch: str = invoking_hutch.value
     expected_device: str = "access_control"
     expected_request_name: str = "operate_motor_clique_plan"
@@ -77,7 +79,7 @@ async def test_when_motor_clique_is_set_that_expected_request_params_are_passed(
         "name": expected_request_name,
         "params": expected_parameters,
     }
-    assert patched_setter.called_once_with(expected_request)
+    internal_setter.assert_called_once_with(expected_request)
 
 
 @pytest.mark.parametrize("invoking_hutch", [HutchState.EH1, HutchState.EH2])
