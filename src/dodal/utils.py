@@ -6,13 +6,16 @@ import re
 import socket
 import string
 from collections.abc import Callable, Iterable, Mapping
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from enum import Enum
 from functools import update_wrapper, wraps
 from importlib import import_module
 from inspect import signature
 from os import environ
+from pathlib import PurePath
 from types import ModuleType
 from typing import (
+    Annotated,
     Any,
     Generic,
     TypeAlias,
@@ -36,9 +39,17 @@ from bluesky.protocols import (
     Triggerable,
     WritesExternalAssets,
 )
-from bluesky.run_engine import call_in_bluesky_event_loop
+from bluesky.run_engine import RunEngine, call_in_bluesky_event_loop
 from ophyd.device import Device as OphydV1Device
+from ophyd_async.core import (
+    DEFAULT_TIMEOUT,
+    NotConnected,
+    PathProvider,
+    StaticPathProvider,
+    UUIDFilenameProvider,
+)
 from ophyd_async.core import Device as OphydV2Device
+from ophyd_async.plan_stubs import ensure_connected
 
 import dodal.log
 
@@ -126,6 +137,10 @@ class DeviceInitializationController(Generic[T]):
     @property
     def skip(self) -> bool:
         return self._skip() if callable(self._skip) else self._skip
+
+    @property
+    def timeout(self) -> float:
+        return self._timeout
 
     def cache_clear(self) -> None:
         """Clears the controller's internal cached instance of the device, if present.
@@ -237,63 +252,109 @@ def make_device(
     return device_collector
 
 
-from dataclasses import field
-from pathlib import PurePath
-from typing import Annotated
-
-from bluesky.run_engine import RunEngine
-from ophyd_async.core import (
-    DEFAULT_TIMEOUT,
-    NotConnected,
-    PathProvider,
-    StaticPathProvider,
-    UUIDFilenameProvider,
-)
-from ophyd_async.plan_stubs import ensure_connected
+class ConnectPolicy(Enum):
+    IMMEDIATE = "IMMEDIATE"
+    IMMEDIATE_MOCK = "IMMEDIATE_MOCK"
+    DEFERRED = "DEFERRED"
 
 
 @dataclass(frozen=True)
 class DeviceContext:
-    run_engine: RunEngine = field(default_factory=RunEngine)
-    path_provider: PathProvider = field(
+    run_engine: Annotated[
+        RunEngine,
+        "RunEngine, needed to allow ophyd-async devices to connect."
+        "See https://blueskyproject.io/ophyd-async/main/explanations/event-loop-choice.html",
+    ] = field(default_factory=lambda: RunEngine(call_returns_result=True))
+    path_provider: Annotated[
+        PathProvider,
+        "PathProvider, passed to detectors so they can determine where to write data",
+    ] = field(
         default_factory=lambda: StaticPathProvider(
             filename_provider=UUIDFilenameProvider(),
             directory_path=PurePath("/tmp"),
         )
     )
-    mock: bool = False
+    include_skipped: Annotated[bool, "Include devices marked as skipped"] = False
+    connect: Annotated[
+        ConnectPolicy, "How to handle live connections when making devices"
+    ] = ConnectPolicy.DEFERRED
 
 
 class DeviceManager:
-    def __init__(self) -> None:
-        self._factories: dict[str, DeviceInitializationController] = {}
+    def __init__(
+        self,
+        factories: dict[str, DeviceInitializationController] | None = None,
+        pass_context: bool = True,
+    ) -> None:
+        self._factories: dict[str, DeviceInitializationController] = factories or {}
+        self._pass_context = pass_context
 
-    def build_and_connect_all(
+    @classmethod
+    def find_or_create_for_module(cls, module: ModuleType) -> "DeviceManager":
+        return cls.find_for_module(module) or cls.create_for_module(module)
+
+    @classmethod
+    def create_for_module(cls, module: ModuleType) -> "DeviceManager":
+        factories = collect_factories(module, include_skipped=True)
+        return cls(factories, pass_context=False)
+
+    @classmethod
+    def find_for_module(cls, module: ModuleType) -> "DeviceManager | None":
+        return next(
+            (obj for obj in module.__dict__.values() if isinstance(obj, cls)),
+            None,
+        )
+
+    def build_all(
         self, context: DeviceContext | None = None
     ) -> tuple[dict[str, AnyDevice], dict[str, Exception]]:
         context = context or DeviceContext()
 
+        kwargs = {"context": context} if self._pass_context else {}
         unconnected_devices, instantiation_errors = invoke_factories(
-            self._factories,
-            context=context,
+            self._factories, **kwargs
         )
-        exceptions = {}
+        connected_devices, connection_errors = self._optionally_connect_devices(
+            context, unconnected_devices
+        )
+        return connected_devices, {**instantiation_errors, **connection_errors}
 
-        # Connect ophyd-async devices
-        try:
-            context.run_engine(
-                ensure_connected(*unconnected_devices.values(), mock=context.mock)
-            )
-        except NotConnected as ex:
-            exceptions = {**exceptions, **ex.sub_errors}
+    def _optionally_connect_devices(
+        self,
+        context: DeviceContext,
+        unconnected_devices: Mapping[str, OphydV2Device],
+    ) -> tuple[dict[str, AnyDevice], dict[str, Exception]]:
+        if context.connect is not ConnectPolicy.DEFERRED:
+            exceptions = {}
 
-        # Only return the subset of devices that haven't raised an exception
-        successful_devices = {
-            name: device
-            for name, device in unconnected_devices.items()
-            if name not in exceptions
-        }
-        return successful_devices, {**exceptions, **instantiation_errors}
+            # Connect devices
+            try:
+                mock = context.connect is ConnectPolicy.IMMEDIATE_MOCK
+                context.run_engine(
+                    ensure_connected(
+                        *unconnected_devices.values(),
+                        mock=mock,
+                        timeout=self._connection_timeout(),
+                    )
+                )
+            except NotConnected as ex:
+                exceptions = {**exceptions, **ex.sub_errors}
+
+            # Only return the subset of devices that haven't raised an exception
+            successful_devices = {
+                name: device
+                for name, device in unconnected_devices.items()
+                if name not in exceptions
+            }
+            return successful_devices, exceptions
+        else:
+            return unconnected_devices, {}
+
+    def _connection_timeout(self) -> float:
+        # The timeout for connecting all devices should be the largest
+        # individual timeout
+        all_timeouts = (factory.timeout for factory in self._factories.values())
+        return max(*all_timeouts)
 
     def factory(
         self,
