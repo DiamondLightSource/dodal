@@ -15,16 +15,12 @@ from ophyd_async.epics.motor import Motor
 
 from dodal.log import LOGGER
 
+from ..common.beamlines.commissioning_mode import is_commissioning_mode_enabled
 from .util.lookup_tables import energy_distance_table
 
 
 class AccessError(Exception):
     pass
-
-
-# Enable to allow testing when the beamline is down, do not change in production!
-TEST_MODE = False
-# will be made more generic in https://github.com/DiamondLightSource/dodal/issues/754
 
 
 # The acceptable difference, in mm, between the undulator gap and the DCM
@@ -110,7 +106,8 @@ class Undulator(StandardReadable, Movable[float]):
 
     async def raise_if_not_enabled(self):
         access_level = await self.gap_access.get_value()
-        if access_level is UndulatorGapAccess.DISABLED and not TEST_MODE:
+        commissioning_mode = await is_commissioning_mode_enabled()
+        if access_level is UndulatorGapAccess.DISABLED and not commissioning_mode:
             raise AccessError("Undulator gap access is disabled. Contact Control Room")
 
     async def _set_undulator_gap(self, energy_kev: float) -> None:
@@ -129,15 +126,16 @@ class Undulator(StandardReadable, Movable[float]):
                 f"Undulator gap mismatch. {difference:.3f}mm is outside tolerance.\
                 Moving gap to nominal value, {target_gap:.3f}mm"
             )
-            if not TEST_MODE:
+            commissioning_mode = await is_commissioning_mode_enabled()
+            if not commissioning_mode:
                 # Only move if the gap is sufficiently different to the value from the
-                # DCM lookup table AND we're not in TEST_MODE
+                # DCM lookup table AND we're not in commissioning mode
                 await self.gap_motor.set(
                     target_gap,
                     timeout=STATUS_TIMEOUT_S,
                 )
             else:
-                LOGGER.debug("In test mode, not moving ID gap")
+                LOGGER.warning("In test mode, not moving ID gap")
         else:
             LOGGER.debug(
                 "Gap is already in the correct place for the new energy value "
