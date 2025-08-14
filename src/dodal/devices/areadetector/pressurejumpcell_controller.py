@@ -10,6 +10,7 @@ from ophyd_async.core import (
     set_and_wait_for_value,
 )
 from ophyd_async.epics import adcore
+from ophyd_async.epics.core import stop_busy_record
 
 from .pressurejumpcell_io import (
     AdcTriggerState,
@@ -67,6 +68,10 @@ class PressureJumpCellController(adcore.ADBaseController[PressureJumpCellDriverI
     async def arm(self):
         # Standard arm the detector and wait for the acquire PV to be True
         self._arm_status = await self.start_acquiring_driver_and_ensure_status()
+
+    async def disarm(self):
+        await stop_busy_record(self.trig.capture, False)
+        await stop_busy_record(self.driver.acquire, False)
 
     async def start_acquiring_driver_and_ensure_status(
         self,
