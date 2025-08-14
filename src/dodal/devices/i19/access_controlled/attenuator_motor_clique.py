@@ -4,7 +4,6 @@ from ophyd_async.core import AsyncStatus
 
 from dodal.devices.i19.access_controlled.hutch_access import ACCESS_DEVICE_NAME
 from dodal.devices.i19.access_controlled.optics_blueapi_device import (
-    HutchState,
     OpticsBlueApiDevice,
 )
 
@@ -21,12 +20,10 @@ class AttenuatorPositionDemand:
             raise ValueError(msg)
 
     @staticmethod
-    def __validate_dict(d: dict[str, Any], motor_type: str):
-        k_msg_template = "Missing attenuator motor axis label for {}"
-        k_msg = str.format(k_msg_template, motor_type)
+    def _validate_dict(d: dict[str, Any], motor_type: str):
+        k_msg = f"Missing attenuator motor axis label for {motor_type}"
         AttenuatorPositionDemand._ensure_no_dict_k_is_none(d, k_msg)
-        v_msg_template = "Missing attenuator position demand value for {}"
-        v_msg = str.format(v_msg_template, motor_type)
+        v_msg = f"Missing attenuator position demand value for {motor_type}"
         AttenuatorPositionDemand._ensure_no_dict_v_is_none(d, v_msg)
 
     @staticmethod
@@ -52,18 +49,18 @@ class AttenuatorPositionDemand:
         combined_demand.update(indexed_motor_position_demands)
         self.demands = combined_demand
 
-    def restful_format(self) -> str:
-        return str(self.demands)
+    def restful_format(self) -> dict[str, Any]:
+        return self.demands.copy()
 
     def _validate_input(
         self,
         continuous_motor_position_demands: dict[str, float],
         indexed_motor_position_demands: dict[str, int],
     ):
-        AttenuatorPositionDemand.__validate_dict(
+        AttenuatorPositionDemand._validate_dict(
             continuous_motor_position_demands, "continuous motor"
         )
-        AttenuatorPositionDemand.__validate_dict(
+        AttenuatorPositionDemand._validate_dict(
             indexed_motor_position_demands, "indexed motor"
         )
         AttenuatorPositionDemand._ensure_dicts_share_no_common_k(
@@ -71,8 +68,8 @@ class AttenuatorPositionDemand:
         )
 
 
-class AttenuatorMotorSet(OpticsBlueApiDevice):
-    """ I19-specific proxy device which requests absorber position changes in x-ray attenuator.
+class AttenuatorMotorClique(OpticsBlueApiDevice):
+    """ I19-specific proxy device which requests absorber position changes in the x-ray attenuator.
 
     Sends REST call to blueapi controlling optics on the I19 cluster.
      The hutch in use is compared against the hutch which sent the REST call.
@@ -83,20 +80,29 @@ class AttenuatorMotorSet(OpticsBlueApiDevice):
     The name of the hutch that wants to operate the optics device is passed to the \
     access controlled device upon instantiation of the latter.
 
+    Nomenclature:
+    Note this class was originally called
+        -MotorSet
+        ( but objections were based on "set" being an overloaded word )
+
+        -Gang might have worked,
+        ( but a gang of mechanical devices are able to be mechanically coupled
+        and move together; whereas the motors here are completely mutually independent )
+
+        -Clique
+        ( as in a set of friends, is an accurate choice, is unlikely to be overloaded, just sounds pretentious).
+
     For details see the architecture described in \
     https://github.com/DiamondLightSource/i19-bluesky/issues/30.
     """
 
-    def __init__(self, prefix: str, hutch: HutchState, name: str = "") -> None:
-        super().__init__(hutch, name)
-
     @AsyncStatus.wrap
     async def set(self, value: AttenuatorPositionDemand):
-        invoking_hutch = self._get_invoking_hutch().value
+        invoking_hutch = str(self._get_invoking_hutch().value)
         request_params = {
             "name": "operate_attenuator_plan",
             "params": {
-                "experiement_hutch": invoking_hutch,
+                "experiment_hutch": invoking_hutch,
                 "access_device": ACCESS_DEVICE_NAME,
                 "attenuator_demands": value.restful_format(),
             },
