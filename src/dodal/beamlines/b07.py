@@ -3,6 +3,7 @@ from dodal.common.beamlines.beamline_utils import (
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.devices.b07 import Grating, LensMode, PsuMode
+from dodal.devices.electron_analyser import SelectedSource
 from dodal.devices.electron_analyser.specs import SpecsAnalyserDriverIO
 from dodal.devices.pgm import PGM
 from dodal.devices.synchrotron import Synchrotron
@@ -33,5 +34,5 @@ def analyser_driver() -> SpecsAnalyserDriverIO[LensMode, PsuMode]:
         prefix=f"{PREFIX.beamline_prefix}-EA-DET-01:CAM:",
         lens_mode_type=LensMode,
         psu_mode_type=PsuMode,
-        energy_sources={"source1": pgm().energy.user_readback},
+        energy_sources={SelectedSource.SOURCE1: pgm().energy.user_readback},
     )
