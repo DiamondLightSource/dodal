@@ -5,9 +5,21 @@ beam. The intent is that when it is enabled, bluesky plans may be run without be
 and plans and devices will as far as is possible behave normally.
 """
 
+import bluesky.plan_stubs as bps
+from bluesky.utils import MsgGenerator
 from ophyd_async.core import SignalR
 
 _commissioning_signal: SignalR | None = None
+
+
+def read_commissioning_mode() -> MsgGenerator[bool]:
+    """Utility method for reading the commissioning mode state from the context
+    of a bluesky plan, where a baton may or may not be present, or
+    commissioning mode is provided by some other mechanism."""
+    if _commissioning_signal:
+        return (yield from bps.rd(_commissioning_signal))
+    else:
+        return False
 
 
 async def is_commissioning_mode_enabled() -> bool:
