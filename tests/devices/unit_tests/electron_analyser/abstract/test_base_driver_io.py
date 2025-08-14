@@ -2,7 +2,7 @@ import pytest
 from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
 from bluesky.utils import FailedStatus
-from ophyd_async.core import SignalR, StrictEnum
+from ophyd_async.core import SignalR, StrictEnum, init_devices
 
 from dodal.devices import b07, i09
 from dodal.devices.electron_analyser.abstract import (
@@ -15,9 +15,9 @@ from dodal.devices.electron_analyser.specs import (
 from dodal.devices.electron_analyser.vgscienta import (
     VGScientaAnalyserDriverIO,
 )
-from tests.devices.unit_tests.electron_analyser.util import (
+from dodal.testing.electron_analyser import create_driver
+from tests.devices.unit_tests.electron_analyser.helper_util import (
     TEST_SEQUENCE_REGION_NAMES,
-    create_analyser_device,
 )
 
 
@@ -28,12 +28,15 @@ from tests.devices.unit_tests.electron_analyser.util import (
     ]
 )
 async def sim_driver(
-    request: pytest.FixtureRequest, energy_sources: dict[str, SignalR[float]]
+    request: pytest.FixtureRequest,
+    energy_sources: dict[str, SignalR[float]],
+    RE: RunEngine,
 ) -> AbstractAnalyserDriverIO:
-    return await create_analyser_device(
-        request.param,
-        energy_sources,
-    )
+    async with init_devices(mock=True):
+        sim_driver = await create_driver(
+            request.param, prefix="TEST:", energy_sources=energy_sources
+        )
+    return sim_driver
 
 
 @pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
@@ -45,13 +48,6 @@ def test_analyser_correctly_selects_energy_source_from_region_input(
     energy_source = sim_driver._get_energy_source(source_alias_name)
 
     assert energy_source == sim_driver.energy_sources[source_alias_name]
-
-
-def test_analyser_raise_error_on_invalid_energy_source_selected(
-    sim_driver: AbstractAnalyserDriverIO,
-) -> None:
-    with pytest.raises(KeyError):
-        sim_driver._get_energy_source("invalid_name")
 
 
 def test_driver_throws_error_with_wrong_lens_mode(

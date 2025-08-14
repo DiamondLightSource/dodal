@@ -25,7 +25,7 @@ from dodal.devices.electron_analyser.abstract.types import (
     TPassEnergy,
     TPsuMode,
 )
-from dodal.devices.electron_analyser.enums import EnergyMode
+from dodal.devices.electron_analyser.enums import EnergyMode, SelectedSource
 from dodal.devices.electron_analyser.util import to_binding_energy
 
 
@@ -49,7 +49,7 @@ class AbstractAnalyserDriverIO(
         lens_mode_type: type[TLensMode],
         psu_mode_type: type[TPsuMode],
         pass_energy_type: type[TPassEnergy],
-        energy_sources: Mapping[str, SignalR[float]],
+        energy_sources: Mapping[SelectedSource, SignalR[float]],
         name: str = "",
     ) -> None:
         """
@@ -143,7 +143,7 @@ class AbstractAnalyserDriverIO(
             region: Contains the parameters to setup the driver for a scan.
         """
 
-    def _get_energy_source(self, alias_name: str) -> SignalR[float]:
+    def _get_energy_source(self, alias_name: SelectedSource) -> SignalR[float]:
         energy_source = self.energy_sources.get(alias_name)
         if energy_source is None:
             raise KeyError(

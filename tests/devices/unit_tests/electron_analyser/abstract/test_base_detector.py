@@ -4,7 +4,7 @@ import pytest
 from bluesky import plan_stubs as bps
 from bluesky.protocols import Triggerable
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import SignalR
+from ophyd_async.core import SignalR, init_devices
 from ophyd_async.epics.adcore import ADBaseController
 
 import dodal.devices.b07 as b07
@@ -14,10 +14,8 @@ from dodal.devices.electron_analyser import (
 )
 from dodal.devices.electron_analyser.specs import SpecsDetector
 from dodal.devices.electron_analyser.vgscienta import VGScientaDetector
-from tests.devices.unit_tests.electron_analyser.util import (
-    create_analyser_device,
-    get_test_sequence,
-)
+from dodal.testing.electron_analyser import create_detector
+from tests.devices.unit_tests.electron_analyser.helper_util import get_test_sequence
 
 
 @pytest.fixture(
@@ -27,9 +25,17 @@ from tests.devices.unit_tests.electron_analyser.util import (
     ]
 )
 async def sim_detector(
-    request: pytest.FixtureRequest, energy_sources: dict[str, SignalR[float]]
+    request: pytest.FixtureRequest,
+    energy_sources: dict[str, SignalR[float]],
+    RE: RunEngine,
 ) -> GenericElectronAnalyserDetector:
-    return await create_analyser_device(request.param, energy_sources)
+    async with init_devices(mock=True):
+        sim_detector = await create_detector(
+            request.param,
+            prefix="TEST:",
+            energy_sources=energy_sources,
+        )
+    return sim_detector
 
 
 @pytest.fixture

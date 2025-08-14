@@ -20,7 +20,7 @@ from dodal.devices.electron_analyser.abstract.types import (
     TPassEnergyEnum,
     TPsuMode,
 )
-from dodal.devices.electron_analyser.enums import EnergyMode
+from dodal.devices.electron_analyser.enums import EnergyMode, SelectedSource
 from dodal.devices.electron_analyser.vgscienta.enums import (
     AcquisitionMode,
     DetectorMode,
@@ -46,7 +46,7 @@ class VGScientaAnalyserDriverIO(
         lens_mode_type: type[TLensMode],
         psu_mode_type: type[TPsuMode],
         pass_energy_type: type[TPassEnergyEnum],
-        energy_sources: Mapping[str, SignalR[float]],
+        energy_sources: Mapping[SelectedSource, SignalR[float]],
         name: str = "",
     ) -> None:
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
@@ -55,11 +55,11 @@ class VGScientaAnalyserDriverIO(
 
             self.region_min_x = epics_signal_rw(int, prefix + "MinX")
             self.region_size_x = epics_signal_rw(int, prefix + "SizeX")
-            self.sensor_max_size_x = epics_signal_rw(int, prefix + "MaxSizeX")
+            self.sensor_max_size_x = epics_signal_r(int, prefix + "MaxSizeX_RBV")
 
             self.region_min_y = epics_signal_rw(int, prefix + "MinY")
             self.region_size_y = epics_signal_rw(int, prefix + "SizeY")
-            self.sensor_max_size_y = epics_signal_rw(int, prefix + "MaxSizeY")
+            self.sensor_max_size_y = epics_signal_r(int, prefix + "MaxSizeY_RBV")
 
         super().__init__(
             prefix,
