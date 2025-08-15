@@ -76,6 +76,7 @@ class SpecsAnalyserDriverIO(
             self.low_energy.set(ke_region.low_energy),
             self.high_energy.set(ke_region.high_energy),
             self.slices.set(ke_region.slices),
+            self.acquire_time.set(ke_region.acquire_time),
             self.lens_mode.set(ke_region.lens_mode),
             self.pass_energy.set(ke_region.pass_energy),
             self.iterations.set(ke_region.iterations),
