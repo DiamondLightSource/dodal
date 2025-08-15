@@ -20,8 +20,8 @@ class HutchState(str, Enum):
     EH2 = "EH2"
 
 
-class OpticsBlueAPIDevice(StandardReadable, Movable[D]):
-    """General device that a REST call to the blueapi instance controlling the optics \
+class OpticsBlueApiDevice(StandardReadable, Movable[D]):
+    """General device that sends a REST call to the blueapi instance controlling the optics \
     hutch running on the I19 cluster, which will evaluate the current hutch in use vs \
     the hutch sending the request and decide if the plan will be run or not.
 
@@ -29,10 +29,14 @@ class OpticsBlueAPIDevice(StandardReadable, Movable[D]):
     https://github.com/DiamondLightSource/i19-bluesky/issues/30.
     """
 
-    def __init__(self, name: str = "") -> None:
+    def __init__(self, hutch: HutchState, name: str = "") -> None:
         self.url = OPTICS_BLUEAPI_URL
         self.headers = HEADERS
+        self.invoking_hutch = hutch
         super().__init__(name)
+
+    def _get_invoking_hutch(self) -> HutchState:
+        return self.invoking_hutch
 
     @AsyncStatus.wrap
     async def set(self, value: D):
