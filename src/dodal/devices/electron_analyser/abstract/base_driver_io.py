@@ -3,7 +3,7 @@ from collections.abc import Mapping
 from typing import Generic, TypeVar
 
 import numpy as np
-from bluesky.protocols import Movable, Stageable
+from bluesky.protocols import Movable
 from ophyd_async.core import (
     Array1D,
     AsyncStatus,
@@ -33,7 +33,6 @@ class AbstractAnalyserDriverIO(
     ABC,
     StandardReadable,
     ADBaseIO,
-    Stageable,
     Movable[TAbstractBaseRegion],
     Generic[TAbstractBaseRegion, TAcquisitionMode, TLensMode, TPsuMode, TPassEnergy],
 ):

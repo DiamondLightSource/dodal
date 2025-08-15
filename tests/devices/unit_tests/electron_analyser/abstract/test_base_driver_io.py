@@ -1,8 +1,11 @@
+from unittest.mock import AsyncMock, patch
+
 import pytest
 from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
 from bluesky.utils import FailedStatus
 from ophyd_async.core import SignalR, StrictEnum, init_devices
+from ophyd_async.epics.adcore import ADImageMode
 
 from dodal.devices import b07, i09
 from dodal.devices.electron_analyser.abstract import (
@@ -94,3 +97,48 @@ def test_driver_throws_error_with_wrong_psu_mode(
     psu_datatype_name = psu_datatype.__name__ if psu_datatype is not None else ""
     with pytest.raises(FailedStatus, match=f"is not a valid {psu_datatype_name}"):
         RE(bps.mv(sim_driver.psu_mode, PsuModeTestEnum.TEST_1))
+
+
+@pytest.mark.asyncio
+async def test_stage_sets_image_mode_and_calls_super(
+    sim_driver: AbstractAnalyserDriverIO,
+    RE: RunEngine,
+):
+    # Patch image_mode.set and super().stage
+    with patch.object(
+        AbstractAnalyserDriverIO.__bases__[1], "stage", new=AsyncMock()
+    ) as super_stage:
+        sim_driver.image_mode.set = AsyncMock()
+        # Call the real stage method (not the mock)
+        await sim_driver.stage()
+        # Assert that image_mode.set was called with ADImageMode.SINGLE
+        sim_driver.image_mode.set.assert_awaited_once_with(ADImageMode.SINGLE)
+        # Assert that the super().stage() method was called
+        super_stage.assert_awaited_once()
+
+
+@pytest.mark.asyncio
+async def test_stage_sets_image_mode_to_single(sim_driver: AbstractAnalyserDriverIO):
+    sim_driver.image_mode.set = AsyncMock()
+    await sim_driver.stage()
+    sim_driver.image_mode.set.assert_awaited_once_with(ADImageMode.SINGLE)
+
+
+@pytest.mark.asyncio
+async def test_stage_calls_super_stage(sim_driver: AbstractAnalyserDriverIO):
+    # Patch the parent class's stage method
+    with patch.object(
+        AbstractAnalyserDriverIO.__bases__[1], "stage", new=AsyncMock()
+    ) as super_stage:
+        sim_driver.image_mode.set = AsyncMock()
+        await sim_driver.stage()
+        super_stage.assert_awaited_once()
+
+
+@pytest.mark.asyncio
+async def test_stage_raises_if_image_mode_set_fails(
+    sim_driver: AbstractAnalyserDriverIO,
+):
+    sim_driver.image_mode.set = AsyncMock(side_effect=RuntimeError("fail"))
+    with pytest.raises(RuntimeError, match="fail"):
+        await sim_driver.stage()
