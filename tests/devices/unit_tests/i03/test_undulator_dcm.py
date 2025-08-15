@@ -6,7 +6,6 @@ import pytest
 from ophyd_async.core import AsyncStatus, init_devices
 from ophyd_async.testing import get_mock_put, set_mock_value
 
-from conftest import MOCK_DAQ_CONFIG_PATH
 from dodal.common.enums import EnabledDisabledUpper
 from dodal.devices.i03.dcm import DCM
 from dodal.devices.i03.undulator_dcm import UndulatorDCM
