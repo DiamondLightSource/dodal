@@ -1,4 +1,3 @@
-import asyncio
 from abc import abstractmethod
 from typing import Generic
 
@@ -59,13 +58,25 @@ class AbstractElectronAnalyserDetector(
 
     @AsyncStatus.wrap
     async def stage(self) -> None:
-        """Make sure the detector is idle and ready to be used."""
-        await asyncio.gather(self.controller.disarm())
+        """
+        Prepare the detector for use by ensuring it is idle and ready.
+
+        This method asynchronously stages the detector by first invoking the driver's
+        stage procedure, then disarming the controller to ensure the detector is not
+        actively acquiring data. This ensures the detector is in a known, ready state
+        before use.
+
+        Raises:
+            Any exceptions raised by the driver's stage or controller's disarm methods.
+        """
+        await self.controller.disarm()
+        await self.driver.stage()
 
     @AsyncStatus.wrap
     async def unstage(self) -> None:
         """Disarm the detector."""
-        await asyncio.gather(self.controller.disarm())
+        await self.controller.disarm()
+        await self.driver.unstage()
 
     async def read(self) -> dict[str, Reading]:
         return await self.driver.read()

@@ -13,7 +13,7 @@ from ophyd_async.core import (
     derived_signal_r,
     soft_signal_rw,
 )
-from ophyd_async.epics.adcore import ADBaseIO
+from ophyd_async.epics.adcore import ADBaseIO, ADImageMode
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
 from dodal.devices.electron_analyser.abstract.base_region import (
@@ -127,6 +127,11 @@ class AbstractAnalyserDriverIO(
             )
 
         super().__init__(prefix=prefix, name=name)
+
+    @AsyncStatus.wrap
+    async def stage(self) -> None:
+        await self.image_mode.set(ADImageMode.SINGLE)
+        await super().stage()
 
     @abstractmethod
     @AsyncStatus.wrap
