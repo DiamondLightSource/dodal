@@ -5,9 +5,9 @@ from dodal.devices.robot import BartRobot
 
 
 class ForceBit(StrictEnum):
-    ON = OnOff.ON
+    ON = OnOff.ON.value
     NO = "No"
-    OFF = OnOff.OFF
+    OFF = OnOff.OFF.value
 
 
 class LaserRobot(BartRobot):

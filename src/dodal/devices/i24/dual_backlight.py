@@ -5,8 +5,8 @@ from dodal.common.enums import OnOffUpper
 
 
 class BacklightPositions(StrictEnum):
-    OUT = InOut.OUT
-    IN = InOut.IN
+    OUT = InOut.OUT.value
+    IN = InOut.IN.value
     LOAD_CHECK = "LoadCheck"
     OAV2 = "OAV2"
     DIODE = "Diode"

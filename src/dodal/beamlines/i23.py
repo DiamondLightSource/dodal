@@ -45,8 +45,8 @@ I23_ZEBRA_MAPPING = ZebraMapping(
 
 
 class I23DetectorPositions(StrictEnum):
-    IN = InOut.IN
-    OUT = InOut.OUT
+    IN = InOut.IN.value
+    OUT = InOut.OUT.value
     SAMPLE_CHANGE = "sample change"
 
 

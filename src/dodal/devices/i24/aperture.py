@@ -5,8 +5,8 @@ from dodal.devices.motors import XYStage
 
 
 class AperturePositions(StrictEnum):
-    IN = InOut.IN
-    OUT = InOut.OUT
+    IN = InOut.IN.value
+    OUT = InOut.OUT.value
     ROBOT = "Robot"
     MANUAL = "Manual Mounting"
 
