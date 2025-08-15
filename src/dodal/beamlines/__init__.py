@@ -1,7 +1,9 @@
+import importlib
 import importlib.util
 from collections.abc import Iterable, Mapping
 from functools import lru_cache
 from pathlib import Path
+from types import ModuleType
 
 # Where beamline names (per the ${BEAMLINE} environment variable don't always
 # match up, we have to map between them bidirectionally). The most common use case is
@@ -9,6 +11,7 @@ from pathlib import Path
 # module name. Add any new beamlines whose name differs from their module name to this
 # dictionary, which maps ${BEAMLINE} to dodal.beamlines.<MODULE NAME>
 _BEAMLINE_NAME_OVERRIDES = {
+    "b01-1": "b01_1",
     "i05-1": "i05_1",
     "b07-1": "b07_1",
     "i09-1": "i09_1",
@@ -23,6 +26,12 @@ _BEAMLINE_NAME_OVERRIDES = {
     "p49": "training_rig",
     "t01": "adsim",
 }
+
+
+def import_beamline_module(beamline: str) -> ModuleType:
+    module_name = module_name_for_beamline(beamline)
+    full_module_path = f"dodal.beamlines.{module_name}"
+    return importlib.import_module(full_module_path)
 
 
 def all_beamline_modules() -> Iterable[str]:

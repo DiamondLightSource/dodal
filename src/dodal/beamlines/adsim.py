@@ -1,20 +1,17 @@
 from ophyd_async.epics.adsimdetector import SimDetector
 
-from dodal.common.beamlines.beamline_utils import (
-    device_factory,
-    get_path_provider,
-)
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.beamlines.device_helpers import DET_SUFFIX, HDF5_SUFFIX
 from dodal.devices.motors import XThetaStage
 from dodal.log import set_beamline as set_log_beamline
-from dodal.utils import BeamlinePrefix
+from dodal.utils import BeamlinePrefix, DeviceContext, DeviceManager
 
 BL = "adsim"
 PREFIX = BeamlinePrefix("t01")
 set_log_beamline(BL)
 set_utils_beamline(BL)
 
+devices = DeviceManager()
 
 """
 Beamline module for use with the simulated AreaDetector and motors.
@@ -62,18 +59,18 @@ RE(count([d], num=10))
 """
 
 
-@device_factory()
-def stage() -> XThetaStage:
+@devices.factory()
+def stage(context: DeviceContext) -> XThetaStage:
     return XThetaStage(
         f"{PREFIX.beamline_prefix}-MO-SIMC-01:", x_infix="M1", theta_infix="M2"
     )
 
 
-@device_factory()
-def det() -> SimDetector:
+@devices.factory()
+def det(context: DeviceContext) -> SimDetector:
     return SimDetector(
         f"{PREFIX.beamline_prefix}-DI-CAM-01:",
-        path_provider=get_path_provider(),
+        path_provider=context.path_provider,
         drv_suffix=DET_SUFFIX,
         fileio_suffix=HDF5_SUFFIX,
     )
