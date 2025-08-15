@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import SignalR, init_devices
+from ophyd_async.core import init_devices
 from ophyd_async.testing import (
     assert_configuration,
     assert_reading,
@@ -17,6 +17,7 @@ from ophyd_async.testing import (
 from dodal.devices.b07 import LensMode, PsuMode
 from dodal.devices.electron_analyser import (
     EnergyMode,
+    SingleEnergySource,
 )
 from dodal.devices.electron_analyser.enums import EnergyMode
 from dodal.devices.electron_analyser.specs import (
@@ -32,13 +33,13 @@ from tests.devices.unit_tests.electron_analyser.helper_util import (
 
 @pytest.fixture
 async def sim_driver(
-    energy_sources: dict[str, SignalR[float]], RE: RunEngine
+    single_energy_source: SingleEnergySource,
 ) -> SpecsAnalyserDriverIO[LensMode, PsuMode]:
     async with init_devices(mock=True):
         sim_driver = await create_driver(
             SpecsAnalyserDriverIO[LensMode, PsuMode],
             prefix="TEST:",
-            energy_sources=energy_sources,
+            energy_source=single_energy_source,
         )
     return sim_driver
 
@@ -51,10 +52,9 @@ async def test_analyser_sets_region_correctly(
 ) -> None:
     RE(bps.mv(sim_driver, region), wait=True)
 
-    energy_source = sim_driver._get_energy_source(region.excitation_energy_source)
-    expected_source = energy_source.name
+    excitation_energy = await sim_driver.energy_source.excitation_energy.get_value()
+    region.switch_energy_mode(EnergyMode.KINETIC, excitation_energy)
 
-    region.switch_energy_mode(EnergyMode.KINETIC, await energy_source.get_value())
     get_mock_put(sim_driver.region_name).assert_called_once_with(region.name, wait=True)
     get_mock_put(sim_driver.energy_mode).assert_called_once_with(
         region.energy_mode, wait=True
@@ -81,9 +81,6 @@ async def test_analyser_sets_region_correctly(
     )
     get_mock_put(sim_driver.pass_energy).assert_called_once_with(
         region.pass_energy, wait=True
-    )
-    get_mock_put(sim_driver.excitation_energy_source).assert_called_once_with(
-        expected_source, wait=True
     )
     get_mock_put(sim_driver.slices).assert_called_once_with(region.slices, wait=True)
     get_mock_put(sim_driver.iterations).assert_called_once_with(
@@ -115,8 +112,8 @@ async def test_analyser_sets_region_and_read_configuration_is_correct(
 
     prefix = sim_driver.name + "-"
 
-    energy_source = sim_driver._get_energy_source(region.excitation_energy_source)
-    region.switch_energy_mode(EnergyMode.KINETIC, await energy_source.get_value())
+    excitation_energy = await sim_driver.energy_source.excitation_energy.get_value()
+    region.switch_energy_mode(EnergyMode.KINETIC, excitation_energy)
 
     await assert_configuration(
         sim_driver,
@@ -130,7 +127,6 @@ async def test_analyser_sets_region_and_read_configuration_is_correct(
             f"{prefix}high_energy": partial_reading(region.high_energy),
             f"{prefix}energy_step": partial_reading(ANY),
             f"{prefix}pass_energy": partial_reading(region.pass_energy),
-            f"{prefix}excitation_energy_source": partial_reading(energy_source.name),
             f"{prefix}slices": partial_reading(region.slices),
             f"{prefix}iterations": partial_reading(region.iterations),
             f"{prefix}total_steps": partial_reading(ANY),
@@ -141,6 +137,7 @@ async def test_analyser_sets_region_and_read_configuration_is_correct(
             f"{prefix}angle_axis": partial_reading(ANY),
             f"{prefix}snapshot_values": partial_reading(region.values),
             f"{prefix}psu_mode": partial_reading(region.psu_mode),
+            f"{prefix}energy_source-source_device": partial_reading(ANY),
         },
     )
 
@@ -153,8 +150,7 @@ async def test_analyser_sets_region_and_read_is_correct(
 ) -> None:
     RE(bps.mv(sim_driver, region), wait=True)
 
-    energy_source = sim_driver._get_energy_source(region.excitation_energy_source)
-    excitation_energy = await energy_source.get_value()
+    excitation_energy = await sim_driver.energy_source.excitation_energy.get_value()
 
     spectrum = np.array([1, 2, 3, 4, 5], dtype=float)
     expected_total_intensity = np.sum(spectrum)
@@ -180,8 +176,7 @@ async def test_specs_analyser_binding_energy_axis(
 ) -> None:
     RE(bps.mv(sim_driver, region))
 
-    source = sim_driver._get_energy_source(region.excitation_energy_source)
-    excitation_energy = await source.get_value()
+    excitation_energy = await sim_driver.energy_source.excitation_energy.get_value()
 
     # Check binding energy is correct
     is_binding = await sim_driver.energy_mode.get_value() == EnergyMode.BINDING

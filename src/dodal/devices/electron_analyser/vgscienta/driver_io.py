@@ -1,5 +1,4 @@
 import asyncio
-from collections.abc import Mapping
 from typing import Generic
 
 import numpy as np
@@ -20,7 +19,11 @@ from dodal.devices.electron_analyser.abstract.types import (
     TPassEnergyEnum,
     TPsuMode,
 )
-from dodal.devices.electron_analyser.enums import EnergyMode, SelectedSource
+from dodal.devices.electron_analyser.energy_sources import (
+    DualEnergySource,
+    SingleEnergySource,
+)
+from dodal.devices.electron_analyser.enums import EnergyMode
 from dodal.devices.electron_analyser.vgscienta.enums import (
     AcquisitionMode,
     DetectorMode,
@@ -46,7 +49,7 @@ class VGScientaAnalyserDriverIO(
         lens_mode_type: type[TLensMode],
         psu_mode_type: type[TPsuMode],
         pass_energy_type: type[TPassEnergyEnum],
-        energy_sources: Mapping[SelectedSource, SignalR[float]],
+        energy_source: SingleEnergySource | DualEnergySource,
         name: str = "",
     ) -> None:
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
@@ -67,14 +70,13 @@ class VGScientaAnalyserDriverIO(
             lens_mode_type,
             psu_mode_type,
             pass_energy_type,
-            energy_sources,
+            energy_source,
             name,
         )
 
     @AsyncStatus.wrap
     async def set(self, region: VGScientaRegion[TLensMode, TPassEnergyEnum]):
-        source = self._get_energy_source(region.excitation_energy_source)
-        excitation_energy = await source.get_value()  # eV
+        excitation_energy = await self.get_energy_from_source(region)
         # Copy region so doesn't alter the actual region and switch to kinetic energy
         ke_region = region.model_copy()
         ke_region.switch_energy_mode(EnergyMode.KINETIC, excitation_energy)
@@ -89,8 +91,6 @@ class VGScientaAnalyserDriverIO(
             self.pass_energy.set(ke_region.pass_energy),
             self.iterations.set(ke_region.iterations),
             self.acquisition_mode.set(ke_region.acquisition_mode),
-            self.excitation_energy.set(excitation_energy),
-            self.excitation_energy_source.set(source.name),
             self.energy_step.set(ke_region.energy_step),
             self.image_mode.set(ADImageMode.SINGLE),
             self.detector_mode.set(ke_region.detector_mode),
