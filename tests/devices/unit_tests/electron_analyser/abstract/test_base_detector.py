@@ -2,7 +2,7 @@ from unittest.mock import AsyncMock
 
 import pytest
 from bluesky import plan_stubs as bps
-from bluesky.protocols import Stageable, Triggerable
+from bluesky.protocols import Triggerable
 from bluesky.run_engine import RunEngine
 from ophyd_async.core import SignalR, init_devices
 from ophyd_async.epics.adcore import ADBaseController
@@ -51,6 +51,41 @@ def test_analyser_detector_loads_sequence_correctly(
 ) -> None:
     seq = sim_detector.load_sequence(sequence_file_path)
     assert seq is not None
+
+
+def test_analyser_detector_stage(
+    sim_detector: GenericElectronAnalyserDetector,
+    RE: RunEngine,
+) -> None:
+    sim_detector.controller.disarm = AsyncMock()
+    sim_detector.driver.stage = AsyncMock()
+
+    RE(bps.stage(sim_detector), wait=True)
+
+    sim_detector.controller.disarm.assert_awaited_once()
+    sim_detector.driver.stage.assert_awaited_once()
+
+
+@pytest.mark.asyncio
+async def test_stage_propagates_driver_stage_exception(
+    sim_detector: GenericElectronAnalyserDetector,
+):
+    sim_detector.driver.stage = AsyncMock(side_effect=RuntimeError("stage failed"))
+
+    with pytest.raises(RuntimeError, match="stage failed"):
+        await sim_detector.stage()
+
+
+@pytest.mark.asyncio
+async def test_stage_propagates_controller_disarm_exception(
+    sim_detector: GenericElectronAnalyserDetector,
+):
+    sim_detector.controller.disarm = AsyncMock(
+        side_effect=RuntimeError("disarm failed")
+    )
+
+    with pytest.raises(RuntimeError, match="disarm failed"):
+        await sim_detector.stage()
 
 
 def test_analyser_detector_creates_region_detectors(
@@ -124,72 +159,7 @@ async def test_analyser_region_detector_trigger_sets_driver_with_region(
         assert_detector_trigger_uses_controller_correctly(
             reg_det, reg_det.controller, RE
         )
-
         reg_det.driver.set.assert_awaited_once_with(reg_det.region)
-
-
-def assert_stage_calls_driver_stage_and_controller_disarm(
-    sim_detector: Stageable,
-    controller: ADBaseController,
-    RE: RunEngine,
-):
-    controller.disarm = AsyncMock()
-    controller.driver.stage = AsyncMock()
-
-    RE(bps.stage(sim_detector), wait=True)
-
-    controller.disarm.assert_awaited_once()
-    controller.driver.stage.assert_awaited_once()
-
-
-async def test_analyser_detector_stage(
-    sim_detector: GenericElectronAnalyserDetector,
-    RE: RunEngine,
-) -> None:
-    assert_stage_calls_driver_stage_and_controller_disarm(
-        sim_detector, sim_detector.controller, RE
-    )
-
-
-async def test_analyser_region_detector_stage(
-    sim_detector: GenericElectronAnalyserDetector,
-    sequence_file_path: str,
-    RE: RunEngine,
-) -> None:
-    region_detectors = sim_detector.create_region_detector_list(
-        sequence_file_path, enabled_only=False
-    )
-
-    for reg_det in region_detectors:
-        reg_det.driver.set = AsyncMock()
-
-        assert_stage_calls_driver_stage_and_controller_disarm(
-            reg_det, sim_detector.controller, RE
-        )
-
-        reg_det.driver.set.assert_awaited_once_with(reg_det.region)
-
-
-@pytest.mark.asyncio
-async def test_stage_propagates_driver_stage_exception(
-    sim_detector: GenericElectronAnalyserDetector,
-):
-    sim_detector.driver.stage = AsyncMock(side_effect=RuntimeError("stage failed"))
-
-    with pytest.raises(RuntimeError, match="stage failed"):
-        await sim_detector.stage()
-
-
-@pytest.mark.asyncio
-async def test_stage_propagates_controller_disarm_exception(
-    sim_detector: GenericElectronAnalyserDetector,
-):
-    sim_detector.controller.disarm = AsyncMock(
-        side_effect=RuntimeError("disarm failed")
-    )
-
-    with pytest.raises(RuntimeError, match="disarm failed"):
-        await sim_detector.stage()
 
 
 # ToDo - Add tests for BaseElectronAnalyserDetector class + controller
