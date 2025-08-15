@@ -1,4 +1,3 @@
-import asyncio
 from abc import abstractmethod
 from typing import Generic
 
@@ -76,7 +75,8 @@ class AbstractElectronAnalyserDetector(
     @AsyncStatus.wrap
     async def unstage(self) -> None:
         """Disarm the detector."""
-        await asyncio.gather(self.controller.disarm())
+        await self.controller.disarm()
+        await self.driver.unstage()
 
     async def read(self) -> dict[str, Reading]:
         return await self.driver.read()

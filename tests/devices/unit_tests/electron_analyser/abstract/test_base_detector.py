@@ -1,3 +1,4 @@
+import traceback
 from unittest.mock import AsyncMock
 
 import pytest
@@ -16,6 +17,11 @@ from dodal.devices.electron_analyser.specs import SpecsDetector
 from dodal.devices.electron_analyser.vgscienta import VGScientaDetector
 from dodal.testing.electron_analyser import create_detector
 from tests.devices.unit_tests.electron_analyser.helper_util import get_test_sequence
+
+
+async def debug_disarm(*args, **kwargs):
+    print("Disarm called!")
+    traceback.print_stack()
 
 
 @pytest.fixture(
@@ -53,17 +59,28 @@ def test_analyser_detector_loads_sequence_correctly(
     assert seq is not None
 
 
-def test_analyser_detector_stage(
+async def test_analyser_detector_stage(
     sim_detector: GenericElectronAnalyserDetector,
-    RE: RunEngine,
 ) -> None:
-    sim_detector.controller.disarm = AsyncMock()
+    sim_detector.controller.disarm = AsyncMock(side_effect=debug_disarm)
     sim_detector.driver.stage = AsyncMock()
 
-    RE(bps.stage(sim_detector), wait=True)
+    await sim_detector.stage()
 
     sim_detector.controller.disarm.assert_awaited_once()
     sim_detector.driver.stage.assert_awaited_once()
+
+
+async def test_analyser_detector_unstage(
+    sim_detector: GenericElectronAnalyserDetector,
+) -> None:
+    sim_detector.controller.disarm = AsyncMock(side_effect=debug_disarm)
+    sim_detector.driver.unstage = AsyncMock()
+
+    await sim_detector.unstage()
+
+    sim_detector.controller.disarm.assert_awaited_once()
+    sim_detector.driver.unstage.assert_awaited_once()
 
 
 @pytest.mark.asyncio
