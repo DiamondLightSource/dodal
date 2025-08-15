@@ -15,8 +15,6 @@ dodal.devices.backlight
    :recursive:
 
    ~backlight.Backlight
-   ~backlight.BacklightPosition
-   ~backlight.BacklightPower
 
 
 

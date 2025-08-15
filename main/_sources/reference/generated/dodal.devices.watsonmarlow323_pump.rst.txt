@@ -16,7 +16,6 @@ dodal.devices.watsonmarlow323\_pump
 
    ~watsonmarlow323_pump.WatsonMarlow323Pump
    ~watsonmarlow323_pump.WatsonMarlow323PumpDirection
-   ~watsonmarlow323_pump.WatsonMarlow323PumpEnable
    ~watsonmarlow323_pump.WatsonMarlow323PumpState
 
 

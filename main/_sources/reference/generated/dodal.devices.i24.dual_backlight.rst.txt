@@ -17,7 +17,6 @@ dodal.devices.i24.dual\_backlight
    ~dual_backlight.BacklightPositioner
    ~dual_backlight.BacklightPositions
    ~dual_backlight.DualBacklight
-   ~dual_backlight.LEDStatus
 
 
 

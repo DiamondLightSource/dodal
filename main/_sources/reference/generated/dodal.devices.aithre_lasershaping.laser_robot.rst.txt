@@ -16,7 +16,6 @@ dodal.devices.aithre\_lasershaping.laser\_robot
 
    ~laser_robot.ForceBit
    ~laser_robot.LaserRobot
-   ~laser_robot.LidHeatEnable
 
 
 

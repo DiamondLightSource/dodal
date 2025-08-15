@@ -17,7 +17,6 @@ dodal.devices.bimorph\_mirror
    ~bimorph_mirror.BimorphMirror
    ~bimorph_mirror.BimorphMirrorChannel
    ~bimorph_mirror.BimorphMirrorMode
-   ~bimorph_mirror.BimorphMirrorOnOff
    ~bimorph_mirror.BimorphMirrorStatus
 
 

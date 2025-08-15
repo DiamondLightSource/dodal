@@ -15,7 +15,6 @@ dodal.devices.thawer
    :recursive:
 
    ~thawer.Thawer
-   ~thawer.ThawerStates
    ~thawer.ThawingTimer
 
 

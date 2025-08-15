@@ -23,8 +23,8 @@ dodal.devices.i10.diagnostics
    ~diagnostics.I10Diagnostic
    ~diagnostics.I10Diagnostic5ADet
    ~diagnostics.I10PneumaticStage
-   ~diagnostics.InOutReadBackTable
-   ~diagnostics.InOutTable
+   ~diagnostics.InStateReadBackTable
+   ~diagnostics.InStateTable
    ~diagnostics.ScreenCam
 
 

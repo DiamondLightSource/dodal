@@ -15,7 +15,6 @@ dodal.devices.cryostream
    :recursive:
 
    ~cryostream.CryoStream
-   ~cryostream.InOut
 
 
 

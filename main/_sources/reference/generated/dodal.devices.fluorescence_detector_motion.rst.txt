@@ -15,7 +15,6 @@ dodal.devices.fluorescence\_detector\_motion
    :recursive:
 
    ~fluorescence_detector_motion.FluorescenceDetector
-   ~fluorescence_detector_motion.InOut
 
 
 

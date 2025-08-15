@@ -15,7 +15,6 @@ dodal.devices.undulator
    :recursive:
 
    ~undulator.Undulator
-   ~undulator.UndulatorGapAccess
 
 
 
