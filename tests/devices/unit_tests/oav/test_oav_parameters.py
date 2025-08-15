@@ -9,29 +9,30 @@ from dodal.devices.oav.oav_parameters import (
     ZoomParams,
     ZoomParamsCrosshair,
 )
-
-OAV_CENTRING_JSON = "tests/devices/unit_tests/test_OAVCentring.json"
-DISPLAY_CONFIGURATION = "tests/devices/unit_tests/test_display.configuration"
-ZOOM_LEVELS_XML = "tests/devices/unit_tests/test_jCameraManZoomLevels.xml"
+from tests.devices.unit_tests.oav.test_data import TEST_OAV_CENTRING_JSON
+from tests.test_data import (
+    TEST_DISPLAY_CONFIG,
+    TEST_OAV_ZOOM_LEVELS_XML,
+)
 
 
 @pytest.fixture
 def mock_parameters():
     return OAVParameters(
         "loopCentring",
-        OAV_CENTRING_JSON,
+        TEST_OAV_CENTRING_JSON,
     )
 
 
 @pytest.fixture
 def mock_config() -> dict[str, ZoomParams]:
-    return OAVConfig(ZOOM_LEVELS_XML).get_parameters()
+    return OAVConfig(TEST_OAV_ZOOM_LEVELS_XML).get_parameters()
 
 
 @pytest.fixture
 def mock_config_with_beam_centre() -> dict[str, ZoomParamsCrosshair]:
     config = OAVConfigBeamCentre(
-        ZOOM_LEVELS_XML, DISPLAY_CONFIGURATION
+        TEST_OAV_ZOOM_LEVELS_XML, TEST_DISPLAY_CONFIG
     ).get_parameters()
     config = cast(dict[str, ZoomParamsCrosshair], config)
     return config
