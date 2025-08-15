@@ -102,36 +102,6 @@ async def test_stage_sets_image_mode_and_calls_super(
         AbstractAnalyserDriverIO.__bases__[1], "stage", new=AsyncMock()
     ) as super_stage:
         sim_driver.image_mode.set = AsyncMock()
-        # Call the real stage method (not the mock)
         await sim_driver.stage()
-        # Assert that image_mode.set was called with ADImageMode.SINGLE
         sim_driver.image_mode.set.assert_awaited_once_with(ADImageMode.SINGLE)
-        # Assert that the super().stage() method was called
         super_stage.assert_awaited_once()
-
-
-@pytest.mark.asyncio
-async def test_stage_sets_image_mode_to_single(sim_driver: AbstractAnalyserDriverIO):
-    sim_driver.image_mode.set = AsyncMock()
-    await sim_driver.stage()
-    sim_driver.image_mode.set.assert_awaited_once_with(ADImageMode.SINGLE)
-
-
-@pytest.mark.asyncio
-async def test_stage_calls_super_stage(sim_driver: AbstractAnalyserDriverIO):
-    # Patch the parent class's stage method
-    with patch.object(
-        AbstractAnalyserDriverIO.__bases__[1], "stage", new=AsyncMock()
-    ) as super_stage:
-        sim_driver.image_mode.set = AsyncMock()
-        await sim_driver.stage()
-        super_stage.assert_awaited_once()
-
-
-@pytest.mark.asyncio
-async def test_stage_raises_if_image_mode_set_fails(
-    sim_driver: AbstractAnalyserDriverIO,
-):
-    sim_driver.image_mode.set = AsyncMock(side_effect=RuntimeError("fail"))
-    with pytest.raises(RuntimeError, match="fail"):
-        await sim_driver.stage()

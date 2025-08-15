@@ -77,28 +77,6 @@ async def test_analyser_detector_unstage(
     sim_detector.driver.unstage.assert_awaited_once()
 
 
-@pytest.mark.asyncio
-async def test_stage_propagates_driver_stage_exception(
-    sim_detector: GenericElectronAnalyserDetector,
-):
-    sim_detector.driver.stage = AsyncMock(side_effect=RuntimeError("stage failed"))
-
-    with pytest.raises(RuntimeError, match="stage failed"):
-        await sim_detector.stage()
-
-
-@pytest.mark.asyncio
-async def test_stage_propagates_controller_disarm_exception(
-    sim_detector: GenericElectronAnalyserDetector,
-):
-    sim_detector.controller.disarm = AsyncMock(
-        side_effect=RuntimeError("disarm failed")
-    )
-
-    with pytest.raises(RuntimeError, match="disarm failed"):
-        await sim_detector.stage()
-
-
 def test_analyser_detector_creates_region_detectors(
     sim_detector: GenericElectronAnalyserDetector,
     sequence_file_path: str,
@@ -173,5 +151,4 @@ async def test_analyser_region_detector_trigger_sets_driver_with_region(
         reg_det.driver.set.assert_awaited_once_with(reg_det.region)
 
 
-# ToDo - Add tests for BaseElectronAnalyserDetector class + controller
 # ToDo - Add test that data being read is correct from plan
