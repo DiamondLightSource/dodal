@@ -7,6 +7,7 @@ from ophyd_async.sim import SimMotor
 
 from dodal.devices.electron_analyser import (
     ElectronAnalyserDetector,
+    SelectedSource,
 )
 from dodal.devices.electron_analyser.abstract import (
     AbstractAnalyserDriverIO,
@@ -22,7 +23,7 @@ from dodal.devices.electron_analyser.vgscienta import (
     VGScientaAnalyserDriverIO,
     VGScientaSequence,
 )
-from tests.devices.unit_tests.electron_analyser.util import (
+from tests.devices.unit_tests.electron_analyser.helper_util import (
     get_test_sequence,
 )
 
@@ -41,7 +42,10 @@ async def dcm_energy(RE: RunEngine) -> SimMotor:
 async def energy_sources(
     dcm_energy: SimMotor, pgm_energy: SimMotor
 ) -> dict[str, SignalR[float]]:
-    return {"source1": dcm_energy.user_readback, "source2": pgm_energy.user_readback}
+    return {
+        SelectedSource.SOURCE1: dcm_energy.user_readback,
+        SelectedSource.SOURCE2: pgm_energy.user_readback,
+    }
 
 
 @pytest.fixture

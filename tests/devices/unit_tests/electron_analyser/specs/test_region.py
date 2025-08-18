@@ -4,12 +4,12 @@ import pytest
 
 from dodal.common.data_util import load_json_file_to_class
 from dodal.devices.b07 import LensMode, PsuMode
-from dodal.devices.electron_analyser import EnergyMode
+from dodal.devices.electron_analyser import EnergyMode, SelectedSource
 from dodal.devices.electron_analyser.specs import (
     AcquisitionMode,
     SpecsSequence,
 )
-from tests.devices.unit_tests.electron_analyser.util import (
+from tests.devices.unit_tests.electron_analyser.helper_util import (
     assert_region_has_expected_values,
     get_test_sequence,
 )
@@ -41,7 +41,7 @@ def expected_region_values() -> list[dict[str, Any]]:
             "slices": 100,
             "centre_energy": 0.0,
             "estimated_time_in_ms": 0.0,
-            "excitation_energy_source": "source1",
+            "excitation_energy_source": SelectedSource.SOURCE1,
         },
         {
             "name": "New_Region1",
@@ -60,7 +60,7 @@ def expected_region_values() -> list[dict[str, Any]]:
             "slices": 110,
             "centre_energy": 0.0,
             "estimated_time_in_ms": 13718.0,
-            "excitation_energy_source": "source1",
+            "excitation_energy_source": SelectedSource.SOURCE1,
         },
         {
             "name": "New_Region2",
@@ -79,7 +79,7 @@ def expected_region_values() -> list[dict[str, Any]]:
             "slices": 100,
             "centre_energy": 300.0,
             "estimated_time_in_ms": 4125.0,
-            "excitation_energy_source": "source1",
+            "excitation_energy_source": SelectedSource.SOURCE1,
         },
     ]
 

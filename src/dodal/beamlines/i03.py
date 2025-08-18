@@ -1,3 +1,4 @@
+from ophyd_async.core import Reference
 from ophyd_async.fastcs.eiger import EigerDetector as FastEiger
 from ophyd_async.fastcs.panda import HDFPanda
 from yarl import URL
@@ -19,11 +20,13 @@ from dodal.devices.aperturescatterguard import (
 from dodal.devices.attenuator.attenuator import BinaryFilterAttenuator
 from dodal.devices.backlight import Backlight
 from dodal.devices.baton import Baton
+from dodal.devices.collimation_table import CollimationTable
 from dodal.devices.cryostream import CryoStream
 from dodal.devices.detector.detector_motion import DetectorMotion
 from dodal.devices.diamond_filter import DiamondFilter, I03Filters
 from dodal.devices.eiger import EigerDetector
 from dodal.devices.fast_grid_scan import PandAFastGridScan, ZebraFastGridScan
+from dodal.devices.fluorescence_detector_motion import FluorescenceDetector
 from dodal.devices.flux import Flux
 from dodal.devices.focusing_mirror import FocusingMirrorWithStripes, MirrorVoltages
 from dodal.devices.i03 import Beamstop
@@ -36,6 +39,7 @@ from dodal.devices.oav.pin_image_recognition import PinTipDetection
 from dodal.devices.qbpm import QBPM
 from dodal.devices.robot import BartRobot
 from dodal.devices.s4_slit_gaps import S4SlitGaps
+from dodal.devices.scintillator import Scintillator
 from dodal.devices.smargon import Smargon
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.thawer import Thawer
@@ -401,7 +405,7 @@ def lower_gonio() -> XYZStage:
 
 
 @device_factory()
-def cryo_stream() -> CryoStream:
+def cryostream() -> CryoStream:
     """Get the i03 cryostream device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
@@ -436,3 +440,31 @@ def baton() -> Baton:
     If this is called when already instantiated in i03, it will return the existing object.
     """
     return Baton(f"{PREFIX.beamline_prefix}-CS-BATON-01:")
+
+
+@device_factory()
+def fluorescence_det_motion() -> FluorescenceDetector:
+    """Get the i03 device for moving the fluorescence detector, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i03, it will return the existing object.
+    """
+    return FluorescenceDetector(f"{PREFIX.beamline_prefix}-EA-FLU-01:")
+
+
+@device_factory()
+def scintillator() -> Scintillator:
+    """Get the i03 scintillator device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i03, it will return the existing object.
+    """
+    return Scintillator(
+        f"{PREFIX.beamline_prefix}-MO-SCIN-01:",
+        Reference(aperture_scatterguard()),
+        get_beamline_parameters(),
+    )
+
+
+@device_factory()
+def collimation_table() -> CollimationTable:
+    """Get the i03 device for moving the collimation table, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i03, it will return the existing object.
+    """
+    return CollimationTable(prefix=f"{PREFIX.beamline_prefix}-MO-TABLE-01")
