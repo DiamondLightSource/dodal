@@ -15,6 +15,10 @@ dodal.devices.cryostream
    :recursive:
 
    ~cryostream.CryoStream
+   ~cryostream.OxfordCryoStream
+   ~cryostream.OxfordCryoStreamController
+   ~cryostream.OxfordCryoStreamStatus
+   ~cryostream.TurboEnum
 
 
 
