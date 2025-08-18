@@ -19,8 +19,8 @@ def test_diffractometer_created_without_errors():
 
 
 async def test_positions_can_be_read(diffractometer: FourCircleDiffractometer):
-    set_mock_value(diffractometer.det_stage.det_z, 250.0)
-    set_mock_value(diffractometer.omega, -90.0)
+    set_mock_value(diffractometer.det_stage.det_z.user_readback, 250.0)
+    set_mock_value(diffractometer.omega.user_readback, -90.0)
     await assert_reading(
         diffractometer,
         {
