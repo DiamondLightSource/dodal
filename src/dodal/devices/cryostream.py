@@ -1,15 +1,14 @@
 from ophyd_async.core import (
+    InOut,
     StandardReadable,
     StandardReadableFormat,
     StrictEnum,
-    InOut
 )
 from ophyd_async.epics.core import (
     epics_signal_r,
     epics_signal_rw,
     epics_signal_x,
 )
-
 
 
 class CryoStream(StandardReadable):
