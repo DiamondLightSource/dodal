@@ -95,9 +95,9 @@ class ElectronAnalyserDetector(
         """
         Prepare the detector for use by ensuring it is idle and ready.
 
-        This method asynchronously stages the detector by first invoking the driver's
-        stage procedure, then disarming the controller to ensure the detector is not
-        actively acquiring data. This ensures the detector is in a known, ready state
+        This method asynchronously stages the detector by first disarming the controller
+        to ensure the detector is not actively acquiring data, then invokes the driver's
+        stage procedure. This ensures the detector is in a known, ready state
         before use.
 
         Raises:
