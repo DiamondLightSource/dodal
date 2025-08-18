@@ -10,7 +10,8 @@ from dodal.devices.electron_analyser.abstract.types import (
     TLensMode,
     TPassEnergy,
 )
-from dodal.devices.electron_analyser.enums import EnergyMode
+from dodal.devices.electron_analyser.enums import EnergyMode, SelectedSource
+from dodal.devices.electron_analyser.util import to_binding_energy, to_kinetic_energy
 
 
 def java_to_python_case(java_str: str) -> str:
@@ -62,22 +63,53 @@ class AbstractBaseRegion(
     enabled: bool = False
     slices: int = 1
     iterations: int = 1
-    excitation_energy_source: str = "source1"
+    excitation_energy_source: SelectedSource = SelectedSource.SOURCE1
     # These ones we need subclasses to provide default values
     lens_mode: TLensMode
     pass_energy: TPassEnergy
     acquisition_mode: TAcquisitionMode
     low_energy: float
+    centre_energy: float
     high_energy: float
     step_time: float
     energy_step: float  # in eV
     energy_mode: EnergyMode = EnergyMode.KINETIC
 
     def is_binding_energy(self) -> bool:
+        """
+        Returns true if the energy_mode is binding.
+        """
         return self.energy_mode == EnergyMode.BINDING
 
     def is_kinetic_energy(self) -> bool:
+        """
+        Returns true if the energy_mode is kinetic.
+        """
         return self.energy_mode == EnergyMode.KINETIC
+
+    def switch_energy_mode(
+        self, energy_mode: EnergyMode, excitation_energy: float
+    ) -> None:
+        """
+        Switch region to new energy mode: Kinetic or Binding. Updates the low_energy,
+        centre_energy, high_energy, and energy_mode, only if it switches to a new one.
+
+        Parameters:
+            energy_mode: mode you want to switch the region to.
+            excitation_energy: the energy to calculate the new values of low_energy,
+                               centre_energy, and high_energy.
+        """
+        conv = (
+            to_binding_energy
+            if energy_mode == EnergyMode.BINDING
+            else to_kinetic_energy
+        )
+        self.low_energy = conv(self.low_energy, self.energy_mode, excitation_energy)
+        self.centre_energy = conv(
+            self.centre_energy, self.energy_mode, excitation_energy
+        )
+        self.high_energy = conv(self.high_energy, self.energy_mode, excitation_energy)
+        self.energy_mode = energy_mode
 
     @model_validator(mode="before")
     @classmethod

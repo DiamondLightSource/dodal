@@ -7,9 +7,10 @@ from ophyd_async.core import AsyncStatus, init_devices
 from ophyd_async.testing import get_mock_put, set_mock_value
 
 from conftest import MOCK_DAQ_CONFIG_PATH
+from dodal.common.enums import EnabledDisabledUpper
 from dodal.devices.i03.dcm import DCM
 from dodal.devices.i03.undulator_dcm import UndulatorDCM
-from dodal.devices.undulator import AccessError, Undulator, UndulatorGapAccess
+from dodal.devices.undulator import AccessError, Undulator
 from dodal.devices.util.test_utils import patch_motor
 from dodal.log import LOGGER
 from tests.constants import UNDULATOR_ID_GAP_LOOKUP_TABLE_PATH
@@ -97,7 +98,7 @@ async def test_when_gap_access_is_not_checked_if_test_mode_enabled(
     mock_logger: MagicMock, mock_load: MagicMock, fake_undulator_dcm: UndulatorDCM
 ):
     set_mock_value(
-        fake_undulator_dcm.undulator_ref().gap_access, UndulatorGapAccess.DISABLED
+        fake_undulator_dcm.undulator_ref().gap_access, EnabledDisabledUpper.DISABLED
     )
     set_mock_value(fake_undulator_dcm.undulator_ref().current_gap, 5.3)
     set_mock_value(fake_undulator_dcm.dcm_ref().energy_in_kev.user_readback, 5.7)
@@ -200,7 +201,7 @@ async def test_when_undulator_gap_is_disabled_setting_energy_errors_and_dcm_ener
     fake_undulator_dcm: UndulatorDCM,
 ):
     set_mock_value(
-        fake_undulator_dcm.undulator_ref().gap_access, UndulatorGapAccess.DISABLED
+        fake_undulator_dcm.undulator_ref().gap_access, EnabledDisabledUpper.DISABLED
     )
 
     with pytest.raises(AccessError):
@@ -209,3 +210,15 @@ async def test_when_undulator_gap_is_disabled_setting_energy_errors_and_dcm_ener
     get_mock_put(
         fake_undulator_dcm.dcm_ref().energy_in_kev.user_setpoint
     ).assert_not_called()
+
+
+async def test_dcm_offset_only_set_when_outside_of_tolerance(
+    fake_undulator_dcm: UndulatorDCM,
+):
+    set_mock_value(fake_undulator_dcm.undulator_ref().current_gap, 5.0)
+    set_mock_value(fake_undulator_dcm.dcm_ref().offset_in_mm.user_readback, 25.599)
+
+    offset_put = get_mock_put(fake_undulator_dcm.dcm_ref().offset_in_mm.user_setpoint)
+    await fake_undulator_dcm.set(5.0)
+
+    offset_put.assert_not_called()

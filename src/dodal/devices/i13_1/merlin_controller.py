@@ -12,8 +12,8 @@ from ophyd_async.epics.adcore import (
     ADBaseIO,
     ADImageMode,
     ADState,
-    stop_busy_record,
 )
+from ophyd_async.epics.core import stop_busy_record
 
 
 class MerlinController(ADBaseController):

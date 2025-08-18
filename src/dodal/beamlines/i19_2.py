@@ -53,7 +53,6 @@ def zebra() -> Zebra:
     """
     return Zebra(
         mapping=I19_2_ZEBRA_MAPPING,
-        name="zebra",
         prefix=f"{PREFIX.beamline_prefix}-EA-ZEBRA-01:",
     )
 
