@@ -24,5 +24,5 @@ class FourCircleDiffractometer(XYZStage):
             self.phi = Motor(f"{prefix}{CIRC}PHI")
             self.omega = Motor(f"{prefix}{CIRC}OMEGA")
             self.kappa = Motor(f"{prefix}{CIRC}KAPPA")
-        self.det_stage = DetectorMotion(f"{prefix}{CIRC}", name)
+            self.det_stage = DetectorMotion(f"{prefix}{CIRC}", name)
         super().__init__(f"{prefix}{SAMP}", name)
