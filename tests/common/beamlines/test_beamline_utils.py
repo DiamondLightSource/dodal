@@ -1,5 +1,6 @@
 import asyncio
 import functools
+from collections.abc import Callable, Generator
 from unittest.mock import ANY, AsyncMock, MagicMock, patch
 
 import pytest
@@ -111,78 +112,94 @@ def test_wait_for_v2_device_connection_passes_through_timeout(
     )
 
 
-def dummy_mirror() -> FocusingMirror:
-    mirror = MagicMock(spec=FocusingMirror)
-    connect = AsyncMock()
-    mirror.connect = connect
+@pytest.fixture
+def dummy_mirror_factory() -> Callable[[], FocusingMirror]:
+    def dummy_mirror() -> FocusingMirror:
+        mirror = MagicMock(spec=FocusingMirror)
+        connect = AsyncMock()
+        mirror.connect = connect
 
-    def set_name(name: str):
-        mirror.name = name  # type: ignore
+        def set_name(name: str):
+            mirror.name = name  # type: ignore
 
-    mirror.set_name.side_effect = set_name
-    mirror.set_name("")
-    return mirror
+        mirror.set_name.side_effect = set_name
+        mirror.set_name("")
+        return mirror
 
-
-@beamline_utils.device_factory(mock=True)
-def dummy_mirror_as_device_factory() -> FocusingMirror:
-    return dummy_mirror()
-
-
-@beamline_utils.device_factory(mock=True)
-@functools.lru_cache
-def cached_dummy_mirror_as_device_factory() -> FocusingMirror:
-    return dummy_mirror()
+    return dummy_mirror
 
 
-def test_device_controller_name_propagated():
-    mirror = dummy_mirror_as_device_factory(name="foo")
+@pytest.fixture
+def dummy_mirror_device_factory(
+    dummy_mirror_factory: Callable[[], FocusingMirror],
+) -> Generator[DeviceInitializationController[FocusingMirror]]:
+    factory = beamline_utils.device_factory(mock=True)(dummy_mirror_factory)
+    yield factory
+    factory.cache_clear()
+
+
+def test_device_controller_name_propagated(
+    dummy_mirror_device_factory: DeviceInitializationController[FocusingMirror],
+):
+    mirror = dummy_mirror_device_factory(name="foo")
     assert mirror.name == "foo"
 
 
-def test_device_controller_connection_is_lazy():
-    mirror = dummy_mirror_as_device_factory(name="foo")
+def test_device_controller_connection_is_lazy(
+    dummy_mirror_device_factory: DeviceInitializationController[FocusingMirror],
+):
+    mirror = dummy_mirror_device_factory(name="foo")
     assert mirror.connect.call_count == 0  # type: ignore
 
 
-def test_device_controller_eager_connect(RE):
-    mirror = dummy_mirror_as_device_factory(connect_immediately=True)
+def test_device_controller_eager_connect(
+    RE, dummy_mirror_device_factory: DeviceInitializationController[FocusingMirror]
+):
+    mirror = dummy_mirror_device_factory(connect_immediately=True)
     assert mirror.connect.call_count == 1  # type: ignore
 
 
-@pytest.mark.parametrize(
-    "factory",
-    [
-        dummy_mirror_as_device_factory,
-        # The second test case confirms that if, for some reason, we use a device
-        # factory decorated with @lru_cache, dodal is not affected and will still cache
-        # the same device instance internally. We actually also use lru_cache
-        # internally so this test case is just a sanity check to prove it is
-        # idempotent.
-        cached_dummy_mirror_as_device_factory,
-    ],
-)
-def test_device_cached(factory: DeviceInitializationController):
-    mirror_1 = factory()
-    mirror_2 = factory()
+def test_device_cached(dummy_mirror_device_factory: DeviceInitializationController):
+    mirror_1 = dummy_mirror_device_factory()
+    mirror_2 = dummy_mirror_device_factory()
     assert mirror_1 is mirror_2
 
 
-def test_device_cache_can_be_cleared():
-    mirror_1 = dummy_mirror_as_device_factory()
-    dummy_mirror_as_device_factory.cache_clear()
+# Confirms that if, for some reason, we use a device
+# factory decorated with @lru_cache, dodal is not affected and will still cache
+# the same device instance internally. We actually also use lru_cache
+# internally so this test case is just a sanity check to prove it is
+# idempotent.
+def test_caching_idempotent(
+    dummy_mirror_device_factory: DeviceInitializationController,
+):
+    cached_dummy_mirror_device_factory = functools.lru_cache(
+        dummy_mirror_device_factory
+    )
 
-    mirror_2 = dummy_mirror_as_device_factory()
+    mirror_1 = cached_dummy_mirror_device_factory()
+    mirror_2 = cached_dummy_mirror_device_factory()
+    assert mirror_1 is mirror_2
+
+
+def test_device_cache_can_be_cleared(
+    dummy_mirror_device_factory: DeviceInitializationController[FocusingMirror],
+    cached_dummy_mirror_device_factory: DeviceInitializationController[FocusingMirror],
+):
+    mirror_1 = dummy_mirror_device_factory()
+    dummy_mirror_device_factory.cache_clear()
+
+    mirror_2 = cached_dummy_mirror_device_factory()
     assert mirror_1 is not mirror_2
 
 
-def test_skip(RE):
+def test_skip(RE, dummy_mirror_factory: Callable[[], FocusingMirror]):
     skip = True
 
     def _skip() -> bool:
         return skip
 
-    controller = beamline_utils.device_factory(skip=_skip)(dummy_mirror)
+    controller = beamline_utils.device_factory(skip=_skip)(dummy_mirror_factory)
 
     assert isinstance(controller, DeviceInitializationController)
     assert controller.skip
