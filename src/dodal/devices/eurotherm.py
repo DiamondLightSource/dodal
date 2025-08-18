@@ -1,6 +1,7 @@
 from bluesky.protocols import Locatable, Location
 from ophyd_async.core import (
     AsyncStatus,
+    OnOff,
     StandardReadable,
     StandardReadableFormat,
     StrictEnum,
@@ -10,11 +11,6 @@ from ophyd_async.epics.core import epics_signal_r, epics_signal_rw, epics_signal
 """
 Note: See i11 cyberstar blower for implementation of Eurotherm Controller
 """
-
-
-class AutotuneControl(StrictEnum):
-    OFF = "Off"
-    ON = "On"
 
 
 class ManualMode(StrictEnum):
@@ -119,7 +115,7 @@ class EurothermAutotune(StandardReadable):
         name: str = "",
     ):
         with self.add_children_as_readables():
-            self.control = epics_signal_rw(AutotuneControl, f"{prefix}AUTOTUNE")
+            self.control = epics_signal_rw(OnOff, f"{prefix}AUTOTUNE")
             self.high_limit = epics_signal_rw(float, f"{prefix}OUTPHI")
             self.low_limit = epics_signal_rw(float, f"{prefix}OUTPLO")
 

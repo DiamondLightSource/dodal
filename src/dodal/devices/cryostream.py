@@ -1,4 +1,5 @@
 from ophyd_async.core import (
+    EnabledDisabled,
     InOut,
     StandardReadable,
     StandardReadableFormat,
@@ -31,11 +32,6 @@ class TurboEnum(StrictEnum):
     AUTO = "Auto"
 
 
-class CryoStreamEnable(StrictEnum):
-    ON = "Enabled"
-    OFF = "Disabled"
-
-
 class OxfordCryoStreamController(StandardReadable):
     def __init__(self, prefix: str, name: str = ""):
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
@@ -43,7 +39,7 @@ class OxfordCryoStreamController(StandardReadable):
             self.turbo = epics_signal_rw(str, f"{prefix}TURBO")
             self.turbo_mode = epics_signal_rw(TurboEnum, f"{prefix}TURBOMODE")
 
-            self.serial_comms = epics_signal_rw(CryoStreamEnable, f"{prefix}DISABLE")
+            self.serial_comms = epics_signal_rw(EnabledDisabled, f"{prefix}DISABLE")
             self.status = epics_signal_r(str, f"{prefix}STATUS.SEVR")
 
         with self.add_children_as_readables():
