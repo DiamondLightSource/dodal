@@ -23,7 +23,7 @@ class CyberstarBlower(StandardReadable, Generic[EU]):
         super().__init__(name=name)
 
 
-class AutotunedCyberstarBlower(CyberstarBlower[EurothermGeneral]):
+class AutotunedCyberstarBlower(Generic[EU], CyberstarBlower[EU]):
     def __init__(
         self,
         prefix: str,

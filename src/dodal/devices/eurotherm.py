@@ -1,3 +1,5 @@
+from typing import Generic, TypeVar
+
 from bluesky.protocols import Locatable, Location
 from ophyd_async.core import (
     AsyncStatus,
@@ -13,7 +15,7 @@ Note: See i11 cyberstar blower for implementation of Eurotherm Controller
 """
 
 
-class ManualMode(StrictEnum):
+class AutoManual(StrictEnum):
     AUTO = "Automatic"
     MANUAL = "Manual"
 
@@ -60,13 +62,17 @@ class UpdatingEurothermPID(EurothermPID):
         super().__init__(prefix=prefix, name=name)
 
 
-class EurothermGeneral(StandardReadable, Locatable[float]):
+P = TypeVar("P", bound=EurothermPID)
+
+
+class EurothermGeneral(StandardReadable, Locatable[float], Generic[P]):
     """A base class for any eurotherm controller."""
 
     def __init__(
         self,
         prefix: str,
         name: str = "",
+        pid_class: type[P] = EurothermPID,
         temp_suffix: str = "PV:RBV",
     ):
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
@@ -76,9 +82,9 @@ class EurothermGeneral(StandardReadable, Locatable[float]):
             self.setpoint = epics_signal_rw_rbv(float, f"{prefix}SP", _EUROTHERM_RBV)
             self.ramprate = epics_signal_rw_rbv(float, f"{prefix}RR", _EUROTHERM_RBV)
             self.output = epics_signal_rw_rbv(float, f"{prefix}O", _EUROTHERM_RBV)
-            self.mode = epics_signal_rw_rbv(ManualMode, f"{prefix}MAN", _EUROTHERM_RBV)
+            self.mode = epics_signal_rw_rbv(AutoManual, f"{prefix}MAN", _EUROTHERM_RBV)
 
-        self.tune = EurothermPID(prefix=prefix)
+        self.tune = pid_class(prefix=prefix)
 
         super().__init__(name)
 
@@ -100,9 +106,7 @@ class UpdatingEurothermGeneral(EurothermGeneral):
     def __init__(self, prefix: str, name: str = ""):
         self.update = epics_signal_rw(EurothermUpdate, f"{prefix}UPDATE.SCAN")
 
-        super().__init__(prefix=prefix, name=name)
-
-        self.tune = UpdatingEurothermPID(prefix=prefix)
+        super().__init__(prefix=prefix, name=name, pid_class=UpdatingEurothermPID)
 
 
 class EurothermAutotune(StandardReadable):

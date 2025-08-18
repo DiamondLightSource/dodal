@@ -92,7 +92,7 @@ def csb1() -> CyberstarBlower[UpdatingEurothermGeneral]:
 
 
 @device_factory()
-def csb2() -> AutotunedCyberstarBlower:
+def csb2() -> AutotunedCyberstarBlower[EurothermGeneral]:
     """Cyberstar hot air blower 2 with autotuneable Eurotherm Controller"""
     return AutotunedCyberstarBlower(
         prefix=f"{PREFIX.beamline_prefix}-EA-BLOW-02:LOOP1:",
