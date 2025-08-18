@@ -102,12 +102,35 @@ async def test_given_response_read_fails_then_placeholder_image_written(
     mock_write.assert_called_once_with("/tmp/file.png", test_placeholder_data)
 
 
+@patch("dodal.devices.webcam.aiofiles", autospec=True)
 @patch("dodal.devices.webcam.create_placeholder_image", autospec=True)
 @patch("dodal.devices.webcam.ClientSession.get", autospec=True)
+@patch("dodal.devices.webcam.Image.open")
 async def test_given_response_read_passes_but_image_is_invalid(
-    mock_get: MagicMock, mock_placeholder_image: MagicMock, webcam: Webcam
+    mock_image_open,
+    mock_get: MagicMock,
+    mock_placeholder_image: MagicMock,
+    mock_aiofiles,
+    webcam: Webcam,
 ):
-    pass
+    mock_get.return_value.__aenter__.return_value = (mock_response := AsyncMock())
+    mock_response.read.return_value = b"<html><h1>503 Service Unavailable</h1></html>"
+
+    mock_image = MagicMock()
+    mock_image.verify.side_effect = Exception("Invalid image")
+    mock_image_open.return_value = mock_image
+    mock_placeholder_image.return_value = (test_placeholder_data := b"TEST")
+
+    mock_open = mock_aiofiles.open
+    mock_open.return_value.__aenter__.return_value = (mock_file := AsyncMock())
+
+    await webcam.filename.set("file")
+    await webcam.directory.set("/tmp")
+    await webcam.trigger()
+
+    mock_image.verify.assert_called_once()
+    mock_open.assert_called_once_with("/tmp/file.png", "wb")
+    mock_file.write.assert_called_once_with(test_placeholder_data)
 
 
 def test_create_place_holder_image_gives_expected_bytes():
