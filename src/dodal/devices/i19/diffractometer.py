@@ -2,8 +2,8 @@ from ophyd_async.epics.motor import Motor
 
 from dodal.devices.motors import Stage, XYZStage
 
-CIRC = "-MO-CIRC-02:SAM:"  # for phi, kappa, omega, 2theta and det_z
-SAMP = "-MO-SAMP-02:SAM:"  # for x,y,z
+CIRC = "-MO-CIRC-02:"  # for phi, kappa, omega, 2theta and det_z
+SAMP = "-MO-SAMP-02:"  # for x,y,z
 
 
 class DetectorMotion(Stage):
@@ -19,10 +19,16 @@ class DetectorMotion(Stage):
 class FourCircleDiffractometer(XYZStage):
     """Newport 4-circle diffractometer device."""
 
-    def __init__(self, prefix: str, name: str = ""):
+    def __init__(
+        self,
+        prefix: str,
+        name: str = "",
+        circ_infix: str = CIRC,
+        samp_infix: str = SAMP,
+    ):
         with self.add_children_as_readables():
-            self.phi = Motor(f"{prefix}{CIRC}PHI")
-            self.omega = Motor(f"{prefix}{CIRC}OMEGA")
-            self.kappa = Motor(f"{prefix}{CIRC}KAPPA")
-            self.det_stage = DetectorMotion(f"{prefix}{CIRC}", name)
-        super().__init__(f"{prefix}{SAMP}", name)
+            self.phi = Motor(f"{prefix}{circ_infix}SAM:PHI")
+            self.omega = Motor(f"{prefix}{circ_infix}SAM:OMEGA")
+            self.kappa = Motor(f"{prefix}{circ_infix}SAM:KAPPA")
+            self.det_stage = DetectorMotion(f"{prefix}{circ_infix}SAM:", name)
+        super().__init__(f"{prefix}{samp_infix}SAM:", name)
