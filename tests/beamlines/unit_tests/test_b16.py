@@ -12,7 +12,7 @@ def test_software_triggered_tiff_area_detector_calls_with_io_correctly():
         patch("dodal.devices.b16.detector.ADTIFFWriter.with_io") as mock_writer_with_io,
         patch("dodal.devices.b16.detector.AreaDetector") as mock_area_detector,
         patch(
-            "dodal.devices.controllers.ConstantDeadTimeController"
+            "dodal.devices.b16.detector.ConstantDeadTimeController"
         ) as mock_controller,
         patch("dodal.devices.b16.detector.get_path_provider") as mock_get_path_provider,
         patch("dodal.devices.b16.detector.ADBaseIO") as mock_adbase_io,
