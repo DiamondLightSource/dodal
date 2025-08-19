@@ -1,10 +1,7 @@
 from unittest.mock import ANY, AsyncMock, MagicMock, call, patch
 
 import pytest
-from ophyd_async.core import (
-    init_devices,
-    soft_signal_r_and_setter,
-)
+from ophyd_async.core import init_devices
 from ophyd_async.testing import set_mock_value
 
 from dodal.devices.oav.snapshots.snapshot import (
@@ -14,12 +11,6 @@ from dodal.devices.oav.snapshots.snapshot_with_grid import (
     SnapshotWithGrid,
     asyncio_save_image,
 )
-
-
-async def create_and_set_mock_signal_r(dtype, name, value):
-    get, _ = soft_signal_r_and_setter(dtype, value, name=name)
-    await get.connect(mock=True)
-    return get
 
 
 @pytest.fixture
