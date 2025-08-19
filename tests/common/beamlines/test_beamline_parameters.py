@@ -7,12 +7,15 @@ from dodal.common.beamlines.beamline_parameters import (
     GDABeamlineParameters,
     get_beamline_parameters,
 )
+from tests.test_data import (
+    BAD_BEAMLINE_PARAMETERS,
+    I04_BEAMLINE_PARAMETERS,
+    TEST_BEAMLINE_PARAMETERS_TXT,
+)
 
 
 def test_beamline_parameters():
-    params = GDABeamlineParameters.from_file(
-        "tests/test_data/test_beamline_parameters.txt"
-    )
+    params = GDABeamlineParameters.from_file(TEST_BEAMLINE_PARAMETERS_TXT)
     assert params["sg_x_MEDIUM_APERTURE"] == 5.285
     assert params["col_parked_downstream_x"] == 0
     assert params["beamLineEnergy__pitchStep"] == 0.002
@@ -21,7 +24,7 @@ def test_beamline_parameters():
 
 
 def test_i03_beamline_parameters():
-    params = GDABeamlineParameters.from_file("tests/test_data/i04_beamlineParameters")
+    params = GDABeamlineParameters.from_file(I04_BEAMLINE_PARAMETERS)
     assert params["flux_predict_polynomial_coefficients_5"] == [
         -0.0000707134131045123,
         7.0205491504418,
@@ -33,7 +36,7 @@ def test_i03_beamline_parameters():
 
 @patch("dodal.common.beamlines.beamline_parameters.LOGGER")
 def test_parse_exception_causes_warning(mock_logger):
-    params = GDABeamlineParameters.from_file("tests/test_data/bad_beamlineParameters")
+    params = GDABeamlineParameters.from_file(BAD_BEAMLINE_PARAMETERS)
     assert params["flux_predict_polynomial_coefficients_5"] == [
         -0.0000707134131045123,
         7.0205491504418,
@@ -43,7 +46,7 @@ def test_parse_exception_causes_warning(mock_logger):
     ]
     mock_logger.warning.assert_called_once()
 
-    params = GDABeamlineParameters.from_file("tests/test_data/bad_beamlineParameters")
+    params = GDABeamlineParameters.from_file(BAD_BEAMLINE_PARAMETERS)
     assert params["flux_predict_polynomial_coefficients_5"] == [
         -0.0000707134131045123,
         7.0205491504418,
@@ -76,7 +79,7 @@ def test_get_beamline_parameters():
     environ["BEAMLINE"] = "i03"
     with patch.dict(
         "dodal.common.beamlines.beamline_parameters.BEAMLINE_PARAMETER_PATHS",
-        {"i03": "tests/test_data/test_beamline_parameters.txt"},
+        {"i03": TEST_BEAMLINE_PARAMETERS_TXT},
     ):
         params = get_beamline_parameters()
     assert params["col_parked_downstream_x"] == 0
@@ -135,6 +138,6 @@ def test_Yes_and_No_replaced_with_bool_values():
 def i03_beamline_parameters():
     with patch.dict(
         "dodal.common.beamlines.beamline_parameters.BEAMLINE_PARAMETER_PATHS",
-        {"i03": "tests/test_data/test_beamline_parameters.txt"},
+        {"i03": TEST_BEAMLINE_PARAMETERS_TXT},
     ) as params:
         yield params
