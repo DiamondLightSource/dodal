@@ -10,7 +10,8 @@ TMirror = TypeVar("TMirror", bound=StrictEnum)
 
 class XYZSwitchingMirror(XYZPitchYawRollStage, Generic[TMirror]):
     """
-    Set of mirrors on a hexapod with x,y,z and yaw, pitch, roll motors. Mirrors is an stritcEnum class type of readback values, to change mirror one need to select and trigger mirror change.
+    Set of mirrors on a hexapod with x,y,z and yaw, pitch, roll motors.
+    To change mirror one need to set mirror enum and trigger mirror change.
     """
 
     def __init__(
@@ -74,9 +75,11 @@ class XYZPiezoCollimatingMirror(XYZPitchYawRollStage):
         )
 
 
-class XYZPiezoSwitchingMirror(XYZPiezoCollimatingMirror, Generic[TMirror]):
+class XYZPiezoSwitchingMirror(XYZPitchYawRollStage, Generic[TMirror]):
     """
-    Set of mirrors on a hexapod with x,y,z and yaw, pitch, roll motors. Mirrors is an stritcEnum class type of readback values, to change mirror one need to select and trigger mirror change. In addition there is a fine pitch piezo motor.
+    Set of mirrors on a hexapod with x,y,z and yaw, pitch, roll motors.
+    To change mirror one need to set mirror enum and trigger mirror change.
+    In addition there is a fine pitch piezo motor.
     """
 
     def __init__(
@@ -98,6 +101,11 @@ class XYZPiezoSwitchingMirror(XYZPiezoCollimatingMirror, Generic[TMirror]):
         mirror_abort_suffix: str = "MIRCTRL:DMD:ABORT.PROC",
     ):
         with self.add_children_as_readables():
+            self.fine_pitch = epics_signal_rw(
+                float,
+                read_pv=prefix + fpitch_read_suffix,
+                write_pv=prefix + fpitch_write_suffix,
+            )
             self.mirror = epics_signal_rw(
                 mirrors,
                 read_pv=prefix + mirror_read_suffix,
@@ -108,14 +116,5 @@ class XYZPiezoSwitchingMirror(XYZPiezoCollimatingMirror, Generic[TMirror]):
         self.mirror_abort = epics_signal_x(write_pv=prefix + mirror_abort_suffix)
 
         super().__init__(
-            prefix,
-            name,
-            x_infix,
-            y_infix,
-            z_infix,
-            pitch_infix,
-            yaw_infix,
-            roll_infix,
-            fpitch_read_suffix,
-            fpitch_write_suffix,
+            prefix, name, x_infix, y_infix, z_infix, pitch_infix, yaw_infix, roll_infix
         )
