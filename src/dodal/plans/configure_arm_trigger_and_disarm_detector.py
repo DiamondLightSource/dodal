@@ -1,5 +1,6 @@
 import functools
 import time
+from pathlib import PurePath
 
 import bluesky.plan_stubs as bps
 from bluesky import preprocessors as bpp
@@ -166,7 +167,7 @@ if __name__ == "__main__":
 
     path_provider = StaticPathProvider(
         StaticFilenameProvider("eiger_test_file12.h5"),
-        "/dls/i03/data/2025/cm40607-2/test_new_eiger/",
+        PurePath("/dls/i03/data/2025/cm40607-2/test_new_eiger/"),
     )
 
     set_path_provider(path_provider)
