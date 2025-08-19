@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.electron_analyser.detector &#8212; dodal 1.55.2.dev11+g679d35911 documentation</title>
+    <title>dodal.devices.electron_analyser.detector &#8212; dodal 1.55.2.dev12+gc34dae18d documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=354a9589"></script>
+    <script src="../../../../_static/documentation_options.js?v=d4cf8261"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -452,6 +452,7 @@ window.addEventListener("load", () => mermaid.run());
   <h1>Source code for dodal.devices.electron_analyser.detector</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Generic</span><span class="p">,</span> <span class="n">TypeVar</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">bluesky.protocols</span><span class="w"> </span><span class="kn">import</span> <span class="n">Stageable</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">AsyncStatus</span><span class="p">,</span>
     <span class="n">Reference</span><span class="p">,</span>
@@ -516,6 +517,7 @@ window.addEventListener("load", () => mermaid.run());
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.electron_analyser.ElectronAnalyserDetector.html#dodal.devices.electron_analyser.ElectronAnalyserDetector">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ElectronAnalyserDetector</span><span class="p">(</span>
     <span class="n">AbstractElectronAnalyserDetector</span><span class="p">[</span><span class="n">TAbstractAnalyserDriverIO</span><span class="p">],</span>
+    <span class="n">Stageable</span><span class="p">,</span>
     <span class="n">Generic</span><span class="p">[</span>
         <span class="n">TAbstractAnalyserDriverIO</span><span class="p">,</span>
         <span class="n">TAbstractBaseSequence</span><span class="p">,</span>
@@ -544,6 +546,34 @@ window.addEventListener("load", () => mermaid.run());
         <span class="c1"># This implementation creates the driver and wants this to be the parent so it</span>
         <span class="c1"># can be used with connect() method.</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_driver</span>
+
+<div class="viewcode-block" id="ElectronAnalyserDetector.stage">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.electron_analyser.ElectronAnalyserDetector.html#dodal.devices.electron_analyser.ElectronAnalyserDetector.stage">[docs]</a>
+    <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">stage</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Prepare the detector for use by ensuring it is idle and ready.</span>
+
+<span class="sd">        This method asynchronously stages the detector by first disarming the controller</span>
+<span class="sd">        to ensure the detector is not actively acquiring data, then invokes the driver&#39;s</span>
+<span class="sd">        stage procedure. This ensures the detector is in a known, ready state</span>
+<span class="sd">        before use.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            Any exceptions raised by the driver&#39;s stage or controller&#39;s disarm methods.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">controller</span><span class="o">.</span><span class="n">disarm</span><span class="p">()</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">stage</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="ElectronAnalyserDetector.unstage">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.electron_analyser.ElectronAnalyserDetector.html#dodal.devices.electron_analyser.ElectronAnalyserDetector.unstage">[docs]</a>
+    <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">unstage</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Disarm the detector.&quot;&quot;&quot;</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">controller</span><span class="o">.</span><span class="n">disarm</span><span class="p">()</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">unstage</span><span class="p">()</span></div>
+
 
 <div class="viewcode-block" id="ElectronAnalyserDetector.load_sequence">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.electron_analyser.ElectronAnalyserDetector.html#dodal.devices.electron_analyser.ElectronAnalyserDetector.load_sequence">[docs]</a>

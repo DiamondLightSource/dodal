@@ -20,9 +20,7 @@ dodal.devices.electron\_analyser.ElectronAnalyserRegionDetector
       
       
       
-      
       ~ElectronAnalyserRegionDetector.trigger
-      
       
    
    
