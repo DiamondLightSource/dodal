@@ -6,7 +6,6 @@ from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
 from bluesky.utils import FailedStatus
 from ophyd_async.core import SignalR, StrictEnum, init_devices
-from ophyd_async.epics.adcore import ADImageMode
 from ophyd_async.testing import (
     assert_configuration,
     assert_reading,
@@ -84,9 +83,6 @@ async def test_analyser_sets_region_correctly(
     )
     get_mock_put(sim_driver.iterations).assert_called_once_with(
         region.iterations, wait=True
-    )
-    get_mock_put(sim_driver.image_mode).assert_called_once_with(
-        ADImageMode.SINGLE, wait=True
     )
     get_mock_put(sim_driver.detector_mode).assert_called_once_with(
         region.detector_mode, wait=True
