@@ -1,4 +1,6 @@
-from .base_detector import AbstractElectronAnalyserDetector
+from .base_detector import (
+    AbstractElectronAnalyserDetector,
+)
 from .base_driver_io import AbstractAnalyserDriverIO, TAbstractAnalyserDriverIO
 from .base_region import (
     AbstractBaseRegion,

@@ -10,20 +10,11 @@ from ophyd_async.core import (
     DetectorController,
     Device,
 )
-from ophyd_async.epics.adcore import (
-    ADBaseController,
-)
 
+from dodal.devices.controllers import ConstantDeadTimeController
 from dodal.devices.electron_analyser.abstract.base_driver_io import (
-    AbstractAnalyserDriverIO,
     TAbstractAnalyserDriverIO,
 )
-
-
-# ToDo - https://github.com/DiamondLightSource/dodal/issues/1461
-class ElectronAnalyserController(ADBaseController[AbstractAnalyserDriverIO]):
-    def get_deadtime(self, exposure: float | None) -> float:
-        return 0
 
 
 class AbstractElectronAnalyserDetector(
