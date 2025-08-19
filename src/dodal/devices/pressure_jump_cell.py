@@ -1,7 +1,8 @@
 import asyncio
+from dataclasses import dataclass
 from typing import Generic, TypeVar
 
-from bluesky.protocols import Movable
+from bluesky.protocols import Movable, Stoppable
 from ophyd_async.core import (
     AsyncStatus,
     DeviceVector,
@@ -9,6 +10,7 @@ from ophyd_async.core import (
     StandardReadable,
     StandardReadableFormat,
     StrictEnum,
+    wait_for_value,
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
@@ -19,11 +21,6 @@ class PumpState(StrictEnum):
     MANUAL = "Manual"
     AUTO_PRESSURE = "Auto Pressure"
     AUTO_POSITION = "Auto Position"
-
-
-class StopState(StrictEnum):
-    CONTINUE = "CONTINUE"
-    STOP = "STOP"
 
 
 class ValveControlRequest(StrictEnum):
@@ -71,6 +68,12 @@ class FastValveState(StrictEnum):
 TValveControlRequest = TypeVar(
     "TValveControlRequest", bound=ValveControlRequest | FastValveControlRequest
 )
+
+
+@dataclass
+class PressureJumpParameters:
+    pressure_from: int
+    pressure_to: int
 
 
 class ValveControl(
@@ -200,27 +203,64 @@ class PressureTransducer(StandardReadable):
         super().__init__(name)
 
 
-class PressureJumpCellController(StandardReadable):
+class PressureJumpCellController(StandardReadable, Movable, Stoppable):
     """
     Top-level control for a fixed pressure or pressure jumps.
     """
 
     def __init__(self, prefix: str, name: str = "") -> None:
         with self.add_children_as_readables():
-            self.stop = epics_signal_rw(StopState, f"{prefix}STOP")
-
-            self.target_pressure = epics_signal_rw(float, f"{prefix}TARGET")
-            self.timeout = epics_signal_rw(float, f"{prefix}TIMER.HIGH")
+            # Consant pressure
+            self.target_pressure = epics_signal_rw(int, f"{prefix}TARGET")
             self.go = epics_signal_rw(bool, f"{prefix}GO")
 
-            self.from_pressure = epics_signal_rw(float, f"{prefix}JUMPF")
-            self.to_pressure = epics_signal_rw(float, f"{prefix}JUMPT")
-            self.jump_ready = epics_signal_rw(bool, f"{prefix}SETJUMP")
+            # Pressure jump
+            self.from_pressure = epics_signal_rw(int, f"{prefix}JUMPF")
+            self.to_pressure = epics_signal_rw(int, f"{prefix}JUMPT")
+            self.set_jump = epics_signal_rw(bool, f"{prefix}SETJUMP")
 
+            # Common
+            self.busy = epics_signal_r(bool, f"{prefix}GOTOBUSY")
             self.result = epics_signal_r(str, f"{prefix}RESULT")
+            self.timeout = epics_signal_rw(float, f"{prefix}TIMER.HIGH")
+
+            # Internal
+            self._stop = epics_signal_rw(bool, f"{prefix}STOP")
 
             self._name = name
+
         super().__init__(name)
+
+    @AsyncStatus.wrap
+    async def set(self, value: int | PressureJumpParameters):
+        """
+        Sets the desired pressure waiting for the device to complete the operation.
+
+        If value is of type int, the pressure is set to the given fixed value.
+        If value is is of type PressureJumpParameters, a pressure jump is performed
+        given by its pressure_from and pressure_to.
+        """
+        timeout = await self.timeout.get_value()
+
+        if isinstance(value, int):
+            # Static press requested
+            await self.target_pressure.set(value)
+            await self.go.set(True)
+
+        elif isinstance(value, PressureJumpParameters):
+            # Pressure jump requested
+            await self.from_pressure.set(value.pressure_from)
+            await self.to_pressure.set(value.pressure_to)
+            await self.set_jump.set(True)
+        else:
+            raise TypeError(f"Unsupported value type of {type(value)} provided.")
+
+        await wait_for_value(self.busy, True, timeout)  # Change started
+        await wait_for_value(self.busy, False, timeout)  # Change complete
+
+    @AsyncStatus.wrap
+    async def stop(self, success=True):
+        await self._stop.set(True)
 
 
 class PressureJumpCell(StandardReadable):
@@ -240,9 +280,7 @@ class PressureJumpCell(StandardReadable):
         self.all_valves_control = AllValvesControl(f"{prefix}{cell_prefix}", name)
         self.pump = Pump(f"{prefix}{cell_prefix}", name)
 
-        self.controller = PressureJumpCellController(
-            f"{prefix}{cell_prefix}CTRL:", name
-        )
+        self.control = PressureJumpCellController(f"{prefix}{cell_prefix}CTRL:", name)
 
         with self.add_children_as_readables():
             self.pressure_transducers: DeviceVector[PressureTransducer] = DeviceVector(
