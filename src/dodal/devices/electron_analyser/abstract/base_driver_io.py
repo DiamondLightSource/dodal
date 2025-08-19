@@ -132,8 +132,6 @@ class AbstractAnalyserDriverIO(
                 iterations=self.iterations,
             )
 
-        super().__init__(prefix=prefix, name=name)
-
     @AsyncStatus.wrap
     async def stage(self) -> None:
         await self.image_mode.set(ADImageMode.SINGLE)
