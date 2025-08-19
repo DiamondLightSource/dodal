@@ -10,7 +10,7 @@ ADBaseIOT = TypeVar("ADBaseIOT", bound=ADBaseIO)
 
 class ConstantDeadTimeController(ADBaseController[ADBaseIOT]):
     """
-    Controller for a driver with a configured constant deadtime.
+    AdBaseController for a ADBaseIO driver with a configured constant deadtime.
     """
 
     def __init__(self, driver: ADBaseIOT, deadtime: float):
