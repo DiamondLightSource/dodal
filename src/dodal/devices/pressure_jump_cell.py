@@ -1,4 +1,5 @@
 import asyncio
+from enum import IntEnum
 from typing import Generic, TypeVar
 
 from bluesky.protocols import HasName, Movable
@@ -40,9 +41,9 @@ class FastValveControlRequest(StrictEnum):
     DISARM = "Disarm"
 
 
-class ValveOpenSeqRequest(StrictEnum):
-    INACTIVE = "0"
-    OPEN_SEQ = "1"
+class ValveOpenSeqRequest(IntEnum):
+    INACTIVE = 0
+    OPEN_SEQ = 1
 
 
 class PumpMotorDirectionState(StrictEnum):
@@ -90,9 +91,9 @@ class ValveControl(
     @AsyncStatus.wrap
     async def set(self, value: TValveControlRequest):
         if value.value == "Open":
-            await self.open.set(ValveOpenSeqRequest.OPEN_SEQ.value)
+            await self.open.set(ValveOpenSeqRequest.OPEN_SEQ)
             await asyncio.sleep(OPENSEQ_PULSE_LENGTH)
-            await self.open.set(ValveOpenSeqRequest.INACTIVE.value)
+            await self.open.set(ValveOpenSeqRequest.INACTIVE)
         else:
             await self.control.set(value)
 
