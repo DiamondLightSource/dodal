@@ -7,6 +7,7 @@ from ophyd_async.core import (
 )
 
 from dodal.common.data_util import load_json_file_to_class
+from dodal.devices.controllers import ConstantDeadTimeController
 from dodal.devices.electron_analyser.abstract.base_detector import (
     AbstractElectronAnalyserDetector,
 )
@@ -17,7 +18,6 @@ from dodal.devices.electron_analyser.abstract.base_region import (
     TAbstractBaseRegion,
     TAbstractBaseSequence,
 )
-from dodal.devices.electron_analyser.controller import ElectronAnalyserController
 
 
 class ElectronAnalyserRegionDetector(
@@ -33,7 +33,7 @@ class ElectronAnalyserRegionDetector(
     def __init__(
         self,
         driver: TAbstractAnalyserDriverIO,
-        controller: ElectronAnalyserController,
+        controller: ConstantDeadTimeController,
         region: TAbstractBaseRegion,
         name: str = "",
     ):
@@ -84,7 +84,7 @@ class ElectronAnalyserDetector(
     ):
         self._driver = driver
         self._sequence_class = sequence_class
-        self.controller = ElectronAnalyserController(driver)
+        self.controller = ConstantDeadTimeController(driver, 0)
         super().__init__(self.controller, name)
 
     @property

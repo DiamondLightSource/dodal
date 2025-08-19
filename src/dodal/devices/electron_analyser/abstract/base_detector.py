@@ -11,7 +11,6 @@ from ophyd_async.core import (
     Device,
 )
 
-from dodal.devices.controllers import ConstantDeadTimeController
 from dodal.devices.electron_analyser.abstract.base_driver_io import (
     TAbstractAnalyserDriverIO,
 )
