@@ -7,6 +7,7 @@ from ophyd_async.core import (
     AsyncConfigurable,
     AsyncReadable,
     AsyncStatus,
+    DetectorController,
     Device,
 )
 from ophyd_async.epics.adcore import (
@@ -19,6 +20,7 @@ from dodal.devices.electron_analyser.abstract.base_driver_io import (
 )
 
 
+# ToDo - https://github.com/DiamondLightSource/dodal/issues/1461
 class ElectronAnalyserController(ADBaseController[AbstractAnalyserDriverIO]):
     def get_deadtime(self, exposure: float | None) -> float:
         return 0
@@ -42,12 +44,10 @@ class AbstractElectronAnalyserDetector(
 
     def __init__(
         self,
-        driver: TAbstractAnalyserDriverIO,
+        controller: DetectorController,
         name: str = "",
     ):
-        self.controller: ElectronAnalyserController = ElectronAnalyserController(
-            driver=driver
-        )
+        self.controller = controller
         super().__init__(name)
 
     @AsyncStatus.wrap

@@ -1,3 +1,4 @@
+from .controller import ElectronAnalyserController
 from .detector import (
     ElectronAnalyserDetector,
     ElectronAnalyserRegionDetector,
@@ -14,6 +15,7 @@ from .types import (
 from .util import to_binding_energy, to_kinetic_energy
 
 __all__ = [
+    "ElectronAnalyserController",
     "to_binding_energy",
     "to_kinetic_energy",
     "EnergyMode",
