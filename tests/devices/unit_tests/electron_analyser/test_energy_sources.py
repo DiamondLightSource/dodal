@@ -8,13 +8,13 @@ from ophyd_async.testing import (
 
 from dodal.devices.electron_analyser import (
     DualEnergySource,
+    EnergySource,
     SelectedSource,
-    SingleEnergySource,
 )
 
 
 async def test_single_energy_source_read(
-    single_energy_source: SingleEnergySource, dcm_energy: SignalR[float]
+    single_energy_source: EnergySource, dcm_energy: SignalR[float]
 ) -> None:
     await assert_reading(
         single_energy_source,
@@ -33,7 +33,7 @@ async def test_single_energy_souce_read_configuration(
     await assert_configuration(
         single_energy_source,
         {
-            f"{single_energy_source.name}-source_device": partial_reading(
+            f"{single_energy_source.name}-wrapped_device_name": partial_reading(
                 dcm_energy.name
             ),
         },
@@ -69,18 +69,10 @@ async def test_dual_energy_souce_read(
         dual_energy_source,
         {
             f"{prefix}-selected_source": partial_reading(SelectedSource.SOURCE1),
-            f"{prefix}-excitation_energy": partial_reading(
+            f"{prefix}-source1-excitation_energy": partial_reading(
                 await dcm_energy.get_value()
             ),
-        },
-    )
-
-    await dual_energy_source.selected_source.set(SelectedSource.SOURCE2)
-    await assert_reading(
-        dual_energy_source,
-        {
-            f"{prefix}-selected_source": partial_reading(SelectedSource.SOURCE2),
-            f"{prefix}-excitation_energy": partial_reading(
+            f"{prefix}-source2-excitation_energy": partial_reading(
                 await pgm_energy.get_value()
             ),
         },
@@ -96,7 +88,7 @@ async def test_dual_energy_souce_read_configuration(
     await assert_configuration(
         dual_energy_source,
         {
-            f"{prefix}-source1_device": partial_reading(dcm_energy.name),
-            f"{prefix}-source2_device": partial_reading(pgm_energy.name),
+            f"{prefix}-source1-wrapped_device_name": partial_reading(dcm_energy.name),
+            f"{prefix}-source2-wrapped_device_name": partial_reading(pgm_energy.name),
         },
     )

@@ -2,13 +2,14 @@ from typing import Any
 
 import pytest
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import SignalR, init_devices, soft_signal_rw
+from ophyd_async.core import SignalR, init_devices
+from ophyd_async.testing import set_mock_value
 
 from dodal.devices.electron_analyser import (
     DualEnergySource,
     ElectronAnalyserDetector,
+    EnergySource,
     SelectedSource,
-    SingleEnergySource,
 )
 from dodal.devices.electron_analyser.abstract import (
     AbstractAnalyserDriverIO,
@@ -24,42 +25,65 @@ from dodal.devices.electron_analyser.vgscienta import (
     VGScientaAnalyserDriverIO,
     VGScientaSequence,
 )
+from dodal.devices.i09 import DCM, Grating
+from dodal.devices.pgm import PGM
 from tests.devices.unit_tests.electron_analyser.helper_util import (
     get_test_sequence,
 )
 
 
 @pytest.fixture
-def pgm_energy(RE: RunEngine) -> SignalR[float]:
+def dcm(RE: RunEngine) -> DCM:
     with init_devices(mock=True):
-        pgm_energy = soft_signal_rw(float, initial_value=100, units="eV")
-    return pgm_energy
+        dcm = DCM("DCM:")
+    return dcm
 
 
 @pytest.fixture
-def dcm_energy(RE: RunEngine) -> SignalR[float]:
+def pgm(RE: RunEngine) -> PGM:
     with init_devices(mock=True):
-        dcm_energy = soft_signal_rw(float, initial_value=2200, units="eV")
-    return dcm_energy
+        pgm = PGM("PGM:", Grating)
+    return pgm
 
 
 @pytest.fixture
-async def single_energy_source(
-    dcm_energy: SignalR[float], RE: RunEngine
-) -> SingleEnergySource:
-    async with init_devices(mock=True):
-        single_energy_source = SingleEnergySource(
-            dcm_energy,
-        )
+def pgm_energy(pgm: PGM, RE: RunEngine) -> SignalR[float]:
+    set_mock_value(pgm.energy.user_readback, 500)
+    return pgm.energy.user_readback
+
+
+@pytest.fixture
+def dcm_energy(dcm: DCM, RE: RunEngine) -> SignalR[float]:
+    set_mock_value(dcm.energy_in_kev.user_readback, 2.2)
+    return dcm.energy_in_ev
+
+
+@pytest.fixture
+def source1(dcm_energy: SignalR[float], RE: RunEngine) -> EnergySource:
+    with init_devices(mock=True):
+        source1 = EnergySource(dcm_energy)
+    return source1
+
+
+@pytest.fixture
+def source2(pgm_energy: SignalR[float], RE: RunEngine) -> EnergySource:
+    with init_devices(mock=True):
+        source2 = EnergySource(pgm_energy)
+    return source2
+
+
+@pytest.fixture
+async def single_energy_source(source1, RE: RunEngine) -> EnergySource:
+    single_energy_source = source1
     return single_energy_source
 
 
 @pytest.fixture
 async def dual_energy_source(
-    dcm_energy: SignalR[float], pgm_energy: SignalR[float], RE: RunEngine
+    source1: EnergySource, source2: EnergySource, RE: RunEngine
 ) -> DualEnergySource:
     async with init_devices(mock=True):
-        dual_energy_source = DualEnergySource(dcm_energy, pgm_energy)
+        dual_energy_source = DualEnergySource(source1, source2)
     return dual_energy_source
 
 
