@@ -174,96 +174,92 @@ class UndulatorGap(SafeUndulatorMover[float], Preparable, Flyable):
                 Name of the Id device
 
         """
-
-        # Gap demand set point and readback
         self.user_setpoint = epics_signal_rw(
             str, prefix + "GAPSET.B", prefix + "BLGSET"
         )
-        # Nothing move until this is set to 1 and it will return to 0 when done
         self.set_move = epics_signal_rw(int, prefix + "BLGSETP")
-
-        # These are gap velocity limit.
         self.max_velocity = epics_signal_r(float, prefix + "BLGSETVEL.HOPR")
         self.min_velocity = epics_signal_r(float, prefix + "BLGSETVEL.LOPR")
-        # These are gap limit.
         self.high_limit_travel = epics_signal_r(float, prefix + "BLGAPMTR.HLM")
         self.low_limit_travel = epics_signal_r(float, prefix + "BLGAPMTR.LLM")
-
         self.acceleration_time = epics_signal_r(float, prefix + "BLGSETVEL.ACCL")
 
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
-            # Unit
             self.motor_egu = epics_signal_r(str, prefix + "BLGAPMTR.EGU")
-            # Gap velocity
             self.velocity = epics_signal_rw(float, prefix + "BLGSETVEL")
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
-            # Gap readback value
             self.user_readback = epics_signal_r(float, prefix + "CURRGAPD")
 
-        # Currently requested fly info, stored in prepare
         self._fly_info: FlyMotorInfo | None = None
-
-        # Set on kickoff(), complete when motor reaches self._fly_completed_position
         self._fly_status: AsyncStatus | None = None
 
         super().__init__(self.set_move, prefix, name)
 
     @AsyncStatus.wrap
-    async def prepare(self, value: FlyMotorInfo):
-        """Move to the beginning of a suitable run-up distance ready for a fly scan."""
-        # Velocity, at which motor travels from start_position to end_position, in motor
-        # egu/s.
+    async def prepare(self, value: FlyMotorInfo) -> None:
+        """
+        Prepare for a fly scan by moving to the run-up position at max velocity.
+        Stores fly info for later use in kickoff.
+        """
         max_velocity, min_velocity, egu = await asyncio.gather(
             self.max_velocity.get_value(),
             self.min_velocity.get_value(),
             self.motor_egu.get_value(),
         )
-        if min_velocity > abs(value.velocity) or abs(value.velocity) > max_velocity:
+        velocity = abs(value.velocity)
+        if not (min_velocity <= velocity <= max_velocity):
             raise ValueError(
-                f"Velocity {abs(value.velocity)} {egu}/s was requested for a id gap motor "
-                f" speed must be between {max_velocity} and {min_velocity} {egu}/s"
+                f"Requested velocity {velocity} {egu}/s is out of bounds: "
+                f"must be between {min_velocity} and {max_velocity} {egu}/s."
             )
 
         acceleration_time = await self.acceleration_time.get_value()
         ramp_up_start_pos = value.ramp_up_start_pos(acceleration_time)
         ramp_down_end_pos = value.ramp_down_end_pos(acceleration_time)
 
-        motor_lower_limit, motor_upper_limit, egu = await asyncio.gather(
+        motor_lower_limit, motor_upper_limit = await asyncio.gather(
             self.low_limit_travel.get_value(),
             self.high_limit_travel.get_value(),
-            self.motor_egu.get_value(),
         )
 
-        if (
-            not motor_upper_limit >= ramp_up_start_pos >= motor_lower_limit
-            or not motor_upper_limit >= ramp_down_end_pos >= motor_lower_limit
-        ):
+        # Check both ramp positions are within limits
+        if not (motor_lower_limit <= ramp_up_start_pos <= motor_upper_limit):
             raise MotorLimitsException(
-                f"Motor trajectory for requested fly is from "
-                f"{ramp_up_start_pos}{egu} to "
-                f"{ramp_down_end_pos}{egu} but motor limits are "
-                f"{motor_lower_limit}{egu} <= x <= {motor_upper_limit}{egu} "
+                f"Ramp-up start position {ramp_up_start_pos}{egu} is outside motor limits "
+                f"({motor_lower_limit}{egu} <= x <= {motor_upper_limit}{egu})."
+            )
+        if not (motor_lower_limit <= ramp_down_end_pos <= motor_upper_limit):
+            raise MotorLimitsException(
+                f"Ramp-down end position {ramp_down_end_pos}{egu} is outside motor limits "
+                f"({motor_lower_limit}{egu} <= x <= {motor_upper_limit}{egu})."
             )
 
-        # move to prepare position at maximum velocity
-        await self.velocity.set(abs(max_velocity))
+        LOGGER.info(
+            f"Preparing for fly scan: moving to run-up position {ramp_up_start_pos}{egu} at max velocity {max_velocity}{egu}/s."
+        )
+        await self.velocity.set(max_velocity)
         await self.set(ramp_up_start_pos)
 
-        # Set velocity we will be using for the fly scan
-        await self.velocity.set(abs(value.velocity))
+        LOGGER.info(f"Setting fly scan velocity to {value.velocity}{egu}/s.")
+        await self.velocity.set(velocity)
+
+        self._fly_info = value  # Store for kickoff
 
     @AsyncStatus.wrap
-    async def kickoff(self):
-        """Begin moving motor from prepared position to final position."""
+    async def kickoff(self) -> None:
+        """
+        Begin moving motor from prepared position to final position.
+        """
         fly_info = error_if_none(
             self._fly_info, "Motor must be prepared before attempting to kickoff"
         )
-
         acceleration_time = await self.acceleration_time.get_value()
         self._fly_status = self.set(fly_info.ramp_down_end_pos(acceleration_time))
 
     def complete(self) -> AsyncStatus:
-        """Mark as complete once motor reaches completed position."""
+        """
+        Mark as complete once motor reaches completed position.
+        """
         fly_status = error_if_none(self._fly_status, "kickoff not called")
         return fly_status
 
