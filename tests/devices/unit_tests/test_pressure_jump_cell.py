@@ -65,11 +65,11 @@ async def test_reading_pjumpcell_includes_config_fields_valves(
     )
     set_mock_value(
         cell.all_valves_control.valve_control[1].open,
-        ValveOpenSeqRequest.INACTIVE.value,
+        ValveOpenSeqRequest.INACTIVE,
     )
     set_mock_value(
         cell.all_valves_control.valve_control[3].open,
-        ValveOpenSeqRequest.OPEN_SEQ.value,
+        ValveOpenSeqRequest.OPEN_SEQ,
     )
 
     set_mock_value(
@@ -81,11 +81,11 @@ async def test_reading_pjumpcell_includes_config_fields_valves(
     )
     set_mock_value(
         cell.all_valves_control.valve_control[5].open,
-        ValveOpenSeqRequest.INACTIVE.value,
+        ValveOpenSeqRequest.INACTIVE,
     )
     set_mock_value(
         cell.all_valves_control.valve_control[6].open,
-        ValveOpenSeqRequest.OPEN_SEQ.value,
+        ValveOpenSeqRequest.OPEN_SEQ,
     )
 
     await assert_reading(
@@ -110,7 +110,7 @@ async def test_pjumpcell_set_valve_sets_valve_fields(
     )
     set_mock_value(
         cell.all_valves_control.valve_control[1].open,
-        ValveOpenSeqRequest.INACTIVE.value,
+        ValveOpenSeqRequest.INACTIVE,
     )
 
     set_mock_value(
@@ -120,7 +120,7 @@ async def test_pjumpcell_set_valve_sets_valve_fields(
 
     set_mock_value(
         cell.all_valves_control.valve_control[6].open,
-        ValveOpenSeqRequest.INACTIVE.value,
+        ValveOpenSeqRequest.INACTIVE,
     )
 
     # Set new values
@@ -211,7 +211,7 @@ async def test_pjumpcell_set_valve_sets_control_request_for_all_valve_types(
 
     set_mock_value(
         cell.all_valves_control.valve_control[5].open,
-        ValveOpenSeqRequest.INACTIVE.value,
+        ValveOpenSeqRequest.INACTIVE,
     )
 
     # Set new values
@@ -331,7 +331,7 @@ async def test_setting_all_pressure_cell_valves(
     )
     set_mock_value(
         cell.all_valves_control.valve_control[1].open,
-        ValveOpenSeqRequest.INACTIVE.value,
+        ValveOpenSeqRequest.INACTIVE,
     )
 
     set_mock_value(
@@ -339,7 +339,7 @@ async def test_setting_all_pressure_cell_valves(
     )
     set_mock_value(
         cell.all_valves_control.valve_control[3].open,
-        ValveOpenSeqRequest.INACTIVE.value,
+        ValveOpenSeqRequest.INACTIVE,
     )
 
     set_mock_value(
@@ -349,7 +349,7 @@ async def test_setting_all_pressure_cell_valves(
 
     set_mock_value(
         cell.all_valves_control.valve_control[5].open,
-        ValveOpenSeqRequest.INACTIVE.value,
+        ValveOpenSeqRequest.INACTIVE,
     )
 
     set_mock_value(
@@ -359,7 +359,7 @@ async def test_setting_all_pressure_cell_valves(
 
     set_mock_value(
         cell.all_valves_control.valve_control[6].open,
-        ValveOpenSeqRequest.INACTIVE.value,
+        ValveOpenSeqRequest.INACTIVE,
     )
 
     # Set new values
