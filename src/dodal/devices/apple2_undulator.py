@@ -5,7 +5,7 @@ from math import isclose
 from typing import Any, Generic, TypeVar
 
 import numpy as np
-from bluesky.protocols import Movable, Preparable
+from bluesky.protocols import Flyable, Movable, Preparable
 from ophyd_async.core import (
     AsyncStatus,
     FlyMotorInfo,
@@ -156,7 +156,7 @@ class SafeUndulatorMover(StandardReadable, Movable[T], Generic[T]):
             raise RuntimeError(f"{self.name} is already in motion.")
 
 
-class UndulatorGap(SafeUndulatorMover[float], Preparable):
+class UndulatorGap(SafeUndulatorMover[float], Preparable, Flyable):
     """A device with a collection of epics signals to set Apple 2 undulator gap motion.
     Only PV used by beamline are added the full list is here:
     /dls_sw/work/R3.14.12.7/support/insertionDevice/db/IDGapVelocityControl.template
