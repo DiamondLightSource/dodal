@@ -21,11 +21,11 @@ class PsuMode(StrictEnum):
 
 
 class PassEnergy(StrictEnum):
-    E5 = 5
-    E10 = 10
-    E20 = 20
-    E50 = 50
-    E70 = 70
-    E100 = 100
-    E200 = 200
-    E500 = 500
+    E5 = "5"
+    E10 = "10"
+    E20 = "20"
+    E50 = "50"
+    E70 = "70"
+    E100 = "100"
+    E200 = "200"
+    E500 = "500"
