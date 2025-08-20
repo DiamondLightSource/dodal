@@ -42,13 +42,13 @@ class EnergySource(AbstractEnergySource):
             self.wrapped_device_name, _ = soft_signal_r_and_setter(
                 str, initial_value=source.name
             )
-        self.source = Reference(source)
+        self._source_ref = Reference(source)
         super().__init__(name)
         self.add_readables([self.excitation_energy])
 
     def _excitation_energy_signal(self) -> SignalR[float]:
         return derived_signal_r(
-            self._get_energy, derived_units="eV", energy=self.source()
+            self._get_energy, derived_units="eV", energy=self._source_ref()
         )
 
     def _get_energy(self, energy: float) -> float:
