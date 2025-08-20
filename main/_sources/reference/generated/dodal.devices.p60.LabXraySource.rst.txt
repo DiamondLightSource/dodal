@@ -17,48 +17,6 @@ dodal.devices.p60.LabXraySource
       
       
       
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
    
    
 
@@ -68,6 +26,8 @@ dodal.devices.p60.LabXraySource
 
    .. autosummary::
    
+      
+      
       
       ~LabXraySource.AL_KALPHA
       
