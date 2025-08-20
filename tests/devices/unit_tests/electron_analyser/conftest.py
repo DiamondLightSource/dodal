@@ -83,10 +83,11 @@ async def dual_energy_source(
 # ToDo - This will be removed once existing devices use the energy source device rather
 # than dict.
 @pytest.fixture
-async def energy_sources(
-    dcm_energy: SignalR[float], pgm_energy: SignalR[float]
-) -> dict[str, SignalR[float]]:
-    return {SelectedSource.SOURCE1: dcm_energy, SelectedSource.SOURCE2: pgm_energy}
+async def energy_sources(dcm: DCM, pgm: PGM) -> dict[str, SignalR[float]]:
+    return {
+        SelectedSource.SOURCE1: dcm.energy_in_ev,
+        SelectedSource.SOURCE2: pgm.energy.user_readback,
+    }
 
 
 @pytest.fixture
