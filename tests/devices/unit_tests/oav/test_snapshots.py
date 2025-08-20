@@ -16,28 +16,28 @@ from dodal.devices.oav.snapshots.snapshot_with_grid import (
 @pytest.fixture
 async def snapshot() -> Snapshot:
     async with init_devices(mock=True):
-        snapshot = Snapshot("", "fake_snapshot")
-    set_mock_value(snapshot.directory, "/tmp/")
-    set_mock_value(snapshot.filename, "test")
-    set_mock_value(snapshot.url, "http://test.url")
-    return snapshot
+        fake_snapshot = Snapshot("")
+    set_mock_value(fake_snapshot.directory, "/tmp/")
+    set_mock_value(fake_snapshot.filename, "test")
+    set_mock_value(fake_snapshot.url, "http://test.url")
+    return fake_snapshot
 
 
 @pytest.fixture
 async def grid_snapshot() -> SnapshotWithGrid:
     async with init_devices(mock=True):
-        grid_snapshot = SnapshotWithGrid("", "fake_grid")
+        fake_grid = SnapshotWithGrid("")
 
-    set_mock_value(grid_snapshot.top_left_x, 100)
-    set_mock_value(grid_snapshot.top_left_y, 100)
-    set_mock_value(grid_snapshot.box_width, 50)
-    set_mock_value(grid_snapshot.num_boxes_x, 15)
-    set_mock_value(grid_snapshot.num_boxes_y, 10)
+    set_mock_value(fake_grid.top_left_x, 100)
+    set_mock_value(fake_grid.top_left_y, 100)
+    set_mock_value(fake_grid.box_width, 50)
+    set_mock_value(fake_grid.num_boxes_x, 15)
+    set_mock_value(fake_grid.num_boxes_y, 10)
 
-    set_mock_value(grid_snapshot.directory, "/tmp/")
-    set_mock_value(grid_snapshot.filename, "test")
-    set_mock_value(grid_snapshot.url, "http://test.url")
-    return grid_snapshot
+    set_mock_value(fake_grid.directory, "/tmp/")
+    set_mock_value(fake_grid.filename, "test")
+    set_mock_value(fake_grid.url, "http://test.url")
+    return fake_grid
 
 
 @pytest.fixture
