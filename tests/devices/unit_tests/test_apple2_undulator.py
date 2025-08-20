@@ -1,11 +1,12 @@
 from collections import defaultdict
-from unittest.mock import AsyncMock
+from unittest.mock import AsyncMock, MagicMock
 
 import bluesky.plan_stubs as bps
 import pytest
 from bluesky.plans import scan
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import init_devices
+from ophyd_async.core import FlyMotorInfo, init_devices
+from ophyd_async.epics.motor import MotorLimitsException
 from ophyd_async.testing import (
     assert_emitted,
     assert_reading,
@@ -34,6 +35,10 @@ async def mock_id_gap(prefix: str = "BLXX-EA-DET-007:") -> UndulatorGap:
     set_mock_value(mock_id_gap.velocity, 1)
     set_mock_value(mock_id_gap.user_readback, 1)
     set_mock_value(mock_id_gap.user_setpoint, "1")
+    set_mock_value(mock_id_gap.high_limit_travel, 210)
+    set_mock_value(mock_id_gap.low_limit_travel, 20)
+    set_mock_value(mock_id_gap.max_velocity, 20)
+    set_mock_value(mock_id_gap.min_velocity, 0.1)
     set_mock_value(mock_id_gap.fault, 0)
     return mock_id_gap
 
@@ -164,6 +169,89 @@ async def test_gap_success_scan(mock_id_gap: UndulatorGap, RE: RunEngine):
     assert_emitted(docs, start=1, descriptor=1, event=11, stop=1)
     for i in output:
         assert docs["event"][i]["data"]["mock_id_gap-user_readback"] == i
+
+
+async def test_gap_prepare_velocity_max_limit_error(mock_id_gap: UndulatorGap):
+    set_mock_value(mock_id_gap.max_velocity, 9)
+    set_mock_value(mock_id_gap.min_velocity, 0.1)
+    with pytest.raises(ValueError):
+        fly_info = FlyMotorInfo(start_position=25, end_position=35, time_for_move=1.0)
+        await mock_id_gap.prepare(fly_info)
+
+
+async def test_gap_prepare_velocity_min_limit_error(mock_id_gap: UndulatorGap):
+    set_mock_value(mock_id_gap.max_velocity, 20)
+    set_mock_value(mock_id_gap.min_velocity, 11)
+    with pytest.raises(ValueError):
+        fly_info = FlyMotorInfo(start_position=25, end_position=35, time_for_move=1)
+        await mock_id_gap.prepare(fly_info)
+
+
+async def test_kickoff(mock_id_gap: UndulatorGap):
+    mock_id_gap.set = MagicMock()
+    with pytest.raises(
+        RuntimeError, match="Motor must be prepared before attempting to kickoff"
+    ):
+        await mock_id_gap.kickoff()
+
+    set_mock_value(mock_id_gap.acceleration_time, 1)
+    mock_id_gap._fly_info = FlyMotorInfo(
+        start_position=12,
+        end_position=2,
+        time_for_move=1,
+    )
+    await mock_id_gap.kickoff()
+    mock_id_gap.set.assert_called_once_with(-3.0)
+
+
+async def test_complete(mock_id_gap: UndulatorGap) -> None:
+    with pytest.raises(RuntimeError, match="kickoff not called"):
+        mock_id_gap.complete()
+    callback_on_mock_put(
+        mock_id_gap.user_setpoint,
+        lambda *_, **__: set_mock_value(mock_id_gap.gate, UndulatorGateStatus.OPEN),
+    )
+
+    callback_on_mock_put(
+        mock_id_gap.set_move,
+        lambda *_, **__: set_mock_value(mock_id_gap.gate, UndulatorGateStatus.CLOSE),
+    )
+    mock_id_gap._fly_status = mock_id_gap.set(55)
+    assert not mock_id_gap._fly_status.done
+    await mock_id_gap.complete()
+    assert mock_id_gap._fly_status.done
+
+
+@pytest.mark.parametrize(
+    "acceleration_time, velocity, start_position, end_position, upper_limit,\
+    lower_limit",
+    [
+        (1, 10, 25, 10, 30, 15.999),  # Goes below lower_limit, +ve direction
+        (1, 10, 0, 10, 14.99, -10),  # Goes above upper_limit, +ve direction
+        (1, 10, 10, 0, -30, -9.999),  # Goes below lower_limit, -ve direction
+        (1, 10, 10, 0, 14.99, -10),  # Goes above upper_limit, -ve direction
+    ],
+)
+async def test_prepare_motor_limits_error(
+    mock_id_gap: UndulatorGap,
+    acceleration_time,
+    velocity,
+    start_position,
+    end_position,
+    upper_limit,
+    lower_limit,
+):
+    set_mock_value(mock_id_gap.acceleration_time, acceleration_time)
+    set_mock_value(mock_id_gap.low_limit_travel, lower_limit)
+    set_mock_value(mock_id_gap.high_limit_travel, upper_limit)
+    time_for_move = abs(end_position - start_position) / velocity
+    fly_info = FlyMotorInfo(
+        start_position=start_position,
+        end_position=end_position,
+        time_for_move=time_for_move,
+    )
+    with pytest.raises(MotorLimitsException):
+        await mock_id_gap.prepare(fly_info)
 
 
 async def test_given_gate_never_closes_then_setting_phases_times_out(

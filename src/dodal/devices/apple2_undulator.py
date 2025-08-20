@@ -5,19 +5,22 @@ from math import isclose
 from typing import Any, Generic, TypeVar
 
 import numpy as np
-from bluesky.protocols import Movable
+from bluesky.protocols import Movable, Preparable
 from ophyd_async.core import (
     AsyncStatus,
+    FlyMotorInfo,
     SignalR,
     SignalW,
     StandardReadable,
     StandardReadableFormat,
     StrictEnum,
     derived_signal_rw,
+    error_if_none,
     soft_signal_r_and_setter,
     wait_for_value,
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw, epics_signal_w
+from ophyd_async.epics.motor import MotorLimitsException
 from pydantic import BaseModel, ConfigDict, RootModel
 
 from dodal.log import LOGGER
@@ -153,7 +156,7 @@ class SafeUndulatorMover(StandardReadable, Movable[T], Generic[T]):
             raise RuntimeError(f"{self.name} is already in motion.")
 
 
-class UndulatorGap(SafeUndulatorMover[float]):
+class UndulatorGap(SafeUndulatorMover[float], Preparable):
     """A device with a collection of epics signals to set Apple 2 undulator gap motion.
     Only PV used by beamline are added the full list is here:
     /dls_sw/work/R3.14.12.7/support/insertionDevice/db/IDGapVelocityControl.template
@@ -186,8 +189,7 @@ class UndulatorGap(SafeUndulatorMover[float]):
         self.high_limit_travel = epics_signal_r(float, prefix + "BLGAPMTR.HLM")
         self.low_limit_travel = epics_signal_r(float, prefix + "BLGAPMTR.LLM")
 
-        # This is calculated acceleration from speed
-        self.acceleration_time = epics_signal_r(float, prefix + "IDGSETACC")
+        self.acceleration_time = epics_signal_r(float, prefix + "BLGSETVEL.ACCL")
 
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             # Unit
@@ -197,7 +199,73 @@ class UndulatorGap(SafeUndulatorMover[float]):
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             # Gap readback value
             self.user_readback = epics_signal_r(float, prefix + "CURRGAPD")
+
+        # Currently requested fly info, stored in prepare
+        self._fly_info: FlyMotorInfo | None = None
+
+        # Set on kickoff(), complete when motor reaches self._fly_completed_position
+        self._fly_status: AsyncStatus | None = None
+
         super().__init__(self.set_move, prefix, name)
+
+    @AsyncStatus.wrap
+    async def prepare(self, value: FlyMotorInfo):
+        """Move to the beginning of a suitable run-up distance ready for a fly scan."""
+        # Velocity, at which motor travels from start_position to end_position, in motor
+        # egu/s.
+        max_velocity, min_velocity, egu = await asyncio.gather(
+            self.max_velocity.get_value(),
+            self.min_velocity.get_value(),
+            self.motor_egu.get_value(),
+        )
+        if min_velocity > abs(value.velocity) or abs(value.velocity) > max_velocity:
+            raise ValueError(
+                f"Velocity {abs(value.velocity)} {egu}/s was requested for a id gap motor "
+                f" speed must be between {max_velocity} and {min_velocity} {egu}/s"
+            )
+
+        acceleration_time = await self.acceleration_time.get_value()
+        ramp_up_start_pos = value.ramp_up_start_pos(acceleration_time)
+        ramp_down_end_pos = value.ramp_down_end_pos(acceleration_time)
+
+        motor_lower_limit, motor_upper_limit, egu = await asyncio.gather(
+            self.low_limit_travel.get_value(),
+            self.high_limit_travel.get_value(),
+            self.motor_egu.get_value(),
+        )
+
+        if (
+            not motor_upper_limit >= ramp_up_start_pos >= motor_lower_limit
+            or not motor_upper_limit >= ramp_down_end_pos >= motor_lower_limit
+        ):
+            raise MotorLimitsException(
+                f"Motor trajectory for requested fly is from "
+                f"{ramp_up_start_pos}{egu} to "
+                f"{ramp_down_end_pos}{egu} but motor limits are "
+                f"{motor_lower_limit}{egu} <= x <= {motor_upper_limit}{egu} "
+            )
+
+        # move to prepare position at maximum velocity
+        await self.velocity.set(abs(max_velocity))
+        await self.set(ramp_up_start_pos)
+
+        # Set velocity we will be using for the fly scan
+        await self.velocity.set(abs(value.velocity))
+
+    @AsyncStatus.wrap
+    async def kickoff(self):
+        """Begin moving motor from prepared position to final position."""
+        fly_info = error_if_none(
+            self._fly_info, "Motor must be prepared before attempting to kickoff"
+        )
+
+        acceleration_time = await self.acceleration_time.get_value()
+        self._fly_status = self.set(fly_info.ramp_down_end_pos(acceleration_time))
+
+    def complete(self) -> AsyncStatus:
+        """Mark as complete once motor reaches completed position."""
+        fly_status = error_if_none(self._fly_status, "kickoff not called")
+        return fly_status
 
     async def _set_demand_positions(self, value: float) -> None:
         await self.user_setpoint.set(str(value))
