@@ -1,8 +1,7 @@
-import asyncio
 from abc import abstractmethod
 from typing import Generic
 
-from bluesky.protocols import Reading, Stageable, Triggerable
+from bluesky.protocols import Reading, Triggerable
 from event_model import DataKey
 from ophyd_async.core import (
     AsyncConfigurable,
@@ -27,7 +26,6 @@ class ElectronAnalyserController(ADBaseController[AbstractAnalyserDriverIO]):
 
 class AbstractElectronAnalyserDetector(
     Device,
-    Stageable,
     Triggerable,
     AsyncReadable,
     AsyncConfigurable,
@@ -56,16 +54,6 @@ class AbstractElectronAnalyserDetector(
     async def trigger(self) -> None:
         await self.controller.arm()
         await self.controller.wait_for_idle()
-
-    @AsyncStatus.wrap
-    async def stage(self) -> None:
-        """Make sure the detector is idle and ready to be used."""
-        await asyncio.gather(self.controller.disarm())
-
-    @AsyncStatus.wrap
-    async def unstage(self) -> None:
-        """Disarm the detector."""
-        await asyncio.gather(self.controller.disarm())
 
     async def read(self) -> dict[str, Reading]:
         return await self.driver.read()

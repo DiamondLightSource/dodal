@@ -11,6 +11,7 @@ from dodal.devices.electron_analyser.abstract.types import (
 from dodal.devices.electron_analyser.detector import (
     ElectronAnalyserDetector,
 )
+from dodal.devices.electron_analyser.enums import SelectedSource
 from dodal.devices.electron_analyser.vgscienta.driver_io import (
     VGScientaAnalyserDriverIO,
 )
@@ -34,7 +35,7 @@ class VGScientaDetector(
         lens_mode_type: type[TLensMode],
         psu_mode_type: type[TPsuMode],
         pass_energy_type: type[TPassEnergyEnum],
-        energy_sources: Mapping[str, SignalR[float]],
+        energy_sources: Mapping[SelectedSource, SignalR[float]],
         name: str = "",
     ):
         driver = VGScientaAnalyserDriverIO[TLensMode, TPsuMode, TPassEnergyEnum](
