@@ -27,7 +27,7 @@ async def test_single_energy_source_read(
 
 
 async def test_single_energy_souce_read_configuration(
-    single_energy_source: DualEnergySource,
+    single_energy_source: EnergySource,
     dcm_energy: SignalR[float],
 ) -> None:
     await assert_configuration(
