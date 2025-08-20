@@ -19,7 +19,7 @@ from dodal.devices.b07_1.ccmc import (
 
 
 class WrongEnum(StrictEnum):
-    POS_100 = 100.0
+    POS_100 = "100.0"
 
 
 @pytest.fixture
