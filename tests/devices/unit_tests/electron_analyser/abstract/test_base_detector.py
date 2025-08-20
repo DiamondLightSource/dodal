@@ -10,8 +10,8 @@ from ophyd_async.epics.adcore import ADBaseController
 import dodal.devices.b07 as b07
 import dodal.devices.i09 as i09
 from dodal.devices.electron_analyser import (
+    EnergySource,
     GenericElectronAnalyserDetector,
-    SingleEnergySource,
 )
 from dodal.devices.electron_analyser.specs import SpecsDetector
 from dodal.devices.electron_analyser.vgscienta import VGScientaDetector
@@ -27,7 +27,7 @@ from tests.devices.unit_tests.electron_analyser.helper_util import get_test_sequ
 )
 async def sim_detector(
     request: pytest.FixtureRequest,
-    single_energy_source: SingleEnergySource,
+    single_energy_source: EnergySource,
     RE: RunEngine,
 ) -> GenericElectronAnalyserDetector:
     async with init_devices(mock=True):
@@ -52,6 +52,30 @@ def test_analyser_detector_loads_sequence_correctly(
 ) -> None:
     seq = sim_detector.load_sequence(sequence_file_path)
     assert seq is not None
+
+
+async def test_analyser_detector_stage(
+    sim_detector: GenericElectronAnalyserDetector,
+) -> None:
+    sim_detector.controller.disarm = AsyncMock()
+    sim_detector.driver.stage = AsyncMock()
+
+    await sim_detector.stage()
+
+    sim_detector.controller.disarm.assert_awaited_once()
+    sim_detector.driver.stage.assert_awaited_once()
+
+
+async def test_analyser_detector_unstage(
+    sim_detector: GenericElectronAnalyserDetector,
+) -> None:
+    sim_detector.controller.disarm = AsyncMock()
+    sim_detector.driver.unstage = AsyncMock()
+
+    await sim_detector.unstage()
+
+    sim_detector.controller.disarm.assert_awaited_once()
+    sim_detector.driver.unstage.assert_awaited_once()
 
 
 def test_analyser_detector_creates_region_detectors(
@@ -125,9 +149,7 @@ async def test_analyser_region_detector_trigger_sets_driver_with_region(
         assert_detector_trigger_uses_controller_correctly(
             reg_det, reg_det.controller, RE
         )
-
         reg_det.driver.set.assert_awaited_once_with(reg_det.region)
 
 
-# ToDo - Add tests for BaseElectronAnalyserDetector class + controller
 # ToDo - Add test that data being read is correct from plan

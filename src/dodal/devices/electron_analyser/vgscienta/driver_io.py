@@ -8,7 +8,6 @@ from ophyd_async.core import (
     SignalR,
     StandardReadableFormat,
 )
-from ophyd_async.epics.adcore import ADImageMode
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
 from dodal.devices.electron_analyser.abstract.base_driver_io import (
@@ -21,7 +20,7 @@ from dodal.devices.electron_analyser.abstract.types import (
 )
 from dodal.devices.electron_analyser.energy_sources import (
     DualEnergySource,
-    SingleEnergySource,
+    EnergySource,
 )
 from dodal.devices.electron_analyser.enums import EnergyMode
 from dodal.devices.electron_analyser.vgscienta.enums import (
@@ -49,7 +48,7 @@ class VGScientaAnalyserDriverIO(
         lens_mode_type: type[TLensMode],
         psu_mode_type: type[TPsuMode],
         pass_energy_type: type[TPassEnergyEnum],
-        energy_source: SingleEnergySource | DualEnergySource,
+        energy_source: EnergySource | DualEnergySource,
         name: str = "",
     ) -> None:
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
@@ -92,7 +91,6 @@ class VGScientaAnalyserDriverIO(
             self.iterations.set(ke_region.iterations),
             self.acquisition_mode.set(ke_region.acquisition_mode),
             self.energy_step.set(ke_region.energy_step),
-            self.image_mode.set(ADImageMode.SINGLE),
             self.detector_mode.set(ke_region.detector_mode),
             self.region_min_x.set(ke_region.min_x),
             self.region_size_x.set(ke_region.size_x),

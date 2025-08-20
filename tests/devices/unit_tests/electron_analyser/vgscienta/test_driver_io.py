@@ -6,7 +6,6 @@ from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
 from bluesky.utils import FailedStatus
 from ophyd_async.core import StrictEnum, init_devices
-from ophyd_async.epics.adcore import ADImageMode
 from ophyd_async.testing import (
     assert_configuration,
     assert_reading,
@@ -79,9 +78,6 @@ async def test_analyser_sets_region_correctly(
     get_mock_put(sim_driver.iterations).assert_called_once_with(
         region.iterations, wait=True
     )
-    get_mock_put(sim_driver.image_mode).assert_called_once_with(
-        ADImageMode.SINGLE, wait=True
-    )
     get_mock_put(sim_driver.detector_mode).assert_called_once_with(
         region.detector_mode, wait=True
     )
@@ -142,8 +138,8 @@ async def test_analyser_sets_region_and_read_configuration_is_correct(
             f"{prefix}region_size_y": partial_reading(region.size_y),
             f"{prefix}sensor_max_size_y": partial_reading(ANY),
             f"{prefix}psu_mode": partial_reading(ANY),
-            f"{prefix}energy_source-source1_device": partial_reading(ANY),
-            f"{prefix}energy_source-source2_device": partial_reading(ANY),
+            f"{prefix}energy_source-source1-wrapped_device_name": partial_reading(ANY),
+            f"{prefix}energy_source-source2-wrapped_device_name": partial_reading(ANY),
         },
     )
 
@@ -164,10 +160,12 @@ async def test_analyser_sets_region_and_read_is_correct(
     await assert_reading(
         sim_driver,
         {
-            f"{prefix}energy_source-excitation_energy": partial_reading(ANY),
+            # f"{prefix}energy_source-excitation_energy": partial_reading(ANY),
             f"{prefix}energy_source-selected_source": partial_reading(
                 region.excitation_energy_source
             ),
+            f"{prefix}energy_source-source1-excitation_energy": partial_reading(ANY),
+            f"{prefix}energy_source-source2-excitation_energy": partial_reading(ANY),
             f"{prefix}image": partial_reading(ANY),
             f"{prefix}spectrum": partial_reading(spectrum),
             f"{prefix}total_intensity": partial_reading(expected_total_intensity),

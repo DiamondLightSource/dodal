@@ -4,7 +4,7 @@ from .detector import (
     TElectronAnalyserDetector,
     TElectronAnalyserRegionDetector,
 )
-from .energy_sources import DualEnergySource, SingleEnergySource
+from .energy_sources import DualEnergySource, EnergySource
 from .enums import EnergyMode, SelectedSource
 from .types import (
     ElectronAnalyserDetectorImpl,
@@ -19,7 +19,7 @@ __all__ = [
     "to_kinetic_energy",
     "DualEnergySource",
     "SelectedSource",
-    "SingleEnergySource",
+    "EnergySource",
     "EnergyMode",
     "SelectedSource",
     "ElectronAnalyserDetector",

@@ -2,7 +2,7 @@ from dodal.common.beamlines.beamline_utils import (
     device_factory,
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.devices.electron_analyser import SingleEnergySource
+from dodal.devices.electron_analyser import EnergySource
 from dodal.devices.electron_analyser.specs import SpecsAnalyserDriverIO
 from dodal.devices.i09.dcm import DCM
 from dodal.devices.i09_1 import LensMode, PsuMode
@@ -27,8 +27,8 @@ def dcm() -> DCM:
 
 
 @device_factory()
-def energy_source() -> SingleEnergySource:
-    return SingleEnergySource(dcm().energy_in_ev)
+def energy_source() -> EnergySource:
+    return EnergySource(dcm().energy_in_ev)
 
 
 # Connect will work again after this work completed

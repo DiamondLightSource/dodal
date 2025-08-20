@@ -26,7 +26,7 @@ from dodal.devices.electron_analyser.abstract.types import (
 )
 from dodal.devices.electron_analyser.energy_sources import (
     DualEnergySource,
-    SingleEnergySource,
+    EnergySource,
 )
 from dodal.devices.electron_analyser.enums import EnergyMode
 from dodal.devices.electron_analyser.util import to_binding_energy
@@ -52,7 +52,7 @@ class AbstractAnalyserDriverIO(
         lens_mode_type: type[TLensMode],
         psu_mode_type: type[TPsuMode],
         pass_energy_type: type[TPassEnergy],
-        energy_source: SingleEnergySource | DualEnergySource,
+        energy_source: EnergySource | DualEnergySource,
         name: str = "",
     ) -> None:
         """

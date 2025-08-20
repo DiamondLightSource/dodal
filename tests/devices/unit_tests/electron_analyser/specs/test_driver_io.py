@@ -17,7 +17,7 @@ from ophyd_async.testing import (
 from dodal.devices.b07 import LensMode, PsuMode
 from dodal.devices.electron_analyser import (
     EnergyMode,
-    SingleEnergySource,
+    EnergySource,
 )
 from dodal.devices.electron_analyser.enums import EnergyMode
 from dodal.devices.electron_analyser.specs import (
@@ -33,7 +33,7 @@ from tests.devices.unit_tests.electron_analyser.helper_util import (
 
 @pytest.fixture
 async def sim_driver(
-    single_energy_source: SingleEnergySource,
+    single_energy_source: EnergySource,
 ) -> SpecsAnalyserDriverIO[LensMode, PsuMode]:
     async with init_devices(mock=True):
         sim_driver = await create_driver(
@@ -137,12 +137,12 @@ async def test_analyser_sets_region_and_read_configuration_is_correct(
             f"{prefix}angle_axis": partial_reading(ANY),
             f"{prefix}snapshot_values": partial_reading(region.values),
             f"{prefix}psu_mode": partial_reading(region.psu_mode),
-            f"{prefix}energy_source-source_device": partial_reading(ANY),
+            f"{prefix}energy_source-wrapped_device_name": partial_reading(ANY),
         },
     )
 
 
-@pytest.fixture
+@pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
 async def test_analyser_sets_region_and_read_is_correct(
     sim_driver: SpecsAnalyserDriverIO[LensMode, PsuMode],
     region: SpecsRegion[LensMode, PsuMode],
@@ -160,7 +160,9 @@ async def test_analyser_sets_region_and_read_is_correct(
     await assert_reading(
         sim_driver,
         {
-            f"{prefix}excitation_energy": partial_reading(excitation_energy),
+            f"{prefix}energy_source-excitation_energy": partial_reading(
+                excitation_energy
+            ),
             f"{prefix}image": partial_reading([]),
             f"{prefix}spectrum": partial_reading(spectrum),
             f"{prefix}total_intensity": partial_reading(expected_total_intensity),

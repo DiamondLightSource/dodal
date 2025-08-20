@@ -10,7 +10,7 @@ from dodal.devices.electron_analyser.detector import (
 )
 from dodal.devices.electron_analyser.energy_sources import (
     DualEnergySource,
-    SingleEnergySource,
+    EnergySource,
 )
 from dodal.devices.electron_analyser.vgscienta.driver_io import (
     VGScientaAnalyserDriverIO,
@@ -35,7 +35,7 @@ class VGScientaDetector(
         lens_mode_type: type[TLensMode],
         psu_mode_type: type[TPsuMode],
         pass_energy_type: type[TPassEnergyEnum],
-        energy_source: DualEnergySource | SingleEnergySource,
+        energy_source: DualEnergySource | EnergySource,
         name: str = "",
     ):
         driver = VGScientaAnalyserDriverIO[TLensMode, TPsuMode, TPassEnergyEnum](

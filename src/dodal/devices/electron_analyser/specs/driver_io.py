@@ -17,7 +17,7 @@ from dodal.devices.electron_analyser.abstract.base_driver_io import (
 from dodal.devices.electron_analyser.abstract.types import TLensMode, TPsuMode
 from dodal.devices.electron_analyser.energy_sources import (
     DualEnergySource,
-    SingleEnergySource,
+    EnergySource,
 )
 from dodal.devices.electron_analyser.enums import EnergyMode
 from dodal.devices.electron_analyser.specs.enums import AcquisitionMode
@@ -39,7 +39,7 @@ class SpecsAnalyserDriverIO(
         prefix: str,
         lens_mode_type: type[TLensMode],
         psu_mode_type: type[TPsuMode],
-        energy_source: SingleEnergySource | DualEnergySource,
+        energy_source: EnergySource | DualEnergySource,
         name: str = "",
     ) -> None:
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):

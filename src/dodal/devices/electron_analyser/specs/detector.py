@@ -6,7 +6,7 @@ from dodal.devices.electron_analyser.detector import (
 )
 from dodal.devices.electron_analyser.energy_sources import (
     DualEnergySource,
-    SingleEnergySource,
+    EnergySource,
 )
 from dodal.devices.electron_analyser.specs.driver_io import SpecsAnalyserDriverIO
 from dodal.devices.electron_analyser.specs.region import SpecsRegion, SpecsSequence
@@ -25,7 +25,7 @@ class SpecsDetector(
         prefix: str,
         lens_mode_type: type[TLensMode],
         psu_mode_type: type[TPsuMode],
-        energy_source: DualEnergySource | SingleEnergySource,
+        energy_source: DualEnergySource | EnergySource,
         name: str = "",
     ):
         driver = SpecsAnalyserDriverIO[TLensMode, TPsuMode](

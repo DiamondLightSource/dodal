@@ -1,4 +1,3 @@
-from ophyd_async.core import SignalR
 from ophyd_async.testing import (
     assert_configuration,
     assert_reading,
@@ -8,33 +7,32 @@ from ophyd_async.testing import (
 
 from dodal.devices.electron_analyser import (
     DualEnergySource,
+    EnergySource,
     SelectedSource,
-    SingleEnergySource,
 )
 
 
 async def test_single_energy_source_read(
-    single_energy_source: SingleEnergySource, dcm_energy: SignalR[float]
+    single_energy_source: EnergySource,
 ) -> None:
     await assert_reading(
         single_energy_source,
         {
             f"{single_energy_source.name}-excitation_energy": partial_reading(
-                await dcm_energy.get_value()
+                await single_energy_source._source_ref().get_value()
             ),
         },
     )
 
 
 async def test_single_energy_souce_read_configuration(
-    single_energy_source: DualEnergySource,
-    dcm_energy: SignalR[float],
+    single_energy_source: EnergySource,
 ) -> None:
     await assert_configuration(
         single_energy_source,
         {
-            f"{single_energy_source.name}-source_device": partial_reading(
-                dcm_energy.name
+            f"{single_energy_source.name}-wrapped_device_name": partial_reading(
+                single_energy_source._source_ref().name
             ),
         },
     )
@@ -42,11 +40,9 @@ async def test_single_energy_souce_read_configuration(
 
 async def test_dual_energy_source_energy_is_correct_when_switching_between_sources(
     dual_energy_source: DualEnergySource,
-    dcm_energy: SignalR[float],
-    pgm_energy: SignalR[float],
 ) -> None:
-    dcm_energy_val = await dcm_energy.get_value()
-    pgm_energy_val = await pgm_energy.get_value()
+    dcm_energy_val = await dual_energy_source.source1.excitation_energy.get_value()
+    pgm_energy_val = await dual_energy_source.source2.excitation_energy.get_value()
 
     # Make sure energy sources values are different for this test so we can tell them a
     # part when switching
@@ -60,8 +56,6 @@ async def test_dual_energy_source_energy_is_correct_when_switching_between_sourc
 
 async def test_dual_energy_souce_read(
     dual_energy_source: DualEnergySource,
-    dcm_energy: SignalR[float],
-    pgm_energy: SignalR[float],
 ) -> None:
     await dual_energy_source.selected_source.set(SelectedSource.SOURCE1)
     prefix = dual_energy_source.name
@@ -69,19 +63,11 @@ async def test_dual_energy_souce_read(
         dual_energy_source,
         {
             f"{prefix}-selected_source": partial_reading(SelectedSource.SOURCE1),
-            f"{prefix}-excitation_energy": partial_reading(
-                await dcm_energy.get_value()
+            f"{prefix}-source1-excitation_energy": partial_reading(
+                await dual_energy_source.source1.excitation_energy.get_value()
             ),
-        },
-    )
-
-    await dual_energy_source.selected_source.set(SelectedSource.SOURCE2)
-    await assert_reading(
-        dual_energy_source,
-        {
-            f"{prefix}-selected_source": partial_reading(SelectedSource.SOURCE2),
-            f"{prefix}-excitation_energy": partial_reading(
-                await pgm_energy.get_value()
+            f"{prefix}-source2-excitation_energy": partial_reading(
+                await dual_energy_source.source2.excitation_energy.get_value()
             ),
         },
     )
@@ -89,14 +75,16 @@ async def test_dual_energy_souce_read(
 
 async def test_dual_energy_souce_read_configuration(
     dual_energy_source: DualEnergySource,
-    dcm_energy: SignalR[float],
-    pgm_energy: SignalR[float],
 ) -> None:
     prefix = dual_energy_source.name
     await assert_configuration(
         dual_energy_source,
         {
-            f"{prefix}-source1_device": partial_reading(dcm_energy.name),
-            f"{prefix}-source2_device": partial_reading(pgm_energy.name),
+            f"{prefix}-source1-wrapped_device_name": partial_reading(
+                dual_energy_source.source1._source_ref().name
+            ),
+            f"{prefix}-source2-wrapped_device_name": partial_reading(
+                dual_energy_source.source2._source_ref().name
+            ),
         },
     )
