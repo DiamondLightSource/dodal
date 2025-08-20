@@ -16,7 +16,7 @@ from dodal.devices.electron_analyser.enums import SelectedSource
 class AbstractEnergySource(StandardReadable):
     """
     Abstract device that wraps an energy source signal and provides common interface via
-    excitation_energy signal.
+    excitation_energy signal, units eV.
     """
 
     def __init__(self, name: str = "") -> None:
@@ -25,7 +25,9 @@ class AbstractEnergySource(StandardReadable):
 
     @abstractmethod
     def _excitation_energy_signal(self) -> SignalR[float]:
-        """ """
+        """
+        Signal to provide the excitation energy value in eV.
+        """
 
 
 class EnergySource(AbstractEnergySource):
@@ -57,16 +59,16 @@ class DualEnergySource(AbstractEnergySource):
     """
     Holds two EnergySource devices and provides a signal to read excitation energy
     depending on which source is selected. This is controlled by a selected_source
-    signal which can switch to the values of the SelectedSource enum.
+    signal which can switch source using SelectedSource enum. Both sources excitation
+    energy is recorded in the read, the excitation_energy is used as a helper signal
+    to know which source is being used.
     """
 
     def __init__(self, source1: EnergySource, source2: EnergySource, name: str = ""):
         """
         Args:
-            source1: Default energy source signal that can be read. Units assumed to be
-                     eV.
-            source2: Secondary excitation energy source that can be read. Units assumed
-                     to be eV.
+            source1: Default EnergySource device to select.
+            source2: Secondary EnergySource device to select.
             name: name of this device.
         """
         with self.add_children_as_readables():
