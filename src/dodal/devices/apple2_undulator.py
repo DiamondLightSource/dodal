@@ -182,7 +182,7 @@ class UndulatorGap(SafeUndulatorMover[float], Preparable, Flyable):
         self.min_velocity = epics_signal_r(float, prefix + "BLGSETVEL.LOPR")
         self.high_limit_travel = epics_signal_r(float, prefix + "BLGAPMTR.HLM")
         self.low_limit_travel = epics_signal_r(float, prefix + "BLGAPMTR.LLM")
-        self.acceleration_time = epics_signal_r(float, prefix + "BLGSETVEL.ACCL")
+        self.acceleration_time = epics_signal_r(float, prefix + "BLGAPMTR.ACCL")
 
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             self.motor_egu = epics_signal_r(str, prefix + "BLGAPMTR.EGU")
