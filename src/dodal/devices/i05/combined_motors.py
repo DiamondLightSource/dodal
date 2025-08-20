@@ -20,68 +20,57 @@ from ophyd_async.epics.motor import Motor
 class PolynomCombinedMotors(
     StandardReadable,
     Locatable[float],
-    Movable,
+    Movable[float],
     Stoppable,
 ):
     """
-    Binds two scannables, Slave against Master, via square polynom dependency.
-    It is a scannable in GDA sense.
-    There are 8 polynom parameters (4 for each slave) that one can set up (via lookuptable?)
-    There is master motor and 2 slave motors.
-    asyncMoveTo() call seem to have a blocking sequence of moves: Master, Slave1, Slave2 - can they be moved asynchronously?
-    getPosition() returns just a master motor position
+    Binds several slave motors against master motor via polynom dependency.
+    This class is a scannable in GDA sense.
+    Setting new position moves master and all slaves asynchronously.
+    Locating position returns just a master motor position.
     """
 
     def __init__(
         self,
         master_motor: Motor,
-        slave_motor1: Motor,
-        slave_motor2: Motor,
-        slave_coeff1: Array1D[np.float64],
-        slave_coeff2: Array1D[np.float64],
+        slaves_dict: dict[Motor, Array1D[np.float64]],
         name: str = "",
     ) -> None:
-        self.slave_coeff_1 = slave_coeff1
-        self.slave_coeff_2 = slave_coeff2
+        """
+        Parameters
+        ----------
+        master:
+            Master motor
+        slaves_dict:
+            Dictionary of slaves motors and their polynomial coefficients
+        """
         self.master = Reference(master_motor)
-        self.slave1 = Reference(slave_motor1)
-        self.slave2 = Reference(slave_motor2)
+        self.slaves_dict: dict[Reference[Motor], Array1D[np.float64]] = {}
+        # master motor added to with polynomial coeff (0,1)
+        self.slaves_dict[self.master] = np.array([0.0, 1.0])
+        # slave motors added with coefficients from input parameters
+        for slave in slaves_dict.keys():
+            self.slaves_dict[Reference(slave)] = slaves_dict[slave]
 
         self.add_readables(
-            [
-                self.master().user_readback,
-                self.slave1().user_readback,
-                self.slave2().user_readback,
-            ],
+            [ref().user_readback for ref in self.slaves_dict.keys()],
             StandardReadableFormat.HINTED_SIGNAL,
         )
-
         super().__init__(name=name)
 
     @AsyncStatus.wrap
     async def set(self, new_position: float) -> None:
         """Move master and slave motors asynchronously"""
         await asyncio.gather(
-            self.master().set(new_position),
-            self.slave1().set(
-                float(
-                    np.polynomial.polynomial.polyval(new_position, self.slave_coeff_1)
-                )
-            ),
-            self.slave2().set(
-                float(
-                    np.polynomial.polynomial.polyval(new_position, self.slave_coeff_2)
-                )
-            ),
+            *[
+                ref().set(float(np.polynomial.polynomial.polyval(new_position, coeff)))
+                for ref, coeff in self.slaves_dict.items()
+            ]
         )
 
     async def stop(self, success=False):
         """Stop all motors immediately"""
-        await asyncio.gather(
-            self.master().stop(),
-            self.slave1().stop(),
-            self.slave2().stop(),
-        )
+        await asyncio.gather(*[ref().stop() for ref in self.slaves_dict.keys()])
 
     async def locate(self) -> Location[float]:
         """Return the current setpoint and readback of the MASTER motor"""
