@@ -108,7 +108,7 @@ class FemtoDDPCA(CurrentAmp):
         LOGGER.info(f"{self.name} gain change to {SEN_setting}:{value}")
 
         await self.gain.set(
-            value=self.gain_table[SEN_setting].value,
+            value=self.gain_table[SEN_setting],
             timeout=self.timeout,
         )
         # wait for current amplifier's bandpass filter to settle.
