@@ -3,6 +3,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from pydantic import ValidationError
+from tests.devices.unit_tests.test_data import TEST_LUT_TXT
 
 from dodal.devices.detector import DetectorParams
 from dodal.devices.detector.det_dim_constants import EIGER2_X_16M_SIZE
@@ -20,7 +21,7 @@ def create_det_params_with_dir_and_prefix(directory: str | Path, prefix="test"):
         num_images_per_trigger=1,
         num_triggers=1,
         use_roi_mode=False,
-        det_dist_to_beam_converter_path="tests/devices/unit_tests/test_lookup_table.txt",
+        det_dist_to_beam_converter_path=TEST_LUT_TXT,
         detector_size_constants=EIGER2_X_16M_SIZE,
     )
 

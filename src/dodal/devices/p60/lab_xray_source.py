@@ -1,11 +1,12 @@
+from enum import Enum
+
 from ophyd_async.core import (
     StandardReadable,
-    StrictEnum,
     soft_signal_r_and_setter,
 )
 
 
-class LabXraySource(StrictEnum):
+class LabXraySource(float, Enum):
     AL_KALPHA = 1486.6
     MG_KALPHA = 1253.6
 

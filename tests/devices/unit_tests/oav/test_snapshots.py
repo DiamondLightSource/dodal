@@ -1,162 +1,191 @@
-from unittest.mock import ANY, AsyncMock, MagicMock, call, patch
+from collections.abc import AsyncGenerator
+from io import BytesIO
+from pathlib import Path
+from unittest.mock import AsyncMock, Mock, patch
+from uuid import uuid4
 
 import pytest
-from ophyd_async.core import (
-    init_devices,
-    soft_signal_r_and_setter,
-)
+from aiohttp.client import ClientSession
+from aiohttp.test_utils import TestClient, TestServer, unused_port
+from aiohttp.web import Response
+from aiohttp.web_app import Application
+from bluesky import RunEngine
+from ophyd_async.core import init_devices
 from ophyd_async.testing import set_mock_value
+from PIL import Image
 
 from dodal.devices.oav.snapshots.snapshot import (
     Snapshot,
 )
 from dodal.devices.oav.snapshots.snapshot_with_grid import (
     SnapshotWithGrid,
-    asyncio_save_image,
 )
 
 
-async def create_and_set_mock_signal_r(dtype, name, value):
-    get, _ = soft_signal_r_and_setter(dtype, value, name=name)
-    await get.connect(mock=True)
-    return get
+@pytest.fixture
+def server_port() -> int:
+    return unused_port()
 
 
 @pytest.fixture
-async def snapshot() -> Snapshot:
-    async with init_devices(mock=True):
-        snapshot = Snapshot("", "fake_snapshot")
-    set_mock_value(snapshot.directory, "/tmp/")
-    set_mock_value(snapshot.filename, "test")
-    set_mock_value(snapshot.url, "http://test.url")
-    return snapshot
+def output_file_name() -> str:
+    return f"output-{uuid4()}"
 
 
 @pytest.fixture
-async def grid_snapshot() -> SnapshotWithGrid:
-    async with init_devices(mock=True):
-        grid_snapshot = SnapshotWithGrid("", "fake_grid")
-
-    set_mock_value(grid_snapshot.top_left_x, 100)
-    set_mock_value(grid_snapshot.top_left_y, 100)
-    set_mock_value(grid_snapshot.box_width, 50)
-    set_mock_value(grid_snapshot.num_boxes_x, 15)
-    set_mock_value(grid_snapshot.num_boxes_y, 10)
-
-    set_mock_value(grid_snapshot.directory, "/tmp/")
-    set_mock_value(grid_snapshot.filename, "test")
-    set_mock_value(grid_snapshot.url, "http://test.url")
-    return grid_snapshot
+def output_file(tmp_path: Path, output_file_name: str) -> Path:
+    return tmp_path / f"{output_file_name}.png"
 
 
 @pytest.fixture
-def mock_session_with_valid_response():
+def image() -> Image.Image:
+    return Image.new("RGB", (3, 3))
+
+
+@pytest.fixture
+def image_bytes(image: Image.Image) -> BytesIO:
+    buffer = BytesIO()
+    image.save(buffer, "png")
+    return buffer
+
+
+@pytest.fixture
+async def snapshot(
+    tmp_path: Path,
+    test_client: TestClient,
+    output_file_name: str,
+    server_port: int,
+    RE: RunEngine,
+) -> AsyncGenerator[Snapshot]:
+    def get_session(raise_for_status: bool) -> ClientSession:
+        return test_client.session
+
     with patch(
-        "dodal.devices.areadetector.plugins.MJPG.ClientSession.get", autospec=True
-    ) as mock_get:
-        mock_get.return_value.__aenter__.return_value = (mock_response := AsyncMock())
-        mock_response.ok = True
-        mock_response.read.return_value = b"TEST"
-        yield mock_get
+        "dodal.devices.areadetector.plugins.MJPG.ClientSession", new=get_session
+    ):
+        async with init_devices(mock=True):
+            fake_snapshot = Snapshot("")
+        set_mock_value(fake_snapshot.directory, f"{tmp_path}")
+        set_mock_value(fake_snapshot.filename, output_file_name)
+        set_mock_value(fake_snapshot.url, f"http://127.0.0.1:{server_port}")
+        yield fake_snapshot
 
 
 @pytest.fixture
-def mock_image_open():
-    with patch("dodal.devices.areadetector.plugins.MJPG.Image") as patch_image:
-        mock_open = patch_image.open
-        mock_open.return_value.__aenter__.return_value = b"TEST"
-        yield mock_open
+async def grid_snapshot(
+    tmp_path: Path,
+    test_client: TestClient,
+    output_file_name: str,
+    server_port: int,
+    RE: RunEngine,
+) -> AsyncGenerator[SnapshotWithGrid]:
+    def get_session(raise_for_status: bool) -> ClientSession:
+        return test_client.session
+
+    with patch(
+        "dodal.devices.areadetector.plugins.MJPG.ClientSession", new=get_session
+    ):
+        async with init_devices(mock=True):
+            fake_grid = SnapshotWithGrid("")
+
+        set_mock_value(fake_grid.top_left_x, 100)
+        set_mock_value(fake_grid.top_left_y, 100)
+        set_mock_value(fake_grid.box_width, 50)
+        set_mock_value(fake_grid.num_boxes_x, 15)
+        set_mock_value(fake_grid.num_boxes_y, 10)
+
+        set_mock_value(fake_grid.directory, f"{tmp_path}")
+        set_mock_value(fake_grid.filename, output_file_name)
+        set_mock_value(fake_grid.url, f"http://127.0.0.1:{server_port}")
+
+        yield fake_grid
 
 
-@patch("dodal.devices.areadetector.plugins.MJPG.aiofiles", autospec=True)
+@pytest.fixture
+async def test_client(
+    image_data_coro: AsyncMock, server_port: int
+) -> AsyncGenerator[TestClient]:
+    app = Application()
+    app.router.add_get("", handler=image_data_coro)
+    client = TestClient(server=TestServer(app, port=server_port))
+    await client.start_server()
+    yield client
+    await client.close()
+
+
+@pytest.fixture
+def image_data_coro(image_bytes: BytesIO) -> AsyncMock:
+    return AsyncMock(return_value=Response(body=image_bytes.getvalue()))
+
+
+def assert_images_identical(left: Image.Image, right: Image.Image):
+    left_data = left.getdata()
+    right_data = right.getdata()
+    assert len(left_data) == len(right_data)
+    for i in range(len(left_data)):
+        assert left_data[i] == right_data[i]
+
+
 async def test_snapshot_correctly_triggered_and_saved(
-    mock_aiofiles,
-    mock_image_open,
-    mock_session_with_valid_response,
-    snapshot,
+    snapshot: Snapshot, output_file: Path, image: Image.Image, image_data_coro: Mock
 ):
-    mock_aio_open = mock_aiofiles.open
-    mock_aio_open.return_value.__aenter__.return_value = (mock_file := AsyncMock())
-
+    assert not output_file.exists()
     await snapshot.trigger()
 
-    test_url = await snapshot.url.get_value()
     # Get called with an instance of the session and correct url
-    mock_session_with_valid_response.assert_called_once_with(ANY, test_url)
+    image_data_coro.assert_called_once()
 
-    assert await snapshot.last_saved_path.get_value() == "/tmp/test.png"
-    mock_aio_open.assert_called_once_with("/tmp/test.png", "wb")
-    mock_file.write.assert_called_once()
+    assert await snapshot.last_saved_path.get_value() == f"{output_file}"
+    assert output_file.exists()
+
+    with Image.open(output_file) as actual:
+        assert_images_identical(actual, image)
 
 
-@patch("dodal.devices.areadetector.plugins.MJPG.Path.mkdir")
-@patch("dodal.devices.areadetector.plugins.MJPG.aiofiles", autospec=True)
-async def test_given_directory_not_existing_when_snapshot_triggered_then_directory_created(
-    mock_aiofiles,
-    mock_mkdir,
-    mock_image_open,
-    mock_session_with_valid_response,
-    snapshot,
+async def test_directory_created_when_snapshot_triggered(
+    tmp_path: Path,
+    snapshot: Snapshot,
+    output_file_name: str,
+    image: Image.Image,
 ):
-    mock_aio_open = mock_aiofiles.open
-    mock_aio_open.return_value.__aenter__.return_value = AsyncMock()
-
+    write_dir = tmp_path / "new_dir"
+    assert not write_dir.exists()
     # Set new directory and test that it's created
-    set_mock_value(snapshot.directory, "new_dir")
-
+    set_mock_value(snapshot.directory, f"{write_dir}")
     await snapshot.trigger()
+    assert write_dir.exists()
+    output_file = write_dir / f"{output_file_name}.png"
+    assert await snapshot.last_saved_path.get_value() == f"{output_file}"
+    assert output_file.exists()
 
-    mock_mkdir.assert_called_once()
+    with Image.open(output_file) as actual:
+        assert_images_identical(actual, image)
 
 
 @patch(
     "dodal.devices.oav.snapshots.snapshot_with_grid.add_grid_border_overlay_to_image"
 )
 @patch("dodal.devices.oav.snapshots.snapshot_with_grid.add_grid_overlay_to_image")
-@patch("dodal.devices.oav.snapshots.snapshot_with_grid.asyncio_save_image")
 async def test_snapshot_with_grid_triggered_saves_image_and_draws_correct_grid(
-    mock_save_grid,
-    patch_add_grid,
-    patch_add_border,
-    mock_image_open,
-    mock_session_with_valid_response,
-    grid_snapshot,
+    patch_add_border: Mock,
+    patch_add_grid: Mock,
+    output_file: Path,
+    tmp_path: Path,
+    output_file_name: str,
+    grid_snapshot: SnapshotWithGrid,
 ):
-    grid_snapshot._save_image = (mock_save := AsyncMock())
-
     await grid_snapshot.trigger()
 
-    mock_save.assert_awaited_once()
-    patch_add_border.assert_called_once_with(
-        mock_image_open.return_value.__enter__.return_value, 100, 100, 50, 15, 10
-    )
-    patch_add_grid.assert_called_once_with(
-        mock_image_open.return_value.__enter__.return_value, 100, 100, 50, 15, 10
-    )
-    assert mock_save_grid.await_count == 2
-    expected_grid_save_calls = [
-        call(ANY, f"/tmp/test_{suffix}.png")
-        for suffix in ["outer_overlay", "grid_overlay"]
-    ]
-    assert mock_save_grid.mock_calls == expected_grid_save_calls
+    with Image.open(output_file) as actual:
+        patch_add_border.assert_called_once_with(actual, 100, 100, 50, 15, 10)
+        patch_add_grid.assert_called_once_with(actual, 100, 100, 50, 15, 10)
+
     assert (
-        await grid_snapshot.last_path_outer.get_value() == "/tmp/test_outer_overlay.png"
+        await grid_snapshot.last_path_outer.get_value()
+        == f"{tmp_path / f'{output_file_name}_outer_overlay.png'}"
     )
+
     assert (
         await grid_snapshot.last_path_full_overlay.get_value()
-        == "/tmp/test_grid_overlay.png"
+        == f"{tmp_path / f'{output_file_name}_grid_overlay.png'}"
     )
-
-
-@patch("dodal.devices.areadetector.plugins.MJPG.Image")
-@patch("dodal.devices.areadetector.plugins.MJPG.aiofiles", autospec=True)
-async def test_asyncio_save_image(mock_aiofiles, patch_image):
-    mock_aio_open = mock_aiofiles.open
-    mock_aio_open.return_value.__aenter__.return_value = (mock_file := AsyncMock())
-
-    test_path = MagicMock(return_value="some_path/test_grid.png")
-    await asyncio_save_image(patch_image, test_path)
-
-    patch_image.save.assert_called_once()
-    mock_aio_open.assert_called_once_with(test_path, "wb")
-    mock_file.write.assert_called_once()
