@@ -187,6 +187,19 @@ async def test_gap_prepare_velocity_min_limit_error(mock_id_gap: UndulatorGap):
         await mock_id_gap.prepare(fly_info)
 
 
+async def test_gap_prepare_success(mock_id_gap: UndulatorGap):
+    set_mock_value(mock_id_gap.max_velocity, 30)
+    set_mock_value(mock_id_gap.min_velocity, 1)
+    set_mock_value(mock_id_gap.acceleration_time, 0.5)
+    fly_info = FlyMotorInfo(start_position=25, end_position=35, time_for_move=1)
+    await mock_id_gap.prepare(fly_info)
+    get_mock_put(mock_id_gap.user_setpoint).assert_awaited_once_with(
+        str(fly_info.ramp_up_start_pos(0.5)), wait=True
+    )
+
+    assert await mock_id_gap.velocity.get_value() == 10
+
+
 async def test_kickoff(mock_id_gap: UndulatorGap):
     mock_id_gap.set = MagicMock()
     with pytest.raises(
