@@ -47,43 +47,36 @@ def pgm(RE: RunEngine) -> PGM:
 
 
 @pytest.fixture
-def pgm_energy(pgm: PGM, RE: RunEngine) -> SignalR[float]:
-    set_mock_value(pgm.energy.user_readback, 500)
-    return pgm.energy.user_readback
-
-
-@pytest.fixture
-def dcm_energy(dcm: DCM, RE: RunEngine) -> SignalR[float]:
+def dcm_energy_source(dcm: DCM, RE: RunEngine) -> EnergySource:
     set_mock_value(dcm.energy_in_kev.user_readback, 2.2)
-    return dcm.energy_in_ev
-
-
-@pytest.fixture
-def source1(dcm_energy: SignalR[float], RE: RunEngine) -> EnergySource:
     with init_devices(mock=True):
-        source1 = EnergySource(dcm_energy)
-    return source1
+        dcm_energy = EnergySource(dcm.energy_in_ev)
+    return dcm_energy
 
 
 @pytest.fixture
-def source2(pgm_energy: SignalR[float], RE: RunEngine) -> EnergySource:
+def pgm_energy_source(pgm: PGM, RE: RunEngine) -> EnergySource:
+    set_mock_value(pgm.energy.user_readback, 500)
     with init_devices(mock=True):
-        source2 = EnergySource(pgm_energy)
-    return source2
+        pgm_energy = EnergySource(pgm.energy.user_readback)
+    return pgm_energy
 
 
 @pytest.fixture
-async def single_energy_source(source1, RE: RunEngine) -> EnergySource:
-    single_energy_source = source1
-    return single_energy_source
+async def single_energy_source(
+    dcm_energy_source: EnergySource, RE: RunEngine
+) -> EnergySource:
+    return dcm_energy_source
 
 
 @pytest.fixture
 async def dual_energy_source(
-    source1: EnergySource, source2: EnergySource, RE: RunEngine
+    dcm_energy_source: EnergySource, pgm_energy_source: EnergySource, RE: RunEngine
 ) -> DualEnergySource:
     async with init_devices(mock=True):
-        dual_energy_source = DualEnergySource(source1, source2)
+        dual_energy_source = DualEnergySource(
+            source1=dcm_energy_source, source2=pgm_energy_source
+        )
     return dual_energy_source
 
 
