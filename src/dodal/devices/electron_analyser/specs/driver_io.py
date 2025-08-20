@@ -67,7 +67,7 @@ class SpecsAnalyserDriverIO(
 
     @AsyncStatus.wrap
     async def set(self, region: SpecsRegion[TLensMode, TPsuMode]):
-        excitation_energy = await self.get_energy_from_source(region)
+        excitation_energy = await self.select_energy_source_from_region(region)
         # Copy region so doesn't alter the actual region and switch to kinetic energy
         ke_region = region.model_copy()
         ke_region.switch_energy_mode(EnergyMode.KINETIC, excitation_energy)
