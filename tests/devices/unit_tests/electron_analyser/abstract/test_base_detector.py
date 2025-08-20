@@ -150,6 +150,7 @@ async def test_analyser_region_detector_trigger_sets_driver_with_region(
         )
         reg_det.driver.set.assert_awaited_once_with(reg_det.region)
 
+
 async def test_analyser_detector_config_read(
     sim_detector: GenericElectronAnalyserDetector,
 ) -> None:
@@ -178,5 +179,6 @@ async def test_analyser_detector_config_read(
         f"{sim_detector.name}-_driver-angle_axis",
     ]
     assert all(item in configuration_read for item in expected_config_keys)
+
 
 # ToDo - Add test that data being read is correct from plan
