@@ -4,7 +4,7 @@ import pytest
 from bluesky import plan_stubs as bps
 from bluesky.protocols import Triggerable
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import SignalR
+from ophyd_async.core import SignalR, init_devices
 from ophyd_async.epics.adcore import ADBaseController
 
 import dodal.devices.b07 as b07
@@ -14,10 +14,8 @@ from dodal.devices.electron_analyser import (
 )
 from dodal.devices.electron_analyser.specs import SpecsDetector
 from dodal.devices.electron_analyser.vgscienta import VGScientaDetector
-from tests.devices.unit_tests.electron_analyser.util import (
-    create_analyser_device,
-    get_test_sequence,
-)
+from dodal.testing.electron_analyser import create_detector
+from tests.devices.unit_tests.electron_analyser.helper_util import get_test_sequence
 
 
 @pytest.fixture(
@@ -27,9 +25,17 @@ from tests.devices.unit_tests.electron_analyser.util import (
     ]
 )
 async def sim_detector(
-    request: pytest.FixtureRequest, energy_sources: dict[str, SignalR[float]]
+    request: pytest.FixtureRequest,
+    energy_sources: dict[str, SignalR[float]],
+    RE: RunEngine,
 ) -> GenericElectronAnalyserDetector:
-    return await create_analyser_device(request.param, energy_sources)
+    async with init_devices(mock=True):
+        sim_detector = await create_detector(
+            request.param,
+            prefix="TEST:",
+            energy_sources=energy_sources,
+        )
+    return sim_detector
 
 
 @pytest.fixture
@@ -45,6 +51,30 @@ def test_analyser_detector_loads_sequence_correctly(
 ) -> None:
     seq = sim_detector.load_sequence(sequence_file_path)
     assert seq is not None
+
+
+async def test_analyser_detector_stage(
+    sim_detector: GenericElectronAnalyserDetector,
+) -> None:
+    sim_detector.controller.disarm = AsyncMock()
+    sim_detector.driver.stage = AsyncMock()
+
+    await sim_detector.stage()
+
+    sim_detector.controller.disarm.assert_awaited_once()
+    sim_detector.driver.stage.assert_awaited_once()
+
+
+async def test_analyser_detector_unstage(
+    sim_detector: GenericElectronAnalyserDetector,
+) -> None:
+    sim_detector.controller.disarm = AsyncMock()
+    sim_detector.driver.unstage = AsyncMock()
+
+    await sim_detector.unstage()
+
+    sim_detector.controller.disarm.assert_awaited_once()
+    sim_detector.driver.unstage.assert_awaited_once()
 
 
 def test_analyser_detector_creates_region_detectors(
@@ -118,9 +148,7 @@ async def test_analyser_region_detector_trigger_sets_driver_with_region(
         assert_detector_trigger_uses_controller_correctly(
             reg_det, reg_det.controller, RE
         )
-
         reg_det.driver.set.assert_awaited_once_with(reg_det.region)
 
 
-# ToDo - Add tests for BaseElectronAnalyserDetector class + controller
 # ToDo - Add test that data being read is correct from plan
