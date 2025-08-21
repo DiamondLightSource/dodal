@@ -78,6 +78,9 @@ class AbstractAnalyserDriverIO(
         self.psu_mode_type = psu_mode_type
         self.pass_energy_type = pass_energy_type
 
+        # must call first to initiate parent variables
+        super().__init__(prefix=prefix, name=name)
+
         with self.add_children_as_readables():
             self.image = epics_signal_r(Array1D[np.float64], prefix + "IMAGE")
             self.spectrum = epics_signal_r(Array1D[np.float64], prefix + "INT_SPECTRUM")
@@ -87,7 +90,8 @@ class AbstractAnalyserDriverIO(
             self.energy_source = energy_source
 
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
-            # Used for setting up region data acquisition.
+            # Read once per scan after data acquired
+            # Used for setting up region data acquisition
             self.region_name = soft_signal_rw(str, initial_value="null")
             self.energy_mode = soft_signal_rw(
                 EnergyMode, initial_value=EnergyMode.KINETIC
@@ -107,8 +111,11 @@ class AbstractAnalyserDriverIO(
             # analyser type to know if is moved with region settings.
             self.psu_mode = epics_signal_rw(psu_mode_type, prefix + "PSU_MODE")
 
+        # This is defined in the parent class, add it as readable configuration.
+        self.add_readables([self.acquire_time], StandardReadableFormat.CONFIG_SIGNAL)
+
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
-            # Read once per scan after data acquired
+            # NOT used for setting up region data acquisition.
             self.energy_axis = self._create_energy_axis_signal(prefix)
             self.binding_energy_axis = derived_signal_r(
                 self._calculate_binding_energy_axis,
@@ -118,17 +125,14 @@ class AbstractAnalyserDriverIO(
                 energy_mode=self.energy_mode,
             )
             self.angle_axis = self._create_angle_axis_signal(prefix)
-            self.step_time = epics_signal_r(float, prefix + "AcquireTime")
             self.total_steps = epics_signal_r(int, prefix + "TOTAL_POINTS_RBV")
             self.total_time = derived_signal_r(
                 self._calculate_total_time,
                 "s",
                 total_steps=self.total_steps,
-                step_time=self.step_time,
+                step_time=self.acquire_time,
                 iterations=self.iterations,
             )
-
-        super().__init__(prefix=prefix, name=name)
 
     async def set_source_from_region_and_get_energy(
         self, region: TAbstractBaseRegion
