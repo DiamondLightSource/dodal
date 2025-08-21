@@ -1,6 +1,5 @@
 from unittest.mock import AsyncMock
 
-import numpy as np
 import pytest
 from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
@@ -11,16 +10,23 @@ from ophyd_async.testing import (
     set_mock_value,
 )
 
+import dodal.devices.b07 as b07
 import dodal.devices.i09 as i09
 from dodal.devices.electron_analyser.abstract import (
     AbstractAnalyserDriverIO,
     AbstractElectronAnalyserDetector,
 )
+from dodal.devices.electron_analyser.specs import SpecsDetector
 from dodal.devices.electron_analyser.vgscienta import VGScientaDetector
 from dodal.testing.electron_analyser import create_detector
 
 
-@pytest.fixture(VGScientaDetector[i09.LensMode, i09.PsuMode, i09.PassEnergy])
+@pytest.fixture(
+    params=[
+        VGScientaDetector[i09.LensMode, i09.PsuMode, i09.PassEnergy],
+        SpecsDetector[b07.LensMode, b07.PsuMode],
+    ]
+)
 async def sim_detector(
     request: pytest.FixtureRequest,
     energy_sources: dict[str, SignalR[float]],
@@ -32,6 +38,8 @@ async def sim_detector(
             prefix="TEST:",
             energy_sources=energy_sources,
         )
+    # Needed for specs so we don't get divsion by zero error.
+    set_mock_value(sim_detector.driver.slices, 1)
     return sim_detector
 
 
@@ -59,12 +67,8 @@ async def test_analyser_detector_read(
 async def test_analyser_describe(
     sim_detector: AbstractElectronAnalyserDetector[AbstractAnalyserDriverIO],
 ) -> None:
-    energy_array = np.array([0, 0, 0, 0], dtype=np.float64)
-    angle_array = np.array([0, 0], dtype=np.float64)
-
-    set_mock_value(sim_detector.driver.energy_axis, energy_array)
-    set_mock_value(sim_detector.driver.angle_axis, angle_array)
-
+    energy_array = await sim_detector.driver.energy_axis.get_value()
+    angle_array = await sim_detector.driver.angle_axis.get_value()
     data = await sim_detector.describe()
     assert data[f"{sim_detector.name}-_driver-image"]["shape"] == [
         len(angle_array),
