@@ -130,7 +130,7 @@ class AbstractAnalyserDriverIO(
 
         super().__init__(prefix=prefix, name=name)
 
-    async def select_energy_source_from_region(
+    async def set_source_from_region_and_get_energy(
         self, region: TAbstractBaseRegion
     ) -> float:
         if isinstance(self.energy_source, DualEnergySource):

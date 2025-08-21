@@ -75,7 +75,7 @@ class VGScientaAnalyserDriverIO(
 
     @AsyncStatus.wrap
     async def set(self, region: VGScientaRegion[TLensMode, TPassEnergyEnum]):
-        excitation_energy = await self.select_energy_source_from_region(region)
+        excitation_energy = await self.set_source_from_region_and_get_energy(region)
         # Copy region so doesn't alter the actual region and switch to kinetic energy
         ke_region = region.model_copy()
         ke_region.switch_energy_mode(EnergyMode.KINETIC, excitation_energy)

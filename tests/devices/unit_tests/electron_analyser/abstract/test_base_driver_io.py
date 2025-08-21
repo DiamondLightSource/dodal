@@ -56,7 +56,7 @@ async def test_driver_gets_correct_energy_source_value(
     single_energy_source: EnergySource,
     dual_energy_source: DualEnergySource,
 ) -> None:
-    energy = await sim_driver.select_energy_source_from_region(region)
+    energy = await sim_driver.set_source_from_region_and_get_energy(region)
     if sim_driver.energy_source == single_energy_source:
         await assert_value(single_energy_source.excitation_energy, energy)
     elif sim_driver.energy_source == dual_energy_source:
