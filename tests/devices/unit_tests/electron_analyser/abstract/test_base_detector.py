@@ -77,9 +77,7 @@ async def test_analyser_detector_configuration(
 ) -> None:
     driver = sim_detector.driver
     driver_config = await driver.read_configuration()
-    # Type ignore needed until this is in next release
-    # https://github.com/bluesky/ophyd-async/issues/1013#event-19205466589
-    await assert_configuration(sim_detector, driver_config)  # type: ignore
+    await assert_configuration(sim_detector, driver_config)
 
 
 async def test_analyser_detector_describe_configuration(
