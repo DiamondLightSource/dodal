@@ -7,10 +7,10 @@ from ophyd_async.core import (
     AsyncConfigurable,
     AsyncReadable,
     AsyncStatus,
+    DetectorController,
     Device,
 )
 
-from dodal.devices.controllers import ConstantDeadTimeController
 from dodal.devices.electron_analyser.abstract.base_driver_io import (
     TAbstractAnalyserDriverIO,
 )
@@ -34,10 +34,10 @@ class AbstractElectronAnalyserDetector(
 
     def __init__(
         self,
-        driver: TAbstractAnalyserDriverIO,
+        controller: DetectorController,
         name: str = "",
     ):
-        self.controller = ConstantDeadTimeController(driver, 0)
+        self.controller = controller
         super().__init__(name)
 
     @AsyncStatus.wrap
