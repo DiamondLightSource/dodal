@@ -51,6 +51,7 @@ def eiger(mock: bool = False) -> EigerDetector:
         bl_prefix=False,
         wait=False,
         fake=mock,
+        name="eiger",
     )
 
 

@@ -51,7 +51,7 @@ class TwoDFastGridScan(ZebraFastGridScan):
 
         # While the prefix is called exposure time, the motion script uses this value
         # to dwell on each trigger point - the names are interchangable here.
-        self.dwell_time_ms = epics_signal_rw_rbv(float, f"{prefix}FGS:EXPOSURE_TIME")
+        self.dwell_time_ms = epics_signal_rw_rbv(float, f"{prefix}EXPOSURE_TIME")
 
         # Z movement and second start positions don't exist in EPICS for 2D scan.
         # Create soft signals for these so the class is structured like the common device.
@@ -65,7 +65,7 @@ class TwoDFastGridScan(ZebraFastGridScan):
         self.scan_invalid = soft_signal_r_and_setter(float, 0)
 
         self.run_cmd = epics_signal_x(f"{prefix}RUN.PROC")
-        self.stop_cmd = epics_signal_x(f"{prefix}FGS:STOP.PROC")
+        self.stop_cmd = epics_signal_x(f"{prefix}STOP.PROC")
         self.status = epics_signal_r(int, f"{prefix}SCAN_STATUS")
         self.expected_images = derived_signal_r(
             self._calculate_expected_images, x=self.x_steps, y=self.y_steps, z=0
@@ -96,7 +96,7 @@ class TwoDFastGridScan(ZebraFastGridScan):
 
     def _create_position_counter(self, prefix: str):
         return epics_signal_rw(
-            int, f"{prefix}POS_COUNTER", write_pv=f"{prefix}POS_COUNTER_WRITE"
+            int, f"{prefix}POS_COUNTER_RBV", write_pv=f"{prefix}POS_COUNTER"
         )
 
     def _calculate_expected_images(self, x: int, y: int, z: int) -> int:
