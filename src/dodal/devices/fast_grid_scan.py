@@ -9,9 +9,11 @@ from ophyd_async.core import (
     AsyncStatus,
     Device,
     Signal,
+    SignalR,
     SignalRW,
     StandardReadable,
     derived_signal_r,
+    soft_signal_r_and_setter,
     wait_for_value,
 )
 from ophyd_async.epics.core import (
@@ -184,30 +186,22 @@ class FastGridScanCommon(StandardReadable, Flyable, ABC, Generic[ParamType]):
         self.y_steps = epics_signal_rw_rbv(
             int, f"{prefix}Y_NUM_STEPS"
         )  # Number of vertical steps during the first grid scan
-        self.z_steps = epics_signal_rw_rbv(
-            int, f"{prefix}Z_NUM_STEPS"
-        )  # Number of vertical steps during the second grid scan, after the rotation in omega
         self.x_step_size = epics_signal_rw_rbv(float, f"{prefix}X_STEP_SIZE")
         self.y_step_size = epics_signal_rw_rbv(float, f"{prefix}Y_STEP_SIZE")
         self.z_step_size = epics_signal_rw_rbv(float, f"{prefix}Z_STEP_SIZE")
         self.x_start = epics_signal_rw_rbv(float, f"{prefix}X_START")
         self.y1_start = epics_signal_rw_rbv(float, f"{prefix}Y_START")
-        self.y2_start = epics_signal_rw_rbv(float, f"{prefix}Y2_START")
         self.z1_start = epics_signal_rw_rbv(float, f"{prefix}Z_START")
-        self.z2_start = epics_signal_rw_rbv(float, f"{prefix}Z2_START")
 
-        self.scan_invalid = epics_signal_r(float, f"{prefix}SCAN_INVALID")
+        # This can be created like a regular signal instead of an abstract method
+        # once https://github.com/DiamondLightSource/mx-bluesky/issues/1203 is done
+        self.scan_invalid = self._create_scan_invalid_signal(prefix)
 
         self.run_cmd = epics_signal_x(f"{prefix}RUN.PROC")
         self.stop_cmd = epics_signal_x(f"{prefix}STOP.PROC")
         self.status = epics_signal_r(int, f"{prefix}SCAN_STATUS")
 
-        self.expected_images = derived_signal_r(
-            self._calculate_expected_images,
-            x=self.x_steps,
-            y=self.y_steps,
-            z=self.z_steps,
-        )
+        self.expected_images = self._create_expected_images_signal()
 
         self.motion_program = MotionProgram(smargon_prefix)
 
@@ -221,23 +215,14 @@ class FastGridScanCommon(StandardReadable, Flyable, ABC, Generic[ParamType]):
         self.movable_params: dict[str, Signal] = {
             "x_steps": self.x_steps,
             "y_steps": self.y_steps,
-            "z_steps": self.z_steps,
             "x_step_size_mm": self.x_step_size,
             "y_step_size_mm": self.y_step_size,
             "z_step_size_mm": self.z_step_size,
             "x_start_mm": self.x_start,
             "y1_start_mm": self.y1_start,
-            "y2_start_mm": self.y2_start,
             "z1_start_mm": self.z1_start,
-            "z2_start_mm": self.z2_start,
         }
         super().__init__(name)
-
-    def _calculate_expected_images(self, x: int, y: int, z: int) -> int:
-        LOGGER.info(f"Reading num of images found {x, y, z} images in each axis")
-        first_grid = x * y
-        second_grid = x * z
-        return first_grid + second_grid
 
     @AsyncStatus.wrap
     async def kickoff(self):
@@ -266,12 +251,18 @@ class FastGridScanCommon(StandardReadable, Flyable, ABC, Generic[ParamType]):
             raise
 
     @abstractmethod
+    def _create_expected_images_signal(self) -> SignalR[int]: ...
+
+    @abstractmethod
     def _create_position_counter(self, prefix: str) -> SignalRW[int]:
         pass
 
+    @abstractmethod
+    def _create_scan_invalid_signal(self, prefix: str) -> SignalR[float]: ...
 
-class ZebraFastGridScan(FastGridScanCommon[ZebraGridScanParams]):
-    """Device for standard Zebra FGS. In this scan, the goniometer's velocity profile follows a parabolic shape between X steps,
+
+class ZebraThreeDFastGridScan(FastGridScanCommon[ZebraGridScanParams]):
+    """Device for standard Zebra 3D FGS. In this scan, the goniometer's velocity profile follows a parabolic shape between X steps,
     with the slowest points occuring at each X step.
     """
 
@@ -279,6 +270,17 @@ class ZebraFastGridScan(FastGridScanCommon[ZebraGridScanParams]):
         full_prefix = prefix + "FGS:"
         # Time taken to travel between X steps
         self.dwell_time_ms = epics_signal_rw_rbv(float, f"{full_prefix}DWELL_TIME")
+        self.z_steps = epics_signal_rw_rbv(
+            int, f"{prefix}Z_NUM_STEPS"
+        )  # Number of vertical steps during the second grid scan, after the rotation in omega
+        self.z_step_size = epics_signal_rw_rbv(float, f"{prefix}Z_STEP_SIZE")
+        self.z2_start = epics_signal_rw_rbv(float, f"{prefix}Z2_START")
+        self.y2_start = epics_signal_rw_rbv(float, f"{prefix}Y2_START")
+        super().__init__(prefix, name)
+        self.movable_params["z_step_size_mm"] = self.z_step_size
+        self.movable_params["z2_start"] = self.z2_start
+        self.movable_params["y2_start"] = self.y2_start
+        self.movable_params["z_steps"] = self.z_steps
 
         self.x_counter = epics_signal_r(int, f"{full_prefix}X_COUNTER")
         self.y_counter = epics_signal_r(int, f"{full_prefix}Y_COUNTER")
@@ -291,6 +293,23 @@ class ZebraFastGridScan(FastGridScanCommon[ZebraGridScanParams]):
         return epics_signal_rw(
             int, f"{prefix}POS_COUNTER", write_pv=f"{prefix}POS_COUNTER_WRITE"
         )
+
+    def _create_expected_images_signal(self):
+        return derived_signal_r(
+            self._calculate_expected_images,
+            x=self.x_steps,
+            y=self.y_steps,
+            z=self.z_steps,
+        )
+
+    def _calculate_expected_images(self, x: int, y: int, z: int) -> int:
+        LOGGER.info(f"Reading num of images found {x, y, z} images in each axis")
+        first_grid = x * y
+        second_grid = x * z
+        return first_grid + second_grid
+
+    def _create_scan_invalid_signal(self, prefix: str) -> SignalR[float]:
+        return epics_signal_r(float, f"{prefix}SCAN_INVALID")
 
 
 class PandAFastGridScan(FastGridScanCommon[PandAGridScanParams]):

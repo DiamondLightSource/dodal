@@ -15,7 +15,7 @@ from dodal.devices.detector import DetectorParams
 from dodal.devices.detector.detector_motion import DetectorMotion
 from dodal.devices.diamond_filter import DiamondFilter, I04Filters
 from dodal.devices.eiger import EigerDetector
-from dodal.devices.fast_grid_scan import ZebraFastGridScan
+from dodal.devices.fast_grid_scan import ZebraThreeDFastGridScan
 from dodal.devices.flux import Flux
 from dodal.devices.i03.dcm import DCM
 from dodal.devices.i04.constants import RedisConstants
@@ -207,11 +207,13 @@ def eiger(mock: bool = False, params: DetectorParams | None = None) -> EigerDete
 
 
 @device_factory()
-def zebra_fast_grid_scan() -> ZebraFastGridScan:
+def zebra_fast_grid_scan() -> ZebraThreeDFastGridScan:
     """Get the i04 zebra_fast_grid_scan device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
     """
-    return ZebraFastGridScan(f"{PREFIX.beamline_prefix}-MO-SGON-01:")
+    return ZebraThreeDFastGridScan(
+        prefix=f"{PREFIX.beamline_prefix}-MO-SGON-01:",
+    )
 
 
 @device_factory()
