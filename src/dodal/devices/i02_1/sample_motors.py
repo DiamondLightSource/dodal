@@ -10,9 +10,10 @@ class SampleMotors(StandardReadable):
         prefix: str,
         name: str = "",
     ):
+        # See https://github.com/DiamondLightSource/mx-bluesky/issues/1212
+        # regarding a potential motion issue with omega
         with self.add_children_as_readables():
             self.x = Motor(f"{prefix}X")
             self.z = Motor(f"{prefix}Z")
-            # See https://github.com/DiamondLightSource/dodal/pull/211/files#r1404213835 if issues are seen in motion
             self.omega = Motor(f"{prefix}OMEGA")
         super().__init__(name=name)

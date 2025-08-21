@@ -47,7 +47,6 @@ def eiger(mock: bool = False) -> EigerDetector:
     """
     return device_instantiation(
         device_factory=EigerDetector,
-        name="eiger",
         prefix=f"{PREFIX.beamline_prefix}-EA-EIGER-01:",
         bl_prefix=False,
         wait=False,
@@ -62,7 +61,6 @@ def zebra_fast_grid_scan() -> TwoDFastGridScan:
     """
     return TwoDFastGridScan(
         prefix=f"{PREFIX.beamline_prefix}-MO-SAMP-11:FGS:",
-        name="zebra_fast_grid_scan",
     )
 
 
@@ -71,7 +69,7 @@ def synchrotron() -> Synchrotron:
     """Get the i03 synchrotron device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return Synchrotron("", "synchrotron")
+    return Synchrotron()
 
 
 @device_factory()
@@ -80,7 +78,6 @@ def zebra() -> Zebra:
     If this is called when already instantiated in i03, it will return the existing object.
     """
     return Zebra(
-        name="zebra",
         prefix=f"{PREFIX.beamline_prefix}-EA-ZEBRA-01:",
         mapping=I02_1_ZEBRA_MAPPING,
     )
@@ -92,7 +89,6 @@ def zocalo() -> ZocaloResults:
     If this is called when already instantiated in i03, it will return the existing object.
     """
     return ZocaloResults(
-        name="zocalo",
         prefix=PREFIX.beamline_prefix,
     )
 
@@ -102,7 +98,7 @@ def goniometer() -> SampleMotors:
     """Get the i02-1 goniometer device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return SampleMotors(f"{PREFIX.beamline_prefix}-MO-SAMP-01:", "goniometer")
+    return SampleMotors(f"{PREFIX.beamline_prefix}-MO-SAMP-01:")
 
 
 @device_factory()

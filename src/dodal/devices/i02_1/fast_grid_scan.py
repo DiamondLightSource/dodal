@@ -31,7 +31,7 @@ class TwoDFastGridScan(ZebraFastGridScan):
     version:
     - No Z steps, Z step sizes, or Y2 start positions,
     - Use exposure_time instead of dwell_time,
-    - No scan valid PV - see https://github.com/DiamondLightSource/mx-bluesky/issues
+    - No scan valid PV - see https://github.com/DiamondLightSource/mx-bluesky/issues/1203
 
     This device abstracts away the differences by adding empty signals to the missing PV's.
     Plans which expect the 3D grid scan device can then also use this.
@@ -61,7 +61,7 @@ class TwoDFastGridScan(ZebraFastGridScan):
         self.y2_start, _ = soft_signal_r_and_setter(int, 0)
 
         # VMXm will trigger the grid scan through GDA, which has its own validity check,
-        # but this PV is being added: https://github.com/DiamondLightSource/mx-bluesky/issues
+        # but this PV is being added: https://github.com/DiamondLightSource/mx-bluesky/issues/1203
         self.scan_invalid = soft_signal_r_and_setter(float, 0)
 
         self.run_cmd = epics_signal_x(f"{prefix}RUN.PROC")
