@@ -1,6 +1,6 @@
 from ophyd_async.core import init_devices
 
-from dodal.devices.fast_grid_scan import ZebraFastGridScan
+from dodal.devices.fast_grid_scan import ZebraThreeDFastGridScan
 from dodal.devices.i02_1.fast_grid_scan import TwoDFastGridScan
 
 
@@ -10,7 +10,7 @@ def test_fast_grid_scan_has_same_attributes_as_parent(RE):
     # looks the same
     with init_devices(mock=True):
         vmxm_fgs = TwoDFastGridScan("vmxm")
-        parent_fgs = ZebraFastGridScan("parent")
+        parent_fgs = ZebraThreeDFastGridScan("parent")
     vmxm_fgs_attrs = set(vars(vmxm_fgs).keys())
     parent_fgs_attrs = set(vars(parent_fgs).keys())
 
