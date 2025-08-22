@@ -23,7 +23,7 @@ from ophyd_async.core import (
     wait_for_value,
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw, epics_signal_w
-from ophyd_async.epics.motor import Motor
+from ophyd_async.epics.motor import Motor, MotorLimitsException
 from pydantic import BaseModel, ConfigDict, RootModel
 
 from dodal.log import LOGGER
@@ -288,17 +288,18 @@ class UndulatorGap(UndulatorGapMotor):
         """
         Prepare for a fly scan by moving to the run-up position at max velocity.
         Stores fly info for later use in kickoff.
+        Extra check that the requested velocity is within the motor
+         both upper and lowers limits.
         """
-        max_velocity, min_velocity, egu = await asyncio.gather(
-            self.max_velocity.get_value(),
+        min_speed, egu = await asyncio.gather(
             self.min_velocity.get_value(),
             self.motor_egu.get_value(),
         )
         velocity = abs(value.velocity)
-        if not (min_velocity <= velocity <= max_velocity):
-            raise ValueError(
-                f"Requested velocity {velocity} {egu}/s is out of bounds: "
-                f"must be between {min_velocity} and {max_velocity} {egu}/s."
+        if not (min_speed < velocity):
+            raise MotorLimitsException(
+                f"Velocity {abs(value.velocity)} {egu}/s was requested for a motor"
+                f" with minimum speed of {min_speed} {egu}/s"
             )
         await super().prepare(value)
 
