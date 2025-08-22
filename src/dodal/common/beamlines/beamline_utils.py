@@ -1,5 +1,7 @@
 import inspect
+import os
 from collections.abc import Callable
+from pathlib import PurePath
 from typing import Annotated, Final, TypeVar, cast
 
 from bluesky.run_engine import call_in_bluesky_event_loop
@@ -8,6 +10,8 @@ from ophyd.sim import make_fake_device
 from ophyd_async.core import (
     DEFAULT_TIMEOUT,
     PathProvider,
+    StaticPathProvider,
+    UUIDFilenameProvider,
 )
 from ophyd_async.core import Device as OphydV2Device
 from ophyd_async.core import wait_for_connection as v2_device_wait_for_connection
@@ -24,6 +28,11 @@ DEFAULT_CONNECTION_TIMEOUT: Final[float] = 5.0
 
 ACTIVE_DEVICES: dict[str, AnyDevice] = {}
 BL = ""
+
+DEFAULT_TEMP_PATH_FOR_DETECTORS = PurePath(os.environ.get("TEMP", "/tmp"))
+DEFAULT_PATH_PROVIDER = StaticPathProvider(
+    UUIDFilenameProvider(), DEFAULT_TEMP_PATH_FOR_DETECTORS
+)
 
 
 def set_beamline(beamline: str):
@@ -170,3 +179,6 @@ def get_path_provider() -> PathProvider:
 def clear_path_provider() -> None:
     global PATH_PROVIDER
     del PATH_PROVIDER
+
+
+set_path_provider(DEFAULT_PATH_PROVIDER)
