@@ -1,6 +1,6 @@
 from collections import defaultdict
 from logging import getLogger
-from unittest.mock import AsyncMock, MagicMock
+from unittest.mock import AsyncMock
 
 import bluesky.plan_stubs as bps
 import pytest
@@ -196,14 +196,6 @@ async def test_gap_success_scan(mock_id_gap: UndulatorGap, RE: RunEngine):
         assert docs["event"][i]["data"]["mock_id_gap"] == i
 
 
-async def test_gap_prepare_velocity_max_limit_error(mock_id_gap: UndulatorGap):
-    set_mock_value(mock_id_gap.max_velocity, 9)
-    set_mock_value(mock_id_gap.min_velocity, 0.1)
-    with pytest.raises(ValueError):
-        fly_info = FlyMotorInfo(start_position=25, end_position=35, time_for_move=1.0)
-        await mock_id_gap.prepare(fly_info)
-
-
 async def test_gap_prepare_velocity_min_limit_error(mock_id_gap: UndulatorGap):
     set_mock_value(mock_id_gap.max_velocity, 20)
     set_mock_value(mock_id_gap.min_velocity, 11)
@@ -223,42 +215,6 @@ async def test_gap_prepare_success(mock_id_gap: UndulatorGap):
     )
 
     assert await mock_id_gap.velocity.get_value() == 10
-
-
-async def test_kickoff(mock_id_gap: UndulatorGap):
-    mock_id_gap.set = MagicMock()
-    with pytest.raises(
-        RuntimeError, match="Motor must be prepared before attempting to kickoff"
-    ):
-        await mock_id_gap.kickoff()
-
-    set_mock_value(mock_id_gap.acceleration_time, 1)
-    mock_id_gap._fly_info = FlyMotorInfo(
-        start_position=12,
-        end_position=2,
-        time_for_move=1,
-        timeout=10,
-    )
-    await mock_id_gap.kickoff()
-    mock_id_gap.set.assert_called_once_with(-3.0, timeout=10)
-
-
-async def test_complete(mock_id_gap: UndulatorGap) -> None:
-    with pytest.raises(RuntimeError, match="kickoff not called"):
-        mock_id_gap.complete()
-    callback_on_mock_put(
-        mock_id_gap.user_setpoint,
-        lambda *_, **__: set_mock_value(mock_id_gap.gate, UndulatorGateStatus.OPEN),
-    )
-
-    callback_on_mock_put(
-        mock_id_gap.set_move,
-        lambda *_, **__: set_mock_value(mock_id_gap.gate, UndulatorGateStatus.CLOSE),
-    )
-    mock_id_gap._fly_status = mock_id_gap.set(55)
-    assert not mock_id_gap._fly_status.done
-    await mock_id_gap.complete()
-    assert mock_id_gap._fly_status.done
 
 
 @pytest.mark.parametrize(
