@@ -8,6 +8,7 @@ import numpy as np
 from bluesky.protocols import Movable
 from ophyd_async.core import (
     AsyncStatus,
+    Device,
     FlyMotorInfo,
     SignalR,
     SignalW,
@@ -118,30 +119,12 @@ async def estimate_motor_timeout(
     return abs((target_pos - cur_pos) * 2.0 / vel) + DEFAULT_MOTOR_MIN_TIMEOUT
 
 
-class SafeUndulatorMover(StandardReadable, Movable[T], Generic[T]):
-    """A device that will check it's safe to move the undulator before moving it and
-    wait for the undulator to be safe again before calling the move complete.
-    """
-
-    def __init__(self, set_move: SignalW, prefix: str, name: str = ""):
+class UndulartorBase(abc.ABC, Device, Generic[T]):
+    def __init__(self, name: str = ""):
         # Gate keeper open when move is requested, closed when move is completed
-        self.gate = epics_signal_r(UndulatorGateStatus, prefix + "BLGATE")
-
-        split_pv = prefix.split("-")
-        fault_pv = f"{split_pv[0]}-{split_pv[1]}-STAT-{split_pv[3]}ANYFAULT"
-        self.fault = epics_signal_r(float, fault_pv)
-        self.set_move = set_move
+        self.gate: SignalR[UndulatorGateStatus]
+        self.fault: SignalR[float]
         super().__init__(name)
-
-    @AsyncStatus.wrap
-    async def set(self, value: T) -> None:
-        LOGGER.info(f"Setting {self.name} to {value}")
-        await self.raise_if_cannot_move()
-        await self._set_demand_positions(value)
-        timeout = await self.get_timeout()
-        LOGGER.info(f"Moving {self.name} to {value} with timeout = {timeout}")
-        await self.set_move.set(value=1, timeout=timeout)
-        await wait_for_value(self.gate, UndulatorGateStatus.CLOSE, timeout=timeout)
 
     @abc.abstractmethod
     async def _set_demand_positions(self, value: T) -> None:
@@ -158,30 +141,84 @@ class SafeUndulatorMover(StandardReadable, Movable[T], Generic[T]):
             raise RuntimeError(f"{self.name} is already in motion.")
 
 
-class MotorWithoutStop(Motor):
-    """A motor that does not support stop."""
-
-    def __init__(self, prefix: str, name: str = ""):
-        super().__init__(prefix=prefix, name=name)
-
-    async def stop(self, success=False):
-        LOGGER.info(f"Stopping {self.name} is not supported.")
-
-
-class GapSafeUndulatorMover(MotorWithoutStop):
+class SafeUndulatorMover(StandardReadable, UndulartorBase, Movable[T]):
     """A device that will check it's safe to move the undulator before moving it and
     wait for the undulator to be safe again before calling the move complete.
     """
 
     def __init__(self, set_move: SignalW, prefix: str, name: str = ""):
+        """
+        Parameters
+        ----------
+            set_move : SignalW
+                A signal that will start the undulator move when set to 1.
+            prefix : str
+                Beamline specific part of the PV
+            name : str
+                Name of the Id device
+        """
+        self.gate = epics_signal_r(UndulatorGateStatus, prefix + "BLGATE")
+        split_pv = prefix.split("-")
+        fault_pv = f"{split_pv[0]}-{split_pv[1]}-STAT-{split_pv[3]}ANYFAULT"
+        self.fault = epics_signal_r(float, fault_pv)
+        self.set_move = set_move
+        super().__init__(name)
+
+    @AsyncStatus.wrap
+    async def set(self, value: T) -> None:
+        LOGGER.info(f"Setting {self.name} to {value}")
+        await self.raise_if_cannot_move()
+        await self._set_demand_positions(value)
+        timeout = await self.get_timeout()
+        LOGGER.info(f"Moving {self.name} to {value} with timeout = {timeout}")
+        await self.set_move.set(value=1, timeout=timeout)
+        await wait_for_value(self.gate, UndulatorGateStatus.CLOSE, timeout=timeout)
+
+
+class MotorWithoutStop(Motor):
+    """A motor that does not support stop."""
+
+    def __init__(self, prefix: str, name: str = ""):
+        super().__init__(prefix=prefix, name=name)
+        self.motor_stop = derived_signal_rw(
+            raw_to_derived=self._stop_read_, set_derived=self._stop_set
+        )
+
+    def _stop_read_(self) -> int:
+        raise NotImplementedError("This motor does not support stop")
+
+    def _stop_set(self, value: int):
+        raise NotImplementedError("This motor does not support stop")
+
+    async def stop(self, success=False):
+        LOGGER.info(f"Stopping {self.name} is not supported.")
+
+
+class UndulatorGapMotor(MotorWithoutStop, UndulartorBase):
+    """A Motor that will check it's safe to move the undulator before moving it. I also
+    wait for the undulator to be safe again before calling the move complete.
+    This motor does not support stop.
+    """
+
+    def __init__(self, set_move: SignalW, prefix: str, name: str = ""):
         # Gate keeper open when move is requested, closed when move is completed
         self.gate = epics_signal_r(UndulatorGateStatus, prefix + "BLGATE")
-
         split_pv = prefix.split("-")
         fault_pv = f"{split_pv[0]}-{split_pv[1]}-STAT-{split_pv[3]}ANYFAULT"
         self.fault = epics_signal_r(float, fault_pv)
         self.set_move = set_move
         super().__init__(prefix=prefix + "BLGAPMTR", name=name)
+        """
+        Parameters
+        ----------
+            set_move : SignalW
+                A signal that will start the undulator move when set to 1.
+            prefix : str
+                Beamline specific part of the PV
+            name : str
+                Name of the Id device
+
+        """
 
     @WatchableAsyncStatus.wrap
     async def set(self, new_position: float, timeout=DEFAULT_MOTOR_MIN_TIMEOUT):
@@ -218,22 +255,8 @@ class GapSafeUndulatorMover(MotorWithoutStop):
                 precision=precision,
             )
 
-    @abc.abstractmethod
-    async def _set_demand_positions(self, value: float) -> None:
-        """Set the demand positions on the device without actually hitting move."""
 
-    @abc.abstractmethod
-    async def get_timeout(self) -> float:
-        """Get the timeout for the move based on an estimate of how long it will take."""
-
-    async def raise_if_cannot_move(self) -> None:
-        if await self.fault.get_value() != 0:
-            raise RuntimeError(f"{self.name} is in fault state")
-        if await self.gate.get_value() == UndulatorGateStatus.OPEN:
-            raise RuntimeError(f"{self.name} is already in motion.")
-
-
-class UndulatorGap(GapSafeUndulatorMover):
+class UndulatorGap(UndulatorGapMotor):
     """A device with a collection of epics signals to set Apple 2 undulator gap motion.
     Only PV used by beamline are added the full list is here:
     /dls_sw/work/R3.14.12.7/support/insertionDevice/db/IDGapVelocityControl.template

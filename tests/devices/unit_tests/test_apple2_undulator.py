@@ -1,4 +1,5 @@
 from collections import defaultdict
+from logging import getLogger
 from unittest.mock import AsyncMock, MagicMock
 
 import bluesky.plan_stubs as bps
@@ -19,11 +20,26 @@ from ophyd_async.testing import (
 from dodal.devices.apple2_undulator import (
     DEFAULT_MOTOR_MIN_TIMEOUT,
     Apple2PhasesVal,
+    MotorWithoutStop,
     UndulatorGap,
     UndulatorGateStatus,
     UndulatorJawPhase,
     UndulatorPhaseAxes,
 )
+
+
+@pytest.fixture(scope="function")
+def logger(caplog: pytest.LogCaptureFixture):
+    logger = getLogger()
+    _ = [logger.removeHandler(h) for h in logger.handlers if h != caplog.handler]  # type: ignore
+    return logger
+
+
+@pytest.fixture
+async def unstoppable_motor():
+    async with init_devices(mock=True):
+        unstoppable_motor = MotorWithoutStop(prefix="MOTOR:", name="unstopable_motor")
+    return unstoppable_motor
 
 
 @pytest.fixture
@@ -100,6 +116,15 @@ async def test_in_motion_error(
     set_mock_value(mock_jaw_phase.gate, UndulatorGateStatus.OPEN)
     with pytest.raises(RuntimeError):
         await mock_jaw_phase.set(2)
+
+
+async def test_unstoppable_motor_stop_not_implemented(
+    unstoppable_motor: MotorWithoutStop, caplog
+):
+    await unstoppable_motor.stop()
+    assert caplog.records[0].msg == "Stopping unstopable_motor is not supported."
+    with pytest.raises(NotImplementedError, match="This motor does not support stop"):
+        await unstoppable_motor.motor_stop.set(1, wait=True)
 
 
 @pytest.mark.parametrize(
