@@ -141,7 +141,7 @@ class UndulartorBase(abc.ABC, Device, Generic[T]):
             raise RuntimeError(f"{self.name} is already in motion.")
 
 
-class SafeUndulatorMover(StandardReadable, UndulartorBase, Movable[T]):
+class SafeUndulatorMover(StandardReadable, UndulartorBase[T], Movable[T]):
     """A device that will check it's safe to move the undulator before moving it and
     wait for the undulator to be safe again before calling the move complete.
     """
@@ -194,7 +194,7 @@ class MotorWithoutStop(Motor):
         LOGGER.info(f"Stopping {self.name} is not supported.")
 
 
-class UndulatorGapMotor(MotorWithoutStop, UndulartorBase):
+class UndulatorGapMotor(MotorWithoutStop, UndulartorBase[float]):
     """A Motor that will check it's safe to move the undulator before moving it. I also
     wait for the undulator to be safe again before calling the move complete.
     This motor does not support stop.
