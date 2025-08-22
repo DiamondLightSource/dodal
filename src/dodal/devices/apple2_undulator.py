@@ -201,13 +201,6 @@ class UndulatorGapMotor(MotorWithoutStop, UndulartorBase):
     """
 
     def __init__(self, set_move: SignalW, prefix: str, name: str = ""):
-        # Gate keeper open when move is requested, closed when move is completed
-        self.gate = epics_signal_r(UndulatorGateStatus, prefix + "BLGATE")
-        split_pv = prefix.split("-")
-        fault_pv = f"{split_pv[0]}-{split_pv[1]}-STAT-{split_pv[3]}ANYFAULT"
-        self.fault = epics_signal_r(float, fault_pv)
-        self.set_move = set_move
-        super().__init__(prefix=prefix + "BLGAPMTR", name=name)
         """
         Parameters
         ----------
@@ -219,6 +212,13 @@ class UndulatorGapMotor(MotorWithoutStop, UndulartorBase):
                 Name of the Id device
 
         """
+        # Gate keeper open when move is requested, closed when move is completed
+        self.gate = epics_signal_r(UndulatorGateStatus, prefix + "BLGATE")
+        split_pv = prefix.split("-")
+        fault_pv = f"{split_pv[0]}-{split_pv[1]}-STAT-{split_pv[3]}ANYFAULT"
+        self.fault = epics_signal_r(float, fault_pv)
+        self.set_move = set_move
+        super().__init__(prefix=prefix + "BLGAPMTR", name=name)
 
     @WatchableAsyncStatus.wrap
     async def set(self, new_position: float, timeout=DEFAULT_MOTOR_MIN_TIMEOUT):
