@@ -1,12 +1,14 @@
 import os
 from collections.abc import Mapping
+from pathlib import Path
 
 import click
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import NotConnected
+from ophyd_async.core import NotConnected, StaticPathProvider, UUIDFilenameProvider
 from ophyd_async.plan_stubs import ensure_connected
 
 from dodal.beamlines import all_beamline_names, module_name_for_beamline
+from dodal.common.beamlines.beamline_utils import set_path_provider
 from dodal.utils import AnyDevice, filter_ophyd_devices, make_all_devices
 
 from . import __version__
@@ -46,6 +48,10 @@ def connect(beamline: str, all: bool, sim_backend: bool) -> None:
     any connection issues."""
 
     os.environ["BEAMLINE"] = beamline
+
+    # We need to make a fake path provider for any detectors that need one,
+    # it is not used in dodal connect
+    _spoof_path_provider()
 
     module_name = module_name_for_beamline(beamline)
     full_module_path = f"dodal.beamlines.{module_name}"
@@ -115,3 +121,7 @@ def _connect_devices(
         name: device for name, device in devices.items() if name not in exceptions
     }
     return successful_devices, exceptions
+
+
+def _spoof_path_provider() -> None:
+    set_path_provider(StaticPathProvider(UUIDFilenameProvider(), Path("/tmp")))
