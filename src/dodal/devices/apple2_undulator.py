@@ -282,6 +282,7 @@ class UndulatorGap(UndulatorGapMotor):
         )
         self.max_velocity = epics_signal_r(float, prefix + "BLGSETVEL.HOPR")
         self.min_velocity = epics_signal_r(float, prefix + "BLGSETVEL.LOPR")
+        self.velocity = epics_signal_rw(float, prefix + "BLGSETVEL")
 
     @AsyncStatus.wrap
     async def prepare(self, value: FlyMotorInfo) -> None:
