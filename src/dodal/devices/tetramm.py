@@ -107,25 +107,27 @@ class TetrammController(DetectorController):
         if trigger_info.livetime is None:
             raise ValueError(f"{self.__class__.__name__} requires that livetime is set")
 
+        averaging_time = trigger_info.livetime / trigger_info.total_number_of_exposures
+
         # trigger mode must be set first and on its own!
         await self.driver.trigger_mode.set(
             self._supported_trigger_types[trigger_info.trigger]
         )
         await asyncio.gather(
-            self.driver.averaging_time.set(trigger_info.livetime),
-            self.set_exposure(trigger_info.livetime),
+            self.driver.averaging_time.set(averaging_time),
+            self.set_exposure(averaging_time),
         )
 
         # raise an error if asked to trigger faster than the max.
         # possible speed for a tetramm
         self._validate_deadtime(trigger_info)
 
-    def _validate_deadtime(self, value: TriggerInfo) -> None:
-        minimum_deadtime = self.get_deadtime(value.livetime)
-        if minimum_deadtime > value.deadtime:
+    def _validate_deadtime(self, trigger: TriggerInfo) -> None:
+        minimum_deadtime = self.get_deadtime(trigger.livetime)
+        if minimum_deadtime > trigger.deadtime:
             msg = (
                 f"Tetramm {self} needs at least {minimum_deadtime}s "
-                f"deadtime, but trigger logic provides only {value.deadtime}s"
+                f"deadtime, but trigger logic provides only {trigger.deadtime}s"
             )
             raise ValueError(msg)
 
@@ -193,14 +195,16 @@ class TetrammController(DetectorController):
 
 
 class TetrammDatasetDescriber(DatasetDescriber):
-    def __init__(self, driver: TetrammDriver) -> None:
+    def __init__(self, driver: TetrammDriver, file_io: NDFileHDFIO) -> None:
         self._driver = driver
+        self._file_io = file_io
 
     async def np_datatype(self) -> str:
         return "<f8"  # IEEE 754 double precision floating point
 
-    async def shape(self) -> tuple[int, int]:
+    async def shape(self) -> tuple[int, int, int]:
         return (
+            int(await self._file_io.num_capture.get_value()),
             int(await self._driver.num_channels.get_value()),
             int(
                 await self._driver.averaging_time.get_value()
@@ -228,7 +232,7 @@ class TetrammDetector(StandardDetector):
         writer = ADHDFWriter(
             fileio=self.file_io,
             path_provider=path_provider,
-            dataset_describer=TetrammDatasetDescriber(self.driver),
+            dataset_describer=TetrammDatasetDescriber(self.driver, self.file_io),
             plugins=plugins,
         )
 
