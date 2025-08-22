@@ -5,7 +5,7 @@ from math import isclose
 from typing import Any, Generic, TypeVar
 
 import numpy as np
-from bluesky.protocols import Flyable, Movable, Preparable
+from bluesky.protocols import Movable
 from ophyd_async.core import (
     AsyncStatus,
     FlyMotorInfo,
@@ -14,13 +14,15 @@ from ophyd_async.core import (
     StandardReadable,
     StandardReadableFormat,
     StrictEnum,
+    WatchableAsyncStatus,
+    WatcherUpdate,
     derived_signal_rw,
-    error_if_none,
+    observe_value,
     soft_signal_r_and_setter,
     wait_for_value,
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw, epics_signal_w
-from ophyd_async.epics.motor import MotorLimitsException
+from ophyd_async.epics.motor import Motor
 from pydantic import BaseModel, ConfigDict, RootModel
 
 from dodal.log import LOGGER
@@ -156,7 +158,82 @@ class SafeUndulatorMover(StandardReadable, Movable[T], Generic[T]):
             raise RuntimeError(f"{self.name} is already in motion.")
 
 
-class UndulatorGap(SafeUndulatorMover[float], Preparable, Flyable):
+class MotorWithoutStop(Motor):
+    """A motor that does not support stop."""
+
+    def __init__(self, prefix: str, name: str = ""):
+        super().__init__(prefix=prefix, name=name)
+
+    async def stop(self, success=False):
+        LOGGER.info(f"Stopping {self.name} is not supported.")
+
+
+class GapSafeUndulatorMover(MotorWithoutStop):
+    """A device that will check it's safe to move the undulator before moving it and
+    wait for the undulator to be safe again before calling the move complete.
+    """
+
+    def __init__(self, set_move: SignalW, prefix: str, name: str = ""):
+        # Gate keeper open when move is requested, closed when move is completed
+        self.gate = epics_signal_r(UndulatorGateStatus, prefix + "BLGATE")
+
+        split_pv = prefix.split("-")
+        fault_pv = f"{split_pv[0]}-{split_pv[1]}-STAT-{split_pv[3]}ANYFAULT"
+        self.fault = epics_signal_r(float, fault_pv)
+        self.set_move = set_move
+        super().__init__(prefix=prefix + "BLGAPMTR", name=name)
+
+    @WatchableAsyncStatus.wrap
+    async def set(self, new_position: float, timeout=DEFAULT_MOTOR_MIN_TIMEOUT):
+        self._set_success = True
+        (
+            old_position,
+            units,
+            precision,
+        ) = await asyncio.gather(
+            self.user_setpoint.get_value(),
+            self.motor_egu.get_value(),
+            self.precision.get_value(),
+        )
+        LOGGER.info(f"Setting {self.name} to {new_position}")
+        await self.raise_if_cannot_move()
+        await self._set_demand_positions(new_position)
+        timeout = await self.get_timeout()
+        LOGGER.info(f"Moving {self.name} to {new_position} with timeout = {timeout}")
+
+        await self.set_move.set(value=1, timeout=timeout)
+        move_status = AsyncStatus(
+            wait_for_value(self.gate, UndulatorGateStatus.CLOSE, timeout=timeout)
+        )
+
+        async for current_position in observe_value(
+            self.user_readback, done_status=move_status
+        ):
+            yield WatcherUpdate(
+                current=current_position,
+                initial=old_position,
+                target=new_position,
+                name=self.name,
+                unit=units,
+                precision=precision,
+            )
+
+    @abc.abstractmethod
+    async def _set_demand_positions(self, value: float) -> None:
+        """Set the demand positions on the device without actually hitting move."""
+
+    @abc.abstractmethod
+    async def get_timeout(self) -> float:
+        """Get the timeout for the move based on an estimate of how long it will take."""
+
+    async def raise_if_cannot_move(self) -> None:
+        if await self.fault.get_value() != 0:
+            raise RuntimeError(f"{self.name} is in fault state")
+        if await self.gate.get_value() == UndulatorGateStatus.OPEN:
+            raise RuntimeError(f"{self.name} is already in motion.")
+
+
+class UndulatorGap(GapSafeUndulatorMover):
     """A device with a collection of epics signals to set Apple 2 undulator gap motion.
     Only PV used by beamline are added the full list is here:
     /dls_sw/work/R3.14.12.7/support/insertionDevice/db/IDGapVelocityControl.template
@@ -174,26 +251,14 @@ class UndulatorGap(SafeUndulatorMover[float], Preparable, Flyable):
                 Name of the Id device
 
         """
+        self.set_move = epics_signal_rw(int, prefix + "BLGSETP")
+        # Nothing move until this is set to 1 and it will return to 0 when done.
+        super().__init__(self.set_move, prefix, name)
         self.user_setpoint = epics_signal_rw(
             str, prefix + "GAPSET.B", prefix + "BLGSET"
         )
-        self.set_move = epics_signal_rw(int, prefix + "BLGSETP")
         self.max_velocity = epics_signal_r(float, prefix + "BLGSETVEL.HOPR")
         self.min_velocity = epics_signal_r(float, prefix + "BLGSETVEL.LOPR")
-        self.high_limit_travel = epics_signal_r(float, prefix + "BLGAPMTR.HLM")
-        self.low_limit_travel = epics_signal_r(float, prefix + "BLGAPMTR.LLM")
-        self.acceleration_time = epics_signal_r(float, prefix + "BLGAPMTR.ACCL")
-
-        with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
-            self.motor_egu = epics_signal_r(str, prefix + "BLGAPMTR.EGU")
-            self.velocity = epics_signal_rw(float, prefix + "BLGSETVEL")
-        with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
-            self.user_readback = epics_signal_r(float, prefix + "CURRGAPD")
-
-        self._fly_info: FlyMotorInfo | None = None
-        self._fly_status: AsyncStatus | None = None
-
-        super().__init__(self.set_move, prefix, name)
 
     @AsyncStatus.wrap
     async def prepare(self, value: FlyMotorInfo) -> None:
@@ -212,56 +277,7 @@ class UndulatorGap(SafeUndulatorMover[float], Preparable, Flyable):
                 f"Requested velocity {velocity} {egu}/s is out of bounds: "
                 f"must be between {min_velocity} and {max_velocity} {egu}/s."
             )
-
-        acceleration_time = await self.acceleration_time.get_value()
-        ramp_up_start_pos = value.ramp_up_start_pos(acceleration_time)
-        ramp_down_end_pos = value.ramp_down_end_pos(acceleration_time)
-
-        motor_lower_limit, motor_upper_limit = await asyncio.gather(
-            self.low_limit_travel.get_value(),
-            self.high_limit_travel.get_value(),
-        )
-
-        # Check both ramp positions are within limits
-        if not (motor_lower_limit <= ramp_up_start_pos <= motor_upper_limit):
-            raise MotorLimitsException(
-                f"Ramp-up start position {ramp_up_start_pos}{egu} is outside motor limits "
-                f"({motor_lower_limit}{egu} <= x <= {motor_upper_limit}{egu})."
-            )
-        if not (motor_lower_limit <= ramp_down_end_pos <= motor_upper_limit):
-            raise MotorLimitsException(
-                f"Ramp-down end position {ramp_down_end_pos}{egu} is outside motor limits "
-                f"({motor_lower_limit}{egu} <= x <= {motor_upper_limit}{egu})."
-            )
-
-        LOGGER.info(
-            f"Preparing for fly scan: moving to run-up position {ramp_up_start_pos}{egu} at max velocity {max_velocity}{egu}/s."
-        )
-        await self.velocity.set(max_velocity)
-        await self.set(ramp_up_start_pos)
-
-        LOGGER.info(f"Setting fly scan velocity to {value.velocity}{egu}/s.")
-        await self.velocity.set(velocity)
-
-        self._fly_info = value  # Store for kickoff
-
-    @AsyncStatus.wrap
-    async def kickoff(self) -> None:
-        """
-        Begin moving motor from prepared position to final position.
-        """
-        fly_info = error_if_none(
-            self._fly_info, "Motor must be prepared before attempting to kickoff"
-        )
-        acceleration_time = await self.acceleration_time.get_value()
-        self._fly_status = self.set(fly_info.ramp_down_end_pos(acceleration_time))
-
-    def complete(self) -> AsyncStatus:
-        """
-        Mark as complete once motor reaches completed position.
-        """
-        fly_status = error_if_none(self._fly_status, "kickoff not called")
-        return fly_status
+        await super().prepare(value)
 
     async def _set_demand_positions(self, value: float) -> None:
         await self.user_setpoint.set(str(value))
@@ -272,7 +288,7 @@ class UndulatorGap(SafeUndulatorMover[float], Preparable, Flyable):
         )
 
 
-class UndulatorPhaseMotor(StandardReadable):
+class UndulatorPhaseMotor(MotorWithoutStop):
     """A collection of epics signals for ID phase motion.
     Only PV used by beamline are added the full list is here:
     /dls_sw/work/R3.14.12.7/support/insertionDevice/db/IDPhaseSoftMotor.template
@@ -290,25 +306,11 @@ class UndulatorPhaseMotor(StandardReadable):
         name : str
             Name of the Id phase device
         """
-        fullPV = f"{prefix}BL{infix}"
-        self.user_setpoint = epics_signal_w(str, fullPV + "SET")
-        self.user_setpoint_readback = epics_signal_r(float, fullPV + "DMD")
-        fullPV = fullPV + "MTR"
-        with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
-            self.user_readback = epics_signal_r(float, fullPV + ".RBV")
-
-        with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
-            self.motor_egu = epics_signal_r(str, fullPV + ".EGU")
-            self.velocity = epics_signal_rw(float, fullPV + ".VELO")
-
-        self.max_velocity = epics_signal_r(float, fullPV + ".VMAX")
-        self.acceleration_time = epics_signal_rw(float, fullPV + ".ACCL")
-        self.precision = epics_signal_r(int, fullPV + ".PREC")
-        self.deadband = epics_signal_r(float, fullPV + ".RDBD")
-        self.motor_done_move = epics_signal_r(int, fullPV + ".DMOV")
-        self.low_limit_travel = epics_signal_rw(float, fullPV + ".LLM")
-        self.high_limit_travel = epics_signal_rw(float, fullPV + ".HLM")
-        super().__init__(name=name)
+        pv = f"{prefix}BL{infix}"
+        fullPV = pv + "MTR"
+        super().__init__(prefix=fullPV, name=name)
+        self.user_setpoint = epics_signal_w(str, pv + "SET")
+        self.user_setpoint_readback = epics_signal_r(float, pv + "DMD")
 
 
 class UndulatorPhaseAxes(SafeUndulatorMover[Apple2PhasesVal]):
@@ -553,8 +555,8 @@ class Apple2(abc.ABC, StandardReadable, Movable):
 
         Examples
         --------
-        >>> RE( id.set(888.0)) # This will set the ID to 888 eV
-        >>> RE(scan([detector], id,600,700,100)) # This will scan the ID from 600 to 700 eV in 100 steps.
+        RE( id.set(888.0)) # This will set the ID to 888 eV
+        RE(scan([detector], id,600,700,100)) # This will scan the ID from 600 to 700 eV in 100 steps.
         """
 
     def _read_pol(
