@@ -218,7 +218,7 @@ class GapSafeUndulatorMover(MotorWithoutStop, UndulartorBase):
         timeout = await self.get_timeout()
         LOGGER.info(f"Moving {self.name} to {new_position} with timeout = {timeout}")
 
-        await self.set_move.set(value=1, timeout=timeout)
+        await self.set_move.set(value=1, wait=True, timeout=timeout)
         move_status = AsyncStatus(
             wait_for_value(self.gate, UndulatorGateStatus.CLOSE, timeout=timeout)
         )
