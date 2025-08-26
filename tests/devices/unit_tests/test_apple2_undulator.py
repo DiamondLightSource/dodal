@@ -122,8 +122,6 @@ async def test_unstoppable_motor_stop_not_implemented(
 ):
     await unstoppable_motor.stop()
     assert caplog.records[0].msg == "Stopping unstopable_motor is not supported."
-    with pytest.raises(NotImplementedError, match="This motor does not support stop"):
-        await unstoppable_motor.motor_stop.set(1, wait=True)
 
 
 @pytest.mark.parametrize(

@@ -8,7 +8,6 @@ import numpy as np
 from bluesky.protocols import Movable
 from ophyd_async.core import (
     AsyncStatus,
-    Device,
     FlyMotorInfo,
     SignalR,
     SignalW,
@@ -23,7 +22,7 @@ from ophyd_async.core import (
     wait_for_value,
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw, epics_signal_w
-from ophyd_async.epics.motor import Motor, MotorLimitsException
+from ophyd_async.epics.motor import Motor
 from pydantic import BaseModel, ConfigDict, RootModel
 
 from dodal.log import LOGGER
@@ -119,45 +118,15 @@ async def estimate_motor_timeout(
     return abs((target_pos - cur_pos) * 2.0 / vel) + DEFAULT_MOTOR_MIN_TIMEOUT
 
 
-class UndulartorBase(abc.ABC, Device, Generic[T]):
-    def __init__(self, name: str = ""):
-        # Gate keeper open when move is requested, closed when move is completed
-        self.gate: SignalR[UndulatorGateStatus]
-        self.fault: SignalR[float]
-        super().__init__(name)
-
-    @abc.abstractmethod
-    async def _set_demand_positions(self, value: T) -> None:
-        """Set the demand positions on the device without actually hitting move."""
-
-    @abc.abstractmethod
-    async def get_timeout(self) -> float:
-        """Get the timeout for the move based on an estimate of how long it will take."""
-
-    async def raise_if_cannot_move(self) -> None:
-        if await self.fault.get_value() != 0:
-            raise RuntimeError(f"{self.name} is in fault state")
-        if await self.gate.get_value() == UndulatorGateStatus.OPEN:
-            raise RuntimeError(f"{self.name} is already in motion.")
-
-
-class SafeUndulatorMover(StandardReadable, UndulartorBase[T], Movable[T]):
+class SafeUndulatorMover(StandardReadable, Movable[T], Generic[T]):
     """A device that will check it's safe to move the undulator before moving it and
     wait for the undulator to be safe again before calling the move complete.
     """
 
     def __init__(self, set_move: SignalW, prefix: str, name: str = ""):
-        """
-        Parameters
-        ----------
-            set_move : SignalW
-                A signal that will start the undulator move when set to 1.
-            prefix : str
-                Beamline specific part of the PV
-            name : str
-                Name of the Id device
-        """
+        # Gate keeper open when move is requested, closed when move is completed
         self.gate = epics_signal_r(UndulatorGateStatus, prefix + "BLGATE")
+
         split_pv = prefix.split("-")
         fault_pv = f"{split_pv[0]}-{split_pv[1]}-STAT-{split_pv[3]}ANYFAULT"
         self.fault = epics_signal_r(float, fault_pv)
@@ -174,46 +143,41 @@ class SafeUndulatorMover(StandardReadable, UndulartorBase[T], Movable[T]):
         await self.set_move.set(value=1, timeout=timeout)
         await wait_for_value(self.gate, UndulatorGateStatus.CLOSE, timeout=timeout)
 
+    @abc.abstractmethod
+    async def _set_demand_positions(self, value: T) -> None:
+        """Set the demand positions on the device without actually hitting move."""
+
+    @abc.abstractmethod
+    async def get_timeout(self) -> float:
+        """Get the timeout for the move based on an estimate of how long it will take."""
+
+    async def raise_if_cannot_move(self) -> None:
+        if await self.fault.get_value() != 0:
+            raise RuntimeError(f"{self.name} is in fault state")
+        if await self.gate.get_value() == UndulatorGateStatus.OPEN:
+            raise RuntimeError(f"{self.name} is already in motion.")
+
 
 class MotorWithoutStop(Motor):
     """A motor that does not support stop."""
 
     def __init__(self, prefix: str, name: str = ""):
         super().__init__(prefix=prefix, name=name)
-        self.motor_stop = derived_signal_rw(
-            raw_to_derived=self._stop_read_, set_derived=self._stop_set
-        )
-
-    def _stop_read_(self) -> int:
-        raise NotImplementedError("This motor does not support stop")
-
-    def _stop_set(self, value: int):
-        raise NotImplementedError("This motor does not support stop")
+        del self.motor_stop  # Remove motor_stop from the public interface
 
     async def stop(self, success=False):
         LOGGER.info(f"Stopping {self.name} is not supported.")
 
 
-class UndulatorGapMotor(MotorWithoutStop, UndulartorBase[float]):
-    """A Motor that will check it's safe to move the undulator before moving it. I also
+class GapSafeUndulatorMover(MotorWithoutStop):
+    """A device that will check it's safe to move the undulator before moving it and
     wait for the undulator to be safe again before calling the move complete.
-    This motor does not support stop.
     """
 
     def __init__(self, set_move: SignalW, prefix: str, name: str = ""):
-        """
-        Parameters
-        ----------
-            set_move : SignalW
-                A signal that will start the undulator move when set to 1.
-            prefix : str
-                Beamline specific part of the PV
-            name : str
-                Name of the Id device
-
-        """
         # Gate keeper open when move is requested, closed when move is completed
         self.gate = epics_signal_r(UndulatorGateStatus, prefix + "BLGATE")
+
         split_pv = prefix.split("-")
         fault_pv = f"{split_pv[0]}-{split_pv[1]}-STAT-{split_pv[3]}ANYFAULT"
         self.fault = epics_signal_r(float, fault_pv)
@@ -255,8 +219,22 @@ class UndulatorGapMotor(MotorWithoutStop, UndulartorBase[float]):
                 precision=precision,
             )
 
+    @abc.abstractmethod
+    async def _set_demand_positions(self, value: float) -> None:
+        """Set the demand positions on the device without actually hitting move."""
 
-class UndulatorGap(UndulatorGapMotor):
+    @abc.abstractmethod
+    async def get_timeout(self) -> float:
+        """Get the timeout for the move based on an estimate of how long it will take."""
+
+    async def raise_if_cannot_move(self) -> None:
+        if await self.fault.get_value() != 0:
+            raise RuntimeError(f"{self.name} is in fault state")
+        if await self.gate.get_value() == UndulatorGateStatus.OPEN:
+            raise RuntimeError(f"{self.name} is already in motion.")
+
+
+class UndulatorGap(GapSafeUndulatorMover):
     """A device with a collection of epics signals to set Apple 2 undulator gap motion.
     Only PV used by beamline are added the full list is here:
     /dls_sw/work/R3.14.12.7/support/insertionDevice/db/IDGapVelocityControl.template
@@ -282,25 +260,23 @@ class UndulatorGap(UndulatorGapMotor):
         )
         self.max_velocity = epics_signal_r(float, prefix + "BLGSETVEL.HOPR")
         self.min_velocity = epics_signal_r(float, prefix + "BLGSETVEL.LOPR")
-        self.velocity = epics_signal_rw(float, prefix + "BLGSETVEL")
 
     @AsyncStatus.wrap
     async def prepare(self, value: FlyMotorInfo) -> None:
         """
         Prepare for a fly scan by moving to the run-up position at max velocity.
         Stores fly info for later use in kickoff.
-        Extra check that the requested velocity is within the motor
-         both upper and lowers limits.
         """
-        min_speed, egu = await asyncio.gather(
+        max_velocity, min_velocity, egu = await asyncio.gather(
+            self.max_velocity.get_value(),
             self.min_velocity.get_value(),
             self.motor_egu.get_value(),
         )
         velocity = abs(value.velocity)
-        if not (min_speed < velocity):
-            raise MotorLimitsException(
-                f"Velocity {abs(value.velocity)} {egu}/s was requested for a motor"
-                f" with minimum speed of {min_speed} {egu}/s"
+        if not (min_velocity <= velocity <= max_velocity):
+            raise ValueError(
+                f"Requested velocity {velocity} {egu}/s is out of bounds: "
+                f"must be between {min_velocity} and {max_velocity} {egu}/s."
             )
         await super().prepare(value)
 
