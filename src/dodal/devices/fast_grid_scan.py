@@ -91,6 +91,11 @@ class GridScanParamsCommon(AbstractExperimentWithBeamParams):
     def y_axis(self) -> GridAxis:
         return GridAxis(self.y1_start_mm, self.y_step_size_mm, self.y_steps)
 
+    # In 2D grid scans, z axis is just the start position
+    @property
+    def z_axis(self) -> GridAxis:
+        return GridAxis(self.z1_start_mm, self.z_step_size_mm, 1)
+
     def grid_position_to_motor_position(self, grid_position: ndarray) -> ndarray:
         """Converts a grid position, given as steps in the x, y, z grid,
         to a real motor position.
