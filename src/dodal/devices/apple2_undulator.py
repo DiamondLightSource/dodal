@@ -8,6 +8,7 @@ import numpy as np
 from bluesky.protocols import Movable
 from ophyd_async.core import (
     AsyncStatus,
+    Device,
     FlyMotorInfo,
     SignalR,
     SignalW,
@@ -118,7 +119,36 @@ async def estimate_motor_timeout(
     return abs((target_pos - cur_pos) * 2.0 / vel) + DEFAULT_MOTOR_MIN_TIMEOUT
 
 
-class SafeUndulatorMover(StandardReadable, Movable[T], Generic[T]):
+class UndulartorBase(Device, Generic[T]):
+    """Abstract base class for Apple2 undulator devices.
+
+    This class provides common functionality for undulator devices, including
+    gate and fault signal management, safety checks before motion, and abstract
+    methods for setting demand positions and estimating move timeouts.
+    """
+
+    def __init__(self, name=""):
+        # Gate keeper open when move is requested, closed when move is completed
+        self.gate: SignalR[UndulatorGateStatus]
+        self.fault: SignalR[float]
+        super().__init__(name=name)
+
+    @abc.abstractmethod
+    async def _set_demand_positions(self, value: T) -> None:
+        """Set the demand positions on the device without actually hitting move."""
+
+    @abc.abstractmethod
+    async def get_timeout(self) -> float:
+        """Get the timeout for the move based on an estimate of how long it will take."""
+
+    async def raise_if_cannot_move(self) -> None:
+        if await self.fault.get_value() != 0:
+            raise RuntimeError(f"{self.name} is in fault state")
+        if await self.gate.get_value() == UndulatorGateStatus.OPEN:
+            raise RuntimeError(f"{self.name} is already in motion.")
+
+
+class SafeUndulatorMover(StandardReadable, UndulartorBase, Movable[T]):
     """A device that will check it's safe to move the undulator before moving it and
     wait for the undulator to be safe again before calling the move complete.
     """
@@ -143,20 +173,6 @@ class SafeUndulatorMover(StandardReadable, Movable[T], Generic[T]):
         await self.set_move.set(value=1, timeout=timeout)
         await wait_for_value(self.gate, UndulatorGateStatus.CLOSE, timeout=timeout)
 
-    @abc.abstractmethod
-    async def _set_demand_positions(self, value: T) -> None:
-        """Set the demand positions on the device without actually hitting move."""
-
-    @abc.abstractmethod
-    async def get_timeout(self) -> float:
-        """Get the timeout for the move based on an estimate of how long it will take."""
-
-    async def raise_if_cannot_move(self) -> None:
-        if await self.fault.get_value() != 0:
-            raise RuntimeError(f"{self.name} is in fault state")
-        if await self.gate.get_value() == UndulatorGateStatus.OPEN:
-            raise RuntimeError(f"{self.name} is already in motion.")
-
 
 class MotorWithoutStop(Motor):
     """A motor that does not support stop."""
@@ -169,7 +185,7 @@ class MotorWithoutStop(Motor):
         LOGGER.info(f"Stopping {self.name} is not supported.")
 
 
-class GapSafeUndulatorMover(MotorWithoutStop):
+class GapSafeUndulatorMover(MotorWithoutStop, UndulartorBase):
     """A device that will check it's safe to move the undulator before moving it and
     wait for the undulator to be safe again before calling the move complete.
     """
@@ -218,20 +234,6 @@ class GapSafeUndulatorMover(MotorWithoutStop):
                 unit=units,
                 precision=precision,
             )
-
-    @abc.abstractmethod
-    async def _set_demand_positions(self, value: float) -> None:
-        """Set the demand positions on the device without actually hitting move."""
-
-    @abc.abstractmethod
-    async def get_timeout(self) -> float:
-        """Get the timeout for the move based on an estimate of how long it will take."""
-
-    async def raise_if_cannot_move(self) -> None:
-        if await self.fault.get_value() != 0:
-            raise RuntimeError(f"{self.name} is in fault state")
-        if await self.gate.get_value() == UndulatorGateStatus.OPEN:
-            raise RuntimeError(f"{self.name} is already in motion.")
 
 
 class UndulatorGap(GapSafeUndulatorMover):
