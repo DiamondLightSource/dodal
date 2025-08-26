@@ -29,7 +29,7 @@ class VGScientaRegion(
     low_energy: float = 8.0
     centre_energy: float = Field(alias="fix_energy", default=9)
     high_energy: float = 10.0
-    step_time: float = 1.0
+    acquire_time: float = Field(default=1.0, alias="step_time")
     energy_step: float = Field(default=200.0)
     # Specific to this class
     id: str = Field(default=str(uuid.uuid4()), alias="region_id")
