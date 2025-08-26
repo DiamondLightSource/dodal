@@ -1,50 +1,52 @@
-from ophyd_async.core import Device, SignalR, derived_signal_r, soft_signal_r_and_setter
-from ophyd_async.epics.core import (
-    epics_signal_r,
-)
+import numpy as np
+from ophyd_async.core import SignalR, derived_signal_r, soft_signal_r_and_setter
+from ophyd_async.epics.core import epics_signal_rw, epics_signal_rw_rbv
+from pydantic import field_validator
 
 from dodal.devices.fast_grid_scan import (
     FastGridScanCommon,
-    ZebraGridScanParams,
+    GridScanParamsCommon,
+    MotionProgram,
 )
 from dodal.log import LOGGER
 
 
-class MotionProgram(Device):
-    def __init__(self, prefix: str, name: str = "") -> None:
-        self.running = epics_signal_r(int, prefix + "PROGBITS")
-        # Prog number PV doesn't exist for i02-1, but it's currently only used for logging
-        self.program_number, _ = soft_signal_r_and_setter(float, -1)
-        super().__init__(name)
+class ZebraGridScanParamsThreeDTwoD(GridScanParamsCommon):
+    exposure_time_ms: float = 213
+
+    @field_validator("exposure_time_ms")
+    @classmethod
+    def non_integer_dwell_time(cls, exposure_time_ms: float) -> float:
+        exposure_time_floor_rounded = np.floor(exposure_time_ms)
+        exposure_time_is_close = np.isclose(
+            exposure_time_ms, exposure_time_floor_rounded, rtol=1e-3
+        )
+        if not exposure_time_is_close:
+            raise ValueError(
+                f"Exposure time of {exposure_time_ms}ms is not an integer value. Fast Grid Scan only accepts integer values"
+            )
+        return exposure_time_ms
 
 
-# TODO this needs to contain differences between 3d and 2d, and those differences need to be taken out
-# of common and confirm that we don't refer to those signals at the plan level.
-class TwoDGridScanNew(FastGridScanCommon[ZebraGridScanParams]):
-    def __init__(self, prefix: str, name: str = "") -> None:
-        # Z movement and second start positions don't exist in EPICS for 2D scan.
-        # Create soft signals for these so the class is structured like the common device.
-        self.z_steps, _ = soft_signal_r_and_setter(int, 0)
-        self.z_step_size, _ = soft_signal_r_and_setter(float, 0)
-        self.z2_start, _ = soft_signal_r_and_setter(float, 0)
-        self.y2_start, _ = soft_signal_r_and_setter(int, 0)
-
-
-class ZebraTwoDFastGridScan(FastGridScanCommon[ZebraGridScanParams]):
-    """The EPICS interface for the 2D FGS differs slightly from the standard
+class ZebraFastGridScanTwoD(FastGridScanCommon[ZebraGridScanParamsThreeDTwoD]):
+    """i02-1's EPICS interface for the 2D FGS differs slightly from the standard 3D
     version:
     - No Z steps, Z step sizes, or Y2 start positions, or Z2 start
     - No scan valid PV - see https://github.com/DiamondLightSource/mx-bluesky/issues/1203
-
-    This device abstracts away the differences by adding empty signals to the missing PV's.
-    Plans which expect the 3D grid scan device can then also use this.
-
-    See https://github.com/DiamondLightSource/mx-bluesky/issues/1112 for long term solution
+    - No program_number - see https://github.com/DiamondLightSource/mx-bluesky/issues/1203
     """
 
-    def __init__(self, prefix: str, name: str = "") -> None:
+    def __init__(self, prefix: str, smargon_prefix: str, name: str = "") -> None:
         full_prefix = prefix + "FGS:"
-        super().__init__(full_prefix, prefix, name)
+
+        # This signal could be put in the common device if the prefix gets standardised.
+        self.exposure_time_ms = epics_signal_rw_rbv(
+            float, f"{full_prefix}EXPOSURE_TIME"
+        )
+
+        super().__init__(full_prefix, smargon_prefix, name)
+
+        self.movable_params["exposure_time_ms"] = self.exposure_time_ms
 
     def _create_expected_images_signal(self):
         return derived_signal_r(
@@ -61,3 +63,11 @@ class ZebraTwoDFastGridScan(FastGridScanCommon[ZebraGridScanParams]):
     # but this PV is being added: https://github.com/DiamondLightSource/mx-bluesky/issues/1203
     def _create_scan_invalid_signal(self, prefix: str) -> SignalR[float]:
         return soft_signal_r_and_setter(float, 0)[0]
+
+    def _create_motion_program(self, smargon_prefix):
+        return MotionProgram(smargon_prefix, has_prog_num=False)
+
+    def _create_position_counter(self, prefix: str):
+        return epics_signal_rw(
+            int, f"{prefix}POS_COUNTER", write_pv=f"{prefix}POS_COUNTER_WRITE"
+        )

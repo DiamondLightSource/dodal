@@ -73,15 +73,12 @@ class GridScanParamsCommon(AbstractExperimentWithBeamParams):
 
     x_steps: int = 1
     y_steps: int = 1
-    z_steps: int = 0
     x_step_size_mm: float = 0.1
     y_step_size_mm: float = 0.1
     z_step_size_mm: float = 0.1
     x_start_mm: float = 0.1
     y1_start_mm: float = 0.1
-    y2_start_mm: float = 0.1
     z1_start_mm: float = 0.1
-    z2_start_mm: float = 0.1
 
     # Whether to set the stub offsets after centering
     set_stub_offsets: bool = False
@@ -93,17 +90,6 @@ class GridScanParamsCommon(AbstractExperimentWithBeamParams):
     @property
     def y_axis(self) -> GridAxis:
         return GridAxis(self.y1_start_mm, self.y_step_size_mm, self.y_steps)
-
-    @property
-    def z_axis(self) -> GridAxis:
-        return GridAxis(self.z2_start_mm, self.z_step_size_mm, self.z_steps)
-
-    def get_num_images(self):
-        return self.x_steps * (self.y_steps + self.z_steps)
-
-    @property
-    def is_3d_grid_scan(self):
-        return self.z_steps > 0
 
     def grid_position_to_motor_position(self, grid_position: ndarray) -> ndarray:
         """Converts a grid position, given as steps in the x, y, z grid,
@@ -132,10 +118,20 @@ class GridScanParamsCommon(AbstractExperimentWithBeamParams):
         )
 
 
+class GridScanParamsThreeD(GridScanParamsCommon):
+    z2_start_mm: float = 0.1
+    y2_start_mm: float = 0.1
+    z_steps: int = 0
+
+    @property
+    def z_axis(self) -> GridAxis:
+        return GridAxis(self.z2_start_mm, self.z_step_size_mm, self.z_steps)
+
+
 ParamType = TypeVar("ParamType", bound=GridScanParamsCommon)
 
 
-class ZebraGridScanParams(GridScanParamsCommon):
+class ZebraGridScanParamsThreeD(GridScanParamsThreeD):
     """
     Params for standard Zebra FGS. Adds on the dwell time
     """
@@ -156,7 +152,7 @@ class ZebraGridScanParams(GridScanParamsCommon):
         return dwell_time_ms
 
 
-class PandAGridScanParams(GridScanParamsCommon):
+class PandAGridScanParams(GridScanParamsThreeD):
     """
     Params for panda constant-motion scan. Adds on the goniometer run-up distance
     """
@@ -165,20 +161,20 @@ class PandAGridScanParams(GridScanParamsCommon):
 
 
 class MotionProgram(Device):
-    def __init__(self, prefix: str, name: str = "") -> None:
+    def __init__(self, prefix: str, name: str = "", has_prog_num=True) -> None:
         super().__init__(name)
         self.running = epics_signal_r(int, prefix + "PROGBITS")
-        self.program_number = epics_signal_r(float, prefix + "CS1:PROG_NUM")
+        if has_prog_num:
+            self.program_number = epics_signal_r(float, prefix + "CS1:PROG_NUM")
+        else:
+            # Prog number PV doesn't currently exist for i02-1
+            self.program_number = soft_signal_r_and_setter(float, -1)
 
 
 class FastGridScanCommon(StandardReadable, Flyable, ABC, Generic[ParamType]):
-    """Device for a general fast grid scan
+    """Device containing the minimal signals for a general fast grid scan.
 
-    When the motion program is started, the goniometer will move in a snake-like grid trajectory,
-    with X as the fast axis and Y as the slow axis. If Z steps isn't 0, the goniometer will
-    then rotate in the omega direction such that it moves from the X-Y, to the X-Z plane then
-    do a second grid scan. The detector is triggered after every x step.
-    See https://github.com/DiamondLightSource/hyperion/wiki/Coordinate-Systems for more
+    See ZebraFastGridScanThreeD as an example of how to implement.
     """
 
     def __init__(self, prefix: str, smargon_prefix: str, name: str = "") -> None:
@@ -203,7 +199,7 @@ class FastGridScanCommon(StandardReadable, Flyable, ABC, Generic[ParamType]):
 
         self.expected_images = self._create_expected_images_signal()
 
-        self.motion_program = MotionProgram(smargon_prefix)
+        self.motion_program = self._create_motion_program(smargon_prefix)
 
         self.position_counter = self._create_position_counter(prefix)
 
@@ -260,34 +256,33 @@ class FastGridScanCommon(StandardReadable, Flyable, ABC, Generic[ParamType]):
     @abstractmethod
     def _create_scan_invalid_signal(self, prefix: str) -> SignalR[float]: ...
 
+    @abstractmethod
+    def _create_motion_program(self, smargon_prefix: str) -> MotionProgram: ...
 
-class ZebraThreeDFastGridScan(FastGridScanCommon[ZebraGridScanParams]):
-    """Device for standard Zebra 3D FGS. In this scan, the goniometer's velocity profile follows a parabolic shape between X steps,
-    with the slowest points occuring at each X step.
+
+class FastGridScanThreeD(FastGridScanCommon[ParamType]):
+    """Device for standard 3D FGS. Subclasses must implement _create_position_counter.
+
+    This class exists to distinguish between the signals required for 2D grid scans,
+    which are currently only used on i02-1.
     """
 
     def __init__(self, prefix: str, name: str = "") -> None:
         full_prefix = prefix + "FGS:"
-        # Time taken to travel between X steps
-        self.dwell_time_ms = epics_signal_rw_rbv(float, f"{full_prefix}DWELL_TIME")
-        self.z_steps = epics_signal_rw_rbv(
-            int, f"{prefix}Z_NUM_STEPS"
-        )  # Number of vertical steps during the second grid scan, after the rotation in omega
+        # Number of vertical steps during the second grid scan, after the rotation in omega
+        self.z_steps = epics_signal_rw_rbv(int, f"{prefix}Z_NUM_STEPS")
         self.z_step_size = epics_signal_rw_rbv(float, f"{prefix}Z_STEP_SIZE")
         self.z2_start = epics_signal_rw_rbv(float, f"{prefix}Z2_START")
         self.y2_start = epics_signal_rw_rbv(float, f"{prefix}Y2_START")
-        super().__init__(prefix, name)
-        self.movable_params["z_step_size_mm"] = self.z_step_size
-        self.movable_params["z2_start"] = self.z2_start
-        self.movable_params["y2_start"] = self.y2_start
-        self.movable_params["z_steps"] = self.z_steps
-
         self.x_counter = epics_signal_r(int, f"{full_prefix}X_COUNTER")
         self.y_counter = epics_signal_r(int, f"{full_prefix}Y_COUNTER")
 
         super().__init__(full_prefix, prefix, name)
 
-        self.movable_params["dwell_time_ms"] = self.dwell_time_ms
+        self.movable_params["z_step_size_mm"] = self.z_step_size
+        self.movable_params["z2_start_mm"] = self.z2_start
+        self.movable_params["y2_start_mm"] = self.y2_start
+        self.movable_params["z_steps"] = self.z_steps
 
     def _create_position_counter(self, prefix: str):
         return epics_signal_rw(
@@ -311,8 +306,35 @@ class ZebraThreeDFastGridScan(FastGridScanCommon[ZebraGridScanParams]):
     def _create_scan_invalid_signal(self, prefix: str) -> SignalR[float]:
         return epics_signal_r(float, f"{prefix}SCAN_INVALID")
 
+    def _create_motion_program(self, smargon_prefix: str):
+        return MotionProgram(smargon_prefix)
 
-class PandAFastGridScan(FastGridScanCommon[PandAGridScanParams]):
+
+class ZebraFastGridScanThreeD(FastGridScanThreeD[ZebraGridScanParamsThreeD]):
+    """Device for standard Zebra 3D FGS. In this scan, the goniometer's velocity profile follows a parabolic shape between X steps,
+    with the slowest points occuring at each X step.
+
+    When the motion program is started, the goniometer will move in a snake-like grid trajectory,
+    with X as the fast axis and Y as the slow axis. If Z steps isn't 0, the goniometer will
+    then rotate in the omega direction such that it moves from the X-Y, to the X-Z plane then
+    do a second grid scan. The detector is triggered after every x step.
+    See https://github.com/DiamondLightSource/hyperion/wiki/Coordinate-Systems for more
+    """
+
+    def __init__(self, prefix: str, name: str = "") -> None:
+        full_prefix = prefix + "FGS:"
+        # Time taken to travel between X steps
+        self.dwell_time_ms = epics_signal_rw_rbv(float, f"{full_prefix}DWELL_TIME")
+        super().__init__(prefix, name)
+        self.movable_params["dwell_time_ms"] = self.dwell_time_ms
+
+    def _create_position_counter(self, prefix: str):
+        return epics_signal_rw(
+            int, f"{prefix}POS_COUNTER", write_pv=f"{prefix}POS_COUNTER_WRITE"
+        )
+
+
+class PandAFastGridScan(FastGridScanThreeD[PandAGridScanParams]):
     """Device for panda constant-motion scan"""
 
     def __init__(self, prefix: str, name: str = "") -> None:
@@ -328,7 +350,7 @@ class PandAFastGridScan(FastGridScanCommon[PandAGridScanParams]):
         self.run_up_distance_mm = epics_signal_rw_rbv(
             float, f"{full_prefix}RUNUP_DISTANCE"
         )
-        super().__init__(full_prefix, prefix, name)
+        super().__init__(prefix, name)
 
         self.movable_params["run_up_distance_mm"] = self.run_up_distance_mm
 

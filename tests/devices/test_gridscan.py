@@ -17,8 +17,8 @@ from dodal.devices.fast_grid_scan import (
     GridScanParamsCommon,
     PandAFastGridScan,
     PandAGridScanParams,
-    ZebraGridScanParams,
-    ZebraThreeDFastGridScan,
+    ZebraFastGridScanThreeD,
+    ZebraGridScanParamsThreeD,
     set_fast_grid_scan_params,
 )
 from dodal.devices.smargon import Smargon
@@ -35,7 +35,7 @@ def discard_status(st: Status | DeviceStatus):
 @pytest.fixture
 async def zebra_fast_grid_scan():
     async with init_devices(mock=True):
-        zebra_fast_grid_scan = ZebraThreeDFastGridScan(name="fake_FGS", prefix="FGS")
+        zebra_fast_grid_scan = ZebraFastGridScanThreeD(name="fake_FGS", prefix="FGS")
 
     return zebra_fast_grid_scan
 
@@ -63,10 +63,10 @@ async def smargon():
 )
 async def test_given_settings_valid_when_kickoff_then_run_started(
     use_pgs,
-    zebra_fast_grid_scan: ZebraThreeDFastGridScan,
+    zebra_fast_grid_scan: ZebraFastGridScanThreeD,
     panda_fast_grid_scan: PandAFastGridScan,
 ):
-    grid_scan: ZebraThreeDFastGridScan | PandAFastGridScan = (
+    grid_scan: ZebraFastGridScanThreeD | PandAFastGridScan = (
         panda_fast_grid_scan if use_pgs else zebra_fast_grid_scan
     )
     set_mock_value(grid_scan.scan_invalid, False)
@@ -84,10 +84,10 @@ async def test_given_settings_valid_when_kickoff_then_run_started(
 )
 async def test_waits_for_running_motion(
     use_pgs,
-    zebra_fast_grid_scan: ZebraThreeDFastGridScan,
+    zebra_fast_grid_scan: ZebraFastGridScanThreeD,
     panda_fast_grid_scan: PandAFastGridScan,
 ):
-    grid_scan: ZebraThreeDFastGridScan | PandAFastGridScan = (
+    grid_scan: ZebraFastGridScanThreeD | PandAFastGridScan = (
         panda_fast_grid_scan if use_pgs else zebra_fast_grid_scan
     )
     set_mock_value(grid_scan.motion_program.running, 1)
@@ -114,7 +114,7 @@ async def test_waits_for_running_motion(
     ],
 )
 async def test_given_different_step_numbers_then_expected_images_correct(
-    zebra_fast_grid_scan: ZebraThreeDFastGridScan, steps, expected_images
+    zebra_fast_grid_scan: ZebraFastGridScanThreeD, steps, expected_images
 ):
     set_mock_value(zebra_fast_grid_scan.x_steps, steps[0])
     set_mock_value(zebra_fast_grid_scan.y_steps, steps[1])
@@ -133,7 +133,7 @@ async def test_given_different_step_numbers_then_expected_images_correct(
 )
 async def test_running_finished_with_all_images_done_then_complete_status_finishes_not_in_error(
     use_pgs,
-    zebra_fast_grid_scan: ZebraThreeDFastGridScan,
+    zebra_fast_grid_scan: ZebraFastGridScanThreeD,
     panda_fast_grid_scan: PandAFastGridScan,
     RE: RunEngine,
 ):
@@ -153,7 +153,7 @@ async def test_running_finished_with_all_images_done_then_complete_status_finish
         RE(
             set_fast_grid_scan_params(
                 grid_scan,
-                ZebraGridScanParams(
+                ZebraGridScanParamsThreeD(
                     transmission_fraction=0.01, x_steps=num_pos_1d, y_steps=num_pos_1d
                 ),
             )
@@ -229,7 +229,7 @@ def check_parameter_validation(params, composite, expected_in_limits):
 
 @pytest.fixture
 def zebra_grid_scan_params():
-    yield ZebraGridScanParams(
+    yield ZebraGridScanParamsThreeD(
         transmission_fraction=0.01,
         x_steps=10,
         y_steps=15,
@@ -327,7 +327,7 @@ def test_given_x_y_z_out_of_range_then_converting_to_motor_coords_raises(
 )
 def test_can_run_fast_grid_scan_in_run_engine(
     pgs,
-    zebra_fast_grid_scan: ZebraThreeDFastGridScan,
+    zebra_fast_grid_scan: ZebraFastGridScanThreeD,
     panda_fast_grid_scan: PandAFastGridScan,
     RE: RunEngine,
 ):
@@ -346,12 +346,6 @@ def test_can_run_fast_grid_scan_in_run_engine(
         else RE(kickoff_and_complete(zebra_fast_grid_scan))
     )
     assert RE.state == "idle"
-
-
-def test_given_x_y_z_steps_when_full_number_calculated_then_answer_is_as_expected(
-    common_grid_scan_params: GridScanParamsCommon,
-):
-    assert common_grid_scan_params.get_num_images() == 350
 
 
 @pytest.mark.parametrize(
@@ -377,14 +371,14 @@ def test_given_x_y_z_steps_when_full_number_calculated_then_answer_is_as_expecte
 )
 def test_non_test_integer_dwell_time(test_dwell_times, expected_dwell_time_is_integer):
     if expected_dwell_time_is_integer:
-        params = ZebraGridScanParams(
+        params = ZebraGridScanParamsThreeD(
             dwell_time_ms=test_dwell_times,
             transmission_fraction=0.01,
         )
         assert params.dwell_time_ms == test_dwell_times
     else:
         with pytest.raises(ValueError):
-            ZebraGridScanParams(
+            ZebraGridScanParamsThreeD(
                 dwell_time_ms=test_dwell_times,
                 transmission_fraction=0.01,
             )
@@ -393,7 +387,7 @@ def test_non_test_integer_dwell_time(test_dwell_times, expected_dwell_time_is_in
 @patch("dodal.devices.fast_grid_scan.LOGGER.error")
 async def test_timeout_on_complete_triggers_stop_and_logs_error(
     mock_log_error: MagicMock,
-    zebra_fast_grid_scan: ZebraThreeDFastGridScan,
+    zebra_fast_grid_scan: ZebraFastGridScanThreeD,
 ):
     zebra_fast_grid_scan.COMPLETE_STATUS = 0.01
     zebra_fast_grid_scan.stop_cmd = AsyncMock()
