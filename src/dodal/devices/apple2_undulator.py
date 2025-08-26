@@ -119,7 +119,7 @@ async def estimate_motor_timeout(
     return abs((target_pos - cur_pos) * 2.0 / vel) + DEFAULT_MOTOR_MIN_TIMEOUT
 
 
-class UndulartorBase(Device, Generic[T]):
+class UndulartorBase(abc.ABC, Device, Generic[T]):
     """Abstract base class for Apple2 undulator devices.
 
     This class provides common functionality for undulator devices, including
@@ -185,7 +185,7 @@ class MotorWithoutStop(Motor):
         LOGGER.info(f"Stopping {self.name} is not supported.")
 
 
-class GapSafeUndulatorMover(MotorWithoutStop, UndulartorBase):
+class GapSafeUndulatorMotor(MotorWithoutStop, UndulartorBase):
     """A device that will check it's safe to move the undulator before moving it and
     wait for the undulator to be safe again before calling the move complete.
     """
@@ -236,7 +236,7 @@ class GapSafeUndulatorMover(MotorWithoutStop, UndulartorBase):
             )
 
 
-class UndulatorGap(GapSafeUndulatorMover):
+class UndulatorGap(GapSafeUndulatorMotor):
     """A device with a collection of epics signals to set Apple 2 undulator gap motion.
     Only PV used by beamline are added the full list is here:
     /dls_sw/work/R3.14.12.7/support/insertionDevice/db/IDGapVelocityControl.template
