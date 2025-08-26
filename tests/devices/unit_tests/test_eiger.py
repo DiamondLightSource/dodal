@@ -331,13 +331,16 @@ def set_up_eiger_to_stage_happily(fake_eiger: EigerDetector):
 @patch("dodal.devices.eiger_odin.await_value")
 @patch("dodal.devices.eiger.await_value")
 def test_stage_runs_successfully(
-    mock_eiger_await, mock_eiger_odin_await, fake_eiger: EigerDetector
+    mock_eiger_await, mock_eiger_odin_await, fake_eiger: EigerDetector, caplog
 ):
     mock_eiger_await.return_value = finished_status()
     mock_eiger_odin_await.return_value = finished_status()
     set_up_eiger_to_stage_happily(fake_eiger)
     fake_eiger.stage()
     fake_eiger.arming_status.wait(1)  # This should complete long before 1s
+    # One log message kicking off arming, then one for each of the 13 arming stages
+    assert len(caplog.messages) == 14
+    print(caplog)
 
 
 def test_given_stale_parameters_goes_high_before_callbacks_then_stale_parameters_waited_on(
@@ -633,9 +636,10 @@ def test_unwrapped_arm_chain_functions_are_not_called_outside_util(
         name="set_num_triggers_and_captures"
     )
     fake_eiger._wait_for_odin_status = MagicMock(name="_wait_for_odin_status")
-    fake_eiger.cam.acquire.set = MagicMock(name="set")
+    fake_eiger.set_cam_acquire = MagicMock(name="set_cam_acquire")
     fake_eiger._wait_fan_ready = MagicMock(name="_wait_fan_ready")
     fake_eiger._finish_arm = MagicMock(name="_finish_arm")
+    fake_eiger.wait_for_stale_params = MagicMock(name="wait_for_stale_params")
 
     fake_eiger.do_arming_chain()
 
@@ -649,10 +653,10 @@ def test_unwrapped_arm_chain_functions_are_not_called_outside_util(
         fake_eiger.set_mx_settings_pvs,
         fake_eiger.set_num_triggers_and_captures,
         fake_eiger._wait_for_odin_status,
-        fake_eiger.cam.acquire.set,
+        fake_eiger.set_cam_acquire,
         fake_eiger._wait_fan_ready,
         fake_eiger._finish_arm,
-        await_value,
+        fake_eiger.wait_for_stale_params,
     ]
 
     for f in funcs:
