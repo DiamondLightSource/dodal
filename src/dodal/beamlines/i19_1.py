@@ -4,12 +4,12 @@ from dodal.common.beamlines.beamline_utils import (
 from dodal.common.beamlines.beamline_utils import (
     set_beamline as set_utils_beamline,
 )
-from dodal.devices.i19.beamstop import BeamStop
-from dodal.devices.i19.blueapi_device import HutchState
-from dodal.devices.i19.shutter import (
+from dodal.devices.i19.access_controlled.optics_blueapi_device import HutchState
+from dodal.devices.i19.access_controlled.shutter import (
     AccessControlledShutter,
     HutchState,
 )
+from dodal.devices.i19.beamstop import BeamStop
 from dodal.devices.oav.oav_detector import OAVBeamCentreFile
 from dodal.devices.oav.oav_parameters import OAVConfigBeamCentre
 from dodal.devices.synchrotron import Synchrotron

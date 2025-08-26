@@ -2,11 +2,14 @@ from ophyd_async.core import AsyncStatus, StandardReadableFormat
 from ophyd_async.epics.core import epics_signal_r
 
 from dodal.devices.hutch_shutter import ShutterDemand, ShutterState
-from dodal.devices.i19.blueapi_device import HutchState, OpticsBlueAPIDevice
-from dodal.devices.i19.hutch_access import ACCESS_DEVICE_NAME
+from dodal.devices.i19.access_controlled.hutch_access import ACCESS_DEVICE_NAME
+from dodal.devices.i19.access_controlled.optics_blueapi_device import (
+    HutchState,
+    OpticsBlueApiDevice,
+)
 
 
-class AccessControlledShutter(OpticsBlueAPIDevice):
+class AccessControlledShutter(OpticsBlueApiDevice):
     """ I19-specific device to operate the hutch shutter.
 
     This device will send a REST call to the blueapi instance controlling the optics \
@@ -25,15 +28,15 @@ class AccessControlledShutter(OpticsBlueAPIDevice):
     def __init__(self, prefix: str, hutch: HutchState, name: str = "") -> None:
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             self.shutter_status = epics_signal_r(ShutterState, f"{prefix}STA")
-        self.hutch_request = hutch
-        super().__init__(name)
+        super().__init__(hutch, name)
 
     @AsyncStatus.wrap
     async def set(self, value: ShutterDemand):
+        invoking_hutch = self._get_invoking_hutch().value
         REQUEST_PARAMS = {
             "name": "operate_shutter_plan",
             "params": {
-                "experiment_hutch": self.hutch_request.value,
+                "experiment_hutch": invoking_hutch,
                 "access_device": ACCESS_DEVICE_NAME,
                 "shutter_demand": value.value,
             },
