@@ -13,7 +13,7 @@ from dodal.devices.attenuator.filter_selections import (
     I02_1FilterTwoSelections,
 )
 from dodal.devices.eiger import EigerDetector
-from dodal.devices.i02_1.fast_grid_scan import TwoDFastGridScan
+from dodal.devices.i02_1.fast_grid_scan import ZebraFastGridScanTwoD
 from dodal.devices.i02_1.sample_motors import SampleMotors
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.zebra.zebra import Zebra
@@ -56,12 +56,13 @@ def eiger(mock: bool = False) -> EigerDetector:
 
 
 @device_factory()
-def zebra_fast_grid_scan() -> TwoDFastGridScan:
+def zebra_fast_grid_scan() -> ZebraFastGridScanTwoD:
     """Get the i02-1 zebra_fast_grid_scan device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i02-1, it will return the existing object.
     """
-    return TwoDFastGridScan(
+    return ZebraFastGridScanTwoD(
         prefix=f"{PREFIX.beamline_prefix}-MO-SAMP-11:FGS:",
+        smargon_prefix="BL02J-MO-STEP-11:",
     )
 
 
