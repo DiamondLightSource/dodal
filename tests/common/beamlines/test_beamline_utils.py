@@ -1,6 +1,10 @@
 import asyncio
 import functools
-from unittest.mock import ANY, AsyncMock, MagicMock, patch
+import importlib
+import os
+import re
+from pathlib import PurePath
+from unittest.mock import ANY, AsyncMock, MagicMock, Mock, patch
 
 import pytest
 from ophyd import Device
@@ -9,13 +13,21 @@ from ophyd.sim import FakeEpicsSignal
 from ophyd_async.core import Device as OphydV2Device
 from ophyd_async.core import StandardReadable
 
+import dodal.common.beamlines.beamline_utils as beamline_utils
 from dodal.common.beamlines import beamline_utils
+from dodal.common.beamlines.beamline_utils import (
+    clear_path_provider,
+    get_path_provider,
+    set_path_provider,
+)
 from dodal.devices.eiger import EigerDetector
 from dodal.devices.focusing_mirror import FocusingMirror
 from dodal.devices.motors import XYZStage
 from dodal.devices.smargon import Smargon
 from dodal.log import LOGGER
 from dodal.utils import DeviceInitializationController
+
+UUID_REGEX = re.compile(r"^[\da-f]{8}-([\da-f]{4}-){3}[\da-f]{12}$", re.IGNORECASE)
 
 
 @pytest.fixture(autouse=True)
@@ -211,3 +223,42 @@ def test_clear_device_destroys_ophyd_v1_device():
     beamline_utils.clear_device("eiger")
 
     dev1.destroy.assert_called_once()
+
+
+def test_path_provider_defaults_to_temp_dir():
+    importlib.reload(beamline_utils)
+    provider = get_path_provider()
+    info = provider()
+
+    assert info.directory_path == PurePath("/tmp")
+    assert UUID_REGEX.match(info.filename)
+
+
+def test_default_path_provider_follows_environment_variable():
+    with patch.dict(
+        os.environ,
+        {
+            "TEMP": "/bananas",
+        },
+        clear=True,
+    ):
+        importlib.reload(beamline_utils)
+
+        provider = get_path_provider()
+        info = provider()
+
+        assert info.directory_path == PurePath("/bananas")
+        assert UUID_REGEX.match(info.filename)
+
+
+def test_path_provider_overridable():
+    new_provider = Mock()
+
+    set_path_provider(new_provider)
+    assert get_path_provider() is new_provider
+
+
+def test_path_provider_clearable():
+    clear_path_provider()
+    with pytest.raises(NameError):
+        get_path_provider()
