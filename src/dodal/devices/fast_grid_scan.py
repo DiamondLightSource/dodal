@@ -126,6 +126,8 @@ class GridScanParamsCommon(AbstractExperimentWithBeamParams):
 class GridScanParamsThreeD(GridScanParamsCommon):
     z2_start_mm: float = 0.1
     y2_start_mm: float = 0.1
+
+    # Number of vertical steps during the second grid scan, after the rotation in omega
     z_steps: int = 0
 
     @property
@@ -268,8 +270,8 @@ class FastGridScanCommon(StandardReadable, Flyable, ABC, Generic[ParamType]):
 class FastGridScanThreeD(FastGridScanCommon[ParamType]):
     """Device for standard 3D FGS. Subclasses must implement _create_position_counter.
 
-    This class exists to distinguish between the signals required for 2D grid scans,
-    which are currently only used on i02-1.
+    This class exists to distinguish between the signals required for the standard
+    3D grid scans and the 2D grid scans which are currently only used on i02-1.
     """
 
     def __init__(self, prefix: str, name: str = "") -> None:
