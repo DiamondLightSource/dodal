@@ -1,7 +1,7 @@
 Creating a new device
 ---------------------
 
-Devices are written using the ophyd-async framework, the hardware abstraction library at Diamond. 
+Devices are written using the ophyd-async framework, the hardware abstraction library at Diamond. Before creating your device, you should [consider where the new code should live](../reference/device-standards.rst#where_to_put_devices).
 
 Reusing an existing class
 =========================

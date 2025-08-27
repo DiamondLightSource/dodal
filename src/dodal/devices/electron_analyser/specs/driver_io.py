@@ -16,9 +16,9 @@ from dodal.devices.electron_analyser.abstract.base_driver_io import (
     AbstractAnalyserDriverIO,
 )
 from dodal.devices.electron_analyser.abstract.types import TLensMode, TPsuMode
+from dodal.devices.electron_analyser.enums import EnergyMode, SelectedSource
 from dodal.devices.electron_analyser.specs.enums import AcquisitionMode
 from dodal.devices.electron_analyser.specs.region import SpecsRegion
-from dodal.devices.electron_analyser.util import to_kinetic_energy
 
 
 class SpecsAnalyserDriverIO(
@@ -36,7 +36,7 @@ class SpecsAnalyserDriverIO(
         prefix: str,
         lens_mode_type: type[TLensMode],
         psu_mode_type: type[TPsuMode],
-        energy_sources: Mapping[str, SignalR[float]],
+        energy_sources: Mapping[SelectedSource, SignalR[float]],
         name: str = "",
     ) -> None:
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
@@ -66,36 +66,31 @@ class SpecsAnalyserDriverIO(
     async def set(self, region: SpecsRegion[TLensMode, TPsuMode]):
         source = self._get_energy_source(region.excitation_energy_source)
         excitation_energy = await source.get_value()  # eV
+        # Copy region so doesn't alter the actual region and switch to kinetic energy
+        ke_region = region.model_copy()
+        ke_region.switch_energy_mode(EnergyMode.KINETIC, excitation_energy)
 
-        low_energy = to_kinetic_energy(
-            region.low_energy, region.energy_mode, excitation_energy
-        )
-        centre_energy = to_kinetic_energy(
-            region.centre_energy, region.energy_mode, excitation_energy
-        )
-        high_energy = to_kinetic_energy(
-            region.high_energy, region.energy_mode, excitation_energy
-        )
         await asyncio.gather(
-            self.region_name.set(region.name),
-            self.energy_mode.set(region.energy_mode),
-            self.low_energy.set(low_energy),
-            self.high_energy.set(high_energy),
-            self.slices.set(region.slices),
-            self.lens_mode.set(region.lens_mode),
-            self.pass_energy.set(region.pass_energy),
-            self.iterations.set(region.iterations),
-            self.acquisition_mode.set(region.acquisition_mode),
+            self.region_name.set(ke_region.name),
+            self.energy_mode.set(ke_region.energy_mode),
+            self.low_energy.set(ke_region.low_energy),
+            self.high_energy.set(ke_region.high_energy),
+            self.slices.set(ke_region.slices),
+            self.acquire_time.set(ke_region.acquire_time),
+            self.lens_mode.set(ke_region.lens_mode),
+            self.pass_energy.set(ke_region.pass_energy),
+            self.iterations.set(ke_region.iterations),
+            self.acquisition_mode.set(ke_region.acquisition_mode),
             self.excitation_energy.set(excitation_energy),
             self.excitation_energy_source.set(source.name),
-            self.snapshot_values.set(region.values),
-            self.psu_mode.set(region.psu_mode),
+            self.snapshot_values.set(ke_region.values),
+            self.psu_mode.set(ke_region.psu_mode),
         )
-        if region.acquisition_mode == AcquisitionMode.FIXED_TRANSMISSION:
-            await self.energy_step.set(region.energy_step)
+        if ke_region.acquisition_mode == AcquisitionMode.FIXED_TRANSMISSION:
+            await self.energy_step.set(ke_region.energy_step)
 
-        if region.acquisition_mode == AcquisitionMode.FIXED_ENERGY:
-            await self.centre_energy.set(centre_energy)
+        if ke_region.acquisition_mode == AcquisitionMode.FIXED_ENERGY:
+            await self.centre_energy.set(ke_region.centre_energy)
 
     def _create_angle_axis_signal(self, prefix: str) -> SignalR[Array1D[np.float64]]:
         angle_axis = derived_signal_r(

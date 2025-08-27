@@ -1,16 +1,13 @@
-from pathlib import Path
-
 from ophyd_async.epics.adaravis import AravisDetector
+from ophyd_async.epics.adcore import NDROIStatIO
 from ophyd_async.fastcs.panda import HDFPanda
 
 from dodal.common.beamlines.beamline_utils import (
     device_factory,
     get_path_provider,
-    set_path_provider,
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.beamlines.device_helpers import CAM_SUFFIX, HDF5_SUFFIX
-from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitPathProvider
 from dodal.devices.motors import XYZStage
 from dodal.devices.synchrotron import Synchrotron
 from dodal.log import set_beamline as set_log_beamline
@@ -20,14 +17,6 @@ BL = "c01"
 PREFIX = BeamlinePrefix(BL)
 set_log_beamline(BL)
 set_utils_beamline(BL)
-
-set_path_provider(
-    StaticVisitPathProvider(
-        BL,
-        Path("/dls/b01-1/data/2025/cm40661-1/"),
-        client=LocalDirectoryServiceClient(),
-    )
-)
 
 """
 NOTE: Due to ArgoCD and the k8s cluster configuration those PVs are not available remotely.
@@ -69,11 +58,15 @@ def spectroscopy_detector() -> AravisDetector:
     Returns:
         AravisDetector: The spectroscopy camera device.
     """
+    pv_prefix = f"{PREFIX.beamline_prefix}-DI-DCAM-02:"
     return AravisDetector(
-        f"{PREFIX.beamline_prefix}-DI-DCAM-02:",
+        pv_prefix,
         path_provider=get_path_provider(),
         drv_suffix=CAM_SUFFIX,
         fileio_suffix=HDF5_SUFFIX,
+        plugins={
+            "roistat": NDROIStatIO(f"{pv_prefix}ROISTAT:", num_channels=3),
+        },
     )
 
 
