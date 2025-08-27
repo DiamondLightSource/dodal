@@ -26,6 +26,11 @@ The aim should be to get a new device ready for testing it on the beamline as so
 
 Dodal's CLI `dodal connect <beamline>` is a useful way to verify that PV addresses are correct and the right datatype. You can use `cainfo <PV address>` to find the datatype of signals. If the datatype is an enum, `caget -d 31 <PV address>` will also display the available enums that the PV takes. Common enums are defined in `ophyd-async.core` for devices to use, but you can define custom ones when suitable. The values should be capitalised. If the PV expects upper case for the enum, please speak to controls to get this changed if possible.
 
+e.g On ON
+superset enums
+subset enums
+
+
 If you're not sure how to represent a PV as a Signal: ask! Seek feedback early (e.g. by opening a draft PR) and merge with other devices where it makes sense to. The test suite should provide confidence to do so without breaking existing code.
 
 
