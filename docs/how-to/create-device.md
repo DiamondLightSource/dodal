@@ -14,10 +14,10 @@ When creating a new device, always check if a device class already supports your
 The module `dodal.devices.motors` defines physical relationships between motors, such as `Stage` and `XYStage`.  
 For example, an `XYStage` is for two perpendicular motors (e.g. X and Y axes on a sample table):
 
-.. literalinclude:: ../../src/dodal/devices/motors.py
-    :start-at: class XYStage(Stage):
-    :end-at: super().__init__(name=name)
-
+```{literalinclude} :: ../../src/dodal/devices/motors.py
+:start-at: class XYStage(Stage):
+:end-at: super().__init__(name=name)
+```
 Do not use `XYStage` for unrelated motors or for motors that move in the same axis (e.g. coarse and fine adjustment).  
 If your device is a group of motors with a physical relationship, define it in `motors` if possible.  
 If you need extra signals or behaviour, extend the `Stage` class outside the `motors` module.
