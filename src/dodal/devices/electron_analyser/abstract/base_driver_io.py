@@ -40,6 +40,21 @@ class AbstractAnalyserDriverIO(
     Driver device that defines signals and readables that should be common to all
     electron analysers. Implementations of electron analyser devices should inherit
     from this class and define additional specialised signals and methods.
+
+    parameters:
+        prefix (str): Base PV to connect to EPICS for this device.
+        acquisition_mode_type (type[TAcquisitionMode]): Enum that determines the available
+                                   acquisition modes for this device.
+        lens_mode_type (type[TLensMode]): Enum that determines the available lens mode for
+                            this device.
+        psu_mode_type (type[TPsuMode]): Enum that determines the available psu modes for
+                            this device.
+        pass_energy_type (type[TPassEnergy]): Can be enum or float, depends on electron
+                              analyser model. If enum, it determines the available pass
+                              energies for this device.
+        energy_sources (Mapping[SelectedSource, SignalR[float]]): Map that pairs a source
+                            name to an energy value signal (in eV).
+        name (str, optional): Name of the device. Defaults to "".
     """
 
     def __init__(
@@ -54,20 +69,6 @@ class AbstractAnalyserDriverIO(
     ) -> None:
         """
         Constructor method for setting up electron analyser.
-
-        Args:
-            prefix: Base PV to connect to EPICS for this device.
-            acquisition_mode_type: Enum that determines the available acquisition modes
-                                   for this device.
-            lens_mode_type: Enum that determines the available lens mode for this
-                            device.
-            psu_mode_type: Enum that determines the available psu modes for this device.
-            pass_energy_type: Can be enum or float, depends on electron analyser model.
-                              If enum, it determines the available pass energies for
-                              this device.
-            energy_sources: Map that pairs a source name to an energy value signal
-                            (in eV).
-            name: Name of the device.
         """
         self.energy_sources = energy_sources
         self.acquisition_mode_type = acquisition_mode_type

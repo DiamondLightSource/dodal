@@ -31,6 +31,40 @@ class SpecsAnalyserDriverIO(
     ],
     Generic[TLensMode, TPsuMode],
 ):
+    """
+    SpecsAnalyserDriverIO is a driver interface for controlling and configuring a SPECS electron analyser device.
+    It manages the setup and acquisition of region data, including energy and angle axes, lens and PSU modes,
+    and acquisition parameters.
+
+    Type Parameters:
+        TLensMode: Type for lens mode enumeration.
+        TPsuMode: Type for PSU mode enumeration.
+
+    Args:
+        prefix (str): The EPICS PV prefix for the analyser device.
+        lens_mode_type (type[TLensMode]): The type of lens mode supported by the analyser.
+        psu_mode_type (type[TPsuMode]): The type of PSU mode supported by the analyser.
+        energy_sources (Mapping[SelectedSource, SignalR[float]]): Mapping of selectable energy sources to their signals.
+        name (str, optional): Name of the device instance.
+
+    Attributes:
+        snapshot_values: Signal for setting up region data acquisition.
+        min_angle_axis: Signal for the minimum value of the angle axis.
+        max_angle_axis: Signal for the maximum value of the angle axis.
+        energy_channels: Signal for the number of energy channels (points per iteration).
+
+    Methods:
+        set(region): Asynchronously configures the analyser for a given region, setting all relevant parameters.
+        _create_angle_axis_signal(prefix): Creates a derived signal representing the angle axis.
+        _calculate_angle_axis(min_angle, max_angle, slices): Calculates the angle axis array based on region parameters.
+        _create_energy_axis_signal(prefix): Creates a derived signal representing the energy axis.
+        _calculate_energy_axis(min_energy, max_energy, total_points_iterations): Calculates the energy axis array.
+
+    Notes:
+        - The class ensures that region configuration is always converted to kinetic energy mode before applying.
+        - Axis calculations account for device-specific conventions (e.g., edge vs. center pixel definitions).
+    """
+
     def __init__(
         self,
         prefix: str,

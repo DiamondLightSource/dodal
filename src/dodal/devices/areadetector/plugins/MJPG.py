@@ -26,6 +26,9 @@ class MJPG(StandardReadable, Triggerable, ABC):
 
     This devices uses that stream to grab images. When it is triggered it will send the
     latest image from the stream to the `post_processing` method for child classes to handle.
+    Args:
+        prefix (str): The EPICS PV prefix for the MJPG plugin.
+        name (str, optional): The name of the device. Defaults to "".
     """
 
     def __init__(self, prefix: str, name: str = "") -> None:

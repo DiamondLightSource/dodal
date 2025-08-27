@@ -38,6 +38,10 @@ class AbstractElectronAnalyserDetector(
     If possible, this should be changed to inherit from a StandardDetector. Currently,
     StandardDetector forces you to use a file writer which doesn't apply here.
     See issue https://github.com/bluesky/ophyd-async/issues/888
+
+    parameters:
+        driver (TAbstractAnalyserDriverIO): The driver instance to use for this detector.
+        name (str, optional): Name of the device. Defaults to "".
     """
 
     def __init__(

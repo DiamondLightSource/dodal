@@ -12,11 +12,27 @@ from dodal.devices.current_amplifiers import (
 
 
 class CountMode(StrictEnum):
+    """
+    Enumeration representing the available counting modes for the scaler counter.
+
+    Attributes:
+        AUTO (str): Automatic counting mode, where the counter operates continuously.
+        ONE_SHOT (str): One-shot counting mode, where the counter performs a single count operation.
+    """
+
     AUTO = "AutoCount"
     ONE_SHOT = "OneShot"
 
 
 class CountState(StrictEnum):
+    """
+    Enumeration representing the possible states of a counting process.
+
+    Attributes:
+        DONE: Indicates that the counting process has completed.
+        COUNT: Indicates that the counting process is currently ongoing.
+    """
+
     DONE = "Done"
     COUNT = "Count"
 
@@ -30,6 +46,11 @@ class StruckScaler(CurrentAmpCounter):
       range of detectors. This class contains the basic control to run the struckscaler
       card together with a current amplifier. It has functions that provide conversion
       between count and voltage.
+    parameters:
+        prefix (str): The EPICS PV prefix for the device.
+        suffix (str): The EPICS PV suffix for the readout signal.
+        count_per_volt (float): The conversion factor between counter output and voltage.
+        name (str, optional): Name of the device. Defaults to "".
     Attributes:
         readout(SignalR): Scaler card output.
         count_mode (SignalR[CountMode]): Counting card setting.

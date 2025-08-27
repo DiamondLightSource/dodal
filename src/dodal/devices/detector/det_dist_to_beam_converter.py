@@ -12,6 +12,19 @@ class Axis(Enum):
 
 
 class DetectorDistanceToBeamXYConverter:
+    """
+    Converts detector distance to beam X and Y coordinates using a lookup table.
+
+    This class provides methods to convert a given detector distance (in mm) to the corresponding
+    beam X or Y position (in mm or pixels) on the detector, based on a lookup table provided at
+    initialization. The lookup table is parsed and used to create linear extrapolation functions
+    for both X and Y axes.
+
+    Args:
+        lookup_file (str): Path to the lookup table file containing detector distance and beam position data.
+
+    """
+
     def __init__(self, lookup_file: str):
         self.lookup_file: str = lookup_file
         lookup_table_columns: list = parse_lookup_table(self.lookup_file)

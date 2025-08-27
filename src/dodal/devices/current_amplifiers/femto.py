@@ -62,6 +62,18 @@ class FemtoDDPCA(CurrentAmp):
     Femto current amplifier device, this class should cover all DDPCA Femto current
       amplifiers, As the main different between all the DDPCA Femto is their gain table
         and response time table.
+    Parameters:
+        prefix (str): The EPICS PV prefix for the device.
+        suffix (str): The EPICS PV suffix for the gain setting.
+        gain_table (strictEnum): The table epic use to set gain.
+        gain_to_current_table (Enum): The table to convert voltage back to current.
+        raise_timetable (Enum): Table contain the minimum amount of time to wait after
+         changing gain.
+        upperlimit (float, optional): upperlimit of the current amplifier. Defaults to 8.8.
+        lowerlimit (float, optional): lowerlimit of the current amplifier. Defaults to 0.68.
+        timeout (float, optional): Maximum waiting time in second for setting gain.
+         Defaults to 1.
+        name (str, optional): Name of the device. Defaults to "".
     Attributes:
         gain (SignalRW): This is the epic signal that control current amplifier gain.
         gain_table (strictEnum): The table epic use to set gain.
