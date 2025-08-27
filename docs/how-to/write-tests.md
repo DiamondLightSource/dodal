@@ -11,6 +11,7 @@ Testing is essential to maintain the integrity and reliability of the codebase. 
 Below a StandardReadable example device is defined which also implements the Stageable protocal.  
 
 ```Python
+import asyncio
 from bluesky.protocals import Stageable
 from ophyd_async.core import AsyncStatus, OnOff, StandardReadable
 from ophyd_async.epics.core import epics_signal_rw
@@ -39,44 +40,27 @@ class MyDevice(StandardReadable, Stageable):
         """
         Setup device by moving signal_a to ON.
         """
-        await self.siganl_b.set(OnOff.ON)
+        await asyncio.gather(super().stage(), self.siganl_b.set(OnOff.ON))
 
     @AsyncStatus.wrap
     async def unstage(self):
         """
         Once device is finished, set signal_b back to OFF.
         """
-        await self.siganl_b.set(OnOff.OFF)
+        await asyncio.gather(super().stage(), self.siganl_b.set(OnOff.OFF))
 ```
 
-We aim for high test coverage in dodal with small modular test functions. To achieve this, we need test the relevant methods by writing tests for the class/method were creating/changing for the expected behaviour and not any parent classes.
+We aim for high test coverage in dodal with small modular test functions. To achieve this, we need test the relevant methods by writing tests for the class/method were creating/changing for the expected behaviour and not unnecessary any parent classes. In this example, we need to test the `stage`, `unstage`, and `read` methods. The `read` method needs to be tested as were adding `signal_a` and `signal_b` as readables to the device, so we need to test we get the expected read signals back.
 
 We use pytest [pytest](https://docs.pytest.org/en/stable/contents.html) for writing unit tests in dodal. A core part of this librabry is the use of fixtures. A `pytest.fixture` is a function you decorate with `@pytest.fixture` that provides setup/teardown or reusable test data for your tests. It is defined onced and can be reused across multiple tests. They are mainly used to define devices 
-and then inject them into each test. To help setup a device, they are created with the `init_devices(mock=True)` funtion from `ophyd_async.core` which auto initalises the device in mock mode. The `RunEngine` is present when creating a device to ensure there is an event loop present when connecting siganls. 
-
-A device were going to use as an example on how to write a test is defined below:
-
-- @pytest.pyfixtures - Done 
-- (conftest.py)
-- init_devices(mock=True) - Done
-- test device methods
-- test read and read_configuration methods 
-- aim for high code coverage
-- callback on mock puts
-- only test things you made changes to on that class, not parent class as not needed.
-
-
-
-aim to make small function tests that
-
-Tests:
+and then inject them into each test. To help setup a device, they are created with the `init_devices(mock=True)` funtion from `ophyd_async.core` which auto initalises the device in mock mode. The `RunEngine` is present when creating a device to ensure there is an event loop present when connecting siganls. The `RunEngine` `pytest.fixture` is defined in `dodal/conftest.py` which is a special file tha is recognised by `pytest`. It defines fixtures that are automatically available to any test in the same directory (and its subdirectories) without needing to import them. It is useful for defining common setup code without having to import it in each test file.
 
 
 ```Python
 from unittest.mock import ANY
 import pytest
 from ophyd_async.core import init_devices
-from ophyd_async.testing import partial_reading, 
+from ophyd_async.testing import assert_reading, partial_reading
 from dodal.devices.my_device import MyDevice
 from bluesky import plan_stubs as bps
 
@@ -111,3 +95,6 @@ async def test_my_device_read(sim_my_device: MyDevice, RE: RunEngine) -> None:
         }
     )
 ```
+
+
+- callback on mock puts
