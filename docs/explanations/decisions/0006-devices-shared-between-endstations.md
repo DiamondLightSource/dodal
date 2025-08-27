@@ -13,3 +13,8 @@ Some beamlines have multiple endstations with shared hardware in the optics hutc
 ## Decision
 
 blabla
+
+
+:::{seealso}
+[Optics hutch implementation on I19](https://diamondlightsource.github.io/i19-bluesky/main/explanations/decisions/0004-optics-blueapi-architecture.html) for an example.
+:::
