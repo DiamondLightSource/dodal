@@ -13,9 +13,10 @@ Before creating a new device, always check if a suitable class already exists in
 - **AreaDetectors:** Use [StandardDetector](https://github.com/bluesky/ophyd-async/tree/main/src/ophyd_async/epics/adcore) or [adcore](https://github.com/bluesky/ophyd-async/tree/main/src/ophyd_async/epics/adcore).
 
 Many device classes in `dodal.devices.motors` represent physical relationships between motors, such as `Stage` and `XYStage`.  
-For example, use `XYStage` for two perpendicular motors (e.g. X and Y axes on a sample table):
+
+For example, only use `XYStage` for two perpendicular motors (e.g. X and Y axes on a sample table):
 - Do not use `XYStage` for unrelated motors or for motors that move in the same axis (e.g. coarse and fine adjustment).
-- Only device that is a group of motors with a physical relationship, should be defined here.
+- Only device that is a group of motors with a physical relationship, should be defined in `motor`.
 - If your class define an `XYStage` but you need extra signals or behaviour, extend the `XYStage` class outside the `motor` module.
 
 
