@@ -1,7 +1,7 @@
 # Plan Standards
 
 > [!NOTE]
-> These are some notes on how to write plans . Plans should not be implemented in dodal (unless very general).
+> Plans should not be implemented in dodal (unless very general), but in the specific technique-bluesky repository.
 
 ## Use a list of standard baseline devices
 
@@ -12,6 +12,8 @@ These devices are usually not included in the scan logic (e.g. upstream optical 
 
 
 ### Example: besaline devices implementation and use for I22
+
+
 
 ```python
 from bluesky.protocols import Readable
