@@ -59,8 +59,8 @@ class ZebraFastGridScanTwoD(FastGridScanCommon[ZebraGridScanParamsTwoD]):
         LOGGER.info(f"Reading num of images found {x, y} images in each axis")
         return x * y
 
-    # VMXm will trigger the grid scan through GDA, which has its own validity check,
-    # but this PV is being added: https://github.com/DiamondLightSource/mx-bluesky/issues/1203
+    # VMXm triggers the grid scan through GDA, which has its own validity check
+    # so whilst this PV is being added, it isn't essential
     def _create_scan_invalid_signal(self, prefix: str) -> SignalR[float]:
         return soft_signal_r_and_setter(float, 0)[0]
 
