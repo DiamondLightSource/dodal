@@ -18,6 +18,25 @@ class ColorMode(StrictEnum):
 
 
 class Cam(StandardReadable):
+    """
+    Camera device class for area detector plugins.
+
+    This class represents a camera interface with standard readable properties,
+    providing access to common camera controls and status signals via EPICS.
+
+    Args:
+        prefix (str): The EPICS PV prefix for the camera.
+        name (str, optional): The name of the camera device. Defaults to "".
+
+    Attributes:
+        color_mode: Read/write EPICS signal for the camera's color mode.
+        acquire_period: Read/write EPICS signal for the acquisition period (float).
+        acquire_time: Read/write EPICS signal for the acquisition time (float).
+        gain: Read/write EPICS signal for the camera gain (float).
+        array_size_x: Read-only EPICS signal for the X dimension of the image array (int).
+        array_size_y: Read-only EPICS signal for the Y dimension of the image array (int).
+    """
+
     def __init__(self, prefix: str, name: str = "") -> None:
         self.color_mode = epics_signal_rw(ColorMode, prefix + "ColorMode")
         self.acquire_period = epics_signal_rw(float, prefix + "AcquirePeriod")
