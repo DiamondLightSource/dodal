@@ -1,5 +1,6 @@
 from ophyd_async.core import (
     EnabledDisabled,
+    InOut,
     StandardReadable,
     StandardReadableFormat,
     StrictEnum,
@@ -90,5 +91,30 @@ class OxfordCryoStream(StandardReadable):
         with self.add_children_as_readables():
             self.controller = OxfordCryoStreamController(prefix=prefix)
             self.status = OxfordCryoStreamStatus(prefix=prefix)
+
+        super().__init__(name)
+
+
+class OxfordCryoJet(StandardReadable):
+    # TODO: https://github.com/DiamondLightSource/dodal/issues/1486
+    # This is a placeholder implementation to get it working with I03, the actual cryojet has many more PVs
+    def __init__(self, prefix: str, name=""):
+        with self.add_children_as_readables():
+            self.course = epics_signal_rw(InOut, f"{prefix}COARSE:CTRL")
+            self.fine = epics_signal_rw(InOut, f"{prefix}FINE:CTRL")
+
+        super().__init__(name)
+
+
+class CompositeCryoStreamCryoJet(StandardReadable):
+    def __init__(
+        self,
+        cryostream: OxfordCryoStream,
+        cryojet: OxfordCryoJet,
+        name: str = "",
+    ):
+        with self.add_children_as_readables():
+            self.cryostream = cryostream
+            self.cryojet = cryojet
 
         super().__init__(name)

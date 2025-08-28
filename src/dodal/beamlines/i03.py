@@ -21,7 +21,11 @@ from dodal.devices.attenuator.attenuator import BinaryFilterAttenuator
 from dodal.devices.backlight import Backlight
 from dodal.devices.baton import Baton
 from dodal.devices.collimation_table import CollimationTable
-from dodal.devices.cryostream import CryoStream
+from dodal.devices.cryostream import (
+    CompositeCryoStreamCryoJet,
+    OxfordCryoJet,
+    OxfordCryoStream,
+)
 from dodal.devices.detector.detector_motion import DetectorMotion
 from dodal.devices.diamond_filter import DiamondFilter, I03Filters
 from dodal.devices.eiger import EigerDetector
@@ -405,12 +409,13 @@ def lower_gonio() -> XYZStage:
 
 
 @device_factory()
-def cryostream() -> CryoStream:
+def cryostream() -> CompositeCryoStreamCryoJet:
     """Get the i03 cryostream device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return CryoStream(
-        PREFIX.beamline_prefix,
+    return CompositeCryoStreamCryoJet(
+        cryostream=OxfordCryoStream(f"{PREFIX.beamline_prefix}-EA-CSTRM-01:"),
+        cryojet=OxfordCryoJet(f"{PREFIX.beamline_prefix}-EA-CJET-01:"),
     )
 
 
