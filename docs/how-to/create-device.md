@@ -12,14 +12,6 @@ Before creating a new device, always check if a suitable class already exists in
 - **Storage ring signals:** Use [Synchrotron](https://github.com/DiamondLightSource/dodal/blob/main/src/dodal/devices/synchrotron.py).
 - **AreaDetectors:** Use [StandardDetector](https://github.com/bluesky/ophyd-async/tree/main/src/ophyd_async/epics/adcore) or [adcore](https://github.com/bluesky/ophyd-async/tree/main/src/ophyd_async/epics/adcore).
 
-Many device classes in `dodal.devices.motors` represent physical relationships between motors, such as `Stage` and `XYStage`.  
-
-For example, only use `XYStage` for two perpendicular motors (e.g. X and Y axes on a sample table):
-- Do not use `XYStage` for unrelated motors or for motors that move in the same axis (e.g. coarse and fine adjustment).
-- Only a device that represents a group of motors with a physical relationship, should be defined in `motor`.
-- If your class define an `XYStage` but you need extra signals or behaviour, extend the `XYStage` class outside the `motor` module.
-
-
 If a compatible device class exists:
 - Use it and add it to the [beamline](./create-beamline.rst) to avoid re-implementation and share improvements.
 - You can use ophyd-async's [DeviceVector](https://blueskyproject.io/ophyd-async/main/explanations/decisions/0006-procedural-device-definitions.html) to handle a collection of identical devices.   
@@ -27,6 +19,13 @@ If a compatible device class exists:
 - If that's not possible (e.g. proprietary support), add configurability to the dodal device class, ensuring defaults match existing patterns and that `dodal connect` still works for current devices.
 - Avoid dynamic attribute assignment (e.g. dicts of motors) as it hinders type checking and plan writing.  
 - Use static attributes and type hints for better IDE support and maintainability.
+
+Many device classes in `dodal.devices.motors` represent physical relationships between motors, such as `Stage` and `XYStage`.  
+
+For example, only use `XYStage` for two perpendicular motors (e.g. X and Y axes on a sample table):
+- Do not use `XYStage` for unrelated motors or for motors that move in the same axis (e.g. coarse and fine adjustment).
+- Only a device that represents a group of motors with a physical relationship, should be defined in `motor`.
+- If your class define an `XYStage` but you need extra signals or behaviour, extend the `XYStage` class outside the `motor` module.
 
 **Only if no suitable class exists**, create a new device that connects to the required signals. During review, refactor to align with existing devices if needed, using inheritance or composition to deduplicate code.  
 
