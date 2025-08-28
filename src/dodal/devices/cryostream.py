@@ -1,6 +1,5 @@
 from ophyd_async.core import (
     EnabledDisabled,
-    InOut,
     StandardReadable,
     StandardReadableFormat,
     StrictEnum,
@@ -10,20 +9,6 @@ from ophyd_async.epics.core import (
     epics_signal_rw,
     epics_signal_x,
 )
-
-
-class CryoStream(StandardReadable):
-    MAX_TEMP_K = 110
-    MAX_PRESSURE_BAR = 0.1
-
-    def __init__(self, prefix: str, name: str = ""):
-        self.course = epics_signal_rw(InOut, f"{prefix}-EA-CJET-01:COARSE:CTRL")
-        self.fine = epics_signal_rw(InOut, f"{prefix}-EA-CJET-01:FINE:CTRL")
-        self.temperature_k = epics_signal_r(float, f"{prefix}-EA-CSTRM-01:TEMP")
-        self.back_pressure_bar = epics_signal_r(
-            float, f"{prefix}-EA-CSTRM-01:BACKPRESS"
-        )
-        super().__init__(name)
 
 
 class TurboEnum(StrictEnum):
