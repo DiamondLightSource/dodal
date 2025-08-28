@@ -66,6 +66,7 @@ from bluesky import RunEngine
 from bluesky import plan_stubs as bps
 from ophyd_async.core import OnOff, init_devices
 from ophyd_async.testing import assert_reading, get_mock_put, partial_reading
+from dodal.device.my_device import  MyDevice
 
 
 # RunEngine is needed to make sure there is an event loop when creating device.
