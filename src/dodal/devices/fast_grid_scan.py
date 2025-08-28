@@ -144,7 +144,7 @@ class GridScanParamsThreeD(GridScanParamsCommon):
         return GridAxis(self.z2_start_mm, self.z_step_size_mm, self.z_steps)
 
 
-ParamType = TypeVar("ParamType", bound=GridScanParamsCommon)
+ParamType = TypeVar("ParamType", bound=GridScanParamsCommon, covariant=True)
 
 
 class ZebraGridScanParamsThreeD(GridScanParamsThreeD):
