@@ -11,7 +11,7 @@ from dodal.devices.fast_grid_scan import (
 from dodal.log import LOGGER
 
 
-class ZebraGridScanParamsThreeDTwoD(GridScanParamsCommon):
+class ZebraGridScanParamsTwoD(GridScanParamsCommon):
     exposure_time_ms: float = 213
 
     @field_validator("exposure_time_ms")
@@ -28,7 +28,7 @@ class ZebraGridScanParamsThreeDTwoD(GridScanParamsCommon):
         return exposure_time_ms
 
 
-class ZebraFastGridScanTwoD(FastGridScanCommon[ZebraGridScanParamsThreeDTwoD]):
+class ZebraFastGridScanTwoD(FastGridScanCommon[ZebraGridScanParamsTwoD]):
     """i02-1's EPICS interface for the 2D FGS differs slightly from the standard 3D
     version:
     - No Z steps, Z step sizes, or Y2 start positions, or Z2 start

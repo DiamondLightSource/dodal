@@ -75,7 +75,6 @@ class GridScanParamsCommon(AbstractExperimentWithBeamParams):
     y_steps: int = 1
     x_step_size_mm: float = 0.1
     y_step_size_mm: float = 0.1
-    z_step_size_mm: float = 0.1
     x_start_mm: float = 0.1
     y1_start_mm: float = 0.1
     z1_start_mm: float = 0.1
@@ -94,7 +93,7 @@ class GridScanParamsCommon(AbstractExperimentWithBeamParams):
     # In 2D grid scans, z axis is just the start position
     @property
     def z_axis(self) -> GridAxis:
-        return GridAxis(self.z1_start_mm, self.z_step_size_mm, 1)
+        return GridAxis(self.z1_start_mm, 0, 1)
 
     def grid_position_to_motor_position(self, grid_position: ndarray) -> ndarray:
         """Converts a grid position, given as steps in the x, y, z grid,
@@ -126,9 +125,10 @@ class GridScanParamsCommon(AbstractExperimentWithBeamParams):
 class GridScanParamsThreeD(GridScanParamsCommon):
     z2_start_mm: float = 0.1
     y2_start_mm: float = 0.1
+    z_step_size_mm: float = 0.1
 
     # Number of vertical steps during the second grid scan, after the rotation in omega
-    z_steps: int = 0
+    z_steps: int = 1
 
     @property
     def z_axis(self) -> GridAxis:
@@ -175,7 +175,7 @@ class MotionProgram(Device):
             self.program_number = epics_signal_r(float, prefix + "CS1:PROG_NUM")
         else:
             # Prog number PV doesn't currently exist for i02-1
-            self.program_number = soft_signal_r_and_setter(float, -1)
+            self.program_number = soft_signal_r_and_setter(float, -1)[0]
 
 
 class FastGridScanCommon(StandardReadable, Flyable, ABC, Generic[ParamType]):
@@ -220,7 +220,6 @@ class FastGridScanCommon(StandardReadable, Flyable, ABC, Generic[ParamType]):
             "y_steps": self.y_steps,
             "x_step_size_mm": self.x_step_size,
             "y_step_size_mm": self.y_step_size,
-            "z_step_size_mm": self.z_step_size,
             "x_start_mm": self.x_start,
             "y1_start_mm": self.y1_start,
             "z1_start_mm": self.z1_start,
