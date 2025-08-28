@@ -65,7 +65,7 @@ class GridScanParamsCommon(AbstractExperimentWithBeamParams):
     """
     Common holder class for the parameters of a grid scan in a similar
     layout to EPICS. The parameters and functions of this class are common
-    to both the zebra and panda triggered fast grid scans.
+    to both the zebra and panda triggered fast grid scans in 2d or 3d.
 
     The grid specified is where data is taken e.g. it can be assumed the first frame is
     at x_start, y1_start, z1_start and subsequent frames are N*step_size away.
@@ -123,8 +123,17 @@ class GridScanParamsCommon(AbstractExperimentWithBeamParams):
 
 
 class GridScanParamsThreeD(GridScanParamsCommon):
+    """Additional parameters required to do a 3 dimensional gridscan.
+
+    A 3D gridscan works by doing two 2D gridscans. The first of these grids is x_steps by
+    y_steps. The sample is then rotated by 90 degrees, and then the second grid is
+    x_steps by z_steps.
+    """
+
+    # Start position for z and y during the second gridscan
     z2_start_mm: float = 0.1
     y2_start_mm: float = 0.1
+
     z_step_size_mm: float = 0.1
 
     # Number of vertical steps during the second grid scan, after the rotation in omega
@@ -140,7 +149,8 @@ ParamType = TypeVar("ParamType", bound=GridScanParamsCommon)
 
 class ZebraGridScanParamsThreeD(GridScanParamsThreeD):
     """
-    Params for standard Zebra FGS. Adds on the dwell time
+    Params for standard Zebra FGS. Adds on the dwell time, which is really the time
+    between trigger positions.
     """
 
     dwell_time_ms: float = 10
@@ -180,6 +190,9 @@ class MotionProgram(Device):
 
 class FastGridScanCommon(StandardReadable, Flyable, ABC, Generic[ParamType]):
     """Device containing the minimal signals for a general fast grid scan.
+
+    When the motion program is started, the goniometer will move in a snake-like grid trajectory,
+    with X as the fast axis and Y as the slow axis.
 
     See ZebraFastGridScanThreeD as an example of how to implement.
     """
@@ -256,21 +269,26 @@ class FastGridScanCommon(StandardReadable, Flyable, ABC, Generic[ParamType]):
     def _create_expected_images_signal(self) -> SignalR[int]: ...
 
     @abstractmethod
-    def _create_position_counter(self, prefix: str) -> SignalRW[int]:
-        pass
+    def _create_position_counter(self, prefix: str) -> SignalRW[int]: ...
 
+    # This can be created within init rather than as a separate method after https://github.com/DiamondLightSource/mx-bluesky/issues/1203
     @abstractmethod
     def _create_scan_invalid_signal(self, prefix: str) -> SignalR[float]: ...
 
+    # This can be created within init rather than as a separate method after https://github.com/DiamondLightSource/mx-bluesky/issues/1203
     @abstractmethod
     def _create_motion_program(self, smargon_prefix: str) -> MotionProgram: ...
 
 
 class FastGridScanThreeD(FastGridScanCommon[ParamType]):
-    """Device for standard 3D FGS. Subclasses must implement _create_position_counter.
+    """Device for standard 3D FGS.
 
-    This class exists to distinguish between the signals required for the standard
-    3D grid scans and the 2D grid scans which are currently only used on i02-1.
+    After completeing the first grid, if Z steps isn't 0, the goniometer will
+    rotate in the omega direction such that it moves from the X-Y, to the X-Z plane then
+    do a second grid scan. The detector is triggered after every x step.
+    See https://github.com/DiamondLightSource/hyperion/wiki/Coordinate-Systems for more.
+
+    Subclasses must implement _create_position_counter.
     """
 
     def __init__(self, prefix: str, name: str = "") -> None:
@@ -289,11 +307,6 @@ class FastGridScanThreeD(FastGridScanCommon[ParamType]):
         self.movable_params["z2_start_mm"] = self.z2_start
         self.movable_params["y2_start_mm"] = self.y2_start
         self.movable_params["z_steps"] = self.z_steps
-
-    def _create_position_counter(self, prefix: str):
-        return epics_signal_rw(
-            int, f"{prefix}POS_COUNTER", write_pv=f"{prefix}POS_COUNTER_WRITE"
-        )
 
     def _create_expected_images_signal(self):
         return derived_signal_r(
@@ -317,14 +330,10 @@ class FastGridScanThreeD(FastGridScanCommon[ParamType]):
 
 
 class ZebraFastGridScanThreeD(FastGridScanThreeD[ZebraGridScanParamsThreeD]):
-    """Device for standard Zebra 3D FGS. In this scan, the goniometer's velocity profile follows a parabolic shape between X steps,
-    with the slowest points occuring at each X step.
+    """Device for standard Zebra 3D FGS.
 
-    When the motion program is started, the goniometer will move in a snake-like grid trajectory,
-    with X as the fast axis and Y as the slow axis. If Z steps isn't 0, the goniometer will
-    then rotate in the omega direction such that it moves from the X-Y, to the X-Z plane then
-    do a second grid scan. The detector is triggered after every x step.
-    See https://github.com/DiamondLightSource/hyperion/wiki/Coordinate-Systems for more
+    In this scan, the goniometer's velocity profile follows a parabolic shape between X steps,
+    with the slowest points occuring at each X step.
     """
 
     def __init__(self, prefix: str, name: str = "") -> None:
@@ -341,7 +350,11 @@ class ZebraFastGridScanThreeD(FastGridScanThreeD[ZebraGridScanParamsThreeD]):
 
 
 class PandAFastGridScan(FastGridScanThreeD[PandAGridScanParams]):
-    """Device for panda constant-motion scan"""
+    """Device for panda constant-motion scan.
+
+    In this scan, the goniometer's velocity
+    is constant through each row. It doesn't slow down when going through trigger points.
+    """
 
     def __init__(self, prefix: str, name: str = "") -> None:
         full_prefix = prefix + "PGS:"
