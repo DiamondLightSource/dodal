@@ -301,7 +301,7 @@ def test_device_factory_can_rename(RE, fake_device_factory_beamline):
     cryo_2 = fake_device_factory_beamline.device_c(name="cryo")
     assert cryo is cryo_2
     assert cryo_2.status.name == "cryo-status"
-    assert cryo_2.temp.name == "cryo-status-temp"
+    assert cryo_2.status.temp.name == "cryo-status-temp"
 
 
 def device_a() -> Readable:
