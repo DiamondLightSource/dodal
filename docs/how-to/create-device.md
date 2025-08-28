@@ -1,32 +1,66 @@
 Creating a new device
 ---------------------
 
-Devices are written using the ophyd-async framework, the hardware abstraction library at Diamond. Before creating your device, you should [consider where the new code should live](../reference/device-standards.rst#where_to_put_devices).
+Devices in dodal use the ophyd-async framework for hardware abstraction at Diamond Light Source. Before starting, [review where your code should live](../reference/device-standards.rst#where_to_put_devices) to avoid duplication and ensure maintainability.
 
 Reusing an existing class
 =========================
 
-When creating a new device, first check if there is a device class that claims to support the device: e.g. all EPICS Motor records should use the [Motor](https://github.com/bluesky/ophyd-async/blob/main/src/ophyd_async/epics/motor.py) type; for reading or monitoring signals from the storage ring the [Synchrotron](https://github.com/DiamondLightSource/dodal/blob/main/src/dodal/devices/synchrotron.py) device should be used; AreaDetectors should use the [StandardDetector](https://github.com/bluesky/ophyd-async/blob/main/src/ophyd_async/core/_detector.py) type- of which there are examples in ophyd_async and in dodal.
+Before creating a new device, always check if a suitable class already exists in dodal or ophyd-async. This helps avoid duplication, ensures maintainability, and leverages tested code.
 
-The module `dodal.devices.motors` defines a series of `Stage`s or groups of motors- a `Stage` represents a physical relationship between motors. For example, an `XYStage` is two perpendicular motors and should not be used for two motors that run parallel to each other (e.g. a coarse motor and a fine adjustment motor in the same axis) or that are unrelated (e.g. attached to different stages with no common frame of reference). Already defined are some relationships with linear and rotational stages. Any device that is a groups of motors only should be additionally defined there, if possible making re-use of the existing classes. Classes that define physical stages but also define additional signals may then extend the `Stage` class outside of the `motors` module for additional behaviour.
+- **Motors:** Use [Motor](https://github.com/bluesky/ophyd-async/blob/main/src/ophyd_async/epics/motor.py) for EPICS motor records.
+- **Storage ring signals:** Use [Synchrotron](https://github.com/DiamondLightSource/dodal/blob/main/src/dodal/devices/synchrotron.py).
+- **AreaDetectors:** Use [StandardDetector](https://github.com/bluesky/ophyd-async/tree/main/src/ophyd_async/epics/adcore) or [adcore](https://github.com/bluesky/ophyd-async/tree/main/src/ophyd_async/epics/adcore).
 
-Device classes that take a list of devices of a type may make use of the ophyd-async `DeviceVector`, and those that use other collections (e.g. a dict of Motors) to set attributes on themselves at runtime should be avoided- these device classes may appear tempting for their genericness and extensibility, but they will be a hindrance when trying to write plans. When writing plans, the device class is all that is available to the IDE, not the instance that you "just know" has specific fields. Making use of type checking and hints should make writing plans and debugging them a much less frustrating experience, while also enabling discoverability of the devices that are in use.
+If a compatible device class exists:
+- Use it and add it to the [beamline](./create-beamline.rst) to avoid re-implementation and share improvements.
+- You can use ophyd-async's [DeviceVector](https://blueskyproject.io/ophyd-async/main/explanations/decisions/0006-procedural-device-definitions.html) to handle a collection of identical devices.   
+- If a device class only differs by PV address, request an alias in the EPICS IOC support module with the relevant controls support team.  
+- If that's not possible (e.g. proprietary support), add configurability to the dodal device class, ensuring defaults match existing patterns and that `dodal connect` still works for current devices.
+- Avoid dynamic attribute assignment (e.g. dicts of motors) as it hinders type checking and plan writing.  
+- Use static attributes and type hints for better IDE support and maintainability.
 
-If there is a compatible device class it should be used- adding it to the [the beamline](./create-beamline.rst)- this prevents reimplementing the device, and allows improvements to be shared. Improving the device to meet your use case is better than starting again.
+Many device classes in `dodal.devices.motors` represent physical relationships between motors, such as `Stage` and `XYStage`.  
 
-If a device class is incompatible due to differences in PV address only, first request that an alias is added to the EPICS support module for the IOC - or request support in making that change. Only if it is not possible to add an alias, for example the support module is proprietary, add configurability to the dodal device class, taking care not to break existing devices- e.g. make new fields have a default that matches the existing pattern, and ensure that `dodal connect` is still able to connect to the device for the existing instances.
+For example, only use `XYStage` for two perpendicular motors (e.g. X and Y axes on a sample table):
+- Do not use `XYStage` for unrelated motors or for motors that move in the same axis (e.g. coarse and fine adjustment).
+- Only a device that represents a group of motors with a physical relationship, should be defined in `motor`.
+- If your class define an `XYStage` but you need extra signals or behaviour, extend the `XYStage` class outside the `motor` module.
 
-If the device class is sufficiently different (or you cannot find a similar device), create a device that connects to the required signals and can be tested for your desired behaviour. During the review process, attempts to bring it closer in line with existing devices may allow to deduplicate some parts, through inheritance or composition of the device from existing components.
-
+**Only if no suitable class exists**, create a new device that connects to the required signals. During review, refactor to align with existing devices if needed, using inheritance or composition to deduplicate code.  
 
 Writing a device class
 ======================
 
-The aim should be to get a new device ready for testing it on the beamline as soon as possible, to ensure fast iteration: write a device against your assumptions of how it should work, write tests against those assumptions then test your assumptions on the beamline. Write issues from beamline testing, to resolve offline to reserve as much time for testing that requires the beamline as possible.
+To develop a new device, get an initial, working version of your code into the main branch as early as possible. Test it at the beamline, then continuously make and merge small changes into main. This approach prevents pull requests from becoming long-standing issues.
 
-Dodal's CLI `dodal connect <beamline>` is a useful way to verify that PV addresses are correct and the signals have the right datatype. You can check a PV's datatype by using the `cainfo <PV address>` command. If the datatype is an enum, `caget -d 31 <PV address>` will also display the available enums that the PV takes. Common enums are defined in `ophyd-async.core` for devices to use, but you can define custom ones when suitable (inheriting from `ophyd_async.core` `StrictEnum`, `SupersetEnum` or `SubsetEnum`). The values should be capitalised e.g `ON = "On"`. If the PV expects upper case for the enum (e.g `ON = "ON"`), please speak to the relevant controls engineer(s) to get this changed if possible. For more infomation, please visit [here](https://blueskyproject.io/ophyd-async/main/explanations/decisions/0008-signal-types.html).
+- **Follow the [ophyd-async device implementation guide](https://blueskyproject.io/ophyd-async/main/tutorials/implementing-devices.html)** to structure your device code.
+- **Choose the right base class** by consulting the [base class guide](https://blueskyproject.io/ophyd-async/main/how-to/choose-right-baseclass.html), If your device needs to move, you'll need to extend the Movable protocol. For detailed guidance on when and how to do this, refer to the [movable device guide](https://blueskyproject.io/ophyd-async/main/explanations/when-to-extend-movable.html). 
+- **Write thorough unit tests** for all expected use cases. Reference the [ophyd-async device test guide](https://blueskyproject.io/ophyd-async/main/tutorials/implementing-devices.html) for best practices.
+- **Validate your device on the beamline** and keep notes of any issues for later fixes.
+- **Make use of type annotations** so that pyright will validate that you are passing around values that ophyd-async will accept.
+- Use `dodal connect <beamline>` to check device connectivity and `cainfo <PV address>` to confirm PVs and datatypes. You can check a PV's datatype by using the `cainfo <PV address>` command. If the datatype is an enum, `caget -d 31 <PV address>` will also display the available enums that the PV takes. Common enums are defined in `ophyd-async.core` for devices to use, but you can define custom ones when suitable (inheriting from `ophyd_async.core` `StrictEnum`, `SupersetEnum` or `SubsetEnum`). The values should be capitalised e.g `ON = "On"`. If the PV expects upper case for the enum (e.g `ON = "ON"`), please speak to the relevant controls engineer(s) to get this changed if possible. For more infomation, please visit [here](https://blueskyproject.io/ophyd-async/main/explanations/decisions/0008-signal-types.html).
 
-If you're not sure how to represent a PV as a Signal: ask! Seek feedback early (e.g. by opening a draft PR) and merge with other devices where it makes sense to. The test suite should provide confidence to do so without breaking existing code.
+**Device best practices for Bluesky plans:**
 
+- Interact with devices in plans only through the Bluesky [messages protocol](https://blueskyproject.io/bluesky/main/msg.html), such as `yield from bps.abs_set(...)` or `yield Msg("set", ...)`.
+- Avoid calling device methods directly inside plans (e.g. `device.do_thing()`), as this breaks the abstraction and can lead to unpredictable behaviour.
 
-.. _ophyd-async: https://blueskyproject.io/ophyd-async/main/how-to/choose-interfaces-for-devices.html
+Example of what **not** to do:
+```python
+class MyDevice(Device):
+    def do_thing(...):
+        ...
+
+def my_plan():
+    yield from bps.set(...)
+    device.do_thing()  # This is bad: do not call device methods directly in plans
+```
+
+**Tip:**
+
+- If you are unsure how to represent a PV as a Signal, seek feedback early (for example, by opening a draft PR).
+- Whenever possible, merge with existing devices—comprehensive tests help ensure changes do not break current functionality.
+- Document any device-specific quirks or limitations for future maintainers.
+
+For further guidance, see the [ophyd-async documentation](https://blueskyproject.io/ophyd-async/main/how-to/choose-interfaces-for-devices.html).
