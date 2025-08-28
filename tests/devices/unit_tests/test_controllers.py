@@ -1,11 +1,15 @@
 from unittest.mock import Mock
 
+import pytest
+
 from dodal.devices.controllers import (
     ConstantDeadTimeController,
 )
 
 
-def test_constant_dead_time_controller_returns_constant():
-    constant_deadtime = 2.4
-    controller = ConstantDeadTimeController(driver=Mock(), deadtime=constant_deadtime)
-    assert controller.get_deadtime(exposure=Mock()) == constant_deadtime
+@pytest.mark.parametrize("exposure", [0.001, 0.01, 0.1, 1, 10, 100])
+def test_constant_dead_time_controller_returns_constant(exposure: float):
+    controller = ConstantDeadTimeController(driver=Mock(), deadtime=0.7)
+    # Check that the exposure value given is ignored and used the configured constant
+    # value instead.
+    assert controller.get_deadtime(exposure) == 0.7
