@@ -1,4 +1,4 @@
-# 6. Handle devices chared between multiple endstations
+# 6. Handle devices shared between multiple endstations
 
 Date: 2025-08-27
 
