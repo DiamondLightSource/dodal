@@ -61,7 +61,7 @@ def zebra_fast_grid_scan() -> ZebraFastGridScanTwoD:
     If this is called when already instantiated in i02-1, it will return the existing object.
     """
     return ZebraFastGridScanTwoD(
-        prefix=f"{PREFIX.beamline_prefix}-MO-SAMP-11:FGS:",
+        prefix=f"{PREFIX.beamline_prefix}-MO-SAMP-11:",
         smargon_prefix="BL02J-MO-STEP-11:",
     )
 

@@ -204,7 +204,6 @@ class FastGridScanCommon(StandardReadable, Flyable, ABC, Generic[ParamType]):
         )  # Number of vertical steps during the first grid scan
         self.x_step_size = epics_signal_rw_rbv(float, f"{prefix}X_STEP_SIZE")
         self.y_step_size = epics_signal_rw_rbv(float, f"{prefix}Y_STEP_SIZE")
-        self.z_step_size = epics_signal_rw_rbv(float, f"{prefix}Z_STEP_SIZE")
         self.x_start = epics_signal_rw_rbv(float, f"{prefix}X_START")
         self.y1_start = epics_signal_rw_rbv(float, f"{prefix}Y_START")
         self.z1_start = epics_signal_rw_rbv(float, f"{prefix}Z_START")

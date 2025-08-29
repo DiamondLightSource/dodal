@@ -1,6 +1,6 @@
 import numpy as np
 from ophyd_async.core import SignalR, derived_signal_r, soft_signal_r_and_setter
-from ophyd_async.epics.core import epics_signal_rw, epics_signal_rw_rbv
+from ophyd_async.epics.core import epics_signal_rw_rbv
 from pydantic import field_validator
 
 from dodal.devices.fast_grid_scan import (
@@ -68,6 +68,4 @@ class ZebraFastGridScanTwoD(FastGridScanCommon[ZebraGridScanParamsTwoD]):
         return MotionProgram(smargon_prefix, has_prog_num=False)
 
     def _create_position_counter(self, prefix: str):
-        return epics_signal_rw(
-            int, f"{prefix}POS_COUNTER", write_pv=f"{prefix}POS_COUNTER_WRITE"
-        )
+        return epics_signal_rw_rbv(int, f"{prefix}POS_COUNTER")
