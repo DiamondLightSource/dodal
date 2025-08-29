@@ -89,8 +89,10 @@ class TetrammController(DetectorController):
     def __init__(
         self,
         driver: TetrammDriver,
+        file_io: NDFileHDFIO,
     ) -> None:
         self.driver = driver
+        self.file_io = file_io
         self._arm_status: AsyncStatus | None = None
 
     def get_deadtime(self, exposure: float | None) -> float:
@@ -227,7 +229,7 @@ class TetrammDetector(StandardDetector):
     ):
         self.driver = TetrammDriver(prefix + drv_suffix)
         self.file_io = NDFileHDFIO(prefix + fileio_suffix)
-        controller = TetrammController(self.driver)
+        controller = TetrammController(self.driver, self.file_io)
 
         writer = ADHDFWriter(
             fileio=self.file_io,
