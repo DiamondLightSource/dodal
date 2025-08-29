@@ -39,7 +39,7 @@ To develop a new device, get an initial, working version of your code into the m
 - **Write thorough unit tests** for all expected use cases. Reference the [ophyd-async device test guide](https://blueskyproject.io/ophyd-async/main/tutorials/implementing-devices.html) for best practices.
 - **Validate your device on the beamline** and keep notes of any issues for later fixes.
 - **Make use of type annotations** so that pyright will validate that you are passing around values that ophyd-async will accept.
-- Use `dodal connect <beamline>` to check device connectivity and `cainfo <PV address>` to confirm PVs and datatypes.
+- Use `dodal connect <beamline>` to check device connectivity and `cainfo <PV address>` to confirm PVs and datatypes. You can check a PV's datatype by using the `cainfo <PV address>` command. If the datatype is an enum, `caget -d 31 <PV address>` will also display the available enums that the PV takes. Common enums are defined in `ophyd-async.core` for devices to use, but you can define custom ones when suitable (inheriting from `ophyd_async.core` `StrictEnum`, `SupersetEnum` or `SubsetEnum`). The values should be capitalised e.g `ON = "On"`. If the PV expects upper case for the enum (e.g `ON = "ON"`), please speak to the relevant controls engineer(s) to get this changed if possible. For more infomation, please visit [here](https://blueskyproject.io/ophyd-async/main/explanations/decisions/0008-signal-types.html).
 
 **Device best practices for Bluesky plans:**
 
