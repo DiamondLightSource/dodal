@@ -1,21 +1,24 @@
 # Plan Standards
 
 > [!NOTE]
-> Plans should not be implemented in dodal (unless very general), but in the specific technique-bluesky repository.
+> This is meant as a collection of guidelines on plan standards using dodal devices.
+> As a general rule, beamline/technique specific plans should not be in dodal.
+
 
 ## Use a list of standard baseline devices
 
 
-Bluesky has a standard preprocesser/plan decorator baseline_decorator that reads from a collection of Readable devices at the start and end of every plan.
+Bluesky has a standard preprocessor/plan decorator [baseline_decorator](https://blueskyproject.io/bluesky/main/generated/bluesky.preprocessors.baseline_decorator.html#bluesky.preprocessors.baseline_decorator) that reads from a collection of Readable devices at the start and end of every plan.
 
 These devices are usually not included in the scan logic (e.g. upstream optical components). They are likely to be consistent across multiple plans, although they may be overridden by explicitly passed arguments.
 
 
 ### Example: besaline devices implementation and use for I22
 
-
+In this example, a set of Readable devices from the optics hutch is defined by injecting all the devices that we want to read at the start of the plan, while not being used directly in the plan logic.
 
 ```python
+# In sas_bluesky/baseline.py
 from bluesky.protocols import Readable
 from dodal.common import inject
 
@@ -34,6 +37,8 @@ DEFAULT_BASELINE_MEASUREMENTS: set[Readable] = {
     inject("synchrotron"),
 }
 ```
+
+This set of devices is passed to the `baseline_decorator` which decorates the `inner_plan`. This decorator will record a reading from all devices once the `open_run` document is emitted.
 
 ```python
 from typing import Any
