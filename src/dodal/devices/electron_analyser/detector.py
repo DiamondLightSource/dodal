@@ -40,7 +40,7 @@ class ElectronAnalyserRegionDetector(
         self._driver_ref = Reference(driver)
         self.controller = controller
         self.region = region
-        super().__init__(controller, name)
+        super().__init__(self.driver, name)
 
     @property
     def driver(self) -> TAbstractAnalyserDriverIO:
@@ -85,7 +85,7 @@ class ElectronAnalyserDetector(
         self._driver = driver
         self._sequence_class = sequence_class
         self.controller = ConstantDeadTimeController(driver, 0)
-        super().__init__(self.controller, name)
+        super().__init__(self.driver, name)
 
     @property
     def driver(self) -> TAbstractAnalyserDriverIO:

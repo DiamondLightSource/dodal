@@ -7,7 +7,6 @@ from ophyd_async.core import (
     AsyncConfigurable,
     AsyncReadable,
     AsyncStatus,
-    DetectorController,
     Device,
 )
 
@@ -35,10 +34,10 @@ class AbstractElectronAnalyserDetector(
 
     def __init__(
         self,
-        controller: DetectorController,
+        driver: TAbstractAnalyserDriverIO,
         name: str = "",
     ):
-        self.controller = controller
+        self.controller = ConstantDeadTimeController(driver, 0)
         super().__init__(name)
 
     @AsyncStatus.wrap
