@@ -21,6 +21,7 @@
    dodal.devices.bimorph_mirror
    dodal.devices.collimation_table
    dodal.devices.common_dcm
+   dodal.devices.controllers
    dodal.devices.cryostream
    dodal.devices.current_amplifiers
    dodal.devices.detector

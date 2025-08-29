@@ -7,15 +7,6 @@ dodal.devices.b16.detector
 
 
 
-.. currentmodule:: dodal.devices.b16
-.. rubric:: Classes
-
-.. autosummary::
-   :toctree:
-   :recursive:
-
-   ~detector.ConstantDeadTimeController
-
 
 
 

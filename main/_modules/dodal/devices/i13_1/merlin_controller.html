@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.i13_1.merlin_controller &#8212; dodal 1.55.2.dev22+gef42c4ce3 documentation</title>
+    <title>dodal.devices.i13_1.merlin_controller &#8212; dodal 1.55.2.dev23+g117d9486e documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=11b44521"></script>
+    <script src="../../../../_static/documentation_options.js?v=53e38781"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -460,17 +460,18 @@ window.addEventListener("load", () => mermaid.run());
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.adcore</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">DEFAULT_GOOD_STATES</span><span class="p">,</span>
-    <span class="n">ADBaseController</span><span class="p">,</span>
     <span class="n">ADBaseIO</span><span class="p">,</span>
     <span class="n">ADImageMode</span><span class="p">,</span>
     <span class="n">ADState</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">stop_busy_record</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.controllers</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConstantDeadTimeController</span>
+
 
 <div class="viewcode-block" id="MerlinController">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i13_1.merlin_controller.MerlinController.html#dodal.devices.i13_1.merlin_controller.MerlinController">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">MerlinController</span><span class="p">(</span><span class="n">ADBaseController</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MerlinController</span><span class="p">(</span><span class="n">ConstantDeadTimeController</span><span class="p">):</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">driver</span><span class="p">:</span> <span class="n">ADBaseIO</span><span class="p">,</span>
@@ -483,8 +484,7 @@ window.addEventListener("load", () => mermaid.run());
         <span class="k">for</span> <span class="n">drv_child</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">children</span><span class="p">():</span>
             <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">drv_child</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">get_deadtime</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exposure</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-        <span class="k">return</span> <span class="mf">0.002</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">driver</span><span class="p">,</span> <span class="mf">0.002</span><span class="p">)</span>
 
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">prepare</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trigger_info</span><span class="p">:</span> <span class="n">TriggerInfo</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">frame_timeout</span> <span class="o">=</span> <span class="p">(</span>

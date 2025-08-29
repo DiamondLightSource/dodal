@@ -17,8 +17,6 @@ dodal.devices.i13\_1.merlin\_controller.MerlinController
       ~MerlinController.disarm
       
       
-      ~MerlinController.get_deadtime
-      
       
       ~MerlinController.prepare
       
