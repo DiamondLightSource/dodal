@@ -70,9 +70,7 @@ def smargon() -> Smargon:
     """Get the i04 Smargon device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
     """
-    return Smargon(
-        f"{PREFIX.beamline_prefix}-MO-SGON-01:",
-    )
+    return Smargon(f"{PREFIX.beamline_prefix}-MO-SGON-01:")
 
 
 @device_factory()
@@ -91,9 +89,7 @@ def sample_delivery_system() -> XYZStage:
     """Get the i04 sample_delivery_system device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
     """
-    return XYZStage(
-        f"{PREFIX.beamline_prefix}-MO-SDE-01:",
-    )
+    return XYZStage(f"{PREFIX.beamline_prefix}-MO-SDE-01:")
 
 
 @device_factory()
@@ -101,9 +97,7 @@ def ipin() -> IPin:
     """Get the i04 ipin device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
     """
-    return IPin(
-        f"{PREFIX.beamline_prefix}-EA-PIN-01:",
-    )
+    return IPin(f"{PREFIX.beamline_prefix}-EA-PIN-01:")
 
 
 @device_factory()
@@ -122,9 +116,7 @@ def sample_shutter() -> ZebraShutter:
     """Get the i04 sample shutter device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
     """
-    return ZebraShutter(
-        f"{PREFIX.beamline_prefix}-EA-SHTR-01:",
-    )
+    return ZebraShutter(f"{PREFIX.beamline_prefix}-EA-SHTR-01:")
 
 
 @device_factory()
@@ -143,9 +135,7 @@ def transfocator() -> Transfocator:
     """Get the i04 transfocator device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
     """
-    return Transfocator(
-        f"{PREFIX.beamline_prefix}-MO-FSWT-01:",
-    )
+    return Transfocator(f"{PREFIX.beamline_prefix}-MO-FSWT-01:")
 
 
 @device_factory()
@@ -153,9 +143,7 @@ def xbpm_feedback() -> XBPMFeedback:
     """Get the i04 xbpm_feedback device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
     """
-    return XBPMFeedback(
-        PREFIX.beamline_prefix,
-    )
+    return XBPMFeedback(f"{PREFIX.beamline_prefix}-EA-FDBK-01:")
 
 
 @device_factory()
@@ -171,9 +159,7 @@ def dcm() -> DCM:
     """Get the i04 DCM device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
     """
-    return DCM(
-        f"{PREFIX.beamline_prefix}-MO-DCM-01:",
-    )
+    return DCM(f"{PREFIX.beamline_prefix}-MO-DCM-01:")
 
 
 @device_factory()
@@ -181,9 +167,7 @@ def backlight() -> Backlight:
     """Get the i04 backlight device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
     """
-    return Backlight(
-        PREFIX.beamline_prefix,
-    )
+    return Backlight(PREFIX.beamline_prefix)
 
 
 @device_factory()
@@ -194,7 +178,8 @@ def aperture_scatterguard() -> ApertureScatterguard:
     """
     params = get_beamline_parameters()
     return ApertureScatterguard(
-        prefix=PREFIX.beamline_prefix,
+        aperture_prefix=f"{PREFIX.beamline_prefix}-MO-MAPT-01:",
+        scatterguard_prefix=f"{PREFIX.beamline_prefix}-MO-SCAT-01:",
         loaded_positions=load_positions_from_beamline_parameters(params),
         tolerances=AperturePosition.tolerances_from_gda_params(params),
     )
@@ -226,9 +211,7 @@ def zebra_fast_grid_scan() -> ZebraFastGridScan:
     """Get the i04 zebra_fast_grid_scan device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
     """
-    return ZebraFastGridScan(
-        prefix=f"{PREFIX.beamline_prefix}-MO-SGON-01:",
-    )
+    return ZebraFastGridScan(f"{PREFIX.beamline_prefix}-MO-SGON-01:")
 
 
 @device_factory()
@@ -304,7 +287,8 @@ def detector_motion() -> DetectorMotion:
     If this is called when already instantiated in i04, it will return the existing object.
     """
     return DetectorMotion(
-        prefix=PREFIX.beamline_prefix,
+        device_prefix=f"{PREFIX.beamline_prefix}-MO-DET-01:",
+        pmac_prefix=f"{PREFIX.beamline_prefix}-MO-PMAC-02:",
     )
 
 
@@ -313,9 +297,7 @@ def thawer() -> Thawer:
     """Get the i04 thawer, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
     """
-    return Thawer(
-        f"{PREFIX.beamline_prefix}-EA-THAW-01",
-    )
+    return Thawer(f"{PREFIX.beamline_prefix}-EA-THAW-01")
 
 
 @device_factory()
@@ -323,9 +305,7 @@ def robot() -> BartRobot:
     """Get the i04 robot device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
     """
-    return BartRobot(
-        f"{PREFIX.beamline_prefix}-MO-ROBOT-01:",
-    )
+    return BartRobot(f"{PREFIX.beamline_prefix}-MO-ROBOT-01:")
 
 
 @device_factory()
@@ -376,6 +356,4 @@ def pin_tip_detection() -> PinTipDetection:
     """Get the i04 pin tip detection device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
     """
-    return PinTipDetection(
-        f"{PREFIX.beamline_prefix}-DI-OAV-01:",
-    )
+    return PinTipDetection(f"{PREFIX.beamline_prefix}-DI-OAV-01:")

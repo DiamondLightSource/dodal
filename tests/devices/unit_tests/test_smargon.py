@@ -14,7 +14,7 @@ from dodal.devices.util.test_utils import patch_all_motors
 @pytest.fixture
 async def smargon() -> AsyncGenerator[Smargon]:
     async with init_devices(mock=True):
-        smargon = Smargon(name="smargon")
+        smargon = Smargon("")
     with patch_all_motors(smargon):
         yield smargon
 

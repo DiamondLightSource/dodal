@@ -163,13 +163,14 @@ class ApertureScatterguard(StandardReadable, Preparable):
 
     def __init__(
         self,
+        aperture_prefix: str,
+        scatterguard_prefix: str,
         loaded_positions: dict[ApertureValue, AperturePosition],
         tolerances: AperturePosition,
-        prefix: str = "",
         name: str = "",
     ) -> None:
-        self.aperture = Aperture(prefix + "-MO-MAPT-01:")
-        self.scatterguard = XYStage(prefix + "-MO-SCAT-01:")
+        self.aperture = Aperture(aperture_prefix)
+        self.scatterguard = XYStage(scatterguard_prefix)
         self._loaded_positions = loaded_positions
         self._tolerances = tolerances
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):

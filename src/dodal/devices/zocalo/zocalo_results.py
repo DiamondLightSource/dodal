@@ -100,44 +100,47 @@ def source_from_results(results):
 
 class ZocaloResults(StandardReadable, Triggerable):
     """An ophyd device which can wait for results from a Zocalo job. These jobs should
-    be triggered from a plan-subscribed callback using the run_start() and run_end()
-    methods on dodal.devices.zocalo.ZocaloTrigger.
+        be triggered from a plan-subscribed callback using the run_start() and run_end()
+        methods on dodal.devices.zocalo.ZocaloTrigger.
 
-    See https://diamondlightsource.github.io/dodal/main/how-to/zocalo.html
+        See https://diamondlightsource.github.io/dodal/main/how-to/zocalo.html
 
-    Args:
-        name (str): Name of the device
+        Args:
+            name (str): Name of the device
 
-        zocalo_environment (str): How zocalo is configured. Defaults to i03's development configuration
+            zocalo_environment (str): How zocalo is configured. Defaults to i03's development configuration
 
-        channel (str): Name for the results Queue
+            channel (str): Name for the results Queue
 
-        sort_key (str): How results are ranked. Defaults to sorting by highest counts
+            sort_key (str): How results are ranked. Defaults to sorting by highest counts
 
-        timeout_s (float): Maximum time to wait for the Queue to be filled by an object, starting
-        from when the ZocaloResults device is triggered
+            timeout_s (float): Maximum time to wait for the Queue to be filled by an object, starting
+            from when the ZocaloResults device is triggered
 
-        prefix (str): EPICS PV prefix for the device
+    <<<<<<< HEAD
+            use_gpu (bool): When True, ZocaloResults will take the first set of
+            results that it receives (which are likely the GPU results)
+    =======
+            prefix (str): EPICS PV prefix for the device
 
-        results_source (ZocaloSource): Where to get results from, GPU or CPU analysis
+            results_source (ZocaloSource): Where to get results from, GPU or CPU analysis
+    >>>>>>> main
 
     """
 
     def __init__(
         self,
-        name: str = "zocalo",
+        name: str = "",
         zocalo_environment: str = ZOCALO_ENV,
         channel: str = "xrc.i03",
         sort_key: str = DEFAULT_SORT_KEY.value,
         timeout_s: float = DEFAULT_TIMEOUT,
-        prefix: str = "",
         results_source: ZocaloSource = ZocaloSource.CPU,
     ) -> None:
         self.zocalo_environment = zocalo_environment
         self.sort_key = SortKeys[sort_key]
         self.channel = channel
         self.timeout_s = timeout_s
-        self._prefix = prefix
         self._raw_results_received: Queue = Queue()
         self.transport: CommonTransport | None = None
         self.results_source = results_source
