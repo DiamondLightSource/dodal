@@ -1,6 +1,10 @@
 (using-pytest)=
 
-# Using VSCode
+# Running tests
+
+Tests can be ran locally via command line or VSCode IDE.
+
+## With VSCode
 
 When using the VSCode IDE, it should automatically detect all of your tests and display one of the following icons next to each of them:
 - Grey circle (not run yet)
@@ -15,7 +19,9 @@ To view all tests inside dodal, use the `Test Explorer` panel (flask icon) in VS
 
 If you find that your tests are being skipped or not recognised by `pytest`, check for any syntax errors as this will block the tests being found. You can also check to see if there is an error output at the very bottom of the `Test Explorer` panel. This is usually caused by invalid syntax in your test file, or by circular dependencies in the code you are testing.
 
-## Run the tests using pytest
+## Command line
+
+### Unit tests
 
 `pytest` will find functions in the project that [look like tests][look like tests], and run them to check for errors. 
 
@@ -25,12 +31,12 @@ When you have some fully working tests then you can run it with coverage:
 $ tox -e tests
 ```
 
-It will also report coverage to the commandline and to `cov.xml` and show the 
+It will also report coverage to the command line and to `cov.xml`.
 
 [look like tests]: https://docs.pytest.org/explanation/goodpractices.html#test-discovery
 [pytest]: https://pytest.org/
 
-## Run the system tests locally
+### System tests locally
 
 The system tests require the ``example-services`` project:
 
