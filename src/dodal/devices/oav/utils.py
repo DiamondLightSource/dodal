@@ -12,6 +12,7 @@ from dodal.devices.oav.oav_calculations import (
 from dodal.devices.oav.oav_detector import OAV
 from dodal.devices.oav.pin_image_recognition import PinTipDetection
 from dodal.devices.smargon import Smargon
+from dodal.devices.aithre_lasershaping.goniometer import Goniometer
 
 Pixel = tuple[int, int]
 
@@ -65,6 +66,36 @@ def get_move_required_so_that_beam_is_at_pixel(
         dtype=np.float64,
     )
     current_angle = yield from bps.rd(smargon.omega)
+
+    beam_x = yield from bps.rd(oav.beam_centre_i)
+    beam_y = yield from bps.rd(oav.beam_centre_j)
+    microns_per_pixel_x = yield from bps.rd(oav.microns_per_pixel_x)
+    microns_per_pixel_y = yield from bps.rd(oav.microns_per_pixel_y)
+
+    return calculate_x_y_z_of_pixel(
+        current_motor_xyz,
+        current_angle,
+        pixel,
+        (beam_x, beam_y),
+        (microns_per_pixel_x, microns_per_pixel_y),
+    )
+
+def get_move_required_so_that_beam_is_at_pixel_non_smargon(
+    goniometer: Goniometer, pixel: Pixel, oav: OAV
+) -> Generator[Msg, None, np.ndarray]:
+    """Calculate the required move so that the given pixel is in the centre of the beam.
+    This is a version of the function for non-smargon goniometers.
+    """
+
+    current_motor_xyz = np.array(
+        [
+            (yield from bps.rd(goniometer.x)),
+            (yield from bps.rd(goniometer.y)),
+            (yield from bps.rd(goniometer.z)),
+        ],
+        dtype=np.float64,
+    )
+    current_angle = yield from bps.rd(goniometer.omega)
 
     beam_x = yield from bps.rd(oav.beam_centre_i)
     beam_y = yield from bps.rd(oav.beam_centre_j)
