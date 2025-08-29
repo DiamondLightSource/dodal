@@ -1,11 +1,12 @@
 from collections import defaultdict
+from logging import getLogger
 from unittest.mock import AsyncMock
 
 import bluesky.plan_stubs as bps
 import pytest
 from bluesky.plans import scan
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import init_devices
+from ophyd_async.core import FlyMotorInfo, init_devices
 from ophyd_async.testing import (
     assert_emitted,
     assert_reading,
@@ -18,11 +19,26 @@ from ophyd_async.testing import (
 from dodal.devices.apple2_undulator import (
     DEFAULT_MOTOR_MIN_TIMEOUT,
     Apple2PhasesVal,
+    MotorWithoutStop,
     UndulatorGap,
     UndulatorGateStatus,
     UndulatorJawPhase,
     UndulatorPhaseAxes,
 )
+
+
+@pytest.fixture(scope="function")
+def logger(caplog: pytest.LogCaptureFixture):
+    logger = getLogger()
+    _ = [logger.removeHandler(h) for h in logger.handlers if h != caplog.handler]  # type: ignore
+    return logger
+
+
+@pytest.fixture
+async def unstoppable_motor():
+    async with init_devices(mock=True):
+        unstoppable_motor = MotorWithoutStop(prefix="MOTOR:", name="unstopable_motor")
+    return unstoppable_motor
 
 
 @pytest.fixture
@@ -34,6 +50,10 @@ async def mock_id_gap(prefix: str = "BLXX-EA-DET-007:") -> UndulatorGap:
     set_mock_value(mock_id_gap.velocity, 1)
     set_mock_value(mock_id_gap.user_readback, 1)
     set_mock_value(mock_id_gap.user_setpoint, "1")
+    set_mock_value(mock_id_gap.high_limit_travel, 210)
+    set_mock_value(mock_id_gap.low_limit_travel, 20)
+    set_mock_value(mock_id_gap.max_velocity, 20)
+    set_mock_value(mock_id_gap.min_velocity, 0.1)
     set_mock_value(mock_id_gap.fault, 0)
     return mock_id_gap
 
@@ -95,6 +115,13 @@ async def test_in_motion_error(
     set_mock_value(mock_jaw_phase.gate, UndulatorGateStatus.OPEN)
     with pytest.raises(RuntimeError):
         await mock_jaw_phase.set(2)
+
+
+async def test_unstoppable_motor_stop_not_implemented(
+    unstoppable_motor: MotorWithoutStop, caplog
+):
+    await unstoppable_motor.stop()
+    assert caplog.records[0].msg == "Stopping unstopable_motor is not supported."
 
 
 @pytest.mark.parametrize(
@@ -163,7 +190,28 @@ async def test_gap_success_scan(mock_id_gap: UndulatorGap, RE: RunEngine):
     RE(scan([mock_id_gap], mock_id_gap, 0, 10, 11), capture_emitted)
     assert_emitted(docs, start=1, descriptor=1, event=11, stop=1)
     for i in output:
-        assert docs["event"][i]["data"]["mock_id_gap-user_readback"] == i
+        assert docs["event"][i]["data"]["mock_id_gap"] == i
+
+
+async def test_gap_prepare_velocity_min_limit_error(mock_id_gap: UndulatorGap):
+    set_mock_value(mock_id_gap.max_velocity, 20)
+    set_mock_value(mock_id_gap.min_velocity, 11)
+    with pytest.raises(ValueError):
+        fly_info = FlyMotorInfo(start_position=25, end_position=35, time_for_move=1)
+        await mock_id_gap.prepare(fly_info)
+
+
+async def test_gap_prepare_success(mock_id_gap: UndulatorGap):
+    set_mock_value(mock_id_gap.max_velocity, 30)
+    set_mock_value(mock_id_gap.min_velocity, 1)
+    set_mock_value(mock_id_gap.acceleration_time, 0.5)
+    fly_info = FlyMotorInfo(start_position=25, end_position=35, time_for_move=1)
+    await mock_id_gap.prepare(fly_info)
+    get_mock_put(mock_id_gap.user_setpoint).assert_awaited_once_with(
+        str(fly_info.ramp_up_start_pos(0.5)), wait=True
+    )
+
+    assert await mock_id_gap.velocity.get_value() == 10
 
 
 async def test_given_gate_never_closes_then_setting_phases_times_out(
@@ -290,10 +338,10 @@ async def test_phase_success_set(mock_phaseAxes: UndulatorPhaseAxes, RE: RunEngi
     await assert_reading(
         mock_phaseAxes,
         {
-            "mock_phaseAxes-top_inner-user_readback": partial_reading(3),
-            "mock_phaseAxes-top_outer-user_readback": partial_reading(2),
-            "mock_phaseAxes-btm_inner-user_readback": partial_reading(5),
-            "mock_phaseAxes-btm_outer-user_readback": partial_reading(7),
+            "mock_phaseAxes-top_inner": partial_reading(3),
+            "mock_phaseAxes-top_outer": partial_reading(2),
+            "mock_phaseAxes-btm_inner": partial_reading(5),
+            "mock_phaseAxes-btm_outer": partial_reading(7),
         },
     )
 
@@ -366,4 +414,4 @@ async def test_jaw_phase_success_scan(mock_jaw_phase: UndulatorJawPhase, RE: Run
     RE(scan([mock_jaw_phase], mock_jaw_phase, 0, 10, 11), capture_emitted)
     assert_emitted(docs, start=1, descriptor=1, event=11, stop=1)
     for i in output:
-        assert docs["event"][i]["data"]["mock_jaw_phase-jaw_phase-user_readback"] == i
+        assert docs["event"][i]["data"]["mock_jaw_phase-jaw_phase"] == i
