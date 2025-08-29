@@ -1,5 +1,3 @@
-import os
-
 from dodal.devices.electron_analyser.specs import (
     SpecsAnalyserDriverIO,
     SpecsDetector,
@@ -10,11 +8,10 @@ from dodal.devices.electron_analyser.vgscienta import (
     VGScientaDetector,
     VGScientaSequence,
 )
-
-TEST_DATA_PATH = "tests/test_data/electron_analyser/"
-
-TEST_VGSCIENTA_SEQUENCE = os.path.join(TEST_DATA_PATH, "vgscienta_sequence.seq")
-TEST_SPECS_SEQUENCE = os.path.join(TEST_DATA_PATH, "specs_sequence.seq")
+from tests.devices.unit_tests.electron_analyser.test_data import (
+    TEST_SPECS_SEQUENCE,
+    TEST_VGSCIENTA_SEQUENCE,
+)
 
 TEST_SEQUENCES = {
     VGScientaSequence: TEST_VGSCIENTA_SEQUENCE,

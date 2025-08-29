@@ -1,8 +1,11 @@
+from unittest.mock import AsyncMock, patch
+
 import pytest
 from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
 from bluesky.utils import FailedStatus
 from ophyd_async.core import SignalR, StrictEnum, init_devices
+from ophyd_async.epics.adcore import ADImageMode
 
 from dodal.devices import b07, i09
 from dodal.devices.electron_analyser.abstract import (
@@ -50,13 +53,6 @@ def test_analyser_correctly_selects_energy_source_from_region_input(
     assert energy_source == sim_driver.energy_sources[source_alias_name]
 
 
-def test_analyser_raise_error_on_invalid_energy_source_selected(
-    sim_driver: AbstractAnalyserDriverIO,
-) -> None:
-    with pytest.raises(KeyError):
-        sim_driver._get_energy_source("invalid_name")
-
-
 def test_driver_throws_error_with_wrong_lens_mode(
     sim_driver: AbstractAnalyserDriverIO,
     RE: RunEngine,
@@ -94,3 +90,18 @@ def test_driver_throws_error_with_wrong_psu_mode(
     psu_datatype_name = psu_datatype.__name__ if psu_datatype is not None else ""
     with pytest.raises(FailedStatus, match=f"is not a valid {psu_datatype_name}"):
         RE(bps.mv(sim_driver.psu_mode, PsuModeTestEnum.TEST_1))
+
+
+@pytest.mark.asyncio
+async def test_stage_sets_image_mode_and_calls_super(
+    sim_driver: AbstractAnalyserDriverIO,
+    RE: RunEngine,
+):
+    # Patch image_mode.set and super().stage
+    with patch.object(
+        AbstractAnalyserDriverIO.__bases__[1], "stage", new=AsyncMock()
+    ) as super_stage:
+        sim_driver.image_mode.set = AsyncMock()
+        await sim_driver.stage()
+        sim_driver.image_mode.set.assert_awaited_once_with(ADImageMode.SINGLE)
+        super_stage.assert_awaited_once()

@@ -11,6 +11,11 @@ from dodal.plan_stubs.check_topup import (
     check_topup_and_wait_if_necessary,
     wait_for_topup_complete,
 )
+from tests.plan_stubs.test_data import (
+    TEST_TOPUP_LONG_DELAY_TXT,
+    TEST_TOPUP_SHORT_PARAMS_TXT,
+)
+from tests.test_data import TEST_BEAMLINE_PARAMETERS_TXT
 
 
 @pytest.fixture
@@ -101,25 +106,25 @@ def test_no_waiting_when_mode_does_not_allow_gating(
     "expected_wait, parameter_file",
     # limit = 120, delay = 1
     [
-        (100, 108, 121, 1, 0, "test_beamline_parameters.txt"),
-        (100, 108, 119, 1, 108 + 1, "test_beamline_parameters.txt"),
-        (110, 120, 120, 1, 0, "test_beamline_parameters.txt"),
-        (110.1, 120, 119.99, 1, 120 + 1, "test_beamline_parameters.txt"),
+        (100, 108, 121, 1, 0, TEST_BEAMLINE_PARAMETERS_TXT),
+        (100, 108, 119, 1, 108 + 1, TEST_BEAMLINE_PARAMETERS_TXT),
+        (110, 120, 120, 1, 0, TEST_BEAMLINE_PARAMETERS_TXT),
+        (110.1, 120, 119.99, 1, 120 + 1, TEST_BEAMLINE_PARAMETERS_TXT),
         # limit = 35, delay = 1
-        (110.1, 120, 36, 1, 0, "topup_short_params.txt"),
-        (36, 42, 36, 1, 0, "topup_short_params.txt"),
-        (36, 42, 34, 4, 42 + 1, "topup_short_params.txt"),
-        (36, 42, 34, 2, 0, "topup_short_params.txt"),
-        (36, 42, 35, 3, 0, "topup_short_params.txt"),
-        (31.1, 39, 31, 1, 39 + 1, "topup_short_params.txt"),
-        (30.1, 38, 31, 1, 38 + 1, "topup_short_params.txt"),
+        (110.1, 120, 36, 1, 0, TEST_TOPUP_SHORT_PARAMS_TXT),
+        (36, 42, 36, 1, 0, TEST_TOPUP_SHORT_PARAMS_TXT),
+        (36, 42, 34, 4, 42 + 1, TEST_TOPUP_SHORT_PARAMS_TXT),
+        (36, 42, 34, 2, 0, TEST_TOPUP_SHORT_PARAMS_TXT),
+        (36, 42, 35, 3, 0, TEST_TOPUP_SHORT_PARAMS_TXT),
+        (31.1, 39, 31, 1, 39 + 1, TEST_TOPUP_SHORT_PARAMS_TXT),
+        (30.1, 38, 31, 1, 38 + 1, TEST_TOPUP_SHORT_PARAMS_TXT),
         # limit = 30, delay = 19
-        (30, 40, 29, 1, 0, "topup_long_delay.txt"),
-        (29, 39, 29, 1, 39 + 19, "topup_long_delay.txt"),
-        (29, 39, 28, 1, 0, "topup_long_delay.txt"),
-        (29, 39, 28, 2, 39 + 19, "topup_long_delay.txt"),
-        (29, 39, 27, 2, 0, "topup_long_delay.txt"),
-        (29, 39, 35, 1, 0, "topup_long_delay.txt"),
+        (30, 40, 29, 1, 0, TEST_TOPUP_LONG_DELAY_TXT),
+        (29, 39, 29, 1, 39 + 19, TEST_TOPUP_LONG_DELAY_TXT),
+        (29, 39, 28, 1, 0, TEST_TOPUP_LONG_DELAY_TXT),
+        (29, 39, 28, 2, 39 + 19, TEST_TOPUP_LONG_DELAY_TXT),
+        (29, 39, 27, 2, 0, TEST_TOPUP_LONG_DELAY_TXT),
+        (29, 39, 35, 1, 0, TEST_TOPUP_LONG_DELAY_TXT),
     ],
 )
 @patch("dodal.plan_stubs.check_topup.bps.sleep")
@@ -140,7 +145,7 @@ def test_topup_not_allowed_when_exceeds_threshold_percentage_of_topup_time(
 
     with patch(
         "dodal.common.beamlines.beamline_parameters.BEAMLINE_PARAMETER_PATHS",
-        {"i03": f"tests/test_data/{parameter_file}"},
+        {"i03": parameter_file},
     ):
         RE(
             check_topup_and_wait_if_necessary(

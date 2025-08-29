@@ -1,8 +1,7 @@
-import asyncio
 from abc import abstractmethod
 from typing import Generic
 
-from bluesky.protocols import Reading, Stageable, Triggerable
+from bluesky.protocols import Reading, Triggerable
 from event_model import DataKey
 from ophyd_async.core import (
     AsyncConfigurable,
@@ -10,24 +9,15 @@ from ophyd_async.core import (
     AsyncStatus,
     Device,
 )
-from ophyd_async.epics.adcore import (
-    ADBaseController,
-)
 
+from dodal.devices.controllers import ConstantDeadTimeController
 from dodal.devices.electron_analyser.abstract.base_driver_io import (
-    AbstractAnalyserDriverIO,
     TAbstractAnalyserDriverIO,
 )
 
 
-class ElectronAnalyserController(ADBaseController[AbstractAnalyserDriverIO]):
-    def get_deadtime(self, exposure: float | None) -> float:
-        return 0
-
-
 class AbstractElectronAnalyserDetector(
     Device,
-    Stageable,
     Triggerable,
     AsyncReadable,
     AsyncConfigurable,
@@ -47,25 +37,13 @@ class AbstractElectronAnalyserDetector(
         driver: TAbstractAnalyserDriverIO,
         name: str = "",
     ):
-        self.controller: ElectronAnalyserController = ElectronAnalyserController(
-            driver=driver
-        )
+        self.controller = ConstantDeadTimeController(driver, 0)
         super().__init__(name)
 
     @AsyncStatus.wrap
     async def trigger(self) -> None:
         await self.controller.arm()
         await self.controller.wait_for_idle()
-
-    @AsyncStatus.wrap
-    async def stage(self) -> None:
-        """Make sure the detector is idle and ready to be used."""
-        await asyncio.gather(self.controller.disarm())
-
-    @AsyncStatus.wrap
-    async def unstage(self) -> None:
-        """Disarm the detector."""
-        await asyncio.gather(self.controller.disarm())
 
     async def read(self) -> dict[str, Reading]:
         return await self.driver.read()

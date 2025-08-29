@@ -1,7 +1,8 @@
 import asyncio
+from enum import IntEnum
 from typing import Generic, TypeVar
 
-from bluesky.protocols import HasName, Movable
+from bluesky.protocols import Movable
 from ophyd_async.core import (
     AsyncStatus,
     DeviceVector,
@@ -40,9 +41,9 @@ class FastValveControlRequest(StrictEnum):
     DISARM = "Disarm"
 
 
-class ValveOpenSeqRequest(StrictEnum):
-    INACTIVE = "0"
-    OPEN_SEQ = "1"
+class ValveOpenSeqRequest(IntEnum):
+    INACTIVE = 0
+    OPEN_SEQ = 1
 
 
 class PumpMotorDirectionState(StrictEnum):
@@ -90,9 +91,9 @@ class ValveControl(
     @AsyncStatus.wrap
     async def set(self, value: TValveControlRequest):
         if value.value == "Open":
-            await self.open.set(ValveOpenSeqRequest.OPEN_SEQ.value)
+            await self.open.set(ValveOpenSeqRequest.OPEN_SEQ)
             await asyncio.sleep(OPENSEQ_PULSE_LENGTH)
-            await self.open.set(ValveOpenSeqRequest.INACTIVE.value)
+            await self.open.set(ValveOpenSeqRequest.INACTIVE)
         else:
             await self.control.set(value)
 
@@ -200,25 +201,27 @@ class PressureTransducer(StandardReadable):
         super().__init__(name)
 
 
-class PressureJumpCellController(HasName):
+class PressureJumpCellController(StandardReadable):
+    """
+    Top-level control for a fixed pressure or pressure jumps.
+    """
+
     def __init__(self, prefix: str, name: str = "") -> None:
-        self.stop = epics_signal_rw(StopState, f"{prefix}STOP")
+        with self.add_children_as_readables():
+            self.stop = epics_signal_rw(StopState, f"{prefix}STOP")
 
-        self.target_pressure = epics_signal_rw(float, f"{prefix}TARGET")
-        self.timeout = epics_signal_rw(float, f"{prefix}TIMER.HIGH")
-        self.go = epics_signal_rw(bool, f"{prefix}GO")
+            self.target_pressure = epics_signal_rw(float, f"{prefix}TARGET")
+            self.timeout = epics_signal_rw(float, f"{prefix}TIMER.HIGH")
+            self.go = epics_signal_rw(bool, f"{prefix}GO")
 
-        ## Jump logic ##
-        self.start_pressure = epics_signal_rw(float, f"{prefix}JUMPF")
-        self.target_pressure = epics_signal_rw(float, f"{prefix}JUMPT")
-        self.jump_ready = epics_signal_rw(bool, f"{prefix}SETJUMP")
+            self.from_pressure = epics_signal_rw(float, f"{prefix}JUMPF")
+            self.to_pressure = epics_signal_rw(float, f"{prefix}JUMPT")
+            self.jump_ready = epics_signal_rw(bool, f"{prefix}SETJUMP")
 
-        self._name = name
-        super().__init__()
+            self.result = epics_signal_r(str, f"{prefix}RESULT")
 
-    @property
-    def name(self):
-        return self._name
+            self._name = name
+        super().__init__(name)
 
 
 class PressureJumpCell(StandardReadable):
