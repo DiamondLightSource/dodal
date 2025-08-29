@@ -12,7 +12,7 @@ Bluesky has a standard preprocessor/plan decorator [baseline_decorator](https://
 
 
 
-### Example: besaline devices implementation and use for I22
+### Example: baseline devices implementation and use for I22
 
 In this example, a set of Readable devices from the optics hutch is defined by injecting all the devices that we want to read at the start and end of the plan, while not being used directly in the plan logic.
 
