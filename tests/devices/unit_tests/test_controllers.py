@@ -9,7 +9,8 @@ from dodal.devices.controllers import (
 
 @pytest.mark.parametrize("exposure", [0.001, 0.01, 0.1, 1, 10, 100])
 def test_constant_dead_time_controller_returns_constant(exposure: float):
-    controller = ConstantDeadTimeController(driver=Mock(), deadtime=0.7)
+    deadtime = 0.7
+    controller = ConstantDeadTimeController(driver=Mock(), deadtime=deadtime)
     # Check that the exposure value given is ignored and used the configured constant
     # value instead.
-    assert controller.get_deadtime(exposure) == 0.7
+    assert controller.get_deadtime(exposure) == deadtime
