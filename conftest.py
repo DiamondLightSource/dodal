@@ -124,7 +124,7 @@ def failed_status(failure: Exception) -> Status:
     return status
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 async def RE():
     RE = RunEngine()
     # make sure the event loop is thoroughly up and running before we try to create
