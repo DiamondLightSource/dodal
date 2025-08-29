@@ -295,13 +295,13 @@ def test_connect_immediately_passed_to_device_factory(
 
 def test_device_factory_can_rename(RE, fake_device_factory_beamline):
     cryo = fake_device_factory_beamline.device_c(mock=True, connect_immediately=True)
-    assert cryo.name == "device_c"
-    assert cryo.fine.name == "device_c-fine"
+    assert cryo.status.name == "device_c-status"
+    assert cryo.status.temp.name == "device_c-status-temp"
 
     cryo_2 = fake_device_factory_beamline.device_c(name="cryo")
     assert cryo is cryo_2
-    assert cryo_2.name == "cryo"
-    assert cryo_2.fine.name == "cryo-fine"
+    assert cryo_2.status.name == "cryo-status"
+    assert cryo_2.status.temp.name == "cryo-status-temp"
 
 
 def device_a() -> Readable:

@@ -1,7 +1,7 @@
 from bluesky.protocols import Readable
 from ophyd_async.epics.motor import Motor
 
-from dodal.devices.cryostream import CryoStream
+from dodal.devices.cryostream import OxfordCryoStream
 
 
 def device_a() -> Readable:
@@ -12,5 +12,5 @@ def device_b() -> Motor:
     raise TimeoutError
 
 
-def device_c() -> CryoStream:
+def device_c() -> OxfordCryoStream:
     raise ValueError
