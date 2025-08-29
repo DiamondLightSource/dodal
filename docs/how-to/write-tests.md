@@ -53,7 +53,7 @@ class MyDevice(StandardReadable, Stageable):
         await asyncio.gather(super().stage(), self.signal_b.set(OnOff.OFF))
 ```
 
-In this example, we need to test the `stage`, `unstage`, and `read` methods. The `read` method needs to be tested because we are adding `signal_a` and `signal_b` as readables to the device, so we need to confirm that we get the expected read signals back when this method is called.
+In this example, we need to test the `stage` and `unstage` methods. For more complex devices, it is also a good idea to test the `read` method to confirm that we get the expected read signals back when this method is called.
 
 We use [pytest](https://docs.pytest.org/en/stable/contents.html) for writing tests in dodal. A core part of this library is the use of fixtures. A fixture is a function decorated with `@pytest.fixture` that provides setup/teardown or reusable test data for your tests. It is defined once and can be reused across multiple tests. Fixtures are mainly used to define devices and then inject them into each test.
 
@@ -63,7 +63,6 @@ In order for `pytest` to detect something as a test, a function should begin wit
 
 ```Python
 import asyncio
-from unittest.mock import ANY
 
 import pytest
 from bluesky import RunEngine
@@ -90,46 +89,31 @@ def test_my_device_unstage(sim_my_device: MyDevice, RE: RunEngine) -> None:
     RE(bps.unstage(sim_my_device, wait=True), wait=True)
     get_mock_put(sim_my_device.signal_b).assert_called_once_with(OnOff.OFF, wait=True)
 
+```
 
+You should test the output of a device when the device has many signals read and you want to ensure the correct ones are read at the correct times, or when the `read` method of it or one of its signals (e.g. a DerivedSignal) requires testing. Functions are defined in `ophyd-async` to aid with this. `assert_reading` allows us to compare the readings generated from a `Readable` device to the expected results.
+
+```Python
 async def test_my_device_read(sim_my_device: MyDevice, RE: RunEngine) -> None:
     prefix = sim_my_device.name
     await assert_reading(
         sim_my_device,
         {
-            f"{prefix}-signal_a": partial_reading(ANY),
-            f"{prefix}-signal_b": partial_reading(ANY),
+            f"{prefix}-signal_a": partial_reading(OnOff.ON),
+            f"{prefix}-signal_b": partial_reading(0),
         },
     )
-
 ```
 
-For testing the read output of a device, there are some handy functions defined in `ophyd-async` to aid with this. `assert_reading` allows us to compare the readings generated from a `Readable` device to the expected results. `partial_reading` wraps the value given in a mapping like `{"value": ANY}`, so we are actually checking that the reading matches the expected structure.
+`partial_reading` wraps the value given in a mapping like `{"value": ANY}`, so we are actually checking that the reading matches the expected structure.
 
 ```Python
     prefix = sim_my_device.name
     await assert_reading(
         sim_my_device,
         {
-            f"{prefix}-signal_a" : {"value": ANY},
-            f"{prefix}-signal_b" : {"value": ANY},
+            f"{prefix}-signal_a" : {"value": OnOff.ON},
+            f"{prefix}-signal_b" : {"value": 0},
         }
     )
 ```
-
-Once we have written the tests, we need to check that they pass and how much coverage there is. `pytest` should automatically detect your tests and display one of the following icons within the VSCode IDE:
-- Grey circle (not run yet)
-- Green circle with a tick (test passed)
-- Red circle with a cross (test failed)
-
-You can also check code coverage by right-clicking on the test icon and selecting `Run with coverage`. This will re-run the test and highlight line numbers in your file:
-- Green = covered by tests
-- Red = not covered (and ideally should be tested)
-
-To view all tests inside dodal, use the `Test Explorer` panel (flask icon) in VSCode. It displays all of your tests in a hierarchy, which you can run individually or in groups. It also shows the pass/fail icons mentioned above. Clicking on an item will run all tests beneath it in the hierarchy.
-
-You can also run all tests in the command line via the command:
-`tox -e tests`
-
-This will also display each Python module’s percentage of code coverage achieved.
-
-If you find that your tests are being skipped or not recognised by `pytest`, check for any syntax errors as this will block the tests being found. You can also check to see if there is an error output at the very bottom of the `Test Explorer` panel. This is usually caused by invalid syntax in your test file, or by circular dependencies in the code you are testing.
