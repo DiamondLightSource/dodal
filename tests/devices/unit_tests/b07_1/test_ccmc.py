@@ -95,7 +95,8 @@ async def test_move_crystal_wrong_position_ignored(
     RE: RunEngine,
 ):
     await assert_value(mock_ccmc.crystal, ChannelCutMonochromatorPositions.OUT)
-    mock_ccmc.set(WrongEnum.POS_100)  # type: ignore
+    with pytest.raises(ValueError):
+        await mock_ccmc.set(WrongEnum.POS_100)  # type: ignore
     await assert_value(mock_ccmc.crystal, ChannelCutMonochromatorPositions.OUT)
 
 

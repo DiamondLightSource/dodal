@@ -110,9 +110,15 @@ async def test_counter_refresh(fake_pmac: PMAC, RE):
 
 
 async def test_counter_refresh_timeout(fake_pmac: PMAC, RE):
+    counting_task = None
+
+    def start_counting(*args, **kwargs):
+        nonlocal counting_task
+        counting_task = asyncio.create_task(update_counter(0.2, fake_pmac))
+
     callback_on_mock_put(
         fake_pmac.pmac_string,
-        lambda *args, **kwargs: asyncio.create_task(update_counter(0.2, fake_pmac)),  # type: ignore
+        start_counting,  # type: ignore
     )
 
     set_mock_value(fake_pmac.counter_time, 0.1)
@@ -121,6 +127,8 @@ async def test_counter_refresh_timeout(fake_pmac: PMAC, RE):
         await fake_pmac.run_program.complete()
 
     assert await fake_pmac.counter.get_value() == 2
+
+    counting_task.cancel()  # type:ignore
 
 
 @patch("dodal.devices.i24.pmac.sleep")
