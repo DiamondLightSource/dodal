@@ -14,9 +14,8 @@ description = "Ophyd devices and other utils that could be used across DLS beaml
 dependencies = [
     "click",
     "ophyd",
-    "ophyd-async==0.11.0",           # Pending https://github.com/bluesky/ophyd-async/issues/976
-    "epicscorelibs<=7.0.7.99.1.2a1", # Pending https://github.com/epics-base/epicscorelibs/issues/41
-    "bluesky",
+    "ophyd-async[ca,pva]>=0.13.0",
+    "bluesky==1.14.2",  # https://github.com/bluesky/bluesky/issues/1938
     "pyepics",
     "dataclasses-json",
     "pillow",
@@ -25,8 +24,6 @@ dependencies = [
     "graypy",
     "pydantic>=2.0",
     "opencv-python-headless",        # For pin-tip detection.
-    "aioca",                         # Required for CA support with ophyd-async.
-    "p4p",                           # Required for PVA support with ophyd-async.
     "numpy",
     "aiofiles",
     "aiohttp",
@@ -34,6 +31,7 @@ dependencies = [
     "scanspec>=0.7.3",
     "event-model>=1.23",             # Until bluesky pins it https://github.com/DiamondLightSource/dodal/issues/1278
     "pyzmq==26.3.0",                 # Until we can move to RHEL 8 https://github.com/DiamondLightSource/mx-bluesky/issues/1139
+    "deepdiff",
 ]
 
 dynamic = ["version"]

@@ -2,14 +2,14 @@ import bluesky.plan_stubs as bps
 import pytest
 
 from dodal.devices.i24.vgonio import VerticalGoniometer
-from dodal.devices.util.test_utils import patch_motor
+from dodal.devices.util.test_utils import patch_all_motors
 
 
 @pytest.fixture
 async def vgonio(RE):
     vgonio = VerticalGoniometer("", name="fake_vgonio")
     await vgonio.connect(mock=True)
-    with patch_motor(vgonio.x), patch_motor(vgonio.yh), patch_motor(vgonio.z):
+    with patch_all_motors(vgonio):
         yield vgonio
 
 

@@ -100,25 +100,31 @@ def source_from_results(results):
 
 class ZocaloResults(StandardReadable, Triggerable):
     """An ophyd device which can wait for results from a Zocalo job. These jobs should
-    be triggered from a plan-subscribed callback using the run_start() and run_end()
-    methods on dodal.devices.zocalo.ZocaloTrigger.
+        be triggered from a plan-subscribed callback using the run_start() and run_end()
+        methods on dodal.devices.zocalo.ZocaloTrigger.
 
-    See https://diamondlightsource.github.io/dodal/main/how-to/zocalo.html
+        See https://diamondlightsource.github.io/dodal/main/how-to/zocalo.html
 
-    Args:
-        name (str): Name of the device
+        Args:
+            name (str): Name of the device
 
-        zocalo_environment (str): How zocalo is configured. Defaults to i03's development configuration
+            zocalo_environment (str): How zocalo is configured. Defaults to i03's development configuration
 
-        channel (str): Name for the results Queue
+            channel (str): Name for the results Queue
 
-        sort_key (str): How results are ranked. Defaults to sorting by highest counts
+            sort_key (str): How results are ranked. Defaults to sorting by highest counts
 
-        timeout_s (float): Maximum time to wait for the Queue to be filled by an object, starting
-        from when the ZocaloResults device is triggered
+            timeout_s (float): Maximum time to wait for the Queue to be filled by an object, starting
+            from when the ZocaloResults device is triggered
 
-        use_gpu (bool): When True, ZocaloResults will take the first set of
-        results that it receives (which are likely the GPU results)
+    <<<<<<< HEAD
+            use_gpu (bool): When True, ZocaloResults will take the first set of
+            results that it receives (which are likely the GPU results)
+    =======
+            prefix (str): EPICS PV prefix for the device
+
+            results_source (ZocaloSource): Where to get results from, GPU or CPU analysis
+    >>>>>>> main
 
     """
 
@@ -129,7 +135,7 @@ class ZocaloResults(StandardReadable, Triggerable):
         channel: str = "xrc.i03",
         sort_key: str = DEFAULT_SORT_KEY.value,
         timeout_s: float = DEFAULT_TIMEOUT,
-        use_gpu: bool = False,
+        results_source: ZocaloSource = ZocaloSource.CPU,
     ) -> None:
         self.zocalo_environment = zocalo_environment
         self.sort_key = SortKeys[sort_key]
@@ -137,7 +143,7 @@ class ZocaloResults(StandardReadable, Triggerable):
         self.timeout_s = timeout_s
         self._raw_results_received: Queue = Queue()
         self.transport: CommonTransport | None = None
-        self.use_gpu = use_gpu
+        self.results_source = results_source
 
         self.centre_of_mass, self._com_setter = soft_signal_r_and_setter(
             Array1D[np.float64], name="centre_of_mass"
@@ -233,9 +239,6 @@ class ZocaloResults(StandardReadable, Triggerable):
             "meant for it"
         )
         if not self.transport:
-            LOGGER.warning(
-                msg  # AsyncStatus exception messages are poorly propagated, remove after https://github.com/bluesky/ophyd-async/issues/103
-            )
             raise NoZocaloSubscription(msg)
 
         try:
@@ -243,16 +246,19 @@ class ZocaloResults(StandardReadable, Triggerable):
                 f"waiting for results in queue - currently {self._raw_results_received.qsize()} items"
             )
 
-            raw_results = self._raw_results_received.get(timeout=self.timeout_s)
-            source_of_first_results = source_from_results(raw_results)
+            while True:
+                raw_results = self._raw_results_received.get(timeout=self.timeout_s)
+                source_of_results = source_from_results(raw_results)
 
-            if self.use_gpu and source_of_first_results == ZocaloSource.CPU:
-                LOGGER.warning(
-                    "Configured to use GPU results but CPU came first, using CPU results."
-                )
+                if source_of_results != self.results_source:
+                    LOGGER.warning(
+                        f"Configured to use {self.results_source} results but {source_of_results} came first, waiting for further results."
+                    )
+                else:
+                    break
 
             LOGGER.info(
-                f"Zocalo results from {source_from_results(raw_results)} processing: found {len(raw_results['results'])} crystals."
+                f"Zocalo results: found {len(raw_results['results'])} crystals."
             )
             # Sort from strongest to weakest in case of multiple crystals
             await self._put_results(
@@ -284,18 +290,9 @@ class ZocaloResults(StandardReadable, Triggerable):
 
             results = message.get("results", [])
 
-            if self.use_gpu:
-                self._raw_results_received.put(
-                    {"results": results, "recipe_parameters": recipe_parameters}
-                )
-            else:
-                # Only add to queue if results are from CPU
-                if not recipe_parameters.get("gpu"):
-                    self._raw_results_received.put(
-                        {"results": results, "recipe_parameters": recipe_parameters}
-                    )
-                else:
-                    LOGGER.warning("Discarding results as they are from GPU")
+            self._raw_results_received.put(
+                {"results": results, "recipe_parameters": recipe_parameters}
+            )
 
         subscription = workflows.recipe.wrap_subscribe(
             self.transport,

@@ -12,8 +12,9 @@ from dodal.devices.electron_analyser.specs import (
     SpecsRegion,
     SpecsSequence,
 )
+from dodal.devices.electron_analyser.util import to_binding_energy, to_kinetic_energy
 from dodal.devices.electron_analyser.vgscienta import VGScientaRegion, VGScientaSequence
-from tests.devices.unit_tests.electron_analyser.util import (
+from tests.devices.unit_tests.electron_analyser.helper_util import (
     TEST_SEQUENCE_REGION_NAMES,
     get_test_sequence,
 )
@@ -83,3 +84,50 @@ def test_region_kinetic_and_binding_energy(
         assert r.is_binding_energy() != is_kinetic_energy
         assert r.is_kinetic_energy() == is_kinetic_energy
         assert r.is_kinetic_energy() != is_binding_energy
+
+
+def assert_region_field_energy_from_switching_energy_modes_is_correct(
+    region: AbstractBaseRegion, field: str, excitation_energy: float
+) -> None:
+    conversion_func_map = {
+        EnergyMode.KINETIC: to_binding_energy,
+        EnergyMode.BINDING: to_kinetic_energy,
+    }
+    opposite_mode = {
+        EnergyMode.KINETIC: EnergyMode.BINDING,
+        EnergyMode.BINDING: EnergyMode.KINETIC,
+    }
+    original_energy = getattr(region, field)
+    original_energy_mode = region.energy_mode
+    conversion_func = conversion_func_map[region.energy_mode]
+    converted_energy = conversion_func(
+        original_energy, region.energy_mode, excitation_energy
+    )
+
+    e_mode_sequence = [
+        original_energy_mode,
+        opposite_mode[original_energy_mode],
+        original_energy_mode,
+    ]
+    expected_e_values = [original_energy, converted_energy, original_energy]
+
+    # Do full cycle of switching energy modes
+    # First check shouldn't see change as region is the same energy mode
+    # Second check cycles to the opposite energy mode, check it is correct via opposite
+    # energy mode.
+    # Third check cycles back so should be original value.
+    for e_mode, e_expected in zip(e_mode_sequence, expected_e_values, strict=False):
+        region.switch_energy_mode(e_mode, excitation_energy)
+        assert getattr(region, field) == e_expected
+        assert region.energy_mode == e_mode
+
+
+@pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
+def test_each_energy_field_for_region_is_correct_when_switching_energy_modes(
+    region: AbstractBaseRegion,
+) -> None:
+    excitation_energy = 100
+    for field in ("low_energy", "centre_energy", "high_energy"):
+        assert_region_field_energy_from_switching_energy_modes_is_correct(
+            region, field, excitation_energy
+        )

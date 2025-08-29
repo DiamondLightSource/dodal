@@ -1,12 +1,14 @@
 import asyncio
-from pathlib import Path
+from pathlib import Path, PurePath
 from unittest.mock import patch
 
 import pytest
 from bluesky.run_engine import RunEngine
 from ophyd_async.core import PathProvider, StandardDetector, init_devices
 from ophyd_async.sim import PatternGenerator, SimBlobDetector, SimMotor
-from tests.constants import UNDULATOR_ID_GAP_LOOKUP_TABLE_PATH
+from tests.devices.unit_tests.test_data import (
+    TEST_BEAMLINE_UNDULATOR_TO_GAP_LUT,
+)
 
 from dodal.devices.common_dcm import BaseDCM
 from dodal.devices.i03.dcm import DCM
@@ -24,7 +26,7 @@ async def mock_undulator_and_dcm() -> UndulatorGapCheckDevices:
     async with init_devices(mock=True):
         undulator = Undulator(
             "",
-            id_gap_lookup_table_path=UNDULATOR_ID_GAP_LOOKUP_TABLE_PATH,
+            id_gap_lookup_table_path=TEST_BEAMLINE_UNDULATOR_TO_GAP_LUT,
         )
         dcm = DCM("")
     return UndulatorGapCheckDevices(undulator, dcm)
@@ -41,7 +43,7 @@ def det(
             super().__init__(sleep)
             self.n_images = 0
 
-        def open_file(self, path: Path, width: int, height: int):
+        def open_file(self, path: PurePath, width: int, height: int):
             pass
 
         async def write_images_to_file(

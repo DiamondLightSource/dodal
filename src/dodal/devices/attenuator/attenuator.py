@@ -15,6 +15,8 @@ from ophyd_async.epics.core import epics_signal_r, epics_signal_rw, epics_signal
 from dodal.devices.attenuator.filter import FilterMotor
 from dodal.log import LOGGER
 
+DEFAULT_TIMEOUT = 60
+
 
 class ReadOnlyAttenuator(StandardReadable):
     """A read-only attenuator class with a minimum set of PVs for reading.
@@ -83,7 +85,7 @@ class BinaryFilterAttenuator(ReadOnlyAttenuator, Movable[float]):
                 wait_for_value(
                     self._filters_in_position[i],
                     bool(await self._calculated_filter_states[i].get_value()),
-                    None,
+                    DEFAULT_TIMEOUT,
                 )
                 for i in range(16)
             ]
