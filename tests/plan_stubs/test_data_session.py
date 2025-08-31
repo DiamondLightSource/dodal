@@ -23,6 +23,10 @@ def test_attach_data_session_metadata_wrapper(caplog, RE: RunEngine):
     )
 
 
+def test_given_no_path_provider_when_running_clear_path_provider_then_noop():
+    clear_path_provider()
+
+
 def test_attach_data_session_metadata_wrapper_with_no_provider_is_noop(
     caplog, RE: RunEngine
 ):
