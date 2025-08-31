@@ -1,9 +1,9 @@
 from ophyd_async.epics.motor import Motor
 
-from dodal.devices.motors import XYZStage, create_axis_perp_to_rotation
+from dodal.devices.motors import XYZOmegaStage, create_axis_perp_to_rotation
 
 
-class Goniometer(XYZStage):
+class Goniometer(XYZOmegaStage):
     """The Aithre lab goniometer and the XYZ stage it sits on.
 
     `x`, `y` and `z` control the axes of the positioner at the base, while `sampy` and
@@ -16,10 +16,9 @@ class Goniometer(XYZStage):
     """
 
     def __init__(self, prefix: str, name: str = "") -> None:
+        super().__init__(name)
         self.sampy = Motor(prefix + "SAMPY")
         self.sampz = Motor(prefix + "SAMPZ")
-        self.omega = Motor(prefix + "OMEGA")
         self.vertical_position = create_axis_perp_to_rotation(
             self.omega, self.sampz, self.sampy
         )
-        super().__init__(name)
