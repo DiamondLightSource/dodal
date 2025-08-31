@@ -7,7 +7,7 @@ from dodal.devices.i22.nxsas import NXSasMetadataHolder, NXSasPilatus
 
 
 @pytest.fixture
-def saxs(static_path_provider: PathProvider, RE) -> PilatusDetector:
+def saxs(static_path_provider: PathProvider) -> PilatusDetector:
     with init_devices(mock=True):
         saxs = NXSasPilatus(
             prefix="-EA-PILAT-01:",

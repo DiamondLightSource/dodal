@@ -126,10 +126,7 @@ def test_mirror_set_voltage_sets_and_waits_happy_path(
         MirrorVoltageDemand.OK,
     )
 
-    def plan():
-        yield from bps.abs_set(mirror_voltage_with_set, 100, wait=True)
-
-    RE(plan())
+    RE(bps.abs_set(mirror_voltage_with_set, 100, wait=True))
 
     mock_put.assert_called_with(100, wait=ANY)
 
@@ -230,10 +227,7 @@ def test_mirror_set_voltage_returns_immediately_if_voltage_already_demanded(
 ):
     set_mock_value(mirror_voltage_with_set._setpoint_v, 100)
 
-    def plan():
-        yield from bps.abs_set(mirror_voltage_with_set, 100, wait=True)
-
-    RE(plan())
+    RE(bps.abs_set(mirror_voltage_with_set, 100, wait=True))
 
     get_mock_put(mirror_voltage_with_set._setpoint_v).assert_not_called()
 

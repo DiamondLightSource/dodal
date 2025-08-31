@@ -33,4 +33,7 @@ def test_attach_data_session_metadata_wrapper_with_no_provider_is_noop(
     plan = attach_data_session_metadata_wrapper(plan=fake_plan())
     RE(plan)
 
-    assert f"There is no PathProvider set, {attach_data_session_metadata_wrapper.__name__} will have no effect"
+    assert (
+        f"There is no PathProvider set, {attach_data_session_metadata_wrapper.__name__} will have no effect"
+        in caplog.text
+    )

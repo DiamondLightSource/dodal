@@ -1,11 +1,12 @@
 import bluesky.plan_stubs as bps
 import pytest
+from bluesky import RunEngine
 
 from dodal.devices.i24.focus_mirrors import FocusMirrorsMode, HFocusMode, VFocusMode
 
 
 @pytest.fixture
-async def fake_mirrors(RE) -> FocusMirrorsMode:
+async def fake_mirrors() -> FocusMirrorsMode:
     mirrors = FocusMirrorsMode("", name="fake_morrors")
     await mirrors.connect(mock=True)
 
@@ -13,7 +14,7 @@ async def fake_mirrors(RE) -> FocusMirrorsMode:
 
 
 async def test_setting_mirror_focus_returns_correct_beam_size(
-    fake_mirrors: FocusMirrorsMode, RE
+    fake_mirrors: FocusMirrorsMode, RE: RunEngine
 ):
     def set_mirrors():
         yield from bps.abs_set(

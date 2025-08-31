@@ -32,7 +32,7 @@ def test_bottom_right_from_top_left():
 
 
 @pytest.fixture
-async def smargon(RE: RunEngine) -> AsyncGenerator[Smargon]:
+async def smargon() -> AsyncGenerator[Smargon]:
     async with init_devices(mock=True):
         smargon = Smargon()
 

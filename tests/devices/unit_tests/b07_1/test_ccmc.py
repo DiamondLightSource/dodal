@@ -23,7 +23,7 @@ class WrongEnum(StrictEnum):
 
 
 @pytest.fixture
-async def mock_ccmc(RE: RunEngine) -> ChannelCutMonochromator:
+async def mock_ccmc() -> ChannelCutMonochromator:
     async with init_devices(mock=True):
         mock_ccmc = ChannelCutMonochromator(prefix="")
     return mock_ccmc
@@ -90,10 +90,7 @@ async def test_get_energy_in_ev(
         )
 
 
-async def test_move_crystal_wrong_position_ignored(
-    mock_ccmc: ChannelCutMonochromator,
-    RE: RunEngine,
-):
+async def test_move_crystal_wrong_position_ignored(mock_ccmc: ChannelCutMonochromator):
     await assert_value(mock_ccmc.crystal, ChannelCutMonochromatorPositions.OUT)
     with pytest.raises(ValueError):
         await mock_ccmc.set(WrongEnum.POS_100)  # type: ignore
