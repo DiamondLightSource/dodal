@@ -36,15 +36,17 @@ class ZebraFastGridScanTwoD(FastGridScanCommon[ZebraGridScanParamsTwoD]):
     - No program_number - see https://github.com/DiamondLightSource/mx-bluesky/issues/1203
     """
 
-    def __init__(self, prefix: str, smargon_prefix: str, name: str = "") -> None:
+    def __init__(
+        self, prefix: str, motion_controller_prefix: str, name: str = ""
+    ) -> None:
         full_prefix = prefix + "FGS:"
+        super().__init__(full_prefix, motion_controller_prefix, name)
 
         # This signal could be put in the common device if the prefix gets standardised.
+        # See https://github.com/DiamondLightSource/mx-bluesky/issues/1203
         self.exposure_time_ms = epics_signal_rw_rbv(
             float, f"{full_prefix}EXPOSURE_TIME"
         )
-
-        super().__init__(full_prefix, smargon_prefix, name)
 
         self.movable_params["exposure_time_ms"] = self.exposure_time_ms
 
@@ -64,8 +66,9 @@ class ZebraFastGridScanTwoD(FastGridScanCommon[ZebraGridScanParamsTwoD]):
     def _create_scan_invalid_signal(self, prefix: str) -> SignalR[float]:
         return soft_signal_r_and_setter(float, 0)[0]
 
-    def _create_motion_program(self, smargon_prefix):
-        return MotionProgram(smargon_prefix, has_prog_num=False)
+    def _create_motion_program(self, motion_controller_prefix):
+        return MotionProgram(motion_controller_prefix, has_prog_num=False)
 
+    # To be standardised in https://github.com/DiamondLightSource/mx-bluesky/issues/1203
     def _create_position_counter(self, prefix: str):
         return epics_signal_rw_rbv(int, f"{prefix}POS_COUNTER")

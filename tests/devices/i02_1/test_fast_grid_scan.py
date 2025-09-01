@@ -11,7 +11,7 @@ from dodal.devices.i02_1.fast_grid_scan import (
 @pytest.fixture
 async def fast_grid_scan():
     async with init_devices(mock=True):
-        fast_grid_scan = ZebraFastGridScanTwoD(prefix="", smargon_prefix="")
+        fast_grid_scan = ZebraFastGridScanTwoD(prefix="", motion_controller_prefix="")
     return fast_grid_scan
 
 
