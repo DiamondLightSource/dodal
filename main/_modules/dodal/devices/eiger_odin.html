@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.eiger_odin &#8212; dodal 1.55.2.dev26+g2c9bbb788 documentation</title>
+    <title>dodal.devices.eiger_odin &#8212; dodal 1.55.2.dev27+g8bd1ce5ff documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=40076fca"></script>
+    <script src="../../../_static/documentation_options.js?v=f2ca1092"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -459,6 +459,7 @@ window.addEventListener("load", () => mermaid.run());
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd.status</span><span class="w"> </span><span class="kn">import</span> <span class="n">StatusBase</span><span class="p">,</span> <span class="n">SubscriptionStatus</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.status</span><span class="w"> </span><span class="kn">import</span> <span class="n">await_value</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.log</span><span class="w"> </span><span class="kn">import</span> <span class="n">LOGGER</span>
 
 
 <div class="viewcode-block" id="EigerFan">
@@ -638,6 +639,7 @@ window.addEventListener("load", () => mermaid.run());
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.eiger_odin.EigerOdin.html#dodal.devices.eiger_odin.EigerOdin.stop">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">StatusBase</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Stop odin manually&quot;&quot;&quot;</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Stopping Odin...&quot;</span><span class="p">)</span>
         <span class="n">status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_writer</span><span class="o">.</span><span class="n">capture</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="n">status</span> <span class="o">&amp;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">stop_writing</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">status</span></div>

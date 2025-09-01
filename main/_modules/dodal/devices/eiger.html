@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.eiger &#8212; dodal 1.55.2.dev26+g2c9bbb788 documentation</title>
+    <title>dodal.devices.eiger &#8212; dodal 1.55.2.dev27+g8bd1ce5ff documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=40076fca"></script>
+    <script src="../../../_static/documentation_options.js?v=f2ca1092"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -682,6 +682,7 @@ window.addEventListener("load", () => mermaid.run());
         <span class="k">return</span> <span class="n">status</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">set_cam_pvs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AndStatus</span><span class="p">:</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Eiger arming: Setting eiger camera PVs...&quot;</span><span class="p">)</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">detector_params</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="n">status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">acquire_time</span><span class="o">.</span><span class="n">set</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">detector_params</span><span class="o">.</span><span class="n">exposure_time_s</span><span class="p">,</span>
@@ -704,6 +705,7 @@ window.addEventListener("load", () => mermaid.run());
         <span class="k">return</span> <span class="n">status</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">set_odin_number_of_frame_chunks</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Status</span><span class="p">:</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Eiger arming: Setting odin number of frames chunks...&quot;</span><span class="p">)</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">detector_params</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="n">status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">odin</span><span class="o">.</span><span class="n">file_writer</span><span class="o">.</span><span class="n">num_frames_chunks</span><span class="o">.</span><span class="n">set</span><span class="p">(</span>
             <span class="mi">1</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeouts</span><span class="o">.</span><span class="n">general_status_timeout</span>
@@ -711,6 +713,7 @@ window.addEventListener("load", () => mermaid.run());
         <span class="k">return</span> <span class="n">status</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">set_odin_pvs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">StatusBase</span><span class="p">:</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Eiger arming: Setting odin PVs...&quot;</span><span class="p">)</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">detector_params</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="n">file_prefix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">detector_params</span><span class="o">.</span><span class="n">full_filename</span>
         <span class="n">status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">odin</span><span class="o">.</span><span class="n">file_writer</span><span class="o">.</span><span class="n">file_path</span><span class="o">.</span><span class="n">set</span><span class="p">(</span>
@@ -732,6 +735,7 @@ window.addEventListener("load", () => mermaid.run());
         <span class="k">return</span> <span class="n">status</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">set_mx_settings_pvs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Eiger arming: Setting mx setting PVs...&quot;</span><span class="p">)</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">detector_params</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="n">beam_x_pixels</span><span class="p">,</span> <span class="n">beam_y_pixels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">detector_params</span><span class="o">.</span><span class="n">get_beam_position_pixels</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">detector_params</span><span class="o">.</span><span class="n">detector_distance</span>
@@ -769,10 +773,14 @@ window.addEventListener("load", () => mermaid.run());
 
         <span class="n">current_energy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">photon_energy</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
         <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">current_energy</span> <span class="o">-</span> <span class="n">energy</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">tolerance</span><span class="p">:</span>
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Setting detector threshold to </span><span class="si">{</span><span class="n">energy</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">photon_energy</span><span class="o">.</span><span class="n">set</span><span class="p">(</span>
                 <span class="n">energy</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeouts</span><span class="o">.</span><span class="n">general_status_timeout</span>
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Not setting detector threshold as already close to </span><span class="si">{</span><span class="n">current_energy</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
             <span class="n">status</span> <span class="o">=</span> <span class="n">Status</span><span class="p">()</span>
             <span class="n">status</span><span class="o">.</span><span class="n">set_finished</span><span class="p">()</span>
             <span class="k">return</span> <span class="n">status</span></div>
@@ -785,7 +793,7 @@ window.addEventListener("load", () => mermaid.run());
 <span class="sd">        during the datacollection. The number of images is the number of images per</span>
 <span class="sd">        trigger.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Eiger arming: setting num triggers and captures...&quot;</span><span class="p">)</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">detector_params</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="n">status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">num_images</span><span class="o">.</span><span class="n">set</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">detector_params</span><span class="o">.</span><span class="n">num_images_per_trigger</span><span class="p">,</span>
@@ -820,7 +828,7 @@ window.addEventListener("load", () => mermaid.run());
         <span class="n">status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">odin</span><span class="o">.</span><span class="n">file_writer</span><span class="o">.</span><span class="n">capture</span><span class="o">.</span><span class="n">set</span><span class="p">(</span>
             <span class="mi">1</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeouts</span><span class="o">.</span><span class="n">general_status_timeout</span>
         <span class="p">)</span>
-        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Eiger staging: awaiting odin metadata&quot;</span><span class="p">)</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Eiger arming: awaiting odin metadata&quot;</span><span class="p">)</span>
         <span class="n">status</span> <span class="o">&amp;=</span> <span class="n">await_value</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">odin</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">ready</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeouts</span><span class="o">.</span><span class="n">meta_file_ready_timeout</span>
         <span class="p">)</span>
@@ -828,11 +836,11 @@ window.addEventListener("load", () => mermaid.run());
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_wait_fan_ready</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">StatusBase</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">filewriters_finished</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">odin</span><span class="o">.</span><span class="n">create_finished_status</span><span class="p">()</span>
-        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Eiger staging: awaiting odin fan ready&quot;</span><span class="p">)</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Eiger arming: awaiting odin fan ready&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">await_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">odin</span><span class="o">.</span><span class="n">fan</span><span class="o">.</span><span class="n">ready</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">timeouts</span><span class="o">.</span><span class="n">general_status_timeout</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_finish_arm</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Status</span><span class="p">:</span>
-        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Eiger staging: Finishing arming&quot;</span><span class="p">)</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Eiger arming: Finishing arming&quot;</span><span class="p">)</span>
         <span class="n">status</span> <span class="o">=</span> <span class="n">Status</span><span class="p">()</span>
         <span class="n">status</span><span class="o">.</span><span class="n">set_finished</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">status</span>
@@ -849,6 +857,14 @@ window.addEventListener("load", () => mermaid.run());
 
     <span class="k">def</span><span class="w"> </span><span class="nf">disarm_detector</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">acquire</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">timeouts</span><span class="o">.</span><span class="n">general_status_timeout</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">wait_for_stale_params</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Status</span><span class="p">:</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Eiger arming: Waiting for stale params...&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">await_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stale_params</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">60</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_cam_acquire</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Status</span><span class="p">:</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Eiger arming: Setting cam acquire...&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">acquire</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeouts</span><span class="o">.</span><span class="n">general_status_timeout</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">do_arming_chain</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Status</span><span class="p">:</span>
         <span class="n">functions_to_do_arm</span> <span class="o">=</span> <span class="p">[]</span>
@@ -869,11 +885,9 @@ window.addEventListener("load", () => mermaid.run());
             <span class="bp">self</span><span class="o">.</span><span class="n">set_odin_pvs</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">set_mx_settings_pvs</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">set_num_triggers_and_captures</span><span class="p">,</span>
-            <span class="k">lambda</span><span class="p">:</span> <span class="n">await_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stale_params</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">60</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">wait_for_stale_params</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_wait_for_odin_status</span><span class="p">,</span>
-            <span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">acquire</span><span class="o">.</span><span class="n">set</span><span class="p">(</span>
-                <span class="mi">1</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeouts</span><span class="o">.</span><span class="n">general_status_timeout</span>
-            <span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_cam_acquire</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_wait_fan_ready</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_finish_arm</span><span class="p">,</span>
         <span class="p">]</span>

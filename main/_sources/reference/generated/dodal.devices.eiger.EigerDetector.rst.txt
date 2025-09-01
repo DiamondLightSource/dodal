@@ -55,6 +55,9 @@ dodal.devices.eiger.EigerDetector
       
       
       
+      ~EigerDetector.set_cam_acquire
+      
+      
       ~EigerDetector.set_cam_pvs
       
       
@@ -93,6 +96,9 @@ dodal.devices.eiger.EigerDetector
       
       
       
+      
+      
+      ~EigerDetector.wait_for_stale_params
       
       
       ~EigerDetector.wait_on_arming_if_started
