@@ -6,10 +6,11 @@ from unittest.mock import Mock
 
 import numpy as np
 import pytest
+from bluesky.plan_stubs import prepare
 from bluesky.plans import scan
 from bluesky.run_engine import RunEngine
 from numpy import poly1d
-from ophyd_async.core import init_devices
+from ophyd_async.core import FlyMotorInfo, init_devices
 from ophyd_async.testing import (
     assert_emitted,
     callback_on_mock_put,
@@ -596,3 +597,12 @@ def test_convert_csv_to_lookup_failed():
             file=ID_ENERGY_2_GAP_CALIBRATIONS_CSV,
             source=("Source", "idw"),
         )
+
+
+async def test_i10apple2_prepare_success(RE: RunEngine, mock_id: I10Apple2):
+    fly_motor_info = FlyMotorInfo(
+        start_position=600,
+        end_position=700,
+        time_for_move=60,
+    )
+    RE(prepare(mock_id, fly_motor_info))

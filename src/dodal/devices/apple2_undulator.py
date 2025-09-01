@@ -5,7 +5,7 @@ from math import isclose
 from typing import Any, Generic, TypeVar
 
 import numpy as np
-from bluesky.protocols import Movable
+from bluesky.protocols import Flyable, Movable, Preparable
 from ophyd_async.core import (
     AsyncStatus,
     Device,
@@ -411,7 +411,7 @@ class UndulatorJawPhase(SafeUndulatorMover[float]):
         )
 
 
-class Apple2(abc.ABC, StandardReadable, Movable):
+class Apple2(abc.ABC, StandardReadable, Movable, Preparable, Flyable):
     """
     Apple2 Undulator Device
 
@@ -542,6 +542,36 @@ class Apple2(abc.ABC, StandardReadable, Movable):
         # This changes the pol setpoint and then changes polarisation via set energy.
         self._set_pol_setpoint(value)
         await self.set(await self.energy.get_value())
+
+    @AsyncStatus.wrap
+    async def prepare(self, value: FlyMotorInfo) -> None:
+        """Convert FlyMotorInfo from energy to gap motion and move phase motor to mid point."""
+        mid_energy = (value.start_position + value.end_position) / 2.0
+        LOGGER.info(f"Preparing for fly energy scan, move {self.phase} to {mid_energy}")
+        await self.set(value=mid_energy)
+
+        start_position, end_position = await asyncio.gather(
+            self._get_id_gap_phase(energy=value.start_position),
+            self._get_id_gap_phase(energy=value.end_position),
+        )
+
+        gap_fly_motor_info = FlyMotorInfo(
+            start_position=start_position[0],
+            end_position=end_position[0],
+            time_for_move=value.time_for_move,
+        )
+        LOGGER.info(
+            f"Flyscan info in energy: {value}"
+            + f"Flyscan info in gap: {gap_fly_motor_info}"
+        )
+        await self.gap.prepare(value=gap_fly_motor_info)
+
+    @AsyncStatus.wrap
+    async def kickoff(self):
+        await self.gap.kickoff()
+
+    def complete(self) -> WatchableAsyncStatus:
+        return self.gap.complete()
 
     @abc.abstractmethod
     @AsyncStatus.wrap

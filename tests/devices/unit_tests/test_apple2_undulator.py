@@ -1,12 +1,12 @@
 from collections import defaultdict
 from logging import getLogger
-from unittest.mock import AsyncMock
+from unittest.mock import AsyncMock, MagicMock
 
 import bluesky.plan_stubs as bps
 import pytest
 from bluesky.plans import scan
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import FlyMotorInfo, init_devices
+from ophyd_async.core import AsyncStatus, FlyMotorInfo, init_devices
 from ophyd_async.testing import (
     assert_emitted,
     assert_reading,
@@ -18,8 +18,10 @@ from ophyd_async.testing import (
 
 from dodal.devices.apple2_undulator import (
     DEFAULT_MOTOR_MIN_TIMEOUT,
+    Apple2,
     Apple2PhasesVal,
     MotorWithoutStop,
+    Pol,
     UndulatorGap,
     UndulatorGateStatus,
     UndulatorJawPhase,
@@ -98,6 +100,31 @@ async def mock_jaw_phase(prefix: str = "BLXX-EA-DET-007:") -> UndulatorJawPhase:
     set_mock_value(mock_jaw_phase.jaw_phase.user_setpoint_readback, 0)
     set_mock_value(mock_jaw_phase.fault, 0)
     return mock_jaw_phase
+
+
+class test_apple2(Apple2):
+    def __init__(
+        self,
+        id_gap: UndulatorGap,
+        id_phase: UndulatorPhaseAxes,
+        prefix: str = "",
+        name: str = "",
+    ) -> None:
+        super().__init__(id_gap, id_phase, prefix, name)
+
+    @AsyncStatus.wrap
+    async def set(self, value, *, wait: bool = False): ...
+
+    def update_lookuptable(self) -> None: ...
+
+
+@pytest.fixture
+async def mock_apple2(
+    mock_id_gap: UndulatorGap, mock_phaseAxes: UndulatorPhaseAxes
+) -> test_apple2:
+    async with init_devices(mock=True):
+        mock_apple2 = test_apple2(id_gap=mock_id_gap, id_phase=mock_phaseAxes)
+    return mock_apple2
 
 
 async def test_in_motion_error(
@@ -415,3 +442,59 @@ async def test_jaw_phase_success_scan(mock_jaw_phase: UndulatorJawPhase, RE: Run
     assert_emitted(docs, start=1, descriptor=1, event=11, stop=1)
     for i in output:
         assert docs["event"][i]["data"]["mock_jaw_phase-jaw_phase"] == i
+
+
+@pytest.mark.parametrize(
+    "start_gap, end_gap,acceleration_time,time_for_move",
+    [
+        ((21.0, 2.0), (25.0, 2), 0.5, 1.0),
+        ((35.0, 2.0), (15.0, 2), 1.5, 9.0),
+    ],
+)
+async def test_apple2_prepare_success(
+    mock_apple2: test_apple2,
+    start_gap,
+    end_gap,
+    acceleration_time,
+    time_for_move,
+):
+    set_mock_value(mock_apple2.gap.max_velocity, 30)
+    set_mock_value(mock_apple2.gap.min_velocity, 1)
+    set_mock_value(mock_apple2.gap.low_limit_travel, 0)
+    set_mock_value(mock_apple2.gap.high_limit_travel, 200)
+    set_mock_value(mock_apple2.gap.gate, UndulatorGateStatus.CLOSE)
+    set_mock_value(mock_apple2.gap.acceleration_time, acceleration_time)
+    mock_apple2._polarisation_setpoint_set(Pol.LH)
+    mock_apple2.set = AsyncMock()
+    mid_gap_position = end_gap[0] + start_gap[0] / 2.0
+    mock_apple2._get_id_gap_phase = AsyncMock(
+        side_effect=[start_gap, end_gap, mid_gap_position]
+    )
+    fly_info = FlyMotorInfo(
+        start_position=700, end_position=800, time_for_move=time_for_move
+    )
+    await mock_apple2.prepare(fly_info)
+    velocity = (end_gap[0] - start_gap[0]) / time_for_move
+    ramp_up_start = start_gap[0] - acceleration_time * velocity / 2
+    mock_apple2.set.assert_awaited_once_with(value=750)
+    get_mock_put(mock_apple2.gap.user_setpoint).assert_awaited_once_with(
+        str(ramp_up_start), wait=True
+    )
+
+    assert await mock_apple2.gap.velocity.get_value() == abs(velocity)
+
+
+async def test_apple2_kickoff__call_gap_kickoff(
+    mock_apple2: test_apple2,
+):
+    mock_apple2.gap.kickoff = AsyncMock()
+    await mock_apple2.kickoff()
+    mock_apple2.gap.kickoff.assert_awaited_once()
+
+
+def test_apple2_complete__call_gap_complete(
+    mock_apple2: test_apple2,
+):
+    mock_apple2.gap.complete = MagicMock()
+    mock_apple2.complete()
+    mock_apple2.gap.complete.assert_called_once()
