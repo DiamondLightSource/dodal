@@ -18,7 +18,7 @@ class _LogOnPercentageProgressWatcher(Watcher[Number]):
         self.message_prefix = message_prefix
         if self.percent_interval <= 0:
             raise ValueError(
-                f"Percent interval on class _LogOnPercentageProgressWatcher must be a positive number, but recieved {self.percent_interval}"
+                f"Percent interval on class _LogOnPercentageProgressWatcher must be a positive number, but received {self.percent_interval}"
             )
 
     def __call__(
@@ -37,7 +37,7 @@ class _LogOnPercentageProgressWatcher(Watcher[Number]):
             isinstance(current, Number)
             and isinstance(target, Number)
             and isinstance(initial, Number)
-            and target - initial
+            and target != initial
         ):
             current_percent = int(((current - initial) / (target - initial)) * 100)
             if (
@@ -67,13 +67,16 @@ def log_on_percentage_complete(
         of the status.
 
     Note that when using with Bluesky plan stubs you will need to cast the status (as of
-    Bluesky v1.14.2), since a Bluesky status doesn't use generics
+    Bluesky v1.14.2), since a Bluesky status doesn't use generics - see https://github.com/bluesky/bluesky/issues/1948.
+
+    When running Bluesky plans using an interactive terminal, it is better to use the standard bluesky progress
+    bar instead of this function. See https://blueskyproject.io/bluesky/main/progress-bar.html#progress-bar
 
     Example usage within a Bluesky plan:
     yield from bps.kickoff(my_detector)
     status = yield from bps.complete(my_detector, group="collection complete")
     status = cast(WatchableAsyncStatus, status)
-    log_on_percentage_complete(status, "Data collection triggers recieved", 10)
+    log_on_percentage_complete(status, "Data collection triggers received", 10)
     yield from bps.wait("collection complete")
 
     """
