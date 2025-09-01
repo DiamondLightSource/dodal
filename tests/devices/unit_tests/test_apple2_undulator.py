@@ -108,12 +108,11 @@ class test_apple2(Apple2):
         id_gap: UndulatorGap,
         id_phase: UndulatorPhaseAxes,
         prefix: str = "",
-        name: str = "",
     ) -> None:
         super().__init__(id_gap, id_phase, prefix)
 
     @AsyncStatus.wrap
-    async def set(self, value: float): ...
+    async def set(self, value, *, wait: bool = False): ...
 
     def update_lookuptable(self) -> None: ...
 

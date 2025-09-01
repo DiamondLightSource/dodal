@@ -803,7 +803,7 @@ class Apple2(abc.ABC, StandardReadable, Movable, Preparable, Flyable):
 ID_TYPE = TypeVar("ID_TYPE", bound=Apple2)
 
 
-class EnergySetter(abc.ABC, StandardReadable, Movable[float], Generic[ID_TYPE]):
+class EnergySetter(StandardReadable, Movable[float], Generic[ID_TYPE]):
     """
     Compound device to set both ID and PGM energy at the same time.
 
