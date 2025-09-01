@@ -197,7 +197,9 @@ class FastGridScanCommon(StandardReadable, Flyable, ABC, Generic[ParamType]):
     See ZebraFastGridScanThreeD as an example of how to implement.
     """
 
-    def __init__(self, prefix: str, smargon_prefix: str, name: str = "") -> None:
+    def __init__(
+        self, prefix: str, motion_controller_prefix: str, name: str = ""
+    ) -> None:
         self.x_steps = epics_signal_rw_rbv(int, f"{prefix}X_NUM_STEPS")
         self.y_steps = epics_signal_rw_rbv(
             int, f"{prefix}Y_NUM_STEPS"
@@ -218,7 +220,7 @@ class FastGridScanCommon(StandardReadable, Flyable, ABC, Generic[ParamType]):
 
         self.expected_images = self._create_expected_images_signal()
 
-        self.motion_program = self._create_motion_program(smargon_prefix)
+        self.motion_program = self._create_motion_program(motion_controller_prefix)
 
         self.position_counter = self._create_position_counter(prefix)
 
@@ -276,7 +278,9 @@ class FastGridScanCommon(StandardReadable, Flyable, ABC, Generic[ParamType]):
 
     # This can be created within init rather than as a separate method after https://github.com/DiamondLightSource/mx-bluesky/issues/1203
     @abstractmethod
-    def _create_motion_program(self, smargon_prefix: str) -> MotionProgram: ...
+    def _create_motion_program(
+        self, motion_controller_prefix: str
+    ) -> MotionProgram: ...
 
 
 class FastGridScanThreeD(FastGridScanCommon[ParamType]):
@@ -292,6 +296,8 @@ class FastGridScanThreeD(FastGridScanCommon[ParamType]):
 
     def __init__(self, prefix: str, name: str = "") -> None:
         full_prefix = prefix + "FGS:"
+        super().__init__(full_prefix, prefix, name)
+
         # Number of vertical steps during the second grid scan, after the rotation in omega
         self.z_steps = epics_signal_rw_rbv(int, f"{prefix}Z_NUM_STEPS")
         self.z_step_size = epics_signal_rw_rbv(float, f"{prefix}Z_STEP_SIZE")
@@ -299,8 +305,6 @@ class FastGridScanThreeD(FastGridScanCommon[ParamType]):
         self.y2_start = epics_signal_rw_rbv(float, f"{prefix}Y2_START")
         self.x_counter = epics_signal_r(int, f"{full_prefix}X_COUNTER")
         self.y_counter = epics_signal_r(int, f"{full_prefix}Y_COUNTER")
-
-        super().__init__(full_prefix, prefix, name)
 
         self.movable_params["z_step_size_mm"] = self.z_step_size
         self.movable_params["z2_start_mm"] = self.z2_start
@@ -324,8 +328,8 @@ class FastGridScanThreeD(FastGridScanCommon[ParamType]):
     def _create_scan_invalid_signal(self, prefix: str) -> SignalR[float]:
         return epics_signal_r(float, f"{prefix}SCAN_INVALID")
 
-    def _create_motion_program(self, smargon_prefix: str):
-        return MotionProgram(smargon_prefix)
+    def _create_motion_program(self, motion_controller_prefix: str):
+        return MotionProgram(motion_controller_prefix)
 
 
 class ZebraFastGridScanThreeD(FastGridScanThreeD[ZebraGridScanParamsThreeD]):

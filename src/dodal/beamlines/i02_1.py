@@ -62,7 +62,7 @@ def zebra_fast_grid_scan() -> ZebraFastGridScanTwoD:
     """
     return ZebraFastGridScanTwoD(
         prefix=f"{PREFIX.beamline_prefix}-MO-SAMP-11:",
-        smargon_prefix="BL02J-MO-STEP-11:",
+        motion_controller_prefix="BL02J-MO-STEP-11:",
     )
 
 
