@@ -110,7 +110,7 @@ class test_apple2(Apple2):
         prefix: str = "",
         name: str = "",
     ) -> None:
-        super().__init__(id_gap, id_phase, prefix, name)
+        super().__init__(id_gap, id_phase, prefix)
 
     @AsyncStatus.wrap
     async def set(self, value: float): ...
