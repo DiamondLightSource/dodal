@@ -87,6 +87,7 @@ class VGScientaAnalyserDriverIO(
             self.lens_mode.set(ke_region.lens_mode),
             self.pass_energy.set(ke_region.pass_energy),
             self.iterations.set(ke_region.iterations),
+            self.acquire_time.set(ke_region.acquire_time),
             self.acquisition_mode.set(ke_region.acquisition_mode),
             self.excitation_energy.set(excitation_energy),
             self.excitation_energy_source.set(source.name),
