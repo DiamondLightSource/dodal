@@ -478,7 +478,6 @@ class Apple2(abc.ABC, StandardReadable, Movable, Preparable, Flyable):
         self,
         id_gap: UndulatorGap,
         id_phase: UndulatorPhaseAxes,
-        prefix: str = "",
         name: str = "",
     ) -> None:
         """
