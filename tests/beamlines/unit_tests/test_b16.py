@@ -1,16 +1,7 @@
-from unittest.mock import MagicMock, Mock, patch
+from unittest.mock import MagicMock, patch
 
 from dodal.common.beamlines.device_helpers import CAM_SUFFIX, TIFF_SUFFIX
-from dodal.devices.b16.detector import (
-    ConstantDeadTimeController,
-    software_triggered_tiff_area_detector,
-)
-
-
-def test_constant_dead_time_controller_returns_constant():
-    constant_deadtime = 2.4
-    controller = ConstantDeadTimeController(driver=Mock(), deadtime=constant_deadtime)
-    assert controller.get_deadtime(exposure=Mock()) == constant_deadtime
+from dodal.devices.b16.detector import software_triggered_tiff_area_detector
 
 
 def test_software_triggered_tiff_area_detector_calls_with_io_correctly():

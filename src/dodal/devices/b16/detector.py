@@ -1,5 +1,4 @@
 from ophyd_async.epics.adcore import (
-    ADBaseController,
     ADBaseIO,
     ADTIFFWriter,
     AreaDetector,
@@ -7,15 +6,7 @@ from ophyd_async.epics.adcore import (
 
 from dodal.common.beamlines.beamline_utils import get_path_provider
 from dodal.common.beamlines.device_helpers import CAM_SUFFIX, TIFF_SUFFIX
-
-
-class ConstantDeadTimeController(ADBaseController):
-    def __init__(self, driver: ADBaseIO, deadtime: float):
-        super().__init__(driver)
-        self.deadtime = deadtime
-
-    def get_deadtime(self, exposure: float | None) -> float:
-        return self.deadtime
+from dodal.devices.controllers import ConstantDeadTimeController
 
 
 def software_triggered_tiff_area_detector(prefix: str, deadtime: float = 0.0):
