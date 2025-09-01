@@ -62,7 +62,7 @@ def mirror_voltage_with_set_to_value(
 @pytest.fixture
 def mirror_voltage():
     with init_devices(mock=True):
-        mirror_voltage = SingleMirrorVoltage()
+        mirror_voltage = SingleMirrorVoltage(prefix="MV:")
     return mirror_voltage
 
 
