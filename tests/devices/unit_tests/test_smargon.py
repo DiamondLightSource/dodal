@@ -152,7 +152,7 @@ async def test_given_set_with_all_values_then_motors_set_in_order(smargon: Smarg
 async def test_given_set_fails_then_defer_moves_turned_back_off(smargon: Smargon):
     class MyException(Exception): ...
 
-    smargon.x.set = MagicMock(side_effect=MyException())
+    smargon.x.user_setpoint.set = MagicMock(side_effect=MyException())
     with pytest.raises(MyException):
         await smargon.set(CombinedMove(x=10))
 
@@ -167,7 +167,7 @@ async def test_given_motor_does_not_change_setpoint_then_deferred_move_times_out
     smargon.DEFERRED_MOVE_SET_TIMEOUT = 0.01  # type: ignore
 
     # Override the callback so it doesn't change the `user_setpoint`
-    smargon.x.set = MagicMock()
+    smargon.x.user_setpoint.set = MagicMock()
 
     with pytest.raises(TimeoutError):
         await smargon.set(CombinedMove(x=10))
