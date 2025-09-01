@@ -113,14 +113,14 @@ EXPECTED_DESCRIBE_CONFIG_RESULT = f"""{{
 @pytest.fixture
 async def sim_synchrotron() -> Synchrotron:
     async with init_devices(mock=True):
-        sim_synchrotron = Synchrotron()
-    set_mock_value(sim_synchrotron.current, CURRENT)
-    set_mock_value(sim_synchrotron.machine_user_countdown, USER_COUNTDOWN)
-    set_mock_value(sim_synchrotron.top_up_start_countdown, START_COUNTDOWN)
-    set_mock_value(sim_synchrotron.top_up_end_countdown, END_COUNTDOWN)
-    set_mock_value(sim_synchrotron.energy, ENERGY)
-    set_mock_value(sim_synchrotron.synchrotron_mode, MODE)
-    return sim_synchrotron
+        synchrotron = Synchrotron()
+    set_mock_value(synchrotron.current, CURRENT)
+    set_mock_value(synchrotron.machine_user_countdown, USER_COUNTDOWN)
+    set_mock_value(synchrotron.top_up_start_countdown, START_COUNTDOWN)
+    set_mock_value(synchrotron.top_up_end_countdown, END_COUNTDOWN)
+    set_mock_value(synchrotron.energy, ENERGY)
+    set_mock_value(synchrotron.synchrotron_mode, MODE)
+    return synchrotron
 
 
 async def test_synchrotron_read(sim_synchrotron: Synchrotron):
