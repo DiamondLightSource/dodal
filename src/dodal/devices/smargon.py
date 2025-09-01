@@ -12,7 +12,7 @@ from ophyd_async.core import (
     AsyncStatus,
     Device,
     StrictEnum,
-    set_and_wait_for_other_value,
+    set_and_wait_for_value,
     wait_for_value,
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
@@ -175,11 +175,9 @@ class Smargon(XYZStage, Movable):
         try:
             finished_moving = []
             for motor_name, new_setpoint in value.items():
-                if new_setpoint is not None:
+                if new_setpoint is not None and isinstance(new_setpoint, float):
                     axis: Motor = getattr(self, motor_name)
-                    put_completion = await set_and_wait_for_other_value(
-                        axis,
-                        new_setpoint,
+                    put_completion = await set_and_wait_for_value(
                         axis.user_setpoint,
                         new_setpoint,
                         timeout=self.DEFERRED_MOVE_SET_TIMEOUT,
