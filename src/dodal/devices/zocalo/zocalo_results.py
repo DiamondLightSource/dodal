@@ -100,31 +100,26 @@ def source_from_results(results):
 
 class ZocaloResults(StandardReadable, Triggerable):
     """An ophyd device which can wait for results from a Zocalo job. These jobs should
-        be triggered from a plan-subscribed callback using the run_start() and run_end()
-        methods on dodal.devices.zocalo.ZocaloTrigger.
+    be triggered from a plan-subscribed callback using the run_start() and run_end()
+    methods on dodal.devices.zocalo.ZocaloTrigger.
 
-        See https://diamondlightsource.github.io/dodal/main/how-to/zocalo.html
+    See https://diamondlightsource.github.io/dodal/main/how-to/zocalo.html
 
-        Args:
-            name (str): Name of the device
+    Args:
+        name (str): Name of the device
 
-            zocalo_environment (str): How zocalo is configured. Defaults to i03's development configuration
+        zocalo_environment (str): How zocalo is configured. Defaults to i03's development configuration
 
-            channel (str): Name for the results Queue
+        channel (str): Name for the results Queue
 
-            sort_key (str): How results are ranked. Defaults to sorting by highest counts
+        sort_key (str): How results are ranked. Defaults to sorting by highest counts
 
-            timeout_s (float): Maximum time to wait for the Queue to be filled by an object, starting
-            from when the ZocaloResults device is triggered
+        timeout_s (float): Maximum time to wait for the Queue to be filled by an object, starting
+        from when the ZocaloResults device is triggered
 
-    <<<<<<< HEAD
-            use_gpu (bool): When True, ZocaloResults will take the first set of
-            results that it receives (which are likely the GPU results)
-    =======
-            prefix (str): EPICS PV prefix for the device
+        prefix (str): EPICS PV prefix for the device
 
-            results_source (ZocaloSource): Where to get results from, GPU or CPU analysis
-    >>>>>>> main
+        results_source (ZocaloSource): Where to get results from, GPU or CPU analysis
 
     """
 
