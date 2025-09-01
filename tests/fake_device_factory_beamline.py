@@ -6,7 +6,7 @@ from event_model.documents.event_descriptor import DataKey
 from ophyd_async.core import Device
 
 from dodal.common.beamlines.beamline_utils import device_factory, device_instantiation
-from dodal.devices.cryostream import CryoStream
+from dodal.devices.cryostream import OxfordCryoStream
 
 
 class ReadableDevice(Readable, Device):
@@ -23,8 +23,8 @@ def device_a() -> ReadableDevice:
 
 
 @device_factory(skip=lambda: True)
-def device_c() -> CryoStream:
-    return CryoStream("FOO:")
+def device_c() -> OxfordCryoStream:
+    return OxfordCryoStream("FOO:")
 
 
 @device_factory(skip=True)
