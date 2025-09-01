@@ -43,7 +43,7 @@ class StubOffsets(Device):
     set them so that the current position is zero or to pre-defined positions.
     """
 
-    def __init__(self, name: str = "", prefix: str = ""):
+    def __init__(self, prefix: str, name: str = ""):
         self.center_at_current_position = SetWhenEnabled(prefix=prefix + "CENTER_CS")
         self.to_robot_load = SetWhenEnabled(prefix=prefix + "SET_STUBS_TO_RL")
         super().__init__(name)
@@ -126,7 +126,7 @@ class Smargon(XYZStage, Movable):
 
     DEFERRED_MOVE_SET_TIMEOUT = 5
 
-    def __init__(self, prefix: str = "", name: str = ""):
+    def __init__(self, prefix: str, name: str = ""):
         with self.add_children_as_readables():
             self.chi = Motor(prefix + "CHI")
             self.phi = Motor(prefix + "PHI")

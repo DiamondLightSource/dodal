@@ -4,6 +4,7 @@ from dodal.devices.zocalo.zocalo_results import (
     NoZocaloSubscription,
     XrcResult,
     ZocaloResults,
+    ZocaloSource,
     get_full_processing_results,
 )
 
@@ -15,4 +16,5 @@ __all__ = [
     "NoResultsFromZocalo",
     "NoZocaloSubscription",
     "ZocaloStartInfo",
+    "ZocaloSource",
 ]

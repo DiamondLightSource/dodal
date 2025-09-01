@@ -1,5 +1,6 @@
 import os
 from collections.abc import Generator
+from pathlib import PurePath
 from typing import cast
 from unittest.mock import patch
 
@@ -30,8 +31,8 @@ from dodal.plans import count
 System tests that can be run against the containerised IOCs from epics-containers:
 https://github.com/epics-containers/example-services
 
-Check out that repository and using docker or podman deploy the services in the compose
-file:
+Check out that repository at ref '2025.8.1' and using docker or podman deploy the
+services in the compose file:
 
 ```sh
 docker compose up -d
@@ -62,7 +63,7 @@ def with_env():
 @pytest.fixture
 def path_provider() -> Generator[PathProvider]:
     # path must be available to the `det` container, so cannot use tmp_path
-    path_provider = StaticPathProvider(UUIDFilenameProvider(), "/tmp")
+    path_provider = StaticPathProvider(UUIDFilenameProvider(), PurePath("/tmp"))
     set_path_provider(path_provider)
     yield path_provider
     clear_path_provider()

@@ -1,3 +1,4 @@
+from collections.abc import AsyncGenerator
 from unittest.mock import AsyncMock
 
 import numpy as np
@@ -17,7 +18,7 @@ from dodal.devices.oav.utils import (
     wait_for_tip_to_be_found,
 )
 from dodal.devices.smargon import Smargon
-from dodal.devices.util.test_utils import patch_motor
+from dodal.devices.util.test_utils import patch_all_motors
 
 
 def test_bottom_right_from_top_left():
@@ -31,14 +32,12 @@ def test_bottom_right_from_top_left():
 
 
 @pytest.fixture
-async def smargon(RE: RunEngine):
+async def smargon(RE: RunEngine) -> AsyncGenerator[Smargon]:
     async with init_devices(mock=True):
-        smargon = Smargon()
+        smargon = Smargon("")
 
-    for motor in [smargon.omega, smargon.x, smargon.y, smargon.z]:
-        patch_motor(motor)
-
-    return smargon
+    with patch_all_motors(smargon):
+        yield smargon
 
 
 @pytest.mark.parametrize(

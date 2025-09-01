@@ -1,24 +1,17 @@
-from pathlib import Path  # noqa
-from ophyd_async.fastcs.panda import HDFPanda
 from ophyd_async.epics.adaravis import AravisDetector
-from dodal.devices.i22.nxsas import NXSasMetadataHolder, NXSasOAV
-from dodal.common.beamlines.device_helpers import CAM_SUFFIX, HDF5_SUFFIX
-
+from ophyd_async.fastcs.eiger import EigerDetector
+from ophyd_async.fastcs.panda import HDFPanda
 
 from dodal.common.beamlines.beamline_utils import (
     device_factory,
     get_path_provider,
-    set_path_provider,
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.common.visit import RemoteDirectoryServiceClient, StaticVisitPathProvider
-from ophyd_async.fastcs.eiger import EigerDetector
-
-
+from dodal.common.beamlines.device_helpers import CAM_SUFFIX, HDF5_SUFFIX
+from dodal.devices.i22.nxsas import NXSasMetadataHolder, NXSasOAV
 from dodal.devices.linkam3 import Linkam3
 from dodal.devices.slits import Slits
 from dodal.devices.synchrotron import Synchrotron
-
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
@@ -26,19 +19,6 @@ BL = get_beamline_name("b21")
 PREFIX = BeamlinePrefix(BL)
 set_log_beamline(BL)
 set_utils_beamline(BL)
-
-# Currently we must hard-code the visit, determining the visit at runtime requires
-# infrastructure that is still WIP.
-# Communication with GDA is also WIP so for now we determine an arbitrary scan number
-# locally and write the commissioning directory. The scan number is not guaranteed to
-# be unique and the data is at risk - this configuration is for testing only.
-set_path_provider(
-    StaticVisitPathProvider(
-        BL,
-        Path("/dls/b21/data/2025/cm40642-3/bluesky"),
-        client=RemoteDirectoryServiceClient(f"http://{BL}-control:8088/api"),
-    )
-)
 
 
 @device_factory()
@@ -116,8 +96,6 @@ def slits_7() -> Slits:
         prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-07:",
         x_gap="X:GAP",
         y_gap="Y:GAP",
-        x_centre="X:CENTRE",
-        y_centre="Y:CENTRE",
     )
 
 
