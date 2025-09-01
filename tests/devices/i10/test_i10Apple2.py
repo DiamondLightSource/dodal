@@ -28,6 +28,7 @@ from tests.devices.i10.test_data import (
 )
 
 from dodal.devices.apple2_undulator import (
+    EnergySetter,
     Pol,
     UndulatorGap,
     UndulatorGateStatus,
@@ -36,7 +37,6 @@ from dodal.devices.apple2_undulator import (
 )
 from dodal.devices.i10.i10_apple2 import (
     DEFAULT_JAW_PHASE_POLY_PARAMS,
-    EnergySetter,
     I10Apple2,
     I10Apple2Pol,
     LinearArbitraryAngle,

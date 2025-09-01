@@ -1,4 +1,3 @@
-import asyncio
 import csv
 from dataclasses import dataclass
 from pathlib import Path
@@ -13,9 +12,9 @@ from ophyd_async.core import (
     StandardReadable,
     StandardReadableFormat,
     soft_signal_r_and_setter,
-    soft_signal_rw,
 )
 
+from dodal.devices.apple2_undulator import EnergySetter
 from dodal.log import LOGGER
 
 from ..apple2_undulator import (
@@ -190,44 +189,6 @@ class I10Apple2(Apple2):
                 raise FileNotFoundError(f"{key} look up table is not in path: {path}")
 
         self._available_pol = list(self.lookup_tables["Gap"].keys())
-
-
-class EnergySetter(StandardReadable, Movable[float]):
-    """
-    Compound device to set both ID and PGM energy at the same time.
-
-    """
-
-    def __init__(self, id: I10Apple2, pgm: PGM, name: str = "") -> None:
-        """
-        Parameters
-        ----------
-        id:
-            An Apple2 device.
-        pgm:
-            A PGM/mono device.
-        name:
-            New device name.
-        """
-        super().__init__(name=name)
-        self.id = id
-        self.pgm_ref = Reference(pgm)
-
-        self.add_readables(
-            [self.id.energy, self.pgm_ref().energy.user_readback],
-            StandardReadableFormat.HINTED_SIGNAL,
-        )
-
-        with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
-            self.energy_offset = soft_signal_rw(float, initial_value=0)
-
-    @AsyncStatus.wrap
-    async def set(self, value: float) -> None:
-        LOGGER.info(f"Moving f{self.name} energy to {value}.")
-        await asyncio.gather(
-            self.id.set(value=value + await self.energy_offset.get_value()),
-            self.pgm_ref().energy.set(value),
-        )
 
 
 class I10Apple2Pol(StandardReadable, Movable[Pol]):
