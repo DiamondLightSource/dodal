@@ -58,6 +58,6 @@ async def test_log_on_percentage_complete_value_error_on_bad_input():
     status = test_watchable.get_watchable_status()
     with pytest.raises(
         ValueError,
-        match="Percent interval on class _LogOnPercentageProgressWatcher must be a positive number, but recieved 0",
+        match="Percent interval on class _LogOnPercentageProgressWatcher must be a positive number, but received 0",
     ):
         log_on_percentage_complete(status, "", 0)
