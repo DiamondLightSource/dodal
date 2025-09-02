@@ -17,7 +17,7 @@ from dodal.devices.i19.shutter import (
 
 
 async def make_test_shutter(hutch: HutchState) -> AccessControlledShutter:
-    shutter = AccessControlledShutter("", hutch, name="mock_shutter")
+    shutter = AccessControlledShutter("", hutch, "cm12345-1", name="mock_shutter")
     await shutter.connect(mock=True)
 
     shutter.url = "http://test-blueapi.url"
@@ -37,7 +37,7 @@ async def eh2_shutter(RE: RunEngine) -> AccessControlledShutter:
 
 @pytest.mark.parametrize("hutch_name", [HutchState.EH1, HutchState.EH2])
 def shutter_can_be_created_without_raising_errors(hutch_name: HutchState):
-    test_shutter = AccessControlledShutter("", hutch_name, "test_shutter")
+    test_shutter = AccessControlledShutter("", hutch_name, "cm12345-1", "test_shutter")
     assert isinstance(test_shutter, AccessControlledShutter)
 
 
@@ -107,6 +107,7 @@ async def test_set_corrently_makes_rest_calls(
             "access_device": "access_control",
             "shutter_demand": shutter_demand.value,
         },
+        "instrument_session": "cm12345-1",
     }
     test_request_json = json.dumps(test_request)
     with (
