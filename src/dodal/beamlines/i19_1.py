@@ -1,15 +1,14 @@
+from dodal.beamline_specific_utils.i19 import HutchState, endstation_has_control
 from dodal.common.beamlines.beamline_utils import (
     device_factory,
 )
 from dodal.common.beamlines.beamline_utils import (
     set_beamline as set_utils_beamline,
 )
+from dodal.common.coordination import locked
+from dodal.devices.hutch_shutter import HutchShutter
 from dodal.devices.i19.beamstop import BeamStop
-from dodal.devices.i19.blueapi_device import HutchState
-from dodal.devices.i19.shutter import (
-    AccessControlledShutter,
-    HutchState,
-)
+from dodal.devices.i19.hutch_access import HutchAccessControl
 from dodal.devices.oav.oav_detector import OAVBeamCentreFile
 from dodal.devices.oav.oav_parameters import OAVConfigBeamCentre
 from dodal.devices.synchrotron import Synchrotron
@@ -38,6 +37,14 @@ ZOOM_PARAMS_FILE = (
     "/dls_sw/i19-1/software/gda_versions/gda/config/xml/jCameraManZoomLevels.xml"
 )
 DISPLAY_CONFIG = "/dls_sw/i19-1/software/daq_configuration/domain/display.configuration"
+
+
+@device_factory()
+def access_control() -> HutchAccessControl:
+    """Get a device that checks the active hutch for i19, instantiate it if it hasn't already been.
+    If this is called when already instantiated, it will return the existing object.
+    """
+    return HutchAccessControl(f"{PREFIX.beamline_prefix}-OP-STAT-01:")
 
 
 # Needs to wait until enum is fixed on the beamline
@@ -70,14 +77,14 @@ def zebra() -> Zebra:
 
 
 @device_factory()
-def shutter() -> AccessControlledShutter:
-    """Get the i19-1 hutch shutter device, instantiate it if it hasn't already been.
+def shutter() -> HutchShutter:
+    """Get the i19 hutch shutter device, instantiate it if it hasn't already been.
     If this is called when already instantiated, it will return the existing object.
+    This shutter is locked, and can only be operated by the end station that is
+    currently active, according to the access_control device.
     """
-    return AccessControlledShutter(
-        prefix=f"{PREFIX.beamline_prefix}-PS-SHTR-01:",
-        hutch=HutchState.EH1,
-    )
+    shutter = HutchShutter(f"{PREFIX.beamline_prefix}-PS-SHTR-01:")
+    return locked(shutter, endstation_has_control(access_control(), HutchState.EH1))
 
 
 @device_factory()
