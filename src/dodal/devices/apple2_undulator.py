@@ -190,7 +190,7 @@ class GapSafeUndulatorMotor(MotorWithoutStop, UndulatorBase):
     wait for the undulator to be safe again before calling the move complete.
     """
 
-    def __init__(self, set_move: SignalW, prefix: str, name: str = ""):
+    def __init__(self, set_move: SignalW[int], prefix: str, name: str = ""):
         # Gate keeper open when move is requested, closed when move is completed
         self.gate = epics_signal_r(UndulatorGateStatus, prefix + "BLGATE")
 
