@@ -202,7 +202,6 @@ class GapSafeUndulatorMotor(MotorWithoutStop, UndulatorBase):
 
     @WatchableAsyncStatus.wrap
     async def set(self, new_position: float, timeout=DEFAULT_MOTOR_MIN_TIMEOUT):
-        self._set_success = True
         (
             old_position,
             units,
@@ -297,7 +296,7 @@ class UndulatorPhaseMotor(MotorWithoutStop):
     /dls_sw/work/R3.14.12.7/support/insertionDevice/db/IDPhaseSoftMotor.template
     """
 
-    def __init__(self, prefix: str, infix: str, name: str = ""):
+    def __init__(self, prefix: str, name: str = ""):
         """
         Parameters
         ----------
@@ -309,11 +308,11 @@ class UndulatorPhaseMotor(MotorWithoutStop):
         name : str
             Name of the Id phase device
         """
-        pv = f"{prefix}BL{infix}"
-        fullPV = pv + "MTR"
-        super().__init__(prefix=fullPV, name=name)
-        self.user_setpoint = epics_signal_w(str, pv + "SET")
-        self.user_setpoint_readback = epics_signal_r(float, pv + "DMD")
+
+        motor_pv = f"{prefix}MTR"
+        super().__init__(prefix=motor_pv, name=name)
+        self.user_setpoint = epics_signal_w(str, prefix + "SET")
+        self.user_setpoint_readback = epics_signal_r(float, prefix + "DMD")
 
 
 class UndulatorPhaseAxes(SafeUndulatorMover[Apple2PhasesVal]):
@@ -337,10 +336,10 @@ class UndulatorPhaseAxes(SafeUndulatorMover[Apple2PhasesVal]):
     ):
         # Gap demand set point and readback
         with self.add_children_as_readables():
-            self.top_outer = UndulatorPhaseMotor(prefix=prefix, infix=top_outer)
-            self.top_inner = UndulatorPhaseMotor(prefix=prefix, infix=top_inner)
-            self.btm_inner = UndulatorPhaseMotor(prefix=prefix, infix=btm_inner)
-            self.btm_outer = UndulatorPhaseMotor(prefix=prefix, infix=btm_outer)
+            self.top_outer = UndulatorPhaseMotor(prefix=f"{prefix}BL{top_outer}")
+            self.top_inner = UndulatorPhaseMotor(prefix=f"{prefix}BL{top_inner}")
+            self.btm_inner = UndulatorPhaseMotor(prefix=f"{prefix}BL{btm_inner}")
+            self.btm_outer = UndulatorPhaseMotor(prefix=f"{prefix}BL{btm_outer}")
         # Nothing move until this is set to 1 and it will return to 0 when done.
         self.set_move = epics_signal_rw(int, f"{prefix}BL{top_outer}" + "MOVE")
 
@@ -391,7 +390,7 @@ class UndulatorJawPhase(SafeUndulatorMover[float]):
     ):
         # Gap demand set point and readback
         with self.add_children_as_readables():
-            self.jaw_phase = UndulatorPhaseMotor(prefix=prefix, infix=jaw_phase)
+            self.jaw_phase = UndulatorPhaseMotor(prefix=f"{prefix}BL{jaw_phase}")
         # Nothing move until this is set to 1 and it will return to 0 when done
         self.set_move = epics_signal_rw(int, f"{prefix}BL{move_pv}" + "MOVE")
 
