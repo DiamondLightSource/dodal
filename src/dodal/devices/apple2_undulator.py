@@ -22,7 +22,7 @@ from ophyd_async.core import (
     soft_signal_r_and_setter,
     wait_for_value,
 )
-from ophyd_async.epics.core import epics_signal_r, epics_signal_rw, epics_signal_w
+from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 from ophyd_async.epics.motor import Motor
 from pydantic import BaseModel, ConfigDict, RootModel
 
@@ -40,19 +40,15 @@ class UndulatorGateStatus(StrictEnum):
 
 @dataclass
 class Apple2PhasesVal:
-    top_outer: str
-    top_inner: str
-    btm_inner: str
-    btm_outer: str
+    top_outer: float
+    top_inner: float
+    btm_inner: float
+    btm_outer: float
 
 
 @dataclass
-class Apple2Val:
-    gap: str
-    top_outer: str
-    top_inner: str
-    btm_inner: str
-    btm_outer: str
+class Apple2Val(Apple2PhasesVal):
+    gap: float
 
 
 class EnergyMinMax(BaseModel):
@@ -256,9 +252,6 @@ class UndulatorGap(GapSafeUndulatorMotor):
         self.set_move = epics_signal_rw(int, prefix + "BLGSETP")
         # Nothing move until this is set to 1 and it will return to 0 when done.
         super().__init__(self.set_move, prefix, name)
-        self.user_setpoint = epics_signal_rw(
-            str, prefix + "GAPSET.B", prefix + "BLGSET"
-        )
         self.max_velocity = epics_signal_r(float, prefix + "BLGSETVEL.HOPR")
         self.min_velocity = epics_signal_r(float, prefix + "BLGSETVEL.LOPR")
 
@@ -282,7 +275,7 @@ class UndulatorGap(GapSafeUndulatorMotor):
         await super().prepare(value)
 
     async def _set_demand_positions(self, value: float) -> None:
-        await self.user_setpoint.set(str(value))
+        await self.user_setpoint.set(value)
 
     async def get_timeout(self) -> float:
         return await estimate_motor_timeout(
@@ -311,7 +304,6 @@ class UndulatorPhaseMotor(MotorWithoutStop):
 
         motor_pv = f"{prefix}MTR"
         super().__init__(prefix=motor_pv, name=name)
-        self.user_setpoint = epics_signal_w(str, prefix + "SET")
         self.user_setpoint_readback = epics_signal_r(float, prefix + "DMD")
 
 
@@ -397,7 +389,7 @@ class UndulatorJawPhase(SafeUndulatorMover[float]):
         super().__init__(self.set_move, prefix, name)
 
     async def _set_demand_positions(self, value: float) -> None:
-        await self.jaw_phase.user_setpoint.set(value=str(value))
+        await self.jaw_phase.user_setpoint.set(value=value)
 
     async def get_timeout(self) -> float:
         """

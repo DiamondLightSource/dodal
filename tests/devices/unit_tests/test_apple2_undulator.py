@@ -41,7 +41,7 @@ async def mock_id_gap(prefix: str = "BLXX-EA-DET-007:") -> UndulatorGap:
     set_mock_value(mock_id_gap.gate, UndulatorGateStatus.CLOSE)
     set_mock_value(mock_id_gap.velocity, 1)
     set_mock_value(mock_id_gap.user_readback, 1)
-    set_mock_value(mock_id_gap.user_setpoint, "1")
+    set_mock_value(mock_id_gap.user_setpoint, 1)
     set_mock_value(mock_id_gap.high_limit_travel, 210)
     set_mock_value(mock_id_gap.low_limit_travel, 20)
     set_mock_value(mock_id_gap.max_velocity, 20)
@@ -101,7 +101,7 @@ async def test_in_motion_error(
     with pytest.raises(RuntimeError):
         await mock_id_gap.set(2)
     set_mock_value(mock_phaseAxes.gate, UndulatorGateStatus.OPEN)
-    setValue = Apple2PhasesVal("3", "2", "5", "7")
+    setValue = Apple2PhasesVal(3, 2, 5, 7)
     with pytest.raises(RuntimeError):
         await mock_phaseAxes.set(setValue)
     set_mock_value(mock_jaw_phase.gate, UndulatorGateStatus.OPEN)
@@ -133,7 +133,7 @@ async def test_gap_cal_timout(
 ):
     set_mock_value(mock_id_gap.velocity, velocity)
     set_mock_value(mock_id_gap.user_readback, readback)
-    set_mock_value(mock_id_gap.user_setpoint, str(target))
+    set_mock_value(mock_id_gap.user_setpoint, target)
 
     assert await mock_id_gap.get_timeout() == pytest.approx(expected_timeout, rel=0.1)
 
@@ -200,7 +200,7 @@ async def test_gap_prepare_success(mock_id_gap: UndulatorGap):
     fly_info = FlyMotorInfo(start_position=25, end_position=35, time_for_move=1)
     await mock_id_gap.prepare(fly_info)
     get_mock_put(mock_id_gap.user_setpoint).assert_awaited_once_with(
-        str(fly_info.ramp_up_start_pos(0.5)), wait=True
+        fly_info.ramp_up_start_pos(0.5), wait=True
     )
 
     assert await mock_id_gap.velocity.get_value() == 10
@@ -209,7 +209,7 @@ async def test_gap_prepare_success(mock_id_gap: UndulatorGap):
 async def test_given_gate_never_closes_then_setting_phases_times_out(
     mock_phaseAxes: UndulatorPhaseAxes, RE: RunEngine
 ):
-    setValue = Apple2PhasesVal("3", "2", "5", "7")
+    setValue = Apple2PhasesVal(3, 2, 5, 7)
 
     callback_on_mock_put(
         mock_phaseAxes.top_outer.user_setpoint,
@@ -221,7 +221,7 @@ async def test_given_gate_never_closes_then_setting_phases_times_out(
 
 
 async def test_phase_status_error(mock_phaseAxes: UndulatorPhaseAxes, RE: RunEngine):
-    setValue = Apple2PhasesVal("3", "2", "5", "7")
+    setValue = Apple2PhasesVal(3, 2, 5, 7)
     set_mock_value(mock_phaseAxes.fault, 1.0)
     with pytest.raises(RuntimeError):
         await mock_phaseAxes.set(setValue)
@@ -284,9 +284,7 @@ async def test_phase_cal_timout(
 
 
 async def test_phase_success_set(mock_phaseAxes: UndulatorPhaseAxes, RE: RunEngine):
-    set_value = Apple2PhasesVal(
-        top_inner="3", top_outer="2", btm_inner="5", btm_outer="7"
-    )
+    set_value = Apple2PhasesVal(top_inner=3, top_outer=2, btm_inner=5, btm_outer=7)
     callback_on_mock_put(
         mock_phaseAxes.top_inner.user_setpoint,
         lambda *_, **__: set_mock_value(mock_phaseAxes.gate, UndulatorGateStatus.OPEN),
