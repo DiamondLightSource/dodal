@@ -800,16 +800,16 @@ class Apple2(abc.ABC, StandardReadable, Movable, Preparable, Flyable):
         return Pol.NONE, 0.0
 
 
-ID_TYPE = TypeVar("ID_TYPE", bound=Apple2)
+Apple2ID = TypeVar("Apple2ID", bound=Apple2)
 
 
-class EnergySetter(StandardReadable, Movable[float], Generic[ID_TYPE]):
+class EnergySetter(StandardReadable, Movable[float], Generic[Apple2ID]):
     """
     Compound device to set both ID and PGM energy at the same time.
 
     """
 
-    def __init__(self, id: ID_TYPE, pgm: PGM, name: str = "") -> None:
+    def __init__(self, id: Apple2ID, pgm: PGM, name: str = "") -> None:
         """
         Parameters
         ----------
