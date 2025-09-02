@@ -45,7 +45,7 @@ set_utils_beamline(BL)
 set_path_provider(
     StaticVisitPathProvider(
         BL,
-        Path("/dls/i22/data/2024/cm37271-2/bluesky"),
+        Path("/dls/i22/data/2025/cm40643-4/"),
         client=RemoteDirectoryServiceClient("http://i22-control:8088/api"),
     )
 )
