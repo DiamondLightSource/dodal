@@ -29,6 +29,8 @@ class AccessControlledShutter(OpticsBlueAPIDevice):
         instrument_session: str = "",
         name: str = "",
     ) -> None:
+        # For instrument session addition to request parameters
+        # see https://github.com/DiamondLightSource/blueapi/issues/1187
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             self.shutter_status = epics_signal_r(ShutterState, f"{prefix}STA")
         self.hutch_request = hutch
