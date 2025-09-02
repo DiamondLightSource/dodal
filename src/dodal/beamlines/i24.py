@@ -41,8 +41,9 @@ BL = get_beamline_name("i24")
 set_log_beamline(BL)
 set_utils_beamline(BL)
 
+# TODO check jungfrau is connected here
 I24_ZEBRA_MAPPING = ZebraMapping(
-    outputs=ZebraTTLOutputs(TTL_EIGER=1, TTL_PILATUS=2, TTL_FAST_SHUTTER=4),
+    outputs=ZebraTTLOutputs(TTL_EIGER=1, TTL_JUNGFRAU=2, TTL_FAST_SHUTTER=4),
     sources=ZebraSources(),
 )
 
