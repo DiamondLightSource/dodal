@@ -1,5 +1,4 @@
 from collections import defaultdict
-from logging import getLogger
 from unittest.mock import AsyncMock
 
 import bluesky.plan_stubs as bps
@@ -25,13 +24,6 @@ from dodal.devices.apple2_undulator import (
     UndulatorJawPhase,
     UndulatorPhaseAxes,
 )
-
-
-@pytest.fixture(scope="function")
-def logger(caplog: pytest.LogCaptureFixture):
-    logger = getLogger()
-    _ = [logger.removeHandler(h) for h in logger.handlers if h != caplog.handler]  # type: ignore
-    return logger
 
 
 @pytest.fixture
@@ -118,7 +110,7 @@ async def test_in_motion_error(
 
 
 async def test_unstoppable_motor_stop_not_implemented(
-    unstoppable_motor: MotorWithoutStop, caplog
+    unstoppable_motor: MotorWithoutStop, caplog: pytest.LogCaptureFixture
 ):
     await unstoppable_motor.stop()
     assert caplog.records[0].msg == "Stopping unstopable_motor is not supported."
