@@ -16,7 +16,7 @@ from ophyd_async.testing import (
 )
 
 from dodal.devices.apple2_undulator import (
-    DEFAULT_MOTOR_MIN_TIMEOUT,
+    DEFAULT_TIMEOUT,
     Apple2PhasesVal,
     MotorWithoutStop,
     UndulatorGap,
@@ -119,9 +119,9 @@ async def test_unstoppable_motor_stop_not_implemented(
 @pytest.mark.parametrize(
     "velocity, readback,target, expected_timeout",
     [
-        (0.7, 20.1, 5.2, 42.5 + DEFAULT_MOTOR_MIN_TIMEOUT),
-        (0.2, 2, 8, 60.0 + DEFAULT_MOTOR_MIN_TIMEOUT),
-        (-0.2, 2, 8, 60.0 + DEFAULT_MOTOR_MIN_TIMEOUT),
+        (0.7, 20.1, 5.2, 42.5 + DEFAULT_TIMEOUT),
+        (0.2, 2, 8, 60.0 + DEFAULT_TIMEOUT),
+        (-0.2, 2, 8, 60.0 + DEFAULT_TIMEOUT),
     ],
 )
 async def test_gap_cal_timout(
@@ -234,25 +234,25 @@ async def test_phase_status_error(mock_phaseAxes: UndulatorPhaseAxes, RE: RunEng
             [-1, 2, 3, 4],
             [5, 2, 3, 4],
             [-2, 2, 3, 4],
-            (14.0 + DEFAULT_MOTOR_MIN_TIMEOUT) * 2,
+            (14.0 + DEFAULT_TIMEOUT) * 2,
         ),
         (
             [-1, 0.8, 3, 4],
             [5, -8.5, 3, 4],
             [-2, 0, 3, 4],
-            (21.2 + DEFAULT_MOTOR_MIN_TIMEOUT) * 2.0,
+            (21.2 + DEFAULT_TIMEOUT) * 2.0,
         ),
         (
             [-1, 0.8, 0.6, 4],
             [5, -8.5, 2, 4],
             [-2, 0, -5.5, 4],
-            (25.0 + DEFAULT_MOTOR_MIN_TIMEOUT) * 2,
+            (25.0 + DEFAULT_TIMEOUT) * 2,
         ),
         (
             [-1, 0.8, 0.6, 2.7],
             [5, -8.5, 2, 30],
             [-2, 0, -5.5, -8.8],
-            (28.74 + DEFAULT_MOTOR_MIN_TIMEOUT) * 2,
+            (28.74 + DEFAULT_TIMEOUT) * 2,
         ),
     ],
 )
@@ -358,9 +358,9 @@ async def test_jaw_phase_status_error(mock_jaw_phase: UndulatorJawPhase):
 @pytest.mark.parametrize(
     "velocity, readback,target, expected_timeout",
     [
-        (0.7, 20.1, 5.2, 42.5 + DEFAULT_MOTOR_MIN_TIMEOUT),
-        (0.2, 2, 8, 60.0 + DEFAULT_MOTOR_MIN_TIMEOUT),
-        (-0.2, 2, 8, 60.0 + DEFAULT_MOTOR_MIN_TIMEOUT),
+        (0.7, 20.1, 5.2, 42.5 + DEFAULT_TIMEOUT),
+        (0.2, 2, 8, 60.0 + DEFAULT_TIMEOUT),
+        (-0.2, 2, 8, 60.0 + DEFAULT_TIMEOUT),
     ],
 )
 async def test_jaw_phase_cal_timout(

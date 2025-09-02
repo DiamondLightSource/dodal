@@ -7,6 +7,7 @@ from typing import Any, Generic, TypeVar
 import numpy as np
 from bluesky.protocols import Movable
 from ophyd_async.core import (
+    DEFAULT_TIMEOUT,
     AsyncStatus,
     Device,
     FlyMotorInfo,
@@ -29,8 +30,6 @@ from pydantic import BaseModel, ConfigDict, RootModel
 from dodal.log import LOGGER
 
 T = TypeVar("T")
-
-DEFAULT_MOTOR_MIN_TIMEOUT = 10
 
 
 class UndulatorGateStatus(StrictEnum):
@@ -112,7 +111,7 @@ async def estimate_motor_timeout(
     vel = await velocity.get_value()
     cur_pos = await curr_pos.get_value()
     target_pos = float(await setpoint.get_value())
-    return abs((target_pos - cur_pos) * 2.0 / vel) + DEFAULT_MOTOR_MIN_TIMEOUT
+    return abs((target_pos - cur_pos) * 2.0 / vel) + DEFAULT_TIMEOUT
 
 
 class UndulatorBase(abc.ABC, Device, Generic[T]):
@@ -166,7 +165,7 @@ class SafeUndulatorMover(StandardReadable, UndulatorBase, Movable[T]):
         await self._set_demand_positions(value)
         timeout = await self.get_timeout()
         LOGGER.info(f"Moving {self.name} to {value} with timeout = {timeout}")
-        await self.set_move.set(value=1, timeout=timeout)
+        await self.set_move.set(value=1, timeout=DEFAULT_TIMEOUT)
         await wait_for_value(self.gate, UndulatorGateStatus.CLOSE, timeout=timeout)
 
 
@@ -197,7 +196,7 @@ class GapSafeUndulatorMotor(MotorWithoutStop, UndulatorBase):
         super().__init__(prefix=prefix + "BLGAPMTR", name=name)
 
     @WatchableAsyncStatus.wrap
-    async def set(self, new_position: float, timeout=DEFAULT_MOTOR_MIN_TIMEOUT):
+    async def set(self, new_position: float, timeout=DEFAULT_TIMEOUT):
         (
             old_position,
             units,
