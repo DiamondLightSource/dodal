@@ -2,7 +2,7 @@ import asyncio
 import logging
 import sys
 import time
-from collections.abc import Mapping
+from collections.abc import Generator, Mapping
 from os import environ
 from pathlib import Path
 from unittest.mock import MagicMock, patch
@@ -125,8 +125,15 @@ def failed_status(failure: Exception) -> Status:
 
 
 @pytest.fixture(scope="session", autouse=True)
-async def _ensure_running_bluesky_event_loop():
-    RE = RunEngine()
+def _loop() -> Generator[asyncio.AbstractEventLoop]:
+    loop = asyncio.new_event_loop()
+    yield loop
+    loop.stop()
+
+
+@pytest.fixture()
+async def RE(_loop: asyncio.AbstractEventLoop):
+    RE = RunEngine(loop=_loop, call_returns_result=True)
     # make sure the event loop is thoroughly up and running before we try to create
     # any ophyd_async devices which might need it
     timeout = time.monotonic() + 1
@@ -135,7 +142,4 @@ async def _ensure_running_bluesky_event_loop():
         if time.monotonic() > timeout:
             raise TimeoutError("This really shouldn't happen but just in case...")
 
-
-@pytest.fixture()
-async def RE():
-    yield RunEngine()
+    yield RE
