@@ -119,7 +119,7 @@ async def estimate_motor_timeout(
     return abs((target_pos - cur_pos) * 2.0 / vel) + DEFAULT_MOTOR_MIN_TIMEOUT
 
 
-class UndulartorBase(abc.ABC, Device, Generic[T]):
+class UndulatorBase(abc.ABC, Device, Generic[T]):
     """Abstract base class for Apple2 undulator devices.
 
     This class provides common functionality for undulator devices, including
@@ -148,7 +148,7 @@ class UndulartorBase(abc.ABC, Device, Generic[T]):
             raise RuntimeError(f"{self.name} is already in motion.")
 
 
-class SafeUndulatorMover(StandardReadable, UndulartorBase, Movable[T]):
+class SafeUndulatorMover(StandardReadable, UndulatorBase, Movable[T]):
     """A device that will check it's safe to move the undulator before moving it and
     wait for the undulator to be safe again before calling the move complete.
     """
@@ -185,7 +185,7 @@ class MotorWithoutStop(Motor):
         LOGGER.info(f"Stopping {self.name} is not supported.")
 
 
-class GapSafeUndulatorMotor(MotorWithoutStop, UndulartorBase):
+class GapSafeUndulatorMotor(MotorWithoutStop, UndulatorBase):
     """A device that will check it's safe to move the undulator before moving it and
     wait for the undulator to be safe again before calling the move complete.
     """
