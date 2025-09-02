@@ -6,7 +6,6 @@ from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
 from bluesky.utils import FailedStatus
 from ophyd_async.core import SignalR, StrictEnum, init_devices
-from ophyd_async.epics.adcore import ADImageMode
 from ophyd_async.testing import (
     assert_configuration,
     assert_reading,
@@ -79,11 +78,11 @@ async def test_analyser_sets_region_correctly(
         energy_source.name, wait=True
     )
     get_mock_put(sim_driver.slices).assert_called_once_with(region.slices, wait=True)
+    get_mock_put(sim_driver.acquire_time).assert_called_once_with(
+        region.acquire_time, wait=True
+    )
     get_mock_put(sim_driver.iterations).assert_called_once_with(
         region.iterations, wait=True
-    )
-    get_mock_put(sim_driver.image_mode).assert_called_once_with(
-        ADImageMode.SINGLE, wait=True
     )
     get_mock_put(sim_driver.detector_mode).assert_called_once_with(
         region.detector_mode, wait=True
@@ -133,7 +132,7 @@ async def test_analyser_sets_region_and_read_configuration_is_correct(
             f"{prefix}slices": partial_reading(region.slices),
             f"{prefix}iterations": partial_reading(region.iterations),
             f"{prefix}total_steps": partial_reading(ANY),
-            f"{prefix}step_time": partial_reading(ANY),
+            f"{prefix}acquire_time": partial_reading(region.acquire_time),
             f"{prefix}total_time": partial_reading(ANY),
             f"{prefix}energy_axis": partial_reading(ANY),
             f"{prefix}binding_energy_axis": partial_reading(ANY),

@@ -3,12 +3,10 @@ from typing import Any
 import pytest
 
 from dodal.common.data_util import load_json_file_to_class
-from dodal.devices.electron_analyser import EnergyMode
-from dodal.devices.electron_analyser.vgscienta import VGScientaRegion, VGScientaSequence
-from dodal.devices.electron_analyser.vgscienta.region import (
+from dodal.devices.electron_analyser import EnergyMode, SelectedSource
+from dodal.devices.electron_analyser.vgscienta import (
     AcquisitionMode,
     DetectorMode,
-    Status,
     VGScientaRegion,
     VGScientaSequence,
 )
@@ -42,12 +40,12 @@ def expected_region_values() -> list[dict[str, Any]]:
             "slices": 1,
             "iterations": 1,
             "acquisition_mode": AcquisitionMode.SWEPT,
-            "excitation_energy_source": "source2",
+            "excitation_energy_source": SelectedSource.SOURCE2,
             "energy_mode": EnergyMode.KINETIC,
             "low_energy": 100.0,
             "high_energy": 101.0,
             "centre_energy": 9.0,
-            "step_time": 1.0,
+            "acquire_time": 1.0,
             "total_steps": 8.0,
             "total_time": 8.0,
             "energy_step": 0.2,
@@ -56,7 +54,6 @@ def expected_region_values() -> list[dict[str, Any]]:
             "min_y": 101,
             "sensor_max_size_y": 800,
             "detector_mode": DetectorMode.ADC,
-            "status": Status.READY,
         },
         {
             "name": "New_Region1",
@@ -67,12 +64,12 @@ def expected_region_values() -> list[dict[str, Any]]:
             "slices": 10,
             "iterations": 5,
             "acquisition_mode": AcquisitionMode.FIXED,
-            "excitation_energy_source": "source1",
+            "excitation_energy_source": SelectedSource.SOURCE1,
             "energy_mode": EnergyMode.BINDING,
             "low_energy": 4899.5615,
             "high_energy": 4900.4385,
             "centre_energy": 4900.0,
-            "step_time": 0.882,
+            "acquire_time": 0.882,
             "total_steps": 1.0,
             "total_time": 4.41,
             "energy_step": 8.77e-4,
@@ -81,7 +78,6 @@ def expected_region_values() -> list[dict[str, Any]]:
             "min_y": 110,
             "sensor_max_size_y": 795,
             "detector_mode": DetectorMode.PULSE_COUNTING,
-            "status": Status.READY,
         },
         {
             "name": "New_Region2",
@@ -92,12 +88,12 @@ def expected_region_values() -> list[dict[str, Any]]:
             "slices": 5,
             "iterations": 2,
             "acquisition_mode": AcquisitionMode.FIXED,
-            "excitation_energy_source": "source1",
+            "excitation_energy_source": SelectedSource.SOURCE1,
             "energy_mode": EnergyMode.KINETIC,
             "low_energy": 149.1905,
             "high_energy": 150.8095,
             "centre_energy": 150.0,
-            "step_time": 0.0625,
+            "acquire_time": 0.0625,
             "total_steps": 1.0,
             "total_time": 0.126,
             "energy_step": 0.001619,
@@ -106,7 +102,6 @@ def expected_region_values() -> list[dict[str, Any]]:
             "min_y": 101,
             "sensor_max_size_y": 800,
             "detector_mode": DetectorMode.ADC,
-            "status": Status.READY,
         },
     ]
 
@@ -118,27 +113,6 @@ def test_sequence_get_expected_enabled_region_names(
     assert sequence.get_enabled_region_names() == expected_enabled_region_names
     for i, region in enumerate(sequence.get_enabled_regions()):
         assert region.name == expected_enabled_region_names[i]
-
-
-def test_sequence_get_expected_excitation_energy_source(
-    sequence: VGScientaSequence[LensMode, PsuMode, PassEnergy],
-) -> None:
-    assert (
-        sequence.get_excitation_energy_source_by_region(sequence.regions[0])
-        == sequence.excitation_energy_sources[1]
-    )
-    assert (
-        sequence.get_excitation_energy_source_by_region(sequence.regions[1])
-        == sequence.excitation_energy_sources[0]
-    )
-    with pytest.raises(ValueError):
-        sequence.get_excitation_energy_source_by_region(
-            VGScientaRegion[LensMode, PassEnergy](
-                excitation_energy_source="invalid_source",
-                lens_mode=LensMode.ANGULAR45,
-                pass_energy=PassEnergy.E5,
-            )
-        )
 
 
 def test_file_loads_into_class_with_expected_values(

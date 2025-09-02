@@ -8,7 +8,7 @@ BEAMLINE_PARAMETER_KEYWORDS = ["FB", "FULL", "deadtime"]
 
 BEAMLINE_PARAMETER_PATHS = {
     "i03": "/dls_sw/i03/software/daq_configuration/domain/beamlineParameters",
-    "i04": "/dls_sw/i04/software/gda_versions/gda_9_37/workspace_git/gda-mx.git/configurations/i04-config/scripts/beamlineParameters",
+    "i04": "/dls_sw/i04/software/daq_configuration/domain/beamlineParameters",
 }
 
 

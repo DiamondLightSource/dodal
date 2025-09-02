@@ -9,7 +9,6 @@ from ophyd_async.core import (
     SignalR,
     StandardReadableFormat,
 )
-from ophyd_async.epics.adcore import ADImageMode
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
 from dodal.devices.electron_analyser.abstract.base_driver_io import (
@@ -20,7 +19,7 @@ from dodal.devices.electron_analyser.abstract.types import (
     TPassEnergyEnum,
     TPsuMode,
 )
-from dodal.devices.electron_analyser.enums import EnergyMode
+from dodal.devices.electron_analyser.enums import EnergyMode, SelectedSource
 from dodal.devices.electron_analyser.vgscienta.enums import (
     AcquisitionMode,
     DetectorMode,
@@ -46,7 +45,7 @@ class VGScientaAnalyserDriverIO(
         lens_mode_type: type[TLensMode],
         psu_mode_type: type[TPsuMode],
         pass_energy_type: type[TPassEnergyEnum],
-        energy_sources: Mapping[str, SignalR[float]],
+        energy_sources: Mapping[SelectedSource, SignalR[float]],
         name: str = "",
     ) -> None:
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
@@ -55,11 +54,11 @@ class VGScientaAnalyserDriverIO(
 
             self.region_min_x = epics_signal_rw(int, prefix + "MinX")
             self.region_size_x = epics_signal_rw(int, prefix + "SizeX")
-            self.sensor_max_size_x = epics_signal_rw(int, prefix + "MaxSizeX")
+            self.sensor_max_size_x = epics_signal_r(int, prefix + "MaxSizeX_RBV")
 
             self.region_min_y = epics_signal_rw(int, prefix + "MinY")
             self.region_size_y = epics_signal_rw(int, prefix + "SizeY")
-            self.sensor_max_size_y = epics_signal_rw(int, prefix + "MaxSizeY")
+            self.sensor_max_size_y = epics_signal_r(int, prefix + "MaxSizeY_RBV")
 
         super().__init__(
             prefix,
@@ -88,11 +87,11 @@ class VGScientaAnalyserDriverIO(
             self.lens_mode.set(ke_region.lens_mode),
             self.pass_energy.set(ke_region.pass_energy),
             self.iterations.set(ke_region.iterations),
+            self.acquire_time.set(ke_region.acquire_time),
             self.acquisition_mode.set(ke_region.acquisition_mode),
             self.excitation_energy.set(excitation_energy),
             self.excitation_energy_source.set(source.name),
             self.energy_step.set(ke_region.energy_step),
-            self.image_mode.set(ADImageMode.SINGLE),
             self.detector_mode.set(ke_region.detector_mode),
             self.region_min_x.set(ke_region.min_x),
             self.region_size_x.set(ke_region.size_x),
