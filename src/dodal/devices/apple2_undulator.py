@@ -23,6 +23,7 @@ from ophyd_async.core import (
     soft_signal_r_and_setter,
     wait_for_value,
 )
+from ophyd_async.core import StandardReadableFormat as Format
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 from ophyd_async.epics.motor import Motor
 from pydantic import BaseModel, ConfigDict, RootModel
@@ -251,8 +252,16 @@ class UndulatorGap(GapSafeUndulatorMotor):
         self.set_move = epics_signal_rw(int, prefix + "BLGSETP")
         # Nothing move until this is set to 1 and it will return to 0 when done.
         super().__init__(self.set_move, prefix, name)
+
         self.max_velocity = epics_signal_r(float, prefix + "BLGSETVEL.HOPR")
         self.min_velocity = epics_signal_r(float, prefix + "BLGSETVEL.LOPR")
+        """ Clear the motor config_signal as we need new PV for velocity."""
+        self._describe_config_funcs = ()
+        self._read_config_funcs = ()
+        self.velocity = epics_signal_rw(float, prefix + "BLGSETVEL")
+        self.add_readables(
+            [self.velocity, self.motor_egu, self.offset], format=Format.CONFIG_SIGNAL
+        )
 
     @AsyncStatus.wrap
     async def prepare(self, value: FlyMotorInfo) -> None:

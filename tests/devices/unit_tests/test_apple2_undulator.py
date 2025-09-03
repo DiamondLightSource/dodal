@@ -7,6 +7,7 @@ from bluesky.plans import scan
 from bluesky.run_engine import RunEngine
 from ophyd_async.core import FlyMotorInfo, init_devices
 from ophyd_async.testing import (
+    assert_configuration,
     assert_emitted,
     assert_reading,
     callback_on_mock_put,
@@ -183,6 +184,26 @@ async def test_gap_success_scan(mock_id_gap: UndulatorGap, RE: RunEngine):
     assert_emitted(docs, start=1, descriptor=1, event=11, stop=1)
     for i in output:
         assert docs["event"][i]["data"]["mock_id_gap"] == i
+
+
+async def test_gap_read_config(mock_id_gap: UndulatorGap):
+    set_mock_value(mock_id_gap.velocity, 2)
+    set_mock_value(mock_id_gap.motor_egu, "c")
+    await assert_configuration(
+        mock_id_gap,
+        {
+            "mock_id_gap-velocity": {
+                "value": 2.0,
+            },
+            "mock_id_gap-motor_egu": {
+                "value": "c",
+            },
+            "mock_id_gap-offset": {
+                "value": 0.0,
+            },
+        },
+        full_match=False,
+    )
 
 
 async def test_gap_prepare_velocity_min_limit_error(mock_id_gap: UndulatorGap):
