@@ -69,7 +69,7 @@ class I10Apple2(Apple2):
         self,
         look_up_table_dir: str,
         source: tuple[str, str],
-        prefix: str = "",
+        prefix: str,
         mode: str = "Mode",
         min_energy: str = "MinEnergy",
         max_energy: str = "MaxEnergy",
@@ -122,7 +122,6 @@ class I10Apple2(Apple2):
                     btm_inner="RPQ3",
                     btm_outer="RPQ4",
                 ),
-                prefix=prefix,
                 name=name,
             )
             self.id_jaw_phase = UndulatorJawPhase(
@@ -154,11 +153,11 @@ class I10Apple2(Apple2):
         gap, phase = await self._get_id_gap_phase(value)
         phase3 = phase * (-1 if pol == Pol.LA else 1)
         id_set_val = Apple2Val(
-            top_outer=f"{phase:.6f}",
-            top_inner="0.0",
-            btm_inner=f"{phase3:.6f}",
-            btm_outer="0.0",
-            gap=f"{gap:.6f}",
+            top_outer=phase,
+            top_inner=0.0,
+            btm_inner=phase3,
+            btm_outer=0.0,
+            gap=gap,
         )
 
         LOGGER.info(f"Setting polarisation to {pol}, with values: {id_set_val}")

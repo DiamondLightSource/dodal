@@ -1,5 +1,4 @@
 from collections import defaultdict
-from logging import getLogger
 from unittest.mock import AsyncMock, MagicMock
 
 import bluesky.plan_stubs as bps
@@ -17,7 +16,7 @@ from ophyd_async.testing import (
 )
 
 from dodal.devices.apple2_undulator import (
-    DEFAULT_MOTOR_MIN_TIMEOUT,
+    DEFAULT_TIMEOUT,
     Apple2,
     Apple2PhasesVal,
     MotorWithoutStop,
@@ -27,13 +26,6 @@ from dodal.devices.apple2_undulator import (
     UndulatorJawPhase,
     UndulatorPhaseAxes,
 )
-
-
-@pytest.fixture(scope="function")
-def logger(caplog: pytest.LogCaptureFixture):
-    logger = getLogger()
-    _ = [logger.removeHandler(h) for h in logger.handlers if h != caplog.handler]  # type: ignore
-    return logger
 
 
 @pytest.fixture
@@ -51,7 +43,7 @@ async def mock_id_gap(prefix: str = "BLXX-EA-DET-007:") -> UndulatorGap:
     set_mock_value(mock_id_gap.gate, UndulatorGateStatus.CLOSE)
     set_mock_value(mock_id_gap.velocity, 1)
     set_mock_value(mock_id_gap.user_readback, 1)
-    set_mock_value(mock_id_gap.user_setpoint, "1")
+    set_mock_value(mock_id_gap.user_setpoint, 1)
     set_mock_value(mock_id_gap.high_limit_travel, 210)
     set_mock_value(mock_id_gap.low_limit_travel, 20)
     set_mock_value(mock_id_gap.max_velocity, 20)
@@ -110,7 +102,7 @@ class test_apple2(Apple2):
         prefix: str = "",
         name: str = "",
     ) -> None:
-        super().__init__(id_gap, id_phase, prefix, name)
+        super().__init__(id_gap, id_phase, prefix)
 
     @AsyncStatus.wrap
     async def set(self, value, *, wait: bool = False): ...
@@ -136,7 +128,7 @@ async def test_in_motion_error(
     with pytest.raises(RuntimeError):
         await mock_id_gap.set(2)
     set_mock_value(mock_phaseAxes.gate, UndulatorGateStatus.OPEN)
-    setValue = Apple2PhasesVal("3", "2", "5", "7")
+    setValue = Apple2PhasesVal(3, 2, 5, 7)
     with pytest.raises(RuntimeError):
         await mock_phaseAxes.set(setValue)
     set_mock_value(mock_jaw_phase.gate, UndulatorGateStatus.OPEN)
@@ -145,7 +137,7 @@ async def test_in_motion_error(
 
 
 async def test_unstoppable_motor_stop_not_implemented(
-    unstoppable_motor: MotorWithoutStop, caplog
+    unstoppable_motor: MotorWithoutStop, caplog: pytest.LogCaptureFixture
 ):
     await unstoppable_motor.stop()
     assert caplog.records[0].msg == "Stopping unstopable_motor is not supported."
@@ -154,9 +146,9 @@ async def test_unstoppable_motor_stop_not_implemented(
 @pytest.mark.parametrize(
     "velocity, readback,target, expected_timeout",
     [
-        (0.7, 20.1, 5.2, 42.5 + DEFAULT_MOTOR_MIN_TIMEOUT),
-        (0.2, 2, 8, 60.0 + DEFAULT_MOTOR_MIN_TIMEOUT),
-        (-0.2, 2, 8, 60.0 + DEFAULT_MOTOR_MIN_TIMEOUT),
+        (0.7, 20.1, 5.2, 42.5 + DEFAULT_TIMEOUT),
+        (0.2, 2, 8, 60.0 + DEFAULT_TIMEOUT),
+        (-0.2, 2, 8, 60.0 + DEFAULT_TIMEOUT),
     ],
 )
 async def test_gap_cal_timout(
@@ -168,7 +160,7 @@ async def test_gap_cal_timout(
 ):
     set_mock_value(mock_id_gap.velocity, velocity)
     set_mock_value(mock_id_gap.user_readback, readback)
-    set_mock_value(mock_id_gap.user_setpoint, str(target))
+    set_mock_value(mock_id_gap.user_setpoint, target)
 
     assert await mock_id_gap.get_timeout() == pytest.approx(expected_timeout, rel=0.1)
 
@@ -235,7 +227,7 @@ async def test_gap_prepare_success(mock_id_gap: UndulatorGap):
     fly_info = FlyMotorInfo(start_position=25, end_position=35, time_for_move=1)
     await mock_id_gap.prepare(fly_info)
     get_mock_put(mock_id_gap.user_setpoint).assert_awaited_once_with(
-        str(fly_info.ramp_up_start_pos(0.5)), wait=True
+        fly_info.ramp_up_start_pos(0.5), wait=True
     )
 
     assert await mock_id_gap.velocity.get_value() == 10
@@ -244,7 +236,7 @@ async def test_gap_prepare_success(mock_id_gap: UndulatorGap):
 async def test_given_gate_never_closes_then_setting_phases_times_out(
     mock_phaseAxes: UndulatorPhaseAxes, RE: RunEngine
 ):
-    setValue = Apple2PhasesVal("3", "2", "5", "7")
+    setValue = Apple2PhasesVal(3, 2, 5, 7)
 
     callback_on_mock_put(
         mock_phaseAxes.top_outer.user_setpoint,
@@ -256,7 +248,7 @@ async def test_given_gate_never_closes_then_setting_phases_times_out(
 
 
 async def test_phase_status_error(mock_phaseAxes: UndulatorPhaseAxes, RE: RunEngine):
-    setValue = Apple2PhasesVal("3", "2", "5", "7")
+    setValue = Apple2PhasesVal(3, 2, 5, 7)
     set_mock_value(mock_phaseAxes.fault, 1.0)
     with pytest.raises(RuntimeError):
         await mock_phaseAxes.set(setValue)
@@ -269,25 +261,25 @@ async def test_phase_status_error(mock_phaseAxes: UndulatorPhaseAxes, RE: RunEng
             [-1, 2, 3, 4],
             [5, 2, 3, 4],
             [-2, 2, 3, 4],
-            (14.0 + DEFAULT_MOTOR_MIN_TIMEOUT) * 2,
+            (14.0 + DEFAULT_TIMEOUT) * 2,
         ),
         (
             [-1, 0.8, 3, 4],
             [5, -8.5, 3, 4],
             [-2, 0, 3, 4],
-            (21.2 + DEFAULT_MOTOR_MIN_TIMEOUT) * 2.0,
+            (21.2 + DEFAULT_TIMEOUT) * 2.0,
         ),
         (
             [-1, 0.8, 0.6, 4],
             [5, -8.5, 2, 4],
             [-2, 0, -5.5, 4],
-            (25.0 + DEFAULT_MOTOR_MIN_TIMEOUT) * 2,
+            (25.0 + DEFAULT_TIMEOUT) * 2,
         ),
         (
             [-1, 0.8, 0.6, 2.7],
             [5, -8.5, 2, 30],
             [-2, 0, -5.5, -8.8],
-            (28.74 + DEFAULT_MOTOR_MIN_TIMEOUT) * 2,
+            (28.74 + DEFAULT_TIMEOUT) * 2,
         ),
     ],
 )
@@ -319,9 +311,7 @@ async def test_phase_cal_timout(
 
 
 async def test_phase_success_set(mock_phaseAxes: UndulatorPhaseAxes, RE: RunEngine):
-    set_value = Apple2PhasesVal(
-        top_inner="3", top_outer="2", btm_inner="5", btm_outer="7"
-    )
+    set_value = Apple2PhasesVal(top_inner=3, top_outer=2, btm_inner=5, btm_outer=7)
     callback_on_mock_put(
         mock_phaseAxes.top_inner.user_setpoint,
         lambda *_, **__: set_mock_value(mock_phaseAxes.gate, UndulatorGateStatus.OPEN),
@@ -395,9 +385,9 @@ async def test_jaw_phase_status_error(mock_jaw_phase: UndulatorJawPhase):
 @pytest.mark.parametrize(
     "velocity, readback,target, expected_timeout",
     [
-        (0.7, 20.1, 5.2, 42.5 + DEFAULT_MOTOR_MIN_TIMEOUT),
-        (0.2, 2, 8, 60.0 + DEFAULT_MOTOR_MIN_TIMEOUT),
-        (-0.2, 2, 8, 60.0 + DEFAULT_MOTOR_MIN_TIMEOUT),
+        (0.7, 20.1, 5.2, 42.5 + DEFAULT_TIMEOUT),
+        (0.2, 2, 8, 60.0 + DEFAULT_TIMEOUT),
+        (-0.2, 2, 8, 60.0 + DEFAULT_TIMEOUT),
     ],
 )
 async def test_jaw_phase_cal_timout(

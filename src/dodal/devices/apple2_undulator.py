@@ -7,6 +7,7 @@ from typing import Any, Generic, TypeVar
 import numpy as np
 from bluesky.protocols import Flyable, Movable, Preparable
 from ophyd_async.core import (
+    DEFAULT_TIMEOUT,
     AsyncStatus,
     Device,
     FlyMotorInfo,
@@ -22,15 +23,13 @@ from ophyd_async.core import (
     soft_signal_r_and_setter,
     wait_for_value,
 )
-from ophyd_async.epics.core import epics_signal_r, epics_signal_rw, epics_signal_w
+from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 from ophyd_async.epics.motor import Motor
 from pydantic import BaseModel, ConfigDict, RootModel
 
 from dodal.log import LOGGER
 
 T = TypeVar("T")
-
-DEFAULT_MOTOR_MIN_TIMEOUT = 10
 
 
 class UndulatorGateStatus(StrictEnum):
@@ -40,19 +39,15 @@ class UndulatorGateStatus(StrictEnum):
 
 @dataclass
 class Apple2PhasesVal:
-    top_outer: str
-    top_inner: str
-    btm_inner: str
-    btm_outer: str
+    top_outer: float
+    top_inner: float
+    btm_inner: float
+    btm_outer: float
 
 
 @dataclass
-class Apple2Val:
-    gap: str
-    top_outer: str
-    top_inner: str
-    btm_inner: str
-    btm_outer: str
+class Apple2Val(Apple2PhasesVal):
+    gap: float
 
 
 class EnergyMinMax(BaseModel):
@@ -116,10 +111,10 @@ async def estimate_motor_timeout(
     vel = await velocity.get_value()
     cur_pos = await curr_pos.get_value()
     target_pos = float(await setpoint.get_value())
-    return abs((target_pos - cur_pos) * 2.0 / vel) + DEFAULT_MOTOR_MIN_TIMEOUT
+    return abs((target_pos - cur_pos) * 2.0 / vel) + DEFAULT_TIMEOUT
 
 
-class UndulartorBase(abc.ABC, Device, Generic[T]):
+class UndulatorBase(abc.ABC, Device, Generic[T]):
     """Abstract base class for Apple2 undulator devices.
 
     This class provides common functionality for undulator devices, including
@@ -148,7 +143,7 @@ class UndulartorBase(abc.ABC, Device, Generic[T]):
             raise RuntimeError(f"{self.name} is already in motion.")
 
 
-class SafeUndulatorMover(StandardReadable, UndulartorBase, Movable[T]):
+class SafeUndulatorMover(StandardReadable, UndulatorBase, Movable[T]):
     """A device that will check it's safe to move the undulator before moving it and
     wait for the undulator to be safe again before calling the move complete.
     """
@@ -170,7 +165,7 @@ class SafeUndulatorMover(StandardReadable, UndulartorBase, Movable[T]):
         await self._set_demand_positions(value)
         timeout = await self.get_timeout()
         LOGGER.info(f"Moving {self.name} to {value} with timeout = {timeout}")
-        await self.set_move.set(value=1, timeout=timeout)
+        await self.set_move.set(value=1, timeout=DEFAULT_TIMEOUT)
         await wait_for_value(self.gate, UndulatorGateStatus.CLOSE, timeout=timeout)
 
 
@@ -185,12 +180,12 @@ class MotorWithoutStop(Motor):
         LOGGER.info(f"Stopping {self.name} is not supported.")
 
 
-class GapSafeUndulatorMotor(MotorWithoutStop, UndulartorBase):
+class GapSafeUndulatorMotor(MotorWithoutStop, UndulatorBase):
     """A device that will check it's safe to move the undulator before moving it and
     wait for the undulator to be safe again before calling the move complete.
     """
 
-    def __init__(self, set_move: SignalW, prefix: str, name: str = ""):
+    def __init__(self, set_move: SignalW[int], prefix: str, name: str = ""):
         # Gate keeper open when move is requested, closed when move is completed
         self.gate = epics_signal_r(UndulatorGateStatus, prefix + "BLGATE")
 
@@ -201,8 +196,7 @@ class GapSafeUndulatorMotor(MotorWithoutStop, UndulartorBase):
         super().__init__(prefix=prefix + "BLGAPMTR", name=name)
 
     @WatchableAsyncStatus.wrap
-    async def set(self, new_position: float, timeout=DEFAULT_MOTOR_MIN_TIMEOUT):
-        self._set_success = True
+    async def set(self, new_position: float, timeout=DEFAULT_TIMEOUT):
         (
             old_position,
             units,
@@ -257,9 +251,6 @@ class UndulatorGap(GapSafeUndulatorMotor):
         self.set_move = epics_signal_rw(int, prefix + "BLGSETP")
         # Nothing move until this is set to 1 and it will return to 0 when done.
         super().__init__(self.set_move, prefix, name)
-        self.user_setpoint = epics_signal_rw(
-            str, prefix + "GAPSET.B", prefix + "BLGSET"
-        )
         self.max_velocity = epics_signal_r(float, prefix + "BLGSETVEL.HOPR")
         self.min_velocity = epics_signal_r(float, prefix + "BLGSETVEL.LOPR")
 
@@ -283,7 +274,7 @@ class UndulatorGap(GapSafeUndulatorMotor):
         await super().prepare(value)
 
     async def _set_demand_positions(self, value: float) -> None:
-        await self.user_setpoint.set(str(value))
+        await self.user_setpoint.set(value)
 
     async def get_timeout(self) -> float:
         return await estimate_motor_timeout(
@@ -297,7 +288,7 @@ class UndulatorPhaseMotor(MotorWithoutStop):
     /dls_sw/work/R3.14.12.7/support/insertionDevice/db/IDPhaseSoftMotor.template
     """
 
-    def __init__(self, prefix: str, infix: str, name: str = ""):
+    def __init__(self, prefix: str, name: str = ""):
         """
         Parameters
         ----------
@@ -309,11 +300,10 @@ class UndulatorPhaseMotor(MotorWithoutStop):
         name : str
             Name of the Id phase device
         """
-        pv = f"{prefix}BL{infix}"
-        fullPV = pv + "MTR"
-        super().__init__(prefix=fullPV, name=name)
-        self.user_setpoint = epics_signal_w(str, pv + "SET")
-        self.user_setpoint_readback = epics_signal_r(float, pv + "DMD")
+
+        motor_pv = f"{prefix}MTR"
+        super().__init__(prefix=motor_pv, name=name)
+        self.user_setpoint_readback = epics_signal_r(float, prefix + "DMD")
 
 
 class UndulatorPhaseAxes(SafeUndulatorMover[Apple2PhasesVal]):
@@ -337,10 +327,10 @@ class UndulatorPhaseAxes(SafeUndulatorMover[Apple2PhasesVal]):
     ):
         # Gap demand set point and readback
         with self.add_children_as_readables():
-            self.top_outer = UndulatorPhaseMotor(prefix=prefix, infix=top_outer)
-            self.top_inner = UndulatorPhaseMotor(prefix=prefix, infix=top_inner)
-            self.btm_inner = UndulatorPhaseMotor(prefix=prefix, infix=btm_inner)
-            self.btm_outer = UndulatorPhaseMotor(prefix=prefix, infix=btm_outer)
+            self.top_outer = UndulatorPhaseMotor(prefix=f"{prefix}BL{top_outer}")
+            self.top_inner = UndulatorPhaseMotor(prefix=f"{prefix}BL{top_inner}")
+            self.btm_inner = UndulatorPhaseMotor(prefix=f"{prefix}BL{btm_inner}")
+            self.btm_outer = UndulatorPhaseMotor(prefix=f"{prefix}BL{btm_outer}")
         # Nothing move until this is set to 1 and it will return to 0 when done.
         self.set_move = epics_signal_rw(int, f"{prefix}BL{top_outer}" + "MOVE")
 
@@ -391,14 +381,14 @@ class UndulatorJawPhase(SafeUndulatorMover[float]):
     ):
         # Gap demand set point and readback
         with self.add_children_as_readables():
-            self.jaw_phase = UndulatorPhaseMotor(prefix=prefix, infix=jaw_phase)
+            self.jaw_phase = UndulatorPhaseMotor(prefix=f"{prefix}BL{jaw_phase}")
         # Nothing move until this is set to 1 and it will return to 0 when done
         self.set_move = epics_signal_rw(int, f"{prefix}BL{move_pv}" + "MOVE")
 
         super().__init__(self.set_move, prefix, name)
 
     async def _set_demand_positions(self, value: float) -> None:
-        await self.jaw_phase.user_setpoint.set(value=str(value))
+        await self.jaw_phase.user_setpoint.set(value=value)
 
     async def get_timeout(self) -> float:
         """
@@ -475,7 +465,6 @@ class Apple2(abc.ABC, StandardReadable, Movable, Preparable, Flyable):
         self,
         id_gap: UndulatorGap,
         id_phase: UndulatorPhaseAxes,
-        prefix: str = "",
         name: str = "",
     ) -> None:
         """
