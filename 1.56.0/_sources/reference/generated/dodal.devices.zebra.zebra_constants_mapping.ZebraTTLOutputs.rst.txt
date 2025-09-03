@@ -1,0 +1,77 @@
+dodal.devices.zebra.zebra\_constants\_mapping.ZebraTTLOutputs
+=============================================================
+
+.. currentmodule:: dodal.devices.zebra.zebra_constants_mapping
+
+.. autoclass:: ZebraTTLOutputs
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      ~ZebraTTLOutputs.model_config
+      
+      
+      
+      
+      
+      ~ZebraTTLOutputs.TTL_EIGER
+      
+      
+      ~ZebraTTLOutputs.TTL_PILATUS
+      
+      
+      ~ZebraTTLOutputs.TTL_FAST_SHUTTER
+      
+      
+      ~ZebraTTLOutputs.TTL_DETECTOR
+      
+      
+      ~ZebraTTLOutputs.TTL_SHUTTER
+      
+      
+      ~ZebraTTLOutputs.TTL_XSPRESS3
+      
+      
+      ~ZebraTTLOutputs.TTL_PANDA
+      
+   
+   
