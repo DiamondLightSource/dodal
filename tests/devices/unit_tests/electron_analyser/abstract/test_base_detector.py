@@ -38,7 +38,7 @@ async def sim_detector(
             prefix="TEST:",
             energy_sources=energy_sources,
         )
-    # Needed for specs so we don't get divsion by zero error.
+    # Needed for specs so we don't get division by zero error.
     set_mock_value(sim_detector.driver.slices, 1)
     return sim_detector
 
