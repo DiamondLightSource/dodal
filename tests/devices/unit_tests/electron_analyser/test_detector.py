@@ -94,9 +94,7 @@ def test_analyser_detector_has_driver_as_child_and_region_detector_does_not(
 ) -> None:
     # Remove parent name from driver name so it can be checked it exists in
     # _child_devices dict
-    driver_name = sim_detector.driver.name
-    if sim_detector.name + "-" in driver_name:
-        driver_name = driver_name.replace(sim_detector.name + "-", "")
+    driver_name = sim_detector.driver.name.replace(sim_detector.name + "-", "")
 
     assert sim_detector.driver.parent == sim_detector
     assert sim_detector._child_devices.get(driver_name) is not None
