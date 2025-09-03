@@ -51,7 +51,16 @@ class Webcam(StandardReadable, Triggerable):
                     )
                 try:
                     data = await response.read()
-                    LOGGER.info(f"Saving webcam image from {self.url} to {file_path}")
+                    try:
+                        Image.open(data).verify()
+                        LOGGER.info(
+                            f"Saving webcam image from {self.url} to {file_path}"
+                        )
+                    except Exception as e:
+                        LOGGER.warning(
+                            f"Failed verification of image from webcam at {self.url}: ({e}). Using placeholder"
+                        )
+                        data = create_placeholder_image()
                 except Exception as e:
                     LOGGER.warning(
                         f"Failed to read data from {self.url} ({e}). Using placeholder image."
