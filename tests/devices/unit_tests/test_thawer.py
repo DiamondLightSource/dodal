@@ -9,7 +9,7 @@ from dodal.devices.thawer import Thawer, ThawingException, ThawingTimer
 
 
 @pytest.fixture
-def thawer(RE):
+def thawer():
     with init_devices(mock=True):
         thawer = Thawer("", name="thawer")
     return thawer

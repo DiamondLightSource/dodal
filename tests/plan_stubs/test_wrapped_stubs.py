@@ -1,7 +1,6 @@
 from unittest.mock import ANY
 
 import pytest
-from bluesky.run_engine import RunEngine
 from bluesky.utils import Msg
 from ophyd_async.core import (
     init_devices,
@@ -19,14 +18,14 @@ from dodal.plan_stubs.wrapped import (
 
 
 @pytest.fixture
-def x_axis(RE: RunEngine) -> SimMotor:
+def x_axis() -> SimMotor:
     with init_devices():
         x_axis = SimMotor()
     return x_axis
 
 
 @pytest.fixture
-def y_axis(RE: RunEngine) -> SimMotor:
+def y_axis() -> SimMotor:
     with init_devices():
         y_axis = SimMotor()
     return y_axis

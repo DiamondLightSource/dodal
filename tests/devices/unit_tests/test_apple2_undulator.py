@@ -140,7 +140,7 @@ async def test_gap_cal_timout(
 
 
 async def test_given_gate_never_closes_then_setting_gaps_times_out(
-    mock_id_gap: UndulatorGap, RE: RunEngine
+    mock_id_gap: UndulatorGap,
 ):
     callback_on_mock_put(
         mock_id_gap.user_setpoint,
@@ -152,7 +152,7 @@ async def test_given_gate_never_closes_then_setting_gaps_times_out(
         await mock_id_gap.set(2)
 
 
-async def test_gap_status_error(mock_id_gap: UndulatorGap, RE: RunEngine):
+async def test_gap_status_error(mock_id_gap: UndulatorGap):
     set_mock_value(mock_id_gap.fault, 1.0)
     with pytest.raises(RuntimeError):
         await mock_id_gap.set(2)
@@ -228,7 +228,7 @@ async def test_gap_prepare_success(mock_id_gap: UndulatorGap):
 
 
 async def test_given_gate_never_closes_then_setting_phases_times_out(
-    mock_phaseAxes: UndulatorPhaseAxes, RE: RunEngine
+    mock_phaseAxes: UndulatorPhaseAxes,
 ):
     setValue = Apple2PhasesVal(3, 2, 5, 7)
 

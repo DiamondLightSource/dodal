@@ -10,7 +10,7 @@ from dodal.devices.webcam import Webcam, create_placeholder_image
 
 
 @pytest.fixture
-async def webcam(RE) -> Webcam:
+async def webcam() -> Webcam:
     async with init_devices(mock=True):
         webcam = Webcam(URL("http://example.com"))
     return webcam
