@@ -11,9 +11,7 @@ from dodal.devices.p60.lab_xray_source import LabXraySource, LabXraySourceReadab
 
 
 @pytest.fixture
-async def al_kalpha_source(
-    RE: RunEngine,
-) -> LabXraySourceReadable:
+async def al_kalpha_source() -> LabXraySourceReadable:
     async with init_devices():
         al_kalpha_source = LabXraySourceReadable(LabXraySource.AL_KALPHA)
     return al_kalpha_source
@@ -25,9 +23,7 @@ async def al_kalpha_source_signal_name(al_kalpha_source: LabXraySourceReadable) 
 
 
 @pytest.fixture
-async def mg_kalpha_source(
-    RE: RunEngine,
-) -> LabXraySourceReadable:
+async def mg_kalpha_source() -> LabXraySourceReadable:
     async with init_devices():
         mg_kalpha_source = LabXraySourceReadable(LabXraySource.MG_KALPHA)
     return mg_kalpha_source

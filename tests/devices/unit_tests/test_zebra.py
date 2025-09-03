@@ -1,7 +1,6 @@
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
-from bluesky.run_engine import RunEngine
 from ophyd_async.testing import set_mock_value
 
 from dodal.devices.zebra.zebra import (
@@ -19,7 +18,7 @@ from dodal.devices.zebra.zebra import (
 )
 
 
-async def test_arming_device(RE: RunEngine):
+async def test_arming_device():
     arming_device = ArmingDevice("", name="fake arming device")
     await arming_device.connect(mock=True)
     status = arming_device.set(ArmDemand.DISARM)
@@ -28,7 +27,7 @@ async def test_arming_device(RE: RunEngine):
     assert await arming_device.disarm_set.get_value() == 1
 
 
-async def test_position_compare_sets_signals(RE: RunEngine):
+async def test_position_compare_sets_signals():
     fake_pc = PositionCompare("", name="fake position compare")
     await fake_pc.connect(mock=True)
 

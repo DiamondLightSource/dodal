@@ -33,7 +33,6 @@ from tests.devices.unit_tests.electron_analyser.helper_util import (
 async def sim_driver(
     request: pytest.FixtureRequest,
     energy_sources: dict[str, SignalR[float]],
-    RE: RunEngine,
 ) -> AbstractAnalyserDriverIO:
     async with init_devices(mock=True):
         sim_driver = await create_driver(
@@ -95,7 +94,6 @@ def test_driver_throws_error_with_wrong_psu_mode(
 @pytest.mark.asyncio
 async def test_stage_sets_image_mode_and_calls_super(
     sim_driver: AbstractAnalyserDriverIO,
-    RE: RunEngine,
 ):
     # Patch image_mode.set and super().stage
     with patch.object(

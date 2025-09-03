@@ -27,7 +27,6 @@ from tests.devices.unit_tests.electron_analyser.helper_util import get_test_sequ
 async def sim_detector(
     request: pytest.FixtureRequest,
     energy_sources: dict[str, SignalR[float]],
-    RE: RunEngine,
 ) -> GenericElectronAnalyserDetector:
     async with init_devices(mock=True):
         sim_detector = await create_detector(

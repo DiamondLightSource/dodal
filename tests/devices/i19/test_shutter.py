@@ -3,7 +3,6 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 from aiohttp.client import ClientConnectionError
-from bluesky.run_engine import RunEngine
 from ophyd_async.testing import assert_reading, partial_reading, set_mock_value
 
 from dodal.devices.hutch_shutter import (
@@ -26,12 +25,12 @@ async def make_test_shutter(hutch: HutchState) -> AccessControlledShutter:
 
 
 @pytest.fixture
-async def eh1_shutter(RE: RunEngine) -> AccessControlledShutter:
+async def eh1_shutter() -> AccessControlledShutter:
     return await make_test_shutter(HutchState.EH1)
 
 
 @pytest.fixture
-async def eh2_shutter(RE: RunEngine) -> AccessControlledShutter:
+async def eh2_shutter() -> AccessControlledShutter:
     return await make_test_shutter(HutchState.EH2)
 
 

@@ -6,7 +6,6 @@ from unittest.mock import ANY, MagicMock, Mock, patch
 
 import pytest
 from bluesky.protocols import Readable
-from bluesky.run_engine import RunEngine
 from ophyd_async.epics.motor import Motor
 
 from dodal.beamlines import i03, i23
@@ -228,7 +227,7 @@ def test_device_factory_passes_kwargs_to_wrapped_factory_v1(
 
 
 def test_device_factory_passes_kwargs_to_wrapped_factory_v2(
-    RE: RunEngine, fake_device_factory_beamline
+    fake_device_factory_beamline,
 ):
     device = fake_device_factory_beamline.mock_device(
         connect_immediately=True,
@@ -245,9 +244,7 @@ def test_device_factory_passes_kwargs_to_wrapped_factory_v2(
     }
 
 
-def test_fake_with_ophyd_sim_passed_to_device_factory(
-    RE: RunEngine, fake_device_factory_beamline
-):
+def test_fake_with_ophyd_sim_passed_to_device_factory(fake_device_factory_beamline):
     fake_device_factory_beamline.mock_device.cache_clear()
 
     devices, exceptions = make_all_devices(
@@ -262,7 +259,7 @@ def test_fake_with_ophyd_sim_passed_to_device_factory(
     mock_device.connect.assert_called_once_with(timeout=ANY, mock=True)
 
 
-def test_mock_passed_to_device_factory(RE: RunEngine, fake_device_factory_beamline):
+def test_mock_passed_to_device_factory(fake_device_factory_beamline):
     fake_device_factory_beamline.mock_device.cache_clear()
 
     devices, exceptions = make_all_devices(
@@ -277,9 +274,7 @@ def test_mock_passed_to_device_factory(RE: RunEngine, fake_device_factory_beamli
     mock_device.connect.assert_called_once_with(timeout=ANY, mock=True)
 
 
-def test_connect_immediately_passed_to_device_factory(
-    RE: RunEngine, fake_device_factory_beamline
-):
+def test_connect_immediately_passed_to_device_factory(fake_device_factory_beamline):
     fake_device_factory_beamline.mock_device.cache_clear()
 
     devices, exceptions = make_all_devices(

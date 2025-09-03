@@ -1,6 +1,5 @@
 import numpy as np
 import pytest
-from bluesky import RunEngine
 from ophyd_async.core import SignalR, init_devices
 from ophyd_async.testing import set_mock_value
 
@@ -14,7 +13,6 @@ from dodal.testing.electron_analyser import create_detector
 @pytest.fixture
 async def sim_detector(
     energy_sources: dict[str, SignalR[float]],
-    RE: RunEngine,
 ) -> VGScientaDetector[LensMode, PsuMode, PassEnergy]:
     async with init_devices(mock=True):
         sim_driver = await create_detector(
@@ -27,7 +25,6 @@ async def sim_detector(
 
 async def test_analyser_vgscienta_detector_image_shape(
     sim_detector: VGScientaDetector,
-    RE: RunEngine,
 ) -> None:
     driver = sim_detector.driver
     prefix = driver.name + "-"
