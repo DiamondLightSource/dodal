@@ -12,12 +12,12 @@ from dodal.devices.i03.undulator_dcm import UndulatorDCM
 from dodal.devices.undulator import AccessError, Undulator
 from dodal.devices.util.test_utils import patch_motor
 from dodal.log import LOGGER
-from tests.devices.unit_tests.test_daq_configuration import MOCK_DAQ_CONFIG_PATH
-from tests.devices.unit_tests.test_daq_configuration.lookup import (
+from tests.devices.test_daq_configuration import MOCK_DAQ_CONFIG_PATH
+from tests.devices.test_daq_configuration.lookup import (
     BEAMLINE_ENERGY_DCM_PITCH_CONVERTER_TXT,
     BEAMLINE_ENERGY_DCM_ROLL_CONVERTER_TXT,
 )
-from tests.devices.unit_tests.test_data import (
+from tests.devices.test_data import (
     TEST_BEAMLINE_UNDULATOR_TO_GAP_LUT,
 )
 
