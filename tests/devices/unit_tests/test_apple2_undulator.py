@@ -489,7 +489,7 @@ async def test_apple2_prepare_success(
     ramp_up_start = start_gap[0] - acceleration_time * velocity / 2
     mock_apple2.set.assert_awaited_once_with(value=750)
     get_mock_put(mock_apple2.gap.user_setpoint).assert_awaited_once_with(
-        str(ramp_up_start), wait=True
+        ramp_up_start, wait=True
     )
 
     assert await mock_apple2.gap.velocity.get_value() == abs(velocity)
