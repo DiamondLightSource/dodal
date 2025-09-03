@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Creating a new device &#8212; dodal 1.55.2.dev31+gf3b53e912 documentation</title>
+    <title>Creating a new device &#8212; dodal 1.55.2.dev32+g0929c10a3 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=35bce164"></script>
+    <script src="../_static/documentation_options.js?v=134afced"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -412,8 +412,7 @@
 <li class="toctree-l1"><a class="reference internal" href="make-release.html">Make a release</a></li>
 <li class="toctree-l1"><a class="reference internal" href="move-code.html">Moving code from another repo</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pypi.html">Setting up PyPI publishing</a></li>
-<li class="toctree-l1"><a class="reference internal" href="run-tests.html">Run the tests using pytest</a></li>
-
+<li class="toctree-l1"><a class="reference internal" href="run-tests.html">Running tests</a></li>
 <li class="toctree-l1"><a class="reference internal" href="static-analysis.html">Run static analysis using pyright or mypy</a></li>
 <li class="toctree-l1"><a class="reference internal" href="update-template.html">How to update to the latest template structure</a></li>
 <li class="toctree-l1"><a class="reference internal" href="write-tests.html">Writing Tests in This Python Project</a></li>
@@ -518,7 +517,7 @@
 <li><p><strong>Write thorough unit tests</strong> for all expected use cases. Reference the <a class="reference external" href="https://blueskyproject.io/ophyd-async/main/tutorials/implementing-devices.html">ophyd-async device test guide</a> for best practices.</p></li>
 <li><p><strong>Validate your device on the beamline</strong> and keep notes of any issues for later fixes.</p></li>
 <li><p><strong>Make use of type annotations</strong> so that pyright will validate that you are passing around values that ophyd-async will accept.</p></li>
-<li><p>Use <code class="docutils literal notranslate"><span class="pre">dodal</span> <span class="pre">connect</span> <span class="pre">&lt;beamline&gt;</span></code> to check device connectivity and <code class="docutils literal notranslate"><span class="pre">cainfo</span> <span class="pre">&lt;PV</span> <span class="pre">address&gt;</span></code> to confirm PVs and datatypes.</p></li>
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">dodal</span> <span class="pre">connect</span> <span class="pre">&lt;beamline&gt;</span></code> to check device connectivity and <code class="docutils literal notranslate"><span class="pre">cainfo</span> <span class="pre">&lt;PV</span> <span class="pre">address&gt;</span></code> to confirm PVs and datatypes. You can check a PV’s datatype by using the <code class="docutils literal notranslate"><span class="pre">cainfo</span> <span class="pre">&lt;PV</span> <span class="pre">address&gt;</span></code> command. If the datatype is an enum, <code class="docutils literal notranslate"><span class="pre">caget</span> <span class="pre">-d</span> <span class="pre">31</span> <span class="pre">&lt;PV</span> <span class="pre">address&gt;</span></code> will also display the available enums that the PV takes. Common enums are defined in <code class="docutils literal notranslate"><span class="pre">ophyd-async.core</span></code> for devices to use, but you can define custom ones when suitable (inheriting from <code class="docutils literal notranslate"><span class="pre">ophyd_async.core</span></code> <code class="docutils literal notranslate"><span class="pre">StrictEnum</span></code>, <code class="docutils literal notranslate"><span class="pre">SupersetEnum</span></code> or <code class="docutils literal notranslate"><span class="pre">SubsetEnum</span></code>). The values should be capitalised e.g <code class="docutils literal notranslate"><span class="pre">ON</span> <span class="pre">=</span> <span class="pre">&quot;On&quot;</span></code>. If the PV expects upper case for the enum (e.g <code class="docutils literal notranslate"><span class="pre">ON</span> <span class="pre">=</span> <span class="pre">&quot;ON&quot;</span></code>), please speak to the relevant controls engineer(s) to get this changed if possible. For more infomation, please visit <a class="reference external" href="https://blueskyproject.io/ophyd-async/main/explanations/decisions/0008-signal-types.html">here</a>.</p></li>
 </ul>
 <p><strong>Device best practices for Bluesky plans:</strong></p>
 <ul class="simple">

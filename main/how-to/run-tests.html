@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Run the tests using pytest &#8212; dodal 1.55.2.dev31+gf3b53e912 documentation</title>
+    <title>Running tests &#8212; dodal 1.55.2.dev32+g0929c10a3 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=35bce164"></script>
+    <script src="../_static/documentation_options.js?v=134afced"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -412,8 +412,7 @@
 <li class="toctree-l1"><a class="reference internal" href="make-release.html">Make a release</a></li>
 <li class="toctree-l1"><a class="reference internal" href="move-code.html">Moving code from another repo</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pypi.html">Setting up PyPI publishing</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">Run the tests using pytest</a></li>
-
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Running tests</a></li>
 <li class="toctree-l1"><a class="reference internal" href="static-analysis.html">Run static analysis using pyright or mypy</a></li>
 <li class="toctree-l1"><a class="reference internal" href="update-template.html">How to update to the latest template structure</a></li>
 <li class="toctree-l1"><a class="reference internal" href="write-tests.html">Writing Tests in This Python Project</a></li>
@@ -462,7 +461,7 @@
     
     <li class="breadcrumb-item"><a href="../how-to.html" class="nav-link">How-to Guides</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Run the tests using pytest</span></li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Running tests</span></li>
   </ul>
 </nav>
 </div>
@@ -479,20 +478,38 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="run-the-tests-using-pytest">
-<span id="using-pytest"></span><h1>Run the tests using pytest<a class="headerlink" href="#run-the-tests-using-pytest" title="Link to this heading">#</a></h1>
-<p>Testing is done with <a class="reference external" href="https://pytest.org/">pytest</a>. It will find functions in the project that <a class="reference external" href="https://docs.pytest.org/explanation/goodpractices.html#test-discovery">look like tests</a>, and run them to check for errors. You can run it with:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pytest
-</pre></div>
-</div>
+  <section id="running-tests">
+<span id="using-pytest"></span><h1>Running tests<a class="headerlink" href="#running-tests" title="Link to this heading">#</a></h1>
+<p>Tests can be ran locally via command line or VSCode IDE.</p>
+<section id="with-vscode">
+<h2>With VSCode<a class="headerlink" href="#with-vscode" title="Link to this heading">#</a></h2>
+<p>When using the VSCode IDE, it should automatically detect all of your tests and display one of the following icons next to each of them:</p>
+<ul class="simple">
+<li><p>Grey circle (not run yet)</p></li>
+<li><p>Green circle with a tick (test passed)</p></li>
+<li><p>Red circle with a cross (test failed)</p></li>
+</ul>
+<p>You can also check code coverage by right-clicking on the test icon and selecting <code class="docutils literal notranslate"><span class="pre">Run</span> <span class="pre">with</span> <span class="pre">coverage</span></code>. This will re-run the test and highlight line numbers in your file:</p>
+<ul class="simple">
+<li><p>Green = covered by tests</p></li>
+<li><p>Red = not covered (and ideally should be tested)</p></li>
+</ul>
+<p>To view all tests inside dodal, use the <code class="docutils literal notranslate"><span class="pre">Test</span> <span class="pre">Explorer</span></code> panel (flask icon) in VSCode. It displays all of your tests in a hierarchy, which you can run individually or in groups. It also shows the pass/fail icons mentioned above. Clicking on an item will run all tests beneath it in the hierarchy.</p>
+<p>If you find that your tests are being skipped or not recognised by <code class="docutils literal notranslate"><span class="pre">pytest</span></code>, check for any syntax errors as this will block the tests being found. You can also check to see if there is an error output at the very bottom of the <code class="docutils literal notranslate"><span class="pre">Test</span> <span class="pre">Explorer</span></code> panel. This is usually caused by invalid syntax in your test file, or by circular dependencies in the code you are testing.</p>
+</section>
+<section id="command-line">
+<h2>Command line<a class="headerlink" href="#command-line" title="Link to this heading">#</a></h2>
+<section id="unit-tests">
+<h3>Unit tests<a class="headerlink" href="#unit-tests" title="Link to this heading">#</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">pytest</span></code> will find functions in the project that <a class="reference external" href="https://docs.pytest.org/explanation/goodpractices.html#test-discovery">look like tests</a>, and run them to check for errors.</p>
 <p>When you have some fully working tests then you can run it with coverage:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ tox -e tests
 </pre></div>
 </div>
-<p>It will also report coverage to the commandline and to <code class="docutils literal notranslate"><span class="pre">cov.xml</span></code>.</p>
+<p>It will also report coverage to the command line and to <code class="docutils literal notranslate"><span class="pre">cov.xml</span></code>.</p>
 </section>
-<section id="run-the-system-tests-locally">
-<h1>Run the system tests locally<a class="headerlink" href="#run-the-system-tests-locally" title="Link to this heading">#</a></h1>
+<section id="system-tests-locally">
+<h3>System tests locally<a class="headerlink" href="#system-tests-locally" title="Link to this heading">#</a></h3>
 <p>The system tests require the <code class="docutils literal notranslate"><span class="pre">example-services</span></code> project:</p>
 <div class="highlight-commandline notranslate"><div class="highlight"><pre><span></span>git clone git@github.com:epics-containers/example-services.git
 </pre></div>
@@ -509,6 +526,8 @@ podman compose up -d bl01t-di-cam-01 bl01t-mo-sim-01 ca-gateway
 <div class="highlight-commandline notranslate"><div class="highlight"><pre><span></span>tox -e system-report
 </pre></div>
 </div>
+</section>
+</section>
 </section>
 
 
@@ -558,10 +577,13 @@ podman compose up -d bl01t-di-cam-01 bl01t-mo-sim-01 ca-gateway
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Run the tests using pytest</a></li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#run-the-system-tests-locally">Run the system tests locally</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#with-vscode">With VSCode</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#command-line">Command line</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#unit-tests">Unit tests</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#system-tests-locally">System tests locally</a></li>
 </ul>
-
+</li>
+</ul>
   </nav></div>
 
   <div class="sidebar-secondary-item">

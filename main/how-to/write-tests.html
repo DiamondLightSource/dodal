@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Writing Tests in This Python Project &#8212; dodal 1.55.2.dev31+gf3b53e912 documentation</title>
+    <title>Writing Tests in This Python Project &#8212; dodal 1.55.2.dev32+g0929c10a3 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=35bce164"></script>
+    <script src="../_static/documentation_options.js?v=134afced"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -412,8 +412,7 @@
 <li class="toctree-l1"><a class="reference internal" href="make-release.html">Make a release</a></li>
 <li class="toctree-l1"><a class="reference internal" href="move-code.html">Moving code from another repo</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pypi.html">Setting up PyPI publishing</a></li>
-<li class="toctree-l1"><a class="reference internal" href="run-tests.html">Run the tests using pytest</a></li>
-
+<li class="toctree-l1"><a class="reference internal" href="run-tests.html">Running tests</a></li>
 <li class="toctree-l1"><a class="reference internal" href="static-analysis.html">Run static analysis using pyright or mypy</a></li>
 <li class="toctree-l1"><a class="reference internal" href="update-template.html">How to update to the latest template structure</a></li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">Writing Tests in This Python Project</a></li>
@@ -489,6 +488,106 @@
 <li><p><strong>System Tests</strong>: Tests that interact with DLS infrastructure, network, and filesystem should be placed in the top-level <code class="docutils literal notranslate"><span class="pre">systems_test</span></code> folder. This separation ensures that these tests are easily identifiable and can be run independently from unit tests.</p></li>
 </ul>
 </section>
+<section id="writing-a-test-for-a-device">
+<h2>Writing a test for a device<a class="headerlink" href="#writing-a-test-for-a-device" title="Link to this heading">#</a></h2>
+<p>We aim for high test coverage in dodal with small, modular test functions. To achieve this, we need to test the relevant methods by writing tests for the class/method we are creating or changing, checking for the expected behaviour. We shouldn’t need to write tests for parent classes unless we alter their behaviour.</p>
+<p>Below, a <code class="docutils literal notranslate"><span class="pre">StandardReadable</span></code> example device is defined which also implements the <code class="docutils literal notranslate"><span class="pre">Stageable</span></code> protocol.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">bluesky</span><span class="w"> </span><span class="kn">import</span> <span class="n">RunEngine</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">bluesky.protocols</span><span class="w"> </span><span class="kn">import</span> <span class="n">Stageable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">AsyncStatus</span><span class="p">,</span> <span class="n">OnOff</span><span class="p">,</span> <span class="n">StandardReadable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">epics_signal_rw</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">MyDevice</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">,</span> <span class="n">Stageable</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Example device demostrating how to test stage, unstage and read methods.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructor for setting up instance of device.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">            prefix: Base PV used for connecting signals.</span>
+<span class="sd">            name: Name of the device.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">signal_a</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;A&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">signal_b</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="n">OnOff</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;B&quot;</span><span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
+    <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">stage</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setup device by moving signal_a to ON.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">stage</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">signal_b</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">OnOff</span><span class="o">.</span><span class="n">ON</span><span class="p">))</span>
+
+    <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">unstage</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Once device is finished, set signal_b back to OFF.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">stage</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">signal_b</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">OnOff</span><span class="o">.</span><span class="n">OFF</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>In this example, we need to test the <code class="docutils literal notranslate"><span class="pre">stage</span></code> and <code class="docutils literal notranslate"><span class="pre">unstage</span></code> methods. For more complex devices, it is also a good idea to test the <code class="docutils literal notranslate"><span class="pre">read</span></code> method to confirm that we get the expected read signals back when this method is called.</p>
+<p>We use <a class="reference external" href="https://docs.pytest.org/en/stable/contents.html">pytest</a> for writing tests in dodal. A core part of this library is the use of fixtures. A fixture is a function decorated with <code class="docutils literal notranslate"><span class="pre">&#64;pytest.fixture</span></code> that provides setup/teardown or reusable test data for your tests. It is defined once and can be reused across multiple tests. Fixtures are mainly used to define devices and then inject them into each test.</p>
+<p>To help set up a device, they are created with the <code class="docutils literal notranslate"><span class="pre">init_devices(mock=True)</span></code> function from <code class="docutils literal notranslate"><span class="pre">ophyd_async.core</span></code>, which automatically initialises the device in mock mode. The <code class="docutils literal notranslate"><span class="pre">RunEngine</span></code> fixture is passed when creating a device to ensure there is an event loop available when connecting signals. This fixture is defined in <code class="docutils literal notranslate"><span class="pre">dodal/tests/conftest.py</span></code>, which is a special file recognised by <code class="docutils literal notranslate"><span class="pre">pytest</span></code>. It defines fixtures that are automatically available to any test in the same directory (and its subdirectories) without needing to import them. This is useful for defining common setup code once without duplicating it across test files.</p>
+<p>In order for <code class="docutils literal notranslate"><span class="pre">pytest</span></code> to detect something as a test, a function should begin with <code class="docutils literal notranslate"><span class="pre">test_*</span></code>. The test function should be self-descriptive about what it is testing, and it is acceptable (even encouraged) to have longer names for test functions for clarity.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">pytest</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">bluesky</span><span class="w"> </span><span class="kn">import</span> <span class="n">RunEngine</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">bluesky</span><span class="w"> </span><span class="kn">import</span> <span class="n">plan_stubs</span> <span class="k">as</span> <span class="n">bps</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">OnOff</span><span class="p">,</span> <span class="n">init_devices</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.testing</span><span class="w"> </span><span class="kn">import</span> <span class="n">assert_reading</span><span class="p">,</span> <span class="n">get_mock_put</span><span class="p">,</span> <span class="n">partial_reading</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.device.my_device</span><span class="w"> </span><span class="kn">import</span>  <span class="n">MyDevice</span>
+
+
+<span class="c1"># RunEngine is needed to make sure there is an event loop when creating device.</span>
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">sim_my_device</span><span class="p">(</span><span class="n">RE</span><span class="p">:</span> <span class="n">RunEngine</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MyDevice</span><span class="p">:</span>
+    <span class="k">async</span> <span class="k">with</span> <span class="n">init_devices</span><span class="p">(</span><span class="n">mock</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="n">sim_my_device</span> <span class="o">=</span> <span class="n">MyDevice</span><span class="p">(</span><span class="s2">&quot;TEST:&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">sim_my_device</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_my_device_stage</span><span class="p">(</span><span class="n">sim_my_device</span><span class="p">:</span> <span class="n">MyDevice</span><span class="p">,</span> <span class="n">RE</span><span class="p">:</span> <span class="n">RunEngine</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">RE</span><span class="p">(</span><span class="n">bps</span><span class="o">.</span><span class="n">stage</span><span class="p">(</span><span class="n">sim_my_device</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span> <span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">get_mock_put</span><span class="p">(</span><span class="n">sim_my_device</span><span class="o">.</span><span class="n">signal_b</span><span class="p">)</span><span class="o">.</span><span class="n">assert_called_once_with</span><span class="p">(</span><span class="n">OnOff</span><span class="o">.</span><span class="n">ON</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_my_device_unstage</span><span class="p">(</span><span class="n">sim_my_device</span><span class="p">:</span> <span class="n">MyDevice</span><span class="p">,</span> <span class="n">RE</span><span class="p">:</span> <span class="n">RunEngine</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">RE</span><span class="p">(</span><span class="n">bps</span><span class="o">.</span><span class="n">unstage</span><span class="p">(</span><span class="n">sim_my_device</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span> <span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">get_mock_put</span><span class="p">(</span><span class="n">sim_my_device</span><span class="o">.</span><span class="n">signal_b</span><span class="p">)</span><span class="o">.</span><span class="n">assert_called_once_with</span><span class="p">(</span><span class="n">OnOff</span><span class="o">.</span><span class="n">OFF</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>You should test the output of a device when the device has many signals read and you want to ensure the correct ones are read at the correct times, or when the <code class="docutils literal notranslate"><span class="pre">read</span></code> method of it or one of its signals (e.g. a DerivedSignal) requires testing. Functions are defined in <code class="docutils literal notranslate"><span class="pre">ophyd-async</span></code> to aid with this. <code class="docutils literal notranslate"><span class="pre">assert_reading</span></code> allows us to compare the readings generated from a <code class="docutils literal notranslate"><span class="pre">Readable</span></code> device to the expected results.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">test_my_device_read</span><span class="p">(</span><span class="n">sim_my_device</span><span class="p">:</span> <span class="n">MyDevice</span><span class="p">,</span> <span class="n">RE</span><span class="p">:</span> <span class="n">RunEngine</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">prefix</span> <span class="o">=</span> <span class="n">sim_my_device</span><span class="o">.</span><span class="n">name</span>
+    <span class="k">await</span> <span class="n">assert_reading</span><span class="p">(</span>
+        <span class="n">sim_my_device</span><span class="p">,</span>
+        <span class="p">{</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">-signal_a&quot;</span><span class="p">:</span> <span class="n">partial_reading</span><span class="p">(</span><span class="n">OnOff</span><span class="o">.</span><span class="n">ON</span><span class="p">),</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">-signal_b&quot;</span><span class="p">:</span> <span class="n">partial_reading</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">partial_reading</span></code> wraps the value given in a mapping like <code class="docutils literal notranslate"><span class="pre">{&quot;value&quot;:</span> <span class="pre">ANY}</span></code>, so we are actually checking that the reading matches the expected structure.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span>    <span class="n">prefix</span> <span class="o">=</span> <span class="n">sim_my_device</span><span class="o">.</span><span class="n">name</span>
+    <span class="k">await</span> <span class="n">assert_reading</span><span class="p">(</span>
+        <span class="n">sim_my_device</span><span class="p">,</span>
+        <span class="p">{</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">-signal_a&quot;</span> <span class="p">:</span> <span class="p">{</span><span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="n">OnOff</span><span class="o">.</span><span class="n">ON</span><span class="p">},</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">-signal_b&quot;</span> <span class="p">:</span> <span class="p">{</span><span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+        <span class="p">}</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+</section>
 </section>
 
 
@@ -539,6 +638,7 @@
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#test-organization">Test Organization</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#writing-a-test-for-a-device">Writing a test for a device</a></li>
 </ul>
   </nav></div>
 
