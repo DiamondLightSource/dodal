@@ -8,7 +8,11 @@ from dodal.common.beamlines.beamline_utils import (
     device_factory,
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.devices.attenuator.attenuator import ReadOnlyAttenuator
+from dodal.devices.attenuator.attenuator import EnumFilterAttenuator, ReadOnlyAttenuator
+from dodal.devices.attenuator.filter_selections import (
+    I24_FilterOneSelections,
+    I24_FilterTwoSelections,
+)
 from dodal.devices.hutch_shutter import HutchShutter
 from dodal.devices.i24.aperture import Aperture
 from dodal.devices.i24.beam_center import DetectorBeamCenter
@@ -135,6 +139,19 @@ def dcm() -> DCM:
 #         fake=fake_with_ophyd_sim,
 #         post_create=set_params,
 #     )
+
+
+@device_factory()
+def attenuator(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> EnumFilterAttenuator:
+    """Get a read-only attenuator device for i24, instantiate it if it hasn't already
+    been. If this is called when already instantiated in i24, it will return the
+    existing object."""
+    return EnumFilterAttenuator(
+        "-OP-ATTN-01:",
+        filter_selection=(I24_FilterOneSelections, I24_FilterTwoSelections),
+    )
 
 
 @device_factory()
