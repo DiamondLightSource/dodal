@@ -20,6 +20,8 @@ class TurboEnum(StrictEnum):
 
 class OxfordCryoStreamController(StandardReadable):
     def __init__(self, prefix: str, name: str = ""):
+        print("OxfordCryoStreamController", prefix)
+
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             # Any signals that should be read once at the start of the scan
             self.turbo = epics_signal_rw(str, f"{prefix}TURBO")
@@ -56,6 +58,8 @@ class OxfordCryoStreamController(StandardReadable):
 
 class OxfordCryoStreamStatus(StandardReadable):
     def __init__(self, prefix: str, name: str = ""):
+        print("OxfordCryoStreamStatus", prefix)
+
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             # Any signals that should be read once at the start of the scan
 
@@ -86,13 +90,17 @@ class OxfordCryoStreamStatus(StandardReadable):
         super().__init__(name)
 
 
-class OxfordCryoStream(StandardReadable):
+class OxfordCryoStream(OxfordCryoStreamController, OxfordCryoStreamStatus):
     def __init__(self, prefix: str, name=""):
-        with self.add_children_as_readables():
-            self.controller = OxfordCryoStreamController(prefix=prefix)
-            self.status = OxfordCryoStreamStatus(prefix=prefix)
+        # with self.add_children_as_readables():
+        #     self.controller = OxfordCryoStreamController(prefix=prefix)
+        #     self.status = OxfordCryoStreamStatus(prefix=prefix)
 
-        super().__init__(name)
+        self.prefix = prefix
+        print(prefix)
+        # with self.add_children_as_readables():
+
+        super().__init__(prefix=prefix, name=name)
 
 
 class OxfordCryoJet(StandardReadable):
@@ -100,21 +108,7 @@ class OxfordCryoJet(StandardReadable):
     # This is a placeholder implementation to get it working with I03, the actual cryojet has many more PVs
     def __init__(self, prefix: str, name=""):
         with self.add_children_as_readables():
-            self.course = epics_signal_rw(InOut, f"{prefix}COARSE:CTRL")
+            self.coarse = epics_signal_rw(InOut, f"{prefix}COARSE:CTRL")
             self.fine = epics_signal_rw(InOut, f"{prefix}FINE:CTRL")
-
-        super().__init__(name)
-
-
-class CompositeCryoStreamCryoJet(StandardReadable):
-    def __init__(
-        self,
-        cryostream: OxfordCryoStream,
-        cryojet: OxfordCryoJet,
-        name: str = "",
-    ):
-        with self.add_children_as_readables():
-            self.cryostream = cryostream
-            self.cryojet = cryojet
 
         super().__init__(name)
