@@ -10,7 +10,7 @@ from dodal.devices.backlight import Backlight
 
 
 @pytest.fixture
-def fake_backlight(RE: RunEngine):
+def fake_backlight():
     with init_devices(mock=True):
         backlight = Backlight("", "backlight")
     return backlight
