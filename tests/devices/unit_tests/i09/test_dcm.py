@@ -1,5 +1,4 @@
 import pytest
-from bluesky.run_engine import RunEngine
 from ophyd_async.core import init_devices
 from ophyd_async.testing import (
     assert_value,
@@ -10,7 +9,7 @@ from dodal.devices.i09.dcm import DCM
 
 
 @pytest.fixture
-async def dcm(RE: RunEngine) -> DCM:
+async def dcm() -> DCM:
     async with init_devices(mock=True):
         dcm = DCM("DCM-01")
     return dcm

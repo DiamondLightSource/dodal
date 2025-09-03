@@ -90,7 +90,7 @@ async def zocalo_results():
 
 
 @pytest.fixture
-async def mocked_zocalo_device(RE: RunEngine, zocalo_results: ZocaloResults):
+async def mocked_zocalo_device(zocalo_results: ZocaloResults):
     async def device(results):
         @AsyncStatus.wrap
         async def mock_trigger(results):
