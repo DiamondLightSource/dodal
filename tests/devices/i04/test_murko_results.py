@@ -148,6 +148,7 @@ def json_metadata(
     microns_pyp: float = 10,
     beam_centre_i: int = 50,
     beam_centre_j: int = 50,
+    uuid: str = "UUID",
 ) -> dict:
     metadatas = {}
     for i in range(n):
@@ -157,6 +158,7 @@ def json_metadata(
             "microns_per_y_pixel": microns_pyp,
             "beam_centre_i": beam_centre_i,
             "beam_centre_j": beam_centre_j,
+            "uuid": uuid,
         }
         metadatas[i] = json.dumps(metadata)
     return metadatas
@@ -283,6 +285,7 @@ async def test_process_batch_makes_correct_calls(
             "microns_per_y_pixel": 10,
             "beam_centre_i": 50,
             "beam_centre_j": 50,
+            "uuid": "UUID",
         },
     )
 
@@ -350,6 +353,7 @@ async def test_correct_movement_given_90_180_degrees(
     x = 0.5
     y = 0.6
     z = 0.3
+    murko_results.PERCENTAGE_TO_USE = 100  # type:ignore
     mock_x_setter, mock_y_setter, mock_z_setter = mock_setters
     messages, metadata = get_messages(
         xyz=(x, y, z), beam_centre_i=90, beam_centre_j=40, shape_x=100, shape_y=100
@@ -370,6 +374,7 @@ async def test_correct_movement_given_45_and_135_angles(
     murko_results: MurkoResultsDevice,
     mock_setters: tuple[MagicMock, MagicMock, MagicMock],
 ):
+    murko_results.PERCENTAGE_TO_USE = 100  # type:ignore
     x = 0.5
     y = 0.3
     z = 0.4
@@ -394,6 +399,7 @@ async def test_correct_movement_given_multiple_angles_and_x_drift(
     murko_results: MurkoResultsDevice,
     mock_setters: tuple[MagicMock, MagicMock, MagicMock],
 ):
+    murko_results.PERCENTAGE_TO_USE = 100  # type:ignore
     x = 0.1
     y = 0.2
     z = 0.3
@@ -493,3 +499,46 @@ async def test_assert_unsubscribes_to_queue_on_unstage(
     await murko_results.unstage()
 
     mock_pubsub.unsubscribe.assert_called_once()
+
+
+@pytest.mark.parametrize(
+    "total_from_murko, percentage_to_keep, expected_left",
+    [(100, 25, 25), (10, 25, 2), (1000, 1, 10), (8, 100, 8), (5, 50, 2)],
+)
+def test_given_n_results_filter_outliers_will_reduce_down_to_smaller_amount(
+    total_from_murko: int,
+    percentage_to_keep: int,
+    expected_left: int,
+    murko_results: MurkoResultsDevice,
+):
+    murko_results.x_dists_mm = list(range(total_from_murko))
+    murko_results.y_dists_mm = list(range(total_from_murko))
+    murko_results.omegas = list(range(total_from_murko))
+    murko_results.uuids = list(range(total_from_murko))
+
+    murko_results.PERCENTAGE_TO_USE = percentage_to_keep  # type:ignore
+
+    murko_results.filter_outliers()
+
+    for r in [
+        murko_results.x_dists_mm,
+        murko_results.y_dists_mm,
+        murko_results.omegas,
+        murko_results.uuids,
+    ]:
+        assert isinstance(r, list)
+        assert len(r) == expected_left
+
+
+def test_when_results_filtered_then_smallest_x_kept(murko_results: MurkoResultsDevice):
+    murko_results.x_dists_mm = [4, 0, 6, 7]
+    murko_results.y_dists_mm = [8, 90, 63, 8]
+    murko_results.omegas = [0, 10, 20, 30]
+    murko_results.uuids = ["a", "b", "c", "d"]
+
+    murko_results.filter_outliers()
+
+    assert murko_results.x_dists_mm == [0]
+    assert murko_results.y_dists_mm == [90]
+    assert murko_results.omegas == [10]
+    assert murko_results.uuids == ["b"]
