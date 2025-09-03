@@ -9,7 +9,6 @@ from aiohttp.client import ClientSession
 from aiohttp.test_utils import TestClient, TestServer, unused_port
 from aiohttp.web import Response
 from aiohttp.web_app import Application
-from bluesky import RunEngine
 from ophyd_async.core import init_devices
 from ophyd_async.testing import set_mock_value
 from PIL import Image
@@ -55,7 +54,6 @@ async def snapshot(
     test_client: TestClient,
     output_file_name: str,
     server_port: int,
-    RE: RunEngine,
 ) -> AsyncGenerator[Snapshot]:
     def get_session(raise_for_status: bool) -> ClientSession:
         return test_client.session
@@ -77,7 +75,6 @@ async def grid_snapshot(
     test_client: TestClient,
     output_file_name: str,
     server_port: int,
-    RE: RunEngine,
 ) -> AsyncGenerator[SnapshotWithGrid]:
     def get_session(raise_for_status: bool) -> ClientSession:
         return test_client.session

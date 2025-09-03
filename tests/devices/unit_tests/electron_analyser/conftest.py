@@ -1,7 +1,6 @@
 from typing import Any
 
 import pytest
-from bluesky.run_engine import RunEngine
 from ophyd_async.core import SignalR
 from ophyd_async.sim import SimMotor
 
@@ -29,12 +28,12 @@ from tests.devices.unit_tests.electron_analyser.helper_util import (
 
 
 @pytest.fixture
-async def pgm_energy(RE: RunEngine) -> SimMotor:
+async def pgm_energy() -> SimMotor:
     return SimMotor("pgm_energy")
 
 
 @pytest.fixture
-async def dcm_energy(RE: RunEngine) -> SimMotor:
+async def dcm_energy() -> SimMotor:
     return SimMotor("dcm_energy")
 
 
@@ -69,7 +68,6 @@ def sequence_class(
 def sequence(
     sim_driver: AbstractAnalyserDriverIO,
     sequence_class: type[TAbstractBaseSequence],
-    RE: RunEngine,
 ) -> AbstractBaseSequence:
     det = ElectronAnalyserDetector(
         driver=sim_driver,
