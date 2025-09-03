@@ -1,7 +1,6 @@
 import re
 
 import pytest
-from bluesky.run_engine import RunEngine
 from ophyd_async.core import DetectorTrigger, PathProvider, TriggerInfo, init_devices
 from ophyd_async.epics.adcore import ADFileWriteMode
 from ophyd_async.testing import callback_on_mock_put, set_mock_value
@@ -21,7 +20,7 @@ async def tetramm_controller(tetramm: TetrammDetector) -> TetrammController:
 
 
 @pytest.fixture
-async def tetramm(static_path_provider: PathProvider, RE: RunEngine) -> TetrammDetector:
+async def tetramm(static_path_provider: PathProvider) -> TetrammDetector:
     async with init_devices(mock=True):
         tetramm = TetrammDetector(
             "MY-TETRAMM:",
@@ -245,7 +244,6 @@ async def test_error_if_armed_without_exposure(tetramm_controller: TetrammContro
 
 
 async def test_pilatus_controller(
-    RE,
     tetramm: TetrammDetector,
     tetramm_controller: TetrammController,
 ):

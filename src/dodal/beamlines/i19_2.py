@@ -65,6 +65,7 @@ def shutter() -> AccessControlledShutter:
     return AccessControlledShutter(
         prefix=f"{PREFIX.beamline_prefix}-PS-SHTR-01:",
         hutch=HutchState.EH2,
+        instrument_session="cm40639-4",
     )
 
 

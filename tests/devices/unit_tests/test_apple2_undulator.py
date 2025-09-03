@@ -7,6 +7,7 @@ from bluesky.plans import scan
 from bluesky.run_engine import RunEngine
 from ophyd_async.core import AsyncStatus, FlyMotorInfo, init_devices
 from ophyd_async.testing import (
+    assert_configuration,
     assert_emitted,
     assert_reading,
     callback_on_mock_put,
@@ -166,7 +167,7 @@ async def test_gap_cal_timout(
 
 
 async def test_given_gate_never_closes_then_setting_gaps_times_out(
-    mock_id_gap: UndulatorGap, RE: RunEngine
+    mock_id_gap: UndulatorGap,
 ):
     callback_on_mock_put(
         mock_id_gap.user_setpoint,
@@ -178,7 +179,7 @@ async def test_given_gate_never_closes_then_setting_gaps_times_out(
         await mock_id_gap.set(2)
 
 
-async def test_gap_status_error(mock_id_gap: UndulatorGap, RE: RunEngine):
+async def test_gap_status_error(mock_id_gap: UndulatorGap):
     set_mock_value(mock_id_gap.fault, 1.0)
     with pytest.raises(RuntimeError):
         await mock_id_gap.set(2)
@@ -212,6 +213,26 @@ async def test_gap_success_scan(mock_id_gap: UndulatorGap, RE: RunEngine):
         assert docs["event"][i]["data"]["mock_id_gap"] == i
 
 
+async def test_gap_read_config(mock_id_gap: UndulatorGap):
+    set_mock_value(mock_id_gap.velocity, 2)
+    set_mock_value(mock_id_gap.motor_egu, "c")
+    await assert_configuration(
+        mock_id_gap,
+        {
+            "mock_id_gap-velocity": {
+                "value": 2.0,
+            },
+            "mock_id_gap-motor_egu": {
+                "value": "c",
+            },
+            "mock_id_gap-offset": {
+                "value": 0.0,
+            },
+        },
+        full_match=False,
+    )
+
+
 async def test_gap_prepare_velocity_min_limit_error(mock_id_gap: UndulatorGap):
     set_mock_value(mock_id_gap.max_velocity, 20)
     set_mock_value(mock_id_gap.min_velocity, 11)
@@ -234,7 +255,7 @@ async def test_gap_prepare_success(mock_id_gap: UndulatorGap):
 
 
 async def test_given_gate_never_closes_then_setting_phases_times_out(
-    mock_phaseAxes: UndulatorPhaseAxes, RE: RunEngine
+    mock_phaseAxes: UndulatorPhaseAxes,
 ):
     setValue = Apple2PhasesVal(3, 2, 5, 7)
 

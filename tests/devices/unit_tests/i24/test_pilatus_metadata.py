@@ -1,12 +1,13 @@
 import bluesky.plan_stubs as bps
 import pytest
+from bluesky import RunEngine
 from ophyd_async.testing import set_mock_value
 
 from dodal.devices.i24.pilatus_metadata import PilatusMetadata
 
 
 @pytest.fixture
-async def fake_pilatus(RE) -> PilatusMetadata:
+async def fake_pilatus() -> PilatusMetadata:
     pilatus = PilatusMetadata("", name="fake_pilatus")
     await pilatus.connect(mock=True)
 
@@ -16,7 +17,7 @@ async def fake_pilatus(RE) -> PilatusMetadata:
     return pilatus
 
 
-async def test_set_filename_and_get_full_template(fake_pilatus, RE):
+async def test_set_filename_and_get_full_template(fake_pilatus, RE: RunEngine):
     expected_template = "test_00010_#####.cbf"
 
     RE(bps.abs_set(fake_pilatus.filename, "test_", wait=True))
