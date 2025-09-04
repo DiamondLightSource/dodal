@@ -639,23 +639,34 @@ async def test_energysetter_kickoff_set_correct_delay(
     mock_id_pgm.pgm_ref().energy.kickoff.assert_awaited_once()  # type: ignore
 
 
-async def test_energysetter_complete(mock_id_pgm: EnergySetter) -> None:
-    fake_id_fly_status = soft_signal_rw(bool, False)
-    fake_pgm_fly_status = soft_signal_rw(bool, False)
-    await asyncio.gather(fake_pgm_fly_status.connect(), fake_id_fly_status.connect())
-
-    mock_id_pgm.id._fly_status = AsyncStatus(
-        wait_for_value(fake_id_fly_status, True, timeout=1)
+@patch("asyncio.sleep", new_callable=AsyncMock)
+async def test_energysetter_complete(mock_sleep, mock_id_pgm: EnergySetter) -> None:
+    fake_id_fly_status = soft_signal_rw(bool, initial_value=False)
+    fake_pgm_fly_status = soft_signal_rw(bool, initial_value=False)
+    await asyncio.gather(
+        fake_pgm_fly_status.connect(mock=True), fake_id_fly_status.connect(mock=True)
     )
-    mock_id_pgm.pgm_ref().energy._fly_status = AsyncStatus(
-        wait_for_value(fake_pgm_fly_status, True, timeout=1)
-    )  # type: ignore
-    with pytest.raises(RuntimeError, match="kickoff not called"):
-        energy_setter_fly_status = mock_id_pgm.complete()
-        assert not energy_setter_fly_status.done
-        set_mock_value(fake_id_fly_status, True)
-        assert mock_id_pgm.id._fly_status.done
-        assert not energy_setter_fly_status.done
-        set_mock_value(fake_pgm_fly_status, True)
-        assert mock_id_pgm.id.pgm_ref().energy._fly_status.done
-        assert energy_setter_fly_status.done
+
+    @AsyncStatus.wrap
+    async def get_status(signal):
+        await wait_for_value(signal, True, timeout=1)
+
+    mock_id_pgm.id.gap._fly_status = get_status(fake_id_fly_status)
+
+    mock_id_pgm.pgm_ref().energy._fly_status = get_status(fake_pgm_fly_status)  # type: ignore
+    mock_id_pgm.id.kickoff = AsyncMock()
+    mock_id_pgm.pgm_ref().energy.kickoff = AsyncMock()
+    pgm_status = mock_id_pgm.pgm_ref().energy.complete()
+    id_status = mock_id_pgm.id.complete()
+    assert not id_status.done
+    assert not pgm_status.done
+    await mock_id_pgm.kickoff()
+    energy_setter_fly_status = mock_id_pgm.complete()
+    assert not energy_setter_fly_status.done
+    await fake_id_fly_status.set(True)
+    assert mock_id_pgm.id.gap._fly_status.done
+    assert not energy_setter_fly_status.done
+    await fake_pgm_fly_status.set(True)
+    assert mock_id_pgm.pgm_ref().energy._fly_status.done
+    await energy_setter_fly_status
+    assert energy_setter_fly_status.done
