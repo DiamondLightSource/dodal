@@ -1,9 +1,10 @@
 from bluesky.protocols import Movable
-from ophyd_async.core import StandardReadable, StrictEnum
+from ophyd_async.core import AsyncStatus, StandardReadable, StrictEnum
 from ophyd_async.epics.signal import epics_signal_r, epics_signal_rw
 
 from dodal.devices.i19.mapt_configuration import MAPTConfiguration
 from dodal.devices.motors import XYStage
+from dodal.log import LOGGER
 
 _PIN = "-MO-PIN-01:"
 _COL = "-MO-COL-01:"
@@ -13,7 +14,7 @@ _CONFIG = "-OP-PCOL-01:"
 APERTURE_SIZES = [20, 40, 100, 3000]
 
 
-class PinColConfig(StrictEnum):
+class PinColRequest(StrictEnum):
     PCOL20 = "20um"
     PCOL40 = "40um"
     PCOL100 = "100um"
@@ -27,18 +28,34 @@ class PinColOut(StrictEnum):
     OUT = "OUT"
 
 
-class PinholeStage(XYStage):
+class PinholeStage(XYStage, Movable):
     """Pinhole stages xy motors."""
 
     def __init__(self, prefix: str, name: str = ""):
         super().__init__(prefix, name)
 
+    @AsyncStatus.wrap
+    async def set(self, value: dict[str, float]):
+        LOGGER.debug(f"Move pinhole stage to {value}")
+        await self.x.set(value["pinx"])
+        if value["piny"]:
+            # Account for "out" which only moves x
+            await self.y.set(value["piny"])
 
-class CollimatorStage(XYStage):
+
+class CollimatorStage(XYStage, Movable):
     """Collimator stage xy motors."""
 
     def __init__(self, prefix: str, name: str = ""):
         super().__init__(prefix, name)
+
+    @AsyncStatus.wrap
+    async def set(self, value: dict[str, float]):
+        LOGGER.debug(f"Move collimator stage to {value}")
+        await self.x.set(value["colx"])
+        if value["coly"]:
+            # Account for "out" which only moves x
+            await self.y.set(value["coly"])
 
 
 class PinColConfiguration(StandardReadable):
@@ -46,7 +63,7 @@ class PinColConfiguration(StandardReadable):
         self, prefix: str, apertures: list[int] = APERTURE_SIZES, name: str = ""
     ) -> None:
         with self.add_children_as_readables():
-            self.selection = epics_signal_rw(PinColConfig, f"{prefix}CONFIG")
+            self.selection = epics_signal_rw(PinColRequest, f"{prefix}CONFIG")
             self.pin_x = MAPTConfiguration(prefix, "PINX", apertures)
             self.pin_Y = MAPTConfiguration(prefix, "PINY", apertures)
             self.col_x = MAPTConfiguration(prefix, "COLX", apertures)
@@ -69,6 +86,9 @@ class PinColControl(StandardReadable, Movable):
             self.pinhole = PinholeStage(f"{prefix}{pin_infix}")
             self.collimator = CollimatorStage(f"{prefix}{col_infix}")
             self.config = PinColConfiguration(f"{prefix}{config_infix}CONFIG")
-            self.config = epics_signal_rw(PinColConfig, f"{prefix}{config_infix}CONFIG")
             self.is_out = epics_signal_r(PinColOut, f"{prefix}{config_infix}IS_OUT")
         super().__init__(name=name)
+
+    @AsyncStatus.wrap
+    async def set(self, value: PinColRequest):
+        pass

@@ -3,9 +3,9 @@ from ophyd_async.epics.signal import epics_signal_r
 
 
 class MAPTConfiguration(StandardReadable):
-    """Readable device that can be used to build the read-only MAPT configuration table for aperture motors in the available positions.
+    """Readable device that can be used to build the read-only MAPT configuration table
+    for aperture motors in the available positions.
     Can be used for both eh1 and eh2 on I19.
-
     """
 
     def __init__(
