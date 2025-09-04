@@ -65,7 +65,7 @@ class PinColConfiguration(StandardReadable):
         with self.add_children_as_readables():
             self.selection = epics_signal_rw(PinColRequest, f"{prefix}CONFIG")
             self.pin_x = MAPTConfiguration(prefix, "PINX", apertures)
-            self.pin_Y = MAPTConfiguration(prefix, "PINY", apertures)
+            self.pin_y = MAPTConfiguration(prefix, "PINY", apertures)
             self.col_x = MAPTConfiguration(prefix, "COLX", apertures)
             self.col_y = MAPTConfiguration(prefix, "COLY", apertures)
             self.pin_x_out = epics_signal_r(float, f"{prefix}OUT:PINX")
@@ -89,6 +89,23 @@ class PinColControl(StandardReadable, Movable):
             self.is_out = epics_signal_r(PinColOut, f"{prefix}{config_infix}IS_OUT")
         super().__init__(name=name)
 
+    async def _get_motor_positions_for_requested_aperture(
+        self, request: PinColRequest
+    ) -> dict[str, float]:
+        # NOTE I think instead f this I should be able to do a reading ? To be checked
+        val = int(request.value.strip("um"))
+
+        pinx = await self.config.pin_x.in_positions[val].get_value()
+        piny = await self.config.pin_y.in_positions[val].get_value()
+        colx = await self.config.col_x.in_positions[val].get_value()
+        coly = await self.config.col_x.in_positions[val].get_value()
+
+        positions = {"pinx": pinx, "piny": piny, "colx": colx, "coly": coly}
+        return positions
+
     @AsyncStatus.wrap
     async def set(self, value: PinColRequest):
-        pass
+        # For now not considering OUT - TBD
+        motor_positions = await self._get_motor_positions_for_requested_aperture(value)
+        await self.pinhole.set(motor_positions)
+        await self.collimator.set(motor_positions)
