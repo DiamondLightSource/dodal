@@ -20,6 +20,7 @@ from ophyd_async.core import (
     WatchableAsyncStatus,
     WatcherUpdate,
     derived_signal_rw,
+    error_if_none,
     observe_value,
     soft_signal_r_and_setter,
     soft_signal_rw,
@@ -802,7 +803,9 @@ class Apple2(abc.ABC, StandardReadable, Movable, Preparable, Flyable):
 Apple2ID = TypeVar("Apple2ID", bound=Apple2)
 
 
-class EnergySetter(StandardReadable, Movable[float], Generic[Apple2ID]):
+class EnergySetter(
+    StandardReadable, Movable[float], Preparable, Flyable, Generic[Apple2ID]
+):
     """
     Compound device to set both ID and PGM energy at the same time.
 
@@ -830,6 +833,7 @@ class EnergySetter(StandardReadable, Movable[float], Generic[Apple2ID]):
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             self.energy_offset = soft_signal_rw(float, initial_value=0)
         super().__init__(name=name)
+        self._fly_status: AsyncStatus | None = None
 
     @AsyncStatus.wrap
     async def set(self, value: float) -> None:
@@ -838,3 +842,33 @@ class EnergySetter(StandardReadable, Movable[float], Generic[Apple2ID]):
             self.id.set(value=value + await self.energy_offset.get_value()),
             self.pgm_ref().energy.set(value),
         )
+
+    @AsyncStatus.wrap
+    async def prepare(self, value: FlyMotorInfo) -> None:
+        await asyncio.gather(
+            self.id.prepare(value), self.pgm_ref().energy.prepare(value)
+        )
+
+    @AsyncStatus.wrap
+    async def kickoff(self):
+        pgm_acceleration_time, gap_acceleration_time = await asyncio.gather(
+            self.pgm_ref().energy.acceleration_time.get_value(),
+            self.id.gap.acceleration_time.get_value(),
+        )
+        start_offset_time = pgm_acceleration_time - gap_acceleration_time
+
+        await self.pgm_ref().energy.kickoff()
+        await asyncio.sleep(start_offset_time)
+        await self.id.kickoff()
+        self._fly_status = self._combined_fly_status()
+
+    def complete(self) -> AsyncStatus:
+        """Stop when both pgm and id is done moving."""
+        fly_status = error_if_none(self._fly_status, "kickoff not called")
+        return fly_status
+
+    @AsyncStatus.wrap
+    async def _combined_fly_status(self):
+        status_pgm = self.pgm_ref().energy.complete()
+        status_id = self.id.complete()
+        await asyncio.gather(status_pgm, status_id)

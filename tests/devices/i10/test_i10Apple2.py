@@ -1,16 +1,23 @@
+import asyncio
 import os
 import pickle
 from collections import defaultdict
 from unittest import mock
-from unittest.mock import Mock
+from unittest.mock import AsyncMock, Mock, patch
 
 import numpy as np
 import pytest
-from bluesky.plan_stubs import prepare
+from bluesky import plan_stubs as bps
 from bluesky.plans import scan
 from bluesky.run_engine import RunEngine
 from numpy import poly1d
-from ophyd_async.core import FlyMotorInfo, init_devices
+from ophyd_async.core import (
+    AsyncStatus,
+    FlyMotorInfo,
+    init_devices,
+    soft_signal_rw,
+    wait_for_value,
+)
 from ophyd_async.testing import (
     assert_emitted,
     callback_on_mock_put,
@@ -597,10 +604,58 @@ def test_convert_csv_to_lookup_failed():
         )
 
 
-async def test_i10apple2_prepare_success(RE: RunEngine, mock_id: I10Apple2):
-    fly_motor_info = FlyMotorInfo(
-        start_position=600,
-        end_position=700,
-        time_for_move=60,
+async def test_energysetter_prepare_success(RE: RunEngine, mock_id_pgm: EnergySetter):
+    fly_info = FlyMotorInfo(start_position=700, end_position=800, time_for_move=10)
+    mock_id_pgm.id.prepare = AsyncMock()
+    mock_id_pgm.pgm_ref().energy.prepare = AsyncMock()
+    RE(bps.prepare(mock_id_pgm, fly_info))
+    mock_id_pgm.id.prepare.assert_awaited_once_with(fly_info)
+    mock_id_pgm.pgm_ref().energy.prepare.assert_awaited_once_with(fly_info)  # type: ignore
+
+
+@patch("asyncio.sleep", new_callable=AsyncMock)
+async def test_energysetter_kickoff_set_correct_delay(
+    mock_sleep: AsyncMock, RE: RunEngine, mock_id_pgm: EnergySetter
+):
+    fly_info = FlyMotorInfo(start_position=700, end_position=800, time_for_move=10)
+    id_acc_time = 3
+    pgm_acc_time = 1
+    set_mock_value(mock_id_pgm.id.gap.max_velocity, 30)
+    set_mock_value(mock_id_pgm.id.gap.min_velocity, 0.1)
+    set_mock_value(mock_id_pgm.id.gap.acceleration_time, id_acc_time)
+    set_mock_value(mock_id_pgm.pgm_ref().energy.max_velocity, 30)
+    set_mock_value(mock_id_pgm.id.gap.low_limit_travel, 0)
+    set_mock_value(mock_id_pgm.id.gap.high_limit_travel, 200)
+    set_mock_value(mock_id_pgm.pgm_ref().energy.low_limit_travel, 0)
+    set_mock_value(mock_id_pgm.pgm_ref().energy.high_limit_travel, 1000)
+    set_mock_value(mock_id_pgm.pgm_ref().energy.acceleration_time, pgm_acc_time)
+    set_mock_value(mock_id_pgm.id.gap.gate, UndulatorGateStatus.CLOSE)
+    mock_id_pgm.id.kickoff = AsyncMock()
+    mock_id_pgm.pgm_ref().energy.kickoff = AsyncMock()
+    await mock_id_pgm.prepare(fly_info)
+    await mock_id_pgm.kickoff()
+    mock_sleep.assert_awaited_once_with(pgm_acc_time - id_acc_time)
+    mock_id_pgm.id.kickoff.assert_awaited_once()
+    mock_id_pgm.pgm_ref().energy.kickoff.assert_awaited_once()  # type: ignore
+
+
+async def test_energysetter_complete(mock_id_pgm: EnergySetter) -> None:
+    fake_id_fly_status = soft_signal_rw(bool, False)
+    fake_pgm_fly_status = soft_signal_rw(bool, False)
+    await asyncio.gather(fake_pgm_fly_status.connect(), fake_id_fly_status.connect())
+
+    mock_id_pgm.id._fly_status = AsyncStatus(
+        wait_for_value(fake_id_fly_status, True, timeout=1)
     )
-    RE(prepare(mock_id, fly_motor_info))
+    mock_id_pgm.pgm_ref().energy._fly_status = AsyncStatus(
+        wait_for_value(fake_pgm_fly_status, True, timeout=1)
+    )  # type: ignore
+    with pytest.raises(RuntimeError, match="kickoff not called"):
+        energy_setter_fly_status = mock_id_pgm.complete()
+        assert not energy_setter_fly_status.done
+        set_mock_value(fake_id_fly_status, True)
+        assert mock_id_pgm.id._fly_status.done
+        assert not energy_setter_fly_status.done
+        set_mock_value(fake_pgm_fly_status, True)
+        assert mock_id_pgm.id.pgm_ref().energy._fly_status.done
+        assert energy_setter_fly_status.done

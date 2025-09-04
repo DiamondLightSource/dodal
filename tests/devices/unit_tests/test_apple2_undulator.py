@@ -5,7 +5,7 @@ import bluesky.plan_stubs as bps
 import pytest
 from bluesky.plans import scan
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import AsyncStatus, FlyMotorInfo, init_devices
+from ophyd_async.core import AsyncStatus, FlyMotorInfo, StrictEnum, init_devices
 from ophyd_async.testing import (
     assert_configuration,
     assert_emitted,
@@ -20,6 +20,7 @@ from dodal.devices.apple2_undulator import (
     DEFAULT_TIMEOUT,
     Apple2,
     Apple2PhasesVal,
+    EnergySetter,
     MotorWithoutStop,
     Pol,
     UndulatorGap,
@@ -27,6 +28,7 @@ from dodal.devices.apple2_undulator import (
     UndulatorJawPhase,
     UndulatorPhaseAxes,
 )
+from dodal.devices.pgm import PGM
 
 
 @pytest.fixture
@@ -117,6 +119,24 @@ async def mock_apple2(
     async with init_devices(mock=True):
         mock_apple2 = test_apple2(id_gap=mock_id_gap, id_phase=mock_phaseAxes)
     return mock_apple2
+
+
+class TestGrating(StrictEnum):
+    LINES = "lines"
+
+
+@pytest.fixture
+async def mock_pgm() -> PGM:
+    async with init_devices(mock=True):
+        mock_pgm = PGM(prefix="", grating=TestGrating)
+    return mock_pgm
+
+
+@pytest.fixture
+async def mock_energy_setter(mock_apple2: test_apple2, mock_pgm: PGM) -> EnergySetter:
+    async with init_devices(mock=True):
+        mock_energy_setter = EnergySetter(id=mock_apple2, pgm=mock_pgm)
+    return mock_energy_setter
 
 
 async def test_in_motion_error(
@@ -494,7 +514,7 @@ async def test_apple2_prepare_success(
     assert await mock_apple2.gap.velocity.get_value() == abs(velocity)
 
 
-async def test_apple2_kickoff__call_gap_kickoff(
+async def test_apple2_kickoff_call_gap_kickoff(
     mock_apple2: test_apple2,
 ):
     mock_apple2.gap.kickoff = AsyncMock()
@@ -502,9 +522,22 @@ async def test_apple2_kickoff__call_gap_kickoff(
     mock_apple2.gap.kickoff.assert_awaited_once()
 
 
-def test_apple2_complete__call_gap_complete(
+def test_apple2_complete_call_gap_complete(
     mock_apple2: test_apple2,
 ):
     mock_apple2.gap.complete = MagicMock()
     mock_apple2.complete()
     mock_apple2.gap.complete.assert_called_once()
+
+
+async def test_energy_setter_prepare_success(
+    mock_energy_setter: EnergySetter,
+    RE: RunEngine,
+):
+    mock_energy_setter.id.prepare = AsyncMock()
+    mock_energy_setter.pgm_ref().energy.prepare = AsyncMock()
+
+    fly_info = FlyMotorInfo(start_position=700, end_position=800, time_for_move=10)
+    RE(bps.prepare(mock_energy_setter, fly_info, wait=True))
+    mock_energy_setter.id.prepare.assert_awaited_once_with(fly_info)
+    mock_energy_setter.pgm_ref().energy.prepare.assert_awaited_once_with(fly_info)  # type: ignore
