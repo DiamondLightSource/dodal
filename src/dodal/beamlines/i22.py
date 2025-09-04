@@ -1,7 +1,6 @@
 from pathlib import Path
 
 from ophyd_async.epics.adaravis import AravisDetector
-from ophyd_async.epics.adcore import NDPluginStatsIO
 from ophyd_async.epics.adpilatus import PilatusDetector
 from ophyd_async.fastcs.panda import HDFPanda
 
