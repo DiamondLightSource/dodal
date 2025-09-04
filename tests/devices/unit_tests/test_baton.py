@@ -12,5 +12,6 @@ async def test_mock_baton_can_be_initialised_and_read():
         {
             "baton-current_user": partial_reading(""),
             "baton-requested_user": partial_reading(""),
+            "baton-commissioning": partial_reading(False),
         },
     )
