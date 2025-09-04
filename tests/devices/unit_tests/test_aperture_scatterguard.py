@@ -87,12 +87,13 @@ def get_all_motors(ap_sg: ApertureScatterguard):
 
 @pytest.fixture
 async def ap_sg(
-    RE: RunEngine,
     aperture_positions: dict[ApertureValue, AperturePosition],
     aperture_tolerances: AperturePosition,
 ) -> AsyncGenerator[ApertureScatterguard]:
     async with init_devices(mock=True):
         ap_sg = ApertureScatterguard(
+            aperture_prefix="-MO-MAPT-01:",
+            scatterguard_prefix="-MO-SCAT-01:",
             name="test_ap_sg",
             loaded_positions=aperture_positions,
             tolerances=aperture_tolerances,

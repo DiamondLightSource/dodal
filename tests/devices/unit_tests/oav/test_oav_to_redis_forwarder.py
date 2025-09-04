@@ -15,7 +15,7 @@ from dodal.devices.oav.oav_to_redis_forwarder import (
 
 @pytest.fixture
 @patch("dodal.devices.oav.oav_to_redis_forwarder.StrictRedis", new=AsyncMock)
-async def oav_forwarder(RE):
+async def oav_forwarder():
     with init_devices(mock=True):
         oav_forwarder = OAVToRedisForwarder("prefix", "host", "password")
     set_mock_value(

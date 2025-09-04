@@ -20,7 +20,7 @@ from tests.devices.unit_tests.test_data import (
 
 
 @pytest.fixture
-async def undulator(RE) -> Undulator:
+async def undulator() -> Undulator:
     async with init_devices(mock=True):
         undulator = Undulator(
             "UND-01",

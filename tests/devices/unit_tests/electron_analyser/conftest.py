@@ -111,7 +111,6 @@ def sequence_class(
 def sequence(
     sim_driver: AbstractAnalyserDriverIO,
     sequence_class: type[TAbstractBaseSequence],
-    RE: RunEngine,
 ) -> AbstractBaseSequence:
     det = ElectronAnalyserDetector(
         driver=sim_driver,

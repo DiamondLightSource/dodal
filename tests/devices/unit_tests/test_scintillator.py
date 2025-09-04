@@ -3,7 +3,6 @@ from contextlib import ExitStack
 from unittest.mock import MagicMock
 
 import pytest
-from bluesky.run_engine import RunEngine
 from ophyd_async.core import init_devices
 
 from dodal.common.beamlines.beamline_parameters import GDABeamlineParameters
@@ -28,7 +27,6 @@ def mock_beamline_parameters() -> GDABeamlineParameters:
 
 @pytest.fixture
 async def scintillator_and_ap_sg(
-    RE: RunEngine,
     mock_beamline_parameters: GDABeamlineParameters,
 ) -> AsyncGenerator[tuple[Scintillator, MagicMock], None]:
     async with init_devices(mock=True):

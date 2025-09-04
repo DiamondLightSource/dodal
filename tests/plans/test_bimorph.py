@@ -39,7 +39,7 @@ VALID_BIMORPH_CHANNELS = [2]
 
 
 @pytest.fixture(params=VALID_BIMORPH_CHANNELS)
-def mirror(request, RE: RunEngine) -> BimorphMirror:
+def mirror(request) -> BimorphMirror:
     number_of_channels = request.param
 
     with init_devices(mock=True):
@@ -79,7 +79,7 @@ def mirror_with_mocked_put(mirror: BimorphMirror) -> BimorphMirror:
 
 
 @pytest.fixture
-def slits(RE: RunEngine) -> Slits:
+def slits() -> Slits:
     """Mock slits with propagation from setpoint to readback."""
     with init_devices(mock=True):
         slits = Slits("FAKE-PREFIX:")
@@ -96,7 +96,7 @@ def slits(RE: RunEngine) -> Slits:
 
 
 @pytest.fixture
-async def oav(RE: RunEngine, static_path_provider: PathProvider) -> StandardDetector:
+async def oav(static_path_provider: PathProvider) -> StandardDetector:
     with init_devices():
         det = SimBlobDetector(static_path_provider)
     return det

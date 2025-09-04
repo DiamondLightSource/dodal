@@ -1,7 +1,6 @@
 from unittest.mock import AsyncMock
 
 import pytest
-from bluesky import RunEngine
 from ophyd_async.core import init_devices
 from ophyd_async.testing import assert_reading, partial_reading, set_mock_value
 
@@ -9,7 +8,7 @@ from dodal.devices.turbo_slit import TurboSlit
 
 
 @pytest.fixture
-def slit(RE) -> TurboSlit:
+def slit() -> TurboSlit:
     with init_devices(mock=True):
         slit = TurboSlit(prefix="TEST-EA-TURBOSLIT:", name="turbo_slit")
     return slit
@@ -28,7 +27,7 @@ async def test_turbo_slit_set(slit: TurboSlit):
     slit.xfine.set.assert_called_once_with(0.5)
 
 
-async def test_turbo_slit_read(slit: TurboSlit, RE: RunEngine):
+async def test_turbo_slit_read(slit: TurboSlit):
     set_mock_value(slit.gap.user_readback, 0.5)
     set_mock_value(slit.arc.user_readback, 1.0)
     set_mock_value(slit.xfine.user_readback, 1.5)
