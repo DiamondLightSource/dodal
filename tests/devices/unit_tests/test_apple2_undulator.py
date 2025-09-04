@@ -121,14 +121,14 @@ async def mock_apple2(
     return mock_apple2
 
 
-class TestGrating(StrictEnum):
+class MockGrating(StrictEnum):
     LINES = "lines"
 
 
 @pytest.fixture
 async def mock_pgm() -> PGM:
     async with init_devices(mock=True):
-        mock_pgm = PGM(prefix="", grating=TestGrating)
+        mock_pgm = PGM(prefix="", grating=MockGrating)
     return mock_pgm
 
 
