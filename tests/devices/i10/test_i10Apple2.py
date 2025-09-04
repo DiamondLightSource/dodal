@@ -667,6 +667,6 @@ async def test_energysetter_complete(mock_sleep, mock_id_pgm: EnergySetter) -> N
     assert mock_id_pgm.id.gap._fly_status.done
     assert not energy_setter_fly_status.done
     await fake_pgm_fly_status.set(True)
-    assert mock_id_pgm.pgm_ref().energy._fly_status.done
+    assert mock_id_pgm.pgm_ref().energy._fly_status.done  # type: ignore
     await energy_setter_fly_status
     assert energy_setter_fly_status.done
