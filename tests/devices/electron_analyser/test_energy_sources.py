@@ -20,7 +20,7 @@ async def test_single_energy_source_read(
     await assert_reading(
         single_energy_source,
         {
-            f"{single_energy_source.name}-excitation_energy": partial_reading(
+            f"{dcm.energy_in_ev.name}": partial_reading(
                 await dcm.energy_in_ev.get_value()
             ),
         },
@@ -46,17 +46,17 @@ async def test_dual_energy_source_energy_is_correct_when_switching_between_sourc
     dcm_energy_source: EnergySource,
     pgm_energy_source: EnergySource,
 ) -> None:
-    dcm_energy_val = await dcm_energy_source.excitation_energy.get_value()
-    pgm_energy_val = await pgm_energy_source.excitation_energy.get_value()
+    dcm_energy_val = await dcm_energy_source.energy.get_value()
+    pgm_energy_val = await pgm_energy_source.energy.get_value()
 
     # Make sure energy sources values are different for this test so we can tell them a
     # part when switching
     assert dcm_energy_val != pgm_energy_val
 
     await dual_energy_source.selected_source.set(SelectedSource.SOURCE1)
-    await assert_value(dual_energy_source.excitation_energy, dcm_energy_val)
+    await assert_value(dual_energy_source.energy, dcm_energy_val)
     await dual_energy_source.selected_source.set(SelectedSource.SOURCE2)
-    await assert_value(dual_energy_source.excitation_energy, pgm_energy_val)
+    await assert_value(dual_energy_source.energy, pgm_energy_val)
 
 
 async def test_dual_energy_souce_read(
@@ -70,11 +70,11 @@ async def test_dual_energy_souce_read(
         dual_energy_source,
         {
             f"{prefix}-selected_source": partial_reading(SelectedSource.SOURCE1),
-            f"{prefix}-source1-excitation_energy": partial_reading(
-                await dcm_energy_source.excitation_energy.get_value()
+            f"{await dcm_energy_source.wrapped_device_name.get_value()}": partial_reading(
+                await dcm_energy_source.energy.get_value()
             ),
-            f"{prefix}-source2-excitation_energy": partial_reading(
-                await pgm_energy_source.excitation_energy.get_value()
+            f"{await pgm_energy_source.wrapped_device_name.get_value()}": partial_reading(
+                await pgm_energy_source.energy.get_value()
             ),
         },
     )
