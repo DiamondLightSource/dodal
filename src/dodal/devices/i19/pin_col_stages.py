@@ -73,7 +73,7 @@ class PinColConfiguration(StandardReadable):
         super().__init__(name)
 
 
-class PinColControl(StandardReadable, Movable):
+class PinColControl(StandardReadable):
     def __init__(
         self,
         prefix: str,
@@ -102,10 +102,3 @@ class PinColControl(StandardReadable, Movable):
 
         positions = {"pinx": pinx, "piny": piny, "colx": colx, "coly": coly}
         return positions
-
-    @AsyncStatus.wrap
-    async def set(self, value: PinColRequest):
-        # For now not considering OUT - TBD
-        motor_positions = await self._get_motor_positions_for_requested_aperture(value)
-        await self.pinhole.set(motor_positions)
-        await self.collimator.set(motor_positions)
