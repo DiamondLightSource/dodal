@@ -89,16 +89,28 @@ class PinColControl(StandardReadable):
             self.is_out = epics_signal_r(PinColOut, f"{prefix}{config_infix}IS_OUT")
         super().__init__(name=name)
 
-    async def _get_motor_positions_for_requested_aperture(
+    def _get_aperture_size(self, request: str) -> int:
+        return int(request.strip("um"))
+
+    async def get_pinhole_motor_positions_for_requested_aperture(
         self, request: PinColRequest
     ) -> dict[str, float]:
         # NOTE I think instead f this I should be able to do a reading ? To be checked
-        val = int(request.value.strip("um"))
+        val = self._get_aperture_size(request.value)
 
         pinx = await self.config.pin_x.in_positions[val].get_value()
         piny = await self.config.pin_y.in_positions[val].get_value()
+
+        positions = {"pinx": pinx, "piny": piny}
+        return positions
+
+    async def get_collimator_motor_positions_for_requested_aperture(
+        self, request: PinColRequest
+    ) -> dict[str, float]:
+        val = self._get_aperture_size(request.value)
+
         colx = await self.config.col_x.in_positions[val].get_value()
         coly = await self.config.col_x.in_positions[val].get_value()
 
-        positions = {"pinx": pinx, "piny": piny, "colx": colx, "coly": coly}
+        positions = {"colx": colx, "coly": coly}
         return positions
