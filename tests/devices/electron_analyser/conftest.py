@@ -27,7 +27,7 @@ from dodal.devices.electron_analyser.vgscienta import (
 )
 from dodal.devices.i09 import DCM, Grating
 from dodal.devices.pgm import PGM
-from tests.devices.unit_tests.electron_analyser.helper_util import (
+from tests.devices.electron_analyser.helper_util import (
     get_test_sequence,
 )
 

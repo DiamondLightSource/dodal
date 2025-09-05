@@ -7,13 +7,13 @@ from dodal.devices.util.lookup_tables import (
     linear_interpolation_lut,
     parse_lookup_table,
 )
-from tests.devices.unit_tests.detector.test_data import (
+from tests.devices.detector.test_data import (
     TEST_DET_DIST_CONVERTER_LUT,
 )
-from tests.devices.unit_tests.test_data import (
+from tests.devices.test_data import (
     TEST_BEAMLINE_UNDULATOR_TO_GAP_LUT,
 )
-from tests.devices.unit_tests.util.test_data import (
+from tests.devices.util.test_data import (
     TEST_BEAMLINE_DCM_ROLL_CONVERTER_NON_MONOTONIC_TXT,
     TEST_BEAMLINE_DCM_ROLL_CONVERTER_REVERESED_TXT,
     TEST_BEAMLINE_DCM_ROLL_CONVERTER_TXT,
