@@ -14,7 +14,7 @@ class MAPTConfiguration(StandardReadable):
         with self.add_children_as_readables():
             self.in_positions: DeviceVector[SignalR[float]] = DeviceVector(
                 {
-                    pos: epics_signal_r(float, f"{prefix}{pos}UM:{motor_name}")
+                    pos: epics_signal_r(float, f"{prefix}:{pos}UM:{motor_name}")
                     for pos in aperture_list
                 }
             )

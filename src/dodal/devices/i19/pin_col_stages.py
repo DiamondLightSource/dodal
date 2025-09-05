@@ -63,13 +63,13 @@ class PinColConfiguration(StandardReadable):
         self, prefix: str, apertures: list[int] = APERTURE_SIZES, name: str = ""
     ) -> None:
         with self.add_children_as_readables():
-            self.selection = epics_signal_rw(PinColRequest, f"{prefix}CONFIG")
+            self.selection = epics_signal_rw(PinColRequest, f"{prefix}")
             self.pin_x = MAPTConfiguration(prefix, "PINX", apertures)
             self.pin_y = MAPTConfiguration(prefix, "PINY", apertures)
             self.col_x = MAPTConfiguration(prefix, "COLX", apertures)
             self.col_y = MAPTConfiguration(prefix, "COLY", apertures)
-            self.pin_x_out = epics_signal_r(float, f"{prefix}OUT:PINX")
-            self.col_x_out = epics_signal_r(float, f"{prefix}OUT:COLX")
+            self.pin_x_out = epics_signal_r(float, f"{prefix}:OUT:PINX")
+            self.col_x_out = epics_signal_r(float, f"{prefix}:OUT:COLX")
         super().__init__(name)
 
 
