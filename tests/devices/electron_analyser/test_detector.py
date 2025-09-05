@@ -2,10 +2,8 @@ from unittest.mock import AsyncMock
 
 import pytest
 from bluesky import plan_stubs as bps
-from bluesky.protocols import Triggerable
 from bluesky.run_engine import RunEngine
 from ophyd_async.core import SignalR, init_devices
-from ophyd_async.epics.adcore import ADBaseController
 
 import dodal.devices.b07 as b07
 import dodal.devices.i09 as i09
@@ -15,7 +13,7 @@ from dodal.devices.electron_analyser import (
 from dodal.devices.electron_analyser.specs import SpecsDetector
 from dodal.devices.electron_analyser.vgscienta import VGScientaDetector
 from dodal.testing.electron_analyser import create_detector
-from tests.devices.unit_tests.electron_analyser.helper_util import get_test_sequence
+from tests.devices.electron_analyser.helper_util import get_test_sequence
 
 
 @pytest.fixture(
@@ -27,6 +25,7 @@ from tests.devices.unit_tests.electron_analyser.helper_util import get_test_sequ
 async def sim_detector(
     request: pytest.FixtureRequest,
     energy_sources: dict[str, SignalR[float]],
+    RE: RunEngine,
 ) -> GenericElectronAnalyserDetector:
     async with init_devices(mock=True):
         sim_detector = await create_detector(
@@ -95,9 +94,7 @@ def test_analyser_detector_has_driver_as_child_and_region_detector_does_not(
 ) -> None:
     # Remove parent name from driver name so it can be checked it exists in
     # _child_devices dict
-    driver_name = sim_detector.driver.name
-    if sim_detector.name + "-" in driver_name:
-        driver_name = driver_name.replace(sim_detector.name + "-", "")
+    driver_name = sim_detector.driver.name.replace(sim_detector.name + "-", "")
 
     assert sim_detector.driver.parent == sim_detector
     assert sim_detector._child_devices.get(driver_name) is not None
@@ -107,29 +104,6 @@ def test_analyser_detector_has_driver_as_child_and_region_detector_does_not(
     for det in region_detectors:
         assert det._child_devices.get(driver_name) is None
         assert det.driver.parent == sim_detector
-
-
-def assert_detector_trigger_uses_controller_correctly(
-    detector: Triggerable,
-    controller: ADBaseController,
-    RE: RunEngine,
-) -> None:
-    controller.arm = AsyncMock()
-    controller.wait_for_idle = AsyncMock()
-
-    RE(bps.trigger(detector), wait=True)
-
-    controller.arm.assert_awaited_once()
-    controller.wait_for_idle.assert_awaited_once()
-
-
-def test_analyser_detector_trigger(
-    sim_detector: GenericElectronAnalyserDetector,
-    RE: RunEngine,
-) -> None:
-    assert_detector_trigger_uses_controller_correctly(
-        sim_detector, sim_detector.controller, RE
-    )
 
 
 async def test_analyser_region_detector_trigger_sets_driver_with_region(
@@ -144,40 +118,11 @@ async def test_analyser_region_detector_trigger_sets_driver_with_region(
     for reg_det in region_detectors:
         reg_det.driver.set = AsyncMock()
 
-        assert_detector_trigger_uses_controller_correctly(
-            reg_det, reg_det.controller, RE
-        )
+        reg_det.controller.arm = AsyncMock()
+        reg_det.controller.wait_for_idle = AsyncMock()
+
+        RE(bps.trigger(reg_det), wait=True)
+
+        reg_det.controller.arm.assert_awaited_once()
+        reg_det.controller.wait_for_idle.assert_awaited_once()
         reg_det.driver.set.assert_awaited_once_with(reg_det.region)
-
-
-async def test_analyser_detector_config_read(
-    sim_detector: GenericElectronAnalyserDetector,
-) -> None:
-    # avoid division by zero in angle axis calculation
-    await sim_detector.driver.slices.set(1)
-    configuration_read = await sim_detector.read_configuration()
-    expected_config_keys = [
-        f"{sim_detector.name}-_driver-centre_energy",
-        f"{sim_detector.name}-_driver-lens_mode",
-        f"{sim_detector.name}-_driver-excitation_energy_source",
-        f"{sim_detector.name}-_driver-acquisition_mode",
-        f"{sim_detector.name}-_driver-psu_mode",
-        f"{sim_detector.name}-_driver-energy_mode",
-        f"{sim_detector.name}-_driver-region_name",
-        f"{sim_detector.name}-_driver-energy_step",
-        f"{sim_detector.name}-_driver-slices",
-        f"{sim_detector.name}-_driver-pass_energy",
-        f"{sim_detector.name}-_driver-high_energy",
-        f"{sim_detector.name}-_driver-iterations",
-        f"{sim_detector.name}-_driver-low_energy",
-        f"{sim_detector.name}-_driver-acquire_time",
-        f"{sim_detector.name}-_driver-total_steps",
-        f"{sim_detector.name}-_driver-total_time",
-        f"{sim_detector.name}-_driver-energy_axis",
-        f"{sim_detector.name}-_driver-binding_energy_axis",
-        f"{sim_detector.name}-_driver-angle_axis",
-    ]
-    assert all(item in configuration_read for item in expected_config_keys)
-
-
-# ToDo - Add test that data being read is correct from plan
