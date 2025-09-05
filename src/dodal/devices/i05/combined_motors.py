@@ -22,7 +22,7 @@ class PolynomCombinedMotors(
     Stoppable,
 ):
     """
-    Binds slave motors positions against master motor via polynom dependency.
+    Binds slave motors positions against master motor position via polynom dependency.
     Instance of this class will be used in a scan (scannable in GDA sense).
     Moving instance of this class moves master and all slaves asynchronously.
     Locating position returns just a master motor position.
@@ -39,14 +39,15 @@ class PolynomCombinedMotors(
         ----------
         master:
             Master motor
-        slaves_dict:
+        motors_dict:
             Dictionary of slaves motors and their polynomial coefficients
         """
         self.master = Reference(master_motor)
-
         self.motor_coeff_dict: dict[Reference[Motor], Array1D[np.float64]] = {}
+
         # master motor added with polynomial coeff (0,1)
         self.motor_coeff_dict[self.master] = np.array([0.0, 1.0])
+
         # slave motors added with coefficients from input parameters
         for slave in slaves_dict.keys():
             self.motor_coeff_dict[Reference(slave)] = slaves_dict[slave]
