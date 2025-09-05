@@ -1,5 +1,5 @@
 from typing import get_origin
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 from bluesky import plan_stubs as bps
@@ -7,7 +7,6 @@ from bluesky.run_engine import RunEngine
 from bluesky.utils import FailedStatus
 from ophyd_async.core import StrictEnum, init_devices
 from ophyd_async.epics.adcore import ADImageMode
-from ophyd_async.testing import assert_value
 
 from dodal.devices import b07, i09
 from dodal.devices.electron_analyser import DualEnergySource, EnergySource
@@ -50,20 +49,23 @@ async def sim_driver(
 
 
 @pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
-async def test_driver_gets_correct_energy_source_value(
+def test_driver_set(
     sim_driver: AbstractAnalyserDriverIO,
     region: AbstractBaseRegion,
-    single_energy_source: EnergySource,
-    dual_energy_source: DualEnergySource,
+    RE: RunEngine,
 ) -> None:
-    energy = await sim_driver.set_source_from_region_and_get_energy(region)
-    if sim_driver.energy_source == single_energy_source:
-        await assert_value(single_energy_source.energy, energy)
-    elif sim_driver.energy_source == dual_energy_source:
-        await assert_value(
-            dual_energy_source.selected_source, region.excitation_energy_source
+    sim_driver._set_region = AsyncMock()
+
+    if isinstance(sim_driver.energy_source, DualEnergySource):
+        sim_driver.energy_source.selected_source.set = MagicMock()
+
+    RE(bps.mv(sim_driver, region))
+
+    if isinstance(sim_driver.energy_source, DualEnergySource):
+        sim_driver.energy_source.selected_source.set.assert_called_once_with(  # type: ignore
+            region.excitation_energy_source
         )
-        await assert_value(dual_energy_source.energy, energy)
+    sim_driver._set_region.assert_called_once()
 
 
 def test_driver_throws_error_with_wrong_lens_mode(

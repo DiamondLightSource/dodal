@@ -141,9 +141,8 @@ async def test_analyser_sets_region_and_read_configuration_is_correct(
             f"{prefix}region_size_y": partial_reading(region.size_y),
             f"{prefix}sensor_max_size_y": partial_reading(ANY),
             f"{prefix}psu_mode": partial_reading(ANY),
-            f"{prefix}energy_source-source1-wrapped_device_name": partial_reading(ANY),
-            f"{prefix}energy_source-source2-wrapped_device_name": partial_reading(ANY),
-        },
+        }
+        | await sim_driver.energy_source.read_configuration(),
     )
 
 
@@ -160,6 +159,7 @@ async def test_analyser_sets_region_and_read_is_correct(
     set_mock_value(sim_driver.spectrum, spectrum)
 
     prefix = sim_driver.name + "-"
+
     await assert_reading(
         sim_driver,
         {
@@ -167,12 +167,11 @@ async def test_analyser_sets_region_and_read_is_correct(
             f"{prefix}energy_source-selected_source": partial_reading(
                 region.excitation_energy_source
             ),
-            f"{prefix}energy_source-source1-excitation_energy": partial_reading(ANY),
-            f"{prefix}energy_source-source2-excitation_energy": partial_reading(ANY),
             f"{prefix}image": partial_reading(ANY),
             f"{prefix}spectrum": partial_reading(spectrum),
             f"{prefix}total_intensity": partial_reading(expected_total_intensity),
-        },
+        }
+        | await sim_driver.energy_source.read(),
     )
 
 

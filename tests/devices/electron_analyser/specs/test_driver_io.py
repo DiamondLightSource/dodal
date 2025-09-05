@@ -140,8 +140,8 @@ async def test_analyser_sets_region_and_read_configuration_is_correct(
             f"{prefix}angle_axis": partial_reading(ANY),
             f"{prefix}snapshot_values": partial_reading(region.values),
             f"{prefix}psu_mode": partial_reading(region.psu_mode),
-            f"{prefix}energy_source-wrapped_device_name": partial_reading(ANY),
-        },
+        }
+        | await sim_driver.energy_source.read_configuration(),
     )
 
 
@@ -153,8 +153,6 @@ async def test_analyser_sets_region_and_read_is_correct(
 ) -> None:
     RE(bps.mv(sim_driver, region), wait=True)
 
-    excitation_energy = await sim_driver.energy_source.energy.get_value()
-
     spectrum = np.array([1, 2, 3, 4, 5], dtype=float)
     expected_total_intensity = np.sum(spectrum)
     set_mock_value(sim_driver.spectrum, spectrum)
@@ -163,13 +161,11 @@ async def test_analyser_sets_region_and_read_is_correct(
     await assert_reading(
         sim_driver,
         {
-            f"{prefix}energy_source-excitation_energy": partial_reading(
-                excitation_energy
-            ),
             f"{prefix}image": partial_reading([]),
             f"{prefix}spectrum": partial_reading(spectrum),
             f"{prefix}total_intensity": partial_reading(expected_total_intensity),
-        },
+        }
+        | await sim_driver.energy_source.read(),
     )
 
 

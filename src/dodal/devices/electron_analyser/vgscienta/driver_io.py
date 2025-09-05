@@ -4,7 +4,6 @@ from typing import Generic
 import numpy as np
 from ophyd_async.core import (
     Array1D,
-    AsyncStatus,
     SignalR,
     StandardReadableFormat,
 )
@@ -22,7 +21,6 @@ from dodal.devices.electron_analyser.energy_sources import (
     DualEnergySource,
     EnergySource,
 )
-from dodal.devices.electron_analyser.enums import EnergyMode
 from dodal.devices.electron_analyser.vgscienta.enums import (
     AcquisitionMode,
     DetectorMode,
@@ -73,12 +71,7 @@ class VGScientaAnalyserDriverIO(
             name,
         )
 
-    @AsyncStatus.wrap
-    async def set(self, region: VGScientaRegion[TLensMode, TPassEnergyEnum]):
-        excitation_energy = await self.set_source_from_region_and_get_energy(region)
-        # Copy region so doesn't alter the actual region and switch to kinetic energy
-        ke_region = region.model_copy()
-        ke_region.switch_energy_mode(EnergyMode.KINETIC, excitation_energy)
+    async def _set_region(self, ke_region: VGScientaRegion[TLensMode, TPassEnergyEnum]):
         await asyncio.gather(
             self.region_name.set(ke_region.name),
             self.energy_mode.set(ke_region.energy_mode),

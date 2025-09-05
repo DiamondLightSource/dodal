@@ -16,6 +16,7 @@ from dodal.devices.electron_analyser.abstract import (
     AbstractAnalyserDriverIO,
     AbstractElectronAnalyserDetector,
 )
+from dodal.devices.electron_analyser.energy_sources import EnergySource
 from dodal.devices.electron_analyser.specs import SpecsDetector
 from dodal.devices.electron_analyser.vgscienta import VGScientaDetector
 from dodal.testing.electron_analyser import create_detector
@@ -29,14 +30,14 @@ from dodal.testing.electron_analyser import create_detector
 )
 async def sim_detector(
     request: pytest.FixtureRequest,
-    energy_sources: dict[str, SignalR[float]],
+    single_energy_source: EnergySource,
     RE: RunEngine,
 ) -> AbstractElectronAnalyserDetector[AbstractAnalyserDriverIO]:
     async with init_devices(mock=True):
         sim_detector = await create_detector(
             request.param,
             prefix="TEST:",
-            energy_sources=energy_sources,
+            energy_source=single_energy_source,
         )
     # Needed for specs so we don't get division by zero error.
     set_mock_value(sim_detector.driver.slices, 1)

@@ -134,21 +134,25 @@ class AbstractAnalyserDriverIO(
                 iterations=self.iterations,
             )
 
-    async def set_source_from_region_and_get_energy(
-        self, region: TAbstractBaseRegion
-    ) -> float:
-        if isinstance(self.energy_source, DualEnergySource):
-            self.energy_source.selected_source.set(region.excitation_energy_source)
-        return await self.energy_source.energy.get_value()
-
     @AsyncStatus.wrap
     async def stage(self) -> None:
         await self.image_mode.set(ADImageMode.SINGLE)
         await super().stage()
 
-    @abstractmethod
     @AsyncStatus.wrap
     async def set(self, region: TAbstractBaseRegion):
+        if isinstance(self.energy_source, DualEnergySource):
+            self.energy_source.selected_source.set(region.excitation_energy_source)
+        excitation_energy = await self.energy_source.energy.get_value()
+
+        # Copy region so doesn't alter the actual region and switch to kinetic energy
+        ke_region = region.model_copy()
+        ke_region.switch_energy_mode(EnergyMode.KINETIC, excitation_energy)
+
+        await self._set_region(ke_region)
+
+    @abstractmethod
+    async def _set_region(self, ke_region: TAbstractBaseRegion):
         """
         Move a group of signals defined in a region. Each implementation of this class
         is responsible for implementing this method correctly.
