@@ -11,7 +11,7 @@ from dodal.devices.electron_analyser.vgscienta import (
     VGScientaSequence,
 )
 from dodal.devices.i09 import LensMode, PassEnergy, PsuMode
-from tests.devices.unit_tests.electron_analyser.helper_util import (
+from tests.devices.electron_analyser.helper_util import (
     assert_region_has_expected_values,
     get_test_sequence,
 )
