@@ -14,7 +14,7 @@ from dodal.devices.undulator import (
     Undulator,
     _get_gap_for_energy,
 )
-from tests.devices.unit_tests.test_data import (
+from tests.devices.test_data import (
     TEST_BEAMLINE_UNDULATOR_TO_GAP_LUT,
 )
 
