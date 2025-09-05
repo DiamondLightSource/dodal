@@ -163,7 +163,6 @@ async def test_analyser_sets_region_and_read_is_correct(
     await assert_reading(
         sim_driver,
         {
-            # f"{prefix}energy_source-excitation_energy": partial_reading(ANY),
             f"{prefix}energy_source-selected_source": partial_reading(
                 region.excitation_energy_source
             ),
