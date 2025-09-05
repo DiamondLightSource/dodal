@@ -16,7 +16,7 @@ from ophyd_async.core import (
 from ophyd_async.epics.motor import Motor
 
 
-class PolynomCombinedMotors(
+class PolynomCompoundMotors(
     StandardReadable,
     Locatable[float],
     Stoppable,
