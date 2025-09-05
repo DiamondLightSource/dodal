@@ -14,7 +14,7 @@ from dodal.devices.electron_analyser import (
 
 
 async def test_single_energy_source_read(
-    single_energy_source: EnergySource, dcm_energy: SignalR[float,]
+    single_energy_source: EnergySource,
 ) -> None:
     await assert_reading(
         single_energy_source,
@@ -62,7 +62,7 @@ async def test_dual_energy_souce_read(
     prefix = dual_energy_source.name
 
     source1_name = await dual_energy_source.source1.wrapped_device_name.get_value()
-    source1_energy_value = await dual_energy_source.source2.energy.get_value()
+    source1_energy_value = await dual_energy_source.source1.energy.get_value()
 
     source2_name = await dual_energy_source.source2.wrapped_device_name.get_value()
     source2_energy_value = await dual_energy_source.source2.energy.get_value()
