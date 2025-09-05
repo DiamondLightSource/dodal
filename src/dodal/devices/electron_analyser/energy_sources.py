@@ -16,7 +16,7 @@ from dodal.devices.electron_analyser.enums import SelectedSource
 class AbstractEnergySource(StandardReadable):
     """
     Abstract device that wraps an energy source signal and provides common interface via
-    a excitation_energy signal.
+    a energy signal.
     """
 
     def __init__(self, name: str = "") -> None:
@@ -32,9 +32,9 @@ class AbstractEnergySource(StandardReadable):
 
 class EnergySource(AbstractEnergySource):
     """
-    Wraps a signal that relates to energy and provides common interface via
-    excitation_energy signal. It also provides the name of the wrapped signal in the
-    read_configuration via wrapped_device_name.
+    Wraps a signal that relates to energy and provides common interface via energy
+    signal. It provides the name of the wrapped signal as a child signal in the
+    read_configuration via wrapped_device_name and adds the signal as a readable.
     """
 
     def __init__(self, source: SignalR[float], name: str = "") -> None:
