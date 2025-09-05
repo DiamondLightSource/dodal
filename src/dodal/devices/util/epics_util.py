@@ -117,7 +117,7 @@ def call_func(func: Callable[[], StatusBase]) -> StatusBase:
 class SetWhenEnabled(OphydAsyncDevice, Movable[int]):
     """A device that sets the proc field of a PV when it becomes enabled."""
 
-    def __init__(self, name: str = "", prefix: str = ""):
+    def __init__(self, prefix: str, name: str = ""):
         self.proc = epics_signal_rw(int, prefix + ".PROC")
         self.disp = epics_signal_r(int, prefix + ".DISP")
         super().__init__(name)

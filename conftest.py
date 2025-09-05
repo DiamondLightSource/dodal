@@ -15,7 +15,7 @@ from ophyd_async.core import (
     PathProvider,
 )
 from tests.devices.i10.test_data import LOOKUP_TABLE_PATH
-from tests.devices.unit_tests.test_daq_configuration import MOCK_DAQ_CONFIG_PATH
+from tests.devices.test_daq_configuration import MOCK_DAQ_CONFIG_PATH
 from tests.test_data import (
     TEST_DISPLAY_CONFIG,
     TEST_OAV_ZOOM_LEVELS_XML,
@@ -124,8 +124,8 @@ def failed_status(failure: Exception) -> Status:
     return status
 
 
-@pytest.fixture
-async def RE():
+@pytest.fixture(scope="session", autouse=True)
+async def _ensure_running_bluesky_event_loop():
     RE = RunEngine()
     # make sure the event loop is thoroughly up and running before we try to create
     # any ophyd_async devices which might need it
@@ -134,4 +134,8 @@ async def RE():
         await asyncio.sleep(0)
         if time.monotonic() > timeout:
             raise TimeoutError("This really shouldn't happen but just in case...")
-    yield RE
+
+
+@pytest.fixture()
+async def RE():
+    yield RunEngine()
