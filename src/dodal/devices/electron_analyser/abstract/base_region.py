@@ -71,7 +71,7 @@ class AbstractBaseRegion(
     low_energy: float
     centre_energy: float
     high_energy: float
-    step_time: float
+    acquire_time: float
     energy_step: float  # in eV
     energy_mode: EnergyMode = EnergyMode.KINETIC
 

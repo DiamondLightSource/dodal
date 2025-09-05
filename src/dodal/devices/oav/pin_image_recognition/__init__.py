@@ -48,9 +48,6 @@ class PinTipDetection(StandardReadable):
     INVALID_POSITION = np.array([np.iinfo(np.int32).min, np.iinfo(np.int32).min])
 
     def __init__(self, prefix: str, name: str = ""):
-        self._prefix: str = prefix
-        self._name = name
-
         self.triggered_tip, self._tip_setter = soft_signal_r_and_setter(
             Tip, name="triggered_tip"
         )

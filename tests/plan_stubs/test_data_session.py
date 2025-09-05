@@ -23,6 +23,10 @@ def test_attach_data_session_metadata_wrapper(caplog, RE: RunEngine):
     )
 
 
+def test_given_no_path_provider_when_running_clear_path_provider_then_noop():
+    clear_path_provider()
+
+
 def test_attach_data_session_metadata_wrapper_with_no_provider_is_noop(
     caplog, RE: RunEngine
 ):
@@ -33,4 +37,7 @@ def test_attach_data_session_metadata_wrapper_with_no_provider_is_noop(
     plan = attach_data_session_metadata_wrapper(plan=fake_plan())
     RE(plan)
 
-    assert f"There is no PathProvider set, {attach_data_session_metadata_wrapper.__name__} will have no effect"
+    assert (
+        f"There is no PathProvider set, {attach_data_session_metadata_wrapper.__name__} will have no effect"
+        in caplog.text
+    )
