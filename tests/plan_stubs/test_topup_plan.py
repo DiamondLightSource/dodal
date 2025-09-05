@@ -19,7 +19,7 @@ from tests.test_data import TEST_BEAMLINE_PARAMETERS_TXT
 
 
 @pytest.fixture
-async def synchrotron(RE) -> Synchrotron:
+async def synchrotron() -> Synchrotron:
     async with init_devices(mock=True):
         synchrotron = Synchrotron()
     return synchrotron
