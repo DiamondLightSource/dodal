@@ -141,6 +141,14 @@ class AbstractAnalyserDriverIO(
 
     @AsyncStatus.wrap
     async def set(self, region: TAbstractBaseRegion):
+        """
+        Take a region object and setup the driver with it. If using a DualEnergySource,
+        set it to use the source selected by the region. It also converts the region to
+        kinetic mode before we move the driver signals to the region parameter values:
+
+        Args:
+            region: Contains the parameters to setup the driver for a scan.
+        """
         if isinstance(self.energy_source, DualEnergySource):
             self.energy_source.selected_source.set(region.excitation_energy_source)
         excitation_energy = await self.energy_source.energy.get_value()
