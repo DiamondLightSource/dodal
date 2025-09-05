@@ -121,7 +121,7 @@ class AbstractAnalyserDriverIO(
                 self._calculate_binding_energy_axis,
                 "eV",
                 energy_axis=self.energy_axis,
-                excitation_energy=self.energy_source.excitation_energy,
+                excitation_energy=self.energy_source.energy,
                 energy_mode=self.energy_mode,
             )
             self.angle_axis = self._create_angle_axis_signal(prefix)
@@ -139,7 +139,7 @@ class AbstractAnalyserDriverIO(
     ) -> float:
         if isinstance(self.energy_source, DualEnergySource):
             self.energy_source.selected_source.set(region.excitation_energy_source)
-        return await self.energy_source.excitation_energy.get_value()
+        return await self.energy_source.energy.get_value()
 
     @AsyncStatus.wrap
     async def stage(self) -> None:

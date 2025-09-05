@@ -1,4 +1,3 @@
-from ophyd_async.core import SignalR
 from ophyd_async.testing import (
     assert_configuration,
     assert_reading,
