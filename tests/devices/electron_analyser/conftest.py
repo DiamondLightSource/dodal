@@ -1,11 +1,14 @@
 from typing import Any
 
 import pytest
-from ophyd_async.core import SignalR
-from ophyd_async.sim import SimMotor
+from bluesky.run_engine import RunEngine
+from ophyd_async.core import SignalR, init_devices
+from ophyd_async.testing import set_mock_value
 
 from dodal.devices.electron_analyser import (
+    DualEnergySource,
     ElectronAnalyserDetector,
+    EnergySource,
     SelectedSource,
 )
 from dodal.devices.electron_analyser.abstract import (
@@ -22,28 +25,68 @@ from dodal.devices.electron_analyser.vgscienta import (
     VGScientaAnalyserDriverIO,
     VGScientaSequence,
 )
+from dodal.devices.i09 import DCM, Grating
+from dodal.devices.pgm import PGM
 from tests.devices.electron_analyser.helper_util import (
     get_test_sequence,
 )
 
 
 @pytest.fixture
-async def pgm_energy() -> SimMotor:
-    return SimMotor("pgm_energy")
+def dcm(RE: RunEngine) -> DCM:
+    with init_devices(mock=True):
+        dcm = DCM("DCM:")
+    return dcm
 
 
 @pytest.fixture
-async def dcm_energy() -> SimMotor:
-    return SimMotor("dcm_energy")
+def pgm(RE: RunEngine) -> PGM:
+    with init_devices(mock=True):
+        pgm = PGM("PGM:", Grating)
+    return pgm
 
 
 @pytest.fixture
-async def energy_sources(
-    dcm_energy: SimMotor, pgm_energy: SimMotor
-) -> dict[str, SignalR[float]]:
+def dcm_energy_source(dcm: DCM, RE: RunEngine) -> EnergySource:
+    set_mock_value(dcm.energy_in_kev.user_readback, 2.2)
+    with init_devices(mock=True):
+        dcm_energy = EnergySource(dcm.energy_in_ev)
+    return dcm_energy
+
+
+@pytest.fixture
+def pgm_energy_source(pgm: PGM, RE: RunEngine) -> EnergySource:
+    set_mock_value(pgm.energy.user_readback, 500)
+    with init_devices(mock=True):
+        pgm_energy = EnergySource(pgm.energy.user_readback)
+    return pgm_energy
+
+
+@pytest.fixture
+async def single_energy_source(
+    dcm_energy_source: EnergySource, RE: RunEngine
+) -> EnergySource:
+    return dcm_energy_source
+
+
+@pytest.fixture
+async def dual_energy_source(
+    dcm_energy_source: EnergySource, pgm_energy_source: EnergySource, RE: RunEngine
+) -> DualEnergySource:
+    async with init_devices(mock=True):
+        dual_energy_source = DualEnergySource(
+            source1=dcm_energy_source, source2=pgm_energy_source
+        )
+    return dual_energy_source
+
+
+# ToDo - This will be removed once existing devices use the energy source device rather
+# than dict.
+@pytest.fixture
+async def energy_sources(dcm: DCM, pgm: PGM) -> dict[str, SignalR[float]]:
     return {
-        SelectedSource.SOURCE1: dcm_energy.user_readback,
-        SelectedSource.SOURCE2: pgm_energy.user_readback,
+        SelectedSource.SOURCE1: dcm.energy_in_ev,
+        SelectedSource.SOURCE2: pgm.energy.user_readback,
     }
 
 
