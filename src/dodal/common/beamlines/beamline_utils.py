@@ -169,4 +169,8 @@ def get_path_provider() -> PathProvider:
 
 def clear_path_provider() -> None:
     global PATH_PROVIDER
-    del PATH_PROVIDER
+    try:
+        del PATH_PROVIDER
+    except NameError:
+        # In this case the path provider was never set so we can do nothing
+        pass
