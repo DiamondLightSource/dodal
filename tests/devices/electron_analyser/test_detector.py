@@ -13,7 +13,7 @@ from dodal.devices.electron_analyser import (
 from dodal.devices.electron_analyser.specs import SpecsDetector
 from dodal.devices.electron_analyser.vgscienta import VGScientaDetector
 from dodal.testing.electron_analyser import create_detector
-from tests.devices.unit_tests.electron_analyser.helper_util import get_test_sequence
+from tests.devices.electron_analyser.helper_util import get_test_sequence
 
 
 @pytest.fixture(

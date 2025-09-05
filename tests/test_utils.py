@@ -24,7 +24,7 @@ from dodal.utils import (
     make_all_devices,
     make_device,
 )
-from tests.devices.unit_tests.test_daq_configuration import MOCK_DAQ_CONFIG_PATH
+from tests.devices.test_daq_configuration import MOCK_DAQ_CONFIG_PATH
 
 
 @pytest.fixture()
