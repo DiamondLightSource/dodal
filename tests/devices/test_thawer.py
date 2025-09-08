@@ -96,6 +96,7 @@ async def test_given_thawing_already_triggered_run_engine_stop_stops_thawer(
         RE.abort()
 
     loop = new_event_loop()
+    test_thread = None
     try:
 
         def test_loop():
@@ -113,7 +114,8 @@ async def test_given_thawing_already_triggered_run_engine_stop_stops_thawer(
         loop.call_soon_threadsafe(loop.stop)
         result_fut.result()
     finally:
-        test_thread.join()
+        if test_thread:
+            test_thread.join()
 
 
 @patch("dodal.devices.thawer.sleep")
