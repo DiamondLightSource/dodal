@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Standards &#8212; dodal 1.56.1.dev1+g0aeab3ff1 documentation</title>
+    <title>Standards &#8212; dodal 1.56.1.dev2+g6eba20e7b documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=7bb08db9"></script>
+    <script src="../_static/documentation_options.js?v=fa8d8277"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -971,51 +971,52 @@ repository.</p>
 </ul>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
-<p>How-to guides <a class="reference internal" href="../how-to/lint.html"><span class="doc">Run linting using pre-commit</span></a> and <a class="reference internal" href="../how-to/static-analysis.html"><span class="doc">Run static analysis using pyright or mypy</span></a></p>
+<p>How-to guides <a class="reference internal" href="../how-to/lint.html"><span class="doc std std-doc">how-to/lint</span></a> and <a class="reference internal" href="../how-to/static-analysis.html"><span class="doc std std-doc">how-to/statis-analysis</span></a></p>
 </div>
 </section>
 <section id="supported-python-versions">
 <h2>Supported Python Versions<a class="headerlink" href="#supported-python-versions" title="Link to this heading">#</a></h2>
 <p>As a standard for the python versions to support, we should be matching the deprecation policy at
-<a class="reference external" href="https://numpy.org/neps/nep-0029-deprecation_policy.html">https://numpy.org/neps/nep-0029-deprecation_policy.html</a>.</p>
+https://numpy.org/neps/nep-0029-deprecation_policy.html.</p>
 <p>Currently supported versions are: 3.11, 3.12, 3.13. (As of the last edit of this document.)</p>
 </section>
 <section id="documentation-standards">
-<span id="id1"></span><h2>Documentation Standards<a class="headerlink" href="#documentation-standards" title="Link to this heading">#</a></h2>
+<h2>Documentation Standards<a class="headerlink" href="#documentation-standards" title="Link to this heading">#</a></h2>
 <p>Docstrings are pre-processed using the Sphinx Napoleon extension. As such,
 <a class="reference external" href="https://sphinxcontrib-napoleon.readthedocs.io/en/latest/index.html#google-vs-numpy">google-style</a> is considered as standard for this repository. Please use type
 hints in the function signature for types. For example:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">func</span><span class="p">(</span><span class="n">arg1</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">arg2</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Summary line.</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">func</span><span class="p">(</span><span class="n">arg1</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">arg2</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Summary line.</span>
 
-<span class="sd">    Extended description of function.</span>
+<span class="sd">        Extended description of function.</span>
 
-<span class="sd">    Args:</span>
-<span class="sd">        arg1: Description of arg1</span>
-<span class="sd">        arg2: Description of arg2</span>
+<span class="sd">        Args:</span>
+<span class="sd">            arg1: Description of arg1</span>
+<span class="sd">            arg2: Description of arg2</span>
 
-<span class="sd">    Returns:</span>
-<span class="sd">        Description of return value</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="kc">True</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            Description of return value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="kc">True</span>
 </pre></div>
 </div>
 <p>Documentation is contained in the <code class="docutils literal notranslate"><span class="pre">docs</span></code> directory and extracted from
 docstrings of the API.</p>
 <p>Docs follow the underlining convention:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Headling</span> <span class="mi">1</span> <span class="p">(</span><span class="n">page</span> <span class="n">title</span><span class="p">)</span>
-<span class="o">=======================</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>    <span class="n">Headling</span> <span class="mi">1</span> <span class="p">(</span><span class="n">page</span> <span class="n">title</span><span class="p">)</span>
+    <span class="o">=======================</span>
 
-<span class="n">Heading</span> <span class="mi">2</span>
-<span class="o">---------</span>
+    <span class="n">Heading</span> <span class="mi">2</span>
+    <span class="o">---------</span>
 
-<span class="n">Heading</span> <span class="mi">3</span>
-<span class="o">~~~~~~~~~</span>
+    <span class="n">Heading</span> <span class="mi">3</span>
+    <span class="o">~~~~~~~~~</span>
 </pre></div>
 </div>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
-<p>How-to guide <a class="reference internal" href="../how-to/build-docs.html"><span class="doc">Build the docs using sphinx</span></a></p>
+<p>How-to guide <a class="reference internal" href="../how-to/build-docs.html"><span class="doc std std-doc">how-to/build-docs</span></a></p>
 </div>
 </section>
 </section>
@@ -1077,7 +1078,7 @@ docstrings of the API.</p>
 
   
   <div class="tocsection editthispage">
-    <a href="https://github.com/DiamondLightSource/dodal/edit/main/docs/reference/standards.rst">
+    <a href="https://github.com/DiamondLightSource/dodal/edit/main/docs/reference/standards.md">
       <i class="fa-solid fa-pencil"></i>
       
       
@@ -1093,7 +1094,7 @@ docstrings of the API.</p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="../_sources/reference/standards.rst.txt"
+      <li><a href="../_sources/reference/standards.md.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div></div>

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Moving code from another repo &#8212; dodal 1.56.1.dev1+g0aeab3ff1 documentation</title>
+    <title>Moving code from another repo &#8212; dodal 1.56.1.dev2+g6eba20e7b documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=7bb08db9"></script>
+    <script src="../_static/documentation_options.js?v=fa8d8277"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -480,84 +480,96 @@
                   
   <section id="moving-code-from-another-repo">
 <h1>Moving code from another repo<a class="headerlink" href="#moving-code-from-another-repo" title="Link to this heading">#</a></h1>
-<p>In the process of writing code in other DLS repos you may come to realise that it makes more sense to be in <code class="docutils literal notranslate"><span class="pre">dodal</span></code>. It is a good idea to keep the history for this code, you can do this by doing the following (we will be using moving devices from <a class="github reference external" href="https://github.com/DiamondLightSource/hyperion">DiamondLightSource/hyperion</a> as an example):</p>
-<ol class="arabic">
-<li><p>Clone the codebase you are copying from:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">git</span><span class="nd">@github</span><span class="o">.</span><span class="n">com</span><span class="p">:</span><span class="n">DiamondLightSource</span><span class="o">/</span><span class="n">hyperion</span><span class="o">.</span><span class="n">git</span> <span class="n">clone_for_history</span>
-<span class="n">cd</span> <span class="n">clone_for_history</span><span class="o">/</span>
+<p>In the process of writing code in other DLS repos you may come to realise that it makes more sense to be in <code class="docutils literal notranslate"><span class="pre">dodal</span></code>. It is a good idea to keep the history for this code, you can do this by doing the following (we will be using moving devices from https://github.com/DiamondLightSource/hyperion as an example):</p>
+<ul class="simple">
+<li><p>Clone the codebase you are copying from:</p></li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="w">    </span>git<span class="w"> </span>clone<span class="w"> </span>git@github.com:DiamondLightSource/hyperion.git<span class="w"> </span>clone_for_history
+<span class="w">    </span><span class="nb">cd</span><span class="w"> </span>clone_for_history/
 </pre></div>
 </div>
-</li>
-<li><p>Remove the remote to avoid any mistaken pushes:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">remote</span> <span class="n">rm</span> <span class="n">origin</span>
+<ul class="simple">
+<li><p>Remove the remote to avoid any mistaken pushes:</p></li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="w">    </span>git<span class="w"> </span>remote<span class="w"> </span>rm<span class="w"> </span>origin
 </pre></div>
 </div>
-</li>
-<li><p>Filter out only the directory/file you want to move:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">git</span><span class="o">-</span><span class="nb">filter</span><span class="o">-</span><span class="n">repo</span>
-<span class="n">git</span><span class="o">-</span><span class="nb">filter</span><span class="o">-</span><span class="n">repo</span> <span class="o">--</span><span class="n">path</span> <span class="n">file</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">move</span> <span class="o">--</span><span class="n">path</span> <span class="o">/</span><span class="n">other</span><span class="o">/</span><span class="n">file</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">move</span> <span class="o">-</span><span class="n">f</span>
+<ul class="simple">
+<li><p>Filter out only the directory/file you want to move:</p></li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="w">    </span>pip<span class="w"> </span>install<span class="w"> </span>git-filter-repo
+<span class="w">    </span>git-filter-repo<span class="w"> </span>--path<span class="w"> </span>file/to/move<span class="w"> </span>--path<span class="w"> </span>/other/file/to/move<span class="w"> </span>-f
 </pre></div>
 </div>
-</li>
-<li><p>Clean everything up:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">reset</span> <span class="o">--</span><span class="n">hard</span>
-<span class="n">git</span> <span class="n">gc</span> <span class="o">--</span><span class="n">aggressive</span>
-<span class="n">git</span> <span class="n">prune</span>
-<span class="n">git</span> <span class="n">clean</span> <span class="o">-</span><span class="n">fd</span>
+<ul class="simple">
+<li><p>Clean everything up:</p></li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="w">    </span>git<span class="w"> </span>reset<span class="w"> </span>--hard
+<span class="w">    </span>git<span class="w"> </span>gc<span class="w"> </span>--aggressive
+<span class="w">    </span>git<span class="w"> </span>prune
+<span class="w">    </span>git<span class="w"> </span>clean<span class="w"> </span>-fd
 </pre></div>
 </div>
-</li>
-<li><p>Add a note to every commit message to mention it’s been moved:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="nb">filter</span><span class="o">-</span><span class="n">branch</span> <span class="o">--</span><span class="n">msg</span><span class="o">-</span><span class="nb">filter</span> <span class="s1">&#39;sed &quot;$ a </span><span class="se">\</span>
-<span class="s1">NOTE: Commit originally came from https://github.com/DiamondLightSource/hyperion&quot;&#39;</span> <span class="o">-</span><span class="n">f</span> <span class="o">--</span> <span class="o">--</span><span class="nb">all</span>
+<ul class="simple">
+<li><p>Add a note to every commit message to mention it’s been moved::</p></li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="w">    </span>git<span class="w"> </span>filter-branch<span class="w"> </span>--msg-filter<span class="w"> </span><span class="s1">&#39;sed &quot;$ a \</span>
+<span class="s1">    NOTE: Commit originally came from https://github.com/DiamondLightSource/hyperion&quot;&#39;</span><span class="w"> </span>-f<span class="w"> </span>--<span class="w"> </span>--all
 </pre></div>
 </div>
-</li>
-<li><p>If you have been using Github <a class="reference external" href="https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/autolinked-references-and-urls#issues-and-pull-requests">issue references</a> in the old repository modify these to point to be more explicit (Note that this assumes the old repo uses <code class="docutils literal notranslate"><span class="pre">#123</span></code> notation and only ever references issues from it’s own repo):</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="nb">filter</span><span class="o">-</span><span class="n">branch</span> <span class="o">-</span><span class="n">f</span> <span class="o">--</span><span class="n">msg</span><span class="o">-</span><span class="nb">filter</span> <span class="s1">&#39;sed &quot;s|#[0-9]\+|DiamondLightSource/hyperion&amp;|g&quot;&#39;</span> <span class="o">--</span> <span class="o">--</span><span class="nb">all</span>
+<ul class="simple">
+<li><p>If you have been using Github <a class="reference external" href="https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/autolinked-references-and-urls#issues-and-pull-requests">issue references</a> in the old repository modify these to point to be more explicit (Note that this assumes the old repo uses <code class="docutils literal notranslate"><span class="pre">#123</span></code> notation and only ever references issues from it’s own repo)::</p></li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="w">    </span>git<span class="w"> </span>filter-branch<span class="w"> </span>-f<span class="w"> </span>--msg-filter<span class="w"> </span><span class="s1">&#39;sed &quot;s|#[0-9]\+|DiamondLightSource/hyperion&amp;|g&quot;&#39;</span><span class="w"> </span>--<span class="w"> </span>--all
 </pre></div>
 </div>
-</li>
-<li><p>Prepare the code to be in the correct structure for dodal:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mkdir</span> <span class="o">-</span><span class="n">p</span> <span class="n">src</span><span class="o">/</span><span class="n">dodal</span><span class="o">/</span><span class="n">devices</span>
-<span class="n">mv</span> <span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">device</span> <span class="n">src</span><span class="o">/</span><span class="n">dodal</span><span class="o">/</span><span class="n">devices</span><span class="o">/</span>
+<ul class="simple">
+<li><p>Prepare the code to be in the correct structure for dodal::</p></li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="w">    </span>mkdir<span class="w"> </span>-p<span class="w"> </span>src/dodal/devices
+<span class="w">    </span>mv<span class="w"> </span>path/to/device<span class="w"> </span>src/dodal/devices/
 </pre></div>
 </div>
-</li>
+<ul class="simple">
 <li><p>At this point it’s a good idea to check the log <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">log</span></code> and the general directory structure to ensure it looks mostly correct</p></li>
-<li><p>Add and commit this (locally):</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">add</span> <span class="o">.</span>
-<span class="n">git</span> <span class="n">commit</span> <span class="o">-</span><span class="n">m</span> <span class="s2">&quot;Prepare for import into dodal&quot;</span>
+<li><p>Add and commit this (locally)::</p></li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="w">    </span>git<span class="w"> </span>add<span class="w"> </span>.
+<span class="w">    </span>git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;Prepare for import into dodal&quot;</span>
 </pre></div>
 </div>
-</li>
-<li><p>In a different folder clone <code class="docutils literal notranslate"><span class="pre">dodal</span></code>, remove the origin (for now) to be safe and create a branch:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">git</span><span class="nd">@github</span><span class="o">.</span><span class="n">com</span><span class="p">:</span><span class="n">DiamondLightSource</span><span class="o">/</span><span class="n">dodal</span><span class="o">.</span><span class="n">git</span>
-<span class="n">cd</span> <span class="n">dodal</span>
-<span class="n">git</span> <span class="n">remote</span> <span class="n">rm</span> <span class="n">origin</span>
-<span class="n">git</span> <span class="n">checkout</span> <span class="o">-</span><span class="n">b</span> <span class="n">add_code_from_hyperion</span>
+<ul class="simple">
+<li><p>In a different folder clone <code class="docutils literal notranslate"><span class="pre">dodal</span></code>, remove the origin (for now) to be safe and create a branch::</p></li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="w">    </span>git<span class="w"> </span>clone<span class="w"> </span>git@github.com:DiamondLightSource/dodal.git
+<span class="w">    </span><span class="nb">cd</span><span class="w"> </span>dodal
+<span class="w">    </span>git<span class="w"> </span>remote<span class="w"> </span>rm<span class="w"> </span>origin
+<span class="w">    </span>git<span class="w"> </span>checkout<span class="w"> </span>-b<span class="w"> </span>add_code_from_hyperion
 </pre></div>
 </div>
-</li>
-<li><p>Add the source repo as a remote for <code class="docutils literal notranslate"><span class="pre">dodal</span></code>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">remote</span> <span class="n">add</span> <span class="n">source</span> <span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">source</span><span class="o">/</span><span class="n">old_repo</span><span class="o">/.</span><span class="n">git</span>
+<ul class="simple">
+<li><p>Add the source repo as a remote for <code class="docutils literal notranslate"><span class="pre">dodal</span></code>::</p></li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="w">    </span>git<span class="w"> </span>remote<span class="w"> </span>add<span class="w"> </span><span class="nb">source</span><span class="w"> </span>/path/to/source/old_repo/.git
 </pre></div>
 </div>
-</li>
-<li><p>Pull from the source repo:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">pull</span> <span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">rebase</span> <span class="n">source</span> <span class="n">main</span> <span class="o">--</span><span class="n">allow</span><span class="o">-</span><span class="n">unrelated</span><span class="o">-</span><span class="n">histories</span>
+<ul class="simple">
+<li><p>Pull from the source repo::</p></li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="w">    </span>git<span class="w"> </span>pull<span class="w"> </span>--no-rebase<span class="w"> </span><span class="nb">source</span><span class="w"> </span>main<span class="w"> </span>--allow-unrelated-histories
 </pre></div>
 </div>
-</li>
+<ul class="simple">
 <li><p>This is another point where it’s a good idea to check the log <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">log</span></code> and the general directory structure to ensure it looks mostly correct</p></li>
-<li><p>Remove the source remote and re-add origin:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">remote</span> <span class="n">rm</span> <span class="n">source</span>
-<span class="n">git</span> <span class="n">remote</span> <span class="n">add</span> <span class="n">origin</span> <span class="n">git</span><span class="nd">@github</span><span class="o">.</span><span class="n">com</span><span class="p">:</span><span class="n">DiamondLightSource</span><span class="o">/</span><span class="n">dodal</span><span class="o">.</span><span class="n">git</span>
+<li><p>Remove the source remote and re-add origin::</p></li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="w">    </span>git<span class="w"> </span>remote<span class="w"> </span>rm<span class="w"> </span><span class="nb">source</span>
+<span class="w">    </span>git<span class="w"> </span>remote<span class="w"> </span>add<span class="w"> </span>origin<span class="w"> </span>git@github.com:DiamondLightSource/dodal.git
 </pre></div>
 </div>
-</li>
+<ul class="simple">
 <li><p>Tidy up the code so that it fits into the <code class="docutils literal notranslate"><span class="pre">dodal</span></code> repo e.g. in the Hyperion case we had to change the tests to import from <code class="docutils literal notranslate"><span class="pre">hyperion</span></code> to import from <code class="docutils literal notranslate"><span class="pre">dodal</span></code> and add some more dependencies.</p></li>
-</ol>
+</ul>
 </section>
 
 
@@ -603,7 +615,7 @@
 
   
   <div class="tocsection editthispage">
-    <a href="https://github.com/DiamondLightSource/dodal/edit/main/docs/how-to/move-code.rst">
+    <a href="https://github.com/DiamondLightSource/dodal/edit/main/docs/how-to/move-code.md">
       <i class="fa-solid fa-pencil"></i>
       
       
@@ -619,7 +631,7 @@
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="../_sources/how-to/move-code.rst.txt"
+      <li><a href="../_sources/how-to/move-code.md.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div></div>
