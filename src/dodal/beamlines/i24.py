@@ -100,7 +100,8 @@ def dcm() -> DCM:
     If this is called when already instantiated in i24, it will return the existing object.
     """
     return DCM(
-        prefix=PREFIX.beamline_prefix,
+        prefix=f"{PREFIX.beamline_prefix}-DI-DCM-01",
+        motion_prefix=f"{PREFIX.beamline_prefix}-MO-DCM-01",
     )
 
 
@@ -136,10 +137,7 @@ def pmac() -> PMAC:
     """Get the i24 PMAC device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i24, it will return the existing object.
     """
-    return PMAC(
-        PREFIX.beamline_prefix,
-        "pmac",
-    )
+    return PMAC(PREFIX.beamline_prefix)
 
 
 @device_factory()
@@ -155,9 +153,7 @@ def vgonio() -> VerticalGoniometer:
     """Get the i24 vertical goniometer device, instantiate it if it hasn't already been.
     If this is called when already instantiated, it will return the existing object.
     """
-    return VerticalGoniometer(
-        f"{PREFIX.beamline_prefix}-MO-VGON-01:",
-    )
+    return VerticalGoniometer(f"{PREFIX.beamline_prefix}-MO-VGON-01:")
 
 
 @device_factory()
@@ -176,17 +172,13 @@ def shutter() -> HutchShutter:
     """Get the i24 hutch shutter device, instantiate it if it hasn't already been.
     If this is called when already instantiated, it will return the existing object.
     """
-    return HutchShutter(
-        f"{PREFIX.beamline_prefix}-PS-SHTR-01:",
-    )
+    return HutchShutter(f"{PREFIX.beamline_prefix}-PS-SHTR-01:")
 
 
 @device_factory()
 def focus_mirrors() -> FocusMirrorsMode:
     """Get the i24 focus mirror devise to find the beam size."""
-    return FocusMirrorsMode(
-        f"{PREFIX.beamline_prefix}-OP-MFM-01:",
-    )
+    return FocusMirrorsMode(f"{PREFIX.beamline_prefix}-OP-MFM-01:")
 
 
 @device_factory()
