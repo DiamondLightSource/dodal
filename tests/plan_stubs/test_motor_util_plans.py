@@ -11,12 +11,12 @@ from ophyd_async.testing import (
     set_mock_value,
 )
 
-from dodal.devices.util.test_utils import patch_motor
 from dodal.plan_stubs.motor_utils import (
     MoveTooLarge,
     check_and_cache_values,
     home_and_reset_wrapper,
 )
+from dodal.testing import patch_motor
 
 
 class DeviceWithOnlyMotors(Device):

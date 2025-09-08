@@ -9,6 +9,14 @@ from ophyd_async.testing import (
 
 
 def patch_motor(motor: Motor, initial_position=0):
+    """
+    Patch a motor that is mocked so that it can still be used in tests and plans without
+    running into errors as default values are set.
+
+    Parameters:
+        motor: The mock motor to set mock values with
+        initial_position: The default initial position of the motor to be set.
+    """
     set_mock_value(motor.user_setpoint, initial_position)
     set_mock_value(motor.user_readback, initial_position)
     set_mock_value(motor.deadband, 0.001)
@@ -22,6 +30,12 @@ def patch_motor(motor: Motor, initial_position=0):
 
 
 def patch_all_motors(parent_device: Device):
+    """
+    Check all children of a device and patch any motors with mock values.
+
+    Parameters:
+        parent_device: The device that hold motor(s) as children.
+    """
     motors = []
 
     def recursively_find_motors(device: Device):
