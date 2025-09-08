@@ -2,10 +2,7 @@ import numpy as np
 import pytest
 from ophyd_async.core import init_devices
 from ophyd_async.epics.motor import Motor
-from ophyd_async.testing import (
-    assert_configuration,
-    partial_reading,
-)
+from ophyd_async.testing import assert_configuration, assert_reading, partial_reading
 
 from dodal.devices.i05 import PolynomCompoundMotors
 
@@ -32,7 +29,7 @@ async def z_motor() -> Motor:
 
 
 @pytest.fixture
-async def mock_ccmc(
+async def mock_compound(
     x_motor: Motor,
     y_motor: Motor,
     z_motor: Motor,
@@ -49,18 +46,19 @@ async def mock_ccmc(
     return mock_compound
 
 
-async def test_read_config_includes(mock_compound: PolynomCompoundMotors):
+async def test_config_includes(mock_compound: PolynomCompoundMotors):
     await assert_configuration(
         mock_compound,
+        {},
+    )
+
+
+async def test_read_includes(mock_compound: PolynomCompoundMotors):
+    await assert_reading(
+        mock_compound,
         {
-            f"{mock_compound.name}-_xyz-x-motor_egu": partial_reading(""),
-            f"{mock_compound.name}-_xyz-x-offset": partial_reading(0.0),
-            f"{mock_compound.name}-_xyz-x-velocity": partial_reading(0.0),
-            f"{mock_compound.name}-_xyz-y-motor_egu": partial_reading(""),
-            f"{mock_compound.name}-_xyz-y-offset": partial_reading(0.0),
-            f"{mock_compound.name}-_xyz-y-velocity": partial_reading(0.0),
-            f"{mock_compound.name}-_xyz-z-motor_egu": partial_reading(""),
-            f"{mock_compound.name}-_xyz-z-offset": partial_reading(0.0),
-            f"{mock_compound.name}-_xyz-z-velocity": partial_reading(0.0),
+            "x_motor": partial_reading(0.0),
+            "y_motor": partial_reading(0.0),
+            "z_motor": partial_reading(0.0),
         },
     )
