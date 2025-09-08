@@ -42,10 +42,10 @@ class PolynomCompoundMotors(
         motors_dict:
             Dictionary of slaves motors and their polynomial coefficients
         """
-        self.master = Reference(master_motor)
         self.motor_coeff_dict: dict[Reference[Motor], Array1D[np.float64]] = {}
 
         # master motor added with polynomial coeff (0,1)
+        self.master = Reference(master_motor)
         self.motor_coeff_dict[self.master] = np.array([0.0, 1.0])
 
         # slave motors added with coefficients from input parameters
