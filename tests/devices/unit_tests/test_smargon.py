@@ -5,8 +5,8 @@ import pytest
 from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
 from ophyd_async.core import init_devices, observe_value
-from ophyd_async.testing import get_mock_put, set_mock_value
 from ophyd_async.epics.motor import MotorLimitsException
+from ophyd_async.testing import get_mock_put, set_mock_value
 
 from dodal.devices.smargon import CombinedMove, DeferMoves, Smargon, StubPosition
 from dodal.devices.util.test_utils import patch_all_motors
@@ -87,29 +87,38 @@ async def test_given_center_disp_low_when_stub_offsets_set_to_center_and_moved_t
 
     assert await smargon.stub_offsets.to_robot_load.proc.get_value() == 0
 
+
 @pytest.mark.parametrize(
     "test_x, test_y, test_z, test_omega, test_chi, test_phi",
     [
-        (100, 20, 30, 5, 15, 25),   # x goes beyond upper limit
+        (100, 20, 30, 5, 15, 25),  # x goes beyond upper limit
         (-100, 20, 30, 5, 15, 25),  # x goes beyond lower limit
-        (10, 100, 30, 5, 15, 25),   # y goes beyond upper limit
+        (10, 100, 30, 5, 15, 25),  # y goes beyond upper limit
         (10, -100, 30, 5, 15, 25),  # y goes beyond lower limit
-        (10, 20, 100, 5, 15, 25),   # z goes beyond upper limit
+        (10, 20, 100, 5, 15, 25),  # z goes beyond upper limit
         (10, 20, -100, 5, 15, 25),  # z goes beyond lower limit
         (10, 20, 30, 100, 15, 25),  # omega goes beyond upper limit
-        (10, 20, 30, -100, 15, 25), # omega goes beyond lower limit
-        (10, 20, 30, 5, 100, 25),   # chi goes beyond upper limit
+        (10, 20, 30, -100, 15, 25),  # omega goes beyond lower limit
+        (10, 20, 30, 5, 100, 25),  # chi goes beyond upper limit
         (10, 20, 30, 5, -100, 25),  # chi goes beyond lower limit
-        (10, 20, 30, 5, 15, 100),   # phi goes beyond upper limit
+        (10, 20, 30, 5, 15, 100),  # phi goes beyond upper limit
         (10, 20, 30, 5, 15, -100),  # phi goes beyond lower limit
     ],
 )
 async def test_given_set_with_value_outside_motor_limit(
-        smargon: Smargon,
-        test_x, test_y, test_z, test_omega, test_chi, test_phi
+    smargon: Smargon, test_x, test_y, test_z, test_omega, test_chi, test_phi
 ):
     with pytest.raises(MotorLimitsException):
-        await smargon.set(CombinedMove(x=test_x, y=test_y, z=test_z, omega=test_omega, chi=test_chi, phi=test_phi))
+        await smargon.set(
+            CombinedMove(
+                x=test_x,
+                y=test_y,
+                z=test_z,
+                omega=test_omega,
+                chi=test_chi,
+                phi=test_phi,
+            )
+        )
 
 
 async def test_given_set_with_single_value_then_that_motor_moves(smargon: Smargon):
