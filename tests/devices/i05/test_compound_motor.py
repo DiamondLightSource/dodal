@@ -43,9 +43,6 @@ async def mock_compound(
     z_motor: Motor,
 ) -> PolynomCompoundMotors:
     async with init_devices(mock=True):
-        x_motor.velocity.set(10.0)
-        y_motor.velocity.set(100.0)
-        z_motor.velocity.set(200.0)
         mock_compound = PolynomCompoundMotors(
             master_motor=x_motor,
             slaves_dict={
