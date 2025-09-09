@@ -1,7 +1,5 @@
-from enum import StrEnum
-
-from bluesky.protocols import Movable, Triggerable
-from ophyd_async.core import AsyncStatus, StandardReadable, StrictEnum
+from bluesky.protocols import Movable
+from ophyd_async.core import AsyncStatus, StandardReadable, SubsetEnum
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw, epics_signal_x
 
 from dodal.devices.i19.mapt_configuration import MAPTConfiguration
@@ -16,21 +14,16 @@ _CONFIG = "-OP-PCOL-01:"
 APERTURE_SIZES = [20, 40, 100, 3000]
 
 
-class ApertureDemand(StrEnum):
+class PinColRequest(SubsetEnum):
+    # NOTE. Using subset anum because from the OUT positions should only be used by
+    # the beamline scientists from the synoptic.
+    # Will need another option for OUT position
     PCOL20 = "20um"
     PCOL40 = "40um"
     PCOL100 = "100um"
     PCOL3000 = "3000um"
-    OUT = "OUT"
-
-
-class PinColConfigChoices(StrictEnum):
-    PCOL20 = "20um"
-    PCOL40 = "40um"
-    PCOL100 = "100um"
-    PCOL3000 = "3000um"
-    PINOUT = "OUT - PINX"
-    COLOUT = "OUT - COLX"
+    # PINOUT = "OUT - PINX"
+    # COLOUT = "OUT - COLX"
 
 
 class PinholeStage(XYStage, Movable):
@@ -68,7 +61,7 @@ class PinColConfiguration(StandardReadable):
         self, prefix: str, apertures: list[int] = APERTURE_SIZES, name: str = ""
     ) -> None:
         with self.add_children_as_readables():
-            self.selection = epics_signal_rw(PinColConfigChoices, f"{prefix}")
+            self.selection = epics_signal_rw(PinColRequest, f"{prefix}")
             self.pin_x = MAPTConfiguration(prefix, "PINX", apertures)
             self.pin_y = MAPTConfiguration(prefix, "PINY", apertures)
             self.col_x = MAPTConfiguration(prefix, "COLX", apertures)
@@ -79,7 +72,7 @@ class PinColConfiguration(StandardReadable):
         super().__init__(name)
 
 
-class PinColControl(StandardReadable, Triggerable):
+class PinColControl(StandardReadable, Movable):
     def __init__(
         self,
         prefix: str,
@@ -98,9 +91,8 @@ class PinColControl(StandardReadable, Triggerable):
         return int(request.strip("um"))
 
     async def get_pinhole_motor_positions_for_requested_aperture(
-        self, request: ApertureDemand
+        self, request: PinColRequest
     ) -> dict[str, float]:
-        # NOTE I think instead f this I should be able to do a reading ? To be checked
         val = self._get_aperture_size(request.value)
 
         pinx = await self.config.pin_x.in_positions[val].get_value()
@@ -110,7 +102,7 @@ class PinColControl(StandardReadable, Triggerable):
         return positions
 
     async def get_collimator_motor_positions_for_requested_aperture(
-        self, request: ApertureDemand
+        self, request: PinColRequest
     ) -> dict[str, float]:
         val = self._get_aperture_size(request.value)
 
@@ -121,5 +113,11 @@ class PinColControl(StandardReadable, Triggerable):
         return positions
 
     @AsyncStatus.wrap
-    async def trigger(self):
+    async def set(self, value: PinColRequest):
+        # if OUT:
+        #     print("read out positions")
+        #     print("move motors")
+        # else:
+        #     print("set config value")
+        #     print("click apply")
         pass
