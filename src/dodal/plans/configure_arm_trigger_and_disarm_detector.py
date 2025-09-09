@@ -1,4 +1,3 @@
-import functools
 import time
 from pathlib import PurePath
 
@@ -6,12 +5,10 @@ import bluesky.plan_stubs as bps
 from bluesky import preprocessors as bpp
 from bluesky.run_engine import RunEngine
 from ophyd_async.core import (
-    DEFAULT_TIMEOUT,
     DetectorTrigger,
     StaticFilenameProvider,
     StaticPathProvider,
     TriggerInfo,
-    wait_for_value,
 )
 from ophyd_async.fastcs.eiger import EigerDetector
 
