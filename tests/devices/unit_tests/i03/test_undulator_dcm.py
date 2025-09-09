@@ -51,6 +51,7 @@ async def fake_undulator_dcm(RE) -> UndulatorDCM:
             name="undulator_dcm",
         )
     patch_all_motors(dcm)
+    patch_all_motors(undulator)
     return undulator_dcm
 
 
