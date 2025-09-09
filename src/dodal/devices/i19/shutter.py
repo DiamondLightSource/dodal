@@ -22,10 +22,19 @@ class AccessControlledShutter(OpticsBlueAPIDevice):
     https://github.com/DiamondLightSource/i19-bluesky/issues/30.
     """
 
-    def __init__(self, prefix: str, hutch: HutchState, name: str = "") -> None:
+    def __init__(
+        self,
+        prefix: str,
+        hutch: HutchState,
+        instrument_session: str = "",
+        name: str = "",
+    ) -> None:
+        # For instrument session addition to request parameters
+        # see https://github.com/DiamondLightSource/blueapi/issues/1187
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             self.shutter_status = epics_signal_r(ShutterState, f"{prefix}STA")
         self.hutch_request = hutch
+        self.instrument_session = instrument_session
         super().__init__(name)
 
     @AsyncStatus.wrap
@@ -37,5 +46,6 @@ class AccessControlledShutter(OpticsBlueAPIDevice):
                 "access_device": ACCESS_DEVICE_NAME,
                 "shutter_demand": value.value,
             },
+            "instrument_session": self.instrument_session,
         }
         await super().set(REQUEST_PARAMS)
