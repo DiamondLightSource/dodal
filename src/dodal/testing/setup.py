@@ -8,21 +8,37 @@ from ophyd_async.testing import (
 )
 
 
-def patch_motor(motor: Motor, initial_position=0):
+def patch_motor(
+    motor: Motor,
+    initial_position: float = 0,
+    deadband: float = 0.001,
+    velocity: float = 3,
+    max_velocity: float = 5,
+    low_limit_travel: float = float("-inf"),
+    high_limit_travel: float = float("inf"),
+):
     """
-    Patch a motor that is mocked so that it can still be used in tests and plans without
-    running into errors as default values are set.
+    Patch a mock motor with sensible default values so that it can still be used in
+    tests and plans without running into errors as default values are zero.
 
     Parameters:
-        motor: The mock motor to set mock values with
+        motor: The mock motor to set mock values with.
         initial_position: The default initial position of the motor to be set.
+        deadband: The tolerance between readback value and demand setpoint which the
+                  motor is considered at position.
+        velocity: Requested move speed when the mock motor moves.
+        max_velocity: The maximum allowable velocity that can be set for the motor.
+        low_limit_travel: The lower limit that the motor can move to.
+        high_limit_travel: The higher limit that the motor can move to.
     """
     set_mock_value(motor.user_setpoint, initial_position)
     set_mock_value(motor.user_readback, initial_position)
-    set_mock_value(motor.deadband, 0.001)
+    set_mock_value(motor.deadband, deadband)
     set_mock_value(motor.motor_done_move, 1)
-    set_mock_value(motor.velocity, 3)
-    set_mock_value(motor.max_velocity, 5)
+    set_mock_value(motor.velocity, velocity)
+    set_mock_value(motor.max_velocity, max_velocity)
+    set_mock_value(motor.low_limit_travel, low_limit_travel)
+    set_mock_value(motor.high_limit_travel, high_limit_travel)
     return callback_on_mock_put(
         motor.user_setpoint,
         lambda pos, *args, **kwargs: set_mock_value(motor.user_readback, pos),
