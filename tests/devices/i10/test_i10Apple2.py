@@ -126,9 +126,17 @@ async def mock_id() -> I10Apple2:
     set_mock_value(mock_id.gap.low_limit_travel, -1999)
     set_mock_value(mock_id.gap.high_limit_travel, 1999)
     set_mock_value(mock_id.phase.btm_inner.velocity, 1)
+    set_mock_value(mock_id.phase.btm_inner.low_limit_travel, -1999)
+    set_mock_value(mock_id.phase.btm_inner.high_limit_travel, 1999)
     set_mock_value(mock_id.phase.top_inner.velocity, 1)
+    set_mock_value(mock_id.phase.top_inner.low_limit_travel, -1999)
+    set_mock_value(mock_id.phase.top_inner.high_limit_travel, 1999)
     set_mock_value(mock_id.phase.btm_outer.velocity, 1)
+    set_mock_value(mock_id.phase.btm_outer.low_limit_travel, -1999)
+    set_mock_value(mock_id.phase.btm_outer.high_limit_travel, 1999)
     set_mock_value(mock_id.phase.top_outer.velocity, 1)
+    set_mock_value(mock_id.phase.top_outer.low_limit_travel, -1999)
+    set_mock_value(mock_id.phase.top_outer.high_limit_travel, 1999)
     return mock_id
 
 
