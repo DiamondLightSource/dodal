@@ -8,7 +8,7 @@ from dodal.common.beamlines.beamline_utils import (
     device_factory,
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.devices.attenuator.attenuator import EnumFilterAttenuator, ReadOnlyAttenuator
+from dodal.devices.attenuator.attenuator import EnumFilterAttenuator
 from dodal.devices.attenuator.filter_selections import (
     I24_FilterOneSelections,
     I24_FilterTwoSelections,
@@ -26,12 +26,14 @@ from dodal.devices.i24.vgonio import VerticalGoniometer
 from dodal.devices.motors import YZStage
 from dodal.devices.oav.oav_detector import OAVBeamCentreFile
 from dodal.devices.oav.oav_parameters import OAVConfigBeamCentre
+from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.zebra.zebra import Zebra
 from dodal.devices.zebra.zebra_constants_mapping import (
     ZebraMapping,
     ZebraSources,
     ZebraTTLOutputs,
 )
+from dodal.devices.zebra.zebra_controlled_shutter import ZebraShutter
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
@@ -47,21 +49,11 @@ set_utils_beamline(BL)
 
 # TODO check jungfrau is connected here
 I24_ZEBRA_MAPPING = ZebraMapping(
-    outputs=ZebraTTLOutputs(TTL_EIGER=1, TTL_JUNGFRAU=2, TTL_FAST_SHUTTER=4),
+    outputs=ZebraTTLOutputs(TTL_DETECTOR=1, TTL_FAST_SHUTTER=4),
     sources=ZebraSources(),
 )
 
 PREFIX = BeamlinePrefix(BL)
-
-
-@device_factory()
-def attenuator() -> ReadOnlyAttenuator:
-    """Get a read-only attenuator device for i24, instantiate it if it hasn't already
-    been. If this is called when already instantiated in i24, it will return the
-    existing object."""
-    return ReadOnlyAttenuator(
-        f"{PREFIX.beamline_prefix}-OP-ATTN-01:",
-    )
 
 
 @device_factory()
@@ -149,7 +141,7 @@ def attenuator(
     been. If this is called when already instantiated in i24, it will return the
     existing object."""
     return EnumFilterAttenuator(
-        "-OP-ATTN-01:",
+        f"{PREFIX.beamline_prefix}-OP-ATTN-01:",
         filter_selection=(I24_FilterOneSelections, I24_FilterTwoSelections),
     )
 
@@ -191,6 +183,16 @@ def zebra() -> Zebra:
     return Zebra(
         prefix=f"{PREFIX.beamline_prefix}-EA-ZEBRA-01:",
         mapping=I24_ZEBRA_MAPPING,
+    )
+
+
+@device_factory()
+def sample_shutter() -> ZebraShutter:
+    """Get the i24 sample shutter device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i24, it will return the existing object.
+    """
+    return ZebraShutter(
+        f"{PREFIX.beamline_prefix}-EA-SHTR-01:",
     )
 
 
@@ -237,6 +239,14 @@ def pilatus_metadata() -> PilatusMetadata:
         f"{PREFIX.beamline_prefix}-EA-PILAT-01:",
         "pilatus_meta",
     )
+
+
+@device_factory()
+def synchrotron() -> Synchrotron:
+    """Get the i24 synchrotron device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i24, it will return the existing object.
+    """
+    return Synchrotron()
 
 
 @device_factory()
