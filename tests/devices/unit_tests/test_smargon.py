@@ -91,18 +91,18 @@ async def test_given_center_disp_low_when_stub_offsets_set_to_center_and_moved_t
 @pytest.mark.parametrize(
     "test_x, test_y, test_z, test_omega, test_chi, test_phi",
     [
-        (100, 20, 30, 5, 15, 25),  # x goes beyond upper limit
-        (-100, 20, 30, 5, 15, 25),  # x goes beyond lower limit
-        (10, 100, 30, 5, 15, 25),  # y goes beyond upper limit
-        (10, -100, 30, 5, 15, 25),  # y goes beyond lower limit
-        (10, 20, 100, 5, 15, 25),  # z goes beyond upper limit
-        (10, 20, -100, 5, 15, 25),  # z goes beyond lower limit
-        (10, 20, 30, 100, 15, 25),  # omega goes beyond upper limit
-        (10, 20, 30, -100, 15, 25),  # omega goes beyond lower limit
-        (10, 20, 30, 5, 100, 25),  # chi goes beyond upper limit
-        (10, 20, 30, 5, -100, 25),  # chi goes beyond lower limit
-        (10, 20, 30, 5, 15, 100),  # phi goes beyond upper limit
-        (10, 20, 30, 5, 15, -100),  # phi goes beyond lower limit
+        (400, 20, 30, 5, 15, 25),  # x goes beyond upper limit
+        (-400, 20, 30, 5, 15, 25),  # x goes beyond lower limit
+        (10, 400, 30, 5, 15, 25),  # y goes beyond upper limit
+        (10, -400, 30, 5, 15, 25),  # y goes beyond lower limit
+        (10, 20, 400, 5, 15, 25),  # z goes beyond upper limit
+        (10, 20, -400, 5, 15, 25),  # z goes beyond lower limit
+        (10, 20, 30, 400, 15, 25),  # omega goes beyond upper limit
+        (10, 20, 30, -400, 15, 25),  # omega goes beyond lower limit
+        (10, 20, 30, 5, 400, 25),  # chi goes beyond upper limit
+        (10, 20, 30, 5, -400, 25),  # chi goes beyond lower limit
+        (10, 20, 30, 5, 15, 400),  # phi goes beyond upper limit
+        (10, 20, 30, 5, 15, -400),  # phi goes beyond lower limit
     ],
 )
 async def test_given_set_with_value_outside_motor_limit(
