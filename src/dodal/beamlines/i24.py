@@ -1,9 +1,18 @@
+from pathlib import PurePath
+
+from ophyd_async.core import AutoIncrementFilenameProvider, YMDPathProvider
+from ophyd_async.fastcs.jungfrau import Jungfrau
+
 from dodal.common.beamlines.beamline_utils import (
     BL,
     device_factory,
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.devices.attenuator.attenuator import ReadOnlyAttenuator
+from dodal.devices.attenuator.attenuator import EnumFilterAttenuator
+from dodal.devices.attenuator.filter_selections import (
+    I24_FilterOneSelections,
+    I24_FilterTwoSelections,
+)
 from dodal.devices.hutch_shutter import HutchShutter
 from dodal.devices.i24.aperture import Aperture
 from dodal.devices.i24.beam_center import DetectorBeamCenter
@@ -17,12 +26,14 @@ from dodal.devices.i24.vgonio import VerticalGoniometer
 from dodal.devices.motors import YZStage
 from dodal.devices.oav.oav_detector import OAVBeamCentreFile
 from dodal.devices.oav.oav_parameters import OAVConfigBeamCentre
+from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.zebra.zebra import Zebra
 from dodal.devices.zebra.zebra_constants_mapping import (
     ZebraMapping,
     ZebraSources,
     ZebraTTLOutputs,
 )
+from dodal.devices.zebra.zebra_controlled_shutter import ZebraShutter
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
@@ -36,22 +47,13 @@ BL = get_beamline_name("i24")
 set_log_beamline(BL)
 set_utils_beamline(BL)
 
+# TODO check jungfrau is connected here
 I24_ZEBRA_MAPPING = ZebraMapping(
-    outputs=ZebraTTLOutputs(TTL_EIGER=1, TTL_PILATUS=2, TTL_FAST_SHUTTER=4),
+    outputs=ZebraTTLOutputs(TTL_DETECTOR=1, TTL_FAST_SHUTTER=4),
     sources=ZebraSources(),
 )
 
 PREFIX = BeamlinePrefix(BL)
-
-
-@device_factory()
-def attenuator() -> ReadOnlyAttenuator:
-    """Get a read-only attenuator device for i24, instantiate it if it hasn't already
-    been. If this is called when already instantiated in i24, it will return the
-    existing object."""
-    return ReadOnlyAttenuator(
-        f"{PREFIX.beamline_prefix}-OP-ATTN-01:",
-    )
 
 
 @device_factory()
@@ -133,6 +135,19 @@ def dcm() -> DCM:
 
 
 @device_factory()
+def attenuator(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> EnumFilterAttenuator:
+    """Get a read-only attenuator device for i24, instantiate it if it hasn't already
+    been. If this is called when already instantiated in i24, it will return the
+    existing object."""
+    return EnumFilterAttenuator(
+        f"{PREFIX.beamline_prefix}-OP-ATTN-01:",
+        filter_selection=(I24_FilterOneSelections, I24_FilterTwoSelections),
+    )
+
+
+@device_factory()
 def pmac() -> PMAC:
     """Get the i24 PMAC device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i24, it will return the existing object.
@@ -164,6 +179,16 @@ def zebra() -> Zebra:
     return Zebra(
         prefix=f"{PREFIX.beamline_prefix}-EA-ZEBRA-01:",
         mapping=I24_ZEBRA_MAPPING,
+    )
+
+
+@device_factory()
+def sample_shutter() -> ZebraShutter:
+    """Get the i24 sample shutter device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i24, it will return the existing object.
+    """
+    return ZebraShutter(
+        f"{PREFIX.beamline_prefix}-EA-SHTR-01:",
     )
 
 
@@ -205,4 +230,29 @@ def pilatus_metadata() -> PilatusMetadata:
     return PilatusMetadata(
         f"{PREFIX.beamline_prefix}-EA-PILAT-01:",
         "pilatus_meta",
+    )
+
+
+@device_factory()
+def synchrotron() -> Synchrotron:
+    """Get the i24 synchrotron device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i24, it will return the existing object.
+    """
+    return Synchrotron()
+
+
+@device_factory()
+def jungfrau(path_to_dir: str = "/tmp/jf", filename: str = "jf_output") -> Jungfrau:
+    """Get the Jungfrau 9M device, instantiate it if it hasn't already been.
+    If this is called when already instantiated, it will return the existing object."""
+    file_provider = AutoIncrementFilenameProvider(filename)
+
+    # TODO find the prefixes + odin nodes
+    return Jungfrau(
+        "prefix",
+        YMDPathProvider(file_provider, PurePath(path_to_dir)),
+        "drv_suffix",
+        "hdf_suffix",
+        odin_nodes=4,
+        name="jungfrau",
     )
