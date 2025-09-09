@@ -10,7 +10,7 @@ from dodal.common.enums import EnabledDisabledUpper
 from dodal.devices.i03.dcm import DCM
 from dodal.devices.i03.undulator_dcm import UndulatorDCM
 from dodal.devices.undulator import AccessError, Undulator
-from dodal.devices.util.test_utils import patch_motor
+from dodal.devices.util.test_utils import patch_all_motor
 from dodal.log import LOGGER
 from tests.devices.unit_tests.test_daq_configuration import MOCK_DAQ_CONFIG_PATH
 from tests.devices.unit_tests.test_daq_configuration.lookup import (
@@ -44,13 +44,13 @@ async def fake_undulator_dcm(RE) -> UndulatorDCM:
             length=2.0,
         )
         dcm = DCM("DCM-01", name="dcm")
-        patch_motor(dcm.offset_in_mm)
         undulator_dcm = UndulatorDCM(
             undulator,
             dcm,
             daq_configuration_path=MOCK_DAQ_CONFIG_PATH,
             name="undulator_dcm",
         )
+    patch_all_motor(dcm)
     return undulator_dcm
 
 
