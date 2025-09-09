@@ -54,13 +54,13 @@ class D7Position(StrictEnum):
     SHUTTER = "Shutter"
 
 
-class InOutTable(StrictEnum):
+class InStateTable(StrictEnum):
     MOVE_IN = "Move In"
     MOVE_OUT = "Move Out"
     RESET = "Reset"
 
 
-class InOutReadBackTable(StrictEnum):
+class InStateReadBackTable(StrictEnum):
     MOVE_IN = "Moving In"
     MOVE_OUT = "Moving Out"
     IN_BEAM = "In Beam"
@@ -80,11 +80,11 @@ class I10PneumaticStage(StandardReadable):
     ) -> None:
         with self.add_children_as_readables(Format.HINTED_SIGNAL):
             self.stage_position_set = epics_signal_rw(
-                InOutTable,
+                InStateTable,
                 read_pv=prefix + "CON",
             )
             self.stage_position_readback = epics_signal_r(
-                InOutReadBackTable,
+                InStateReadBackTable,
                 read_pv=prefix + "STA",
             )
         super().__init__(name=name)

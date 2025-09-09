@@ -3,8 +3,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 from aiohttp.client import ClientConnectionError
-from bluesky.run_engine import RunEngine
-from ophyd_async.testing import assert_reading, set_mock_value
+from ophyd_async.testing import assert_reading, partial_reading, set_mock_value
 
 from dodal.devices.hutch_shutter import (
     ShutterDemand,
@@ -17,7 +16,7 @@ from dodal.devices.i19.shutter import (
 
 
 async def make_test_shutter(hutch: HutchState) -> AccessControlledShutter:
-    shutter = AccessControlledShutter("", hutch, name="mock_shutter")
+    shutter = AccessControlledShutter("", hutch, "cm12345-1", name="mock_shutter")
     await shutter.connect(mock=True)
 
     shutter.url = "http://test-blueapi.url"
@@ -26,18 +25,18 @@ async def make_test_shutter(hutch: HutchState) -> AccessControlledShutter:
 
 
 @pytest.fixture
-async def eh1_shutter(RE: RunEngine) -> AccessControlledShutter:
+async def eh1_shutter() -> AccessControlledShutter:
     return await make_test_shutter(HutchState.EH1)
 
 
 @pytest.fixture
-async def eh2_shutter(RE: RunEngine) -> AccessControlledShutter:
+async def eh2_shutter() -> AccessControlledShutter:
     return await make_test_shutter(HutchState.EH2)
 
 
 @pytest.mark.parametrize("hutch_name", [HutchState.EH1, HutchState.EH2])
 def shutter_can_be_created_without_raising_errors(hutch_name: HutchState):
-    test_shutter = AccessControlledShutter("", hutch_name, "test_shutter")
+    test_shutter = AccessControlledShutter("", hutch_name, "cm12345-1", "test_shutter")
     assert isinstance(test_shutter, AccessControlledShutter)
 
 
@@ -47,9 +46,7 @@ async def test_read_on_eh1_shutter_device_returns_correct_status(
     await assert_reading(
         eh1_shutter,
         {
-            "mock_shutter-shutter_status": {
-                "value": ShutterState.CLOSED,
-            }
+            "mock_shutter-shutter_status": partial_reading(ShutterState.CLOSED),
         },
     )
 
@@ -60,9 +57,7 @@ async def test_read_on_eh2_shutter_device_returns_correct_status(
     await assert_reading(
         eh2_shutter,
         {
-            "mock_shutter-shutter_status": {
-                "value": ShutterState.CLOSED,
-            }
+            "mock_shutter-shutter_status": partial_reading(ShutterState.CLOSED),
         },
     )
 
@@ -111,6 +106,7 @@ async def test_set_corrently_makes_rest_calls(
             "access_device": "access_control",
             "shutter_demand": shutter_demand.value,
         },
+        "instrument_session": "cm12345-1",
     }
     test_request_json = json.dumps(test_request)
     with (
