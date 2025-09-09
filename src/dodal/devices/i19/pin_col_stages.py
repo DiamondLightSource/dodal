@@ -1,6 +1,8 @@
-from bluesky.protocols import Movable
+from enum import StrEnum
+
+from bluesky.protocols import Movable, Triggerable
 from ophyd_async.core import AsyncStatus, StandardReadable, StrictEnum
-from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
+from ophyd_async.epics.core import epics_signal_r, epics_signal_rw, epics_signal_x
 
 from dodal.devices.i19.mapt_configuration import MAPTConfiguration
 from dodal.devices.motors import XYStage
@@ -14,7 +16,15 @@ _CONFIG = "-OP-PCOL-01:"
 APERTURE_SIZES = [20, 40, 100, 3000]
 
 
-class PinColRequest(StrictEnum):
+class ApertureDemand(StrEnum):
+    PCOL20 = "20um"
+    PCOL40 = "40um"
+    PCOL100 = "100um"
+    PCOL3000 = "3000um"
+    OUT = "OUT"
+
+
+class PinColConfigChoices(StrictEnum):
     PCOL20 = "20um"
     PCOL40 = "40um"
     PCOL100 = "100um"
@@ -63,7 +73,8 @@ class PinColConfiguration(StandardReadable):
         self, prefix: str, apertures: list[int] = APERTURE_SIZES, name: str = ""
     ) -> None:
         with self.add_children_as_readables():
-            self.selection = epics_signal_rw(PinColRequest, f"{prefix}")
+            self.selection = epics_signal_rw(PinColConfigChoices, f"{prefix}")
+            self.apply_selection = epics_signal_x(int, f"{prefix}:APPLY.PROC")
             self.pin_x = MAPTConfiguration(prefix, "PINX", apertures)
             self.pin_y = MAPTConfiguration(prefix, "PINY", apertures)
             self.col_x = MAPTConfiguration(prefix, "COLX", apertures)
@@ -73,7 +84,7 @@ class PinColConfiguration(StandardReadable):
         super().__init__(name)
 
 
-class PinColControl(StandardReadable):
+class PinColControl(StandardReadable, Triggerable):
     def __init__(
         self,
         prefix: str,
@@ -93,7 +104,7 @@ class PinColControl(StandardReadable):
         return int(request.strip("um"))
 
     async def get_pinhole_motor_positions_for_requested_aperture(
-        self, request: PinColRequest
+        self, request: ApertureDemand
     ) -> dict[str, float]:
         # NOTE I think instead f this I should be able to do a reading ? To be checked
         val = self._get_aperture_size(request.value)
@@ -105,7 +116,7 @@ class PinColControl(StandardReadable):
         return positions
 
     async def get_collimator_motor_positions_for_requested_aperture(
-        self, request: PinColRequest
+        self, request: ApertureDemand
     ) -> dict[str, float]:
         val = self._get_aperture_size(request.value)
 
