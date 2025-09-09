@@ -44,13 +44,13 @@ async def fake_undulator_dcm(RE) -> UndulatorDCM:
             length=2.0,
         )
         dcm = DCM("DCM-01", name="dcm")
+        patch_motor(dcm.offset_in_mm)
         undulator_dcm = UndulatorDCM(
             undulator,
             dcm,
             daq_configuration_path=MOCK_DAQ_CONFIG_PATH,
             name="undulator_dcm",
         )
-    patch_motor(dcm.offset_in_mm)
     return undulator_dcm
 
 
