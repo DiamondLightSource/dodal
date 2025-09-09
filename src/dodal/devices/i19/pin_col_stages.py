@@ -69,13 +69,13 @@ class PinColConfiguration(StandardReadable):
     ) -> None:
         with self.add_children_as_readables():
             self.selection = epics_signal_rw(PinColConfigChoices, f"{prefix}")
-            self.apply_selection = epics_signal_x(int, f"{prefix}:APPLY.PROC")
             self.pin_x = MAPTConfiguration(prefix, "PINX", apertures)
             self.pin_y = MAPTConfiguration(prefix, "PINY", apertures)
             self.col_x = MAPTConfiguration(prefix, "COLX", apertures)
             self.col_y = MAPTConfiguration(prefix, "COLY", apertures)
             self.pin_x_out = epics_signal_r(float, f"{prefix}:OUT:PINX")
             self.col_x_out = epics_signal_r(float, f"{prefix}:OUT:COLX")
+        self.apply_selection = epics_signal_x(f"{prefix}:APPLY.PROC")
         super().__init__(name)
 
 
@@ -119,3 +119,7 @@ class PinColControl(StandardReadable, Triggerable):
 
         positions = {"colx": colx, "coly": coly}
         return positions
+
+    @AsyncStatus.wrap
+    async def trigger(self):
+        pass
