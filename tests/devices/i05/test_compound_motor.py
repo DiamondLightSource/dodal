@@ -44,8 +44,8 @@ async def mock_compound(
 ) -> PolynomCompoundMotors:
     async with init_devices(mock=True):
         mock_compound = PolynomCompoundMotors(
-            master_motor=x_motor,
-            slaves_dict={
+            x_motor,
+            {
                 y_motor: np.array([1.0, 2.0], dtype=np.float64),
                 z_motor: np.array([-1.0, 0.5], dtype=np.float64),
             },
