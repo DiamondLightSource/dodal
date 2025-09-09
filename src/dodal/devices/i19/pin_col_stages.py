@@ -33,11 +33,6 @@ class PinColConfigChoices(StrictEnum):
     COLOUT = "OUT - COLX"
 
 
-class PinColOut(StrictEnum):
-    NOTOUT = "NOT OUT"
-    OUT = "OUT"
-
-
 class PinholeStage(XYStage, Movable):
     """Pinhole stages xy motors."""
 
@@ -97,7 +92,6 @@ class PinColControl(StandardReadable, Triggerable):
             self.pinhole = PinholeStage(f"{prefix}{pin_infix}")
             self.collimator = CollimatorStage(f"{prefix}{col_infix}")
             self.config = PinColConfiguration(f"{prefix}{config_infix}CONFIG")
-            self.is_out = epics_signal_r(PinColOut, f"{prefix}{config_infix}IS_OUT")
         super().__init__(name=name)
 
     def _get_aperture_size(self, request: str) -> int:
