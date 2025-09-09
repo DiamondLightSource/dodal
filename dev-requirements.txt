@@ -43,7 +43,7 @@ nose2==0.15.1
 numpy==2.2.6
 opencv-python-headless==4.12.0.88
 opentelemetry-api==1.36.0
-ophyd-async @ git+https://github.com/bluesky/ophy-async@c5aa76fc469d356d39c8ae9f1a726cb705e56c19
+ophyd-async @ git+https://github.com/bluesky/ophyd-async@c5aa76fc469d356d39c8ae9f1a726cb705e56c19
 orderly-set==5.5.0
 p4p==4.2.1
 packaging==25.0
