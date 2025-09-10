@@ -370,4 +370,3 @@ def scintillator() -> Scintillator:
         Reference(aperture_scatterguard()),
         get_beamline_parameters(),
     )
-    #return Scintillator(f"{PREFIX.beamline_prefix}-DI-OAV-01:")
