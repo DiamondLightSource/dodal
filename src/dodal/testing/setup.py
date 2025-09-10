@@ -14,8 +14,8 @@ def patch_motor(
     deadband: float = 0.001,
     velocity: float = 3,
     max_velocity: float = 5,
-    low_limit_travel: float = float("-inf"),
-    high_limit_travel: float = float("inf"),
+    low_limit_travel: float = -1999,
+    high_limit_travel: float = 1999,
 ):
     """
     Patch a mock motor with sensible default values so that it can still be used in
