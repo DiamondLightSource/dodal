@@ -10,8 +10,8 @@ from dodal.common.enums import EnabledDisabledUpper
 from dodal.devices.i03.dcm import DCM
 from dodal.devices.i03.undulator_dcm import UndulatorDCM
 from dodal.devices.undulator import AccessError, Undulator
-from dodal.devices.util.test_utils import patch_motor
 from dodal.log import LOGGER
+from dodal.testing import patch_motor
 from tests.devices.test_daq_configuration import MOCK_DAQ_CONFIG_PATH
 from tests.devices.test_daq_configuration.lookup import (
     BEAMLINE_ENERGY_DCM_PITCH_CONVERTER_TXT,
