@@ -8,7 +8,7 @@ from ophyd_async.core import init_devices, observe_value
 from ophyd_async.testing import get_mock_put, set_mock_value
 
 from dodal.devices.smargon import CombinedMove, DeferMoves, Smargon, StubPosition
-from dodal.devices.util.test_utils import patch_all_motors
+from dodal.testing import patch_all_motors
 
 
 @pytest.fixture
@@ -121,8 +121,7 @@ async def test_given_set_with_all_values_then_motors_move(smargon: Smargon):
     )
 
 
-@pytest.mark.skip(reason="https://github.com/DiamondLightSource/dodal/issues/1315")
-async def test_given_set_with_all_values_then_motors_move_in_order(smargon: Smargon):
+async def test_given_set_with_all_values_then_motors_set_in_order(smargon: Smargon):
     parent = MagicMock()
     parent.attach_mock(get_mock_put(smargon.defer_move), "defer_move")
     parent.attach_mock(get_mock_put(smargon.x.user_setpoint), "x")
@@ -153,10 +152,22 @@ async def test_given_set_with_all_values_then_motors_move_in_order(smargon: Smar
 async def test_given_set_fails_then_defer_moves_turned_back_off(smargon: Smargon):
     class MyException(Exception): ...
 
-    get_mock_put(smargon.x.user_setpoint).side_effect = MyException()
+    smargon.x.user_setpoint.set = MagicMock(side_effect=MyException())
     with pytest.raises(MyException):
         await smargon.set(CombinedMove(x=10))
 
     get_mock_put(smargon.defer_move).assert_has_calls(
         [call(DeferMoves.ON, wait=True), call(DeferMoves.OFF, wait=True)]
     )
+
+
+async def test_given_motor_does_not_change_setpoint_then_deferred_move_times_out(
+    smargon: Smargon,
+):
+    smargon.DEFERRED_MOVE_SET_TIMEOUT = 0.01  # type: ignore
+
+    # Override the callback so it doesn't change the `user_setpoint`
+    smargon.x.user_setpoint.set = MagicMock()
+
+    with pytest.raises(TimeoutError):
+        await smargon.set(CombinedMove(x=10))
