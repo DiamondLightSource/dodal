@@ -59,6 +59,8 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
     """
 
     TIMEOUT_S = 2
+    PERCENTAGE_TO_USE = 25
+    NUMBER_OF_WRONG_RESULTS_TO_LOG = 5
 
     def __init__(
         self,
@@ -80,6 +82,7 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
         self.x_dists_mm = []
         self.y_dists_mm = []
         self.omegas = []
+        self.uuids = []
 
         with self.add_children_as_readables():
             # Diffs from current x/y/z
@@ -114,6 +117,8 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
             LOGGER.debug(
                 f"omega: {round(self.omegas[i], 2)}, x: {round(self.x_dists_mm[i], 2)}, y: {round(self.y_dists_mm[i], 2)}"
             )
+
+        self.filter_outliers()
 
         LOGGER.info(f"Using average of x beam distances: {self.x_dists_mm}")
         avg_x = float(np.mean(self.x_dists_mm))
@@ -169,8 +174,38 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
             self.y_dists_mm.append(
                 beam_dist_px[1] * metadata["microns_per_y_pixel"] / 1000
             )
+            self.uuids.append(metadata["uuid"])
             self.omegas.append(omega)
             self._last_omega = omega
+
+    def filter_outliers(self):
+        """Whilst murko is not fully trained it often gives us poor results.
+        When it is wrong it usually picks up the base of the pin, rather than the tip,
+        meaning that by keeping only a percentage of the results with the smallest X we
+        remove many of the outliers.
+        """
+
+        zipped = list(
+            zip(self.x_dists_mm, self.y_dists_mm, self.omegas, self.uuids, strict=True)
+        )
+
+        sorted_zipped = sorted(zipped, key=lambda item: item[0])
+
+        worst_results = [
+            r[3] for r in sorted_zipped[-self.NUMBER_OF_WRONG_RESULTS_TO_LOG :]
+        ]
+
+        LOGGER.info(
+            f"Worst {self.NUMBER_OF_WRONG_RESULTS_TO_LOG} murko results were {worst_results}"
+        )
+        cutoff = int(len(sorted_zipped) // (100 / self.PERCENTAGE_TO_USE))
+        smallest_x = sorted_zipped[:cutoff]
+
+        x_dists_mm, y_dists_mm, omegas, uuids = zip(*smallest_x, strict=True)
+        self.x_dists_mm = list(x_dists_mm)
+        self.y_dists_mm = list(y_dists_mm)
+        self.omegas = list(omegas)
+        self.uuids = list(uuids)
 
 
 def get_yz_least_squares(vertical_dists: list, omegas: list) -> tuple[float, float]:
