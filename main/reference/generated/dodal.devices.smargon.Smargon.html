@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.smargon.Smargon &#8212; dodal 1.56.1.dev3+g5cb0c93f2 documentation</title>
+    <title>dodal.devices.smargon.Smargon &#8212; dodal 1.56.1.dev4+ga004677d5 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=6ce2a311"></script>
+    <script src="../../_static/documentation_options.js?v=b4694aa9"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -988,8 +988,8 @@ Robot loading can nudge these and lead to errors.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#dodal.devices.smargon.Smargon.get_xyz_limits" title="dodal.devices.smargon.Smargon.get_xyz_limits"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_xyz_limits</span></code></a>()</p></td>
 <td><p>Obtain a plan stub that returns the smargon XYZ axis limits</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">set</span></code>(value)</p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#dodal.devices.smargon.Smargon.set" title="dodal.devices.smargon.Smargon.set"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set</span></code></a>(value)</p></td>
+<td><p>This will move all motion together in a deferred move.</p></td>
 </tr>
 </tbody>
 </table>
@@ -997,6 +997,9 @@ Robot loading can nudge these and lead to errors.</p>
 <p class="rubric">Attributes</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">DEFERRED_MOVE_SET_TIMEOUT</span></code></p></td>
+<td><p></p></td>
+</tr>
 </tbody>
 </table>
 </div>
@@ -1013,6 +1016,21 @@ Robot loading can nudge these and lead to errors.</p>
 </dd>
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>the axis limits</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dodal.devices.smargon.Smargon.set">
+<span class="sig-name descname"><span class="pre">set</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="dodal.devices.smargon.CombinedMove.html#dodal.devices.smargon.CombinedMove" title="dodal.devices.smargon.CombinedMove"><span class="pre">CombinedMove</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dodal/devices/smargon.html#Smargon.set"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.smargon.Smargon.set" title="Link to this definition">#</a></dt>
+<dd><p>This will move all motion together in a deferred move.</p>
+<p>Once defer_move is on, sets to any axis do not immediately move the axis. Instead
+the setpoint will go to that value. Then, when defer_move is switched off all
+axes will move at the same time. The put callbacks on the axes themselves will
+only come back after the motion on that axis finished.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>value</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="dodal.devices.smargon.CombinedMove.html#dodal.devices.smargon.CombinedMove" title="dodal.devices.smargon.CombinedMove"><code class="xref py py-class docutils literal notranslate"><span class="pre">CombinedMove</span></code></a></span>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1070,6 +1088,7 @@ Robot loading can nudge these and lead to errors.</p>
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.smargon.Smargon"><code class="docutils literal notranslate"><span class="pre">Smargon</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.smargon.Smargon.get_xyz_limits"><code class="docutils literal notranslate"><span class="pre">Smargon.get_xyz_limits()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.smargon.Smargon.set"><code class="docutils literal notranslate"><span class="pre">Smargon.set()</span></code></a></li>
 </ul>
 </li>
 </ul>

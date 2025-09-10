@@ -39,6 +39,9 @@ dodal.devices.smargon.Smargon
    .. autosummary::
    
       
+      ~Smargon.DEFERRED_MOVE_SET_TIMEOUT
+      
+      
       
       
       
