@@ -1,12 +1,13 @@
 from pathlib import PurePath
 
 from ophyd_async.core import AutoIncrementFilenameProvider, YMDPathProvider
-from ophyd_async.fastcs.jungfrau import Jungfrau
-
+from ophyd_async.fastcs.jungfrau import Jungfrau, JungfrauWriter
+from ophyd_async.core import Device
 from dodal.common.beamlines.beamline_utils import (
     BL,
     device_factory,
 )
+from ophyd_async.epics.core import epics_signal_r, epics_signal_rw, epics_signal_rw_rbv
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.devices.attenuator.attenuator import EnumFilterAttenuator
 from dodal.devices.attenuator.filter_selections import (
@@ -47,9 +48,8 @@ BL = get_beamline_name("i24")
 set_log_beamline(BL)
 set_utils_beamline(BL)
 
-# TODO check jungfrau is connected here
 I24_ZEBRA_MAPPING = ZebraMapping(
-    outputs=ZebraTTLOutputs(TTL_DETECTOR=1, TTL_FAST_SHUTTER=4),
+    outputs=ZebraTTLOutputs(TTL_DETECTOR=2, TTL_FAST_SHUTTER=4),
     sources=ZebraSources(),
 )
 
@@ -194,7 +194,12 @@ def sample_shutter() -> ZebraShutter:
     return ZebraShutter(
         f"{PREFIX.beamline_prefix}-EA-SHTR-01:",
     )
+# @device_factory()
+# def jungfrau_writer() -> JungfrauWriter:
+#     """Get the Jungfrau 9M device, instantiate it if it hasn't already been.
+#     If this is called when already instantiated, it will return the existing object."""
 
+#     return JungfrauWriter()
 
 @device_factory()
 def shutter() -> HutchShutter:
@@ -236,7 +241,7 @@ def pilatus_beam_center() -> DetectorBeamCenter:
 def pilatus_metadata() -> PilatusMetadata:
     """A small pilatus driver device for figuring out the filename template."""
     return PilatusMetadata(
-        f"{PREFIX.beamline_prefix}-EA-PILAT-01:",
+        f"{PREFIX.beamline_prefix}-EA-PdILAT-01:",
         "pilatus_meta",
     )
 
@@ -256,10 +261,11 @@ def jungfrau(path_to_dir: str = "/tmp/jf", filename: str = "jf_output") -> Jungf
     file_provider = AutoIncrementFilenameProvider(filename)
 
     return Jungfrau(
-        "prefix",
+        "BL24I-EA-JFRAU-01:",
         YMDPathProvider(file_provider, PurePath(path_to_dir)),
-        "drv_suffix",
-        "hdf_suffix",
-        odin_nodes=4,
         name="jungfrau",
     )
+
+
+
+
