@@ -34,6 +34,7 @@ from dodal.plans.bimorph import (
     restore_bimorph_state,
     validate_bimorph_plan,
 )
+from dodal.testing import patch_all_motors
 
 VALID_BIMORPH_CHANNELS = [2]
 
@@ -47,7 +48,6 @@ def mirror(request) -> BimorphMirror:
             prefix="FAKE-PREFIX:",
             number_of_channels=number_of_channels,
         )
-
     return bm
 
 
@@ -94,6 +94,8 @@ def slits() -> Slits:
             set_mock_value(signal, value)
 
         callback_on_mock_put(motor.user_setpoint, callback)
+
+    patch_all_motors(slits)
     return slits
 
 
