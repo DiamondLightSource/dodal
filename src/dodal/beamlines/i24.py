@@ -255,7 +255,6 @@ def jungfrau(path_to_dir: str = "/tmp/jf", filename: str = "jf_output") -> Jungf
     If this is called when already instantiated, it will return the existing object."""
     file_provider = AutoIncrementFilenameProvider(filename)
 
-    # TODO find the prefixes + odin nodes
     return Jungfrau(
         "prefix",
         YMDPathProvider(file_provider, PurePath(path_to_dir)),
