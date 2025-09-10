@@ -34,6 +34,7 @@ from dodal.plans.bimorph import (
     restore_bimorph_state,
     validate_bimorph_plan,
 )
+from dodal.testing import patch_all_motors
 
 VALID_BIMORPH_CHANNELS = [2]
 
@@ -47,7 +48,6 @@ def mirror(request) -> BimorphMirror:
             prefix="FAKE-PREFIX:",
             number_of_channels=number_of_channels,
         )
-
     return bm
 
 
@@ -84,15 +84,8 @@ def slits() -> Slits:
     with init_devices(mock=True):
         slits = Slits("FAKE-PREFIX:")
 
-    for motor in [slits.x_gap, slits.y_gap, slits.x_centre, slits.y_centre]:
-        # Set velocity to avoid zero velocity error:
-        set_mock_value(motor.velocity, 1)
-
-        def callback(value, wait=False, signal=motor.user_readback):
-            set_mock_value(signal, value)
-
-        callback_on_mock_put(motor.user_setpoint, callback)
-    return slits
+    with patch_all_motors(slits):
+        return slits
 
 
 @pytest.fixture
