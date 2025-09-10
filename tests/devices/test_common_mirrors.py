@@ -3,7 +3,7 @@ from ophyd_async.core import init_devices
 from ophyd_async.testing import assert_reading, partial_reading, set_mock_value
 
 from dodal.beamline_specific_utils.i05_shared import M3MJ6Mirror
-from dodal.devices.common_mirror import (
+from dodal.devices.i05.common_mirror import (
     XYZPiezoCollimatingMirror,
     XYZPiezoSwitchingMirror,
     XYZSwitchingMirror,

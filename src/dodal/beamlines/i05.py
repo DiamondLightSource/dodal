@@ -7,7 +7,7 @@ from dodal.beamline_specific_utils.i05_shared import (
 )
 from dodal.common.beamlines.beamline_utils import device_factory
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.devices.common_mirror import XYZPiezoSwitchingMirror, XYZSwitchingMirror
+from dodal.devices.i05.common_mirror import XYZPiezoSwitchingMirror, XYZSwitchingMirror
 from dodal.devices.motors import XYZPitchYawRollStage
 from dodal.devices.pgm import PGM
 from dodal.devices.synchrotron import Synchrotron

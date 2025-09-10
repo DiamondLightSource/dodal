@@ -1,7 +1,7 @@
 from ophyd_async.core import StrictEnum
 
 from dodal.common.beamlines.beamline_utils import device_factory
-from dodal.devices.common_mirror import XYZPiezoSwitchingMirror
+from dodal.devices.i05.common_mirror import XYZPiezoSwitchingMirror
 from dodal.devices.motors import XYZPitchYawRollStage
 from dodal.devices.pgm import PGM
 from dodal.utils import BeamlinePrefix
