@@ -108,6 +108,19 @@ async def test_given_center_disp_low_when_stub_offsets_set_to_center_and_moved_t
 async def test_given_set_with_value_outside_motor_limit(
     smargon: Smargon, test_x, test_y, test_z, test_omega, test_chi, test_phi
 ):
+    set_mock_value(smargon.x.low_limit_travel, -1999)
+    set_mock_value(smargon.y.low_limit_travel, -1999)
+    set_mock_value(smargon.z.low_limit_travel, -1999)
+    set_mock_value(smargon.omega.low_limit_travel, -1999)
+    set_mock_value(smargon.chi.low_limit_travel, -1999)
+    set_mock_value(smargon.phi.low_limit_travel, -1999)
+    set_mock_value(smargon.x.high_limit_travel, 1999)
+    set_mock_value(smargon.y.high_limit_travel, 1999)
+    set_mock_value(smargon.z.high_limit_travel, 1999)
+    set_mock_value(smargon.omega.high_limit_travel, 1999)
+    set_mock_value(smargon.chi.high_limit_travel, 1999)
+    set_mock_value(smargon.phi.high_limit_travel, 1999)
+
     with pytest.raises(MotorLimitsException):
         await smargon.set(
             CombinedMove(
