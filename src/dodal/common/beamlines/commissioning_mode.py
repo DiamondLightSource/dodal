@@ -22,18 +22,6 @@ def read_commissioning_mode() -> MsgGenerator[bool]:
         return False
 
 
-async def is_commissioning_mode_enabled() -> bool:
-    """
-    Determine whether commissioning mode is enabled.
-    Returns:
-        True if commissioning mode is enabled. False if commissioning mode
-        is not enabled, or the commissioning signal has not been set."""
-    if _commissioning_signal:
-        return await _commissioning_signal.get_value()
-    else:
-        return False
-
-
 def set_commissioning_signal(signal: SignalR[bool] | None):
     """Commissioning mode is enabled by a PV which when set enables commissioning mode.
     This allows beamline staff to ensure that commissioning mode is disabled prior
