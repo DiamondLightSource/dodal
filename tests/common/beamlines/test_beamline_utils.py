@@ -70,7 +70,7 @@ def test_instantiate_v1_function_fake_makes_fake():
     assert isinstance(eiger.stale_params, FakeEpicsSignal)
 
 
-def test_instantiate_v2_function_fake_makes_fake(RE):
+def test_instantiate_v2_function_fake_makes_fake():
     fake_smargon: Smargon = beamline_utils.device_instantiation(
         Smargon, "smargon", "", True, True, None
     )
@@ -97,9 +97,7 @@ def test_wait_for_v1_device_connection_passes_through_timeout(kwargs, expected_t
     "dodal.common.beamlines.beamline_utils.v2_device_wait_for_connection",
     new=AsyncMock(),
 )
-def test_wait_for_v2_device_connection_passes_through_timeout(
-    kwargs, expected_timeout, RE
-):
+def test_wait_for_v2_device_connection_passes_through_timeout(kwargs, expected_timeout):
     device = OphydV2Device()
     device.connect = MagicMock()
 
@@ -145,7 +143,7 @@ def test_device_controller_connection_is_lazy():
     assert mirror.connect.call_count == 0  # type: ignore
 
 
-def test_device_controller_eager_connect(RE):
+def test_device_controller_eager_connect():
     mirror = dummy_mirror_as_device_factory(connect_immediately=True)
     assert mirror.connect.call_count == 1  # type: ignore
 
@@ -176,7 +174,7 @@ def test_device_cache_can_be_cleared():
     assert mirror_1 is not mirror_2
 
 
-def test_skip(RE):
+def test_skip():
     skip = True
 
     def _skip() -> bool:
