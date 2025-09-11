@@ -1,4 +1,5 @@
 import asyncio
+from collections.abc import Generator
 from unittest.mock import AsyncMock, patch
 
 import pytest
@@ -20,8 +21,10 @@ async def fake_xbpm_feedback() -> XBPMFeedback:
 
 
 @pytest.fixture
-def xbpm_feedback_in_commissioning_mode(fake_xbpm_feedback) -> XBPMFeedback:
-    set_mock_value(fake_xbpm_feedback.baton_ref().commissioning, True)
+def xbpm_feedback_in_commissioning_mode(
+    fake_xbpm_feedback,
+) -> Generator[XBPMFeedback, None, None]:
+    set_mock_value(fake_xbpm_feedback.baton_ref().commissioning, True)  # type: ignore
     yield fake_xbpm_feedback
 
 
