@@ -51,6 +51,7 @@ from dodal.devices.i10.i10_apple2 import (
 )
 from dodal.devices.i10.i10_setting_data import I10Grating
 from dodal.devices.pgm import PGM
+from dodal.testing import patch_motor
 
 ID_ENERGY_2_GAP_CALIBRATIONS_FILE_CSV = os.path.split(ID_ENERGY_2_GAP_CALIBRATIONS_CSV)[
     1
@@ -102,6 +103,7 @@ async def mock_phaseAxes(prefix: str = "BLXX-EA-DET-007:") -> UndulatorPhaseAxes
 async def mock_pgm(prefix: str = "BLXX-EA-DET-007:") -> PGM:
     async with init_devices(mock=True):
         mock_pgm = PGM(prefix=prefix, grating=I10Grating, gratingPv="NLINES2")
+    patch_motor(mock_pgm.energy)
     return mock_pgm
 
 
@@ -153,7 +155,6 @@ async def mock_id_pgm(mock_id: I10Apple2, mock_pgm: PGM) -> EnergySetter:
     set_mock_value(mock_id_pgm.id.gap.gate, UndulatorGateStatus.CLOSE)
     set_mock_value(mock_id_pgm.id.id_jaw_phase.gate, UndulatorGateStatus.CLOSE)
 
-    set_mock_value(mock_id_pgm.pgm_ref().energy.velocity, 1)
     return mock_id_pgm
 
 
