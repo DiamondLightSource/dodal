@@ -9,19 +9,11 @@ from ophyd_async.core import (
     AsyncStatus,
     Device,
 )
-from ophyd_async.epics.adcore import (
-    ADBaseController,
-)
 
+from dodal.devices.controllers import ConstantDeadTimeController
 from dodal.devices.electron_analyser.abstract.base_driver_io import (
-    AbstractAnalyserDriverIO,
     TAbstractAnalyserDriverIO,
 )
-
-
-class ElectronAnalyserController(ADBaseController[AbstractAnalyserDriverIO]):
-    def get_deadtime(self, exposure: float | None) -> float:
-        return 0
 
 
 class AbstractElectronAnalyserDetector(
@@ -49,9 +41,7 @@ class AbstractElectronAnalyserDetector(
         driver: TAbstractAnalyserDriverIO,
         name: str = "",
     ):
-        self.controller: ElectronAnalyserController = ElectronAnalyserController(
-            driver=driver
-        )
+        self.controller = ConstantDeadTimeController(driver, 0)
         super().__init__(name)
 
     @AsyncStatus.wrap

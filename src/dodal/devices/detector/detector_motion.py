@@ -26,7 +26,8 @@ class DetectorMotion(XYZStage):
         XYZStage
 
     Args:
-        prefix (str): The base prefix for all EPICS process variables.
+        device_prefix (str): The base prefix for all EPICS process variables.
+        pmac_prefix (str): The base prefix for PMAC
         name (str, optional): An optional name for the device.
 
     Attributes:
@@ -42,13 +43,7 @@ class DetectorMotion(XYZStage):
 
     """
 
-    _device_prefix = "-MO-DET-01:"
-    _pmac_prefix = "-MO-PMAC-02:"
-
-    def __init__(self, prefix: str, name: str = ""):
-        device_prefix = f"{prefix}{self._device_prefix}"
-        pmac_prefix = f"{prefix}{self._pmac_prefix}"
-
+    def __init__(self, device_prefix: str, pmac_prefix: str, name: str = ""):
         self.upstream_x = Motor(f"{device_prefix}UPSTREAMX")
         self.downstream_x = Motor(f"{device_prefix}DOWNSTREAMX")
         self.yaw = Motor(f"{device_prefix}YAW")
