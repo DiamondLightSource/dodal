@@ -1,3 +1,4 @@
+from collections.abc import Generator
 from unittest.mock import AsyncMock, patch
 
 import numpy as np
@@ -40,8 +41,10 @@ async def undulator() -> Undulator:
 
 
 @pytest.fixture
-def undulator_in_commissioning_mode(undulator: Undulator) -> Undulator:
-    set_mock_value(undulator.baton_ref().commissioning, True)
+def undulator_in_commissioning_mode(
+    undulator: Undulator,
+) -> Generator[Undulator, None, None]:
+    set_mock_value(undulator.baton_ref().commissioning, True)  # type: ignore
     yield undulator
 
 

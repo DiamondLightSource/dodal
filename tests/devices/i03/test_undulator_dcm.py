@@ -60,7 +60,7 @@ async def fake_undulator_dcm() -> UndulatorDCM:
 
 @pytest.fixture
 def undulator_in_commissioning_mode(fake_undulator_dcm: UndulatorDCM):
-    set_mock_value(fake_undulator_dcm.undulator_ref().baton_ref().commissioning, True)
+    set_mock_value(fake_undulator_dcm.undulator_ref().baton_ref().commissioning, True)  # type: ignore
     yield fake_undulator_dcm
 
 
