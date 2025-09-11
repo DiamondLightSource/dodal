@@ -11,6 +11,7 @@ from ophyd_async.core import (
     AsyncStatus,
     Device,
     FlyMotorInfo,
+    Reference,
     SignalR,
     SignalW,
     StandardReadable,
@@ -19,8 +20,10 @@ from ophyd_async.core import (
     WatchableAsyncStatus,
     WatcherUpdate,
     derived_signal_rw,
+    error_if_none,
     observe_value,
     soft_signal_r_and_setter,
+    soft_signal_rw,
     wait_for_value,
 )
 from ophyd_async.core import StandardReadableFormat as Format
@@ -28,6 +31,7 @@ from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 from ophyd_async.epics.motor import Motor
 from pydantic import BaseModel, ConfigDict, RootModel
 
+from dodal.devices.pgm import PGM
 from dodal.log import LOGGER
 
 T = TypeVar("T")
@@ -794,3 +798,77 @@ class Apple2(abc.ABC, StandardReadable, Movable, Preparable, Flyable):
 
         LOGGER.warning("Unable to determine polarisation. Defaulting to NONE.")
         return Pol.NONE, 0.0
+
+
+Apple2ID = TypeVar("Apple2ID", bound=Apple2)
+
+
+class EnergySetter(
+    StandardReadable, Movable[float], Preparable, Flyable, Generic[Apple2ID]
+):
+    """
+    Compound device to set both ID and PGM energy at the same time.
+
+    """
+
+    def __init__(self, id: Apple2ID, pgm: PGM, name: str = "") -> None:
+        """
+        Parameters
+        ----------
+        id:
+            An Apple2 device (should be I10Apple2 or subclass).
+        pgm:
+            A PGM/mono device.
+        name:
+            New device name.
+        """
+
+        self.id = id
+        self.pgm_ref = Reference(pgm)
+        self.add_readables(
+            [self.id.energy, self.pgm_ref().energy.user_readback],
+            StandardReadableFormat.HINTED_SIGNAL,
+        )
+
+        with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
+            self.energy_offset = soft_signal_rw(float, initial_value=0)
+        super().__init__(name=name)
+        self._fly_status: AsyncStatus | None = None
+
+    @AsyncStatus.wrap
+    async def set(self, value: float) -> None:
+        LOGGER.info(f"Moving f{self.name} energy to {value}.")
+        await asyncio.gather(
+            self.id.set(value=value + await self.energy_offset.get_value()),
+            self.pgm_ref().energy.set(value),
+        )
+
+    @AsyncStatus.wrap
+    async def prepare(self, value: FlyMotorInfo) -> None:
+        await asyncio.gather(
+            self.id.prepare(value), self.pgm_ref().energy.prepare(value)
+        )
+
+    @AsyncStatus.wrap
+    async def kickoff(self):
+        pgm_acceleration_time, gap_acceleration_time = await asyncio.gather(
+            self.pgm_ref().energy.acceleration_time.get_value(),
+            self.id.gap.acceleration_time.get_value(),
+        )
+        start_offset_time = pgm_acceleration_time - gap_acceleration_time
+
+        await self.pgm_ref().energy.kickoff()
+        await asyncio.sleep(start_offset_time)
+        await self.id.kickoff()
+        self._fly_status = self._combined_fly_status()
+
+    def complete(self) -> AsyncStatus:
+        """Stop when both pgm and id is done moving."""
+        fly_status = error_if_none(self._fly_status, "kickoff not called")
+        return fly_status
+
+    @AsyncStatus.wrap
+    async def _combined_fly_status(self):
+        status_pgm = self.pgm_ref().energy.complete()
+        status_id = self.id.complete()
+        await asyncio.gather(status_pgm, status_id)
