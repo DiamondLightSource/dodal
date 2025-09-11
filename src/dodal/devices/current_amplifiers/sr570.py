@@ -116,6 +116,19 @@ class SR570(CurrentAmp):
     SR570 current amplifier device. This is similar to Femto with the only different
      is SR570 has two gain setting fine and coarse, therefore it requires extra
      gain tables.
+     parameters:
+        prefix (str): The EPICS PV prefix for the device.
+        suffix (str): The EPICS PV suffix for the device.
+        fine_gain_table (strictEnum): The table that fine_gain use to set gain.
+        coarse_gain_table (strictEnum): The table that coarse_gain use to set gain.
+        combined_table (Enum): Table that combine fine and coarse table into one.
+        gain_to_current_table (Enum): The table to convert voltage back to current.
+        raise_timetable (Enum): Table contain the amount of time to wait after
+            setting gain.
+        upperlimit (float, optional): upperlimit of the current amplifier. Defaults to 4.8.
+        lowerlimit (float, optional): lowerlimit of the current amplifier. Defaults to 0.4.
+        timeout (float, optional): Maximum waiting time in second for setting gain.
+         Defaults to 1.
     Attributes:
         fine_gain (SignalRW): This is the epic signal that control SR570 fine gain.
         coarse_gain (SignalRW): This is the epic signal that control SR570 coarse gain.
