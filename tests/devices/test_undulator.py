@@ -18,6 +18,7 @@ from dodal.devices.undulator import (
     Undulator,
     _get_gap_for_energy,
 )
+from dodal.testing import patch_all_motors
 from tests.devices.test_data import (
     TEST_BEAMLINE_UNDULATOR_TO_GAP_LUT,
 )
@@ -26,14 +27,22 @@ from tests.devices.test_data import (
 @pytest.fixture
 async def undulator() -> Undulator:
     async with init_devices(mock=True):
+        baton = Baton("BATON-01")
         undulator = Undulator(
             "UND-01",
             name="undulator",
             poles=80,
             length=2.0,
             id_gap_lookup_table_path=TEST_BEAMLINE_UNDULATOR_TO_GAP_LUT,
+            baton=baton,
         )
     return undulator
+
+
+@pytest.fixture
+def undulator_in_commissioning_mode(undulator: Undulator) -> Undulator:
+    set_mock_value(undulator.baton_ref().commissioning, True)
+    yield undulator
 
 
 async def test_reading_includes_read_fields(undulator: Undulator):
@@ -109,12 +118,16 @@ async def test_when_gap_access_is_disabled_set_then_error_is_raised(
     AsyncMock(return_value=np.array([[0, 10], [10, 20]])),
 )
 async def test_gap_access_check_disabled_and_move_inhibited_when_commissioning_mode_enabled(
-    undulator: Undulator, baton_in_commissioning_mode: Baton
+    undulator_in_commissioning_mode: Undulator,
 ):
-    set_mock_value(undulator.gap_access, UndulatorGapAccess.DISABLED)
-    await undulator.set(5)
+    set_mock_value(
+        undulator_in_commissioning_mode.gap_access, EnabledDisabledUpper.DISABLED
+    )
+    await undulator_in_commissioning_mode.set(5)
 
-    get_mock_put(undulator.gap_motor.user_setpoint).assert_not_called()
+    get_mock_put(
+        undulator_in_commissioning_mode.gap_motor.user_setpoint
+    ).assert_not_called()
 
 
 @patch(
@@ -122,12 +135,12 @@ async def test_gap_access_check_disabled_and_move_inhibited_when_commissioning_m
     AsyncMock(return_value=np.array([[0, 10], [10000, 20]])),
 )
 async def test_gap_access_check_move_not_inhibited_when_commissioning_mode_disabled(
-    undulator: Undulator, baton_in_commissioning_mode: Baton
+    undulator: Undulator,
 ):
-    set_mock_value(baton_in_commissioning_mode.commissioning, False)
-    set_mock_value(undulator.gap_access, UndulatorGapAccess.ENABLED)
-    await undulator.set(5)
+    with patch_all_motors(undulator):
+        set_mock_value(undulator.gap_access, EnabledDisabledUpper.ENABLED)
+        await undulator.set(5)
 
-    get_mock_put(undulator.gap_motor.user_setpoint).assert_called_once_with(
-        15.0, wait=True
-    )
+        get_mock_put(undulator.gap_motor.user_setpoint).assert_called_once_with(
+            15.0, wait=True
+        )

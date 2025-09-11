@@ -14,8 +14,15 @@ from dodal.devices.xbpm_feedback import XBPMFeedback
 @pytest.fixture
 async def fake_xbpm_feedback() -> XBPMFeedback:
     async with init_devices(mock=True):
-        xbpm_feedback = XBPMFeedback("")
+        baton = Baton("BATON-01:")
+        xbpm_feedback = XBPMFeedback("", baton=baton)
     return xbpm_feedback
+
+
+@pytest.fixture
+def xbpm_feedback_in_commissioning_mode(fake_xbpm_feedback) -> XBPMFeedback:
+    set_mock_value(fake_xbpm_feedback.baton_ref().commissioning, True)
+    yield fake_xbpm_feedback
 
 
 def test_given_pos_stable_when_xbpm_feedback_kickoff_then_return_immediately(
@@ -92,11 +99,10 @@ def test_logging_while_waiting_for_XBPM(
 def test_xbpm_feedback_does_not_wait_if_commissioning_mode_enabled(
     mock_periodic_reminder: AsyncMock,
     mock_observe_value: AsyncMock,
-    fake_xbpm_feedback: XBPMFeedback,
-    baton_in_commissioning_mode: Baton,
+    xbpm_feedback_in_commissioning_mode: XBPMFeedback,
     RE: RunEngine,
 ):
-    set_mock_value(fake_xbpm_feedback.pos_stable, False)
-    RE(bps.trigger(fake_xbpm_feedback, wait=True))
+    set_mock_value(xbpm_feedback_in_commissioning_mode.pos_stable, False)
+    RE(bps.trigger(xbpm_feedback_in_commissioning_mode, wait=True))
     mock_periodic_reminder.assert_not_called()
     mock_observe_value.assert_not_called()

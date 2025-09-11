@@ -5,6 +5,7 @@ from bluesky.protocols import Movable
 from numpy import ndarray
 from ophyd_async.core import (
     AsyncStatus,
+    Reference,
     StandardReadable,
     StandardReadableFormat,
     soft_signal_r_and_setter,
@@ -15,7 +16,7 @@ from ophyd_async.epics.motor import Motor
 from dodal.common.enums import EnabledDisabledUpper
 from dodal.log import LOGGER
 
-from ..common.beamlines.commissioning_mode import is_commissioning_mode_enabled
+from .baton import Baton
 from .util.lookup_tables import energy_distance_table
 
 
@@ -50,6 +51,7 @@ class Undulator(StandardReadable, Movable[float]):
         name: str = "",
         poles: int | None = None,
         length: float | None = None,
+        baton: Baton | None = None,
     ) -> None:
         """Constructor
 
@@ -60,6 +62,7 @@ class Undulator(StandardReadable, Movable[float]):
             name (str, optional): Name for device. Defaults to "".
         """
 
+        self.baton_ref = Reference(baton) if baton else None
         self.id_gap_lookup_table_path = id_gap_lookup_table_path
         with self.add_children_as_readables():
             self.gap_motor = Motor(prefix + "BLGAPMTR")
@@ -101,7 +104,7 @@ class Undulator(StandardReadable, Movable[float]):
 
     async def raise_if_not_enabled(self):
         access_level = await self.gap_access.get_value()
-        commissioning_mode = await is_commissioning_mode_enabled()
+        commissioning_mode = await self._is_commissioning_mode_enabled()
         if access_level is EnabledDisabledUpper.DISABLED and not commissioning_mode:
             raise AccessError("Undulator gap access is disabled. Contact Control Room")
 
@@ -121,7 +124,7 @@ class Undulator(StandardReadable, Movable[float]):
                 f"Undulator gap mismatch. {difference:.3f}mm is outside tolerance.\
                 Moving gap to nominal value, {target_gap:.3f}mm"
             )
-            commissioning_mode = await is_commissioning_mode_enabled()
+            commissioning_mode = await self._is_commissioning_mode_enabled()
             if not commissioning_mode:
                 # Only move if the gap is sufficiently different to the value from the
                 # DCM lookup table AND we're not in commissioning mode
@@ -136,6 +139,9 @@ class Undulator(StandardReadable, Movable[float]):
                 "Gap is already in the correct place for the new energy value "
                 f"{energy_kev}, no need to ask it to move"
             )
+
+    async def _is_commissioning_mode_enabled(self):
+        return self.baton_ref and await self.baton_ref().commissioning.get_value()
 
     async def _get_gap_to_match_energy(self, energy_kev: float) -> float:
         """
