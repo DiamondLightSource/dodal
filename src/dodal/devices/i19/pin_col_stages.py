@@ -1,3 +1,5 @@
+# import asyncio
+
 from bluesky.protocols import Movable
 from ophyd_async.core import AsyncStatus, StandardReadable, SubsetEnum
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw, epics_signal_x
@@ -22,38 +24,12 @@ class PinColRequest(SubsetEnum):
     PCOL40 = "40um"
     PCOL100 = "100um"
     PCOL3000 = "3000um"
-    # PINOUT = "OUT - PINX"
-    # COLOUT = "OUT - COLX"
 
 
-class PinholeStage(XYStage, Movable):
-    """Pinhole stages xy motors."""
-
-    def __init__(self, prefix: str, name: str = ""):
-        super().__init__(prefix, name)
-
-    @AsyncStatus.wrap
-    async def set(self, value: dict[str, float]):
-        LOGGER.debug(f"Move pinhole stage to {value}")
-        await self.x.set(value["pinx"])
-        if value["piny"]:
-            # Account for "out" which only moves x
-            await self.y.set(value["piny"])
-
-
-class CollimatorStage(XYStage, Movable):
-    """Collimator stage xy motors."""
-
-    def __init__(self, prefix: str, name: str = ""):
-        super().__init__(prefix, name)
-
-    @AsyncStatus.wrap
-    async def set(self, value: dict[str, float]):
-        LOGGER.debug(f"Move collimator stage to {value}")
-        await self.x.set(value["colx"])
-        if value["coly"]:
-            # Account for "out" which only moves x
-            await self.y.set(value["coly"])
+def define_allowed_aperture_requests():
+    aperture_list = [v.value for v in PinColRequest]
+    aperture_list.append("OUT")
+    return aperture_list
 
 
 class PinColConfiguration(StandardReadable):
@@ -72,7 +48,7 @@ class PinColConfiguration(StandardReadable):
         super().__init__(name)
 
 
-class PinColControl(StandardReadable, Movable):
+class PinColControl(StandardReadable, Movable[str]):
     def __init__(
         self,
         prefix: str,
@@ -81,9 +57,10 @@ class PinColControl(StandardReadable, Movable):
         col_infix: str = _COL,
         config_infix: str = _CONFIG,
     ):
+        self._allowed_requests = define_allowed_aperture_requests()
         with self.add_children_as_readables():
-            self.pinhole = PinholeStage(f"{prefix}{pin_infix}")
-            self.collimator = CollimatorStage(f"{prefix}{col_infix}")
+            self.pinhole = XYStage(f"{prefix}{pin_infix}")
+            self.collimator = XYStage(f"{prefix}{col_infix}")
             self.config = PinColConfiguration(f"{prefix}{config_infix}CONFIG")
         super().__init__(name=name)
 
@@ -112,12 +89,37 @@ class PinColControl(StandardReadable, Movable):
         positions = {"colx": colx, "coly": coly}
         return positions
 
+    async def _safe_move_out(self):
+        colx_out = await self.config.col_x_out.get_value()
+        pin_x_out = await self.config.pin_x_out.get_value()
+        # First move Collimator x motor
+        LOGGER.debug(f"Move collimator stage x motor to {colx_out}")
+        await self.collimator.x.set(colx_out)
+        # Then move Pinhole x motor
+        LOGGER.debug(f"Move pinhole stage x motor to {pin_x_out}")
+        await self.pinhole.x.set(pin_x_out)
+
+    async def _safe_move_in(self, value: PinColRequest):
+        # The moves should be done in a safe way by apply button in controls
+        # TODO double check that collisions are actually avoided
+        # First move Pinhole motors, then move Collimator motors
+        await self.config.selection.set(value)
+        await self.config.apply_selection.trigger()
+        # Check motors have stopped moving here
+
     @AsyncStatus.wrap
-    async def set(self, value: PinColRequest):
-        # if OUT:
-        #     print("read out positions")
-        #     print("move motors")
-        # else:
-        #     print("set config value")
-        #     print("click apply")
-        pass
+    async def set(self, value: str):
+        # The request from a plan would always oly be either one of the
+        # 4 allowed apertures values in PinColRequest or "OUT" which always moves
+        # first colx out and then pinx
+        # This is to avoid collisions.
+        if value not in self._allowed_requests:
+            raise ValueError(
+                f"""{value} is not a valid aperture request.
+                Please pass one of: {self._allowed_requests}."""
+            )
+        if value == "OUT":
+            LOGGER.info("Moving pinhole and collimator stages to out position")
+            await self._safe_move_out()
+        else:
+            await self._safe_move_in(PinColRequest(value))
