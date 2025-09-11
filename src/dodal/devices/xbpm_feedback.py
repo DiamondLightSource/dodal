@@ -20,14 +20,13 @@ class XBPMFeedback(Device, Triggerable):
         self.pos_ok = epics_signal_r(float, prefix + "XBPM2POSITION_OK")
         self.pos_stable = epics_signal_r(float, prefix + "XBPM2_STABLE")
         self.pause_feedback = epics_signal_rw(Pause, prefix + "FB_PAUSE")
-        self.threshold_pc = epics_signal_rw(float, prefix + "THRESHOLDPC_XBPM2")
         self.baton_ref = Reference(baton) if baton else None
         super().__init__(name=name)
 
     @AsyncStatus.wrap
     async def trigger(self):
         if self.baton_ref and await self.baton_ref().commissioning.get_value():
-            LOGGER.info("Commissioning mode enabled, ignoring feedback")
+            LOGGER.warning("Commissioning mode enabled, ignoring feedback")
         else:
             async with periodic_reminder("Waiting for XBPM"):
                 async for value in observe_value(self.pos_stable):
