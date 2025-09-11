@@ -13,7 +13,7 @@ from dodal.devices.i24.pmac import (
     EncReset,
     LaserSettings,
 )
-from dodal.devices.util.test_utils import patch_all_motors
+from dodal.testing import patch_all_motors
 
 
 @pytest.fixture
