@@ -13,7 +13,7 @@ from dodal.devices.i19.pin_col_stages import (
     PinholeCollimatorControl,
 )
 from dodal.devices.motors import XYStage
-from dodal.devices.util.test_utils import patch_all_motors
+from dodal.testing import patch_all_motors
 
 
 @pytest.fixture
