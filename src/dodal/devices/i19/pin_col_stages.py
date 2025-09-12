@@ -13,9 +13,6 @@ _COL = "-MO-COL-01:"
 _CONFIG = "-OP-PCOL-01:"
 
 
-APERTURE_SIZES = [20, 40, 100, 3000]
-
-
 class PinColRequest(SubsetEnum):
     # NOTE. Using subset anum because from the OUT positions should only be used by
     # the beamline scientists from the synoptic.
@@ -26,16 +23,14 @@ class PinColRequest(SubsetEnum):
     PCOL3000 = "3000um"
 
 
-def define_allowed_aperture_requests():
+def define_allowed_aperture_requests() -> list[str]:
     aperture_list = [v.value for v in PinColRequest]
     aperture_list.append("OUT")
     return aperture_list
 
 
 class PinColConfiguration(StandardReadable):
-    def __init__(
-        self, prefix: str, apertures: list[int] = APERTURE_SIZES, name: str = ""
-    ) -> None:
+    def __init__(self, prefix: str, apertures: list[int], name: str = "") -> None:
         with self.add_children_as_readables():
             self.selection = epics_signal_rw(PinColRequest, f"{prefix}")
             self.pin_x = MAPTConfiguration(prefix, "PINX", apertures)
@@ -58,10 +53,13 @@ class PinColControl(StandardReadable, Movable[str]):
         config_infix: str = _CONFIG,
     ):
         self._allowed_requests = define_allowed_aperture_requests()
+        self._aperture_sizes = [self._get_aperture_size(i) for i in PinColRequest]
         with self.add_children_as_readables():
             self.pinhole = XYStage(f"{prefix}{pin_infix}")
             self.collimator = XYStage(f"{prefix}{col_infix}")
-            self.config = PinColConfiguration(f"{prefix}{config_infix}CONFIG")
+            self.config = PinColConfiguration(
+                f"{prefix}{config_infix}CONFIG", apertures=self._aperture_sizes
+            )
         super().__init__(name=name)
 
     def _get_aperture_size(self, request: str) -> int:
