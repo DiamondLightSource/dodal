@@ -111,20 +111,14 @@ class TetrammController(DetectorController):
             self._supported_trigger_types[trigger_info.trigger]
         )
 
-        total_triggers = (
-            sum(trigger_info.number_of_events)
-            if isinstance(trigger_info.number_of_events, list | tuple)
-            else int(trigger_info.number_of_events)
-        )
-
         # Tetramms do not use a typical cam plugin, so we need to work out
         # the time per trigger
-        averaging_time = trigger_info.livetime / total_triggers
+        averaging_time = trigger_info.livetime / trigger_info.total_number_of_exposures
 
         await asyncio.gather(
             self.driver.averaging_time.set(averaging_time),
             self.set_exposure(averaging_time),
-            self._file_io.num_capture.set(total_triggers),
+            self._file_io.num_capture.set(trigger_info.total_number_of_exposures),
         )
 
         # raise an error if asked to trigger faster than the max.
