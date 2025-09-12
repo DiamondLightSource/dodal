@@ -17,6 +17,10 @@ _COL = "-MO-COL-01:"
 _CONFIG = "-OP-PCOL-01:"
 
 
+class InvalidApertureRequest(Exception):
+    pass
+
+
 # NOTE. Using subset anum because from the OUT positions should only be used by
 # the beamline scientists from the synoptic. Another option will be needed in the
 # device for OUT position.
@@ -85,23 +89,23 @@ class PinholeCollimatorControl(StandardReadable, Movable[PinColRequest | str]):
         with self.add_children_as_readables():
             self.pinhole = XYStage(f"{prefix}{pin_infix}")
             self.collimator = XYStage(f"{prefix}{col_infix}")
-            self.config = PinColConfiguration(
+            self.mapt = PinColConfiguration(
                 f"{prefix}{config_infix}CONFIG", apertures=self._aperture_sizes
             )
         super().__init__(name=name)
 
-    def _get_aperture_size(self, request: str) -> int:
-        return int(request.strip("um"))
+    def _get_aperture_size(self, ap_request: str) -> int:
+        return int(ap_request.strip("um"))
 
     async def get_motor_positions_for_requested_aperture(
-        self, request: PinColRequest
+        self, ap_request: PinColRequest
     ) -> AperturePosition:
-        val = self._get_aperture_size(request.value)
+        val = self._get_aperture_size(ap_request.value)
 
-        pinx = await self.config.pin_x.in_positions[val].get_value()
-        piny = await self.config.pin_y.in_positions[val].get_value()
-        colx = await self.config.col_x.in_positions[val].get_value()
-        coly = await self.config.col_x.in_positions[val].get_value()
+        pinx = await self.mapt.pin_x.in_positions[val].get_value()
+        piny = await self.mapt.pin_y.in_positions[val].get_value()
+        colx = await self.mapt.col_x.in_positions[val].get_value()
+        coly = await self.mapt.col_y.in_positions[val].get_value()
 
         return AperturePosition(
             pinhole_x=pinx, pinhole_y=piny, collimator_x=colx, collimator_y=coly
@@ -114,8 +118,8 @@ class PinholeCollimatorControl(StandardReadable, Movable[PinColRequest | str]):
         always moved out first and the pinhole stage second.
         """
         LOGGER.info("Moving pinhole and collimator stages to out position")
-        colx_out = await self.config.col_x_out.get_value()
-        pin_x_out = await self.config.pin_x_out.get_value()
+        colx_out = await self.mapt.col_x_out.get_value()
+        pin_x_out = await self.mapt.pin_x_out.get_value()
         # First move Collimator x motor
         LOGGER.debug(f"Move collimator stage x motor to {colx_out}")
         await self.collimator.x.set(colx_out)
@@ -130,7 +134,7 @@ class PinholeCollimatorControl(StandardReadable, Movable[PinColRequest | str]):
         LOGGER.info(
             f"Moving pinhole and collimator stages to in position: {value.value}"
         )
-        await self.config.configuration.select_config.set(value)
+        await self.mapt.configuration.select_config.set(value)
         # NOTE. The apply PV will not be used here unless fixed in controls first.
         # This is to avoid collisions. A safe move in will move first the pinhole stage
         # and then the collimator stage, but apply will try to move all the motors
@@ -161,11 +165,11 @@ class PinholeCollimatorControl(StandardReadable, Movable[PinColRequest | str]):
         PinColRequest enum ('20um', '40um', '100um', '3000um') or "OUT".
 
         Raises:
-            ValueError: when the request doesn't match one of the allowed requests:
+            InvalidApertureRequest: when the request doesn't match one of the allowed requests:
                 ['20um', '40um', '100um', '3000um', 'OUT']
         """
         if not isinstance(value, PinColRequest) and value not in self._allowed_requests:
-            raise ValueError(
+            raise InvalidApertureRequest(
                 f"""{value} is not a valid aperture request.
                 Please pass one of: {self._allowed_requests}."""
             )
