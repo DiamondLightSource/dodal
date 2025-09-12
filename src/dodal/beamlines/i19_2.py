@@ -4,6 +4,7 @@ from dodal.common.beamlines.beamline_utils import (
 from dodal.common.beamlines.beamline_utils import (
     set_beamline as set_utils_beamline,
 )
+from dodal.devices.i19.backlight import BacklightPosition
 from dodal.devices.i19.beamstop import BeamStop
 from dodal.devices.i19.blueapi_device import HutchState
 from dodal.devices.i19.diffractometer import FourCircleDiffractometer
@@ -82,4 +83,4 @@ def backlight() -> BacklightPosition:
     """Get the i19-2 backlight device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i19-2, it will return the existing object.
     """
-    return BacklightPosition()
+    return BacklightPosition(prefix=(PREFIX.beamline_prefix))

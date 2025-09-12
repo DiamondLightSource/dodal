@@ -1,5 +1,5 @@
 from bluesky.protocols import Movable
-from ophyd_async.core import AsyncStatus, InOut, StandardReadable, StrictEnum
+from ophyd_async.core import AsyncStatus, InOut, StandardReadable
 from ophyd_async.epics.core import epics_signal_rw
 
 
