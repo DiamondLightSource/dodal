@@ -68,7 +68,7 @@ class PinColConfiguration(StandardReadable):
         super().__init__(name)
 
 
-class PinholeCollimatorControl(StandardReadable, Movable[str]):
+class PinholeCollimatorControl(StandardReadable, Movable[PinColRequest | str]):
     """Device to control the Pinhole and Collimator stages moves on I19-2, using the
     MAPT configuration table to look up the positions."""
 
@@ -154,7 +154,7 @@ class PinholeCollimatorControl(StandardReadable, Movable[str]):
         )
 
     @AsyncStatus.wrap
-    async def set(self, value: str):
+    async def set(self, value: PinColRequest | str):
         """Moves the motor stages to the position for the requested aperture while
         avoiding possible collisions.
         The request coming from a plan should always be one of the values from the
@@ -164,7 +164,7 @@ class PinholeCollimatorControl(StandardReadable, Movable[str]):
             ValueError: when the request doesn't match one of the allowed requests:
                 ['20um', '40um', '100um', '3000um', 'OUT']
         """
-        if value not in self._allowed_requests:
+        if not isinstance(value, PinColRequest) and value not in self._allowed_requests:
             raise ValueError(
                 f"""{value} is not a valid aperture request.
                 Please pass one of: {self._allowed_requests}."""
