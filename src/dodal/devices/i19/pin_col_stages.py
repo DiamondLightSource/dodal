@@ -30,7 +30,7 @@ class PinColRequest(SubsetEnum):
 
 
 class AperturePosition(BaseModel):
-    """Describes the positions of the pinhole and collimator stage motors for
+    """Describe the positions of the pinhole and collimator stage motors for
     one of the available apertures.
 
     Attributes:
@@ -53,21 +53,25 @@ def define_allowed_aperture_requests() -> list[str]:
 
 
 class PinColConfiguration(StandardReadable):
+    """Full MAPT configuration table, including out positions and selection for the
+    Pinhole and Collimator control."""
+
     def __init__(self, prefix: str, apertures: list[int], name: str = "") -> None:
         with self.add_children_as_readables():
             self.configuration = MAPTConfigurationControl(prefix, PinColRequest)
-            # self.selection = epics_signal_rw(PinColRequest, f"{prefix}")
             self.pin_x = MAPTConfigurationTable(prefix, "PINX", apertures)
             self.pin_y = MAPTConfigurationTable(prefix, "PINY", apertures)
             self.col_x = MAPTConfigurationTable(prefix, "COLX", apertures)
             self.col_y = MAPTConfigurationTable(prefix, "COLY", apertures)
             self.pin_x_out = epics_signal_r(float, f"{prefix}:OUT:PINX")
             self.col_x_out = epics_signal_r(float, f"{prefix}:OUT:COLX")
-        # self.apply_selection = epics_signal_x(f"{prefix}:APPLY.PROC")
         super().__init__(name)
 
 
 class PinholeCollimatorControl(StandardReadable, Movable[str]):
+    """Device to control the Pinhole and Collimator stages moves on I19-2, using the
+    MAPT configuration table to look up the positions."""
+
     def __init__(
         self,
         prefix: str,
@@ -104,6 +108,11 @@ class PinholeCollimatorControl(StandardReadable, Movable[str]):
         )
 
     async def _safe_move_out(self):
+        """Move the pinhole and collimator stages safely to the out position, which
+        involves only the x motors of the stages.
+        In order to avoid a collision, we have to make sure that the collimator stage is
+        always moved out first and the pinhole stage second.
+        """
         LOGGER.info("Moving pinhole and collimator stages to out position")
         colx_out = await self.config.col_x_out.get_value()
         pin_x_out = await self.config.pin_x_out.get_value()
@@ -115,6 +124,9 @@ class PinholeCollimatorControl(StandardReadable, Movable[str]):
         await self.pinhole.x.set(pin_x_out)
 
     async def _safe_move_in(self, value: PinColRequest):
+        """Move the pinhole and collimator stages safely to the in position.
+        In order to avoid a collision, we have to make sure that the pinhole stage is
+        always moved in before the collimator stage."""
         LOGGER.info(
             f"Moving pinhole and collimator stages to in position: {value.value}"
         )
@@ -143,10 +155,15 @@ class PinholeCollimatorControl(StandardReadable, Movable[str]):
 
     @AsyncStatus.wrap
     async def set(self, value: str):
-        # The request from a plan would always oly be either one of the
-        # 4 allowed apertures values in PinColRequest or "OUT" which always moves
-        # first colx out and then pinx
-        # This is to avoid collisions.
+        """Moves the motor stages to the position for the requested aperture while
+        avoiding possible collisions.
+        The request coming from a plan should always be one of the values from the
+        PinColRequest enum ('20um', '40um', '100um', '3000um') or "OUT".
+
+        Raises:
+            ValueError: when the request doesn't match one of the allowed requests:
+                ['20um', '40um', '100um', '3000um', 'OUT']
+        """
         if value not in self._allowed_requests:
             raise ValueError(
                 f"""{value} is not a valid aperture request.
