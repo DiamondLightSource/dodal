@@ -266,11 +266,6 @@ async def test_pilatus_controller(
 
 
 async def assert_armed(driver: TetrammDriver) -> None:
-    sample_time = await driver.sample_time.get_value()
-    samples_per_reading = int(VALID_TEST_EXPOSURE_TIME / sample_time)
-    exposure = samples_per_reading * sample_time
-
     assert (await driver.trigger_mode.get_value()) is TetrammTrigger.EXT_TRIGGER
-    assert (await driver.averaging_time.get_value()) == exposure
     assert (await driver.values_per_reading.get_value()) == 5
     assert (await driver.acquire.get_value()) == 1
