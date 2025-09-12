@@ -113,7 +113,13 @@ class TetrammController(DetectorController):
 
         # Tetramms do not use a typical cam plugin, so we need to work out
         # the time per trigger
-        averaging_time = trigger_info.livetime / trigger_info.total_number_of_exposures
+
+        if trigger_info.total_number_of_exposures != 0:
+            averaging_time = (
+                trigger_info.livetime / trigger_info.total_number_of_exposures
+            )
+        else:
+            averaging_time = trigger_info.livetime
 
         await asyncio.gather(
             self.driver.averaging_time.set(averaging_time),
