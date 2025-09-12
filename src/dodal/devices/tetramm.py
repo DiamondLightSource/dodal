@@ -16,6 +16,7 @@ from ophyd_async.core import (
     TriggerInfo,
     set_and_wait_for_value,
     soft_signal_r_and_setter,
+    wait_for_value,
 )
 from ophyd_async.epics.adcore import (
     ADHDFWriter,
@@ -86,11 +87,9 @@ class TetrammController(DetectorController):
     """The TetrAMM always digitizes at 100 kHz"""
     _base_sample_rate: int = 100_000
 
-    def __init__(
-        self,
-        driver: TetrammDriver,
-    ) -> None:
+    def __init__(self, driver: TetrammDriver, file_io: NDFileHDFIO) -> None:
         self.driver = driver
+        self._file_io = file_io
         self._arm_status: AsyncStatus | None = None
 
     def get_deadtime(self, exposure: float | None) -> float:
@@ -111,9 +110,21 @@ class TetrammController(DetectorController):
         await self.driver.trigger_mode.set(
             self._supported_trigger_types[trigger_info.trigger]
         )
+
+        total_triggers = (
+            sum(trigger_info.number_of_events)
+            if isinstance(trigger_info.number_of_events, list | tuple)
+            else int(trigger_info.number_of_events)
+        )
+
+        # Tetramms do not use a typical cam plugin, so we need to work out
+        # the time per trigger
+        averaging_time = trigger_info.livetime / total_triggers
+
         await asyncio.gather(
-            self.driver.averaging_time.set(trigger_info.livetime),
-            self.set_exposure(trigger_info.livetime),
+            self.driver.averaging_time.set(averaging_time),
+            self.set_exposure(averaging_time),
+            self._file_io.num_capture.set(total_triggers),
         )
 
         # raise an error if asked to trigger faster than the max.
@@ -133,9 +144,9 @@ class TetrammController(DetectorController):
         self._arm_status = await self.start_acquiring_driver_and_ensure_status()
 
     async def wait_for_idle(self):
-        if self._arm_status and not self._arm_status.done:
-            await self._arm_status
-        self._arm_status = None
+        # tetramm never goes idle really, actually it is always acquiring
+        # so need to wait for the capture to finish instead
+        await wait_for_value(self._file_io.capture, False, timeout=DEFAULT_TIMEOUT)
 
     async def disarm(self):
         # We can't use caput callback as we already used it in arm() and we can't have
@@ -223,7 +234,7 @@ class TetrammDetector(StandardDetector):
     ):
         self.driver = TetrammDriver(prefix + drv_suffix)
         self.file_io = NDFileHDFIO(prefix + fileio_suffix)
-        controller = TetrammController(self.driver)
+        controller = TetrammController(self.driver, self.file_io)
 
         writer = ADHDFWriter(
             fileio=self.file_io,
