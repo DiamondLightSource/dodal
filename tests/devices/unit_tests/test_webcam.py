@@ -41,7 +41,14 @@ async def test_given_filename_and_directory_when_trigger_and_read_then_returns_e
     expected_path,
     webcam: Webcam,
 ):
-    mock_get.return_value.__aenter__.return_value = AsyncMock()
+    img_byte_arr = BytesIO()
+    Image.new("RGB", (10, 10)).save(img_byte_arr, format="PNG")
+    img_bytes = img_byte_arr.getvalue()
+
+    mock_response = AsyncMock()
+    mock_response.read.return_value = img_bytes
+    mock_get.return_value.__aenter__.return_value = mock_response
+
     await webcam.filename.set(filename)
     await webcam.directory.set(directory)
     await webcam.trigger()
@@ -131,6 +138,21 @@ async def test_given_response_read_passes_but_image_is_invalid(
     mock_image.verify.assert_called_once()
     mock_open.assert_called_once_with("/tmp/file.png", "wb")
     mock_file.write.assert_called_once_with(test_placeholder_data)
+
+
+async def test_webcam_system_test(RE):
+    async with init_devices(mock=True):
+        webcam = Webcam(
+            url=URL("http://i03-webcam1/axis-cgi/jpg/image.cgi"),
+        )
+
+    import pathlib
+
+    this_folder = pathlib.Path(__file__).parent.resolve()
+
+    await webcam.filename.set("tezst")
+    await webcam.directory.set(str(this_folder))
+    await webcam.trigger()
 
 
 def test_create_place_holder_image_gives_expected_bytes():

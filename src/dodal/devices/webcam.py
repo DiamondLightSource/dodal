@@ -51,7 +51,7 @@ class Webcam(StandardReadable, Triggerable):
                     )
                 try:
                     data = await response.read()
-                    Image.open(data).verify()
+                    Image.open(BytesIO(data)).verify()
                     LOGGER.info(f"Saving webcam image from {self.url} to {file_path}")
                 except Exception as e:
                     LOGGER.warning(
