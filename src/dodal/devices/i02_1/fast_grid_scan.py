@@ -1,31 +1,20 @@
-import numpy as np
 from ophyd_async.core import SignalR, derived_signal_r, soft_signal_r_and_setter
 from ophyd_async.epics.core import epics_signal_rw_rbv
-from pydantic import field_validator
 
 from dodal.devices.fast_grid_scan import (
     FastGridScanCommon,
     GridScanParamsCommon,
     MotionProgram,
+    WithDwellTime,
 )
 from dodal.log import LOGGER
 
 
-class ZebraGridScanParamsTwoD(GridScanParamsCommon):
-    exposure_time_ms: float = 213
-
-    @field_validator("exposure_time_ms")
-    @classmethod
-    def non_integer_dwell_time(cls, exposure_time_ms: float) -> float:
-        exposure_time_floor_rounded = np.floor(exposure_time_ms)
-        exposure_time_is_close = np.isclose(
-            exposure_time_ms, exposure_time_floor_rounded, rtol=1e-3
-        )
-        if not exposure_time_is_close:
-            raise ValueError(
-                f"Exposure time of {exposure_time_ms}ms is not an integer value. Fast Grid Scan only accepts integer values"
-            )
-        return exposure_time_ms
+class ZebraGridScanParamsTwoD(GridScanParamsCommon, WithDwellTime):
+    """
+    Params for 2D Zebra FGS. Adds on the dwell time, which is really the time
+    between trigger positions.
+    """
 
 
 class ZebraFastGridScanTwoD(FastGridScanCommon[ZebraGridScanParamsTwoD]):
@@ -44,11 +33,9 @@ class ZebraFastGridScanTwoD(FastGridScanCommon[ZebraGridScanParamsTwoD]):
 
         # This signal could be put in the common device if the prefix gets standardised.
         # See https://github.com/DiamondLightSource/mx-bluesky/issues/1203
-        self.exposure_time_ms = epics_signal_rw_rbv(
-            float, f"{full_prefix}EXPOSURE_TIME"
-        )
+        self.dwell_time_ms = epics_signal_rw_rbv(float, f"{full_prefix}EXPOSURE_TIME")
 
-        self.movable_params["exposure_time_ms"] = self.exposure_time_ms
+        self.movable_params["dwell_time_ms"] = self.dwell_time_ms
 
     def _create_expected_images_signal(self):
         return derived_signal_r(

@@ -22,7 +22,7 @@ from ophyd_async.epics.core import (
     epics_signal_rw_rbv,
     epics_signal_x,
 )
-from pydantic import field_validator
+from pydantic import BaseModel, field_validator
 from pydantic.dataclasses import dataclass
 
 from dodal.log import LOGGER
@@ -147,13 +147,8 @@ class GridScanParamsThreeD(GridScanParamsCommon):
 ParamType = TypeVar("ParamType", bound=GridScanParamsCommon, covariant=True)
 
 
-class ZebraGridScanParamsThreeD(GridScanParamsThreeD):
-    """
-    Params for standard Zebra FGS. Adds on the dwell time, which is really the time
-    between trigger positions.
-    """
-
-    dwell_time_ms: float = 10
+class WithDwellTime(BaseModel):
+    dwell_time_ms: float = 213
 
     @field_validator("dwell_time_ms")
     @classmethod
@@ -167,6 +162,13 @@ class ZebraGridScanParamsThreeD(GridScanParamsThreeD):
                 f"Dwell time of {dwell_time_ms}ms is not an integer value. Fast Grid Scan only accepts integer values"
             )
         return dwell_time_ms
+
+
+class ZebraGridScanParamsThreeD(GridScanParamsThreeD, WithDwellTime):
+    """
+    Params for standard Zebra FGS. Adds on the dwell time, which is really the time
+    between trigger positions.
+    """
 
 
 class PandAGridScanParams(GridScanParamsThreeD):
@@ -200,6 +202,7 @@ class FastGridScanCommon(StandardReadable, Flyable, ABC, Generic[ParamType]):
     def __init__(
         self, prefix: str, motion_controller_prefix: str, name: str = ""
     ) -> None:
+        super().__init__(name)
         self.x_steps = epics_signal_rw_rbv(int, f"{prefix}X_NUM_STEPS")
         self.y_steps = epics_signal_rw_rbv(
             int, f"{prefix}Y_NUM_STEPS"
@@ -238,7 +241,6 @@ class FastGridScanCommon(StandardReadable, Flyable, ABC, Generic[ParamType]):
             "y1_start_mm": self.y1_start,
             "z1_start_mm": self.z1_start,
         }
-        super().__init__(name)
 
     @AsyncStatus.wrap
     async def kickoff(self):
@@ -296,7 +298,6 @@ class FastGridScanThreeD(FastGridScanCommon[ParamType]):
 
     def __init__(self, prefix: str, name: str = "") -> None:
         full_prefix = prefix + "FGS:"
-        super().__init__(full_prefix, prefix, name)
 
         # Number of vertical steps during the second grid scan, after the rotation in omega
         self.z_steps = epics_signal_rw_rbv(int, f"{prefix}Z_NUM_STEPS")
@@ -305,6 +306,8 @@ class FastGridScanThreeD(FastGridScanCommon[ParamType]):
         self.y2_start = epics_signal_rw_rbv(float, f"{prefix}Y2_START")
         self.x_counter = epics_signal_r(int, f"{full_prefix}X_COUNTER")
         self.y_counter = epics_signal_r(int, f"{full_prefix}Y_COUNTER")
+
+        super().__init__(full_prefix, prefix, name)
 
         self.movable_params["z_step_size_mm"] = self.z_step_size
         self.movable_params["z2_start_mm"] = self.z2_start

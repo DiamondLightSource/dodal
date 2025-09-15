@@ -90,9 +90,7 @@ def zocalo() -> ZocaloResults:
     """Get the i03 ZocaloResults device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return ZocaloResults(
-        prefix=PREFIX.beamline_prefix,
-    )
+    return ZocaloResults()
 
 
 @device_factory()

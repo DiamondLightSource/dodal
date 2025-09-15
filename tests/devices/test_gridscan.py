@@ -21,6 +21,7 @@ from dodal.devices.fast_grid_scan import (
     ZebraGridScanParamsThreeD,
     set_fast_grid_scan_params,
 )
+from dodal.devices.i02_1.fast_grid_scan import ZebraFastGridScanTwoD
 from dodal.devices.smargon import Smargon
 from dodal.testing import patch_all_motors
 
@@ -49,6 +50,13 @@ async def panda_fast_grid_scan():
 
 
 @pytest.fixture
+async def zebra_fast_grid_scan_2d():
+    async with init_devices(mock=True):
+        fast_grid_scan = ZebraFastGridScanTwoD(prefix="", motion_controller_prefix="")
+    return fast_grid_scan
+
+
+@pytest.fixture
 async def smargon():
     async with init_devices(mock=True):
         smargon = Smargon("")
@@ -57,18 +65,17 @@ async def smargon():
         yield smargon
 
 
-@pytest.mark.parametrize(
-    "use_pgs",
-    [(False), (True)],
+@pytest.fixture(
+    params=["zebra_fast_grid_scan", "panda_fast_grid_scan", "zebra_fast_grid_scan_2d"]
 )
+def grid_scan(request: pytest.FixtureRequest) -> FastGridScanCommon:
+    instance = request.getfixturevalue(request.param)
+    return instance
+
+
 async def test_given_settings_valid_when_kickoff_then_run_started(
-    use_pgs,
-    zebra_fast_grid_scan: ZebraFastGridScanThreeD,
-    panda_fast_grid_scan: PandAFastGridScan,
+    grid_scan: FastGridScanCommon,
 ):
-    grid_scan: ZebraFastGridScanThreeD | PandAFastGridScan = (
-        panda_fast_grid_scan if use_pgs else zebra_fast_grid_scan
-    )
     set_mock_value(grid_scan.scan_invalid, False)
     set_mock_value(grid_scan.position_counter, 0)
     set_mock_value(grid_scan.status, 1)
@@ -78,18 +85,7 @@ async def test_given_settings_valid_when_kickoff_then_run_started(
     get_mock_put(grid_scan.run_cmd).assert_called_once()
 
 
-@pytest.mark.parametrize(
-    "use_pgs",
-    [(False), (True)],
-)
-async def test_waits_for_running_motion(
-    use_pgs,
-    zebra_fast_grid_scan: ZebraFastGridScanThreeD,
-    panda_fast_grid_scan: PandAFastGridScan,
-):
-    grid_scan: ZebraFastGridScanThreeD | PandAFastGridScan = (
-        panda_fast_grid_scan if use_pgs else zebra_fast_grid_scan
-    )
+async def test_waits_for_running_motion(grid_scan: FastGridScanCommon):
     set_mock_value(grid_scan.motion_program.running, 1)
 
     grid_scan.KICKOFF_TIMEOUT = 0.01
@@ -128,6 +124,27 @@ async def test_given_different_step_numbers_then_expected_images_correct(
 
 
 @pytest.mark.parametrize(
+    "steps, expected_images",
+    [
+        ((10, 10), 100),
+        ((30, 5), 150),
+        ((7, 0), 0),
+    ],
+)
+async def test_given_different_2d_step_numbers_then_expected_images_correct(
+    zebra_fast_grid_scan_2d: ZebraFastGridScanTwoD, steps, expected_images
+):
+    set_mock_value(zebra_fast_grid_scan_2d.x_steps, steps[0])
+    set_mock_value(zebra_fast_grid_scan_2d.y_steps, steps[1])
+
+    RE = RunEngine(call_returns_result=True)
+
+    result = RE(bps.rd(zebra_fast_grid_scan_2d.expected_images))
+
+    assert result.plan_result == expected_images  # type: ignore
+
+
+@pytest.mark.parametrize(
     "use_pgs",
     [(False), (True)],
 )
@@ -137,9 +154,11 @@ async def test_running_finished_with_all_images_done_then_complete_status_finish
     panda_fast_grid_scan: PandAFastGridScan,
     RE: RunEngine,
 ):
+    grid_scan: ZebraFastGridScanThreeD | PandAFastGridScan = (
+        panda_fast_grid_scan if use_pgs else zebra_fast_grid_scan
+    )
     num_pos_1d = 2
     if use_pgs:
-        grid_scan = panda_fast_grid_scan
         RE(
             set_fast_grid_scan_params(
                 grid_scan,
@@ -149,7 +168,6 @@ async def test_running_finished_with_all_images_done_then_complete_status_finish
             )
         )
     else:
-        grid_scan = zebra_fast_grid_scan
         RE(
             set_fast_grid_scan_params(
                 grid_scan,
@@ -321,12 +339,8 @@ def test_given_x_y_z_out_of_range_then_converting_to_motor_coords_raises(
         assert np.allclose(motor_position, expected_value)
 
 
-@pytest.mark.parametrize(
-    "pgs",
-    [(False), (True)],
-)
 def test_can_run_fast_grid_scan_in_run_engine(
-    pgs,
+    grid_scan: FastGridScanCommon,
     zebra_fast_grid_scan: ZebraFastGridScanThreeD,
     panda_fast_grid_scan: PandAFastGridScan,
     RE: RunEngine,
@@ -340,11 +354,7 @@ def test_can_run_fast_grid_scan_in_run_engine(
         set_mock_value(device.status, 0)
         yield from bps.wait("complete")
 
-    (
-        RE(kickoff_and_complete(panda_fast_grid_scan))
-        if pgs
-        else RE(kickoff_and_complete(zebra_fast_grid_scan))
-    )
+    (RE(kickoff_and_complete(grid_scan)))
     assert RE.state == "idle"
 
 
@@ -396,3 +406,12 @@ async def test_timeout_on_complete_triggers_stop_and_logs_error(
         await zebra_fast_grid_scan.complete()
     mock_log_error.assert_called_once()
     zebra_fast_grid_scan.stop_cmd.trigger.assert_awaited_once()
+
+
+async def test_i02_1_gridscan_has_2d_behaviour(fast_grid_scan: ZebraFastGridScanTwoD):
+    three_d_movables = ["z_step_size_mm", "z2_start_mm", "y2_start_mm", "z_steps"]
+    for movable in three_d_movables:
+        assert movable not in fast_grid_scan.movable_params.keys()
+    set_mock_value(fast_grid_scan.x_steps, 5)
+    set_mock_value(fast_grid_scan.y_steps, 4)
+    assert await fast_grid_scan.expected_images.get_value() == 20
