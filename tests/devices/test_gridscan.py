@@ -408,10 +408,12 @@ async def test_timeout_on_complete_triggers_stop_and_logs_error(
     zebra_fast_grid_scan.stop_cmd.trigger.assert_awaited_once()
 
 
-async def test_i02_1_gridscan_has_2d_behaviour(fast_grid_scan: ZebraFastGridScanTwoD):
+async def test_i02_1_gridscan_has_2d_behaviour(
+    zebra_fast_grid_scan_2d: ZebraFastGridScanTwoD,
+):
     three_d_movables = ["z_step_size_mm", "z2_start_mm", "y2_start_mm", "z_steps"]
     for movable in three_d_movables:
-        assert movable not in fast_grid_scan.movable_params.keys()
-    set_mock_value(fast_grid_scan.x_steps, 5)
-    set_mock_value(fast_grid_scan.y_steps, 4)
-    assert await fast_grid_scan.expected_images.get_value() == 20
+        assert movable not in zebra_fast_grid_scan_2d.movable_params.keys()
+    set_mock_value(zebra_fast_grid_scan_2d.x_steps, 5)
+    set_mock_value(zebra_fast_grid_scan_2d.y_steps, 4)
+    assert await zebra_fast_grid_scan_2d.expected_images.get_value() == 20
