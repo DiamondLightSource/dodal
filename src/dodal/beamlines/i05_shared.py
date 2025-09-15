@@ -1,9 +1,10 @@
 from dodal.common.beamlines.beamline_utils import device_factory
 from dodal.devices.i05.enums import Grating
 from dodal.devices.pgm import PGM
-from dodal.utils import BeamlinePrefix
+from dodal.utils import BeamlinePrefix, get_beamline_name
 
-PREFIX = BeamlinePrefix("i05", "I")
+BL = get_beamline_name("i05")
+PREFIX = BeamlinePrefix(BL, "I")
 
 
 @device_factory()
