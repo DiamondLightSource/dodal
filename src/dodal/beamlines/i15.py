@@ -10,10 +10,11 @@ from dodal.devices.i15.focussing_mirror import (
     FocusingMirrorWithRoll,
 )
 from dodal.devices.i15.jack import JackX, JackY
-from dodal.devices.i15.motors import UpstreamDownstreamPair, XYZPitchYawStage
+from dodal.devices.i15.motors import UpstreamDownstreamPair
 from dodal.devices.motors import (
     SixAxisGonioKappaPhi,
     XYStage,
+    XYZPitchYawStage,
     XYZStage,
 )
 from dodal.devices.slits import Slits, SlitsY
