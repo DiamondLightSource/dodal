@@ -124,15 +124,20 @@ class HardUndulator(Undulator):
             - The calculation uses a lookup table and considers the current undulator order, gap offset, and period.
         """
         await self.check_energy_limits(energy_kev, await self.order_signal.get_value())
+        await self.update_cached_lookup_table()
         return _get_gap_for_energy_order(
             energy_kev,
-            look_up_table=await energy_distance_table(
-                self.id_gap_lookup_table_path, comments=LUT_COMMENTS
-            ),
+            look_up_table=self._cached_lookup_table,
             order=await self.order_signal.get_value(),
             gap_offset=await self.gap_offset.get_value(),
             undulator_period=await self.undulator_period.get_value(),
         )
+
+    async def update_cached_lookup_table(self):
+        if not hasattr(self, "_cached_lookup_table"):
+            self._cached_lookup_table = await energy_distance_table(
+                self.id_gap_lookup_table_path, comments=LUT_COMMENTS
+            )
 
     async def get_min_max_energy_for_order(self, order: int) -> tuple[float, float]:
         """
@@ -144,14 +149,18 @@ class HardUndulator(Undulator):
         Returns:
             tuple: (min energy, max energy) in keV
         """
-        look_up_table = await energy_distance_table(
-            self.id_gap_lookup_table_path, comments=LUT_COMMENTS
-        )
-        if order < 1 or order >= look_up_table.shape[0]:
+        if not hasattr(self, "_cached_lookup_table"):
+            self._cached_lookup_table = await energy_distance_table(
+                self.id_gap_lookup_table_path, comments=LUT_COMMENTS
+            )
+        if order < 1 or order >= self._cached_lookup_table.shape[0]:
             raise ValueError(
-                f"Order {order} is out of range for the lookup table, must be between 1 and {look_up_table.shape[0] - 1}"
+                f"Order {order} is out of range for the lookup table, must be between 1 and {self._cached_lookup_table.shape[0] - 1}"
             )
         LOGGER.debug(
-            f"Min and max energies for order {order} are {look_up_table[order][3]}keV and {look_up_table[order][4]}keV respectively"
+            f"Min and max energies for order {order} are {self._cached_lookup_table[order][3]}keV and {self._cached_lookup_table[order][4]}keV respectively"
         )
-        return (look_up_table[order][3], look_up_table[order][4])
+        return (
+            self._cached_lookup_table[order][3],
+            self._cached_lookup_table[order][4],
+        )
