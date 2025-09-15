@@ -7,7 +7,11 @@ from bluesky.run_engine import RunEngine
 from ophyd_async.core import NotConnected, StaticPathProvider, UUIDFilenameProvider
 from ophyd_async.plan_stubs import ensure_connected
 
-from dodal.beamlines import all_beamline_names, module_name_for_beamline
+from dodal.beamlines import (
+    all_beamline_names,
+    module_name_for_beamline,
+    shared_beamline_modules,
+)
 from dodal.common.beamlines.beamline_utils import set_path_provider
 from dodal.utils import AnyDevice, filter_ophyd_devices, make_all_devices
 
@@ -43,7 +47,15 @@ def main(ctx: click.Context) -> None:
     "attempt any I/O. Useful as a a dry-run.",
     default=False,
 )
-def connect(beamline: str, all: bool, sim_backend: bool) -> None:
+@click.option(
+    "-m",
+    "--module-only",
+    is_flag=True,
+    help="If a beamline depends on a shared beamline module, test devices only within"
+    "the selected module.",
+    default=False,
+)
+def connect(beamline: str, all: bool, sim_backend: bool, module_only: bool) -> None:
     """Initialises a beamline module, connects to all devices, reports
     any connection issues."""
 
@@ -53,32 +65,46 @@ def connect(beamline: str, all: bool, sim_backend: bool) -> None:
     # it is not used in dodal connect
     _spoof_path_provider()
 
-    module_name = module_name_for_beamline(beamline)
-    full_module_path = f"dodal.beamlines.{module_name}"
-
     # We need to make a RunEngine to allow ophyd-async devices to connect.
     # See https://blueskyproject.io/ophyd-async/main/explanations/event-loop-choice.html
     RE = RunEngine(call_returns_result=True)
 
-    print(f"Attempting connection to {beamline} (using {full_module_path})")
+    exceptions = {}
 
-    # Force all devices to be lazy (don't connect to PVs on instantiation) and do
-    # connection as an extra step, because the alternatives is handling the fact
-    # that only some devices may be lazy.
-    devices, instance_exceptions = make_all_devices(
-        full_module_path,
-        include_skipped=all,
-        fake_with_ophyd_sim=sim_backend,
-        wait_for_connection=False,
-    )
-    devices, connect_exceptions = _connect_devices(RE, devices, sim_backend)
+    if module_only:
+        beamline_modules = [module_name_for_beamline(beamline)]
+    else:
+        beamline_modules = shared_beamline_modules(beamline)
 
-    # Inform user of successful connections
-    _report_successful_devices(devices, sim_backend)
+    for bl_module in beamline_modules:
+        module_name = module_name_for_beamline(bl_module)
+        full_module_path = f"dodal.beamlines.{module_name}"
 
-    # If exceptions have occurred, this will print details of the relevant PVs
-    exceptions = {**instance_exceptions, **connect_exceptions}
+        print("=" * 100)
+        print(f"Attempting connection to {bl_module} (using {full_module_path})")
+
+        # Force all devices to be lazy (don't connect to PVs on instantiation) and do
+        # connection as an extra step, because the alternatives is handling the fact
+        # that only some devices may be lazy.
+        devices, instance_exceptions = make_all_devices(
+            full_module_path,
+            include_skipped=all,
+            fake_with_ophyd_sim=sim_backend,
+            wait_for_connection=False,
+        )
+        devices, connect_exceptions = _connect_devices(RE, devices, sim_backend)
+
+        # Inform user of successful connections
+        _report_successful_devices(devices, sim_backend)
+
+        # If exceptions have occurred, this will print details of the relevant PVs
+        e = {**instance_exceptions, **connect_exceptions}
+        exceptions = exceptions | e
+
+    print("Finished all device connections.")
     if len(exceptions) > 0:
+        print("=" * 100)
+        print("Had the following errors:")
         raise NotConnected(exceptions)
 
 
