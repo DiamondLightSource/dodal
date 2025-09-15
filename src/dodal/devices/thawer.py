@@ -1,4 +1,4 @@
-from asyncio import Task, create_task, sleep
+from asyncio import CancelledError, Task, create_task, sleep
 
 from bluesky.protocols import Movable, Stoppable
 from ophyd_async.core import (
@@ -10,6 +10,8 @@ from ophyd_async.core import (
     StandardReadable,
 )
 from ophyd_async.epics.core import epics_signal_rw
+
+from dodal.log import LOGGER
 
 
 class ThawingException(Exception):
@@ -24,19 +26,29 @@ class ThawingTimer(Device, Stoppable, Movable[float]):
 
     @AsyncStatus.wrap
     async def set(self, value: float):
-        await self._control_signal_ref().set(OnOff.ON)
-        if self._thawing_task and not self._thawing_task.done():
-            raise ThawingException("Thawing task already in progress")
+        if self._thawing_task:
+            LOGGER.info("Thawing task already in progress, resetting timer")
+            self._thawing_task.cancel()
+        else:
+            LOGGER.info("Thawing started")
+            await self._control_signal_ref().set(OnOff.ON)
         self._thawing_task = create_task(sleep(value))
         try:
             await self._thawing_task
-        finally:
+        except CancelledError:
+            LOGGER.info("Timer task cancelled.")
+            raise
+        else:
+            LOGGER.info("Thawing completed")
             await self._control_signal_ref().set(OnOff.OFF)
 
     @AsyncStatus.wrap
     async def stop(self, *args, **kwargs):
         if self._thawing_task:
             self._thawing_task.cancel()
+            self._thawing_task = None
+        LOGGER.info("Thawer stopped.")
+        await self._control_signal_ref().set(OnOff.OFF)
 
 
 class Thawer(StandardReadable, Stoppable):
