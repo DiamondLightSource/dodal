@@ -1,3 +1,4 @@
+import pathlib
 from io import BytesIO
 from unittest.mock import AsyncMock, MagicMock, patch
 
@@ -113,7 +114,7 @@ async def test_given_response_read_fails_then_placeholder_image_written(
 @patch("dodal.devices.webcam.create_placeholder_image", autospec=True)
 @patch("dodal.devices.webcam.ClientSession.get", autospec=True)
 @patch("dodal.devices.webcam.Image.open")
-async def test_given_response_read_passes_but_image_is_invalid(
+async def test_given_non_image_error_from_webcam_then_placeholder_image_written(
     mock_image_open,
     mock_get: MagicMock,
     mock_placeholder_image: MagicMock,
@@ -121,6 +122,7 @@ async def test_given_response_read_passes_but_image_is_invalid(
     webcam: Webcam,
 ):
     mock_get.return_value.__aenter__.return_value = (mock_response := AsyncMock())
+    # This can occur when the camera gets an internal error
     mock_response.read.return_value = b"<html><h1>503 Service Unavailable</h1></html>"
 
     mock_image = MagicMock()
@@ -140,18 +142,16 @@ async def test_given_response_read_passes_but_image_is_invalid(
     mock_file.write.assert_called_once_with(test_placeholder_data)
 
 
-@pytest.mark.skip(reason="System test that hits a real webcam, not suitable for CI")
+@pytest.mark.system_test
 async def test_webcam_system_test(RE):
-    async with init_devices(mock=True):
+    async with init_devices():
         webcam = Webcam(
             url=URL("http://i03-webcam1/axis-cgi/jpg/image.cgi"),
         )
 
-    import pathlib
-
     this_folder = pathlib.Path(__file__).parent.resolve()
 
-    await webcam.filename.set("tezst")
+    await webcam.filename.set("test")
     await webcam.directory.set(str(this_folder))
     await webcam.trigger()
 
