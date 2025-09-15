@@ -13,7 +13,9 @@ from numpy import interp, loadtxt
 from dodal.log import LOGGER
 
 
-async def energy_distance_table(lookup_table_path: str) -> np.ndarray:
+async def energy_distance_table(
+    lookup_table_path: str, comments: Sequence[str] = ["#", "Units"]
+) -> np.ndarray:
     """
     Returns a numpy formatted lookup table for required positions of an ID gap to
     provide emission at a given beam energy.
@@ -29,7 +31,7 @@ async def energy_distance_table(lookup_table_path: str) -> np.ndarray:
     # decodes the text
     async with aiofiles.open(lookup_table_path) as stream:
         raw_table = await stream.read()
-    return loadtxt(StringIO(raw_table), comments=["#", "Units"])
+    return loadtxt(StringIO(raw_table), comments=comments)
 
 
 def parse_lookup_table(filename: str) -> list[Sequence]:

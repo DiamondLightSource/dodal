@@ -6,9 +6,8 @@ from ophyd_async.core import (
 )
 
 from dodal.devices.undulator import Undulator
+from dodal.devices.util.lookup_tables import energy_distance_table
 from dodal.log import LOGGER
-
-from ..util.lookup_tables import energy_distance_table
 
 
 def _get_gap_for_energy_order(
