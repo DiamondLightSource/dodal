@@ -9,6 +9,8 @@ from dodal.devices.undulator import Undulator
 from dodal.devices.util.lookup_tables import energy_distance_table
 from dodal.log import LOGGER
 
+LUT_COMMENTS = ["#", "Units", "ScannableNames", "ScannableUnits"]
+
 
 def _get_gap_for_energy_order(
     energy_kev: float,
@@ -124,7 +126,9 @@ class HardUndulator(Undulator):
         await self.check_energy_limits(energy_kev, await self.order_signal.get_value())
         return _get_gap_for_energy_order(
             energy_kev,
-            look_up_table=await energy_distance_table(self.id_gap_lookup_table_path),
+            look_up_table=await energy_distance_table(
+                self.id_gap_lookup_table_path, comments=LUT_COMMENTS
+            ),
             order=await self.order_signal.get_value(),
             gap_offset=await self.gap_offset.get_value(),
             undulator_period=await self.undulator_period.get_value(),
@@ -140,7 +144,9 @@ class HardUndulator(Undulator):
         Returns:
             tuple: (min energy, max energy) in keV
         """
-        look_up_table = await energy_distance_table(self.id_gap_lookup_table_path)
+        look_up_table = await energy_distance_table(
+            self.id_gap_lookup_table_path, comments=LUT_COMMENTS
+        )
         if order < 1 or order >= look_up_table.shape[0]:
             raise ValueError(
                 f"Order {order} is out of range for the lookup table, must be between 1 and {look_up_table.shape[0] - 1}"
