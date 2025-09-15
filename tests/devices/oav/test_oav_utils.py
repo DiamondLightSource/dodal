@@ -18,7 +18,7 @@ from dodal.devices.oav.utils import (
     wait_for_tip_to_be_found,
 )
 from dodal.devices.smargon import Smargon
-from dodal.devices.util.test_utils import patch_all_motors
+from dodal.testing import patch_all_motors
 
 
 def test_bottom_right_from_top_left():
