@@ -362,7 +362,7 @@ def pin_tip_detection() -> PinTipDetection:
 
 @device_factory()
 def scintillator() -> Scintillator:
-    """Get the i04 scintillator detection device, instantiate it if it hasn't already been.
+    """Get the i04 scintillator device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
     """
     return Scintillator(
