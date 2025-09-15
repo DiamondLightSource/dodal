@@ -32,6 +32,8 @@ _BEAMLINE_NAME_OVERRIDES = {
 _BEAMLINE_SHARED = {
     "i05": ["i05", "i05_shared"],
     "i05_1": ["i05_1", "i05_shared"],
+    "i06": ["i06", "i06_shared"],
+    "i06_1": ["i06_1", "i06_shared"],
     "b07": ["b07", "b07_shared"],
     "b07_1": ["b07_1", "b07_shared"],
     "i09": ["i09", "i09_1_shared", "i09_2_shared"],
