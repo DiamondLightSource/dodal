@@ -150,7 +150,7 @@ class SixAxisGonio(XYZStage):
         )
 
 
-class SixAxisGonioKappaGeometry(XYZStage):
+class SixAxisGonioKappaPhi(XYZStage):
     def __init__(
         self,
         prefix: str,
@@ -160,14 +160,13 @@ class SixAxisGonioKappaGeometry(XYZStage):
         z_infix: str = _Z,
         kappa_infix: str = "KAPPA",
         phi_infix: str = "PHI",
-        theta_infix: str = "THETA",
-        mu_infix: str = "MU",
     ):
+        """Six-axis goniometer with a standard xyz stage and two axes of rotation:
+        kappa and phi.
+        """
         with self.add_children_as_readables():
             self.kappa = Motor(prefix + kappa_infix)
             self.phi = Motor(prefix + phi_infix)
-            self.theta = Motor(prefix + theta_infix)
-            self.mu = Motor(prefix + mu_infix)
         super().__init__(prefix, name, x_infix, y_infix, z_infix)
 
 
