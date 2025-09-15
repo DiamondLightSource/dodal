@@ -22,7 +22,20 @@ For all hardware in the shared optics hutch where access control is required, th
 - The shared blueapi instance also has an ``AccessControl`` device that reads the endstation in use for beamtime from a PV.
 - Every plan should then be wrapped in a decorator that reads the ``AccessControl`` device, check which endstation is making the request and only allows the plan to run if the two values match.
 
-
 :::{seealso}
 [Optics hutch implementation on I19](https://diamondlightsource.github.io/i19-bluesky/main/explanations/decisions/0004-optics-blueapi-architecture.html) for an example.
 :::
+
+## Dodal connect with shared endstations
+
+If you have beamline that is composed of multiple modules, dodal connect can be extended to include all shared components. This is done by extending the `_BEAMLINE_SHARED` configuration (found in `dodal.beamlines.__init__.py`) to join together beamline modules when running the dodal connect command. 
+
+```Python
+_BEAMLINE_SHARED = {
+    "i05": ["i05", "i05_shared"],
+    "i05_1": ["i05_1", "i05_shared"],
+    ...
+}
+```
+
+For example, when running `dodal connect i05` will do the device connections for `dodal.beamlines.i05` and `dodal.beamlines.i05_shared`.
