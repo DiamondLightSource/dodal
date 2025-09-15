@@ -51,7 +51,7 @@ def main(ctx: click.Context) -> None:
     "-m",
     "--module-only",
     is_flag=True,
-    help="If a beamline depends on a shared beamline module, test devices only within"
+    help="If a beamline depends on a shared beamline module, test devices only within "
     "the selected module.",
     default=False,
 )
@@ -77,8 +77,7 @@ def connect(beamline: str, all: bool, sim_backend: bool, module_only: bool) -> N
         beamline_modules = shared_beamline_modules(beamline)
 
     for bl_module in beamline_modules:
-        module_name = module_name_for_beamline(bl_module)
-        full_module_path = f"dodal.beamlines.{module_name}"
+        full_module_path = f"dodal.beamlines.{bl_module}"
 
         print("=" * 100)
         print(f"Attempting connection to {bl_module} (using {full_module_path})")
