@@ -198,13 +198,11 @@ def test_process_result_appends_lists_with_correct_values(
         sample_id="test",
     )
 
-    assert murko_results.x_dists_mm == []
-    assert murko_results.y_dists_mm == []
-    assert murko_results.omegas == []
+    assert murko_results.results == []
     murko_results.process_result(result, metadata)
-    assert murko_results.x_dists_mm == [0.2 * 100 * 5 / 1000]
-    assert murko_results.y_dists_mm == [0]
-    assert murko_results.omegas == [60]
+    assert murko_results.results[0].x_dist_mm == 0.2 * 100 * 5 / 1000
+    assert murko_results.results[0].y_dist_mm == 0
+    assert murko_results.results[0].omega == 60
 
 
 @patch("dodal.devices.i04.murko_results.calculate_beam_distance")
@@ -231,9 +229,7 @@ def test_process_result_skips_when_no_result_from_murko(
     with caplog.at_level("INFO"):
         murko_results.process_result(result, metadata)
 
-    assert murko_results.x_dists_mm == []
-    assert murko_results.y_dists_mm == []
-    assert murko_results.omegas == []
+    assert murko_results.results == []
     assert mock_calculate_beam_distance.call_count == 0
     assert "Murko didn't produce a result, moving on" in caplog.text
 
