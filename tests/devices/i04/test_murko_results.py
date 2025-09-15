@@ -10,6 +10,7 @@ from pytest import approx
 
 from dodal.devices.i04.murko_results import (
     MurkoMetadata,
+    MurkoResult,
     MurkoResultsDevice,
     get_yz_least_squares,
 )
@@ -200,6 +201,7 @@ def test_process_result_appends_lists_with_correct_values(
 
     assert murko_results.results == []
     murko_results.process_result(result, metadata)
+    assert len(murko_results.results) == 1
     assert murko_results.results[0].x_dist_mm == 0.2 * 100 * 5 / 1000
     assert murko_results.results[0].y_dist_mm == 0
     assert murko_results.results[0].omega == 60
@@ -507,23 +509,17 @@ def test_given_n_results_filter_outliers_will_reduce_down_to_smaller_amount(
     expected_left: int,
     murko_results: MurkoResultsDevice,
 ):
-    murko_results.x_dists_mm = list(range(total_from_murko))
-    murko_results.y_dists_mm = list(range(total_from_murko))
-    murko_results.omegas = list(range(total_from_murko))
-    murko_results.uuids = list(range(total_from_murko))
+    murko_results.results = [
+        MurkoResult(x_dist_mm=i, y_dist_mm=i, omega=i, uuid=str(i))
+        for i in range(total_from_murko)
+    ]
 
     murko_results.PERCENTAGE_TO_USE = percentage_to_keep  # type:ignore
 
     murko_results.filter_outliers()
 
-    for r in [
-        murko_results.x_dists_mm,
-        murko_results.y_dists_mm,
-        murko_results.omegas,
-        murko_results.uuids,
-    ]:
-        assert isinstance(r, list)
-        assert len(r) == expected_left
+    assert isinstance(murko_results.results, list)
+    assert len(murko_results.results) == expected_left
 
 
 def test_when_results_filtered_then_smallest_x_kept(murko_results: MurkoResultsDevice):
@@ -532,9 +528,17 @@ def test_when_results_filtered_then_smallest_x_kept(murko_results: MurkoResultsD
     murko_results.omegas = [0, 10, 20, 30]
     murko_results.uuids = ["a", "b", "c", "d"]
 
-    murko_results.filter_outliers()
+    murko_results.results = [
+        MurkoResult(x_dist_mm=4, y_dist_mm=8, omega=0, uuid="a"),
+        MurkoResult(x_dist_mm=0, y_dist_mm=90, omega=10, uuid="b"),
+        MurkoResult(x_dist_mm=6, y_dist_mm=63, omega=20, uuid="c"),
+        MurkoResult(x_dist_mm=7, y_dist_mm=8, omega=30, uuid="d"),
+    ]
 
-    assert murko_results.x_dists_mm == [0]
-    assert murko_results.y_dists_mm == [90]
-    assert murko_results.omegas == [10]
-    assert murko_results.uuids == ["b"]
+    murko_results.filter_outliers()
+    assert len(murko_results.results) == 1
+    results = murko_results.results[0]
+    assert results.x_dist_mm == 0
+    assert results.y_dist_mm == 90
+    assert results.omega == 10
+    assert results.uuid == "b"

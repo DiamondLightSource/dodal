@@ -202,7 +202,7 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
         LOGGER.info(
             f"Worst {self.NUMBER_OF_WRONG_RESULTS_TO_LOG} murko results were {worst_results}"
         )
-        cutoff = min(1, int(len(sorted_results) * self.PERCENTAGE_TO_USE / 100))
+        cutoff = max(1, int(len(sorted_results) * self.PERCENTAGE_TO_USE / 100))
         smallest_x = sorted_results[:cutoff]
         self.results = smallest_x
         LOGGER.info(f"Number of results after filtering: {len(self.results)}")
