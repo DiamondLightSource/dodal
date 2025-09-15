@@ -8,12 +8,13 @@ Proposed
 
 ## Context
 
-Some beamlines have multiple endstations with shared hardware in the optics or experiment hutch, and could potentially be trying to control it at the same time. Any device in the common hutch should only be fully controlled by one endstation at a time - the one that is taking data - but still be readable from the other endstations.
+Some beamlines have multiple endstations with shared hardware in the optics or experiment hutch, and could potentially be trying to control it at the same time. Any device in the common hutch should only be fully controlled by one endstation at a time - the one that is taking data - but still be readable from the other endstations. Additionally, it is desirable to reduce device configuration as much as possible.
 
 ## Decision
 
-The current solution is to have a separate blueapi instance for the shared hutch in order to be able to control the access to all the devices defined there.
-For all hardware in the shared optics hutch, the architecture should follow this structure:
+Beamlines specific devices should be defined in `dodal/beamlines/iXX.py` and shared components between end stations should be defined in `dodal/beamlines/iXX_shared.py`. They should either have separate blueapi instances, or if not possible, a single blueapi instance which the base beamline module is imported with any additional beamline modules e.g `iXX_shared.py`.
+
+For all hardware in the shared optics hutch where access control is required, the architecture should follow this structure:
 
 - There is a base device in dodal that sends a REST call to the shared blueapi with plan and devices names, as well as the name of the endstation performing the call.
 - There are read-only versions of the shared devices in the endstation blueapi which inherit from the base device above and set up the request parameters.
