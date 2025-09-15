@@ -51,8 +51,7 @@ class HardUndulator(Undulator):
     A Hard X-ray Undulator-type insertion device, used to control photon emission at a
     given beam energy.
 
-    This class is currently identical to the base Undulator class, but exists to allow
-    future specialisation for hard X-ray undulators if required.
+    This class extends Undulator to allow future specialisation for hard X-ray undulators.
     """
 
     def __init__(
@@ -63,17 +62,15 @@ class HardUndulator(Undulator):
         poles: int | None = None,
         length: float | None = None,
     ) -> None:
-        """Constructor
-
+        """
         Args:
             prefix: PV prefix
             id_gap_lookup_table_path: Path to lookup table for gap vs energy
-            name (str, optional): Name for device. Defaults to ""
-            poles (int): Number of magnetic poles built into the undulator
-            length (float): Length of the undulator in meters.
+            name: Name for device. Defaults to ""
+            poles: Number of magnetic poles built into the undulator
+            length: Length of the undulator in meters.
         """
         with self.add_children_as_readables():
-            # Additional signals specific to HardUndulator
             self.order_signal = soft_signal_rw(int, initial_value=3)
             self.undulator_period, _ = soft_signal_r_and_setter(int, initial_value=27)
             self.gap_offset, _ = soft_signal_r_and_setter(float, initial_value=0.0)
@@ -85,15 +82,16 @@ class HardUndulator(Undulator):
             poles=poles,
             length=length,
         )
+        # self._cached_lookup_table = None
 
     @AsyncStatus.wrap
     async def set(self, value: float, order: int = 3):
         """
-        Set the undulator gap to a given energy in keV and harmonic order
+        Set the undulator gap to a given energy in keV and harmonic order.
 
         Args:
-            value (float): energy in keV
-            order (int): harmonic order, defaults to 3
+            value: energy in keV
+            order: harmonic order, defaults to 3
         """
         await self.check_energy_limits(value, order)
         await self.order_signal.set(order)
@@ -101,9 +99,9 @@ class HardUndulator(Undulator):
 
     async def check_energy_limits(self, value: float, order: int):
         min_energy, max_energy = await self.get_min_max_energy_for_order(order)
-        if value < min_energy or value > max_energy:
+        if not (min_energy <= value <= max_energy):
             raise ValueError(
-                f"Energy {value}keV is out of range for order {order} in the lookup table"
+                f"Energy {value}keV is out of range for order {order} ({min_energy}-{max_energy} keV)"
             )
 
     async def _get_gap_to_match_energy(self, energy_kev: float) -> float:
@@ -111,43 +109,50 @@ class HardUndulator(Undulator):
         Asynchronously calculates the undulator gap required to match a specified energy.
 
         Args:
-            energy_kev (float): The target energy in keV for which the undulator gap should be matched.
+            energy_kev: The target energy in keV.
 
         Returns:
-            float: The calculated undulator gap value corresponding to the specified energy.
+            The calculated undulator gap value.
 
         Raises:
             ValueError: If the specified energy is outside the allowed limits.
-
-        Notes:
-            - This method checks if the energy is within valid limits before calculation.
-            - The calculation uses a lookup table and considers the current undulator order, gap offset, and period.
         """
-        await self.check_energy_limits(energy_kev, await self.order_signal.get_value())
-        await self.update_cached_lookup_table()
+        order = await self.order_signal.get_value()
+        await self.check_energy_limits(energy_kev, order)
         return _get_gap_for_energy_order(
             energy_kev,
             look_up_table=self._cached_lookup_table,
-            order=await self.order_signal.get_value(),
+            order=order,
             gap_offset=await self.gap_offset.get_value(),
             undulator_period=await self.undulator_period.get_value(),
         )
 
     async def update_cached_lookup_table(self):
-        if not hasattr(self, "_cached_lookup_table"):
-            self._cached_lookup_table = await energy_distance_table(
-                self.id_gap_lookup_table_path, comments=LUT_COMMENTS
+        """
+        Force update of cached lookup table by reading lut file.
+
+        Raises:
+            RuntimeError: If the lookup table cannot be loaded.
+        """
+        self._cached_lookup_table = await energy_distance_table(
+            self.id_gap_lookup_table_path, comments=LUT_COMMENTS
+        )
+        if self._cached_lookup_table is None:
+            raise RuntimeError(
+                f"Failed to load lookup table from path {self.id_gap_lookup_table_path}"
             )
+        LOGGER.debug(f"Loaded lookup table:\n{self._cached_lookup_table}")
 
     async def get_min_max_energy_for_order(self, order: int) -> tuple[float, float]:
         """
         Get the minimum and maximum energies in keV for a given harmonic order from
-        the lookup table
+        the lookup table.
 
         Args:
-            order (int): harmonic order
+            order: harmonic order
+
         Returns:
-            tuple: (min energy, max energy) in keV
+            (min energy, max energy) in keV
         """
         if not hasattr(self, "_cached_lookup_table"):
             self._cached_lookup_table = await energy_distance_table(
@@ -157,10 +162,9 @@ class HardUndulator(Undulator):
             raise ValueError(
                 f"Order {order} is out of range for the lookup table, must be between 1 and {self._cached_lookup_table.shape[0] - 1}"
             )
+        min_energy = self._cached_lookup_table[order][3]
+        max_energy = self._cached_lookup_table[order][4]
         LOGGER.debug(
-            f"Min and max energies for order {order} are {self._cached_lookup_table[order][3]}keV and {self._cached_lookup_table[order][4]}keV respectively"
+            f"Min and max energies for order {order} are {min_energy}keV and {max_energy}keV respectively"
         )
-        return (
-            self._cached_lookup_table[order][3],
-            self._cached_lookup_table[order][4],
-        )
+        return min_energy, max_energy
