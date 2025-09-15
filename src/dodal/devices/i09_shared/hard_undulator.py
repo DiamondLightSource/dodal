@@ -82,7 +82,6 @@ class HardUndulator(Undulator):
             poles=poles,
             length=length,
         )
-        # self._cached_lookup_table = None
 
     @AsyncStatus.wrap
     async def set(self, value: float, order: int = 3):
