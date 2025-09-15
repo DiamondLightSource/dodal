@@ -1,0 +1,32 @@
+from os import fspath
+from os.path import join
+from pathlib import Path
+
+LOOKUP_TABLE_PATH = fspath(Path(__file__).parent)
+ID_ENERGY_2_GAP_CALIBRATIONS_CSV = join(
+    LOOKUP_TABLE_PATH, "IDEnergy2GapCalibrations.csv"
+)
+ID_ENERGY_2_PHASE_CALIBRATIONS_CSV = join(
+    LOOKUP_TABLE_PATH, "IDEnergy2PhaseCalibrations.csv"
+)
+EXPECTED_ID_ENERGY_2_GAP_CALIBRATIONS_IDD_PKL = join(
+    LOOKUP_TABLE_PATH, "expectedIDEnergy2GapCalibrationsIdd.pkl"
+)
+EXPECTED_ID_ENERGY_2_GAP_CALIBRATIONS_IDU_PKL = join(
+    LOOKUP_TABLE_PATH, "expectedIDEnergy2GapCalibrationsIdu.pkl"
+)
+EXPECTED_ID_ENERGY_2_PHASE_CALIBRATIONS_IDD_PKL = join(
+    LOOKUP_TABLE_PATH, "expectedIDEnergy2PhaseCalibrationsidd.pkl"
+)
+EXPECTED_ID_ENERGY_2_PHASE_CALIBRATIONS_IDU_PKL = join(
+    LOOKUP_TABLE_PATH, "expectedIDEnergy2PhaseCalibrationsidu.pkl"
+)
+__all__ = [
+    "LOOKUP_TABLE_PATH",
+    "ID_ENERGY_2_GAP_CALIBRATIONS_CSV",
+    "ID_ENERGY_2_PHASE_CALIBRATIONS_CSV",
+    "EXPECTED_ID_ENERGY_2_GAP_CALIBRATIONS_IDD_PKL",
+    "EXPECTED_ID_ENERGY_2_GAP_CALIBRATIONS_IDU_PKL",
+    "EXPECTED_ID_ENERGY_2_PHASE_CALIBRATIONS_IDD_PKL",
+    "EXPECTED_ID_ENERGY_2_PHASE_CALIBRATIONS_IDU_PKL",
+]

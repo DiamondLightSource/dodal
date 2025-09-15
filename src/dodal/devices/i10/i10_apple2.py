@@ -69,7 +69,7 @@ class I10Apple2(Apple2):
         self,
         look_up_table_dir: str,
         source: tuple[str, str],
-        prefix: str = "",
+        prefix: str,
         mode: str = "Mode",
         min_energy: str = "MinEnergy",
         max_energy: str = "MaxEnergy",
@@ -97,11 +97,9 @@ class I10Apple2(Apple2):
             Name of the device
         """
 
-        energy_gap_table_path = Path(
-            look_up_table_dir + "IDEnergy2GapCalibrations.csv",
-        )
+        energy_gap_table_path = Path(look_up_table_dir, "IDEnergy2GapCalibrations.csv")
         energy_phase_table_path = Path(
-            look_up_table_dir + "IDEnergy2PhaseCalibrations.csv",
+            look_up_table_dir, "IDEnergy2PhaseCalibrations.csv"
         )
         # A dataclass contains the path to the look up table and the expected column names.
         self.lookup_table_config = LookupTableConfig(
@@ -124,7 +122,6 @@ class I10Apple2(Apple2):
                     btm_inner="RPQ3",
                     btm_outer="RPQ4",
                 ),
-                prefix=prefix,
                 name=name,
             )
             self.id_jaw_phase = UndulatorJawPhase(
