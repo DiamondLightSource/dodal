@@ -10,7 +10,7 @@ from dodal.devices.electron_analyser.abstract.types import (
     TLensMode,
     TPassEnergy,
 )
-from dodal.devices.electron_analyser.enums import EnergyMode
+from dodal.devices.electron_analyser.enums import EnergyMode, SelectedSource
 from dodal.devices.electron_analyser.util import to_binding_energy, to_kinetic_energy
 
 
@@ -63,7 +63,7 @@ class AbstractBaseRegion(
     enabled: bool = False
     slices: int = 1
     iterations: int = 1
-    excitation_energy_source: str = "source1"
+    excitation_energy_source: SelectedSource = SelectedSource.SOURCE1
     # These ones we need subclasses to provide default values
     lens_mode: TLensMode
     pass_energy: TPassEnergy
@@ -71,7 +71,7 @@ class AbstractBaseRegion(
     low_energy: float
     centre_energy: float
     high_energy: float
-    step_time: float
+    acquire_time: float
     energy_step: float  # in eV
     energy_mode: EnergyMode = EnergyMode.KINETIC
 
