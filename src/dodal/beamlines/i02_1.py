@@ -33,9 +33,7 @@ set_utils_beamline(BL)
 DAQ_CONFIGURATION_PATH = "/dls_sw/i02-1/software/daq_configuration"
 
 I02_1_ZEBRA_MAPPING = ZebraMapping(
-    outputs=ZebraTTLOutputs(
-        TTL_EIGER=2, TTL_XSPRESS3=3, TTL_FAST_SHUTTER=1, TTL_PILATUS=2
-    ),
+    outputs=ZebraTTLOutputs(TTL_EIGER=2, TTL_XSPRESS3=3, TTL_FAST_SHUTTER=1),
     sources=ZebraSources(),
 )
 
