@@ -9,7 +9,7 @@ class BacklightPosition(StandardReadable, Movable[InOutUpper]):
     """Device moves backlight to the IN or OUT position since controls side manages switching the light on/off"""
 
     def __init__(self, prefix: str, name: str = "") -> None:
-        self.position = epics_signal_rw(InOutUpper, prefix + "AD1:choiceButton")
+        self.position = epics_signal_rw(InOutUpper, f"{prefix}AD1:choiceButton")
         super().__init__(name)
 
     @AsyncStatus.wrap
