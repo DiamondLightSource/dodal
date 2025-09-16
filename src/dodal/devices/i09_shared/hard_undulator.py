@@ -117,12 +117,12 @@ class HardUndulator(Undulator):
         Raises:
             ValueError: If the specified energy is outside the allowed limits.
         """
-        current_order = await self.order.get_value()
-        await self.check_energy_limits(energy_kev, current_order)
+        _current_order = await self.order.get_value()
+        await self.check_energy_limits(energy_kev, _current_order)
         return _get_gap_for_energy_order(
             energy_kev,
             look_up_table=self._cached_lookup_table,
-            order=current_order,
+            order=_current_order,
             gap_offset=await self.gap_offset.get_value(),
             undulator_period=await self.undulator_period.get_value(),
         )

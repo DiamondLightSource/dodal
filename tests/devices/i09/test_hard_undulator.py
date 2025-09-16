@@ -1,4 +1,6 @@
 import pytest
+from bluesky.plan_stubs import mv
+from bluesky.run_engine import RunEngine
 from ophyd_async.core import init_devices
 
 from dodal.devices.i09_shared.hard_undulator import HardUndulator
@@ -55,3 +57,24 @@ async def test_check_energy_limits(
     with pytest.raises(ValueError) as e:
         await hu.check_energy_limits(1.0, 3)
     assert str(e.value) == "Energy 1.0keV is out of range for order 3: (2.4-4.3 keV)"
+
+
+@pytest.mark.parametrize(
+    "energy, order, expected_gap",
+    [
+        (2.13, 1, 12.81),
+        (2.78, 3, 6.05),
+        (6.24, 5, 7.95),
+    ],
+)
+async def test_move_undulator(
+    hu: HardUndulator,
+    RE: RunEngine,
+    energy: float,
+    order: int,
+    expected_gap: float,
+):
+    RE(mv(hu, energy, order=order))
+    assert await hu.gap_motor.user_readback.get_value() == pytest.approx(
+        expected_gap, abs=0.01
+    )
