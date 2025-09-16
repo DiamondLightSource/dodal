@@ -10,9 +10,6 @@ from dodal.devices.synchrotron import Synchrotron
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
-# The path to the lookup table on the control system
-ID_LUT_PATH = "/IIDCalibrationTable.txt"
-
 BL = get_beamline_name("i09")
 PREFIX = BeamlinePrefix(BL)
 set_log_beamline(BL)
