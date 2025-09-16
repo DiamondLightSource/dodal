@@ -14,4 +14,4 @@ set_utils_beamline(BL)
 
 @device_factory()
 def synchrotron() -> Synchrotron:
-    return synchrotron()
+    return Synchrotron()
