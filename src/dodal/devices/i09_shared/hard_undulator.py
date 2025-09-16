@@ -9,12 +9,13 @@ from dodal.devices.undulator import Undulator
 from dodal.devices.util.lookup_tables import energy_distance_table
 from dodal.log import LOGGER
 
-LUT_COMMENTS = ["#", "Units", "ScannableNames", "ScannableUnits"]
+LUT_COMMENTS = ["#"]
+HU_SKIP_ROWS = 3
 
 
 def _get_gap_for_energy_order(
     energy_kev: float,
-    look_up_table: "np.ndarray",
+    look_up_table: dict[int, "np.ndarray"],
     order: int = 1,
     gap_offset: float = 0.0,
     undulator_period: int = 27,
@@ -71,7 +72,7 @@ class HardUndulator(Undulator):
             length: Length of the undulator in meters.
         """
         with self.add_children_as_readables():
-            self.order_signal = soft_signal_rw(int, initial_value=3)
+            self.order = soft_signal_rw(int, initial_value=3)
             self.undulator_period, _ = soft_signal_r_and_setter(int, initial_value=27)
             self.gap_offset, _ = soft_signal_r_and_setter(float, initial_value=0.0)
 
@@ -93,14 +94,14 @@ class HardUndulator(Undulator):
             order: harmonic order, defaults to 3
         """
         await self.check_energy_limits(value, order)
-        await self.order_signal.set(order)
+        await self.order.set(order)
         await self._set_undulator_gap(value)
 
     async def check_energy_limits(self, value: float, order: int):
         min_energy, max_energy = await self.get_min_max_energy_for_order(order)
         if not (min_energy <= value <= max_energy):
             raise ValueError(
-                f"Energy {value}keV is out of range for order {order} ({min_energy}-{max_energy} keV)"
+                f"Energy {value}keV is out of range for order {order}: ({min_energy}-{max_energy} keV)"
             )
 
     async def _get_gap_to_match_energy(self, energy_kev: float) -> float:
@@ -116,12 +117,12 @@ class HardUndulator(Undulator):
         Raises:
             ValueError: If the specified energy is outside the allowed limits.
         """
-        order = await self.order_signal.get_value()
-        await self.check_energy_limits(energy_kev, order)
+        current_order = await self.order.get_value()
+        await self.check_energy_limits(energy_kev, current_order)
         return _get_gap_for_energy_order(
             energy_kev,
             look_up_table=self._cached_lookup_table,
-            order=order,
+            order=current_order,
             gap_offset=await self.gap_offset.get_value(),
             undulator_period=await self.undulator_period.get_value(),
         )
@@ -133,13 +134,21 @@ class HardUndulator(Undulator):
         Raises:
             RuntimeError: If the lookup table cannot be loaded.
         """
-        self._cached_lookup_table = await energy_distance_table(
-            self.id_gap_lookup_table_path, comments=LUT_COMMENTS
+        _lookup_table = await energy_distance_table(
+            self.id_gap_lookup_table_path,
+            comments=LUT_COMMENTS,
+            skiprows=HU_SKIP_ROWS,
         )
-        if self._cached_lookup_table is None:
+        if _lookup_table is None:
             raise RuntimeError(
                 f"Failed to load lookup table from path {self.id_gap_lookup_table_path}"
             )
+
+        # cache the lookup table as a dictionary keyed on the order
+        self._cached_lookup_table = {}
+        for i in range(_lookup_table.shape[0]):
+            self._cached_lookup_table[_lookup_table[i][0]] = _lookup_table[i]
+
         LOGGER.debug(f"Loaded lookup table:\n{self._cached_lookup_table}")
 
     async def get_min_max_energy_for_order(self, order: int) -> tuple[float, float]:
@@ -154,12 +163,10 @@ class HardUndulator(Undulator):
             (min energy, max energy) in keV
         """
         if not hasattr(self, "_cached_lookup_table"):
-            self._cached_lookup_table = await energy_distance_table(
-                self.id_gap_lookup_table_path, comments=LUT_COMMENTS
-            )
-        if order < 1 or order >= self._cached_lookup_table.shape[0]:
+            await self.update_cached_lookup_table()
+        if order not in self._cached_lookup_table.keys():
             raise ValueError(
-                f"Order {order} is out of range for the lookup table, must be between 1 and {self._cached_lookup_table.shape[0] - 1}"
+                f"Order {order} not found in lookup table, must be between {min(self._cached_lookup_table.keys())} and {max(self._cached_lookup_table.keys())}"
             )
         min_energy = self._cached_lookup_table[order][3]
         max_energy = self._cached_lookup_table[order][4]

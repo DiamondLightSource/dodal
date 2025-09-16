@@ -1,6 +1,6 @@
 #I09 Hard X-ray ID calibration parameters for I09 undulator
-#ScannableNames	n	Ee	Br	Epmin	Epmax	Gmin	Gmax	Goffset
-#ScannableUnits	ONE	GeV	T	KeV	Kev	mm	mm
+ScannableNames	n	Ee	Br	Epmin	Epmax	Gmin	Gmax	Goffset
+ScannableUnits	ONE	GeV	T	KeV	Kev	mm	mm
 1	3.00089	0.98928	2.12	3.05	14.2650	23.7200	0.0
 2	3.04129	1.02504	2.50	2.80	5.05165	8.88007	0.0
 3	3.05798	1.03065	2.40	4.30	5.20000	8.99036	0.0
