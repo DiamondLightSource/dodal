@@ -1,9 +1,10 @@
+import asyncio
 from abc import ABC, abstractmethod
 from typing import Generic, TypeVar
 
 import numpy as np
-from bluesky.plan_stubs import mv
-from bluesky.protocols import Flyable
+from bluesky.plan_stubs import prepare
+from bluesky.protocols import Flyable, Preparable
 from numpy import ndarray
 from ophyd_async.core import (
     AsyncStatus,
@@ -13,6 +14,7 @@ from ophyd_async.core import (
     SignalRW,
     StandardReadable,
     derived_signal_r,
+    set_and_wait_for_value,
     soft_signal_r_and_setter,
     wait_for_value,
 )
@@ -190,7 +192,9 @@ class MotionProgram(Device):
             self.program_number = soft_signal_r_and_setter(float, -1)[0]
 
 
-class FastGridScanCommon(StandardReadable, Flyable, ABC, Generic[ParamType]):
+class FastGridScanCommon(
+    StandardReadable, Flyable, ABC, Preparable, Generic[ParamType]
+):
     """Device containing the minimal signals for a general fast grid scan.
 
     When the motion program is started, the goniometer will move in a snake-like grid trajectory,
@@ -217,6 +221,11 @@ class FastGridScanCommon(StandardReadable, Flyable, ABC, Generic[ParamType]):
         # once https://github.com/DiamondLightSource/mx-bluesky/issues/1203 is done
         self.scan_invalid = self._create_scan_invalid_signal(prefix)
 
+        self.x_scan_valid = epics_signal_r(float, f"{prefix}X_SCAN_VALID")
+        self.y_scan_valid = epics_signal_r(float, f"{prefix}Y_SCAN_VALID")
+        self.z_scan_valid = epics_signal_r(float, f"{prefix}Z_SCAN_VALID")
+        self.scan_invalid = epics_signal_r(float, f"{prefix}SCAN_INVALID")
+
         self.run_cmd = epics_signal_x(f"{prefix}RUN.PROC")
         self.stop_cmd = epics_signal_x(f"{prefix}STOP.PROC")
         self.status = epics_signal_r(int, f"{prefix}SCAN_STATUS")
@@ -231,6 +240,7 @@ class FastGridScanCommon(StandardReadable, Flyable, ABC, Generic[ParamType]):
         self.KICKOFF_TIMEOUT: float = 5.0
 
         self.COMPLETE_STATUS: float = 60.0
+        self.VALIDITY_CHECK_TIMEOUT = 0.5
 
         self.movable_params: dict[str, Signal] = {
             "x_steps": self.x_steps,
@@ -283,6 +293,43 @@ class FastGridScanCommon(StandardReadable, Flyable, ABC, Generic[ParamType]):
     def _create_motion_program(
         self, motion_controller_prefix: str
     ) -> MotionProgram: ...
+
+    @AsyncStatus.wrap
+    async def prepare(self, value: ParamType):
+        set_statuses = []
+
+        LOGGER.info("Applying gridscan parameters...")
+        # Create arguments for bps.mv
+        for key, signal in self.movable_params.items():
+            param_value = value.__dict__[key]
+            set_statuses.append(await set_and_wait_for_value(signal, param_value))  # type: ignore
+
+        # Counter should always start at 0
+        set_statuses.append(await set_and_wait_for_value(self.position_counter, 0))
+
+        LOGGER.info("Gridscan parameters applied, waiting for readbacks to update...")
+
+        # wait for parameter readbacks to update
+        await asyncio.gather(*set_statuses)
+
+        LOGGER.info("Readbacks confirmed, waiting for validity checks to pass...")
+        # XXX Can we use x/y/z scan valid to distinguish between SampleException/pin invalid
+        # and other non-sample-related errors?
+        check_tasks = []
+        for signal, expected_value in {
+            self.x_scan_valid: 1,
+            self.y_scan_valid: 1,
+            self.z_scan_valid: 1,
+            self.scan_invalid: 0,
+        }.items():
+            check_tasks.append(
+                wait_for_value(
+                    signal, expected_value, timeout=self.VALIDITY_CHECK_TIMEOUT
+                )
+            )
+
+        await asyncio.gather(*check_tasks)
+        LOGGER.info("Gridscan validity confirmed, gridscan is now prepared.")
 
 
 class FastGridScanThreeD(FastGridScanCommon[ParamType]):
@@ -387,13 +434,4 @@ class PandAFastGridScan(FastGridScanThreeD[PandAGridScanParams]):
 
 
 def set_fast_grid_scan_params(scan: FastGridScanCommon[ParamType], params: ParamType):
-    to_move = []
-
-    # Create arguments for bps.mv
-    for key in scan.movable_params.keys():
-        to_move.extend([scan.movable_params[key], params.__dict__[key]])
-
-    # Counter should always start at 0
-    to_move.extend([scan.position_counter, 0])
-
-    yield from mv(*to_move)
+    yield from prepare(scan, params, wait=True)

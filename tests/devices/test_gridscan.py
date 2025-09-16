@@ -1,7 +1,8 @@
+import asyncio
 from asyncio import wait_for
 from contextlib import nullcontext
 from dataclasses import dataclass
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock, call, patch
 
 import numpy as np
 import pytest
@@ -10,7 +11,7 @@ from bluesky import preprocessors as bpp
 from bluesky.run_engine import RunEngine
 from ophyd.status import DeviceStatus, Status
 from ophyd_async.core import init_devices
-from ophyd_async.testing import get_mock_put, set_mock_value
+from ophyd_async.testing import get_mock_put, set_mock_put_proceeds, set_mock_value
 
 from dodal.devices.fast_grid_scan import (
     FastGridScanCommon,
@@ -38,6 +39,9 @@ async def zebra_fast_grid_scan():
     async with init_devices(mock=True):
         zebra_fast_grid_scan = ZebraFastGridScanThreeD(name="fake_FGS", prefix="FGS")
 
+    set_mock_value(zebra_fast_grid_scan.x_scan_valid, 1)
+    set_mock_value(zebra_fast_grid_scan.y_scan_valid, 1)
+    set_mock_value(zebra_fast_grid_scan.z_scan_valid, 1)
     return zebra_fast_grid_scan
 
 
@@ -46,6 +50,9 @@ async def panda_fast_grid_scan():
     async with init_devices(mock=True):
         panda_fast_grid_scan = PandAFastGridScan(name="fake_PGS", prefix="PGS")
 
+    set_mock_value(panda_fast_grid_scan.x_scan_valid, 1)
+    set_mock_value(panda_fast_grid_scan.y_scan_valid, 1)
+    set_mock_value(panda_fast_grid_scan.z_scan_valid, 1)
     return panda_fast_grid_scan
 
 
@@ -392,3 +399,100 @@ async def test_i02_1_gridscan_has_2d_behaviour(
     set_mock_value(zebra_fast_grid_scan_2d.x_steps, 5)
     set_mock_value(zebra_fast_grid_scan_2d.y_steps, 4)
     assert await zebra_fast_grid_scan_2d.expected_images.get_value() == 20
+
+
+# TODO check all signals, parametrize for Panda
+async def test_gridscan_prepare_writes_values_and_checks_readback(
+    zebra_fast_grid_scan: ZebraFastGridScan,
+    zebra_grid_scan_params: ZebraGridScanParams,
+):
+    params = zebra_grid_scan_params
+    for signal, value in {
+        zebra_fast_grid_scan.x_scan_valid: 1,
+        zebra_fast_grid_scan.y_scan_valid: 1,
+        zebra_fast_grid_scan.z_scan_valid: 1,
+        zebra_fast_grid_scan.scan_invalid: 0,
+    }.items():
+        set_mock_value(signal, value)
+
+    signals_to_check = [zebra_fast_grid_scan.x_steps, zebra_fast_grid_scan.y_steps]
+    for signal in signals_to_check:
+        set_mock_put_proceeds(signal, False)
+
+    status = zebra_fast_grid_scan.prepare(params)
+
+    for signal in signals_to_check:
+        put = get_mock_put(signal)
+        assert not status.done
+        while True:
+            if len(put.mock_calls) > 0:
+                put.assert_called_once_with(
+                    zebra_grid_scan_params.__dict__[
+                        signal.name[signal.name.rfind("-") + 1 :]
+                    ],
+                    wait=True,
+                )
+                break
+            await asyncio.sleep(0.1)
+        set_mock_put_proceeds(signal, True)
+
+    await status
+    assert status.done
+
+
+async def test_gridscan_prepare_checks_validity_after_writes(
+    zebra_fast_grid_scan: ZebraFastGridScan, zebra_grid_scan_params: ZebraGridScanParams
+):
+    parent = MagicMock()
+    expected_signals_to_set = {}
+
+    for key in zebra_grid_scan_params.__dict__.keys():
+        if signal := getattr(zebra_fast_grid_scan, key, None):
+            expected_signals_to_set[key] = signal
+
+    for key, signal in expected_signals_to_set.items():
+        parent.attach_mock(get_mock_put(signal), key)
+
+    checked_signals = {
+        zebra_fast_grid_scan.x_scan_valid: 1,
+        zebra_fast_grid_scan.y_scan_valid: 1,
+        zebra_fast_grid_scan.z_scan_valid: 1,
+        zebra_fast_grid_scan.scan_invalid: 0,
+    }
+    for signal, expected_value in checked_signals.items():
+        set_mock_value(signal, 0 if expected_value else 1)
+
+    status = zebra_fast_grid_scan.prepare(zebra_grid_scan_params)
+    await asyncio.sleep(0.1)
+    assert not status.done
+    for key in expected_signals_to_set:
+        parent.assert_has_calls(
+            [getattr(call, key)(zebra_grid_scan_params.__dict__[key], wait=True)]
+        )
+
+    for signal, expected_value in checked_signals.items():
+        set_mock_value(signal, expected_value)
+
+    await status
+
+
+async def test_gridscan_prepare_times_out_for_validity_check(
+    zebra_fast_grid_scan: ZebraFastGridScan, zebra_grid_scan_params: ZebraGridScanParams
+):
+    checked_signals = {
+        zebra_fast_grid_scan.x_scan_valid: 1,
+        zebra_fast_grid_scan.y_scan_valid: 1,
+        zebra_fast_grid_scan.z_scan_valid: 1,
+        zebra_fast_grid_scan.scan_invalid: 0,
+    }
+    for signal, expected_value in checked_signals.items():
+        if signal.name != "fake_FGS-scan_invalid":
+            set_mock_value(signal, 0 if expected_value else 1)
+
+    status = zebra_fast_grid_scan.prepare(zebra_grid_scan_params)
+
+    with pytest.raises(
+        TimeoutError,
+        match="fake_FGS-x_scan_valid didn't match 1 in 0.5s, last value 0.0",
+    ):
+        await status
