@@ -52,7 +52,7 @@ class HardUndulator(Undulator):
     A Hard X-ray Undulator-type insertion device, used to control photon emission at a
     given beam energy.
 
-    This class extends Undulator to allow future specialisation for hard X-ray undulators.
+    This class extends Undulator and adds specialisation for hard X-ray undulators.
     """
 
     def __init__(
