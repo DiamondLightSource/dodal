@@ -134,7 +134,7 @@ class PinholeCollimatorControl(StandardReadable, Movable[PinColRequest | str]):
         LOGGER.info(
             f"Moving pinhole and collimator stages to in position: {value.value}"
         )
-        await self.mapt.configuration.select_config.set(value)
+        await self.mapt.configuration.select_config.set(value, wait=True)
         # NOTE. The apply PV will not be used here unless fixed in controls first.
         # This is to avoid collisions. A safe move in will move first the pinhole stage
         # and then the collimator stage, but apply will try to move all the motors
