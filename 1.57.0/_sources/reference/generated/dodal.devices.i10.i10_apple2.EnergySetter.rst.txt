@@ -1,0 +1,43 @@
+dodal.devices.i10.i10\_apple2.EnergySetter
+==========================================
+
+.. currentmodule:: dodal.devices.i10.i10_apple2
+
+.. autoclass:: EnergySetter
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~EnergySetter.set
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

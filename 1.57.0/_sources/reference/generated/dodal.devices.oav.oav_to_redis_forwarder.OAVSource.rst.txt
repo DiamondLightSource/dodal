@@ -1,0 +1,40 @@
+dodal.devices.oav.oav\_to\_redis\_forwarder.OAVSource
+=====================================================
+
+.. currentmodule:: dodal.devices.oav.oav_to_redis_forwarder
+
+.. autoclass:: OAVSource
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

@@ -1,0 +1,78 @@
+dodal.devices.i09.PsuMode
+=========================
+
+.. currentmodule:: dodal.devices.i09
+
+.. autoclass:: PsuMode
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~PsuMode.HIGH
+      
+      
+      ~PsuMode.LOW
+      
+   
+   

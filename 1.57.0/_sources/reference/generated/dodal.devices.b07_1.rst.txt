@@ -1,0 +1,39 @@
+dodal.devices.b07\_1
+====================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~b07_1.Grating
+   ~b07_1.LensMode
+   ~b07_1.ChannelCutMonochromator
+   ~b07_1.ChannelCutMonochromatorPositions
+
+
+
+
+.. automodule:: dodal.devices.b07_1
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
