@@ -15,6 +15,7 @@ from dodal.common.crystal_metadata import (
     make_crystal_metadata_from_material,
 )
 from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitPathProvider
+from dodal.devices.areadetector import PressureJumpCellDetector
 from dodal.devices.focusing_mirror import FocusingMirror
 from dodal.devices.i22.dcm import DCM
 from dodal.devices.i22.fswitch import FSwitch
@@ -208,4 +209,15 @@ def high_pressure_xray_cell() -> PressureJumpCell:
         f"{PREFIX.beamline_prefix}-EA",
         cell_prefix="-HPXC-01:",
         adc_prefix="-ADC",
+    )
+
+
+@device_factory()
+def high_pressure_xray_cell_adc() -> PressureJumpCellDetector:
+    """high_pressure_xray_cell_adc"""
+    return PressureJumpCellDetector(
+        f"{PREFIX.beamline_prefix}-EA-HPXC-01:",
+        path_provider=get_path_provider(),
+        adc_trig_suffix="TRIG:",
+        drv_suffix="CAM:",
     )
