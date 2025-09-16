@@ -13,7 +13,7 @@ LUT_COMMENTS = ["#"]
 HU_SKIP_ROWS = 3
 
 
-def _get_gap_for_energy_order(
+def calculate_gap(
     energy_kev: float,
     look_up_table: dict[int, "np.ndarray"],
     order: int = 1,
@@ -129,7 +129,7 @@ class HardUndulator(Undulator):
         """
         _current_order = await self.order.get_value()
         await self.check_energy_limits(energy_kev, _current_order)
-        return _get_gap_for_energy_order(
+        return calculate_gap(
             energy_kev,
             look_up_table=self._cached_lookup_table,
             order=_current_order,

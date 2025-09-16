@@ -1,11 +1,12 @@
 import re
-from unittest.mock import MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import numpy as np
 import pytest
 from bluesky.plan_stubs import mv
 from bluesky.run_engine import RunEngine
 from ophyd_async.core import init_devices
+from ophyd_async.testing import set_mock_value
 
 from dodal.devices.i09_shared.hard_undulator import HardUndulator
 from dodal.testing.setup import patch_all_motors
@@ -64,7 +65,7 @@ async def test_check_energy_limits(
 
 
 @patch("dodal.devices.i09_shared.hard_undulator.energy_distance_table")
-async def test_update_cached_lookup_table(
+async def test_update_cached_lookup_table_fails(
     mock_table: MagicMock,
     hu: HardUndulator,
 ):
@@ -74,6 +75,19 @@ async def test_update_cached_lookup_table(
         match=re.escape("Failed to load lookup table from path"),
     ):
         await hu.update_cached_lookup_table()
+
+
+async def test_get_gap_for_energy_fails(
+    hu: HardUndulator,
+):
+    await hu.update_cached_lookup_table()
+    hu.check_energy_limits = AsyncMock()
+    set_mock_value(hu.order, 1)
+    with pytest.raises(
+        ValueError,
+        match=re.escape("k_squared must be positive"),
+    ):
+        await hu._get_gap_to_match_energy(30.0)
 
 
 @pytest.mark.parametrize(
