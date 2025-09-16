@@ -1,12 +1,8 @@
 import pytest
-from ophyd_async.core import InOut, StrictEnum, init_devices
+from ophyd_async.core import init_devices
 
+from dodal.common.enums import InOutUpper
 from dodal.devices.i19.backlight import BacklightPosition
-
-
-class InOutUpper(StrictEnum):
-    IN = "IN"
-    OUT = "OUT"
 
 
 @pytest.fixture
