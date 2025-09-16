@@ -33,7 +33,7 @@ def mg_kalpha_source() -> LabXraySourceReadable:
 # Connect will work again after this work completed
 # https://jira.diamond.ac.uk/browse/P60-13
 @device_factory()
-def vgscienta() -> VGScientaDetector[LensMode, PsuMode, PassEnergy]:
+def r4000() -> VGScientaDetector[LensMode, PsuMode, PassEnergy]:
     energy_sources = {
         SelectedSource.SOURCE1: al_kalpha_source().energy_ev,
         SelectedSource.SOURCE2: mg_kalpha_source().energy_ev,
