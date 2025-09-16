@@ -11,7 +11,6 @@ from dodal.devices.i24.beamstop import Beamstop
 from dodal.devices.i24.dcm import DCM
 from dodal.devices.i24.dual_backlight import DualBacklight
 from dodal.devices.i24.focus_mirrors import FocusMirrorsMode
-from dodal.devices.i24.pilatus_metadata import PilatusMetadata
 from dodal.devices.i24.pmac import PMAC
 from dodal.devices.i24.vgonio import VerticalGoniometer
 from dodal.devices.motors import YZStage
@@ -187,22 +186,4 @@ def eiger_beam_center() -> DetectorBeamCenter:
     return DetectorBeamCenter(
         f"{PREFIX.beamline_prefix}-EA-EIGER-01:CAM:",
         "eiger_bc",
-    )
-
-
-@device_factory()
-def pilatus_beam_center() -> DetectorBeamCenter:
-    """A device for setting/reading the beamcenter from the pilatus on i24."""
-    return DetectorBeamCenter(
-        f"{PREFIX.beamline_prefix}-EA-PILAT-01:cam1:",
-        "pilatus_bc",
-    )
-
-
-@device_factory()
-def pilatus_metadata() -> PilatusMetadata:
-    """A small pilatus driver device for figuring out the filename template."""
-    return PilatusMetadata(
-        f"{PREFIX.beamline_prefix}-EA-PILAT-01:",
-        "pilatus_meta",
     )
