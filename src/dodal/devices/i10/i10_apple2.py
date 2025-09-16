@@ -34,6 +34,7 @@ MAXIMUM_ROW_PHASE_MOTOR_POSITION = 24.0
 MAXIMUM_GAP_MOTOR_POSITION = 100
 DEFAULT_JAW_PHASE_POLY_PARAMS = [1.0 / 7.5, -120.0 / 7.5]
 ALPHA_OFFSET = 180
+MAXIMUM_MOVE_TIME = 200  # slowest possible move(closing ID from open to min)
 
 
 # data class to store the lookup table configuration that is use in convert_csv_to_lookup
@@ -250,7 +251,8 @@ class I10Apple2Pol(StandardReadable, Movable[Pol]):
     @AsyncStatus.wrap
     async def set(self, value: Pol) -> None:
         LOGGER.info(f"Changing f{self.name} polarisation to {value}.")
-        await self.id_ref().polarisation.set(value)
+        # Timeout is determined internally by the set method later, so we set it to max here.
+        await self.id_ref().polarisation.set(value, timeout=MAXIMUM_MOVE_TIME)
 
 
 class LinearArbitraryAngle(StandardReadable, Movable[SupportsFloat]):
