@@ -64,8 +64,6 @@ async def test_pincol_get_motor_positions_for_requested_aperture(
 
     assert isinstance(positions, AperturePosition)
 
-    assert await pincol.mapt.configuration.select_config.get_value() == ap_request
-
     assert positions.pinhole_x == in_positions[0]
     assert positions.pinhole_y == in_positions[1]
     assert positions.collimator_x == in_positions[2]
@@ -134,6 +132,8 @@ async def test_move_in(
     )
 
     await pincol.set(ap_request)
+
+    assert await pincol.mapt.configuration.select_config.get_value() == ap_request
 
     assert await pincol.pinhole.x.user_readback.get_value() == in_positions[0]
     assert await pincol.pinhole.y.user_readback.get_value() == in_positions[1]
