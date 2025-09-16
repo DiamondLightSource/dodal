@@ -3,10 +3,9 @@ from pathlib import Path, PurePath
 from unittest.mock import patch
 
 import pytest
-from bluesky.run_engine import RunEngine
 from ophyd_async.core import PathProvider, StandardDetector, init_devices
 from ophyd_async.sim import PatternGenerator, SimBlobDetector, SimMotor
-from tests.devices.unit_tests.test_data import (
+from tests.devices.test_data import (
     TEST_BEAMLINE_UNDULATOR_TO_GAP_LUT,
 )
 
@@ -33,11 +32,7 @@ async def mock_undulator_and_dcm() -> UndulatorGapCheckDevices:
 
 
 @pytest.fixture
-def det(
-    RE: RunEngine,
-    tmp_path: Path,
-    path_provider,
-) -> StandardDetector:
+def det(tmp_path: Path, path_provider) -> StandardDetector:
     class DevNullPatternGenerator(PatternGenerator):
         def __init__(self, sleep=asyncio.sleep):
             super().__init__(sleep)
@@ -70,14 +65,14 @@ def det(
 
 
 @pytest.fixture
-def x_axis(RE: RunEngine) -> SimMotor:
+def x_axis() -> SimMotor:
     with init_devices(mock=True):
         x_axis = SimMotor()
     return x_axis
 
 
 @pytest.fixture
-def y_axis(RE: RunEngine) -> SimMotor:
+def y_axis() -> SimMotor:
     with init_devices(mock=True):
         y_axis = SimMotor()
     return y_axis

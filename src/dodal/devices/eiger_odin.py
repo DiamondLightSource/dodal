@@ -7,6 +7,7 @@ from ophyd.sim import NullStatus
 from ophyd.status import StatusBase, SubscriptionStatus
 
 from dodal.devices.status import await_value
+from dodal.log import LOGGER
 
 
 class EigerFan(Device):
@@ -167,6 +168,7 @@ class EigerOdin(Device):
 
     def stop(self) -> StatusBase:
         """Stop odin manually"""
+        LOGGER.info("Stopping Odin...")
         status = self.file_writer.capture.set(0)
         status &= self.meta.stop_writing.set(1)
         return status
