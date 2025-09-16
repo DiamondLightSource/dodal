@@ -5,7 +5,6 @@ from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beam
 from dodal.devices.electron_analyser import SelectedSource
 from dodal.devices.electron_analyser.vgscienta import VGScientaAnalyserDriverIO
 from dodal.devices.i09 import DCM, Grating, LensMode, PassEnergy, PsuMode
-from dodal.devices.i09_shared import HardUndulator
 from dodal.devices.pgm import PGM
 from dodal.devices.synchrotron import Synchrotron
 from dodal.log import set_beamline as set_log_beamline
@@ -23,13 +22,6 @@ set_utils_beamline(BL)
 @device_factory()
 def synchrotron() -> Synchrotron:
     return Synchrotron()
-
-
-@device_factory()
-def undulator() -> HardUndulator:
-    return HardUndulator(
-        f"{PREFIX.insertion_prefix}-MO-SERVC-01:", id_gap_lookup_table_path=ID_LUT_PATH
-    )
 
 
 @device_factory()

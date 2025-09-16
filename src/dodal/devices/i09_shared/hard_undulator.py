@@ -98,6 +98,16 @@ class HardUndulator(Undulator):
         await self._set_undulator_gap(value)
 
     async def check_energy_limits(self, value: float, order: int):
+        """
+        Asynchronously checks if the specified energy value is within the allowed limits for a given undulator order.
+
+        Args:
+            value (float): The energy value in keV to check.
+            order (int): The undulator harmonic order for which to check the energy limits.
+
+        Raises:
+            ValueError: If the energy value is outside the allowed range for the specified order.
+        """
         min_energy, max_energy = await self.get_min_max_energy_for_order(order)
         if not (min_energy <= value <= max_energy):
             raise ValueError(
@@ -134,12 +144,12 @@ class HardUndulator(Undulator):
         Raises:
             RuntimeError: If the lookup table cannot be loaded.
         """
-        _lookup_table = await energy_distance_table(
+        _lookup_table: np.ndarray = await energy_distance_table(
             self.id_gap_lookup_table_path,
             comments=LUT_COMMENTS,
             skiprows=HU_SKIP_ROWS,
         )
-        if _lookup_table is None:
+        if _lookup_table.size == 0:
             raise RuntimeError(
                 f"Failed to load lookup table from path {self.id_gap_lookup_table_path}"
             )

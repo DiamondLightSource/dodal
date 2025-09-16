@@ -1,3 +1,7 @@
+import re
+from unittest.mock import MagicMock, patch
+
+import numpy as np
 import pytest
 from bluesky.plan_stubs import mv
 from bluesky.run_engine import RunEngine
@@ -57,6 +61,19 @@ async def test_check_energy_limits(
     with pytest.raises(ValueError) as e:
         await hu.check_energy_limits(1.0, 3)
     assert str(e.value) == "Energy 1.0keV is out of range for order 3: (2.4-4.3 keV)"
+
+
+@patch("dodal.devices.i09_shared.hard_undulator.energy_distance_table")
+async def test_update_cached_lookup_table(
+    mock_table: MagicMock,
+    hu: HardUndulator,
+):
+    mock_table.return_value = np.empty(0)
+    with pytest.raises(
+        RuntimeError,
+        match=re.escape("Failed to load lookup table from path"),
+    ):
+        await hu.update_cached_lookup_table()
 
 
 @pytest.mark.parametrize(
