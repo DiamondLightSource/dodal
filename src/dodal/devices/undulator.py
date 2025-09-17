@@ -5,6 +5,7 @@ from bluesky.protocols import Movable
 from numpy import ndarray
 from ophyd_async.core import (
     AsyncStatus,
+    Reference,
     StandardReadable,
     StandardReadableFormat,
     soft_signal_r_and_setter,
@@ -15,16 +16,12 @@ from ophyd_async.epics.motor import Motor
 from dodal.common.enums import EnabledDisabledUpper
 from dodal.log import LOGGER
 
+from .baton import Baton
 from .util.lookup_tables import energy_distance_table
 
 
 class AccessError(Exception):
     pass
-
-
-# Enable to allow testing when the beamline is down, do not change in production!
-TEST_MODE = False
-# will be made more generic in https://github.com/DiamondLightSource/dodal/issues/754
 
 
 # The acceptable difference, in mm, between the undulator gap and the DCM
@@ -54,6 +51,7 @@ class Undulator(StandardReadable, Movable[float]):
         name: str = "",
         poles: int | None = None,
         length: float | None = None,
+        baton: Baton | None = None,
     ) -> None:
         """Constructor
 
@@ -64,6 +62,7 @@ class Undulator(StandardReadable, Movable[float]):
             name (str, optional): Name for device. Defaults to "".
         """
 
+        self.baton_ref = Reference(baton) if baton else None
         self.id_gap_lookup_table_path = id_gap_lookup_table_path
         with self.add_children_as_readables():
             self.gap_motor = Motor(prefix + "BLGAPMTR")
@@ -105,7 +104,8 @@ class Undulator(StandardReadable, Movable[float]):
 
     async def raise_if_not_enabled(self):
         access_level = await self.gap_access.get_value()
-        if access_level is EnabledDisabledUpper.DISABLED and not TEST_MODE:
+        commissioning_mode = await self._is_commissioning_mode_enabled()
+        if access_level is EnabledDisabledUpper.DISABLED and not commissioning_mode:
             raise AccessError("Undulator gap access is disabled. Contact Control Room")
 
     async def _set_undulator_gap(self, energy_kev: float) -> None:
@@ -124,20 +124,24 @@ class Undulator(StandardReadable, Movable[float]):
                 f"Undulator gap mismatch. {difference:.3f}mm is outside tolerance.\
                 Moving gap to nominal value, {target_gap:.3f}mm"
             )
-            if not TEST_MODE:
+            commissioning_mode = await self._is_commissioning_mode_enabled()
+            if not commissioning_mode:
                 # Only move if the gap is sufficiently different to the value from the
-                # DCM lookup table AND we're not in TEST_MODE
+                # DCM lookup table AND we're not in commissioning mode
                 await self.gap_motor.set(
                     target_gap,
                     timeout=STATUS_TIMEOUT_S,
                 )
             else:
-                LOGGER.debug("In test mode, not moving ID gap")
+                LOGGER.warning("In test mode, not moving ID gap")
         else:
             LOGGER.debug(
                 "Gap is already in the correct place for the new energy value "
                 f"{energy_kev}, no need to ask it to move"
             )
+
+    async def _is_commissioning_mode_enabled(self):
+        return self.baton_ref and await self.baton_ref().commissioning.get_value()
 
     async def _get_gap_to_match_energy(self, energy_kev: float) -> float:
         """
