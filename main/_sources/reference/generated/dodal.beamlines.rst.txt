@@ -37,6 +37,7 @@
    dodal.beamlines.i22
    dodal.beamlines.i23
    dodal.beamlines.i24
+   dodal.beamlines.k07
    dodal.beamlines.k11
    dodal.beamlines.p38
    dodal.beamlines.p45
