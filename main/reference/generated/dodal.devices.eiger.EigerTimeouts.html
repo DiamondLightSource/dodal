@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.eiger.EigerTimeouts &#8212; dodal 1.58.1.dev2+g6e95c5618 documentation</title>
+    <title>dodal.devices.eiger.EigerTimeouts &#8212; dodal 1.58.1.dev3+gb2a3f9c28 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=f5f81188"></script>
+    <script src="../../_static/documentation_options.js?v=f7ade5df"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -977,7 +977,7 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="dodal.devices.eiger.EigerTimeouts">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dodal.devices.eiger.</span></span><span class="sig-name descname"><span class="pre">EigerTimeouts</span></span><a class="reference internal" href="../../_modules/dodal/devices/eiger.html#EigerTimeouts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.eiger.EigerTimeouts" title="Link to this definition">#</a></dt>
-<dd><p>EigerTimeouts(stale_params_timeout: int = 60, general_status_timeout: int = 10, meta_file_ready_timeout: int = 30, all_frames_timeout: int = 120, arming_timeout: int = 60)</p>
+<dd><p>EigerTimeouts(stale_params_timeout: int = 60, general_status_timeout: int = 10, meta_file_ready_timeout: int = 30, all_frames_timeout: int = 120, arming_timeout: int = 60, odin_stop_timeout: int = 30)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -986,6 +986,7 @@
 <li><p><strong>meta_file_ready_timeout</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">30</span></code>)</p></li>
 <li><p><strong>all_frames_timeout</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">120</span></code>)</p></li>
 <li><p><strong>arming_timeout</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">60</span></code>)</p></li>
+<li><p><strong>odin_stop_timeout</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">30</span></code>)</p></li>
 </ul>
 </dd>
 </dl>
@@ -1004,7 +1005,10 @@
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">meta_file_ready_timeout</span></code></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">stale_params_timeout</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">odin_stop_timeout</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">stale_params_timeout</span></code></p></td>
 <td><p></p></td>
 </tr>
 </tbody>

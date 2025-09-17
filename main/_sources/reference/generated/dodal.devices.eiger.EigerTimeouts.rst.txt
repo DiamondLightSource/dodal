@@ -29,6 +29,9 @@ dodal.devices.eiger.EigerTimeouts
       ~EigerTimeouts.meta_file_ready_timeout
       
       
+      ~EigerTimeouts.odin_stop_timeout
+      
+      
       ~EigerTimeouts.stale_params_timeout
       
    
