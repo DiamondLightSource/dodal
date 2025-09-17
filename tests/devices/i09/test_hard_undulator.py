@@ -105,7 +105,8 @@ async def test_move_undulator(
     order: int,
     expected_gap: float,
 ):
-    RE(mv(hu, energy, order=order))
+    await hu.set_order(order)
+    RE(mv(hu, energy))
     assert await hu.gap_motor.user_readback.get_value() == pytest.approx(
         expected_gap, abs=0.01
     )

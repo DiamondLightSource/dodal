@@ -85,17 +85,34 @@ class HardUndulator(Undulator):
         )
 
     @AsyncStatus.wrap
-    async def set(self, value: float, order: int = 3):
+    async def set(self, value: float):
         """
         Set the undulator gap to a given energy in keV and harmonic order.
 
         Args:
             value: energy in keV
-            order: harmonic order, defaults to 3
         """
-        await self.check_energy_limits(value, order)
-        await self.order.set(order)
+        _current_order = await self.order.get_value()
+        await self.check_energy_limits(value, _current_order)
         await self._set_undulator_gap(value)
+
+    async def set_order(self, order: int):
+        """
+        Set the undulator harmonic order.
+
+        Args:
+            order: harmonic order
+        """
+        self._check_order_valid(order)
+        await self.order.set(order)
+
+    async def get_order(self) -> int:
+        """
+        Get the undulator harmonic order.
+        Returns:
+            order: harmonic order
+        """
+        return await self.order.get_value()
 
     async def check_energy_limits(self, value: float, order: int):
         """
@@ -174,13 +191,16 @@ class HardUndulator(Undulator):
         """
         if not hasattr(self, "_cached_lookup_table"):
             await self.update_cached_lookup_table()
-        if order not in self._cached_lookup_table.keys():
-            raise ValueError(
-                f"Order {order} not found in lookup table, must be between {min(self._cached_lookup_table.keys())} and {max(self._cached_lookup_table.keys())}"
-            )
+        self._check_order_valid(order)
         min_energy = self._cached_lookup_table[order][3]
         max_energy = self._cached_lookup_table[order][4]
         LOGGER.debug(
             f"Min and max energies for order {order} are {min_energy}keV and {max_energy}keV respectively"
         )
         return min_energy, max_energy
+
+    def _check_order_valid(self, order):
+        if order not in self._cached_lookup_table.keys():
+            raise ValueError(
+                f"Order {order} not found in lookup table, must be between {min(self._cached_lookup_table.keys())} and {max(self._cached_lookup_table.keys())}"
+            )
