@@ -87,7 +87,7 @@ class HardUndulator(Undulator):
     @AsyncStatus.wrap
     async def set(self, value: float):
         """
-        Set the undulator gap to a given energy in keV and harmonic order.
+        Set the undulator gap to a given energy in keV.
 
         Args:
             value: energy in keV
