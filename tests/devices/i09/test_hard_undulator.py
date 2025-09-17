@@ -47,21 +47,39 @@ async def test_min_max_energy_for_order(
     min, max = await hu.get_min_max_energy_for_order(3)
     assert min == pytest.approx(2.4)
     assert max == pytest.approx(4.3)
-    with pytest.raises(ValueError) as e:
+    with pytest.raises(
+        ValueError,
+        match=re.escape(
+            "Order 0 not found in lookup table, must be between 1.0 and 23.0"
+        ),
+    ):
         await hu.get_min_max_energy_for_order(0)
-    assert (
-        str(e.value)
-        == "Order 0 not found in lookup table, must be between 1.0 and 23.0"
-    )
 
 
 async def test_check_energy_limits(
     hu: HardUndulator,
 ):
     await hu.check_energy_limits(3.0, 3)  # within limits
-    with pytest.raises(ValueError) as e:
+    with pytest.raises(
+        ValueError,
+        match=re.escape("Energy 1.0keV is out of range for order 3: (2.4-4.3 keV)"),
+    ):
         await hu.check_energy_limits(1.0, 3)
-    assert str(e.value) == "Energy 1.0keV is out of range for order 3: (2.4-4.3 keV)"
+
+
+async def test_set_get_order(
+    hu: HardUndulator,
+):
+    assert await hu.get_order() == 3  # default order
+    await hu.set_order(5)
+    assert await hu.get_order() == 5  # no error
+    with pytest.raises(
+        ValueError,
+        match=re.escape(
+            "Order 0 not found in lookup table, must be between 1.0 and 23.0"
+        ),
+    ):
+        await hu.set_order(0)
 
 
 @patch("dodal.devices.i09_shared.hard_undulator.energy_distance_table")
