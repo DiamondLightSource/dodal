@@ -81,6 +81,10 @@ def synchrotron() -> Synchrotron:
 
 @device_factory()
 def pincol() -> PinholeCollimatorControl:
+    """Get the i19-2 pinhole and collimator control device, instantiate it if it
+    hasn't already been. If this is called when already instantiated in i19-2,
+    it will return the existing object.
+    """
     return PinholeCollimatorControl(prefix=PREFIX.beamline_prefix)
 
 
