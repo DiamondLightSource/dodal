@@ -56,7 +56,11 @@ def supported_trigger_info() -> TriggerInfo:
     )
 
 
-VALID_TEST_EXPOSURE_TIME = 1 / 19
+VALID_TEST_TOTAL_TRIGGERS = 5
+VALID_TEST_EXPOSURE_TIME_PER_COLLECTION = 1 / 6
+VALID_TEST_EXPOSURE_TIME = (
+    VALID_TEST_EXPOSURE_TIME_PER_COLLECTION / VALID_TEST_TOTAL_TRIGGERS
+)
 VALID_TEST_DEADTIME = 1 / 100
 
 
@@ -197,7 +201,7 @@ async def test_prepare_arms_tetramm(
             number_of_events=5,
             trigger=DetectorTrigger.EDGE_TRIGGER,
             deadtime=0.1,
-            livetime=VALID_TEST_EXPOSURE_TIME,
+            livetime=VALID_TEST_EXPOSURE_TIME_PER_COLLECTION,
             exposure_timeout=None,
         )
     )
@@ -266,6 +270,12 @@ async def test_pilatus_controller(
 
 
 async def assert_armed(driver: TetrammDriver) -> None:
+    sample_time = await driver.sample_time.get_value()
+    samples_per_reading = int(VALID_TEST_EXPOSURE_TIME / sample_time)
+    averaging_time = samples_per_reading * sample_time
+
     assert (await driver.trigger_mode.get_value()) is TetrammTrigger.EXT_TRIGGER
     assert (await driver.values_per_reading.get_value()) == 5
     assert (await driver.acquire.get_value()) == 1
+
+    assert (await driver.averaging_time.get_value()) == averaging_time

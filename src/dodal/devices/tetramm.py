@@ -115,15 +115,14 @@ class TetrammController(DetectorController):
         # the time per trigger
 
         if trigger_info.total_number_of_exposures != 0:
-            averaging_time = (
+            exposure_per_trigger = (
                 trigger_info.livetime / trigger_info.total_number_of_exposures
             )
         else:
-            averaging_time = trigger_info.livetime
+            exposure_per_trigger = trigger_info.livetime
 
         await asyncio.gather(
-            self.driver.averaging_time.set(averaging_time),
-            self.set_exposure(averaging_time),
+            self.set_exposure(exposure_per_trigger),
             self._file_io.num_capture.set(trigger_info.total_number_of_exposures),
         )
 
@@ -147,6 +146,7 @@ class TetrammController(DetectorController):
         # tetramm never goes idle really, actually it is always acquiring
         # so need to wait for the capture to finish instead
         await wait_for_value(self._file_io.capture, False, timeout=DEFAULT_TIMEOUT)
+        self._arm_status = None
 
     async def disarm(self):
         # We can't use caput callback as we already used it in arm() and we can't have
