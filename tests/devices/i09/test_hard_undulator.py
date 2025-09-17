@@ -8,7 +8,7 @@ from bluesky.run_engine import RunEngine
 from ophyd_async.core import init_devices
 from ophyd_async.testing import set_mock_value
 
-from dodal.devices.i09_shared.hard_undulator import HardUndulator
+from dodal.devices.i09_shared.hard_undulator import HardUndulator, calculate_gap_i09
 from dodal.testing.setup import patch_all_motors
 
 LUT_TEST_PATH = "tests/devices/test_data/test_hard_undulator_lookup_table.txt"
@@ -17,7 +17,11 @@ LUT_TEST_PATH = "tests/devices/test_data/test_hard_undulator_lookup_table.txt"
 @pytest.fixture
 async def hu() -> HardUndulator:
     async with init_devices(mock=True):
-        hu = HardUndulator(prefix="HU-01", id_gap_lookup_table_path=LUT_TEST_PATH)
+        hu = HardUndulator(
+            prefix="HU-01",
+            id_gap_lookup_table_path=LUT_TEST_PATH,
+            calculate_gap_function=calculate_gap_i09,
+        )
     patch_all_motors(hu)
     return hu
 

@@ -1,3 +1,5 @@
+from collections.abc import Callable
+
 import numpy as np
 from ophyd_async.core import (
     AsyncStatus,
@@ -13,7 +15,7 @@ LUT_COMMENTS = ["#"]
 HU_SKIP_ROWS = 3
 
 
-def calculate_gap(
+def calculate_gap_i09(
     energy_kev: float,
     look_up_table: dict[int, "np.ndarray"],
     order: int = 1,
@@ -59,6 +61,7 @@ class HardUndulator(Undulator):
         self,
         prefix: str,
         id_gap_lookup_table_path: str,
+        calculate_gap_function: Callable[..., float],
         name: str = "",
         poles: int | None = None,
         length: float | None = None,
@@ -71,6 +74,7 @@ class HardUndulator(Undulator):
             poles: Number of magnetic poles built into the undulator
             length: Length of the undulator in meters.
         """
+        self.calculate_gap = calculate_gap_function
         with self.add_children_as_readables():
             self.order = soft_signal_rw(int, initial_value=3)
             self.undulator_period, _ = soft_signal_r_and_setter(int, initial_value=27)
@@ -146,7 +150,7 @@ class HardUndulator(Undulator):
         """
         _current_order = await self.order.get_value()
         await self.check_energy_limits(energy_kev, _current_order)
-        return calculate_gap(
+        return self.calculate_gap(
             energy_kev,
             look_up_table=self._cached_lookup_table,
             order=_current_order,
