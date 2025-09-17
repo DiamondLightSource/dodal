@@ -34,6 +34,7 @@
    dodal.beamlines.i19_2
    dodal.beamlines.i19_optics
    dodal.beamlines.i20_1
+   dodal.beamlines.i21
    dodal.beamlines.i22
    dodal.beamlines.i23
    dodal.beamlines.i24
