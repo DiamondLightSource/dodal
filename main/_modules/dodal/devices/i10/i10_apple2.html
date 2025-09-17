@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.i10.i10_apple2 &#8212; dodal 1.57.1.dev3+g52d34a5bc documentation</title>
+    <title>dodal.devices.i10.i10_apple2 &#8212; dodal 1.58.1.dev1+gc77db0772 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=8502bd21"></script>
+    <script src="../../../../_static/documentation_options.js?v=c0b0d5a9"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -486,6 +486,7 @@ window.addEventListener("load", () => mermaid.run());
 <span class="n">MAXIMUM_GAP_MOTOR_POSITION</span> <span class="o">=</span> <span class="mi">100</span>
 <span class="n">DEFAULT_JAW_PHASE_POLY_PARAMS</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.0</span> <span class="o">/</span> <span class="mf">7.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">120.0</span> <span class="o">/</span> <span class="mf">7.5</span><span class="p">]</span>
 <span class="n">ALPHA_OFFSET</span> <span class="o">=</span> <span class="mi">180</span>
+<span class="n">MAXIMUM_MOVE_TIME</span> <span class="o">=</span> <span class="mi">550</span>  <span class="c1"># There is no useful movements take longer than this.</span>
 
 
 <span class="c1"># data class to store the lookup table configuration that is use in convert_csv_to_lookup</span>
@@ -722,7 +723,8 @@ window.addEventListener("load", () => mermaid.run());
     <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Pol</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Changing f</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> polarisation to </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
-        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">id_ref</span><span class="p">()</span><span class="o">.</span><span class="n">polarisation</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="p">)</span></div>
+        <span class="c1"># Timeout is determined internally by the set method later, so we set it to max here.</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">id_ref</span><span class="p">()</span><span class="o">.</span><span class="n">polarisation</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">MAXIMUM_MOVE_TIME</span><span class="p">)</span></div>
 
 
 
