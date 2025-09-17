@@ -42,5 +42,8 @@ dodal.devices.baton.Baton
       
       ~Baton.current_user
       
+      
+      ~Baton.commissioning
+      
    
    

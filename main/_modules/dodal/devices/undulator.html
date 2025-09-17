@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.undulator &#8212; dodal 1.57.1.dev2+g248fafd8b documentation</title>
+    <title>dodal.devices.undulator &#8212; dodal 1.57.1.dev3+g52d34a5bc documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=d7b9e9a6"></script>
+    <script src="../../../_static/documentation_options.js?v=8502bd21"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -457,6 +457,7 @@ window.addEventListener("load", () => mermaid.run());
 <span class="kn">from</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="kn">import</span> <span class="n">ndarray</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">AsyncStatus</span><span class="p">,</span>
+    <span class="n">Reference</span><span class="p">,</span>
     <span class="n">StandardReadable</span><span class="p">,</span>
     <span class="n">StandardReadableFormat</span><span class="p">,</span>
     <span class="n">soft_signal_r_and_setter</span><span class="p">,</span>
@@ -467,16 +468,12 @@ window.addEventListener("load", () => mermaid.run());
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.common.enums</span><span class="w"> </span><span class="kn">import</span> <span class="n">EnabledDisabledUpper</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.log</span><span class="w"> </span><span class="kn">import</span> <span class="n">LOGGER</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">.baton</span><span class="w"> </span><span class="kn">import</span> <span class="n">Baton</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.util.lookup_tables</span><span class="w"> </span><span class="kn">import</span> <span class="n">energy_distance_table</span>
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">AccessError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
     <span class="k">pass</span>
-
-
-<span class="c1"># Enable to allow testing when the beamline is down, do not change in production!</span>
-<span class="n">TEST_MODE</span> <span class="o">=</span> <span class="kc">False</span>
-<span class="c1"># will be made more generic in https://github.com/DiamondLightSource/dodal/issues/754</span>
 
 
 <span class="c1"># The acceptable difference, in mm, between the undulator gap and the DCM</span>
@@ -508,6 +505,7 @@ window.addEventListener("load", () => mermaid.run());
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
         <span class="n">poles</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">length</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">baton</span><span class="p">:</span> <span class="n">Baton</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructor</span>
 
@@ -518,6 +516,7 @@ window.addEventListener("load", () => mermaid.run());
 <span class="sd">            name (str, optional): Name for device. Defaults to &quot;&quot;.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">baton_ref</span> <span class="o">=</span> <span class="n">Reference</span><span class="p">(</span><span class="n">baton</span><span class="p">)</span> <span class="k">if</span> <span class="n">baton</span> <span class="k">else</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">id_gap_lookup_table_path</span> <span class="o">=</span> <span class="n">id_gap_lookup_table_path</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">gap_motor</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;BLGAPMTR&quot;</span><span class="p">)</span>
@@ -562,7 +561,8 @@ window.addEventListener("load", () => mermaid.run());
 
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">raise_if_not_enabled</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">access_level</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">gap_access</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">access_level</span> <span class="ow">is</span> <span class="n">EnabledDisabledUpper</span><span class="o">.</span><span class="n">DISABLED</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">TEST_MODE</span><span class="p">:</span>
+        <span class="n">commissioning_mode</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_commissioning_mode_enabled</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">access_level</span> <span class="ow">is</span> <span class="n">EnabledDisabledUpper</span><span class="o">.</span><span class="n">DISABLED</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">commissioning_mode</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">AccessError</span><span class="p">(</span><span class="s2">&quot;Undulator gap access is disabled. Contact Control Room&quot;</span><span class="p">)</span>
 
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_set_undulator_gap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energy_kev</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -581,20 +581,24 @@ window.addEventListener("load", () => mermaid.run());
                 <span class="sa">f</span><span class="s2">&quot;Undulator gap mismatch. </span><span class="si">{</span><span class="n">difference</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">mm is outside tolerance.</span><span class="se">\</span>
 <span class="s2">                Moving gap to nominal value, </span><span class="si">{</span><span class="n">target_gap</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">mm&quot;</span>
             <span class="p">)</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">TEST_MODE</span><span class="p">:</span>
+            <span class="n">commissioning_mode</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_commissioning_mode_enabled</span><span class="p">()</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">commissioning_mode</span><span class="p">:</span>
                 <span class="c1"># Only move if the gap is sufficiently different to the value from the</span>
-                <span class="c1"># DCM lookup table AND we&#39;re not in TEST_MODE</span>
+                <span class="c1"># DCM lookup table AND we&#39;re not in commissioning mode</span>
                 <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">gap_motor</span><span class="o">.</span><span class="n">set</span><span class="p">(</span>
                     <span class="n">target_gap</span><span class="p">,</span>
                     <span class="n">timeout</span><span class="o">=</span><span class="n">STATUS_TIMEOUT_S</span><span class="p">,</span>
                 <span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;In test mode, not moving ID gap&quot;</span><span class="p">)</span>
+                <span class="n">LOGGER</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;In test mode, not moving ID gap&quot;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
                 <span class="s2">&quot;Gap is already in the correct place for the new energy value &quot;</span>
                 <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">energy_kev</span><span class="si">}</span><span class="s2">, no need to ask it to move&quot;</span>
             <span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_is_commissioning_mode_enabled</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">baton_ref</span> <span class="ow">and</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">baton_ref</span><span class="p">()</span><span class="o">.</span><span class="n">commissioning</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
 
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_get_gap_to_match_energy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energy_kev</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
