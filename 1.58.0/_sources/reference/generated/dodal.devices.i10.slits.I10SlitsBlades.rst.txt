@@ -1,0 +1,40 @@
+dodal.devices.i10.slits.I10SlitsBlades
+======================================
+
+.. currentmodule:: dodal.devices.i10.slits
+
+.. autoclass:: I10SlitsBlades
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

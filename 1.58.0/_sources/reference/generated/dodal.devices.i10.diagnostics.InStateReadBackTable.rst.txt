@@ -1,0 +1,87 @@
+dodal.devices.i10.diagnostics.InStateReadBackTable
+==================================================
+
+.. currentmodule:: dodal.devices.i10.diagnostics
+
+.. autoclass:: InStateReadBackTable
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~InStateReadBackTable.MOVE_IN
+      
+      
+      ~InStateReadBackTable.MOVE_OUT
+      
+      
+      ~InStateReadBackTable.IN_BEAM
+      
+      
+      ~InStateReadBackTable.FAULT
+      
+      
+      ~InStateReadBackTable.OUT_OF_BEAM
+      
+   
+   

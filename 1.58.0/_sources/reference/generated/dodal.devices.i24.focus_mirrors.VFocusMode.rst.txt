@@ -1,0 +1,90 @@
+dodal.devices.i24.focus\_mirrors.VFocusMode
+===========================================
+
+.. currentmodule:: dodal.devices.i24.focus_mirrors
+
+.. autoclass:: VFocusMode
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~VFocusMode.FOCUS_10
+      
+      
+      ~VFocusMode.FOCUS_20D
+      
+      
+      ~VFocusMode.FOCUS_30D
+      
+      
+      ~VFocusMode.FOCUS_50D
+      
+      
+      ~VFocusMode.FOCUS_1030D
+      
+      
+      ~VFocusMode.FOCUS_3010D
+      
+   
+   
