@@ -103,7 +103,7 @@ class HardUndulator(Undulator):
         Args:
             order: harmonic order
         """
-        self._check_order_valid(order)
+        await self._check_order_valid(order)
         await self.order.set(order)
 
     async def get_order(self) -> int:
@@ -189,9 +189,7 @@ class HardUndulator(Undulator):
         Returns:
             (min energy, max energy) in keV
         """
-        if not hasattr(self, "_cached_lookup_table"):
-            await self.update_cached_lookup_table()
-        self._check_order_valid(order)
+        await self._check_order_valid(order)
         min_energy = self._cached_lookup_table[order][3]
         max_energy = self._cached_lookup_table[order][4]
         LOGGER.debug(
@@ -199,7 +197,9 @@ class HardUndulator(Undulator):
         )
         return min_energy, max_energy
 
-    def _check_order_valid(self, order):
+    async def _check_order_valid(self, order):
+        if not hasattr(self, "_cached_lookup_table"):
+            await self.update_cached_lookup_table()
         if order not in self._cached_lookup_table.keys():
             raise ValueError(
                 f"Order {order} not found in lookup table, must be between {min(self._cached_lookup_table.keys())} and {max(self._cached_lookup_table.keys())}"
