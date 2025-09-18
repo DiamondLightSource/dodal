@@ -238,7 +238,9 @@ def make_device(
 
 
 def make_all_devices(
-    module: str | ModuleType | None = None, include_skipped: bool = False, **kwargs
+    modules: list[str] | list[ModuleType] | str | ModuleType | None = None,
+    include_skipped: bool = False,
+    **kwargs,
 ) -> tuple[dict[str, AnyDevice], dict[str, Exception]]:
     """Makes all devices in the given beamline module.
 
@@ -255,9 +257,19 @@ def make_all_devices(
     A dictionary where the keys are device names and the values are devices.
     A dictionary where the keys are device names and the values are exceptions.
     """
-    if isinstance(module, str) or module is None:
-        module = import_module(module or __name__)
-    factories = collect_factories(module, include_skipped)
+    if modules is None:
+        mods = [__name__]
+    elif not isinstance(modules, list):
+        mods = [modules]
+    else:
+        mods = modules
+
+    factories = {}
+    for m in mods:
+        if isinstance(m, str) or m is None:
+            m = import_module(m)
+        factories = factories | collect_factories(m, include_skipped)
+
     devices: tuple[dict[str, AnyDevice], dict[str, Exception]] = invoke_factories(
         factories, **kwargs
     )
