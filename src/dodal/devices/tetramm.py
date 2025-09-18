@@ -92,6 +92,7 @@ class TetrammController(DetectorController):
         self.driver = driver
         self._file_io = file_io
         self._arm_status: AsyncStatus | None = None
+        self._trigger_info: TriggerInfo | None = None
 
     def get_deadtime(self, exposure: float | None) -> float:
         # 2 internal clock cycles. Best effort approximation
@@ -112,18 +113,20 @@ class TetrammController(DetectorController):
             self._supported_trigger_types[trigger_info.trigger]
         )
 
+        self._trigger_info = trigger_info
+
         # Tetramms do not use a typical cam plugin, so we need to work out
         # the time per trigger
 
-        if trigger_info.total_number_of_exposures != 0:
-            exposure_per_trigger = (
-                trigger_info.livetime / trigger_info.total_number_of_exposures
-            )
-        else:
-            exposure_per_trigger = trigger_info.livetime
+        # if trigger_info.total_number_of_exposures != 0:
+        #     exposure_per_trigger = (
+        #         trigger_info.livetime #/ trigger_info.total_number_of_exposures
+        #     )
+        # else:
+        #     exposure_per_trigger = trigger_info.livetime
 
         await asyncio.gather(
-            self.set_exposure(exposure_per_trigger),
+            self.set_exposure(trigger_info.livetime),
             self._file_io.num_capture.set(trigger_info.total_number_of_exposures),
         )
 
@@ -146,8 +149,14 @@ class TetrammController(DetectorController):
     async def wait_for_idle(self):
         # tetramm never goes idle really, actually it is always acquiring
         # so need to wait for the capture to finish instead
-        await wait_for_value(self._file_io.capture, False, timeout=DEFAULT_TIMEOUT)
-        self._arm_status = None
+        # await wait_for_value(self.driver.acquire, False, timeout=DEFAULT_TIMEOUT)
+        # self._arm_status = None
+        await wait_for_value(self._file_io.acquire, False, timeout=DEFAULT_TIMEOUT)
+        # pass
+        # self._trigger_info = None
+
+    async def unstage(self):
+        await self.disarm()
 
     async def disarm(self):
         # We can't use caput callback as we already used it in arm() and we can't have
