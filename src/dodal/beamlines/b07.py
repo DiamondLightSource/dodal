@@ -1,11 +1,11 @@
+from dodal.beamlines.b07_shared import pgm
 from dodal.common.beamlines.beamline_utils import (
     device_factory,
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.devices.b07 import Grating, LensMode, PsuMode
+from dodal.devices.b07 import LensMode, PsuMode
 from dodal.devices.electron_analyser import SelectedSource
 from dodal.devices.electron_analyser.specs import SpecsAnalyserDriverIO
-from dodal.devices.pgm import PGM
 from dodal.devices.synchrotron import Synchrotron
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
@@ -19,11 +19,6 @@ set_utils_beamline(BL)
 @device_factory()
 def synchrotron() -> Synchrotron:
     return Synchrotron()
-
-
-@device_factory()
-def pgm() -> PGM:
-    return PGM(prefix=f"{PREFIX.beamline_prefix}-OP-PGM-01:", grating=Grating)
 
 
 # Connect will work again after this work completed

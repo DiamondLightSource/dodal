@@ -12,6 +12,7 @@ _BEAMLINE_NAME_OVERRIDES = {
     "i05-1": "i05_1",
     "b07-1": "b07_1",
     "i09-1": "i09_1",
+    "i09-2": "i09_2",
     "i13-1": "i13_1",
     "i20-1": "i20_1",
     "i19-1": "i19_1",
@@ -22,6 +23,19 @@ _BEAMLINE_NAME_OVERRIDES = {
     "p48": "training_rig",
     "p49": "training_rig",
     "t01": "adsim",
+}
+
+# Some beamlines have shared components between branch lines. This configuration is
+# used by dodal connect to know which beamlines are shared so that when running dodal
+# connect, it will connect your beamline + shared components.
+_BEAMLINE_SHARED = {
+    "i05": ["i05", "i05_shared"],
+    "i05_1": ["i05_1", "i05_shared"],
+    "b07": ["b07", "b07_shared"],
+    "b07_1": ["b07_1", "b07_shared"],
+    "i09": ["i09", "i09_1_shared", "i09_2_shared"],
+    "i09_1": ["i09_1", "i09_1_shared"],
+    "i09_2": ["i09_2", "i09_2_shared"],
 }
 
 
@@ -94,3 +108,8 @@ def module_name_for_beamline(beamline: str) -> str:
     """
 
     return _BEAMLINE_NAME_OVERRIDES.get(beamline, beamline)
+
+
+def shared_beamline_modules(beamline: str) -> list[str]:
+    bl = module_name_for_beamline(beamline)
+    return [module_name_for_beamline(b) for b in _BEAMLINE_SHARED.get(bl, [bl])]
