@@ -1,7 +1,7 @@
 from pathlib import PurePath
 
-from ophyd_async.core import AutoIncrementFilenameProvider, YMDPathProvider
-from ophyd_async.fastcs.jungfrau import Jungfrau, JungfrauWriter
+from ophyd_async.core import AutoIncrementFilenameProvider, YMDPathProvider, StaticPathProvider, StaticFilenameProvider
+from ophyd_async.fastcs.jungfrau import Jungfrau #, JungfrauWriter
 from ophyd_async.core import Device
 from dodal.common.beamlines.beamline_utils import (
     BL,
@@ -237,13 +237,13 @@ def pilatus_beam_center() -> DetectorBeamCenter:
     )
 
 
-@device_factory()
-def pilatus_metadata() -> PilatusMetadata:
-    """A small pilatus driver device for figuring out the filename template."""
-    return PilatusMetadata(
-        f"{PREFIX.beamline_prefix}-EA-PdILAT-01:",
-        "pilatus_meta",
-    )
+# @device_factory()
+# def pilatus_metadata() -> PilatusMetadata:
+#     """A small pilatus driver device for figuring out the filename template."""
+#     return PilatusMetadata(
+#         f"{PREFIX.beamline_prefix}-EA-PdILAT-01:",
+#         "pilatus_meta",
+#     )
 
 
 @device_factory()
@@ -253,16 +253,14 @@ def synchrotron() -> Synchrotron:
     """
     return Synchrotron()
 
-
 @device_factory()
-def jungfrau(path_to_dir: str = "/tmp/jf", filename: str = "jf_output") -> Jungfrau:
+def jungfrau(path_to_dir: str = "/dls/i24/data/2025/cm40647-4/jungfrau/2025-09-15/pedestals/pedestal_1", filename: str = "jf_output") -> Jungfrau:
     """Get the Jungfrau 9M device, instantiate it if it hasn't already been.
     If this is called when already instantiated, it will return the existing object."""
-    file_provider = AutoIncrementFilenameProvider(filename)
 
     return Jungfrau(
         "BL24I-EA-JFRAU-01:",
-        YMDPathProvider(file_provider, PurePath(path_to_dir)),
+        StaticPathProvider(StaticFilenameProvider(filename), PurePath(path_to_dir)),
         name="jungfrau",
     )
 
