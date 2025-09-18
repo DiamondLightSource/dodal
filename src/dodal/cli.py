@@ -76,29 +76,29 @@ def connect(beamline: str, all: bool, sim_backend: bool, module_only: bool) -> N
     else:
         beamline_modules = shared_beamline_modules(beamline)
 
-    for bl_module in beamline_modules:
-        full_module_path = f"dodal.beamlines.{bl_module}"
+    full_module_paths = [
+        f"dodal.beamlines.{bl_module}" for bl_module in beamline_modules
+    ]
+    print(f"Attempting connection to {beamline} (using {full_module_paths})")
+    print(shared_beamline_modules)
 
-        print("=" * 100)
-        print(f"Attempting connection to {bl_module} (using {full_module_path})")
+    # Force all devices to be lazy (don't connect to PVs on instantiation) and do
+    # connection as an extra step, because the alternatives is handling the fact
+    # that only some devices may be lazy.
+    devices, instance_exceptions = make_all_devices(
+        full_module_paths,
+        include_skipped=all,
+        fake_with_ophyd_sim=sim_backend,
+        wait_for_connection=False,
+    )
+    devices, connect_exceptions = _connect_devices(RE, devices, sim_backend)
 
-        # Force all devices to be lazy (don't connect to PVs on instantiation) and do
-        # connection as an extra step, because the alternatives is handling the fact
-        # that only some devices may be lazy.
-        devices, instance_exceptions = make_all_devices(
-            full_module_path,
-            include_skipped=all,
-            fake_with_ophyd_sim=sim_backend,
-            wait_for_connection=False,
-        )
-        devices, connect_exceptions = _connect_devices(RE, devices, sim_backend)
+    # Inform user of successful connections
+    _report_successful_devices(devices, sim_backend)
 
-        # Inform user of successful connections
-        _report_successful_devices(devices, sim_backend)
-
-        # If exceptions have occurred, this will print details of the relevant PVs
-        e = {**instance_exceptions, **connect_exceptions}
-        exceptions = exceptions | e
+    # If exceptions have occurred, this will print details of the relevant PVs
+    e = {**instance_exceptions, **connect_exceptions}
+    exceptions = exceptions | e
 
     print("Finished all device connections.")
     if len(exceptions) > 0:
