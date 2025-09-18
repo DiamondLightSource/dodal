@@ -24,9 +24,24 @@ class ElectronAnalyserRegionDetector(
     Generic[TAbstractAnalyserDriverIO, TAbstractBaseRegion],
 ):
     """
-    Extends electron analyser detector to configure specific region settings before data
-    acqusition. This object must be passed in a driver and store it as a reference. It
-    is designed to only exist inside a plan.
+    ElectronAnalyserRegionDetector extends the AbstractElectronAnalyserDetector to allow configuration
+    of specific region settings on an electron analyser before data acquisition. This class is intended
+    to be used within a plan, where it receives a driver and a region object, storing the driver as a
+    reference to avoid conflicting parent relationships.
+
+    Args:
+        driver (TAbstractAnalyserDriverIO): The driver instance controlling the electron analyser.
+        region (TAbstractBaseRegion): The region configuration to apply before acquisition.
+        name (str, optional): An optional name for the detector.
+
+    Attributes:
+        region (TAbstractBaseRegion): The region configuration to be set on the driver.
+
+    Properties:
+        driver (TAbstractAnalyserDriverIO): Returns the referenced driver instance.
+
+    Methods:
+        trigger(): Asynchronously configures the region on the driver and then triggers data acquisition.
     """
 
     def __init__(
@@ -67,10 +82,30 @@ class ElectronAnalyserDetector(
         TAbstractBaseRegion,
     ],
 ):
-    """
-    Electron analyser detector with the additional functionality to load a sequence file
-    and create a list of temporary ElectronAnalyserRegionDetector objects. These will
-    setup configured region settings before data acquisition.
+    """ElectronAnalyserDetector is a detector class for electron analysers that extends the base detector functionality
+    with the ability to load sequence files and manage region-specific detectors.
+
+    This class provides methods to:
+    - Load a sequence of regions from a JSON file.
+    - Create a list of temporary ElectronAnalyserRegionDetector objects, each configured for a specific region.
+    - Stage and unstage the detector asynchronously, ensuring it is ready for data acquisition.
+
+        sequence_class (type[TAbstractBaseSequence]): The class used to represent a sequence of regions.
+        driver (TAbstractAnalyserDriverIO): The driver instance for hardware communication.
+        name (str, optional): The name of the detector instance.
+
+    Attributes:
+        _driver (TAbstractAnalyserDriverIO): The driver instance for the detector.
+        _sequence_class (type[TAbstractBaseSequence]): The class used to load and represent sequences.
+
+    Methods:
+        driver: Returns the driver instance.
+        stage: Asynchronously prepares the detector for use by disarming and staging.
+        unstage: Asynchronously disarms and unstages the detector.
+        load_sequence: Loads a sequence from a JSON file into a sequence class.
+        create_region_detector_list: Creates a list of region detectors for each region in the sequence file.
+
+        Any exceptions raised by the driver's stage/unstage or controller's disarm methods.
     """
 
     def __init__(

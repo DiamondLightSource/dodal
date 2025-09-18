@@ -39,6 +39,29 @@ class VGScientaAnalyserDriverIO(
     ],
     Generic[TLensMode, TPsuMode, TPassEnergyEnum],
 ):
+    """
+    VGScientaAnalyserDriverIO is a driver class for interfacing with a VG Scienta electron analyser via EPICS signals.
+
+    This class provides methods and properties to configure and control the analyser's region of interest, detector modes, and acquisition parameters. It extends AbstractAnalyserDriverIO and is parameterized by lens mode, PSU mode, and pass energy enumerations.
+
+    Attributes:
+        detector_mode: Read/write EPICS signal for the detector mode.
+        region_min_x: Read/write EPICS signal for the minimum X coordinate of the region.
+        region_size_x: Read/write EPICS signal for the size of the region in X.
+        sensor_max_size_x: Read-only EPICS signal for the maximum X size of the sensor.
+        region_min_y: Read/write EPICS signal for the minimum Y coordinate of the region.
+        region_size_y: Read/write EPICS signal for the size of the region in Y.
+        sensor_max_size_y: Read-only EPICS signal for the maximum Y size of the sensor.
+
+    Args:
+        prefix (str): The EPICS PV prefix for the analyser.
+        lens_mode_type (type[TLensMode]): The type for lens mode enumeration.
+        psu_mode_type (type[TPsuMode]): The type for PSU mode enumeration.
+        pass_energy_type (type[TPassEnergyEnum]): The type for pass energy enumeration.
+        energy_sources (Mapping[SelectedSource, SignalR[float]]): Mapping of energy sources to their signals.
+        name (str, optional): Name of the device instance.
+    """
+
     def __init__(
         self,
         prefix: str,

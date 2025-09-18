@@ -12,7 +12,10 @@ class CurrentAmp(ABC, StandardReadable, Movable):
     """
     Base class for current amplifier, it contains the minimal functionality
      a current amplifier needs:
-
+    Parameters:
+        gain_conversion_table (type[Enum]): The conversion table between current
+        and gain setting.
+        name (str, optional): Name of the device. Defaults to "".
     Attributes:
         gain_conversion_table (Enum): The conversion table between current
         and gain setting.
@@ -59,6 +62,10 @@ class CurrentAmpCounter(ABC, StandardReadable, Preparable):
     """
     Base class for current amplifier counter, it contain the minimal implementations
       required for a counter/detector to function with CurrentAmpDet:
+
+    parameters:
+        count_per_volt (float): The conversion factor between counter output and voltage.
+        name (str, optional): Name of the device. Defaults to "".
 
     Attributes:
         count_per_volt (float): The conversion factor between counter output and voltage.

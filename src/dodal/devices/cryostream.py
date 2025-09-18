@@ -13,6 +13,15 @@ from ophyd_async.epics.core import (
 
 
 class CryoStream(StandardReadable):
+    """CryoStream device for controlling a cryogenic stream.
+    Parameters
+    ----------
+    prefix : str
+        The EPICS prefix for the device.
+    name : str
+        The name of the device. Defaults to "".
+    """
+
     MAX_TEMP_K = 110
     MAX_PRESSURE_BAR = 0.1
 
@@ -33,6 +42,16 @@ class TurboEnum(StrictEnum):
 
 
 class OxfordCryoStreamController(StandardReadable):
+    """
+    Oxford CryoStream Controller
+    Parameters
+    ----------
+    prefix : str
+        The EPICS prefix for the device.
+    name : str
+        The name of the device. Defaults to "".
+    """
+
     def __init__(self, prefix: str, name: str = ""):
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             # Any signals that should be read once at the start of the scan
@@ -69,6 +88,16 @@ class OxfordCryoStreamController(StandardReadable):
 
 
 class OxfordCryoStreamStatus(StandardReadable):
+    """
+    Oxford CryoStream Status
+    Parameters
+    ----------
+    prefix : str
+        The EPICS prefix for the device.
+    name : str
+        The name of the device. Defaults to "".
+    """
+
     def __init__(self, prefix: str, name: str = ""):
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             # Any signals that should be read once at the start of the scan
@@ -101,6 +130,15 @@ class OxfordCryoStreamStatus(StandardReadable):
 
 
 class OxfordCryoStream(StandardReadable):
+    """Oxford CryoStream device for controlling a cryogenic stream.
+    Parameters
+    ----------
+    prefix : str
+        The EPICS prefix for the device.
+    name : str
+        The name of the device. Defaults to "".
+    """
+
     def __init__(self, prefix: str, name=""):
         with self.add_children_as_readables():
             self.controller = OxfordCryoStreamController(prefix=prefix)

@@ -23,6 +23,10 @@ class CurrentAmpDet(StandardReadable, Preparable):
       the option for automatically changing the CurrentAmp gain to within the optimal
       range. It also converts the currentAmp/counter output back into the detector
       current output in Amp.
+    Parameters:
+        current_amp (CurrentAmp): Current amplifier type device.
+        counter (CurrentAmpCounter): Counter that capture the current amplifier output.
+        name (str, optional): Name of the device. Defaults to "".
     Attributes:
         current_amp (currentAmp): Current amplifier type device.
         counter (CurrentAmpCounter): Counter that capture the current amplifier output.

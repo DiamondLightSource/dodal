@@ -29,6 +29,29 @@ class VGScientaDetector(
     ],
     Generic[TLensMode, TPsuMode, TPassEnergyEnum],
 ):
+    """
+    VGScientaDetector is a specialized detector class for VG Scienta electron analysers.
+
+    This class extends the generic ElectronAnalyserDetector, parameterized for VG Scienta-specific
+    driver, sequence, and region types. It provides initialization and configuration for the detector,
+    including lens mode, PSU mode, pass energy, and energy sources.
+
+    Args:
+        prefix (str): The EPICS PV prefix for the detector.
+        lens_mode_type (type[TLensMode]): The type representing lens modes.
+        psu_mode_type (type[TPsuMode]): The type representing PSU modes.
+        pass_energy_type (type[TPassEnergyEnum]): The type representing pass energy values.
+        energy_sources (Mapping[SelectedSource, SignalR[float]]): Mapping of energy sources to their signals.
+        name (str, optional): An optional name for the detector. Defaults to "".
+
+    Attributes:
+        driver (VGScientaAnalyserDriverIO): The driver instance for the VG Scienta analyser.
+
+    Raises:
+        Any exceptions raised by the parent ElectronAnalyserDetector or driver initialization.
+
+    """
+
     def __init__(
         self,
         prefix: str,
