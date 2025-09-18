@@ -1,4 +1,5 @@
 import asyncio
+from collections.abc import Generator
 from unittest.mock import AsyncMock, patch
 
 import pytest
@@ -7,14 +8,24 @@ from bluesky.run_engine import RunEngine
 from ophyd_async.core import init_devices
 from ophyd_async.testing import set_mock_value
 
+from dodal.devices.baton import Baton
 from dodal.devices.xbpm_feedback import XBPMFeedback
 
 
 @pytest.fixture
 async def fake_xbpm_feedback() -> XBPMFeedback:
     async with init_devices(mock=True):
-        xbpm_feedback = XBPMFeedback("")
+        baton = Baton("BATON-01:")
+        xbpm_feedback = XBPMFeedback("", baton=baton)
     return xbpm_feedback
+
+
+@pytest.fixture
+def xbpm_feedback_in_commissioning_mode(
+    fake_xbpm_feedback,
+) -> Generator[XBPMFeedback, None, None]:
+    set_mock_value(fake_xbpm_feedback.baton_ref().commissioning, True)  # type: ignore
+    yield fake_xbpm_feedback
 
 
 def test_given_pos_stable_when_xbpm_feedback_kickoff_then_return_immediately(
@@ -84,3 +95,17 @@ def test_logging_while_waiting_for_XBPM(
         record.getMessage() == "Waiting for XBPM" for record in caplog.records
     )
     assert log_messages == expected_log_messages
+
+
+@patch("dodal.devices.xbpm_feedback.observe_value")
+@patch("dodal.devices.xbpm_feedback.periodic_reminder")
+def test_xbpm_feedback_does_not_wait_if_commissioning_mode_enabled(
+    mock_periodic_reminder: AsyncMock,
+    mock_observe_value: AsyncMock,
+    xbpm_feedback_in_commissioning_mode: XBPMFeedback,
+    RE: RunEngine,
+):
+    set_mock_value(xbpm_feedback_in_commissioning_mode.pos_stable, False)
+    RE(bps.trigger(xbpm_feedback_in_commissioning_mode, wait=True))
+    mock_periodic_reminder.assert_not_called()
+    mock_observe_value.assert_not_called()
