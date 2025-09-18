@@ -78,6 +78,7 @@ class TetrammController(DetectorController):
     _supported_trigger_types = {
         DetectorTrigger.EDGE_TRIGGER: TetrammTrigger.EXT_TRIGGER,
         DetectorTrigger.CONSTANT_GATE: TetrammTrigger.EXT_TRIGGER,
+        DetectorTrigger.VARIABLE_GATE: TetrammTrigger.EXT_TRIGGER,
     }
     """"On the TetrAMM ASCII mode requires a minimum value of ValuesPerRead of 500,
     [...] binary mode the minimum value of ValuesPerRead is 5."
