@@ -1,7 +1,6 @@
-from unittest.mock import MagicMock
-
 from bluesky.protocols import Readable
 from ophyd_async.epics.motor import Motor
+from tests.fake_beamline.util import _mock_with_name
 
 from dodal.devices.cryostream import CryoStream
 
@@ -11,14 +10,8 @@ def device_x() -> Readable:
 
 
 def device_y() -> Motor:
-    raise AssertionError("Test failure")
+    return _mock_with_name("motor")
 
 
 def device_z(device_x: Readable, device_y: Motor) -> CryoStream:
     return _mock_with_name("cryo")
-
-
-def _mock_with_name(name: str) -> MagicMock:
-    mock = MagicMock()
-    mock.name = name
-    return mock

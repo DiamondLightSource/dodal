@@ -40,7 +40,7 @@ def alternate_config(tmp_path) -> str:
 
 @pytest.fixture()
 def fake_device_factory_beamline():
-    import tests.fake_device_factory_beamline as beamline
+    import tests.fake_beamline.factory_beamline as beamline
 
     factories = [
         f
@@ -53,11 +53,11 @@ def fake_device_factory_beamline():
 
 
 def test_finds_device_factories() -> None:
-    import tests.fake_beamline as fake_beamline
+    import tests.fake_beamline.beamline_1 as beamline_1
 
-    factories = collect_factories(fake_beamline)
+    factories = collect_factories(beamline_1)
 
-    from tests.fake_beamline import (
+    from tests.fake_beamline.beamline_1 import (
         device_a,
         device_b,
         device_c,
@@ -75,9 +75,9 @@ def test_finds_device_factories() -> None:
 
 
 def test_makes_devices() -> None:
-    import tests.fake_beamline as fake_beamline
+    import tests.fake_beamline.beamline_1 as beamline_1
 
-    devices, exceptions = make_all_devices(fake_beamline)
+    devices, exceptions = make_all_devices(beamline_1)
     assert {
         "readable",
         "motor",
@@ -87,22 +87,58 @@ def test_makes_devices() -> None:
     } == devices.keys() and len(exceptions) == 0
 
 
+def test_makes_devices_from_multiple_beamlines_as_str() -> None:
+    devices, exceptions = make_all_devices(
+        [
+            "tests.fake_beamline.beamline_1",
+            "tests.fake_beamline.beamline_2",
+        ]
+    )
+    assert {
+        "readable",
+        "motor",
+        "cryo",
+        "diamond_filter",
+        "ophyd_v2_device",
+        "device_e",
+        "device_f",
+        "device_g",
+    } == devices.keys() and len(exceptions) == 0
+
+
+def test_makes_devices_from_multiple_beamlines_as_modules() -> None:
+    import tests.fake_beamline.beamline_1 as beamline_1
+    import tests.fake_beamline.beamline_2 as beamline_2
+
+    devices, exceptions = make_all_devices([beamline_1, beamline_2])
+    assert {
+        "readable",
+        "motor",
+        "cryo",
+        "diamond_filter",
+        "ophyd_v2_device",
+        "device_e",
+        "device_f",
+        "device_g",
+    } == devices.keys() and len(exceptions) == 0
+
+
 def test_makes_devices_with_dependencies() -> None:
-    import tests.fake_beamline_dependencies as fake_beamline
+    import tests.fake_beamline.dependencies as fake_beamline
 
     devices, exceptions = make_all_devices(fake_beamline)
     assert {"readable", "motor", "cryo"} == devices.keys() and len(exceptions) == 0
 
 
 def test_makes_devices_with_disordered_dependencies() -> None:
-    import tests.fake_beamline_disordered_dependencies as fake_beamline
+    import tests.fake_beamline.disordered_dependencies as fake_beamline
 
     devices, exceptions = make_all_devices(fake_beamline)
     assert {"readable", "motor", "cryo"} == devices.keys() and len(exceptions) == 0
 
 
 def test_makes_devices_with_module_name() -> None:
-    devices, exceptions = make_all_devices("tests.fake_beamline")
+    devices, exceptions = make_all_devices("tests.fake_beamline.beamline_1")
     assert {
         "readable",
         "motor",
@@ -119,7 +155,7 @@ def test_get_hostname() -> None:
 
 
 def test_no_signature_builtins_not_devices() -> None:
-    import tests.fake_beamline_misbehaving_builtins as fake_beamline
+    import tests.fake_beamline.misbehaving_builtins as fake_beamline
 
     devices, exceptions = make_all_devices(fake_beamline)
     assert len(devices) == 0
@@ -127,7 +163,7 @@ def test_no_signature_builtins_not_devices() -> None:
 
 
 def test_no_devices_when_all_factories_raise_exceptions() -> None:
-    import tests.fake_beamline_all_devices_raise_exception as fake_beamline
+    import tests.fake_beamline.all_devices_raise_exception as fake_beamline
 
     devices, exceptions = make_all_devices(fake_beamline)
     assert len(devices) == 0
@@ -137,7 +173,7 @@ def test_no_devices_when_all_factories_raise_exceptions() -> None:
 
 
 def test_some_devices_when_some_factories_raise_exceptions() -> None:
-    import tests.fake_beamline_some_devices_working as fake_beamline
+    import tests.fake_beamline.some_devices_working as fake_beamline
 
     devices, exceptions = make_all_devices(fake_beamline)
     assert len(devices) == 2
@@ -147,40 +183,40 @@ def test_some_devices_when_some_factories_raise_exceptions() -> None:
 
 
 def test_make_device_with_dependency():
-    import tests.fake_beamline_dependencies as fake_beamline
+    import tests.fake_beamline.dependencies as fake_beamline
 
     devices = make_device(fake_beamline, "device_z")
     assert devices.keys() == {"device_x", "device_y", "device_z"}
 
 
 def test_make_device_no_dependency():
-    import tests.fake_beamline_dependencies as fake_beamline
+    import tests.fake_beamline.dependencies as fake_beamline
 
     devices = make_device(fake_beamline, "device_x")
     assert devices.keys() == {"device_x"}
 
 
 def test_make_device_with_exception():
-    import tests.fake_beamline_all_devices_raise_exception as fake_beamline
+    import tests.fake_beamline.all_devices_raise_exception as fake_beamline
 
     with pytest.raises(ValueError):
         make_device(fake_beamline, "device_c")
 
 
 def test_make_device_with_module_name():
-    devices = make_device("tests.fake_beamline", "device_a")
+    devices = make_device("tests.fake_beamline.beamline_1", "device_a")
     assert {"device_a"} == devices.keys()
 
 
 def test_make_device_no_factory():
-    import tests.fake_beamline_dependencies as fake_beamline
+    import tests.fake_beamline.dependencies as fake_beamline
 
     with pytest.raises(ValueError):
         make_device(fake_beamline, "this_device_does_not_exist")
 
 
 def test_make_device_dependency_throws():
-    import tests.fake_beamline_broken_dependency as fake_beamline
+    import tests.fake_beamline.broken_dependency as fake_beamline
 
     with pytest.raises(RuntimeError):
         make_device(fake_beamline, "device_z")

@@ -1,7 +1,6 @@
-from unittest.mock import MagicMock
-
 from bluesky.protocols import Readable
 from ophyd_async.epics.motor import Motor
+from tests.fake_beamline.util import _mock_with_name
 
 from dodal.devices.cryostream import CryoStream
 from dodal.devices.diamond_filter import DiamondFilter, I03Filters
@@ -30,9 +29,3 @@ def plain_ophyd_v2_device() -> OphydV2Device:
 
 def not_device() -> int:
     return 5
-
-
-def _mock_with_name(name: str) -> MagicMock:
-    mock = MagicMock()
-    mock.name = name
-    return mock

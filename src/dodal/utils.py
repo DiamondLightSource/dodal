@@ -266,7 +266,7 @@ def make_all_devices(
 
     factories = {}
     for m in mods:
-        if isinstance(m, str) or m is None:
+        if isinstance(m, str):
             m = import_module(m)
         factories = factories | collect_factories(m, include_skipped)
 
