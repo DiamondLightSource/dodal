@@ -7,6 +7,9 @@ Testing is essential to maintain the integrity and reliability of the codebase. 
 - **Unit Tests**: Place unit tests for individual components in the `tests` directory, but take care to mirror the file structure of the `src` folder with the corresponding code files. Use the `test_*.py` naming convention for test files.
 - **System Tests**: Tests that interact with DLS infrastructure, network, and filesystem should be placed in the top-level `systems_test` folder. This separation ensures that these tests are easily identifiable and can be run independently from unit tests.
 
+Useful functions for testing that can be reused across multiple tests for common devices and for external plan repositories belong in the `dodal/testing` directory. For example, when mocking a `Motor` device, all of the signals will default to zero, which will cause errors when trying to move. The `patch_motor` and `patch_all_motors` functions, found in `dodal.testing`, will populate the mocked motor with useful default values for the signals so that it can still be used in tests.
+
+
 ## Writing a test for a device
 We aim for high test coverage in dodal with small, modular test functions. To achieve this, we need to test the relevant methods by writing tests for the class/method we are creating or changing, checking for the expected behaviour. We shouldn't need to write tests for parent classes unless we alter their behaviour.
 
