@@ -29,7 +29,7 @@ def dcm() -> DCM:
 # Connect will work again after this work completed
 # https://jira.diamond.ac.uk/browse/I09-651
 @device_factory()
-def specs() -> SpecsDetector[LensMode, PsuMode]:
+def analyser() -> SpecsDetector[LensMode, PsuMode]:
     return SpecsDetector[LensMode, PsuMode](
         prefix=f"{PREFIX.beamline_prefix}-EA-DET-02:CAM:",
         lens_mode_type=LensMode,
