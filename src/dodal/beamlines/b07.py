@@ -29,7 +29,7 @@ def pgm() -> PGM:
 # Connect will work again after this work completed
 # https://jira.diamond.ac.uk/browse/B07-1104
 @device_factory()
-def specs() -> SpecsDetector[LensMode, PsuMode]:
+def analyser() -> SpecsDetector[LensMode, PsuMode]:
     return SpecsDetector[LensMode, PsuMode](
         prefix=f"{PREFIX.beamline_prefix}-EA-DET-01:CAM:",
         lens_mode_type=LensMode,
