@@ -111,8 +111,10 @@ class DeviceManager:
             return decorator
         return decorator(func)
 
-    def build_all(self, **kwargs):
-        order = self._build_order(kwargs)
+    def build_all(
+        self, fixtures: dict[str, Any]
+    ) -> tuple[dict[str, Any], dict[str, Exception]]:
+        order = self._build_order(fixtures)
         built = {}
         errors = {}
         for device in order:
@@ -120,7 +122,7 @@ class DeviceManager:
             if deps.keys() & errors.keys():
                 errors[device] = ValueError("Errors building dependencies")
             else:
-                params = {dep: built.get(dep) or kwargs[dep] for dep in deps}
+                params = {dep: built.get(dep) or fixtures[dep] for dep in deps}
                 try:
                     built[device] = self[device](**params)
                 except Exception as e:
