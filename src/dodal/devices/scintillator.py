@@ -8,9 +8,10 @@ from dodal.devices.aperturescatterguard import ApertureScatterguard, ApertureVal
 
 
 class InOut(StrictEnum):
-    """Currently Hyperion only needs to move the scintillator out for data collection."""
+    """Moves the scintillator out for data collection."""
 
     OUT = "Out"
+    IN = "In"
     UNKNOWN = "Unknown"
 
 
@@ -42,9 +43,15 @@ class Scintillator(StandardReadable):
             )
 
         self._aperture_scatterguard = aperture_scatterguard
+        # ask what these lines are doing
         self._scintillator_out_yz_mm = [
             float(beamline_parameters[f"scin_{axis}_SCIN_OUT"]) for axis in ("y", "z")
         ]
+
+        self._scintillator_in_yz_mm = [
+            float(beamline_parameters[f"scin_{axis}_SCIN_IN"]) for axis in ("y", "z")
+        ]
+
         self._yz_tolerance_mm = [
             float(beamline_parameters[f"scin_{axis}_tolerance"]) for axis in ("y", "z")
         ]
@@ -63,6 +70,18 @@ class Scintillator(StandardReadable):
             )
         ):
             return InOut.OUT
+
+        elif all(
+            isclose(axis_pos, axis_in_beam, abs_tol=axis_tolerance)
+            for axis_pos, axis_in_beam, axis_tolerance in zip(
+                current_pos,
+                self._scintillator_in_yz_mm,
+                self._yz_tolerance_mm,
+                strict=False,
+            )
+        ):
+            return InOut.IN
+
         else:
             return InOut.UNKNOWN
 
@@ -78,5 +97,8 @@ class Scintillator(StandardReadable):
                     )
                 await self.y_mm.set(self._scintillator_out_yz_mm[0])
                 await self.z_mm.set(self._scintillator_out_yz_mm[1])
+            case InOut.IN:
+                await self.y_mm.set(self._scintillator_in_yz_mm[0])
+                await self.z_mm.set(self._scintillator_in_yz_mm[1])
             case _:
                 raise ValueError(f"Cannot set scintillator to position {position}")
