@@ -1,3 +1,7 @@
+from pathlib import PurePath
+
+from ophyd_async.core import AutoIncrementingPathProvider, StaticFilenameProvider
+
 from dodal.common.beamlines.beamline_utils import (
     BL,
     device_factory,
@@ -8,6 +12,7 @@ from dodal.devices.hutch_shutter import HutchShutter
 from dodal.devices.i24.aperture import Aperture
 from dodal.devices.i24.beam_center import DetectorBeamCenter
 from dodal.devices.i24.beamstop import Beamstop
+from dodal.devices.i24.commissioning_jungfrau import CommissioningJungfrau
 from dodal.devices.i24.dcm import DCM
 from dodal.devices.i24.dual_backlight import DualBacklight
 from dodal.devices.i24.focus_mirrors import FocusMirrorsMode
@@ -186,4 +191,23 @@ def eiger_beam_center() -> DetectorBeamCenter:
     return DetectorBeamCenter(
         f"{PREFIX.beamline_prefix}-EA-EIGER-01:CAM:",
         "eiger_bc",
+    )
+
+
+@device_factory()
+def commissioning_jungfrau(
+    path_to_dir: str = "/tmp/jf",  # Device factory doesn't allow for required args,
+    filename: str = "jf_output",  # but these should be manually entered when commissioning
+) -> CommissioningJungfrau:
+    """Get the commissionning Jungfrau 9M device, which uses a temporary filewriter
+    device in place of the Odin while the detector is in commissioning.
+    Instantiates the device if it hasn't already been.
+    If this is called when already instantiated, it will return the existing object."""
+
+    return CommissioningJungfrau(
+        f"{PREFIX.beamline_prefix}-EA-JFRAU-01:",
+        f"{PREFIX.beamline_prefix}-JUNGFRAU-META:FD:",
+        AutoIncrementingPathProvider(
+            StaticFilenameProvider(filename), PurePath(path_to_dir)
+        ),
     )
