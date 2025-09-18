@@ -79,8 +79,8 @@ def connect(beamline: str, all: bool, sim_backend: bool, module_only: bool) -> N
     full_module_paths = [
         f"dodal.beamlines.{bl_module}" for bl_module in beamline_modules
     ]
-    print("=" * 100)
-    print(f"Attempting connection to {beamline_modules})")
+    print(f"Attempting connection to {beamline} (using {full_module_paths})")
+    print(shared_beamline_modules)
 
     # Force all devices to be lazy (don't connect to PVs on instantiation) and do
     # connection as an extra step, because the alternatives is handling the fact

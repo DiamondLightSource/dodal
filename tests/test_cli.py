@@ -17,7 +17,7 @@ from dodal.utils import AnyDevice, OphydV1Device, OphydV2Device
 # Test with an example beamline, device instantiation is already tested
 # in beamline unit tests
 EXAMPLE_BEAMLINE = "i22"
-EXAMPLE_BEAMLINE_SHARED = EXAMPLE_BEAMLINE + "_shared"
+EXAMPLE_SHARED_BEAMLINE = [EXAMPLE_BEAMLINE, EXAMPLE_BEAMLINE + "_shared"]
 
 
 @pytest.fixture
@@ -126,28 +126,36 @@ def test_cli_connect_in_sim_mode(runner: CliRunner):
     assert "6 devices connected (sim mode)" in result.stdout
 
 
-# @patch.dict(os.environ, clear=True)
-# def test_cli_connect_with_shared_beamline_module_only(runner: CliRunner):
-#     result = _mock_connect(
-#         "-m",
-#         EXAMPLE_BEAMLINE,
-#         runner=runner,
-#         devices=device_results(ophyd_async_happy_devices=6),
-#     )
-
-#     assert "using dodal.beamlines." + EXAMPLE_BEAMLINE in result.stdout
+@patch.dict(os.environ, clear=True)
+def test_cli_connect_with_shared_beamline(runner: CliRunner):
+    with patch(
+        "dodal.cli.shared_beamline_modules",
+        side_effect=lambda _: EXAMPLE_SHARED_BEAMLINE,
+    ):
+        result = _mock_connect(
+            EXAMPLE_BEAMLINE,
+            runner=runner,
+            devices=device_results(ophyd_async_happy_devices=6),
+        )
+        assert (
+            f"using ['dodal.beamlines.{EXAMPLE_SHARED_BEAMLINE[0]}', 'dodal.beamlines.{EXAMPLE_SHARED_BEAMLINE[1]}']"
+            in result.stdout
+        )
 
 
 @patch.dict(os.environ, clear=True)
-def test_cli_connect_with_shared_beamline_module_only(runner: CliRunner):
-    result = _mock_connect(
-        "-m",
-        EXAMPLE_BEAMLINE,
-        runner=runner,
-        devices=device_results(ophyd_async_happy_devices=6),
-    )
-
-    assert "using dodal.beamlines." + EXAMPLE_BEAMLINE in result.stdout
+def test_cli_connect_with_shared_beamline_module_only_argument(runner: CliRunner):
+    with patch(
+        "dodal.cli.shared_beamline_modules",
+        side_effect=lambda _: EXAMPLE_SHARED_BEAMLINE,
+    ):
+        result = _mock_connect(
+            "-m",
+            EXAMPLE_BEAMLINE,
+            runner=runner,
+            devices=device_results(ophyd_async_happy_devices=6),
+        )
+        assert f"using ['dodal.beamlines.{EXAMPLE_BEAMLINE}']" in result.stdout
 
 
 @patch.dict(os.environ, clear=True)
