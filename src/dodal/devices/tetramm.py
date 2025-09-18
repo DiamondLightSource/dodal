@@ -157,11 +157,14 @@ class TetrammController(DetectorController):
 
     async def unstage(self):
         await self.disarm()
+        await self.driver.averaging_time.set(self._file_io.acquire, False)
+
 
     async def disarm(self):
         # We can't use caput callback as we already used it in arm() and we can't have
         # 2 or they will deadlock
         await stop_busy_record(self.driver.acquire, False, timeout=1)
+        
 
     async def set_exposure(self, exposure: float) -> None:
         """Set the exposure time and acquire period.
