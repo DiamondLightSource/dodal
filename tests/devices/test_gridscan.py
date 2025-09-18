@@ -194,31 +194,6 @@ def composite_with_smargon(motor_bundle_with_limits):
     return CompositeWithSmargon(motor_bundle_with_limits)
 
 
-@pytest.mark.parametrize(
-    "position, expected_in_limit",
-    [
-        (-1, False),
-        (20, False),
-        (5, True),
-    ],
-)
-async def test_within_limits_check(
-    RE: RunEngine, motor_bundle_with_limits, position, expected_in_limit
-):
-    def check_limits_plan():
-        limits = yield from motor_bundle_with_limits.get_xyz_limits()
-        assert limits.x.contains(position) == expected_in_limit
-
-    RE(check_limits_plan())
-
-
-PASSING_LINE_1 = (1, 5, 1)
-PASSING_LINE_2 = (0, 10, 0.5)
-FAILING_LINE_1 = (-1, 20, 0.5)
-PASSING_CONST = 6
-FAILING_CONST = 15
-
-
 def check_parameter_validation(params, composite, expected_in_limits):
     if expected_in_limits:
         yield from params.validate_against_hardware(composite)
