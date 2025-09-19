@@ -56,7 +56,7 @@ class LakeshoreBaseIO(Device):
     Provides access to control channels and readback channels for setpoint, ramp rate, heater output,
     and PID parameters. Supports both single and multiple control channel configurations.
     Note:
-        Almost all model has a controller for each readback channel but some model
+        Almost all models have a controller for each readback channel but some models
             only has a single controller for multiple readback channels.
     """
 
