@@ -136,3 +136,20 @@ async def test_lakeshore_count_with_hints(
         docs["descriptor"][0]["hints"]["lakeshore"]["fields"][0]
         == f"lakeshore-readback-{readback_channel}"
     )
+
+
+@pytest.mark.parametrize(
+    "readback_channel",
+    [3, 2, 1, 4],
+)
+async def test_lakeshore_hints_read(
+    lakeshore: Lakeshore, RE: RunEngine, readback_channel: int
+):
+    docs = defaultdict(list)
+
+    def capture_emitted(name, doc):
+        docs[name].append(doc)
+
+    RE(abs_set(lakeshore.hints_channel, readback_channel), wait=True)
+    RE(count([lakeshore.hints_channel]), capture_emitted)
+    assert docs["event"][0]["data"]["lakeshore-hints_channel"] == readback_channel

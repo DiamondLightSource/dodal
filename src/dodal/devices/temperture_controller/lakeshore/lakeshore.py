@@ -149,6 +149,7 @@ class Lakeshore(LakeshoreBaseIO, StandardReadable, Movable[float]):
 
     async def _set_hints_channel(self, readback_channel: int) -> None:
         self._has_hints = (_HintsFromName(self.readback[readback_channel]),)
+        await self._hints_channel.set(readback_channel)
 
     def _get_hints_channel(self, current_channel: int) -> int:
         return current_channel
