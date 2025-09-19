@@ -18,25 +18,9 @@ from .lakeshore_io import (
 
 class Lakeshore(LakeshoreBaseIO, StandardReadable, Movable[float]):
     """
-    Lakeshore temperature controller device.
-
-    This class provides an interface for controlling and reading from a Lakeshore temperature controller.
-    It supports multiple channels and PID control.
-
-    Parameters
-    ----------
-    prefix : str
-        The EPICS prefix for the device.
-    no_channels : int
-        Number of temperature channels.
-    heater_setting : type[SignalDatatypeT]
-        Enum type for heater settings.
-    control_channel : int, optional
-        The initial control channel (default is 1).
-    single_control_channel : bool, optional
-        Whether to use a single control channel (default is False).
-    name : str, optional
-        Name of the device.
+    Lakeshore temperature controller device. This provides an interface for controlling
+     and reading from a Lakeshore temperature controller.
+     It supports multiple channels and PID control.
 
     Attributes
     ----------
@@ -70,6 +54,22 @@ class Lakeshore(LakeshoreBaseIO, StandardReadable, Movable[float]):
         single_control_channel: bool = False,
         name: str = "",
     ):
+        """
+        Parameters
+        ----------
+        prefix : str
+            The EPICS prefix for the device.
+        no_channels : int
+            Number of temperature channels.
+        heater_setting : type[SignalDatatypeT]
+            Enum type for heater settings.
+        control_channel : int, optional
+            The initial control channel (default is 1).
+        single_control_channel : bool, optional
+            Whether to use a single control channel (default is False).
+        name : str, optional
+            Name of the device.
+        """
         self._control_channel = soft_signal_rw(int, initial_value=control_channel)
         self.temperature_high_limit = soft_signal_rw(float, initial_value=400)
         self.temperature_low_limit = soft_signal_rw(float, initial_value=0)
@@ -127,7 +127,9 @@ class Lakeshore(LakeshoreBaseIO, StandardReadable, Movable[float]):
                 await self.control_channel.get_value()
             ].user_setpoint.set(value)
         else:
-            raise ValueError(f"Requested temperature must be withing {high} and {low}")
+            raise ValueError(
+                f"Requested temperature {value} is outside limits: {low}, {high}"
+            )
 
     def _get_control_channel(self, current_channel: int) -> int:
         return current_channel
@@ -135,7 +137,7 @@ class Lakeshore(LakeshoreBaseIO, StandardReadable, Movable[float]):
     async def _set_control_channel(self, value: int) -> None:
         if value < 1 or value > len(self.control_channels):
             raise ValueError(
-                f"Control channels must be between 1 and {len(self.control_channels)}."
+                f"Control channel must be between 1 and {len(self.control_channels)}."
             )
         await self._control_channel.set(value)
         self._read_config_funcs = (

@@ -64,8 +64,11 @@ async def test_lakeshore_set_success(
 async def test_lakeshore_set_success_fail_outside_limit(
     lakeshore: Lakeshore, RE: RunEngine, temperature: float
 ):
+    low = await lakeshore.temperature_low_limit.get_value()
+    high = await lakeshore.temperature_high_limit.get_value()
     with pytest.raises(
-        ValueError, match="Requested temperature must be withing 400.0 and 0.0"
+        ValueError,
+        match=f"Requested temperature {temperature} is outside limits: {low}, {high}",
     ):
         await lakeshore.set(temperature)
 
@@ -75,7 +78,7 @@ async def test_lakeshore_set_fail_unavailable_channel(
 ):
     with pytest.raises(
         ValueError,
-        match=f"Control channels must be between 1 and {len(lakeshore.control_channels)}.",
+        match=f"Control channel must be between 1 and {len(lakeshore.control_channels)}.",
     ):
         await lakeshore._set_control_channel(0)
 
@@ -89,7 +92,7 @@ async def test_lakeshore_set_control_channel_correctly_set_up_config(
     RE: RunEngine,
     control_channel: int,
 ):
-    RE(abs_set(lakeshore.control_channel, control_channel))
+    RE(abs_set(lakeshore.control_channel, control_channel, wait=True))
 
     config = ["user_setpoint", "p", "i", "d", "heater_output_range"]
     expected_config = {
@@ -130,7 +133,7 @@ async def test_lakeshore_count_with_hints(
     def capture_emitted(name, doc):
         docs[name].append(doc)
 
-    RE(abs_set(lakeshore.hints_channel, readback_channel))
+    RE(abs_set(lakeshore.hints_channel, readback_channel, wait=True))
     RE(count([lakeshore]), capture_emitted)
     assert (
         docs["descriptor"][0]["hints"]["lakeshore"]["fields"][0]
