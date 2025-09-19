@@ -85,7 +85,7 @@ class Lakeshore(LakeshoreBaseIO, StandardReadable, Movable[float]):
         self.hints_channel = derived_signal_rw(
             raw_to_derived=self._get_hints_channel,
             set_derived=self._set_hints_channel,
-            current_channel=self._hints_channel,
+            current_hints_channel=self._hints_channel,
         )
 
         super().__init__(
@@ -153,5 +153,5 @@ class Lakeshore(LakeshoreBaseIO, StandardReadable, Movable[float]):
         self._has_hints = (_HintsFromName(self.readback[readback_channel]),)
         await self._hints_channel.set(readback_channel)
 
-    def _get_hints_channel(self, current_channel: int) -> int:
-        return current_channel
+    def _get_hints_channel(self, current_hints_channel: int) -> int:
+        return current_hints_channel
