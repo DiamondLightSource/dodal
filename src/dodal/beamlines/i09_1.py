@@ -2,7 +2,8 @@ from dodal.common.beamlines.beamline_utils import (
     device_factory,
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.devices.electron_analyser.specs import SpecsAnalyserDriverIO
+from dodal.devices.electron_analyser import SelectedSource
+from dodal.devices.electron_analyser.specs import SpecsDetector
 from dodal.devices.i09.dcm import DCM
 from dodal.devices.i09_1 import LensMode, PsuMode
 from dodal.devices.synchrotron import Synchrotron
@@ -28,10 +29,10 @@ def dcm() -> DCM:
 # Connect will work again after this work completed
 # https://jira.diamond.ac.uk/browse/I09-651
 @device_factory()
-def analyser_driver() -> SpecsAnalyserDriverIO[LensMode, PsuMode]:
-    return SpecsAnalyserDriverIO[LensMode, PsuMode](
+def analyser() -> SpecsDetector[LensMode, PsuMode]:
+    return SpecsDetector[LensMode, PsuMode](
         prefix=f"{PREFIX.beamline_prefix}-EA-DET-02:CAM:",
         lens_mode_type=LensMode,
         psu_mode_type=PsuMode,
-        energy_sources={"source1": dcm().energy_in_ev},
+        energy_sources={SelectedSource.SOURCE1: dcm().energy_in_ev},
     )

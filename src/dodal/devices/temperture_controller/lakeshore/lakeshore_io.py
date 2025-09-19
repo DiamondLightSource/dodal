@@ -3,6 +3,13 @@ from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
 
 class LakeshoreControlChannel(Device):
+    """
+    Single control channel for a Lakeshore temperature controller.
+
+    Provides access to setpoint, ramp rate, ramp enable, heater output, heater output range,
+    PID parameters (P, I, D), and manual output for the channel.
+    """
+
     def __init__(
         self,
         prefix: str,
@@ -10,11 +17,17 @@ class LakeshoreControlChannel(Device):
         heater_type: type[SignalDatatypeT],
         name: str = "",
     ):
-        """
-        Single control channel for a Lakeshore temperature controller.
-
-        Provides access to setpoint, ramp rate, ramp enable, heater output, heater output range,
-        PID parameters (P, I, D), and manual output for the channel.
+        """Initialize the LakeshoreControlChannel device.
+        Parameters
+        ----------
+            prefix: str
+                The EPICS prefix for the Lakeshore device.
+            suffix: str
+                Suffix for the channel, used to differentiate multiple channels.
+            heater_type: SignalDatatypeT
+                Type of the heater output range.
+            name: str
+                Optional name for the device.
         """
 
         def channel_rw(channel_type, pv_name):
@@ -29,15 +42,24 @@ class LakeshoreControlChannel(Device):
         self.ramp_enable = channel_rw(channel_type=int, pv_name="RAMPST")
         self.heater_output = channel_rw(channel_type=float, pv_name="HTR")
         self.heater_output_range = channel_rw(channel_type=heater_type, pv_name="RANGE")
-        self.p = channel_rw(float, "P")
-        self.i = channel_rw(float, "I")
-        self.d = channel_rw(float, "D")
-        self.manual_output = channel_rw(float, "MOUT")
+        self.p = channel_rw(channel_type=float, pv_name="P")
+        self.i = channel_rw(channel_type=float, pv_name="I")
+        self.d = channel_rw(channel_type=float, pv_name="D")
+        self.manual_output = channel_rw(channel_type=float, pv_name="MOUT")
 
         super().__init__(name=name)
 
 
 class LakeshoreBaseIO(Device):
+    """Base class for Lakeshore temperature controller IO.
+
+    Provides access to control channels and readback channels for setpoint, ramp rate, heater output,
+    and PID parameters. Supports both single and multiple control channel configurations.
+    Note:
+        Almost all models have a controller for each readback channel but some models
+            only has a single controller for multiple readback channels.
+    """
+
     def __init__(
         self,
         prefix: str,
@@ -46,31 +68,35 @@ class LakeshoreBaseIO(Device):
         name: str = "",
         single_control_channel: bool = False,
     ):
-        """Base class for Lakeshore temperature controller IO.
+        """Initialize the LakeshoreBaseIO device.
 
-        Provides access to control channels and readback channels for setpoint, ramp rate, heater output,
-        and PID parameters. Supports both single and multiple control channel configurations.
-        Note:
-            Almost all model has a controller for each readback channel but some model
-             only has a single controller for multiple readback channels.
+        Parameters
+        -----------
+            prefix: str
+                The EPICS prefix for the Lakeshore device.
+            num_readback_channel: int
+                Number of readback channels to create.
+            heater_setting: SignalDatatypeT
+                Type of the heater setting.
+            name: str
+                Optional name for the device.
+            single_control_channel: bool
+                If True, use a single control channel for all readback.
         """
-        if single_control_channel:
-            self.control_channels = DeviceVector(
-                {
-                    1: LakeshoreControlChannel(
-                        prefix=prefix, suffix="", heater_type=heater_setting
-                    )
-                }
-            )
-        else:
-            self.control_channels = DeviceVector(
-                {
-                    i: LakeshoreControlChannel(
-                        prefix=prefix, suffix=str(i), heater_type=heater_setting
-                    )
-                    for i in range(1, num_readback_channel + 1)
-                }
-            )
+
+        suffixes = (
+            [""]
+            if single_control_channel
+            else map(str, range(1, num_readback_channel + 1))
+        )
+        self.control_channels = DeviceVector(
+            {
+                i: LakeshoreControlChannel(
+                    prefix=prefix, suffix=suffix, heater_type=heater_setting
+                )
+                for i, suffix in enumerate(suffixes, start=1)
+            }
+        )
 
         self.readback = DeviceVector(
             {

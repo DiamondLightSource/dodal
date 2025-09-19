@@ -34,6 +34,7 @@ MAXIMUM_ROW_PHASE_MOTOR_POSITION = 24.0
 MAXIMUM_GAP_MOTOR_POSITION = 100
 DEFAULT_JAW_PHASE_POLY_PARAMS = [1.0 / 7.5, -120.0 / 7.5]
 ALPHA_OFFSET = 180
+MAXIMUM_MOVE_TIME = 550  # There is no useful movements take longer than this.
 
 
 # data class to store the lookup table configuration that is use in convert_csv_to_lookup
@@ -69,7 +70,7 @@ class I10Apple2(Apple2):
         self,
         look_up_table_dir: str,
         source: tuple[str, str],
-        prefix: str = "",
+        prefix: str,
         mode: str = "Mode",
         min_energy: str = "MinEnergy",
         max_energy: str = "MaxEnergy",
@@ -97,11 +98,9 @@ class I10Apple2(Apple2):
             Name of the device
         """
 
-        energy_gap_table_path = Path(
-            look_up_table_dir + "IDEnergy2GapCalibrations.csv",
-        )
+        energy_gap_table_path = Path(look_up_table_dir, "IDEnergy2GapCalibrations.csv")
         energy_phase_table_path = Path(
-            look_up_table_dir + "IDEnergy2PhaseCalibrations.csv",
+            look_up_table_dir, "IDEnergy2PhaseCalibrations.csv"
         )
         # A dataclass contains the path to the look up table and the expected column names.
         self.lookup_table_config = LookupTableConfig(
@@ -124,7 +123,6 @@ class I10Apple2(Apple2):
                     btm_inner="RPQ3",
                     btm_outer="RPQ4",
                 ),
-                prefix=prefix,
                 name=name,
             )
             self.id_jaw_phase = UndulatorJawPhase(
@@ -253,7 +251,8 @@ class I10Apple2Pol(StandardReadable, Movable[Pol]):
     @AsyncStatus.wrap
     async def set(self, value: Pol) -> None:
         LOGGER.info(f"Changing f{self.name} polarisation to {value}.")
-        await self.id_ref().polarisation.set(value)
+        # Timeout is determined internally by the set method later, so we set it to max here.
+        await self.id_ref().polarisation.set(value, timeout=MAXIMUM_MOVE_TIME)
 
 
 class LinearArbitraryAngle(StandardReadable, Movable[SupportsFloat]):

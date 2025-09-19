@@ -22,9 +22,8 @@ from ophyd_async.epics.adcore import (
     NDArrayBaseIO,
     NDFileHDFIO,
     NDPluginBaseIO,
-    stop_busy_record,
 )
-from ophyd_async.epics.core import PvSuffix
+from ophyd_async.epics.core import PvSuffix, stop_busy_record
 
 
 class TetrammRange(StrictEnum):
@@ -116,6 +115,19 @@ class TetrammController(DetectorController):
             self.driver.averaging_time.set(trigger_info.livetime),
             self.set_exposure(trigger_info.livetime),
         )
+
+        # raise an error if asked to trigger faster than the max.
+        # possible speed for a tetramm
+        self._validate_deadtime(trigger_info)
+
+    def _validate_deadtime(self, value: TriggerInfo) -> None:
+        minimum_deadtime = self.get_deadtime(value.livetime)
+        if minimum_deadtime > value.deadtime:
+            msg = (
+                f"Tetramm {self} needs at least {minimum_deadtime}s "
+                f"deadtime, but trigger logic provides only {value.deadtime}s"
+            )
+            raise ValueError(msg)
 
     async def arm(self):
         self._arm_status = await self.start_acquiring_driver_and_ensure_status()

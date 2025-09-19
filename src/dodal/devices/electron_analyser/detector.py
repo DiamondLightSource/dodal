@@ -1,5 +1,6 @@
 from typing import Generic, TypeVar
 
+from bluesky.protocols import Stageable
 from ophyd_async.core import (
     AsyncStatus,
     Reference,
@@ -59,6 +60,7 @@ TElectronAnalyserRegionDetector = TypeVar(
 
 class ElectronAnalyserDetector(
     AbstractElectronAnalyserDetector[TAbstractAnalyserDriverIO],
+    Stageable,
     Generic[
         TAbstractAnalyserDriverIO,
         TAbstractBaseSequence,
@@ -87,6 +89,28 @@ class ElectronAnalyserDetector(
         # This implementation creates the driver and wants this to be the parent so it
         # can be used with connect() method.
         return self._driver
+
+    @AsyncStatus.wrap
+    async def stage(self) -> None:
+        """
+        Prepare the detector for use by ensuring it is idle and ready.
+
+        This method asynchronously stages the detector by first disarming the controller
+        to ensure the detector is not actively acquiring data, then invokes the driver's
+        stage procedure. This ensures the detector is in a known, ready state
+        before use.
+
+        Raises:
+            Any exceptions raised by the driver's stage or controller's disarm methods.
+        """
+        await self.controller.disarm()
+        await self.driver.stage()
+
+    @AsyncStatus.wrap
+    async def unstage(self) -> None:
+        """Disarm the detector."""
+        await self.controller.disarm()
+        await self.driver.unstage()
 
     def load_sequence(self, filename: str) -> TAbstractBaseSequence:
         """

@@ -1,3 +1,4 @@
+import os
 import pickle
 from collections import defaultdict
 from unittest import mock
@@ -14,6 +15,15 @@ from ophyd_async.testing import (
     callback_on_mock_put,
     get_mock_put,
     set_mock_value,
+)
+from tests.devices.i10.test_data import (
+    EXPECTED_ID_ENERGY_2_GAP_CALIBRATIONS_IDD_PKL,
+    EXPECTED_ID_ENERGY_2_GAP_CALIBRATIONS_IDU_PKL,
+    EXPECTED_ID_ENERGY_2_PHASE_CALIBRATIONS_IDD_PKL,
+    EXPECTED_ID_ENERGY_2_PHASE_CALIBRATIONS_IDU_PKL,
+    ID_ENERGY_2_GAP_CALIBRATIONS_CSV,
+    ID_ENERGY_2_PHASE_CALIBRATIONS_CSV,
+    LOOKUP_TABLE_PATH,
 )
 
 from dodal.devices.apple2_undulator import (
@@ -33,10 +43,11 @@ from dodal.devices.i10.i10_apple2 import (
 )
 from dodal.devices.i10.i10_setting_data import I10Grating
 from dodal.devices.pgm import PGM
+from dodal.testing import patch_motor
 
-LOOK_UP_TABLE_DIR = "tests/devices/i10/lookupTables/"
-ID_GAP_LOOKUP_TABLE = "tests/devices/i10/lookupTables/IDEnergy2GapCalibrations.csv"
-ID_PHASE_LOOKUP_TABLE = "tests/devices/i10/lookupTables/IDEnergy2PhaseCalibrations.csv"
+ID_ENERGY_2_GAP_CALIBRATIONS_FILE_CSV = os.path.split(ID_ENERGY_2_GAP_CALIBRATIONS_CSV)[
+    1
+]
 
 
 @pytest.fixture
@@ -84,6 +95,7 @@ async def mock_phaseAxes(prefix: str = "BLXX-EA-DET-007:") -> UndulatorPhaseAxes
 async def mock_pgm(prefix: str = "BLXX-EA-DET-007:") -> PGM:
     async with init_devices(mock=True):
         mock_pgm = PGM(prefix=prefix, grating=I10Grating, gratingPv="NLINES2")
+    patch_motor(mock_pgm.energy)
     return mock_pgm
 
 
@@ -104,7 +116,7 @@ async def mock_jaw_phase(prefix: str = "BLXX-EA-DET-007:") -> UndulatorJawPhase:
 async def mock_id() -> I10Apple2:
     async with init_devices(mock=True):
         mock_id = I10Apple2(
-            look_up_table_dir=LOOK_UP_TABLE_DIR,
+            look_up_table_dir=LOOKUP_TABLE_PATH,
             source=("Source", "idu"),
             prefix="BLWOW-MO-SERVC-01:",
         )
@@ -135,7 +147,6 @@ async def mock_id_pgm(mock_id: I10Apple2, mock_pgm: PGM) -> EnergySetter:
     set_mock_value(mock_id_pgm.id.gap.gate, UndulatorGateStatus.CLOSE)
     set_mock_value(mock_id_pgm.id.id_jaw_phase.gate, UndulatorGateStatus.CLOSE)
 
-    set_mock_value(mock_id_pgm.pgm_ref().energy.velocity, 1)
     return mock_id_pgm
 
 
@@ -199,10 +210,8 @@ async def test_fail_I10Apple2_no_lookup():
             source=("Source", "idu"),
             prefix="BLWOW-MO-SERVC-01:",
         )
-    assert (
-        str(e.value)
-        == f"Gap look up table is not in path: {wrong_path}IDEnergy2GapCalibrations.csv"
-    )
+    file_path = os.path.join(wrong_path, ID_ENERGY_2_GAP_CALIBRATIONS_FILE_CSV)
+    assert str(e.value) == f"Gap look up table is not in path: {file_path}"
 
 
 @pytest.mark.parametrize("energy", [(100), (5500), (-299)])
@@ -547,23 +556,23 @@ async def test_linear_arbitrary_RE_scan(
     "fileName, expected_dict_file_name, source",
     [
         (
-            ID_GAP_LOOKUP_TABLE,
-            "expectedIDEnergy2GapCalibrationsIdu.pkl",
+            ID_ENERGY_2_GAP_CALIBRATIONS_CSV,
+            EXPECTED_ID_ENERGY_2_GAP_CALIBRATIONS_IDU_PKL,
             ("Source", "idu"),
         ),
         (
-            ID_GAP_LOOKUP_TABLE,
-            "expectedIDEnergy2GapCalibrationsIdd.pkl",
+            ID_ENERGY_2_GAP_CALIBRATIONS_CSV,
+            EXPECTED_ID_ENERGY_2_GAP_CALIBRATIONS_IDD_PKL,
             ("Source", "idd"),
         ),
         (
-            ID_PHASE_LOOKUP_TABLE,
-            "expectedIDEnergy2PhaseCalibrationsidu.pkl",
+            ID_ENERGY_2_PHASE_CALIBRATIONS_CSV,
+            EXPECTED_ID_ENERGY_2_PHASE_CALIBRATIONS_IDU_PKL,
             ("Source", "idu"),
         ),
         (
-            ID_PHASE_LOOKUP_TABLE,
-            "expectedIDEnergy2PhaseCalibrationsidd.pkl",
+            ID_ENERGY_2_PHASE_CALIBRATIONS_CSV,
+            EXPECTED_ID_ENERGY_2_PHASE_CALIBRATIONS_IDD_PKL,
             ("Source", "idd"),
         ),
     ],
@@ -577,8 +586,7 @@ def test_convert_csv_to_lookup_success(
         file=fileName,
         source=source,
     )
-    path = "tests/devices/i10/lookupTables/"
-    with open(path + expected_dict_file_name, "rb") as f:
+    with open(expected_dict_file_name, "rb") as f:
         loaded_dict = pickle.load(f)
     assert data == loaded_dict
 
@@ -586,6 +594,6 @@ def test_convert_csv_to_lookup_success(
 def test_convert_csv_to_lookup_failed():
     with pytest.raises(RuntimeError):
         convert_csv_to_lookup(
-            file=ID_GAP_LOOKUP_TABLE,
+            file=ID_ENERGY_2_GAP_CALIBRATIONS_CSV,
             source=("Source", "idw"),
         )

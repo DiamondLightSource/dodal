@@ -3,7 +3,7 @@ from collections.abc import Collection, Generator
 from dataclasses import dataclass
 from enum import Enum
 from math import isclose
-from typing import NotRequired, TypedDict, cast
+from typing import TypedDict, cast
 
 from bluesky import plan_stubs as bps
 from bluesky.protocols import Movable
@@ -12,6 +12,7 @@ from ophyd_async.core import (
     AsyncStatus,
     Device,
     StrictEnum,
+    set_and_wait_for_value,
     wait_for_value,
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
@@ -42,7 +43,7 @@ class StubOffsets(Device):
     set them so that the current position is zero or to pre-defined positions.
     """
 
-    def __init__(self, name: str = "", prefix: str = ""):
+    def __init__(self, prefix: str, name: str = ""):
         self.center_at_current_position = SetWhenEnabled(prefix=prefix + "CENTER_CS")
         self.to_robot_load = SetWhenEnabled(prefix=prefix + "SET_STUBS_TO_RL")
         super().__init__(name)
@@ -104,15 +105,15 @@ class DeferMoves(StrictEnum):
     OFF = "Defer Off"
 
 
-class CombinedMove(TypedDict):
+class CombinedMove(TypedDict, total=False):
     """A move on multiple axes at once using a deferred move"""
 
-    x: NotRequired[float | None]
-    y: NotRequired[float | None]
-    z: NotRequired[float | None]
-    omega: NotRequired[float | None]
-    phi: NotRequired[float | None]
-    chi: NotRequired[float | None]
+    x: float | None
+    y: float | None
+    z: float | None
+    omega: float | None
+    phi: float | None
+    chi: float | None
 
 
 class Smargon(XYZStage, Movable):
@@ -123,7 +124,9 @@ class Smargon(XYZStage, Movable):
     Robot loading can nudge these and lead to errors.
     """
 
-    def __init__(self, prefix: str = "", name: str = ""):
+    DEFERRED_MOVE_SET_TIMEOUT = 5
+
+    def __init__(self, prefix: str, name: str = ""):
         with self.add_children_as_readables():
             self.chi = Motor(prefix + "CHI")
             self.phi = Motor(prefix + "PHI")
@@ -161,15 +164,29 @@ class Smargon(XYZStage, Movable):
 
     @AsyncStatus.wrap
     async def set(self, value: CombinedMove):
+        """This will move all motion together in a deferred move.
+
+        Once defer_move is on, sets to any axis do not immediately move the axis. Instead
+        the setpoint will go to that value. Then, when defer_move is switched off all
+        axes will move at the same time. The put callbacks on the axes themselves will
+        only come back after the motion on that axis finished.
+        """
         await self.defer_move.set(DeferMoves.ON)
         try:
-            tasks = []
-            for k, v in value.items():
-                if v is not None:
-                    tasks.append(getattr(self, k).set(v))
+            finished_moving = []
+            for motor_name, new_setpoint in value.items():
+                if new_setpoint is not None and isinstance(new_setpoint, int | float):
+                    axis: Motor = getattr(self, motor_name)
+                    await axis.check_motor_limit(
+                        await axis.user_setpoint.get_value(), new_setpoint
+                    )
+                    put_completion = await set_and_wait_for_value(
+                        axis.user_setpoint,
+                        new_setpoint,
+                        timeout=self.DEFERRED_MOVE_SET_TIMEOUT,
+                        wait_for_set_completion=False,
+                    )
+                    finished_moving.append(put_completion)
         finally:
             await self.defer_move.set(DeferMoves.OFF)
-        # The set() coroutines will not complete until after defer moves has been
-        # switched back off so we cannot wait for them until this point.
-        # see https://github.com/DiamondLightSource/dodal/issues/1315
-        await asyncio.gather(*tasks)
+        await asyncio.gather(*finished_moving)

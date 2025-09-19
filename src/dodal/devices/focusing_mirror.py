@@ -56,7 +56,7 @@ class SingleMirrorVoltage(Device):
     the demanded voltage setpoint is accepted, without blocking the caller as this process can take significant time.
     """
 
-    def __init__(self, name: str = "", prefix: str = ""):
+    def __init__(self, prefix: str, name: str = ""):
         self._actual_v = epics_signal_r(int, prefix + "R")
         self._setpoint_v = epics_signal_rw(int, prefix + "D")
         self._demand_accepted = epics_signal_r(MirrorVoltageDemand, prefix + "DSEV")
@@ -113,7 +113,7 @@ class SingleMirrorVoltage(Device):
 
 class MirrorVoltages(StandardReadable):
     def __init__(
-        self, name: str, prefix: str, *args, daq_configuration_path: str, **kwargs
+        self, prefix: str, name: str = "", *args, daq_configuration_path: str, **kwargs
     ):
         self.voltage_lookup_table_path = (
             daq_configuration_path + "/json/mirrorFocus.json"
