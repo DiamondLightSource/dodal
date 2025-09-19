@@ -4,14 +4,14 @@ import pytest
 from aiohttp.client import ClientConnectionError
 from bluesky.run_engine import RunEngine
 
-from dodal.devices.i19.access_controlled.attenuator_motor_clique import (
-    AttenuatorMotorClique,
-    AttenuatorPositionDemand,
+from dodal.devices.i19.access_controlled.attenuator_motor_squad import (
+    AttenuatorMotorPositionDemands,
+    AttenuatorMotorSquad,
 )
 from dodal.devices.i19.access_controlled.optics_blueapi_device import HutchState
 
 
-def given_a_position_demand() -> AttenuatorPositionDemand:
+def given_position_demands() -> AttenuatorMotorPositionDemands:
     position_demand = MagicMock()
     restful_payload = {"x": 54.3, "y": 72.1, "w": 4}
     position_demand.restful_format = MagicMock(return_value=restful_payload)
@@ -25,10 +25,10 @@ def given_an_unhappy_restful_response() -> AsyncMock:
     return unhappy_response
 
 
-async def given_a_clique_of_attenuator_motors(
+async def given_a_squad_of_attenuator_motors(
     hutch: HutchState,
-) -> AttenuatorMotorClique:
-    motor_clique = AttenuatorMotorClique(hutch, name="attenuator_motor_clique")
+) -> AttenuatorMotorSquad:
+    motor_clique = AttenuatorMotorSquad(hutch, name="attenuator_motor_clique")
     await motor_clique.connect(mock=True)
 
     motor_clique.url = "http://test-blueapi.url"
@@ -36,21 +36,21 @@ async def given_a_clique_of_attenuator_motors(
 
 
 @pytest.fixture
-async def eh1_motor_clique(RE: RunEngine) -> AttenuatorMotorClique:
-    return await given_a_clique_of_attenuator_motors(HutchState.EH1)
+async def eh1_motor_clique(RE: RunEngine) -> AttenuatorMotorSquad:
+    return await given_a_squad_of_attenuator_motors(HutchState.EH1)
 
 
 @pytest.fixture
-async def eh2_motor_clique(RE: RunEngine) -> AttenuatorMotorClique:
-    return await given_a_clique_of_attenuator_motors(HutchState.EH2)
+async def eh2_motor_clique(RE: RunEngine) -> AttenuatorMotorSquad:
+    return await given_a_squad_of_attenuator_motors(HutchState.EH2)
 
 
 @pytest.mark.parametrize("invoking_hutch", [HutchState.EH1, HutchState.EH2])
 async def test_that_motor_clique_can_be_instantiated(invoking_hutch):
-    motor_clique: AttenuatorMotorClique = await given_a_clique_of_attenuator_motors(
+    motor_clique: AttenuatorMotorSquad = await given_a_squad_of_attenuator_motors(
         invoking_hutch
     )
-    assert isinstance(motor_clique, AttenuatorMotorClique)
+    assert isinstance(motor_clique, AttenuatorMotorSquad)
 
 
 @pytest.mark.parametrize("invoking_hutch", [HutchState.EH1, HutchState.EH2])
@@ -61,11 +61,11 @@ async def test_that_motor_clique_can_be_instantiated(invoking_hutch):
 async def test_when_motor_clique_is_set_that_expected_request_params_are_passed(
     internal_setter, invoking_hutch
 ):
-    motors: AttenuatorMotorClique = await given_a_clique_of_attenuator_motors(
+    motors: AttenuatorMotorSquad = await given_a_squad_of_attenuator_motors(
         invoking_hutch
     )
-    position_demand: AttenuatorPositionDemand = given_a_position_demand()
-    await motors.set(position_demand)  # when motor position demand is set
+    position_demands: AttenuatorMotorPositionDemands = given_position_demands()
+    await motors.set(position_demands)  # when motor position demand is set
 
     expected_hutch: str = invoking_hutch.value
     expected_device: str = "access_control"
@@ -87,15 +87,15 @@ async def test_when_motor_clique_is_set_that_expected_request_params_are_passed(
 async def test_when_rest_post_unsuccessful_that_error_raised(
     unsuccessful_post, invoking_hutch
 ):
-    motors: AttenuatorMotorClique = await given_a_clique_of_attenuator_motors(
+    motors: AttenuatorMotorSquad = await given_a_squad_of_attenuator_motors(
         invoking_hutch
     )
     with pytest.raises(ClientConnectionError):
         restful_response: AsyncMock = given_an_unhappy_restful_response()
         unsuccessful_post.return_value.__aenter__.return_value = restful_response
 
-        postion_demand = given_a_position_demand()
-        await motors.set(postion_demand)
+        postion_demands = given_position_demands()
+        await motors.set(postion_demands)
 
 
 @pytest.mark.parametrize("invoking_hutch", [HutchState.EH1, HutchState.EH2])
@@ -114,11 +114,11 @@ async def test_that_error_is_logged_whenever_position_demand_fails(
     response_to_put.ok = False
     restful_put.return_value.__aenter__.return_value = response_to_put
 
-    motors: AttenuatorMotorClique = await given_a_clique_of_attenuator_motors(
+    motors: AttenuatorMotorSquad = await given_a_squad_of_attenuator_motors(
         invoking_hutch
     )
-    demand: AttenuatorPositionDemand = given_a_position_demand()
+    position_demands: AttenuatorMotorPositionDemands = given_position_demands()
 
     logger.error.assert_not_called()
-    await motors.set(demand)
+    await motors.set(position_demands)
     logger.error.assert_called_once()
