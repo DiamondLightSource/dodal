@@ -17,15 +17,17 @@ class AttenuatorMotorPositionDemands(BaseModel):
     indexed_demands: dict[PermittedKeyStr, PositiveInt] = {}
 
     @field_validator("indexed_demands")
-    def no_keys_clash(cls, indexed_demands, values, **kwargs):
-        if len(indexed_demands) < 1:
-            return indexed_demands
-        other_demands = values["continuous_demands"]
-        for key in indexed_demands:
-            if key in other_demands:
+
+    def no_keys_clash(cls, values, **kwargs):
+        continuous = values["continuous_demands"]
+        indexed = values["indexed_demands"]
+        if len(indexed) < 1:
+            return values
+        for key in indexed:
+            if key in continuous:
                 message = f"Attenuator Position Demand Key clash: {key}. Require distinct keys for axis names on continuous motors and indexed positions."
                 raise ValueError(message)
-        return indexed_demands
+        return values
 
     def restful_format(self) -> dict[PermittedKeyStr, Any]:
         combined: dict[PermittedKeyStr, Any] = {}
