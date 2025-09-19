@@ -64,6 +64,7 @@
    dodal.devices.smargon
    dodal.devices.status
    dodal.devices.synchrotron
+   dodal.devices.temperture_controller
    dodal.devices.tetramm
    dodal.devices.thawer
    dodal.devices.turbo_slit
