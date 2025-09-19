@@ -40,13 +40,12 @@ class LakeshoreControlChannel(Device):
         self.user_setpoint = channel_rw(channel_type=float, pv_name="SETP")
         self.ramp_rate = channel_rw(channel_type=float, pv_name="RAMP")
         self.ramp_enable = channel_rw(channel_type=int, pv_name="RAMPST")
-        self.heater_output = channel_rw(channel_type=float, pv_name="HTR")
         self.heater_output_range = channel_rw(channel_type=heater_type, pv_name="RANGE")
         self.p = channel_rw(channel_type=float, pv_name="P")
         self.i = channel_rw(channel_type=float, pv_name="I")
         self.d = channel_rw(channel_type=float, pv_name="D")
         self.manual_output = channel_rw(channel_type=float, pv_name="MOUT")
-
+        self.heater_output = epics_signal_r(float, f"{prefix}{'HTR'}{suffix}")
         super().__init__(name=name)
 
 

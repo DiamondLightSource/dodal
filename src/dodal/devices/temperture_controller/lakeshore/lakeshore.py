@@ -6,6 +6,7 @@ from ophyd_async.core import (
     SignalDatatypeT,
     StandardReadable,
     StandardReadableFormat,
+    StrictEnum,
     derived_signal_rw,
     soft_signal_rw,
 )
@@ -14,6 +15,13 @@ from ophyd_async.core._readable import _HintsFromName
 from .lakeshore_io import (
     LakeshoreBaseIO,
 )
+
+
+class LAKESHORE336_HEATER_SETTING(StrictEnum):
+    OFF = "Off"
+    LOW = "Low"
+    MEDIUM = "Medium"
+    HIGH = "High"
 
 
 class Lakeshore(LakeshoreBaseIO, StandardReadable, Movable[float]):
@@ -79,7 +87,6 @@ class Lakeshore(LakeshoreBaseIO, StandardReadable, Movable[float]):
             set_derived=self._set_control_channel,
             current_channel=self._control_channel,
         )
-
         self._hints_channel = soft_signal_rw(int, initial_value=control_channel)
 
         self.hints_channel = derived_signal_rw(
@@ -155,3 +162,21 @@ class Lakeshore(LakeshoreBaseIO, StandardReadable, Movable[float]):
 
     def _get_hints_channel(self, current_hints_channel: int) -> int:
         return current_hints_channel
+
+
+class Lakeshore336(Lakeshore):
+    def __init__(
+        self,
+        prefix: str,
+        control_channel: int = 1,
+        single_control_channel: bool = False,
+        name: str = "",
+    ):
+        super().__init__(
+            prefix=prefix,
+            num_readback_channel=4,
+            heater_setting=LAKESHORE336_HEATER_SETTING,
+            control_channel=control_channel,
+            single_control_channel=single_control_channel,
+            name=name,
+        )
