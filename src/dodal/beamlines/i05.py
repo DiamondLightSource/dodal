@@ -50,8 +50,8 @@ def m3mj6() -> XYZPiezoSwitchingMirror:
 # will connect after https://jira.diamond.ac.uk/browse/I05-731
 class M4M5Mirror(StrictEnum):
     UNKNOWN = "Unknown"
-    MJ6 = "M4"
-    M3 = "M5"
+    M4 = "M4"
+    M5 = "M5"
     REFERENCE = "Reference"
 
 

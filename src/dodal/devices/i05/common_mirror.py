@@ -1,17 +1,20 @@
 from typing import Generic, TypeVar
 
-from ophyd_async.core import StrictEnum
+from bluesky.protocols import Locatable, Location, Stoppable
+from ophyd_async.core import AsyncStatus, StrictEnum
 from ophyd_async.epics.core import epics_signal_rw, epics_signal_x
 
-from dodal.devices.motors import _X, _Y, _Z, XYZPitchYawRollStage
+from dodal.devices.motors import XYZPitchYawRollStage
 
 TMirror = TypeVar("TMirror", bound=StrictEnum)
 
 
-class XYZSwitchingMirror(XYZPitchYawRollStage, Generic[TMirror]):
+class XYZSwitchingMirror(
+    XYZPitchYawRollStage, Generic[TMirror], Locatable[TMirror], Stoppable
+):
     """
-    Set of mirrors on a hexapod with x,y,z and yaw, pitch, roll motors.
-    To change mirror one need to set mirror enum and trigger mirror change.
+    A device represention set of mirrors on a hexapod stage with x,y,z and yaw, pitch, roll motors.
+    To change mirror set mirror enum and trigger mirror change.
     """
 
     def __init__(
@@ -19,12 +22,6 @@ class XYZSwitchingMirror(XYZPitchYawRollStage, Generic[TMirror]):
         prefix: str,
         mirrors: type[TMirror],
         name: str = "",
-        x_infix: str = _X,
-        y_infix: str = _Y,
-        z_infix: str = _Z,
-        pitch_infix: str = "PITCH",
-        yaw_infix: str = "YAW",
-        roll_infix: str = "ROLL",
         mirror_read_suffix: str = "MIRCTRL:RBV:MIRROR",
         mirror_write_suffix: str = "MIRCTRL:DMD:MIRROR",
         mirror_change_suffix: str = "MIRCTRL:SEQ:CHNG:MIRROR.PROC",
@@ -40,27 +37,30 @@ class XYZSwitchingMirror(XYZPitchYawRollStage, Generic[TMirror]):
         self.mirror_change = epics_signal_x(write_pv=prefix + mirror_change_suffix)
         self.mirror_abort = epics_signal_x(write_pv=prefix + mirror_abort_suffix)
 
-        super().__init__(
-            prefix, name, x_infix, y_infix, z_infix, pitch_infix, yaw_infix, roll_infix
-        )
+        super().__init__(prefix=prefix, name=name)
+
+    @AsyncStatus.wrap
+    async def set(self, new_position: TMirror):
+        await self.mirror.set(new_position)
+        await self.mirror_change.trigger()
+
+    async def locate(self) -> Location[TMirror]:
+        location = await self.mirror.locate()
+        return location
+
+    async def stop(self, success=True) -> None:
+        await self.mirror_abort.trigger()
 
 
 class XYZPiezoCollimatingMirror(XYZPitchYawRollStage):
     """
-    Collimating mirror on a hexapod with x,y,z and yaw, pitch, roll motors.
-    In addition there is a fine pitch piezo motor.
+    Collimating mirror on a hexapod stage with x,y,z and yaw, pitch, roll motors, including a fine pitch piezo motor.
     """
 
     def __init__(
         self,
         prefix: str,
         name: str = "",
-        x_infix: str = _X,
-        y_infix: str = _Y,
-        z_infix: str = _Z,
-        pitch_infix: str = "PITCH",
-        yaw_infix: str = "YAW",
-        roll_infix: str = "ROLL",
         fpitch_read_suffix: str = "FPITCH:RBV",
         fpitch_write_suffix: str = "FPITCH:DMD",
     ):
@@ -70,16 +70,15 @@ class XYZPiezoCollimatingMirror(XYZPitchYawRollStage):
                 read_pv=prefix + fpitch_read_suffix,
                 write_pv=prefix + fpitch_write_suffix,
             )
-        super().__init__(
-            prefix, name, x_infix, y_infix, z_infix, pitch_infix, yaw_infix, roll_infix
-        )
+        super().__init__(prefix=prefix, name=name)
 
 
-class XYZPiezoSwitchingMirror(XYZPitchYawRollStage, Generic[TMirror]):
+class XYZPiezoSwitchingMirror(
+    XYZPitchYawRollStage, Generic[TMirror], Locatable[TMirror], Stoppable
+):
     """
-    Set of mirrors on a hexapod with x,y,z and yaw, pitch, roll motors.
-    To change mirror one need to set mirror enum and trigger mirror change.
-    In addition there is a fine pitch piezo motor.
+    A device represention set of mirrors on a hexapod stage with x,y,z and yaw, pitch, roll motors, including a fine pitch piezo motor.
+    To change mirror set mirror enum and trigger mirror change.
     """
 
     def __init__(
@@ -87,12 +86,6 @@ class XYZPiezoSwitchingMirror(XYZPitchYawRollStage, Generic[TMirror]):
         prefix: str,
         mirrors: type[TMirror],
         name: str = "",
-        x_infix: str = _X,
-        y_infix: str = _Y,
-        z_infix: str = _Z,
-        pitch_infix: str = "PITCH",
-        yaw_infix: str = "YAW",
-        roll_infix: str = "ROLL",
         fpitch_read_suffix: str = "FPITCH:RBV",
         fpitch_write_suffix: str = "FPITCH:DMD",
         mirror_read_suffix: str = "MIRCTRL:RBV:MIRROR",
@@ -115,6 +108,16 @@ class XYZPiezoSwitchingMirror(XYZPitchYawRollStage, Generic[TMirror]):
         self.mirror_change = epics_signal_x(write_pv=prefix + mirror_change_suffix)
         self.mirror_abort = epics_signal_x(write_pv=prefix + mirror_abort_suffix)
 
-        super().__init__(
-            prefix, name, x_infix, y_infix, z_infix, pitch_infix, yaw_infix, roll_infix
-        )
+        super().__init__(prefix=prefix, name=name)
+
+    @AsyncStatus.wrap
+    async def set(self, new_position: TMirror):
+        await self.mirror.set(new_position)
+        await self.mirror_change.trigger()
+
+    async def locate(self) -> Location[TMirror]:
+        location = await self.mirror.locate()
+        return location
+
+    async def stop(self, success=True) -> None:
+        await self.mirror_abort.trigger()
