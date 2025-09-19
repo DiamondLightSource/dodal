@@ -3,7 +3,7 @@ import pytest
 from bluesky import RunEngine
 
 from dodal.devices.i24.vgonio import VerticalGoniometer
-from dodal.devices.util.test_utils import patch_all_motors
+from dodal.testing import patch_all_motors
 
 
 @pytest.fixture

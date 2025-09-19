@@ -1,11 +1,15 @@
 import asyncio
+import threading
+from asyncio import CancelledError, new_event_loop
 from unittest.mock import ANY, AsyncMock, call, patch
 
 import pytest
+from bluesky import RunEngine, RunEngineInterrupted
+from bluesky import plan_stubs as bps
 from ophyd_async.core import OnOff, init_devices
 from ophyd_async.testing import get_mock_put
 
-from dodal.devices.thawer import Thawer, ThawingException, ThawingTimer
+from dodal.devices.thawer import Thawer, ThawingTimer
 
 
 @pytest.fixture
@@ -47,22 +51,71 @@ async def test_when_thawing_triggered_then_turn_on_sleep_and_turn_off(
 
 
 @patch("dodal.devices.thawer.sleep")
-async def test_given_thawing_already_triggered_when_triggered_again_then_fails(
+async def test_given_thawing_already_triggered_when_triggered_again_then_timer_restarted(
     mock_sleep: AsyncMock,
     thawer: Thawer,
 ):
     release_sleep = patch_sleep(mock_sleep)
 
-    status = thawer.thaw_for_time_s.set(10)
+    status1 = thawer.thaw_for_time_s.set(10)
 
+    await asyncio.sleep(0.01)
+    mock_sleep.assert_awaited_once()
+    get_mock_put(thawer.control).assert_called_once_with(OnOff.ON, wait=True)
+
+    status2 = thawer.thaw_for_time_s.set(10)
+    with pytest.raises(CancelledError):
+        await status1
+
+    assert isinstance(status1.exception(), CancelledError)
+
+    release_sleep.set()
+    await status2
+    assert status2.done
+    assert status2.success
+    assert status1.task.cancelled()
+    assert status1.done
+    assert not status1.success
+
+
+@patch("dodal.devices.thawer.sleep")
+async def test_given_thawing_already_triggered_run_engine_stop_stops_thawer(
+    mock_sleep: AsyncMock, thawer: Thawer, RE: RunEngine
+):
+    patch_sleep(mock_sleep)
+    put = get_mock_put(thawer.control)
+
+    def thaw_plan():
+        yield from bps.abs_set(thawer.thaw_for_time_s, 10)
+        yield from bps.sleep(10)
+
+    async def abort_plan_execution():
+        while not put.mock_calls:
+            await asyncio.sleep(0.1)
+
+        RE.abort()
+
+    loop = new_event_loop()
+    test_thread = None
     try:
-        await asyncio.sleep(0.01)
 
-        with pytest.raises(ThawingException):
-            await thawer.thaw_for_time_s.set(10)
+        def test_loop():
+            loop.run_forever()
+            loop.close()
+
+        test_thread = threading.Thread(None, test_loop)
+        test_thread.start()
+        result_fut = asyncio.run_coroutine_threadsafe(abort_plan_execution(), loop)
+
+        with pytest.raises(RunEngineInterrupted):
+            RE(thaw_plan())
+
+        put.assert_has_calls([call(OnOff.ON, wait=True), call(OnOff.OFF, wait=True)])
+        loop.call_soon_threadsafe(loop.stop)
+        result_fut.result()
     finally:
-        release_sleep.set()
-        await status
+        if test_thread:
+            test_thread.join()
 
 
 @patch("dodal.devices.thawer.sleep")
