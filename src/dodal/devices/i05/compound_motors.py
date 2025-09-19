@@ -56,15 +56,15 @@ class PolynomCompoundMotors(
 
     def __init__(
         self,
-        master_motor: Motor,
+        master: Motor,
         driven_dict: dict[Motor, Array1D[np.float64]],
         name: str = "",
     ) -> None:
         self.motor_coeff_dict: dict[Reference[Motor], Array1D[np.float64]] = {}
 
         # master motor added with polynomial coeff (0,1)
-        self.master = Reference(master_motor)
-        self.motor_coeff_dict[self.master] = np.array([0.0, 1.0])
+        self.master_ref = Reference(master)
+        self.motor_coeff_dict[self.master_ref] = np.array([0.0, 1.0])
 
         # slave motors added with coefficients from input parameters
         for slave in driven_dict.keys():
@@ -92,4 +92,4 @@ class PolynomCompoundMotors(
 
     async def locate(self) -> Location[float]:
         """Return the current setpoint and readback of the MASTER motor"""
-        return await self.master().locate()
+        return await self.master_ref().locate()
