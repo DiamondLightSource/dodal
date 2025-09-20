@@ -272,7 +272,7 @@ def linkam() -> Linkam3:
     return Linkam3(prefix=f"{PREFIX.beamline_prefix}-EA-TEMPC-05:")
 
 
-@device_factory()
+@device_factory(skip=True)
 def ppump() -> WatsonMarlow323Pump:
     """Sample Environment Peristaltic Pump"""
     return WatsonMarlow323Pump(f"{PREFIX.beamline_prefix}-EA-PUMP-01:")
