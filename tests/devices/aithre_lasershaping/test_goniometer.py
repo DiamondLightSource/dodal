@@ -5,7 +5,7 @@ from ophyd_async.core import init_devices
 
 from dodal.beamlines import aithre
 from dodal.devices.aithre_lasershaping.goniometer import Goniometer
-from dodal.devices.util.test_utils import patch_all_motors
+from dodal.testing import patch_all_motors
 
 
 @pytest.fixture

@@ -3,7 +3,8 @@ from dodal.common.beamlines.beamline_utils import (
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.devices.electron_analyser import DualEnergySource, EnergySource
-from dodal.devices.electron_analyser.vgscienta import VGScientaAnalyserDriverIO
+from dodal.devices.electron_analyser import SelectedSource
+from dodal.devices.electron_analyser.vgscienta import VGScientaDetector
 from dodal.devices.p60 import (
     LabXraySource,
     LabXraySourceReadable,
@@ -40,8 +41,8 @@ def energy_source() -> DualEnergySource:
 # Connect will work again after this work completed
 # https://jira.diamond.ac.uk/browse/P60-13
 @device_factory()
-def analyser_driver() -> VGScientaAnalyserDriverIO[LensMode, PsuMode, PassEnergy]:
-    return VGScientaAnalyserDriverIO[LensMode, PsuMode, PassEnergy](
+def r4000() -> VGScientaDetector[LensMode, PsuMode, PassEnergy]:
+    return VGScientaDetector[LensMode, PsuMode, PassEnergy](
         prefix=f"{PREFIX.beamline_prefix}-EA-DET-01:CAM:",
         lens_mode_type=LensMode,
         psu_mode_type=PsuMode,
