@@ -83,7 +83,7 @@ def idu() -> I10Id:
 
 
 @device_factory()
-def slits() -> I10SharedSlits:
+def optics_slits() -> I10SharedSlits:
     return I10SharedSlits(prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-")
 
 
@@ -91,7 +91,7 @@ def slits() -> I10SharedSlits:
 
 
 @device_factory()
-def diagnostics() -> I10SharedDiagnostic:
+def optics_diagnostics() -> I10SharedDiagnostic:
     return I10SharedDiagnostic(
         prefix=f"{PREFIX.beamline_prefix}-DI-",
     )
