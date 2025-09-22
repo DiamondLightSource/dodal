@@ -171,7 +171,7 @@ class Lakeshore336(Lakeshore):
         name: str = "",
     ):
         """
-        Lakeshore 336 temperature controller. WIth 4 readback and control channels.
+        Lakeshore 336 temperature controller. With 4 readback and control channels.
         Heater settings are: Off, Low, Medium, High.
         Parameters
         ----------
