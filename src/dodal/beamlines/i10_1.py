@@ -1,6 +1,6 @@
 from dodal.common.beamlines.beamline_utils import device_factory
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.devices.i10 import I10JDiagnostic, I10JSlits
+from dodal.devices.i10 import I10JDiagnostic, I10JSlits, PiezoMirror
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
@@ -20,3 +20,8 @@ def diagnostic() -> I10JDiagnostic:
     return I10JDiagnostic(
         prefix=f"{PREFIX.beamline_prefix}-DI-",
     )
+
+
+@device_factory()
+def focusing_mirror() -> PiezoMirror:
+    return PiezoMirror(prefix=f"{PREFIX.beamline_prefix}-OP-FOCA-01:")
