@@ -92,7 +92,6 @@ class TetrammController(DetectorController):
         self.driver = driver
         self._file_io = file_io
         self._arm_status: AsyncStatus | None = None
-        self._trigger_info: TriggerInfo | None = None
 
     def get_deadtime(self, exposure: float | None) -> float:
         # 2 internal clock cycles. Best effort approximation
@@ -108,22 +107,15 @@ class TetrammController(DetectorController):
         if trigger_info.livetime is None:
             raise ValueError(f"{self.__class__.__name__} requires that livetime is set")
 
+        current_active_status = await self.driver.acquire.get_value()
+
+        if current_active_status:  # if active turn off first
+            await self.driver.acquire.set(False)
+
         # trigger mode must be set first and on its own!
         await self.driver.trigger_mode.set(
             self._supported_trigger_types[trigger_info.trigger]
         )
-
-        self._trigger_info = trigger_info
-
-        # Tetramms do not use a typical cam plugin, so we need to work out
-        # the time per trigger
-
-        # if trigger_info.total_number_of_exposures != 0:
-        #     exposure_per_trigger = (
-        #         trigger_info.livetime #/ trigger_info.total_number_of_exposures
-        #     )
-        # else:
-        #     exposure_per_trigger = trigger_info.livetime
 
         await asyncio.gather(
             self.set_exposure(trigger_info.livetime),
