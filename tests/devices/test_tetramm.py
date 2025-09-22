@@ -101,7 +101,6 @@ async def test_set_invalid_exposure_for_number_of_values_per_reading(
     "trigger_type",
     [
         DetectorTrigger.INTERNAL,
-        DetectorTrigger.VARIABLE_GATE,
     ],
 )
 async def test_arm_raises_value_error_for_invalid_trigger_type(
@@ -111,6 +110,7 @@ async def test_arm_raises_value_error_for_invalid_trigger_type(
     accepted_types = [
         "EDGE_TRIGGER",
         "CONSTANT_GATE",
+        "VARIABLE_GATE",
     ]
     with pytest.raises(
         TypeError,
@@ -201,7 +201,7 @@ async def test_prepare_arms_tetramm(
             number_of_events=5,
             trigger=DetectorTrigger.EDGE_TRIGGER,
             deadtime=0.1,
-            livetime=VALID_TEST_EXPOSURE_TIME_PER_COLLECTION,
+            livetime=VALID_TEST_EXPOSURE_TIME,
             exposure_timeout=None,
         )
     )

@@ -149,22 +149,16 @@ class TetrammController(DetectorController):
     async def wait_for_idle(self):
         # tetramm never goes idle really, actually it is always acquiring
         # so need to wait for the capture to finish instead
-        # await wait_for_value(self.driver.acquire, False, timeout=DEFAULT_TIMEOUT)
-        # self._arm_status = None
         await wait_for_value(self._file_io.acquire, False, timeout=DEFAULT_TIMEOUT)
-        # pass
-        # self._trigger_info = None
 
     async def unstage(self):
         await self.disarm()
-        await self.driver.averaging_time.set(self._file_io.acquire, False)
-
+        await self._file_io.acquire.set(False)
 
     async def disarm(self):
         # We can't use caput callback as we already used it in arm() and we can't have
         # 2 or they will deadlock
         await stop_busy_record(self.driver.acquire, False, timeout=1)
-        
 
     async def set_exposure(self, exposure: float) -> None:
         """Set the exposure time and acquire period.
