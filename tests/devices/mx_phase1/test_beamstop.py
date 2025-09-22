@@ -10,7 +10,7 @@ from ophyd_async.testing import get_mock_put, set_mock_value
 
 from dodal.common.beamlines.beamline_parameters import GDABeamlineParameters
 from dodal.devices.i03 import Beamstop, BeamstopPositions
-from dodal.devices.util.test_utils import patch_motor
+from dodal.testing import patch_motor
 from tests.common.beamlines.test_beamline_parameters import TEST_BEAMLINE_PARAMETERS_TXT
 
 

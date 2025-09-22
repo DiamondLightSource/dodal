@@ -22,7 +22,7 @@ from dodal.devices.aperturescatterguard import (
     InvalidApertureMove,
     load_positions_from_beamline_parameters,
 )
-from dodal.devices.util.test_utils import patch_all_motors
+from dodal.testing import patch_all_motors
 
 
 @pytest.fixture
