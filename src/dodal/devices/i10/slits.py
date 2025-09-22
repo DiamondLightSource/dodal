@@ -88,6 +88,7 @@ class I10SharedSlits(Device):
         self.s3 = I10SlitsBlades(
             prefix=prefix + "03:",
         )
+        super().__init__(name=name)
 
 
 class I10Slits(Device):
@@ -108,7 +109,37 @@ class I10Slits(Device):
         super().__init__(name=name)
 
 
+class I10JSlits(Device):
+    """Collection of all the i10 slits before end station."""
+
+    def __init__(self, prefix: str, name: str = "") -> None:
+        self.s7 = MinimalSlits(
+            prefix=prefix + "01:",
+            x_gap="XSIZE",
+            y_gap="YSIZE",
+        )
+        self.s8 = I10SlitsBlades(
+            prefix=prefix + "02:",
+        )
+        self.s9 = I10SlitsBlades(
+            prefix=prefix + "03:",
+        )
+        super().__init__(name=name)
+
+
 class I10SlitsDrainCurrent(Device):
+    """Collection of all the drain current from i10 slits."""
+
+    def __init__(
+        self, prefix: str, name: str = "", connector: DeviceConnector | None = None
+    ) -> None:
+        self.s4 = BladeDrainCurrents(prefix=prefix + "DI-IAMP-02:")
+        self.s5 = BladeDrainCurrents(prefix=prefix + "DI-IAMP-03:")
+        self.s6 = BladeDrainCurrents(prefix=prefix + "DI-IAMP-04:")
+        super().__init__(name, connector)
+
+
+class I10SlitsSharedDrainCurrent(Device):
     """Collection of all the drain current from i10 slits."""
 
     def __init__(
@@ -122,7 +153,4 @@ class I10SlitsDrainCurrent(Device):
             suffix_bot_blade="YMINUS:I",
         )
         self.s3 = BladeDrainCurrents(prefix=prefix + "DI-IAMP-01:")
-        self.s4 = BladeDrainCurrents(prefix=prefix + "DI-IAMP-02:")
-        self.s5 = BladeDrainCurrents(prefix=prefix + "DI-IAMP-03:")
-        self.s6 = BladeDrainCurrents(prefix=prefix + "DI-IAMP-04:")
         super().__init__(name, connector)
