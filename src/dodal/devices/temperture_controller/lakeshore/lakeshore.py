@@ -18,10 +18,8 @@ from .lakeshore_io import (
 
 class Lakeshore(LakeshoreBaseIO, StandardReadable, Movable[float]):
     """
-    Lakeshore temperature controller device. This provides an interface for controlling
-     and reading from a Lakeshore temperature controller.
-     It supports multiple channels and PID control.
-
+    Device for controlling and reading from a Lakeshore temperature controller. 
+    It supports multiple channels and PID control.
     Attributes
     ----------
     temperature : LakeshoreBaseIO
@@ -128,7 +126,7 @@ class Lakeshore(LakeshoreBaseIO, StandardReadable, Movable[float]):
             ].user_setpoint.set(value)
         else:
             raise ValueError(
-                f"Requested temperature {value} is outside limits: {low}, {high}"
+                f"{self.name} requested temperature {value} is outside limits: {low}, {high}"
             )
 
     def _get_control_channel(self, current_channel: int) -> int:

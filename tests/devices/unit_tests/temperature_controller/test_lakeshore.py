@@ -14,7 +14,7 @@ from dodal.devices.temperture_controller import (
 )
 
 
-class HEATER_SETTING(StrictEnum):
+class HeaterSettings(StrictEnum):
     OFF = "Off"
     LOW = "Low"
     MEDIUM = "Medium"
@@ -22,7 +22,7 @@ class HEATER_SETTING(StrictEnum):
 
 
 @pytest.fixture
-async def lakeshore():
+async def lakeshore() -> Lakeshore:
     async with init_devices(mock=True):
         lakeshore = Lakeshore(
             prefix="007", num_readback_channel=4, heater_setting=HEATER_SETTING
