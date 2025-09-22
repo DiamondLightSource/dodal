@@ -2,7 +2,7 @@ from dodal.common.beamlines.beamline_utils import (
     device_factory,
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.devices.electron_analyser import DualEnergySource, EnergySource
+from dodal.devices.electron_analyser import DualEnergySource
 from dodal.devices.electron_analyser.vgscienta import VGScientaDetector
 from dodal.devices.i09 import DCM, Grating, LensMode, PassEnergy, PsuMode
 from dodal.devices.pgm import PGM
@@ -36,9 +36,7 @@ def dcm() -> DCM:
 
 @device_factory()
 def energy_source() -> DualEnergySource:
-    source1 = EnergySource(dcm().energy_in_ev)
-    source2 = EnergySource(pgm().energy.user_readback)
-    return DualEnergySource(source1, source2)
+    return DualEnergySource(dcm().energy_in_ev, pgm().energy.user_readback)
 
 
 # Connect will work again after this work completed

@@ -60,11 +60,13 @@ class DualEnergySource(AbstractEnergySource):
     used.
     """
 
-    def __init__(self, source1: EnergySource, source2: EnergySource, name: str = ""):
+    def __init__(
+        self, source1: SignalR[float], source2: SignalR[float], name: str = ""
+    ):
         """
         Args:
-            source1: Default EnergySource device to select.
-            source2: Secondary EnergySource device to select.
+            source1: Default energy signal to select.
+            source2: Secondary energy signal to select.
             name: name of this device.
         """
 
@@ -72,8 +74,8 @@ class DualEnergySource(AbstractEnergySource):
             self.selected_source = soft_signal_rw(
                 SelectedSource, initial_value=SelectedSource.SOURCE1
             )
-            self.source1 = source1
-            self.source2 = source2
+            self.source1 = EnergySource(source1)
+            self.source2 = EnergySource(source2)
 
         self._selected_energy = derived_signal_r(
             self._get_excitation_energy,
