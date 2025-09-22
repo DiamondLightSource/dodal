@@ -42,3 +42,8 @@ async def test_jungfrau_with_temporary_writer(
         set_mock_value(jungfrau._writer.frame_counter, 5)
 
     await asyncio.gather(status, _do_fake_writing())
+
+
+def test_collect_stream_docs_raises_error(jungfrau: CommissioningJungfrau):
+    with pytest.raises(NotImplementedError):
+        jungfrau._writer.collect_stream_docs("jungfrau", 0)
