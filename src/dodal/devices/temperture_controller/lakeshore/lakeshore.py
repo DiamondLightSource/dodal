@@ -180,3 +180,21 @@ class Lakeshore336(Lakeshore):
             single_control_channel=single_control_channel,
             name=name,
         )
+
+
+class Lakeshore340(Lakeshore):
+    def __init__(
+        self,
+        prefix: str,
+        control_channel: int = 1,
+        single_control_channel: bool = True,
+        name: str = "",
+    ):
+        super().__init__(
+            prefix=prefix,
+            num_readback_channel=4,
+            heater_setting=float,
+            control_channel=control_channel,
+            single_control_channel=single_control_channel,
+            name=name,
+        )
