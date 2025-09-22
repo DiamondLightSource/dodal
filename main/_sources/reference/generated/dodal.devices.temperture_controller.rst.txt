@@ -3,17 +3,18 @@ dodal.devices.temperture\_controller
 
 
 
-.. rubric:: Modules
+
+
+
+
+.. currentmodule:: dodal.devices
+.. rubric:: Classes
 
 .. autosummary::
    :toctree:
    :recursive:
 
-   dodal.devices.temperture_controller.lakeshore
-
-
-
-
+   ~temperture_controller.Lakeshore
 
 
 
