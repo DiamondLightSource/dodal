@@ -46,6 +46,7 @@ class LakeshoreControlChannel(Device):
         self.d = channel_rw(channel_type=float, pv_name="D")
         self.manual_output = channel_rw(channel_type=float, pv_name="MOUT")
         self.heater_output = epics_signal_r(float, f"{prefix}{'HTR'}{suffix}")
+
         super().__init__(name=name)
 
 
