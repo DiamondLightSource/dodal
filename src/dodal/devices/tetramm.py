@@ -231,7 +231,7 @@ class TetrammDetector(StandardDetector):
         self.current4 = epics_signal_r(float, prefix + "Cur4:MeanValue_RBV")
 
         self.sum_x = epics_signal_r(float, prefix + "SumX:MeanValue_RBV")
-        self.xum_y = epics_signal_r(float, prefix + "SumY:MeanValue_RBV")
+        self.sum_y = epics_signal_r(float, prefix + "SumY:MeanValue_RBV")
         self.sum_all = epics_signal_r(float, prefix + "SumAll:MeanValue_RBV")
         self.diff_x = epics_signal_r(float, prefix + "DiffX:MeanValue_RBV")
         self.diff_y = epics_signal_r(float, prefix + "DiffY:MeanValue_RBV")
