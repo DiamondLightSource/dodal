@@ -1,32 +1,19 @@
 from asyncio import gather
 
-from bluesky.protocols import HasHints, Hints, Movable
+from bluesky.protocols import Movable
 from ophyd_async.core import (
     AsyncStatus,
-    Signal,
     SignalDatatypeT,
     StandardReadable,
     StandardReadableFormat,
     derived_signal_rw,
     soft_signal_rw,
 )
+from ophyd_async.core._readable import _HintsFromName
 
 from .lakeshore_io import (
     LakeshoreBaseIO,
 )
-
-
-class LakeshoreHint(HasHints):
-    def __init__(self, signal: Signal[SignalDatatypeT]) -> None:
-        self.signal = signal
-
-    @property
-    def name(self) -> str:
-        return self.signal.name
-
-    @property
-    def hints(self) -> Hints:
-        return {"fields": [self.signal.name]}
 
 
 class Lakeshore(LakeshoreBaseIO, StandardReadable, Movable[float]):
@@ -111,7 +98,7 @@ class Lakeshore(LakeshoreBaseIO, StandardReadable, Movable[float]):
             [setpoint.user_setpoint for setpoint in self.control_channels.values()]
             + list(self.readback.values())
         )
-        self._has_hints = (LakeshoreHint(self.readback[control_channel]),)
+        self._has_hints = (_HintsFromName(self.readback[control_channel]),)
 
         self.add_readables(
             [
@@ -161,7 +148,7 @@ class Lakeshore(LakeshoreBaseIO, StandardReadable, Movable[float]):
         )
 
     async def _set_hints_channel(self, readback_channel: int) -> None:
-        self._has_hints = (LakeshoreHint(self.readback[readback_channel]),)
+        self._has_hints = (_HintsFromName(self.readback[readback_channel]),)
         await self._hints_channel.set(readback_channel)
 
     def _get_hints_channel(self, current_hints_channel: int) -> int:
