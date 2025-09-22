@@ -7,18 +7,26 @@ note:
 """
 
 from dodal.common.beamlines.beamline_utils import device_factory
+from dodal.devices.i10 import I10SharedSlits, PiezoMirror
+from dodal.devices.i10.diagnostics import I10SharedDiagnostic
 from dodal.devices.i10.i10_apple2 import (
     I10Id,
 )
 
 # Imports taken from i10 while we work out how to deal with split end stations
 from dodal.devices.i10.i10_setting_data import I10Grating
-from dodal.devices.i10.mirrors import PiezoMirror
 from dodal.devices.pgm import PGM
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
 BL = get_beamline_name("i10")
 PREFIX = BeamlinePrefix(BL)
+
+"""Mirrors"""
+
+
+@device_factory()
+def first_mirror() -> PiezoMirror:
+    return PiezoMirror(prefix=f"{PREFIX.beamline_prefix}-OP-COL-01:")
 
 
 @device_factory()
@@ -29,6 +37,11 @@ def pgm() -> PGM:
         grating=I10Grating,
         gratingPv="NLINES2",
     )
+
+
+@device_factory()
+def switching_mirror() -> PiezoMirror:
+    return PiezoMirror(prefix=f"{PREFIX.beamline_prefix}-OP-SWTCH-01:")
 
 
 LOOK_UPTABLE_DIR = "/dls_sw/i10/software/blueapi/scratch/i10-config/lookupTables/"
@@ -66,14 +79,19 @@ def idu() -> I10Id:
     )
 
 
-"""Mirrors"""
+"""Slits"""
 
 
 @device_factory()
-def first_mirror() -> PiezoMirror:
-    return PiezoMirror(prefix=f"{PREFIX.beamline_prefix}-OP-COL-01:")
+def slits() -> I10SharedSlits:
+    return I10SharedSlits(prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-")
+
+
+"""Diagnostics"""
 
 
 @device_factory()
-def switching_mirror() -> PiezoMirror:
-    return PiezoMirror(prefix=f"{PREFIX.beamline_prefix}-OP-SWTCH-01:")
+def diagnostics() -> I10SharedDiagnostic:
+    return I10SharedDiagnostic(
+        prefix=f"{PREFIX.beamline_prefix}-DI-",
+    )

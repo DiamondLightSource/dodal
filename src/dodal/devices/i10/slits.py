@@ -77,9 +77,7 @@ class I10PrimarySlits(Slits):
         )
 
 
-class I10Slits(Device):
-    """Collection of all the i10 slits before end station."""
-
+class I10SharedSlits(Device):
     def __init__(self, prefix: str, name: str = "") -> None:
         self.s1 = I10PrimarySlits(
             prefix=prefix + "01:",
@@ -90,6 +88,12 @@ class I10Slits(Device):
         self.s3 = I10SlitsBlades(
             prefix=prefix + "03:",
         )
+
+
+class I10Slits(Device):
+    """Collection of all the i10 slits before end station."""
+
+    def __init__(self, prefix: str, name: str = "") -> None:
         self.s4 = MinimalSlits(
             prefix=prefix + "04:",
             x_gap="XSIZE",

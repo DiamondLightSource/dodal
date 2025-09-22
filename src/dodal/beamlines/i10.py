@@ -1,8 +1,13 @@
 from dodal.common.beamlines.beamline_utils import device_factory
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.devices.current_amplifiers import CurrentAmpDet
-from dodal.devices.i10.diagnostics import I10Diagnostic, I10Diagnostic5ADet
-from dodal.devices.i10.mirrors import PiezoMirror
+from dodal.devices.i10 import (
+    I10Diagnostic,
+    I10Diagnostic5ADet,
+    I10Slits,
+    I10SlitsDrainCurrent,
+    PiezoMirror,
+)
 from dodal.devices.i10.rasor.rasor_current_amp import RasorFemto, RasorSR570
 from dodal.devices.i10.rasor.rasor_motors import (
     DetSlits,
@@ -10,7 +15,6 @@ from dodal.devices.i10.rasor.rasor_motors import (
     PaStage,
 )
 from dodal.devices.i10.rasor.rasor_scaler_cards import RasorScalerCard1
-from dodal.devices.i10.slits import I10Slits, I10SlitsDrainCurrent
 from dodal.devices.motors import XYStage, XYZStage
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name

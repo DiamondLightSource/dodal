@@ -138,9 +138,7 @@ class FullDiagnostic(Device):
         super().__init__(name)
 
 
-class I10Diagnostic(Device):
-    """Collection of all the diagnostic stage on i10."""
-
+class I10SharedDiagnostic(Device):
     def __init__(self, prefix, name: str = "") -> None:
         self.d1 = ScreenCam(prefix=prefix + "PHDGN-01:")
         self.d2 = ScreenCam(prefix=prefix + "PHDGN-02:")
@@ -149,6 +147,13 @@ class I10Diagnostic(Device):
             positioner_enum=D3Position,
             positioner_suffix="DET:X",
         )
+        super().__init__(name)
+
+
+class I10Diagnostic(Device):
+    """Collection of all the diagnostic stage on i10."""
+
+    def __init__(self, prefix, name: str = "") -> None:
         self.d4 = ScreenCam(prefix=prefix + "PHDGN-04:")
         self.d5 = create_positioner(D5Position, f"{prefix}IONC-01:Y")
         self.d5A = create_positioner(D5APosition, f"{prefix}PHDGN-06:DET:X")
