@@ -22,9 +22,6 @@ from dodal.log import LOGGER
 
 NO_MURKO_RESULT = (-1, -1)
 
-# MurkoResult = dict
-# FullMurkoResults = dict[str, list[MurkoResult]]
-
 
 class MurkoMetadata(TypedDict):
     zoom_percentage: float

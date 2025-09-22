@@ -523,11 +523,6 @@ def test_given_n_results_filter_outliers_will_reduce_down_to_smaller_amount(
 
 
 def test_when_results_filtered_then_smallest_x_kept(murko_results: MurkoResultsDevice):
-    murko_results.x_dists_mm = [4, 0, 6, 7]
-    murko_results.y_dists_mm = [8, 90, 63, 8]
-    murko_results.omegas = [0, 10, 20, 30]
-    murko_results.uuids = ["a", "b", "c", "d"]
-
     murko_results.results = [
         MurkoResult(x_dist_mm=4, y_dist_mm=8, omega=0, uuid="a"),
         MurkoResult(x_dist_mm=0, y_dist_mm=90, omega=10, uuid="b"),
