@@ -168,15 +168,24 @@ class Lakeshore336(Lakeshore):
         self,
         prefix: str,
         control_channel: int = 1,
-        single_control_channel: bool = False,
         name: str = "",
     ):
+        """
+        Lakeshore 336 temperature controller. WIth 4 readback and control channels.
+        Heater settings are: Off, Low, Medium, High.
+        Parameters
+        ----------
+        prefix : str
+            The EPICS prefix for the device.
+        control_channel : int, optional
+            The initial control channel (default is 1).
+        """
         super().__init__(
             prefix=prefix,
             num_readback_channel=4,
-            heater_setting=LAKESHORE336_HEATER_SETTING,
+            heater_setting=Heater336Settings,
             control_channel=control_channel,
-            single_control_channel=single_control_channel,
+            single_control_channel=False,
             name=name,
         )
 
@@ -186,14 +195,24 @@ class Lakeshore340(Lakeshore):
         self,
         prefix: str,
         control_channel: int = 1,
-        single_control_channel: bool = True,
         name: str = "",
     ):
+        """Lakeshore 340 temperature controller. WIth 4 readback channels and a single
+        control channel.
+        Heater settings are in power from 0 to 5. 0 is 0 watt, 5 is 50 watt.
+        Parameters
+        ----------
+        prefix : str
+            The EPICS prefix for the device.
+        control_channel : int, optional
+            The initial control channel (default is 1).
+        """
+
         super().__init__(
             prefix=prefix,
             num_readback_channel=4,
             heater_setting=float,
             control_channel=control_channel,
-            single_control_channel=single_control_channel,
+            single_control_channel=True,
             name=name,
         )
