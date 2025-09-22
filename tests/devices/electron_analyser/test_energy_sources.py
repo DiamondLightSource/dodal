@@ -11,6 +11,7 @@ from dodal.devices.electron_analyser import (
     SelectedSource,
 )
 from dodal.devices.i09 import DCM
+from dodal.devices.pgm import PGM
 
 
 async def test_single_energy_source_read(
@@ -43,11 +44,11 @@ async def test_single_energy_souce_read_configuration(
 
 async def test_dual_energy_source_energy_is_correct_when_switching_between_sources(
     dual_energy_source: DualEnergySource,
-    dcm_energy_source: EnergySource,
-    pgm_energy_source: EnergySource,
+    dcm: DCM,
+    pgm: PGM,
 ) -> None:
-    dcm_energy_val = await dcm_energy_source.energy.get_value()
-    pgm_energy_val = await pgm_energy_source.energy.get_value()
+    dcm_energy_val = await dcm.energy_in_ev.get_value()
+    pgm_energy_val = await pgm.energy.user_readback.get_value()
 
     # Make sure energy sources values are different for this test so we can tell them a
     # part when switching
@@ -61,8 +62,8 @@ async def test_dual_energy_source_energy_is_correct_when_switching_between_sourc
 
 async def test_dual_energy_souce_read(
     dual_energy_source: DualEnergySource,
-    dcm_energy_source: EnergySource,
-    pgm_energy_source: EnergySource,
+    dcm: DCM,
+    pgm: PGM,
 ) -> None:
     await dual_energy_source.selected_source.set(SelectedSource.SOURCE1)
     prefix = dual_energy_source.name
@@ -70,11 +71,11 @@ async def test_dual_energy_souce_read(
         dual_energy_source,
         {
             f"{prefix}-selected_source": partial_reading(SelectedSource.SOURCE1),
-            f"{await dcm_energy_source.wrapped_device_name.get_value()}": partial_reading(
-                await dcm_energy_source.energy.get_value()
+            f"{dcm.energy_in_ev.name}": partial_reading(
+                await dcm.energy_in_ev.get_value()
             ),
-            f"{await pgm_energy_source.wrapped_device_name.get_value()}": partial_reading(
-                await pgm_energy_source.energy.get_value()
+            f"{pgm.energy.user_readback.name}": partial_reading(
+                await pgm.energy.user_readback.get_value()
             ),
         },
     )
@@ -82,18 +83,18 @@ async def test_dual_energy_souce_read(
 
 async def test_dual_energy_souce_read_configuration(
     dual_energy_source: DualEnergySource,
-    dcm_energy_source: EnergySource,
-    pgm_energy_source: EnergySource,
+    dcm: DCM,
+    pgm: PGM,
 ) -> None:
     prefix = dual_energy_source.name
     await assert_configuration(
         dual_energy_source,
         {
             f"{prefix}-source1-wrapped_device_name": partial_reading(
-                dcm_energy_source._source_ref().name
+                dcm.energy_in_ev.name
             ),
             f"{prefix}-source2-wrapped_device_name": partial_reading(
-                pgm_energy_source._source_ref().name
+                pgm.energy.user_readback.name
             ),
         },
     )

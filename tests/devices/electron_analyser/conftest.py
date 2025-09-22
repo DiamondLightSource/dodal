@@ -3,7 +3,6 @@ from typing import Any
 import pytest
 from bluesky.run_engine import RunEngine
 from ophyd_async.core import SignalR, init_devices
-from ophyd_async.testing import set_mock_value
 
 from dodal.devices.electron_analyser import (
     DualEnergySource,
@@ -27,6 +26,7 @@ from dodal.devices.electron_analyser.vgscienta import (
 )
 from dodal.devices.i09 import DCM, Grating
 from dodal.devices.pgm import PGM
+from dodal.testing import patch_motor
 from tests.devices.electron_analyser.helper_util import (
     get_test_sequence,
 )
@@ -36,6 +36,7 @@ from tests.devices.electron_analyser.helper_util import (
 def dcm(RE: RunEngine) -> DCM:
     with init_devices(mock=True):
         dcm = DCM("DCM:")
+    patch_motor(dcm.energy_in_kev, initial_position=2.2)
     return dcm
 
 
@@ -43,39 +44,22 @@ def dcm(RE: RunEngine) -> DCM:
 def pgm(RE: RunEngine) -> PGM:
     with init_devices(mock=True):
         pgm = PGM("PGM:", Grating)
+    patch_motor(pgm.energy, initial_position=500)
     return pgm
 
 
 @pytest.fixture
-def dcm_energy_source(dcm: DCM, RE: RunEngine) -> EnergySource:
-    set_mock_value(dcm.energy_in_kev.user_readback, 2.2)
+async def single_energy_source(dcm: DCM, RE: RunEngine) -> EnergySource:
     with init_devices(mock=True):
-        dcm_energy = EnergySource(dcm.energy_in_ev)
-    return dcm_energy
+        single_energy_source = EnergySource(dcm.energy_in_ev)
+    return single_energy_source
 
 
 @pytest.fixture
-def pgm_energy_source(pgm: PGM, RE: RunEngine) -> EnergySource:
-    set_mock_value(pgm.energy.user_readback, 500)
-    with init_devices(mock=True):
-        pgm_energy = EnergySource(pgm.energy.user_readback)
-    return pgm_energy
-
-
-@pytest.fixture
-async def single_energy_source(
-    dcm_energy_source: EnergySource, RE: RunEngine
-) -> EnergySource:
-    return dcm_energy_source
-
-
-@pytest.fixture
-async def dual_energy_source(
-    dcm_energy_source: EnergySource, pgm_energy_source: EnergySource, RE: RunEngine
-) -> DualEnergySource:
+async def dual_energy_source(dcm: DCM, pgm: PGM, RE: RunEngine) -> DualEnergySource:
     async with init_devices(mock=True):
         dual_energy_source = DualEnergySource(
-            source1=dcm_energy_source, source2=pgm_energy_source
+            source1=dcm.energy_in_ev, source2=pgm.energy.user_readback
         )
     return dual_energy_source
 
