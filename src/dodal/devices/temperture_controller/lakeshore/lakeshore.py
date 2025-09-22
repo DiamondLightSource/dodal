@@ -17,7 +17,7 @@ from .lakeshore_io import (
 )
 
 
-class LAKESHORE336_HEATER_SETTING(StrictEnum):
+class Heater336Settings(StrictEnum):
     OFF = "Off"
     LOW = "Low"
     MEDIUM = "Medium"
