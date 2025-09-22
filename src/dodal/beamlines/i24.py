@@ -41,7 +41,7 @@ set_log_beamline(BL)
 set_utils_beamline(BL)
 
 I24_ZEBRA_MAPPING = ZebraMapping(
-    outputs=ZebraTTLOutputs(TTL_EIGER=1, TTL_PILATUS=2, TTL_FAST_SHUTTER=4),
+    outputs=ZebraTTLOutputs(TTL_DETECTOR=2, TTL_FAST_SHUTTER=4),
     sources=ZebraSources(),
 )
 
