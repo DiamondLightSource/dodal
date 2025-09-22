@@ -19,9 +19,6 @@ dodal.devices.smargon.Smargon
       
       
       
-      ~Smargon.get_xyz_limits
-      
-      
       
       
       ~Smargon.set

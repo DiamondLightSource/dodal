@@ -14,13 +14,11 @@ dodal.devices.smargon
    :toctree:
    :recursive:
 
-   ~smargon.AxisLimit
    ~smargon.CombinedMove
    ~smargon.DeferMoves
    ~smargon.Smargon
    ~smargon.StubOffsets
    ~smargon.StubPosition
-   ~smargon.XYZLimits
 
 
 
