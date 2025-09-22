@@ -23,7 +23,7 @@ from ophyd_async.epics.adcore import (
     NDFileHDFIO,
     NDPluginBaseIO,
 )
-from ophyd_async.epics.core import PvSuffix, stop_busy_record
+from ophyd_async.epics.core import PvSuffix, epics_signal_r, stop_busy_record
 
 
 class TetrammRange(StrictEnum):
@@ -224,6 +224,19 @@ class TetrammDetector(StandardDetector):
         self.driver = TetrammDriver(prefix + drv_suffix)
         self.file_io = NDFileHDFIO(prefix + fileio_suffix)
         controller = TetrammController(self.driver)
+
+        self.current1 = epics_signal_r(float, prefix + "Cur1:MeanValue_RBV")
+        self.current2 = epics_signal_r(float, prefix + "Cur2:MeanValue_RBV")
+        self.current3 = epics_signal_r(float, prefix + "Cur3:MeanValue_RBV")
+        self.current4 = epics_signal_r(float, prefix + "Cur4:MeanValue_RBV")
+
+        self.sum_x = epics_signal_r(float, prefix + "SumX:MeanValue_RBV")
+        self.xum_y = epics_signal_r(float, prefix + "SumY:MeanValue_RBV")
+        self.sum_all = epics_signal_r(float, prefix + "SumAll:MeanValue_RBV")
+        self.diff_x = epics_signal_r(float, prefix + "DiffX:MeanValue_RBV")
+        self.diff_y = epics_signal_r(float, prefix + "DiffY:MeanValue_RBV")
+        self.pos_x = epics_signal_r(float, prefix + "PosX:MeanValue_RBV")
+        self.pos_y = epics_signal_r(float, prefix + "PosY:MeanValue_RBV")
 
         writer = ADHDFWriter(
             fileio=self.file_io,
