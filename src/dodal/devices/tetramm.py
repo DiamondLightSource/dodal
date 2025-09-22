@@ -141,7 +141,7 @@ class TetrammController(DetectorController):
     async def wait_for_idle(self):
         # tetramm never goes idle really, actually it is always acquiring
         # so need to wait for the capture to finish instead
-        await wait_for_value(self._file_io.acquire, False, timeout=DEFAULT_TIMEOUT)
+        await wait_for_value(self.driver.acquire, False, timeout=DEFAULT_TIMEOUT)
 
     async def unstage(self):
         await self.disarm()
