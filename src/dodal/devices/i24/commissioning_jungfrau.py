@@ -3,7 +3,6 @@ from collections.abc import AsyncGenerator, AsyncIterator
 
 from bluesky.protocols import StreamAsset
 from event_model import DataKey  # type: ignore
-from mx_bluesky.common.utils.log import LOGGER
 from ophyd_async.core import (
     AutoIncrementingPathProvider,
     DetectorWriter,
@@ -15,6 +14,8 @@ from ophyd_async.core import (
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw, epics_signal_rw_rbv
 from ophyd_async.fastcs.jungfrau._controller import JungfrauController
 from ophyd_async.fastcs.jungfrau._signals import JungfrauDriverIO
+
+from dodal.log import LOGGER
 
 
 class JunfrauCommissioningWriter(DetectorWriter, StandardReadable):
