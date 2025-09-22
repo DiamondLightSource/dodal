@@ -3,6 +3,7 @@ from collections.abc import AsyncGenerator, AsyncIterator
 
 from bluesky.protocols import StreamAsset
 from event_model import DataKey  # type: ignore
+from mx_bluesky.common.utils.log import LOGGER
 from ophyd_async.core import (
     AutoIncrementingPathProvider,
     DetectorWriter,
@@ -42,6 +43,9 @@ class JunfrauCommissioningWriter(DetectorWriter, StandardReadable):
             self.file_name.set(self._path_info().filename),
             self.file_path.set(str(self._path_info().directory_path)),
             self.frame_counter.set(0),
+        )
+        LOGGER.info(
+            f"Jungfrau writing to folder {self._path_info().directory_path} with filename {self._path_info().filename}"
         )
         await wait_for_value(self.writer_ready, 1, timeout=10)
         return await self._describe()
