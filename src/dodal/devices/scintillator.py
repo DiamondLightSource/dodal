@@ -98,6 +98,7 @@ class Scintillator(StandardReadable):
                 await self.y_mm.set(self._scintillator_out_yz_mm[0])
                 await self.z_mm.set(self._scintillator_out_yz_mm[1])
             case InOut.IN:
+                # may need to add the same collision logic as above
                 await self.y_mm.set(self._scintillator_in_yz_mm[0])
                 await self.z_mm.set(self._scintillator_in_yz_mm[1])
             case _:
