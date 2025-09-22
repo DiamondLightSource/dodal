@@ -14,7 +14,7 @@ from dodal.devices.temperture_controller import (
 )
 
 
-class HEATER_SETTING(StrictEnum):
+class HeaterSettings(StrictEnum):
     OFF = "Off"
     LOW = "Low"
     MEDIUM = "Medium"
@@ -22,12 +22,12 @@ class HEATER_SETTING(StrictEnum):
 
 
 @pytest.fixture
-async def lakeshore():
+async def lakeshore() -> Lakeshore:
     async with init_devices(mock=True):
         lakeshore = Lakeshore(
-            prefix="007", num_readback_channel=4, heater_setting=HEATER_SETTING
+            prefix="007", num_readback_channel=4, heater_setting=HeaterSettings
         )
-    yield lakeshore
+    return lakeshore
 
 
 @pytest.mark.parametrize(
@@ -61,14 +61,14 @@ async def test_lakeshore_set_success(
         500,
     ],
 )
-async def test_lakeshore_set_success_fail_outside_limit(
+async def test_lakeshore_set_fail_outside_limit(
     lakeshore: Lakeshore, RE: RunEngine, temperature: float
 ):
     low = await lakeshore.temperature_low_limit.get_value()
     high = await lakeshore.temperature_high_limit.get_value()
     with pytest.raises(
         ValueError,
-        match=f"Requested temperature {temperature} is outside limits: {low}, {high}",
+        match=f"{lakeshore.name} requested temperature {temperature} is outside limits: {low}, {high}",
     ):
         await lakeshore.set(temperature)
 
