@@ -6,7 +6,7 @@ from dodal.devices.b07_1 import (
     Grating,
     LensMode,
 )
-from dodal.devices.electron_analyser import SelectedSource
+from dodal.devices.electron_analyser import EnergySource
 from dodal.devices.electron_analyser.specs import SpecsDetector
 from dodal.devices.pgm import PGM
 from dodal.devices.synchrotron import Synchrotron
@@ -37,10 +37,15 @@ def ccmc() -> ChannelCutMonochromator:
 
 
 @device_factory()
+def energy_source() -> EnergySource:
+    return EnergySource(pgm().energy.user_readback)
+
+
+@device_factory()
 def analyser() -> SpecsDetector[LensMode, PsuMode]:
     return SpecsDetector[LensMode, PsuMode](
         prefix=f"{PREFIX.beamline_prefix}-EA-DET-01:CAM:",
         lens_mode_type=LensMode,
         psu_mode_type=PsuMode,
-        energy_sources={SelectedSource.SOURCE1: pgm().energy.user_readback},
+        energy_source=energy_source(),
     )
