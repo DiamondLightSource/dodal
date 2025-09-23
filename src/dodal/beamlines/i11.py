@@ -34,12 +34,6 @@ PREFIX = BeamlinePrefix(BL)
 set_log_beamline(BL)
 set_utils_beamline(BL)
 
-# Currently we must hard-code the visit, determining the visit at runtime requires
-# infrastructure that is still WIP.
-# Communication with GDA is also WIP so for now we determine an arbitrary scan number
-# locally and write the commissioning directory. The scan number is not guaranteed to
-# be unique and the data is at risk - this configuration is for testing only.
-
 
 @device_factory()
 def mythen3() -> Mythen3:
