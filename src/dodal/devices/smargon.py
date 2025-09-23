@@ -1,13 +1,9 @@
 import asyncio
-from collections.abc import Collection, Generator
-from dataclasses import dataclass
 from enum import Enum
 from math import isclose
 from typing import TypedDict, cast
 
-from bluesky import plan_stubs as bps
 from bluesky.protocols import Movable
-from bluesky.utils import Msg
 from ophyd_async.core import (
     AsyncStatus,
     Device,
@@ -66,40 +62,6 @@ class StubOffsets(Device):
             await self.to_robot_load.set(1)
 
 
-@dataclass
-class AxisLimit:
-    """Represents the minimum and maximum allowable values on an axis"""
-
-    min_value: float
-    max_value: float
-
-    def contains(self, pos: float):
-        """Determine if the specified value is within limits.
-
-        Args:
-            pos: the value to check
-
-        Returns:
-            True if the value does not exceed the limits
-        """
-        return self.min_value <= pos <= self.max_value
-
-
-@dataclass
-class XYZLimits:
-    """The limits of the smargon x, y, z axes."""
-
-    x: AxisLimit
-    y: AxisLimit
-    z: AxisLimit
-
-    def position_valid(self, pos: Collection[float]) -> bool:
-        return all(
-            axis_limits.contains(value)
-            for axis_limits, value in zip([self.x, self.y, self.z], pos, strict=False)
-        )
-
-
 class DeferMoves(StrictEnum):
     ON = "Defer On"
     OFF = "Defer Off"
@@ -142,24 +104,6 @@ class Smargon(XYZOmegaStage, Movable):
         self.defer_move = epics_signal_rw(DeferMoves, prefix + "CS1:DeferMoves")
 
         super().__init__(prefix, name)
-
-    def get_xyz_limits(self) -> Generator[Msg, None, XYZLimits]:
-        """Obtain a plan stub that returns the smargon XYZ axis limits
-
-        Yields:
-            Bluesky messages
-
-        Returns:
-            the axis limits
-        """
-        limits = {}
-        for name, pv in [
-            (attr_name, getattr(self, attr_name)) for attr_name in ["x", "y", "z"]
-        ]:
-            min_value = yield from bps.rd(pv.low_limit_travel)
-            max_value = yield from bps.rd(pv.high_limit_travel)
-            limits[name] = AxisLimit(min_value, max_value)
-        return XYZLimits(**limits)
 
     @AsyncStatus.wrap
     async def set(self, value: CombinedMove):
