@@ -14,8 +14,10 @@ dodal.devices.electron\_analyser
    :toctree:
    :recursive:
 
-   ~electron_analyser.EnergyMode
+   ~electron_analyser.DualEnergySource
    ~electron_analyser.SelectedSource
+   ~electron_analyser.EnergySource
+   ~electron_analyser.EnergyMode
    ~electron_analyser.ElectronAnalyserDetector
    ~electron_analyser.ElectronAnalyserRegionDetector
 
