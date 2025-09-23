@@ -361,6 +361,7 @@ def pin_tip_detection() -> PinTipDetection:
     """
     return PinTipDetection(f"{PREFIX.beamline_prefix}-DI-OAV-01:")
 
+
 @device_factory()
 def scintillator() -> Scintillator:
     """Get the i04 scintillator device, instantiate it if it hasn't already been.
