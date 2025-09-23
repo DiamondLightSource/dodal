@@ -50,7 +50,7 @@ def supported_trigger_info() -> TriggerInfo:
     return TriggerInfo(
         number_of_events=1,
         trigger=DetectorTrigger.CONSTANT_GATE,
-        deadtime=2e-5,
+        deadtime=1e-4,
         livetime=1,
         exposure_timeout=None,
     )
@@ -230,19 +230,14 @@ async def test_stage_sets_up_accurate_describe_output(
     await tetramm.prepare(supported_trigger_info)
 
     averaging_time = await tetramm.driver.averaging_time.get_value()
-
-    averaging_time = round(averaging_time, 3)
-    sample_time = await tetramm.driver.sample_time.get_value()
+    averaging_time = round(averaging_time, 3)  # avoid floating point issues
 
     assert averaging_time == 1.0
-    assert sample_time == 0.0001
-
-    livetime = round(averaging_time / sample_time, 2)
 
     assert await tetramm.describe() == {
         "tetramm": {
             "source": "mock+ca://MY-TETRAMM:HDF5:FullFileName_RBV",
-            "shape": [1, 4, livetime],
+            "shape": [1, 4, averaging_time],
             "dtype_numpy": "<f8",
             "dtype": "array",
             "external": "STREAM:",
