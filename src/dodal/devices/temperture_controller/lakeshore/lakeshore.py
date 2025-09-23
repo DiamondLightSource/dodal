@@ -182,9 +182,10 @@ class Lakeshore340(Lakeshore):
         control_channel: int = 1,
         name: str = "",
     ):
-        """Lakeshore 340 temperature controller. WIth 4 readback channels and a single
+        """Lakeshore 340 temperature controller. With 4 readback channels and a single
         control channel.
         Heater settings are in power from 0 to 5. 0 is 0 watt, 5 is 50 watt.
+
         Parameters
         ----------
         prefix : str
