@@ -24,7 +24,7 @@ from ophyd_async.epics.adcore import (
     NDFileHDFIO,
     NDPluginBaseIO,
 )
-from ophyd_async.epics.core import PvSuffix, epics_signal_r, stop_busy_record
+from ophyd_async.epics.core import PvSuffix
 
 
 class TetrammRange(StrictEnum):
@@ -110,7 +110,7 @@ class TetrammController(DetectorController):
         current_active_status = await self.driver.acquire.get_value()
 
         if current_active_status:  # if active turn off first
-            await self.driver.acquire.set(False)
+            await self.disarm()
 
         # trigger mode must be set first and on its own!
         await self.driver.trigger_mode.set(
@@ -141,7 +141,7 @@ class TetrammController(DetectorController):
     async def wait_for_idle(self):
         # tetramm never goes idle really, actually it is always acquiring
         # so need to wait for the capture to finish instead
-        await wait_for_value(self.driver.acquire, False, timeout=DEFAULT_TIMEOUT)
+        await wait_for_value(self._file_io.acquire, False, timeout=DEFAULT_TIMEOUT)
 
     async def unstage(self):
         await self.disarm()
@@ -150,7 +150,7 @@ class TetrammController(DetectorController):
     async def disarm(self):
         # We can't use caput callback as we already used it in arm() and we can't have
         # 2 or they will deadlock
-        await stop_busy_record(self.driver.acquire, False, timeout=1)
+        await set_and_wait_for_value(self.driver.acquire, False, timeout=1)
 
     async def set_exposure(self, exposure: float) -> None:
         """Set the exposure time and acquire period.
