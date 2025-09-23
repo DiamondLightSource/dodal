@@ -2,13 +2,12 @@ from typing import Any
 
 import pytest
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import SignalR, init_devices
+from ophyd_async.core import init_devices
 
 from dodal.devices.electron_analyser import (
     DualEnergySource,
     ElectronAnalyserDetector,
     EnergySource,
-    SelectedSource,
 )
 from dodal.devices.electron_analyser.abstract import (
     AbstractAnalyserDriverIO,
@@ -33,45 +32,30 @@ from tests.devices.electron_analyser.helper_util import (
 
 
 @pytest.fixture
-def dcm(RE: RunEngine) -> DCM:
+async def single_energy_source(RE: RunEngine) -> EnergySource:
     with init_devices(mock=True):
         dcm = DCM("DCM:")
     patch_motor(dcm.energy_in_kev, initial_position=2.2)
-    return dcm
+    async with init_devices(mock=True):
+        dcm_energy_source = EnergySource(dcm.energy_in_ev)
+    return dcm_energy_source
 
 
 @pytest.fixture
-def pgm(RE: RunEngine) -> PGM:
-    with init_devices(mock=True):
+async def dual_energy_source(RE: RunEngine) -> DualEnergySource:
+    async with init_devices(mock=True):
+        dcm = DCM("DCM:")
+    patch_motor(dcm.energy_in_kev, initial_position=2.2)
+
+    async with init_devices(mock=True):
         pgm = PGM("PGM:", Grating)
     patch_motor(pgm.energy, initial_position=500)
-    return pgm
 
-
-@pytest.fixture
-async def single_energy_source(dcm: DCM, RE: RunEngine) -> EnergySource:
-    with init_devices(mock=True):
-        single_energy_source = EnergySource(dcm.energy_in_ev)
-    return single_energy_source
-
-
-@pytest.fixture
-async def dual_energy_source(dcm: DCM, pgm: PGM, RE: RunEngine) -> DualEnergySource:
     async with init_devices(mock=True):
         dual_energy_source = DualEnergySource(
             source1=dcm.energy_in_ev, source2=pgm.energy.user_readback
         )
     return dual_energy_source
-
-
-# ToDo - This will be removed once existing devices use the energy source device rather
-# than dict.
-@pytest.fixture
-async def energy_sources(dcm: DCM, pgm: PGM) -> dict[str, SignalR[float]]:
-    return {
-        SelectedSource.SOURCE1: dcm.energy_in_ev,
-        SelectedSource.SOURCE2: pgm.energy.user_readback,
-    }
 
 
 @pytest.fixture
