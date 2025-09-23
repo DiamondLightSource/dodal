@@ -1,4 +1,5 @@
 from ophyd_async.core import Reference
+
 from dodal.common.beamlines.beamline_parameters import get_beamline_parameters
 from dodal.common.beamlines.beamline_utils import (
     device_factory,
@@ -366,7 +367,7 @@ def scintillator() -> Scintillator:
     If this is called when already instantiated in i04, it will return the existing object.
     """
     return Scintillator(
-        f"{PREFIX.beamline_prefix}-MO-SCIN-01:", 
+        f"{PREFIX.beamline_prefix}-MO-SCIN-01:",
         Reference(aperture_scatterguard()),
         get_beamline_parameters(),
     )
