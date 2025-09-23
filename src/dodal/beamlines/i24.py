@@ -200,7 +200,7 @@ def commissioning_jungfrau(
     filename: str = "jf_output",  # but these should be manually entered when commissioning
 ) -> CommissioningJungfrau:
     """Get the commissionning Jungfrau 9M device, which uses a temporary filewriter
-    device in place of the Odin while the detector is in commissioning.
+    device in place of Odin while the detector is in commissioning.
     Instantiates the device if it hasn't already been.
     If this is called when already instantiated, it will return the existing object."""
 

@@ -1,5 +1,6 @@
 import asyncio
 from pathlib import Path, PurePath
+from unittest.mock import MagicMock
 
 import pytest
 from ophyd_async.core import (
@@ -30,6 +31,7 @@ async def test_jungfrau_with_temporary_writer(
 ):
     set_mock_value(jungfrau._writer.writer_ready, 1)
     set_mock_value(jungfrau._writer.frame_counter, 10)
+    jungfrau._writer._path_info = MagicMock()
     await jungfrau.prepare(TriggerInfo(livetime=1e-3, exposures_per_event=5))
     assert await jungfrau._writer.frame_counter.get_value() == 0
     await jungfrau.kickoff()
@@ -42,6 +44,7 @@ async def test_jungfrau_with_temporary_writer(
         set_mock_value(jungfrau._writer.frame_counter, 5)
 
     await asyncio.gather(status, _do_fake_writing())
+    jungfrau._writer._path_info.assert_called_once()
 
 
 def test_collect_stream_docs_raises_error(jungfrau: CommissioningJungfrau):

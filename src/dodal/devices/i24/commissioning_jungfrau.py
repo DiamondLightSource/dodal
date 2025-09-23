@@ -39,14 +39,15 @@ class JunfrauCommissioningWriter(DetectorWriter, StandardReadable):
 
     async def open(self, name: str, exposures_per_event: int = 1) -> dict[str, DataKey]:
         self._exposures_per_event = exposures_per_event
+        _path_info = self._path_info()
 
         await asyncio.gather(
-            self.file_name.set(self._path_info().filename),
-            self.file_path.set(str(self._path_info().directory_path)),
+            self.file_name.set(_path_info.filename),
+            self.file_path.set(str(_path_info.directory_path)),
             self.frame_counter.set(0),
         )
         LOGGER.info(
-            f"Jungfrau writing to folder {self._path_info().directory_path} with filename {self._path_info().filename}"
+            f"Jungfrau writing to folder {_path_info.directory_path} with filename {_path_info.filename}"
         )
         await wait_for_value(self.writer_ready, 1, timeout=10)
         return await self._describe()
