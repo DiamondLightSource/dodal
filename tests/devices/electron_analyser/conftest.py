@@ -3,7 +3,6 @@ from typing import Any
 import pytest
 from bluesky.run_engine import RunEngine
 from ophyd_async.core import init_devices
-from ophyd_async.testing import set_mock_value
 
 from dodal.devices.electron_analyser import (
     DualEnergySource,
@@ -36,7 +35,7 @@ from tests.devices.electron_analyser.helper_util import (
 async def single_energy_source(RE: RunEngine) -> EnergySource:
     with init_devices(mock=True):
         dcm = DCM("DCM:")
-    set_mock_value(dcm.energy_in_kev.user_readback, 2.2)
+    patch_motor(dcm.energy_in_kev, initial_position=2.2)
     async with init_devices(mock=True):
         dcm_energy_source = EnergySource(dcm.energy_in_ev)
     return dcm_energy_source
