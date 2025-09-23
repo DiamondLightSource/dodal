@@ -269,6 +269,30 @@ async def test_pilatus_controller(
     assert await tetramm.driver.acquire.get_value() is False
 
 
+async def test_tetramm_unstage(tetramm_controller: TetrammController):
+    set_mock_value(tetramm_controller.driver.acquire, True)
+    set_mock_value(tetramm_controller._file_io.acquire, True)
+
+    await tetramm_controller.unstage()
+    assert await tetramm_controller.driver.acquire.get_value() is False
+    assert await tetramm_controller._file_io.acquire.get_value() is False
+
+
+async def test_tetramm_prepare_when_freerunning(tetramm_controller: TetrammController):
+    set_mock_value(tetramm_controller.driver.trigger_mode, TetrammTrigger.FREE_RUN)
+    set_mock_value(tetramm_controller.driver.acquire, True)
+
+    await tetramm_controller.prepare(
+        TriggerInfo(
+            number_of_events=1,
+            trigger=DetectorTrigger.CONSTANT_GATE,
+            livetime=VALID_TEST_EXPOSURE_TIME,
+            deadtime=VALID_TEST_DEADTIME,
+        )
+    )
+    assert await tetramm_controller.driver.acquire.get_value() is False
+
+
 async def assert_armed(driver: TetrammDriver) -> None:
     sample_time = await driver.sample_time.get_value()
     samples_per_reading = int(VALID_TEST_EXPOSURE_TIME / sample_time)

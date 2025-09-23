@@ -107,9 +107,9 @@ class TetrammController(DetectorController):
         if trigger_info.livetime is None:
             raise ValueError(f"{self.__class__.__name__} requires that livetime is set")
 
-        current_active_status = await self.driver.acquire.get_value()
+        current_trig_status = await self.driver.trigger_mode.get_value()
 
-        if current_active_status:  # if active turn off first
+        if current_trig_status == TetrammTrigger.FREE_RUN:  # if active turn off first
             await self.disarm()
 
         # trigger mode must be set first and on its own!
