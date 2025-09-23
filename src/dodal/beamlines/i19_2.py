@@ -1,9 +1,13 @@
+from ophyd_async.fastcs.panda import HDFPanda
+
 from dodal.common.beamlines.beamline_utils import (
     device_factory,
+    get_path_provider,
 )
 from dodal.common.beamlines.beamline_utils import (
     set_beamline as set_utils_beamline,
 )
+from dodal.devices.i19.backlight import BacklightPosition
 from dodal.devices.i19.beamstop import BeamStop
 from dodal.devices.i19.blueapi_device import HutchState
 from dodal.devices.i19.diffractometer import FourCircleDiffractometer
@@ -75,3 +79,19 @@ def synchrotron() -> Synchrotron:
     If this is called when already instantiated in i19-2, it will return the existing object.
     """
     return Synchrotron()
+
+
+@device_factory()
+def backlight() -> BacklightPosition:
+    """Get the i19-2 backlight device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i19-2, it will return the existing object.
+    """
+    return BacklightPosition(prefix=f"{PREFIX.beamline_prefix}-EA-IOC-12:")
+
+
+@device_factory()
+def panda() -> HDFPanda:
+    return HDFPanda(
+        prefix=f"{PREFIX.beamline_prefix}-EA-PANDA-01:",
+        path_provider=get_path_provider(),
+    )
