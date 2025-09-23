@@ -24,7 +24,7 @@ from ophyd_async.epics.adcore import (
     NDFileHDFIO,
     NDPluginBaseIO,
 )
-from ophyd_async.epics.core import PvSuffix
+from ophyd_async.epics.core import PvSuffix, epics_signal_r
 
 
 class TetrammRange(StrictEnum):
