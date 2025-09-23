@@ -53,7 +53,7 @@ class EnergySource(AbstractEnergySource):
 
 class DualEnergySource(AbstractEnergySource):
     """
-    Holds two EnergySource devices and provides a signal to read energydepending on
+    Holds two EnergySource devices and provides a signal to read energy depending on
     which source is selected. This is controlled by a selected_source signal which can
     switch source using SelectedSource enum. Both sources energy is recorded in the
     read, the energy signal is used as a helper signal to know which source is being
