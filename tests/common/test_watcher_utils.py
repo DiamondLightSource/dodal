@@ -61,3 +61,17 @@ async def test_log_on_percentage_complete_value_error_on_bad_input():
         match="Percent interval on class _LogOnPercentageProgressWatcher must be a positive number, but received 0",
     ):
         log_on_percentage_complete(status, "", 0)
+
+
+async def test_log_on_percentage_complete_for_already_updating_status():
+    test_watchable = MockWatchable()
+    status = test_watchable.get_watchable_status()
+
+    async def update_signal():
+        for i in range(10):
+            await test_watchable.signal.set(i)
+
+    async def do_log():
+        log_on_percentage_complete(status, "")
+
+    await asyncio.gather(update_signal(), do_log())
