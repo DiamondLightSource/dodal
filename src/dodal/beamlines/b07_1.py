@@ -41,6 +41,7 @@ def energy_source() -> EnergySource:
     return EnergySource(pgm().energy.user_readback)
 
 
+@device_factory()
 def analyser() -> SpecsDetector[LensMode, PsuMode]:
     return SpecsDetector[LensMode, PsuMode](
         prefix=f"{PREFIX.beamline_prefix}-EA-DET-01:CAM:",
