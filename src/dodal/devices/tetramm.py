@@ -109,7 +109,7 @@ class TetrammController(DetectorController):
 
         current_trig_status = await self.driver.trigger_mode.get_value()
 
-        if current_trig_status == TetrammTrigger.FREE_RUN:  # if active turn off first
+        if current_trig_status == TetrammTrigger.FREE_RUN:  # if freerun turn off first
             await self.disarm()
 
         # trigger mode must be set first and on its own!
@@ -174,7 +174,9 @@ class TetrammController(DetectorController):
                 "Tetramm exposure time must be at least "
                 f"{minimum_samples * sample_time}s, asked to set it to {exposure}s"
             )
-        await self.driver.averaging_time.set(samples_per_reading * sample_time)
+        await self.driver.averaging_time.set(
+            samples_per_reading * sample_time
+        )  # correct
 
     async def start_acquiring_driver_and_ensure_status(self) -> AsyncStatus:
         """Start acquiring driver, raising ValueError if the detector is in a bad state.
@@ -212,10 +214,7 @@ class TetrammDatasetDescriber(DatasetDescriber):
     async def shape(self) -> tuple[int, int]:
         return (
             int(await self._driver.num_channels.get_value()),
-            int(
-                await self._driver.averaging_time.get_value()
-                / await self._driver.sample_time.get_value(),
-            ),
+            int(await self._driver.to_average.get_value()),
         )
 
 
