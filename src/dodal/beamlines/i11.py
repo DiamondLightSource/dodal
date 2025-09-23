@@ -39,13 +39,6 @@ set_utils_beamline(BL)
 # Communication with GDA is also WIP so for now we determine an arbitrary scan number
 # locally and write the commissioning directory. The scan number is not guaranteed to
 # be unique and the data is at risk - this configuration is for testing only.
-set_path_provider(
-    StaticVisitPathProvider(
-        BL,
-        Path(f"/dls/{BL}/data/2025/cm40625-3/bluesky"),
-        client=RemoteDirectoryServiceClient(f"http://{BL}-control:8088/api"),
-    )
-)
 
 
 @device_factory()
