@@ -108,7 +108,8 @@ class HardUndulator(Undulator):
     An Undulator-type insertion device, used to control photon emission at a
     given beam energy.
 
-    This class extends Undulator and adds an order(harmonics) parameter.
+    This class extends Undulator and adds an order(harmonics) parameter. In addition there are gap_offset
+    to allow for small adjustments to the gap and an undulator_period soft signals.
     """
 
     def __init__(
@@ -124,6 +125,8 @@ class HardUndulator(Undulator):
         """
         Args:
             prefix: PV prefix
+            order: UndulatorOrder object to set/get undulator order
+            calculate_gap_function: Function to calculate gap from energy
             id_gap_lookup_table_path: Path to lookup table for gap vs energy
             name: Name for device. Defaults to ""
             poles: Number of magnetic poles built into the undulator
