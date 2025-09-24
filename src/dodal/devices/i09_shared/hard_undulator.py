@@ -17,6 +17,16 @@ from dodal.log import LOGGER
 LUT_COMMENTS = ["#"]
 HU_SKIP_ROWS = 3
 
+# Electron rest energy in MeV
+ELECTRON_REST_ENERGY_MEV = 0.510999
+
+# Columns in the lookup table
+RING_ENERGY_COLUMN = 1
+MAGNET_FIELD_COLUMN = 2
+MIN_ENERGY_COLUMN = 3
+MAX_ENERGY_COLUMN = 4
+GAP_OFFSET_COLUMN = 7
+
 
 def calculate_gap_i09(
     photon_energy_kev: float,
@@ -31,9 +41,7 @@ def calculate_gap_i09(
     """
     M = 4
     h = 16
-    ELECTRON_REST_ENERGY_MEV = 0.510999
-    RING_ENERGY_COLUMN = 1
-    MAGNET_FIELD_COLUMN = 2
+
     gamma = 1000 * look_up_table[order][RING_ENERGY_COLUMN] / ELECTRON_REST_ENERGY_MEV
     k_squared = (
         4.959368e-6 * (order * gamma * gamma / (undulator_period * photon_energy_kev))
@@ -56,7 +64,7 @@ def calculate_gap_i09(
     )
     gap = (
         (undulator_period / np.pi) * np.log(A / K)
-        + look_up_table[order][7]
+        + look_up_table[order][GAP_OFFSET_COLUMN]
         + gap_offset
     )
     LOGGER.debug(
@@ -85,9 +93,7 @@ class UndulatorOrder(StandardReadable, Locatable[int]):
             skiprows=HU_SKIP_ROWS,
         )
         LOGGER.debug(f"Loaded lookup table: {self._lookup_table}")
-        order_list = [
-            int(self._lookup_table[i][0]) for i in range(self._lookup_table.shape[0])
-        ]
+        order_list = [int(row[0]) for row in self._lookup_table]
         if value not in order_list:
             raise ValueError(
                 f"Order {value} not found in lookup table, must be in {order_list}"
@@ -161,8 +167,8 @@ class HardUndulator(Undulator):
             value (float): The energy value in keV to check.
         """
         _current_order = (await self.order().locate()).get("readback")
-        min_energy = self._cached_lookup_table[_current_order][3]
-        max_energy = self._cached_lookup_table[_current_order][4]
+        min_energy = self._cached_lookup_table[_current_order][MIN_ENERGY_COLUMN]
+        max_energy = self._cached_lookup_table[_current_order][MAX_ENERGY_COLUMN]
         LOGGER.debug(
             f"Min and max energies for order {_current_order} are {min_energy}keV and {max_energy}keV respectively"
         )
