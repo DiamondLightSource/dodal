@@ -7,6 +7,7 @@ from bluesky.utils import MsgGenerator
 from ophyd_async.epics.motor import Motor
 
 from dodal.common.coordination import group_uuid, inject, locked
+from dodal.testing import patch_motor
 
 static_uuid = "51aef931-33b4-4b33-b7ad-a8287f541202"
 
@@ -36,6 +37,7 @@ async def test_device_locking(state: bool):
 
     mock_motor = locked(Motor(""), is_unlocked)
     await mock_motor.connect(mock=True)
+    patch_motor(mock_motor)
 
     set_status = mock_motor.set(400)
 
@@ -44,8 +46,8 @@ async def test_device_locking(state: bool):
         await asyncio.sleep(0.01)
 
     new_location = await mock_motor.locate()
-    assert new_location["readback"] == 400 if state else 0
-    assert new_location["setpoint"] == 400 if state else 0
+    assert new_location["readback"] == (400 if state else 0)
+    assert new_location["setpoint"] == (400 if state else 0)
 
 
 async def test_device_locked_raises_exception():
