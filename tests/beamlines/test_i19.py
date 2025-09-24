@@ -1,3 +1,5 @@
+import asyncio
+
 import pytest
 from bluesky.run_engine import RunEngine
 from ophyd_async.testing import callback_on_mock_put, set_mock_value
@@ -48,7 +50,11 @@ async def test_device_locking(
     assert await i19_1_shutter.status.get_value() == ShutterState.CLOSED
     assert await i19_1_shutter.interlock.status.get_value() == HUTCH_SAFE_FOR_OPERATIONS
 
-    await i19_1_shutter.set(ShutterDemand.OPEN)
+    set_status = i19_1_shutter.set(ShutterDemand.OPEN)
+
+    while not set_status.done:
+        # Allow time for the set to be scheduled?
+        await asyncio.sleep(0.01)
 
     shutter_state = await i19_1_shutter.status.get_value()
 
