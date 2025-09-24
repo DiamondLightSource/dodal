@@ -67,16 +67,16 @@ def zebra_fast_grid_scan() -> TwoDFastGridScan:
 
 @device_factory()
 def synchrotron() -> Synchrotron:
-    """Get the i03 synchrotron device, instantiate it if it hasn't already been.
-    If this is called when already instantiated in i03, it will return the existing object.
+    """Get the i02-1 synchrotron device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i02-1, it will return the existing object.
     """
     return Synchrotron()
 
 
 @device_factory()
 def zebra() -> Zebra:
-    """Get the i03 zebra device, instantiate it if it hasn't already been.
-    If this is called when already instantiated in i03, it will return the existing object.
+    """Get the i02-1 zebra device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i02-1, it will return the existing object.
     """
     return Zebra(
         prefix=f"{PREFIX.beamline_prefix}-EA-ZEBRA-01:",
@@ -84,20 +84,19 @@ def zebra() -> Zebra:
     )
 
 
+# Device not needed after https://github.com/DiamondLightSource/mx-bluesky/issues/1299
 @device_factory()
 def zocalo() -> ZocaloResults:
-    """Get the i03 ZocaloResults device, instantiate it if it hasn't already been.
-    If this is called when already instantiated in i03, it will return the existing object.
+    """Get the i02-1 ZocaloResults device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i02-1, it will return the existing object.
     """
-    return ZocaloResults(
-        prefix=PREFIX.beamline_prefix,
-    )
+    return ZocaloResults()
 
 
 @device_factory()
 def goniometer() -> SampleMotors:
     """Get the i02-1 goniometer device, instantiate it if it hasn't already been.
-    If this is called when already instantiated in i03, it will return the existing object.
+    If this is called when already instantiated in i02-1, it will return the existing object.
     """
     return SampleMotors(f"{PREFIX.beamline_prefix}-MO-SAMP-01:")
 
