@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.fast_grid_scan &#8212; dodal 1.58.1.dev19+g4b4fa535d documentation</title>
+    <title>dodal.devices.fast_grid_scan &#8212; dodal 1.58.1.dev20+g060c2e4f0 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=e7fdb657"></script>
+    <script src="../../_static/documentation_options.js?v=37c9c5a2"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -606,13 +606,16 @@
 </details></li>
 <li class="toctree-l3 current active has-children"><a class="current reference internal" href="#">dodal.devices.fast_grid_scan</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.fast_grid_scan.FastGridScanCommon.html">dodal.devices.fast_grid_scan.FastGridScanCommon</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.fast_grid_scan.FastGridScanThreeD.html">dodal.devices.fast_grid_scan.FastGridScanThreeD</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.fast_grid_scan.GridAxis.html">dodal.devices.fast_grid_scan.GridAxis</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.fast_grid_scan.GridScanParamsCommon.html">dodal.devices.fast_grid_scan.GridScanParamsCommon</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.fast_grid_scan.GridScanParamsThreeD.html">dodal.devices.fast_grid_scan.GridScanParamsThreeD</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.fast_grid_scan.MotionProgram.html">dodal.devices.fast_grid_scan.MotionProgram</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.fast_grid_scan.PandAFastGridScan.html">dodal.devices.fast_grid_scan.PandAFastGridScan</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.fast_grid_scan.PandAGridScanParams.html">dodal.devices.fast_grid_scan.PandAGridScanParams</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.fast_grid_scan.ZebraFastGridScan.html">dodal.devices.fast_grid_scan.ZebraFastGridScan</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.fast_grid_scan.ZebraGridScanParams.html">dodal.devices.fast_grid_scan.ZebraGridScanParams</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.fast_grid_scan.WithDwellTime.html">dodal.devices.fast_grid_scan.WithDwellTime</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.fast_grid_scan.ZebraFastGridScanThreeD.html">dodal.devices.fast_grid_scan.ZebraFastGridScanThreeD</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.fast_grid_scan.ZebraGridScanParamsThreeD.html">dodal.devices.fast_grid_scan.ZebraGridScanParamsThreeD</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.fluorescence_detector_motion.html">dodal.devices.fluorescence_detector_motion</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -992,27 +995,36 @@
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.fast_grid_scan.FastGridScanCommon.html#dodal.devices.fast_grid_scan.FastGridScanCommon" title="dodal.devices.fast_grid_scan.FastGridScanCommon"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FastGridScanCommon</span></code></a></p></td>
-<td><p>Device for a general fast grid scan</p></td>
+<td><p>Device containing the minimal signals for a general fast grid scan.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.fast_grid_scan.GridAxis.html#dodal.devices.fast_grid_scan.GridAxis" title="dodal.devices.fast_grid_scan.GridAxis"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GridAxis</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.fast_grid_scan.FastGridScanThreeD.html#dodal.devices.fast_grid_scan.FastGridScanThreeD" title="dodal.devices.fast_grid_scan.FastGridScanThreeD"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FastGridScanThreeD</span></code></a></p></td>
+<td><p>Device for standard 3D FGS.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.fast_grid_scan.GridAxis.html#dodal.devices.fast_grid_scan.GridAxis" title="dodal.devices.fast_grid_scan.GridAxis"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GridAxis</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.fast_grid_scan.GridScanParamsCommon.html#dodal.devices.fast_grid_scan.GridScanParamsCommon" title="dodal.devices.fast_grid_scan.GridScanParamsCommon"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GridScanParamsCommon</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.fast_grid_scan.GridScanParamsCommon.html#dodal.devices.fast_grid_scan.GridScanParamsCommon" title="dodal.devices.fast_grid_scan.GridScanParamsCommon"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GridScanParamsCommon</span></code></a></p></td>
 <td><p>Common holder class for the parameters of a grid scan in a similar layout to EPICS.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.fast_grid_scan.GridScanParamsThreeD.html#dodal.devices.fast_grid_scan.GridScanParamsThreeD" title="dodal.devices.fast_grid_scan.GridScanParamsThreeD"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GridScanParamsThreeD</span></code></a></p></td>
+<td><p>Additional parameters required to do a 3 dimensional gridscan.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.fast_grid_scan.MotionProgram.html#dodal.devices.fast_grid_scan.MotionProgram" title="dodal.devices.fast_grid_scan.MotionProgram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MotionProgram</span></code></a></p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.fast_grid_scan.PandAFastGridScan.html#dodal.devices.fast_grid_scan.PandAFastGridScan" title="dodal.devices.fast_grid_scan.PandAFastGridScan"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PandAFastGridScan</span></code></a></p></td>
-<td><p>Device for panda constant-motion scan</p></td>
+<td><p>Device for panda constant-motion scan.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.fast_grid_scan.PandAGridScanParams.html#dodal.devices.fast_grid_scan.PandAGridScanParams" title="dodal.devices.fast_grid_scan.PandAGridScanParams"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PandAGridScanParams</span></code></a></p></td>
 <td><p>Params for panda constant-motion scan.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.fast_grid_scan.ZebraFastGridScan.html#dodal.devices.fast_grid_scan.ZebraFastGridScan" title="dodal.devices.fast_grid_scan.ZebraFastGridScan"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ZebraFastGridScan</span></code></a></p></td>
-<td><p>Device for standard Zebra FGS.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.fast_grid_scan.WithDwellTime.html#dodal.devices.fast_grid_scan.WithDwellTime" title="dodal.devices.fast_grid_scan.WithDwellTime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">WithDwellTime</span></code></a></p></td>
+<td><p>Create a new model by parsing and validating input data from keyword arguments.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.fast_grid_scan.ZebraGridScanParams.html#dodal.devices.fast_grid_scan.ZebraGridScanParams" title="dodal.devices.fast_grid_scan.ZebraGridScanParams"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ZebraGridScanParams</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.fast_grid_scan.ZebraFastGridScanThreeD.html#dodal.devices.fast_grid_scan.ZebraFastGridScanThreeD" title="dodal.devices.fast_grid_scan.ZebraFastGridScanThreeD"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ZebraFastGridScanThreeD</span></code></a></p></td>
+<td><p>Device for standard Zebra 3D FGS.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.fast_grid_scan.ZebraGridScanParamsThreeD.html#dodal.devices.fast_grid_scan.ZebraGridScanParamsThreeD" title="dodal.devices.fast_grid_scan.ZebraGridScanParamsThreeD"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ZebraGridScanParamsThreeD</span></code></a></p></td>
 <td><p>Params for standard Zebra FGS.</p></td>
 </tr>
 </tbody>
@@ -1033,8 +1045,8 @@
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>scan</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="dodal.devices.fast_grid_scan.FastGridScanCommon.html#dodal.devices.fast_grid_scan.FastGridScanCommon" title="dodal.devices.fast_grid_scan.FastGridScanCommon"><code class="xref py py-class docutils literal notranslate"><span class="pre">FastGridScanCommon</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.TypeVar" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code></a>(<code class="docutils literal notranslate"><span class="pre">ParamType</span></code>, bound= <a class="reference internal" href="dodal.devices.fast_grid_scan.GridScanParamsCommon.html#dodal.devices.fast_grid_scan.GridScanParamsCommon" title="dodal.devices.fast_grid_scan.GridScanParamsCommon"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridScanParamsCommon</span></code></a>)]</span>)</p></li>
-<li><p><strong>params</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.TypeVar" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code></a>(<code class="docutils literal notranslate"><span class="pre">ParamType</span></code>, bound= <a class="reference internal" href="dodal.devices.fast_grid_scan.GridScanParamsCommon.html#dodal.devices.fast_grid_scan.GridScanParamsCommon" title="dodal.devices.fast_grid_scan.GridScanParamsCommon"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridScanParamsCommon</span></code></a>)</span>)</p></li>
+<li><p><strong>scan</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="dodal.devices.fast_grid_scan.FastGridScanCommon.html#dodal.devices.fast_grid_scan.FastGridScanCommon" title="dodal.devices.fast_grid_scan.FastGridScanCommon"><code class="xref py py-class docutils literal notranslate"><span class="pre">FastGridScanCommon</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.TypeVar" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code></a>(<code class="docutils literal notranslate"><span class="pre">ParamType</span></code>, bound= <a class="reference internal" href="dodal.devices.fast_grid_scan.GridScanParamsCommon.html#dodal.devices.fast_grid_scan.GridScanParamsCommon" title="dodal.devices.fast_grid_scan.GridScanParamsCommon"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridScanParamsCommon</span></code></a>, covariant=True)]</span>)</p></li>
+<li><p><strong>params</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.TypeVar" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code></a>(<code class="docutils literal notranslate"><span class="pre">ParamType</span></code>, bound= <a class="reference internal" href="dodal.devices.fast_grid_scan.GridScanParamsCommon.html#dodal.devices.fast_grid_scan.GridScanParamsCommon" title="dodal.devices.fast_grid_scan.GridScanParamsCommon"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridScanParamsCommon</span></code></a>, covariant=True)</span>)</p></li>
 </ul>
 </dd>
 </dl>

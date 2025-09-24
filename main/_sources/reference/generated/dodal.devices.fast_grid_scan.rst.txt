@@ -15,13 +15,16 @@ dodal.devices.fast\_grid\_scan
    :recursive:
 
    ~fast_grid_scan.FastGridScanCommon
+   ~fast_grid_scan.FastGridScanThreeD
    ~fast_grid_scan.GridAxis
    ~fast_grid_scan.GridScanParamsCommon
+   ~fast_grid_scan.GridScanParamsThreeD
    ~fast_grid_scan.MotionProgram
    ~fast_grid_scan.PandAFastGridScan
    ~fast_grid_scan.PandAGridScanParams
-   ~fast_grid_scan.ZebraFastGridScan
-   ~fast_grid_scan.ZebraGridScanParams
+   ~fast_grid_scan.WithDwellTime
+   ~fast_grid_scan.ZebraFastGridScanThreeD
+   ~fast_grid_scan.ZebraGridScanParamsThreeD
 
 
 

@@ -36,7 +36,6 @@ dodal.devices.fast\_grid\_scan.PandAGridScanParams
       
       
       
-      
    
    
 
@@ -46,7 +45,6 @@ dodal.devices.fast\_grid\_scan.PandAGridScanParams
 
    .. autosummary::
    
-      
       
       
       ~PandAGridScanParams.model_config
@@ -61,13 +59,22 @@ dodal.devices.fast\_grid\_scan.PandAGridScanParams
       ~PandAGridScanParams.run_up_distance_mm
       
       
+      ~PandAGridScanParams.z2_start_mm
+      
+      
+      ~PandAGridScanParams.y2_start_mm
+      
+      
+      ~PandAGridScanParams.z_step_size_mm
+      
+      
+      ~PandAGridScanParams.z_steps
+      
+      
       ~PandAGridScanParams.x_steps
       
       
       ~PandAGridScanParams.y_steps
-      
-      
-      ~PandAGridScanParams.z_steps
       
       
       ~PandAGridScanParams.x_step_size_mm
@@ -76,22 +83,13 @@ dodal.devices.fast\_grid\_scan.PandAGridScanParams
       ~PandAGridScanParams.y_step_size_mm
       
       
-      ~PandAGridScanParams.z_step_size_mm
-      
-      
       ~PandAGridScanParams.x_start_mm
       
       
       ~PandAGridScanParams.y1_start_mm
       
       
-      ~PandAGridScanParams.y2_start_mm
-      
-      
       ~PandAGridScanParams.z1_start_mm
-      
-      
-      ~PandAGridScanParams.z2_start_mm
       
       
       ~PandAGridScanParams.set_stub_offsets

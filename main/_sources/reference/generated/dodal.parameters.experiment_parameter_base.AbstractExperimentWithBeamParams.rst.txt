@@ -17,9 +17,6 @@ dodal.parameters.experiment\_parameter\_base.AbstractExperimentWithBeamParams
       
       
       
-      ~AbstractExperimentWithBeamParams.get_num_images
-      
-      
       
       
       

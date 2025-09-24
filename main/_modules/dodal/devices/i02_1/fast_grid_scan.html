@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.i02_1.fast_grid_scan &#8212; dodal 1.58.1.dev19+g4b4fa535d documentation</title>
+    <title>dodal.devices.i02_1.fast_grid_scan &#8212; dodal 1.58.1.dev20+g060c2e4f0 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=e7fdb657"></script>
+    <script src="../../../../_static/documentation_options.js?v=37c9c5a2"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -450,115 +450,72 @@ window.addEventListener("load", () => mermaid.run());
                 <article class="bd-article">
                   
   <h1>Source code for dodal.devices.i02_1.fast_grid_scan</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">Device</span><span class="p">,</span>
-    <span class="n">Signal</span><span class="p">,</span>
-    <span class="n">StandardReadable</span><span class="p">,</span>
-    <span class="n">derived_signal_r</span><span class="p">,</span>
-    <span class="n">soft_signal_r_and_setter</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">epics_signal_r</span><span class="p">,</span>
-    <span class="n">epics_signal_rw</span><span class="p">,</span>
-    <span class="n">epics_signal_rw_rbv</span><span class="p">,</span>
-    <span class="n">epics_signal_x</span><span class="p">,</span>
-<span class="p">)</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">SignalR</span><span class="p">,</span> <span class="n">derived_signal_r</span><span class="p">,</span> <span class="n">soft_signal_r_and_setter</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">epics_signal_rw_rbv</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.fast_grid_scan</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">ZebraFastGridScan</span><span class="p">,</span>
+    <span class="n">FastGridScanCommon</span><span class="p">,</span>
+    <span class="n">GridScanParamsCommon</span><span class="p">,</span>
+    <span class="n">MotionProgram</span><span class="p">,</span>
+    <span class="n">WithDwellTime</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.log</span><span class="w"> </span><span class="kn">import</span> <span class="n">LOGGER</span>
 
 
-<div class="viewcode-block" id="MotionProgram">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i02_1.fast_grid_scan.MotionProgram.html#dodal.devices.i02_1.fast_grid_scan.MotionProgram">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">MotionProgram</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">running</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;PROGBITS&quot;</span><span class="p">)</span>
-        <span class="c1"># Prog number PV doesn&#39;t exist for i02-1, but it&#39;s currently only used for logging</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">program_number</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">soft_signal_r_and_setter</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
+<div class="viewcode-block" id="ZebraGridScanParamsTwoD">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i02_1.fast_grid_scan.ZebraGridScanParamsTwoD.html#dodal.devices.i02_1.fast_grid_scan.ZebraGridScanParamsTwoD">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ZebraGridScanParamsTwoD</span><span class="p">(</span><span class="n">GridScanParamsCommon</span><span class="p">,</span> <span class="n">WithDwellTime</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Params for 2D Zebra FGS. Adds on the dwell time, which is really the time</span>
+<span class="sd">    between trigger positions.</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
 
 
 
-<div class="viewcode-block" id="TwoDFastGridScan">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i02_1.fast_grid_scan.TwoDFastGridScan.html#dodal.devices.i02_1.fast_grid_scan.TwoDFastGridScan">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">TwoDFastGridScan</span><span class="p">(</span><span class="n">ZebraFastGridScan</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;The EPICS interface for the 2D FGS differs slightly from the standard</span>
+<div class="viewcode-block" id="ZebraFastGridScanTwoD">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i02_1.fast_grid_scan.ZebraFastGridScanTwoD.html#dodal.devices.i02_1.fast_grid_scan.ZebraFastGridScanTwoD">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ZebraFastGridScanTwoD</span><span class="p">(</span><span class="n">FastGridScanCommon</span><span class="p">[</span><span class="n">ZebraGridScanParamsTwoD</span><span class="p">]):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;i02-1&#39;s EPICS interface for the 2D FGS differs slightly from the standard 3D</span>
 <span class="sd">    version:</span>
-<span class="sd">    - No Z steps, Z step sizes, or Y2 start positions,</span>
-<span class="sd">    - Use exposure_time instead of dwell_time,</span>
+<span class="sd">    - No Z steps, Z step sizes, or Y2 start positions, or Z2 start</span>
 <span class="sd">    - No scan valid PV - see https://github.com/DiamondLightSource/mx-bluesky/issues/1203</span>
-
-<span class="sd">    This device abstracts away the differences by adding empty signals to the missing PV&#39;s.</span>
-<span class="sd">    Plans which expect the 3D grid scan device can then also use this.</span>
-
-<span class="sd">    See https://github.com/DiamondLightSource/mx-bluesky/issues/1112 for long term solution</span>
+<span class="sd">    - No program_number - see https://github.com/DiamondLightSource/mx-bluesky/issues/1203</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">x_steps</span> <span class="o">=</span> <span class="n">epics_signal_rw_rbv</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">X_NUM_STEPS&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">y_steps</span> <span class="o">=</span> <span class="n">epics_signal_rw_rbv</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">Y_NUM_STEPS&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">x_step_size</span> <span class="o">=</span> <span class="n">epics_signal_rw_rbv</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">X_STEP_SIZE&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">y_step_size</span> <span class="o">=</span> <span class="n">epics_signal_rw_rbv</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">Y_STEP_SIZE&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">x_start</span> <span class="o">=</span> <span class="n">epics_signal_rw_rbv</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">X_START&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">y1_start</span> <span class="o">=</span> <span class="n">epics_signal_rw_rbv</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">Y_START&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">z1_start</span> <span class="o">=</span> <span class="n">epics_signal_rw_rbv</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">Z_START&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">motion_program</span> <span class="o">=</span> <span class="n">MotionProgram</span><span class="p">(</span><span class="s2">&quot;BL02J-MO-STEP-11:&quot;</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">motion_controller_prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">full_prefix</span> <span class="o">=</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;FGS:&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">full_prefix</span><span class="p">,</span> <span class="n">motion_controller_prefix</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
 
-        <span class="c1"># While the prefix is called exposure time, the motion script uses this value</span>
-        <span class="c1"># to dwell on each trigger point - the names are interchangable here.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dwell_time_ms</span> <span class="o">=</span> <span class="n">epics_signal_rw_rbv</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">EXPOSURE_TIME&quot;</span><span class="p">)</span>
+        <span class="c1"># This signal could be put in the common device if the prefix gets standardised.</span>
+        <span class="c1"># See https://github.com/DiamondLightSource/mx-bluesky/issues/1203</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dwell_time_ms</span> <span class="o">=</span> <span class="n">epics_signal_rw_rbv</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">full_prefix</span><span class="si">}</span><span class="s2">EXPOSURE_TIME&quot;</span><span class="p">)</span>
 
-        <span class="c1"># Z movement and second start positions don&#39;t exist in EPICS for 2D scan.</span>
-        <span class="c1"># Create soft signals for these so the class is structured like the common device.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">z_steps</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">soft_signal_r_and_setter</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">z_step_size</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">soft_signal_r_and_setter</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">z2_start</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">soft_signal_r_and_setter</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">y2_start</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">soft_signal_r_and_setter</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">movable_params</span><span class="p">[</span><span class="s2">&quot;dwell_time_ms&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dwell_time_ms</span>
 
-        <span class="c1"># VMXm will trigger the grid scan through GDA, which has its own validity check,</span>
-        <span class="c1"># but this PV is being added: https://github.com/DiamondLightSource/mx-bluesky/issues/1203</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">scan_invalid</span> <span class="o">=</span> <span class="n">soft_signal_r_and_setter</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">run_cmd</span> <span class="o">=</span> <span class="n">epics_signal_x</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">RUN.PROC&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">stop_cmd</span> <span class="o">=</span> <span class="n">epics_signal_x</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">STOP.PROC&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">SCAN_STATUS&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">expected_images</span> <span class="o">=</span> <span class="n">derived_signal_r</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_expected_images</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">x_steps</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">y_steps</span><span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="mi">0</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_expected_images_signal</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">derived_signal_r</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_expected_images</span><span class="p">,</span>
+            <span class="n">x</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">x_steps</span><span class="p">,</span>
+            <span class="n">y</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">y_steps</span><span class="p">,</span>
         <span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">x_counter</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">X_COUNTER&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">y_counter</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">Y_COUNTER&quot;</span><span class="p">)</span>
-
-        <span class="c1"># Kickoff timeout in seconds</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">KICKOFF_TIMEOUT</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">5.0</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">COMPLETE_STATUS</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">60.0</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">movable_params</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Signal</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;x_steps&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_steps</span><span class="p">,</span>
-            <span class="s2">&quot;y_steps&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_steps</span><span class="p">,</span>
-            <span class="s2">&quot;x_step_size_mm&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_step_size</span><span class="p">,</span>
-            <span class="s2">&quot;y_step_size_mm&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_step_size</span><span class="p">,</span>
-            <span class="s2">&quot;x_start_mm&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_start</span><span class="p">,</span>
-            <span class="s2">&quot;y1_start_mm&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">y1_start</span><span class="p">,</span>
-            <span class="s2">&quot;z1_start_mm&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">z1_start</span><span class="p">,</span>
-        <span class="p">}</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">position_counter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_position_counter</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span>
-
-        <span class="c1"># Skip the FGSCommon init function as we have already overriden all the signals</span>
-        <span class="n">StandardReadable</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">_create_position_counter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">epics_signal_rw</span><span class="p">(</span>
-            <span class="nb">int</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">POS_COUNTER_RBV&quot;</span><span class="p">,</span> <span class="n">write_pv</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">POS_COUNTER&quot;</span>
-        <span class="p">)</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">_calculate_expected_images</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">z</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_calculate_expected_images</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Reading num of images found </span><span class="si">{</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="si">}</span><span class="s2"> images in each axis&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">x</span> <span class="o">*</span> <span class="n">y</span></div>
+        <span class="k">return</span> <span class="n">x</span> <span class="o">*</span> <span class="n">y</span>
+
+    <span class="c1"># VMXm triggers the grid scan through GDA, which has its own validity check</span>
+    <span class="c1"># so whilst this PV is being added, it isn&#39;t essential</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_scan_invalid_signal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SignalR</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="n">soft_signal_r_and_setter</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_motion_program</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">motion_controller_prefix</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">MotionProgram</span><span class="p">(</span><span class="n">motion_controller_prefix</span><span class="p">,</span> <span class="n">has_prog_num</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="c1"># To be standardised in https://github.com/DiamondLightSource/mx-bluesky/issues/1203</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_position_counter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">epics_signal_rw_rbv</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">POS_COUNTER&quot;</span><span class="p">)</span></div>
 
 </pre></div>
 

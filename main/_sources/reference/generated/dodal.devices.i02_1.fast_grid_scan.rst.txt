@@ -14,8 +14,8 @@ dodal.devices.i02\_1.fast\_grid\_scan
    :toctree:
    :recursive:
 
-   ~fast_grid_scan.MotionProgram
-   ~fast_grid_scan.TwoDFastGridScan
+   ~fast_grid_scan.ZebraFastGridScanTwoD
+   ~fast_grid_scan.ZebraGridScanParamsTwoD
 
 
 

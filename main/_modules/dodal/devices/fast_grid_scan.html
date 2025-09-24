@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.fast_grid_scan &#8212; dodal 1.58.1.dev19+g4b4fa535d documentation</title>
+    <title>dodal.devices.fast_grid_scan &#8212; dodal 1.58.1.dev20+g060c2e4f0 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=e7fdb657"></script>
+    <script src="../../../_static/documentation_options.js?v=37c9c5a2"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -461,9 +461,11 @@ window.addEventListener("load", () => mermaid.run());
     <span class="n">AsyncStatus</span><span class="p">,</span>
     <span class="n">Device</span><span class="p">,</span>
     <span class="n">Signal</span><span class="p">,</span>
+    <span class="n">SignalR</span><span class="p">,</span>
     <span class="n">SignalRW</span><span class="p">,</span>
     <span class="n">StandardReadable</span><span class="p">,</span>
     <span class="n">derived_signal_r</span><span class="p">,</span>
+    <span class="n">soft_signal_r_and_setter</span><span class="p">,</span>
     <span class="n">wait_for_value</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
@@ -472,7 +474,7 @@ window.addEventListener("load", () => mermaid.run());
     <span class="n">epics_signal_rw_rbv</span><span class="p">,</span>
     <span class="n">epics_signal_x</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">field_validator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">field_validator</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pydantic.dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.log</span><span class="w"> </span><span class="kn">import</span> <span class="n">LOGGER</span>
@@ -526,7 +528,7 @@ window.addEventListener("load", () => mermaid.run());
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Common holder class for the parameters of a grid scan in a similar</span>
 <span class="sd">    layout to EPICS. The parameters and functions of this class are common</span>
-<span class="sd">    to both the zebra and panda triggered fast grid scans.</span>
+<span class="sd">    to both the zebra and panda triggered fast grid scans in 2d or 3d.</span>
 
 <span class="sd">    The grid specified is where data is taken e.g. it can be assumed the first frame is</span>
 <span class="sd">    at x_start, y1_start, z1_start and subsequent frames are N*step_size away.</span>
@@ -534,15 +536,11 @@ window.addEventListener("load", () => mermaid.run());
 
     <span class="n">x_steps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="n">y_steps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span>
-    <span class="n">z_steps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">x_step_size_mm</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span>
     <span class="n">y_step_size_mm</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span>
-    <span class="n">z_step_size_mm</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span>
     <span class="n">x_start_mm</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span>
     <span class="n">y1_start_mm</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span>
-    <span class="n">y2_start_mm</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span>
     <span class="n">z1_start_mm</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span>
-    <span class="n">z2_start_mm</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span>
 
     <span class="c1"># Whether to set the stub offsets after centering</span>
     <span class="n">set_stub_offsets</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
@@ -555,16 +553,10 @@ window.addEventListener("load", () => mermaid.run());
     <span class="k">def</span><span class="w"> </span><span class="nf">y_axis</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GridAxis</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">GridAxis</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y1_start_mm</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_step_size_mm</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_steps</span><span class="p">)</span>
 
+    <span class="c1"># In 2D grid scans, z axis is just the start position</span>
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">z_axis</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GridAxis</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">GridAxis</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">z2_start_mm</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">z_step_size_mm</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">z_steps</span><span class="p">)</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">get_num_images</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_steps</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y_steps</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">z_steps</span><span class="p">)</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">is_3d_grid_scan</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">z_steps</span> <span class="o">&gt;</span> <span class="mi">0</span>
+        <span class="k">return</span> <span class="n">GridAxis</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">z1_start_mm</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 
 <div class="viewcode-block" id="GridScanParamsCommon.grid_position_to_motor_position">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.fast_grid_scan.GridScanParamsCommon.html#dodal.devices.fast_grid_scan.GridScanParamsCommon.grid_position_to_motor_position">[docs]</a>
@@ -597,17 +589,38 @@ window.addEventListener("load", () => mermaid.run());
 
 
 
-<span class="n">ParamType</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;ParamType&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">GridScanParamsCommon</span><span class="p">)</span>
+<div class="viewcode-block" id="GridScanParamsThreeD">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.fast_grid_scan.GridScanParamsThreeD.html#dodal.devices.fast_grid_scan.GridScanParamsThreeD">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">GridScanParamsThreeD</span><span class="p">(</span><span class="n">GridScanParamsCommon</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Additional parameters required to do a 3 dimensional gridscan.</span>
 
-
-<div class="viewcode-block" id="ZebraGridScanParams">
-<a class="viewcode-back" href="../../../reference/generated/dodal.devices.fast_grid_scan.ZebraGridScanParams.html#dodal.devices.fast_grid_scan.ZebraGridScanParams">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">ZebraGridScanParams</span><span class="p">(</span><span class="n">GridScanParamsCommon</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Params for standard Zebra FGS. Adds on the dwell time</span>
+<span class="sd">    A 3D gridscan works by doing two 2D gridscans. The first of these grids is x_steps by</span>
+<span class="sd">    y_steps. The sample is then rotated by 90 degrees, and then the second grid is</span>
+<span class="sd">    x_steps by z_steps.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">dwell_time_ms</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="c1"># Start position for z and y during the second gridscan</span>
+    <span class="n">z2_start_mm</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span>
+    <span class="n">y2_start_mm</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span>
+
+    <span class="n">z_step_size_mm</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span>
+
+    <span class="c1"># Number of vertical steps during the second grid scan, after the rotation in omega</span>
+    <span class="n">z_steps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">z_axis</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GridAxis</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">GridAxis</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">z2_start_mm</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">z_step_size_mm</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">z_steps</span><span class="p">)</span></div>
+
+
+
+<span class="n">ParamType</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;ParamType&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">GridScanParamsCommon</span><span class="p">,</span> <span class="n">covariant</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="WithDwellTime">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.fast_grid_scan.WithDwellTime.html#dodal.devices.fast_grid_scan.WithDwellTime">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">WithDwellTime</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">dwell_time_ms</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">213</span>
 
     <span class="nd">@field_validator</span><span class="p">(</span><span class="s2">&quot;dwell_time_ms&quot;</span><span class="p">)</span>
     <span class="nd">@classmethod</span>
@@ -624,9 +637,19 @@ window.addEventListener("load", () => mermaid.run());
 
 
 
+<div class="viewcode-block" id="ZebraGridScanParamsThreeD">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.fast_grid_scan.ZebraGridScanParamsThreeD.html#dodal.devices.fast_grid_scan.ZebraGridScanParamsThreeD">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ZebraGridScanParamsThreeD</span><span class="p">(</span><span class="n">GridScanParamsThreeD</span><span class="p">,</span> <span class="n">WithDwellTime</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Params for standard Zebra FGS. Adds on the dwell time, which is really the time</span>
+<span class="sd">    between trigger positions.</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+
 <div class="viewcode-block" id="PandAGridScanParams">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.fast_grid_scan.PandAGridScanParams.html#dodal.devices.fast_grid_scan.PandAGridScanParams">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">PandAGridScanParams</span><span class="p">(</span><span class="n">GridScanParamsCommon</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">PandAGridScanParams</span><span class="p">(</span><span class="n">GridScanParamsThreeD</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Params for panda constant-motion scan. Adds on the goniometer run-up distance</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -638,56 +661,53 @@ window.addEventListener("load", () => mermaid.run());
 <div class="viewcode-block" id="MotionProgram">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.fast_grid_scan.MotionProgram.html#dodal.devices.fast_grid_scan.MotionProgram">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">MotionProgram</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">has_prog_num</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">running</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;PROGBITS&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">program_number</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;CS1:PROG_NUM&quot;</span><span class="p">)</span></div>
+        <span class="k">if</span> <span class="n">has_prog_num</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">program_number</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;CS1:PROG_NUM&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Prog number PV doesn&#39;t currently exist for i02-1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">program_number</span> <span class="o">=</span> <span class="n">soft_signal_r_and_setter</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span></div>
 
 
 
 <div class="viewcode-block" id="FastGridScanCommon">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.fast_grid_scan.FastGridScanCommon.html#dodal.devices.fast_grid_scan.FastGridScanCommon">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">FastGridScanCommon</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">,</span> <span class="n">Flyable</span><span class="p">,</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">Generic</span><span class="p">[</span><span class="n">ParamType</span><span class="p">]):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Device for a general fast grid scan</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Device containing the minimal signals for a general fast grid scan.</span>
 
 <span class="sd">    When the motion program is started, the goniometer will move in a snake-like grid trajectory,</span>
-<span class="sd">    with X as the fast axis and Y as the slow axis. If Z steps isn&#39;t 0, the goniometer will</span>
-<span class="sd">    then rotate in the omega direction such that it moves from the X-Y, to the X-Z plane then</span>
-<span class="sd">    do a second grid scan. The detector is triggered after every x step.</span>
-<span class="sd">    See https://github.com/DiamondLightSource/hyperion/wiki/Coordinate-Systems for more</span>
+<span class="sd">    with X as the fast axis and Y as the slow axis.</span>
+
+<span class="sd">    See ZebraFastGridScanThreeD as an example of how to implement.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">smargon_prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">motion_controller_prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">x_steps</span> <span class="o">=</span> <span class="n">epics_signal_rw_rbv</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">X_NUM_STEPS&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">y_steps</span> <span class="o">=</span> <span class="n">epics_signal_rw_rbv</span><span class="p">(</span>
             <span class="nb">int</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">Y_NUM_STEPS&quot;</span>
         <span class="p">)</span>  <span class="c1"># Number of vertical steps during the first grid scan</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">z_steps</span> <span class="o">=</span> <span class="n">epics_signal_rw_rbv</span><span class="p">(</span>
-            <span class="nb">int</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">Z_NUM_STEPS&quot;</span>
-        <span class="p">)</span>  <span class="c1"># Number of vertical steps during the second grid scan, after the rotation in omega</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">x_step_size</span> <span class="o">=</span> <span class="n">epics_signal_rw_rbv</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">X_STEP_SIZE&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">y_step_size</span> <span class="o">=</span> <span class="n">epics_signal_rw_rbv</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">Y_STEP_SIZE&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">z_step_size</span> <span class="o">=</span> <span class="n">epics_signal_rw_rbv</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">Z_STEP_SIZE&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">x_start</span> <span class="o">=</span> <span class="n">epics_signal_rw_rbv</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">X_START&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">y1_start</span> <span class="o">=</span> <span class="n">epics_signal_rw_rbv</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">Y_START&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">y2_start</span> <span class="o">=</span> <span class="n">epics_signal_rw_rbv</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">Y2_START&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">z1_start</span> <span class="o">=</span> <span class="n">epics_signal_rw_rbv</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">Z_START&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">z2_start</span> <span class="o">=</span> <span class="n">epics_signal_rw_rbv</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">Z2_START&quot;</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">scan_invalid</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">SCAN_INVALID&quot;</span><span class="p">)</span>
+        <span class="c1"># This can be created like a regular signal instead of an abstract method</span>
+        <span class="c1"># once https://github.com/DiamondLightSource/mx-bluesky/issues/1203 is done</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scan_invalid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_scan_invalid_signal</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">run_cmd</span> <span class="o">=</span> <span class="n">epics_signal_x</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">RUN.PROC&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">stop_cmd</span> <span class="o">=</span> <span class="n">epics_signal_x</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">STOP.PROC&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">SCAN_STATUS&quot;</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">expected_images</span> <span class="o">=</span> <span class="n">derived_signal_r</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_expected_images</span><span class="p">,</span>
-            <span class="n">x</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">x_steps</span><span class="p">,</span>
-            <span class="n">y</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">y_steps</span><span class="p">,</span>
-            <span class="n">z</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">z_steps</span><span class="p">,</span>
-        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">expected_images</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_expected_images_signal</span><span class="p">()</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">motion_program</span> <span class="o">=</span> <span class="n">MotionProgram</span><span class="p">(</span><span class="n">smargon_prefix</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">motion_program</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_motion_program</span><span class="p">(</span><span class="n">motion_controller_prefix</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">position_counter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_position_counter</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span>
 
@@ -699,23 +719,12 @@ window.addEventListener("load", () => mermaid.run());
         <span class="bp">self</span><span class="o">.</span><span class="n">movable_params</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Signal</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;x_steps&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_steps</span><span class="p">,</span>
             <span class="s2">&quot;y_steps&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_steps</span><span class="p">,</span>
-            <span class="s2">&quot;z_steps&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">z_steps</span><span class="p">,</span>
             <span class="s2">&quot;x_step_size_mm&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_step_size</span><span class="p">,</span>
             <span class="s2">&quot;y_step_size_mm&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_step_size</span><span class="p">,</span>
-            <span class="s2">&quot;z_step_size_mm&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">z_step_size</span><span class="p">,</span>
             <span class="s2">&quot;x_start_mm&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_start</span><span class="p">,</span>
             <span class="s2">&quot;y1_start_mm&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">y1_start</span><span class="p">,</span>
-            <span class="s2">&quot;y2_start_mm&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">y2_start</span><span class="p">,</span>
             <span class="s2">&quot;z1_start_mm&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">z1_start</span><span class="p">,</span>
-            <span class="s2">&quot;z2_start_mm&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">z2_start</span><span class="p">,</span>
         <span class="p">}</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">_calculate_expected_images</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">z</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Reading num of images found </span><span class="si">{</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">,</span><span class="w"> </span><span class="n">z</span><span class="si">}</span><span class="s2"> images in each axis&quot;</span><span class="p">)</span>
-        <span class="n">first_grid</span> <span class="o">=</span> <span class="n">x</span> <span class="o">*</span> <span class="n">y</span>
-        <span class="n">second_grid</span> <span class="o">=</span> <span class="n">x</span> <span class="o">*</span> <span class="n">z</span>
-        <span class="k">return</span> <span class="n">first_grid</span> <span class="o">+</span> <span class="n">second_grid</span>
 
     <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">kickoff</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -744,15 +753,82 @@ window.addEventListener("load", () => mermaid.run());
             <span class="k">raise</span>
 
     <span class="nd">@abstractmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">_create_position_counter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SignalRW</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
-        <span class="k">pass</span></div>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_expected_images_signal</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SignalR</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span> <span class="o">...</span>
+
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_position_counter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SignalRW</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span> <span class="o">...</span>
+
+    <span class="c1"># This can be created within init rather than as a separate method after https://github.com/DiamondLightSource/mx-bluesky/issues/1203</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_scan_invalid_signal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SignalR</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span> <span class="o">...</span>
+
+    <span class="c1"># This can be created within init rather than as a separate method after https://github.com/DiamondLightSource/mx-bluesky/issues/1203</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_motion_program</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">motion_controller_prefix</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MotionProgram</span><span class="p">:</span> <span class="o">...</span></div>
 
 
 
-<div class="viewcode-block" id="ZebraFastGridScan">
-<a class="viewcode-back" href="../../../reference/generated/dodal.devices.fast_grid_scan.ZebraFastGridScan.html#dodal.devices.fast_grid_scan.ZebraFastGridScan">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">ZebraFastGridScan</span><span class="p">(</span><span class="n">FastGridScanCommon</span><span class="p">[</span><span class="n">ZebraGridScanParams</span><span class="p">]):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Device for standard Zebra FGS. In this scan, the goniometer&#39;s velocity profile follows a parabolic shape between X steps,</span>
+<div class="viewcode-block" id="FastGridScanThreeD">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.fast_grid_scan.FastGridScanThreeD.html#dodal.devices.fast_grid_scan.FastGridScanThreeD">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">FastGridScanThreeD</span><span class="p">(</span><span class="n">FastGridScanCommon</span><span class="p">[</span><span class="n">ParamType</span><span class="p">]):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Device for standard 3D FGS.</span>
+
+<span class="sd">    After completeing the first grid, if Z steps isn&#39;t 0, the goniometer will</span>
+<span class="sd">    rotate in the omega direction such that it moves from the X-Y, to the X-Z plane then</span>
+<span class="sd">    do a second grid scan. The detector is triggered after every x step.</span>
+<span class="sd">    See https://github.com/DiamondLightSource/hyperion/wiki/Coordinate-Systems for more.</span>
+
+<span class="sd">    Subclasses must implement _create_position_counter.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">full_prefix</span> <span class="o">=</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;FGS:&quot;</span>
+
+        <span class="c1"># Number of vertical steps during the second grid scan, after the rotation in omega</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">z_steps</span> <span class="o">=</span> <span class="n">epics_signal_rw_rbv</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">Z_NUM_STEPS&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">z_step_size</span> <span class="o">=</span> <span class="n">epics_signal_rw_rbv</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">Z_STEP_SIZE&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">z2_start</span> <span class="o">=</span> <span class="n">epics_signal_rw_rbv</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">Z2_START&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y2_start</span> <span class="o">=</span> <span class="n">epics_signal_rw_rbv</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">Y2_START&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x_counter</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">full_prefix</span><span class="si">}</span><span class="s2">X_COUNTER&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y_counter</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">full_prefix</span><span class="si">}</span><span class="s2">Y_COUNTER&quot;</span><span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">full_prefix</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">movable_params</span><span class="p">[</span><span class="s2">&quot;z_step_size_mm&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">z_step_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">movable_params</span><span class="p">[</span><span class="s2">&quot;z2_start_mm&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">z2_start</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">movable_params</span><span class="p">[</span><span class="s2">&quot;y2_start_mm&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">y2_start</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">movable_params</span><span class="p">[</span><span class="s2">&quot;z_steps&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">z_steps</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_expected_images_signal</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">derived_signal_r</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_expected_images</span><span class="p">,</span>
+            <span class="n">x</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">x_steps</span><span class="p">,</span>
+            <span class="n">y</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">y_steps</span><span class="p">,</span>
+            <span class="n">z</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">z_steps</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_calculate_expected_images</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">z</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Reading num of images found </span><span class="si">{</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">,</span><span class="w"> </span><span class="n">z</span><span class="si">}</span><span class="s2"> images in each axis&quot;</span><span class="p">)</span>
+        <span class="n">first_grid</span> <span class="o">=</span> <span class="n">x</span> <span class="o">*</span> <span class="n">y</span>
+        <span class="n">second_grid</span> <span class="o">=</span> <span class="n">x</span> <span class="o">*</span> <span class="n">z</span>
+        <span class="k">return</span> <span class="n">first_grid</span> <span class="o">+</span> <span class="n">second_grid</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_scan_invalid_signal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SignalR</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">SCAN_INVALID&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_motion_program</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">motion_controller_prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">MotionProgram</span><span class="p">(</span><span class="n">motion_controller_prefix</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="ZebraFastGridScanThreeD">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.fast_grid_scan.ZebraFastGridScanThreeD.html#dodal.devices.fast_grid_scan.ZebraFastGridScanThreeD">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ZebraFastGridScanThreeD</span><span class="p">(</span><span class="n">FastGridScanThreeD</span><span class="p">[</span><span class="n">ZebraGridScanParamsThreeD</span><span class="p">]):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Device for standard Zebra 3D FGS.</span>
+
+<span class="sd">    In this scan, the goniometer&#39;s velocity profile follows a parabolic shape between X steps,</span>
 <span class="sd">    with the slowest points occuring at each X step.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -760,12 +836,7 @@ window.addEventListener("load", () => mermaid.run());
         <span class="n">full_prefix</span> <span class="o">=</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;FGS:&quot;</span>
         <span class="c1"># Time taken to travel between X steps</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dwell_time_ms</span> <span class="o">=</span> <span class="n">epics_signal_rw_rbv</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">full_prefix</span><span class="si">}</span><span class="s2">DWELL_TIME&quot;</span><span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">x_counter</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">full_prefix</span><span class="si">}</span><span class="s2">X_COUNTER&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">y_counter</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">full_prefix</span><span class="si">}</span><span class="s2">Y_COUNTER&quot;</span><span class="p">)</span>
-
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">full_prefix</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
-
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">movable_params</span><span class="p">[</span><span class="s2">&quot;dwell_time_ms&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dwell_time_ms</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_create_position_counter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
@@ -777,8 +848,12 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="PandAFastGridScan">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.fast_grid_scan.PandAFastGridScan.html#dodal.devices.fast_grid_scan.PandAFastGridScan">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">PandAFastGridScan</span><span class="p">(</span><span class="n">FastGridScanCommon</span><span class="p">[</span><span class="n">PandAGridScanParams</span><span class="p">]):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Device for panda constant-motion scan&quot;&quot;&quot;</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">PandAFastGridScan</span><span class="p">(</span><span class="n">FastGridScanThreeD</span><span class="p">[</span><span class="n">PandAGridScanParams</span><span class="p">]):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Device for panda constant-motion scan.</span>
+
+<span class="sd">    In this scan, the goniometer&#39;s velocity</span>
+<span class="sd">    is constant through each row. It doesn&#39;t slow down when going through trigger points.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">full_prefix</span> <span class="o">=</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;PGS:&quot;</span>
@@ -793,7 +868,7 @@ window.addEventListener("load", () => mermaid.run());
         <span class="bp">self</span><span class="o">.</span><span class="n">run_up_distance_mm</span> <span class="o">=</span> <span class="n">epics_signal_rw_rbv</span><span class="p">(</span>
             <span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">full_prefix</span><span class="si">}</span><span class="s2">RUNUP_DISTANCE&quot;</span>
         <span class="p">)</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">full_prefix</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">movable_params</span><span class="p">[</span><span class="s2">&quot;run_up_distance_mm&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_up_distance_mm</span>
 
