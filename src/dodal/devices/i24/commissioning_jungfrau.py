@@ -1,5 +1,6 @@
 import asyncio
 from collections.abc import AsyncGenerator, AsyncIterator
+from pathlib import Path
 
 from bluesky.protocols import StreamAsset
 from event_model import DataKey  # type: ignore
@@ -8,6 +9,7 @@ from ophyd_async.core import (
     DetectorWriter,
     StandardDetector,
     StandardReadable,
+    StaticPathProvider,
     observe_value,
     wait_for_value,
 )
@@ -27,7 +29,10 @@ class JunfrauCommissioningWriter(DetectorWriter, StandardReadable):
     """
 
     def __init__(
-        self, prefix, path_provider: AutoIncrementingPathProvider, name=""
+        self,
+        prefix,
+        path_provider: AutoIncrementingPathProvider | StaticPathProvider,
+        name="",
     ) -> None:
         with self.add_children_as_readables():
             self._path_info = path_provider
@@ -40,6 +45,13 @@ class JunfrauCommissioningWriter(DetectorWriter, StandardReadable):
     async def open(self, name: str, exposures_per_event: int = 1) -> dict[str, DataKey]:
         self._exposures_per_event = exposures_per_event
         _path_info = self._path_info()
+
+        # Commissioning Jungfrau plans allow you to override path, so check to see if file exists
+        requested_filepath = Path(_path_info.directory_path) / _path_info.filename
+        if requested_filepath.exists():
+            raise FileExistsError(
+                f"Jungfrau was requested to write to {requested_filepath}, but this file already exists!"
+            )
 
         await asyncio.gather(
             self.file_name.set(_path_info.filename),
@@ -93,11 +105,10 @@ class CommissioningJungfrau(
         self,
         prefix: str,
         writer_prefix: str,
-        path_provider: AutoIncrementingPathProvider,
+        path_provider: AutoIncrementingPathProvider | StaticPathProvider,
         name="",
     ):
         self.drv = JungfrauDriverIO(prefix)
-        self.provider = path_provider
         writer = JunfrauCommissioningWriter(writer_prefix, path_provider)
         controller = JungfrauController(self.drv)
         super().__init__(controller, writer, name=name)

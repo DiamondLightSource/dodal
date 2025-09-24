@@ -6,6 +6,7 @@ import pytest
 from ophyd_async.core import (
     AutoIncrementingPathProvider,
     StaticFilenameProvider,
+    StaticPathProvider,
     TriggerInfo,
     init_devices,
 )
@@ -45,6 +46,19 @@ async def test_jungfrau_with_temporary_writer(
 
     await asyncio.gather(status, _do_fake_writing())
     jungfrau._writer._path_info.assert_called_once()
+
+
+async def test_jungfrau_error_when_writing_to_existing_file(tmp_path: Path):
+    file_name = "test_file"
+    empty_file = tmp_path / file_name
+    empty_file.touch()
+    name = StaticFilenameProvider(file_name)
+    path = StaticPathProvider(name, PurePath(tmp_path))
+    with init_devices(mock=True):
+        jungfrau = CommissioningJungfrau("", "", path)
+    set_mock_value(jungfrau._writer.writer_ready, 1)
+    with pytest.raises(FileExistsError):
+        await jungfrau.prepare(TriggerInfo(livetime=1e-3, exposures_per_event=5))
 
 
 def test_collect_stream_docs_raises_error(jungfrau: CommissioningJungfrau):
