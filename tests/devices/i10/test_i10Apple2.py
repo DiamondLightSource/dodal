@@ -58,7 +58,7 @@ async def mock_id_gap(prefix: str = "BLXX-EA-DET-007:") -> UndulatorGap:
     set_mock_value(mock_id_gap.gate, UndulatorGateStatus.CLOSE)
     set_mock_value(mock_id_gap.velocity, 1)
     set_mock_value(mock_id_gap.user_readback, 20)
-    set_mock_value(mock_id_gap.user_setpoint, "20")
+    set_mock_value(mock_id_gap.user_setpoint, 20)
     set_mock_value(mock_id_gap.fault, 0)
     return mock_id_gap
 
@@ -547,9 +547,7 @@ async def test_linear_arbitrary_RE_scan(
             if temp_angle > mock_linear_arbitrary_angle.angle_threshold_deg
             else temp_angle + 180.0
         )  # convert angle to jawphase.
-        assert jaw_phase.call_args_list[cnt] == mock.call(
-            str(poly(alpha_real)), wait=True
-        )
+        assert jaw_phase.call_args_list[cnt] == mock.call(poly(alpha_real), wait=True)
 
 
 @pytest.mark.parametrize(
