@@ -13,7 +13,7 @@ from dodal.devices.attenuator.filter_selections import (
     I02_1FilterTwoSelections,
 )
 from dodal.devices.eiger import EigerDetector
-from dodal.devices.i02_1.fast_grid_scan import TwoDFastGridScan
+from dodal.devices.i02_1.fast_grid_scan import ZebraFastGridScanTwoD
 from dodal.devices.i02_1.sample_motors import SampleMotors
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.zebra.zebra import Zebra
@@ -33,9 +33,7 @@ set_utils_beamline(BL)
 DAQ_CONFIGURATION_PATH = "/dls_sw/i02-1/software/daq_configuration"
 
 I02_1_ZEBRA_MAPPING = ZebraMapping(
-    outputs=ZebraTTLOutputs(
-        TTL_EIGER=4, TTL_XSPRESS3=3, TTL_FAST_SHUTTER=1, TTL_PILATUS=2
-    ),
+    outputs=ZebraTTLOutputs(TTL_EIGER=2, TTL_XSPRESS3=3, TTL_FAST_SHUTTER=1),
     sources=ZebraSources(),
 )
 
@@ -56,12 +54,13 @@ def eiger(mock: bool = False) -> EigerDetector:
 
 
 @device_factory()
-def zebra_fast_grid_scan() -> TwoDFastGridScan:
+def zebra_fast_grid_scan() -> ZebraFastGridScanTwoD:
     """Get the i02-1 zebra_fast_grid_scan device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i02-1, it will return the existing object.
     """
-    return TwoDFastGridScan(
-        prefix=f"{PREFIX.beamline_prefix}-MO-SAMP-11:FGS:",
+    return ZebraFastGridScanTwoD(
+        prefix=f"{PREFIX.beamline_prefix}-MO-SAMP-11:",
+        motion_controller_prefix="BL02J-MO-STEP-11:",
     )
 
 
