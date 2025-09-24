@@ -8,9 +8,10 @@ from dodal.devices.aperturescatterguard import ApertureScatterguard, ApertureVal
 
 
 class InOut(StrictEnum):
-    """Currently Hyperion only needs to move the scintillator out for data collection."""
+    """Moves scintillator in and out of the beam"""
 
-    OUT = "Out"
+    OUT = "Out_Beam"
+    IN = "In_Beam"
     UNKNOWN = "Unknown"
 
 
@@ -45,6 +46,9 @@ class Scintillator(StandardReadable):
         self._scintillator_out_yz_mm = [
             float(beamline_parameters[f"scin_{axis}_SCIN_OUT"]) for axis in ("y", "z")
         ]
+        self._scintillator_in_yz_mm = [
+            float(beamline_parameters[f"scin_{axis}_SCIN_IN"]) for axis in ("y", "z")
+        ]
         self._yz_tolerance_mm = [
             float(beamline_parameters[f"scin_{axis}_tolerance"]) for axis in ("y", "z")
         ]
@@ -63,6 +67,18 @@ class Scintillator(StandardReadable):
             )
         ):
             return InOut.OUT
+        
+        elif all(
+            isclose(axis_pos, axis_in_beam, abs_tol=axis_tolerance)
+            for axis_pos, axis_in_beam, axis_tolerance in zip(
+                current_pos,
+                self._scintillator_in_yz_mm,
+                self._yz_tolerance_mm,
+                strict=False,
+            )
+        ):
+            return InOut.IN
+        
         else:
             return InOut.UNKNOWN
 
@@ -82,5 +98,15 @@ class Scintillator(StandardReadable):
                     )
                 await self.y_mm.set(self._scintillator_out_yz_mm[0])
                 await self.z_mm.set(self._scintillator_out_yz_mm[1])
+            case InOut.IN:
+                if (
+                    self._aperture_scatterguard().selected_aperture.get_value()
+                    != ApertureValue.PARKED
+                ):
+                    raise ValueError(
+                        "Cannot move scintillator out if aperture/scatterguard is not parked"
+                    )
+                await self.z_mm.set(self._scintillator_in_yz_mm[1])
+                await self.y_mm.set(self._scintillator_in_yz_mm[0])
             case _:
                 raise ValueError(f"Cannot set scintillator to position {position}")
