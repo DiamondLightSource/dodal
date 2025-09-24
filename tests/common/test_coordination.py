@@ -1,3 +1,4 @@
+import asyncio
 from inspect import Parameter, signature
 
 import pytest
@@ -36,7 +37,12 @@ async def test_device_locking(state: bool):
     mock_motor = locked(Motor(""), is_unlocked)
     await mock_motor.connect(mock=True)
 
-    await mock_motor.set(400)
+    set_status = mock_motor.set(400)
+
+    while not set_status.done:
+        # Allow time for the set to be scheduled?
+        await asyncio.sleep(0.01)
+
     new_location = await mock_motor.locate()
     assert new_location["readback"] == 400 if state else 0
     assert new_location["setpoint"] == 400 if state else 0
