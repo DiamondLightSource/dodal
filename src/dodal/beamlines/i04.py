@@ -1,3 +1,5 @@
+from ophyd_async.core import Reference
+
 from dodal.common.beamlines.beamline_parameters import get_beamline_parameters
 from dodal.common.beamlines.beamline_utils import (
     device_factory,
@@ -30,6 +32,7 @@ from dodal.devices.oav.oav_to_redis_forwarder import OAVToRedisForwarder
 from dodal.devices.oav.pin_image_recognition import PinTipDetection
 from dodal.devices.robot import BartRobot
 from dodal.devices.s4_slit_gaps import S4SlitGaps
+from dodal.devices.scintillator import Scintillator
 from dodal.devices.smargon import Smargon
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.thawer import Thawer
@@ -359,3 +362,15 @@ def pin_tip_detection() -> PinTipDetection:
     If this is called when already instantiated in i04, it will return the existing object.
     """
     return PinTipDetection(f"{PREFIX.beamline_prefix}-DI-OAV-01:")
+
+
+@device_factory()
+def scintillator() -> Scintillator:
+    """Get the i04 scintillator device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i04, it will return the existing object.
+    """
+    return Scintillator(
+        f"{PREFIX.beamline_prefix}-MO-SCIN-01:",
+        Reference(aperture_scatterguard()),
+        get_beamline_parameters(),
+    )

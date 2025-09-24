@@ -263,6 +263,7 @@ def undulator(daq_configuration_path: str | None = None) -> Undulator:
         f"{BeamlinePrefix(BL).insertion_prefix}-MO-SERVC-01:",
         # evaluate here not as parameter default to enable post-import mocking
         id_gap_lookup_table_path=f"{daq_configuration_path or DAQ_CONFIGURATION_PATH}/lookup/BeamLine_Undulator_toGap.txt",
+        baton=baton(),
     )
 
 
@@ -335,7 +336,7 @@ def xbpm_feedback() -> XBPMFeedback:
     """Get the i03 XBPM feeback device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return XBPMFeedback(f"{PREFIX.beamline_prefix}-EA-FDBK-01:")
+    return XBPMFeedback(f"{PREFIX.beamline_prefix}-EA-FDBK-01:", baton=baton())
 
 
 @device_factory()
