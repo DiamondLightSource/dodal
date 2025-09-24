@@ -2,7 +2,7 @@ import abc
 import asyncio
 from dataclasses import dataclass
 from math import isclose
-from typing import Any, Generic, TypeVar
+from typing import Generic, TypeVar
 
 import numpy as np
 from bluesky.protocols import Movable
@@ -18,7 +18,6 @@ from ophyd_async.core import (
     wait_for_value,
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw, epics_signal_w
-from pydantic import BaseModel, ConfigDict, RootModel
 
 from dodal.log import LOGGER
 
@@ -47,46 +46,6 @@ class Apple2Val:
     top_inner: str
     btm_inner: str
     btm_outer: str
-
-
-class EnergyMinMax(BaseModel):
-    Minimum: float
-    Maximum: float
-
-
-class EnergyCoverageEntry(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True)
-    Low: float
-    High: float
-    Poly: np.poly1d
-
-
-class EnergyCoverage(RootModel):
-    root: dict[str, EnergyCoverageEntry]
-
-
-class LookupTableEntries(BaseModel):
-    Energies: EnergyCoverage
-    Limit: EnergyMinMax
-
-
-class Lookuptable(RootModel):
-    """BaseModel class for the lookup table.
-    Apple2 lookup table should be in this format.
-
-    {mode: {'Energies': {Any: {'Low': float,
-                            'High': float,
-                            'Poly':np.poly1d
-                            }
-                        }
-            'Limit': {'Minimum': float,
-                    'Maximum': float
-                    }
-        }
-    }
-    """
-
-    root: dict[str, LookupTableEntries]
 
 
 class Pol(StrictEnum):
@@ -435,11 +394,7 @@ class Apple2(abc.ABC, StandardReadable, Movable):
         self.polarisation_setpoint, self._polarisation_setpoint_set = (
             soft_signal_r_and_setter(Pol)
         )
-        # This store two lookup tables, Gap and Phase in the Lookuptable format
-        self.lookup_tables: dict[str, dict[str | None, dict[str, dict[str, Any]]]] = {
-            "Gap": {},
-            "Phase": {},
-        }
+
         # Hardware backed read/write for polarisation.
         self.polarisation = derived_signal_rw(
             raw_to_derived=self._read_pol,
@@ -457,7 +412,6 @@ class Apple2(abc.ABC, StandardReadable, Movable):
         Abstract method that run at start up to load lookup tables into  self.lookup_tables
         and set available_pol.
         """
-        self.update_lookuptable()
 
     def _set_pol_setpoint(self, pol: Pol) -> None:
         """Set the polarisation setpoint without moving hardware. The polarisation
@@ -488,8 +442,8 @@ class Apple2(abc.ABC, StandardReadable, Movable):
 
         Examples
         --------
-        >>> RE( id.set(888.0)) # This will set the ID to 888 eV
-        >>> RE(scan([detector], id,600,700,100)) # This will scan the ID from 600 to 700 eV in 100 steps.
+        RE( id.set(888.0)) # This will set the ID to 888 eV
+        RE(scan([detector], id,600,700,100)) # This will scan the ID from 600 to 700 eV in 100 steps.
         """
 
     def _read_pol(
@@ -551,76 +505,14 @@ class Apple2(abc.ABC, StandardReadable, Movable):
         await wait_for_value(self.gap.gate, UndulatorGateStatus.CLOSE, timeout=timeout)
         self._set_energy_rbv(energy)  # Update energy after move for readback.
 
-    async def _get_id_gap_phase(self, energy: float) -> tuple[float, float]:
-        """
-        Converts energy and polarisation to gap and phase.
-        """
-        gap_poly = await self._get_poly(
-            lookup_table=self.lookup_tables["Gap"], new_energy=energy
-        )
-        phase_poly = await self._get_poly(
-            lookup_table=self.lookup_tables["Phase"], new_energy=energy
-        )
-        return gap_poly(energy), phase_poly(energy)
-
-    async def _get_poly(
-        self,
-        new_energy: float,
-        lookup_table: dict[str | None, dict[str, dict[str, Any]]],
-    ) -> np.poly1d:
-        """
-        Get the correct polynomial for a given energy form lookuptable
-        for the current polarisation setpoint.
-        Parameters
-        ----------
-        new_energy : float
-            The energy in eV for which the polynomial is requested.
-        lookup_table : dict[str | None, dict[str, dict[str, Any]]]
-            The lookup table containing polynomial coefficients for different energies
-            and polarisations.
-        Returns
-        -------
-        np.poly1d
-            The polynomial coefficients for the requested energy and polarisation.
-        Raises
-        ------
-        ValueError
-            If the requested energy is outside the limits defined in the lookup table
-            or if no polynomial coefficients are found for the requested energy.
-        """
-        pol = await self.polarisation_setpoint.get_value()
-        if (
-            new_energy < lookup_table[pol]["Limit"]["Minimum"]
-            or new_energy > lookup_table[pol]["Limit"]["Maximum"]
-        ):
-            raise ValueError(
-                "Demanding energy must lie between {} and {} eV!".format(
-                    lookup_table[pol]["Limit"]["Minimum"],
-                    lookup_table[pol]["Limit"]["Maximum"],
-                )
-            )
-        else:
-            for energy_range in lookup_table[pol]["Energies"].values():
-                if (
-                    new_energy >= energy_range["Low"]
-                    and new_energy < energy_range["High"]
-                ):
-                    return energy_range["Poly"]
-
-        raise ValueError(
-            """Cannot find polynomial coefficients for your requested energy.
-        There might be gap in the calibration lookup table."""
-        )
-
     @abc.abstractmethod
-    def update_lookuptable(self) -> None:
-        """
-        Abstract method to update the stored lookup tabled from file.
-        This function should include check to ensure the lookuptable is in the correct format:
-            # ensure the importing lookup table is the correct format
-            Lookuptable.model_validate(<loockuptable>)
+    async def _get_id_gap_phase(self, energy: float, pol: Pol) -> tuple[float, float]:
+        """Method to get the gap and phase motor position for a given energy
+        and polarisation.
 
         """
+
+        ...
 
     def determine_phase_from_hardware(
         self,

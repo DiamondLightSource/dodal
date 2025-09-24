@@ -15,13 +15,13 @@ from ophyd_async.core import (
     soft_signal_r_and_setter,
     soft_signal_rw,
 )
+from pydantic import BaseModel, ConfigDict, RootModel
 
 from dodal.log import LOGGER
 
 from ..apple2_undulator import (
     Apple2,
     Apple2Val,
-    Lookuptable,
     Pol,
     UndulatorGap,
     UndulatorJawPhase,
@@ -52,6 +52,46 @@ class LookupTableConfig:
     min_energy: str | None
     max_energy: str | None
     poly_deg: list | None
+
+
+class EnergyMinMax(BaseModel):
+    Minimum: float
+    Maximum: float
+
+
+class EnergyCoverageEntry(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+    Low: float
+    High: float
+    Poly: np.poly1d
+
+
+class EnergyCoverage(RootModel):
+    root: dict[str, EnergyCoverageEntry]
+
+
+class LookupTableEntries(BaseModel):
+    Energies: EnergyCoverage
+    Limit: EnergyMinMax
+
+
+class Lookuptable(RootModel):
+    """BaseModel class for the lookup table.
+    Apple2 lookup table should be in this format.
+
+    {mode: {'Energies': {Any: {'Low': float,
+                            'High': float,
+                            'Poly':np.poly1d
+                            }
+                        }
+            'Limit': {'Minimum': float,
+                    'Maximum': float
+                    }
+        }
+    }
+    """
+
+    root: dict[str, LookupTableEntries]
 
 
 class I10Apple2(Apple2):
@@ -111,6 +151,11 @@ class I10Apple2(Apple2):
             max_energy=max_energy,
             poly_deg=poly_deg,
         )
+        # This store two lookup tables, Gap and Phase in the Lookuptable format
+        self.lookup_tables: dict[str, dict[str | None, dict[str, dict[str, Any]]]] = {
+            "Gap": {},
+            "Phase": {},
+        }
 
         with self.add_children_as_readables():
             super().__init__(
@@ -129,6 +174,7 @@ class I10Apple2(Apple2):
                 prefix=prefix,
                 move_pv="RPQ1",
             )
+        self.update_lookuptable()
 
     @AsyncStatus.wrap
     async def set(self, value: float) -> None:
@@ -151,7 +197,7 @@ class I10Apple2(Apple2):
                 )
 
             self._set_pol_setpoint(pol)
-        gap, phase = await self._get_id_gap_phase(value)
+        gap, phase = await self._get_id_gap_phase(energy=value, pol=pol)
         phase3 = phase * (-1 if pol == Pol.LA else 1)
         id_set_val = Apple2Val(
             top_outer=f"{phase:.6f}",
@@ -190,6 +236,68 @@ class I10Apple2(Apple2):
                 raise FileNotFoundError(f"{key} look up table is not in path: {path}")
 
         self._available_pol = list(self.lookup_tables["Gap"].keys())
+
+    async def _get_id_gap_phase(self, energy: float, pol: Pol) -> tuple[float, float]:
+        """
+        Converts energy and polarisation to gap and phase.
+        """
+        gap_poly = await self._get_poly(
+            lookup_table=self.lookup_tables["Gap"], new_energy=energy, pol=pol
+        )
+        phase_poly = await self._get_poly(
+            lookup_table=self.lookup_tables["Phase"], new_energy=energy, pol=pol
+        )
+        return gap_poly(energy), phase_poly(energy)
+
+    async def _get_poly(
+        self,
+        new_energy: float,
+        pol: Pol,
+        lookup_table: dict[str | None, dict[str, dict[str, Any]]],
+    ) -> np.poly1d:
+        """
+        Get the correct polynomial for a given energy form lookuptable
+        for the current polarisation setpoint.
+        Parameters
+        ----------
+        new_energy : float
+            The energy in eV for which the polynomial is requested.
+        lookup_table : dict[str | None, dict[str, dict[str, Any]]]
+            The lookup table containing polynomial coefficients for different energies
+            and polarisations.
+        Returns
+        -------
+        np.poly1d
+            The polynomial coefficients for the requested energy and polarisation.
+        Raises
+        ------
+        ValueError
+            If the requested energy is outside the limits defined in the lookup table
+            or if no polynomial coefficients are found for the requested energy.
+        """
+        # pol = await self.polarisation_setpoint.get_value()
+        if (
+            new_energy < lookup_table[pol]["Limit"]["Minimum"]
+            or new_energy > lookup_table[pol]["Limit"]["Maximum"]
+        ):
+            raise ValueError(
+                "Demanding energy must lie between {} and {} eV!".format(
+                    lookup_table[pol]["Limit"]["Minimum"],
+                    lookup_table[pol]["Limit"]["Maximum"],
+                )
+            )
+        else:
+            for energy_range in lookup_table[pol]["Energies"].values():
+                if (
+                    new_energy >= energy_range["Low"]
+                    and new_energy < energy_range["High"]
+                ):
+                    return energy_range["Poly"]
+
+        raise ValueError(
+            """Cannot find polynomial coefficients for your requested energy.
+        There might be gap in the calibration lookup table."""
+        )
 
 
 class EnergySetter(StandardReadable, Movable[float]):
