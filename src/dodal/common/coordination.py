@@ -4,7 +4,7 @@ from functools import wraps
 from typing import Any, ParamSpec, TypeVar
 
 from bluesky.protocols import Movable, Status
-from ophyd_async.core import completed_status
+from ophyd_async.core import AsyncStatus, completed_status
 
 from dodal.common.types import Group
 
@@ -57,9 +57,12 @@ def locked(
     wrapped = movable.set
 
     @wraps(wrapped)
+    @AsyncStatus.wrap
     async def wrapper(*args: P.args, **kwargs: P.kwargs) -> Status:
         if await is_locked():
-            return completed_status(locked_exception)
+            if locked_exception:
+                raise locked_exception
+            return completed_status()
         return wrapped(*args, **kwargs)  # type: ignore
 
     movable.set = wrapper  # type: ignore

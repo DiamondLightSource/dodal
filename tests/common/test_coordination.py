@@ -3,8 +3,9 @@ from inspect import Parameter, signature
 import pytest
 from bluesky.protocols import Movable
 from bluesky.utils import MsgGenerator
+from ophyd_async.epics.motor import Motor
 
-from dodal.common.coordination import group_uuid, inject
+from dodal.common.coordination import group_uuid, inject, locked
 
 static_uuid = "51aef931-33b4-4b33-b7ad-a8287f541202"
 
@@ -25,3 +26,28 @@ def test_type_checking_ignores_inject():
     x: Parameter = signature(example_function).parameters["x"]
     assert x.annotation == Movable
     assert x.default == "foo"
+
+
+@pytest.mark.parametrize("state", [True, False])
+async def test_device_locking(state: bool):
+    async def is_locked() -> bool:
+        return state
+
+    mock_motor = locked(Motor(""), is_locked)
+    await mock_motor.connect(mock=True)
+
+    await mock_motor.set(400)
+    new_location = await mock_motor.locate()
+    assert new_location["readback"] == 0 if state else 400
+    assert new_location["setpoint"] == 0 if state else 400
+
+
+async def test_device_locked_raises_exception():
+    async def is_locked() -> bool:
+        return True
+
+    mock_motor = locked(Motor(""), is_locked, ValueError("Unable!"))
+    await mock_motor.connect(mock=True)
+
+    with pytest.raises(ValueError, match="Unable!"):
+        await mock_motor.set(400)
