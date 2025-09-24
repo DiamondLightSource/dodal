@@ -51,7 +51,7 @@ P = ParamSpec("P")
 
 def locked(
     movable: T,
-    is_locked: Callable[[], Awaitable[bool]],
+    unlocked: Callable[[], Awaitable[bool]],
     locked_exception: Exception | None = None,
 ) -> T:
     wrapped = movable.set
@@ -59,11 +59,11 @@ def locked(
     @wraps(wrapped)
     @AsyncStatus.wrap
     async def wrapper(*args: P.args, **kwargs: P.kwargs) -> Status:
-        if await is_locked():
-            if locked_exception:
-                raise locked_exception
-            return completed_status()
-        return wrapped(*args, **kwargs)  # type: ignore
+        if await unlocked():
+            return wrapped(*args, **kwargs)  # type: ignore
+        if locked_exception:
+            raise locked_exception
+        return completed_status()
 
     movable.set = wrapper  # type: ignore
     return movable

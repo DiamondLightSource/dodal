@@ -30,23 +30,23 @@ def test_type_checking_ignores_inject():
 
 @pytest.mark.parametrize("state", [True, False])
 async def test_device_locking(state: bool):
-    async def is_locked() -> bool:
+    async def is_unlocked() -> bool:
         return state
 
-    mock_motor = locked(Motor(""), is_locked)
+    mock_motor = locked(Motor(""), is_unlocked)
     await mock_motor.connect(mock=True)
 
     await mock_motor.set(400)
     new_location = await mock_motor.locate()
-    assert new_location["readback"] == 0 if state else 400
-    assert new_location["setpoint"] == 0 if state else 400
+    assert new_location["readback"] == 400 if state else 0
+    assert new_location["setpoint"] == 400 if state else 0
 
 
 async def test_device_locked_raises_exception():
-    async def is_locked() -> bool:
-        return True
+    async def is_unlocked() -> bool:
+        return False
 
-    mock_motor = locked(Motor(""), is_locked, ValueError("Unable!"))
+    mock_motor = locked(Motor(""), is_unlocked, ValueError("Unable!"))
     await mock_motor.connect(mock=True)
 
     with pytest.raises(ValueError, match="Unable!"):
