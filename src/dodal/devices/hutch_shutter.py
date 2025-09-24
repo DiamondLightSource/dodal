@@ -91,12 +91,12 @@ class HutchShutter(StandardReadable, Movable[ShutterDemand]):
                     )
                 await self.control.set(ShutterDemand.RESET, wait=True)
                 await self.control.set(value, wait=True)
-                return await wait_for_value(
+                await wait_for_value(
                     self.status, match=ShutterState.OPEN, timeout=DEFAULT_TIMEOUT
                 )
             else:
                 await self.control.set(value, wait=True)
-                return await wait_for_value(
+                await wait_for_value(
                     self.status, match=ShutterState.CLOSED, timeout=DEFAULT_TIMEOUT
                 )
         else:
