@@ -32,8 +32,8 @@ async def _get_bart_robot() -> BartRobot:
 
 # For tests which are intentionally triggering a timeout error
 def _set_fast_robot_timeouts(robot: BartRobot):
-    robot.LOAD_TIMEOUT = 0.05  # type: ignore
-    robot.NOT_BUSY_TIMEOUT = 0.05  # type: ignore
+    robot.LOAD_TIMEOUT = 0.01  # type: ignore
+    robot.NOT_BUSY_TIMEOUT = 0.01  # type: ignore
 
 
 async def test_bart_robot_can_be_connected_in_sim_mode():
