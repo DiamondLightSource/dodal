@@ -12,6 +12,7 @@ dodal.devices.i24
    dodal.devices.i24.aperture
    dodal.devices.i24.beam_center
    dodal.devices.i24.beamstop
+   dodal.devices.i24.commissioning_jungfrau
    dodal.devices.i24.dcm
    dodal.devices.i24.dual_backlight
    dodal.devices.i24.focus_mirrors
