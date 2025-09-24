@@ -8,10 +8,10 @@ from dodal.devices.aperturescatterguard import ApertureScatterguard, ApertureVal
 
 
 class InOut(StrictEnum):
-    """Moves scintillator in and out of the beam"""
+    """Moves scintillator in and out of the beam."""
 
-    OUT = "Out_Beam"
-    IN = "In_Beam"
+    OUT = "Out"
+    IN = "In"
     UNKNOWN = "Unknown"
 
 
