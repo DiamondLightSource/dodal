@@ -7,6 +7,7 @@ from bluesky.protocols import Reading
 from event_model.documents.event_descriptor import DataKey
 from ophyd_async.core import PathProvider
 from ophyd_async.epics.adaravis import AravisDetector
+from ophyd_async.epics.adcore import NDPluginBaseIO
 from ophyd_async.epics.adpilatus import PilatusDetector
 
 ValueAndUnits = tuple[float, str]
@@ -106,6 +107,7 @@ class NXSasPilatus(PilatusDetector):
         fileio_suffix: str,
         metadata_holder: NXSasMetadataHolder,
         name: str = "",
+        plugins: dict[str, NDPluginBaseIO] | None = None,
     ):
         """Extends detector with configuration metadata required or desired
         to comply with the NXsas application definition.
