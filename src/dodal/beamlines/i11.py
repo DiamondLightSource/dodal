@@ -1,13 +1,9 @@
-from pathlib import Path
-
 from dodal.common.beamlines.beamline_utils import (
     device_factory,
     get_path_provider,
-    set_path_provider,
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.beamlines.device_helpers import DET_SUFFIX
-from dodal.common.visit import RemoteDirectoryServiceClient, StaticVisitPathProvider
 from dodal.devices.cryostream import OxfordCryoStream
 from dodal.devices.eurotherm import (
     EurothermGeneral,
@@ -33,19 +29,6 @@ BL = get_beamline_name("i11")
 PREFIX = BeamlinePrefix(BL)
 set_log_beamline(BL)
 set_utils_beamline(BL)
-
-# Currently we must hard-code the visit, determining the visit at runtime requires
-# infrastructure that is still WIP.
-# Communication with GDA is also WIP so for now we determine an arbitrary scan number
-# locally and write the commissioning directory. The scan number is not guaranteed to
-# be unique and the data is at risk - this configuration is for testing only.
-set_path_provider(
-    StaticVisitPathProvider(
-        BL,
-        Path(f"/dls/{BL}/data/2025/cm40625-3/bluesky"),
-        client=RemoteDirectoryServiceClient(f"http://{BL}-control:8088/api"),
-    )
-)
 
 
 @device_factory()
