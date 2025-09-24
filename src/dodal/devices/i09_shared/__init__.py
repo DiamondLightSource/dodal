@@ -1,3 +1,7 @@
-from dodal.devices.i09_shared.hard_undulator import HardUndulator
+from dodal.devices.i09_shared.hard_undulator import (
+    HardUndulator,
+    UndulatorOrder,
+    calculate_gap_i09,
+)
 
-__all__ = ["HardUndulator"]
+__all__ = ["HardUndulator", "UndulatorOrder", "calculate_gap_i09"]

@@ -6,84 +6,81 @@ import pytest
 from bluesky.plan_stubs import mv
 from bluesky.run_engine import RunEngine
 from ophyd_async.core import init_devices
-from ophyd_async.testing import set_mock_value
+from ophyd_async.testing import assert_reading, partial_reading
 
-from dodal.devices.i09_shared.hard_undulator import HardUndulator, calculate_gap_i09
+from dodal.common.enums import EnabledDisabledUpper
+from dodal.devices.i09_shared import HardUndulator, UndulatorOrder, calculate_gap_i09
 from dodal.testing.setup import patch_all_motors
-
-LUT_TEST_PATH = "tests/devices/test_data/test_hard_undulator_lookup_table.txt"
+from tests.devices.test_data import TEST_HARD_UNDULATOR_LUT
 
 
 @pytest.fixture
-async def hu() -> HardUndulator:
+async def undulator_order() -> UndulatorOrder:
+    async with init_devices(mock=True):
+        order = UndulatorOrder(
+            id_gap_lookup_table_path=TEST_HARD_UNDULATOR_LUT,
+        )
+    return order
+
+
+@pytest.fixture
+async def hu(
+    undulator_order: UndulatorOrder,
+) -> HardUndulator:
     async with init_devices(mock=True):
         hu = HardUndulator(
             prefix="HU-01",
-            id_gap_lookup_table_path=LUT_TEST_PATH,
+            id_gap_lookup_table_path=TEST_HARD_UNDULATOR_LUT,
             calculate_gap_function=calculate_gap_i09,
+            order=undulator_order,
         )
     patch_all_motors(hu)
     return hu
 
 
-async def test_read_and_describe_includes(
+async def test_hard_undulator_read(
     hu: HardUndulator,
 ):
-    description = await hu.describe()
-    reading = await hu.read()
-
-    expected_keys: list[str] = [
-        "undulator_period",
-        "gap_offset",
-        "gap_access",
-        "current_gap",
-        "gap_motor",
-        "order",
-    ]
-    for key in expected_keys:
-        assert f"{hu.name}-{key}" in reading
-        assert f"{hu.name}-{key}" in description
+    await assert_reading(
+        hu,
+        {
+            "hu-undulator_period": partial_reading(27),
+            "hu-gap_offset": partial_reading(0.0),
+            "hu-gap_access": partial_reading(EnabledDisabledUpper.ENABLED),
+            "hu-current_gap": partial_reading(0.0),
+            "hu-gap_motor": partial_reading(0.0),
+            "order-_order": partial_reading(3),
+        },
+    )
 
 
-async def test_min_max_energy_for_order(
+async def test_check_energy_limits_throw_error(
     hu: HardUndulator,
+    undulator_order: UndulatorOrder,
+    RE: RunEngine,
 ):
-    min, max = await hu.get_min_max_energy_for_order(3)
-    assert min == pytest.approx(2.4)
-    assert max == pytest.approx(4.3)
-    with pytest.raises(
-        ValueError,
-        match=re.escape(
-            "Order 0 not found in lookup table, must be between 1.0 and 23.0"
-        ),
-    ):
-        await hu.get_min_max_energy_for_order(0)
-
-
-async def test_check_energy_limits(
-    hu: HardUndulator,
-):
-    await hu.check_energy_limits(3.0, 3)  # within limits
+    RE(mv(undulator_order, 3))
     with pytest.raises(
         ValueError,
         match=re.escape("Energy 1.0keV is out of range for order 3: (2.4-4.3 keV)"),
     ):
-        await hu.check_energy_limits(1.0, 3)
+        await hu.set(1.0)
 
 
-async def test_set_get_order(
-    hu: HardUndulator,
+async def test_move_order(
+    undulator_order: UndulatorOrder,
+    RE: RunEngine,
 ):
-    assert await hu.get_order() == 3  # default order
-    await hu.set_order(5)
-    assert await hu.get_order() == 5  # no error
+    assert (await undulator_order.locate())["readback"] == 3  # default order
+    RE(mv(undulator_order, 5))
+    assert (await undulator_order.locate())["readback"] == 5  # no error
     with pytest.raises(
         ValueError,
         match=re.escape(
-            "Order 0 not found in lookup table, must be between 1.0 and 23.0"
+            "Order 0 not found in lookup table, must be in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]"
         ),
     ):
-        await hu.set_order(0)
+        await undulator_order.set(0)
 
 
 @patch("dodal.devices.i09_shared.hard_undulator.energy_distance_table")
@@ -96,20 +93,20 @@ async def test_update_cached_lookup_table_fails(
         RuntimeError,
         match=re.escape("Failed to load lookup table from path"),
     ):
-        await hu.update_cached_lookup_table()
+        await hu.set(1.0)
 
 
 async def test_get_gap_for_energy_fails(
     hu: HardUndulator,
+    undulator_order: UndulatorOrder,
 ):
-    await hu.update_cached_lookup_table()
-    hu.check_energy_limits = AsyncMock()
-    set_mock_value(hu.order, 1)
+    await undulator_order.set(1)
+    hu._check_energy_limits = AsyncMock()
     with pytest.raises(
         ValueError,
         match=re.escape("k_squared must be positive"),
     ):
-        await hu._get_gap_to_match_energy(30.0)
+        await hu.set(30.0)
 
 
 @pytest.mark.parametrize(
@@ -122,12 +119,13 @@ async def test_get_gap_for_energy_fails(
 )
 async def test_move_undulator(
     hu: HardUndulator,
+    undulator_order: UndulatorOrder,
     RE: RunEngine,
     energy: float,
     order: int,
     expected_gap: float,
 ):
-    await hu.set_order(order)
+    await undulator_order.set(order)
     RE(mv(hu, energy))
     assert await hu.gap_motor.user_readback.get_value() == pytest.approx(
         expected_gap, abs=0.01
