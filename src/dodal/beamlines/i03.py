@@ -86,7 +86,8 @@ def aperture_scatterguard() -> ApertureScatterguard:
     """
     params = get_beamline_parameters()
     return ApertureScatterguard(
-        prefix=PREFIX.beamline_prefix,
+        aperture_prefix=f"{PREFIX.beamline_prefix}-MO-MAPT-01:",
+        scatterguard_prefix=f"{PREFIX.beamline_prefix}-MO-SCAT-01:",
         loaded_positions=load_positions_from_beamline_parameters(params),
         tolerances=AperturePosition.tolerances_from_gda_params(params),
     )
@@ -119,9 +120,7 @@ def dcm() -> DCM:
     """Get the i03 DCM device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return DCM(
-        prefix=f"{PREFIX.beamline_prefix}-MO-DCM-01:",
-    )
+    return DCM(prefix=f"{PREFIX.beamline_prefix}-MO-DCM-01:")
 
 
 @device_factory()
@@ -157,7 +156,8 @@ def detector_motion() -> DetectorMotion:
     If this is called when already instantiated in i03, it will return the existing object.
     """
     return DetectorMotion(
-        prefix=PREFIX.beamline_prefix,
+        device_prefix=f"{PREFIX.beamline_prefix}-MO-DET-01:",
+        pmac_prefix=f"{PREFIX.beamline_prefix}-MO-PMAC-02:",
     )
 
 
@@ -195,9 +195,7 @@ def zebra_fast_grid_scan() -> ZebraFastGridScan:
     """Get the i03 zebra_fast_grid_scan device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return ZebraFastGridScan(
-        prefix=f"{PREFIX.beamline_prefix}-MO-SGON-01:",
-    )
+    return ZebraFastGridScan(prefix=f"{PREFIX.beamline_prefix}-MO-SGON-01:")
 
 
 @device_factory()
@@ -206,9 +204,7 @@ def panda_fast_grid_scan() -> PandAFastGridScan:
     If this is called when already instantiated in i03, it will return the existing object.
     This is used instead of the zebra_fast_grid_scan device when using the PandA.
     """
-    return PandAFastGridScan(
-        prefix=f"{PREFIX.beamline_prefix}-MO-SGON-01:",
-    )
+    return PandAFastGridScan(prefix=f"{PREFIX.beamline_prefix}-MO-SGON-01:")
 
 
 @device_factory()
@@ -229,9 +225,7 @@ def pin_tip_detection() -> PinTipDetection:
     """Get the i03 pin tip detection device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return PinTipDetection(
-        f"{PREFIX.beamline_prefix}-DI-OAV-01:",
-    )
+    return PinTipDetection(f"{PREFIX.beamline_prefix}-DI-OAV-01:")
 
 
 @device_factory()
@@ -247,9 +241,7 @@ def s4_slit_gaps() -> S4SlitGaps:
     """Get the i03 s4_slit_gaps device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return S4SlitGaps(
-        f"{PREFIX.beamline_prefix}-AL-SLITS-04:",
-    )
+    return S4SlitGaps(f"{PREFIX.beamline_prefix}-AL-SLITS-04:")
 
 
 @device_factory()
@@ -269,6 +261,7 @@ def undulator(daq_configuration_path: str | None = None) -> Undulator:
         f"{BeamlinePrefix(BL).insertion_prefix}-MO-SERVC-01:",
         # evaluate here not as parameter default to enable post-import mocking
         id_gap_lookup_table_path=f"{daq_configuration_path or DAQ_CONFIGURATION_PATH}/lookup/BeamLine_Undulator_toGap.txt",
+        baton=baton(),
     )
 
 
@@ -284,7 +277,6 @@ def undulator_dcm(daq_configuration_path: str | None = None) -> UndulatorDCM:
         else undulator()
     )
     return UndulatorDCM(
-        prefix=PREFIX.beamline_prefix,
         undulator=undulator_singleton,
         dcm=dcm(),
         daq_configuration_path=daq_configuration_path or DAQ_CONFIGURATION_PATH,
@@ -307,9 +299,7 @@ def xspress3mini() -> Xspress3:
     """Get the i03 Xspress3Mini device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return Xspress3(
-        f"{PREFIX.beamline_prefix}-EA-XSP3-01:",
-    )
+    return Xspress3(f"{PREFIX.beamline_prefix}-EA-XSP3-01:")
 
 
 @device_factory()
@@ -328,9 +318,7 @@ def sample_shutter() -> ZebraShutter:
     """Get the i03 sample shutter device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return ZebraShutter(
-        f"{PREFIX.beamline_prefix}-EA-SHTR-01:",
-    )
+    return ZebraShutter(f"{PREFIX.beamline_prefix}-EA-SHTR-01:")
 
 
 @device_factory()
@@ -338,9 +326,7 @@ def flux() -> Flux:
     """Get the i03 flux device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return Flux(
-        f"{PREFIX.beamline_prefix}-MO-FLUX-01:",
-    )
+    return Flux(f"{PREFIX.beamline_prefix}-MO-FLUX-01:")
 
 
 @device_factory()
@@ -348,9 +334,7 @@ def xbpm_feedback() -> XBPMFeedback:
     """Get the i03 XBPM feeback device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return XBPMFeedback(
-        PREFIX.beamline_prefix,
-    )
+    return XBPMFeedback(f"{PREFIX.beamline_prefix}-EA-FDBK-01:", baton=baton())
 
 
 @device_factory()
@@ -358,10 +342,7 @@ def zocalo() -> ZocaloResults:
     """Get the i03 ZocaloResults device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return ZocaloResults(
-        prefix=PREFIX.beamline_prefix,
-        results_source=ZocaloSource.GPU,
-    )
+    return ZocaloResults(results_source=ZocaloSource.GPU)
 
 
 @device_factory()
@@ -369,9 +350,7 @@ def robot() -> BartRobot:
     """Get the i03 robot device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return BartRobot(
-        f"{PREFIX.beamline_prefix}-MO-ROBOT-01:",
-    )
+    return BartRobot(f"{PREFIX.beamline_prefix}-MO-ROBOT-01:")
 
 
 @device_factory()
@@ -379,9 +358,7 @@ def webcam() -> Webcam:
     """Get the i03 webcam, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return Webcam(
-        url=URL("http://i03-webcam1/axis-cgi/jpg/image.cgi"),
-    )
+    return Webcam(url=URL("http://i03-webcam1/axis-cgi/jpg/image.cgi"))
 
 
 @device_factory()
@@ -389,9 +366,7 @@ def thawer() -> Thawer:
     """Get the i03 thawer, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return Thawer(
-        f"{PREFIX.beamline_prefix}-EA-THAW-01",
-    )
+    return Thawer(f"{PREFIX.beamline_prefix}-EA-THAW-01")
 
 
 @device_factory()
@@ -399,9 +374,7 @@ def lower_gonio() -> XYZStage:
     """Get the i03 lower gonio device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return XYZStage(
-        f"{PREFIX.beamline_prefix}-MO-GONP-01:",
-    )
+    return XYZStage(f"{PREFIX.beamline_prefix}-MO-GONP-01:")
 
 
 @device_factory()
@@ -409,9 +382,7 @@ def cryostream() -> CryoStream:
     """Get the i03 cryostream device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return CryoStream(
-        PREFIX.beamline_prefix,
-    )
+    return CryoStream(PREFIX.beamline_prefix)
 
 
 @device_factory()
@@ -429,9 +400,7 @@ def qbpm() -> QBPM:
     """Get the i03 qbpm device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return QBPM(
-        f"{PREFIX.beamline_prefix}-DI-QBPM-01:",
-    )
+    return QBPM(f"{PREFIX.beamline_prefix}-DI-QBPM-01:")
 
 
 @device_factory()

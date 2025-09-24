@@ -1,13 +1,18 @@
 import importlib
 import os
+from collections.abc import AsyncGenerator
 from pathlib import Path
 from types import ModuleType
 from unittest.mock import patch
 
 import pytest
+from ophyd_async.core import init_devices
+from ophyd_async.testing import set_mock_value
 
 from conftest import mock_attributes_table
 from dodal.common.beamlines import beamline_parameters, beamline_utils
+from dodal.common.beamlines.commissioning_mode import set_commissioning_signal
+from dodal.devices.baton import Baton
 from dodal.devices.detector import DetectorParams
 from dodal.devices.detector.det_dim_constants import EIGER2_X_16M_SIZE
 from dodal.utils import (
@@ -15,7 +20,7 @@ from dodal.utils import (
     collect_factories,
     make_all_devices,
 )
-from tests.devices.unit_tests.test_data import TEST_LUT_TXT
+from tests.devices.test_data import TEST_LUT_TXT
 from tests.test_data import I04_BEAMLINE_PARAMETERS
 
 
@@ -61,3 +66,13 @@ def eiger_params(tmp_path: Path) -> DetectorParams:
         det_dist_to_beam_converter_path=TEST_LUT_TXT,
         detector_size_constants=EIGER2_X_16M_SIZE.det_type_string,  # type: ignore
     )
+
+
+@pytest.fixture
+async def baton_in_commissioning_mode() -> AsyncGenerator[Baton]:
+    async with init_devices(mock=True):
+        baton = Baton("BATON-01")
+    set_commissioning_signal(baton.commissioning)
+    set_mock_value(baton.commissioning, True)
+    yield baton
+    set_commissioning_signal(None)
