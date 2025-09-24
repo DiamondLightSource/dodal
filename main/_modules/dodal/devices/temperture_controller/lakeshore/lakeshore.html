@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.temperture_controller.lakeshore.lakeshore &#8212; dodal 1.58.1.dev16+g19f468cf6 documentation</title>
+    <title>dodal.devices.temperture_controller.lakeshore.lakeshore &#8212; dodal 1.58.1.dev17+g6a7d66753 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../../_static/documentation_options.js?v=a7435c94"></script>
+    <script src="../../../../../_static/documentation_options.js?v=0124fbfe"></script>
     <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -458,14 +458,21 @@ window.addEventListener("load", () => mermaid.run());
     <span class="n">SignalDatatypeT</span><span class="p">,</span>
     <span class="n">StandardReadable</span><span class="p">,</span>
     <span class="n">StandardReadableFormat</span><span class="p">,</span>
+    <span class="n">StrictEnum</span><span class="p">,</span>
     <span class="n">derived_signal_rw</span><span class="p">,</span>
     <span class="n">soft_signal_rw</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core._readable</span><span class="w"> </span><span class="kn">import</span> <span class="n">_HintsFromName</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">.lakeshore_io</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">LakeshoreBaseIO</span><span class="p">,</span>
 <span class="p">)</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Heater336Settings</span><span class="p">(</span><span class="n">StrictEnum</span><span class="p">):</span>
+    <span class="n">OFF</span> <span class="o">=</span> <span class="s2">&quot;Off&quot;</span>
+    <span class="n">LOW</span> <span class="o">=</span> <span class="s2">&quot;Low&quot;</span>
+    <span class="n">MEDIUM</span> <span class="o">=</span> <span class="s2">&quot;Medium&quot;</span>
+    <span class="n">HIGH</span> <span class="o">=</span> <span class="s2">&quot;High&quot;</span>
 
 
 <div class="viewcode-block" id="Lakeshore">
@@ -474,6 +481,7 @@ window.addEventListener("load", () => mermaid.run());
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Device for controlling and reading from a Lakeshore temperature controller.</span>
 <span class="sd">    It supports multiple channels and PID control.</span>
+
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
 <span class="sd">    temperature : LakeshoreBaseIO</span>
@@ -531,15 +539,6 @@ window.addEventListener("load", () => mermaid.run());
             <span class="n">set_derived</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_set_control_channel</span><span class="p">,</span>
             <span class="n">current_channel</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_control_channel</span><span class="p">,</span>
         <span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">_hints_channel</span> <span class="o">=</span> <span class="n">soft_signal_rw</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">initial_value</span><span class="o">=</span><span class="n">control_channel</span><span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">hints_channel</span> <span class="o">=</span> <span class="n">derived_signal_rw</span><span class="p">(</span>
-            <span class="n">raw_to_derived</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_hints_channel</span><span class="p">,</span>
-            <span class="n">set_derived</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_set_hints_channel</span><span class="p">,</span>
-            <span class="n">current_hints_channel</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_hints_channel</span><span class="p">,</span>
-        <span class="p">)</span>
-
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">,</span>
             <span class="n">num_readback_channel</span><span class="o">=</span><span class="n">num_readback_channel</span><span class="p">,</span>
@@ -550,9 +549,10 @@ window.addEventListener("load", () => mermaid.run());
 
         <span class="bp">self</span><span class="o">.</span><span class="n">add_readables</span><span class="p">(</span>
             <span class="p">[</span><span class="n">setpoint</span><span class="o">.</span><span class="n">user_setpoint</span> <span class="k">for</span> <span class="n">setpoint</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">control_channels</span><span class="o">.</span><span class="n">values</span><span class="p">()]</span>
-            <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">readback</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
         <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_has_hints</span> <span class="o">=</span> <span class="p">(</span><span class="n">_HintsFromName</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">readback</span><span class="p">[</span><span class="n">control_channel</span><span class="p">]),)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_readables</span><span class="p">(</span>
+            <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">readback</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span> <span class="nb">format</span><span class="o">=</span><span class="n">StandardReadableFormat</span><span class="o">.</span><span class="n">HINTED_SIGNAL</span>
+        <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">add_readables</span><span class="p">(</span>
             <span class="p">[</span>
@@ -602,14 +602,69 @@ window.addEventListener("load", () => mermaid.run());
             <span class="bp">self</span><span class="o">.</span><span class="n">control_channels</span><span class="p">[</span><span class="n">value</span><span class="p">]</span><span class="o">.</span><span class="n">i</span><span class="o">.</span><span class="n">read</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">control_channels</span><span class="p">[</span><span class="n">value</span><span class="p">]</span><span class="o">.</span><span class="n">d</span><span class="o">.</span><span class="n">read</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">control_channels</span><span class="p">[</span><span class="n">value</span><span class="p">]</span><span class="o">.</span><span class="n">heater_output_range</span><span class="o">.</span><span class="n">read</span><span class="p">,</span>
-        <span class="p">)</span>
+        <span class="p">)</span></div>
 
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_set_hints_channel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">readback_channel</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_has_hints</span> <span class="o">=</span> <span class="p">(</span><span class="n">_HintsFromName</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">readback</span><span class="p">[</span><span class="n">readback_channel</span><span class="p">]),)</span>
-        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hints_channel</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">readback_channel</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_get_hints_channel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_hints_channel</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">current_hints_channel</span></div>
+
+<div class="viewcode-block" id="Lakeshore336">
+<a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.temperture_controller.Lakeshore336.html#dodal.devices.temperture_controller.Lakeshore336">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Lakeshore336</span><span class="p">(</span><span class="n">Lakeshore</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">control_channel</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Lakeshore 336 temperature controller. With 4 readback and control channels.</span>
+<span class="sd">        Heater settings are: Off, Low, Medium, High.</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        prefix : str</span>
+<span class="sd">            The EPICS prefix for the device.</span>
+<span class="sd">        control_channel : int, optional</span>
+<span class="sd">            The initial control channel (default is 1).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">,</span>
+            <span class="n">num_readback_channel</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+            <span class="n">heater_setting</span><span class="o">=</span><span class="n">Heater336Settings</span><span class="p">,</span>
+            <span class="n">control_channel</span><span class="o">=</span><span class="n">control_channel</span><span class="p">,</span>
+            <span class="n">single_control_channel</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="Lakeshore340">
+<a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.temperture_controller.Lakeshore340.html#dodal.devices.temperture_controller.Lakeshore340">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Lakeshore340</span><span class="p">(</span><span class="n">Lakeshore</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">control_channel</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Lakeshore 340 temperature controller. With 4 readback channels and a single</span>
+<span class="sd">        control channel.</span>
+<span class="sd">        Heater settings are in power from 0 to 5. 0 is 0 watt, 5 is 50 watt.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        prefix : str</span>
+<span class="sd">            The EPICS prefix for the device.</span>
+<span class="sd">        control_channel : int, optional</span>
+<span class="sd">            The initial control channel (default is 1).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">,</span>
+            <span class="n">num_readback_channel</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+            <span class="n">heater_setting</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span>
+            <span class="n">control_channel</span><span class="o">=</span><span class="n">control_channel</span><span class="p">,</span>
+            <span class="n">single_control_channel</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+        <span class="p">)</span></div>
 
 </pre></div>
 

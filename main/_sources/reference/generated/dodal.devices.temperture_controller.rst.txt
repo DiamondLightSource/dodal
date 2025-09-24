@@ -14,6 +14,8 @@ dodal.devices.temperture\_controller
    :toctree:
    :recursive:
 
+   ~temperture_controller.Lakeshore336
+   ~temperture_controller.Lakeshore340
    ~temperture_controller.Lakeshore
 
 
