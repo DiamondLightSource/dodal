@@ -161,11 +161,9 @@ async def test_running_finished_with_all_images_done_then_complete_status_finish
     panda_fast_grid_scan: PandAFastGridScan,
     RE: RunEngine,
 ):
-    grid_scan: ZebraFastGridScanThreeD | PandAFastGridScan = (
-        panda_fast_grid_scan if use_pgs else zebra_fast_grid_scan
-    )
     num_pos_1d = 2
     if use_pgs:
+        grid_scan = panda_fast_grid_scan
         RE(
             set_fast_grid_scan_params(
                 grid_scan,
@@ -175,6 +173,7 @@ async def test_running_finished_with_all_images_done_then_complete_status_finish
             )
         )
     else:
+        grid_scan = zebra_fast_grid_scan
         RE(
             set_fast_grid_scan_params(
                 grid_scan,
