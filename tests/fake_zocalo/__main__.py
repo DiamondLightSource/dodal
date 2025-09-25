@@ -65,7 +65,7 @@ def get_dcgid_and_prefix(dcid: int, session_maker: sessionmaker) -> tuple[int, s
             assert isinstance(session, Session)
             query = (
                 session.query(
-                    DataCollection.dataCollectionId, DataCollection.imagePrefix
+                    DataCollection.dataCollectionGroupId, DataCollection.imagePrefix
                 )
                 .filter(DataCollection.dataCollectionId == dcid)
                 .first()
