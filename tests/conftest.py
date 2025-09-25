@@ -1,7 +1,12 @@
+import asyncio
 import importlib
 import os
+import threading
+import time
 from collections.abc import AsyncGenerator
 from pathlib import Path
+from random import random
+from threading import Thread
 from types import ModuleType
 from unittest.mock import patch
 
@@ -76,3 +81,53 @@ async def baton_in_commissioning_mode() -> AsyncGenerator[Baton]:
     set_mock_value(baton.commissioning, True)
     yield baton
     set_commissioning_signal(None)
+
+
+@pytest.fixture
+async def event_loop_fuzzing():
+    """
+    This fixture can be used to try and detect / reproduce intermittent test failures
+    caused by race conditions and timing issues, which are often difficult to replicate
+    due to caching etc. causing timing to be different on a development machine compared
+    to when the test runs in CI.
+
+    It works by attaching a fuzzer to the current event loop which randomly schedules
+    a fixed delay into the event loop thread every few milliseconds. The idea is that
+    over a number of iterations, there should be sufficient timing variation introduced
+    that the failure can be reproduced.
+
+    Examples:
+        Example usage:
+    >>> import pytest
+    >>> # repeat the test a number of times
+    >>> @pytest.mark.parametrize("i", range(0, 100))
+    >>> async def my_unreliable_test(i, event_loop_fuzzing):
+    >>>     # Do some stuff in here
+    >>>     ...
+    """
+    FUZZ_PROBABILITY = 0.05
+    FUZZ_DELAY_S = 0.05
+    FUZZ_PERIOD_S = 0.001
+    stop_running = threading.Event()
+    event_loop = asyncio.get_running_loop()
+
+    def delay(finished_event: threading.Event):
+        time.sleep(FUZZ_DELAY_S)
+        finished_event.set()
+
+    def fuzz():
+        while not stop_running.is_set():
+            if random() < FUZZ_PROBABILITY:
+                delay_is_finished = threading.Event()
+                event_loop.call_soon_threadsafe(delay, delay_is_finished)
+                delay_is_finished.wait()
+
+            time.sleep(FUZZ_PERIOD_S)
+
+    fuzzer_thread = Thread(group=None, target=fuzz, name="Event loop fuzzer")
+    fuzzer_thread.start()
+    try:
+        yield None
+    finally:
+        stop_running.set()
+        fuzzer_thread.join()
