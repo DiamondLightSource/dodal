@@ -81,8 +81,9 @@ def sequence(
     sequence_class: type[TAbstractBaseSequence],
 ) -> AbstractBaseSequence:
     det = ElectronAnalyserDetector(
-        driver=sim_driver,
         sequence_class=sequence_class,
+        driver=sim_driver,
+        config_sigs=(),
     )
     return det.load_sequence(get_test_sequence(type(sim_driver)))
 

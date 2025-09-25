@@ -29,13 +29,12 @@ async def sim_detector(
 async def test_analyser_vgscienta_detector_image_shape(
     sim_detector: VGScientaDetector,
 ) -> None:
-    driver = sim_detector.driver
-    prefix = driver.name + "-"
+    prefix = sim_detector.driver.name + "-"
 
     energy_axis = np.array([1, 2, 3, 4, 5])
     angle_axis = np.array([1, 2])
-    set_mock_value(driver.energy_axis, energy_axis)
-    set_mock_value(driver.angle_axis, angle_axis)
+    set_mock_value(sim_detector.driver.energy_axis, energy_axis)
+    set_mock_value(sim_detector.driver.angle_axis, angle_axis)
 
     describe = await sim_detector.describe()
     assert describe[f"{prefix}image"]["shape"] == [

@@ -7,6 +7,7 @@ from ophyd_async.core import init_devices
 from ophyd_async.testing import (
     assert_configuration,
     assert_reading,
+    partial_reading,
     set_mock_value,
 )
 
@@ -40,7 +41,7 @@ async def sim_detector(
             energy_source=single_energy_source,
         )
     # Needed for specs so we don't get division by zero error.
-    set_mock_value(sim_detector.driver.slices, 1)
+    set_mock_value(sim_detector.controller.driver.slices, 1)
     return sim_detector
 
 
@@ -60,7 +61,7 @@ def test_analyser_detector_trigger(
 async def test_analyser_detector_read(
     sim_detector: AbstractElectronAnalyserDetector[AbstractAnalyserDriverIO],
 ) -> None:
-    driver = sim_detector.driver
+    driver = sim_detector.controller.driver
     driver_read = await driver.read()
     await assert_reading(sim_detector, driver_read)
 
@@ -68,10 +69,10 @@ async def test_analyser_detector_read(
 async def test_analyser_describe(
     sim_detector: AbstractElectronAnalyserDetector[AbstractAnalyserDriverIO],
 ) -> None:
-    energy_array = await sim_detector.driver.energy_axis.get_value()
-    angle_array = await sim_detector.driver.angle_axis.get_value()
+    energy_array = await sim_detector.controller.driver.energy_axis.get_value()
+    angle_array = await sim_detector.controller.driver.angle_axis.get_value()
     data = await sim_detector.describe()
-    assert data[f"{sim_detector.name}-_driver-image"]["shape"] == [
+    assert data[f"{sim_detector.name}-driver-image"]["shape"] == [
         len(angle_array),
         len(energy_array),
     ]
@@ -80,15 +81,22 @@ async def test_analyser_describe(
 async def test_analyser_detector_configuration(
     sim_detector: AbstractElectronAnalyserDetector[AbstractAnalyserDriverIO],
 ) -> None:
-    driver = sim_detector.driver
-    driver_config = await driver.read_configuration()
-    await assert_configuration(sim_detector, driver_config)
+    region_name = sim_detector.controller.driver.region_name
+    lens_mode = sim_detector.controller.driver.lens_mode
+    sim_detector._config_sigs = (region_name, lens_mode)  # type: ignore
+    await assert_configuration(
+        sim_detector,
+        {
+            region_name.name: partial_reading(await region_name.get_value()),
+            lens_mode.name: partial_reading(await lens_mode.get_value()),
+        },
+    )
 
 
 async def test_analyser_detector_describe_configuration(
     sim_detector: AbstractElectronAnalyserDetector[AbstractAnalyserDriverIO],
 ) -> None:
-    driver = sim_detector.driver
+    driver = sim_detector.controller.driver
     driver_describe_config = await driver.describe_configuration()
 
     assert await sim_detector.describe_configuration() == driver_describe_config

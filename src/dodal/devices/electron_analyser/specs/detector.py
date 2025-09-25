@@ -31,4 +31,38 @@ class SpecsDetector(
         driver = SpecsAnalyserDriverIO[TLensMode, TPsuMode](
             prefix, lens_mode_type, psu_mode_type, energy_source
         )
-        super().__init__(SpecsSequence[lens_mode_type, psu_mode_type], driver, name)
+
+        if isinstance(energy_source, DualEnergySource):
+            energy_config_signals = (
+                energy_source.source1.wrapped_device_name,
+                energy_source.source2.wrapped_device_name,
+            )
+        else:
+            energy_config_signals = (energy_source.wrapped_device_name,)
+
+        config_sigs = (
+            driver.region_name,
+            driver.energy_mode,
+            driver.low_energy,
+            driver.centre_energy,
+            driver.high_energy,
+            driver.slices,
+            driver.lens_mode,
+            driver.pass_energy,
+            driver.energy_step,
+            driver.iterations,
+            driver.acquisition_mode,
+            driver.psu_mode,
+            driver.acquire_time,
+            driver.total_steps,
+            driver.total_time,
+            driver.energy_axis,
+            driver.binding_energy_axis,
+            driver.angle_axis,
+            *energy_config_signals,
+            # Specifc to this analyser
+            driver.snapshot_values,
+        )
+        super().__init__(
+            SpecsSequence[lens_mode_type, psu_mode_type], driver, config_sigs, name
+        )

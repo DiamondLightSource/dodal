@@ -1,12 +1,15 @@
+from collections.abc import Sequence
 from typing import Generic, TypeVar
 
 from bluesky.protocols import Stageable
 from ophyd_async.core import (
     AsyncStatus,
-    Reference,
+    SignalR,
 )
+from ophyd_async.epics.adcore import ADBaseController
 
 from dodal.common.data_util import load_json_file_to_class
+from dodal.devices.controllers import ConstantDeadTimeController
 from dodal.devices.electron_analyser.abstract.base_detector import (
     AbstractElectronAnalyserDetector,
 )
@@ -25,30 +28,23 @@ class ElectronAnalyserRegionDetector(
 ):
     """
     Extends electron analyser detector to configure specific region settings before data
-    acqusition. This object must be passed in a driver and store it as a reference. It
-    is designed to only exist inside a plan.
+    acqusition. It is designed to only exist inside a plan.
     """
 
     def __init__(
         self,
-        driver: TAbstractAnalyserDriverIO,
+        controller: ADBaseController[TAbstractAnalyserDriverIO],
         region: TAbstractBaseRegion,
+        config_sigs: Sequence[SignalR],
         name: str = "",
     ):
-        self._driver_ref = Reference(driver)
         self.region = region
-        super().__init__(driver, name)
-
-    @property
-    def driver(self) -> TAbstractAnalyserDriverIO:
-        # Store as a reference, this implementation will be given a driver so needs to
-        # make sure we don't get conflicting parents.
-        return self._driver_ref()
+        super().__init__(controller, config_sigs, name)
 
     @AsyncStatus.wrap
     async def trigger(self) -> None:
         # Configure region parameters on the driver first before data collection.
-        await self.driver.set(self.region)
+        await self.controller.driver.set(self.region)
         await super().trigger()
 
 
@@ -77,18 +73,16 @@ class ElectronAnalyserDetector(
         self,
         sequence_class: type[TAbstractBaseSequence],
         driver: TAbstractAnalyserDriverIO,
+        config_sigs: Sequence[SignalR],
         name: str = "",
     ):
-        # Pass in driver
-        self._driver = driver
         self._sequence_class = sequence_class
-        super().__init__(self.driver, name)
+        self.controller = ConstantDeadTimeController(driver, 0)
 
-    @property
-    def driver(self) -> TAbstractAnalyserDriverIO:
-        # This implementation creates the driver and wants this to be the parent so it
-        # can be used with connect() method.
-        return self._driver
+        # Store driver so that it is found as child device so is automatically connected.
+        self.driver = driver
+
+        super().__init__(self.controller, config_sigs, name)
 
     @AsyncStatus.wrap
     async def stage(self) -> None:
@@ -144,7 +138,9 @@ class ElectronAnalyserDetector(
         seq = self.load_sequence(filename)
         regions = seq.get_enabled_regions() if enabled_only else seq.regions
         return [
-            ElectronAnalyserRegionDetector(self.driver, r, self.name + "_" + r.name)
+            ElectronAnalyserRegionDetector(
+                self.controller, r, self._config_sigs, self.name + "_" + r.name
+            )
             for r in regions
         ]
 
