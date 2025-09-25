@@ -2,7 +2,7 @@ import abc
 import asyncio
 from dataclasses import dataclass
 from math import isclose
-from typing import Generic, TypeVar
+from typing import Generic, Protocol, TypeVar
 
 import numpy as np
 from bluesky.protocols import Movable
@@ -301,6 +301,10 @@ class UndulatorJawPhase(SafeUndulatorMover[float]):
         )
 
 
+class EnergyMotorConvertor(Protocol):
+    def __call__(self, energy: float, pol: Pol) -> tuple[float, float]: ...
+
+
 class Apple2(abc.ABC, StandardReadable, Movable):
     """
     Apple2 Undulator Device
@@ -365,6 +369,7 @@ class Apple2(abc.ABC, StandardReadable, Movable):
         self,
         id_gap: UndulatorGap,
         id_phase: UndulatorPhaseAxes,
+        energy_motor_convertor: EnergyMotorConvertor,
         name: str = "",
     ) -> None:
         """
@@ -382,7 +387,7 @@ class Apple2(abc.ABC, StandardReadable, Movable):
         # <name>-undulator, etc.
         self.gap = id_gap
         self.phase = id_phase
-
+        self.energy_to_motor = energy_motor_convertor
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             # Store the set energy for readback.
             self.energy, self._set_energy_rbv = soft_signal_r_and_setter(
@@ -406,12 +411,7 @@ class Apple2(abc.ABC, StandardReadable, Movable):
             btm_outer=self.phase.btm_outer.user_readback,
             gap=id_gap.user_readback,
         )
-
-        self._available_pol = []
-        """
-        Abstract method that run at start up to load lookup tables into  self.lookup_tables
-        and set available_pol.
-        """
+        self.energy_to_motor = energy_motor_convertor
 
     def _set_pol_setpoint(self, pol: Pol) -> None:
         """Set the polarisation setpoint without moving hardware. The polarisation
@@ -504,15 +504,6 @@ class Apple2(abc.ABC, StandardReadable, Movable):
         )
         await wait_for_value(self.gap.gate, UndulatorGateStatus.CLOSE, timeout=timeout)
         self._set_energy_rbv(energy)  # Update energy after move for readback.
-
-    @abc.abstractmethod
-    async def _get_id_gap_phase(self, energy: float, pol: Pol) -> tuple[float, float]:
-        """Method to get the gap and phase motor position for a given energy
-        and polarisation.
-
-        """
-
-        ...
 
     def determine_phase_from_hardware(
         self,
