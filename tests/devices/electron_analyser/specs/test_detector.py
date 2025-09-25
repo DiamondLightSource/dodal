@@ -24,7 +24,7 @@ async def sim_detector(
 
 
 async def test_analyser_specs_detector_image_shape(sim_detector: SpecsDetector) -> None:
-    driver = sim_detector.driver
+    driver = sim_detector.controller.driver
     prefix = driver.name + "-"
 
     low_energy = 1

@@ -104,7 +104,7 @@ def test_analyser_detector_has_driver_as_child_and_region_detector_does_not(
 
     for det in region_detectors:
         assert det._child_devices.get(driver_name) is None
-        assert det.driver.parent == sim_detector
+        assert det.controller.driver.parent == sim_detector
 
 
 async def test_analyser_region_detector_trigger_sets_driver_with_region(
@@ -117,7 +117,7 @@ async def test_analyser_region_detector_trigger_sets_driver_with_region(
     )
 
     for reg_det in region_detectors:
-        reg_det.driver.set = AsyncMock()
+        reg_det.controller.driver.set = AsyncMock()
 
         reg_det.controller.arm = AsyncMock()
         reg_det.controller.wait_for_idle = AsyncMock()
@@ -126,4 +126,4 @@ async def test_analyser_region_detector_trigger_sets_driver_with_region(
 
         reg_det.controller.arm.assert_awaited_once()
         reg_det.controller.wait_for_idle.assert_awaited_once()
-        reg_det.driver.set.assert_awaited_once_with(reg_det.region)
+        reg_det.controller.driver.set.assert_awaited_once_with(reg_det.region)
