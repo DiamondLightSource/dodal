@@ -9,9 +9,9 @@ from ophyd_async.core import init_devices
 from ophyd_async.testing import assert_reading, partial_reading
 
 from dodal.common.enums import EnabledDisabledUpper
-from dodal.devices.i09_shared import HardUndulator, UndulatorOrder, calculate_gap_U27
+from dodal.devices.i09_1_shared import HardUndulator, UndulatorOrder, calculate_gap_hu
 from dodal.testing.setup import patch_all_motors
-from tests.devices.test_data import TEST_HARD_UNDULATOR_LUT
+from tests.devices.i09_1_shared.test_data import TEST_HARD_UNDULATOR_LUT
 
 
 @pytest.fixture
@@ -31,7 +31,7 @@ async def hu(
         hu = HardUndulator(
             prefix="HU-01",
             id_gap_lookup_table_path=TEST_HARD_UNDULATOR_LUT,
-            calculate_gap_function=calculate_gap_U27,
+            calculate_gap_function=calculate_gap_hu,
             order=undulator_order,
         )
     patch_all_motors(hu)
@@ -62,7 +62,9 @@ async def test_check_energy_limits_throw_error(
     RE(mv(undulator_order, 5))
     with pytest.raises(
         ValueError,
-        match=re.escape("Energy 1.0keV is out of range for order 3: (2.4-4.3 keV) ttt"),
+        match=re.escape(
+            "Energy 3.0keV is out of range for order 5: (4.0-7.2 keV)\n Valid orders for this energy are: [1, 3]"
+        ),
     ):
         await hu.set(3.0)
 
@@ -83,7 +85,7 @@ async def test_move_order(
         await undulator_order.set(0)
 
 
-@patch("dodal.devices.i09_shared.hard_undulator.energy_distance_table")
+@patch("dodal.devices.i09_1_shared.hard_undulator.energy_distance_table")
 async def test_update_cached_lookup_table_fails(
     mock_table: MagicMock,
     hu: HardUndulator,

@@ -28,23 +28,34 @@ MAX_ENERGY_COLUMN = 4
 GAP_OFFSET_COLUMN = 7
 
 
-def calculate_gap_U27(
+def calculate_gap_hu(
     photon_energy_kev: float,
     look_up_table: dict[int, "np.ndarray"],
     order: int = 1,
     gap_offset: float = 0.0,
-    undulator_period: int = 27,
+    undulator_period_mm: int = 27,
 ) -> float:
     """
     Calculate the undulator gap required to produce a given energy at a given harmonic order.
     This algorithm was provided by the I09 beamline scientists.
+
+    Args:
+        photon_energy_kev (float): Requested photon energy in keV.
+        look_up_table (dict[int, np.ndarray]): Lookup table containing undulator and beamline parameters for each harmonic order.
+        order (int, optional): Harmonic order for which to calculate the gap. Defaults to 1.
+        gap_offset (float, optional): Additional gap offset to apply (in mm). Defaults to 0.0.
+        undulator_period_mm (int, optional): Undulator period in mm. Defaults to 27.
+
+    Returns:
+        float: Calculated undulator gap in millimeters.
     """
     magnet_blocks_per_period = 4
     magnet_block_height_mm = 16
 
     gamma = 1000 * look_up_table[order][RING_ENERGY_COLUMN] / ELECTRON_REST_ENERGY_MEV
     diffraction_param_sqr = (
-        4.959368e-6 * (order * gamma * gamma / (undulator_period * photon_energy_kev))
+        4.959368e-6
+        * (order * gamma * gamma / (undulator_period_mm * photon_energy_kev))
         - 2
     )
     if diffraction_param_sqr < 0:
@@ -54,16 +65,16 @@ def calculate_gap_U27(
         (
             2
             * 0.0934
-            * undulator_period
+            * undulator_period_mm
             * look_up_table[order][MAGNET_FIELD_COLUMN]
             * magnet_blocks_per_period
             / np.pi
         )
         * np.sin(np.pi / magnet_blocks_per_period)
-        * (1 - np.exp(-2 * np.pi * magnet_block_height_mm / undulator_period))
+        * (1 - np.exp(-2 * np.pi * magnet_block_height_mm / undulator_period_mm))
     )
     gap = (
-        (undulator_period / np.pi) * np.log(A / diffraction_param)
+        (undulator_period_mm / np.pi) * np.log(A / diffraction_param)
         + look_up_table[order][GAP_OFFSET_COLUMN]
         + gap_offset
     )
@@ -75,7 +86,18 @@ def calculate_gap_U27(
 
 
 class UndulatorOrder(StandardReadable, Locatable[int]):
-    def __init__(self, id_gap_lookup_table_path: str, name="") -> None:
+    """
+    Represents the order of an undulator, providing mechanisms to read, set, and validate the order value
+    against a lookup table loaded from a file.
+
+    """
+
+    def __init__(self, id_gap_lookup_table_path: str, name: str = "") -> None:
+        """
+        Args:
+            id_gap_lookup_table_path (str): Path to the lookup table file.
+            name: Name for device. Defaults to ""
+        """
         self.id_gap_lookup_table_path = id_gap_lookup_table_path
         with self.add_children_as_readables():
             self._order = soft_signal_rw(int, initial_value=3)
@@ -122,7 +144,8 @@ class HardUndulator(Undulator):
         poles: int | None = None,
         length: float | None = None,
     ) -> None:
-        """
+        """Constructor
+
         Args:
             prefix: PV prefix
             order: UndulatorOrder object to set/get undulator order
@@ -204,7 +227,7 @@ class HardUndulator(Undulator):
             look_up_table=self._cached_lookup_table,
             order=(await self.order().locate()).get("readback"),
             gap_offset=await self.gap_offset.get_value(),
-            undulator_period=await self.undulator_period.get_value(),
+            undulator_period_mm=await self.undulator_period.get_value(),
         )
 
     async def _update_cached_lookup_table(self):

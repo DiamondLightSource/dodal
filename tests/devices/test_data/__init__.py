@@ -6,10 +6,8 @@ TEST_BEAMLINE_UNDULATOR_TO_GAP_LUT = join(
     TEST_DATA_PATH, "test_beamline_undulator_to_gap_lookup_table.txt"
 )
 TEST_LUT_TXT = join(TEST_DATA_PATH, "test_lookup_table.txt")
-TEST_HARD_UNDULATOR_LUT = join(TEST_DATA_PATH, "test_hard_undulator_lookup_table.txt")
 __all__ = [
     "TEST_BEAMLINE_UNDULATOR_TO_GAP_LUT",
-    "TEST_HARD_UNDULATOR_LUT",
     "TEST_DATA_PATH",
     "TEST_LUT_TXT",
 ]
