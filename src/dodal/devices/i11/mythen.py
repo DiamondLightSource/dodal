@@ -110,7 +110,10 @@ class Mythen3Controller(ADBaseController):
 
     async def prepare(self, trigger_info: TriggerInfo) -> None:
         if (exposure := trigger_info.livetime) is not None:
-            await self._driver.acquire_time.set(exposure)
+            await asyncio.gather(
+                self._driver.acquire_time.set(exposure),
+                self._driver.acquire_period.set(exposure),
+            )
 
         if trigger_info.trigger is DetectorTrigger.INTERNAL:
             await self._driver.trigger_mode.set(Mythen3TriggerMode.INTERNAL)
