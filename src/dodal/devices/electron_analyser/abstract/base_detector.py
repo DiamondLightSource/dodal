@@ -61,10 +61,9 @@ class AbstractElectronAnalyserDetector(
     async def describe(self) -> dict[str, DataKey]:
         data = await self.controller.driver.describe()
         # Correct the shape for image
-        driver = self.controller.driver
-        energy_size = len(await driver.energy_axis.get_value())
-        angle_size = len(await driver.angle_axis.get_value())
-        prefix = driver.name + "-"
+        energy_size = len(await self.controller.driver.energy_axis.get_value())
+        angle_size = len(await self.controller.driver.angle_axis.get_value())
+        prefix = self.controller.driver.name + "-"
         data[prefix + "image"]["shape"] = [angle_size, energy_size]
         return data
 
