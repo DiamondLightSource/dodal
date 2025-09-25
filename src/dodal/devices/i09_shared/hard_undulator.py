@@ -176,8 +176,17 @@ class HardUndulator(Undulator):
             f"Min and max energies for order {_current_order} are {min_energy}keV and {max_energy}keV respectively"
         )
         if not (min_energy <= value <= max_energy):
+            valid_orders = [
+                int(i)
+                for i in self._cached_lookup_table.keys()
+                if (
+                    self._cached_lookup_table[i][MIN_ENERGY_COLUMN]
+                    <= value
+                    <= self._cached_lookup_table[i][MAX_ENERGY_COLUMN]
+                )
+            ]
             raise ValueError(
-                f"Energy {value}keV is out of range for order {_current_order}: ({min_energy}-{max_energy} keV)"
+                f"Energy {value}keV is out of range for order {_current_order}: ({min_energy}-{max_energy} keV)\n Valid orders for this energy are: {valid_orders}"
             )
 
     async def _get_gap_to_match_energy(self, energy_kev: float) -> float:

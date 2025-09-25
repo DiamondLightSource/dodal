@@ -59,12 +59,12 @@ async def test_check_energy_limits_throw_error(
     undulator_order: UndulatorOrder,
     RE: RunEngine,
 ):
-    RE(mv(undulator_order, 3))
+    RE(mv(undulator_order, 5))
     with pytest.raises(
         ValueError,
-        match=re.escape("Energy 1.0keV is out of range for order 3: (2.4-4.3 keV)"),
+        match=re.escape("Energy 1.0keV is out of range for order 3: (2.4-4.3 keV) ttt"),
     ):
-        await hu.set(1.0)
+        await hu.set(3.0)
 
 
 async def test_move_order(
