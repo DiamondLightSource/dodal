@@ -17,7 +17,7 @@ from dodal.log import LOGGER
 LUT_COMMENTS = ["#"]
 HU_SKIP_ROWS = 3
 
-# Electron rest energy in MeV
+# Physics constants
 ELECTRON_REST_ENERGY_MEV = 0.510999
 
 # Columns in the lookup table
