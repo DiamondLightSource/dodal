@@ -9,7 +9,7 @@ from ophyd_async.core import init_devices
 from ophyd_async.testing import assert_reading, partial_reading
 
 from dodal.common.enums import EnabledDisabledUpper
-from dodal.devices.i09_shared import HardUndulator, UndulatorOrder, calculate_gap_i09
+from dodal.devices.i09_shared import HardUndulator, UndulatorOrder, calculate_gap_U27
 from dodal.testing.setup import patch_all_motors
 from tests.devices.test_data import TEST_HARD_UNDULATOR_LUT
 
@@ -31,7 +31,7 @@ async def hu(
         hu = HardUndulator(
             prefix="HU-01",
             id_gap_lookup_table_path=TEST_HARD_UNDULATOR_LUT,
-            calculate_gap_function=calculate_gap_i09,
+            calculate_gap_function=calculate_gap_U27,
             order=undulator_order,
         )
     patch_all_motors(hu)

@@ -28,7 +28,7 @@ MAX_ENERGY_COLUMN = 4
 GAP_OFFSET_COLUMN = 7
 
 
-def calculate_gap_i09(
+def calculate_gap_U27(
     photon_energy_kev: float,
     look_up_table: dict[int, "np.ndarray"],
     order: int = 1,
@@ -39,31 +39,31 @@ def calculate_gap_i09(
     Calculate the undulator gap required to produce a given energy at a given harmonic order.
     This algorithm was provided by the I09 beamline scientists.
     """
-    M = 4
-    h = 16
+    magnet_blocks_per_period = 4
+    magnet_block_height_mm = 16
 
     gamma = 1000 * look_up_table[order][RING_ENERGY_COLUMN] / ELECTRON_REST_ENERGY_MEV
-    k_squared = (
+    diffraction_param_sqr = (
         4.959368e-6 * (order * gamma * gamma / (undulator_period * photon_energy_kev))
         - 2
     )
-    if k_squared < 0:
-        raise ValueError("k_squared must be positive!")
-    K = np.sqrt(k_squared)
+    if diffraction_param_sqr < 0:
+        raise ValueError("diffraction parameter squared must be positive!")
+    diffraction_param = np.sqrt(diffraction_param_sqr)
     A = (
         (
             2
             * 0.0934
             * undulator_period
             * look_up_table[order][MAGNET_FIELD_COLUMN]
-            * M
+            * magnet_blocks_per_period
             / np.pi
         )
-        * np.sin(np.pi / M)
-        * (1 - np.exp(-2 * np.pi * h / undulator_period))
+        * np.sin(np.pi / magnet_blocks_per_period)
+        * (1 - np.exp(-2 * np.pi * magnet_block_height_mm / undulator_period))
     )
     gap = (
-        (undulator_period / np.pi) * np.log(A / K)
+        (undulator_period / np.pi) * np.log(A / diffraction_param)
         + look_up_table[order][GAP_OFFSET_COLUMN]
         + gap_offset
     )
