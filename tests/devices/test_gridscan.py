@@ -414,7 +414,6 @@ async def test_i02_1_gridscan_has_2d_behaviour(
     assert await zebra_fast_grid_scan_2d.expected_images.get_value() == 20
 
 
-# TODO check all signals, parametrize for Panda
 async def test_gridscan_prepare_writes_values_and_checks_readback(
     grid_scan_devices_with_params,
 ):
@@ -450,7 +449,7 @@ async def test_gridscan_prepare_writes_values_and_checks_readback(
                     wait=True,
                 )
                 break
-            await asyncio.sleep(0.1)
+            await asyncio.sleep(0.01)
         set_mock_put_proceeds(signal, True)
 
     await status
