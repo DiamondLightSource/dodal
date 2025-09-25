@@ -40,6 +40,12 @@ class AbstractElectronAnalyserDetector(
         config_sigs: Sequence[SignalR] = (),
         name: str = "",
     ):
+        """
+        Args:
+            controller: Controller for arming detector for data acqusition.
+            config_sigs: Sequence of signals to be used as configuration.
+            name: Name of this device.
+        """
         self.controller = controller
         self._config_sigs = config_sigs
         super().__init__(name)
