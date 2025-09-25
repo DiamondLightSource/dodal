@@ -3,11 +3,12 @@ from unittest.mock import AsyncMock
 import pytest
 from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import SignalR, init_devices
+from ophyd_async.core import init_devices
 
 import dodal.devices.b07 as b07
 import dodal.devices.i09 as i09
 from dodal.devices.electron_analyser import (
+    EnergySource,
     GenericElectronAnalyserDetector,
 )
 from dodal.devices.electron_analyser.specs import SpecsDetector
@@ -24,14 +25,14 @@ from tests.devices.electron_analyser.helper_util import get_test_sequence
 )
 async def sim_detector(
     request: pytest.FixtureRequest,
-    energy_sources: dict[str, SignalR[float]],
+    single_energy_source: EnergySource,
     RE: RunEngine,
 ) -> GenericElectronAnalyserDetector:
     async with init_devices(mock=True):
         sim_detector = await create_detector(
             request.param,
             prefix="TEST:",
-            energy_sources=energy_sources,
+            energy_source=single_energy_source,
         )
     return sim_detector
 
