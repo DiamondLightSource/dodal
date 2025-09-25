@@ -101,9 +101,9 @@ async def event_loop_fuzzing():
     >>> import pytest
     >>> # repeat the test a number of times
     >>> @pytest.mark.parametrize("i", range(0, 100))
-    >>> async def my_unreliable_test(i, event_loop_fuzzing):
-    >>>     # Do some stuff in here
-    >>>     ...
+    ... async def my_unreliable_test(i, event_loop_fuzzing):
+    ...     # Do some stuff in here
+    ...     ...
     """
     FUZZ_PROBABILITY = 0.05
     FUZZ_DELAY_S = 0.05
