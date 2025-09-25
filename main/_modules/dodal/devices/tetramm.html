@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.tetramm &#8212; dodal 1.58.1.dev20+g060c2e4f0 documentation</title>
+    <title>dodal.devices.tetramm &#8212; dodal 1.58.1.dev21+g1ae801806 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=37c9c5a2"></script>
+    <script src="../../../_static/documentation_options.js?v=e7c0553a"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -468,6 +468,7 @@ window.addEventListener("load", () => mermaid.run());
     <span class="n">TriggerInfo</span><span class="p">,</span>
     <span class="n">set_and_wait_for_value</span><span class="p">,</span>
     <span class="n">soft_signal_r_and_setter</span><span class="p">,</span>
+    <span class="n">wait_for_value</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.adcore</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">ADHDFWriter</span><span class="p">,</span>
@@ -475,7 +476,7 @@ window.addEventListener("load", () => mermaid.run());
     <span class="n">NDFileHDFIO</span><span class="p">,</span>
     <span class="n">NDPluginBaseIO</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">PvSuffix</span><span class="p">,</span> <span class="n">epics_signal_r</span><span class="p">,</span> <span class="n">stop_busy_record</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">PvSuffix</span><span class="p">,</span> <span class="n">epics_signal_r</span>
 
 
 <div class="viewcode-block" id="TetrammRange">
@@ -549,6 +550,7 @@ window.addEventListener("load", () => mermaid.run());
     <span class="n">_supported_trigger_types</span> <span class="o">=</span> <span class="p">{</span>
         <span class="n">DetectorTrigger</span><span class="o">.</span><span class="n">EDGE_TRIGGER</span><span class="p">:</span> <span class="n">TetrammTrigger</span><span class="o">.</span><span class="n">EXT_TRIGGER</span><span class="p">,</span>
         <span class="n">DetectorTrigger</span><span class="o">.</span><span class="n">CONSTANT_GATE</span><span class="p">:</span> <span class="n">TetrammTrigger</span><span class="o">.</span><span class="n">EXT_TRIGGER</span><span class="p">,</span>
+        <span class="n">DetectorTrigger</span><span class="o">.</span><span class="n">VARIABLE_GATE</span><span class="p">:</span> <span class="n">TetrammTrigger</span><span class="o">.</span><span class="n">EXT_TRIGGER</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;&quot;On the TetrAMM ASCII mode requires a minimum value of ValuesPerRead of 500,</span>
 <span class="sd">    [...] binary mode the minimum value of ValuesPerRead is 5.&quot;</span>
@@ -558,11 +560,9 @@ window.addEventListener("load", () => mermaid.run());
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;The TetrAMM always digitizes at 100 kHz&quot;&quot;&quot;</span>
     <span class="n">_base_sample_rate</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100_000</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">driver</span><span class="p">:</span> <span class="n">TetrammDriver</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="p">:</span> <span class="n">TetrammDriver</span><span class="p">,</span> <span class="n">file_io</span><span class="p">:</span> <span class="n">NDFileHDFIO</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">driver</span> <span class="o">=</span> <span class="n">driver</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_file_io</span> <span class="o">=</span> <span class="n">file_io</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_arm_status</span><span class="p">:</span> <span class="n">AsyncStatus</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">get_deadtime</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exposure</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
@@ -579,13 +579,19 @@ window.addEventListener("load", () => mermaid.run());
         <span class="k">if</span> <span class="n">trigger_info</span><span class="o">.</span><span class="n">livetime</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> requires that livetime is set&quot;</span><span class="p">)</span>
 
+        <span class="n">current_trig_status</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">trigger_mode</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">current_trig_status</span> <span class="o">==</span> <span class="n">TetrammTrigger</span><span class="o">.</span><span class="n">FREE_RUN</span><span class="p">:</span>  <span class="c1"># if freerun turn off first</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">disarm</span><span class="p">()</span>
+
         <span class="c1"># trigger mode must be set first and on its own!</span>
         <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">trigger_mode</span><span class="o">.</span><span class="n">set</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_supported_trigger_types</span><span class="p">[</span><span class="n">trigger_info</span><span class="o">.</span><span class="n">trigger</span><span class="p">]</span>
         <span class="p">)</span>
+
         <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">averaging_time</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">trigger_info</span><span class="o">.</span><span class="n">livetime</span><span class="p">),</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">set_exposure</span><span class="p">(</span><span class="n">trigger_info</span><span class="o">.</span><span class="n">livetime</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_file_io</span><span class="o">.</span><span class="n">num_capture</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">trigger_info</span><span class="o">.</span><span class="n">total_number_of_exposures</span><span class="p">),</span>
         <span class="p">)</span>
 
         <span class="c1"># raise an error if asked to trigger faster than the max.</span>
@@ -605,14 +611,18 @@ window.addEventListener("load", () => mermaid.run());
         <span class="bp">self</span><span class="o">.</span><span class="n">_arm_status</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_acquiring_driver_and_ensure_status</span><span class="p">()</span>
 
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">wait_for_idle</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_arm_status</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_arm_status</span><span class="o">.</span><span class="n">done</span><span class="p">:</span>
-            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_arm_status</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_arm_status</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="c1"># tetramm never goes idle really, actually it is always acquiring</span>
+        <span class="c1"># so need to wait for the capture to finish instead</span>
+        <span class="k">await</span> <span class="n">wait_for_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_file_io</span><span class="o">.</span><span class="n">acquire</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">unstage</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">disarm</span><span class="p">()</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file_io</span><span class="o">.</span><span class="n">acquire</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
 
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">disarm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># We can&#39;t use caput callback as we already used it in arm() and we can&#39;t have</span>
         <span class="c1"># 2 or they will deadlock</span>
-        <span class="k">await</span> <span class="n">stop_busy_record</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">acquire</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">await</span> <span class="n">set_and_wait_for_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">acquire</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
 <div class="viewcode-block" id="TetrammController.set_exposure">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.tetramm.TetrammController.html#dodal.devices.tetramm.TetrammController.set_exposure">[docs]</a>
@@ -638,7 +648,9 @@ window.addEventListener("load", () => mermaid.run());
                 <span class="s2">&quot;Tetramm exposure time must be at least &quot;</span>
                 <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">minimum_samples</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">sample_time</span><span class="si">}</span><span class="s2">s, asked to set it to </span><span class="si">{</span><span class="n">exposure</span><span class="si">}</span><span class="s2">s&quot;</span>
             <span class="p">)</span>
-        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">averaging_time</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">samples_per_reading</span> <span class="o">*</span> <span class="n">sample_time</span><span class="p">)</span></div>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">averaging_time</span><span class="o">.</span><span class="n">set</span><span class="p">(</span>
+            <span class="n">samples_per_reading</span> <span class="o">*</span> <span class="n">sample_time</span>
+        <span class="p">)</span>  <span class="c1"># correct</span></div>
 
 
 <div class="viewcode-block" id="TetrammController.start_acquiring_driver_and_ensure_status">
@@ -683,10 +695,7 @@ window.addEventListener("load", () => mermaid.run());
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">shape</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
         <span class="k">return</span> <span class="p">(</span>
             <span class="nb">int</span><span class="p">(</span><span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_driver</span><span class="o">.</span><span class="n">num_channels</span><span class="o">.</span><span class="n">get_value</span><span class="p">()),</span>
-            <span class="nb">int</span><span class="p">(</span>
-                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_driver</span><span class="o">.</span><span class="n">averaging_time</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
-                <span class="o">/</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_driver</span><span class="o">.</span><span class="n">sample_time</span><span class="o">.</span><span class="n">get_value</span><span class="p">(),</span>
-            <span class="p">),</span>
+            <span class="nb">int</span><span class="p">(</span><span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_driver</span><span class="o">.</span><span class="n">to_average</span><span class="o">.</span><span class="n">get_value</span><span class="p">()),</span>
         <span class="p">)</span></div>
 
 
@@ -707,7 +716,7 @@ window.addEventListener("load", () => mermaid.run());
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">driver</span> <span class="o">=</span> <span class="n">TetrammDriver</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="n">drv_suffix</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">file_io</span> <span class="o">=</span> <span class="n">NDFileHDFIO</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="n">fileio_suffix</span><span class="p">)</span>
-        <span class="n">controller</span> <span class="o">=</span> <span class="n">TetrammController</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="p">)</span>
+        <span class="n">controller</span> <span class="o">=</span> <span class="n">TetrammController</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_io</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">current1</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;Cur1:MeanValue_RBV&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">current2</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;Cur2:MeanValue_RBV&quot;</span><span class="p">)</span>

@@ -31,6 +31,9 @@ dodal.devices.tetramm.TetrammController
       ~TetrammController.start_acquiring_driver_and_ensure_status
       
       
+      ~TetrammController.unstage
+      
+      
       ~TetrammController.wait_for_idle
       
    
