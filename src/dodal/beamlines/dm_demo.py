@@ -1,5 +1,6 @@
 import inspect
 import typing
+import warnings
 from collections.abc import Callable, Iterable
 from functools import wraps
 from types import NoneType
@@ -27,6 +28,13 @@ Args = ParamSpec("Args")
 
 
 class DeviceFactory(Generic[Args, T]):
+    """
+    Wrapper around a device factory (any function returning a device) that holds
+    a reference to a device manager that can provide dependencies, along with
+    default connection information for how the created device should be
+    connected.
+    """
+
     factory: Callable[Args, T]
     use_factory_name: bool
     timeout: float
@@ -45,19 +53,18 @@ class DeviceFactory(Generic[Args, T]):
 
     @property
     def name(self) -> str:
+        """Name of the underlying factory function"""
         return self.factory.__name__
 
     @property
     def dependencies(self) -> set[str]:
+        """Names of all parameters"""
         sig = inspect.signature(self.factory)
-        return {
-            para.name
-            for para in sig.parameters.values()
-            # if para.default is inspect.Parameter.empty
-        }
+        return {para.name for para in sig.parameters.values()}
 
     @property
     def optional_dependencies(self) -> set[str]:
+        """Names of optional dependencies"""
         sig = inspect.signature(self.factory)
         return {
             para.name
@@ -67,6 +74,10 @@ class DeviceFactory(Generic[Args, T]):
 
     @property
     def skip(self) -> bool:
+        """
+        Whether this device should be skipped as part of build_all - it will
+        still be built if a required device depends on it
+        """
         return self._skip() if callable(self._skip) else self._skip
 
     def build(
@@ -77,6 +88,7 @@ class DeviceFactory(Generic[Args, T]):
         timeout: float | None = None,
         **fixtures,
     ) -> T:
+        """Build this device, building any dependencies first"""
         devices, errors = self._manager.build_devices(self, fixtures=fixtures)
         if errors:
             raise errors[self.name]
@@ -84,7 +96,7 @@ class DeviceFactory(Generic[Args, T]):
             return devices[self.name]
 
     def __call__(self, *args, **kwargs) -> T:
-        return self.factory(*args, **kwargs)  # type: ignore
+        return self.factory(*args, **kwargs)
 
     def __repr__(self) -> str:
         target = self.factory.__annotations__.get("return")
@@ -157,15 +169,20 @@ class DeviceManager:
         dependencies are built first and passed to later factories as required.
         """
         # TODO: Should we check all the factories are our factories?
-        # print("building: ", factories)
         fixtures = fixtures or {}
+        if common := fixtures.keys() & {f.name for f in factories}:
+            warnings.warn(
+                f"Factories ({common}) will be overridden by fixtures", stacklevel=1
+            )
+            factories = tuple(f for f in factories if f.name not in common)
+        if unknown := {f for f in factories if f not in self._factories.values()}:
+            raise ValueError(f"Factories ({unknown}) are unknown to this manager")
         build_list = self._expand_dependencies(factories, fixtures)
         order = self._build_order(
             {dep: self._factories[dep] for dep in build_list}, fixtures=fixtures
         )
         built = {}
         errors = {}
-        # print(order)
         for device in order:
             deps = self[device].dependencies
             if dep_errs := deps & errors.keys():
@@ -237,7 +254,6 @@ class DeviceManager:
             buffer = {}
             for name, factory in pending.items():
                 buildable_deps = factory.dependencies & factories.keys()
-                # print("buildable", name, buildable_deps, available)
                 # We should only have been called with a resolvable set of things to build
                 # but just to double check
                 assert buildable_deps.issubset(
@@ -309,15 +325,16 @@ def unknown():
     return "unknown device"
 
 
-# @devices.factory
-# def circ_1(circ_2): ...
-
-
-# @devices.factory
-# def circ_2(circ_1): ...
-
-
 others = DeviceManager()
+
+
+@others.factory
+def circ_1(circ_2): ...
+
+
+@others.factory
+def circ_2(circ_1): ...
+
 
 if __name__ == "__main__":
     # for name, factory in devices._factories.items():
@@ -366,3 +383,11 @@ if __name__ == "__main__":
     )
     print(valid)
     print(errs)
+
+    valid, errs = devices.build_devices(
+        base_x, base, optional, fixtures={"base_x": "19", "path_provider": "nt_pp"}
+    )
+    print(valid)
+    print(errs)
+
+    # devices.build_devices(circ_1, circ_2)
