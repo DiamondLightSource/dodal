@@ -104,7 +104,7 @@ async def test_get_gap_for_energy_fails(
     hu._check_energy_limits = AsyncMock()
     with pytest.raises(
         ValueError,
-        match=re.escape("k_squared must be positive"),
+        match=re.escape("diffraction parameter squared must be positive"),
     ):
         await hu.set(30.0)
 
