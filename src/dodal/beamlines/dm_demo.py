@@ -1,7 +1,7 @@
 import inspect
 import typing
 from collections.abc import Callable, Iterable
-from functools import cache, wraps
+from functools import wraps
 from types import NoneType
 from typing import Annotated, Any, Generic, ParamSpec, TypeVar
 
@@ -35,7 +35,7 @@ class DeviceFactory(Generic[Args, T]):
     _manager: "DeviceManager"
 
     def __init__(self, factory, use_factory_name, timeout, mock, skip, manager):
-        self.factory = cache(factory)  # type: ignore
+        self.factory = factory
         self.use_factory_name = use_factory_name
         self.timeout = timeout
         self.mock = mock
@@ -48,14 +48,21 @@ class DeviceFactory(Generic[Args, T]):
         return self.factory.__name__
 
     @property
-    def dependencies(self) -> dict[str, type | None]:
+    def dependencies(self) -> set[str]:
         sig = inspect.signature(self.factory)
         return {
-            para.name: para.annotation
-            if para.annotation is not inspect.Parameter.empty
-            else None
+            para.name
             for para in sig.parameters.values()
             # if para.default is inspect.Parameter.empty
+        }
+
+    @property
+    def optional_dependencies(self) -> set[str]:
+        sig = inspect.signature(self.factory)
+        return {
+            para.name
+            for para in sig.parameters.values()
+            if para.default is not inspect.Parameter.empty
         }
 
     @property
@@ -82,7 +89,8 @@ class DeviceFactory(Generic[Args, T]):
     def __repr__(self) -> str:
         target = self.factory.__annotations__.get("return")
         target = target.__name__ if target else "???"
-        return f"<{self.name}: DeviceFactory ({', '.join(self.dependencies.keys())}) -> {target}>"
+        params = inspect.signature(self.factory)
+        return f"<{self.name}: DeviceFactory ({params}) -> {target}>"
 
 
 class DeviceManager:
@@ -129,8 +137,14 @@ class DeviceManager:
         return decorator(func)
 
     def build_all(self, fixtures: dict[str, Any] | None = None):
+        # exclude all skipped devices and those that have been overridden by fixtures
         return self.build_devices(
-            *(f for f in self._factories.values() if not f.skip), fixtures=fixtures
+            *(
+                f
+                for f in self._factories.values()
+                if not f.skip and f.name not in fixtures
+            ),
+            fixtures=fixtures,
         )
 
     def build_devices(
@@ -143,7 +157,7 @@ class DeviceManager:
         dependencies are built first and passed to later factories as required.
         """
         # TODO: Should we check all the factories are our factories?
-        print("building: ", factories)
+        # print("building: ", factories)
         fixtures = fixtures or {}
         build_list = self._expand_dependencies(factories, fixtures)
         order = self._build_order(
@@ -151,12 +165,19 @@ class DeviceManager:
         )
         built = {}
         errors = {}
+        # print(order)
         for device in order:
             deps = self[device].dependencies
-            if dep_errs := deps.keys() & errors.keys():
+            if dep_errs := deps & errors.keys():
                 errors[device] = ValueError(f"Errors building dependencies: {dep_errs}")
             else:
-                params = {dep: built.get(dep) or fixtures[dep] for dep in deps}
+                # If we've made it this far, any devices that aren't available must have default
+                # values so ignore anything that's missing
+                params = {
+                    dep: built.get(dep) or fixtures[dep]
+                    for dep in deps
+                    if dep in built.keys() | fixtures.keys()
+                }
                 try:
                     built[device] = self[device](**params)
                 except Exception as e:
@@ -186,12 +207,13 @@ class DeviceManager:
         while factories:
             fact = factories.pop()
             dependencies.add(fact.name)
+            options = fact.optional_dependencies
             for dep in fact.dependencies:
                 if dep not in dependencies and dep not in available_fixtures:
                     if dep in self._factories:
                         dependencies.add(dep)
                         factories.append(self[dep])
-                    else:
+                    elif dep not in options:
                         raise ValueError(
                             f"Missing fixture or factory for {dep}",
                         )
@@ -214,15 +236,23 @@ class DeviceManager:
         while pending:
             buffer = {}
             for name, factory in pending.items():
-                # if factory.skip:
-                #     continue
-                if all(dep in available for dep in factory.dependencies):
+                buildable_deps = factory.dependencies & factories.keys()
+                # print("buildable", name, buildable_deps, available)
+                # We should only have been called with a resolvable set of things to build
+                # but just to double check
+                assert buildable_deps.issubset(
+                    factory.dependencies - factory.optional_dependencies
+                )
+                if all(dep in available for dep in buildable_deps):
                     order.append(name)
                     available.add(name)
                 else:
                     buffer[name] = factory
             if len(pending) == len(buffer):
-                raise ValueError(f"Cannot fulfil requirements for {pending}")
+                # This should only be reachable if we have circular dependencies
+                raise ValueError(
+                    f"Cannot determine build order - possibly circular dependencies ({', '.join(pending.keys())})"
+                )
             buffer, pending = [], buffer
 
         return order
@@ -249,11 +279,11 @@ def det(path_provider: PathProvider) -> SimDetector:
     )
 
 
-@devices.factory
+@devices.factory(mock=True)
 def base(base_x, base_y: motors.Motor) -> Motor:
     # print(base_x)
     # print(base_y)
-    return base_x + base_y
+    return f"{base_x} - {base_y}"
 
 
 @devices.factory
@@ -269,14 +299,22 @@ def base_y(path_provider) -> motors.Motor:
 
 
 @devices.factory
-def optional(base_z=42):
-    return base_z
+def optional(base_x, base_z=42):
+    return (base_x, base_z)
 
 
 @devices.factory
 def unknown():
     # raise ValueError("Unknown error")
     return "unknown device"
+
+
+# @devices.factory
+# def circ_1(circ_2): ...
+
+
+# @devices.factory
+# def circ_2(circ_1): ...
 
 
 others = DeviceManager()
@@ -294,26 +332,37 @@ if __name__ == "__main__":
     # print(devices._expand_dependencies(list(devices._factories.values())))
     # print(devices._build_order({"base": devices["base"]}))
 
-    print(
-        "build_all",
-        devices.build_all({"path_provider": "all_nt", "base_y": "other base_y"}),
+    # print(
+    #     "build_all",
+    #     devices.build_all({"path_provider": "all_nt", "base_y": "other base_y"}),
+    # )
+    # print(
+    #     "build_some",
+    #     devices.build_devices(
+    #         base, det, stage, unknown, fixtures={"path_provider": "numtracker"}
+    #     ),
+    # )
+
+    # print("base", optional)
+    # print("base_y", base_y)
+    # print("b1", b1 := base.build(path_provider="num_track"))
+    # print("b2", b2 := base(base_x="base_x motor", base_y="base_y motor"))
+    # print("b1 is b2", b1 is b2)
+
+    # print("unknown()", unknown())
+    # print("unknown.build()", unknown.build())
+
+    # print("circular", circ_1.build())
+
+    # print("optional deps", optional.dependencies)
+    # print("optional optional deps", optional.optional_dependencies)
+    # print("optional build", optional.build())
+    # print("optional with override", optional.build(base_z=14))
+    # print("optional without override", optional(17))
+    # print("optional override required", optional.build(base_x=19))
+
+    valid, errs = devices.build_all(
+        fixtures={"base_x": 19, "path_provider": "numtrack"}
     )
-    print(
-        "build_some",
-        devices.build_devices(
-            base, det, stage, unknown, fixtures={"path_provider": "numtracker"}
-        ),
-    )
-
-    print("base", base)
-    print("base_y", base_y)
-    print("b1", b1 := base.build(path_provider="num_track"))
-    print("b2", b2 := base(base_x="base_x motor", base_y="base_y motor"))
-    print("b1 is b2", b1 is b2)
-
-    print("unknown()", unknown())
-    print("unknown.build()", unknown.build())
-
-    print("optional build", optional.build())
-    print("optional with override", optional.build(base_z=14))
-    print("optional without override", optional())
+    print(valid)
+    print(errs)
