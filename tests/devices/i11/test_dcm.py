@@ -41,9 +41,9 @@ def test_count_dcm(
     ],
 )
 async def test_wavelength(
-    dcm: DCM,
     energy: float,
     wavelength: float,
+    dcm: DCM,
 ):
     set_mock_value(dcm.energy_in_kev.user_readback, energy)
     reading = await dcm.read()
