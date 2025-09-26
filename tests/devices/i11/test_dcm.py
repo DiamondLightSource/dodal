@@ -35,16 +35,15 @@ def test_count_dcm(
 @pytest.mark.parametrize(
     "energy,wavelength,units",
     [
-        (0.0, 0.0, "kev"),
-        (1.0, 12.3984, "kev"),
-        (2.0, 6.1992, "kev"),
+        (0.0, 0.0),
+        (1.0, 12.3984),
+        (2.0, 6.1992),
     ],
 )
 async def test_wavelength(
     dcm: DCM,
     energy: float,
     wavelength: float,
-    units: str,
 ):
     set_mock_value(dcm.energy_in_kev.user_readback, energy)
     reading = await dcm.read()
