@@ -49,6 +49,7 @@ async def scintillator_and_ap_sg(
 @pytest.mark.parametrize(
     "y, z, expected_position",
     [
+        (100.855, 101.5115, InOut.IN),
         (-0.02, 0.1, InOut.OUT),
         (0.1, 0.1, InOut.UNKNOWN),
         (10.2, 15.6, InOut.UNKNOWN),
@@ -87,6 +88,11 @@ async def test_given_aperture_scatterguard_parked_when_set_to_out_position_then_
     assert await scintillator.y_mm.user_setpoint.get_value() == -0.02
     assert await scintillator.z_mm.user_setpoint.get_value() == 0.1
 
+    await scintillator.selected_pos.set(InOut.IN)
+
+    assert await scintillator.y_mm.user_setpoint.get_value() == -100.855
+    assert await scintillator.z_mm.user_setpoint.get_value() == 101.5115
+
 
 async def test_given_aperture_scatterguard_not_parked_when_set_to_out_position_then_exception_raised(
     scintillator_and_ap_sg: tuple[Scintillator, ApertureScatterguard],
@@ -95,9 +101,10 @@ async def test_given_aperture_scatterguard_not_parked_when_set_to_out_position_t
         if position != ApertureValue.PARKED:
             scintillator, ap_sg = scintillator_and_ap_sg
             ap_sg.return_value.selected_aperture.get_value.return_value = position  # type: ignore
-
             with pytest.raises(ValueError):
                 await scintillator.selected_pos.set(InOut.OUT)
+            with pytest.raises(ValueError):
+                await scintillator.selected_pos.set(InOut.IN)
 
 
 async def test_given_scintillator_already_out_when_moved_out_then_does_nothing(
