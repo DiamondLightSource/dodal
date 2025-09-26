@@ -1,4 +1,6 @@
+import importlib
 import os
+import warnings
 from collections.abc import Mapping
 from pathlib import Path
 
@@ -8,6 +10,7 @@ from ophyd_async.core import NotConnectedError, StaticPathProvider, UUIDFilename
 from ophyd_async.plan_stubs import ensure_connected
 
 from dodal.beamlines import all_beamline_names, module_name_for_beamline
+from dodal.beamlines.dm_demo import DeviceManager
 from dodal.common.beamlines.beamline_utils import set_path_provider
 from dodal.utils import AnyDevice, filter_ophyd_devices, make_all_devices
 
@@ -51,7 +54,6 @@ def connect(beamline: str, all: bool, sim_backend: bool) -> None:
 
     # We need to make a fake path provider for any detectors that need one,
     # it is not used in dodal connect
-    _spoof_path_provider()
 
     module_name = module_name_for_beamline(beamline)
     full_module_path = f"dodal.beamlines.{module_name}"
@@ -62,15 +64,33 @@ def connect(beamline: str, all: bool, sim_backend: bool) -> None:
 
     print(f"Attempting connection to {beamline} (using {full_module_path})")
 
-    # Force all devices to be lazy (don't connect to PVs on instantiation) and do
-    # connection as an extra step, because the alternatives is handling the fact
-    # that only some devices may be lazy.
-    devices, instance_exceptions = make_all_devices(
-        full_module_path,
-        include_skipped=all,
-        fake_with_ophyd_sim=sim_backend,
-        wait_for_connection=False,
-    )
+    mod = importlib.import_module(full_module_path)
+
+    # Don't connect devices as they're built and do connection as an extra step,
+    # because the alternatives is handling the fact that only some devices may
+    # be lazy.
+    if (manager := getattr(mod, "devices", None)) and isinstance(
+        manager, DeviceManager
+    ):
+        path_provider = StaticPathProvider(UUIDFilenameProvider(), Path("/tmp"))
+        devices, instance_exceptions = manager.build_all(
+            mock=sim_backend,  # only used by v1 devices
+            fixtures={"path_provider": path_provider},
+        )
+    else:
+        # Fall back to the previous approach
+        warnings.warn(
+            "Using deprecated @device_factory approach - consider using DeviceManager",
+            DeprecationWarning,
+            stacklevel=1,
+        )
+        _spoof_path_provider()
+        devices, instance_exceptions = make_all_devices(
+            full_module_path,
+            include_skipped=all,
+            fake_with_ophyd_sim=sim_backend,
+            wait_for_connection=False,
+        )
     devices, connect_exceptions = _connect_devices(run_engine, devices, sim_backend)
 
     # Inform user of successful connections
