@@ -10,6 +10,8 @@ from dodal.devices.motors import XThetaStage
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix
 
+from dodal.beamlines.dm_demo import DeviceManager
+
 BL = "adsim"
 PREFIX = BeamlinePrefix("t01")
 set_log_beamline(BL)
@@ -63,19 +65,21 @@ run_engine(count([d], num=10))
 
 """
 
+devices = DeviceManager()
 
-@device_factory()
+
+@devices.factory(timeout=2)
 def stage() -> XThetaStage:
     return XThetaStage(
         f"{PREFIX.beamline_prefix}-MO-SIMC-01:", x_infix="M1", theta_infix="M2"
     )
 
 
-@device_factory()
-def det() -> SimDetector:
+@devices.factory(timeout=2)
+def det(path_provider) -> SimDetector:
     return SimDetector(
         f"{PREFIX.beamline_prefix}-DI-CAM-01:",
-        path_provider=get_path_provider(),
+        path_provider=path_provider,
         drv_suffix=DET_SUFFIX,
         fileio_suffix=HDF5_SUFFIX,
     )
