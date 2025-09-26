@@ -1,5 +1,6 @@
 import json
 import pickle
+from dataclasses import dataclass
 from enum import Enum
 from typing import TypedDict
 
@@ -21,9 +22,6 @@ from dodal.log import LOGGER
 
 NO_MURKO_RESULT = (-1, -1)
 
-MurkoResult = dict
-FullMurkoResults = dict[str, list[MurkoResult]]
-
 
 class MurkoMetadata(TypedDict):
     zoom_percentage: float
@@ -40,6 +38,14 @@ class Coord(Enum):
     x = 0
     y = 1
     z = 2
+
+
+@dataclass
+class MurkoResult:
+    x_dist_mm: float
+    y_dist_mm: float
+    omega: float
+    uuid: str
 
 
 class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
@@ -59,6 +65,8 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
     """
 
     TIMEOUT_S = 2
+    PERCENTAGE_TO_USE = 25
+    NUMBER_OF_WRONG_RESULTS_TO_LOG = 5
 
     def __init__(
         self,
@@ -77,9 +85,7 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
         self._last_omega = 0
         self.sample_id = soft_signal_rw(str)  # Should get from redis
         self.stop_angle = stop_angle
-        self.x_dists_mm = []
-        self.y_dists_mm = []
-        self.omegas = []
+        self.results: list[MurkoResult] = []
 
         with self.add_children_as_readables():
             # Diffs from current x/y/z
@@ -110,15 +116,19 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
                 break
             await self.process_batch(message, sample_id)
 
-        for i in range(len(self.omegas)):
-            LOGGER.debug(
-                f"omega: {round(self.omegas[i], 2)}, x: {round(self.x_dists_mm[i], 2)}, y: {round(self.y_dists_mm[i], 2)}"
-            )
+        for result in self.results:
+            LOGGER.debug(result)
 
-        LOGGER.info(f"Using average of x beam distances: {self.x_dists_mm}")
-        avg_x = float(np.mean(self.x_dists_mm))
-        LOGGER.info(f"Finding least square y and z from y distances: {self.y_dists_mm}")
-        best_y, best_z = get_yz_least_squares(self.y_dists_mm, self.omegas)
+        self.filter_outliers()
+
+        x_dists_mm = [result.x_dist_mm for result in self.results]
+        y_dists_mm = [result.y_dist_mm for result in self.results]
+        omegas = [result.omega for result in self.results]
+
+        LOGGER.info(f"Using average of x beam distances: {x_dists_mm}")
+        avg_x = float(np.mean(x_dists_mm))
+        LOGGER.info(f"Finding least square y and z from y distances: {y_dists_mm}")
+        best_y, best_z = get_yz_least_squares(y_dists_mm, omegas)
         # x, y, z are relative to beam centre. Need to move negative these values to get centred.
         self._x_mm_setter(-avg_x)
         self._y_mm_setter(-best_y)
@@ -163,14 +173,36 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
                 centre_px[0],
                 centre_px[1],
             )
-            self.x_dists_mm.append(
-                beam_dist_px[0] * metadata["microns_per_x_pixel"] / 1000
+            self.results.append(
+                MurkoResult(
+                    x_dist_mm=beam_dist_px[0] * metadata["microns_per_x_pixel"] / 1000,
+                    y_dist_mm=beam_dist_px[1] * metadata["microns_per_y_pixel"] / 1000,
+                    omega=omega,
+                    uuid=metadata["uuid"],
+                )
             )
-            self.y_dists_mm.append(
-                beam_dist_px[1] * metadata["microns_per_y_pixel"] / 1000
-            )
-            self.omegas.append(omega)
             self._last_omega = omega
+
+    def filter_outliers(self):
+        """Whilst murko is not fully trained it often gives us poor results.
+        When it is wrong it usually picks up the base of the pin, rather than the tip,
+        meaning that by keeping only a percentage of the results with the smallest X we
+        remove many of the outliers.
+        """
+        LOGGER.info(f"Number of results before filtering: {len(self.results)}")
+        sorted_results = sorted(self.results, key=lambda item: item.x_dist_mm)
+
+        worst_results = [
+            r.uuid for r in sorted_results[-self.NUMBER_OF_WRONG_RESULTS_TO_LOG :]
+        ]
+
+        LOGGER.info(
+            f"Worst {self.NUMBER_OF_WRONG_RESULTS_TO_LOG} murko results were {worst_results}"
+        )
+        cutoff = max(1, int(len(sorted_results) * self.PERCENTAGE_TO_USE / 100))
+        smallest_x = sorted_results[:cutoff]
+        self.results = smallest_x
+        LOGGER.info(f"Number of results after filtering: {len(self.results)}")
 
 
 def get_yz_least_squares(vertical_dists: list, omegas: list) -> tuple[float, float]:

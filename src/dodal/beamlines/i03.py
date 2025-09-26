@@ -25,7 +25,7 @@ from dodal.devices.cryostream import CryoStream
 from dodal.devices.detector.detector_motion import DetectorMotion
 from dodal.devices.diamond_filter import DiamondFilter, I03Filters
 from dodal.devices.eiger import EigerDetector
-from dodal.devices.fast_grid_scan import PandAFastGridScan, ZebraFastGridScan
+from dodal.devices.fast_grid_scan import PandAFastGridScan, ZebraFastGridScanThreeD
 from dodal.devices.fluorescence_detector_motion import FluorescenceDetector
 from dodal.devices.flux import Flux
 from dodal.devices.focusing_mirror import FocusingMirrorWithStripes, MirrorVoltages
@@ -191,11 +191,13 @@ def fastcs_eiger() -> FastEiger:
 
 
 @device_factory()
-def zebra_fast_grid_scan() -> ZebraFastGridScan:
+def zebra_fast_grid_scan() -> ZebraFastGridScanThreeD:
     """Get the i03 zebra_fast_grid_scan device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return ZebraFastGridScan(prefix=f"{PREFIX.beamline_prefix}-MO-SGON-01:")
+    return ZebraFastGridScanThreeD(
+        prefix=f"{PREFIX.beamline_prefix}-MO-SGON-01:",
+    )
 
 
 @device_factory()

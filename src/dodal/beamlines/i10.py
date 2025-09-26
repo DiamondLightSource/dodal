@@ -16,6 +16,9 @@ from dodal.devices.i10.rasor.rasor_motors import (
 )
 from dodal.devices.i10.rasor.rasor_scaler_cards import RasorScalerCard1
 from dodal.devices.motors import XYStage, XYZStage
+from dodal.devices.temperture_controller import (
+    Lakeshore340,
+)
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
@@ -87,6 +90,13 @@ def pa_stage() -> PaStage:
 @device_factory()
 def sample_stage() -> XYZStage:
     return XYZStage(prefix="ME01D-MO-CRYO-01:")
+
+
+@device_factory()
+def rasor_temperature_controller() -> Lakeshore340:
+    return Lakeshore340(
+        prefix="ME01D-EA-TCTRL-01:",
+    )
 
 
 @device_factory()
