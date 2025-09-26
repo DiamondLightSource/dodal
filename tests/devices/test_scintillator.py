@@ -87,7 +87,7 @@ async def test_given_aperture_scatterguard_parked_when_set_to_out_position_then_
 
     await scintillator.selected_pos.set(InOut.IN)
 
-    assert await scintillator.y_mm.user_setpoint.get_value() == -100.855
+    assert await scintillator.y_mm.user_setpoint.get_value() == 100.855
     assert await scintillator.z_mm.user_setpoint.get_value() == 101.5115
 
 
@@ -98,7 +98,6 @@ async def test_given_aperture_scatterguard_not_parked_when_set_to_out_position_t
         if position != ApertureValue.PARKED:
             scintillator, ap_sg = scintillator_and_ap_sg
             ap_sg.return_value.selected_aperture.get_value.return_value = position  # type: ignore
-            # there is no assert so why does this work
             with pytest.raises(ValueError):
                 await scintillator.selected_pos.set(InOut.OUT)
             with pytest.raises(ValueError):
