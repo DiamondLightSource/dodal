@@ -4,7 +4,7 @@ from unittest.mock import MagicMock
 
 import pytest
 from ophyd_async.core import init_devices
-from ophyd_async.testing import get_mock_put
+from ophyd_async.testing import assert_value, get_mock_put
 
 from dodal.common.beamlines.beamline_parameters import GDABeamlineParameters
 from dodal.devices.aperturescatterguard import ApertureScatterguard, ApertureValue
@@ -85,13 +85,20 @@ async def test_given_aperture_scatterguard_parked_when_set_to_out_position_then_
 
     await scintillator.selected_pos.set(InOut.OUT)
 
-    assert await scintillator.y_mm.user_setpoint.get_value() == -0.02
-    assert await scintillator.z_mm.user_setpoint.get_value() == 0.1
+    await assert_value(scintillator.y_mm.user_setpoint, -0.02)
+    await assert_value(scintillator.z_mm.user_setpoint, -0.1)
+
+
+async def test_given_aperture_scatterguard_parked_when_set_to_in_position_then_returns_expected(
+    scintillator_and_ap_sg: tuple[Scintillator, ApertureScatterguard],
+):
+    scintillator, ap_sg = scintillator_and_ap_sg
+    ap_sg.return_value.selected_aperture.get_value.return_value = ApertureValue.PARKED  # type: ignore
 
     await scintillator.selected_pos.set(InOut.IN)
 
-    assert await scintillator.y_mm.user_setpoint.get_value() == 100.855
-    assert await scintillator.z_mm.user_setpoint.get_value() == 101.5115
+    await assert_value(scintillator.y_mm.user_setpoint, 100.855)
+    await assert_value(scintillator.z_mm.user_setpoint, 101.5115)
 
 
 async def test_given_aperture_scatterguard_not_parked_when_set_to_out_position_then_exception_raised(
