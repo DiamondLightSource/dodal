@@ -1,4 +1,4 @@
-from abc import ABC, abstractmethod
+from abc import ABC
 
 from pydantic import BaseModel
 
@@ -9,7 +9,3 @@ class AbstractExperimentParameterBase(BaseModel, ABC):
 
 class AbstractExperimentWithBeamParams(AbstractExperimentParameterBase):
     transmission_fraction: float
-
-    @abstractmethod
-    def get_num_images(self) -> int:
-        pass
