@@ -116,7 +116,8 @@ class I10EnergyMotorLookUp:
         phase_file_name: str = "IDEnergy2PhaseCalibrations.csv",
         poly_deg: list | None = None,
     ):
-        """Initialise the I10EnergyMotorLookUp class.
+        """Initialise the I10EnergyMotorLookUp class with lookup_table_config provided.
+
         Parameters
         ----------
         look_up_table_dir:
@@ -152,6 +153,16 @@ class I10EnergyMotorLookUp:
         self.config_client = config_client
         self._available_pol = []
 
+    @property
+    def available_pol(self):
+        """Get the list of available polarisations."""
+        return self._available_pol
+
+    @available_pol.setter
+    def available_pol(self, value):
+        """Set the list of available polarisations."""
+        self._available_pol = value
+
     def update_lookuptable(self):
         """
         Update the stored lookup tabled from file.
@@ -170,13 +181,13 @@ class I10EnergyMotorLookUp:
             # ensure the importing lookup table is the correct format
             Lookuptable.model_validate(self.lookup_tables[key])
 
-        self._available_pol = list(self.lookup_tables["Gap"].keys())
+        self.available_pol = list(self.lookup_tables["Gap"].keys())
 
     def get_motor_from_energy(self, energy: float, pol: Pol) -> tuple[float, float]:
         """
         Converts energy and polarisation to gap and phase.
         """
-        if self._available_pol == []:
+        if self.available_pol == []:
             self.update_lookuptable()
 
         gap_poly = self._get_poly(

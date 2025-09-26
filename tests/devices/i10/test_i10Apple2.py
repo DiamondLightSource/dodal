@@ -609,7 +609,7 @@ async def test_fail_I10EnergyMotorLookUp_with_lookup_gap(
     mock_id: I10Apple2,
     mock_I10EnergyMotorLookUp_idu: I10EnergyMotorLookUp,
 ):
-    await mock_id.set(555)  # look the lookup table.
+    mock_I10EnergyMotorLookUp_idu.update_lookuptable()
     # make gap in energy
     mock_I10EnergyMotorLookUp_idu.lookup_tables["Gap"]["lh"]["Energies"] = {
         "1": {
