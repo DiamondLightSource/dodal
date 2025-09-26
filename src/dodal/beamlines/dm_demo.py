@@ -43,6 +43,11 @@ class DeviceFactory(Generic[Args, T]):
     _manager: "DeviceManager"
 
     def __init__(self, factory, use_factory_name, timeout, mock, skip, manager):
+        if any(
+            p.kind == inspect.Parameter.POSITIONAL_ONLY
+            for p in inspect.signature(factory).parameters.values()
+        ):
+            raise ValueError(f"{factory.__name__} has positional only arguments")
         self.factory = factory
         self.use_factory_name = use_factory_name
         self.timeout = timeout
