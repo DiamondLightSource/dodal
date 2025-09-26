@@ -72,6 +72,8 @@ class DCM(BaseDCM[PitchAndRollCrystal, StationaryCrystal]):
                 initial_value=reflection_array,
             )
         super().__init__(prefix, PitchAndRollCrystal, StationaryCrystal, name)
+        with self.add_children_as_readables():
+                    self.wavelength = derived_signal_r(self._wavelength_from_energy, energy= self.energy_in_kev, units="angstrom")
 
     async def describe(self) -> dict[str, DataKey]:
         default_describe = await super().describe()
