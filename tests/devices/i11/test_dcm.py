@@ -12,14 +12,6 @@ from dodal.devices.i11.dcm import DCM
 
 @pytest.fixture
 async def dcm() -> DCM:
-    return DCM(
-        prefix="x-MO-DCM-01:",
-        xtal_prefix="x-DI-DCM-01:",
-    )
-
-
-@pytest.fixture
-async def dcm() -> DCM:
     async with init_devices(mock=True):
         dcm = DCM(
             prefix="x-MO-DCM-01:",
