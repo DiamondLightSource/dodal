@@ -154,11 +154,11 @@ class I10EnergyMotorLookup:
         self._available_pol = []
 
     @property
-    def available_pol(self):
+    def available_pol(self) -> list[str | None]:
         return self._available_pol
 
     @available_pol.setter
-    def available_pol(self, value):
+    def available_pol(self, value: list[str | None]) -> None:
         self._available_pol = value
 
     def update_lookuptable(self):
