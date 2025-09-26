@@ -75,30 +75,7 @@ class DCM(BaseDCM[PitchAndRollCrystal, StationaryCrystal]):
         with self.add_children_as_readables():
                     self.wavelength = derived_signal_r(self._wavelength_from_energy, energy= self.energy_in_kev, units="angstrom")
 
-    async def describe(self) -> dict[str, DataKey]:
-        default_describe = await super().describe()
-        return {
-            f"{self.name}-wavelength_in_a": DataKey(
-                dtype="number",
-                shape=[],
-                source=self.name,
-                units="angstrom",
-            ),
-            **default_describe,
-        }
-
-    async def read(self) -> dict[str, Reading]:
-        default_reading = await super().read()
-        energy: float = default_reading[f"{self.name}-energy_in_kev"]["value"]
-        if energy > 0.0:
-            wavelength = _CONVERSION_CONSTANT / energy
-        else:
-            wavelength = 0.0
-
-        return {
-            **default_reading,
-            f"{self.name}-wavelength_in_a": Reading(
-                value=wavelength,
-                timestamp=time.time(),
-            ),
-        }
+        def _wavelength_from_energy(self, energy: float) -> float:
+            if energy > 0:
+                return _CONVERSION_CONSTANT / energy
+            return 0
