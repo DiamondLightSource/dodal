@@ -488,8 +488,8 @@ class Apple2(abc.ABC, StandardReadable, Movable):
 
         Examples
         --------
-        >>> RE( id.set(888.0)) # This will set the ID to 888 eV
-        >>> RE(scan([detector], id,600,700,100)) # This will scan the ID from 600 to 700 eV in 100 steps.
+        RE( id.set(888.0)) # This will set the ID to 888 eV
+        RE(scan([detector], id,600,700,100)) # This will scan the ID from 600 to 700 eV in 100 steps.
         """
 
     def _read_pol(
