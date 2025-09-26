@@ -375,7 +375,6 @@ class I10Apple2(Apple2):
                 prefix=prefix,
                 move_pv="RPQ1",
             )
-        # self.update_lookuptable()
 
     @AsyncStatus.wrap
     async def set(self, value: float) -> None:
