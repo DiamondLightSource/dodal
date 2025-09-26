@@ -6,6 +6,8 @@ note:
     idd == id1,    idu == id2.
 """
 
+from daq_config_server.client import ConfigServer
+
 from dodal.common.beamlines.beamline_utils import device_factory
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.devices.current_amplifiers import CurrentAmpDet
@@ -36,8 +38,10 @@ set_log_beamline(BL)
 set_utils_beamline(BL)
 PREFIX = BeamlinePrefix(BL)
 
+I10_CONF_CLIENT = ConfigServer(url="https://daq-config.diamond.ac.uk")
 
-LOOK_UPTABLE_DIR = "/dls_sw/i10/software/blueapi/scratch/i10-config/lookupTables/"
+
+LOOK_UPTABLE_DIR = "/dls_sw/i10/software/gda/workspace_git/gda-diamond.git/configurations/i10-shared/lookupTables/"
 
 
 @device_factory()
@@ -63,6 +67,7 @@ def idd() -> I10Id:
         pgm=pgm(),
         look_up_table_dir=LOOK_UPTABLE_DIR,
         source=("Source", "idd"),
+        config_client=I10_CONF_CLIENT,
     )
 
 
@@ -79,6 +84,7 @@ def idu() -> I10Id:
         pgm=pgm(),
         look_up_table_dir=LOOK_UPTABLE_DIR,
         source=("Source", "idu"),
+        config_client=I10_CONF_CLIENT,
     )
 
 
