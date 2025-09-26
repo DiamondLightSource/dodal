@@ -9,9 +9,9 @@ from dodal.devices.aperturescatterguard import ApertureScatterguard, ApertureVal
 
 class InOut(StrictEnum):
     """Moves scintillator in and out of the beam."""
-    
-    OUT = "Out" #Out of beam 
-    IN = "In"   #In to beam 
+
+    OUT = "Out"  # Out of beam
+    IN = "In"  # In to beam
     UNKNOWN = "Unknown"
 
 
@@ -67,7 +67,7 @@ class Scintillator(StandardReadable):
             )
         ):
             return InOut.OUT
-        
+
         elif all(
             isclose(axis_pos, axis_in_beam, abs_tol=axis_tolerance)
             for axis_pos, axis_in_beam, axis_tolerance in zip(
@@ -78,7 +78,7 @@ class Scintillator(StandardReadable):
             )
         ):
             return InOut.IN
-        
+
         else:
             return InOut.UNKNOWN
 
@@ -104,7 +104,7 @@ class Scintillator(StandardReadable):
                     != ApertureValue.PARKED
                 ):
                     raise ValueError(
-                        "Cannot move scintillator out if aperture/scatterguard is not parked"
+                        "Cannot move scintillator in if aperture/scatterguard is not parked"
                     )
                 await self.z_mm.set(self._scintillator_in_yz_mm[1])
                 await self.y_mm.set(self._scintillator_in_yz_mm[0])
