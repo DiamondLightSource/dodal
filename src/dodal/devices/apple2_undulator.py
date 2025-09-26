@@ -302,7 +302,9 @@ class UndulatorJawPhase(SafeUndulatorMover[float]):
 
 
 class EnergyMotorConvertor(Protocol):
-    def __call__(self, energy: float, pol: Pol) -> tuple[float, float]: ...
+    def __call__(self, energy: float, pol: Pol) -> tuple[float, float]:
+        """Protocol to provide energy to motor position convertion"""
+        ...
 
 
 class Apple2(abc.ABC, StandardReadable, Movable):
@@ -316,9 +318,8 @@ class Apple2(abc.ABC, StandardReadable, Movable):
     The class is designed to manage the undulator's gap, phase motors, and polarisation settings, while
     abstracting hardware interactions and providing a high-level interface for beamline operations.
 
-
-    A pair of look up tables are needed to provide the conversion between motor position
-    and energy.
+    The class is abstract and requires beamline-specific implementations for set motor
+     positions based on energy and polarisation.
 
     Attributes
     ----------
@@ -334,27 +335,22 @@ class Apple2(abc.ABC, StandardReadable, Movable):
         A hardware-backed signal for polarisation readback and control.
     lookup_tables : dict
         A dictionary storing lookup tables for gap and phase motor positions, used for energy and polarisation conversion.
-    _available_pol : list
-        A list of available polarisations supported by the device.
+    energy_to_motor : EnergyMotorConvertor
+        A callable that converts energy and polarisation to motor positions.
 
     Abstract Methods
     ----------------
     set(value: float) -> None
         Abstract method to set motor positions for a given energy and polarisation.
-    update_lookuptable() -> None
-        Abstract method to load and validate lookup tables from external sources.
 
     Methods
     -------
-    _set_pol_setpoint(pol: Pol) -> None
-        Sets the polarisation setpoint without moving hardware.
     determine_phase_from_hardware(...) -> tuple[Pol, float]
         Determines the polarisation and phase value based on motor positions.
 
     Notes
     -----
     - This class requires beamline-specific implementations of the abstract methods.
-    - The lookup tables must follow the `Lookuptable` format and be validated before use.
     - The device supports multiple polarisation modes, including linear horizontal (LH), linear vertical (LV),
       positive circular (PC), negative circular (NC), and linear arbitrary (LA).
 
@@ -378,13 +374,10 @@ class Apple2(abc.ABC, StandardReadable, Movable):
         ----------
         id_gap: An UndulatorGap device.
         id_phase: An UndulatorPhaseAxes device.
-        prefix: Not in use but needed for device_instantiation.
+        energy_motor_convertor: A callable that converts energy and polarisation to motor positions.
         name: Name of the device.
         """
-        super().__init__(name)
 
-        # Attributes are set after super call so they are not renamed to
-        # <name>-undulator, etc.
         self.gap = id_gap
         self.phase = id_phase
         self.energy_to_motor = energy_motor_convertor
@@ -412,6 +405,7 @@ class Apple2(abc.ABC, StandardReadable, Movable):
             gap=id_gap.user_readback,
         )
         self.energy_to_motor = energy_motor_convertor
+        super().__init__(name)
 
     def _set_pol_setpoint(self, pol: Pol) -> None:
         """Set the polarisation setpoint without moving hardware. The polarisation

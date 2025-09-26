@@ -175,7 +175,6 @@ class I10EnergyMotorLookup:
                 max_energy=self.lookup_table_config.max_energy,
                 poly_deg=self.lookup_table_config.poly_deg,
             )
-            # ensure the importing lookup table is the correct format
             Lookuptable.model_validate(self.lookup_tables[key])
 
         self.available_pol = list(self.lookup_tables["Gap"].keys())
@@ -310,14 +309,14 @@ class I10EnergyMotorLookup:
                 lookup_table[mode_value]["Limit"]["Maximum"], float(row[max_energy])
             )
 
-        csvfile = self.config_client.get_file_contents(file, reset_cached_result=True)
-        reader = csv.DictReader(io.StringIO(csvfile))
+        csv_file = self.config_client.get_file_contents(file, reset_cached_result=True)
+        reader = csv.DictReader(io.StringIO(csv_file))
         for row in reader:
             # If there are multiple source only convert requested.
             if row[source[0]] == source[1]:
                 process_row(row=row)
         if not lookup_table:
-            raise RuntimeError(f"Unable to convert lookup table:/n/t{file}")
+            raise RuntimeError(f"Unable to convert lookup table:\t{file}")
         return lookup_table
 
 
@@ -325,11 +324,8 @@ class I10Apple2(Apple2):
     """I10Apple2 is the i10 version of Apple2 ID, set and energy_motor_convertor
      should be the only part that is I10 specific.
 
-    A energy_motor_convertor function is needed to provide the conversion between
-     Apple 2 ID/undulator has 4 extra degrees of freedom compare to the
-     standard Undulator, each bank of magnet can move independently to each other,
-    which allow the production of different x-ray polarisation as well as energy.
-    This type of ID is use on I10, I21, I09, I17 and I06 for soft x-ray motor position and energy.
+    A EnergyMotorConvertor function is needed to provide the conversion between
+     x-ray motor position and energy.
 
     Set is in energy(eV).
     """
