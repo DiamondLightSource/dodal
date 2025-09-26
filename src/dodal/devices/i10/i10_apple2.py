@@ -98,6 +98,12 @@ class Lookuptable(RootModel):
 
 
 class I10EnergyMotorLookUp:
+    """Class to handle the look up table for I10 Apple2 ID.
+    It fetch the look up table from daq config server and convert it to
+     the correct format and provide a method to convert energy and polarisation
+    to gap and phase for apple2 to use.
+    """
+
     def __init__(
         self,
         look_up_table_dir: str,
@@ -106,16 +112,35 @@ class I10EnergyMotorLookUp:
         mode: str = "Mode",
         min_energy: str = "MinEnergy",
         max_energy: str = "MaxEnergy",
+        gap_file_name: str = "IDEnergy2GapCalibrations.csv",
+        phase_file_name: str = "IDEnergy2PhaseCalibrations.csv",
         poly_deg: list | None = None,
     ):
+        """Initialise the I10EnergyMotorLookUp class.
+        Parameters
+        ----------
+        look_up_table_dir:
+            The path to look up table.
+        source:
+            The column name and the name of the source in look up table. e.g. ( "source", "idu")
+        mode:
+            The column name of the mode in look up table.
+        min_energy:
+            The column name that contain the maximum energy in look up table.
+        max_energy:
+
+            The column name that contain the maximum energy in look up table.
+        poly_deg:
+            The column names for the parameters for the energy conversion polynomial, starting with the least significant.
+        config_client:
+            The config server client to fetch the look up table.
+        """
         self.lookup_tables: dict[str, dict[str | None, dict[str, dict[str, Any]]]] = {
             "Gap": {},
             "Phase": {},
         }
-        energy_gap_table_path = Path(look_up_table_dir, "IDEnergy2GapCalibrations.csv")
-        energy_phase_table_path = Path(
-            look_up_table_dir, "IDEnergy2PhaseCalibrations.csv"
-        )
+        energy_gap_table_path = Path(look_up_table_dir, gap_file_name)
+        energy_phase_table_path = Path(look_up_table_dir, phase_file_name)
         self.lookup_table_config = LookupTableConfig(
             path=LookupPath(Gap=energy_gap_table_path, Phase=energy_phase_table_path),
             source=source,
@@ -304,10 +329,10 @@ class I10Apple2(Apple2):
     """I10Apple2 is the i10 version of Apple2 ID, set and update_lookuptable function
     should be the only part that is I10 specific.
 
-    A pair of look up tables are needed to provide the conversion betwApple 2 ID/undulator has 4 extra degrees of freedom compare to the standard Undulator,
+    A pair of look up tables are needed to provide the conversion between Apple 2 ID/undulator has 4 extra degrees of freedom compare to the standard Undulator,
     each bank of magnet can move independently to each other,
     which allow the production of different x-ray polarisation as well as energy.
-    This type of ID is use on I10, I21, I09, I17 and I06 for soft x-ray.een motor position and energy.
+    This type of ID is use on I10, I21, I09, I17 and I06 for soft x-ray motor position and energy.
 
     Set is in energy(eV).
     """
@@ -381,7 +406,6 @@ class I10Apple2(Apple2):
 
             self._set_pol_setpoint(pol)
         gap, phase = self.energy_to_motor(energy=value, pol=pol)
-        print(f"Calculated gap: {gap}, phase: {phase} for pol: {pol}")
         phase3 = phase * (-1 if pol == Pol.LA else 1)
         id_set_val = Apple2Val(
             top_outer=f"{phase:.6f}",
