@@ -37,7 +37,8 @@ def calculate_gap_hu(
 ) -> float:
     """
     Calculate the undulator gap required to produce a given energy at a given harmonic order.
-    This algorithm was provided by the I09 beamline scientists.
+    This algorithm was provided by the I09 beamline scientists, and is based on the physics of undulator radiation.
+    https://cxro.lbl.gov//PDF/X-Ray-Data-Booklet.pdf
 
     Args:
         photon_energy_kev (float): Requested photon energy in keV.
@@ -53,15 +54,29 @@ def calculate_gap_hu(
     magnet_block_height_mm = 16
 
     gamma = 1000 * look_up_table[order][RING_ENERGY_COLUMN] / ELECTRON_REST_ENERGY_MEV
-    diffraction_param_sqr = (
+
+    # Constructive interference of radiation emitted at different poles
+    # lamda = (lambda_u/2*gamma^2)*(1+K^2/2 + gamma^2*theta^2)/n for n=1,2,3...
+    # theta is the observation angle, assumed to be 0 here.
+    # Rearranging for K (the undulator parameter, related to magnetic field and gap)
+    # gives K^2 = 2*((2*n*gamma^2*lamda/lambda_u)-1)
+
+    undulator_parameter_sqr = (
         4.959368e-6
         * (order * gamma * gamma / (undulator_period_mm * photon_energy_kev))
         - 2
     )
-    if diffraction_param_sqr < 0:
+    if undulator_parameter_sqr < 0:
         raise ValueError("diffraction parameter squared must be positive!")
-    diffraction_param = np.sqrt(diffraction_param_sqr)
-    A = (
+    undulator_parameter = np.sqrt(undulator_parameter_sqr)
+
+    # Undulator_parameter K is also defined as K = 0.934*B0[T]*lambda_u[cm],
+    # where B0[T] is a peak magnetic field that must depend on gap,
+    # but in our LUT it is does not depend on gap, so it's a factor,
+    # leading to K = 0.934*B0[T]*lambda_u[cm]*exp(-pi*gap/lambda_u) or
+    # K = undulator_parameter_max*exp(-pi*gap/lambda_u)
+    # Calculating undulator_parameter_max gives:
+    undulator_parameter_max = (
         (
             2
             * 0.0934
@@ -73,8 +88,12 @@ def calculate_gap_hu(
         * np.sin(np.pi / magnet_blocks_per_period)
         * (1 - np.exp(-2 * np.pi * magnet_block_height_mm / undulator_period_mm))
     )
+
+    # Finnaly, rearranging the equation:
+    # undulator_parameter = undulator_parameter_max*exp(-pi*gap/lambda_u) for gap gives:
     gap = (
-        (undulator_period_mm / np.pi) * np.log(A / diffraction_param)
+        (undulator_period_mm / np.pi)
+        * np.log(undulator_parameter_max / undulator_parameter)
         + look_up_table[order][GAP_OFFSET_COLUMN]
         + gap_offset
     )
