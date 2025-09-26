@@ -90,7 +90,7 @@ async def test_given_aperture_scatterguard_parked_when_set_to_out_position_then_
 
     await scintillator.selected_pos.set(InOut.IN)
 
-    assert await scintillator.y_mm.user_setpoint.get_value() == -100.855
+    assert await scintillator.y_mm.user_setpoint.get_value() == 100.855
     assert await scintillator.z_mm.user_setpoint.get_value() == 101.5115
 
 
