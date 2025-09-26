@@ -55,34 +55,41 @@ class Scintillator(StandardReadable):
 
         super().__init__(name)
 
+    def check_position(
+        self, current_pos: tuple[float, float], pos_to_check: tuple[float, float]
+    ):
+        return all(
+            isclose(axis_pos, axis_in_beam, abs_tol=axis_tolerance)
+            for axis_pos, axis_in_beam, axis_tolerance in zip(
+                current_pos,
+                pos_to_check,
+                self._yz_tolerance_mm,
+                strict=False,
+            )
+        )
+
     def _get_selected_position(self, y: float, z: float) -> InOut:
         current_pos = [y, z]
-        if all(
-            isclose(axis_pos, axis_in_beam, abs_tol=axis_tolerance)
-            for axis_pos, axis_in_beam, axis_tolerance in zip(
-                current_pos,
-                self._scintillator_out_yz_mm,
-                self._yz_tolerance_mm,
-                strict=False,
-            )
-        ):
+        if self.check_position(current_pos, self._scintillator_out_yz_mm):
             return InOut.OUT
 
-        elif all(
-            isclose(axis_pos, axis_in_beam, abs_tol=axis_tolerance)
-            for axis_pos, axis_in_beam, axis_tolerance in zip(
-                current_pos,
-                self._scintillator_in_yz_mm,
-                self._yz_tolerance_mm,
-                strict=False,
-            )
-        ):
+        elif self.check_position(current_pos, self._scintillator_in_yz_mm):
             return InOut.IN
 
         else:
             return InOut.UNKNOWN
 
+    def check_aperture_parked(self):
+        if (
+            self._aperture_scatterguard().selected_aperture.get_value()
+            != ApertureValue.PARKED
+        ):
+            raise ValueError(
+                "Cannot move scintillator out if aperture/scatterguard is not parked"
+            )
+
     async def _set_selected_position(self, position: InOut) -> None:
+        self.check_aperture_parked()
         match position:
             case InOut.OUT:
                 current_y = await self.y_mm.user_readback.get_value()
@@ -99,13 +106,6 @@ class Scintillator(StandardReadable):
                 await self.y_mm.set(self._scintillator_out_yz_mm[0])
                 await self.z_mm.set(self._scintillator_out_yz_mm[1])
             case InOut.IN:
-                if (
-                    self._aperture_scatterguard().selected_aperture.get_value()
-                    != ApertureValue.PARKED
-                ):
-                    raise ValueError(
-                        "Cannot move scintillator in if aperture/scatterguard is not parked"
-                    )
                 await self.z_mm.set(self._scintillator_in_yz_mm[1])
                 await self.y_mm.set(self._scintillator_in_yz_mm[0])
             case _:
