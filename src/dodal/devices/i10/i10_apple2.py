@@ -98,10 +98,10 @@ class Lookuptable(RootModel):
 
 
 class I10EnergyMotorLookup:
-    """Class to handle the look up table for I10 Apple2 ID.
-    It fetch the look up table from daq config server and convert it to
-     the correct format and provide a method to convert energy and polarisation
-    to gap and phase for apple2 to use.
+    """
+    Handles lookup tables for I10 Apple2 ID, converting energy and polarisation to gap
+     and phase. Fetches and parses lookup tables from a config server, supports dynamic
+     updates, and validates input.
     """
 
     def __init__(
@@ -155,18 +155,15 @@ class I10EnergyMotorLookup:
 
     @property
     def available_pol(self):
-        """Get the list of available polarisations."""
         return self._available_pol
 
     @available_pol.setter
     def available_pol(self, value):
-        """Set the list of available polarisations."""
         self._available_pol = value
 
     def update_lookuptable(self):
         """
-        Update the stored lookup tabled from file.
-
+        Update lookup tables from files and validate their format.
         """
         LOGGER.info("Updating lookup dictionary from file.")
         for key, path in self.lookup_table_config.path.__dict__.items():
@@ -185,48 +182,49 @@ class I10EnergyMotorLookup:
 
     def get_motor_from_energy(self, energy: float, pol: Pol) -> tuple[float, float]:
         """
-        Converts energy and polarisation to gap and phase.
+        Convert energy and polarisation to gap and phase motor positions.
+
+        Parameters
+        ----------
+        energy : float
+            Desired energy in eV.
+        pol : Pol
+            Polarisation mode.
+
+        Returns
+        -------
+        tuple[float, float]
+            (gap, phase) motor positions.
+
         """
         if self.available_pol == []:
             self.update_lookuptable()
 
         gap_poly = self._get_poly(
-            lookup_table=self.lookup_tables["Gap"], new_energy=energy, pol=pol
+            lookup_table=self.lookup_tables["Gap"], energy=energy, pol=pol
         )
         phase_poly = self._get_poly(
-            lookup_table=self.lookup_tables["Phase"], new_energy=energy, pol=pol
+            lookup_table=self.lookup_tables["Phase"], energy=energy, pol=pol
         )
         return gap_poly(energy), phase_poly(energy)
 
     def _get_poly(
         self,
-        new_energy: float,
+        energy: float,
         pol: Pol,
         lookup_table: dict[str | None, dict[str, dict[str, Any]]],
     ) -> np.poly1d:
         """
-        Get the correct polynomial for a given energy form lookuptable
-        for the current polarisation setpoint.
-        Parameters
-        ----------
-        new_energy : float
-            The energy in eV for which the polynomial is requested.
-        lookup_table : dict[str | None, dict[str, dict[str, Any]]]
-            The lookup table containing polynomial coefficients for different energies
-            and polarisations.
-        Returns
-        -------
-        np.poly1d
-            The polynomial coefficients for the requested energy and polarisation.
+        Get polynomial for a given energy and polarisation.
+
         Raises
         ------
         ValueError
-            If the requested energy is outside the limits defined in the lookup table
-            or if no polynomial coefficients are found for the requested energy.
+            If energy is out of bounds or coefficients are missing.
         """
         if (
-            new_energy < lookup_table[pol]["Limit"]["Minimum"]
-            or new_energy > lookup_table[pol]["Limit"]["Maximum"]
+            energy < lookup_table[pol]["Limit"]["Minimum"]
+            or energy > lookup_table[pol]["Limit"]["Maximum"]
         ):
             raise ValueError(
                 "Demanding energy must lie between {} and {} eV!".format(
@@ -236,10 +234,7 @@ class I10EnergyMotorLookup:
             )
         else:
             for energy_range in lookup_table[pol]["Energies"].values():
-                if (
-                    new_energy >= energy_range["Low"]
-                    and new_energy < energy_range["High"]
-                ):
+                if energy >= energy_range["Low"] and energy < energy_range["High"]:
                     return energy_range["Poly"]
 
         raise ValueError(
@@ -257,27 +252,17 @@ class I10EnergyMotorLookup:
         poly_deg: list | None = None,
     ) -> dict[str | None, dict[str, dict[str, dict[str, Any]]]]:
         """
-        Convert a CSV file to a dictionary compatible with the Apple2 lookup table format.
-
-        Parameters
-        ----------
-        file : str
-            Path to the CSV file.
-        source : tuple[str, str]
-            Tuple specifying the column name and source name (e.g., ("Source", "idu")).
-        mode : str, optional
-            Column name for the available modes (e.g., "lv", "lh", "pc", "nc"), by default "Mode".
-        min_energy : str, optional
-            Column name for the minimum energy, by default "MinEnergy".
-        max_energy : str, optional
-            Column name for the maximum energy, by default "MaxEnergy".
-        poly_deg : list, optional
-            Column names for polynomial coefficients, starting with the least significant term.
+        Convert a CSV file to a lookup table dictionary.
 
         Returns
         -------
         dict
-            A dictionary conforming to the Apple2 lookup table format.
+            Dictionary in Apple2 lookup table format.
+
+        Raises
+        ------
+        RuntimeError
+            If the CSV cannot be converted.
 
         """
         if poly_deg is None:
@@ -337,11 +322,12 @@ class I10EnergyMotorLookup:
 
 
 class I10Apple2(Apple2):
-    """I10Apple2 is the i10 version of Apple2 ID, set and update_lookuptable function
-    should be the only part that is I10 specific.
+    """I10Apple2 is the i10 version of Apple2 ID, set and energy_motor_convertor
+     should be the only part that is I10 specific.
 
-    A pair of look up tables are needed to provide the conversion between Apple 2 ID/undulator has 4 extra degrees of freedom compare to the standard Undulator,
-    each bank of magnet can move independently to each other,
+    A energy_motor_convertor function is needed to provide the conversion between
+     Apple 2 ID/undulator has 4 extra degrees of freedom compare to the
+     standard Undulator, each bank of magnet can move independently to each other,
     which allow the production of different x-ray polarisation as well as energy.
     This type of ID is use on I10, I21, I09, I17 and I06 for soft x-ray motor position and energy.
 
