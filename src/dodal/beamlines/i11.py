@@ -13,6 +13,9 @@ from dodal.devices.i11.cyberstar_blower import (
     AutotunedCyberstarBlower,
     CyberstarBlower,
 )
+
+# from dodal.devices.common_dcm import BaseDCM, PitchAndRollCrystal, RollCrystal
+from dodal.devices.i11.dcm import DCM
 from dodal.devices.i11.diff_stages import (
     DiffractometerBase,
     DiffractometerStage,
@@ -124,3 +127,11 @@ def slits_4() -> Slits:
 @device_factory()
 def slits_5() -> Slits:
     return Slits(prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-05:")
+
+
+@device_factory()
+def dcm() -> DCM:
+    return DCM(
+        prefix=f"{PREFIX.beamline_prefix}-MO-DCM-01:",
+        xtal_prefix=f"{PREFIX.beamline_prefix}-DI-DCM-01:",
+    )
