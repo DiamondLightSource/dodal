@@ -185,9 +185,7 @@ async def mock_id_pol(mock_id: I10Apple2) -> I10Apple2Pol:
 
 
 @pytest.fixture
-async def mock_linear_arbitrary_angle(
-    mock_id: I10Apple2, prefix: str = "BLXX-EA-DET-007:"
-) -> LinearArbitraryAngle:
+async def mock_linear_arbitrary_angle(mock_id: I10Apple2) -> LinearArbitraryAngle:
     async with init_devices(mock=True):
         mock_linear_arbitrary_angle = LinearArbitraryAngle(id=mock_id)
     return mock_linear_arbitrary_angle
