@@ -97,7 +97,7 @@ class Lookuptable(RootModel):
     root: dict[str, LookupTableEntries]
 
 
-class I10EnergyMotorLookUp:
+class I10EnergyMotorLookup:
     """Class to handle the look up table for I10 Apple2 ID.
     It fetch the look up table from daq config server and convert it to
      the correct format and provide a method to convert energy and polarisation
@@ -116,7 +116,7 @@ class I10EnergyMotorLookUp:
         phase_file_name: str = "IDEnergy2PhaseCalibrations.csv",
         poly_deg: list | None = None,
     ):
-        """Initialise the I10EnergyMotorLookUp class with lookup_table_config provided.
+        """Initialise the I10EnergyMotorLookup class with lookup table headers provided.
 
         Parameters
         ----------
@@ -124,17 +124,17 @@ class I10EnergyMotorLookUp:
             The path to look up table.
         source:
             The column name and the name of the source in look up table. e.g. ( "source", "idu")
+        config_client:
+            The config server client to fetch the look up table.
         mode:
             The column name of the mode in look up table.
         min_energy:
             The column name that contain the maximum energy in look up table.
         max_energy:
-
             The column name that contain the maximum energy in look up table.
         poly_deg:
             The column names for the parameters for the energy conversion polynomial, starting with the least significant.
-        config_client:
-            The config server client to fetch the look up table.
+
         """
         self.lookup_tables: dict[str, dict[str | None, dict[str, dict[str, Any]]]] = {
             "Gap": {},
@@ -586,7 +586,7 @@ class I10Id(Device):
         linear_arbitrary_angle : LinearArbitraryAngle
             A device for controlling the linear arbitrary polarization angle.
         """
-        self.lookup_table_client = I10EnergyMotorLookUp(
+        self.lookup_table_client = I10EnergyMotorLookup(
             look_up_table_dir=look_up_table_dir,
             source=source,
             config_client=config_client,
