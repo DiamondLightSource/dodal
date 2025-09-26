@@ -48,7 +48,5 @@ async def test_i11_wavelength(
     set_mock_value(i11_dcm.energy_in_kev.user_readback, energy)
     reading = await i11_dcm.read()
 
-    print(reading)
-
     assert reading["i11_dcm-energy_in_kev"]["value"] == energy
     assert reading["i11_dcm-wavelength"]["value"] == wavelength
