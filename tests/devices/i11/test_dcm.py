@@ -33,7 +33,7 @@ def test_count_dcm(
 
 
 @pytest.mark.parametrize(
-    "energy,wavelength,units",
+    "energy,wavelength",
     [
         (0.0, 0.0),
         (1.0, 12.3984),
