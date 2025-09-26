@@ -33,7 +33,7 @@ def test_count_i11_dcm(
 
 
 @pytest.mark.parametrize(
-    "energy,wavelength",
+    "wavelength,energy",
     [
         (0.0, 0.0),
         (1.0, 12.3984),
@@ -41,11 +41,14 @@ def test_count_i11_dcm(
     ],
 )
 async def test_i11_wavelength(
-    energy: float,
     wavelength: float,
+    energy: float,
     i11_dcm: DCM,
 ):
     set_mock_value(i11_dcm.energy_in_kev.user_readback, energy)
     reading = await i11_dcm.read()
 
-    assert reading["dcm-wavelength"]["value"] == wavelength
+    print(reading)
+
+    assert reading["i11_dcm-energy_in_kev"]["value"] == energy
+    assert reading["i11_dcm-wavelength"]["value"] == wavelength
