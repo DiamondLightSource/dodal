@@ -11,18 +11,18 @@ from dodal.devices.i11.dcm import DCM
 
 
 @pytest.fixture
-async def dcm() -> DCM:
+async def i11_dcm() -> DCM:
     async with init_devices(mock=True):
-        dcm = DCM(prefix="x-MO-DCM-01:", xtal_prefix="x-DI-DCM-01:")
-    return dcm
+        i11_dcm = DCM(prefix="x-MO-DCM-01:", xtal_prefix="x-DI-DCM-01:")
+    return i11_dcm
 
 
-def test_count_dcm(
+def test_count_i11_dcm(
     RE: RunEngine,
     run_engine_documents: dict[str, list[dict]],
-    dcm: DCM,
+    i11_dcm: DCM,
 ):
-    RE(bp.count([dcm]))
+    RE(bp.count([i11_dcm]))
     assert_emitted(
         run_engine_documents,
         start=1,
@@ -40,12 +40,12 @@ def test_count_dcm(
         (2.0, 6.1992),
     ],
 )
-async def test_wavelength(
+async def test_i11_wavelength(
     energy: float,
     wavelength: float,
-    dcm: DCM,
+    i11_dcm: DCM,
 ):
-    set_mock_value(dcm.energy_in_kev.user_readback, energy)
-    reading = await dcm.read()
+    set_mock_value(i11_dcm.energy_in_kev.user_readback, energy)
+    reading = await i11_dcm.read()
 
     assert reading["dcm-wavelength"]["value"] == wavelength
