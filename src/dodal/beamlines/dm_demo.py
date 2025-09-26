@@ -2,10 +2,12 @@ import inspect
 import typing
 import warnings
 from collections.abc import Callable, Iterable
-from functools import wraps
+from functools import cached_property, wraps
 from types import NoneType
-from typing import Annotated, Any, Generic, ParamSpec, TypeVar
+from typing import Annotated, Any, Generic, Mapping, ParamSpec, TypeVar
 
+from bluesky.run_engine import call_in_bluesky_event_loop
+from ophyd import Device
 from ophyd_async.core import PathProvider
 from ophyd_async.epics.adsimdetector import SimDetector
 from ophyd_async.epics.motor import Motor
@@ -15,7 +17,13 @@ from dodal.common.beamlines.device_helpers import DET_SUFFIX, HDF5_SUFFIX
 from dodal.devices import motors
 from dodal.devices.motors import XThetaStage
 from dodal.log import set_beamline as set_log_beamline
-from dodal.utils import BeamlinePrefix, SkipType
+from dodal.utils import (
+    AnyDevice,
+    BeamlinePrefix,
+    OphydV1Device,
+    OphydV2Device,
+    SkipType,
+)
 
 BL = "adsim"
 DEFAULT_TIMEOUT = 30
@@ -62,12 +70,16 @@ class DeviceFactory(Generic[Args, T]):
         return self.factory.__name__
 
     @property
+    def device_type(self) -> type[T]:
+        return inspect.signature(self.factory).return_annotation
+
+    @cached_property
     def dependencies(self) -> set[str]:
         """Names of all parameters"""
         sig = inspect.signature(self.factory)
         return {para.name for para in sig.parameters.values()}
 
-    @property
+    @cached_property
     def optional_dependencies(self) -> set[str]:
         """Names of optional dependencies"""
         sig = inspect.signature(self.factory)
@@ -94,11 +106,20 @@ class DeviceFactory(Generic[Args, T]):
         **fixtures,
     ) -> T:
         """Build this device, building any dependencies first"""
-        devices, errors = self._manager.build_devices(self, fixtures=fixtures)
+        devices, errors = self._manager.build_devices(
+            self,
+            fixtures=fixtures,
+            mock=mock,
+            connect_immediately=connect_immediately,
+            timeout=timeout or self.timeout,
+        )
         if errors:
             raise errors[self.name]
         else:
-            return devices[self.name]
+            device = devices[self.name]
+            if name:
+                device.set_name(device)
+            return device
 
     def __call__(self, *args, **kwargs) -> T:
         return self.factory(*args, **kwargs)
@@ -153,21 +174,36 @@ class DeviceManager:
             return decorator
         return decorator(func)
 
-    def build_all(self, fixtures: dict[str, Any] | None = None):
+    def build_all(
+        self,
+        include_skipped=False,
+        fixtures: dict[str, Any] | None = None,
+        mock: bool = False,
+        connect_immediately: bool = False,
+        timeout: float | None = None,
+    ):
+        fixtures = fixtures or {}
         # exclude all skipped devices and those that have been overridden by fixtures
         return self.build_devices(
             *(
                 f
                 for f in self._factories.values()
-                if not f.skip and f.name not in fixtures
+                # allow overriding skip but still allow fixtures to override devices
+                if (include_skipped or not f.skip) and f.name not in fixtures
             ),
             fixtures=fixtures,
+            mock=mock,
+            connect_immediately=connect_immediately,
+            timeout=timeout,
         )
 
     def build_devices(
         self,
         *factories: DeviceFactory,
         fixtures: dict[str, Any] | None = None,
+        mock: bool = False,
+        connect_immediately: bool = False,
+        timeout: float | None = None,
     ) -> tuple[dict[str, Any], dict[str, Exception]]:
         """
         Build the devices from the given factories, ensuring that any
@@ -189,7 +225,8 @@ class DeviceManager:
         built = {}
         errors = {}
         for device in order:
-            deps = self[device].dependencies
+            factory = self[device]
+            deps = factory.dependencies
             if dep_errs := deps & errors.keys():
                 errors[device] = ValueError(f"Errors building dependencies: {dep_errs}")
             else:
@@ -201,10 +238,32 @@ class DeviceManager:
                     if dep in built.keys() | fixtures.keys()
                 }
                 try:
-                    built[device] = self[device](**params)
+                    mock = mock or factory.mock
+                    if issubclass(factory.device_type, OphydV1Device):
+                        print("building v1")
+                        built_device = factory(mock=mock, **params)
+                    else:
+                        print("building v2")
+                        built_device = factory(**params)
+                        if factory.use_factory_name:
+                            built_device.set_name(device)
+                    if connect_immediately:
+                        if issubclass(factory.device_type, OphydV1Device):
+                            print("connecting v1")
+                            built_device.wait_for_connection()
+                        else:
+                            print("connecting v2")
+                            call_in_bluesky_event_loop(
+                                built_device.connect(
+                                    mock=mock,
+                                    timeout=timeout or factory.timeout,
+                                )
+                            )
+                    built[device] = built_device
                 except Exception as e:
                     errors[device] = e
-        return (built, errors)
+
+        return built, errors
 
     def __getitem__(self, name):
         return self._factories[name]
@@ -277,6 +336,9 @@ class DeviceManager:
             buffer, pending = [], buffer
 
         return order
+
+    def __repr__(self) -> str:
+        return f"<DeviceManager: {len(self._factories)} devices>"
 
 
 devices = DeviceManager()
