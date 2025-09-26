@@ -1,9 +1,5 @@
-import time
-
 import numpy as np
-from bluesky.protocols import Reading
-from event_model.documents.event_descriptor import DataKey
-from ophyd_async.core import Array1D, soft_signal_r_and_setter
+from ophyd_async.core import Array1D, derived_signal_r, soft_signal_r_and_setter
 from ophyd_async.epics.core import epics_signal_r
 from ophyd_async.epics.motor import Motor
 
@@ -72,10 +68,15 @@ class DCM(BaseDCM[PitchAndRollCrystal, StationaryCrystal]):
                 initial_value=reflection_array,
             )
         super().__init__(prefix, PitchAndRollCrystal, StationaryCrystal, name)
-        with self.add_children_as_readables():
-                    self.wavelength = derived_signal_r(self._wavelength_from_energy, energy= self.energy_in_kev, units="angstrom")
 
-        def _wavelength_from_energy(self, energy: float) -> float:
-            if energy > 0:
-                return _CONVERSION_CONSTANT / energy
-            return 0
+        with self.add_children_as_readables():
+            self.wavelength = derived_signal_r(
+                self._wavelength_from_energy,
+                energy=self.energy_in_kev,
+                units="angstrom",
+            )
+
+    def _wavelength_from_energy(self, energy: float) -> float:
+        if energy > 0:
+            return _CONVERSION_CONSTANT / energy
+        return 0
