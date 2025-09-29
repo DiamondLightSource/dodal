@@ -73,9 +73,10 @@ class DCM(BaseDCM[PitchAndRollCrystal, StationaryCrystal]):
             self.wavelength = derived_signal_r(
                 self._wavelength_from_energy,
                 energy=self.energy_in_kev,
+                unit="angstrom",
             )
 
-    def _wavelength_from_energy(self, energy: float) -> float:
+    def _wavelength_from_energy(self, energy: float, unit: str) -> float:
         if energy > 0:
             return _CONVERSION_CONSTANT / energy
         return 0
