@@ -28,37 +28,37 @@ def given_an_unhappy_restful_response() -> AsyncMock:
 async def given_a_squad_of_attenuator_motors(
     hutch: HutchState,
 ) -> AttenuatorMotorSquad:
-    motor_clique = AttenuatorMotorSquad(hutch, name="attenuator_motor_clique")
-    await motor_clique.connect(mock=True)
+    motor_squad = AttenuatorMotorSquad(hutch, name="attenuator_motor_squad")
+    await motor_squad.connect(mock=True)
 
-    motor_clique.url = "http://test-blueapi.url"
-    return motor_clique
+    motor_squad.url = "http://test-blueapi.url"
+    return motor_squad
 
 
 @pytest.fixture
-async def eh1_motor_clique(RE: RunEngine) -> AttenuatorMotorSquad:
+async def eh1_motor_squad(RE: RunEngine) -> AttenuatorMotorSquad:
     return await given_a_squad_of_attenuator_motors(HutchState.EH1)
 
 
 @pytest.fixture
-async def eh2_motor_clique(RE: RunEngine) -> AttenuatorMotorSquad:
+async def eh2_motor_squad(RE: RunEngine) -> AttenuatorMotorSquad:
     return await given_a_squad_of_attenuator_motors(HutchState.EH2)
 
 
 @pytest.mark.parametrize("invoking_hutch", [HutchState.EH1, HutchState.EH2])
-async def test_that_motor_clique_can_be_instantiated(invoking_hutch):
-    motor_clique: AttenuatorMotorSquad = await given_a_squad_of_attenuator_motors(
+async def test_that_motor_squad_can_be_instantiated(invoking_hutch):
+    motor_squad: AttenuatorMotorSquad = await given_a_squad_of_attenuator_motors(
         invoking_hutch
     )
-    assert isinstance(motor_clique, AttenuatorMotorSquad)
+    assert isinstance(motor_squad, AttenuatorMotorSquad)
 
 
 @pytest.mark.parametrize("invoking_hutch", [HutchState.EH1, HutchState.EH2])
 @patch(
-    "dodal.devices.i19.access_controlled.attenuator_motor_clique.OpticsBlueApiDevice.set",
+    "dodal.devices.i19.access_controlled.attenuator_motor_squad.OpticsBlueApiDevice.set",
     new_callable=AsyncMock,
 )
-async def test_when_motor_clique_is_set_that_expected_request_params_are_passed(
+async def test_when_motor_squad_is_set_that_expected_request_params_are_passed(
     internal_setter, invoking_hutch
 ):
     motors: AttenuatorMotorSquad = await given_a_squad_of_attenuator_motors(
@@ -69,7 +69,7 @@ async def test_when_motor_clique_is_set_that_expected_request_params_are_passed(
 
     expected_hutch: str = invoking_hutch.value
     expected_device: str = "access_control"
-    expected_request_name: str = "operate_motor_clique_plan"
+    expected_request_name: str = "operate_motor_squad_plan"
     expected_parameters: dict = {
         "experiment_hutch": expected_hutch,
         "access_device": expected_device,

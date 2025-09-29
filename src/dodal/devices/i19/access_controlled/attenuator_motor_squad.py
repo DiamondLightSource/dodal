@@ -1,7 +1,7 @@
-from typing import Annotated, Any
+from typing import Annotated, Any, Self
 
 from ophyd_async.core import AsyncStatus
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, model_validator
 from pydantic.types import PositiveInt, StringConstraints
 
 from dodal.devices.i19.access_controlled.hutch_access import ACCESS_DEVICE_NAME
@@ -16,24 +16,23 @@ class AttenuatorMotorPositionDemands(BaseModel):
     continuous_demands: dict[PermittedKeyStr, float] = {}
     indexed_demands: dict[PermittedKeyStr, PositiveInt] = {}
 
-    @field_validator("indexed_demands")
-
-    def no_keys_clash(cls, values, **kwargs):
-        continuous = values["continuous_demands"]
-        indexed = values["indexed_demands"]
-        if len(indexed) < 1:
-            return values
-        for key in indexed:
-            if key in continuous:
-                message = f"Attenuator Position Demand Key clash: {key}. Require distinct keys for axis names on continuous motors and indexed positions."
-                raise ValueError(message)
-        return values
+    @model_validator(mode="after")
+    def no_keys_clash(self) -> Self:
+        common_key_filter = filter(
+            lambda k: k in self.continuous_demands, self.indexed_demands
+        )
+        common_key_count = sum(1 for _ in common_key_filter)
+        if common_key_count < 1:
+            return self
+        else:
+            ks: str = "key" if common_key_count == 1 else "keys"
+            error_msg = (
+                f"{common_key_count} common {ks} found in distinct motor demands"
+            )
+            raise ValueError(error_msg)
 
     def restful_format(self) -> dict[PermittedKeyStr, Any]:
-        combined: dict[PermittedKeyStr, Any] = {}
-        combined.update(self.continuous_demands)
-        combined.update(self.indexed_demands)
-        return combined
+        return self.continuous_demands | self.indexed_demands
 
 
 class AttenuatorMotorSquad(OpticsBlueApiDevice):
@@ -48,18 +47,6 @@ class AttenuatorMotorSquad(OpticsBlueApiDevice):
     The name of the hutch that wants to operate the optics device is passed to the \
     access controlled device upon instantiation of the latter.
 
-    Nomenclature:
-    Note this class was originally called
-        -MotorSet
-        ( but objections were based on "set" being an overloaded word )
-
-        -Gang might have worked,
-        ( but a gang of mechanical devices are able to be mechanically coupled
-        and move together; whereas the motors here are completely mutually independent )
-
-        -Clique
-        ( as in a set of friends, is an accurate choice, is unlikely to be overloaded, just sounds pretentious).
-
     For details see the architecture described in \
     https://github.com/DiamondLightSource/i19-bluesky/issues/30.
     """
@@ -68,7 +55,7 @@ class AttenuatorMotorSquad(OpticsBlueApiDevice):
     async def set(self, value: AttenuatorMotorPositionDemands):
         invoking_hutch = str(self._get_invoking_hutch().value)
         request_params = {
-            "name": "operate_motor_clique_plan",
+            "name": "operate_motor_squad_plan",
             "params": {
                 "experiment_hutch": invoking_hutch,
                 "access_device": ACCESS_DEVICE_NAME,

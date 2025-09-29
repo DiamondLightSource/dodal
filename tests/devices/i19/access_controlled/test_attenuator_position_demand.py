@@ -97,7 +97,12 @@ def test_that_attenuator_position_demand_triplet_provides_expected_rest_format()
 def test_that_attenuator_position_raises_error_when_discrete_and_continuous_demands_overload_axis_label():
     wedge_position_demands = {"x": 0.1, "v": 90.1}
     wheel_position_demands = {"w": 6, "v": 7}
-    anticipated_message: str = "Clashing keys in common between wheel and wedge for attenuation position demand: v"
+    preamble: str = (
+        "1 validation error for AttenuatorMotorPositionDemands\n  Value error,"
+    )
+    anticipated_message: str = (
+        f"{preamble} 1 common key found in distinct motor demands"
+    )
     with pytest.raises(expected_exception=ValueError, match=anticipated_message):
         AttenuatorMotorPositionDemands(
             continuous_demands=wedge_position_demands,
