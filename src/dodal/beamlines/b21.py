@@ -8,6 +8,7 @@ from dodal.common.beamlines.beamline_utils import (
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.beamlines.device_helpers import CAM_SUFFIX, HDF5_SUFFIX
+from dodal.devices.focusing_mirror import SimpleMirror
 from dodal.devices.i22.nxsas import NXSasMetadataHolder, NXSasOAV
 from dodal.devices.linkam3 import Linkam3
 from dodal.devices.motors import XYStage
@@ -41,6 +42,13 @@ def waxs() -> EigerDetector:
         drv_suffix="-EA-EIGER-02:",
         hdf_suffix="-EA-EIGER-02:OD:",
         odin_nodes=1,
+    )
+
+
+@device_factory()
+def mirror() -> SimpleMirror:
+    return SimpleMirror(
+        prefix=f"{PREFIX.beamline_prefix}-OP-MR-01:",
     )
 
 

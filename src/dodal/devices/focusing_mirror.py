@@ -134,6 +134,39 @@ class MirrorVoltages(StandardReadable):
         )
 
 
+class SimpleMirror(StandardReadable):
+    """Simple Focusing Mirror"""
+
+    def __init__(
+        self,
+        prefix: str,
+        name: str = "",
+        bragg_to_lat_lut_path: str | None = None,
+        x_suffix: str = "X",
+        y_suffix: str = "Y",
+    ):
+        self.bragg_to_lat_lookup_table_path = bragg_to_lat_lut_path
+        self.yaw_mrad = Motor(prefix + "YAW")
+        self.pitch_mrad = Motor(prefix + "PITCH")
+        self.bend = Motor(prefix + "BEND")
+        self.x_mm = Motor(prefix + x_suffix)
+        self.y_mm = Motor(prefix + y_suffix)
+        self.jack1_mm = Motor(prefix + "J1")
+        self.jack2_mm = Motor(prefix + "J2")
+
+        self.type, _ = soft_signal_r_and_setter(MirrorType, MirrorType.SINGLE)
+        # The device is in the beamline co-ordinate system so pitch is the incident angle
+        # regardless of orientation of the mirror
+        self.incident_angle = Motor(prefix + "PITCH")
+
+        self.add_readables(
+            [self.incident_angle.user_readback],
+            format=StandardReadableFormat.HINTED_SIGNAL,
+        )
+        self.add_readables([self.type], format=StandardReadableFormat.CONFIG_SIGNAL)
+        super().__init__(name)
+
+
 class FocusingMirror(StandardReadable):
     """Focusing Mirror"""
 
