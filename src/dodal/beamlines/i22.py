@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from ophyd_async.epics.adaravis import AravisDetector
-from ophyd_async.epics.adcore import NDPluginBaseIO
+from ophyd_async.epics.adcore import NDPluginBaseIO, NDPluginStatsIO
 from ophyd_async.epics.adpilatus import PilatusDetector
 from ophyd_async.fastcs.panda import HDFPanda
 
@@ -68,6 +68,11 @@ def saxs() -> PilatusDetector:
         drv_suffix=CAM_SUFFIX,
         fileio_suffix=HDF5_SUFFIX,
         metadata_holder=metadata_holder,
+        plugins={
+            "stats": NDPluginStatsIO(
+                prefix=f"{PREFIX.beamline_prefix}-EA-PILAT-01:STAT:"
+            )
+        },
     )
 
 
@@ -93,6 +98,11 @@ def waxs() -> PilatusDetector:
         drv_suffix=CAM_SUFFIX,
         fileio_suffix=HDF5_SUFFIX,
         metadata_holder=metadata_holder,
+        plugins={
+            "stats": NDPluginStatsIO(
+                prefix=f"{PREFIX.beamline_prefix}-EA-PILAT-03:STAT:"
+            )
+        },
     )
 
 
@@ -272,7 +282,7 @@ def linkam() -> Linkam3:
     return Linkam3(prefix=f"{PREFIX.beamline_prefix}-EA-TEMPC-05:")
 
 
-@device_factory()
+@device_factory(skip=True)
 def ppump() -> WatsonMarlow323Pump:
     """Sample Environment Peristaltic Pump"""
     return WatsonMarlow323Pump(f"{PREFIX.beamline_prefix}-EA-PUMP-01:")
