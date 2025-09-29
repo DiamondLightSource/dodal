@@ -10,6 +10,7 @@ from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beam
 from dodal.common.beamlines.device_helpers import CAM_SUFFIX, HDF5_SUFFIX
 from dodal.devices.i22.nxsas import NXSasMetadataHolder, NXSasOAV
 from dodal.devices.linkam3 import Linkam3
+from dodal.devices.motors import XYStage
 from dodal.devices.slits import Slits
 from dodal.devices.synchrotron import Synchrotron
 from dodal.log import set_beamline as set_log_beamline
@@ -48,6 +49,13 @@ def panda1() -> HDFPanda:
     return HDFPanda(
         prefix=f"{PREFIX.beamline_prefix}-MO-PANDA-01:",
         path_provider=get_path_provider(),
+    )
+
+
+@device_factory()
+def table() -> XYStage:
+    return XYStage(
+        prefix=f"{PREFIX.beamline_prefix}-MO-TABLE-04:",
     )
 
 
