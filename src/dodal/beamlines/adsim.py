@@ -1,16 +1,12 @@
+from ophyd.epics_motor import EpicsMotor
 from ophyd_async.epics.adsimdetector import SimDetector
 
-from dodal.common.beamlines.beamline_utils import (
-    device_factory,
-    get_path_provider,
-)
+from dodal.beamlines.dm_demo import DeviceManager
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.beamlines.device_helpers import DET_SUFFIX, HDF5_SUFFIX
 from dodal.devices.motors import XThetaStage
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix
-
-from dodal.beamlines.dm_demo import DeviceManager
 
 BL = "adsim"
 PREFIX = BeamlinePrefix("t01")
@@ -68,7 +64,7 @@ run_engine(count([d], num=10))
 devices = DeviceManager()
 
 
-@devices.factory(timeout=2)
+@devices.factory(timeout=2, mock=True)
 def stage() -> XThetaStage:
     return XThetaStage(
         f"{PREFIX.beamline_prefix}-MO-SIMC-01:", x_infix="M1", theta_infix="M2"
@@ -83,3 +79,8 @@ def det(path_provider) -> SimDetector:
         drv_suffix=DET_SUFFIX,
         fileio_suffix=HDF5_SUFFIX,
     )
+
+
+# @devices.factory
+# def old_motor() -> EpicsMotor:
+#     return EpicsMotor(name="old_motor", prefix=f"{PREFIX.beamline_prefix}-MO-SIMC-01:")
