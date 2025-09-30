@@ -120,3 +120,33 @@ async def test_my_device_read(sim_my_device: MyDevice, RE: RunEngine) -> None:
         }
     )
 ```
+
+## Test performance and reliability
+
+Dodal has well over 1000 unit tests and developers will run the full unit test suite frequently on their local 
+machines, therefore it is imperative that the unit tests are both reliable and run quickly. Ideally the test suite 
+should run in about a minute, so if your test takes more than a fraction of a second to complete then consider 
+making it faster. The GitHub CI will fail if any test takes longer than 1 second.
+
+Tests that involve concurrency can sometimes be unreliable due to subtle race conditions and variations in timing 
+caused by caching, garbage collection and other factors. 
+Often these manifest only on certain machines or in CI and are difficult to reproduce. Whilst the odd test failure 
+can be worked around by re-running the tests, this is annoying and a build up of such flaky tests is undesirable so 
+it is preferable to fix the test.  
+
+### Event loop fuzzer
+
+To assist in the reproduction of concurrency-related test failures, there is an event loop fuzzer available as a 
+pytest fixture. The fuzzer introduces random delays into the ``asyncio`` event loop. You can use it as by 
+requesting ``event_loop_fuzzing`` as a fixture. It is also recommended when debugging to parametrize the test to 
+introduce a good number of iterations in order to ensure the problem has a good chance to show up, but remember to 
+remove the parametrization afterwards.
+
+```Python
+    import pytest
+    # repeat the test a number of times
+    @pytest.mark.parametrize("i", range(0, 100))
+    async def my_unreliable_test(i, event_loop_fuzzing):
+        # Do some stuff in here
+
+```
