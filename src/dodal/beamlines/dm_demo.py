@@ -126,8 +126,6 @@ class DeviceFactory(Generic[Args, T]):
         if isinstance(device, OphydV2Device):
             if self.use_factory_name:
                 device.set_name(self.name)
-            if (conn := self._manager._connect):
-                call_in_bluesky_event_loop(device.connect(conn.mock or self.mock), timeout=conn.timeout)
         return device
 
     def __repr__(self) -> str:
@@ -141,13 +139,12 @@ class ConnectionOptions(NamedTuple):
     mock: bool
     timeout: float
 
+
 class DeviceManager:
     _factories: dict[str, DeviceFactory]
-    _connect: ConnectionOptions | None
 
     def __init__(self):
         self._factories = {}
-        self._connect = None
 
     # Overload for using as plain decorator, ie: @devices.factory
     @typing.overload
@@ -187,12 +184,6 @@ class DeviceManager:
         if func is None:
             return decorator
         return decorator(func)
-
-    def auto_connect(self, connect=True, mock=False, timeout: float =10):
-        if connect:
-            self._connect = ConnectionOptions(mock, timeout)
-        else:
-            self._connect = None
 
     def build_all(
         self,
@@ -244,8 +235,6 @@ class DeviceManager:
         )
         built = {}
         errors = {}
-        previous_connect = self._connect
-        self.auto_connect(connect_immediately, mock, timeout or 10)
         for device in order:
             factory = self[device]
             deps = factory.dependencies
@@ -260,30 +249,11 @@ class DeviceManager:
                     if dep in built.keys() | fixtures.keys()
                 }
                 try:
-                    # mock = mock or factory.mock
-                    # if issubclass(factory.device_type, OphydV1Device):
-                    #     print("building v1")
-                    #     built_device = factory(mock=mock, **params)
-                    # else:
-                    # print("building v2")
                     built_device = factory(**params)
-                    # if connect_immediately:
-                    #     if issubclass(factory.device_type, OphydV1Device):
-                    #         print("connecting v1")
-                    #         built_device.wait_for_connection()
-                    #     else:
-                    #         print("connecting v2")
-                    #         call_in_bluesky_event_loop(
-                    #             built_device.connect(
-                    #                 mock=mock,
-                    #                 timeout=timeout or factory.timeout,
-                    #             )
-                    #         )
                     built[device] = built_device
                 except Exception as e:
                     errors[device] = e
 
-        self._connect = previous_connect
         return built, errors
 
     def __getitem__(self, name):
@@ -478,7 +448,6 @@ if __name__ == "__main__":
     print(valid)
     print(errs)
 
-    devices.auto_connect(mock=True, timeout=17)
     print(base_x())
 
     # devices.build_devices(circ_1, circ_2)
