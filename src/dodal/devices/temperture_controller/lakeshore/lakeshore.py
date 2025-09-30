@@ -6,20 +6,28 @@ from ophyd_async.core import (
     SignalDatatypeT,
     StandardReadable,
     StandardReadableFormat,
+    StrictEnum,
     derived_signal_rw,
     soft_signal_rw,
 )
-from ophyd_async.core._readable import _HintsFromName
 
 from .lakeshore_io import (
     LakeshoreBaseIO,
 )
 
 
+class Heater336Settings(StrictEnum):
+    OFF = "Off"
+    LOW = "Low"
+    MEDIUM = "Medium"
+    HIGH = "High"
+
+
 class Lakeshore(LakeshoreBaseIO, StandardReadable, Movable[float]):
     """
     Device for controlling and reading from a Lakeshore temperature controller.
     It supports multiple channels and PID control.
+
     Attributes
     ----------
     temperature : LakeshoreBaseIO
@@ -77,15 +85,6 @@ class Lakeshore(LakeshoreBaseIO, StandardReadable, Movable[float]):
             set_derived=self._set_control_channel,
             current_channel=self._control_channel,
         )
-
-        self._hints_channel = soft_signal_rw(int, initial_value=control_channel)
-
-        self.hints_channel = derived_signal_rw(
-            raw_to_derived=self._get_hints_channel,
-            set_derived=self._set_hints_channel,
-            current_hints_channel=self._hints_channel,
-        )
-
         super().__init__(
             prefix=prefix,
             num_readback_channel=num_readback_channel,
@@ -96,9 +95,10 @@ class Lakeshore(LakeshoreBaseIO, StandardReadable, Movable[float]):
 
         self.add_readables(
             [setpoint.user_setpoint for setpoint in self.control_channels.values()]
-            + list(self.readback.values())
         )
-        self._has_hints = (_HintsFromName(self.readback[control_channel]),)
+        self.add_readables(
+            list(self.readback.values()), format=StandardReadableFormat.HINTED_SIGNAL
+        )
 
         self.add_readables(
             [
@@ -147,9 +147,58 @@ class Lakeshore(LakeshoreBaseIO, StandardReadable, Movable[float]):
             self.control_channels[value].heater_output_range.read,
         )
 
-    async def _set_hints_channel(self, readback_channel: int) -> None:
-        self._has_hints = (_HintsFromName(self.readback[readback_channel]),)
-        await self._hints_channel.set(readback_channel)
 
-    def _get_hints_channel(self, current_hints_channel: int) -> int:
-        return current_hints_channel
+class Lakeshore336(Lakeshore):
+    def __init__(
+        self,
+        prefix: str,
+        control_channel: int = 1,
+        name: str = "",
+    ):
+        """
+        Lakeshore 336 temperature controller. With 4 readback and control channels.
+        Heater settings are: Off, Low, Medium, High.
+        Parameters
+        ----------
+        prefix : str
+            The EPICS prefix for the device.
+        control_channel : int, optional
+            The initial control channel (default is 1).
+        """
+        super().__init__(
+            prefix=prefix,
+            num_readback_channel=4,
+            heater_setting=Heater336Settings,
+            control_channel=control_channel,
+            single_control_channel=False,
+            name=name,
+        )
+
+
+class Lakeshore340(Lakeshore):
+    def __init__(
+        self,
+        prefix: str,
+        control_channel: int = 1,
+        name: str = "",
+    ):
+        """Lakeshore 340 temperature controller. With 4 readback channels and a single
+        control channel.
+        Heater settings are in power from 0 to 5. 0 is 0 watt, 5 is 50 watt.
+
+        Parameters
+        ----------
+        prefix : str
+            The EPICS prefix for the device.
+        control_channel : int, optional
+            The initial control channel (default is 1).
+        """
+
+        super().__init__(
+            prefix=prefix,
+            num_readback_channel=4,
+            heater_setting=float,
+            control_channel=control_channel,
+            single_control_channel=True,
+            name=name,
+        )
