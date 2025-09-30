@@ -404,7 +404,6 @@ class Apple2(abc.ABC, StandardReadable, Movable):
             btm_outer=self.phase.btm_outer.user_readback,
             gap=id_gap.user_readback,
         )
-        self.energy_to_motor = energy_motor_convertor
         super().__init__(name)
 
     def _set_pol_setpoint(self, pol: Pol) -> None:
