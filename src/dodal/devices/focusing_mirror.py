@@ -142,7 +142,6 @@ class SimpleMirror(XYPitchStage):
         self,
         prefix: str,
         name: str = "",
-        bragg_to_lat_lut_path: str | None = None,
         x_suffix: str = "X",
         y_suffix: str = "Y",
         pitch_suffix: str = "PITCH",
@@ -158,7 +157,7 @@ class SimpleMirror(XYPitchStage):
         self.type, _ = soft_signal_r_and_setter(MirrorType, MirrorType.SINGLE)
         # The device is in the beamline co-ordinate system so pitch is the incident angle
         # regardless of orientation of the mirror
-        self.incident_angle = Motor(prefix + "PITCH")
+        self.incident_angle = Motor(prefix + pitch_suffix)
 
         self.add_readables(
             [self.incident_angle.user_readback],
