@@ -121,7 +121,7 @@ def mock_config_client() -> ConfigServer:
 
 
 @pytest.fixture
-def mock_I10EnergyMotorLookup_idu(
+def mock_i10energymotorlookup_idu(
     mock_config_client: ConfigServer,
 ) -> I10EnergyMotorLookup:
     mock_config_client.get_file_contents = MagicMock(spec=["get_file_contents"])
@@ -140,11 +140,11 @@ def mock_I10EnergyMotorLookup_idu(
 
 
 @pytest.fixture
-async def mock_id(mock_I10EnergyMotorLookup_idu: I10EnergyMotorLookup) -> I10Apple2:
+async def mock_id(mock_i10energymotorlookup_idu: I10EnergyMotorLookup) -> I10Apple2:
     async with init_devices(mock=True):
         mock_id = I10Apple2(
             prefix="BLWOW-MO-SERVC-01:",
-            energy_motor_convertor=mock_I10EnergyMotorLookup_idu.get_motor_from_energy,
+            energy_motor_convertor=mock_i10energymotorlookup_idu.get_motor_from_energy,
         )
     set_mock_value(mock_id.gap.gate, UndulatorGateStatus.CLOSE)
     set_mock_value(mock_id.phase.gate, UndulatorGateStatus.CLOSE)
@@ -258,7 +258,7 @@ async def test_i10apple2_RE_scan(mock_id_pgm: EnergySetter, RE: RunEngine):
     assert_emitted(docs, start=1, descriptor=1, event=11, stop=1)
 
 
-async def test_EnergySetter_RE_scan(mock_id_pgm: EnergySetter, RE: RunEngine):
+async def test_energySetter_re_scan(mock_id_pgm: EnergySetter, RE: RunEngine):
     docs = defaultdict(list)
 
     def capture_emitted(name, doc):
@@ -548,13 +548,13 @@ async def test_linear_arbitrary_RE_scan(
         ),
     ],
 )
-def test_I10EnergyMotorLookup_convert_csv_to_lookup_success(
-    mock_I10EnergyMotorLookup_idu: I10EnergyMotorLookup,
+def test_i10energymotorlookup_convert_csv_to_lookup_success(
+    mock_i10energymotorlookup_idu: I10EnergyMotorLookup,
     fileName: str,
     expected_dict_file_name: str,
     source: tuple[str, str],
 ):
-    data = mock_I10EnergyMotorLookup_idu.convert_csv_to_lookup(
+    data = mock_i10energymotorlookup_idu.convert_csv_to_lookup(
         file=fileName,
         source=source,
     )
@@ -563,22 +563,22 @@ def test_I10EnergyMotorLookup_convert_csv_to_lookup_success(
     assert data == loaded_dict
 
 
-def test_I10EnergyMotorLookup_convert_csv_to_lookup_failed(
-    mock_I10EnergyMotorLookup_idu: I10EnergyMotorLookup,
+def test_i10energymotorlookup_convert_csv_to_lookup_failed(
+    mock_i10energymotorlookup_idu: I10EnergyMotorLookup,
 ):
     with pytest.raises(RuntimeError):
-        mock_I10EnergyMotorLookup_idu.convert_csv_to_lookup(
+        mock_i10energymotorlookup_idu.convert_csv_to_lookup(
             file=ID_ENERGY_2_GAP_CALIBRATIONS_CSV,
             source=("Source", "idw"),
         )
 
 
-async def test_fail_I10EnergyMotorLookup_no_lookup(
-    mock_I10EnergyMotorLookup_idu: I10EnergyMotorLookup,
+async def test_fail_i10energymotorlookup_no_lookup(
+    mock_i10energymotorlookup_idu: I10EnergyMotorLookup,
 ):
     wrong_path = "fnslkfndlsnf"
     with pytest.raises(FileNotFoundError) as e:
-        mock_I10EnergyMotorLookup_idu.convert_csv_to_lookup(
+        mock_i10energymotorlookup_idu.convert_csv_to_lookup(
             file=wrong_path,
             source=("Source", "idd"),
         )
@@ -586,37 +586,37 @@ async def test_fail_I10EnergyMotorLookup_no_lookup(
 
 
 @pytest.mark.parametrize("energy", [(100), (5500), (-299)])
-async def test_fail_I10EnergyMotorLookup_outside_energy_limits(
+async def test_fail_i10energymotorlookup_outside_energy_limits(
     mock_id: I10Apple2,
     energy: float,
-    mock_I10EnergyMotorLookup_idu: I10EnergyMotorLookup,
+    mock_i10energymotorlookup_idu: I10EnergyMotorLookup,
 ):
     with pytest.raises(ValueError) as e:
         await mock_id.set(energy)
     assert str(e.value) == "Demanding energy must lie between {} and {} eV!".format(
-        mock_I10EnergyMotorLookup_idu.lookup_tables["Gap"][
+        mock_i10energymotorlookup_idu.lookup_tables["Gap"][
             await mock_id.polarisation_setpoint.get_value()
         ]["Limit"]["Minimum"],
-        mock_I10EnergyMotorLookup_idu.lookup_tables["Gap"][
+        mock_i10energymotorlookup_idu.lookup_tables["Gap"][
             await mock_id.polarisation_setpoint.get_value()
         ]["Limit"]["Maximum"],
     )
 
 
-async def test_fail_I10EnergyMotorLookup_with_lookup_gap(
+async def test_fail_i10energymotorlookup_with_lookup_gap(
     mock_id: I10Apple2,
-    mock_I10EnergyMotorLookup_idu: I10EnergyMotorLookup,
+    mock_i10energymotorlookup_idu: I10EnergyMotorLookup,
 ):
-    mock_I10EnergyMotorLookup_idu.update_lookuptable()
+    mock_i10energymotorlookup_idu.update_lookuptable()
     # make gap in energy
-    mock_I10EnergyMotorLookup_idu.lookup_tables["Gap"]["lh"]["Energies"] = {
+    mock_i10energymotorlookup_idu.lookup_tables["Gap"]["lh"]["Energies"] = {
         "1": {
             "Low": 255.3,
             "High": 500,
             "Poly": poly1d([4.33435e-08, -7.52562e-05, 6.41791e-02, 3.88755e00]),
         }
     }
-    mock_I10EnergyMotorLookup_idu.lookup_tables["Gap"]["lh"]["Energies"] = {
+    mock_i10energymotorlookup_idu.lookup_tables["Gap"]["lh"]["Energies"] = {
         "2": {
             "Low": 600,
             "High": 1000,
