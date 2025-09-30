@@ -54,7 +54,7 @@ def mirror() -> SimpleMirror:
 
 
 @device_factory()
-def d7() -> QDV2F:
+def it() -> QDV2F:
     return QDV2F(prefix=f"{PREFIX.beamline_prefix}-DI-PHDGN-07:PHD1:", I_suffix="I")
 
 
