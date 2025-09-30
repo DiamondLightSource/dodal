@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.apple2_undulator.Apple2 &#8212; dodal 1.58.1.dev23+g9cc6d018e documentation</title>
+    <title>dodal.devices.apple2_undulator.Apple2 &#8212; dodal 1.58.1.dev24+g257aede2f documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=49d3963d"></script>
+    <script src="../../_static/documentation_options.js?v=d2e8e78a"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -472,11 +472,7 @@
 <li class="toctree-l4 current active"><a class="current reference internal" href="#">dodal.devices.apple2_undulator.Apple2</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.apple2_undulator.Apple2PhasesVal.html">dodal.devices.apple2_undulator.Apple2PhasesVal</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.apple2_undulator.Apple2Val.html">dodal.devices.apple2_undulator.Apple2Val</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.apple2_undulator.EnergyCoverage.html">dodal.devices.apple2_undulator.EnergyCoverage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.apple2_undulator.EnergyCoverageEntry.html">dodal.devices.apple2_undulator.EnergyCoverageEntry</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.apple2_undulator.EnergyMinMax.html">dodal.devices.apple2_undulator.EnergyMinMax</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.apple2_undulator.LookupTableEntries.html">dodal.devices.apple2_undulator.LookupTableEntries</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.apple2_undulator.Lookuptable.html">dodal.devices.apple2_undulator.Lookuptable</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.apple2_undulator.EnergyMotorConvertor.html">dodal.devices.apple2_undulator.EnergyMotorConvertor</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.apple2_undulator.Pol.html">dodal.devices.apple2_undulator.Pol</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.apple2_undulator.SafeUndulatorMover.html">dodal.devices.apple2_undulator.SafeUndulatorMover</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.apple2_undulator.UndulatorGap.html">dodal.devices.apple2_undulator.UndulatorGap</a></li>
@@ -1003,8 +999,10 @@ This device provides additional degrees of freedom compared to standard undulato
 movement of magnet banks to produce X-rays with various polarisations and energies.</p>
 <p>The class is designed to manage the undulator’s gap, phase motors, and polarisation settings, while
 abstracting hardware interactions and providing a high-level interface for beamline operations.</p>
-<p>A pair of look up tables are needed to provide the conversion between motor position
-and energy.</p>
+<dl class="simple">
+<dt>The class is abstract and requires beamline-specific implementations for set motor</dt><dd><p>positions based on energy and polarisation.</p>
+</dd>
+</dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="dodal.devices.apple2_undulator.Apple2.gap">
 <span class="sig-name descname"><span class="pre">gap</span></span><a class="headerlink" href="#dodal.devices.apple2_undulator.Apple2.gap" title="Link to this definition">#</a></dt>
@@ -1072,12 +1070,12 @@ and energy.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="dodal.devices.apple2_undulator.Apple2._available_pol">
-<span class="sig-name descname"><span class="pre">_available_pol</span></span><a class="headerlink" href="#dodal.devices.apple2_undulator.Apple2._available_pol" title="Link to this definition">#</a></dt>
-<dd><p>A list of available polarisations supported by the device.</p>
+<dt class="sig sig-object py" id="dodal.devices.apple2_undulator.Apple2.energy_to_motor">
+<span class="sig-name descname"><span class="pre">energy_to_motor</span></span><a class="headerlink" href="#dodal.devices.apple2_undulator.Apple2.energy_to_motor" title="Link to this definition">#</a></dt>
+<dd><p>A callable that converts energy and polarisation to motor positions.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)">list</a></p>
+<dd class="field-odd"><p><a class="reference internal" href="dodal.devices.apple2_undulator.EnergyMotorConvertor.html#dodal.devices.apple2_undulator.EnergyMotorConvertor" title="dodal.devices.apple2_undulator.EnergyMotorConvertor">EnergyMotorConvertor</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1103,18 +1101,6 @@ and energy.</p>
 </dl>
 </dd></dl>
 
-<dl class="py attribute">
-<dt class="sig sig-object py" id="dodal.devices.apple2_undulator.Apple2.update_lookuptable">
-<span class="sig-name descname"><span class="pre">update_lookuptable</span></span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../_modules/dodal/devices/apple2_undulator.html#Apple2.update_lookuptable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.apple2_undulator.Apple2.update_lookuptable" title="Link to this definition">#</a></dt>
-<dd><p>Abstract method to load and validate lookup tables from external sources.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="dodal.devices.apple2_undulator.Apple2._set_pol_setpoint">
-<span class="sig-name descname"><span class="pre">_set_pol_setpoint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="dodal.devices.apple2_undulator.Pol.html#dodal.devices.apple2_undulator.Pol" title="dodal.devices.apple2_undulator.Pol"><span class="pre">Pol</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../_modules/dodal/devices/apple2_undulator.html#Apple2._set_pol_setpoint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.apple2_undulator.Apple2._set_pol_setpoint" title="Link to this definition">#</a></dt>
-<dd><p>Sets the polarisation setpoint without moving hardware.</p>
-</dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="dodal.devices.apple2_undulator.Apple2.determine_phase_from_hardware">
 <span class="sig-name descname"><span class="pre">determine_phase_from_hardware</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">...</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="dodal.devices.apple2_undulator.Pol.html#dodal.devices.apple2_undulator.Pol" title="dodal.devices.apple2_undulator.Pol"><span class="pre">Pol</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/dodal/devices/apple2_undulator.html#Apple2.determine_phase_from_hardware"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.apple2_undulator.Apple2.determine_phase_from_hardware" title="Link to this definition">#</a></dt>
@@ -1124,7 +1110,6 @@ and energy.</p>
 <p class="rubric">Notes</p>
 <ul class="simple">
 <li><p>This class requires beamline-specific implementations of the abstract methods.</p></li>
-<li><p>The lookup tables must follow the <a class="reference internal" href="dodal.devices.apple2_undulator.Lookuptable.html#dodal.devices.apple2_undulator.Lookuptable" title="dodal.devices.apple2_undulator.Lookuptable"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Lookuptable</span></code></a> format and be validated before use.</p></li>
 <li><p>The device supports multiple polarisation modes, including linear horizontal (LH), linear vertical (LV),
 positive circular (PC), negative circular (NC), and linear arbitrary (LA).</p></li>
 </ul>
@@ -1138,10 +1123,11 @@ positive circular (PC), negative circular (NC), and linear arbitrary (LA).</p></
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>id_gap</strong> (<em>An UndulatorGap device.</em>)</p></li>
 <li><p><strong>id_phase</strong> (<em>An UndulatorPhaseAxes device.</em>)</p></li>
+<li><p><strong>energy_motor_convertor</strong> (<em>A callable that converts energy and polarisation to motor positions.</em>)</p></li>
 <li><p><strong>name</strong> (<em>Name</em><em> of </em><em>the device.</em>)</p></li>
 <li><p><strong>id_gap</strong></p></li>
 <li><p><strong>id_phase</strong></p></li>
-<li><p><strong>prefix</strong> (<em>Not in use but needed for device_instantiation.</em>)</p></li>
+<li><p><strong>energy_motor_convertor</strong></p></li>
 <li><p><strong>name</strong></p></li>
 </ul>
 </dd>
@@ -1149,14 +1135,11 @@ positive circular (PC), negative circular (NC), and linear arbitrary (LA).</p></
 <p class="rubric">Methods</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#id1" title="dodal.devices.apple2_undulator.Apple2.determine_phase_from_hardware"><code class="xref py py-obj docutils literal notranslate"><span class="pre">determine_phase_from_hardware</span></code></a>(top_outer, ...)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#id0" title="dodal.devices.apple2_undulator.Apple2.determine_phase_from_hardware"><code class="xref py py-obj docutils literal notranslate"><span class="pre">determine_phase_from_hardware</span></code></a>(top_outer, ...)</p></td>
 <td><p>Determine polarisation and phase value using motor position patterns.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#dodal.devices.apple2_undulator.Apple2.set" title="dodal.devices.apple2_undulator.Apple2.set"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set</span></code></a>(value)</p></td>
 <td><p>Set should be in energy units, this will set the energy of the ID by setting the gap and phase motors to the correct position for the given energy and polarisation.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#id0" title="dodal.devices.apple2_undulator.Apple2.update_lookuptable"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_lookuptable</span></code></a>()</p></td>
-<td><p></p></td>
 </tr>
 </tbody>
 </table>
@@ -1179,10 +1162,8 @@ undulator design and the lookup table used.
 _set can be used to set the motor positions for the given energy and
 polarisation provided that all motors can be moved at the same time.</p>
 <p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">RE</span><span class="p">(</span> <span class="nb">id</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="mf">888.0</span><span class="p">))</span> <span class="c1"># This will set the ID to 888 eV</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">RE</span><span class="p">(</span><span class="n">scan</span><span class="p">([</span><span class="n">detector</span><span class="p">],</span> <span class="nb">id</span><span class="p">,</span><span class="mi">600</span><span class="p">,</span><span class="mi">700</span><span class="p">,</span><span class="mi">100</span><span class="p">))</span> <span class="c1"># This will scan the ID from 600 to 700 eV in 100 steps.</span>
-</pre></div>
-</div>
+<p>RE( id.set(888.0)) # This will set the ID to 888 eV
+RE(scan([detector], id,600,700,100)) # This will scan the ID from 600 to 700 eV in 100 steps.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>value</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>)</p>
@@ -1195,23 +1176,7 @@ polarisation provided that all motors can be moved at the same time.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="id0">
-<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">update_lookuptable</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../_modules/dodal/devices/apple2_undulator.html#Apple2.update_lookuptable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id0" title="Link to this definition">#</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
-</dd>
-</dl>
-<p>Abstract method to update the stored lookup tabled from file.
-This function should include check to ensure the lookuptable is in the correct format:</p>
-<blockquote>
-<div><p># ensure the importing lookup table is the correct format
-Lookuptable.model_validate(&lt;loockuptable&gt;)</p>
-</div></blockquote>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="id1">
-<span class="sig-name descname"><span class="pre">determine_phase_from_hardware</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">top_outer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">top_inner</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">btm_inner</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">btm_outer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">gap</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="dodal.devices.apple2_undulator.Pol.html#dodal.devices.apple2_undulator.Pol" title="dodal.devices.apple2_undulator.Pol"><span class="pre">Pol</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/dodal/devices/apple2_undulator.html#Apple2.determine_phase_from_hardware"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id1" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">determine_phase_from_hardware</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">top_outer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">top_inner</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">btm_inner</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">btm_outer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">gap</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="dodal.devices.apple2_undulator.Pol.html#dodal.devices.apple2_undulator.Pol" title="dodal.devices.apple2_undulator.Pol"><span class="pre">Pol</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/dodal/devices/apple2_undulator.html#Apple2.determine_phase_from_hardware"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id0" title="Link to this definition">#</a></dt>
 <dd><p>Determine polarisation and phase value using motor position patterns.
 However there is no way to return lh3 polarisation or higher harmonic setting.
 (May be for future one can use the inverse poly to work out the energy and try to match it with the current energy
@@ -1290,13 +1255,10 @@ to workout the polarisation but during my test the inverse poly is too unstable 
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.apple2_undulator.Apple2.polarisation_setpoint"><code class="docutils literal notranslate"><span class="pre">Apple2.polarisation_setpoint</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.apple2_undulator.Apple2.polarisation"><code class="docutils literal notranslate"><span class="pre">Apple2.polarisation</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.apple2_undulator.Apple2.lookup_tables"><code class="docutils literal notranslate"><span class="pre">Apple2.lookup_tables</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.apple2_undulator.Apple2._available_pol"><code class="docutils literal notranslate"><span class="pre">Apple2._available_pol</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.apple2_undulator.Apple2.update_lookuptable"><code class="docutils literal notranslate"><span class="pre">Apple2.update_lookuptable</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.apple2_undulator.Apple2._set_pol_setpoint"><code class="docutils literal notranslate"><span class="pre">Apple2._set_pol_setpoint()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.apple2_undulator.Apple2.energy_to_motor"><code class="docutils literal notranslate"><span class="pre">Apple2.energy_to_motor</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.apple2_undulator.Apple2.determine_phase_from_hardware"><code class="docutils literal notranslate"><span class="pre">Apple2.determine_phase_from_hardware()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.apple2_undulator.Apple2.set"><code class="docutils literal notranslate"><span class="pre">Apple2.set()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id0"><code class="docutils literal notranslate"><span class="pre">Apple2.update_lookuptable()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1"><code class="docutils literal notranslate"><span class="pre">Apple2.determine_phase_from_hardware()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id0"><code class="docutils literal notranslate"><span class="pre">Apple2.determine_phase_from_hardware()</span></code></a></li>
 </ul>
 </li>
 </ul>

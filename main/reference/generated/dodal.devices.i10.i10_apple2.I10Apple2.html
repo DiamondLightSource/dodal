@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.i10.i10_apple2.I10Apple2 &#8212; dodal 1.58.1.dev23+g9cc6d018e documentation</title>
+    <title>dodal.devices.i10.i10_apple2.I10Apple2 &#8212; dodal 1.58.1.dev24+g257aede2f documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=49d3963d"></script>
+    <script src="../../_static/documentation_options.js?v=d2e8e78a"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -472,11 +472,7 @@
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.apple2_undulator.Apple2.html">dodal.devices.apple2_undulator.Apple2</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.apple2_undulator.Apple2PhasesVal.html">dodal.devices.apple2_undulator.Apple2PhasesVal</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.apple2_undulator.Apple2Val.html">dodal.devices.apple2_undulator.Apple2Val</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.apple2_undulator.EnergyCoverage.html">dodal.devices.apple2_undulator.EnergyCoverage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.apple2_undulator.EnergyCoverageEntry.html">dodal.devices.apple2_undulator.EnergyCoverageEntry</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.apple2_undulator.EnergyMinMax.html">dodal.devices.apple2_undulator.EnergyMinMax</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.apple2_undulator.LookupTableEntries.html">dodal.devices.apple2_undulator.LookupTableEntries</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.apple2_undulator.Lookuptable.html">dodal.devices.apple2_undulator.Lookuptable</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.apple2_undulator.EnergyMotorConvertor.html">dodal.devices.apple2_undulator.EnergyMotorConvertor</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.apple2_undulator.Pol.html">dodal.devices.apple2_undulator.Pol</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.apple2_undulator.SafeUndulatorMover.html">dodal.devices.apple2_undulator.SafeUndulatorMover</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.apple2_undulator.UndulatorGap.html">dodal.devices.apple2_undulator.UndulatorGap</a></li>
@@ -1000,23 +996,18 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="dodal.devices.i10.i10_apple2.I10Apple2">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dodal.devices.i10.i10_apple2.</span></span><span class="sig-name descname"><span class="pre">I10Apple2</span></span><a class="reference internal" href="../../_modules/dodal/devices/i10/i10_apple2.html#I10Apple2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.i10.i10_apple2.I10Apple2" title="Link to this definition">#</a></dt>
-<dd><p>I10Apple2 is the i10 version of Apple2 ID, set and update_lookuptable function
-should be the only part that is I10 specific.</p>
-<p>A pair of look up tables are needed to provide the conversion betwApple 2 ID/undulator has 4 extra degrees of freedom compare to the standard Undulator,
-each bank of magnet can move independently to each other,
-which allow the production of different x-ray polarisation as well as energy.
-This type of ID is use on I10, I21, I09, I17 and I06 for soft x-ray.een motor position and energy.</p>
+<dd><dl class="simple">
+<dt>I10Apple2 is the i10 version of Apple2 ID, set and energy_motor_convertor</dt><dd><p>should be the only part that is I10 specific.</p>
+</dd>
+<dt>A EnergyMotorConvertor function is needed to provide the conversion between</dt><dd><p>x-ray motor position and energy.</p>
+</dd>
+</dl>
 <p>Set is in energy(eV).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>look_up_table_dir</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
-<li><p><strong>source</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>)</p></li>
 <li><p><strong>prefix</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
-<li><p><strong>mode</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">'Mode'</span></code>)</p></li>
-<li><p><strong>min_energy</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">'MinEnergy'</span></code>)</p></li>
-<li><p><strong>max_energy</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">'MaxEnergy'</span></code>)</p></li>
-<li><p><strong>poly_deg</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
+<li><p><strong>energy_motor_convertor</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="dodal.devices.apple2_undulator.EnergyMotorConvertor.html#dodal.devices.apple2_undulator.EnergyMotorConvertor" title="dodal.devices.apple2_undulator.EnergyMotorConvertor"><code class="xref py py-class docutils literal notranslate"><span class="pre">EnergyMotorConvertor</span></code></a></span>)</p></li>
 <li><p><strong>name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">''</span></code>)</p></li>
 <li><p><strong>look_up_table_dir</strong> – The path to look up table.</p></li>
 <li><p><strong>source</strong> – The column name and the name of the source in look up table. e.g. (“source”, “idu”)</p></li>
@@ -1026,6 +1017,7 @@ This type of ID is use on I10, I21, I09, I17 and I06 for soft x-ray.een motor po
 <li><p><strong>poly_deg</strong> – The column names for the parameters for the energy conversion polynomial, starting with the least significant.</p></li>
 <li><p><strong>prefix</strong> – epic pv for id</p></li>
 <li><p><strong>Name</strong> – Name of the device</p></li>
+<li><p><strong>energy_motor_convertor</strong></p></li>
 <li><p><strong>name</strong></p></li>
 </ul>
 </dd>
@@ -1035,9 +1027,6 @@ This type of ID is use on I10, I21, I09, I17 and I06 for soft x-ray.een motor po
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#dodal.devices.i10.i10_apple2.I10Apple2.set" title="dodal.devices.i10.i10_apple2.I10Apple2.set"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set</span></code></a>(value)</p></td>
 <td><p>Check polarisation state and use it together with the energy(value) to calculate the required gap and phases before setting it.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#dodal.devices.i10.i10_apple2.I10Apple2.update_lookuptable" title="dodal.devices.i10.i10_apple2.I10Apple2.update_lookuptable"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_lookuptable</span></code></a>()</p></td>
-<td><p>Update the stored lookup tabled from file.</p></td>
 </tr>
 </tbody>
 </table>
@@ -1061,12 +1050,6 @@ to calculate the required gap and phases before setting it.</p>
 <dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
 </dd>
 </dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="dodal.devices.i10.i10_apple2.I10Apple2.update_lookuptable">
-<span class="sig-name descname"><span class="pre">update_lookuptable</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dodal/devices/i10/i10_apple2.html#I10Apple2.update_lookuptable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.i10.i10_apple2.I10Apple2.update_lookuptable" title="Link to this definition">#</a></dt>
-<dd><p>Update the stored lookup tabled from file.</p>
 </dd></dl>
 
 </dd></dl>
@@ -1122,7 +1105,6 @@ to calculate the required gap and phases before setting it.</p>
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.i10.i10_apple2.I10Apple2"><code class="docutils literal notranslate"><span class="pre">I10Apple2</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.i10.i10_apple2.I10Apple2.set"><code class="docutils literal notranslate"><span class="pre">I10Apple2.set()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.i10.i10_apple2.I10Apple2.update_lookuptable"><code class="docutils literal notranslate"><span class="pre">I10Apple2.update_lookuptable()</span></code></a></li>
 </ul>
 </li>
 </ul>

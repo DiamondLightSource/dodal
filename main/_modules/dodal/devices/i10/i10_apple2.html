@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.i10.i10_apple2 &#8212; dodal 1.58.1.dev23+g9cc6d018e documentation</title>
+    <title>dodal.devices.i10.i10_apple2 &#8212; dodal 1.58.1.dev24+g257aede2f documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=49d3963d"></script>
+    <script src="../../../../_static/documentation_options.js?v=d2e8e78a"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -452,12 +452,14 @@ window.addEventListener("load", () => mermaid.run());
   <h1>Source code for dodal.devices.i10.i10_apple2</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">csv</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">io</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">SupportsFloat</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">bluesky.protocols</span><span class="w"> </span><span class="kn">import</span> <span class="n">Movable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">daq_config_server.client</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConfigServer</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">AsyncStatus</span><span class="p">,</span>
     <span class="n">Device</span><span class="p">,</span>
@@ -467,13 +469,14 @@ window.addEventListener("load", () => mermaid.run());
     <span class="n">soft_signal_r_and_setter</span><span class="p">,</span>
     <span class="n">soft_signal_rw</span><span class="p">,</span>
 <span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">ConfigDict</span><span class="p">,</span> <span class="n">RootModel</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.log</span><span class="w"> </span><span class="kn">import</span> <span class="n">LOGGER</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">..apple2_undulator</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">Apple2</span><span class="p">,</span>
     <span class="n">Apple2Val</span><span class="p">,</span>
-    <span class="n">Lookuptable</span><span class="p">,</span>
+    <span class="n">EnergyMotorConvertor</span><span class="p">,</span>
     <span class="n">Pol</span><span class="p">,</span>
     <span class="n">UndulatorGap</span><span class="p">,</span>
     <span class="n">UndulatorJawPhase</span><span class="p">,</span>
@@ -512,29 +515,312 @@ window.addEventListener("load", () => mermaid.run());
 
 
 
-<div class="viewcode-block" id="I10Apple2">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i10.i10_apple2.I10Apple2.html#dodal.devices.i10.i10_apple2.I10Apple2">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">I10Apple2</span><span class="p">(</span><span class="n">Apple2</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;I10Apple2 is the i10 version of Apple2 ID, set and update_lookuptable function</span>
-<span class="sd">    should be the only part that is I10 specific.</span>
+<div class="viewcode-block" id="EnergyMinMax">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i10.i10_apple2.EnergyMinMax.html#dodal.devices.i10.i10_apple2.EnergyMinMax">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">EnergyMinMax</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">Minimum</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">Maximum</span><span class="p">:</span> <span class="nb">float</span></div>
 
-<span class="sd">    A pair of look up tables are needed to provide the conversion betwApple 2 ID/undulator has 4 extra degrees of freedom compare to the standard Undulator,</span>
-<span class="sd">    each bank of magnet can move independently to each other,</span>
-<span class="sd">    which allow the production of different x-ray polarisation as well as energy.</span>
-<span class="sd">    This type of ID is use on I10, I21, I09, I17 and I06 for soft x-ray.een motor position and energy.</span>
 
-<span class="sd">    Set is in energy(eV).</span>
+
+<div class="viewcode-block" id="EnergyCoverageEntry">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i10.i10_apple2.EnergyCoverageEntry.html#dodal.devices.i10.i10_apple2.EnergyCoverageEntry">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">EnergyCoverageEntry</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">model_config</span> <span class="o">=</span> <span class="n">ConfigDict</span><span class="p">(</span><span class="n">arbitrary_types_allowed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">Low</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">High</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">Poly</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">poly1d</span></div>
+
+
+
+<div class="viewcode-block" id="EnergyCoverage">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i10.i10_apple2.EnergyCoverage.html#dodal.devices.i10.i10_apple2.EnergyCoverage">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">EnergyCoverage</span><span class="p">(</span><span class="n">RootModel</span><span class="p">):</span>
+    <span class="n">root</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">EnergyCoverageEntry</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="LookupTableEntries">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i10.i10_apple2.LookupTableEntries.html#dodal.devices.i10.i10_apple2.LookupTableEntries">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">LookupTableEntries</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">Energies</span><span class="p">:</span> <span class="n">EnergyCoverage</span>
+    <span class="n">Limit</span><span class="p">:</span> <span class="n">EnergyMinMax</span></div>
+
+
+
+<div class="viewcode-block" id="Lookuptable">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i10.i10_apple2.Lookuptable.html#dodal.devices.i10.i10_apple2.Lookuptable">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Lookuptable</span><span class="p">(</span><span class="n">RootModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;BaseModel class for the lookup table.</span>
+<span class="sd">    Apple2 lookup table should be in this format.</span>
+
+<span class="sd">    {mode: {&#39;Energies&#39;: {Any: {&#39;Low&#39;: float,</span>
+<span class="sd">                            &#39;High&#39;: float,</span>
+<span class="sd">                            &#39;Poly&#39;:np.poly1d</span>
+<span class="sd">                            }</span>
+<span class="sd">                        }</span>
+<span class="sd">            &#39;Limit&#39;: {&#39;Minimum&#39;: float,</span>
+<span class="sd">                    &#39;Maximum&#39;: float</span>
+<span class="sd">                    }</span>
+<span class="sd">        }</span>
+<span class="sd">    }</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">root</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">LookupTableEntries</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="I10EnergyMotorLookup">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i10.i10_apple2.I10EnergyMotorLookup.html#dodal.devices.i10.i10_apple2.I10EnergyMotorLookup">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">I10EnergyMotorLookup</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Handles lookup tables for I10 Apple2 ID, converting energy and polarisation to gap</span>
+<span class="sd">     and phase. Fetches and parses lookup tables from a config server, supports dynamic</span>
+<span class="sd">     updates, and validates input.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">look_up_table_dir</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">source</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
-        <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">config_client</span><span class="p">:</span> <span class="n">ConfigServer</span><span class="p">,</span>
         <span class="n">mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Mode&quot;</span><span class="p">,</span>
         <span class="n">min_energy</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;MinEnergy&quot;</span><span class="p">,</span>
         <span class="n">max_energy</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;MaxEnergy&quot;</span><span class="p">,</span>
+        <span class="n">gap_file_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;IDEnergy2GapCalibrations.csv&quot;</span><span class="p">,</span>
+        <span class="n">phase_file_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;IDEnergy2PhaseCalibrations.csv&quot;</span><span class="p">,</span>
         <span class="n">poly_deg</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialise the I10EnergyMotorLookup class with lookup table headers provided.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        look_up_table_dir:</span>
+<span class="sd">            The path to look up table.</span>
+<span class="sd">        source:</span>
+<span class="sd">            The column name and the name of the source in look up table. e.g. ( &quot;source&quot;, &quot;idu&quot;)</span>
+<span class="sd">        config_client:</span>
+<span class="sd">            The config server client to fetch the look up table.</span>
+<span class="sd">        mode:</span>
+<span class="sd">            The column name of the mode in look up table.</span>
+<span class="sd">        min_energy:</span>
+<span class="sd">            The column name that contain the maximum energy in look up table.</span>
+<span class="sd">        max_energy:</span>
+<span class="sd">            The column name that contain the maximum energy in look up table.</span>
+<span class="sd">        poly_deg:</span>
+<span class="sd">            The column names for the parameters for the energy conversion polynomial, starting with the least significant.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lookup_tables</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;Gap&quot;</span><span class="p">:</span> <span class="p">{},</span>
+            <span class="s2">&quot;Phase&quot;</span><span class="p">:</span> <span class="p">{},</span>
+        <span class="p">}</span>
+        <span class="n">energy_gap_table_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">look_up_table_dir</span><span class="p">,</span> <span class="n">gap_file_name</span><span class="p">)</span>
+        <span class="n">energy_phase_table_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">look_up_table_dir</span><span class="p">,</span> <span class="n">phase_file_name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lookup_table_config</span> <span class="o">=</span> <span class="n">LookupTableConfig</span><span class="p">(</span>
+            <span class="n">path</span><span class="o">=</span><span class="n">LookupPath</span><span class="p">(</span><span class="n">Gap</span><span class="o">=</span><span class="n">energy_gap_table_path</span><span class="p">,</span> <span class="n">Phase</span><span class="o">=</span><span class="n">energy_phase_table_path</span><span class="p">),</span>
+            <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span>
+            <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">,</span>
+            <span class="n">min_energy</span><span class="o">=</span><span class="n">min_energy</span><span class="p">,</span>
+            <span class="n">max_energy</span><span class="o">=</span><span class="n">max_energy</span><span class="p">,</span>
+            <span class="n">poly_deg</span><span class="o">=</span><span class="n">poly_deg</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config_client</span> <span class="o">=</span> <span class="n">config_client</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_available_pol</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">available_pol</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_available_pol</span>
+
+    <span class="nd">@available_pol</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">available_pol</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_available_pol</span> <span class="o">=</span> <span class="n">value</span>
+
+<div class="viewcode-block" id="I10EnergyMotorLookup.update_lookuptable">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i10.i10_apple2.I10EnergyMotorLookup.html#dodal.devices.i10.i10_apple2.I10EnergyMotorLookup.update_lookuptable">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_lookuptable</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Update lookup tables from files and validate their format.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Updating lookup dictionary from file.&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">path</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">lookup_table_config</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lookup_tables</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">convert_csv_to_lookup</span><span class="p">(</span>
+                <span class="n">file</span><span class="o">=</span><span class="n">path</span><span class="p">,</span>
+                <span class="n">source</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lookup_table_config</span><span class="o">.</span><span class="n">source</span><span class="p">,</span>
+                <span class="n">mode</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lookup_table_config</span><span class="o">.</span><span class="n">mode</span><span class="p">,</span>
+                <span class="n">min_energy</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lookup_table_config</span><span class="o">.</span><span class="n">min_energy</span><span class="p">,</span>
+                <span class="n">max_energy</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lookup_table_config</span><span class="o">.</span><span class="n">max_energy</span><span class="p">,</span>
+                <span class="n">poly_deg</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lookup_table_config</span><span class="o">.</span><span class="n">poly_deg</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">Lookuptable</span><span class="o">.</span><span class="n">model_validate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lookup_tables</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">available_pol</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lookup_tables</span><span class="p">[</span><span class="s2">&quot;Gap&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="I10EnergyMotorLookup.get_motor_from_energy">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i10.i10_apple2.I10EnergyMotorLookup.html#dodal.devices.i10.i10_apple2.I10EnergyMotorLookup.get_motor_from_energy">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_motor_from_energy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energy</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">pol</span><span class="p">:</span> <span class="n">Pol</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert energy and polarisation to gap and phase motor positions.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        energy : float</span>
+<span class="sd">            Desired energy in eV.</span>
+<span class="sd">        pol : Pol</span>
+<span class="sd">            Polarisation mode.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        tuple[float, float]</span>
+<span class="sd">            (gap, phase) motor positions.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">available_pol</span> <span class="o">==</span> <span class="p">[]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update_lookuptable</span><span class="p">()</span>
+
+        <span class="n">gap_poly</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_poly</span><span class="p">(</span>
+            <span class="n">lookup_table</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lookup_tables</span><span class="p">[</span><span class="s2">&quot;Gap&quot;</span><span class="p">],</span> <span class="n">energy</span><span class="o">=</span><span class="n">energy</span><span class="p">,</span> <span class="n">pol</span><span class="o">=</span><span class="n">pol</span>
+        <span class="p">)</span>
+        <span class="n">phase_poly</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_poly</span><span class="p">(</span>
+            <span class="n">lookup_table</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lookup_tables</span><span class="p">[</span><span class="s2">&quot;Phase&quot;</span><span class="p">],</span> <span class="n">energy</span><span class="o">=</span><span class="n">energy</span><span class="p">,</span> <span class="n">pol</span><span class="o">=</span><span class="n">pol</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">gap_poly</span><span class="p">(</span><span class="n">energy</span><span class="p">),</span> <span class="n">phase_poly</span><span class="p">(</span><span class="n">energy</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_poly</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">energy</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">pol</span><span class="p">:</span> <span class="n">Pol</span><span class="p">,</span>
+        <span class="n">lookup_table</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">poly1d</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get polynomial for a given energy and polarisation.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If energy is out of bounds or coefficients are missing.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="n">energy</span> <span class="o">&lt;</span> <span class="n">lookup_table</span><span class="p">[</span><span class="n">pol</span><span class="p">][</span><span class="s2">&quot;Limit&quot;</span><span class="p">][</span><span class="s2">&quot;Minimum&quot;</span><span class="p">]</span>
+            <span class="ow">or</span> <span class="n">energy</span> <span class="o">&gt;</span> <span class="n">lookup_table</span><span class="p">[</span><span class="n">pol</span><span class="p">][</span><span class="s2">&quot;Limit&quot;</span><span class="p">][</span><span class="s2">&quot;Maximum&quot;</span><span class="p">]</span>
+        <span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Demanding energy must lie between </span><span class="si">{}</span><span class="s2"> and </span><span class="si">{}</span><span class="s2"> eV!&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">lookup_table</span><span class="p">[</span><span class="n">pol</span><span class="p">][</span><span class="s2">&quot;Limit&quot;</span><span class="p">][</span><span class="s2">&quot;Minimum&quot;</span><span class="p">],</span>
+                    <span class="n">lookup_table</span><span class="p">[</span><span class="n">pol</span><span class="p">][</span><span class="s2">&quot;Limit&quot;</span><span class="p">][</span><span class="s2">&quot;Maximum&quot;</span><span class="p">],</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">energy_range</span> <span class="ow">in</span> <span class="n">lookup_table</span><span class="p">[</span><span class="n">pol</span><span class="p">][</span><span class="s2">&quot;Energies&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">energy</span> <span class="o">&gt;=</span> <span class="n">energy_range</span><span class="p">[</span><span class="s2">&quot;Low&quot;</span><span class="p">]</span> <span class="ow">and</span> <span class="n">energy</span> <span class="o">&lt;</span> <span class="n">energy_range</span><span class="p">[</span><span class="s2">&quot;High&quot;</span><span class="p">]:</span>
+                    <span class="k">return</span> <span class="n">energy_range</span><span class="p">[</span><span class="s2">&quot;Poly&quot;</span><span class="p">]</span>
+
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;Cannot find polynomial coefficients for your requested energy.</span>
+<span class="sd">        There might be gap in the calibration lookup table.&quot;&quot;&quot;</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="I10EnergyMotorLookup.convert_csv_to_lookup">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i10.i10_apple2.I10EnergyMotorLookup.html#dodal.devices.i10.i10_apple2.I10EnergyMotorLookup.convert_csv_to_lookup">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">convert_csv_to_lookup</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">source</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
+        <span class="n">mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="s2">&quot;Mode&quot;</span><span class="p">,</span>
+        <span class="n">min_energy</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="s2">&quot;MinEnergy&quot;</span><span class="p">,</span>
+        <span class="n">max_energy</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="s2">&quot;MaxEnergy&quot;</span><span class="p">,</span>
+        <span class="n">poly_deg</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert a CSV file to a lookup table dictionary.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dict</span>
+<span class="sd">            Dictionary in Apple2 lookup table format.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        RuntimeError</span>
+<span class="sd">            If the CSV cannot be converted.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">poly_deg</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">poly_deg</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="s2">&quot;7th-order&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;6th-order&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;5th-order&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;4th-order&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;3rd-order&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;2nd-order&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;1st-order&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;b&quot;</span><span class="p">,</span>
+            <span class="p">]</span>
+        <span class="n">lookup_table</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">polarisations</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">process_row</span><span class="p">(</span><span class="n">row</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;Process a single row from the CSV file and update the lookup table.&quot;&quot;&quot;</span>
+            <span class="n">mode_value</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="n">mode</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">mode_value</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">polarisations</span><span class="p">:</span>
+                <span class="n">polarisations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">mode_value</span><span class="p">)</span>
+                <span class="n">lookup_table</span><span class="p">[</span><span class="n">mode_value</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s2">&quot;Energies&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                    <span class="s2">&quot;Limit&quot;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s2">&quot;Minimum&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">min_energy</span><span class="p">]),</span>
+                        <span class="s2">&quot;Maximum&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">max_energy</span><span class="p">]),</span>
+                    <span class="p">},</span>
+                <span class="p">}</span>
+
+            <span class="c1"># Create polynomial object for energy-to-gap/phase conversion</span>
+            <span class="n">coefficients</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">coef</span><span class="p">])</span> <span class="k">for</span> <span class="n">coef</span> <span class="ow">in</span> <span class="n">poly_deg</span><span class="p">]</span>
+            <span class="n">polynomial</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">poly1d</span><span class="p">(</span><span class="n">coefficients</span><span class="p">)</span>
+
+            <span class="n">lookup_table</span><span class="p">[</span><span class="n">mode_value</span><span class="p">][</span><span class="s2">&quot;Energies&quot;</span><span class="p">][</span><span class="n">row</span><span class="p">[</span><span class="n">min_energy</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;Low&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">min_energy</span><span class="p">]),</span>
+                <span class="s2">&quot;High&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">max_energy</span><span class="p">]),</span>
+                <span class="s2">&quot;Poly&quot;</span><span class="p">:</span> <span class="n">polynomial</span><span class="p">,</span>
+            <span class="p">}</span>
+
+            <span class="c1"># Update energy limits</span>
+            <span class="n">lookup_table</span><span class="p">[</span><span class="n">mode_value</span><span class="p">][</span><span class="s2">&quot;Limit&quot;</span><span class="p">][</span><span class="s2">&quot;Minimum&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span>
+                <span class="n">lookup_table</span><span class="p">[</span><span class="n">mode_value</span><span class="p">][</span><span class="s2">&quot;Limit&quot;</span><span class="p">][</span><span class="s2">&quot;Minimum&quot;</span><span class="p">],</span> <span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">min_energy</span><span class="p">])</span>
+            <span class="p">)</span>
+            <span class="n">lookup_table</span><span class="p">[</span><span class="n">mode_value</span><span class="p">][</span><span class="s2">&quot;Limit&quot;</span><span class="p">][</span><span class="s2">&quot;Maximum&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span>
+                <span class="n">lookup_table</span><span class="p">[</span><span class="n">mode_value</span><span class="p">][</span><span class="s2">&quot;Limit&quot;</span><span class="p">][</span><span class="s2">&quot;Maximum&quot;</span><span class="p">],</span> <span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">max_energy</span><span class="p">])</span>
+            <span class="p">)</span>
+
+        <span class="n">csv_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config_client</span><span class="o">.</span><span class="n">get_file_contents</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">reset_cached_result</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">reader</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">DictReader</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">(</span><span class="n">csv_file</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">reader</span><span class="p">:</span>
+            <span class="c1"># If there are multiple source only convert requested.</span>
+            <span class="k">if</span> <span class="n">row</span><span class="p">[</span><span class="n">source</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">==</span> <span class="n">source</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="n">process_row</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="n">row</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">lookup_table</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unable to convert lookup table:</span><span class="se">\t</span><span class="si">{</span><span class="n">file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">lookup_table</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="I10Apple2">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i10.i10_apple2.I10Apple2.html#dodal.devices.i10.i10_apple2.I10Apple2">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">I10Apple2</span><span class="p">(</span><span class="n">Apple2</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;I10Apple2 is the i10 version of Apple2 ID, set and energy_motor_convertor</span>
+<span class="sd">     should be the only part that is I10 specific.</span>
+
+<span class="sd">    A EnergyMotorConvertor function is needed to provide the conversion between</span>
+<span class="sd">     x-ray motor position and energy.</span>
+
+<span class="sd">    Set is in energy(eV).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">energy_motor_convertor</span><span class="p">:</span> <span class="n">EnergyMotorConvertor</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -558,20 +844,6 @@ window.addEventListener("load", () => mermaid.run());
 <span class="sd">            Name of the device</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">energy_gap_table_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">look_up_table_dir</span><span class="p">,</span> <span class="s2">&quot;IDEnergy2GapCalibrations.csv&quot;</span><span class="p">)</span>
-        <span class="n">energy_phase_table_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span>
-            <span class="n">look_up_table_dir</span><span class="p">,</span> <span class="s2">&quot;IDEnergy2PhaseCalibrations.csv&quot;</span>
-        <span class="p">)</span>
-        <span class="c1"># A dataclass contains the path to the look up table and the expected column names.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">lookup_table_config</span> <span class="o">=</span> <span class="n">LookupTableConfig</span><span class="p">(</span>
-            <span class="n">path</span><span class="o">=</span><span class="n">LookupPath</span><span class="p">(</span><span class="n">Gap</span><span class="o">=</span><span class="n">energy_gap_table_path</span><span class="p">,</span> <span class="n">Phase</span><span class="o">=</span><span class="n">energy_phase_table_path</span><span class="p">),</span>
-            <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span>
-            <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">,</span>
-            <span class="n">min_energy</span><span class="o">=</span><span class="n">min_energy</span><span class="p">,</span>
-            <span class="n">max_energy</span><span class="o">=</span><span class="n">max_energy</span><span class="p">,</span>
-            <span class="n">poly_deg</span><span class="o">=</span><span class="n">poly_deg</span><span class="p">,</span>
-        <span class="p">)</span>
-
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
             <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
                 <span class="n">id_gap</span><span class="o">=</span><span class="n">UndulatorGap</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;id_gap&quot;</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">),</span>
@@ -583,6 +855,7 @@ window.addEventListener("load", () => mermaid.run());
                     <span class="n">btm_inner</span><span class="o">=</span><span class="s2">&quot;RPQ3&quot;</span><span class="p">,</span>
                     <span class="n">btm_outer</span><span class="o">=</span><span class="s2">&quot;RPQ4&quot;</span><span class="p">,</span>
                 <span class="p">),</span>
+                <span class="n">energy_motor_convertor</span><span class="o">=</span><span class="n">energy_motor_convertor</span><span class="p">,</span>
                 <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">id_jaw_phase</span> <span class="o">=</span> <span class="n">UndulatorJawPhase</span><span class="p">(</span>
@@ -613,7 +886,7 @@ window.addEventListener("load", () => mermaid.run());
                 <span class="p">)</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">_set_pol_setpoint</span><span class="p">(</span><span class="n">pol</span><span class="p">)</span>
-        <span class="n">gap</span><span class="p">,</span> <span class="n">phase</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_id_gap_phase</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="n">gap</span><span class="p">,</span> <span class="n">phase</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy_to_motor</span><span class="p">(</span><span class="n">energy</span><span class="o">=</span><span class="n">value</span><span class="p">,</span> <span class="n">pol</span><span class="o">=</span><span class="n">pol</span><span class="p">)</span>
         <span class="n">phase3</span> <span class="o">=</span> <span class="n">phase</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span> <span class="k">if</span> <span class="n">pol</span> <span class="o">==</span> <span class="n">Pol</span><span class="o">.</span><span class="n">LA</span> <span class="k">else</span> <span class="mi">1</span><span class="p">)</span>
         <span class="n">id_set_val</span> <span class="o">=</span> <span class="n">Apple2Val</span><span class="p">(</span>
             <span class="n">top_outer</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">phase</span><span class="si">:</span><span class="s2">.6f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
@@ -629,32 +902,6 @@ window.addEventListener("load", () => mermaid.run());
             <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">id_jaw_phase</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
             <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">id_jaw_phase</span><span class="o">.</span><span class="n">set_move</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
         <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Energy set to </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2"> eV successfully.&quot;</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="I10Apple2.update_lookuptable">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i10.i10_apple2.I10Apple2.html#dodal.devices.i10.i10_apple2.I10Apple2.update_lookuptable">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">update_lookuptable</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Update the stored lookup tabled from file.</span>
-
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Updating lookup dictionary from file.&quot;</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">path</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">lookup_table_config</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">lookup_tables</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">convert_csv_to_lookup</span><span class="p">(</span>
-                    <span class="n">file</span><span class="o">=</span><span class="n">path</span><span class="p">,</span>
-                    <span class="n">source</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lookup_table_config</span><span class="o">.</span><span class="n">source</span><span class="p">,</span>
-                    <span class="n">mode</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lookup_table_config</span><span class="o">.</span><span class="n">mode</span><span class="p">,</span>
-                    <span class="n">min_energy</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lookup_table_config</span><span class="o">.</span><span class="n">min_energy</span><span class="p">,</span>
-                    <span class="n">max_energy</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lookup_table_config</span><span class="o">.</span><span class="n">max_energy</span><span class="p">,</span>
-                    <span class="n">poly_deg</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lookup_table_config</span><span class="o">.</span><span class="n">poly_deg</span><span class="p">,</span>
-                <span class="p">)</span>
-                <span class="c1"># ensure the importing lookup table is the correct format</span>
-                <span class="n">Lookuptable</span><span class="o">.</span><span class="n">model_validate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lookup_tables</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> look up table is not in path: </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">_available_pol</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lookup_tables</span><span class="p">[</span><span class="s2">&quot;Gap&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span></div>
 </div>
 
 
@@ -800,6 +1047,7 @@ window.addEventListener("load", () => mermaid.run());
         <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">look_up_table_dir</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">source</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
+        <span class="n">config_client</span><span class="p">:</span> <span class="n">ConfigServer</span><span class="p">,</span>
         <span class="n">jaw_phase_limit</span><span class="o">=</span><span class="mf">12.0</span><span class="p">,</span>
         <span class="n">jaw_phase_poly_param</span><span class="o">=</span><span class="n">DEFAULT_JAW_PHASE_POLY_PARAMS</span><span class="p">,</span>
         <span class="n">angle_threshold_deg</span><span class="o">=</span><span class="mf">30.0</span><span class="p">,</span>
@@ -821,12 +1069,16 @@ window.addEventListener("load", () => mermaid.run());
 <span class="sd">        linear_arbitrary_angle : LinearArbitraryAngle</span>
 <span class="sd">            A device for controlling the linear arbitrary polarization angle.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lookup_table_client</span> <span class="o">=</span> <span class="n">I10EnergyMotorLookup</span><span class="p">(</span>
+            <span class="n">look_up_table_dir</span><span class="o">=</span><span class="n">look_up_table_dir</span><span class="p">,</span>
+            <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span>
+            <span class="n">config_client</span><span class="o">=</span><span class="n">config_client</span><span class="p">,</span>
+        <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">energy</span> <span class="o">=</span> <span class="n">EnergySetter</span><span class="p">(</span>
             <span class="nb">id</span><span class="o">=</span><span class="n">I10Apple2</span><span class="p">(</span>
-                <span class="n">look_up_table_dir</span><span class="o">=</span><span class="n">look_up_table_dir</span><span class="p">,</span>
-                <span class="n">name</span><span class="o">=</span><span class="s2">&quot;id_energy&quot;</span><span class="p">,</span>
-                <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span>
                 <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">,</span>
+                <span class="n">energy_motor_convertor</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lookup_table_client</span><span class="o">.</span><span class="n">get_motor_from_energy</span><span class="p">,</span>
+                <span class="n">name</span><span class="o">=</span><span class="s2">&quot;id_energy&quot;</span><span class="p">,</span>
             <span class="p">),</span>
             <span class="n">pgm</span><span class="o">=</span><span class="n">pgm</span><span class="p">,</span>
             <span class="n">name</span><span class="o">=</span><span class="s2">&quot;energy&quot;</span><span class="p">,</span>
@@ -841,97 +1093,6 @@ window.addEventListener("load", () => mermaid.run());
         <span class="p">)</span>
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span></div>
-
-
-
-<div class="viewcode-block" id="convert_csv_to_lookup">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i10.i10_apple2.html#dodal.devices.i10.i10_apple2.convert_csv_to_lookup">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">convert_csv_to_lookup</span><span class="p">(</span>
-    <span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-    <span class="n">source</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
-    <span class="n">mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="s2">&quot;Mode&quot;</span><span class="p">,</span>
-    <span class="n">min_energy</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="s2">&quot;MinEnergy&quot;</span><span class="p">,</span>
-    <span class="n">max_energy</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="s2">&quot;MaxEnergy&quot;</span><span class="p">,</span>
-    <span class="n">poly_deg</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Convert a CSV file to a dictionary compatible with the Apple2 lookup table format.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    file : str</span>
-<span class="sd">        Path to the CSV file.</span>
-<span class="sd">    source : tuple[str, str]</span>
-<span class="sd">        Tuple specifying the column name and source name (e.g., (&quot;Source&quot;, &quot;idu&quot;)).</span>
-<span class="sd">    mode : str, optional</span>
-<span class="sd">        Column name for the available modes (e.g., &quot;lv&quot;, &quot;lh&quot;, &quot;pc&quot;, &quot;nc&quot;), by default &quot;Mode&quot;.</span>
-<span class="sd">    min_energy : str, optional</span>
-<span class="sd">        Column name for the minimum energy, by default &quot;MinEnergy&quot;.</span>
-<span class="sd">    max_energy : str, optional</span>
-<span class="sd">        Column name for the maximum energy, by default &quot;MaxEnergy&quot;.</span>
-<span class="sd">    poly_deg : list, optional</span>
-<span class="sd">        Column names for polynomial coefficients, starting with the least significant term.</span>
-
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    dict</span>
-<span class="sd">        A dictionary conforming to the Apple2 lookup table format.</span>
-
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">poly_deg</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">poly_deg</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="s2">&quot;7th-order&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;6th-order&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;5th-order&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;4th-order&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;3rd-order&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;2nd-order&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;1st-order&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;b&quot;</span><span class="p">,</span>
-        <span class="p">]</span>
-    <span class="n">lookup_table</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="n">polarisations</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">process_row</span><span class="p">(</span><span class="n">row</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Process a single row from the CSV file and update the lookup table.&quot;&quot;&quot;</span>
-        <span class="n">mode_value</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="n">mode</span><span class="p">]</span>
-        <span class="k">if</span> <span class="n">mode_value</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">polarisations</span><span class="p">:</span>
-            <span class="n">polarisations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">mode_value</span><span class="p">)</span>
-            <span class="n">lookup_table</span><span class="p">[</span><span class="n">mode_value</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-                <span class="s2">&quot;Energies&quot;</span><span class="p">:</span> <span class="p">{},</span>
-                <span class="s2">&quot;Limit&quot;</span><span class="p">:</span> <span class="p">{</span>
-                    <span class="s2">&quot;Minimum&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">min_energy</span><span class="p">]),</span>
-                    <span class="s2">&quot;Maximum&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">max_energy</span><span class="p">]),</span>
-                <span class="p">},</span>
-            <span class="p">}</span>
-
-        <span class="c1"># Create polynomial object for energy-to-gap/phase conversion</span>
-        <span class="n">coefficients</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">coef</span><span class="p">])</span> <span class="k">for</span> <span class="n">coef</span> <span class="ow">in</span> <span class="n">poly_deg</span><span class="p">]</span>
-        <span class="n">polynomial</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">poly1d</span><span class="p">(</span><span class="n">coefficients</span><span class="p">)</span>
-
-        <span class="n">lookup_table</span><span class="p">[</span><span class="n">mode_value</span><span class="p">][</span><span class="s2">&quot;Energies&quot;</span><span class="p">][</span><span class="n">row</span><span class="p">[</span><span class="n">min_energy</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;Low&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">min_energy</span><span class="p">]),</span>
-            <span class="s2">&quot;High&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">max_energy</span><span class="p">]),</span>
-            <span class="s2">&quot;Poly&quot;</span><span class="p">:</span> <span class="n">polynomial</span><span class="p">,</span>
-        <span class="p">}</span>
-
-        <span class="c1"># Update energy limits</span>
-        <span class="n">lookup_table</span><span class="p">[</span><span class="n">mode_value</span><span class="p">][</span><span class="s2">&quot;Limit&quot;</span><span class="p">][</span><span class="s2">&quot;Minimum&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span>
-            <span class="n">lookup_table</span><span class="p">[</span><span class="n">mode_value</span><span class="p">][</span><span class="s2">&quot;Limit&quot;</span><span class="p">][</span><span class="s2">&quot;Minimum&quot;</span><span class="p">],</span> <span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">min_energy</span><span class="p">])</span>
-        <span class="p">)</span>
-        <span class="n">lookup_table</span><span class="p">[</span><span class="n">mode_value</span><span class="p">][</span><span class="s2">&quot;Limit&quot;</span><span class="p">][</span><span class="s2">&quot;Maximum&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span>
-            <span class="n">lookup_table</span><span class="p">[</span><span class="n">mode_value</span><span class="p">][</span><span class="s2">&quot;Limit&quot;</span><span class="p">][</span><span class="s2">&quot;Maximum&quot;</span><span class="p">],</span> <span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">max_energy</span><span class="p">])</span>
-        <span class="p">)</span>
-
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">newline</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">csvfile</span><span class="p">:</span>
-        <span class="n">reader</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">DictReader</span><span class="p">(</span><span class="n">csvfile</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">reader</span><span class="p">:</span>
-            <span class="c1"># If there are multiple source only convert requested.</span>
-            <span class="k">if</span> <span class="n">row</span><span class="p">[</span><span class="n">source</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">==</span> <span class="n">source</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
-                <span class="n">process_row</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="n">row</span><span class="p">)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">lookup_table</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unable to convert lookup table:/n/t</span><span class="si">{</span><span class="n">file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">lookup_table</span></div>
 
 </pre></div>
 

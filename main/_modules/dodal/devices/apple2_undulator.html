@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.apple2_undulator &#8212; dodal 1.58.1.dev23+g9cc6d018e documentation</title>
+    <title>dodal.devices.apple2_undulator &#8212; dodal 1.58.1.dev24+g257aede2f documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=49d3963d"></script>
+    <script src="../../../_static/documentation_options.js?v=d2e8e78a"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -454,7 +454,7 @@ window.addEventListener("load", () => mermaid.run());
 <span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">math</span><span class="w"> </span><span class="kn">import</span> <span class="n">isclose</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Generic</span><span class="p">,</span> <span class="n">TypeVar</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Generic</span><span class="p">,</span> <span class="n">Protocol</span><span class="p">,</span> <span class="n">TypeVar</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">bluesky.protocols</span><span class="w"> </span><span class="kn">import</span> <span class="n">Movable</span>
@@ -470,7 +470,6 @@ window.addEventListener("load", () => mermaid.run());
     <span class="n">wait_for_value</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">epics_signal_r</span><span class="p">,</span> <span class="n">epics_signal_rw</span><span class="p">,</span> <span class="n">epics_signal_w</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">ConfigDict</span><span class="p">,</span> <span class="n">RootModel</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.log</span><span class="w"> </span><span class="kn">import</span> <span class="n">LOGGER</span>
 
@@ -507,61 +506,6 @@ window.addEventListener("load", () => mermaid.run());
     <span class="n">top_inner</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">btm_inner</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">btm_outer</span><span class="p">:</span> <span class="nb">str</span></div>
-
-
-
-<div class="viewcode-block" id="EnergyMinMax">
-<a class="viewcode-back" href="../../../reference/generated/dodal.devices.apple2_undulator.EnergyMinMax.html#dodal.devices.apple2_undulator.EnergyMinMax">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">EnergyMinMax</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-    <span class="n">Minimum</span><span class="p">:</span> <span class="nb">float</span>
-    <span class="n">Maximum</span><span class="p">:</span> <span class="nb">float</span></div>
-
-
-
-<div class="viewcode-block" id="EnergyCoverageEntry">
-<a class="viewcode-back" href="../../../reference/generated/dodal.devices.apple2_undulator.EnergyCoverageEntry.html#dodal.devices.apple2_undulator.EnergyCoverageEntry">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">EnergyCoverageEntry</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-    <span class="n">model_config</span> <span class="o">=</span> <span class="n">ConfigDict</span><span class="p">(</span><span class="n">arbitrary_types_allowed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">Low</span><span class="p">:</span> <span class="nb">float</span>
-    <span class="n">High</span><span class="p">:</span> <span class="nb">float</span>
-    <span class="n">Poly</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">poly1d</span></div>
-
-
-
-<div class="viewcode-block" id="EnergyCoverage">
-<a class="viewcode-back" href="../../../reference/generated/dodal.devices.apple2_undulator.EnergyCoverage.html#dodal.devices.apple2_undulator.EnergyCoverage">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">EnergyCoverage</span><span class="p">(</span><span class="n">RootModel</span><span class="p">):</span>
-    <span class="n">root</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">EnergyCoverageEntry</span><span class="p">]</span></div>
-
-
-
-<div class="viewcode-block" id="LookupTableEntries">
-<a class="viewcode-back" href="../../../reference/generated/dodal.devices.apple2_undulator.LookupTableEntries.html#dodal.devices.apple2_undulator.LookupTableEntries">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">LookupTableEntries</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-    <span class="n">Energies</span><span class="p">:</span> <span class="n">EnergyCoverage</span>
-    <span class="n">Limit</span><span class="p">:</span> <span class="n">EnergyMinMax</span></div>
-
-
-
-<div class="viewcode-block" id="Lookuptable">
-<a class="viewcode-back" href="../../../reference/generated/dodal.devices.apple2_undulator.Lookuptable.html#dodal.devices.apple2_undulator.Lookuptable">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">Lookuptable</span><span class="p">(</span><span class="n">RootModel</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;BaseModel class for the lookup table.</span>
-<span class="sd">    Apple2 lookup table should be in this format.</span>
-
-<span class="sd">    {mode: {&#39;Energies&#39;: {Any: {&#39;Low&#39;: float,</span>
-<span class="sd">                            &#39;High&#39;: float,</span>
-<span class="sd">                            &#39;Poly&#39;:np.poly1d</span>
-<span class="sd">                            }</span>
-<span class="sd">                        }</span>
-<span class="sd">            &#39;Limit&#39;: {&#39;Minimum&#39;: float,</span>
-<span class="sd">                    &#39;Maximum&#39;: float</span>
-<span class="sd">                    }</span>
-<span class="sd">        }</span>
-<span class="sd">    }</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="n">root</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">LookupTableEntries</span><span class="p">]</span></div>
 
 
 
@@ -848,6 +792,15 @@ window.addEventListener("load", () => mermaid.run());
 
 
 
+<div class="viewcode-block" id="EnergyMotorConvertor">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.apple2_undulator.EnergyMotorConvertor.html#dodal.devices.apple2_undulator.EnergyMotorConvertor">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">EnergyMotorConvertor</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energy</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">pol</span><span class="p">:</span> <span class="n">Pol</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Protocol to provide energy to motor position convertion&quot;&quot;&quot;</span>
+        <span class="o">...</span></div>
+
+
+
 <div class="viewcode-block" id="Apple2">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.apple2_undulator.Apple2.html#dodal.devices.apple2_undulator.Apple2">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Apple2</span><span class="p">(</span><span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">,</span> <span class="n">StandardReadable</span><span class="p">,</span> <span class="n">Movable</span><span class="p">):</span>
@@ -861,9 +814,8 @@ window.addEventListener("load", () => mermaid.run());
 <span class="sd">    The class is designed to manage the undulator&#39;s gap, phase motors, and polarisation settings, while</span>
 <span class="sd">    abstracting hardware interactions and providing a high-level interface for beamline operations.</span>
 
-
-<span class="sd">    A pair of look up tables are needed to provide the conversion between motor position</span>
-<span class="sd">    and energy.</span>
+<span class="sd">    The class is abstract and requires beamline-specific implementations for set motor</span>
+<span class="sd">     positions based on energy and polarisation.</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
@@ -879,27 +831,22 @@ window.addEventListener("load", () => mermaid.run());
 <span class="sd">        A hardware-backed signal for polarisation readback and control.</span>
 <span class="sd">    lookup_tables : dict</span>
 <span class="sd">        A dictionary storing lookup tables for gap and phase motor positions, used for energy and polarisation conversion.</span>
-<span class="sd">    _available_pol : list</span>
-<span class="sd">        A list of available polarisations supported by the device.</span>
+<span class="sd">    energy_to_motor : EnergyMotorConvertor</span>
+<span class="sd">        A callable that converts energy and polarisation to motor positions.</span>
 
 <span class="sd">    Abstract Methods</span>
 <span class="sd">    ----------------</span>
 <span class="sd">    set(value: float) -&gt; None</span>
 <span class="sd">        Abstract method to set motor positions for a given energy and polarisation.</span>
-<span class="sd">    update_lookuptable() -&gt; None</span>
-<span class="sd">        Abstract method to load and validate lookup tables from external sources.</span>
 
 <span class="sd">    Methods</span>
 <span class="sd">    -------</span>
-<span class="sd">    _set_pol_setpoint(pol: Pol) -&gt; None</span>
-<span class="sd">        Sets the polarisation setpoint without moving hardware.</span>
 <span class="sd">    determine_phase_from_hardware(...) -&gt; tuple[Pol, float]</span>
 <span class="sd">        Determines the polarisation and phase value based on motor positions.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
 <span class="sd">    - This class requires beamline-specific implementations of the abstract methods.</span>
-<span class="sd">    - The lookup tables must follow the `Lookuptable` format and be validated before use.</span>
 <span class="sd">    - The device supports multiple polarisation modes, including linear horizontal (LH), linear vertical (LV),</span>
 <span class="sd">      positive circular (PC), negative circular (NC), and linear arbitrary (LA).</span>
 
@@ -914,6 +861,7 @@ window.addEventListener("load", () => mermaid.run());
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">id_gap</span><span class="p">:</span> <span class="n">UndulatorGap</span><span class="p">,</span>
         <span class="n">id_phase</span><span class="p">:</span> <span class="n">UndulatorPhaseAxes</span><span class="p">,</span>
+        <span class="n">energy_motor_convertor</span><span class="p">:</span> <span class="n">EnergyMotorConvertor</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -922,16 +870,13 @@ window.addEventListener("load", () => mermaid.run());
 <span class="sd">        ----------</span>
 <span class="sd">        id_gap: An UndulatorGap device.</span>
 <span class="sd">        id_phase: An UndulatorPhaseAxes device.</span>
-<span class="sd">        prefix: Not in use but needed for device_instantiation.</span>
+<span class="sd">        energy_motor_convertor: A callable that converts energy and polarisation to motor positions.</span>
 <span class="sd">        name: Name of the device.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
-        <span class="c1"># Attributes are set after super call so they are not renamed to</span>
-        <span class="c1"># &lt;name&gt;-undulator, etc.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">gap</span> <span class="o">=</span> <span class="n">id_gap</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">phase</span> <span class="o">=</span> <span class="n">id_phase</span>
-
+        <span class="bp">self</span><span class="o">.</span><span class="n">energy_to_motor</span> <span class="o">=</span> <span class="n">energy_motor_convertor</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">(</span><span class="n">StandardReadableFormat</span><span class="o">.</span><span class="n">HINTED_SIGNAL</span><span class="p">):</span>
             <span class="c1"># Store the set energy for readback.</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">energy</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_set_energy_rbv</span> <span class="o">=</span> <span class="n">soft_signal_r_and_setter</span><span class="p">(</span>
@@ -943,11 +888,7 @@ window.addEventListener("load", () => mermaid.run());
         <span class="bp">self</span><span class="o">.</span><span class="n">polarisation_setpoint</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_polarisation_setpoint_set</span> <span class="o">=</span> <span class="p">(</span>
             <span class="n">soft_signal_r_and_setter</span><span class="p">(</span><span class="n">Pol</span><span class="p">)</span>
         <span class="p">)</span>
-        <span class="c1"># This store two lookup tables, Gap and Phase in the Lookuptable format</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">lookup_tables</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]]</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;Gap&quot;</span><span class="p">:</span> <span class="p">{},</span>
-            <span class="s2">&quot;Phase&quot;</span><span class="p">:</span> <span class="p">{},</span>
-        <span class="p">}</span>
+
         <span class="c1"># Hardware backed read/write for polarisation.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">polarisation</span> <span class="o">=</span> <span class="n">derived_signal_rw</span><span class="p">(</span>
             <span class="n">raw_to_derived</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_read_pol</span><span class="p">,</span>
@@ -959,22 +900,13 @@ window.addEventListener("load", () => mermaid.run());
             <span class="n">btm_outer</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">phase</span><span class="o">.</span><span class="n">btm_outer</span><span class="o">.</span><span class="n">user_readback</span><span class="p">,</span>
             <span class="n">gap</span><span class="o">=</span><span class="n">id_gap</span><span class="o">.</span><span class="n">user_readback</span><span class="p">,</span>
         <span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_available_pol</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Abstract method that run at start up to load lookup tables into  self.lookup_tables</span>
-<span class="sd">        and set available_pol.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">update_lookuptable</span><span class="p">()</span>
-
-<div class="viewcode-block" id="Apple2._set_pol_setpoint">
-<a class="viewcode-back" href="../../../reference/generated/dodal.devices.apple2_undulator.Apple2.html#dodal.devices.apple2_undulator.Apple2._set_pol_setpoint">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">_set_pol_setpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pol</span><span class="p">:</span> <span class="n">Pol</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the polarisation setpoint without moving hardware. The polarisation</span>
 <span class="sd">        setpoint is used to determine the gap and phase motor positions when</span>
 <span class="sd">        setting the energy/polarisation of the undulator.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_polarisation_setpoint_set</span><span class="p">(</span><span class="n">pol</span><span class="p">)</span></div>
-
+        <span class="bp">self</span><span class="o">.</span><span class="n">_polarisation_setpoint_set</span><span class="p">(</span><span class="n">pol</span><span class="p">)</span>
 
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_set_pol</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -1001,8 +933,8 @@ window.addEventListener("load", () => mermaid.run());
 
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
-<span class="sd">        &gt;&gt;&gt; RE( id.set(888.0)) # This will set the ID to 888 eV</span>
-<span class="sd">        &gt;&gt;&gt; RE(scan([detector], id,600,700,100)) # This will scan the ID from 600 to 700 eV in 100 steps.</span>
+<span class="sd">        RE( id.set(888.0)) # This will set the ID to 888 eV</span>
+<span class="sd">        RE(scan([detector], id,600,700,100)) # This will scan the ID from 600 to 700 eV in 100 steps.</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
 
@@ -1064,80 +996,6 @@ window.addEventListener("load", () => mermaid.run());
         <span class="p">)</span>
         <span class="k">await</span> <span class="n">wait_for_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gap</span><span class="o">.</span><span class="n">gate</span><span class="p">,</span> <span class="n">UndulatorGateStatus</span><span class="o">.</span><span class="n">CLOSE</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_set_energy_rbv</span><span class="p">(</span><span class="n">energy</span><span class="p">)</span>  <span class="c1"># Update energy after move for readback.</span>
-
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_get_id_gap_phase</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energy</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Converts energy and polarisation to gap and phase.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">gap_poly</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_poly</span><span class="p">(</span>
-            <span class="n">lookup_table</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lookup_tables</span><span class="p">[</span><span class="s2">&quot;Gap&quot;</span><span class="p">],</span> <span class="n">new_energy</span><span class="o">=</span><span class="n">energy</span>
-        <span class="p">)</span>
-        <span class="n">phase_poly</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_poly</span><span class="p">(</span>
-            <span class="n">lookup_table</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lookup_tables</span><span class="p">[</span><span class="s2">&quot;Phase&quot;</span><span class="p">],</span> <span class="n">new_energy</span><span class="o">=</span><span class="n">energy</span>
-        <span class="p">)</span>
-        <span class="k">return</span> <span class="n">gap_poly</span><span class="p">(</span><span class="n">energy</span><span class="p">),</span> <span class="n">phase_poly</span><span class="p">(</span><span class="n">energy</span><span class="p">)</span>
-
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_get_poly</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">new_energy</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-        <span class="n">lookup_table</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]],</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">poly1d</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Get the correct polynomial for a given energy form lookuptable</span>
-<span class="sd">        for the current polarisation setpoint.</span>
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        new_energy : float</span>
-<span class="sd">            The energy in eV for which the polynomial is requested.</span>
-<span class="sd">        lookup_table : dict[str | None, dict[str, dict[str, Any]]]</span>
-<span class="sd">            The lookup table containing polynomial coefficients for different energies</span>
-<span class="sd">            and polarisations.</span>
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        np.poly1d</span>
-<span class="sd">            The polynomial coefficients for the requested energy and polarisation.</span>
-<span class="sd">        Raises</span>
-<span class="sd">        ------</span>
-<span class="sd">        ValueError</span>
-<span class="sd">            If the requested energy is outside the limits defined in the lookup table</span>
-<span class="sd">            or if no polynomial coefficients are found for the requested energy.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">pol</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">polarisation_setpoint</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
-        <span class="k">if</span> <span class="p">(</span>
-            <span class="n">new_energy</span> <span class="o">&lt;</span> <span class="n">lookup_table</span><span class="p">[</span><span class="n">pol</span><span class="p">][</span><span class="s2">&quot;Limit&quot;</span><span class="p">][</span><span class="s2">&quot;Minimum&quot;</span><span class="p">]</span>
-            <span class="ow">or</span> <span class="n">new_energy</span> <span class="o">&gt;</span> <span class="n">lookup_table</span><span class="p">[</span><span class="n">pol</span><span class="p">][</span><span class="s2">&quot;Limit&quot;</span><span class="p">][</span><span class="s2">&quot;Maximum&quot;</span><span class="p">]</span>
-        <span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;Demanding energy must lie between </span><span class="si">{}</span><span class="s2"> and </span><span class="si">{}</span><span class="s2"> eV!&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                    <span class="n">lookup_table</span><span class="p">[</span><span class="n">pol</span><span class="p">][</span><span class="s2">&quot;Limit&quot;</span><span class="p">][</span><span class="s2">&quot;Minimum&quot;</span><span class="p">],</span>
-                    <span class="n">lookup_table</span><span class="p">[</span><span class="n">pol</span><span class="p">][</span><span class="s2">&quot;Limit&quot;</span><span class="p">][</span><span class="s2">&quot;Maximum&quot;</span><span class="p">],</span>
-                <span class="p">)</span>
-            <span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">energy_range</span> <span class="ow">in</span> <span class="n">lookup_table</span><span class="p">[</span><span class="n">pol</span><span class="p">][</span><span class="s2">&quot;Energies&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
-                <span class="k">if</span> <span class="p">(</span>
-                    <span class="n">new_energy</span> <span class="o">&gt;=</span> <span class="n">energy_range</span><span class="p">[</span><span class="s2">&quot;Low&quot;</span><span class="p">]</span>
-                    <span class="ow">and</span> <span class="n">new_energy</span> <span class="o">&lt;</span> <span class="n">energy_range</span><span class="p">[</span><span class="s2">&quot;High&quot;</span><span class="p">]</span>
-                <span class="p">):</span>
-                    <span class="k">return</span> <span class="n">energy_range</span><span class="p">[</span><span class="s2">&quot;Poly&quot;</span><span class="p">]</span>
-
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<span class="w">            </span><span class="sd">&quot;&quot;&quot;Cannot find polynomial coefficients for your requested energy.</span>
-<span class="sd">        There might be gap in the calibration lookup table.&quot;&quot;&quot;</span>
-        <span class="p">)</span>
-
-<div class="viewcode-block" id="Apple2.update_lookuptable">
-<a class="viewcode-back" href="../../../reference/generated/dodal.devices.apple2_undulator.Apple2.html#dodal.devices.apple2_undulator.Apple2.update_lookuptable">[docs]</a>
-    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">update_lookuptable</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Abstract method to update the stored lookup tabled from file.</span>
-<span class="sd">        This function should include check to ensure the lookuptable is in the correct format:</span>
-<span class="sd">            # ensure the importing lookup table is the correct format</span>
-<span class="sd">            Lookuptable.model_validate(&lt;loockuptable&gt;)</span>
-
-<span class="sd">        &quot;&quot;&quot;</span></div>
-
 
 <div class="viewcode-block" id="Apple2.determine_phase_from_hardware">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.apple2_undulator.Apple2.html#dodal.devices.apple2_undulator.Apple2.determine_phase_from_hardware">[docs]</a>
