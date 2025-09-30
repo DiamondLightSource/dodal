@@ -17,6 +17,7 @@ from ophyd_async.epics.core import (
 )
 from ophyd_async.epics.motor import Motor
 
+from dodal.devices.motors import XYPitchStage
 from dodal.log import LOGGER
 
 VOLTAGE_POLLING_DELAY_S = 0.5
@@ -134,7 +135,7 @@ class MirrorVoltages(StandardReadable):
         )
 
 
-class SimpleMirror(StandardReadable):
+class SimpleMirror(XYPitchStage):
     """Simple Focusing Mirror"""
 
     def __init__(
@@ -144,25 +145,28 @@ class SimpleMirror(StandardReadable):
         bragg_to_lat_lut_path: str | None = None,
         x_suffix: str = "X",
         y_suffix: str = "Y",
+        pitch_suffix: str = "PITCH",
     ):
         self.bragg_to_lat_lookup_table_path = bragg_to_lat_lut_path
         self.yaw_mrad = Motor(prefix + "YAW")
-        self.pitch_mrad = Motor(prefix + "PITCH")
-        self.bend = Motor(prefix + "BEND")
-        self.x_mm = Motor(prefix + x_suffix)
-        self.y_mm = Motor(prefix + y_suffix)
         self.jack1_mm = Motor(prefix + "J1")
         self.jack2_mm = Motor(prefix + "J2")
 
         self.type, _ = soft_signal_r_and_setter(MirrorType, MirrorType.SINGLE)
-        # The device is in the beamline co-ordinate system so pitch is the incident angle
-        # regardless of orientation of the mirror
-        self.incident_angle = Motor(prefix + "PITCH")
 
         self.add_readables(
             [self.incident_angle.user_readback],
             format=StandardReadableFormat.HINTED_SIGNAL,
         )
+        self.add_readables([self.type], format=StandardReadableFormat.CONFIG_SIGNAL)
+        super().__init__(
+            name, x_infix=x_suffix, y_infix=y_suffix, pitch_infix=pitch_suffix
+        )
+        self.x_mm = self.x
+        self.y_mm = self.y
+        # The device is in the beamline co-ordinate system so pitch is the incident angle
+        # regardless of orientation of the mirror
+        self.incident_angle = self.pitch
         self.add_readables([self.type], format=StandardReadableFormat.CONFIG_SIGNAL)
         super().__init__(name)
 
