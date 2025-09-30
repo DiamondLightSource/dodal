@@ -73,9 +73,12 @@ def connect(beamline: str, all: bool, sim_backend: bool) -> None:
         manager, DeviceManager
     ):
         path_provider = StaticPathProvider(UUIDFilenameProvider(), Path("/tmp"))
-        devices, instance_exceptions = manager.build_all(
+        device_result = manager.build_all(
             mock=sim_backend,  # only used by v1 devices
             fixtures={"path_provider": path_provider},
+        )
+        devices, instance_exceptions, connect_exceptions = device_result.connect(
+            mock=sim_backend
         )
     else:
         # Fall back to the previous approach
@@ -91,7 +94,7 @@ def connect(beamline: str, all: bool, sim_backend: bool) -> None:
             fake_with_ophyd_sim=sim_backend,
             wait_for_connection=False,
         )
-    devices, connect_exceptions = _connect_devices(run_engine, devices, sim_backend)
+        devices, connect_exceptions = _connect_devices(run_engine, devices, sim_backend)
 
     # Inform user of successful connections
     _report_successful_devices(devices, sim_backend)
