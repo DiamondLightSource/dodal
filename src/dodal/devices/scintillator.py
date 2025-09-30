@@ -55,7 +55,7 @@ class Scintillator(StandardReadable):
 
         super().__init__(name)
 
-    def check_position(
+    def _check_position(
         self, current_pos: tuple[float, float], pos_to_check: tuple[float, float]
     ):
         return all(
@@ -70,16 +70,16 @@ class Scintillator(StandardReadable):
 
     def _get_selected_position(self, y: float, z: float) -> InOut:
         current_pos = [y, z]
-        if self.check_position(current_pos, self._scintillator_out_yz_mm):
+        if self._check_position(current_pos, self._scintillator_out_yz_mm):
             return InOut.OUT
 
-        elif self.check_position(current_pos, self._scintillator_in_yz_mm):
+        elif self._check_position(current_pos, self._scintillator_in_yz_mm):
             return InOut.IN
 
         else:
             return InOut.UNKNOWN
 
-    def check_aperture_parked(self):
+    def _check_aperture_parked(self):
         if (
             self._aperture_scatterguard().selected_aperture.get_value()
             != ApertureValue.PARKED
@@ -89,7 +89,7 @@ class Scintillator(StandardReadable):
             )
 
     async def _set_selected_position(self, position: InOut) -> None:
-        self.check_aperture_parked()
+        self._check_aperture_parked()
         match position:
             case InOut.OUT:
                 current_y = await self.y_mm.user_readback.get_value()
