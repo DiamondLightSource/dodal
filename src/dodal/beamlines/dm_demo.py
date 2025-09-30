@@ -201,9 +201,14 @@ class DeviceBuildResult(NamedTuple):
 
 class DeviceManager:
     _factories: dict[str, DeviceFactory]
+    _fixtures: dict[str, Any]
 
     def __init__(self):
         self._factories = {}
+        self._fixtures = {}
+
+    def fixture(self, func: Callable[[], Any]):
+        self._fixtures[func.__name__] = func
 
     # Overload for using as plain decorator, ie: @devices.factory
     @typing.overload
@@ -277,7 +282,15 @@ class DeviceManager:
         dependencies are built first and passed to later factories as required.
         """
         # TODO: Should we check all the factories are our factories?
+
+        # TODO: build fixtures lazily
         fixtures = fixtures or {}
+        builtin_fixtures = {
+            name: func()
+            for name, func in self._fixtures.items()
+            if name not in fixtures
+        }
+        fixtures = builtin_fixtures | fixtures
         if common := fixtures.keys() & {f.name for f in factories}:
             warnings.warn(
                 f"Factories ({common}) will be overridden by fixtures", stacklevel=1
