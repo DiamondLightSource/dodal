@@ -205,7 +205,7 @@ async def mock_linear_arbitrary_angle(mock_id: I10Apple2) -> LinearArbitraryAngl
         (Pol.NONE, 11, 0, 10, 0),
     ],
 )
-async def test_I10Apple2_determine_pol(
+async def test_i10apple2_determine_pol(
     mock_id: I10Apple2,
     pol: None | str,
     top_inner_phase: float,
@@ -226,7 +226,7 @@ async def test_I10Apple2_determine_pol(
         assert await mock_id.polarisation.get_value() == pol
 
 
-async def test_fail_I10Apple2_set_undefined_pol(mock_id: I10Apple2):
+async def test_fail_i10apple2_set_undefined_pol(mock_id: I10Apple2):
     set_mock_value(mock_id.gap.user_readback, 101)
     with pytest.raises(RuntimeError) as e:
         await mock_id.set(600)
@@ -236,7 +236,7 @@ async def test_fail_I10Apple2_set_undefined_pol(mock_id: I10Apple2):
     )
 
 
-async def test_fail_I10Apple2_set_id_not_ready(mock_id: I10Apple2):
+async def test_fail_i10apple2_set_id_not_ready(mock_id: I10Apple2):
     set_mock_value(mock_id.gap.fault, 1)
     with pytest.raises(RuntimeError) as e:
         await mock_id.set(600)
@@ -248,7 +248,7 @@ async def test_fail_I10Apple2_set_id_not_ready(mock_id: I10Apple2):
     assert str(e.value) == mock_id.gap.name + " is already in motion."
 
 
-async def test_I10Apple2_RE_scan(mock_id_pgm: EnergySetter, RE: RunEngine):
+async def test_i10apple2_RE_scan(mock_id_pgm: EnergySetter, RE: RunEngine):
     docs = defaultdict(list)
 
     def capture_emitted(name, doc):
@@ -319,7 +319,7 @@ async def test_EnergySetter_RE_scan(mock_id_pgm: EnergySetter, RE: RunEngine):
         ("dsf", 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
     ],
 )
-async def test_I10Apple2_pol_set(
+async def test_i10apple2_pol_set(
     mock_id_pol: I10Apple2Pol,
     pol: Pol,
     energy: float,
@@ -368,7 +368,7 @@ async def test_I10Apple2_pol_set(
         (Pol.LA, 1300, -16.4, 0.0, 16.4, 0.0),
     ],
 )
-async def test_I10Apple2_pol_read_check_pol_from_hardware(
+async def test_i10apple2_pol_read_check_pol_from_hardware(
     mock_id_pol: I10Apple2Pol,
     pol: str,
     energy: float,
@@ -393,7 +393,7 @@ async def test_I10Apple2_pol_read_check_pol_from_hardware(
         ("lh3", 500, 0.0, 0.0, 0.0, 0.0),
     ],
 )
-async def test_I10Apple2_pol_read_leave_lh3_unchange_when_hardware_match(
+async def test_i10apple2_pol_read_leave_lh3_unchanged_when_hardware_match(
     mock_id_pol: I10Apple2Pol,
     pol: str,
     energy: float,
