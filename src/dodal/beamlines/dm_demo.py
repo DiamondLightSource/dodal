@@ -23,7 +23,6 @@ from bluesky.run_engine import (
     call_in_bluesky_event_loop,
     get_bluesky_event_loop,
 )
-from ophyd import Device
 from ophyd_async.core import PathProvider
 from ophyd_async.epics.adsimdetector import SimDetector
 from ophyd_async.epics.motor import Motor
@@ -36,7 +35,6 @@ from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import (
     AnyDevice,
     BeamlinePrefix,
-    OphydV1Device,
     OphydV2Device,
     SkipType,
 )
@@ -126,18 +124,15 @@ class DeviceFactory(Generic[Args, T]):
             self,
             fixtures=fixtures,
             mock=mock,
-            # connect_immediately=connect_immediately,
-            # timeout=timeout or self.timeout,
         )
         if devices.errors:
             raise Exception("??? build")
         else:
-            # device = devices[self.name][0]
             if connect_immediately:
                 conn = devices.connect(timeout=timeout)
                 if conn.connection_errors:
                     raise Exception("??? conn")
-            device = devices.devices[self.name][0]
+            device = devices.devices[self.name].device
             if name:
                 device.set_name(device)
             elif self.use_factory_name:
@@ -158,26 +153,36 @@ class DeviceFactory(Generic[Args, T]):
         return f"<{self.name}: DeviceFactory ({params}) -> {target}>"
 
 
+class ConnectionSpec(NamedTuple):
+    device: Any
+    mock: bool
+
+
 class ConnectionResult(NamedTuple):
     devices: dict[str, AnyDevice]
     build_errors: dict[str, Exception]
     connection_errors: dict[str, Exception]
 
+    def or_raise(self) -> dict[str, Any]:
+        if self.build_errors or self.connection_errors:
+            all_exc = []
+            for name, exc in (self.build_errors | self.connection_errors).items():
+                exc.add_note(name)
+                all_exc.append(exc)
+            raise ExceptionGroup("Some devices failed", tuple(all_exc))
+        return self.devices
+
 
 class DeviceBuildResult(NamedTuple):
-    devices: dict[str, tuple[Any, bool]]
+    devices: dict[str, ConnectionSpec]
     errors: dict[str, Exception]
 
-    def connect(
-        self, timeout: float | None = None, run_engine: RunEngine | None = None
-    ) -> ConnectionResult:
+    def connect(self, timeout: float | None = None) -> ConnectionResult:
         connections = {}
-        loop: asyncio.EventLoop = (  # type: ignore
-            run_engine.loop if run_engine else get_bluesky_event_loop()
-        )
+        loop: asyncio.EventLoop = get_bluesky_event_loop()  # type: ignore
         for name, (device, mock) in self.devices.items():
             fut: futures.Future = asyncio.run_coroutine_threadsafe(
-                device.connect(mock=mock, timeout=timeout or 10),  # type: ignore
+                device.connect(mock=mock, timeout=timeout or 5),  # type: ignore
                 loop=loop,
             )
             connections[name] = fut
@@ -187,25 +192,11 @@ class DeviceBuildResult(NamedTuple):
         for name, connection_future in connections.items():
             try:
                 connection_future.result(timeout=12)
-                connected[name] = self.devices[name][0]
+                connected[name] = self.devices[name].device
             except Exception as e:
                 connection_errors[name] = e
 
         return ConnectionResult(connected, self.errors, connection_errors)
-
-    # @typing.overload
-    # def __getitem__(self, idx: Literal[0]) -> dict[str, Any]: ...
-    # @typing.overload
-    # def __getitem__(self, idx: Literal[1]) -> dict[str, Exception]: ...
-
-    # def __getitem__(self, idx):
-    #     match idx:
-    #         case 0:
-    #             return {n: d[0] for n, d in self.devices.items()}
-    #         case 1:
-    #             return self.errors
-    #         case _:
-    #             raise IndexError()
 
 
 class DeviceManager:
@@ -253,13 +244,14 @@ class DeviceManager:
             return decorator
         return decorator(func)
 
+    def build_and_connect(self, fixtures, mock) -> ConnectionResult:
+        return self.build_all(fixtures=fixtures, mock=mock).connect()
+
     def build_all(
         self,
         include_skipped=False,
         fixtures: dict[str, Any] | None = None,
         mock: bool = False,
-        # connect_immediately: bool = False,
-        # timeout: float | None = None,
     ) -> DeviceBuildResult:
         fixtures = fixtures or {}
         # exclude all skipped devices and those that have been overridden by fixtures
@@ -272,8 +264,6 @@ class DeviceManager:
             ),
             fixtures=fixtures,
             mock=mock,
-            # connect_immediately=connect_immediately,
-            # timeout=timeout,
         )
 
     def build_devices(
@@ -281,8 +271,6 @@ class DeviceManager:
         *factories: DeviceFactory,
         fixtures: dict[str, Any] | None = None,
         mock: bool = False,
-        # connect_immediately: bool = False,
-        # timeout: float | None = None,
     ) -> DeviceBuildResult:
         """
         Build the devices from the given factories, ensuring that any
@@ -301,7 +289,7 @@ class DeviceManager:
         order = self._build_order(
             {dep: self._factories[dep] for dep in build_list}, fixtures=fixtures
         )
-        built: dict[str, tuple[Any, bool]] = {}
+        built: dict[str, ConnectionSpec] = {}
         errors = {}
         for device in order:
             factory = self[device]
@@ -318,7 +306,7 @@ class DeviceManager:
                 }
                 try:
                     built_device = factory(**params)
-                    built[device] = (built_device, mock or factory.mock)
+                    built[device] = ConnectionSpec(built_device, mock or factory.mock)
                 except Exception as e:
                     errors[device] = e
 
