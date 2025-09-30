@@ -12,6 +12,7 @@ from dodal.devices.i04.murko_results import (
     MurkoMetadata,
     MurkoResult,
     MurkoResultsDevice,
+    NoResultsFound,
     get_yz_least_squares,
 )
 
@@ -20,6 +21,7 @@ from dodal.devices.i04.murko_results import (
 @patch("dodal.devices.i04.murko_results.StrictRedis")
 async def murko_results(mock_strict_redis: MagicMock) -> MurkoResultsDevice:
     murko_results = MurkoResultsDevice(name="murko_results")
+    murko_results.pubsub = AsyncMock()
     return murko_results
 
 
@@ -544,3 +546,26 @@ def test_when_results_filtered_then_smallest_x_pixels_kept(
     assert results.y_dist_mm == 63
     assert results.omega == 20
     assert results.uuid == "c"
+
+
+async def test_when_no_results_from_redis_then_expected_error_message_on_trigger(
+    murko_results: MurkoResultsDevice,
+):
+    murko_results.results = []
+    murko_results._last_omega = 360
+    with pytest.raises(NoResultsFound):
+        await murko_results.trigger()
+
+
+async def test_when_results_device_unstaged_then_results_cleared_and_last_omega_reset(
+    murko_results: MurkoResultsDevice,
+):
+    murko_results.results = [
+        MurkoResult(centre_px=(100, 100), x_dist_mm=4, y_dist_mm=8, omega=0, uuid="a")
+    ]
+    murko_results._last_omega = 360
+
+    await murko_results.unstage()
+
+    assert not murko_results.results
+    assert murko_results._last_omega == 0
