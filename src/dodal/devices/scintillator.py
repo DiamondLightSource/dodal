@@ -69,7 +69,7 @@ class Scintillator(StandardReadable):
         )
 
     def _get_selected_position(self, y: float, z: float) -> InOut:
-        current_pos = [y, z]
+        current_pos = (y, z)
         if self._check_position(current_pos, self._scintillator_out_yz_mm):
             return InOut.OUT
 
