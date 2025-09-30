@@ -155,9 +155,6 @@ class SimpleMirror(XYPitchStage):
         self.jack2_mm = Motor(prefix + "J2")
 
         self.type, _ = soft_signal_r_and_setter(MirrorType, MirrorType.SINGLE)
-        # The device is in the beamline co-ordinate system so pitch is the incident angle
-        # regardless of orientation of the mirror
-        self.incident_angle = Motor(prefix + pitch_suffix)
 
         self.add_readables(
             [self.incident_angle.user_readback],
