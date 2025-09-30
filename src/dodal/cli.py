@@ -73,20 +73,11 @@ def connect(beamline: str, all: bool, sim_backend: bool) -> None:
         manager, DeviceManager
     ):
         path_provider = StaticPathProvider(UUIDFilenameProvider(), Path("/tmp"))
-        device_result = manager.build_all(
-            mock=sim_backend,  # only used by v1 devices
+        devices, instance_exceptions, connect_exceptions = manager.build_and_connect(
+            mock=sim_backend,
             fixtures={"path_provider": path_provider},
         )
-        devices, instance_exceptions, connect_exceptions = device_result.connect(
-            mock=sim_backend
-        )
     else:
-        # Fall back to the previous approach
-        # warnings.warn(
-        #     "Using deprecated @device_factory approach - consider using DeviceManager",
-        #     DeprecationWarning,
-        #     stacklevel=1,
-        # )
         _spoof_path_provider()
         devices, instance_exceptions = make_all_devices(
             full_module_path,
