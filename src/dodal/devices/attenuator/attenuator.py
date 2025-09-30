@@ -27,8 +27,9 @@ class ReadOnlyAttenuator(StandardReadable):
 
     def __init__(self, prefix: str, name: str = "") -> None:
         with self.add_children_as_readables():
-            # This isn't the readback value, but is the closest obtainable transmission to the current desired transmission
-            # given the specific set of filters in the attenuator
+            # Closest obtainable transmission to the current desired transmission given the specific
+            # set of filters in the attenuator. This value updates immediately after setting desired
+            # transmission, before the motors may have finished moving. It is not a readback value.
             self.actual_transmission = epics_signal_r(float, prefix + "MATCH")
 
         super().__init__(name)
@@ -95,6 +96,7 @@ class BinaryFilterAttenuator(ReadOnlyAttenuator, Movable[float]):
         )
 
 
+# Replace with ophyd async enum after https://github.com/bluesky/ophyd-async/pull/1067
 class YesNo(StrictEnum):
     YES = "YES"
     NO = "NO"
@@ -127,7 +129,7 @@ class EnumFilterAttenuator(ReadOnlyAttenuator, Movable[float]):
         self._use_current_energy = epics_signal_x(prefix + "E2WL:USECURRENTENERGY.PROC")
 
         with self.add_children_as_readables():
-            self.filters: DeviceVector[FilterMotor] = DeviceVector(
+            self._filters: DeviceVector[FilterMotor] = DeviceVector(
                 {
                     index: FilterMotor(f"{prefix}MP{index + 1}:", filter, name)
                     for index, filter in enumerate(filter_selection)
@@ -151,7 +153,7 @@ class EnumFilterAttenuator(ReadOnlyAttenuator, Movable[float]):
         # a callback is added at the controls level: https://github.com/DiamondLightSource/dodal/issues/972
         await asyncio.sleep(ENUM_ATTENUATOR_SETTLE_TIME_S)
         coros = [
-            wait_for_value(self.filters[i].done_move, 1, timeout=DEFAULT_TIMEOUT)
-            for i in self.filters
+            wait_for_value(self._filters[i].done_move, 1, timeout=DEFAULT_TIMEOUT)
+            for i in self._filters
         ]
         await asyncio.gather(*coros)

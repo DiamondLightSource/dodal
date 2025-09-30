@@ -53,9 +53,7 @@ PREFIX = BeamlinePrefix(BL)
 
 
 @device_factory()
-def attenuator(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> EnumFilterAttenuator:
+def attenuator() -> EnumFilterAttenuator:
     """Get a read-only attenuator device for i24, instantiate it if it hasn't already
     been. If this is called when already instantiated in i24, it will return the
     existing object."""
