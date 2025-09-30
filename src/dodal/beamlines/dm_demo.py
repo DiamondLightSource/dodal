@@ -1,3 +1,6 @@
+import asyncio
+from concurrent import futures
+import concurrent
 import inspect
 import typing
 import warnings
@@ -6,7 +9,11 @@ from functools import cached_property, wraps
 from types import NoneType
 from typing import Annotated, Any, Generic, Mapping, NamedTuple, ParamSpec, TypeVar
 
-from bluesky.run_engine import call_in_bluesky_event_loop
+from bluesky.run_engine import (
+    RunEngine,
+    call_in_bluesky_event_loop,
+    get_bluesky_event_loop,
+)
 from ophyd import Device
 from ophyd_async.core import PathProvider
 from ophyd_async.epics.adsimdetector import SimDetector
@@ -135,9 +142,40 @@ class DeviceFactory(Generic[Args, T]):
         return f"<{self.name}: DeviceFactory ({params}) -> {target}>"
 
 
-class ConnectionOptions(NamedTuple):
-    mock: bool
-    timeout: float
+class ConnectionResult(NamedTuple):
+    devices: dict[str, AnyDevice]
+    build_errors: dict[str, Exception]
+    connection_errors: dict[str, Exception]
+
+
+class DeviceBuildResult(NamedTuple):
+    devices: dict[str, Any]
+    errors: dict[str, Exception]
+
+    def connect(
+        self, mock: bool = False, run_engine: RunEngine | None = None
+    ) -> ConnectionResult:
+        connections = {}
+        loop: asyncio.EventLoop = (  # type: ignore
+            run_engine.loop if run_engine else get_bluesky_event_loop()
+        )
+        for name, device in self.devices.items():
+            fut: futures.Future = asyncio.run_coroutine_threadsafe(
+                device.connect(mock=mock),  # type: ignore
+                loop=loop,
+            )
+            connections[name] = fut
+
+        connected = {}
+        connection_errors = {}
+        for name, connection_future in connections.items():
+            try:
+                connection_future.result(timeout=12)
+                connected[name] = self.devices[name]
+            except Exception as e:
+                connection_errors[name] = e
+
+        return ConnectionResult(connected, self.errors, connection_errors)
 
 
 class DeviceManager:
@@ -192,7 +230,7 @@ class DeviceManager:
         mock: bool = False,
         connect_immediately: bool = False,
         timeout: float | None = None,
-    ):
+    ) -> DeviceBuildResult:
         fixtures = fixtures or {}
         # exclude all skipped devices and those that have been overridden by fixtures
         return self.build_devices(
@@ -215,7 +253,7 @@ class DeviceManager:
         mock: bool = False,
         connect_immediately: bool = False,
         timeout: float | None = None,
-    ) -> tuple[dict[str, Any], dict[str, Exception]]:
+    ) -> DeviceBuildResult:
         """
         Build the devices from the given factories, ensuring that any
         dependencies are built first and passed to later factories as required.
@@ -254,7 +292,7 @@ class DeviceManager:
                 except Exception as e:
                     errors[device] = e
 
-        return built, errors
+        return DeviceBuildResult(built, errors)
 
     def __getitem__(self, name):
         return self._factories[name]
@@ -436,18 +474,23 @@ if __name__ == "__main__":
     # print("optional without override", optional(17))
     # print("optional override required", optional.build(base_x=19))
 
-    valid, errs = devices.build_all(
-        fixtures={"base_x": 19, "path_provider": "numtrack"}
-    )
-    print(valid)
-    print(errs)
+    # valid, errs = devices.build_all(
+    #     fixtures={"base_x": 19, "path_provider": "numtrack"}
+    # )
+    # print(valid)
+    # print(errs)
 
-    valid, errs = devices.build_devices(
-        base_x, base, optional, fixtures={"base_x": "19", "path_provider": "nt_pp"}
-    )
-    print(valid)
-    print(errs)
+    # valid, errs = devices.build_devices(
+    #     base_x, base, optional, fixtures={"base_x": "19", "path_provider": "nt_pp"}
+    # )
+    # print(valid)
+    # print(errs)
 
-    print(base_x())
+    # print(base_x())
+
+    res = devices.build_all(fixtures={"path_provider": "nt_path_provider"})
+    print(res)
+    conn = res.connect()
+    print(conn)
 
     # devices.build_devices(circ_1, circ_2)
