@@ -1,4 +1,6 @@
+from pathlib import PurePath
 from ophyd.epics_motor import EpicsMotor
+from ophyd_async.core import PathProvider, StaticPathProvider, UUIDFilenameProvider
 from ophyd_async.epics.adsimdetector import SimDetector
 
 from dodal.beamlines.dm_demo import DeviceManager
@@ -64,7 +66,12 @@ run_engine(count([d], num=10))
 devices = DeviceManager()
 
 
-@devices.factory(timeout=2, mock=True)
+@devices.fixture
+def path_provider() -> PathProvider:
+    return StaticPathProvider(UUIDFilenameProvider(), PurePath("/"))
+
+
+@devices.factory(timeout=2, mock=False)
 def stage() -> XThetaStage:
     return XThetaStage(
         f"{PREFIX.beamline_prefix}-MO-SIMC-01:", x_infix="M1", theta_infix="M2"
@@ -81,6 +88,9 @@ def det(path_provider) -> SimDetector:
     )
 
 
-# @devices.factory
+# v1_devices = OphydV1DeviceManager()
+
+
+# @v1_devices.factory
 # def old_motor() -> EpicsMotor:
 #     return EpicsMotor(name="old_motor", prefix=f"{PREFIX.beamline_prefix}-MO-SIMC-01:")
