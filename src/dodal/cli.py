@@ -46,7 +46,8 @@ def main(ctx: click.Context) -> None:
     "attempt any I/O. Useful as a a dry-run.",
     default=False,
 )
-def connect(beamline: str, all: bool, sim_backend: bool) -> None:
+@click.option("-n", "--name", multiple=True)
+def connect(beamline: str, all: bool, sim_backend: bool, name: tuple[str, ...]) -> None:
     """Initialises a beamline module, connects to all devices, reports
     any connection issues."""
 
@@ -69,14 +70,19 @@ def connect(beamline: str, all: bool, sim_backend: bool) -> None:
     # Don't connect devices as they're built and do connection as an extra step,
     # because the alternatives is handling the fact that only some devices may
     # be lazy.
-    if (manager := getattr(mod, "devices", None)) and isinstance(
-        manager, DeviceManager
-    ):
-        path_provider = StaticPathProvider(UUIDFilenameProvider(), Path("/tmp"))
-        devices, instance_exceptions, connect_exceptions = manager.build_and_connect(
-            mock=sim_backend,
-            fixtures={"path_provider": path_provider},
-        )
+
+    if name:
+        for manager_name in name:
+            if (manager := getattr(mod, manager_name, None)) and isinstance(
+                manager, DeviceManager
+            ):
+                path_provider = StaticPathProvider(UUIDFilenameProvider(), Path("/tmp"))
+                devices, instance_exceptions, connect_exceptions = (
+                    manager.build_and_connect(
+                        mock=sim_backend,
+                        fixtures={"path_provider": path_provider},
+                    )
+                )
     else:
         _spoof_path_provider()
         devices, instance_exceptions = make_all_devices(
