@@ -14,6 +14,7 @@ from dodal.devices.linkam3 import Linkam3
 from dodal.devices.motors import XYStage
 from dodal.devices.slits import Slits
 from dodal.devices.synchrotron import Synchrotron
+from dodal.devices.v2f import QDV2F
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
@@ -50,6 +51,11 @@ def mirror() -> SimpleMirror:
     return SimpleMirror(
         prefix=f"{PREFIX.beamline_prefix}-OP-MR-01:",
     )
+
+
+@device_factory()
+def d7() -> QDV2F:
+    return QDV2F(prefix=f"{PREFIX.beamline_prefix}-DI-PHDGN-07:PHD1:", I_suffix="I")
 
 
 @device_factory()
