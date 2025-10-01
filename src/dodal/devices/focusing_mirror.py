@@ -154,11 +154,6 @@ class SimpleMirror(XYPitchStage):
             pitch_infix=pitch_infix,
         )
 
-        self.add_readables(
-            [self.pitch.user_readback],
-            format=StandardReadableFormat.HINTED_SIGNAL,
-        )
-
         self.type, _ = soft_signal_r_and_setter(MirrorType, MirrorType.SINGLE)
 
         self.add_readables([self.type], format=StandardReadableFormat.CONFIG_SIGNAL)
