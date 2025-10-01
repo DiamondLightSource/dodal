@@ -79,7 +79,7 @@ def stage() -> XThetaStage:
 
 
 @devices.factory(timeout=2)
-def det(path_provider) -> SimDetector:
+def det(path_provider: PathProvider) -> SimDetector:
     return SimDetector(
         f"{PREFIX.beamline_prefix}-DI-CAM-01:",
         path_provider=path_provider,

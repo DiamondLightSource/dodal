@@ -76,11 +76,9 @@ def connect(beamline: str, all: bool, sim_backend: bool, name: tuple[str, ...]) 
             if (manager := getattr(mod, manager_name, None)) and isinstance(
                 manager, DeviceManager
             ):
-                path_provider = StaticPathProvider(UUIDFilenameProvider(), Path("/tmp"))
                 devices, instance_exceptions, connect_exceptions = (
                     manager.build_and_connect(
                         mock=sim_backend,
-                        fixtures={"path_provider": path_provider},
                     )
                 )
     else:
