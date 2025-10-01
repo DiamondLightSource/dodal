@@ -424,6 +424,9 @@ class DeviceManager:
         Assumes that all required devices and fixtures are included in the
         given factory list.
         """
+
+        # TODO: This is not an efficient way of doing this
+        # However, for realistic use cases, it is fast enough for now
         order = []
         available = set(fixtures.keys())
         pending = factories
