@@ -142,15 +142,12 @@ class SimpleMirror(XYPitchStage):
         self,
         prefix: str,
         name: str = "",
-        x_suffix: str = "X",
-        y_suffix: str = "Y",
-        pitch_suffix: str = "PITCH",
+        x_infix: str = "X",
+        y_infix: str = "Y",
+        pitch_infix: str = "PITCH",
     ):
         self.yaw = Motor(prefix + "YAW")
-        self.pitch = Motor(prefix + pitch_suffix)
         self.bend = Motor(prefix + "BEND")
-        self.x = Motor(prefix + x_suffix)
-        self.y = Motor(prefix + y_suffix)
         self.jack1 = Motor(prefix + "J1")
         self.jack2 = Motor(prefix + "J2")
 
