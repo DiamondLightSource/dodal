@@ -376,8 +376,7 @@ class I10Apple2(Apple2):
                 move_pv="RPQ1",
             )
 
-    @AsyncStatus.wrap
-    async def set(self, value: float) -> None:
+    async def _set(self, value: float) -> None:
         """
         Check polarisation state and use it together with the energy(value)
         to calculate the required gap and phases before setting it.
@@ -412,8 +411,6 @@ class I10Apple2(Apple2):
         if pol != Pol.LA:
             await self.id_jaw_phase.set(0)
             await self.id_jaw_phase.set_move.set(1)
-        self._set_energy_rbv(value)  # Update energy after move for readback.
-        LOGGER.info(f"Energy set to {value} eV successfully.")
 
 
 class EnergySetter(StandardReadable, Movable[float]):

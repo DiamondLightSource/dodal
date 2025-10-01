@@ -301,14 +301,30 @@ class UndulatorJawPhase(SafeUndulatorMover[float]):
         )
 
 
-class EnergyMotorConvertor(Protocol):
-    def __call__(self, energy: float, pol: Pol) -> tuple[float, float]:
-        """Protocol to provide energy to motor position convertion"""
-        ...
-
-
 class Apple2Motors(StandardReadable, Movable):
+    """
+    Device representing the combined motor controls for an Apple2 undulator.
+
+    Attributes
+    ----------
+    gap : UndulatorGap
+        The undulator gap motor device.
+    phase : UndulatorPhaseAxes
+        The undulator phase axes device, consisting of four phase motors.
+    """
+
     def __init__(self, id_gap: UndulatorGap, id_phase: UndulatorPhaseAxes, name=""):
+        """
+        Parameters
+        ----------
+
+        id_gap: UndulatorGap
+            An UndulatorGap device.
+        id_phase: UndulatorPhaseAxes
+            An UndulatorPhaseAxes device.
+        name: str
+            Name of the device.
+        """
         with self.add_children_as_readables():
             self.gap = id_gap
             self.phase = id_phase
@@ -344,6 +360,12 @@ class Apple2Motors(StandardReadable, Movable):
         await wait_for_value(self.gap.gate, UndulatorGateStatus.CLOSE, timeout=timeout)
 
 
+class EnergyMotorConvertor(Protocol):
+    def __call__(self, energy: float, pol: Pol) -> tuple[float, float]:
+        """Protocol to provide energy to motor position conversion"""
+        ...
+
+
 class Apple2(abc.ABC, StandardReadable, Movable):
     """
     Apple2 Undulator Device
@@ -355,7 +377,7 @@ class Apple2(abc.ABC, StandardReadable, Movable):
     The class is designed to manage the undulator's gap, phase motors, and polarisation settings, while
     abstracting hardware interactions and providing a high-level interface for beamline operations.
 
-    The class is abstract and requires beamline-specific implementations for set motor
+    The class is abstract and requires beamline-specific implementations for _set motor
      positions based on energy and polarisation.
 
     Attributes
@@ -456,23 +478,31 @@ class Apple2(abc.ABC, StandardReadable, Movable):
         self._set_pol_setpoint(value)
         await self.set(await self.energy.get_value())
 
-    @abc.abstractmethod
     @AsyncStatus.wrap
     async def set(self, value: float) -> None:
         """
         Set should be in energy units, this will set the energy of the ID by setting the
         gap and phase motors to the correct position for the given energy
         and polarisation.
-        This method should be implemented by the beamline specific ID class as the
-        motor positions will be different for each beamline depending on the
-        undulator design and the lookup table used.
-        _set can be used to set the motor positions for the given energy and
-        polarisation provided that all motors can be moved at the same time.
+
 
         Examples
         --------
         RE( id.set(888.0)) # This will set the ID to 888 eV
         RE(scan([detector], id,600,700,100)) # This will scan the ID from 600 to 700 eV in 100 steps.
+        """
+        await self._set(value)
+        self._set_energy_rbv(value)  # Update energy after move for readback.
+        LOGGER.info(f"Energy set to {value} eV successfully.")
+
+    @abc.abstractmethod
+    async def _set(self, value: float) -> None:
+        """
+        This method should be implemented by the beamline specific ID class as the
+        motor positions will be different for each beamline depending on the
+        undulator design and the lookup table used.
+        set can be used to set the motor positions for the given energy and
+        polarisation provided that all motors can be moved at the same time....
         """
 
     def _read_pol(
