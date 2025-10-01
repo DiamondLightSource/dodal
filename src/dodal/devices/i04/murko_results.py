@@ -2,7 +2,7 @@ import json
 import pickle
 from dataclasses import dataclass
 from enum import Enum
-from typing import TypedDict
+from typing import Optional, TypedDict
 
 import numpy as np
 from bluesky.protocols import Stageable, Triggerable
@@ -32,6 +32,7 @@ class MurkoMetadata(TypedDict):
     sample_id: str
     omega_angle: float
     uuid: str
+    used: Optional[bool]
 
 
 class Coord(Enum):
@@ -47,6 +48,7 @@ class MurkoResult:
     y_dist_mm: float
     omega: float
     uuid: str
+    metadata: MurkoMetadata
 
 
 class NoResultsFound(ValueError):
@@ -102,6 +104,7 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
     def _reset(self):
         self._last_omega = 0
         self.results: list[MurkoResult] = []
+        self.discarded_results: list[MurkoResult] = []
 
     @AsyncStatus.wrap
     async def stage(self):
@@ -146,6 +149,15 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
         self._x_mm_setter(-avg_x)
         self._y_mm_setter(-best_y)
         self._z_mm_setter(-best_z)
+
+        for result in self.results:
+            self.redis_client.hset(
+                f"murko:{sample_id}:metadata", result.uuid, json.dumps(result.metadata)
+            )
+        for result in self.discarded_results:
+            self.redis_client.hset(
+                f"murko:{sample_id}:metadata", result.uuid, json.dumps(result.metadata)
+            )
 
     async def process_batch(self, message: dict | None, sample_id: str):
         if message and message["type"] == "message":
@@ -193,6 +205,7 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
                     y_dist_mm=beam_dist_px[1] * metadata["microns_per_y_pixel"] / 1000,
                     omega=omega,
                     uuid=metadata["uuid"],
+                    metadata=metadata,
                 )
             )
             self._last_omega = omega
@@ -215,6 +228,12 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
         )
         cutoff = max(1, int(len(sorted_results) * self.PERCENTAGE_TO_USE / 100))
         smallest_x = sorted_results[:cutoff]
+        largest_x = sorted_results[cutoff:]
+        for result in smallest_x:
+            result.metadata["used"] = True
+        for result in largest_x:
+            result.metadata["used"] = False
+        self.discarded_results = largest_x
         self.results = smallest_x
         LOGGER.info(f"Number of results after filtering: {len(self.results)}")
 
