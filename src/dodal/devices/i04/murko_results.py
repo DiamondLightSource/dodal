@@ -42,6 +42,7 @@ class Coord(Enum):
 
 @dataclass
 class MurkoResult:
+    centre_px: tuple
     x_dist_mm: float
     y_dist_mm: float
     omega: float
@@ -175,6 +176,7 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
             )
             self.results.append(
                 MurkoResult(
+                    centre_px=centre_px,
                     x_dist_mm=beam_dist_px[0] * metadata["microns_per_x_pixel"] / 1000,
                     y_dist_mm=beam_dist_px[1] * metadata["microns_per_y_pixel"] / 1000,
                     omega=omega,
@@ -190,7 +192,7 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
         remove many of the outliers.
         """
         LOGGER.info(f"Number of results before filtering: {len(self.results)}")
-        sorted_results = sorted(self.results, key=lambda item: item.x_dist_mm)
+        sorted_results = sorted(self.results, key=lambda item: item.centre_px[0])
 
         worst_results = [
             r.uuid for r in sorted_results[-self.NUMBER_OF_WRONG_RESULTS_TO_LOG :]
