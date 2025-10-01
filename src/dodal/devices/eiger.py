@@ -23,6 +23,7 @@ class EigerTimeouts:
     meta_file_ready_timeout: int = 30
     all_frames_timeout: int = 120
     arming_timeout: int = 60
+    odin_stop_timeout: int = 30
 
 
 class InternalEigerTriggerMode(Enum):
@@ -139,7 +140,7 @@ class EigerDetector(Device, Stageable):
             ).wait(self.timeouts.all_frames_timeout)
         finally:
             LOGGER.info("Stopping Odin")
-            self.odin.stop().wait(5)
+            self.odin.stop().wait(self.timeouts.odin_stop_timeout)
 
     def unstage(self) -> bool:
         assert self.detector_params is not None

@@ -6,6 +6,8 @@ note:
     idd == id1,    idu == id2.
 """
 
+from daq_config_server.client import ConfigServer
+
 from dodal.common.beamlines.beamline_utils import device_factory
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.devices.current_amplifiers import CurrentAmpDet
@@ -25,6 +27,9 @@ from dodal.devices.i10.rasor.rasor_scaler_cards import RasorScalerCard1
 from dodal.devices.i10.slits import I10Slits, I10SlitsDrainCurrent
 from dodal.devices.motors import XYStage, XYZStage
 from dodal.devices.pgm import PGM
+from dodal.devices.temperture_controller import (
+    Lakeshore340,
+)
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
@@ -33,8 +38,10 @@ set_log_beamline(BL)
 set_utils_beamline(BL)
 PREFIX = BeamlinePrefix(BL)
 
+I10_CONF_CLIENT = ConfigServer(url="https://daq-config.diamond.ac.uk")
 
-LOOK_UPTABLE_DIR = "/dls_sw/i10/software/blueapi/scratch/i10-config/lookupTables/"
+
+LOOK_UPTABLE_DIR = "/dls_sw/i10/software/gda/workspace_git/gda-diamond.git/configurations/i10-shared/lookupTables/"
 
 
 @device_factory()
@@ -60,6 +67,7 @@ def idd() -> I10Id:
         pgm=pgm(),
         look_up_table_dir=LOOK_UPTABLE_DIR,
         source=("Source", "idd"),
+        config_client=I10_CONF_CLIENT,
     )
 
 
@@ -76,6 +84,7 @@ def idu() -> I10Id:
         pgm=pgm(),
         look_up_table_dir=LOOK_UPTABLE_DIR,
         source=("Source", "idu"),
+        config_client=I10_CONF_CLIENT,
     )
 
 
@@ -151,6 +160,13 @@ def pa_stage() -> PaStage:
 @device_factory()
 def sample_stage() -> XYZStage:
     return XYZStage(prefix="ME01D-MO-CRYO-01:")
+
+
+@device_factory()
+def rasor_temperature_controller() -> Lakeshore340:
+    return Lakeshore340(
+        prefix="ME01D-EA-TCTRL-01:",
+    )
 
 
 @device_factory()
