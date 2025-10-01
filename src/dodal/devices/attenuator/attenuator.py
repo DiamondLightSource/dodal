@@ -145,12 +145,15 @@ class EnumFilterAttenuator(ReadOnlyAttenuator, Movable[float]):
         the current beamline energy, the set will only complete when they have all been
         applied.
         """
+
+        # auto move should normally be on, but check here incase it was manually turned off
         await self._auto_move_on_desired_transmission_set.set(YesNo.YES)
+
         await self._use_current_energy.trigger()
         await self._desired_transmission.set(value)
 
         # Give EPICS a chance to start moving the filter motors. Not needed after
-        # a callback is added at the controls level: https://github.com/DiamondLightSource/dodal/issues/972
+        # a transmission readback PV is added at the controls level: https://jira.diamond.ac.uk/browse/I24-725
         await asyncio.sleep(ENUM_ATTENUATOR_SETTLE_TIME_S)
         coros = [
             wait_for_value(self._filters[i].done_move, 1, timeout=DEFAULT_TIMEOUT)
