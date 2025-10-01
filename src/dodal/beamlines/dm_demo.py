@@ -337,7 +337,6 @@ class DeviceManager:
         Build the devices from the given factories, ensuring that any
         dependencies are built first and passed to later factories as required.
         """
-        # TODO: Should we check all the factories are our factories?
 
         fixtures = LazyFixtures(provided=fixtures, factories=self._fixtures)
         if common := fixtures.keys() & {f.name for f in factories}:
