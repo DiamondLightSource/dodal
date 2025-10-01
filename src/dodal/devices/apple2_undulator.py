@@ -334,8 +334,8 @@ class Apple2Motors(StandardReadable, Movable):
     async def set(self, id_motor_values: Apple2Val) -> None:
         """
         Check ID is in a movable state and set all the demand value before moving them
-        all at the same time. This should be modified by the beamline specific ID class
-        , if the ID motors has to move in a specific order.
+        all at the same time. This should be modified by the beamline specific ID 
+        class, if the ID motors has to move in a specific order.
         """
 
         # Only need to check gap as the phase motors share both fault and gate with gap.
