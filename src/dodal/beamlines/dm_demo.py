@@ -1,15 +1,18 @@
 import asyncio
 import inspect
+import itertools
 import typing
 import warnings
-from collections.abc import Callable, Iterable
+from collections.abc import Callable, Iterable, Mapping
 from concurrent import futures
+from dataclasses import InitVar, dataclass, field
 from functools import cached_property, wraps
 from types import NoneType
 from typing import (
     Annotated,
     Any,
     Generic,
+    MutableMapping,
     NamedTuple,
     ParamSpec,
     TypeVar,
@@ -42,6 +45,50 @@ set_utils_beamline(BL)
 
 T = TypeVar("T")
 Args = ParamSpec("Args")
+
+
+_EMPTY = object()
+"""Sentinel value to distinguish between missing values and present but null values"""
+
+
+class LazyFixtures(Mapping[str, Any]):
+    """
+    Wrapper around fixtures and fixture generators
+
+    If a fixture is provided at runtime, the generator function does not have to be called.
+    """
+
+    ready: MutableMapping[str, Any] = field(init=False)
+    lazy: MutableMapping[str, Callable[[], Any]] = field(init=False)
+
+    def __init__(
+        self,
+        provided: Mapping[str, Any] | None,
+        factories: Mapping[str, Callable[[], Any]],
+    ):
+        self.ready = dict(provided or {})
+        # wrap to prevent modification escaping
+        # drop duplicate keys so the len and iter methods are easier
+        self.lazy = {k: v for k, v in factories.items() if k not in self.ready}
+
+    def __contains__(self, key: Any) -> bool:
+        return key in self.ready or key in self.lazy
+
+    def __len__(self) -> int:
+        # Can just add the lengths as the keys are distinct by construction
+        return len(self.ready.keys()) + len(self.lazy.keys())
+
+    def __getitem__(self, key: str) -> Any:
+        if (value := self.ready.get(key, _EMPTY)) is not _EMPTY:
+            return value
+        if factory := self.lazy.pop(key, None):
+            value = factory()
+            self.ready[key] = value
+            return value
+        raise KeyError(key)
+
+    def __iter__(self):
+        return itertools.chain(self.lazy.keys(), self.ready.keys())
 
 
 class DeviceFactory(Generic[Args, T]):
@@ -201,7 +248,7 @@ class DeviceBuildResult(NamedTuple):
 
 class DeviceManager:
     _factories: dict[str, DeviceFactory]
-    _fixtures: dict[str, Any]
+    _fixtures: dict[str, Callable[[], Any]]
 
     def __init__(self):
         self._factories = {}
@@ -261,14 +308,15 @@ class DeviceManager:
         fixtures: dict[str, Any] | None = None,
         mock: bool = False,
     ) -> DeviceBuildResult:
-        fixtures = fixtures or {}
         # exclude all skipped devices and those that have been overridden by fixtures
         return self.build_devices(
             *(
                 f
                 for f in self._factories.values()
                 # allow overriding skip but still allow fixtures to override devices
-                if (include_skipped or not f.skip) and f.name not in fixtures
+                if (include_skipped or not f.skip)
+                # don't build anything that has been overridden by a fixture
+                and (not fixtures or f.name not in fixtures)
             ),
             fixtures=fixtures,
             mock=mock,
@@ -277,7 +325,7 @@ class DeviceManager:
     def build_devices(
         self,
         *factories: DeviceFactory,
-        fixtures: dict[str, Any] | None = None,
+        fixtures: Mapping[str, Any] | None = None,
         mock: bool = False,
     ) -> DeviceBuildResult:
         """
@@ -286,14 +334,7 @@ class DeviceManager:
         """
         # TODO: Should we check all the factories are our factories?
 
-        # TODO: build fixtures lazily
-        fixtures = fixtures or {}
-        builtin_fixtures = {
-            name: func()
-            for name, func in self._fixtures.items()
-            if name not in fixtures
-        }
-        fixtures = builtin_fixtures | fixtures
+        fixtures = LazyFixtures(provided=fixtures, factories=self._fixtures)
         if common := fixtures.keys() & {f.name for f in factories}:
             warnings.warn(
                 f"Factories ({common}) will be overridden by fixtures", stacklevel=1
@@ -316,9 +357,12 @@ class DeviceManager:
                 # If we've made it this far, any devices that aren't available must have default
                 # values so ignore anything that's missing
                 params = {
-                    dep: built.get(dep) or fixtures[dep]
+                    dep: value
                     for dep in deps
-                    if dep in built.keys() | fixtures.keys()
+                    # get from built if it's there, from fixtures otherwise...
+                    if (value := (built.get(dep, fixtures.get(dep, _EMPTY))))
+                    # ...and skip if in neither
+                    is not _EMPTY
                 }
                 try:
                     built_device = factory(**params)
@@ -340,7 +384,7 @@ class DeviceManager:
     def _expand_dependencies(
         self,
         factories: Iterable[DeviceFactory[Any, Any]],
-        available_fixtures: dict[str, Any],
+        available_fixtures: Mapping[str, Any],
     ) -> set[str]:
         """
         Determine full list of devices that are required to build the given devices.
@@ -371,7 +415,7 @@ class DeviceManager:
         return dependencies
 
     def _build_order(
-        self, factories: dict[str, DeviceFactory], fixtures=None
+        self, factories: dict[str, DeviceFactory], fixtures: Mapping[str, Any]
     ) -> list[str]:
         """
         Determine the order devices in which devices should be build to ensure
@@ -381,7 +425,7 @@ class DeviceManager:
         given factory list.
         """
         order = []
-        available = set(fixtures or {})
+        available = set(fixtures.keys())
         pending = factories
         while pending:
             buffer = {}
