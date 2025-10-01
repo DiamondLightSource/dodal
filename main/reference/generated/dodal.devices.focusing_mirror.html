@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.focusing_mirror &#8212; dodal 1.58.1.dev25+g72e180904 documentation</title>
+    <title>dodal.devices.focusing_mirror &#8212; dodal 1.58.1.dev26+gc2cc11c9b documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=9128eae6"></script>
+    <script src="../../_static/documentation_options.js?v=b4dd9b72"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -630,6 +630,7 @@
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.focusing_mirror.MirrorType.html">dodal.devices.focusing_mirror.MirrorType</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.focusing_mirror.MirrorVoltageDemand.html">dodal.devices.focusing_mirror.MirrorVoltageDemand</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.focusing_mirror.MirrorVoltages.html">dodal.devices.focusing_mirror.MirrorVoltages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.focusing_mirror.SimpleMirror.html">dodal.devices.focusing_mirror.SimpleMirror</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.focusing_mirror.SingleMirrorVoltage.html">dodal.devices.focusing_mirror.SingleMirrorVoltage</a></li>
 </ul>
 </details></li>
@@ -863,6 +864,11 @@
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.util.lookup_tables.html">dodal.devices.util.lookup_tables</a></li>
 </ul>
 </details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.v2f.html">dodal.devices.v2f</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.v2f.QDV2F.html">dodal.devices.v2f.QDV2F</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.v2f.V2FGain.html">dodal.devices.v2f.V2FGain</a></li>
+</ul>
+</details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.watsonmarlow323_pump.html">dodal.devices.watsonmarlow323_pump</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.watsonmarlow323_pump.WatsonMarlow323Pump.html">dodal.devices.watsonmarlow323_pump.WatsonMarlow323Pump</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.watsonmarlow323_pump.WatsonMarlow323PumpDirection.html">dodal.devices.watsonmarlow323_pump.WatsonMarlow323PumpDirection</a></li>
@@ -1011,7 +1017,10 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.focusing_mirror.MirrorVoltages.html#dodal.devices.focusing_mirror.MirrorVoltages" title="dodal.devices.focusing_mirror.MirrorVoltages"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MirrorVoltages</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.focusing_mirror.SingleMirrorVoltage.html#dodal.devices.focusing_mirror.SingleMirrorVoltage" title="dodal.devices.focusing_mirror.SingleMirrorVoltage"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SingleMirrorVoltage</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.focusing_mirror.SimpleMirror.html#dodal.devices.focusing_mirror.SimpleMirror" title="dodal.devices.focusing_mirror.SimpleMirror"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SimpleMirror</span></code></a></p></td>
+<td><p>Simple Focusing Mirror</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.focusing_mirror.SingleMirrorVoltage.html#dodal.devices.focusing_mirror.SingleMirrorVoltage" title="dodal.devices.focusing_mirror.SingleMirrorVoltage"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SingleMirrorVoltage</span></code></a></p></td>
 <td><p>Abstract the bimorph mirror voltage PVs into a single device that can be set asynchronously and returns when the demanded voltage setpoint is accepted, without blocking the caller as this process can take significant time.</p></td>
 </tr>
 </tbody>

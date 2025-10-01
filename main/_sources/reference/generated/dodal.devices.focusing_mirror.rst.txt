@@ -21,6 +21,7 @@ dodal.devices.focusing\_mirror
    ~focusing_mirror.MirrorType
    ~focusing_mirror.MirrorVoltageDemand
    ~focusing_mirror.MirrorVoltages
+   ~focusing_mirror.SimpleMirror
    ~focusing_mirror.SingleMirrorVoltage
 
 

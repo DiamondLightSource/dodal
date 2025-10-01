@@ -71,6 +71,7 @@
    dodal.devices.turbo_slit
    dodal.devices.undulator
    dodal.devices.util
+   dodal.devices.v2f
    dodal.devices.watsonmarlow323_pump
    dodal.devices.webcam
    dodal.devices.xbpm_feedback

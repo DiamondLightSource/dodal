@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Index &#8212; dodal 1.58.1.dev25+g72e180904 documentation</title>
+    <title>Index &#8212; dodal 1.58.1.dev26+gc2cc11c9b documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="_static/documentation_options.js?v=9128eae6"></script>
+    <script src="_static/documentation_options.js?v=b4dd9b72"></script>
     <script src="_static/doctools.js?v=9a2dae69"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -631,6 +631,7 @@ window.addEventListener("load", () => mermaid.run());
 <li class="toctree-l4"><a class="reference internal" href="reference/generated/dodal.devices.focusing_mirror.MirrorType.html">dodal.devices.focusing_mirror.MirrorType</a></li>
 <li class="toctree-l4"><a class="reference internal" href="reference/generated/dodal.devices.focusing_mirror.MirrorVoltageDemand.html">dodal.devices.focusing_mirror.MirrorVoltageDemand</a></li>
 <li class="toctree-l4"><a class="reference internal" href="reference/generated/dodal.devices.focusing_mirror.MirrorVoltages.html">dodal.devices.focusing_mirror.MirrorVoltages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="reference/generated/dodal.devices.focusing_mirror.SimpleMirror.html">dodal.devices.focusing_mirror.SimpleMirror</a></li>
 <li class="toctree-l4"><a class="reference internal" href="reference/generated/dodal.devices.focusing_mirror.SingleMirrorVoltage.html">dodal.devices.focusing_mirror.SingleMirrorVoltage</a></li>
 </ul>
 </details></li>
@@ -862,6 +863,11 @@ window.addEventListener("load", () => mermaid.run());
 <li class="toctree-l4"><a class="reference internal" href="reference/generated/dodal.devices.util.adjuster_plans.html">dodal.devices.util.adjuster_plans</a></li>
 <li class="toctree-l4"><a class="reference internal" href="reference/generated/dodal.devices.util.epics_util.html">dodal.devices.util.epics_util</a></li>
 <li class="toctree-l4"><a class="reference internal" href="reference/generated/dodal.devices.util.lookup_tables.html">dodal.devices.util.lookup_tables</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="reference/generated/dodal.devices.v2f.html">dodal.devices.v2f</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="reference/generated/dodal.devices.v2f.QDV2F.html">dodal.devices.v2f.QDV2F</a></li>
+<li class="toctree-l4"><a class="reference internal" href="reference/generated/dodal.devices.v2f.V2FGain.html">dodal.devices.v2f.V2FGain</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="reference/generated/dodal.devices.watsonmarlow323_pump.html">dodal.devices.watsonmarlow323_pump</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -2248,6 +2254,13 @@ window.addEventListener("load", () => mermaid.run());
 </li>
       </ul></li>
       <li>
+    dodal.devices.v2f
+
+      <ul>
+        <li><a href="reference/generated/dodal.devices.v2f.html#module-dodal.devices.v2f">module</a>
+</li>
+      </ul></li>
+      <li>
     dodal.devices.watsonmarlow323_pump
 
       <ul>
@@ -3069,6 +3082,8 @@ window.addEventListener("load", () => mermaid.run());
 </li>
         <li><a href="reference/generated/dodal.devices.util.lookup_tables.html#module-dodal.devices.util.lookup_tables">dodal.devices.util.lookup_tables</a>
 </li>
+        <li><a href="reference/generated/dodal.devices.v2f.html#module-dodal.devices.v2f">dodal.devices.v2f</a>
+</li>
         <li><a href="reference/generated/dodal.devices.watsonmarlow323_pump.html#module-dodal.devices.watsonmarlow323_pump">dodal.devices.watsonmarlow323_pump</a>
 </li>
         <li><a href="reference/generated/dodal.devices.webcam.html#module-dodal.devices.webcam">dodal.devices.webcam</a>
@@ -3283,6 +3298,10 @@ window.addEventListener("load", () => mermaid.run());
       <li><a href="reference/generated/dodal.devices.qbpm.QBPM.html#dodal.devices.qbpm.QBPM">QBPM (class in dodal.devices.qbpm)</a>
 </li>
   </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/generated/dodal.devices.v2f.QDV2F.html#dodal.devices.v2f.QDV2F">QDV2F (class in dodal.devices.v2f)</a>
+</li>
+  </ul></td>
 </tr></table>
 
 <h2 id="R">R</h2>
@@ -3398,15 +3417,17 @@ window.addEventListener("load", () => mermaid.run());
 </li>
       <li><a href="reference/generated/dodal.devices.util.epics_util.SetWhenEnabled.html#dodal.devices.util.epics_util.SetWhenEnabled">SetWhenEnabled (class in dodal.devices.util.epics_util)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/generated/dodal.devices.bimorph_mirror.BimorphMirrorChannel.html#dodal.devices.bimorph_mirror.BimorphMirrorChannel.shift">shift (dodal.devices.bimorph_mirror.BimorphMirrorChannel attribute)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/generated/dodal.devices.hutch_shutter.HutchInterlock.html#dodal.devices.hutch_shutter.HutchInterlock.shutter_safe_to_operate">shutter_safe_to_operate() (dodal.devices.hutch_shutter.HutchInterlock method)</a>
 </li>
       <li><a href="reference/generated/dodal.devices.hutch_shutter.ShutterDemand.html#dodal.devices.hutch_shutter.ShutterDemand">ShutterDemand (class in dodal.devices.hutch_shutter)</a>
 </li>
       <li><a href="reference/generated/dodal.devices.hutch_shutter.ShutterState.html#dodal.devices.hutch_shutter.ShutterState">ShutterState (class in dodal.devices.hutch_shutter)</a>
+</li>
+      <li><a href="reference/generated/dodal.devices.focusing_mirror.SimpleMirror.html#dodal.devices.focusing_mirror.SimpleMirror">SimpleMirror (class in dodal.devices.focusing_mirror)</a>
 </li>
       <li><a href="reference/generated/dodal.devices.focusing_mirror.SingleMirrorVoltage.html#dodal.devices.focusing_mirror.SingleMirrorVoltage">SingleMirrorVoltage (class in dodal.devices.focusing_mirror)</a>
 </li>
@@ -3600,14 +3621,16 @@ window.addEventListener("load", () => mermaid.run());
 <h2 id="V">V</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/generated/dodal.devices.v2f.V2FGain.html#dodal.devices.v2f.V2FGain">V2FGain (class in dodal.devices.v2f)</a>
+</li>
       <li><a href="reference/generated/dodal.devices.pressure_jump_cell.ValveControl.html#dodal.devices.pressure_jump_cell.ValveControl">ValveControl (class in dodal.devices.pressure_jump_cell)</a>
 </li>
       <li><a href="reference/generated/dodal.devices.pressure_jump_cell.ValveControlRequest.html#dodal.devices.pressure_jump_cell.ValveControlRequest">ValveControlRequest (class in dodal.devices.pressure_jump_cell)</a>
 </li>
-      <li><a href="reference/generated/dodal.devices.pressure_jump_cell.ValveOpenSeqRequest.html#dodal.devices.pressure_jump_cell.ValveOpenSeqRequest">ValveOpenSeqRequest (class in dodal.devices.pressure_jump_cell)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/generated/dodal.devices.pressure_jump_cell.ValveOpenSeqRequest.html#dodal.devices.pressure_jump_cell.ValveOpenSeqRequest">ValveOpenSeqRequest (class in dodal.devices.pressure_jump_cell)</a>
+</li>
       <li><a href="reference/generated/dodal.devices.pressure_jump_cell.ValveState.html#dodal.devices.pressure_jump_cell.ValveState">ValveState (class in dodal.devices.pressure_jump_cell)</a>
 </li>
       <li><a href="reference/generated/dodal.devices.i24.vgonio.VerticalGoniometer.html#dodal.devices.i24.vgonio.VerticalGoniometer">VerticalGoniometer (class in dodal.devices.i24.vgonio)</a>
