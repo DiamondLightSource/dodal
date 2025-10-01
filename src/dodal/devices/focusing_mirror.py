@@ -158,13 +158,14 @@ class SimpleMirror(XYPitchStage):
             [self.pitch.user_readback],
             format=StandardReadableFormat.HINTED_SIGNAL,
         )
+
+        self.type, _ = soft_signal_r_and_setter(MirrorType, MirrorType.SINGLE)
+
         self.add_readables([self.type], format=StandardReadableFormat.CONFIG_SIGNAL)
         self.yaw = Motor(prefix + "YAW")
         self.bend = Motor(prefix + "BEND")
         self.jack1 = Motor(prefix + "J1")
         self.jack2 = Motor(prefix + "J2")
-
-        self.type, _ = soft_signal_r_and_setter(MirrorType, MirrorType.SINGLE)
 
 
 class FocusingMirror(StandardReadable):
