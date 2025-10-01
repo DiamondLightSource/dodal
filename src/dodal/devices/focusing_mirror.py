@@ -146,19 +146,25 @@ class SimpleMirror(XYPitchStage):
         y_infix: str = "Y",
         pitch_infix: str = "PITCH",
     ):
-        self.yaw = Motor(prefix + "YAW")
-        self.bend = Motor(prefix + "BEND")
-        self.jack1 = Motor(prefix + "J1")
-        self.jack2 = Motor(prefix + "J2")
-
-        self.type, _ = soft_signal_r_and_setter(MirrorType, MirrorType.SINGLE)
+        super().__init__(
+            name,
+            prefix=prefix,
+            x_infix=x_infix,
+            y_infix=y_infix,
+            pitch_infix=pitch_infix,
+        )
 
         self.add_readables(
             [self.pitch.user_readback],
             format=StandardReadableFormat.HINTED_SIGNAL,
         )
         self.add_readables([self.type], format=StandardReadableFormat.CONFIG_SIGNAL)
-        super().__init__(name)
+        self.yaw = Motor(prefix + "YAW")
+        self.bend = Motor(prefix + "BEND")
+        self.jack1 = Motor(prefix + "J1")
+        self.jack2 = Motor(prefix + "J2")
+
+        self.type, _ = soft_signal_r_and_setter(MirrorType, MirrorType.SINGLE)
 
 
 class FocusingMirror(StandardReadable):
