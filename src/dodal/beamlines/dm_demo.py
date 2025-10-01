@@ -397,11 +397,11 @@ class DeviceManager:
         be overridden.
 
         Errors:
-            If a required dependencies is not available as either a device
+            If a required dependency is not available as either a device
             factory or a fixture, a ValueError is raised
         """
         dependencies = set()
-        factories = list(factories)
+        factories = set(factories)
         while factories:
             fact = factories.pop()
             dependencies.add(fact.name)
@@ -409,8 +409,7 @@ class DeviceManager:
             for dep in fact.dependencies:
                 if dep not in dependencies and dep not in available_fixtures:
                     if dep in self._factories:
-                        dependencies.add(dep)
-                        factories.append(self[dep])
+                        factories.add(self[dep])
                     elif dep not in options:
                         raise ValueError(
                             f"Missing fixture or factory for {dep}",
