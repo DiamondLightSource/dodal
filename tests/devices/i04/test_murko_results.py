@@ -510,7 +510,9 @@ def test_given_n_results_filter_outliers_will_reduce_down_to_smaller_amount(
     murko_results: MurkoResultsDevice,
 ):
     murko_results.results = [
-        MurkoResult(x_dist_mm=i, y_dist_mm=i, omega=i, uuid=str(i))
+        MurkoResult(
+            centre_px=(100, 100), x_dist_mm=i, y_dist_mm=i, omega=i, uuid=str(i)
+        )
         for i in range(total_from_murko)
     ]
 
@@ -522,18 +524,23 @@ def test_given_n_results_filter_outliers_will_reduce_down_to_smaller_amount(
     assert len(murko_results.results) == expected_left
 
 
-def test_when_results_filtered_then_smallest_x_kept(murko_results: MurkoResultsDevice):
+def test_when_results_filtered_then_smallest_x_pixels_kept(
+    murko_results: MurkoResultsDevice,
+):
     murko_results.results = [
-        MurkoResult(x_dist_mm=4, y_dist_mm=8, omega=0, uuid="a"),
-        MurkoResult(x_dist_mm=0, y_dist_mm=90, omega=10, uuid="b"),
-        MurkoResult(x_dist_mm=6, y_dist_mm=63, omega=20, uuid="c"),
-        MurkoResult(x_dist_mm=7, y_dist_mm=8, omega=30, uuid="d"),
+        MurkoResult(centre_px=(100, 200), x_dist_mm=4, y_dist_mm=8, omega=0, uuid="a"),
+        MurkoResult(
+            centre_px=(300, 200), x_dist_mm=0, y_dist_mm=90, omega=10, uuid="b"
+        ),
+        MurkoResult(centre_px=(50, 200), x_dist_mm=6, y_dist_mm=63, omega=20, uuid="c"),
+        MurkoResult(centre_px=(300, 200), x_dist_mm=7, y_dist_mm=8, omega=30, uuid="d"),
     ]
 
     murko_results.filter_outliers()
     assert len(murko_results.results) == 1
     results = murko_results.results[0]
-    assert results.x_dist_mm == 0
-    assert results.y_dist_mm == 90
-    assert results.omega == 10
-    assert results.uuid == "b"
+    assert results.centre_px == (50, 200)
+    assert results.x_dist_mm == 6
+    assert results.y_dist_mm == 63
+    assert results.omega == 20
+    assert results.uuid == "c"
