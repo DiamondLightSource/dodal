@@ -360,7 +360,7 @@ class I10Apple2(Apple2):
 
         with self.add_children_as_readables():
             super().__init__(
-                id_motors=Apple2Motors(
+                apple2_motors=Apple2Motors(
                     id_gap=UndulatorGap(name="id_gap", prefix=prefix),
                     id_phase=UndulatorPhaseAxes(
                         name="id_phase",
