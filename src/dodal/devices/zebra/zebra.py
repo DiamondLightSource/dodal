@@ -82,6 +82,7 @@ class ArmDemand(Enum):
     DISARM = 0
 
 
+# Replace with ophyd-async enum after https://github.com/bluesky/ophyd-async/pull/1067
 class SoftInState(StrictEnum):
     YES = "Yes"
     NO = "No"
