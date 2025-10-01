@@ -129,7 +129,7 @@ class DeviceFactory(Generic[Args, T]):
             raise Exception("??? build")
         else:
             if connect_immediately:
-                conn = devices.connect(timeout=timeout)
+                conn = devices.connect(timeout=timeout or self.timeout)
                 if conn.connection_errors:
                     raise Exception("??? conn")
             device = devices.devices[self.name].device
@@ -153,9 +153,14 @@ class DeviceFactory(Generic[Args, T]):
         return f"<{self.name}: DeviceFactory ({params}) -> {target}>"
 
 
+class ConnectionParameters(NamedTuple):
+    mock: bool
+    timeout: float
+
+
 class ConnectionSpec(NamedTuple):
     device: Any
-    mock: bool
+    params: ConnectionParameters
 
 
 class ConnectionResult(NamedTuple):
@@ -180,9 +185,10 @@ class DeviceBuildResult(NamedTuple):
     def connect(self, timeout: float | None = None) -> ConnectionResult:
         connections = {}
         loop: asyncio.EventLoop = get_bluesky_event_loop()  # type: ignore
-        for name, (device, mock) in self.devices.items():
+        for name, (device, (mock, dev_timeout)) in self.devices.items():
+            timeout = timeout or dev_timeout or DEFAULT_TIMEOUT
             fut: futures.Future = asyncio.run_coroutine_threadsafe(
-                device.connect(mock=mock, timeout=timeout or 5),  # type: ignore
+                device.connect(mock=mock, timeout=timeout),  # type: ignore
                 loop=loop,
             )
             connections[name] = fut
@@ -191,7 +197,7 @@ class DeviceBuildResult(NamedTuple):
         connection_errors = {}
         for name, connection_future in connections.items():
             try:
-                connection_future.result(timeout=12)
+                connection_future.result()
                 connected[name] = self.devices[name].device
             except Exception as e:
                 connection_errors[name] = e
@@ -319,7 +325,13 @@ class DeviceManager:
                 }
                 try:
                     built_device = factory(**params)
-                    built[device] = ConnectionSpec(built_device, mock or factory.mock)
+                    built[device] = ConnectionSpec(
+                        built_device,
+                        ConnectionParameters(
+                            mock=mock or factory.mock,
+                            timeout=factory.timeout,
+                        ),
+                    )
                 except Exception as e:
                     errors[device] = e
 
