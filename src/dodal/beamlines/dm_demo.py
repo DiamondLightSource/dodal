@@ -1,26 +1,21 @@
 import asyncio
-from concurrent import futures
-import concurrent
 import inspect
 import typing
 import warnings
 from collections.abc import Callable, Iterable
+from concurrent import futures
 from functools import cached_property, wraps
 from types import NoneType
 from typing import (
     Annotated,
     Any,
     Generic,
-    Literal,
-    Mapping,
     NamedTuple,
     ParamSpec,
     TypeVar,
 )
 
 from bluesky.run_engine import (
-    RunEngine,
-    call_in_bluesky_event_loop,
     get_bluesky_event_loop,
 )
 from ophyd_async.core import PathProvider
@@ -126,24 +121,23 @@ class DeviceFactory(Generic[Args, T]):
             mock=mock,
         )
         if devices.errors:
+            # TODO: NotBuilt?
             raise Exception("??? build")
         else:
             if connect_immediately:
                 conn = devices.connect(timeout=timeout or self.timeout)
                 if conn.connection_errors:
+                    # TODO: NotConnected?
                     raise Exception("??? conn")
             device = devices.devices[self.name].device
             if name:
                 device.set_name(device)
-            elif self.use_factory_name:
-                device.set_name(self.name)
             return device
 
     def __call__(self, *args, **kwargs) -> T:
         device = self.factory(*args, **kwargs)
-        if isinstance(device, OphydV2Device):
-            if self.use_factory_name:
-                device.set_name(self.name)
+        if isinstance(device, OphydV2Device) and self.use_factory_name:
+            device.set_name(self.name)
         return device
 
     def __repr__(self) -> str:
