@@ -299,9 +299,13 @@ class DeviceManager:
         return decorator(func)
 
     def build_and_connect(
-        self, *, fixtures: dict[str, Any] | None = None, mock: bool = False
+        self,
+        *,
+        fixtures: dict[str, Any] | None = None,
+        mock: bool = False,
+        timeout: float | None = None,
     ) -> ConnectionResult:
-        return self.build_all(fixtures=fixtures, mock=mock).connect()
+        return self.build_all(fixtures=fixtures, mock=mock).connect(timeout=timeout)
 
     def build_all(
         self,
