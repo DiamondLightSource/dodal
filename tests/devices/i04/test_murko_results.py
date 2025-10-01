@@ -574,3 +574,36 @@ async def test_when_results_device_unstaged_then_results_cleared_and_last_omega_
 
     assert not murko_results.results
     assert murko_results._last_omega == 0
+
+
+@patch("dodal.devices.i04.murko_results.StrictRedis")
+async def test_none_result_does_not_stop_results_device(
+    mock_strict_redis: MagicMock,
+    murko_results: MurkoResultsDevice,
+):
+    messages, metadata = get_messages(
+        batches=2,
+        messages_per_batch=1,
+        images_per_message=1,
+        omega_start=90,
+        omega_step=90,
+    )
+    messages = list(messages)
+    messages = [None] + [messages[0]] + [None] + messages[1:]
+
+    assert messages[0] is None
+    assert messages[2] is None
+
+    messages = iter(messages)
+    murko_results.stop_angle = 180
+
+    murko_results.pubsub.get_message, murko_results.redis_client.hget = (
+        mock_redis_calls(mock_strict_redis, messages, metadata)
+    )
+    mock_get_message = cast(MagicMock, murko_results.pubsub.get_message)
+    mock_hget = cast(MagicMock, murko_results.redis_client.hget)
+
+    await murko_results.trigger()
+
+    assert mock_get_message.call_count == 4
+    assert mock_hget.call_count == 2  # 2 non None results
