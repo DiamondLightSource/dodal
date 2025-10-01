@@ -307,6 +307,43 @@ class EnergyMotorConvertor(Protocol):
         ...
 
 
+class Apple2base(StandardReadable, Movable):
+    def __init__(self, id_gap: UndulatorGap, id_phase: UndulatorPhaseAxes, name=""):
+        with self.add_children_as_readables():
+            self.gap = id_gap
+            self.phase = id_phase
+        super().__init__(name=name)
+
+    @AsyncStatus.wrap
+    async def set(self, id_motor_values: Apple2Val) -> None:
+        """
+        Check ID is in a movable state and set all the demand value before moving them
+        all at the same time. This should be modified by the beamline specific ID class
+        , if the ID motors has to move in a specific order.
+        """
+
+        # Only need to check gap as the phase motors share both fault and gate with gap.
+        await self.gap.raise_if_cannot_move()
+        await asyncio.gather(
+            self.phase.top_outer.user_setpoint.set(value=id_motor_values.top_outer),
+            self.phase.top_inner.user_setpoint.set(value=id_motor_values.top_inner),
+            self.phase.btm_inner.user_setpoint.set(value=id_motor_values.btm_inner),
+            self.phase.btm_outer.user_setpoint.set(value=id_motor_values.btm_outer),
+            self.gap.user_setpoint.set(value=id_motor_values.gap),
+        )
+        timeout = np.max(
+            await asyncio.gather(self.gap.get_timeout(), self.phase.get_timeout())
+        )
+        LOGGER.info(
+            f"Moving f{self.name} apple2 motors to {id_motor_values}, timeout = {timeout}"
+        )
+        await asyncio.gather(
+            self.gap.set_move.set(value=1, wait=False, timeout=timeout),
+            self.phase.set_move.set(value=1, wait=False, timeout=timeout),
+        )
+        await wait_for_value(self.gap.gate, UndulatorGateStatus.CLOSE, timeout=timeout)
+
+
 class Apple2(abc.ABC, StandardReadable, Movable):
     """
     Apple2 Undulator Device
@@ -378,8 +415,7 @@ class Apple2(abc.ABC, StandardReadable, Movable):
         name: Name of the device.
         """
 
-        self.gap = id_gap
-        self.phase = id_phase
+        self.motors = Apple2base(id_gap=id_gap, id_phase=id_phase)
         self.energy_to_motor = energy_motor_convertor
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             # Store the set energy for readback.
@@ -398,10 +434,10 @@ class Apple2(abc.ABC, StandardReadable, Movable):
             raw_to_derived=self._read_pol,
             set_derived=self._set_pol,
             pol=self.polarisation_setpoint,
-            top_outer=self.phase.top_outer.user_readback,
-            top_inner=self.phase.top_inner.user_readback,
-            btm_inner=self.phase.btm_inner.user_readback,
-            btm_outer=self.phase.btm_outer.user_readback,
+            top_outer=self.motors.phase.top_outer.user_readback,
+            top_inner=self.motors.phase.top_inner.user_readback,
+            btm_inner=self.motors.phase.btm_inner.user_readback,
+            btm_outer=self.motors.phase.btm_outer.user_readback,
             gap=id_gap.user_readback,
         )
         super().__init__(name)
@@ -467,36 +503,6 @@ class Apple2(abc.ABC, StandardReadable, Movable):
             return Pol.LH3
 
         return read_pol
-
-    async def _set(self, value: Apple2Val, energy: float) -> None:
-        """
-        Check ID is in a movable state and set all the demand value before moving them
-        all at the same time. This should be modified by the beamline specific ID class
-        , if the ID motors has to move in a specific order.
-        """
-
-        # Only need to check gap as the phase motors share both fault and gate with gap.
-        await self.gap.raise_if_cannot_move()
-        await asyncio.gather(
-            self.phase.top_outer.user_setpoint.set(value=value.top_outer),
-            self.phase.top_inner.user_setpoint.set(value=value.top_inner),
-            self.phase.btm_inner.user_setpoint.set(value=value.btm_inner),
-            self.phase.btm_outer.user_setpoint.set(value=value.btm_outer),
-            self.gap.user_setpoint.set(value=value.gap),
-        )
-        timeout = np.max(
-            await asyncio.gather(self.gap.get_timeout(), self.phase.get_timeout())
-        )
-        LOGGER.info(
-            f"Moving f{self.name} energy and polorisation to {energy}, {await self.polarisation.get_value()}"
-            + f"with motor position {value}, timeout = {timeout}"
-        )
-        await asyncio.gather(
-            self.gap.set_move.set(value=1, wait=False, timeout=timeout),
-            self.phase.set_move.set(value=1, wait=False, timeout=timeout),
-        )
-        await wait_for_value(self.gap.gate, UndulatorGateStatus.CLOSE, timeout=timeout)
-        self._set_energy_rbv(energy)  # Update energy after move for readback.
 
     def determine_phase_from_hardware(
         self,

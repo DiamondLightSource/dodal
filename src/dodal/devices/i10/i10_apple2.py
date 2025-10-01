@@ -408,10 +408,11 @@ class I10Apple2(Apple2):
         )
 
         LOGGER.info(f"Setting polarisation to {pol}, with values: {id_set_val}")
-        await self._set(value=id_set_val, energy=value)
+        await self.motors.set(id_motor_values=id_set_val)
         if pol != Pol.LA:
             await self.id_jaw_phase.set(0)
             await self.id_jaw_phase.set_move.set(1)
+        self._set_energy_rbv(value)  # Update energy after move for readback.
         LOGGER.info(f"Energy set to {value} eV successfully.")
 
 
