@@ -24,7 +24,7 @@ class ElectronAnalyserRegionDetector(
 ):
     """
     Extends electron analyser detector to configure specific region settings before data
-    acqusition. It is designed to only exist inside a plan.
+    acquisition. It is designed to only exist inside a plan.
     """
 
     def __init__(
