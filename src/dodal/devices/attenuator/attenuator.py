@@ -149,6 +149,7 @@ class EnumFilterAttenuator(ReadOnlyAttenuator, Movable[float]):
         # auto move should normally be on, but check here incase it was manually turned off
         await self._auto_move_on_desired_transmission_set.set(YesNo.YES)
 
+        # Currently uncertain if _use_current_energy correctly waits for completion: https://github.com/DiamondLightSource/dodal/issues/1588
         await self._use_current_energy.trigger()
         await self._desired_transmission.set(value)
 
