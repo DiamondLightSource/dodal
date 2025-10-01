@@ -214,6 +214,7 @@ class DeviceManager:
         self._fixtures = {}
 
     def fixture(self, func: Callable[[], Any]):
+        """Add a function that can provide fixtures required by the factories"""
         self._fixtures[func.__name__] = func
 
     # Overload for using as plain decorator, ie: @devices.factory
@@ -255,7 +256,9 @@ class DeviceManager:
             return decorator
         return decorator(func)
 
-    def build_and_connect(self, fixtures, mock) -> ConnectionResult:
+    def build_and_connect(
+        self, *, fixtures: dict[str, Any] | None = None, mock: bool = False
+    ) -> ConnectionResult:
         return self.build_all(fixtures=fixtures, mock=mock).connect()
 
     def build_all(
