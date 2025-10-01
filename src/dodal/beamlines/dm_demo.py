@@ -254,9 +254,10 @@ class DeviceManager:
         self._factories = {}
         self._fixtures = {}
 
-    def fixture(self, func: Callable[[], Any]):
+    def fixture(self, func: Callable[[], T]) -> Callable[[], T]:
         """Add a function that can provide fixtures required by the factories"""
         self._fixtures[func.__name__] = func
+        return func
 
     # Overload for using as plain decorator, ie: @devices.factory
     @typing.overload
