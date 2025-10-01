@@ -55,24 +55,24 @@ def test_analyser_detector_loads_sequence_correctly(
 async def test_analyser_detector_stage(
     sim_detector: GenericElectronAnalyserDetector,
 ) -> None:
-    sim_detector.controller.disarm = AsyncMock()
+    sim_detector._controller.disarm = AsyncMock()
     sim_detector.driver.stage = AsyncMock()
 
     await sim_detector.stage()
 
-    sim_detector.controller.disarm.assert_awaited_once()
+    sim_detector._controller.disarm.assert_awaited_once()
     sim_detector.driver.stage.assert_awaited_once()
 
 
 async def test_analyser_detector_unstage(
     sim_detector: GenericElectronAnalyserDetector,
 ) -> None:
-    sim_detector.controller.disarm = AsyncMock()
+    sim_detector._controller.disarm = AsyncMock()
     sim_detector.driver.unstage = AsyncMock()
 
     await sim_detector.unstage()
 
-    sim_detector.controller.disarm.assert_awaited_once()
+    sim_detector._controller.disarm.assert_awaited_once()
     sim_detector.driver.unstage.assert_awaited_once()
 
 
@@ -104,7 +104,7 @@ def test_analyser_detector_has_driver_as_child_and_region_detector_does_not(
 
     for det in region_detectors:
         assert det._child_devices.get(driver_name) is None
-        assert det.controller.driver.parent == sim_detector
+        assert det._controller.driver.parent == sim_detector
 
 
 async def test_analyser_region_detector_trigger_sets_driver_with_region(
@@ -117,13 +117,13 @@ async def test_analyser_region_detector_trigger_sets_driver_with_region(
     )
 
     for reg_det in region_detectors:
-        reg_det.controller.driver.set = AsyncMock()
+        reg_det._controller.driver.set = AsyncMock()
 
-        reg_det.controller.arm = AsyncMock()
-        reg_det.controller.wait_for_idle = AsyncMock()
+        reg_det._controller.arm = AsyncMock()
+        reg_det._controller.wait_for_idle = AsyncMock()
 
         RE(bps.trigger(reg_det), wait=True)
 
-        reg_det.controller.arm.assert_awaited_once()
-        reg_det.controller.wait_for_idle.assert_awaited_once()
-        reg_det.controller.driver.set.assert_awaited_once_with(reg_det.region)
+        reg_det._controller.arm.assert_awaited_once()
+        reg_det._controller.wait_for_idle.assert_awaited_once()
+        reg_det._controller.driver.set.assert_awaited_once_with(reg_det.region)

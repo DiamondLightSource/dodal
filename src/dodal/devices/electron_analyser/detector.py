@@ -39,7 +39,7 @@ class ElectronAnalyserRegionDetector(
     @AsyncStatus.wrap
     async def trigger(self) -> None:
         # Configure region parameters on the driver first before data collection.
-        await self.controller.driver.set(self.region)
+        await self._controller.driver.set(self.region)
         await super().trigger()
 
 
@@ -73,10 +73,8 @@ class ElectronAnalyserDetector(
         # Save driver as direct child so particpates with connect()
         self.driver = driver
         self._sequence_class = sequence_class
-        self.controller = ConstantDeadTimeController[TAbstractAnalyserDriverIO](
-            driver, 0
-        )
-        super().__init__(self.controller, name)
+        controller = ConstantDeadTimeController[TAbstractAnalyserDriverIO](driver, 0)
+        super().__init__(controller, name)
 
     @AsyncStatus.wrap
     async def stage(self) -> None:
@@ -91,13 +89,13 @@ class ElectronAnalyserDetector(
         Raises:
             Any exceptions raised by the driver's stage or controller's disarm methods.
         """
-        await self.controller.disarm()
+        await self._controller.disarm()
         await self.driver.stage()
 
     @AsyncStatus.wrap
     async def unstage(self) -> None:
         """Disarm the detector."""
-        await self.controller.disarm()
+        await self._controller.disarm()
         await self.driver.unstage()
 
     def load_sequence(self, filename: str) -> TAbstractBaseSequence:
@@ -132,7 +130,9 @@ class ElectronAnalyserDetector(
         seq = self.load_sequence(filename)
         regions = seq.get_enabled_regions() if enabled_only else seq.regions
         return [
-            ElectronAnalyserRegionDetector(self.controller, r, self.name + "_" + r.name)
+            ElectronAnalyserRegionDetector(
+                self._controller, r, self.name + "_" + r.name
+            )
             for r in regions
         ]
 

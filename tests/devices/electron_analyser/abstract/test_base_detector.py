@@ -48,29 +48,29 @@ def test_analyser_detector_trigger(
     sim_detector: BaseElectronAnalyserDetector[AbstractAnalyserDriverIO],
     RE: RunEngine,
 ) -> None:
-    sim_detector.controller.arm = AsyncMock()
-    sim_detector.controller.wait_for_idle = AsyncMock()
+    sim_detector._controller.arm = AsyncMock()
+    sim_detector._controller.wait_for_idle = AsyncMock()
 
     RE(bps.trigger(sim_detector), wait=True)
 
-    sim_detector.controller.arm.assert_awaited_once()
-    sim_detector.controller.wait_for_idle.assert_awaited_once()
+    sim_detector._controller.arm.assert_awaited_once()
+    sim_detector._controller.wait_for_idle.assert_awaited_once()
 
 
 async def test_analyser_detector_read(
     sim_detector: BaseElectronAnalyserDetector[AbstractAnalyserDriverIO],
 ) -> None:
-    driver_read = await sim_detector.controller.driver.read()
+    driver_read = await sim_detector._controller.driver.read()
     await assert_reading(sim_detector, driver_read)
 
 
 async def test_analyser_describe(
     sim_detector: BaseElectronAnalyserDetector[AbstractAnalyserDriverIO],
 ) -> None:
-    energy_array = await sim_detector.controller.driver.energy_axis.get_value()
-    angle_array = await sim_detector.controller.driver.angle_axis.get_value()
+    energy_array = await sim_detector._controller.driver.energy_axis.get_value()
+    angle_array = await sim_detector._controller.driver.angle_axis.get_value()
     data = await sim_detector.describe()
-    assert data[f"{sim_detector.controller.driver.image.name}"]["shape"] == [
+    assert data[f"{sim_detector._controller.driver.image.name}"]["shape"] == [
         len(angle_array),
         len(energy_array),
     ]
@@ -79,7 +79,7 @@ async def test_analyser_describe(
 async def test_analyser_detector_configuration(
     sim_detector: BaseElectronAnalyserDetector[AbstractAnalyserDriverIO],
 ) -> None:
-    driver_config = await sim_detector.controller.driver.read_configuration()
+    driver_config = await sim_detector._controller.driver.read_configuration()
     await assert_configuration(sim_detector, driver_config)
 
 
@@ -87,7 +87,7 @@ async def test_analyser_detector_describe_configuration(
     sim_detector: BaseElectronAnalyserDetector[AbstractAnalyserDriverIO],
 ) -> None:
     driver_describe_config = (
-        await sim_detector.controller.driver.describe_configuration()
+        await sim_detector._controller.driver.describe_configuration()
     )
 
     assert await sim_detector.describe_configuration() == driver_describe_config
