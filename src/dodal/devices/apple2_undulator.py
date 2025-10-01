@@ -382,10 +382,8 @@ class Apple2(abc.ABC, StandardReadable, Movable):
 
     Attributes
     ----------
-    gap : UndulatorGap
-        The gap control device for the undulator.
-    phase : UndulatorPhaseAxes
-        The phase control device, consisting of four phase motors.
+    apple2_motors : Apple2Motors
+        A collection of gap and phase motor devices.
     energy : SignalR
         A soft signal for the current energy readback.
     polarisation_setpoint : SignalR
@@ -399,7 +397,7 @@ class Apple2(abc.ABC, StandardReadable, Movable):
 
     Abstract Methods
     ----------------
-    set(value: float) -> None
+    _set(value: float) -> None
         Abstract method to set motor positions for a given energy and polarisation.
 
     Methods
