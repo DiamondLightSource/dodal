@@ -331,6 +331,7 @@ async def test_no_movement_given_sample_centre_matches_beam_centre(
     murko_results: MurkoResultsDevice,
     mock_setters: tuple[MagicMock, MagicMock, MagicMock],
 ):
+    murko_results.stop_angle = 140
     mock_x_setter, mock_y_setter, mock_z_setter = mock_setters
     messages, metadata = get_messages(
         images_per_message=10, omega_start=50, omega_step=5
@@ -354,6 +355,7 @@ async def test_correct_movement_given_90_180_degrees(
     y = 0.6
     z = 0.3
     murko_results.PERCENTAGE_TO_USE = 100  # type:ignore
+    murko_results.stop_angle = 180
     mock_x_setter, mock_y_setter, mock_z_setter = mock_setters
     messages, metadata = get_messages(
         xyz=(x, y, z), beam_centre_i=90, beam_centre_j=40, shape_x=100, shape_y=100
@@ -375,6 +377,7 @@ async def test_correct_movement_given_45_and_135_angles(
     mock_setters: tuple[MagicMock, MagicMock, MagicMock],
 ):
     murko_results.PERCENTAGE_TO_USE = 100  # type:ignore
+    murko_results.stop_angle = 135
     x = 0.5
     y = 0.3
     z = 0.4
@@ -400,6 +403,7 @@ async def test_correct_movement_given_multiple_angles_and_x_drift(
     mock_setters: tuple[MagicMock, MagicMock, MagicMock],
 ):
     murko_results.PERCENTAGE_TO_USE = 100  # type:ignore
+    murko_results.stop_angle = 250
     x = 0.1
     y = 0.2
     z = 0.3
@@ -437,13 +441,14 @@ async def test_trigger_calls_get_message_and_hget(
     murko_results.pubsub.get_message, murko_results.redis_client.hget = (
         mock_redis_calls(mock_strict_redis, messages, metadata)
     )
+    murko_results.stop_angle = 205  # Last omega angle
     await murko_results.trigger()
 
     mock_get_message = cast(MagicMock, murko_results.pubsub.get_message)
     mock_hget = cast(MagicMock, murko_results.redis_client.hget)
 
-    # 4 messages to find, plus one None message
-    assert mock_get_message.call_count == 5
+    # 4 messages to find
+    assert mock_get_message.call_count == 4
     # 4 * 3 * 2 metadata messages
     assert mock_hget.call_count == 24
 
