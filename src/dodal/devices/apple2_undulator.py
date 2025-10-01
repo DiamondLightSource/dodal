@@ -307,7 +307,7 @@ class EnergyMotorConvertor(Protocol):
         ...
 
 
-class Apple2base(StandardReadable, Movable):
+class Apple2Motors(StandardReadable, Movable):
     def __init__(self, id_gap: UndulatorGap, id_phase: UndulatorPhaseAxes, name=""):
         with self.add_children_as_readables():
             self.gap = id_gap
@@ -415,7 +415,7 @@ class Apple2(abc.ABC, StandardReadable, Movable):
         name: Name of the device.
         """
 
-        self.motors = Apple2base(id_gap=id_gap, id_phase=id_phase)
+        self.motors = Apple2Motors(id_gap=id_gap, id_phase=id_phase)
         self.energy_to_motor = energy_motor_convertor
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             # Store the set energy for readback.
