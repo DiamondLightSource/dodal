@@ -708,9 +708,9 @@ def test_when_results_filtered_then_used_field_is_correct(
     assert results.y_dist_mm == 63
     assert results.omega == 20
     assert results.uuid == "c"
-    assert results.metadata["used"]
+    assert results.metadata["used"] is True
     for unused_result in murko_results.discarded_results:
-        assert not unused_result.metadata["used"]
+        assert unused_result.metadata["used"] is False
 
 
 @patch("dodal.devices.i04.murko_results.StrictRedis")
