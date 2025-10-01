@@ -154,13 +154,13 @@ class SimpleMirror(XYPitchStage):
             pitch_infix=pitch_infix,
         )
 
-        self.type, _ = soft_signal_r_and_setter(MirrorType, MirrorType.SINGLE)
-
-        self.add_readables([self.type], format=StandardReadableFormat.CONFIG_SIGNAL)
-        self.yaw = Motor(prefix + "YAW")
-        self.bend = Motor(prefix + "BEND")
-        self.jack1 = Motor(prefix + "J1")
-        self.jack2 = Motor(prefix + "J2")
+        with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
+            self.type, _ = soft_signal_r_and_setter(MirrorType, MirrorType.SINGLE)
+        with self.add_children_as_readables():
+            self.yaw = Motor(prefix + "YAW")
+            self.bend = Motor(prefix + "BEND")
+            self.jack1 = Motor(prefix + "J1")
+            self.jack2 = Motor(prefix + "J2")    
 
 
 class FocusingMirror(StandardReadable):
