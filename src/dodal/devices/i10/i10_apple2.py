@@ -23,6 +23,7 @@ from dodal.log import LOGGER
 
 from ..apple2_undulator import (
     Apple2,
+    Apple2Motors,
     Apple2Val,
     EnergyMotorConvertor,
     Pol,
@@ -359,14 +360,16 @@ class I10Apple2(Apple2):
 
         with self.add_children_as_readables():
             super().__init__(
-                id_gap=UndulatorGap(name="id_gap", prefix=prefix),
-                id_phase=UndulatorPhaseAxes(
-                    name="id_phase",
-                    prefix=prefix,
-                    top_outer="RPQ1",
-                    top_inner="RPQ2",
-                    btm_inner="RPQ3",
-                    btm_outer="RPQ4",
+                id_motors=Apple2Motors(
+                    id_gap=UndulatorGap(name="id_gap", prefix=prefix),
+                    id_phase=UndulatorPhaseAxes(
+                        name="id_phase",
+                        prefix=prefix,
+                        top_outer="RPQ1",
+                        top_inner="RPQ2",
+                        btm_inner="RPQ3",
+                        btm_outer="RPQ4",
+                    ),
                 ),
                 energy_motor_convertor=energy_motor_convertor,
                 name=name,

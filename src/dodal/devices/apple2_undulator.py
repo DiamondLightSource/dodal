@@ -422,8 +422,7 @@ class Apple2(abc.ABC, StandardReadable, Movable):
 
     def __init__(
         self,
-        id_gap: UndulatorGap,
-        id_phase: UndulatorPhaseAxes,
+        apple2_motors: Apple2Motors,
         energy_motor_convertor: EnergyMotorConvertor,
         name: str = "",
     ) -> None:
@@ -437,7 +436,7 @@ class Apple2(abc.ABC, StandardReadable, Movable):
         name: Name of the device.
         """
 
-        self.motors = Apple2Motors(id_gap=id_gap, id_phase=id_phase)
+        self.motors = apple2_motors
         self.energy_to_motor = energy_motor_convertor
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             # Store the set energy for readback.
@@ -460,7 +459,7 @@ class Apple2(abc.ABC, StandardReadable, Movable):
             top_inner=self.motors.phase.top_inner.user_readback,
             btm_inner=self.motors.phase.btm_inner.user_readback,
             btm_outer=self.motors.phase.btm_outer.user_readback,
-            gap=id_gap.user_readback,
+            gap=self.motors.gap.user_readback,
         )
         super().__init__(name)
 
@@ -502,7 +501,7 @@ class Apple2(abc.ABC, StandardReadable, Movable):
         motor positions will be different for each beamline depending on the
         undulator design and the lookup table used.
         set can be used to set the motor positions for the given energy and
-        polarisation provided that all motors can be moved at the same time....
+        polarisation provided that all motors can be moved at the same time
         """
 
     def _read_pol(
