@@ -147,7 +147,7 @@ class SimpleMirror(XYPitchStage):
         pitch_infix: str = "PITCH",
     ):
         super().__init__(
-            name,
+            name=name,
             prefix=prefix,
             x_infix=x_infix,
             y_infix=y_infix,
