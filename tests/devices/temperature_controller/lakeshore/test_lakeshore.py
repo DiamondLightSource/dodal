@@ -1,4 +1,5 @@
 from collections import defaultdict
+from typing import Any
 from unittest.mock import ANY
 
 import numpy as np
@@ -95,7 +96,7 @@ async def test_lakeshore_set_control_channel_correctly_set_up_config(
     RE(abs_set(lakeshore.control_channel, control_channel, wait=True))
 
     config = ["user_setpoint", "p", "i", "d", "heater_output_range"]
-    expected_config = {
+    expected_config: dict[str, Any] = {
         f"lakeshore-control_channels-{control_channel}-{pv}": {"value": ANY}
         for pv in config
     }
