@@ -85,7 +85,7 @@ class UndulatorBase(abc.ABC, Device, Generic[T]):
     methods for setting demand positions and estimating move timeouts.
     """
 
-    def __init__(self, name=""):
+    def __init__(self, name: str = ""):
         # Gate keeper open when move is requested, closed when move is completed
         self.gate: SignalR[UndulatorGateStatus]
         self.fault: SignalR[float]
