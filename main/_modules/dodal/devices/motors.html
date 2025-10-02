@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.motors &#8212; dodal 1.59.2.dev1+g12f7ceabd documentation</title>
+    <title>dodal.devices.motors &#8212; dodal 1.59.2.dev6+g1822b047d documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=4d818e87"></script>
+    <script src="../../../_static/documentation_options.js?v=cdfae28a"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -536,11 +536,28 @@ window.addEventListener("load", () => mermaid.run());
         <span class="n">x_infix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">_X</span><span class="p">,</span>
         <span class="n">y_infix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">_Y</span><span class="p">,</span>
         <span class="n">z_infix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">_Z</span><span class="p">,</span>
-        <span class="n">theta_infix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">_Z</span><span class="p">,</span>
+        <span class="n">theta_infix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;THETA&quot;</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">theta</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="n">theta_infix</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">x_infix</span><span class="p">,</span> <span class="n">y_infix</span><span class="p">,</span> <span class="n">z_infix</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="XYPhiStage">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.motors.XYPhiStage.html#dodal.devices.motors.XYPhiStage">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">XYPhiStage</span><span class="p">(</span><span class="n">XYStage</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">x_infix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">_X</span><span class="p">,</span>
+        <span class="n">y_infix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">_Y</span><span class="p">,</span>
+        <span class="n">phi_infix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;PHI&quot;</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">phi</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="n">phi_infix</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">x_infix</span><span class="p">,</span> <span class="n">y_infix</span><span class="p">)</span></div>
 
 
 
@@ -558,6 +575,26 @@ window.addEventListener("load", () => mermaid.run());
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">pitch</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="n">pitch_infix</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">x_infix</span><span class="p">,</span> <span class="n">y_infix</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="XYZPitchYawStage">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.motors.XYZPitchYawStage.html#dodal.devices.motors.XYZPitchYawStage">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">XYZPitchYawStage</span><span class="p">(</span><span class="n">XYZStage</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">x_infix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">_X</span><span class="p">,</span>
+        <span class="n">y_infix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">_Y</span><span class="p">,</span>
+        <span class="n">z_infix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">_Z</span><span class="p">,</span>
+        <span class="n">pitch_infix</span><span class="o">=</span><span class="s2">&quot;PITCH&quot;</span><span class="p">,</span>
+        <span class="n">yaw_infix</span><span class="o">=</span><span class="s2">&quot;YAW&quot;</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pitch</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="n">pitch_infix</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">yaw</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="n">yaw_infix</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">x_infix</span><span class="p">,</span> <span class="n">y_infix</span><span class="p">,</span> <span class="n">z_infix</span><span class="p">)</span></div>
 
 
 
@@ -609,6 +646,29 @@ window.addEventListener("load", () => mermaid.run());
         <span class="bp">self</span><span class="o">.</span><span class="n">vertical_in_lab_space</span> <span class="o">=</span> <span class="n">create_axis_perp_to_rotation</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">omega</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">z</span>
         <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="SixAxisGonioKappaPhi">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.motors.SixAxisGonioKappaPhi.html#dodal.devices.motors.SixAxisGonioKappaPhi">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SixAxisGonioKappaPhi</span><span class="p">(</span><span class="n">XYZStage</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">x_infix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">_X</span><span class="p">,</span>
+        <span class="n">y_infix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">_Y</span><span class="p">,</span>
+        <span class="n">z_infix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">_Z</span><span class="p">,</span>
+        <span class="n">kappa_infix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;KAPPA&quot;</span><span class="p">,</span>
+        <span class="n">phi_infix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;PHI&quot;</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Six-axis goniometer with a standard xyz stage and two axes of rotation:</span>
+<span class="sd">        kappa and phi.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">kappa</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="n">kappa_infix</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">phi</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="n">phi_infix</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">x_infix</span><span class="p">,</span> <span class="n">y_infix</span><span class="p">,</span> <span class="n">z_infix</span><span class="p">)</span></div>
 
 
 

@@ -15,11 +15,14 @@ dodal.devices.motors
    :recursive:
 
    ~motors.SixAxisGonio
+   ~motors.SixAxisGonioKappaPhi
    ~motors.Stage
    ~motors.XThetaStage
+   ~motors.XYPhiStage
    ~motors.XYPitchStage
    ~motors.XYStage
    ~motors.XYZPitchYawRollStage
+   ~motors.XYZPitchYawStage
    ~motors.XYZStage
    ~motors.XYZThetaStage
    ~motors.YZStage

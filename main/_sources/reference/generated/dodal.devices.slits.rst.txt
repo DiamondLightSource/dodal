@@ -16,6 +16,7 @@ dodal.devices.slits
 
    ~slits.MinimalSlits
    ~slits.Slits
+   ~slits.SlitsY
 
 
 
