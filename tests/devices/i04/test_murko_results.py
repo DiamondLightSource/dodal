@@ -1,7 +1,6 @@
 import json
 import pickle
 from collections.abc import Iterable
-from importlib import metadata
 from typing import cast
 from unittest.mock import AsyncMock, MagicMock, call, patch
 
@@ -60,7 +59,7 @@ def mock_redis_calls(mock_strict_redis: MagicMock, messages, metadata):
         if metadata
         else None
     )
-    mock_hset = MagicMock()
+    mock_hset = AsyncMock()
     return mock_get_message, mock_hget, mock_hset
 
 
@@ -340,9 +339,11 @@ async def test_no_movement_given_sample_centre_matches_beam_centre(
     messages, metadata = get_messages(
         images_per_message=10, omega_start=50, omega_step=5
     )  # Crystal aligned with beam centre
-    murko_results.pubsub.get_message, murko_results.redis_client.hget, _ = (
-        mock_redis_calls(mock_strict_redis, messages, metadata)
-    )
+    (
+        murko_results.pubsub.get_message,
+        murko_results.redis_client.hget,
+        murko_results.redis_client.hset,
+    ) = mock_redis_calls(mock_strict_redis, messages, metadata)
     await murko_results.trigger()
     assert mock_x_setter.call_args[0][0] == 0, "wrong x"
     assert mock_y_setter.call_args[0][0] == 0, "wrong y"
@@ -364,9 +365,11 @@ async def test_correct_movement_given_90_180_degrees(
     messages, metadata = get_messages(
         xyz=(x, y, z), beam_centre_i=90, beam_centre_j=40, shape_x=100, shape_y=100
     )
-    murko_results.pubsub.get_message, murko_results.redis_client.hget, _ = (
-        mock_redis_calls(mock_strict_redis, messages, metadata)
-    )
+    (
+        murko_results.pubsub.get_message,
+        murko_results.redis_client.hget,
+        murko_results.redis_client.hset,
+    ) = mock_redis_calls(mock_strict_redis, messages, metadata)
     await murko_results.trigger()
 
     assert mock_x_setter.call_args[0][0] == x - 0.9, "wrong x"
@@ -390,9 +393,11 @@ async def test_correct_movement_given_45_and_135_angles(
     messages, metadata = get_messages(
         xyz=xyz, omega_start=45, omega_step=90, beam_centre_i=75, beam_centre_j=70
     )
-    murko_results.pubsub.get_message, murko_results.redis_client.hget, _ = (
-        mock_redis_calls(mock_strict_redis, messages, metadata)
-    )
+    (
+        murko_results.pubsub.get_message,
+        murko_results.redis_client.hget,
+        murko_results.redis_client.hset,
+    ) = mock_redis_calls(mock_strict_redis, messages, metadata)
     await murko_results.trigger()
 
     assert mock_x_setter.call_args[0][0] == x - 0.75, "wrong x"
@@ -424,9 +429,11 @@ async def test_correct_movement_given_multiple_angles_and_x_drift(
         beam_centre_j=70,
         x_drift=0.01,
     )
-    murko_results.pubsub.get_message, murko_results.redis_client.hget, _ = (
-        mock_redis_calls(mock_strict_redis, messages, metadata)
-    )
+    (
+        murko_results.pubsub.get_message,
+        murko_results.redis_client.hget,
+        murko_results.redis_client.hset,
+    ) = mock_redis_calls(mock_strict_redis, messages, metadata)
     await murko_results.trigger()
     assert mock_x_setter.call_args[0][0] == approx(x + 0.055 - 0.75), "wrong x"
     assert mock_y_setter.call_args[0][0] == approx(y - 0.7), "wrong y"
@@ -442,9 +449,11 @@ async def test_trigger_calls_get_message_and_hget(
         batches=4, messages_per_batch=3, images_per_message=2, omega_step=5
     )
 
-    murko_results.pubsub.get_message, murko_results.redis_client.hget, _ = (
-        mock_redis_calls(mock_strict_redis, messages, metadata)
-    )
+    (
+        murko_results.pubsub.get_message,
+        murko_results.redis_client.hget,
+        murko_results.redis_client.hset,
+    ) = mock_redis_calls(mock_strict_redis, messages, metadata)
     murko_results.stop_angle = 205  # Last omega angle
     await murko_results.trigger()
 
@@ -470,9 +479,11 @@ async def test_trigger_stops_once_last_angle_found(
         omega_step=10,
     )
 
-    murko_results.pubsub.get_message, murko_results.redis_client.hget, _ = (
-        mock_redis_calls(mock_strict_redis, messages, metadata)
-    )
+    (
+        murko_results.pubsub.get_message,
+        murko_results.redis_client.hget,
+        murko_results.redis_client.hset,
+    ) = mock_redis_calls(mock_strict_redis, messages, metadata)
     murko_results.stop_angle = 200
     await murko_results.trigger()
 
@@ -639,9 +650,11 @@ async def test_none_result_does_not_stop_results_device(
     messages = iter(messages)
     murko_results.stop_angle = 180
 
-    murko_results.pubsub.get_message, murko_results.redis_client.hget, _ = (
-        mock_redis_calls(mock_strict_redis, messages, metadata)
-    )
+    (
+        murko_results.pubsub.get_message,
+        murko_results.redis_client.hget,
+        murko_results.redis_client.hset,
+    ) = mock_redis_calls(mock_strict_redis, messages, metadata)
     mock_get_message = cast(MagicMock, murko_results.pubsub.get_message)
     mock_hget = cast(MagicMock, murko_results.redis_client.hget)
 

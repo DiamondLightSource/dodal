@@ -2,7 +2,7 @@ import json
 import pickle
 from dataclasses import dataclass
 from enum import Enum
-from typing import Optional, TypedDict
+from typing import TypedDict
 
 import numpy as np
 from bluesky.protocols import Stageable, Triggerable
@@ -32,7 +32,7 @@ class MurkoMetadata(TypedDict):
     sample_id: str
     omega_angle: float
     uuid: str
-    used: Optional[bool]
+    used: bool | None
 
 
 class Coord(Enum):
@@ -151,11 +151,11 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
         self._z_mm_setter(-best_z)
 
         for result in self.results:
-            self.redis_client.hset(
+            await self.redis_client.hset(  # type: ignore
                 f"murko:{sample_id}:metadata", result.uuid, json.dumps(result.metadata)
             )
         for result in self.discarded_results:
-            self.redis_client.hset(
+            await self.redis_client.hset(  # type: ignore
                 f"murko:{sample_id}:metadata", result.uuid, json.dumps(result.metadata)
             )
 
