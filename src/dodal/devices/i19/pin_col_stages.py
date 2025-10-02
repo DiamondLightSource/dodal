@@ -1,7 +1,7 @@
 import asyncio
 
 from bluesky.protocols import Movable
-from ophyd_async.core import AsyncStatus, StandardReadable, SubsetEnum
+from ophyd_async.core import AsyncStatus, StandardReadable, StrictEnum, SubsetEnum
 from ophyd_async.epics.core import epics_signal_r
 from pydantic import BaseModel
 
@@ -17,14 +17,20 @@ _COL = "-MO-COL-01:"
 _CONFIG = "-OP-PCOL-01:"
 
 
-class InvalidApertureRequest(Exception):
-    pass
+class PinColRequest(StrictEnum):
+    """Aperture request IN positions."""
+
+    PCOL20 = "20um"
+    PCOL40 = "40um"
+    PCOL100 = "100um"
+    PCOL3000 = "3000um"
+    OUT = "OUT"
 
 
-# NOTE. Using subset anum because from the OUT positions should only be used by
+# NOTE. Using subset enum because from the OUT positions should only be used by
 # the beamline scientists from the synoptic. Another option will be needed in the
 # device for OUT position.
-class PinColRequest(SubsetEnum):
+class PinColPosition(SubsetEnum):
     """Aperture request IN positions."""
 
     PCOL20 = "20um"
@@ -50,19 +56,13 @@ class AperturePosition(BaseModel):
     collimator_y: float
 
 
-def define_allowed_aperture_requests() -> list[str]:
-    aperture_list = [v.value for v in PinColRequest]
-    aperture_list.append("OUT")
-    return aperture_list
-
-
 class PinColConfiguration(StandardReadable):
     """Full MAPT configuration table, including out positions and selection for the
     Pinhole and Collimator control."""
 
     def __init__(self, prefix: str, apertures: list[int], name: str = "") -> None:
         with self.add_children_as_readables():
-            self.configuration = MAPTConfigurationControl(prefix, PinColRequest)
+            self.configuration = MAPTConfigurationControl(prefix, PinColPosition)
             self.pin_x = MAPTConfigurationTable(prefix, "PINX", apertures)
             self.pin_y = MAPTConfigurationTable(prefix, "PINY", apertures)
             self.col_x = MAPTConfigurationTable(prefix, "COLX", apertures)
@@ -84,8 +84,7 @@ class PinholeCollimatorControl(StandardReadable, Movable[str]):
         col_infix: str = _COL,
         config_infix: str = _CONFIG,
     ):
-        self._allowed_requests = define_allowed_aperture_requests()
-        self._aperture_sizes = [self._get_aperture_size(i) for i in PinColRequest]
+        self._aperture_sizes = [self._get_aperture_size(i) for i in PinColPosition]
         with self.add_children_as_readables():
             self.pinhole = XYStage(f"{prefix}{pin_infix}")
             self.collimator = XYStage(f"{prefix}{col_infix}")
@@ -98,7 +97,7 @@ class PinholeCollimatorControl(StandardReadable, Movable[str]):
         return int(ap_request.strip("um"))
 
     async def get_motor_positions_for_requested_aperture(
-        self, ap_request: PinColRequest
+        self, ap_request: PinColPosition
     ) -> AperturePosition:
         val = self._get_aperture_size(ap_request.value)
 
@@ -127,7 +126,7 @@ class PinholeCollimatorControl(StandardReadable, Movable[str]):
         LOGGER.debug(f"Move pinhole stage x motor to {pin_x_out}")
         await self.pinhole.x.set(pin_x_out)
 
-    async def _safe_move_in(self, value: PinColRequest):
+    async def _safe_move_in(self, value: PinColPosition):
         """Move the pinhole and collimator stages safely to the in position.
         In order to avoid a collision, we have to make sure that the pinhole stage is
         always moved in before the collimator stage."""
@@ -158,22 +157,13 @@ class PinholeCollimatorControl(StandardReadable, Movable[str]):
         )
 
     @AsyncStatus.wrap
-    async def set(self, value: str):
+    async def set(self, value: PinColRequest):
         """Moves the motor stages to the position for the requested aperture while
         avoiding possible collisions.
-        The request coming from a plan should always be one of the values from the
-        PinColRequest enum ('20um', '40um', '100um', '3000um') or "OUT".
-
-        Raises:
-            InvalidApertureRequest: when the request doesn't match one of the allowed requests:
-                ['20um', '40um', '100um', '3000um', 'OUT']
+        The request coming from a plan should always be one of accepted request values:
+        ('20um', '40um', '100um', '3000um', 'OUT').
         """
-        if value not in self._allowed_requests:
-            raise InvalidApertureRequest(
-                f"""{value} is not a valid aperture request.
-                Please pass one of: {self._allowed_requests}."""
-            )
-        if value == "OUT":
+        if value is PinColRequest.OUT:
             await self._safe_move_out()
         else:
-            await self._safe_move_in(PinColRequest(value))
+            await self._safe_move_in(PinColPosition(value))
