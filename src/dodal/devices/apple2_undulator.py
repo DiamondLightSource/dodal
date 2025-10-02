@@ -478,18 +478,12 @@ class Apple2(abc.ABC, StandardReadable, Movable):
         )
         super().__init__(name)
 
-    def _set_pol_setpoint(self, pol: Pol) -> None:
-        """Set the polarisation setpoint without moving hardware. The polarisation
-        setpoint is used to determine the gap and phase motor positions when
-        setting the energy/polarisation of the undulator."""
-        self._polarisation_setpoint_set(pol)
-
     async def _set_pol(
         self,
         value: Pol,
     ) -> None:
         # This changes the pol setpoint and then changes polarisation via set energy.
-        self._set_pol_setpoint(value)
+        self._polarisation_setpoint_set(value)
         await self.set(await self.energy.get_value())
 
     @abc.abstractmethod

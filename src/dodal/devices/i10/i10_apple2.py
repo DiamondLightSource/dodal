@@ -396,7 +396,7 @@ class I10Apple2(Apple2):
                     f"Polarisation cannot be determined from hardware for {self.name}"
                 )
 
-            self._set_pol_setpoint(pol)
+            self._polarisation_setpoint_set(pol)
         gap, phase = self.energy_to_motor(energy=value, pol=pol)
         phase3 = phase * (-1 if pol == Pol.LA else 1)
         id_set_val = Apple2Val(
