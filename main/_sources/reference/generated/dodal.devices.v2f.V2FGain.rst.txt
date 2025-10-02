@@ -90,25 +90,25 @@ dodal.devices.v2f.V2FGain
       ~V2FGain.LOW_NOISE9
       
       
-      ~V2FGain.HIGHSPEED5
+      ~V2FGain.HIGH_SPEED5
       
       
-      ~V2FGain.HIGHSPEED6
+      ~V2FGain.HIGH_SPEED6
       
       
-      ~V2FGain.HIGHSPEED7
+      ~V2FGain.HIGH_SPEED7
       
       
-      ~V2FGain.HIGHSPEED8
+      ~V2FGain.HIGH_SPEED8
       
       
-      ~V2FGain.HIGHSPEED9
+      ~V2FGain.HIGH_SPEED9
       
       
-      ~V2FGain.HIGHSPEED10
+      ~V2FGain.HIGH_SPEED10
       
       
-      ~V2FGain.HIGHSPEED11
+      ~V2FGain.HIGH_SPEED11
       
    
    
