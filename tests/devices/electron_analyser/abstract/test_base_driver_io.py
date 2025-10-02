@@ -1,5 +1,5 @@
 from typing import get_origin
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, patch
 
 import pytest
 from bluesky import plan_stubs as bps
@@ -7,9 +7,10 @@ from bluesky.run_engine import RunEngine
 from bluesky.utils import FailedStatus
 from ophyd_async.core import StrictEnum, init_devices
 from ophyd_async.epics.adcore import ADImageMode
+from ophyd_async.testing import get_mock_put
 
 from dodal.devices import b07, i09
-from dodal.devices.electron_analyser import DualEnergySource, EnergySource
+from dodal.devices.electron_analyser import DualEnergySource, EnergyMode, EnergySource
 from dodal.devices.electron_analyser.abstract import (
     AbstractAnalyserDriverIO,
     AbstractBaseRegion,
@@ -56,16 +57,23 @@ def test_driver_set(
 ) -> None:
     sim_driver._set_region = AsyncMock()
 
-    if isinstance(sim_driver.energy_source, DualEnergySource):
-        sim_driver.energy_source.selected_source.set = MagicMock()
+    with patch(
+        "dodal.devices.electron_analyser.abstract.AbstractBaseRegion.switch_energy_mode"
+    ) as mock_switch:
+        ke_region = region.switch_energy_mode(EnergyMode.KINETIC, 0)
+        mock_switch.return_value = ke_region
 
-    RE(bps.mv(sim_driver, region))
+        RE(bps.mv(sim_driver, region))
 
-    if isinstance(sim_driver.energy_source, DualEnergySource):
-        sim_driver.energy_source.selected_source.set.assert_called_once_with(  # type: ignore
-            region.excitation_energy_source
+        if isinstance(sim_driver.energy_source, DualEnergySource):
+            get_mock_put(
+                sim_driver.energy_source.selected_source
+            ).assert_called_once_with(region.excitation_energy_source, wait=True)
+
+        sim_driver._set_region.assert_called_once_with(ke_region)
+        get_mock_put(sim_driver.energy_mode).assert_called_once_with(
+            region.energy_mode, wait=True
         )
-    sim_driver._set_region.assert_called_once()
 
 
 def test_driver_throws_error_with_wrong_lens_mode(
