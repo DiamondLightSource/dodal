@@ -49,6 +49,10 @@ class MurkoResult:
     uuid: str
 
 
+class NoResultsFound(ValueError):
+    pass
+
+
 class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
     """Device that takes crystal centre values from Murko and uses them to set the
     x, y, z coordinate of the sample to be in line with the beam centre.
@@ -83,10 +87,10 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
             db=redis_db,
         )
         self.pubsub = self.redis_client.pubsub()
-        self._last_omega = 0
         self.sample_id = soft_signal_rw(str)  # Should get from redis
         self.stop_angle = stop_angle
-        self.results: list[MurkoResult] = []
+
+        self._reset()
 
         with self.add_children_as_readables():
             # Diffs from current x/y/z
@@ -94,6 +98,10 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
             self.y_mm, self._y_mm_setter = soft_signal_r_and_setter(float)
             self.z_mm, self._z_mm_setter = soft_signal_r_and_setter(float)
         super().__init__(name=name)
+
+    def _reset(self):
+        self._last_omega = 0
+        self.results: list[MurkoResult] = []
 
     @AsyncStatus.wrap
     async def stage(self):
@@ -104,6 +112,7 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
 
     @AsyncStatus.wrap
     async def unstage(self):
+        self._reset()
         await self.pubsub.unsubscribe()
 
     @AsyncStatus.wrap
@@ -113,9 +122,12 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
         while self._last_omega < self.stop_angle:
             # waits here for next batch to be received
             message = await self.pubsub.get_message(timeout=self.TIMEOUT_S)
-            if message is None:  # No more messages to process
-                break
+            if message is None:
+                continue
             await self.process_batch(message, sample_id)
+
+        if not self.results:
+            raise NoResultsFound("No results retrieved from Murko")
 
         for result in self.results:
             LOGGER.debug(result)
