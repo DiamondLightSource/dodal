@@ -1,0 +1,78 @@
+dodal.devices.p60.PsuMode
+=========================
+
+.. currentmodule:: dodal.devices.p60
+
+.. autoclass:: PsuMode
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~PsuMode.HIGH
+      
+      
+      ~PsuMode.LOW
+      
+   
+   

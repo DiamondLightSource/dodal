@@ -1,0 +1,50 @@
+dodal.devices.aperturescatterguard
+==================================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~aperturescatterguard.AperturePosition
+   ~aperturescatterguard.ApertureScatterguard
+   ~aperturescatterguard.ApertureValue
+
+
+
+
+.. automodule:: dodal.devices.aperturescatterguard
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      load_positions_from_beamline_parameters
+   
+   
+
+   
+   
+   .. rubric:: Exceptions
+
+   .. autosummary::
+   
+      InvalidApertureMove
+   
+   

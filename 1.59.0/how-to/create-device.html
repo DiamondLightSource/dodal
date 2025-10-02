@@ -1,0 +1,660 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Creating a new device &#8212; dodal 1.59.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=1fa155a2"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=30646c52"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'how-to/create-device';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://DiamondLightSource.github.io/dodal/switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '1.59.0';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            false;
+        </script>
+    <link rel="icon" href="../_static/dls-logo.svg"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Setup Developer Environment" href="dev-install.html" />
+    <link rel="prev" title="Creating a new beamline" href="create-beamline.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="1.59.0" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/dls-logo.svg" class="logo__image only-light" alt=""/>
+    <img src="../_static/dls-logo.svg" class="logo__image only-dark pst-js-only" alt=""/>
+  
+  
+    <p class="title logo__title">dodal</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../tutorials.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../how-to.html">
+    How-to Guides
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../explanations.html">
+    Explanations
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../reference.html">
+    Reference
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/DiamondLightSource/dodal" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/dodal" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-cube fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">PyPI</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../tutorials.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../how-to.html">
+    How-to Guides
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../explanations.html">
+    Explanations
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../reference.html">
+    Reference
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/DiamondLightSource/dodal" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/dodal" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-cube fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">PyPI</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="build-docs.html">Build the docs using sphinx</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contribute.html">Contribute to the project</a></li>
+<li class="toctree-l1"><a class="reference internal" href="coverage.html">How to check code coverage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="create-beamline.html">Creating a new beamline</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Creating a new device</a></li>
+
+
+<li class="toctree-l1"><a class="reference internal" href="dev-install.html">Setup Developer Environment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="excalidraw.html">How to embed Excalidraw diagrams</a></li>
+<li class="toctree-l1"><a class="reference internal" href="external-io-devices.html">How to Write External IO Devices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="lint.html">Run linting using pre-commit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="lock-requirements.html">Lock requirements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="make-release.html">Make a release</a></li>
+<li class="toctree-l1"><a class="reference internal" href="move-code.html">Moving code from another repo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pypi.html">Setting up PyPI publishing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="run-tests.html">Running tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="static-analysis.html">Run static analysis using pyright or mypy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="update-template.html">How to update to the latest template structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="write-tests.html">Writing Tests in This Python Project</a></li>
+<li class="toctree-l1"><a class="reference internal" href="zocalo.html">Zocalo Interaction</a></li>
+
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../how-to.html" class="nav-link">How-to Guides</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Creating a new device</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="creating-a-new-device">
+<h1>Creating a new device<a class="headerlink" href="#creating-a-new-device" title="Link to this heading">#</a></h1>
+<p>Devices in dodal use the ophyd-async framework for hardware abstraction at Diamond Light Source. Before starting, <a class="reference internal" href="#../reference/device-standards.rst#where_to_put_devices"><span class="xref myst">review where your code should live</span></a> to avoid duplication and ensure maintainability.</p>
+</section>
+<section id="reusing-an-existing-class">
+<h1>Reusing an existing class<a class="headerlink" href="#reusing-an-existing-class" title="Link to this heading">#</a></h1>
+<p>Before creating a new device, always check if a suitable class already exists in dodal or ophyd-async. This helps avoid duplication, ensures maintainability, and leverages tested code.</p>
+<ul class="simple">
+<li><p><strong>Motors:</strong> Use <a class="reference external" href="https://github.com/bluesky/ophyd-async/blob/main/src/ophyd_async/epics/motor.py">Motor</a> for EPICS motor records.</p></li>
+<li><p><strong>Storage ring signals:</strong> Use <a class="reference external" href="https://github.com/DiamondLightSource/dodal/blob/main/src/dodal/devices/synchrotron.py">Synchrotron</a>.</p></li>
+<li><p><strong>AreaDetectors:</strong> Use <a class="reference external" href="https://github.com/bluesky/ophyd-async/tree/main/src/ophyd_async/epics/adcore">StandardDetector</a> or <a class="reference external" href="https://github.com/bluesky/ophyd-async/tree/main/src/ophyd_async/epics/adcore">adcore</a>.</p></li>
+</ul>
+<p>If a compatible device class exists:</p>
+<ul class="simple">
+<li><p>Use it and add it to the <a class="reference internal" href="#./create-beamline.rst"><span class="xref myst">beamline</span></a> to avoid re-implementation and share improvements.</p></li>
+<li><p>You can use ophyd-async’s <a class="reference external" href="https://blueskyproject.io/ophyd-async/main/explanations/decisions/0006-procedural-device-definitions.html">DeviceVector</a> to handle a collection of identical devices.</p></li>
+<li><p>If a device class only differs by PV address, request an alias in the EPICS IOC support module with the relevant controls support team.</p></li>
+<li><p>If that’s not possible (e.g. proprietary support), add configurability to the dodal device class, ensuring defaults match existing patterns and that <code class="docutils literal notranslate"><span class="pre">dodal</span> <span class="pre">connect</span></code> still works for current devices.</p></li>
+<li><p>Avoid dynamic attribute assignment (e.g. dicts of motors) as it hinders type checking and plan writing.</p></li>
+<li><p>Use static attributes and type hints for better IDE support and maintainability.</p></li>
+</ul>
+<p>Many device classes in <code class="docutils literal notranslate"><span class="pre">dodal.devices.motors</span></code> represent physical relationships between motors, such as <code class="docutils literal notranslate"><span class="pre">Stage</span></code> and <code class="docutils literal notranslate"><span class="pre">XYStage</span></code>.</p>
+<p>For example, only use <code class="docutils literal notranslate"><span class="pre">XYStage</span></code> for two perpendicular motors (e.g. X and Y axes on a sample table):</p>
+<ul class="simple">
+<li><p>Do not use <code class="docutils literal notranslate"><span class="pre">XYStage</span></code> for unrelated motors or for motors that move in the same axis (e.g. coarse and fine adjustment).</p></li>
+<li><p>Only a device that represents a group of motors with a physical relationship, should be defined in <code class="docutils literal notranslate"><span class="pre">motor</span></code>.</p></li>
+<li><p>If your class define an <code class="docutils literal notranslate"><span class="pre">XYStage</span></code> but you need extra signals or behaviour, extend the <code class="docutils literal notranslate"><span class="pre">XYStage</span></code> class outside the <code class="docutils literal notranslate"><span class="pre">motor</span></code> module.</p></li>
+</ul>
+<p><strong>Only if no suitable class exists</strong>, create a new device that connects to the required signals. During review, refactor to align with existing devices if needed, using inheritance or composition to deduplicate code.</p>
+</section>
+<section id="writing-a-device-class">
+<h1>Writing a device class<a class="headerlink" href="#writing-a-device-class" title="Link to this heading">#</a></h1>
+<p>To develop a new device, get an initial, working version of your code into the main branch as early as possible. Test it at the beamline, then continuously make and merge small changes into main. This approach prevents pull requests from becoming long-standing issues.</p>
+<ul class="simple">
+<li><p><strong>Follow the <a class="reference external" href="https://blueskyproject.io/ophyd-async/main/tutorials/implementing-devices.html">ophyd-async device implementation guide</a></strong> to structure your device code.</p></li>
+<li><p><strong>Choose the right base class</strong> by consulting the <a class="reference external" href="https://blueskyproject.io/ophyd-async/main/how-to/choose-right-baseclass.html">base class guide</a>, If your device needs to move, you’ll need to extend the Movable protocol. For detailed guidance on when and how to do this, refer to the <a class="reference external" href="https://blueskyproject.io/ophyd-async/main/explanations/when-to-extend-movable.html">movable device guide</a>.</p></li>
+<li><p><strong>Write thorough unit tests</strong> for all expected use cases. Reference the <a class="reference external" href="https://blueskyproject.io/ophyd-async/main/tutorials/implementing-devices.html">ophyd-async device test guide</a> for best practices.</p></li>
+<li><p><strong>Validate your device on the beamline</strong> and keep notes of any issues for later fixes.</p></li>
+<li><p><strong>Make use of type annotations</strong> so that pyright will validate that you are passing around values that ophyd-async will accept.</p></li>
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">dodal</span> <span class="pre">connect</span> <span class="pre">&lt;beamline&gt;</span></code> to check device connectivity and <code class="docutils literal notranslate"><span class="pre">cainfo</span> <span class="pre">&lt;PV</span> <span class="pre">address&gt;</span></code> to confirm PVs and datatypes. You can check a PV’s datatype by using the <code class="docutils literal notranslate"><span class="pre">cainfo</span> <span class="pre">&lt;PV</span> <span class="pre">address&gt;</span></code> command. If the datatype is an enum, <code class="docutils literal notranslate"><span class="pre">caget</span> <span class="pre">-d</span> <span class="pre">31</span> <span class="pre">&lt;PV</span> <span class="pre">address&gt;</span></code> will also display the available enums that the PV takes. Common enums are defined in <code class="docutils literal notranslate"><span class="pre">ophyd-async.core</span></code> for devices to use, but you can define custom ones when suitable (inheriting from <code class="docutils literal notranslate"><span class="pre">ophyd_async.core</span></code> <code class="docutils literal notranslate"><span class="pre">StrictEnum</span></code>, <code class="docutils literal notranslate"><span class="pre">SupersetEnum</span></code> or <code class="docutils literal notranslate"><span class="pre">SubsetEnum</span></code>). The values should be capitalised e.g <code class="docutils literal notranslate"><span class="pre">ON</span> <span class="pre">=</span> <span class="pre">&quot;On&quot;</span></code>. If the PV expects upper case for the enum (e.g <code class="docutils literal notranslate"><span class="pre">ON</span> <span class="pre">=</span> <span class="pre">&quot;ON&quot;</span></code>), please speak to the relevant controls engineer(s) to get this changed if possible. For more infomation, please visit <a class="reference external" href="https://blueskyproject.io/ophyd-async/main/explanations/decisions/0008-signal-types.html">here</a>.</p></li>
+</ul>
+<p><strong>Device best practices for Bluesky plans:</strong></p>
+<ul class="simple">
+<li><p>Interact with devices in plans only through the Bluesky <a class="reference external" href="https://blueskyproject.io/bluesky/main/msg.html">messages protocol</a>, such as <code class="docutils literal notranslate"><span class="pre">yield</span> <span class="pre">from</span> <span class="pre">bps.abs_set(...)</span></code> or <code class="docutils literal notranslate"><span class="pre">yield</span> <span class="pre">Msg(&quot;set&quot;,</span> <span class="pre">...)</span></code>.</p></li>
+<li><p>Avoid calling device methods directly inside plans (e.g. <code class="docutils literal notranslate"><span class="pre">device.do_thing()</span></code>), as this breaks the abstraction and can lead to unpredictable behaviour.</p></li>
+</ul>
+<p>Example of what <strong>not</strong> to do:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">MyDevice</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_thing</span><span class="p">(</span><span class="o">...</span><span class="p">):</span>
+        <span class="o">...</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">my_plan</span><span class="p">():</span>
+    <span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+    <span class="n">device</span><span class="o">.</span><span class="n">do_thing</span><span class="p">()</span>  <span class="c1"># This is bad: do not call device methods directly in plans</span>
+</pre></div>
+</div>
+<p><strong>Tip:</strong></p>
+<ul class="simple">
+<li><p>If you are unsure how to represent a PV as a Signal, seek feedback early (for example, by opening a draft PR).</p></li>
+<li><p>Whenever possible, merge with existing devices—comprehensive tests help ensure changes do not break current functionality.</p></li>
+<li><p>Document any device-specific quirks or limitations for future maintainers.</p></li>
+</ul>
+<p>For further guidance, see the <a class="reference external" href="https://blueskyproject.io/ophyd-async/main/how-to/choose-interfaces-for-devices.html">ophyd-async documentation</a>.</p>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="create-beamline.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Creating a new beamline</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="dev-install.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Setup Developer Environment</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Creating a new device</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#reusing-an-existing-class">Reusing an existing class</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#writing-a-device-class">Writing a device class</a></li>
+</ul>
+
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/DiamondLightSource/dodal/edit/1.59.0/docs/how-to/create-device.md">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/how-to/create-device.md.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
