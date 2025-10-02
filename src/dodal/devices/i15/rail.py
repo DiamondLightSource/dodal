@@ -3,11 +3,7 @@ from ophyd_async.epics.motor import Motor
 
 
 class Rail(StandardReadable):
-    def __init__(
-        self,
-        prefix: str,
-        name: str = "",
-    ):
+    def __init__(self, prefix: str, name: str = ""):
         with self.add_children_as_readables():
             self.pitch = Motor(prefix + "PITCH")
             self.y = Motor(prefix + "Y")
