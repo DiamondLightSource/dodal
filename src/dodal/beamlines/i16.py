@@ -19,7 +19,7 @@ set_utils_beamline(BL)
 def synchrotron() -> Synchrotron:
     return Synchrotron()
 
-
+# dodal connect should work again after this https://jira.diamond.ac.uk/browse/I16-960
 @device_factory()
 def dcm() -> DCM:
     return DCM(
