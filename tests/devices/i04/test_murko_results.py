@@ -533,12 +533,12 @@ def test_given_n_results_filter_outliers_will_reduce_down_to_smaller_amount(
 ):
     murko_results.results = [
         MurkoResult(
-            centre_px=(100, 100),
+            centre_px=(i, 100),
             x_dist_mm=i,
             y_dist_mm=i,
             omega=i,
             uuid=str(i),
-            metadata=MagicMock(),
+            metadata={},  # type:ignore
         )
         for i in range(total_from_murko)
     ]
@@ -561,7 +561,7 @@ def test_when_results_filtered_then_smallest_x_pixels_kept(
             y_dist_mm=8,
             omega=0,
             uuid="a",
-            metadata=MagicMock(),
+            metadata={},  # type:ignore
         ),
         MurkoResult(
             centre_px=(300, 200),
@@ -569,7 +569,7 @@ def test_when_results_filtered_then_smallest_x_pixels_kept(
             y_dist_mm=90,
             omega=10,
             uuid="b",
-            metadata=MagicMock(),
+            metadata={},  # type:ignore
         ),
         MurkoResult(
             centre_px=(50, 200),
@@ -577,7 +577,7 @@ def test_when_results_filtered_then_smallest_x_pixels_kept(
             y_dist_mm=63,
             omega=20,
             uuid="c",
-            metadata=MagicMock(),
+            metadata={},  # type:ignore
         ),
         MurkoResult(
             centre_px=(300, 200),
@@ -585,7 +585,7 @@ def test_when_results_filtered_then_smallest_x_pixels_kept(
             y_dist_mm=8,
             omega=30,
             uuid="d",
-            metadata=MagicMock(),
+            metadata={},  # type:ignore
         ),
     ]
 
@@ -618,7 +618,7 @@ async def test_when_results_device_unstaged_then_results_cleared_and_last_omega_
             y_dist_mm=8,
             omega=0,
             uuid="a",
-            metadata=MagicMock(),
+            metadata={},  # type:ignore
         )
     ]
     murko_results._last_omega = 360
