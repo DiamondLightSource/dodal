@@ -1,0 +1,41 @@
+dodal.devices.electron\_analyser.ElectronAnalyserRegionDetector
+===============================================================
+
+.. currentmodule:: dodal.devices.electron_analyser
+
+.. autoclass:: ElectronAnalyserRegionDetector
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      ~ElectronAnalyserRegionDetector.trigger
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~ElectronAnalyserRegionDetector.driver
+      
+      
+      
+      
+   
+   

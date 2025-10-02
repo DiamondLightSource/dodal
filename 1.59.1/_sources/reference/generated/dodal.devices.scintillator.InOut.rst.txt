@@ -1,0 +1,78 @@
+dodal.devices.scintillator.InOut
+================================
+
+.. currentmodule:: dodal.devices.scintillator
+
+.. autoclass:: InOut
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~InOut.OUT
+      
+      
+      ~InOut.UNKNOWN
+      
+   
+   

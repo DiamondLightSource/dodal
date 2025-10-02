@@ -1,0 +1,58 @@
+dodal.devices.i10.i10\_apple2.Lookuptable
+=========================================
+
+.. currentmodule:: dodal.devices.i10.i10_apple2
+
+.. autoclass:: Lookuptable
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      ~Lookuptable.model_config
+      
+      
+      
+      
+      
+      ~Lookuptable.root
+      
+   
+   

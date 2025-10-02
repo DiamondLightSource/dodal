@@ -1,0 +1,48 @@
+dodal.devices.i10.i10\_apple2
+=============================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices.i10
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~i10_apple2.EnergyCoverage
+   ~i10_apple2.EnergyCoverageEntry
+   ~i10_apple2.EnergyMinMax
+   ~i10_apple2.EnergySetter
+   ~i10_apple2.I10Apple2
+   ~i10_apple2.I10Apple2Pol
+   ~i10_apple2.I10EnergyMotorLookup
+   ~i10_apple2.I10Id
+   ~i10_apple2.LinearArbitraryAngle
+   ~i10_apple2.LookupPath
+   ~i10_apple2.LookupTableConfig
+   ~i10_apple2.LookupTableEntries
+   ~i10_apple2.Lookuptable
+
+
+
+
+.. automodule:: dodal.devices.i10.i10_apple2
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

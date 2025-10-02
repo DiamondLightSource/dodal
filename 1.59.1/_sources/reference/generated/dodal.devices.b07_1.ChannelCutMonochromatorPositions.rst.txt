@@ -1,0 +1,84 @@
+dodal.devices.b07\_1.ChannelCutMonochromatorPositions
+=====================================================
+
+.. currentmodule:: dodal.devices.b07_1
+
+.. autoclass:: ChannelCutMonochromatorPositions
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~ChannelCutMonochromatorPositions.OUT
+      
+      
+      ~ChannelCutMonochromatorPositions.XTAL_2000
+      
+      
+      ~ChannelCutMonochromatorPositions.XTAL_2250
+      
+      
+      ~ChannelCutMonochromatorPositions.XTAL_2500
+      
+   
+   
