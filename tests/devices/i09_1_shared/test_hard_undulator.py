@@ -1,17 +1,25 @@
 import re
-from unittest.mock import AsyncMock, MagicMock, patch
 
-import numpy as np
 import pytest
 from bluesky.plan_stubs import mv
 from bluesky.run_engine import RunEngine
 from ophyd_async.core import init_devices
-from ophyd_async.testing import assert_reading, partial_reading
+from ophyd_async.testing import assert_configuration, assert_reading, partial_reading
 
 from dodal.common.enums import EnabledDisabledUpper
-from dodal.devices.i09_1_shared import HardUndulator, UndulatorOrder, calculate_gap_hu
+from dodal.devices.i09_1_shared import (
+    HardUndulator,
+    UndulatorOrder,
+    calculate_gap_hu,
+    get_hu_lut_as_dict,
+)
 from dodal.testing.setup import patch_all_motors
 from tests.devices.i09_1_shared.test_data import TEST_HARD_UNDULATOR_LUT
+
+
+@pytest.fixture
+async def lut_dictionary() -> dict:
+    return await get_hu_lut_as_dict(TEST_HARD_UNDULATOR_LUT)
 
 
 @pytest.fixture
@@ -30,9 +38,10 @@ async def hu(
     async with init_devices(mock=True):
         hu = HardUndulator(
             prefix="HU-01",
-            id_gap_lookup_table_path=TEST_HARD_UNDULATOR_LUT,
-            calculate_gap_function=calculate_gap_hu,
             order=undulator_order,
+            undulator_period=27,
+            poles=4,
+            length=100,
         )
     patch_all_motors(hu)
     return hu
@@ -44,7 +53,6 @@ async def test_hard_undulator_read(
     await assert_reading(
         hu,
         {
-            "hu-undulator_period": partial_reading(27),
             "hu-gap_offset": partial_reading(0.0),
             "hu-gap_access": partial_reading(EnabledDisabledUpper.ENABLED),
             "hu-current_gap": partial_reading(0.0),
@@ -54,19 +62,21 @@ async def test_hard_undulator_read(
     )
 
 
-async def test_check_energy_limits_throw_error(
+async def test_hard_undulator_config(
     hu: HardUndulator,
-    undulator_order: UndulatorOrder,
-    RE: RunEngine,
 ):
-    RE(mv(undulator_order, 5))
-    with pytest.raises(
-        ValueError,
-        match=re.escape(
-            "Energy 3.0keV is out of range for order 5: (4.0-7.2 keV)\n Valid orders for this energy are: [1, 3]"
-        ),
-    ):
-        await hu.set(3.0)
+    await assert_configuration(
+        hu,
+        {
+            "hu-gap_discrepancy_tolerance_mm": partial_reading(0.002),
+            "hu-gap_motor-motor_egu": partial_reading(""),
+            "hu-gap_motor-offset": partial_reading(0.0),
+            "hu-gap_motor-velocity": partial_reading(3.0),
+            "hu-undulator_period": partial_reading(27.0),
+            "hu-poles": partial_reading(4.0),
+            "hu-length": partial_reading(100.0),
+        },
+    )
 
 
 async def test_move_order(
@@ -85,30 +95,26 @@ async def test_move_order(
         await undulator_order.set(0)
 
 
-@patch("dodal.devices.i09_1_shared.hard_undulator.energy_distance_table")
-async def test_update_cached_lookup_table_fails(
-    mock_table: MagicMock,
-    hu: HardUndulator,
-):
-    mock_table.return_value = np.empty(0)
-    with pytest.raises(
-        RuntimeError,
-        match=re.escape("Failed to load lookup table from path"),
-    ):
-        await hu.set(1.0)
-
-
-async def test_get_gap_for_energy_fails(
+@pytest.mark.parametrize(
+    "gap, order, expected_gap",
+    [
+        (12.81, 1, 12.81),
+        (6.05, 3, 6.05),
+    ],
+)
+async def test_move_undulator(
     hu: HardUndulator,
     undulator_order: UndulatorOrder,
+    RE: RunEngine,
+    gap: float,
+    order: int,
+    expected_gap: float,
 ):
-    await undulator_order.set(1)
-    hu._check_energy_limits = AsyncMock()
-    with pytest.raises(
-        ValueError,
-        match=re.escape("diffraction parameter squared must be positive"),
-    ):
-        await hu.set(30.0)
+    await undulator_order.set(order)
+    RE(mv(hu, gap))
+    assert await hu.gap_motor.user_readback.get_value() == pytest.approx(
+        expected_gap, abs=0.01
+    )
 
 
 @pytest.mark.parametrize(
@@ -119,16 +125,12 @@ async def test_get_gap_for_energy_fails(
         (6.24, 5, 7.95),
     ],
 )
-async def test_move_undulator(
-    hu: HardUndulator,
-    undulator_order: UndulatorOrder,
-    RE: RunEngine,
+async def test_calculate_gap_from_energy(
     energy: float,
     order: int,
     expected_gap: float,
+    lut_dictionary: dict,
 ):
-    await undulator_order.set(order)
-    RE(mv(hu, energy))
-    assert await hu.gap_motor.user_readback.get_value() == pytest.approx(
+    assert calculate_gap_hu(energy, lut_dictionary, order) == pytest.approx(
         expected_gap, abs=0.01
     )

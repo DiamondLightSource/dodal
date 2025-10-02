@@ -1,16 +1,19 @@
-from collections.abc import Callable
-
 import numpy as np
-from bluesky.protocols import Locatable, Location
+from bluesky.protocols import Locatable, Location, Movable
 from ophyd_async.core import (
     AsyncStatus,
     Reference,
     StandardReadable,
+    StandardReadableFormat,
     soft_signal_r_and_setter,
     soft_signal_rw,
 )
 
-from dodal.devices.undulator import Undulator
+from dodal.devices.baton import Baton
+from dodal.devices.undulator import (
+    STATUS_TIMEOUT_S,
+    UndulatorBase,
+)
 from dodal.devices.util.lookup_tables import energy_distance_table
 from dodal.log import LOGGER
 
@@ -26,6 +29,19 @@ MAGNET_FIELD_COLUMN = 2
 MIN_ENERGY_COLUMN = 3
 MAX_ENERGY_COLUMN = 4
 GAP_OFFSET_COLUMN = 7
+
+
+async def get_hu_lut_as_dict(lut_path: str) -> dict:
+    lut_dict: dict = {}
+    _lookup_table: np.ndarray = await energy_distance_table(
+        lut_path,
+        comments=LUT_COMMENTS,
+        skiprows=HU_SKIP_ROWS,
+    )
+    for i in range(_lookup_table.shape[0]):
+        lut_dict[_lookup_table[i][0]] = _lookup_table[i]
+        LOGGER.debug(f"Loaded lookup table:\n {lut_dict}")
+    return lut_dict
 
 
 def calculate_gap_hu(
@@ -128,23 +144,18 @@ class UndulatorOrder(StandardReadable, Locatable[int]):
         await self._order.set(value)
 
     async def _check_order_valid(self, value: int):
-        self._lookup_table: np.ndarray = await energy_distance_table(
-            self.id_gap_lookup_table_path,
-            comments=LUT_COMMENTS,
-            skiprows=HU_SKIP_ROWS,
-        )
-        LOGGER.debug(f"Loaded lookup table: {self._lookup_table}")
-        order_list = [int(row[0]) for row in self._lookup_table]
-        if value not in order_list:
+        self._lut_dict: dict = await get_hu_lut_as_dict(self.id_gap_lookup_table_path)
+        LOGGER.debug(f"Loaded lookup table: {self._lut_dict}")
+        if value not in self._lut_dict.keys():
             raise ValueError(
-                f"Order {value} not found in lookup table, must be in {order_list}"
+                f"Order {value} not found in lookup table, must be in {[int(key) for key in self._lut_dict.keys()]}"
             )
 
     async def locate(self) -> Location[int]:
         return await self._order.locate()
 
 
-class HardUndulator(Undulator):
+class HardUndulator(UndulatorBase, Movable[float]):
     """
     An Undulator-type insertion device, used to control photon emission at a
     given beam energy.
@@ -157,113 +168,71 @@ class HardUndulator(Undulator):
         self,
         prefix: str,
         order: UndulatorOrder,
-        id_gap_lookup_table_path: str,
-        calculate_gap_function: Callable[..., float],
-        name: str = "",
         poles: int | None = None,
+        undulator_period: int | None = None,
         length: float | None = None,
+        baton: Baton | None = None,
+        name: str = "",
     ) -> None:
         """Constructor
 
         Args:
             prefix: PV prefix
             order: UndulatorOrder object to set/get undulator order
-            calculate_gap_function: Function to calculate gap from energy
-            id_gap_lookup_table_path: Path to lookup table for gap vs energy
-            name: Name for device. Defaults to ""
             poles: Number of magnetic poles built into the undulator
-            length: Length of the undulator in meters.
+            length: Length of the undulator in meters
+            undulator_period: undulator period in mm
+            baton: Baton
+            name: Name for device. Defaults to ""
         """
-        self._cached_lookup_table: dict[int, np.ndarray] = {}
-        self.calculate_gap = calculate_gap_function
         self.order = Reference(order)
-
         self.add_readables([self.order()])
+
         with self.add_children_as_readables():
-            self.undulator_period, _ = soft_signal_r_and_setter(int, initial_value=27)
             self.gap_offset, _ = soft_signal_r_and_setter(float, initial_value=0.0)
 
-        super().__init__(
-            prefix,
-            id_gap_lookup_table_path=id_gap_lookup_table_path,
-            name=name,
-            poles=poles,
-            length=length,
-        )
+        with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
+            if undulator_period is not None:
+                self.undulator_period, _ = soft_signal_r_and_setter(
+                    int, initial_value=undulator_period
+                )
+            else:
+                self.undulator_period = None
+
+            if poles is not None:
+                self.poles, _ = soft_signal_r_and_setter(int, initial_value=poles)
+            else:
+                self.poles = None
+
+            if length is not None:
+                self.length, _ = soft_signal_r_and_setter(float, initial_value=length)
+            else:
+                self.length = None
+
+        super().__init__(prefix=prefix, baton=baton, name=name)
 
     @AsyncStatus.wrap
     async def set(self, value: float):
         """
-        Set the undulator gap to a given energy in keV.
+        Set the undulator gap to a given value in mm.
 
         Args:
-            value: energy in keV
+            value: target gap in mm
         """
-        if self._cached_lookup_table == {}:
-            await self._update_cached_lookup_table()
-        await self._check_energy_limits(value)
+        await self.raise_if_not_enabled()  # Check access
+        if await self.check_gap_within_threshold(value):
+            LOGGER.debug(
+                "Gap is already in the correct place, no need to ask it to move"
+            )
+            return
         await self._set_undulator_gap(value)
 
-    async def _check_energy_limits(self, value: float):
-        """
-        Asynchronously checks if the specified energy value is within the allowed limits for a given undulator order.
-
-        Args:
-            value (float): The energy value in keV to check.
-        """
-        _current_order = (await self.order().locate()).get("readback")
-        min_energy = self._cached_lookup_table[_current_order][MIN_ENERGY_COLUMN]
-        max_energy = self._cached_lookup_table[_current_order][MAX_ENERGY_COLUMN]
-        LOGGER.debug(
-            f"Min and max energies for order {_current_order} are {min_energy}keV and {max_energy}keV respectively"
-        )
-        if not (min_energy <= value <= max_energy):
-            valid_orders = [
-                int(i)
-                for i in self._cached_lookup_table.keys()
-                if (
-                    self._cached_lookup_table[i][MIN_ENERGY_COLUMN]
-                    <= value
-                    <= self._cached_lookup_table[i][MAX_ENERGY_COLUMN]
-                )
-            ]
-            raise ValueError(
-                f"Energy {value}keV is out of range for order {_current_order}: ({min_energy}-{max_energy} keV)\n Valid orders for this energy are: {valid_orders}"
+    async def _set_undulator_gap(self, target_gap: float) -> None:
+        commissioning_mode = await self._is_commissioning_mode_enabled()
+        if not commissioning_mode:
+            await self.gap_motor.set(
+                target_gap,
+                timeout=STATUS_TIMEOUT_S,
             )
-
-    async def _get_gap_to_match_energy(self, energy_kev: float) -> float:
-        """
-        Asynchronously calculates the undulator gap required to match a specified energy.
-
-        Args:
-            energy_kev: The target energy in keV.
-
-        Returns:
-            The calculated undulator gap value.
-        """
-        return self.calculate_gap(
-            photon_energy_kev=energy_kev,
-            look_up_table=self._cached_lookup_table,
-            order=(await self.order().locate()).get("readback"),
-            gap_offset=await self.gap_offset.get_value(),
-            undulator_period_mm=await self.undulator_period.get_value(),
-        )
-
-    async def _update_cached_lookup_table(self):
-        """
-        Force update of cached lookup table by reading lut file.
-        Use cached version to avoid reading file multiple times during energy scans.
-        """
-        _lookup_table: np.ndarray = await energy_distance_table(
-            self.id_gap_lookup_table_path,
-            comments=LUT_COMMENTS,
-            skiprows=HU_SKIP_ROWS,
-        )
-        if _lookup_table.size == 0:
-            raise RuntimeError(
-                f"Failed to load lookup table from path {self.id_gap_lookup_table_path}"
-            )
-        self._cached_lookup_table.clear()
-        for i in range(_lookup_table.shape[0]):
-            self._cached_lookup_table[_lookup_table[i][0]] = _lookup_table[i]
-        LOGGER.debug(f"Loaded lookup table:\n{self._cached_lookup_table}")
+        else:
+            LOGGER.warning("In test mode, not moving ID gap")
