@@ -129,7 +129,7 @@ class Undulator(UndulatorBase, Movable[float]):
     @AsyncStatus.wrap
     async def set(self, value: float):
         """
-        Set the undulator gap to a given energy in keV
+        Check conditions and Set undulator gap to a given energy in keV
 
         Args:
             value: energy in keV
@@ -149,6 +149,12 @@ class Undulator(UndulatorBase, Movable[float]):
         await self._set_undulator_gap(target_gap)
 
     async def _set_undulator_gap(self, target_gap: float) -> None:
+        """
+        Set the undulator gap to a given value in mm
+
+        Args:
+            value: gap in mm
+        """
         LOGGER.info(
             f"Undulator gap mismatch. Moving gap to nominal value, {target_gap:.3f}mm"
         )

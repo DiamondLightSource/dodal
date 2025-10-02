@@ -139,11 +139,11 @@ class UndulatorOrder(StandardReadable, Locatable[int]):
         super().__init__(name=name)
 
     @AsyncStatus.wrap
-    async def set(self, value: int):
+    async def set(self, value: int) -> None:
         await self._check_order_valid(value)
         await self._order.set(value)
 
-    async def _check_order_valid(self, value: int):
+    async def _check_order_valid(self, value: int) -> None:
         self._lut_dict: dict = await get_hu_lut_as_dict(self.id_gap_lookup_table_path)
         LOGGER.debug(f"Loaded lookup table: {self._lut_dict}")
         if value not in self._lut_dict.keys():
@@ -214,7 +214,7 @@ class HardUndulator(UndulatorBase, Movable[float]):
     @AsyncStatus.wrap
     async def set(self, value: float):
         """
-        Set the undulator gap to a given value in mm.
+        Check conditions and Set undulator gap to a given value in mm.
 
         Args:
             value: target gap in mm
@@ -228,6 +228,12 @@ class HardUndulator(UndulatorBase, Movable[float]):
         await self._set_undulator_gap(value)
 
     async def _set_undulator_gap(self, target_gap: float) -> None:
+        """
+        Set the undulator gap to a given value in mm
+
+        Args:
+            value: gap in mm
+        """
         commissioning_mode = await self._is_commissioning_mode_enabled()
         if not commissioning_mode:
             await self.gap_motor.set(
