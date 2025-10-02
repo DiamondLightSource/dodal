@@ -291,6 +291,8 @@ class DeviceManager:
     ) -> DeviceFactory[Args, T] | Callable[[Callable[Args, T]], DeviceFactory[Args, T]]:
         def decorator(func: Callable[Args, T]) -> DeviceFactory[Args, T]:
             factory = DeviceFactory(func, use_factory_name, timeout, mock, skip, self)
+            if func.__name__ in self._factories:
+                raise ValueError(f"Duplicate factory name: {func.__name__}")
             self._factories[func.__name__] = factory
             return factory
 
