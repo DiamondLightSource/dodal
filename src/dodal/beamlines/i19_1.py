@@ -58,6 +58,8 @@ def oav() -> OAVBeamCentreFile:
     )
 
 
+# NOTE EH1 uses the Zebra 2 box. While a Zebra 1 box exists and is connected
+# on the beamline, it is currently not in use
 @device_factory()
 def zebra() -> Zebra:
     """Get the i19-1 zebra device, instantiate it if it hasn't already been.
