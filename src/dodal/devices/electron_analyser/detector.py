@@ -70,7 +70,7 @@ class ElectronAnalyserDetector(
         driver: TAbstractAnalyserDriverIO,
         name: str = "",
     ):
-        # Save driver as direct child so particpates with connect()
+        # Save driver as direct child so participates with connect()
         self.driver = driver
         self._sequence_class = sequence_class
         controller = ConstantDeadTimeController[TAbstractAnalyserDriverIO](driver, 0)
