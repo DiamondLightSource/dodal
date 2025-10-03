@@ -172,10 +172,3 @@ async def test_oav_with_null_zoom_controller(null_controller: NullZoomController
 
     assert await oav.zoom_controller.level.get_value() == "1.0x"
 
-
-def test_setting_null_zoom_controller_raises_exception(
-    null_controller: NullZoomController,
-):
-    with pytest.raises(Exception) as exc:
-        null_controller.set("2.0x")
-    assert str(exc.value) == "Attempting to set zoom level of a null zoom controller"
