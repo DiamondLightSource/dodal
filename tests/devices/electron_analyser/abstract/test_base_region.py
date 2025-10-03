@@ -117,9 +117,9 @@ def assert_region_field_energy_from_switching_energy_modes_is_correct(
     # energy mode.
     # Third check cycles back so should be original value.
     for e_mode, e_expected in zip(e_mode_sequence, expected_e_values, strict=False):
-        region.switch_energy_mode(e_mode, excitation_energy)
-        assert getattr(region, field) == e_expected
-        assert region.energy_mode == e_mode
+        new_r = region.switch_energy_mode(e_mode, excitation_energy)
+        assert getattr(new_r, field) == e_expected
+        assert new_r.energy_mode == e_mode
 
 
 @pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)

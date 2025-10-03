@@ -1,7 +1,7 @@
 import re
 from abc import ABC
 from collections.abc import Callable
-from typing import Generic, TypeVar
+from typing import Generic, Self, TypeVar
 
 from pydantic import BaseModel, Field, model_validator
 
@@ -89,7 +89,7 @@ class AbstractBaseRegion(
 
     def switch_energy_mode(
         self, energy_mode: EnergyMode, excitation_energy: float
-    ) -> None:
+    ) -> Self:
         """
         Switch region to new energy mode: Kinetic or Binding. Updates the low_energy,
         centre_energy, high_energy, and energy_mode, only if it switches to a new one.
@@ -98,18 +98,27 @@ class AbstractBaseRegion(
             energy_mode: mode you want to switch the region to.
             excitation_energy: the energy to calculate the new values of low_energy,
                                centre_energy, and high_energy.
+        Returns:
+            A new region with calculated the selected energy mode.
         """
+        switched_r = self.model_copy()
         conv = (
             to_binding_energy
             if energy_mode == EnergyMode.BINDING
             else to_kinetic_energy
         )
-        self.low_energy = conv(self.low_energy, self.energy_mode, excitation_energy)
-        self.centre_energy = conv(
-            self.centre_energy, self.energy_mode, excitation_energy
+        switched_r.low_energy = conv(
+            switched_r.low_energy, switched_r.energy_mode, excitation_energy
         )
-        self.high_energy = conv(self.high_energy, self.energy_mode, excitation_energy)
-        self.energy_mode = energy_mode
+        switched_r.centre_energy = conv(
+            switched_r.centre_energy, switched_r.energy_mode, excitation_energy
+        )
+        switched_r.high_energy = conv(
+            switched_r.high_energy, switched_r.energy_mode, excitation_energy
+        )
+        switched_r.energy_mode = energy_mode
+
+        return switched_r
 
     @model_validator(mode="before")
     @classmethod
