@@ -171,4 +171,3 @@ async def test_oav_with_null_zoom_controller(null_controller: NullZoomController
     oav = OAVBeamCentreFile("", oav_config, "", zoom_controller=null_controller)
 
     assert await oav.zoom_controller.level.get_value() == "1.0x"
-
