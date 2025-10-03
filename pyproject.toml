@@ -15,7 +15,7 @@ dependencies = [
     "click",
     "ophyd",
     "ophyd-async[ca,pva]>=0.13.2",
-    "bluesky==1.14.2",  # https://github.com/bluesky/bluesky/issues/1938
+    "bluesky>=1.14.5",
     "pyepics",
     "dataclasses-json",
     "pillow",
@@ -29,9 +29,9 @@ dependencies = [
     "aiohttp",
     "redis",
     "scanspec>=0.7.3",
-    "event-model>=1.23",             # Until bluesky pins it https://github.com/DiamondLightSource/dodal/issues/1278
     "pyzmq==26.3.0",                 # Until we can move to RHEL 8 https://github.com/DiamondLightSource/mx-bluesky/issues/1139
     "deepdiff",
+    "daq-config-server>=v1.0.0-rc.2",# For getting Configuration settings.
 ]
 
 dynamic = ["version"]
