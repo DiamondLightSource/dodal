@@ -45,12 +45,8 @@ class Apple2PhasesVal:
 
 
 @dataclass
-class Apple2Val:
+class Apple2Val(Apple2PhasesVal):
     gap: float
-    top_outer: float
-    top_inner: float
-    btm_inner: float
-    btm_outer: float
 
 
 class Pol(StrictEnum):
