@@ -39,12 +39,26 @@ def _get_gap_for_energy(
 
 
 class UndulatorBase(StandardReadable):
+    """
+    Base class for undulator devices providing gap control and access management.
+
+        prefix (str): EPICS PV prefix for the undulator device.
+        baton (Baton | None, optional): Reference to a Baton object for commissioning mode checks.
+        name (str, optional): Name of the device.
+    """
+
     def __init__(
         self,
         prefix: str,
         baton: Baton | None = None,
         name: str = "",
     ) -> None:
+        """
+        Args:
+            prefix: PV prefix
+            baton: baton object if provided.
+            name: Name for device. Defaults to ""
+        """
         self.baton_ref = Reference(baton) if baton else None
 
         with self.add_children_as_readables():
@@ -72,10 +86,16 @@ class UndulatorBase(StandardReadable):
         tolerance = await self.gap_discrepancy_tolerance_mm.get_value()
         return abs(target_gap - current_gap) <= tolerance
 
-    async def _is_commissioning_mode_enabled(self):
+    async def _is_commissioning_mode_enabled(self) -> bool | None:
+        """
+        Asynchronously checks if commissioning mode is enabled via the baton reference.
+        """
         return self.baton_ref and await self.baton_ref().commissioning.get_value()
 
-    async def raise_if_not_enabled(self):
+    async def raise_if_not_enabled(self) -> AccessError | None:
+        """
+        Asynchronously raises AccessError if gap access is disabled and not in commissioning mode.
+        """
         access_level = await self.gap_access.get_value()
         commissioning_mode = await self._is_commissioning_mode_enabled()
         if access_level is EnabledDisabledUpper.DISABLED and not commissioning_mode:

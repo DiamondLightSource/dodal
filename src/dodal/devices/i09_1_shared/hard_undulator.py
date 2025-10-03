@@ -69,6 +69,9 @@ def calculate_gap_hu(
     magnet_blocks_per_period = 4
     magnet_block_height_mm = 16
 
+    if order not in look_up_table.keys():
+        raise ValueError(f"Order parameter {order} not found in lookup table")
+
     gamma = 1000 * look_up_table[order][RING_ENERGY_COLUMN] / ELECTRON_REST_ENERGY_MEV
 
     # Constructive interference of radiation emitted at different poles
@@ -162,6 +165,7 @@ class HardUndulator(UndulatorBase, Movable[float]):
 
     This class extends Undulator and adds an order(harmonics) parameter. In addition there are gap_offset
     to allow for small adjustments to the gap and an undulator_period soft signals.
+    This class does not convert energy to gap and instead controls gap only.
     """
 
     def __init__(

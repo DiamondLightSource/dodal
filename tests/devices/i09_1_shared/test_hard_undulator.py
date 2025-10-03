@@ -47,6 +47,26 @@ async def hu(
     return hu
 
 
+async def test_undulator_config_default_parameters(
+    undulator_order: UndulatorOrder,
+):
+    async with init_devices(mock=True):
+        hu_default = HardUndulator(
+            prefix="HU-01",
+            order=undulator_order,
+        )
+    patch_all_motors(hu_default)
+    await assert_configuration(
+        hu_default,
+        {
+            "hu_default-gap_discrepancy_tolerance_mm": partial_reading(0.002),
+            "hu_default-gap_motor-motor_egu": partial_reading(""),
+            "hu_default-gap_motor-offset": partial_reading(0.0),
+            "hu_default-gap_motor-velocity": partial_reading(3.0),
+        },
+    )
+
+
 async def test_hard_undulator_read(
     hu: HardUndulator,
 ):
@@ -100,6 +120,7 @@ async def test_move_order(
     [
         (12.81, 1, 12.81),
         (6.05, 3, 6.05),
+        (6.04, 3, 6.04),
     ],
 )
 async def test_move_undulator(
@@ -134,3 +155,24 @@ async def test_calculate_gap_from_energy(
     assert calculate_gap_hu(energy, lut_dictionary, order) == pytest.approx(
         expected_gap, abs=0.01
     )
+
+
+async def test_calculate_gap_from_energy_wrong_order(
+    lut_dictionary: dict,
+):
+    wrong_order = 100
+    with pytest.raises(
+        ValueError,
+        match=re.escape(f"Order parameter {wrong_order} not found in lookup table"),
+    ):
+        calculate_gap_hu(30, lut_dictionary, wrong_order)
+
+
+async def test_calculate_gap_from_energy_wrong_k(
+    lut_dictionary: dict,
+):
+    with pytest.raises(
+        ValueError,
+        match=re.escape("diffraction parameter squared must be positive!"),
+    ):
+        calculate_gap_hu(30, lut_dictionary, 1)
