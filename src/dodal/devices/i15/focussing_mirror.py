@@ -21,11 +21,7 @@ class FocusingMirrorBase(StandardReadable):
 class FocusingMirrorHorizontal(FocusingMirrorBase):
     """Focusing Mirror with curve, ellip, pitch & X"""
 
-    def __init__(
-        self,
-        prefix: str,
-        name: str = "",
-    ):
+    def __init__(self, prefix: str, name: str = ""):
         with self.add_children_as_readables():
             self.x = Motor(prefix + "X")
 
