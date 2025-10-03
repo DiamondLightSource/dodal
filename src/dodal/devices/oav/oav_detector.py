@@ -48,8 +48,9 @@ class NullZoomController(BaseZoomController):
         self.level = soft_signal_rw(str, "1.0x")
         self.percentage = soft_signal_rw(float, 100)
 
-    def set(self, value):
-        pass
+    @AsyncStatus.wrap
+    async def set(self, value):
+        return
 
 
 class ZoomController(BaseZoomController):
