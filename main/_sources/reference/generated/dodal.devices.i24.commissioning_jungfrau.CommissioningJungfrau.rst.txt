@@ -22,6 +22,8 @@ dodal.devices.i24.commissioning\_jungfrau.CommissioningJungfrau
       
       
       
+      ~CommissioningJungfrau.prepare
+      
       
       
       
