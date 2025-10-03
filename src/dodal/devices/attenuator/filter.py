@@ -8,4 +8,7 @@ class FilterMotor(StandardReadable):
     ):
         with self.add_children_as_readables():
             self.user_setpoint = epics_signal_rw(filter_selections, f"{prefix}SELECT")
+            self.done_move = epics_signal_rw(
+                int, f"{prefix}DMOV"
+            )  # 1 for yes, 0 for no
         super().__init__(name=name)
