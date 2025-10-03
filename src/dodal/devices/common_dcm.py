@@ -46,7 +46,12 @@ class BaseDCM(StandardReadable, Generic[Xtal_1, Xtal_2]):
     """
 
     def __init__(
-        self, prefix: str, xtal_1: type[Xtal_1], xtal_2: type[Xtal_2], name: str = ""
+        self,
+        prefix: str,
+        xtal_1: type[Xtal_1],
+        xtal_2: type[Xtal_2],
+        name: str = "",
+        dspacing_pv_suffix="DSPACING:RBV",
     ) -> None:
         with self.add_children_as_readables():
             # Virtual motor PV's which set the physical motors so that the DCM produces requested
@@ -59,9 +64,10 @@ class BaseDCM(StandardReadable, Generic[Xtal_1, Xtal_2]):
             # Offset ensures that the beam exits the DCM at the same point, regardless of energy.
             self.offset_in_mm = Motor(prefix + "OFFSET")
 
-            self.crystal_metadata_d_spacing_a = epics_signal_r(
-                float, prefix + "DSPACING:RBV"
-            )
+            if dspacing_pv_suffix:
+                self.crystal_metadata_d_spacing_a = epics_signal_r(
+                    float, prefix + dspacing_pv_suffix
+                )
 
             self._make_crystals(prefix, xtal_1, xtal_2)
 
