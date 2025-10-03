@@ -1,8 +1,11 @@
+import re
 from collections.abc import Generator
 from unittest.mock import AsyncMock, patch
 
 import numpy as np
 import pytest
+from bluesky.plan_stubs import mv
+from bluesky.run_engine import RunEngine
 from ophyd_async.core import init_devices
 from ophyd_async.testing import (
     assert_configuration,
@@ -16,13 +19,24 @@ from dodal.common.enums import EnabledDisabledUpper
 from dodal.devices.baton import Baton
 from dodal.devices.undulator import (
     AccessError,
+    BaseUndulator,
     Undulator,
+    UndulatorOrder,
     _get_gap_for_energy,
 )
 from dodal.testing import patch_all_motors
 from tests.devices.test_data import (
     TEST_BEAMLINE_UNDULATOR_TO_GAP_LUT,
 )
+
+LUT_DICT = {1: [0.0, 1.0], 2: [0.4, 0.3], 3: [1.0, 4.9]}
+
+
+@pytest.fixture
+async def undulator_order() -> UndulatorOrder:
+    async with init_devices(mock=True):
+        order = UndulatorOrder(LUT_DICT)
+    return order
 
 
 @pytest.fixture
@@ -46,6 +60,23 @@ def undulator_in_commissioning_mode(
 ) -> Generator[Undulator, None, None]:
     set_mock_value(undulator.baton_ref().commissioning, True)  # type: ignore
     yield undulator
+
+
+async def test_undulator_config_default_parameters():
+    async with init_devices(mock=True):
+        hu_default = BaseUndulator(
+            prefix="HU-01",
+        )
+    patch_all_motors(hu_default)
+    await assert_configuration(
+        hu_default,
+        {
+            "hu_default-gap_discrepancy_tolerance_mm": partial_reading(0.002),
+            "hu_default-gap_motor-motor_egu": partial_reading(""),
+            "hu_default-gap_motor-offset": partial_reading(0.0),
+            "hu_default-gap_motor-velocity": partial_reading(3.0),
+        },
+    )
 
 
 async def test_reading_includes_read_fields(undulator: Undulator):
@@ -147,3 +178,28 @@ async def test_gap_access_check_move_not_inhibited_when_commissioning_mode_disab
         get_mock_put(undulator.gap_motor.user_setpoint).assert_called_once_with(
             15.0, wait=True
         )
+
+
+async def test_order_read(
+    undulator_order: UndulatorOrder,
+):
+    await assert_reading(
+        undulator_order,
+        {"order-_order": partial_reading(3)},
+    )
+
+
+async def test_move_order(
+    undulator_order: UndulatorOrder,
+    RE: RunEngine,
+):
+    assert (await undulator_order.locate())["readback"] == 3  # default order
+    RE(mv(undulator_order, 1))
+    assert (await undulator_order.locate())["readback"] == 1  # no error
+    with pytest.raises(
+        ValueError,
+        match=re.escape(
+            f"Order 0 not found in lookup table, must be in {[int(key) for key in LUT_DICT.keys()]}"
+        ),
+    ):
+        await undulator_order.set(0)
