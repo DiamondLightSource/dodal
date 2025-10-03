@@ -19,9 +19,7 @@ from ophyd_async.core import (
 )
 from pydantic import BaseModel, ConfigDict, RootModel
 
-from dodal.log import LOGGER
-
-from ..apple2_undulator import (
+from dodal.devices.apple2_undulator import (
     Apple2,
     Apple2Motors,
     Apple2Val,
@@ -31,6 +29,8 @@ from ..apple2_undulator import (
     UndulatorJawPhase,
     UndulatorPhaseAxes,
 )
+from dodal.log import LOGGER
+
 from ..pgm import PGM
 
 ROW_PHASE_MOTOR_TOLERANCE = 0.004
