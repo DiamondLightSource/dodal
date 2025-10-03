@@ -189,6 +189,7 @@ lint.select = [
     "SLF",    # self - https://docs.astral.sh/ruff/settings/#lintflake8-self
     "RUF018", # walrus operators in asserts - https://docs.astral.sh/ruff/rules/assignment-in-assert/
     "TID251", # banned api - https://docs.astral.sh/ruff/rules/banned-api/
+    "INP001", # missing __init__.py - https://docs.astral.sh/ruff/rules/implicit-namespace-package/
 ]
 
 [tool.ruff.lint.per-file-ignores]
