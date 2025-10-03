@@ -2,7 +2,6 @@ import numpy as np
 from bluesky.protocols import Locatable, Location, Movable
 from ophyd_async.core import (
     AsyncStatus,
-    Reference,
     StandardReadable,
     StandardReadableFormat,
     soft_signal_r_and_setter,
@@ -160,17 +159,16 @@ class UndulatorOrder(StandardReadable, Locatable[int]):
 class HardUndulator(UndulatorBase, Movable[float]):
     """
     An Undulator-type insertion device, used to control photon emission at a
-    given beam energy.
+    given beam energy.This class does NOT convert energy to gap and instead
+    controls gap in mm only.
 
-    This class extends Undulator and adds an order(harmonics) parameter. In addition there are gap_offset
-    to allow for small adjustments to the gap and an undulator_period soft signals.
-    This class does not convert energy to gap and instead controls gap only.
+    This class extends UndulatorBase and adds gap_offset to allow for small adjustments
+    to the gap and an undulator_period soft signals.
     """
 
     def __init__(
         self,
         prefix: str,
-        order: UndulatorOrder,
         poles: int | None = None,
         undulator_period: int | None = None,
         length: float | None = None,
@@ -181,15 +179,12 @@ class HardUndulator(UndulatorBase, Movable[float]):
 
         Args:
             prefix: PV prefix
-            order: UndulatorOrder object to set/get undulator order
             poles: Number of magnetic poles built into the undulator
             length: Length of the undulator in meters
             undulator_period: undulator period in mm
             baton: Baton
             name: Name for device. Defaults to ""
         """
-        self.order = Reference(order)
-        self.add_readables([self.order()])
 
         with self.add_children_as_readables():
             self.gap_offset, _ = soft_signal_r_and_setter(float, initial_value=0.0)
@@ -202,17 +197,9 @@ class HardUndulator(UndulatorBase, Movable[float]):
             else:
                 self.undulator_period = None
 
-            if poles is not None:
-                self.poles, _ = soft_signal_r_and_setter(int, initial_value=poles)
-            else:
-                self.poles = None
-
-            if length is not None:
-                self.length, _ = soft_signal_r_and_setter(float, initial_value=length)
-            else:
-                self.length = None
-
-        super().__init__(prefix=prefix, baton=baton, name=name)
+        super().__init__(
+            prefix=prefix, poles=poles, length=length, baton=baton, name=name
+        )
 
     @AsyncStatus.wrap
     async def set(self, value: float):

@@ -41,21 +41,21 @@ def _get_gap_for_energy(
 class UndulatorBase(StandardReadable):
     """
     Base class for undulator devices providing gap control and access management.
-
-        prefix (str): EPICS PV prefix for the undulator device.
-        baton (Baton | None, optional): Reference to a Baton object for commissioning mode checks.
-        name (str, optional): Name of the device.
     """
 
     def __init__(
         self,
         prefix: str,
+        poles: int | None = None,
+        length: float | None = None,
         baton: Baton | None = None,
         name: str = "",
     ) -> None:
         """
         Args:
             prefix: PV prefix
+            poles: Number of magnetic poles built into the undulator
+            length: Length of the undulator in meters
             baton: baton object if provided.
             name: Name for device. Defaults to ""
         """
@@ -71,6 +71,22 @@ class UndulatorBase(StandardReadable):
                 float,
                 initial_value=UNDULATOR_DISCREPANCY_THRESHOLD_MM,
             )
+
+            if poles is not None:
+                self.poles, _ = soft_signal_r_and_setter(
+                    int,
+                    initial_value=poles,
+                )
+            else:
+                self.poles = None
+
+            if length is not None:
+                self.length, _ = soft_signal_r_and_setter(
+                    float,
+                    initial_value=length,
+                )
+            else:
+                self.length = None
         super().__init__(name=name)
 
     async def _set_undulator_gap(self, target_gap: float) -> None:
@@ -125,8 +141,7 @@ class UndulatorBase(StandardReadable):
 
 class Undulator(UndulatorBase, Movable[float]):
     """
-    An Undulator-type insertion device, used to control photon emission at a given
-    beam energy.
+    An Undulator-type insertion device, used to control photon emission at a given beam energy.
     """
 
     def __init__(
@@ -148,24 +163,9 @@ class Undulator(UndulatorBase, Movable[float]):
         """
 
         self.id_gap_lookup_table_path = id_gap_lookup_table_path
-        with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
-            if poles is not None:
-                self.poles, _ = soft_signal_r_and_setter(
-                    int,
-                    initial_value=poles,
-                )
-            else:
-                self.poles = None
-
-            if length is not None:
-                self.length, _ = soft_signal_r_and_setter(
-                    float,
-                    initial_value=length,
-                )
-            else:
-                self.length = None
-
-        super().__init__(prefix=prefix, baton=baton, name=name)
+        super().__init__(
+            prefix=prefix, poles=poles, length=length, baton=baton, name=name
+        )
 
     @AsyncStatus.wrap
     async def set(self, value: float):
@@ -176,6 +176,7 @@ class Undulator(UndulatorBase, Movable[float]):
             value: energy in keV
         """
         await self.raise_if_not_enabled()  # Check access
+        # Convert energy in keV to gap in mm
         target_gap = await self._get_gap_to_match_energy(value)
         LOGGER.info(
             f"Setting undulator gap to {target_gap:.3f}mm based on {value:.2f}kev"

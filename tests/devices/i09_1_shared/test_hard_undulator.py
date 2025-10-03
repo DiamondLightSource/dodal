@@ -38,7 +38,6 @@ async def hu(
     async with init_devices(mock=True):
         hu = HardUndulator(
             prefix="HU-01",
-            order=undulator_order,
             undulator_period=27,
             poles=4,
             length=100,
@@ -53,7 +52,6 @@ async def test_undulator_config_default_parameters(
     async with init_devices(mock=True):
         hu_default = HardUndulator(
             prefix="HU-01",
-            order=undulator_order,
         )
     patch_all_motors(hu_default)
     await assert_configuration(
@@ -77,7 +75,6 @@ async def test_hard_undulator_read(
             "hu-gap_access": partial_reading(EnabledDisabledUpper.ENABLED),
             "hu-current_gap": partial_reading(0.0),
             "hu-gap_motor": partial_reading(0.0),
-            "order-_order": partial_reading(3),
         },
     )
 
@@ -116,22 +113,19 @@ async def test_move_order(
 
 
 @pytest.mark.parametrize(
-    "gap, order, expected_gap",
+    "gap, expected_gap",
     [
-        (12.81, 1, 12.81),
-        (6.05, 3, 6.05),
-        (6.04, 3, 6.04),
+        (12.81, 12.81),
+        (6.05, 6.05),
+        (6.051, 6.050),
     ],
 )
 async def test_move_undulator(
     hu: HardUndulator,
-    undulator_order: UndulatorOrder,
     RE: RunEngine,
     gap: float,
-    order: int,
     expected_gap: float,
 ):
-    await undulator_order.set(order)
     RE(mv(hu, gap))
     assert await hu.gap_motor.user_readback.get_value() == pytest.approx(
         expected_gap, abs=0.01
