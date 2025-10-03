@@ -11,7 +11,6 @@ from ophyd_async.core import (
 
 from dodal.devices.baton import Baton
 from dodal.devices.undulator import (
-    STATUS_TIMEOUT_S,
     UndulatorBase,
 )
 from dodal.devices.util.lookup_tables import energy_distance_table
@@ -230,19 +229,3 @@ class HardUndulator(UndulatorBase, Movable[float]):
             )
             return
         await self._set_undulator_gap(value)
-
-    async def _set_undulator_gap(self, target_gap: float) -> None:
-        """
-        Set the undulator gap to a given value in mm
-
-        Args:
-            value: gap in mm
-        """
-        commissioning_mode = await self._is_commissioning_mode_enabled()
-        if not commissioning_mode:
-            await self.gap_motor.set(
-                target_gap,
-                timeout=STATUS_TIMEOUT_S,
-            )
-        else:
-            LOGGER.warning("In test mode, not moving ID gap")

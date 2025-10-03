@@ -73,6 +73,27 @@ class UndulatorBase(StandardReadable):
             )
         super().__init__(name=name)
 
+    async def _set_undulator_gap(self, target_gap: float) -> None:
+        """
+        Set the undulator gap to a given value in mm
+
+        Args:
+            value: gap in mm
+        """
+        LOGGER.info(
+            f"Undulator gap mismatch. Moving gap to nominal value, {target_gap:.3f}mm"
+        )
+        commissioning_mode = await self._is_commissioning_mode_enabled()
+        if not commissioning_mode:
+            # Only move if the gap is sufficiently different to the value from the
+            # DCM lookup table AND we're not in commissioning mode
+            await self.gap_motor.set(
+                target_gap,
+                timeout=STATUS_TIMEOUT_S,
+            )
+        else:
+            LOGGER.warning("In test mode, not moving ID gap")
+
     async def check_gap_within_threshold(self, target_gap: float) -> bool:
         """
         Check if the undulator gap is within the acceptable threshold of the target gap
@@ -167,27 +188,6 @@ class Undulator(UndulatorBase, Movable[float]):
             return
 
         await self._set_undulator_gap(target_gap)
-
-    async def _set_undulator_gap(self, target_gap: float) -> None:
-        """
-        Set the undulator gap to a given value in mm
-
-        Args:
-            value: gap in mm
-        """
-        LOGGER.info(
-            f"Undulator gap mismatch. Moving gap to nominal value, {target_gap:.3f}mm"
-        )
-        commissioning_mode = await self._is_commissioning_mode_enabled()
-        if not commissioning_mode:
-            # Only move if the gap is sufficiently different to the value from the
-            # DCM lookup table AND we're not in commissioning mode
-            await self.gap_motor.set(
-                target_gap,
-                timeout=STATUS_TIMEOUT_S,
-            )
-        else:
-            LOGGER.warning("In test mode, not moving ID gap")
 
     async def _get_gap_to_match_energy(self, energy_kev: float) -> float:
         """
