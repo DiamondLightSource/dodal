@@ -4,7 +4,12 @@ import pytest
 from bluesky.plan_stubs import mv
 from bluesky.run_engine import RunEngine
 from ophyd_async.core import init_devices
-from ophyd_async.testing import assert_configuration, assert_reading, partial_reading
+from ophyd_async.testing import (
+    assert_configuration,
+    assert_reading,
+    get_mock_put,
+    partial_reading,
+)
 
 from dodal.common.enums import EnabledDisabledUpper
 from dodal.devices.i09_1_shared import (
@@ -113,23 +118,25 @@ async def test_move_order(
 
 
 @pytest.mark.parametrize(
-    "gap, expected_gap",
-    [
-        (12.81, 12.81),
-        (6.05, 6.05),
-        (6.051, 6.050),
-    ],
+    "gap",
+    [(5.227), (9.03)],
 )
 async def test_move_undulator(
     hu: HardUndulator,
     RE: RunEngine,
     gap: float,
-    expected_gap: float,
 ):
     RE(mv(hu, gap))
-    assert await hu.gap_motor.user_readback.get_value() == pytest.approx(
-        expected_gap, abs=0.01
-    )
+    assert await hu.gap_motor.user_readback.get_value() == pytest.approx(gap, abs=0.001)
+
+
+async def test_move_undulator_same_gap(
+    hu: HardUndulator,
+):
+    current_gap = await hu.gap_motor.user_readback.get_value()
+    await hu.set(current_gap)
+    mock_gap_setpoint = get_mock_put(hu.gap_motor.user_setpoint)
+    mock_gap_setpoint.assert_not_called()
 
 
 @pytest.mark.parametrize(
