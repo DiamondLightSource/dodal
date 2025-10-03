@@ -1,7 +1,4 @@
-from collections.abc import Mapping
 from typing import Generic
-
-from ophyd_async.core import SignalR
 
 from dodal.devices.electron_analyser.abstract.types import (
     TLensMode,
@@ -11,7 +8,10 @@ from dodal.devices.electron_analyser.abstract.types import (
 from dodal.devices.electron_analyser.detector import (
     ElectronAnalyserDetector,
 )
-from dodal.devices.electron_analyser.enums import SelectedSource
+from dodal.devices.electron_analyser.energy_sources import (
+    DualEnergySource,
+    EnergySource,
+)
 from dodal.devices.electron_analyser.vgscienta.driver_io import (
     VGScientaAnalyserDriverIO,
 )
@@ -35,11 +35,11 @@ class VGScientaDetector(
         lens_mode_type: type[TLensMode],
         psu_mode_type: type[TPsuMode],
         pass_energy_type: type[TPassEnergyEnum],
-        energy_sources: Mapping[SelectedSource, SignalR[float]],
+        energy_source: DualEnergySource | EnergySource,
         name: str = "",
     ):
         driver = VGScientaAnalyserDriverIO[TLensMode, TPsuMode, TPassEnergyEnum](
-            prefix, lens_mode_type, psu_mode_type, pass_energy_type, energy_sources
+            prefix, lens_mode_type, psu_mode_type, pass_energy_type, energy_source
         )
         super().__init__(
             VGScientaSequence[lens_mode_type, psu_mode_type, pass_energy_type],
