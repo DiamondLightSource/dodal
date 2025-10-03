@@ -617,9 +617,7 @@ class Apple2(abc.ABC, StandardReadable, Movable):
             and isclose(top_inner, 0.0, abs_tol=ROW_PHASE_MOTOR_TOLERANCE)
             and isclose(btm_outer, 0.0, abs_tol=ROW_PHASE_MOTOR_TOLERANCE)
         ):
-            LOGGER.info(
-                "Determined polarisation: NC (Negative Circulassert_awaited_withar)."
-            )
+            LOGGER.info("Determined polarisation: NC (Negative Circular).")
             return Pol.NC, top_outer
         if (
             isclose(top_outer, -btm_inner, abs_tol=ROW_PHASE_MOTOR_TOLERANCE)
