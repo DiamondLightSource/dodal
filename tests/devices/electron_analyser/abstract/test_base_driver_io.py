@@ -50,27 +50,40 @@ async def sim_driver(
 
 
 @pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
-def test_driver_set(
+async def test_driver_set(
     sim_driver: AbstractAnalyserDriverIO,
     region: AbstractBaseRegion,
     RE: RunEngine,
 ) -> None:
     sim_driver._set_region = AsyncMock()
 
-    with patch(
-        "dodal.devices.electron_analyser.abstract.AbstractBaseRegion.switch_energy_mode"
-    ) as mock_switch:
-        ke_region = region.switch_energy_mode(EnergyMode.KINETIC, 0)
-        mock_switch.return_value = ke_region
-
+    # Patch switch_energy_mode so we can check on calls, but still run the real function
+    with patch.object(
+        AbstractBaseRegion,
+        "switch_energy_mode",
+        side_effect=AbstractBaseRegion.switch_energy_mode,  # run the real method
+        autospec=True,
+    ) as mock_switch_energy_mode:
         RE(bps.mv(sim_driver, region))
+
+        mock_switch_energy_mode.assert_called_once_with(
+            region,
+            EnergyMode.KINETIC,
+            await sim_driver.energy_source.energy.get_value(),
+        )
 
         if isinstance(sim_driver.energy_source, DualEnergySource):
             get_mock_put(
                 sim_driver.energy_source.selected_source
             ).assert_called_once_with(region.excitation_energy_source, wait=True)
 
+        # Check interal _set_region was set with ke_region
+        ke_region = mock_switch_energy_mode.call_args[0][0].switch_energy_mode(
+            EnergyMode.KINETIC,
+            await sim_driver.energy_source.energy.get_value(),
+        )
         sim_driver._set_region.assert_called_once_with(ke_region)
+
         get_mock_put(sim_driver.energy_mode).assert_called_once_with(
             region.energy_mode, wait=True
         )
