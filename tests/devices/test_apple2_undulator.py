@@ -134,7 +134,7 @@ async def test_gap_cal_timout(
 ):
     set_mock_value(mock_id_gap.velocity, velocity)
     set_mock_value(mock_id_gap.user_readback, readback)
-    set_mock_value(mock_id_gap.user_setpoint, target)
+    set_mock_value(mock_id_gap.user_setpoint, str(target))
 
     assert await mock_id_gap.get_timeout() == pytest.approx(expected_timeout, rel=0.1)
 
