@@ -3,19 +3,19 @@ dodal.devices.attenuator
 
 
 
-
-
-
-
-.. currentmodule:: dodal.devices
-.. rubric:: Classes
+.. rubric:: Modules
 
 .. autosummary::
    :toctree:
    :recursive:
 
-   ~attenuator.Attenuator
-   ~attenuator.ReadOnlyAttenuator
+   dodal.devices.attenuator.attenuator
+   dodal.devices.attenuator.filter
+   dodal.devices.attenuator.filter_selections
+
+
+
+
 
 
 

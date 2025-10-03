@@ -1,0 +1,31 @@
+dodal.devices.i10.rasor.rasor\_scaler\_cards.RasorScalerCard1
+=============================================================
+
+.. currentmodule:: dodal.devices.i10.rasor.rasor_scaler_cards
+
+.. autoclass:: RasorScalerCard1
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+   
+   

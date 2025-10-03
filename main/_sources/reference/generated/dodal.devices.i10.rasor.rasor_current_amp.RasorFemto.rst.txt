@@ -1,0 +1,31 @@
+dodal.devices.i10.rasor.rasor\_current\_amp.RasorFemto
+======================================================
+
+.. currentmodule:: dodal.devices.i10.rasor.rasor_current_amp
+
+.. autoclass:: RasorFemto
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+   
+   

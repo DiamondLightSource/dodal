@@ -13,6 +13,8 @@
    dodal.devices.aperture
    dodal.devices.aperturescatterguard
    dodal.devices.apple2_undulator
+   dodal.devices.areadetector
+   dodal.devices.attenuator
    dodal.devices.b07
    dodal.devices.b07_1
    dodal.devices.b16
@@ -42,14 +44,19 @@
    dodal.devices.i09
    dodal.devices.i09_1
    dodal.devices.i10
+   dodal.devices.i11
    dodal.devices.i13_1
+   dodal.devices.i15
+   dodal.devices.i18
    dodal.devices.i19
    dodal.devices.i20_1
    dodal.devices.i21
+   dodal.devices.i22
    dodal.devices.i24
    dodal.devices.ipin
    dodal.devices.linkam3
    dodal.devices.motors
+   dodal.devices.mx_phase1
    dodal.devices.oav
    dodal.devices.p45
    dodal.devices.p60
@@ -75,6 +82,7 @@
    dodal.devices.watsonmarlow323_pump
    dodal.devices.webcam
    dodal.devices.xbpm_feedback
+   dodal.devices.xspress3
    dodal.devices.zebra
    dodal.devices.zocalo
 

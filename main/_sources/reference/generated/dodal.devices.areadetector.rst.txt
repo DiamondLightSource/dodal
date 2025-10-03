@@ -9,9 +9,7 @@ dodal.devices.areadetector
    :toctree:
    :recursive:
 
-   dodal.devices.areadetector.adaravis
-   dodal.devices.areadetector.adsim
-   dodal.devices.areadetector.adutils
+   dodal.devices.areadetector.plugins
 
 
 

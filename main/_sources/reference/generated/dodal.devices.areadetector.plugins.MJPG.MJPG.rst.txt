@@ -1,0 +1,46 @@
+dodal.devices.areadetector.plugins.MJPG.MJPG
+============================================
+
+.. currentmodule:: dodal.devices.areadetector.plugins.MJPG
+
+.. autoclass:: MJPG
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      ~MJPG.post_processing
+      
+      
+      
+      
+      
+      
+      ~MJPG.trigger
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

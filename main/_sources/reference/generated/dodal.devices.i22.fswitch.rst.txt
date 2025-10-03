@@ -1,0 +1,36 @@
+dodal.devices.i22.fswitch
+=========================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices.i22
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~fswitch.FSwitch
+
+
+
+
+.. automodule:: dodal.devices.i22.fswitch
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

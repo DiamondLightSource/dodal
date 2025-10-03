@@ -1,0 +1,102 @@
+dodal.devices.attenuator.filter\_selections.I02\_1FilterOneSelections
+=====================================================================
+
+.. currentmodule:: dodal.devices.attenuator.filter_selections
+
+.. autoclass:: I02_1FilterOneSelections
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~I02_1FilterOneSelections.EMPTY
+      
+      
+      ~I02_1FilterOneSelections.AL8
+      
+      
+      ~I02_1FilterOneSelections.AL15
+      
+      
+      ~I02_1FilterOneSelections.AL25
+      
+      
+      ~I02_1FilterOneSelections.AL1000
+      
+      
+      ~I02_1FilterOneSelections.TI50
+      
+      
+      ~I02_1FilterOneSelections.TI100
+      
+      
+      ~I02_1FilterOneSelections.TI200
+      
+      
+      ~I02_1FilterOneSelections.TI400
+      
+      
+      ~I02_1FilterOneSelections.TWO_TIMES_TI500
+      
+   
+   

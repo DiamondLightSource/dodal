@@ -1,0 +1,39 @@
+dodal.devices.i15.dcm
+=====================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices.i15
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~dcm.DCM
+   ~dcm.DualCrystalMonoSimple
+   ~dcm.ThetaRollYZCrystal
+   ~dcm.ThetaYCrystal
+
+
+
+
+.. automodule:: dodal.devices.i15.dcm
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

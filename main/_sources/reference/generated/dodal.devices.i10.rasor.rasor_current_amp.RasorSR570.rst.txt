@@ -1,0 +1,31 @@
+dodal.devices.i10.rasor.rasor\_current\_amp.RasorSR570
+======================================================
+
+.. currentmodule:: dodal.devices.i10.rasor.rasor_current_amp
+
+.. autoclass:: RasorSR570
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+   
+   

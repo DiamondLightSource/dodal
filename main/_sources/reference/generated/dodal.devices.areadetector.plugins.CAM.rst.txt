@@ -1,0 +1,37 @@
+dodal.devices.areadetector.plugins.CAM
+======================================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices.areadetector.plugins
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~CAM.Cam
+   ~CAM.ColorMode
+
+
+
+
+.. automodule:: dodal.devices.areadetector.plugins.CAM
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
