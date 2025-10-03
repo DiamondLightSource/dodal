@@ -1,5 +1,10 @@
 import uuid
-from typing import Any
+from collections.abc import Awaitable, Callable
+from functools import wraps
+from typing import Any, ParamSpec, TypeVar
+
+from bluesky.protocols import Movable, Status
+from ophyd_async.core import AsyncStatus, completed_status
 
 from dodal.common.types import Group
 
@@ -38,3 +43,27 @@ def inject(name: str) -> Any:  # type: ignore
     """
 
     return name
+
+
+T = TypeVar("T", bound=Movable)
+P = ParamSpec("P")
+
+
+def locked(
+    movable: T,
+    unlocked: Callable[[], Awaitable[bool]],
+    locked_exception: Exception | None = None,
+) -> T:
+    wrapped = movable.set
+
+    @wraps(wrapped)
+    @AsyncStatus.wrap
+    async def wrapper(*args: P.args, **kwargs: P.kwargs) -> Status:
+        if await unlocked():
+            return wrapped(*args, **kwargs)  # type: ignore
+        if locked_exception:
+            raise locked_exception
+        return completed_status()
+
+    movable.set = wrapper  # type: ignore
+    return movable
