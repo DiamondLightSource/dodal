@@ -11,12 +11,13 @@ from daq_config_server.client import ConfigServer
 from dodal.common.beamlines.beamline_utils import device_factory
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.devices.current_amplifiers import CurrentAmpDet
-from dodal.devices.i10.diagnostics import I10Diagnostic, I10Diagnostic5ADet
-from dodal.devices.i10.i10_apple2 import (
-    I10Id,
+from dodal.devices.i10 import (
+    I10Diagnostic,
+    I10Diagnostic5ADet,
+    I10Slits,
+    I10SlitsDrainCurrent,
+    PiezoMirror,
 )
-from dodal.devices.i10.i10_setting_data import I10Grating
-from dodal.devices.i10.mirrors import PiezoMirror
 from dodal.devices.i10.rasor.rasor_current_amp import RasorFemto, RasorSR570
 from dodal.devices.i10.rasor.rasor_motors import (
     DetSlits,
@@ -24,9 +25,7 @@ from dodal.devices.i10.rasor.rasor_motors import (
     PaStage,
 )
 from dodal.devices.i10.rasor.rasor_scaler_cards import RasorScalerCard1
-from dodal.devices.i10.slits import I10Slits, I10SlitsDrainCurrent
 from dodal.devices.motors import XYStage, XYZStage
-from dodal.devices.pgm import PGM
 from dodal.devices.temperture_controller import (
     Lakeshore340,
 )
@@ -89,16 +88,6 @@ def idu() -> I10Id:
 
 
 """Mirrors"""
-
-
-@device_factory()
-def first_mirror() -> PiezoMirror:
-    return PiezoMirror(prefix=f"{PREFIX.beamline_prefix}-OP-COL-01:")
-
-
-@device_factory()
-def switching_mirror() -> PiezoMirror:
-    return PiezoMirror(prefix=f"{PREFIX.beamline_prefix}-OP-SWTCH-01:")
 
 
 @device_factory()

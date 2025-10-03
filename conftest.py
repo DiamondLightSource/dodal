@@ -37,7 +37,7 @@ mock_paths = [
 ]
 mock_attributes_table = {
     "i03": mock_paths,
-    "i10": mock_paths,
+    "i10_optics": mock_paths,
     "i04": mock_paths,
     "s04": mock_paths,
     "i19_1": mock_paths,
