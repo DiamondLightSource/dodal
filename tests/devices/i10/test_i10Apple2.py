@@ -17,15 +17,6 @@ from ophyd_async.testing import (
     get_mock_put,
     set_mock_value,
 )
-from tests.devices.i10.test_data import (
-    EXPECTED_ID_ENERGY_2_GAP_CALIBRATIONS_IDD_PKL,
-    EXPECTED_ID_ENERGY_2_GAP_CALIBRATIONS_IDU_PKL,
-    EXPECTED_ID_ENERGY_2_PHASE_CALIBRATIONS_IDD_PKL,
-    EXPECTED_ID_ENERGY_2_PHASE_CALIBRATIONS_IDU_PKL,
-    ID_ENERGY_2_GAP_CALIBRATIONS_CSV,
-    ID_ENERGY_2_PHASE_CALIBRATIONS_CSV,
-    LOOKUP_TABLE_PATH,
-)
 
 from dodal.devices.apple2_undulator import (
     Pol,
@@ -45,6 +36,15 @@ from dodal.devices.i10.i10_apple2 import (
 from dodal.devices.i10.i10_setting_data import I10Grating
 from dodal.devices.pgm import PGM
 from dodal.testing import patch_motor
+from tests.devices.i10.test_data import (
+    EXPECTED_ID_ENERGY_2_GAP_CALIBRATIONS_IDD_PKL,
+    EXPECTED_ID_ENERGY_2_GAP_CALIBRATIONS_IDU_PKL,
+    EXPECTED_ID_ENERGY_2_PHASE_CALIBRATIONS_IDD_PKL,
+    EXPECTED_ID_ENERGY_2_PHASE_CALIBRATIONS_IDU_PKL,
+    ID_ENERGY_2_GAP_CALIBRATIONS_CSV,
+    ID_ENERGY_2_PHASE_CALIBRATIONS_CSV,
+    LOOKUP_TABLE_PATH,
+)
 
 ID_ENERGY_2_GAP_CALIBRATIONS_FILE_CSV = os.path.split(ID_ENERGY_2_GAP_CALIBRATIONS_CSV)[
     1
