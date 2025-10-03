@@ -5,7 +5,7 @@ from typing import cast
 import pytest
 from bluesky.run_engine import RunEngine
 from event_model.documents import (
-    DocumentType,
+    Document,
     Event,
     EventDescriptor,
     RunStart,
@@ -26,7 +26,7 @@ def documents_from_expected_shape(
     RE: RunEngine,
     x_axis: SimMotor,
     y_axis: SimMotor,
-) -> dict[str, list[DocumentType]]:
+) -> dict[str, list[Document]]:
     shape: Sequence[int] = request.param
     motors = [x_axis, y_axis]
     # Does not support static, https://github.com/bluesky/scanspec/issues/154
@@ -35,7 +35,7 @@ def documents_from_expected_shape(
     for i in range(1, len(shape)):
         spec = spec * Line(motors[i], 0, 5, shape[i])
 
-    docs: dict[str, list[DocumentType]] = {}
+    docs: dict[str, list[Document]] = {}
     RE(
         spec_scan({det}, spec),  # type: ignore
         lambda name, doc: docs.setdefault(name, []).append(doc),
@@ -63,7 +63,7 @@ def length_from_shape(shape: tuple[int, ...]) -> int:
     indirect=["documents_from_expected_shape"],
 )
 def test_plan_produces_expected_start_document(
-    documents_from_expected_shape: dict[str, list[DocumentType]],
+    documents_from_expected_shape: dict[str, list[Document]],
     shape: tuple[int, ...],
     x_axis: SimMotor,
     y_axis: SimMotor,
@@ -93,7 +93,7 @@ def test_plan_produces_expected_start_document(
     indirect=["documents_from_expected_shape"],
 )
 def test_plan_produces_expected_stop_document(
-    documents_from_expected_shape: dict[str, list[DocumentType]], shape: tuple[int, ...]
+    documents_from_expected_shape: dict[str, list[Document]], shape: tuple[int, ...]
 ):
     docs = documents_from_expected_shape.get("stop")
     assert docs and len(docs) == 1
@@ -108,7 +108,7 @@ def test_plan_produces_expected_stop_document(
     indirect=["documents_from_expected_shape"],
 )
 def test_plan_produces_expected_descriptor(
-    documents_from_expected_shape: dict[str, list[DocumentType]],
+    documents_from_expected_shape: dict[str, list[Document]],
     det: StandardDetector,
     shape: tuple[int, ...],
 ):
@@ -126,7 +126,7 @@ def test_plan_produces_expected_descriptor(
     indirect=["documents_from_expected_shape"],
 )
 def test_plan_produces_expected_events(
-    documents_from_expected_shape: dict[str, list[DocumentType]],
+    documents_from_expected_shape: dict[str, list[Document]],
     shape: tuple[int, ...],
     det: StandardDetector,
     x_axis: SimMotor,
@@ -156,7 +156,7 @@ def test_plan_produces_expected_events(
     indirect=["documents_from_expected_shape"],
 )
 def test_plan_produces_expected_resources(
-    documents_from_expected_shape: dict[str, list[DocumentType]],
+    documents_from_expected_shape: dict[str, list[Document]],
     shape: tuple[int, ...],
     det: StandardDetector,
 ):
@@ -174,7 +174,7 @@ def test_plan_produces_expected_resources(
     indirect=["documents_from_expected_shape"],
 )
 def test_plan_produces_expected_datums(
-    documents_from_expected_shape: dict[str, list[DocumentType]],
+    documents_from_expected_shape: dict[str, list[Document]],
     shape: tuple[int, ...],
     det: StandardDetector,
 ):
