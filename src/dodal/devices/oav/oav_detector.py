@@ -44,7 +44,7 @@ class BaseZoomController(StandardReadable, Movable[str]):
 
 class NullZoomController(BaseZoomController):
     def __init__(self):
-        super.__init__()
+        super().__init__()
         self.level = soft_signal_rw(str, "1.0x")
         self.percentage = soft_signal_rw(float, 100)
 
