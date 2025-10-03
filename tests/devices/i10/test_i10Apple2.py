@@ -146,15 +146,15 @@ async def mock_id(mock_i10_energy_motor_lookup_idu: I10EnergyMotorLookup) -> I10
             prefix="BLWOW-MO-SERVC-01:",
             energy_motor_convertor=mock_i10_energy_motor_lookup_idu.get_motor_from_energy,
         )
-    set_mock_value(mock_id.gap.gate, UndulatorGateStatus.CLOSE)
-    set_mock_value(mock_id.phase.gate, UndulatorGateStatus.CLOSE)
+    set_mock_value(mock_id.motors.gap.gate, UndulatorGateStatus.CLOSE)
+    set_mock_value(mock_id.motors.phase.gate, UndulatorGateStatus.CLOSE)
     set_mock_value(mock_id.id_jaw_phase.gate, UndulatorGateStatus.CLOSE)
     set_mock_value(mock_id.id_jaw_phase.jaw_phase.velocity, 1)
-    set_mock_value(mock_id.gap.velocity, 1)
-    set_mock_value(mock_id.phase.btm_inner.velocity, 1)
-    set_mock_value(mock_id.phase.top_inner.velocity, 1)
-    set_mock_value(mock_id.phase.btm_outer.velocity, 1)
-    set_mock_value(mock_id.phase.top_outer.velocity, 1)
+    set_mock_value(mock_id.motors.gap.velocity, 1)
+    set_mock_value(mock_id.motors.phase.btm_inner.velocity, 1)
+    set_mock_value(mock_id.motors.phase.top_inner.velocity, 1)
+    set_mock_value(mock_id.motors.phase.btm_outer.velocity, 1)
+    set_mock_value(mock_id.motors.phase.top_outer.velocity, 1)
     return mock_id
 
 
@@ -162,15 +162,15 @@ async def mock_id(mock_i10_energy_motor_lookup_idu: I10EnergyMotorLookup) -> I10
 async def mock_id_pgm(mock_id: I10Apple2, mock_pgm: PGM) -> EnergySetter:
     async with init_devices(mock=True):
         mock_id_pgm = EnergySetter(id=mock_id, pgm=mock_pgm)
-    set_mock_value(mock_id_pgm.id.gap.velocity, 1)
-    set_mock_value(mock_id_pgm.id.phase.btm_inner.velocity, 1)
-    set_mock_value(mock_id_pgm.id.phase.top_inner.velocity, 1)
-    set_mock_value(mock_id_pgm.id.phase.btm_outer.velocity, 1)
-    set_mock_value(mock_id_pgm.id.phase.top_outer.velocity, 1)
+    set_mock_value(mock_id.motors.gap.velocity, 1)
+    set_mock_value(mock_id.motors.phase.btm_inner.velocity, 1)
+    set_mock_value(mock_id.motors.phase.top_inner.velocity, 1)
+    set_mock_value(mock_id.motors.phase.btm_outer.velocity, 1)
+    set_mock_value(mock_id.motors.phase.top_outer.velocity, 1)
     set_mock_value(mock_id_pgm.id.id_jaw_phase.jaw_phase.velocity, 1)
     set_mock_value(mock_id_pgm.pgm_ref().energy.velocity, 1)
 
-    set_mock_value(mock_id_pgm.id.gap.gate, UndulatorGateStatus.CLOSE)
+    set_mock_value(mock_id.motors.gap.gate, UndulatorGateStatus.CLOSE)
     set_mock_value(mock_id_pgm.id.id_jaw_phase.gate, UndulatorGateStatus.CLOSE)
 
     return mock_id_pgm
@@ -214,10 +214,10 @@ async def test_i10apple2_determine_pol(
     btm_outer_phase: float,
 ):
     assert await mock_id.polarisation_setpoint.get_value() == Pol.NONE
-    set_mock_value(mock_id.phase.top_inner.user_readback, top_inner_phase)
-    set_mock_value(mock_id.phase.top_outer.user_readback, top_outer_phase)
-    set_mock_value(mock_id.phase.btm_inner.user_readback, btm_inner_phase)
-    set_mock_value(mock_id.phase.btm_outer.user_readback, btm_outer_phase)
+    set_mock_value(mock_id.motors.phase.top_inner.user_readback, top_inner_phase)
+    set_mock_value(mock_id.motors.phase.top_outer.user_readback, top_outer_phase)
+    set_mock_value(mock_id.motors.phase.btm_inner.user_readback, btm_inner_phase)
+    set_mock_value(mock_id.motors.phase.btm_outer.user_readback, btm_outer_phase)
     if pol == Pol.NONE:
         with pytest.raises(ValueError):
             await mock_id.set(800)
@@ -227,7 +227,7 @@ async def test_i10apple2_determine_pol(
 
 
 async def test_fail_i10apple2_set_undefined_pol(mock_id: I10Apple2):
-    set_mock_value(mock_id.gap.user_readback, 101)
+    set_mock_value(mock_id.motors.gap.user_readback, 101)
     with pytest.raises(RuntimeError) as e:
         await mock_id.set(600)
     assert (
@@ -237,15 +237,15 @@ async def test_fail_i10apple2_set_undefined_pol(mock_id: I10Apple2):
 
 
 async def test_fail_i10apple2_set_id_not_ready(mock_id: I10Apple2):
-    set_mock_value(mock_id.gap.fault, 1)
+    set_mock_value(mock_id.motors.gap.fault, 1)
     with pytest.raises(RuntimeError) as e:
         await mock_id.set(600)
-    assert str(e.value) == mock_id.gap.name + " is in fault state"
-    set_mock_value(mock_id.gap.fault, 0)
-    set_mock_value(mock_id.gap.gate, UndulatorGateStatus.OPEN)
+    assert str(e.value) == mock_id.motors.gap.name + " is in fault state"
+    set_mock_value(mock_id.motors.gap.fault, 0)
+    set_mock_value(mock_id.motors.gap.gate, UndulatorGateStatus.OPEN)
     with pytest.raises(RuntimeError) as e:
         await mock_id.set(600)
-    assert str(e.value) == mock_id.gap.name + " is already in motion."
+    assert str(e.value) == mock_id.motors.gap.name + " is already in motion."
 
 
 async def test_i10apple2_RE_scan(mock_id_pgm: EnergySetter, RE: RunEngine):
@@ -337,23 +337,31 @@ async def test_i10apple2_pol_set(
     else:
         await mock_id_pol.set(pol)
 
-        top_inner = get_mock_put(mock_id_pol.id_ref().phase.top_inner.user_setpoint)
+        top_inner = get_mock_put(
+            mock_id_pol.id_ref().motors.phase.top_inner.user_setpoint
+        )
         top_inner.assert_called_once()
         assert float(top_inner.call_args[0][0]) == pytest.approx(expect_top_inner, 0.01)
 
-        top_outer = get_mock_put(mock_id_pol.id_ref().phase.top_outer.user_setpoint)
+        top_outer = get_mock_put(
+            mock_id_pol.id_ref().motors.phase.top_outer.user_setpoint
+        )
         top_outer.assert_called_once()
         assert float(top_outer.call_args[0][0]) == pytest.approx(expect_top_outer, 0.01)
 
-        btm_inner = get_mock_put(mock_id_pol.id_ref().phase.btm_inner.user_setpoint)
+        btm_inner = get_mock_put(
+            mock_id_pol.id_ref().motors.phase.btm_inner.user_setpoint
+        )
         btm_inner.assert_called_once()
         assert float(btm_inner.call_args[0][0]) == pytest.approx(expect_btm_inner, 0.01)
 
-        btm_outer = get_mock_put(mock_id_pol.id_ref().phase.btm_outer.user_setpoint)
+        btm_outer = get_mock_put(
+            mock_id_pol.id_ref().motors.phase.btm_outer.user_setpoint
+        )
         btm_outer.assert_called_once()
         assert float(btm_outer.call_args[0][0]) == pytest.approx(expect_btm_outer, 0.01)
 
-        gap = get_mock_put(mock_id_pol.id_ref().gap.user_setpoint)
+        gap = get_mock_put(mock_id_pol.id_ref().motors.gap.user_setpoint)
         gap.assert_called_once()
         assert float(gap.call_args[0][0]) == pytest.approx(expect_gap, 0.05)
 
@@ -379,10 +387,10 @@ async def test_i10apple2_pol_read_check_pol_from_hardware(
 ):
     mock_id_pol.id_ref()._set_energy_rbv(energy)
 
-    set_mock_value(mock_id_pol.id_ref().phase.top_inner.user_readback, top_inner)
-    set_mock_value(mock_id_pol.id_ref().phase.top_outer.user_readback, top_outer)
-    set_mock_value(mock_id_pol.id_ref().phase.btm_inner.user_readback, btm_inner)
-    set_mock_value(mock_id_pol.id_ref().phase.btm_outer.user_readback, btm_outer)
+    set_mock_value(mock_id_pol.id_ref().motors.phase.top_inner.user_readback, top_inner)
+    set_mock_value(mock_id_pol.id_ref().motors.phase.top_outer.user_readback, top_outer)
+    set_mock_value(mock_id_pol.id_ref().motors.phase.btm_inner.user_readback, btm_inner)
+    set_mock_value(mock_id_pol.id_ref().motors.phase.btm_outer.user_readback, btm_outer)
 
     assert (await mock_id_pol.read())["mock_id-polarisation"]["value"] == pol
 
@@ -404,10 +412,10 @@ async def test_i10apple2_pol_read_leave_lh3_unchanged_when_hardware_match(
 ):
     mock_id_pol.id_ref()._set_energy_rbv(energy)
     mock_id_pol.id_ref()._set_pol_setpoint(Pol("lh3"))
-    set_mock_value(mock_id_pol.id_ref().phase.top_inner.user_readback, top_inner)
-    set_mock_value(mock_id_pol.id_ref().phase.top_outer.user_readback, top_outer)
-    set_mock_value(mock_id_pol.id_ref().phase.btm_inner.user_readback, btm_inner)
-    set_mock_value(mock_id_pol.id_ref().phase.btm_outer.user_readback, btm_outer)
+    set_mock_value(mock_id_pol.id_ref().motors.phase.top_inner.user_readback, top_inner)
+    set_mock_value(mock_id_pol.id_ref().motors.phase.top_outer.user_readback, top_outer)
+    set_mock_value(mock_id_pol.id_ref().motors.phase.btm_inner.user_readback, btm_inner)
+    set_mock_value(mock_id_pol.id_ref().motors.phase.btm_outer.user_readback, btm_outer)
     assert (await mock_id_pol.read())["mock_id-polarisation"]["value"] == pol
 
 
@@ -430,17 +438,17 @@ async def test_linear_arbitrary_limit_fail(
     mock_linear_arbitrary_angle: LinearArbitraryAngle, poly: float
 ):
     set_mock_value(
-        mock_linear_arbitrary_angle.id_ref().phase.top_inner.user_readback,
+        mock_linear_arbitrary_angle.id_ref().motors.phase.top_inner.user_readback,
         16.4,
     )
     set_mock_value(
-        mock_linear_arbitrary_angle.id_ref().phase.top_outer.user_readback, 0
+        mock_linear_arbitrary_angle.id_ref().motors.phase.top_outer.user_readback, 0
     )
     set_mock_value(
-        mock_linear_arbitrary_angle.id_ref().phase.btm_inner.user_readback, 0
+        mock_linear_arbitrary_angle.id_ref().motors.phase.btm_inner.user_readback, 0
     )
     set_mock_value(
-        mock_linear_arbitrary_angle.id_ref().phase.btm_outer.user_readback, -16.4
+        mock_linear_arbitrary_angle.id_ref().motors.phase.btm_outer.user_readback, -16.4
     )
     mock_linear_arbitrary_angle.jaw_phase_from_angle = poly1d([poly])
     with pytest.raises(RuntimeError) as e:
@@ -474,17 +482,17 @@ async def test_linear_arbitrary_RE_scan(
         docs[name].append(doc)
 
     set_mock_value(
-        mock_linear_arbitrary_angle.id_ref().phase.top_inner.user_readback,
+        mock_linear_arbitrary_angle.id_ref().motors.phase.top_inner.user_readback,
         16.4,
     )
     set_mock_value(
-        mock_linear_arbitrary_angle.id_ref().phase.top_outer.user_readback, 0
+        mock_linear_arbitrary_angle.id_ref().motors.phase.top_outer.user_readback, 0
     )
     set_mock_value(
-        mock_linear_arbitrary_angle.id_ref().phase.btm_inner.user_readback, 0
+        mock_linear_arbitrary_angle.id_ref().motors.phase.btm_inner.user_readback, 0
     )
     set_mock_value(
-        mock_linear_arbitrary_angle.id_ref().phase.btm_outer.user_readback, -16.4
+        mock_linear_arbitrary_angle.id_ref().motors.phase.btm_outer.user_readback, -16.4
     )
     RE(
         scan(
@@ -498,10 +506,11 @@ async def test_linear_arbitrary_RE_scan(
     )
     assert_emitted(docs, start=1, descriptor=1, event=num_point, stop=1)
     set_mock_value(
-        mock_linear_arbitrary_angle.id_ref().gap.gate, UndulatorGateStatus.CLOSE
+        mock_linear_arbitrary_angle.id_ref().motors.gap.gate, UndulatorGateStatus.CLOSE
     )
     set_mock_value(
-        mock_linear_arbitrary_angle.id_ref().phase.gate, UndulatorGateStatus.CLOSE
+        mock_linear_arbitrary_angle.id_ref().motors.phase.gate,
+        UndulatorGateStatus.CLOSE,
     )
     jaw_phase = get_mock_put(
         mock_linear_arbitrary_angle.id_ref().id_jaw_phase.jaw_phase.user_setpoint
