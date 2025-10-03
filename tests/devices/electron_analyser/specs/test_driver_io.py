@@ -52,21 +52,19 @@ async def test_analyser_sets_region_correctly(
 ) -> None:
     RE(bps.mv(sim_driver, region), wait=True)
 
+    get_mock_put(sim_driver.region_name).assert_called_once_with(region.name, wait=True)
     get_mock_put(sim_driver.energy_mode).assert_called_once_with(
         region.energy_mode, wait=True
     )
-    excitation_energy = await sim_driver.energy_source.energy.get_value()
-    ke_region = region.switch_energy_mode(EnergyMode.KINETIC, excitation_energy)
-    get_mock_put(sim_driver.region_name).assert_called_once_with(
-        ke_region.name, wait=True
-    )
     get_mock_put(sim_driver.acquisition_mode).assert_called_once_with(
-        ke_region.acquisition_mode, wait=True
+        region.acquisition_mode, wait=True
     )
     get_mock_put(sim_driver.lens_mode).assert_called_once_with(
-        ke_region.lens_mode, wait=True
+        region.lens_mode, wait=True
     )
 
+    excitation_energy = await sim_driver.energy_source.energy.get_value()
+    ke_region = region.switch_energy_mode(EnergyMode.KINETIC, excitation_energy)
     get_mock_put(sim_driver.low_energy).assert_called_once_with(
         ke_region.low_energy, wait=True
     )
@@ -81,28 +79,28 @@ async def test_analyser_sets_region_correctly(
         ke_region.high_energy, wait=True
     )
     get_mock_put(sim_driver.pass_energy).assert_called_once_with(
-        ke_region.pass_energy, wait=True
+        region.pass_energy, wait=True
     )
-    get_mock_put(sim_driver.slices).assert_called_once_with(ke_region.slices, wait=True)
+    get_mock_put(sim_driver.slices).assert_called_once_with(region.slices, wait=True)
     get_mock_put(sim_driver.acquire_time).assert_called_once_with(
-        ke_region.acquire_time, wait=True
+        region.acquire_time, wait=True
     )
     get_mock_put(sim_driver.iterations).assert_called_once_with(
-        ke_region.iterations, wait=True
+        region.iterations, wait=True
     )
 
-    if ke_region.acquisition_mode == AcquisitionMode.FIXED_TRANSMISSION:
+    if region.acquisition_mode == AcquisitionMode.FIXED_TRANSMISSION:
         get_mock_put(sim_driver.energy_step).assert_called_once_with(
-            ke_region.energy_step, wait=True
+            region.energy_step, wait=True
         )
     else:
         get_mock_put(sim_driver.energy_step).assert_not_called()
 
     get_mock_put(sim_driver.psu_mode).assert_called_once_with(
-        ke_region.psu_mode, wait=True
+        region.psu_mode, wait=True
     )
     get_mock_put(sim_driver.snapshot_values).assert_called_once_with(
-        ke_region.values, wait=True
+        region.values, wait=True
     )
 
 
@@ -118,29 +116,28 @@ async def test_analyser_sets_region_and_read_configuration_is_correct(
 
     excitation_energy = await sim_driver.energy_source.energy.get_value()
     ke_region = region.switch_energy_mode(EnergyMode.KINETIC, excitation_energy)
-
     await assert_configuration(
         sim_driver,
         {
+            f"{prefix}region_name": partial_reading(region.name),
             f"{prefix}energy_mode": partial_reading(region.energy_mode),
-            f"{prefix}region_name": partial_reading(ke_region.name),
-            f"{prefix}acquisition_mode": partial_reading(ke_region.acquisition_mode),
-            f"{prefix}lens_mode": partial_reading(ke_region.lens_mode),
+            f"{prefix}acquisition_mode": partial_reading(region.acquisition_mode),
+            f"{prefix}lens_mode": partial_reading(region.lens_mode),
             f"{prefix}low_energy": partial_reading(ke_region.low_energy),
             f"{prefix}centre_energy": partial_reading(ANY),
             f"{prefix}high_energy": partial_reading(ke_region.high_energy),
             f"{prefix}energy_step": partial_reading(ANY),
-            f"{prefix}pass_energy": partial_reading(ke_region.pass_energy),
-            f"{prefix}slices": partial_reading(ke_region.slices),
-            f"{prefix}acquire_time": partial_reading(ke_region.acquire_time),
-            f"{prefix}iterations": partial_reading(ke_region.iterations),
+            f"{prefix}pass_energy": partial_reading(region.pass_energy),
+            f"{prefix}slices": partial_reading(region.slices),
+            f"{prefix}acquire_time": partial_reading(region.acquire_time),
+            f"{prefix}iterations": partial_reading(region.iterations),
             f"{prefix}total_steps": partial_reading(ANY),
             f"{prefix}total_time": partial_reading(ANY),
             f"{prefix}energy_axis": partial_reading(ANY),
             f"{prefix}binding_energy_axis": partial_reading(ANY),
             f"{prefix}angle_axis": partial_reading(ANY),
-            f"{prefix}snapshot_values": partial_reading(ke_region.values),
-            f"{prefix}psu_mode": partial_reading(ke_region.psu_mode),
+            f"{prefix}snapshot_values": partial_reading(region.values),
+            f"{prefix}psu_mode": partial_reading(region.psu_mode),
         }
         | await sim_driver.energy_source.read_configuration(),
     )
