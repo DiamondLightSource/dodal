@@ -33,8 +33,13 @@ async def test_jungfrau_with_temporary_writer(
     set_mock_value(jungfrau._writer.writer_ready, 1)
     set_mock_value(jungfrau._writer.frame_counter, 10)
     jungfrau._writer._path_info = MagicMock()
-    await jungfrau.prepare(TriggerInfo(livetime=1e-3, exposures_per_event=5))
+    trigger_info = TriggerInfo(livetime=1e-3, exposures_per_event=5)
+    await jungfrau.prepare(trigger_info)
     assert await jungfrau._writer.frame_counter.get_value() == 0
+    assert (
+        await jungfrau._writer.expected_frames.get_value()
+        == trigger_info.total_number_of_exposures
+    )
     await jungfrau.kickoff()
     status = jungfrau.complete()
 
