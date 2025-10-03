@@ -1,0 +1,40 @@
+dodal.devices.i09.DCM
+=====================
+
+.. currentmodule:: dodal.devices.i09
+
+.. autoclass:: DCM
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

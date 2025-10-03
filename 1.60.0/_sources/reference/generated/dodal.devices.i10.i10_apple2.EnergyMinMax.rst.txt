@@ -1,0 +1,61 @@
+dodal.devices.i10.i10\_apple2.EnergyMinMax
+==========================================
+
+.. currentmodule:: dodal.devices.i10.i10_apple2
+
+.. autoclass:: EnergyMinMax
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      ~EnergyMinMax.model_config
+      
+      
+      
+      
+      
+      ~EnergyMinMax.Minimum
+      
+      
+      ~EnergyMinMax.Maximum
+      
+   
+   

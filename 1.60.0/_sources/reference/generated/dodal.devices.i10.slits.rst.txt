@@ -1,0 +1,40 @@
+dodal.devices.i10.slits
+=======================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices.i10
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~slits.BladeDrainCurrents
+   ~slits.I10PrimarySlits
+   ~slits.I10Slits
+   ~slits.I10SlitsBlades
+   ~slits.I10SlitsDrainCurrent
+
+
+
+
+.. automodule:: dodal.devices.i10.slits
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

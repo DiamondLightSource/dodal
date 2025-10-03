@@ -1,0 +1,81 @@
+dodal.devices.i10.diagnostics.InStateTable
+==========================================
+
+.. currentmodule:: dodal.devices.i10.diagnostics
+
+.. autoclass:: InStateTable
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~InStateTable.MOVE_IN
+      
+      
+      ~InStateTable.MOVE_OUT
+      
+      
+      ~InStateTable.RESET
+      
+   
+   
