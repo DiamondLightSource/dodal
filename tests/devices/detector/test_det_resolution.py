@@ -4,13 +4,13 @@ from unittest.mock import MagicMock, PropertyMock, patch
 
 import pytest
 from numpy import isclose
-from tests.devices.detector.test_data import (
-    TEST_DET_DIST_CONVERTER_LUT,
-)
 
 from dodal.devices.detector import DetectorParams
 from dodal.devices.detector.det_resolution import (
     resolution,
+)
+from tests.devices.detector.test_data import (
+    TEST_DET_DIST_CONVERTER_LUT,
 )
 
 
