@@ -42,7 +42,7 @@ async def mock_id_gap(prefix: str = "BLXX-EA-DET-007:") -> UndulatorGap:
     set_mock_value(mock_id_gap.gate, UndulatorGateStatus.CLOSE)
     set_mock_value(mock_id_gap.velocity, 1)
     set_mock_value(mock_id_gap.user_readback, 1)
-    set_mock_value(mock_id_gap.user_setpoint, 1)
+    set_mock_value(mock_id_gap.user_setpoint, "1")
     set_mock_value(mock_id_gap.high_limit_travel, 210)
     set_mock_value(mock_id_gap.low_limit_travel, 20)
     set_mock_value(mock_id_gap.max_velocity, 20)
@@ -221,7 +221,7 @@ async def test_gap_prepare_success(mock_id_gap: UndulatorGap):
     fly_info = FlyMotorInfo(start_position=25, end_position=35, time_for_move=1)
     await mock_id_gap.prepare(fly_info)
     get_mock_put(mock_id_gap.user_setpoint).assert_awaited_once_with(
-        fly_info.ramp_up_start_pos(0.5), wait=True
+        str(fly_info.ramp_up_start_pos(0.5)), wait=True
     )
 
     assert await mock_id_gap.velocity.get_value() == 10
@@ -334,16 +334,16 @@ async def test_phase_success_set(mock_phaseAxes: UndulatorPhaseAxes, RE: RunEngi
     RE(bps.abs_set(mock_phaseAxes, set_value, wait=True))
     get_mock_put(mock_phaseAxes.set_move).assert_called_once_with(1, wait=True)
     get_mock_put(mock_phaseAxes.top_inner.user_setpoint).assert_called_once_with(
-        set_value.top_inner, wait=True
+        str(set_value.top_inner), wait=True
     )
     get_mock_put(mock_phaseAxes.top_outer.user_setpoint).assert_called_once_with(
-        set_value.top_outer, wait=True
+        str(set_value.top_outer), wait=True
     )
     get_mock_put(mock_phaseAxes.btm_inner.user_setpoint).assert_called_once_with(
-        set_value.btm_inner, wait=True
+        str(set_value.btm_inner), wait=True
     )
     get_mock_put(mock_phaseAxes.btm_outer.user_setpoint).assert_called_once_with(
-        set_value.btm_outer, wait=True
+        str(set_value.btm_outer), wait=True
     )
 
     await assert_reading(

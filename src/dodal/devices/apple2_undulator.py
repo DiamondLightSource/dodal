@@ -213,6 +213,7 @@ class UndulatorGap(GapSafeUndulatorMotor):
 
         self.max_velocity = epics_signal_r(float, prefix + "BLGSETVEL.HOPR")
         self.min_velocity = epics_signal_r(float, prefix + "BLGSETVEL.LOPR")
+        self.user_setpoint = epics_signal_rw(str, prefix + "BLGSET")
         """ Clear the motor config_signal as we need new PV for velocity."""
         self._describe_config_funcs = ()
         self._read_config_funcs = ()
@@ -242,7 +243,7 @@ class UndulatorGap(GapSafeUndulatorMotor):
         await super().prepare(value)
 
     async def _set_demand_positions(self, value: float) -> None:
-        await self.user_setpoint.set(value)
+        await self.user_setpoint.set(str(value))
 
     async def get_timeout(self) -> float:
         return await estimate_motor_timeout(
@@ -271,6 +272,7 @@ class UndulatorPhaseMotor(MotorWithoutStop):
 
         motor_pv = f"{prefix}MTR"
         super().__init__(prefix=motor_pv, name=name)
+        self.user_setpoint = epics_signal_rw(str, prefix + "SET")
         self.user_setpoint_readback = epics_signal_r(float, prefix + "DMD")
 
 
@@ -306,10 +308,10 @@ class UndulatorPhaseAxes(SafeUndulatorMover[Apple2PhasesVal]):
 
     async def _set_demand_positions(self, value: Apple2PhasesVal) -> None:
         await asyncio.gather(
-            self.top_outer.user_setpoint.set(value=value.top_outer),
-            self.top_inner.user_setpoint.set(value=value.top_inner),
-            self.btm_inner.user_setpoint.set(value=value.btm_inner),
-            self.btm_outer.user_setpoint.set(value=value.btm_outer),
+            self.top_outer.user_setpoint.set(value=str(value.top_outer)),
+            self.top_inner.user_setpoint.set(value=str(value.top_inner)),
+            self.btm_inner.user_setpoint.set(value=str(value.btm_inner)),
+            self.btm_outer.user_setpoint.set(value=str(value.btm_outer)),
         )
 
     async def get_timeout(self) -> float:
@@ -356,7 +358,7 @@ class UndulatorJawPhase(SafeUndulatorMover[float]):
         super().__init__(self.set_move, prefix, name)
 
     async def _set_demand_positions(self, value: float) -> None:
-        await self.jaw_phase.user_setpoint.set(value=value)
+        await self.jaw_phase.user_setpoint.set(value=str(value))
 
     async def get_timeout(self) -> float:
         """
@@ -540,11 +542,11 @@ class Apple2(abc.ABC, StandardReadable, Movable):
         # Only need to check gap as the phase motors share both fault and gate with gap.
         await self.gap.raise_if_cannot_move()
         await asyncio.gather(
-            self.phase.top_outer.user_setpoint.set(value=value.top_outer),
-            self.phase.top_inner.user_setpoint.set(value=value.top_inner),
-            self.phase.btm_inner.user_setpoint.set(value=value.btm_inner),
-            self.phase.btm_outer.user_setpoint.set(value=value.btm_outer),
-            self.gap.user_setpoint.set(value=value.gap),
+            self.phase.top_outer.user_setpoint.set(value=str(value.top_outer)),
+            self.phase.top_inner.user_setpoint.set(value=str(value.top_inner)),
+            self.phase.btm_inner.user_setpoint.set(value=str(value.btm_inner)),
+            self.phase.btm_outer.user_setpoint.set(value=str(value.btm_outer)),
+            self.gap.user_setpoint.set(value=str(value.gap)),
         )
         timeout = np.max(
             await asyncio.gather(self.gap.get_timeout(), self.phase.get_timeout())
@@ -615,7 +617,9 @@ class Apple2(abc.ABC, StandardReadable, Movable):
             and isclose(top_inner, 0.0, abs_tol=ROW_PHASE_MOTOR_TOLERANCE)
             and isclose(btm_outer, 0.0, abs_tol=ROW_PHASE_MOTOR_TOLERANCE)
         ):
-            LOGGER.info("Determined polarisation: NC (Negative Circular).")
+            LOGGER.info(
+                "Determined polarisation: NC (Negative Circulassert_awaited_withar)."
+            )
             return Pol.NC, top_outer
         if (
             isclose(top_outer, -btm_inner, abs_tol=ROW_PHASE_MOTOR_TOLERANCE)

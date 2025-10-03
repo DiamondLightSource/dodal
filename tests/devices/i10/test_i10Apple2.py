@@ -518,7 +518,9 @@ async def test_linear_arbitrary_RE_scan(
             if temp_angle > mock_linear_arbitrary_angle.angle_threshold_deg
             else temp_angle + 180.0
         )  # convert angle to jawphase.
-        assert jaw_phase.call_args_list[cnt] == mock.call(poly(alpha_real), wait=True)
+        assert jaw_phase.call_args_list[cnt] == mock.call(
+            str(poly(alpha_real)), wait=True
+        )
 
 
 @pytest.mark.parametrize(
