@@ -221,11 +221,6 @@ class FastGridScanCommon(
         # once https://github.com/DiamondLightSource/mx-bluesky/issues/1203 is done
         self.scan_invalid = self._create_scan_invalid_signal(prefix)
 
-        self.x_scan_valid = epics_signal_r(float, f"{prefix}X_SCAN_VALID")
-        self.y_scan_valid = epics_signal_r(float, f"{prefix}Y_SCAN_VALID")
-        self.z_scan_valid = epics_signal_r(float, f"{prefix}Z_SCAN_VALID")
-        self.scan_invalid = epics_signal_r(float, f"{prefix}SCAN_INVALID")
-
         self.run_cmd = epics_signal_x(f"{prefix}RUN.PROC")
         self.stop_cmd = epics_signal_x(f"{prefix}STOP.PROC")
         self.status = epics_signal_r(int, f"{prefix}SCAN_STATUS")
@@ -242,7 +237,7 @@ class FastGridScanCommon(
         self.COMPLETE_STATUS: float = 60.0
         self.VALIDITY_CHECK_TIMEOUT = 0.5
 
-        self.movable_params: dict[str, Signal] = {
+        self._movable_params: dict[str, Signal] = {
             "x_steps": self.x_steps,
             "y_steps": self.y_steps,
             "x_step_size_mm": self.x_step_size,
@@ -300,35 +295,25 @@ class FastGridScanCommon(
 
         LOGGER.info("Applying gridscan parameters...")
         # Create arguments for bps.mv
-        for key, signal in self.movable_params.items():
+        for key, signal in self._movable_params.items():
             param_value = value.__dict__[key]
             set_statuses.append(await set_and_wait_for_value(signal, param_value))  # type: ignore
 
         # Counter should always start at 0
         set_statuses.append(await set_and_wait_for_value(self.position_counter, 0))
 
-        LOGGER.info("Gridscan parameters applied, waiting for readbacks to update...")
+        LOGGER.info("Gridscan parameters applied, waiting for sets to complete...")
 
-        # wait for parameter readbacks to update
+        # wait for parameter sets to complete
         await asyncio.gather(*set_statuses)
 
-        LOGGER.info("Readbacks confirmed, waiting for validity checks to pass...")
+        LOGGER.info("Sets confirmed, waiting for validity checks to pass...")
         # XXX Can we use x/y/z scan valid to distinguish between SampleException/pin invalid
         # and other non-sample-related errors?
-        check_tasks = []
-        for signal, expected_value in {
-            self.x_scan_valid: 1,
-            self.y_scan_valid: 1,
-            self.z_scan_valid: 1,
-            self.scan_invalid: 0,
-        }.items():
-            check_tasks.append(
-                wait_for_value(
-                    signal, expected_value, timeout=self.VALIDITY_CHECK_TIMEOUT
-                )
-            )
+        await wait_for_value(
+            self.scan_invalid, 0.0, timeout=self.VALIDITY_CHECK_TIMEOUT
+        )
 
-        await asyncio.gather(*check_tasks)
         LOGGER.info("Gridscan validity confirmed, gridscan is now prepared.")
 
 
@@ -356,10 +341,10 @@ class FastGridScanThreeD(FastGridScanCommon[ParamType]):
 
         super().__init__(full_prefix, prefix, name)
 
-        self.movable_params["z_step_size_mm"] = self.z_step_size
-        self.movable_params["z2_start_mm"] = self.z2_start
-        self.movable_params["y2_start_mm"] = self.y2_start
-        self.movable_params["z_steps"] = self.z_steps
+        self._movable_params["z_step_size_mm"] = self.z_step_size
+        self._movable_params["z2_start_mm"] = self.z2_start
+        self._movable_params["y2_start_mm"] = self.y2_start
+        self._movable_params["z_steps"] = self.z_steps
 
     def _create_expected_images_signal(self):
         return derived_signal_r(
@@ -376,7 +361,35 @@ class FastGridScanThreeD(FastGridScanCommon[ParamType]):
         return first_grid + second_grid
 
     def _create_scan_invalid_signal(self, prefix: str) -> SignalR[float]:
-        return epics_signal_r(float, f"{prefix}SCAN_INVALID")
+        self.x_scan_valid = epics_signal_r(float, f"{prefix}X_SCAN_VALID")
+        self.y_scan_valid = epics_signal_r(float, f"{prefix}Y_SCAN_VALID")
+        self.z_scan_valid = epics_signal_r(float, f"{prefix}Z_SCAN_VALID")
+        self.device_scan_invalid = epics_signal_r(float, f"{prefix}SCAN_INVALID")
+
+        def compute_derived_value(
+            x_scan_valid: float,
+            y_scan_valid: float,
+            z_scan_valid: float,
+            device_scan_invalid: float,
+        ) -> float:
+            return (
+                1.0
+                if not (
+                    x_scan_valid
+                    and y_scan_valid
+                    and z_scan_valid
+                    and not device_scan_invalid
+                )
+                else 0.0
+            )
+
+        return derived_signal_r(
+            compute_derived_value,
+            x_scan_valid=self.x_scan_valid,
+            y_scan_valid=self.y_scan_valid,
+            z_scan_valid=self.z_scan_valid,
+            device_scan_invalid=self.device_scan_invalid,
+        )
 
     def _create_motion_program(self, motion_controller_prefix: str):
         return MotionProgram(motion_controller_prefix)
@@ -396,7 +409,7 @@ class ZebraFastGridScanThreeD(FastGridScanThreeD[ZebraGridScanParamsThreeD]):
         self.dwell_time_ms = epics_signal_rw_rbv(float, f"{full_prefix}DWELL_TIME")
         self.x_counter = epics_signal_r(int, f"{full_prefix}X_COUNTER")
         super().__init__(prefix, infix, name)
-        self.movable_params["dwell_time_ms"] = self.dwell_time_ms
+        self._movable_params["dwell_time_ms"] = self.dwell_time_ms
 
     def _create_position_counter(self, prefix: str):
         return epics_signal_rw(
@@ -427,7 +440,7 @@ class PandAFastGridScan(FastGridScanThreeD[PandAGridScanParams]):
         )
         super().__init__(prefix, infix, name)
 
-        self.movable_params["run_up_distance_mm"] = self.run_up_distance_mm
+        self._movable_params["run_up_distance_mm"] = self.run_up_distance_mm
 
     def _create_position_counter(self, prefix: str):
         return epics_signal_rw(int, f"{prefix}Y_COUNTER")

@@ -22,7 +22,10 @@ from dodal.devices.fast_grid_scan import (
     ZebraGridScanParamsThreeD,
     set_fast_grid_scan_params,
 )
-from dodal.devices.i02_1.fast_grid_scan import ZebraFastGridScanTwoD
+from dodal.devices.i02_1.fast_grid_scan import (
+    ZebraFastGridScanTwoD,
+    ZebraGridScanParamsTwoD,
+)
 from dodal.devices.smargon import Smargon
 from dodal.testing import patch_all_motors
 
@@ -42,7 +45,25 @@ async def zebra_fast_grid_scan():
     set_mock_value(zebra_fast_grid_scan.x_scan_valid, 1)
     set_mock_value(zebra_fast_grid_scan.y_scan_valid, 1)
     set_mock_value(zebra_fast_grid_scan.z_scan_valid, 1)
+    set_mock_value(zebra_fast_grid_scan.device_scan_invalid, False)
     return zebra_fast_grid_scan
+
+
+@pytest.fixture
+def three_axis_validity(grid_scan_device) -> dict:
+    return {
+        grid_scan_device.x_scan_valid: 1,
+        grid_scan_device.y_scan_valid: 1,
+        grid_scan_device.z_scan_valid: 1,
+        grid_scan_device.device_scan_invalid: 0,
+    }
+
+
+@pytest.fixture
+def simple_validity(grid_scan_device) -> dict:
+    return {
+        grid_scan_device.device_scan_invalid: 0,
+    }
 
 
 @pytest.fixture
@@ -53,6 +74,7 @@ async def panda_fast_grid_scan():
     set_mock_value(panda_fast_grid_scan.x_scan_valid, 1)
     set_mock_value(panda_fast_grid_scan.y_scan_valid, 1)
     set_mock_value(panda_fast_grid_scan.z_scan_valid, 1)
+    set_mock_value(panda_fast_grid_scan.device_scan_invalid, 0.0)
     return panda_fast_grid_scan
 
 
@@ -83,7 +105,6 @@ def grid_scan(request: pytest.FixtureRequest) -> FastGridScanCommon:
 async def test_given_settings_valid_when_kickoff_then_run_started(
     grid_scan: FastGridScanCommon,
 ):
-    set_mock_value(grid_scan.scan_invalid, False)
     set_mock_value(grid_scan.position_counter, 0)
     set_mock_value(grid_scan.status, 1)
 
@@ -245,6 +266,20 @@ def zebra_grid_scan_params():
 
 
 @pytest.fixture
+def zebra_grid_scan_params_2d():
+    yield ZebraGridScanParamsTwoD(
+        transmission_fraction=0.01,
+        x_steps=10,
+        y_steps=15,
+        x_step_size_mm=0.3,
+        y_step_size_mm=0.2,
+        x_start_mm=0,
+        y1_start_mm=1,
+        z1_start_mm=3,
+    )
+
+
+@pytest.fixture
 def panda_grid_scan_params():
     yield PandAGridScanParams(
         transmission_fraction=0.01,
@@ -269,15 +304,38 @@ def common_grid_scan_params(request: pytest.FixtureRequest):
 
 @pytest.fixture(
     params=[
-        ["zebra_fast_grid_scan", "zebra_grid_scan_params"],
-        ["panda_fast_grid_scan", "panda_grid_scan_params"],
+        [
+            "zebra_fast_grid_scan",
+            "zebra_grid_scan_params",
+            {
+                "x_scan_valid": 1,
+                "y_scan_valid": 1,
+                "z_scan_valid": 1,
+                "device_scan_invalid": 0,
+            },
+        ],
+        [
+            "panda_fast_grid_scan",
+            "panda_grid_scan_params",
+            {
+                "x_scan_valid": 1,
+                "y_scan_valid": 1,
+                "z_scan_valid": 1,
+                "device_scan_invalid": 0,
+            },
+        ],
+        ["zebra_fast_grid_scan_2d", "zebra_grid_scan_params_2d", {"scan_invalid": 0}],
     ],
-    ids=["zebra", "panda"],
+    ids=["zebra", "panda", "zebra2d"],
 )
-def grid_scan_devices_with_params(request: pytest.FixtureRequest):
+def grid_scan_devices_with_params_and_valid_state(request: pytest.FixtureRequest):
     return (
-        request.getfixturevalue(request.param[0]),
+        fgs_device := request.getfixturevalue(request.param[0]),
         request.getfixturevalue(request.param[1]),
+        {
+            getattr(fgs_device, signal): expected_value
+            for signal, expected_value in request.param[2].items()
+        },
     )
 
 
@@ -408,31 +466,29 @@ async def test_i02_1_gridscan_has_2d_behaviour(
 ):
     three_d_movables = ["z_step_size_mm", "z2_start_mm", "y2_start_mm", "z_steps"]
     for movable in three_d_movables:
-        assert movable not in zebra_fast_grid_scan_2d.movable_params.keys()
+        assert movable not in zebra_fast_grid_scan_2d._movable_params.keys()
     set_mock_value(zebra_fast_grid_scan_2d.x_steps, 5)
     set_mock_value(zebra_fast_grid_scan_2d.y_steps, 4)
     assert await zebra_fast_grid_scan_2d.expected_images.get_value() == 20
 
 
 async def test_gridscan_prepare_writes_values_and_checks_readback(
-    grid_scan_devices_with_params,
+    grid_scan_devices_with_params_and_valid_state,
 ):
-    grid_scan_device, grid_scan_params = grid_scan_devices_with_params
+    grid_scan_device, grid_scan_params, valid_state = (
+        grid_scan_devices_with_params_and_valid_state
+    )
     params = grid_scan_params
-    for signal, value in {
-        grid_scan_device.x_scan_valid: 1,
-        grid_scan_device.y_scan_valid: 1,
-        grid_scan_device.z_scan_valid: 1,
-        grid_scan_device.scan_invalid: 0,
-    }.items():
+    for signal, value in valid_state.items():
         set_mock_value(signal, value)
 
     signal_names_to_param_names = {
         signal.name: p_name
-        for p_name, signal in grid_scan_device.movable_params.items()
+        for p_name, signal in grid_scan_device._movable_params.items()
     }
     signals = [
-        grid_scan_device.movable_params[k] for k in signal_names_to_param_names.values()
+        grid_scan_device._movable_params[k]
+        for k in signal_names_to_param_names.values()
     ]
     for signal in signals:
         set_mock_put_proceeds(signal, False)
@@ -457,9 +513,11 @@ async def test_gridscan_prepare_writes_values_and_checks_readback(
 
 
 async def test_gridscan_prepare_checks_validity_after_writes(
-    grid_scan_devices_with_params,
+    grid_scan_devices_with_params_and_valid_state,
 ):
-    grid_scan_device, grid_scan_params = grid_scan_devices_with_params
+    grid_scan_device, grid_scan_params, valid_state = (
+        grid_scan_devices_with_params_and_valid_state
+    )
     parent = MagicMock()
     expected_signals_to_set = {}
 
@@ -470,13 +528,7 @@ async def test_gridscan_prepare_checks_validity_after_writes(
     for key, signal in expected_signals_to_set.items():
         parent.attach_mock(get_mock_put(signal), key)
 
-    checked_signals = {
-        grid_scan_device.x_scan_valid: 1,
-        grid_scan_device.y_scan_valid: 1,
-        grid_scan_device.z_scan_valid: 1,
-        grid_scan_device.scan_invalid: 0,
-    }
-    for signal, expected_value in checked_signals.items():
+    for signal, expected_value in valid_state.items():
         set_mock_value(signal, 0 if expected_value else 1)
 
     status = grid_scan_device.prepare(grid_scan_params)
@@ -487,31 +539,27 @@ async def test_gridscan_prepare_checks_validity_after_writes(
         mock_put.assert_called_with(grid_scan_params.__dict__[key], wait=True)
     assert not status.done
 
-    for signal, expected_value in checked_signals.items():
+    for signal, expected_value in valid_state.items():
         set_mock_value(signal, expected_value)
 
     await status
 
 
 async def test_gridscan_prepare_times_out_for_validity_check(
-    grid_scan_devices_with_params,
+    grid_scan_devices_with_params_and_valid_state,
 ):
-    grid_scan_device, grid_scan_params = grid_scan_devices_with_params
-    checked_signals = {
-        grid_scan_device.x_scan_valid: 1,
-        grid_scan_device.y_scan_valid: 1,
-        grid_scan_device.z_scan_valid: 1,
-        grid_scan_device.scan_invalid: 0,
-    }
+    grid_scan_device, grid_scan_params, valid_state = (
+        grid_scan_devices_with_params_and_valid_state
+    )
     device_name = grid_scan_device.name
-    for signal, expected_value in checked_signals.items():
-        if signal.name != f"{device_name}-scan_invalid":
+    for signal, expected_value in valid_state.items():
+        if signal.name != f"{device_name}-device_scan_invalid":
             set_mock_value(signal, 0 if expected_value else 1)
 
     status = grid_scan_device.prepare(grid_scan_params)
 
     with pytest.raises(
         TimeoutError,
-        match=f"{device_name}-x_scan_valid didn't match 1 in 0.5s, last value 0.0",
+        match=f"{device_name}-scan_invalid didn't match 0.0 in 0.5s, last value 1.0",
     ):
         await status
