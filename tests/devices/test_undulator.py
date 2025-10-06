@@ -48,6 +48,7 @@ async def undulator() -> Undulator:
             name="undulator",
             poles=80,
             length=2.0,
+            undulator_period=27,
             id_gap_lookup_table_path=TEST_BEAMLINE_UNDULATOR_TO_GAP_LUT,
             baton=baton,
         )
@@ -100,6 +101,7 @@ async def test_configuration_includes_configuration_fields(undulator: Undulator)
             "undulator-poles": partial_reading(80),
             "undulator-gap_discrepancy_tolerance_mm": partial_reading(0.002),
             "undulator-gap_motor-offset": partial_reading(0.0),
+            "undulator-undulator_period": partial_reading(27),
         },
     )
 
