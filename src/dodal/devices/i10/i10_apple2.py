@@ -19,10 +19,9 @@ from ophyd_async.core import (
 )
 from pydantic import BaseModel, ConfigDict, RootModel
 
-from dodal.log import LOGGER
-
-from ..apple2_undulator import (
+from dodal.devices.apple2_undulator import (
     Apple2,
+    Apple2Motors,
     Apple2Val,
     EnergyMotorConvertor,
     Pol,
@@ -30,6 +29,8 @@ from ..apple2_undulator import (
     UndulatorJawPhase,
     UndulatorPhaseAxes,
 )
+from dodal.log import LOGGER
+
 from ..pgm import PGM
 
 ROW_PHASE_MOTOR_TOLERANCE = 0.004
@@ -359,14 +360,15 @@ class I10Apple2(Apple2):
 
         with self.add_children_as_readables():
             super().__init__(
-                id_gap=UndulatorGap(name="id_gap", prefix=prefix),
-                id_phase=UndulatorPhaseAxes(
-                    name="id_phase",
-                    prefix=prefix,
-                    top_outer="RPQ1",
-                    top_inner="RPQ2",
-                    btm_inner="RPQ3",
-                    btm_outer="RPQ4",
+                apple2_motors=Apple2Motors(
+                    id_gap=UndulatorGap(prefix=prefix),
+                    id_phase=UndulatorPhaseAxes(
+                        prefix=prefix,
+                        top_outer="RPQ1",
+                        top_inner="RPQ2",
+                        btm_inner="RPQ3",
+                        btm_outer="RPQ4",
+                    ),
                 ),
                 energy_motor_convertor=energy_motor_convertor,
                 name=name,
@@ -376,8 +378,7 @@ class I10Apple2(Apple2):
                 move_pv="RPQ1",
             )
 
-    @AsyncStatus.wrap
-    async def set(self, value: float) -> None:
+    async def _set(self, value: float) -> None:
         """
         Check polarisation state and use it together with the energy(value)
         to calculate the required gap and phases before setting it.
@@ -408,11 +409,10 @@ class I10Apple2(Apple2):
         )
 
         LOGGER.info(f"Setting polarisation to {pol}, with values: {id_set_val}")
-        await self._set(value=id_set_val, energy=value)
+        await self.motors.set(id_motor_values=id_set_val)
         if pol != Pol.LA:
             await self.id_jaw_phase.set(0)
             await self.id_jaw_phase.set_move.set(1)
-        LOGGER.info(f"Energy set to {value} eV successfully.")
 
 
 class EnergySetter(StandardReadable, Movable[float]):
