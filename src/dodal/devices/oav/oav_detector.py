@@ -1,4 +1,3 @@
-import asyncio
 from enum import IntEnum
 
 from bluesky.protocols import Movable
@@ -50,8 +49,8 @@ class NullZoomController(BaseZoomController):
         super().__init__()
 
     @AsyncStatus.wrap
-    async def set(self, value: str):
-        await asyncio.sleep(0)
+    async def set(self, value):
+        return
 
 
 class ZoomController(BaseZoomController):
