@@ -1,4 +1,3 @@
-from abc import abstractmethod
 from typing import Generic
 
 from bluesky.protocols import Reading, Triggerable
@@ -9,14 +8,14 @@ from ophyd_async.core import (
     AsyncStatus,
     Device,
 )
+from ophyd_async.epics.adcore import ADBaseController
 
-from dodal.devices.controllers import ConstantDeadTimeController
 from dodal.devices.electron_analyser.abstract.base_driver_io import (
     TAbstractAnalyserDriverIO,
 )
 
 
-class AbstractElectronAnalyserDetector(
+class BaseElectronAnalyserDetector(
     Device,
     Triggerable,
     AsyncReadable,
@@ -34,43 +33,31 @@ class AbstractElectronAnalyserDetector(
 
     def __init__(
         self,
-        driver: TAbstractAnalyserDriverIO,
+        controller: ADBaseController[TAbstractAnalyserDriverIO],
         name: str = "",
     ):
-        self.controller = ConstantDeadTimeController(driver, 0)
+        self._controller = controller
         super().__init__(name)
 
     @AsyncStatus.wrap
     async def trigger(self) -> None:
-        await self.controller.arm()
-        await self.controller.wait_for_idle()
+        await self._controller.arm()
+        await self._controller.wait_for_idle()
 
     async def read(self) -> dict[str, Reading]:
-        return await self.driver.read()
+        return await self._controller.driver.read()
 
     async def describe(self) -> dict[str, DataKey]:
-        data = await self.driver.describe()
+        data = await self._controller.driver.describe()
         # Correct the shape for image
-        prefix = self.driver.name + "-"
-        energy_size = len(await self.driver.energy_axis.get_value())
-        angle_size = len(await self.driver.angle_axis.get_value())
+        prefix = self._controller.driver.name + "-"
+        energy_size = len(await self._controller.driver.energy_axis.get_value())
+        angle_size = len(await self._controller.driver.angle_axis.get_value())
         data[prefix + "image"]["shape"] = [angle_size, energy_size]
         return data
 
     async def read_configuration(self) -> dict[str, Reading]:
-        return await self.driver.read_configuration()
+        return await self._controller.driver.read_configuration()
 
     async def describe_configuration(self) -> dict[str, DataKey]:
-        return await self.driver.describe_configuration()
-
-    @property
-    @abstractmethod
-    def driver(self) -> TAbstractAnalyserDriverIO:
-        """
-        Define common property for all implementations to access the driver. Some
-        implementations will store this as a reference so it doesn't have conflicting
-        parents.
-
-        Returns:
-            instance of the driver.
-        """
+        return await self._controller.driver.describe_configuration()
