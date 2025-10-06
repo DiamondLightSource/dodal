@@ -10,13 +10,13 @@ class V2FGain(StrictEnum):
     LOW_NOISE7 = "10^7 low noise"
     LOW_NOISE8 = "10^8 low noise"
     LOW_NOISE9 = "10^9 low noise"
-    HIGHSPEED5 = "10^5 high speed"
-    HIGHSPEED6 = "10^6 high speed"
-    HIGHSPEED7 = "10^7 high speed"
-    HIGHSPEED8 = "10^8 high speed"
-    HIGHSPEED9 = "10^9 high speed"
-    HIGHSPEED10 = "10^10 high spd"
-    HIGHSPEED11 = "10^11 high spd"
+    HIGH_SPEED5 = "10^5 high speed"
+    HIGH_SPEED6 = "10^6 high speed"
+    HIGH_SPEED7 = "10^7 high speed"
+    HIGH_SPEED8 = "10^8 high speed"
+    HIGH_SPEED9 = "10^9 high speed"
+    HIGH_SPEED10 = "10^10 high spd"
+    HIGH_SPEED11 = "10^11 high spd"
 
 
 class QDV2F(StandardReadable):
