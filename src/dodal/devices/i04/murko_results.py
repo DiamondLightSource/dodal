@@ -32,7 +32,7 @@ class MurkoMetadata(TypedDict):
     sample_id: str
     omega_angle: float
     uuid: str
-    used: bool | None
+    used_for_centring: bool | None
 
 
 class Coord(Enum):
@@ -103,8 +103,7 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
 
     def _reset(self):
         self._last_omega = 0
-        self.results: list[MurkoResult] = []
-        self.discarded_results: list[MurkoResult] = []
+        self._results: list[MurkoResult] = []
 
     @AsyncStatus.wrap
     async def stage(self):
@@ -129,17 +128,17 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
                 continue
             await self.process_batch(message, sample_id)
 
-        if not self.results:
+        if not self._results:
             raise NoResultsFound("No results retrieved from Murko")
 
-        for result in self.results:
+        for result in self._results:
             LOGGER.debug(result)
 
-        self.filter_outliers()
+        filtered_results = self.filter_outliers()
 
-        x_dists_mm = [result.x_dist_mm for result in self.results]
-        y_dists_mm = [result.y_dist_mm for result in self.results]
-        omegas = [result.omega for result in self.results]
+        x_dists_mm = [result.x_dist_mm for result in filtered_results]
+        y_dists_mm = [result.y_dist_mm for result in filtered_results]
+        omegas = [result.omega for result in filtered_results]
 
         LOGGER.info(f"Using average of x beam distances: {x_dists_mm}")
         avg_x = float(np.mean(x_dists_mm))
@@ -150,11 +149,7 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
         self._y_mm_setter(-best_y)
         self._z_mm_setter(-best_z)
 
-        for result in self.results:
-            await self.redis_client.hset(  # type: ignore
-                f"murko:{sample_id}:metadata", result.uuid, json.dumps(result.metadata)
-            )
-        for result in self.discarded_results:
+        for result in self._results:
             await self.redis_client.hset(  # type: ignore
                 f"murko:{sample_id}:metadata", result.uuid, json.dumps(result.metadata)
             )
@@ -198,7 +193,7 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
                 centre_px[0],
                 centre_px[1],
             )
-            self.results.append(
+            self._results.append(
                 MurkoResult(
                     centre_px=centre_px,
                     x_dist_mm=beam_dist_px[0] * metadata["microns_per_x_pixel"] / 1000,
@@ -216,8 +211,8 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
         meaning that by keeping only a percentage of the results with the smallest X we
         remove many of the outliers.
         """
-        LOGGER.info(f"Number of results before filtering: {len(self.results)}")
-        sorted_results = sorted(self.results, key=lambda item: item.centre_px[0])
+        LOGGER.info(f"Number of results before filtering: {len(self._results)}")
+        sorted_results = sorted(self._results, key=lambda item: item.centre_px[0])
 
         worst_results = [
             r.uuid for r in sorted_results[-self.NUMBER_OF_WRONG_RESULTS_TO_LOG :]
@@ -227,15 +222,13 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
             f"Worst {self.NUMBER_OF_WRONG_RESULTS_TO_LOG} murko results were {worst_results}"
         )
         cutoff = max(1, int(len(sorted_results) * self.PERCENTAGE_TO_USE / 100))
+        for i, result in enumerate(sorted_results):
+            result.metadata["used_for_centring"] = i < cutoff
+
         smallest_x = sorted_results[:cutoff]
-        largest_x = sorted_results[cutoff:]
-        for result in smallest_x:
-            result.metadata["used"] = True
-        for result in largest_x:
-            result.metadata["used"] = False
-        self.discarded_results = largest_x
-        self.results = smallest_x
-        LOGGER.info(f"Number of results after filtering: {len(self.results)}")
+
+        LOGGER.info(f"Number of results after filtering: {len(smallest_x)}")
+        return smallest_x
 
 
 def get_yz_least_squares(vertical_dists: list, omegas: list) -> tuple[float, float]:
