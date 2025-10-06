@@ -49,7 +49,7 @@ class NullZoomController(BaseZoomController):
         super().__init__()
 
     @AsyncStatus.wrap
-    async def set(self, value):
+    async def set(self, value) -> AsyncStatus:
         return
 
 
