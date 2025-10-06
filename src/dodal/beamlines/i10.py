@@ -18,6 +18,8 @@ from dodal.devices.i10 import (
     I10SlitsDrainCurrent,
     PiezoMirror,
 )
+from dodal.devices.i10.i10_apple2 import I10Id
+from dodal.devices.i10.i10_setting_data import I10Grating
 from dodal.devices.i10.rasor.rasor_current_amp import RasorFemto, RasorSR570
 from dodal.devices.i10.rasor.rasor_motors import (
     DetSlits,
@@ -26,6 +28,7 @@ from dodal.devices.i10.rasor.rasor_motors import (
 )
 from dodal.devices.i10.rasor.rasor_scaler_cards import RasorScalerCard1
 from dodal.devices.motors import XYStage, XYZStage
+from dodal.devices.pgm import PGM
 from dodal.devices.temperture_controller import (
     Lakeshore340,
 )
