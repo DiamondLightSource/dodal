@@ -42,9 +42,6 @@ dodal.devices.electron\_analyser.ElectronAnalyserDetector
    .. autosummary::
    
       
-      ~ElectronAnalyserDetector.driver
-      
-      
       
       
    

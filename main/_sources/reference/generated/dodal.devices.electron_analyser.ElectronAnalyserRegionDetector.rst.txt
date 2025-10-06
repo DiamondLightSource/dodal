@@ -32,9 +32,6 @@ dodal.devices.electron\_analyser.ElectronAnalyserRegionDetector
    .. autosummary::
    
       
-      ~ElectronAnalyserRegionDetector.driver
-      
-      
       
       
    

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.electron_analyser.ElectronAnalyserRegionDetector &#8212; dodal 1.60.1.dev2+g17b1eb44d documentation</title>
+    <title>dodal.devices.electron_analyser.ElectronAnalyserRegionDetector &#8212; dodal 1.60.1.dev3+g83fc8200f documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=41bcf240"></script>
+    <script src="../../_static/documentation_options.js?v=7e413ae5"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -1056,12 +1056,11 @@
 <dt class="sig sig-object py" id="dodal.devices.electron_analyser.ElectronAnalyserRegionDetector">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dodal.devices.electron_analyser.</span></span><span class="sig-name descname"><span class="pre">ElectronAnalyserRegionDetector</span></span><a class="reference internal" href="../../_modules/dodal/devices/electron_analyser/detector.html#ElectronAnalyserRegionDetector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.electron_analyser.ElectronAnalyserRegionDetector" title="Link to this definition">#</a></dt>
 <dd><p>Extends electron analyser detector to configure specific region settings before data
-acqusition. This object must be passed in a driver and store it as a reference. It
-is designed to only exist inside a plan.</p>
+acquisition. It is designed to only exist inside a plan.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>driver</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.TypeVar" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code></a>(<code class="docutils literal notranslate"><span class="pre">TAbstractAnalyserDriverIO</span></code>, bound= <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractAnalyserDriverIO</span></code>)</span>)</p></li>
+<li><p><strong>controller</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">ADBaseController</span></code>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.TypeVar" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code></a>(<code class="docutils literal notranslate"><span class="pre">TAbstractAnalyserDriverIO</span></code>, bound= <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractAnalyserDriverIO</span></code>)]</span>)</p></li>
 <li><p><strong>region</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.TypeVar" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code></a>(<code class="docutils literal notranslate"><span class="pre">TAbstractBaseRegion</span></code>, bound= <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractBaseRegion</span></code>)</span>)</p></li>
 <li><p><strong>name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">''</span></code>)</p></li>
 </ul>
@@ -1079,9 +1078,6 @@ is designed to only exist inside a plan.</p>
 <p class="rubric">Attributes</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">driver</span></code></p></td>
-<td><p></p></td>
-</tr>
 </tbody>
 </table>
 </div>
