@@ -6,6 +6,8 @@ note:
     idd == id1,    idu == id2.
 """
 
+from daq_config_server.client import ConfigServer
+
 from dodal.common.beamlines.beamline_utils import device_factory
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.devices.i10 import (
@@ -54,6 +56,9 @@ def switching_mirror() -> PiezoMirror:
     return PiezoMirror(prefix=f"{PREFIX.beamline_prefix}-OP-SWTCH-01:")
 
 
+I10_CONF_CLIENT = ConfigServer(url="https://daq-config.diamond.ac.uk")
+
+
 @device_factory()
 def idd() -> I10Id:
     """i10 downstream insertion device:
@@ -67,6 +72,7 @@ def idd() -> I10Id:
         pgm=pgm(),
         look_up_table_dir=LOOK_UPTABLE_DIR,
         source=("Source", "idd"),
+        config_client=I10_CONF_CLIENT,
     )
 
 
@@ -83,6 +89,7 @@ def idu() -> I10Id:
         pgm=pgm(),
         look_up_table_dir=LOOK_UPTABLE_DIR,
         source=("Source", "idu"),
+        config_client=I10_CONF_CLIENT,
     )
 
 

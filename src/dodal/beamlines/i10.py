@@ -6,8 +6,6 @@ note:
     idd == id1,    idu == id2.
 """
 
-from daq_config_server.client import ConfigServer
-
 from dodal.common.beamlines.beamline_utils import device_factory
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.devices.current_amplifiers import CurrentAmpDet
@@ -18,8 +16,6 @@ from dodal.devices.i10 import (
     I10SlitsDrainCurrent,
     PiezoMirror,
 )
-from dodal.devices.i10.i10_apple2 import I10Id
-from dodal.devices.i10.i10_setting_data import I10Grating
 from dodal.devices.i10.rasor.rasor_current_amp import RasorFemto, RasorSR570
 from dodal.devices.i10.rasor.rasor_motors import (
     DetSlits,
@@ -28,7 +24,6 @@ from dodal.devices.i10.rasor.rasor_motors import (
 )
 from dodal.devices.i10.rasor.rasor_scaler_cards import RasorScalerCard1
 from dodal.devices.motors import XYStage, XYZStage
-from dodal.devices.pgm import PGM
 from dodal.devices.temperture_controller import (
     Lakeshore340,
 )
@@ -39,55 +34,6 @@ BL = get_beamline_name("i10")
 set_log_beamline(BL)
 set_utils_beamline(BL)
 PREFIX = BeamlinePrefix(BL)
-
-I10_CONF_CLIENT = ConfigServer(url="https://daq-config.diamond.ac.uk")
-
-
-LOOK_UPTABLE_DIR = "/dls_sw/i10/software/gda/workspace_git/gda-diamond.git/configurations/i10-shared/lookupTables/"
-
-
-@device_factory()
-def pgm() -> PGM:
-    "I10 Plane Grating Monochromator, it can change energy via pgm.energy.set(<energy>)"
-    return PGM(
-        prefix=f"{PREFIX.beamline_prefix}-OP-PGM-01:",
-        grating=I10Grating,
-        gratingPv="NLINES2",
-    )
-
-
-@device_factory()
-def idd() -> I10Id:
-    """i10 downstream insertion device:
-    id.energy.set(<energy>) to change beamline energy.
-    id.energy.energy_offset.set(<off_set>) to change id energy offset relative to pgm.
-    id.pol.set(<polarisation>) to change polarisation.
-    id.laa.set(<linear polarisation angle>) to change polarisation angle, must be in LA mode.
-    """
-    return I10Id(
-        prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:",
-        pgm=pgm(),
-        look_up_table_dir=LOOK_UPTABLE_DIR,
-        source=("Source", "idd"),
-        config_client=I10_CONF_CLIENT,
-    )
-
-
-@device_factory()
-def idu() -> I10Id:
-    """i10 upstream insertion device:
-    id.energy.set(<energy>) to change beamline energy.
-    id.energy.energy_offset.set(<off_set>) to change id energy offset relative to pgm.
-    id.pol.set(<polarisation>) to change polarisation.
-    id.laa.set(<linear polarisation angle>) to change polarisation angle, must be in LA mode.
-    """
-    return I10Id(
-        prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-21:",
-        pgm=pgm(),
-        look_up_table_dir=LOOK_UPTABLE_DIR,
-        source=("Source", "idu"),
-        config_client=I10_CONF_CLIENT,
-    )
 
 
 """Mirrors"""
