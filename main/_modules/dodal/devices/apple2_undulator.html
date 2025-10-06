@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.apple2_undulator &#8212; dodal 1.60.1.dev3+g83fc8200f documentation</title>
+    <title>dodal.devices.apple2_undulator &#8212; dodal 1.60.1.dev4+g264e73865 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=7e413ae5"></script>
+    <script src="../../../_static/documentation_options.js?v=0eee0894"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -792,11 +792,76 @@ window.addEventListener("load", () => mermaid.run());
 
 
 
+<div class="viewcode-block" id="Apple2Motors">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.apple2_undulator.Apple2Motors.html#dodal.devices.apple2_undulator.Apple2Motors">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Apple2Motors</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">,</span> <span class="n">Movable</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Device representing the combined motor controls for an Apple2 undulator.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    gap : UndulatorGap</span>
+<span class="sd">        The undulator gap motor device.</span>
+<span class="sd">    phase : UndulatorPhaseAxes</span>
+<span class="sd">        The undulator phase axes device, consisting of four phase motors.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">id_gap</span><span class="p">:</span> <span class="n">UndulatorGap</span><span class="p">,</span> <span class="n">id_phase</span><span class="p">:</span> <span class="n">UndulatorPhaseAxes</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+
+<span class="sd">        id_gap: UndulatorGap</span>
+<span class="sd">            An UndulatorGap device.</span>
+<span class="sd">        id_phase: UndulatorPhaseAxes</span>
+<span class="sd">            An UndulatorPhaseAxes device.</span>
+<span class="sd">        name: str</span>
+<span class="sd">            Name of the device.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">gap</span> <span class="o">=</span> <span class="n">id_gap</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">phase</span> <span class="o">=</span> <span class="n">id_phase</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Apple2Motors.set">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.apple2_undulator.Apple2Motors.html#dodal.devices.apple2_undulator.Apple2Motors.set">[docs]</a>
+    <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">id_motor_values</span><span class="p">:</span> <span class="n">Apple2Val</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check ID is in a movable state and set all the demand value before moving them</span>
+<span class="sd">        all at the same time. This should be modified by the beamline specific ID</span>
+<span class="sd">        class, if the ID motors has to move in a specific order.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Only need to check gap as the phase motors share both fault and gate with gap.</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">gap</span><span class="o">.</span><span class="n">raise_if_cannot_move</span><span class="p">()</span>
+        <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">phase</span><span class="o">.</span><span class="n">top_outer</span><span class="o">.</span><span class="n">user_setpoint</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">id_motor_values</span><span class="o">.</span><span class="n">top_outer</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">phase</span><span class="o">.</span><span class="n">top_inner</span><span class="o">.</span><span class="n">user_setpoint</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">id_motor_values</span><span class="o">.</span><span class="n">top_inner</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">phase</span><span class="o">.</span><span class="n">btm_inner</span><span class="o">.</span><span class="n">user_setpoint</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">id_motor_values</span><span class="o">.</span><span class="n">btm_inner</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">phase</span><span class="o">.</span><span class="n">btm_outer</span><span class="o">.</span><span class="n">user_setpoint</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">id_motor_values</span><span class="o">.</span><span class="n">btm_outer</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">gap</span><span class="o">.</span><span class="n">user_setpoint</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">id_motor_values</span><span class="o">.</span><span class="n">gap</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="n">timeout</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span>
+            <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gap</span><span class="o">.</span><span class="n">get_timeout</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">phase</span><span class="o">.</span><span class="n">get_timeout</span><span class="p">())</span>
+        <span class="p">)</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Moving f</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> apple2 motors to </span><span class="si">{</span><span class="n">id_motor_values</span><span class="si">}</span><span class="s2">, timeout = </span><span class="si">{</span><span class="n">timeout</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+        <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">gap</span><span class="o">.</span><span class="n">set_move</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">phase</span><span class="o">.</span><span class="n">set_move</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="k">await</span> <span class="n">wait_for_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gap</span><span class="o">.</span><span class="n">gate</span><span class="p">,</span> <span class="n">UndulatorGateStatus</span><span class="o">.</span><span class="n">CLOSE</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span></div>
+</div>
+
+
+
 <div class="viewcode-block" id="EnergyMotorConvertor">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.apple2_undulator.EnergyMotorConvertor.html#dodal.devices.apple2_undulator.EnergyMotorConvertor">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">EnergyMotorConvertor</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energy</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">pol</span><span class="p">:</span> <span class="n">Pol</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Protocol to provide energy to motor position convertion&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Protocol to provide energy to motor position conversion&quot;&quot;&quot;</span>
         <span class="o">...</span></div>
 
 
@@ -814,15 +879,13 @@ window.addEventListener("load", () => mermaid.run());
 <span class="sd">    The class is designed to manage the undulator&#39;s gap, phase motors, and polarisation settings, while</span>
 <span class="sd">    abstracting hardware interactions and providing a high-level interface for beamline operations.</span>
 
-<span class="sd">    The class is abstract and requires beamline-specific implementations for set motor</span>
+<span class="sd">    The class is abstract and requires beamline-specific implementations for _set motor</span>
 <span class="sd">     positions based on energy and polarisation.</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
-<span class="sd">    gap : UndulatorGap</span>
-<span class="sd">        The gap control device for the undulator.</span>
-<span class="sd">    phase : UndulatorPhaseAxes</span>
-<span class="sd">        The phase control device, consisting of four phase motors.</span>
+<span class="sd">    apple2_motors : Apple2Motors</span>
+<span class="sd">        A collection of gap and phase motor devices.</span>
 <span class="sd">    energy : SignalR</span>
 <span class="sd">        A soft signal for the current energy readback.</span>
 <span class="sd">    polarisation_setpoint : SignalR</span>
@@ -836,7 +899,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <span class="sd">    Abstract Methods</span>
 <span class="sd">    ----------------</span>
-<span class="sd">    set(value: float) -&gt; None</span>
+<span class="sd">    _set(value: float) -&gt; None</span>
 <span class="sd">        Abstract method to set motor positions for a given energy and polarisation.</span>
 
 <span class="sd">    Methods</span>
@@ -859,8 +922,7 @@ window.addEventListener("load", () => mermaid.run());
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">id_gap</span><span class="p">:</span> <span class="n">UndulatorGap</span><span class="p">,</span>
-        <span class="n">id_phase</span><span class="p">:</span> <span class="n">UndulatorPhaseAxes</span><span class="p">,</span>
+        <span class="n">apple2_motors</span><span class="p">:</span> <span class="n">Apple2Motors</span><span class="p">,</span>
         <span class="n">energy_motor_convertor</span><span class="p">:</span> <span class="n">EnergyMotorConvertor</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -874,8 +936,7 @@ window.addEventListener("load", () => mermaid.run());
 <span class="sd">        name: Name of the device.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">gap</span> <span class="o">=</span> <span class="n">id_gap</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">phase</span> <span class="o">=</span> <span class="n">id_phase</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">motors</span> <span class="o">=</span> <span class="n">apple2_motors</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">energy_to_motor</span> <span class="o">=</span> <span class="n">energy_motor_convertor</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">(</span><span class="n">StandardReadableFormat</span><span class="o">.</span><span class="n">HINTED_SIGNAL</span><span class="p">):</span>
             <span class="c1"># Store the set energy for readback.</span>
@@ -894,11 +955,11 @@ window.addEventListener("load", () => mermaid.run());
             <span class="n">raw_to_derived</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_read_pol</span><span class="p">,</span>
             <span class="n">set_derived</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_set_pol</span><span class="p">,</span>
             <span class="n">pol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">polarisation_setpoint</span><span class="p">,</span>
-            <span class="n">top_outer</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">phase</span><span class="o">.</span><span class="n">top_outer</span><span class="o">.</span><span class="n">user_readback</span><span class="p">,</span>
-            <span class="n">top_inner</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">phase</span><span class="o">.</span><span class="n">top_inner</span><span class="o">.</span><span class="n">user_readback</span><span class="p">,</span>
-            <span class="n">btm_inner</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">phase</span><span class="o">.</span><span class="n">btm_inner</span><span class="o">.</span><span class="n">user_readback</span><span class="p">,</span>
-            <span class="n">btm_outer</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">phase</span><span class="o">.</span><span class="n">btm_outer</span><span class="o">.</span><span class="n">user_readback</span><span class="p">,</span>
-            <span class="n">gap</span><span class="o">=</span><span class="n">id_gap</span><span class="o">.</span><span class="n">user_readback</span><span class="p">,</span>
+            <span class="n">top_outer</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">motors</span><span class="o">.</span><span class="n">phase</span><span class="o">.</span><span class="n">top_outer</span><span class="o">.</span><span class="n">user_readback</span><span class="p">,</span>
+            <span class="n">top_inner</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">motors</span><span class="o">.</span><span class="n">phase</span><span class="o">.</span><span class="n">top_inner</span><span class="o">.</span><span class="n">user_readback</span><span class="p">,</span>
+            <span class="n">btm_inner</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">motors</span><span class="o">.</span><span class="n">phase</span><span class="o">.</span><span class="n">btm_inner</span><span class="o">.</span><span class="n">user_readback</span><span class="p">,</span>
+            <span class="n">btm_outer</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">motors</span><span class="o">.</span><span class="n">phase</span><span class="o">.</span><span class="n">btm_outer</span><span class="o">.</span><span class="n">user_readback</span><span class="p">,</span>
+            <span class="n">gap</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">motors</span><span class="o">.</span><span class="n">gap</span><span class="o">.</span><span class="n">user_readback</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
@@ -918,25 +979,33 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="Apple2.set">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.apple2_undulator.Apple2.html#dodal.devices.apple2_undulator.Apple2.set">[docs]</a>
-    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Set should be in energy units, this will set the energy of the ID by setting the</span>
 <span class="sd">        gap and phase motors to the correct position for the given energy</span>
 <span class="sd">        and polarisation.</span>
-<span class="sd">        This method should be implemented by the beamline specific ID class as the</span>
-<span class="sd">        motor positions will be different for each beamline depending on the</span>
-<span class="sd">        undulator design and the lookup table used.</span>
-<span class="sd">        _set can be used to set the motor positions for the given energy and</span>
-<span class="sd">        polarisation provided that all motors can be moved at the same time.</span>
+
 
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
 <span class="sd">        RE( id.set(888.0)) # This will set the ID to 888 eV</span>
 <span class="sd">        RE(scan([detector], id,600,700,100)) # This will scan the ID from 600 to 700 eV in 100 steps.</span>
-<span class="sd">        &quot;&quot;&quot;</span></div>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_energy_rbv</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>  <span class="c1"># Update energy after move for readback.</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Energy set to </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2"> eV successfully.&quot;</span><span class="p">)</span></div>
 
+
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method should be implemented by the beamline specific ID class as the</span>
+<span class="sd">        motor positions will be different for each beamline depending on the</span>
+<span class="sd">        undulator design and the lookup table used. The set method can be</span>
+<span class="sd">        used to set the motor positions for the given energy and polarisation</span>
+<span class="sd">        provided that all motors can be moved at the same time.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_read_pol</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -966,36 +1035,6 @@ window.addEventListener("load", () => mermaid.run());
             <span class="k">return</span> <span class="n">Pol</span><span class="o">.</span><span class="n">LH3</span>
 
         <span class="k">return</span> <span class="n">read_pol</span>
-
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Apple2Val</span><span class="p">,</span> <span class="n">energy</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Check ID is in a movable state and set all the demand value before moving them</span>
-<span class="sd">        all at the same time. This should be modified by the beamline specific ID class</span>
-<span class="sd">        , if the ID motors has to move in a specific order.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="c1"># Only need to check gap as the phase motors share both fault and gate with gap.</span>
-        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">gap</span><span class="o">.</span><span class="n">raise_if_cannot_move</span><span class="p">()</span>
-        <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">phase</span><span class="o">.</span><span class="n">top_outer</span><span class="o">.</span><span class="n">user_setpoint</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="o">.</span><span class="n">top_outer</span><span class="p">),</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">phase</span><span class="o">.</span><span class="n">top_inner</span><span class="o">.</span><span class="n">user_setpoint</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="o">.</span><span class="n">top_inner</span><span class="p">),</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">phase</span><span class="o">.</span><span class="n">btm_inner</span><span class="o">.</span><span class="n">user_setpoint</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="o">.</span><span class="n">btm_inner</span><span class="p">),</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">phase</span><span class="o">.</span><span class="n">btm_outer</span><span class="o">.</span><span class="n">user_setpoint</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="o">.</span><span class="n">btm_outer</span><span class="p">),</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">gap</span><span class="o">.</span><span class="n">user_setpoint</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="o">.</span><span class="n">gap</span><span class="p">),</span>
-        <span class="p">)</span>
-        <span class="n">timeout</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span>
-            <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gap</span><span class="o">.</span><span class="n">get_timeout</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">phase</span><span class="o">.</span><span class="n">get_timeout</span><span class="p">())</span>
-        <span class="p">)</span>
-        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Moving f</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> energy and polorisation to </span><span class="si">{</span><span class="n">energy</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="k">await</span><span class="w"> </span><span class="bp">self</span><span class="o">.</span><span class="n">polarisation</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;with motor position </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">, timeout = </span><span class="si">{</span><span class="n">timeout</span><span class="si">}</span><span class="s2">&quot;</span>
-        <span class="p">)</span>
-        <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">gap</span><span class="o">.</span><span class="n">set_move</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">),</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">phase</span><span class="o">.</span><span class="n">set_move</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">),</span>
-        <span class="p">)</span>
-        <span class="k">await</span> <span class="n">wait_for_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gap</span><span class="o">.</span><span class="n">gate</span><span class="p">,</span> <span class="n">UndulatorGateStatus</span><span class="o">.</span><span class="n">CLOSE</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_set_energy_rbv</span><span class="p">(</span><span class="n">energy</span><span class="p">)</span>  <span class="c1"># Update energy after move for readback.</span>
 
 <div class="viewcode-block" id="Apple2.determine_phase_from_hardware">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.apple2_undulator.Apple2.html#dodal.devices.apple2_undulator.Apple2.determine_phase_from_hardware">[docs]</a>

@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.i10.i10_apple2 &#8212; dodal 1.60.1.dev3+g83fc8200f documentation</title>
+    <title>dodal.devices.i10.i10_apple2 &#8212; dodal 1.60.1.dev4+g264e73865 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=7e413ae5"></script>
+    <script src="../../../../_static/documentation_options.js?v=0eee0894"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -471,10 +471,9 @@ window.addEventListener("load", () => mermaid.run());
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">ConfigDict</span><span class="p">,</span> <span class="n">RootModel</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.log</span><span class="w"> </span><span class="kn">import</span> <span class="n">LOGGER</span>
-
-<span class="kn">from</span><span class="w"> </span><span class="nn">..apple2_undulator</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.apple2_undulator</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">Apple2</span><span class="p">,</span>
+    <span class="n">Apple2Motors</span><span class="p">,</span>
     <span class="n">Apple2Val</span><span class="p">,</span>
     <span class="n">EnergyMotorConvertor</span><span class="p">,</span>
     <span class="n">Pol</span><span class="p">,</span>
@@ -482,6 +481,8 @@ window.addEventListener("load", () => mermaid.run());
     <span class="n">UndulatorJawPhase</span><span class="p">,</span>
     <span class="n">UndulatorPhaseAxes</span><span class="p">,</span>
 <span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.log</span><span class="w"> </span><span class="kn">import</span> <span class="n">LOGGER</span>
+
 <span class="kn">from</span><span class="w"> </span><span class="nn">..pgm</span><span class="w"> </span><span class="kn">import</span> <span class="n">PGM</span>
 
 <span class="n">ROW_PHASE_MOTOR_TOLERANCE</span> <span class="o">=</span> <span class="mf">0.004</span>
@@ -846,14 +847,15 @@ window.addEventListener("load", () => mermaid.run());
 
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
             <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-                <span class="n">id_gap</span><span class="o">=</span><span class="n">UndulatorGap</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;id_gap&quot;</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">),</span>
-                <span class="n">id_phase</span><span class="o">=</span><span class="n">UndulatorPhaseAxes</span><span class="p">(</span>
-                    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;id_phase&quot;</span><span class="p">,</span>
-                    <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">,</span>
-                    <span class="n">top_outer</span><span class="o">=</span><span class="s2">&quot;RPQ1&quot;</span><span class="p">,</span>
-                    <span class="n">top_inner</span><span class="o">=</span><span class="s2">&quot;RPQ2&quot;</span><span class="p">,</span>
-                    <span class="n">btm_inner</span><span class="o">=</span><span class="s2">&quot;RPQ3&quot;</span><span class="p">,</span>
-                    <span class="n">btm_outer</span><span class="o">=</span><span class="s2">&quot;RPQ4&quot;</span><span class="p">,</span>
+                <span class="n">apple2_motors</span><span class="o">=</span><span class="n">Apple2Motors</span><span class="p">(</span>
+                    <span class="n">id_gap</span><span class="o">=</span><span class="n">UndulatorGap</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">),</span>
+                    <span class="n">id_phase</span><span class="o">=</span><span class="n">UndulatorPhaseAxes</span><span class="p">(</span>
+                        <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">,</span>
+                        <span class="n">top_outer</span><span class="o">=</span><span class="s2">&quot;RPQ1&quot;</span><span class="p">,</span>
+                        <span class="n">top_inner</span><span class="o">=</span><span class="s2">&quot;RPQ2&quot;</span><span class="p">,</span>
+                        <span class="n">btm_inner</span><span class="o">=</span><span class="s2">&quot;RPQ3&quot;</span><span class="p">,</span>
+                        <span class="n">btm_outer</span><span class="o">=</span><span class="s2">&quot;RPQ4&quot;</span><span class="p">,</span>
+                    <span class="p">),</span>
                 <span class="p">),</span>
                 <span class="n">energy_motor_convertor</span><span class="o">=</span><span class="n">energy_motor_convertor</span><span class="p">,</span>
                 <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
@@ -863,10 +865,7 @@ window.addEventListener("load", () => mermaid.run());
                 <span class="n">move_pv</span><span class="o">=</span><span class="s2">&quot;RPQ1&quot;</span><span class="p">,</span>
             <span class="p">)</span>
 
-<div class="viewcode-block" id="I10Apple2.set">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i10.i10_apple2.I10Apple2.html#dodal.devices.i10.i10_apple2.I10Apple2.set">[docs]</a>
-    <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Check polarisation state and use it together with the energy(value)</span>
 <span class="sd">        to calculate the required gap and phases before setting it.</span>
@@ -897,12 +896,10 @@ window.addEventListener("load", () => mermaid.run());
         <span class="p">)</span>
 
         <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Setting polarisation to </span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">, with values: </span><span class="si">{</span><span class="n">id_set_val</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">id_set_val</span><span class="p">,</span> <span class="n">energy</span><span class="o">=</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">motors</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">id_motor_values</span><span class="o">=</span><span class="n">id_set_val</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">pol</span> <span class="o">!=</span> <span class="n">Pol</span><span class="o">.</span><span class="n">LA</span><span class="p">:</span>
             <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">id_jaw_phase</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">id_jaw_phase</span><span class="o">.</span><span class="n">set_move</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Energy set to </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2"> eV successfully.&quot;</span><span class="p">)</span></div>
-</div>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">id_jaw_phase</span><span class="o">.</span><span class="n">set_move</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span></div>
 
 
 

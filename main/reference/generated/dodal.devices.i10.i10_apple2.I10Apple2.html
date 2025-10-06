@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.i10.i10_apple2.I10Apple2 &#8212; dodal 1.60.1.dev3+g83fc8200f documentation</title>
+    <title>dodal.devices.i10.i10_apple2.I10Apple2 &#8212; dodal 1.60.1.dev4+g264e73865 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=7e413ae5"></script>
+    <script src="../../_static/documentation_options.js?v=0eee0894"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -472,6 +472,7 @@
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.apple2_undulator.html">dodal.devices.apple2_undulator</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.apple2_undulator.Apple2.html">dodal.devices.apple2_undulator.Apple2</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.apple2_undulator.Apple2Motors.html">dodal.devices.apple2_undulator.Apple2Motors</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.apple2_undulator.Apple2PhasesVal.html">dodal.devices.apple2_undulator.Apple2PhasesVal</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.apple2_undulator.Apple2Val.html">dodal.devices.apple2_undulator.Apple2Val</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.apple2_undulator.EnergyMotorConvertor.html">dodal.devices.apple2_undulator.EnergyMotorConvertor</a></li>
@@ -1087,9 +1088,6 @@
 <p class="rubric">Methods</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#dodal.devices.i10.i10_apple2.I10Apple2.set" title="dodal.devices.i10.i10_apple2.I10Apple2.set"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set</span></code></a>(value)</p></td>
-<td><p>Check polarisation state and use it together with the energy(value) to calculate the required gap and phases before setting it.</p></td>
-</tr>
 </tbody>
 </table>
 </div>
@@ -1099,21 +1097,6 @@
 </tbody>
 </table>
 </div>
-<dl class="py method">
-<dt class="sig sig-object py" id="dodal.devices.i10.i10_apple2.I10Apple2.set">
-<span class="sig-name descname"><span class="pre">set</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../_modules/dodal/devices/i10/i10_apple2.html#I10Apple2.set"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.i10.i10_apple2.I10Apple2.set" title="Link to this definition">#</a></dt>
-<dd><p>Check polarisation state and use it together with the energy(value)
-to calculate the required gap and phases before setting it.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>value</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>)</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
-</dd>
-</dl>
-</dd></dl>
-
 </dd></dl>
 
 </section>
@@ -1165,10 +1148,7 @@ to calculate the required gap and phases before setting it.</p>
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.i10.i10_apple2.I10Apple2"><code class="docutils literal notranslate"><span class="pre">I10Apple2</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.i10.i10_apple2.I10Apple2.set"><code class="docutils literal notranslate"><span class="pre">I10Apple2.set()</span></code></a></li>
-</ul>
-</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.i10.i10_apple2.I10Apple2"><code class="docutils literal notranslate"><span class="pre">I10Apple2</span></code></a></li>
 </ul>
   </nav></div>
 

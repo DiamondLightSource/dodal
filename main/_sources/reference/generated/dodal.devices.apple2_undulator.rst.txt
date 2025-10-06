@@ -15,6 +15,7 @@ dodal.devices.apple2\_undulator
    :recursive:
 
    ~apple2_undulator.Apple2
+   ~apple2_undulator.Apple2Motors
    ~apple2_undulator.Apple2PhasesVal
    ~apple2_undulator.Apple2Val
    ~apple2_undulator.EnergyMotorConvertor
