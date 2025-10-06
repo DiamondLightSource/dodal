@@ -1,3 +1,4 @@
+import asyncio
 from enum import IntEnum
 
 from bluesky.protocols import Movable
@@ -50,9 +51,7 @@ class NullZoomController(BaseZoomController):
 
     @AsyncStatus.wrap
     async def set(self, value: str):
-        status = AsyncStatus()
-        status.success()
-        return status
+        await asyncio.sleep(0)
 
 
 class ZoomController(BaseZoomController):
