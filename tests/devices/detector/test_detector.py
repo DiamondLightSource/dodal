@@ -3,10 +3,10 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from pydantic import ValidationError
-from tests.devices.test_data import TEST_LUT_TXT
 
 from dodal.devices.detector import DetectorParams
 from dodal.devices.detector.det_dim_constants import EIGER2_X_16M_SIZE
+from tests.devices.test_data import TEST_LUT_TXT
 
 
 def create_det_params_with_dir_and_prefix(directory: str | Path, prefix="test"):
