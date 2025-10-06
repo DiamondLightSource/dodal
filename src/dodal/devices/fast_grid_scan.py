@@ -296,15 +296,15 @@ class FastGridScanThreeD(FastGridScanCommon[ParamType]):
     Subclasses must implement _create_position_counter.
     """
 
-    def __init__(self, prefix: str, name: str = "") -> None:
-        full_prefix = prefix + "FGS:"
+    def __init__(self, prefix: str, infix: str, name: str = "") -> None:
+        full_prefix = prefix + infix
 
         # Number of vertical steps during the second grid scan, after the rotation in omega
-        self.z_steps = epics_signal_rw_rbv(int, f"{prefix}Z_NUM_STEPS")
-        self.z_step_size = epics_signal_rw_rbv(float, f"{prefix}Z_STEP_SIZE")
-        self.z2_start = epics_signal_rw_rbv(float, f"{prefix}Z2_START")
-        self.y2_start = epics_signal_rw_rbv(float, f"{prefix}Y2_START")
-        self.x_counter = epics_signal_r(int, f"{full_prefix}X_COUNTER")
+        self.z_steps = epics_signal_rw_rbv(int, f"{full_prefix}Z_NUM_STEPS")
+        self.z_step_size = epics_signal_rw_rbv(float, f"{full_prefix}Z_STEP_SIZE")
+        self.z2_start = epics_signal_rw_rbv(float, f"{full_prefix}Z2_START")
+        self.y2_start = epics_signal_rw_rbv(float, f"{full_prefix}Y2_START")
+        # panda does not have x counter
         self.y_counter = epics_signal_r(int, f"{full_prefix}Y_COUNTER")
 
         super().__init__(full_prefix, prefix, name)
@@ -343,10 +343,12 @@ class ZebraFastGridScanThreeD(FastGridScanThreeD[ZebraGridScanParamsThreeD]):
     """
 
     def __init__(self, prefix: str, name: str = "") -> None:
-        full_prefix = prefix + "FGS:"
+        infix = "FGS:"
+        full_prefix = prefix + infix
         # Time taken to travel between X steps
         self.dwell_time_ms = epics_signal_rw_rbv(float, f"{full_prefix}DWELL_TIME")
-        super().__init__(prefix, name)
+        self.x_counter = epics_signal_r(int, f"{full_prefix}X_COUNTER")
+        super().__init__(prefix, infix, name)
         self.movable_params["dwell_time_ms"] = self.dwell_time_ms
 
     def _create_position_counter(self, prefix: str):
@@ -363,7 +365,8 @@ class PandAFastGridScan(FastGridScanThreeD[PandAGridScanParams]):
     """
 
     def __init__(self, prefix: str, name: str = "") -> None:
-        full_prefix = prefix + "PGS:"
+        infix = "PGS:"
+        full_prefix = prefix + infix
         self.time_between_x_steps_ms = (
             epics_signal_rw_rbv(  # Used by motion controller to set goniometer velocity
                 float, f"{full_prefix}TIME_BETWEEN_X_STEPS"
@@ -375,7 +378,7 @@ class PandAFastGridScan(FastGridScanThreeD[PandAGridScanParams]):
         self.run_up_distance_mm = epics_signal_rw_rbv(
             float, f"{full_prefix}RUNUP_DISTANCE"
         )
-        super().__init__(prefix, name)
+        super().__init__(prefix, infix, name)
 
         self.movable_params["run_up_distance_mm"] = self.run_up_distance_mm
 
