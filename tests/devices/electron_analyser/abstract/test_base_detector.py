@@ -48,11 +48,13 @@ def test_analyser_detector_trigger(
     sim_detector: AbstractElectronAnalyserDetector[AbstractAnalyserDriverIO],
     RE: RunEngine,
 ) -> None:
+    sim_detector.controller.prepare = AsyncMock()
     sim_detector.controller.arm = AsyncMock()
     sim_detector.controller.wait_for_idle = AsyncMock()
 
     RE(bps.trigger(sim_detector), wait=True)
 
+    sim_detector.controller.prepare.assert_awaited_once()
     sim_detector.controller.arm.assert_awaited_once()
     sim_detector.controller.wait_for_idle.assert_awaited_once()
 

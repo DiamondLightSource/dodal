@@ -1,12 +1,11 @@
 from typing import get_origin
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
 from bluesky.utils import FailedStatus
 from ophyd_async.core import StrictEnum, init_devices
-from ophyd_async.epics.adcore import ADImageMode
 
 from dodal.devices import b07, i09
 from dodal.devices.electron_analyser import DualEnergySource, EnergySource
@@ -105,17 +104,3 @@ def test_driver_throws_error_with_wrong_psu_mode(
     psu_datatype_name = psu_datatype.__name__ if psu_datatype is not None else ""
     with pytest.raises(FailedStatus, match=f"is not a valid {psu_datatype_name}"):
         RE(bps.mv(sim_driver.psu_mode, PsuModeTestEnum.TEST_1))
-
-
-@pytest.mark.asyncio
-async def test_stage_sets_image_mode_and_calls_super(
-    sim_driver: AbstractAnalyserDriverIO,
-):
-    # Patch image_mode.set and super().stage
-    with patch.object(
-        AbstractAnalyserDriverIO.__bases__[1], "stage", new=AsyncMock()
-    ) as super_stage:
-        sim_driver.image_mode.set = AsyncMock()
-        await sim_driver.stage()
-        sim_driver.image_mode.set.assert_awaited_once_with(ADImageMode.SINGLE)
-        super_stage.assert_awaited_once()

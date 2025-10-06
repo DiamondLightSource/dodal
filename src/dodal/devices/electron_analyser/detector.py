@@ -104,13 +104,11 @@ class ElectronAnalyserDetector(
             Any exceptions raised by the driver's stage or controller's disarm methods.
         """
         await self.controller.disarm()
-        await self.driver.stage()
 
     @AsyncStatus.wrap
     async def unstage(self) -> None:
         """Disarm the detector."""
         await self.controller.disarm()
-        await self.driver.unstage()
 
     def load_sequence(self, filename: str) -> TAbstractBaseSequence:
         """

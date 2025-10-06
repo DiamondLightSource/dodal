@@ -52,30 +52,6 @@ def test_analyser_detector_loads_sequence_correctly(
     assert seq is not None
 
 
-async def test_analyser_detector_stage(
-    sim_detector: GenericElectronAnalyserDetector,
-) -> None:
-    sim_detector.controller.disarm = AsyncMock()
-    sim_detector.driver.stage = AsyncMock()
-
-    await sim_detector.stage()
-
-    sim_detector.controller.disarm.assert_awaited_once()
-    sim_detector.driver.stage.assert_awaited_once()
-
-
-async def test_analyser_detector_unstage(
-    sim_detector: GenericElectronAnalyserDetector,
-) -> None:
-    sim_detector.controller.disarm = AsyncMock()
-    sim_detector.driver.unstage = AsyncMock()
-
-    await sim_detector.unstage()
-
-    sim_detector.controller.disarm.assert_awaited_once()
-    sim_detector.driver.unstage.assert_awaited_once()
-
-
 def test_analyser_detector_creates_region_detectors(
     sim_detector: GenericElectronAnalyserDetector,
     sequence_file_path: str,
@@ -119,11 +95,13 @@ async def test_analyser_region_detector_trigger_sets_driver_with_region(
     for reg_det in region_detectors:
         reg_det.driver.set = AsyncMock()
 
+        reg_det.controller.prepare = AsyncMock()
         reg_det.controller.arm = AsyncMock()
         reg_det.controller.wait_for_idle = AsyncMock()
 
         RE(bps.trigger(reg_det), wait=True)
 
+        reg_det.controller.prepare.assert_awaited_once()
         reg_det.controller.arm.assert_awaited_once()
         reg_det.controller.wait_for_idle.assert_awaited_once()
         reg_det.driver.set.assert_awaited_once_with(reg_det.region)

@@ -8,7 +8,9 @@ from ophyd_async.core import (
     AsyncReadable,
     AsyncStatus,
     Device,
+    TriggerInfo,
 )
+from ophyd_async.epics.adcore import ADImageMode
 
 from dodal.devices.controllers import ConstantDeadTimeController
 from dodal.devices.electron_analyser.abstract.base_driver_io import (
@@ -37,11 +39,14 @@ class AbstractElectronAnalyserDetector(
         driver: TAbstractAnalyserDriverIO,
         name: str = "",
     ):
-        self.controller = ConstantDeadTimeController(driver, 0)
+        self.controller = ConstantDeadTimeController(
+            driver=driver, deadtime=0, image_mode=ADImageMode.SINGLE
+        )
         super().__init__(name)
 
     @AsyncStatus.wrap
     async def trigger(self) -> None:
+        await self.controller.prepare(TriggerInfo())
         await self.controller.arm()
         await self.controller.wait_for_idle()
 
