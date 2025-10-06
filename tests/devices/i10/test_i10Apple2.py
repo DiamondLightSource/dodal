@@ -1,7 +1,7 @@
 import os
 from collections import defaultdict
 from unittest import mock
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, Mock
 
 import pytest
 from bluesky.plans import scan
@@ -10,12 +10,15 @@ from daq_config_server.client import ConfigServer
 from ophyd_async.core import init_devices
 from ophyd_async.testing import (
     assert_emitted,
+    callback_on_mock_put,
+    get_mock_put,
     set_mock_value,
 )
 
 from dodal.devices.apple2_undulator import (
     Apple2,
     BeamEnergy,
+    IdPolarisation,
     Pol,
     UndulatorGap,
     UndulatorGateStatus,
@@ -158,12 +161,12 @@ async def beam_energy(
     return beam_energy
 
 
-# @pytest.fixture
-# async def mock_id_pol(mock_id: I10Apple2) -> I10Apple2Pol:
-#     async with init_devices(mock=True):
-#         mock_id_pol = I10Apple2Pol(id=mock_id)
+@pytest.fixture
+async def mock_id_pol(mock_id_controller: I10Apple2Controller) -> IdPolarisation:
+    async with init_devices(mock=True):
+        mock_id_pol = IdPolarisation(id_controller=mock_id_controller)
 
-#     return mock_id_pol
+    return mock_id_pol
 
 
 # @pytest.fixture
@@ -259,165 +262,180 @@ async def test_i10apple2_RE_scan(beam_energy: BeamEnergy, RE: RunEngine):
         assert data["data"]["mock_pgm-energy"] == 500 + cnt * 10
 
 
-# async def test_energySetter_re_scan(mock_id_pgm: EnergySetter, RE: RunEngine):
-#     docs = defaultdict(list)
+async def test_beam_energy_re_scan(
+    beam_energy: BeamEnergy, mock_id_controller: I10Apple2Controller, RE: RunEngine
+):
+    docs = defaultdict(list)
 
-#     def capture_emitted(name, doc):
-#         docs[name].append(doc)
+    def capture_emitted(name, doc):
+        docs[name].append(doc)
 
-#     mock_id_pgm.id._set_pol_setpoint(Pol("lh3"))
-#     RE(scan([], mock_id_pgm, 1700, 1800, num=11), capture_emitted)
-#     assert_emitted(docs, start=1, descriptor=1, event=11, stop=1)
-#     # with energy offset
-#     docs = defaultdict(list)
-#     await mock_id_pgm.energy_offset.set(20)
-#     rbv_mocks = Mock()
-#     rbv_mocks.get.side_effect = range(1700, 1810, 10)
-#     callback_on_mock_put(
-#         mock_id_pgm.pgm_ref().energy.user_setpoint,
-#         lambda *_, **__: set_mock_value(
-#             mock_id_pgm.pgm_ref().energy.user_readback, rbv_mocks.get()
-#         ),
-#     )
-#     RE(
-#         scan(
-#             [],
-#             mock_id_pgm,
-#             1700,
-#             1800,
-#             num=11,
-#         ),
-#         capture_emitted,
-#     )
-#     for cnt, data in enumerate(docs["event"]):
-#         assert data["data"]["mock_id_pgm-id-energy"] == 1700 + cnt * 10 + 20
-#         assert data["data"]["mock_pgm-energy"] == 1700 + cnt * 10
-
-
-# @pytest.mark.parametrize(
-#     "pol,energy, expect_top_outer, expect_top_inner, expect_btm_inner,expect_btm_outer, expect_gap",
-#     [
-#         (Pol.LH, 500, 0.0, 0.0, 0.0, 0.0, 23.0),
-#         (Pol.LH, 700, 0.0, 0.0, 0.0, 0.0, 26.0),
-#         (Pol.LH, 1000, 0.0, 0.0, 0.0, 0.0, 32.0),
-#         (Pol.LH, 1400, 0.0, 0.0, 0.0, 0.0, 40.11),
-#         (Pol.LH3, 1400, 0.0, 0.0, 0.0, 0.0, 21.8),  # force LH3 lookup table to be used
-#         (Pol.LH3, 1700, 0.0, 0.0, 0.0, 0.0, 23.93),
-#         (Pol.LH3, 1900, 0.0, 0.0, 0.0, 0.0, 25.0),
-#         (Pol.LH3, 2090, 0.0, 0.0, 0.0, 0.0, 26.0),
-#         (Pol.LV, 600, 24.0, 0.0, 24.0, 0.0, 17.0),
-#         (Pol.LV, 900, 24.0, 0.0, 24.0, 0.0, 21.0),
-#         (Pol.LV, 1200, 24.0, 0.0, 24.0, 0.0, 25.0),
-#         (Pol.PC, 500, 15.5, 0.0, 15.5, 0.0, 17.0),
-#         (Pol.PC, 700, 16, 0.0, 16, 0.0, 21.0),
-#         (Pol.PC, 1000, 16.5, 0.0, 16.5, 0.0, 25.0),
-#         (Pol.NC, 500, -15.5, 0.0, -15.5, 0.0, 17.0),
-#         (Pol.NC, 800, -16, 0.0, -16, 0.0, 22.0),
-#         (Pol.NC, 1000, -16.5, 0.0, -16.5, 0.0, 25.0),
-#         (Pol.LA, 700, -15.2, 0.0, 15.2, 0.0, 16.5),
-#         (Pol.LA, 900, -15.6, 0.0, 15.6, 0.0, 19.0),
-#         (Pol.LA, 1300, -16.4, 0.0, 16.4, 0.0, 25.0),
-#         ("dsf", 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
-#     ],
-# )
-# async def test_i10apple2_pol_set(
-#     mock_id_pol: I10Apple2Pol,
-#     pol: Pol,
-#     energy: float,
-#     expect_top_inner: float,
-#     expect_top_outer: float,
-#     expect_btm_inner: float,
-#     expect_btm_outer: float,
-#     expect_gap: float,
-# ):
-#     mock_id_pol.id_ref()._set_energy_rbv(energy)
-
-#     if pol == "dsf":
-#         with pytest.raises(ValueError):
-#             await mock_id_pol.set(pol)
-#     else:
-#         await mock_id_pol.set(pol)
-
-#         top_inner = get_mock_put(
-#             mock_id_pol.id_ref().motors.phase.top_inner.user_setpoint
-#         )
-#         top_inner.assert_called_once()
-#         assert float(top_inner.call_args[0][0]) == pytest.approx(expect_top_inner, 0.01)
-
-#         top_outer = get_mock_put(
-#             mock_id_pol.id_ref().motors.phase.top_outer.user_setpoint
-#         )
-#         top_outer.assert_called_once()
-#         assert float(top_outer.call_args[0][0]) == pytest.approx(expect_top_outer, 0.01)
-
-#         btm_inner = get_mock_put(
-#             mock_id_pol.id_ref().motors.phase.btm_inner.user_setpoint
-#         )
-#         btm_inner.assert_called_once()
-#         assert float(btm_inner.call_args[0][0]) == pytest.approx(expect_btm_inner, 0.01)
-
-#         btm_outer = get_mock_put(
-#             mock_id_pol.id_ref().motors.phase.btm_outer.user_setpoint
-#         )
-#         btm_outer.assert_called_once()
-#         assert float(btm_outer.call_args[0][0]) == pytest.approx(expect_btm_outer, 0.01)
-
-#         gap = get_mock_put(mock_id_pol.id_ref().motors.gap.user_setpoint)
-#         gap.assert_called_once()
-#         assert float(gap.call_args[0][0]) == pytest.approx(expect_gap, 0.05)
+    mock_id_controller._set_pol_setpoint(Pol("lh3"))
+    # with energy offset
+    await beam_energy.energy_offset.set(20)
+    rbv_mocks = Mock()
+    rbv_mocks.get.side_effect = range(1700, 1810, 10)
+    callback_on_mock_put(
+        beam_energy.pgm_ref().energy.user_setpoint,
+        lambda *_, **__: set_mock_value(
+            beam_energy.pgm_ref().energy.user_readback, rbv_mocks.get()
+        ),
+    )
+    RE(
+        scan(
+            [],
+            beam_energy,
+            1700,
+            1800,
+            num=11,
+        ),
+        capture_emitted,
+    )
+    for cnt, data in enumerate(docs["event"]):
+        assert data["data"]["mock_id_controller-energy"] == 1700 + cnt * 10 + 20
+        assert data["data"]["mock_pgm-energy"] == 1700 + cnt * 10
 
 
-# @pytest.mark.parametrize(
-#     "pol,energy, top_outer, top_inner, btm_inner,btm_outer",
-#     [
-#         (Pol.LH, 500, 0.0, 0.0, 0.0, 0.0),
-#         (Pol.LV, 600, 24.0, 0.0, 24.0, 0.0),
-#         (Pol.PC, 500, 15.5, 0.0, 15.5, 0.0),
-#         (Pol.NC, 500, -15.5, 0.0, -15.5, 0.0),
-#         (Pol.LA, 1300, -16.4, 0.0, 16.4, 0.0),
-#     ],
-# )
-# async def test_i10apple2_pol_read_check_pol_from_hardware(
-#     mock_id_pol: I10Apple2Pol,
-#     pol: str,
-#     energy: float,
-#     top_inner: float,
-#     top_outer: float,
-#     btm_inner: float,
-#     btm_outer: float,
-# ):
-#     mock_id_pol.id_ref()._set_energy_rbv(energy)
+@pytest.mark.parametrize(
+    "pol,energy, expect_top_outer, expect_top_inner, expect_btm_inner,expect_btm_outer, expect_gap",
+    [
+        (Pol.LH, 500, 0.0, 0.0, 0.0, 0.0, 23.0),
+        (Pol.LH, 700, 0.0, 0.0, 0.0, 0.0, 26.0),
+        (Pol.LH, 1000, 0.0, 0.0, 0.0, 0.0, 32.0),
+        (Pol.LH, 1400, 0.0, 0.0, 0.0, 0.0, 40.11),
+        (Pol.LH3, 1400, 0.0, 0.0, 0.0, 0.0, 21.8),  # force LH3 lookup table to be used
+        (Pol.LH3, 1700, 0.0, 0.0, 0.0, 0.0, 23.93),
+        (Pol.LH3, 1900, 0.0, 0.0, 0.0, 0.0, 25.0),
+        (Pol.LH3, 2090, 0.0, 0.0, 0.0, 0.0, 26.0),
+        (Pol.LV, 600, 24.0, 0.0, 24.0, 0.0, 17.0),
+        (Pol.LV, 900, 24.0, 0.0, 24.0, 0.0, 21.0),
+        (Pol.LV, 1200, 24.0, 0.0, 24.0, 0.0, 25.0),
+        (Pol.PC, 500, 15.5, 0.0, 15.5, 0.0, 17.0),
+        (Pol.PC, 700, 16, 0.0, 16, 0.0, 21.0),
+        (Pol.PC, 1000, 16.5, 0.0, 16.5, 0.0, 25.0),
+        (Pol.NC, 500, -15.5, 0.0, -15.5, 0.0, 17.0),
+        (Pol.NC, 800, -16, 0.0, -16, 0.0, 22.0),
+        (Pol.NC, 1000, -16.5, 0.0, -16.5, 0.0, 25.0),
+        (Pol.LA, 700, -15.2, 0.0, 15.2, 0.0, 16.5),
+        (Pol.LA, 900, -15.6, 0.0, 15.6, 0.0, 19.0),
+        (Pol.LA, 1300, -16.4, 0.0, 16.4, 0.0, 25.0),
+        ("dsf", 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
+    ],
+)
+async def test_id_polarisation_set(
+    mock_id_pol: IdPolarisation,
+    pol: Pol,
+    energy: float,
+    expect_top_inner: float,
+    expect_top_outer: float,
+    expect_btm_inner: float,
+    expect_btm_outer: float,
+    expect_gap: float,
+):
+    set_mock_value(mock_id_pol.id_controller()._energy, energy)
 
-#     set_mock_value(mock_id_pol.id_ref().motors.phase.top_inner.user_readback, top_inner)
-#     set_mock_value(mock_id_pol.id_ref().motors.phase.top_outer.user_readback, top_outer)
-#     set_mock_value(mock_id_pol.id_ref().motors.phase.btm_inner.user_readback, btm_inner)
-#     set_mock_value(mock_id_pol.id_ref().motors.phase.btm_outer.user_readback, btm_outer)
+    if pol == "dsf":
+        with pytest.raises(ValueError):
+            await mock_id_pol.set(pol)
+    else:
+        await mock_id_pol.set(pol)
 
-#     assert (await mock_id_pol.read())["mock_id-polarisation"]["value"] == pol
+        top_inner = get_mock_put(
+            mock_id_pol.id_controller().apple2().phase.top_inner.user_setpoint
+        )
+        top_inner.assert_called_once()
+        assert float(top_inner.call_args[0][0]) == pytest.approx(expect_top_inner, 0.01)
+
+        top_outer = get_mock_put(
+            mock_id_pol.id_controller().apple2().phase.top_outer.user_setpoint
+        )
+        top_outer.assert_called_once()
+        assert float(top_outer.call_args[0][0]) == pytest.approx(expect_top_outer, 0.01)
+
+        btm_inner = get_mock_put(
+            mock_id_pol.id_controller().apple2().phase.btm_inner.user_setpoint
+        )
+        btm_inner.assert_called_once()
+        assert float(btm_inner.call_args[0][0]) == pytest.approx(expect_btm_inner, 0.01)
+
+        btm_outer = get_mock_put(
+            mock_id_pol.id_controller().apple2().phase.btm_outer.user_setpoint
+        )
+        btm_outer.assert_called_once()
+        assert float(btm_outer.call_args[0][0]) == pytest.approx(expect_btm_outer, 0.01)
+
+        gap = get_mock_put(mock_id_pol.id_controller().apple2().gap.user_setpoint)
+        gap.assert_called_once()
+        assert float(gap.call_args[0][0]) == pytest.approx(expect_gap, 0.05)
 
 
-# @pytest.mark.parametrize(
-#     "pol,energy, top_outer, top_inner, btm_inner,btm_outer",
-#     [
-#         ("lh3", 500, 0.0, 0.0, 0.0, 0.0),
-#     ],
-# )
-# async def test_i10apple2_pol_read_leave_lh3_unchanged_when_hardware_match(
-#     mock_id_pol: I10Apple2Pol,
-#     pol: str,
-#     energy: float,
-#     top_inner: float,
-#     top_outer: float,
-#     btm_inner: float,
-#     btm_outer: float,
-# ):
-#     mock_id_pol.id_ref()._set_energy_rbv(energy)
-#     mock_id_pol.id_ref()._set_pol_setpoint(Pol("lh3"))
-#     set_mock_value(mock_id_pol.id_ref().motors.phase.top_inner.user_readback, top_inner)
-#     set_mock_value(mock_id_pol.id_ref().motors.phase.top_outer.user_readback, top_outer)
-#     set_mock_value(mock_id_pol.id_ref().motors.phase.btm_inner.user_readback, btm_inner)
-#     set_mock_value(mock_id_pol.id_ref().motors.phase.btm_outer.user_readback, btm_outer)
-#     assert (await mock_id_pol.read())["mock_id-polarisation"]["value"] == pol
+@pytest.mark.parametrize(
+    "pol,energy, top_outer, top_inner, btm_inner,btm_outer",
+    [
+        (Pol.LH, 500, 0.0, 0.0, 0.0, 0.0),
+        (Pol.LV, 600, 24.0, 0.0, 24.0, 0.0),
+        (Pol.PC, 500, 15.5, 0.0, 15.5, 0.0),
+        (Pol.NC, 500, -15.5, 0.0, -15.5, 0.0),
+        (Pol.LA, 1300, -16.4, 0.0, 16.4, 0.0),
+    ],
+)
+async def test_id_polarisation_read_check_pol_from_hardware(
+    mock_id_pol: IdPolarisation,
+    pol: str,
+    energy: float,
+    top_inner: float,
+    top_outer: float,
+    btm_inner: float,
+    btm_outer: float,
+):
+    set_mock_value(mock_id_pol.id_controller()._energy, energy)
+
+    set_mock_value(
+        mock_id_pol.id_controller().apple2().phase.top_inner.user_readback, top_inner
+    )
+    set_mock_value(
+        mock_id_pol.id_controller().apple2().phase.top_outer.user_readback, top_outer
+    )
+    set_mock_value(
+        mock_id_pol.id_controller().apple2().phase.btm_inner.user_readback, btm_inner
+    )
+    set_mock_value(
+        mock_id_pol.id_controller().apple2().phase.btm_outer.user_readback, btm_outer
+    )
+
+    assert (await mock_id_pol.read())["mock_id_controller-polarisation"]["value"] == pol
+
+
+@pytest.mark.parametrize(
+    "pol,energy, top_outer, top_inner, btm_inner,btm_outer",
+    [
+        ("lh3", 500, 0.0, 0.0, 0.0, 0.0),
+    ],
+)
+async def test_id_polarisation_read_leave_lh3_unchanged_when_hardware_match(
+    mock_id_pol: IdPolarisation,
+    pol: str,
+    energy: float,
+    top_inner: float,
+    top_outer: float,
+    btm_inner: float,
+    btm_outer: float,
+):
+    set_mock_value(mock_id_pol.id_controller()._energy, energy)
+    mock_id_pol.id_controller()._set_pol_setpoint(Pol("lh3"))
+    set_mock_value(
+        mock_id_pol.id_controller().apple2().phase.top_inner.user_readback, top_inner
+    )
+    set_mock_value(
+        mock_id_pol.id_controller().apple2().phase.top_outer.user_readback, top_outer
+    )
+    set_mock_value(
+        mock_id_pol.id_controller().apple2().phase.btm_inner.user_readback, btm_inner
+    )
+    set_mock_value(
+        mock_id_pol.id_controller().apple2().phase.btm_outer.user_readback, btm_outer
+    )
+    assert (await mock_id_pol.read())["mock_id_controller-polarisation"]["value"] == pol
 
 
 # async def test_linear_arbitrary_pol_fail(

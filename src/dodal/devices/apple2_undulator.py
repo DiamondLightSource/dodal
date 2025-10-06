@@ -625,13 +625,21 @@ class IdEnergy(StandardReadable, Movable):
         return self.id_controller().set(energy)
 
 
-class IdPol(StandardReadable, Movable):
+class IdPolarisation(StandardReadable, Movable):
     def __init__(self, id_controller: Apple2Controller, name: str = "") -> None:
         self.id_controller = Reference(id_controller)
         super().__init__(name=name)
 
-    def set(self, pol: Pol) -> Status:
-        return self.id_controller().polarisation.set(pol)
+        self.add_readables(
+            [
+                self.id_controller().polarisation,
+            ],
+            StandardReadableFormat.HINTED_SIGNAL,
+        )
+
+    @AsyncStatus.wrap
+    async def set(self, pol: Pol) -> None:
+        await self.id_controller().polarisation.set(pol)
 
 
 class BeamEnergy(StandardReadable, Movable[float]):
