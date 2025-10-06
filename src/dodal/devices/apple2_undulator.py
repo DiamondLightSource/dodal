@@ -5,9 +5,10 @@ from math import isclose
 from typing import Generic, Protocol, TypeVar
 
 import numpy as np
-from bluesky.protocols import Movable
+from bluesky.protocols import Movable, Status
 from ophyd_async.core import (
     AsyncStatus,
+    Reference,
     SignalR,
     SignalW,
     StandardReadable,
@@ -15,10 +16,12 @@ from ophyd_async.core import (
     StrictEnum,
     derived_signal_rw,
     soft_signal_r_and_setter,
+    soft_signal_rw,
     wait_for_value,
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw, epics_signal_w
 
+from dodal.devices.pgm import PGM
 from dodal.log import LOGGER
 
 T = TypeVar("T")
@@ -40,12 +43,8 @@ class Apple2PhasesVal:
 
 
 @dataclass
-class Apple2Val:
+class Apple2Val(Apple2PhasesVal):
     gap: str
-    top_outer: str
-    top_inner: str
-    btm_inner: str
-    btm_outer: str
 
 
 class Pol(StrictEnum):
@@ -301,9 +300,9 @@ class UndulatorJawPhase(SafeUndulatorMover[float]):
         )
 
 
-class Apple2Motors(StandardReadable, Movable):
+class Apple2(StandardReadable, Movable):
     """
-    Device representing the combined motor controls for an Apple2 undulator.
+    Device representing the combined motor controls for an Apple2Controller undulator.
 
     Attributes
     ----------
@@ -366,11 +365,11 @@ class EnergyMotorConvertor(Protocol):
         ...
 
 
-class Apple2(abc.ABC, StandardReadable, Movable):
+class Apple2Controller(abc.ABC, StandardReadable, Movable):
     """
-    Apple2 Undulator Device
+    Apple2Controller Undulator Device
 
-    The `Apple2` class represents an Apple 2 insertion device (undulator) used in synchrotron beamlines.
+    The `Apple2Controller` class represents an Apple 2 insertion device (undulator) used in synchrotron beamlines.
     This device provides additional degrees of freedom compared to standard undulators, allowing independent
     movement of magnet banks to produce X-rays with various polarisations and energies.
 
@@ -382,7 +381,7 @@ class Apple2(abc.ABC, StandardReadable, Movable):
 
     Attributes
     ----------
-    apple2_motors : Apple2Motors
+    apple2 : Apple2
         A collection of gap and phase motor devices.
     energy : SignalR
         A soft signal for the current energy readback.
@@ -420,8 +419,7 @@ class Apple2(abc.ABC, StandardReadable, Movable):
 
     def __init__(
         self,
-        apple2_motors: Apple2Motors,
-        energy_motor_convertor: EnergyMotorConvertor,
+        apple2: Apple2,
         name: str = "",
     ) -> None:
         """
@@ -434,13 +432,16 @@ class Apple2(abc.ABC, StandardReadable, Movable):
         name: Name of the device.
         """
 
-        self.motors = apple2_motors
-        self.energy_to_motor = energy_motor_convertor
+        self.apple2 = Reference(apple2)
+        self.energy_to_motor: EnergyMotorConvertor
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             # Store the set energy for readback.
-            self.energy, self._set_energy_rbv = soft_signal_r_and_setter(
-                float, initial_value=None
-            )
+            self._energy = soft_signal_rw(float, initial_value=None)
+        self.energy = derived_signal_rw(
+            raw_to_derived=self._read_energy,
+            set_derived=self._set_energy,
+            energy=self._energy,
+        )
 
         # Store the polarisation for setpoint. And provide readback for LH3.
         # LH3 is a special case as it is indistinguishable from LH in the hardware.
@@ -453,11 +454,11 @@ class Apple2(abc.ABC, StandardReadable, Movable):
             raw_to_derived=self._read_pol,
             set_derived=self._set_pol,
             pol=self.polarisation_setpoint,
-            top_outer=self.motors.phase.top_outer.user_readback,
-            top_inner=self.motors.phase.top_inner.user_readback,
-            btm_inner=self.motors.phase.btm_inner.user_readback,
-            btm_outer=self.motors.phase.btm_outer.user_readback,
-            gap=self.motors.gap.user_readback,
+            top_outer=self.apple2().phase.top_outer.user_readback,
+            top_inner=self.apple2().phase.top_inner.user_readback,
+            btm_inner=self.apple2().phase.btm_inner.user_readback,
+            btm_outer=self.apple2().phase.btm_outer.user_readback,
+            gap=self.apple2().gap.user_readback,
         )
         super().__init__(name)
 
@@ -466,14 +467,6 @@ class Apple2(abc.ABC, StandardReadable, Movable):
         setpoint is used to determine the gap and phase motor positions when
         setting the energy/polarisation of the undulator."""
         self._polarisation_setpoint_set(pol)
-
-    async def _set_pol(
-        self,
-        value: Pol,
-    ) -> None:
-        # This changes the pol setpoint and then changes polarisation via set energy.
-        self._set_pol_setpoint(value)
-        await self.set(await self.energy.get_value())
 
     @AsyncStatus.wrap
     async def set(self, value: float) -> None:
@@ -488,8 +481,8 @@ class Apple2(abc.ABC, StandardReadable, Movable):
         RE( id.set(888.0)) # This will set the ID to 888 eV
         RE(scan([detector], id,600,700,100)) # This will scan the ID from 600 to 700 eV in 100 steps.
         """
-        await self._set(value)
-        self._set_energy_rbv(value)  # Update energy after move for readback.
+        await self.energy.set(value)
+
         LOGGER.info(f"Energy set to {value} eV successfully.")
 
     @abc.abstractmethod
@@ -501,6 +494,22 @@ class Apple2(abc.ABC, StandardReadable, Movable):
         used to set the motor positions for the given energy and polarisation
         provided that all motors can be moved at the same time.
         """
+
+    async def _set_energy(self, energy: float) -> None:
+        await self._set(energy)
+        await self._energy.set(energy)
+
+    def _read_energy(self, energy: float) -> float:
+        """Readback for energy is just the set value."""
+        return energy
+
+    async def _set_pol(
+        self,
+        value: Pol,
+    ) -> None:
+        # This changes the pol setpoint and then changes polarisation via set energy.
+        self._set_pol_setpoint(value)
+        await self.set(await self.energy.get_value())
 
     def _read_pol(
         self,
@@ -605,3 +614,66 @@ class Apple2(abc.ABC, StandardReadable, Movable):
 
         LOGGER.warning("Unable to determine polarisation. Defaulting to NONE.")
         return Pol.NONE, 0.0
+
+
+class IdEnergy(StandardReadable, Movable):
+    def __init__(self, id_controller: Apple2Controller, name: str = "") -> None:
+        self.id_controller = Reference(id_controller)
+        super().__init__(name=name)  #
+
+    def set(self, energy: float) -> Status:
+        return self.id_controller().set(energy)
+
+
+class IdPol(StandardReadable, Movable):
+    def __init__(self, id_controller: Apple2Controller, name: str = "") -> None:
+        self.id_controller = Reference(id_controller)
+        super().__init__(name=name)
+
+    def set(self, pol: Pol) -> Status:
+        return self.id_controller().polarisation.set(pol)
+
+
+class BeamEnergy(StandardReadable, Movable[float]):
+    """
+    Compound device to set both ID and PGM energy at the same time.
+
+    """
+
+    def __init__(
+        self, id_controller: Apple2Controller, pgm: PGM, name: str = ""
+    ) -> None:
+        """
+        Parameters
+        ----------
+        id:
+            An Apple2 device.
+        pgm:
+            A PGM/mono device.
+        name:
+            New device name.
+        """
+        super().__init__(name=name)
+        self.id_controller = Reference(id_controller)
+        self.pgm_ref = Reference(pgm)
+
+        self.add_readables(
+            [
+                self.id_controller().energy,
+                self.pgm_ref().energy.user_readback,
+            ],
+            StandardReadableFormat.HINTED_SIGNAL,
+        )
+
+        with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
+            self.energy_offset = soft_signal_rw(float, initial_value=0)
+
+    @AsyncStatus.wrap
+    async def set(self, value: float) -> None:
+        LOGGER.info(f"Moving f{self.name} energy to {value}.")
+        await asyncio.gather(
+            self.id_controller().energy.set(
+                value=value + await self.energy_offset.get_value()
+            ),
+            self.pgm_ref().energy.set(value),
+        )
