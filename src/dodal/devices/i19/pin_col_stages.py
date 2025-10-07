@@ -87,9 +87,9 @@ class PinholeCollimatorControl(StandardReadable, Movable[str]):
     ):
         self._aperture_sizes = [self._get_aperture_size(i) for i in _PinColPosition]
         with self.add_children_as_readables():
-            self.pinhole = XYStage(f"{prefix}{pin_infix}")
-            self.collimator = XYStage(f"{prefix}{col_infix}")
-            self.mapt = PinColConfiguration(
+            self._pinhole = XYStage(f"{prefix}{pin_infix}")
+            self._collimator = XYStage(f"{prefix}{col_infix}")
+            self._mapt = PinColConfiguration(
                 f"{prefix}{config_infix}CONFIG", apertures=self._aperture_sizes
             )
         super().__init__(name=name)
@@ -102,10 +102,10 @@ class PinholeCollimatorControl(StandardReadable, Movable[str]):
     ) -> AperturePosition:
         val = self._get_aperture_size(ap_request.value)
 
-        pinx = await self.mapt.pin_x.in_positions[val].get_value()
-        piny = await self.mapt.pin_y.in_positions[val].get_value()
-        colx = await self.mapt.col_x.in_positions[val].get_value()
-        coly = await self.mapt.col_y.in_positions[val].get_value()
+        pinx = await self._mapt.pin_x.in_positions[val].get_value()
+        piny = await self._mapt.pin_y.in_positions[val].get_value()
+        colx = await self._mapt.col_x.in_positions[val].get_value()
+        coly = await self._mapt.col_y.in_positions[val].get_value()
 
         return AperturePosition(
             pinhole_x=pinx, pinhole_y=piny, collimator_x=colx, collimator_y=coly
@@ -118,14 +118,14 @@ class PinholeCollimatorControl(StandardReadable, Movable[str]):
         always moved out first and the pinhole stage second.
         """
         LOGGER.info("Moving pinhole and collimator stages to out position")
-        colx_out = await self.mapt.col_x_out.get_value()
-        pin_x_out = await self.mapt.pin_x_out.get_value()
+        colx_out = await self._mapt.col_x_out.get_value()
+        pin_x_out = await self._mapt.pin_x_out.get_value()
         # First move Collimator x motor
         LOGGER.debug(f"Move collimator stage x motor to {colx_out}")
-        await self.collimator.x.set(colx_out)
+        await self._collimator.x.set(colx_out)
         # Then move Pinhole x motor
         LOGGER.debug(f"Move pinhole stage x motor to {pin_x_out}")
-        await self.pinhole.x.set(pin_x_out)
+        await self._pinhole.x.set(pin_x_out)
 
     async def _safe_move_in(self, value: _PinColPosition):
         """Move the pinhole and collimator stages safely to the in position.
@@ -134,7 +134,7 @@ class PinholeCollimatorControl(StandardReadable, Movable[str]):
         LOGGER.info(
             f"Moving pinhole and collimator stages to in position: {value.value}"
         )
-        await self.mapt.configuration.select_config.set(value, wait=True)
+        await self._mapt.configuration.select_config.set(value, wait=True)
         # NOTE. The apply PV will not be used here unless fixed in controls first.
         # This is to avoid collisions. A safe move in will move first the pinhole stage
         # and then the collimator stage, but apply will try to move all the motors
@@ -147,14 +147,14 @@ class PinholeCollimatorControl(StandardReadable, Movable[str]):
         # First move Pinhole motors,
         LOGGER.debug("Moving pinhole stage in")
         await asyncio.gather(
-            self.pinhole.x.set(aperture_positions.pinhole_x),
-            self.pinhole.y.set(aperture_positions.pinhole_y),
+            self._pinhole.x.set(aperture_positions.pinhole_x),
+            self._pinhole.y.set(aperture_positions.pinhole_y),
         )
         # Then move Collimator motors
         LOGGER.debug("Moving collimator stage in")
         await asyncio.gather(
-            self.collimator.x.set(aperture_positions.collimator_x),
-            self.collimator.y.set(aperture_positions.collimator_y),
+            self._collimator.x.set(aperture_positions.collimator_x),
+            self._collimator.y.set(aperture_positions.collimator_y),
         )
 
     @AsyncStatus.wrap
