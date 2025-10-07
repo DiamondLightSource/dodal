@@ -398,20 +398,12 @@ class I10Apple2Controller(Apple2Controller[I10Apple2]):
         )
 
     def _read_linear_arbitrary_angle(self, pol_angle: float, pol: Pol) -> float:
-        if pol != Pol.LA:
-            raise RuntimeError(
-                "Angle control is not available in polarisation"
-                + f" {pol} with {self.name}"
-            )
-        elif pol_angle is not None:
-            return pol_angle
+        self._raise_if_not_la(pol)
+        return pol_angle
 
     async def _set_linear_arbitrary_angle(self, pol_angle: float) -> None:
         pol = await self.polarisation.get_value()
-        if pol != Pol.LA:
-            raise RuntimeError(
-                f"Angle control is not available in polarisation {pol} with {self.name}"
-            )
+        self._raise_if_not_la(pol)
         # Moving to real angle which is 210 to 30.
         alpha_real = (
             pol_angle
@@ -464,6 +456,13 @@ class I10Apple2Controller(Apple2Controller[I10Apple2]):
         if pol != Pol.LA:
             await self.apple2().jaw_phase.set(0)
             await self.apple2().jaw_phase.set_move.set(1)
+
+    def _raise_if_not_la(self, pol: Pol) -> None:
+        if pol != Pol.LA:
+            raise RuntimeError(
+                "Angle control is not available in polarisation"
+                + f" {pol} with {self.name}"
+            )
 
 
 class LinearArbitraryAngle(StandardReadable, Movable[SupportsFloat]):

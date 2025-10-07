@@ -285,7 +285,7 @@ async def test_fail_i10_apple2_controller_set_id_not_ready(
     )
 
 
-async def test_i10apple2_RE_scan(beam_energy: BeamEnergy, RE: RunEngine):
+async def test_beam_energy_re_scan(beam_energy: BeamEnergy, RE: RunEngine):
     docs = defaultdict(list)
 
     def capture_emitted(name, doc):
@@ -299,7 +299,7 @@ async def test_i10apple2_RE_scan(beam_energy: BeamEnergy, RE: RunEngine):
         assert data["data"]["mock_pgm-energy"] == 500 + cnt * 10
 
 
-async def test_beam_energy_re_scan(
+async def test_beam_energy_re_scan_with_offset(
     beam_energy: BeamEnergy, mock_id_controller: I10Apple2Controller, RE: RunEngine
 ):
     docs = defaultdict(list)
@@ -462,11 +462,23 @@ async def test_id_polarisation_read_leave_lh3_unchanged_when_hardware_match(
     assert (await mock_id_pol.read())["mock_id_controller-polarisation"]["value"] == pol
 
 
-async def test_linear_arbitrary_pol_fail(
+async def test_linear_arbitrary_pol_fail_set(
     mock_linear_arbitrary_angle: LinearArbitraryAngle,
 ):
     with pytest.raises(RuntimeError) as e:
         await mock_linear_arbitrary_angle.set(20)
+    assert str(e.value) == (
+        f"Angle control is not available in polarisation"
+        f" {await mock_linear_arbitrary_angle._id_controller_ref().polarisation.get_value()}"
+        + f" with {mock_linear_arbitrary_angle._id_controller_ref().name}"
+    )
+
+
+async def test_linear_arbitrary_pol_fail_read(
+    mock_linear_arbitrary_angle: LinearArbitraryAngle,
+):
+    with pytest.raises(RuntimeError) as e:
+        await mock_linear_arbitrary_angle.read()
     assert str(e.value) == (
         f"Angle control is not available in polarisation"
         f" {await mock_linear_arbitrary_angle._id_controller_ref().polarisation.get_value()}"
