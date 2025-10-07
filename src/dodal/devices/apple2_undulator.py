@@ -621,28 +621,28 @@ class Apple2Controller(abc.ABC, StandardReadable, Movable, Generic[Apple2Type]):
 
 class IdEnergy(StandardReadable, Movable):
     def __init__(self, id_controller: Apple2Controller, name: str = "") -> None:
-        self.id_controller = Reference(id_controller)
-        super().__init__(name=name)  #
+        self.energy = Reference(id_controller.energy)
+        super().__init__(name=name)
 
     def set(self, energy: float) -> Status:
-        return self.id_controller().set(energy)
+        return self.energy().set(energy)
 
 
 class IdPolarisation(StandardReadable, Movable):
     def __init__(self, id_controller: Apple2Controller, name: str = "") -> None:
-        self.id_controller = Reference(id_controller)
+        self.polarisation = Reference(id_controller.polarisation)
         super().__init__(name=name)
 
         self.add_readables(
             [
-                self.id_controller().polarisation,
+                self.polarisation(),
             ],
             StandardReadableFormat.HINTED_SIGNAL,
         )
 
     @AsyncStatus.wrap
     async def set(self, pol: Pol) -> None:
-        await self.id_controller().polarisation.set(pol)
+        await self.polarisation().set(pol)
 
 
 class BeamEnergy(StandardReadable, Movable[float]):
@@ -651,9 +651,7 @@ class BeamEnergy(StandardReadable, Movable[float]):
 
     """
 
-    def __init__(
-        self, id_controller: Apple2Controller, pgm: PGM, name: str = ""
-    ) -> None:
+    def __init__(self, id_energy: IdEnergy, pgm: PGM, name: str = "") -> None:
         """
         Parameters
         ----------
@@ -665,12 +663,12 @@ class BeamEnergy(StandardReadable, Movable[float]):
             New device name.
         """
         super().__init__(name=name)
-        self._id_controller_ref = Reference(id_controller)
+        self._IdEnergy = Reference(id_energy)
         self._pgm_ref = Reference(pgm)
 
         self.add_readables(
             [
-                self._id_controller_ref().energy,
+                self._IdEnergy().energy(),
                 self._pgm_ref().energy.user_readback,
             ],
             StandardReadableFormat.HINTED_SIGNAL,
@@ -683,8 +681,8 @@ class BeamEnergy(StandardReadable, Movable[float]):
     async def set(self, value: float) -> None:
         LOGGER.info(f"Moving f{self.name} energy to {value}.")
         await asyncio.gather(
-            self._id_controller_ref().energy.set(
-                value=value + await self.energy_offset.get_value()
-            ),
+            self._IdEnergy()
+            .energy()
+            .set(value=value + await self.energy_offset.get_value()),
             self._pgm_ref().energy.set(value),
         )

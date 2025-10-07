@@ -19,6 +19,7 @@ from ophyd_async.testing import (
 
 from dodal.devices.apple2_undulator import (
     BeamEnergy,
+    IdEnergy,
     IdPolarisation,
     Pol,
     UndulatorGap,
@@ -165,11 +166,22 @@ async def mock_id_controller(
 
 
 @pytest.fixture
+async def mock_id_energy(
+    mock_id_controller: I10Apple2Controller,
+) -> IdEnergy:
+    async with init_devices(mock=True):
+        mock_id_energy = IdEnergy(
+            id_controller=mock_id_controller,
+        )
+    return mock_id_energy
+
+
+@pytest.fixture
 async def beam_energy(
-    mock_id_controller: I10Apple2Controller, mock_pgm: PGM
+    mock_id_energy: IdEnergy, mock_id_controller: I10Apple2Controller, mock_pgm: PGM
 ) -> BeamEnergy:
     async with init_devices(mock=True):
-        beam_energy = BeamEnergy(id_controller=mock_id_controller, pgm=mock_pgm)
+        beam_energy = BeamEnergy(id_energy=mock_id_energy, pgm=mock_pgm)
     return beam_energy
 
 
@@ -349,6 +361,7 @@ async def test_beam_energy_re_scan(
 )
 async def test_id_polarisation_set(
     mock_id_pol: IdPolarisation,
+    mock_id_controller: I10Apple2Controller,
     pol: Pol,
     energy: float,
     expect_top_inner: float,
@@ -357,7 +370,7 @@ async def test_id_polarisation_set(
     expect_btm_outer: float,
     expect_gap: float,
 ):
-    set_mock_value(mock_id_pol.id_controller()._energy, energy)
+    set_mock_value(mock_id_controller._energy, energy)
 
     if pol == "dsf":
         with pytest.raises(ValueError):
@@ -366,30 +379,30 @@ async def test_id_polarisation_set(
         await mock_id_pol.set(pol)
 
         top_inner = get_mock_put(
-            mock_id_pol.id_controller().apple2().phase.top_inner.user_setpoint
+            mock_id_controller.apple2().phase.top_inner.user_setpoint
         )
         top_inner.assert_called_once()
         assert float(top_inner.call_args[0][0]) == pytest.approx(expect_top_inner, 0.01)
 
         top_outer = get_mock_put(
-            mock_id_pol.id_controller().apple2().phase.top_outer.user_setpoint
+            mock_id_controller.apple2().phase.top_outer.user_setpoint
         )
         top_outer.assert_called_once()
         assert float(top_outer.call_args[0][0]) == pytest.approx(expect_top_outer, 0.01)
 
         btm_inner = get_mock_put(
-            mock_id_pol.id_controller().apple2().phase.btm_inner.user_setpoint
+            mock_id_controller.apple2().phase.btm_inner.user_setpoint
         )
         btm_inner.assert_called_once()
         assert float(btm_inner.call_args[0][0]) == pytest.approx(expect_btm_inner, 0.01)
 
         btm_outer = get_mock_put(
-            mock_id_pol.id_controller().apple2().phase.btm_outer.user_setpoint
+            mock_id_controller.apple2().phase.btm_outer.user_setpoint
         )
         btm_outer.assert_called_once()
         assert float(btm_outer.call_args[0][0]) == pytest.approx(expect_btm_outer, 0.01)
 
-        gap = get_mock_put(mock_id_pol.id_controller().apple2().gap.user_setpoint)
+        gap = get_mock_put(mock_id_controller.apple2().gap.user_setpoint)
         gap.assert_called_once()
         assert float(gap.call_args[0][0]) == pytest.approx(expect_gap, 0.05)
 
@@ -406,6 +419,7 @@ async def test_id_polarisation_set(
 )
 async def test_id_polarisation_read_check_pol_from_hardware(
     mock_id_pol: IdPolarisation,
+    mock_id_controller: I10Apple2Controller,
     pol: str,
     energy: float,
     top_inner: float,
@@ -413,20 +427,12 @@ async def test_id_polarisation_read_check_pol_from_hardware(
     btm_inner: float,
     btm_outer: float,
 ):
-    set_mock_value(mock_id_pol.id_controller()._energy, energy)
+    set_mock_value(mock_id_controller._energy, energy)
 
-    set_mock_value(
-        mock_id_pol.id_controller().apple2().phase.top_inner.user_readback, top_inner
-    )
-    set_mock_value(
-        mock_id_pol.id_controller().apple2().phase.top_outer.user_readback, top_outer
-    )
-    set_mock_value(
-        mock_id_pol.id_controller().apple2().phase.btm_inner.user_readback, btm_inner
-    )
-    set_mock_value(
-        mock_id_pol.id_controller().apple2().phase.btm_outer.user_readback, btm_outer
-    )
+    set_mock_value(mock_id_controller.apple2().phase.top_inner.user_readback, top_inner)
+    set_mock_value(mock_id_controller.apple2().phase.top_outer.user_readback, top_outer)
+    set_mock_value(mock_id_controller.apple2().phase.btm_inner.user_readback, btm_inner)
+    set_mock_value(mock_id_controller.apple2().phase.btm_outer.user_readback, btm_outer)
 
     assert (await mock_id_pol.read())["mock_id_controller-polarisation"]["value"] == pol
 
@@ -439,6 +445,7 @@ async def test_id_polarisation_read_check_pol_from_hardware(
 )
 async def test_id_polarisation_read_leave_lh3_unchanged_when_hardware_match(
     mock_id_pol: IdPolarisation,
+    mock_id_controller: I10Apple2Controller,
     pol: str,
     energy: float,
     top_inner: float,
@@ -446,20 +453,12 @@ async def test_id_polarisation_read_leave_lh3_unchanged_when_hardware_match(
     btm_inner: float,
     btm_outer: float,
 ):
-    set_mock_value(mock_id_pol.id_controller()._energy, energy)
-    mock_id_pol.id_controller()._set_pol_setpoint(Pol("lh3"))
-    set_mock_value(
-        mock_id_pol.id_controller().apple2().phase.top_inner.user_readback, top_inner
-    )
-    set_mock_value(
-        mock_id_pol.id_controller().apple2().phase.top_outer.user_readback, top_outer
-    )
-    set_mock_value(
-        mock_id_pol.id_controller().apple2().phase.btm_inner.user_readback, btm_inner
-    )
-    set_mock_value(
-        mock_id_pol.id_controller().apple2().phase.btm_outer.user_readback, btm_outer
-    )
+    set_mock_value(mock_id_controller._energy, energy)
+    mock_id_controller._set_pol_setpoint(Pol("lh3"))
+    set_mock_value(mock_id_controller.apple2().phase.top_inner.user_readback, top_inner)
+    set_mock_value(mock_id_controller.apple2().phase.top_outer.user_readback, top_outer)
+    set_mock_value(mock_id_controller.apple2().phase.btm_inner.user_readback, btm_inner)
+    set_mock_value(mock_id_controller.apple2().phase.btm_outer.user_readback, btm_outer)
     assert (await mock_id_pol.read())["mock_id_controller-polarisation"]["value"] == pol
 
 
