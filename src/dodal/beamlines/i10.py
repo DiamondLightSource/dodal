@@ -65,12 +65,7 @@ def pgm() -> PGM:
 
 @device_factory()
 def idd() -> I10Apple2:
-    """i10 downstream insertion device:
-    id.energy.set(<energy>) to change beamline energy.
-    id.energy.energy_offset.set(<off_set>) to change id energy offset relative to pgm.
-    id.pol.set(<polarisation>) to change polarisation.
-    id.laa.set(<linear polarisation angle>) to change polarisation angle, must be in LA mode.
-    """
+    """i10 downstream insertion device:"""
     return I10Apple2(
         id_gap=UndulatorGap(prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:"),
         id_phase=UndulatorPhaseAxes(
@@ -89,7 +84,7 @@ def idd() -> I10Apple2:
 
 @device_factory()
 def idd_controller() -> I10Apple2Controller:
-    """I10 insertion device controller, it controls both idu and idd."""
+    """I10 downstream insertion device controller."""
     return I10Apple2Controller(
         apple2=idd(),
         lookuptable_dir=LOOK_UPTABLE_DIR,
@@ -115,12 +110,7 @@ def idd_laa() -> LinearArbitraryAngle:
 
 @device_factory()
 def idu() -> I10Apple2:
-    """i10 downstream insertion device:
-    id.energy.set(<energy>) to change beamline energy.
-    id.energy.energy_offset.set(<off_set>) to change id energy offset relative to pgm.
-    id.pol.set(<polarisation>) to change polarisation.
-    id.laa.set(<linear polarisation angle>) to change polarisation angle, must be in LA mode.
-    """
+    """i10 upstream insertion device"""
     return I10Apple2(
         id_gap=UndulatorGap(prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-21:"),
         id_phase=UndulatorPhaseAxes(
@@ -139,7 +129,7 @@ def idu() -> I10Apple2:
 
 @device_factory()
 def idu_controller() -> I10Apple2Controller:
-    """I10 insertion device controller, it controls both idu and idd."""
+    """I10 upstream insertion device controller."""
     return I10Apple2Controller(
         apple2=idu(),
         lookuptable_dir=LOOK_UPTABLE_DIR,
