@@ -582,7 +582,7 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
 
 
 class IdEnergyBase(abc.ABC, StandardReadable, Movable):
-    """Base class for energy movable device."""
+    """Base class for ID energy movable device."""
 
     def __init__(self, name: str = "") -> None:
         self.energy: Reference[SignalRW[float]]
@@ -591,37 +591,6 @@ class IdEnergyBase(abc.ABC, StandardReadable, Movable):
     @abc.abstractmethod
     @AsyncStatus.wrap
     async def set(self, energy: float) -> None: ...
-
-
-class IdEnergy(IdEnergyBase):
-    """Apple2 ID energy movable device."""
-
-    def __init__(self, id_controller: Apple2Controller, name: str = "") -> None:
-        self.energy = Reference(id_controller.energy)
-        super().__init__(name=name)
-
-    @AsyncStatus.wrap
-    async def set(self, energy: float) -> None:
-        await self.energy().set(energy)
-
-
-class IdPolarisation(StandardReadable, Movable):
-    """Apple2 ID polarisation movable device."""
-
-    def __init__(self, id_controller: Apple2Controller, name: str = "") -> None:
-        self.polarisation = Reference(id_controller.polarisation)
-        super().__init__(name=name)
-
-        self.add_readables(
-            [
-                self.polarisation(),
-            ],
-            StandardReadableFormat.HINTED_SIGNAL,
-        )
-
-    @AsyncStatus.wrap
-    async def set(self, pol: Pol) -> None:
-        await self.polarisation().set(pol)
 
 
 class BeamEnergy(StandardReadable, Movable[float]):
@@ -666,3 +635,34 @@ class BeamEnergy(StandardReadable, Movable[float]):
             self._Id_energy().set(energy=energy + await self.energy_offset.get_value()),
             self._mono_energy().set(energy),
         )
+
+
+class IdEnergy(IdEnergyBase):
+    """Apple2 ID energy movable device."""
+
+    def __init__(self, id_controller: Apple2Controller, name: str = "") -> None:
+        self.energy = Reference(id_controller.energy)
+        super().__init__(name=name)
+
+    @AsyncStatus.wrap
+    async def set(self, energy: float) -> None:
+        await self.energy().set(energy)
+
+
+class IdPolarisation(StandardReadable, Movable):
+    """Apple2 ID polarisation movable device."""
+
+    def __init__(self, id_controller: Apple2Controller, name: str = "") -> None:
+        self.polarisation = Reference(id_controller.polarisation)
+        super().__init__(name=name)
+
+        self.add_readables(
+            [
+                self.polarisation(),
+            ],
+            StandardReadableFormat.HINTED_SIGNAL,
+        )
+
+    @AsyncStatus.wrap
+    async def set(self, pol: Pol) -> None:
+        await self.polarisation().set(pol)
