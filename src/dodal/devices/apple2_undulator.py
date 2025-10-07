@@ -662,13 +662,13 @@ class BeamEnergy(StandardReadable, Movable[float]):
             New device name.
         """
         super().__init__(name=name)
-        self.id_controller = Reference(id_controller)
-        self.pgm_ref = Reference(pgm)
+        self._id_controller_ref = Reference(id_controller)
+        self._pgm_ref = Reference(pgm)
 
         self.add_readables(
             [
-                self.id_controller().energy,
-                self.pgm_ref().energy.user_readback,
+                self._id_controller_ref().energy,
+                self._pgm_ref().energy.user_readback,
             ],
             StandardReadableFormat.HINTED_SIGNAL,
         )
@@ -680,8 +680,8 @@ class BeamEnergy(StandardReadable, Movable[float]):
     async def set(self, value: float) -> None:
         LOGGER.info(f"Moving f{self.name} energy to {value}.")
         await asyncio.gather(
-            self.id_controller().energy.set(
+            self._id_controller_ref().energy.set(
                 value=value + await self.energy_offset.get_value()
             ),
-            self.pgm_ref().energy.set(value),
+            self._pgm_ref().energy.set(value),
         )

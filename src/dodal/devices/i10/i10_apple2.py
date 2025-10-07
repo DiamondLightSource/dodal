@@ -12,7 +12,8 @@ from ophyd_async.core import (
     Reference,
     StandardReadable,
     StandardReadableFormat,
-    soft_signal_r_and_setter,
+    derived_signal_rw,
+    soft_signal_rw,
 )
 from pydantic import BaseModel, ConfigDict, RootModel
 
@@ -330,6 +331,9 @@ class I10Apple2Controller(Apple2Controller):
         look_up_table_dir: str,
         source: tuple[str, str],
         config_client: ConfigServer,
+        jaw_phase_limit: float = 12.0,
+        jaw_phase_poly_param: list[float] = DEFAULT_JAW_PHASE_POLY_PARAMS,
+        angle_threshold_deg=30.0,
         name: str = "",
     ) -> None:
         """I10Id is a compound device that combines the I10-specific Apple2 undulator,
@@ -348,13 +352,57 @@ class I10Apple2Controller(Apple2Controller):
         linear_arbitrary_angle : LinearArbitraryAngle
             A device for controlling the linear arbitrary polarization angle.
         """
+        super().__init__(apple2=apple2, name=name)
         self.lookup_table_client = I10EnergyMotorLookup(
             look_up_table_dir=look_up_table_dir,
             source=source,
             config_client=config_client,
         )
+
         self.jaw_phase = Reference(jaw_phase)
-        super().__init__(apple2=apple2, name=name)
+        self.jaw_phase_from_angle = np.poly1d(jaw_phase_poly_param)
+        self.angle_threshold_deg = angle_threshold_deg
+        self.jaw_phase_limit = jaw_phase_limit
+        self._linear_arbitrary_angle = soft_signal_rw(float, initial_value=None)
+
+        self.linear_arbitrary_angle = derived_signal_rw(
+            raw_to_derived=self._read_linear_arbitrary_angle,
+            set_derived=self._set_linear_arbitrary_angle,
+            pol_angle=self._linear_arbitrary_angle,
+            pol=self.polarisation,
+        )
+
+    def _read_linear_arbitrary_angle(self, pol_angle: float, pol: Pol) -> float:
+        if pol != Pol.LA:
+            raise RuntimeError(
+                "Angle control is not available in polarisation"
+                + f" {pol} with {self.name}"
+            )
+        elif pol_angle is not None:
+            return pol_angle
+        else:
+            raise ValueError("Linear arbitrary angle is not set.")
+
+    async def _set_linear_arbitrary_angle(self, pol_angle: float) -> None:
+        pol = await self.polarisation.get_value()
+        if pol != Pol.LA:
+            raise RuntimeError(
+                f"Angle control is not available in polarisation {pol} with {self.name}"
+            )
+        # Moving to real angle which is 210 to 30.
+        alpha_real = (
+            pol_angle
+            if pol_angle > self.angle_threshold_deg
+            else pol_angle + ALPHA_OFFSET
+        )
+        jaw_phase = self.jaw_phase_from_angle(alpha_real)
+        if abs(jaw_phase) > self.jaw_phase_limit:
+            raise RuntimeError(
+                f"jaw_phase position for angle ({pol_angle}) is outside permitted range"
+                f" [-{self.jaw_phase_limit}, {self.jaw_phase_limit}]"
+            )
+        await self.jaw_phase().set(jaw_phase)
+        await self._linear_arbitrary_angle.set(pol_angle)
 
     async def _set(self, value: float) -> None:
         """
@@ -409,9 +457,6 @@ class LinearArbitraryAngle(StandardReadable, Movable[SupportsFloat]):
         self,
         id_controller: I10Apple2Controller,
         name: str = "",
-        jaw_phase_limit: float = 12.0,
-        jaw_phase_poly_param: list[float] = DEFAULT_JAW_PHASE_POLY_PARAMS,
-        angle_threshold_deg=30.0,
     ) -> None:
         """
         Parameters
@@ -426,30 +471,13 @@ class LinearArbitraryAngle(StandardReadable, Movable[SupportsFloat]):
             polynomial parameters highest power first.
         """
         super().__init__(name=name)
-        self.id_controller_ref = Reference(id_controller)
-        self.jaw_phase_from_angle = np.poly1d(jaw_phase_poly_param)
-        self.angle_threshold_deg = angle_threshold_deg
-        self.jaw_phase_limit = jaw_phase_limit
-        with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
-            self.angle, self._angle_set = soft_signal_r_and_setter(
-                float, initial_value=None
-            )
+        self._id_controller_ref = Reference(id_controller)
+
+        self.add_readables(
+            [self._id_controller_ref().linear_arbitrary_angle],
+            StandardReadableFormat.HINTED_SIGNAL,
+        )
 
     @AsyncStatus.wrap
-    async def set(self, value: SupportsFloat) -> None:
-        value = float(value)
-        pol = await self.id_controller_ref().polarisation.get_value()
-        if pol != Pol.LA:
-            raise RuntimeError(
-                f"Angle control is not available in polarisation {pol} with {self.id_controller_ref().name}"
-            )
-        # Moving to real angle which is 210 to 30.
-        alpha_real = value if value > self.angle_threshold_deg else value + ALPHA_OFFSET
-        jaw_phase = self.jaw_phase_from_angle(alpha_real)
-        if abs(jaw_phase) > self.jaw_phase_limit:
-            raise RuntimeError(
-                f"jaw_phase position for angle ({value}) is outside permitted range"
-                f" [-{self.jaw_phase_limit}, {self.jaw_phase_limit}]"
-            )
-        await self.id_controller_ref().jaw_phase().set(jaw_phase)
-        self._angle_set(value)
+    async def set(self, angle: float) -> None:
+        await self._id_controller_ref().linear_arbitrary_angle.set(angle)

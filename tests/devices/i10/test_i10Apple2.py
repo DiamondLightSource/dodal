@@ -7,6 +7,7 @@ import pytest
 from bluesky.plans import scan
 from bluesky.run_engine import RunEngine
 from daq_config_server.client import ConfigServer
+from numpy import linspace, poly1d
 from ophyd_async.core import init_devices
 from ophyd_async.testing import (
     assert_emitted,
@@ -26,7 +27,9 @@ from dodal.devices.apple2_undulator import (
     UndulatorPhaseAxes,
 )
 from dodal.devices.i10.i10_apple2 import (
+    DEFAULT_JAW_PHASE_POLY_PARAMS,
     I10Apple2Controller,
+    LinearArbitraryAngle,
 )
 from dodal.devices.i10.i10_setting_data import I10Grating
 from dodal.devices.pgm import PGM
@@ -169,11 +172,15 @@ async def mock_id_pol(mock_id_controller: I10Apple2Controller) -> IdPolarisation
     return mock_id_pol
 
 
-# @pytest.fixture
-# async def mock_linear_arbitrary_angle(mock_id: I10Apple2) -> LinearArbitraryAngle:
-#     async with init_devices(mock=True):
-#         mock_linear_arbitrary_angle = LinearArbitraryAngle(id=mock_id)
-#     return mock_linear_arbitrary_angle
+@pytest.fixture
+async def mock_linear_arbitrary_angle(
+    mock_id_controller: I10Apple2Controller,
+) -> LinearArbitraryAngle:
+    async with init_devices(mock=True):
+        mock_linear_arbitrary_angle = LinearArbitraryAngle(
+            id_controller=mock_id_controller
+        )
+    return mock_linear_arbitrary_angle
 
 
 @pytest.mark.parametrize(
@@ -276,9 +283,9 @@ async def test_beam_energy_re_scan(
     rbv_mocks = Mock()
     rbv_mocks.get.side_effect = range(1700, 1810, 10)
     callback_on_mock_put(
-        beam_energy.pgm_ref().energy.user_setpoint,
+        beam_energy._pgm_ref().energy.user_setpoint,
         lambda *_, **__: set_mock_value(
-            beam_energy.pgm_ref().energy.user_readback, rbv_mocks.get()
+            beam_energy._pgm_ref().energy.user_readback, rbv_mocks.get()
         ),
     )
     RE(
@@ -438,117 +445,148 @@ async def test_id_polarisation_read_leave_lh3_unchanged_when_hardware_match(
     assert (await mock_id_pol.read())["mock_id_controller-polarisation"]["value"] == pol
 
 
-# async def test_linear_arbitrary_pol_fail(
-#     mock_linear_arbitrary_angle: LinearArbitraryAngle,
-# ):
-#     with pytest.raises(RuntimeError) as e:
-#         await mock_linear_arbitrary_angle.set(20)
-#     assert str(e.value) == (
-#         f"Angle control is not available in polarisation"
-#         f" {await mock_linear_arbitrary_angle.id_ref().polarisation.get_value()} with {mock_linear_arbitrary_angle.id_ref().name}"
-#     )
+async def test_linear_arbitrary_pol_fail(
+    mock_linear_arbitrary_angle: LinearArbitraryAngle,
+):
+    with pytest.raises(RuntimeError) as e:
+        await mock_linear_arbitrary_angle.set(20)
+    assert str(e.value) == (
+        f"Angle control is not available in polarisation"
+        f" {await mock_linear_arbitrary_angle._id_controller_ref().polarisation.get_value()}"
+        + f" with {mock_linear_arbitrary_angle._id_controller_ref().name}"
+    )
 
 
-# @pytest.mark.parametrize(
-#     "poly",
-#     [18, -18, 12.01, -12.01],
-# )
-# async def test_linear_arbitrary_limit_fail(
-#     mock_linear_arbitrary_angle: LinearArbitraryAngle, poly: float
-# ):
-#     set_mock_value(
-#         mock_linear_arbitrary_angle.id_ref().motors.phase.top_inner.user_readback,
-#         16.4,
-#     )
-#     set_mock_value(
-#         mock_linear_arbitrary_angle.id_ref().motors.phase.top_outer.user_readback, 0
-#     )
-#     set_mock_value(
-#         mock_linear_arbitrary_angle.id_ref().motors.phase.btm_inner.user_readback, 0
-#     )
-#     set_mock_value(
-#         mock_linear_arbitrary_angle.id_ref().motors.phase.btm_outer.user_readback, -16.4
-#     )
-#     mock_linear_arbitrary_angle.jaw_phase_from_angle = poly1d([poly])
-#     with pytest.raises(RuntimeError) as e:
-#         await mock_linear_arbitrary_angle.set(20)
-#     assert (
-#         str(e.value)
-#         == f"jaw_phase position for angle (20.0) is outside permitted range"
-#         f" [-{mock_linear_arbitrary_angle.jaw_phase_limit}, {mock_linear_arbitrary_angle.jaw_phase_limit}]"
-#     )
+@pytest.mark.parametrize(
+    "poly",
+    [18, -18, 12.01, -12.01],
+)
+async def test_linear_arbitrary_limit_fail(
+    mock_linear_arbitrary_angle: LinearArbitraryAngle, poly: float
+):
+    set_mock_value(
+        mock_linear_arbitrary_angle._id_controller_ref()
+        .apple2()
+        .phase.top_inner.user_readback,
+        16.4,
+    )
+    set_mock_value(
+        mock_linear_arbitrary_angle._id_controller_ref()
+        .apple2()
+        .phase.top_outer.user_readback,
+        0,
+    )
+    set_mock_value(
+        mock_linear_arbitrary_angle._id_controller_ref()
+        .apple2()
+        .phase.btm_inner.user_readback,
+        0,
+    )
+    set_mock_value(
+        mock_linear_arbitrary_angle._id_controller_ref()
+        .apple2()
+        .phase.btm_outer.user_readback,
+        -16.4,
+    )
+    mock_linear_arbitrary_angle._id_controller_ref().jaw_phase_from_angle = poly1d(
+        [poly]
+    )
+    with pytest.raises(RuntimeError) as e:
+        await mock_linear_arbitrary_angle.set(20.0)
+    assert (
+        str(e.value)
+        == f"jaw_phase position for angle (20.0) is outside permitted range"
+        f" [-{mock_linear_arbitrary_angle._id_controller_ref().jaw_phase_limit},"
+        f" {mock_linear_arbitrary_angle._id_controller_ref().jaw_phase_limit}]"
+    )
 
 
-# @pytest.mark.parametrize(
-#     "start, stop, num_point",
-#     [
-#         (-1, 180, 11),
-#         (-20, 170, 31),
-#         (-90, -25, 18),
-#     ],
-# )
-# async def test_linear_arbitrary_RE_scan(
-#     mock_linear_arbitrary_angle: LinearArbitraryAngle,
-#     RE: RunEngine,
-#     start: float,
-#     stop: float,
-#     num_point: int,
-# ):
-#     angles = np.linspace(start, stop, num_point, endpoint=True)
-#     docs = defaultdict(list)
+@pytest.mark.parametrize(
+    "start, stop, num_point",
+    [
+        (-1, 180, 11),
+        (-20, 170, 31),
+        (-90, -25, 18),
+    ],
+)
+async def test_linear_arbitrary_RE_scan(
+    mock_linear_arbitrary_angle: LinearArbitraryAngle,
+    RE: RunEngine,
+    start: float,
+    stop: float,
+    num_point: int,
+):
+    angles = linspace(start, stop, num_point, endpoint=True)
+    docs = defaultdict(list)
 
-#     def capture_emitted(name, doc):
-#         docs[name].append(doc)
+    def capture_emitted(name, doc):
+        docs[name].append(doc)
 
-#     set_mock_value(
-#         mock_linear_arbitrary_angle.id_ref().motors.phase.top_inner.user_readback,
-#         16.4,
-#     )
-#     set_mock_value(
-#         mock_linear_arbitrary_angle.id_ref().motors.phase.top_outer.user_readback, 0
-#     )
-#     set_mock_value(
-#         mock_linear_arbitrary_angle.id_ref().motors.phase.btm_inner.user_readback, 0
-#     )
-#     set_mock_value(
-#         mock_linear_arbitrary_angle.id_ref().motors.phase.btm_outer.user_readback, -16.4
-#     )
-#     RE(
-#         scan(
-#             [],
-#             mock_linear_arbitrary_angle,
-#             start,
-#             stop,
-#             num=num_point,
-#         ),
-#         capture_emitted,
-#     )
-#     assert_emitted(docs, start=1, descriptor=1, event=num_point, stop=1)
-#     set_mock_value(
-#         mock_linear_arbitrary_angle.id_ref().motors.gap.gate, UndulatorGateStatus.CLOSE
-#     )
-#     set_mock_value(
-#         mock_linear_arbitrary_angle.id_ref().motors.phase.gate,
-#         UndulatorGateStatus.CLOSE,
-#     )
-#     jaw_phase = get_mock_put(
-#         mock_linear_arbitrary_angle.id_ref().id_jaw_phase.jaw_phase.user_setpoint
-#     )
+    set_mock_value(
+        mock_linear_arbitrary_angle._id_controller_ref()
+        .apple2()
+        .phase.top_inner.user_readback,
+        16.4,
+    )
+    set_mock_value(
+        mock_linear_arbitrary_angle._id_controller_ref()
+        .apple2()
+        .phase.top_outer.user_readback,
+        0,
+    )
+    set_mock_value(
+        mock_linear_arbitrary_angle._id_controller_ref()
+        .apple2()
+        .phase.btm_inner.user_readback,
+        0,
+    )
+    set_mock_value(
+        mock_linear_arbitrary_angle._id_controller_ref()
+        .apple2()
+        .phase.btm_outer.user_readback,
+        -16.4,
+    )
+    RE(
+        scan(
+            [],
+            mock_linear_arbitrary_angle,
+            start,
+            stop,
+            num=num_point,
+        ),
+        capture_emitted,
+    )
+    assert_emitted(docs, start=1, descriptor=1, event=num_point, stop=1)
+    set_mock_value(
+        mock_linear_arbitrary_angle._id_controller_ref().apple2().gap.gate,
+        UndulatorGateStatus.CLOSE,
+    )
+    set_mock_value(
+        mock_linear_arbitrary_angle._id_controller_ref().apple2().phase.gate,
+        UndulatorGateStatus.CLOSE,
+    )
+    jaw_phase = get_mock_put(
+        mock_linear_arbitrary_angle._id_controller_ref()
+        .jaw_phase()
+        .jaw_phase.user_setpoint
+    )
 
-#     poly = poly1d(
-#         DEFAULT_JAW_PHASE_POLY_PARAMS
-#     )  # default setting for i10 jaw phase to angle
-#     for cnt, data in enumerate(docs["event"]):
-#         temp_angle = angles[cnt]
-#         assert data["data"]["mock_linear_arbitrary_angle-angle"] == temp_angle
-#         alpha_real = (
-#             temp_angle
-#             if temp_angle > mock_linear_arbitrary_angle.angle_threshold_deg
-#             else temp_angle + 180.0
-#         )  # convert angle to jawphase.
-#         assert jaw_phase.call_args_list[cnt] == mock.call(
-#             str(poly(alpha_real)), wait=True
-#         )
+    poly = poly1d(
+        DEFAULT_JAW_PHASE_POLY_PARAMS
+    )  # default setting for i10 jaw phase to angle
+    for cnt, data in enumerate(docs["event"]):
+        temp_angle = angles[cnt]
+        print(data["data"])
+        assert data["data"]["mock_id_controller-linear_arbitrary_angle"] == temp_angle
+        alpha_real = (
+            temp_angle
+            if temp_angle
+            > mock_linear_arbitrary_angle._id_controller_ref().angle_threshold_deg
+            else temp_angle + 180.0
+        )  # convert angle to jawphase.
+        assert jaw_phase.call_args_list[cnt] == mock.call(
+            str(poly(alpha_real)), wait=True
+        )
 
 
 # @pytest.mark.parametrize(
