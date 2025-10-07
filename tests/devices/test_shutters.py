@@ -30,24 +30,18 @@ def test_shutter_set_open_close_without_knowing_enum_values(
     RE(bps.mv(shutter, shutter.CLOSE))
 
 
-def test_shutter_invalid_set(
-    shutter: GenericShutter[ShutterStates], RE: RunEngine
-) -> None:
+def test_shutter_invalid_set(shutter: GenericShutter, RE: RunEngine) -> None:
     with pytest.raises(FailedStatus):
         RE(bps.mv(shutter, ShutterStates.FAULT))
 
 
-async def test_shutter_is_open(
-    shutter: GenericShutter[ShutterStates], RE: RunEngine
-) -> None:
+async def test_shutter_is_open(shutter: GenericShutter, RE: RunEngine) -> None:
     RE(bps.mv(shutter, shutter.OPEN))
     assert await shutter.is_open()
     assert not await shutter.is_closed()
 
 
-async def test_shutter_is_closed(
-    shutter: GenericShutter[ShutterStates], RE: RunEngine
-) -> None:
+async def test_shutter_is_closed(shutter: GenericShutter, RE: RunEngine) -> None:
     RE(bps.mv(shutter, shutter.CLOSE))
     assert not await shutter.is_open()
     assert await shutter.is_closed()
