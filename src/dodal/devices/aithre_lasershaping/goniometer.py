@@ -16,11 +16,17 @@ class Goniometer(XYZOmegaStage):
     """
 
     def __init__(self, prefix: str, name: str = "") -> None:
-        super().__init__(name)
-        self.y = Motor(prefix + "_SAMPY")
-        self.z = Motor(prefix + "_SAMPZ")
-        self.stage_y = Motor(prefix + "_Y")
-        self.stage_z = Motor(prefix + "_Z")
-        self.vertical_position = create_axis_perp_to_rotation(
-            self.omega, self.z, self.y
+        super().__init__(
+            prefix=prefix,
+            name=name
+            x_infix="_X",
+            y_infix="_SAMPY",
+            z_infix="_SAMPZ",
+            omega_infix="_OMEGA",
         )
+        with self.add_children_as_readables():
+            self.stage_y = Motor(prefix + "_Y")
+            self.stage_z = Motor(prefix + "_Z")
+            self.vertical_position = create_axis_perp_to_rotation(
+                self.omega, self.z, self.y
+            )
