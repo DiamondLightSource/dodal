@@ -74,7 +74,6 @@ class VGScientaAnalyserDriverIO(
     async def _set_region(self, ke_region: VGScientaRegion[TLensMode, TPassEnergyEnum]):
         await asyncio.gather(
             self.region_name.set(ke_region.name),
-            self.energy_mode.set(ke_region.energy_mode),
             self.low_energy.set(ke_region.low_energy),
             self.centre_energy.set(ke_region.centre_energy),
             self.high_energy.set(ke_region.high_energy),

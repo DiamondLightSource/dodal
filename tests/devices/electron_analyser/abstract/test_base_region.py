@@ -86,9 +86,13 @@ def test_region_kinetic_and_binding_energy(
         assert r.is_kinetic_energy() != is_binding_energy
 
 
-def assert_region_field_energy_from_switching_energy_modes_is_correct(
-    region: AbstractBaseRegion, field: str, excitation_energy: float
+@pytest.mark.parametrize("field", ["low_energy", "centre_energy", "high_energy"])
+@pytest.mark.parametrize("copy", [True, False])
+@pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
+def test_each_energy_field_for_region_is_correct_when_switching_energy_modes(
+    region: AbstractBaseRegion, field: str, copy: bool
 ) -> None:
+    excitation_energy = 100
     conversion_func_map = {
         EnergyMode.KINETIC: to_binding_energy,
         EnergyMode.BINDING: to_kinetic_energy,
@@ -111,23 +115,16 @@ def assert_region_field_energy_from_switching_energy_modes_is_correct(
     ]
     expected_e_values = [original_energy, converted_energy, original_energy]
 
-    # Do full cycle of switching energy modes
-    # First check shouldn't see change as region is the same energy mode
+    # Do full cycle of switching energy modes.
+    # First check shouldn't see change as region is the same energy mode.
     # Second check cycles to the opposite energy mode, check it is correct via opposite
     # energy mode.
     # Third check cycles back so should be original value.
     for e_mode, e_expected in zip(e_mode_sequence, expected_e_values, strict=False):
-        region.switch_energy_mode(e_mode, excitation_energy)
-        assert getattr(region, field) == e_expected
-        assert region.energy_mode == e_mode
-
-
-@pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
-def test_each_energy_field_for_region_is_correct_when_switching_energy_modes(
-    region: AbstractBaseRegion,
-) -> None:
-    excitation_energy = 100
-    for field in ("low_energy", "centre_energy", "high_energy"):
-        assert_region_field_energy_from_switching_energy_modes_is_correct(
-            region, field, excitation_energy
-        )
+        new_r = region.switch_energy_mode(e_mode, excitation_energy, copy)
+        assert getattr(new_r, field) == e_expected
+        assert new_r.energy_mode == e_mode
+        if copy:
+            assert new_r is not region
+        else:
+            assert new_r is region
