@@ -8,9 +8,9 @@ from ophyd_async.testing import get_mock_put, set_mock_value
 from dodal.devices.i19.pin_col_stages import (
     AperturePosition,
     PinColConfiguration,
-    PinColPosition,
     PinColRequest,
     PinholeCollimatorControl,
+    _PinColPosition,
 )
 from dodal.devices.motors import XYStage
 from dodal.testing import patch_all_motors
@@ -35,12 +35,12 @@ def test_pincol_created_without_errors():
 @pytest.mark.parametrize(
     "ap_request, in_positions, size",
     [
-        (PinColPosition.PCOL20, [12, 34, 7, 28], 20),
-        (PinColPosition.PCOL100, [15, 24, 10, 16], 100),
+        (_PinColPosition.PCOL20, [12, 34, 7, 28], 20),
+        (_PinColPosition.PCOL100, [15, 24, 10, 16], 100),
     ],
 )
 async def test_pincol_get_motor_positions_for_requested_aperture(
-    ap_request: PinColPosition,
+    ap_request: _PinColPosition,
     in_positions: list[float],
     size: int,
     pincol: PinholeCollimatorControl,
@@ -51,7 +51,7 @@ async def test_pincol_get_motor_positions_for_requested_aperture(
     set_mock_value(pincol.mapt.col_x.in_positions[size], in_positions[2])
     set_mock_value(pincol.mapt.col_y.in_positions[size], in_positions[3])
 
-    positions = await pincol.get_motor_positions_for_requested_aperture(ap_request)
+    positions = await pincol._get_motor_positions_for_requested_aperture(ap_request)
 
     assert isinstance(positions, AperturePosition)
 
@@ -118,7 +118,7 @@ async def test_move_in(
         collimator_x=in_positions[2],
         collimator_y=in_positions[3],
     )
-    pincol.get_motor_positions_for_requested_aperture = AsyncMock(
+    pincol._get_motor_positions_for_requested_aperture = AsyncMock(
         return_value=ap_positions
     )
 
@@ -138,7 +138,7 @@ async def test_when_move_in_motors_move_in_right_order(
     ap_positions = AperturePosition(
         pinhole_x=18, pinhole_y=15, collimator_x=22, collimator_y=13
     )
-    pincol.get_motor_positions_for_requested_aperture = AsyncMock(
+    pincol._get_motor_positions_for_requested_aperture = AsyncMock(
         return_value=ap_positions
     )
 

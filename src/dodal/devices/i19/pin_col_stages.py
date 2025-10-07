@@ -1,7 +1,8 @@
 import asyncio
+from enum import StrEnum
 
 from bluesky.protocols import Movable
-from ophyd_async.core import AsyncStatus, StandardReadable, StrictEnum, SubsetEnum
+from ophyd_async.core import AsyncStatus, StandardReadable, SubsetEnum
 from ophyd_async.epics.core import epics_signal_r
 from pydantic import BaseModel
 
@@ -17,8 +18,8 @@ _COL = "-MO-COL-01:"
 _CONFIG = "-OP-PCOL-01:"
 
 
-class PinColRequest(StrictEnum):
-    """Aperture request IN positions."""
+class PinColRequest(StrEnum):
+    """Aperture request positions."""
 
     PCOL20 = "20um"
     PCOL40 = "40um"
@@ -30,7 +31,7 @@ class PinColRequest(StrictEnum):
 # NOTE. Using subset enum because from the OUT positions should only be used by
 # the beamline scientists from the synoptic. Another option will be needed in the
 # device for OUT position.
-class PinColPosition(SubsetEnum):
+class _PinColPosition(SubsetEnum):
     """Aperture request IN positions."""
 
     PCOL20 = "20um"
@@ -62,7 +63,7 @@ class PinColConfiguration(StandardReadable):
 
     def __init__(self, prefix: str, apertures: list[int], name: str = "") -> None:
         with self.add_children_as_readables():
-            self.configuration = MAPTConfigurationControl(prefix, PinColPosition)
+            self.configuration = MAPTConfigurationControl(prefix, _PinColPosition)
             self.pin_x = MAPTConfigurationTable(prefix, "PINX", apertures)
             self.pin_y = MAPTConfigurationTable(prefix, "PINY", apertures)
             self.col_x = MAPTConfigurationTable(prefix, "COLX", apertures)
@@ -84,7 +85,7 @@ class PinholeCollimatorControl(StandardReadable, Movable[str]):
         col_infix: str = _COL,
         config_infix: str = _CONFIG,
     ):
-        self._aperture_sizes = [self._get_aperture_size(i) for i in PinColPosition]
+        self._aperture_sizes = [self._get_aperture_size(i) for i in _PinColPosition]
         with self.add_children_as_readables():
             self.pinhole = XYStage(f"{prefix}{pin_infix}")
             self.collimator = XYStage(f"{prefix}{col_infix}")
@@ -96,8 +97,8 @@ class PinholeCollimatorControl(StandardReadable, Movable[str]):
     def _get_aperture_size(self, ap_request: str) -> int:
         return int(ap_request.strip("um"))
 
-    async def get_motor_positions_for_requested_aperture(
-        self, ap_request: PinColPosition
+    async def _get_motor_positions_for_requested_aperture(
+        self, ap_request: _PinColPosition
     ) -> AperturePosition:
         val = self._get_aperture_size(ap_request.value)
 
@@ -126,7 +127,7 @@ class PinholeCollimatorControl(StandardReadable, Movable[str]):
         LOGGER.debug(f"Move pinhole stage x motor to {pin_x_out}")
         await self.pinhole.x.set(pin_x_out)
 
-    async def _safe_move_in(self, value: PinColPosition):
+    async def _safe_move_in(self, value: _PinColPosition):
         """Move the pinhole and collimator stages safely to the in position.
         In order to avoid a collision, we have to make sure that the pinhole stage is
         always moved in before the collimator stage."""
@@ -138,7 +139,7 @@ class PinholeCollimatorControl(StandardReadable, Movable[str]):
         # This is to avoid collisions. A safe move in will move first the pinhole stage
         # and then the collimator stage, but apply will try to move all the motors
         # at the same time.
-        aperture_positions = await self.get_motor_positions_for_requested_aperture(
+        aperture_positions = await self._get_motor_positions_for_requested_aperture(
             value
         )
         LOGGER.debug(f"Moving motors to {aperture_positions}")
@@ -166,4 +167,4 @@ class PinholeCollimatorControl(StandardReadable, Movable[str]):
         if value is PinColRequest.OUT:
             await self._safe_move_out()
         else:
-            await self._safe_move_in(PinColPosition(value))
+            await self._safe_move_in(_PinColPosition(value))
