@@ -50,7 +50,10 @@ class NullZoomController(BaseZoomController):
 
     @AsyncStatus.wrap
     async def set(self, value: str) -> None:
-        await self.level.set("1.0x", wait=True)
+        if value != "1.0x":
+            raise Exception("Attempting to set zoom level of a null zoom controller")
+        else:
+            await self.level.set(value, wait=True)
 
 
 class ZoomController(BaseZoomController):
