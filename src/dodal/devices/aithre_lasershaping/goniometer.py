@@ -18,7 +18,7 @@ class Goniometer(XYZOmegaStage):
     def __init__(self, prefix: str, name: str = "") -> None:
         super().__init__(
             prefix=prefix,
-            name=name
+            name=name,
             x_infix="_X",
             y_infix="_SAMPY",
             z_infix="_SAMPZ",
