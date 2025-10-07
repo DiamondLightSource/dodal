@@ -564,8 +564,9 @@ async def test_gridscan_prepare_times_out_for_validity_check(
         match="Gridscan parameters not validated after 0.5s",
     ) as exc_info:
         await status
+    cause = exc_info.value.__cause__
     assert (
-        exc_info.value.__cause__.args[0]
-        == f"{device_name}-scan_invalid didn't match 0.0 in 0.5s, "
-        f"last value 1.0"
+        cause
+        and cause.args[0]
+        == f"{device_name}-scan_invalid didn't match 0.0 in 0.5s, last value 1.0"
     )
