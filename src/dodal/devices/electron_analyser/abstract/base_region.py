@@ -88,20 +88,26 @@ class AbstractBaseRegion(
         return self.energy_mode == EnergyMode.KINETIC
 
     def switch_energy_mode(
-        self, energy_mode: EnergyMode, excitation_energy: float
+        self, energy_mode: EnergyMode, excitation_energy: float, copy: bool = True
     ) -> Self:
         """
-        Switch region to new energy mode: Kinetic or Binding. Updates the low_energy,
-        centre_energy, high_energy, and energy_mode, only if it switches to a new one.
+        Switch region with to a new energy mode with a new energy mode: Kinetic or Binding.
+        It caculates new values for low_energy, centre_energy, high_energy, via the
+        excitation enerrgy. It doesn't calculate anything if the region is already of
+        the same energy mode.
 
         Parameters:
-            energy_mode: mode you want to switch the region to.
-            excitation_energy: the energy to calculate the new values of low_energy,
-                               centre_energy, and high_energy.
+            energy_mode: Mode you want to switch the region to.
+            excitation_energy: Energy conversion for low_energy, centre_energy, and
+                               high_energy for new energy mode.
+            copy: Defaults to True. If true, create a copy of this region for the new
+                  energy_mode and return it. If False, alter this region for the
+                  energy_mode and return it self.
+
         Returns:
-            A new region with calculated the selected energy mode.
+            Region with selected energy mode and new calculated energy values.
         """
-        switched_r = self.model_copy()
+        switched_r = self.model_copy() if copy else self
         conv = (
             to_binding_energy
             if energy_mode == EnergyMode.BINDING
