@@ -624,7 +624,8 @@ class IdEnergy(StandardReadable, Movable):
         self.energy = Reference(id_controller.energy)
         super().__init__(name=name)
 
-    def set(self, energy: float) -> Status:
+    @AsyncStatus.wrap
+    async def set(self, energy: float) -> Status:
         return self.energy().set(energy)
 
 
@@ -678,11 +679,9 @@ class BeamEnergy(StandardReadable, Movable[float]):
             self.energy_offset = soft_signal_rw(float, initial_value=0)
 
     @AsyncStatus.wrap
-    async def set(self, value: float) -> None:
-        LOGGER.info(f"Moving f{self.name} energy to {value}.")
+    async def set(self, energy: float) -> None:
+        LOGGER.info(f"Moving f{self.name} energy to {energy}.")
         await asyncio.gather(
-            self._IdEnergy()
-            .energy()
-            .set(value=value + await self.energy_offset.get_value()),
-            self._pgm_ref().energy.set(value),
+            self._IdEnergy().set(energy=energy + await self.energy_offset.get_value()),
+            self._pgm_ref().energy.set(energy),
         )
