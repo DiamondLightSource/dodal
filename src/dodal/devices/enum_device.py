@@ -20,6 +20,7 @@ class EnumDevice(StandardReadable, Generic[StrictEnumT]):
         Arguments:
             prefix: PV string to connect to device.
             enum_type: The enum that the pv takes for the device.
+            name: Name of the device.
         """
         self.enum_type = enum_type
         with self.add_children_as_readables():

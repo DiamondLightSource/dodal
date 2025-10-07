@@ -1,6 +1,6 @@
 from typing import Generic
 
-from ophyd_async.core import AsyncStatus, StrictEnum
+from ophyd_async.core import AsyncStatus
 
 from dodal.devices.enum_device import EnumDevice, StrictEnumT
 
@@ -8,35 +8,39 @@ from dodal.devices.enum_device import EnumDevice, StrictEnumT
 class GenericShutter(EnumDevice[StrictEnumT], Generic[StrictEnumT]):
     """
     Shutter with configured open and close states so it can be used with any device or
-    plan, no matter what the underlying PV enum takes.
+    plan without knowing the specific enum to use.
     """
 
     def __init__(
         self,
         prefix: str,
-        enum_type: type[StrictEnumT],
-        open: StrictEnum,
-        close: StrictEnum,
+        OPEN: StrictEnumT,
+        CLOSE: StrictEnumT,
+        name: str = "",
     ):
         """
         Arguments:
-            prefix: the prefix for the shutter device.
-            enum_type: The enum that the shutter takes.
-            open: The enum that corrosponds with opening the shutter.
-            close: The enum that corrosponds with closing the shutter.
+            prefix: The prefix for the shutter device.
+            OPEN: The enum value that corrosponds with opening the shutter.
+            CLOSE: The enum value that corrosponds with closing the shutter.
         """
-        self.OPEN = open
-        self.CLOSE = close
-        super().__init__(prefix, enum_type)
+        self.OPEN = OPEN
+        self.CLOSE = CLOSE
+        super().__init__(prefix, type(OPEN), name)
 
     @AsyncStatus.wrap
     async def set(self, value: StrictEnumT) -> None:
         """
-        Move the shutter to an open or close state. Raise error if attempted to a
+        Move the shutter to an open or close state. Raise error if move attempted to a
         different position. Can be used generically inside plans or devices by moving
-        like this example:
+        to the configured OPEN and CLOSE states without knowing the underlying enum to
+        use. For example:
+
             await shutter.set(shutter.OPEN)
             await shutter.set(shutter.CLOSE)
+
+        Parameters:
+            value: The open or close state.
         """
         if value is not self.OPEN and value is not self.CLOSE:
             raise ValueError(
