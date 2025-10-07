@@ -18,7 +18,6 @@ from ophyd_async.testing import (
 )
 
 from dodal.devices.apple2_undulator import (
-    Apple2,
     BeamEnergy,
     IdPolarisation,
     Pol,
@@ -29,6 +28,7 @@ from dodal.devices.apple2_undulator import (
 )
 from dodal.devices.i10.i10_apple2 import (
     DEFAULT_JAW_PHASE_POLY_PARAMS,
+    I10Apple2,
     I10Apple2Controller,
     I10EnergyMotorLookup,
     LinearArbitraryAngle,
@@ -130,31 +130,33 @@ def mock_config_client() -> ConfigServer:
 
 
 @pytest.fixture
-async def mock_id(mock_id_gap, mock_phaseAxes) -> Apple2:
+async def mock_id(mock_id_gap, mock_phaseAxes, mock_jaw_phase) -> I10Apple2:
     async with init_devices(mock=True):
-        mock_id = Apple2(id_gap=mock_id_gap, id_phase=mock_phaseAxes)
+        mock_id = I10Apple2(
+            id_gap=mock_id_gap, id_phase=mock_phaseAxes, id_jaw_phase=mock_jaw_phase
+        )
     return mock_id
 
 
 @pytest.fixture
 async def mock_id_controller(
-    mock_id: Apple2,
-    mock_jaw_phase,
+    mock_id: I10Apple2,
     mock_config_client,
 ) -> I10Apple2Controller:
     async with init_devices(mock=True):
         mock_id_controller = I10Apple2Controller(
             apple2=mock_id,
-            jaw_phase=mock_jaw_phase,
             look_up_table_dir=LOOKUP_TABLE_PATH,
             source=("Source", "idu"),
             config_client=mock_config_client,
         )
     set_mock_value(mock_id_controller.apple2().gap.gate, UndulatorGateStatus.CLOSE)
     set_mock_value(mock_id_controller.apple2().phase.gate, UndulatorGateStatus.CLOSE)
-    set_mock_value(mock_id_controller.jaw_phase().gate, UndulatorGateStatus.CLOSE)
+    set_mock_value(
+        mock_id_controller.apple2().jaw_phase.gate, UndulatorGateStatus.CLOSE
+    )
     set_mock_value(mock_id_controller.apple2().gap.velocity, 1)
-    set_mock_value(mock_id_controller.jaw_phase().jaw_phase.velocity, 1)
+    set_mock_value(mock_id_controller.apple2().jaw_phase.jaw_phase.velocity, 1)
     set_mock_value(mock_id_controller.apple2().phase.btm_inner.velocity, 1)
     set_mock_value(mock_id_controller.apple2().phase.top_inner.velocity, 1)
     set_mock_value(mock_id_controller.apple2().phase.btm_outer.velocity, 1)
@@ -583,8 +585,8 @@ async def test_linear_arbitrary_RE_scan(
     )
     jaw_phase = get_mock_put(
         mock_linear_arbitrary_angle._id_controller_ref()
-        .jaw_phase()
-        .jaw_phase.user_setpoint
+        .apple2()
+        .jaw_phase.jaw_phase.user_setpoint
     )
 
     poly = poly1d(

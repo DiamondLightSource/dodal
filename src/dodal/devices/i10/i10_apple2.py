@@ -22,7 +22,9 @@ from dodal.devices.apple2_undulator import (
     Apple2Controller,
     Apple2Val,
     Pol,
+    UndulatorGap,
     UndulatorJawPhase,
+    UndulatorPhaseAxes,
 )
 from dodal.log import LOGGER
 
@@ -314,7 +316,32 @@ class I10EnergyMotorLookup:
         return lookup_table
 
 
-class I10Apple2Controller(Apple2Controller):
+class I10Apple2(Apple2):
+    def __init__(
+        self,
+        id_gap: UndulatorGap,
+        id_phase: UndulatorPhaseAxes,
+        id_jaw_phase: UndulatorJawPhase,
+        name: str = "",
+    ) -> None:
+        """
+        An I10Apple2 device.
+
+        Parameters
+        ----------
+        id_gap : UndulatorJawPhase
+            The gap motor of the undulator.
+        id_phase : UndulatorJawPhase
+            The phase motors of the undulator.
+        name : str, optional
+            The name of the device, by default "".
+        """
+        with self.add_children_as_readables():
+            self.jaw_phase = id_jaw_phase
+        super().__init__(id_gap=id_gap, id_phase=id_phase, name=name)
+
+
+class I10Apple2Controller(Apple2Controller[I10Apple2]):
     """I10Apple2 is the i10 version of Apple2 ID, set and energy_motor_convertor
      should be the only part that is I10 specific.
 
@@ -326,8 +353,7 @@ class I10Apple2Controller(Apple2Controller):
 
     def __init__(
         self,
-        apple2: Apple2,
-        jaw_phase: UndulatorJawPhase,
+        apple2: I10Apple2,
         look_up_table_dir: str,
         source: tuple[str, str],
         config_client: ConfigServer,
@@ -359,7 +385,6 @@ class I10Apple2Controller(Apple2Controller):
             config_client=config_client,
         )
 
-        self.jaw_phase = Reference(jaw_phase)
         self.jaw_phase_from_angle = np.poly1d(jaw_phase_poly_param)
         self.angle_threshold_deg = angle_threshold_deg
         self.jaw_phase_limit = jaw_phase_limit
@@ -380,8 +405,6 @@ class I10Apple2Controller(Apple2Controller):
             )
         elif pol_angle is not None:
             return pol_angle
-        else:
-            raise ValueError("Linear arbitrary angle is not set.")
 
     async def _set_linear_arbitrary_angle(self, pol_angle: float) -> None:
         pol = await self.polarisation.get_value()
@@ -401,7 +424,7 @@ class I10Apple2Controller(Apple2Controller):
                 f"jaw_phase position for angle ({pol_angle}) is outside permitted range"
                 f" [-{self.jaw_phase_limit}, {self.jaw_phase_limit}]"
             )
-        await self.jaw_phase().set(jaw_phase)
+        await self.apple2().jaw_phase.set(jaw_phase)
         await self._linear_arbitrary_angle.set(pol_angle)
 
     async def _set(self, value: float) -> None:
@@ -439,8 +462,8 @@ class I10Apple2Controller(Apple2Controller):
         LOGGER.info(f"Setting polarisation to {pol}, with values: {id_set_val}")
         await self.apple2().set(id_motor_values=id_set_val)
         if pol != Pol.LA:
-            await self.jaw_phase().set(0)
-            await self.jaw_phase().set_move.set(1)
+            await self.apple2().jaw_phase.set(0)
+            await self.apple2().jaw_phase.set_move.set(1)
 
 
 class LinearArbitraryAngle(StandardReadable, Movable[SupportsFloat]):

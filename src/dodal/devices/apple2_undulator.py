@@ -365,7 +365,10 @@ class EnergyMotorConvertor(Protocol):
         ...
 
 
-class Apple2Controller(abc.ABC, StandardReadable, Movable):
+Apple2Type = TypeVar("Apple2Type", bound="Apple2")
+
+
+class Apple2Controller(abc.ABC, StandardReadable, Movable, Generic[Apple2Type]):
     """
     Apple2Controller Undulator Device
 
@@ -419,7 +422,7 @@ class Apple2Controller(abc.ABC, StandardReadable, Movable):
 
     def __init__(
         self,
-        apple2: Apple2,
+        apple2: Apple2Type,
         name: str = "",
     ) -> None:
         """
