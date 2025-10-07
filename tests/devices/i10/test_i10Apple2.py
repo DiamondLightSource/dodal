@@ -181,7 +181,7 @@ async def beam_energy(
     mock_id_energy: IdEnergy, mock_id_controller: I10Apple2Controller, mock_pgm: PGM
 ) -> BeamEnergy:
     async with init_devices(mock=True):
-        beam_energy = BeamEnergy(id_energy=mock_id_energy, pgm=mock_pgm)
+        beam_energy = BeamEnergy(id_energy=mock_id_energy, mono=mock_pgm)
     return beam_energy
 
 
@@ -313,9 +313,9 @@ async def test_beam_energy_re_scan_with_offset(
     rbv_mocks = Mock()
     rbv_mocks.get.side_effect = range(1700, 1810, 10)
     callback_on_mock_put(
-        beam_energy._pgm_ref().energy.user_setpoint,
+        beam_energy._mono_energy().user_setpoint,
         lambda *_, **__: set_mock_value(
-            beam_energy._pgm_ref().energy.user_readback, rbv_mocks.get()
+            beam_energy._mono_energy().user_readback, rbv_mocks.get()
         ),
     )
     RE(

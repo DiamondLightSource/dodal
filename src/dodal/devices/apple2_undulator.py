@@ -10,6 +10,7 @@ from ophyd_async.core import (
     AsyncStatus,
     Reference,
     SignalR,
+    SignalRW,
     SignalW,
     StandardReadable,
     StandardReadableFormat,
@@ -21,7 +22,7 @@ from ophyd_async.core import (
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw, epics_signal_w
 
-from dodal.devices.pgm import PGM
+from dodal.devices.pgm import MonoEnergyBase
 from dodal.log import LOGGER
 
 T = TypeVar("T")
@@ -580,7 +581,19 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
         return Pol.NONE, 0.0
 
 
-class IdEnergy(StandardReadable, Movable):
+class IdEnergyBase(abc.ABC, StandardReadable, Movable):
+    """Base class for energy movable device."""
+
+    def __init__(self, name: str = "") -> None:
+        self.energy: Reference[SignalRW[float]]
+        super().__init__(name=name)
+
+    @abc.abstractmethod
+    @AsyncStatus.wrap
+    async def set(self, energy: float) -> None: ...
+
+
+class IdEnergy(IdEnergyBase):
     """Apple2 ID energy movable device."""
 
     def __init__(self, id_controller: Apple2Controller, name: str = "") -> None:
@@ -617,7 +630,9 @@ class BeamEnergy(StandardReadable, Movable[float]):
 
     """
 
-    def __init__(self, id_energy: IdEnergy, pgm: PGM, name: str = "") -> None:
+    def __init__(
+        self, id_energy: IdEnergyBase, mono: MonoEnergyBase, name: str = ""
+    ) -> None:
         """
         Parameters
         ----------
@@ -630,13 +645,13 @@ class BeamEnergy(StandardReadable, Movable[float]):
             New device name.
         """
         super().__init__(name=name)
-        self._IdEnergy = Reference(id_energy)
-        self._pgm_ref = Reference(pgm)
+        self._Id_energy = Reference(id_energy)
+        self._mono_energy = Reference(mono.energy)
 
         self.add_readables(
             [
-                self._IdEnergy().energy(),
-                self._pgm_ref().energy.user_readback,
+                self._Id_energy().energy(),
+                self._mono_energy().user_readback,
             ],
             StandardReadableFormat.HINTED_SIGNAL,
         )
@@ -648,6 +663,6 @@ class BeamEnergy(StandardReadable, Movable[float]):
     async def set(self, energy: float) -> None:
         LOGGER.info(f"Moving f{self.name} energy to {energy}.")
         await asyncio.gather(
-            self._IdEnergy().set(energy=energy + await self.energy_offset.get_value()),
-            self._pgm_ref().energy.set(energy),
+            self._Id_energy().set(energy=energy + await self.energy_offset.get_value()),
+            self._mono_energy().set(energy),
         )
