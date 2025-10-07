@@ -110,7 +110,7 @@ class I10Slits(Device):
 
 
 class I10JSlits(Device):
-    """Collection of all the i10 slits before end station."""
+    """Collection of all the i10-1 slits before end station."""
 
     def __init__(self, prefix: str, name: str = "") -> None:
         self.s7 = MinimalSlits(
@@ -139,8 +139,8 @@ class I10SlitsDrainCurrent(Device):
         super().__init__(name, connector)
 
 
-class I10SlitsSharedDrainCurrent(Device):
-    """Collection of all the drain current from i10 slits."""
+class I10SharedSlitsDrainCurrent(Device):
+    """Collection of all the drain current from i10 and i10-1 slits."""
 
     def __init__(
         self, prefix: str, name: str = "", connector: DeviceConnector | None = None

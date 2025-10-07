@@ -13,7 +13,7 @@ from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beam
 from dodal.devices.i10 import (
     I10SharedDiagnostic,
     I10SharedSlits,
-    I10SlitsSharedDrainCurrent,
+    I10SharedSlitsDrainCurrent,
     PiezoMirror,
 )
 from dodal.devices.i10.i10_apple2 import (
@@ -119,5 +119,5 @@ def optics_diagnostics() -> I10SharedDiagnostic:
 
 
 @device_factory()
-def optics_slits_current() -> I10SlitsSharedDrainCurrent:
-    return I10SlitsSharedDrainCurrent(prefix=f"{PREFIX.beamline_prefix}-")
+def optics_slits_current() -> I10SharedSlitsDrainCurrent:
+    return I10SharedSlitsDrainCurrent(prefix=f"{PREFIX.beamline_prefix}-")

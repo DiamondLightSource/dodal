@@ -9,9 +9,9 @@ from .mirrors import PiezoMirror
 from .slits import (
     I10JSlits,
     I10SharedSlits,
+    I10SharedSlitsDrainCurrent,
     I10Slits,
     I10SlitsDrainCurrent,
-    I10SlitsSharedDrainCurrent,
 )
 
 __all__ = [
@@ -24,6 +24,6 @@ __all__ = [
     "I10SharedDiagnostic",
     "I10SharedSlits",
     "I10JSlits",
-    "I10SlitsSharedDrainCurrent",
+    "I10SharedSlitsDrainCurrent",
     "I10JDiagnostic",
 ]
