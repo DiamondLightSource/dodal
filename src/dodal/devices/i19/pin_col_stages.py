@@ -144,7 +144,7 @@ class PinholeCollimatorControl(StandardReadable, Movable[str]):
         LOGGER.debug(f"Moving motors to {aperture_positions}")
 
         # First move Pinhole motors,
-        LOGGER.debug("Move pinhole stage in")
+        LOGGER.debug("Moving pinhole stage in")
         await asyncio.gather(
             self.pinhole.x.set(aperture_positions.pinhole_x),
             self.pinhole.y.set(aperture_positions.pinhole_y),
