@@ -24,8 +24,7 @@ async def pincol() -> AsyncGenerator[PinholeCollimatorControl]:
         yield pc
 
 
-def test_pincol_created_without_errors():
-    pincol = PinholeCollimatorControl("", "test_pincol")
+def test_pincol_created_without_errors(pincol: PinholeCollimatorControl):
     assert isinstance(pincol, PinholeCollimatorControl)
     assert isinstance(pincol.mapt, PinColConfiguration)
     assert isinstance(pincol._pinhole, XYStage)
