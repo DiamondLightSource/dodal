@@ -27,7 +27,7 @@ async def pincol() -> AsyncGenerator[PinholeCollimatorControl]:
 def test_pincol_created_without_errors():
     pincol = PinholeCollimatorControl("", "test_pincol")
     assert isinstance(pincol, PinholeCollimatorControl)
-    assert isinstance(pincol._mapt, PinColConfiguration)
+    assert isinstance(pincol.mapt, PinColConfiguration)
     assert isinstance(pincol._pinhole, XYStage)
     assert isinstance(pincol._collimator, XYStage)
 
@@ -45,11 +45,11 @@ async def test_pincol_get_motor_positions_for_requested_aperture(
     size: int,
     pincol: PinholeCollimatorControl,
 ):
-    set_mock_value(pincol._mapt.configuration.select_config, ap_request)
-    set_mock_value(pincol._mapt.pin_x.in_positions[size], in_positions[0])
-    set_mock_value(pincol._mapt.pin_y.in_positions[size], in_positions[1])
-    set_mock_value(pincol._mapt.col_x.in_positions[size], in_positions[2])
-    set_mock_value(pincol._mapt.col_y.in_positions[size], in_positions[3])
+    set_mock_value(pincol.mapt.configuration.select_config, ap_request)
+    set_mock_value(pincol.mapt.pin_x.in_positions[size], in_positions[0])
+    set_mock_value(pincol.mapt.pin_y.in_positions[size], in_positions[1])
+    set_mock_value(pincol.mapt.col_x.in_positions[size], in_positions[2])
+    set_mock_value(pincol.mapt.col_y.in_positions[size], in_positions[3])
 
     positions = await pincol._get_motor_positions_for_requested_aperture(ap_request)
 
@@ -65,8 +65,8 @@ async def test_when_move_out_only_x_motors_move(
     pincol: PinholeCollimatorControl,
 ):
     out_positions = [5.2, 3.5]
-    set_mock_value(pincol._mapt.pin_x_out, out_positions[0])
-    set_mock_value(pincol._mapt.col_x_out, out_positions[1])
+    set_mock_value(pincol.mapt.pin_x_out, out_positions[0])
+    set_mock_value(pincol.mapt.col_x_out, out_positions[1])
 
     await pincol.set(PinColRequest.OUT)
 
@@ -82,8 +82,8 @@ async def test_when_move_out_motors_move_in_right_order(
     pincol: PinholeCollimatorControl,
 ):
     out_positions = [5.2, 3.5]
-    set_mock_value(pincol._mapt.pin_x_out, out_positions[0])
-    set_mock_value(pincol._mapt.col_x_out, out_positions[1])
+    set_mock_value(pincol.mapt.pin_x_out, out_positions[0])
+    set_mock_value(pincol.mapt.col_x_out, out_positions[1])
 
     set_mock_value(pincol._pinhole.x.user_readback, 18)
     set_mock_value(pincol._pinhole.y.user_readback, 15)
@@ -124,9 +124,7 @@ async def test_move_in(
 
     await pincol.set(ap_request)
 
-    assert (
-        await pincol._mapt.configuration.select_config.get_value() == ap_request.value
-    )
+    assert await pincol.mapt.configuration.select_config.get_value() == ap_request.value
 
     assert await pincol._pinhole.x.user_readback.get_value() == in_positions[0]
     assert await pincol._pinhole.y.user_readback.get_value() == in_positions[1]
