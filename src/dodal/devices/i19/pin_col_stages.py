@@ -150,7 +150,7 @@ class PinholeCollimatorControl(StandardReadable, Movable[str]):
             self.pinhole.y.set(aperture_positions.pinhole_y),
         )
         # Then move Collimator motors
-        LOGGER.debug("Move pinhole stage in")
+        LOGGER.debug("Moving collimator stage in")
         await asyncio.gather(
             self.collimator.x.set(aperture_positions.collimator_x),
             self.collimator.y.set(aperture_positions.collimator_y),
