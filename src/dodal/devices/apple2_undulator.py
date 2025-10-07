@@ -595,7 +595,7 @@ class IdEnergyBase(abc.ABC, StandardReadable, Movable):
 
 class BeamEnergy(StandardReadable, Movable[float]):
     """
-    Compound device to set both ID and PGM energy at the same time.
+    Compound device to set both ID and PGM energy at the same time with an option to add an offset.
 
     """
 
