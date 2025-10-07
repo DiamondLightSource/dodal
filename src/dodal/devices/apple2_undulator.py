@@ -367,7 +367,7 @@ class EnergyMotorConvertor(Protocol):
 Apple2Type = TypeVar("Apple2Type", bound="Apple2")
 
 
-class Apple2Controller(abc.ABC, StandardReadable, Movable, Generic[Apple2Type]):
+class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
     """
 
     The `Apple2Controller` class is an abstract base class that provides a high-level interface for controlling
@@ -391,7 +391,7 @@ class Apple2Controller(abc.ABC, StandardReadable, Movable, Generic[Apple2Type]):
 
     Abstract Methods
     ----------------
-    _set(value: float) -> None
+    _set_motors_from_energy(value: float) -> None
         Abstract method to set motor positions for a given energy and polarisation.
     energy_to_motor : EnergyMotorConvertor
         A callable that converts energy and polarisation to motor positions.
@@ -425,63 +425,45 @@ class Apple2Controller(abc.ABC, StandardReadable, Movable, Generic[Apple2Type]):
         """
         self.energy_to_motor: EnergyMotorConvertor
         self.apple2 = Reference(apple2)
+
+        # Store the set energy for readback.
+        self._energy = soft_signal_rw(float, initial_value=None)
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
-            # Store the set energy for readback.
-            self._energy = soft_signal_rw(float, initial_value=None)
-        self.energy = derived_signal_rw(
-            raw_to_derived=self._read_energy,
-            set_derived=self._set_energy,
-            energy=self._energy,
-        )
+            self.energy = derived_signal_rw(
+                raw_to_derived=self._read_energy,
+                set_derived=self._set_energy,
+                energy=self._energy,
+            )
 
         # Store the polarisation for setpoint. And provide readback for LH3.
         # LH3 is a special case as it is indistinguishable from LH in the hardware.
         self.polarisation_setpoint, self._polarisation_setpoint_set = (
             soft_signal_r_and_setter(Pol)
         )
-
-        # Hardware backed read/write for polarisation.
-        self.polarisation = derived_signal_rw(
-            raw_to_derived=self._read_pol,
-            set_derived=self._set_pol,
-            pol=self.polarisation_setpoint,
-            top_outer=self.apple2().phase.top_outer.user_readback,
-            top_inner=self.apple2().phase.top_inner.user_readback,
-            btm_inner=self.apple2().phase.btm_inner.user_readback,
-            btm_outer=self.apple2().phase.btm_outer.user_readback,
-            gap=self.apple2().gap.user_readback,
-        )
+        with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
+            # Hardware backed read/write for polarisation.
+            self.polarisation = derived_signal_rw(
+                raw_to_derived=self._read_pol,
+                set_derived=self._set_pol,
+                pol=self.polarisation_setpoint,
+                top_outer=self.apple2().phase.top_outer.user_readback,
+                top_inner=self.apple2().phase.top_inner.user_readback,
+                btm_inner=self.apple2().phase.btm_inner.user_readback,
+                btm_outer=self.apple2().phase.btm_outer.user_readback,
+                gap=self.apple2().gap.user_readback,
+            )
         super().__init__(name)
 
-    @AsyncStatus.wrap
-    async def set(self, value: float) -> None:
-        """
-        Set should be in energy units, this will set the energy of the ID by setting the
-        gap and phase motors to the correct position for the given energy
-        and polarisation.
-
-
-        Examples
-        --------
-        RE( id.set(888.0)) # This will set the ID to 888 eV
-        RE(scan([detector], id,600,700,100)) # This will scan the ID from 600 to 700 eV in 100 steps.
-        """
-        await self.energy.set(value)
-
-        LOGGER.info(f"Energy set to {value} eV successfully.")
-
     @abc.abstractmethod
-    async def _set(self, value: float) -> None:
+    async def _set_motors_from_energy(self, value: float) -> None:
         """
         This method should be implemented by the beamline specific ID class as the
         motor positions will be different for each beamline depending on the
-        undulator design and the lookup table used. The set method can be
-        used to set the motor positions for the given energy and polarisation
-        provided that all motors can be moved at the same time.
+        undulator design and the lookup table used.
         """
 
     async def _set_energy(self, energy: float) -> None:
-        await self._set(energy)
+        await self._set_motors_from_energy(energy)
         await self._energy.set(energy)
 
     def _read_energy(self, energy: float) -> float:
@@ -494,7 +476,7 @@ class Apple2Controller(abc.ABC, StandardReadable, Movable, Generic[Apple2Type]):
     ) -> None:
         # This changes the pol setpoint and then changes polarisation via set energy.
         self._polarisation_setpoint_set(value)
-        await self.set(await self.energy.get_value())
+        await self.energy.set(await self.energy.get_value())
 
     def _read_pol(
         self,
@@ -602,6 +584,8 @@ class Apple2Controller(abc.ABC, StandardReadable, Movable, Generic[Apple2Type]):
 
 
 class IdEnergy(StandardReadable, Movable):
+    """Apple2 ID energy movable device."""
+
     def __init__(self, id_controller: Apple2Controller, name: str = "") -> None:
         self.energy = Reference(id_controller.energy)
         super().__init__(name=name)
@@ -612,6 +596,8 @@ class IdEnergy(StandardReadable, Movable):
 
 
 class IdPolarisation(StandardReadable, Movable):
+    """Apple2 ID polarisation movable device."""
+
     def __init__(self, id_controller: Apple2Controller, name: str = "") -> None:
         self.polarisation = Reference(id_controller.polarisation)
         super().__init__(name=name)
@@ -638,10 +624,11 @@ class BeamEnergy(StandardReadable, Movable[float]):
         """
         Parameters
         ----------
-        id:
-            An Apple2 device.
-        pgm:
-            A PGM/mono device.
+
+        id_energy: IdEnergy
+            An IdEnergy device.
+        pgm: PGM
+            A PGM device.
         name:
             New device name.
         """

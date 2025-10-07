@@ -419,7 +419,7 @@ class I10Apple2Controller(Apple2Controller[I10Apple2]):
         await self.apple2().jaw_phase.set(jaw_phase)
         await self._linear_arbitrary_angle.set(pol_angle)
 
-    async def _set(self, value: float) -> None:
+    async def _set_motors_from_energy(self, value: float) -> None:
         """
         Check polarisation state and use it together with the energy(value)
         to calculate the required gap and phases before setting it.
