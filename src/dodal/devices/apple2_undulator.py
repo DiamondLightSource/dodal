@@ -370,24 +370,25 @@ Apple2Type = TypeVar("Apple2Type", bound="Apple2")
 class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
     """
 
-    The `Apple2Controller` class is an abstract base class that provides a high-level interface for controlling
-    an Apple2 undulator device.
+    Abstract base class for controlling an Apple2 undulator device.
 
-    The class is designed to manage the undulator's gap, phase motors, and polarisation settings, while
-    abstracting hardware interactions and providing a high-level interface for beamline operations.
+    This class manages the undulator's gap and phase motors, and provides an interface
+    for controlling polarisation and energy settings. It exposes derived signals for
+    energy and polarisation, and handles conversion between energy/polarisation and
+    motor positions via a user-supplied conversion callable.
 
     Attributes
     ----------
-    apple2 : Apple2
-        A collection of gap and phase motor devices.
-    energy : SignalRW
-        A derived signal for moving energy.
+    apple2 : Reference[Apple2Type]
+        Reference to the Apple2 device containing gap and phase motors.
+    energy : derived_signal_rw
+        Derived signal for moving and reading back energy.
     polarisation_setpoint : SignalR
-        A soft signal for the polarisation setpoint.
-    polarisation : SignalRW
-        A hardware-backed signal for polarisation readback and control.
+        Soft signal for the polarisation setpoint.
+    polarisation : derived_signal_rw
+        Hardware-backed signal for polarisation readback and control.
     energy_to_motor : EnergyMotorConvertor
-        A callable that converts energy and polarisation to motor positions.
+        Callable that converts energy and polarisation to motor positions.
 
     Abstract Methods
     ----------------
@@ -396,16 +397,12 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
     energy_to_motor : EnergyMotorConvertor
         A callable that converts energy and polarisation to motor positions.
 
-    Methods
-    -------
-    determine_phase_from_hardware(...) -> tuple[Pol, float]
-        Determines the polarisation and phase value based on motor positions.
-
     Notes
     -----
-    - This class requires beamline-specific implementations of the abstract methods,
-    - The device supports multiple polarisation modes, including linear horizontal (LH), linear vertical (LV),
-      positive circular (PC), negative circular (NC).
+    - Subclasses must implement `_set_motors_from_energy` for beamline-specific logic.
+    - LH3 polarisation is indistinguishable from LH in hardware; special handling is provided.
+    - Supports multiple polarisation modes, including linear horizontal (LH), linear vertical (LV),
+      positive circular (PC), negative circular (NC), and linear arbitrary (LA).
 
     """
 

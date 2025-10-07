@@ -325,14 +325,17 @@ class I10Apple2(Apple2):
         name: str = "",
     ) -> None:
         """
-        An I10Apple2 device.
+        I10Apple2 device is an appl2 with extra jaw phase control.
 
         Parameters
         ----------
+
         id_gap : UndulatorJawPhase
             The gap motor of the undulator.
         id_phase : UndulatorJawPhase
             The phase motors of the undulator.
+        id_jaw_phase : UndulatorJawPhase
+            The jaw phase motor of the undulator.
         name : str, optional
             The name of the device, by default "".
         """
@@ -342,13 +345,9 @@ class I10Apple2(Apple2):
 
 
 class I10Apple2Controller(Apple2Controller[I10Apple2]):
-    """I10Apple2 is the i10 version of Apple2 ID, set and energy_motor_convertor
-     should be the only part that is I10 specific.
-
-    A EnergyMotorConvertor function is needed to provide the conversion between
-     x-ray motor position and energy.
-
-    Set is in energy(eV).
+    """
+    I10Apple2Controller is a extension of Apple2Controller which provide linear
+     arbitrary angle control.
     """
 
     def __init__(
@@ -362,21 +361,26 @@ class I10Apple2Controller(Apple2Controller[I10Apple2]):
         angle_threshold_deg=30.0,
         name: str = "",
     ) -> None:
-        """I10Id is a compound device that combines the I10-specific Apple2 undulator,
-        energy setter, and polarization control.
-        This class provides a high-level interface for controlling the undulator's
-        energy, polarization, and linear arbitrary angle.
+        """
 
-        Attributes
+        parameters
         ----------
-        id : I10Apple2
-            The I10-specific Apple2 undulator device.
-        energy_setter : EnergySetter
-            A device for synchronizing the undulator and monochromator energy.
-        pol : I10Apple2Pol
-            A device for controlling the polarization of the undulator.
-        linear_arbitrary_angle : LinearArbitraryAngle
-            A device for controlling the linear arbitrary polarization angle.
+        apple2 : I10Apple2
+            An I10Apple2 device.
+        lookuptable_dir : str
+            The path to look up table.
+        source : tuple[str, str]
+            The column name and the name of the source in look up table. e.g. ( "source", "idu")
+        config_client : ConfigServer
+            The config server client to fetch the look up table.
+        jaw_phase_limit : float, optional
+            The maximum allowed jaw_phase movement., by default 12.0
+        jaw_phase_poly_param : list[float], optional
+            polynomial parameters highest power first., by default DEFAULT_JAW_PHASE_POLY_PARAMS
+        angle_threshold_deg : float, optional
+            The angle threshold to switch between 0-180 and 180-360 range., by default 30.0
+        name : str, optional
+            New device name.
         """
         super().__init__(apple2=apple2, name=name)
         self.lookup_table_client = I10EnergyMotorLookup(
@@ -421,8 +425,7 @@ class I10Apple2Controller(Apple2Controller[I10Apple2]):
 
     async def _set_motors_from_energy(self, value: float) -> None:
         """
-        Check polarisation state and use it together with the energy(value)
-        to calculate the required gap and phases before setting it.
+        Set the undulator motors for a given energy and polarisation.
         """
 
         pol = await self.polarisation_setpoint.get_value()
@@ -467,12 +470,7 @@ class I10Apple2Controller(Apple2Controller[I10Apple2]):
 
 class LinearArbitraryAngle(StandardReadable, Movable[SupportsFloat]):
     """
-    Device to set polorisation angle of the ID. Linear Arbitrary Angle (laa)
-     is the direction of the magnetic field which can be change by varying the jaw_phase
-     in (linear arbitrary (la) mode,
-     The angle of 0 is equivalent to linear horizontal "lh" (sigma) and
-      90 is linear vertical "lv" (pi).
-    This device require a jaw_phase to angle conversion which is done via a polynomial.
+    Device to set the polarisation angle of the Apple2 undulator in Linear Arbitrary (LA) mode..
     """
 
     def __init__(
@@ -483,14 +481,10 @@ class LinearArbitraryAngle(StandardReadable, Movable[SupportsFloat]):
         """
         Parameters
         ----------
-        id: I10Apple2
-            An I10Apple2 device.
-        name: str
+        id_controller : I10Apple2Controller
+            The I10Apple2Controller which control the ID.
+        name : str, optional
             New device name.
-        jaw_phase_limit: float
-            The maximum allowed jaw_phase movement.
-        jaw_phase_poly_param: list
-            polynomial parameters highest power first.
         """
         super().__init__(name=name)
         self.linear_arbitrary_angle = Reference(id_controller.linear_arbitrary_angle)
