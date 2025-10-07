@@ -131,7 +131,11 @@ def mock_config_client() -> ConfigServer:
 
 
 @pytest.fixture
-async def mock_id(mock_id_gap, mock_phaseAxes, mock_jaw_phase) -> I10Apple2:
+async def mock_id(
+    mock_id_gap: UndulatorGap,
+    mock_phaseAxes: UndulatorPhaseAxes,
+    mock_jaw_phase: UndulatorJawPhase,
+) -> I10Apple2:
     async with init_devices(mock=True):
         mock_id = I10Apple2(
             id_gap=mock_id_gap, id_phase=mock_phaseAxes, id_jaw_phase=mock_jaw_phase
@@ -142,7 +146,7 @@ async def mock_id(mock_id_gap, mock_phaseAxes, mock_jaw_phase) -> I10Apple2:
 @pytest.fixture
 async def mock_id_controller(
     mock_id: I10Apple2,
-    mock_config_client,
+    mock_config_client: ConfigServer,
 ) -> I10Apple2Controller:
     async with init_devices(mock=True):
         mock_id_controller = I10Apple2Controller(
@@ -177,9 +181,7 @@ async def mock_id_energy(
 
 
 @pytest.fixture
-async def beam_energy(
-    mock_id_energy: IdEnergy, mock_id_controller: I10Apple2Controller, mock_pgm: PGM
-) -> BeamEnergy:
+async def beam_energy(mock_id_energy: IdEnergy, mock_pgm: PGM) -> BeamEnergy:
     async with init_devices(mock=True):
         beam_energy = BeamEnergy(id_energy=mock_id_energy, mono=mock_pgm)
     return beam_energy

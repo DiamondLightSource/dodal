@@ -325,7 +325,7 @@ class I10Apple2(Apple2):
         name: str = "",
     ) -> None:
         """
-        I10Apple2 device is an appl2 with extra jaw phase control.
+        I10Apple2 device is an apple2 with extra jaw phase motor.
 
         Parameters
         ----------
