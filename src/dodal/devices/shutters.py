@@ -25,8 +25,8 @@ class GenericShutter(EnumDevice[StrictEnumT], Generic[StrictEnumT]):
             open: The enum that corrosponds with opening the shutter.
             close: The enum that corrosponds with closing the shutter.
         """
-        self.open = open
-        self.close = close
+        self.OPEN = open
+        self.CLOSE = close
         super().__init__(prefix, enum_type)
 
     @AsyncStatus.wrap
@@ -35,17 +35,20 @@ class GenericShutter(EnumDevice[StrictEnumT], Generic[StrictEnumT]):
         Move the shutter to an open or close state. Raise error if attempted to a
         different position. Can be used generically inside plans or devices by moving
         like this example:
-            await shutter.set(shutter.open)
-            await shutter.set(shutter.close)
+            await shutter.set(shutter.OPEN)
+            await shutter.set(shutter.CLOSE)
         """
-        if value is not self.open and value is not self.close:
-            raise ValueError()
+        if value is not self.OPEN and value is not self.CLOSE:
+            raise ValueError(
+                f"Valid states to move shutter to are {self.OPEN} and {self.CLOSE}. "
+                "Requested state was {value}."
+            )
         await super().set(value)
 
     async def is_open(self) -> bool:
         """Checks to see if shutter is currently open"""
-        return await self.state.get_value() == self.open
+        return await self.state.get_value() == self.OPEN
 
     async def is_closed(self) -> bool:
         """Checks to see if shutter is currently closed"""
-        return await self.state.get_value() == self.close
+        return await self.state.get_value() == self.CLOSE
