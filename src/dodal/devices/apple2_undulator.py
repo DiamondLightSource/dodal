@@ -5,7 +5,7 @@ from math import isclose
 from typing import Generic, Protocol, TypeVar
 
 import numpy as np
-from bluesky.protocols import Movable, Status
+from bluesky.protocols import Movable
 from ophyd_async.core import (
     AsyncStatus,
     Reference,
@@ -625,8 +625,8 @@ class IdEnergy(StandardReadable, Movable):
         super().__init__(name=name)
 
     @AsyncStatus.wrap
-    async def set(self, energy: float) -> Status:
-        return self.energy().set(energy)
+    async def set(self, energy: float) -> None:
+        await self.energy().set(energy)
 
 
 class IdPolarisation(StandardReadable, Movable):
