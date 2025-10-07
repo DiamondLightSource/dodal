@@ -5,11 +5,7 @@ from ophyd_async.epics.motor import Motor
 class JackX(StandardReadable):
     """Focusing Mirror"""
 
-    def __init__(
-        self,
-        prefix: str,
-        name: str = "",
-    ):
+    def __init__(self, prefix: str, name: str = ""):
         with self.add_children_as_readables():
             self.rotation = Motor(prefix + "Ry")
             self.transx = Motor(prefix + "X")
@@ -23,11 +19,7 @@ class JackX(StandardReadable):
 class JackY(StandardReadable):
     """Focusing Mirror"""
 
-    def __init__(
-        self,
-        prefix: str,
-        name: str = "",
-    ):
+    def __init__(self, prefix: str, name: str = ""):
         with self.add_children_as_readables():
             self.j1 = Motor(prefix + "J1")
             self.j2 = Motor(prefix + "J2")

@@ -3,11 +3,7 @@ from ophyd_async.epics.motor import Motor
 
 
 class LaueMonochrometer(StandardReadable):
-    def __init__(
-        self,
-        prefix: str,
-        name: str = "",
-    ):
+    def __init__(self, prefix: str, name: str = ""):
         with self.add_children_as_readables():
             self.bend = Motor(prefix + "BENDER")
             self.bragg = Motor(prefix + "PITCH")
