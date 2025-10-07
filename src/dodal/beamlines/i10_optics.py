@@ -23,6 +23,7 @@ from dodal.devices.i10.i10_apple2 import (
 # Imports taken from i10 while we work out how to deal with split end stations
 from dodal.devices.i10.i10_setting_data import I10Grating
 from dodal.devices.pgm import PGM
+from dodal.devices.synchrotron import Synchrotron
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
@@ -32,6 +33,12 @@ set_utils_beamline(BL)
 PREFIX = BeamlinePrefix(BL)
 
 LOOK_UPTABLE_DIR = "/dls_sw/i10/software/blueapi/scratch/i10-config/lookupTables/"
+
+
+@device_factory()
+def synchrotron() -> Synchrotron:
+    return Synchrotron()
+
 
 """Mirrors"""
 
