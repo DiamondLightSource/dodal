@@ -148,11 +148,12 @@ class AbstractAnalyserDriverIO(
             self.energy_source.selected_source.set(region.excitation_energy_source)
         excitation_energy = await self.energy_source.energy.get_value()
 
-        # Copy region so doesn't alter the actual region and switch to kinetic energy
-        ke_region = region.model_copy()
-        ke_region.switch_energy_mode(EnergyMode.KINETIC, excitation_energy)
-
+        # Switch to kinetic energy as epics doesn't support BINDING.
+        ke_region = region.switch_energy_mode(EnergyMode.KINETIC, excitation_energy)
         await self._set_region(ke_region)
+        # Set the true energy mode from original region so binding_energy_axis can be
+        # calculated correctly.
+        await self.energy_mode.set(region.energy_mode)
 
     @abstractmethod
     async def _set_region(self, ke_region: TAbstractBaseRegion):
