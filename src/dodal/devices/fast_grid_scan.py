@@ -31,6 +31,10 @@ from dodal.log import LOGGER
 from dodal.parameters.experiment_parameter_base import AbstractExperimentWithBeamParams
 
 
+class GridScanInvalidException(RuntimeError):
+    """Raised when the gridscan parameters are not valid."""
+
+
 @dataclass
 class GridAxis:
     start: float
@@ -291,6 +295,15 @@ class FastGridScanCommon(
 
     @AsyncStatus.wrap
     async def prepare(self, value: ParamType):
+        """
+        Submit the gridscan parameters to the device for validation prior to
+        gridscan kickoff
+        Args:
+            value: the gridscan parameters
+
+        Raises:
+            GridScanInvalidException: if the gridscan parameters were not valid
+        """
         set_statuses = []
 
         LOGGER.info("Applying gridscan parameters...")
@@ -310,9 +323,14 @@ class FastGridScanCommon(
         LOGGER.info("Sets confirmed, waiting for validity checks to pass...")
         # XXX Can we use x/y/z scan valid to distinguish between SampleException/pin invalid
         # and other non-sample-related errors?
-        await wait_for_value(
-            self.scan_invalid, 0.0, timeout=self.VALIDITY_CHECK_TIMEOUT
-        )
+        try:
+            await wait_for_value(
+                self.scan_invalid, 0.0, timeout=self.VALIDITY_CHECK_TIMEOUT
+            )
+        except TimeoutError as e:
+            raise GridScanInvalidException(
+                f"Gridscan parameters not validated after {self.VALIDITY_CHECK_TIMEOUT}s"
+            ) from e
 
         LOGGER.info("Gridscan validity confirmed, gridscan is now prepared.")
 
