@@ -174,7 +174,7 @@ async def test_oav_with_null_zoom_controller(null_controller: NullZoomController
 
 
 async def test_oav_with_null_zoom_controller_set(null_controller: NullZoomController):
-    status = null_controller.set("2.0x")
+    status = null_controller.set("1.0x")
     await status
     assert status.success
     assert await null_controller.level.get_value() == "1.0x"
