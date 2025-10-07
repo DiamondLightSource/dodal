@@ -102,7 +102,7 @@ class I10EnergyMotorLookup:
 
     def __init__(
         self,
-        look_up_table_dir: str,
+        lookuptable_dir: str,
         source: tuple[str, str],
         config_client: ConfigServer,
         mode: str = "Mode",
@@ -136,8 +136,8 @@ class I10EnergyMotorLookup:
             "Gap": {},
             "Phase": {},
         }
-        energy_gap_table_path = Path(look_up_table_dir, gap_file_name)
-        energy_phase_table_path = Path(look_up_table_dir, phase_file_name)
+        energy_gap_table_path = Path(lookuptable_dir, gap_file_name)
+        energy_phase_table_path = Path(lookuptable_dir, phase_file_name)
         self.lookup_table_config = LookupTableConfig(
             path=LookupPath(Gap=energy_gap_table_path, Phase=energy_phase_table_path),
             source=source,
@@ -354,7 +354,7 @@ class I10Apple2Controller(Apple2Controller[I10Apple2]):
     def __init__(
         self,
         apple2: I10Apple2,
-        look_up_table_dir: str,
+        lookuptable_dir: str,
         source: tuple[str, str],
         config_client: ConfigServer,
         jaw_phase_limit: float = 12.0,
@@ -380,7 +380,7 @@ class I10Apple2Controller(Apple2Controller[I10Apple2]):
         """
         super().__init__(apple2=apple2, name=name)
         self.lookup_table_client = I10EnergyMotorLookup(
-            look_up_table_dir=look_up_table_dir,
+            lookuptable_dir=lookuptable_dir,
             source=source,
             config_client=config_client,
         )

@@ -147,7 +147,7 @@ async def mock_id_controller(
     async with init_devices(mock=True):
         mock_id_controller = I10Apple2Controller(
             apple2=mock_id,
-            look_up_table_dir=LOOKUP_TABLE_PATH,
+            lookuptable_dir=LOOKUP_TABLE_PATH,
             source=("Source", "idu"),
             config_client=mock_config_client,
         )
@@ -207,7 +207,7 @@ async def mock_linear_arbitrary_angle(
 @pytest.fixture
 def mock_i10_energy_motor_lookup_idu(mock_config_client) -> I10EnergyMotorLookup:
     return I10EnergyMotorLookup(
-        look_up_table_dir=LOOKUP_TABLE_PATH,
+        lookuptable_dir=LOOKUP_TABLE_PATH,
         source=("Source", "idu"),
         config_client=mock_config_client,
     )

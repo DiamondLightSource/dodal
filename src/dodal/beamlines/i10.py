@@ -10,9 +10,16 @@ from daq_config_server.client import ConfigServer
 
 from dodal.common.beamlines.beamline_utils import device_factory
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.devices.apple2_undulator import Apple2, UndulatorGap, UndulatorPhaseAxes
+from dodal.devices.apple2_undulator import (
+    IdEnergy,
+    IdPolarisation,
+    UndulatorGap,
+    UndulatorJawPhase,
+    UndulatorPhaseAxes,
+)
 from dodal.devices.current_amplifiers import CurrentAmpDet
 from dodal.devices.i10.diagnostics import I10Diagnostic, I10Diagnostic5ADet
+from dodal.devices.i10.i10_apple2 import I10Apple2, I10Apple2Controller
 from dodal.devices.i10.i10_setting_data import I10Grating
 from dodal.devices.i10.mirrors import PiezoMirror
 from dodal.devices.i10.rasor.rasor_current_amp import RasorFemto, RasorSR570
@@ -53,14 +60,14 @@ def pgm() -> PGM:
 
 
 @device_factory()
-def idd() -> Apple2:
+def idd() -> I10Apple2:
     """i10 downstream insertion device:
     id.energy.set(<energy>) to change beamline energy.
     id.energy.energy_offset.set(<off_set>) to change id energy offset relative to pgm.
     id.pol.set(<polarisation>) to change polarisation.
     id.laa.set(<linear polarisation angle>) to change polarisation angle, must be in LA mode.
     """
-    return Apple2(
+    return I10Apple2(
         id_gap=UndulatorGap(prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:"),
         id_phase=UndulatorPhaseAxes(
             prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:",
@@ -69,37 +76,77 @@ def idd() -> Apple2:
             btm_inner="RPQ3",
             btm_outer="RPQ4",
         ),
+        id_jaw_phase=UndulatorJawPhase(
+            prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:",
+            move_pv="RPQ1",
+        ),
     )
 
 
 @device_factory()
-def idu() -> Apple2:
+def idd_controller() -> I10Apple2Controller:
+    """I10 insertion device controller, it controls both idu and idd."""
+    return I10Apple2Controller(
+        apple2=idd(),
+        lookuptable_dir=LOOK_UPTABLE_DIR,
+        source=("Source", "idd"),
+        config_client=I10_CONF_CLIENT,
+    )
+
+
+@device_factory()
+def idd_energy() -> IdEnergy:
+    return IdEnergy(id_controller=idd_controller())
+
+
+@device_factory()
+def idd_polarisation() -> IdPolarisation:
+    return IdPolarisation(id_controller=idd_controller())
+
+
+@device_factory()
+def idu() -> I10Apple2:
     """i10 downstream insertion device:
     id.energy.set(<energy>) to change beamline energy.
     id.energy.energy_offset.set(<off_set>) to change id energy offset relative to pgm.
     id.pol.set(<polarisation>) to change polarisation.
     id.laa.set(<linear polarisation angle>) to change polarisation angle, must be in LA mode.
     """
-    return Apple2(
+    return I10Apple2(
         id_gap=UndulatorGap(prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-21:"),
         id_phase=UndulatorPhaseAxes(
-            prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:",
+            prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-21:",
             top_outer="RPQ1",
             top_inner="RPQ2",
             btm_inner="RPQ3",
             btm_outer="RPQ4",
         ),
+        id_jaw_phase=UndulatorJawPhase(
+            prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-21:",
+            move_pv="RPQ1",
+        ),
     )
 
 
-# @device_factory()
-# def idu_
-# @device_factory()
-# def idd_controller() -> I10Apple2Controller:
-#     """I10 insertion device controller, it controls both idu and idd."""
-#     return I10Apple2Controller(
-#         apple2=idd(), lookuptable_dir=LOOK_UPTABLE_DIR, config_client=I10_CONF_CLIENT
-#     )
+@device_factory()
+def idu_controller() -> I10Apple2Controller:
+    """I10 insertion device controller, it controls both idu and idd."""
+    return I10Apple2Controller(
+        apple2=idu(),
+        lookuptable_dir=LOOK_UPTABLE_DIR,
+        source=("Source", "idu"),
+        config_client=I10_CONF_CLIENT,
+    )
+
+
+@device_factory()
+def idu_energy() -> IdEnergy:
+    return IdEnergy(id_controller=idu_controller())
+
+
+@device_factory()
+def idu_polarisation() -> IdPolarisation:
+    return IdPolarisation(id_controller=idu_controller())
 
 
 """Mirrors"""
