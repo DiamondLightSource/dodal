@@ -1,7 +1,3 @@
-from ophyd_async.epics.adaravis import AravisDetector
-from ophyd_async.epics.adcore import NDROIStatIO
-from ophyd_async.fastcs.panda import HDFPanda
-
 from dodal.common.beamlines.beamline_utils import (
     device_factory,
     get_path_provider,
@@ -12,6 +8,10 @@ from dodal.devices.motors import XYZStage
 from dodal.devices.synchrotron import Synchrotron
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix
+from ophyd_async.epics.adaravis import AravisDetector
+from ophyd_async.epics.adcore import NDROIStatIO
+from ophyd_async.epics.pmac import PmacIO
+from ophyd_async.fastcs.panda import HDFPanda
 
 BL = "c01"
 PREFIX = BeamlinePrefix(BL)
@@ -96,4 +96,19 @@ def sample_stage() -> XYZStage:
     """
     return XYZStage(
         f"{PREFIX.beamline_prefix}-MO-PPMAC-01:",
+    )
+
+
+@device_factory()
+def pmac() -> PmacIO:
+    """An XYZ stage holding the sample.
+
+    Returns:
+        XYZStage: The XYZ sample stage device.
+    """
+    stage = sample_stage()
+    return PmacIO(
+        f"{PREFIX.beamline_prefix}-MO-PPMAC-01:",
+        raw_motors=[stage.x, stage.y, stage.z],
+        coord_nums=[2],
     )
