@@ -23,8 +23,8 @@ def shutter(RE: RunEngine) -> GenericShutter[ShutterStates]:
     return shutter
 
 
-def test_shutter_set_open_close(
-    shutter: GenericShutter[ShutterStates], RE: RunEngine
+def test_shutter_set_open_close_without_knowing_enum_values(
+    shutter: GenericShutter, RE: RunEngine
 ) -> None:
     RE(bps.mv(shutter, shutter.OPEN))
     RE(bps.mv(shutter, shutter.CLOSE))
