@@ -302,7 +302,7 @@ class UndulatorJawPhase(SafeUndulatorMover[float]):
 
 class Apple2(StandardReadable, Movable):
     """
-    Device representing the combined motor controls for an Apple2Controller undulator.
+    Device representing the combined motor controls for an Apple2 undulator.
 
     Attributes
     ----------
@@ -333,8 +333,7 @@ class Apple2(StandardReadable, Movable):
     async def set(self, id_motor_values: Apple2Val) -> None:
         """
         Check ID is in a movable state and set all the demand value before moving them
-        all at the same time. This should be modified by the beamline specific ID
-        class, if the ID motors has to move in a specific order.
+        all at the same time.
         """
 
         # Only need to check gap as the phase motors share both fault and gate with gap.
@@ -370,30 +369,23 @@ Apple2Type = TypeVar("Apple2Type", bound="Apple2")
 
 class Apple2Controller(abc.ABC, StandardReadable, Movable, Generic[Apple2Type]):
     """
-    Apple2Controller Undulator Device
 
-    The `Apple2Controller` class represents an Apple 2 insertion device (undulator) used in synchrotron beamlines.
-    This device provides additional degrees of freedom compared to standard undulators, allowing independent
-    movement of magnet banks to produce X-rays with various polarisations and energies.
+    The `Apple2Controller` class is an abstract base class that provides a high-level interface for controlling
+    an Apple2 undulator device.
 
     The class is designed to manage the undulator's gap, phase motors, and polarisation settings, while
     abstracting hardware interactions and providing a high-level interface for beamline operations.
-
-    The class is abstract and requires beamline-specific implementations for _set motor
-     positions based on energy and polarisation.
 
     Attributes
     ----------
     apple2 : Apple2
         A collection of gap and phase motor devices.
-    energy : SignalR
-        A soft signal for the current energy readback.
+    energy : SignalRW
+        A derived signal for moving energy.
     polarisation_setpoint : SignalR
         A soft signal for the polarisation setpoint.
     polarisation : SignalRW
         A hardware-backed signal for polarisation readback and control.
-    lookup_tables : dict
-        A dictionary storing lookup tables for gap and phase motor positions, used for energy and polarisation conversion.
     energy_to_motor : EnergyMotorConvertor
         A callable that converts energy and polarisation to motor positions.
 
@@ -401,6 +393,8 @@ class Apple2Controller(abc.ABC, StandardReadable, Movable, Generic[Apple2Type]):
     ----------------
     _set(value: float) -> None
         Abstract method to set motor positions for a given energy and polarisation.
+    energy_to_motor : EnergyMotorConvertor
+        A callable that converts energy and polarisation to motor positions.
 
     Methods
     -------
@@ -409,14 +403,9 @@ class Apple2Controller(abc.ABC, StandardReadable, Movable, Generic[Apple2Type]):
 
     Notes
     -----
-    - This class requires beamline-specific implementations of the abstract methods.
+    - This class requires beamline-specific implementations of the abstract methods,
     - The device supports multiple polarisation modes, including linear horizontal (LH), linear vertical (LV),
-      positive circular (PC), negative circular (NC), and linear arbitrary (LA).
-
-    For more detail see
-    `UML </_images/apple2_design.png>`__ for detail.
-
-    .. figure:: /explanations/umls/apple2_design.png
+      positive circular (PC), negative circular (NC).
 
     """
 
@@ -429,14 +418,13 @@ class Apple2Controller(abc.ABC, StandardReadable, Movable, Generic[Apple2Type]):
 
         Parameters
         ----------
-        id_gap: An UndulatorGap device.
-        id_phase: An UndulatorPhaseAxes device.
-        energy_motor_convertor: A callable that converts energy and polarisation to motor positions.
-        name: Name of the device.
+        apple2: Apple2
+            An Apple2 device.
+        name: str
+            Name of the device.
         """
-
-        self.apple2 = Reference(apple2)
         self.energy_to_motor: EnergyMotorConvertor
+        self.apple2 = Reference(apple2)
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             # Store the set energy for readback.
             self._energy = soft_signal_rw(float, initial_value=None)
@@ -464,12 +452,6 @@ class Apple2Controller(abc.ABC, StandardReadable, Movable, Generic[Apple2Type]):
             gap=self.apple2().gap.user_readback,
         )
         super().__init__(name)
-
-    def _set_pol_setpoint(self, pol: Pol) -> None:
-        """Set the polarisation setpoint without moving hardware. The polarisation
-        setpoint is used to determine the gap and phase motor positions when
-        setting the energy/polarisation of the undulator."""
-        self._polarisation_setpoint_set(pol)
 
     @AsyncStatus.wrap
     async def set(self, value: float) -> None:
@@ -511,7 +493,7 @@ class Apple2Controller(abc.ABC, StandardReadable, Movable, Generic[Apple2Type]):
         value: Pol,
     ) -> None:
         # This changes the pol setpoint and then changes polarisation via set energy.
-        self._set_pol_setpoint(value)
+        self._polarisation_setpoint_set(value)
         await self.set(await self.energy.get_value())
 
     def _read_pol(

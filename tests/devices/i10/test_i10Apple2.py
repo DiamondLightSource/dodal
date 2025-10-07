@@ -307,7 +307,7 @@ async def test_beam_energy_re_scan_with_offset(
     def capture_emitted(name, doc):
         docs[name].append(doc)
 
-    mock_id_controller._set_pol_setpoint(Pol("lh3"))
+    mock_id_controller._polarisation_setpoint_set(Pol("lh3"))
     # with energy offset
     await beam_energy.energy_offset.set(20)
     rbv_mocks = Mock()
@@ -454,7 +454,7 @@ async def test_id_polarisation_read_leave_lh3_unchanged_when_hardware_match(
     btm_outer: float,
 ):
     set_mock_value(mock_id_controller._energy, energy)
-    mock_id_controller._set_pol_setpoint(Pol("lh3"))
+    mock_id_controller._polarisation_setpoint_set(Pol("lh3"))
     set_mock_value(mock_id_controller.apple2().phase.top_inner.user_readback, top_inner)
     set_mock_value(mock_id_controller.apple2().phase.top_outer.user_readback, top_outer)
     set_mock_value(mock_id_controller.apple2().phase.btm_inner.user_readback, btm_inner)
@@ -464,25 +464,27 @@ async def test_id_polarisation_read_leave_lh3_unchanged_when_hardware_match(
 
 async def test_linear_arbitrary_pol_fail_set(
     mock_linear_arbitrary_angle: LinearArbitraryAngle,
+    mock_id_controller: I10Apple2Controller,
 ):
     with pytest.raises(RuntimeError) as e:
         await mock_linear_arbitrary_angle.set(20)
     assert str(e.value) == (
         f"Angle control is not available in polarisation"
-        f" {await mock_linear_arbitrary_angle._id_controller_ref().polarisation.get_value()}"
-        + f" with {mock_linear_arbitrary_angle._id_controller_ref().name}"
+        f" {await mock_id_controller.polarisation.get_value()}"
+        + f" with {mock_id_controller.name}"
     )
 
 
 async def test_linear_arbitrary_pol_fail_read(
     mock_linear_arbitrary_angle: LinearArbitraryAngle,
+    mock_id_controller: I10Apple2Controller,
 ):
     with pytest.raises(RuntimeError) as e:
         await mock_linear_arbitrary_angle.read()
     assert str(e.value) == (
         f"Angle control is not available in polarisation"
-        f" {await mock_linear_arbitrary_angle._id_controller_ref().polarisation.get_value()}"
-        + f" with {mock_linear_arbitrary_angle._id_controller_ref().name}"
+        f" {await mock_id_controller.polarisation.get_value()}"
+        + f" with {mock_id_controller.name}"
     )
 
 
@@ -491,42 +493,34 @@ async def test_linear_arbitrary_pol_fail_read(
     [18, -18, 12.01, -12.01],
 )
 async def test_linear_arbitrary_limit_fail(
-    mock_linear_arbitrary_angle: LinearArbitraryAngle, poly: float
+    mock_linear_arbitrary_angle: LinearArbitraryAngle,
+    mock_id_controller: I10Apple2Controller,
+    poly: float,
 ):
     set_mock_value(
-        mock_linear_arbitrary_angle._id_controller_ref()
-        .apple2()
-        .phase.top_inner.user_readback,
+        mock_id_controller.apple2().phase.top_inner.user_readback,
         16.4,
     )
     set_mock_value(
-        mock_linear_arbitrary_angle._id_controller_ref()
-        .apple2()
-        .phase.top_outer.user_readback,
+        mock_id_controller.apple2().phase.top_outer.user_readback,
         0,
     )
     set_mock_value(
-        mock_linear_arbitrary_angle._id_controller_ref()
-        .apple2()
-        .phase.btm_inner.user_readback,
+        mock_id_controller.apple2().phase.btm_inner.user_readback,
         0,
     )
     set_mock_value(
-        mock_linear_arbitrary_angle._id_controller_ref()
-        .apple2()
-        .phase.btm_outer.user_readback,
+        mock_id_controller.apple2().phase.btm_outer.user_readback,
         -16.4,
     )
-    mock_linear_arbitrary_angle._id_controller_ref().jaw_phase_from_angle = poly1d(
-        [poly]
-    )
+    mock_id_controller.jaw_phase_from_angle = poly1d([poly])
     with pytest.raises(RuntimeError) as e:
         await mock_linear_arbitrary_angle.set(20.0)
     assert (
         str(e.value)
         == f"jaw_phase position for angle (20.0) is outside permitted range"
-        f" [-{mock_linear_arbitrary_angle._id_controller_ref().jaw_phase_limit},"
-        f" {mock_linear_arbitrary_angle._id_controller_ref().jaw_phase_limit}]"
+        f" [-{mock_id_controller.jaw_phase_limit},"
+        f" {mock_id_controller.jaw_phase_limit}]"
     )
 
 
@@ -540,6 +534,7 @@ async def test_linear_arbitrary_limit_fail(
 )
 async def test_linear_arbitrary_RE_scan(
     mock_linear_arbitrary_angle: LinearArbitraryAngle,
+    mock_id_controller: I10Apple2Controller,
     RE: RunEngine,
     start: float,
     stop: float,
@@ -552,27 +547,19 @@ async def test_linear_arbitrary_RE_scan(
         docs[name].append(doc)
 
     set_mock_value(
-        mock_linear_arbitrary_angle._id_controller_ref()
-        .apple2()
-        .phase.top_inner.user_readback,
+        mock_id_controller.apple2().phase.top_inner.user_readback,
         16.4,
     )
     set_mock_value(
-        mock_linear_arbitrary_angle._id_controller_ref()
-        .apple2()
-        .phase.top_outer.user_readback,
+        mock_id_controller.apple2().phase.top_outer.user_readback,
         0,
     )
     set_mock_value(
-        mock_linear_arbitrary_angle._id_controller_ref()
-        .apple2()
-        .phase.btm_inner.user_readback,
+        mock_id_controller.apple2().phase.btm_inner.user_readback,
         0,
     )
     set_mock_value(
-        mock_linear_arbitrary_angle._id_controller_ref()
-        .apple2()
-        .phase.btm_outer.user_readback,
+        mock_id_controller.apple2().phase.btm_outer.user_readback,
         -16.4,
     )
     RE(
@@ -587,17 +574,15 @@ async def test_linear_arbitrary_RE_scan(
     )
     assert_emitted(docs, start=1, descriptor=1, event=num_point, stop=1)
     set_mock_value(
-        mock_linear_arbitrary_angle._id_controller_ref().apple2().gap.gate,
+        mock_id_controller.apple2().gap.gate,
         UndulatorGateStatus.CLOSE,
     )
     set_mock_value(
-        mock_linear_arbitrary_angle._id_controller_ref().apple2().phase.gate,
+        mock_id_controller.apple2().phase.gate,
         UndulatorGateStatus.CLOSE,
     )
     jaw_phase = get_mock_put(
-        mock_linear_arbitrary_angle._id_controller_ref()
-        .apple2()
-        .jaw_phase.jaw_phase.user_setpoint
+        mock_id_controller.apple2().jaw_phase.jaw_phase.user_setpoint
     )
 
     poly = poly1d(
@@ -609,8 +594,7 @@ async def test_linear_arbitrary_RE_scan(
         assert data["data"]["mock_id_controller-linear_arbitrary_angle"] == temp_angle
         alpha_real = (
             temp_angle
-            if temp_angle
-            > mock_linear_arbitrary_angle._id_controller_ref().angle_threshold_deg
+            if temp_angle > mock_id_controller.angle_threshold_deg
             else temp_angle + 180.0
         )  # convert angle to jawphase.
         assert jaw_phase.call_args_list[cnt] == mock.call(

@@ -438,7 +438,7 @@ class I10Apple2Controller(Apple2Controller[I10Apple2]):
                     f"Polarisation cannot be determined from hardware for {self.name}"
                 )
 
-            self._set_pol_setpoint(pol)
+            self._polarisation_setpoint_set(pol)
         gap, phase = self.lookup_table_client.get_motor_from_energy(
             energy=value, pol=pol
         )
