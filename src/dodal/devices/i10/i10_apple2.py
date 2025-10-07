@@ -493,13 +493,13 @@ class LinearArbitraryAngle(StandardReadable, Movable[SupportsFloat]):
             polynomial parameters highest power first.
         """
         super().__init__(name=name)
-        self._id_controller_ref = Reference(id_controller)
+        self.linear_arbitrary_angle = Reference(id_controller.linear_arbitrary_angle)
 
         self.add_readables(
-            [self._id_controller_ref().linear_arbitrary_angle],
+            [self.linear_arbitrary_angle()],
             StandardReadableFormat.HINTED_SIGNAL,
         )
 
     @AsyncStatus.wrap
     async def set(self, angle: float) -> None:
-        await self._id_controller_ref().linear_arbitrary_angle.set(angle)
+        await self.linear_arbitrary_angle().set(angle)

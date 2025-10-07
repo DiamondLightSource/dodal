@@ -19,7 +19,11 @@ from dodal.devices.apple2_undulator import (
 )
 from dodal.devices.current_amplifiers import CurrentAmpDet
 from dodal.devices.i10.diagnostics import I10Diagnostic, I10Diagnostic5ADet
-from dodal.devices.i10.i10_apple2 import I10Apple2, I10Apple2Controller
+from dodal.devices.i10.i10_apple2 import (
+    I10Apple2,
+    I10Apple2Controller,
+    LinearArbitraryAngle,
+)
 from dodal.devices.i10.i10_setting_data import I10Grating
 from dodal.devices.i10.mirrors import PiezoMirror
 from dodal.devices.i10.rasor.rasor_current_amp import RasorFemto, RasorSR570
@@ -105,6 +109,11 @@ def idd_polarisation() -> IdPolarisation:
 
 
 @device_factory()
+def idd_laa() -> LinearArbitraryAngle:
+    return LinearArbitraryAngle(id_controller=idd_controller())
+
+
+@device_factory()
 def idu() -> I10Apple2:
     """i10 downstream insertion device:
     id.energy.set(<energy>) to change beamline energy.
@@ -147,6 +156,11 @@ def idu_energy() -> IdEnergy:
 @device_factory()
 def idu_polarisation() -> IdPolarisation:
     return IdPolarisation(id_controller=idu_controller())
+
+
+@device_factory()
+def idu_laa() -> LinearArbitraryAngle:
+    return LinearArbitraryAngle(id_controller=idu_controller())
 
 
 """Mirrors"""
