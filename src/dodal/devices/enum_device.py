@@ -1,5 +1,6 @@
 from typing import Generic, TypeVar
 
+from bluesky.protocols import Movable
 from ophyd_async.core import (
     AsyncStatus,
     EnumTypes,
@@ -10,7 +11,7 @@ from ophyd_async.epics.core import epics_signal_rw
 StrictEnumT = TypeVar("StrictEnumT", bound=EnumTypes)
 
 
-class EnumDevice(StandardReadable, Generic[StrictEnumT]):
+class EnumDevice(StandardReadable, Movable, Generic[StrictEnumT]):
     """Simple device to hold enum state of a PV."""
 
     def __init__(
