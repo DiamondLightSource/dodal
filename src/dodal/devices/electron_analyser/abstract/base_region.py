@@ -1,7 +1,7 @@
 import re
 from abc import ABC
 from collections.abc import Callable
-from typing import Generic, TypeVar
+from typing import Generic, Self, TypeVar
 
 from pydantic import BaseModel, Field, model_validator
 
@@ -88,28 +88,43 @@ class AbstractBaseRegion(
         return self.energy_mode == EnergyMode.KINETIC
 
     def switch_energy_mode(
-        self, energy_mode: EnergyMode, excitation_energy: float
-    ) -> None:
+        self, energy_mode: EnergyMode, excitation_energy: float, copy: bool = True
+    ) -> Self:
         """
-        Switch region to new energy mode: Kinetic or Binding. Updates the low_energy,
-        centre_energy, high_energy, and energy_mode, only if it switches to a new one.
+        Switch region with to a new energy mode with a new energy mode: Kinetic or Binding.
+        It caculates new values for low_energy, centre_energy, high_energy, via the
+        excitation enerrgy. It doesn't calculate anything if the region is already of
+        the same energy mode.
 
         Parameters:
-            energy_mode: mode you want to switch the region to.
-            excitation_energy: the energy to calculate the new values of low_energy,
-                               centre_energy, and high_energy.
+            energy_mode: Mode you want to switch the region to.
+            excitation_energy: Energy conversion for low_energy, centre_energy, and
+                               high_energy for new energy mode.
+            copy: Defaults to True. If true, create a copy of this region for the new
+                  energy_mode and return it. If False, alter this region for the
+                  energy_mode and return it self.
+
+        Returns:
+            Region with selected energy mode and new calculated energy values.
         """
+        switched_r = self.model_copy() if copy else self
         conv = (
             to_binding_energy
             if energy_mode == EnergyMode.BINDING
             else to_kinetic_energy
         )
-        self.low_energy = conv(self.low_energy, self.energy_mode, excitation_energy)
-        self.centre_energy = conv(
-            self.centre_energy, self.energy_mode, excitation_energy
+        switched_r.low_energy = conv(
+            switched_r.low_energy, switched_r.energy_mode, excitation_energy
         )
-        self.high_energy = conv(self.high_energy, self.energy_mode, excitation_energy)
-        self.energy_mode = energy_mode
+        switched_r.centre_energy = conv(
+            switched_r.centre_energy, switched_r.energy_mode, excitation_energy
+        )
+        switched_r.high_energy = conv(
+            switched_r.high_energy, switched_r.energy_mode, excitation_energy
+        )
+        switched_r.energy_mode = energy_mode
+
+        return switched_r
 
     @model_validator(mode="before")
     @classmethod
