@@ -235,7 +235,7 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
         )
 
         results_without_tiny_x = [
-            result for result in sorted_results if result.centre_px[0] > 10
+            result for result in sorted_results if result.centre_px[0] >= 10
         ]
         result_uuids_with_tiny_x = [
             result.uuid
