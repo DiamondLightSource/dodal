@@ -43,7 +43,7 @@ class Coord(Enum):
 
 @dataclass
 class MurkoResult:
-    centre_px: tuple
+    chosen_point_px: tuple
     x_dist_mm: float
     y_dist_mm: float
     omega: float
@@ -186,16 +186,16 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
         else:
             shape = result["original_shape"]  # Dimensions of image in pixels
             # Murko returns coords as y, x
-            centre_px = (coords[1] * shape[1], coords[0] * shape[0])
+            chosen_point_px = (coords[1] * shape[1], coords[0] * shape[0])
 
             beam_dist_px = calculate_beam_distance(
                 (metadata["beam_centre_i"], metadata["beam_centre_j"]),
-                centre_px[0],
-                centre_px[1],
+                chosen_point_px[0],
+                chosen_point_px[1],
             )
             self._results.append(
                 MurkoResult(
-                    centre_px=centre_px,
+                    chosen_point_px=chosen_point_px,
                     x_dist_mm=beam_dist_px[0] * metadata["microns_per_x_pixel"] / 1000,
                     y_dist_mm=beam_dist_px[1] * metadata["microns_per_y_pixel"] / 1000,
                     omega=omega,
@@ -214,10 +214,10 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
         """
 
         LOGGER.info(f"Number of results before filtering: {len(self._results)}")
-        sorted_results = sorted(self._results, key=lambda item: item.centre_px[0])
+        sorted_results = sorted(self._results, key=lambda item: item.chosen_point_px[0])
 
         results_without_tiny_x = [
-            result for result in sorted_results if result.centre_px[0] >= 10
+            result for result in sorted_results if result.chosen_point_px[0] >= 10
         ]
         result_uuids_with_tiny_x = [
             result.uuid
