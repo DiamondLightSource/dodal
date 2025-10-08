@@ -9,7 +9,6 @@ from dodal.devices.fast_shutter import GenericShutter
 class ShutterStates(StrictEnum):
     OPEN = "Open"
     CLOSE = "Close"
-    FAULT = "Fault"
 
 
 @pytest.fixture

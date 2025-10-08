@@ -13,9 +13,9 @@ StrictEnumT = TypeVar("StrictEnumT", bound=EnumTypes)
 
 class GenericShutter(StandardReadable, Movable[StrictEnumT]):
     """
-    Basic enum device specialised for a shutter with configured open_state and
-    close_state so it can be used with any device or plan without knowing the specific
-    enum to use.
+    Basic enum device specialised for a fast shutter with configured open_state and
+    close_state so it is generic enough to be used with any device or plan without
+    knowing the specific enum to use.
 
     For example:
         await shutter.set(shutter.open_state)
