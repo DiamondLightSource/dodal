@@ -23,11 +23,13 @@ def shutter(RE: RunEngine) -> GenericShutter[ShutterStates]:
     return shutter
 
 
-def test_shutter_set_open_close_without_knowing_enum_values(
+async def test_shutter_set_open_close_without_knowing_enum_values(
     shutter: GenericShutter, RE: RunEngine
 ) -> None:
     RE(bps.mv(shutter, shutter.OPEN))
+    assert await shutter.state.get_value() == ShutterStates.OPEN
     RE(bps.mv(shutter, shutter.CLOSE))
+    assert await shutter.state.get_value() == ShutterStates.CLOSE
 
 
 def test_shutter_invalid_set(shutter: GenericShutter, RE: RunEngine) -> None:
