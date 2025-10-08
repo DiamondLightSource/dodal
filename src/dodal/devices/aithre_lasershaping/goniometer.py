@@ -15,13 +15,28 @@ class Goniometer(XYZOmegaStage):
     regardless of the current rotation.
     """
 
-    def __init__(self, prefix: str, name: str = "") -> None:
-        super().__init__(prefix=prefix, name=name)
-        XYZOmegaStage.y = Motor(prefix+ "_SAMPY")
-        XYZOmegaStage.z = Motor(prefix+ "_SAMPZ")
+    def __init__(
+        self,
+        prefix: str,
+        name: str = "",
+        x_infix: str = _X,
+        y_infix: str = _SAMPY,
+        z_infix: str = _SAMPZ,
+        omega_infix: str = _OMEGA
+        stage_y_infix: str = _Y,
+        stage_z_infix: str = _Z
+    ) -> None:
+        super().__init__(
+            prefix=prefix,
+            name=name
+            x_infix=x_infix,
+            y_infix=y_infix,
+            z_infix=z_infix,
+            omega_infix=omega_infix,
+        )
         with self.add_children_as_readables():
-            self.stage_y = Motor(prefix + "_Y")
-            self.stage_z = Motor(prefix + "_Z")
+            self.stage_y = Motor(prefix + stage_y_infix)
+            self.stage_z = Motor(prefix + stage_z_infix)
             self.vertical_position = create_axis_perp_to_rotation(
                 self.omega, self.z, self.y
             )
