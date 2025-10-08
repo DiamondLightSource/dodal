@@ -232,6 +232,19 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
             f"Results with tiny x have been removed: {result_uuids_with_tiny_x}"
         )
 
+        results_without_tiny_x = [
+            result for result in sorted_results if result.centre_px[0] > 10
+        ]
+        result_uuids_with_tiny_x = [
+            result.uuid
+            for result in sorted_results
+            if result not in results_without_tiny_x
+        ]
+
+        LOGGER.info(
+            f"Results with tiny x have been removed: {result_uuids_with_tiny_x}"
+        )
+
         worst_results = [
             r.uuid for r in sorted_results[-self.NUMBER_OF_WRONG_RESULTS_TO_LOG :]
         ]
