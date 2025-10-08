@@ -16,14 +16,9 @@ class Goniometer(XYZOmegaStage):
     """
 
     def __init__(self, prefix: str, name: str = "") -> None:
-        super().__init__(
-            prefix=prefix,
-            name=name,
-            x_infix="_X",
-            y_infix="_SAMPY",
-            z_infix="_SAMPZ",
-            omega_infix="_OMEGA",
-        )
+        super().__init__(prefix=prefix, name=name)
+        XYZOmegaStage.y = Motor(prefix+ "_SAMPY")
+        XYZOmegaStage.z = Motor(prefix+ "_SAMPZ")
         with self.add_children_as_readables():
             self.stage_y = Motor(prefix + "_Y")
             self.stage_z = Motor(prefix + "_Z")
