@@ -413,7 +413,7 @@ async def test_correct_movement_given_multiple_angles_and_x_drift(
 ):
     murko_results.PERCENTAGE_TO_USE = 100  # type:ignore
     murko_results.stop_angle = 250
-    x = 0.1
+    x = 0.7
     y = 0.2
     z = 0.3
     xyz = (x, y, z)
@@ -533,7 +533,7 @@ def test_given_n_results_filter_outliers_will_reduce_down_to_smaller_amount(
 ):
     murko_results._results = [
         MurkoResult(
-            centre_px=(i, 100),
+            centre_px=(i + 11, 100),
             x_dist_mm=i,
             y_dist_mm=i,
             omega=i,

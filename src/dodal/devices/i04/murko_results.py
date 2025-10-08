@@ -209,10 +209,25 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
         """Whilst murko is not fully trained it often gives us poor results.
         When it is wrong it usually picks up the base of the pin, rather than the tip,
         meaning that by keeping only a percentage of the results with the smallest X we
-        remove many of the outliers.
+        remove many of the outliers. Murko also occasionally picks a point in the bottom
+        left corner, which can be removed by filtering results with a small x pixel.
         """
+
         LOGGER.info(f"Number of results before filtering: {len(self._results)}")
         sorted_results = sorted(self._results, key=lambda item: item.centre_px[0])
+
+        results_without_tiny_x = [
+            result for result in sorted_results if result.centre_px[0] > 10
+        ]
+        result_uuids_with_tiny_x = [
+            result.uuid
+            for result in sorted_results
+            if result not in results_without_tiny_x
+        ]
+
+        LOGGER.info(
+            f"Results with tiny x have been removed: {result_uuids_with_tiny_x}"
+        )
 
         worst_results = [
             r.uuid for r in sorted_results[-self.NUMBER_OF_WRONG_RESULTS_TO_LOG :]
@@ -221,14 +236,17 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
         LOGGER.info(
             f"Worst {self.NUMBER_OF_WRONG_RESULTS_TO_LOG} murko results were {worst_results}"
         )
+
         cutoff = max(1, int(len(sorted_results) * self.PERCENTAGE_TO_USE / 100))
-        for i, result in enumerate(sorted_results):
-            result.metadata["used_for_centring"] = i < cutoff
+        cutoff = min(cutoff, len(results_without_tiny_x))
 
-        smallest_x = sorted_results[:cutoff]
+        best_x = results_without_tiny_x[:cutoff]
 
-        LOGGER.info(f"Number of results after filtering: {len(smallest_x)}")
-        return smallest_x
+        for result in sorted_results:
+            result.metadata["used_for_centring"] = result in best_x
+
+        LOGGER.info(f"Number of results after filtering: {len(best_x)}")
+        return best_x
 
 
 def get_yz_least_squares(vertical_dists: list, omegas: list) -> tuple[float, float]:
