@@ -1,0 +1,40 @@
+dodal.devices.i10.rasor.rasor\_motors.DetSlits
+==============================================
+
+.. currentmodule:: dodal.devices.i10.rasor.rasor_motors
+
+.. autoclass:: DetSlits
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

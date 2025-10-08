@@ -1,0 +1,43 @@
+dodal.devices.i19.shutter.AccessControlledShutter
+=================================================
+
+.. currentmodule:: dodal.devices.i19.shutter
+
+.. autoclass:: AccessControlledShutter
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~AccessControlledShutter.set
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

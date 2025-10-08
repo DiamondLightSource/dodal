@@ -1,0 +1,43 @@
+dodal.devices.apple2\_undulator.Apple2Motors
+============================================
+
+.. currentmodule:: dodal.devices.apple2_undulator
+
+.. autoclass:: Apple2Motors
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~Apple2Motors.set
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

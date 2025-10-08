@@ -1,0 +1,37 @@
+dodal.devices.i15.motors
+========================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices.i15
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~motors.NumberedTripleAxisStage
+   ~motors.UpstreamDownstreamPair
+
+
+
+
+.. automodule:: dodal.devices.i15.motors
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
