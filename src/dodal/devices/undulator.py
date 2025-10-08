@@ -41,8 +41,8 @@ def _get_gap_for_energy(
 
 class UndulatorOrder(StandardReadable, Locatable[int]):
     """
-    Represents the order of an undulator, providing mechanisms to read, set, and validate the order value against a lookup table passed as a dictionary.
-
+    Represents the order of an undulator, providing mechanisms to read, set, and
+    validate the order value against a lookup table passed as a dictionary.
     """
 
     def __init__(self, lut: dict, name: str = "") -> None:
