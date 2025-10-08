@@ -218,22 +218,7 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
         sorted_results = sorted(self._results, key=lambda item: item.chosen_point_px[0])
 
         results_without_tiny_x = [
-            result
-            for result in sorted_results
-            if result.chosen_point_px[0] >= self.LEFTMOST_PIXEL_TO_USE
-        ]
-        result_uuids_with_tiny_x = [
-            result.uuid
-            for result in sorted_results
-            if result not in results_without_tiny_x
-        ]
-
-        LOGGER.info(
-            f"Results with tiny x have been removed: {result_uuids_with_tiny_x}"
-        )
-
-        results_without_tiny_x = [
-            result for result in sorted_results if result.centre_px[0] >= 10
+            result for result in sorted_results if result.chosen_point_px[0] >= 10
         ]
         result_uuids_with_tiny_x = [
             result.uuid
