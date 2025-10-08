@@ -761,3 +761,65 @@ async def test_correct_hset_calls_are_made_for_used_and_unused_results(
 
     assert mock_hset.call_count == 24
     mock_hset.assert_has_calls(expected_calls, any_order=True)
+
+
+def test_results_with_tiny_x_pixel_value_are_filtered_out(
+    murko_results: MurkoResultsDevice,
+):
+    metadata = MurkoMetadata(  # fields dont matter
+        zoom_percentage=1,
+        microns_per_x_pixel=1,
+        microns_per_y_pixel=1,
+        beam_centre_i=1,
+        beam_centre_j=1,
+        sample_id="1",
+        omega_angle=0,
+        uuid="any",
+        used_for_centring=None,
+    )
+    murko_results.PERCENTAGE_TO_USE = 100  # type: ignore
+    murko_results._results = [
+        MurkoResult(
+            centre_px=(500, 0),
+            x_dist_mm=4,
+            y_dist_mm=8,
+            omega=0,
+            uuid="a",
+            metadata=metadata.copy(),
+        ),
+        MurkoResult(
+            centre_px=(0, 100),
+            x_dist_mm=0,
+            y_dist_mm=90,
+            omega=10,
+            uuid="b",
+            metadata=metadata.copy(),
+        ),
+        MurkoResult(
+            centre_px=(5, 200),
+            x_dist_mm=6,
+            y_dist_mm=63,
+            omega=20,
+            uuid="c",
+            metadata=metadata.copy(),
+        ),
+        MurkoResult(
+            centre_px=(9, 300),
+            x_dist_mm=7,
+            y_dist_mm=8,
+            omega=30,
+            uuid="d",
+            metadata=metadata.copy(),
+        ),
+    ]
+    filtered_results = murko_results.filter_outliers()
+    assert len(filtered_results) == 1
+    used_result = filtered_results[0]
+    assert used_result.centre_px == (500, 0)
+    assert used_result == murko_results._results[0]
+    assert len(murko_results._results) == 4
+    for result in murko_results._results:
+        if result == used_result:
+            assert result.metadata["used_for_centring"] is True
+        else:
+            assert result.metadata["used_for_centring"] is False
