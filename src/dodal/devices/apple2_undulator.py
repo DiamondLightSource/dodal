@@ -410,6 +410,7 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
     def __init__(
         self,
         apple2: Apple2Type,
+        energy_to_motor_converter: EnergyMotorConvertor,
         name: str = "",
     ) -> None:
         """
@@ -421,7 +422,7 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
         name: str
             Name of the device.
         """
-        self.energy_to_motor: EnergyMotorConvertor
+        self.energy_to_motor = energy_to_motor_converter
         self.apple2 = Reference(apple2)
 
         # Store the set energy for readback.

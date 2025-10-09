@@ -382,11 +382,16 @@ class I10Apple2Controller(Apple2Controller[I10Apple2]):
         name : str, optional
             New device name.
         """
-        super().__init__(apple2=apple2, name=name)
+
         self.lookup_table_client = I10EnergyMotorLookup(
             lookuptable_dir=lookuptable_dir,
             source=source,
             config_client=config_client,
+        )
+        super().__init__(
+            apple2=apple2,
+            energy_to_motor_converter=self.lookup_table_client.get_motor_from_energy,
+            name=name,
         )
 
         self.jaw_phase_from_angle = np.poly1d(jaw_phase_poly_param)
@@ -442,9 +447,7 @@ class I10Apple2Controller(Apple2Controller[I10Apple2]):
                 )
 
             self._polarisation_setpoint_set(pol)
-        gap, phase = self.lookup_table_client.get_motor_from_energy(
-            energy=value, pol=pol
-        )
+        gap, phase = self.energy_to_motor(energy=value, pol=pol)
         phase3 = phase * (-1 if pol == Pol.LA else 1)
         id_set_val = Apple2Val(
             top_outer=f"{phase:.6f}",
