@@ -1,5 +1,6 @@
 from ophyd_async.fastcs.panda import HDFPanda
 
+from dodal.beamline_specific_utils.i19 import HutchState, endstation_has_control
 from dodal.common.beamlines.beamline_utils import (
     device_factory,
     get_path_provider,
@@ -7,11 +8,12 @@ from dodal.common.beamlines.beamline_utils import (
 from dodal.common.beamlines.beamline_utils import (
     set_beamline as set_utils_beamline,
 )
+from dodal.common.coordination import locked
+from dodal.devices.hutch_shutter import HutchShutter
 from dodal.devices.i19.backlight import BacklightPosition
 from dodal.devices.i19.beamstop import BeamStop
-from dodal.devices.i19.blueapi_device import HutchState
 from dodal.devices.i19.diffractometer import FourCircleDiffractometer
-from dodal.devices.i19.shutter import AccessControlledShutter
+from dodal.devices.i19.hutch_access import HutchAccessControl
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.zebra.zebra import Zebra
 from dodal.devices.zebra.zebra_constants_mapping import (
@@ -35,6 +37,14 @@ I19_2_ZEBRA_MAPPING = ZebraMapping(
     outputs=ZebraTTLOutputs(),
     sources=ZebraSources(),
 )
+
+
+@device_factory()
+def access_control() -> HutchAccessControl:
+    """Get a device that checks the active hutch for i19, instantiate it if it hasn't already been.
+    If this is called when already instantiated, it will return the existing object.
+    """
+    return HutchAccessControl(f"{PREFIX.beamline_prefix}-OP-STAT-01:")
 
 
 @device_factory()
@@ -62,15 +72,12 @@ def zebra() -> Zebra:
 
 
 @device_factory()
-def shutter() -> AccessControlledShutter:
-    """Get the i19-2 hutch shutter device, instantiate it if it hasn't already been.
+def shutter() -> HutchShutter:
+    """Get the i19 hutch shutter device, instantiate it if it hasn't already been.
     If this is called when already instantiated, it will return the existing object.
     """
-    return AccessControlledShutter(
-        prefix=f"{PREFIX.beamline_prefix}-PS-SHTR-01:",
-        hutch=HutchState.EH2,
-        instrument_session="cm40639-4",
-    )
+    shutter = HutchShutter(f"{PREFIX.beamline_prefix}-PS-SHTR-01:")
+    return locked(shutter, endstation_has_control(access_control(), HutchState.EH2))
 
 
 @device_factory()
