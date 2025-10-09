@@ -82,6 +82,7 @@ class OAV(StandardReadable):
         prefix: str,
         config: OAVConfigBase,
         name: str = "",
+        mjpeg_prefix: str = "MJPG",
         zoom_controller: BaseZoomController | None = None,
     ):
         self.oav_config = config
@@ -98,7 +99,7 @@ class OAV(StandardReadable):
 
         self.cam = Cam(f"{prefix}CAM:", name=name)
         with self.add_children_as_readables():
-            self.grid_snapshot = SnapshotWithGrid(f"{prefix}MJPG:", name)
+            self.grid_snapshot = SnapshotWithGrid(f"{prefix}{mjpeg_prefix}:", name)
 
         self.sizes = [self.grid_snapshot.x_size, self.grid_snapshot.y_size]
 
@@ -153,9 +154,16 @@ class OAVBeamCentreFile(OAV):
         prefix: str,
         config: OAVConfigBeamCentre,
         name: str = "",
+        mjpeg_prefix: str = "MJPG",
         zoom_controller: BaseZoomController | None = None,
     ):
-        super().__init__(prefix, config, name, zoom_controller)
+        super().__init__(
+            prefix,
+            config=config,
+            name=name,
+            mjpeg_prefix=mjpeg_prefix,
+            zoom_controller=zoom_controller,
+        )
 
         with self.add_children_as_readables():
             self.beam_centre_i = derived_signal_r(
@@ -189,6 +197,7 @@ class OAVBeamCentrePV(OAV):
         prefix: str,
         config: OAVConfig,
         name: str = "",
+        mjpeg_prefix: str = "MJPG",
         zoom_controller: BaseZoomController | None = None,
         overlay_channel: int = 1,
     ):
@@ -199,4 +208,10 @@ class OAVBeamCentrePV(OAV):
             self.beam_centre_j = epics_signal_r(
                 int, prefix + f"OVER:{overlay_channel}:CenterY"
             )
-        super().__init__(prefix, config, name, zoom_controller)
+        super().__init__(
+            prefix=prefix,
+            config=config,
+            name=name,
+            mjpeg_prefix=mjpeg_prefix,
+            zoom_controller=zoom_controller,
+        )
