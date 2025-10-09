@@ -49,6 +49,8 @@ async def test_calculate_gap_from_energy_wrong_k(
 ):
     with pytest.raises(
         ValueError,
-        match=re.escape("diffraction parameter squared must be positive!"),
+        match=re.escape(
+            "Diffraction parameter squared must be positive! Calculated value -1.78"
+        ),
     ):
         calculate_gap_hu(30, lut_dictionary, 1)
