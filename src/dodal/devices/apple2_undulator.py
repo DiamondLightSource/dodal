@@ -661,7 +661,7 @@ class InsertionDeviceEnergy(InsertionDeviceEnergyBase):
         await self.energy().set(energy)
 
 
-class IdPolarisation(StandardReadable, Locatable[Pol]):
+class InsertionDevicePolarisation(StandardReadable, Locatable[Pol]):
     """Apple2 ID polarisation movable device."""
 
     def __init__(self, id_controller: Apple2Controller, name: str = "") -> None:

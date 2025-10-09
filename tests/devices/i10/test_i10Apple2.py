@@ -19,8 +19,8 @@ from ophyd_async.testing import (
 
 from dodal.devices.apple2_undulator import (
     BeamEnergy,
-    IdPolarisation,
     InsertionDeviceEnergy,
+    InsertionDevicePolarisation,
     Pol,
     UndulatorGap,
     UndulatorGateStatus,
@@ -190,9 +190,11 @@ async def beam_energy(
 
 
 @pytest.fixture
-async def mock_id_pol(mock_id_controller: I10Apple2Controller) -> IdPolarisation:
+async def mock_id_pol(
+    mock_id_controller: I10Apple2Controller,
+) -> InsertionDevicePolarisation:
     async with init_devices(mock=True):
-        mock_id_pol = IdPolarisation(id_controller=mock_id_controller)
+        mock_id_pol = InsertionDevicePolarisation(id_controller=mock_id_controller)
 
     return mock_id_pol
 
@@ -364,7 +366,7 @@ async def test_beam_energy_re_scan_with_offset(
     ],
 )
 async def test_id_polarisation_set(
-    mock_id_pol: IdPolarisation,
+    mock_id_pol: InsertionDevicePolarisation,
     mock_id_controller: I10Apple2Controller,
     pol: Pol,
     energy: float,
@@ -422,7 +424,7 @@ async def test_id_polarisation_set(
     ],
 )
 async def test_id_polarisation_locate(
-    mock_id_pol: IdPolarisation,
+    mock_id_pol: InsertionDevicePolarisation,
     mock_id_controller: I10Apple2Controller,
     pol: Pol,
     energy: float,
@@ -454,7 +456,7 @@ async def test_id_polarisation_locate(
     ],
 )
 async def test_id_polarisation_read_check_pol_from_hardware(
-    mock_id_pol: IdPolarisation,
+    mock_id_pol: InsertionDevicePolarisation,
     mock_id_controller: I10Apple2Controller,
     pol: str,
     energy: float,
@@ -480,7 +482,7 @@ async def test_id_polarisation_read_check_pol_from_hardware(
     ],
 )
 async def test_id_polarisation_read_leave_lh3_unchanged_when_hardware_match(
-    mock_id_pol: IdPolarisation,
+    mock_id_pol: InsertionDevicePolarisation,
     mock_id_controller: I10Apple2Controller,
     pol: str,
     energy: float,
