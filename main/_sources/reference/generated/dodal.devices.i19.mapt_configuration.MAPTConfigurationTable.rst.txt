@@ -1,0 +1,40 @@
+dodal.devices.i19.mapt\_configuration.MAPTConfigurationTable
+============================================================
+
+.. currentmodule:: dodal.devices.i19.mapt_configuration
+
+.. autoclass:: MAPTConfigurationTable
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   
