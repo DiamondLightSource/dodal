@@ -413,7 +413,7 @@ async def test_correct_movement_given_multiple_angles_and_x_drift(
 ):
     murko_results.PERCENTAGE_TO_USE = 100  # type:ignore
     murko_results.stop_angle = 250
-    x = 0.1
+    x = 0.7
     y = 0.2
     z = 0.3
     xyz = (x, y, z)
@@ -533,7 +533,7 @@ def test_given_n_results_filter_outliers_will_reduce_down_to_smaller_amount(
 ):
     murko_results._results = [
         MurkoResult(
-            centre_px=(i, 100),
+            chosen_point_px=(i + 11, 100),
             x_dist_mm=i,
             y_dist_mm=i,
             omega=i,
@@ -556,7 +556,7 @@ def test_when_results_filtered_then_smallest_x_pixels_kept(
 ):
     murko_results._results = [
         MurkoResult(
-            centre_px=(100, 0),
+            chosen_point_px=(100, 0),
             x_dist_mm=4,
             y_dist_mm=8,
             omega=0,
@@ -564,7 +564,7 @@ def test_when_results_filtered_then_smallest_x_pixels_kept(
             metadata={},  # type:ignore
         ),
         MurkoResult(
-            centre_px=(300, 100),
+            chosen_point_px=(300, 100),
             x_dist_mm=0,
             y_dist_mm=90,
             omega=10,
@@ -572,7 +572,7 @@ def test_when_results_filtered_then_smallest_x_pixels_kept(
             metadata={},  # type:ignore
         ),
         MurkoResult(
-            centre_px=(50, 200),
+            chosen_point_px=(50, 200),
             x_dist_mm=6,
             y_dist_mm=63,
             omega=20,
@@ -580,7 +580,7 @@ def test_when_results_filtered_then_smallest_x_pixels_kept(
             metadata={},  # type:ignore
         ),
         MurkoResult(
-            centre_px=(300, 300),
+            chosen_point_px=(300, 300),
             x_dist_mm=7,
             y_dist_mm=8,
             omega=30,
@@ -592,7 +592,7 @@ def test_when_results_filtered_then_smallest_x_pixels_kept(
     filtered_results = murko_results.filter_outliers()
     assert len(filtered_results) == 1
     results = filtered_results[0]
-    assert results.centre_px == (50, 200)
+    assert results.chosen_point_px == (50, 200)
     assert results.x_dist_mm == 6
     assert results.y_dist_mm == 63
     assert results.omega == 20
@@ -613,7 +613,7 @@ async def test_when_results_device_unstaged_then_results_cleared_and_last_omega_
 ):
     murko_results._results = [
         MurkoResult(
-            centre_px=(100, 100),
+            chosen_point_px=(100, 100),
             x_dist_mm=4,
             y_dist_mm=8,
             omega=0,
@@ -680,7 +680,7 @@ def test_when_results_filtered_then_used_for_centring_field_is_correct(
     )
     murko_results._results = [
         MurkoResult(
-            centre_px=(100, 0),
+            chosen_point_px=(100, 0),
             x_dist_mm=4,
             y_dist_mm=8,
             omega=0,
@@ -688,7 +688,7 @@ def test_when_results_filtered_then_used_for_centring_field_is_correct(
             metadata=metadata.copy(),
         ),
         MurkoResult(
-            centre_px=(300, 100),
+            chosen_point_px=(300, 100),
             x_dist_mm=0,
             y_dist_mm=90,
             omega=10,
@@ -696,7 +696,7 @@ def test_when_results_filtered_then_used_for_centring_field_is_correct(
             metadata=metadata.copy(),
         ),
         MurkoResult(
-            centre_px=(50, 200),
+            chosen_point_px=(50, 200),
             x_dist_mm=6,
             y_dist_mm=63,
             omega=20,
@@ -704,7 +704,7 @@ def test_when_results_filtered_then_used_for_centring_field_is_correct(
             metadata=metadata.copy(),
         ),
         MurkoResult(
-            centre_px=(300, 300),
+            chosen_point_px=(300, 300),
             x_dist_mm=7,
             y_dist_mm=8,
             omega=30,
@@ -715,7 +715,7 @@ def test_when_results_filtered_then_used_for_centring_field_is_correct(
     filtered_results = murko_results.filter_outliers()
     assert len(filtered_results) == 1
     used_result = filtered_results[0]
-    assert used_result.centre_px == (50, 200)
+    assert used_result.chosen_point_px == (50, 200)
     assert used_result.x_dist_mm == 6
     assert used_result.y_dist_mm == 63
     assert used_result.omega == 20
@@ -761,3 +761,65 @@ async def test_correct_hset_calls_are_made_for_used_and_unused_results(
 
     assert mock_hset.call_count == 24
     mock_hset.assert_has_calls(expected_calls, any_order=True)
+
+
+def test_results_with_tiny_x_pixel_value_are_filtered_out(
+    murko_results: MurkoResultsDevice,
+):
+    metadata = MurkoMetadata(  # fields dont matter
+        zoom_percentage=1,
+        microns_per_x_pixel=1,
+        microns_per_y_pixel=1,
+        beam_centre_i=1,
+        beam_centre_j=1,
+        sample_id="1",
+        omega_angle=0,
+        uuid="any",
+        used_for_centring=None,
+    )
+    murko_results.PERCENTAGE_TO_USE = 100  # type: ignore
+    murko_results._results = [
+        MurkoResult(
+            chosen_point_px=(500, 0),
+            x_dist_mm=4,
+            y_dist_mm=8,
+            omega=0,
+            uuid="a",
+            metadata=metadata.copy(),
+        ),
+        MurkoResult(
+            chosen_point_px=(0, 100),
+            x_dist_mm=0,
+            y_dist_mm=90,
+            omega=10,
+            uuid="b",
+            metadata=metadata.copy(),
+        ),
+        MurkoResult(
+            chosen_point_px=(5, 200),
+            x_dist_mm=6,
+            y_dist_mm=63,
+            omega=20,
+            uuid="c",
+            metadata=metadata.copy(),
+        ),
+        MurkoResult(
+            chosen_point_px=(9, 300),
+            x_dist_mm=7,
+            y_dist_mm=8,
+            omega=30,
+            uuid="d",
+            metadata=metadata.copy(),
+        ),
+    ]
+    filtered_results = murko_results.filter_outliers()
+    assert len(filtered_results) == 1
+    used_result = filtered_results[0]
+    assert used_result.chosen_point_px == (500, 0)
+    assert used_result == murko_results._results[0]
+    assert len(murko_results._results) == 4
+    for result in murko_results._results:
+        if result == used_result:
+            assert result.metadata["used_for_centring"] is True
+        else:
+            assert result.metadata["used_for_centring"] is False
