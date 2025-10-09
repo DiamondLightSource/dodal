@@ -11,7 +11,7 @@ from ophyd_async.epics.core import epics_signal_rw
 StrictEnumT = TypeVar("StrictEnumT", bound=EnumTypes)
 
 
-class GenericShutter(StandardReadable, Movable[StrictEnumT]):
+class GenericFastShutter(StandardReadable, Movable[StrictEnumT]):
     """
     Basic enum device specialised for a fast shutter with configured open_state and
     close_state so it is generic enough to be used with any device or plan without
