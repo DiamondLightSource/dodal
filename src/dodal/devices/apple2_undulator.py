@@ -609,8 +609,8 @@ class BeamEnergy(StandardReadable, Movable[float]):
 
         id_energy: IdEnergy
             An IdEnergy device.
-        pgm: PGM
-            A PGM device.
+        pgm: MonoEnergyBase
+            A energy device.
         name:
             New device name.
         """
