@@ -72,7 +72,9 @@ def calculate_gap_hu(
         - 2
     )
     if undulator_parameter_sqr < 0:
-        raise ValueError(f"Diffraction parameter squared must be positive! Calculated value {undulator_parameter_sqr}.")
+        raise ValueError(
+            f"Diffraction parameter squared must be positive! Calculated value {undulator_parameter_sqr}."
+        )
     undulator_parameter = np.sqrt(undulator_parameter_sqr)
 
     # Undulator_parameter K is also defined as K = 0.934*B0[T]*lambda_u[cm],
@@ -95,7 +97,7 @@ def calculate_gap_hu(
     )
 
     # Finnaly, rearranging the equation:
-    # undulator_parameter = undulator_parameter_max*exp(-pi*gap/lambda_u) for gap gives:
+    # undulator_parameter = undulator_parameter_max*exp(-pi*gap/lambda_u) for gap gives
     gap = (
         (undulator_period_mm / np.pi)
         * np.log(undulator_parameter_max / undulator_parameter)

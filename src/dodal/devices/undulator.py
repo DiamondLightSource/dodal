@@ -135,7 +135,7 @@ class BaseUndulator(StandardReadable, Movable[float]):
     @AsyncStatus.wrap
     async def set(self, value: float) -> None:
         """
-        Set the undulator gap to a given value in mm
+        Set the undulator gap to a given value in mm.
 
         Args:
             value: gap in mm
@@ -163,7 +163,7 @@ class BaseUndulator(StandardReadable, Movable[float]):
 
     async def _check_gap_within_threshold(self, target_gap: float) -> bool:
         """
-        Check if the undulator gap is within the acceptable threshold of the target gap
+        Check if the undulator gap is within the acceptable threshold of the target gap.
 
         Args:
             target_gap: target gap in mm
