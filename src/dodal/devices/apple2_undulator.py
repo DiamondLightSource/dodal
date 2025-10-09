@@ -426,7 +426,9 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
         self.apple2 = Reference(apple2)
 
         # Store the set energy for readback.
-        self._energy = soft_signal_rw(float, initial_value=None)
+        self._energy, self._energy_set = soft_signal_r_and_setter(
+            float, initial_value=None
+        )
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             self.energy = derived_signal_rw(
                 raw_to_derived=self._read_energy,
@@ -463,7 +465,7 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
 
     async def _set_energy(self, energy: float) -> None:
         await self._set_motors_from_energy(energy)
-        await self._energy.set(energy)
+        self._energy_set(energy)
 
     def _read_energy(self, energy: float) -> float:
         """Readback for energy is just the set value."""
