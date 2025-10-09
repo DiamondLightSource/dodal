@@ -311,7 +311,7 @@ async def test_beam_energy_re_scan_with_offset(
 
     mock_id_controller._polarisation_setpoint_set(Pol("lh3"))
     # with energy offset
-    await beam_energy.energy_offset.set(20)
+    await beam_energy.id_energy_offset.set(20)
     rbv_mocks = Mock()
     rbv_mocks.get.side_effect = range(1700, 1810, 10)
     callback_on_mock_put(

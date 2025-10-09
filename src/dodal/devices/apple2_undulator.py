@@ -627,13 +627,15 @@ class BeamEnergy(StandardReadable, Movable[float]):
         )
 
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
-            self.energy_offset = soft_signal_rw(float, initial_value=0)
+            self.id_energy_offset = soft_signal_rw(float, initial_value=0)
 
     @AsyncStatus.wrap
     async def set(self, energy: float) -> None:
         LOGGER.info(f"Moving f{self.name} energy to {energy}.")
         await asyncio.gather(
-            self._Id_energy().set(energy=energy + await self.energy_offset.get_value()),
+            self._Id_energy().set(
+                energy=energy + await self.id_energy_offset.get_value()
+            ),
             self._mono_energy().set(energy),
         )
 
