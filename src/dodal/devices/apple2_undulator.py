@@ -5,7 +5,7 @@ from math import isclose
 from typing import Generic, Protocol, TypeVar
 
 import numpy as np
-from bluesky.protocols import Movable
+from bluesky.protocols import Locatable, Location, Movable
 from ophyd_async.core import (
     AsyncStatus,
     Reference,
@@ -661,11 +661,12 @@ class IdEnergy(IdEnergyBase):
         await self.energy().set(energy)
 
 
-class IdPolarisation(StandardReadable, Movable):
+class IdPolarisation(StandardReadable, Locatable[Pol]):
     """Apple2 ID polarisation movable device."""
 
     def __init__(self, id_controller: Apple2Controller, name: str = "") -> None:
         self.polarisation = Reference(id_controller.polarisation)
+        self.polarisation_setpoint = Reference(id_controller.polarisation_setpoint)
         super().__init__(name=name)
 
         self.add_readables(
@@ -678,3 +679,10 @@ class IdPolarisation(StandardReadable, Movable):
     @AsyncStatus.wrap
     async def set(self, pol: Pol) -> None:
         await self.polarisation().set(pol)
+
+    async def locate(self) -> Location[Pol]:
+        """Return the current polarisation"""
+        setpoint, readback = await asyncio.gather(
+            self.polarisation_setpoint().get_value(), self.polarisation().get_value()
+        )
+        return Location(setpoint=setpoint, readback=readback)

@@ -412,6 +412,38 @@ async def test_id_polarisation_set(
 @pytest.mark.parametrize(
     "pol,energy, top_outer, top_inner, btm_inner,btm_outer",
     [
+        (Pol.LH, 550, 0.0, 0.0, 0.0, 0.0),
+        (Pol.LV, 600, 24.0, 0.0, 24.0, 0.0),
+        (Pol.PC, 550, 15.5, 0.0, 15.5, 0.0),
+        (Pol.NC, 550, -15.5, 0.0, -15.5, 0.0),
+        (Pol.LA, 1300, -16.4, 0.0, 16.4, 0.0),
+    ],
+)
+async def test_id_polarisation_locate(
+    mock_id_pol: IdPolarisation,
+    mock_id_controller: I10Apple2Controller,
+    pol: Pol,
+    energy: float,
+    top_inner: float,
+    top_outer: float,
+    btm_inner: float,
+    btm_outer: float,
+):
+    await mock_id_controller.energy.set(energy)
+
+    await mock_id_pol.set(pol=pol)
+    assert await mock_id_pol.locate() == {"setpoint": pol, "readback": Pol.LH}
+    # move the motor
+    set_mock_value(mock_id_controller.apple2().phase.top_inner.user_readback, top_inner)
+    set_mock_value(mock_id_controller.apple2().phase.top_outer.user_readback, top_outer)
+    set_mock_value(mock_id_controller.apple2().phase.btm_inner.user_readback, btm_inner)
+    set_mock_value(mock_id_controller.apple2().phase.btm_outer.user_readback, btm_outer)
+    assert await mock_id_pol.locate() == {"setpoint": pol, "readback": pol}
+
+
+@pytest.mark.parametrize(
+    "pol,energy, top_outer, top_inner, btm_inner,btm_outer",
+    [
         (Pol.LH, 500, 0.0, 0.0, 0.0, 0.0),
         (Pol.LV, 600, 24.0, 0.0, 24.0, 0.0),
         (Pol.PC, 500, 15.5, 0.0, 15.5, 0.0),
