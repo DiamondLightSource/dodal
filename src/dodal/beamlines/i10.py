@@ -11,8 +11,8 @@ from daq_config_server.client import ConfigServer
 from dodal.common.beamlines.beamline_utils import device_factory
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.devices.apple2_undulator import (
-    IdEnergy,
     IdPolarisation,
+    InsertionDeviceEnergy,
     UndulatorGap,
     UndulatorJawPhase,
     UndulatorPhaseAxes,
@@ -94,8 +94,8 @@ def idd_controller() -> I10Apple2Controller:
 
 
 @device_factory()
-def idd_energy() -> IdEnergy:
-    return IdEnergy(id_controller=idd_controller())
+def idd_energy() -> InsertionDeviceEnergy:
+    return InsertionDeviceEnergy(id_controller=idd_controller())
 
 
 @device_factory()
@@ -139,8 +139,8 @@ def idu_controller() -> I10Apple2Controller:
 
 
 @device_factory()
-def idu_energy() -> IdEnergy:
-    return IdEnergy(id_controller=idu_controller())
+def idu_energy() -> InsertionDeviceEnergy:
+    return InsertionDeviceEnergy(id_controller=idu_controller())
 
 
 @device_factory()

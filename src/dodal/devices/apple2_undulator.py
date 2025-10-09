@@ -584,7 +584,7 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
         return Pol.NONE, 0.0
 
 
-class IdEnergyBase(abc.ABC, StandardReadable, Movable):
+class InsertionDeviceEnergyBase(abc.ABC, StandardReadable, Movable):
     """Base class for ID energy movable device."""
 
     def __init__(self, name: str = "") -> None:
@@ -603,14 +603,14 @@ class BeamEnergy(StandardReadable, Movable[float]):
     """
 
     def __init__(
-        self, id_energy: IdEnergyBase, mono: MonoEnergyBase, name: str = ""
+        self, id_energy: InsertionDeviceEnergyBase, mono: MonoEnergyBase, name: str = ""
     ) -> None:
         """
         Parameters
         ----------
 
-        id_energy: IdEnergy
-            An IdEnergy device.
+        id_energy: InsertionDeviceEnergy
+            An InsertionDeviceEnergy device.
         pgm: MonoEnergyBase
             A energy device.
         name:
@@ -642,7 +642,7 @@ class BeamEnergy(StandardReadable, Movable[float]):
         )
 
 
-class IdEnergy(IdEnergyBase):
+class InsertionDeviceEnergy(InsertionDeviceEnergyBase):
     """Apple2 ID energy movable device."""
 
     def __init__(self, id_controller: Apple2Controller, name: str = "") -> None:

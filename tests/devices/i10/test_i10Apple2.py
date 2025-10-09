@@ -19,8 +19,8 @@ from ophyd_async.testing import (
 
 from dodal.devices.apple2_undulator import (
     BeamEnergy,
-    IdEnergy,
     IdPolarisation,
+    InsertionDeviceEnergy,
     Pol,
     UndulatorGap,
     UndulatorGateStatus,
@@ -172,16 +172,18 @@ async def mock_id_controller(
 @pytest.fixture
 async def mock_id_energy(
     mock_id_controller: I10Apple2Controller,
-) -> IdEnergy:
+) -> InsertionDeviceEnergy:
     async with init_devices(mock=True):
-        mock_id_energy = IdEnergy(
+        mock_id_energy = InsertionDeviceEnergy(
             id_controller=mock_id_controller,
         )
     return mock_id_energy
 
 
 @pytest.fixture
-async def beam_energy(mock_id_energy: IdEnergy, mock_pgm: PGM) -> BeamEnergy:
+async def beam_energy(
+    mock_id_energy: InsertionDeviceEnergy, mock_pgm: PGM
+) -> BeamEnergy:
     async with init_devices(mock=True):
         beam_energy = BeamEnergy(id_energy=mock_id_energy, mono=mock_pgm)
     return beam_energy
