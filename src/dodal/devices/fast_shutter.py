@@ -27,21 +27,21 @@ class GenericFastShutter(StandardReadable, Movable[StrictEnumT]):
 
     def __init__(
         self,
-        prefix: str,
+        pv: str,
         open_state: StrictEnumT,
         close_state: StrictEnumT,
         name: str = "",
     ):
         """
         Arguments:
-            prefix: The prefix for the shutter device.
+            pv: The pv to connect to the shutter device.
             open_state: The enum value that corresponds with opening the shutter.
             close_state: The enum value that corresponds with closing the shutter.
         """
         self.open_state = open_state
         self.close_state = close_state
         with self.add_children_as_readables():
-            self.state = epics_signal_rw(type(self.open_state), prefix)
+            self.state = epics_signal_rw(type(self.open_state), pv)
         super().__init__(name)
 
     @AsyncStatus.wrap
