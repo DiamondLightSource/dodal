@@ -4,6 +4,7 @@ from unittest.mock import MagicMock
 
 import pytest
 from ophyd_async.core import init_devices
+from ophyd_async.testing import get_mock_put
 
 from dodal.common.beamlines.beamline_parameters import GDABeamlineParameters
 from dodal.devices.aperturescatterguard import ApertureScatterguard, ApertureValue
@@ -95,3 +96,14 @@ async def test_given_aperture_scatterguard_not_parked_when_set_to_out_position_t
 
             with pytest.raises(ValueError):
                 await scintillator.selected_pos.set(InOut.OUT)
+
+
+async def test_given_scintillator_already_out_when_moved_out_then_does_nothing(
+    scintillator_and_ap_sg: tuple[Scintillator, ApertureScatterguard],
+):
+    scintillator, ap_sg = scintillator_and_ap_sg
+    ap_sg.return_value.selected_aperture.get_value.return_value = ApertureValue.LARGE  # type: ignore
+    await scintillator.selected_pos.set(InOut.OUT)
+
+    get_mock_put(scintillator.y_mm.user_setpoint).assert_not_called()
+    get_mock_put(scintillator.z_mm.user_setpoint).assert_not_called()
