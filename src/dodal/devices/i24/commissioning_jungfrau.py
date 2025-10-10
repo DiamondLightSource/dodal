@@ -68,6 +68,7 @@ class JunfrauCommissioningWriter(DetectorWriter, StandardReadable):
             f"Jungfrau writing to folder {_path_info.directory_path} with filename {_path_info.filename}"
         )
         await wait_for_value(self.writer_ready, 1, timeout=10)
+        self.final_path = requested_filepath
         return await self._describe()
 
     async def _describe(self) -> dict[str, DataKey]:
