@@ -463,4 +463,13 @@ class PandAFastGridScan(FastGridScanThreeD[PandAGridScanParams]):
 
 
 def set_fast_grid_scan_params(scan: FastGridScanCommon[ParamType], params: ParamType):
+    """
+    Apply the fast grid scan parameters to the grid scan device and validate them
+    Args:
+        scan: The fast grid scan device
+        params: The parameters to set
+
+    Raises:
+        GridScanInvalidException: if the grid scan parameters are not valid
+    """
     yield from prepare(scan, params, wait=True)
