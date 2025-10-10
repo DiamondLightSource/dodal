@@ -1,5 +1,3 @@
-from abc import abstractmethod
-
 from ophyd_async.core import (
     Reference,
     SignalR,
@@ -11,26 +9,10 @@ from ophyd_async.core import (
 )
 
 from dodal.devices.electron_analyser.enums import SelectedSource
+from dodal.protocols import EnergyWrapper
 
 
-class AbstractEnergySource(StandardReadable):
-    """
-    Abstract device that wraps an energy source signal and provides common interface via
-    a energy signal.
-    """
-
-    def __init__(self, name: str = "") -> None:
-        super().__init__(name)
-
-    @property
-    @abstractmethod
-    def energy(self) -> SignalR[float]:
-        """
-        Signal to provide the excitation energy value in eV.
-        """
-
-
-class EnergySource(AbstractEnergySource):
+class EnergySource(StandardReadable, EnergyWrapper[SignalR[float]]):
     """
     Wraps a signal that relates to energy and provides common interface via energy
     signal. It provides the name of the wrapped signal as a child signal in the
@@ -51,7 +33,7 @@ class EnergySource(AbstractEnergySource):
         return self._source_ref()
 
 
-class DualEnergySource(AbstractEnergySource):
+class DualEnergySource(StandardReadable, EnergyWrapper[SignalR[float]]):
     """
     Holds two EnergySource devices and provides a signal to read energy depending on
     which source is selected. This is controlled by a selected_source signal which can
