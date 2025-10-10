@@ -5,11 +5,7 @@ from ophyd_async.epics.motor import Motor
 class FocusingMirrorBase(StandardReadable):
     """Focusing Mirror with curve, ellip & pitch"""
 
-    def __init__(
-        self,
-        prefix: str,
-        name: str = "",
-    ):
+    def __init__(self, prefix: str, name: str = ""):
         with self.add_children_as_readables():
             self.curve = Motor(prefix + "CURVE")
             self.ellipticity = Motor(prefix + "ELLIP")
@@ -21,11 +17,7 @@ class FocusingMirrorBase(StandardReadable):
 class FocusingMirrorHorizontal(FocusingMirrorBase):
     """Focusing Mirror with curve, ellip, pitch & X"""
 
-    def __init__(
-        self,
-        prefix: str,
-        name: str = "",
-    ):
+    def __init__(self, prefix: str, name: str = ""):
         with self.add_children_as_readables():
             self.x = Motor(prefix + "X")
 
@@ -35,11 +27,7 @@ class FocusingMirrorHorizontal(FocusingMirrorBase):
 class FocusingMirrorVertical(FocusingMirrorBase):
     """Focusing Mirror with curve, ellip, pitch & Y"""
 
-    def __init__(
-        self,
-        prefix: str,
-        name: str = "",
-    ):
+    def __init__(self, prefix: str, name: str = ""):
         with self.add_children_as_readables():
             self.y = Motor(prefix + "Y")
 
@@ -49,11 +37,7 @@ class FocusingMirrorVertical(FocusingMirrorBase):
 class FocusingMirror(FocusingMirrorBase):
     """Focusing Mirror with curve, ellip, pitch, yaw, X & Y"""
 
-    def __init__(
-        self,
-        prefix: str,
-        name: str = "",
-    ):
+    def __init__(self, prefix: str, name: str = ""):
         with self.add_children_as_readables():
             self.yaw = Motor(prefix + "YAW")
             self.x = Motor(prefix + "X")
