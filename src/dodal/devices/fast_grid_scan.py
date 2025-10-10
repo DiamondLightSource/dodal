@@ -321,8 +321,6 @@ class FastGridScanCommon(
         await asyncio.gather(*set_statuses)
 
         LOGGER.info("Sets confirmed, waiting for validity checks to pass...")
-        # XXX Can we use x/y/z scan valid to distinguish between SampleException/pin invalid
-        # and other non-sample-related errors?
         try:
             await wait_for_value(
                 self.scan_invalid, 0.0, timeout=self.VALIDITY_CHECK_TIMEOUT
