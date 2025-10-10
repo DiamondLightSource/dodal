@@ -14,8 +14,8 @@ dodal.devices.i15.dcm
    :toctree:
    :recursive:
 
+   ~dcm.BaseDCMforI15
    ~dcm.DCM
-   ~dcm.DualCrystalMonoSimple
    ~dcm.ThetaRollYZCrystal
    ~dcm.ThetaYCrystal
 
