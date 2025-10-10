@@ -28,19 +28,17 @@ Xtal_1 = TypeVar("Xtal_1", bound=StationaryCrystal)
 Xtal_2 = TypeVar("Xtal_2", bound=StationaryCrystal)
 
 
-class DualCrystalMonoSimple(StandardReadable, Generic[Xtal_1, Xtal_2]):
+class BaseDCMforI15(StandardReadable, Generic[Xtal_1, Xtal_2]):
     """
-    Device for simple double crystal monochromators (DCM), which only allow energy of the beam to be selected.
+    Device for double crystal monochromators (DCM), which only allow energy of the beam to be selected.
 
     Features common across all DCM's should include virtual motors to set energy/wavelength and contain two crystals,
     each of which can be movable. Some DCM's contain crystals with roll motors, and some contain crystals with roll and pitch motors.
-    This base device accounts for all combinations of this.
+    This device only accounts for combinations of energy plus two crystals.
 
-    This device is more able to act as a parent for beamline-specific DCM's, in which any other missing signals can be added,
-    as it doesn't assume WAVELENGTH, BRAGG and OFFSET are available for all DCM deivces, as BaseDCM does.
-
-    Bluesky plans using DCM's should be typed to specify which types of crystals are required. For example, a plan
-    which only requires one crystal which can roll should be typed 'def my_plan(dcm: BaseDCM[RollCrystal, StationaryCrystal])`
+    This device is designed to be a drop in replacement for BaseDCM for i15, which doesn't require WAVELENGTH, BRAGG and OFFSET to
+    be available. Once the i15 DCM supports all of the PVs required by BaseDCM, the i15 DCM device can switch to inheriting from
+    BaseDCM and this class can be removed.
     """
 
     def __init__(
@@ -64,9 +62,12 @@ class DualCrystalMonoSimple(StandardReadable, Generic[Xtal_1, Xtal_2]):
             self.xtal_2 = xtal_2(prefix)
 
 
-class DCM(DualCrystalMonoSimple[ThetaRollYZCrystal, ThetaYCrystal]):
+class DCM(BaseDCMforI15[ThetaRollYZCrystal, ThetaYCrystal]):
     """
     A double crystal monocromator device, used to select the beam energy.
+
+    Once the i15 DCM supports all of the PVs required by BaseDCM, this class can be
+    changed to inherit from BaseDCM and BaseDCMforI15 can be removed.
     """
 
     def __init__(self, prefix: str, name: str = "") -> None:
