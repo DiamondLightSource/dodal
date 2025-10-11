@@ -69,6 +69,10 @@ class Scintillator(StandardReadable):
     async def _set_selected_position(self, position: InOut) -> None:
         match position:
             case InOut.OUT:
+                current_y = await self.y_mm.user_readback.get_value()
+                current_z = await self.z_mm.user_readback.get_value()
+                if self._get_selected_position(current_y, current_z) == InOut.OUT:
+                    return
                 if (
                     self._aperture_scatterguard().selected_aperture.get_value()
                     != ApertureValue.PARKED
