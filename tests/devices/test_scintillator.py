@@ -41,6 +41,8 @@ async def scintillator_and_ap_sg(
     with ExitStack() as motor_patch_stack:
         for motor in [scintillator.y_mm, scintillator.z_mm]:
             motor_patch_stack.enter_context(patch_motor(motor))
+        await scintillator.y_mm.set(5)
+        await scintillator.z_mm.set(5)
         yield scintillator, mock_ap_sg
 
 
@@ -80,7 +82,7 @@ async def test_given_aperture_scatterguard_parked_when_set_to_out_position_then_
     scintillator, ap_sg = scintillator_and_ap_sg
     ap_sg.return_value.selected_aperture.get_value.return_value = ApertureValue.PARKED  # type: ignore
 
-    await scintillator.selected_pos.set(InOut.OUT)
+    await scintillator.selected_pos.set(InOut.OUT, wait=True)
 
     assert await scintillator.y_mm.user_setpoint.get_value() == -0.02
     assert await scintillator.z_mm.user_setpoint.get_value() == 0.1
@@ -102,6 +104,12 @@ async def test_given_scintillator_already_out_when_moved_out_then_does_nothing(
     scintillator_and_ap_sg: tuple[Scintillator, ApertureScatterguard],
 ):
     scintillator, ap_sg = scintillator_and_ap_sg
+    await scintillator.y_mm.set(0)
+    await scintillator.z_mm.set(0)
+
+    get_mock_put(scintillator.y_mm.user_setpoint).reset_mock()
+    get_mock_put(scintillator.z_mm.user_setpoint).reset_mock()
+
     ap_sg.return_value.selected_aperture.get_value.return_value = ApertureValue.LARGE  # type: ignore
     await scintillator.selected_pos.set(InOut.OUT)
 
