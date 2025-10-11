@@ -2,7 +2,7 @@ import abc
 import asyncio
 from dataclasses import dataclass
 from math import isclose
-from typing import Any, Generic, TypeVar
+from typing import Generic, Protocol, TypeVar
 
 import numpy as np
 from bluesky.protocols import Movable
@@ -18,7 +18,6 @@ from ophyd_async.core import (
     wait_for_value,
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw, epics_signal_w
-from pydantic import BaseModel, ConfigDict, RootModel
 
 from dodal.log import LOGGER
 
@@ -47,46 +46,6 @@ class Apple2Val:
     top_inner: str
     btm_inner: str
     btm_outer: str
-
-
-class EnergyMinMax(BaseModel):
-    Minimum: float
-    Maximum: float
-
-
-class EnergyCoverageEntry(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True)
-    Low: float
-    High: float
-    Poly: np.poly1d
-
-
-class EnergyCoverage(RootModel):
-    root: dict[str, EnergyCoverageEntry]
-
-
-class LookupTableEntries(BaseModel):
-    Energies: EnergyCoverage
-    Limit: EnergyMinMax
-
-
-class Lookuptable(RootModel):
-    """BaseModel class for the lookup table.
-    Apple2 lookup table should be in this format.
-
-    {mode: {'Energies': {Any: {'Low': float,
-                            'High': float,
-                            'Poly':np.poly1d
-                            }
-                        }
-            'Limit': {'Minimum': float,
-                    'Maximum': float
-                    }
-        }
-    }
-    """
-
-    root: dict[str, LookupTableEntries]
 
 
 class Pol(StrictEnum):
@@ -342,6 +301,71 @@ class UndulatorJawPhase(SafeUndulatorMover[float]):
         )
 
 
+class Apple2Motors(StandardReadable, Movable):
+    """
+    Device representing the combined motor controls for an Apple2 undulator.
+
+    Attributes
+    ----------
+    gap : UndulatorGap
+        The undulator gap motor device.
+    phase : UndulatorPhaseAxes
+        The undulator phase axes device, consisting of four phase motors.
+    """
+
+    def __init__(self, id_gap: UndulatorGap, id_phase: UndulatorPhaseAxes, name=""):
+        """
+        Parameters
+        ----------
+
+        id_gap: UndulatorGap
+            An UndulatorGap device.
+        id_phase: UndulatorPhaseAxes
+            An UndulatorPhaseAxes device.
+        name: str
+            Name of the device.
+        """
+        with self.add_children_as_readables():
+            self.gap = id_gap
+            self.phase = id_phase
+        super().__init__(name=name)
+
+    @AsyncStatus.wrap
+    async def set(self, id_motor_values: Apple2Val) -> None:
+        """
+        Check ID is in a movable state and set all the demand value before moving them
+        all at the same time. This should be modified by the beamline specific ID
+        class, if the ID motors has to move in a specific order.
+        """
+
+        # Only need to check gap as the phase motors share both fault and gate with gap.
+        await self.gap.raise_if_cannot_move()
+        await asyncio.gather(
+            self.phase.top_outer.user_setpoint.set(value=id_motor_values.top_outer),
+            self.phase.top_inner.user_setpoint.set(value=id_motor_values.top_inner),
+            self.phase.btm_inner.user_setpoint.set(value=id_motor_values.btm_inner),
+            self.phase.btm_outer.user_setpoint.set(value=id_motor_values.btm_outer),
+            self.gap.user_setpoint.set(value=id_motor_values.gap),
+        )
+        timeout = np.max(
+            await asyncio.gather(self.gap.get_timeout(), self.phase.get_timeout())
+        )
+        LOGGER.info(
+            f"Moving f{self.name} apple2 motors to {id_motor_values}, timeout = {timeout}"
+        )
+        await asyncio.gather(
+            self.gap.set_move.set(value=1, wait=False, timeout=timeout),
+            self.phase.set_move.set(value=1, wait=False, timeout=timeout),
+        )
+        await wait_for_value(self.gap.gate, UndulatorGateStatus.CLOSE, timeout=timeout)
+
+
+class EnergyMotorConvertor(Protocol):
+    def __call__(self, energy: float, pol: Pol) -> tuple[float, float]:
+        """Protocol to provide energy to motor position conversion"""
+        ...
+
+
 class Apple2(abc.ABC, StandardReadable, Movable):
     """
     Apple2 Undulator Device
@@ -353,16 +377,13 @@ class Apple2(abc.ABC, StandardReadable, Movable):
     The class is designed to manage the undulator's gap, phase motors, and polarisation settings, while
     abstracting hardware interactions and providing a high-level interface for beamline operations.
 
-
-    A pair of look up tables are needed to provide the conversion between motor position
-    and energy.
+    The class is abstract and requires beamline-specific implementations for _set motor
+     positions based on energy and polarisation.
 
     Attributes
     ----------
-    gap : UndulatorGap
-        The gap control device for the undulator.
-    phase : UndulatorPhaseAxes
-        The phase control device, consisting of four phase motors.
+    apple2_motors : Apple2Motors
+        A collection of gap and phase motor devices.
     energy : SignalR
         A soft signal for the current energy readback.
     polarisation_setpoint : SignalR
@@ -371,27 +392,22 @@ class Apple2(abc.ABC, StandardReadable, Movable):
         A hardware-backed signal for polarisation readback and control.
     lookup_tables : dict
         A dictionary storing lookup tables for gap and phase motor positions, used for energy and polarisation conversion.
-    _available_pol : list
-        A list of available polarisations supported by the device.
+    energy_to_motor : EnergyMotorConvertor
+        A callable that converts energy and polarisation to motor positions.
 
     Abstract Methods
     ----------------
-    set(value: float) -> None
+    _set(value: float) -> None
         Abstract method to set motor positions for a given energy and polarisation.
-    update_lookuptable() -> None
-        Abstract method to load and validate lookup tables from external sources.
 
     Methods
     -------
-    _set_pol_setpoint(pol: Pol) -> None
-        Sets the polarisation setpoint without moving hardware.
     determine_phase_from_hardware(...) -> tuple[Pol, float]
         Determines the polarisation and phase value based on motor positions.
 
     Notes
     -----
     - This class requires beamline-specific implementations of the abstract methods.
-    - The lookup tables must follow the `Lookuptable` format and be validated before use.
     - The device supports multiple polarisation modes, including linear horizontal (LH), linear vertical (LV),
       positive circular (PC), negative circular (NC), and linear arbitrary (LA).
 
@@ -404,8 +420,8 @@ class Apple2(abc.ABC, StandardReadable, Movable):
 
     def __init__(
         self,
-        id_gap: UndulatorGap,
-        id_phase: UndulatorPhaseAxes,
+        apple2_motors: Apple2Motors,
+        energy_motor_convertor: EnergyMotorConvertor,
         name: str = "",
     ) -> None:
         """
@@ -414,16 +430,12 @@ class Apple2(abc.ABC, StandardReadable, Movable):
         ----------
         id_gap: An UndulatorGap device.
         id_phase: An UndulatorPhaseAxes device.
-        prefix: Not in use but needed for device_instantiation.
+        energy_motor_convertor: A callable that converts energy and polarisation to motor positions.
         name: Name of the device.
         """
-        super().__init__(name)
 
-        # Attributes are set after super call so they are not renamed to
-        # <name>-undulator, etc.
-        self.gap = id_gap
-        self.phase = id_phase
-
+        self.motors = apple2_motors
+        self.energy_to_motor = energy_motor_convertor
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             # Store the set energy for readback.
             self.energy, self._set_energy_rbv = soft_signal_r_and_setter(
@@ -435,29 +447,19 @@ class Apple2(abc.ABC, StandardReadable, Movable):
         self.polarisation_setpoint, self._polarisation_setpoint_set = (
             soft_signal_r_and_setter(Pol)
         )
-        # This store two lookup tables, Gap and Phase in the Lookuptable format
-        self.lookup_tables: dict[str, dict[str | None, dict[str, dict[str, Any]]]] = {
-            "Gap": {},
-            "Phase": {},
-        }
+
         # Hardware backed read/write for polarisation.
         self.polarisation = derived_signal_rw(
             raw_to_derived=self._read_pol,
             set_derived=self._set_pol,
             pol=self.polarisation_setpoint,
-            top_outer=self.phase.top_outer.user_readback,
-            top_inner=self.phase.top_inner.user_readback,
-            btm_inner=self.phase.btm_inner.user_readback,
-            btm_outer=self.phase.btm_outer.user_readback,
-            gap=id_gap.user_readback,
+            top_outer=self.motors.phase.top_outer.user_readback,
+            top_inner=self.motors.phase.top_inner.user_readback,
+            btm_inner=self.motors.phase.btm_inner.user_readback,
+            btm_outer=self.motors.phase.btm_outer.user_readback,
+            gap=self.motors.gap.user_readback,
         )
-
-        self._available_pol = []
-        """
-        Abstract method that run at start up to load lookup tables into  self.lookup_tables
-        and set available_pol.
-        """
-        self.update_lookuptable()
+        super().__init__(name)
 
     def _set_pol_setpoint(self, pol: Pol) -> None:
         """Set the polarisation setpoint without moving hardware. The polarisation
@@ -473,23 +475,31 @@ class Apple2(abc.ABC, StandardReadable, Movable):
         self._set_pol_setpoint(value)
         await self.set(await self.energy.get_value())
 
-    @abc.abstractmethod
     @AsyncStatus.wrap
     async def set(self, value: float) -> None:
         """
         Set should be in energy units, this will set the energy of the ID by setting the
         gap and phase motors to the correct position for the given energy
         and polarisation.
-        This method should be implemented by the beamline specific ID class as the
-        motor positions will be different for each beamline depending on the
-        undulator design and the lookup table used.
-        _set can be used to set the motor positions for the given energy and
-        polarisation provided that all motors can be moved at the same time.
+
 
         Examples
         --------
-        >>> RE( id.set(888.0)) # This will set the ID to 888 eV
-        >>> RE(scan([detector], id,600,700,100)) # This will scan the ID from 600 to 700 eV in 100 steps.
+        RE( id.set(888.0)) # This will set the ID to 888 eV
+        RE(scan([detector], id,600,700,100)) # This will scan the ID from 600 to 700 eV in 100 steps.
+        """
+        await self._set(value)
+        self._set_energy_rbv(value)  # Update energy after move for readback.
+        LOGGER.info(f"Energy set to {value} eV successfully.")
+
+    @abc.abstractmethod
+    async def _set(self, value: float) -> None:
+        """
+        This method should be implemented by the beamline specific ID class as the
+        motor positions will be different for each beamline depending on the
+        undulator design and the lookup table used. The set method can be
+        used to set the motor positions for the given energy and polarisation
+        provided that all motors can be moved at the same time.
         """
 
     def _read_pol(
@@ -520,107 +530,6 @@ class Apple2(abc.ABC, StandardReadable, Movable):
             return Pol.LH3
 
         return read_pol
-
-    async def _set(self, value: Apple2Val, energy: float) -> None:
-        """
-        Check ID is in a movable state and set all the demand value before moving them
-        all at the same time. This should be modified by the beamline specific ID class
-        , if the ID motors has to move in a specific order.
-        """
-
-        # Only need to check gap as the phase motors share both fault and gate with gap.
-        await self.gap.raise_if_cannot_move()
-        await asyncio.gather(
-            self.phase.top_outer.user_setpoint.set(value=value.top_outer),
-            self.phase.top_inner.user_setpoint.set(value=value.top_inner),
-            self.phase.btm_inner.user_setpoint.set(value=value.btm_inner),
-            self.phase.btm_outer.user_setpoint.set(value=value.btm_outer),
-            self.gap.user_setpoint.set(value=value.gap),
-        )
-        timeout = np.max(
-            await asyncio.gather(self.gap.get_timeout(), self.phase.get_timeout())
-        )
-        LOGGER.info(
-            f"Moving f{self.name} energy and polorisation to {energy}, {await self.polarisation.get_value()}"
-            + f"with motor position {value}, timeout = {timeout}"
-        )
-        await asyncio.gather(
-            self.gap.set_move.set(value=1, wait=False, timeout=timeout),
-            self.phase.set_move.set(value=1, wait=False, timeout=timeout),
-        )
-        await wait_for_value(self.gap.gate, UndulatorGateStatus.CLOSE, timeout=timeout)
-        self._set_energy_rbv(energy)  # Update energy after move for readback.
-
-    async def _get_id_gap_phase(self, energy: float) -> tuple[float, float]:
-        """
-        Converts energy and polarisation to gap and phase.
-        """
-        gap_poly = await self._get_poly(
-            lookup_table=self.lookup_tables["Gap"], new_energy=energy
-        )
-        phase_poly = await self._get_poly(
-            lookup_table=self.lookup_tables["Phase"], new_energy=energy
-        )
-        return gap_poly(energy), phase_poly(energy)
-
-    async def _get_poly(
-        self,
-        new_energy: float,
-        lookup_table: dict[str | None, dict[str, dict[str, Any]]],
-    ) -> np.poly1d:
-        """
-        Get the correct polynomial for a given energy form lookuptable
-        for the current polarisation setpoint.
-        Parameters
-        ----------
-        new_energy : float
-            The energy in eV for which the polynomial is requested.
-        lookup_table : dict[str | None, dict[str, dict[str, Any]]]
-            The lookup table containing polynomial coefficients for different energies
-            and polarisations.
-        Returns
-        -------
-        np.poly1d
-            The polynomial coefficients for the requested energy and polarisation.
-        Raises
-        ------
-        ValueError
-            If the requested energy is outside the limits defined in the lookup table
-            or if no polynomial coefficients are found for the requested energy.
-        """
-        pol = await self.polarisation_setpoint.get_value()
-        if (
-            new_energy < lookup_table[pol]["Limit"]["Minimum"]
-            or new_energy > lookup_table[pol]["Limit"]["Maximum"]
-        ):
-            raise ValueError(
-                "Demanding energy must lie between {} and {} eV!".format(
-                    lookup_table[pol]["Limit"]["Minimum"],
-                    lookup_table[pol]["Limit"]["Maximum"],
-                )
-            )
-        else:
-            for energy_range in lookup_table[pol]["Energies"].values():
-                if (
-                    new_energy >= energy_range["Low"]
-                    and new_energy < energy_range["High"]
-                ):
-                    return energy_range["Poly"]
-
-        raise ValueError(
-            """Cannot find polynomial coefficients for your requested energy.
-        There might be gap in the calibration lookup table."""
-        )
-
-    @abc.abstractmethod
-    def update_lookuptable(self) -> None:
-        """
-        Abstract method to update the stored lookup tabled from file.
-        This function should include check to ensure the lookuptable is in the correct format:
-            # ensure the importing lookup table is the correct format
-            Lookuptable.model_validate(<loockuptable>)
-
-        """
 
     def determine_phase_from_hardware(
         self,

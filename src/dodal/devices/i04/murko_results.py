@@ -32,6 +32,7 @@ class MurkoMetadata(TypedDict):
     sample_id: str
     omega_angle: float
     uuid: str
+    used_for_centring: bool | None
 
 
 class Coord(Enum):
@@ -42,10 +43,16 @@ class Coord(Enum):
 
 @dataclass
 class MurkoResult:
+    centre_px: tuple
     x_dist_mm: float
     y_dist_mm: float
     omega: float
     uuid: str
+    metadata: MurkoMetadata
+
+
+class NoResultsFound(ValueError):
+    pass
 
 
 class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
@@ -82,10 +89,10 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
             db=redis_db,
         )
         self.pubsub = self.redis_client.pubsub()
-        self._last_omega = 0
         self.sample_id = soft_signal_rw(str)  # Should get from redis
         self.stop_angle = stop_angle
-        self.results: list[MurkoResult] = []
+
+        self._reset()
 
         with self.add_children_as_readables():
             # Diffs from current x/y/z
@@ -93,6 +100,10 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
             self.y_mm, self._y_mm_setter = soft_signal_r_and_setter(float)
             self.z_mm, self._z_mm_setter = soft_signal_r_and_setter(float)
         super().__init__(name=name)
+
+    def _reset(self):
+        self._last_omega = 0
+        self._results: list[MurkoResult] = []
 
     @AsyncStatus.wrap
     async def stage(self):
@@ -103,6 +114,7 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
 
     @AsyncStatus.wrap
     async def unstage(self):
+        self._reset()
         await self.pubsub.unsubscribe()
 
     @AsyncStatus.wrap
@@ -112,18 +124,21 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
         while self._last_omega < self.stop_angle:
             # waits here for next batch to be received
             message = await self.pubsub.get_message(timeout=self.TIMEOUT_S)
-            if message is None:  # No more messages to process
-                break
+            if message is None:
+                continue
             await self.process_batch(message, sample_id)
 
-        for result in self.results:
+        if not self._results:
+            raise NoResultsFound("No results retrieved from Murko")
+
+        for result in self._results:
             LOGGER.debug(result)
 
-        self.filter_outliers()
+        filtered_results = self.filter_outliers()
 
-        x_dists_mm = [result.x_dist_mm for result in self.results]
-        y_dists_mm = [result.y_dist_mm for result in self.results]
-        omegas = [result.omega for result in self.results]
+        x_dists_mm = [result.x_dist_mm for result in filtered_results]
+        y_dists_mm = [result.y_dist_mm for result in filtered_results]
+        omegas = [result.omega for result in filtered_results]
 
         LOGGER.info(f"Using average of x beam distances: {x_dists_mm}")
         avg_x = float(np.mean(x_dists_mm))
@@ -133,6 +148,11 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
         self._x_mm_setter(-avg_x)
         self._y_mm_setter(-best_y)
         self._z_mm_setter(-best_z)
+
+        for result in self._results:
+            await self.redis_client.hset(  # type: ignore
+                f"murko:{sample_id}:metadata", result.uuid, json.dumps(result.metadata)
+            )
 
     async def process_batch(self, message: dict | None, sample_id: str):
         if message and message["type"] == "message":
@@ -173,12 +193,14 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
                 centre_px[0],
                 centre_px[1],
             )
-            self.results.append(
+            self._results.append(
                 MurkoResult(
+                    centre_px=centre_px,
                     x_dist_mm=beam_dist_px[0] * metadata["microns_per_x_pixel"] / 1000,
                     y_dist_mm=beam_dist_px[1] * metadata["microns_per_y_pixel"] / 1000,
                     omega=omega,
                     uuid=metadata["uuid"],
+                    metadata=metadata,
                 )
             )
             self._last_omega = omega
@@ -189,8 +211,8 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
         meaning that by keeping only a percentage of the results with the smallest X we
         remove many of the outliers.
         """
-        LOGGER.info(f"Number of results before filtering: {len(self.results)}")
-        sorted_results = sorted(self.results, key=lambda item: item.x_dist_mm)
+        LOGGER.info(f"Number of results before filtering: {len(self._results)}")
+        sorted_results = sorted(self._results, key=lambda item: item.centre_px[0])
 
         worst_results = [
             r.uuid for r in sorted_results[-self.NUMBER_OF_WRONG_RESULTS_TO_LOG :]
@@ -200,9 +222,13 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
             f"Worst {self.NUMBER_OF_WRONG_RESULTS_TO_LOG} murko results were {worst_results}"
         )
         cutoff = max(1, int(len(sorted_results) * self.PERCENTAGE_TO_USE / 100))
+        for i, result in enumerate(sorted_results):
+            result.metadata["used_for_centring"] = i < cutoff
+
         smallest_x = sorted_results[:cutoff]
-        self.results = smallest_x
-        LOGGER.info(f"Number of results after filtering: {len(self.results)}")
+
+        LOGGER.info(f"Number of results after filtering: {len(smallest_x)}")
+        return smallest_x
 
 
 def get_yz_least_squares(vertical_dists: list, omegas: list) -> tuple[float, float]:
