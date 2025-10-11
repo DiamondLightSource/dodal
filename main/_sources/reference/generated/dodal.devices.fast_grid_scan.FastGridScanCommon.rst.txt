@@ -25,6 +25,9 @@ dodal.devices.fast\_grid\_scan.FastGridScanCommon
       ~FastGridScanCommon.kickoff
       
       
+      ~FastGridScanCommon.prepare
+      
+      
       
       
       

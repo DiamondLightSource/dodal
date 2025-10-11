@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.fast_grid_scan &#8212; dodal 1.61.1.dev5+g40667264d documentation</title>
+    <title>dodal.devices.fast_grid_scan &#8212; dodal 1.61.1.dev6+g559acedab documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=598cceff"></script>
+    <script src="../../../_static/documentation_options.js?v=6895eed6"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -450,12 +450,13 @@ window.addEventListener("load", () => mermaid.run());
                 <article class="bd-article">
                   
   <h1>Source code for dodal.devices.fast_grid_scan</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Generic</span><span class="p">,</span> <span class="n">TypeVar</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">bluesky.plan_stubs</span><span class="w"> </span><span class="kn">import</span> <span class="n">mv</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">bluesky.protocols</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flyable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">bluesky.plan_stubs</span><span class="w"> </span><span class="kn">import</span> <span class="n">prepare</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">bluesky.protocols</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flyable</span><span class="p">,</span> <span class="n">Preparable</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="kn">import</span> <span class="n">ndarray</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">AsyncStatus</span><span class="p">,</span>
@@ -465,6 +466,7 @@ window.addEventListener("load", () => mermaid.run());
     <span class="n">SignalRW</span><span class="p">,</span>
     <span class="n">StandardReadable</span><span class="p">,</span>
     <span class="n">derived_signal_r</span><span class="p">,</span>
+    <span class="n">set_and_wait_for_value</span><span class="p">,</span>
     <span class="n">soft_signal_r_and_setter</span><span class="p">,</span>
     <span class="n">wait_for_value</span><span class="p">,</span>
 <span class="p">)</span>
@@ -479,6 +481,10 @@ window.addEventListener("load", () => mermaid.run());
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.log</span><span class="w"> </span><span class="kn">import</span> <span class="n">LOGGER</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.parameters.experiment_parameter_base</span><span class="w"> </span><span class="kn">import</span> <span class="n">AbstractExperimentWithBeamParams</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">GridScanInvalidException</span><span class="p">(</span><span class="ne">RuntimeError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when the gridscan parameters are not valid.&quot;&quot;&quot;</span>
 
 
 <div class="viewcode-block" id="GridAxis">
@@ -614,7 +620,7 @@ window.addEventListener("load", () => mermaid.run());
 
 
 
-<span class="n">ParamType</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;ParamType&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">GridScanParamsCommon</span><span class="p">,</span> <span class="n">covariant</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">ParamType</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;ParamType&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">GridScanParamsCommon</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="WithDwellTime">
@@ -674,7 +680,9 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="FastGridScanCommon">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.fast_grid_scan.FastGridScanCommon.html#dodal.devices.fast_grid_scan.FastGridScanCommon">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">FastGridScanCommon</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">,</span> <span class="n">Flyable</span><span class="p">,</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">Generic</span><span class="p">[</span><span class="n">ParamType</span><span class="p">]):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">FastGridScanCommon</span><span class="p">(</span>
+    <span class="n">StandardReadable</span><span class="p">,</span> <span class="n">Flyable</span><span class="p">,</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">Preparable</span><span class="p">,</span> <span class="n">Generic</span><span class="p">[</span><span class="n">ParamType</span><span class="p">]</span>
+<span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Device containing the minimal signals for a general fast grid scan.</span>
 
 <span class="sd">    When the motion program is started, the goniometer will move in a snake-like grid trajectory,</span>
@@ -715,8 +723,9 @@ window.addEventListener("load", () => mermaid.run());
         <span class="bp">self</span><span class="o">.</span><span class="n">KICKOFF_TIMEOUT</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">5.0</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">COMPLETE_STATUS</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">60.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">VALIDITY_CHECK_TIMEOUT</span> <span class="o">=</span> <span class="mf">0.5</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">movable_params</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Signal</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_movable_params</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Signal</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;x_steps&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_steps</span><span class="p">,</span>
             <span class="s2">&quot;y_steps&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_steps</span><span class="p">,</span>
             <span class="s2">&quot;x_step_size_mm&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_step_size</span><span class="p">,</span>
@@ -766,7 +775,49 @@ window.addEventListener("load", () => mermaid.run());
     <span class="nd">@abstractmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_create_motion_program</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">motion_controller_prefix</span><span class="p">:</span> <span class="nb">str</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MotionProgram</span><span class="p">:</span> <span class="o">...</span></div>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MotionProgram</span><span class="p">:</span> <span class="o">...</span>
+
+<div class="viewcode-block" id="FastGridScanCommon.prepare">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.fast_grid_scan.FastGridScanCommon.html#dodal.devices.fast_grid_scan.FastGridScanCommon.prepare">[docs]</a>
+    <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">prepare</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">ParamType</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Submit the gridscan parameters to the device for validation prior to</span>
+<span class="sd">        gridscan kickoff</span>
+<span class="sd">        Args:</span>
+<span class="sd">            value: the gridscan parameters</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            GridScanInvalidException: if the gridscan parameters were not valid</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">set_statuses</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Applying gridscan parameters...&quot;</span><span class="p">)</span>
+        <span class="c1"># Create arguments for bps.mv</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">signal</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_movable_params</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">param_value</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+            <span class="n">set_statuses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="k">await</span> <span class="n">set_and_wait_for_value</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span> <span class="n">param_value</span><span class="p">))</span>  <span class="c1"># type: ignore</span>
+
+        <span class="c1"># Counter should always start at 0</span>
+        <span class="n">set_statuses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="k">await</span> <span class="n">set_and_wait_for_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">position_counter</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Gridscan parameters applied, waiting for sets to complete...&quot;</span><span class="p">)</span>
+
+        <span class="c1"># wait for parameter sets to complete</span>
+        <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="o">*</span><span class="n">set_statuses</span><span class="p">)</span>
+
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Sets confirmed, waiting for validity checks to pass...&quot;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">await</span> <span class="n">wait_for_value</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">scan_invalid</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">VALIDITY_CHECK_TIMEOUT</span>
+            <span class="p">)</span>
+        <span class="k">except</span> <span class="ne">TimeoutError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">GridScanInvalidException</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Gridscan parameters not validated after </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">VALIDITY_CHECK_TIMEOUT</span><span class="si">}</span><span class="s2">s&quot;</span>
+            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
+
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Gridscan validity confirmed, gridscan is now prepared.&quot;</span><span class="p">)</span></div>
+</div>
 
 
 
@@ -796,10 +847,10 @@ window.addEventListener("load", () => mermaid.run());
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">full_prefix</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">movable_params</span><span class="p">[</span><span class="s2">&quot;z_step_size_mm&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">z_step_size</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">movable_params</span><span class="p">[</span><span class="s2">&quot;z2_start_mm&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">z2_start</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">movable_params</span><span class="p">[</span><span class="s2">&quot;y2_start_mm&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">y2_start</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">movable_params</span><span class="p">[</span><span class="s2">&quot;z_steps&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">z_steps</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_movable_params</span><span class="p">[</span><span class="s2">&quot;z_step_size_mm&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">z_step_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_movable_params</span><span class="p">[</span><span class="s2">&quot;z2_start_mm&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">z2_start</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_movable_params</span><span class="p">[</span><span class="s2">&quot;y2_start_mm&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">y2_start</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_movable_params</span><span class="p">[</span><span class="s2">&quot;z_steps&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">z_steps</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_create_expected_images_signal</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">derived_signal_r</span><span class="p">(</span>
@@ -816,7 +867,35 @@ window.addEventListener("load", () => mermaid.run());
         <span class="k">return</span> <span class="n">first_grid</span> <span class="o">+</span> <span class="n">second_grid</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_create_scan_invalid_signal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SignalR</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
-        <span class="k">return</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">SCAN_INVALID&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x_scan_valid</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">X_SCAN_VALID&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y_scan_valid</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">Y_SCAN_VALID&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">z_scan_valid</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">Z_SCAN_VALID&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">device_scan_invalid</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">SCAN_INVALID&quot;</span><span class="p">)</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">compute_derived_value</span><span class="p">(</span>
+            <span class="n">x_scan_valid</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+            <span class="n">y_scan_valid</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+            <span class="n">z_scan_valid</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+            <span class="n">device_scan_invalid</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span>
+                <span class="mf">1.0</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span>
+                    <span class="n">x_scan_valid</span>
+                    <span class="ow">and</span> <span class="n">y_scan_valid</span>
+                    <span class="ow">and</span> <span class="n">z_scan_valid</span>
+                    <span class="ow">and</span> <span class="ow">not</span> <span class="n">device_scan_invalid</span>
+                <span class="p">)</span>
+                <span class="k">else</span> <span class="mf">0.0</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">derived_signal_r</span><span class="p">(</span>
+            <span class="n">compute_derived_value</span><span class="p">,</span>
+            <span class="n">x_scan_valid</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">x_scan_valid</span><span class="p">,</span>
+            <span class="n">y_scan_valid</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">y_scan_valid</span><span class="p">,</span>
+            <span class="n">z_scan_valid</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">z_scan_valid</span><span class="p">,</span>
+            <span class="n">device_scan_invalid</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device_scan_invalid</span><span class="p">,</span>
+        <span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_create_motion_program</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">motion_controller_prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">MotionProgram</span><span class="p">(</span><span class="n">motion_controller_prefix</span><span class="p">)</span></div>
@@ -839,7 +918,7 @@ window.addEventListener("load", () => mermaid.run());
         <span class="bp">self</span><span class="o">.</span><span class="n">dwell_time_ms</span> <span class="o">=</span> <span class="n">epics_signal_rw_rbv</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">full_prefix</span><span class="si">}</span><span class="s2">DWELL_TIME&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">x_counter</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">full_prefix</span><span class="si">}</span><span class="s2">X_COUNTER&quot;</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">infix</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">movable_params</span><span class="p">[</span><span class="s2">&quot;dwell_time_ms&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dwell_time_ms</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_movable_params</span><span class="p">[</span><span class="s2">&quot;dwell_time_ms&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dwell_time_ms</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_create_position_counter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">epics_signal_rw</span><span class="p">(</span>
@@ -873,7 +952,7 @@ window.addEventListener("load", () => mermaid.run());
         <span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">infix</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">movable_params</span><span class="p">[</span><span class="s2">&quot;run_up_distance_mm&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_up_distance_mm</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_movable_params</span><span class="p">[</span><span class="s2">&quot;run_up_distance_mm&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_up_distance_mm</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_create_position_counter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">Y_COUNTER&quot;</span><span class="p">)</span></div>
@@ -883,16 +962,16 @@ window.addEventListener("load", () => mermaid.run());
 <div class="viewcode-block" id="set_fast_grid_scan_params">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.fast_grid_scan.html#dodal.devices.fast_grid_scan.set_fast_grid_scan_params">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">set_fast_grid_scan_params</span><span class="p">(</span><span class="n">scan</span><span class="p">:</span> <span class="n">FastGridScanCommon</span><span class="p">[</span><span class="n">ParamType</span><span class="p">],</span> <span class="n">params</span><span class="p">:</span> <span class="n">ParamType</span><span class="p">):</span>
-    <span class="n">to_move</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Apply the fast grid scan parameters to the grid scan device and validate them</span>
+<span class="sd">    Args:</span>
+<span class="sd">        scan: The fast grid scan device</span>
+<span class="sd">        params: The parameters to set</span>
 
-    <span class="c1"># Create arguments for bps.mv</span>
-    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">scan</span><span class="o">.</span><span class="n">movable_params</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-        <span class="n">to_move</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">scan</span><span class="o">.</span><span class="n">movable_params</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">params</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">key</span><span class="p">]])</span>
-
-    <span class="c1"># Counter should always start at 0</span>
-    <span class="n">to_move</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">scan</span><span class="o">.</span><span class="n">position_counter</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
-
-    <span class="k">yield from</span> <span class="n">mv</span><span class="p">(</span><span class="o">*</span><span class="n">to_move</span><span class="p">)</span></div>
+<span class="sd">    Raises:</span>
+<span class="sd">        GridScanInvalidException: if the grid scan parameters are not valid</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">yield from</span> <span class="n">prepare</span><span class="p">(</span><span class="n">scan</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 
 </pre></div>
 

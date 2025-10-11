@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.fast_grid_scan &#8212; dodal 1.61.1.dev5+g40667264d documentation</title>
+    <title>dodal.devices.fast_grid_scan &#8212; dodal 1.61.1.dev6+g559acedab documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=598cceff"></script>
+    <script src="../../_static/documentation_options.js?v=6895eed6"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -1099,7 +1099,16 @@
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#dodal.devices.fast_grid_scan.set_fast_grid_scan_params" title="dodal.devices.fast_grid_scan.set_fast_grid_scan_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_fast_grid_scan_params</span></code></a>(scan, params)</p></td>
-<td><p></p></td>
+<td><p>Apply the fast grid scan parameters to the grid scan device and validate them :type scan: <span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="dodal.devices.fast_grid_scan.FastGridScanCommon.html#dodal.devices.fast_grid_scan.FastGridScanCommon" title="dodal.devices.fast_grid_scan.FastGridScanCommon"><code class="xref py py-class docutils literal notranslate"><span class="pre">FastGridScanCommon</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.TypeVar" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code></a>(<code class="docutils literal notranslate"><span class="pre">ParamType</span></code>, bound= <a class="reference internal" href="dodal.devices.fast_grid_scan.GridScanParamsCommon.html#dodal.devices.fast_grid_scan.GridScanParamsCommon" title="dodal.devices.fast_grid_scan.GridScanParamsCommon"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridScanParamsCommon</span></code></a>)]</span> :param scan: The fast grid scan device :type params: <span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.TypeVar" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code></a>(<code class="docutils literal notranslate"><span class="pre">ParamType</span></code>, bound= <a class="reference internal" href="dodal.devices.fast_grid_scan.GridScanParamsCommon.html#dodal.devices.fast_grid_scan.GridScanParamsCommon" title="dodal.devices.fast_grid_scan.GridScanParamsCommon"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridScanParamsCommon</span></code></a>)</span> :param params: The parameters to set</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="rubric">Exceptions</p>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">GridScanInvalidException</span></code></p></td>
+<td><p>Raised when the gridscan parameters are not valid.</p></td>
 </tr>
 </tbody>
 </table>
@@ -1107,12 +1116,14 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="dodal.devices.fast_grid_scan.set_fast_grid_scan_params">
 <span class="sig-prename descclassname"><span class="pre">dodal.devices.fast_grid_scan.</span></span><span class="sig-name descname"><span class="pre">set_fast_grid_scan_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scan</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="dodal.devices.fast_grid_scan.FastGridScanCommon.html#dodal.devices.fast_grid_scan.FastGridScanCommon" title="dodal.devices.fast_grid_scan.FastGridScanCommon"><span class="pre">FastGridScanCommon</span></a><span class="p"><span class="pre">[</span></span><span class="pre">ParamType</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ParamType</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dodal/devices/fast_grid_scan.html#set_fast_grid_scan_params"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.fast_grid_scan.set_fast_grid_scan_params" title="Link to this definition">#</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>scan</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="dodal.devices.fast_grid_scan.FastGridScanCommon.html#dodal.devices.fast_grid_scan.FastGridScanCommon" title="dodal.devices.fast_grid_scan.FastGridScanCommon"><code class="xref py py-class docutils literal notranslate"><span class="pre">FastGridScanCommon</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.TypeVar" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code></a>(<code class="docutils literal notranslate"><span class="pre">ParamType</span></code>, bound= <a class="reference internal" href="dodal.devices.fast_grid_scan.GridScanParamsCommon.html#dodal.devices.fast_grid_scan.GridScanParamsCommon" title="dodal.devices.fast_grid_scan.GridScanParamsCommon"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridScanParamsCommon</span></code></a>, covariant=True)]</span>)</p></li>
-<li><p><strong>params</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.TypeVar" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code></a>(<code class="docutils literal notranslate"><span class="pre">ParamType</span></code>, bound= <a class="reference internal" href="dodal.devices.fast_grid_scan.GridScanParamsCommon.html#dodal.devices.fast_grid_scan.GridScanParamsCommon" title="dodal.devices.fast_grid_scan.GridScanParamsCommon"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridScanParamsCommon</span></code></a>, covariant=True)</span>)</p></li>
-</ul>
+<dd><p>Apply the fast grid scan parameters to the grid scan device and validate them
+:type scan: <span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="dodal.devices.fast_grid_scan.FastGridScanCommon.html#dodal.devices.fast_grid_scan.FastGridScanCommon" title="dodal.devices.fast_grid_scan.FastGridScanCommon"><code class="xref py py-class docutils literal notranslate"><span class="pre">FastGridScanCommon</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.TypeVar" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code></a>(<code class="docutils literal notranslate"><span class="pre">ParamType</span></code>, bound= <a class="reference internal" href="dodal.devices.fast_grid_scan.GridScanParamsCommon.html#dodal.devices.fast_grid_scan.GridScanParamsCommon" title="dodal.devices.fast_grid_scan.GridScanParamsCommon"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridScanParamsCommon</span></code></a>)]</span>
+:param scan: The fast grid scan device
+:type params: <span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.TypeVar" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code></a>(<code class="docutils literal notranslate"><span class="pre">ParamType</span></code>, bound= <a class="reference internal" href="dodal.devices.fast_grid_scan.GridScanParamsCommon.html#dodal.devices.fast_grid_scan.GridScanParamsCommon" title="dodal.devices.fast_grid_scan.GridScanParamsCommon"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridScanParamsCommon</span></code></a>)</span>
+:param params: The parameters to set</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>GridScanInvalidException</strong> – if the grid scan parameters are not valid</p>
 </dd>
 </dl>
 </dd></dl>

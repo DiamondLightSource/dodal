@@ -49,4 +49,10 @@ dodal.devices.fast\_grid\_scan
 
    
    
+   .. rubric:: Exceptions
+
+   .. autosummary::
+   
+      GridScanInvalidException
+   
    
