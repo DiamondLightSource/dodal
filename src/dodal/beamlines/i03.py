@@ -325,7 +325,7 @@ def sample_shutter() -> ZebraShutter:
 
 
 @device_factory()
-def hutch_shutter() -> ZebraShutter:
+def hutch_shutter() -> HutchShutter:
     """Get the i03 hutch shutter device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
