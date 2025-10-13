@@ -13,9 +13,7 @@ from dodal.devices.apple2_undulator import (
     BeamEnergy,
     InsertionDeviceEnergy,
     InsertionDevicePolarisation,
-    Pol,
     UndulatorGap,
-    UndulatorJawPhase,
     UndulatorPhaseAxes,
 )
 from dodal.devices.i17.i17_apple2 import I17Apple2Controller
@@ -64,9 +62,25 @@ def id() -> Apple2:
     )
 
 
-@device_factory()
+@device_factory(skip=True)
 def id_controller() -> Apple2Controller:
     """I17 insertion device controller with dummy energy to motor_converter."""
     return I17Apple2Controller(
         apple2=id(), energy_to_motor_converter=lambda energy, pol: (0.0, 0.0)
     )
+
+
+@device_factory(skip=True)
+def id_energy() -> InsertionDeviceEnergy:
+    return InsertionDeviceEnergy(id_controller=id_controller())
+
+
+@device_factory(skip=True)
+def idd_polarisation() -> InsertionDevicePolarisation:
+    return InsertionDevicePolarisation(id_controller=id_controller())
+
+
+@device_factory(skip=True)
+def energy() -> BeamEnergy:
+    """Beam energy from down energy devices."""
+    return BeamEnergy(id_energy=id_energy(), mono=pgm().energy)
