@@ -35,7 +35,7 @@ class ZebraFastGridScanTwoD(FastGridScanCommon[ZebraGridScanParamsTwoD]):
         # See https://github.com/DiamondLightSource/mx-bluesky/issues/1203
         self.dwell_time_ms = epics_signal_rw_rbv(float, f"{full_prefix}EXPOSURE_TIME")
 
-        self.movable_params["dwell_time_ms"] = self.dwell_time_ms
+        self._movable_params["dwell_time_ms"] = self.dwell_time_ms
 
     def _create_expected_images_signal(self):
         return derived_signal_r(
