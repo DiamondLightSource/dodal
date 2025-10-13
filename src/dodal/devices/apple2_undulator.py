@@ -23,7 +23,6 @@ from ophyd_async.core import (
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw, epics_signal_w
 from ophyd_async.epics.motor import Motor
 
-from dodal.devices.pgm import MonoEnergyBase
 from dodal.log import LOGGER
 
 T = TypeVar("T")
