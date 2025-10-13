@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.i10.i10_apple2.I10Apple2 &#8212; dodal 1.62.1.dev1+gf41b324c5 documentation</title>
+    <title>dodal.devices.i10.i10_apple2.I10Apple2 &#8212; dodal 1.62.1.dev2+g4413e404f documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=fd6041e9"></script>
+    <script src="../../_static/documentation_options.js?v=0e5bff4f"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -58,8 +58,8 @@
     <link rel="icon" href="../../_static/dls-logo.svg"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="dodal.devices.i10.i10_apple2.I10Apple2Pol" href="dodal.devices.i10.i10_apple2.I10Apple2Pol.html" />
-    <link rel="prev" title="dodal.devices.i10.i10_apple2.EnergySetter" href="dodal.devices.i10.i10_apple2.EnergySetter.html" />
+    <link rel="next" title="dodal.devices.i10.i10_apple2.I10Apple2Controller" href="dodal.devices.i10.i10_apple2.I10Apple2Controller.html" />
+    <link rel="prev" title="dodal.devices.i10.i10_apple2.EnergyMinMax" href="dodal.devices.i10.i10_apple2.EnergyMinMax.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="main" />
@@ -472,10 +472,14 @@
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.apple2_undulator.html">dodal.devices.apple2_undulator</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.apple2_undulator.Apple2.html">dodal.devices.apple2_undulator.Apple2</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.apple2_undulator.Apple2Motors.html">dodal.devices.apple2_undulator.Apple2Motors</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.apple2_undulator.Apple2Controller.html">dodal.devices.apple2_undulator.Apple2Controller</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.apple2_undulator.Apple2PhasesVal.html">dodal.devices.apple2_undulator.Apple2PhasesVal</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.apple2_undulator.Apple2Val.html">dodal.devices.apple2_undulator.Apple2Val</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.apple2_undulator.BeamEnergy.html">dodal.devices.apple2_undulator.BeamEnergy</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.apple2_undulator.EnergyMotorConvertor.html">dodal.devices.apple2_undulator.EnergyMotorConvertor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.apple2_undulator.InsertionDeviceEnergy.html">dodal.devices.apple2_undulator.InsertionDeviceEnergy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.apple2_undulator.InsertionDeviceEnergyBase.html">dodal.devices.apple2_undulator.InsertionDeviceEnergyBase</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.apple2_undulator.InsertionDevicePolarisation.html">dodal.devices.apple2_undulator.InsertionDevicePolarisation</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.apple2_undulator.Pol.html">dodal.devices.apple2_undulator.Pol</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.apple2_undulator.SafeUndulatorMover.html">dodal.devices.apple2_undulator.SafeUndulatorMover</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.apple2_undulator.UndulatorGap.html">dodal.devices.apple2_undulator.UndulatorGap</a></li>
@@ -1065,29 +1069,14 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="dodal.devices.i10.i10_apple2.I10Apple2">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dodal.devices.i10.i10_apple2.</span></span><span class="sig-name descname"><span class="pre">I10Apple2</span></span><a class="reference internal" href="../../_modules/dodal/devices/i10/i10_apple2.html#I10Apple2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.i10.i10_apple2.I10Apple2" title="Link to this definition">#</a></dt>
-<dd><dl class="simple">
-<dt>I10Apple2 is the i10 version of Apple2 ID, set and energy_motor_convertor</dt><dd><p>should be the only part that is I10 specific.</p>
-</dd>
-<dt>A EnergyMotorConvertor function is needed to provide the conversion between</dt><dd><p>x-ray motor position and energy.</p>
-</dd>
-</dl>
-<p>Set is in energy(eV).</p>
+<dd><p>I10Apple2 device is an apple2 with extra jaw phase motor.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>prefix</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
-<li><p><strong>energy_motor_convertor</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="dodal.devices.apple2_undulator.EnergyMotorConvertor.html#dodal.devices.apple2_undulator.EnergyMotorConvertor" title="dodal.devices.apple2_undulator.EnergyMotorConvertor"><code class="xref py py-class docutils literal notranslate"><span class="pre">EnergyMotorConvertor</span></code></a></span>)</p></li>
-<li><p><strong>name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">''</span></code>)</p></li>
-<li><p><strong>look_up_table_dir</strong> – The path to look up table.</p></li>
-<li><p><strong>source</strong> – The column name and the name of the source in look up table. e.g. (“source”, “idu”)</p></li>
-<li><p><strong>mode</strong> – The column name of the mode in look up table.</p></li>
-<li><p><strong>min_energy</strong> – The column name that contain the maximum energy in look up table.</p></li>
-<li><p><strong>max_energy</strong> – The column name that contain the maximum energy in look up table.</p></li>
-<li><p><strong>poly_deg</strong> – The column names for the parameters for the energy conversion polynomial, starting with the least significant.</p></li>
-<li><p><strong>prefix</strong> – epic pv for id</p></li>
-<li><p><strong>Name</strong> – Name of the device</p></li>
-<li><p><strong>energy_motor_convertor</strong></p></li>
-<li><p><strong>name</strong></p></li>
+<li><p><strong>id_gap</strong> (<a class="reference internal" href="dodal.devices.apple2_undulator.UndulatorJawPhase.html#dodal.devices.apple2_undulator.UndulatorJawPhase" title="dodal.devices.apple2_undulator.UndulatorJawPhase"><em>UndulatorJawPhase</em></a>) – The gap motor of the undulator.</p></li>
+<li><p><strong>id_phase</strong> (<a class="reference internal" href="dodal.devices.apple2_undulator.UndulatorJawPhase.html#dodal.devices.apple2_undulator.UndulatorJawPhase" title="dodal.devices.apple2_undulator.UndulatorJawPhase"><em>UndulatorJawPhase</em></a>) – The phase motors of the undulator.</p></li>
+<li><p><strong>id_jaw_phase</strong> (<a class="reference internal" href="dodal.devices.apple2_undulator.UndulatorJawPhase.html#dodal.devices.apple2_undulator.UndulatorJawPhase" title="dodal.devices.apple2_undulator.UndulatorJawPhase"><em>UndulatorJawPhase</em></a>) – The jaw phase motor of the undulator.</p></li>
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><em>optional</em>) – The name of the device, by default “”.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1118,20 +1107,20 @@
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="dodal.devices.i10.i10_apple2.EnergySetter.html"
+       href="dodal.devices.i10.i10_apple2.EnergyMinMax.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">dodal.devices.i10.i10_apple2.EnergySetter</p>
+        <p class="prev-next-title">dodal.devices.i10.i10_apple2.EnergyMinMax</p>
       </div>
     </a>
     <a class="right-next"
-       href="dodal.devices.i10.i10_apple2.I10Apple2Pol.html"
+       href="dodal.devices.i10.i10_apple2.I10Apple2Controller.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">dodal.devices.i10.i10_apple2.I10Apple2Pol</p>
+        <p class="prev-next-title">dodal.devices.i10.i10_apple2.I10Apple2Controller</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

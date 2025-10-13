@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.i10.i10_apple2 &#8212; dodal 1.62.1.dev1+gf41b324c5 documentation</title>
+    <title>dodal.devices.i10.i10_apple2 &#8212; dodal 1.62.1.dev2+g4413e404f documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=fd6041e9"></script>
+    <script src="../../../../_static/documentation_options.js?v=0e5bff4f"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -450,8 +450,7 @@ window.addEventListener("load", () => mermaid.run());
                 <article class="bd-article">
                   
   <h1>Source code for dodal.devices.i10.i10_apple2</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">csv</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">csv</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">io</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
@@ -462,28 +461,24 @@ window.addEventListener("load", () => mermaid.run());
 <span class="kn">from</span><span class="w"> </span><span class="nn">daq_config_server.client</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConfigServer</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">AsyncStatus</span><span class="p">,</span>
-    <span class="n">Device</span><span class="p">,</span>
     <span class="n">Reference</span><span class="p">,</span>
     <span class="n">StandardReadable</span><span class="p">,</span>
     <span class="n">StandardReadableFormat</span><span class="p">,</span>
-    <span class="n">soft_signal_r_and_setter</span><span class="p">,</span>
+    <span class="n">derived_signal_rw</span><span class="p">,</span>
     <span class="n">soft_signal_rw</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">ConfigDict</span><span class="p">,</span> <span class="n">RootModel</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.apple2_undulator</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">Apple2</span><span class="p">,</span>
-    <span class="n">Apple2Motors</span><span class="p">,</span>
+    <span class="n">Apple2Controller</span><span class="p">,</span>
     <span class="n">Apple2Val</span><span class="p">,</span>
-    <span class="n">EnergyMotorConvertor</span><span class="p">,</span>
     <span class="n">Pol</span><span class="p">,</span>
     <span class="n">UndulatorGap</span><span class="p">,</span>
     <span class="n">UndulatorJawPhase</span><span class="p">,</span>
     <span class="n">UndulatorPhaseAxes</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.log</span><span class="w"> </span><span class="kn">import</span> <span class="n">LOGGER</span>
-
-<span class="kn">from</span><span class="w"> </span><span class="nn">..pgm</span><span class="w"> </span><span class="kn">import</span> <span class="n">PGM</span>
 
 <span class="n">ROW_PHASE_MOTOR_TOLERANCE</span> <span class="o">=</span> <span class="mf">0.004</span>
 <span class="n">MAXIMUM_ROW_PHASE_MOTOR_POSITION</span> <span class="o">=</span> <span class="mf">24.0</span>
@@ -582,7 +577,7 @@ window.addEventListener("load", () => mermaid.run());
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">look_up_table_dir</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">lookuptable_dir</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">source</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
         <span class="n">config_client</span><span class="p">:</span> <span class="n">ConfigServer</span><span class="p">,</span>
         <span class="n">mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Mode&quot;</span><span class="p">,</span>
@@ -616,8 +611,8 @@ window.addEventListener("load", () => mermaid.run());
             <span class="s2">&quot;Gap&quot;</span><span class="p">:</span> <span class="p">{},</span>
             <span class="s2">&quot;Phase&quot;</span><span class="p">:</span> <span class="p">{},</span>
         <span class="p">}</span>
-        <span class="n">energy_gap_table_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">look_up_table_dir</span><span class="p">,</span> <span class="n">gap_file_name</span><span class="p">)</span>
-        <span class="n">energy_phase_table_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">look_up_table_dir</span><span class="p">,</span> <span class="n">phase_file_name</span><span class="p">)</span>
+        <span class="n">energy_gap_table_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">lookuptable_dir</span><span class="p">,</span> <span class="n">gap_file_name</span><span class="p">)</span>
+        <span class="n">energy_phase_table_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">lookuptable_dir</span><span class="p">,</span> <span class="n">phase_file_name</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lookup_table_config</span> <span class="o">=</span> <span class="n">LookupTableConfig</span><span class="p">(</span>
             <span class="n">path</span><span class="o">=</span><span class="n">LookupPath</span><span class="p">(</span><span class="n">Gap</span><span class="o">=</span><span class="n">energy_gap_table_path</span><span class="p">,</span> <span class="n">Phase</span><span class="o">=</span><span class="n">energy_phase_table_path</span><span class="p">),</span>
             <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span>
@@ -809,66 +804,123 @@ window.addEventListener("load", () => mermaid.run());
 <div class="viewcode-block" id="I10Apple2">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i10.i10_apple2.I10Apple2.html#dodal.devices.i10.i10_apple2.I10Apple2">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">I10Apple2</span><span class="p">(</span><span class="n">Apple2</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;I10Apple2 is the i10 version of Apple2 ID, set and energy_motor_convertor</span>
-<span class="sd">     should be the only part that is I10 specific.</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">id_gap</span><span class="p">:</span> <span class="n">UndulatorGap</span><span class="p">,</span>
+        <span class="n">id_phase</span><span class="p">:</span> <span class="n">UndulatorPhaseAxes</span><span class="p">,</span>
+        <span class="n">id_jaw_phase</span><span class="p">:</span> <span class="n">UndulatorJawPhase</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        I10Apple2 device is an apple2 with extra jaw phase motor.</span>
 
-<span class="sd">    A EnergyMotorConvertor function is needed to provide the conversion between</span>
-<span class="sd">     x-ray motor position and energy.</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
 
-<span class="sd">    Set is in energy(eV).</span>
+<span class="sd">        id_gap : UndulatorJawPhase</span>
+<span class="sd">            The gap motor of the undulator.</span>
+<span class="sd">        id_phase : UndulatorJawPhase</span>
+<span class="sd">            The phase motors of the undulator.</span>
+<span class="sd">        id_jaw_phase : UndulatorJawPhase</span>
+<span class="sd">            The jaw phase motor of the undulator.</span>
+<span class="sd">        name : str, optional</span>
+<span class="sd">            The name of the device, by default &quot;&quot;.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">jaw_phase</span> <span class="o">=</span> <span class="n">id_jaw_phase</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">id_gap</span><span class="o">=</span><span class="n">id_gap</span><span class="p">,</span> <span class="n">id_phase</span><span class="o">=</span><span class="n">id_phase</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="I10Apple2Controller">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i10.i10_apple2.I10Apple2Controller.html#dodal.devices.i10.i10_apple2.I10Apple2Controller">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">I10Apple2Controller</span><span class="p">(</span><span class="n">Apple2Controller</span><span class="p">[</span><span class="n">I10Apple2</span><span class="p">]):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    I10Apple2Controller is a extension of Apple2Controller which provide linear</span>
+<span class="sd">     arbitrary angle control.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">energy_motor_convertor</span><span class="p">:</span> <span class="n">EnergyMotorConvertor</span><span class="p">,</span>
+        <span class="n">apple2</span><span class="p">:</span> <span class="n">I10Apple2</span><span class="p">,</span>
+        <span class="n">lookuptable_dir</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">source</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
+        <span class="n">config_client</span><span class="p">:</span> <span class="n">ConfigServer</span><span class="p">,</span>
+        <span class="n">jaw_phase_limit</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">12.0</span><span class="p">,</span>
+        <span class="n">jaw_phase_poly_param</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="n">DEFAULT_JAW_PHASE_POLY_PARAMS</span><span class="p">,</span>
+        <span class="n">angle_threshold_deg</span><span class="o">=</span><span class="mf">30.0</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Parameters</span>
+
+<span class="sd">        parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        look_up_table_dir:</span>
+<span class="sd">        apple2 : I10Apple2</span>
+<span class="sd">            An I10Apple2 device.</span>
+<span class="sd">        lookuptable_dir : str</span>
 <span class="sd">            The path to look up table.</span>
-<span class="sd">        source:</span>
-<span class="sd">            The column name and the name of the source in look up table. e.g. (&quot;source&quot;, &quot;idu&quot;)</span>
-<span class="sd">        mode:</span>
-<span class="sd">            The column name of the mode in look up table.</span>
-<span class="sd">        min_energy:</span>
-<span class="sd">            The column name that contain the maximum energy in look up table.</span>
-<span class="sd">        max_energy:</span>
-<span class="sd">            The column name that contain the maximum energy in look up table.</span>
-<span class="sd">        poly_deg:</span>
-<span class="sd">            The column names for the parameters for the energy conversion polynomial, starting with the least significant.</span>
-<span class="sd">        prefix:</span>
-<span class="sd">            epic pv for id</span>
-<span class="sd">        Name:</span>
-<span class="sd">            Name of the device</span>
+<span class="sd">        source : tuple[str, str]</span>
+<span class="sd">            The column name and the name of the source in look up table. e.g. ( &quot;source&quot;, &quot;idu&quot;)</span>
+<span class="sd">        config_client : ConfigServer</span>
+<span class="sd">            The config server client to fetch the look up table.</span>
+<span class="sd">        jaw_phase_limit : float, optional</span>
+<span class="sd">            The maximum allowed jaw_phase movement., by default 12.0</span>
+<span class="sd">        jaw_phase_poly_param : list[float], optional</span>
+<span class="sd">            polynomial parameters highest power first., by default DEFAULT_JAW_PHASE_POLY_PARAMS</span>
+<span class="sd">        angle_threshold_deg : float, optional</span>
+<span class="sd">            The angle threshold to switch between 0-180 and 180-360 range., by default 30.0</span>
+<span class="sd">        name : str, optional</span>
+<span class="sd">            New device name.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
-            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-                <span class="n">apple2_motors</span><span class="o">=</span><span class="n">Apple2Motors</span><span class="p">(</span>
-                    <span class="n">id_gap</span><span class="o">=</span><span class="n">UndulatorGap</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">),</span>
-                    <span class="n">id_phase</span><span class="o">=</span><span class="n">UndulatorPhaseAxes</span><span class="p">(</span>
-                        <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">,</span>
-                        <span class="n">top_outer</span><span class="o">=</span><span class="s2">&quot;RPQ1&quot;</span><span class="p">,</span>
-                        <span class="n">top_inner</span><span class="o">=</span><span class="s2">&quot;RPQ2&quot;</span><span class="p">,</span>
-                        <span class="n">btm_inner</span><span class="o">=</span><span class="s2">&quot;RPQ3&quot;</span><span class="p">,</span>
-                        <span class="n">btm_outer</span><span class="o">=</span><span class="s2">&quot;RPQ4&quot;</span><span class="p">,</span>
-                    <span class="p">),</span>
-                <span class="p">),</span>
-                <span class="n">energy_motor_convertor</span><span class="o">=</span><span class="n">energy_motor_convertor</span><span class="p">,</span>
-                <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
-            <span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">id_jaw_phase</span> <span class="o">=</span> <span class="n">UndulatorJawPhase</span><span class="p">(</span>
-                <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">,</span>
-                <span class="n">move_pv</span><span class="o">=</span><span class="s2">&quot;RPQ1&quot;</span><span class="p">,</span>
-            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lookup_table_client</span> <span class="o">=</span> <span class="n">I10EnergyMotorLookup</span><span class="p">(</span>
+            <span class="n">lookuptable_dir</span><span class="o">=</span><span class="n">lookuptable_dir</span><span class="p">,</span>
+            <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span>
+            <span class="n">config_client</span><span class="o">=</span><span class="n">config_client</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">apple2</span><span class="o">=</span><span class="n">apple2</span><span class="p">,</span>
+            <span class="n">energy_to_motor_converter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lookup_table_client</span><span class="o">.</span><span class="n">get_motor_from_energy</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+        <span class="p">)</span>
 
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">jaw_phase_from_angle</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">poly1d</span><span class="p">(</span><span class="n">jaw_phase_poly_param</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">angle_threshold_deg</span> <span class="o">=</span> <span class="n">angle_threshold_deg</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">jaw_phase_limit</span> <span class="o">=</span> <span class="n">jaw_phase_limit</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_linear_arbitrary_angle</span> <span class="o">=</span> <span class="n">soft_signal_rw</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">initial_value</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">linear_arbitrary_angle</span> <span class="o">=</span> <span class="n">derived_signal_rw</span><span class="p">(</span>
+            <span class="n">raw_to_derived</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_read_linear_arbitrary_angle</span><span class="p">,</span>
+            <span class="n">set_derived</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_set_linear_arbitrary_angle</span><span class="p">,</span>
+            <span class="n">pol_angle</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_linear_arbitrary_angle</span><span class="p">,</span>
+            <span class="n">pol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">polarisation</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_read_linear_arbitrary_angle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pol_angle</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">pol</span><span class="p">:</span> <span class="n">Pol</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_raise_if_not_la</span><span class="p">(</span><span class="n">pol</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">pol_angle</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_set_linear_arbitrary_angle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pol_angle</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">pol</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">polarisation</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_raise_if_not_la</span><span class="p">(</span><span class="n">pol</span><span class="p">)</span>
+        <span class="c1"># Moving to real angle which is 210 to 30.</span>
+        <span class="n">alpha_real</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">pol_angle</span>
+            <span class="k">if</span> <span class="n">pol_angle</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">angle_threshold_deg</span>
+            <span class="k">else</span> <span class="n">pol_angle</span> <span class="o">+</span> <span class="n">ALPHA_OFFSET</span>
+        <span class="p">)</span>
+        <span class="n">jaw_phase</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">jaw_phase_from_angle</span><span class="p">(</span><span class="n">alpha_real</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">jaw_phase</span><span class="p">)</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">jaw_phase_limit</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;jaw_phase position for angle (</span><span class="si">{</span><span class="n">pol_angle</span><span class="si">}</span><span class="s2">) is outside permitted range&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot; [-</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">jaw_phase_limit</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">jaw_phase_limit</span><span class="si">}</span><span class="s2">]&quot;</span>
+            <span class="p">)</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">apple2</span><span class="p">()</span><span class="o">.</span><span class="n">jaw_phase</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">jaw_phase</span><span class="p">)</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_linear_arbitrary_angle</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">pol_angle</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_set_motors_from_energy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Check polarisation state and use it together with the energy(value)</span>
-<span class="sd">        to calculate the required gap and phases before setting it.</span>
+<span class="sd">        Set the undulator motors for a given energy and polarisation.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">pol</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">polarisation_setpoint</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
@@ -884,7 +936,7 @@ window.addEventListener("load", () => mermaid.run());
                     <span class="sa">f</span><span class="s2">&quot;Polarisation cannot be determined from hardware for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>
                 <span class="p">)</span>
 
-            <span class="bp">self</span><span class="o">.</span><span class="n">_set_pol_setpoint</span><span class="p">(</span><span class="n">pol</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_polarisation_setpoint_set</span><span class="p">(</span><span class="n">pol</span><span class="p">)</span>
         <span class="n">gap</span><span class="p">,</span> <span class="n">phase</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy_to_motor</span><span class="p">(</span><span class="n">energy</span><span class="o">=</span><span class="n">value</span><span class="p">,</span> <span class="n">pol</span><span class="o">=</span><span class="n">pol</span><span class="p">)</span>
         <span class="n">phase3</span> <span class="o">=</span> <span class="n">phase</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span> <span class="k">if</span> <span class="n">pol</span> <span class="o">==</span> <span class="n">Pol</span><span class="o">.</span><span class="n">LA</span> <span class="k">else</span> <span class="mi">1</span><span class="p">)</span>
         <span class="n">id_set_val</span> <span class="o">=</span> <span class="n">Apple2Val</span><span class="p">(</span>
@@ -896,79 +948,17 @@ window.addEventListener("load", () => mermaid.run());
         <span class="p">)</span>
 
         <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Setting polarisation to </span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">, with values: </span><span class="si">{</span><span class="n">id_set_val</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">motors</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">id_motor_values</span><span class="o">=</span><span class="n">id_set_val</span><span class="p">)</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">apple2</span><span class="p">()</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">id_motor_values</span><span class="o">=</span><span class="n">id_set_val</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">pol</span> <span class="o">!=</span> <span class="n">Pol</span><span class="o">.</span><span class="n">LA</span><span class="p">:</span>
-            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">id_jaw_phase</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">id_jaw_phase</span><span class="o">.</span><span class="n">set_move</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span></div>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">apple2</span><span class="p">()</span><span class="o">.</span><span class="n">jaw_phase</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">apple2</span><span class="p">()</span><span class="o">.</span><span class="n">jaw_phase</span><span class="o">.</span><span class="n">set_move</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 
-
-
-<div class="viewcode-block" id="EnergySetter">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i10.i10_apple2.EnergySetter.html#dodal.devices.i10.i10_apple2.EnergySetter">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">EnergySetter</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">,</span> <span class="n">Movable</span><span class="p">[</span><span class="nb">float</span><span class="p">]):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Compound device to set both ID and PGM energy at the same time.</span>
-
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">:</span> <span class="n">I10Apple2</span><span class="p">,</span> <span class="n">pgm</span><span class="p">:</span> <span class="n">PGM</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        id:</span>
-<span class="sd">            An Apple2 device.</span>
-<span class="sd">        pgm:</span>
-<span class="sd">            A PGM/mono device.</span>
-<span class="sd">        name:</span>
-<span class="sd">            New device name.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="nb">id</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">pgm_ref</span> <span class="o">=</span> <span class="n">Reference</span><span class="p">(</span><span class="n">pgm</span><span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">add_readables</span><span class="p">(</span>
-            <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">energy</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pgm_ref</span><span class="p">()</span><span class="o">.</span><span class="n">energy</span><span class="o">.</span><span class="n">user_readback</span><span class="p">],</span>
-            <span class="n">StandardReadableFormat</span><span class="o">.</span><span class="n">HINTED_SIGNAL</span><span class="p">,</span>
-        <span class="p">)</span>
-
-        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">(</span><span class="n">StandardReadableFormat</span><span class="o">.</span><span class="n">CONFIG_SIGNAL</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">energy_offset</span> <span class="o">=</span> <span class="n">soft_signal_rw</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">initial_value</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-
-    <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Moving f</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> energy to </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
-        <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">value</span> <span class="o">+</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy_offset</span><span class="o">.</span><span class="n">get_value</span><span class="p">()),</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">pgm_ref</span><span class="p">()</span><span class="o">.</span><span class="n">energy</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="p">),</span>
-        <span class="p">)</span></div>
-
-
-
-<div class="viewcode-block" id="I10Apple2Pol">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i10.i10_apple2.I10Apple2Pol.html#dodal.devices.i10.i10_apple2.I10Apple2Pol">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">I10Apple2Pol</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">,</span> <span class="n">Movable</span><span class="p">[</span><span class="n">Pol</span><span class="p">]):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Compound device to set polorisation of ID.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">:</span> <span class="n">I10Apple2</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        id:</span>
-<span class="sd">            An I10Apple2 device.</span>
-<span class="sd">        name:</span>
-<span class="sd">            New device name.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">id_ref</span> <span class="o">=</span> <span class="n">Reference</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">add_readables</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">id_ref</span><span class="p">()</span><span class="o">.</span><span class="n">polarisation</span><span class="p">])</span>
-
-    <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Pol</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Changing f</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> polarisation to </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
-        <span class="c1"># Timeout is determined internally by the set method later, so we set it to max here.</span>
-        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">id_ref</span><span class="p">()</span><span class="o">.</span><span class="n">polarisation</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">MAXIMUM_MOVE_TIME</span><span class="p">)</span></div>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_raise_if_not_la</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pol</span><span class="p">:</span> <span class="n">Pol</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">pol</span> <span class="o">!=</span> <span class="n">Pol</span><span class="o">.</span><span class="n">LA</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="s2">&quot;Angle control is not available in polarisation&quot;</span>
+                <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2"> with </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span></div>
 
 
 
@@ -976,120 +966,33 @@ window.addEventListener("load", () => mermaid.run());
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i10.i10_apple2.LinearArbitraryAngle.html#dodal.devices.i10.i10_apple2.LinearArbitraryAngle">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">LinearArbitraryAngle</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">,</span> <span class="n">Movable</span><span class="p">[</span><span class="n">SupportsFloat</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Device to set polorisation angle of the ID. Linear Arbitrary Angle (laa)</span>
-<span class="sd">     is the direction of the magnetic field which can be change by varying the jaw_phase</span>
-<span class="sd">     in (linear arbitrary (la) mode,</span>
-<span class="sd">     The angle of 0 is equivalent to linear horizontal &quot;lh&quot; (sigma) and</span>
-<span class="sd">      90 is linear vertical &quot;lv&quot; (pi).</span>
-<span class="sd">    This device require a jaw_phase to angle conversion which is done via a polynomial.</span>
+<span class="sd">    Device to set the polarisation angle of the Apple2 undulator in Linear Arbitrary (LA) mode..</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="nb">id</span><span class="p">:</span> <span class="n">I10Apple2</span><span class="p">,</span>
+        <span class="n">id_controller</span><span class="p">:</span> <span class="n">I10Apple2Controller</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-        <span class="n">jaw_phase_limit</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">12.0</span><span class="p">,</span>
-        <span class="n">jaw_phase_poly_param</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="n">DEFAULT_JAW_PHASE_POLY_PARAMS</span><span class="p">,</span>
-        <span class="n">angle_threshold_deg</span><span class="o">=</span><span class="mf">30.0</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        id: I10Apple2</span>
-<span class="sd">            An I10Apple2 device.</span>
-<span class="sd">        name: str</span>
+<span class="sd">        id_controller : I10Apple2Controller</span>
+<span class="sd">            The I10Apple2Controller which control the ID.</span>
+<span class="sd">        name : str, optional</span>
 <span class="sd">            New device name.</span>
-<span class="sd">        jaw_phase_limit: float</span>
-<span class="sd">            The maximum allowed jaw_phase movement.</span>
-<span class="sd">        jaw_phase_poly_param: list</span>
-<span class="sd">            polynomial parameters highest power first.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">id_ref</span> <span class="o">=</span> <span class="n">Reference</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">jaw_phase_from_angle</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">poly1d</span><span class="p">(</span><span class="n">jaw_phase_poly_param</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">angle_threshold_deg</span> <span class="o">=</span> <span class="n">angle_threshold_deg</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">jaw_phase_limit</span> <span class="o">=</span> <span class="n">jaw_phase_limit</span>
-        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">(</span><span class="n">StandardReadableFormat</span><span class="o">.</span><span class="n">HINTED_SIGNAL</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">angle</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_angle_set</span> <span class="o">=</span> <span class="n">soft_signal_r_and_setter</span><span class="p">(</span>
-                <span class="nb">float</span><span class="p">,</span> <span class="n">initial_value</span><span class="o">=</span><span class="kc">None</span>
-            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">linear_arbitrary_angle</span> <span class="o">=</span> <span class="n">Reference</span><span class="p">(</span><span class="n">id_controller</span><span class="o">.</span><span class="n">linear_arbitrary_angle</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_readables</span><span class="p">(</span>
+            <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">linear_arbitrary_angle</span><span class="p">()],</span>
+            <span class="n">StandardReadableFormat</span><span class="o">.</span><span class="n">HINTED_SIGNAL</span><span class="p">,</span>
+        <span class="p">)</span>
 
     <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">SupportsFloat</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">value</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
-        <span class="n">pol</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">id_ref</span><span class="p">()</span><span class="o">.</span><span class="n">polarisation</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">pol</span> <span class="o">!=</span> <span class="n">Pol</span><span class="o">.</span><span class="n">LA</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Angle control is not available in polarisation </span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2"> with </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">id_ref</span><span class="p">()</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="p">)</span>
-        <span class="c1"># Moving to real angle which is 210 to 30.</span>
-        <span class="n">alpha_real</span> <span class="o">=</span> <span class="n">value</span> <span class="k">if</span> <span class="n">value</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">angle_threshold_deg</span> <span class="k">else</span> <span class="n">value</span> <span class="o">+</span> <span class="n">ALPHA_OFFSET</span>
-        <span class="n">jaw_phase</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">jaw_phase_from_angle</span><span class="p">(</span><span class="n">alpha_real</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">jaw_phase</span><span class="p">)</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">jaw_phase_limit</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;jaw_phase position for angle (</span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">) is outside permitted range&quot;</span>
-                <span class="sa">f</span><span class="s2">&quot; [-</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">jaw_phase_limit</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">jaw_phase_limit</span><span class="si">}</span><span class="s2">]&quot;</span>
-            <span class="p">)</span>
-        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">id_ref</span><span class="p">()</span><span class="o">.</span><span class="n">id_jaw_phase</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">jaw_phase</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_angle_set</span><span class="p">(</span><span class="n">value</span><span class="p">)</span></div>
-
-
-
-<div class="viewcode-block" id="I10Id">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i10.i10_apple2.I10Id.html#dodal.devices.i10.i10_apple2.I10Id">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">I10Id</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">pgm</span><span class="p">:</span> <span class="n">PGM</span><span class="p">,</span>
-        <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">look_up_table_dir</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">source</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
-        <span class="n">config_client</span><span class="p">:</span> <span class="n">ConfigServer</span><span class="p">,</span>
-        <span class="n">jaw_phase_limit</span><span class="o">=</span><span class="mf">12.0</span><span class="p">,</span>
-        <span class="n">jaw_phase_poly_param</span><span class="o">=</span><span class="n">DEFAULT_JAW_PHASE_POLY_PARAMS</span><span class="p">,</span>
-        <span class="n">angle_threshold_deg</span><span class="o">=</span><span class="mf">30.0</span><span class="p">,</span>
-        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;I10Id is a compound device that combines the I10-specific Apple2 undulator,</span>
-<span class="sd">        energy setter, and polarization control.</span>
-<span class="sd">        This class provides a high-level interface for controlling the undulator&#39;s</span>
-<span class="sd">        energy, polarization, and linear arbitrary angle.</span>
-
-<span class="sd">        Attributes</span>
-<span class="sd">        ----------</span>
-<span class="sd">        id : I10Apple2</span>
-<span class="sd">            The I10-specific Apple2 undulator device.</span>
-<span class="sd">        energy_setter : EnergySetter</span>
-<span class="sd">            A device for synchronizing the undulator and monochromator energy.</span>
-<span class="sd">        pol : I10Apple2Pol</span>
-<span class="sd">            A device for controlling the polarization of the undulator.</span>
-<span class="sd">        linear_arbitrary_angle : LinearArbitraryAngle</span>
-<span class="sd">            A device for controlling the linear arbitrary polarization angle.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">lookup_table_client</span> <span class="o">=</span> <span class="n">I10EnergyMotorLookup</span><span class="p">(</span>
-            <span class="n">look_up_table_dir</span><span class="o">=</span><span class="n">look_up_table_dir</span><span class="p">,</span>
-            <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span>
-            <span class="n">config_client</span><span class="o">=</span><span class="n">config_client</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">energy</span> <span class="o">=</span> <span class="n">EnergySetter</span><span class="p">(</span>
-            <span class="nb">id</span><span class="o">=</span><span class="n">I10Apple2</span><span class="p">(</span>
-                <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">,</span>
-                <span class="n">energy_motor_convertor</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lookup_table_client</span><span class="o">.</span><span class="n">get_motor_from_energy</span><span class="p">,</span>
-                <span class="n">name</span><span class="o">=</span><span class="s2">&quot;id_energy&quot;</span><span class="p">,</span>
-            <span class="p">),</span>
-            <span class="n">pgm</span><span class="o">=</span><span class="n">pgm</span><span class="p">,</span>
-            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;energy&quot;</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">pol</span> <span class="o">=</span> <span class="n">I10Apple2Pol</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">energy</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;pol&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">laa</span> <span class="o">=</span> <span class="n">LinearArbitraryAngle</span><span class="p">(</span>
-            <span class="nb">id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">energy</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
-            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;laa&quot;</span><span class="p">,</span>
-            <span class="n">jaw_phase_limit</span><span class="o">=</span><span class="n">jaw_phase_limit</span><span class="p">,</span>
-            <span class="n">jaw_phase_poly_param</span><span class="o">=</span><span class="n">jaw_phase_poly_param</span><span class="p">,</span>
-            <span class="n">angle_threshold_deg</span><span class="o">=</span><span class="n">angle_threshold_deg</span><span class="p">,</span>
-        <span class="p">)</span>
-
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span></div>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">angle</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">linear_arbitrary_angle</span><span class="p">()</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span></div>
 
 </pre></div>
 

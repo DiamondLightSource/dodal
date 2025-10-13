@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.i10.i10_apple2.LinearArbitraryAngle &#8212; dodal 1.62.1.dev1+gf41b324c5 documentation</title>
+    <title>dodal.devices.i10.i10_apple2.LinearArbitraryAngle &#8212; dodal 1.62.1.dev2+g4413e404f documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=fd6041e9"></script>
+    <script src="../../_static/documentation_options.js?v=0e5bff4f"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -59,7 +59,7 @@
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="dodal.devices.i10.i10_apple2.LookupPath" href="dodal.devices.i10.i10_apple2.LookupPath.html" />
-    <link rel="prev" title="dodal.devices.i10.i10_apple2.I10Id" href="dodal.devices.i10.i10_apple2.I10Id.html" />
+    <link rel="prev" title="dodal.devices.i10.i10_apple2.I10EnergyMotorLookup" href="dodal.devices.i10.i10_apple2.I10EnergyMotorLookup.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="main" />
@@ -472,10 +472,14 @@
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.apple2_undulator.html">dodal.devices.apple2_undulator</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.apple2_undulator.Apple2.html">dodal.devices.apple2_undulator.Apple2</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.apple2_undulator.Apple2Motors.html">dodal.devices.apple2_undulator.Apple2Motors</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.apple2_undulator.Apple2Controller.html">dodal.devices.apple2_undulator.Apple2Controller</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.apple2_undulator.Apple2PhasesVal.html">dodal.devices.apple2_undulator.Apple2PhasesVal</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.apple2_undulator.Apple2Val.html">dodal.devices.apple2_undulator.Apple2Val</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.apple2_undulator.BeamEnergy.html">dodal.devices.apple2_undulator.BeamEnergy</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.apple2_undulator.EnergyMotorConvertor.html">dodal.devices.apple2_undulator.EnergyMotorConvertor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.apple2_undulator.InsertionDeviceEnergy.html">dodal.devices.apple2_undulator.InsertionDeviceEnergy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.apple2_undulator.InsertionDeviceEnergyBase.html">dodal.devices.apple2_undulator.InsertionDeviceEnergyBase</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.apple2_undulator.InsertionDevicePolarisation.html">dodal.devices.apple2_undulator.InsertionDevicePolarisation</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.apple2_undulator.Pol.html">dodal.devices.apple2_undulator.Pol</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.apple2_undulator.SafeUndulatorMover.html">dodal.devices.apple2_undulator.SafeUndulatorMover</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.apple2_undulator.UndulatorGap.html">dodal.devices.apple2_undulator.UndulatorGap</a></li>
@@ -1065,34 +1069,21 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="dodal.devices.i10.i10_apple2.LinearArbitraryAngle">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dodal.devices.i10.i10_apple2.</span></span><span class="sig-name descname"><span class="pre">LinearArbitraryAngle</span></span><a class="reference internal" href="../../_modules/dodal/devices/i10/i10_apple2.html#LinearArbitraryAngle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.i10.i10_apple2.LinearArbitraryAngle" title="Link to this definition">#</a></dt>
-<dd><dl>
-<dt>Device to set polorisation angle of the ID. Linear Arbitrary Angle (laa)</dt><dd><p>is the direction of the magnetic field which can be change by varying the jaw_phase
-in (linear arbitrary (la) mode,
-The angle of 0 is equivalent to linear horizontal “lh” (sigma) and</p>
-<blockquote>
-<div><p>90 is linear vertical “lv” (pi).</p>
-</div></blockquote>
-</dd>
-</dl>
-<p>This device require a jaw_phase to angle conversion which is done via a polynomial.</p>
+<dd><p>Device to set the polarisation angle of the Apple2 undulator in Linear Arbitrary (LA) mode..</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>id</strong> (<a class="reference internal" href="dodal.devices.i10.i10_apple2.I10Apple2.html#dodal.devices.i10.i10_apple2.I10Apple2" title="dodal.devices.i10.i10_apple2.I10Apple2"><em>I10Apple2</em></a>)</p></li>
-<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
-<li><p><strong>jaw_phase_limit</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>)</p></li>
-<li><p><strong>jaw_phase_poly_param</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a>)</p></li>
-<li><p><strong>id</strong> – An I10Apple2 device.</p></li>
+<li><p><strong>id_controller</strong> (<a class="reference internal" href="dodal.devices.i10.i10_apple2.I10Apple2Controller.html#dodal.devices.i10.i10_apple2.I10Apple2Controller" title="dodal.devices.i10.i10_apple2.I10Apple2Controller"><em>I10Apple2Controller</em></a>)</p></li>
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><em>optional</em>)</p></li>
+<li><p><strong>id_controller</strong> – The I10Apple2Controller which control the ID.</p></li>
 <li><p><strong>name</strong> – New device name.</p></li>
-<li><p><strong>jaw_phase_limit</strong> – The maximum allowed jaw_phase movement.</p></li>
-<li><p><strong>jaw_phase_poly_param</strong> – polynomial parameters highest power first.</p></li>
 </ul>
 </dd>
 </dl>
 <p class="rubric">Methods</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">set</span></code>(value)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">set</span></code>(angle)</p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -1119,12 +1110,12 @@ The angle of 0 is equivalent to linear horizontal “lh” (sigma) and</p>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="dodal.devices.i10.i10_apple2.I10Id.html"
+       href="dodal.devices.i10.i10_apple2.I10EnergyMotorLookup.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">dodal.devices.i10.i10_apple2.I10Id</p>
+        <p class="prev-next-title">dodal.devices.i10.i10_apple2.I10EnergyMotorLookup</p>
       </div>
     </a>
     <a class="right-next"
