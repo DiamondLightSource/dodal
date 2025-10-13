@@ -185,7 +185,7 @@ async def beam_energy(
     mock_id_energy: InsertionDeviceEnergy, mock_pgm: PGM
 ) -> BeamEnergy:
     async with init_devices(mock=True):
-        beam_energy = BeamEnergy(id_energy=mock_id_energy, mono=mock_pgm)
+        beam_energy = BeamEnergy(id_energy=mock_id_energy, mono=mock_pgm.energy)
     return beam_energy
 
 

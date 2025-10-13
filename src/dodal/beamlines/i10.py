@@ -11,6 +11,7 @@ from daq_config_server.client import ConfigServer
 from dodal.common.beamlines.beamline_utils import device_factory
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.devices.apple2_undulator import (
+    BeamEnergy,
     InsertionDeviceEnergy,
     InsertionDevicePolarisation,
     UndulatorGap,
@@ -109,6 +110,12 @@ def idd_laa() -> LinearArbitraryAngle:
 
 
 @device_factory()
+def energy_dd() -> BeamEnergy:
+    """Beam energy from down energy devices."""
+    return BeamEnergy(id_energy=idd_energy(), mono=pgm().energy)
+
+
+@device_factory()
 def idu() -> I10Apple2:
     """i10 upstream insertion device"""
     return I10Apple2(
@@ -151,6 +158,12 @@ def idu_polarisation() -> InsertionDevicePolarisation:
 @device_factory()
 def idu_laa() -> LinearArbitraryAngle:
     return LinearArbitraryAngle(id_controller=idu_controller())
+
+
+@device_factory()
+def energy_ud() -> BeamEnergy:
+    """Beam energy from down energy devices."""
+    return BeamEnergy(id_energy=idu_energy(), mono=pgm().energy)
 
 
 """Mirrors"""

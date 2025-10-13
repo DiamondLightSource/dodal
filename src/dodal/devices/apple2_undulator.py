@@ -21,6 +21,7 @@ from ophyd_async.core import (
     wait_for_value,
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw, epics_signal_w
+from ophyd_async.epics.motor import Motor
 
 from dodal.devices.pgm import MonoEnergyBase
 from dodal.log import LOGGER
@@ -427,13 +428,14 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
 
         # Store the set energy for readback.
         self._energy, self._energy_set = soft_signal_r_and_setter(
-            float, initial_value=None
+            float, initial_value=None, units="eV"
         )
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             self.energy = derived_signal_rw(
                 raw_to_derived=self._read_energy,
                 set_derived=self._set_energy,
                 energy=self._energy,
+                derived_units="eV",
             )
 
         # Store the polarisation for setpoint. And provide readback for LH3.
@@ -598,12 +600,11 @@ class InsertionDeviceEnergyBase(abc.ABC, StandardReadable, Movable):
 
 class BeamEnergy(StandardReadable, Movable[float]):
     """
-    Compound device to set both ID and PGM energy at the same time with an option to add an offset.
-
+    Compound device to set both ID and energy motor at the same time with an option to add an offset.
     """
 
     def __init__(
-        self, id_energy: InsertionDeviceEnergyBase, mono: MonoEnergyBase, name: str = ""
+        self, id_energy: InsertionDeviceEnergyBase, mono: Motor, name: str = ""
     ) -> None:
         """
         Parameters
@@ -611,18 +612,18 @@ class BeamEnergy(StandardReadable, Movable[float]):
 
         id_energy: InsertionDeviceEnergy
             An InsertionDeviceEnergy device.
-        pgm: MonoEnergyBase
-            A energy device.
+        mono: Motor
+            A Motor(energy) device.
         name:
             New device name.
         """
         super().__init__(name=name)
-        self._Id_energy = Reference(id_energy)
-        self._mono_energy = Reference(mono.energy)
+        self._id_energy = Reference(id_energy)
+        self._mono_energy = Reference(mono)
 
         self.add_readables(
             [
-                self._Id_energy().energy(),
+                self._id_energy().energy(),
                 self._mono_energy().user_readback,
             ],
             StandardReadableFormat.HINTED_SIGNAL,
@@ -635,7 +636,7 @@ class BeamEnergy(StandardReadable, Movable[float]):
     async def set(self, energy: float) -> None:
         LOGGER.info(f"Moving f{self.name} energy to {energy}.")
         await asyncio.gather(
-            self._Id_energy().set(
+            self._id_energy().set(
                 energy=energy + await self.id_energy_offset.get_value()
             ),
             self._mono_energy().set(energy),
@@ -669,12 +670,7 @@ class InsertionDevicePolarisation(StandardReadable, Locatable[Pol]):
         self.polarisation_setpoint = Reference(id_controller.polarisation_setpoint)
         super().__init__(name=name)
 
-        self.add_readables(
-            [
-                self.polarisation(),
-            ],
-            StandardReadableFormat.HINTED_SIGNAL,
-        )
+        self.add_readables([self.polarisation()], StandardReadableFormat.HINTED_SIGNAL)
 
     @AsyncStatus.wrap
     async def set(self, pol: Pol) -> None:
