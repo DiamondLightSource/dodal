@@ -25,8 +25,9 @@ def robot() -> LaserRobot:
 
 @device_factory()
 def oav(params: OAVConfigBeamCentre | None = None) -> OAVBeamCentreFile:
+    config = params if params is not None else OAVConfigBeamCentre(zoom_params_file=ZOOM_PARAMS_FILE, display_config_file=DISPLAY_CONFIG)
     return OAVBeamCentreFile(
         prefix=f"{PREFIX}-DI-OAV-01:",
-        config=params or OAVConfigBeamCentre(ZOOM_PARAMS_FILE, DISPLAY_CONFIG),
+        config=config,
         zoom_controller=NullZoomController(),
     )
