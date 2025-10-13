@@ -599,8 +599,7 @@ class InsertionDeviceEnergyBase(abc.ABC, StandardReadable, Movable):
 
 class BeamEnergy(StandardReadable, Movable[float]):
     """
-    Compound device to set both ID and PGM energy at the same time with an option to add an offset.
-
+    Compound device to set both ID and energy motor at the same time with an option to add an offset.
     """
 
     def __init__(
