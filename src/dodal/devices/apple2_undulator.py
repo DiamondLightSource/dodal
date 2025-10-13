@@ -464,6 +464,27 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
         undulator design and the lookup table used.
         """
 
+    async def _check_and_get_pol_setpoint(self) -> Pol:
+        """
+        Check the polarisation setpoint and if it is NONE try to read it from
+        hardware.
+        """
+
+        pol = await self.polarisation_setpoint.get_value()
+
+        if pol == Pol.NONE:
+            LOGGER.warning(
+                "Found no setpoint for polarisation. Attempting to"
+                " determine polarisation from hardware..."
+            )
+            pol = await self.polarisation.get_value()
+            if pol == Pol.NONE:
+                raise ValueError(
+                    f"Polarisation cannot be determined from hardware for {self.name}"
+                )
+            self._polarisation_setpoint_set(pol)
+        return pol
+
     async def _set_energy(self, energy: float) -> None:
         await self._set_motors_from_energy(energy)
         self._energy_set(energy)
