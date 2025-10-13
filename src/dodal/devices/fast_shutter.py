@@ -49,11 +49,21 @@ class GenericFastShutter(StandardReadable, Movable[StrictEnumT]):
         await self.state.set(value)
 
     async def is_open(self) -> bool:
-        """Checks to see if shutter is in open_state. Should not be used directly in a
-        plan."""
+        """
+        Checks to see if shutter is in open_state. If need to be used inside a plan, a
+        user should use the following instead:
+
+            from bluesky import plan_stubs as bps
+            is_open = yield from bps.rd(shutter.state) == shutter.open_state
+        """
         return await self.state.get_value() == self.open_state
 
     async def is_closed(self) -> bool:
-        """Checks to see if shutter is in close_state. Should not be used directly in a
-        plan."""
+        """
+        Checks to see if shutter is in close_state. If need to be used inside a plan, a
+        user should use the following instead:
+
+            from bluesky import plan_stubs as bps
+            is_closed = yield from bps.rd(shutter.state) == shutter.clsoe_state
+        """
         return await self.state.get_value() == self.close_state
