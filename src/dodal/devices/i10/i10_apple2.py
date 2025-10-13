@@ -433,20 +433,7 @@ class I10Apple2Controller(Apple2Controller[I10Apple2]):
         Set the undulator motors for a given energy and polarisation.
         """
 
-        pol = await self.polarisation_setpoint.get_value()
-
-        if pol == Pol.NONE:
-            LOGGER.warning(
-                "Found no setpoint for polarisation. Attempting to"
-                " determine polarisation from hardware..."
-            )
-            pol = await self.polarisation.get_value()
-            if pol == Pol.NONE:
-                raise ValueError(
-                    f"Polarisation cannot be determined from hardware for {self.name}"
-                )
-
-            self._polarisation_setpoint_set(pol)
+        pol = await self._check_and_get_pol_setpoint()
         gap, phase = self.energy_to_motor(energy=value, pol=pol)
         phase3 = phase * (-1 if pol == Pol.LA else 1)
         id_set_val = Apple2Val(
