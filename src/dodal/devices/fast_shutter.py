@@ -49,9 +49,11 @@ class GenericFastShutter(StandardReadable, Movable[StrictEnumT]):
         await self.state.set(value)
 
     async def is_open(self) -> bool:
-        """Checks to see if shutter is currently open"""
+        """Checks to see if shutter is in open_state. Should not be used directly in a
+        plan."""
         return await self.state.get_value() == self.open_state
 
     async def is_closed(self) -> bool:
-        """Checks to see if shutter is currently closed"""
+        """Checks to see if shutter is in close_state. Should not be used directly in a
+        plan."""
         return await self.state.get_value() == self.close_state
