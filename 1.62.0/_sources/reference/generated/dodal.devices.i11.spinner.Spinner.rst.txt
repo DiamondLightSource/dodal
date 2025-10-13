@@ -1,0 +1,46 @@
+dodal.devices.i11.spinner.Spinner
+=================================
+
+.. currentmodule:: dodal.devices.i11.spinner
+
+.. autoclass:: Spinner
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      ~Spinner.pause
+      
+      
+      
+      
+      ~Spinner.resume
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

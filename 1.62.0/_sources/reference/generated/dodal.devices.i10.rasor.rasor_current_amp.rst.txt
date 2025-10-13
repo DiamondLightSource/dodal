@@ -1,0 +1,37 @@
+dodal.devices.i10.rasor.rasor\_current\_amp
+===========================================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices.i10.rasor
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~rasor_current_amp.RasorFemto
+   ~rasor_current_amp.RasorSR570
+
+
+
+
+.. automodule:: dodal.devices.i10.rasor.rasor_current_amp
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

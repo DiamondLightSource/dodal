@@ -1,0 +1,50 @@
+dodal.devices.i22.fswitch.FSwitch
+=================================
+
+.. currentmodule:: dodal.devices.i22.fswitch
+
+.. autoclass:: FSwitch
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      ~FSwitch.describe
+      
+      
+      
+      ~FSwitch.read
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~FSwitch.NUM_FILTERS
+      
+      
+      ~FSwitch.NUM_LENSES_FIELD_NAME
+      
+      
+      
+      
+      
+   
+   

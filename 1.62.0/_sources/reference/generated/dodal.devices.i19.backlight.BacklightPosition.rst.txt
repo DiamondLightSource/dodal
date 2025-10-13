@@ -1,0 +1,43 @@
+dodal.devices.i19.backlight.BacklightPosition
+=============================================
+
+.. currentmodule:: dodal.devices.i19.backlight
+
+.. autoclass:: BacklightPosition
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~BacklightPosition.set
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

@@ -1,0 +1,37 @@
+dodal.devices.i10.i10\_apple2.I10EnergyMotorLookup
+==================================================
+
+.. currentmodule:: dodal.devices.i10.i10_apple2
+
+.. autoclass:: I10EnergyMotorLookup
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      ~I10EnergyMotorLookup.convert_csv_to_lookup
+      
+      
+      ~I10EnergyMotorLookup.get_motor_from_energy
+      
+      
+      ~I10EnergyMotorLookup.update_lookuptable
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~I10EnergyMotorLookup.available_pol
+      
+   
+   

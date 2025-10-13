@@ -1,0 +1,96 @@
+dodal.devices.areadetector.plugins.CAM.ColorMode
+================================================
+
+.. currentmodule:: dodal.devices.areadetector.plugins.CAM
+
+.. autoclass:: ColorMode
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~ColorMode.MONO
+      
+      
+      ~ColorMode.BAYER
+      
+      
+      ~ColorMode.RGB1
+      
+      
+      ~ColorMode.RGB2
+      
+      
+      ~ColorMode.RGB3
+      
+      
+      ~ColorMode.YUV444
+      
+      
+      ~ColorMode.YUV422
+      
+      
+      ~ColorMode.YUV421
+      
+   
+   

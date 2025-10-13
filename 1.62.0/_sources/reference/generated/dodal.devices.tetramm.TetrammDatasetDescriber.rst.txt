@@ -1,0 +1,26 @@
+dodal.devices.tetramm.TetrammDatasetDescriber
+=============================================
+
+.. currentmodule:: dodal.devices.tetramm
+
+.. autoclass:: TetrammDatasetDescriber
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      ~TetrammDatasetDescriber.np_datatype
+      
+      
+      ~TetrammDatasetDescriber.shape
+      
+   
+   
+
+   
+   
+   

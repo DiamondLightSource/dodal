@@ -1,0 +1,93 @@
+dodal.devices.i18.diode.FilterBValues
+=====================================
+
+.. currentmodule:: dodal.devices.i18.diode
+
+.. autoclass:: FilterBValues
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~FilterBValues.DIAMOND_THIN
+      
+      
+      ~FilterBValues.DIAMOND_THICK
+      
+      
+      ~FilterBValues.NI_DRAIN
+      
+      
+      ~FilterBValues.AU_DRAIN
+      
+      
+      ~FilterBValues.AL_DRAIN
+      
+      
+      ~FilterBValues.GAP
+      
+      
+      ~FilterBValues.IN_LINE_DIODE
+      
+   
+   
