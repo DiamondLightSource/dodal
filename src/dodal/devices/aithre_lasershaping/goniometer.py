@@ -19,16 +19,16 @@ class Goniometer(XYZOmegaStage):
         self,
         prefix: str,
         name: str = "",
-        x_infix: str = _X,
-        y_infix: str = _SAMPY,
-        z_infix: str = _SAMPZ,
-        omega_infix: str = _OMEGA
-        stage_y_infix: str = _Y,
-        stage_z_infix: str = _Z
+        x_infix: str = "X",
+        y_infix: str = "SAMPY",
+        z_infix: str = "SAMPZ",
+        omega_infix: str = "OMEGA",
+        stage_y_infix: str = "Y",
+        stage_z_infix: str = "Z"
     ) -> None:
         super().__init__(
             prefix=prefix,
-            name=name
+            name=name,
             x_infix=x_infix,
             y_infix=y_infix,
             z_infix=z_infix,
