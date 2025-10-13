@@ -31,8 +31,8 @@ class MJPG(StandardReadable, Triggerable, ABC):
     def __init__(self, prefix: str, name: str = "") -> None:
         self.url = epics_signal_rw(str, prefix + "JPG_URL_RBV")
 
-        self.x_size = epics_signal_r(int, prefix + "ArraySize1_RBV")
-        self.y_size = epics_signal_r(int, prefix + "ArraySize2_RBV")
+        self.x_size = epics_signal_r(int, prefix + "ArraySize0_RBV")
+        self.y_size = epics_signal_r(int, prefix + "ArraySize1_RBV")
 
         with self.add_children_as_readables():
             self.filename = soft_signal_rw(str)
