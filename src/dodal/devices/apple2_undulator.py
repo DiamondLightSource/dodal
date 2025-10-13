@@ -669,12 +669,7 @@ class InsertionDevicePolarisation(StandardReadable, Locatable[Pol]):
         self.polarisation_setpoint = Reference(id_controller.polarisation_setpoint)
         super().__init__(name=name)
 
-        self.add_readables(
-            [
-                self.polarisation(),
-            ],
-            StandardReadableFormat.HINTED_SIGNAL,
-        )
+        self.add_readables([self.polarisation()], StandardReadableFormat.HINTED_SIGNAL)
 
     @AsyncStatus.wrap
     async def set(self, pol: Pol) -> None:
