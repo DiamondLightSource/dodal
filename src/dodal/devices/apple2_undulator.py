@@ -623,7 +623,7 @@ class BeamEnergy(StandardReadable, Movable[float]):
 
         self.add_readables(
             [
-                self._Id_energy().energy(),
+                self._id_energy().energy(),
                 self._mono_energy().user_readback,
             ],
             StandardReadableFormat.HINTED_SIGNAL,
@@ -636,7 +636,7 @@ class BeamEnergy(StandardReadable, Movable[float]):
     async def set(self, energy: float) -> None:
         LOGGER.info(f"Moving f{self.name} energy to {energy}.")
         await asyncio.gather(
-            self._Id_energy().set(
+            self._id_energy().set(
                 energy=energy + await self.id_energy_offset.get_value()
             ),
             self._mono_energy().set(energy),
