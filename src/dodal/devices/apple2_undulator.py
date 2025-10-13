@@ -617,7 +617,7 @@ class BeamEnergy(StandardReadable, Movable[float]):
             New device name.
         """
         super().__init__(name=name)
-        self._Id_energy = Reference(id_energy)
+        self._id_energy = Reference(id_energy)
         self._mono_energy = Reference(mono.energy)
 
         self.add_readables(
