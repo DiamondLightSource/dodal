@@ -21,8 +21,8 @@ from ophyd_async.core import (
     wait_for_value,
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw, epics_signal_w
+from ophyd_async.epics.motor import Motor
 
-from dodal.devices.pgm import MonoEnergyBase
 from dodal.log import LOGGER
 
 T = TypeVar("T")
@@ -604,7 +604,7 @@ class BeamEnergy(StandardReadable, Movable[float]):
     """
 
     def __init__(
-        self, id_energy: InsertionDeviceEnergyBase, mono: MonoEnergyBase, name: str = ""
+        self, id_energy: InsertionDeviceEnergyBase, mono: Motor, name: str = ""
     ) -> None:
         """
         Parameters
@@ -612,14 +612,14 @@ class BeamEnergy(StandardReadable, Movable[float]):
 
         id_energy: InsertionDeviceEnergy
             An InsertionDeviceEnergy device.
-        pgm: MonoEnergyBase
-            A energy device.
+        mono: Motor
+            A Motor(energy) device.
         name:
             New device name.
         """
         super().__init__(name=name)
         self._id_energy = Reference(id_energy)
-        self._mono_energy = Reference(mono.energy)
+        self._mono_energy = Reference(mono)
 
         self.add_readables(
             [

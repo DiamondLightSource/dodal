@@ -1,5 +1,3 @@
-import abc
-
 from ophyd_async.core import (
     StandardReadable,
     StandardReadableFormat,
@@ -9,15 +7,7 @@ from ophyd_async.epics.core import epics_signal_rw
 from ophyd_async.epics.motor import Motor
 
 
-class MonoEnergyBase(abc.ABC, StandardReadable):
-    """Base class for Mono energy movable device."""
-
-    def __init__(self, name: str = "") -> None:
-        self.energy: Motor
-        super().__init__(name=name)
-
-
-class PGM(MonoEnergyBase):
+class PGM(StandardReadable):
     """
     Plane grating monochromator, it is use in soft x-ray beamline to generate monochromic beam.
     """

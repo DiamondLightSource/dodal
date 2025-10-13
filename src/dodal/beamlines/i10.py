@@ -112,7 +112,7 @@ def idd_laa() -> LinearArbitraryAngle:
 @device_factory()
 def energy_dd() -> BeamEnergy:
     """Beam energy from down energy devices."""
-    return BeamEnergy(id_energy=idd_energy(), mono=pgm())
+    return BeamEnergy(id_energy=idd_energy(), mono=pgm().energy)
 
 
 @device_factory()
@@ -163,7 +163,7 @@ def idu_laa() -> LinearArbitraryAngle:
 @device_factory()
 def energy_ud() -> BeamEnergy:
     """Beam energy from down energy devices."""
-    return BeamEnergy(id_energy=idu_energy(), mono=pgm())
+    return BeamEnergy(id_energy=idu_energy(), mono=pgm().energy)
 
 
 """Mirrors"""
