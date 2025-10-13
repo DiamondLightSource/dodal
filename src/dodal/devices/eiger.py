@@ -335,8 +335,9 @@ class EigerDetector(Device, Stageable):
         if self.detector_params.trigger_mode == TriggerMode.FREE_RUN:
             # The Eiger can't actually free run so we set a very large number of frames
             status &= self.cam.num_triggers.set(
-                FREE_RUN_MAX_IMAGES, timeout=self.timeouts.general_status_timeout
+                self.detector_params.num, timeout=self.timeouts.general_status_timeout
             )
+
             # Setting Odin to write 0 frames tells it to write until externally stopped
             status &= self.odin.file_writer.num_capture.set(
                 0, timeout=self.timeouts.general_status_timeout
@@ -350,6 +351,9 @@ class EigerDetector(Device, Stageable):
                 self.detector_params.full_number_of_images,
                 timeout=self.timeouts.general_status_timeout,
             )
+        LOGGER.info(
+            f"Eiger arming: Taking {self.detector_params.num_images_per_trigger} images per trigger and expecting {self.detector_params.num_triggers} total triggers"
+        )
 
         return status
 
