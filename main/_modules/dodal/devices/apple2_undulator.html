@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.apple2_undulator &#8212; dodal 1.62.1.dev3+gc0e74bee7 documentation</title>
+    <title>dodal.devices.apple2_undulator &#8212; dodal 1.62.1.dev4+g4451ac5b1 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=7bcca2cd"></script>
+    <script src="../../../_static/documentation_options.js?v=1318ec80"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -973,6 +973,27 @@ window.addEventListener("load", () => mermaid.run());
     <span class="k">def</span><span class="w"> </span><span class="nf">_read_energy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energy</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Readback for energy is just the set value.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">energy</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_check_and_get_pol_setpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Pol</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check the polarisation setpoint and if it is NONE try to read it from</span>
+<span class="sd">        hardware.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">pol</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">polarisation_setpoint</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">pol</span> <span class="o">==</span> <span class="n">Pol</span><span class="o">.</span><span class="n">NONE</span><span class="p">:</span>
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="s2">&quot;Found no setpoint for polarisation. Attempting to&quot;</span>
+                <span class="s2">&quot; determine polarisation from hardware...&quot;</span>
+            <span class="p">)</span>
+            <span class="n">pol</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">polarisation</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">pol</span> <span class="o">==</span> <span class="n">Pol</span><span class="o">.</span><span class="n">NONE</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Polarisation cannot be determined from hardware for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_polarisation_setpoint_set</span><span class="p">(</span><span class="n">pol</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">pol</span>
 
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_set_pol</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
