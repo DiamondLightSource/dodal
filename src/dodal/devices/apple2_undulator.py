@@ -620,8 +620,7 @@ class InsertionDeviceEnergyBase(abc.ABC, StandardReadable, Movable):
 
 class BeamEnergy(StandardReadable, Movable[float]):
     """
-    Compound device to set both ID and PGM energy at the same time with an option to add an offset.
-
+    Compound device to set both ID and energy motor at the same time with an option to add an offset.
     """
 
     def __init__(
@@ -691,12 +690,7 @@ class InsertionDevicePolarisation(StandardReadable, Locatable[Pol]):
         self.polarisation_setpoint = Reference(id_controller.polarisation_setpoint)
         super().__init__(name=name)
 
-        self.add_readables(
-            [
-                self.polarisation(),
-            ],
-            StandardReadableFormat.HINTED_SIGNAL,
-        )
+        self.add_readables([self.polarisation()], StandardReadableFormat.HINTED_SIGNAL)
 
     @AsyncStatus.wrap
     async def set(self, pol: Pol) -> None:
