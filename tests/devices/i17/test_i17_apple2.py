@@ -35,9 +35,7 @@ async def test_set_motors_from_energy_sets_correct_values():
     )
     # Mock polarisation setpoint check
     controller._check_and_get_pol_setpoint = AsyncMock(return_value=Pol.LH)
-    # Act
     await controller._set_motors_from_energy(100.0)
-    # Assert
     mock_energy_to_motor.assert_called_once_with(energy=100.0, pol=Pol.LH)
     expected_val = Apple2Val(
         top_outer=f"{7.5:.6f}",
