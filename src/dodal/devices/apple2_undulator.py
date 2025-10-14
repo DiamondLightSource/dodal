@@ -464,6 +464,22 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
         undulator design and the lookup table used.
         """
 
+    async def _set_energy(self, energy: float) -> None:
+        await self._set_motors_from_energy(energy)
+        self._energy_set(energy)
+
+    def _read_energy(self, energy: float) -> float:
+        """Readback for energy is just the set value."""
+        return energy
+
+    @abc.abstractmethod
+    async def _set_motors_from_energy(self, value: float) -> None:
+        """
+        This method should be implemented by the beamline specific ID class as the
+        motor positions will be different for each beamline depending on the
+        undulator design and the lookup table used.
+        """
+
     async def _check_and_get_pol_setpoint(self) -> Pol:
         """
         Check the polarisation setpoint and if it is NONE try to read it from
@@ -604,6 +620,104 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
 
         LOGGER.warning("Unable to determine polarisation. Defaulting to NONE.")
         return Pol.NONE, 0.0
+
+
+class InsertionDeviceEnergyBase(abc.ABC, StandardReadable, Movable):
+    """Base class for ID energy movable device."""
+
+    def __init__(self, name: str = "") -> None:
+        self.energy: Reference[SignalRW[float]]
+        super().__init__(name=name)
+
+    @abc.abstractmethod
+    @AsyncStatus.wrap
+    async def set(self, energy: float) -> None: ...
+
+
+class BeamEnergy(StandardReadable, Movable[float]):
+    """
+    Compound device to set both ID and energy motor at the same time with an option to add an offset.
+    """
+
+    def __init__(
+        self, id_energy: InsertionDeviceEnergyBase, mono: Motor, name: str = ""
+    ) -> None:
+        """
+        Parameters
+        ----------
+
+        id_energy: InsertionDeviceEnergy
+            An InsertionDeviceEnergy device.
+        mono: Motor
+            A Motor(energy) device.
+        name:
+            New device name.
+        """
+        super().__init__(name=name)
+        self._id_energy = Reference(id_energy)
+        self._mono_energy = Reference(mono)
+
+        self.add_readables(
+            [
+                self._id_energy().energy(),
+                self._mono_energy().user_readback,
+            ],
+            StandardReadableFormat.HINTED_SIGNAL,
+        )
+
+        with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
+            self.id_energy_offset = soft_signal_rw(float, initial_value=0)
+
+    @AsyncStatus.wrap
+    async def set(self, energy: float) -> None:
+        LOGGER.info(f"Moving f{self.name} energy to {energy}.")
+        await asyncio.gather(
+            self._id_energy().set(
+                energy=energy + await self.id_energy_offset.get_value()
+            ),
+            self._mono_energy().set(energy),
+        )
+
+
+class InsertionDeviceEnergy(InsertionDeviceEnergyBase):
+    """Apple2 ID energy movable device."""
+
+    def __init__(self, id_controller: Apple2Controller, name: str = "") -> None:
+        self.energy = Reference(id_controller.energy)
+        super().__init__(name=name)
+
+        self.add_readables(
+            [
+                self.energy(),
+            ],
+            StandardReadableFormat.HINTED_SIGNAL,
+        )
+
+    @AsyncStatus.wrap
+    async def set(self, energy: float) -> None:
+        await self.energy().set(energy)
+
+
+class InsertionDevicePolarisation(StandardReadable, Locatable[Pol]):
+    """Apple2 ID polarisation movable device."""
+
+    def __init__(self, id_controller: Apple2Controller, name: str = "") -> None:
+        self.polarisation = Reference(id_controller.polarisation)
+        self.polarisation_setpoint = Reference(id_controller.polarisation_setpoint)
+        super().__init__(name=name)
+
+        self.add_readables([self.polarisation()], StandardReadableFormat.HINTED_SIGNAL)
+
+    @AsyncStatus.wrap
+    async def set(self, pol: Pol) -> None:
+        await self.polarisation().set(pol)
+
+    async def locate(self) -> Location[Pol]:
+        """Return the current polarisation"""
+        setpoint, readback = await asyncio.gather(
+            self.polarisation_setpoint().get_value(), self.polarisation().get_value()
+        )
+        return Location(setpoint=setpoint, readback=readback)
 
 
 class InsertionDeviceEnergyBase(abc.ABC, StandardReadable, Movable):
