@@ -76,11 +76,11 @@ def id_energy() -> InsertionDeviceEnergy:
 
 
 @device_factory(skip=True)
-def idd_polarisation() -> InsertionDevicePolarisation:
+def id_polarisation() -> InsertionDevicePolarisation:
     return InsertionDevicePolarisation(id_controller=id_controller())
 
 
 @device_factory(skip=True)
 def energy() -> BeamEnergy:
-    """Beam energy from down energy devices."""
+    """Beam energy."""
     return BeamEnergy(id_energy=id_energy(), mono=pgm().energy)
