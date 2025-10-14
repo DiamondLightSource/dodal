@@ -17,7 +17,7 @@ MAXIMUM_MOVE_TIME = 550  # There is no useful movements take longer than this.
 class I17Apple2Controller(Apple2Controller[Apple2]):
     """
     I10Apple2Controller is a extension of Apple2Controller which provide linear
-     arbitrary angle control.
+    arbitrary angle control.
     """
 
     def __init__(
