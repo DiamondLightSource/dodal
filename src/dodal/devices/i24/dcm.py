@@ -1,13 +1,13 @@
 from ophyd_async.epics.core import epics_signal_r
 
 from dodal.devices.common_dcm import (
-    BaseDCM,
+    DoubleCrystalMonochromator,
     PitchAndRollCrystal,
     RollCrystal,
 )
 
 
-class DCM(BaseDCM[RollCrystal, PitchAndRollCrystal]):
+class DCM(DoubleCrystalMonochromator[RollCrystal, PitchAndRollCrystal]):
     """
     A double crystal monocromator device, used to select the beam energy.
     """
@@ -25,5 +25,9 @@ class DCM(BaseDCM[RollCrystal, PitchAndRollCrystal]):
             self.backplate_temp = epics_signal_r(float, prefix + "PT100-7")
             self.b1_plate_temp = epics_signal_r(float, prefix + "PT100-7")
             self.gap_temp = epics_signal_r(float, prefix + "TC-1")
+
+            self.crystal_metadata_d_spacing_a = epics_signal_r(
+                float, prefix + "DSPACING:RBV"
+            )
 
         super().__init__(motion_prefix, RollCrystal, PitchAndRollCrystal, name)

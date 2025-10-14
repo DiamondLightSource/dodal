@@ -13,7 +13,7 @@ from ophyd_async.epics.motor import Motor
 
 from dodal.common.crystal_metadata import CrystalMetadata
 from dodal.devices.common_dcm import (
-    BaseDCM,
+    DoubleCrystalMonochromator,
     PitchAndRollCrystal,
     RollCrystal,
 )
@@ -23,7 +23,7 @@ from dodal.devices.common_dcm import (
 _CONVERSION_CONSTANT = 12.3984
 
 
-class DCM(BaseDCM[RollCrystal, PitchAndRollCrystal]):
+class DCM(DoubleCrystalMonochromator[RollCrystal, PitchAndRollCrystal]):
     """
     A double crystal monochromator (DCM), used to select the energy of the beam.
 
@@ -55,6 +55,10 @@ class DCM(BaseDCM[RollCrystal, PitchAndRollCrystal]):
             self.crystal_2_temp = epics_signal_r(float, temperature_prefix + "PT100-4")
             self.crystal_2_heater_temp = epics_signal_r(
                 float, temperature_prefix + "PT100-5"
+            )
+
+            self.crystal_metadata_d_spacing_a = epics_signal_r(
+                float, prefix + "DSPACING:RBV"
             )
 
         # Soft metadata
