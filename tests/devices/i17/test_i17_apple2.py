@@ -13,8 +13,8 @@ from dodal.devices.apple2_undulator import (
 from dodal.devices.i17.i17_apple2 import I17Apple2Controller
 
 
-@pytest.mark.asyncio
-async def test_set_motors_from_energy_sets_correct_values():
+@pytest.fixture
+async def mock_apple2():
     async with init_devices(mock=True):
         mock_id_gap = UndulatorGap("BLXX-EA-DET-007:")
         mock_phaseAxes = UndulatorPhaseAxes(
@@ -24,8 +24,12 @@ async def test_set_motors_from_energy_sets_correct_values():
             btm_outer="RPQ3",
             btm_inner="RPQ4",
         )
-
     mock_apple2 = Apple2(id_gap=mock_id_gap, id_phase=mock_phaseAxes)
+
+    return mock_apple2
+
+
+async def test_set_motors_from_energy_sets_correct_values(mock_apple2: Apple2):
     mock_apple2.set = AsyncMock()
     mock_energy_to_motor = MagicMock(return_value=(42.0, 7.5))
     controller = I17Apple2Controller(
@@ -35,9 +39,7 @@ async def test_set_motors_from_energy_sets_correct_values():
     )
     # Mock polarisation setpoint check
     controller._check_and_get_pol_setpoint = AsyncMock(return_value=Pol.LH)
-    # Act
     await controller._set_motors_from_energy(100.0)
-    # Assert
     mock_energy_to_motor.assert_called_once_with(energy=100.0, pol=Pol.LH)
     expected_val = Apple2Val(
         top_outer=f"{7.5:.6f}",
