@@ -27,21 +27,21 @@ class GenericFastShutter(StandardReadable, Movable[StrictEnumT]):
 
     def __init__(
         self,
-        prefix: str,
+        pv: str,
         open_state: StrictEnumT,
         close_state: StrictEnumT,
         name: str = "",
     ):
         """
         Arguments:
-            prefix: The prefix for the shutter device.
+            pv: The pv to connect to the shutter device.
             open_state: The enum value that corresponds with opening the shutter.
             close_state: The enum value that corresponds with closing the shutter.
         """
         self.open_state = open_state
         self.close_state = close_state
         with self.add_children_as_readables():
-            self.state = epics_signal_rw(type(self.open_state), prefix)
+            self.state = epics_signal_rw(type(self.open_state), pv)
         super().__init__(name)
 
     @AsyncStatus.wrap
@@ -49,9 +49,21 @@ class GenericFastShutter(StandardReadable, Movable[StrictEnumT]):
         await self.state.set(value)
 
     async def is_open(self) -> bool:
-        """Checks to see if shutter is currently open"""
+        """
+        Checks to see if shutter is in open_state. Should not be used directly inside a
+        plan. A user should use the following instead in a plan:
+
+            from bluesky import plan_stubs as bps
+            is_open = yield from bps.rd(shutter.state) == shutter.open_state
+        """
         return await self.state.get_value() == self.open_state
 
     async def is_closed(self) -> bool:
-        """Checks to see if shutter is currently closed"""
+        """
+        Checks to see if shutter is in close_state. Should not be used directly inside a
+        plan. A user should use the following instead in a plan:
+
+            from bluesky import plan_stubs as bps
+            is_closed = yield from bps.rd(shutter.state) == shutter.close_state
+        """
         return await self.state.get_value() == self.close_state
