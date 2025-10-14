@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.fast_shutter &#8212; dodal 1.62.1.dev2+g4413e404f documentation</title>
+    <title>dodal.devices.fast_shutter &#8212; dodal 1.62.1.dev3+gc0e74bee7 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=0e5bff4f"></script>
+    <script src="../../../_static/documentation_options.js?v=7bcca2cd"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -481,21 +481,21 @@ window.addEventListener("load", () => mermaid.run());
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">pv</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">open_state</span><span class="p">:</span> <span class="n">StrictEnumT</span><span class="p">,</span>
         <span class="n">close_state</span><span class="p">:</span> <span class="n">StrictEnumT</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Arguments:</span>
-<span class="sd">            prefix: The prefix for the shutter device.</span>
+<span class="sd">            pv: The pv to connect to the shutter device.</span>
 <span class="sd">            open_state: The enum value that corresponds with opening the shutter.</span>
 <span class="sd">            close_state: The enum value that corresponds with closing the shutter.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">open_state</span> <span class="o">=</span> <span class="n">open_state</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">close_state</span> <span class="o">=</span> <span class="n">close_state</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">open_state</span><span class="p">),</span> <span class="n">prefix</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">open_state</span><span class="p">),</span> <span class="n">pv</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
     <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
@@ -505,14 +505,26 @@ window.addEventListener("load", () => mermaid.run());
 <div class="viewcode-block" id="GenericFastShutter.is_open">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.fast_shutter.GenericFastShutter.html#dodal.devices.fast_shutter.GenericFastShutter.is_open">[docs]</a>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">is_open</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Checks to see if shutter is currently open&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks to see if shutter is in open_state. Should not be used directly inside a</span>
+<span class="sd">        plan. A user should use the following instead in a plan:</span>
+
+<span class="sd">            from bluesky import plan_stubs as bps</span>
+<span class="sd">            is_open = yield from bps.rd(shutter.state) == shutter.open_state</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">open_state</span></div>
 
 
 <div class="viewcode-block" id="GenericFastShutter.is_closed">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.fast_shutter.GenericFastShutter.html#dodal.devices.fast_shutter.GenericFastShutter.is_closed">[docs]</a>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">is_closed</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Checks to see if shutter is currently closed&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks to see if shutter is in close_state. Should not be used directly inside a</span>
+<span class="sd">        plan. A user should use the following instead in a plan:</span>
+
+<span class="sd">            from bluesky import plan_stubs as bps</span>
+<span class="sd">            is_closed = yield from bps.rd(shutter.state) == shutter.close_state</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">close_state</span></div>
 </div>
 
