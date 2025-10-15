@@ -6,7 +6,7 @@ import pytest
 from ophyd_async.core import PathProvider, StandardDetector, init_devices
 from ophyd_async.sim import PatternGenerator, SimBlobDetector, SimMotor
 
-from dodal.devices.common_dcm import DoubleCrystalMonochromator
+from dodal.devices.common_dcm import DoubleCrystalMonochromatorBase
 from dodal.devices.i03.dcm import DCM
 from dodal.devices.undulator import Undulator
 from tests.devices.test_data import (
@@ -15,7 +15,7 @@ from tests.devices.test_data import (
 
 
 class UndulatorGapCheckDevices:
-    def __init__(self, undulator: Undulator, dcm: DoubleCrystalMonochromator):
+    def __init__(self, undulator: Undulator, dcm: DoubleCrystalMonochromatorBase):
         self.undulator = undulator
         self.dcm = dcm
 

@@ -19,6 +19,7 @@ class DCM(DoubleCrystalMonochromator[PitchAndRollCrystal, StationaryCrystal]):
 
     def __init__(self, prefix: str, name: str = "") -> None:
         super().__init__(prefix, PitchAndRollCrystal, StationaryCrystal, name)
-        self.crystal_metadata_d_spacing_a = epics_signal_r(
-            float, prefix + "DSPACING:RBV"
-        )
+        with self.add_children_as_readables():
+            self.crystal_metadata_d_spacing_a = epics_signal_r(
+                float, prefix + "DSPACING:RBV"
+            )
