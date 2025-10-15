@@ -42,10 +42,10 @@ async def test_set_motors_from_energy_sets_correct_values(mock_apple2: Apple2):
     await controller._set_motors_from_energy(100.0)
     mock_energy_to_motor.assert_called_once_with(energy=100.0, pol=Pol.LH)
     expected_val = Apple2Val(
-        top_outer=f"{7.5:.6f}",
-        top_inner="0.0",
-        btm_inner=f"{7.5:.6f}",
-        btm_outer="0.0",
-        gap=f"{42.0:.6f}",
+        top_outer=7.5,
+        top_inner=0.0,
+        btm_inner=7.5,
+        btm_outer=0.0,
+        gap=42.0,
     )
     mock_apple2.set.assert_awaited_once_with(id_motor_values=expected_val)
