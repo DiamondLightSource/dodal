@@ -96,7 +96,7 @@ class DoubleCrystalMonochromator(
         super().__init__(prefix, xtal_1, xtal_2, name)
         with self.add_children_as_readables():
             # Virtual motor PV's which set the physical motors so that the DCM produces requested
-            # wavelength/energy
+            # wavelength
             self.wavelength_in_a = Motor(prefix + "WAVELENGTH")
 
             # Real motors
