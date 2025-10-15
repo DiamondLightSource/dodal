@@ -26,6 +26,9 @@ class ThetaRollYZCrystal(ThetaYCrystal):
 class DCM(DoubleCrystalMonochromatorBase[ThetaRollYZCrystal, ThetaYCrystal]):
     """
     A double crystal monocromator device, used to select the beam energy.
+
+    Once the i15 DCM supports all of the PVs required by BaseDCM, this class can be
+    changed to inherit from BaseDCM and BaseDCMforI15 can be removed.
     """
 
     def __init__(self, prefix: str, name: str = "") -> None:
