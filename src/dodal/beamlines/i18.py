@@ -52,7 +52,7 @@ def synchrotron() -> Synchrotron:
 def undulator() -> Undulator:
     return Undulator(f"{PREFIX.insertion_prefix}-MO-SERVC-01:")
 
-
+# See https://github.com/DiamondLightSource/dodal/issues/1180
 @device_factory(skip=True)
 def dcm() -> DCM:
     return DCM(prefix=f"{PREFIX.beamline_prefix}-MO-DCM-01:")
