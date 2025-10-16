@@ -124,7 +124,6 @@ def test_main(
     expected_output_file,
     expected_return_value,
 ):
-    args.insert(0, "save_panda")
     env_patch = {}
     if beamline:
         env_patch["BEAMLINE"] = beamline
@@ -165,7 +164,6 @@ def test_file_exists_check(
     exists = mock_path.return_value.exists
     exists.return_value = file_exists
     argv = [
-        "save_panda",
         "--beamline=i03",
         f"--output-file={tmpdir}/test_output_file.yml",
     ]
