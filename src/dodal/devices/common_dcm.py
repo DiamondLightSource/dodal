@@ -4,6 +4,7 @@ from ophyd_async.core import (
     StandardReadable,
     derived_signal_r,
 )
+from ophyd_async.epics.core import epics_signal_r
 from ophyd_async.epics.motor import Motor
 
 
@@ -103,3 +104,21 @@ class DoubleCrystalMonochromator(
             self.bragg_in_degrees = Motor(prefix + "BRAGG")
             # Offset ensures that the beam exits the DCM at the same point, regardless of energy.
             self.offset_in_mm = Motor(prefix + "OFFSET")
+
+
+class DoubleCrystalMonochromatorWithDSpacing(
+    DoubleCrystalMonochromator, Generic[Xtal_1, Xtal_2]
+):
+    """
+    Adds crystal D-spacing metadata to the DoubleCrystalMonochromator class.  This should be used in preference to the
+    DoubleCrystalMonochromator on beamlines which have a "DSPACING:RBV" pv on their DCM.
+    """
+
+    def __init__(
+        self, prefix: str, xtal_1: type[Xtal_1], xtal_2: type[Xtal_2], name: str = ""
+    ) -> None:
+        super().__init__(prefix, xtal_1, xtal_2, name)
+        with self.add_children_as_readables():
+            self.crystal_metadata_d_spacing_a = epics_signal_r(
+                float, prefix + "DSPACING:RBV"
+            )

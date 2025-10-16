@@ -12,7 +12,11 @@ from dodal.common.visit import (
     LocalDirectoryServiceClient,
     StaticVisitPathProvider,
 )
-from dodal.devices.i18.dcm import DCM
+from dodal.devices.common_dcm import (
+    DoubleCrystalMonochromatorWithDSpacing,
+    PitchAndRollCrystal,
+    RollCrystal,
+)
 from dodal.devices.i18.diode import Diode
 from dodal.devices.i18.KBMirror import KBMirror
 from dodal.devices.motors import XYStage, XYZThetaStage
@@ -55,8 +59,16 @@ def undulator() -> Undulator:
 
 # See https://github.com/DiamondLightSource/dodal/issues/1180
 @device_factory(skip=True)
-def dcm() -> DCM:
-    return DCM(prefix=f"{PREFIX.beamline_prefix}-MO-DCM-01:")
+def dcm() -> DoubleCrystalMonochromatorWithDSpacing:
+    """
+    A double crystal monocromator device, used to select the beam energy.
+
+    Once spacing is added Si111 d-spacing is 3.135 angsterm , and Si311 is 1.637
+    calculations are in gda/config/lookupTables/Si111/eV_Deg_converter.xml
+    """
+    return DoubleCrystalMonochromatorWithDSpacing(
+        f"{PREFIX.beamline_prefix}-MO-DCM-01:", RollCrystal, PitchAndRollCrystal
+    )
 
 
 @device_factory()

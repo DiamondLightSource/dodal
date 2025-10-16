@@ -9,13 +9,15 @@ from dodal.common.crystal_metadata import (
     make_crystal_metadata_from_material,
 )
 from dodal.devices.common_dcm import (
-    DoubleCrystalMonochromator,
+    DoubleCrystalMonochromatorWithDSpacing,
     PitchAndRollCrystal,
     StationaryCrystal,
 )
 
 
-class DCM(DoubleCrystalMonochromator[PitchAndRollCrystal, StationaryCrystal]):
+class DCM(
+    DoubleCrystalMonochromatorWithDSpacing[PitchAndRollCrystal, StationaryCrystal]
+):
     """
     A double crystal monochromator (DCM), used to select the energy of the beam.
 
@@ -56,8 +58,5 @@ class DCM(DoubleCrystalMonochromator[PitchAndRollCrystal, StationaryCrystal]):
             self.crystal_metadata_reflection, _ = soft_signal_r_and_setter(
                 Array1D[np.uint64],
                 initial_value=reflection_array,
-            )
-            self.crystal_metadata_d_spacing_a = epics_signal_r(
-                float, prefix + "DSPACING:RBV"
             )
         super().__init__(prefix, PitchAndRollCrystal, StationaryCrystal, name)
