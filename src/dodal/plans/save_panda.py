@@ -15,7 +15,7 @@ from dodal.beamlines import module_name_for_beamline
 from dodal.utils import make_device
 
 
-def main(argv: list[str]):
+def main(argv: list[str] = None):
     """CLI Utility to save the panda configuration."""
     parser = ArgumentParser(description="Save an ophyd_async panda to yaml")
     parser.add_argument(
@@ -39,7 +39,7 @@ def main(argv: list[str]):
     )
 
     # this exit()s with message/help unless args parsed successfully
-    args = parser.parse_args(argv[1:])
+    args = parser.parse_args()
 
     beamline = args.beamline
     device_name = args.device_name
