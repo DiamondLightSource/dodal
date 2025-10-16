@@ -1,4 +1,3 @@
-import asyncio
 import csv
 import io
 from dataclasses import dataclass
@@ -10,28 +9,24 @@ from bluesky.protocols import Movable
 from daq_config_server.client import ConfigServer
 from ophyd_async.core import (
     AsyncStatus,
-    Device,
     Reference,
     StandardReadable,
     StandardReadableFormat,
-    soft_signal_r_and_setter,
+    derived_signal_rw,
     soft_signal_rw,
 )
 from pydantic import BaseModel, ConfigDict, RootModel
 
 from dodal.devices.apple2_undulator import (
     Apple2,
-    Apple2Motors,
+    Apple2Controller,
     Apple2Val,
-    EnergyMotorConvertor,
     Pol,
     UndulatorGap,
     UndulatorJawPhase,
     UndulatorPhaseAxes,
 )
 from dodal.log import LOGGER
-
-from ..pgm import PGM
 
 ROW_PHASE_MOTOR_TOLERANCE = 0.004
 MAXIMUM_ROW_PHASE_MOTOR_POSITION = 24.0
@@ -107,7 +102,7 @@ class I10EnergyMotorLookup:
 
     def __init__(
         self,
-        look_up_table_dir: str,
+        lookuptable_dir: str,
         source: tuple[str, str],
         config_client: ConfigServer,
         mode: str = "Mode",
@@ -141,8 +136,8 @@ class I10EnergyMotorLookup:
             "Gap": {},
             "Phase": {},
         }
-        energy_gap_table_path = Path(look_up_table_dir, gap_file_name)
-        energy_phase_table_path = Path(look_up_table_dir, phase_file_name)
+        energy_gap_table_path = Path(lookuptable_dir, gap_file_name)
+        energy_phase_table_path = Path(lookuptable_dir, phase_file_name)
         self.lookup_table_config = LookupTableConfig(
             path=LookupPath(Gap=energy_gap_table_path, Phase=energy_phase_table_path),
             source=source,
@@ -322,82 +317,123 @@ class I10EnergyMotorLookup:
 
 
 class I10Apple2(Apple2):
-    """I10Apple2 is the i10 version of Apple2 ID, set and energy_motor_convertor
-     should be the only part that is I10 specific.
+    def __init__(
+        self,
+        id_gap: UndulatorGap,
+        id_phase: UndulatorPhaseAxes,
+        id_jaw_phase: UndulatorJawPhase,
+        name: str = "",
+    ) -> None:
+        """
+        I10Apple2 device is an apple2 with extra jaw phase motor.
 
-    A EnergyMotorConvertor function is needed to provide the conversion between
-     x-ray motor position and energy.
+        Parameters
+        ----------
 
-    Set is in energy(eV).
+        id_gap : UndulatorJawPhase
+            The gap motor of the undulator.
+        id_phase : UndulatorJawPhase
+            The phase motors of the undulator.
+        id_jaw_phase : UndulatorJawPhase
+            The jaw phase motor of the undulator.
+        name : str, optional
+            The name of the device, by default "".
+        """
+        with self.add_children_as_readables():
+            self.jaw_phase = id_jaw_phase
+        super().__init__(id_gap=id_gap, id_phase=id_phase, name=name)
+
+
+class I10Apple2Controller(Apple2Controller[I10Apple2]):
+    """
+    I10Apple2Controller is a extension of Apple2Controller which provide linear
+     arbitrary angle control.
     """
 
     def __init__(
         self,
-        prefix: str,
-        energy_motor_convertor: EnergyMotorConvertor,
+        apple2: I10Apple2,
+        lookuptable_dir: str,
+        source: tuple[str, str],
+        config_client: ConfigServer,
+        jaw_phase_limit: float = 12.0,
+        jaw_phase_poly_param: list[float] = DEFAULT_JAW_PHASE_POLY_PARAMS,
+        angle_threshold_deg=30.0,
         name: str = "",
     ) -> None:
         """
-        Parameters
+
+        parameters
         ----------
-        look_up_table_dir:
+        apple2 : I10Apple2
+            An I10Apple2 device.
+        lookuptable_dir : str
             The path to look up table.
-        source:
-            The column name and the name of the source in look up table. e.g. ("source", "idu")
-        mode:
-            The column name of the mode in look up table.
-        min_energy:
-            The column name that contain the maximum energy in look up table.
-        max_energy:
-            The column name that contain the maximum energy in look up table.
-        poly_deg:
-            The column names for the parameters for the energy conversion polynomial, starting with the least significant.
-        prefix:
-            epic pv for id
-        Name:
-            Name of the device
+        source : tuple[str, str]
+            The column name and the name of the source in look up table. e.g. ( "source", "idu")
+        config_client : ConfigServer
+            The config server client to fetch the look up table.
+        jaw_phase_limit : float, optional
+            The maximum allowed jaw_phase movement., by default 12.0
+        jaw_phase_poly_param : list[float], optional
+            polynomial parameters highest power first., by default DEFAULT_JAW_PHASE_POLY_PARAMS
+        angle_threshold_deg : float, optional
+            The angle threshold to switch between 0-180 and 180-360 range., by default 30.0
+        name : str, optional
+            New device name.
         """
 
-        with self.add_children_as_readables():
-            super().__init__(
-                apple2_motors=Apple2Motors(
-                    id_gap=UndulatorGap(prefix=prefix),
-                    id_phase=UndulatorPhaseAxes(
-                        prefix=prefix,
-                        top_outer="RPQ1",
-                        top_inner="RPQ2",
-                        btm_inner="RPQ3",
-                        btm_outer="RPQ4",
-                    ),
-                ),
-                energy_motor_convertor=energy_motor_convertor,
-                name=name,
-            )
-            self.id_jaw_phase = UndulatorJawPhase(
-                prefix=prefix,
-                move_pv="RPQ1",
-            )
+        self.lookup_table_client = I10EnergyMotorLookup(
+            lookuptable_dir=lookuptable_dir,
+            source=source,
+            config_client=config_client,
+        )
+        super().__init__(
+            apple2=apple2,
+            energy_to_motor_converter=self.lookup_table_client.get_motor_from_energy,
+            name=name,
+        )
 
-    async def _set(self, value: float) -> None:
+        self.jaw_phase_from_angle = np.poly1d(jaw_phase_poly_param)
+        self.angle_threshold_deg = angle_threshold_deg
+        self.jaw_phase_limit = jaw_phase_limit
+        self._linear_arbitrary_angle = soft_signal_rw(float, initial_value=None)
+
+        self.linear_arbitrary_angle = derived_signal_rw(
+            raw_to_derived=self._read_linear_arbitrary_angle,
+            set_derived=self._set_linear_arbitrary_angle,
+            pol_angle=self._linear_arbitrary_angle,
+            pol=self.polarisation,
+        )
+
+    def _read_linear_arbitrary_angle(self, pol_angle: float, pol: Pol) -> float:
+        self._raise_if_not_la(pol)
+        return pol_angle
+
+    async def _set_linear_arbitrary_angle(self, pol_angle: float) -> None:
+        pol = await self.polarisation.get_value()
+        self._raise_if_not_la(pol)
+        # Moving to real angle which is 210 to 30.
+        alpha_real = (
+            pol_angle
+            if pol_angle > self.angle_threshold_deg
+            else pol_angle + ALPHA_OFFSET
+        )
+        jaw_phase = self.jaw_phase_from_angle(alpha_real)
+        if abs(jaw_phase) > self.jaw_phase_limit:
+            raise RuntimeError(
+                f"jaw_phase position for angle ({pol_angle}) is outside permitted range"
+                f" [-{self.jaw_phase_limit}, {self.jaw_phase_limit}]"
+            )
+        await self.apple2().jaw_phase.set(jaw_phase)
+        await self._linear_arbitrary_angle.set(pol_angle)
+
+    async def _set_motors_from_energy(self, value: float) -> None:
         """
-        Check polarisation state and use it together with the energy(value)
-        to calculate the required gap and phases before setting it.
+        Set the undulator motors for a given energy and polarisation.
         """
 
-        pol = await self.polarisation_setpoint.get_value()
-
-        if pol == Pol.NONE:
-            LOGGER.warning(
-                "Found no setpoint for polarisation. Attempting to"
-                " determine polarisation from hardware..."
-            )
-            pol = await self.polarisation.get_value()
-            if pol == Pol.NONE:
-                raise ValueError(
-                    f"Polarisation cannot be determined from hardware for {self.name}"
-                )
-
-            self._set_pol_setpoint(pol)
+        pol = await self._check_and_get_pol_setpoint()
         gap, phase = self.energy_to_motor(energy=value, pol=pol)
         phase3 = phase * (-1 if pol == Pol.LA else 1)
         id_set_val = Apple2Val(
@@ -409,185 +445,45 @@ class I10Apple2(Apple2):
         )
 
         LOGGER.info(f"Setting polarisation to {pol}, with values: {id_set_val}")
-        await self.motors.set(id_motor_values=id_set_val)
+        await self.apple2().set(id_motor_values=id_set_val)
         if pol != Pol.LA:
-            await self.id_jaw_phase.set(0)
-            await self.id_jaw_phase.set_move.set(1)
+            await self.apple2().jaw_phase.set(0)
+            await self.apple2().jaw_phase.set_move.set(1)
 
-
-class EnergySetter(StandardReadable, Movable[float]):
-    """
-    Compound device to set both ID and PGM energy at the same time.
-
-    """
-
-    def __init__(self, id: I10Apple2, pgm: PGM, name: str = "") -> None:
-        """
-        Parameters
-        ----------
-        id:
-            An Apple2 device.
-        pgm:
-            A PGM/mono device.
-        name:
-            New device name.
-        """
-        super().__init__(name=name)
-        self.id = id
-        self.pgm_ref = Reference(pgm)
-
-        self.add_readables(
-            [self.id.energy, self.pgm_ref().energy.user_readback],
-            StandardReadableFormat.HINTED_SIGNAL,
-        )
-
-        with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
-            self.energy_offset = soft_signal_rw(float, initial_value=0)
-
-    @AsyncStatus.wrap
-    async def set(self, value: float) -> None:
-        LOGGER.info(f"Moving f{self.name} energy to {value}.")
-        await asyncio.gather(
-            self.id.set(value=value + await self.energy_offset.get_value()),
-            self.pgm_ref().energy.set(value),
-        )
-
-
-class I10Apple2Pol(StandardReadable, Movable[Pol]):
-    """
-    Compound device to set polorisation of ID.
-    """
-
-    def __init__(self, id: I10Apple2, name: str = "") -> None:
-        """
-        Parameters
-        ----------
-        id:
-            An I10Apple2 device.
-        name:
-            New device name.
-        """
-        super().__init__(name=name)
-        self.id_ref = Reference(id)
-        self.add_readables([self.id_ref().polarisation])
-
-    @AsyncStatus.wrap
-    async def set(self, value: Pol) -> None:
-        LOGGER.info(f"Changing f{self.name} polarisation to {value}.")
-        # Timeout is determined internally by the set method later, so we set it to max here.
-        await self.id_ref().polarisation.set(value, timeout=MAXIMUM_MOVE_TIME)
+    def _raise_if_not_la(self, pol: Pol) -> None:
+        if pol != Pol.LA:
+            raise RuntimeError(
+                "Angle control is not available in polarisation"
+                + f" {pol} with {self.name}"
+            )
 
 
 class LinearArbitraryAngle(StandardReadable, Movable[SupportsFloat]):
     """
-    Device to set polorisation angle of the ID. Linear Arbitrary Angle (laa)
-     is the direction of the magnetic field which can be change by varying the jaw_phase
-     in (linear arbitrary (la) mode,
-     The angle of 0 is equivalent to linear horizontal "lh" (sigma) and
-      90 is linear vertical "lv" (pi).
-    This device require a jaw_phase to angle conversion which is done via a polynomial.
+    Device to set the polarisation angle of the Apple2 undulator in Linear Arbitrary (LA) mode.
     """
 
     def __init__(
         self,
-        id: I10Apple2,
+        id_controller: I10Apple2Controller,
         name: str = "",
-        jaw_phase_limit: float = 12.0,
-        jaw_phase_poly_param: list[float] = DEFAULT_JAW_PHASE_POLY_PARAMS,
-        angle_threshold_deg=30.0,
     ) -> None:
         """
         Parameters
         ----------
-        id: I10Apple2
-            An I10Apple2 device.
-        name: str
+        id_controller : I10Apple2Controller
+            The I10Apple2Controller which control the ID.
+        name : str, optional
             New device name.
-        jaw_phase_limit: float
-            The maximum allowed jaw_phase movement.
-        jaw_phase_poly_param: list
-            polynomial parameters highest power first.
         """
         super().__init__(name=name)
-        self.id_ref = Reference(id)
-        self.jaw_phase_from_angle = np.poly1d(jaw_phase_poly_param)
-        self.angle_threshold_deg = angle_threshold_deg
-        self.jaw_phase_limit = jaw_phase_limit
-        with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
-            self.angle, self._angle_set = soft_signal_r_and_setter(
-                float, initial_value=None
-            )
+        self.linear_arbitrary_angle = Reference(id_controller.linear_arbitrary_angle)
+
+        self.add_readables(
+            [self.linear_arbitrary_angle()],
+            StandardReadableFormat.HINTED_SIGNAL,
+        )
 
     @AsyncStatus.wrap
-    async def set(self, value: SupportsFloat) -> None:
-        value = float(value)
-        pol = await self.id_ref().polarisation.get_value()
-        if pol != Pol.LA:
-            raise RuntimeError(
-                f"Angle control is not available in polarisation {pol} with {self.id_ref().name}"
-            )
-        # Moving to real angle which is 210 to 30.
-        alpha_real = value if value > self.angle_threshold_deg else value + ALPHA_OFFSET
-        jaw_phase = self.jaw_phase_from_angle(alpha_real)
-        if abs(jaw_phase) > self.jaw_phase_limit:
-            raise RuntimeError(
-                f"jaw_phase position for angle ({value}) is outside permitted range"
-                f" [-{self.jaw_phase_limit}, {self.jaw_phase_limit}]"
-            )
-        await self.id_ref().id_jaw_phase.set(jaw_phase)
-        self._angle_set(value)
-
-
-class I10Id(Device):
-    def __init__(
-        self,
-        pgm: PGM,
-        prefix: str,
-        look_up_table_dir: str,
-        source: tuple[str, str],
-        config_client: ConfigServer,
-        jaw_phase_limit=12.0,
-        jaw_phase_poly_param=DEFAULT_JAW_PHASE_POLY_PARAMS,
-        angle_threshold_deg=30.0,
-        name: str = "",
-    ) -> None:
-        """I10Id is a compound device that combines the I10-specific Apple2 undulator,
-        energy setter, and polarization control.
-        This class provides a high-level interface for controlling the undulator's
-        energy, polarization, and linear arbitrary angle.
-
-        Attributes
-        ----------
-        id : I10Apple2
-            The I10-specific Apple2 undulator device.
-        energy_setter : EnergySetter
-            A device for synchronizing the undulator and monochromator energy.
-        pol : I10Apple2Pol
-            A device for controlling the polarization of the undulator.
-        linear_arbitrary_angle : LinearArbitraryAngle
-            A device for controlling the linear arbitrary polarization angle.
-        """
-        self.lookup_table_client = I10EnergyMotorLookup(
-            look_up_table_dir=look_up_table_dir,
-            source=source,
-            config_client=config_client,
-        )
-        self.energy = EnergySetter(
-            id=I10Apple2(
-                prefix=prefix,
-                energy_motor_convertor=self.lookup_table_client.get_motor_from_energy,
-                name="id_energy",
-            ),
-            pgm=pgm,
-            name="energy",
-        )
-        self.pol = I10Apple2Pol(id=self.energy.id, name="pol")
-        self.laa = LinearArbitraryAngle(
-            id=self.energy.id,
-            name="laa",
-            jaw_phase_limit=jaw_phase_limit,
-            jaw_phase_poly_param=jaw_phase_poly_param,
-            angle_threshold_deg=angle_threshold_deg,
-        )
-
-        super().__init__(name=name)
+    async def set(self, angle: float) -> None:
+        await self.linear_arbitrary_angle().set(angle)
