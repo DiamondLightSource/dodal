@@ -12,7 +12,7 @@ from ophyd_async.testing import (
 )
 
 from dodal.plan_stubs.motor_utils import (
-    MoveTooLarge,
+    MoveTooLargeError,
     check_and_cache_values,
     home_and_reset_wrapper,
 )
@@ -108,7 +108,7 @@ def test_given_a_device_with_a_too_large_move_when_check_and_cache_values_then_e
 
     motors_and_positions = dict.fromkeys(my_device.motors, new_position)
 
-    with pytest.raises(MoveTooLarge) as e:
+    with pytest.raises(MoveTooLargeError) as e:
         run_engine(check_and_cache_values(motors_and_positions, 0, max))
         assert e.value.axis == my_device.y
         assert e.value.maximum_move == max
@@ -251,7 +251,7 @@ def test_given_an_axis_out_of_range_when_home_and_reset_wrapper_called_then_thro
     patch_motor(my_device.x, initial_x)
     patch_motor(my_device.y, initial_y)
 
-    with pytest.raises(MoveTooLarge):
+    with pytest.raises(MoveTooLargeError):
         run_engine(
             home_and_reset_wrapper(
                 my_plan(),
@@ -266,7 +266,7 @@ def test_given_an_axis_out_of_range_when_home_and_reset_wrapper_called_then_thro
     get_mock_put(my_device.y.user_setpoint).assert_not_called()
 
 
-class MyException(Exception):
+class MyError(Exception):
     pass
 
 
@@ -277,12 +277,12 @@ def test_given_home_and_reset_inner_plan_fails_reset_still(
 
     def my_plan():
         yield from bps.null()
-        raise MyException()
+        raise MyError()
 
     patch_motor(my_device.x, initial_x)
     patch_motor(my_device.y, initial_y)
 
-    with pytest.raises(MyException):
+    with pytest.raises(MyError):
         run_engine(
             home_and_reset_wrapper(
                 my_plan(),
@@ -318,7 +318,7 @@ def test_given_move_to_home_fails_reset_still(
     patch_motor(my_device.y, initial_y)
     get_mock_put(
         getattr(my_device, move_that_failed).user_setpoint
-    ).side_effect = MyException()
+    ).side_effect = MyError()
 
     with pytest.raises(FailedStatus) as e:
         run_engine(
@@ -330,7 +330,7 @@ def test_given_move_to_home_fails_reset_still(
             )
         )
 
-    assert isinstance(e.value.__cause__, MyException)
+    assert isinstance(e.value.__cause__, MyError)
 
     get_mock_put(my_device.x.user_setpoint).assert_has_calls(
         [call(0.0, wait=ANY), call(initial_x, wait=ANY)]

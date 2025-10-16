@@ -197,10 +197,10 @@ async def test_given_set_with_all_values_then_motors_set_in_order(smargon: Smarg
 
 
 async def test_given_set_fails_then_defer_moves_turned_back_off(smargon: Smargon):
-    class MyException(Exception): ...
+    class MyError(Exception): ...
 
-    smargon.x.user_setpoint.set = MagicMock(side_effect=MyException())
-    with pytest.raises(MyException):
+    smargon.x.user_setpoint.set = MagicMock(side_effect=MyError())
+    with pytest.raises(MyError):
         await smargon.set(CombinedMove(x=10))
 
     get_mock_put(smargon.defer_move).assert_has_calls(

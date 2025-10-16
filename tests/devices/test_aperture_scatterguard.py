@@ -19,7 +19,7 @@ from dodal.devices.aperturescatterguard import (
     AperturePosition,
     ApertureScatterguard,
     ApertureValue,
-    InvalidApertureMove,
+    InvalidApertureMoveError,
     load_positions_from_beamline_parameters,
 )
 from dodal.testing import patch_all_motors
@@ -224,7 +224,7 @@ async def test_given_aperture_z_still_moving_when_aperture_scatterguard_moved_th
     ap_sg: ApertureScatterguard,
 ):
     set_mock_value(ap_sg.aperture.z.motor_done_move, 0)
-    with pytest.raises(InvalidApertureMove):
+    with pytest.raises(InvalidApertureMoveError):
         await ap_sg.selected_aperture.set(selected_aperture)
 
 
@@ -244,7 +244,7 @@ async def test_aperture_scatterguard_throws_error_if_moved_whilst_z_outside_tole
     set_mock_value(ap_sg.aperture.z.user_readback, 1)
     set_mock_value(ap_sg.aperture.z.motor_done_move, 1)
 
-    with pytest.raises(InvalidApertureMove):
+    with pytest.raises(InvalidApertureMoveError):
         await ap_sg.selected_aperture.set(selected_aperture)
 
 
@@ -342,7 +342,7 @@ async def test_aperture_positions_robot_load_outside_tolerance(
     set_mock_value(ap_sg.aperture.small, 0)
     await ap_sg.aperture.y.set(robot_load_ap_y + tolerance)
     await ap_sg.aperture.z.set(robot_load.aperture_z)
-    with pytest.raises(InvalidApertureMove):
+    with pytest.raises(InvalidApertureMoveError):
         await ap_sg.read()
 
 
@@ -392,7 +392,7 @@ async def test_aperture_positions_parked_outside_tolerance(
     set_mock_value(ap_sg.aperture.small, 0)
     await ap_sg.aperture.y.set(parked.aperture_y)
     await ap_sg.aperture.z.set(parked_z + tolerance)
-    with pytest.raises(InvalidApertureMove):
+    with pytest.raises(InvalidApertureMoveError):
         await ap_sg.read()
 
 
@@ -403,7 +403,7 @@ async def test_aperture_positions_unsafe(
     set_mock_value(ap_sg.aperture.medium, 0)
     set_mock_value(ap_sg.aperture.small, 0)
     await ap_sg.aperture.y.set(50.0)
-    with pytest.raises(InvalidApertureMove):
+    with pytest.raises(InvalidApertureMoveError):
         await ap_sg.read()
 
 
@@ -651,5 +651,5 @@ async def test_calling_prepare_then_set_in_quick_succession_throws_an_error(
     )
     await aperture_in_medium_pos.prepare(ApertureValue.SMALL)
 
-    with pytest.raises(InvalidApertureMove):
+    with pytest.raises(InvalidApertureMoveError):
         await aperture_in_medium_pos.selected_aperture.set(ApertureValue.SMALL)

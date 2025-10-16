@@ -25,7 +25,7 @@ from dodal.log import LOGGER
 Tip = Array1D[np.int32]
 
 
-class InvalidPinException(Exception):
+class InvalidPinError(Exception):
     pass
 
 
@@ -88,7 +88,7 @@ class PinTipDetection(StandardReadable):
 
     def _set_triggered_values(self, results: SampleLocation):
         if results.tip_x is None or results.tip_y is None:
-            raise InvalidPinException
+            raise InvalidPinError
         else:
             tip = np.array([results.tip_x, results.tip_y])
             self._tip_setter(tip)

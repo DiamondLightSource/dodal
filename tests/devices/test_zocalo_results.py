@@ -11,8 +11,8 @@ from ophyd_async.core import AsyncStatus
 
 from dodal.devices.zocalo.zocalo_constants import ZOCALO_ENV
 from dodal.devices.zocalo.zocalo_results import (
-    NoResultsFromZocalo,
-    NoZocaloSubscription,
+    NoResultsFromZocaloError,
+    NoZocaloSubscriptionError,
     XrcResult,
     ZocaloResults,
     ZocaloSource,
@@ -221,7 +221,7 @@ async def test_when_exception_caused_by_zocalo_message_then_exception_propagated
     with pytest.raises(FailedStatus) as e:
         run_engine(bps.trigger(zocalo_results, wait=True))
 
-    assert isinstance(e.value.__cause__, NoZocaloSubscription)
+    assert isinstance(e.value.__cause__, NoZocaloSubscriptionError)
 
 
 @pytest.mark.parametrize(
@@ -267,7 +267,7 @@ async def test_if_zocalo_results_timeout_before_any_results_then_error(
 ):
     await zocalo_results.stage()
     zocalo_results._raw_results_received.get = MagicMock(side_effect=Empty)
-    with pytest.raises(NoResultsFromZocalo):
+    with pytest.raises(NoResultsFromZocaloError):
         await zocalo_results.trigger()
 
 
