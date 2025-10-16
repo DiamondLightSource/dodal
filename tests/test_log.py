@@ -158,7 +158,7 @@ def test_messages_logged_from_dodal_get_sent_to_graylog_and_file(
 
 @patch("dodal.log.logging.FileHandler.emit")
 def test_various_messages_to_graylog_get_beamline_filter(
-    mock_filehandler_emit: MagicMock, RE
+    mock_filehandler_emit: MagicMock, run_engine
 ):
     from os import environ
 
@@ -194,7 +194,7 @@ def test_various_messages_to_graylog_get_beamline_filter(
     assert mock_GELFTCPHandler.emit.call_args.args[0].name == "ophyd"
     assert mock_GELFTCPHandler.emit.call_args.args[0].beamline == "dev"
 
-    RE.log.logger.info("RunEngine log message")
+    run_engine.log.logger.info("RunEngine log message")
     assert mock_GELFTCPHandler.emit.call_args.args[0].name == "bluesky"
     assert mock_GELFTCPHandler.emit.call_args.args[0].beamline == "dev"
 

@@ -53,10 +53,10 @@ set_path_provider(
     )
 )
 
-RE = RunEngine()
+run_engine = RunEngine()
 d = det(connect_immediately=True)
 s = stage(connect_immediately=True)
-RE(count([d], num=10))
+run_engine(count([d], num=10))
 ```
 
 """

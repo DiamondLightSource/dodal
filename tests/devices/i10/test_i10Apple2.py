@@ -291,13 +291,13 @@ async def test_fail_i10_apple2_controller_set_id_not_ready(
     )
 
 
-async def test_beam_energy_re_scan(beam_energy: BeamEnergy, RE: RunEngine):
+async def test_beam_energy_re_scan(beam_energy: BeamEnergy, run_engine: RunEngine):
     docs = defaultdict(list)
 
     def capture_emitted(name, doc):
         docs[name].append(doc)
 
-    RE(scan([], beam_energy, 500, 600, num=11), capture_emitted)
+    run_engine(scan([], beam_energy, 500, 600, num=11), capture_emitted)
     assert_emitted(docs, start=1, descriptor=1, event=11, stop=1)
 
     for cnt, data in enumerate(docs["event"]):
@@ -306,7 +306,9 @@ async def test_beam_energy_re_scan(beam_energy: BeamEnergy, RE: RunEngine):
 
 
 async def test_beam_energy_re_scan_with_offset(
-    beam_energy: BeamEnergy, mock_id_controller: I10Apple2Controller, RE: RunEngine
+    beam_energy: BeamEnergy,
+    mock_id_controller: I10Apple2Controller,
+    run_engine: RunEngine,
 ):
     docs = defaultdict(list)
 
@@ -324,7 +326,7 @@ async def test_beam_energy_re_scan_with_offset(
             beam_energy._mono_energy().user_readback, rbv_mocks.get()
         ),
     )
-    RE(
+    run_engine(
         scan(
             [],
             beam_energy,
@@ -570,10 +572,10 @@ async def test_linear_arbitrary_limit_fail(
         (-90, -25, 18),
     ],
 )
-async def test_linear_arbitrary_RE_scan(
+async def test_linear_arbitrary_run_engine_scan(
     mock_linear_arbitrary_angle: LinearArbitraryAngle,
     mock_id_controller: I10Apple2Controller,
-    RE: RunEngine,
+    run_engine: RunEngine,
     start: float,
     stop: float,
     num_point: int,
@@ -600,7 +602,7 @@ async def test_linear_arbitrary_RE_scan(
         mock_id_controller.apple2().phase.btm_outer.user_readback,
         -16.4,
     )
-    RE(
+    run_engine(
         scan(
             [],
             mock_linear_arbitrary_angle,

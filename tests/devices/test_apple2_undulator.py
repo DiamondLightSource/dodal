@@ -138,7 +138,7 @@ async def test_gap_status_error(mock_id_gap: UndulatorGap):
         await mock_id_gap.set(2)
 
 
-async def test_gap_success_scan(mock_id_gap: UndulatorGap, RE: RunEngine):
+async def test_gap_success_scan(mock_id_gap: UndulatorGap, run_engine: RunEngine):
     callback_on_mock_put(
         mock_id_gap.user_setpoint,
         lambda *_, **__: set_mock_value(mock_id_gap.gate, UndulatorGateStatus.OPEN),
@@ -160,7 +160,7 @@ async def test_gap_success_scan(mock_id_gap: UndulatorGap, RE: RunEngine):
     def capture_emitted(name, doc):
         docs[name].append(doc)
 
-    RE(scan([mock_id_gap], mock_id_gap, 0, 10, 11), capture_emitted)
+    run_engine(scan([mock_id_gap], mock_id_gap, 0, 10, 11), capture_emitted)
     assert_emitted(docs, start=1, descriptor=1, event=11, stop=1)
     for i in output:
         assert docs["event"][i]["data"]["mock_id_gap-user_readback"] == i
@@ -243,52 +243,54 @@ async def test_phase_cal_timout(
     )
 
 
-async def test_phase_success_set(mock_phaseAxes: UndulatorPhaseAxes, RE: RunEngine):
+async def test_phase_success_set(
+    mock_phase_axes: UndulatorPhaseAxes, run_engine: RunEngine
+):
     set_value = Apple2PhasesVal(
         top_inner="3", top_outer="2", btm_inner="5", btm_outer="7"
     )
     callback_on_mock_put(
-        mock_phaseAxes.top_inner.user_setpoint,
-        lambda *_, **__: set_mock_value(mock_phaseAxes.gate, UndulatorGateStatus.OPEN),
+        mock_phase_axes.top_inner.user_setpoint,
+        lambda *_, **__: set_mock_value(mock_phase_axes.gate, UndulatorGateStatus.OPEN),
     )
 
     def set_complete_move():
         set_mock_value(
-            mock_phaseAxes.top_inner.user_readback,
+            mock_phase_axes.top_inner.user_readback,
             3,
         )
         set_mock_value(
-            mock_phaseAxes.top_outer.user_readback,
+            mock_phase_axes.top_outer.user_readback,
             2,
         )
         set_mock_value(
-            mock_phaseAxes.btm_inner.user_readback,
+            mock_phase_axes.btm_inner.user_readback,
             5,
         )
         set_mock_value(
-            mock_phaseAxes.btm_outer.user_readback,
+            mock_phase_axes.btm_outer.user_readback,
             7,
         )
-        set_mock_value(mock_phaseAxes.gate, UndulatorGateStatus.CLOSE)
+        set_mock_value(mock_phase_axes.gate, UndulatorGateStatus.CLOSE)
 
-    callback_on_mock_put(mock_phaseAxes.set_move, lambda *_, **__: set_complete_move())
-    RE(bps.abs_set(mock_phaseAxes, set_value, wait=True))
-    get_mock_put(mock_phaseAxes.set_move).assert_called_once_with(1, wait=True)
-    get_mock_put(mock_phaseAxes.top_inner.user_setpoint).assert_called_once_with(
+    callback_on_mock_put(mock_phase_axes.set_move, lambda *_, **__: set_complete_move())
+    run_engine(bps.abs_set(mock_phase_axes, set_value, wait=True))
+    get_mock_put(mock_phase_axes.set_move).assert_called_once_with(1, wait=True)
+    get_mock_put(mock_phase_axes.top_inner.user_setpoint).assert_called_once_with(
         set_value.top_inner, wait=True
     )
-    get_mock_put(mock_phaseAxes.top_outer.user_setpoint).assert_called_once_with(
+    get_mock_put(mock_phase_axes.top_outer.user_setpoint).assert_called_once_with(
         set_value.top_outer, wait=True
     )
-    get_mock_put(mock_phaseAxes.btm_inner.user_setpoint).assert_called_once_with(
+    get_mock_put(mock_phase_axes.btm_inner.user_setpoint).assert_called_once_with(
         set_value.btm_inner, wait=True
     )
-    get_mock_put(mock_phaseAxes.btm_outer.user_setpoint).assert_called_once_with(
+    get_mock_put(mock_phase_axes.btm_outer.user_setpoint).assert_called_once_with(
         set_value.btm_outer, wait=True
     )
 
     await assert_reading(
-        mock_phaseAxes,
+        mock_phase_axes,
         {
             "mock_phaseAxes-top_inner-user_readback": partial_reading(3),
             "mock_phaseAxes-top_outer-user_readback": partial_reading(2),
@@ -311,10 +313,10 @@ async def test_given_gate_never_closes_then_setting_jaw_phases_times_out(
 
 
 async def test_jaw_phase_status_error(mock_jaw_phase: UndulatorJawPhase):
-    setValue = 5
+    set_value = 5
     set_mock_value(mock_jaw_phase.fault, 1.0)
     with pytest.raises(RuntimeError):
-        await mock_jaw_phase.set(setValue)
+        await mock_jaw_phase.set(set_value)
 
 
 @pytest.mark.parametrize(
@@ -341,7 +343,9 @@ async def test_jaw_phase_cal_timout(
     )
 
 
-async def test_jaw_phase_success_scan(mock_jaw_phase: UndulatorJawPhase, RE: RunEngine):
+async def test_jaw_phase_success_scan(
+    mock_jaw_phase: UndulatorJawPhase, run_engine: RunEngine
+):
     callback_on_mock_put(
         mock_jaw_phase.jaw_phase.user_setpoint,
         lambda *_, **__: set_mock_value(mock_jaw_phase.gate, UndulatorGateStatus.OPEN),
@@ -363,7 +367,7 @@ async def test_jaw_phase_success_scan(mock_jaw_phase: UndulatorJawPhase, RE: Run
     def capture_emitted(name, doc):
         docs[name].append(doc)
 
-    RE(scan([mock_jaw_phase], mock_jaw_phase, 0, 10, 11), capture_emitted)
+    run_engine(scan([mock_jaw_phase], mock_jaw_phase, 0, 10, 11), capture_emitted)
     assert_emitted(docs, start=1, descriptor=1, event=11, stop=1)
     for i in output:
         assert docs["event"][i]["data"]["mock_jaw_phase-jaw_phase-user_readback"] == i

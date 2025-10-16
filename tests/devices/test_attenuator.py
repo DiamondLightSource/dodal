@@ -35,9 +35,9 @@ async def test_set_transmission_success(fake_attenuator: BinaryFilterAttenuator)
 
 
 def test_set_transmission_in_run_engine(
-    fake_attenuator: BinaryFilterAttenuator, RE: RunEngine
+    fake_attenuator: BinaryFilterAttenuator, run_engine: RunEngine
 ):
-    RE(bps.abs_set(fake_attenuator, 1, wait=True))
+    run_engine(bps.abs_set(fake_attenuator, 1, wait=True))
 
 
 async def test_given_attenuator_sets_filters_to_expected_value_then_set_returns(

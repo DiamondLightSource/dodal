@@ -91,9 +91,14 @@ async def mock_sr570_struck_scaler_detector(
 )
 @mock.patch("asyncio.sleep")
 async def test_sr570_set(
-    sleep: AsyncMock, mock_sr570: SR570, RE: RunEngine, gain, wait_time, gain_value
+    sleep: AsyncMock,
+    mock_sr570: SR570,
+    run_engine: RunEngine,
+    gain,
+    wait_time,
+    gain_value,
 ):
-    RE(abs_set(mock_sr570, gain, wait=True))
+    run_engine(abs_set(mock_sr570, gain, wait=True))
     assert (await mock_sr570.get_gain()).name == gain_value
     # extra sleeps either side of set are bluesky's sleep which are set to 0.
     for actual, expected in zip(
@@ -222,7 +227,7 @@ class MockSR570RaiseTimeTable(float, Enum):
 )
 async def test_SR570_struck_scaler_read(
     mock_sr570_struck_scaler_detector,
-    RE: RunEngine,
+    run_engine: RunEngine,
     gain,
     raw_count,
     expected_current,
@@ -241,7 +246,7 @@ async def test_SR570_struck_scaler_read(
     def capture_emitted(name, doc):
         docs[name].append(doc)
 
-    RE(count([mock_sr570_struck_scaler_detector]), capture_emitted)
+    run_engine(count([mock_sr570_struck_scaler_detector]), capture_emitted)
     assert docs["event"][0]["data"][
         "mock_sr570_struck_scaler_detector-current"
     ] == pytest.approx(expected_current)
@@ -269,7 +274,7 @@ async def test_SR570_struck_scaler_read(
 )
 async def test_SR570_struck_scaler_read_with_autoGain(
     mock_sr570_struck_scaler_detector,
-    RE: RunEngine,
+    run_engine: RunEngine,
     gain,
     raw_count,
     expected_current,
@@ -302,8 +307,8 @@ async def test_SR570_struck_scaler_read_with_autoGain(
     def capture_emitted(name, doc):
         docs[name].append(doc)
 
-    RE(prepare(mock_sr570_struck_scaler_detector, 1))
-    RE(count([mock_sr570_struck_scaler_detector]), capture_emitted)
+    run_engine(prepare(mock_sr570_struck_scaler_detector, 1))
+    run_engine(count([mock_sr570_struck_scaler_detector]), capture_emitted)
     assert docs["event"][0]["data"][
         "mock_sr570_struck_scaler_detector-current"
     ] == pytest.approx(expected_current, rel=1e-14)

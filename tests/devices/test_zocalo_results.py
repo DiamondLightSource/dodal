@@ -105,17 +105,19 @@ async def mocked_zocalo_device(zocalo_results: ZocaloResults):
 
 async def test_trigger_and_wait_puts_results(
     mocked_zocalo_device,
-    RE,
+    run_engine: RunEngine,
 ):
     zocalo_device = await mocked_zocalo_device(TEST_RESULTS)
     zocalo_device._put_results = AsyncMock()
     zocalo_device._put_results.assert_not_called()
 
-    RE(bps.trigger(zocalo_device))
+    run_engine(bps.trigger(zocalo_device))
     zocalo_device._put_results.assert_called()
 
 
-async def test_get_full_processing_results(mocked_zocalo_device, RE) -> None:
+async def test_get_full_processing_results(
+    mocked_zocalo_device, run_engine: RunEngine
+) -> None:
     zocalo_device: ZocaloResults = await mocked_zocalo_device(TEST_RESULTS)
 
     def plan():
@@ -146,7 +148,7 @@ async def test_get_full_processing_results(mocked_zocalo_device, RE) -> None:
         for prop in ["max_voxel", "max_count", "n_voxels", "total_count", "sample_id"]:
             assert [r[prop] for r in full_results] == [r[prop] for r in TEST_RESULTS]  # type: ignore
 
-    RE(plan())
+    run_engine(plan())
 
 
 @patch(
@@ -155,7 +157,7 @@ async def test_get_full_processing_results(mocked_zocalo_device, RE) -> None:
 @patch("dodal.devices.zocalo.zocalo_results._get_zocalo_connection", autospec=True)
 @patch("dodal.devices.zocalo.zocalo_results.CLEAR_QUEUE_WAIT_S", 0)
 async def test_subscribe_only_on_called_stage(
-    mock_connection: MagicMock, mock_wrap_subscribe: MagicMock, RE: RunEngine
+    mock_connection: MagicMock, mock_wrap_subscribe: MagicMock, run_engine: RunEngine
 ):
     zocalo_results = ZocaloResults(
         name="zocalo", zocalo_environment=ZOCALO_ENV, timeout_s=0
@@ -164,12 +166,12 @@ async def test_subscribe_only_on_called_stage(
     await zocalo_results.stage()
     mock_wrap_subscribe.assert_called_once()
     zocalo_results._raw_results_received.put([])
-    RE(bps.trigger(zocalo_results))
+    run_engine(bps.trigger(zocalo_results))
     mock_wrap_subscribe.assert_called_once()
     zocalo_results._raw_results_received.put([])
-    RE(bps.trigger(zocalo_results))
+    run_engine(bps.trigger(zocalo_results))
     zocalo_results._raw_results_received.put([])
-    RE(bps.trigger(zocalo_results))
+    run_engine(bps.trigger(zocalo_results))
     mock_wrap_subscribe.assert_called_once()
 
 
@@ -179,7 +181,7 @@ async def test_subscribe_only_on_called_stage(
 )
 @patch("dodal.devices.zocalo.zocalo_results._get_zocalo_connection", new=MagicMock())
 async def test_zocalo_results_trigger_log_message(
-    mock_wrap_subscribe, mock_logger, RE: RunEngine
+    mock_wrap_subscribe, mock_logger, run_engine: RunEngine
 ):
     zocalo_results = ZocaloResults(
         name="zocalo",
@@ -204,20 +206,20 @@ async def test_zocalo_results_trigger_log_message(
         )
         yield from bps.trigger(zocalo_results)
 
-    RE(zocalo_plan())
+    run_engine(zocalo_plan())
     mock_logger.info.assert_has_calls([call("Zocalo results: found 1 crystals.")])
 
 
 @patch("dodal.devices.zocalo.zocalo_results._get_zocalo_connection", autospec=True)
 async def test_when_exception_caused_by_zocalo_message_then_exception_propagated(
-    mock_connection, RE: RunEngine
+    mock_connection, run_engine: RunEngine
 ):
     zocalo_results = ZocaloResults(
         name="zocalo", zocalo_environment=ZOCALO_ENV, timeout_s=0.1
     )
     await zocalo_results.connect()
     with pytest.raises(FailedStatus) as e:
-        RE(bps.trigger(zocalo_results, wait=True))
+        run_engine(bps.trigger(zocalo_results, wait=True))
 
     assert isinstance(e.value.__cause__, NoZocaloSubscription)
 
@@ -233,8 +235,8 @@ async def test_source_of_zocalo_results_correctly_identified(
     assert source_from_results(raw_results) == results_source
 
 
-async def test_if_expecting_GPU_then_read_until_GPU_result_found(
-    zocalo_results: ZocaloResults, RE: RunEngine
+async def test_if_expecting_gpu_then_read_until_gpu_result_found(
+    zocalo_results: ZocaloResults, run_engine: RunEngine
 ):
     zocalo_results.results_source = ZocaloSource.GPU
     await zocalo_results.stage()
@@ -242,20 +244,20 @@ async def test_if_expecting_GPU_then_read_until_GPU_result_found(
     zocalo_results._raw_results_received.put(CPU_RESULT)
     zocalo_results._raw_results_received.put(GPU_RESULT)
     zocalo_results._put_results = AsyncMock()
-    RE(bps.trigger(zocalo_results, wait=True))
+    run_engine(bps.trigger(zocalo_results, wait=True))
     assert zocalo_results._put_results.call_args[0][0] == [TEST_RESULTS[1]]
     assert zocalo_results._put_results.await_count == 1
 
 
-async def test_if_expecting_CPU_then_read_until_CPU_result_found(
-    zocalo_results: ZocaloResults, RE: RunEngine
+async def test_if_expecting_cpu_then_read_until_cpu_result_found(
+    zocalo_results: ZocaloResults, run_engine: RunEngine
 ):
     zocalo_results.results_source = ZocaloSource.CPU
     await zocalo_results.stage()
     zocalo_results._raw_results_received.put(GPU_RESULT)
     zocalo_results._raw_results_received.put(CPU_RESULT)
     zocalo_results._put_results = AsyncMock()
-    RE(bps.trigger(zocalo_results, wait=True))
+    run_engine(bps.trigger(zocalo_results, wait=True))
     assert zocalo_results._put_results.call_args[0][0] == [TEST_RESULTS[0]]
     assert zocalo_results._put_results.await_count == 1
 
@@ -270,7 +272,7 @@ async def test_if_zocalo_results_timeout_before_any_results_then_error(
 
 
 async def test_given_no_sample_id_from_zocalo_then_returns_none(
-    mocked_zocalo_device, RE
+    mocked_zocalo_device, run_engine: RunEngine
 ):
     zocalo_device: ZocaloResults = await mocked_zocalo_device(
         [
@@ -291,4 +293,4 @@ async def test_given_no_sample_id_from_zocalo_then_returns_none(
         full_results = yield from get_full_processing_results(zocalo_device)
         assert full_results[0]["sample_id"] is None
 
-    RE(plan())
+    run_engine(plan())

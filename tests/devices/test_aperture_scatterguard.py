@@ -446,7 +446,7 @@ async def test_when_aperture_set_and_device_read_then_position_returned(
 
 async def test_ap_sg_in_runengine(
     aperture_in_medium_pos: ApertureScatterguard,
-    RE: RunEngine,
+    run_engine: RunEngine,
     aperture_positions: dict[ApertureValue, AperturePosition],
 ):
     ap = aperture_in_medium_pos.aperture
@@ -460,7 +460,7 @@ async def test_ap_sg_in_runengine(
 
     callback_on_mock_put(ap.y.user_setpoint, set_small_readback_pv)
 
-    RE(
+    run_engine(
         bps.abs_set(
             aperture_in_medium_pos.selected_aperture, ApertureValue.SMALL, wait=True
         )
