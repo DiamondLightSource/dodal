@@ -101,16 +101,16 @@ def test_given_node_in_error_node_error_status_gives_message_and_node_number(
     patch_await,
     fake_odin: EigerOdin,
 ):
-    ERR_MESSAGE = "Help, I'm in error!"
+    error_message = "Help, I'm in error!"
     patch_await.side_effect = lambda *_: fake_status(True)
-    fake_odin.nodes.node_0.error_message.sim_put(ERR_MESSAGE)  # type: ignore
+    fake_odin.nodes.node_0.error_message.sim_put(error_message)  # type: ignore
 
     error = fake_odin.nodes.wait_for_no_errors(None)
     error_messages = list(error.values())
 
     assert any(status.exception for status in error.keys())
     assert any("0" in message for message in error_messages)
-    assert any(ERR_MESSAGE in message for message in error_messages)
+    assert any(error_message in message for message in error_messages)
 
 
 @pytest.mark.parametrize(

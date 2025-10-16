@@ -19,7 +19,7 @@ TEST_PREFIX = "test"
 TEST_RUN_NUMBER = 0
 
 
-class StatusException(Exception):
+class StatusError(Exception):
     pass
 
 
@@ -44,7 +44,7 @@ def finished_status():
     return status
 
 
-def get_bad_status(exception=StatusException):
+def get_bad_status(exception=StatusError):
     status = Status()
     status.set_exception(exception)
     return status
@@ -265,7 +265,7 @@ def test_unsuccessful_true_roi_mode_change_results_in_callback_error(
     mock_and, fake_eiger: EigerDetector
 ):
     bad_status = Status()
-    bad_status.set_exception(StatusException("Failed setting ROI mode True"))
+    bad_status.set_exception(StatusError("Failed setting ROI mode True"))
     mock_and.return_value = bad_status
     LOGGER.error = MagicMock()
 
@@ -275,7 +275,7 @@ def test_unsuccessful_true_roi_mode_change_results_in_callback_error(
             energy=fake_eiger.detector_params.expected_energy_ev
         ),
     ]
-    with pytest.raises(StatusException):
+    with pytest.raises(StatusError):
         run_functions_without_blocking(unwrapped_funcs).wait()
     LOGGER.error.assert_called()
 
@@ -285,7 +285,7 @@ def test_unsuccessful_false_roi_mode_change_results_in_callback_error(
     mock_and, fake_eiger: EigerDetector
 ):
     bad_status = Status()
-    bad_status.set_exception(StatusException("Failed setting ROI mode False"))
+    bad_status.set_exception(StatusError("Failed setting ROI mode False"))
     mock_and.return_value = bad_status
     LOGGER.error = MagicMock()
 
@@ -295,7 +295,7 @@ def test_unsuccessful_false_roi_mode_change_results_in_callback_error(
             energy=fake_eiger.detector_params.expected_energy_ev
         ),
     ]
-    with pytest.raises(StatusException):
+    with pytest.raises(StatusError):
         run_functions_without_blocking(unwrapped_funcs).wait()
 
 
@@ -478,7 +478,7 @@ def test_check_callback_error(fake_eiger: EigerDetector, iteration):
 
     unwrapped_funcs[iteration] = get_bad_status
 
-    with pytest.raises(StatusException):
+    with pytest.raises(StatusError):
         run_functions_without_blocking(unwrapped_funcs).wait(timeout=10)
         LOGGER.error.assert_called_once()
 

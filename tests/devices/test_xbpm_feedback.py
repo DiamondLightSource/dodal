@@ -67,7 +67,7 @@ def test_given_pos_not_stable_and_goes_stable_when_xbpm_feedback_kickoff_then_re
     ],
 )
 @patch("dodal.common.device_utils.sleep")
-def test_logging_while_waiting_for_XBPM(
+def test_logging_while_waiting_for_xbpm(
     asyncio_sleep: AsyncMock,
     time_before_stable: float,
     expected_log_messages: int,

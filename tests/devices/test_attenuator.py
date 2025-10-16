@@ -13,8 +13,8 @@ from dodal.devices.attenuator.attenuator import (
     YesNo,
 )
 from dodal.devices.attenuator.filter_selections import (
-    I24_FilterOneSelections,
-    I24_FilterTwoSelections,
+    I24FilterOneSelections,
+    I24FilterTwoSelections,
 )
 
 CALCULATED_VALUE = [True, False, True] * 6  # Some "random" values
@@ -86,7 +86,7 @@ async def test_enum_attenuator_set():
     with init_devices(mock=True):
         attenuator = EnumFilterAttenuator(
             prefix="",
-            filter_selection=(I24_FilterOneSelections, I24_FilterTwoSelections),
+            filter_selection=(I24FilterOneSelections, I24FilterTwoSelections),
         )
 
     async def _move_filter_after_short_delay(_):

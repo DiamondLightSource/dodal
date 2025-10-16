@@ -72,7 +72,7 @@ class I02_1FilterFourSelections(SubsetEnum):
     TI500 = "Ti500"
 
 
-class I24_FilterOneSelections(SubsetEnum):
+class I24FilterOneSelections(SubsetEnum):
     EMPTY = "Empty"
     AL12_5 = "Al12.5"
     AL25 = "Al25"
@@ -85,7 +85,7 @@ class I24_FilterOneSelections(SubsetEnum):
     TI500 = "Ti500"
 
 
-class I24_FilterTwoSelections(SubsetEnum):
+class I24FilterTwoSelections(SubsetEnum):
     EMPTY = "Empty"
     AL100 = "Al100"
     AL200 = "Al200"

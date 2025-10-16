@@ -96,7 +96,7 @@ async def mock_phaseAxes(prefix: str = "BLXX-EA-DET-007:") -> UndulatorPhaseAxes
 @pytest.fixture
 async def mock_pgm(prefix: str = "BLXX-EA-DET-007:") -> PGM:
     async with init_devices(mock=True):
-        mock_pgm = PGM(prefix=prefix, grating=I10Grating, gratingPv="NLINES2")
+        mock_pgm = PGM(prefix=prefix, grating=I10Grating, grating_pv="NLINES2")
     patch_motor(mock_pgm.energy)
     return mock_pgm
 

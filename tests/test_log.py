@@ -46,13 +46,13 @@ def dodal_logger_for_tests():
 def test_handlers_set_at_correct_default_level(
     mock_memory_handler,
     mock_file_handler,
-    mock_GELFTCPHandler,
+    mock_gelf_tcp_handler,
     mock_stream_handler,
     mock_logger: MagicMock,
 ):
     mock_memory_handler.return_value.level = logging.DEBUG
     mock_file_handler.return_value.level = logging.INFO
-    mock_GELFTCPHandler.return_value.level = logging.INFO
+    mock_gelf_tcp_handler.return_value.level = logging.INFO
     mock_stream_handler.return_value.level = logging.DEBUG
     handlers = set_up_all_logging_handlers(mock_logger, Path(""), "", True, 10000)
 
@@ -68,27 +68,27 @@ def test_handlers_set_at_correct_default_level(
 
 @patch("dodal.log.GELFTCPHandler", autospec=True)
 def test_dev_mode_sets_correct_graypy_handler(
-    mock_GELFTCPHandler,
+    mock_gelf_tcp_handler,
     mock_logger: MagicMock,
 ):
-    mock_GELFTCPHandler.return_value.level = logging.INFO
+    mock_gelf_tcp_handler.return_value.level = logging.INFO
     handler_config = set_up_all_logging_handlers(
         mock_logger, Path("tmp/dev"), "dodal.log", True, 10000
     )
-    mock_GELFTCPHandler.assert_called_once_with("localhost", 5555)
+    mock_gelf_tcp_handler.assert_called_once_with("localhost", 5555)
     _close_all_handlers(handler_config)
 
 
 @patch("dodal.log.GELFTCPHandler", autospec=True)
 def test_prod_mode_sets_correct_graypy_handler(
-    mock_GELFTCPHandler,
+    mock_gelf_tcp_handler,
     mock_logger: MagicMock,
 ):
-    mock_GELFTCPHandler.return_value.level = logging.INFO
+    mock_gelf_tcp_handler.return_value.level = logging.INFO
     handler_config = set_up_all_logging_handlers(
         mock_logger, Path("tmp/dev"), "dodal.log", False, 10000
     )
-    mock_GELFTCPHandler.assert_called_once_with(
+    mock_gelf_tcp_handler.assert_called_once_with(
         "graylog-log-target.diamond.ac.uk", 12231
     )
     _close_all_handlers(handler_config)
@@ -100,12 +100,12 @@ def test_prod_mode_sets_correct_graypy_handler(
 def test_no_env_variable_sets_correct_file_handler(
     mock_memory_handler,
     mock_file_handler: MagicMock,
-    mock_GELFTCPHandler,
+    mock_gelf_tcp_handler,
     mock_logger: MagicMock,
 ):
     mock_memory_handler.return_value.level = logging.DEBUG
     mock_file_handler.return_value.level = logging.INFO
-    mock_GELFTCPHandler.return_value.level = logging.INFO
+    mock_gelf_tcp_handler.return_value.level = logging.INFO
     clear_all_loggers_and_handlers()
     logging_file_path, debug_logging_file_path = get_logging_file_paths()
     handler_config = set_up_all_logging_handlers(
@@ -147,12 +147,12 @@ def test_messages_logged_from_dodal_get_sent_to_graylog_and_file(
             LOGGER, Path("tmp/dev"), "dodal.log", False, 10000
         )
     LOGGER.info("test")
-    mock_GELFTCPHandler = handlers["graylog_handler"]
-    assert mock_GELFTCPHandler is not None
+    mock_gelf_tcp_handler = handlers["graylog_handler"]
+    assert mock_gelf_tcp_handler is not None
     mock_graylog_handler_class.assert_called_once_with(
         "graylog-log-target.diamond.ac.uk", 12231
     )
-    mock_GELFTCPHandler.handle.assert_called()  # type: ignore
+    mock_gelf_tcp_handler.handle.assert_called()  # type: ignore
     mock_filehandler_emit.assert_called()
 
 
@@ -180,23 +180,23 @@ def test_various_messages_to_graylog_get_beamline_filter(
         )
         integrate_bluesky_and_ophyd_logging(LOGGER)
 
-    mock_GELFTCPHandler: GELFTCPHandler = handlers["graylog_handler"]
-    assert mock_GELFTCPHandler is not None
-    assert mock_GELFTCPHandler.host == "localhost"
-    assert mock_GELFTCPHandler.port == 5555
+    mock_gelf_tcp_handler: GELFTCPHandler = handlers["graylog_handler"]
+    assert mock_gelf_tcp_handler is not None
+    assert mock_gelf_tcp_handler.host == "localhost"
+    assert mock_gelf_tcp_handler.port == 5555
 
     LOGGER.info("test")
-    assert isinstance(mock_GELFTCPHandler.emit, MagicMock)
-    mock_GELFTCPHandler.emit.assert_called()
-    assert mock_GELFTCPHandler.emit.call_args.args[0].beamline == "dev"
+    assert isinstance(mock_gelf_tcp_handler.emit, MagicMock)
+    mock_gelf_tcp_handler.emit.assert_called()
+    assert mock_gelf_tcp_handler.emit.call_args.args[0].beamline == "dev"
 
     ophyd_log.logger.info("Ophyd log message")
-    assert mock_GELFTCPHandler.emit.call_args.args[0].name == "ophyd"
-    assert mock_GELFTCPHandler.emit.call_args.args[0].beamline == "dev"
+    assert mock_gelf_tcp_handler.emit.call_args.args[0].name == "ophyd"
+    assert mock_gelf_tcp_handler.emit.call_args.args[0].beamline == "dev"
 
     run_engine.log.logger.info("RunEngine log message")
-    assert mock_GELFTCPHandler.emit.call_args.args[0].name == "bluesky"
-    assert mock_GELFTCPHandler.emit.call_args.args[0].beamline == "dev"
+    assert mock_gelf_tcp_handler.emit.call_args.args[0].name == "bluesky"
+    assert mock_gelf_tcp_handler.emit.call_args.args[0].beamline == "dev"
 
 
 @pytest.mark.parametrize(
