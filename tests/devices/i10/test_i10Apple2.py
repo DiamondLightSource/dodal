@@ -5,11 +5,12 @@ from unittest import mock
 from unittest.mock import MagicMock, Mock
 
 import pytest
+from bluesky.plan_stubs import prepare
 from bluesky.plans import scan
 from bluesky.run_engine import RunEngine
 from daq_config_server.client import ConfigServer
 from numpy import linspace, poly1d
-from ophyd_async.core import init_devices
+from ophyd_async.core import FlyMotorInfo, init_devices
 from ophyd_async.testing import (
     assert_emitted,
     callback_on_mock_put,
@@ -745,3 +746,14 @@ async def test_fail_i10_energy_motor_lookup_with_lookup_gap(
         == """Cannot find polynomial coefficients for your requested energy.
         There might be gap in the calibration lookup table."""
     )
+
+
+async def test_InsertionDeviceEnergy_prepare_success(
+    RE: RunEngine, mock_id_energy: InsertionDeviceEnergy
+):
+    fly_motor_info = FlyMotorInfo(
+        start_position=600,
+        end_position=700,
+        time_for_move=60,
+    )
+    RE(prepare(mock_id_energy, fly_motor_info))

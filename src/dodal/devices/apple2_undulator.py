@@ -374,7 +374,7 @@ class UndulatorJawPhase(SafeUndulatorMover[float]):
         )
 
 
-class Apple2(StandardReadable, Movable):
+class Apple2(StandardReadable, Movable[Apple2Val]):
     """
     Device representing the combined motor controls for an Apple2 undulator.
 
@@ -449,7 +449,7 @@ class EnergyMotorConvertor(Protocol):
 Apple2Type = TypeVar("Apple2Type", bound="Apple2")
 
 
-class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
+class Apple2Controller(StandardReadable, Generic[Apple2Type]):
     """
 
     Abstract base class for controlling an Apple2 undulator device.
@@ -747,8 +747,11 @@ class BeamEnergy(StandardReadable, Movable[float]):
 class InsertionDeviceEnergy(InsertionDeviceEnergyBase):
     """Apple2 ID energy movable device."""
 
-    def __init__(self, id_controller: Apple2Controller, name: str = "") -> None:
+    def __init__(
+        self, id_controller: Apple2Controller[Apple2Type], name: str = ""
+    ) -> None:
         self.energy = Reference(id_controller.energy)
+        self._id_controller = Reference(id_controller)
         super().__init__(name=name)
 
         self.add_readables(
@@ -761,6 +764,41 @@ class InsertionDeviceEnergy(InsertionDeviceEnergyBase):
     @AsyncStatus.wrap
     async def set(self, energy: float) -> None:
         await self.energy().set(energy)
+
+    @AsyncStatus.wrap
+    async def prepare(self, value: FlyMotorInfo) -> None:
+        """Convert FlyMotorInfo from energy to gap motion and move phase motor to mid point."""
+        mid_energy = (value.start_position + value.end_position) / 2.0
+        LOGGER.info(
+            f"Preparing for fly energy scan, move {self._id_controller().apple2().phase} to {mid_energy}"
+        )
+        await self.set(energy=mid_energy)
+        current_pol = await self._id_controller().polarisation_setpoint.get_value()
+        start_position = self._id_controller().energy_to_motor(
+            energy=value.start_position,
+            pol=current_pol,
+        )
+        end_position = self._id_controller().energy_to_motor(
+            energy=value.end_position, pol=current_pol
+        )
+
+        gap_fly_motor_info = FlyMotorInfo(
+            start_position=start_position[0],
+            end_position=end_position[0],
+            time_for_move=value.time_for_move,
+        )
+        LOGGER.info(
+            f"Flyscan info in energy: {value}"
+            + f"Flyscan info in gap: {gap_fly_motor_info}"
+        )
+        await self._id_controller().apple2().gap.prepare(value=gap_fly_motor_info)
+
+    @AsyncStatus.wrap
+    async def kickoff(self):
+        await self._id_controller().apple2().gap.kickoff()
+
+    def complete(self) -> WatchableAsyncStatus:
+        return self._id_controller().apple2().gap.complete()
 
 
 class InsertionDevicePolarisation(StandardReadable, Locatable[Pol]):

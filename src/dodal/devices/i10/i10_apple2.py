@@ -339,6 +339,7 @@ class I10Apple2(Apple2):
         name : str, optional
             The name of the device, by default "".
         """
+
         with self.add_children_as_readables():
             self.jaw_phase = id_jaw_phase
         super().__init__(id_gap=id_gap, id_phase=id_phase, name=name)
