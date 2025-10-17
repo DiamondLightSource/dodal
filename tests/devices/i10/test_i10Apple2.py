@@ -5,12 +5,15 @@ from unittest import mock
 from unittest.mock import MagicMock, Mock
 
 import pytest
-from bluesky.plan_stubs import prepare
+from bluesky import plan_stubs as bps
 from bluesky.plans import scan
 from bluesky.run_engine import RunEngine
 from daq_config_server.client import ConfigServer
 from numpy import linspace, poly1d
-from ophyd_async.core import FlyMotorInfo, init_devices
+from ophyd_async.core import (
+    FlyMotorInfo,
+    init_devices,
+)
 from ophyd_async.testing import (
     assert_emitted,
     callback_on_mock_put,
@@ -756,4 +759,4 @@ async def test_InsertionDeviceEnergy_prepare_success(
         end_position=700,
         time_for_move=60,
     )
-    RE(prepare(mock_id_energy, fly_motor_info))
+    RE(bps.prepare(mock_id_energy, fly_motor_info))
