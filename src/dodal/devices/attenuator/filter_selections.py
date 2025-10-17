@@ -72,6 +72,45 @@ class I02_1FilterFourSelections(SubsetEnum):
     TI500 = "Ti500"
 
 
+class I02_2FilterOneSelections(SubsetEnum):
+    EMPTY = "Empty"
+    AL10 = "10AL"
+    AL25 = "25AL"
+    AL50 = "50Al"
+    AL100 = "100Al"
+    AL200 = "200Al"
+    AL300 = "300Al"
+    AL400 = "400Al"
+    AL500 = "500Al"
+    AL600 = "600Al"
+
+
+class I02_2FilterTwoSelections(SubsetEnum):
+    EMPTY = "Empty"
+    AL30 = "30Al"
+    AL40 = "40Al"
+    AL60 = "60Al"
+    AL70 = "70Al"
+    AL80 = "80Al"
+    AL90 = "90Al"
+    AL700 = "700Al"
+    AL800 = "800Al"
+    AL900 = "900Al"
+
+
+class I02_2FilterThreeSelections(SubsetEnum):
+    EMPTY = "Empty"
+    AL1000 = "1000Al"
+    AG100 = "100Ag"
+    AG200 = "200Ag"
+    AG300 = "300Ag"
+    AG400 = "400Ag"
+    AG500 = "500Ag"
+    AG600 = "600Ag"
+    AG700 = "700Ag"
+    AG800 = "800Ag"
+
+
 class I24_FilterOneSelections(SubsetEnum):
     EMPTY = "Empty"
     AL12_5 = "Al12.5"
