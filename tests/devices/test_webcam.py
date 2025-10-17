@@ -142,7 +142,7 @@ async def test_given_non_image_error_from_webcam_then_placeholder_image_written(
     mock_file.write.assert_called_once_with(test_placeholder_data)
 
 
-@pytest.mark.requires(instrument="i03")  # uses the real webcam
+@pytest.mark.skip(reason="System test that hits a real webcam, not suitable for CI")
 async def test_webcam_system_test():
     async with init_devices():
         webcam = Webcam(
