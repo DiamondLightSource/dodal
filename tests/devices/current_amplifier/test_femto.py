@@ -47,29 +47,29 @@ async def mock_femto(
 
 
 @pytest.fixture
-async def mock_StruckScaler(
+async def mock_struck_scaler(
     prefix: str = "BLXX-EA-DET-007:", suffix: str = ".s17"
 ) -> StruckScaler:
     async with init_devices(mock=True):
-        mock_StruckScaler = StruckScaler(
+        mock_struck_scaler = StruckScaler(
             prefix=prefix,
             suffix=suffix,
-            name="mock_StruckScaler",
+            name="mock_struck_scaler",
         )
-    assert mock_StruckScaler.name == "mock_StruckScaler"
-    return mock_StruckScaler
+    assert mock_struck_scaler.name == "mock_struck_scaler"
+    return mock_struck_scaler
 
 
 @pytest.fixture
 async def mock_femto_struck_scaler_detector(
-    mock_StruckScaler: StruckScaler,
+    mock_struck_scaler: StruckScaler,
     mock_femto: FemtoDDPCA,
     prefix: str = "BLXX-EA-DET-007:",
 ) -> CurrentAmpDet:
     async with init_devices(mock=True):
         mock_femto_struck_scaler_detector = CurrentAmpDet(
             current_amp=mock_femto,
-            counter=mock_StruckScaler,
+            counter=mock_struck_scaler,
             name="mock_femto_struck_scaler_detector",
         )
     assert mock_femto_struck_scaler_detector.name == "mock_femto_struck_scaler_detector"

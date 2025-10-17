@@ -110,7 +110,7 @@ def test_status_points_to_provided_device_object():
     assert returned_status.obj == expected_obj
 
 
-async def test_given_disp_high_when_set_SetWhenEnabled_then_proc_not_set_until_disp_low():
+async def test_given_disp_high_when_set_SetWhenEnabled_then_proc_not_set_until_disp_low():  # noqa: N802
     device: SetWhenEnabled = SetWhenEnabled("", name="test")
     await device.connect(True)
     set_mock_value(device.disp, 1)

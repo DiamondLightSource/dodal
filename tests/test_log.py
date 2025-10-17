@@ -25,8 +25,8 @@ from dodal.log import (
 
 @pytest.fixture()
 def mock_logger():
-    with patch("dodal.log.LOGGER") as mock_LOGGER:
-        yield mock_LOGGER
+    with patch("dodal.log.LOGGER") as mock_logger:
+        yield mock_logger
 
 
 @pytest.fixture()

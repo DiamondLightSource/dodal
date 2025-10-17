@@ -127,7 +127,7 @@ def test_leading_comma_in_list_causes_error():
         GDABeamlineParameters.parse_value("[[1, 2], [ ,3, 4]]")
 
 
-def test_Yes_and_No_replaced_with_bool_values():
+def test_yes_and_no_replaced_with_bool_values():
     value = "[Yes, No, True, False, 0, 1]"
     expected = [True, False, True, False, 0, 1]
     actual = GDABeamlineParameters.parse_value(value)

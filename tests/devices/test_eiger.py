@@ -25,8 +25,8 @@ class StatusError(Exception):
 
 @pytest.fixture
 def fake_eiger(request, eiger_params: DetectorParams):
-    FakeEigerDetector: EigerDetector = make_fake_device(EigerDetector)
-    fake_eiger: EigerDetector = FakeEigerDetector.with_params(
+    fake_eiger_factory: EigerDetector = make_fake_device(EigerDetector)
+    fake_eiger: EigerDetector = fake_eiger_factory.with_params(
         params=eiger_params, name=f"test fake Eiger: {request.node.name}"
     )
     return fake_eiger
@@ -706,8 +706,8 @@ def test_when_eiger_is_stopped_then_dev_shm_disabled(fake_eiger: EigerDetector):
 
 
 def test_for_other_beamlines_i03_used_as_default(eiger_params: DetectorParams):
-    FakeEigerDetector: EigerDetector = make_fake_device(EigerDetector)
-    fake_eiger: EigerDetector = FakeEigerDetector.with_params(
+    fake_eiger_factory: EigerDetector = make_fake_device(EigerDetector)
+    fake_eiger: EigerDetector = fake_eiger_factory.with_params(
         params=eiger_params, beamline="ixx"
     )
     assert fake_eiger.beamline == "ixx"
