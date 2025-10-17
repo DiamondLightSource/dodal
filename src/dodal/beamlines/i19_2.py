@@ -1,12 +1,16 @@
+from pathlib import Path
+
 from ophyd_async.fastcs.panda import HDFPanda
 
 from dodal.common.beamlines.beamline_utils import (
     device_factory,
     get_path_provider,
+    set_path_provider,
 )
 from dodal.common.beamlines.beamline_utils import (
     set_beamline as set_utils_beamline,
 )
+from dodal.common.visit import StaticVisitPathProvider
 from dodal.devices.i19.backlight import BacklightPosition
 from dodal.devices.i19.beamstop import BeamStop
 from dodal.devices.i19.blueapi_device import HutchState
@@ -30,6 +34,13 @@ BL = "i19-2"
 PREFIX = BeamlinePrefix("i19", "I")
 set_log_beamline(BL)
 set_utils_beamline(BL)
+
+set_path_provider(
+    StaticVisitPathProvider(
+        BL,
+        Path("/dls/i19-2/data/2025/cm40639-4/"),
+    )
+)
 
 
 I19_2_ZEBRA_MAPPING = ZebraMapping(
