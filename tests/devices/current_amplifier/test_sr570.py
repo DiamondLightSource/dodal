@@ -139,7 +139,7 @@ async def test_sr570_set_fail_out_of_range(sleep: AsyncMock, mock_sr570: SR570, 
     ],
 )
 @mock.patch("asyncio.sleep")
-async def test_SR570_increase_gain(
+async def test_sr570_increase_gain(
     sleep: AsyncMock,
     mock_sr570: SR570,
     starting_gain: float,
@@ -154,7 +154,7 @@ async def test_SR570_increase_gain(
 
 
 @mock.patch("asyncio.sleep")
-async def test_SR570_increase_gain_top_out_fail(
+async def test_sr570_increase_gain_top_out_fail(
     sleep: AsyncMock,
     mock_sr570: SR570,
 ):
@@ -176,7 +176,7 @@ async def test_SR570_increase_gain_top_out_fail(
     ],
 )
 @mock.patch("asyncio.sleep")
-async def test_SR570_decrease_gain(
+async def test_sr570_decrease_gain(
     sleep: AsyncMock,
     mock_sr570: SR570,
     starting_gain: str,
@@ -193,7 +193,7 @@ async def test_SR570_decrease_gain(
 
 
 @mock.patch("asyncio.sleep")
-async def test_SR570_decrease_gain_bottom_out_fail(
+async def test_sr570_decrease_gain_bottom_out_fail(
     sleep: AsyncMock,
     mock_sr570: SR570,
 ):
@@ -225,7 +225,7 @@ class MockSR570RaiseTimeTable(float, Enum):
         ("SEN_5", 0.0, 0.0),
     ],
 )
-async def test_SR570_struck_scaler_read(
+async def test_sr570_struck_scaler_read(
     mock_sr570_struck_scaler_detector,
     run_engine: RunEngine,
     gain,
@@ -272,7 +272,7 @@ async def test_SR570_struck_scaler_read(
         ("SEN_25", [0.002e5, 0.004e5, 0.01e5, 0.02e5, 0.02e5], 2e-14),
     ],
 )
-async def test_SR570_struck_scaler_read_with_autoGain(
+async def test_sr570_struck_scaler_read_with_autogain(
     mock_sr570_struck_scaler_detector,
     run_engine: RunEngine,
     gain,

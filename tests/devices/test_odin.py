@@ -114,7 +114,7 @@ def test_given_node_in_error_node_error_status_gives_message_and_node_number(
 
 
 @pytest.mark.parametrize(
-    "meta_writing, OD1_writing, OD2_writing",
+    "meta_writing, od1_writing, od2_writing",
     [
         (True, False, False),
         (True, True, True),
@@ -122,11 +122,11 @@ def test_given_node_in_error_node_error_status_gives_message_and_node_number(
     ],
 )
 def test_wait_for_all_filewriters_to_finish(
-    fake_odin: EigerOdin, meta_writing, OD1_writing, OD2_writing
+    fake_odin: EigerOdin, meta_writing, od1_writing, od2_writing
 ):
     fake_odin.meta.ready.sim_put(meta_writing)  # type: ignore
-    fake_odin.nodes.nodes[0].writing.sim_put(OD1_writing)  # type: ignore
-    fake_odin.nodes.nodes[1].writing.sim_put(OD2_writing)  # type: ignore
+    fake_odin.nodes.nodes[0].writing.sim_put(od1_writing)  # type: ignore
+    fake_odin.nodes.nodes[1].writing.sim_put(od2_writing)  # type: ignore
     fake_odin.nodes.nodes[2].writing.sim_put(0)  # type: ignore
     fake_odin.nodes.nodes[3].writing.sim_put(0)  # type: ignore
 

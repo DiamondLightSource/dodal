@@ -20,7 +20,7 @@ class DataCollectionIdentifier(BaseModel):
     Should be always incrementing, unique per-visit, co-ordinated with any other scan engines.
     """
 
-    collectionNumber: int
+    collectionNumber: int  # noqa:N815
 
 
 class DirectoryServiceClient(ABC):

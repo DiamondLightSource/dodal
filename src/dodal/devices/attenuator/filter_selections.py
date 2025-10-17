@@ -20,7 +20,7 @@ class P99FilterSelections(SubsetEnum):
     USER = "User"
 
 
-class I02_1FilterOneSelections(SubsetEnum):
+class I02_1FilterOneSelections(SubsetEnum):  # noqa: N801
     EMPTY = "Empty"
     AL8 = "Al8"
     AL15 = "Al15"
@@ -33,7 +33,7 @@ class I02_1FilterOneSelections(SubsetEnum):
     TWO_TIMES_TI500 = "2xTi500"
 
 
-class I02_1FilterTwoSelections(SubsetEnum):
+class I02_1FilterTwoSelections(SubsetEnum):  # noqa: N801
     EMPTY = "Empty"
     AL50 = "Al50"
     AL100 = "Al100"
@@ -46,7 +46,7 @@ class I02_1FilterTwoSelections(SubsetEnum):
     TWO_TIMES_TI500 = "2xTi500"
 
 
-class I02_1FilterThreeSelections(SubsetEnum):
+class I02_1FilterThreeSelections(SubsetEnum):  # noqa: N801
     EMPTY = "Empty"
     AL15 = "Al15"
     AL25 = "Al25"
@@ -59,7 +59,7 @@ class I02_1FilterThreeSelections(SubsetEnum):
     TI200 = "Ti200"
 
 
-class I02_1FilterFourSelections(SubsetEnum):
+class I02_1FilterFourSelections(SubsetEnum):  # noqa: N801
     EMPTY = "Empty"
     AL15 = "Al15"
     AL25 = "Al25"

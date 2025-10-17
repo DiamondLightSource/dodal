@@ -204,6 +204,10 @@ lint.select = [
 [tool.ruff.lint.flake8-tidy-imports.banned-api]
 "time.sleep".msg = "Use bps.sleep or asyncio.sleep instead. # noqa will disable this rule for that line. See https://github.com/DiamondLightSource/mx-bluesky/issues/925"
 
+[tool.ruff.lint.flake8-import-conventions.extend-aliases]
+# We often shorten "Annotated" to "A" for brevity
+"typing.Annotated" = "A"
+
 [tool.importlinter]
 root_package = "dodal"
 
