@@ -40,11 +40,11 @@ class I17Apple2Controller(Apple2Controller[Apple2]):
         pol = await self._check_and_get_pol_setpoint()
         gap, phase = self.energy_to_motor(energy=value, pol=pol)
         id_set_val = Apple2Val(
-            top_outer=f"{phase:.6f}",
-            top_inner="0.0",
-            btm_inner=f"{phase:.6f}",
-            btm_outer="0.0",
-            gap=f"{gap:.6f}",
+            top_outer=phase,
+            top_inner=0.0,
+            btm_inner=phase,
+            btm_outer=0.0,
+            gap=gap,
         )
 
         LOGGER.info(f"Setting polarisation to {pol}, with values: {id_set_val}")
