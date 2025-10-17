@@ -7,7 +7,7 @@ from dodal.plans.verify_undulator_gap import verify_undulator_gap
 from tests.plans.conftest import UndulatorGapCheckDevices
 
 
-@patch("dodal.devices.undulator.BaseUndulator.set", new_callable=AsyncMock)
+@patch("dodal.devices.undulator.BaseUndulator._set_gap", new_callable=AsyncMock)
 def test_verify_undulator_gap(
     mock_set: AsyncMock, mock_undulator_and_dcm: UndulatorGapCheckDevices, RE: RunEngine
 ):
