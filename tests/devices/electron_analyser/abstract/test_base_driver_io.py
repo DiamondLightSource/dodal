@@ -1,13 +1,16 @@
+from typing import get_origin
 from unittest.mock import AsyncMock, patch
 
 import pytest
 from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
 from bluesky.utils import FailedStatus
-from ophyd_async.core import SignalR, StrictEnum, init_devices
+from ophyd_async.core import StrictEnum, init_devices
 from ophyd_async.epics.adcore import ADImageMode
+from ophyd_async.testing import get_mock_put
 
 from dodal.devices import b07, i09
+from dodal.devices.electron_analyser import DualEnergySource, EnergyMode, EnergySource
 from dodal.devices.electron_analyser.abstract import (
     AbstractAnalyserDriverIO,
     AbstractBaseRegion,
@@ -32,24 +35,58 @@ from tests.devices.electron_analyser.helper_util import (
 )
 async def sim_driver(
     request: pytest.FixtureRequest,
-    energy_sources: dict[str, SignalR[float]],
+    single_energy_source: EnergySource,
+    dual_energy_source: DualEnergySource,
+    RE: RunEngine,
 ) -> AbstractAnalyserDriverIO:
+    source = single_energy_source
+    if get_origin(request.param) is VGScientaAnalyserDriverIO:
+        source = dual_energy_source
     async with init_devices(mock=True):
         sim_driver = await create_driver(
-            request.param, prefix="TEST:", energy_sources=energy_sources
+            request.param, prefix="TEST:", energy_source=source
         )
     return sim_driver
 
 
 @pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
-def test_analyser_correctly_selects_energy_source_from_region_input(
+async def test_driver_set(
     sim_driver: AbstractAnalyserDriverIO,
     region: AbstractBaseRegion,
+    RE: RunEngine,
 ) -> None:
-    source_alias_name = region.excitation_energy_source
-    energy_source = sim_driver._get_energy_source(source_alias_name)
+    sim_driver._set_region = AsyncMock()
 
-    assert energy_source == sim_driver.energy_sources[source_alias_name]
+    # Patch switch_energy_mode so we can check on calls, but still run the real function
+    with patch.object(
+        AbstractBaseRegion,
+        "switch_energy_mode",
+        side_effect=AbstractBaseRegion.switch_energy_mode,  # run the real method
+        autospec=True,
+    ) as mock_switch_energy_mode:
+        RE(bps.mv(sim_driver, region))
+
+        mock_switch_energy_mode.assert_called_once_with(
+            region,
+            EnergyMode.KINETIC,
+            await sim_driver.energy_source.energy.get_value(),
+        )
+
+        if isinstance(sim_driver.energy_source, DualEnergySource):
+            get_mock_put(
+                sim_driver.energy_source.selected_source
+            ).assert_called_once_with(region.excitation_energy_source, wait=True)
+
+        # Check interal _set_region was set with ke_region
+        ke_region = mock_switch_energy_mode.call_args[0][0].switch_energy_mode(
+            EnergyMode.KINETIC,
+            await sim_driver.energy_source.energy.get_value(),
+        )
+        sim_driver._set_region.assert_called_once_with(ke_region)
+
+        get_mock_put(sim_driver.energy_mode).assert_called_once_with(
+            region.energy_mode, wait=True
+        )
 
 
 def test_driver_throws_error_with_wrong_lens_mode(
