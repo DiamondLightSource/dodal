@@ -748,10 +748,12 @@ async def test_fail_i10_energy_motor_lookup_with_lookup_gap(
     )
 
 
-async def test_i10apple2_prepare_success(RE: RunEngine, mock_id: I10Apple2):
+async def test_InsertionDeviceEnergy_prepare_success(
+    RE: RunEngine, mock_id_energy: InsertionDeviceEnergy
+):
     fly_motor_info = FlyMotorInfo(
         start_position=600,
         end_position=700,
         time_for_move=60,
     )
-    RE(prepare(mock_id, fly_motor_info))
+    RE(prepare(mock_id_energy, fly_motor_info))
