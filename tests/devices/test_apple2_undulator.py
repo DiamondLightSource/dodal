@@ -1,11 +1,19 @@
+import asyncio
 from collections import defaultdict
-from unittest.mock import AsyncMock, MagicMock, Mock
+from unittest.mock import AsyncMock, MagicMock, Mock, patch
 
 import bluesky.plan_stubs as bps
 import pytest
 from bluesky.plans import scan
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import FlyMotorInfo, StrictEnum, init_devices
+from ophyd_async.core import (
+    AsyncStatus,
+    FlyMotorInfo,
+    StrictEnum,
+    init_devices,
+    soft_signal_rw,
+    wait_for_value,
+)
 from ophyd_async.testing import (
     assert_configuration,
     assert_emitted,
@@ -21,6 +29,7 @@ from dodal.devices.apple2_undulator import (
     Apple2,
     Apple2Controller,
     Apple2PhasesVal,
+    BeamEnergy,
     EnergyMotorConvertor,
     InsertionDeviceEnergy,
     MotorWithoutStop,
@@ -151,6 +160,15 @@ async def mock_pgm() -> PGM:
     async with init_devices(mock=True):
         mock_pgm = PGM(prefix="", grating=MockGrating)
     return mock_pgm
+
+
+@pytest.fixture
+async def mock_beam_energy(
+    mock_pgm: PGM, mock_id_energy: InsertionDeviceEnergy
+) -> BeamEnergy:
+    async with init_devices(mock=True):
+        mock_beam_energy = BeamEnergy(id_energy=mock_id_energy, mono=mock_pgm.energy)
+    return mock_beam_energy
 
 
 async def test_in_motion_error(
@@ -551,14 +569,88 @@ def test_InsertionDeviceEnergy_complete_call_gap_complete(
     mock_id_gap.complete.assert_called_once()
 
 
-# async def test_energy_setter_prepare_success(
-#     mock_energy_setter: EnergySetter,
-#     RE: RunEngine,
-# ):
-#     mock_energy_setter.id.prepare = AsyncMock()
-#     mock_energy_setter.pgm_ref().energy.prepare = AsyncMock()
+async def test_beam_energy_prepare_success(
+    RE: RunEngine,
+    mock_beam_energy: BeamEnergy,
+    mock_pgm: PGM,
+    mock_id_energy: InsertionDeviceEnergy,
+):
+    fly_info = FlyMotorInfo(start_position=700, end_position=800, time_for_move=10)
+    mock_id_energy.prepare = AsyncMock()
+    mock_pgm.energy.prepare = AsyncMock()
+    RE(bps.prepare(mock_beam_energy, fly_info))
+    mock_id_energy.prepare.assert_awaited_once_with(fly_info)
+    mock_pgm.energy.prepare.assert_awaited_once_with(fly_info)
 
-#     fly_info = FlyMotorInfo(start_position=700, end_position=800, time_for_move=10)
-#     RE(bps.prepare(mock_energy_setter, fly_info, wait=True))
-#     mock_energy_setter.id.prepare.assert_awaited_once_with(fly_info)
-#     mock_energy_setter.pgm_ref().energy.prepare.assert_awaited_once_with(fly_info)  # type: ignore
+
+@patch("asyncio.sleep", new_callable=AsyncMock)
+async def test_beam_energy_kickoff_set_correct_delay(
+    mock_sleep: AsyncMock,
+    RE: RunEngine,
+    mock_beam_energy: BeamEnergy,
+    mock_pgm: PGM,
+    mock_id_gap: UndulatorGap,
+    mock_apple2_controller: Apple2Controller,
+):
+    mock_apple2_controller.energy_to_motor = Mock(
+        side_effect=[(20.0, 22.0), (22.0, 22.0)]
+    )
+    fly_info = FlyMotorInfo(start_position=700, end_position=800, time_for_move=10)
+    id_acc_time = 3
+    pgm_acc_time = 1
+    set_mock_value(mock_id_gap.max_velocity, 30)
+    set_mock_value(mock_id_gap.min_velocity, 0.1)
+    set_mock_value(mock_id_gap.acceleration_time, id_acc_time)
+    set_mock_value(mock_pgm.energy.max_velocity, 30)
+    set_mock_value(mock_id_gap.low_limit_travel, 0)
+    set_mock_value(mock_id_gap.high_limit_travel, 200)
+    set_mock_value(mock_pgm.energy.low_limit_travel, 0)
+    set_mock_value(mock_pgm.energy.high_limit_travel, 1000)
+    set_mock_value(mock_pgm.energy.acceleration_time, pgm_acc_time)
+    set_mock_value(mock_id_gap.gate, UndulatorGateStatus.CLOSE)
+    mock_id_gap.kickoff = AsyncMock()
+    mock_pgm.energy.kickoff = AsyncMock()
+    await mock_beam_energy.prepare(fly_info)
+    await mock_beam_energy.kickoff()
+    mock_sleep.assert_awaited_once_with(pgm_acc_time - id_acc_time)
+    mock_id_gap.kickoff.assert_awaited_once()
+    mock_pgm.energy.kickoff.assert_awaited_once()
+
+
+@patch("asyncio.sleep", new_callable=AsyncMock)
+async def test_energysetter_complete(
+    mock_sleep,
+    mock_beam_energy: BeamEnergy,
+    mock_pgm: PGM,
+    mock_id_gap: UndulatorGap,
+    mock_id_energy: InsertionDeviceEnergy,
+) -> None:
+    fake_id_fly_status = soft_signal_rw(bool, initial_value=False)
+    fake_pgm_fly_status = soft_signal_rw(bool, initial_value=False)
+    await asyncio.gather(
+        fake_pgm_fly_status.connect(mock=True), fake_id_fly_status.connect(mock=True)
+    )
+
+    @AsyncStatus.wrap
+    async def get_status(signal):
+        await wait_for_value(signal, True, timeout=1)
+
+    mock_id_gap._fly_status = get_status(fake_id_fly_status)  # type: ignore
+
+    mock_pgm.energy._fly_status = get_status(fake_pgm_fly_status)  # type: ignore
+    mock_id_energy.kickoff = AsyncMock()
+    mock_pgm.energy.kickoff = AsyncMock()
+    pgm_status = mock_pgm.energy.complete()
+    id_status = mock_id_gap.complete()
+    assert not id_status.done
+    assert not pgm_status.done
+    await mock_beam_energy.kickoff()
+    energy_setter_fly_status = mock_beam_energy.complete()
+    assert not energy_setter_fly_status.done
+    await fake_id_fly_status.set(True)
+    assert mock_id_gap._fly_status.done  # type: ignore
+    assert not energy_setter_fly_status.done
+    await fake_pgm_fly_status.set(True)
+    assert mock_pgm.energy._fly_status.done  # type: ignore
+    await energy_setter_fly_status
+    assert energy_setter_fly_status.done
