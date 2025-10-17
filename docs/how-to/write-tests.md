@@ -62,7 +62,7 @@ We use [pytest](https://docs.pytest.org/en/stable/contents.html) for writing tes
 
 Common fixtures, such as the `run_engine` used in the below tests, can also be defined in `dodal/tests/conftest.py`, which is a special file recognised by `pytest`. These fixtures are automatically available to any test in the same directory (and its subdirectories) without needing to import them. This is useful for defining common setup code once without duplicating it across test files.
 
-Devices are ste up in the fixture using the `init_devices(mock=True)` function from `ophyd_async.core`, which automatically initialises the device in mock mode. 
+Devices are set up in the fixture using the `init_devices(mock=True)` function from `ophyd_async.core`, which automatically initialises the device in mock mode. 
 
 In order for `pytest` to detect something as a test, a function should begin with `test_*`. The test function should be self-descriptive about what it is testing, and it is acceptable (even encouraged) to have longer names for test functions for clarity.
 
