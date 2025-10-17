@@ -1,4 +1,3 @@
-import pathlib
 from io import BytesIO
 from unittest.mock import AsyncMock, MagicMock, patch
 
@@ -149,10 +148,8 @@ async def test_webcam_system_test(RE):
             url=URL("http://i03-webcam1/axis-cgi/jpg/image.cgi"),
         )
 
-    this_folder = pathlib.Path(__file__).parent.resolve()
-
     await webcam.filename.set("test")
-    await webcam.directory.set(str(this_folder))
+    await webcam.directory.set("/tmp")
     await webcam.trigger()
 
 
