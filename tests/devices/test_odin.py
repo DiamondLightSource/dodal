@@ -19,8 +19,8 @@ def fake_status(in_error: bool):
 
 @pytest.fixture
 def fake_odin():
-    fake_odin_factory = make_fake_device(EigerOdin)
-    fake_odin: EigerOdin = fake_odin_factory(name="test fake odin")
+    fake_odin_class = make_fake_device(EigerOdin)
+    fake_odin: EigerOdin = fake_odin_class(name="test fake odin")
 
     return fake_odin
 
