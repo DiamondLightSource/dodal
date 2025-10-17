@@ -116,11 +116,12 @@ def image_data_coro(image_bytes: BytesIO) -> AsyncMock:
 
 
 def assert_images_identical(left: Image.Image, right: Image.Image):
-    left_data = list(left.getdata())  # type:ignore # Can remove once https://github.com/python-pillow/Pillow/pull/9261 is released
-    right_data = list(right.getdata())  # type:ignore # Can remove once https://github.com/python-pillow/Pillow/pull/9261 is released
-    assert len(left_data) == len(right_data)
-    for i in range(len(left_data)):
-        assert left_data[i] == right_data[i]
+    assert all(
+        left_px == right_px
+        for left_px, right_px in zip(
+            iter(left.getdata()), iter(right.getdata()), strict=True
+        )
+    )
 
 
 async def test_snapshot_correctly_triggered_and_saved(
