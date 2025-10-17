@@ -19,7 +19,7 @@ from dodal.devices.motors import XYStage, XYZThetaStage
 from dodal.devices.slits import Slits
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.tetramm import TetrammDetector
-from dodal.devices.undulator import Undulator
+from dodal.devices.undulator import UndulatorInKeV
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
@@ -49,8 +49,8 @@ def synchrotron() -> Synchrotron:
 
 
 @device_factory()
-def undulator() -> Undulator:
-    return Undulator(f"{PREFIX.insertion_prefix}-MO-SERVC-01:")
+def undulator() -> UndulatorInKeV:
+    return UndulatorInKeV(f"{PREFIX.insertion_prefix}-MO-SERVC-01:")
 
 
 # See https://github.com/DiamondLightSource/dodal/issues/1180

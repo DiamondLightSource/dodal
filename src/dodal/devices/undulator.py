@@ -1,7 +1,8 @@
 import os
+from abc import ABC, abstractmethod
 
 import numpy as np
-from bluesky.protocols import Locatable, Location, Movable
+from bluesky.protocols import Movable
 from numpy import ndarray
 from ophyd_async.core import (
     AsyncStatus,
@@ -9,7 +10,6 @@ from ophyd_async.core import (
     StandardReadable,
     StandardReadableFormat,
     soft_signal_r_and_setter,
-    soft_signal_rw,
 )
 from ophyd_async.epics.core import epics_signal_r
 from ophyd_async.epics.motor import Motor
@@ -39,39 +39,7 @@ def _get_gap_for_energy(
     )
 
 
-class UndulatorOrder(StandardReadable, Locatable[int]):
-    """
-    Represents the order of an undulator, providing mechanisms to read, set, and
-    validate the order value against a lookup table passed as a dictionary.
-    """
-
-    def __init__(self, lut: dict, name: str = "") -> None:
-        """
-        Args:
-            lut (dict): Dictionary read from lookup table file.
-            name: Name for device. Defaults to ""
-        """
-        self.lut = lut
-        with self.add_children_as_readables():
-            self._order = soft_signal_rw(int, initial_value=3)
-        super().__init__(name=name)
-
-    @AsyncStatus.wrap
-    async def set(self, value: int) -> None:
-        await self._check_order_valid(value)
-        await self._order.set(value)
-
-    async def _check_order_valid(self, value: int) -> None:
-        if value not in self.lut.keys():
-            raise ValueError(
-                f"Order {value} not found in lookup table, must be in {[int(key) for key in self.lut.keys()]}"
-            )
-
-    async def locate(self) -> Location[int]:
-        return await self._order.locate()
-
-
-class BaseUndulator(StandardReadable, Movable[float]):
+class BaseUndulator(StandardReadable, Movable[float], ABC):
     """
     Base class for undulator devices providing gap control and access management.
     This class expects target gap value [mm] passed in set method.
@@ -107,33 +75,29 @@ class BaseUndulator(StandardReadable, Movable[float]):
                 float,
                 initial_value=UNDULATOR_DISCREPANCY_THRESHOLD_MM,
             )
+            self.poles = self._make_signal_if_not_none(poles, int)
+            self.length = self._make_signal_if_not_none(length, float)
+            self.undulator_period = self._make_signal_if_not_none(undulator_period, int)
 
-            if poles is not None:
-                self.poles, _ = soft_signal_r_and_setter(
-                    int,
-                    initial_value=poles,
-                )
-            else:
-                self.poles = None
-
-            if length is not None:
-                self.length, _ = soft_signal_r_and_setter(
-                    float,
-                    initial_value=length,
-                )
-            else:
-                self.length = None
-
-            if undulator_period is not None:
-                self.undulator_period, _ = soft_signal_r_and_setter(
-                    int, initial_value=undulator_period
-                )
-            else:
-                self.undulator_period = None
         super().__init__(name=name)
 
+    def _make_signal_if_not_none(self, initial_value, type):
+        if initial_value is None:
+            return None
+        signal, _ = soft_signal_r_and_setter(type, initial_value=initial_value)
+        return signal
+
+    @abstractmethod
     @AsyncStatus.wrap
     async def set(self, value: float) -> None:
+        """
+        Move undulator to a given position.
+        Args:
+            value: target position - units depend on implementation
+        """
+        ...
+
+    async def _set_gap(self, value: float) -> None:
         """
         Set the undulator gap to a given value in mm.
 
@@ -190,7 +154,7 @@ class BaseUndulator(StandardReadable, Movable[float]):
             raise AccessError("Undulator gap access is disabled. Contact Control Room")
 
 
-class Undulator(BaseUndulator):
+class UndulatorInKeV(BaseUndulator):
     """
     An Undulator-type insertion device, used to control photon emission at a given beam energy.
     This class expects energy [keV] passed in set method and does convertion to gap
@@ -242,7 +206,7 @@ class Undulator(BaseUndulator):
         LOGGER.info(
             f"Setting undulator gap to {target_gap:.3f}mm based on {value:.2f}kev"
         )
-        await super().set(target_gap)
+        await self._set_gap(target_gap)
 
     async def _get_gap_to_match_energy(self, energy_kev: float) -> float:
         """
@@ -258,3 +222,49 @@ class Undulator(BaseUndulator):
             energy_kev * 1000,
             energy_to_distance_table,
         )
+
+
+class UndulatorInMm(BaseUndulator):
+    """
+    An Undulator-type insertion device, used to control photon emission.
+    This class expects gap [mm] passed in set method.
+    """
+
+    def __init__(
+        self,
+        prefix: str,
+        poles: int | None = None,
+        length: float | None = None,
+        undulator_period: int | None = None,
+        baton: Baton | None = None,
+        name: str = "",
+    ) -> None:
+        """Constructor
+
+        Args:
+            prefix: PV prefix
+            poles (int, optional): Number of magnetic poles built into the undulator
+            length (float, optional): Length of the undulator in meters
+            undulator_period(int, optional): Undulator period
+            baton (optional): Baton object if provided.
+            name (str, optional): Name for device. Defaults to "".
+        """
+
+        super().__init__(
+            prefix=prefix,
+            poles=poles,
+            length=length,
+            undulator_period=undulator_period,
+            baton=baton,
+            name=name,
+        )
+
+    @AsyncStatus.wrap
+    async def set(self, value: float):
+        """
+        Check conditions and Set undulator gap to a given value in mm
+
+        Args:
+            value: value in mm
+        """
+        await self._set_gap(value)

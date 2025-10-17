@@ -3,12 +3,12 @@ from typing import Protocol, runtime_checkable
 from bluesky import plan_stubs as bps
 
 from dodal.devices.common_dcm import BaseDCM
-from dodal.devices.undulator import Undulator
+from dodal.devices.undulator import UndulatorInKeV
 
 
 @runtime_checkable
 class CheckUndulatorDevices(Protocol):
-    undulator: Undulator
+    undulator: UndulatorInKeV
     dcm: BaseDCM
 
 
