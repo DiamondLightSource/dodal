@@ -39,6 +39,7 @@
    dodal.devices.focusing_mirror
    dodal.devices.hutch_shutter
    dodal.devices.i02_1
+   dodal.devices.i02_2
    dodal.devices.i03
    dodal.devices.i04
    dodal.devices.i05
