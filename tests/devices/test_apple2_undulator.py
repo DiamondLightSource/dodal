@@ -1,11 +1,11 @@
 from collections import defaultdict
-from unittest.mock import AsyncMock, MagicMock
+from unittest.mock import AsyncMock, MagicMock, Mock
 
 import bluesky.plan_stubs as bps
 import pytest
 from bluesky.plans import scan
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import AsyncStatus, FlyMotorInfo, StrictEnum, init_devices
+from ophyd_async.core import FlyMotorInfo, StrictEnum, init_devices
 from ophyd_async.testing import (
     assert_configuration,
     assert_emitted,
@@ -19,8 +19,10 @@ from ophyd_async.testing import (
 from dodal.devices.apple2_undulator import (
     DEFAULT_TIMEOUT,
     Apple2,
+    Apple2Controller,
     Apple2PhasesVal,
-    EnergySetter,
+    EnergyMotorConvertor,
+    InsertionDeviceEnergy,
     MotorWithoutStop,
     Pol,
     UndulatorGap,
@@ -46,7 +48,7 @@ async def mock_id_gap(prefix: str = "BLXX-EA-DET-007:") -> UndulatorGap:
     set_mock_value(mock_id_gap.gate, UndulatorGateStatus.CLOSE)
     set_mock_value(mock_id_gap.velocity, 1)
     set_mock_value(mock_id_gap.user_readback, 1)
-    set_mock_value(mock_id_gap.user_setpoint, 1)
+    set_mock_value(mock_id_gap.user_setpoint, "1")
     set_mock_value(mock_id_gap.high_limit_travel, 210)
     set_mock_value(mock_id_gap.low_limit_travel, 20)
     set_mock_value(mock_id_gap.max_velocity, 20)
@@ -97,28 +99,47 @@ async def mock_jaw_phase(prefix: str = "BLXX-EA-DET-007:") -> UndulatorJawPhase:
     return mock_jaw_phase
 
 
-class test_apple2(Apple2):
-    def __init__(
-        self,
-        id_gap: UndulatorGap,
-        id_phase: UndulatorPhaseAxes,
-        prefix: str = "",
-    ) -> None:
-        super().__init__(id_gap, id_phase, prefix)
-
-    @AsyncStatus.wrap
-    async def set(self, value, *, wait: bool = False): ...
-
-    def update_lookuptable(self) -> None: ...
-
-
 @pytest.fixture
 async def mock_apple2(
     mock_id_gap: UndulatorGap, mock_phaseAxes: UndulatorPhaseAxes
-) -> test_apple2:
+) -> Apple2:
     async with init_devices(mock=True):
-        mock_apple2 = test_apple2(id_gap=mock_id_gap, id_phase=mock_phaseAxes)
+        mock_apple2 = Apple2(id_gap=mock_id_gap, id_phase=mock_phaseAxes)
     return mock_apple2
+
+
+class Mock_Apple2Controller(Apple2Controller[Apple2]):
+    def __init__(
+        self,
+        apple2: Apple2,
+        energy_to_motor_converter: EnergyMotorConvertor,
+        name: str = "",
+    ) -> None:
+        super().__init__(apple2, energy_to_motor_converter, name)
+
+    async def _set_motors_from_energy(self, value: float) -> None:
+        """
+        Set the undulator motors for a given energy and polarisation.
+        """
+        pass
+
+
+@pytest.fixture
+async def mock_apple2_controller(
+    mock_apple2: Apple2,
+) -> Apple2Controller:
+    async with init_devices(mock=True):
+        mock_apple2_controller = Mock_Apple2Controller(
+            apple2=mock_apple2, energy_to_motor_converter=MagicMock()
+        )
+    return mock_apple2_controller
+
+
+@pytest.fixture
+async def mock_id_energy(mock_apple2_controller: Mock_Apple2Controller):
+    async with init_devices(mock=True):
+        mock_id_energy = InsertionDeviceEnergy(id_controller=mock_apple2_controller)
+    return mock_id_energy
 
 
 class MockGrating(StrictEnum):
@@ -130,13 +151,6 @@ async def mock_pgm() -> PGM:
     async with init_devices(mock=True):
         mock_pgm = PGM(prefix="", grating=MockGrating)
     return mock_pgm
-
-
-@pytest.fixture
-async def mock_energy_setter(mock_apple2: test_apple2, mock_pgm: PGM) -> EnergySetter:
-    async with init_devices(mock=True):
-        mock_energy_setter = EnergySetter(id=mock_apple2, pgm=mock_pgm)
-    return mock_energy_setter
 
 
 async def test_in_motion_error(
@@ -180,7 +194,7 @@ async def test_gap_cal_timout(
 ):
     set_mock_value(mock_id_gap.velocity, velocity)
     set_mock_value(mock_id_gap.user_readback, readback)
-    set_mock_value(mock_id_gap.user_setpoint, target)
+    set_mock_value(mock_id_gap.user_setpoint, str(target))
 
     assert await mock_id_gap.get_timeout() == pytest.approx(expected_timeout, rel=0.1)
 
@@ -267,7 +281,7 @@ async def test_gap_prepare_success(mock_id_gap: UndulatorGap):
     fly_info = FlyMotorInfo(start_position=25, end_position=35, time_for_move=1)
     await mock_id_gap.prepare(fly_info)
     get_mock_put(mock_id_gap.user_setpoint).assert_awaited_once_with(
-        fly_info.ramp_up_start_pos(0.5), wait=True
+        str(fly_info.ramp_up_start_pos(0.5)), wait=True
     )
 
     assert await mock_id_gap.velocity.get_value() == 10
@@ -380,16 +394,16 @@ async def test_phase_success_set(mock_phaseAxes: UndulatorPhaseAxes, RE: RunEngi
     RE(bps.abs_set(mock_phaseAxes, set_value, wait=True))
     get_mock_put(mock_phaseAxes.set_move).assert_called_once_with(1, wait=True)
     get_mock_put(mock_phaseAxes.top_inner.user_setpoint).assert_called_once_with(
-        set_value.top_inner, wait=True
+        str(set_value.top_inner), wait=True
     )
     get_mock_put(mock_phaseAxes.top_outer.user_setpoint).assert_called_once_with(
-        set_value.top_outer, wait=True
+        str(set_value.top_outer), wait=True
     )
     get_mock_put(mock_phaseAxes.btm_inner.user_setpoint).assert_called_once_with(
-        set_value.btm_inner, wait=True
+        str(set_value.btm_inner), wait=True
     )
     get_mock_put(mock_phaseAxes.btm_outer.user_setpoint).assert_called_once_with(
-        set_value.btm_outer, wait=True
+        str(set_value.btm_outer), wait=True
     )
 
     await assert_reading(
@@ -481,63 +495,70 @@ async def test_jaw_phase_success_scan(mock_jaw_phase: UndulatorJawPhase, RE: Run
         ((35.0, 2.0), (15.0, 2), 1.5, 9.0),
     ],
 )
-async def test_apple2_prepare_success(
-    mock_apple2: test_apple2,
+async def test_InsertionDeviceEnergy_prepare_success(
+    mock_apple2_controller: Mock_Apple2Controller,
+    mock_id_energy: InsertionDeviceEnergy,
     start_gap,
     end_gap,
     acceleration_time,
     time_for_move,
 ):
-    set_mock_value(mock_apple2.gap.max_velocity, 30)
-    set_mock_value(mock_apple2.gap.min_velocity, 1)
-    set_mock_value(mock_apple2.gap.low_limit_travel, 0)
-    set_mock_value(mock_apple2.gap.high_limit_travel, 200)
-    set_mock_value(mock_apple2.gap.gate, UndulatorGateStatus.CLOSE)
-    set_mock_value(mock_apple2.gap.acceleration_time, acceleration_time)
-    mock_apple2._polarisation_setpoint_set(Pol.LH)
-    mock_apple2.set = AsyncMock()
+    set_mock_value(mock_apple2_controller.apple2().gap.max_velocity, 30)
+    set_mock_value(mock_apple2_controller.apple2().gap.min_velocity, 1)
+    set_mock_value(mock_apple2_controller.apple2().gap.low_limit_travel, 0)
+    set_mock_value(mock_apple2_controller.apple2().gap.high_limit_travel, 200)
+    set_mock_value(mock_apple2_controller.apple2().gap.gate, UndulatorGateStatus.CLOSE)
+    set_mock_value(
+        mock_apple2_controller.apple2().gap.acceleration_time, acceleration_time
+    )
+    mock_apple2_controller._polarisation_setpoint_set(Pol.LH)
+    mock_id_energy.set = AsyncMock()
     mid_gap_position = end_gap[0] + start_gap[0] / 2.0
-    mock_apple2._get_id_gap_phase = AsyncMock(
+    mock_apple2_controller.energy_to_motor = Mock(
         side_effect=[start_gap, end_gap, mid_gap_position]
     )
     fly_info = FlyMotorInfo(
         start_position=700, end_position=800, time_for_move=time_for_move
     )
-    await mock_apple2.prepare(fly_info)
+    await mock_id_energy.prepare(fly_info)
     velocity = (end_gap[0] - start_gap[0]) / time_for_move
-    ramp_up_start = start_gap[0] - acceleration_time * velocity / 2
-    mock_apple2.set.assert_awaited_once_with(value=750)
-    get_mock_put(mock_apple2.gap.user_setpoint).assert_awaited_once_with(
-        ramp_up_start, wait=True
+    ramp_up_start = start_gap[0] - acceleration_time * velocity / 2.0
+    mock_id_energy.set.assert_awaited_once_with(energy=750)
+    get_mock_put(
+        mock_apple2_controller.apple2().gap.user_setpoint
+    ).assert_awaited_once_with(str(ramp_up_start), wait=True)
+
+    assert await mock_apple2_controller.apple2().gap.velocity.get_value() == abs(
+        velocity
     )
 
-    assert await mock_apple2.gap.velocity.get_value() == abs(velocity)
 
-
-async def test_apple2_kickoff_call_gap_kickoff(
-    mock_apple2: test_apple2,
+async def test_InsertionDeviceEnergy_kickoff__call_gap_kickoff(
+    mock_id_energy: InsertionDeviceEnergy,
+    mock_id_gap: UndulatorGap,
 ):
-    mock_apple2.gap.kickoff = AsyncMock()
-    await mock_apple2.kickoff()
-    mock_apple2.gap.kickoff.assert_awaited_once()
+    mock_id_gap.kickoff = AsyncMock()
+    await mock_id_energy.kickoff()
+    mock_id_gap.kickoff.assert_awaited_once()
 
 
-def test_apple2_complete_call_gap_complete(
-    mock_apple2: test_apple2,
+def test_InsertionDeviceEnergy_complete_call_gap_complete(
+    mock_id_energy: InsertionDeviceEnergy,
+    mock_id_gap: UndulatorGap,
 ):
-    mock_apple2.gap.complete = MagicMock()
-    mock_apple2.complete()
-    mock_apple2.gap.complete.assert_called_once()
+    mock_id_gap.complete = MagicMock()
+    mock_id_energy.complete()
+    mock_id_gap.complete.assert_called_once()
 
 
-async def test_energy_setter_prepare_success(
-    mock_energy_setter: EnergySetter,
-    RE: RunEngine,
-):
-    mock_energy_setter.id.prepare = AsyncMock()
-    mock_energy_setter.pgm_ref().energy.prepare = AsyncMock()
+# async def test_energy_setter_prepare_success(
+#     mock_energy_setter: EnergySetter,
+#     RE: RunEngine,
+# ):
+#     mock_energy_setter.id.prepare = AsyncMock()
+#     mock_energy_setter.pgm_ref().energy.prepare = AsyncMock()
 
-    fly_info = FlyMotorInfo(start_position=700, end_position=800, time_for_move=10)
-    RE(bps.prepare(mock_energy_setter, fly_info, wait=True))
-    mock_energy_setter.id.prepare.assert_awaited_once_with(fly_info)
-    mock_energy_setter.pgm_ref().energy.prepare.assert_awaited_once_with(fly_info)  # type: ignore
+#     fly_info = FlyMotorInfo(start_position=700, end_position=800, time_for_move=10)
+#     RE(bps.prepare(mock_energy_setter, fly_info, wait=True))
+#     mock_energy_setter.id.prepare.assert_awaited_once_with(fly_info)
+#     mock_energy_setter.pgm_ref().energy.prepare.assert_awaited_once_with(fly_info)  # type: ignore
