@@ -252,7 +252,7 @@ async def test_error_if_armed_without_exposure(tetramm_controller: TetrammContro
         )
 
 
-async def test_pilatus_controller(
+async def test_tetramm_controller(
     tetramm: TetrammDetector,
     tetramm_controller: TetrammController,
 ):
