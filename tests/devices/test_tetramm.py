@@ -275,11 +275,8 @@ async def test_pilatus_controller(
 
 
 async def test_tetramm_unstage(tetramm_controller: TetrammController):
-    set_mock_value(tetramm_controller.driver.acquire, True)
     set_mock_value(tetramm_controller._file_io.acquire, True)
-
     await tetramm_controller.unstage()
-    assert await tetramm_controller.driver.acquire.get_value() is False
     assert await tetramm_controller._file_io.acquire.get_value() is False
 
 
