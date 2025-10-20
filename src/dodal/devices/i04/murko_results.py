@@ -220,7 +220,9 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
         sorted_results = sorted(self._results, key=lambda item: item.chosen_point_px[0])
 
         results_without_tiny_x = [
-            result for result in sorted_results if result.chosen_point_px[0] >= 10
+            result
+            for result in sorted_results
+            if result.chosen_point_px[0] >= self.LEFTMOST_PIXEL_TO_USE
         ]
         result_uuids_with_tiny_x = [
             result.uuid
