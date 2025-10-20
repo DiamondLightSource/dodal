@@ -58,6 +58,11 @@ class Pol(StrictEnum):
     LH3 = "lh3"
 
 
+class InsertionDeviceStatus(StrictEnum):
+    ENABLED = "ENABLED"
+    DISABLED = "DISABLED"
+
+
 ROW_PHASE_MOTOR_TOLERANCE = 0.004
 MAXIMUM_ROW_PHASE_MOTOR_POSITION = 24.0
 MAXIMUM_GAP_MOTOR_POSITION = 100
@@ -80,10 +85,7 @@ class SafeUndulatorMover(StandardReadable, Movable[T], Generic[T]):
     def __init__(self, set_move: SignalW, prefix: str, name: str = ""):
         # Gate keeper open when move is requested, closed when move is completed
         self.gate = epics_signal_r(UndulatorGateStatus, prefix + "BLGATE")
-
-        split_pv = prefix.split("-")
-        fault_pv = f"{split_pv[0]}-{split_pv[1]}-STAT-{split_pv[3]}ANYFAULT"
-        self.fault = epics_signal_r(float, fault_pv)
+        self.status = epics_signal_r(InsertionDeviceStatus, prefix + "IDBLENA")
         self.set_move = set_move
         super().__init__(name)
 
@@ -106,8 +108,8 @@ class SafeUndulatorMover(StandardReadable, Movable[T], Generic[T]):
         """Get the timeout for the move based on an estimate of how long it will take."""
 
     async def raise_if_cannot_move(self) -> None:
-        if await self.fault.get_value() != 0:
-            raise RuntimeError(f"{self.name} is in fault state")
+        if await self.status.get_value() is not InsertionDeviceStatus.ENABLED:
+            raise RuntimeError(f"{self.name} is DISABLED and cannot move.")
         if await self.gate.get_value() == UndulatorGateStatus.OPEN:
             raise RuntimeError(f"{self.name} is already in motion.")
 

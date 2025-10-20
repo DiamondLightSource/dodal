@@ -18,6 +18,7 @@ from ophyd_async.testing import (
 from dodal.devices.apple2_undulator import (
     DEFAULT_MOTOR_MIN_TIMEOUT,
     Apple2PhasesVal,
+    InsertionDeviceStatus,
     UndulatorGap,
     UndulatorGateStatus,
     UndulatorJawPhase,
@@ -34,7 +35,7 @@ async def mock_id_gap(prefix: str = "BLXX-EA-DET-007:") -> UndulatorGap:
     set_mock_value(mock_id_gap.velocity, 1)
     set_mock_value(mock_id_gap.user_readback, 1)
     set_mock_value(mock_id_gap.user_setpoint, "1")
-    set_mock_value(mock_id_gap.fault, 0)
+    set_mock_value(mock_id_gap.status, InsertionDeviceStatus.ENABLED)
     return mock_id_gap
 
 
@@ -62,7 +63,7 @@ async def mock_phaseAxes(prefix: str = "BLXX-EA-DET-007:") -> UndulatorPhaseAxes
     set_mock_value(mock_phaseAxes.top_inner.user_setpoint_readback, 2)
     set_mock_value(mock_phaseAxes.btm_outer.user_setpoint_readback, 2)
     set_mock_value(mock_phaseAxes.btm_inner.user_setpoint_readback, 2)
-    set_mock_value(mock_phaseAxes.fault, 0)
+    set_mock_value(mock_phaseAxes.status, InsertionDeviceStatus.ENABLED)
     return mock_phaseAxes
 
 
@@ -76,7 +77,7 @@ async def mock_jaw_phase(prefix: str = "BLXX-EA-DET-007:") -> UndulatorJawPhase:
     set_mock_value(mock_jaw_phase.jaw_phase.velocity, 2)
     set_mock_value(mock_jaw_phase.jaw_phase.user_readback, 0)
     set_mock_value(mock_jaw_phase.jaw_phase.user_setpoint_readback, 0)
-    set_mock_value(mock_jaw_phase.fault, 0)
+    set_mock_value(mock_jaw_phase.status, InsertionDeviceStatus.ENABLED)
     return mock_jaw_phase
 
 
@@ -133,7 +134,7 @@ async def test_given_gate_never_closes_then_setting_gaps_times_out(
 
 
 async def test_gap_status_error(mock_id_gap: UndulatorGap):
-    set_mock_value(mock_id_gap.fault, 1.0)
+    set_mock_value(mock_id_gap.status, InsertionDeviceStatus.DISABLED)
     with pytest.raises(RuntimeError):
         await mock_id_gap.set(2)
 
@@ -182,7 +183,7 @@ async def test_given_gate_never_closes_then_setting_phases_times_out(
 
 async def test_phase_status_error(mock_phaseAxes: UndulatorPhaseAxes):
     setValue = Apple2PhasesVal("3", "2", "5", "7")
-    set_mock_value(mock_phaseAxes.fault, 1.0)
+    set_mock_value(mock_phaseAxes.status, InsertionDeviceStatus.DISABLED)
     with pytest.raises(RuntimeError):
         await mock_phaseAxes.set(setValue)
 
@@ -312,7 +313,7 @@ async def test_given_gate_never_closes_then_setting_jaw_phases_times_out(
 
 async def test_jaw_phase_status_error(mock_jaw_phase: UndulatorJawPhase):
     setValue = 5
-    set_mock_value(mock_jaw_phase.fault, 1.0)
+    set_mock_value(mock_jaw_phase.status, InsertionDeviceStatus.DISABLED)
     with pytest.raises(RuntimeError):
         await mock_jaw_phase.set(setValue)
 
