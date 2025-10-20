@@ -22,17 +22,17 @@ from dodal.plans.wrapped import count
 
 @pytest.fixture
 def documents_from_num(
-    request: pytest.FixtureRequest, det: StandardDetector, RE: RunEngine
+    request: pytest.FixtureRequest, det: StandardDetector, run_engine: RunEngine
 ) -> dict[str, list[Document]]:
     docs: dict[str, list[Document]] = {}
-    RE(
+    run_engine(
         count({det}, num=request.param),
         lambda name, doc: docs.setdefault(name, []).append(doc),
     )
     return docs
 
 
-def test_count_delay_validation(det: StandardDetector, RE):
+def test_count_delay_validation(det: StandardDetector, run_engine: RunEngine):
     args: dict[float | Sequence[float], str] = {  # type: ignore
         # List wrong length
         (1,): "Number of delays given must be 2: was given 1",
@@ -50,11 +50,11 @@ def test_count_delay_validation(det: StandardDetector, RE):
     }
     for delay, reason in args.items():
         with pytest.raises((ValidationError, AssertionError), match=reason):
-            RE(count({det}, num=3, delay=delay))
+            run_engine(count({det}, num=3, delay=delay))
         print(delay)
 
 
-def test_count_detectors_validation(RE):
+def test_count_detectors_validation(run_engine: RunEngine):
     args: dict[str, set[Readable]] = {
         # No device to read
         "Set should have at least 1 item after validation, not 0": set(),
@@ -63,10 +63,10 @@ def test_count_detectors_validation(RE):
     }
     for reason, dets in args.items():
         with pytest.raises(ValidationError, match=reason):
-            RE(count(dets))
+            run_engine(count(dets))
 
 
-def test_count_num_validation(det: StandardDetector, RE):
+def test_count_num_validation(det: StandardDetector, run_engine: RunEngine):
     args: dict[int, str] = {
         -1: "Input should be greater than or equal to 1",
         0: "Input should be greater than or equal to 1",
@@ -74,7 +74,7 @@ def test_count_num_validation(det: StandardDetector, RE):
     }
     for num, reason in args.items():
         with pytest.raises(ValidationError, match=reason):
-            RE(count({det}, num=num))
+            run_engine(count({det}, num=num))
 
 
 @pytest.mark.parametrize(

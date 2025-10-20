@@ -111,8 +111,8 @@ async def test_given_byte_stream_when_get_next_jpeg_called_then_jpeg_bytes_retur
 async def test_when_get_frame_and_put_to_redis_called_then_data_put_in_redis_under_sample_id(
     oav_forwarder,
 ):
-    SAMPLE_ID = 100
-    await oav_forwarder.sample_id.set(SAMPLE_ID)
+    sample_id = 100
+    await oav_forwarder.sample_id.set(sample_id)
     await oav_forwarder._get_frame_and_put_to_redis(ANY, get_mock_response())
     redis_call = oav_forwarder.redis_client.hset.call_args[0]
     assert redis_call[0] == "murko:100:raw"
@@ -132,8 +132,8 @@ async def test_when_get_frame_and_put_to_redis_called_then_data_is_jpeg_bytes(
 async def test_when_get_frame_and_put_to_redis_called_then_data_put_in_redis_with_expiry_time(
     oav_forwarder,
 ):
-    SAMPLE_ID = 100
-    await oav_forwarder.sample_id.set(SAMPLE_ID)
+    sample_id = 100
+    await oav_forwarder.sample_id.set(sample_id)
     await oav_forwarder._get_frame_and_put_to_redis(ANY, get_mock_response())
     redis_expire_call = oav_forwarder.redis_client.expire.call_args[0]
     assert redis_expire_call[0] == "murko:100:raw"

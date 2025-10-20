@@ -4,7 +4,7 @@ from ophyd_async.core import init_devices
 from dodal.beamlines.i03 import I03_ZEBRA_MAPPING
 from dodal.devices.zebra.zebra import Zebra
 from dodal.devices.zebra.zebra_constants_mapping import (
-    UnmappedZebraException,
+    UnmappedZebraError,
     ZebraMapping,
     ZebraTTLOutputs,
 )
@@ -19,7 +19,7 @@ async def fake_zebra(zebra_mapping: ZebraMapping):
 async def test_exception_when_accessing_mapping_set_to_minus_1():
     mapping_no_output = ZebraMapping(outputs=ZebraTTLOutputs())
     with pytest.raises(
-        UnmappedZebraException,
+        UnmappedZebraError,
         match="'ZebraTTLOutputs.TTL_EIGER' was accessed but is set to -1. Please check the zebra mappings against the zebra's physical configuration",
     ):
         zebra = await fake_zebra(mapping_no_output)

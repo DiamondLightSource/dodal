@@ -25,7 +25,7 @@ to one or more Bluesky Protocols.
 
 
 @device_factory()
-def attY() -> NumberedTripleAxisStage:
+def att_y() -> NumberedTripleAxisStage:
     return NumberedTripleAxisStage(
         f"{PREFIX.beamline_prefix}-OP-ATTN-01:",
         axis1_infix="STICK1",
@@ -35,18 +35,18 @@ def attY() -> NumberedTripleAxisStage:
 
 
 @device_factory()
-def baseY() -> Motor:
+def base_y() -> Motor:
     return Motor(f"{PREFIX.beamline_prefix}-MO-TABLE-01:Y")
 
 
 @device_factory()
-def blowerY() -> Motor:
+def blower_y() -> Motor:
     """Same motor as blowerZ"""
     return Motor(f"{PREFIX.beamline_prefix}-EA-BLOWR-01:TLATE")
 
 
 @device_factory()
-def blowerZ() -> Motor:
+def blower_z() -> Motor:
     """Same motor as blowerY"""
     return Motor(f"{PREFIX.beamline_prefix}-EA-BLOWR-01:TLATE")
 
@@ -67,7 +67,7 @@ def det2() -> YZStage:
 
 
 @device_factory()
-def envX() -> Motor:
+def env_x() -> Motor:
     return Motor(f"{PREFIX.beamline_prefix}-MO-TABLE-01:ENV:X")
 
 

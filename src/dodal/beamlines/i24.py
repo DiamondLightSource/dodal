@@ -9,8 +9,8 @@ from dodal.common.beamlines.beamline_utils import (
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.devices.attenuator.attenuator import EnumFilterAttenuator
 from dodal.devices.attenuator.filter_selections import (
-    I24_FilterOneSelections,
-    I24_FilterTwoSelections,
+    I24FilterOneSelections,
+    I24FilterTwoSelections,
 )
 from dodal.devices.hutch_shutter import HutchShutter
 from dodal.devices.i24.aperture import Aperture
@@ -59,7 +59,7 @@ def attenuator() -> EnumFilterAttenuator:
     existing object."""
     return EnumFilterAttenuator(
         f"{PREFIX.beamline_prefix}-OP-ATTN-01:",
-        filter_selection=(I24_FilterOneSelections, I24_FilterTwoSelections),
+        filter_selection=(I24FilterOneSelections, I24FilterTwoSelections),
     )
 
 

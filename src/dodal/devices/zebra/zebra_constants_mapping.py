@@ -13,7 +13,7 @@ class ZebraMappingValidations(BaseModel):
         value = object.__getattribute__(self, name)
         if not name.startswith("__"):
             if value == -1:
-                raise UnmappedZebraException(
+                raise UnmappedZebraError(
                     f"'{type(self).__name__}.{name}' was accessed but is set to -1. Please check the zebra mappings against the zebra's physical configuration"
                 )
         return value
@@ -92,5 +92,5 @@ class ZebraMapping(ZebraMappingValidations):
     AND_GATE_FOR_AUTO_SHUTTER: int = Field(default=2, ge=-1, le=4)
 
 
-class UnmappedZebraException(Exception):
+class UnmappedZebraError(Exception):
     pass

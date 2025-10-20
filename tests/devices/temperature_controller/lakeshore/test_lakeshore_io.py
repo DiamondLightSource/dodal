@@ -45,7 +45,7 @@ async def test_lakeshore_io_creation_success():
     assert len(lakeshore.readback) == no_channels
 
 
-async def test_lakeshoreIO_single_control_creation_success():
+async def test_lakeshore_io_single_control_creation_success():
     no_channels = 2
     prefix = "888"
     async with init_devices(mock=True):

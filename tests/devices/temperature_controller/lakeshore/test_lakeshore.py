@@ -41,11 +41,11 @@ async def lakeshore() -> Lakeshore:
     ],
 )
 async def test_lakeshore_set_success(
-    lakeshore: Lakeshore, RE: RunEngine, control_channel: int
+    lakeshore: Lakeshore, run_engine: RunEngine, control_channel: int
 ):
-    RE(abs_set(lakeshore.control_channel, control_channel, wait=True))
+    run_engine(abs_set(lakeshore.control_channel, control_channel, wait=True))
     temperature = np.random.uniform(10, 400)
-    RE(abs_set(lakeshore, temperature, wait=True))
+    run_engine(abs_set(lakeshore, temperature, wait=True))
 
     assert (
         await lakeshore.control_channels[
@@ -63,7 +63,7 @@ async def test_lakeshore_set_success(
     ],
 )
 async def test_lakeshore_set_fail_outside_limit(
-    lakeshore: Lakeshore, RE: RunEngine, temperature: float
+    lakeshore: Lakeshore, temperature: float
 ):
     low = await lakeshore.temperature_low_limit.get_value()
     high = await lakeshore.temperature_high_limit.get_value()
@@ -74,9 +74,7 @@ async def test_lakeshore_set_fail_outside_limit(
         await lakeshore.set(temperature)
 
 
-async def test_lakeshore_set_fail_unavailable_channel(
-    lakeshore: Lakeshore, RE: RunEngine
-):
+async def test_lakeshore_set_fail_unavailable_channel(lakeshore: Lakeshore):
     with pytest.raises(
         ValueError,
         match=f"Control channel must be between 1 and {len(lakeshore.control_channels)}.",
@@ -90,10 +88,10 @@ async def test_lakeshore_set_fail_unavailable_channel(
 )
 async def test_lakeshore_set_control_channel_correctly_set_up_config(
     lakeshore: Lakeshore,
-    RE: RunEngine,
+    run_engine: RunEngine,
     control_channel: int,
 ):
-    RE(abs_set(lakeshore.control_channel, control_channel, wait=True))
+    run_engine(abs_set(lakeshore.control_channel, control_channel, wait=True))
 
     config = ["user_setpoint", "p", "i", "d", "heater_output_range"]
     expected_config: dict[str, dict[str, Any]] = {
@@ -122,13 +120,13 @@ async def test_lakeshore_read(
     await assert_reading(lakeshore, expected_reading, full_match=False)
 
 
-async def test_lakeshore_hints_with_count(lakeshore: Lakeshore, RE: RunEngine):
+async def test_lakeshore_hints_with_count(lakeshore: Lakeshore, run_engine: RunEngine):
     docs = defaultdict(list)
 
     def capture_emitted(name, doc):
         docs[name].append(doc)
 
-    RE(count([lakeshore]), capture_emitted)
+    run_engine(count([lakeshore]), capture_emitted)
     for i in range(1, 5):
         assert (
             docs["descriptor"][0]["hints"]["lakeshore"]["fields"][i - 1]

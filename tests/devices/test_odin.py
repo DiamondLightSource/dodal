@@ -19,8 +19,8 @@ def fake_status(in_error: bool):
 
 @pytest.fixture
 def fake_odin():
-    FakeOdin = make_fake_device(EigerOdin)
-    fake_odin: EigerOdin = FakeOdin(name="test fake odin")
+    fake_odin_class = make_fake_device(EigerOdin)
+    fake_odin: EigerOdin = fake_odin_class(name="test fake odin")
 
     return fake_odin
 
@@ -101,20 +101,20 @@ def test_given_node_in_error_node_error_status_gives_message_and_node_number(
     patch_await,
     fake_odin: EigerOdin,
 ):
-    ERR_MESSAGE = "Help, I'm in error!"
+    error_message = "Help, I'm in error!"
     patch_await.side_effect = lambda *_: fake_status(True)
-    fake_odin.nodes.node_0.error_message.sim_put(ERR_MESSAGE)  # type: ignore
+    fake_odin.nodes.node_0.error_message.sim_put(error_message)  # type: ignore
 
     error = fake_odin.nodes.wait_for_no_errors(None)
     error_messages = list(error.values())
 
     assert any(status.exception for status in error.keys())
     assert any("0" in message for message in error_messages)
-    assert any(ERR_MESSAGE in message for message in error_messages)
+    assert any(error_message in message for message in error_messages)
 
 
 @pytest.mark.parametrize(
-    "meta_writing, OD1_writing, OD2_writing",
+    "meta_writing, od1_writing, od2_writing",
     [
         (True, False, False),
         (True, True, True),
@@ -122,11 +122,11 @@ def test_given_node_in_error_node_error_status_gives_message_and_node_number(
     ],
 )
 def test_wait_for_all_filewriters_to_finish(
-    fake_odin: EigerOdin, meta_writing, OD1_writing, OD2_writing
+    fake_odin: EigerOdin, meta_writing, od1_writing, od2_writing
 ):
     fake_odin.meta.ready.sim_put(meta_writing)  # type: ignore
-    fake_odin.nodes.nodes[0].writing.sim_put(OD1_writing)  # type: ignore
-    fake_odin.nodes.nodes[1].writing.sim_put(OD2_writing)  # type: ignore
+    fake_odin.nodes.nodes[0].writing.sim_put(od1_writing)  # type: ignore
+    fake_odin.nodes.nodes[1].writing.sim_put(od2_writing)  # type: ignore
     fake_odin.nodes.nodes[2].writing.sim_put(0)  # type: ignore
     fake_odin.nodes.nodes[3].writing.sim_put(0)  # type: ignore
 

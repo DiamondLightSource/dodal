@@ -59,7 +59,7 @@ async def snapshot(
         return test_client.session
 
     with patch(
-        "dodal.devices.areadetector.plugins.MJPG.ClientSession", new=get_session
+        "dodal.devices.areadetector.plugins.mjpg.ClientSession", new=get_session
     ):
         async with init_devices(mock=True):
             fake_snapshot = Snapshot("")
@@ -80,7 +80,7 @@ async def grid_snapshot(
         return test_client.session
 
     with patch(
-        "dodal.devices.areadetector.plugins.MJPG.ClientSession", new=get_session
+        "dodal.devices.areadetector.plugins.mjpg.ClientSession", new=get_session
     ):
         async with init_devices(mock=True):
             fake_grid = SnapshotWithGrid("")

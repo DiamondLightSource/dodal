@@ -13,7 +13,7 @@ from ophyd_async.core import (
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
-from dodal.devices.areadetector.plugins.CAM import Cam
+from dodal.devices.areadetector.plugins.cam import Cam
 from dodal.devices.oav.oav_parameters import (
     DEFAULT_OAV_WINDOW,
     OAVConfig,

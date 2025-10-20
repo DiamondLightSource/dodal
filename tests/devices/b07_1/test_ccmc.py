@@ -63,10 +63,10 @@ async def test_reading(mock_ccmc: ChannelCutMonochromator):
 
 async def test_move_crystal(
     mock_ccmc: ChannelCutMonochromator,
-    RE: RunEngine,
+    run_engine: RunEngine,
 ):
     await assert_value(mock_ccmc.crystal, ChannelCutMonochromatorPositions.OUT)
-    RE(mv(mock_ccmc, ChannelCutMonochromatorPositions.XTAL_2000))
+    run_engine(mv(mock_ccmc, ChannelCutMonochromatorPositions.XTAL_2000))
     await assert_value(mock_ccmc.crystal, ChannelCutMonochromatorPositions.XTAL_2000)
 
 
@@ -99,11 +99,11 @@ async def test_move_crystal_wrong_position_ignored(mock_ccmc: ChannelCutMonochro
 
 async def test_move_crystal_wrong_position_re_error(
     mock_ccmc: ChannelCutMonochromator,
-    RE: RunEngine,
+    run_engine: RunEngine,
 ):
     await assert_value(mock_ccmc.crystal, ChannelCutMonochromatorPositions.OUT)
     with pytest.raises(
         FailedStatus,
         match=re.escape("is not a valid ChannelCutMonochromatorPositions"),
     ):
-        RE(mv(mock_ccmc, WrongEnum.POS_100))
+        run_engine(mv(mock_ccmc, WrongEnum.POS_100))

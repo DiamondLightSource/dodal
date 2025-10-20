@@ -177,13 +177,13 @@ def nested_run_without_metadata(
 
 
 def test_simple_run_gets_scan_number(
-    RE: RunEngine,
+    run_engine: RunEngine,
     detectors: list[Readable],
     provider: UpdatingPathProvider,
     tmp_path: Path,
 ) -> None:
     docs = collect_docs(
-        RE,
+        run_engine,
         simple_run(detectors),
         provider,
     )
@@ -194,7 +194,7 @@ def test_simple_run_gets_scan_number(
 
 @pytest.mark.parametrize("plan", [multi_run, multi_nested_plan])
 def test_multi_run_gets_scan_numbers(
-    RE: RunEngine,
+    run_engine: RunEngine,
     detectors: list[Readable],
     plan: Callable[[list[Readable]], MsgGenerator],
     provider: UpdatingPathProvider,
@@ -202,7 +202,7 @@ def test_multi_run_gets_scan_numbers(
 ) -> None:
     """Test is here to demonstrate that multi run plans will overwrite files."""
     docs = collect_docs(
-        RE,
+        run_engine,
         plan(detectors),
         provider,
     )
@@ -214,13 +214,13 @@ def test_multi_run_gets_scan_numbers(
 
 
 def test_multi_run_single_stage(
-    RE: RunEngine,
+    run_engine: RunEngine,
     detectors: list[Readable],
     provider: UpdatingPathProvider,
     tmp_path: Path,
 ) -> None:
     docs = collect_docs(
-        RE,
+        run_engine,
         multi_run_single_stage(detectors),
         provider,
     )
@@ -240,13 +240,13 @@ def test_multi_run_single_stage(
 
 
 def test_multi_run_single_stage_multi_group(
-    RE: RunEngine,
+    run_engine: RunEngine,
     detectors: list[Readable],
     provider: UpdatingPathProvider,
     tmp_path: Path,
 ) -> None:
     docs = collect_docs(
-        RE,
+        run_engine,
         multi_run_single_stage_multi_group(detectors),
         provider,
     )
@@ -265,7 +265,7 @@ def test_multi_run_single_stage_multi_group(
 
 
 def test_nested_run_with_metadata(
-    RE: RunEngine,
+    run_engine: RunEngine,
     detectors: list[Readable],
     provider: UpdatingPathProvider,
     tmp_path: Path,
@@ -275,7 +275,7 @@ def test_nested_run_with_metadata(
     That means detectors in such runs will overwrite files.
     """
     docs = collect_docs(
-        RE,
+        run_engine,
         nested_run_with_metadata(detectors),
         provider,
     )
@@ -288,7 +288,7 @@ def test_nested_run_with_metadata(
 
 
 def test_nested_run_without_metadata(
-    RE: RunEngine,
+    run_engine: RunEngine,
     detectors: list[Readable],
     provider: UpdatingPathProvider,
     tmp_path: Path,
@@ -298,7 +298,7 @@ def test_nested_run_without_metadata(
     That means detectors in such runs will overwrite files.
     """
     docs = collect_docs(
-        RE,
+        run_engine,
         nested_run_without_metadata(detectors),
         provider,
     )
@@ -311,7 +311,7 @@ def test_nested_run_without_metadata(
 
 
 def test_visit_path_provider_fails(
-    RE: RunEngine,
+    run_engine: RunEngine,
     detectors: list[Readable],
     provider: UpdatingPathProvider,
     client: MockDirectoryServiceClient,
@@ -319,34 +319,34 @@ def test_visit_path_provider_fails(
     client.fail = True
     with pytest.raises(ValueError):
         collect_docs(
-            RE,
+            run_engine,
             simple_run(detectors),
             provider,
         )
 
 
 def test_visit_path_provider_fails_after_one_sucess(
-    RE: RunEngine,
+    run_engine: RunEngine,
     detectors: list[Readable],
     provider: UpdatingPathProvider,
     client: MockDirectoryServiceClient,
 ) -> None:
     collect_docs(
-        RE,
+        run_engine,
         simple_run(detectors),
         provider,
     )
     client.fail = True
     with pytest.raises(ValueError):
         collect_docs(
-            RE,
+            run_engine,
             simple_run(detectors),
             provider,
         )
 
 
 def collect_docs(
-    RE: RunEngine,
+    run_engine: RunEngine,
     plan: MsgGenerator,
     provider: UpdatingPathProvider,
 ) -> list[DataEvent]:
@@ -356,7 +356,7 @@ def collect_docs(
         events.append(DataEvent(name=name, doc=doc))
 
     wrapped_plan = attach_data_session_metadata_wrapper(plan, provider)
-    RE(wrapped_plan, on_event)
+    run_engine(wrapped_plan, on_event)
     return events
 
 
@@ -364,19 +364,19 @@ def assert_all_detectors_used_collection_numbers(
     tmp_path: Path,
     docs: list[DataEvent],
     detectors: list[Readable],
-    dataCollectionIds: list[str],
+    data_collection_ids: list[str],
 ) -> None:
     descriptors = find_descriptor_docs(docs)
-    assert len(descriptors) == len(dataCollectionIds)
+    assert len(descriptors) == len(data_collection_ids)
 
-    for descriptor, dataCollectionId in zip(
-        descriptors, dataCollectionIds, strict=False
+    for descriptor, data_collection_id in zip(
+        descriptors, data_collection_ids, strict=False
     ):
         for detector in detectors:
             source = descriptor.doc.get("data_keys", {}).get(f"{detector.name}_data")[
                 "source"
             ]
-            expected_source = f"example-{dataCollectionId}-{detector.name}.h5"
+            expected_source = f"example-{data_collection_id}-{detector.name}.h5"
             assert Path(source) == tmp_path / expected_source
 
 

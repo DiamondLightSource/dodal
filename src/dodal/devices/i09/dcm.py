@@ -22,5 +22,5 @@ class DCM(BaseDCM[PitchAndRollCrystal, StationaryCrystal]):
         # need to do it until https://github.com/bluesky/ophyd-async/pull/899 merged
         self.set_name(self.name)
 
-    def _convert_keV_to_eV(self, energy_signal: float) -> float:
+    def _convert_keV_to_eV(self, energy_signal: float) -> float:  # noqa: N802
         return energy_signal * 1000

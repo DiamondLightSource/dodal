@@ -77,19 +77,19 @@ from dodal.device.my_device import  MyDevice
 
 # RunEngine is needed to make sure there is an event loop when creating device.
 @pytest.fixture
-async def sim_my_device(RE: RunEngine) -> MyDevice:
+async def sim_my_device(run_engine: RunEngine) -> MyDevice:
     async with init_devices(mock=True):
         sim_my_device = MyDevice("TEST:")
     return sim_my_device
 
 
-def test_my_device_stage(sim_my_device: MyDevice, RE: RunEngine) -> None:
-    RE(bps.stage(sim_my_device, wait=True), wait=True)
+def test_my_device_stage(sim_my_device: MyDevice, run_engine: RunEngine) -> None:
+    run_engine(bps.stage(sim_my_device, wait=True), wait=True)
     get_mock_put(sim_my_device.signal_b).assert_called_once_with(OnOff.ON, wait=True)
 
 
-def test_my_device_unstage(sim_my_device: MyDevice, RE: RunEngine) -> None:
-    RE(bps.unstage(sim_my_device, wait=True), wait=True)
+def test_my_device_unstage(sim_my_device: MyDevice, run_engine: RunEngine) -> None:
+    run_engine(bps.unstage(sim_my_device, wait=True), wait=True)
     get_mock_put(sim_my_device.signal_b).assert_called_once_with(OnOff.OFF, wait=True)
 
 ```
@@ -97,7 +97,7 @@ def test_my_device_unstage(sim_my_device: MyDevice, RE: RunEngine) -> None:
 You should test the output of a device when the device has many signals read and you want to ensure the correct ones are read at the correct times, or when the `read` method of it or one of its signals (e.g. a DerivedSignal) requires testing. Functions are defined in `ophyd-async` to aid with this. `assert_reading` allows us to compare the readings generated from a `Readable` device to the expected results.
 
 ```Python
-async def test_my_device_read(sim_my_device: MyDevice, RE: RunEngine) -> None:
+async def test_my_device_read(sim_my_device: MyDevice, run_engine: RunEngine) -> None:
     prefix = sim_my_device.name
     await assert_reading(
         sim_my_device,

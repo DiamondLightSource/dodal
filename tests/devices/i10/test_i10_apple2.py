@@ -66,37 +66,37 @@ async def mock_id_gap(prefix: str = "BLXX-EA-DET-007:") -> UndulatorGap:
 
 
 @pytest.fixture
-async def mock_phaseAxes(prefix: str = "BLXX-EA-DET-007:") -> UndulatorPhaseAxes:
+async def mock_phase_axes(prefix: str = "BLXX-EA-DET-007:") -> UndulatorPhaseAxes:
     async with init_devices(mock=True):
-        mock_phaseAxes = UndulatorPhaseAxes(
+        mock_phase_axes = UndulatorPhaseAxes(
             prefix=prefix,
             top_outer="RPQ1",
             top_inner="RPQ2",
             btm_outer="RPQ3",
             btm_inner="RPQ4",
         )
-    assert mock_phaseAxes.name == "mock_phaseAxes"
-    set_mock_value(mock_phaseAxes.gate, UndulatorGateStatus.CLOSE)
-    set_mock_value(mock_phaseAxes.top_outer.velocity, 2)
-    set_mock_value(mock_phaseAxes.top_inner.velocity, 2)
-    set_mock_value(mock_phaseAxes.btm_outer.velocity, 2)
-    set_mock_value(mock_phaseAxes.btm_inner.velocity, 2)
-    set_mock_value(mock_phaseAxes.top_outer.user_readback, 0)
-    set_mock_value(mock_phaseAxes.top_inner.user_readback, 0)
-    set_mock_value(mock_phaseAxes.btm_outer.user_readback, 0)
-    set_mock_value(mock_phaseAxes.btm_inner.user_readback, 0)
-    set_mock_value(mock_phaseAxes.top_outer.user_setpoint_readback, 0)
-    set_mock_value(mock_phaseAxes.top_inner.user_setpoint_readback, 0)
-    set_mock_value(mock_phaseAxes.btm_outer.user_setpoint_readback, 0)
-    set_mock_value(mock_phaseAxes.btm_inner.user_setpoint_readback, 0)
-    set_mock_value(mock_phaseAxes.fault, 0)
-    return mock_phaseAxes
+    assert mock_phase_axes.name == "mock_phase_axes"
+    set_mock_value(mock_phase_axes.gate, UndulatorGateStatus.CLOSE)
+    set_mock_value(mock_phase_axes.top_outer.velocity, 2)
+    set_mock_value(mock_phase_axes.top_inner.velocity, 2)
+    set_mock_value(mock_phase_axes.btm_outer.velocity, 2)
+    set_mock_value(mock_phase_axes.btm_inner.velocity, 2)
+    set_mock_value(mock_phase_axes.top_outer.user_readback, 0)
+    set_mock_value(mock_phase_axes.top_inner.user_readback, 0)
+    set_mock_value(mock_phase_axes.btm_outer.user_readback, 0)
+    set_mock_value(mock_phase_axes.btm_inner.user_readback, 0)
+    set_mock_value(mock_phase_axes.top_outer.user_setpoint_readback, 0)
+    set_mock_value(mock_phase_axes.top_inner.user_setpoint_readback, 0)
+    set_mock_value(mock_phase_axes.btm_outer.user_setpoint_readback, 0)
+    set_mock_value(mock_phase_axes.btm_inner.user_setpoint_readback, 0)
+    set_mock_value(mock_phase_axes.fault, 0)
+    return mock_phase_axes
 
 
 @pytest.fixture
 async def mock_pgm(prefix: str = "BLXX-EA-DET-007:") -> PGM:
     async with init_devices(mock=True):
-        mock_pgm = PGM(prefix=prefix, grating=I10Grating, gratingPv="NLINES2")
+        mock_pgm = PGM(prefix=prefix, grating=I10Grating, grating_pv="NLINES2")
     patch_motor(mock_pgm.energy)
     return mock_pgm
 
@@ -133,12 +133,12 @@ def mock_config_client() -> ConfigServer:
 @pytest.fixture
 async def mock_id(
     mock_id_gap: UndulatorGap,
-    mock_phaseAxes: UndulatorPhaseAxes,
+    mock_phase_axes: UndulatorPhaseAxes,
     mock_jaw_phase: UndulatorJawPhase,
 ) -> I10Apple2:
     async with init_devices(mock=True):
         mock_id = I10Apple2(
-            id_gap=mock_id_gap, id_phase=mock_phaseAxes, id_jaw_phase=mock_jaw_phase
+            id_gap=mock_id_gap, id_phase=mock_phase_axes, id_jaw_phase=mock_jaw_phase
         )
     return mock_id
 
@@ -291,13 +291,13 @@ async def test_fail_i10_apple2_controller_set_id_not_ready(
     )
 
 
-async def test_beam_energy_re_scan(beam_energy: BeamEnergy, RE: RunEngine):
+async def test_beam_energy_re_scan(beam_energy: BeamEnergy, run_engine: RunEngine):
     docs = defaultdict(list)
 
     def capture_emitted(name, doc):
         docs[name].append(doc)
 
-    RE(scan([], beam_energy, 500, 600, num=11), capture_emitted)
+    run_engine(scan([], beam_energy, 500, 600, num=11), capture_emitted)
     assert_emitted(docs, start=1, descriptor=1, event=11, stop=1)
 
     for cnt, data in enumerate(docs["event"]):
@@ -306,7 +306,9 @@ async def test_beam_energy_re_scan(beam_energy: BeamEnergy, RE: RunEngine):
 
 
 async def test_beam_energy_re_scan_with_offset(
-    beam_energy: BeamEnergy, mock_id_controller: I10Apple2Controller, RE: RunEngine
+    beam_energy: BeamEnergy,
+    mock_id_controller: I10Apple2Controller,
+    run_engine: RunEngine,
 ):
     docs = defaultdict(list)
 
@@ -324,7 +326,7 @@ async def test_beam_energy_re_scan_with_offset(
             beam_energy._mono_energy().user_readback, rbv_mocks.get()
         ),
     )
-    RE(
+    run_engine(
         scan(
             [],
             beam_energy,
@@ -570,10 +572,10 @@ async def test_linear_arbitrary_limit_fail(
         (-90, -25, 18),
     ],
 )
-async def test_linear_arbitrary_RE_scan(
+async def test_linear_arbitrary_run_engine_scan(
     mock_linear_arbitrary_angle: LinearArbitraryAngle,
     mock_id_controller: I10Apple2Controller,
-    RE: RunEngine,
+    run_engine: RunEngine,
     start: float,
     stop: float,
     num_point: int,
@@ -600,7 +602,7 @@ async def test_linear_arbitrary_RE_scan(
         mock_id_controller.apple2().phase.btm_outer.user_readback,
         -16.4,
     )
-    RE(
+    run_engine(
         scan(
             [],
             mock_linear_arbitrary_angle,
@@ -641,7 +643,7 @@ async def test_linear_arbitrary_RE_scan(
 
 
 @pytest.mark.parametrize(
-    "fileName, expected_dict_file_name, source",
+    "file_name, expected_dict_file_name, source",
     [
         (
             ID_ENERGY_2_GAP_CALIBRATIONS_CSV,
@@ -667,12 +669,12 @@ async def test_linear_arbitrary_RE_scan(
 )
 def test_i10_energy_motor_lookup_convert_csv_to_lookup_success(
     mock_i10_energy_motor_lookup_idu: I10EnergyMotorLookup,
-    fileName: str,
+    file_name: str,
     expected_dict_file_name: str,
     source: tuple[str, str],
 ):
     data = mock_i10_energy_motor_lookup_idu.convert_csv_to_lookup(
-        file=fileName,
+        file=file_name,
         source=source,
     )
     with open(expected_dict_file_name, "rb") as f:

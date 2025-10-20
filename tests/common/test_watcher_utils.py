@@ -35,7 +35,7 @@ class MockWatchable:
                 )
 
 
-async def test_log_on_percentage_complete(caplog, RE):
+async def test_log_on_percentage_complete(caplog):
     test_watchable = MockWatchable()
     status = test_watchable.get_watchable_status()
     interval = 20

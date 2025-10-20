@@ -27,7 +27,7 @@ async def fake_observe_indices_written(timeout: float) -> AsyncGenerator[int, No
 
 
 async def test_configure_arm_trigger_and_disarm_detector(
-    fake_eiger, eiger_params, RE: RunEngine
+    fake_eiger, eiger_params, run_engine: RunEngine
 ):
     trigger_info = TriggerInfo(
         # Manual trigger, so setting number of triggers to 1.
@@ -58,7 +58,7 @@ async def test_configure_arm_trigger_and_disarm_detector(
         fake_eiger.odin.capture, set_capture_rbv_meta_writing_and_detector_state
     )
 
-    RE(
+    run_engine(
         configure_arm_trigger_and_disarm_detector(
             fake_eiger, eiger_params, trigger_info
         )

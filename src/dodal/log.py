@@ -57,22 +57,22 @@ class CircularMemoryHandler(logging.Handler):
     """Loosely based on the MemoryHandler, which keeps a buffer and writes it when full
     or when there is a record of specific level. This instead keeps a circular buffer
     that always contains the last {capacity} number of messages, this is only flushed
-    when a log of specific {flushLevel} comes in. On flush this buffer is then passed to
+    when a log of specific {flush_level} comes in. On flush this buffer is then passed to
     the {target} handler.
 
     The CircularMemoryHandler becomes the owner of the target handler which will be closed
     on close of this handler.
     """
 
-    def __init__(self, capacity, flushLevel=logging.ERROR, target=None):
+    def __init__(self, capacity, flush_level=logging.ERROR, target=None):
         logging.Handler.__init__(self)
         self.buffer: deque[logging.LogRecord] = deque(maxlen=capacity)
-        self.flushLevel = flushLevel
+        self.flush_level = flush_level
         self.target = target
 
     def emit(self, record):
         self.buffer.append(record)
-        if record.levelno >= self.flushLevel:
+        if record.levelno >= self.flush_level:
             self.flush()
 
     def flush(self):
@@ -149,7 +149,7 @@ def set_up_graylog_handler(logger: Logger, host: str, port: int):
     return graylog_handler
 
 
-def set_up_INFO_file_handler(logger, path: Path, filename: str):
+def set_up_info_file_handler(logger, path: Path, filename: str):
     """Set up a file handler for the logger, at INFO level, which will keep 30 days
     of logs, rotating once per day. Creates the directory if necessary."""
     print(f"Logging to INFO file handler {path / filename}")
@@ -162,7 +162,7 @@ def set_up_INFO_file_handler(logger, path: Path, filename: str):
     return file_handler
 
 
-def set_up_DEBUG_memory_handler(
+def set_up_debug_memory_handler(
     logger: Logger, path: Path, filename: str, capacity: int
 ):
     """Set up a Memory handler which holds 200k lines, and writes them to an hourly
@@ -178,7 +178,7 @@ def set_up_DEBUG_memory_handler(
     file_handler.setFormatter(DEFAULT_FORMATTER)
     memory_handler = CircularMemoryHandler(
         capacity=capacity,
-        flushLevel=logging.ERROR,
+        flush_level=logging.ERROR,
         target=file_handler,
     )
     memory_handler.setLevel(logging.DEBUG)
@@ -223,8 +223,8 @@ def set_up_all_logging_handlers(
         "graylog_handler": set_up_graylog_handler(
             logger, *get_graylog_configuration(dev_mode, graylog_port)
         ),
-        "info_file_handler": set_up_INFO_file_handler(logger, logging_path, filename),
-        "debug_memory_handler": set_up_DEBUG_memory_handler(
+        "info_file_handler": set_up_info_file_handler(logger, logging_path, filename),
+        "debug_memory_handler": set_up_debug_memory_handler(
             logger, debug_logging_path or logging_path, filename, error_log_buffer_lines
         ),
     }

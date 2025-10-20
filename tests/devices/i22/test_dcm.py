@@ -33,11 +33,11 @@ async def dcm() -> DCM:
 
 
 def test_count_dcm(
-    RE: RunEngine,
+    run_engine: RunEngine,
     run_engine_documents: dict[str, list[dict]],
     dcm: DCM,
 ):
-    RE(bp.count([dcm]))
+    run_engine(bp.count([dcm]))
     assert_emitted(
         run_engine_documents,
         start=1,

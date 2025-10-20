@@ -104,15 +104,15 @@ class FemtoDDPCA(CurrentAmp):
                 + "\n Available gain:"
                 + f" {[f'{c.value:.0e}' for c in self.gain_conversion_table]}"
             )
-        SEN_setting = self.gain_conversion_table(value).name
-        LOGGER.info(f"{self.name} gain change to {SEN_setting}:{value}")
+        sensitivity_setting = self.gain_conversion_table(value).name
+        LOGGER.info(f"{self.name} gain change to {sensitivity_setting}:{value}")
 
         await self.gain.set(
-            value=self.gain_table[SEN_setting],
+            value=self.gain_table[sensitivity_setting],
             timeout=self.timeout,
         )
         # wait for current amplifier's bandpass filter to settle.
-        await asyncio.sleep(self.raise_timetable[SEN_setting].value)
+        await asyncio.sleep(self.raise_timetable[sensitivity_setting].value)
 
     async def increase_gain(self, value: int = 1) -> None:
         current_gain = int((await self.get_gain()).name.split("_")[-1])

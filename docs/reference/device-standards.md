@@ -112,7 +112,7 @@ Whilst it would be possible to do:
 this has potential negative side effects:
 
 * When the plan is simulated it will still set the parameter on the device
-* There may be external things attached to the RE that are tracking messages e.g. metrics. A set like this would be
+* There may be external things attached to the RunEngine that are tracking messages e.g. metrics. A set like this would be
   lost
 
 Instead you should make a soft signal:

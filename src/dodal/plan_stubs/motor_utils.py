@@ -9,7 +9,7 @@ from ophyd_async.core import Device
 from ophyd_async.epics.motor import Motor
 
 
-class MoveTooLarge(Exception):
+class MoveTooLargeError(Exception):
     def __init__(
         self,
         axis: Motor,
@@ -29,14 +29,14 @@ def check_and_cache_values(
     maximum_move: float,
 ) -> Generator[Msg, Any, dict[Motor, float]]:
     """Caches the positions of all Motors on specified device if they are within
-    smallest_move of home_position. Throws MoveTooLarge if they are outside maximum_move
+    smallest_move of home_position. Throws MoveTooLargeError if they are outside maximum_move
     of the home_position
     """
     positions = {}
     for axis, new_position in devices_and_positions.items():
         position = yield from bps.rd(axis)
         if abs(position - new_position) > maximum_move:
-            raise MoveTooLarge(axis, maximum_move, position)
+            raise MoveTooLargeError(axis, maximum_move, position)
         if abs(position - new_position) > smallest_move:
             positions[axis] = position
     return positions
@@ -68,7 +68,7 @@ def move_and_reset_wrapper(
 ) -> MsgGenerator:
     """Wrapper that does the following:
        1. Caches the positions of all Motors on device
-       2. Throws a MoveTooLarge exception if any positions are maximum_move away from home_position
+       2. Throws a MoveTooLargeError exception if any positions are maximum_move away from home_position
        2. Moves any motor that is more than smallest_move away from the home_position to home_position
        3. Runs the specified plan
        4. Moves all motors back to their cached positions

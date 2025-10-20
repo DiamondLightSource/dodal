@@ -42,7 +42,7 @@ class AccessControlledShutter(OpticsBlueAPIDevice):
 
     @AsyncStatus.wrap
     async def set(self, value: ShutterDemand):
-        REQUEST_PARAMS = {
+        request_params = {
             "name": "operate_shutter_plan",
             "params": {
                 "experiment_hutch": self.hutch_request.value,
@@ -51,4 +51,4 @@ class AccessControlledShutter(OpticsBlueAPIDevice):
             },
             "instrument_session": self.instrument_session,
         }
-        await super().set(REQUEST_PARAMS)
+        await super().set(request_params)

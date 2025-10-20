@@ -16,32 +16,32 @@ def draw_crosshair(image: Image.Image, beam_x: int, beam_y: int):
         beam_y: The y-coordinate of the crosshair (pixels)
     """
     draw = ImageDraw.Draw(image)
-    OUTLINE_WIDTH = 1
-    HALF_LEN = CROSSHAIR_LENGTH_PX / 2
+    outline_width = 1
+    half_len = CROSSHAIR_LENGTH_PX / 2
     draw.rectangle(
         [
-            beam_x - OUTLINE_WIDTH,
-            beam_y - HALF_LEN - OUTLINE_WIDTH,
-            beam_x + OUTLINE_WIDTH,
-            beam_y + HALF_LEN + OUTLINE_WIDTH,
+            beam_x - outline_width,
+            beam_y - half_len - outline_width,
+            beam_x + outline_width,
+            beam_y + half_len + outline_width,
         ],
         fill=CROSSHAIR_OUTLINE_COLOUR,
     )
     draw.rectangle(
         [
-            beam_x - HALF_LEN - OUTLINE_WIDTH,
-            beam_y - OUTLINE_WIDTH,
-            beam_x + HALF_LEN + OUTLINE_WIDTH,
-            beam_y + OUTLINE_WIDTH,
+            beam_x - half_len - outline_width,
+            beam_y - outline_width,
+            beam_x + half_len + outline_width,
+            beam_y + outline_width,
         ],
         fill=CROSSHAIR_OUTLINE_COLOUR,
     )
     draw.line(
-        ((beam_x, beam_y - HALF_LEN), (beam_x, beam_y + HALF_LEN)),
+        ((beam_x, beam_y - half_len), (beam_x, beam_y + half_len)),
         fill=CROSSHAIR_FILL_COLOUR,
     )
     draw.line(
-        ((beam_x - HALF_LEN, beam_y), (beam_x + HALF_LEN, beam_y)),
+        ((beam_x - half_len, beam_y), (beam_x + half_len, beam_y)),
         fill=CROSSHAIR_FILL_COLOUR,
     )
 

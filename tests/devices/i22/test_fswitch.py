@@ -35,7 +35,7 @@ async def test_reading_fswitch(fswitch: FSwitch):
     )
 
 
-def test_fswitch_count_plan(RE: RunEngine, fswitch: FSwitch):
+def test_fswitch_count_plan(run_engine: RunEngine, fswitch: FSwitch):
     names = []
     docs = []
 
@@ -43,7 +43,7 @@ def test_fswitch_count_plan(RE: RunEngine, fswitch: FSwitch):
         names.append(name)
         docs.append(doc)
 
-    RE(count([fswitch]), subscription)
+    run_engine(count([fswitch]), subscription)
 
     descriptor_doc = docs[names.index("descriptor")]
     event_doc = docs[names.index("event")]

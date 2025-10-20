@@ -4,7 +4,7 @@ from typing import Literal
 
 from aiohttp import ClientSession
 from ophyd_async.core import FilenameProvider, PathInfo
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from dodal.common.types import UpdatingPathProvider
 from dodal.log import LOGGER
@@ -20,7 +20,7 @@ class DataCollectionIdentifier(BaseModel):
     Should be always incrementing, unique per-visit, co-ordinated with any other scan engines.
     """
 
-    collectionNumber: int
+    collection_number: int = Field(alias="collectionNumber")
 
 
 class DirectoryServiceClient(ABC):
@@ -46,7 +46,7 @@ class DiamondFilenameProvider(FilenameProvider):
     def __call__(self, device_name: str | None = None):
         assert device_name, "Diamond filename requires device_name to be passed"
         assert self.collectionId is not None
-        return f"{self._beamline}-{self.collectionId.collectionNumber}-{device_name}"
+        return f"{self._beamline}-{self.collectionId.collection_number}-{device_name}"
 
 
 class RemoteDirectoryServiceClient(DirectoryServiceClient):
@@ -143,7 +143,7 @@ class StaticVisitPathProvider(UpdatingPathProvider):
 
     async def data_session(self) -> str:
         collection = await self._client.get_current_collection()
-        return f"{self._beamline}-{collection.collectionNumber}"
+        return f"{self._beamline}-{collection.collection_number}"
 
     def __call__(self, device_name: str | None = None) -> PathInfo:
         assert device_name, "Must call PathProvider with device_name"

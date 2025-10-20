@@ -1,7 +1,7 @@
 from dodal.devices.zocalo.zocalo_interaction import ZocaloStartInfo, ZocaloTrigger
 from dodal.devices.zocalo.zocalo_results import (
-    NoResultsFromZocalo,
-    NoZocaloSubscription,
+    NoResultsFromZocaloError,
+    NoZocaloSubscriptionError,
     XrcResult,
     ZocaloResults,
     ZocaloSource,
@@ -13,8 +13,8 @@ __all__ = [
     "XrcResult",
     "ZocaloTrigger",
     "get_full_processing_results",
-    "NoResultsFromZocalo",
-    "NoZocaloSubscription",
+    "NoResultsFromZocaloError",
+    "NoZocaloSubscriptionError",
     "ZocaloStartInfo",
     "ZocaloSource",
 ]

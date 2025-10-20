@@ -27,7 +27,7 @@ def set_smargon_pos(smargon: Smargon, pos: tuple[float, float, float]):
 
 
 async def test_given_to_robot_disp_low_when_stub_offsets_set_to_robot_load_then_proc_set(
-    RE: RunEngine,
+    run_engine: RunEngine,
     smargon: Smargon,
 ):
     set_mock_value(smargon.stub_offsets.to_robot_load.disp, 0)
@@ -43,11 +43,11 @@ async def test_given_to_robot_disp_low_when_stub_offsets_set_to_robot_load_then_
         )
         assert current_pos_proc == 0
 
-    RE(plan())
+    run_engine(plan())
 
 
 async def test_given_center_disp_low_and_at_centre_when_stub_offsets_set_to_center_then_proc_set(
-    RE: RunEngine,
+    run_engine: RunEngine,
     smargon: Smargon,
 ):
     set_mock_value(smargon.stub_offsets.center_at_current_position.disp, 0)
@@ -62,7 +62,7 @@ async def test_given_center_disp_low_and_at_centre_when_stub_offsets_set_to_cent
             yield from bps.rd(smargon.stub_offsets.center_at_current_position.proc)
         ) == 1
 
-    RE(plan())
+    run_engine(plan())
 
 
 async def test_given_center_disp_low_when_stub_offsets_set_to_center_and_moved_to_0_0_0_then_proc_set(
@@ -197,10 +197,10 @@ async def test_given_set_with_all_values_then_motors_set_in_order(smargon: Smarg
 
 
 async def test_given_set_fails_then_defer_moves_turned_back_off(smargon: Smargon):
-    class MyException(Exception): ...
+    class MyError(Exception): ...
 
-    smargon.x.user_setpoint.set = MagicMock(side_effect=MyException())
-    with pytest.raises(MyException):
+    smargon.x.user_setpoint.set = MagicMock(side_effect=MyError())
+    with pytest.raises(MyError):
         await smargon.set(CombinedMove(x=10))
 
     get_mock_put(smargon.defer_move).assert_has_calls(

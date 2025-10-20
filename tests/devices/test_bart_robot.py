@@ -17,7 +17,7 @@ from dodal.devices.robot import (
     WAIT_FOR_OLD_PIN_MSG,
     BartRobot,
     PinMounted,
-    RobotLoadFailed,
+    RobotLoadError,
     SampleLocation,
 )
 
@@ -49,7 +49,7 @@ async def test_given_robot_load_times_out_when_load_called_then_exception_contai
     set_mock_value(device.prog_error.code, (expected_error_code := 10))
     set_mock_value(device.prog_error.str, (expected_error_string := "BAD"))
 
-    with pytest.raises(RobotLoadFailed) as e:
+    with pytest.raises(RobotLoadError) as e:
         await device.set(SampleLocation(0, 0))
     assert e.value.error_code == expected_error_code
     assert e.value.error_string == expected_error_string
@@ -65,7 +65,7 @@ async def test_given_program_running_when_load_pin_then_logs_the_program_name_an
     program_name = "BAD_PROGRAM"
     set_mock_value(device.program_running, True)
     set_mock_value(device.program_name, program_name)
-    with pytest.raises(RobotLoadFailed):
+    with pytest.raises(RobotLoadError):
         await device.set(SampleLocation(0, 0))
     last_log = patch_logger.mock_calls[1].args[0]
     assert program_name in last_log
@@ -80,7 +80,7 @@ async def test_given_program_not_running_but_pin_not_unmounting_when_load_pin_th
     set_mock_value(device.program_running, False)
     set_mock_value(device.gonio_pin_sensor, PinMounted.PIN_MOUNTED)
     device.load = AsyncMock(side_effect=device.load)
-    with pytest.raises(RobotLoadFailed):
+    with pytest.raises(RobotLoadError):
         await device.set(SampleLocation(15, 10))
     device.load.trigger.assert_called_once()  # type:ignore
     last_log = patch_logger.mock_calls[1].args[0]
@@ -96,7 +96,7 @@ async def test_given_program_not_running_and_pin_unmounting_but_new_pin_not_moun
     set_mock_value(device.program_running, False)
     set_mock_value(device.gonio_pin_sensor, PinMounted.NO_PIN_MOUNTED)
     device.load = AsyncMock(side_effect=device.load)
-    with pytest.raises(RobotLoadFailed) as exc_info:
+    with pytest.raises(RobotLoadError) as exc_info:
         await device.set(SampleLocation(15, 10))
 
     try:
@@ -145,7 +145,7 @@ async def test_given_waiting_for_pin_to_mount_when_no_pin_mounted_then_error_rai
     device = await _get_bart_robot()
     set_mock_value(device.prog_error.code, 25)
     status = device.pin_mounted_or_no_pin_found()
-    with pytest.raises(RobotLoadFailed):
+    with pytest.raises(RobotLoadError):
         await status
 
 
@@ -170,7 +170,7 @@ async def test_moving_the_robot_will_reset_error_if_light_curtain_is_tripped_and
     _set_fast_robot_timeouts(device)
     set_mock_value(device.controller_error.code, BartRobot.LIGHT_CURTAIN_TRIPPED)
 
-    with pytest.raises(RobotLoadFailed) as e:
+    with pytest.raises(RobotLoadError) as e:
         await device.set(SampleLocation(1, 2))
         assert e.value.error_code == 40
 
