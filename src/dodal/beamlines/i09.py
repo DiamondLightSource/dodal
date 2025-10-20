@@ -2,6 +2,11 @@ from dodal.common.beamlines.beamline_utils import (
     device_factory,
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
+from dodal.devices.apple2_undulator import (
+    Apple2,
+    UndulatorGap,
+    UndulatorPhaseAxes,
+)
 from dodal.devices.electron_analyser import DualEnergySource
 from dodal.devices.electron_analyser.vgscienta import VGScientaDetector
 from dodal.devices.i09 import DCM, Grating, LensMode, PassEnergy, PsuMode
@@ -49,4 +54,21 @@ def ew4000() -> VGScientaDetector[LensMode, PsuMode, PassEnergy]:
         psu_mode_type=PsuMode,
         pass_energy_type=PassEnergy,
         energy_source=energy_source(),
+    )
+
+
+@device_factory()
+def id() -> Apple2:
+    """i09 soft x-ray insertion device:"""
+    return Apple2(
+        id_gap=UndulatorGap(
+            prefix=f"{BeamlinePrefix(BL, suffix='J').insertion_prefix}-MO-SERVC-01:"
+        ),
+        id_phase=UndulatorPhaseAxes(
+            prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:",
+            top_outer="PUO",
+            top_inner="PUI",
+            btm_inner="PLI",
+            btm_outer="PLO",
+        ),
     )
