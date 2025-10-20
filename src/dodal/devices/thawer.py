@@ -14,10 +14,6 @@ from ophyd_async.epics.core import epics_signal_rw
 from dodal.log import LOGGER
 
 
-class ThawingException(Exception):
-    pass
-
-
 class ThawingTimer(Device, Stoppable, Movable[float]):
     def __init__(self, control_signal: SignalRW[OnOff]) -> None:
         self._control_signal_ref = Reference(control_signal)

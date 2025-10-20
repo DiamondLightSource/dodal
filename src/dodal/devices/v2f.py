@@ -29,10 +29,10 @@ class QDV2F(StandardReadable):
         self,
         prefix: str,
         name: str = "",
-        I_suffix="I",
+        intensity_suffix="I",
     ) -> None:
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
-            self.intensity = epics_signal_r(float, f"{prefix}{I_suffix}")
+            self.intensity = epics_signal_r(float, f"{prefix}{intensity_suffix}")
         with self.add_children_as_readables():
             self.gain = epics_signal_rw(V2FGain, f"{prefix}GAIN")
 

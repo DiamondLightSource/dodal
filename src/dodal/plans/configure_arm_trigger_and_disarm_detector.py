@@ -155,7 +155,7 @@ def set_mx_settings_pvs(
 
 
 if __name__ == "__main__":
-    RE = RunEngine()
+    run_engine = RunEngine()
     do_default_logging_setup()
 
     path_provider = StaticPathProvider(
@@ -166,7 +166,7 @@ if __name__ == "__main__":
     set_path_provider(path_provider)
 
     eiger = fastcs_eiger(connect_immediately=True)
-    RE(
+    run_engine(
         configure_arm_trigger_and_disarm_detector(
             eiger=eiger,
             detector_params=DetectorParams(
