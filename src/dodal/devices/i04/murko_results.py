@@ -43,7 +43,7 @@ class Coord(Enum):
 
 @dataclass
 class MurkoResult:
-    chosen_point_px: tuple
+    chosen_point_px: tuple[int, int]
     x_dist_mm: float
     y_dist_mm: float
     omega: float
