@@ -59,7 +59,7 @@ def ew4000() -> VGScientaDetector[LensMode, PsuMode, PassEnergy]:
 
 @device_factory()
 def id() -> Apple2:
-    """i09 soft x-ray insertion device:"""
+    """I09 soft x-ray insertion device."""
     return Apple2(
         id_gap=UndulatorGap(
             prefix=f"{BeamlinePrefix(BL, suffix='J').insertion_prefix}-MO-SERVC-01:"

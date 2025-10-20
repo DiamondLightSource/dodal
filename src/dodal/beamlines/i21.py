@@ -34,7 +34,7 @@ def pgm() -> PGM:
 
 @device_factory()
 def id() -> Apple2:
-    """i21 insertion device:"""
+    """I21 insertion device."""
     return Apple2(
         id_gap=UndulatorGap(prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:"),
         id_phase=UndulatorPhaseAxes(
