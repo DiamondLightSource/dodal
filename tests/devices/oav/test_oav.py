@@ -1,6 +1,7 @@
 from unittest.mock import AsyncMock, patch
 
 import pytest
+from ophyd_async.core import init_devices
 from ophyd_async.testing import set_mock_value
 
 from dodal.devices.oav.oav_detector import (
@@ -179,3 +180,20 @@ def test_setting_null_zoom_controller_raises_exception(
     with pytest.raises(Exception) as exc:
         null_controller.set("2.0x")
     assert str(exc.value) == "Attempting to set zoom level of a null zoom controller"
+
+
+@pytest.mark.parametrize(
+    "mjpeg_prefix",
+    [
+        "MJPG",
+        "XTAL"
+    ],
+)
+async def test_setting_mjpeg_prefix_changes_stream_url(mjpeg_prefix):
+    oav_config = OAVConfigBeamCentre(TEST_OAV_ZOOM_LEVELS_XML, TEST_DISPLAY_CONFIG)
+    async with init_devices(mock=True, connect=True):
+        oav = OAVBeamCentreFile("", config=oav_config, name="oav", mjpeg_prefix=mjpeg_prefix)
+    url = oav.grid_snapshot.url.source.split("mock+ca://")[1]
+    assert url.startswith(mjpeg_prefix)
+    url = oav.snapshot.url.source.split("mock+ca://")[1]
+    assert url.startswith(mjpeg_prefix)

@@ -117,7 +117,7 @@ class OAV(StandardReadable):
                 coord=soft_signal_rw(datatype=int, initial_value=Coords.Y.value),
             )
             self.snapshot = Snapshot(
-                f"{self._prefix}MJPG:",
+                f"{self._prefix}{mjpeg_prefix}:",
                 self._name,
             )
 
