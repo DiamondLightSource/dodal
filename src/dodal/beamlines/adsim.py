@@ -29,7 +29,9 @@ https://epics-containers.github.io/main/tutorials/launch_example.html
 And ensure that the signals are visible:
 
 ```sh
-export EPICS_CA_ADDR_LIST=127.0.0.1:5094
+export EPICS_CA_ADDR_LIST=127.0.0.1:9064
+export EPICS_CA_NAME_SERVERS=127.0.0.1:9064
+export EPICS_PVA_NAME_SERVERS=127.0.0.1:9075
 ```
 
 How to use the devices in a plan:

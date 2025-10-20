@@ -31,8 +31,8 @@ from dodal.plans import count
 System tests that can be run against the containerised IOCs from epics-containers:
 https://github.com/epics-containers/example-services
 
-Check out that repository at ref '2025.8.1' and using docker or podman deploy the
-services in the compose file:
+Check out that repository and using docker or podman deploy the services in the
+compose file:
 
 ```sh
 docker compose up -d
@@ -51,9 +51,9 @@ def with_env():
     with patch.dict(
         os.environ,
         {
-            "EPICS_CA_NAME_SERVERS": "127.0.0.1:5094",
-            "EPICS_PVA_NAME_SERVERS": "127.0.0.1:5095",
-            "EPICS_CA_ADDR_LIST": "127.0.0.1:5094",
+            "EPICS_CA_NAME_SERVERS": "127.0.0.1:9064",
+            "EPICS_PVA_NAME_SERVERS": "127.0.0.1:9075",
+            "EPICS_CA_ADDR_LIST": "127.0.0.1:9064",
         },
         clear=True,
     ):
