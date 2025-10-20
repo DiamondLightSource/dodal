@@ -112,7 +112,7 @@ class TetrammController(DetectorController):
         current_trig_status = await self.driver.trigger_mode.get_value()
 
         if current_trig_status == TetrammTrigger.FREE_RUN:  # if freerun turn off first
-            LOGGER.info("disarming from free run")
+            LOGGER.info("Disarming TetrAMM from free run")
             await self.disarm()
 
         # trigger mode must be set first and on its own!
@@ -147,13 +147,13 @@ class TetrammController(DetectorController):
         await wait_for_value(self._file_io.acquire, False, timeout=None)
 
     async def unstage(self):
-        LOGGER.info("Unstaging tetram")
+        LOGGER.info("Unstaging TetrAMM")
         await self._file_io.acquire.set(False, wait=False)
 
     async def disarm(self):
         # We can't use caput callback as we already used it in arm() and we can't have
         # 2 or they will deadlock. Therefore must use stop_busy_record
-        LOGGER.info("Disarming tetram")
+        LOGGER.info("Disarming TetrAMM")
         await stop_busy_record(self.driver.acquire, False, timeout=DEFAULT_TIMEOUT)
 
     async def set_exposure(self, exposure: float) -> None:

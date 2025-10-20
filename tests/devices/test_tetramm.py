@@ -1,4 +1,5 @@
 import re
+from unittest.mock import MagicMock, patch
 
 import pytest
 from ophyd_async.core import DetectorTrigger, PathProvider, TriggerInfo, init_devices
@@ -305,3 +306,12 @@ async def assert_armed(driver: TetrammDriver) -> None:
     assert (await driver.acquire.get_value()) == 1
 
     assert (await driver.averaging_time.get_value()) == averaging_time
+
+
+@patch("dodal.devices.tetramm.stop_busy_record")
+async def test_tetramm_disarm_calls_stop_busy_recording(
+    stop_busy_record_mock: MagicMock,
+    tetramm_controller: TetrammController,
+):
+    await tetramm_controller.disarm()
+    stop_busy_record_mock.assert_called_once()
