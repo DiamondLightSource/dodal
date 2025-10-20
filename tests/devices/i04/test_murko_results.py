@@ -12,7 +12,7 @@ from dodal.devices.i04.murko_results import (
     MurkoMetadata,
     MurkoResult,
     MurkoResultsDevice,
-    NoResultsFound,
+    NoResultsFoundError,
     get_yz_least_squares,
 )
 
@@ -598,7 +598,7 @@ async def test_when_no_results_from_redis_then_expected_error_message_on_trigger
 ):
     murko_results._results = []
     murko_results._last_omega = 360
-    with pytest.raises(NoResultsFound):
+    with pytest.raises(NoResultsFoundError):
         await murko_results.trigger()
 
 

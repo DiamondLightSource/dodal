@@ -48,9 +48,9 @@ async def sim_driver(
 async def test_analyser_sets_region_correctly(
     sim_driver: SpecsAnalyserDriverIO[LensMode, PsuMode],
     region: SpecsRegion[LensMode, PsuMode],
-    RE: RunEngine,
+    run_engine: RunEngine,
 ) -> None:
-    RE(bps.mv(sim_driver, region), wait=True)
+    run_engine(bps.mv(sim_driver, region), wait=True)
 
     get_mock_put(sim_driver.region_name).assert_called_once_with(region.name, wait=True)
     get_mock_put(sim_driver.energy_mode).assert_called_once_with(
@@ -108,9 +108,9 @@ async def test_analyser_sets_region_correctly(
 async def test_analyser_sets_region_and_read_configuration_is_correct(
     sim_driver: SpecsAnalyserDriverIO[LensMode, PsuMode],
     region: SpecsRegion[LensMode, PsuMode],
-    RE: RunEngine,
+    run_engine: RunEngine,
 ) -> None:
-    RE(bps.mv(sim_driver, region), wait=True)
+    run_engine(bps.mv(sim_driver, region), wait=True)
 
     prefix = sim_driver.name + "-"
 
@@ -147,9 +147,9 @@ async def test_analyser_sets_region_and_read_configuration_is_correct(
 async def test_analyser_sets_region_and_read_is_correct(
     sim_driver: SpecsAnalyserDriverIO[LensMode, PsuMode],
     region: SpecsRegion[LensMode, PsuMode],
-    RE: RunEngine,
+    run_engine: RunEngine,
 ) -> None:
-    RE(bps.mv(sim_driver, region), wait=True)
+    run_engine(bps.mv(sim_driver, region), wait=True)
 
     spectrum = np.array([1, 2, 3, 4, 5], dtype=float)
     expected_total_intensity = np.sum(spectrum)
@@ -171,9 +171,9 @@ async def test_analyser_sets_region_and_read_is_correct(
 async def test_specs_analyser_binding_energy_axis(
     sim_driver: SpecsAnalyserDriverIO[LensMode, PsuMode],
     region: SpecsRegion[LensMode, PsuMode],
-    RE: RunEngine,
+    run_engine: RunEngine,
 ) -> None:
-    RE(bps.mv(sim_driver, region))
+    run_engine(bps.mv(sim_driver, region))
 
     excitation_energy = await sim_driver.energy_source.energy.get_value()
 
@@ -191,14 +191,14 @@ async def test_specs_analyser_binding_energy_axis(
 
 async def test_specs_analyser_energy_axis(
     sim_driver: SpecsAnalyserDriverIO[LensMode, PsuMode],
-    RE: RunEngine,
+    run_engine: RunEngine,
 ) -> None:
     start_energy = 1
     end_energy = 10
     total_points_iterations = 11
 
-    RE(bps.mv(sim_driver.low_energy, start_energy))
-    RE(bps.mv(sim_driver.high_energy, end_energy))
+    run_engine(bps.mv(sim_driver.low_energy, start_energy))
+    run_engine(bps.mv(sim_driver.high_energy, end_energy))
     set_mock_value(sim_driver.energy_channels, total_points_iterations)
 
     expected_energy_axis = [1.0, 1.9, 2.8, 3.7, 4.6, 5.5, 6.4, 7.3, 8.2, 9.1, 10.0]
@@ -207,7 +207,7 @@ async def test_specs_analyser_energy_axis(
 
 async def test_specs_analyser_angle_axis(
     sim_driver: SpecsAnalyserDriverIO[LensMode, PsuMode],
-    RE: RunEngine,
+    run_engine: RunEngine,
 ) -> None:
     max_angle = 21
     min_angle = 1
@@ -215,7 +215,7 @@ async def test_specs_analyser_angle_axis(
 
     set_mock_value(sim_driver.min_angle_axis, min_angle)
     set_mock_value(sim_driver.max_angle_axis, max_angle)
-    RE(bps.mv(sim_driver.slices, slices))
+    run_engine(bps.mv(sim_driver.slices, slices))
 
     expected_angle_axis = [2.0, 4.0, 6.0, 8.0, 10.0, 12.0, 14.0, 16.0, 18.0, 20.0]
     await assert_value(sim_driver.angle_axis, expected_angle_axis)

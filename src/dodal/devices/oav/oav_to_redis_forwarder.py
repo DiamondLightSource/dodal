@@ -21,12 +21,12 @@ from dodal.log import LOGGER
 
 
 async def get_next_jpeg(response: ClientResponse) -> bytes:
-    JPEG_START_BYTE = b"\xff\xd8"
-    JPEG_STOP_BYTE = b"\xff\xd9"
+    jpeg_start_byte = b"\xff\xd8"
+    jpeg_stop_byte = b"\xff\xd9"
     while True:
         line = await response.content.readline()
-        if line.startswith(JPEG_START_BYTE):
-            return line + await response.content.readuntil(JPEG_STOP_BYTE)
+        if line.startswith(jpeg_start_byte):
+            return line + await response.content.readuntil(jpeg_stop_byte)
 
 
 class Source(IntEnum):

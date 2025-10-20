@@ -27,7 +27,7 @@ async def fake_observe_indices_written(timeout: float) -> AsyncGenerator[int, No
 
 
 async def test_configure_arm_trigger_and_disarm_detector(
-    fake_eiger, eiger_params, RE: RunEngine
+    fake_eiger, eiger_params, run_engine: RunEngine
 ):
     trigger_info = TriggerInfo(
         # Manual trigger, so setting number of triggers to 1.
@@ -45,8 +45,12 @@ async def test_configure_arm_trigger_and_disarm_detector(
 
     def set_capture_rbv_meta_writing_and_detector_state(*args, **kwargs) -> None:
         # Mimics capturing and immediete completion status on Eiger.
+        fake_eiger._writer._path_provider.return_value.filename = "filename.h5"
         set_mock_value(fake_eiger.odin.capture_rbv, "Capturing")
         set_mock_value(fake_eiger.odin.meta_writing, "Writing")
+        set_mock_value(fake_eiger.odin.meta_file_name, "filename.h5")
+        set_mock_value(fake_eiger.odin.id, "filename.h5")
+        set_mock_value(fake_eiger.odin.fan_ready, 1)
         set_mock_value(fake_eiger.drv.detector.state, "idle")
 
     callback_on_mock_put(fake_eiger.odin.num_to_capture, set_meta_active)
@@ -54,7 +58,7 @@ async def test_configure_arm_trigger_and_disarm_detector(
         fake_eiger.odin.capture, set_capture_rbv_meta_writing_and_detector_state
     )
 
-    RE(
+    run_engine(
         configure_arm_trigger_and_disarm_detector(
             fake_eiger, eiger_params, trigger_info
         )

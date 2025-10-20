@@ -51,7 +51,7 @@ class MurkoResult:
     metadata: MurkoMetadata
 
 
-class NoResultsFound(ValueError):
+class NoResultsFoundError(ValueError):
     pass
 
 
@@ -130,7 +130,7 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
             await self.process_batch(message, sample_id)
 
         if not self._results:
-            raise NoResultsFound("No results retrieved from Murko")
+            raise NoResultsFoundError("No results retrieved from Murko")
 
         for result in self._results:
             LOGGER.debug(result)
