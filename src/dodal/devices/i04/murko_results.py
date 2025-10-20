@@ -43,7 +43,7 @@ class Coord(Enum):
 
 @dataclass
 class MurkoResult:
-    centre_px: tuple
+    chosen_point_px: tuple[int, int]
     x_dist_mm: float
     y_dist_mm: float
     omega: float
@@ -73,6 +73,7 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
 
     TIMEOUT_S = 2
     PERCENTAGE_TO_USE = 25
+    LEFTMOST_PIXEL_TO_USE = 10
     NUMBER_OF_WRONG_RESULTS_TO_LOG = 5
 
     def __init__(
@@ -186,16 +187,16 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
         else:
             shape = result["original_shape"]  # Dimensions of image in pixels
             # Murko returns coords as y, x
-            centre_px = (coords[1] * shape[1], coords[0] * shape[0])
+            chosen_point_px = (coords[1] * shape[1], coords[0] * shape[0])
 
             beam_dist_px = calculate_beam_distance(
                 (metadata["beam_centre_i"], metadata["beam_centre_j"]),
-                centre_px[0],
-                centre_px[1],
+                chosen_point_px[0],
+                chosen_point_px[1],
             )
             self._results.append(
                 MurkoResult(
-                    centre_px=centre_px,
+                    chosen_point_px=chosen_point_px,
                     x_dist_mm=beam_dist_px[0] * metadata["microns_per_x_pixel"] / 1000,
                     y_dist_mm=beam_dist_px[1] * metadata["microns_per_y_pixel"] / 1000,
                     omega=omega,
@@ -209,10 +210,27 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
         """Whilst murko is not fully trained it often gives us poor results.
         When it is wrong it usually picks up the base of the pin, rather than the tip,
         meaning that by keeping only a percentage of the results with the smallest X we
-        remove many of the outliers.
+        remove many of the outliers. Murko also occasionally picks a point in the bottom
+        left corner, which can be removed by filtering results with a small x pixel.
         """
+
         LOGGER.info(f"Number of results before filtering: {len(self._results)}")
-        sorted_results = sorted(self._results, key=lambda item: item.centre_px[0])
+        sorted_results = sorted(self._results, key=lambda item: item.chosen_point_px[0])
+
+        results_without_tiny_x = [
+            result
+            for result in sorted_results
+            if result.chosen_point_px[0] >= self.LEFTMOST_PIXEL_TO_USE
+        ]
+        result_uuids_with_tiny_x = [
+            result.uuid
+            for result in sorted_results
+            if result not in results_without_tiny_x
+        ]
+
+        LOGGER.info(
+            f"Results with tiny x have been removed: {result_uuids_with_tiny_x}"
+        )
 
         worst_results = [
             r.uuid for r in sorted_results[-self.NUMBER_OF_WRONG_RESULTS_TO_LOG :]
@@ -221,14 +239,17 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
         LOGGER.info(
             f"Worst {self.NUMBER_OF_WRONG_RESULTS_TO_LOG} murko results were {worst_results}"
         )
+
         cutoff = max(1, int(len(sorted_results) * self.PERCENTAGE_TO_USE / 100))
-        for i, result in enumerate(sorted_results):
-            result.metadata["used_for_centring"] = i < cutoff
+        cutoff = min(cutoff, len(results_without_tiny_x))
 
-        smallest_x = sorted_results[:cutoff]
+        best_x = results_without_tiny_x[:cutoff]
 
-        LOGGER.info(f"Number of results after filtering: {len(smallest_x)}")
-        return smallest_x
+        for result in sorted_results:
+            result.metadata["used_for_centring"] = result in best_x
+
+        LOGGER.info(f"Number of results after filtering: {len(best_x)}")
+        return best_x
 
 
 def get_yz_least_squares(vertical_dists: list, omegas: list) -> tuple[float, float]:
