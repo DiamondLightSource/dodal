@@ -184,15 +184,14 @@ def test_setting_null_zoom_controller_raises_exception(
 
 @pytest.mark.parametrize(
     "mjpeg_prefix",
-    [
-        "MJPG",
-        "XTAL"
-    ],
+    ["MJPG", "XTAL"],
 )
 async def test_setting_mjpeg_prefix_changes_stream_url(mjpeg_prefix):
     oav_config = OAVConfigBeamCentre(TEST_OAV_ZOOM_LEVELS_XML, TEST_DISPLAY_CONFIG)
     async with init_devices(mock=True, connect=True):
-        oav = OAVBeamCentreFile("", config=oav_config, name="oav", mjpeg_prefix=mjpeg_prefix)
+        oav = OAVBeamCentreFile(
+            "", config=oav_config, name="oav", mjpeg_prefix=mjpeg_prefix
+        )
     url = oav.grid_snapshot.url.source.split("mock+ca://")[1]
     assert url.startswith(mjpeg_prefix)
     url = oav.snapshot.url.source.split("mock+ca://")[1]

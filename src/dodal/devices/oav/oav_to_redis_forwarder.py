@@ -39,7 +39,6 @@ class Source(IntEnum):
 class OAVSource(StandardReadable):
     def __init__(self, oav: OAV, label: str):
         self.url_ref = Reference(oav.grid_snapshot.url)
-        self.oav_name = oav.name
         self.oav_ref = Reference(oav)
         self.label = label
         super().__init__()
@@ -62,8 +61,8 @@ class OAVToRedisForwarder(StandardReadable, Flyable, Stoppable):
     def __init__(
         self,
         prefix: str,
-        oav_fs: OAV,
         oav_roi: OAV,
+        oav_fs: OAV,
         redis_host: str,
         redis_password: str,
         redis_db: int = 0,
