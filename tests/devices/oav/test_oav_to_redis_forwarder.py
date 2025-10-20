@@ -27,7 +27,7 @@ async def oav_forwarder(oav_beam_centre_pv_fs: OAV, oav_beam_centre_pv_roi: OAV)
     )
     with init_devices(mock=True):
         oav_forwarder = OAVToRedisForwarder(
-            "prefix", oav_beam_centre_pv_fs, oav_beam_centre_pv_roi, "host", "password"
+            "prefix", oav_beam_centre_pv_roi, oav_beam_centre_pv_fs, "host", "password"
         )
 
     set_mock_value(oav_forwarder.selected_source, Source.FULL_SCREEN.value)
