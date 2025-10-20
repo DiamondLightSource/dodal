@@ -19,13 +19,13 @@ def _oav_to_redis_forwarder(mock):
 
 @pytest.fixture
 @patch("dodal.devices.oav.oav_to_redis_forwarder.StrictRedis")
-def oav_to_redis_forwarder(_, RE):
+def oav_to_redis_forwarder(_):
     return _oav_to_redis_forwarder(False)
 
 
 @pytest.fixture
 @patch("dodal.devices.oav.oav_to_redis_forwarder.StrictRedis")
-def mock_oav_to_redis_forwarder(_, RE):
+def mock_oav_to_redis_forwarder(_):
     return _oav_to_redis_forwarder(True)
 
 
@@ -52,11 +52,11 @@ async def test_given_stream_url_is_not_a_real_webpage_when_kickoff_then_error(
 async def test_given_stream_url_is_real_webpage_but_not_mjpg_when_kickoff_then_error(
     mock_oav_to_redis_forwarder: OAVToRedisForwarder,
 ):
-    URL = "https://www.google.com/"
-    _set_url(mock_oav_to_redis_forwarder, URL)
+    url = "https://www.google.com/"
+    _set_url(mock_oav_to_redis_forwarder, url)
     with pytest.raises(ValueError) as e:
         await mock_oav_to_redis_forwarder.kickoff()
-    assert URL in str(e.value)
+    assert url in str(e.value)
 
 
 @pytest.mark.requires(instrument="i04")  # connects to the real beamline. See
