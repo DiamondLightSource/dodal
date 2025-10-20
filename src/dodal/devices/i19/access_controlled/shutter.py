@@ -2,8 +2,11 @@ from ophyd_async.core import AsyncStatus, StandardReadableFormat
 from ophyd_async.epics.core import epics_signal_r
 
 from dodal.devices.hutch_shutter import ShutterDemand, ShutterState
-from dodal.devices.i19.blueapi_device import HutchState, OpticsBlueAPIDevice
-from dodal.devices.i19.hutch_access import ACCESS_DEVICE_NAME
+from dodal.devices.i19.access_controlled.blueapi_device import (
+    HutchState,
+    OpticsBlueAPIDevice,
+)
+from dodal.devices.i19.access_controlled.hutch_access import ACCESS_DEVICE_NAME
 
 
 class AccessControlledShutter(OpticsBlueAPIDevice):
