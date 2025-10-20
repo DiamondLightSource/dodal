@@ -3,11 +3,11 @@ from unittest.mock import MagicMock, patch
 import bluesky.plan_stubs as bps
 import bluesky.preprocessors as bpp
 from bluesky.run_engine import RunEngine
-from tests.plans.conftest import UndulatorGapCheckDevices
 
 from dodal.plans.preprocessors.verify_undulator_gap import (
     verify_undulator_gap_before_run_decorator,
 )
+from tests.plans.conftest import UndulatorGapCheckDevices
 
 RUN_KEY = "test_run"
 

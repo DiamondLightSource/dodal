@@ -16,6 +16,7 @@ from dodal.devices.i10 import (
     I10SlitsDrainCurrent,
     PiezoMirror,
 )
+from dodal.devices.i10.diagnostics import I10Diagnostic, I10Diagnostic5ADet
 from dodal.devices.i10.rasor.rasor_current_amp import RasorFemto, RasorSR570
 from dodal.devices.i10.rasor.rasor_motors import (
     DetSlits,
@@ -34,7 +35,6 @@ BL = get_beamline_name("i10")
 set_log_beamline(BL)
 set_utils_beamline(BL)
 PREFIX = BeamlinePrefix(BL)
-
 
 """Mirrors"""
 
