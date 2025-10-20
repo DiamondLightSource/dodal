@@ -17,14 +17,14 @@ from dodal.devices.i17.i17_apple2 import I17Apple2Controller
 async def mock_apple2():
     async with init_devices(mock=True):
         mock_id_gap = UndulatorGap("BLXX-EA-DET-007:")
-        mock_phaseAxes = UndulatorPhaseAxes(
+        mock_phase_axes = UndulatorPhaseAxes(
             "BLXX-EA-DET-007:",
             top_outer="RPQ1",
             top_inner="RPQ2",
             btm_outer="RPQ3",
             btm_inner="RPQ4",
         )
-    mock_apple2 = Apple2(id_gap=mock_id_gap, id_phase=mock_phaseAxes)
+    mock_apple2 = Apple2(id_gap=mock_id_gap, id_phase=mock_phase_axes)
 
     return mock_apple2
 
