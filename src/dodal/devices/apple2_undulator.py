@@ -550,6 +550,11 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
             raise RuntimeError(
                 f"{self.name} is not in use, close gap or set polarisation to use this ID"
             )
+        """If both top and bottom phase motor are paired, it is running on two phase
+        axis mode.
+        """
+        if top_outer == top_inner and btm_inner == btm_outer:
+            top_inner = btm_outer = 0
 
         if all(
             isclose(x, 0.0, abs_tol=ROW_PHASE_MOTOR_TOLERANCE)
