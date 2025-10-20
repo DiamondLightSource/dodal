@@ -65,7 +65,7 @@ def id() -> Apple2:
             prefix=f"{BeamlinePrefix(BL, suffix='J').insertion_prefix}-MO-SERVC-01:"
         ),
         id_phase=UndulatorPhaseAxes(
-            prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:",
+            prefix=f"{BeamlinePrefix(BL, suffix='J').insertion_prefix}-MO-SERVC-01:",
             top_outer="PUO",
             top_inner="PUI",
             btm_inner="PLI",
