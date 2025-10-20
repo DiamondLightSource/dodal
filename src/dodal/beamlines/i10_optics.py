@@ -64,7 +64,7 @@ def pgm() -> PGM:
     return PGM(
         prefix=f"{PREFIX.beamline_prefix}-OP-PGM-01:",
         grating=I10Grating,
-        gratingPv="NLINES2",
+        grating_pv="NLINES2",
     )
 
 
