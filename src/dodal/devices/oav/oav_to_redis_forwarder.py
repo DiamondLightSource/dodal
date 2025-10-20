@@ -9,6 +9,7 @@ from bluesky.protocols import Flyable, Stoppable
 from ophyd_async.core import (
     AsyncStatus,
     DeviceVector,
+    Reference,
     StandardReadable,
     observe_value,
     soft_signal_r_and_setter,
@@ -33,6 +34,15 @@ async def get_next_jpeg(response: ClientResponse) -> bytes:
 class Source(IntEnum):
     FULL_SCREEN = 0
     ROI = 1
+
+
+class OAVSource(StandardReadable):
+    def __init__(self, oav: OAV, label: str):
+        self.url_ref = Reference(oav.grid_snapshot.url)
+        self.oav_name = oav.name
+        self.oav_ref = Reference(oav)
+        self.label = label
+        super().__init__()
 
 
 class OAVToRedisForwarder(StandardReadable, Flyable, Stoppable):
@@ -72,10 +82,11 @@ class OAVToRedisForwarder(StandardReadable, Flyable, Stoppable):
         self.counter = epics_signal_r(int, f"{prefix}CAM:ArrayCounter_RBV")
         self.sources = DeviceVector(
             {
-                Source.ROI.value: oav_roi,
-                Source.FULL_SCREEN.value: oav_fs,
+                Source.ROI.value: OAVSource(oav_roi, "roi"),
+                Source.FULL_SCREEN.value: OAVSource(oav_fs, "fullscreen"),
             }
         )
+
         self.selected_source = soft_signal_rw(int)
 
         self.forwarding_task = None
@@ -108,19 +119,19 @@ class OAVToRedisForwarder(StandardReadable, Flyable, Stoppable):
         self.uuid_setter(redis_uuid)
 
     async def _open_connection_and_do_function(
-        self, function_to_do: Callable[[ClientResponse, OAV], Awaitable]
+        self, function_to_do: Callable[[ClientResponse, OAVSource], Awaitable]
     ):
         source_idx = await self.selected_source.get_value()
         LOGGER.info(
             f"Forwarding data from sample {await self.sample_id.get_value()} and OAV {source_idx}"
         )
         source = self.sources[source_idx]
-        stream_url = await source.grid_snapshot.url.get_value()
+        stream_url = await source.url_ref().get_value()
         async with ClientSession() as session:
             async with session.get(stream_url) as response:
                 await function_to_do(response, source)
 
-    async def _stream_to_redis(self, response: ClientResponse, source: OAV):
+    async def _stream_to_redis(self, response: ClientResponse, source: OAVSource):
         """Uses the update of the frame counter as a trigger to pull an image off the OAV
         and into redis.
 
@@ -132,13 +143,13 @@ class OAVToRedisForwarder(StandardReadable, Flyable, Stoppable):
             asyncio.wait_for(self._stop_flag.wait(), timeout=self.TIMEOUT)
         )
         async for frame_count in observe_value(self.counter, done_status=done_status):
-            redis_uuid = f"{source.name}-{frame_count}-{uuid4()}"
+            redis_uuid = f"{source.label}-{frame_count}-{uuid4()}"
             await self._get_frame_and_put_to_redis(redis_uuid, response)
 
-    async def _confirm_mjpg_stream(self, response: ClientResponse, source: OAV):
+    async def _confirm_mjpg_stream(self, response: ClientResponse, source: OAVSource):
         if response.content_type != "multipart/x-mixed-replace":
             raise ValueError(
-                f"{await source.grid_snapshot.url.get_value()} is not an MJPG stream"
+                f"{await source.url_ref().get_value()} is not an MJPG stream"
             )
 
     @AsyncStatus.wrap
