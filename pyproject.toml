@@ -14,8 +14,8 @@ description = "Ophyd devices and other utils that could be used across DLS beaml
 dependencies = [
     "click",
     "ophyd",
-    "ophyd-async[ca,pva]>=0.12.3",
-    "bluesky",
+    "ophyd-async[ca,pva]>=0.13.2",
+    "bluesky>=1.14.5",
     "pyepics",
     "dataclasses-json",
     "pillow",
@@ -23,15 +23,15 @@ dependencies = [
     "requests",
     "graypy",
     "pydantic>=2.0",
-    "opencv-python-headless",        # For pin-tip detection.
+    "opencv-python-headless",         # For pin-tip detection.
     "numpy",
     "aiofiles",
     "aiohttp",
     "redis",
     "scanspec>=0.7.3",
-    "event-model>=1.23",             # Until bluesky pins it https://github.com/DiamondLightSource/dodal/issues/1278
-    "pyzmq==26.3.0",                 # Until we can move to RHEL 8 https://github.com/DiamondLightSource/mx-bluesky/issues/1139
+    "pyzmq==26.3.0",                  # Until we can move to RHEL 8 https://github.com/DiamondLightSource/mx-bluesky/issues/1139
     "deepdiff",
+    "daq-config-server>=v1.0.0-rc.2", # For getting Configuration settings.
 ]
 
 dynamic = ["version"]
@@ -76,7 +76,7 @@ dev = [
 
 [project.scripts]
 dodal = "dodal.__main__:main"
-save-panda = "dodal.devices.util.save_panda:main"
+save-panda = "dodal.plans.save_panda:main"
 
 [project.urls]
 GitHub = "https://github.com/DiamondLightSource/dodal"
@@ -188,14 +188,17 @@ lint.select = [
     "SLF",    # self - https://docs.astral.sh/ruff/settings/#lintflake8-self
     "RUF018", # walrus operators in asserts - https://docs.astral.sh/ruff/rules/assignment-in-assert/
     "TID251", # banned api - https://docs.astral.sh/ruff/rules/banned-api/
+    "INP001", # missing __init__.py - https://docs.astral.sh/ruff/rules/implicit-namespace-package/
 ]
 
 [tool.ruff.lint.per-file-ignores]
 # By default, private member access is allowed in tests
 # See https://github.com/DiamondLightSource/python-copier-template/issues/154
-# Remove this line to forbid private member access, walrus operators, banned api in asserts in tests 
+# Remove this line to forbid private member access, walrus operators, banned api in asserts in tests
 "tests/**/*" = ["SLF001", "RUF018", "TID251"]
 "system_tests/**/*" = ["SLF001", "RUF018", "TID251"]
+".github/**/*" = ["INP001"]
+"docs/**/*" = ["INP001"]
 
 [tool.ruff.lint.flake8-tidy-imports.banned-api]
 "time.sleep".msg = "Use bps.sleep or asyncio.sleep instead. # noqa will disable this rule for that line. See https://github.com/DiamondLightSource/mx-bluesky/issues/925"

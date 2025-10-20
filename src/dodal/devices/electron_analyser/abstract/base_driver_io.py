@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from collections.abc import Mapping
 from typing import Generic, TypeVar
 
 import numpy as np
@@ -13,7 +12,7 @@ from ophyd_async.core import (
     derived_signal_r,
     soft_signal_rw,
 )
-from ophyd_async.epics.adcore import ADBaseIO
+from ophyd_async.epics.adcore import ADBaseIO, ADImageMode
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
 from dodal.devices.electron_analyser.abstract.base_region import (
@@ -24,6 +23,10 @@ from dodal.devices.electron_analyser.abstract.types import (
     TLensMode,
     TPassEnergy,
     TPsuMode,
+)
+from dodal.devices.electron_analyser.energy_sources import (
+    DualEnergySource,
+    EnergySource,
 )
 from dodal.devices.electron_analyser.enums import EnergyMode
 from dodal.devices.electron_analyser.util import to_binding_energy
@@ -49,7 +52,7 @@ class AbstractAnalyserDriverIO(
         lens_mode_type: type[TLensMode],
         psu_mode_type: type[TPsuMode],
         pass_energy_type: type[TPassEnergy],
-        energy_sources: Mapping[str, SignalR[float]],
+        energy_source: EnergySource | DualEnergySource,
         name: str = "",
     ) -> None:
         """
@@ -65,15 +68,18 @@ class AbstractAnalyserDriverIO(
             pass_energy_type: Can be enum or float, depends on electron analyser model.
                               If enum, it determines the available pass energies for
                               this device.
-            energy_sources: Map that pairs a source name to an energy value signal
+            energy_source: Device that can give us the correct excitation energy and
+                           switch sources if applicable.
                             (in eV).
             name: Name of the device.
         """
-        self.energy_sources = energy_sources
         self.acquisition_mode_type = acquisition_mode_type
         self.lens_mode_type = lens_mode_type
         self.psu_mode_type = psu_mode_type
         self.pass_energy_type = pass_energy_type
+
+        # must call first to initiate parent variables
+        super().__init__(prefix=prefix, name=name)
 
         with self.add_children_as_readables():
             self.image = epics_signal_r(Array1D[np.float64], prefix + "IMAGE")
@@ -81,10 +87,11 @@ class AbstractAnalyserDriverIO(
             self.total_intensity = derived_signal_r(
                 self._calculate_total_intensity, spectrum=self.spectrum
             )
-            self.excitation_energy = soft_signal_rw(float, initial_value=0, units="eV")
+            self.energy_source = energy_source
 
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
-            # Used for setting up region data acquisition.
+            # Read once per scan after data acquired
+            # Used for setting up region data acquisition
             self.region_name = soft_signal_rw(str, initial_value="null")
             self.energy_mode = soft_signal_rw(
                 EnergyMode, initial_value=EnergyMode.KINETIC
@@ -100,37 +107,61 @@ class AbstractAnalyserDriverIO(
             self.acquisition_mode = epics_signal_rw(
                 acquisition_mode_type, prefix + "ACQ_MODE"
             )
-            self.excitation_energy_source = soft_signal_rw(str, initial_value="")
             # This is used by each electron analyser, however it depends on the electron
             # analyser type to know if is moved with region settings.
             self.psu_mode = epics_signal_rw(psu_mode_type, prefix + "PSU_MODE")
 
+        # This is defined in the parent class, add it as readable configuration.
+        self.add_readables([self.acquire_time], StandardReadableFormat.CONFIG_SIGNAL)
+
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
-            # Read once per scan after data acquired
+            # NOT used for setting up region data acquisition.
             self.energy_axis = self._create_energy_axis_signal(prefix)
             self.binding_energy_axis = derived_signal_r(
                 self._calculate_binding_energy_axis,
                 "eV",
                 energy_axis=self.energy_axis,
-                excitation_energy=self.excitation_energy,
+                excitation_energy=self.energy_source.energy,
                 energy_mode=self.energy_mode,
             )
             self.angle_axis = self._create_angle_axis_signal(prefix)
-            self.step_time = epics_signal_r(float, prefix + "AcquireTime")
             self.total_steps = epics_signal_r(int, prefix + "TOTAL_POINTS_RBV")
             self.total_time = derived_signal_r(
                 self._calculate_total_time,
                 "s",
                 total_steps=self.total_steps,
-                step_time=self.step_time,
+                step_time=self.acquire_time,
                 iterations=self.iterations,
             )
 
-        super().__init__(prefix=prefix, name=name)
+    @AsyncStatus.wrap
+    async def stage(self) -> None:
+        await self.image_mode.set(ADImageMode.SINGLE)
+        await super().stage()
 
-    @abstractmethod
     @AsyncStatus.wrap
     async def set(self, region: TAbstractBaseRegion):
+        """
+        Take a region object and setup the driver with it. If using a DualEnergySource,
+        set it to use the source selected by the region. It also converts the region to
+        kinetic mode before we move the driver signals to the region parameter values:
+
+        Args:
+            region: Contains the parameters to setup the driver for a scan.
+        """
+        if isinstance(self.energy_source, DualEnergySource):
+            self.energy_source.selected_source.set(region.excitation_energy_source)
+        excitation_energy = await self.energy_source.energy.get_value()
+
+        # Switch to kinetic energy as epics doesn't support BINDING.
+        ke_region = region.switch_energy_mode(EnergyMode.KINETIC, excitation_energy)
+        await self._set_region(ke_region)
+        # Set the true energy mode from original region so binding_energy_axis can be
+        # calculated correctly.
+        await self.energy_mode.set(region.energy_mode)
+
+    @abstractmethod
+    async def _set_region(self, ke_region: TAbstractBaseRegion):
         """
         Move a group of signals defined in a region. Each implementation of this class
         is responsible for implementing this method correctly.
@@ -138,15 +169,6 @@ class AbstractAnalyserDriverIO(
         Args:
             region: Contains the parameters to setup the driver for a scan.
         """
-
-    def _get_energy_source(self, alias_name: str) -> SignalR[float]:
-        energy_source = self.energy_sources.get(alias_name)
-        if energy_source is None:
-            raise KeyError(
-                f"'{energy_source}' is an invalid energy source. Avaliable energy "
-                + f"sources are '{list(self.energy_sources.keys())}'"
-            )
-        return energy_source
 
     @abstractmethod
     def _create_angle_axis_signal(self, prefix: str) -> SignalR[Array1D[np.float64]]:

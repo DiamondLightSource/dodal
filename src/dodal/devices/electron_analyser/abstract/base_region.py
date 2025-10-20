@@ -1,7 +1,7 @@
 import re
 from abc import ABC
 from collections.abc import Callable
-from typing import Generic, TypeVar
+from typing import Generic, Self, TypeVar
 
 from pydantic import BaseModel, Field, model_validator
 
@@ -10,7 +10,8 @@ from dodal.devices.electron_analyser.abstract.types import (
     TLensMode,
     TPassEnergy,
 )
-from dodal.devices.electron_analyser.enums import EnergyMode
+from dodal.devices.electron_analyser.enums import EnergyMode, SelectedSource
+from dodal.devices.electron_analyser.util import to_binding_energy, to_kinetic_energy
 
 
 def java_to_python_case(java_str: str) -> str:
@@ -62,7 +63,7 @@ class AbstractBaseRegion(
     enabled: bool = False
     slices: int = 1
     iterations: int = 1
-    excitation_energy_source: str = "source1"
+    excitation_energy_source: SelectedSource = SelectedSource.SOURCE1
     # These ones we need subclasses to provide default values
     lens_mode: TLensMode
     pass_energy: TPassEnergy
@@ -70,15 +71,60 @@ class AbstractBaseRegion(
     low_energy: float
     centre_energy: float
     high_energy: float
-    step_time: float
+    acquire_time: float
     energy_step: float  # in eV
     energy_mode: EnergyMode = EnergyMode.KINETIC
 
     def is_binding_energy(self) -> bool:
+        """
+        Returns true if the energy_mode is binding.
+        """
         return self.energy_mode == EnergyMode.BINDING
 
     def is_kinetic_energy(self) -> bool:
+        """
+        Returns true if the energy_mode is kinetic.
+        """
         return self.energy_mode == EnergyMode.KINETIC
+
+    def switch_energy_mode(
+        self, energy_mode: EnergyMode, excitation_energy: float, copy: bool = True
+    ) -> Self:
+        """
+        Switch region with to a new energy mode with a new energy mode: Kinetic or Binding.
+        It caculates new values for low_energy, centre_energy, high_energy, via the
+        excitation enerrgy. It doesn't calculate anything if the region is already of
+        the same energy mode.
+
+        Parameters:
+            energy_mode: Mode you want to switch the region to.
+            excitation_energy: Energy conversion for low_energy, centre_energy, and
+                               high_energy for new energy mode.
+            copy: Defaults to True. If true, create a copy of this region for the new
+                  energy_mode and return it. If False, alter this region for the
+                  energy_mode and return it self.
+
+        Returns:
+            Region with selected energy mode and new calculated energy values.
+        """
+        switched_r = self.model_copy() if copy else self
+        conv = (
+            to_binding_energy
+            if energy_mode == EnergyMode.BINDING
+            else to_kinetic_energy
+        )
+        switched_r.low_energy = conv(
+            switched_r.low_energy, switched_r.energy_mode, excitation_energy
+        )
+        switched_r.centre_energy = conv(
+            switched_r.centre_energy, switched_r.energy_mode, excitation_energy
+        )
+        switched_r.high_energy = conv(
+            switched_r.high_energy, switched_r.energy_mode, excitation_energy
+        )
+        switched_r.energy_mode = energy_mode
+
+        return switched_r
 
     @model_validator(mode="before")
     @classmethod
