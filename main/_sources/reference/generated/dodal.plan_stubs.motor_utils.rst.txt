@@ -37,6 +37,6 @@ dodal.plan\_stubs.motor\_utils
 
    .. autosummary::
    
-      MoveTooLarge
+      MoveTooLargeError
    
    

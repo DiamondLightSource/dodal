@@ -40,6 +40,6 @@ dodal.devices.robot
 
    .. autosummary::
    
-      RobotLoadFailed
+      RobotLoadError
    
    

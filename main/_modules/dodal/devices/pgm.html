@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.pgm &#8212; dodal 1.62.1.dev11+gdf3c4dff4 documentation</title>
+    <title>dodal.devices.pgm &#8212; dodal 1.62.1.dev12+g4b48d8989 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=1f9f26b8"></script>
+    <script src="../../../_static/documentation_options.js?v=3cd22876"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -470,7 +470,7 @@ window.addEventListener("load", () => mermaid.run());
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">grating</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">StrictEnum</span><span class="p">],</span>
-        <span class="n">gratingPv</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;GRATINGSELECT:SELECT&quot;</span><span class="p">,</span>
+        <span class="n">grating_pv</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;GRATINGSELECT:SELECT&quot;</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -480,7 +480,7 @@ window.addEventListener("load", () => mermaid.run());
 <span class="sd">            Beamline specific part of the PV</span>
 <span class="sd">        grating:</span>
 <span class="sd">            The Enum for the grating table.</span>
-<span class="sd">        gratingPv:</span>
+<span class="sd">        grating_pv:</span>
 <span class="sd">            The suffix pv part of grating Pv</span>
 <span class="sd">        name:</span>
 <span class="sd">            Name of the device</span>
@@ -488,7 +488,7 @@ window.addEventListener("load", () => mermaid.run());
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">energy</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;ENERGY&quot;</span><span class="p">)</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">(</span><span class="n">StandardReadableFormat</span><span class="o">.</span><span class="n">CONFIG_SIGNAL</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">grating</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="n">grating</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="n">gratingPv</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">grating</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="n">grating</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="n">grating_pv</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">cff</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;CFF&quot;</span><span class="p">)</span>
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span></div>

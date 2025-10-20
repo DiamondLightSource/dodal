@@ -46,6 +46,6 @@ dodal.devices.oav.utils
 
    .. autosummary::
    
-      PinNotFoundException
+      PinNotFoundError
    
    

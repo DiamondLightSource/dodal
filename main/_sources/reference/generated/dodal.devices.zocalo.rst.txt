@@ -47,7 +47,7 @@ dodal.devices.zocalo
 
    .. autosummary::
    
-      NoResultsFromZocalo
-      NoZocaloSubscription
+      NoResultsFromZocaloError
+      NoZocaloSubscriptionError
    
    

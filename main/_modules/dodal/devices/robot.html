@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.robot &#8212; dodal 1.62.1.dev11+gdf3c4dff4 documentation</title>
+    <title>dodal.devices.robot &#8212; dodal 1.62.1.dev12+g4b48d8989 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=1f9f26b8"></script>
+    <script src="../../../_static/documentation_options.js?v=3cd22876"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -477,7 +477,7 @@ window.addEventListener("load", () => mermaid.run());
 <span class="n">WAIT_FOR_NEW_PIN_MSG</span> <span class="o">=</span> <span class="s2">&quot;Waiting on new pin loaded&quot;</span>
 
 
-<span class="k">class</span><span class="w"> </span><span class="nc">RobotLoadFailed</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">RobotLoadError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
     <span class="n">error_code</span><span class="p">:</span> <span class="nb">int</span>
     <span class="n">error_string</span><span class="p">:</span> <span class="nb">str</span>
 
@@ -518,7 +518,7 @@ window.addEventListener("load", () => mermaid.run());
         <span class="n">error_code</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">code</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">error_code</span><span class="p">:</span>
             <span class="n">error_string</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
-            <span class="k">raise</span> <span class="n">RobotLoadFailed</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">error_code</span><span class="p">),</span> <span class="n">error_string</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">raise_from</span></div>
+            <span class="k">raise</span> <span class="n">RobotLoadError</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">error_code</span><span class="p">),</span> <span class="n">error_string</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">raise_from</span></div>
 
 
 
@@ -584,12 +584,12 @@ window.addEventListener("load", () => mermaid.run());
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">pin_mounted_or_no_pin_found</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;This co-routine will finish when either a pin is detected or the robot gives</span>
 <span class="sd">        an error saying no pin was found (whichever happens first). In the case where no</span>
-<span class="sd">        pin was found a RobotLoadFailed error is raised.</span>
+<span class="sd">        pin was found a RobotLoadError error is raised.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">raise_if_no_pin</span><span class="p">():</span>
             <span class="k">await</span> <span class="n">wait_for_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prog_error</span><span class="o">.</span><span class="n">code</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">NO_PIN_ERROR_CODE</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-            <span class="k">raise</span> <span class="n">RobotLoadFailed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">NO_PIN_ERROR_CODE</span><span class="p">,</span> <span class="s2">&quot;Pin was not detected&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">RobotLoadError</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">NO_PIN_ERROR_CODE</span><span class="p">,</span> <span class="s2">&quot;Pin was not detected&quot;</span><span class="p">)</span>
 
         <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">wfv</span><span class="p">():</span>
             <span class="k">await</span> <span class="n">wait_for_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gonio_pin_sensor</span><span class="p">,</span> <span class="n">PinMounted</span><span class="o">.</span><span class="n">PIN_MOUNTED</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
@@ -650,7 +650,7 @@ window.addEventListener("load", () => mermaid.run());
         <span class="k">except</span> <span class="ne">TimeoutError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">prog_error</span><span class="o">.</span><span class="n">raise_if_error</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
             <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">controller_error</span><span class="o">.</span><span class="n">raise_if_error</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
-            <span class="k">raise</span> <span class="n">RobotLoadFailed</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Robot timed out&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span></div>
+            <span class="k">raise</span> <span class="n">RobotLoadError</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Robot timed out&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span></div>
 
 </pre></div>
 

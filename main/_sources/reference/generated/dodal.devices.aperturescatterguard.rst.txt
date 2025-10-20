@@ -45,6 +45,6 @@ dodal.devices.aperturescatterguard
 
    .. autosummary::
    
-      InvalidApertureMove
+      InvalidApertureMoveError
    
    

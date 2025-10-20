@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.oav.pin_image_recognition &#8212; dodal 1.62.1.dev11+gdf3c4dff4 documentation</title>
+    <title>dodal.devices.oav.pin_image_recognition &#8212; dodal 1.62.1.dev12+g4b48d8989 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=1f9f26b8"></script>
+    <script src="../../../../_static/documentation_options.js?v=3cd22876"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -477,7 +477,7 @@ window.addEventListener("load", () => mermaid.run());
 <span class="n">Tip</span> <span class="o">=</span> <span class="n">Array1D</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">]</span>
 
 
-<span class="k">class</span><span class="w"> </span><span class="nc">InvalidPinException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">InvalidPinError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
     <span class="k">pass</span>
 
 
@@ -542,7 +542,7 @@ window.addEventListener("load", () => mermaid.run());
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_set_triggered_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">:</span> <span class="n">SampleLocation</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">results</span><span class="o">.</span><span class="n">tip_x</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">results</span><span class="o">.</span><span class="n">tip_y</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">InvalidPinException</span>
+            <span class="k">raise</span> <span class="n">InvalidPinError</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">tip</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">results</span><span class="o">.</span><span class="n">tip_x</span><span class="p">,</span> <span class="n">results</span><span class="o">.</span><span class="n">tip_y</span><span class="p">])</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_tip_setter</span><span class="p">(</span><span class="n">tip</span><span class="p">)</span>
@@ -582,7 +582,7 @@ window.addEventListener("load", () => mermaid.run());
         <span class="p">)</span>
 
         <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-        <span class="n">location</span> <span class="o">=</span> <span class="n">sample_detection</span><span class="o">.</span><span class="n">processArray</span><span class="p">(</span><span class="n">array_data</span><span class="p">)</span>
+        <span class="n">location</span> <span class="o">=</span> <span class="n">sample_detection</span><span class="o">.</span><span class="n">process_array</span><span class="p">(</span><span class="n">array_data</span><span class="p">)</span>
         <span class="n">end_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
         <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;Sample location detection took </span><span class="si">{</span><span class="p">(</span><span class="n">end_time</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">start_time</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">1000.0</span><span class="si">}</span><span class="s2">ms&quot;</span>

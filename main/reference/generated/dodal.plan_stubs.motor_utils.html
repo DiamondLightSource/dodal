@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.plan_stubs.motor_utils &#8212; dodal 1.62.1.dev11+gdf3c4dff4 documentation</title>
+    <title>dodal.plan_stubs.motor_utils &#8212; dodal 1.62.1.dev12+g4b48d8989 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=1f9f26b8"></script>
+    <script src="../../_static/documentation_options.js?v=3cd22876"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -417,6 +417,7 @@
 <li class="toctree-l3"><a class="reference internal" href="dodal.beamlines.i09_1.html">dodal.beamlines.i09_1</a></li>
 <li class="toctree-l3"><a class="reference internal" href="dodal.beamlines.i09_2.html">dodal.beamlines.i09_2</a></li>
 <li class="toctree-l3"><a class="reference internal" href="dodal.beamlines.i10.html">dodal.beamlines.i10</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dodal.beamlines.i10_1.html">dodal.beamlines.i10_1</a></li>
 <li class="toctree-l3"><a class="reference internal" href="dodal.beamlines.i11.html">dodal.beamlines.i11</a></li>
 <li class="toctree-l3"><a class="reference internal" href="dodal.beamlines.i13_1.html">dodal.beamlines.i13_1</a></li>
 <li class="toctree-l3"><a class="reference internal" href="dodal.beamlines.i15.html">dodal.beamlines.i15</a></li>
@@ -733,8 +734,8 @@
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.i18.html">dodal.devices.i18</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.i18.KBMirror.html">dodal.devices.i18.KBMirror</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.i18.diode.html">dodal.devices.i18.diode</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.i18.kb_mirror.html">dodal.devices.i18.kb_mirror</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.i19.html">dodal.devices.i19</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -1085,7 +1086,7 @@
 <p class="rubric">Exceptions</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">MoveTooLarge</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">MoveTooLargeError</span></code></p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -1095,7 +1096,7 @@
 <dt class="sig sig-object py" id="dodal.plan_stubs.motor_utils.check_and_cache_values">
 <span class="sig-prename descclassname"><span class="pre">dodal.plan_stubs.motor_utils.</span></span><span class="sig-name descname"><span class="pre">check_and_cache_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">devices_and_positions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Motor</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">smallest_move</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">maximum_move</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Generator" title="(in Python v3.14)"><span class="pre">Generator</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Msg</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><span class="pre">Any</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Motor</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/dodal/plan_stubs/motor_utils.html#check_and_cache_values"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.plan_stubs.motor_utils.check_and_cache_values" title="Link to this definition">#</a></dt>
 <dd><p>Caches the positions of all Motors on specified device if they are within
-smallest_move of home_position. Throws MoveTooLarge if they are outside maximum_move
+smallest_move of home_position. Throws MoveTooLargeError if they are outside maximum_move
 of the home_position</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1138,7 +1139,7 @@ of the home_position</p>
 <dt>Wrapper that does the following:</dt><dd><ol class="arabic simple">
 <li><p>Caches the positions of all Motors on device</p></li>
 </ol>
-<p>2. Throws a MoveTooLarge exception if any positions are maximum_move away from home_position
+<p>2. Throws a MoveTooLargeError exception if any positions are maximum_move away from home_position
 2. Moves any motor that is more than smallest_move away from the home_position to home_position
 3. Runs the specified plan
 4. Moves all motors back to their cached positions</p>

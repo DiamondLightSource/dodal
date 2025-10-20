@@ -40,6 +40,6 @@ dodal.devices.zebra.zebra\_constants\_mapping
 
    .. autosummary::
    
-      UnmappedZebraException
+      UnmappedZebraError
    
    

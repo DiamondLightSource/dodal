@@ -13,7 +13,7 @@ dodal.devices.oav.pin\_image\_recognition.utils.MxSampleDetect
    .. autosummary::
    
       
-      ~MxSampleDetect.processArray
+      ~MxSampleDetect.process_array
       
    
    

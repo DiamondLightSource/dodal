@@ -18,8 +18,8 @@ dodal.devices.attenuator.filter\_selections
    ~filter_selections.I02_1FilterOneSelections
    ~filter_selections.I02_1FilterThreeSelections
    ~filter_selections.I02_1FilterTwoSelections
-   ~filter_selections.I24_FilterOneSelections
-   ~filter_selections.I24_FilterTwoSelections
+   ~filter_selections.I24FilterOneSelections
+   ~filter_selections.I24FilterTwoSelections
    ~filter_selections.P99FilterSelections
 
 

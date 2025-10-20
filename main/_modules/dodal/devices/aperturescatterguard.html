@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.aperturescatterguard &#8212; dodal 1.62.1.dev11+gdf3c4dff4 documentation</title>
+    <title>dodal.devices.aperturescatterguard &#8212; dodal 1.62.1.dev12+g4b48d8989 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=1f9f26b8"></script>
+    <script src="../../../_static/documentation_options.js?v=3cd22876"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -470,7 +470,7 @@ window.addEventListener("load", () => mermaid.run());
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.motors</span><span class="w"> </span><span class="kn">import</span> <span class="n">XYStage</span>
 
 
-<span class="k">class</span><span class="w"> </span><span class="nc">InvalidApertureMove</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">InvalidApertureMoveError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
     <span class="k">pass</span>
 
 
@@ -705,7 +705,7 @@ window.addEventListener("load", () => mermaid.run());
         <span class="n">diff_on_z</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">current_ap_z</span> <span class="o">-</span> <span class="n">expected_z_position</span><span class="p">)</span>
         <span class="n">aperture_z_tolerance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tolerances</span><span class="o">.</span><span class="n">aperture_z</span>
         <span class="k">if</span> <span class="n">diff_on_z</span> <span class="o">&gt;</span> <span class="n">aperture_z_tolerance</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">InvalidApertureMove</span><span class="p">(</span>
+            <span class="k">raise</span> <span class="n">InvalidApertureMoveError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;Current aperture z (</span><span class="si">{</span><span class="n">current_ap_z</span><span class="si">}</span><span class="s2">), outside of tolerance (</span><span class="si">{</span><span class="n">aperture_z_tolerance</span><span class="si">}</span><span class="s2">) from target (</span><span class="si">{</span><span class="n">expected_z_position</span><span class="si">}</span><span class="s2">).&quot;</span>
             <span class="p">)</span>
 
@@ -719,7 +719,7 @@ window.addEventListener("load", () => mermaid.run());
         <span class="k">for</span> <span class="n">axis</span> <span class="ow">in</span> <span class="n">all_axes</span><span class="p">:</span>
             <span class="n">axis_stationary</span> <span class="o">=</span> <span class="k">await</span> <span class="n">axis</span><span class="o">.</span><span class="n">motor_done_move</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">axis_stationary</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">InvalidApertureMove</span><span class="p">(</span>
+                <span class="k">raise</span> <span class="n">InvalidApertureMoveError</span><span class="p">(</span>
                     <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">axis</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> is still moving. Wait for it to finish before&quot;</span>
                     <span class="s2">&quot;triggering another move.&quot;</span>
                 <span class="p">)</span>
@@ -757,7 +757,9 @@ window.addEventListener("load", () => mermaid.run());
         <span class="p">):</span>
             <span class="k">return</span> <span class="n">ApertureValue</span><span class="o">.</span><span class="n">OUT_OF_BEAM</span>
 
-        <span class="k">raise</span> <span class="n">InvalidApertureMove</span><span class="p">(</span><span class="s2">&quot;Current aperture/scatterguard state unrecognised&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">InvalidApertureMoveError</span><span class="p">(</span>
+            <span class="s2">&quot;Current aperture/scatterguard state unrecognised&quot;</span>
+        <span class="p">)</span>
 
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_safe_move_whilst_in_beam</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">position</span><span class="p">:</span> <span class="n">AperturePosition</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>

@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.fast_grid_scan &#8212; dodal 1.62.1.dev11+gdf3c4dff4 documentation</title>
+    <title>dodal.devices.fast_grid_scan &#8212; dodal 1.62.1.dev12+g4b48d8989 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=1f9f26b8"></script>
+    <script src="../../../_static/documentation_options.js?v=3cd22876"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -483,7 +483,7 @@ window.addEventListener("load", () => mermaid.run());
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.parameters.experiment_parameter_base</span><span class="w"> </span><span class="kn">import</span> <span class="n">AbstractExperimentWithBeamParams</span>
 
 
-<span class="k">class</span><span class="w"> </span><span class="nc">GridScanInvalidException</span><span class="p">(</span><span class="ne">RuntimeError</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">GridScanInvalidError</span><span class="p">(</span><span class="ne">RuntimeError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when the gridscan parameters are not valid.&quot;&quot;&quot;</span>
 
 
@@ -788,7 +788,7 @@ window.addEventListener("load", () => mermaid.run());
 <span class="sd">            value: the gridscan parameters</span>
 
 <span class="sd">        Raises:</span>
-<span class="sd">            GridScanInvalidException: if the gridscan parameters were not valid</span>
+<span class="sd">            GridScanInvalidError: if the gridscan parameters were not valid</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">set_statuses</span> <span class="o">=</span> <span class="p">[]</span>
 
@@ -812,7 +812,7 @@ window.addEventListener("load", () => mermaid.run());
                 <span class="bp">self</span><span class="o">.</span><span class="n">scan_invalid</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">VALIDITY_CHECK_TIMEOUT</span>
             <span class="p">)</span>
         <span class="k">except</span> <span class="ne">TimeoutError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">GridScanInvalidException</span><span class="p">(</span>
+            <span class="k">raise</span> <span class="n">GridScanInvalidError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;Gridscan parameters not validated after </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">VALIDITY_CHECK_TIMEOUT</span><span class="si">}</span><span class="s2">s&quot;</span>
             <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
 
@@ -969,7 +969,7 @@ window.addEventListener("load", () => mermaid.run());
 <span class="sd">        params: The parameters to set</span>
 
 <span class="sd">    Raises:</span>
-<span class="sd">        GridScanInvalidException: if the grid scan parameters are not valid</span>
+<span class="sd">        GridScanInvalidError: if the grid scan parameters are not valid</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">yield from</span> <span class="n">prepare</span><span class="p">(</span><span class="n">scan</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 

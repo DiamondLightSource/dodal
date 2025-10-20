@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.plan_stubs.motor_utils &#8212; dodal 1.62.1.dev11+gdf3c4dff4 documentation</title>
+    <title>dodal.plan_stubs.motor_utils &#8212; dodal 1.62.1.dev12+g4b48d8989 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=1f9f26b8"></script>
+    <script src="../../../_static/documentation_options.js?v=3cd22876"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -461,7 +461,7 @@ window.addEventListener("load", () => mermaid.run());
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.motor</span><span class="w"> </span><span class="kn">import</span> <span class="n">Motor</span>
 
 
-<span class="k">class</span><span class="w"> </span><span class="nc">MoveTooLarge</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MoveTooLargeError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">axis</span><span class="p">:</span> <span class="n">Motor</span><span class="p">,</span>
@@ -483,14 +483,14 @@ window.addEventListener("load", () => mermaid.run());
     <span class="n">maximum_move</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="n">Msg</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Motor</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Caches the positions of all Motors on specified device if they are within</span>
-<span class="sd">    smallest_move of home_position. Throws MoveTooLarge if they are outside maximum_move</span>
+<span class="sd">    smallest_move of home_position. Throws MoveTooLargeError if they are outside maximum_move</span>
 <span class="sd">    of the home_position</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">positions</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">for</span> <span class="n">axis</span><span class="p">,</span> <span class="n">new_position</span> <span class="ow">in</span> <span class="n">devices_and_positions</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="n">position</span> <span class="o">=</span> <span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">rd</span><span class="p">(</span><span class="n">axis</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">position</span> <span class="o">-</span> <span class="n">new_position</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">maximum_move</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">MoveTooLarge</span><span class="p">(</span><span class="n">axis</span><span class="p">,</span> <span class="n">maximum_move</span><span class="p">,</span> <span class="n">position</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">MoveTooLargeError</span><span class="p">(</span><span class="n">axis</span><span class="p">,</span> <span class="n">maximum_move</span><span class="p">,</span> <span class="n">position</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">position</span> <span class="o">-</span> <span class="n">new_position</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">smallest_move</span><span class="p">:</span>
             <span class="n">positions</span><span class="p">[</span><span class="n">axis</span><span class="p">]</span> <span class="o">=</span> <span class="n">position</span>
     <span class="k">return</span> <span class="n">positions</span></div>
@@ -528,7 +528,7 @@ window.addEventListener("load", () => mermaid.run());
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MsgGenerator</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Wrapper that does the following:</span>
 <span class="sd">       1. Caches the positions of all Motors on device</span>
-<span class="sd">       2. Throws a MoveTooLarge exception if any positions are maximum_move away from home_position</span>
+<span class="sd">       2. Throws a MoveTooLargeError exception if any positions are maximum_move away from home_position</span>
 <span class="sd">       2. Moves any motor that is more than smallest_move away from the home_position to home_position</span>
 <span class="sd">       3. Runs the specified plan</span>
 <span class="sd">       4. Moves all motors back to their cached positions</span>

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Writing Tests in This Python Project &#8212; dodal 1.62.1.dev11+gdf3c4dff4 documentation</title>
+    <title>Writing Tests in This Python Project &#8212; dodal 1.62.1.dev12+g4b48d8989 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=1f9f26b8"></script>
+    <script src="../_static/documentation_options.js?v=3cd22876"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -549,24 +549,24 @@
 
 <span class="c1"># RunEngine is needed to make sure there is an event loop when creating device.</span>
 <span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span>
-<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">sim_my_device</span><span class="p">(</span><span class="n">RE</span><span class="p">:</span> <span class="n">RunEngine</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MyDevice</span><span class="p">:</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">sim_my_device</span><span class="p">(</span><span class="n">run_engine</span><span class="p">:</span> <span class="n">RunEngine</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MyDevice</span><span class="p">:</span>
     <span class="k">async</span> <span class="k">with</span> <span class="n">init_devices</span><span class="p">(</span><span class="n">mock</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="n">sim_my_device</span> <span class="o">=</span> <span class="n">MyDevice</span><span class="p">(</span><span class="s2">&quot;TEST:&quot;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">sim_my_device</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">test_my_device_stage</span><span class="p">(</span><span class="n">sim_my_device</span><span class="p">:</span> <span class="n">MyDevice</span><span class="p">,</span> <span class="n">RE</span><span class="p">:</span> <span class="n">RunEngine</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-    <span class="n">RE</span><span class="p">(</span><span class="n">bps</span><span class="o">.</span><span class="n">stage</span><span class="p">(</span><span class="n">sim_my_device</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span> <span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">test_my_device_stage</span><span class="p">(</span><span class="n">sim_my_device</span><span class="p">:</span> <span class="n">MyDevice</span><span class="p">,</span> <span class="n">run_engine</span><span class="p">:</span> <span class="n">RunEngine</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">run_engine</span><span class="p">(</span><span class="n">bps</span><span class="o">.</span><span class="n">stage</span><span class="p">(</span><span class="n">sim_my_device</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span> <span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">get_mock_put</span><span class="p">(</span><span class="n">sim_my_device</span><span class="o">.</span><span class="n">signal_b</span><span class="p">)</span><span class="o">.</span><span class="n">assert_called_once_with</span><span class="p">(</span><span class="n">OnOff</span><span class="o">.</span><span class="n">ON</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">test_my_device_unstage</span><span class="p">(</span><span class="n">sim_my_device</span><span class="p">:</span> <span class="n">MyDevice</span><span class="p">,</span> <span class="n">RE</span><span class="p">:</span> <span class="n">RunEngine</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-    <span class="n">RE</span><span class="p">(</span><span class="n">bps</span><span class="o">.</span><span class="n">unstage</span><span class="p">(</span><span class="n">sim_my_device</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span> <span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">test_my_device_unstage</span><span class="p">(</span><span class="n">sim_my_device</span><span class="p">:</span> <span class="n">MyDevice</span><span class="p">,</span> <span class="n">run_engine</span><span class="p">:</span> <span class="n">RunEngine</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">run_engine</span><span class="p">(</span><span class="n">bps</span><span class="o">.</span><span class="n">unstage</span><span class="p">(</span><span class="n">sim_my_device</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span> <span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">get_mock_put</span><span class="p">(</span><span class="n">sim_my_device</span><span class="o">.</span><span class="n">signal_b</span><span class="p">)</span><span class="o">.</span><span class="n">assert_called_once_with</span><span class="p">(</span><span class="n">OnOff</span><span class="o">.</span><span class="n">OFF</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>You should test the output of a device when the device has many signals read and you want to ensure the correct ones are read at the correct times, or when the <code class="docutils literal notranslate"><span class="pre">read</span></code> method of it or one of its signals (e.g. a DerivedSignal) requires testing. Functions are defined in <code class="docutils literal notranslate"><span class="pre">ophyd-async</span></code> to aid with this. <code class="docutils literal notranslate"><span class="pre">assert_reading</span></code> allows us to compare the readings generated from a <code class="docutils literal notranslate"><span class="pre">Readable</span></code> device to the expected results.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">test_my_device_read</span><span class="p">(</span><span class="n">sim_my_device</span><span class="p">:</span> <span class="n">MyDevice</span><span class="p">,</span> <span class="n">RE</span><span class="p">:</span> <span class="n">RunEngine</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">test_my_device_read</span><span class="p">(</span><span class="n">sim_my_device</span><span class="p">:</span> <span class="n">MyDevice</span><span class="p">,</span> <span class="n">run_engine</span><span class="p">:</span> <span class="n">RunEngine</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="n">prefix</span> <span class="o">=</span> <span class="n">sim_my_device</span><span class="o">.</span><span class="n">name</span>
     <span class="k">await</span> <span class="n">assert_reading</span><span class="p">(</span>
         <span class="n">sim_my_device</span><span class="p">,</span>

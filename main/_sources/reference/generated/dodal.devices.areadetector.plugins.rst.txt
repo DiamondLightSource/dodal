@@ -9,8 +9,8 @@ dodal.devices.areadetector.plugins
    :toctree:
    :recursive:
 
-   dodal.devices.areadetector.plugins.CAM
-   dodal.devices.areadetector.plugins.MJPG
+   dodal.devices.areadetector.plugins.cam
+   dodal.devices.areadetector.plugins.mjpg
 
 
 

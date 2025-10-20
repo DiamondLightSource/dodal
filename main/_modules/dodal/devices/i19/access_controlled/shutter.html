@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.i19.access_controlled.shutter &#8212; dodal 1.62.1.dev11+gdf3c4dff4 documentation</title>
+    <title>dodal.devices.i19.access_controlled.shutter &#8212; dodal 1.62.1.dev12+g4b48d8989 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../../_static/documentation_options.js?v=1f9f26b8"></script>
+    <script src="../../../../../_static/documentation_options.js?v=3cd22876"></script>
     <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -496,7 +496,7 @@ window.addEventListener("load", () => mermaid.run());
 
     <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">ShutterDemand</span><span class="p">):</span>
-        <span class="n">REQUEST_PARAMS</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">request_params</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;operate_shutter_plan&quot;</span><span class="p">,</span>
             <span class="s2">&quot;params&quot;</span><span class="p">:</span> <span class="p">{</span>
                 <span class="s2">&quot;experiment_hutch&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">hutch_request</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
@@ -505,7 +505,7 @@ window.addEventListener("load", () => mermaid.run());
             <span class="p">},</span>
             <span class="s2">&quot;instrument_session&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">instrument_session</span><span class="p">,</span>
         <span class="p">}</span>
-        <span class="k">await</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">REQUEST_PARAMS</span><span class="p">)</span></div>
+        <span class="k">await</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">request_params</span><span class="p">)</span></div>
 
 </pre></div>
 

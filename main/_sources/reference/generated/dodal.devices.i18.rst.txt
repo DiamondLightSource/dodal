@@ -9,8 +9,8 @@ dodal.devices.i18
    :toctree:
    :recursive:
 
-   dodal.devices.i18.KBMirror
    dodal.devices.i18.diode
+   dodal.devices.i18.kb_mirror
 
 
 
