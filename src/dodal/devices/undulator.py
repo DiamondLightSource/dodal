@@ -92,6 +92,8 @@ class BaseUndulator(StandardReadable, Movable[float], ABC):
     async def set(self, value: float) -> None:
         """
         Move undulator to a given position.
+        Abstract method - must be implemented by subclasses.
+
         Args:
             value: target position - units depend on implementation
         """
