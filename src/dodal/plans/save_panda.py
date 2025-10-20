@@ -71,7 +71,7 @@ def main(argv: list[str] | None = None):
 
 
 def _save_panda(beamline, device_name, output_directory, file_name):
-    RE = RunEngine()
+    run_engine = RunEngine()
     print("Creating devices...")
     module_name = module_name_for_beamline(beamline)
     try:
@@ -86,17 +86,17 @@ def _save_panda(beamline, device_name, output_directory, file_name):
     print(
         f"Saving to {output_directory}/{file_name} from {device_name} on {beamline}..."
     )
-    _save_panda_to_yaml(RE, cast(Device, panda), file_name, output_directory)
+    _save_panda_to_yaml(run_engine, cast(Device, panda), file_name, output_directory)
 
 
 def _save_panda_to_yaml(
-    RE: RunEngine, panda: Device, file_name: str, output_directory: str
+    run_engine: RunEngine, panda: Device, file_name: str, output_directory: str
 ):
     def save_to_file():
         provider = YamlSettingsProvider(output_directory)
         yield from store_settings(provider, file_name, panda)
 
-    RE(save_to_file())
+    run_engine(save_to_file())
 
 
 if __name__ == "__main__":  # pragma: no cover

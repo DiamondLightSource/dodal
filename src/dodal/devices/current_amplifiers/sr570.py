@@ -79,7 +79,7 @@ class SR570FullGainTable(Enum):
 
 
 class SR570GainToCurrentTable(float, Enum):
-    """Conversion table for gain(sen) to current"""
+    """Conversion table for gain (sensitivity) to current"""
 
     SEN_1 = 1e3
     SEN_2 = 2e3
@@ -168,10 +168,10 @@ class SR570(CurrentAmp):
                 + "\n Available gain:"
                 + f" {[f'{c.value:.0e}' for c in self.gain_conversion_table]}"
             )
-        SEN_setting = self.gain_conversion_table(value).name
+        sensitivity_setting = self.gain_conversion_table(value).name
         LOGGER.info(f"{self.name} gain change to {value}")
 
-        coarse_gain, fine_gain = self.combined_table[SEN_setting].value
+        coarse_gain, fine_gain = self.combined_table[sensitivity_setting].value
         await asyncio.gather(
             self.fine_gain.set(value=fine_gain, timeout=self.timeout),
             self.coarse_gain.set(value=coarse_gain, timeout=self.timeout),
