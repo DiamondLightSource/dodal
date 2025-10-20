@@ -51,9 +51,9 @@ def with_env():
     with patch.dict(
         os.environ,
         {
-            "EPICS_CA_ADDR_LIST": "127.0.0.1:9064",
             "EPICS_CA_NAME_SERVERS": "127.0.0.1:9064",
             "EPICS_PVA_NAME_SERVERS": "127.0.0.1:9075",
+            "EPICS_CA_ADDR_LIST": "127.0.0.1:9064",
         },
         clear=True,
     ):
