@@ -307,10 +307,17 @@ class FastGridScanCommon(
         set_statuses = []
 
         LOGGER.info("Applying gridscan parameters...")
+
         # Create arguments for bps.mv
         for key, signal in self._movable_params.items():
             param_value = value.__dict__[key]
-            set_statuses.append(await set_and_wait_for_value(signal, param_value))  # type: ignore
+            set_statuses.append(
+                await set_and_wait_for_value(
+                    signal,
+                    param_value,
+                    # match_value=partial(isclose, param_value, abs_tol=0.0001),
+                )
+            )  # type: ignore
 
         # Counter should always start at 0
         set_statuses.append(await set_and_wait_for_value(self.position_counter, 0))
