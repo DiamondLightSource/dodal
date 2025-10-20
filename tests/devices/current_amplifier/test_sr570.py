@@ -49,29 +49,29 @@ async def mock_sr570(prefix: str = "BLXX-EA-DET-007:", suffix: str = "Gain") -> 
 
 
 @pytest.fixture
-async def mock_StruckScaler(
+async def mock_struck_scaler(
     prefix: str = "BLXX-EA-DET-007:", suffix: str = ".s17"
 ) -> StruckScaler:
     async with init_devices(mock=True):
-        mock_StruckScaler = StruckScaler(
+        mock_struck_scaler = StruckScaler(
             prefix=prefix,
             suffix=suffix,
-            name="mock_StruckScaler",
+            name="mock_struck_scaler",
         )
-    assert mock_StruckScaler.name == "mock_StruckScaler"
-    return mock_StruckScaler
+    assert mock_struck_scaler.name == "mock_struck_scaler"
+    return mock_struck_scaler
 
 
 @pytest.fixture
 async def mock_sr570_struck_scaler_detector(
-    mock_StruckScaler: StruckScaler,
+    mock_struck_scaler: StruckScaler,
     mock_sr570: SR570,
     prefix: str = "BLXX-EA-DET-007:",
 ) -> CurrentAmpDet:
     async with init_devices(mock=True):
         mock_sr570_struck_scaler_detector = CurrentAmpDet(
             current_amp=mock_sr570,
-            counter=mock_StruckScaler,
+            counter=mock_struck_scaler,
             name="mock_sr570_struck_scaler_detector",
         )
     assert mock_sr570_struck_scaler_detector.name == "mock_sr570_struck_scaler_detector"
@@ -91,9 +91,14 @@ async def mock_sr570_struck_scaler_detector(
 )
 @mock.patch("asyncio.sleep")
 async def test_sr570_set(
-    sleep: AsyncMock, mock_sr570: SR570, RE: RunEngine, gain, wait_time, gain_value
+    sleep: AsyncMock,
+    mock_sr570: SR570,
+    run_engine: RunEngine,
+    gain,
+    wait_time,
+    gain_value,
 ):
-    RE(abs_set(mock_sr570, gain, wait=True))
+    run_engine(abs_set(mock_sr570, gain, wait=True))
     assert (await mock_sr570.get_gain()).name == gain_value
     # extra sleeps either side of set are bluesky's sleep which are set to 0.
     for actual, expected in zip(
@@ -134,7 +139,7 @@ async def test_sr570_set_fail_out_of_range(sleep: AsyncMock, mock_sr570: SR570, 
     ],
 )
 @mock.patch("asyncio.sleep")
-async def test_SR570_increase_gain(
+async def test_sr570_increase_gain(
     sleep: AsyncMock,
     mock_sr570: SR570,
     starting_gain: float,
@@ -149,7 +154,7 @@ async def test_SR570_increase_gain(
 
 
 @mock.patch("asyncio.sleep")
-async def test_SR570_increase_gain_top_out_fail(
+async def test_sr570_increase_gain_top_out_fail(
     sleep: AsyncMock,
     mock_sr570: SR570,
 ):
@@ -171,7 +176,7 @@ async def test_SR570_increase_gain_top_out_fail(
     ],
 )
 @mock.patch("asyncio.sleep")
-async def test_SR570_decrease_gain(
+async def test_sr570_decrease_gain(
     sleep: AsyncMock,
     mock_sr570: SR570,
     starting_gain: str,
@@ -188,7 +193,7 @@ async def test_SR570_decrease_gain(
 
 
 @mock.patch("asyncio.sleep")
-async def test_SR570_decrease_gain_bottom_out_fail(
+async def test_sr570_decrease_gain_bottom_out_fail(
     sleep: AsyncMock,
     mock_sr570: SR570,
 ):
@@ -220,9 +225,9 @@ class MockSR570RaiseTimeTable(float, Enum):
         ("SEN_5", 0.0, 0.0),
     ],
 )
-async def test_SR570_struck_scaler_read(
+async def test_sr570_struck_scaler_read(
     mock_sr570_struck_scaler_detector,
-    RE: RunEngine,
+    run_engine: RunEngine,
     gain,
     raw_count,
     expected_current,
@@ -241,7 +246,7 @@ async def test_SR570_struck_scaler_read(
     def capture_emitted(name, doc):
         docs[name].append(doc)
 
-    RE(count([mock_sr570_struck_scaler_detector]), capture_emitted)
+    run_engine(count([mock_sr570_struck_scaler_detector]), capture_emitted)
     assert docs["event"][0]["data"][
         "mock_sr570_struck_scaler_detector-current"
     ] == pytest.approx(expected_current)
@@ -267,9 +272,9 @@ async def test_SR570_struck_scaler_read(
         ("SEN_25", [0.002e5, 0.004e5, 0.01e5, 0.02e5, 0.02e5], 2e-14),
     ],
 )
-async def test_SR570_struck_scaler_read_with_autoGain(
+async def test_sr570_struck_scaler_read_with_autogain(
     mock_sr570_struck_scaler_detector,
-    RE: RunEngine,
+    run_engine: RunEngine,
     gain,
     raw_count,
     expected_current,
@@ -302,8 +307,8 @@ async def test_SR570_struck_scaler_read_with_autoGain(
     def capture_emitted(name, doc):
         docs[name].append(doc)
 
-    RE(prepare(mock_sr570_struck_scaler_detector, 1))
-    RE(count([mock_sr570_struck_scaler_detector]), capture_emitted)
+    run_engine(prepare(mock_sr570_struck_scaler_detector, 1))
+    run_engine(count([mock_sr570_struck_scaler_detector]), capture_emitted)
     assert docs["event"][0]["data"][
         "mock_sr570_struck_scaler_detector-current"
     ] == pytest.approx(expected_current, rel=1e-14)
