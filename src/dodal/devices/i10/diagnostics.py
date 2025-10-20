@@ -179,7 +179,7 @@ class I10Diagnostic(Device):
 
 
 class I10JDiagnostic(Device):
-    """Collection of all the diagnostic stage on i10."""
+    """Collection of all the diagnostic stage on i10-1."""
 
     def __init__(self, prefix, name: str = "") -> None:
         self.dj1 = ScreenCam(prefix=prefix + "PHDGN-01:")
