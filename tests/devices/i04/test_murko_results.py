@@ -38,6 +38,21 @@ async def mock_setters(
     return mock_x_setter, mock_y_setter, mock_z_setter
 
 
+@pytest.fixture
+async def default_metadata() -> MurkoMetadata:
+    return MurkoMetadata(
+        zoom_percentage=100.0,
+        omega_angle=60.0,
+        microns_per_x_pixel=5.0,
+        microns_per_y_pixel=5.0,
+        beam_centre_i=50,
+        beam_centre_j=50,
+        uuid="uuid",
+        sample_id="test",
+        used_for_centring=None,
+    )
+
+
 def mock_redis_calls(mock_strict_redis: MagicMock, messages, metadata):
     mock_get_message = (
         patch.object(
@@ -185,26 +200,15 @@ def test_get_yz_least_squares_with_more_angles():
 
 
 def test_process_result_appends_lists_with_correct_values(
-    murko_results: MurkoResultsDevice,
+    murko_results: MurkoResultsDevice, default_metadata: MurkoMetadata
 ):
     result = {
         "most_likely_click": (0.5, 0.3),  # (y, x)
         "original_shape": (100, 100),
     }
-    metadata = MurkoMetadata(
-        zoom_percentage=100.0,
-        omega_angle=60.0,
-        microns_per_x_pixel=5.0,
-        microns_per_y_pixel=5.0,
-        beam_centre_i=50,
-        beam_centre_j=50,
-        uuid="uuid",
-        sample_id="test",
-        used_for_centring=None,
-    )
 
     assert murko_results._results == []
-    murko_results.process_result(result, metadata)
+    murko_results.process_result(result, default_metadata)
     assert len(murko_results._results) == 1
     assert murko_results._results[0].x_dist_mm == 0.2 * 100 * 5 / 1000
     assert murko_results._results[0].y_dist_mm == 0
@@ -216,25 +220,15 @@ def test_process_result_skips_when_no_result_from_murko(
     mock_calculate_beam_distance: MagicMock,
     murko_results: MurkoResultsDevice,
     caplog: pytest.LogCaptureFixture,
+    default_metadata: MurkoMetadata,
 ):
     result = {
         "most_likely_click": (-1, -1),  #  Murko could not find a most_likely_click
         "original_shape": (100, 100),
     }
-    metadata = MurkoMetadata(
-        zoom_percentage=100.0,
-        omega_angle=60.0,
-        microns_per_x_pixel=5.0,
-        microns_per_y_pixel=5.0,
-        beam_centre_i=50,
-        beam_centre_j=50,
-        uuid="uuid",
-        sample_id="test",
-        used_for_centring=None,
-    )
 
     with caplog.at_level("INFO"):
-        murko_results.process_result(result, metadata)
+        murko_results.process_result(result, default_metadata)
 
     assert murko_results._results == []
     assert mock_calculate_beam_distance.call_count == 0
@@ -665,19 +659,8 @@ async def test_none_result_does_not_stop_results_device(
 
 
 def test_when_results_filtered_then_used_for_centring_field_is_correct(
-    murko_results: MurkoResultsDevice,
+    murko_results: MurkoResultsDevice, default_metadata: MurkoMetadata
 ):
-    metadata = MurkoMetadata(  # fields dont matter
-        zoom_percentage=1,
-        microns_per_x_pixel=1,
-        microns_per_y_pixel=1,
-        beam_centre_i=1,
-        beam_centre_j=1,
-        sample_id="1",
-        omega_angle=0,
-        uuid="any",
-        used_for_centring=None,
-    )
     murko_results._results = [
         MurkoResult(
             chosen_point_px=(100, 0),
@@ -685,7 +668,7 @@ def test_when_results_filtered_then_used_for_centring_field_is_correct(
             y_dist_mm=8,
             omega=0,
             uuid="a",
-            metadata=metadata.copy(),
+            metadata=default_metadata.copy(),
         ),
         MurkoResult(
             chosen_point_px=(300, 100),
@@ -693,7 +676,7 @@ def test_when_results_filtered_then_used_for_centring_field_is_correct(
             y_dist_mm=90,
             omega=10,
             uuid="b",
-            metadata=metadata.copy(),
+            metadata=default_metadata.copy(),
         ),
         MurkoResult(
             chosen_point_px=(50, 200),
@@ -701,7 +684,7 @@ def test_when_results_filtered_then_used_for_centring_field_is_correct(
             y_dist_mm=63,
             omega=20,
             uuid="c",
-            metadata=metadata.copy(),
+            metadata=default_metadata.copy(),
         ),
         MurkoResult(
             chosen_point_px=(300, 300),
@@ -709,7 +692,7 @@ def test_when_results_filtered_then_used_for_centring_field_is_correct(
             y_dist_mm=8,
             omega=30,
             uuid="d",
-            metadata=metadata.copy(),
+            metadata=default_metadata.copy(),
         ),
     ]
     filtered_results = murko_results.filter_outliers()
@@ -764,19 +747,8 @@ async def test_correct_hset_calls_are_made_for_used_and_unused_results(
 
 
 def test_results_with_tiny_x_pixel_value_are_filtered_out(
-    murko_results: MurkoResultsDevice,
+    murko_results: MurkoResultsDevice, default_metadata: MurkoMetadata
 ):
-    metadata = MurkoMetadata(  # fields dont matter
-        zoom_percentage=1,
-        microns_per_x_pixel=1,
-        microns_per_y_pixel=1,
-        beam_centre_i=1,
-        beam_centre_j=1,
-        sample_id="1",
-        omega_angle=0,
-        uuid="any",
-        used_for_centring=None,
-    )
     murko_results.PERCENTAGE_TO_USE = 100  # type: ignore
     murko_results._results = [
         MurkoResult(
@@ -785,7 +757,7 @@ def test_results_with_tiny_x_pixel_value_are_filtered_out(
             y_dist_mm=8,
             omega=0,
             uuid="a",
-            metadata=metadata.copy(),
+            metadata=default_metadata.copy(),
         ),
         MurkoResult(
             chosen_point_px=(0, 100),
@@ -793,7 +765,7 @@ def test_results_with_tiny_x_pixel_value_are_filtered_out(
             y_dist_mm=90,
             omega=10,
             uuid="b",
-            metadata=metadata.copy(),
+            metadata=default_metadata.copy(),
         ),
         MurkoResult(
             chosen_point_px=(5, 200),
@@ -801,7 +773,7 @@ def test_results_with_tiny_x_pixel_value_are_filtered_out(
             y_dist_mm=63,
             omega=20,
             uuid="c",
-            metadata=metadata.copy(),
+            metadata=default_metadata.copy(),
         ),
         MurkoResult(
             chosen_point_px=(9, 300),
@@ -809,7 +781,7 @@ def test_results_with_tiny_x_pixel_value_are_filtered_out(
             y_dist_mm=8,
             omega=30,
             uuid="d",
-            metadata=metadata.copy(),
+            metadata=default_metadata.copy(),
         ),
     ]
     filtered_results = murko_results.filter_outliers()
