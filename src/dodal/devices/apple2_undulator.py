@@ -53,7 +53,10 @@ class Apple2Val(Apple2PhasesVal):
 
     def extract_phase_val(self):
         return Apple2PhasesVal(
-            self.top_outer, self.top_inner, self.btm_inner, self.btm_outer
+            top_outer=self.top_outer,
+            top_inner=self.top_inner,
+            btm_inner=self.btm_inner,
+            btm_outer=self.btm_outer,
         )
 
 
@@ -62,7 +65,7 @@ class Apple2LockedVal(Apple2LockedPhasesVal):
     gap: str
 
     def extract_phase_val(self):
-        return Apple2LockedPhasesVal(self.top_outer, self.btm_inner)
+        return Apple2LockedPhasesVal(top_outer=self.top_outer, btm_inner=self.btm_inner)
 
 
 class Pol(StrictEnum):
@@ -499,7 +502,7 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
             soft_signal_r_and_setter(Pol)
         )
         # check if phase has 4 motors
-        if apple2.phase.isinstance(UndulatorPhaseAxes):
+        if isinstance(self.apple2().phase, UndulatorPhaseAxes):
             top_inner = self.apple2().phase.top_inner.user_readback
             btm_outer = self.apple2().phase.btm_outer.user_readback
         else:
@@ -616,8 +619,6 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
         """If both top and bottom phase motor are paired, it is running on two phase
         axis mode.
         """
-        if top_outer == top_inner and btm_inner == btm_outer:
-            top_inner = btm_outer = 0
 
         if all(
             isclose(x, 0.0, abs_tol=ROW_PHASE_MOTOR_TOLERANCE)
