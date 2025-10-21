@@ -37,7 +37,7 @@ from tests.devices.electron_analyser.helper_util import (
 
 
 @pytest.fixture
-async def single_energy_source(run_engine: RunEngine) -> EnergySource:
+async def single_energy_source() -> EnergySource:
     async with init_devices(mock=True):
         dcm = DoubleCrystalMonochromatorWithDSpacing(
             "DCM:", PitchAndRollCrystal, StationaryCrystal
