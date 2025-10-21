@@ -1,7 +1,6 @@
 from typing import Any
 
 import pytest
-from bluesky import RunEngine
 from ophyd_async.core import init_devices
 
 from dodal.devices.common_dcm import (
