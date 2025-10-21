@@ -31,7 +31,7 @@ def pgm() -> PGM:
 
 @device_factory()
 def id() -> Apple2:
-    """i05 downstream insertion device:"""
+    """i05 insertion device:"""
     return Apple2(
         id_gap=UndulatorGap(prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:"),
         id_phase=UndulatorLockedPhaseAxes(
