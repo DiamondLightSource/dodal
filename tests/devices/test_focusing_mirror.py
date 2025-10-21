@@ -113,7 +113,7 @@ def mirror_voltage_with_set_timing_out(
 
 
 def test_mirror_set_voltage_sets_and_waits_happy_path(
-    RE: RunEngine,
+    run_engine: RunEngine,
     mirror_voltage_with_set: SingleMirrorVoltage,
 ):
     def completed():
@@ -126,13 +126,13 @@ def test_mirror_set_voltage_sets_and_waits_happy_path(
         MirrorVoltageDemand.OK,
     )
 
-    RE(bps.abs_set(mirror_voltage_with_set, 100, wait=True))
+    run_engine(bps.abs_set(mirror_voltage_with_set, 100, wait=True))
 
     mock_put.assert_called_with(100, wait=ANY)
 
 
 def test_mirror_set_voltage_sets_and_waits_happy_path_spin_while_waiting_for_slew(
-    RE: RunEngine,
+    run_engine: RunEngine,
     mirror_voltage_with_set_multiple_spins: SingleMirrorVoltage,
 ):
     def completed():
@@ -152,13 +152,13 @@ def test_mirror_set_voltage_sets_and_waits_happy_path_spin_while_waiting_for_sle
             wait=True,
         )
 
-    RE(plan())
+    run_engine(plan())
 
     mock_put.assert_called_with(100, wait=ANY)
 
 
 def test_mirror_set_voltage_set_rejected_when_not_ok(
-    RE: RunEngine,
+    run_engine: RunEngine,
     mirror_voltage_not_ok: SingleMirrorVoltage,
 ):
     def plan():
@@ -167,11 +167,11 @@ def test_mirror_set_voltage_set_rejected_when_not_ok(
 
         assert isinstance(e.value.args[0].exception(), AssertionError)
 
-    RE(plan())
+    run_engine(plan())
 
 
 def test_mirror_set_voltage_sets_and_waits_set_fail(
-    RE: RunEngine,
+    run_engine: RunEngine,
     mirror_voltage_with_set: SingleMirrorVoltage,
 ):
     def failed(*args, **kwargs):
@@ -185,11 +185,11 @@ def test_mirror_set_voltage_sets_and_waits_set_fail(
 
         assert isinstance(e.value.args[0].exception(), AssertionError)
 
-    RE(plan())
+    run_engine(plan())
 
 
 def test_mirror_set_voltage_sets_and_waits_demand_accepted_fail(
-    RE: RunEngine, mirror_voltage_with_set_accepted_fail: SingleMirrorVoltage
+    run_engine: RunEngine, mirror_voltage_with_set_accepted_fail: SingleMirrorVoltage
 ):
     def plan():
         with pytest.raises(FailedStatus) as e:
@@ -201,12 +201,12 @@ def test_mirror_set_voltage_sets_and_waits_demand_accepted_fail(
 
         assert isinstance(e.value.args[0].exception(), AssertionError)
 
-    RE(plan())
+    run_engine(plan())
 
 
 @patch("dodal.devices.focusing_mirror.DEFAULT_SETTLE_TIME_S", 0.1)
 def test_mirror_set_voltage_sets_and_waits_settle_timeout_expires(
-    RE: RunEngine,
+    run_engine: RunEngine,
     mirror_voltage_with_set_timing_out: SingleMirrorVoltage,
 ):
     def plan():
@@ -218,21 +218,21 @@ def test_mirror_set_voltage_sets_and_waits_settle_timeout_expires(
             )
         assert isinstance(excinfo.value.args[0].exception(), TimeoutError)
 
-    RE(plan())
+    run_engine(plan())
 
 
 def test_mirror_set_voltage_returns_immediately_if_voltage_already_demanded(
-    RE: RunEngine,
+    run_engine: RunEngine,
     mirror_voltage_with_set: SingleMirrorVoltage,
 ):
     set_mock_value(mirror_voltage_with_set._setpoint_v, 100)
 
-    RE(bps.abs_set(mirror_voltage_with_set, 100, wait=True))
+    run_engine(bps.abs_set(mirror_voltage_with_set, 100, wait=True))
 
     get_mock_put(mirror_voltage_with_set._setpoint_v).assert_not_called()
 
 
-def test_mirror_populates_voltage_channels(RE):
+def test_mirror_populates_voltage_channels():
     with init_devices(mock=True):
         mirror_voltages = MirrorVoltages("", "", daq_configuration_path="")
     assert len(mirror_voltages.horizontal_voltages) == 14
@@ -248,7 +248,7 @@ def test_mirror_populates_voltage_channels(RE):
     ],
 )
 async def test_given_striped_focussing_mirror_then_energy_to_stripe_returns_expected(
-    RE, energy_kev: float, expected_config: MirrorStripeConfiguration
+    energy_kev: float, expected_config: MirrorStripeConfiguration
 ):
     with init_devices(mock=True):
         device = FocusingMirrorWithStripes(prefix="-OP-VFM-01:", name="mirror")

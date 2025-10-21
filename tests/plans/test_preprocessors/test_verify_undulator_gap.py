@@ -15,7 +15,7 @@ RUN_KEY = "test_run"
 @patch("dodal.plans.verify_undulator_gap.verify_undulator_gap")
 def test_verify_undulator_gap_decorator_does_nothing_on_wrong_run(
     mock_verify: MagicMock,
-    RE: RunEngine,
+    run_engine: RunEngine,
     mock_undulator_and_dcm: UndulatorGapCheckDevices,
 ):
     @verify_undulator_gap_before_run_decorator(
@@ -24,14 +24,14 @@ def test_verify_undulator_gap_decorator_does_nothing_on_wrong_run(
     def boring_plan():
         yield from bps.null()
 
-    RE(boring_plan())
+    run_engine(boring_plan())
     mock_verify.assert_not_called()
 
 
 @patch("dodal.plans.preprocessors.verify_undulator_gap.verify_undulator_gap")
 def test_verify_undulator_gap_decorator_runs_on_run_key_only(
     mock_verify: MagicMock,
-    RE: RunEngine,
+    run_engine: RunEngine,
     mock_undulator_and_dcm: UndulatorGapCheckDevices,
 ):
     @verify_undulator_gap_before_run_decorator(
@@ -51,14 +51,14 @@ def test_verify_undulator_gap_decorator_runs_on_run_key_only(
     def inner_plan():
         yield from bps.null()
 
-    RE(outer_plan())
+    run_engine(outer_plan())
     mock_verify.assert_called_once()
 
 
 @patch("dodal.plans.preprocessors.verify_undulator_gap.verify_undulator_gap")
 def test_verify_undulator_gap_decorator_no_run_key_runs_on_first_run_only(
     mock_verify: MagicMock,
-    RE: RunEngine,
+    run_engine: RunEngine,
     mock_undulator_and_dcm: UndulatorGapCheckDevices,
 ):
     @verify_undulator_gap_before_run_decorator(devices=mock_undulator_and_dcm)
@@ -75,5 +75,5 @@ def test_verify_undulator_gap_decorator_no_run_key_runs_on_first_run_only(
     def inner_plan():
         yield from bps.null()
 
-    RE(outer_plan())
+    run_engine(outer_plan())
     mock_verify.assert_called_once()

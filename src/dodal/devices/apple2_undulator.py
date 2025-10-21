@@ -51,7 +51,7 @@ class Apple2PhasesVal(Apple2LockedPhasesVal):
 class Apple2Val(Apple2PhasesVal):
     gap: str
 
-    def extract_phaseVal(self):
+    def extract_phase_val(self):
         return Apple2PhasesVal(
             self.top_outer, self.top_inner, self.btm_inner, self.btm_outer
         )
@@ -61,7 +61,7 @@ class Apple2Val(Apple2PhasesVal):
 class Apple2LockedVal(Apple2LockedPhasesVal):
     gap: str
 
-    def extract_phaseVal(self):
+    def extract_phase_val(self):
         return Apple2LockedPhasesVal(self.top_outer, self.btm_inner)
 
 
@@ -204,24 +204,24 @@ class UndulatorPhaseMotor(StandardReadable):
         name : str
             Name of the Id phase device
         """
-        fullPV = f"{prefix}BL{infix}"
-        self.user_setpoint = epics_signal_w(str, fullPV + "SET")
-        self.user_setpoint_readback = epics_signal_r(float, fullPV + "DMD")
-        fullPV = fullPV + "MTR"
+        full_pv = f"{prefix}BL{infix}"
+        self.user_setpoint = epics_signal_w(str, full_pv + "SET")
+        self.user_setpoint_readback = epics_signal_r(float, full_pv + "DMD")
+        full_pv = full_pv + "MTR"
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
-            self.user_readback = epics_signal_r(float, fullPV + ".RBV")
+            self.user_readback = epics_signal_r(float, full_pv + ".RBV")
 
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
-            self.motor_egu = epics_signal_r(str, fullPV + ".EGU")
-            self.velocity = epics_signal_rw(float, fullPV + ".VELO")
+            self.motor_egu = epics_signal_r(str, full_pv + ".EGU")
+            self.velocity = epics_signal_rw(float, full_pv + ".VELO")
 
-        self.max_velocity = epics_signal_r(float, fullPV + ".VMAX")
-        self.acceleration_time = epics_signal_rw(float, fullPV + ".ACCL")
-        self.precision = epics_signal_r(int, fullPV + ".PREC")
-        self.deadband = epics_signal_r(float, fullPV + ".RDBD")
-        self.motor_done_move = epics_signal_r(int, fullPV + ".DMOV")
-        self.low_limit_travel = epics_signal_rw(float, fullPV + ".LLM")
-        self.high_limit_travel = epics_signal_rw(float, fullPV + ".HLM")
+        self.max_velocity = epics_signal_r(float, full_pv + ".VMAX")
+        self.acceleration_time = epics_signal_rw(float, full_pv + ".ACCL")
+        self.precision = epics_signal_r(int, full_pv + ".PREC")
+        self.deadband = epics_signal_r(float, full_pv + ".RDBD")
+        self.motor_done_move = epics_signal_r(int, full_pv + ".DMOV")
+        self.low_limit_travel = epics_signal_rw(float, full_pv + ".LLM")
+        self.high_limit_travel = epics_signal_rw(float, full_pv + ".HLM")
         super().__init__(name=name)
 
 
@@ -399,7 +399,7 @@ class Apple2(
         await self.gap.raise_if_cannot_move()
 
         await asyncio.gather(
-            self.phase.set_demand_positions(value=id_motor_values.extract_phaseVal()),
+            self.phase.set_demand_positions(value=id_motor_values.extract_phase_val()),
             self.gap.set_demand_positions(value=float(id_motor_values.gap)),
         )
         timeout = np.max(

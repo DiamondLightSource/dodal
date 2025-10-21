@@ -16,7 +16,7 @@ async def test_when_create_new_collection_called_on_remote_directory_service_cli
     test_url = "test.com"
     client = RemoteDirectoryServiceClient(test_url)
     collection = await client.create_new_collection()
-    assert collection.collectionNumber == 1
+    assert collection.collection_number == 1
     mock_request.assert_called_with("POST", f"{test_url}/numtracker")
 
 
@@ -28,5 +28,5 @@ async def test_when_get_current_collection_called_on_remote_directory_service_cl
     test_url = "test.com"
     client = RemoteDirectoryServiceClient(test_url)
     collection = await client.get_current_collection()
-    assert collection.collectionNumber == 1
+    assert collection.collection_number == 1
     mock_request.assert_called_with("GET", f"{test_url}/numtracker")
