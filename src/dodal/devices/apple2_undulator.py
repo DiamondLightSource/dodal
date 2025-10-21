@@ -234,11 +234,7 @@ Apple2ValType = TypeVar("Apple2ValType", Apple2LockedVal, Apple2Val)
 
 class UndulatorLockedPhaseAxes(SafeUndulatorMover[Apple2PhaseType]):
     """
-    A collection of 4 phase Motor to make up the full id phase motion. We are using the diamond pv convention.
-    e.g. top_outer == Q1
-         top_inner == Q2
-         btm_inner == q3
-         btm_outer == q4
+    Two phase Motor to make up the locked id phase motion.
 
     """
 
