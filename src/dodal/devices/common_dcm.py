@@ -62,7 +62,7 @@ class DoubleCrystalMonochromatorBase(StandardReadable, Generic[Xtal_1, Xtal_2]):
 
         super().__init__(name)
 
-    def _convert_keV_to_eV(self, energy_signal: float) -> float:
+    def _convert_keV_to_eV(self, energy_signal: float) -> float:  # noqa: N802
         return energy_signal * 1000
 
     # Prefix convention is different depending on whether there are one or two controllable crystals
