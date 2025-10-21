@@ -1,0 +1,90 @@
+dodal.devices.b07\_1.Grating
+============================
+
+.. currentmodule:: dodal.devices.b07_1
+
+.. autoclass:: Grating
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~Grating.AU_400
+      
+      
+      ~Grating.AU_600
+      
+      
+      ~Grating.PT_600
+      
+      
+      ~Grating.AU_1200
+      
+      
+      ~Grating.ML_1200
+      
+      
+      ~Grating.NO_GRATING
+      
+   
+   

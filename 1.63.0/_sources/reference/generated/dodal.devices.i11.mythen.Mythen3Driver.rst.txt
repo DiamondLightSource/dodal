@@ -1,0 +1,94 @@
+dodal.devices.i11.mythen.Mythen3Driver
+======================================
+
+.. currentmodule:: dodal.devices.i11.mythen
+
+.. autoclass:: Mythen3Driver
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      ~Mythen3Driver.acquire_time
+      
+      
+      ~Mythen3Driver.acquire_period
+      
+      
+      ~Mythen3Driver.num_images
+      
+      
+      ~Mythen3Driver.image_mode
+      
+      
+      ~Mythen3Driver.detector_state
+      
+      
+      ~Mythen3Driver.trigger_mode
+      
+      
+      ~Mythen3Driver.mode_setting
+      
+      
+      ~Mythen3Driver.bit_depth
+      
+      
+      ~Mythen3Driver.beam_energy
+      
+      
+      ~Mythen3Driver.threshold
+      
+      
+      ~Mythen3Driver.threshold2
+      
+      
+      ~Mythen3Driver.threshold3
+      
+      
+      ~Mythen3Driver.global_threshold
+      
+      
+      ~Mythen3Driver.unique_id
+      
+      
+      ~Mythen3Driver.nd_attributes_file
+      
+      
+      ~Mythen3Driver.acquire
+      
+      
+      ~Mythen3Driver.array_size_x
+      
+      
+      ~Mythen3Driver.array_size_y
+      
+      
+      ~Mythen3Driver.data_type
+      
+      
+      ~Mythen3Driver.array_counter
+      
+      
+      ~Mythen3Driver.wait_for_plugins
+      
+   
+   

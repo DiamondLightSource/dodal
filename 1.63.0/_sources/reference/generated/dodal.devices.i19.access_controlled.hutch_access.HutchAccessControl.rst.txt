@@ -1,0 +1,40 @@
+dodal.devices.i19.access\_controlled.hutch\_access.HutchAccessControl
+=====================================================================
+
+.. currentmodule:: dodal.devices.i19.access_controlled.hutch_access
+
+.. autoclass:: HutchAccessControl
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

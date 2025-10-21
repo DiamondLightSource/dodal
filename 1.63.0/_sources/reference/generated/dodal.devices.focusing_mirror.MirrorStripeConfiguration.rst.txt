@@ -1,0 +1,45 @@
+dodal.devices.focusing\_mirror.MirrorStripeConfiguration
+========================================================
+
+.. currentmodule:: dodal.devices.focusing_mirror
+
+.. autoclass:: MirrorStripeConfiguration
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~MirrorStripeConfiguration.stripe
+      
+      
+      ~MirrorStripeConfiguration.yaw_mrad
+      
+      
+      ~MirrorStripeConfiguration.lat_mm
+      
+   
+   

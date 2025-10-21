@@ -1,0 +1,36 @@
+dodal.devices.i22.dcm
+=====================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices.i22
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~dcm.DCM
+
+
+
+
+.. automodule:: dodal.devices.i22.dcm
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

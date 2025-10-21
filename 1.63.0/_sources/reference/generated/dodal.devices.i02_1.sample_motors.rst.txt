@@ -1,0 +1,36 @@
+dodal.devices.i02\_1.sample\_motors
+===================================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices.i02_1
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~sample_motors.SampleMotors
+
+
+
+
+.. automodule:: dodal.devices.i02_1.sample_motors
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
