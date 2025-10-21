@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.i10.diagnostics &#8212; dodal 1.62.1.dev14+gdbcffad0e documentation</title>
+    <title>dodal.devices.i10.diagnostics &#8212; dodal 1.62.1.dev15+g79804a65c documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=f04955d2"></script>
+    <script src="../../../../_static/documentation_options.js?v=9fe52268"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -475,24 +475,16 @@ window.addEventListener("load", () => mermaid.run());
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.positioner</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_positioner</span>
 
 
-<div class="viewcode-block" id="D3Position">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i10.diagnostics.D3Position.html#dodal.devices.i10.diagnostics.D3Position">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">D3Position</span><span class="p">(</span><span class="n">StrictEnum</span><span class="p">):</span>
     <span class="n">NOTHING</span> <span class="o">=</span> <span class="s2">&quot;Nothing&quot;</span>
-    <span class="n">GRID</span> <span class="o">=</span> <span class="s2">&quot;Grid&quot;</span></div>
+    <span class="n">GRID</span> <span class="o">=</span> <span class="s2">&quot;Grid&quot;</span>
 
 
-
-<div class="viewcode-block" id="D5Position">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i10.diagnostics.D5Position.html#dodal.devices.i10.diagnostics.D5Position">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">D5Position</span><span class="p">(</span><span class="n">StrictEnum</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">CellPosition</span><span class="p">(</span><span class="n">StrictEnum</span><span class="p">):</span>
     <span class="n">CELL_IN</span> <span class="o">=</span> <span class="s2">&quot;Cell In&quot;</span>
-    <span class="n">CELL_OUT</span> <span class="o">=</span> <span class="s2">&quot;Cell Out&quot;</span></div>
+    <span class="n">CELL_OUT</span> <span class="o">=</span> <span class="s2">&quot;Cell Out&quot;</span>
 
 
-
-<div class="viewcode-block" id="D5APosition">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i10.diagnostics.D5APosition.html#dodal.devices.i10.diagnostics.D5APosition">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">D5APosition</span><span class="p">(</span><span class="n">StrictEnum</span><span class="p">):</span>
     <span class="n">OUT_OF_THE_BEAM</span> <span class="o">=</span> <span class="s2">&quot;Out of the beam&quot;</span>
     <span class="n">DIODE</span> <span class="o">=</span> <span class="s2">&quot;Diode&quot;</span>
@@ -500,49 +492,51 @@ window.addEventListener("load", () => mermaid.run());
     <span class="n">LA</span> <span class="o">=</span> <span class="s2">&quot;La ref&quot;</span>
     <span class="n">GD</span> <span class="o">=</span> <span class="s2">&quot;Gd ref&quot;</span>
     <span class="n">YB</span> <span class="o">=</span> <span class="s2">&quot;Yb ref&quot;</span>
-    <span class="n">GRID</span> <span class="o">=</span> <span class="s2">&quot;Grid&quot;</span></div>
+    <span class="n">GRID</span> <span class="o">=</span> <span class="s2">&quot;Grid&quot;</span>
 
 
-
-<div class="viewcode-block" id="D6Position">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i10.diagnostics.D6Position.html#dodal.devices.i10.diagnostics.D6Position">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">D6Position</span><span class="p">(</span><span class="n">StrictEnum</span><span class="p">):</span>
     <span class="n">DIODE_OUT</span> <span class="o">=</span> <span class="s2">&quot;Diode Out&quot;</span>
     <span class="n">DIODE_IN</span> <span class="o">=</span> <span class="s2">&quot;Diode In&quot;</span>
-    <span class="n">AU_MESH</span> <span class="o">=</span> <span class="s2">&quot;Au Mesh&quot;</span></div>
+    <span class="n">AU_MESH</span> <span class="o">=</span> <span class="s2">&quot;Au Mesh&quot;</span>
 
 
-
-<div class="viewcode-block" id="D7Position">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i10.diagnostics.D7Position.html#dodal.devices.i10.diagnostics.D7Position">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">D7Position</span><span class="p">(</span><span class="n">StrictEnum</span><span class="p">):</span>
     <span class="n">OUT</span> <span class="o">=</span> <span class="s2">&quot;Out&quot;</span>
-    <span class="n">SHUTTER</span> <span class="o">=</span> <span class="s2">&quot;Shutter&quot;</span></div>
+    <span class="n">SHUTTER</span> <span class="o">=</span> <span class="s2">&quot;Shutter&quot;</span>
 
 
-
-<div class="viewcode-block" id="InStateTable">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i10.diagnostics.InStateTable.html#dodal.devices.i10.diagnostics.InStateTable">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">InStateTable</span><span class="p">(</span><span class="n">StrictEnum</span><span class="p">):</span>
     <span class="n">MOVE_IN</span> <span class="o">=</span> <span class="s2">&quot;Move In&quot;</span>
     <span class="n">MOVE_OUT</span> <span class="o">=</span> <span class="s2">&quot;Move Out&quot;</span>
-    <span class="n">RESET</span> <span class="o">=</span> <span class="s2">&quot;Reset&quot;</span></div>
+    <span class="n">RESET</span> <span class="o">=</span> <span class="s2">&quot;Reset&quot;</span>
 
 
-
-<div class="viewcode-block" id="InStateReadBackTable">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i10.diagnostics.InStateReadBackTable.html#dodal.devices.i10.diagnostics.InStateReadBackTable">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">InStateReadBackTable</span><span class="p">(</span><span class="n">StrictEnum</span><span class="p">):</span>
     <span class="n">MOVE_IN</span> <span class="o">=</span> <span class="s2">&quot;Moving In&quot;</span>
     <span class="n">MOVE_OUT</span> <span class="o">=</span> <span class="s2">&quot;Moving Out&quot;</span>
     <span class="n">IN_BEAM</span> <span class="o">=</span> <span class="s2">&quot;In Beam&quot;</span>
     <span class="n">FAULT</span> <span class="o">=</span> <span class="s2">&quot;Fault&quot;</span>
-    <span class="n">OUT_OF_BEAM</span> <span class="o">=</span> <span class="s2">&quot;Out of Beam&quot;</span></div>
+    <span class="n">OUT_OF_BEAM</span> <span class="o">=</span> <span class="s2">&quot;Out of Beam&quot;</span>
 
+
+<span class="k">class</span><span class="w"> </span><span class="nc">D2jPosition</span><span class="p">(</span><span class="n">StrictEnum</span><span class="p">):</span>
+    <span class="n">OUT_OF_THE_BEAM</span> <span class="o">=</span> <span class="s2">&quot;Out of the beam&quot;</span>
+    <span class="n">DIODE</span> <span class="o">=</span> <span class="s2">&quot;Diode&quot;</span>
+    <span class="n">BLADE</span> <span class="o">=</span> <span class="s2">&quot;Blade&quot;</span>
+    <span class="n">LA</span> <span class="o">=</span> <span class="s2">&quot;La ref&quot;</span>
+    <span class="n">GD</span> <span class="o">=</span> <span class="s2">&quot;Gd ref&quot;</span>
+    <span class="n">YB</span> <span class="o">=</span> <span class="s2">&quot;Yb ref&quot;</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">D3jPosition</span><span class="p">(</span><span class="n">StrictEnum</span><span class="p">):</span>
+    <span class="n">OUT_OF_THE_BEAM</span> <span class="o">=</span> <span class="s2">&quot;Out of the beam&quot;</span>
+    <span class="n">DIODE_IN</span> <span class="o">=</span> <span class="s2">&quot;Diode In&quot;</span>
+    <span class="n">DIAMOND_WINDOW</span> <span class="o">=</span> <span class="s2">&quot;Diamond window&quot;</span>
 
 
 <div class="viewcode-block" id="I10PneumaticStage">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i10.diagnostics.I10PneumaticStage.html#dodal.devices.i10.diagnostics.I10PneumaticStage">[docs]</a>
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i10.I10PneumaticStage.html#dodal.devices.i10.I10PneumaticStage">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">I10PneumaticStage</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Pneumatic stage only has two real positions in or out.</span>
 <span class="sd">    Use for fluorescent screen which can be insert into the x-ray beam.</span>
@@ -566,8 +560,6 @@ window.addEventListener("load", () => mermaid.run());
 
 
 
-<div class="viewcode-block" id="ScreenCam">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i10.diagnostics.ScreenCam.html#dodal.devices.i10.diagnostics.ScreenCam">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ScreenCam</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Compound device of pneumatic stage(fluorescent screen) and webcam&quot;&quot;&quot;</span>
 
@@ -590,12 +582,9 @@ window.addEventListener("load", () => mermaid.run());
                 <span class="bp">self</span><span class="o">.</span><span class="n">centroid_y</span><span class="p">,</span>
             <span class="p">],</span>
         <span class="p">)</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span></div>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
 
 
-
-<div class="viewcode-block" id="FullDiagnostic">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i10.diagnostics.FullDiagnostic.html#dodal.devices.i10.diagnostics.FullDiagnostic">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">FullDiagnostic</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Compound device of a diagnostic with screen, webcam and Positioner stage.&quot;&quot;&quot;</span>
 
@@ -616,15 +605,12 @@ window.addEventListener("load", () => mermaid.run());
             <span class="n">cam_infix</span><span class="p">,</span>
             <span class="n">name</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
 
-
-<div class="viewcode-block" id="I10Diagnostic">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i10.diagnostics.I10Diagnostic.html#dodal.devices.i10.diagnostics.I10Diagnostic">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">I10Diagnostic</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Collection of all the diagnostic stage on i10.&quot;&quot;&quot;</span>
-
+<div class="viewcode-block" id="I10SharedDiagnostic">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i10.I10SharedDiagnostic.html#dodal.devices.i10.I10SharedDiagnostic">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">I10SharedDiagnostic</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">d1</span> <span class="o">=</span> <span class="n">ScreenCam</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;PHDGN-01:&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">d2</span> <span class="o">=</span> <span class="n">ScreenCam</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;PHDGN-02:&quot;</span><span class="p">)</span>
@@ -633,8 +619,18 @@ window.addEventListener("load", () => mermaid.run());
             <span class="n">positioner_enum</span><span class="o">=</span><span class="n">D3Position</span><span class="p">,</span>
             <span class="n">positioner_suffix</span><span class="o">=</span><span class="s2">&quot;DET:X&quot;</span><span class="p">,</span>
         <span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="I10Diagnostic">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i10.I10Diagnostic.html#dodal.devices.i10.I10Diagnostic">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">I10Diagnostic</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Collection of all the diagnostic stage on i10.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">d4</span> <span class="o">=</span> <span class="n">ScreenCam</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;PHDGN-04:&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">d5</span> <span class="o">=</span> <span class="n">create_positioner</span><span class="p">(</span><span class="n">D5Position</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">IONC-01:Y&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">d5</span> <span class="o">=</span> <span class="n">create_positioner</span><span class="p">(</span><span class="n">CellPosition</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">IONC-01:Y&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">d5A</span> <span class="o">=</span> <span class="n">create_positioner</span><span class="p">(</span><span class="n">D5APosition</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">PHDGN-06:DET:X&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">d6</span> <span class="o">=</span> <span class="n">FullDiagnostic</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">PHDGN-05:&quot;</span><span class="p">,</span> <span class="n">D6Position</span><span class="p">,</span> <span class="s2">&quot;DET:X&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">d7</span> <span class="o">=</span> <span class="n">create_positioner</span><span class="p">(</span><span class="n">D7Position</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">PHDGN-07:Y&quot;</span><span class="p">)</span>
@@ -643,8 +639,23 @@ window.addEventListener("load", () => mermaid.run());
 
 
 
+<div class="viewcode-block" id="I10JDiagnostic">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i10.I10JDiagnostic.html#dodal.devices.i10.I10JDiagnostic">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">I10JDiagnostic</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Collection of all the diagnostic stage on i10-1.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dj1</span> <span class="o">=</span> <span class="n">ScreenCam</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;PHDGN-01:&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dj2</span> <span class="o">=</span> <span class="n">create_positioner</span><span class="p">(</span><span class="n">CellPosition</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">IONC-01:Y&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dj2A</span> <span class="o">=</span> <span class="n">create_positioner</span><span class="p">(</span><span class="n">D2jPosition</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">PHDGN-03:DET:X&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dj3</span> <span class="o">=</span> <span class="n">FullDiagnostic</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">PHDGN-02:&quot;</span><span class="p">,</span> <span class="n">D3jPosition</span><span class="p">,</span> <span class="s2">&quot;DET:X&quot;</span><span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
+
+
+
 <div class="viewcode-block" id="I10Diagnostic5ADet">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i10.diagnostics.I10Diagnostic5ADet.html#dodal.devices.i10.diagnostics.I10Diagnostic5ADet">[docs]</a>
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i10.I10Diagnostic5ADet.html#dodal.devices.i10.I10Diagnostic5ADet">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">I10Diagnostic5ADet</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Diagnostic 5a detection with drain current and photo diode&quot;&quot;&quot;</span>
 

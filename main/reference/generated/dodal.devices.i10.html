@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.i10 &#8212; dodal 1.62.1.dev14+gdbcffad0e documentation</title>
+    <title>dodal.devices.i10 &#8212; dodal 1.62.1.dev15+g79804a65c documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=f04955d2"></script>
+    <script src="../../_static/documentation_options.js?v=9fe52268"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -58,7 +58,7 @@
     <link rel="icon" href="../../_static/dls-logo.svg"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="dodal.devices.i10.diagnostics" href="dodal.devices.i10.diagnostics.html" />
+    <link rel="next" title="dodal.devices.i10.I10Diagnostic" href="dodal.devices.i10.I10Diagnostic.html" />
     <link rel="prev" title="dodal.devices.i09_1.PsuMode" href="dodal.devices.i09_1.PsuMode.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -418,6 +418,7 @@
 <li class="toctree-l3"><a class="reference internal" href="dodal.beamlines.i09_2.html">dodal.beamlines.i09_2</a></li>
 <li class="toctree-l3"><a class="reference internal" href="dodal.beamlines.i10.html">dodal.beamlines.i10</a></li>
 <li class="toctree-l3"><a class="reference internal" href="dodal.beamlines.i10_1.html">dodal.beamlines.i10_1</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dodal.beamlines.i10_optics.html">dodal.beamlines.i10_optics</a></li>
 <li class="toctree-l3"><a class="reference internal" href="dodal.beamlines.i11.html">dodal.beamlines.i11</a></li>
 <li class="toctree-l3"><a class="reference internal" href="dodal.beamlines.i13_1.html">dodal.beamlines.i13_1</a></li>
 <li class="toctree-l3"><a class="reference internal" href="dodal.beamlines.i15.html">dodal.beamlines.i15</a></li>
@@ -698,12 +699,17 @@
 </ul>
 </details></li>
 <li class="toctree-l3 current active has-children"><a class="current reference internal" href="#">dodal.devices.i10</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.i10.diagnostics.html">dodal.devices.i10.diagnostics</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.i10.i10_apple2.html">dodal.devices.i10.i10_apple2</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.i10.i10_setting_data.html">dodal.devices.i10.i10_setting_data</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.i10.mirrors.html">dodal.devices.i10.mirrors</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.i10.rasor.html">dodal.devices.i10.rasor</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.i10.slits.html">dodal.devices.i10.slits</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.i10.I10Diagnostic.html">dodal.devices.i10.I10Diagnostic</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.i10.I10Diagnostic5ADet.html">dodal.devices.i10.I10Diagnostic5ADet</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.i10.I10PneumaticStage.html">dodal.devices.i10.I10PneumaticStage</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.i10.PiezoMirror.html">dodal.devices.i10.PiezoMirror</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.i10.I10Slits.html">dodal.devices.i10.I10Slits</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.i10.I10SlitsDrainCurrent.html">dodal.devices.i10.I10SlitsDrainCurrent</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.i10.I10SharedDiagnostic.html">dodal.devices.i10.I10SharedDiagnostic</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.i10.I10SharedSlits.html">dodal.devices.i10.I10SharedSlits</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.i10.I10JSlits.html">dodal.devices.i10.I10JSlits</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.i10.I10SharedSlitsDrainCurrent.html">dodal.devices.i10.I10SharedSlitsDrainCurrent</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.i10.I10JDiagnostic.html">dodal.devices.i10.I10JDiagnostic</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.i11.html">dodal.devices.i11</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -1065,26 +1071,41 @@
                   
   <section id="dodal-devices-i10">
 <h1>dodal.devices.i10<a class="headerlink" href="#dodal-devices-i10" title="Link to this heading">#</a></h1>
-<p class="rubric">Modules</p>
+<p class="rubric">Classes</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.i10.diagnostics.html#module-dodal.devices.i10.diagnostics" title="dodal.devices.i10.diagnostics"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dodal.devices.i10.diagnostics</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.i10.I10Diagnostic.html#dodal.devices.i10.I10Diagnostic" title="dodal.devices.i10.I10Diagnostic"><code class="xref py py-obj docutils literal notranslate"><span class="pre">I10Diagnostic</span></code></a></p></td>
+<td><p>Collection of all the diagnostic stage on i10.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.i10.I10Diagnostic5ADet.html#dodal.devices.i10.I10Diagnostic5ADet" title="dodal.devices.i10.I10Diagnostic5ADet"><code class="xref py py-obj docutils literal notranslate"><span class="pre">I10Diagnostic5ADet</span></code></a></p></td>
+<td><p>Diagnostic 5a detection with drain current and photo diode</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.i10.I10PneumaticStage.html#dodal.devices.i10.I10PneumaticStage" title="dodal.devices.i10.I10PneumaticStage"><code class="xref py py-obj docutils literal notranslate"><span class="pre">I10PneumaticStage</span></code></a></p></td>
+<td><p>Pneumatic stage only has two real positions in or out.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.i10.PiezoMirror.html#dodal.devices.i10.PiezoMirror" title="dodal.devices.i10.PiezoMirror"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PiezoMirror</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.i10.i10_apple2.html#module-dodal.devices.i10.i10_apple2" title="dodal.devices.i10.i10_apple2"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dodal.devices.i10.i10_apple2</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.i10.I10Slits.html#dodal.devices.i10.I10Slits" title="dodal.devices.i10.I10Slits"><code class="xref py py-obj docutils literal notranslate"><span class="pre">I10Slits</span></code></a></p></td>
+<td><p>Collection of all the i10 slits before end station.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.i10.I10SlitsDrainCurrent.html#dodal.devices.i10.I10SlitsDrainCurrent" title="dodal.devices.i10.I10SlitsDrainCurrent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">I10SlitsDrainCurrent</span></code></a></p></td>
+<td><p>Collection of all the drain current from i10 slits.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.i10.I10SharedDiagnostic.html#dodal.devices.i10.I10SharedDiagnostic" title="dodal.devices.i10.I10SharedDiagnostic"><code class="xref py py-obj docutils literal notranslate"><span class="pre">I10SharedDiagnostic</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.i10.i10_setting_data.html#module-dodal.devices.i10.i10_setting_data" title="dodal.devices.i10.i10_setting_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dodal.devices.i10.i10_setting_data</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.i10.I10SharedSlits.html#dodal.devices.i10.I10SharedSlits" title="dodal.devices.i10.I10SharedSlits"><code class="xref py py-obj docutils literal notranslate"><span class="pre">I10SharedSlits</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.i10.mirrors.html#module-dodal.devices.i10.mirrors" title="dodal.devices.i10.mirrors"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dodal.devices.i10.mirrors</span></code></a></p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.i10.I10JSlits.html#dodal.devices.i10.I10JSlits" title="dodal.devices.i10.I10JSlits"><code class="xref py py-obj docutils literal notranslate"><span class="pre">I10JSlits</span></code></a></p></td>
+<td><p>Collection of all the i10-1 slits before end station.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.i10.rasor.html#module-dodal.devices.i10.rasor" title="dodal.devices.i10.rasor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dodal.devices.i10.rasor</span></code></a></p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.i10.I10SharedSlitsDrainCurrent.html#dodal.devices.i10.I10SharedSlitsDrainCurrent" title="dodal.devices.i10.I10SharedSlitsDrainCurrent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">I10SharedSlitsDrainCurrent</span></code></a></p></td>
+<td><p>Collection of all the drain current from i10 and i10-1 slits.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.i10.slits.html#module-dodal.devices.i10.slits" title="dodal.devices.i10.slits"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dodal.devices.i10.slits</span></code></a></p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.i10.I10JDiagnostic.html#dodal.devices.i10.I10JDiagnostic" title="dodal.devices.i10.I10JDiagnostic"><code class="xref py py-obj docutils literal notranslate"><span class="pre">I10JDiagnostic</span></code></a></p></td>
+<td><p>Collection of all the diagnostic stage on i10-1.</p></td>
 </tr>
 </tbody>
 </table>
@@ -1111,11 +1132,11 @@
       </div>
     </a>
     <a class="right-next"
-       href="dodal.devices.i10.diagnostics.html"
+       href="dodal.devices.i10.I10Diagnostic.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">dodal.devices.i10.diagnostics</p>
+        <p class="prev-next-title">dodal.devices.i10.I10Diagnostic</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

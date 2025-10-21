@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.i10.slits &#8212; dodal 1.62.1.dev14+gdbcffad0e documentation</title>
+    <title>dodal.devices.i10.slits &#8212; dodal 1.62.1.dev15+g79804a65c documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=f04955d2"></script>
+    <script src="../../../../_static/documentation_options.js?v=9fe52268"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -458,8 +458,6 @@ window.addEventListener("load", () => mermaid.run());
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.slits</span><span class="w"> </span><span class="kn">import</span> <span class="n">MinimalSlits</span><span class="p">,</span> <span class="n">Slits</span>
 
 
-<div class="viewcode-block" id="I10SlitsBlades">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i10.slits.I10SlitsBlades.html#dodal.devices.i10.slits.I10SlitsBlades">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">I10SlitsBlades</span><span class="p">(</span><span class="n">Slits</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Slits with extra control for each blade.&quot;&quot;&quot;</span>
 
@@ -477,12 +475,9 @@ window.addEventListener("load", () => mermaid.run());
             <span class="n">y_gap</span><span class="o">=</span><span class="s2">&quot;YSIZE&quot;</span><span class="p">,</span>
             <span class="n">y_centre</span><span class="o">=</span><span class="s2">&quot;YCENTRE&quot;</span><span class="p">,</span>
             <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
-        <span class="p">)</span></div>
+        <span class="p">)</span>
 
 
-
-<div class="viewcode-block" id="BladeDrainCurrents">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i10.slits.BladeDrainCurrents.html#dodal.devices.i10.slits.BladeDrainCurrents">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">BladeDrainCurrents</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot; &quot;The drain current measurements on each blade. The drain current are due to</span>
 <span class="sd">    photoelectric effect (https://en.wikipedia.org/wiki/Photoelectric_effect).</span>
@@ -511,12 +506,9 @@ window.addEventListener("load", () => mermaid.run());
             <span class="nb">float</span><span class="p">,</span> <span class="n">read_pv</span><span class="o">=</span><span class="n">prefix</span> <span class="o">+</span> <span class="n">suffix_bot_blade</span>
         <span class="p">)</span>
 
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">connector</span><span class="p">)</span></div>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">connector</span><span class="p">)</span>
 
 
-
-<div class="viewcode-block" id="I10PrimarySlits">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i10.slits.I10PrimarySlits.html#dodal.devices.i10.slits.I10PrimarySlits">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">I10PrimarySlits</span><span class="p">(</span><span class="n">Slits</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;First slits of the beamline with very high power load, they are two square water</span>
 <span class="sd">    cooled blocks(aperture/aptr) that overlap to produce slit like behavior.&quot;&quot;&quot;</span>
@@ -534,15 +526,12 @@ window.addEventListener("load", () => mermaid.run());
             <span class="n">y_gap</span><span class="o">=</span><span class="s2">&quot;YSIZE&quot;</span><span class="p">,</span>
             <span class="n">y_centre</span><span class="o">=</span><span class="s2">&quot;YCENTRE&quot;</span><span class="p">,</span>
             <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
-        <span class="p">)</span></div>
+        <span class="p">)</span>
 
 
-
-<div class="viewcode-block" id="I10Slits">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i10.slits.I10Slits.html#dodal.devices.i10.slits.I10Slits">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">I10Slits</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Collection of all the i10 slits before end station.&quot;&quot;&quot;</span>
-
+<div class="viewcode-block" id="I10SharedSlits">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i10.I10SharedSlits.html#dodal.devices.i10.I10SharedSlits">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">I10SharedSlits</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">s1</span> <span class="o">=</span> <span class="n">I10PrimarySlits</span><span class="p">(</span>
             <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;01:&quot;</span><span class="p">,</span>
@@ -553,6 +542,16 @@ window.addEventListener("load", () => mermaid.run());
         <span class="bp">self</span><span class="o">.</span><span class="n">s3</span> <span class="o">=</span> <span class="n">I10SlitsBlades</span><span class="p">(</span>
             <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;03:&quot;</span><span class="p">,</span>
         <span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="I10Slits">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i10.I10Slits.html#dodal.devices.i10.I10Slits">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">I10Slits</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Collection of all the i10 slits before end station.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">s4</span> <span class="o">=</span> <span class="n">MinimalSlits</span><span class="p">(</span>
             <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;04:&quot;</span><span class="p">,</span>
             <span class="n">x_gap</span><span class="o">=</span><span class="s2">&quot;XSIZE&quot;</span><span class="p">,</span>
@@ -568,10 +567,46 @@ window.addEventListener("load", () => mermaid.run());
 
 
 
+<div class="viewcode-block" id="I10JSlits">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i10.I10JSlits.html#dodal.devices.i10.I10JSlits">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">I10JSlits</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Collection of all the i10-1 slits before end station.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">s7</span> <span class="o">=</span> <span class="n">MinimalSlits</span><span class="p">(</span>
+            <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;01:&quot;</span><span class="p">,</span>
+            <span class="n">x_gap</span><span class="o">=</span><span class="s2">&quot;XSIZE&quot;</span><span class="p">,</span>
+            <span class="n">y_gap</span><span class="o">=</span><span class="s2">&quot;YSIZE&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">s8</span> <span class="o">=</span> <span class="n">I10SlitsBlades</span><span class="p">(</span>
+            <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;02:&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">s9</span> <span class="o">=</span> <span class="n">I10SlitsBlades</span><span class="p">(</span>
+            <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;03:&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span></div>
+
+
+
 <div class="viewcode-block" id="I10SlitsDrainCurrent">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i10.slits.I10SlitsDrainCurrent.html#dodal.devices.i10.slits.I10SlitsDrainCurrent">[docs]</a>
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i10.I10SlitsDrainCurrent.html#dodal.devices.i10.I10SlitsDrainCurrent">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">I10SlitsDrainCurrent</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Collection of all the drain current from i10 slits.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">connector</span><span class="p">:</span> <span class="n">DeviceConnector</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">s4</span> <span class="o">=</span> <span class="n">BladeDrainCurrents</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;DI-IAMP-02:&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">s5</span> <span class="o">=</span> <span class="n">BladeDrainCurrents</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;DI-IAMP-03:&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">s6</span> <span class="o">=</span> <span class="n">BladeDrainCurrents</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;DI-IAMP-04:&quot;</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">connector</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="I10SharedSlitsDrainCurrent">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i10.I10SharedSlitsDrainCurrent.html#dodal.devices.i10.I10SharedSlitsDrainCurrent">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">I10SharedSlitsDrainCurrent</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Collection of all the drain current from i10 and i10-1 slits.&quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">connector</span><span class="p">:</span> <span class="n">DeviceConnector</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
@@ -584,9 +619,6 @@ window.addEventListener("load", () => mermaid.run());
             <span class="n">suffix_bot_blade</span><span class="o">=</span><span class="s2">&quot;YMINUS:I&quot;</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">s3</span> <span class="o">=</span> <span class="n">BladeDrainCurrents</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;DI-IAMP-01:&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">s4</span> <span class="o">=</span> <span class="n">BladeDrainCurrents</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;DI-IAMP-02:&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">s5</span> <span class="o">=</span> <span class="n">BladeDrainCurrents</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;DI-IAMP-03:&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">s6</span> <span class="o">=</span> <span class="n">BladeDrainCurrents</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;DI-IAMP-04:&quot;</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">connector</span><span class="p">)</span></div>
 
 </pre></div>

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.beamlines.i10 &#8212; dodal 1.62.1.dev14+gdbcffad0e documentation</title>
+    <title>dodal.beamlines.i10 &#8212; dodal 1.62.1.dev15+g79804a65c documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=f04955d2"></script>
+    <script src="../../_static/documentation_options.js?v=9fe52268"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -418,6 +418,7 @@
 <li class="toctree-l3"><a class="reference internal" href="dodal.beamlines.i09_2.html">dodal.beamlines.i09_2</a></li>
 <li class="toctree-l3 current active"><a class="current reference internal" href="#">dodal.beamlines.i10</a></li>
 <li class="toctree-l3"><a class="reference internal" href="dodal.beamlines.i10_1.html">dodal.beamlines.i10_1</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dodal.beamlines.i10_optics.html">dodal.beamlines.i10_optics</a></li>
 <li class="toctree-l3"><a class="reference internal" href="dodal.beamlines.i11.html">dodal.beamlines.i11</a></li>
 <li class="toctree-l3"><a class="reference internal" href="dodal.beamlines.i13_1.html">dodal.beamlines.i13_1</a></li>
 <li class="toctree-l3"><a class="reference internal" href="dodal.beamlines.i15.html">dodal.beamlines.i15</a></li>
@@ -698,12 +699,17 @@
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.i10.html">dodal.devices.i10</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.i10.diagnostics.html">dodal.devices.i10.diagnostics</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.i10.i10_apple2.html">dodal.devices.i10.i10_apple2</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.i10.i10_setting_data.html">dodal.devices.i10.i10_setting_data</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.i10.mirrors.html">dodal.devices.i10.mirrors</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.i10.rasor.html">dodal.devices.i10.rasor</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.i10.slits.html">dodal.devices.i10.slits</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.i10.I10Diagnostic.html">dodal.devices.i10.I10Diagnostic</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.i10.I10Diagnostic5ADet.html">dodal.devices.i10.I10Diagnostic5ADet</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.i10.I10PneumaticStage.html">dodal.devices.i10.I10PneumaticStage</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.i10.PiezoMirror.html">dodal.devices.i10.PiezoMirror</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.i10.I10Slits.html">dodal.devices.i10.I10Slits</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.i10.I10SlitsDrainCurrent.html">dodal.devices.i10.I10SlitsDrainCurrent</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.i10.I10SharedDiagnostic.html">dodal.devices.i10.I10SharedDiagnostic</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.i10.I10SharedSlits.html">dodal.devices.i10.I10SharedSlits</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.i10.I10JSlits.html">dodal.devices.i10.I10JSlits</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.i10.I10SharedSlitsDrainCurrent.html">dodal.devices.i10.I10SharedSlitsDrainCurrent</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.i10.I10JDiagnostic.html">dodal.devices.i10.I10JDiagnostic</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.i11.html">dodal.devices.i11</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -1072,6 +1078,21 @@ It is worth noting that the downstream device is slightly longer,
 so it can reach Mn edge for linear arbitrary.
 idd == id1,    idu == id2.</p>
 </div>
+<p class="rubric">Module Attributes</p>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dodal.beamlines.i10.PREFIX" title="dodal.beamlines.i10.PREFIX"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PREFIX</span></code></a></p></td>
+<td><p>Mirrors</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<dl class="py data">
+<dt class="sig sig-object py" id="dodal.beamlines.i10.PREFIX">
+<span class="sig-prename descclassname"><span class="pre">dodal.beamlines.i10.</span></span><span class="sig-name descname"><span class="pre">PREFIX</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">BeamlinePrefix(ixx='i10',</span> <span class="pre">suffix='I')</span></em><a class="headerlink" href="#dodal.beamlines.i10.PREFIX" title="Link to this definition">#</a></dt>
+<dd><p>Mirrors</p>
+</dd></dl>
+
 </section>
 
 
@@ -1112,6 +1133,18 @@ idd == id1,    idu == id2.</p>
                 <dialog id="pst-secondary-sidebar-modal"></dialog>
                 <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
 
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.beamlines.i10.PREFIX"><code class="docutils literal notranslate"><span class="pre">PREFIX</span></code></a></li>
+</ul>
+  </nav></div>
 
   <div class="sidebar-secondary-item">
 

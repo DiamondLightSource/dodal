@@ -3,22 +3,28 @@ dodal.devices.i10
 
 
 
-.. rubric:: Modules
+
+
+
+
+.. currentmodule:: dodal.devices
+.. rubric:: Classes
 
 .. autosummary::
    :toctree:
    :recursive:
 
-   dodal.devices.i10.diagnostics
-   dodal.devices.i10.i10_apple2
-   dodal.devices.i10.i10_setting_data
-   dodal.devices.i10.mirrors
-   dodal.devices.i10.rasor
-   dodal.devices.i10.slits
-
-
-
-
+   ~i10.I10Diagnostic
+   ~i10.I10Diagnostic5ADet
+   ~i10.I10PneumaticStage
+   ~i10.PiezoMirror
+   ~i10.I10Slits
+   ~i10.I10SlitsDrainCurrent
+   ~i10.I10SharedDiagnostic
+   ~i10.I10SharedSlits
+   ~i10.I10JSlits
+   ~i10.I10SharedSlitsDrainCurrent
+   ~i10.I10JDiagnostic
 
 
 
