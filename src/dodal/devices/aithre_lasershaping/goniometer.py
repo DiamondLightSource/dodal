@@ -20,8 +20,8 @@ class Goniometer(XYZOmegaStage):
         prefix: str,
         name: str = "",
         x_infix: str = "X",
-        y_infix: str = "SAMPY",
-        z_infix: str = "SAMPZ",
+        y_infix: str = "SAMPZ",
+        z_infix: str = "SAMPY",
         omega_infix: str = "OMEGA",
         stage_y_infix: str = "Y",
         stage_z_infix: str = "Z"
