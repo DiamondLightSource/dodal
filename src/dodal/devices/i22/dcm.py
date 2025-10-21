@@ -13,7 +13,7 @@ from ophyd_async.epics.motor import Motor
 
 from dodal.common.crystal_metadata import CrystalMetadata
 from dodal.devices.common_dcm import (
-    BaseDCM,
+    DoubleCrystalMonochromatorWithDSpacing,
     PitchAndRollCrystal,
     RollCrystal,
 )
@@ -23,7 +23,7 @@ from dodal.devices.common_dcm import (
 _CONVERSION_CONSTANT = 12.3984
 
 
-class DCM(BaseDCM[RollCrystal, PitchAndRollCrystal]):
+class DCM(DoubleCrystalMonochromatorWithDSpacing[RollCrystal, PitchAndRollCrystal]):
     """
     A double crystal monochromator (DCM), used to select the energy of the beam.
 

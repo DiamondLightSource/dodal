@@ -1,13 +1,13 @@
 from ophyd_async.epics.core import epics_signal_r
 
 from dodal.devices.common_dcm import (
-    BaseDCM,
+    DoubleCrystalMonochromatorWithDSpacing,
     PitchAndRollCrystal,
     RollCrystal,
 )
 
 
-class DCM(BaseDCM[RollCrystal, PitchAndRollCrystal]):
+class DCM(DoubleCrystalMonochromatorWithDSpacing[RollCrystal, PitchAndRollCrystal]):
     """
     A double crystal monocromator device, used to select the beam energy.
     """

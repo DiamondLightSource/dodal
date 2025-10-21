@@ -3,6 +3,11 @@ from typing import Any
 import pytest
 from ophyd_async.core import init_devices
 
+from dodal.devices.common_dcm import (
+    DoubleCrystalMonochromatorWithDSpacing,
+    PitchAndRollCrystal,
+    StationaryCrystal,
+)
 from dodal.devices.electron_analyser import (
     DualEnergySource,
     ElectronAnalyserDetector,
@@ -22,7 +27,7 @@ from dodal.devices.electron_analyser.vgscienta import (
     VGScientaAnalyserDriverIO,
     VGScientaSequence,
 )
-from dodal.devices.i09 import DCM, Grating
+from dodal.devices.i09 import Grating
 from dodal.devices.pgm import PGM
 from dodal.testing import patch_motor
 from tests.devices.electron_analyser.helper_util import (
@@ -32,8 +37,10 @@ from tests.devices.electron_analyser.helper_util import (
 
 @pytest.fixture
 async def single_energy_source() -> EnergySource:
-    with init_devices(mock=True):
-        dcm = DCM("DCM:")
+    async with init_devices(mock=True):
+        dcm = DoubleCrystalMonochromatorWithDSpacing(
+            "DCM:", PitchAndRollCrystal, StationaryCrystal
+        )
     patch_motor(dcm.energy_in_kev, initial_position=2.2)
     async with init_devices(mock=True):
         dcm_energy_source = EnergySource(dcm.energy_in_ev)
@@ -43,7 +50,9 @@ async def single_energy_source() -> EnergySource:
 @pytest.fixture
 async def dual_energy_source() -> DualEnergySource:
     async with init_devices(mock=True):
-        dcm = DCM("DCM:")
+        dcm = DoubleCrystalMonochromatorWithDSpacing(
+            "DCM:", PitchAndRollCrystal, StationaryCrystal
+        )
     patch_motor(dcm.energy_in_kev, initial_position=2.2)
 
     async with init_devices(mock=True):
