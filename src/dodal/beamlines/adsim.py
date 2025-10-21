@@ -88,9 +88,6 @@ def det(path_provider: PathProvider) -> SimDetector:
     )
 
 
-# v1_devices = OphydV1DeviceManager()
-
-
-# @v1_devices.factory
-# def old_motor() -> EpicsMotor:
-#     return EpicsMotor(name="old_motor", prefix=f"{PREFIX.beamline_prefix}-MO-SIMC-01:")
+@devices.v1_init(factory=EpicsMotor, prefix=f"{PREFIX.beamline_prefix}-MO-SIMC-01:M1")
+def old_motor(motor: EpicsMotor):
+    print(f"Built {motor}")
