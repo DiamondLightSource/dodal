@@ -18,7 +18,7 @@ from dodal.devices.common_dcm import (
     RollCrystal,
 )
 from dodal.devices.i18.diode import Diode
-from dodal.devices.i18.KBMirror import KBMirror
+from dodal.devices.i18.kb_mirror import KBMirror
 from dodal.devices.motors import XYStage, XYZThetaStage
 from dodal.devices.slits import Slits
 from dodal.devices.synchrotron import Synchrotron

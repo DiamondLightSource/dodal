@@ -1,4 +1,3 @@
-from ophyd_async.epics.core import epics_signal_r
 from ophyd_async.epics.motor import Motor
 
 from dodal.devices.common_dcm import (
@@ -25,18 +24,16 @@ class ThetaRollYZCrystal(ThetaYCrystal):
 
 class DCM(DoubleCrystalMonochromatorBase[ThetaRollYZCrystal, ThetaYCrystal]):
     """
-    A double crystal monocromator device, used to select the beam energy.
+    A double crystal monochromator device, used to select the beam energy.
 
-    Once the i15 DCM supports all of the PVs required by BaseDCM, this class can be
-    changed to inherit from BaseDCM and BaseDCMforI15 can be removed.
+    Once the i15 DCM supports all of the PVs required by DoubleCrystalMonochromator or
+    DoubleCrystalMonochromatorWithDSpacing this class can be changed to inherit from it,
+    see https://jira.diamond.ac.uk/browse/I15-1053 for more info.
     """
 
     def __init__(self, prefix: str, name: str = "") -> None:
         with self.add_children_as_readables():
             self.calibrated_energy_in_kev = Motor(prefix + "CAL")
             self.x1 = Motor(prefix + "X1")
-            self.crystal_metadata_d_spacing_a = epics_signal_r(
-                float, prefix + "DSPACING:RBV"
-            )
 
         super().__init__(prefix, ThetaRollYZCrystal, ThetaYCrystal, name)

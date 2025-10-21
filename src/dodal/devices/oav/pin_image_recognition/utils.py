@@ -140,7 +140,7 @@ class MxSampleDetect:
 
         self.min_tip_height = min_tip_height
 
-    def processArray(self, arr: np.ndarray) -> SampleLocation:
+    def process_array(self, arr: np.ndarray) -> SampleLocation:
         # Get a greyscale version of the input.
         if arr.ndim == 3:
             gray_arr = cv2.cvtColor(arr, cv2.COLOR_BGR2GRAY)

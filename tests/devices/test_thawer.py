@@ -80,7 +80,7 @@ async def test_given_thawing_already_triggered_when_triggered_again_then_timer_r
 
 @patch("dodal.devices.thawer.sleep")
 async def test_given_thawing_already_triggered_run_engine_stop_stops_thawer(
-    mock_sleep: AsyncMock, thawer: Thawer, RE: RunEngine
+    mock_sleep: AsyncMock, thawer: Thawer, run_engine: RunEngine
 ):
     patch_sleep(mock_sleep)
     put = get_mock_put(thawer.control)
@@ -93,7 +93,7 @@ async def test_given_thawing_already_triggered_run_engine_stop_stops_thawer(
         while not put.mock_calls:
             await asyncio.sleep(0.1)
 
-        RE.abort()
+        run_engine.abort()
 
     loop = new_event_loop()
     test_thread = None
@@ -108,7 +108,7 @@ async def test_given_thawing_already_triggered_run_engine_stop_stops_thawer(
         result_fut = asyncio.run_coroutine_threadsafe(abort_plan_execution(), loop)
 
         with pytest.raises(RunEngineInterrupted):
-            RE(thaw_plan())
+            run_engine(thaw_plan())
 
         put.assert_has_calls([call(OnOff.ON, wait=True), call(OnOff.OFF, wait=True)])
         loop.call_soon_threadsafe(loop.stop)
