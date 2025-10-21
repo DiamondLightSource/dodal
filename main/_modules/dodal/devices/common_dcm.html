@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.common_dcm &#8212; dodal 1.62.1.dev15+g79804a65c documentation</title>
+    <title>dodal.devices.common_dcm &#8212; dodal 1.62.1.dev16+g8bb309b63 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=9fe52268"></script>
+    <script src="../../../_static/documentation_options.js?v=ca2d3b6e"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -454,6 +454,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">StandardReadable</span><span class="p">,</span>
+    <span class="n">derived_signal_r</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">epics_signal_r</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.motor</span><span class="w"> </span><span class="kn">import</span> <span class="n">Motor</span>
@@ -492,43 +493,40 @@ window.addEventListener("load", () => mermaid.run());
 <span class="n">Xtal_2</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;Xtal_2&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">StationaryCrystal</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="BaseDCM">
-<a class="viewcode-back" href="../../../reference/generated/dodal.devices.common_dcm.BaseDCM.html#dodal.devices.common_dcm.BaseDCM">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">BaseDCM</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">,</span> <span class="n">Generic</span><span class="p">[</span><span class="n">Xtal_1</span><span class="p">,</span> <span class="n">Xtal_2</span><span class="p">]):</span>
+<div class="viewcode-block" id="DoubleCrystalMonochromatorBase">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.common_dcm.DoubleCrystalMonochromatorBase.html#dodal.devices.common_dcm.DoubleCrystalMonochromatorBase">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">DoubleCrystalMonochromatorBase</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">,</span> <span class="n">Generic</span><span class="p">[</span><span class="n">Xtal_1</span><span class="p">,</span> <span class="n">Xtal_2</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Common device for the double crystal monochromator (DCM), used to select the energy of the beam.</span>
+<span class="sd">    Base device for the double crystal monochromator (DCM), used to select the energy of the beam.</span>
 
 <span class="sd">    Features common across all DCM&#39;s should include virtual motors to set energy/wavelength and contain two crystals,</span>
 <span class="sd">    each of which can be movable. Some DCM&#39;s contain crystals with roll motors, and some contain crystals with roll and pitch motors.</span>
 <span class="sd">    This base device accounts for all combinations of this.</span>
 
-<span class="sd">    This device should act as a parent for beamline-specific DCM&#39;s, in which any other missing signals can be added.</span>
+<span class="sd">    This device should act as a parent for beamline-specific DCM&#39;s which do not match the standard EPICS interface, it provides</span>
+<span class="sd">    only energy and the crystal configuration.  Most beamlines should use DoubleCrystalMonochromator instead</span>
 
 <span class="sd">    Bluesky plans using DCM&#39;s should be typed to specify which types of crystals are required. For example, a plan</span>
-<span class="sd">    which only requires one crystal which can roll should be typed &#39;def my_plan(dcm: BaseDCM[RollCrystal, StationaryCrystal])`</span>
+<span class="sd">    which only requires one crystal which can roll should be typed</span>
+<span class="sd">    &#39;def my_plan(dcm: DoubleCrystalMonochromatorBase[RollCrystal, StationaryCrystal])`</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">xtal_1</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Xtal_1</span><span class="p">],</span> <span class="n">xtal_2</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Xtal_2</span><span class="p">],</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
-            <span class="c1"># Virtual motor PV&#39;s which set the physical motors so that the DCM produces requested</span>
-            <span class="c1"># wavelength/energy</span>
+            <span class="c1"># Virtual motor PV&#39;s which set the physical motors so that the DCM produces requested energy</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">energy_in_kev</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;ENERGY&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">wavelength_in_a</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;WAVELENGTH&quot;</span><span class="p">)</span>
-
-            <span class="c1"># Real motors</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">bragg_in_degrees</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;BRAGG&quot;</span><span class="p">)</span>
-            <span class="c1"># Offset ensures that the beam exits the DCM at the same point, regardless of energy.</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">offset_in_mm</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;OFFSET&quot;</span><span class="p">)</span>
-
-            <span class="bp">self</span><span class="o">.</span><span class="n">crystal_metadata_d_spacing_a</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span>
-                <span class="nb">float</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;DSPACING:RBV&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">energy_in_ev</span> <span class="o">=</span> <span class="n">derived_signal_r</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_convert_keV_to_eV</span><span class="p">,</span> <span class="n">energy_signal</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">energy_in_kev</span><span class="o">.</span><span class="n">user_readback</span>
             <span class="p">)</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">_make_crystals</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">xtal_1</span><span class="p">,</span> <span class="n">xtal_2</span><span class="p">)</span>
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_convert_keV_to_eV</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energy_signal</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>  <span class="c1"># noqa: N802</span>
+        <span class="k">return</span> <span class="n">energy_signal</span> <span class="o">*</span> <span class="mi">1000</span>
 
     <span class="c1"># Prefix convention is different depending on whether there are one or two controllable crystals</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_make_crystals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">xtal_1</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Xtal_1</span><span class="p">],</span> <span class="n">xtal_2</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Xtal_2</span><span class="p">]):</span>
@@ -538,6 +536,61 @@ window.addEventListener("load", () => mermaid.run());
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">xtal_1</span> <span class="o">=</span> <span class="n">xtal_1</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">xtal_2</span> <span class="o">=</span> <span class="n">xtal_2</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="DoubleCrystalMonochromator">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.common_dcm.DoubleCrystalMonochromator.html#dodal.devices.common_dcm.DoubleCrystalMonochromator">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">DoubleCrystalMonochromator</span><span class="p">(</span>
+    <span class="n">DoubleCrystalMonochromatorBase</span><span class="p">,</span> <span class="n">Generic</span><span class="p">[</span><span class="n">Xtal_1</span><span class="p">,</span> <span class="n">Xtal_2</span><span class="p">]</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Common device for the double crystal monochromator (DCM), used to select the energy of the beam.</span>
+
+<span class="sd">    Features common across all DCM&#39;s should include virtual motors to set energy/wavelength and contain two crystals,</span>
+<span class="sd">    each of which can be movable. Some DCM&#39;s contain crystals with roll motors, and some contain crystals with roll and pitch motors.</span>
+<span class="sd">    This base device accounts for all combinations of this.</span>
+
+<span class="sd">    This device should act as a parent for beamline-specific DCM&#39;s, in which any other missing signals can be added.</span>
+
+<span class="sd">    Bluesky plans using DCM&#39;s should be typed to specify which types of crystals are required. For example, a plan which only</span>
+<span class="sd">    requires one crystal which can roll should be typed &#39;def my_plan(dcm: DoubleCrystalMonochromator[RollCrystal, StationaryCrystal])`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">xtal_1</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Xtal_1</span><span class="p">],</span> <span class="n">xtal_2</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Xtal_2</span><span class="p">],</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">xtal_1</span><span class="p">,</span> <span class="n">xtal_2</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
+            <span class="c1"># Virtual motor PV&#39;s which set the physical motors so that the DCM produces requested</span>
+            <span class="c1"># wavelength</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">wavelength_in_a</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;WAVELENGTH&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Real motors</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bragg_in_degrees</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;BRAGG&quot;</span><span class="p">)</span>
+            <span class="c1"># Offset ensures that the beam exits the DCM at the same point, regardless of energy.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">offset_in_mm</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;OFFSET&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="DoubleCrystalMonochromatorWithDSpacing">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.common_dcm.DoubleCrystalMonochromatorWithDSpacing.html#dodal.devices.common_dcm.DoubleCrystalMonochromatorWithDSpacing">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">DoubleCrystalMonochromatorWithDSpacing</span><span class="p">(</span>
+    <span class="n">DoubleCrystalMonochromator</span><span class="p">,</span> <span class="n">Generic</span><span class="p">[</span><span class="n">Xtal_1</span><span class="p">,</span> <span class="n">Xtal_2</span><span class="p">]</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Adds crystal D-spacing metadata to the DoubleCrystalMonochromator class.  This should be used in preference to the</span>
+<span class="sd">    DoubleCrystalMonochromator on beamlines which have a &quot;DSPACING:RBV&quot; pv on their DCM.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">xtal_1</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Xtal_1</span><span class="p">],</span> <span class="n">xtal_2</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Xtal_2</span><span class="p">],</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">xtal_1</span><span class="p">,</span> <span class="n">xtal_2</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">crystal_metadata_d_spacing_a</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span>
+                <span class="nb">float</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;DSPACING:RBV&quot;</span>
+            <span class="p">)</span></div>
 
 </pre></div>
 

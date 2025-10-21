@@ -14,7 +14,9 @@ dodal.devices.common\_dcm
    :toctree:
    :recursive:
 
-   ~common_dcm.BaseDCM
+   ~common_dcm.DoubleCrystalMonochromator
+   ~common_dcm.DoubleCrystalMonochromatorBase
+   ~common_dcm.DoubleCrystalMonochromatorWithDSpacing
    ~common_dcm.PitchAndRollCrystal
    ~common_dcm.RollCrystal
    ~common_dcm.StationaryCrystal

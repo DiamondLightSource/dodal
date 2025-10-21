@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.i15.dcm &#8212; dodal 1.62.1.dev15+g79804a65c documentation</title>
+    <title>dodal.devices.i15.dcm &#8212; dodal 1.62.1.dev16+g8bb309b63 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=9fe52268"></script>
+    <script src="../../../../_static/documentation_options.js?v=ca2d3b6e"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -450,12 +450,10 @@ window.addEventListener("load", () => mermaid.run());
                 <article class="bd-article">
                   
   <h1>Source code for dodal.devices.i15.dcm</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Generic</span><span class="p">,</span> <span class="n">TypeVar</span>
-
-<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">StandardReadable</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.motor</span><span class="w"> </span><span class="kn">import</span> <span class="n">Motor</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.motor</span><span class="w"> </span><span class="kn">import</span> <span class="n">Motor</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.common_dcm</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">DoubleCrystalMonochromatorBase</span><span class="p">,</span>
     <span class="n">StationaryCrystal</span><span class="p">,</span>
 <span class="p">)</span>
 
@@ -482,55 +480,15 @@ window.addEventListener("load", () => mermaid.run());
 
 
 
-<span class="n">Xtal_1</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;Xtal_1&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">StationaryCrystal</span><span class="p">)</span>
-<span class="n">Xtal_2</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;Xtal_2&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">StationaryCrystal</span><span class="p">)</span>
-
-
-<div class="viewcode-block" id="BaseDCMforI15">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i15.dcm.BaseDCMforI15.html#dodal.devices.i15.dcm.BaseDCMforI15">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">BaseDCMforI15</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">,</span> <span class="n">Generic</span><span class="p">[</span><span class="n">Xtal_1</span><span class="p">,</span> <span class="n">Xtal_2</span><span class="p">]):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Device for double crystal monochromators (DCM), which only allow energy of the beam to be selected.</span>
-
-<span class="sd">    Features common across all DCM&#39;s should include virtual motors to set energy/wavelength and contain two crystals,</span>
-<span class="sd">    each of which can be movable. Some DCM&#39;s contain crystals with roll motors, and some contain crystals with roll and pitch motors.</span>
-<span class="sd">    This device only accounts for combinations of energy plus two crystals.</span>
-
-<span class="sd">    This device is designed to be a drop in replacement for BaseDCM for i15, which doesn&#39;t require WAVELENGTH, BRAGG and OFFSET to</span>
-<span class="sd">    be available. Once the i15 DCM supports all of the PVs required by BaseDCM, the i15 DCM device can switch to inheriting from</span>
-<span class="sd">    BaseDCM and this class can be removed.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">xtal_1</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Xtal_1</span><span class="p">],</span> <span class="n">xtal_2</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Xtal_2</span><span class="p">],</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
-            <span class="c1"># Virtual motor PV&#39;s which set the physical motors so that the DCM produces requested</span>
-            <span class="c1"># wavelength/energy</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">energy_in_kev</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;ENERGY&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_make_crystals</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">xtal_1</span><span class="p">,</span> <span class="n">xtal_2</span><span class="p">)</span>
-
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
-
-    <span class="c1"># Prefix convention is different depending on whether there are one or two controllable crystals</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">_make_crystals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">xtal_1</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Xtal_1</span><span class="p">],</span> <span class="n">xtal_2</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Xtal_2</span><span class="p">]):</span>
-        <span class="k">if</span> <span class="n">StationaryCrystal</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="n">xtal_1</span><span class="p">,</span> <span class="n">xtal_2</span><span class="p">]:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">xtal_1</span> <span class="o">=</span> <span class="n">xtal_1</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">XTAL1:&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">xtal_2</span> <span class="o">=</span> <span class="n">xtal_2</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">XTAL2:&quot;</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">xtal_1</span> <span class="o">=</span> <span class="n">xtal_1</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">xtal_2</span> <span class="o">=</span> <span class="n">xtal_2</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span></div>
-
-
-
 <div class="viewcode-block" id="DCM">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i15.dcm.DCM.html#dodal.devices.i15.dcm.DCM">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">DCM</span><span class="p">(</span><span class="n">BaseDCMforI15</span><span class="p">[</span><span class="n">ThetaRollYZCrystal</span><span class="p">,</span> <span class="n">ThetaYCrystal</span><span class="p">]):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">DCM</span><span class="p">(</span><span class="n">DoubleCrystalMonochromatorBase</span><span class="p">[</span><span class="n">ThetaRollYZCrystal</span><span class="p">,</span> <span class="n">ThetaYCrystal</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A double crystal monocromator device, used to select the beam energy.</span>
+<span class="sd">    A double crystal monochromator device, used to select the beam energy.</span>
 
-<span class="sd">    Once the i15 DCM supports all of the PVs required by BaseDCM, this class can be</span>
-<span class="sd">    changed to inherit from BaseDCM and BaseDCMforI15 can be removed.</span>
+<span class="sd">    Once the i15 DCM supports all of the PVs required by DoubleCrystalMonochromator or</span>
+<span class="sd">    DoubleCrystalMonochromatorWithDSpacing this class can be changed to inherit from it,</span>
+<span class="sd">    see https://jira.diamond.ac.uk/browse/I15-1053 for more info.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
