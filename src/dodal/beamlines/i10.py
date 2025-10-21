@@ -6,27 +6,17 @@ note:
     idd == id1,    idu == id2.
 """
 
-from daq_config_server.client import ConfigServer
-
 from dodal.common.beamlines.beamline_utils import device_factory
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.devices.apple2_undulator import (
-    BeamEnergy,
-    InsertionDeviceEnergy,
-    InsertionDevicePolarisation,
-    UndulatorGap,
-    UndulatorJawPhase,
-    UndulatorPhaseAxes,
-)
 from dodal.devices.current_amplifiers import CurrentAmpDet
-from dodal.devices.i10.diagnostics import I10Diagnostic, I10Diagnostic5ADet
-from dodal.devices.i10.i10_apple2 import (
-    I10Apple2,
-    I10Apple2Controller,
-    LinearArbitraryAngle,
+from dodal.devices.i10 import (
+    I10Diagnostic,
+    I10Diagnostic5ADet,
+    I10Slits,
+    I10SlitsDrainCurrent,
+    PiezoMirror,
 )
-from dodal.devices.i10.i10_setting_data import I10Grating
-from dodal.devices.i10.mirrors import PiezoMirror
+from dodal.devices.i10.diagnostics import I10Diagnostic, I10Diagnostic5ADet
 from dodal.devices.i10.rasor.rasor_current_amp import RasorFemto, RasorSR570
 from dodal.devices.i10.rasor.rasor_motors import (
     DetSlits,
@@ -34,9 +24,7 @@ from dodal.devices.i10.rasor.rasor_motors import (
     PaStage,
 )
 from dodal.devices.i10.rasor.rasor_scaler_cards import RasorScalerCard1
-from dodal.devices.i10.slits import I10Slits, I10SlitsDrainCurrent
 from dodal.devices.motors import XYStage, XYZStage
-from dodal.devices.pgm import PGM
 from dodal.devices.temperture_controller import (
     Lakeshore340,
 )
@@ -48,135 +36,7 @@ set_log_beamline(BL)
 set_utils_beamline(BL)
 PREFIX = BeamlinePrefix(BL)
 
-I10_CONF_CLIENT = ConfigServer(url="https://daq-config.diamond.ac.uk")
-
-
-LOOK_UPTABLE_DIR = "/dls_sw/i10/software/gda/workspace_git/gda-diamond.git/configurations/i10-shared/lookupTables/"
-
-
-@device_factory()
-def pgm() -> PGM:
-    "I10 Plane Grating Monochromator, it can change energy via pgm.energy.set(<energy>)"
-    return PGM(
-        prefix=f"{PREFIX.beamline_prefix}-OP-PGM-01:",
-        grating=I10Grating,
-        grating_pv="NLINES2",
-    )
-
-
-@device_factory()
-def idd() -> I10Apple2:
-    """i10 downstream insertion device:"""
-    return I10Apple2(
-        id_gap=UndulatorGap(prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:"),
-        id_phase=UndulatorPhaseAxes(
-            prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:",
-            top_outer="RPQ1",
-            top_inner="RPQ2",
-            btm_inner="RPQ3",
-            btm_outer="RPQ4",
-        ),
-        id_jaw_phase=UndulatorJawPhase(
-            prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:",
-            move_pv="RPQ1",
-        ),
-    )
-
-
-@device_factory()
-def idd_controller() -> I10Apple2Controller:
-    """I10 downstream insertion device controller."""
-    return I10Apple2Controller(
-        apple2=idd(),
-        lookuptable_dir=LOOK_UPTABLE_DIR,
-        source=("Source", "idd"),
-        config_client=I10_CONF_CLIENT,
-    )
-
-
-@device_factory()
-def idd_energy() -> InsertionDeviceEnergy:
-    return InsertionDeviceEnergy(id_controller=idd_controller())
-
-
-@device_factory()
-def idd_polarisation() -> InsertionDevicePolarisation:
-    return InsertionDevicePolarisation(id_controller=idd_controller())
-
-
-@device_factory()
-def idd_laa() -> LinearArbitraryAngle:
-    return LinearArbitraryAngle(id_controller=idd_controller())
-
-
-@device_factory()
-def energy_dd() -> BeamEnergy:
-    """Beam energy from down energy devices."""
-    return BeamEnergy(id_energy=idd_energy(), mono=pgm().energy)
-
-
-@device_factory()
-def idu() -> I10Apple2:
-    """i10 upstream insertion device"""
-    return I10Apple2(
-        id_gap=UndulatorGap(prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-21:"),
-        id_phase=UndulatorPhaseAxes(
-            prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-21:",
-            top_outer="RPQ1",
-            top_inner="RPQ2",
-            btm_inner="RPQ3",
-            btm_outer="RPQ4",
-        ),
-        id_jaw_phase=UndulatorJawPhase(
-            prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-21:",
-            move_pv="RPQ1",
-        ),
-    )
-
-
-@device_factory()
-def idu_controller() -> I10Apple2Controller:
-    """I10 upstream insertion device controller."""
-    return I10Apple2Controller(
-        apple2=idu(),
-        lookuptable_dir=LOOK_UPTABLE_DIR,
-        source=("Source", "idu"),
-        config_client=I10_CONF_CLIENT,
-    )
-
-
-@device_factory()
-def idu_energy() -> InsertionDeviceEnergy:
-    return InsertionDeviceEnergy(id_controller=idu_controller())
-
-
-@device_factory()
-def idu_polarisation() -> InsertionDevicePolarisation:
-    return InsertionDevicePolarisation(id_controller=idu_controller())
-
-
-@device_factory()
-def idu_laa() -> LinearArbitraryAngle:
-    return LinearArbitraryAngle(id_controller=idu_controller())
-
-
-@device_factory()
-def energy_ud() -> BeamEnergy:
-    """Beam energy from down energy devices."""
-    return BeamEnergy(id_energy=idu_energy(), mono=pgm().energy)
-
-
 """Mirrors"""
-
-
-@device_factory()
-def first_mirror() -> PiezoMirror:
-    return PiezoMirror(prefix=f"{PREFIX.beamline_prefix}-OP-COL-01:")
-
-
-@device_factory()
-def switching_mirror() -> PiezoMirror:
-    return PiezoMirror(prefix=f"{PREFIX.beamline_prefix}-OP-SWTCH-01:")
 
 
 @device_factory()
