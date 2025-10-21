@@ -24,7 +24,7 @@ def synchrotron() -> Synchrotron:
 
 @device_factory()
 def idd() -> Apple2:
-    """i06 downstream insertion device:"""
+    """i06 downstream insertion device."""
     return Apple2(
         id_gap=UndulatorGap(prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:"),
         id_phase=UndulatorLockedPhaseAxes(
@@ -37,7 +37,7 @@ def idd() -> Apple2:
 
 @device_factory()
 def idu() -> Apple2:
-    """i06 upstream insertion device:"""
+    """i06 upstream insertion device."""
     return Apple2(
         id_gap=UndulatorGap(prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-21:"),
         id_phase=UndulatorLockedPhaseAxes(

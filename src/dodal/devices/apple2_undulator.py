@@ -48,6 +48,14 @@ class Apple2PhasesVal(Apple2LockedPhasesVal):
 
 
 @dataclass
+class Apple2LockedVal(Apple2LockedPhasesVal):
+    gap: str
+
+    def extract_phase_val(self):
+        return Apple2LockedPhasesVal(top_outer=self.top_outer, btm_inner=self.btm_inner)
+
+
+@dataclass
 class Apple2Val(Apple2PhasesVal):
     gap: str
 
@@ -58,14 +66,6 @@ class Apple2Val(Apple2PhasesVal):
             btm_inner=self.btm_inner,
             btm_outer=self.btm_outer,
         )
-
-
-@dataclass
-class Apple2LockedVal(Apple2LockedPhasesVal):
-    gap: str
-
-    def extract_phase_val(self):
-        return Apple2LockedPhasesVal(top_outer=self.top_outer, btm_inner=self.btm_inner)
 
 
 class Pol(StrictEnum):
@@ -228,11 +228,10 @@ class UndulatorPhaseMotor(StandardReadable):
         super().__init__(name=name)
 
 
-Apple2PhaseType = TypeVar("Apple2PhaseType", bound=Apple2LockedPhasesVal)
-Apple2ValType = TypeVar("Apple2ValType", Apple2LockedVal, Apple2Val)
+Apple2PhaseValType = TypeVar("Apple2PhaseValType", bound=Apple2LockedPhasesVal)
 
 
-class UndulatorLockedPhaseAxes(SafeUndulatorMover[Apple2PhaseType]):
+class UndulatorLockedPhaseAxes(SafeUndulatorMover[Apple2PhaseValType]):
     """
     Two phase Motor to make up the locked id phase motion.
 
@@ -254,7 +253,7 @@ class UndulatorLockedPhaseAxes(SafeUndulatorMover[Apple2PhaseType]):
         self.axes = [self.top_outer, self.btm_inner]
         super().__init__(self.set_move, prefix, name)
 
-    async def set_demand_positions(self, value: Apple2PhaseType) -> None:
+    async def set_demand_positions(self, value: Apple2PhaseValType) -> None:
         await asyncio.gather(
             self.top_outer.user_setpoint.set(value=value.top_outer),
             self.btm_inner.user_setpoint.set(value=value.btm_inner),
@@ -354,6 +353,7 @@ class UndulatorJawPhase(SafeUndulatorMover[float]):
 
 
 PhaseAxesType = TypeVar("PhaseAxesType", bound=UndulatorLockedPhaseAxes)
+Apple2ValType = TypeVar("Apple2ValType", Apple2LockedVal, Apple2Val)
 
 
 class Apple2(
@@ -497,12 +497,12 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
         self.polarisation_setpoint, self._polarisation_setpoint_set = (
             soft_signal_r_and_setter(Pol)
         )
-        # check if phase has 4 motors
+        # check if undulator phase is unlocked.
         if isinstance(self.apple2().phase, UndulatorPhaseAxes):
             top_inner = self.apple2().phase.top_inner.user_readback
             btm_outer = self.apple2().phase.btm_outer.user_readback
         else:
-            # If not it is locked phase axes
+            # If locked phase axes make the locked phase 0.
             top_inner = btm_outer = soft_signal_rw(float, initial_value=0.0)
 
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
@@ -612,9 +612,6 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
             raise RuntimeError(
                 f"{self.name} is not in use, close gap or set polarisation to use this ID"
             )
-        """If both top and bottom phase motor are paired, it is running on two phase
-        axis mode.
-        """
 
         if all(
             isclose(x, 0.0, abs_tol=ROW_PHASE_MOTOR_TOLERANCE)
