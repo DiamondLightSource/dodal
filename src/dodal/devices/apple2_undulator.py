@@ -226,8 +226,6 @@ class UndulatorPhaseMotor(StandardReadable):
 
 
 Apple2PhaseType = TypeVar("Apple2PhaseType", bound=Apple2LockedPhasesVal)
-
-
 Apple2ValType = TypeVar("Apple2ValType", Apple2LockedVal, Apple2Val)
 
 
@@ -356,10 +354,12 @@ class UndulatorJawPhase(SafeUndulatorMover[float]):
         )
 
 
-PhaseType = TypeVar("PhaseType", bound=UndulatorLockedPhaseAxes)
+PhaseAxesType = TypeVar("PhaseAxesType", bound=UndulatorLockedPhaseAxes)
 
 
-class Apple2(StandardReadable, Movable, Generic[Apple2ValType, PhaseType]):
+class Apple2(
+    StandardReadable, Movable[Apple2ValType], Generic[Apple2ValType, PhaseAxesType]
+):
     """
     Device representing the combined motor controls for an Apple2 undulator.
 
@@ -371,7 +371,7 @@ class Apple2(StandardReadable, Movable, Generic[Apple2ValType, PhaseType]):
         The undulator phase axes device, consisting of four phase motors.
     """
 
-    def __init__(self, id_gap: UndulatorGap, id_phase: PhaseType, name=""):
+    def __init__(self, id_gap: UndulatorGap, id_phase: PhaseAxesType, name=""):
         """
         Parameters
         ----------
@@ -499,8 +499,8 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
             soft_signal_r_and_setter(Pol)
         )
         if apple2.phase.__class__ == UndulatorPhaseAxes:
-            top_inner = apple2.phase.top_inner.user_readback
-            btm_outer = apple2.phase.btm_outer.user_readback
+            top_inner = self.apple2().phase.top_inner.user_readback
+            btm_outer = self.apple2().phase.btm_outer.user_readback
         else:
             top_inner = btm_outer = soft_signal_rw(float, initial_value=0)
 
