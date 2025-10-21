@@ -498,11 +498,13 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
         self.polarisation_setpoint, self._polarisation_setpoint_set = (
             soft_signal_r_and_setter(Pol)
         )
-        if apple2.phase.__class__ == UndulatorPhaseAxes:
+        # check if phase has 4 motors
+        if apple2.phase.isinstance(UndulatorPhaseAxes):
             top_inner = self.apple2().phase.top_inner.user_readback
             btm_outer = self.apple2().phase.btm_outer.user_readback
         else:
-            top_inner = btm_outer = soft_signal_rw(float, initial_value=0)
+            # If not it is locked phase axes
+            top_inner = btm_outer = 0
 
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             # Hardware backed read/write for polarisation.
