@@ -17,11 +17,16 @@ from ophyd_async.testing import (
 
 from dodal.devices.apple2_undulator import (
     DEFAULT_MOTOR_MIN_TIMEOUT,
+    Apple2,
+    Apple2Controller,
     Apple2PhasesVal,
+    EnergyMotorConvertor,
     InsertionDeviceStatus,
+    Pol,
     UndulatorGap,
     UndulatorGateStatus,
     UndulatorJawPhase,
+    UndulatorLockedPhaseAxes,
     UndulatorPhaseAxes,
 )
 
@@ -79,6 +84,72 @@ async def mock_jaw_phase(prefix: str = "BLXX-EA-DET-007:") -> UndulatorJawPhase:
     set_mock_value(mock_jaw_phase.jaw_phase.user_setpoint_readback, 0)
     set_mock_value(mock_jaw_phase.status, InsertionDeviceStatus.ENABLED)
     return mock_jaw_phase
+
+
+@pytest.fixture
+async def mock_locked_phase_axes(
+    prefix: str = "BLXX-EA-DET-007:",
+) -> UndulatorLockedPhaseAxes:
+    async with init_devices(mock=True):
+        mock_phase_axes = UndulatorLockedPhaseAxes(
+            prefix=prefix,
+            top_outer="RPQ1",
+            btm_inner="RPQ4",
+        )
+    assert mock_phase_axes.name == "mock_phase_axes"
+    set_mock_value(mock_phase_axes.gate, UndulatorGateStatus.CLOSE)
+    set_mock_value(mock_phase_axes.top_outer.velocity, 2)
+    set_mock_value(mock_phase_axes.btm_inner.velocity, 2)
+    set_mock_value(mock_phase_axes.top_outer.user_readback, 2)
+    set_mock_value(mock_phase_axes.btm_inner.user_readback, 2)
+    set_mock_value(mock_phase_axes.top_outer.user_setpoint_readback, 2)
+    set_mock_value(mock_phase_axes.btm_inner.user_setpoint_readback, 2)
+    set_mock_value(mock_phase_axes.status, InsertionDeviceStatus.ENABLED)
+    return mock_phase_axes
+
+
+@pytest.fixture
+async def mock_locked_apple2(
+    mock_id_gap: UndulatorGap,
+    mock_locked_phase_axes: UndulatorLockedPhaseAxes,
+) -> Apple2:
+    mock_locked_apple2 = Apple2(
+        id_gap=mock_id_gap,
+        id_phase=mock_locked_phase_axes,
+    )
+    return mock_locked_apple2
+
+
+@pytest.fixture
+async def mock_locked_controller(
+    mock_locked_apple2: Apple2,
+) -> Apple2Controller:
+    class LockedApple2Controller(Apple2Controller[Apple2]):
+        """
+        I10Apple2Controller is a extension of Apple2Controller which provide linear
+        arbitrary angle control.
+        """
+
+        def __init__(
+            self,
+            apple2: Apple2,
+            energy_to_motor_converter: EnergyMotorConvertor,
+            name: str = "",
+        ) -> None:
+            super().__init__(
+                apple2=apple2,
+                energy_to_motor_converter=energy_to_motor_converter,
+                name=name,
+            )
+
+        async def _set_motors_from_energy(self, value: float) -> None:
+            pass
+
+    mock_locked_controller = LockedApple2Controller(
+        apple2=mock_locked_apple2,
+        energy_to_motor_converter=lambda energy, pol: (42.0, 7.5),
+    )
+    return mock_locked_controller
 
 
 async def test_in_motion_error(
@@ -372,3 +443,26 @@ async def test_jaw_phase_success_scan(
     assert_emitted(docs, start=1, descriptor=1, event=11, stop=1)
     for i in output:
         assert docs["event"][i]["data"]["mock_jaw_phase-jaw_phase-user_readback"] == i
+
+
+@pytest.mark.parametrize(
+    "pol, expect_top_outer, expect_btm_inner",
+    [
+        (Pol.LH, 0.0, 0.0),
+        (Pol.LV, 24.0, 24.0),
+        (Pol.PC, 16.5, 16.5),
+        (Pol.NC, -15.5, -15.5),
+        (Pol.LA, -16.4, 16.4),
+        (Pol.LA, 16.4, -16.4),
+    ],
+)
+async def test_id_polarisation_set(
+    mock_locked_controller: Apple2Controller,
+    mock_locked_apple2: Apple2,
+    pol: Pol,
+    expect_top_outer: float,
+    expect_btm_inner: float,
+):
+    set_mock_value(mock_locked_apple2.phase.top_outer.user_readback, expect_top_outer)
+    set_mock_value(mock_locked_apple2.phase.btm_inner.user_readback, expect_btm_inner)
+    assert await mock_locked_controller.polarisation.get_value() == pol
