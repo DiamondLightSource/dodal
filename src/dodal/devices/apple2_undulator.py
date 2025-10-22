@@ -48,24 +48,12 @@ class Apple2PhasesVal(Apple2LockedPhasesVal):
 
 
 @dataclass
-class Apple2LockedVal(Apple2LockedPhasesVal):
+class Apple2Val:
     gap: str
+    phase: Apple2LockedPhasesVal | Apple2PhasesVal
 
     def extract_phase_val(self):
-        return Apple2LockedPhasesVal(top_outer=self.top_outer, btm_inner=self.btm_inner)
-
-
-@dataclass
-class Apple2Val(Apple2PhasesVal):
-    gap: str
-
-    def extract_phase_val(self):
-        return Apple2PhasesVal(
-            top_outer=self.top_outer,
-            top_inner=self.top_inner,
-            btm_inner=self.btm_inner,
-            btm_outer=self.btm_outer,
-        )
+        return self.phase
 
 
 class Pol(StrictEnum):
@@ -353,12 +341,9 @@ class UndulatorJawPhase(SafeUndulatorMover[float]):
 
 
 PhaseAxesType = TypeVar("PhaseAxesType", bound=UndulatorLockedPhaseAxes)
-Apple2ValType = TypeVar("Apple2ValType", Apple2LockedVal, Apple2Val)
 
 
-class Apple2(
-    StandardReadable, Movable[Apple2ValType], Generic[Apple2ValType, PhaseAxesType]
-):
+class Apple2(StandardReadable, Movable[Apple2Val], Generic[PhaseAxesType]):
     """
     Device representing the combined motor controls for an Apple2 undulator.
 
@@ -388,7 +373,7 @@ class Apple2(
         super().__init__(name=name)
 
     @AsyncStatus.wrap
-    async def set(self, id_motor_values: Apple2ValType) -> None:
+    async def set(self, id_motor_values: Apple2Val) -> None:
         """
         Check ID is in a movable state and set all the demand value before moving them
         all at the same time.

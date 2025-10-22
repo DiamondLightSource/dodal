@@ -19,8 +19,9 @@ from dodal.devices.apple2_undulator import (
     DEFAULT_MOTOR_MIN_TIMEOUT,
     Apple2,
     Apple2Controller,
-    Apple2LockedVal,
+    Apple2LockedPhasesVal,
     Apple2PhasesVal,
+    Apple2Val,
     EnergyMotorConvertor,
     InsertionDeviceStatus,
     Pol,
@@ -146,9 +147,10 @@ async def mock_locked_controller(
         async def _set_motors_from_energy(self, value: float) -> None:
             pol = await self._check_and_get_pol_setpoint()
             gap, phase = self.energy_to_motor(energy=value, pol=pol)
-            id_set_val = Apple2LockedVal(
-                top_outer=f"{phase:.6f}",
-                btm_inner=f"{phase:.6f}",
+            id_set_val = Apple2Val(
+                phase=Apple2LockedPhasesVal(
+                    top_outer=f"{phase:.6f}", btm_inner=f"{phase:.6f}"
+                ),
                 gap=f"{gap:.6f}",
             )
             await self.apple2().set(id_motor_values=id_set_val)
@@ -485,9 +487,8 @@ async def test_set_motors_from_energy_sets_correct_values(
     mock_locked_controller.energy_to_motor = lambda energy, pol: (42.0, 7.5)
     mock_locked_controller._check_and_get_pol_setpoint = AsyncMock(return_value=Pol.LH)
     await mock_locked_controller._set_motors_from_energy(100.0)
-    expected_val = Apple2LockedVal(
-        top_outer=f"{7.5:.6f}",
-        btm_inner=f"{7.5:.6f}",
+    expected_val = Apple2Val(
+        phase=Apple2LockedPhasesVal(top_outer=f"{7.5:.6f}", btm_inner=f"{7.5:.6f}"),
         gap=f"{42.0:.6f}",
     )
     mock_locked_apple2.set.assert_awaited_once_with(id_motor_values=expected_val)
