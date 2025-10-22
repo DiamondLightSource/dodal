@@ -2,6 +2,11 @@ from dodal.common.beamlines.beamline_utils import (
     device_factory,
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
+from dodal.devices.apple2_undulator import (
+    Apple2,
+    UndulatorGap,
+    UndulatorPhaseAxes,
+)
 from dodal.devices.i09.enums import Grating
 from dodal.devices.pgm import PGM
 from dodal.devices.synchrotron import Synchrotron
@@ -22,3 +27,18 @@ def synchrotron() -> Synchrotron:
 @device_factory()
 def pgm() -> PGM:
     return PGM(prefix=f"{PREFIX.beamline_prefix}-MO-PGM-01:", grating=Grating)
+
+
+@device_factory()
+def jid() -> Apple2:
+    """I09 soft x-ray insertion device."""
+    return Apple2(
+        id_gap=UndulatorGap(prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:"),
+        id_phase=UndulatorPhaseAxes(
+            prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:",
+            top_outer="PUO",
+            top_inner="PUI",
+            btm_inner="PLI",
+            btm_outer="PLO",
+        ),
+    )
