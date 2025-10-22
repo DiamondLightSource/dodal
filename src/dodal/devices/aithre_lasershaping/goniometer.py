@@ -20,11 +20,11 @@ class Goniometer(XYZOmegaStage):
         prefix: str,
         name: str = "",
         x_infix: str = "X",
-        y_infix: str = "SAMPZ",
-        z_infix: str = "SAMPY",
+        y_infix: str = "Y",
+        z_infix: str = "Z",
         omega_infix: str = "OMEGA",
-        stage_y_infix: str = "Y",
-        stage_z_infix: str = "Z"
+        sampy_infix: str = "SAMPY",
+        sampz_infix: str = "SAMPZ"
     ) -> None:
         super().__init__(
             prefix=prefix,
@@ -38,5 +38,5 @@ class Goniometer(XYZOmegaStage):
             self.stage_y = Motor(prefix + stage_y_infix)
             self.stage_z = Motor(prefix + stage_z_infix)
             self.vertical_position = create_axis_perp_to_rotation(
-                self.omega, self.z, self.y
+                self.omega, self.sampz, self.sampy
             )
