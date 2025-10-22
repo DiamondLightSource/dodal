@@ -35,8 +35,8 @@ class Goniometer(XYZOmegaStage):
             omega_infix=omega_infix,
         )
         with self.add_children_as_readables():
-            self.stage_y = Motor(prefix + stage_y_infix)
-            self.stage_z = Motor(prefix + stage_z_infix)
+            self.sampy = Motor(prefix + sampy_infix)
+            self.sampz = Motor(prefix + sampz_infix)
             self.vertical_position = create_axis_perp_to_rotation(
                 self.omega, self.sampz, self.sampy
             )

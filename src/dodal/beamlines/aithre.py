@@ -15,7 +15,7 @@ PREFIX = "LA18L"
 
 @device_factory()
 def goniometer() -> Goniometer:
-    return Goniometer(f"{PREFIX}-MO-LSR-01:")
+    return Goniometer(f"{PREFIX}-MO-LSR-01:",y_infix="SAMPZ", z_infix="SAMPY", sampy_infix="Y", sampz_infix="Z")
 
 
 @device_factory()
