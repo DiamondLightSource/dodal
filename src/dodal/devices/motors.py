@@ -257,3 +257,29 @@ def create_axis_perp_to_rotation(motor_theta: Motor, motor_i: Motor, motor_j: Mo
         j_val=motor_j,
         rot_value=motor_theta,
     )
+
+
+
+class CombineMove(TypedDict, total=False):
+    """mapping of motor names to float positions for a combined move."""
+
+
+def make_combine_move(stage: Stage) -> CombineMove:
+    """
+    Initiate a CombineMove dict by gathering all Motor attributes from the Stage
+
+    Args:
+        stage: A Stage-derived instance (e.g. XYZStage, XYStage, etc.)
+
+    Returns:
+        CombineMove: A TypedDict mapping each motor name to a float
+
+    """
+    combine: CombineMove = {}
+
+    for attr_name in dir(stage):
+        attr = getattr(stage, attr_name)
+        if isinstance(attr, Motor):
+            combine[attr_name] = 0.0
+
+    return combine
