@@ -9,6 +9,7 @@ from dodal.devices.motors import XYZOmegaStage
 from dodal.devices.oav.oav_calculations import (
     calculate_beam_distance,
     camera_coordinates_to_xyz_mm,
+    Direction,
 )
 from dodal.devices.oav.oav_detector import OAV
 from dodal.devices.oav.pin_image_recognition import PinTipDetection
@@ -52,7 +53,12 @@ class EdgeOutputArrayImageType(IntEnum):
 
 
 def get_move_required_so_that_beam_is_at_pixel(
-    gonio: XYZOmegaStage, pixel: Pixel, oav: OAV
+    gonio: XYZOmegaStage,
+    pixel: Pixel,
+    oav: OAV,
+    x_direction: int = 1,
+    y_direction: int = -1,
+    z_direction: int = 1,
 ) -> Generator[Msg, None, np.ndarray]:
     """Calculate the required move so that the given pixel is in the centre of the beam."""
 
@@ -77,6 +83,7 @@ def get_move_required_so_that_beam_is_at_pixel(
         pixel,
         (beam_x, beam_y),
         (microns_per_pixel_x, microns_per_pixel_y),
+        (x_direction, y_direction, z_direction),
     )
 
 
@@ -86,6 +93,7 @@ def calculate_x_y_z_of_pixel(
     pixel: Pixel,
     beam_centre: tuple[int, int],
     microns_per_pixel: tuple[float, float],
+    xyz_direction: tuple[int, int, int],
 ) -> np.ndarray:
     """Get the x, y, z position of a pixel in mm"""
     beam_distance_px: Pixel = calculate_beam_distance(beam_centre, *pixel)
@@ -96,6 +104,9 @@ def calculate_x_y_z_of_pixel(
         current_omega,
         microns_per_pixel[0],
         microns_per_pixel[1],
+        Direction(xyz_direction[0]),
+        Direction(xyz_direction[1]),
+        Direction(xyz_direction[2]),
     )
 
 
