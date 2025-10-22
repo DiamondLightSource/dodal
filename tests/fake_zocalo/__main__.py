@@ -63,7 +63,7 @@ def load_configuration_file(filename):
 def get_dcgid_and_prefix(dcid: int, session_maker: sessionmaker) -> tuple[int, str]:
     tries_left = 2
     try:
-        while tries_left > 0:
+        while True:
             try:
                 tries_left -= 1
                 with session_maker() as session:
