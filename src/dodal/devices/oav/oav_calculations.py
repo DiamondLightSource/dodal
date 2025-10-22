@@ -1,9 +1,5 @@
 import numpy as np
 
-class Direction(Enum):
-    """ The direction of oav camera and motors """
-    SAME = 1
-    OPPOSITE = -1
 
 def camera_coordinates_to_xyz_mm(
     horizontal: float,
@@ -11,9 +7,9 @@ def camera_coordinates_to_xyz_mm(
     omega: float,
     microns_per_i_pixel: float,
     microns_per_j_pixel: float,
-    x_horizontal_sign: Direction = Direction.SAME,
-    y_vertical_sign: Direction = Direction.OPPOSITE,
-    z_vertical_sign: Direction = Direction.SAME,
+    x_horizontal_sign: int = -1,
+    y_vertical_sign: int = -1,
+    z_vertical_sign: int = 1,
 ) -> np.ndarray:
     """
     Converts from (horizontal,vertical) pixel measurements from the OAV camera into to (x, y, z) motor coordinates in millimetres.
@@ -25,9 +21,9 @@ def camera_coordinates_to_xyz_mm(
         omega (float): The omega angle of the smargon that the horizontal, vertical measurements were obtained at.
         microns_per_i_pixel (float): The number of microns per i pixel, adjusted for the zoom level horizontal was measured at.
         microns_per_j_pixel (float): The number of microns per j pixel, adjusted for the zoom level vertical was measured at.
-        x_horizontal_sign (Direction): Direction mapping for x
-        y_vertical_sign (Direction): Direction mapping for y
-        z_vertical_sign (Direction): Direction mapping for z
+        x_horizontal_sign (int): Direction mapping for x, positive means the oav and motor are on same direction, default from hyperion
+        y_vertical_sign (int): Direction mapping for y
+        z_vertical_sign (int): Direction mapping for z
     """
     # Convert the vertical and horizontal into mm.
     horizontal *= microns_per_i_pixel * 1e-3
@@ -44,8 +40,8 @@ def camera_coordinates_to_xyz_mm(
 
     # +ve y in the OAV camera becomes -ve y in the smargon motors/
     y = y_vertical_sign * vertical * cosine
-
     z = z_vertical_sign * vertical * sine
+
     return np.array([x, y, z], dtype=np.float64)
 
 

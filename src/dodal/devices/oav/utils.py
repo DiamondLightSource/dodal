@@ -9,7 +9,6 @@ from dodal.devices.motors import XYZOmegaStage
 from dodal.devices.oav.oav_calculations import (
     calculate_beam_distance,
     camera_coordinates_to_xyz_mm,
-    Direction,
 )
 from dodal.devices.oav.oav_detector import OAV
 from dodal.devices.oav.pin_image_recognition import PinTipDetection
@@ -104,9 +103,9 @@ def calculate_x_y_z_of_pixel(
         current_omega,
         microns_per_pixel[0],
         microns_per_pixel[1],
-        Direction(xyz_direction[0]),
-        Direction(xyz_direction[1]),
-        Direction(xyz_direction[2]),
+        xyz_direction[0],
+        xyz_direction[1],
+        xyz_direction[2],
     )
 
 
