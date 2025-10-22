@@ -1,6 +1,7 @@
 import asyncio
 import math
 from abc import ABC
+from typing import TypedDict
 
 from ophyd_async.core import StandardReadable, derived_signal_rw
 from ophyd_async.epics.motor import Motor
