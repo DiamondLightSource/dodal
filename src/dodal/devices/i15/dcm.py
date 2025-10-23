@@ -33,7 +33,7 @@ class DCM(DoubleCrystalMonochromatorBase[ThetaRollYZCrystal, ThetaYCrystal]):
 
     def __init__(self, prefix: str, name: str = "") -> None:
         with self.add_children_as_readables():
-            self.calibrated_V = Motor(prefix + "CAL")
+            self.calibrated_energy_in_keV = Motor(prefix + "CAL")
             self.x1 = Motor(prefix + "X1")
 
         super().__init__(prefix, ThetaRollYZCrystal, ThetaYCrystal, name)

@@ -1,5 +1,6 @@
 import pytest
 from ophyd_async.core import init_devices
+from ophyd_async.testing import assert_reading, partial_reading
 
 from dodal.devices.i07.dcm import DCM
 
@@ -14,22 +15,22 @@ async def dcm() -> DCM:
 async def test_read_and_describe_includes(
     dcm: DCM,
 ):
-    description = await dcm.describe()
-    reading = await dcm.read()
-
-    expected_keys: list[str] = [
-        "bragg_in_degrees",
-        "energy_in_keV",
-        "offset_in_mm",
-        "wavelength_in_a",
-        "vertical_in_mm",
-        "xtal1_temp",
-        "xtal2_temp",
-        "xtal1_holder_temp",
-        "xtal2_holder_temp",
-        "gap_motor",
-        "white_beam_stop_temp",
-    ]
-    for key in expected_keys:
-        assert f"{dcm.name}-{key}" in reading
-        assert f"{dcm.name}-{key}" in description
+    await assert_reading(
+        dcm,
+        {
+            f"{dcm.name}-bragg_in_degrees": partial_reading(0.0),
+            f"{dcm.name}-energy_in_keV": partial_reading(0.0),
+            f"{dcm.name}-energy_in_eV": partial_reading(0.0),
+            f"{dcm.name}-offset_in_mm": partial_reading(0.0),
+            f"{dcm.name}-wavelength_in_a": partial_reading(0.0),
+            f"{dcm.name}-vertical_in_mm": partial_reading(0.0),
+            f"{dcm.name}-xtal1_temp": partial_reading(0.0),
+            f"{dcm.name}-xtal2_temp": partial_reading(0.0),
+            f"{dcm.name}-xtal1_holder_temp": partial_reading(0.0),
+            f"{dcm.name}-xtal2_holder_temp": partial_reading(0.0),
+            f"{dcm.name}-xtal_1-pitch_in_mrad": partial_reading(0.0),
+            f"{dcm.name}-xtal_1-roll_in_mrad": partial_reading(0.0),
+            f"{dcm.name}-gap_motor": partial_reading(0.0),
+            f"{dcm.name}-white_beam_stop_temp": partial_reading(0.0),
+        },
+    )
