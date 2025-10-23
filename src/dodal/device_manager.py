@@ -194,6 +194,12 @@ class DeviceFactory(Generic[Args, V2]):
 
 
 class V1DeviceFactory(Generic[V1]):
+    """
+    Wrapper around an ophyd v1 device that holds a reference to a device
+    manager that can provide dependencies, along with default connection
+    information for how the created device should be connected.
+    """
+
     def __init__(
         self,
         *,
@@ -289,17 +295,22 @@ class V1DeviceFactory(Generic[V1]):
 
 
 class ConnectionSpec(NamedTuple):
+    """A device paired with the options used to configure it"""
+
     device: OphydV2Device
     mock: bool
     timeout: float
 
 
 class ConnectionResult(NamedTuple):
+    """Wrapper around results of building and connecting devices"""
+
     devices: dict[str, AnyDevice]
     build_errors: dict[str, Exception]
     connection_errors: dict[str, Exception]
 
     def or_raise(self) -> dict[str, Any]:
+        """Re-raise any errors from build or connect stage or return devices"""
         if self.build_errors or self.connection_errors:
             all_exc = []
             for name, exc in (self.build_errors | self.connection_errors).items():
@@ -310,10 +321,13 @@ class ConnectionResult(NamedTuple):
 
 
 class DeviceBuildResult(NamedTuple):
+    """Wrapper around the results of building devices"""
+
     devices: dict[str, ConnectionSpec]
     errors: dict[str, Exception]
 
     def connect(self, timeout: float | None = None) -> ConnectionResult:
+        """Connect all devices that didn't fail to build"""
         connections = {}
         connected = {}
         loop: asyncio.EventLoop = get_bluesky_event_loop()  # type: ignore
@@ -339,6 +353,7 @@ class DeviceBuildResult(NamedTuple):
         return ConnectionResult(connected, self.errors, connection_errors)
 
     def or_raise(self) -> Self:
+        """Re-raise any build errors"""
         if self.errors:
             for name, exc in self.errors.items():
                 exc.add_note(name)
@@ -347,6 +362,8 @@ class DeviceBuildResult(NamedTuple):
 
 
 class DeviceManager:
+    """Manager to handle building and connecting interdependent devices"""
+
     _factories: dict[str, DeviceFactory]
     _fixtures: dict[str, Callable[[], Any]]
     _v1_factories: dict[str, V1DeviceFactory]
