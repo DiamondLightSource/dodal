@@ -185,24 +185,24 @@ class UndulatorPhaseMotor(StandardReadable):
         name : str
             Name of the Id phase device
         """
-        fullPV = f"{prefix}BL{infix}"
-        self.user_setpoint = epics_signal_w(str, fullPV + "SET")
-        self.user_setpoint_readback = epics_signal_r(float, fullPV + "DMD")
-        fullPV = fullPV + "MTR"
+        full_pv = f"{prefix}BL{infix}"
+        self.user_setpoint = epics_signal_w(str, full_pv + "SET")
+        self.user_setpoint_readback = epics_signal_r(float, full_pv + "DMD")
+        full_pv = full_pv + "MTR"
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
-            self.user_readback = epics_signal_r(float, fullPV + ".RBV")
+            self.user_readback = epics_signal_r(float, full_pv + ".RBV")
 
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
-            self.motor_egu = epics_signal_r(str, fullPV + ".EGU")
-            self.velocity = epics_signal_rw(float, fullPV + ".VELO")
+            self.motor_egu = epics_signal_r(str, full_pv + ".EGU")
+            self.velocity = epics_signal_rw(float, full_pv + ".VELO")
 
-        self.max_velocity = epics_signal_r(float, fullPV + ".VMAX")
-        self.acceleration_time = epics_signal_rw(float, fullPV + ".ACCL")
-        self.precision = epics_signal_r(int, fullPV + ".PREC")
-        self.deadband = epics_signal_r(float, fullPV + ".RDBD")
-        self.motor_done_move = epics_signal_r(int, fullPV + ".DMOV")
-        self.low_limit_travel = epics_signal_rw(float, fullPV + ".LLM")
-        self.high_limit_travel = epics_signal_rw(float, fullPV + ".HLM")
+        self.max_velocity = epics_signal_r(float, full_pv + ".VMAX")
+        self.acceleration_time = epics_signal_rw(float, full_pv + ".ACCL")
+        self.precision = epics_signal_r(int, full_pv + ".PREC")
+        self.deadband = epics_signal_r(float, full_pv + ".RDBD")
+        self.motor_done_move = epics_signal_r(int, full_pv + ".DMOV")
+        self.low_limit_travel = epics_signal_rw(float, full_pv + ".LLM")
+        self.high_limit_travel = epics_signal_rw(float, full_pv + ".HLM")
         super().__init__(name=name)
 
 
@@ -471,6 +471,27 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
     def _read_energy(self, energy: float) -> float:
         """Readback for energy is just the set value."""
         return energy
+
+    async def _check_and_get_pol_setpoint(self) -> Pol:
+        """
+        Check the polarisation setpoint and if it is NONE try to read it from
+        hardware.
+        """
+
+        pol = await self.polarisation_setpoint.get_value()
+
+        if pol == Pol.NONE:
+            LOGGER.warning(
+                "Found no setpoint for polarisation. Attempting to"
+                " determine polarisation from hardware..."
+            )
+            pol = await self.polarisation.get_value()
+            if pol == Pol.NONE:
+                raise ValueError(
+                    f"Polarisation cannot be determined from hardware for {self.name}"
+                )
+            self._polarisation_setpoint_set(pol)
+        return pol
 
     async def _set_pol(
         self,
