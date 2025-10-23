@@ -7,7 +7,7 @@ from dodal.devices.electron_analyser.specs import SpecsDetector
 from dodal.devices.i09.dcm import DCM
 from dodal.devices.i09_1 import LensMode, PsuMode
 from dodal.devices.synchrotron import Synchrotron
-from dodal.devices.undulator import UndulatorInMm
+from dodal.devices.undulator import UndulatorInMm, UndulatorOrder
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
@@ -47,3 +47,8 @@ def analyser() -> SpecsDetector[LensMode, PsuMode]:
 @device_factory()
 def undulator() -> UndulatorInMm:
     return UndulatorInMm(prefix=f"{PREFIX.beamline_prefix}-MO-UND-01:")
+
+
+@device_factory()
+def harmonics() -> UndulatorOrder:
+    return UndulatorOrder(name="harmonics")
