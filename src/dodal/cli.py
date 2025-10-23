@@ -10,7 +10,7 @@ from ophyd_async.core import NotConnectedError, StaticPathProvider, UUIDFilename
 from ophyd_async.plan_stubs import ensure_connected
 
 from dodal.beamlines import all_beamline_names, module_name_for_beamline
-from dodal.beamlines.dm_demo import DeviceManager
+from dodal.device_manager import DeviceManager
 from dodal.common.beamlines.beamline_utils import set_path_provider
 from dodal.utils import AnyDevice, filter_ophyd_devices, make_all_devices
 
