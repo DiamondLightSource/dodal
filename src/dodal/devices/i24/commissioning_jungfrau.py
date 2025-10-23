@@ -5,11 +5,13 @@ from pathlib import Path
 from bluesky.protocols import StreamAsset
 from event_model import DataKey  # type: ignore
 from ophyd_async.core import (
+    AsyncStatus,
     AutoIncrementingPathProvider,
     DetectorWriter,
     StandardDetector,
     StandardReadable,
     StaticPathProvider,
+    TriggerInfo,
     observe_value,
     wait_for_value,
 )
@@ -40,6 +42,7 @@ class JunfrauCommissioningWriter(DetectorWriter, StandardReadable):
             self.file_name = epics_signal_rw_rbv(str, f"{prefix}FileName")
             self.file_path = epics_signal_rw_rbv(str, f"{prefix}FilePath")
             self.writer_ready = epics_signal_r(int, f"{prefix}Ready_RBV")
+            self.expected_frames = epics_signal_rw(int, f"{prefix}NumCapture")
         super().__init__(name)
 
     async def open(self, name: str, exposures_per_event: int = 1) -> dict[str, DataKey]:
@@ -80,7 +83,7 @@ class JunfrauCommissioningWriter(DetectorWriter, StandardReadable):
     async def observe_indices_written(
         self, timeout: float
     ) -> AsyncGenerator[int, None]:
-        timeout = timeout * 2  # This filewriter is slow
+        timeout = timeout * 4  # This filewriter is very slow
         async for num_captured in observe_value(self.frame_counter, timeout):
             yield num_captured // (self._exposures_per_event)
 
@@ -112,3 +115,8 @@ class CommissioningJungfrau(
         writer = JunfrauCommissioningWriter(writer_prefix, path_provider)
         controller = JungfrauController(self.drv)
         super().__init__(controller, writer, name=name)
+
+    @AsyncStatus.wrap
+    async def prepare(self, value: TriggerInfo) -> None:
+        await super().prepare(value)
+        await self._writer.expected_frames.set(value.total_number_of_exposures)

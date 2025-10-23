@@ -7,7 +7,11 @@ from dodal.common.beamlines.beamline_utils import (
     device_factory,
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.devices.attenuator.attenuator import ReadOnlyAttenuator
+from dodal.devices.attenuator.attenuator import EnumFilterAttenuator
+from dodal.devices.attenuator.filter_selections import (
+    I24FilterOneSelections,
+    I24FilterTwoSelections,
+)
 from dodal.devices.hutch_shutter import HutchShutter
 from dodal.devices.i24.aperture import Aperture
 from dodal.devices.i24.beam_center import DetectorBeamCenter
@@ -49,12 +53,13 @@ PREFIX = BeamlinePrefix(BL)
 
 
 @device_factory()
-def attenuator() -> ReadOnlyAttenuator:
+def attenuator() -> EnumFilterAttenuator:
     """Get a read-only attenuator device for i24, instantiate it if it hasn't already
     been. If this is called when already instantiated in i24, it will return the
     existing object."""
-    return ReadOnlyAttenuator(
+    return EnumFilterAttenuator(
         f"{PREFIX.beamline_prefix}-OP-ATTN-01:",
+        filter_selection=(I24FilterOneSelections, I24FilterTwoSelections),
     )
 
 

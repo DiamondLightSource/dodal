@@ -37,7 +37,7 @@ mock_paths = [
 ]
 mock_attributes_table = {
     "i03": mock_paths,
-    "i10": mock_paths,
+    "i10_optics": mock_paths,
     "i04": mock_paths,
     "s04": mock_paths,
     "i19_1": mock_paths,
@@ -106,7 +106,7 @@ async def static_path_provider(
 
 
 @pytest.fixture
-def run_engine_documents(RE: RunEngine) -> Mapping[str, list[dict]]:
+def run_engine_documents(run_engine: RunEngine) -> Mapping[str, list[dict]]:
     docs: dict[str, list[dict]] = {}
 
     def append_and_print(name, doc):
@@ -114,7 +114,7 @@ def run_engine_documents(RE: RunEngine) -> Mapping[str, list[dict]]:
             docs[name] = []
         docs[name] += [doc]
 
-    RE.subscribe(append_and_print)
+    run_engine.subscribe(append_and_print)
     return docs
 
 
@@ -126,16 +126,16 @@ def failed_status(failure: Exception) -> Status:
 
 @pytest.fixture(scope="session", autouse=True)
 async def _ensure_running_bluesky_event_loop():
-    RE = RunEngine()
+    run_engine = RunEngine()
     # make sure the event loop is thoroughly up and running before we try to create
     # any ophyd_async devices which might need it
     timeout = time.monotonic() + 1
-    while not RE.loop.is_running():
+    while not run_engine.loop.is_running():
         await asyncio.sleep(0)
         if time.monotonic() > timeout:
             raise TimeoutError("This really shouldn't happen but just in case...")
 
 
 @pytest.fixture()
-async def RE():
+async def run_engine():
     yield RunEngine()
