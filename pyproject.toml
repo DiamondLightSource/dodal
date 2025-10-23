@@ -136,6 +136,8 @@ testpaths = "docs src tests system_tests"
 exclude_also = [
     '^"""', # Ignore the start/end of a file-level triple quoted docstring
 ]
+# Exclude pytest.fixtures from code coverage report
+omit = ["*/dodal/testing/fixtures/*"]
 
 [tool.coverage.run]
 data_file = "/tmp/dodal.coverage"
