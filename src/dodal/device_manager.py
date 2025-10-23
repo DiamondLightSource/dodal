@@ -291,14 +291,11 @@ class V1DeviceFactory(Generic[V1]):
             return device  # type: ignore - it's us really, promise
 
 
-class ConnectionParameters(NamedTuple):
-    mock: bool
-    timeout: float
-
 
 class ConnectionSpec(NamedTuple):
     device: OphydV2Device
-    params: ConnectionParameters
+    mock: bool
+    timeout: float
 
 
 class ConnectionResult(NamedTuple):
@@ -324,7 +321,7 @@ class DeviceBuildResult(NamedTuple):
         connections = {}
         connected = {}
         loop: asyncio.EventLoop = get_bluesky_event_loop()  # type: ignore
-        for name, (device, (mock, dev_timeout)) in self.devices.items():
+        for name, (device, mock, dev_timeout) in self.devices.items():
             if not isinstance(device, OphydV2Device):
                 connected[name] = device
                 continue
@@ -504,10 +501,8 @@ class DeviceManager:
                     built_device = factory._create(**params)
                     built[device] = ConnectionSpec(
                         built_device,
-                        ConnectionParameters(
-                            mock=mock or factory.mock,
-                            timeout=factory.timeout,
-                        ),
+                        mock=mock or factory.mock,
+                        timeout=factory.timeout,
                     )
                 except Exception as e:
                     errors[device] = e
