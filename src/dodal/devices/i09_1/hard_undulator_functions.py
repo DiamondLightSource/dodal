@@ -1,5 +1,4 @@
 import numpy as np
-from scipy.constants import physical_constants
 
 from dodal.devices.util.lookup_tables import energy_distance_table
 from dodal.log import LOGGER
@@ -8,9 +7,7 @@ LUT_COMMENTS = ["#"]
 HU_SKIP_ROWS = 3
 
 # Physics constants
-ELECTRON_REST_ENERGY_MEV = physical_constants["electron mass energy equivalent in MeV"][
-    0
-]
+ELECTRON_REST_ENERGY_MEV = 0.510999
 
 # Columns in the lookup table
 RING_ENERGY_COLUMN = 1
