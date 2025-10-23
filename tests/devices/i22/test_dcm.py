@@ -77,6 +77,7 @@ async def test_reading(dcm: DCM):
             "dcm-crystal_2_temp": partial_reading(0.0),
             "dcm-crystal_metadata_d_spacing_a": partial_reading(0.0),
             "dcm-energy_in_kev": partial_reading(0.0),
+            "dcm-energy_in_ev": partial_reading(0.0),
             "dcm-offset_in_mm": partial_reading(0.0),
             "dcm-perp": partial_reading(0.0),
             "dcm-perp_temp": partial_reading(0.0),
