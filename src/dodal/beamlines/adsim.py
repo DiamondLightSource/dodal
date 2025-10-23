@@ -90,4 +90,5 @@ def det(path_provider: PathProvider) -> SimDetector:
 
 @devices.v1_init(factory=EpicsMotor, prefix=f"{PREFIX.beamline_prefix}-MO-SIMC-01:M1")
 def old_motor(motor: EpicsMotor):
-    print(f"Built {motor}")
+    # arbitrary post-init configuration
+    motor.settle_time = 12

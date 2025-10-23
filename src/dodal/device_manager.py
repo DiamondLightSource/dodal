@@ -63,8 +63,8 @@ class LazyFixtures(Mapping[str, Any]):
         provided: Mapping[str, Any] | None,
         factories: Mapping[str, Callable[[], Any]],
     ):
-        self.ready = dict(provided or {})
         # wrap to prevent modification escaping
+        self.ready = dict(provided or {})
         # drop duplicate keys so the len and iter methods are easier
         self.lazy = {k: v for k, v in factories.items() if k not in self.ready}
 
@@ -166,7 +166,6 @@ class DeviceFactory(Generic[Args, V2]):
         )
         if devices.errors:
             # TODO: NotBuilt?
-            print(devices.errors)
             raise Exception("??? build")
         else:
             if connect_immediately:
@@ -286,7 +285,6 @@ class V1DeviceFactory(Generic[V1]):
         )
         if devices.errors:
             # TODO: NotBuilt?
-            print(devices.errors)
             raise Exception("??? build")
         else:
             device = devices.devices[self.name].device
@@ -366,7 +364,6 @@ class DeviceManager:
     def v1_init(
         self,
         factory: type[V1],
-        # name: str,
         prefix: str,
         mock: bool = False,
         skip: SkipType = False,
@@ -479,10 +476,7 @@ class DeviceManager:
                 f"Factories ({common}) will be overridden by fixtures", stacklevel=1
             )
             factories = tuple(f for f in factories if f.name not in common)
-        # if unknown := {f for f in factories if f not in self._factories.values()}:
-        #     raise ValueError(f"Factories ({unknown}) are unknown to this manager")
         build_list = self._expand_dependencies(factories, fixtures)
-        # print(build_list)
         order = self._build_order(
             {dep: self[dep] for dep in build_list}, fixtures=fixtures
         )
@@ -544,13 +538,10 @@ class DeviceManager:
         dependencies = set()
         factories = set(factories)
         while factories:
-            # print(dependencies)
             fact = factories.pop()
             dependencies.add(fact.name)
             options = fact.optional_dependencies
-            # print(f"  {fact.name}")
             for dep in fact.dependencies:
-                # print(f"    {dep}")
                 if dep not in dependencies and dep not in available_fixtures:
                     if dep in self._factories:
                         factories.add(self[dep])
