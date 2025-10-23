@@ -6,8 +6,10 @@ from ophyd_async.core import (
 from ophyd_async.epics.core import epics_signal_rw
 from ophyd_async.epics.motor import Motor
 
+from dodal.protocols import EnergySource
 
-class PGM(StandardReadable):
+
+class PGM(StandardReadable, EnergySource[Motor]):
     """
     Plane grating monochromator, it is use in soft x-ray beamline to generate monochromic beam.
     """
