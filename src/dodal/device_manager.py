@@ -401,7 +401,7 @@ class DeviceManager:
                 mock=mock,
                 skip=skip,
                 wait=wait,
-                timeout=DEFAULT_TIMEOUT,
+                timeout=timeout,
                 init=init,
                 manager=self,
             )
