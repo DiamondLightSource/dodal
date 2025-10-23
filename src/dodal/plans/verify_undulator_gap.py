@@ -2,8 +2,8 @@ from typing import Protocol, runtime_checkable
 
 from bluesky import plan_stubs as bps
 
-from dodal.devices.undulator import UndulatorInKeV
 from dodal.devices.common_dcm import DoubleCrystalMonochromatorBase
+from dodal.devices.undulator import UndulatorInKeV
 
 
 @runtime_checkable
