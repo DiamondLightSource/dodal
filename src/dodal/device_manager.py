@@ -184,6 +184,7 @@ class DeviceFactory(Generic[Args, V2]):
         )
         if devices.errors:
             # TODO: NotBuilt?
+            print(devices.errors)
             raise Exception("??? build")
         else:
             if connect_immediately:
@@ -674,6 +675,23 @@ def unknown():
     return "unknown device"
 
 
+@devices.factory
+def one(): ...
+
+
+@devices.factory
+def two(one): ...
+
+
+@devices.factory
+def three(one, two): ...
+
+
+@devices.factory
+def four(one, two, three):
+    return 4
+
+
 others = DeviceManager()
 
 
@@ -746,9 +764,17 @@ if __name__ == "__main__":
 
     # print(base_x())
 
-    res = devices.build_all(fixtures={"path_provider": "nt_path_provider"})
-    print(res)
-    conn = res.connect()
-    print(conn)
+    # res = devices.build_all(fixtures={"path_provider": "nt_path_provider"})
+    # print(res)
+    # conn = res.connect()
+    # print(conn)
+
+    # res = four.build()
+    # print(res)
 
     # devices.build_devices(circ_1, circ_2)
+
+    # print(old_motor.dependencies)
+    print(old_motor.build(mock=False))
+
+    # res = others.build_all()
