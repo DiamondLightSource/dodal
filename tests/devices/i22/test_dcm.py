@@ -33,11 +33,11 @@ async def dcm() -> DCM:
 
 
 def test_count_dcm(
-    RE: RunEngine,
+    run_engine: RunEngine,
     run_engine_documents: dict[str, list[dict]],
     dcm: DCM,
 ):
-    RE(bp.count([dcm]))
+    run_engine(bp.count([dcm]))
     assert_emitted(
         run_engine_documents,
         start=1,
@@ -77,6 +77,7 @@ async def test_reading(dcm: DCM):
             "dcm-crystal_2_temp": partial_reading(0.0),
             "dcm-crystal_metadata_d_spacing_a": partial_reading(0.0),
             "dcm-energy_in_kev": partial_reading(0.0),
+            "dcm-energy_in_ev": partial_reading(0.0),
             "dcm-offset_in_mm": partial_reading(0.0),
             "dcm-perp": partial_reading(0.0),
             "dcm-perp_temp": partial_reading(0.0),
