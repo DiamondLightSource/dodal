@@ -24,7 +24,7 @@ from dodal.devices.i22.fswitch import FSwitch
 from dodal.devices.i22.nxsas import NXSasMetadataHolder, NXSasOAV, NXSasPilatus
 from dodal.devices.linkam3 import Linkam3
 from dodal.devices.motors import XYPitchStage
-from dodal.devices.slits import Slits
+from dodal.devices.slits import Slits, SlitsWithIndividualBlades
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.tetramm import TetrammDetector
 from dodal.devices.undulator import Undulator
@@ -187,18 +187,18 @@ def undulator() -> Undulator:
 
 
 @device_factory()
-def slits_1() -> Slits:
-    return Slits(prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-01:")
+def slits_1() -> SlitsWithIndividualBlades:
+    return SlitsWithIndividualBlades(prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-01:")
 
 
 @device_factory()
-def slits_2() -> Slits:
-    return Slits(prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-02:")
+def slits_2() -> SlitsWithIndividualBlades:
+    return SlitsWithIndividualBlades(prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-02:")
 
 
 @device_factory()
-def slits_3() -> Slits:
-    return Slits(prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-03:")
+def slits_3() -> SlitsWithIndividualBlades:
+    return SlitsWithIndividualBlades(prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-03:")
 
 
 @device_factory()
@@ -207,13 +207,13 @@ def slits_4() -> Slits:
 
 
 @device_factory()
-def slits_5() -> Slits:
-    return Slits(prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-05:")
+def slits_5() -> SlitsWithIndividualBlades:
+    return SlitsWithIndividualBlades(prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-05:")
 
 
 @device_factory()
-def slits_6() -> Slits:
-    return Slits(prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-06:")
+def slits_6() -> SlitsWithIndividualBlades:
+    return SlitsWithIndividualBlades(prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-06:")
 
 
 @device_factory()
