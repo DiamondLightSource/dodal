@@ -172,6 +172,7 @@ class DeviceFactory(Generic[Args, V2]):
         return device  # type: ignore - it's us, honest
 
     def _create(self, *args, **kwargs) -> V2:
+        # TODO: Remove when v1 support is no longer required
         return self(*args, **kwargs)
 
     def __call__(self, *args, **kwargs) -> V2:
@@ -187,6 +188,7 @@ class DeviceFactory(Generic[Args, V2]):
         return f"<{self.name}: DeviceFactory ({params}) -> {target}>"
 
 
+# TODO: Remove when ophyd v1 support is no longer required
 class V1DeviceFactory(Generic[V1]):
     """
     Wrapper around an ophyd v1 device that holds a reference to a device
@@ -327,6 +329,8 @@ class DeviceBuildResult(NamedTuple):
         loop: asyncio.EventLoop = get_bluesky_event_loop()  # type: ignore
         for name, (device, mock, dev_timeout) in self.devices.items():
             if not isinstance(device, OphydV2Device):
+                # TODO: Remove when ophyd v1 support is no longer required
+                # V1 devices are connected at creation time assuming wait is not set to False
                 connected[name] = device
                 continue
             timeout = timeout or dev_timeout or DEFAULT_TIMEOUT
@@ -380,6 +384,13 @@ class DeviceManager:
         skip: SkipType = False,
         wait: bool = False,
     ):
+        """
+        Register an ophyd v1 device
+
+        The function this decorates is an initialiser that takes a built device
+        and is not used to create the device.
+        """
+
         def decorator(init: OphydInitialiser[V1]):
             name = init.__name__
             if name in self:
@@ -511,6 +522,7 @@ class DeviceManager:
                 }
                 try:
                     if isinstance(factory, V1DeviceFactory):
+                        # TODO: Remove when ophyd v1 support is no longer required
                         factory = factory.mock_if_needed(mock)
                     built_device = factory._create(**params)
                     built[device] = ConnectionSpec(
