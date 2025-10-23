@@ -19,7 +19,7 @@ async def test_read_and_describe_includes(
 
     expected_keys: list[str] = [
         "bragg_in_degrees",
-        "energy_in_kev",
+        "energy_in_keV",
         "offset_in_mm",
         "wavelength_in_a",
         "vertical_in_mm",
