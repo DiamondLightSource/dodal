@@ -289,6 +289,9 @@ class V1DeviceFactory(Generic[V1]):
         device = devices.devices[self.name].device
         return device  # type: ignore - it's us really, promise
 
+    def __repr__(self) -> str:
+        return f"<{self.name}: V1DeviceFactory({self.factory.__name__})>"
+
 
 class ConnectionSpec(NamedTuple):
     """A device paired with the options used to configure it"""
