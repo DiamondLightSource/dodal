@@ -176,7 +176,8 @@ class DeviceFactory(Generic[Args, V2]):
 
     def __call__(self, *args, **kwargs) -> V2:
         device = self.factory(*args, **kwargs)
-        device.set_name(self.name)
+        if self.use_factory_name:
+            device.set_name(self.name)
         return device
 
     def __repr__(self) -> str:
