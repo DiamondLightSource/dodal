@@ -282,14 +282,10 @@ class V1DeviceFactory(Generic[V1]):
             self,
             fixtures=fixtures,
             mock=mock,
-        )
-        if devices.errors:
-            # TODO: NotBuilt?
-            raise Exception("??? build")
-        else:
-            device = devices.devices[self.name].device
-            return device  # type: ignore - it's us really, promise
+        ).or_raise()
 
+        device = devices.devices[self.name].device
+        return device  # type: ignore - it's us really, promise
 
 
 class ConnectionSpec(NamedTuple):
@@ -341,6 +337,13 @@ class DeviceBuildResult(NamedTuple):
                 connection_errors[name] = e
 
         return ConnectionResult(connected, self.errors, connection_errors)
+
+    def or_raise(self) -> Self:
+        if self.errors:
+            for name, exc in self.errors.items():
+                exc.add_note(name)
+            raise ExceptionGroup("Some devices failed", tuple(self.errors.values()))
+        return self
 
 
 class DeviceManager:
