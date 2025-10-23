@@ -382,7 +382,8 @@ class DeviceManager:
         prefix: str,
         mock: bool = False,
         skip: SkipType = False,
-        wait: bool = False,
+        wait: bool = True,
+        timeout: int = DEFAULT_TIMEOUT,
     ):
         """
         Register an ophyd v1 device
