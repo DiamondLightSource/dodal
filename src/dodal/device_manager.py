@@ -4,7 +4,6 @@ import itertools
 import typing
 import warnings
 from collections.abc import Callable, Iterable, Mapping, MutableMapping
-from concurrent import futures
 from functools import cached_property, wraps
 from inspect import Parameter
 from types import NoneType
@@ -17,41 +16,24 @@ from typing import (
     ParamSpec,
     Self,
     TypeVar,
-    cast,
 )
 
 from bluesky.run_engine import (
     get_bluesky_event_loop,
 )
-from ophyd import EpicsMotor
 from ophyd.sim import make_fake_device
-from ophyd_async.core import PathProvider
-from ophyd_async.epics.adsimdetector import SimDetector
-from ophyd_async.epics.motor import Motor
 
-from dodal.common.beamlines.beamline_utils import (
-    set_beamline as set_utils_beamline,
-)
 from dodal.common.beamlines.beamline_utils import (
     wait_for_connection,
 )
-from dodal.common.beamlines.device_helpers import DET_SUFFIX, HDF5_SUFFIX
-from dodal.devices import motors
-from dodal.devices.motors import XThetaStage
-from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import (
     AnyDevice,
-    BeamlinePrefix,
     OphydV1Device,
     OphydV2Device,
     SkipType,
 )
 
-BL = "adsim"
 DEFAULT_TIMEOUT = 30
-PREFIX = BeamlinePrefix("t01")
-set_log_beamline(BL)
-set_utils_beamline(BL)
 
 T = TypeVar("T")
 Args = ParamSpec("Args")
@@ -622,159 +604,3 @@ class DeviceManager:
 
     def __repr__(self) -> str:
         return f"<DeviceManager: {len(self._factories)} devices>"
-
-
-devices = DeviceManager()
-
-
-@devices.factory(skip=True, timeout=13, mock=True, use_factory_name=False)
-def stage() -> XThetaStage:
-    """Build the stage"""
-    return XThetaStage(
-        f"{PREFIX.beamline_prefix}-MO-SIMC-01:", x_infix="M1", theta_infix="M2"
-    )
-
-
-@devices.factory(skip=stage.skip)
-def det(path_provider: PathProvider) -> SimDetector:
-    return SimDetector(
-        f"{PREFIX.beamline_prefix}-DI-CAM-01:",
-        path_provider=path_provider,
-        drv_suffix=DET_SUFFIX,
-        fileio_suffix=HDF5_SUFFIX,
-    )
-
-
-@devices.factory(mock=True)
-def base(base_x, base_y: motors.Motor) -> Motor:
-    # print(base_x)
-    # print(base_y)
-    return f"{base_x} - {base_y}"
-
-
-@devices.factory
-def base_x() -> motors.Motor:
-    # raise ValueError("Not a base_x")
-    return "base_x motor"
-
-
-@devices.factory(skip=True)
-def base_y(path_provider) -> motors.Motor:
-    # print(f"Using {path_provider=}")
-    return "base_y motor"
-
-
-@devices.factory
-def optional(base_x, base_z=42):
-    return (base_x, base_z)
-
-
-@devices.factory
-def unknown():
-    # raise ValueError("Unknown error")
-    return "unknown device"
-
-
-@devices.factory
-def one(): ...
-
-
-@devices.factory
-def two(one): ...
-
-
-@devices.factory
-def three(one, two): ...
-
-
-@devices.factory
-def four(one, two, three):
-    return 4
-
-
-others = DeviceManager()
-
-
-@others.factory
-def circ_1(circ_2): ...
-
-
-@others.factory
-def circ_2(circ_1): ...
-
-
-@devices.v1_init(factory=EpicsMotor, prefix=f"{PREFIX.beamline_prefix}-MO-SIMC-01:M1")
-def old_motor(motor: EpicsMotor, foo: int = 42):
-    print(f"Built {motor.name} with {foo=}")
-
-
-if __name__ == "__main__":
-    # for name, factory in devices._factories.items():
-    #     print(name, factory, factory.dependencies)
-    # print(devices._build_order({"path_provider": ["42"]}))
-
-    # print(devices["stage"])
-    # print(devices["unknown"])
-    # print(devices.build_all(fixtures={"path_provider": "numtracker"}))
-    # print(devices._required_fixtures((devices["base"], devices["base_y"])))
-    # print(devices._expand_dependencies([devices["base"]]))
-    # print(devices._expand_dependencies(list(devices._factories.values())))
-    # print(devices._build_order({"base": devices["base"]}))
-
-    # print(
-    #     "build_all",
-    #     devices.build_all({"path_provider": "all_nt", "base_y": "other base_y"}),
-    # )
-    # print(
-    #     "build_some",
-    #     devices.build_devices(
-    #         base, det, stage, unknown, fixtures={"path_provider": "numtracker"}
-    #     ),
-    # )
-
-    # print("base", optional)
-    # print("base_y", base_y)
-    # print("b1", b1 := base.build(path_provider="num_track"))
-    # print("b2", b2 := base(base_x="base_x motor", base_y="base_y motor"))
-    # print("b1 is b2", b1 is b2)
-
-    # print("unknown()", unknown())
-    # print("unknown.build()", unknown.build())
-
-    # print("circular", circ_1.build())
-
-    # print("optional deps", optional.dependencies)
-    # print("optional optional deps", optional.optional_dependencies)
-    # print("optional build", optional.build())
-    # print("optional with override", optional.build(base_z=14))
-    # print("optional without override", optional(17))
-    # print("optional override required", optional.build(base_x=19))
-
-    # valid, errs = devices.build_all(
-    #     fixtures={"base_x": 19, "path_provider": "numtrack"}
-    # )
-    # print(valid)
-    # print(errs)
-
-    # valid, errs = devices.build_devices(
-    #     base_x, base, optional, fixtures={"base_x": "19", "path_provider": "nt_pp"}
-    # )
-    # print(valid)
-    # print(errs)
-
-    # print(base_x())
-
-    # res = devices.build_all(fixtures={"path_provider": "nt_path_provider"})
-    # print(res)
-    # conn = res.connect()
-    # print(conn)
-
-    # res = four.build()
-    # print(res)
-
-    # devices.build_devices(circ_1, circ_2)
-
-    # print(old_motor.dependencies)
-    print(old_motor.build(mock=False))
-
-    # res = others.build_all()
