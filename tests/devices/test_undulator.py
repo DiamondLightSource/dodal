@@ -207,10 +207,10 @@ async def test_order_read(
 
 async def test_move_order(
     undulator_order: UndulatorOrder,
-    RE: RunEngine,
+    run_engine: RunEngine,
 ):
     assert (await undulator_order.locate())["readback"] == 3  # default order
-    RE(mv(undulator_order, 1))
+    run_engine(mv(undulator_order, 1))
     assert (await undulator_order.locate())["readback"] == 1  # no error
 
 
@@ -221,7 +221,6 @@ async def test_move_order(
 async def test_move_order_fails(
     undulator_order: UndulatorOrder,
     order_value: float | int,
-    RE: RunEngine,
 ):
     with pytest.raises(
         ValueError,
