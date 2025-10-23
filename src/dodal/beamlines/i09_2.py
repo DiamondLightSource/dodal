@@ -30,15 +30,25 @@ def pgm() -> PGM:
 
 
 @device_factory()
+def jid_gap() -> UndulatorGap:
+    return UndulatorGap(prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:")
+
+
+@device_factory()
+def jid_phase() -> UndulatorPhaseAxes:
+    return UndulatorPhaseAxes(
+        prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:",
+        top_outer="PUO",
+        top_inner="PUI",
+        btm_inner="PLI",
+        btm_outer="PLO",
+    )
+
+
+@device_factory()
 def jid() -> Apple2:
     """I09 soft x-ray insertion device."""
     return Apple2(
-        id_gap=UndulatorGap(prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:"),
-        id_phase=UndulatorPhaseAxes(
-            prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:",
-            top_outer="PUO",
-            top_inner="PUI",
-            btm_inner="PLI",
-            btm_outer="PLO",
-        ),
+        id_gap=jid_gap(),
+        id_phase=jid_phase(),
     )
