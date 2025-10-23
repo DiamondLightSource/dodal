@@ -3,6 +3,8 @@ from unittest.mock import AsyncMock, patch
 
 import numpy as np
 import pytest
+from bluesky.plan_stubs import mv
+from bluesky.run_engine import RunEngine
 from ophyd_async.core import init_devices
 from ophyd_async.testing import (
     assert_configuration,
@@ -18,6 +20,7 @@ from dodal.devices.undulator import (
     AccessError,
     UndulatorInKeV,
     UndulatorInMm,
+    UndulatorOrder,
     _get_gap_for_energy,
 )
 from dodal.testing import patch_all_motors
@@ -26,6 +29,13 @@ from tests.devices.test_data import (
 )
 
 LUT_DICT = {1: [0.0, 1.0], 2: [0.4, 0.3], 3: [1.0, 4.9]}
+
+
+@pytest.fixture
+async def undulator_order() -> UndulatorOrder:
+    async with init_devices(mock=True):
+        order = UndulatorOrder(name="undulator_order")
+    return order
 
 
 @pytest.fixture
@@ -184,3 +194,37 @@ async def test_undulator_mm_move(undulator_in_mm: UndulatorInMm):
         get_mock_put(undulator_in_mm.gap_motor.user_setpoint).assert_called_once_with(
             10.0, wait=True
         )
+
+
+async def test_order_read(
+    undulator_order: UndulatorOrder,
+):
+    await assert_reading(
+        undulator_order,
+        {"undulator_order-_order": partial_reading(3)},
+    )
+
+
+async def test_move_order(
+    undulator_order: UndulatorOrder,
+    RE: RunEngine,
+):
+    assert (await undulator_order.locate())["readback"] == 3  # default order
+    RE(mv(undulator_order, 1))
+    assert (await undulator_order.locate())["readback"] == 1  # no error
+
+
+@pytest.mark.parametrize(
+    "order_value",
+    [-1, 1.56],
+)
+async def test_move_order_fails(
+    undulator_order: UndulatorOrder,
+    order_value: float | int,
+    RE: RunEngine,
+):
+    with pytest.raises(
+        ValueError,
+        match="Undulator order must be a positive integer",
+    ):
+        await undulator_order.set(order_value)  # type: ignore
