@@ -5,8 +5,10 @@ from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
+from ophyd.status import Status
 from ophyd_async.core import (
     PathInfo,
+    PathProvider,
 )
 from tests.devices.i10.test_data import LOOKUP_TABLE_PATH
 from tests.devices.test_daq_configuration import MOCK_DAQ_CONFIG_PATH
@@ -19,6 +21,7 @@ from dodal.common.beamlines import beamline_utils
 from dodal.common.visit import (
     DirectoryServiceClient,
     LocalDirectoryServiceClient,
+    StaticVisitPathProvider,
 )
 from dodal.log import LOGGER, GELFTCPHandler, set_up_all_logging_handlers
 
@@ -40,6 +43,10 @@ mock_attributes_table = {
 
 BANNED_PATHS = [Path("/dls"), Path("/dls_sw")]
 environ["DODAL_TEST_MODE"] = "true"
+
+
+# Add run_engine fixtures to be used in tests
+pytest_plugins = ["dodal.testing.fixtures.run_engine"]
 
 
 @pytest.fixture(autouse=True)
@@ -87,5 +94,18 @@ def dummy_visit_client() -> DirectoryServiceClient:
     return LocalDirectoryServiceClient()
 
 
-# Add common fixtures to be used in testing
-pytest_plugins = ["dodal.testing.common_fixtures"]
+@pytest.fixture
+async def static_path_provider(
+    tmp_path: Path, dummy_visit_client: DirectoryServiceClient
+) -> PathProvider:
+    svpp = StaticVisitPathProvider(
+        beamline="ixx", root=tmp_path, client=dummy_visit_client
+    )
+    await svpp.update()
+    return svpp
+
+
+def failed_status(failure: Exception) -> Status:
+    status = Status()
+    status.set_exception(failure)
+    return status
