@@ -18,11 +18,11 @@ async def i11_dcm() -> DCM:
 
 
 def test_count_i11_dcm(
-    RE: RunEngine,
+    run_engine: RunEngine,
     run_engine_documents: dict[str, list[dict]],
     i11_dcm: DCM,
 ):
-    RE(bp.count([i11_dcm]))
+    run_engine(bp.count([i11_dcm]))
     assert_emitted(
         run_engine_documents,
         start=1,
