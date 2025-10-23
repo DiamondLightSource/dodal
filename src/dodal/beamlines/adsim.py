@@ -3,7 +3,7 @@ from ophyd.epics_motor import EpicsMotor
 from ophyd_async.core import PathProvider, StaticPathProvider, UUIDFilenameProvider
 from ophyd_async.epics.adsimdetector import SimDetector
 
-from dodal.beamlines.dm_demo import DeviceManager
+from dodal.device_manager import DeviceManager
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.beamlines.device_helpers import DET_SUFFIX, HDF5_SUFFIX
 from dodal.devices.motors import XThetaStage
