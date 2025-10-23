@@ -15,6 +15,7 @@ from typing import (
     Generic,
     NamedTuple,
     ParamSpec,
+    Self,
     TypeVar,
     cast,
 )
@@ -193,7 +194,7 @@ class DeviceFactory(Generic[Args, V2]):
             device = devices.devices[self.name].device
             if name:
                 device.set_name(name)
-            return device
+            return device  # type: ignore - it's us, honest
 
     def _create(self, *args, **kwargs) -> V2:
         return self(*args, **kwargs)
@@ -266,6 +267,22 @@ class V1DeviceFactory(Generic[V1]):
         """
         return self._skip() if callable(self._skip) else self._skip
 
+    def mock_if_needed(self, mock=False) -> Self:
+        # TODO: Remove when Ophyd V1 support is no longer required
+        factory = (
+            make_fake_device(self.factory) if (self.mock or mock) else self.factory
+        )
+        return self.__class__(
+            factory=factory,
+            prefix=self.prefix,
+            mock=mock or self.mock,
+            skip=self._skip,
+            wait=self.wait,
+            timeout=self.timeout,
+            init=self.post_create,
+            manager=self._manager,
+        )
+
     def __call__(self, *args, **kwargs):
         """Call the wrapped function to make decorator transparent"""
         return self.post_create(*args, **kwargs)
@@ -289,15 +306,8 @@ class V1DeviceFactory(Generic[V1]):
             print(devices.errors)
             raise Exception("??? build")
         else:
-            # if connect_immediately:
-            #     conn = devices.connect(timeout=timeout or self.timeout)
-            #     if conn.connection_errors:
-            #         # TODO: NotConnected?
-            #         raise Exception("??? conn")
             device = devices.devices[self.name].device
-            # if name:
-            #     device.set_name(name)
-            return device
+            return device  # type: ignore - it's us really, promise
 
 
 class ConnectionParameters(NamedTuple):
@@ -306,7 +316,7 @@ class ConnectionParameters(NamedTuple):
 
 
 class ConnectionSpec(NamedTuple):
-    device: OphydV1Device | OphydV2Device
+    device: OphydV2Device
     params: ConnectionParameters
 
 
@@ -331,16 +341,19 @@ class DeviceBuildResult(NamedTuple):
 
     def connect(self, timeout: float | None = None) -> ConnectionResult:
         connections = {}
+        connected = {}
         loop: asyncio.EventLoop = get_bluesky_event_loop()  # type: ignore
         for name, (device, (mock, dev_timeout)) in self.devices.items():
+            if not isinstance(device, OphydV2Device):
+                connected[name] = device
+                continue
             timeout = timeout or dev_timeout or DEFAULT_TIMEOUT
-            fut: futures.Future = asyncio.run_coroutine_threadsafe(
+            fut = asyncio.run_coroutine_threadsafe(
                 device.connect(mock=mock, timeout=timeout),
                 loop=loop,
             )
             connections[name] = fut
 
-        connected = {}
         connection_errors = {}
         for name, connection_future in connections.items():
             try:
@@ -509,6 +522,8 @@ class DeviceManager:
                     is not _EMPTY
                 }
                 try:
+                    if isinstance(factory, V1DeviceFactory):
+                        factory = factory.mock_if_needed(mock)
                     built_device = factory._create(**params)
                     built[device] = ConnectionSpec(
                         built_device,
