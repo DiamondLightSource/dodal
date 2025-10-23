@@ -8,14 +8,14 @@ from ophyd_async.sim import PatternGenerator, SimBlobDetector, SimMotor
 
 from dodal.devices.common_dcm import DoubleCrystalMonochromatorBase
 from dodal.devices.i03.dcm import DCM
-from dodal.devices.undulator import Undulator
+from dodal.devices.undulator import UndulatorInKeV
 from tests.devices.test_data import (
     TEST_BEAMLINE_UNDULATOR_TO_GAP_LUT,
 )
 
 
 class UndulatorGapCheckDevices:
-    def __init__(self, undulator: Undulator, dcm: DoubleCrystalMonochromatorBase):
+    def __init__(self, undulator: UndulatorInKeV, dcm: DoubleCrystalMonochromatorBase):
         self.undulator = undulator
         self.dcm = dcm
 
@@ -23,7 +23,7 @@ class UndulatorGapCheckDevices:
 @pytest.fixture
 async def mock_undulator_and_dcm() -> UndulatorGapCheckDevices:
     async with init_devices(mock=True):
-        undulator = Undulator(
+        undulator = UndulatorInKeV(
             "",
             id_gap_lookup_table_path=TEST_BEAMLINE_UNDULATOR_TO_GAP_LUT,
         )

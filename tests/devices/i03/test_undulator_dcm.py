@@ -10,7 +10,7 @@ from dodal.common.enums import EnabledDisabledUpper
 from dodal.devices.baton import Baton
 from dodal.devices.i03.dcm import DCM
 from dodal.devices.i03.undulator_dcm import UndulatorDCM
-from dodal.devices.undulator import AccessError, Undulator
+from dodal.devices.undulator import AccessError, UndulatorInKeV
 from dodal.log import LOGGER
 from dodal.testing import patch_all_motors
 from tests.devices.test_daq_configuration import MOCK_DAQ_CONFIG_PATH
@@ -38,7 +38,7 @@ def flush_event_loop_on_finish():
 async def fake_undulator_dcm() -> UndulatorDCM:
     async with init_devices(mock=True):
         baton = Baton("BATON-01:")
-        undulator = Undulator(
+        undulator = UndulatorInKeV(
             "UND-01",
             name="undulator",
             poles=80,
