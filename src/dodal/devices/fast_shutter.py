@@ -21,8 +21,8 @@ class GenericFastShutter(StandardReadable, Movable[StrictEnumT]):
         await shutter.set(shutter.open_state)
         await shutter.set(shutter.close_state)
     OR
-        RE(bps.mv(shutter, shutter.open_state))
-        RE(bps.mv(shutter, shutter.close_state))
+        run_engine(bps.mv(shutter, shutter.open_state))
+        run_engine(bps.mv(shutter, shutter.close_state))
     """
 
     def __init__(
