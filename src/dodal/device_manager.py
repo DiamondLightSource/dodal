@@ -163,20 +163,13 @@ class DeviceFactory(Generic[Args, V2]):
             self,
             fixtures=fixtures,
             mock=mock,
-        )
-        if devices.errors:
-            # TODO: NotBuilt?
-            raise Exception("??? build")
-        else:
-            if connect_immediately:
-                conn = devices.connect(timeout=timeout or self.timeout)
-                if conn.connection_errors:
-                    # TODO: NotConnected?
-                    raise Exception("??? conn")
-            device = devices.devices[self.name].device
-            if name:
-                device.set_name(name)
-            return device  # type: ignore - it's us, honest
+        ).or_raise()
+        if connect_immediately:
+            devices.connect(timeout=timeout or self.timeout).or_raise()
+        device = devices.devices[self.name].device
+        if name:
+            device.set_name(name)
+        return device  # type: ignore - it's us, honest
 
     def _create(self, *args, **kwargs) -> V2:
         return self(*args, **kwargs)
