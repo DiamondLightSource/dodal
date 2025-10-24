@@ -2,8 +2,8 @@ import re
 
 import pytest
 
-from dodal.devices.i09_1 import calculate_gap_i09_hu, get_hu_lut_as_dict
-from tests.devices.i09_1.test_data import TEST_HARD_UNDULATOR_LUT
+from dodal.devices.i09_1_shared import calculate_gap_i09_hu, get_hu_lut_as_dict
+from tests.devices.i09_1_shared.test_data import TEST_HARD_UNDULATOR_LUT
 
 
 @pytest.fixture
