@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.util.lookup_tables &#8212; dodal 1.63.1.dev5+g4a296b077 documentation</title>
+    <title>dodal.devices.util.lookup_tables &#8212; dodal 1.63.1.dev6+g4bdbb0521 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=c762a2cf"></script>
+    <script src="../../_static/documentation_options.js?v=f7fb9cd0"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -704,6 +704,7 @@
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.i09_1.PsuMode.html">dodal.devices.i09_1.PsuMode</a></li>
 </ul>
 </details></li>
+<li class="toctree-l3"><a class="reference internal" href="dodal.devices.i09_1_shared.html">dodal.devices.i09_1_shared</a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.i10.html">dodal.devices.i10</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.i10.I10Diagnostic.html">dodal.devices.i10.I10Diagnostic</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.i10.I10Diagnostic5ADet.html">dodal.devices.i10.I10Diagnostic5ADet</a></li>
@@ -1085,7 +1086,7 @@ converts the source value s to a target value t for different values of s.</p>
 <p class="rubric">Functions</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#dodal.devices.util.lookup_tables.energy_distance_table" title="dodal.devices.util.lookup_tables.energy_distance_table"><code class="xref py py-obj docutils literal notranslate"><span class="pre">energy_distance_table</span></code></a>(lookup_table_path)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dodal.devices.util.lookup_tables.energy_distance_table" title="dodal.devices.util.lookup_tables.energy_distance_table"><code class="xref py py-obj docutils literal notranslate"><span class="pre">energy_distance_table</span></code></a>(lookup_table_path[, ...])</p></td>
 <td><p>Returns a numpy formatted lookup table for required positions of an ID gap to provide emission at a given beam energy.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#dodal.devices.util.lookup_tables.linear_extrapolation_lut" title="dodal.devices.util.lookup_tables.linear_extrapolation_lut"><code class="xref py py-obj docutils literal notranslate"><span class="pre">linear_extrapolation_lut</span></code></a>(s_values, t_values)</p></td>
@@ -1102,12 +1103,16 @@ converts the source value s to a target value t for different values of s.</p>
 </div>
 <dl class="py function">
 <dt class="sig sig-object py" id="dodal.devices.util.lookup_tables.energy_distance_table">
-<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dodal.devices.util.lookup_tables.</span></span><span class="sig-name descname"><span class="pre">energy_distance_table</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lookup_table_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="../../_modules/dodal/devices/util/lookup_tables.html#energy_distance_table"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.util.lookup_tables.energy_distance_table" title="Link to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dodal.devices.util.lookup_tables.</span></span><span class="sig-name descname"><span class="pre">energy_distance_table</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lookup_table_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">comments</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence" title="(in Python v3.14)"><span class="pre">Sequence</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">['#',</span> <span class="pre">'Units']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skiprows</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="../../_modules/dodal/devices/util/lookup_tables.html#energy_distance_table"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.util.lookup_tables.energy_distance_table" title="Link to this definition">#</a></dt>
 <dd><p>Returns a numpy formatted lookup table for required positions of an ID gap to
 provide emission at a given beam energy.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>lookup_table_path</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Path to lookup table</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lookup_table_path</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Path to lookup table</p></li>
+<li><p><strong>comments</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>, default: <code class="docutils literal notranslate"><span class="pre">[&quot;#&quot;,</span> <span class="pre">&quot;Units&quot;]</span></code>) – Lines starting with any of these strings will be ignored</p></li>
+<li><p><strong>skiprows</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">0</span></code>) – Number of rows to skip at the start of the file</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Lookup table</p>

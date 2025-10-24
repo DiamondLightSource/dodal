@@ -46,6 +46,7 @@
    dodal.devices.i07
    dodal.devices.i09
    dodal.devices.i09_1
+   dodal.devices.i09_1_shared
    dodal.devices.i10
    dodal.devices.i11
    dodal.devices.i13_1

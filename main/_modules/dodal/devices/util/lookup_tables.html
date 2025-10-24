@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.util.lookup_tables &#8212; dodal 1.63.1.dev5+g4a296b077 documentation</title>
+    <title>dodal.devices.util.lookup_tables &#8212; dodal 1.63.1.dev6+g4bdbb0521 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=c762a2cf"></script>
+    <script src="../../../../_static/documentation_options.js?v=f7fb9cd0"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -467,13 +467,19 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="energy_distance_table">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.util.lookup_tables.html#dodal.devices.util.lookup_tables.energy_distance_table">[docs]</a>
-<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">energy_distance_table</span><span class="p">(</span><span class="n">lookup_table_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">energy_distance_table</span><span class="p">(</span>
+    <span class="n">lookup_table_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">comments</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;#&quot;</span><span class="p">,</span> <span class="s2">&quot;Units&quot;</span><span class="p">],</span>
+    <span class="n">skiprows</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns a numpy formatted lookup table for required positions of an ID gap to</span>
 <span class="sd">    provide emission at a given beam energy.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        lookup_table_path: Path to lookup table</span>
+<span class="sd">        comments: Lines starting with any of these strings will be ignored</span>
+<span class="sd">        skiprows: Number of rows to skip at the start of the file</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        ndarray: Lookup table</span>
@@ -483,7 +489,7 @@ window.addEventListener("load", () => mermaid.run());
     <span class="c1"># decodes the text</span>
     <span class="k">async</span> <span class="k">with</span> <span class="n">aiofiles</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">lookup_table_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">stream</span><span class="p">:</span>
         <span class="n">raw_table</span> <span class="o">=</span> <span class="k">await</span> <span class="n">stream</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
-    <span class="k">return</span> <span class="n">loadtxt</span><span class="p">(</span><span class="n">StringIO</span><span class="p">(</span><span class="n">raw_table</span><span class="p">),</span> <span class="n">comments</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;#&quot;</span><span class="p">,</span> <span class="s2">&quot;Units&quot;</span><span class="p">])</span></div>
+    <span class="k">return</span> <span class="n">loadtxt</span><span class="p">(</span><span class="n">StringIO</span><span class="p">(</span><span class="n">raw_table</span><span class="p">),</span> <span class="n">comments</span><span class="o">=</span><span class="n">comments</span><span class="p">,</span> <span class="n">skiprows</span><span class="o">=</span><span class="n">skiprows</span><span class="p">)</span></div>
 
 
 
