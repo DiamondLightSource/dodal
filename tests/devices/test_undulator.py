@@ -3,6 +3,8 @@ from unittest.mock import AsyncMock, patch
 
 import numpy as np
 import pytest
+from bluesky import RunEngine
+from bluesky.plan_stubs import mv
 from ophyd_async.core import init_devices
 from ophyd_async.testing import (
     assert_configuration,
@@ -17,6 +19,7 @@ from dodal.devices.baton import Baton
 from dodal.devices.undulator import (
     AccessError,
     Undulator,
+    UndulatorOrder,
     _get_gap_for_energy,
 )
 from dodal.testing import patch_all_motors
@@ -46,6 +49,13 @@ def undulator_in_commissioning_mode(
 ) -> Generator[Undulator, None, None]:
     set_mock_value(undulator.baton_ref().commissioning, True)  # type: ignore
     yield undulator
+
+
+@pytest.fixture
+async def undulator_order() -> UndulatorOrder:
+    async with init_devices(mock=True):
+        order = UndulatorOrder(name="undulator_order")
+    return order
 
 
 async def test_reading_includes_read_fields(undulator: Undulator):
@@ -147,3 +157,36 @@ async def test_gap_access_check_move_not_inhibited_when_commissioning_mode_disab
         get_mock_put(undulator.gap_motor.user_setpoint).assert_called_once_with(
             15.0, wait=True
         )
+
+
+async def test_order_read(
+    undulator_order: UndulatorOrder,
+):
+    await assert_reading(
+        undulator_order,
+        {"undulator_order-_order": partial_reading(3)},
+    )
+
+
+async def test_move_order(
+    undulator_order: UndulatorOrder,
+    run_engine: RunEngine,
+):
+    assert (await undulator_order.locate())["readback"] == 3  # default order
+    run_engine(mv(undulator_order, 1))
+    assert (await undulator_order.locate())["readback"] == 1  # no error
+
+
+@pytest.mark.parametrize(
+    "order_value",
+    [-1, 1.56],
+)
+async def test_move_order_fails(
+    undulator_order: UndulatorOrder,
+    order_value: float | int,
+):
+    with pytest.raises(
+        ValueError,
+        match="Undulator order must be a positive integer",
+    ):
+        await undulator_order.set(order_value)  # type: ignore
