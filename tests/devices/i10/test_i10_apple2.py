@@ -19,9 +19,9 @@ from ophyd_async.testing import (
 
 from dodal.devices.apple2_undulator import (
     BeamEnergy,
+    EnabledDisabledUpper,
     InsertionDeviceEnergy,
     InsertionDevicePolarisation,
-    InsertionDeviceStatus,
     Pol,
     UndulatorGap,
     UndulatorGateStatus,
@@ -62,7 +62,7 @@ async def mock_id_gap(prefix: str = "BLXX-EA-DET-007:") -> UndulatorGap:
     set_mock_value(mock_id_gap.velocity, 1)
     set_mock_value(mock_id_gap.user_readback, 20)
     set_mock_value(mock_id_gap.user_setpoint, "20")
-    set_mock_value(mock_id_gap.status, InsertionDeviceStatus.ENABLED)
+    set_mock_value(mock_id_gap.status, EnabledDisabledUpper.ENABLED)
     return mock_id_gap
 
 
@@ -90,7 +90,7 @@ async def mock_phase_axes(prefix: str = "BLXX-EA-DET-007:") -> UndulatorPhaseAxe
     set_mock_value(mock_phase_axes.top_inner.user_setpoint_readback, 0)
     set_mock_value(mock_phase_axes.btm_outer.user_setpoint_readback, 0)
     set_mock_value(mock_phase_axes.btm_inner.user_setpoint_readback, 0)
-    set_mock_value(mock_phase_axes.status, InsertionDeviceStatus.ENABLED)
+    set_mock_value(mock_phase_axes.status, EnabledDisabledUpper.ENABLED)
     return mock_phase_axes
 
 
@@ -111,7 +111,7 @@ async def mock_jaw_phase(prefix: str = "BLXX-EA-DET-007:") -> UndulatorJawPhase:
     set_mock_value(mock_jaw_phase.gate, UndulatorGateStatus.CLOSE)
     set_mock_value(mock_jaw_phase.jaw_phase.velocity, 2)
     set_mock_value(mock_jaw_phase.jaw_phase.user_readback, 0)
-    set_mock_value(mock_jaw_phase.status, InsertionDeviceStatus.ENABLED)
+    set_mock_value(mock_jaw_phase.status, EnabledDisabledUpper.ENABLED)
     return mock_jaw_phase
 
 
@@ -280,7 +280,7 @@ async def test_fail_i10_apple2_controller_set_id_not_ready(
     mock_id_controller: I10Apple2Controller,
 ):
     set_mock_value(
-        mock_id_controller.apple2().gap.status, InsertionDeviceStatus.DISABLED
+        mock_id_controller.apple2().gap.status, EnabledDisabledUpper.DISABLED
     )
     with pytest.raises(RuntimeError) as e:
         await mock_id_controller.energy.set(600)
@@ -288,9 +288,7 @@ async def test_fail_i10_apple2_controller_set_id_not_ready(
         str(e.value)
         == mock_id_controller.apple2().gap.name + " is DISABLED and cannot move."
     )
-    set_mock_value(
-        mock_id_controller.apple2().gap.status, InsertionDeviceStatus.ENABLED
-    )
+    set_mock_value(mock_id_controller.apple2().gap.status, EnabledDisabledUpper.ENABLED)
     set_mock_value(mock_id_controller.apple2().gap.gate, UndulatorGateStatus.OPEN)
     with pytest.raises(RuntimeError) as e:
         await mock_id_controller.energy.set(600)

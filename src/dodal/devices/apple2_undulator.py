@@ -23,6 +23,7 @@ from ophyd_async.core import (
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw, epics_signal_w
 from ophyd_async.epics.motor import Motor
 
+from dodal.common.enums import EnabledDisabledUpper
 from dodal.log import LOGGER
 
 T = TypeVar("T")
@@ -66,11 +67,6 @@ class Pol(StrictEnum):
     LH3 = "lh3"
 
 
-class InsertionDeviceStatus(StrictEnum):
-    ENABLED = "ENABLED"
-    DISABLED = "DISABLED"
-
-
 ROW_PHASE_MOTOR_TOLERANCE = 0.004
 MAXIMUM_ROW_PHASE_MOTOR_POSITION = 24.0
 MAXIMUM_GAP_MOTOR_POSITION = 100
@@ -93,7 +89,7 @@ class SafeUndulatorMover(StandardReadable, Movable[T], Generic[T]):
     def __init__(self, set_move: SignalW, prefix: str, name: str = ""):
         # Gate keeper open when move is requested, closed when move is completed
         self.gate = epics_signal_r(UndulatorGateStatus, prefix + "BLGATE")
-        self.status = epics_signal_r(InsertionDeviceStatus, prefix + "IDBLENA")
+        self.status = epics_signal_r(EnabledDisabledUpper, prefix + "IDBLENA")
         self.set_move = set_move
         super().__init__(name)
 
@@ -116,7 +112,7 @@ class SafeUndulatorMover(StandardReadable, Movable[T], Generic[T]):
         """Get the timeout for the move based on an estimate of how long it will take."""
 
     async def raise_if_cannot_move(self) -> None:
-        if await self.status.get_value() is not InsertionDeviceStatus.ENABLED:
+        if await self.status.get_value() is not EnabledDisabledUpper.ENABLED:
             raise RuntimeError(f"{self.name} is DISABLED and cannot move.")
         if await self.gate.get_value() == UndulatorGateStatus.OPEN:
             raise RuntimeError(f"{self.name} is already in motion.")
