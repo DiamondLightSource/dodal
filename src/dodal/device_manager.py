@@ -166,7 +166,7 @@ class DeviceFactory(Generic[Args, V2]):
         ).or_raise()
         if connect_immediately:
             devices.connect(timeout=timeout or self.timeout).or_raise()
-        device = devices.devices[self.name].device
+        device = devices.devices[self.name]
         if name:
             device.set_name(name)
         return device  # type: ignore - it's us, honest
@@ -286,7 +286,7 @@ class V1DeviceFactory(Generic[V1]):
             mock=mock,
         ).or_raise()
 
-        device = devices.devices[self.name].device
+        device = devices.devices[self.name]
         return device  # type: ignore - it's us really, promise
 
     def __repr__(self) -> str:
@@ -294,9 +294,8 @@ class V1DeviceFactory(Generic[V1]):
 
 
 class ConnectionSpec(NamedTuple):
-    """A device paired with the options used to configure it"""
+    """The options used to configure a device"""
 
-    device: OphydV2Device
     mock: bool
     timeout: float
 
@@ -322,20 +321,22 @@ class ConnectionResult(NamedTuple):
 class DeviceBuildResult(NamedTuple):
     """Wrapper around the results of building devices"""
 
-    devices: dict[str, ConnectionSpec]
+    devices: dict[str, AnyDevice]
     errors: dict[str, Exception]
+    connection_specs: dict[str, ConnectionSpec]
 
     def connect(self, timeout: float | None = None) -> ConnectionResult:
         """Connect all devices that didn't fail to build"""
         connections = {}
         connected = {}
         loop: asyncio.EventLoop = get_bluesky_event_loop()  # type: ignore
-        for name, (device, mock, dev_timeout) in self.devices.items():
+        for name, device in self.devices.items():
             if not isinstance(device, OphydV2Device):
                 # TODO: Remove when ophyd v1 support is no longer required
                 # V1 devices are connected at creation time assuming wait is not set to False
                 connected[name] = device
                 continue
+            mock, dev_timeout = self.connection_specs[name]
             timeout = timeout or dev_timeout or DEFAULT_TIMEOUT
             fut = asyncio.run_coroutine_threadsafe(
                 device.connect(mock=mock, timeout=timeout),
@@ -347,7 +348,7 @@ class DeviceBuildResult(NamedTuple):
         for name, connection_future in connections.items():
             try:
                 connection_future.result()
-                connected[name] = self.devices[name].device
+                connected[name] = self.devices[name]
             except Exception as e:
                 connection_errors[name] = e
 
@@ -506,7 +507,8 @@ class DeviceManager:
         order = self._build_order(
             {dep: self[dep] for dep in build_list}, fixtures=fixtures
         )
-        built: dict[str, ConnectionSpec] = {}
+        built: dict[str, AnyDevice] = {}
+        connection_specs: dict[str, ConnectionSpec] = {}
         errors = {}
         for device in order:
             factory = self[device]
@@ -529,15 +531,15 @@ class DeviceManager:
                         # TODO: Remove when ophyd v1 support is no longer required
                         factory = factory.mock_if_needed(mock)
                     built_device = factory._create(**params)
-                    built[device] = ConnectionSpec(
-                        built_device,
+                    built[device] = built_device
+                    connection_specs[device] = ConnectionSpec(
                         mock=mock or factory.mock,
                         timeout=factory.timeout,
                     )
                 except Exception as e:
                     errors[device] = e
 
-        return DeviceBuildResult(built, errors)
+        return DeviceBuildResult(built, errors, connection_specs)
 
     def __contains__(self, name):
         return name in self._factories or name in self._v1_factories
