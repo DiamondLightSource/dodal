@@ -1,4 +1,4 @@
-from collections import defaultdict
+from collections.abc import Mapping
 from enum import Enum
 from unittest import mock
 from unittest.mock import AsyncMock, Mock
@@ -215,7 +215,7 @@ class MockSR570RaiseTimeTable(float, Enum):
 
 
 @pytest.mark.parametrize(
-    "gain,raw_count, expected_current",
+    "gain, raw_count, expected_current",
     [
         ("SEN_1", 0.51e5, 0.51e-3),
         ("SEN_3", -10e5, -2e-3),
@@ -226,8 +226,9 @@ class MockSR570RaiseTimeTable(float, Enum):
     ],
 )
 async def test_sr570_struck_scaler_read(
-    mock_sr570_struck_scaler_detector,
     run_engine: RunEngine,
+    run_engine_documents: Mapping[str, list[dict]],
+    mock_sr570_struck_scaler_detector,
     gain,
     raw_count,
     expected_current,
@@ -241,19 +242,14 @@ async def test_sr570_struck_scaler_read(
     mock_sr570_struck_scaler_detector.current_amp().raise_timetable = (
         MockSR570RaiseTimeTable
     )
-    docs = defaultdict(list)
-
-    def capture_emitted(name, doc):
-        docs[name].append(doc)
-
-    run_engine(count([mock_sr570_struck_scaler_detector]), capture_emitted)
-    assert docs["event"][0]["data"][
+    run_engine(count([mock_sr570_struck_scaler_detector]))
+    assert run_engine_documents["event"][0]["data"][
         "mock_sr570_struck_scaler_detector-current"
     ] == pytest.approx(expected_current)
 
 
 @pytest.mark.parametrize(
-    "gain,raw_count, expected_current",
+    "gain, raw_count, expected_current",
     [
         (
             "SEN_10",
@@ -273,8 +269,9 @@ async def test_sr570_struck_scaler_read(
     ],
 )
 async def test_sr570_struck_scaler_read_with_autogain(
-    mock_sr570_struck_scaler_detector,
     run_engine: RunEngine,
+    run_engine_documents: Mapping[str, list[dict]],
+    mock_sr570_struck_scaler_detector,
     gain,
     raw_count,
     expected_current,
@@ -301,14 +298,8 @@ async def test_sr570_struck_scaler_read_with_autogain(
         mock_sr570_struck_scaler_detector.counter().trigger_start,
         lambda *_, **__: set_mock_counter(),
     )
-
-    docs = defaultdict(list)
-
-    def capture_emitted(name, doc):
-        docs[name].append(doc)
-
     run_engine(prepare(mock_sr570_struck_scaler_detector, 1))
-    run_engine(count([mock_sr570_struck_scaler_detector]), capture_emitted)
-    assert docs["event"][0]["data"][
+    run_engine(count([mock_sr570_struck_scaler_detector]))
+    assert run_engine_documents["event"][0]["data"][
         "mock_sr570_struck_scaler_detector-current"
     ] == pytest.approx(expected_current, rel=1e-14)

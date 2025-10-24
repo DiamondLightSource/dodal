@@ -1,34 +1,15 @@
-import asyncio
-from collections.abc import Awaitable, Iterable
 from dataclasses import dataclass, fields
 from typing import TypeVar
 
 from bluesky.protocols import Reading
 from event_model.documents.event_descriptor import DataKey
-from ophyd_async.core import PathProvider
+from ophyd_async.core import PathProvider, merge_gathered_dicts
 from ophyd_async.epics.adaravis import AravisDetector
 from ophyd_async.epics.adcore import NDPluginBaseIO
 from ophyd_async.epics.adpilatus import PilatusDetector
 
 ValueAndUnits = tuple[float, str]
 T = TypeVar("T")
-
-
-# TODO: Remove this file as part of github.com/DiamondLightSource/dodal/issues/595
-# Until which, temporarily duplicated non-public method from ophyd_async
-async def _merge_gathered_dicts(
-    coros: Iterable[Awaitable[dict[str, T]]],
-) -> dict[str, T]:
-    """Merge dictionaries produced by a sequence of coroutines.
-
-    Can be used for merging ``read()`` or ``describe``. For instance::
-
-        combined_read = await merge_gathered_dicts(s.read() for s in signals)
-    """
-    ret: dict[str, T] = {}
-    for result in await asyncio.gather(*coros):
-        ret.update(result)
-    return ret
 
 
 @dataclass
@@ -124,7 +105,7 @@ class NXSasPilatus(PilatusDetector):
         self._metadata_holder = metadata_holder
 
     async def read_configuration(self) -> dict[str, Reading]:
-        return await _merge_gathered_dicts(
+        return await merge_gathered_dicts(
             r
             for r in (
                 super().read_configuration(),
@@ -133,7 +114,7 @@ class NXSasPilatus(PilatusDetector):
         )
 
     async def describe_configuration(self) -> dict[str, DataKey]:
-        return await _merge_gathered_dicts(
+        return await merge_gathered_dicts(
             r
             for r in (
                 super().describe_configuration(),
@@ -167,7 +148,7 @@ class NXSasOAV(AravisDetector):
         self._metadata_holder = metadata_holder
 
     async def read_configuration(self) -> dict[str, Reading]:
-        return await _merge_gathered_dicts(
+        return await merge_gathered_dicts(
             r
             for r in (
                 super().read_configuration(),
@@ -176,7 +157,7 @@ class NXSasOAV(AravisDetector):
         )
 
     async def describe_configuration(self) -> dict[str, DataKey]:
-        return await _merge_gathered_dicts(
+        return await merge_gathered_dicts(
             r
             for r in (
                 super().describe_configuration(),

@@ -1,4 +1,4 @@
-from collections import defaultdict
+from collections.abc import Mapping
 from enum import Enum
 from unittest import mock
 from unittest.mock import AsyncMock, Mock
@@ -235,9 +235,10 @@ class MockFemto3xxRaiseTime(float, Enum):
     ],
 )
 async def test_femto_struck_scaler_read(
+    run_engine: RunEngine,
+    run_engine_documents: Mapping[str, list[dict]],
     mock_femto: FemtoDDPCA,
     mock_femto_struck_scaler_detector,
-    run_engine: RunEngine,
     gain,
     raw_voltage,
     expected_current,
@@ -246,16 +247,12 @@ async def test_femto_struck_scaler_read(
     set_mock_value(mock_femto_struck_scaler_detector.counter().count_time, 1)
     set_mock_value(mock_femto_struck_scaler_detector.counter().readout, raw_voltage)
     set_mock_value(mock_femto_struck_scaler_detector.auto_mode, False)
-    docs = defaultdict(list)
     mock_femto_struck_scaler_detector.current_amp().raise_timetable = (
         MockFemto3xxRaiseTime
     )
 
-    def capture_emitted(name, doc):
-        docs[name].append(doc)
-
-    run_engine(count([mock_femto_struck_scaler_detector]), capture_emitted)
-    assert docs["event"][0]["data"][
+    run_engine(count([mock_femto_struck_scaler_detector]))
+    assert run_engine_documents["event"][0]["data"][
         "mock_femto_struck_scaler_detector-current"
     ] == pytest.approx(expected_current)
 
@@ -274,9 +271,10 @@ async def test_femto_struck_scaler_read(
     ],
 )
 async def test_femto_struck_scaler_read_with_auto_gain(
+    run_engine: RunEngine,
+    run_engine_documents: Mapping[str, list[dict]],
     mock_femto: FemtoDDPCA,
     mock_femto_struck_scaler_detector,
-    run_engine: RunEngine,
     gain,
     raw_voltage,
     expected_current,
@@ -302,13 +300,7 @@ async def test_femto_struck_scaler_read_with_auto_gain(
         mock_femto_struck_scaler_detector.counter().trigger_start,
         lambda *_, **__: set_mock_counter(),
     )
-
-    docs = defaultdict(list)
-
-    def capture_emitted(name, doc):
-        docs[name].append(doc)
-
-    run_engine(count([mock_femto_struck_scaler_detector]), capture_emitted)
-    assert docs["event"][0]["data"][
+    run_engine(count([mock_femto_struck_scaler_detector]))
+    assert run_engine_documents["event"][0]["data"][
         "mock_femto_struck_scaler_detector-current"
     ] == pytest.approx(expected_current, rel=1e-14)

@@ -1,4 +1,4 @@
-from collections import defaultdict
+from collections.abc import Mapping
 from unittest.mock import AsyncMock
 
 import bluesky.plan_stubs as bps
@@ -138,7 +138,11 @@ async def test_gap_status_error(mock_id_gap: UndulatorGap):
         await mock_id_gap.set(2)
 
 
-async def test_gap_success_scan(mock_id_gap: UndulatorGap, run_engine: RunEngine):
+async def test_gap_success_scan(
+    run_engine: RunEngine,
+    run_engine_documents: Mapping[str, list[dict]],
+    mock_id_gap: UndulatorGap,
+):
     callback_on_mock_put(
         mock_id_gap.user_setpoint,
         lambda *_, **__: set_mock_value(mock_id_gap.gate, UndulatorGateStatus.OPEN),
@@ -155,15 +159,13 @@ async def test_gap_success_scan(mock_id_gap: UndulatorGap, run_engine: RunEngine
         set_mock_value(mock_id_gap.gate, UndulatorGateStatus.CLOSE)
 
     callback_on_mock_put(mock_id_gap.set_move, lambda *_, **__: set_complete_move())
-    docs = defaultdict(list)
 
-    def capture_emitted(name, doc):
-        docs[name].append(doc)
-
-    run_engine(scan([mock_id_gap], mock_id_gap, 0, 10, 11), capture_emitted)
-    assert_emitted(docs, start=1, descriptor=1, event=11, stop=1)
+    run_engine(scan([mock_id_gap], mock_id_gap, 0, 10, 11))
+    assert_emitted(run_engine_documents, start=1, descriptor=1, event=11, stop=1)  # type: ignore
     for i in output:
-        assert docs["event"][i]["data"]["mock_id_gap-user_readback"] == i
+        assert (
+            run_engine_documents["event"][i]["data"]["mock_id_gap-user_readback"] == i
+        )
 
 
 async def test_given_gate_never_closes_then_setting_phases_times_out(
@@ -344,7 +346,9 @@ async def test_jaw_phase_cal_timout(
 
 
 async def test_jaw_phase_success_scan(
-    mock_jaw_phase: UndulatorJawPhase, run_engine: RunEngine
+    run_engine: RunEngine,
+    run_engine_documents: Mapping[str, list[dict]],
+    mock_jaw_phase: UndulatorJawPhase,
 ):
     callback_on_mock_put(
         mock_jaw_phase.jaw_phase.user_setpoint,
@@ -362,12 +366,13 @@ async def test_jaw_phase_success_scan(
         set_mock_value(mock_jaw_phase.gate, UndulatorGateStatus.CLOSE)
 
     callback_on_mock_put(mock_jaw_phase.set_move, lambda *_, **__: set_complete_move())
-    docs = defaultdict(list)
 
-    def capture_emitted(name, doc):
-        docs[name].append(doc)
-
-    run_engine(scan([mock_jaw_phase], mock_jaw_phase, 0, 10, 11), capture_emitted)
-    assert_emitted(docs, start=1, descriptor=1, event=11, stop=1)
+    run_engine(scan([mock_jaw_phase], mock_jaw_phase, 0, 10, 11))
+    assert_emitted(run_engine_documents, start=1, descriptor=1, event=11, stop=1)  # type: ignore
     for i in output:
-        assert docs["event"][i]["data"]["mock_jaw_phase-jaw_phase-user_readback"] == i
+        assert (
+            run_engine_documents["event"][i]["data"][
+                "mock_jaw_phase-jaw_phase-user_readback"
+            ]
+            == i
+        )
