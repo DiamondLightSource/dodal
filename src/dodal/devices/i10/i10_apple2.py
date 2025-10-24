@@ -20,6 +20,7 @@ from pydantic import BaseModel, ConfigDict, RootModel
 from dodal.devices.apple2_undulator import (
     Apple2,
     Apple2Controller,
+    Apple2PhasesVal,
     Apple2Val,
     Pol,
     UndulatorGap,
@@ -437,11 +438,13 @@ class I10Apple2Controller(Apple2Controller[I10Apple2]):
         gap, phase = self.energy_to_motor(energy=value, pol=pol)
         phase3 = phase * (-1 if pol == Pol.LA else 1)
         id_set_val = Apple2Val(
-            top_outer=f"{phase:.6f}",
-            top_inner="0.0",
-            btm_inner=f"{phase3:.6f}",
-            btm_outer="0.0",
             gap=f"{gap:.6f}",
+            phase=Apple2PhasesVal(
+                top_outer=f"{phase:.6f}",
+                top_inner="0.0",
+                btm_inner=f"{phase3:.6f}",
+                btm_outer="0.0",
+            ),
         )
 
         LOGGER.info(f"Setting polarisation to {pol}, with values: {id_set_val}")
