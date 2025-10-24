@@ -122,10 +122,6 @@ class DeviceFactory(Generic[Args, V2]):
         """Name of the underlying factory function"""
         return self.factory.__name__
 
-    @property
-    def device_type(self) -> type[V2]:
-        return inspect.signature(self.factory).return_annotation
-
     @cached_property
     def dependencies(self) -> set[str]:
         """Names of all parameters"""
@@ -223,10 +219,6 @@ class V1DeviceFactory(Generic[V1]):
     def name(self) -> str:
         """Name of the underlying factory function"""
         return self.post_create.__name__
-
-    @property
-    def device_type(self) -> type[V1]:
-        return self.factory
 
     @cached_property
     def dependencies(self) -> set[str]:
