@@ -120,5 +120,11 @@ class CryoStreamGantry(StandardReadable):
             self.cryostream_selector = epics_signal_r(
                 CryostreamSelection, f"{prefix}-EA-GANT-01:CTRL"
             )
+            self.hc1_selected = epics_signal_r(
+                int, f"{prefix}-MO-STEP-02:GPIO_INP_BITS.B2"
+            )
+            self.cryostream_selected = epics_signal_r(
+                int, f"{prefix}-MO-STEP-02:GPIO_INP_BITS.B3"
+            )
 
         super().__init__(name)
