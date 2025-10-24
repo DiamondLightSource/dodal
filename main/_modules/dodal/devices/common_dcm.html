@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.common_dcm &#8212; dodal 1.63.1.dev4+g0bc3a29ac documentation</title>
+    <title>dodal.devices.common_dcm &#8212; dodal 1.63.1.dev5+g4a296b077 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=dfb90697"></script>
+    <script src="../../../_static/documentation_options.js?v=c762a2cf"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -516,9 +516,9 @@ window.addEventListener("load", () => mermaid.run());
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
             <span class="c1"># Virtual motor PV&#39;s which set the physical motors so that the DCM produces requested energy</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">energy_in_kev</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;ENERGY&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">energy_in_ev</span> <span class="o">=</span> <span class="n">derived_signal_r</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_convert_keV_to_eV</span><span class="p">,</span> <span class="n">energy_signal</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">energy_in_kev</span><span class="o">.</span><span class="n">user_readback</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">energy_in_keV</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;ENERGY&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">energy_in_eV</span> <span class="o">=</span> <span class="n">derived_signal_r</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_convert_keV_to_eV</span><span class="p">,</span> <span class="n">energy_signal</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">energy_in_keV</span><span class="o">.</span><span class="n">user_readback</span>
             <span class="p">)</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">_make_crystals</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">xtal_1</span><span class="p">,</span> <span class="n">xtal_2</span><span class="p">)</span>
