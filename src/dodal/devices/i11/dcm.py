@@ -29,8 +29,8 @@ class DCM(DoubleCrystalMonochromator[PitchAndRollCrystal, StationaryCrystal]):
         self,
         prefix: str,
         xtal_prefix: str,
-        name: str = "",
         crystal_metadata: CrystalMetadata | None = None,
+        name: str = "",
     ) -> None:
         cm = crystal_metadata or make_crystal_metadata_from_material(
             MaterialsEnum.Si, (1, 1, 1)
