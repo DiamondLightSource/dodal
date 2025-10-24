@@ -62,7 +62,7 @@ class ChannelCutMonochromator(
             )
 
         # energy derived signal as property
-        self.energy_in_ev = derived_signal_r(
+        self.energy_in_eV = derived_signal_r(
             self._convert_pos_to_ev, pos_signal=self.crystal
         )
         super().__init__(name=name)

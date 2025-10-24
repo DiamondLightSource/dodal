@@ -43,7 +43,7 @@ def dcm() -> DoubleCrystalMonochromatorWithDSpacing:
 
 @device_factory()
 def energy_source() -> DualEnergySource:
-    return DualEnergySource(dcm().energy_in_ev, pgm().energy.user_readback)
+    return DualEnergySource(dcm().energy_in_eV, pgm().energy.user_readback)
 
 
 # Connect will work again after this work completed

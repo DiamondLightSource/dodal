@@ -474,8 +474,8 @@ async def test_id_polarisation_set(
     expect_btm_inner: float,
 ):
     await mock_locked_controller.polarisation.set(pol)
-    set_mock_value(mock_locked_apple2.phase.top_outer.user_readback, expect_top_outer)
-    set_mock_value(mock_locked_apple2.phase.btm_inner.user_readback, expect_btm_inner)
+    set_mock_value(mock_locked_apple2.phase().top_outer.user_readback, expect_top_outer)
+    set_mock_value(mock_locked_apple2.phase().btm_inner.user_readback, expect_btm_inner)
     assert await mock_locked_controller.polarisation.get_value() == pol
 
 
