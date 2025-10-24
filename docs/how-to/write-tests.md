@@ -58,9 +58,11 @@ class MyDevice(StandardReadable, Stageable):
 
 In this example, we need to test the `stage` and `unstage` methods. For more complex devices, it is also a good idea to test the `read` method to confirm that we get the expected read signals back when this method is called.
 
-We use [pytest](https://docs.pytest.org/en/stable/contents.html) for writing tests in dodal. A core part of this library is the use of fixtures. A fixture is a function decorated with `@pytest.fixture` that provides setup/teardown or reusable test data for your tests. It is defined once and can be reused across multiple tests. Fixtures are mainly used to define devices and then inject them into each test.
+We use [pytest](https://docs.pytest.org/en/stable/contents.html) for writing tests in dodal. A core part of this library is the use of fixtures. A fixture is a function decorated with `@pytest.fixture` that provides setup/teardown or reusable test data for your tests. It is defined once and can be reused across multiple tests. Fixtures are mainly used to define devices and then inject them into each test. 
 
-To help set up a device, they are created with the `init_devices(mock=True)` function from `ophyd_async.core`, which automatically initialises the device in mock mode. The `RunEngine` fixture is passed when creating a device to ensure there is an event loop available when connecting signals. This fixture is defined in `dodal/tests/conftest.py`, which is a special file recognised by `pytest`. It defines fixtures that are automatically available to any test in the same directory (and its subdirectories) without needing to import them. This is useful for defining common setup code once without duplicating it across test files.
+Common fixtures, such as the `run_engine` used in the below tests, can also be defined in `dodal/tests/conftest.py`, which is a special file recognised by `pytest`. These fixtures are automatically available to any test in the same directory (and its subdirectories) without needing to import them. This is useful for defining common setup code once without duplicating it across test files.
+
+Devices are set up in the fixture using the `init_devices(mock=True)` function from `ophyd_async.core`, which automatically initialises the device in mock mode. 
 
 In order for `pytest` to detect something as a test, a function should begin with `test_*`. The test function should be self-descriptive about what it is testing, and it is acceptable (even encouraged) to have longer names for test functions for clarity.
 
@@ -75,9 +77,8 @@ from ophyd_async.testing import assert_reading, get_mock_put, partial_reading
 from dodal.device.my_device import  MyDevice
 
 
-# RunEngine is needed to make sure there is an event loop when creating device.
 @pytest.fixture
-async def sim_my_device(run_engine: RunEngine) -> MyDevice:
+async def sim_my_device() -> MyDevice:
     async with init_devices(mock=True):
         sim_my_device = MyDevice("TEST:")
     return sim_my_device
@@ -91,7 +92,6 @@ def test_my_device_stage(sim_my_device: MyDevice, run_engine: RunEngine) -> None
 def test_my_device_unstage(sim_my_device: MyDevice, run_engine: RunEngine) -> None:
     run_engine(bps.unstage(sim_my_device, wait=True), wait=True)
     get_mock_put(sim_my_device.signal_b).assert_called_once_with(OnOff.OFF, wait=True)
-
 ```
 
 You should test the output of a device when the device has many signals read and you want to ensure the correct ones are read at the correct times, or when the `read` method of it or one of its signals (e.g. a DerivedSignal) requires testing. Functions are defined in `ophyd-async` to aid with this. `assert_reading` allows us to compare the readings generated from a `Readable` device to the expected results.
