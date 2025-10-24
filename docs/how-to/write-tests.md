@@ -85,14 +85,13 @@ async def sim_my_device() -> MyDevice:
 
 
 def test_my_device_stage(sim_my_device: MyDevice, run_engine: RunEngine) -> None:
-    RE(bps.stage(sim_my_device, wait=True), wait=True)
+    run_engine(bps.stage(sim_my_device, wait=True), wait=True)
     get_mock_put(sim_my_device.signal_b).assert_called_once_with(OnOff.ON, wait=True)
 
 
 def test_my_device_unstage(sim_my_device: MyDevice, run_engine: RunEngine) -> None:
-    RE(bps.unstage(sim_my_device, wait=True), wait=True)
+    run_engine(bps.unstage(sim_my_device, wait=True), wait=True)
     get_mock_put(sim_my_device.signal_b).assert_called_once_with(OnOff.OFF, wait=True)
-
 ```
 
 You should test the output of a device when the device has many signals read and you want to ensure the correct ones are read at the correct times, or when the `read` method of it or one of its signals (e.g. a DerivedSignal) requires testing. Functions are defined in `ophyd-async` to aid with this. `assert_reading` allows us to compare the readings generated from a `Readable` device to the expected results.

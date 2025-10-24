@@ -136,6 +136,8 @@ testpaths = "docs src tests system_tests"
 exclude_also = [
     '^"""', # Ignore the start/end of a file-level triple quoted docstring
 ]
+# Exclude pytest.fixtures from code coverage report
+omit = ["*/dodal/testing/fixtures/*"]
 
 [tool.coverage.run]
 data_file = "/tmp/dodal.coverage"
@@ -182,6 +184,7 @@ lint.select = [
     "C4",     # flake8-comprehensions - https://docs.astral.sh/ruff/rules/#flake8-comprehensions-c4
     "E",      # pycodestyle errors - https://docs.astral.sh/ruff/rules/#error-e
     "F",      # pyflakes rules - https://docs.astral.sh/ruff/rules/#pyflakes-f
+    "N",      # pep8-naming - https://docs.astral.sh/ruff/rules/#pep8-naming-n
     "W",      # pycodestyle warnings - https://docs.astral.sh/ruff/rules/#warning-w
     "I",      # isort - https://docs.astral.sh/ruff/rules/#isort-i
     "UP",     # pyupgrade - https://docs.astral.sh/ruff/rules/#pyupgrade-up
@@ -202,6 +205,10 @@ lint.select = [
 
 [tool.ruff.lint.flake8-tidy-imports.banned-api]
 "time.sleep".msg = "Use bps.sleep or asyncio.sleep instead. # noqa will disable this rule for that line. See https://github.com/DiamondLightSource/mx-bluesky/issues/925"
+
+[tool.ruff.lint.flake8-import-conventions.extend-aliases]
+# We often shorten "Annotated" to "A" for brevity
+"typing.Annotated" = "A"
 
 [tool.importlinter]
 root_package = "dodal"

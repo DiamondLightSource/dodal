@@ -7,7 +7,7 @@ from dodal.common.beamlines.beamline_utils import clear_path_provider
 from dodal.plan_stubs.data_session import attach_data_session_metadata_wrapper
 
 
-def test_attach_data_session_metadata_wrapper(caplog, RE: RunEngine):
+def test_attach_data_session_metadata_wrapper(caplog, run_engine: RunEngine):
     def fake_plan() -> MsgGenerator[None]:
         yield from []
 
@@ -15,7 +15,7 @@ def test_attach_data_session_metadata_wrapper(caplog, RE: RunEngine):
     plan = attach_data_session_metadata_wrapper(
         plan=fake_plan(), provider=path_provider
     )
-    RE(plan)
+    run_engine(plan)
 
     assert (
         f"{path_provider} is not an UpdatingPathProvider, {attach_data_session_metadata_wrapper.__name__} will have no effect"
@@ -28,14 +28,14 @@ def test_given_no_path_provider_when_running_clear_path_provider_then_noop():
 
 
 def test_attach_data_session_metadata_wrapper_with_no_provider_is_noop(
-    caplog, RE: RunEngine
+    caplog, run_engine: RunEngine
 ):
     def fake_plan() -> MsgGenerator[None]:
         yield from []
 
     clear_path_provider()
     plan = attach_data_session_metadata_wrapper(plan=fake_plan())
-    RE(plan)
+    run_engine(plan)
 
     assert (
         f"There is no PathProvider set, {attach_data_session_metadata_wrapper.__name__} will have no effect"
