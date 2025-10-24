@@ -81,21 +81,34 @@ LOOK_UPTABLE_DIR = "/dls_sw/i10/software/gda/workspace_git/gda-diamond.git/confi
 
 
 @device_factory()
+def idd_gap() -> UndulatorGap:
+    return UndulatorGap(prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:")
+
+
+@device_factory()
+def idd_phase() -> UndulatorPhaseAxes:
+    return UndulatorPhaseAxes(
+        prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:",
+        top_outer="RPQ1",
+        top_inner="RPQ2",
+        btm_inner="RPQ3",
+        btm_outer="RPQ4",
+    )
+
+
+@device_factory()
+def idd_jaw_phase() -> UndulatorJawPhase:
+    return UndulatorJawPhase(
+        prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:",
+        move_pv="RPQ1",
+    )
+
+
+@device_factory()
 def idd() -> I10Apple2:
     """i10 downstream insertion device:"""
     return I10Apple2(
-        id_gap=UndulatorGap(prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:"),
-        id_phase=UndulatorPhaseAxes(
-            prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:",
-            top_outer="RPQ1",
-            top_inner="RPQ2",
-            btm_inner="RPQ3",
-            btm_outer="RPQ4",
-        ),
-        id_jaw_phase=UndulatorJawPhase(
-            prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:",
-            move_pv="RPQ1",
-        ),
+        id_gap=idd_gap(), id_phase=idd_phase(), id_jaw_phase=idd_jaw_phase()
     )
 
 
@@ -132,21 +145,34 @@ def energy_dd() -> BeamEnergy:
 
 
 @device_factory()
+def idu_gap() -> UndulatorGap:
+    return UndulatorGap(prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-21:")
+
+
+@device_factory()
+def idu_phase() -> UndulatorPhaseAxes:
+    return UndulatorPhaseAxes(
+        prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-21:",
+        top_outer="RPQ1",
+        top_inner="RPQ2",
+        btm_inner="RPQ3",
+        btm_outer="RPQ4",
+    )
+
+
+@device_factory()
+def idu_jaw_phase() -> UndulatorJawPhase:
+    return UndulatorJawPhase(
+        prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-21:",
+        move_pv="RPQ1",
+    )
+
+
+@device_factory()
 def idu() -> I10Apple2:
     """i10 upstream insertion device"""
     return I10Apple2(
-        id_gap=UndulatorGap(prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-21:"),
-        id_phase=UndulatorPhaseAxes(
-            prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-21:",
-            top_outer="RPQ1",
-            top_inner="RPQ2",
-            btm_inner="RPQ3",
-            btm_outer="RPQ4",
-        ),
-        id_jaw_phase=UndulatorJawPhase(
-            prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-21:",
-            move_pv="RPQ1",
-        ),
+        id_gap=idu_gap(), id_phase=idu_phase(), id_jaw_phase=idu_jaw_phase()
     )
 
 

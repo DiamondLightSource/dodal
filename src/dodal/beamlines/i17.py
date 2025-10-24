@@ -47,18 +47,28 @@ def pgm() -> PGM:
     )
 
 
+@device_factory()
+def id_gap() -> UndulatorGap:
+    return UndulatorGap(prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:")
+
+
+@device_factory()
+def id_phase() -> UndulatorPhaseAxes:
+    return UndulatorPhaseAxes(
+        prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:",
+        top_outer="RPQ1",
+        top_inner="RPQ2",
+        btm_inner="RPQ3",
+        btm_outer="RPQ4",
+    )
+
+
 @device_factory(skip=True)
 def id() -> Apple2:
     """I17 insertion device:"""
     return Apple2(
-        id_gap=UndulatorGap(prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:"),
-        id_phase=UndulatorPhaseAxes(
-            prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:",
-            top_outer="RPQ1",
-            top_inner="RPQ2",
-            btm_inner="RPQ3",
-            btm_outer="RPQ4",
-        ),
+        id_gap=id_gap(),
+        id_phase=id_phase(),
     )
 
 

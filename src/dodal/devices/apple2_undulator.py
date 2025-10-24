@@ -326,8 +326,8 @@ class Apple2(StandardReadable, Movable):
             Name of the device.
         """
         with self.add_children_as_readables():
-            self.gap = id_gap
-            self.phase = id_phase
+            self.gap = Reference(id_gap)
+            self.phase = Reference(id_phase)
         super().__init__(name=name)
 
     @AsyncStatus.wrap
@@ -338,25 +338,27 @@ class Apple2(StandardReadable, Movable):
         """
 
         # Only need to check gap as the phase motors share both fault and gate with gap.
-        await self.gap.raise_if_cannot_move()
+        await self.gap().raise_if_cannot_move()
         await asyncio.gather(
-            self.phase.top_outer.user_setpoint.set(value=id_motor_values.top_outer),
-            self.phase.top_inner.user_setpoint.set(value=id_motor_values.top_inner),
-            self.phase.btm_inner.user_setpoint.set(value=id_motor_values.btm_inner),
-            self.phase.btm_outer.user_setpoint.set(value=id_motor_values.btm_outer),
-            self.gap.user_setpoint.set(value=id_motor_values.gap),
+            self.phase().top_outer.user_setpoint.set(value=id_motor_values.top_outer),
+            self.phase().top_inner.user_setpoint.set(value=id_motor_values.top_inner),
+            self.phase().btm_inner.user_setpoint.set(value=id_motor_values.btm_inner),
+            self.phase().btm_outer.user_setpoint.set(value=id_motor_values.btm_outer),
+            self.gap().user_setpoint.set(value=id_motor_values.gap),
         )
         timeout = np.max(
-            await asyncio.gather(self.gap.get_timeout(), self.phase.get_timeout())
+            await asyncio.gather(self.gap().get_timeout(), self.phase().get_timeout())
         )
         LOGGER.info(
             f"Moving f{self.name} apple2 motors to {id_motor_values}, timeout = {timeout}"
         )
         await asyncio.gather(
-            self.gap.set_move.set(value=1, wait=False, timeout=timeout),
-            self.phase.set_move.set(value=1, wait=False, timeout=timeout),
+            self.gap().set_move.set(value=1, wait=False, timeout=timeout),
+            self.phase().set_move.set(value=1, wait=False, timeout=timeout),
         )
-        await wait_for_value(self.gap.gate, UndulatorGateStatus.CLOSE, timeout=timeout)
+        await wait_for_value(
+            self.gap().gate, UndulatorGateStatus.CLOSE, timeout=timeout
+        )
 
 
 class EnergyMotorConvertor(Protocol):
@@ -448,11 +450,11 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
                 raw_to_derived=self._read_pol,
                 set_derived=self._set_pol,
                 pol=self.polarisation_setpoint,
-                top_outer=self.apple2().phase.top_outer.user_readback,
-                top_inner=self.apple2().phase.top_inner.user_readback,
-                btm_inner=self.apple2().phase.btm_inner.user_readback,
-                btm_outer=self.apple2().phase.btm_outer.user_readback,
-                gap=self.apple2().gap.user_readback,
+                top_outer=self.apple2().phase().top_outer.user_readback,
+                top_inner=self.apple2().phase().top_inner.user_readback,
+                btm_inner=self.apple2().phase().btm_inner.user_readback,
+                btm_outer=self.apple2().phase().btm_outer.user_readback,
+                gap=self.apple2().gap().user_readback,
             )
         super().__init__(name)
 
