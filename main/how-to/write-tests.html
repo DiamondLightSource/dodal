@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Writing Tests in This Python Project &#8212; dodal 1.63.1.dev2+gea92977bd documentation</title>
+    <title>Writing Tests in This Python Project &#8212; dodal 1.63.1.dev3+gd13dc42d6 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=467483b6"></script>
+    <script src="../_static/documentation_options.js?v=bacd3f82"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -535,7 +535,8 @@
 </div>
 <p>In this example, we need to test the <code class="docutils literal notranslate"><span class="pre">stage</span></code> and <code class="docutils literal notranslate"><span class="pre">unstage</span></code> methods. For more complex devices, it is also a good idea to test the <code class="docutils literal notranslate"><span class="pre">read</span></code> method to confirm that we get the expected read signals back when this method is called.</p>
 <p>We use <a class="reference external" href="https://docs.pytest.org/en/stable/contents.html">pytest</a> for writing tests in dodal. A core part of this library is the use of fixtures. A fixture is a function decorated with <code class="docutils literal notranslate"><span class="pre">&#64;pytest.fixture</span></code> that provides setup/teardown or reusable test data for your tests. It is defined once and can be reused across multiple tests. Fixtures are mainly used to define devices and then inject them into each test.</p>
-<p>To help set up a device, they are created with the <code class="docutils literal notranslate"><span class="pre">init_devices(mock=True)</span></code> function from <code class="docutils literal notranslate"><span class="pre">ophyd_async.core</span></code>, which automatically initialises the device in mock mode. The <code class="docutils literal notranslate"><span class="pre">RunEngine</span></code> fixture is passed when creating a device to ensure there is an event loop available when connecting signals. This fixture is defined in <code class="docutils literal notranslate"><span class="pre">dodal/tests/conftest.py</span></code>, which is a special file recognised by <code class="docutils literal notranslate"><span class="pre">pytest</span></code>. It defines fixtures that are automatically available to any test in the same directory (and its subdirectories) without needing to import them. This is useful for defining common setup code once without duplicating it across test files.</p>
+<p>Common fixtures, such as the <code class="docutils literal notranslate"><span class="pre">run_engine</span></code> used in the below tests, can also be defined in <code class="docutils literal notranslate"><span class="pre">dodal/tests/conftest.py</span></code>, which is a special file recognised by <code class="docutils literal notranslate"><span class="pre">pytest</span></code>. These fixtures are automatically available to any test in the same directory (and its subdirectories) without needing to import them. This is useful for defining common setup code once without duplicating it across test files.</p>
+<p>Devices are set up in the fixture using the <code class="docutils literal notranslate"><span class="pre">init_devices(mock=True)</span></code> function from <code class="docutils literal notranslate"><span class="pre">ophyd_async.core</span></code>, which automatically initialises the device in mock mode.</p>
 <p>In order for <code class="docutils literal notranslate"><span class="pre">pytest</span></code> to detect something as a test, a function should begin with <code class="docutils literal notranslate"><span class="pre">test_*</span></code>. The test function should be self-descriptive about what it is testing, and it is acceptable (even encouraged) to have longer names for test functions for clarity.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
 
@@ -547,9 +548,8 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.device.my_device</span><span class="w"> </span><span class="kn">import</span>  <span class="n">MyDevice</span>
 
 
-<span class="c1"># RunEngine is needed to make sure there is an event loop when creating device.</span>
 <span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span>
-<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">sim_my_device</span><span class="p">(</span><span class="n">run_engine</span><span class="p">:</span> <span class="n">RunEngine</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MyDevice</span><span class="p">:</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">sim_my_device</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">MyDevice</span><span class="p">:</span>
     <span class="k">async</span> <span class="k">with</span> <span class="n">init_devices</span><span class="p">(</span><span class="n">mock</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="n">sim_my_device</span> <span class="o">=</span> <span class="n">MyDevice</span><span class="p">(</span><span class="s2">&quot;TEST:&quot;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">sim_my_device</span>
