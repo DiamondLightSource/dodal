@@ -1,5 +1,5 @@
 import numpy as np
-from ophyd_async.core import Array1D, derived_signal_r, soft_signal_r_and_setter
+from ophyd_async.core import Array1D, soft_signal_r_and_setter
 from ophyd_async.epics.core import epics_signal_r
 from ophyd_async.epics.motor import Motor
 
@@ -13,10 +13,6 @@ from dodal.devices.common_dcm import (
     PitchAndRollCrystal,
     StationaryCrystal,
 )
-
-# Conversion constant for energy and wavelength, taken from the X-Ray data booklet
-# Converts between energy in KeV and wavelength in angstrom
-_CONVERSION_CONSTANT = 12.3984
 
 
 class DCM(DoubleCrystalMonochromator[PitchAndRollCrystal, StationaryCrystal]):
@@ -68,15 +64,3 @@ class DCM(DoubleCrystalMonochromator[PitchAndRollCrystal, StationaryCrystal]):
                 initial_value=reflection_array,
             )
         super().__init__(prefix, PitchAndRollCrystal, StationaryCrystal, name)
-
-        with self.add_children_as_readables():
-            self.wavelength = derived_signal_r(
-                self._wavelength_from_energy,
-                energy=self.energy_in_kev,
-                unit="angstrom",
-            )
-
-    def _wavelength_from_energy(self, energy: float, unit: str) -> float:
-        if energy > 0:
-            return _CONVERSION_CONSTANT / energy
-        return 0

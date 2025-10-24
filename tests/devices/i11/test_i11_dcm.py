@@ -4,7 +4,6 @@ from bluesky.run_engine import RunEngine
 from ophyd_async.core import init_devices
 from ophyd_async.testing import (
     assert_emitted,
-    set_mock_value,
 )
 
 from dodal.devices.i11.dcm import DCM
@@ -30,27 +29,3 @@ def test_count_i11_dcm(
         event=1,
         stop=1,
     )
-
-
-@pytest.mark.parametrize(
-    "wavelength,energy,unit",
-    [
-        (0.0, 0.0, "angstrom"),
-        (1.0, 12.3984, "angstrom"),
-        (2.0, 6.1992, "angstrom"),
-    ],
-)
-async def test_i11_wavelength(
-    wavelength: float,
-    energy: float,
-    unit: str,
-    i11_dcm: DCM,
-):
-    set_mock_value(i11_dcm.energy_in_kev.user_readback, energy)
-    set_mock_value(i11_dcm.wavelength_in_a.user_readback, wavelength)
-
-    reading = await i11_dcm.read()
-
-    assert reading["i11_dcm-energy_in_kev"]["value"] == energy
-    assert reading["i11_dcm-wavelength_in_a"]["value"] == wavelength
-    assert reading["i11_dcm-wavelength"]["value"] == wavelength
