@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.beamlines.i17 &#8212; dodal 1.63.1.dev3+gd13dc42d6 documentation</title>
+    <title>dodal.beamlines.i17 &#8212; dodal 1.63.1.dev4+g0bc3a29ac documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=bacd3f82"></script>
+    <script src="../../../_static/documentation_options.js?v=dfb90697"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -505,18 +505,28 @@ window.addEventListener("load", () => mermaid.run());
     <span class="p">)</span>
 
 
+<span class="nd">@device_factory</span><span class="p">()</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">id_gap</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">UndulatorGap</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">UndulatorGap</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">PREFIX</span><span class="o">.</span><span class="n">insertion_prefix</span><span class="si">}</span><span class="s2">-MO-SERVC-01:&quot;</span><span class="p">)</span>
+
+
+<span class="nd">@device_factory</span><span class="p">()</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">id_phase</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">UndulatorPhaseAxes</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">UndulatorPhaseAxes</span><span class="p">(</span>
+        <span class="n">prefix</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">PREFIX</span><span class="o">.</span><span class="n">insertion_prefix</span><span class="si">}</span><span class="s2">-MO-SERVC-01:&quot;</span><span class="p">,</span>
+        <span class="n">top_outer</span><span class="o">=</span><span class="s2">&quot;RPQ1&quot;</span><span class="p">,</span>
+        <span class="n">top_inner</span><span class="o">=</span><span class="s2">&quot;RPQ2&quot;</span><span class="p">,</span>
+        <span class="n">btm_inner</span><span class="o">=</span><span class="s2">&quot;RPQ3&quot;</span><span class="p">,</span>
+        <span class="n">btm_outer</span><span class="o">=</span><span class="s2">&quot;RPQ4&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+
 <span class="nd">@device_factory</span><span class="p">(</span><span class="n">skip</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">id</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Apple2</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;I17 insertion device:&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">Apple2</span><span class="p">(</span>
-        <span class="n">id_gap</span><span class="o">=</span><span class="n">UndulatorGap</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">PREFIX</span><span class="o">.</span><span class="n">insertion_prefix</span><span class="si">}</span><span class="s2">-MO-SERVC-01:&quot;</span><span class="p">),</span>
-        <span class="n">id_phase</span><span class="o">=</span><span class="n">UndulatorPhaseAxes</span><span class="p">(</span>
-            <span class="n">prefix</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">PREFIX</span><span class="o">.</span><span class="n">insertion_prefix</span><span class="si">}</span><span class="s2">-MO-SERVC-01:&quot;</span><span class="p">,</span>
-            <span class="n">top_outer</span><span class="o">=</span><span class="s2">&quot;RPQ1&quot;</span><span class="p">,</span>
-            <span class="n">top_inner</span><span class="o">=</span><span class="s2">&quot;RPQ2&quot;</span><span class="p">,</span>
-            <span class="n">btm_inner</span><span class="o">=</span><span class="s2">&quot;RPQ3&quot;</span><span class="p">,</span>
-            <span class="n">btm_outer</span><span class="o">=</span><span class="s2">&quot;RPQ4&quot;</span><span class="p">,</span>
-        <span class="p">),</span>
+        <span class="n">id_gap</span><span class="o">=</span><span class="n">id_gap</span><span class="p">(),</span>
+        <span class="n">id_phase</span><span class="o">=</span><span class="n">id_phase</span><span class="p">(),</span>
     <span class="p">)</span>
 
 
