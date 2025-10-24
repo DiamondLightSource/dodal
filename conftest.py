@@ -1,14 +1,10 @@
-import asyncio
 import logging
 import sys
-import time
-from collections.abc import Mapping
 from os import environ
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
-from bluesky.run_engine import RunEngine
 from ophyd.status import Status
 from ophyd_async.core import (
     PathInfo,
@@ -37,7 +33,7 @@ mock_paths = [
 ]
 mock_attributes_table = {
     "i03": mock_paths,
-    "i10": mock_paths,
+    "i10_optics": mock_paths,
     "i04": mock_paths,
     "s04": mock_paths,
     "i19_1": mock_paths,
@@ -47,6 +43,10 @@ mock_attributes_table = {
 
 BANNED_PATHS = [Path("/dls"), Path("/dls_sw")]
 environ["DODAL_TEST_MODE"] = "true"
+
+
+# Add run_engine fixtures to be used in tests
+pytest_plugins = ["dodal.testing.fixtures.run_engine"]
 
 
 @pytest.fixture(autouse=True)
@@ -105,37 +105,7 @@ async def static_path_provider(
     return svpp
 
 
-@pytest.fixture
-def run_engine_documents(run_engine: RunEngine) -> Mapping[str, list[dict]]:
-    docs: dict[str, list[dict]] = {}
-
-    def append_and_print(name, doc):
-        if name not in docs:
-            docs[name] = []
-        docs[name] += [doc]
-
-    run_engine.subscribe(append_and_print)
-    return docs
-
-
 def failed_status(failure: Exception) -> Status:
     status = Status()
     status.set_exception(failure)
     return status
-
-
-@pytest.fixture(scope="session", autouse=True)
-async def _ensure_running_bluesky_event_loop():
-    run_engine = RunEngine()
-    # make sure the event loop is thoroughly up and running before we try to create
-    # any ophyd_async devices which might need it
-    timeout = time.monotonic() + 1
-    while not run_engine.loop.is_running():
-        await asyncio.sleep(0)
-        if time.monotonic() > timeout:
-            raise TimeoutError("This really shouldn't happen but just in case...")
-
-
-@pytest.fixture()
-async def run_engine():
-    yield RunEngine()
