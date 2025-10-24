@@ -178,10 +178,8 @@ class DeviceFactory(Generic[Args, V2]):
         return device
 
     def __repr__(self) -> str:
-        target = self.factory.__annotations__.get("return")
-        target = target.__name__ if target else "???"
         params = inspect.signature(self.factory)
-        return f"<{self.name}: DeviceFactory ({params}) -> {target}>"
+        return f"<{self.name}: DeviceFactory{params}>"
 
 
 # TODO: Remove when ophyd v1 support is no longer required
