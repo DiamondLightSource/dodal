@@ -8,10 +8,13 @@ from dodal.common.beamlines.beamline_utils import (
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.beamlines.device_helpers import CAM_SUFFIX, HDF5_SUFFIX
+from dodal.devices.focusing_mirror import SimpleMirror
 from dodal.devices.i22.nxsas import NXSasMetadataHolder, NXSasOAV
 from dodal.devices.linkam3 import Linkam3
+from dodal.devices.motors import XYStage
 from dodal.devices.slits import Slits
 from dodal.devices.synchrotron import Synchrotron
+from dodal.devices.v2f import QDV2F
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
@@ -44,10 +47,31 @@ def waxs() -> EigerDetector:
 
 
 @device_factory()
+def mirror() -> SimpleMirror:
+    return SimpleMirror(
+        prefix=f"{PREFIX.beamline_prefix}-OP-MR-01:",
+    )
+
+
+@device_factory()
+def it() -> QDV2F:
+    return QDV2F(
+        prefix=f"{PREFIX.beamline_prefix}-DI-PHDGN-07:PHD1:", intensity_suffix="I"
+    )
+
+
+@device_factory()
 def panda1() -> HDFPanda:
     return HDFPanda(
         prefix=f"{PREFIX.beamline_prefix}-MO-PANDA-01:",
         path_provider=get_path_provider(),
+    )
+
+
+@device_factory()
+def table() -> XYStage:
+    return XYStage(
+        prefix=f"{PREFIX.beamline_prefix}-MO-TABLE-04:",
     )
 
 

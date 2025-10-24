@@ -9,13 +9,15 @@ from dodal.common.crystal_metadata import (
     make_crystal_metadata_from_material,
 )
 from dodal.devices.common_dcm import (
-    BaseDCM,
+    DoubleCrystalMonochromatorWithDSpacing,
     PitchAndRollCrystal,
     StationaryCrystal,
 )
 
 
-class DCM(BaseDCM[PitchAndRollCrystal, StationaryCrystal]):
+class DCM(
+    DoubleCrystalMonochromatorWithDSpacing[PitchAndRollCrystal, StationaryCrystal]
+):
     """
     A double crystal monochromator (DCM), used to select the energy of the beam.
 

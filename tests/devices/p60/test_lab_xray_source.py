@@ -83,32 +83,32 @@ def test_class_parents_definitions(
 def test_move_fail(
     al_kalpha_source: LabXraySourceReadable,
     mg_kalpha_source: LabXraySourceReadable,
-    RE: RunEngine,
+    run_engine: RunEngine,
 ):
     new_energy = 100.0
     with pytest.raises(
         AssertionError, match=re.escape("does not implement all Movable methods")
     ):
-        RE(mv(al_kalpha_source, new_energy))
+        run_engine(mv(al_kalpha_source, new_energy))
 
     with pytest.raises(
         AssertionError, match=re.escape("does not implement all Movable methods")
     ):
-        RE(mv(mg_kalpha_source, new_energy))
+        run_engine(mv(mg_kalpha_source, new_energy))
 
 
 def test_move_energy_fail(
     al_kalpha_source: LabXraySourceReadable,
     mg_kalpha_source: LabXraySourceReadable,
-    RE: RunEngine,
+    run_engine: RunEngine,
 ):
     new_energy = 100.0
     with pytest.raises(
         AssertionError, match=re.escape("does not implement all Movable methods")
     ):
-        RE(mv(al_kalpha_source.energy_ev, new_energy))
+        run_engine(mv(al_kalpha_source.energy_ev, new_energy))
 
     with pytest.raises(
         AssertionError, match=re.escape("does not implement all Movable methods")
     ):
-        RE(mv(mg_kalpha_source.energy_ev, new_energy))
+        run_engine(mv(mg_kalpha_source.energy_ev, new_energy))

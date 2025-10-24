@@ -23,6 +23,9 @@ from dodal.utils import (
 from tests.devices.test_data import TEST_LUT_TXT
 from tests.test_data import I04_BEAMLINE_PARAMETERS
 
+# Add utils fixtures to be used in tests
+pytest_plugins = ["dodal.testing.fixtures.utils"]
+
 
 @pytest.fixture(scope="function")
 def module_and_devices_for_beamline(request: pytest.FixtureRequest):

@@ -2,13 +2,13 @@ from ophyd_async.epics.core import epics_signal_r
 from ophyd_async.epics.motor import Motor
 
 from dodal.devices.common_dcm import (
-    BaseDCM,
+    DoubleCrystalMonochromator,
     PitchAndRollCrystal,
     StationaryCrystal,
 )
 
 
-class DCM(BaseDCM[PitchAndRollCrystal, StationaryCrystal]):
+class DCM(DoubleCrystalMonochromator[PitchAndRollCrystal, StationaryCrystal]):
     """
     Device for i07's DCM, including temperature monitors and vertical motor which were
     included in GDA.

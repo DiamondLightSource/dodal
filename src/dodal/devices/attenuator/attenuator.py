@@ -7,6 +7,7 @@ from ophyd_async.core import (
     DeviceVector,
     SignalR,
     StandardReadable,
+    StrictEnum,
     SubsetEnum,
     wait_for_value,
 )
@@ -26,6 +27,9 @@ class ReadOnlyAttenuator(StandardReadable):
 
     def __init__(self, prefix: str, name: str = "") -> None:
         with self.add_children_as_readables():
+            # Closest obtainable transmission to the current desired transmission given the specific
+            # set of filters in the attenuator. This value updates immediately after setting desired
+            # transmission, before the motors may have finished moving. It is not a readback value.
             self.actual_transmission = epics_signal_r(float, prefix + "MATCH")
 
         super().__init__(name)
@@ -92,7 +96,18 @@ class BinaryFilterAttenuator(ReadOnlyAttenuator, Movable[float]):
         )
 
 
-class EnumFilterAttenuator(ReadOnlyAttenuator):
+# Replace with ophyd async enum after https://github.com/bluesky/ophyd-async/pull/1067
+class YesNo(StrictEnum):
+    YES = "YES"
+    NO = "NO"
+
+
+# Time given to allow for motors to begin moving after the desired transmission has been set,
+# so that we can work out when the set is complete.
+ENUM_ATTENUATOR_SETTLE_TIME_S = 0.15
+
+
+class EnumFilterAttenuator(ReadOnlyAttenuator, Movable[float]):
     """The attenuator will insert filters into the beam to reduce its transmission.
 
     This device is currently working, but feature incomplete. See https://github.com/DiamondLightSource/dodal/issues/972
@@ -107,11 +122,42 @@ class EnumFilterAttenuator(ReadOnlyAttenuator):
         filter_selection: tuple[type[SubsetEnum], ...],
         name: str = "",
     ):
+        self._auto_move_on_desired_transmission_set = epics_signal_rw(
+            YesNo, prefix + "AUTOMOVE"
+        )
+        self._desired_transmission = epics_signal_rw(float, prefix + "T2A:SETVAL1")
+        self._use_current_energy = epics_signal_x(prefix + "E2WL:USECURRENTENERGY.PROC")
+
         with self.add_children_as_readables():
-            self.filters: DeviceVector[FilterMotor] = DeviceVector(
+            self._filters: DeviceVector[FilterMotor] = DeviceVector(
                 {
                     index: FilterMotor(f"{prefix}MP{index + 1}:", filter, name)
                     for index, filter in enumerate(filter_selection)
                 }
             )
         super().__init__(prefix, name=name)
+
+    @AsyncStatus.wrap
+    async def set(self, value: float):
+        """Set the transmission to the fractional (0-1) value given.
+
+        The attenuator IOC will then insert filters to reach the desired transmission for
+        the current beamline energy, the set will only complete when they have all been
+        applied.
+        """
+
+        # auto move should normally be on, but check here incase it was manually turned off
+        await self._auto_move_on_desired_transmission_set.set(YesNo.YES)
+
+        # Currently uncertain if _use_current_energy correctly waits for completion: https://github.com/DiamondLightSource/dodal/issues/1588
+        await self._use_current_energy.trigger()
+        await self._desired_transmission.set(value)
+
+        # Give EPICS a chance to start moving the filter motors. Not needed after
+        # a transmission readback PV is added at the controls level: https://jira.diamond.ac.uk/browse/I24-725
+        await asyncio.sleep(ENUM_ATTENUATOR_SETTLE_TIME_S)
+        coros = [
+            wait_for_value(self._filters[i].done_move, 1, timeout=DEFAULT_TIMEOUT)
+            for i in self._filters
+        ]
+        await asyncio.gather(*coros)
