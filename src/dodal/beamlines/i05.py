@@ -30,13 +30,20 @@ def pgm() -> PGM:
 
 
 @device_factory()
+def id_gap() -> UndulatorGap:
+    return UndulatorGap(prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:")
+
+
+@device_factory()
+def id_phase() -> UndulatorLockedPhaseAxes:
+    return UndulatorLockedPhaseAxes(
+        prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:",
+        top_outer="PL",
+        btm_inner="PU",
+    )
+
+
+@device_factory()
 def id() -> Apple2:
     """i05 insertion device."""
-    return Apple2(
-        id_gap=UndulatorGap(prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:"),
-        id_phase=UndulatorLockedPhaseAxes(
-            prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:",
-            top_outer="PL",
-            btm_inner="PU",
-        ),
-    )
+    return Apple2(id_gap=id_gap(), id_phase=id_phase())

@@ -23,26 +23,40 @@ def synchrotron() -> Synchrotron:
 
 
 @device_factory()
+def idd_gap() -> UndulatorGap:
+    return UndulatorGap(prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:")
+
+
+@device_factory()
+def idd_phase() -> UndulatorLockedPhaseAxes:
+    return UndulatorLockedPhaseAxes(
+        prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:",
+        top_outer="PL",
+        btm_inner="PU",
+    )
+
+
+@device_factory()
 def idd() -> Apple2:
     """i06 downstream insertion device."""
-    return Apple2(
-        id_gap=UndulatorGap(prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:"),
-        id_phase=UndulatorLockedPhaseAxes(
-            prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:",
-            top_outer="PL",
-            btm_inner="PU",
-        ),
+    return Apple2(id_gap=idd_gap(), id_phase=idd_phase())
+
+
+@device_factory()
+def idu_gap() -> UndulatorGap:
+    return UndulatorGap(prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-21:")
+
+
+@device_factory()
+def idu_phase() -> UndulatorLockedPhaseAxes:
+    return UndulatorLockedPhaseAxes(
+        prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-21:",
+        top_outer="PL",
+        btm_inner="PU",
     )
 
 
 @device_factory()
 def idu() -> Apple2:
     """i06 upstream insertion device."""
-    return Apple2(
-        id_gap=UndulatorGap(prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-21:"),
-        id_phase=UndulatorLockedPhaseAxes(
-            prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-21:",
-            top_outer="PL",
-            btm_inner="PU",
-        ),
-    )
+    return Apple2(id_gap=idd_gap(), id_phase=idd_phase())
