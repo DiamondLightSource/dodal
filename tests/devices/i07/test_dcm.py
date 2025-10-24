@@ -12,7 +12,7 @@ async def dcm() -> DCM:
     return dcm
 
 
-async def test_read_includes(
+async def test_dcm_read(
     dcm: DCM,
 ):
     await assert_reading(
