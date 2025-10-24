@@ -18,7 +18,9 @@ async def i11_dcm() -> DCM:
 
 def test_count_i11_dcm(
     run_engine: RunEngine,
-    run_engine_documents: dict[str, list[dict]],
+    from collections.abc import Mapping
+    ...
+    run_engine_documents: Mapping[str, list[dict]],
     i11_dcm: DCM,
 ):
     run_engine(bp.count([i11_dcm]))
