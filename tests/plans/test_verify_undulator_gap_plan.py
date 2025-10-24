@@ -14,6 +14,6 @@ def test_verify_undulator_gap(
     run_engine: RunEngine,
 ):
     kev_val = 5
-    set_mock_value(mock_undulator_and_dcm.dcm.energy_in_kev.user_readback, kev_val)
+    set_mock_value(mock_undulator_and_dcm.dcm.energy_in_keV.user_readback, kev_val)
     run_engine(verify_undulator_gap(mock_undulator_and_dcm))
     mock_set.assert_called_once_with(kev_val)
