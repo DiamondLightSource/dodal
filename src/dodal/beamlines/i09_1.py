@@ -34,7 +34,7 @@ def dcm() -> DoubleCrystalMonochromatorWithDSpacing:
 
 @device_factory()
 def energy_source() -> EnergySource:
-    return EnergySource(dcm().energy_in_ev)
+    return EnergySource(dcm().energy_in_eV)
 
 
 # Connect will work again after this work completed

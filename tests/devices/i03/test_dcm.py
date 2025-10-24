@@ -24,7 +24,7 @@ async def test_metadata_reflection(dcm: DCM):
     [
         "dcm-backplate_temp",
         "dcm-bragg_in_degrees",
-        "dcm-energy_in_kev",
+        "dcm-energy_in_keV",
         "dcm-offset_in_mm",
         "dcm-crystal_metadata_usage",
         "dcm-crystal_metadata_type",

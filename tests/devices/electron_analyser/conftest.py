@@ -41,9 +41,9 @@ async def single_energy_source() -> EnergySource:
         dcm = DoubleCrystalMonochromatorWithDSpacing(
             "DCM:", PitchAndRollCrystal, StationaryCrystal
         )
-    patch_motor(dcm.energy_in_kev, initial_position=2.2)
+    patch_motor(dcm.energy_in_keV, initial_position=2.2)
     async with init_devices(mock=True):
-        dcm_energy_source = EnergySource(dcm.energy_in_ev)
+        dcm_energy_source = EnergySource(dcm.energy_in_eV)
     return dcm_energy_source
 
 
@@ -53,7 +53,7 @@ async def dual_energy_source() -> DualEnergySource:
         dcm = DoubleCrystalMonochromatorWithDSpacing(
             "DCM:", PitchAndRollCrystal, StationaryCrystal
         )
-    patch_motor(dcm.energy_in_kev, initial_position=2.2)
+    patch_motor(dcm.energy_in_keV, initial_position=2.2)
 
     async with init_devices(mock=True):
         pgm = PGM("PGM:", Grating)
@@ -61,7 +61,7 @@ async def dual_energy_source() -> DualEnergySource:
 
     async with init_devices(mock=True):
         dual_energy_source = DualEnergySource(
-            source1=dcm.energy_in_ev, source2=pgm.energy.user_readback
+            source1=dcm.energy_in_eV, source2=pgm.energy.user_readback
         )
     return dual_energy_source
 

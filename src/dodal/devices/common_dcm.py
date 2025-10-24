@@ -53,9 +53,9 @@ class DoubleCrystalMonochromatorBase(StandardReadable, Generic[Xtal_1, Xtal_2]):
     ) -> None:
         with self.add_children_as_readables():
             # Virtual motor PV's which set the physical motors so that the DCM produces requested energy
-            self.energy_in_kev = Motor(prefix + "ENERGY")
-            self.energy_in_ev = derived_signal_r(
-                self._convert_keV_to_eV, energy_signal=self.energy_in_kev.user_readback
+            self.energy_in_keV = Motor(prefix + "ENERGY")
+            self.energy_in_eV = derived_signal_r(
+                self._convert_keV_to_eV, energy_signal=self.energy_in_keV.user_readback
             )
 
             self._make_crystals(prefix, xtal_1, xtal_2)

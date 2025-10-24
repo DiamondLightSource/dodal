@@ -89,14 +89,14 @@ async def test_if_gap_is_wrong_then_logger_info_is_called_and_gap_is_set_correct
     mock_logger: MagicMock, mock_load: MagicMock, fake_undulator_dcm: UndulatorDCM
 ):
     set_mock_value(fake_undulator_dcm.undulator_ref().current_gap, 5.3)
-    set_mock_value(fake_undulator_dcm.dcm_ref().energy_in_kev.user_readback, 5.7)
+    set_mock_value(fake_undulator_dcm.dcm_ref().energy_in_keV.user_readback, 5.7)
 
     mock_load.return_value = np.array([[5700, 5.4606], [7000, 6.045], [9700, 6.404]])
 
     await fake_undulator_dcm.set(6.9)
 
     assert (
-        await fake_undulator_dcm.dcm_ref().energy_in_kev.user_setpoint.get_value()
+        await fake_undulator_dcm.dcm_ref().energy_in_keV.user_setpoint.get_value()
     ) == 6.9
     assert (
         await fake_undulator_dcm.undulator_ref().gap_motor.user_setpoint.get_value()
@@ -120,7 +120,7 @@ async def test_when_gap_access_is_not_checked_if_commissioning_mode_enabled(
     )
     set_mock_value(undulator_in_commissioning_mode.undulator_ref().current_gap, 5.3)
     set_mock_value(
-        undulator_in_commissioning_mode.dcm_ref().energy_in_kev.user_readback, 5.7
+        undulator_in_commissioning_mode.dcm_ref().energy_in_keV.user_readback, 5.7
     )
 
     set_mock_value(
@@ -135,7 +135,7 @@ async def test_when_gap_access_is_not_checked_if_commissioning_mode_enabled(
     await undulator_in_commissioning_mode.set(6.9)
 
     assert (
-        await undulator_in_commissioning_mode.dcm_ref().energy_in_kev.user_setpoint.get_value()
+        await undulator_in_commissioning_mode.dcm_ref().energy_in_keV.user_setpoint.get_value()
     ) == 6.9
     # Verify undulator has not been asked to move
     assert (
@@ -151,8 +151,8 @@ async def test_when_gap_access_is_not_checked_if_commissioning_mode_enabled(
 async def test_if_gap_is_already_correct_then_dont_move_gap(
     mock_logger: MagicMock, mock_load: MagicMock, fake_undulator_dcm: UndulatorDCM
 ):
-    set_mock_value(fake_undulator_dcm.dcm_ref().energy_in_kev.user_setpoint, 0.0)
-    set_mock_value(fake_undulator_dcm.dcm_ref().energy_in_kev.user_readback, 0.0)
+    set_mock_value(fake_undulator_dcm.dcm_ref().energy_in_keV.user_setpoint, 0.0)
+    set_mock_value(fake_undulator_dcm.dcm_ref().energy_in_keV.user_readback, 0.0)
 
     mock_load.return_value = np.array([[5700, 5.4606], [7000, 6.045], [9700, 6.404]])
     set_mock_value(fake_undulator_dcm.undulator_ref().current_gap, 5.4605)
@@ -175,7 +175,7 @@ async def test_dcm_offset_only_set_when_energy_set_completes(
     release_dcm = asyncio.Event()
     release_undulator = asyncio.Event()
 
-    fake_undulator_dcm.dcm_ref().energy_in_kev.set = MagicMock(
+    fake_undulator_dcm.dcm_ref().energy_in_keV.set = MagicMock(
         return_value=AsyncStatus(release_dcm.wait())
     )
     fake_undulator_dcm.undulator_ref().gap_motor.set = MagicMock(
@@ -203,7 +203,7 @@ async def test_energy_set_only_complete_when_all_statuses_are_finished(
     release_dcm = asyncio.Event()
     release_undulator = asyncio.Event()
 
-    fake_undulator_dcm.dcm_ref().energy_in_kev.set = MagicMock(
+    fake_undulator_dcm.dcm_ref().energy_in_keV.set = MagicMock(
         return_value=AsyncStatus(release_dcm.wait())
     )
     fake_undulator_dcm.undulator_ref().gap_motor.set = MagicMock(
@@ -232,7 +232,7 @@ async def test_when_undulator_gap_is_disabled_setting_energy_errors_and_dcm_ener
         await fake_undulator_dcm.set(5)
 
     get_mock_put(
-        fake_undulator_dcm.dcm_ref().energy_in_kev.user_setpoint
+        fake_undulator_dcm.dcm_ref().energy_in_keV.user_setpoint
     ).assert_not_called()
 
 

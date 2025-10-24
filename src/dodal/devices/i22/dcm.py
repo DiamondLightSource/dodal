@@ -107,7 +107,7 @@ class DCM(DoubleCrystalMonochromatorWithDSpacing[RollCrystal, PitchAndRollCrysta
 
     async def read(self) -> dict[str, Reading]:
         default_reading = await super().read()
-        energy: float = default_reading[f"{self.name}-energy_in_kev"]["value"]
+        energy: float = default_reading[f"{self.name}-energy_in_keV"]["value"]
         if energy > 0.0:
             wavelength = _CONVERSION_CONSTANT / energy
         else:
