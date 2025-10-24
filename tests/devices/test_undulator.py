@@ -164,7 +164,7 @@ async def test_order_read(
 ):
     await assert_reading(
         undulator_order,
-        {"undulator_order-_order": partial_reading(3)},
+        {"undulator_order-_value": partial_reading(3)},
     )
 
 
@@ -187,6 +187,6 @@ async def test_move_order_fails(
 ):
     with pytest.raises(
         ValueError,
-        match="Undulator order must be a positive integer",
+        match=f"Undulator order must be a positive integer. Requested value: {order_value}",
     ):
         await undulator_order.set(order_value)  # type: ignore
