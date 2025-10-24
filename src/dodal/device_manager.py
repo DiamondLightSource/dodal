@@ -471,8 +471,6 @@ class DeviceManager:
                 for f in (self._factories | self._v1_factories).values()
                 # allow overriding skip but still allow fixtures to override devices
                 if (include_skipped or not f.skip)
-                # don't build anything that has been overridden by a fixture
-                and (not fixtures or f.name not in fixtures)
             ),
             fixtures=fixtures,
             mock=mock,
@@ -491,15 +489,14 @@ class DeviceManager:
 
         fixtures = LazyFixtures(provided=fixtures, factories=self._fixtures)
         if common := fixtures.keys() & {f.name for f in factories}:
-            warnings.warn(
-                f"Factories ({common}) will be overridden by fixtures", stacklevel=1
-            )
             factories = tuple(f for f in factories if f.name not in common)
         build_list = self._expand_dependencies(factories, fixtures)
         order = self._build_order(
             {dep: self[dep] for dep in build_list}, fixtures=fixtures
         )
-        built: dict[str, AnyDevice] = {}
+        built: dict[str, AnyDevice] = {
+            override: fixtures[override] for override in common
+        }
         connection_specs: dict[str, ConnectionSpec] = {}
         errors = {}
         for device in order:
