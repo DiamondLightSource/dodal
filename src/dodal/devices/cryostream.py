@@ -32,7 +32,7 @@ class TurboEnum(StrictEnum):
     AUTO = "Auto"
 
 
-class CryostreamSelection(StrictEnum):
+class CryoStreamSelection(StrictEnum):
     CRYOJET = "CryoJet"
     HC1 = "HC1"
 
@@ -118,7 +118,7 @@ class CryoStreamGantry(StandardReadable):
     def __init__(self, prefix: str, name: str = ""):
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             self.cryostream_selector = epics_signal_r(
-                CryostreamSelection, f"{prefix}-EA-GANT-01:CTRL"
+                CryoStreamSelection, f"{prefix}-EA-GANT-01:CTRL"
             )
             self.hc1_selected = epics_signal_r(
                 int, f"{prefix}-MO-STEP-02:GPIO_INP_BITS.B2"
