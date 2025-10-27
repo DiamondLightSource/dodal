@@ -199,7 +199,7 @@ class V1DeviceFactory(Generic[V1]):
         skip: SkipType,
         wait: bool,
         timeout: int,
-        init: OphydInitialiser[V1] | None,
+        init: OphydInitialiser[V1],
         manager: "DeviceManager",
     ):
         self.factory = factory
@@ -210,8 +210,7 @@ class V1DeviceFactory(Generic[V1]):
         self.timeout = timeout
         self.post_create = init or (lambda x: x)
         self._manager = manager
-        if init:
-            wraps(init)(self)
+        wraps(init)(self)
 
     @property
     def name(self) -> str:
@@ -280,7 +279,7 @@ class V1DeviceFactory(Generic[V1]):
         return device  # type: ignore - it's us really, promise
 
     def __repr__(self) -> str:
-        return f"<{self.name}: V1DeviceFactory({self.factory.__name__})>"
+        return f"<{self.name}: V1DeviceFactory[{self.factory.__name__}]>"
 
 
 class ConnectionSpec(NamedTuple):
@@ -607,5 +606,8 @@ class DeviceManager:
 
         return order
 
+    def __len__(self) -> int:
+        return len(self._factories) + len(self._v1_factories)
+
     def __repr__(self) -> str:
-        return f"<DeviceManager: {len(self._factories)} devices>"
+        return f"<DeviceManager: {len(self)} devices>"
