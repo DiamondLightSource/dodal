@@ -1,9 +1,9 @@
-from pathlib import PurePath
-from ophyd.epics_motor import EpicsMotor
-from ophyd_async.core import PathProvider, StaticPathProvider, UUIDFilenameProvider
 from ophyd_async.epics.adsimdetector import SimDetector
 
-from dodal.device_manager import DeviceManager
+from dodal.common.beamlines.beamline_utils import (
+    device_factory,
+    get_path_provider,
+)
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.beamlines.device_helpers import DET_SUFFIX, HDF5_SUFFIX
 from dodal.devices.motors import XThetaStage
@@ -63,32 +63,19 @@ run_engine(count([d], num=10))
 
 """
 
-devices = DeviceManager()
 
-
-@devices.fixture
-def path_provider() -> PathProvider:
-    return StaticPathProvider(UUIDFilenameProvider(), PurePath("/"))
-
-
-@devices.factory(timeout=2, mock=False)
+@device_factory()
 def stage() -> XThetaStage:
     return XThetaStage(
         f"{PREFIX.beamline_prefix}-MO-SIMC-01:", x_infix="M1", theta_infix="M2"
     )
 
 
-@devices.factory(timeout=2)
-def det(path_provider: PathProvider) -> SimDetector:
+@device_factory()
+def det() -> SimDetector:
     return SimDetector(
         f"{PREFIX.beamline_prefix}-DI-CAM-01:",
-        path_provider=path_provider,
+        path_provider=get_path_provider(),
         drv_suffix=DET_SUFFIX,
         fileio_suffix=HDF5_SUFFIX,
     )
-
-
-@devices.v1_init(factory=EpicsMotor, prefix=f"{PREFIX.beamline_prefix}-MO-SIMC-01:M1")
-def old_motor(motor: EpicsMotor):
-    # arbitrary post-init configuration
-    motor.settle_time = 12
