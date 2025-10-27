@@ -14,7 +14,7 @@
                 "debug-test"
             ],
             "console": "integratedTerminal",
-            "preLaunchTask": "load_dials_env",
+            //"preLaunchTask": "load_dials_env",
             "env": {
                 "PYTEST_ADDOPTS": "--no-cov -vv"
             },

@@ -32,6 +32,9 @@ class MerlinController(ConstantDeadTimeController):
 
         super().__init__(driver, 0.002)
 
+    def get_deadtime(self, exposure: float | None) -> float:
+        return 0.001
+
     async def prepare(self, trigger_info: TriggerInfo):
         self.frame_timeout = (
             DEFAULT_TIMEOUT + await self.driver.acquire_time.get_value()
