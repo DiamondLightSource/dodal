@@ -50,7 +50,8 @@ dev = [
     # Commented out due to dependency version conflict with pydantic 1.x
     # "copier",
     "myst-parser",
-    "ophyd_async[sim]",
+    "ophyd_async @ git+https://github.com/bluesky/ophyd-async.git#egg=1104_quantize_gap",
+    # "ophyd_async[sim]",
     "pipdeptree",
     "pre-commit",
     "psutil",
