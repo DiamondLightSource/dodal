@@ -9,10 +9,11 @@ from ophyd_async.core import Device as OphydV2Device
 
 from dodal.device_manager import DEFAULT_TIMEOUT, DeviceBuildResult, DeviceManager, LazyFixtures
 
+@pytest.fixture
+def dm() -> DeviceManager:
+    return DeviceManager()
 
-def test_single_factory():
-    dm = DeviceManager()
-
+def test_single_factory(dm: DeviceManager):
     s1 = Mock()
 
     @dm.factory
@@ -23,9 +24,7 @@ def test_single_factory():
     assert devices.devices == {"sim": s1()}
 
 
-def test_two_devices():
-    dm = DeviceManager()
-
+def test_two_devices(dm: DeviceManager):
     s1 = Mock()
     s2 = Mock()
 
@@ -41,9 +40,7 @@ def test_two_devices():
     assert devices.devices == {"foo": s1(), "bar": s2()}
 
 
-def test_build_one_of_two():
-    dm = DeviceManager()
-
+def test_build_one_of_two(dm: DeviceManager):
     s1 = Mock()
     s2 = Mock()
 
@@ -59,9 +56,7 @@ def test_build_one_of_two():
     assert devices.devices == {"foo": s1()}
 
 
-def test_build_directly():
-    dm = DeviceManager()
-
+def test_build_directly(dm: DeviceManager):
     s1 = Mock()
     s2 = Mock()
 
@@ -77,9 +72,7 @@ def test_build_directly():
     assert f == s1()
 
 
-def test_build_method():
-    dm = DeviceManager()
-
+def test_build_method(dm: DeviceManager):
     s1 = Mock()
     s2 = Mock()
 
@@ -95,9 +88,7 @@ def test_build_method():
     assert f == s1()
 
 
-def test_dependent_devices():
-    dm = DeviceManager()
-
+def test_dependent_devices(dm: DeviceManager):
     s1 = Mock()
     s2 = Mock()
 
@@ -114,9 +105,7 @@ def test_dependent_devices():
     assert devices.devices == {"foo": s1(s2()), "bar": s2()}
 
 
-def test_dependent_device_build_method():
-    dm = DeviceManager()
-
+def test_dependent_device_build_method(dm: DeviceManager):
     s1 = Mock()
     s2 = Mock()
 
@@ -133,9 +122,7 @@ def test_dependent_device_build_method():
     assert f == s1(s2())
 
 
-def test_fixture_argument():
-    dm = DeviceManager()
-
+def test_fixture_argument(dm: DeviceManager):
     s1 = Mock()
 
     @dm.factory
@@ -145,9 +132,7 @@ def test_fixture_argument():
     s1.assert_called_once_with(123)
 
 
-def test_none_fixture():
-    dm = DeviceManager()
-
+def test_none_fixture(dm: DeviceManager):
     s1 = Mock()
 
     @dm.factory
@@ -158,9 +143,7 @@ def test_none_fixture():
     assert devices.devices == {"foo": s1(None)}
 
 
-def test_default_argument():
-    dm = DeviceManager()
-
+def test_default_argument(dm: DeviceManager):
     s1 = Mock()
 
     @dm.factory
@@ -170,9 +153,7 @@ def test_default_argument():
     s1.assert_called_once_with(42)
 
 
-def test_fixture_overrides_default_argument():
-    dm = DeviceManager()
-
+def test_fixture_overrides_default_argument(dm: DeviceManager):
     s1 = Mock()
 
     @dm.factory
@@ -182,9 +163,7 @@ def test_fixture_overrides_default_argument():
     s1.assert_called_once_with(17)
 
 
-def test_fixture_overrides_factory():
-    dm = DeviceManager()
-
+def test_fixture_overrides_factory(dm: DeviceManager):
     s1 = Mock()
     s2 = Mock()
 
@@ -201,9 +180,7 @@ def test_fixture_overrides_factory():
     assert devices.devices == {"foo": s1(17), "bar": 17}
 
 
-def test_fixture_function():
-    dm = DeviceManager()
-
+def test_fixture_function(dm: DeviceManager):
     s1 = Mock()
 
     @dm.factory
@@ -217,9 +194,7 @@ def test_fixture_function():
     assert devices.devices == {"foo": s1(42)}
 
 
-def test_fixture_functions_are_lazy():
-    dm = DeviceManager()
-
+def test_fixture_functions_are_lazy(dm: DeviceManager):
     s1 = Mock()
     fix = Mock()
     fix.__name__ = "fix"
@@ -234,9 +209,7 @@ def test_fixture_functions_are_lazy():
     assert devices.devices == {"foo": s1()}
 
 
-def test_duplicate_factories_error():
-    dm = DeviceManager()
-
+def test_duplicate_factories_error(dm: DeviceManager):
     s1 = Mock()
 
     @dm.factory
@@ -248,8 +221,7 @@ def test_duplicate_factories_error():
         def foo(): return s1()
 
 
-def test_missing_dependency_errors():
-    dm = DeviceManager()
+def test_missing_dependency_errors(dm: DeviceManager):
     s1 = Mock()
 
     @dm.factory
@@ -259,9 +231,7 @@ def test_missing_dependency_errors():
         dm.build_all()
 
 
-def test_missing_fixture_ok_if_not_required():
-    dm = DeviceManager()
-
+def test_missing_fixture_ok_if_not_required(dm: DeviceManager):
     s1 = Mock()
     s2 = Mock()
 
@@ -278,9 +248,7 @@ def test_missing_fixture_ok_if_not_required():
     assert devices.devices == {"bar": s2()}
 
 
-def test_circular_dependencies_error():
-    dm = DeviceManager()
-
+def test_circular_dependencies_error(dm: DeviceManager):
     s1 = Mock()
     s2 = Mock()
 
@@ -295,8 +263,7 @@ def test_circular_dependencies_error():
 
 
 # chasing coverage numbers
-def test_repr():
-    dm = DeviceManager()
+def test_repr(dm: DeviceManager):
     s1 = Mock()
     s2 = Mock()
     s2.__name__ = "S2"
@@ -314,8 +281,7 @@ def test_repr():
     assert repr(bar) == "<bar: V1DeviceFactory[S2]>"
 
 
-def test_build_errors_are_caught():
-    dm = DeviceManager()
+def test_build_errors_are_caught(dm: DeviceManager):
     s1 = Mock()
     err = RuntimeError("Build failed")
     s1.side_effect = err
@@ -330,9 +296,7 @@ def test_build_errors_are_caught():
     assert devices.errors == {"foo": err}
 
 
-def test_dependency_errors_propagate():
-    dm = DeviceManager()
-
+def test_dependency_errors_propagate(dm: DeviceManager):
     s1 = Mock()
     err = RuntimeError("Build failed")
     s2 = Mock()
@@ -355,8 +319,7 @@ def test_dependency_errors_propagate():
     assert foo_err.args == ("Errors building dependencies: {'bar'}",)
 
 
-def test_devices_are_named():
-    dm = DeviceManager()
+def test_devices_are_named(dm: DeviceManager):
     s1 = Mock()
 
     @dm.factory
@@ -368,8 +331,7 @@ def test_devices_are_named():
     f.set_name.assert_called_once_with("foo")
 
 
-def test_skip_naming():
-    dm = DeviceManager()
+def test_skip_naming(dm: DeviceManager):
     s1 = Mock()
 
     @dm.factory(use_factory_name=False)
@@ -381,8 +343,7 @@ def test_skip_naming():
     f.set_name.assert_not_called()
 
 
-def test_override_name():
-    dm = DeviceManager()
+def test_override_name(dm: DeviceManager):
     s1 = Mock()
 
     @dm.factory
@@ -394,8 +355,7 @@ def test_override_name():
     f.set_name.assert_called_with("not_foo")
 
 
-def test_positional_only_args_error():
-    dm = DeviceManager()
+def test_positional_only_args_error(dm: DeviceManager):
     s1 = Mock()
 
     with pytest.raises(ValueError, match="positional only arguments"):
@@ -404,8 +364,7 @@ def test_positional_only_args_error():
         def foo(foo, /): return s1()
 
 
-def test_devices_or_raise():
-    dm = DeviceManager()
+def test_devices_or_raise(dm: DeviceManager):
     s1 = Mock()
     s1.side_effect = RuntimeError("Build failed")
 
@@ -416,9 +375,7 @@ def test_devices_or_raise():
     with RaisesGroup(RaisesExc(RuntimeError, match="Build failed")):
         devices.or_raise()
 
-def test_connect():
-    dm = DeviceManager()
-
+def test_connect(dm: DeviceManager):
     s1 = Mock()
     s1.return_value = Mock(spec=OphydV2Device)
 
@@ -433,9 +390,7 @@ def test_connect():
     assert con.build_errors == {}
     assert con.connection_errors == {}
 
-def test_build_and_connect():
-    dm = DeviceManager()
-
+def test_build_and_connect(dm: DeviceManager):
     s1 = Mock()
     s1.return_value = Mock(spec=OphydV2Device)
 
@@ -451,8 +406,7 @@ def test_build_and_connect():
     assert con.connection_errors == {}
 
 
-def test_factory_options():
-    dm = DeviceManager()
+def test_factory_options(dm: DeviceManager):
     s1 = Mock()
     s1.return_value = Mock(spec=OphydV2Device)
     @dm.factory(mock=True, timeout=12)
@@ -462,8 +416,7 @@ def test_factory_options():
     assert con.connection_errors == {}
     assert con.build_errors == {}
 
-def test_connect_failures():
-    dm = DeviceManager()
+def test_connect_failures(dm: DeviceManager):
     s1 = Mock()
     s1.return_value = Mock(spec=OphydV2Device)
     err = ValueError("Not connected")
@@ -475,9 +428,7 @@ def test_connect_failures():
     assert con.connection_errors == {"foo": err}
     assert con.build_errors == {}
 
-def test_connect_or_raise_without_errors():
-    dm = DeviceManager()
-
+def test_connect_or_raise_without_errors(dm: DeviceManager):
     s1 = Mock()
     s1.return_value = Mock(spec=OphydV2Device)
 
@@ -490,9 +441,7 @@ def test_connect_or_raise_without_errors():
 
     assert con == {"foo": s1()}
 
-def test_connect_or_raise_with_build_errors():
-    dm = DeviceManager()
-
+def test_connect_or_raise_with_build_errors(dm: DeviceManager):
     s1 = Mock()
     s1.return_value = Mock(spec=OphydV2Device)
 
@@ -503,9 +452,7 @@ def test_connect_or_raise_with_build_errors():
         dm.build_devices(foo).connect().or_raise()
 
 
-def test_connect_or_raise_with_connect_errors():
-    dm = DeviceManager()
-
+def test_connect_or_raise_with_connect_errors(dm: DeviceManager):
     s1 = Mock()
     s1.return_value = Mock(spec=OphydV2Device)
     s1.return_value.connect.side_effect = ValueError("foo connection")
@@ -516,8 +463,7 @@ def test_connect_or_raise_with_connect_errors():
     with RaisesGroup(RaisesExc(ValueError, match="foo connection")):
         dm.build_devices(foo).connect().or_raise()
 
-def test_build_and_connect_immediately():
-    dm = DeviceManager()
+def test_build_and_connect_immediately(dm: DeviceManager):
     s1 = Mock()
     s1.return_value = Mock(spec=OphydV2Device)
     @dm.factory
@@ -527,9 +473,7 @@ def test_build_and_connect_immediately():
     s1().connect.assert_called_with(mock=False, timeout=DEFAULT_TIMEOUT)
     assert f is s1()
 
-def test_skip_factory():
-    dm = DeviceManager()
-
+def test_skip_factory(dm: DeviceManager):
     s1 = Mock()
     s2 = Mock()
 
@@ -544,9 +488,7 @@ def test_skip_factory():
     s2.assert_not_called()
     assert devices.devices == {"foo": s1()}
 
-def test_skip_ignored_if_required():
-    dm = DeviceManager()
-
+def test_skip_ignored_if_required(dm: DeviceManager):
     s1 = Mock()
     s2 = Mock()
 
@@ -561,8 +503,7 @@ def test_skip_ignored_if_required():
     s1.assert_called_once_with(s2())
     assert devices.devices == {"foo": s1(), "bar": s2()}
 
-def test_mock_all():
-    dm = DeviceManager()
+def test_mock_all(dm: DeviceManager):
     s1 = Mock()
     s1.return_value = Mock(spec=OphydV2Device)
     @dm.factory
@@ -572,8 +513,7 @@ def test_mock_all():
     s1().connect.assert_called_once_with(mock=True, timeout=11)
 
 
-def test_v1_device_factory():
-    dm = DeviceManager()
+def test_v1_device_factory(dm: DeviceManager):
     s1 = MagicMock(spec=OphydV1Device) # type: ignore
     s1.__name__ = "S1"
 
@@ -588,8 +528,7 @@ def test_v1_device_factory():
     assert devices.devices["foo"] is device
     wfc.assert_called_once_with(device, timeout=DEFAULT_TIMEOUT)
 
-def test_v1_v2_name_clash():
-    dm = DeviceManager()
+def test_v1_v2_name_clash(dm: DeviceManager):
     s1 = Mock()
     s2 = MagicMock()
 
@@ -601,8 +540,7 @@ def test_v1_v2_name_clash():
         def foo(_):
             pass
 
-def test_v1_decorator_is_transparent():
-    dm = DeviceManager()
+def test_v1_decorator_is_transparent(dm: DeviceManager):
     s1 = MagicMock()
 
     @dm.v1_init(s1, prefix="S1_PREFIX")
@@ -616,8 +554,7 @@ def test_v1_decorator_is_transparent():
     dev.special_init_method.assert_called_once()
     s1.assert_not_called()
 
-def test_v1_no_wait():
-    dm = DeviceManager()
+def test_v1_no_wait(dm: DeviceManager):
     s1 = Mock()
     @dm.v1_init(s1, prefix="S1_PREFIX", wait=False)
     def foo(_):
@@ -634,19 +571,17 @@ def test_connect_ignores_v1():
     # mock raises exception if connect is called
     assert con.devices == {"foo": v1}
 
-def test_v1_mocking():
+def test_v1_mocking(dm: DeviceManager):
     s1 = Mock()
     s1.return_value = Mock(spec=OphydV1Device)
-    dm = DeviceManager()
     @dm.v1_init(s1, prefix="S1_PREFIX", mock=True)
     def foo(_): pass
     with patch("dodal.device_manager.make_fake_device") as mfd:
         dm.build_all()
         mfd.assert_called_once_with(s1)
 
-def test_v1_init_params():
+def test_v1_init_params(dm: DeviceManager):
     # values are passed from fixtures
-    dm = DeviceManager()
     s1 = Mock()
     s1.return_value = Mock(spec=OphydV1Device)
     s1.return_value.mock_add_spec(["set_up_with"])
