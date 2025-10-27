@@ -36,6 +36,7 @@ from dodal.devices.i10.i10_apple2 import (
 )
 from dodal.devices.i10.i10_setting_data import I10Grating
 from dodal.devices.pgm import PGM
+from dodal.devices.util.lookup_tables_apple2 import convert_csv_to_lookup
 from dodal.testing import patch_motor
 from tests.devices.i10.test_data import (
     EXPECTED_ID_ENERGY_2_GAP_CALIBRATIONS_IDD_PKL,
@@ -698,8 +699,11 @@ def test_i10_energy_motor_lookup_convert_csv_to_lookup_success(
     expected_dict_file_name: str,
     source: tuple[str, str],
 ):
-    data = mock_i10_energy_motor_lookup_idu.convert_csv_to_lookup(
-        file=file_name,
+    file = mock_i10_energy_motor_lookup_idu.config_client.get_file_contents(
+        file_path=file_name, reset_cached_result=True
+    )
+    data = convert_csv_to_lookup(
+        file=file,
         source=source,
     )
     with open(expected_dict_file_name, "rb") as f:
@@ -711,7 +715,7 @@ def test_i10_energy_motor_lookup_convert_csv_to_lookup_failed(
     mock_i10_energy_motor_lookup_idu: I10EnergyMotorLookup,
 ):
     with pytest.raises(RuntimeError):
-        mock_i10_energy_motor_lookup_idu.convert_csv_to_lookup(
+        convert_csv_to_lookup(
             file=ID_ENERGY_2_GAP_CALIBRATIONS_CSV,
             source=("Source", "idw"),
         )
@@ -721,12 +725,12 @@ async def test_fail_i10_energy_motor_lookup_no_lookup(
     mock_i10_energy_motor_lookup_idu: I10EnergyMotorLookup,
 ):
     wrong_path = "fnslkfndlsnf"
-    with pytest.raises(FileNotFoundError) as e:
-        mock_i10_energy_motor_lookup_idu.convert_csv_to_lookup(
+    with pytest.raises(RuntimeError) as e:
+        convert_csv_to_lookup(
             file=wrong_path,
             source=("Source", "idd"),
         )
-    assert str(e.value) == f"[Errno 2] No such file or directory: '{wrong_path}'"
+    assert str(e.value) == f"Unable to convert lookup table:\t{wrong_path}"
 
 
 @pytest.mark.parametrize("energy", [(100), (5500), (-299)])
@@ -769,6 +773,6 @@ async def test_fail_i10_energy_motor_lookup_with_lookup_gap(
         await mock_id_controller.energy.set(555)
     assert (
         str(e.value)
-        == """Cannot find polynomial coefficients for your requested energy.
-        There might be gap in the calibration lookup table."""
+        == "Cannot find polynomial coefficients for your requested energy."
+        + " There might be gap in the calibration lookup table."
     )
