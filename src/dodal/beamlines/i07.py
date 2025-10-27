@@ -23,7 +23,7 @@ def dcm() -> DCM:
 
 
 @device_factory()
-def undulator() -> Undulator:
+def id() -> Undulator:
     """Get the i07 undulator device, instantiate it if it hasn't already been.
     If this is called when already instantiated it will return the existing object.
     """
