@@ -185,24 +185,24 @@ class UndulatorPhaseMotor(StandardReadable):
         name : str
             Name of the Id phase device
         """
-        fullPV = f"{prefix}BL{infix}"
-        self.user_setpoint = epics_signal_w(str, fullPV + "SET")
-        self.user_setpoint_readback = epics_signal_r(float, fullPV + "DMD")
-        fullPV = fullPV + "MTR"
+        full_pv = f"{prefix}BL{infix}"
+        self.user_setpoint = epics_signal_w(str, full_pv + "SET")
+        self.user_setpoint_readback = epics_signal_r(float, full_pv + "DMD")
+        full_pv = full_pv + "MTR"
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
-            self.user_readback = epics_signal_r(float, fullPV + ".RBV")
+            self.user_readback = epics_signal_r(float, full_pv + ".RBV")
 
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
-            self.motor_egu = epics_signal_r(str, fullPV + ".EGU")
-            self.velocity = epics_signal_rw(float, fullPV + ".VELO")
+            self.motor_egu = epics_signal_r(str, full_pv + ".EGU")
+            self.velocity = epics_signal_rw(float, full_pv + ".VELO")
 
-        self.max_velocity = epics_signal_r(float, fullPV + ".VMAX")
-        self.acceleration_time = epics_signal_rw(float, fullPV + ".ACCL")
-        self.precision = epics_signal_r(int, fullPV + ".PREC")
-        self.deadband = epics_signal_r(float, fullPV + ".RDBD")
-        self.motor_done_move = epics_signal_r(int, fullPV + ".DMOV")
-        self.low_limit_travel = epics_signal_rw(float, fullPV + ".LLM")
-        self.high_limit_travel = epics_signal_rw(float, fullPV + ".HLM")
+        self.max_velocity = epics_signal_r(float, full_pv + ".VMAX")
+        self.acceleration_time = epics_signal_rw(float, full_pv + ".ACCL")
+        self.precision = epics_signal_r(int, full_pv + ".PREC")
+        self.deadband = epics_signal_r(float, full_pv + ".RDBD")
+        self.motor_done_move = epics_signal_r(int, full_pv + ".DMOV")
+        self.low_limit_travel = epics_signal_rw(float, full_pv + ".LLM")
+        self.high_limit_travel = epics_signal_rw(float, full_pv + ".HLM")
         super().__init__(name=name)
 
 
@@ -326,8 +326,8 @@ class Apple2(StandardReadable, Movable):
             Name of the device.
         """
         with self.add_children_as_readables():
-            self.gap = id_gap
-            self.phase = id_phase
+            self.gap = Reference(id_gap)
+            self.phase = Reference(id_phase)
         super().__init__(name=name)
 
     @AsyncStatus.wrap
@@ -338,25 +338,27 @@ class Apple2(StandardReadable, Movable):
         """
 
         # Only need to check gap as the phase motors share both fault and gate with gap.
-        await self.gap.raise_if_cannot_move()
+        await self.gap().raise_if_cannot_move()
         await asyncio.gather(
-            self.phase.top_outer.user_setpoint.set(value=id_motor_values.top_outer),
-            self.phase.top_inner.user_setpoint.set(value=id_motor_values.top_inner),
-            self.phase.btm_inner.user_setpoint.set(value=id_motor_values.btm_inner),
-            self.phase.btm_outer.user_setpoint.set(value=id_motor_values.btm_outer),
-            self.gap.user_setpoint.set(value=id_motor_values.gap),
+            self.phase().top_outer.user_setpoint.set(value=id_motor_values.top_outer),
+            self.phase().top_inner.user_setpoint.set(value=id_motor_values.top_inner),
+            self.phase().btm_inner.user_setpoint.set(value=id_motor_values.btm_inner),
+            self.phase().btm_outer.user_setpoint.set(value=id_motor_values.btm_outer),
+            self.gap().user_setpoint.set(value=id_motor_values.gap),
         )
         timeout = np.max(
-            await asyncio.gather(self.gap.get_timeout(), self.phase.get_timeout())
+            await asyncio.gather(self.gap().get_timeout(), self.phase().get_timeout())
         )
         LOGGER.info(
             f"Moving f{self.name} apple2 motors to {id_motor_values}, timeout = {timeout}"
         )
         await asyncio.gather(
-            self.gap.set_move.set(value=1, wait=False, timeout=timeout),
-            self.phase.set_move.set(value=1, wait=False, timeout=timeout),
+            self.gap().set_move.set(value=1, wait=False, timeout=timeout),
+            self.phase().set_move.set(value=1, wait=False, timeout=timeout),
         )
-        await wait_for_value(self.gap.gate, UndulatorGateStatus.CLOSE, timeout=timeout)
+        await wait_for_value(
+            self.gap().gate, UndulatorGateStatus.CLOSE, timeout=timeout
+        )
 
 
 class EnergyMotorConvertor(Protocol):
@@ -448,11 +450,11 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
                 raw_to_derived=self._read_pol,
                 set_derived=self._set_pol,
                 pol=self.polarisation_setpoint,
-                top_outer=self.apple2().phase.top_outer.user_readback,
-                top_inner=self.apple2().phase.top_inner.user_readback,
-                btm_inner=self.apple2().phase.btm_inner.user_readback,
-                btm_outer=self.apple2().phase.btm_outer.user_readback,
-                gap=self.apple2().gap.user_readback,
+                top_outer=self.apple2().phase().top_outer.user_readback,
+                top_inner=self.apple2().phase().top_inner.user_readback,
+                btm_inner=self.apple2().phase().btm_inner.user_readback,
+                btm_outer=self.apple2().phase().btm_outer.user_readback,
+                gap=self.apple2().gap().user_readback,
             )
         super().__init__(name)
 

@@ -340,7 +340,7 @@ class I10Apple2(Apple2):
             The name of the device, by default "".
         """
         with self.add_children_as_readables():
-            self.jaw_phase = id_jaw_phase
+            self.jaw_phase = Reference(id_jaw_phase)
         super().__init__(id_gap=id_gap, id_phase=id_phase, name=name)
 
 
@@ -425,7 +425,7 @@ class I10Apple2Controller(Apple2Controller[I10Apple2]):
                 f"jaw_phase position for angle ({pol_angle}) is outside permitted range"
                 f" [-{self.jaw_phase_limit}, {self.jaw_phase_limit}]"
             )
-        await self.apple2().jaw_phase.set(jaw_phase)
+        await self.apple2().jaw_phase().set(jaw_phase)
         await self._linear_arbitrary_angle.set(pol_angle)
 
     async def _set_motors_from_energy(self, value: float) -> None:
@@ -447,8 +447,8 @@ class I10Apple2Controller(Apple2Controller[I10Apple2]):
         LOGGER.info(f"Setting polarisation to {pol}, with values: {id_set_val}")
         await self.apple2().set(id_motor_values=id_set_val)
         if pol != Pol.LA:
-            await self.apple2().jaw_phase.set(0)
-            await self.apple2().jaw_phase.set_move.set(1)
+            await self.apple2().jaw_phase().set(0)
+            await self.apple2().jaw_phase().set_move.set(1)
 
     def _raise_if_not_la(self, pol: Pol) -> None:
         if pol != Pol.LA:
