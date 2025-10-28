@@ -34,29 +34,31 @@ set_log_beamline(BL)
 set_utils_beamline(BL)
 
 PREFIX = BeamlinePrefix(BL, "J")
+PATH = "/dls/i13-1/data/2025/cm40629-5/tmp"
 
-set_path_provider(
-    StaticVisitPathProvider(
-        BL,
-        Path("/dls/i13-1/data/2025/cm40629-5/tmp/"),
-        # client=RemoteDirectoryServiceClient("http://i13-1-control:8088/api"),
-        client=LocalDirectoryServiceClient(),
-    )
-)
-path_test = get_path_provider()
-# print(path_test._root)  # type: ignore
-"""
+static_path = StaticPathProvider(UUIDFilenameProvider(), Path(PATH))
+
+# set_path_provider(
+#     StaticVisitPathProvider(
+#         BL,
+#         Path(PATH),
+#         # client=RemoteDirectoryServiceClient("http://i13-1-control:8088/api"),
+#         client=LocalDirectoryServiceClient(),
+#     )
+# )
+# path_test = get_path_provider()
+# # print(path_test._root)  # type: ignore
 set_path_provider(
     StaticPathProvider(
         # UUIDFilenameProvider(),
         # AutoIncrementFilenameProvider("merlin_test"),
         AutoIncrementFilenameProvider("merlin_test", starting_value=1, max_digits=3),
-        Path("/dls/i13-1/data/2025/cm40629-5/tmp/merlin-tests"),
+        Path(PATH),
     )
 )
 path_test = get_path_provider()
-print(f"Path = {path_test._directory_path}")  # type: ignore # noqa
-"""
+print(f"Data path = {path_test._directory_path}")  # type: ignore # noqa
+print(f"Merlin base filename = {path_test._filename_provider._base_filename}")  # type: ignore # noqa
 
 
 # --------------------------------------------------------------------------
@@ -168,7 +170,8 @@ def panda_01() -> HDFPanda:
 def panda_02() -> HDFPanda:
     return HDFPanda(
         prefix=f"{PREFIX.beamline_prefix}-MO-PANDA-02:",
-        path_provider=get_path_provider(),
+        # path_provider=get_path_provider(),
+        path_provider=static_path,
     )
 
 
