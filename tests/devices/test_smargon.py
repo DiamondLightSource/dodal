@@ -5,7 +5,7 @@ import pytest
 from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
 from ophyd_async.core import init_devices, observe_value
-from ophyd_async.epics.motor import MotorLimitsException
+from ophyd_async.epics.motor import MotorLimitsError
 from ophyd_async.testing import get_mock_put, set_mock_value
 
 from dodal.devices.smargon import CombinedMove, DeferMoves, Smargon, StubPosition
@@ -121,7 +121,7 @@ async def test_given_set_with_value_outside_motor_limit(
     set_mock_value(smargon.chi.high_limit_travel, 1999)
     set_mock_value(smargon.phi.high_limit_travel, 1999)
 
-    with pytest.raises(MotorLimitsException):
+    with pytest.raises(MotorLimitsError):
         await smargon.set(
             CombinedMove(
                 x=test_x,
