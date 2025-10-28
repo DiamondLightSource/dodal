@@ -1,0 +1,35 @@
+dodal.devices.b16
+=================
+
+
+
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   dodal.devices.b16.detector
+
+
+
+
+
+
+
+
+.. automodule:: dodal.devices.b16
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

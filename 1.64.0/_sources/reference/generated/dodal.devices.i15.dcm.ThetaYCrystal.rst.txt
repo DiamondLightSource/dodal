@@ -1,0 +1,40 @@
+dodal.devices.i15.dcm.ThetaYCrystal
+===================================
+
+.. currentmodule:: dodal.devices.i15.dcm
+
+.. autoclass:: ThetaYCrystal
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

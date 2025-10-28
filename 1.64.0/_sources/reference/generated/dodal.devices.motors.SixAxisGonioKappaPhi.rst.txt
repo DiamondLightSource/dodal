@@ -1,0 +1,40 @@
+dodal.devices.motors.SixAxisGonioKappaPhi
+=========================================
+
+.. currentmodule:: dodal.devices.motors
+
+.. autoclass:: SixAxisGonioKappaPhi
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

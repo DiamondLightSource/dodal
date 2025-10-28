@@ -1,0 +1,34 @@
+dodal.devices.i09\_1\_shared
+============================
+
+
+
+
+
+
+
+
+
+
+.. automodule:: dodal.devices.i09_1_shared
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      calculate_gap_i09_hu
+      get_hu_lut_as_dict
+   
+   
+
+   
+   
+   

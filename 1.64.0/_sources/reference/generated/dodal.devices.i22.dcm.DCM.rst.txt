@@ -1,0 +1,44 @@
+dodal.devices.i22.dcm.DCM
+=========================
+
+.. currentmodule:: dodal.devices.i22.dcm
+
+.. autoclass:: DCM
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      ~DCM.describe
+      
+      
+      
+      ~DCM.read
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

@@ -1,0 +1,102 @@
+dodal.devices.i11.mythen.Mythen3DetectorState
+=============================================
+
+.. currentmodule:: dodal.devices.i11.mythen
+
+.. autoclass:: Mythen3DetectorState
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~Mythen3DetectorState.IDLE
+      
+      
+      ~Mythen3DetectorState.ERROR
+      
+      
+      ~Mythen3DetectorState.WAITING
+      
+      
+      ~Mythen3DetectorState.FINISHED
+      
+      
+      ~Mythen3DetectorState.TRASMITTING
+      
+      
+      ~Mythen3DetectorState.RUNNING
+      
+      
+      ~Mythen3DetectorState.STOPPED
+      
+      
+      ~Mythen3DetectorState.INITIALIZING
+      
+      
+      ~Mythen3DetectorState.DISCONNECTED
+      
+      
+      ~Mythen3DetectorState.ABORTED
+      
+   
+   

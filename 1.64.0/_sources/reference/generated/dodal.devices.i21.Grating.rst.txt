@@ -1,0 +1,84 @@
+dodal.devices.i21.Grating
+=========================
+
+.. currentmodule:: dodal.devices.i21
+
+.. autoclass:: Grating
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~Grating.VPG1
+      
+      
+      ~Grating.VPG2
+      
+      
+      ~Grating.VPG3
+      
+      
+      ~Grating.VPG4
+      
+   
+   

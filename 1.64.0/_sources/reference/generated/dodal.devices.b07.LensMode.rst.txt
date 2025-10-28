@@ -1,0 +1,108 @@
+dodal.devices.b07.LensMode
+==========================
+
+.. currentmodule:: dodal.devices.b07
+
+.. autoclass:: LensMode
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~LensMode.LARGE_AREA
+      
+      
+      ~LensMode.HIGH_MAGNIFICATION
+      
+      
+      ~LensMode.MEDIUM_MAGNIFICATION
+      
+      
+      ~LensMode.LOW_MAGNIFICATION
+      
+      
+      ~LensMode.MEDIUM_ANGULAR_DISPERSION
+      
+      
+      ~LensMode.LOW_ANGULAR_DISPERSION
+      
+      
+      ~LensMode.HIGH_ANGULAR_DISPERSION
+      
+      
+      ~LensMode.WIDE_ANGLE_MODE
+      
+      
+      ~LensMode.MEDIUM_AREA
+      
+      
+      ~LensMode.SMALL_AREA
+      
+      
+      ~LensMode.HIGH_MAGNIFICATION2
+      
+      
+      ~LensMode.NOT_CONNECTED
+      
+   
+   

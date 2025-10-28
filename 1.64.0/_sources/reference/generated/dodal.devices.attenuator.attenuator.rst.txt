@@ -1,0 +1,39 @@
+dodal.devices.attenuator.attenuator
+===================================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices.attenuator
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~attenuator.BinaryFilterAttenuator
+   ~attenuator.EnumFilterAttenuator
+   ~attenuator.ReadOnlyAttenuator
+   ~attenuator.YesNo
+
+
+
+
+.. automodule:: dodal.devices.attenuator.attenuator
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

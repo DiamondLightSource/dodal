@@ -1,0 +1,36 @@
+dodal.devices.pgm
+=================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~pgm.PGM
+
+
+
+
+.. automodule:: dodal.devices.pgm
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
