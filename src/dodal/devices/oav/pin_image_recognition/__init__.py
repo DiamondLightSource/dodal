@@ -103,9 +103,13 @@ class PinTipDetection(StandardReadable):
         preprocess_iter = await self.preprocess_iterations.get_value()
         preprocess_ksize = await self.preprocess_ksize.get_value()
 
+        print(f"Preprocess Key: {preprocess_key}")
+        print(f"Preprocess iter: {preprocess_iter}")
+        print(f"Preprocess Ksize: {preprocess_ksize}")
+
         try:
             preprocess_func = ARRAY_PROCESSING_FUNCTIONS_MAP[preprocess_key](
-                iter=preprocess_iter, ksize=preprocess_ksize
+                iterations=preprocess_iter, ksize=preprocess_ksize
             )
         except KeyError:
             LOGGER.error("Invalid preprocessing function, using identity")

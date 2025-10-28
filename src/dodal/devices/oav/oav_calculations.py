@@ -41,7 +41,6 @@ def camera_coordinates_to_xyz_mm(
     # +ve y in the OAV camera becomes -ve y in the smargon motors/
     y = y_vertical_sign * vertical * cosine
     z = z_vertical_sign * vertical * sine
-
     return np.array([x, y, z], dtype=np.float64)
 
 
