@@ -298,7 +298,7 @@ async def test_beam_energy_re_scan(
     beam_energy: BeamEnergy,
 ):
     run_engine(scan([], beam_energy, 500, 600, num=11))
-    assert_emitted(run_engine_documents, start=1, descriptor=1, event=11, stop=1)  # type: ignore
+    assert_emitted(run_engine_documents, start=1, descriptor=1, event=11, stop=1)
 
     for cnt, data in enumerate(run_engine_documents["event"]):
         assert data["data"]["mock_id_controller-energy"] == 500 + cnt * 10
@@ -620,7 +620,7 @@ async def test_linear_arbitrary_run_engine_scan(
             num=num_point,
         ),
     )
-    assert_emitted(run_engine_documents, start=1, descriptor=1, event=num_point, stop=1)  # type:ignore
+    assert_emitted(run_engine_documents, start=1, descriptor=1, event=num_point, stop=1)
     set_mock_value(
         mock_id_controller.apple2().gap().gate,
         UndulatorGateStatus.CLOSE,

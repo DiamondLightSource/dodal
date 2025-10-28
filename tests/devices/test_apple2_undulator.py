@@ -161,7 +161,7 @@ async def test_gap_success_scan(
     callback_on_mock_put(mock_id_gap.set_move, lambda *_, **__: set_complete_move())
 
     run_engine(scan([mock_id_gap], mock_id_gap, 0, 10, 11))
-    assert_emitted(run_engine_documents, start=1, descriptor=1, event=11, stop=1)  # type: ignore
+    assert_emitted(run_engine_documents, start=1, descriptor=1, event=11, stop=1)
     for i in output:
         assert (
             run_engine_documents["event"][i]["data"]["mock_id_gap-user_readback"] == i
@@ -368,7 +368,7 @@ async def test_jaw_phase_success_scan(
     callback_on_mock_put(mock_jaw_phase.set_move, lambda *_, **__: set_complete_move())
 
     run_engine(scan([mock_jaw_phase], mock_jaw_phase, 0, 10, 11))
-    assert_emitted(run_engine_documents, start=1, descriptor=1, event=11, stop=1)  # type: ignore
+    assert_emitted(run_engine_documents, start=1, descriptor=1, event=11, stop=1)
     for i in output:
         assert (
             run_engine_documents["event"][i]["data"][
