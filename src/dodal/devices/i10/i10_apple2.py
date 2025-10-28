@@ -1,6 +1,4 @@
-from dataclasses import dataclass
-from pathlib import Path
-from typing import Any, SupportsFloat
+from typing import SupportsFloat
 
 import numpy as np
 from bluesky.protocols import Movable
@@ -24,9 +22,9 @@ from dodal.devices.apple2_undulator import (
     UndulatorPhaseAxes,
 )
 from dodal.devices.util.lookup_tables_apple2 import (
+    EnergyMotorLookup,
     Lookuptable,
     convert_csv_to_lookup,
-    get_poly,
 )
 from dodal.log import LOGGER
 
@@ -38,24 +36,7 @@ ALPHA_OFFSET = 180
 MAXIMUM_MOVE_TIME = 550  # There is no useful movements take longer than this.
 
 
-# data class to store the lookup table configuration that is use in convert_csv_to_lookup
-@dataclass
-class LookupPath:
-    Gap: Path
-    Phase: Path
-
-
-@dataclass
-class LookupTableConfig:
-    path: LookupPath
-    source: tuple[str, str]
-    mode: str | None
-    min_energy: str | None
-    max_energy: str | None
-    poly_deg: list | None
-
-
-class I10EnergyMotorLookup:
+class I10EnergyMotorLookup(EnergyMotorLookup):
     """
     Handles lookup tables for I10 Apple2 ID, converting energy and polarisation to gap
      and phase. Fetches and parses lookup tables from a config server, supports dynamic
@@ -94,30 +75,17 @@ class I10EnergyMotorLookup:
             The column names for the parameters for the energy conversion polynomial, starting with the least significant.
 
         """
-        self.lookup_tables: dict[str, dict[str | None, dict[str, dict[str, Any]]]] = {
-            "Gap": {},
-            "Phase": {},
-        }
-        energy_gap_table_path = Path(lookuptable_dir, gap_file_name)
-        energy_phase_table_path = Path(lookuptable_dir, phase_file_name)
-        self.lookup_table_config = LookupTableConfig(
-            path=LookupPath(Gap=energy_gap_table_path, Phase=energy_phase_table_path),
-            source=source,
+        super().__init__(
+            lookuptable_dir=lookuptable_dir,
+            config_client=config_client,
             mode=mode,
+            source=source,
             min_energy=min_energy,
             max_energy=max_energy,
+            gap_file_name=gap_file_name,
+            phase_file_name=phase_file_name,
             poly_deg=poly_deg,
         )
-        self.config_client = config_client
-        self._available_pol = []
-
-    @property
-    def available_pol(self) -> list[str | None]:
-        return self._available_pol
-
-    @available_pol.setter
-    def available_pol(self, value: list[str | None]) -> None:
-        self._available_pol = value
 
     def update_lookuptable(self):
         """
@@ -139,34 +107,6 @@ class I10EnergyMotorLookup:
             Lookuptable.model_validate(self.lookup_tables[key])
 
         self.available_pol = list(self.lookup_tables["Gap"].keys())
-
-    def get_motor_from_energy(self, energy: float, pol: Pol) -> tuple[float, float]:
-        """
-        Convert energy and polarisation to gap and phase motor positions.
-
-        Parameters
-        ----------
-        energy : float
-            Desired energy in eV.
-        pol : Pol
-            Polarisation mode.
-
-        Returns
-        -------
-        tuple[float, float]
-            (gap, phase) motor positions.
-
-        """
-        if self.available_pol == []:
-            self.update_lookuptable()
-
-        gap_poly = get_poly(
-            lookup_table=self.lookup_tables["Gap"], energy=energy, pol=pol
-        )
-        phase_poly = get_poly(
-            lookup_table=self.lookup_tables["Phase"], energy=energy, pol=pol
-        )
-        return gap_poly(energy), phase_poly(energy)
 
 
 class I10Apple2(Apple2):

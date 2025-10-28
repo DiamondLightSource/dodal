@@ -1,15 +1,53 @@
 import pickle
+from unittest import mock
+from unittest.mock import MagicMock
 
-from dodal.devices.i09_2_shared.i09_apple2 import convert_csv_to_lookup
+import pytest
+from daq_config_server.client import ConfigServer
+
+from dodal.devices.i09_2_shared.i09_apple2 import J09EnergyMotorLookup
+from dodal.devices.util.lookup_tables_apple2 import convert_csv_to_lookup
 from tests.devices.i09_2_shared.test_data import (
+    LOOKUP_TABLE_PATH,
     TEST_EXPECTED_UNDULATOR_LUT,
     TEST_SOFT_UNDULATOR_LUT,
 )
 
 
-def test_i10_energy_motor_lookup_convert_csv_to_lookup_success():
+@pytest.fixture
+def mock_config_client() -> ConfigServer:
+    mock.patch("dodal.devices.i10.i10_apple2.ConfigServer")
+    mock_config_client = ConfigServer()
+
+    mock_config_client.get_file_contents = MagicMock(spec=["get_file_contents"])
+
+    def my_side_effect(file_path, reset_cached_result) -> str:
+        assert reset_cached_result is True
+        with open(file_path) as f:
+            return f.read()
+
+    mock_config_client.get_file_contents.side_effect = my_side_effect
+    return mock_config_client
+
+
+@pytest.fixture
+def mock_j09_energy_motor_lookup_idu(mock_config_client) -> J09EnergyMotorLookup:
+    return J09EnergyMotorLookup(
+        lookuptable_dir=LOOKUP_TABLE_PATH,
+        gap_file_name="JIDEnergy2GapCalibrations.csv",
+        config_client=mock_config_client,
+    )
+
+
+def test_j09_energy_motor_lookup_convert_csv_to_lookup_success(
+    mock_j09_energy_motor_lookup_idu: J09EnergyMotorLookup,
+):
+    file = mock_j09_energy_motor_lookup_idu.config_client.get_file_contents(
+        file_path=TEST_SOFT_UNDULATOR_LUT, reset_cached_result=True
+    )
+    print(file)
     data = convert_csv_to_lookup(
-        file=TEST_SOFT_UNDULATOR_LUT,
+        file=file,
         source=None,
         poly_deg=[
             "9th-order",
@@ -23,8 +61,8 @@ def test_i10_energy_motor_lookup_convert_csv_to_lookup_success():
             "1st-order",
             "0th-order",
         ],
+        skip_line_start_with="#",
     )
-
     with open(TEST_EXPECTED_UNDULATOR_LUT, "rb") as f:
         loaded_dict = pickle.load(f)
     assert data == loaded_dict

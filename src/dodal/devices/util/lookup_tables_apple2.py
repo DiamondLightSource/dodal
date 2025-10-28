@@ -1,13 +1,33 @@
 """Apple2 lookuptable definition and csv converter"""
 
+import abc
 import csv
 import io
+from dataclasses import dataclass
+from pathlib import Path
 from typing import Any
 
 import numpy as np
+from daq_config_server.client import ConfigServer
 from pydantic import BaseModel, ConfigDict, RootModel
 
 from dodal.devices.apple2_undulator import Pol
+
+
+@dataclass
+class LookupPath:
+    Gap: Path | None
+    Phase: Path | None
+
+
+@dataclass
+class LookupTableConfig:
+    path: LookupPath
+    source: tuple[str, str] | None
+    mode: str | None
+    min_energy: str | None
+    max_energy: str | None
+    poly_deg: list | None
 
 
 class EnergyMinMax(BaseModel):
@@ -52,12 +72,13 @@ class Lookuptable(RootModel):
 
 def convert_csv_to_lookup(
     file: str,
-    source: tuple[str, str] | None,
+    source: tuple[str, str] | None = None,
     mode: str | None = "Mode",
     mode_name_convert: dict[str, str] | None = None,
     min_energy: str | None = "MinEnergy",
     max_energy: str | None = "MaxEnergy",
     poly_deg: list | None = None,
+    skip_line_start_with: str = "#",
 ) -> dict[str | None, dict[str, dict[str, dict[str, Any]]]]:
     """
     Convert a CSV file to a lookup table dictionary.
@@ -91,7 +112,7 @@ def convert_csv_to_lookup(
 
     def process_row(row: dict) -> None:
         """Process a single row from the CSV file and update the lookup table."""
-
+        print(row)
         mode_value = row[mode]
         if mode_value in mode_name_convert:
             mode_value = mode_name_convert[f"{mode_value}"]
@@ -123,10 +144,7 @@ def convert_csv_to_lookup(
             lookup_table[mode_value]["Limit"]["Maximum"], float(row[max_energy])
         )
 
-    # csv_file = read_file_and_skip(file=file)
-    # reader = csv.DictReader(csv_file)
-    # self.config_client.get_file_contents(file, reset_cached_result=True)
-    reader = csv.DictReader(io.StringIO(file))
+    reader = csv.DictReader(read_file_and_skip(file, skip_line_start_with))
 
     for row in reader:
         # If there are multiple source only convert requested.
@@ -142,10 +160,10 @@ def convert_csv_to_lookup(
 
 
 def read_file_and_skip(file: str, skip_line_start_with: str = "#"):
-    with open(file) as f:
-        for line in f:
-            if line.startswith(skip_line_start_with):
-                continue
+    for line in io.StringIO(file):
+        if line.startswith(skip_line_start_with):
+            continue
+        else:
             yield line
 
 
@@ -181,3 +199,123 @@ def get_poly(
         "Cannot find polynomial coefficients for your requested energy."
         + " There might be gap in the calibration lookup table."
     )
+
+
+def generate_lookup_table(
+    pol: Pol, min_energy: float, max_energy: float, poly1d_param: list[float]
+) -> dict[str | None, dict[str, dict[str, Any]]]:
+    return {
+        pol.value: {
+            "Energies": {
+                f"{min_energy}": {
+                    "Low": min_energy,
+                    "High": max_energy,
+                    "Poly": np.poly1d(poly1d_param),
+                },
+            },
+            "Limit": {"Minimum": min_energy, "Maximum": max_energy},
+        }
+    }
+
+
+class EnergyMotorLookup:
+    """
+    Handles lookup tables for I10 Apple2 ID, converting energy and polarisation to gap
+     and phase. Fetches and parses lookup tables from a config server, supports dynamic
+     updates, and validates input.
+    """
+
+    def __init__(
+        self,
+        lookuptable_dir: str,
+        config_client: ConfigServer,
+        source: tuple[str, str] | None = None,
+        mode: str = "Mode",
+        min_energy: str = "MinEnergy",
+        max_energy: str = "MaxEnergy",
+        gap_file_name: str = "IDEnergy2GapCalibrations.csv",
+        phase_file_name: str | None = "IDEnergy2PhaseCalibrations.csv",
+        poly_deg: list | None = None,
+    ):
+        """Initialise the I10EnergyMotorLookup class with lookup table headers provided.
+
+        Parameters
+        ----------
+        look_up_table_dir:
+            The path to look up table.
+        source:
+            The column name and the name of the source in look up table. e.g. ( "source", "idu")
+        config_client:
+            The config server client to fetch the look up table.
+        mode:
+            The column name of the mode in look up table.
+        min_energy:
+            The column name that contain the maximum energy in look up table.
+        max_energy:
+            The column name that contain the maximum energy in look up table.
+        poly_deg:
+            The column names for the parameters for the energy conversion polynomial, starting with the least significant.
+
+        """
+        self.lookup_tables: dict[str, dict[str | None, dict[str, dict[str, Any]]]] = {
+            "Gap": {},
+            "Phase": {},
+        }
+        energy_gap_table_path = Path(lookuptable_dir, gap_file_name)
+        if phase_file_name is not None:
+            energy_phase_table_path = Path(lookuptable_dir, phase_file_name)
+        else:
+            energy_phase_table_path = None
+        self.lookup_table_config = LookupTableConfig(
+            path=LookupPath(energy_gap_table_path, energy_phase_table_path),
+            mode=mode,
+            source=source,
+            min_energy=min_energy,
+            max_energy=max_energy,
+            poly_deg=poly_deg,
+        )
+        self.config_client = config_client
+        self._available_pol = []
+
+    @property
+    def available_pol(self) -> list[str | None]:
+        return self._available_pol
+
+    @available_pol.setter
+    def available_pol(self, value: list[str | None]) -> None:
+        self._available_pol = value
+
+    @abc.abstractmethod
+    def update_lookuptable(self):
+        """
+        Update lookup tables from files and validate their format.
+        """
+        ...
+
+    def get_motor_from_energy(self, energy: float, pol: Pol) -> tuple[float, float]:
+        """
+        Convert energy and polarisation to gap and phase motor positions.
+
+        Parameters
+        ----------
+        energy : float
+            Desired energy in eV.
+        pol : Pol
+            Polarisation mode.
+
+        Returns
+        -------
+        tuple[float, float]
+            (gap, phase) motor positions.
+
+        """
+        if self.available_pol == []:
+            self.update_lookuptable()
+
+        gap_poly = get_poly(
+            lookup_table=self.lookup_tables["Gap"], energy=energy, pol=pol
+        )
+        phase_poly = get_poly(
+            lookup_table=self.lookup_tables["Phase"], energy=energy, pol=pol
+        )
+        return gap_poly(energy), phase_poly(energy)
