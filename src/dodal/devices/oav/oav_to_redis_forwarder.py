@@ -38,7 +38,7 @@ class Source(IntEnum):
 
 class OAVSource(StandardReadable):
     def __init__(self, oav: OAV, label: str):
-        self.url_ref = Reference(oav.grid_snapshot.url)
+        self.url_ref = Reference(oav.snapshot.video_url)
         self.oav_ref = Reference(oav)
         self.label = label
         super().__init__()
@@ -121,11 +121,11 @@ class OAVToRedisForwarder(StandardReadable, Flyable, Stoppable):
         self, function_to_do: Callable[[ClientResponse, OAVSource], Awaitable]
     ):
         source_idx = await self.selected_source.get_value()
-        LOGGER.info(
-            f"Forwarding data from sample {await self.sample_id.get_value()} and OAV {source_idx}"
-        )
         source = self.sources[source_idx]
         stream_url = await source.url_ref().get_value()
+        LOGGER.info(
+            f"Forwarding data from sample {await self.sample_id.get_value()} and OAV {source_idx} from URL {stream_url}"
+        )
         async with ClientSession() as session:
             async with session.get(stream_url) as response:
                 await function_to_do(response, source)
