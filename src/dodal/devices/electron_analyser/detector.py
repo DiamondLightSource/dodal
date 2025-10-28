@@ -1,14 +1,16 @@
 from typing import Generic, TypeVar
 
-from bluesky.protocols import Stageable
-from ophyd_async.core import AsyncStatus
-from ophyd_async.epics.adcore import ADBaseController
+from ophyd_async.core import AsyncStatus, PathProvider, StandardDetector
+from ophyd_async.epics.adcore import (
+    ADBaseController,
+    ADBaseDatasetDescriber,
+    ADHDFWriter,
+    ADImageMode,
+    NDFileHDFIO,
+)
 
 from dodal.common.data_util import load_json_file_to_class
 from dodal.devices.controllers import ConstantDeadTimeController
-from dodal.devices.electron_analyser.abstract.base_detector import (
-    BaseElectronAnalyserDetector,
-)
 from dodal.devices.electron_analyser.abstract.base_driver_io import (
     TAbstractAnalyserDriverIO,
 )
@@ -19,7 +21,7 @@ from dodal.devices.electron_analyser.abstract.base_region import (
 
 
 class ElectronAnalyserRegionDetector(
-    BaseElectronAnalyserDetector[TAbstractAnalyserDriverIO],
+    StandardDetector[ADBaseController[TAbstractAnalyserDriverIO], ADHDFWriter],
     Generic[TAbstractAnalyserDriverIO, TAbstractBaseRegion],
 ):
     """
@@ -31,10 +33,22 @@ class ElectronAnalyserRegionDetector(
         self,
         controller: ADBaseController[TAbstractAnalyserDriverIO],
         region: TAbstractBaseRegion,
+        path_provider: PathProvider,
+        hdf: NDFileHDFIO,
         name: str = "",
     ):
         self.region = region
-        super().__init__(controller, name)
+
+        super().__init__(
+            controller,
+            ADHDFWriter(
+                fileio=hdf,
+                path_provider=path_provider,
+                dataset_describer=ADBaseDatasetDescriber(controller.driver),
+            ),
+            config_sigs=(),
+            name=name,
+        )
 
     @AsyncStatus.wrap
     async def trigger(self) -> None:
@@ -50,13 +64,8 @@ TElectronAnalyserRegionDetector = TypeVar(
 
 
 class ElectronAnalyserDetector(
-    BaseElectronAnalyserDetector[TAbstractAnalyserDriverIO],
-    Stageable,
-    Generic[
-        TAbstractAnalyserDriverIO,
-        TAbstractBaseSequence,
-        TAbstractBaseRegion,
-    ],
+    StandardDetector[ADBaseController[TAbstractAnalyserDriverIO], ADHDFWriter],
+    Generic[TAbstractAnalyserDriverIO, TAbstractBaseSequence, TAbstractBaseRegion],
 ):
     """
     Electron analyser detector with the additional functionality to load a sequence file
@@ -68,13 +77,27 @@ class ElectronAnalyserDetector(
         self,
         sequence_class: type[TAbstractBaseSequence],
         driver: TAbstractAnalyserDriverIO,
+        hdf: NDFileHDFIO,
+        path_provider: PathProvider,
         name: str = "",
     ):
         # Save driver as direct child so participates with connect()
         self.driver = driver
+        self.hdf = hdf
         self._sequence_class = sequence_class
-        controller = ConstantDeadTimeController[TAbstractAnalyserDriverIO](driver, 0)
-        super().__init__(controller, name)
+        controller = ConstantDeadTimeController[TAbstractAnalyserDriverIO](
+            driver, 0, ADImageMode.SINGLE
+        )
+        super().__init__(
+            controller,
+            ADHDFWriter(
+                fileio=hdf,
+                path_provider=path_provider,
+                dataset_describer=ADBaseDatasetDescriber(controller.driver),
+            ),
+            config_sigs=(),
+            name=name,
+        )
 
     @AsyncStatus.wrap
     async def stage(self) -> None:
@@ -90,13 +113,11 @@ class ElectronAnalyserDetector(
             Any exceptions raised by the driver's stage or controller's disarm methods.
         """
         await self._controller.disarm()
-        await self.driver.stage()
 
     @AsyncStatus.wrap
     async def unstage(self) -> None:
         """Disarm the detector."""
         await self._controller.disarm()
-        await self.driver.unstage()
 
     def load_sequence(self, filename: str) -> TAbstractBaseSequence:
         """
@@ -131,7 +152,10 @@ class ElectronAnalyserDetector(
         regions = seq.get_enabled_regions() if enabled_only else seq.regions
         return [
             ElectronAnalyserRegionDetector(
-                self._controller, r, self.name + "_" + r.name
+                self._controller,
+                r,
+                self._writer._path_provider,  # noqa: SLF001
+                self.name + "_" + r.name,
             )
             for r in regions
         ]

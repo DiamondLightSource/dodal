@@ -1,5 +1,8 @@
 from typing import Generic
 
+from ophyd_async.core import PathProvider
+from ophyd_async.epics.adcore import NDFileHDFIO
+
 from dodal.devices.electron_analyser.abstract.types import (
     TLensMode,
     TPassEnergyEnum,
@@ -36,13 +39,21 @@ class VGScientaDetector(
         psu_mode_type: type[TPsuMode],
         pass_energy_type: type[TPassEnergyEnum],
         energy_source: DualEnergySource | EnergySource,
+        path_provider: PathProvider,
         name: str = "",
     ):
         driver = VGScientaAnalyserDriverIO[TLensMode, TPsuMode, TPassEnergyEnum](
-            prefix, lens_mode_type, psu_mode_type, pass_energy_type, energy_source
+            prefix + "CAM:",
+            lens_mode_type,
+            psu_mode_type,
+            pass_energy_type,
+            energy_source,
         )
+        hdf = NDFileHDFIO(prefix + "HDF:")
         super().__init__(
             VGScientaSequence[lens_mode_type, psu_mode_type, pass_energy_type],
             driver,
+            hdf,
+            path_provider,
             name,
         )
