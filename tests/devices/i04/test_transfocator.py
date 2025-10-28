@@ -2,6 +2,7 @@ import asyncio
 from unittest.mock import AsyncMock, patch
 
 import pytest
+from bluesky.protocols import Reading
 from ophyd_async.core import (
     init_devices,
     wait_for_value,
@@ -19,10 +20,13 @@ async def fake_transfocator() -> Transfocator:
 
 
 def given_predicted_lenses_is_half_of_beamsize(transfocator: Transfocator):
-    def lens_number_is_half_beamsize(value, *args, **kwargs):
+    def lens_number_is_half_beamsize(
+        reading: dict[str, Reading[float]], *args, **kwargs
+    ):
+        value = reading[transfocator.beamsize_set_microns.name]["value"]
         set_mock_value(transfocator.predicted_vertical_num_lenses, int(value / 2))
 
-    transfocator.beamsize_set_microns.subscribe_value(lens_number_is_half_beamsize)
+    transfocator.beamsize_set_microns.subscribe_reading(lens_number_is_half_beamsize)
 
 
 async def set_beamsize_to_same_value_as_mock_signal(
