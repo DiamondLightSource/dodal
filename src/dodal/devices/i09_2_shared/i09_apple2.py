@@ -5,7 +5,7 @@ from dodal.devices.util.lookup_tables_apple2 import (
     EnergyMotorLookup,
     Lookuptable,
     convert_csv_to_lookup,
-    generate_lookup_table,
+    make_phase_tables,
 )
 from dodal.log import LOGGER
 
@@ -71,53 +71,31 @@ class J09EnergyMotorLookup(EnergyMotorLookup):
         """
         LOGGER.info("Updating lookup dictionary from file.")
         for key, path in self.lookup_table_config.path.__dict__.items():
-            csv_file = self.config_client.get_file_contents(
-                path, reset_cached_result=True
-            )
-            self.lookup_tables[key] = convert_csv_to_lookup(
-                file=csv_file,
-                mode=self.lookup_table_config.mode,
-                min_energy=self.lookup_table_config.min_energy,
-                max_energy=self.lookup_table_config.max_energy,
-                poly_deg=self.lookup_table_config.poly_deg,
-                skip_line_start_with="#",
-            )
-            Lookuptable.model_validate(self.lookup_tables[key])
+            if path is not None:
+                csv_file = self.config_client.get_file_contents(
+                    path, reset_cached_result=True
+                )
+                self.lookup_tables[key] = convert_csv_to_lookup(
+                    file=csv_file,
+                    mode=self.lookup_table_config.mode,
+                    min_energy=self.lookup_table_config.min_energy,
+                    max_energy=self.lookup_table_config.max_energy,
+                    poly_deg=self.lookup_table_config.poly_deg,
+                    skip_line_start_with="#",
+                )
+                Lookuptable.model_validate(self.lookup_tables[key])
         min_energy = self.lookup_tables["Gap"]["LH"]["Limit"]["Minimum"]
         max_energy = self.lookup_tables["Gap"]["LH"]["Limit"]["Maximum"]
-        self.lookup_tables["Phase"] = generate_lookup_table(
-            pol=Pol.LH, min_energy=min_energy, max_energy=max_energy, poly1d_param=[0]
-        )
-        self.lookup_tables["Phase"].update(
-            generate_lookup_table(
-                pol=Pol.LH3,
-                min_energy=min_energy,
-                max_energy=max_energy,
-                poly1d_param=[0],
-            )
-        )
-        self.lookup_tables["Phase"].update(
-            generate_lookup_table(
-                pol=Pol.LV,
-                min_energy=min_energy,
-                max_energy=max_energy,
-                poly1d_param=[MAXIMUM_ROW_PHASE_MOTOR_POSITION],
-            )
-        )
 
-        self.lookup_tables["Phase"].update(
-            generate_lookup_table(
-                pol=Pol.PC,
-                min_energy=min_energy,
-                max_energy=max_energy,
-                poly1d_param=[ROW_PHASE_CIRCULAR],
-            )
-        )
-        self.lookup_tables["Phase"].update(
-            generate_lookup_table(
-                pol=Pol.NC,
-                min_energy=min_energy,
-                max_energy=max_energy,
-                poly1d_param=[ROW_PHASE_CIRCULAR],
-            )
+        self.lookup_tables["Phase"] = make_phase_tables(
+            pols=[Pol.LH, Pol.LH3, Pol.LV, Pol.PC, Pol.NC],
+            min_energys=[min_energy] * 5,
+            max_energys=[max_energy] * 5,
+            poly1d_params=[
+                [0],
+                [0],
+                [MAXIMUM_ROW_PHASE_MOTOR_POSITION],
+                [ROW_PHASE_CIRCULAR],
+                [ROW_PHASE_CIRCULAR],
+            ],
         )

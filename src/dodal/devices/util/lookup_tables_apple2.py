@@ -218,6 +218,25 @@ def generate_lookup_table(
     }
 
 
+def make_phase_tables(
+    pols: list[Pol],
+    min_energys: list[float],
+    max_energys: list[float],
+    poly1d_params: list[list[float]],
+) -> dict[str | None, dict[str, dict[str, Any]]]:
+    lookuptable_phase = {}
+    for i in range(len(pols)):
+        lookuptable_phase.update(
+            generate_lookup_table(
+                pol=pols[i],
+                min_energy=min_energys[i],
+                max_energy=max_energys[i],
+                poly1d_param=poly1d_params[i],
+            )
+        )
+    return lookuptable_phase
+
+
 class EnergyMotorLookup:
     """
     Handles lookup tables for I10 Apple2 ID, converting energy and polarisation to gap
