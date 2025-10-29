@@ -23,6 +23,8 @@ async def murko_results(mock_strict_redis: MagicMock) -> MurkoResultsDevice:
     murko_results = MurkoResultsDevice(name="murko_results")
     murko_results.stop_angle.get_value = AsyncMock()
     murko_results.stop_angle.get_value.return_value = 350
+    murko_results.invert_stop_angle.get_value = AsyncMock()
+    murko_results.invert_stop_angle.get_value.return_value = False
     murko_results.pubsub = AsyncMock()
     return murko_results
 
@@ -797,3 +799,30 @@ def test_results_with_tiny_x_pixel_value_are_filtered_out(
             assert result.metadata["used_for_centring"] is True
         else:
             assert result.metadata["used_for_centring"] is False
+
+
+@pytest.mark.parametrize(
+    "last_omega, stop_angle, inverted, expected_check_outcome",
+    [
+        (10, 350, False, False),
+        (10, 350, True, True),
+        (350, 10, False, True),
+        (350, 10, True, False),
+        (None, 10, True, False),
+        (None, 350, True, False),
+        (None, 10, False, False),
+        (None, 350, False, False),
+    ],
+)
+async def test_check_passes_and_fails_correctly_based_on_last_omega_and_stop_angle_and_inverted(
+    stop_angle: float,
+    last_omega: float,
+    inverted: bool,
+    expected_check_outcome: bool,
+    murko_results: MurkoResultsDevice,
+):
+    murko_results.stop_angle.get_value.return_value = stop_angle  # type: ignore
+    murko_results.invert_stop_angle.get_value.return_value = inverted  # type: ignore
+    murko_results._last_omega = last_omega
+    result = await murko_results.check_if_reached_stop_angle()
+    assert result == expected_check_outcome
