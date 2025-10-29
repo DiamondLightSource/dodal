@@ -124,4 +124,6 @@ def fastcs_eiger() -> EigerDetector:
     return EigerDetector(
         prefix=PREFIX.beamline_prefix,
         path_provider=get_path_provider(),
+        drv_suffix="-EA-EIGER-01:",
+        hdf_suffix="-EA-EIGER-01:OD:",
     )
