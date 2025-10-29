@@ -58,7 +58,7 @@ class UndulatorDCM(StandardReadable, Movable[float]):
     async def set(self, value: float):
         await self.undulator_ref().raise_if_not_enabled()
         await asyncio.gather(
-            self.dcm_ref().energy_in_kev.set(value, timeout=ENERGY_TIMEOUT_S),
+            self.dcm_ref().energy_in_keV.set(value, timeout=ENERGY_TIMEOUT_S),
             self.undulator_ref().set(value),
         )
 
