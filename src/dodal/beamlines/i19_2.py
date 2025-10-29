@@ -1,5 +1,6 @@
 from pathlib import Path
 
+from ophyd_async.fastcs.eiger import EigerDetector
 from ophyd_async.fastcs.panda import HDFPanda
 
 from dodal.common.beamlines.beamline_utils import (
@@ -115,4 +116,14 @@ def panda() -> HDFPanda:
     return HDFPanda(
         prefix=f"{PREFIX.beamline_prefix}-EA-PANDA-01:",
         path_provider=get_path_provider(),
+    )
+
+
+@device_factory()
+def eiger() -> EigerDetector:
+    return EigerDetector(
+        prefix=PREFIX.beamline_prefix,
+        path_provider=get_path_provider(),
+        drv_suffix="-EA-EIGER-01:",
+        hdf_suffix="-EA-EIGER-01:OD:",
     )
