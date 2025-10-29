@@ -18,6 +18,15 @@ ALPHA_OFFSET = 180
 MAXIMUM_MOVE_TIME = 550  # There is no useful movements take longer than this.
 
 
+J09PhasePoly1dParameters = {
+    "LH": [0],
+    "LV": [MAXIMUM_ROW_PHASE_MOTOR_POSITION],
+    "PC": [ROW_PHASE_CIRCULAR],
+    "NC": [ROW_PHASE_CIRCULAR],
+    "LH3": [0],
+}
+
+
 class J09EnergyMotorLookup(EnergyMotorLookup):
     """
     Handles lookup tables for I10 Apple2 ID, converting energy and polarisation to gap
@@ -62,6 +71,7 @@ class J09EnergyMotorLookup(EnergyMotorLookup):
             min_energy=min_energy,
             max_energy=max_energy,
             gap_file_name=gap_file_name,
+            phase_file_name=None,
             poly_deg=poly_deg,
         )
 
@@ -84,18 +94,19 @@ class J09EnergyMotorLookup(EnergyMotorLookup):
                     skip_line_start_with="#",
                 )
                 Lookuptable.model_validate(self.lookup_tables[key])
-        min_energy = self.lookup_tables["Gap"]["LH"]["Limit"]["Minimum"]
-        max_energy = self.lookup_tables["Gap"]["LH"]["Limit"]["Maximum"]
-
+        mix_energies = []
+        max_energies = []
+        pols = []
+        poly1d_params = []
+        for key in self.lookup_tables["Gap"].keys():
+            if key is not None:
+                pols.append(Pol[key])
+                mix_energies.append(self.lookup_tables["Gap"][key]["Limit"]["Minimum"])
+                max_energies.append(self.lookup_tables["Gap"][key]["Limit"]["Maximum"])
+                poly1d_params.append(J09PhasePoly1dParameters[key])
         self.lookup_tables["Phase"] = make_phase_tables(
-            pols=[Pol.LH, Pol.LH3, Pol.LV, Pol.PC, Pol.NC],
-            min_energys=[min_energy] * 5,
-            max_energys=[max_energy] * 5,
-            poly1d_params=[
-                [0],
-                [0],
-                [MAXIMUM_ROW_PHASE_MOTOR_POSITION],
-                [ROW_PHASE_CIRCULAR],
-                [ROW_PHASE_CIRCULAR],
-            ],
+            pols=pols,
+            min_energies=mix_energies,
+            max_energies=max_energies,
+            poly1d_params=poly1d_params,
         )

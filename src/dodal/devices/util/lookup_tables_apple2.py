@@ -112,7 +112,6 @@ def convert_csv_to_lookup(
 
     def process_row(row: dict) -> None:
         """Process a single row from the CSV file and update the lookup table."""
-        print(row)
         mode_value = row[mode]
         if mode_value in mode_name_convert:
             mode_value = mode_name_convert[f"{mode_value}"]
@@ -220,8 +219,8 @@ def generate_lookup_table(
 
 def make_phase_tables(
     pols: list[Pol],
-    min_energys: list[float],
-    max_energys: list[float],
+    min_energies: list[float],
+    max_energies: list[float],
     poly1d_params: list[list[float]],
 ) -> dict[str | None, dict[str, dict[str, Any]]]:
     lookuptable_phase = {}
@@ -229,8 +228,8 @@ def make_phase_tables(
         lookuptable_phase.update(
             generate_lookup_table(
                 pol=pols[i],
-                min_energy=min_energys[i],
-                max_energy=max_energys[i],
+                min_energy=min_energies[i],
+                max_energy=max_energies[i],
                 poly1d_param=poly1d_params[i],
             )
         )
