@@ -159,9 +159,9 @@ async def test_synchrotron_describe_configuration(sim_synchrotron: Synchrotron):
     )
 
 
-async def test_synchrotron_count(RE: RunEngine, sim_synchrotron: Synchrotron):
+async def test_synchrotron_count(run_engine: RunEngine, sim_synchrotron: Synchrotron):
     docs = []
-    RE(count_sim(sim_synchrotron), lambda x, y: docs.append(y))
+    run_engine(count_sim(sim_synchrotron), lambda x, y: docs.append(y))
 
     assert len(docs) == 4
     assert sim_synchrotron.name in docs[1]["configuration"]

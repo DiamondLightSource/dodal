@@ -26,7 +26,6 @@ from tests.devices.electron_analyser.helper_util import get_test_sequence
 async def sim_detector(
     request: pytest.FixtureRequest,
     single_energy_source: EnergySource,
-    RE: RunEngine,
 ) -> GenericElectronAnalyserDetector:
     async with init_devices(mock=True):
         sim_detector = await create_detector(
@@ -110,7 +109,7 @@ def test_analyser_detector_has_driver_as_child_and_region_detector_does_not(
 async def test_analyser_region_detector_trigger_sets_driver_with_region(
     sim_detector: GenericElectronAnalyserDetector,
     sequence_file_path: str,
-    RE: RunEngine,
+    run_engine: RunEngine,
 ) -> None:
     region_detectors = sim_detector.create_region_detector_list(
         sequence_file_path, enabled_only=False
@@ -122,7 +121,7 @@ async def test_analyser_region_detector_trigger_sets_driver_with_region(
         reg_det._controller.arm = AsyncMock()
         reg_det._controller.wait_for_idle = AsyncMock()
 
-        RE(bps.trigger(reg_det), wait=True)
+        run_engine(bps.trigger(reg_det), wait=True)
 
         reg_det._controller.arm.assert_awaited_once()
         reg_det._controller.wait_for_idle.assert_awaited_once()

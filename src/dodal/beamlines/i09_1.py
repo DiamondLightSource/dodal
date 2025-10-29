@@ -2,9 +2,13 @@ from dodal.common.beamlines.beamline_utils import (
     device_factory,
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
+from dodal.devices.common_dcm import (
+    DoubleCrystalMonochromatorWithDSpacing,
+    PitchAndRollCrystal,
+    StationaryCrystal,
+)
 from dodal.devices.electron_analyser import EnergySource
 from dodal.devices.electron_analyser.specs import SpecsDetector
-from dodal.devices.i09.dcm import DCM
 from dodal.devices.i09_1 import LensMode, PsuMode
 from dodal.devices.synchrotron import Synchrotron
 from dodal.log import set_beamline as set_log_beamline
@@ -22,13 +26,15 @@ def synchrotron() -> Synchrotron:
 
 
 @device_factory()
-def dcm() -> DCM:
-    return DCM(prefix=f"{PREFIX.beamline_prefix}-MO-DCM-01:")
+def dcm() -> DoubleCrystalMonochromatorWithDSpacing:
+    return DoubleCrystalMonochromatorWithDSpacing(
+        f"{PREFIX.beamline_prefix}-MO-DCM-01:", PitchAndRollCrystal, StationaryCrystal
+    )
 
 
 @device_factory()
 def energy_source() -> EnergySource:
-    return EnergySource(dcm().energy_in_ev)
+    return EnergySource(dcm().energy_in_eV)
 
 
 # Connect will work again after this work completed

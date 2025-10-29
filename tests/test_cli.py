@@ -7,7 +7,7 @@ from ophyd.device import DEFAULT_CONNECTION_TIMEOUT
 from ophyd_async.core import (
     DEFAULT_TIMEOUT,
     LazyMock,
-    NotConnected,
+    NotConnectedError,
 )
 
 from dodal import __version__
@@ -282,7 +282,7 @@ def test_cli_connect_when_devices_error(
     runner: CliRunner,
     devices: tuple[dict[str, AnyDevice], dict[str, Exception]],
 ):
-    with pytest.raises(NotConnected):
+    with pytest.raises(NotConnectedError):
         _mock_connect(
             EXAMPLE_BEAMLINE,
             runner=runner,

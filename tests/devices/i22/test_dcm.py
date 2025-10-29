@@ -33,11 +33,11 @@ async def dcm() -> DCM:
 
 
 def test_count_dcm(
-    RE: RunEngine,
+    run_engine: RunEngine,
     run_engine_documents: dict[str, list[dict]],
     dcm: DCM,
 ):
-    RE(bp.count([dcm]))
+    run_engine(bp.count([dcm]))
     assert_emitted(
         run_engine_documents,
         start=1,
@@ -60,7 +60,7 @@ async def test_wavelength(
     energy: float,
     wavelength: float,
 ):
-    set_mock_value(dcm.energy_in_kev.user_readback, energy)
+    set_mock_value(dcm.energy_in_keV.user_readback, energy)
     reading = await dcm.read()
     assert reading["dcm-wavelength_in_a"]["value"] == wavelength
 
@@ -76,7 +76,8 @@ async def test_reading(dcm: DCM):
             "dcm-crystal_2_heater_temp": partial_reading(0.0),
             "dcm-crystal_2_temp": partial_reading(0.0),
             "dcm-crystal_metadata_d_spacing_a": partial_reading(0.0),
-            "dcm-energy_in_kev": partial_reading(0.0),
+            "dcm-energy_in_keV": partial_reading(0.0),
+            "dcm-energy_in_eV": partial_reading(0.0),
             "dcm-offset_in_mm": partial_reading(0.0),
             "dcm-perp": partial_reading(0.0),
             "dcm-perp_temp": partial_reading(0.0),
@@ -103,9 +104,9 @@ async def test_configuration(dcm: DCM):
             "dcm-crystal_2_reflection": partial_reading([1, 1, 1]),
             "dcm-crystal_2_type": partial_reading("silicon"),
             "dcm-crystal_2_usage": partial_reading("Bragg"),
-            "dcm-energy_in_kev-motor_egu": partial_reading(""),
-            "dcm-energy_in_kev-offset": partial_reading(0.0),
-            "dcm-energy_in_kev-velocity": partial_reading(0.0),
+            "dcm-energy_in_keV-motor_egu": partial_reading(""),
+            "dcm-energy_in_keV-offset": partial_reading(0.0),
+            "dcm-energy_in_keV-velocity": partial_reading(0.0),
             "dcm-offset_in_mm-motor_egu": partial_reading(""),
             "dcm-offset_in_mm-offset": partial_reading(0.0),
             "dcm-offset_in_mm-velocity": partial_reading(0.0),
