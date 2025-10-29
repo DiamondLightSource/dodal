@@ -1,12 +1,17 @@
+from pathlib import Path
+
+from ophyd_async.fastcs.eiger import EigerDetector
 from ophyd_async.fastcs.panda import HDFPanda
 
 from dodal.common.beamlines.beamline_utils import (
     device_factory,
     get_path_provider,
+    set_path_provider,
 )
 from dodal.common.beamlines.beamline_utils import (
     set_beamline as set_utils_beamline,
 )
+from dodal.common.visit import StaticVisitPathProvider
 from dodal.devices.i19.access_controlled.blueapi_device import HutchState
 from dodal.devices.i19.access_controlled.shutter import AccessControlledShutter
 from dodal.devices.i19.backlight import BacklightPosition
@@ -30,6 +35,13 @@ BL = "i19-2"
 PREFIX = BeamlinePrefix("i19", "I")
 set_log_beamline(BL)
 set_utils_beamline(BL)
+
+set_path_provider(
+    StaticVisitPathProvider(
+        BL,
+        Path("/dls/i19-2/data/2025/cm40639-4/"),
+    )
+)
 
 
 I19_2_ZEBRA_MAPPING = ZebraMapping(
@@ -104,4 +116,14 @@ def panda() -> HDFPanda:
     return HDFPanda(
         prefix=f"{PREFIX.beamline_prefix}-EA-PANDA-01:",
         path_provider=get_path_provider(),
+    )
+
+
+@device_factory()
+def eiger() -> EigerDetector:
+    return EigerDetector(
+        prefix=PREFIX.beamline_prefix,
+        path_provider=get_path_provider(),
+        drv_suffix="-EA-EIGER-01:",
+        hdf_suffix="-EA-EIGER-01:OD:",
     )

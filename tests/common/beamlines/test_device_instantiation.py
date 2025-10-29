@@ -1,7 +1,7 @@
 from typing import Any
 
 import pytest
-from ophyd_async.core import NotConnected
+from ophyd_async.core import NotConnectedError
 
 from dodal.beamlines import all_beamline_modules
 from dodal.utils import BLUESKY_PROTOCOLS, make_all_devices
@@ -23,7 +23,7 @@ def test_device_creation(module_and_devices_for_beamline):
     """
     _, devices, exceptions = module_and_devices_for_beamline
     if len(exceptions) > 0:
-        raise NotConnected(exceptions)
+        raise NotConnectedError(exceptions)
     devices_not_following_bluesky_protocols = [
         name
         for name, device in devices.items()
