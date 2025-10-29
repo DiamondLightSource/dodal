@@ -123,6 +123,7 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
     async def trigger(self):
         # Wait for results
         sample_id = await self.sample_id.get_value()
+
         async def check():
             inverted = await self.invert_stop_angle.get_value()
             stop_angle = await self.stop_angle.get_value()
@@ -132,7 +133,7 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
                 return self._last_omega > stop_angle
             else:
                 return self._last_omega < stop_angle
-            
+
         while await check():
             # waits here for next batch to be received
             message = await self.pubsub.get_message(timeout=self.TIMEOUT_S)
