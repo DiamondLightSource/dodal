@@ -120,7 +120,7 @@ def panda() -> HDFPanda:
 
 
 @device_factory()
-def fastcs_eiger() -> EigerDetector:
+def eiger() -> EigerDetector:
     return EigerDetector(
         prefix=PREFIX.beamline_prefix,
         path_provider=get_path_provider(),
