@@ -18,11 +18,11 @@ from dodal.devices.oav.oav_to_redis_forwarder import (
 @patch("dodal.devices.oav.oav_to_redis_forwarder.StrictRedis", new=AsyncMock)
 async def oav_forwarder(oav_beam_centre_pv_fs: OAV, oav_beam_centre_pv_roi: OAV):
     set_mock_value(
-        oav_beam_centre_pv_fs.grid_snapshot.url,
+        oav_beam_centre_pv_fs.snapshot.video_url,
         "test-full-screen-stream-url",
     )
     set_mock_value(
-        oav_beam_centre_pv_roi.grid_snapshot.url,
+        oav_beam_centre_pv_roi.snapshot.video_url,
         "test-roi-stream-url",
     )
     with init_devices(mock=True):
