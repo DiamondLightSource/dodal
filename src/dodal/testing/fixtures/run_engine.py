@@ -10,20 +10,18 @@ import pytest
 from bluesky.run_engine import RunEngine
 from bluesky.simulators import RunEngineSimulator
 
+_run_engine = RunEngine()
+
 
 @pytest.fixture(scope="session", autouse=True)
 async def _ensure_running_bluesky_event_loop():
-    run_engine = RunEngine()
     # make sure the event loop is thoroughly up and running before we try to create
     # any ophyd_async devices which might need it
     timeout = time.monotonic() + 1
-    while not run_engine.loop.is_running():
+    while not _run_engine.loop.is_running():
         await asyncio.sleep(0)
         if time.monotonic() > timeout:
             raise TimeoutError("This really shouldn't happen but just in case...")
-
-
-_run_engine = RunEngine()
 
 
 @pytest.fixture()
