@@ -111,7 +111,6 @@ class J09EnergyMotorLookup(EnergyMotorLookup):
         for key in self.lookup_tables["Gap"].keys():
             if key is not None:
                 pols.append(Pol(key.lower()))
-                print(key)
                 mix_energies.append(self.lookup_tables["Gap"][key]["Limit"]["Minimum"])
                 max_energies.append(self.lookup_tables["Gap"][key]["Limit"]["Maximum"])
                 poly1d_params.append(J09PhasePoly1dParameters[key])
