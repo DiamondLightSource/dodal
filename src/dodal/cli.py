@@ -1,4 +1,6 @@
+import importlib
 import os
+import warnings
 from collections.abc import Mapping
 from pathlib import Path
 
@@ -8,6 +10,7 @@ from ophyd_async.core import NotConnectedError, StaticPathProvider, UUIDFilename
 from ophyd_async.plan_stubs import ensure_connected
 
 from dodal.beamlines import all_beamline_names, module_name_for_beamline
+from dodal.device_manager import DeviceManager
 from dodal.common.beamlines.beamline_utils import set_path_provider
 from dodal.utils import AnyDevice, filter_ophyd_devices, make_all_devices
 
@@ -43,7 +46,8 @@ def main(ctx: click.Context) -> None:
     "attempt any I/O. Useful as a a dry-run.",
     default=False,
 )
-def connect(beamline: str, all: bool, sim_backend: bool) -> None:
+@click.option("-n", "--name", multiple=True)
+def connect(beamline: str, all: bool, sim_backend: bool, name: tuple[str, ...]) -> None:
     """Initialises a beamline module, connects to all devices, reports
     any connection issues."""
 
@@ -51,7 +55,6 @@ def connect(beamline: str, all: bool, sim_backend: bool) -> None:
 
     # We need to make a fake path provider for any detectors that need one,
     # it is not used in dodal connect
-    _spoof_path_provider()
 
     module_name = module_name_for_beamline(beamline)
     full_module_path = f"dodal.beamlines.{module_name}"
@@ -62,16 +65,31 @@ def connect(beamline: str, all: bool, sim_backend: bool) -> None:
 
     print(f"Attempting connection to {beamline} (using {full_module_path})")
 
-    # Force all devices to be lazy (don't connect to PVs on instantiation) and do
-    # connection as an extra step, because the alternatives is handling the fact
-    # that only some devices may be lazy.
-    devices, instance_exceptions = make_all_devices(
-        full_module_path,
-        include_skipped=all,
-        fake_with_ophyd_sim=sim_backend,
-        wait_for_connection=False,
-    )
-    devices, connect_exceptions = _connect_devices(run_engine, devices, sim_backend)
+    mod = importlib.import_module(full_module_path)
+
+    # Don't connect devices as they're built and do connection as an extra step,
+    # because the alternatives is handling the fact that only some devices may
+    # be lazy.
+
+    if name:
+        for manager_name in name:
+            if (manager := getattr(mod, manager_name, None)) and isinstance(
+                manager, DeviceManager
+            ):
+                devices, instance_exceptions, connect_exceptions = (
+                    manager.build_and_connect(
+                        mock=sim_backend,
+                    )
+                )
+    else:
+        _spoof_path_provider()
+        devices, instance_exceptions = make_all_devices(
+            full_module_path,
+            include_skipped=all,
+            fake_with_ophyd_sim=sim_backend,
+            wait_for_connection=False,
+        )
+        devices, connect_exceptions = _connect_devices(run_engine, devices, sim_backend)
 
     # Inform user of successful connections
     _report_successful_devices(devices, sim_backend)
