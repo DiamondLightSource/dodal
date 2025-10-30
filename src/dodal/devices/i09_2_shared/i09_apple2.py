@@ -129,7 +129,7 @@ class J09Apple2Controller(Apple2Controller[Apple2]):
         apple2: Apple2,
         lookuptable_dir: str,
         config_client: ConfigServer,
-        poly_deg: list[str],
+        poly_deg: list[str] | None = None,
         units: str = "keV",
         name: str = "",
     ) -> None:
