@@ -1,8 +1,36 @@
-"""Apple2 lookuptable definition and csv converter"""
+"""Apple2 lookup table utilities and CSV converter.
+
+This module provides helpers to read, validate and convert Apple2 insertion-device
+lookup tables (energy -> gap/phase polynomials) from CSV sources into an
+in-memory dictionary format used by the Apple2 controllers.
+
+Data format produced
+The lookup-table dictionary created by convert_csv_to_lookup() follows this
+structure:
+
+{
+  "POL_MODE": {
+    "Energies": {
+      "<min_energy>": {
+        "Low": <float>,
+        "High": <float>,
+        "Poly": <numpy.poly1d>
+      },
+      ...
+    },
+    "Limit": {
+      "Minimum": <float>,
+      "Maximum": <float>
+    }
+  },
+}
+
+"""
 
 import abc
 import csv
 import io
+from collections.abc import Generator
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -81,19 +109,29 @@ def convert_csv_to_lookup(
     skip_line_start_with: str = "#",
 ) -> dict[str | None, dict[str, dict[str, dict[str, Any]]]]:
     """
-    Convert a CSV file to a lookup table dictionary.
+    Convert CSV content into the Apple2 lookup-table dictionary.
 
-    Returns
-    -------
-    dict
-        Dictionary in Apple2 lookup table format.
-
-    Raises
-    ------
-    RuntimeError
-        If the CSV cannot be converted.
+    Parameters
+    ----------
+    file:
+        The CSV content as a string.
+    source:
+        Optional (column_name) pair to filter rows by source.
+    mode
+        Name of the column that identifies the polarisation for a row.
+    mode_name_convert
+        Optional mapping to normalise non-standard mode names
+        (e.g. {"CR": "PC", "CL": "NC"}).
+    min_energy, max_energy
+        Column names for the energy coverage range in the CSV.
+    poly_deg
+        Ordered list of CSV column names to read polynomial coefficients from.
+        If None, defaults to ["7th-order", ..., "1st-order", "b"].
+    skip_line_start_with
+        Lines beginning with this prefix are skipped (default "#").
 
     """
+    # Change none standard name to standard used in Pol
     if mode_name_convert is None:
         mode_name_convert = {"CR": "PC", "CL": "NC"}
     if poly_deg is None:
@@ -158,7 +196,8 @@ def convert_csv_to_lookup(
     return lookup_table
 
 
-def read_file_and_skip(file: str, skip_line_start_with: str = "#"):
+def read_file_and_skip(file: str, skip_line_start_with: str = "#") -> Generator[str]:
+    """Yield non-comment lines from the CSV content string."""
     for line in io.StringIO(file):
         if line.startswith(skip_line_start_with):
             continue
@@ -172,12 +211,17 @@ def get_poly(
     lookup_table: dict[str | None, dict[str, dict[str, Any]]],
 ) -> np.poly1d:
     """
-    Get polynomial for a given energy and polarisation.
+    Return the numpy.poly1d polynomial applicable for the given energy and polarisation.
 
-    Raises
-    ------
-    ValueError
-        If energy is out of bounds or coefficients are missing.
+    Parameters
+    ----------
+    energy:
+        Energy value in the same units used to create the lookup table (eV).
+    pol:
+        Polarisation mode (Pol enum).
+    lookup_table:
+        The converted lookup-table dictionary for either 'Gap' or 'Phase'.
+
     """
     if (
         energy < lookup_table[pol]["Limit"]["Minimum"]
@@ -203,6 +247,7 @@ def get_poly(
 def generate_lookup_table(
     pol: Pol, min_energy: float, max_energy: float, poly1d_param: list[float]
 ) -> dict[str | None, dict[str, dict[str, Any]]]:
+    """Generate a single lookuptable for a given set of parameters."""
     return {
         pol.value: {
             "Energies": {
@@ -223,6 +268,8 @@ def make_phase_tables(
     max_energies: list[float],
     poly1d_params: list[list[float]],
 ) -> dict[str | None, dict[str, dict[str, Any]]]:
+    """Generate a dictionary containing multiple lookuptable entries
+    for provided polarisations."""
     lookuptable_phase = {}
     for i in range(len(pols)):
         lookuptable_phase.update(
@@ -238,9 +285,12 @@ def make_phase_tables(
 
 class EnergyMotorLookup:
     """
-    Handles lookup tables for I10 Apple2 ID, converting energy and polarisation to gap
-     and phase. Fetches and parses lookup tables from a config server, supports dynamic
-     updates, and validates input.
+    Abstract base for energy->motor lookup.
+
+    Subclasses should implement `update_lookuptable()` to populate `self.lookup_tables`
+    from the configured file sources. After update_lookuptable() has populated the
+    'Gap' and 'Phase' tables, `get_motor_from_energy()` can be used to compute
+    (gap, phase) for a requested (energy, pol) pair.
     """
 
     def __init__(
@@ -271,6 +321,10 @@ class EnergyMotorLookup:
             The column name that contain the maximum energy in look up table.
         max_energy:
             The column name that contain the maximum energy in look up table.
+        gap_file_name:
+            File name for the id game.
+        phase_file_name:
+            File name for the phase(optional).
         poly_deg:
             The column names for the parameters for the energy conversion polynomial, starting with the least significant.
 
