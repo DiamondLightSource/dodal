@@ -1,4 +1,5 @@
 import asyncio
+import json
 from collections.abc import Awaitable, Callable
 from datetime import timedelta
 from enum import IntEnum
@@ -20,6 +21,8 @@ from redis.asyncio import StrictRedis
 
 from dodal.devices.oav.oav_detector import OAV
 from dodal.log import LOGGER
+
+FORWARDING_COMPLETE_MESSAGE = "image_forwarding_complete"
 
 
 async def get_next_jpeg(response: ClientResponse) -> bytes:
@@ -172,3 +175,7 @@ class OAVToRedisForwarder(StandardReadable, Flyable, Stoppable):
             )
             self._stop_flag.set()
             await self.forwarding_task
+        self.redis_client.publish(
+            "murko",
+            json.dumps(FORWARDING_COMPLETE_MESSAGE),
+        )
