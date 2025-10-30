@@ -1,52 +1,42 @@
 import asyncio
 
 from ophyd_async.core import (
-    # DEFAULT_TIMEOUT,
+    DetectorTrigger,
     TriggerInfo,
 )
 from ophyd_async.epics.adcore import (
     ADBaseController,
-    ADBaseIO,
     ADImageMode,
 )
 
+from .merlin_driver_io import MerlinDriverIO, MerlinTriggerMode
 
-class MerlinController(ADBaseController[ADBaseIO]):
-    # def __init__(
-    #     self,
-    #     driver: ADBaseIO,
-    #     good_states: frozenset[ADState] = DEFAULT_GOOD_STATES,
-    # ) -> None:
-    #     self.driver = driver
-    #     self.good_states = good_states
-    #     self.frame_timeout: float = 0
-    #     self._arm_status: AsyncStatus | None = None
-    #     for drv_child in self.driver.children():
-    #         logging.debug(drv_child)
 
-    #     super().__init__(driver, 0.002)
+class MerlinController(ADBaseController[MerlinDriverIO]):
+    """MerlinController for a MerlinDriverIO"""
 
     def get_deadtime(self, exposure: float | None) -> float:
-        return 0.001
+        return 1.64e-3
 
     async def prepare(self, trigger_info: TriggerInfo):
         if (exposure := trigger_info.livetime) is not None:
             await self.driver.acquire_time.set(exposure)
+            # await self.driver.acquire_period.set(exposure + trigger_info.deadtime)
+            await self.driver.acquire_period.set(exposure)
 
-        # self.frame_timeout = (
-        #     DEFAULT_TIMEOUT + await self.driver.acquire_time.get_value()
-        # )
+        if trigger_info.trigger is DetectorTrigger.INTERNAL:
+            await self.driver.trigger_mode.set(MerlinTriggerMode.INTERNAL)
+        elif trigger_info.trigger in {
+            DetectorTrigger.CONSTANT_GATE,
+            DetectorTrigger.EDGE_TRIGGER,
+        }:
+            await self.driver.trigger_mode.set(MerlinTriggerMode.START_RISING)
+        else:
+            # CONSTANT_GATE not in ADMerlin.  When configuring from Windows NI software,
+            # a stop trigger can be used in additon to the start trigger.
+            raise ValueError(f"ADMerlin does not support {trigger_info.trigger}")
 
         await asyncio.gather(
             self.driver.num_images.set(trigger_info.total_number_of_exposures),
             self.driver.image_mode.set(ADImageMode.MULTIPLE),
         )
-
-    # async def wait_for_idle(self):
-    #     if self._arm_status:
-    #         await self._arm_status
-
-    # async def disarm(self):
-    #     # We can't use caput callback as we already used it in arm() and we can't have
-    #     # 2 or they will deadlock
-    #     await stop_busy_record(self.driver.acquire, False, timeout=1)

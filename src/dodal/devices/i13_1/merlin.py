@@ -6,6 +6,7 @@ from ophyd_async.epics import adcore
 from dodal.common.beamlines.device_helpers import CAM_SUFFIX, HDF5_SUFFIX
 
 from .merlin_controller import MerlinController
+from .merlin_driver_io import MerlinDriverIO
 
 
 class Merlin(adcore.AreaDetector[MerlinController]):
@@ -20,7 +21,7 @@ class Merlin(adcore.AreaDetector[MerlinController]):
         config_sigs: Sequence[SignalR] = (),
         plugins: dict[str, adcore.NDPluginBaseIO] | None = None,
     ):
-        driver = adcore.ADBaseIO(prefix + drv_suffix)
+        driver = MerlinDriverIO(prefix + drv_suffix)
         controller = MerlinController(driver)
         writer = writer_cls.with_io(
             prefix,
