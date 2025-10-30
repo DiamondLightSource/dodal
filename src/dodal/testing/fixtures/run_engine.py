@@ -23,9 +23,14 @@ async def _ensure_running_bluesky_event_loop():
             raise TimeoutError("This really shouldn't happen but just in case...")
 
 
+_run_engine = RunEngine()
+
+
 @pytest.fixture()
 async def run_engine():
-    yield RunEngine()
+    global run_engine
+    _run_engine.reset()
+    return _run_engine
 
 
 @pytest.fixture
