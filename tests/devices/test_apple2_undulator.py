@@ -54,14 +54,6 @@ async def mock_phase_axes(prefix: str = "BLXX-EA-DET-007:") -> UndulatorPhaseAxe
     set_mock_value(mock_phase_axes.top_inner.velocity, 2)
     set_mock_value(mock_phase_axes.btm_outer.velocity, 2)
     set_mock_value(mock_phase_axes.btm_inner.velocity, 2)
-    set_mock_value(mock_phase_axes.top_outer.user_readback, 0)
-    set_mock_value(mock_phase_axes.top_inner.user_readback, 0)
-    set_mock_value(mock_phase_axes.btm_outer.user_readback, 0)
-    set_mock_value(mock_phase_axes.btm_inner.user_readback, 0)
-    set_mock_value(mock_phase_axes.top_outer.user_setpoint_readback, 0)
-    set_mock_value(mock_phase_axes.top_inner.user_setpoint_readback, 0)
-    set_mock_value(mock_phase_axes.btm_outer.user_setpoint_readback, 0)
-    set_mock_value(mock_phase_axes.btm_inner.user_setpoint_readback, 0)
     set_mock_value(mock_phase_axes.fault, 0)
     return mock_phase_axes
 
@@ -74,8 +66,6 @@ async def mock_jaw_phase(prefix: str = "BLXX-EA-DET-007:") -> UndulatorJawPhase:
         )
     set_mock_value(mock_jaw_phase.gate, UndulatorGateStatus.CLOSE)
     set_mock_value(mock_jaw_phase.jaw_phase.velocity, 2)
-    set_mock_value(mock_jaw_phase.jaw_phase.user_readback, 0)
-    set_mock_value(mock_jaw_phase.jaw_phase.user_setpoint_readback, 0)
     set_mock_value(mock_jaw_phase.fault, 0)
     return mock_jaw_phase
 
