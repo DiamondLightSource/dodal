@@ -27,7 +27,7 @@ _run_engine = RunEngine()
 
 
 @pytest.fixture()
-async def run_engine():
+def run_engine():
     global _run_engine
     _run_engine.reset()
     return _run_engine

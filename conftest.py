@@ -25,23 +25,6 @@ from dodal.common.visit import (
 )
 from dodal.log import LOGGER, GELFTCPHandler, set_up_all_logging_handlers
 
-
-@pytest.hookimpl()
-def pytest_sessionfinish(session, exitstatus):
-    """
-    Called after the whole pytest run (all tests in the session).
-    """
-
-    import os
-    import resource
-
-    pid = os.getpid()
-    open_files = len(os.listdir(f"/proc/{pid}/fd"))
-    soft, hard = resource.getrlimit(resource.RLIMIT_NOFILE)
-
-    print(f"\nOpen files: {open_files}/{soft} (soft limit)")
-
-
 mock_paths = [
     ("DAQ_CONFIGURATION_PATH", MOCK_DAQ_CONFIG_PATH),
     ("ZOOM_PARAMS_FILE", TEST_OAV_ZOOM_LEVELS_XML),
