@@ -145,7 +145,6 @@ def test_convert_csv_to_lookup_overwrite_name_convert_default() -> None:
 
     assert "lh" in lookuptable
     assert "lv" in lookuptable
-    print(lookuptable)
     # Check polynomials evaluate as expected
     poly_lh = lookuptable["lh"]["Energies"]["100"]["Poly"]
     assert isinstance(poly_lh, np.poly1d)
