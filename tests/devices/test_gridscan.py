@@ -139,13 +139,11 @@ async def test_waits_for_running_motion(grid_scan: FastGridScanCommon):
     ],
 )
 async def test_given_different_step_numbers_then_expected_images_correct(
-    zebra_fast_grid_scan: ZebraFastGridScanThreeD, steps, expected_images
+    run_engine, zebra_fast_grid_scan: ZebraFastGridScanThreeD, steps, expected_images
 ):
     set_mock_value(zebra_fast_grid_scan.x_steps, steps[0])
     set_mock_value(zebra_fast_grid_scan.y_steps, steps[1])
     set_mock_value(zebra_fast_grid_scan.z_steps, steps[2])
-
-    run_engine = RunEngine(call_returns_result=True)
 
     result = run_engine(bps.rd(zebra_fast_grid_scan.expected_images))
 

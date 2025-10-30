@@ -70,10 +70,8 @@ def test_given_types_of_device_when_home_and_reset_wrapper_called_then_motors_an
 
 
 def test_given_a_device_when_check_and_cache_values_then_motor_values_returned(
-    my_device,
+    my_device, run_engine: RunEngine
 ):
-    run_engine = RunEngine(call_returns_result=True)
-
     for i, motor in enumerate(my_device.motors, start=1):
         set_mock_value(motor.user_readback, i * 100)
 
@@ -124,10 +122,12 @@ def test_given_a_device_with_a_too_large_move_when_check_and_cache_values_then_e
     ],
 )
 def test_given_a_device_where_one_move_too_small_when_check_and_cache_values_then_other_positions_returned(
-    my_device: DeviceWithOnlyMotors, initial, min, new_position: float
+    my_device: DeviceWithOnlyMotors,
+    initial,
+    min,
+    new_position: float,
+    run_engine: RunEngine,
 ):
-    run_engine = RunEngine(call_returns_result=True)
-
     set_mock_value(my_device.x.user_readback, initial)
     set_mock_value(my_device.y.user_readback, 200)
 
@@ -144,10 +144,8 @@ def test_given_a_device_where_one_move_too_small_when_check_and_cache_values_the
 
 
 def test_given_a_device_where_all_moves_too_small_when_check_and_cache_values_then_no_positions_returned(
-    my_device,
+    my_device, run_engine: RunEngine
 ):
-    run_engine = RunEngine(call_returns_result=True)
-
     set_mock_value(my_device.x.user_readback, 10)
     set_mock_value(my_device.y.user_readback, 20)
 

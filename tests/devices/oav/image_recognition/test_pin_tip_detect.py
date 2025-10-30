@@ -1,4 +1,3 @@
-import asyncio
 from unittest.mock import MagicMock, patch
 
 import numpy as np
@@ -9,9 +8,6 @@ from dodal.devices.oav.pin_image_recognition import (
     PinTipDetection,
 )
 from dodal.devices.oav.pin_image_recognition.utils import NONE_VALUE, SampleLocation
-
-EVENT_LOOP = asyncio.new_event_loop()
-
 
 DEVICE_NAME = "pin_tip_detection"
 TRIGGERED_TIP_READING = DEVICE_NAME + "-triggered_tip"
