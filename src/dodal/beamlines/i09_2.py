@@ -19,6 +19,10 @@ from dodal.devices.synchrotron import Synchrotron
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
+J09_CONF_CLIENT = ConfigServer(url="https://daq-config.diamond.ac.uk")
+LOOK_UPTABLE_DIR = "/dls_sw/i09-2/software/gda/workspace_git/gda-diamond.git/configurations/i09-2-shared/lookupTables/"
+
+
 BL = get_beamline_name("i09-2")
 PREFIX = BeamlinePrefix(BL, suffix="J")
 set_log_beamline(BL)
@@ -61,11 +65,6 @@ def jid() -> Apple2:
         id_gap=jid_gap(),
         id_phase=jid_phase(),
     )
-
-
-J09_CONF_CLIENT = ConfigServer(url="https://daq-config.diamond.ac.uk")
-
-LOOK_UPTABLE_DIR = "/dls_sw/i09-2/software/gda/workspace_git/gda-diamond.git/configurations/i09-2-shared/lookupTables/"
 
 
 @device_factory()
