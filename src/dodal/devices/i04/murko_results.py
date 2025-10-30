@@ -91,7 +91,8 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
         )
         self.pubsub = self.redis_client.pubsub()
         self.sample_id = soft_signal_rw(str)  # Should get from redis
-        self.stop_angle = stop_angle
+        self.stop_angle = soft_signal_rw(int, initial_value=stop_angle)
+        self.invert_stop_angle = soft_signal_rw(bool, initial_value=False)
 
         self._reset()
 
@@ -103,7 +104,7 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
         super().__init__(name=name)
 
     def _reset(self):
-        self._last_omega = 0
+        self._last_omega = None
         self._results: list[MurkoResult] = []
 
     @AsyncStatus.wrap
@@ -122,7 +123,8 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
     async def trigger(self):
         # Wait for results
         sample_id = await self.sample_id.get_value()
-        while self._last_omega < self.stop_angle:
+
+        while not await self.check_if_reached_stop_angle():
             # waits here for next batch to be received
             message = await self.pubsub.get_message(timeout=self.TIMEOUT_S)
             if message is None:
@@ -250,6 +252,16 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
 
         LOGGER.info(f"Number of results after filtering: {len(best_x)}")
         return best_x
+
+    async def check_if_reached_stop_angle(self):
+        inverted = await self.invert_stop_angle.get_value()
+        stop_angle = await self.stop_angle.get_value()
+        if self._last_omega is None:
+            return False
+        if inverted:
+            return self._last_omega <= stop_angle
+        else:
+            return self._last_omega >= stop_angle
 
 
 def get_yz_least_squares(vertical_dists: list, omegas: list) -> tuple[float, float]:
