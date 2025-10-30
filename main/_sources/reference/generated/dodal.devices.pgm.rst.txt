@@ -14,7 +14,7 @@ dodal.devices.pgm
    :toctree:
    :recursive:
 
-   ~pgm.PGM
+   ~pgm.PlaneGratingMonochromator
 
 
 
