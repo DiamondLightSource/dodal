@@ -15,7 +15,7 @@ from bluesky.simulators import RunEngineSimulator
 _run_engine = RunEngine()
 
 
-@pytest.fixture(scope="session", autouse=True)
+@pytest_asyncio.fixture(scope="session", loop_scope="session", autouse=True)
 async def _ensure_running_bluesky_event_loop(_global_run_engine):
     # make sure the event loop is thoroughly up and running before we try to create
     # any ophyd_async devices which might need it
