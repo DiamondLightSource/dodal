@@ -35,7 +35,7 @@ from dodal.devices.i10.i10_apple2 import (
     LinearArbitraryAngle,
 )
 from dodal.devices.i10.i10_setting_data import I10Grating
-from dodal.devices.pgm import PGM
+from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.devices.util.lookup_tables_apple2 import convert_csv_to_lookup
 from dodal.testing import patch_motor
 from tests.devices.i10.test_data import (
@@ -54,9 +54,52 @@ ID_ENERGY_2_GAP_CALIBRATIONS_FILE_CSV = os.path.split(ID_ENERGY_2_GAP_CALIBRATIO
 
 
 @pytest.fixture
-async def mock_pgm(prefix: str = "BLXX-EA-DET-007:") -> PGM:
+async def mock_id_gap(prefix: str = "BLXX-EA-DET-007:") -> UndulatorGap:
     async with init_devices(mock=True):
-        mock_pgm = PGM(prefix=prefix, grating=I10Grating, grating_pv="NLINES2")
+        mock_id_gap = UndulatorGap(prefix, "mock_id_gap")
+    assert mock_id_gap.name == "mock_id_gap"
+    set_mock_value(mock_id_gap.gate, UndulatorGateStatus.CLOSE)
+    set_mock_value(mock_id_gap.velocity, 1)
+    set_mock_value(mock_id_gap.user_readback, 20)
+    set_mock_value(mock_id_gap.user_setpoint, "20")
+    set_mock_value(mock_id_gap.fault, 0)
+    return mock_id_gap
+
+
+@pytest.fixture
+async def mock_phase_axes(prefix: str = "BLXX-EA-DET-007:") -> UndulatorPhaseAxes:
+    async with init_devices(mock=True):
+        mock_phase_axes = UndulatorPhaseAxes(
+            prefix=prefix,
+            top_outer="RPQ1",
+            top_inner="RPQ2",
+            btm_outer="RPQ3",
+            btm_inner="RPQ4",
+        )
+    assert mock_phase_axes.name == "mock_phase_axes"
+    set_mock_value(mock_phase_axes.gate, UndulatorGateStatus.CLOSE)
+    set_mock_value(mock_phase_axes.top_outer.velocity, 2)
+    set_mock_value(mock_phase_axes.top_inner.velocity, 2)
+    set_mock_value(mock_phase_axes.btm_outer.velocity, 2)
+    set_mock_value(mock_phase_axes.btm_inner.velocity, 2)
+    set_mock_value(mock_phase_axes.top_outer.user_readback, 0)
+    set_mock_value(mock_phase_axes.top_inner.user_readback, 0)
+    set_mock_value(mock_phase_axes.btm_outer.user_readback, 0)
+    set_mock_value(mock_phase_axes.btm_inner.user_readback, 0)
+    set_mock_value(mock_phase_axes.top_outer.user_setpoint_readback, 0)
+    set_mock_value(mock_phase_axes.top_inner.user_setpoint_readback, 0)
+    set_mock_value(mock_phase_axes.btm_outer.user_setpoint_readback, 0)
+    set_mock_value(mock_phase_axes.btm_inner.user_setpoint_readback, 0)
+    set_mock_value(mock_phase_axes.fault, 0)
+    return mock_phase_axes
+
+
+@pytest.fixture
+async def mock_pgm(prefix: str = "BLXX-EA-DET-007:") -> PlaneGratingMonochromator:
+    async with init_devices(mock=True):
+        mock_pgm = PlaneGratingMonochromator(
+            prefix=prefix, grating=I10Grating, grating_pv="NLINES2"
+        )
     patch_motor(mock_pgm.energy)
     return mock_pgm
 
@@ -103,7 +146,7 @@ async def mock_id_energy(
 
 @pytest.fixture
 async def beam_energy(
-    mock_id_energy: InsertionDeviceEnergy, mock_pgm: PGM
+    mock_id_energy: InsertionDeviceEnergy, mock_pgm: PlaneGratingMonochromator
 ) -> BeamEnergy:
     async with init_devices(mock=True):
         beam_energy = BeamEnergy(id_energy=mock_id_energy, mono=mock_pgm.energy)
