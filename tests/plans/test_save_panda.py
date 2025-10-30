@@ -7,6 +7,12 @@ from bluesky.simulators import RunEngineSimulator
 from dodal.plans.save_panda import _save_panda, main
 
 
+@pytest.fixture(autouse=True)
+def patch_run_engine_in_save_panda_to_avoid_leaks(run_engine):
+    with patch("dodal.plans.save_panda.RunEngine", return_value=run_engine):
+        yield
+
+
 def test_save_panda():
     sim_run_engine = RunEngineSimulator()
     panda = MagicMock()

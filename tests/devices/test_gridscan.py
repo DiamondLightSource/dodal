@@ -159,12 +159,13 @@ async def test_given_different_step_numbers_then_expected_images_correct(
     ],
 )
 async def test_given_different_2d_step_numbers_then_expected_images_correct(
-    zebra_fast_grid_scan_2d: ZebraFastGridScanTwoD, steps, expected_images
+    zebra_fast_grid_scan_2d: ZebraFastGridScanTwoD,
+    steps,
+    expected_images,
+    run_engine: RunEngine,
 ):
     set_mock_value(zebra_fast_grid_scan_2d.x_steps, steps[0])
     set_mock_value(zebra_fast_grid_scan_2d.y_steps, steps[1])
-
-    run_engine = RunEngine(call_returns_result=True)
 
     result = run_engine(bps.rd(zebra_fast_grid_scan_2d.expected_images))
 
