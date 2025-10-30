@@ -6,6 +6,7 @@ from types import ModuleType
 from unittest.mock import patch
 
 import pytest
+from _pytest.fixtures import FixtureRequest
 from ophyd_async.core import init_devices
 from ophyd_async.testing import set_mock_value
 
@@ -79,3 +80,18 @@ async def baton_in_commissioning_mode() -> AsyncGenerator[Baton]:
     set_mock_value(baton.commissioning, True)
     yield baton
     set_commissioning_signal(None)
+
+
+@pytest.fixture(
+    # autouse=True
+)
+def check_for_filehandle_leaks(request: FixtureRequest):
+    pid = os.getpid()
+    _baseline_n_open_files = len(os.listdir(f"/proc/{pid}/fd"))
+    try:
+        yield
+    finally:
+        _n_open_files = len(os.listdir(f"/proc/{pid}/fd"))
+        assert _n_open_files == _baseline_n_open_files, (
+            f"Function {request.function.__name__} leaked some filehandles"
+        )
