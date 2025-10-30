@@ -21,6 +21,7 @@ from dodal.devices.oav.oav_calculations import (
 from dodal.log import LOGGER
 
 NO_MURKO_RESULT = (-1, -1)
+RESULTS_COMPLETE_MESSAGE = "murko_results_complete"
 
 
 class MurkoMetadata(TypedDict):
@@ -124,9 +125,11 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
         # Wait for results
         sample_id = await self.sample_id.get_value()
 
-        while not await self.check_if_reached_stop_angle():
+        while True:
             # waits here for next batch to be received
             message = await self.pubsub.get_message(timeout=self.TIMEOUT_S)
+            if message == RESULTS_COMPLETE_MESSAGE:
+                break
             if message is None:
                 continue
             await self.process_batch(message, sample_id)
@@ -253,15 +256,11 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
         LOGGER.info(f"Number of results after filtering: {len(best_x)}")
         return best_x
 
-    async def check_if_reached_stop_angle(self):
-        inverted = await self.invert_stop_angle.get_value()
-        stop_angle = await self.stop_angle.get_value()
-        if self._last_omega is None:
-            return False
-        if inverted:
-            return self._last_omega <= stop_angle
-        else:
-            return self._last_omega >= stop_angle
+    async def check_running(self, sample_id: str) -> bool:
+        running_str = await self.redis_client.hget(
+            f"murko:{sample_id}:running", "running"
+        )
+        return json.loads(running_str)
 
 
 def get_yz_least_squares(vertical_dists: list, omegas: list) -> tuple[float, float]:
