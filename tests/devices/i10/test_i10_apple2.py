@@ -35,7 +35,7 @@ from dodal.devices.i10.i10_apple2 import (
     LinearArbitraryAngle,
 )
 from dodal.devices.i10.i10_setting_data import I10Grating
-from dodal.devices.pgm import PGM
+from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.testing import patch_motor
 from tests.devices.i10.test_data import (
     EXPECTED_ID_ENERGY_2_GAP_CALIBRATIONS_IDD_PKL,
@@ -94,9 +94,11 @@ async def mock_phase_axes(prefix: str = "BLXX-EA-DET-007:") -> UndulatorPhaseAxe
 
 
 @pytest.fixture
-async def mock_pgm(prefix: str = "BLXX-EA-DET-007:") -> PGM:
+async def mock_pgm(prefix: str = "BLXX-EA-DET-007:") -> PlaneGratingMonochromator:
     async with init_devices(mock=True):
-        mock_pgm = PGM(prefix=prefix, grating=I10Grating, grating_pv="NLINES2")
+        mock_pgm = PlaneGratingMonochromator(
+            prefix=prefix, grating=I10Grating, grating_pv="NLINES2"
+        )
     patch_motor(mock_pgm.energy)
     return mock_pgm
 
@@ -182,7 +184,7 @@ async def mock_id_energy(
 
 @pytest.fixture
 async def beam_energy(
-    mock_id_energy: InsertionDeviceEnergy, mock_pgm: PGM
+    mock_id_energy: InsertionDeviceEnergy, mock_pgm: PlaneGratingMonochromator
 ) -> BeamEnergy:
     async with init_devices(mock=True):
         beam_energy = BeamEnergy(id_energy=mock_id_energy, mono=mock_pgm.energy)
