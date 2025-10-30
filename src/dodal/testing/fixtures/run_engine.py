@@ -45,6 +45,7 @@ async def _global_run_engine():
     try:
         run_engine.halt()
     except Exception as e:
+        # Ignore exception thrown if the run engine is already halted.
         print(f"Got exception while halting RunEngine {e}")
     finally:
 

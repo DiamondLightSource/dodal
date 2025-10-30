@@ -40,6 +40,13 @@ async def smargon() -> AsyncGenerator[Smargon]:
         yield smargon
 
 
+@pytest.fixture
+async def mock_pin_tip_detect():
+    async with init_devices(mock=True):
+        mock_pin_tip_detect = PinTipDetection("")
+        return mock_pin_tip_detect
+
+
 @pytest.mark.parametrize(
     "h, v, expected_x, expected_y",
     [
@@ -90,12 +97,8 @@ async def test_values_for_move_so_that_beam_is_at_pixel(
 
 
 async def test_given_tip_found_when_wait_for_tip_to_be_found_called_then_tip_immediately_returned(
-    run_engine,
+    run_engine, mock_pin_tip_detect
 ):
-    async with init_devices(mock=True):
-        mock_pin_tip_detect = PinTipDetection("")
-
-    await mock_pin_tip_detect.connect(mock=True)
     mock_pin_tip_detect._get_tip_and_edge_data = AsyncMock(
         return_value=SampleLocation(100, 100, np.array([]), np.array([]))
     )
@@ -106,11 +109,8 @@ async def test_given_tip_found_when_wait_for_tip_to_be_found_called_then_tip_imm
 
 async def test_given_no_tip_when_wait_for_tip_to_be_found_called_then_exception_thrown(
     run_engine: RunEngine,
+    mock_pin_tip_detect: PinTipDetection,
 ):
-    async with init_devices(mock=True):
-        mock_pin_tip_detect = PinTipDetection("")
-
-    await mock_pin_tip_detect.connect(mock=True)
     await mock_pin_tip_detect.validity_timeout.set(0.2)
     mock_pin_tip_detect._get_tip_and_edge_data = AsyncMock(
         return_value=SampleLocation(
