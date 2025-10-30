@@ -8,7 +8,7 @@ threshold = 5
 
 
 @pytest.mark.parametrize("iteration", range(11))
-def test_run_engine_fixture_has_no_memory_leak(
+def test_run_engine_fixture_has_no_file_handler_leak(
     run_engine: RunEngine, iteration: int
 ) -> None:
     global _baseline_n_open_files
