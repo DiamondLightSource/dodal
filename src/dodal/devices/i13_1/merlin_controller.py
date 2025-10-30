@@ -16,7 +16,10 @@ class MerlinController(ADBaseController[MerlinDriverIO]):
     """MerlinController for a MerlinDriverIO"""
 
     def get_deadtime(self, exposure: float | None) -> float:
-        return 1.64e-3
+        # Need to know the Mode (Counting Mode in the windows control SW) to set the
+        # correct deadtime as 12bit (and <12bit) read and write in parallel and so only
+        # require half the readout time.
+        return 0.822e-3  # 24bit: 1.644e-3, 12bit: 0.822e-3
 
     async def prepare(self, trigger_info: TriggerInfo):
         if (exposure := trigger_info.livetime) is not None:
