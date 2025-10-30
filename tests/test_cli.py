@@ -19,6 +19,12 @@ from dodal.utils import AnyDevice, OphydV1Device, OphydV2Device
 EXAMPLE_BEAMLINE = "i22"
 
 
+@pytest.fixture(autouse=True)
+def patch_run_engine_in_cli_to_avoid_leaks(run_engine):
+    with patch("dodal.cli.RunEngine", return_value=run_engine):
+        yield
+
+
 @pytest.fixture
 def runner():
     return CliRunner()
