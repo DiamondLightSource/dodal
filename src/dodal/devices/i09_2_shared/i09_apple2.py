@@ -1,6 +1,6 @@
 from daq_config_server.client import ConfigServer
 
-from dodal.devices.apple2_undulator import Pol
+from dodal.devices.apple2_undulator import Apple2, Apple2Controller, Apple2Val, Pol
 from dodal.devices.util.lookup_tables_apple2 import (
     EnergyMotorLookup,
     Lookuptable,
@@ -19,11 +19,11 @@ MAXIMUM_MOVE_TIME = 550  # There is no useful movements take longer than this.
 
 
 J09PhasePoly1dParameters = {
-    "LH": [0],
-    "LV": [MAXIMUM_ROW_PHASE_MOTOR_POSITION],
-    "PC": [ROW_PHASE_CIRCULAR],
-    "NC": [ROW_PHASE_CIRCULAR],
-    "LH3": [0],
+    "lh": [0],
+    "lv": [MAXIMUM_ROW_PHASE_MOTOR_POSITION],
+    "pc": [ROW_PHASE_CIRCULAR],
+    "nc": [ROW_PHASE_CIRCULAR],
+    "lh3": [0],
 }
 
 
@@ -41,7 +41,7 @@ class J09EnergyMotorLookup(EnergyMotorLookup):
         mode: str = "Mode",
         min_energy: str = "MinEnergy",
         max_energy: str = "MaxEnergy",
-        gap_file_name: str = "IDEnergy2GapCalibrations.csv",
+        gap_file_name: str = "JIDEnergy2GapCalibrations.csv",
         poly_deg: list | None = None,
     ):
         """Initialise the I10EnergyMotorLookup class with lookup table headers provided.
@@ -64,6 +64,20 @@ class J09EnergyMotorLookup(EnergyMotorLookup):
             The column names for the parameters for the energy conversion polynomial, starting with the least significant.
 
         """
+        if poly_deg is None:
+            poly_deg = [
+                "9th-order",
+                "8th-order",
+                "7th-order",
+                "6th-order",
+                "5th-order",
+                "4th-order",
+                "3rd-order",
+                "2nd-order",
+                "1st-order",
+                "0th-order",
+            ]
+
         super().__init__(
             lookuptable_dir=lookuptable_dir,
             config_client=config_client,
@@ -100,7 +114,8 @@ class J09EnergyMotorLookup(EnergyMotorLookup):
         poly1d_params = []
         for key in self.lookup_tables["Gap"].keys():
             if key is not None:
-                pols.append(Pol[key])
+                pols.append(Pol(key.lower()))
+                print(key)
                 mix_energies.append(self.lookup_tables["Gap"][key]["Limit"]["Minimum"])
                 max_energies.append(self.lookup_tables["Gap"][key]["Limit"]["Maximum"])
                 poly1d_params.append(J09PhasePoly1dParameters[key])
@@ -110,3 +125,45 @@ class J09EnergyMotorLookup(EnergyMotorLookup):
             max_energies=max_energies,
             poly1d_params=poly1d_params,
         )
+
+
+class J09Apple2Controller(Apple2Controller[Apple2]):
+    def __init__(
+        self,
+        apple2: Apple2,
+        lookuptable_dir: str,
+        config_client: ConfigServer,
+        poly_deg: list[str],
+        units: str = "keV",
+        name: str = "",
+    ) -> None:
+        self.lookup_table_client = J09EnergyMotorLookup(
+            lookuptable_dir=lookuptable_dir,
+            config_client=config_client,
+            poly_deg=poly_deg,
+        )
+        super().__init__(
+            apple2=apple2,
+            energy_to_motor_converter=self.lookup_table_client.get_motor_from_energy,
+            units=units,
+            name=name,
+        )
+
+    async def _set_motors_from_energy(self, value: float) -> None:
+        """
+        Set the undulator motors for a given energy and polarisation.
+        """
+
+        pol = await self._check_and_get_pol_setpoint()
+        gap, phase = self.energy_to_motor(energy=value, pol=pol)
+        phase3 = phase * (-1 if pol == Pol.LA else 1)
+        id_set_val = Apple2Val(
+            top_outer=f"{phase:.6f}",
+            top_inner="0.0",
+            btm_inner=f"{phase3:.6f}",
+            btm_outer="0.0",
+            gap=f"{gap:.6f}",
+        )
+
+        LOGGER.info(f"Setting polarisation to {pol}, with values: {id_set_val}")
+        await self.apple2().set(id_motor_values=id_set_val)

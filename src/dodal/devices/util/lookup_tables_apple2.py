@@ -154,6 +154,7 @@ def convert_csv_to_lookup(
         if mode_value in mode_name_convert:
             mode_value = mode_name_convert[f"{mode_value}"]
         if mode_value not in polarisations:
+            mode_value = mode_value.lower()
             polarisations.add(mode_value)
             lookup_table[mode_value] = {
                 "Energies": {},
@@ -224,17 +225,17 @@ def get_poly(
 
     """
     if (
-        energy < lookup_table[pol]["Limit"]["Minimum"]
-        or energy > lookup_table[pol]["Limit"]["Maximum"]
+        energy < lookup_table[pol.value]["Limit"]["Minimum"]
+        or energy > lookup_table[pol.value]["Limit"]["Maximum"]
     ):
         raise ValueError(
-            "Demanding energy must lie between {} and {} eV!".format(
-                lookup_table[pol]["Limit"]["Minimum"],
-                lookup_table[pol]["Limit"]["Maximum"],
+            "Demanding energy must lie between {} and {}!".format(
+                lookup_table[pol.value]["Limit"]["Minimum"],
+                lookup_table[pol.value]["Limit"]["Maximum"],
             )
         )
     else:
-        for energy_range in lookup_table[pol]["Energies"].values():
+        for energy_range in lookup_table[pol.value]["Energies"].values():
             if energy >= energy_range["Low"] and energy < energy_range["High"]:
                 return energy_range["Poly"]
 
