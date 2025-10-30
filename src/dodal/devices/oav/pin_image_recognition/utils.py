@@ -109,6 +109,8 @@ class MxSampleDetect:
         self,
         *,
         preprocess: Callable[[np.ndarray], np.ndarray] = lambda arr: arr,
+        open_ksize: int = 5,
+        open_iterations: int = 5,
         canny_upper: int = 100,
         canny_lower: int = 50,
         close_ksize: int = 5,
@@ -132,6 +134,8 @@ class MxSampleDetect:
         """
 
         self.preprocess = preprocess
+        self.open_ksize = open_ksize
+        self.open_iterations = open_iterations
         self.canny_upper = canny_upper
         self.canny_lower = canny_lower
         self.close_ksize = close_ksize
@@ -148,8 +152,11 @@ class MxSampleDetect:
             assert arr.ndim == 2
             gray_arr = arr
 
+        # Remove Noises
+        open_arr = open_morph(self.open_ksize, self.open_iterations)(gray_arr)
+
         # Preprocess the array. (Use the greyscale one.)
-        pp_arr = self.preprocess(gray_arr)
+        pp_arr = self.preprocess(open_arr)
 
         # Find some edges.
         edge_arr = cv2.Canny(pp_arr, self.canny_upper, self.canny_lower)
