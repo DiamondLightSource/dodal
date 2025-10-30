@@ -35,8 +35,8 @@ from dodal.devices.i10.i10_apple2 import (
     LinearArbitraryAngle,
 )
 from dodal.devices.i10.i10_setting_data import I10Grating
-from dodal.devices.util.lookup_tables_apple2 import convert_csv_to_lookup
 from dodal.devices.pgm import PlaneGratingMonochromator
+from dodal.devices.util.lookup_tables_apple2 import convert_csv_to_lookup
 from dodal.testing import patch_motor
 from tests.devices.i10.test_data import (
     EXPECTED_ID_ENERGY_2_GAP_CALIBRATIONS_IDD_PKL,
