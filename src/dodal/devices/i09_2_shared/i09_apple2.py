@@ -13,10 +13,6 @@ ROW_PHASE_MOTOR_TOLERANCE = 0.004
 ROW_PHASE_CIRCULAR = 15
 MAXIMUM_ROW_PHASE_MOTOR_POSITION = 24.0
 MAXIMUM_GAP_MOTOR_POSITION = 100
-DEFAULT_JAW_PHASE_POLY_PARAMS = [1.0 / 7.5, -120.0 / 7.5]
-ALPHA_OFFSET = 180
-MAXIMUM_MOVE_TIME = 550  # There is no useful movements take longer than this.
-
 
 J09PhasePoly1dParameters = {
     "lh": [0],
@@ -156,11 +152,11 @@ class J09Apple2Controller(Apple2Controller[Apple2]):
 
         pol = await self._check_and_get_pol_setpoint()
         gap, phase = self.energy_to_motor(energy=value, pol=pol)
-        phase3 = phase * (-1 if pol == Pol.LA else 1)
+        phase = phase * (-1 if pol == Pol.NC else 1)
         id_set_val = Apple2Val(
             top_outer=f"{phase:.6f}",
             top_inner="0.0",
-            btm_inner=f"{phase3:.6f}",
+            btm_inner=f"{phase:.6f}",
             btm_outer="0.0",
             gap=f"{gap:.6f}",
         )

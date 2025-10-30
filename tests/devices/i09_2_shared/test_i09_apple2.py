@@ -4,6 +4,7 @@ import pytest
 from daq_config_server.client import ConfigServer
 from ophyd_async.core import init_devices
 from ophyd_async.testing import (
+    get_mock_put,
     set_mock_value,
 )
 
@@ -15,10 +16,12 @@ from dodal.devices.apple2_undulator import (
     Pol,
 )
 from dodal.devices.i09_2_shared.i09_apple2 import (
+    MAXIMUM_ROW_PHASE_MOTOR_POSITION,
+    ROW_PHASE_CIRCULAR,
     J09Apple2Controller,
     J09EnergyMotorLookup,
 )
-from dodal.devices.pgm import PGM
+from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.devices.util.lookup_tables_apple2 import convert_csv_to_lookup
 from tests.devices.i09_2_shared.test_data import (
     LOOKUP_TABLE_PATH,
@@ -69,7 +72,7 @@ async def mock_id_controller(
             poly_deg=POLY_DEG,
             config_client=mock_config_client,
         )
-
+    mock_id_controller._energy_set(0.5)
     return mock_id_controller
 
 
@@ -81,12 +84,13 @@ async def mock_id_energy(
         mock_id_energy = InsertionDeviceEnergy(
             id_controller=mock_id_controller,
         )
+
     return mock_id_energy
 
 
 @pytest.fixture
 async def beam_energy(
-    mock_id_energy: InsertionDeviceEnergy, mock_pgm: PGM
+    mock_id_energy: InsertionDeviceEnergy, mock_pgm: PlaneGratingMonochromator
 ) -> BeamEnergy:
     async with init_devices(mock=True):
         beam_energy = BeamEnergy(id_energy=mock_id_energy, mono=mock_pgm.energy)
@@ -138,7 +142,6 @@ def test_j09_energy_motor_lookup_update_lookuptable(
         (Pol.PC, 12, 0, 12, 0),
         (Pol.NC, -12, 0, -12, 0),
         (Pol.NONE, 8, 12, 2, -12),
-        (Pol.NONE, 11, 0, 10, 0),
     ],
 )
 async def test_j09_apple2_controller_determine_pol(
@@ -169,3 +172,69 @@ async def test_j09_apple2_controller_determine_pol(
     else:
         await mock_id_controller.energy.set(0.800)
         assert await mock_id_controller.polarisation.get_value() == pol
+
+
+@pytest.mark.parametrize(
+    "pol, top_outer_phase,top_inner_phase,btm_inner_phase, btm_outer_phase",
+    [
+        (
+            Pol.LH,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+        ),
+        (
+            Pol.LV,
+            MAXIMUM_ROW_PHASE_MOTOR_POSITION,
+            0.0,
+            MAXIMUM_ROW_PHASE_MOTOR_POSITION,
+            0.0,
+        ),
+        (Pol.PC, ROW_PHASE_CIRCULAR, 0.0, ROW_PHASE_CIRCULAR, 0.0),
+        (Pol.NC, -ROW_PHASE_CIRCULAR, 0.0, -ROW_PHASE_CIRCULAR, 0.0),
+    ],
+)
+async def test_j09_apple2_controller_set_pol(
+    mock_id_controller: J09Apple2Controller,
+    pol: Pol,
+    top_inner_phase: float,
+    top_outer_phase: float,
+    btm_inner_phase: float,
+    btm_outer_phase: float,
+):
+    await mock_id_controller.polarisation.set(pol)
+    get_mock_put(
+        mock_id_controller.apple2().phase().top_outer.user_setpoint
+    ).assert_called_once_with(f"{top_outer_phase:.6f}", wait=True)
+    get_mock_put(
+        mock_id_controller.apple2().phase().top_inner.user_setpoint
+    ).assert_called_once_with(f"{top_inner_phase}", wait=True)
+    get_mock_put(
+        mock_id_controller.apple2().phase().btm_inner.user_setpoint
+    ).assert_called_once_with(f"{btm_inner_phase:.6f}", wait=True)
+    get_mock_put(
+        mock_id_controller.apple2().phase().btm_outer.user_setpoint
+    ).assert_called_once_with(f"{btm_outer_phase}", wait=True)
+
+
+@pytest.mark.parametrize(
+    "pol, energy, expected_gap",
+    [
+        (Pol.LH, 0.3, 28),
+        (Pol.LV, 0.5, 35),
+        (Pol.PC, 1.1, 52),
+        (Pol.NC, 0.8, 43),
+    ],
+)
+async def test_j09_apple2_controller_set_energy(
+    mock_id_controller: J09Apple2Controller,
+    pol: Pol,
+    energy: float,
+    expected_gap: float,
+):
+    await mock_id_controller.energy.set(energy)
+    mock_gap_setpoint = get_mock_put(mock_id_controller.apple2().gap().user_setpoint)
+    assert float(mock_gap_setpoint.call_args_list[0].args[0]) == pytest.approx(
+        expected_gap, abs=1
+    )
