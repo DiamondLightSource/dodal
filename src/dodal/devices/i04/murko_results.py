@@ -21,6 +21,7 @@ from dodal.devices.oav.oav_calculations import (
 from dodal.log import LOGGER
 
 NO_MURKO_RESULT = (-1, -1)
+RESULTS_COMPLETE_MESSAGE = "murko_results_complete"
 
 
 class MurkoMetadata(TypedDict):
@@ -91,7 +92,8 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
         )
         self.pubsub = self.redis_client.pubsub()
         self.sample_id = soft_signal_rw(str)  # Should get from redis
-        self.stop_angle = stop_angle
+        self.stop_angle = soft_signal_rw(int, initial_value=stop_angle)
+        self.invert_stop_angle = soft_signal_rw(bool, initial_value=False)
 
         self._reset()
 
@@ -103,7 +105,7 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
         super().__init__(name=name)
 
     def _reset(self):
-        self._last_omega = 0
+        self._last_omega = None
         self._results: list[MurkoResult] = []
 
     @AsyncStatus.wrap
@@ -122,9 +124,12 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
     async def trigger(self):
         # Wait for results
         sample_id = await self.sample_id.get_value()
-        while self._last_omega < self.stop_angle:
+
+        while True:
             # waits here for next batch to be received
             message = await self.pubsub.get_message(timeout=self.TIMEOUT_S)
+            if message == RESULTS_COMPLETE_MESSAGE:
+                break
             if message is None:
                 continue
             await self.process_batch(message, sample_id)
@@ -250,6 +255,12 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
 
         LOGGER.info(f"Number of results after filtering: {len(best_x)}")
         return best_x
+
+    async def check_running(self, sample_id: str) -> bool:
+        running_str = await self.redis_client.hget(
+            f"murko:{sample_id}:running", "running"
+        )
+        return json.loads(running_str)
 
 
 def get_yz_least_squares(vertical_dists: list, omegas: list) -> tuple[float, float]:
