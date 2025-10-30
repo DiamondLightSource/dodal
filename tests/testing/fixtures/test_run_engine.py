@@ -14,7 +14,7 @@ def test_run_engine_fixture_has_no_memory_leak(
     pid = os.getpid()
     n_open_files = len(os.listdir(f"/proc/{pid}/fd"))
     if iteration == 0:
-        _baseline_open_files = n_open_files
+        _baseline_n_open_files = n_open_files
     else:
         try:
             assert _baseline_n_open_files == n_open_files
