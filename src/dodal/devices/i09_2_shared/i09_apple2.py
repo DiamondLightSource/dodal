@@ -121,6 +121,7 @@ class J09EnergyMotorLookup(EnergyMotorLookup):
             max_energies=max_energies,
             poly1d_params=poly1d_params,
         )
+        Lookuptable.model_validate(self.lookup_tables["Phase"])
 
 
 class J09Apple2Controller(Apple2Controller[Apple2]):
