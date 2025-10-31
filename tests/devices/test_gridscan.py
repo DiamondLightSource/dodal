@@ -13,6 +13,7 @@ from bluesky.run_engine import RunEngine
 from ophyd.status import DeviceStatus, Status
 from ophyd_async.core import init_devices
 from ophyd_async.testing import (
+    callback_on_mock_put,
     get_mock_put,
     set_mock_put_proceeds,
     set_mock_value,
@@ -591,30 +592,12 @@ async def test_gridscan_prepare_works_within_tolerance_on_the_readback(
     grid_scan_device, grid_scan_params, valid_state = (
         grid_scan_devices_with_params_and_valid_state
     )
-    my_event = asyncio.Event()
 
-    async def _wait(*_, **__):
-        await my_event.wait()
+    grid_scan_params.x_step_size_mm = 0.1111111
 
-    grid_scan_device.x_step_size = MagicMock()
+    def return_rounded_value(value, *_, **__):
+        return round(value, 4)
 
-    # get_mock_put(grid_scan_device.x_step_size).side_effect = _wait
-    # callback_on_mock_put(
-    #     grid_scan_device.x_step_size,
-    #     lambda *_, **__: set_mock_value(
-    #         grid_scan_device.x_step_size, grid_scan_params.x_step_size_mm + 0.01
-    #     ),
-    # )
-    # set_mock_put_proceeds(grid_scan_device.x_step_size, False)
+    callback_on_mock_put(grid_scan_device.x_step_size, return_rounded_value)
 
-    status = grid_scan_device.prepare(grid_scan_params)
-
-    assert not status.done
-
-    set_mock_value(
-        grid_scan_device.x_step_size, grid_scan_params.x_step_size_mm
-    )  # + 0.01)
-
-    # set_mock_put_proceeds(grid_scan_device.x_step_size, True)
-
-    await status
+    await grid_scan_device.prepare(grid_scan_params)
