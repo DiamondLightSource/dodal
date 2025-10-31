@@ -8,7 +8,7 @@ from ophyd_async.core import init_devices
 from dodal.common.beamlines.beamline_parameters import GDABeamlineParameters
 from dodal.devices.aperturescatterguard import ApertureScatterguard, ApertureValue
 from dodal.devices.scintillator import InOut, Scintillator
-from dodal.devices.util.test_utils import patch_motor
+from dodal.testing import patch_motor
 
 
 @pytest.fixture

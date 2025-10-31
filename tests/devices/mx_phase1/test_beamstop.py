@@ -10,7 +10,7 @@ from ophyd_async.testing import get_mock_put, set_mock_value
 
 from dodal.common.beamlines.beamline_parameters import GDABeamlineParameters
 from dodal.devices.i03 import Beamstop, BeamstopPositions
-from dodal.devices.util.test_utils import patch_motor
+from dodal.testing import patch_motor
 from tests.common.beamlines.test_beamline_parameters import TEST_BEAMLINE_PARAMETERS_TXT
 
 
@@ -32,7 +32,7 @@ def beamline_parameters() -> GDABeamlineParameters:
 )
 async def test_beamstop_pos_select(
     beamline_parameters: GDABeamlineParameters,
-    RE: RunEngine,
+    run_engine: RunEngine,
     x: float,
     y: float,
     z: float,
@@ -45,7 +45,7 @@ async def test_beamstop_pos_select(
     set_mock_value(beamstop.z_mm.user_readback, z)
 
     mock_callback = Mock()
-    RE.subscribe(mock_callback, "event")
+    run_engine.subscribe(mock_callback, "event")
 
     @run_decorator()
     def check_in_beam():
@@ -55,7 +55,7 @@ async def test_beamstop_pos_select(
         yield from bps.read(beamstop)
         yield from bps.save()
 
-    RE(check_in_beam())
+    run_engine(check_in_beam())
 
     event_call = next(
         dropwhile(lambda c: c.args[0] != "event", mock_callback.mock_calls)
@@ -68,7 +68,7 @@ async def test_beamstop_pos_select(
 
 
 async def test_set_beamstop_position_to_data_collection_moves_beamstop_into_beam(
-    beamline_parameters: GDABeamlineParameters, RE: RunEngine
+    beamline_parameters: GDABeamlineParameters, run_engine: RunEngine
 ):
     beamstop = Beamstop("-MO-BS-01:", beamline_parameters, name="beamstop")
     await beamstop.connect(mock=True)
@@ -86,7 +86,9 @@ async def test_set_beamstop_position_to_data_collection_moves_beamstop_into_beam
     parent_mock.attach_mock(get_mock_put(y_mock), "beamstop_y")
     parent_mock.attach_mock(get_mock_put(z_mock), "beamstop_z")
 
-    RE(bps.abs_set(beamstop.selected_pos, BeamstopPositions.DATA_COLLECTION, wait=True))
+    run_engine(
+        bps.abs_set(beamstop.selected_pos, BeamstopPositions.DATA_COLLECTION, wait=True)
+    )
 
     assert get_mock_put(x_mock).call_args_list == [call(1.52, wait=True)]
     assert get_mock_put(y_mock).call_args_list == [call(44.78, wait=True)]
@@ -96,10 +98,12 @@ async def test_set_beamstop_position_to_data_collection_moves_beamstop_into_beam
 
 
 async def test_set_beamstop_position_to_unknown_raises_error(
-    beamline_parameters: GDABeamlineParameters, RE: RunEngine
+    beamline_parameters: GDABeamlineParameters, run_engine: RunEngine
 ):
     beamstop = Beamstop("-MO-BS-01:", beamline_parameters, name="beamstop")
     await beamstop.connect(mock=True)
     with pytest.raises(FailedStatus) as e:
-        RE(bps.abs_set(beamstop.selected_pos, BeamstopPositions.UNKNOWN, wait=True))
+        run_engine(
+            bps.abs_set(beamstop.selected_pos, BeamstopPositions.UNKNOWN, wait=True)
+        )
         assert isinstance(e.value.args[0].exception(), ValueError)

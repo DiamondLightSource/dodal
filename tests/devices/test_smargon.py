@@ -5,10 +5,11 @@ import pytest
 from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
 from ophyd_async.core import init_devices, observe_value
+from ophyd_async.epics.motor import MotorLimitsError
 from ophyd_async.testing import get_mock_put, set_mock_value
 
 from dodal.devices.smargon import CombinedMove, DeferMoves, Smargon, StubPosition
-from dodal.devices.util.test_utils import patch_all_motors
+from dodal.testing import patch_all_motors
 
 
 @pytest.fixture
@@ -26,7 +27,7 @@ def set_smargon_pos(smargon: Smargon, pos: tuple[float, float, float]):
 
 
 async def test_given_to_robot_disp_low_when_stub_offsets_set_to_robot_load_then_proc_set(
-    RE: RunEngine,
+    run_engine: RunEngine,
     smargon: Smargon,
 ):
     set_mock_value(smargon.stub_offsets.to_robot_load.disp, 0)
@@ -42,11 +43,11 @@ async def test_given_to_robot_disp_low_when_stub_offsets_set_to_robot_load_then_
         )
         assert current_pos_proc == 0
 
-    RE(plan())
+    run_engine(plan())
 
 
 async def test_given_center_disp_low_and_at_centre_when_stub_offsets_set_to_center_then_proc_set(
-    RE: RunEngine,
+    run_engine: RunEngine,
     smargon: Smargon,
 ):
     set_mock_value(smargon.stub_offsets.center_at_current_position.disp, 0)
@@ -61,7 +62,7 @@ async def test_given_center_disp_low_and_at_centre_when_stub_offsets_set_to_cent
             yield from bps.rd(smargon.stub_offsets.center_at_current_position.proc)
         ) == 1
 
-    RE(plan())
+    run_engine(plan())
 
 
 async def test_given_center_disp_low_when_stub_offsets_set_to_center_and_moved_to_0_0_0_then_proc_set(
@@ -85,6 +86,52 @@ async def test_given_center_disp_low_when_stub_offsets_set_to_center_and_moved_t
     set_smargon_pos(smargon, (0, 0, 0))
 
     assert await smargon.stub_offsets.to_robot_load.proc.get_value() == 0
+
+
+@pytest.mark.parametrize(
+    "test_x, test_y, test_z, test_omega, test_chi, test_phi",
+    [
+        (2000, 20, 30, 5, 15, 25),  # x goes beyond upper limit
+        (-2000, 20, 30, 5, 15, 25),  # x goes beyond lower limit
+        (10, 2000, 30, 5, 15, 25),  # y goes beyond upper limit
+        (10, -2000, 30, 5, 15, 25),  # y goes beyond lower limit
+        (10, 20, 2000, 5, 15, 25),  # z goes beyond upper limit
+        (10, 20, -2000, 5, 15, 25),  # z goes beyond lower limit
+        (10, 20, 30, 2000, 15, 25),  # omega goes beyond upper limit
+        (10, 20, 30, -2000, 15, 25),  # omega goes beyond lower limit
+        (10, 20, 30, 5, 2000, 25),  # chi goes beyond upper limit
+        (10, 20, 30, 5, -2000, 25),  # chi goes beyond lower limit
+        (10, 20, 30, 5, 15, 2000),  # phi goes beyond upper limit
+        (10, 20, 30, 5, 15, -2000),  # phi goes beyond lower limit
+    ],
+)
+async def test_given_set_with_value_outside_motor_limit(
+    smargon: Smargon, test_x, test_y, test_z, test_omega, test_chi, test_phi
+):
+    set_mock_value(smargon.x.low_limit_travel, -1999)
+    set_mock_value(smargon.y.low_limit_travel, -1999)
+    set_mock_value(smargon.z.low_limit_travel, -1999)
+    set_mock_value(smargon.omega.low_limit_travel, -1999)
+    set_mock_value(smargon.chi.low_limit_travel, -1999)
+    set_mock_value(smargon.phi.low_limit_travel, -1999)
+    set_mock_value(smargon.x.high_limit_travel, 1999)
+    set_mock_value(smargon.y.high_limit_travel, 1999)
+    set_mock_value(smargon.z.high_limit_travel, 1999)
+    set_mock_value(smargon.omega.high_limit_travel, 1999)
+    set_mock_value(smargon.chi.high_limit_travel, 1999)
+    set_mock_value(smargon.phi.high_limit_travel, 1999)
+
+    with pytest.raises(MotorLimitsError):
+        await smargon.set(
+            CombinedMove(
+                x=test_x,
+                y=test_y,
+                z=test_z,
+                omega=test_omega,
+                chi=test_chi,
+                phi=test_phi,
+            )
+        )
 
 
 async def test_given_set_with_single_value_then_that_motor_moves(smargon: Smargon):
@@ -121,8 +168,7 @@ async def test_given_set_with_all_values_then_motors_move(smargon: Smargon):
     )
 
 
-@pytest.mark.skip(reason="https://github.com/DiamondLightSource/dodal/issues/1315")
-async def test_given_set_with_all_values_then_motors_move_in_order(smargon: Smargon):
+async def test_given_set_with_all_values_then_motors_set_in_order(smargon: Smargon):
     parent = MagicMock()
     parent.attach_mock(get_mock_put(smargon.defer_move), "defer_move")
     parent.attach_mock(get_mock_put(smargon.x.user_setpoint), "x")
@@ -151,12 +197,24 @@ async def test_given_set_with_all_values_then_motors_move_in_order(smargon: Smar
 
 
 async def test_given_set_fails_then_defer_moves_turned_back_off(smargon: Smargon):
-    class MyException(Exception): ...
+    class MyError(Exception): ...
 
-    get_mock_put(smargon.x.user_setpoint).side_effect = MyException()
-    with pytest.raises(MyException):
+    smargon.x.user_setpoint.set = MagicMock(side_effect=MyError())
+    with pytest.raises(MyError):
         await smargon.set(CombinedMove(x=10))
 
     get_mock_put(smargon.defer_move).assert_has_calls(
         [call(DeferMoves.ON, wait=True), call(DeferMoves.OFF, wait=True)]
     )
+
+
+async def test_given_motor_does_not_change_setpoint_then_deferred_move_times_out(
+    smargon: Smargon,
+):
+    smargon.DEFERRED_MOVE_SET_TIMEOUT = 0.01  # type: ignore
+
+    # Override the callback so it doesn't change the `user_setpoint`
+    smargon.x.user_setpoint.set = MagicMock()
+
+    with pytest.raises(TimeoutError):
+        await smargon.set(CombinedMove(x=10))
