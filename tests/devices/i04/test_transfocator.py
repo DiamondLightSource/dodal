@@ -53,9 +53,7 @@ async def test_when_beamsize_set_then_set_correctly_on_device(
     fake_transfocator: Transfocator,
 ):
     given_predicted_lenses_is_half_of_beamsize(fake_transfocator)
-    set_status = fake_transfocator.set(315)
-
-    await set_status
+    await fake_transfocator.set(315)
 
     assert fake_transfocator.predicted_vertical_num_lenses.get_value() == 157
     assert fake_transfocator.number_filters_sp.get_value() == 157
