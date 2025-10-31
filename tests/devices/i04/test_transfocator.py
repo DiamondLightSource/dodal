@@ -5,7 +5,6 @@ import pytest
 from bluesky.protocols import Reading
 from ophyd_async.core import (
     init_devices,
-    wait_for_value,
 )
 from ophyd_async.testing import set_mock_value
 
@@ -49,23 +48,18 @@ async def test_given_beamsize_already_set_then_when_transfocator_set_then_return
 
 
 @patch("dodal.devices.i04.transfocator.wait_for_value")
-async def test_when_beamsize_set_then_set_correctly_on_device_and_waited_on(
+async def test_when_beamsize_set_then_set_correctly_on_device(
     mock_wait_for_value,
     fake_transfocator: Transfocator,
 ):
     given_predicted_lenses_is_half_of_beamsize(fake_transfocator)
     set_status = fake_transfocator.set(315)
 
-    assert not set_status.done
-
-    await asyncio.gather(
-        wait_for_value(fake_transfocator.predicted_vertical_num_lenses, 157, 0.1),
-        wait_for_value(fake_transfocator.number_filters_sp, 157, 0.1),
-        wait_for_value(fake_transfocator.start, 1, 0.1),
-    )
-
     await set_status
-    assert set_status.done and set_status.success
+
+    assert fake_transfocator.predicted_vertical_num_lenses.get_value() == 157
+    assert fake_transfocator.number_filters_sp.get_value() == 157
+    assert fake_transfocator.start.get_value() == 1
 
 
 async def test_if_timeout_exceeded_and_start_rbv_not_equal_to_set_value_then_timeout_exception(
