@@ -413,6 +413,7 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
         self,
         apple2: Apple2Type,
         energy_to_motor_converter: EnergyMotorConvertor,
+        units: str = "eV",
         name: str = "",
     ) -> None:
         """
@@ -429,14 +430,14 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
 
         # Store the set energy for readback.
         self._energy, self._energy_set = soft_signal_r_and_setter(
-            float, initial_value=None, units="eV"
+            float, initial_value=None, units=units
         )
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             self.energy = derived_signal_rw(
                 raw_to_derived=self._read_energy,
                 set_derived=self._set_energy,
                 energy=self._energy,
-                derived_units="eV",
+                derived_units=units,
             )
 
         # Store the polarisation for setpoint. And provide readback for LH3.

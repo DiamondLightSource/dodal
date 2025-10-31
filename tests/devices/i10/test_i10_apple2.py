@@ -2,7 +2,7 @@ import os
 import pickle
 from collections.abc import Mapping
 from unittest import mock
-from unittest.mock import MagicMock, Mock
+from unittest.mock import Mock
 
 import pytest
 from bluesky.plans import scan
@@ -105,35 +105,6 @@ async def mock_pgm(prefix: str = "BLXX-EA-DET-007:") -> PlaneGratingMonochromato
 
 
 @pytest.fixture
-async def mock_jaw_phase(prefix: str = "BLXX-EA-DET-007:") -> UndulatorJawPhase:
-    async with init_devices(mock=True):
-        mock_jaw_phase = UndulatorJawPhase(
-            prefix=prefix, move_pv="RPQ1", jaw_phase="JAW"
-        )
-    set_mock_value(mock_jaw_phase.gate, UndulatorGateStatus.CLOSE)
-    set_mock_value(mock_jaw_phase.jaw_phase.velocity, 2)
-    set_mock_value(mock_jaw_phase.jaw_phase.user_readback, 0)
-    set_mock_value(mock_jaw_phase.fault, 0)
-    return mock_jaw_phase
-
-
-@pytest.fixture
-def mock_config_client() -> ConfigServer:
-    mock.patch("dodal.devices.i10.i10_apple2.ConfigServer")
-    mock_config_client = ConfigServer()
-
-    mock_config_client.get_file_contents = MagicMock(spec=["get_file_contents"])
-
-    def my_side_effect(file_path, reset_cached_result) -> str:
-        assert reset_cached_result is True
-        with open(file_path) as f:
-            return f.read()
-
-    mock_config_client.get_file_contents.side_effect = my_side_effect
-    return mock_config_client
-
-
-@pytest.fixture
 async def mock_id(
     mock_id_gap: UndulatorGap,
     mock_phase_axes: UndulatorPhaseAxes,
@@ -158,17 +129,7 @@ async def mock_id_controller(
             source=("Source", "idu"),
             config_client=mock_config_client,
         )
-    set_mock_value(mock_id_controller.apple2().gap().gate, UndulatorGateStatus.CLOSE)
-    set_mock_value(mock_id_controller.apple2().phase().gate, UndulatorGateStatus.CLOSE)
-    set_mock_value(
-        mock_id_controller.apple2().jaw_phase().gate, UndulatorGateStatus.CLOSE
-    )
-    set_mock_value(mock_id_controller.apple2().gap().velocity, 1)
-    set_mock_value(mock_id_controller.apple2().jaw_phase().jaw_phase.velocity, 1)
-    set_mock_value(mock_id_controller.apple2().phase().btm_inner.velocity, 1)
-    set_mock_value(mock_id_controller.apple2().phase().top_inner.velocity, 1)
-    set_mock_value(mock_id_controller.apple2().phase().btm_outer.velocity, 1)
-    set_mock_value(mock_id_controller.apple2().phase().top_outer.velocity, 1)
+
     return mock_id_controller
 
 
@@ -725,7 +686,7 @@ async def test_fail_i10_energy_motor_lookup_outside_energy_limits(
 ):
     with pytest.raises(ValueError) as e:
         await mock_id_controller.energy.set(energy)
-    assert str(e.value) == "Demanding energy must lie between {} and {} eV!".format(
+    assert str(e.value) == "Demanding energy must lie between {} and {}!".format(
         mock_id_controller.lookup_table_client.lookup_tables["Gap"][
             await mock_id_controller.polarisation_setpoint.get_value()
         ]["Limit"]["Minimum"],
