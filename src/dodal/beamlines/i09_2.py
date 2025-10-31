@@ -89,5 +89,5 @@ def jid_polarisation() -> InsertionDevicePolarisation:
 
 @device_factory()
 def energy_jid() -> BeamEnergy:
-    """Beam energy from down energy devices."""
+    """Beam energy."""
     return BeamEnergy(id_energy=jid_energy(), mono=pgm().energy)
