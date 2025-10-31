@@ -31,7 +31,7 @@ from dodal.log import LOGGER
 from dodal.parameters.experiment_parameter_base import AbstractExperimentWithBeamParams
 
 
-class GridScanInvalidException(RuntimeError):
+class GridScanInvalidError(RuntimeError):
     """Raised when the gridscan parameters are not valid."""
 
 
@@ -302,7 +302,7 @@ class FastGridScanCommon(
             value: the gridscan parameters
 
         Raises:
-            GridScanInvalidException: if the gridscan parameters were not valid
+            GridScanInvalidError: if the gridscan parameters were not valid
         """
         set_statuses = []
 
@@ -333,7 +333,7 @@ class FastGridScanCommon(
                 self.scan_invalid, 0.0, timeout=self.VALIDITY_CHECK_TIMEOUT
             )
         except TimeoutError as e:
-            raise GridScanInvalidException(
+            raise GridScanInvalidError(
                 f"Gridscan parameters not validated after {self.VALIDITY_CHECK_TIMEOUT}s"
             ) from e
 
@@ -477,6 +477,6 @@ def set_fast_grid_scan_params(scan: FastGridScanCommon[ParamType], params: Param
         params: The parameters to set
 
     Raises:
-        GridScanInvalidException: if the grid scan parameters are not valid
+        GridScanInvalidError: if the grid scan parameters are not valid
     """
     yield from prepare(scan, params, wait=True)

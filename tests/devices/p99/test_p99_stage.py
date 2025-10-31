@@ -14,13 +14,13 @@ A_BIT = 0.001
 
 
 @pytest.fixture
-async def sim_sampleAngleStage():
+async def sim_sample_angle_stage():
     async with init_devices(mock=True):
-        sim_sampleAngleStage = SampleAngleStage(
-            "p99-MO-TABLE-01:", name="sim_sampleAngleStage"
+        sim_sample_angle_stage = SampleAngleStage(
+            "p99-MO-TABLE-01:", name="sim_sample_angle_stage"
         )
         # Signals connected here
-    yield sim_sampleAngleStage
+    yield sim_sample_angle_stage
 
 
 @pytest.fixture
@@ -33,11 +33,11 @@ async def sim_filter_wheel():
     yield sim_filter_wheel
 
 
-async def test_sampleAngleStage(sim_sampleAngleStage: SampleAngleStage) -> None:
-    assert sim_sampleAngleStage.name == "sim_sampleAngleStage"
-    assert sim_sampleAngleStage.theta.name == "sim_sampleAngleStage-theta"
-    assert sim_sampleAngleStage.roll.name == "sim_sampleAngleStage-roll"
-    assert sim_sampleAngleStage.pitch.name == "sim_sampleAngleStage-pitch"
+async def test_sample_angle_stage(sim_sample_angle_stage: SampleAngleStage) -> None:
+    assert sim_sample_angle_stage.name == "sim_sample_angle_stage"
+    assert sim_sample_angle_stage.theta.name == "sim_sample_angle_stage-theta"
+    assert sim_sample_angle_stage.roll.name == "sim_sample_angle_stage-roll"
+    assert sim_sample_angle_stage.pitch.name == "sim_sample_angle_stage-pitch"
 
 
 async def test_filter_wheel(sim_filter_wheel: FilterMotor) -> None:
