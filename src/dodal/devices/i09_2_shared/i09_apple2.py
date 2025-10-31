@@ -18,7 +18,7 @@ J09PhasePoly1dParameters = {
     "lh": [0],
     "lv": [MAXIMUM_ROW_PHASE_MOTOR_POSITION],
     "pc": [ROW_PHASE_CIRCULAR],
-    "nc": [ROW_PHASE_CIRCULAR],
+    "nc": [-ROW_PHASE_CIRCULAR],
     "lh3": [0],
 }
 
@@ -152,7 +152,6 @@ class J09Apple2Controller(Apple2Controller[Apple2]):
 
         pol = await self._check_and_get_pol_setpoint()
         gap, phase = self.energy_to_motor(energy=value, pol=pol)
-        phase = phase * (-1 if pol == Pol.NC else 1)
         id_set_val = Apple2Val(
             top_outer=f"{phase:.6f}",
             top_inner="0.0",
