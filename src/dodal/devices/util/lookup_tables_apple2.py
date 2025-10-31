@@ -80,21 +80,6 @@ class LookupTableEntries(BaseModel):
 
 
 class Lookuptable(RootModel):
-    """BaseModel class for the lookup table.
-    Apple2 lookup table should be in this format.
-
-    {mode: {'Energies': {Any: {'Low': float,
-                            'High': float,
-                            'Poly':np.poly1d
-                            }
-                        }
-            'Limit': {'Minimum': float,
-                    'Maximum': float
-                    }
-        }
-    }
-    """
-
     root: dict[str, LookupTableEntries]
 
 
@@ -306,7 +291,7 @@ class EnergyMotorLookup:
         phase_file_name: str | None = "IDEnergy2PhaseCalibrations.csv",
         poly_deg: list | None = None,
     ):
-        """Initialise the I10EnergyMotorLookup class with lookup table headers provided.
+        """Initialise the EnergyMotorLookup class with lookup table headers provided.
 
         Parameters
         ----------
