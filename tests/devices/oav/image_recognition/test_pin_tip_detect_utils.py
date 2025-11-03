@@ -263,7 +263,7 @@ def test_process_array():
         dtype=np.int32,
     )
 
-    location = MxSampleDetect(min_tip_height=2, preprocess=identity)._process_array(
+    location = MxSampleDetect(min_tip_height=2, preprocess=identity).process_array(
         test_arr
     )
 
