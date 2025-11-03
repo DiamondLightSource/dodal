@@ -77,6 +77,11 @@ def theta() -> Motor:
 
 
 @device_factory()
+def theta_virtual() -> Motor:
+    return Motor(prefix=f"{PREFIX.beamline_prefix}-MO-PI-02:VIRTUAL:THETA")
+
+
+@device_factory()
 def sample_xyz() -> XYZStage:
     return XYZStage(
         prefix=f"{PREFIX.beamline_prefix}-MO-PI-02:",
@@ -99,6 +104,7 @@ async def sample_xyz_print():
     )
 
 
+# CS 3 can't be used with traj motion progs.
 @device_factory()
 def sample_xyz_lab() -> XYZStage:
     return XYZStage(
@@ -123,25 +129,48 @@ async def sample_xyz_lab_print():
 
 
 @device_factory()
-def sample_xyz_lab_fa() -> XYZStage:
+def sample_xyz_map() -> XYZStage:
     return XYZStage(
-        prefix=f"{PREFIX.beamline_prefix}-MO-PI-02:FIXANG:",
-        name="sample_xyz_lab_fa",
+        prefix=f"{PREFIX.beamline_prefix}-MO-PI-02:MAP:",
+        name="sample_xyz_map",
         x_infix="X",
         y_infix="Y",
         z_infix="Z",
     )
 
 
-async def sample_xyz_lab_fa_print():
-    pi = sample_xyz_lab_fa()
+async def sample_xyz_map_print():
+    pi = sample_xyz_map()
     x_pos = await pi.x.read()
     y_pos = await pi.y.read()
     z_pos = await pi.z.read()
     print(
-        x_pos["sample_xyz_lab_fa-x"]["value"],
-        y_pos["sample_xyz_lab_fa-y"]["value"],
-        z_pos["sample_xyz_lab_fa-z"]["value"],
+        x_pos["sample_xyz_map-x"]["value"],
+        y_pos["sample_xyz_map-y"]["value"],
+        z_pos["sample_xyz_map-z"]["value"],
+    )
+
+
+@device_factory()
+def sample_xyz_map_fa() -> XYZStage:
+    return XYZStage(
+        prefix=f"{PREFIX.beamline_prefix}-MO-PI-02:FIXANG:",
+        name="sample_xyz_map_fa",
+        x_infix="X",
+        y_infix="Y",
+        z_infix="Z",
+    )
+
+
+async def sample_xyz_map_fa_print():
+    pi = sample_xyz_map_fa()
+    x_pos = await pi.x.read()
+    y_pos = await pi.y.read()
+    z_pos = await pi.z.read()
+    print(
+        x_pos["sample_xyz_map_fa-x"]["value"],
+        y_pos["sample_xyz_map_fa-y"]["value"],
+        z_pos["sample_xyz_map_fa-z"]["value"],
     )
 
 
@@ -153,7 +182,9 @@ def step_25() -> PmacIO:
     return PmacIO(
         prefix="BL13J-MO-STEP-25:",
         raw_motors=[sample_xyz().x, sample_xyz().y, sample_xyz().z, theta()],
-        coord_nums=[1, 2, 3, 4, 5],
+        # coord_nums=[1],
+        coord_nums=[4],
+        # coord_nums=[5],
         name="step_25",
     )
 
