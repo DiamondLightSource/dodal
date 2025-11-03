@@ -1,16 +1,16 @@
 from unittest.mock import MagicMock
 
 import pytest
-from ophyd.sim import make_fake_device
+from ophyd_async.core import init_devices
 
 from dodal.devices.aperture import Aperture
 from dodal.devices.util.adjuster_plans import lookup_table_adjuster
 
 
 @pytest.fixture
-def fake_aperture():
-    FakeAperture = make_fake_device(Aperture)
-    fake_aperture: Aperture = FakeAperture(prefix="", name="aperture")
+async def fake_aperture():
+    with init_devices(mock=True):
+        fake_aperture = Aperture(prefix="test_ap", name="aperture")
     return fake_aperture
 
 

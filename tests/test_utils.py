@@ -288,7 +288,7 @@ def test_connect_immediately_passed_to_device_factory(fake_device_factory_beamli
     mock_device.connect.assert_not_called()
 
 
-def test_device_factory_can_rename(RE, fake_device_factory_beamline):
+def test_device_factory_can_rename(fake_device_factory_beamline):
     cryo = fake_device_factory_beamline.device_c(mock=True, connect_immediately=True)
     assert cryo.name == "device_c"
     assert cryo.fine.name == "device_c-fine"

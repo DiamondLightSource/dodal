@@ -29,6 +29,7 @@ from dodal.devices.fast_grid_scan import PandAFastGridScan, ZebraFastGridScanThr
 from dodal.devices.fluorescence_detector_motion import FluorescenceDetector
 from dodal.devices.flux import Flux
 from dodal.devices.focusing_mirror import FocusingMirrorWithStripes, MirrorVoltages
+from dodal.devices.hutch_shutter import HutchShutter
 from dodal.devices.i03 import Beamstop
 from dodal.devices.i03.dcm import DCM
 from dodal.devices.i03.undulator_dcm import UndulatorDCM
@@ -321,6 +322,14 @@ def sample_shutter() -> ZebraShutter:
     If this is called when already instantiated in i03, it will return the existing object.
     """
     return ZebraShutter(f"{PREFIX.beamline_prefix}-EA-SHTR-01:")
+
+
+@device_factory()
+def hutch_shutter() -> HutchShutter:
+    """Get the i03 hutch shutter device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i03, it will return the existing object.
+    """
+    return HutchShutter(f"{PREFIX.beamline_prefix}-PS-SHTR-01:")
 
 
 @device_factory()

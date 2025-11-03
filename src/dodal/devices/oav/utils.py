@@ -16,7 +16,7 @@ from dodal.devices.oav.pin_image_recognition import PinTipDetection
 Pixel = tuple[int, int]
 
 
-class PinNotFoundException(Exception):
+class PinNotFoundError(Exception):
     pass
 
 
@@ -116,6 +116,6 @@ def wait_for_tip_to_be_found(
     found_tip = yield from bps.rd(ophyd_pin_tip_detection.triggered_tip)
     if all(found_tip == ophyd_pin_tip_detection.INVALID_POSITION):
         timeout = yield from bps.rd(ophyd_pin_tip_detection.validity_timeout)
-        raise PinNotFoundException(f"No pin found after {timeout} seconds")
+        raise PinNotFoundError(f"No pin found after {timeout} seconds")
 
     return Pixel((int(found_tip[0]), int(found_tip[1])))

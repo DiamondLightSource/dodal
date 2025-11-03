@@ -30,7 +30,6 @@ from tests.devices.electron_analyser.helper_util import (
 @pytest.fixture
 async def sim_driver(
     dual_energy_source: DualEnergySource,
-    RE: RunEngine,
 ) -> VGScientaAnalyserDriverIO[LensMode, PsuMode, PassEnergy]:
     async with init_devices(mock=True):
         sim_driver = await create_driver(
@@ -45,12 +44,9 @@ async def sim_driver(
 async def test_analyser_sets_region_correctly(
     sim_driver: VGScientaAnalyserDriverIO[LensMode, PsuMode, PassEnergy],
     region: VGScientaRegion[LensMode, PassEnergy],
-    RE: RunEngine,
+    run_engine: RunEngine,
 ) -> None:
-    RE(bps.mv(sim_driver, region), wait=True)
-
-    excitation_energy = await sim_driver.energy_source.energy.get_value()
-    region.switch_energy_mode(EnergyMode.KINETIC, excitation_energy)
+    run_engine(bps.mv(sim_driver, region), wait=True)
 
     get_mock_put(sim_driver.region_name).assert_called_once_with(region.name, wait=True)
     get_mock_put(sim_driver.energy_mode).assert_called_once_with(
@@ -62,14 +58,16 @@ async def test_analyser_sets_region_correctly(
     get_mock_put(sim_driver.lens_mode).assert_called_once_with(
         region.lens_mode, wait=True
     )
+    excitation_energy = await sim_driver.energy_source.energy.get_value()
+    ke_region = region.switch_energy_mode(EnergyMode.KINETIC, excitation_energy)
     get_mock_put(sim_driver.low_energy).assert_called_once_with(
-        region.low_energy, wait=True
+        ke_region.low_energy, wait=True
     )
     get_mock_put(sim_driver.centre_energy).assert_called_once_with(
-        region.centre_energy, wait=True
+        ke_region.centre_energy, wait=True
     )
     get_mock_put(sim_driver.high_energy).assert_called_once_with(
-        region.high_energy, wait=True
+        ke_region.high_energy, wait=True
     )
     get_mock_put(sim_driver.pass_energy).assert_called_once_with(
         region.pass_energy, wait=True
@@ -105,14 +103,13 @@ async def test_analyser_sets_region_correctly(
 async def test_analyser_sets_region_and_read_configuration_is_correct(
     sim_driver: VGScientaAnalyserDriverIO[LensMode, PsuMode, PassEnergy],
     region: VGScientaRegion[LensMode, PassEnergy],
-    RE: RunEngine,
+    run_engine: RunEngine,
 ) -> None:
-    RE(bps.mv(sim_driver, region), wait=True)
+    run_engine(bps.mv(sim_driver, region), wait=True)
 
     prefix = sim_driver.name + "-"
     excitation_energy = await sim_driver.energy_source.energy.get_value()
-    region.switch_energy_mode(EnergyMode.KINETIC, excitation_energy)
-
+    ke_region = region.switch_energy_mode(EnergyMode.KINETIC, excitation_energy)
     await assert_configuration(
         sim_driver,
         {
@@ -120,9 +117,9 @@ async def test_analyser_sets_region_and_read_configuration_is_correct(
             f"{prefix}energy_mode": partial_reading(region.energy_mode),
             f"{prefix}acquisition_mode": partial_reading(region.acquisition_mode),
             f"{prefix}lens_mode": partial_reading(region.lens_mode),
-            f"{prefix}low_energy": partial_reading(region.low_energy),
-            f"{prefix}centre_energy": partial_reading(region.centre_energy),
-            f"{prefix}high_energy": partial_reading(region.high_energy),
+            f"{prefix}low_energy": partial_reading(ke_region.low_energy),
+            f"{prefix}centre_energy": partial_reading(ke_region.centre_energy),
+            f"{prefix}high_energy": partial_reading(ke_region.high_energy),
             f"{prefix}energy_step": partial_reading(region.energy_step),
             f"{prefix}pass_energy": partial_reading(region.pass_energy),
             f"{prefix}slices": partial_reading(region.slices),
@@ -150,9 +147,9 @@ async def test_analyser_sets_region_and_read_configuration_is_correct(
 async def test_analyser_sets_region_and_read_is_correct(
     sim_driver: VGScientaAnalyserDriverIO[LensMode, PsuMode, PassEnergy],
     region: VGScientaRegion[LensMode, PassEnergy],
-    RE: RunEngine,
+    run_engine: RunEngine,
 ) -> None:
-    RE(bps.mv(sim_driver, region), wait=True)
+    run_engine(bps.mv(sim_driver, region), wait=True)
 
     spectrum = np.array([1, 2, 3, 4, 5], dtype=float)
     expected_total_intensity = np.sum(spectrum)
@@ -178,24 +175,29 @@ async def test_analyser_sets_region_and_read_is_correct(
 async def test_analayser_binding_energy_is_correct(
     sim_driver: VGScientaAnalyserDriverIO[LensMode, PsuMode, PassEnergy],
     region: VGScientaRegion[LensMode, PassEnergy],
-    RE: RunEngine,
+    run_engine: RunEngine,
 ) -> None:
-    RE(bps.mv(sim_driver, region), wait=True)
+    run_engine(bps.mv(sim_driver, region), wait=True)
     excitation_energy = await sim_driver.energy_source.energy.get_value()
 
     # Check binding energy is correct
     energy_axis = [1, 2, 3, 4, 5]
     set_mock_value(sim_driver.energy_axis, np.array(energy_axis, dtype=float))
-    is_binding = await sim_driver.energy_mode.get_value() == EnergyMode.BINDING
+
+    # Check binding energy is correct
+    is_region_binding = region.is_binding_energy()
+    is_driver_binding = await sim_driver.energy_mode.get_value() == EnergyMode.BINDING
+    # Catch that driver correctly reflects what region energy mode is.
+    assert is_region_binding == is_driver_binding
     expected_binding_energy_axis = np.array(
-        [excitation_energy - e if is_binding else e for e in energy_axis]
+        [excitation_energy - e if is_driver_binding else e for e in energy_axis]
     )
     await assert_value(sim_driver.binding_energy_axis, expected_binding_energy_axis)
 
 
 def test_driver_throws_error_with_wrong_pass_energy(
     sim_driver: VGScientaAnalyserDriverIO[LensMode, PsuMode, PassEnergy],
-    RE: RunEngine,
+    run_engine: RunEngine,
 ) -> None:
     class PassEnergyTestEnum(StrictEnum):
         TEST_1 = "INVALID_PASS_ENERGY"
@@ -207,12 +209,12 @@ def test_driver_throws_error_with_wrong_pass_energy(
     with pytest.raises(
         FailedStatus, match=f"is not a valid {pass_energy_datatype_name}"
     ):
-        RE(bps.mv(sim_driver.pass_energy, PassEnergyTestEnum.TEST_1))
+        run_engine(bps.mv(sim_driver.pass_energy, PassEnergyTestEnum.TEST_1))
 
 
 def test_driver_throws_error_with_wrong_detector_mode(
     sim_driver: VGScientaAnalyserDriverIO[LensMode, PsuMode, PassEnergy],
-    RE: RunEngine,
+    run_engine: RunEngine,
 ) -> None:
     class DetectorModeTestEnum(StrictEnum):
         TEST_1 = "INVALID_DETECTOR_MODE"
@@ -224,4 +226,4 @@ def test_driver_throws_error_with_wrong_detector_mode(
     with pytest.raises(
         FailedStatus, match=f"is not a valid {pass_energy_datatype_name}"
     ):
-        RE(bps.mv(sim_driver.detector_mode, DetectorModeTestEnum.TEST_1))
+        run_engine(bps.mv(sim_driver.detector_mode, DetectorModeTestEnum.TEST_1))
