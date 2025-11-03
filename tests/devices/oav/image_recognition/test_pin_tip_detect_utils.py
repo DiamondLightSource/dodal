@@ -5,7 +5,28 @@ from dodal.devices.oav.pin_image_recognition.utils import (
     NONE_VALUE,
     MxSampleDetect,
     ScanDirections,
+    blur,
+    close,
+    dilate,
+    erode,
+    gaussian_blur,
+    median_blur,
+    open_morph,
 )
+
+
+@pytest.fixture
+def sample_array():
+    return np.array(
+        [
+            [0, 0, 0, 0, 0],
+            [0, 255, 255, 255, 0],
+            [0, 255, 255, 255, 0],
+            [0, 255, 255, 255, 0],
+            [0, 0, 0, 0, 0],
+        ],
+        dtype=np.int8,
+    )
 
 
 def test_locate_sample_simple_forward():
@@ -186,3 +207,44 @@ def test_first_and_last_nonzero_by_columns():
 
     np.testing.assert_array_equal(first, np.array([1, 1, NONE_VALUE, 0]))
     np.testing.assert_array_equal(last, np.array([1, 2, NONE_VALUE, 2]))
+
+
+def test_erode_dilate(sample_array):
+    erode_fn = erode(3, 1)
+    dilate_fn = dilate(3, 1)
+
+    eroded = erode_fn(sample_array)
+    dilated = dilate_fn(sample_array)
+
+    assert np.count_nonzero(eroded) < np.count_nonzero(sample_array)
+    assert np.count_nonzero(dilated) > np.count_nonzero(sample_array)
+
+
+def test_open_close(sample_array):
+    open_fn = open_morph(3, 1)
+    close_fn = close(3, 1)
+
+    noisy = sample_array.copy()
+    noisy[0, 0] = 255
+    noisy_with_hole = sample_array.copy()
+    noisy_with_hole[2, 2] = 0
+
+    cleaned = open_fn(noisy)
+    filled = close_fn(noisy_with_hole)
+
+    assert cleaned[0, 0] == 0
+    assert filled[2, 2] == 255
+
+
+def test_blur_variants(sample_array):
+    blur_fn = blur(3)
+    gblur_fn = gaussian_blur(3)
+    mblur_fn = median_blur(3)
+
+    blurred = blur_fn(sample_array)
+    gblurred = gblur_fn(sample_array)
+    mblurred = mblur_fn(sample_array)
+
+    assert blurred[2, 2] < 255
+    assert gblurred[2, 2] < 255
+    assert mblurred[2, 2] < 255
