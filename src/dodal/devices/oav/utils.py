@@ -55,7 +55,7 @@ def get_move_required_so_that_beam_is_at_pixel(
     gonio: XYZOmegaStage,
     pixel: Pixel,
     oav: OAV,
-    x_direction: int = 1,
+    x_direction: int = -1,
     y_direction: int = -1,
     z_direction: int = 1,
 ) -> Generator[Msg, None, np.ndarray]:
