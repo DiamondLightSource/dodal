@@ -254,11 +254,13 @@ def test_blur_variants(sample_array):
 def test_process_array():
     test_arr = np.array(
         [
-            [254, 0, 0, 120, 120],
-            [0, 0, 120, 127, 127],
-            [0, 0, 120, 0, 127],
-            [0, 0, 120, 127, 127],
-            [0, 0, 0, 120, 120],
+            [0, 0, 0, 0, 0, 0],
+            [200, 0, 0, 120, 120, 120],
+            [0, 0, 120, 127, 127, 127],
+            [0, 0, 120, 0, 0, 127],
+            [0, 0, 120, 127, 127, 127],
+            [0, 0, 0, 120, 120, 120],
+            [0, 0, 0, 0, 0, 0],
         ],
         dtype=np.uint8,
     )
@@ -267,5 +269,5 @@ def test_process_array():
         test_arr
     )
 
-    assert location.tip_x == 2
-    assert location.tip_y == 2
+    assert location.tip_x == 3
+    assert location.tip_y == 3
