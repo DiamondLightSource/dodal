@@ -6,6 +6,8 @@ from unittest.mock import AsyncMock, MagicMock, call, patch
 
 import numpy as np
 import pytest
+from ophyd_async.core import init_devices
+from ophyd_async.testing import set_mock_value
 from pytest import approx
 
 from dodal.devices.i04.murko_results import (
@@ -20,11 +22,11 @@ from dodal.devices.i04.murko_results import (
 @pytest.fixture
 @patch("dodal.devices.i04.murko_results.StrictRedis")
 async def murko_results(mock_strict_redis: MagicMock) -> MurkoResultsDevice:
-    murko_results = MurkoResultsDevice(name="murko_results")
-    murko_results.stop_angle.get_value = AsyncMock()
-    murko_results.stop_angle.get_value.return_value = 350
-    murko_results.invert_stop_angle.get_value = AsyncMock()
-    murko_results.invert_stop_angle.get_value.return_value = False
+    with init_devices(mock=True):
+        murko_results = MurkoResultsDevice(name="murko_results")
+    set_mock_value(murko_results.stop_angle, 350)
+    set_mock_value(murko_results.invert_stop_angle, False)
+    set_mock_value(murko_results.invert_stop_angle, False)
     murko_results.pubsub = AsyncMock()
     return murko_results
 
@@ -332,7 +334,7 @@ async def test_no_movement_given_sample_centre_matches_beam_centre(
     murko_results: MurkoResultsDevice,
     mock_setters: tuple[MagicMock, MagicMock, MagicMock],
 ):
-    murko_results.stop_angle.get_value.return_value = 140  # type: ignore
+    set_mock_value(murko_results.stop_angle, 140)
     mock_x_setter, mock_y_setter, mock_z_setter = mock_setters
     messages, metadata = get_messages(
         images_per_message=10, omega_start=50, omega_step=5
@@ -358,7 +360,7 @@ async def test_correct_movement_given_90_180_degrees(
     y = 0.6
     z = 0.3
     murko_results.PERCENTAGE_TO_USE = 100  # type:ignore
-    murko_results.stop_angle.get_value.return_value = 180  # type: ignore
+    set_mock_value(murko_results.stop_angle, 180)
     mock_x_setter, mock_y_setter, mock_z_setter = mock_setters
     messages, metadata = get_messages(
         xyz=(x, y, z), beam_centre_i=90, beam_centre_j=40, shape_x=100, shape_y=100
@@ -382,7 +384,7 @@ async def test_correct_movement_given_45_and_135_angles(
     mock_setters: tuple[MagicMock, MagicMock, MagicMock],
 ):
     murko_results.PERCENTAGE_TO_USE = 100  # type:ignore
-    murko_results.stop_angle.get_value.return_value = 135  # type: ignore
+    set_mock_value(murko_results.stop_angle, 135)
     x = 0.5
     y = 0.3
     z = 0.4
@@ -410,7 +412,7 @@ async def test_correct_movement_given_multiple_angles_and_x_drift(
     mock_setters: tuple[MagicMock, MagicMock, MagicMock],
 ):
     murko_results.PERCENTAGE_TO_USE = 100  # type:ignore
-    murko_results.stop_angle.get_value.return_value = 250  # type: ignore
+    set_mock_value(murko_results.stop_angle, 250)
     x = 0.7
     y = 0.2
     z = 0.3
@@ -452,7 +454,7 @@ async def test_trigger_calls_get_message_and_hget(
         murko_results.redis_client.hget,
         murko_results.redis_client.hset,
     ) = mock_redis_calls(mock_strict_redis, messages, metadata)
-    murko_results.stop_angle.get_value.return_value = 205  # type: ignore
+    set_mock_value(murko_results.stop_angle, 205)
     await murko_results.trigger()
 
     mock_get_message = cast(MagicMock, murko_results.pubsub.get_message)
@@ -482,7 +484,7 @@ async def test_trigger_stops_once_last_angle_found(
         murko_results.redis_client.hget,
         murko_results.redis_client.hset,
     ) = mock_redis_calls(mock_strict_redis, messages, metadata)
-    murko_results.stop_angle.get_value.return_value = 200  # type: ignore
+    set_mock_value(murko_results.stop_angle, 200)
     await murko_results.trigger()
 
     mock_get_message = cast(MagicMock, murko_results.pubsub.get_message)
@@ -646,7 +648,7 @@ async def test_none_result_does_not_stop_results_device(
     assert messages[2] is None
 
     messages = iter(messages)
-    murko_results.stop_angle.get_value.return_value = 180  # type: ignore
+    set_mock_value(murko_results.stop_angle, 180)
 
     (
         murko_results.pubsub.get_message,
@@ -734,7 +736,7 @@ async def test_correct_hset_calls_are_made_for_used_and_unused_results(
         murko_results.redis_client.hget,
         murko_results.redis_client.hset,
     ) = mock_redis_calls(mock_strict_redis, messages, metadata)
-    murko_results.stop_angle.get_value.return_value = 205  # type: ignore
+    set_mock_value(murko_results.stop_angle, 205)
     murko_results.PERCENTAGE_TO_USE = 50  # type:ignore
     await murko_results.trigger()
 
@@ -815,14 +817,14 @@ def test_results_with_tiny_x_pixel_value_are_filtered_out(
     ],
 )
 async def test_check_passes_and_fails_correctly_based_on_last_omega_and_stop_angle_and_inverted(
-    stop_angle: float,
+    stop_angle: int,
     last_omega: float,
     inverted: bool,
     expected_check_outcome: bool,
     murko_results: MurkoResultsDevice,
 ):
-    murko_results.stop_angle.get_value.return_value = stop_angle  # type: ignore
-    murko_results.invert_stop_angle.get_value.return_value = inverted  # type: ignore
+    set_mock_value(murko_results.stop_angle, stop_angle)
+    set_mock_value(murko_results.invert_stop_angle, inverted)
     murko_results._last_omega = last_omega
     result = await murko_results.check_if_reached_stop_angle()
     assert result == expected_check_outcome
