@@ -40,4 +40,6 @@ def oav(params: OAVConfigBeamCentre | None = None) -> OAVBeamCentreFile:
         prefix=f"{PREFIX}-DI-OAV-01:",
         config=config,
         zoom_controller=NullZoomController(),
+        mjpg_x_size_pv="ArraySize0_RBV",
+        mjpg_y_size_pv="ArraySize1_RBV",
     )

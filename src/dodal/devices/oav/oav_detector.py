@@ -88,6 +88,8 @@ class OAV(StandardReadable):
         config: OAVConfigBase,
         name: str = "",
         zoom_controller: BaseZoomController | None = None,
+        mjpg_x_size_pv: str = "ArraySize1_RBV",
+        mjpg_y_size_pv: str = "ArraySize2_RBV",
     ):
         self.oav_config = config
         self._prefix = prefix
@@ -103,7 +105,9 @@ class OAV(StandardReadable):
 
         self.cam = Cam(f"{prefix}CAM:", name=name)
         with self.add_children_as_readables():
-            self.grid_snapshot = SnapshotWithGrid(f"{prefix}MJPG:", name)
+            self.grid_snapshot = SnapshotWithGrid(
+                f"{prefix}MJPG:", name, mjpg_x_size_pv, mjpg_y_size_pv
+            )
 
         self.sizes = [self.grid_snapshot.x_size, self.grid_snapshot.y_size]
 
@@ -159,8 +163,12 @@ class OAVBeamCentreFile(OAV):
         config: OAVConfigBeamCentre,
         name: str = "",
         zoom_controller: BaseZoomController | None = None,
+        mjpg_x_size_pv: str = "ArraySize1_RBV",
+        mjpg_y_size_pv: str = "ArraySize2_RBV",
     ):
-        super().__init__(prefix, config, name, zoom_controller)
+        super().__init__(
+            prefix, config, name, zoom_controller, mjpg_x_size_pv, mjpg_y_size_pv
+        )
 
         with self.add_children_as_readables():
             self.beam_centre_i = derived_signal_r(
