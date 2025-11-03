@@ -260,7 +260,7 @@ def test_process_array():
             [0, 0, 120, 127, 127],
             [0, 0, 0, 120, 120],
         ],
-        dtype=np.int32,
+        dtype=np.uint8,
     )
 
     location = MxSampleDetect(min_tip_height=2, preprocess=identity()).process_array(
