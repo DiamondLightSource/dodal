@@ -10,6 +10,7 @@ from dodal.devices.oav.pin_image_recognition.utils import (
     dilate,
     erode,
     gaussian_blur,
+    identity,
     median_blur,
     open_morph,
 )
@@ -248,3 +249,23 @@ def test_blur_variants(sample_array):
     assert blurred[2, 2] < 127
     assert gblurred[2, 2] < 127
     assert mblurred[2, 2] < 127
+
+
+def test_process_array():
+    test_arr = np.array(
+        [
+            [254, 0, 0, 120, 120],
+            [0, 0, 120, 127, 127],
+            [0, 0, 120, 0, 127],
+            [0, 0, 120, 127, 127],
+            [0, 0, 0, 120, 120],
+        ],
+        dtype=np.int32,
+    )
+
+    location = MxSampleDetect(min_tip_height=2, preprocess=identity)._process_array(
+        test_arr
+    )
+
+    assert location.tip_x == 2
+    assert location.tip_y == 2
