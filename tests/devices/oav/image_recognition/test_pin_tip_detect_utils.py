@@ -25,7 +25,7 @@ def sample_array():
             [0, 120, 120, 120, 0],
             [0, 0, 0, 0, 0],
         ],
-        dtype=np.int8,
+        dtype=np.uint8,
     )
 
 
