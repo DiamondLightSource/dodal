@@ -20,9 +20,9 @@ def sample_array():
     return np.array(
         [
             [0, 0, 0, 0, 0],
-            [0, 250, 250, 250, 0],
-            [0, 250, 254, 250, 0],
-            [0, 250, 250, 250, 0],
+            [0, 120, 120, 120, 0],
+            [0, 120, 127, 120, 0],
+            [0, 120, 120, 120, 0],
             [0, 0, 0, 0, 0],
         ],
         dtype=np.int8,
@@ -225,7 +225,7 @@ def test_open_close(sample_array):
     close_fn = close(3, 1)
 
     noisy = sample_array.copy()
-    noisy[0, 0] = 254
+    noisy[0, 0] = 127
     noisy_with_hole = sample_array.copy()
     noisy_with_hole[2, 2] = 0
 
@@ -233,7 +233,7 @@ def test_open_close(sample_array):
     filled = close_fn(noisy_with_hole)
 
     assert cleaned[0, 0] == 0
-    assert filled[2, 2] > 250
+    assert filled[2, 2] >= 120
 
 
 def test_blur_variants(sample_array):
@@ -245,6 +245,6 @@ def test_blur_variants(sample_array):
     gblurred = gblur_fn(sample_array)
     mblurred = mblur_fn(sample_array)
 
-    assert blurred[2, 2] < 254
-    assert gblurred[2, 2] < 254
-    assert mblurred[2, 2] < 254
+    assert blurred[2, 2] < 127
+    assert gblurred[2, 2] < 127
+    assert mblurred[2, 2] < 127
