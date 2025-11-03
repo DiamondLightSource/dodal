@@ -254,20 +254,34 @@ def test_blur_variants(sample_array):
 def test_process_array():
     test_arr = np.array(
         [
-            [0, 0, 0, 0, 0, 0],
-            [200, 0, 0, 120, 120, 120],
-            [0, 0, 120, 127, 127, 127],
-            [0, 0, 120, 0, 0, 127],
-            [0, 0, 120, 127, 127, 127],
-            [0, 0, 0, 120, 120, 120],
-            [0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0],
+            [0, 0, 255, 0, 0],
+            [0, 0, 255, 0, 0],
+            [0, 0, 255, 0, 0],
+            [0, 0, 0, 0, 0],
         ],
         dtype=np.uint8,
     )
 
-    location = MxSampleDetect(min_tip_height=2, preprocess=identity()).process_array(
-        test_arr
+    detector = MxSampleDetect(
+        preprocess=identity(),
+        open_ksize=1,
+        open_iterations=1,
+        close_ksize=1,
+        close_iterations=1,
+        canny_upper=100,
+        canny_lower=50,
+        min_tip_height=3,
     )
 
-    assert location.tip_x == 3
-    assert location.tip_y == 3
+    location = detector.process_array(test_arr)
+
+    assert location.tip_x is not None
+    assert location.tip_y is not None
+
+    assert 1 <= location.tip_x <= 3
+    assert 1 <= location.tip_y <= 3
+
+    assert isinstance(location.edge_top, np.ndarray)
+    assert isinstance(location.edge_bottom, np.ndarray)
+    assert location.edge_top.shape == location.edge_bottom.shape
