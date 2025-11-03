@@ -4,10 +4,8 @@ from dodal.devices.aithre_lasershaping.laser_robot import LaserRobot
 from dodal.devices.oav.oav_detector import NullZoomController, OAVBeamCentreFile
 from dodal.devices.oav.oav_parameters import OAVConfigBeamCentre
 
-# ZOOM_PARAMS_FILE = "/dls_sw/i23/software/aithre/aithre_oav.xml"
-# DISPLAY_CONFIG = "/dls_sw/i23/software/aithre/aithre_display.configuration"
-ZOOM_PARAMS_FILE = "/dls/science/users/wck38436/aithre_oav.xml"
-DISPLAY_CONFIG = "/dls/science/users/wck38436/aithre_display.configuration"
+ZOOM_PARAMS_FILE = "/dls_sw/i23/software/aithre/aithre_oav.xml"
+DISPLAY_CONFIG = "/dls_sw/i23/software/aithre/aithre_display.configuration"
 
 
 PREFIX = "LA18L"
