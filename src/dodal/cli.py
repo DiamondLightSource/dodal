@@ -4,7 +4,7 @@ from pathlib import Path
 
 import click
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import NotConnected, StaticPathProvider, UUIDFilenameProvider
+from ophyd_async.core import NotConnectedError, StaticPathProvider, UUIDFilenameProvider
 from ophyd_async.plan_stubs import ensure_connected
 
 from dodal.beamlines import all_beamline_names, module_name_for_beamline
@@ -79,7 +79,7 @@ def connect(beamline: str, all: bool, sim_backend: bool) -> None:
     # If exceptions have occurred, this will print details of the relevant PVs
     exceptions = {**instance_exceptions, **connect_exceptions}
     if len(exceptions) > 0:
-        raise NotConnected(exceptions)
+        raise NotConnectedError(exceptions)
 
 
 def _report_successful_devices(
@@ -113,7 +113,7 @@ def _connect_devices(
     # Connect ophyd-async devices
     try:
         run_engine(ensure_connected(*ophyd_async_devices.values(), mock=sim_backend))
-    except NotConnected as ex:
+    except NotConnectedError as ex:
         exceptions = {**exceptions, **ex.sub_errors}
 
     # Only return the subset of devices that haven't raised an exception
