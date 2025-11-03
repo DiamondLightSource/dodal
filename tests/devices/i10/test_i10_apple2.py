@@ -1,6 +1,6 @@
 import os
 import pickle
-from collections import defaultdict
+from collections.abc import Mapping
 from unittest import mock
 from unittest.mock import MagicMock, Mock
 
@@ -35,7 +35,7 @@ from dodal.devices.i10.i10_apple2 import (
     LinearArbitraryAngle,
 )
 from dodal.devices.i10.i10_setting_data import I10Grating
-from dodal.devices.pgm import PGM
+from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.testing import patch_motor
 from tests.devices.i10.test_data import (
     EXPECTED_ID_ENERGY_2_GAP_CALIBRATIONS_IDD_PKL,
@@ -94,9 +94,11 @@ async def mock_phase_axes(prefix: str = "BLXX-EA-DET-007:") -> UndulatorPhaseAxe
 
 
 @pytest.fixture
-async def mock_pgm(prefix: str = "BLXX-EA-DET-007:") -> PGM:
+async def mock_pgm(prefix: str = "BLXX-EA-DET-007:") -> PlaneGratingMonochromator:
     async with init_devices(mock=True):
-        mock_pgm = PGM(prefix=prefix, grating=I10Grating, grating_pv="NLINES2")
+        mock_pgm = PlaneGratingMonochromator(
+            prefix=prefix, grating=I10Grating, grating_pv="NLINES2"
+        )
     patch_motor(mock_pgm.energy)
     return mock_pgm
 
@@ -182,7 +184,7 @@ async def mock_id_energy(
 
 @pytest.fixture
 async def beam_energy(
-    mock_id_energy: InsertionDeviceEnergy, mock_pgm: PGM
+    mock_id_energy: InsertionDeviceEnergy, mock_pgm: PlaneGratingMonochromator
 ) -> BeamEnergy:
     async with init_devices(mock=True):
         beam_energy = BeamEnergy(id_energy=mock_id_energy, mono=mock_pgm.energy)
@@ -292,30 +294,25 @@ async def test_fail_i10_apple2_controller_set_id_not_ready(
     )
 
 
-async def test_beam_energy_re_scan(beam_energy: BeamEnergy, run_engine: RunEngine):
-    docs = defaultdict(list)
+async def test_beam_energy_re_scan(
+    run_engine: RunEngine,
+    run_engine_documents: Mapping[str, list[dict]],
+    beam_energy: BeamEnergy,
+):
+    run_engine(scan([], beam_energy, 500, 600, num=11))
+    assert_emitted(run_engine_documents, start=1, descriptor=1, event=11, stop=1)
 
-    def capture_emitted(name, doc):
-        docs[name].append(doc)
-
-    run_engine(scan([], beam_energy, 500, 600, num=11), capture_emitted)
-    assert_emitted(docs, start=1, descriptor=1, event=11, stop=1)
-
-    for cnt, data in enumerate(docs["event"]):
+    for cnt, data in enumerate(run_engine_documents["event"]):
         assert data["data"]["mock_id_controller-energy"] == 500 + cnt * 10
         assert data["data"]["mock_pgm-energy"] == 500 + cnt * 10
 
 
 async def test_beam_energy_re_scan_with_offset(
+    run_engine: RunEngine,
+    run_engine_documents: Mapping[str, list[dict]],
     beam_energy: BeamEnergy,
     mock_id_controller: I10Apple2Controller,
-    run_engine: RunEngine,
 ):
-    docs = defaultdict(list)
-
-    def capture_emitted(name, doc):
-        docs[name].append(doc)
-
     mock_id_controller._polarisation_setpoint_set(Pol("lh3"))
     # with energy offset
     await beam_energy.id_energy_offset.set(20)
@@ -327,17 +324,9 @@ async def test_beam_energy_re_scan_with_offset(
             beam_energy._mono_energy().user_readback, rbv_mocks.get()
         ),
     )
-    run_engine(
-        scan(
-            [],
-            beam_energy,
-            1700,
-            1800,
-            num=11,
-        ),
-        capture_emitted,
-    )
-    for cnt, data in enumerate(docs["event"]):
+    run_engine(scan([], beam_energy, 1700, 1800, num=11))
+
+    for cnt, data in enumerate(run_engine_documents["event"]):
         assert data["data"]["mock_id_controller-energy"] == 1700 + cnt * 10 + 20
         assert data["data"]["mock_pgm-energy"] == 1700 + cnt * 10
 
@@ -598,18 +587,15 @@ async def test_linear_arbitrary_limit_fail(
     ],
 )
 async def test_linear_arbitrary_run_engine_scan(
+    run_engine: RunEngine,
+    run_engine_documents: Mapping[str, list[dict]],
     mock_linear_arbitrary_angle: LinearArbitraryAngle,
     mock_id_controller: I10Apple2Controller,
-    run_engine: RunEngine,
     start: float,
     stop: float,
     num_point: int,
 ):
     angles = linspace(start, stop, num_point, endpoint=True)
-    docs = defaultdict(list)
-
-    def capture_emitted(name, doc):
-        docs[name].append(doc)
 
     set_mock_value(
         mock_id_controller.apple2().phase().top_inner.user_readback,
@@ -635,9 +621,8 @@ async def test_linear_arbitrary_run_engine_scan(
             stop,
             num=num_point,
         ),
-        capture_emitted,
     )
-    assert_emitted(docs, start=1, descriptor=1, event=num_point, stop=1)
+    assert_emitted(run_engine_documents, start=1, descriptor=1, event=num_point, stop=1)
     set_mock_value(
         mock_id_controller.apple2().gap().gate,
         UndulatorGateStatus.CLOSE,
@@ -653,7 +638,7 @@ async def test_linear_arbitrary_run_engine_scan(
     poly = poly1d(
         DEFAULT_JAW_PHASE_POLY_PARAMS
     )  # default setting for i10 jaw phase to angle
-    for cnt, data in enumerate(docs["event"]):
+    for cnt, data in enumerate(run_engine_documents["event"]):
         temp_angle = angles[cnt]
         print(data["data"])
         assert data["data"]["mock_id_controller-linear_arbitrary_angle"] == temp_angle

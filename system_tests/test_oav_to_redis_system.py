@@ -1,4 +1,7 @@
 import asyncio
+from http.server import HTTPServer, SimpleHTTPRequestHandler
+from pathlib import Path
+from threading import Thread
 from unittest.mock import AsyncMock, patch
 
 import pytest
@@ -37,22 +40,42 @@ def _set_url(mock_oav_to_redis_forwarder: OAVToRedisForwarder, url: str):
     set_mock_value(mock_oav_to_redis_forwarder.selected_source, Source.FULL_SCREEN)
 
 
-@pytest.mark.requires(external="internet")  # depends on external webpage. See
-# https://github.com/DiamondLightSource/mx-bluesky/issues/183
+@pytest.fixture
+def static_http_server(tmp_path: Path):
+    class HandlerInTestDirectory(SimpleHTTPRequestHandler):
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, directory=str(tmp_path), **kwargs)
+
+    server_address = ("", 9876)
+    httpd = HTTPServer(server_address, HandlerInTestDirectory)
+
+    def run_server():
+        httpd.serve_forever()
+        httpd.server_close()
+
+    server_thread = Thread(
+        group=None, target=run_server, name="Test server", daemon=True
+    )
+    server_thread.start()
+    try:
+        yield
+    finally:
+        httpd.shutdown()
+        server_thread.join()
+
+
 async def test_given_stream_url_is_not_a_real_webpage_when_kickoff_then_error(
     mock_oav_to_redis_forwarder: OAVToRedisForwarder,
 ):
-    _set_url(mock_oav_to_redis_forwarder, "http://www.this_is_not_a_valid_webpage.com/")
+    _set_url(mock_oav_to_redis_forwarder, "http://localhost:9875/")
     with pytest.raises(ClientConnectorError):
         await mock_oav_to_redis_forwarder.kickoff()
 
 
-@pytest.mark.requires(external="internet")  # depends on external webpage.
-# See https://github.com/DiamondLightSource/mx-bluesky/issues/183
 async def test_given_stream_url_is_real_webpage_but_not_mjpg_when_kickoff_then_error(
-    mock_oav_to_redis_forwarder: OAVToRedisForwarder,
+    mock_oav_to_redis_forwarder: OAVToRedisForwarder, static_http_server
 ):
-    url = "https://www.google.com/"
+    url = "http://localhost:9876/"
     _set_url(mock_oav_to_redis_forwarder, url)
     with pytest.raises(ValueError) as e:
         await mock_oav_to_redis_forwarder.kickoff()
