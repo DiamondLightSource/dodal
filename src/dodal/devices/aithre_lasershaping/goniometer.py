@@ -24,7 +24,7 @@ class Goniometer(XYZOmegaStage):
         z_infix: str = "Z",
         omega_infix: str = "OMEGA",
         sampy_infix: str = "SAMPY",
-        sampz_infix: str = "SAMPZ"
+        sampz_infix: str = "SAMPZ",
     ) -> None:
         super().__init__(
             prefix=prefix,

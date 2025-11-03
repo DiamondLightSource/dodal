@@ -36,8 +36,12 @@ async def test_vertical_signal_set(
     await goniometer.omega.set(omega_set_value)
     await goniometer.vertical_position.set(vertical_set_value)
 
-    assert await goniometer.sampz.user_readback.get_value() == pytest.approx(expected_horz)
-    assert await goniometer.sampy.user_readback.get_value() == pytest.approx(expected_vert)
+    assert await goniometer.sampz.user_readback.get_value() == pytest.approx(
+        expected_horz
+    )
+    assert await goniometer.sampy.user_readback.get_value() == pytest.approx(
+        expected_vert
+    )
 
     await goniometer.vertical_position.set(vertical_set_value * 2)
     assert await goniometer.sampz.user_readback.get_value() == pytest.approx(

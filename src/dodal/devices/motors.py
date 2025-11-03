@@ -1,7 +1,6 @@
 import asyncio
 import math
 from abc import ABC
-from typing import TypedDict
 
 from ophyd_async.core import StandardReadable, derived_signal_rw
 from ophyd_async.epics.motor import Motor
@@ -258,4 +257,3 @@ def create_axis_perp_to_rotation(motor_theta: Motor, motor_i: Motor, motor_j: Mo
         j_val=motor_j,
         rot_value=motor_theta,
     )
-

@@ -13,7 +13,13 @@ PREFIX = "LA18L"
 
 @device_factory()
 def goniometer() -> Goniometer:
-    return Goniometer(f"{PREFIX}-MO-LSR-01:",y_infix="SAMPZ", z_infix="SAMPY", sampy_infix="Y", sampz_infix="Z")
+    return Goniometer(
+        f"{PREFIX}-MO-LSR-01:",
+        y_infix="SAMPZ",
+        z_infix="SAMPY",
+        sampy_infix="Y",
+        sampz_infix="Z",
+    )
 
 
 @device_factory()
@@ -23,7 +29,13 @@ def robot() -> LaserRobot:
 
 @device_factory()
 def oav(params: OAVConfigBeamCentre | None = None) -> OAVBeamCentreFile:
-    config = params if params is not None else OAVConfigBeamCentre(zoom_params_file=ZOOM_PARAMS_FILE, display_config_file=DISPLAY_CONFIG)
+    config = (
+        params
+        if params is not None
+        else OAVConfigBeamCentre(
+            zoom_params_file=ZOOM_PARAMS_FILE, display_config_file=DISPLAY_CONFIG
+        )
+    )
     return OAVBeamCentreFile(
         prefix=f"{PREFIX}-DI-OAV-01:",
         config=config,
