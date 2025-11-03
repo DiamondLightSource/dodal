@@ -3,17 +3,6 @@
 
 
 
-.. rubric:: Modules
-
-.. autosummary::
-   :toctree:
-   :recursive:
-
-   dodal.plan_stubs.check_topup
-   dodal.plan_stubs.data_session
-   dodal.plan_stubs.motor_utils
-   dodal.plan_stubs.wrapped
-
 
 
 
@@ -30,6 +19,17 @@
    
 
    
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      move
+      move_relative
+      set_absolute
+      set_relative
+      sleep
+      wait
    
    
 
