@@ -7,9 +7,9 @@ def camera_coordinates_to_xyz_mm(
     omega: float,
     microns_per_i_pixel: float,
     microns_per_j_pixel: float,
-    x_horizontal_sign: int = -1,
-    y_vertical_sign: int = -1,
-    z_vertical_sign: int = 1,
+    x_horizontal_sign: int,
+    y_vertical_sign: int,
+    z_vertical_sign: int,
 ) -> np.ndarray:
     """
     Converts from (horizontal,vertical) pixel measurements from the OAV camera into to (x, y, z) motor coordinates in millimetres.

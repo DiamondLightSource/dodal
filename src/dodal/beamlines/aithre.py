@@ -42,4 +42,7 @@ def oav(params: OAVConfigBeamCentre | None = None) -> OAVBeamCentreFile:
         zoom_controller=NullZoomController(),
         mjpg_x_size_pv="ArraySize0_RBV",
         mjpg_y_size_pv="ArraySize1_RBV",
+        x_direction=-1,
+        y_direction=-1,
+        z_direction=-1,
     )

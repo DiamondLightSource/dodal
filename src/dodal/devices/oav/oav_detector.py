@@ -88,6 +88,9 @@ class OAV(StandardReadable):
         config: OAVConfigBase,
         name: str = "",
         zoom_controller: BaseZoomController | None = None,
+        x_direction: int = -1,
+        y_direction: int = -1,
+        z_direction: int = 1,
         mjpg_x_size_pv: str = "ArraySize1_RBV",
         mjpg_y_size_pv: str = "ArraySize2_RBV",
     ):
@@ -110,6 +113,10 @@ class OAV(StandardReadable):
             )
 
         self.sizes = [self.grid_snapshot.x_size, self.grid_snapshot.y_size]
+
+        self.x_direction = soft_signal_rw(int, x_direction, name="x_direction")
+        self.y_direction = soft_signal_rw(int, y_direction, name="y_direction")
+        self.z_direction = soft_signal_rw(int, z_direction, name="z_direction")
 
         with self.add_children_as_readables():
             self.microns_per_pixel_x = derived_signal_r(
@@ -165,9 +172,20 @@ class OAVBeamCentreFile(OAV):
         zoom_controller: BaseZoomController | None = None,
         mjpg_x_size_pv: str = "ArraySize1_RBV",
         mjpg_y_size_pv: str = "ArraySize2_RBV",
+        x_direction: int = -1,
+        y_direction: int = -1,
+        z_direction: int = 1,
     ):
         super().__init__(
-            prefix, config, name, zoom_controller, mjpg_x_size_pv, mjpg_y_size_pv
+            prefix,
+            config,
+            name,
+            zoom_controller,
+            mjpg_x_size_pv,
+            mjpg_y_size_pv,
+            x_direction,
+            y_direction,
+            z_direction,
         )
 
         with self.add_children_as_readables():

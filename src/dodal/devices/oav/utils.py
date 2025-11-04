@@ -55,9 +55,6 @@ def get_move_required_so_that_beam_is_at_pixel(
     gonio: XYZOmegaStage,
     pixel: Pixel,
     oav: OAV,
-    x_direction: int = -1,
-    y_direction: int = -1,
-    z_direction: int = 1,
 ) -> Generator[Msg, None, np.ndarray]:
     """Calculate the required move so that the given pixel is in the centre of the beam."""
 
@@ -75,6 +72,9 @@ def get_move_required_so_that_beam_is_at_pixel(
     beam_y = yield from bps.rd(oav.beam_centre_j)
     microns_per_pixel_x = yield from bps.rd(oav.microns_per_pixel_x)
     microns_per_pixel_y = yield from bps.rd(oav.microns_per_pixel_y)
+    x_direction = yield from bps.rd(oav.x_direction)
+    y_direction = yield from bps.rd(oav.y_direction)
+    z_direction = yield from bps.rd(oav.z_direction)
 
     return calculate_x_y_z_of_pixel(
         current_motor_xyz,
