@@ -113,10 +113,10 @@ class OAV(StandardReadable):
             )
 
         self.sizes = [self.grid_snapshot.x_size, self.grid_snapshot.y_size]
-
-        self.x_direction = soft_signal_rw(int, x_direction, name="x_direction")
-        self.y_direction = soft_signal_rw(int, y_direction, name="y_direction")
-        self.z_direction = soft_signal_rw(int, z_direction, name="z_direction")
+        with self.add_children_as_readables():
+            self.x_direction = soft_signal_rw(int, x_direction, name="x_direction")
+            self.y_direction = soft_signal_rw(int, y_direction, name="y_direction")
+            self.z_direction = soft_signal_rw(int, z_direction, name="z_direction")
 
         with self.add_children_as_readables():
             self.microns_per_pixel_x = derived_signal_r(
