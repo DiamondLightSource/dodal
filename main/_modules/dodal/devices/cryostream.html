@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.cryostream &#8212; dodal 1.64.1.dev11+ge946940b0 documentation</title>
+    <title>dodal.devices.cryostream &#8212; dodal 1.64.1.dev12+g7f2d3e3df documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=d8e07154"></script>
+    <script src="../../../_static/documentation_options.js?v=88afebef"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -490,6 +490,14 @@ window.addEventListener("load", () => mermaid.run());
 
 
 
+<div class="viewcode-block" id="CryoStreamSelection">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.cryostream.CryoStreamSelection.html#dodal.devices.cryostream.CryoStreamSelection">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CryoStreamSelection</span><span class="p">(</span><span class="n">StrictEnum</span><span class="p">):</span>
+    <span class="n">CRYOJET</span> <span class="o">=</span> <span class="s2">&quot;CryoJet&quot;</span>
+    <span class="n">HC1</span> <span class="o">=</span> <span class="s2">&quot;HC1&quot;</span></div>
+
+
+
 <div class="viewcode-block" id="OxfordCryoStreamController">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.cryostream.OxfordCryoStreamController.html#dodal.devices.cryostream.OxfordCryoStreamController">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">OxfordCryoStreamController</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">):</span>
@@ -571,6 +579,25 @@ window.addEventListener("load", () => mermaid.run());
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">controller</span> <span class="o">=</span> <span class="n">OxfordCryoStreamController</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">OxfordCryoStreamStatus</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="CryoStreamGantry">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.cryostream.CryoStreamGantry.html#dodal.devices.cryostream.CryoStreamGantry">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CryoStreamGantry</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">(</span><span class="n">StandardReadableFormat</span><span class="o">.</span><span class="n">CONFIG_SIGNAL</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cryostream_selector</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span>
+                <span class="n">CryoStreamSelection</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">-EA-GANT-01:CTRL&quot;</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hc1_selected</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span>
+                <span class="nb">int</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">-MO-STEP-02:GPIO_INP_BITS.B2&quot;</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cryostream_selected</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span>
+                <span class="nb">int</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">-MO-STEP-02:GPIO_INP_BITS.B3&quot;</span>
+            <span class="p">)</span>
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
 
