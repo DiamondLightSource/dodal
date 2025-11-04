@@ -315,7 +315,7 @@ class FastGridScanCommon(
             param_value = value.__dict__[key]
 
             matcher = partial(isclose, param_value, abs_tol=0.001)
-            matcher.__name__ = "does_parameter_match"  # Remove when https://github.com/bluesky/ophyd-async/pull/1123 deployed
+            matcher.__name__ = "does_parameter_match"  # type: ignore # Remove when https://github.com/bluesky/ophyd-async/pull/1123 deployed
 
             set_statuses.append(
                 await set_and_wait_for_value(
