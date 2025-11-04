@@ -313,11 +313,15 @@ class FastGridScanCommon(
         # Create arguments for bps.mv
         for key, signal in self._movable_params.items():
             param_value = value.__dict__[key]
+
+            matcher = partial(isclose, param_value, abs_tol=0.001)
+            matcher.__name__ = "does_parameter_match"  # Remove when https://github.com/bluesky/ophyd-async/pull/1123 deployed
+
             set_statuses.append(
                 await set_and_wait_for_value(
                     signal,  # type: ignore
                     param_value,
-                    match_value=partial(isclose, param_value, abs_tol=0.0001),
+                    match_value=matcher,
                 )
             )
 

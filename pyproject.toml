@@ -49,7 +49,7 @@ dev = [
     # Commented out due to dependency version conflict with pydantic 1.x
     # "copier",
     "myst-parser",
-    "ophyd_async[sim] @ git+https://github.com/bluesky/ophyd-async.git@main", # Needed until https://github.com/bluesky/ophyd-async/pull/1096 is released
+    "ophyd_async[sim]>=v0.13.6",
     "pipdeptree",
     "pre-commit",
     "psutil",

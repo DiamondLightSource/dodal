@@ -596,7 +596,7 @@ async def test_gridscan_prepare_works_within_tolerance_on_the_readback(
     grid_scan_params.x_step_size_mm = 0.1111111
 
     def return_rounded_value(value, *_, **__):
-        return round(value, 4)
+        return round(value, 3)
 
     callback_on_mock_put(grid_scan_device.x_step_size, return_rounded_value)
 
