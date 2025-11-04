@@ -177,15 +177,15 @@ class OAVBeamCentreFile(OAV):
         z_direction: int = 1,
     ):
         super().__init__(
-            prefix,
-            config,
-            name,
-            zoom_controller,
-            mjpg_x_size_pv,
-            mjpg_y_size_pv,
-            x_direction,
-            y_direction,
-            z_direction,
+            prefix=prefix,
+            config=config,
+            name=name,
+            zoom_controller=zoom_controller,
+            mjpg_x_size_pv=mjpg_x_size_pv,
+            mjpg_y_size_pv=mjpg_y_size_pv,
+            x_direction=x_direction,
+            y_direction=y_direction,
+            z_direction=z_direction,
         )
 
         with self.add_children_as_readables():
