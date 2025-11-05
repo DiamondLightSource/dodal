@@ -7,10 +7,10 @@ from unittest.mock import AsyncMock, MagicMock, call, patch
 import numpy as np
 import pytest
 from ophyd_async.core import init_devices
-from ophyd_async.testing import set_mock_value
 from pytest import approx
 
 from dodal.devices.i04.murko_results import (
+    RESULTS_COMPLETE_MESSAGE,
     MurkoMetadata,
     MurkoResult,
     MurkoResultsDevice,
@@ -24,9 +24,6 @@ from dodal.devices.i04.murko_results import (
 async def murko_results(mock_strict_redis: MagicMock) -> MurkoResultsDevice:
     with init_devices(mock=True):
         murko_results = MurkoResultsDevice(name="murko_results")
-    set_mock_value(murko_results.stop_angle, 350)
-    set_mock_value(murko_results.invert_stop_angle, False)
-    set_mock_value(murko_results.invert_stop_angle, False)
     murko_results.pubsub = AsyncMock()
     return murko_results
 
@@ -111,14 +108,12 @@ def abs_sin(degrees):
 def pickled_messages(messages) -> list:
     for message in messages:
         message["data"] = pickle.dumps(message["data"])
-    messages.append(None)
     return messages
 
 
 def get_messages(
     batches: int = 2,
-    messages_per_batch: int = 1,
-    images_per_message: int = 1,
+    results_per_batch: int = 1,
     xyz: tuple[float, float, float] = (0.5, 0.5, 0.0),
     omega_start: float = 90,
     omega_step: float = 90,
@@ -139,22 +134,25 @@ def get_messages(
     x, y, z = xyz
     for _ in range(batches):
         batch = []
-        for _ in range(messages_per_batch):
-            results = {}
-            for _ in range(images_per_message):
-                results[uuid] = {
+        for _ in range(results_per_batch):
+            results = (
+                str(uuid),
+                {
                     "most_likely_click": (
                         get_y_after_rotation(omega, y, z, beam_centre_j, shape_y),
                         x + x_drift * uuid,  # Murko returns coords as y, x
                     ),
                     "original_shape": (shape_y, shape_x),  # (y, x) to match Murko
-                }
-                uuid += 1
-                omega += omega_step
+                },
+            )
+            uuid += 1
+            omega += omega_step
             batch.append(results)
         messages.append({"type": "message", "data": batch})
+    messages.append({"type": "message", "data": RESULTS_COMPLETE_MESSAGE})
+
     metadata = json_metadata(
-        n=batches * messages_per_batch * images_per_message,
+        n=batches * results_per_batch,
         start=omega_start,
         step=omega_step,
         microns_pxp=microns_pxp,
@@ -185,7 +183,7 @@ def json_metadata(
             "beam_centre_j": beam_centre_j,
             "uuid": uuid,
         }
-        metadatas[i] = json.dumps(metadata)
+        metadatas[str(i)] = json.dumps(metadata)
     return metadatas
 
 
@@ -252,17 +250,17 @@ async def test_process_batch_makes_correct_calls(
     omega = 0
     batch = []
 
-    for _ in range(2):
-        results = {}
-        for _ in range(3):
-            results[uuid] = {
+    for _ in range(6):
+        result = (
+            str(uuid),
+            {
                 "most_likely_click": (0.5, 0.5),
                 "original_shape": (100, 100),  # (y, x) to match Murko
-            }
-            uuid += 1
-            omega += 20
-        batch.append(results)
-    message = {"data": pickle.dumps(batch), "type": "message"}
+            },
+        )
+        uuid += 1
+        omega += 20
+        batch.append(result)
     metadata = json_metadata(
         n=6,
         start=0,
@@ -277,7 +275,7 @@ async def test_process_batch_makes_correct_calls(
     )
     mock_hget = cast(MagicMock, murko_results.redis_client.hget)
 
-    await murko_results.process_batch(message, sample_id="0")
+    await murko_results.process_batch(batch, sample_id="0")
     assert mock_hget.call_count == 6
     assert mock_process_result.call_count == 6
     assert mock_process_result.call_args_list[-1] == call(
@@ -300,18 +298,21 @@ async def test_process_batch_doesnt_process_result_if_no_metadata_for_certain_uu
     caplog: pytest.LogCaptureFixture,
 ):
     batch = [
-        {
-            0: {
+        (
+            "0",
+            {
                 "most_likely_click": (0.5, 0.5),
                 "original_shape": (100, 100),
             },
-            1: {
+        ),
+        (
+            "1",
+            {
                 "most_likely_click": (0.7, 0.7),
                 "original_shape": (100, 100),
             },
-        }
+        ),
     ]
-    message = {"data": pickle.dumps(batch), "type": "message"}
 
     murko_results.redis_client.hget = patch.object(
         murko_results.redis_client,
@@ -321,7 +322,7 @@ async def test_process_batch_doesnt_process_result_if_no_metadata_for_certain_uu
     ).start()
 
     with caplog.at_level("INFO"):
-        await murko_results.process_batch(message, sample_id="0")
+        await murko_results.process_batch(batch, sample_id="0")
 
     assert mock_process_result.call_count == 0
     assert "Found no metadata for uuid 0" in caplog.text
@@ -334,10 +335,9 @@ async def test_no_movement_given_sample_centre_matches_beam_centre(
     murko_results: MurkoResultsDevice,
     mock_setters: tuple[MagicMock, MagicMock, MagicMock],
 ):
-    set_mock_value(murko_results.stop_angle, 140)
     mock_x_setter, mock_y_setter, mock_z_setter = mock_setters
     messages, metadata = get_messages(
-        images_per_message=10, omega_start=50, omega_step=5
+        results_per_batch=10, omega_start=50, omega_step=5
     )  # Crystal aligned with beam centre
     (
         murko_results.pubsub.get_message,
@@ -360,10 +360,15 @@ async def test_correct_movement_given_90_180_degrees(
     y = 0.6
     z = 0.3
     murko_results.PERCENTAGE_TO_USE = 100  # type:ignore
-    set_mock_value(murko_results.stop_angle, 180)
     mock_x_setter, mock_y_setter, mock_z_setter = mock_setters
     messages, metadata = get_messages(
-        xyz=(x, y, z), beam_centre_i=90, beam_centre_j=40, shape_x=100, shape_y=100
+        xyz=(x, y, z),
+        omega_start=90,
+        omega_step=90,
+        beam_centre_i=90,
+        beam_centre_j=40,
+        shape_x=100,
+        shape_y=100,
     )
     (
         murko_results.pubsub.get_message,
@@ -384,7 +389,6 @@ async def test_correct_movement_given_45_and_135_angles(
     mock_setters: tuple[MagicMock, MagicMock, MagicMock],
 ):
     murko_results.PERCENTAGE_TO_USE = 100  # type:ignore
-    set_mock_value(murko_results.stop_angle, 135)
     x = 0.5
     y = 0.3
     z = 0.4
@@ -412,7 +416,6 @@ async def test_correct_movement_given_multiple_angles_and_x_drift(
     mock_setters: tuple[MagicMock, MagicMock, MagicMock],
 ):
     murko_results.PERCENTAGE_TO_USE = 100  # type:ignore
-    set_mock_value(murko_results.stop_angle, 250)
     x = 0.7
     y = 0.2
     z = 0.3
@@ -420,8 +423,7 @@ async def test_correct_movement_given_multiple_angles_and_x_drift(
     mock_x_setter, mock_y_setter, mock_z_setter = mock_setters
     messages, metadata = get_messages(
         batches=2,
-        messages_per_batch=2,
-        images_per_message=3,
+        results_per_batch=6,
         xyz=xyz,
         omega_start=22.4,
         omega_step=20.7,
@@ -445,55 +447,22 @@ async def test_trigger_calls_get_message_and_hget(
     mock_strict_redis: MagicMock,
     murko_results: MurkoResultsDevice,
 ):
-    messages, metadata = get_messages(
-        batches=4, messages_per_batch=3, images_per_message=2, omega_step=5
-    )
+    messages, metadata = get_messages(batches=4, results_per_batch=6, omega_step=5)
 
     (
         murko_results.pubsub.get_message,
         murko_results.redis_client.hget,
         murko_results.redis_client.hset,
     ) = mock_redis_calls(mock_strict_redis, messages, metadata)
-    set_mock_value(murko_results.stop_angle, 205)
     await murko_results.trigger()
 
-    mock_get_message = cast(MagicMock, murko_results.pubsub.get_message)
-    mock_hget = cast(MagicMock, murko_results.redis_client.hget)
+    mock_get_message = murko_results.pubsub.get_message
+    mock_hget = murko_results.redis_client.hget
 
-    # 4 messages to find
-    assert mock_get_message.call_count == 4
+    # 4 results + 1 RESULTS_COMPLETE_MESSAGE to find
+    assert mock_get_message.call_count == 5  # type: ignore
     # 4 * 3 * 2 metadata messages
-    assert mock_hget.call_count == 24
-
-
-@patch("dodal.devices.i04.murko_results.StrictRedis")
-async def test_trigger_stops_once_last_angle_found(
-    mock_strict_redis: MagicMock,
-    murko_results: MurkoResultsDevice,
-):
-    messages, metadata = get_messages(
-        batches=5,
-        messages_per_batch=3,
-        images_per_message=2,
-        omega_start=90,
-        omega_step=10,
-    )
-
-    (
-        murko_results.pubsub.get_message,
-        murko_results.redis_client.hget,
-        murko_results.redis_client.hset,
-    ) = mock_redis_calls(mock_strict_redis, messages, metadata)
-    set_mock_value(murko_results.stop_angle, 200)
-    await murko_results.trigger()
-
-    mock_get_message = cast(MagicMock, murko_results.pubsub.get_message)
-    mock_hget = cast(MagicMock, murko_results.redis_client.hget)
-
-    # Takes 2 batches to find the last angle, 200°
-    assert mock_get_message.call_count == 2
-    # 2 batches of 6 = 12
-    assert mock_hget.call_count == 12
+    assert mock_hget.call_count == 24  # type: ignore
 
 
 async def test_assert_subscribes_to_queue_and_clears_results_on_stage(
@@ -636,8 +605,7 @@ async def test_none_result_does_not_stop_results_device(
 ):
     messages, metadata = get_messages(
         batches=2,
-        messages_per_batch=1,
-        images_per_message=1,
+        results_per_batch=1,
         omega_start=90,
         omega_step=90,
     )
@@ -648,20 +616,19 @@ async def test_none_result_does_not_stop_results_device(
     assert messages[2] is None
 
     messages = iter(messages)
-    set_mock_value(murko_results.stop_angle, 180)
 
     (
         murko_results.pubsub.get_message,
         murko_results.redis_client.hget,
         murko_results.redis_client.hset,
     ) = mock_redis_calls(mock_strict_redis, messages, metadata)
-    mock_get_message = cast(MagicMock, murko_results.pubsub.get_message)
-    mock_hget = cast(MagicMock, murko_results.redis_client.hget)
+    mock_get_message = murko_results.pubsub.get_message
+    mock_hget = murko_results.redis_client.hget
 
     await murko_results.trigger()
 
-    assert mock_get_message.call_count == 4
-    assert mock_hget.call_count == 2  # 2 non None results
+    assert mock_get_message.call_count == 5  # type: ignore
+    assert mock_hget.call_count == 2  # 2 non None results  # type: ignore
 
 
 def test_when_results_filtered_then_used_for_centring_field_is_correct(
@@ -725,8 +692,7 @@ async def test_correct_hset_calls_are_made_for_used_and_unused_results(
 ):
     messages, metadata = get_messages(
         batches=4,
-        messages_per_batch=3,
-        images_per_message=2,
+        results_per_batch=6,
         omega_step=5,
         omega_start=90,
     )
@@ -736,7 +702,6 @@ async def test_correct_hset_calls_are_made_for_used_and_unused_results(
         murko_results.redis_client.hget,
         murko_results.redis_client.hset,
     ) = mock_redis_calls(mock_strict_redis, messages, metadata)
-    set_mock_value(murko_results.stop_angle, 205)
     murko_results.PERCENTAGE_TO_USE = 50  # type:ignore
     await murko_results.trigger()
 
@@ -801,30 +766,3 @@ def test_results_with_tiny_x_pixel_value_are_filtered_out(
             assert result.metadata["used_for_centring"] is True
         else:
             assert result.metadata["used_for_centring"] is False
-
-
-@pytest.mark.parametrize(
-    "last_omega, stop_angle, inverted, expected_check_outcome",
-    [
-        (10, 350, False, False),
-        (10, 350, True, True),
-        (350, 10, False, True),
-        (350, 10, True, False),
-        (None, 10, True, False),
-        (None, 350, True, False),
-        (None, 10, False, False),
-        (None, 350, False, False),
-    ],
-)
-async def test_check_passes_and_fails_correctly_based_on_last_omega_and_stop_angle_and_inverted(
-    stop_angle: int,
-    last_omega: float,
-    inverted: bool,
-    expected_check_outcome: bool,
-    murko_results: MurkoResultsDevice,
-):
-    set_mock_value(murko_results.stop_angle, stop_angle)
-    set_mock_value(murko_results.invert_stop_angle, inverted)
-    murko_results._last_omega = last_omega
-    result = await murko_results.check_if_reached_stop_angle()
-    assert result == expected_check_outcome
