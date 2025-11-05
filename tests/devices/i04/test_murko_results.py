@@ -1,6 +1,7 @@
 import json
+import logging
 import pickle
-from typing import Any, cast
+from typing import Any
 from unittest.mock import AsyncMock, MagicMock, call, patch
 
 import numpy as np
@@ -55,28 +56,20 @@ async def default_metadata() -> MurkoMetadata:
     )
 
 
-def mock_redis_calls(mock_strict_redis: MagicMock, messages: list | None, metadata):
-    iter_messages = iter(messages) if messages is not None else None
-    mock_get_message = (
-        patch.object(
-            mock_strict_redis.pubsub,
-            "get_message",
-            new_callable=AsyncMock,
-            side_effect=lambda *args, **kwargs: next(iter_messages),
-        ).start()
-        if iter_messages
-        else None
-    )
-    mock_hget = (
-        patch.object(
-            mock_strict_redis,
-            "hget",
-            new_callable=AsyncMock,
-            side_effect=lambda _, uuid: metadata[uuid],
-        ).start()
-        if metadata
-        else None
-    )
+def mock_redis_calls(mock_strict_redis, messages: list, metadata: dict):
+    iter_messages = iter(messages)
+    mock_get_message = patch.object(
+        mock_strict_redis.pubsub,
+        "get_message",
+        new_callable=AsyncMock,
+        side_effect=lambda *args, **kwargs: next(iter_messages),
+    ).start()
+    mock_hget = patch.object(
+        mock_strict_redis,
+        "hget",
+        new_callable=AsyncMock,
+        side_effect=lambda _, uuid: metadata[uuid],
+    ).start()
     mock_hset = AsyncMock()
     return mock_get_message, mock_hget, mock_hset
 
@@ -234,9 +227,7 @@ def test_process_result_skips_when_no_result_from_murko(
 
 
 @patch("dodal.devices.i04.murko_results.MurkoResultsDevice.process_result")
-@patch("dodal.devices.i04.murko_results.StrictRedis")
 async def test_process_batch_makes_correct_calls(
-    mock_strict_redis: MagicMock,
     mock_process_result: MagicMock,
     murko_results: MurkoResultsDevice,
 ):
@@ -265,7 +256,7 @@ async def test_process_batch_makes_correct_calls(
         beam_centre_j=50,
     )
     _, murko_results.redis_client.hget, _ = mock_redis_calls(
-        mock_strict_redis, None, metadata
+        murko_results.redis_client, [], metadata
     )
     mock_hget = murko_results.redis_client.hget
 
@@ -323,9 +314,7 @@ async def test_process_batch_doesnt_process_result_if_no_metadata_for_certain_uu
     assert "Found no metadata for uuid 1" in caplog.text
 
 
-@patch("dodal.devices.i04.murko_results.StrictRedis")
 async def test_no_movement_given_sample_centre_matches_beam_centre(
-    mock_strict_redis: MagicMock,
     murko_results: MurkoResultsDevice,
     mock_setters: tuple[MagicMock, MagicMock, MagicMock],
 ):
@@ -337,16 +326,14 @@ async def test_no_movement_given_sample_centre_matches_beam_centre(
         murko_results.pubsub.get_message,
         murko_results.redis_client.hget,
         murko_results.redis_client.hset,
-    ) = mock_redis_calls(mock_strict_redis, messages, metadata)
+    ) = mock_redis_calls(murko_results.redis_client, messages, metadata)
     await murko_results.trigger()
     assert mock_x_setter.call_args[0][0] == 0, "wrong x"
     assert mock_y_setter.call_args[0][0] == 0, "wrong y"
     assert mock_z_setter.call_args[0][0] == 0, "wrong z"
 
 
-@patch("dodal.devices.i04.murko_results.StrictRedis")
 async def test_correct_movement_given_90_180_degrees(
-    mock_strict_redis: MagicMock,
     murko_results: MurkoResultsDevice,
     mock_setters: tuple[MagicMock, MagicMock, MagicMock],
 ):
@@ -368,7 +355,7 @@ async def test_correct_movement_given_90_180_degrees(
         murko_results.pubsub.get_message,
         murko_results.redis_client.hget,
         murko_results.redis_client.hset,
-    ) = mock_redis_calls(mock_strict_redis, messages, metadata)
+    ) = mock_redis_calls(murko_results.redis_client, messages, metadata)
     await murko_results.trigger()
 
     assert mock_x_setter.call_args[0][0] == x - 0.9, "wrong x"
@@ -376,9 +363,7 @@ async def test_correct_movement_given_90_180_degrees(
     assert mock_z_setter.call_args[0][0] == approx(z), "wrong z"
 
 
-@patch("dodal.devices.i04.murko_results.StrictRedis")
 async def test_correct_movement_given_45_and_135_angles(
-    mock_strict_redis: MagicMock,
     murko_results: MurkoResultsDevice,
     mock_setters: tuple[MagicMock, MagicMock, MagicMock],
 ):
@@ -395,7 +380,7 @@ async def test_correct_movement_given_45_and_135_angles(
         murko_results.pubsub.get_message,
         murko_results.redis_client.hget,
         murko_results.redis_client.hset,
-    ) = mock_redis_calls(mock_strict_redis, messages, metadata)
+    ) = mock_redis_calls(murko_results.redis_client, messages, metadata)
     await murko_results.trigger()
 
     assert mock_x_setter.call_args[0][0] == x - 0.75, "wrong x"
@@ -403,9 +388,7 @@ async def test_correct_movement_given_45_and_135_angles(
     assert mock_z_setter.call_args[0][0] == approx(z), "wrong z"
 
 
-@patch("dodal.devices.i04.murko_results.StrictRedis")
 async def test_correct_movement_given_multiple_angles_and_x_drift(
-    mock_strict_redis: MagicMock,
     murko_results: MurkoResultsDevice,
     mock_setters: tuple[MagicMock, MagicMock, MagicMock],
 ):
@@ -429,16 +412,14 @@ async def test_correct_movement_given_multiple_angles_and_x_drift(
         murko_results.pubsub.get_message,
         murko_results.redis_client.hget,
         murko_results.redis_client.hset,
-    ) = mock_redis_calls(mock_strict_redis, messages, metadata)
+    ) = mock_redis_calls(murko_results.redis_client, messages, metadata)
     await murko_results.trigger()
     assert mock_x_setter.call_args[0][0] == approx(x + 0.055 - 0.75), "wrong x"
     assert mock_y_setter.call_args[0][0] == approx(y - 0.7), "wrong y"
     assert mock_z_setter.call_args[0][0] == approx(z), "wrong z"
 
 
-@patch("dodal.devices.i04.murko_results.StrictRedis")
 async def test_trigger_calls_get_message_and_hget(
-    mock_strict_redis: MagicMock,
     murko_results: MurkoResultsDevice,
 ):
     messages, metadata = get_messages(batches=4, results_per_batch=6, omega_step=5)
@@ -447,7 +428,7 @@ async def test_trigger_calls_get_message_and_hget(
         murko_results.pubsub.get_message,
         murko_results.redis_client.hget,
         murko_results.redis_client.hset,
-    ) = mock_redis_calls(mock_strict_redis, messages, metadata)
+    ) = mock_redis_calls(murko_results.redis_client, messages, metadata)
     await murko_results.trigger()
 
     mock_get_message = murko_results.pubsub.get_message
@@ -595,9 +576,7 @@ async def test_when_results_device_unstaged_then_results_cleared_and_last_omega_
     assert murko_results._last_omega is None
 
 
-@patch("dodal.devices.i04.murko_results.StrictRedis")
 async def test_none_result_does_not_stop_results_device(
-    mock_strict_redis: MagicMock,
     murko_results: MurkoResultsDevice,
 ):
     messages, metadata = get_messages(
@@ -616,7 +595,7 @@ async def test_none_result_does_not_stop_results_device(
         murko_results.pubsub.get_message,
         murko_results.redis_client.hget,
         murko_results.redis_client.hset,
-    ) = mock_redis_calls(mock_strict_redis, messages, metadata)
+    ) = mock_redis_calls(murko_results.redis_client, messages, metadata)
     mock_get_message = murko_results.pubsub.get_message
     mock_hget = murko_results.redis_client.hget
 
@@ -680,9 +659,7 @@ def test_when_results_filtered_then_used_for_centring_field_is_correct(
             assert result.metadata["used_for_centring"] is False
 
 
-@patch("dodal.devices.i04.murko_results.StrictRedis")
 async def test_correct_hset_calls_are_made_for_used_and_unused_results(
-    mock_strict_redis: MagicMock,
     murko_results: MurkoResultsDevice,
 ):
     messages, metadata = get_messages(
@@ -696,7 +673,7 @@ async def test_correct_hset_calls_are_made_for_used_and_unused_results(
         murko_results.pubsub.get_message,
         murko_results.redis_client.hget,
         murko_results.redis_client.hset,
-    ) = mock_redis_calls(mock_strict_redis, messages, metadata)
+    ) = mock_redis_calls(murko_results.redis_client, messages, metadata)
     murko_results.PERCENTAGE_TO_USE = 50  # type:ignore
     await murko_results.trigger()
 
@@ -763,18 +740,14 @@ def test_results_with_tiny_x_pixel_value_are_filtered_out(
             assert result.metadata["used_for_centring"] is False
 
 
-@patch("dodal.devices.i04.murko_results.StrictRedis")
 async def test_trigger_stops_once_complete_message_received(
-    mock_strict_redis: MagicMock,
     murko_results: MurkoResultsDevice,
+    caplog,
 ):
     messages, metadata = get_messages(
         batches=5,
         results_per_batch=10,
-        omega_start=90,
-        omega_step=10,
     )
-    messages = list(messages)
 
     messages = (
         [messages[0]]
@@ -789,13 +762,48 @@ async def test_trigger_stops_once_complete_message_received(
         murko_results.pubsub.get_message,
         murko_results.redis_client.hget,
         murko_results.redis_client.hset,
-    ) = mock_redis_calls(mock_strict_redis, messages, metadata)
-    await murko_results.trigger()
+    ) = mock_redis_calls(murko_results.redis_client, messages, metadata)
 
-    mock_get_message = murko_results.pubsub.get_message
-    mock_hget = murko_results.redis_client.hget
+    with caplog.at_level(logging.INFO):
+        await murko_results.trigger()
 
     # Second message is RESULTS_COMPLETE_MESSAGE
-    assert mock_get_message.call_count == 2  # type: ignore
+    assert murko_results.pubsub.get_message.call_count == 2
     # One batch of 10 results is retrieved
-    assert mock_hget.call_count == 10  # type: ignore
+    assert murko_results.redis_client.hget.call_count == 10
+
+    assert any(
+        record.message
+        == f"Received results complete message: {RESULTS_COMPLETE_MESSAGE}"
+        and record.levelname == "INFO"
+        for record in caplog.records
+    )
+
+
+@patch("dodal.devices.i04.murko_results.time.time")
+async def test_trigger_stops_if_no_message_in_5_seconds_and_raises_warning(
+    mock_time: MagicMock,
+    murko_results: MurkoResultsDevice,
+    caplog,
+):
+    mock_time.side_effect = [1, 7, 8]
+    messages, metadata = get_messages(batches=2)
+
+    (
+        murko_results.pubsub.get_message,
+        murko_results.redis_client.hget,
+        murko_results.redis_client.hset,
+    ) = mock_redis_calls(murko_results.redis_client, messages, metadata)
+
+    with caplog.at_level(logging.WARNING):
+        with pytest.raises(NoResultsFoundError):
+            await murko_results.trigger()
+
+    assert murko_results.pubsub.get_message.call_count == 0
+
+    assert any(
+        record.message
+        == f"Time since last result > 5, expected to receive {RESULTS_COMPLETE_MESSAGE}"
+        and record.levelname == "WARNING"
+        for record in caplog.records
+    )
