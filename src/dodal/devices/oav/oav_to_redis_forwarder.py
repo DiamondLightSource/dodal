@@ -1,5 +1,4 @@
 import asyncio
-import json
 from collections.abc import Awaitable, Callable
 from datetime import timedelta
 from enum import IntEnum
@@ -175,7 +174,3 @@ class OAVToRedisForwarder(StandardReadable, Flyable, Stoppable):
             )
             self._stop_flag.set()
             await self.forwarding_task
-        self.redis_client.publish(
-            "murko",
-            json.dumps(FORWARDING_COMPLETE_MESSAGE),
-        )
