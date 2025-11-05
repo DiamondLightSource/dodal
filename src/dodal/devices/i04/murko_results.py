@@ -1,5 +1,6 @@
 import json
 import pickle
+import time
 from dataclasses import dataclass
 from enum import Enum
 from typing import TypedDict
@@ -122,17 +123,27 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
 
     @AsyncStatus.wrap
     async def trigger(self):
-        # Wait for results
         sample_id = await self.sample_id.get_value()
-
+        t_last_result = time.time()
         while True:
+            if time.time() - t_last_result > 5:
+                LOGGER.warning(
+                    f"Time since last result > 5, expected to receive {RESULTS_COMPLETE_MESSAGE}"
+                )
+                break
             # waits here for next batch to be received
             message = await self.pubsub.get_message(timeout=self.TIMEOUT_S)
-            if message == RESULTS_COMPLETE_MESSAGE:
-                break
-            if message is None:
-                continue
-            await self.process_batch(message, sample_id)
+            if message and message["type"] == "message":
+                t_last_result = time.time()
+                data = pickle.loads(message["data"])
+
+                if data == RESULTS_COMPLETE_MESSAGE:
+                    LOGGER.info(
+                        f"Received results complete message: {RESULTS_COMPLETE_MESSAGE}"
+                    )
+                    break
+
+                await self.process_batch(data, sample_id)
 
         if not self._results:
             raise NoResultsFoundError("No results retrieved from Murko")
@@ -160,24 +171,20 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
                 f"murko:{sample_id}:metadata", result.uuid, json.dumps(result.metadata)
             )
 
-    async def process_batch(self, message: dict | None, sample_id: str):
-        if message and message["type"] == "message":
-            batch_results: list[dict] = pickle.loads(message["data"])
-            for results in batch_results:
-                for uuid, result in results.items():
-                    if metadata_str := await self.redis_client.hget(  # type: ignore
-                        f"murko:{sample_id}:metadata", uuid
-                    ):
-                        LOGGER.info(
-                            f"Found metadata for uuid {uuid}, processing result"
-                        )
-                        self.process_result(
-                            result, MurkoMetadata(json.loads(metadata_str))
-                        )
-                    else:
-                        LOGGER.info(f"Found no metadata for uuid {uuid}")
+    async def process_batch(
+        self, batch_results: list[tuple[str, MurkoResult]], sample_id: str
+    ):
+        for result_with_uuid in batch_results:
+            uuid, result = result_with_uuid
+            if metadata_str := await self.redis_client.hget(  # type: ignore
+                f"murko:{sample_id}:metadata", uuid
+            ):
+                LOGGER.info(f"Found metadata for uuid {uuid}, processing result")
+                self.process_result(result, MurkoMetadata(json.loads(metadata_str)))
+            else:
+                LOGGER.info(f"Found no metadata for uuid {uuid}")
 
-    def process_result(self, result: dict, metadata: MurkoMetadata):
+    def process_result(self, result: MurkoResult, metadata: MurkoMetadata):
         """Uses the 'most_likely_click' coordinates from Murko to calculate the
         horizontal and vertical distances from the beam centre, and store these values
         as well as the omega angle the image was taken at.
