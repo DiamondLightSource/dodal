@@ -93,8 +93,6 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
         )
         self.pubsub = self.redis_client.pubsub()
         self.sample_id = soft_signal_rw(str)  # Should get from redis
-        self.stop_angle = soft_signal_rw(int, initial_value=stop_angle)
-        self.invert_stop_angle = soft_signal_rw(bool, initial_value=False)
 
         self._reset()
 
