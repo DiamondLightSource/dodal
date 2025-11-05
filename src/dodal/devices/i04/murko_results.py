@@ -170,7 +170,7 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
             )
 
     async def process_batch(
-        self, batch_results: list[tuple[str, MurkoResult]], sample_id: str
+        self, batch_results: list[tuple[str, dict]], sample_id: str
     ):
         for result_with_uuid in batch_results:
             uuid, result = result_with_uuid
@@ -182,7 +182,7 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
             else:
                 LOGGER.info(f"Found no metadata for uuid {uuid}")
 
-    def process_result(self, result: MurkoResult, metadata: MurkoMetadata):
+    def process_result(self, result: dict, metadata: MurkoMetadata):
         """Uses the 'most_likely_click' coordinates from Murko to calculate the
         horizontal and vertical distances from the beam centre, and store these values
         as well as the omega angle the image was taken at.
