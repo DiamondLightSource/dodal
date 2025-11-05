@@ -1,7 +1,6 @@
 import json
 import pickle
-from collections.abc import Iterable
-from typing import cast
+from typing import Any, cast
 from unittest.mock import AsyncMock, MagicMock, call, patch
 
 import numpy as np
@@ -56,15 +55,16 @@ async def default_metadata() -> MurkoMetadata:
     )
 
 
-def mock_redis_calls(mock_strict_redis: MagicMock, messages, metadata):
+def mock_redis_calls(mock_strict_redis: MagicMock, messages: list | None, metadata):
+    iter_messages = iter(messages) if messages is not None else None
     mock_get_message = (
         patch.object(
             mock_strict_redis.pubsub,
             "get_message",
             new_callable=AsyncMock,
-            side_effect=lambda *args, **kwargs: next(messages),
+            side_effect=lambda *args, **kwargs: next(iter_messages),
         ).start()
-        if messages
+        if iter_messages
         else None
     )
     mock_hget = (
@@ -105,12 +105,6 @@ def abs_sin(degrees):
     return abs(np.sin(np.radians(degrees)))
 
 
-def pickled_messages(messages) -> list:
-    for message in messages:
-        message["data"] = pickle.dumps(message["data"])
-    return messages
-
-
 def get_messages(
     batches: int = 2,
     results_per_batch: int = 1,
@@ -124,7 +118,7 @@ def get_messages(
     microns_pxp: float = 10,
     microns_pyp: float = 10,
     x_drift: float = 0,
-) -> tuple[Iterable, dict]:
+) -> tuple[list, dict]:
     """Generate mock Murko messages and metadata with accurate most_likely_click values,
     based on x, y, z and a range of omega values. By default, xyz lines up with the beam
     centre."""
@@ -148,8 +142,8 @@ def get_messages(
             uuid += 1
             omega += omega_step
             batch.append(results)
-        messages.append({"type": "message", "data": batch})
-    messages.append({"type": "message", "data": RESULTS_COMPLETE_MESSAGE})
+        messages.append({"type": "message", "data": pickle.dumps(batch)})
+    messages.append({"type": "message", "data": pickle.dumps(RESULTS_COMPLETE_MESSAGE)})
 
     metadata = json_metadata(
         n=batches * results_per_batch,
@@ -160,7 +154,7 @@ def get_messages(
         beam_centre_i=beam_centre_i,
         beam_centre_j=beam_centre_j,
     )
-    return iter(pickled_messages(messages)), metadata
+    return messages, metadata
 
 
 def json_metadata(
@@ -172,8 +166,8 @@ def json_metadata(
     beam_centre_i: int = 50,
     beam_centre_j: int = 50,
     uuid: str = "UUID",
-) -> dict:
-    metadatas = {}
+) -> dict[str, Any]:
+    metadatas: dict[str, Any] = {}
     for i in range(n):
         metadata = {
             "omega_angle": start + step * i,
@@ -273,10 +267,10 @@ async def test_process_batch_makes_correct_calls(
     _, murko_results.redis_client.hget, _ = mock_redis_calls(
         mock_strict_redis, None, metadata
     )
-    mock_hget = cast(MagicMock, murko_results.redis_client.hget)
+    mock_hget = murko_results.redis_client.hget
 
     await murko_results.process_batch(batch, sample_id="0")
-    assert mock_hget.call_count == 6
+    assert mock_hget.call_count == 6  # type: ignore
     assert mock_process_result.call_count == 6
     assert mock_process_result.call_args_list[-1] == call(
         {"most_likely_click": (0.5, 0.5), "original_shape": (100, 100)},
@@ -571,10 +565,13 @@ def test_when_results_filtered_then_smallest_x_pixels_kept(
 async def test_when_no_results_from_redis_then_expected_error_message_on_trigger(
     murko_results: MurkoResultsDevice,
 ):
-    murko_results._results = []
-    murko_results._last_omega = 360
+    murko_results.pubsub.get_message.return_value = {  # type: ignore
+        "type": "message",
+        "data": pickle.dumps(RESULTS_COMPLETE_MESSAGE),
+    }
     with pytest.raises(NoResultsFoundError):
         await murko_results.trigger()
+        assert murko_results._results == []
 
 
 async def test_when_results_device_unstaged_then_results_cleared_and_last_omega_reset(
@@ -614,8 +611,6 @@ async def test_none_result_does_not_stop_results_device(
 
     assert messages[0] is None
     assert messages[2] is None
-
-    messages = iter(messages)
 
     (
         murko_results.pubsub.get_message,
@@ -705,7 +700,7 @@ async def test_correct_hset_calls_are_made_for_used_and_unused_results(
     murko_results.PERCENTAGE_TO_USE = 50  # type:ignore
     await murko_results.trigger()
 
-    mock_hset = cast(MagicMock, murko_results.redis_client.hset)
+    mock_hset = murko_results.redis_client.hset
 
     expected_calls = []
     for result in murko_results._results:
@@ -766,3 +761,41 @@ def test_results_with_tiny_x_pixel_value_are_filtered_out(
             assert result.metadata["used_for_centring"] is True
         else:
             assert result.metadata["used_for_centring"] is False
+
+
+@patch("dodal.devices.i04.murko_results.StrictRedis")
+async def test_trigger_stops_once_complete_message_received(
+    mock_strict_redis: MagicMock,
+    murko_results: MurkoResultsDevice,
+):
+    messages, metadata = get_messages(
+        batches=5,
+        results_per_batch=10,
+        omega_start=90,
+        omega_step=10,
+    )
+    messages = list(messages)
+
+    messages = (
+        [messages[0]]
+        + [{"type": "message", "data": pickle.dumps(RESULTS_COMPLETE_MESSAGE)}]
+        + messages[1:]
+    )
+
+    assert pickle.loads(messages[1]["data"]) == RESULTS_COMPLETE_MESSAGE
+    assert len(messages) == 7
+
+    (
+        murko_results.pubsub.get_message,
+        murko_results.redis_client.hget,
+        murko_results.redis_client.hset,
+    ) = mock_redis_calls(mock_strict_redis, messages, metadata)
+    await murko_results.trigger()
+
+    mock_get_message = murko_results.pubsub.get_message
+    mock_hget = murko_results.redis_client.hget
+
+    # Second message is RESULTS_COMPLETE_MESSAGE
+    assert mock_get_message.call_count == 2  # type: ignore
+    # One batch of 10 results is retrieved
+    assert mock_hget.call_count == 10  # type: ignore
