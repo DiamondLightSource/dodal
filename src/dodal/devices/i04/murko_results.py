@@ -261,12 +261,6 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
         LOGGER.info(f"Number of results after filtering: {len(best_x)}")
         return best_x
 
-    async def check_running(self, sample_id: str) -> bool:
-        running_str = await self.redis_client.hget(
-            f"murko:{sample_id}:running", "running"
-        )
-        return json.loads(running_str)
-
 
 def get_yz_least_squares(vertical_dists: list, omegas: list) -> tuple[float, float]:
     """Get the least squares solution for y and z from the vertical distances and omega angles.
