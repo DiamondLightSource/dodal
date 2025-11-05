@@ -41,7 +41,7 @@ async def smargon() -> AsyncGenerator[Smargon]:
 
 
 @pytest.fixture
-async def mock_pin_tip_detect():
+async def mock_pin_tip_detect() -> PinTipDetection:
     async with init_devices(mock=True):
         mock_pin_tip_detect = PinTipDetection("")
         return mock_pin_tip_detect
@@ -97,7 +97,7 @@ async def test_values_for_move_so_that_beam_is_at_pixel(
 
 
 async def test_given_tip_found_when_wait_for_tip_to_be_found_called_then_tip_immediately_returned(
-    run_engine, mock_pin_tip_detect
+    run_engine: RunEngine, mock_pin_tip_detect: PinTipDetection
 ):
     mock_pin_tip_detect._get_tip_and_edge_data = AsyncMock(
         return_value=SampleLocation(100, 100, np.array([]), np.array([]))

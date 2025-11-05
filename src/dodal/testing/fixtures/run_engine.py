@@ -3,14 +3,22 @@ Allow external repos to reuse these fixtures so defined in single place.
 """
 
 import asyncio
+import os
 import threading
 import time
-from collections.abc import Mapping
+from collections.abc import Generator, Mapping
 
 import pytest
 import pytest_asyncio
+from _pytest.fixtures import FixtureRequest
 from bluesky.run_engine import RunEngine
 from bluesky.simulators import RunEngineSimulator
+
+_run_engine = RunEngine()
+
+_ENABLE_FILEHANDLE_LEAK_CHECKS = (
+    os.getenv("ENABLE_FILEHANDLE_LEAK_CHECKS", "").lower() == "true"
+)
 
 
 @pytest_asyncio.fixture(scope="session", loop_scope="session", autouse=True)
@@ -25,7 +33,7 @@ async def _ensure_running_bluesky_event_loop(_global_run_engine):
 
 
 @pytest.fixture()
-async def run_engine(_global_run_engine: RunEngine):
+async def run_engine(_global_run_engine: RunEngine) -> Generator[RunEngine, None, None]:
     try:
         yield _global_run_engine
     finally:
@@ -33,7 +41,7 @@ async def run_engine(_global_run_engine: RunEngine):
 
 
 @pytest_asyncio.fixture(scope="session", loop_scope="session")
-async def _global_run_engine():
+async def _global_run_engine() -> Generator[RunEngine, None, None]:
     """
     Obtain a run engine, with its own event loop and thread.
 
@@ -86,3 +94,25 @@ def run_engine_documents(run_engine: RunEngine) -> Mapping[str, list[dict]]:
 
     run_engine.subscribe(append_and_print)
     return docs
+
+
+@pytest.fixture(autouse=_ENABLE_FILEHANDLE_LEAK_CHECKS)
+def check_for_filehandle_leaks(request: FixtureRequest):
+    """
+    Test fixture that can be enabled in order to check for leaked filehandles
+    (typically caused by a rogue RunEngine instance).
+
+    Note that this test is not enabled by default due to imposing a significant
+    overhead. When a leak is suspected, usually from seeing a
+    PytestUnraisableExceptionWarning, enable this via autouse and run the full
+    test suite.
+    """
+    pid = os.getpid()
+    _baseline_n_open_files = len(os.listdir(f"/proc/{pid}/fd"))
+    try:
+        yield
+    finally:
+        _n_open_files = len(os.listdir(f"/proc/{pid}/fd"))
+        assert _n_open_files == _baseline_n_open_files, (
+            f"Function {request.function.__name__} leaked some filehandles"
+        )
