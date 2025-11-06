@@ -2,6 +2,7 @@ import os
 from unittest.mock import patch
 
 import pytest
+from bluesky import RunEngine
 from click.testing import CliRunner, Result
 from ophyd.device import DEFAULT_CONNECTION_TIMEOUT
 from ophyd_async.core import (
@@ -17,6 +18,12 @@ from dodal.utils import AnyDevice, OphydV1Device, OphydV2Device
 # Test with an example beamline, device instantiation is already tested
 # in beamline unit tests
 EXAMPLE_BEAMLINE = "i22"
+
+
+@pytest.fixture(autouse=True)
+def patch_run_engine_in_cli_to_avoid_leaks(run_engine: RunEngine):
+    with patch("dodal.cli.RunEngine", return_value=run_engine):
+        yield
 
 
 @pytest.fixture
