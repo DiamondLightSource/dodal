@@ -82,7 +82,7 @@ async def test_given_aperture_scatterguard_parked_when_set_to_out_position_then_
     scintillator, ap_sg = scintillator_and_ap_sg
     ap_sg.return_value.selected_aperture.get_value.return_value = ApertureValue.PARKED  # type: ignore
 
-    await scintillator.selected_pos.set(InOut.OUT, wait=True)
+    await scintillator.selected_pos.set(InOut.OUT)
 
     assert await scintillator.y_mm.user_setpoint.get_value() == -0.02
     assert await scintillator.z_mm.user_setpoint.get_value() == 0.1
