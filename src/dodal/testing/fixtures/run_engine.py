@@ -6,7 +6,7 @@ import asyncio
 import os
 import threading
 import time
-from collections.abc import Generator, Mapping
+from collections.abc import AsyncGenerator, Mapping
 
 import pytest
 import pytest_asyncio
@@ -17,7 +17,7 @@ from bluesky.simulators import RunEngineSimulator
 _run_engine = RunEngine()
 
 _ENABLE_FILEHANDLE_LEAK_CHECKS = (
-    os.getenv("ENABLE_FILEHANDLE_LEAK_CHECKS", "").lower() == "true"
+    os.getenv("DODAL_ENABLE_FILEHANDLE_LEAK_CHECKS", "").lower() == "true"
 )
 
 
@@ -33,7 +33,7 @@ async def _ensure_running_bluesky_event_loop(_global_run_engine):
 
 
 @pytest.fixture()
-async def run_engine(_global_run_engine: RunEngine) -> Generator[RunEngine, None, None]:
+async def run_engine(_global_run_engine: RunEngine) -> AsyncGenerator[RunEngine, None]:
     try:
         yield _global_run_engine
     finally:
@@ -41,7 +41,7 @@ async def run_engine(_global_run_engine: RunEngine) -> Generator[RunEngine, None
 
 
 @pytest_asyncio.fixture(scope="session", loop_scope="session")
-async def _global_run_engine() -> Generator[RunEngine, None, None]:
+async def _global_run_engine() -> AsyncGenerator[RunEngine, None]:
     """
     Obtain a run engine, with its own event loop and thread.
 
