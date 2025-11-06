@@ -687,12 +687,12 @@ async def test_fail_i10_energy_motor_lookup_outside_energy_limits(
     with pytest.raises(ValueError) as e:
         await mock_id_controller.energy.set(energy)
     assert str(e.value) == "Demanding energy must lie between {} and {}!".format(
-        mock_id_controller.lookup_table_client.lookup_tables["Gap"][
+        mock_id_controller.lookup_table_client.lookup_tables["gap"][
             await mock_id_controller.polarisation_setpoint.get_value()
-        ]["Limit"]["Minimum"],
-        mock_id_controller.lookup_table_client.lookup_tables["Gap"][
+        ]["limit"]["minimum"],
+        mock_id_controller.lookup_table_client.lookup_tables["gap"][
             await mock_id_controller.polarisation_setpoint.get_value()
-        ]["Limit"]["Maximum"],
+        ]["limit"]["maximum"],
     )
 
 
@@ -701,18 +701,18 @@ async def test_fail_i10_energy_motor_lookup_with_lookup_gap(
 ):
     mock_id_controller.lookup_table_client.update_lookuptable()
     # make gap in energy
-    mock_id_controller.lookup_table_client.lookup_tables["Gap"]["lh"]["Energies"] = {
+    mock_id_controller.lookup_table_client.lookup_tables["gap"]["lh"]["energies"] = {
         "1": {
-            "Low": 255.3,
-            "High": 500,
-            "Poly": poly1d([4.33435e-08, -7.52562e-05, 6.41791e-02, 3.88755e00]),
+            "low": 255.3,
+            "high": 500,
+            "poly": poly1d([4.33435e-08, -7.52562e-05, 6.41791e-02, 3.88755e00]),
         }
     }
-    mock_id_controller.lookup_table_client.lookup_tables["Gap"]["lh"]["Energies"] = {
+    mock_id_controller.lookup_table_client.lookup_tables["gap"]["lh"]["energies"] = {
         "2": {
-            "Low": 600,
-            "High": 1000,
-            "Poly": poly1d([4.33435e-08, -7.52562e-05, 6.41791e-02, 3.88755e00]),
+            "low": 600,
+            "high": 1000,
+            "poly": poly1d([4.33435e-08, -7.52562e-05, 6.41791e-02, 3.88755e00]),
         }
     }
     with pytest.raises(ValueError) as e:

@@ -42,19 +42,19 @@ def test_generate_lookup_table_structure_and_poly():
     assert key in table
 
     entry = table[key]
-    assert entry["Limit"]["Minimum"] == pytest.approx(min_e)
-    assert entry["Limit"]["Maximum"] == pytest.approx(max_e)
+    assert entry["limit"]["minimum"] == pytest.approx(min_e)
+    assert entry["limit"]["maximum"] == pytest.approx(max_e)
 
     energy_key = f"{min_e}"
-    assert energy_key in entry["Energies"]
+    assert energy_key in entry["energies"]
 
-    ec = entry["Energies"][energy_key]
-    assert ec["Low"] == pytest.approx(min_e)
-    assert ec["High"] == pytest.approx(max_e)
+    ec = entry["energies"][energy_key]
+    assert ec["low"] == pytest.approx(min_e)
+    assert ec["high"] == pytest.approx(max_e)
 
-    assert isinstance(ec["Poly"], np.poly1d)
+    assert isinstance(ec["poly"], np.poly1d)
     expected = np.poly1d(coeffs)(150.0)
-    assert ec["Poly"](150.0) == pytest.approx(expected)
+    assert ec["poly"](150.0) == pytest.approx(expected)
 
 
 def test_make_phase_tables_multiple_entries():
@@ -74,12 +74,12 @@ def test_make_phase_tables_multiple_entries():
         key = pol.value
         assert key in table
         entry = table[key]
-        assert entry["Limit"]["Minimum"] == pytest.approx(min_energies[i])
-        assert entry["Limit"]["Maximum"] == pytest.approx(max_energies[i])
+        assert entry["limit"]["minimum"] == pytest.approx(min_energies[i])
+        assert entry["limit"]["maximum"] == pytest.approx(max_energies[i])
 
         energy_key = f"{min_energies[i]}"
-        assert energy_key in entry["Energies"]
-        poly = entry["Energies"][energy_key]["Poly"]
+        assert energy_key in entry["energies"]
+        poly = entry["energies"][energy_key]["poly"]
         assert isinstance(poly, np.poly1d)
 
         test_energy = (min_energies[i] + max_energies[i]) / 2.0
@@ -93,26 +93,26 @@ class DummyLookup(EnergyMotorLookup):
 
     def update_lookuptable(self) -> None:
         # Populate only the Gap table and intentionally leave Phase empty
-        self.lookup_tables["Gap"] = generate_lookup_table(
+        self.lookup_tables["gap"] = generate_lookup_table(
             pol=Pol.LH,
             min_energy=100.0,
             max_energy=200.0,
             poly1d_param=[2.0, -1.0, 0.5],
         )
-        self.available_pol = list(self.lookup_tables["Gap"].keys())
+        self.available_pol = list(self.lookup_tables["gap"].keys())
 
 
 def test_energy_motor_lookup_with_phase_path_none() -> None:
     lookup = DummyLookup(
         lookuptable_dir=".", config_client=MagicMock(), phase_file_name=None
     )
-    assert lookup.lookup_table_config.path.Phase is None
+    assert lookup.lookup_table_config.path.phase is None
 
     lookup.update_lookuptable()
 
     assert lookup.available_pol == [Pol.LH.value]
 
-    poly = get_poly(150.0, Pol.LH, lookup.lookup_tables["Gap"])
+    poly = get_poly(150.0, Pol.LH, lookup.lookup_tables["gap"])
     assert isinstance(poly, np.poly1d)
     assert poly(150.0) == pytest.approx(np.poly1d([2.0, -1.0, 0.5])(150.0))
 
@@ -146,10 +146,10 @@ def test_convert_csv_to_lookup_overwrite_name_convert_default() -> None:
     assert "lh" in lookuptable
     assert "lv" in lookuptable
     # Check polynomials evaluate as expected
-    poly_lh = lookuptable["lh"]["Energies"]["100"]["Poly"]
+    poly_lh = lookuptable["LH"]["energies"]["100"]["poly"]
     assert isinstance(poly_lh, np.poly1d)
     assert poly_lh(150.0) == pytest.approx(np.poly1d([2.0, 1.0])(150.0))
 
-    poly_lv = lookuptable["lv"]["Energies"]["200"]["Poly"]
+    poly_lv = lookuptable["LV"]["energies"]["200"]["poly"]
     assert isinstance(poly_lv, np.poly1d)
     assert poly_lv(250.0) == pytest.approx(np.poly1d([1.0, 0.0])(250.0))
