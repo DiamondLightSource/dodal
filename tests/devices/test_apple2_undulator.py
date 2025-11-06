@@ -452,7 +452,12 @@ async def test_jaw_phase_success_scan(
     run_engine(scan([mock_jaw_phase], mock_jaw_phase, 0, 10, 11))
     assert_emitted(run_engine_documents, start=1, descriptor=1, event=11, stop=1)
     for i in output:
-        assert docs["event"][i]["data"]["mock_jaw_phase-jaw_phase-user_readback"] == i
+        assert (
+            run_engine_documents["event"][i]["data"][
+                "mock_jaw_phase-jaw_phase-user_readback"
+            ]
+            == i
+        )
 
 
 @pytest.mark.parametrize(
@@ -492,9 +497,3 @@ async def test_set_motors_from_energy_sets_correct_values(
         gap=f"{42.0:.6f}",
     )
     mock_locked_apple2.set.assert_awaited_once_with(id_motor_values=expected_val)
-        assert (
-            run_engine_documents["event"][i]["data"][
-                "mock_jaw_phase-jaw_phase-user_readback"
-            ]
-            == i
-        )
