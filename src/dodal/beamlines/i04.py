@@ -234,7 +234,7 @@ def undulator() -> Undulator:
     """
     return Undulator(
         prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:",
-        id_gap_lookup_table_path="/dls_sw/i04/software/gda/config/lookupTables/BeamLine_Undulator_toGap.txt",
+        id_gap_lookup_table_path="/dls_sw/i04/software/daq_configuration/lookup/BeamLine_Undulator_toGap.txt",
     )
 
 

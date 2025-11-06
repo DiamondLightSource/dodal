@@ -21,7 +21,7 @@ from dodal.devices.attenuator.attenuator import BinaryFilterAttenuator
 from dodal.devices.backlight import Backlight
 from dodal.devices.baton import Baton
 from dodal.devices.collimation_table import CollimationTable
-from dodal.devices.cryostream import CryoStream
+from dodal.devices.cryostream import CryoStream, CryoStreamGantry
 from dodal.devices.detector.detector_motion import DetectorMotion
 from dodal.devices.diamond_filter import DiamondFilter, I03Filters
 from dodal.devices.eiger import EigerDetector
@@ -29,6 +29,7 @@ from dodal.devices.fast_grid_scan import PandAFastGridScan, ZebraFastGridScanThr
 from dodal.devices.fluorescence_detector_motion import FluorescenceDetector
 from dodal.devices.flux import Flux
 from dodal.devices.focusing_mirror import FocusingMirrorWithStripes, MirrorVoltages
+from dodal.devices.hutch_shutter import HutchShutter
 from dodal.devices.i03 import Beamstop
 from dodal.devices.i03.dcm import DCM
 from dodal.devices.i03.undulator_dcm import UndulatorDCM
@@ -324,6 +325,14 @@ def sample_shutter() -> ZebraShutter:
 
 
 @device_factory()
+def hutch_shutter() -> HutchShutter:
+    """Get the i03 hutch shutter device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i03, it will return the existing object.
+    """
+    return HutchShutter(f"{PREFIX.beamline_prefix}-PS-SHTR-01:")
+
+
+@device_factory()
 def flux() -> Flux:
     """Get the i03 flux device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
@@ -385,6 +394,14 @@ def cryostream() -> CryoStream:
     If this is called when already instantiated in i03, it will return the existing object.
     """
     return CryoStream(PREFIX.beamline_prefix)
+
+
+@device_factory()
+def cryostream_gantry() -> CryoStreamGantry:
+    """Get the i03 cryostream gantry device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i03, it will return the existing object.
+    """
+    return CryoStreamGantry(PREFIX.beamline_prefix)
 
 
 @device_factory()
