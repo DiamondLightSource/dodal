@@ -1,6 +1,6 @@
 from collections.abc import AsyncGenerator
 from contextlib import ExitStack
-from unittest.mock import MagicMock
+from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 from ophyd_async.core import init_devices
@@ -32,6 +32,8 @@ async def scintillator_and_ap_sg(
 ) -> AsyncGenerator[tuple[Scintillator, MagicMock], None]:
     async with init_devices(mock=True):
         mock_ap_sg = MagicMock()
+        mock_ap_sg.return_value.selected_aperture.set = AsyncMock()
+        mock_ap_sg.return_value.selected_aperture.get_value = AsyncMock()
         scintillator = Scintillator(
             prefix="",
             name="test_scin",
