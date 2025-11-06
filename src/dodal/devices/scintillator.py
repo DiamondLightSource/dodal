@@ -56,7 +56,7 @@ class Scintillator(StandardReadable):
         super().__init__(name)
 
     def _check_position(
-        self, current_pos: tuple[float, float], pos_to_check: tuple[float, float]
+        self, current_pos: list[float, float], pos_to_check: tuple[float, float]
     ):
         return all(
             isclose(axis_pos, axis_in_beam, abs_tol=axis_tolerance)
