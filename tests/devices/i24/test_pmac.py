@@ -68,15 +68,16 @@ async def test_set_pmac_string_for_enc_reset(fake_pmac: PMAC, run_engine: RunEng
 
 
 async def test_run_program(fake_pmac: PMAC):
-    async def go_high_then_low():
-        set_mock_value(fake_pmac.scanstatus, 1)
-        await asyncio.sleep(0.01)
-        set_mock_value(fake_pmac.scanstatus, 0)
+    def go_high_then_low(value, *_, **__):
+        async def async_go_high_then_low():
+            set_mock_value(fake_pmac.scanstatus, 1)
+            await asyncio.sleep(0.01)
+            set_mock_value(fake_pmac.scanstatus, 0)
 
-    callback_on_mock_put(
-        fake_pmac.pmac_string,
-        lambda *args, **kwargs: asyncio.create_task(go_high_then_low()),  # type: ignore
-    )
+        asyncio.create_task(async_go_high_then_low())
+        return value
+
+    callback_on_mock_put(fake_pmac.pmac_string, go_high_then_low)
 
     set_mock_value(fake_pmac.program_number, 11)
     await fake_pmac.run_program.kickoff()

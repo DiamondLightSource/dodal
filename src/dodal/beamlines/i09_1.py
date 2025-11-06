@@ -11,6 +11,7 @@ from dodal.devices.electron_analyser import EnergySource
 from dodal.devices.electron_analyser.specs import SpecsDetector
 from dodal.devices.i09_1 import LensMode, PsuMode
 from dodal.devices.synchrotron import Synchrotron
+from dodal.devices.undulator import UndulatorOrder
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
@@ -47,3 +48,8 @@ def analyser() -> SpecsDetector[LensMode, PsuMode]:
         psu_mode_type=PsuMode,
         energy_source=energy_source(),
     )
+
+
+@device_factory()
+def harmonics() -> UndulatorOrder:
+    return UndulatorOrder(name="harmonics")
