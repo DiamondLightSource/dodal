@@ -106,7 +106,7 @@ class I10EnergyMotorLookup(EnergyMotorLookup):
             )
             Lookuptable.model_validate(self.lookup_tables[key])
 
-        self.available_pol = list(self.lookup_tables["Gap"].keys())
+        self.available_pol = list(self.lookup_tables["gap"].keys())
 
 
 class I10Apple2(Apple2):
