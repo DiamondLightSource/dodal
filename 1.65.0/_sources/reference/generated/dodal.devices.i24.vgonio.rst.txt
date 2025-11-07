@@ -1,0 +1,36 @@
+dodal.devices.i24.vgonio
+========================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices.i24
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~vgonio.VerticalGoniometer
+
+
+
+
+.. automodule:: dodal.devices.i24.vgonio
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

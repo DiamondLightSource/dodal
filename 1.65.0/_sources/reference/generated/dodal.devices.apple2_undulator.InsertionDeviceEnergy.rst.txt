@@ -1,0 +1,43 @@
+dodal.devices.apple2\_undulator.InsertionDeviceEnergy
+=====================================================
+
+.. currentmodule:: dodal.devices.apple2_undulator
+
+.. autoclass:: InsertionDeviceEnergy
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~InsertionDeviceEnergy.set
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

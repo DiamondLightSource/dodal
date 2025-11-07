@@ -1,0 +1,96 @@
+dodal.devices.p60.PassEnergy
+============================
+
+.. currentmodule:: dodal.devices.p60
+
+.. autoclass:: PassEnergy
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~PassEnergy.E1
+      
+      
+      ~PassEnergy.E2
+      
+      
+      ~PassEnergy.E5
+      
+      
+      ~PassEnergy.E10
+      
+      
+      ~PassEnergy.E20
+      
+      
+      ~PassEnergy.E50
+      
+      
+      ~PassEnergy.E100
+      
+      
+      ~PassEnergy.E200
+      
+   
+   

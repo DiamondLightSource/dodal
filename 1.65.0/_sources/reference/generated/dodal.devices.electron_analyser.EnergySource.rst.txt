@@ -1,0 +1,43 @@
+dodal.devices.electron\_analyser.EnergySource
+=============================================
+
+.. currentmodule:: dodal.devices.electron_analyser
+
+.. autoclass:: EnergySource
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~EnergySource.energy
+      
+      
+      
+      
+      
+   
+   

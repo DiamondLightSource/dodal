@@ -1,0 +1,90 @@
+dodal.devices.i02\_1.fast\_grid\_scan.ZebraGridScanParamsTwoD
+=============================================================
+
+.. currentmodule:: dodal.devices.i02_1.fast_grid_scan
+
+.. autoclass:: ZebraGridScanParamsTwoD
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      ~ZebraGridScanParamsTwoD.model_config
+      
+      
+      
+      
+      
+      
+      
+      
+      ~ZebraGridScanParamsTwoD.x_steps
+      
+      
+      ~ZebraGridScanParamsTwoD.y_steps
+      
+      
+      ~ZebraGridScanParamsTwoD.x_step_size_mm
+      
+      
+      ~ZebraGridScanParamsTwoD.y_step_size_mm
+      
+      
+      ~ZebraGridScanParamsTwoD.x_start_mm
+      
+      
+      ~ZebraGridScanParamsTwoD.y1_start_mm
+      
+      
+      ~ZebraGridScanParamsTwoD.z1_start_mm
+      
+      
+      ~ZebraGridScanParamsTwoD.set_stub_offsets
+      
+      
+      ~ZebraGridScanParamsTwoD.transmission_fraction
+      
+      
+      ~ZebraGridScanParamsTwoD.dwell_time_ms
+      
+   
+   

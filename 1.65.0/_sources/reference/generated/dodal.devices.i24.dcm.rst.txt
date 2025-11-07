@@ -1,0 +1,36 @@
+dodal.devices.i24.dcm
+=====================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices.i24
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~dcm.DCM
+
+
+
+
+.. automodule:: dodal.devices.i24.dcm
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

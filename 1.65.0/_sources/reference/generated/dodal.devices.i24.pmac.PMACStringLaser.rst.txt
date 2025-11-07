@@ -1,0 +1,34 @@
+dodal.devices.i24.pmac.PMACStringLaser
+======================================
+
+.. currentmodule:: dodal.devices.i24.pmac
+
+.. autoclass:: PMACStringLaser
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      ~PMACStringLaser.set
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+   
+   

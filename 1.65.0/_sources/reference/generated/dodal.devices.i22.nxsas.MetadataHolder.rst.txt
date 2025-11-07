@@ -1,0 +1,26 @@
+dodal.devices.i22.nxsas.MetadataHolder
+======================================
+
+.. currentmodule:: dodal.devices.i22.nxsas
+
+.. autoclass:: MetadataHolder
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      ~MetadataHolder.describe
+      
+      
+      ~MetadataHolder.read
+      
+   
+   
+
+   
+   
+   
