@@ -109,7 +109,7 @@ class MxSampleDetect:
         self,
         *,
         preprocess: Callable[[np.ndarray], np.ndarray] = lambda arr: arr,
-        open_ksize: int = 5,
+        open_ksize: int = 0,
         open_iterations: int = 5,
         canny_upper: int = 100,
         canny_lower: int = 50,
@@ -129,7 +129,7 @@ class MxSampleDetect:
             for open and close operations, please read:
                 https://docs.opencv.org/4.x/d9/d61/tutorial_py_morphological_ops.html
 
-            open_ksize: kernel size for "open" operation
+            open_ksize: kernel size for "open" operation, if set to zero then ignore "open" operation
             open_iterations: number of iterations for "open" operation
             canny_upper: upper threshold for canny edge detection
             canny_lower: lower threshold for canny edge detection
@@ -158,8 +158,11 @@ class MxSampleDetect:
             assert arr.ndim == 2
             gray_arr = arr
 
-        # Remove Noises
-        open_arr = open_morph(self.open_ksize, self.open_iterations)(gray_arr)
+        # Remove Noises if open set to non-zero
+        if self.open_ksize == 0:
+            open_arr = gray_arr
+        else:
+            open_arr = open_morph(self.open_ksize, self.open_iterations)(gray_arr)
 
         # Preprocess the array. (Use the greyscale one.)
         pp_arr = self.preprocess(open_arr)

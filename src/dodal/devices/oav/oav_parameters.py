@@ -94,7 +94,7 @@ class OAVParameters:
         )  # length scale for blur preprocessing
         self.preprocess_iter: int = update("preProcessIteration", int, default=5)
         self.detection_script_filename: str = update("filename", str)
-        self.open_ksize: int = update("open_ksize", int, default=5)
+        self.open_ksize: int = update("open_ksize", int, default=0)
         self.close_ksize: int = update("close_ksize", int, default=5)
         self.min_callback_time: float = update("min_callback_time", float, default=0.08)
         self.direction: int = update("direction", int)
