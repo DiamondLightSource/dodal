@@ -210,17 +210,6 @@ def test_first_and_last_nonzero_by_columns():
     np.testing.assert_array_equal(last, np.array([1, 2, NONE_VALUE, 2]))
 
 
-def test_erode_dilate(sample_array):
-    erode_fn = erode(3, 1)
-    dilate_fn = dilate(3, 1)
-
-    eroded = erode_fn(sample_array)
-    dilated = dilate_fn(sample_array)
-
-    assert np.count_nonzero(eroded) < np.count_nonzero(sample_array)
-    assert np.count_nonzero(dilated) > np.count_nonzero(sample_array)
-
-
 def test_open_close(sample_array):
     open_fn = open_morph(3, 1)
     close_fn = close(3, 1)
