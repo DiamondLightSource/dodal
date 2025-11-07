@@ -23,6 +23,26 @@ def configure_arm_trigger_and_disarm_detector(
     detector_params: DetectorParams,
     trigger_info: TriggerInfo,
 ):
+    yield from configure_and_arm_detector(eiger, detector_params, trigger_info)
+    start = time.time()
+    yield from bps.kickoff(eiger, wait=True)
+    LOGGER.info(f"Kickoff Eiger: {time.time() - start}s")
+    start = time.time()
+    yield from bps.trigger(eiger.drv.detector.trigger, wait=True)
+    LOGGER.info(f"Triggering Eiger: {time.time() - start}s")
+    start = time.time()
+    yield from bps.complete(eiger, wait=True)
+    LOGGER.info(f"Completing Capture: {time.time() - start}s")
+    start = time.time()
+    yield from bps.unstage(eiger, wait=True)
+    LOGGER.info(f"Disarming Eiger: {time.time() - start}s")
+
+
+def configure_and_arm_detector(
+    eiger: EigerDetector,
+    detector_params: DetectorParams,
+    trigger_info: TriggerInfo,
+):
     assert detector_params.expected_energy_ev
     start = time.time()
     yield from bps.unstage(eiger, wait=True)
@@ -50,18 +70,6 @@ def configure_arm_trigger_and_disarm_detector(
     start = time.time()
     yield from bps.prepare(eiger, trigger_info, wait=True)
     LOGGER.info(f"Preparing Eiger: {time.time() - start}s")
-    start = time.time()
-    yield from bps.kickoff(eiger, wait=True)
-    LOGGER.info(f"Kickoff Eiger: {time.time() - start}s")
-    start = time.time()
-    yield from bps.trigger(eiger.drv.detector.trigger, wait=True)
-    LOGGER.info(f"Triggering Eiger: {time.time() - start}s")
-    start = time.time()
-    yield from bps.complete(eiger, wait=True)
-    LOGGER.info(f"Completing Capture: {time.time() - start}s")
-    start = time.time()
-    yield from bps.unstage(eiger, wait=True)
-    LOGGER.info(f"Disarming Eiger: {time.time() - start}s")
 
 
 def set_cam_pvs(
