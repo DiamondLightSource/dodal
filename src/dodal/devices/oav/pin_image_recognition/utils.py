@@ -125,6 +125,12 @@ class MxSampleDetect:
             preprocess: A preprocessing function applied to the array after conversion to grayscale.
                 See implementations of common functions above for predefined conversions
                 Defaults to a no-op (i.e. no preprocessing)
+
+            for open and close operations, please read:
+                https://docs.opencv.org/4.x/d9/d61/tutorial_py_morphological_ops.html
+
+            open_ksize: kernel size for "open" operation
+            open_iterations: number of iterations for "open" operation
             canny_upper: upper threshold for canny edge detection
             canny_lower: lower threshold for canny edge detection
             close_ksize: kernel size for "close" operation
