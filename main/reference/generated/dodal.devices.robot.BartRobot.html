@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.robot.BartRobot &#8212; dodal 1.64.1.dev15+g5fe631f29 documentation</title>
+    <title>dodal.devices.robot.BartRobot &#8212; dodal 1.65.1.dev1+g2e4d3b1a2 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=bb6f420e"></script>
+    <script src="../../_static/documentation_options.js?v=1e4fe170"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -1093,8 +1093,8 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="#dodal.devices.robot.BartRobot.pin_mounted_or_no_pin_found" title="dodal.devices.robot.BartRobot.pin_mounted_or_no_pin_found"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pin_mounted_or_no_pin_found</span></code></a>()</p></td>
 <td><p>This co-routine will finish when either a pin is detected or the robot gives an error saying no pin was found (whichever happens first).</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">set</span></code>(value)</p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#dodal.devices.robot.BartRobot.set" title="dodal.devices.robot.BartRobot.set"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set</span></code></a>(value)</p></td>
+<td><p>Perform a sample load from the specified sample location :type value: <span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="dodal.devices.robot.SampleLocation.html#dodal.devices.robot.SampleLocation" title="dodal.devices.robot.SampleLocation"><code class="xref py py-class docutils literal notranslate"><span class="pre">SampleLocation</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span> :param value: The pin and puck to load, or None to unload the sample.</p></td>
 </tr>
 </tbody>
 </table>
@@ -1126,6 +1126,19 @@
 <dd><p>This co-routine will finish when either a pin is detected or the robot gives
 an error saying no pin was found (whichever happens first). In the case where no
 pin was found a RobotLoadError error is raised.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dodal.devices.robot.BartRobot.set">
+<span class="sig-name descname"><span class="pre">set</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="dodal.devices.robot.SampleLocation.html#dodal.devices.robot.SampleLocation" title="dodal.devices.robot.SampleLocation"><span class="pre">SampleLocation</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dodal/devices/robot.html#BartRobot.set"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.robot.BartRobot.set" title="Link to this definition">#</a></dt>
+<dd><p>Perform a sample load from the specified sample location
+:type value: <span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="dodal.devices.robot.SampleLocation.html#dodal.devices.robot.SampleLocation" title="dodal.devices.robot.SampleLocation"><code class="xref py py-class docutils literal notranslate"><span class="pre">SampleLocation</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>
+:param value: The pin and puck to load, or None to unload the sample.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>RobotLoadError if a timeout occurs</strong><strong>, or </strong><strong>if an error occurs loading the smaple.</strong> – </p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -1181,6 +1194,7 @@ pin was found a RobotLoadError error is raised.</p>
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.robot.BartRobot"><code class="docutils literal notranslate"><span class="pre">BartRobot</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.robot.BartRobot.pin_mounted_or_no_pin_found"><code class="docutils literal notranslate"><span class="pre">BartRobot.pin_mounted_or_no_pin_found()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.robot.BartRobot.set"><code class="docutils literal notranslate"><span class="pre">BartRobot.set()</span></code></a></li>
 </ul>
 </li>
 </ul>
