@@ -79,6 +79,15 @@ class ZoomController(BaseZoomController):
 
 
 class OAV(StandardReadable):
+    """
+    Class for oav device
+
+    x_direction(int): Should only be 1 or -1, with 1 indicating the oav x direction is the same with motor x
+    y_direction(int): Same with x_direction but for motor y
+    z_direction(int): Same with x_direction but for motor z
+    mjpg_x_size_pv(str): PV infix for x_size in mjpg
+    mjpg_y_size_pv(str): PV infix for y_size in mjpg
+    """
     beam_centre_i: SignalR[int]
     beam_centre_j: SignalR[int]
 
