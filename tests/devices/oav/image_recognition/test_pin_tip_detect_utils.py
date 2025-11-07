@@ -7,8 +7,6 @@ from dodal.devices.oav.pin_image_recognition.utils import (
     ScanDirections,
     blur,
     close,
-    dilate,
-    erode,
     gaussian_blur,
     identity,
     median_blur,
