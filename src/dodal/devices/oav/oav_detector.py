@@ -168,9 +168,16 @@ class OAV(StandardReadable):
 
 
 class OAVBeamCentreFile(OAV):
-    """OAV device that reads its beam centre values from a file. The config parameter
+    """
+    OAV device that reads its beam centre values from a file. The config parameter
     must be a OAVConfigBeamCentre object, as this contains a filepath to where the beam
     centre values are stored.
+
+    x_direction(int): Should only be 1 or -1, with 1 indicating the oav x direction is the same with motor x
+    y_direction(int): Same with x_direction but for motor y
+    z_direction(int): Same with x_direction but for motor z
+    mjpg_x_size_pv(str): PV infix for x_size in mjpg
+    mjpg_y_size_pv(str): PV infix for y_size in mjpg
     """
 
     def __init__(
