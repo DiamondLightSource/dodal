@@ -22,7 +22,7 @@ dependencies = [
     "zocalo>=1.0.0",
     "requests",
     "graypy",
-    "pydantic>=2.0",
+    "pydantic>=2.0,<2.12",           # https://github.com/bluesky/scanspec/issues/190
     "opencv-python-headless",        # For pin-tip detection.
     "numpy",
     "aiofiles",
