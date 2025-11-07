@@ -28,6 +28,7 @@ class BeamstopPositions(StrictEnum):
     """
 
     DATA_COLLECTION = "Data Collection"
+    OUT = "Out"
     UNKNOWN = "Unknown"
 
 
@@ -63,6 +64,10 @@ class Beamstop(StandardReadable):
             float(beamline_parameters[f"in_beam_{axis}_STANDARD"])
             for axis in ("x", "y", "z")
         ]
+        # XXX need better way to configure this
+        self._out_of_beam_xyz_mm = list(self._in_beam_xyz_mm)
+        self._out_of_beam_xyz_mm[1] -= 5
+
         self._xyz_tolerance_mm = [
             float(beamline_parameters[f"bs_{axis}_tolerance"])
             for axis in ("x", "y", "z")
@@ -72,24 +77,36 @@ class Beamstop(StandardReadable):
 
     def _get_selected_position(self, x: float, y: float, z: float) -> BeamstopPositions:
         current_pos = [x, y, z]
-        if all(
-            isclose(axis_pos, axis_in_beam, abs_tol=axis_tolerance)
-            for axis_pos, axis_in_beam, axis_tolerance in zip(
-                current_pos, self._in_beam_xyz_mm, self._xyz_tolerance_mm, strict=False
-            )
-        ):
+        if self._is_near_position(current_pos, self._in_beam_xyz_mm):
             return BeamstopPositions.DATA_COLLECTION
+        elif self._is_near_position(current_pos, self._out_of_beam_xyz_mm):
+            return BeamstopPositions.OUT
         else:
             return BeamstopPositions.UNKNOWN
+
+    def _is_near_position(
+        self, current_pos: list[float], target_pos: list[float]
+    ) -> bool:
+        return all(
+            isclose(axis_pos, axis_in_beam, abs_tol=axis_tolerance)
+            for axis_pos, axis_in_beam, axis_tolerance in zip(
+                current_pos, target_pos, self._xyz_tolerance_mm, strict=False
+            )
+        )
 
     async def _set_selected_position(self, position: BeamstopPositions) -> None:
         match position:
             case BeamstopPositions.DATA_COLLECTION:
-                # Move z first as it could be under the table
-                await self.z_mm.set(self._in_beam_xyz_mm[2])
-                await asyncio.gather(
-                    self.x_mm.set(self._in_beam_xyz_mm[0]),
-                    self.y_mm.set(self._in_beam_xyz_mm[1]),
-                )
+                await self._safe_move_above_table(self._in_beam_xyz_mm)
+            case BeamstopPositions.OUT:
+                await self._safe_move_above_table(self._out_of_beam_xyz_mm)
             case _:
                 raise ValueError(f"Cannot set beamstop to position {position}")
+
+    async def _safe_move_above_table(self, pos: list[float]):
+        # Move z first as it could be under the table
+        await self.z_mm.set(pos[2])
+        await asyncio.gather(
+            self.x_mm.set(pos[0]),
+            self.y_mm.set(pos[1]),
+        )
