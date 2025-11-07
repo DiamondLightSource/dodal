@@ -25,7 +25,7 @@ WAIT_FOR_OLD_PIN_MSG = "Waiting on old pin unloaded"
 WAIT_FOR_NEW_PIN_MSG = "Waiting on new pin loaded"
 
 
-class RobotLoadFailed(Exception):
+class RobotLoadError(Exception):
     error_code: int
     error_string: str
 
@@ -58,10 +58,10 @@ class ErrorStatus(Device):
         error_code = await self.code.get_value()
         if error_code:
             error_string = await self.str.get_value()
-            raise RobotLoadFailed(int(error_code), error_string) from raise_from
+            raise RobotLoadError(int(error_code), error_string) from raise_from
 
 
-class BartRobot(StandardReadable, Movable[SampleLocation]):
+class BartRobot(StandardReadable, Movable[SampleLocation | None]):
     """The sample changing robot."""
 
     # How long to wait for the robot if it is busy soaking/drying
@@ -104,7 +104,6 @@ class BartRobot(StandardReadable, Movable[SampleLocation]):
         self.init = epics_signal_x(prefix + "INIT.PROC")
         self.soak = epics_signal_x(prefix + "SOAK.PROC")
         self.home = epics_signal_x(prefix + "GOHM.PROC")
-        self.unload = epics_signal_x(prefix + "UNLD.PROC")
         self.dry = epics_signal_x(prefix + "DRY.PROC")
         self.open = epics_signal_x(prefix + "COLO.PROC")
         self.close = epics_signal_x(prefix + "COLC.PROC")
@@ -119,12 +118,12 @@ class BartRobot(StandardReadable, Movable[SampleLocation]):
     async def pin_mounted_or_no_pin_found(self):
         """This co-routine will finish when either a pin is detected or the robot gives
         an error saying no pin was found (whichever happens first). In the case where no
-        pin was found a RobotLoadFailed error is raised.
+        pin was found a RobotLoadError error is raised.
         """
 
         async def raise_if_no_pin():
             await wait_for_value(self.prog_error.code, self.NO_PIN_ERROR_CODE, None)
-            raise RobotLoadFailed(self.NO_PIN_ERROR_CODE, "Pin was not detected")
+            raise RobotLoadError(self.NO_PIN_ERROR_CODE, "Pin was not detected")
 
         async def wfv():
             await wait_for_value(self.gonio_pin_sensor, PinMounted.PIN_MOUNTED, None)
@@ -175,13 +174,24 @@ class BartRobot(StandardReadable, Movable[SampleLocation]):
         await self.pin_mounted_or_no_pin_found()
 
     @AsyncStatus.wrap
-    async def set(self, value: SampleLocation):
+    async def set(self, value: SampleLocation | None):
+        """
+        Perform a sample load from the specified sample location
+        Args:
+            value: The pin and puck to load, or None to unload the sample.
+        Raises:
+            RobotLoadError if a timeout occurs, or if an error occurs loading the smaple.
+        """
         try:
-            await wait_for(
-                self._load_pin_and_puck(value),
-                timeout=self.LOAD_TIMEOUT + self.NOT_BUSY_TIMEOUT,
-            )
+            if value is not None:
+                await wait_for(
+                    self._load_pin_and_puck(value),
+                    timeout=self.LOAD_TIMEOUT + self.NOT_BUSY_TIMEOUT,
+                )
+            else:
+                await self.unload.trigger(timeout=self.LOAD_TIMEOUT)
+                await wait_for_value(self.program_running, False, self.NOT_BUSY_TIMEOUT)
         except TimeoutError as e:
             await self.prog_error.raise_if_error(e)
             await self.controller_error.raise_if_error(e)
-            raise RobotLoadFailed(0, "Robot timed out") from e
+            raise RobotLoadError(0, "Robot timed out") from e

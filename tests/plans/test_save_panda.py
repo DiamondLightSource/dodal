@@ -2,13 +2,18 @@ import os
 from unittest.mock import MagicMock, patch
 
 import pytest
-from bluesky.simulators import RunEngineSimulator
+from bluesky import RunEngine
 
 from dodal.plans.save_panda import _save_panda, main
 
 
-def test_save_panda():
-    sim_run_engine = RunEngineSimulator()
+@pytest.fixture(autouse=True)
+def patch_run_engine_in_save_panda_to_avoid_leaks(run_engine: RunEngine):
+    with patch("dodal.plans.save_panda.RunEngine", return_value=run_engine):
+        yield
+
+
+def test_save_panda(sim_run_engine):
     panda = MagicMock()
     directory = "test"
     filename = "file.yml"
@@ -124,7 +129,6 @@ def test_main(
     expected_output_file,
     expected_return_value,
 ):
-    args.insert(0, "save_panda")
     env_patch = {}
     if beamline:
         env_patch["BEAMLINE"] = beamline
@@ -165,7 +169,6 @@ def test_file_exists_check(
     exists = mock_path.return_value.exists
     exists.return_value = file_exists
     argv = [
-        "save_panda",
         "--beamline=i03",
         f"--output-file={tmpdir}/test_output_file.yml",
     ]
