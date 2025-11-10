@@ -742,7 +742,7 @@ def test_results_with_tiny_x_pixel_value_are_filtered_out(
 
 async def test_trigger_stops_once_results_complete_message_received(
     murko_results: MurkoResultsDevice,
-    caplog,
+    caplog: pytest.LogCaptureFixture,
 ):
     messages, metadata = get_messages(
         batches=5,
@@ -784,7 +784,7 @@ async def test_trigger_stops_once_results_complete_message_received(
 async def test_trigger_stops_if_no_message_in_5_seconds_and_raises_warning(
     mock_time: MagicMock,
     murko_results: MurkoResultsDevice,
-    caplog,
+    caplog: pytest.LogCaptureFixture,
 ):
     mock_time.side_effect = [1, 7, 8]
     messages, metadata = get_messages(batches=2)
