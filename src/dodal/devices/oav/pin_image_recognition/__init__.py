@@ -47,7 +47,7 @@ class PinTipDetection(StandardReadable):
 
     INVALID_POSITION = np.array([np.iinfo(np.int32).min, np.iinfo(np.int32).min])
 
-    def __init__(self, prefix: str, name: str = "", open_ksize: int = 0):
+    def __init__(self, prefix: str, name: str = ""):
         self.triggered_tip, self._tip_setter = soft_signal_r_and_setter(
             Tip, name="triggered_tip"
         )
@@ -67,7 +67,7 @@ class PinTipDetection(StandardReadable):
         )
         self.canny_upper_threshold = soft_signal_rw(int, 100, name="canny_upper")
         self.canny_lower_threshold = soft_signal_rw(int, 50, name="canny_lower")
-        self.open_ksize = soft_signal_rw(int, open_ksize, name="open_ksize")
+        self.open_ksize = soft_signal_rw(int, 0, name="open_ksize")
         self.open_iterations = soft_signal_rw(int, 5, name="open_iterations")
         self.close_ksize = soft_signal_rw(int, 5, name="close_ksize")
         self.close_iterations = soft_signal_rw(int, 5, name="close_iterations")
