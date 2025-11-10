@@ -1,4 +1,5 @@
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
+
 import numpy as np
 import pytest
 
@@ -274,6 +275,7 @@ def test_process_array():
     assert isinstance(location.edge_bottom, np.ndarray)
     assert location.edge_top.shape == location.edge_bottom.shape
 
+
 def test_process_array_if_open_ksize_is_not_zero():
     test_arr = np.array(
         [
@@ -297,7 +299,20 @@ def test_process_array_if_open_ksize_is_not_zero():
         min_tip_height=3,
     )
 
-    with patch("dodal.devices.oav.pin_image_recognition.utils.open_morph", return_value=lambda arr: arr) as mock_open_morph:
+    with patch(
+        "dodal.devices.oav.pin_image_recognition.utils.open_morph",
+        return_value=lambda arr: arr,
+    ) as mock_open_morph:
         location = detector.process_array(test_arr)
 
         mock_open_morph.assert_called_once()
+
+        assert location.tip_x is not None
+        assert location.tip_y is not None
+
+        assert 1 <= location.tip_x <= 3
+        assert 1 <= location.tip_y <= 3
+
+        assert isinstance(location.edge_top, np.ndarray)
+        assert isinstance(location.edge_bottom, np.ndarray)
+        assert location.edge_top.shape == location.edge_bottom.shape
