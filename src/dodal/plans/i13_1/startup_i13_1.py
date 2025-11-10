@@ -14,8 +14,8 @@ from dodal.plans.i13_1.merlin_test_plans import pcomp_fly_scan  # noqa: F401
 kb_y = bl13j.mirror02_vert_y()
 theta = bl13j.theta()
 pi = bl13j.sample_xyz()
-pi_lab = bl13j.sample_xyz_lab()
-pi_lab_fa = bl13j.sample_xyz_lab_fa()
+pi_map = bl13j.sample_xyz_map()
+pi_map_fa = bl13j.sample_xyz_map_fa()
 # --------------------------------
 # PMAC and pandas
 step25 = bl13j.step_25()
@@ -41,7 +41,7 @@ RE = RunEngine(call_returns_result=True)
 
 RE(
     ensure_connected(
-        kb_y, theta, pi, pi_lab, pi_lab_fa, step25, panda01, panda02, side_cam, merlin
+        kb_y, theta, pi, pi_map, pi_map_fa, step25, panda01, panda02, side_cam, merlin
     )
 )
 
