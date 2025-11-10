@@ -88,6 +88,7 @@ class OAV(StandardReadable):
     mjpg_x_size_pv(str): PV infix for x_size in mjpg
     mjpg_y_size_pv(str): PV infix for y_size in mjpg
     """
+
     beam_centre_i: SignalR[int]
     beam_centre_j: SignalR[int]
 
