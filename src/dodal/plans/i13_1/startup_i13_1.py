@@ -29,11 +29,22 @@ merlin = bl13j.merlin()
 #
 
 
-# Create a run engine and ensures that await commands happen in the same event loop
+# Autocompletion doesn't work for bl13j.<motor>.
+# But can add bl13j.<motor> to a class:
+# self.my_motor = bl13j.<motor>
+# bl13j_components = BL13JComponents()
+# Can now use autocomplete:  bl13j_components.my_motor.
+
+
+# Motors have the property user_readback that can be await'ed on:
+# await bl13j_components.my_motor.user_readback.get_value()
+
+
+# Create a run engine and ensure that await commands happen in the same event loop
 # that this uses rather than an ipython specific one.  This avoids some surprising
 # behavior that occurs when devices are accessed from multiple event loops.
 RE = RunEngine(call_returns_result=True)
-# autoawait_in_bluesky_event_loop() # vscode debugger doesn't like this!
+autoawait_in_bluesky_event_loop()  # Can't be used with vscode debugger.
 
 # Need matplotlib
 # bec = BestEffortCallback()
