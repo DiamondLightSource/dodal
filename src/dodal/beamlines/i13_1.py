@@ -64,23 +64,28 @@ print(f"Merlin base filename = {path_test._filename_provider._base_filename}")  
 # --------------------------------------------------------------------------
 # Individual and Combined Motors/Stages
 # -------------------------------------
-# Just for testing but need to be careful don't move too much.
+# Useful for testing without effecting BL but need to be careful don't move too much.
 # Have set limits to 0-1mm.
 @device_factory()
 def mirror02_vert_y() -> Motor:
-    return Motor(prefix=f"{PREFIX.beamline_prefix}-OP-MIRR-02:VERT:Y")
+    return Motor(
+        prefix=f"{PREFIX.beamline_prefix}-OP-MIRR-02:VERT:Y", name="mirror02_vert_y"
+    )
 
 
 @device_factory()
 def theta() -> Motor:
-    return Motor(prefix=f"{PREFIX.beamline_prefix}-MO-STAGE-01:THETA")
+    return Motor(prefix=f"{PREFIX.beamline_prefix}-MO-STAGE-01:THETA", name="theta")
 
 
 @device_factory()
 def theta_virtual() -> Motor:
-    return Motor(prefix=f"{PREFIX.beamline_prefix}-MO-PI-02:VIRTUAL:THETA")
+    return Motor(
+        prefix=f"{PREFIX.beamline_prefix}-MO-PI-02:VIRTUAL:THETA", name="theta_virtual"
+    )
 
 
+# PI raw motors:
 @device_factory()
 def sample_xyz() -> XYZStage:
     return XYZStage(
@@ -92,19 +97,7 @@ def sample_xyz() -> XYZStage:
     )
 
 
-async def sample_xyz_print():
-    pi = sample_xyz()
-    x_pos = await pi.x.read()
-    y_pos = await pi.y.read()
-    z_pos = await pi.z.read()
-    print(
-        x_pos["sample_xyz-x"]["value"],
-        y_pos["sample_xyz-y"]["value"],
-        z_pos["sample_xyz-z"]["value"],
-    )
-
-
-# CS 3 can't be used with traj motion progs.
+# The original lab CS (3) can't be used with trajectory motion progs.
 @device_factory()
 def sample_xyz_lab() -> XYZStage:
     return XYZStage(
@@ -116,18 +109,8 @@ def sample_xyz_lab() -> XYZStage:
     )
 
 
-async def sample_xyz_lab_print():
-    pi = sample_xyz_lab()
-    x_pos = await pi.x.read()
-    y_pos = await pi.y.read()
-    z_pos = await pi.z.read()
-    print(
-        x_pos["sample_xyz_lab-x"]["value"],
-        y_pos["sample_xyz_lab-y"]["value"],
-        z_pos["sample_xyz_lab-z"]["value"],
-    )
-
-
+# This CS (4) uses theta_virtual to calculate the lab frame.
+# theta_virtual must be used instead of theta when in this CS.
 @device_factory()
 def sample_xyz_map() -> XYZStage:
     return XYZStage(
@@ -139,18 +122,8 @@ def sample_xyz_map() -> XYZStage:
     )
 
 
-async def sample_xyz_map_print():
-    pi = sample_xyz_map()
-    x_pos = await pi.x.read()
-    y_pos = await pi.y.read()
-    z_pos = await pi.z.read()
-    print(
-        x_pos["sample_xyz_map-x"]["value"],
-        y_pos["sample_xyz_map-y"]["value"],
-        z_pos["sample_xyz_map-z"]["value"],
-    )
-
-
+# This CS (5) allows a fixed value of theta to be used to caluclate the lab frame.
+# theta can then be moved independently without effecting the PI stages.
 @device_factory()
 def sample_xyz_map_fa() -> XYZStage:
     return XYZStage(
@@ -159,18 +132,6 @@ def sample_xyz_map_fa() -> XYZStage:
         x_infix="X",
         y_infix="Y",
         z_infix="Z",
-    )
-
-
-async def sample_xyz_map_fa_print():
-    pi = sample_xyz_map_fa()
-    x_pos = await pi.x.read()
-    y_pos = await pi.y.read()
-    z_pos = await pi.z.read()
-    print(
-        x_pos["sample_xyz_map_fa-x"]["value"],
-        y_pos["sample_xyz_map_fa-y"]["value"],
-        z_pos["sample_xyz_map_fa-z"]["value"],
     )
 
 
