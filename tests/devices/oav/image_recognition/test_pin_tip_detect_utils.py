@@ -1,3 +1,4 @@
+from unittest.mock import patch, MagicMock
 import numpy as np
 import pytest
 
@@ -252,7 +253,7 @@ def test_process_array():
 
     detector = MxSampleDetect(
         preprocess=identity(),
-        open_ksize=1,
+        open_ksize=0,
         open_iterations=1,
         close_ksize=1,
         close_iterations=1,
@@ -272,3 +273,31 @@ def test_process_array():
     assert isinstance(location.edge_top, np.ndarray)
     assert isinstance(location.edge_bottom, np.ndarray)
     assert location.edge_top.shape == location.edge_bottom.shape
+
+def test_process_array_if_open_ksize_is_not_zero():
+    test_arr = np.array(
+        [
+            [0, 0, 0, 0, 0],
+            [0, 0, 255, 0, 0],
+            [0, 0, 255, 0, 0],
+            [0, 0, 255, 0, 0],
+            [0, 0, 0, 0, 0],
+        ],
+        dtype=np.uint8,
+    )
+
+    detector = MxSampleDetect(
+        preprocess=identity(),
+        open_ksize=1,
+        open_iterations=1,
+        close_ksize=1,
+        close_iterations=1,
+        canny_upper=100,
+        canny_lower=50,
+        min_tip_height=3,
+    )
+
+    with patch("dodal.devices.oav.pin_image_recognition.utils.open_morph", return_value=lambda arr: arr) as mock_open_morph:
+        location = detector.process_array(test_arr)
+
+        mock_open_morph.assert_called_once()
