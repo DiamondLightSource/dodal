@@ -84,7 +84,6 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
         redis_password=RedisConstants.REDIS_PASSWORD,
         redis_db=RedisConstants.MURKO_REDIS_DB,
         name="",
-        stop_angle=350,
     ):
         self.redis_client = StrictRedis(
             host=redis_host,

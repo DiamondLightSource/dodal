@@ -740,7 +740,7 @@ def test_results_with_tiny_x_pixel_value_are_filtered_out(
             assert result.metadata["used_for_centring"] is False
 
 
-async def test_trigger_stops_once_complete_message_received(
+async def test_trigger_stops_once_results_complete_message_received(
     murko_results: MurkoResultsDevice,
     caplog,
 ):
