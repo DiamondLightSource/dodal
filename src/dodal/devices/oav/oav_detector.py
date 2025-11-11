@@ -119,7 +119,9 @@ class OAV(StandardReadable):
 
         self.cam = Cam(f"{prefix}CAM:", name=name)
         with self.add_children_as_readables():
-            self.grid_snapshot = SnapshotWithGrid(f"{prefix}{mjpeg_prefix}:", name, mjpg_x_size_pv, mjpg_y_size_pv)
+            self.grid_snapshot = SnapshotWithGrid(
+                f"{prefix}{mjpeg_prefix}:", name, mjpg_x_size_pv, mjpg_y_size_pv
+            )
 
         self.sizes = [self.grid_snapshot.x_size, self.grid_snapshot.y_size]
         with self.add_children_as_readables():
