@@ -109,6 +109,8 @@ class MxSampleDetect:
         self,
         *,
         preprocess: Callable[[np.ndarray], np.ndarray] = lambda arr: arr,
+        open_ksize: int = 0,
+        open_iterations: int = 5,
         canny_upper: int = 100,
         canny_lower: int = 50,
         close_ksize: int = 5,
@@ -123,6 +125,12 @@ class MxSampleDetect:
             preprocess: A preprocessing function applied to the array after conversion to grayscale.
                 See implementations of common functions above for predefined conversions
                 Defaults to a no-op (i.e. no preprocessing)
+
+            for open and close operations, please read:
+                https://docs.opencv.org/4.x/d9/d61/tutorial_py_morphological_ops.html
+
+            open_ksize: kernel size for "open" operation, if set to zero then ignore "open" operation
+            open_iterations: number of iterations for "open" operation
             canny_upper: upper threshold for canny edge detection
             canny_lower: lower threshold for canny edge detection
             close_ksize: kernel size for "close" operation
@@ -132,6 +140,8 @@ class MxSampleDetect:
         """
 
         self.preprocess = preprocess
+        self.open_ksize = open_ksize
+        self.open_iterations = open_iterations
         self.canny_upper = canny_upper
         self.canny_lower = canny_lower
         self.close_ksize = close_ksize
@@ -140,7 +150,7 @@ class MxSampleDetect:
 
         self.min_tip_height = min_tip_height
 
-    def processArray(self, arr: np.ndarray) -> SampleLocation:
+    def process_array(self, arr: np.ndarray) -> SampleLocation:
         # Get a greyscale version of the input.
         if arr.ndim == 3:
             gray_arr = cv2.cvtColor(arr, cv2.COLOR_BGR2GRAY)
@@ -148,8 +158,14 @@ class MxSampleDetect:
             assert arr.ndim == 2
             gray_arr = arr
 
+        # Remove Noises if open set to non-zero
+        if self.open_ksize == 0:
+            open_arr = gray_arr
+        else:
+            open_arr = open_morph(self.open_ksize, self.open_iterations)(gray_arr)
+
         # Preprocess the array. (Use the greyscale one.)
-        pp_arr = self.preprocess(gray_arr)
+        pp_arr = self.preprocess(open_arr)
 
         # Find some edges.
         edge_arr = cv2.Canny(pp_arr, self.canny_upper, self.canny_lower)

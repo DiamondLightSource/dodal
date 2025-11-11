@@ -28,11 +28,17 @@ class MJPG(StandardReadable, Triggerable, ABC):
     latest image from the stream to the `post_processing` method for child classes to handle.
     """
 
-    def __init__(self, prefix: str, name: str = "") -> None:
+    def __init__(
+        self,
+        prefix: str,
+        name: str = "",
+        x_size_pv: str = "ArraySize1_RBV",
+        y_size_pv: str = "ArraySize2_RBV",
+    ) -> None:
         self.url = epics_signal_rw(str, prefix + "JPG_URL_RBV")
 
-        self.x_size = epics_signal_r(int, prefix + "ArraySize1_RBV")
-        self.y_size = epics_signal_r(int, prefix + "ArraySize2_RBV")
+        self.x_size = epics_signal_r(int, prefix + x_size_pv)
+        self.y_size = epics_signal_r(int, prefix + y_size_pv)
 
         with self.add_children_as_readables():
             self.filename = soft_signal_rw(str)

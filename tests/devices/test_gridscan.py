@@ -15,7 +15,7 @@ from ophyd_async.testing import get_mock_put, set_mock_put_proceeds, set_mock_va
 
 from dodal.devices.fast_grid_scan import (
     FastGridScanCommon,
-    GridScanInvalidException,
+    GridScanInvalidError,
     GridScanParamsCommon,
     PandAFastGridScan,
     PandAGridScanParams,
@@ -139,15 +139,16 @@ async def test_waits_for_running_motion(grid_scan: FastGridScanCommon):
     ],
 )
 async def test_given_different_step_numbers_then_expected_images_correct(
-    zebra_fast_grid_scan: ZebraFastGridScanThreeD, steps, expected_images
+    run_engine: RunEngine,
+    zebra_fast_grid_scan: ZebraFastGridScanThreeD,
+    steps: tuple[int, int, int],
+    expected_images: int,
 ):
     set_mock_value(zebra_fast_grid_scan.x_steps, steps[0])
     set_mock_value(zebra_fast_grid_scan.y_steps, steps[1])
     set_mock_value(zebra_fast_grid_scan.z_steps, steps[2])
 
-    RE = RunEngine(call_returns_result=True)
-
-    result = RE(bps.rd(zebra_fast_grid_scan.expected_images))
+    result = run_engine(bps.rd(zebra_fast_grid_scan.expected_images))
 
     assert result.plan_result == expected_images  # type: ignore
 
@@ -161,14 +162,15 @@ async def test_given_different_step_numbers_then_expected_images_correct(
     ],
 )
 async def test_given_different_2d_step_numbers_then_expected_images_correct(
-    zebra_fast_grid_scan_2d: ZebraFastGridScanTwoD, steps, expected_images
+    zebra_fast_grid_scan_2d: ZebraFastGridScanTwoD,
+    steps: tuple[int, int],
+    expected_images: int,
+    run_engine: RunEngine,
 ):
     set_mock_value(zebra_fast_grid_scan_2d.x_steps, steps[0])
     set_mock_value(zebra_fast_grid_scan_2d.y_steps, steps[1])
 
-    RE = RunEngine(call_returns_result=True)
-
-    result = RE(bps.rd(zebra_fast_grid_scan_2d.expected_images))
+    result = run_engine(bps.rd(zebra_fast_grid_scan_2d.expected_images))
 
     assert result.plan_result == expected_images  # type: ignore
 
@@ -181,12 +183,12 @@ async def test_running_finished_with_all_images_done_then_complete_status_finish
     use_pgs,
     zebra_fast_grid_scan: ZebraFastGridScanThreeD,
     panda_fast_grid_scan: PandAFastGridScan,
-    RE: RunEngine,
+    run_engine: RunEngine,
 ):
     num_pos_1d = 2
     if use_pgs:
         grid_scan = panda_fast_grid_scan
-        RE(
+        run_engine(
             set_fast_grid_scan_params(
                 grid_scan,
                 PandAGridScanParams(
@@ -196,7 +198,7 @@ async def test_running_finished_with_all_images_done_then_complete_status_finish
         )
     else:
         grid_scan = zebra_fast_grid_scan
-        RE(
+        run_engine(
             set_fast_grid_scan_params(
                 grid_scan,
                 ZebraGridScanParamsThreeD(
@@ -397,7 +399,7 @@ def test_can_run_fast_grid_scan_in_run_engine(
     grid_scan: FastGridScanCommon,
     zebra_fast_grid_scan: ZebraFastGridScanThreeD,
     panda_fast_grid_scan: PandAFastGridScan,
-    RE: RunEngine,
+    run_engine: RunEngine,
 ):
     @bpp.run_decorator()
     def kickoff_and_complete(device: FastGridScanCommon):
@@ -408,8 +410,8 @@ def test_can_run_fast_grid_scan_in_run_engine(
         set_mock_value(device.status, 0)
         yield from bps.wait("complete")
 
-    (RE(kickoff_and_complete(grid_scan)))
-    assert RE.state == "idle"
+    run_engine(kickoff_and_complete(grid_scan))
+    assert run_engine.state == "idle"
 
 
 @pytest.mark.parametrize(
@@ -560,7 +562,7 @@ async def test_gridscan_prepare_times_out_for_validity_check(
     status = grid_scan_device.prepare(grid_scan_params)
 
     with pytest.raises(
-        GridScanInvalidException,
+        GridScanInvalidError,
         match="Gridscan parameters not validated after 0.5s",
     ) as exc_info:
         await status
