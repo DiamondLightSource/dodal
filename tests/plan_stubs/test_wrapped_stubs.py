@@ -10,9 +10,11 @@ from ophyd_async.sim import SimMotor
 from dodal.plan_stubs.wrapped import (
     move,
     move_relative,
+    rd,
     set_absolute,
     set_relative,
     sleep,
+    stop,
     wait,
 )
 
@@ -147,3 +149,11 @@ def test_wait_group_and_timeout():
     assert list(wait("foo", 5.0)) == [
         Msg("wait", group="foo", timeout=5.0, error_on_timeout=True, watch=_EMPTY)
     ]
+
+
+def test_rd(x_axis: SimMotor):
+    assert list(rd(x_axis)) == [Msg("locate", obj=x_axis)]
+
+
+def test_stop(x_axis: SimMotor):
+    assert list(stop(x_axis)) == [Msg("stop", obj=x_axis)]
