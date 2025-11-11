@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.oav.oav_parameters &#8212; dodal 1.65.1.dev1+g2e4d3b1a2 documentation</title>
+    <title>dodal.devices.oav.oav_parameters &#8212; dodal 1.65.1.dev2+gc63b64f11 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=1e4fe170"></script>
+    <script src="../../../../_static/documentation_options.js?v=cddb8b49"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -549,8 +549,10 @@ window.addEventListener("load", () => mermaid.run());
         <span class="bp">self</span><span class="o">.</span><span class="n">preprocess_K_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">update</span><span class="p">(</span>
             <span class="s2">&quot;preProcessKSize&quot;</span><span class="p">,</span> <span class="nb">int</span>
         <span class="p">)</span>  <span class="c1"># length scale for blur preprocessing</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">preprocess_iter</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">update</span><span class="p">(</span><span class="s2">&quot;preProcessIteration&quot;</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">detection_script_filename</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">update</span><span class="p">(</span><span class="s2">&quot;filename&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">close_ksize</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">update</span><span class="p">(</span><span class="s2">&quot;close_ksize&quot;</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">11</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">open_ksize</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">update</span><span class="p">(</span><span class="s2">&quot;open_ksize&quot;</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">close_ksize</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">update</span><span class="p">(</span><span class="s2">&quot;close_ksize&quot;</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">min_callback_time</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">update</span><span class="p">(</span><span class="s2">&quot;min_callback_time&quot;</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mf">0.08</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">direction</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">update</span><span class="p">(</span><span class="s2">&quot;direction&quot;</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">max_tip_distance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">update</span><span class="p">(</span><span class="s2">&quot;max_tip_distance&quot;</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>

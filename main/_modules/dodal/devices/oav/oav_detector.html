@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.oav.oav_detector &#8212; dodal 1.65.1.dev1+g2e4d3b1a2 documentation</title>
+    <title>dodal.devices.oav.oav_detector &#8212; dodal 1.65.1.dev2+gc63b64f11 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=1e4fe170"></script>
+    <script src="../../../../_static/documentation_options.js?v=cddb8b49"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -506,9 +506,14 @@ window.addEventListener("load", () => mermaid.run());
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">level</span> <span class="o">=</span> <span class="n">soft_signal_rw</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;1.0x&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">percentage</span> <span class="o">=</span> <span class="n">soft_signal_rw</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Attempting to set zoom level of a null zoom controller&quot;</span><span class="p">)</span></div>
+    <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="o">!=</span> <span class="s2">&quot;1.0x&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Attempting to set zoom level of a null zoom controller&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 
 
 
@@ -540,6 +545,16 @@ window.addEventListener("load", () => mermaid.run());
 <div class="viewcode-block" id="OAV">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.oav.oav_detector.OAV.html#dodal.devices.oav.oav_detector.OAV">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">OAV</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class for oav device</span>
+
+<span class="sd">    x_direction(int): Should only be 1 or -1, with 1 indicating the oav x direction is the same with motor x</span>
+<span class="sd">    y_direction(int): Same with x_direction but for motor y</span>
+<span class="sd">    z_direction(int): Same with x_direction but for motor z</span>
+<span class="sd">    mjpg_x_size_pv(str): PV infix for x_size in mjpg</span>
+<span class="sd">    mjpg_y_size_pv(str): PV infix for y_size in mjpg</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="n">beam_centre_i</span><span class="p">:</span> <span class="n">SignalR</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
     <span class="n">beam_centre_j</span><span class="p">:</span> <span class="n">SignalR</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
 
@@ -549,6 +564,11 @@ window.addEventListener("load", () => mermaid.run());
         <span class="n">config</span><span class="p">:</span> <span class="n">OAVConfigBase</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
         <span class="n">zoom_controller</span><span class="p">:</span> <span class="n">BaseZoomController</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">x_direction</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">y_direction</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">z_direction</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="n">mjpg_x_size_pv</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;ArraySize1_RBV&quot;</span><span class="p">,</span>
+        <span class="n">mjpg_y_size_pv</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;ArraySize2_RBV&quot;</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">oav_config</span> <span class="o">=</span> <span class="n">config</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_prefix</span> <span class="o">=</span> <span class="n">prefix</span>
@@ -564,9 +584,15 @@ window.addEventListener("load", () => mermaid.run());
 
         <span class="bp">self</span><span class="o">.</span><span class="n">cam</span> <span class="o">=</span> <span class="n">Cam</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">CAM:&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">grid_snapshot</span> <span class="o">=</span> <span class="n">SnapshotWithGrid</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">MJPG:&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">grid_snapshot</span> <span class="o">=</span> <span class="n">SnapshotWithGrid</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">MJPG:&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">mjpg_x_size_pv</span><span class="p">,</span> <span class="n">mjpg_y_size_pv</span>
+            <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">sizes</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">grid_snapshot</span><span class="o">.</span><span class="n">x_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid_snapshot</span><span class="o">.</span><span class="n">y_size</span><span class="p">]</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">x_direction</span> <span class="o">=</span> <span class="n">soft_signal_rw</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">x_direction</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;x_direction&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">y_direction</span> <span class="o">=</span> <span class="n">soft_signal_rw</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">y_direction</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;y_direction&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">z_direction</span> <span class="o">=</span> <span class="n">soft_signal_rw</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">z_direction</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;z_direction&quot;</span><span class="p">)</span>
 
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">microns_per_pixel_x</span> <span class="o">=</span> <span class="n">derived_signal_r</span><span class="p">(</span>
@@ -612,9 +638,16 @@ window.addEventListener("load", () => mermaid.run());
 <div class="viewcode-block" id="OAVBeamCentreFile">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.oav.oav_detector.OAVBeamCentreFile.html#dodal.devices.oav.oav_detector.OAVBeamCentreFile">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">OAVBeamCentreFile</span><span class="p">(</span><span class="n">OAV</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;OAV device that reads its beam centre values from a file. The config parameter</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    OAV device that reads its beam centre values from a file. The config parameter</span>
 <span class="sd">    must be a OAVConfigBeamCentre object, as this contains a filepath to where the beam</span>
 <span class="sd">    centre values are stored.</span>
+
+<span class="sd">    x_direction(int): Should only be 1 or -1, with 1 indicating the oav x direction is the same with motor x</span>
+<span class="sd">    y_direction(int): Same with x_direction but for motor y</span>
+<span class="sd">    z_direction(int): Same with x_direction but for motor z</span>
+<span class="sd">    mjpg_x_size_pv(str): PV infix for x_size in mjpg</span>
+<span class="sd">    mjpg_y_size_pv(str): PV infix for y_size in mjpg</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -623,8 +656,23 @@ window.addEventListener("load", () => mermaid.run());
         <span class="n">config</span><span class="p">:</span> <span class="n">OAVConfigBeamCentre</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
         <span class="n">zoom_controller</span><span class="p">:</span> <span class="n">BaseZoomController</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">mjpg_x_size_pv</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;ArraySize1_RBV&quot;</span><span class="p">,</span>
+        <span class="n">mjpg_y_size_pv</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;ArraySize2_RBV&quot;</span><span class="p">,</span>
+        <span class="n">x_direction</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">y_direction</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">z_direction</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">zoom_controller</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">,</span>
+            <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">zoom_controller</span><span class="o">=</span><span class="n">zoom_controller</span><span class="p">,</span>
+            <span class="n">mjpg_x_size_pv</span><span class="o">=</span><span class="n">mjpg_x_size_pv</span><span class="p">,</span>
+            <span class="n">mjpg_y_size_pv</span><span class="o">=</span><span class="n">mjpg_y_size_pv</span><span class="p">,</span>
+            <span class="n">x_direction</span><span class="o">=</span><span class="n">x_direction</span><span class="p">,</span>
+            <span class="n">y_direction</span><span class="o">=</span><span class="n">y_direction</span><span class="p">,</span>
+            <span class="n">z_direction</span><span class="o">=</span><span class="n">z_direction</span><span class="p">,</span>
+        <span class="p">)</span>
 
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">beam_centre_i</span> <span class="o">=</span> <span class="n">derived_signal_r</span><span class="p">(</span>

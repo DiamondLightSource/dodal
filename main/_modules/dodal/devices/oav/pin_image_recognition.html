@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.oav.pin_image_recognition &#8212; dodal 1.65.1.dev1+g2e4d3b1a2 documentation</title>
+    <title>dodal.devices.oav.pin_image_recognition &#8212; dodal 1.65.1.dev2+gc63b64f11 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=1e4fe170"></script>
+    <script src="../../../../_static/documentation_options.js?v=cddb8b49"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -521,6 +521,8 @@ window.addEventListener("load", () => mermaid.run());
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">canny_upper_threshold</span> <span class="o">=</span> <span class="n">soft_signal_rw</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;canny_upper&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">canny_lower_threshold</span> <span class="o">=</span> <span class="n">soft_signal_rw</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;canny_lower&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">open_ksize</span> <span class="o">=</span> <span class="n">soft_signal_rw</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;open_ksize&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">open_iterations</span> <span class="o">=</span> <span class="n">soft_signal_rw</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;open_iterations&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">close_ksize</span> <span class="o">=</span> <span class="n">soft_signal_rw</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;close_ksize&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">close_iterations</span> <span class="o">=</span> <span class="n">soft_signal_rw</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;close_iterations&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">scan_direction</span> <span class="o">=</span> <span class="n">soft_signal_rw</span><span class="p">(</span>
@@ -559,7 +561,7 @@ window.addEventListener("load", () => mermaid.run());
 
         <span class="k">try</span><span class="p">:</span>
             <span class="n">preprocess_func</span> <span class="o">=</span> <span class="n">ARRAY_PROCESSING_FUNCTIONS_MAP</span><span class="p">[</span><span class="n">preprocess_key</span><span class="p">](</span>
-                <span class="nb">iter</span><span class="o">=</span><span class="n">preprocess_iter</span><span class="p">,</span> <span class="n">ksize</span><span class="o">=</span><span class="n">preprocess_ksize</span>
+                <span class="n">iterations</span><span class="o">=</span><span class="n">preprocess_iter</span><span class="p">,</span> <span class="n">ksize</span><span class="o">=</span><span class="n">preprocess_ksize</span>
             <span class="p">)</span>
         <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
             <span class="n">LOGGER</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Invalid preprocessing function, using identity&quot;</span><span class="p">)</span>
@@ -575,6 +577,8 @@ window.addEventListener("load", () => mermaid.run());
             <span class="n">preprocess</span><span class="o">=</span><span class="n">preprocess_func</span><span class="p">,</span>
             <span class="n">canny_lower</span><span class="o">=</span><span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">canny_lower_threshold</span><span class="o">.</span><span class="n">get_value</span><span class="p">(),</span>
             <span class="n">canny_upper</span><span class="o">=</span><span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">canny_upper_threshold</span><span class="o">.</span><span class="n">get_value</span><span class="p">(),</span>
+            <span class="n">open_ksize</span><span class="o">=</span><span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">open_ksize</span><span class="o">.</span><span class="n">get_value</span><span class="p">(),</span>
+            <span class="n">open_iterations</span><span class="o">=</span><span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">open_iterations</span><span class="o">.</span><span class="n">get_value</span><span class="p">(),</span>
             <span class="n">close_ksize</span><span class="o">=</span><span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">close_ksize</span><span class="o">.</span><span class="n">get_value</span><span class="p">(),</span>
             <span class="n">close_iterations</span><span class="o">=</span><span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">close_iterations</span><span class="o">.</span><span class="n">get_value</span><span class="p">(),</span>
             <span class="n">scan_direction</span><span class="o">=</span><span class="n">direction</span><span class="p">,</span>

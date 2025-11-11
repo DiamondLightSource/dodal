@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.oav.utils &#8212; dodal 1.65.1.dev1+g2e4d3b1a2 documentation</title>
+    <title>dodal.devices.oav.utils &#8212; dodal 1.65.1.dev2+gc63b64f11 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=1e4fe170"></script>
+    <script src="../../../../_static/documentation_options.js?v=cddb8b49"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -457,13 +457,13 @@ window.addEventListener("load", () => mermaid.run());
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">bluesky.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">Msg</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.motors</span><span class="w"> </span><span class="kn">import</span> <span class="n">XYZOmegaStage</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.oav.oav_calculations</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">calculate_beam_distance</span><span class="p">,</span>
     <span class="n">camera_coordinates_to_xyz_mm</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.oav.oav_detector</span><span class="w"> </span><span class="kn">import</span> <span class="n">OAV</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.oav.pin_image_recognition</span><span class="w"> </span><span class="kn">import</span> <span class="n">PinTipDetection</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.smargon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Smargon</span>
 
 <span class="n">Pixel</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>
 
@@ -512,24 +512,29 @@ window.addEventListener("load", () => mermaid.run());
 <div class="viewcode-block" id="get_move_required_so_that_beam_is_at_pixel">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.oav.utils.html#dodal.devices.oav.utils.get_move_required_so_that_beam_is_at_pixel">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_move_required_so_that_beam_is_at_pixel</span><span class="p">(</span>
-    <span class="n">smargon</span><span class="p">:</span> <span class="n">Smargon</span><span class="p">,</span> <span class="n">pixel</span><span class="p">:</span> <span class="n">Pixel</span><span class="p">,</span> <span class="n">oav</span><span class="p">:</span> <span class="n">OAV</span>
+    <span class="n">gonio</span><span class="p">:</span> <span class="n">XYZOmegaStage</span><span class="p">,</span>
+    <span class="n">pixel</span><span class="p">:</span> <span class="n">Pixel</span><span class="p">,</span>
+    <span class="n">oav</span><span class="p">:</span> <span class="n">OAV</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="n">Msg</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the required move so that the given pixel is in the centre of the beam.&quot;&quot;&quot;</span>
 
     <span class="n">current_motor_xyz</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
         <span class="p">[</span>
-            <span class="p">(</span><span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">rd</span><span class="p">(</span><span class="n">smargon</span><span class="o">.</span><span class="n">x</span><span class="p">)),</span>
-            <span class="p">(</span><span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">rd</span><span class="p">(</span><span class="n">smargon</span><span class="o">.</span><span class="n">y</span><span class="p">)),</span>
-            <span class="p">(</span><span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">rd</span><span class="p">(</span><span class="n">smargon</span><span class="o">.</span><span class="n">z</span><span class="p">)),</span>
+            <span class="p">(</span><span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">rd</span><span class="p">(</span><span class="n">gonio</span><span class="o">.</span><span class="n">x</span><span class="p">)),</span>
+            <span class="p">(</span><span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">rd</span><span class="p">(</span><span class="n">gonio</span><span class="o">.</span><span class="n">y</span><span class="p">)),</span>
+            <span class="p">(</span><span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">rd</span><span class="p">(</span><span class="n">gonio</span><span class="o">.</span><span class="n">z</span><span class="p">)),</span>
         <span class="p">],</span>
         <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="n">current_angle</span> <span class="o">=</span> <span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">rd</span><span class="p">(</span><span class="n">smargon</span><span class="o">.</span><span class="n">omega</span><span class="p">)</span>
+    <span class="n">current_angle</span> <span class="o">=</span> <span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">rd</span><span class="p">(</span><span class="n">gonio</span><span class="o">.</span><span class="n">omega</span><span class="p">)</span>
 
     <span class="n">beam_x</span> <span class="o">=</span> <span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">rd</span><span class="p">(</span><span class="n">oav</span><span class="o">.</span><span class="n">beam_centre_i</span><span class="p">)</span>
     <span class="n">beam_y</span> <span class="o">=</span> <span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">rd</span><span class="p">(</span><span class="n">oav</span><span class="o">.</span><span class="n">beam_centre_j</span><span class="p">)</span>
     <span class="n">microns_per_pixel_x</span> <span class="o">=</span> <span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">rd</span><span class="p">(</span><span class="n">oav</span><span class="o">.</span><span class="n">microns_per_pixel_x</span><span class="p">)</span>
     <span class="n">microns_per_pixel_y</span> <span class="o">=</span> <span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">rd</span><span class="p">(</span><span class="n">oav</span><span class="o">.</span><span class="n">microns_per_pixel_y</span><span class="p">)</span>
+    <span class="n">x_direction</span> <span class="o">=</span> <span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">rd</span><span class="p">(</span><span class="n">oav</span><span class="o">.</span><span class="n">x_direction</span><span class="p">)</span>
+    <span class="n">y_direction</span> <span class="o">=</span> <span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">rd</span><span class="p">(</span><span class="n">oav</span><span class="o">.</span><span class="n">y_direction</span><span class="p">)</span>
+    <span class="n">z_direction</span> <span class="o">=</span> <span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">rd</span><span class="p">(</span><span class="n">oav</span><span class="o">.</span><span class="n">z_direction</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">calculate_x_y_z_of_pixel</span><span class="p">(</span>
         <span class="n">current_motor_xyz</span><span class="p">,</span>
@@ -537,6 +542,7 @@ window.addEventListener("load", () => mermaid.run());
         <span class="n">pixel</span><span class="p">,</span>
         <span class="p">(</span><span class="n">beam_x</span><span class="p">,</span> <span class="n">beam_y</span><span class="p">),</span>
         <span class="p">(</span><span class="n">microns_per_pixel_x</span><span class="p">,</span> <span class="n">microns_per_pixel_y</span><span class="p">),</span>
+        <span class="p">(</span><span class="n">x_direction</span><span class="p">,</span> <span class="n">y_direction</span><span class="p">,</span> <span class="n">z_direction</span><span class="p">),</span>
     <span class="p">)</span></div>
 
 
@@ -549,6 +555,7 @@ window.addEventListener("load", () => mermaid.run());
     <span class="n">pixel</span><span class="p">:</span> <span class="n">Pixel</span><span class="p">,</span>
     <span class="n">beam_centre</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span>
     <span class="n">microns_per_pixel</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>
+    <span class="n">xyz_direction</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the x, y, z position of a pixel in mm&quot;&quot;&quot;</span>
     <span class="n">beam_distance_px</span><span class="p">:</span> <span class="n">Pixel</span> <span class="o">=</span> <span class="n">calculate_beam_distance</span><span class="p">(</span><span class="n">beam_centre</span><span class="p">,</span> <span class="o">*</span><span class="n">pixel</span><span class="p">)</span>
@@ -559,6 +566,9 @@ window.addEventListener("load", () => mermaid.run());
         <span class="n">current_omega</span><span class="p">,</span>
         <span class="n">microns_per_pixel</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
         <span class="n">microns_per_pixel</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+        <span class="n">xyz_direction</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+        <span class="n">xyz_direction</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+        <span class="n">xyz_direction</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
     <span class="p">)</span></div>
 
 

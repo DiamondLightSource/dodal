@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.oav.oav_calculations &#8212; dodal 1.65.1.dev1+g2e4d3b1a2 documentation</title>
+    <title>dodal.devices.oav.oav_calculations &#8212; dodal 1.65.1.dev2+gc63b64f11 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=1e4fe170"></script>
+    <script src="../../../../_static/documentation_options.js?v=cddb8b49"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -461,6 +461,9 @@ window.addEventListener("load", () => mermaid.run());
     <span class="n">omega</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">microns_per_i_pixel</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">microns_per_j_pixel</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">x_horizontal_sign</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">y_vertical_sign</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">z_vertical_sign</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Converts from (horizontal,vertical) pixel measurements from the OAV camera into to (x, y, z) motor coordinates in millimetres.</span>
@@ -472,13 +475,16 @@ window.addEventListener("load", () => mermaid.run());
 <span class="sd">        omega (float): The omega angle of the smargon that the horizontal, vertical measurements were obtained at.</span>
 <span class="sd">        microns_per_i_pixel (float): The number of microns per i pixel, adjusted for the zoom level horizontal was measured at.</span>
 <span class="sd">        microns_per_j_pixel (float): The number of microns per j pixel, adjusted for the zoom level vertical was measured at.</span>
+<span class="sd">        x_horizontal_sign (int): Direction mapping for x, positive means the oav and motor are on same direction, default from hyperion</span>
+<span class="sd">        y_vertical_sign (int): Direction mapping for y</span>
+<span class="sd">        z_vertical_sign (int): Direction mapping for z</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Convert the vertical and horizontal into mm.</span>
     <span class="n">horizontal</span> <span class="o">*=</span> <span class="n">microns_per_i_pixel</span> <span class="o">*</span> <span class="mf">1e-3</span>
     <span class="n">vertical</span> <span class="o">*=</span> <span class="n">microns_per_j_pixel</span> <span class="o">*</span> <span class="mf">1e-3</span>
 
     <span class="c1"># +ve x in the OAV camera becomes -ve x in the smargon motors.</span>
-    <span class="n">x</span> <span class="o">=</span> <span class="o">-</span><span class="n">horizontal</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">x_horizontal_sign</span> <span class="o">*</span> <span class="n">horizontal</span>
 
     <span class="c1"># Rotating the camera causes the position on the vertical horizontal to change by raising or lowering the centre.</span>
     <span class="c1"># We can negate this change by multiplying sin and cosine of the omega.</span>
@@ -487,9 +493,8 @@ window.addEventListener("load", () => mermaid.run());
     <span class="n">sine</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">radians</span><span class="p">)</span>
 
     <span class="c1"># +ve y in the OAV camera becomes -ve y in the smargon motors/</span>
-    <span class="n">y</span> <span class="o">=</span> <span class="o">-</span><span class="n">vertical</span> <span class="o">*</span> <span class="n">cosine</span>
-
-    <span class="n">z</span> <span class="o">=</span> <span class="n">vertical</span> <span class="o">*</span> <span class="n">sine</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">y_vertical_sign</span> <span class="o">*</span> <span class="n">vertical</span> <span class="o">*</span> <span class="n">cosine</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">z_vertical_sign</span> <span class="o">*</span> <span class="n">vertical</span> <span class="o">*</span> <span class="n">sine</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span></div>
 
 

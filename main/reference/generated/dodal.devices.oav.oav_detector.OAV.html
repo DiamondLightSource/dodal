@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.oav.oav_detector.OAV &#8212; dodal 1.65.1.dev1+g2e4d3b1a2 documentation</title>
+    <title>dodal.devices.oav.oav_detector.OAV &#8212; dodal 1.65.1.dev2+gc63b64f11 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=1e4fe170"></script>
+    <script src="../../_static/documentation_options.js?v=cddb8b49"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -802,6 +802,7 @@
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.motors.XYPhiStage.html">dodal.devices.motors.XYPhiStage</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.motors.XYPitchStage.html">dodal.devices.motors.XYPitchStage</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.motors.XYStage.html">dodal.devices.motors.XYStage</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.motors.XYZOmegaStage.html">dodal.devices.motors.XYZOmegaStage</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.motors.XYZPitchYawRollStage.html">dodal.devices.motors.XYZPitchYawRollStage</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.motors.XYZPitchYawStage.html">dodal.devices.motors.XYZPitchYawStage</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.motors.XYZStage.html">dodal.devices.motors.XYZStage</a></li>
@@ -1081,13 +1082,24 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="dodal.devices.oav.oav_detector.OAV">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dodal.devices.oav.oav_detector.</span></span><span class="sig-name descname"><span class="pre">OAV</span></span><a class="reference internal" href="../../_modules/dodal/devices/oav/oav_detector.html#OAV"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.oav.oav_detector.OAV" title="Link to this definition">#</a></dt>
-<dd><dl class="field-list simple">
+<dd><p>Class for oav device</p>
+<p>x_direction(int): Should only be 1 or -1, with 1 indicating the oav x direction is the same with motor x
+y_direction(int): Same with x_direction but for motor y
+z_direction(int): Same with x_direction but for motor z
+mjpg_x_size_pv(str): PV infix for x_size in mjpg
+mjpg_y_size_pv(str): PV infix for y_size in mjpg</p>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>prefix</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
 <li><p><strong>config</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="dodal.devices.oav.oav_parameters.OAVConfigBase.html#dodal.devices.oav.oav_parameters.OAVConfigBase" title="dodal.devices.oav.oav_parameters.OAVConfigBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">OAVConfigBase</span></code></a></span>)</p></li>
 <li><p><strong>name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">''</span></code>)</p></li>
 <li><p><strong>zoom_controller</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="dodal.devices.oav.oav_detector.BaseZoomController.html#dodal.devices.oav.oav_detector.BaseZoomController" title="dodal.devices.oav.oav_detector.BaseZoomController"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseZoomController</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
+<li><p><strong>x_direction</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">-1</span></code>)</p></li>
+<li><p><strong>y_direction</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">-1</span></code>)</p></li>
+<li><p><strong>z_direction</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">1</span></code>)</p></li>
+<li><p><strong>mjpg_x_size_pv</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">'ArraySize1_RBV'</span></code>)</p></li>
+<li><p><strong>mjpg_y_size_pv</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">'ArraySize2_RBV'</span></code>)</p></li>
 </ul>
 </dd>
 </dl>

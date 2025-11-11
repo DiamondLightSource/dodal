@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.oav.pin_image_recognition.utils &#8212; dodal 1.65.1.dev1+g2e4d3b1a2 documentation</title>
+    <title>dodal.devices.oav.pin_image_recognition.utils &#8212; dodal 1.65.1.dev2+gc63b64f11 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../../_static/documentation_options.js?v=1e4fe170"></script>
+    <script src="../../../../../_static/documentation_options.js?v=cddb8b49"></script>
     <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -605,6 +605,8 @@ window.addEventListener("load", () => mermaid.run());
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">preprocess</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">arr</span><span class="p">:</span> <span class="n">arr</span><span class="p">,</span>
+        <span class="n">open_ksize</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="n">open_iterations</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
         <span class="n">canny_upper</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
         <span class="n">canny_lower</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">50</span><span class="p">,</span>
         <span class="n">close_ksize</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
@@ -619,6 +621,12 @@ window.addEventListener("load", () => mermaid.run());
 <span class="sd">            preprocess: A preprocessing function applied to the array after conversion to grayscale.</span>
 <span class="sd">                See implementations of common functions above for predefined conversions</span>
 <span class="sd">                Defaults to a no-op (i.e. no preprocessing)</span>
+
+<span class="sd">            for open and close operations, please read:</span>
+<span class="sd">                https://docs.opencv.org/4.x/d9/d61/tutorial_py_morphological_ops.html</span>
+
+<span class="sd">            open_ksize: kernel size for &quot;open&quot; operation, if set to zero then ignore &quot;open&quot; operation</span>
+<span class="sd">            open_iterations: number of iterations for &quot;open&quot; operation</span>
 <span class="sd">            canny_upper: upper threshold for canny edge detection</span>
 <span class="sd">            canny_lower: lower threshold for canny edge detection</span>
 <span class="sd">            close_ksize: kernel size for &quot;close&quot; operation</span>
@@ -628,6 +636,8 @@ window.addEventListener("load", () => mermaid.run());
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">preprocess</span> <span class="o">=</span> <span class="n">preprocess</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">open_ksize</span> <span class="o">=</span> <span class="n">open_ksize</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">open_iterations</span> <span class="o">=</span> <span class="n">open_iterations</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">canny_upper</span> <span class="o">=</span> <span class="n">canny_upper</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">canny_lower</span> <span class="o">=</span> <span class="n">canny_lower</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">close_ksize</span> <span class="o">=</span> <span class="n">close_ksize</span>
@@ -644,8 +654,14 @@ window.addEventListener("load", () => mermaid.run());
             <span class="k">assert</span> <span class="n">arr</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span>
             <span class="n">gray_arr</span> <span class="o">=</span> <span class="n">arr</span>
 
+        <span class="c1"># Remove Noises if open set to non-zero</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">open_ksize</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">open_arr</span> <span class="o">=</span> <span class="n">gray_arr</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">open_arr</span> <span class="o">=</span> <span class="n">open_morph</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">open_ksize</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">open_iterations</span><span class="p">)(</span><span class="n">gray_arr</span><span class="p">)</span>
+
         <span class="c1"># Preprocess the array. (Use the greyscale one.)</span>
-        <span class="n">pp_arr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">preprocess</span><span class="p">(</span><span class="n">gray_arr</span><span class="p">)</span>
+        <span class="n">pp_arr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">preprocess</span><span class="p">(</span><span class="n">open_arr</span><span class="p">)</span>
 
         <span class="c1"># Find some edges.</span>
         <span class="n">edge_arr</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">Canny</span><span class="p">(</span><span class="n">pp_arr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">canny_upper</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">canny_lower</span><span class="p">)</span>

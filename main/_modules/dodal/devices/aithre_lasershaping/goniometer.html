@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.aithre_lasershaping.goniometer &#8212; dodal 1.65.1.dev1+g2e4d3b1a2 documentation</title>
+    <title>dodal.devices.aithre_lasershaping.goniometer &#8212; dodal 1.65.1.dev2+gc63b64f11 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=1e4fe170"></script>
+    <script src="../../../../_static/documentation_options.js?v=cddb8b49"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -452,12 +452,12 @@ window.addEventListener("load", () => mermaid.run());
   <h1>Source code for dodal.devices.aithre_lasershaping.goniometer</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.motor</span><span class="w"> </span><span class="kn">import</span> <span class="n">Motor</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.motors</span><span class="w"> </span><span class="kn">import</span> <span class="n">XYZStage</span><span class="p">,</span> <span class="n">create_axis_perp_to_rotation</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.motors</span><span class="w"> </span><span class="kn">import</span> <span class="n">XYZOmegaStage</span><span class="p">,</span> <span class="n">create_axis_perp_to_rotation</span>
 
 
 <div class="viewcode-block" id="Goniometer">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.aithre_lasershaping.goniometer.Goniometer.html#dodal.devices.aithre_lasershaping.goniometer.Goniometer">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">Goniometer</span><span class="p">(</span><span class="n">XYZStage</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Goniometer</span><span class="p">(</span><span class="n">XYZOmegaStage</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;The Aithre lab goniometer and the XYZ stage it sits on.</span>
 
 <span class="sd">    `x`, `y` and `z` control the axes of the positioner at the base, while `sampy` and</span>
@@ -469,14 +469,31 @@ window.addEventListener("load", () => mermaid.run());
 <span class="sd">    regardless of the current rotation.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">sampy</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;SAMPY&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">sampz</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;SAMPZ&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">omega</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;OMEGA&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">vertical_position</span> <span class="o">=</span> <span class="n">create_axis_perp_to_rotation</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">omega</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sampz</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sampy</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">x_infix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;X&quot;</span><span class="p">,</span>
+        <span class="n">y_infix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Y&quot;</span><span class="p">,</span>
+        <span class="n">z_infix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Z&quot;</span><span class="p">,</span>
+        <span class="n">omega_infix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;OMEGA&quot;</span><span class="p">,</span>
+        <span class="n">sampy_infix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;SAMPY&quot;</span><span class="p">,</span>
+        <span class="n">sampz_infix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;SAMPZ&quot;</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">x_infix</span><span class="o">=</span><span class="n">x_infix</span><span class="p">,</span>
+            <span class="n">y_infix</span><span class="o">=</span><span class="n">y_infix</span><span class="p">,</span>
+            <span class="n">z_infix</span><span class="o">=</span><span class="n">z_infix</span><span class="p">,</span>
+            <span class="n">omega_infix</span><span class="o">=</span><span class="n">omega_infix</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sampy</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="n">sampy_infix</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sampz</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="n">sampz_infix</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">vertical_position</span> <span class="o">=</span> <span class="n">create_axis_perp_to_rotation</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">omega</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sampz</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sampy</span>
+            <span class="p">)</span></div>
 
 </pre></div>
 
