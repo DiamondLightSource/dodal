@@ -97,6 +97,7 @@ class OAV(StandardReadable):
         prefix: str,
         config: OAVConfigBase,
         name: str = "",
+        mjpeg_prefix: str = "MJPG",
         zoom_controller: BaseZoomController | None = None,
         x_direction: int = -1,
         y_direction: int = -1,
@@ -119,7 +120,7 @@ class OAV(StandardReadable):
         self.cam = Cam(f"{prefix}CAM:", name=name)
         with self.add_children_as_readables():
             self.grid_snapshot = SnapshotWithGrid(
-                f"{prefix}MJPG:", name, mjpg_x_size_pv, mjpg_y_size_pv
+                f"{prefix}{mjpeg_prefix}:", name, mjpg_x_size_pv, mjpg_y_size_pv
             )
 
         self.sizes = [self.grid_snapshot.x_size, self.grid_snapshot.y_size]
@@ -142,7 +143,7 @@ class OAV(StandardReadable):
                 coord=soft_signal_rw(datatype=int, initial_value=Coords.Y.value),
             )
             self.snapshot = Snapshot(
-                f"{self._prefix}MJPG:",
+                f"{self._prefix}{mjpeg_prefix}:",
                 self._name,
             )
 
@@ -186,6 +187,7 @@ class OAVBeamCentreFile(OAV):
         prefix: str,
         config: OAVConfigBeamCentre,
         name: str = "",
+        mjpeg_prefix: str = "MJPG",
         zoom_controller: BaseZoomController | None = None,
         mjpg_x_size_pv: str = "ArraySize1_RBV",
         mjpg_y_size_pv: str = "ArraySize2_RBV",
@@ -197,6 +199,7 @@ class OAVBeamCentreFile(OAV):
             prefix=prefix,
             config=config,
             name=name,
+            mjpeg_prefix=mjpeg_prefix,
             zoom_controller=zoom_controller,
             mjpg_x_size_pv=mjpg_x_size_pv,
             mjpg_y_size_pv=mjpg_y_size_pv,
@@ -237,6 +240,7 @@ class OAVBeamCentrePV(OAV):
         prefix: str,
         config: OAVConfig,
         name: str = "",
+        mjpeg_prefix: str = "MJPG",
         zoom_controller: BaseZoomController | None = None,
         overlay_channel: int = 1,
     ):
@@ -247,4 +251,10 @@ class OAVBeamCentrePV(OAV):
             self.beam_centre_j = epics_signal_r(
                 int, prefix + f"OVER:{overlay_channel}:CenterY"
             )
-        super().__init__(prefix, config, name, zoom_controller)
+        super().__init__(
+            prefix=prefix,
+            config=config,
+            name=name,
+            mjpeg_prefix=mjpeg_prefix,
+            zoom_controller=zoom_controller,
+        )
