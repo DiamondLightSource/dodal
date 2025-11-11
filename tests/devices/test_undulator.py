@@ -227,4 +227,3 @@ async def test_move_order_fails(
         match=f"Undulator order must be a positive integer. Requested value: {order_value}",
     ):
         await undulator_order.set(order_value)  # type: ignore
-
