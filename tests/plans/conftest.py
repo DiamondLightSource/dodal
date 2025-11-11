@@ -79,6 +79,13 @@ def y_axis() -> SimMotor:
 
 
 @pytest.fixture
+def z_axis() -> SimMotor:
+    with init_devices(mock=True):
+        z_axis = SimMotor()
+    return z_axis
+
+
+@pytest.fixture
 def path_provider(static_path_provider: PathProvider):
     # Prevents issue with leftover state from beamline tests
     with patch("dodal.plan_stubs.data_session.get_path_provider") as mock:
