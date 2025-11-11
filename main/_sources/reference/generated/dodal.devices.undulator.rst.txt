@@ -14,7 +14,9 @@ dodal.devices.undulator
    :toctree:
    :recursive:
 
-   ~undulator.Undulator
+   ~undulator.BaseUndulator
+   ~undulator.UndulatorInKeV
+   ~undulator.UndulatorInMm
    ~undulator.UndulatorOrder
 
 

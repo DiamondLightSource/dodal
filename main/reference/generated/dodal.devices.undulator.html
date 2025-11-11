@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.undulator &#8212; dodal 1.65.1.dev3+gd64d1efbb documentation</title>
+    <title>dodal.devices.undulator &#8212; dodal 1.65.1.dev4+gc3fb578ae documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=1007128d"></script>
+    <script src="../../_static/documentation_options.js?v=58311261"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -58,7 +58,7 @@
     <link rel="icon" href="../../_static/dls-logo.svg"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="dodal.devices.undulator.Undulator" href="dodal.devices.undulator.Undulator.html" />
+    <link rel="next" title="dodal.devices.undulator.BaseUndulator" href="dodal.devices.undulator.BaseUndulator.html" />
     <link rel="prev" title="dodal.devices.turbo_slit.TurboSlit" href="dodal.devices.turbo_slit.TurboSlit.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -938,7 +938,9 @@
 </ul>
 </details></li>
 <li class="toctree-l3 current active has-children"><a class="current reference internal" href="#">dodal.devices.undulator</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.undulator.Undulator.html">dodal.devices.undulator.Undulator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.undulator.BaseUndulator.html">dodal.devices.undulator.BaseUndulator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.undulator.UndulatorInKeV.html">dodal.devices.undulator.UndulatorInKeV</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.undulator.UndulatorInMm.html">dodal.devices.undulator.UndulatorInMm</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.undulator.UndulatorOrder.html">dodal.devices.undulator.UndulatorOrder</a></li>
 </ul>
 </details></li>
@@ -1076,8 +1078,14 @@
 <p class="rubric">Classes</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.undulator.Undulator.html#dodal.devices.undulator.Undulator" title="dodal.devices.undulator.Undulator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Undulator</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.undulator.BaseUndulator.html#dodal.devices.undulator.BaseUndulator" title="dodal.devices.undulator.BaseUndulator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BaseUndulator</span></code></a></p></td>
+<td><p>Base class for undulator devices providing gap control and access management.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.undulator.UndulatorInKeV.html#dodal.devices.undulator.UndulatorInKeV" title="dodal.devices.undulator.UndulatorInKeV"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UndulatorInKeV</span></code></a></p></td>
 <td><p>An Undulator-type insertion device, used to control photon emission at a given beam energy.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.undulator.UndulatorInMm.html#dodal.devices.undulator.UndulatorInMm" title="dodal.devices.undulator.UndulatorInMm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UndulatorInMm</span></code></a></p></td>
+<td><p>An Undulator-type insertion device, used to control photon emission.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.undulator.UndulatorOrder.html#dodal.devices.undulator.UndulatorOrder" title="dodal.devices.undulator.UndulatorOrder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UndulatorOrder</span></code></a></p></td>
 <td><p>Represents the order of an undulator device.</p></td>
@@ -1116,11 +1124,11 @@
       </div>
     </a>
     <a class="right-next"
-       href="dodal.devices.undulator.Undulator.html"
+       href="dodal.devices.undulator.BaseUndulator.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">dodal.devices.undulator.Undulator</p>
+        <p class="prev-next-title">dodal.devices.undulator.BaseUndulator</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
