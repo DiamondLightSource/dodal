@@ -42,5 +42,5 @@ async def test_ev_to_kev(
     energy_kev: float,
     energy_ev: float,
 ):
-    set_mock_value(dcm.energy_in_kev.user_readback, energy_kev)
-    await assert_value(dcm.energy_in_ev, energy_ev)
+    set_mock_value(dcm.energy_in_keV.user_readback, energy_kev)
+    await assert_value(dcm.energy_in_eV, energy_ev)

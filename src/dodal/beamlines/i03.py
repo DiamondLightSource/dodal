@@ -21,7 +21,7 @@ from dodal.devices.attenuator.attenuator import BinaryFilterAttenuator
 from dodal.devices.backlight import Backlight
 from dodal.devices.baton import Baton
 from dodal.devices.collimation_table import CollimationTable
-from dodal.devices.cryostream import CryoStream
+from dodal.devices.cryostream import CryoStream, CryoStreamGantry
 from dodal.devices.detector.detector_motion import DetectorMotion
 from dodal.devices.diamond_filter import DiamondFilter, I03Filters
 from dodal.devices.eiger import EigerDetector
@@ -44,7 +44,7 @@ from dodal.devices.scintillator import Scintillator
 from dodal.devices.smargon import Smargon
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.thawer import Thawer
-from dodal.devices.undulator import Undulator
+from dodal.devices.undulator import UndulatorInKeV
 from dodal.devices.webcam import Webcam
 from dodal.devices.xbpm_feedback import XBPMFeedback
 from dodal.devices.xspress3.xspress3 import Xspress3
@@ -256,11 +256,11 @@ def synchrotron() -> Synchrotron:
 
 
 @device_factory()
-def undulator(daq_configuration_path: str | None = None) -> Undulator:
+def undulator(daq_configuration_path: str | None = None) -> UndulatorInKeV:
     """Get the i03 undulator device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return Undulator(
+    return UndulatorInKeV(
         f"{BeamlinePrefix(BL).insertion_prefix}-MO-SERVC-01:",
         # evaluate here not as parameter default to enable post-import mocking
         id_gap_lookup_table_path=f"{daq_configuration_path or DAQ_CONFIGURATION_PATH}/lookup/BeamLine_Undulator_toGap.txt",
@@ -394,6 +394,14 @@ def cryostream() -> CryoStream:
     If this is called when already instantiated in i03, it will return the existing object.
     """
     return CryoStream(PREFIX.beamline_prefix)
+
+
+@device_factory()
+def cryostream_gantry() -> CryoStreamGantry:
+    """Get the i03 cryostream gantry device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i03, it will return the existing object.
+    """
+    return CryoStreamGantry(PREFIX.beamline_prefix)
 
 
 @device_factory()
