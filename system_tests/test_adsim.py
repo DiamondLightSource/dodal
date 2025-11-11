@@ -90,7 +90,7 @@ def test_plan_produces_expected_start_document(
     run_engine_documents: Mapping[str, list[DocumentType]],
     det: StandardDetector,
 ):
-    run_engine(count({det}, num=num))
+    run_engine(count([det], num=num))
 
     docs = run_engine_documents.get("start")
     assert docs and len(docs) == 1
@@ -115,7 +115,7 @@ def test_plan_produces_expected_stop_document(
     run_engine_documents: Mapping[str, list[DocumentType]],
     det: StandardDetector,
 ):
-    run_engine(count({det}, num=num))
+    run_engine(count([det], num=num))
 
     docs = run_engine_documents.get("stop")
     assert docs and len(docs) == 1
@@ -132,7 +132,7 @@ def test_plan_produces_expected_descriptor(
     run_engine_documents: Mapping[str, list[DocumentType]],
     det: StandardDetector,
 ):
-    run_engine(count({det}, num=num))
+    run_engine(count([det], num=num))
 
     docs = run_engine_documents.get("descriptor")
     assert docs and len(docs) == 1
@@ -151,7 +151,7 @@ def test_plan_produces_expected_events(
     run_engine_documents: Mapping[str, list[DocumentType]],
     det: StandardDetector,
 ):
-    run_engine(count({det}, num=num))
+    run_engine(count([det], num=num))
 
     docs = run_engine_documents.get("event")
     assert docs and len(docs) == length
@@ -169,7 +169,7 @@ def test_plan_produces_expected_resources(
     run_engine_documents: Mapping[str, list[DocumentType]],
     det: StandardDetector,
 ):
-    run_engine(count({det}, num=num))
+    run_engine(count([det], num=num))
     docs = run_engine_documents.get("stream_resource")
     data_keys = [det.name]
     assert docs and len(docs) == len(data_keys)
@@ -192,7 +192,7 @@ def test_plan_produces_expected_datums(
     run_engine_documents: Mapping[str, list[DocumentType]],
     det: StandardDetector,
 ):
-    run_engine(count({det}, num=num))
+    run_engine(count([det], num=num))
     docs = cast(list[StreamDatum], run_engine_documents.get("stream_datum"))
     data_keys = [det.name]  # If we enable e.g. Stats plugin add to this
     assert (
