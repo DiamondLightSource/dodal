@@ -20,6 +20,7 @@ from dodal.devices.eiger import EigerDetector
 from dodal.devices.fast_grid_scan import ZebraFastGridScanThreeD
 from dodal.devices.flux import Flux
 from dodal.devices.i03.dcm import DCM
+from dodal.devices.i04.beamsize import Beamsize
 from dodal.devices.i04.constants import RedisConstants
 from dodal.devices.i04.murko_results import MurkoResultsDevice
 from dodal.devices.i04.transfocator import Transfocator
@@ -376,4 +377,15 @@ def scintillator() -> Scintillator:
         f"{PREFIX.beamline_prefix}-MO-SCIN-01:",
         Reference(aperture_scatterguard()),
         get_beamline_parameters(),
+    )
+
+
+@device_factory()
+def beamsize() -> Beamsize:
+    """Get the i03 beamstop device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i03, it will return the existing object.
+    """
+    return Beamsize(
+        transfocator=transfocator(),
+        aperture_scatterguard=aperture_scatterguard(),
     )
