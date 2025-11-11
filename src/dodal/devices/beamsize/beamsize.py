@@ -5,4 +5,5 @@ class BeamsizeBase(StandardReadable):
     x_um: SignalR[float]
     y_um: SignalR[float]
 
-    def __init__(self): ...
+    def __init__(self):
+        super().__init__()
