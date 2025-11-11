@@ -55,3 +55,111 @@ def count(
     metadata = metadata or {}
     metadata["shape"] = (num,)
     yield from bp.count(tuple(detectors), num, delay=delay, md=metadata)
+
+
+def scan(
+    detectors: Annotated[
+        set[Readable] | list[Readable],
+        Field(
+            description="Set of readable devices, will take a reading at each point",
+            min_length=1,
+        ),
+    ],
+    args: Annotated[
+        tuple,
+        Field(
+            description="For one or more dimensions, 'motor1, start1, stop1, ..., "
+            "motorN, startN, stopN'. Motors can be any 'settable' object (motor, "
+            "temp controller, etc.)"
+        ),
+    ],
+    num: Annotated[int, Field(description="Number of points")],
+    metadata: dict[str, Any] | None = None,
+) -> MsgGenerator:
+    """Scan over one multi-motor trajectory.
+    Wraps bluesky.plans.scan(det, *args, num, md=metadata)"""
+    metadata = metadata or {}
+    metadata["shape"] = (num,)
+    yield from bp.scan(tuple(detectors), *args, num=num, md=metadata)
+
+
+def rel_scan(
+    detectors: Annotated[
+        set[Readable] | list[Readable],
+        Field(
+            description="Set of readable devices, will take a reading at each point",
+            min_length=1,
+        ),
+    ],
+    args: Annotated[
+        tuple,
+        Field(
+            description="For one or more dimensions, 'motor1, start1, stop1, ..., "
+            "motorN, startN, stopN'. Motors can be any 'settable' object (motor, "
+            "temp controller, etc.)"
+        ),
+    ],
+    num: Annotated[int, Field(description="Number of points")],
+    metadata: dict[str, Any] | None = None,
+) -> MsgGenerator:
+    """Scan over one multi-motor trajectory, relative to current position.
+    Wraps bluesky.plans.rel_scan(det, *args, num, md=metadata)"""
+    metadata = metadata or {}
+    metadata["shape"] = (num,)
+    yield from bp.rel_scan(tuple(detectors), *args, num=num, md=metadata)
+
+
+def grid_scan(
+    detectors: Annotated[
+        set[Readable] | list[Readable],
+        Field(
+            description="Set of readable devices, will take a reading at each point",
+            min_length=1,
+        ),
+    ],
+    args: Annotated[
+        tuple,
+        Field(
+            description="Patterend like (motor1, start1, stop1, num1, ..., motorN, "
+            "startN, stopN, numN). The first motor is the 'slowest', the outer loop. "
+            "For all motors except the first motor, there is a 'snake' argument: a"
+            "boolean indicating whether to follow snake-like, winding trajectory or a"
+            "simple left to right."
+        ),
+    ],
+    snake_axes: list | bool | None = None,
+    metadata: dict[str, Any] | None = None,
+) -> MsgGenerator:
+    """Scan over a mesh; each motor is on an independent trajectory.
+    Wraps bluesky.plans.grid_scan(det, *args, snake_axes, md=metadata)"""
+    metadata = metadata or {}
+    yield from bp.grid_scan(tuple(detectors), *args, snake_axes=snake_axes, md=metadata)
+
+
+def rel_grid_scan(
+    detectors: Annotated[
+        set[Readable] | list[Readable],
+        Field(
+            description="Set of readable devices, will take a reading at each point",
+            min_length=1,
+        ),
+    ],
+    args: Annotated[
+        tuple,
+        Field(
+            description="Patterend like (motor1, start1, stop1, num1, ..., motorN, "
+            "startN, stopN, numN). The first motor is the 'slowest', the outer loop. "
+            "For all motors except the first motor, there is a 'snake' argument: a"
+            "boolean indicating whether to follow snake-like, winding trajectory or a"
+            "simple left to right."
+        ),
+    ],
+    snake_axes: list | bool | None = None,
+    metadata: dict[str, Any] | None = None,
+) -> MsgGenerator:
+    """Scan over a mesh relative to current position.
+    Wraps bluesky.plans.rel_grid_scan(det, *args, snake_axes, md=metadata)"""
+    metadata = metadata or {}
+    yield from bp.rel_grid_scan(
+        tuple(detectors), *args, snake_axes=snake_axes, md=metadata
+    )

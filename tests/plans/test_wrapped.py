@@ -1,5 +1,5 @@
 from collections.abc import Sequence
-from typing import cast
+from typing import Any, cast
 
 import pytest
 from bluesky.protocols import Readable
@@ -17,7 +17,8 @@ from ophyd_async.core import (
 )
 from pydantic import ValidationError
 
-from dodal.plans.wrapped import count
+from dodal.devices.motors import Motor
+from dodal.plans.wrapped import count, grid_scan, rel_grid_scan, rel_scan, scan
 
 
 @pytest.fixture
@@ -157,3 +158,361 @@ def test_plan_produces_expected_datums(
     docs = documents_from_num.get("stream_datum")
     data_keys = [det.name, f"{det.name}-sum"]
     assert docs and len(docs) == len(data_keys) * length
+
+
+@pytest.mark.parametrize("x_start, x_stop, num", ([0, 2, 5], [1, -1, 3]))
+def test_scan(
+    run_engine: RunEngine,
+    det: StandardDetector,
+    x_axis: Motor,
+    x_start: Any,
+    x_stop: Any,
+    num: int,
+):
+    run_engine(scan(detectors={det}, args=(x_axis, x_start, x_stop), num=num))
+
+
+@pytest.mark.parametrize(
+    "x_start, x_stop, y_start, y_stop, num", ([0, 2, 2, 0, 5], [-1, 1, -1, 1, 3])
+)
+def test_scan_with_two_axes(
+    run_engine: RunEngine,
+    det: StandardDetector,
+    x_axis: Motor,
+    x_start: Any,
+    x_stop: Any,
+    y_axis: Motor,
+    y_start: Any,
+    y_stop: Any,
+    num: int,
+):
+    run_engine(
+        scan(
+            detectors={det},
+            args=(x_axis, x_start, x_stop, y_axis, y_start, y_stop),
+            num=num,
+        )
+    )
+
+
+@pytest.mark.parametrize(
+    "x_start, x_stop, y_start, y_stop, num", ([-1, 1, 2, 0, 0], [-1, 1, -1, 1, 3.5])
+)
+def test_scan_fails_when_given_bad_info(
+    run_engine: RunEngine,
+    det: StandardDetector,
+    x_axis: Motor,
+    x_start: Any,
+    x_stop: Any,
+    y_axis: Motor,
+    y_start: Any,
+    y_stop: Any,
+    num: int,
+):
+    with pytest.raises(ValueError):
+        run_engine(
+            scan(
+                detectors={det},
+                args=(x_axis, x_start, x_stop, y_axis, y_start, y_stop),
+                num=num,
+            )
+        )
+
+
+@pytest.mark.parametrize("x_start, x_stop, num", ([0, 2, 5], [1, -1, 3]))
+def test_rel_scan(
+    run_engine: RunEngine,
+    det: StandardDetector,
+    x_axis: Motor,
+    x_start: Any,
+    x_stop: Any,
+    num: int,
+):
+    run_engine(rel_scan(detectors={det}, args=(x_axis, x_start, x_stop), num=num))
+
+
+@pytest.mark.parametrize(
+    "x_start, x_stop, y_start, y_stop, num", ([0, 2, 2, 0, 5], [-1, 1, -1, 1, 3])
+)
+def test_rel_scan_with_two_axes(
+    run_engine: RunEngine,
+    det: StandardDetector,
+    x_axis: Motor,
+    x_start: Any,
+    x_stop: Any,
+    y_axis: Motor,
+    y_start: Any,
+    y_stop: Any,
+    num: int,
+):
+    run_engine(
+        rel_scan(
+            detectors={det},
+            args=(x_axis, x_start, x_stop, y_axis, y_start, y_stop),
+            num=num,
+        )
+    )
+
+
+@pytest.mark.parametrize(
+    "x_start, x_stop, y_start, y_stop, num", ([-1, 1, 2, 0, 0], [-1, 1, -1, 1, 3.5])
+)
+def test_rel_scan_fails_when_given_bad_info(
+    run_engine: RunEngine,
+    det: StandardDetector,
+    x_axis: Motor,
+    x_start: Any,
+    x_stop: Any,
+    y_axis: Motor,
+    y_start: Any,
+    y_stop: Any,
+    num: int,
+):
+    with pytest.raises(ValueError):
+        run_engine(
+            rel_scan(
+                detectors={det},
+                args=(x_axis, x_start, x_stop, y_axis, y_start, y_stop),
+                num=num,
+            )
+        )
+
+
+@pytest.mark.parametrize(
+    "x_start, x_stop, x_num, y_start, y_stop, y_num",
+    ([0, 2, 3, 0, 2, 3], [-1, 1, 5, 1, -1, 5]),
+)
+def test_grid_scan(
+    run_engine: RunEngine,
+    det: StandardDetector,
+    x_axis: Motor,
+    x_start: Any,
+    x_stop: Any,
+    x_num: int,
+    y_axis: Motor,
+    y_start: Any,
+    y_stop: Any,
+    y_num: int,
+):
+    run_engine(
+        grid_scan(
+            detectors={det},
+            args=(y_axis, y_start, y_stop, y_num, x_axis, x_start, x_stop, x_num),
+        )
+    )
+
+
+@pytest.mark.parametrize(
+    "x_start, x_stop, x_num, y_start, y_stop, y_num",
+    ([0, 2, 3, 0, 2, 3], [-1, 1, 5, 1, -1, 5]),
+)
+def test_grid_scan_when_snaking(
+    run_engine: RunEngine,
+    det: StandardDetector,
+    x_axis: Motor,
+    x_start: Any,
+    x_stop: Any,
+    x_num: int,
+    y_axis: Motor,
+    y_start: Any,
+    y_stop: Any,
+    y_num: int,
+):
+    run_engine(
+        grid_scan(
+            detectors={det},
+            args=(y_axis, y_start, y_stop, y_num, x_axis, x_start, x_stop, x_num),
+            snake_axes=True,
+        )
+    )
+
+
+@pytest.mark.parametrize(
+    "x_start, x_stop, x_num, y_start, y_stop, y_num",
+    ([0, 2, 3, 0, 2, 3], [-1, 1, 5, 1, -1, 5]),
+)
+def test_grid_scan_when_snaking_subset_of_axes(
+    run_engine: RunEngine,
+    det: StandardDetector,
+    x_axis: Motor,
+    x_start: Any,
+    x_stop: Any,
+    x_num: int,
+    y_axis: Motor,
+    y_start: Any,
+    y_stop: Any,
+    y_num: int,
+):
+    run_engine(
+        grid_scan(
+            detectors={det},
+            args=(y_axis, y_start, y_stop, y_num, x_axis, x_start, x_stop, x_num),
+            snake_axes=[x_axis],
+        )
+    )
+
+
+def test_grid_scan_fails_when_snaking_slow_axis(
+    run_engine: RunEngine,
+    det: StandardDetector,
+    x_axis: Motor,
+    y_axis: Motor,
+):
+    with pytest.raises(ValueError):
+        run_engine(
+            grid_scan(
+                detectors={det},
+                args=(y_axis, 0, 2, 3, x_axis, 0, 2, 3),
+                snake_axes=[y_axis],
+            )
+        )
+
+
+def test_grid_scan_fails_when_given_length_of_zero(
+    run_engine: RunEngine,
+    det: StandardDetector,
+    x_axis: Motor,
+    y_axis: Motor,
+):
+    with pytest.raises(RuntimeError):
+        run_engine(
+            grid_scan(
+                detectors={det},
+                args=(y_axis, 0, 2, 0, x_axis, 0, 2, 3),
+            )
+        )
+
+
+def test_grid_scan_fails_when_given_non_integer_length(
+    run_engine: RunEngine,
+    det: StandardDetector,
+    x_axis: Motor,
+    y_axis: Motor,
+):
+    with pytest.raises(TypeError):
+        run_engine(
+            grid_scan(
+                detectors={det},
+                args=(y_axis, 0, 2, 3.5, x_axis, 0, 2, 3),
+            )
+        )
+
+
+@pytest.mark.parametrize(
+    "x_start, x_stop, x_num, y_start, y_stop, y_num",
+    ([0, 2, 3, 0, 2, 3], [-1, 1, 5, 1, -1, 5]),
+)
+def test_rel_grid_scan(
+    run_engine: RunEngine,
+    det: StandardDetector,
+    x_axis: Motor,
+    x_start: Any,
+    x_stop: Any,
+    x_num: int,
+    y_axis: Motor,
+    y_start: Any,
+    y_stop: Any,
+    y_num: int,
+):
+    run_engine(
+        rel_grid_scan(
+            detectors={det},
+            args=(y_axis, y_start, y_stop, y_num, x_axis, x_start, x_stop, x_num),
+        )
+    )
+
+
+@pytest.mark.parametrize(
+    "x_start, x_stop, x_num, y_start, y_stop, y_num",
+    ([0, 2, 3, 0, 2, 3], [-1, 1, 5, 1, -1, 5]),
+)
+def test_rel_grid_scan_when_snaking(
+    run_engine: RunEngine,
+    det: StandardDetector,
+    x_axis: Motor,
+    x_start: Any,
+    x_stop: Any,
+    x_num: int,
+    y_axis: Motor,
+    y_start: Any,
+    y_stop: Any,
+    y_num: int,
+):
+    run_engine(
+        rel_grid_scan(
+            detectors={det},
+            args=(y_axis, y_start, y_stop, y_num, x_axis, x_start, x_stop, x_num),
+            snake_axes=True,
+        )
+    )
+
+
+@pytest.mark.parametrize(
+    "x_start, x_stop, x_num, y_start, y_stop, y_num",
+    ([0, 2, 3, 0, 2, 3], [-1, 1, 5, 1, -1, 5]),
+)
+def test_rel_grid_scan_when_snaking_subset_of_axes(
+    run_engine: RunEngine,
+    det: StandardDetector,
+    x_axis: Motor,
+    x_start: Any,
+    x_stop: Any,
+    x_num: int,
+    y_axis: Motor,
+    y_start: Any,
+    y_stop: Any,
+    y_num: int,
+):
+    run_engine(
+        rel_grid_scan(
+            detectors={det},
+            args=(y_axis, y_start, y_stop, y_num, x_axis, x_start, x_stop, x_num),
+            snake_axes=[x_axis],
+        )
+    )
+
+
+def test_rel_grid_scan_fails_when_snaking_slow_axis(
+    run_engine: RunEngine,
+    det: StandardDetector,
+    x_axis: Motor,
+    y_axis: Motor,
+):
+    with pytest.raises(ValueError):
+        run_engine(
+            rel_grid_scan(
+                detectors={det},
+                args=(y_axis, 0, 2, 3, x_axis, 0, 2, 3),
+                snake_axes=[y_axis],
+            )
+        )
+
+
+def test_rel_grid_scan_fails_when_given_length_of_zero(
+    run_engine: RunEngine,
+    det: StandardDetector,
+    x_axis: Motor,
+    y_axis: Motor,
+):
+    with pytest.raises(RuntimeError):
+        run_engine(
+            rel_grid_scan(
+                detectors={det},
+                args=(y_axis, 0, 2, 0, x_axis, 0, 2, 3),
+            )
+        )
+
+
+def test_rel_grid_scan_fails_when_given_non_integer_length(
+    run_engine: RunEngine,
+    det: StandardDetector,
+    x_axis: Motor,
+    y_axis: Motor,
+):
+    with pytest.raises(TypeError):
+        run_engine(
+            rel_grid_scan(
+                detectors={det},
+                args=(y_axis, 0, 2, 3.5, x_axis, 0, 2, 3),
+            )
+        )
