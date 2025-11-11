@@ -159,7 +159,7 @@ class BaseUndulator(StandardReadable, Movable[float], ABC):
 class UndulatorInKeV(BaseUndulator):
     """
     An Undulator-type insertion device, used to control photon emission at a given beam energy.
-    This class expects energy [keV] passed in set method and does convertion to gap
+    This class expects energy [keV] passed in set method and does conversion to gap
     internally, for which it requires path to lookup table file in constructor.
     """
 
@@ -231,35 +231,6 @@ class UndulatorInMm(BaseUndulator):
     An Undulator-type insertion device, used to control photon emission.
     This class expects gap [mm] passed in set method.
     """
-
-    def __init__(
-        self,
-        prefix: str,
-        poles: int | None = None,
-        length: float | None = None,
-        undulator_period: int | None = None,
-        baton: Baton | None = None,
-        name: str = "",
-    ) -> None:
-        """Constructor
-
-        Args:
-            prefix: PV prefix
-            poles (int, optional): Number of magnetic poles built into the undulator
-            length (float, optional): Length of the undulator in meters
-            undulator_period(int, optional): Undulator period
-            baton (optional): Baton object if provided.
-            name (str, optional): Name for device. Defaults to "".
-        """
-
-        super().__init__(
-            prefix=prefix,
-            poles=poles,
-            length=length,
-            undulator_period=undulator_period,
-            baton=baton,
-            name=name,
-        )
 
     @AsyncStatus.wrap
     async def set(self, value: float):
