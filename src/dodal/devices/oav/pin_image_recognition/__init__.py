@@ -67,6 +67,8 @@ class PinTipDetection(StandardReadable):
         )
         self.canny_upper_threshold = soft_signal_rw(int, 100, name="canny_upper")
         self.canny_lower_threshold = soft_signal_rw(int, 50, name="canny_lower")
+        self.open_ksize = soft_signal_rw(int, 0, name="open_ksize")
+        self.open_iterations = soft_signal_rw(int, 5, name="open_iterations")
         self.close_ksize = soft_signal_rw(int, 5, name="close_ksize")
         self.close_iterations = soft_signal_rw(int, 5, name="close_iterations")
         self.scan_direction = soft_signal_rw(
@@ -105,7 +107,7 @@ class PinTipDetection(StandardReadable):
 
         try:
             preprocess_func = ARRAY_PROCESSING_FUNCTIONS_MAP[preprocess_key](
-                iter=preprocess_iter, ksize=preprocess_ksize
+                iterations=preprocess_iter, ksize=preprocess_ksize
             )
         except KeyError:
             LOGGER.error("Invalid preprocessing function, using identity")
@@ -121,6 +123,8 @@ class PinTipDetection(StandardReadable):
             preprocess=preprocess_func,
             canny_lower=await self.canny_lower_threshold.get_value(),
             canny_upper=await self.canny_upper_threshold.get_value(),
+            open_ksize=await self.open_ksize.get_value(),
+            open_iterations=await self.open_iterations.get_value(),
             close_ksize=await self.close_ksize.get_value(),
             close_iterations=await self.close_iterations.get_value(),
             scan_direction=direction,

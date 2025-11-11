@@ -24,6 +24,8 @@ async def energy_distance_table(
 
     Args:
         lookup_table_path: Path to lookup table
+        comments: Lines starting with any of these strings will be ignored
+        skiprows: Number of rows to skip at the start of the file
 
     Returns:
         ndarray: Lookup table

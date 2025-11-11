@@ -2,7 +2,7 @@ import os
 from abc import ABC, abstractmethod
 
 import numpy as np
-from bluesky.protocols import Movable
+from bluesky.protocols import Locatable, Location, Movable
 from numpy import ndarray
 from ophyd_async.core import (
     AsyncStatus,
@@ -10,6 +10,7 @@ from ophyd_async.core import (
     StandardReadable,
     StandardReadableFormat,
     soft_signal_r_and_setter,
+    soft_signal_rw,
 )
 from ophyd_async.epics.core import epics_signal_r
 from ophyd_async.epics.motor import Motor
@@ -241,3 +242,30 @@ class UndulatorInMm(BaseUndulator):
             value: value in mm
         """
         await self._set_gap(value)
+
+
+class UndulatorOrder(StandardReadable, Locatable[int]):
+    """
+    Represents the order of an undulator device. Allows setting and locating the order.
+    """
+
+    def __init__(self, name: str = "") -> None:
+        """
+        Args:
+            name: Name for device. Defaults to ""
+        """
+        with self.add_children_as_readables():
+            self._value = soft_signal_rw(int, initial_value=3)
+        super().__init__(name=name)
+
+    @AsyncStatus.wrap
+    async def set(self, value: int) -> None:
+        if (value >= 0) and isinstance(value, int):
+            await self._value.set(value)
+        else:
+            raise ValueError(
+                f"Undulator order must be a positive integer. Requested value: {value}"
+            )
+
+    async def locate(self) -> Location[int]:
+        return await self._value.locate()
