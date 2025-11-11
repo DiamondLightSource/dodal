@@ -46,9 +46,14 @@ class NullZoomController(BaseZoomController):
     def __init__(self):
         self.level = soft_signal_rw(str, "1.0x")
         self.percentage = soft_signal_rw(float, 100)
+        super().__init__()
 
-    def set(self, value):
-        raise Exception("Attempting to set zoom level of a null zoom controller")
+    @AsyncStatus.wrap
+    async def set(self, value: str) -> None:
+        if value != "1.0x":
+            raise Exception("Attempting to set zoom level of a null zoom controller")
+        else:
+            await self.level.set(value, wait=True)
 
 
 class ZoomController(BaseZoomController):
@@ -74,6 +79,16 @@ class ZoomController(BaseZoomController):
 
 
 class OAV(StandardReadable):
+    """
+    Class for oav device
+
+    x_direction(int): Should only be 1 or -1, with 1 indicating the oav x direction is the same with motor x
+    y_direction(int): Same with x_direction but for motor y
+    z_direction(int): Same with x_direction but for motor z
+    mjpg_x_size_pv(str): PV infix for x_size in mjpg
+    mjpg_y_size_pv(str): PV infix for y_size in mjpg
+    """
+
     beam_centre_i: SignalR[int]
     beam_centre_j: SignalR[int]
 
@@ -83,6 +98,11 @@ class OAV(StandardReadable):
         config: OAVConfigBase,
         name: str = "",
         zoom_controller: BaseZoomController | None = None,
+        x_direction: int = -1,
+        y_direction: int = -1,
+        z_direction: int = 1,
+        mjpg_x_size_pv: str = "ArraySize1_RBV",
+        mjpg_y_size_pv: str = "ArraySize2_RBV",
     ):
         self.oav_config = config
         self._prefix = prefix
@@ -98,9 +118,15 @@ class OAV(StandardReadable):
 
         self.cam = Cam(f"{prefix}CAM:", name=name)
         with self.add_children_as_readables():
-            self.grid_snapshot = SnapshotWithGrid(f"{prefix}MJPG:", name)
+            self.grid_snapshot = SnapshotWithGrid(
+                f"{prefix}MJPG:", name, mjpg_x_size_pv, mjpg_y_size_pv
+            )
 
         self.sizes = [self.grid_snapshot.x_size, self.grid_snapshot.y_size]
+        with self.add_children_as_readables():
+            self.x_direction = soft_signal_rw(int, x_direction, name="x_direction")
+            self.y_direction = soft_signal_rw(int, y_direction, name="y_direction")
+            self.z_direction = soft_signal_rw(int, z_direction, name="z_direction")
 
         with self.add_children_as_readables():
             self.microns_per_pixel_x = derived_signal_r(
@@ -143,9 +169,16 @@ class OAV(StandardReadable):
 
 
 class OAVBeamCentreFile(OAV):
-    """OAV device that reads its beam centre values from a file. The config parameter
+    """
+    OAV device that reads its beam centre values from a file. The config parameter
     must be a OAVConfigBeamCentre object, as this contains a filepath to where the beam
     centre values are stored.
+
+    x_direction(int): Should only be 1 or -1, with 1 indicating the oav x direction is the same with motor x
+    y_direction(int): Same with x_direction but for motor y
+    z_direction(int): Same with x_direction but for motor z
+    mjpg_x_size_pv(str): PV infix for x_size in mjpg
+    mjpg_y_size_pv(str): PV infix for y_size in mjpg
     """
 
     def __init__(
@@ -154,8 +187,23 @@ class OAVBeamCentreFile(OAV):
         config: OAVConfigBeamCentre,
         name: str = "",
         zoom_controller: BaseZoomController | None = None,
+        mjpg_x_size_pv: str = "ArraySize1_RBV",
+        mjpg_y_size_pv: str = "ArraySize2_RBV",
+        x_direction: int = -1,
+        y_direction: int = -1,
+        z_direction: int = 1,
     ):
-        super().__init__(prefix, config, name, zoom_controller)
+        super().__init__(
+            prefix=prefix,
+            config=config,
+            name=name,
+            zoom_controller=zoom_controller,
+            mjpg_x_size_pv=mjpg_x_size_pv,
+            mjpg_y_size_pv=mjpg_y_size_pv,
+            x_direction=x_direction,
+            y_direction=y_direction,
+            z_direction=z_direction,
+        )
 
         with self.add_children_as_readables():
             self.beam_centre_i = derived_signal_r(
