@@ -8,13 +8,28 @@ import pytest
 from aiohttp.client_exceptions import ClientConnectorError
 from ophyd_async.core import init_devices
 from ophyd_async.testing import set_mock_value
+from tests.devices.oav.conftest import (
+    oav_beam_centre_pv_fs,  # noqa: F401
+    oav_beam_centre_pv_roi,  # noqa: F401
+)
 
+from dodal.devices.oav.oav_detector import OAV
 from dodal.devices.oav.oav_to_redis_forwarder import OAVToRedisForwarder, Source
 
 
-def _oav_to_redis_forwarder(mock):
+def _oav_to_redis_forwarder(
+    mock,
+    oav_roi: OAV,
+    oav_fs: OAV,
+):
     with init_devices(mock=mock):
-        oav_forwarder = OAVToRedisForwarder("BL04I-DI-OAV-01:", "", "")
+        oav_forwarder = OAVToRedisForwarder(
+            "BL04I-DI-OAV-01:",
+            oav_roi,
+            oav_fs,
+            "",
+            "",
+        )
     oav_forwarder.redis_client.hset = AsyncMock()
     oav_forwarder.redis_client.expire = AsyncMock()
     return oav_forwarder
@@ -22,19 +37,19 @@ def _oav_to_redis_forwarder(mock):
 
 @pytest.fixture
 @patch("dodal.devices.oav.oav_to_redis_forwarder.StrictRedis")
-def oav_to_redis_forwarder(_):
-    return _oav_to_redis_forwarder(False)
+def oav_to_redis_forwarder(_, oav_beam_centre_pv_roi, oav_beam_centre_pv_fs):
+    return _oav_to_redis_forwarder(False, oav_beam_centre_pv_roi, oav_beam_centre_pv_fs)
 
 
 @pytest.fixture
 @patch("dodal.devices.oav.oav_to_redis_forwarder.StrictRedis")
-def mock_oav_to_redis_forwarder(_):
-    return _oav_to_redis_forwarder(True)
+def mock_oav_to_redis_forwarder(_, oav_beam_centre_pv_roi, oav_beam_centre_pv_fs):
+    return _oav_to_redis_forwarder(True, oav_beam_centre_pv_roi, oav_beam_centre_pv_fs)
 
 
 def _set_url(mock_oav_to_redis_forwarder: OAVToRedisForwarder, url: str):
     set_mock_value(
-        mock_oav_to_redis_forwarder.sources[Source.FULL_SCREEN.value].url,
+        mock_oav_to_redis_forwarder.sources[Source.FULL_SCREEN.value].url_ref._obj,
         url,
     )
     set_mock_value(mock_oav_to_redis_forwarder.selected_source, Source.FULL_SCREEN)

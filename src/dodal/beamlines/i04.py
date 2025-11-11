@@ -281,6 +281,7 @@ def oav_full_screen(params: OAVConfig | None = None) -> OAVBeamCentrePV:
         prefix=f"{PREFIX.beamline_prefix}-DI-OAV-01:",
         config=params or OAVConfig(ZOOM_PARAMS_FILE),
         overlay_channel=3,
+        mjpeg_prefix="XTAL",
     )
 
 
@@ -320,6 +321,8 @@ def oav_to_redis_forwarder() -> OAVToRedisForwarder:
     """
     return OAVToRedisForwarder(
         f"{PREFIX.beamline_prefix}-DI-OAV-01:",
+        oav_roi=oav(),
+        oav_fs=oav_full_screen(),
         redis_host=RedisConstants.REDIS_HOST,
         redis_password=RedisConstants.REDIS_PASSWORD,
         redis_db=RedisConstants.MURKO_REDIS_DB,

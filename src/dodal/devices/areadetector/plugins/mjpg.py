@@ -36,6 +36,7 @@ class MJPG(StandardReadable, Triggerable, ABC):
         y_size_pv: str = "ArraySize2_RBV",
     ) -> None:
         self.url = epics_signal_rw(str, prefix + "JPG_URL_RBV")
+        self.video_url = epics_signal_rw(str, prefix + "MJPG_URL_RBV")
 
         self.x_size = epics_signal_r(int, prefix + x_size_pv)
         self.y_size = epics_signal_r(int, prefix + y_size_pv)
