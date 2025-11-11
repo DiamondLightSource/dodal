@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.areadetector.plugins.mjpg &#8212; dodal 1.65.1.dev4+gc3fb578ae documentation</title>
+    <title>dodal.devices.areadetector.plugins.mjpg &#8212; dodal 1.65.1.dev5+gfbf77449b documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../../_static/documentation_options.js?v=58311261"></script>
+    <script src="../../../../../_static/documentation_options.js?v=b3e609ad"></script>
     <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -493,6 +493,7 @@ window.addEventListener("load", () => mermaid.run());
         <span class="n">y_size_pv</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;ArraySize2_RBV&quot;</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;JPG_URL_RBV&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">video_url</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;MJPG_URL_RBV&quot;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">x_size</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="n">x_size_pv</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">y_size</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="n">y_size_pv</span><span class="p">)</span>

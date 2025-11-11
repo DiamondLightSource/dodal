@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.oav.oav_detector &#8212; dodal 1.65.1.dev4+gc3fb578ae documentation</title>
+    <title>dodal.devices.oav.oav_detector &#8212; dodal 1.65.1.dev5+gfbf77449b documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=58311261"></script>
+    <script src="../../../../_static/documentation_options.js?v=b3e609ad"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -563,6 +563,7 @@ window.addEventListener("load", () => mermaid.run());
         <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">config</span><span class="p">:</span> <span class="n">OAVConfigBase</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">mjpeg_prefix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;MJPG&quot;</span><span class="p">,</span>
         <span class="n">zoom_controller</span><span class="p">:</span> <span class="n">BaseZoomController</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">x_direction</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
         <span class="n">y_direction</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
@@ -585,7 +586,7 @@ window.addEventListener("load", () => mermaid.run());
         <span class="bp">self</span><span class="o">.</span><span class="n">cam</span> <span class="o">=</span> <span class="n">Cam</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">CAM:&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">grid_snapshot</span> <span class="o">=</span> <span class="n">SnapshotWithGrid</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">MJPG:&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">mjpg_x_size_pv</span><span class="p">,</span> <span class="n">mjpg_y_size_pv</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}{</span><span class="n">mjpeg_prefix</span><span class="si">}</span><span class="s2">:&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">mjpg_x_size_pv</span><span class="p">,</span> <span class="n">mjpg_y_size_pv</span>
             <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">sizes</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">grid_snapshot</span><span class="o">.</span><span class="n">x_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid_snapshot</span><span class="o">.</span><span class="n">y_size</span><span class="p">]</span>
@@ -608,7 +609,7 @@ window.addEventListener("load", () => mermaid.run());
                 <span class="n">coord</span><span class="o">=</span><span class="n">soft_signal_rw</span><span class="p">(</span><span class="n">datatype</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">initial_value</span><span class="o">=</span><span class="n">Coords</span><span class="o">.</span><span class="n">Y</span><span class="o">.</span><span class="n">value</span><span class="p">),</span>
             <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">snapshot</span> <span class="o">=</span> <span class="n">Snapshot</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_prefix</span><span class="si">}</span><span class="s2">MJPG:&quot;</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_prefix</span><span class="si">}{</span><span class="n">mjpeg_prefix</span><span class="si">}</span><span class="s2">:&quot;</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">,</span>
             <span class="p">)</span>
 
@@ -655,6 +656,7 @@ window.addEventListener("load", () => mermaid.run());
         <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">config</span><span class="p">:</span> <span class="n">OAVConfigBeamCentre</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">mjpeg_prefix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;MJPG&quot;</span><span class="p">,</span>
         <span class="n">zoom_controller</span><span class="p">:</span> <span class="n">BaseZoomController</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">mjpg_x_size_pv</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;ArraySize1_RBV&quot;</span><span class="p">,</span>
         <span class="n">mjpg_y_size_pv</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;ArraySize2_RBV&quot;</span><span class="p">,</span>
@@ -666,6 +668,7 @@ window.addEventListener("load", () => mermaid.run());
             <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">,</span>
             <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span>
             <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">mjpeg_prefix</span><span class="o">=</span><span class="n">mjpeg_prefix</span><span class="p">,</span>
             <span class="n">zoom_controller</span><span class="o">=</span><span class="n">zoom_controller</span><span class="p">,</span>
             <span class="n">mjpg_x_size_pv</span><span class="o">=</span><span class="n">mjpg_x_size_pv</span><span class="p">,</span>
             <span class="n">mjpg_y_size_pv</span><span class="o">=</span><span class="n">mjpg_y_size_pv</span><span class="p">,</span>
@@ -709,6 +712,7 @@ window.addEventListener("load", () => mermaid.run());
         <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">config</span><span class="p">:</span> <span class="n">OAVConfig</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">mjpeg_prefix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;MJPG&quot;</span><span class="p">,</span>
         <span class="n">zoom_controller</span><span class="p">:</span> <span class="n">BaseZoomController</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">overlay_channel</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
     <span class="p">):</span>
@@ -719,7 +723,13 @@ window.addEventListener("load", () => mermaid.run());
             <span class="bp">self</span><span class="o">.</span><span class="n">beam_centre_j</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span>
                 <span class="nb">int</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;OVER:</span><span class="si">{</span><span class="n">overlay_channel</span><span class="si">}</span><span class="s2">:CenterY&quot;</span>
             <span class="p">)</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">zoom_controller</span><span class="p">)</span></div>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">,</span>
+            <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">mjpeg_prefix</span><span class="o">=</span><span class="n">mjpeg_prefix</span><span class="p">,</span>
+            <span class="n">zoom_controller</span><span class="o">=</span><span class="n">zoom_controller</span><span class="p">,</span>
+        <span class="p">)</span></div>
 
 </pre></div>
 
