@@ -1,4 +1,4 @@
-from ophyd_async.core import PathInfo, Reference
+from ophyd_async.core import Reference
 from ophyd_async.fastcs.eiger import EigerDetector as FastEiger
 from ophyd_async.fastcs.panda import HDFPanda
 from yarl import URL
@@ -44,7 +44,6 @@ from dodal.devices.s4_slit_gaps import S4SlitGaps
 from dodal.devices.scintillator import Scintillator
 from dodal.devices.smargon import Smargon
 from dodal.devices.synchrotron import Synchrotron
-from dodal.devices.tetramm import TetrammDetector
 from dodal.devices.thawer import Thawer
 from dodal.devices.undulator import UndulatorInKeV
 from dodal.devices.webcam import Webcam
@@ -422,21 +421,6 @@ def qbpm() -> QBPM:
     If this is called when already instantiated in i03, it will return the existing object.
     """
     return QBPM(f"{PREFIX.beamline_prefix}-DI-QBPM-01:")
-
-
-@device_factory()
-def xbpm1() -> TetrammDetector:
-    """Get the i03 xbpm1 device, instantiate it if it hasn't already been.
-    If this is called when already instantiated in i03, it will return the existing object.
-    """
-
-    def null_provider(device_name: str | None) -> PathInfo:
-        raise RuntimeError("Saving to files for xbpm1 not supported")
-
-    return TetrammDetector(
-        f"{PREFIX.beamline_prefix}-EA-XBPM-01:",
-        path_provider=null_provider,
-    )
 
 
 @device_factory()
