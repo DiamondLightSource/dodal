@@ -3,7 +3,7 @@ from os import getenv
 
 from daq_config_server import ConfigClient
 from ophyd_async.core import PathProvider, Reference
-from ophyd_async.fastcs.eiger import EigerDetector as FastEiger
+from ophyd_async.fastcs.eiger import EigerDetector as FastCSEiger
 from ophyd_async.fastcs.panda import HDFPanda
 from yarl import URL
 
@@ -193,8 +193,8 @@ def eiger(eiger: EigerDetector) -> EigerDetector:
 # ophyd-async no longer works with a mixed ADOdin and fastCS Eiger. Need to update the
 # beamline to use a fastCS Odin and Eiger
 @devices.factory(skip=True)
-def fastcs_eiger(path_provider: PathProvider) -> FastEiger:
-    return FastEiger(
+def fastcs_eiger(path_provider: PathProvider) -> FastCSEiger:
+    return FastCSEiger(
         prefix=f"{PREFIX.beamline_prefix}-EA-EIGER-02:",
         path_provider=path_provider,
     )
