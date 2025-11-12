@@ -1,9 +1,11 @@
 from ophyd_async.core import Reference
+from ophyd_async.fastcs.eiger import EigerDetector as FastCSEiger
 
 from dodal.common.beamlines.beamline_parameters import get_beamline_parameters
 from dodal.common.beamlines.beamline_utils import (
     device_factory,
     device_instantiation,
+    get_path_provider,
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.devices.aperturescatterguard import (
@@ -409,6 +411,17 @@ def beamsize() -> Beamsize:
     If this is called when already instantiated in i04, it will return the existing object.
     """
     return Beamsize(
-        transfocator=transfocator(),
-        aperture_scatterguard=aperture_scatterguard(),
+        transfocator=transfocator(), aperture_scatterguard=aperture_scatterguard()
+    )
+
+
+def fastcs_eiger() -> FastCSEiger:
+    """Get the i04 FastCS Eiger device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i04, it will return the existing object.
+    """
+    return FastCSEiger(
+        prefix=PREFIX.beamline_prefix,
+        path_provider=get_path_provider(),
+        drv_suffix="-EA-EIGER-02:",
+        hdf_suffix="-EA-EIGER-01:OD:",
     )
