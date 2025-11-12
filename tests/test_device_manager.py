@@ -1,11 +1,10 @@
-from dodal import device_manager
-from ophyd_async.sim import SimMotor
-import pytest
-from pytest import RaisesExc, RaisesGroup
 from unittest.mock import MagicMock, Mock, patch
 
+import pytest
 from ophyd.device import Device as OphydV1Device
 from ophyd_async.core import Device as OphydV2Device
+from ophyd_async.sim import SimMotor
+from pytest import RaisesExc, RaisesGroup
 
 from dodal.device_manager import (
     DEFAULT_TIMEOUT,

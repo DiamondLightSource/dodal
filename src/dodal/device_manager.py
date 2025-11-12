@@ -2,7 +2,6 @@ import asyncio
 import inspect
 import itertools
 import typing
-import warnings
 from collections.abc import Callable, Iterable, Mapping, MutableMapping
 from functools import cached_property, wraps
 from inspect import Parameter
