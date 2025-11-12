@@ -31,7 +31,7 @@ class InsertionDevice(UndulatorInKeV):
         energy_to_distance_table: np.ndarray = await energy_distance_table(
             self.id_gap_lookup_table_path, comments="#", skiprows=2
         )
-        harmonic_value: int = await self.harmonic.get()
+        harmonic_value: int = await self.harmonic.value.get_value()
 
         row: np.ndarray = energy_to_distance_table[harmonic_value - 1, :]
         gap = np.interp(energy_kev, [row[1], row[2]], [row[3], row[4]])
