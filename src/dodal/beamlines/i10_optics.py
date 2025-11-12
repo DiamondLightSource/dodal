@@ -32,7 +32,7 @@ from dodal.devices.i10.i10_apple2 import (
 
 # Imports taken from i10 while we work out how to deal with split end stations
 from dodal.devices.i10.i10_setting_data import I10Grating
-from dodal.devices.pgm import PGM
+from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.devices.synchrotron import Synchrotron
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
@@ -59,9 +59,9 @@ def first_mirror() -> PiezoMirror:
 
 
 @device_factory()
-def pgm() -> PGM:
+def pgm() -> PlaneGratingMonochromator:
     "I10 Plane Grating Monochromator, it can change energy via pgm.energy.set(<energy>)"
-    return PGM(
+    return PlaneGratingMonochromator(
         prefix=f"{PREFIX.beamline_prefix}-OP-PGM-01:",
         grating=I10Grating,
         grating_pv="NLINES2",

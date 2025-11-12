@@ -43,7 +43,9 @@ async def oav_beam_centre_pv_roi() -> OAVBeamCentrePV:
 async def oav_beam_centre_pv_fs() -> OAVBeamCentrePV:
     oav_config = OAVConfig(TEST_OAV_ZOOM_LEVELS_XML)
     async with init_devices(mock=True, connect=True):
-        oav = OAVBeamCentrePV("", config=oav_config, name="oav", overlay_channel=3)
+        oav = OAVBeamCentrePV(
+            "", config=oav_config, name="oav", mjpeg_prefix="XTAL", overlay_channel=3
+        )
     zoom_levels_list = ["1.0x", "3.0x", "5.0x", "7.5x", "10.0x"]
     oav.zoom_controller.level.describe = AsyncMock(
         return_value={"level": {"choices": zoom_levels_list}}
