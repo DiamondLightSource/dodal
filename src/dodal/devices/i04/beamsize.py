@@ -7,9 +7,12 @@ from dodal.devices.i04.transfocator import Transfocator
 
 class Beamsize(BeamsizeBase):
     def __init__(
-        self, transfocator: Transfocator, aperture_scatterguard: ApertureScatterguard
+        self,
+        transfocator: Transfocator,
+        aperture_scatterguard: ApertureScatterguard,
+        name="beamsize",
     ):
-        super().__init__()
+        super().__init__(name=name)
         self._transfocator_ref = Reference(transfocator)
         self._aperture_scatterguard_ref = Reference(aperture_scatterguard)
 
