@@ -382,8 +382,8 @@ def scintillator() -> Scintillator:
 
 @device_factory()
 def beamsize() -> Beamsize:
-    """Get the i03 beamstop device, instantiate it if it hasn't already been.
-    If this is called when already instantiated in i03, it will return the existing object.
+    """Get the i04 beamstop device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i04, it will return the existing object.
     """
     return Beamsize(
         transfocator=transfocator(),
