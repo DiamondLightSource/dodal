@@ -29,7 +29,7 @@ Limits and metadata (e.g. units)
 @validate_call(config={"arbitrary_types_allowed": True})
 def count(
     detectors: Annotated[
-        set[Readable] | set[AsyncReadable],
+        set[Readable | AsyncReadable],
         Field(
             description="Set of readable devices, will take a reading at each point",
             min_length=1,
@@ -78,7 +78,7 @@ def _make_args(movables, params, num_params):
 @validate_call(config={"arbitrary_types_allowed": True})
 def scan(
     detectors: Annotated[
-        set[Readable] | set[AsyncReadable],
+        set[Readable | AsyncReadable],
         Field(
             description="Set of readable devices, will take a reading at each point",
             min_length=1,
@@ -109,7 +109,7 @@ def scan(
 @validate_call(config={"arbitrary_types_allowed": True})
 def rel_scan(
     detectors: Annotated[
-        set[Readable] | set[AsyncReadable],
+        set[Readable | AsyncReadable],
         Field(
             description="Set of readable devices, will take a reading at each point",
             min_length=1,
@@ -140,7 +140,7 @@ def rel_scan(
 @validate_call(config={"arbitrary_types_allowed": True})
 def grid_scan(
     detectors: Annotated[
-        set[Readable] | set[AsyncReadable],
+        set[Readable | AsyncReadable],
         Field(
             description="Set of readable devices, will take a reading at each point",
             min_length=1,
@@ -170,7 +170,7 @@ def grid_scan(
 @validate_call(config={"arbitrary_types_allowed": True})
 def rel_grid_scan(
     detectors: Annotated[
-        set[Readable] | set[AsyncReadable],
+        set[Readable | AsyncReadable],
         Field(
             description="Set of readable devices, will take a reading at each point",
             min_length=1,
