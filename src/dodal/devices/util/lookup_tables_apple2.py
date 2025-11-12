@@ -135,28 +135,31 @@ def convert_csv_to_lookup(
 
     def process_row(row: dict) -> None:
         """Process a single row from the CSV file and update the lookup table."""
-        mode_value = row[mode]
+        mode_value = str(row[mode]).lower()
         if mode_value in mode_name_convert:
             mode_value = mode_name_convert[f"{mode_value}"]
         if mode_value not in polarisations:
             polarisations.add(mode_value)
-            lookup_table[mode_value] = {
-                "energies": {},
-                "limit": {
-                    "minimum": float(row[min_energy]),
-                    "maximum": float(row[max_energy]),
-                },
-            }
 
         # Create polynomial object for energy-to-gap/phase conversion
         coefficients = [float(row[coef]) for coef in poly_deg]
-        polynomial = np.poly1d(coefficients)
+        if mode_value not in lookup_table:
+            lookup_table.update(
+                generate_lookup_table(
+                    pol=Pol(mode_value),
+                    min_energy=float(row[min_energy]),
+                    max_energy=float(row[max_energy]),
+                    poly1d_param=coefficients,
+                )
+            )
 
-        lookup_table[mode_value]["energies"][row[min_energy]] = {
-            "low": float(row[min_energy]),
-            "high": float(row[max_energy]),
-            "poly": polynomial,
-        }
+        else:
+            polynomial = np.poly1d(coefficients)
+            lookup_table[mode_value]["energies"][row[min_energy]] = EnergyCoverageEntry(
+                low=float(row[min_energy]),
+                high=float(row[max_energy]),
+                poly=polynomial,
+            ).model_dump()
 
         # Update energy limits
         lookup_table[mode_value]["limit"]["minimum"] = min(
@@ -232,19 +235,25 @@ def get_poly(
 def generate_lookup_table(
     pol: Pol, min_energy: float, max_energy: float, poly1d_param: list[float]
 ) -> dict[str | None, dict[str, dict[str, Any]]]:
-    """Generate a single lookuptable for a given set of parameters."""
-    return {
-        pol.value: {
-            "energies": {
-                f"{min_energy}": {
-                    "low": min_energy,
-                    "high": max_energy,
-                    "poly": np.poly1d(poly1d_param),
-                },
-            },
-            "limit": {"minimum": min_energy, "maximum": max_energy},
+    return Lookuptable(
+        {
+            pol.value: LookupTableEntries(
+                energies=EnergyCoverage(
+                    {
+                        str(min_energy): EnergyCoverageEntry(
+                            low=min_energy,
+                            high=max_energy,
+                            poly=np.poly1d(poly1d_param),
+                        )
+                    }
+                ),
+                limit=EnergyMinMax(
+                    minimum=float(min_energy),
+                    maximum=float(max_energy),
+                ),
+            )
         }
-    }
+    ).model_dump()
 
 
 def make_phase_tables(
@@ -309,7 +318,7 @@ class EnergyMotorLookup:
         gap_file_name:
             File name for the id game.
         phase_file_name:
-            File name for the phase(optional).
+            File name for the phase(option.al).
         poly_deg:
             The column names for the parameters for the energy conversion polynomial, starting with the least significant.
 
