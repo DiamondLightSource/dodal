@@ -166,7 +166,7 @@ class DeviceFactory(Generic[Args, V2]):
             device.set_name(name)
         return device  # type: ignore - it's us, honest
 
-    def _create(self, *args, **kwargs) -> V2:
+    def create(self, *args, **kwargs) -> V2:
         # TODO: Remove when v1 support is no longer required
         return self(*args, **kwargs)
 
@@ -259,7 +259,7 @@ class V1DeviceFactory(Generic[V1]):
         """Call the wrapped function to make decorator transparent"""
         return self.post_create(*args, **kwargs)
 
-    def _create(self, *args, **kwargs) -> V1:
+    def create(self, *args, **kwargs) -> V1:
         device = self.factory(name=self.name, prefix=self.prefix)
         if self.wait:
             wait_for_connection(device, timeout=self.timeout)
@@ -515,7 +515,7 @@ class DeviceManager:
                     if isinstance(factory, V1DeviceFactory):
                         # TODO: Remove when ophyd v1 support is no longer required
                         factory = factory.mock_if_needed(mock)
-                    built_device = factory._create(**params)
+                    built_device = factory.create(**params)
                     built[device] = built_device
                     connection_specs[device] = ConnectionSpec(
                         mock=mock or factory.mock,
