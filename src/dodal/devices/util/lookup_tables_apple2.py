@@ -400,6 +400,8 @@ class EnergyMotorLookup:
             lookup_table=self.lookup_tables[LookupTableKeys.GAP], energy=energy, pol=pol
         )
         phase_poly = get_poly(
-            lookup_table=self.lookup_tables[LookupTableKeys.GAP], energy=energy, pol=pol
+            lookup_table=self.lookup_tables[LookupTableKeys.PHASE],
+            energy=energy,
+            pol=pol,
         )
         return gap_poly(energy), phase_poly(energy)
