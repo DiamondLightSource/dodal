@@ -300,7 +300,7 @@ def test_circular_dependencies_error(dm: DeviceManager):
 # chasing coverage numbers
 def test_repr(dm: DeviceManager):
     s1 = Mock()
-    s2 = Mock()
+    s2: type[OphydV1Device] = Mock()  # type: ignore
     s2.__name__ = "S2"
 
     @dm.factory
@@ -588,10 +588,10 @@ def test_mock_all(dm: DeviceManager):
 
 
 def test_v1_device_factory(dm: DeviceManager):
-    s1 = MagicMock(spec=OphydV1Device)  # type: ignore
+    s1 = Mock(spec=OphydV1Device)
     s1.__name__ = "S1"
 
-    @dm.v1_init(s1, prefix="S1_PREFIX")
+    @dm.v1_init(s1, prefix="S1_PREFIX")  # type: ignore
     def foo(_):
         pass
 
@@ -609,12 +609,12 @@ def test_v1_v2_name_clash(dm: DeviceManager):
     s2 = MagicMock()
 
     @dm.factory
-    def foo():
+    def foo():  # type: ignore foo is overridden below
         return s1()
 
     with pytest.raises(ValueError, match="name"):
 
-        @dm.v1_init(s2, prefix="S2_PREFIX")
+        @dm.v1_init(s2, prefix="S2_PREFIX")  # type:ignore
         def foo(_):
             pass
 
@@ -622,7 +622,7 @@ def test_v1_v2_name_clash(dm: DeviceManager):
 def test_v1_decorator_is_transparent(dm: DeviceManager):
     s1 = MagicMock()
 
-    @dm.v1_init(s1, prefix="S1_PREFIX")
+    @dm.v1_init(s1, prefix="S1_PREFIX")  # type: ignore
     def foo(s):
         # arbitrary setup method
         s.special_init_method()
@@ -637,7 +637,7 @@ def test_v1_decorator_is_transparent(dm: DeviceManager):
 def test_v1_no_wait(dm: DeviceManager):
     s1 = Mock()
 
-    @dm.v1_init(s1, prefix="S1_PREFIX", wait=False)
+    @dm.v1_init(s1, prefix="S1_PREFIX", wait=False)  # type: ignore
     def foo(_):
         pass
 
@@ -658,7 +658,7 @@ def test_v1_mocking(dm: DeviceManager):
     s1 = Mock()
     s1.return_value = Mock(spec=OphydV1Device)
 
-    @dm.v1_init(s1, prefix="S1_PREFIX", mock=True)
+    @dm.v1_init(s1, prefix="S1_PREFIX", mock=True)  # type: ignore
     def foo(_):
         pass
 
@@ -677,7 +677,7 @@ def test_v1_init_params(dm: DeviceManager):
     def one():
         return "one"
 
-    @dm.v1_init(s1, prefix="S1_PREFIX", wait=False)
+    @dm.v1_init(s1, prefix="S1_PREFIX", wait=False)  # type: ignore
     def foo(s, one, two):
         s.set_up_with(one, two)
 
@@ -752,7 +752,7 @@ def test_docstrings_are_kept(dm: DeviceManager):
         """This is the docstring for foo"""
         return Mock()
 
-    @dm.v1_init(Mock(), prefix="MOCK_PREFIX")
+    @dm.v1_init(Mock(), prefix="MOCK_PREFIX")  # type: ignore
     def bar(_):
         """This is the docstring for bar"""
         pass
