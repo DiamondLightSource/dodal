@@ -2,8 +2,9 @@ from functools import cache
 
 from daq_config_server import ConfigClient
 from ophyd_async.core import Reference
+from ophyd_async.fastcs.eiger import EigerDetector as FastCSEiger
 
-from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
+from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline, get_path_provider
 from dodal.common.beamlines.beamline_utils import set_config_client
 from dodal.device_manager import DeviceManager
 from dodal.devices.aperturescatterguard import (
@@ -338,3 +339,15 @@ def zoom_controller() -> ZoomControllerWithBeamCentres:
     If this is called when already instantiated in i04, it will return the existing object.
     """
     return ZoomControllerWithBeamCentres(f"{PREFIX.beamline_prefix}-EA-OAV-01:FZOOM:")
+
+
+def fastcs_eiger() -> FastCSEiger:
+    """Get the i04 FastCS Eiger device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i04, it will return the existing object.
+    """
+    return FastCSEiger(
+        prefix=PREFIX.beamline_prefix,
+        path_provider=get_path_provider(),
+        drv_suffix="-EA-EIGER-02:",
+        hdf_suffix="-EA-EIGER-01:OD:",
+    )
