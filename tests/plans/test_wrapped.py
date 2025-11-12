@@ -13,6 +13,7 @@ from event_model.documents import (
     StreamResource,
 )
 from ophyd_async.core import (
+    AsyncReadable,
     StandardDetector,
 )
 from pydantic import ValidationError
@@ -63,7 +64,7 @@ def test_count_delay_validation(det: StandardDetector, run_engine: RunEngine):
 
 
 def test_count_detectors_validation(run_engine: RunEngine):
-    args: dict[str, set[Readable]] = {
+    args: dict[str, set[Readable | AsyncReadable]] = {
         # No device to read
         "Set should have at least 1 item after validation, not 0": set(),
         # Not Readable
