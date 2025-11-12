@@ -1,8 +1,10 @@
+import itertools
 from collections.abc import Sequence
 from typing import Annotated, Any
 
 import bluesky.plans as bp
-from bluesky.protocols import Readable
+from bluesky.protocols import Movable, Readable
+from ophyd_async.core import AsyncReadable
 from pydantic import Field, NonNegativeFloat, validate_call
 
 from dodal.common import MsgGenerator
@@ -27,7 +29,7 @@ Limits and metadata (e.g. units)
 @validate_call(config={"arbitrary_types_allowed": True})
 def count(
     detectors: Annotated[
-        set[Readable],
+        set[Readable] | set[AsyncReadable],
         Field(
             description="Set of readable devices, will take a reading at each point",
             min_length=1,
@@ -57,20 +59,39 @@ def count(
     yield from bp.count(tuple(detectors), num, delay=delay, md=metadata)
 
 
+def _make_args(movables, params, num_params):
+    movables_len = len(movables)
+    params_len = len(params)
+    if params_len % movables_len != 0 or params_len % num_params != 0:
+        raise ValueError(f"params must contain {num_params} values for each movable")
+
+    args = []
+    it = iter(params)
+    param_chunks = iter(lambda: tuple(itertools.islice(it, num_params)), ())
+    for movable, param_chunk in zip(movables, param_chunks, strict=False):
+        args.append(movable)
+        args.extend(param_chunk)
+    return args
+
+
+@attach_data_session_metadata_decorator()
+@validate_call(config={"arbitrary_types_allowed": True})
 def scan(
     detectors: Annotated[
-        set[Readable] | list[Readable],
+        set[Readable] | set[AsyncReadable],
         Field(
             description="Set of readable devices, will take a reading at each point",
             min_length=1,
         ),
     ],
-    args: Annotated[
-        tuple,
+    movables: Annotated[
+        list[Movable], Field(description="One or more movable to move during the scan.")
+    ],
+    params: Annotated[
+        list[float],
         Field(
-            description="For one or more dimensions, 'motor1, start1, stop1, ..., "
-            "motorN, startN, stopN'. Motors can be any 'settable' object (motor, "
-            "temp controller, etc.)"
+            description="Start and stop points for each movable, 'start1, stop1, ...,"
+            "startN, stopN' for every movable in `movables`."
         ),
     ],
     num: Annotated[int, Field(description="Number of points")],
@@ -80,23 +101,28 @@ def scan(
     Wraps bluesky.plans.scan(det, *args, num, md=metadata)"""
     metadata = metadata or {}
     metadata["shape"] = (num,)
+    args = _make_args(movables=movables, params=params, num_params=2)
     yield from bp.scan(tuple(detectors), *args, num=num, md=metadata)
 
 
+@attach_data_session_metadata_decorator()
+@validate_call(config={"arbitrary_types_allowed": True})
 def rel_scan(
     detectors: Annotated[
-        set[Readable] | list[Readable],
+        set[Readable] | set[AsyncReadable],
         Field(
             description="Set of readable devices, will take a reading at each point",
             min_length=1,
         ),
     ],
-    args: Annotated[
-        tuple,
+    movables: Annotated[
+        list[Movable], Field(description="One or more movable to move during the scan.")
+    ],
+    params: Annotated[
+        list[float],
         Field(
-            description="For one or more dimensions, 'motor1, start1, stop1, ..., "
-            "motorN, startN, stopN'. Motors can be any 'settable' object (motor, "
-            "temp controller, etc.)"
+            description="Start and stop points for each movable, 'start1, stop1, ...,"
+            "startN, stopN' for every movable in `movables`."
         ),
     ],
     num: Annotated[int, Field(description="Number of points")],
@@ -106,25 +132,28 @@ def rel_scan(
     Wraps bluesky.plans.rel_scan(det, *args, num, md=metadata)"""
     metadata = metadata or {}
     metadata["shape"] = (num,)
+    args = _make_args(movables=movables, params=params, num_params=2)
     yield from bp.rel_scan(tuple(detectors), *args, num=num, md=metadata)
 
 
+@attach_data_session_metadata_decorator()
+@validate_call(config={"arbitrary_types_allowed": True})
 def grid_scan(
     detectors: Annotated[
-        set[Readable] | list[Readable],
+        set[Readable] | set[AsyncReadable],
         Field(
             description="Set of readable devices, will take a reading at each point",
             min_length=1,
         ),
     ],
-    args: Annotated[
-        tuple,
+    movables: Annotated[
+        list[Movable], Field(description="One or more movable to move during the scan.")
+    ],
+    params: Annotated[
+        list[float | int],
         Field(
-            description="Patterend like (motor1, start1, stop1, num1, ..., motorN, "
-            "startN, stopN, numN). The first motor is the 'slowest', the outer loop. "
-            "For all motors except the first motor, there is a 'snake' argument: a"
-            "boolean indicating whether to follow snake-like, winding trajectory or a"
-            "simple left to right."
+            description="Start and stop points for each movable, 'start1, stop1, ...,"
+            "startN, stopN' for every movable in `movables`."
         ),
     ],
     snake_axes: list | bool | None = None,
@@ -133,25 +162,28 @@ def grid_scan(
     """Scan over a mesh; each motor is on an independent trajectory.
     Wraps bluesky.plans.grid_scan(det, *args, snake_axes, md=metadata)"""
     metadata = metadata or {}
+    args = _make_args(movables=movables, params=params, num_params=3)
     yield from bp.grid_scan(tuple(detectors), *args, snake_axes=snake_axes, md=metadata)
 
 
+@attach_data_session_metadata_decorator()
+@validate_call(config={"arbitrary_types_allowed": True})
 def rel_grid_scan(
     detectors: Annotated[
-        set[Readable] | list[Readable],
+        set[Readable] | set[AsyncReadable],
         Field(
             description="Set of readable devices, will take a reading at each point",
             min_length=1,
         ),
     ],
-    args: Annotated[
-        tuple,
+    movables: Annotated[
+        list[Movable], Field(description="One or more movable to move during the scan.")
+    ],
+    params: Annotated[
+        list[float | int],
         Field(
-            description="Patterend like (motor1, start1, stop1, num1, ..., motorN, "
-            "startN, stopN, numN). The first motor is the 'slowest', the outer loop. "
-            "For all motors except the first motor, there is a 'snake' argument: a"
-            "boolean indicating whether to follow snake-like, winding trajectory or a"
-            "simple left to right."
+            description="Start and stop points for each movable, 'start1, stop1, ...,"
+            "startN, stopN' for every movable in `movables`."
         ),
     ],
     snake_axes: list | bool | None = None,
@@ -160,6 +192,7 @@ def rel_grid_scan(
     """Scan over a mesh relative to current position.
     Wraps bluesky.plans.rel_grid_scan(det, *args, snake_axes, md=metadata)"""
     metadata = metadata or {}
+    args = _make_args(movables=movables, params=params, num_params=3)
     yield from bp.rel_grid_scan(
         tuple(detectors), *args, snake_axes=snake_axes, md=metadata
     )
