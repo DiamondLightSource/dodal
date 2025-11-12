@@ -8,6 +8,7 @@ from ophyd_async.core import AsyncReadable
 from pydantic import Field, NonNegativeFloat, validate_call
 
 from dodal.common import MsgGenerator
+from dodal.devices.motors import Motor
 from dodal.plan_stubs.data_session import attach_data_session_metadata_decorator
 
 """This module wraps plan(s) from bluesky.plans until required handling for them is
@@ -29,7 +30,7 @@ Limits and metadata (e.g. units)
 @validate_call(config={"arbitrary_types_allowed": True})
 def count(
     detectors: Annotated[
-        set[Readable | AsyncReadable],
+        Sequence[Readable | AsyncReadable],
         Field(
             description="Set of readable devices, will take a reading at each point",
             min_length=1,
@@ -59,16 +60,20 @@ def count(
     yield from bp.count(tuple(detectors), num, delay=delay, md=metadata)
 
 
-def _make_args(movables, params, num_params):
-    movables_len = len(movables)
+def _make_args(
+    movers: Sequence[Movable | Motor],
+    params: list[Any] | Sequence[Any],
+    num_params: int,
+):
+    movers_len = len(movers)
     params_len = len(params)
-    if params_len % movables_len != 0 or params_len % num_params != 0:
+    if params_len % movers_len != 0 or params_len % num_params != 0:
         raise ValueError(f"params must contain {num_params} values for each movable")
 
     args = []
     it = iter(params)
     param_chunks = iter(lambda: tuple(itertools.islice(it, num_params)), ())
-    for movable, param_chunk in zip(movables, param_chunks, strict=False):
+    for movable, param_chunk in zip(movers, param_chunks, strict=False):
         args.append(movable)
         args.extend(param_chunk)
     return args
@@ -78,20 +83,21 @@ def _make_args(movables, params, num_params):
 @validate_call(config={"arbitrary_types_allowed": True})
 def scan(
     detectors: Annotated[
-        set[Readable | AsyncReadable],
+        Sequence[Readable | AsyncReadable],
         Field(
             description="Set of readable devices, will take a reading at each point",
             min_length=1,
         ),
     ],
-    movables: Annotated[
-        list[Movable], Field(description="One or more movable to move during the scan.")
+    movers: Annotated[
+        Sequence[Movable | Motor],
+        Field(description="One or more movable to move during the scan."),
     ],
     params: Annotated[
         list[float],
         Field(
             description="Start and stop points for each movable, 'start1, stop1, ...,"
-            "startN, stopN' for every movable in `movables`."
+            "startN, stopN' for every movable in `movers`."
         ),
     ],
     num: Annotated[int, Field(description="Number of points")],
@@ -101,7 +107,7 @@ def scan(
     Wraps bluesky.plans.scan(det, *args, num, md=metadata)"""
     metadata = metadata or {}
     metadata["shape"] = (num,)
-    args = _make_args(movables=movables, params=params, num_params=2)
+    args = _make_args(movers=movers, params=params, num_params=2)
     yield from bp.scan(tuple(detectors), *args, num=num, md=metadata)
 
 
@@ -109,20 +115,21 @@ def scan(
 @validate_call(config={"arbitrary_types_allowed": True})
 def rel_scan(
     detectors: Annotated[
-        set[Readable | AsyncReadable],
+        Sequence[Readable | AsyncReadable],
         Field(
             description="Set of readable devices, will take a reading at each point",
             min_length=1,
         ),
     ],
-    movables: Annotated[
-        list[Movable], Field(description="One or more movable to move during the scan.")
+    movers: Annotated[
+        Sequence[Movable | Motor],
+        Field(description="One or more movable to move during the scan."),
     ],
     params: Annotated[
         list[float],
         Field(
             description="Start and stop points for each movable, 'start1, stop1, ...,"
-            "startN, stopN' for every movable in `movables`."
+            "startN, stopN' for every movable in `movers`."
         ),
     ],
     num: Annotated[int, Field(description="Number of points")],
@@ -132,7 +139,7 @@ def rel_scan(
     Wraps bluesky.plans.rel_scan(det, *args, num, md=metadata)"""
     metadata = metadata or {}
     metadata["shape"] = (num,)
-    args = _make_args(movables=movables, params=params, num_params=2)
+    args = _make_args(movers=movers, params=params, num_params=2)
     yield from bp.rel_scan(tuple(detectors), *args, num=num, md=metadata)
 
 
@@ -140,20 +147,21 @@ def rel_scan(
 @validate_call(config={"arbitrary_types_allowed": True})
 def grid_scan(
     detectors: Annotated[
-        set[Readable | AsyncReadable],
+        Sequence[Readable | AsyncReadable],
         Field(
             description="Set of readable devices, will take a reading at each point",
             min_length=1,
         ),
     ],
-    movables: Annotated[
-        list[Movable], Field(description="One or more movable to move during the scan.")
+    movers: Annotated[
+        Sequence[Movable | Motor],
+        Field(description="One or more movable to move during the scan."),
     ],
     params: Annotated[
-        list[float | int],
+        Sequence[float | int],
         Field(
             description="Start and stop points for each movable, 'start1, stop1, ...,"
-            "startN, stopN' for every movable in `movables`."
+            "startN, stopN' for every movable in `movers`."
         ),
     ],
     snake_axes: list | bool | None = None,
@@ -162,7 +170,7 @@ def grid_scan(
     """Scan over a mesh; each motor is on an independent trajectory.
     Wraps bluesky.plans.grid_scan(det, *args, snake_axes, md=metadata)"""
     metadata = metadata or {}
-    args = _make_args(movables=movables, params=params, num_params=3)
+    args = _make_args(movers=movers, params=params, num_params=3)
     yield from bp.grid_scan(tuple(detectors), *args, snake_axes=snake_axes, md=metadata)
 
 
@@ -170,20 +178,21 @@ def grid_scan(
 @validate_call(config={"arbitrary_types_allowed": True})
 def rel_grid_scan(
     detectors: Annotated[
-        set[Readable | AsyncReadable],
+        Sequence[Readable | AsyncReadable],
         Field(
             description="Set of readable devices, will take a reading at each point",
             min_length=1,
         ),
     ],
-    movables: Annotated[
-        list[Movable], Field(description="One or more movable to move during the scan.")
+    movers: Annotated[
+        Sequence[Movable | Motor],
+        Field(description="One or more movable to move during the scan."),
     ],
     params: Annotated[
-        list[float | int],
+        Sequence[float | int],
         Field(
             description="Start and stop points for each movable, 'start1, stop1, ...,"
-            "startN, stopN' for every movable in `movables`."
+            "startN, stopN' for every movable in `movers`."
         ),
     ],
     snake_axes: list | bool | None = None,
@@ -192,7 +201,133 @@ def rel_grid_scan(
     """Scan over a mesh relative to current position.
     Wraps bluesky.plans.rel_grid_scan(det, *args, snake_axes, md=metadata)"""
     metadata = metadata or {}
-    args = _make_args(movables=movables, params=params, num_params=3)
+    args = _make_args(movers=movers, params=params, num_params=3)
     yield from bp.rel_grid_scan(
+        tuple(detectors), *args, snake_axes=snake_axes, md=metadata
+    )
+
+
+@attach_data_session_metadata_decorator()
+@validate_call(config={"arbitrary_types_allowed": True})
+def list_scan(
+    detectors: Annotated[
+        Sequence[Readable | AsyncReadable],
+        Field(
+            description="Set of readable devices, will take a reading at each point",
+            min_length=1,
+        ),
+    ],
+    movers: Annotated[
+        Sequence[Movable | Motor],
+        Field(description="One or more movable to move during the scan."),
+    ],
+    params: Annotated[
+        list[list[Any]],
+        Field(
+            description="List of points for each movable, '[point1, point2, ..., ], "
+            "[point1, point2, ...], ...' for every movable in `movers`."
+        ),
+    ],
+    metadata: dict[str, Any] | None = None,
+) -> MsgGenerator:
+    """Scan over one or more variables in steps simultaneously.
+    Wraps bluesky.plans.list_scan(det, *args, md=metadata)."""
+    metadata = metadata or {}
+    args = _make_args(movers=movers, params=params, num_params=1)
+    yield from bp.list_scan(tuple(detectors), *args, md=metadata)
+
+
+@attach_data_session_metadata_decorator()
+@validate_call(config={"arbitrary_types_allowed": True})
+def rel_list_scan(
+    detectors: Annotated[
+        Sequence[Readable | AsyncReadable],
+        Field(
+            description="Set of readable devices, will take a reading at each point",
+            min_length=1,
+        ),
+    ],
+    movers: Annotated[
+        Sequence[Movable | Motor],
+        Field(description="One or more movable to move during the scan."),
+    ],
+    params: Annotated[
+        list[list[Any]],
+        Field(
+            description="List of points for each movable, '[point1, point2, ..., ], "
+            "[point1, point2, ...], ...' for every movable in `movers`."
+        ),
+    ],
+    metadata: dict[str, Any] | None = None,
+) -> MsgGenerator:
+    """Scan over one or more variables simultaneously relative to current position.
+    Wraps bluesky.plans.rel_list_scan(det, *args, md=metadata)."""
+    metadata = metadata or {}
+    args = _make_args(movers=movers, params=params, num_params=1)
+    yield from bp.rel_list_scan(tuple(detectors), *args, md=metadata)
+
+
+@attach_data_session_metadata_decorator()
+@validate_call(config={"arbitrary_types_allowed": True})
+def list_grid_scan(
+    detectors: Annotated[
+        Sequence[Readable | AsyncReadable],
+        Field(
+            description="Set of readable devices, will take a reading at each point",
+            min_length=1,
+        ),
+    ],
+    movers: Annotated[
+        Sequence[Movable | Motor],
+        Field(description="One or more movable to move during the scan."),
+    ],
+    params: Annotated[
+        list[list[Any]],
+        Field(
+            description="List of points for each movable, '[point1, point2, ..., ], "
+            "[point1, point2, ...], ...' for every movable in `movers`."
+        ),
+    ],
+    snake_axes: bool = False,  # Currently specifying axes to snake is not supported
+    metadata: dict[str, Any] | None = None,
+) -> MsgGenerator:
+    """Scan over one or more variables for each given point on independent trajectories.
+    Wraps bluesky.plans.list_grid_scan(det, *args, md=metadata)."""
+    metadata = metadata or {}
+    args = _make_args(movers=movers, params=params, num_params=1)
+    yield from bp.list_grid_scan(
+        tuple(detectors), *args, snake_axes=snake_axes, md=metadata
+    )
+
+
+@attach_data_session_metadata_decorator()
+@validate_call(config={"arbitrary_types_allowed": True})
+def rel_list_grid_scan(
+    detectors: Annotated[
+        Sequence[Readable | AsyncReadable],
+        Field(
+            description="Set of readable devices, will take a reading at each point",
+            min_length=1,
+        ),
+    ],
+    movers: Annotated[
+        Sequence[Movable | Motor],
+        Field(description="One or more movable to move during the scan."),
+    ],
+    params: Annotated[
+        list[list[Any]],
+        Field(
+            description="List of points for each movable, '[point1, point2, ..., ], "
+            "[point1, point2, ...], ...' for every movable in `movers`."
+        ),
+    ],
+    snake_axes: bool = False,  # Currently specifying axes to snake is not supported
+    metadata: dict[str, Any] | None = None,
+) -> MsgGenerator:
+    """Scan over some variables for each given point relative to current position.
+    Wraps bluesky.plans.rel_list_grid_scan(det, *args, md=metadata)."""
+    metadata = metadata or {}
+    args = _make_args(movers=movers, params=params, num_params=1)
+    yield from bp.rel_list_grid_scan(
         tuple(detectors), *args, snake_axes=snake_axes, md=metadata
     )
