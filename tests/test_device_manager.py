@@ -681,7 +681,7 @@ def test_v1_init_params(dm: DeviceManager):
     def foo(s, one, two):
         s.set_up_with(one, two)
 
-    dev = dm.build_devices(foo, fixtures={"two": 2})
+    dm.build_devices(foo, fixtures={"two": 2})
     s1.assert_called_once_with(name="foo", prefix="S1_PREFIX")
     s1().set_up_with.assert_called_once_with("one", 2)
 
