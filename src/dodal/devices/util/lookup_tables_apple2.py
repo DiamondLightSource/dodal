@@ -49,6 +49,17 @@ class LookupPath:
 
 
 @dataclass
+class LookupTableKeys:
+    MIN: str = "minimum"
+    MAX: str = "maximum"
+    LIMIT: str = "limit"
+    ENERGIES: str = "energies"
+    POLY: str = "poly"
+    High: str = "high"
+    Low: str = "low"
+
+
+@dataclass
 class LookupTableConfig:
     path: LookupPath
     source: tuple[str, str] | None
@@ -118,7 +129,7 @@ def convert_csv_to_lookup(
     """
     # Change none standard name to standard used in Pol
     if mode_name_convert is None:
-        mode_name_convert = {"CR": "PC", "CL": "NC"}
+        mode_name_convert = {"CR": "pc", "CL": "nc"}
     if poly_deg is None:
         poly_deg = [
             "7th-order",
@@ -154,19 +165,22 @@ def convert_csv_to_lookup(
             )
 
         else:
-            polynomial = np.poly1d(coefficients)
-            lookup_table[mode_value]["energies"][row[min_energy]] = EnergyCoverageEntry(
-                low=float(row[min_energy]),
-                high=float(row[max_energy]),
-                poly=polynomial,
-            ).model_dump()
+            lookup_table[mode_value][LookupTableKeys.ENERGIES][row[min_energy]] = (
+                EnergyCoverageEntry(
+                    low=float(row[min_energy]),
+                    high=float(row[max_energy]),
+                    poly=np.poly1d(coefficients),
+                ).model_dump()
+            )
 
         # Update energy limits
-        lookup_table[mode_value]["limit"]["minimum"] = min(
-            lookup_table[mode_value]["limit"]["minimum"], float(row[min_energy])
+        lookup_table[mode_value][LookupTableKeys.LIMIT][LookupTableKeys.MIN] = min(
+            lookup_table[mode_value][LookupTableKeys.LIMIT][LookupTableKeys.MIN],
+            float(row[min_energy]),
         )
-        lookup_table[mode_value]["limit"]["maximum"] = max(
-            lookup_table[mode_value]["limit"]["maximum"], float(row[max_energy])
+        lookup_table[mode_value][LookupTableKeys.LIMIT][LookupTableKeys.MAX] = max(
+            lookup_table[mode_value][LookupTableKeys.LIMIT][LookupTableKeys.MAX],
+            float(row[max_energy]),
         )
 
     reader = csv.DictReader(read_file_and_skip(file, skip_line_start_with))
@@ -212,19 +226,21 @@ def get_poly(
 
     """
     if (
-        energy < lookup_table[pol]["limit"]["minimum"]
-        or energy > lookup_table[pol]["limit"]["maximum"]
+        energy < lookup_table[pol][LookupTableKeys.LIMIT][LookupTableKeys.MIN]
+        or energy > lookup_table[pol][LookupTableKeys.LIMIT][LookupTableKeys.MAX]
     ):
         raise ValueError(
-            "Demanding energy must lie between {} and {} eV!".format(
-                lookup_table[pol]["limit"]["minimum"],
-                lookup_table[pol]["limit"]["maximum"],
-            )
+            "Demanding energy must lie between"
+            + f" {lookup_table[pol][LookupTableKeys.LIMIT][LookupTableKeys.MIN]}"
+            + f" and {lookup_table[pol][LookupTableKeys.LIMIT][LookupTableKeys.MAX]} eV!"
         )
     else:
-        for energy_range in lookup_table[pol]["energies"].values():
-            if energy >= energy_range["low"] and energy < energy_range["high"]:
-                return energy_range["poly"]
+        for energy_range in lookup_table[pol][LookupTableKeys.ENERGIES].values():
+            if (
+                energy >= energy_range[LookupTableKeys.Low]
+                and energy < energy_range[LookupTableKeys.High]
+            ):
+                return energy_range[LookupTableKeys.POLY]
 
     raise ValueError(
         "Cannot find polynomial coefficients for your requested energy."
