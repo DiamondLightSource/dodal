@@ -1,7 +1,8 @@
 from dodal.common.beamlines.beamline_utils import device_factory
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.devices.i07.dcm import DCM
-from dodal.devices.undulator import Undulator
+from dodal.devices.i07.id import InsertionDevice
+from dodal.devices.undulator import UndulatorOrder
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
@@ -23,11 +24,18 @@ def dcm() -> DCM:
 
 
 @device_factory()
-def id() -> Undulator:
+def harmonic() -> UndulatorOrder:
+    return UndulatorOrder("harmonic")
+
+
+@device_factory()
+def id() -> InsertionDevice:
     """Get the i07 undulator device, instantiate it if it hasn't already been.
     If this is called when already instantiated it will return the existing object.
     """
-    return Undulator(
-        prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:",
+    return InsertionDevice(
+        "id",
+        f"{PREFIX.insertion_prefix}-MO-SERVC-01:",
+        harmonic(),
         id_gap_lookup_table_path="/dls_sw/i07/software/gda/config/lookupTables/IIDCalibrationTable.txt",
     )
