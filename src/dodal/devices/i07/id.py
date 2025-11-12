@@ -1,10 +1,10 @@
 import numpy as np
 
-from dodal.devices.undulator import Undulator, UndulatorOrder
+from dodal.devices.undulator import UndulatorInKeV, UndulatorOrder
 from dodal.devices.util.lookup_tables import energy_distance_table
 
 
-class InsertionDevice(Undulator):
+class InsertionDevice(UndulatorInKeV):
     """
     Insertion device for i07 including beamline-specific energy-gap lookup behaviour
     """
@@ -31,7 +31,7 @@ class InsertionDevice(Undulator):
         energy_to_distance_table: np.ndarray = await energy_distance_table(
             self.id_gap_lookup_table_path, comments="#", skiprows=2
         )
-        harmonic_value: int = (await self.harmonic.read())[""]["value"]  # TODO not this
+        harmonic_value: int = await self.harmonic.get()
 
         row: np.ndarray = energy_to_distance_table[harmonic_value - 1, :]
         gap = np.interp(energy_kev, [row[1], row[2]], [row[3], row[4]])

@@ -17,8 +17,11 @@ async def id() -> InsertionDevice:
     return id
 
 
-async def test_id_gap_calculation():
-    test_id = await id()
-    test_id.harmonic.set(5)
-
-    assert test_id._get_gap_to_match_energy(14) == pytest.approx(5.80, abs=0.01)
+@pytest.mark.parametrize(
+    "energy_kev, gap",
+    [(14, 5.81), (15, 6.25)],
+)
+async def test_id_gap_calculation(energy_kev: float, gap: float, id: InsertionDevice):
+    id.harmonic.set(5)
+    interpolated_gap: float = await id._get_gap_to_match_energy(energy_kev)
+    assert interpolated_gap == pytest.approx(gap, abs=0.01)
