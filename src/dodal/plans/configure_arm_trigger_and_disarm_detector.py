@@ -42,6 +42,8 @@ def configure_and_arm_detector(
     eiger: EigerDetector,
     detector_params: DetectorParams,
     trigger_info: TriggerInfo,
+    group: str = "arm_detector",
+    wait: bool = False,
 ):
     assert detector_params.expected_energy_ev
     start = time.time()
@@ -68,7 +70,7 @@ def configure_and_arm_detector(
     yield from set_mx_settings_pvs(eiger, detector_params, wait=True)
     LOGGER.info(f"Setting MX PVs: {time.time() - start}s")
     start = time.time()
-    yield from bps.prepare(eiger, trigger_info, wait=True)
+    yield from bps.prepare(eiger, trigger_info, group=group)
     LOGGER.info(f"Preparing Eiger: {time.time() - start}s")
 
 
