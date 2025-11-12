@@ -267,7 +267,6 @@ class UndulatorOrder(StandardReadable, Locatable[int]):
                 f"Undulator order must be a positive integer. Requested value: {value}"
             )
 
-    @AsyncStatus.wrap
     async def get(self) -> int:
         return (await self.locate())["readback"]
 
