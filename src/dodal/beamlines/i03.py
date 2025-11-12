@@ -1,7 +1,7 @@
 from functools import cache
 
 from ophyd_async.core import PathProvider, Reference
-from ophyd_async.fastcs.eiger import EigerDetector as FastEiger
+from ophyd_async.fastcs.eiger import EigerDetector as FastCSEiger
 from ophyd_async.fastcs.panda import HDFPanda
 from yarl import URL
 
@@ -164,8 +164,8 @@ def eiger(eiger: EigerDetector) -> EigerDetector:
 
 
 @devices.factory()
-def fastcs_eiger(path_provider: PathProvider) -> FastEiger:
-    return FastEiger(
+def fastcs_eiger(path_provider: PathProvider) -> FastCSEiger:
+    return FastCSEiger(
         prefix=PREFIX.beamline_prefix,
         path_provider=path_provider,
         drv_suffix="-EA-EIGER-02:",
