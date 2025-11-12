@@ -55,8 +55,10 @@ class LookupTableKeys:
     LIMIT: str = "limit"
     ENERGIES: str = "energies"
     POLY: str = "poly"
-    High: str = "high"
-    Low: str = "low"
+    HIGH: str = "high"
+    LOW: str = "low"
+    GAP: str = "gap"
+    PHASE: str = "phase"
 
 
 @dataclass
@@ -237,8 +239,8 @@ def get_poly(
     else:
         for energy_range in lookup_table[pol][LookupTableKeys.ENERGIES].values():
             if (
-                energy >= energy_range[LookupTableKeys.Low]
-                and energy < energy_range[LookupTableKeys.High]
+                energy >= energy_range[LookupTableKeys.LOW]
+                and energy < energy_range[LookupTableKeys.HIGH]
             ):
                 return energy_range[LookupTableKeys.POLY]
 
@@ -395,9 +397,9 @@ class EnergyMotorLookup:
             self.update_lookuptable()
 
         gap_poly = get_poly(
-            lookup_table=self.lookup_tables["gap"], energy=energy, pol=pol
+            lookup_table=self.lookup_tables[LookupTableKeys.GAP], energy=energy, pol=pol
         )
         phase_poly = get_poly(
-            lookup_table=self.lookup_tables["phase"], energy=energy, pol=pol
+            lookup_table=self.lookup_tables[LookupTableKeys.GAP], energy=energy, pol=pol
         )
         return gap_poly(energy), phase_poly(energy)
