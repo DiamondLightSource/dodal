@@ -40,6 +40,7 @@ from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.devices.util.lookup_tables_apple2 import (
     EnergyCoverage,
     EnergyCoverageEntry,
+    LookupTable,
     LookupTableColumnConfig,
     convert_csv_to_lookup,
     create_lookup_path,
@@ -230,6 +231,19 @@ def mock_i10_energy_motor_lookup_idu(
         lut_column_config=LookupTableColumnConfig(
             path=create_lookup_path(LOOKUP_TABLE_PATH),
             source=("Source", "idu"),
+        ),
+        config_client=mock_config_client,
+    )
+
+
+@pytest.fixture
+def mock_i10_energy_motor_lookup_idd(
+    mock_config_client: ConfigServer,
+) -> I10EnergyMotorLookup:
+    return I10EnergyMotorLookup(
+        lut_column_config=LookupTableColumnConfig(
+            path=create_lookup_path(LOOKUP_TABLE_PATH),
+            source=("Source", "idd"),
         ),
         config_client=mock_config_client,
     )
@@ -674,45 +688,62 @@ async def test_linear_arbitrary_run_engine_scan(
 
 
 @pytest.mark.parametrize(
-    "file_name, expected_dict_file_name, source",
+    "file_name, expected_dict_file_name",
     [
         (
             ID_ENERGY_2_GAP_CALIBRATIONS_CSV,
             EXPECTED_ID_ENERGY_2_GAP_CALIBRATIONS_IDU_PKL,
-            ("Source", "idu"),
-        ),
-        (
-            ID_ENERGY_2_GAP_CALIBRATIONS_CSV,
-            EXPECTED_ID_ENERGY_2_GAP_CALIBRATIONS_IDD_PKL,
-            ("Source", "idd"),
         ),
         (
             ID_ENERGY_2_PHASE_CALIBRATIONS_CSV,
             EXPECTED_ID_ENERGY_2_PHASE_CALIBRATIONS_IDU_PKL,
-            ("Source", "idu"),
-        ),
-        (
-            ID_ENERGY_2_PHASE_CALIBRATIONS_CSV,
-            EXPECTED_ID_ENERGY_2_PHASE_CALIBRATIONS_IDD_PKL,
-            ("Source", "idd"),
         ),
     ],
 )
-def test_i10_energy_motor_lookup_convert_csv_to_lookup_success(
+def test_i10_energy_motor_lookup_idu_convert_csv_to_lookup_success(
     mock_i10_energy_motor_lookup_idu: I10EnergyMotorLookup,
     file_name: str,
     expected_dict_file_name: str,
-    source: tuple[str, str],
 ):
     file = mock_i10_energy_motor_lookup_idu.config_client.get_file_contents(
         file_path=file_name, reset_cached_result=True
     )
-    data = convert_csv_to_lookup(
+    lut = convert_csv_to_lookup(
         file=file, lut_column_config=mock_i10_energy_motor_lookup_idu.lut_column_config
     )
     with open(expected_dict_file_name, "rb") as f:
-        loaded_dict = pickle.load(f)
-    assert data == loaded_dict
+        expected_lut = LookupTable(pickle.load(f))
+    assert lut == expected_lut
+
+
+@pytest.mark.parametrize(
+    "file_name, expected_dict_file_name",
+    [
+        (
+            ID_ENERGY_2_GAP_CALIBRATIONS_CSV,
+            EXPECTED_ID_ENERGY_2_GAP_CALIBRATIONS_IDD_PKL,
+        ),
+        (
+            ID_ENERGY_2_PHASE_CALIBRATIONS_CSV,
+            EXPECTED_ID_ENERGY_2_PHASE_CALIBRATIONS_IDD_PKL,
+        ),
+    ],
+)
+def test_i10_energy_motor_lookup_idd_convert_csv_to_lookup_success(
+    mock_i10_energy_motor_lookup_idd: I10EnergyMotorLookup,
+    file_name: str,
+    expected_dict_file_name: str,
+):
+    file = mock_i10_energy_motor_lookup_idd.config_client.get_file_contents(
+        file_path=file_name, reset_cached_result=True
+    )
+    lut = convert_csv_to_lookup(
+        file=file, lut_column_config=mock_i10_energy_motor_lookup_idd.lut_column_config
+    )
+    with open(expected_dict_file_name, "rb") as f:
+        expected_lut = LookupTable(pickle.load(f))
+
+    assert lut == expected_lut
 
 
 def test_i10_energy_motor_lookup_convert_csv_to_lookup_failed(

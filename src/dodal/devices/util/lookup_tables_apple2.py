@@ -147,14 +147,10 @@ def convert_csv_to_lookup(
 
     def process_row(row: dict, lut: LookupTable) -> LookupTable:
         """Process a single row from the CSV file and update the lookup table."""
-        print(f"DEBUG: row = {row}")
         mode_value = str(row[lut_column_config.mode]).lower()
-        print(f"DEBUG: mode_value = {mode_value}")
         if mode_value in lut_column_config.mode_name_convert:
             mode_value = lut_column_config.mode_name_convert[f"{mode_value}"]
-        print(f"DEBUG: mode_value = {mode_value}")
         if mode_value not in polarisations:
-            print(f"DEBUG: added {mode_value} to polarisations")
             polarisations.add(mode_value)
 
         print(f"lut = {lut}")
@@ -168,10 +164,6 @@ def convert_csv_to_lookup(
                 poly1d_param=coefficients,
             )
 
-            print(
-                f"DEBUG: mode_value not in lookup. Doing generate_lookup_table. Now looks like {lut}"
-            )
-
         else:
             lut.root[mode_value].energies.root[row[lut_column_config.min_energy]] = (
                 EnergyCoverageEntry(
@@ -180,8 +172,6 @@ def convert_csv_to_lookup(
                     poly=np.poly1d(coefficients),
                 )
             )
-
-            print(f"DEBUG: mode_value is in lookup. Now looks like {lut}")
 
         # Update energy limits
         lut.root[mode_value].limit.minimum = min(
@@ -202,7 +192,6 @@ def convert_csv_to_lookup(
     for row in reader:
         # If there are multiple source only convert requested.
         if lut_column_config.source is not None:
-            print(f"DEBUG: source = {lut_column_config.source}")
             if row[lut_column_config.source[0]] == lut_column_config.source[1]:
                 lookup_table = process_row(row=row, lut=lookup_table)
         else:
