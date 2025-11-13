@@ -548,7 +548,7 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
     ) -> None:
         # This changes the pol setpoint and then changes polarisation via set energy.
         self._polarisation_setpoint_set(value)
-        await self.energy.set(await self.energy.get_value())
+        await self.energy.set(await self.energy.get_value(), timeout=MAXIMUM_MOVE_TIME)
 
     def _read_pol(
         self,
