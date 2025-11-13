@@ -30,7 +30,7 @@ class BeamstopPositions(StrictEnum):
     """
 
     DATA_COLLECTION = "Data Collection"
-    OUT = "Out"
+    OUT_OF_BEAM = "Out"
     UNKNOWN = "Unknown"
 
 
@@ -82,7 +82,7 @@ class Beamstop(StandardReadable):
         if self._is_near_position(current_pos, self._in_beam_xyz_mm):
             return BeamstopPositions.DATA_COLLECTION
         elif self._is_near_position(current_pos, self._out_of_beam_xyz_mm):
-            return BeamstopPositions.OUT
+            return BeamstopPositions.OUT_OF_BEAM
         else:
             return BeamstopPositions.UNKNOWN
 
@@ -100,7 +100,7 @@ class Beamstop(StandardReadable):
         match position:
             case BeamstopPositions.DATA_COLLECTION:
                 await self._safe_move_above_table(self._in_beam_xyz_mm)
-            case BeamstopPositions.OUT:
+            case BeamstopPositions.OUT_OF_BEAM:
                 await self._safe_move_above_table(self._out_of_beam_xyz_mm)
             case _:
                 raise ValueError(f"Cannot set beamstop to position {position}")
