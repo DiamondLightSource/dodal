@@ -33,6 +33,7 @@ from dodal.devices.hutch_shutter import HutchShutter
 from dodal.devices.i03 import Beamstop
 from dodal.devices.i03.dcm import DCM
 from dodal.devices.i03.undulator_dcm import UndulatorDCM
+from dodal.devices.ipin import IPin
 from dodal.devices.motors import XYZStage
 from dodal.devices.oav.oav_detector import OAVBeamCentreFile
 from dodal.devices.oav.oav_parameters import OAVConfigBeamCentre
@@ -456,3 +457,11 @@ def collimation_table() -> CollimationTable:
     If this is called when already instantiated in i03, it will return the existing object.
     """
     return CollimationTable(prefix=f"{PREFIX.beamline_prefix}-MO-TABLE-01")
+
+
+@device_factory()
+def ipin() -> IPin:
+    """Get the i03 ipin device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i04, it will return the existing object.
+    """
+    return IPin(f"{PREFIX.beamline_prefix}-EA-PIN-01:")
