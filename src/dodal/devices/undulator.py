@@ -2,7 +2,7 @@ import os
 from abc import ABC, abstractmethod
 
 import numpy as np
-from bluesky.protocols import Location, Movable, Readable
+from bluesky.protocols import Locatable, Location, Movable
 from numpy import ndarray
 from ophyd_async.core import (
     AsyncStatus,
@@ -244,7 +244,7 @@ class UndulatorInMm(BaseUndulator):
         await self._set_gap(value)
 
 
-class UndulatorOrder(StandardReadable, Readable[int]):
+class UndulatorOrder(StandardReadable, Locatable[int]):
     """
     Represents the order of an undulator device. Allows setting and locating the order.
     """
