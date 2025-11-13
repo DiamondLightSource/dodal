@@ -34,6 +34,10 @@ from dodal.devices.i10.i10_apple2 import (
 from dodal.devices.i10.i10_setting_data import I10Grating
 from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.devices.synchrotron import Synchrotron
+from dodal.devices.util.lookup_tables_apple2 import (
+    LookupTableColumnConfig,
+    create_lookup_path,
+)
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
@@ -117,9 +121,10 @@ def idd_controller() -> I10Apple2Controller:
     """I10 downstream insertion device controller."""
     return I10Apple2Controller(
         apple2=idd(),
-        lookuptable_dir=LOOK_UPTABLE_DIR,
-        source=("Source", "idd"),
         config_client=I10_CONF_CLIENT,
+        lut_column_config=LookupTableColumnConfig(
+            source=("Source", "idd"), path=create_lookup_path(LOOK_UPTABLE_DIR)
+        ),
     )
 
 
@@ -181,9 +186,10 @@ def idu_controller() -> I10Apple2Controller:
     """I10 upstream insertion device controller."""
     return I10Apple2Controller(
         apple2=idu(),
-        lookuptable_dir=LOOK_UPTABLE_DIR,
-        source=("Source", "idu"),
         config_client=I10_CONF_CLIENT,
+        lut_column_config=LookupTableColumnConfig(
+            source=("Source", "idu"), path=create_lookup_path(LOOK_UPTABLE_DIR)
+        ),
     )
 
 

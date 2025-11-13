@@ -33,7 +33,6 @@ import io
 from collections.abc import Generator
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
 
 import numpy as np
 from daq_config_server.client import ConfigServer
@@ -44,31 +43,40 @@ from dodal.devices.apple2_undulator import Pol
 
 @dataclass
 class LookupPath:
-    gap: Path | None
-    phase: Path | None
+    gap: Path
+    phase: Path
 
 
-@dataclass
-class LookupTableKeys:
-    MIN: str = "minimum"
-    MAX: str = "maximum"
-    LIMIT: str = "limit"
-    ENERGIES: str = "energies"
-    POLY: str = "poly"
-    HIGH: str = "high"
-    LOW: str = "low"
-    GAP: str = "gap"
-    PHASE: str = "phase"
+def create_lookup_path(
+    path: str,
+    gap_file: str = "IDEnergy2GapCalibrations.csv",
+    phase_file: str = "IDEnergy2GapCalibrations.csv",
+) -> LookupPath:
+    return LookupPath(gap=Path(path, gap_file), phase=Path(path, phase_file))
 
 
-@dataclass
-class LookupTableConfig:
+DEFAULT_POLY_DEG = [
+    "7th-order",
+    "6th-order",
+    "5th-order",
+    "4th-order",
+    "3rd-order",
+    "2nd-order",
+    "1st-order",
+    "b",
+]
+
+MODE_NAME_CONVERT = {"CR": "pc", "CL": "nc"}
+
+
+class LookupTableColumnConfig(BaseModel):
     path: LookupPath
-    source: tuple[str, str] | None
-    mode: str | None
-    min_energy: str | None
-    max_energy: str | None
-    poly_deg: list | None
+    source: tuple[str, str] | None = None
+    mode: str = "Mode"
+    min_energy: str = "MinEnergy"
+    max_energy: str = "MaxEnergy"
+    poly_deg: list[str] = DEFAULT_POLY_DEG
+    mode_name_convert: dict[str, str] = MODE_NAME_CONVERT
 
 
 class EnergyMinMax(BaseModel):
@@ -84,7 +92,7 @@ class EnergyCoverageEntry(BaseModel):
 
 
 class EnergyCoverage(RootModel):
-    root: dict[str, EnergyCoverageEntry]
+    root: dict[str, EnergyCoverageEntry] = {}
 
 
 class LookupTableEntries(BaseModel):
@@ -92,20 +100,21 @@ class LookupTableEntries(BaseModel):
     limit: EnergyMinMax
 
 
-class Lookuptable(RootModel):
-    root: dict[str, LookupTableEntries]
+class LookupTable(RootModel):
+    root: dict[str, LookupTableEntries] = {}
+
+
+class GapPhaseLookupTable(BaseModel):
+    gap: LookupTable = LookupTable()
+    phase: LookupTable = LookupTable()
 
 
 def convert_csv_to_lookup(
     file: str,
-    source: tuple[str, str] | None = None,
-    mode: str | None = "Mode",
-    mode_name_convert: dict[str, str] | None = None,
-    min_energy: str | None = "MinEnergy",
-    max_energy: str | None = "MaxEnergy",
-    poly_deg: list | None = None,
+    lut_column_config: LookupTableColumnConfig,
+    mode_name_convert: dict[str, str] = MODE_NAME_CONVERT,
     skip_line_start_with: str = "#",
-) -> dict[str | None, dict[str, dict[str, dict[str, Any]]]]:
+) -> LookupTable:
     """
     Convert CSV content into the Apple2 lookup-table dictionary.
 
@@ -129,68 +138,58 @@ def convert_csv_to_lookup(
         Lines beginning with this prefix are skipped (default "#").
 
     """
-    # Change none standard name to standard used in Pol
-    if mode_name_convert is None:
-        mode_name_convert = {"CR": "pc", "CL": "nc"}
-    if poly_deg is None:
-        poly_deg = [
-            "7th-order",
-            "6th-order",
-            "5th-order",
-            "4th-order",
-            "3rd-order",
-            "2nd-order",
-            "1st-order",
-            "b",
-        ]
-    lookup_table = {}
+
+    lookup_table = LookupTable({})
     polarisations = set()
 
     def process_row(row: dict) -> None:
         """Process a single row from the CSV file and update the lookup table."""
-        mode_value = str(row[mode]).lower()
+        print(f"DEBUG: row = {row}")
+        mode_value = str(row[lut_column_config.mode]).lower()
+        print(f"DEBUG: mode_value = {mode_value}")
         if mode_value in mode_name_convert:
             mode_value = mode_name_convert[f"{mode_value}"]
         if mode_value not in polarisations:
             polarisations.add(mode_value)
 
         # Create polynomial object for energy-to-gap/phase conversion
-        coefficients = [float(row[coef]) for coef in poly_deg]
-        if mode_value not in lookup_table:
-            lookup_table.update(
+        coefficients = [float(row[coef]) for coef in lut_column_config.poly_deg]
+        if mode_value not in lookup_table.root:
+            lookup_table.root.update(
                 generate_lookup_table(
                     pol=Pol(mode_value),
-                    min_energy=float(row[min_energy]),
-                    max_energy=float(row[max_energy]),
+                    min_energy=float(row[lut_column_config.min_energy]),
+                    max_energy=float(row[lut_column_config.max_energy]),
                     poly1d_param=coefficients,
                 )
             )
 
         else:
-            lookup_table[mode_value][LookupTableKeys.ENERGIES][row[min_energy]] = (
-                EnergyCoverageEntry(
-                    low=float(row[min_energy]),
-                    high=float(row[max_energy]),
-                    poly=np.poly1d(coefficients),
-                ).model_dump()
+            lookup_table.root[mode_value].energies.root[
+                row[lut_column_config.min_energy]
+            ] = EnergyCoverageEntry(
+                low=float(row[lut_column_config.min_energy]),
+                high=float(row[lut_column_config.max_energy]),
+                poly=np.poly1d(coefficients),
             )
 
         # Update energy limits
-        lookup_table[mode_value][LookupTableKeys.LIMIT][LookupTableKeys.MIN] = min(
-            lookup_table[mode_value][LookupTableKeys.LIMIT][LookupTableKeys.MIN],
-            float(row[min_energy]),
+        lookup_table.root[mode_value].limit.minimum = min(
+            lookup_table.root[mode_value].limit.minimum,
+            float(row[lut_column_config.min_energy]),
         )
-        lookup_table[mode_value][LookupTableKeys.LIMIT][LookupTableKeys.MAX] = max(
-            lookup_table[mode_value][LookupTableKeys.LIMIT][LookupTableKeys.MAX],
-            float(row[max_energy]),
+        lookup_table.root[mode_value].limit.maximum = max(
+            lookup_table.root[mode_value].limit.maximum,
+            float(row[lut_column_config.max_energy]),
         )
 
     reader = csv.DictReader(read_file_and_skip(file, skip_line_start_with))
 
     for row in reader:
         # If there are multiple source only convert requested.
-        if source is not None:
-            if row[source[0]] == source[1]:
+        if lut_column_config.source is not None:
+            print(f"DEBUG: source = {lut_column_config.source}")
+            if row[lut_column_config.source[0]] == lut_column_config.source[1]:
                 process_row(row=row)
         else:
             process_row(row=row)
@@ -212,7 +211,7 @@ def read_file_and_skip(file: str, skip_line_start_with: str = "#") -> Generator[
 def get_poly(
     energy: float,
     pol: Pol,
-    lookup_table: dict[str | None, dict[str, dict[str, Any]]],
+    lookup_table: LookupTable,
 ) -> np.poly1d:
     """
     Return the numpy.poly1d polynomial applicable for the given energy and polarisation.
@@ -228,21 +227,18 @@ def get_poly(
 
     """
     if (
-        energy < lookup_table[pol][LookupTableKeys.LIMIT][LookupTableKeys.MIN]
-        or energy > lookup_table[pol][LookupTableKeys.LIMIT][LookupTableKeys.MAX]
+        energy < lookup_table.root[pol].limit.minimum
+        or energy > lookup_table.root[pol].limit.maximum
     ):
         raise ValueError(
             "Demanding energy must lie between"
-            + f" {lookup_table[pol][LookupTableKeys.LIMIT][LookupTableKeys.MIN]}"
-            + f" and {lookup_table[pol][LookupTableKeys.LIMIT][LookupTableKeys.MAX]} eV!"
+            + f" {lookup_table.root[pol].limit.minimum}"
+            + f" and {lookup_table.root[pol].limit.maximum} eV!"
         )
     else:
-        for energy_range in lookup_table[pol][LookupTableKeys.ENERGIES].values():
-            if (
-                energy >= energy_range[LookupTableKeys.LOW]
-                and energy < energy_range[LookupTableKeys.HIGH]
-            ):
-                return energy_range[LookupTableKeys.POLY]
+        for energy_range in lookup_table.root[pol].energies.root.values():
+            if energy >= energy_range.low and energy < energy_range.high:
+                return energy_range.poly
 
     raise ValueError(
         "Cannot find polynomial coefficients for your requested energy."
@@ -252,8 +248,8 @@ def get_poly(
 
 def generate_lookup_table(
     pol: Pol, min_energy: float, max_energy: float, poly1d_param: list[float]
-) -> dict[str | None, dict[str, dict[str, Any]]]:
-    return Lookuptable(
+) -> LookupTable:
+    return LookupTable(
         {
             pol.value: LookupTableEntries(
                 energies=EnergyCoverage(
@@ -271,7 +267,7 @@ def generate_lookup_table(
                 ),
             )
         }
-    ).model_dump()
+    )
 
 
 def make_phase_tables(
@@ -279,12 +275,12 @@ def make_phase_tables(
     min_energies: list[float],
     max_energies: list[float],
     poly1d_params: list[list[float]],
-) -> dict[str | None, dict[str, dict[str, Any]]]:
+) -> LookupTable:
     """Generate a dictionary containing multiple lookuptable entries
     for provided polarisations."""
-    lookuptable_phase = {}
+    lookuptable_phase = LookupTable()
     for i in range(len(pols)):
-        lookuptable_phase.update(
+        lookuptable_phase.root.update(
             generate_lookup_table(
                 pol=pols[i],
                 min_energy=min_energies[i],
@@ -295,7 +291,7 @@ def make_phase_tables(
     return lookuptable_phase
 
 
-class EnergyMotorLookup:
+class BaseEnergyMotorLookup:
     """
     Abstract base for energy->motor lookup.
 
@@ -307,15 +303,8 @@ class EnergyMotorLookup:
 
     def __init__(
         self,
-        lookuptable_dir: str,
         config_client: ConfigServer,
-        source: tuple[str, str] | None = None,
-        mode: str = "Mode",
-        min_energy: str = "MinEnergy",
-        max_energy: str = "MaxEnergy",
-        gap_file_name: str = "IDEnergy2GapCalibrations.csv",
-        phase_file_name: str | None = "IDEnergy2PhaseCalibrations.csv",
-        poly_deg: list | None = None,
+        lut_column_config: LookupTableColumnConfig,
     ):
         """Initialise the EnergyMotorLookup class with lookup table headers provided.
 
@@ -341,23 +330,8 @@ class EnergyMotorLookup:
             The column names for the parameters for the energy conversion polynomial, starting with the least significant.
 
         """
-        self.lookup_tables: dict[str, dict[str | None, dict[str, dict[str, Any]]]] = {
-            "gap": {},
-            "phase": {},
-        }
-        energy_gap_table_path = Path(lookuptable_dir, gap_file_name)
-        if phase_file_name is not None:
-            energy_phase_table_path = Path(lookuptable_dir, phase_file_name)
-        else:
-            energy_phase_table_path = None
-        self.lookup_table_config = LookupTableConfig(
-            path=LookupPath(energy_gap_table_path, energy_phase_table_path),
-            mode=mode,
-            source=source,
-            min_energy=min_energy,
-            max_energy=max_energy,
-            poly_deg=poly_deg,
-        )
+        self.lookup_tables = GapPhaseLookupTable()
+        self.lut_column_config = lut_column_config
         self.config_client = config_client
         self._available_pol = []
 
@@ -374,7 +348,6 @@ class EnergyMotorLookup:
         """
         Update lookup tables from files and validate their format.
         """
-        ...
 
     def get_motor_from_energy(self, energy: float, pol: Pol) -> tuple[float, float]:
         """
@@ -396,11 +369,9 @@ class EnergyMotorLookup:
         if self.available_pol == []:
             self.update_lookuptable()
 
-        gap_poly = get_poly(
-            lookup_table=self.lookup_tables[LookupTableKeys.GAP], energy=energy, pol=pol
-        )
+        gap_poly = get_poly(lookup_table=self.lookup_tables.gap, energy=energy, pol=pol)
         phase_poly = get_poly(
-            lookup_table=self.lookup_tables[LookupTableKeys.PHASE],
+            lookup_table=self.lookup_tables.phase,
             energy=energy,
             pol=pol,
         )
