@@ -3,6 +3,7 @@ from ophyd_async.core import init_devices
 
 from dodal.devices.i07.id import InsertionDevice
 from dodal.devices.undulator import UndulatorOrder
+from tests.devices.i07 import TEST_LOOKUP_TABLE_PATH
 
 
 @pytest.fixture
@@ -12,7 +13,7 @@ async def id() -> InsertionDevice:
             "ID-01",
             "ID-01",
             UndulatorOrder("harmonic"),
-            "/workspaces/dodal/tests/devices/i07/IIDCalibrationTable.txt",
+            TEST_LOOKUP_TABLE_PATH,
         )
     return id
 
