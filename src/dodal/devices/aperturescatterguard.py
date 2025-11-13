@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+from math import inf
 
 from bluesky.protocols import Preparable
 from ophyd_async.core import (
@@ -112,7 +113,7 @@ def load_positions_from_beamline_parameters(
 ) -> dict[ApertureValue, AperturePosition]:
     return {
         ApertureValue.OUT_OF_BEAM: AperturePosition.from_gda_params(
-            _GDAParamApertureValue.ROBOT_LOAD, 0, params
+            _GDAParamApertureValue.ROBOT_LOAD, inf, params
         ),
         ApertureValue.SMALL: AperturePosition.from_gda_params(
             _GDAParamApertureValue.SMALL, 20, params
@@ -124,7 +125,7 @@ def load_positions_from_beamline_parameters(
             _GDAParamApertureValue.LARGE, 100, params
         ),
         ApertureValue.PARKED: AperturePosition.from_gda_params(
-            _GDAParamApertureValue.MANUAL_LOAD, 0, params
+            _GDAParamApertureValue.MANUAL_LOAD, inf, params
         ),
     }
 
