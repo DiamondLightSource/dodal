@@ -308,7 +308,6 @@ async def test_fail_i10_apple2_controller_set_energy_has_default(
     mock_id_energy: InsertionDeviceEnergy,
     mock_id_controller: I10Apple2Controller,
 ):
-    set_mock_value(mock_id_controller._energy, 700)
     mock_id_controller.energy.set = AsyncMock()
     await mock_id_energy.set(600)
     mock_id_controller.energy.set.assert_awaited_once_with(
@@ -573,6 +572,17 @@ async def test_linear_arbitrary_pol_fail_read(
         f"Angle control is not available in polarisation"
         f" {await mock_id_controller.polarisation.get_value()}"
         + f" with {mock_id_controller.name}"
+    )
+
+
+async def test_linear_arbitrary_pol_set_default_timeout(
+    mock_linear_arbitrary_angle: LinearArbitraryAngle,
+    mock_id_controller: I10Apple2Controller,
+):
+    mock_id_controller.linear_arbitrary_angle.set = AsyncMock()
+    await mock_linear_arbitrary_angle.set(60)
+    mock_id_controller.linear_arbitrary_angle.set.assert_awaited_once_with(
+        60, timeout=MAXIMUM_MOVE_TIME
     )
 
 
