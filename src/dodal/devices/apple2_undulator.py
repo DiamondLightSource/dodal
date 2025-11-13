@@ -29,6 +29,7 @@ from dodal.log import LOGGER
 T = TypeVar("T")
 
 DEFAULT_MOTOR_MIN_TIMEOUT = 10
+MAXIMUM_MOVE_TIME = 550  # There is no useful movements take longer than this.
 
 
 class UndulatorGateStatus(StrictEnum):
@@ -548,7 +549,7 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
     ) -> None:
         # This changes the pol setpoint and then changes polarisation via set energy.
         self._polarisation_setpoint_set(value)
-        await self.energy.set(await self.energy.get_value())
+        await self.energy.set(await self.energy.get_value(), timeout=MAXIMUM_MOVE_TIME)
 
     def _read_pol(
         self,
@@ -728,7 +729,7 @@ class InsertionDeviceEnergy(InsertionDeviceEnergyBase):
 
     @AsyncStatus.wrap
     async def set(self, energy: float) -> None:
-        await self.energy().set(energy)
+        await self.energy().set(energy, timeout=MAXIMUM_MOVE_TIME)
 
 
 class InsertionDevicePolarisation(StandardReadable, Locatable[Pol]):
@@ -743,7 +744,7 @@ class InsertionDevicePolarisation(StandardReadable, Locatable[Pol]):
 
     @AsyncStatus.wrap
     async def set(self, pol: Pol) -> None:
-        await self.polarisation().set(pol)
+        await self.polarisation().set(pol, timeout=MAXIMUM_MOVE_TIME)
 
     async def locate(self) -> Location[Pol]:
         """Return the current polarisation"""
