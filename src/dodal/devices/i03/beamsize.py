@@ -6,7 +6,7 @@ from dodal.devices.i03.constants import BeamsizeConstants
 
 
 class Beamsize(BeamsizeBase):
-    def __init__(self, aperture_scatterguard: ApertureScatterguard, name="beamsize"):
+    def __init__(self, aperture_scatterguard: ApertureScatterguard, name=""):
         super().__init__(name=name)
         self._aperture_scatterguard_ref = Reference(aperture_scatterguard)
 

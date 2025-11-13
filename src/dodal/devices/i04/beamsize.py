@@ -10,7 +10,7 @@ class Beamsize(BeamsizeBase):
         self,
         transfocator: Transfocator,
         aperture_scatterguard: ApertureScatterguard,
-        name="beamsize",
+        name="",
     ):
         super().__init__(name=name)
         self._transfocator_ref = Reference(transfocator)

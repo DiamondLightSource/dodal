@@ -1,4 +1,5 @@
 from collections.abc import AsyncGenerator
+from math import inf
 from typing import Any
 from unittest.mock import AsyncMock, call
 
@@ -218,7 +219,7 @@ async def test_aperture_positions_robot_load(
     await ap_sg.aperture.z.set(robot_load.aperture_z)
     reading = await ap_sg.read()
     assert isinstance(reading, dict)
-    assert reading[f"{ap_sg.name}-radius"]["value"] == 0.0
+    assert reading[f"{ap_sg.name}-radius"]["value"] == inf
     assert (
         reading[f"{ap_sg.name}-selected_aperture"]["value"] == ApertureValue.OUT_OF_BEAM
     )
@@ -238,7 +239,7 @@ async def test_aperture_positions_robot_load_within_tolerance(
     await ap_sg.aperture.z.set(robot_load.aperture_z)
     reading = await ap_sg.read()
     assert isinstance(reading, dict)
-    assert reading[f"{ap_sg.name}-radius"]["value"] == 0.0
+    assert reading[f"{ap_sg.name}-radius"]["value"] == inf
     assert (
         reading[f"{ap_sg.name}-selected_aperture"]["value"] == ApertureValue.OUT_OF_BEAM
     )
@@ -272,7 +273,7 @@ async def test_aperture_positions_parked(
     await ap_sg.aperture.z.set(parked.aperture_z)
     reading = await ap_sg.read()
     assert isinstance(reading, dict)
-    assert reading[f"{ap_sg.name}-radius"]["value"] == 0.0
+    assert reading[f"{ap_sg.name}-radius"]["value"] == inf
     assert reading[f"{ap_sg.name}-selected_aperture"]["value"] == ApertureValue.PARKED
 
 
@@ -290,7 +291,7 @@ async def test_aperture_positions_parked_within_tolerance(
     await ap_sg.aperture.z.set(parked_z + tolerance)
     reading = await ap_sg.read()
     assert isinstance(reading, dict)
-    assert reading[f"{ap_sg.name}-radius"]["value"] == 0.0
+    assert reading[f"{ap_sg.name}-radius"]["value"] == inf
     assert reading[f"{ap_sg.name}-selected_aperture"]["value"] == ApertureValue.PARKED
 
 

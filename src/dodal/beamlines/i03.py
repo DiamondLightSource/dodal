@@ -461,7 +461,7 @@ def collimation_table() -> CollimationTable:
 
 @device_factory()
 def beamsize() -> Beamsize:
-    """Get the i03 beamstop device, instantiate it if it hasn't already been.
+    """Get the i03 beamsize device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
     return Beamsize(
