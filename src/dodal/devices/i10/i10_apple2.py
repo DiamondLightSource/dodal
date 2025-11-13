@@ -18,6 +18,7 @@ from ophyd_async.core import (
 from pydantic import BaseModel, ConfigDict, RootModel
 
 from dodal.devices.apple2_undulator import (
+    MAXIMUM_MOVE_TIME,
     Apple2,
     Apple2Controller,
     Apple2PhasesVal,
@@ -26,7 +27,6 @@ from dodal.devices.apple2_undulator import (
     UndulatorGap,
     UndulatorJawPhase,
     UndulatorPhaseAxes,
-    MAXIMUM_MOVE_TIME
 )
 from dodal.log import LOGGER
 
@@ -35,7 +35,6 @@ MAXIMUM_ROW_PHASE_MOTOR_POSITION = 24.0
 MAXIMUM_GAP_MOTOR_POSITION = 100
 DEFAULT_JAW_PHASE_POLY_PARAMS = [1.0 / 7.5, -120.0 / 7.5]
 ALPHA_OFFSET = 180
-
 
 
 # data class to store the lookup table configuration that is use in convert_csv_to_lookup
@@ -490,4 +489,4 @@ class LinearArbitraryAngle(StandardReadable, Movable[SupportsFloat]):
 
     @AsyncStatus.wrap
     async def set(self, angle: float) -> None:
-        await self.linear_arbitrary_angle().set(angle,timeout=MAXIMUM_MOVE_TIME)
+        await self.linear_arbitrary_angle().set(angle, timeout=MAXIMUM_MOVE_TIME)
