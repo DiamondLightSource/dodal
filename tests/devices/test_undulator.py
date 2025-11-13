@@ -201,7 +201,7 @@ async def test_order_read(
 ):
     await assert_reading(
         undulator_order,
-        {"undulator_order-_value": partial_reading(3)},
+        {"undulator_order-value": partial_reading(3)},
     )
 
 
