@@ -91,7 +91,7 @@ class EnergyCoverageEntry(BaseModel):
     poly: np.poly1d
 
 
-class EnergyCoverage(RootModel[dict[float, EnergyCoverageEntry]]):
+class EnergyCoverage(RootModel[dict[str, EnergyCoverageEntry]]):
     pass
     # def __init__(self, root: dict[str, EnergyCoverageEntry] | None = None):
     #     super().__init__(root=root or {})
