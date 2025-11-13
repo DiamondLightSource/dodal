@@ -1,0 +1,38 @@
+dodal.devices.util.lookup\_tables\_apple2.LookupTableConfig
+===========================================================
+
+.. currentmodule:: dodal.devices.util.lookup_tables_apple2
+
+.. autoclass:: LookupTableConfig
+   :members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~LookupTableConfig.path
+      
+      
+      ~LookupTableConfig.source
+      
+      
+      ~LookupTableConfig.mode
+      
+      
+      ~LookupTableConfig.min_energy
+      
+      
+      ~LookupTableConfig.max_energy
+      
+      
+      ~LookupTableConfig.poly_deg
+      
+   
+   

@@ -1,0 +1,26 @@
+dodal.devices.util.lookup\_tables\_apple2.LookupPath
+====================================================
+
+.. currentmodule:: dodal.devices.util.lookup_tables_apple2
+
+.. autoclass:: LookupPath
+   :members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~LookupPath.gap
+      
+      
+      ~LookupPath.phase
+      
+   
+   

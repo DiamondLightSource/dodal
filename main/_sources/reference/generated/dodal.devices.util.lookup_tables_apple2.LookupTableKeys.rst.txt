@@ -1,0 +1,47 @@
+dodal.devices.util.lookup\_tables\_apple2.LookupTableKeys
+=========================================================
+
+.. currentmodule:: dodal.devices.util.lookup_tables_apple2
+
+.. autoclass:: LookupTableKeys
+   :members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~LookupTableKeys.ENERGIES
+      
+      
+      ~LookupTableKeys.GAP
+      
+      
+      ~LookupTableKeys.HIGH
+      
+      
+      ~LookupTableKeys.LIMIT
+      
+      
+      ~LookupTableKeys.LOW
+      
+      
+      ~LookupTableKeys.MAX
+      
+      
+      ~LookupTableKeys.MIN
+      
+      
+      ~LookupTableKeys.PHASE
+      
+      
+      ~LookupTableKeys.POLY
+      
+   
+   

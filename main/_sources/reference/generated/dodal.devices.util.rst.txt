@@ -12,6 +12,7 @@ dodal.devices.util
    dodal.devices.util.adjuster_plans
    dodal.devices.util.epics_util
    dodal.devices.util.lookup_tables
+   dodal.devices.util.lookup_tables_apple2
 
 
 

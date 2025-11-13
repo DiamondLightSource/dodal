@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Index &#8212; dodal 1.65.1.dev10+g82560ebc5 documentation</title>
+    <title>Index &#8212; dodal 1.65.1.dev11+g22ad0f627 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="_static/documentation_options.js?v=45b50f45"></script>
+    <script src="_static/documentation_options.js?v=8c71e43a"></script>
     <script src="_static/doctools.js?v=9a2dae69"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -953,6 +953,7 @@ window.addEventListener("load", () => mermaid.run());
 <li class="toctree-l4"><a class="reference internal" href="reference/generated/dodal.devices.util.adjuster_plans.html">dodal.devices.util.adjuster_plans</a></li>
 <li class="toctree-l4"><a class="reference internal" href="reference/generated/dodal.devices.util.epics_util.html">dodal.devices.util.epics_util</a></li>
 <li class="toctree-l4"><a class="reference internal" href="reference/generated/dodal.devices.util.lookup_tables.html">dodal.devices.util.lookup_tables</a></li>
+<li class="toctree-l4"><a class="reference internal" href="reference/generated/dodal.devices.util.lookup_tables_apple2.html">dodal.devices.util.lookup_tables_apple2</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="reference/generated/dodal.devices.v2f.html">dodal.devices.v2f</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -1291,15 +1292,17 @@ window.addEventListener("load", () => mermaid.run());
 </li>
       <li><a href="reference/generated/dodal.devices.i24.commissioning_jungfrau.CommissioningJungfrau.html#dodal.devices.i24.commissioning_jungfrau.CommissioningJungfrau">CommissioningJungfrau (class in dodal.devices.i24.commissioning_jungfrau)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/generated/dodal.devices.i24.pmac.ProgramRunner.html#dodal.devices.i24.pmac.ProgramRunner.complete">complete() (dodal.devices.i24.pmac.ProgramRunner method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/generated/dodal.devices.oav.snapshots.snapshot_image_processing.html#dodal.devices.oav.snapshots.snapshot_image_processing.compute_beam_centre_pixel_xy_for_mm_position">compute_beam_centre_pixel_xy_for_mm_position() (in module dodal.devices.oav.snapshots.snapshot_image_processing)</a>
 </li>
       <li><a href="reference/generated/dodal.devices.controllers.ConstantDeadTimeController.html#dodal.devices.controllers.ConstantDeadTimeController">ConstantDeadTimeController (class in dodal.devices.controllers)</a>
 </li>
       <li><a href="reference/generated/dodal.devices.temperture_controller.Lakeshore.html#dodal.devices.temperture_controller.Lakeshore.control_channel">control_channel (dodal.devices.temperture_controller.Lakeshore attribute)</a>
+</li>
+      <li><a href="reference/generated/dodal.devices.util.lookup_tables_apple2.html#dodal.devices.util.lookup_tables_apple2.convert_csv_to_lookup">convert_csv_to_lookup() (in module dodal.devices.util.lookup_tables_apple2)</a>
 </li>
       <li><a href="reference/generated/dodal.devices.oav.oav_detector.Coords.html#dodal.devices.oav.oav_detector.Coords">Coords (class in dodal.devices.oav.oav_detector)</a>
 </li>
@@ -2091,8 +2094,6 @@ window.addEventListener("load", () => mermaid.run());
         <li><a href="reference/generated/dodal.devices.i11.html#module-dodal.devices.i11">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     dodal.devices.i11.cyberstar_blower
 
@@ -2100,6 +2101,8 @@ window.addEventListener("load", () => mermaid.run());
         <li><a href="reference/generated/dodal.devices.i11.cyberstar_blower.html#module-dodal.devices.i11.cyberstar_blower">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     dodal.devices.i11.diff_stages
 
@@ -2731,6 +2734,13 @@ window.addEventListener("load", () => mermaid.run());
 </li>
       </ul></li>
       <li>
+    dodal.devices.util.lookup_tables_apple2
+
+      <ul>
+        <li><a href="reference/generated/dodal.devices.util.lookup_tables_apple2.html#module-dodal.devices.util.lookup_tables_apple2">module</a>
+</li>
+      </ul></li>
+      <li>
     dodal.devices.v2f
 
       <ul>
@@ -2892,13 +2902,21 @@ window.addEventListener("load", () => mermaid.run());
 </li>
       <li><a href="reference/generated/dodal.devices.apple2_undulator.Apple2Controller.html#dodal.devices.apple2_undulator.Apple2Controller.energy_to_motor">energy_to_motor (dodal.devices.apple2_undulator.Apple2Controller attribute)</a>, <a href="reference/generated/dodal.devices.apple2_undulator.Apple2Controller.html#id0">[1]</a>
 </li>
+      <li><a href="reference/generated/dodal.devices.focusing_mirror.FocusingMirrorWithStripes.html#dodal.devices.focusing_mirror.FocusingMirrorWithStripes.energy_to_stripe">energy_to_stripe() (dodal.devices.focusing_mirror.FocusingMirrorWithStripes method)</a>
+</li>
+      <li><a href="reference/generated/dodal.devices.util.lookup_tables_apple2.EnergyCoverage.html#dodal.devices.util.lookup_tables_apple2.EnergyCoverage">EnergyCoverage (class in dodal.devices.util.lookup_tables_apple2)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference/generated/dodal.devices.focusing_mirror.FocusingMirrorWithStripes.html#dodal.devices.focusing_mirror.FocusingMirrorWithStripes.energy_to_stripe">energy_to_stripe() (dodal.devices.focusing_mirror.FocusingMirrorWithStripes method)</a>
+      <li><a href="reference/generated/dodal.devices.util.lookup_tables_apple2.EnergyCoverageEntry.html#dodal.devices.util.lookup_tables_apple2.EnergyCoverageEntry">EnergyCoverageEntry (class in dodal.devices.util.lookup_tables_apple2)</a>
+</li>
+      <li><a href="reference/generated/dodal.devices.util.lookup_tables_apple2.EnergyMinMax.html#dodal.devices.util.lookup_tables_apple2.EnergyMinMax">EnergyMinMax (class in dodal.devices.util.lookup_tables_apple2)</a>
 </li>
       <li><a href="reference/generated/dodal.devices.electron_analyser.EnergyMode.html#dodal.devices.electron_analyser.EnergyMode">EnergyMode (class in dodal.devices.electron_analyser)</a>
 </li>
       <li><a href="reference/generated/dodal.devices.apple2_undulator.EnergyMotorConvertor.html#dodal.devices.apple2_undulator.EnergyMotorConvertor">EnergyMotorConvertor (class in dodal.devices.apple2_undulator)</a>
+</li>
+      <li><a href="reference/generated/dodal.devices.util.lookup_tables_apple2.EnergyMotorLookup.html#dodal.devices.util.lookup_tables_apple2.EnergyMotorLookup">EnergyMotorLookup (class in dodal.devices.util.lookup_tables_apple2)</a>
 </li>
       <li><a href="reference/generated/dodal.devices.electron_analyser.EnergySource.html#dodal.devices.electron_analyser.EnergySource">EnergySource (class in dodal.devices.electron_analyser)</a>
 </li>
@@ -3010,6 +3028,8 @@ window.addEventListener("load", () => mermaid.run());
 </li>
       <li><a href="reference/generated/dodal.devices.oav.pin_image_recognition.utils.html#dodal.devices.oav.pin_image_recognition.utils.gaussian_blur">gaussian_blur() (in module dodal.devices.oav.pin_image_recognition.utils)</a>
 </li>
+      <li><a href="reference/generated/dodal.devices.util.lookup_tables_apple2.html#dodal.devices.util.lookup_tables_apple2.generate_lookup_table">generate_lookup_table() (in module dodal.devices.util.lookup_tables_apple2)</a>
+</li>
       <li><a href="reference/generated/dodal.devices.fast_shutter.GenericFastShutter.html#dodal.devices.fast_shutter.GenericFastShutter">GenericFastShutter (class in dodal.devices.fast_shutter)</a>
 </li>
       <li><a href="reference/generated/dodal.devices.current_amplifiers.CurrentAmpDet.html#dodal.devices.current_amplifiers.CurrentAmpDet.get_corrected_current">get_corrected_current() (dodal.devices.current_amplifiers.CurrentAmpDet method)</a>
@@ -3028,12 +3048,16 @@ window.addEventListener("load", () => mermaid.run());
 </li>
       <li><a href="reference/generated/dodal.devices.oav.oav_parameters.OAVParameters.html#dodal.devices.oav.oav_parameters.OAVParameters.get_max_tip_distance_in_pixels">get_max_tip_distance_in_pixels() (dodal.devices.oav.oav_parameters.OAVParameters method)</a>
 </li>
-      <li><a href="reference/generated/dodal.devices.oav.utils.html#dodal.devices.oav.utils.get_move_required_so_that_beam_is_at_pixel">get_move_required_so_that_beam_is_at_pixel() (in module dodal.devices.oav.utils)</a>
+      <li><a href="reference/generated/dodal.devices.util.lookup_tables_apple2.EnergyMotorLookup.html#dodal.devices.util.lookup_tables_apple2.EnergyMotorLookup.get_motor_from_energy">get_motor_from_energy() (dodal.devices.util.lookup_tables_apple2.EnergyMotorLookup method)</a>
 </li>
-      <li><a href="reference/generated/dodal.devices.oav.oav_to_redis_forwarder.html#dodal.devices.oav.oav_to_redis_forwarder.get_next_jpeg">get_next_jpeg() (in module dodal.devices.oav.oav_to_redis_forwarder)</a>
+      <li><a href="reference/generated/dodal.devices.oav.utils.html#dodal.devices.oav.utils.get_move_required_so_that_beam_is_at_pixel">get_move_required_so_that_beam_is_at_pixel() (in module dodal.devices.oav.utils)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/generated/dodal.devices.oav.oav_to_redis_forwarder.html#dodal.devices.oav.oav_to_redis_forwarder.get_next_jpeg">get_next_jpeg() (in module dodal.devices.oav.oav_to_redis_forwarder)</a>
+</li>
+      <li><a href="reference/generated/dodal.devices.util.lookup_tables_apple2.html#dodal.devices.util.lookup_tables_apple2.get_poly">get_poly() (in module dodal.devices.util.lookup_tables_apple2)</a>
+</li>
       <li><a href="reference/generated/dodal.devices.xspress3.xspress3.Xspress3.html#dodal.devices.xspress3.xspress3.Xspress3.get_roi_calc_status">get_roi_calc_status (dodal.devices.xspress3.xspress3.Xspress3 attribute)</a>
 </li>
       <li><a href="reference/generated/dodal.devices.apple2_undulator.SafeUndulatorMover.html#dodal.devices.apple2_undulator.SafeUndulatorMover.get_timeout">get_timeout() (dodal.devices.apple2_undulator.SafeUndulatorMover method)</a>
@@ -3244,12 +3268,12 @@ window.addEventListener("load", () => mermaid.run());
         <li><a href="reference/generated/dodal.devices.p60.LensMode.html#dodal.devices.p60.LensMode">(class in dodal.devices.p60)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/generated/dodal.devices.util.lookup_tables.html#dodal.devices.util.lookup_tables.linear_extrapolation_lut">linear_extrapolation_lut() (in module dodal.devices.util.lookup_tables)</a>
 </li>
       <li><a href="reference/generated/dodal.devices.util.lookup_tables.html#dodal.devices.util.lookup_tables.linear_interpolation_lut">linear_interpolation_lut() (in module dodal.devices.util.lookup_tables)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/generated/dodal.devices.linkam3.Linkam3.html#dodal.devices.linkam3.Linkam3">Linkam3 (class in dodal.devices.linkam3)</a>
 </li>
       <li><a href="reference/generated/dodal.devices.oav.oav_parameters.OAVParameters.html#dodal.devices.oav.oav_parameters.OAVParameters.load_json">load_json() (dodal.devices.oav.oav_parameters.OAVParameters static method)</a>
@@ -3268,6 +3292,16 @@ window.addEventListener("load", () => mermaid.run());
 </li>
       <li><a href="reference/generated/dodal.devices.util.adjuster_plans.html#dodal.devices.util.adjuster_plans.lookup_table_adjuster">lookup_table_adjuster() (in module dodal.devices.util.adjuster_plans)</a>
 </li>
+      <li><a href="reference/generated/dodal.devices.util.lookup_tables_apple2.LookupPath.html#dodal.devices.util.lookup_tables_apple2.LookupPath">LookupPath (class in dodal.devices.util.lookup_tables_apple2)</a>
+</li>
+      <li><a href="reference/generated/dodal.devices.util.lookup_tables_apple2.Lookuptable.html#dodal.devices.util.lookup_tables_apple2.Lookuptable">Lookuptable (class in dodal.devices.util.lookup_tables_apple2)</a>
+</li>
+      <li><a href="reference/generated/dodal.devices.util.lookup_tables_apple2.LookupTableConfig.html#dodal.devices.util.lookup_tables_apple2.LookupTableConfig">LookupTableConfig (class in dodal.devices.util.lookup_tables_apple2)</a>
+</li>
+      <li><a href="reference/generated/dodal.devices.util.lookup_tables_apple2.LookupTableEntries.html#dodal.devices.util.lookup_tables_apple2.LookupTableEntries">LookupTableEntries (class in dodal.devices.util.lookup_tables_apple2)</a>
+</li>
+      <li><a href="reference/generated/dodal.devices.util.lookup_tables_apple2.LookupTableKeys.html#dodal.devices.util.lookup_tables_apple2.LookupTableKeys">LookupTableKeys (class in dodal.devices.util.lookup_tables_apple2)</a>
+</li>
       <li><a href="reference/generated/dodal.devices.current_amplifiers.FemtoDDPCA.html#dodal.devices.current_amplifiers.FemtoDDPCA.lowerlimit">lowerlimit (dodal.devices.current_amplifiers.FemtoDDPCA attribute)</a>
 
       <ul>
@@ -3280,6 +3314,8 @@ window.addEventListener("load", () => mermaid.run());
 <h2 id="M">M</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/generated/dodal.devices.util.lookup_tables_apple2.html#dodal.devices.util.lookup_tables_apple2.make_phase_tables">make_phase_tables() (in module dodal.devices.util.lookup_tables_apple2)</a>
+</li>
       <li><a href="reference/generated/dodal.devices.i19.mapt_configuration.MAPTConfigurationControl.html#dodal.devices.i19.mapt_configuration.MAPTConfigurationControl">MAPTConfigurationControl (class in dodal.devices.i19.mapt_configuration)</a>
 </li>
       <li><a href="reference/generated/dodal.devices.i19.mapt_configuration.MAPTConfigurationTable.html#dodal.devices.i19.mapt_configuration.MAPTConfigurationTable">MAPTConfigurationTable (class in dodal.devices.i19.mapt_configuration)</a>
@@ -3696,6 +3732,8 @@ window.addEventListener("load", () => mermaid.run());
 </li>
         <li><a href="reference/generated/dodal.devices.util.lookup_tables.html#module-dodal.devices.util.lookup_tables">dodal.devices.util.lookup_tables</a>
 </li>
+        <li><a href="reference/generated/dodal.devices.util.lookup_tables_apple2.html#module-dodal.devices.util.lookup_tables_apple2">dodal.devices.util.lookup_tables_apple2</a>
+</li>
         <li><a href="reference/generated/dodal.devices.v2f.html#module-dodal.devices.v2f">dodal.devices.v2f</a>
 </li>
         <li><a href="reference/generated/dodal.devices.watsonmarlow323_pump.html#module-dodal.devices.watsonmarlow323_pump">dodal.devices.watsonmarlow323_pump</a>
@@ -3971,12 +4009,14 @@ window.addEventListener("load", () => mermaid.run());
       </ul></li>
       <li><a href="reference/generated/dodal.devices.current_amplifiers.CurrentAmpDet.html#dodal.devices.current_amplifiers.CurrentAmpDet.read">read() (dodal.devices.current_amplifiers.CurrentAmpDet method)</a>
 </li>
-      <li><a href="reference/generated/dodal.devices.attenuator.attenuator.ReadOnlyAttenuator.html#dodal.devices.attenuator.attenuator.ReadOnlyAttenuator">ReadOnlyAttenuator (class in dodal.devices.attenuator.attenuator)</a>
+      <li><a href="reference/generated/dodal.devices.util.lookup_tables_apple2.html#dodal.devices.util.lookup_tables_apple2.read_file_and_skip">read_file_and_skip() (in module dodal.devices.util.lookup_tables_apple2)</a>
 </li>
-      <li><a href="reference/generated/dodal.devices.current_amplifiers.StruckScaler.html#dodal.devices.current_amplifiers.StruckScaler.readout">readout (dodal.devices.current_amplifiers.StruckScaler attribute)</a>
+      <li><a href="reference/generated/dodal.devices.attenuator.attenuator.ReadOnlyAttenuator.html#dodal.devices.attenuator.attenuator.ReadOnlyAttenuator">ReadOnlyAttenuator (class in dodal.devices.attenuator.attenuator)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/generated/dodal.devices.current_amplifiers.StruckScaler.html#dodal.devices.current_amplifiers.StruckScaler.readout">readout (dodal.devices.current_amplifiers.StruckScaler attribute)</a>
+</li>
       <li><a href="reference/generated/dodal.devices.i11.nx100robot.RobotJobs.html#dodal.devices.i11.nx100robot.RobotJobs">RobotJobs (class in dodal.devices.i11.nx100robot)</a>
 </li>
       <li><a href="reference/generated/dodal.devices.i11.nx100robot.RobotSampleState.html#dodal.devices.i11.nx100robot.RobotSampleState">RobotSampleState (class in dodal.devices.i11.nx100robot)</a>
@@ -4304,6 +4344,8 @@ window.addEventListener("load", () => mermaid.run());
 </li>
       </ul></li>
       <li><a href="reference/generated/dodal.devices.electron_analyser.ElectronAnalyserDetector.html#dodal.devices.electron_analyser.ElectronAnalyserDetector.unstage">unstage() (dodal.devices.electron_analyser.ElectronAnalyserDetector method)</a>
+</li>
+      <li><a href="reference/generated/dodal.devices.util.lookup_tables_apple2.EnergyMotorLookup.html#dodal.devices.util.lookup_tables_apple2.EnergyMotorLookup.update_lookuptable">update_lookuptable() (dodal.devices.util.lookup_tables_apple2.EnergyMotorLookup method)</a>
 </li>
       <li><a href="reference/generated/dodal.devices.eurotherm.UpdatingEurothermGeneral.html#dodal.devices.eurotherm.UpdatingEurothermGeneral">UpdatingEurothermGeneral (class in dodal.devices.eurotherm)</a>
 </li>

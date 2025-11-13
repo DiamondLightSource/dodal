@@ -1,0 +1,959 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>dodal.devices.util.lookup_tables_apple2 &#8212; dodal 1.65.1.dev11+g22ad0f627 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../../../_static/documentation_options.js?v=8c71e43a"></script>
+    <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../../_static/copybutton.js?v=30646c52"></script>
+    <script src="../../../../_static/design-tabs.js?v=f930bc37"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+    <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs";import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs";mermaid.registerLayoutLoaders(elkLayouts);mermaid.initialize({startOnLoad:false});</script>
+    <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+    <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/dodal/devices/util/lookup_tables_apple2';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://DiamondLightSource.github.io/dodal/switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'main';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            false;
+        </script>
+    <link rel="icon" href="../../../../_static/dls-logo.svg"/>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="main" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../../../_static/dls-logo.svg" class="logo__image only-light" alt=""/>
+    <img src="../../../../_static/dls-logo.svg" class="logo__image only-dark pst-js-only" alt=""/>
+  
+  
+    <p class="title logo__title">dodal</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../tutorials.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../how-to.html">
+    How-to Guides
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../explanations.html">
+    Explanations
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../reference.html">
+    Reference
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/DiamondLightSource/dodal" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/dodal" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-cube fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">PyPI</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../tutorials.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../how-to.html">
+    How-to Guides
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../explanations.html">
+    Explanations
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../reference.html">
+    Reference
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/DiamondLightSource/dodal" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/dodal" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-cube fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">PyPI</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">dodal.devices.util.lookup_tables_apple2</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for dodal.devices.util.lookup_tables_apple2</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Apple2 lookup table utilities and CSV converter.</span>
+
+<span class="sd">This module provides helpers to read, validate and convert Apple2 insertion-device</span>
+<span class="sd">lookup tables (energy -&gt; gap/phase polynomials) from CSV sources into an</span>
+<span class="sd">in-memory dictionary format used by the Apple2 controllers.</span>
+
+<span class="sd">Data format produced</span>
+<span class="sd">The lookup-table dictionary created by convert_csv_to_lookup() follows this</span>
+<span class="sd">structure:</span>
+
+<span class="sd">{</span>
+<span class="sd">  &quot;POL_MODE&quot;: {</span>
+<span class="sd">    &quot;energies&quot;: {</span>
+<span class="sd">      &quot;&lt;min_energy&gt;&quot;: {</span>
+<span class="sd">        &quot;low&quot;: &lt;float&gt;,</span>
+<span class="sd">        &quot;high&quot;: &lt;float&gt;,</span>
+<span class="sd">        &quot;poly&quot;: &lt;numpy.poly1d&gt;</span>
+<span class="sd">      },</span>
+<span class="sd">      ...</span>
+<span class="sd">    },</span>
+<span class="sd">    &quot;limit&quot;: {</span>
+<span class="sd">      &quot;minimum&quot;: &lt;float&gt;,</span>
+<span class="sd">      &quot;maximum&quot;: &lt;float&gt;</span>
+<span class="sd">    }</span>
+<span class="sd">  },</span>
+<span class="sd">}</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">abc</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">csv</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">io</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Generator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">daq_config_server.client</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConfigServer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">ConfigDict</span><span class="p">,</span> <span class="n">RootModel</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.apple2_undulator</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pol</span>
+
+
+<div class="viewcode-block" id="LookupPath">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.util.lookup_tables_apple2.LookupPath.html#dodal.devices.util.lookup_tables_apple2.LookupPath">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">LookupPath</span><span class="p">:</span>
+    <span class="n">gap</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span>
+    <span class="n">phase</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span></div>
+
+
+
+<div class="viewcode-block" id="LookupTableKeys">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.util.lookup_tables_apple2.LookupTableKeys.html#dodal.devices.util.lookup_tables_apple2.LookupTableKeys">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">LookupTableKeys</span><span class="p">:</span>
+    <span class="n">MIN</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;minimum&quot;</span>
+    <span class="n">MAX</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;maximum&quot;</span>
+    <span class="n">LIMIT</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;limit&quot;</span>
+    <span class="n">ENERGIES</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;energies&quot;</span>
+    <span class="n">POLY</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;poly&quot;</span>
+    <span class="n">HIGH</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;high&quot;</span>
+    <span class="n">LOW</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;low&quot;</span>
+    <span class="n">GAP</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;gap&quot;</span>
+    <span class="n">PHASE</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;phase&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="LookupTableConfig">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.util.lookup_tables_apple2.LookupTableConfig.html#dodal.devices.util.lookup_tables_apple2.LookupTableConfig">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">LookupTableConfig</span><span class="p">:</span>
+    <span class="n">path</span><span class="p">:</span> <span class="n">LookupPath</span>
+    <span class="n">source</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span>
+    <span class="n">mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span>
+    <span class="n">min_energy</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span>
+    <span class="n">max_energy</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span>
+    <span class="n">poly_deg</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="kc">None</span></div>
+
+
+
+<div class="viewcode-block" id="EnergyMinMax">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.util.lookup_tables_apple2.EnergyMinMax.html#dodal.devices.util.lookup_tables_apple2.EnergyMinMax">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">EnergyMinMax</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">minimum</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">maximum</span><span class="p">:</span> <span class="nb">float</span></div>
+
+
+
+<div class="viewcode-block" id="EnergyCoverageEntry">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.util.lookup_tables_apple2.EnergyCoverageEntry.html#dodal.devices.util.lookup_tables_apple2.EnergyCoverageEntry">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">EnergyCoverageEntry</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">model_config</span> <span class="o">=</span> <span class="n">ConfigDict</span><span class="p">(</span><span class="n">arbitrary_types_allowed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">low</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">high</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">poly</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">poly1d</span></div>
+
+
+
+<div class="viewcode-block" id="EnergyCoverage">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.util.lookup_tables_apple2.EnergyCoverage.html#dodal.devices.util.lookup_tables_apple2.EnergyCoverage">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">EnergyCoverage</span><span class="p">(</span><span class="n">RootModel</span><span class="p">):</span>
+    <span class="n">root</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">EnergyCoverageEntry</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="LookupTableEntries">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.util.lookup_tables_apple2.LookupTableEntries.html#dodal.devices.util.lookup_tables_apple2.LookupTableEntries">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">LookupTableEntries</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">energies</span><span class="p">:</span> <span class="n">EnergyCoverage</span>
+    <span class="n">limit</span><span class="p">:</span> <span class="n">EnergyMinMax</span></div>
+
+
+
+<div class="viewcode-block" id="Lookuptable">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.util.lookup_tables_apple2.Lookuptable.html#dodal.devices.util.lookup_tables_apple2.Lookuptable">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Lookuptable</span><span class="p">(</span><span class="n">RootModel</span><span class="p">):</span>
+    <span class="n">root</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">LookupTableEntries</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="convert_csv_to_lookup">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.util.lookup_tables_apple2.html#dodal.devices.util.lookup_tables_apple2.convert_csv_to_lookup">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">convert_csv_to_lookup</span><span class="p">(</span>
+    <span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">source</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="s2">&quot;Mode&quot;</span><span class="p">,</span>
+    <span class="n">mode_name_convert</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">min_energy</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="s2">&quot;MinEnergy&quot;</span><span class="p">,</span>
+    <span class="n">max_energy</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="s2">&quot;MaxEnergy&quot;</span><span class="p">,</span>
+    <span class="n">poly_deg</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">skip_line_start_with</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;#&quot;</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert CSV content into the Apple2 lookup-table dictionary.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    file:</span>
+<span class="sd">        The CSV content as a string.</span>
+<span class="sd">    source:</span>
+<span class="sd">        Optional (column_name) pair to filter rows by source.</span>
+<span class="sd">    mode</span>
+<span class="sd">        Name of the column that identifies the polarisation for a row.</span>
+<span class="sd">    mode_name_convert</span>
+<span class="sd">        Optional mapping to normalise non-standard mode names</span>
+<span class="sd">        (e.g. {&quot;CR&quot;: &quot;PC&quot;, &quot;CL&quot;: &quot;NC&quot;}).</span>
+<span class="sd">    min_energy, max_energy</span>
+<span class="sd">        Column names for the energy coverage range in the CSV.</span>
+<span class="sd">    poly_deg</span>
+<span class="sd">        Ordered list of CSV column names to read polynomial coefficients from.</span>
+<span class="sd">        If None, defaults to [&quot;7th-order&quot;, ..., &quot;1st-order&quot;, &quot;b&quot;].</span>
+<span class="sd">    skip_line_start_with</span>
+<span class="sd">        Lines beginning with this prefix are skipped (default &quot;#&quot;).</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Change none standard name to standard used in Pol</span>
+    <span class="k">if</span> <span class="n">mode_name_convert</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">mode_name_convert</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;CR&quot;</span><span class="p">:</span> <span class="s2">&quot;pc&quot;</span><span class="p">,</span> <span class="s2">&quot;CL&quot;</span><span class="p">:</span> <span class="s2">&quot;nc&quot;</span><span class="p">}</span>
+    <span class="k">if</span> <span class="n">poly_deg</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">poly_deg</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s2">&quot;7th-order&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;6th-order&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;5th-order&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;4th-order&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;3rd-order&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;2nd-order&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;1st-order&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;b&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
+    <span class="n">lookup_table</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">polarisations</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">process_row</span><span class="p">(</span><span class="n">row</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Process a single row from the CSV file and update the lookup table.&quot;&quot;&quot;</span>
+        <span class="n">mode_value</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">mode</span><span class="p">])</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">mode_value</span> <span class="ow">in</span> <span class="n">mode_name_convert</span><span class="p">:</span>
+            <span class="n">mode_value</span> <span class="o">=</span> <span class="n">mode_name_convert</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">mode_value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">mode_value</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">polarisations</span><span class="p">:</span>
+            <span class="n">polarisations</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">mode_value</span><span class="p">)</span>
+
+        <span class="c1"># Create polynomial object for energy-to-gap/phase conversion</span>
+        <span class="n">coefficients</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">coef</span><span class="p">])</span> <span class="k">for</span> <span class="n">coef</span> <span class="ow">in</span> <span class="n">poly_deg</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">mode_value</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">lookup_table</span><span class="p">:</span>
+            <span class="n">lookup_table</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+                <span class="n">generate_lookup_table</span><span class="p">(</span>
+                    <span class="n">pol</span><span class="o">=</span><span class="n">Pol</span><span class="p">(</span><span class="n">mode_value</span><span class="p">),</span>
+                    <span class="n">min_energy</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">min_energy</span><span class="p">]),</span>
+                    <span class="n">max_energy</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">max_energy</span><span class="p">]),</span>
+                    <span class="n">poly1d_param</span><span class="o">=</span><span class="n">coefficients</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">lookup_table</span><span class="p">[</span><span class="n">mode_value</span><span class="p">][</span><span class="n">LookupTableKeys</span><span class="o">.</span><span class="n">ENERGIES</span><span class="p">][</span><span class="n">row</span><span class="p">[</span><span class="n">min_energy</span><span class="p">]]</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">EnergyCoverageEntry</span><span class="p">(</span>
+                    <span class="n">low</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">min_energy</span><span class="p">]),</span>
+                    <span class="n">high</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">max_energy</span><span class="p">]),</span>
+                    <span class="n">poly</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">poly1d</span><span class="p">(</span><span class="n">coefficients</span><span class="p">),</span>
+                <span class="p">)</span><span class="o">.</span><span class="n">model_dump</span><span class="p">()</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Update energy limits</span>
+        <span class="n">lookup_table</span><span class="p">[</span><span class="n">mode_value</span><span class="p">][</span><span class="n">LookupTableKeys</span><span class="o">.</span><span class="n">LIMIT</span><span class="p">][</span><span class="n">LookupTableKeys</span><span class="o">.</span><span class="n">MIN</span><span class="p">]</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span>
+            <span class="n">lookup_table</span><span class="p">[</span><span class="n">mode_value</span><span class="p">][</span><span class="n">LookupTableKeys</span><span class="o">.</span><span class="n">LIMIT</span><span class="p">][</span><span class="n">LookupTableKeys</span><span class="o">.</span><span class="n">MIN</span><span class="p">],</span>
+            <span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">min_energy</span><span class="p">]),</span>
+        <span class="p">)</span>
+        <span class="n">lookup_table</span><span class="p">[</span><span class="n">mode_value</span><span class="p">][</span><span class="n">LookupTableKeys</span><span class="o">.</span><span class="n">LIMIT</span><span class="p">][</span><span class="n">LookupTableKeys</span><span class="o">.</span><span class="n">MAX</span><span class="p">]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span>
+            <span class="n">lookup_table</span><span class="p">[</span><span class="n">mode_value</span><span class="p">][</span><span class="n">LookupTableKeys</span><span class="o">.</span><span class="n">LIMIT</span><span class="p">][</span><span class="n">LookupTableKeys</span><span class="o">.</span><span class="n">MAX</span><span class="p">],</span>
+            <span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">max_energy</span><span class="p">]),</span>
+        <span class="p">)</span>
+
+    <span class="n">reader</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">DictReader</span><span class="p">(</span><span class="n">read_file_and_skip</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">skip_line_start_with</span><span class="p">))</span>
+
+    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">reader</span><span class="p">:</span>
+        <span class="c1"># If there are multiple source only convert requested.</span>
+        <span class="k">if</span> <span class="n">source</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">row</span><span class="p">[</span><span class="n">source</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">==</span> <span class="n">source</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="n">process_row</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="n">row</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">process_row</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="n">row</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">lookup_table</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unable to convert lookup table:</span><span class="se">\t</span><span class="si">{</span><span class="n">file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">lookup_table</span></div>
+
+
+
+<div class="viewcode-block" id="read_file_and_skip">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.util.lookup_tables_apple2.html#dodal.devices.util.lookup_tables_apple2.read_file_and_skip">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_file_and_skip</span><span class="p">(</span><span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">skip_line_start_with</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;#&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Yield non-comment lines from the CSV content string.&quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">(</span><span class="n">file</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">skip_line_start_with</span><span class="p">):</span>
+            <span class="k">continue</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">line</span></div>
+
+
+
+<div class="viewcode-block" id="get_poly">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.util.lookup_tables_apple2.html#dodal.devices.util.lookup_tables_apple2.get_poly">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_poly</span><span class="p">(</span>
+    <span class="n">energy</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">pol</span><span class="p">:</span> <span class="n">Pol</span><span class="p">,</span>
+    <span class="n">lookup_table</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">poly1d</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return the numpy.poly1d polynomial applicable for the given energy and polarisation.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    energy:</span>
+<span class="sd">        Energy value in the same units used to create the lookup table (eV).</span>
+<span class="sd">    pol:</span>
+<span class="sd">        Polarisation mode (Pol enum).</span>
+<span class="sd">    lookup_table:</span>
+<span class="sd">        The converted lookup-table dictionary for either &#39;gap&#39; or &#39;phase&#39;.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="p">(</span>
+        <span class="n">energy</span> <span class="o">&lt;</span> <span class="n">lookup_table</span><span class="p">[</span><span class="n">pol</span><span class="p">][</span><span class="n">LookupTableKeys</span><span class="o">.</span><span class="n">LIMIT</span><span class="p">][</span><span class="n">LookupTableKeys</span><span class="o">.</span><span class="n">MIN</span><span class="p">]</span>
+        <span class="ow">or</span> <span class="n">energy</span> <span class="o">&gt;</span> <span class="n">lookup_table</span><span class="p">[</span><span class="n">pol</span><span class="p">][</span><span class="n">LookupTableKeys</span><span class="o">.</span><span class="n">LIMIT</span><span class="p">][</span><span class="n">LookupTableKeys</span><span class="o">.</span><span class="n">MAX</span><span class="p">]</span>
+    <span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;Demanding energy must lie between&quot;</span>
+            <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">lookup_table</span><span class="p">[</span><span class="n">pol</span><span class="p">][</span><span class="n">LookupTableKeys</span><span class="o">.</span><span class="n">LIMIT</span><span class="p">][</span><span class="n">LookupTableKeys</span><span class="o">.</span><span class="n">MIN</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot; and </span><span class="si">{</span><span class="n">lookup_table</span><span class="p">[</span><span class="n">pol</span><span class="p">][</span><span class="n">LookupTableKeys</span><span class="o">.</span><span class="n">LIMIT</span><span class="p">][</span><span class="n">LookupTableKeys</span><span class="o">.</span><span class="n">MAX</span><span class="p">]</span><span class="si">}</span><span class="s2"> eV!&quot;</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">energy_range</span> <span class="ow">in</span> <span class="n">lookup_table</span><span class="p">[</span><span class="n">pol</span><span class="p">][</span><span class="n">LookupTableKeys</span><span class="o">.</span><span class="n">ENERGIES</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="n">energy</span> <span class="o">&gt;=</span> <span class="n">energy_range</span><span class="p">[</span><span class="n">LookupTableKeys</span><span class="o">.</span><span class="n">LOW</span><span class="p">]</span>
+                <span class="ow">and</span> <span class="n">energy</span> <span class="o">&lt;</span> <span class="n">energy_range</span><span class="p">[</span><span class="n">LookupTableKeys</span><span class="o">.</span><span class="n">HIGH</span><span class="p">]</span>
+            <span class="p">):</span>
+                <span class="k">return</span> <span class="n">energy_range</span><span class="p">[</span><span class="n">LookupTableKeys</span><span class="o">.</span><span class="n">POLY</span><span class="p">]</span>
+
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+        <span class="s2">&quot;Cannot find polynomial coefficients for your requested energy.&quot;</span>
+        <span class="o">+</span> <span class="s2">&quot; There might be gap in the calibration lookup table.&quot;</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="generate_lookup_table">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.util.lookup_tables_apple2.html#dodal.devices.util.lookup_tables_apple2.generate_lookup_table">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">generate_lookup_table</span><span class="p">(</span>
+    <span class="n">pol</span><span class="p">:</span> <span class="n">Pol</span><span class="p">,</span> <span class="n">min_energy</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">max_energy</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">poly1d_param</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]:</span>
+    <span class="k">return</span> <span class="n">Lookuptable</span><span class="p">(</span>
+        <span class="p">{</span>
+            <span class="n">pol</span><span class="o">.</span><span class="n">value</span><span class="p">:</span> <span class="n">LookupTableEntries</span><span class="p">(</span>
+                <span class="n">energies</span><span class="o">=</span><span class="n">EnergyCoverage</span><span class="p">(</span>
+                    <span class="p">{</span>
+                        <span class="nb">str</span><span class="p">(</span><span class="n">min_energy</span><span class="p">):</span> <span class="n">EnergyCoverageEntry</span><span class="p">(</span>
+                            <span class="n">low</span><span class="o">=</span><span class="n">min_energy</span><span class="p">,</span>
+                            <span class="n">high</span><span class="o">=</span><span class="n">max_energy</span><span class="p">,</span>
+                            <span class="n">poly</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">poly1d</span><span class="p">(</span><span class="n">poly1d_param</span><span class="p">),</span>
+                        <span class="p">)</span>
+                    <span class="p">}</span>
+                <span class="p">),</span>
+                <span class="n">limit</span><span class="o">=</span><span class="n">EnergyMinMax</span><span class="p">(</span>
+                    <span class="n">minimum</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">min_energy</span><span class="p">),</span>
+                    <span class="n">maximum</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">max_energy</span><span class="p">),</span>
+                <span class="p">),</span>
+            <span class="p">)</span>
+        <span class="p">}</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">model_dump</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="make_phase_tables">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.util.lookup_tables_apple2.html#dodal.devices.util.lookup_tables_apple2.make_phase_tables">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">make_phase_tables</span><span class="p">(</span>
+    <span class="n">pols</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Pol</span><span class="p">],</span>
+    <span class="n">min_energies</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+    <span class="n">max_energies</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+    <span class="n">poly1d_params</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate a dictionary containing multiple lookuptable entries</span>
+<span class="sd">    for provided polarisations.&quot;&quot;&quot;</span>
+    <span class="n">lookuptable_phase</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">pols</span><span class="p">)):</span>
+        <span class="n">lookuptable_phase</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+            <span class="n">generate_lookup_table</span><span class="p">(</span>
+                <span class="n">pol</span><span class="o">=</span><span class="n">pols</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                <span class="n">min_energy</span><span class="o">=</span><span class="n">min_energies</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                <span class="n">max_energy</span><span class="o">=</span><span class="n">max_energies</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                <span class="n">poly1d_param</span><span class="o">=</span><span class="n">poly1d_params</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">lookuptable_phase</span></div>
+
+
+
+<div class="viewcode-block" id="EnergyMotorLookup">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.util.lookup_tables_apple2.EnergyMotorLookup.html#dodal.devices.util.lookup_tables_apple2.EnergyMotorLookup">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">EnergyMotorLookup</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Abstract base for energy-&gt;motor lookup.</span>
+
+<span class="sd">    Subclasses should implement `update_lookuptable()` to populate `self.lookup_tables`</span>
+<span class="sd">    from the configured file sources. After update_lookuptable() has populated the</span>
+<span class="sd">    &#39;gap&#39; and &#39;phase&#39; tables, `get_motor_from_energy()` can be used to compute</span>
+<span class="sd">    (gap, phase) for a requested (energy, pol) pair.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">lookuptable_dir</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">config_client</span><span class="p">:</span> <span class="n">ConfigServer</span><span class="p">,</span>
+        <span class="n">source</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Mode&quot;</span><span class="p">,</span>
+        <span class="n">min_energy</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;MinEnergy&quot;</span><span class="p">,</span>
+        <span class="n">max_energy</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;MaxEnergy&quot;</span><span class="p">,</span>
+        <span class="n">gap_file_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;IDEnergy2GapCalibrations.csv&quot;</span><span class="p">,</span>
+        <span class="n">phase_file_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="s2">&quot;IDEnergy2PhaseCalibrations.csv&quot;</span><span class="p">,</span>
+        <span class="n">poly_deg</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialise the EnergyMotorLookup class with lookup table headers provided.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        look_up_table_dir:</span>
+<span class="sd">            The path to look up table.</span>
+<span class="sd">        source:</span>
+<span class="sd">            The column name and the name of the source in look up table. e.g. ( &quot;source&quot;, &quot;idu&quot;)</span>
+<span class="sd">        config_client:</span>
+<span class="sd">            The config server client to fetch the look up table.</span>
+<span class="sd">        mode:</span>
+<span class="sd">            The column name of the mode in look up table.</span>
+<span class="sd">        min_energy:</span>
+<span class="sd">            The column name that contain the maximum energy in look up table.</span>
+<span class="sd">        max_energy:</span>
+<span class="sd">            The column name that contain the maximum energy in look up table.</span>
+<span class="sd">        gap_file_name:</span>
+<span class="sd">            File name for the id game.</span>
+<span class="sd">        phase_file_name:</span>
+<span class="sd">            File name for the phase(option.al).</span>
+<span class="sd">        poly_deg:</span>
+<span class="sd">            The column names for the parameters for the energy conversion polynomial, starting with the least significant.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lookup_tables</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;gap&quot;</span><span class="p">:</span> <span class="p">{},</span>
+            <span class="s2">&quot;phase&quot;</span><span class="p">:</span> <span class="p">{},</span>
+        <span class="p">}</span>
+        <span class="n">energy_gap_table_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">lookuptable_dir</span><span class="p">,</span> <span class="n">gap_file_name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">phase_file_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">energy_phase_table_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">lookuptable_dir</span><span class="p">,</span> <span class="n">phase_file_name</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">energy_phase_table_path</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lookup_table_config</span> <span class="o">=</span> <span class="n">LookupTableConfig</span><span class="p">(</span>
+            <span class="n">path</span><span class="o">=</span><span class="n">LookupPath</span><span class="p">(</span><span class="n">energy_gap_table_path</span><span class="p">,</span> <span class="n">energy_phase_table_path</span><span class="p">),</span>
+            <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">,</span>
+            <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span>
+            <span class="n">min_energy</span><span class="o">=</span><span class="n">min_energy</span><span class="p">,</span>
+            <span class="n">max_energy</span><span class="o">=</span><span class="n">max_energy</span><span class="p">,</span>
+            <span class="n">poly_deg</span><span class="o">=</span><span class="n">poly_deg</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config_client</span> <span class="o">=</span> <span class="n">config_client</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_available_pol</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">available_pol</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_available_pol</span>
+
+    <span class="nd">@available_pol</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">available_pol</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_available_pol</span> <span class="o">=</span> <span class="n">value</span>
+
+<div class="viewcode-block" id="EnergyMotorLookup.update_lookuptable">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.util.lookup_tables_apple2.EnergyMotorLookup.html#dodal.devices.util.lookup_tables_apple2.EnergyMotorLookup.update_lookuptable">[docs]</a>
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_lookuptable</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Update lookup tables from files and validate their format.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="o">...</span></div>
+
+
+<div class="viewcode-block" id="EnergyMotorLookup.get_motor_from_energy">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.util.lookup_tables_apple2.EnergyMotorLookup.html#dodal.devices.util.lookup_tables_apple2.EnergyMotorLookup.get_motor_from_energy">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_motor_from_energy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energy</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">pol</span><span class="p">:</span> <span class="n">Pol</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert energy and polarisation to gap and phase motor positions.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        energy : float</span>
+<span class="sd">            Desired energy in eV.</span>
+<span class="sd">        pol : Pol</span>
+<span class="sd">            Polarisation mode.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        tuple[float, float]</span>
+<span class="sd">            (gap, phase) motor positions.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">available_pol</span> <span class="o">==</span> <span class="p">[]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update_lookuptable</span><span class="p">()</span>
+
+        <span class="n">gap_poly</span> <span class="o">=</span> <span class="n">get_poly</span><span class="p">(</span>
+            <span class="n">lookup_table</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lookup_tables</span><span class="p">[</span><span class="n">LookupTableKeys</span><span class="o">.</span><span class="n">GAP</span><span class="p">],</span> <span class="n">energy</span><span class="o">=</span><span class="n">energy</span><span class="p">,</span> <span class="n">pol</span><span class="o">=</span><span class="n">pol</span>
+        <span class="p">)</span>
+        <span class="n">phase_poly</span> <span class="o">=</span> <span class="n">get_poly</span><span class="p">(</span>
+            <span class="n">lookup_table</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lookup_tables</span><span class="p">[</span><span class="n">LookupTableKeys</span><span class="o">.</span><span class="n">PHASE</span><span class="p">],</span>
+            <span class="n">energy</span><span class="o">=</span><span class="n">energy</span><span class="p">,</span>
+            <span class="n">pol</span><span class="o">=</span><span class="n">pol</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">gap_poly</span><span class="p">(</span><span class="n">energy</span><span class="p">),</span> <span class="n">phase_poly</span><span class="p">(</span><span class="n">energy</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
