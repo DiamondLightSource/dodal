@@ -87,7 +87,7 @@ def documents_from_num(
 ) -> dict[str, list[DocumentType]]:
     docs: dict[str, list[DocumentType]] = {}
     run_engine(
-        count({det}, num=request.param),
+        count([det], num=request.param),
         lambda name, doc: docs.setdefault(name, []).append(doc),
     )
     return docs

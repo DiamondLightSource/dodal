@@ -81,7 +81,7 @@ def _make_args(
 
 @attach_data_session_metadata_decorator()
 @validate_call(config={"arbitrary_types_allowed": True})
-def scan(
+def num_scan(
     detectors: Annotated[
         Sequence[Readable | AsyncReadable],
         Field(
@@ -113,7 +113,7 @@ def scan(
 
 @attach_data_session_metadata_decorator()
 @validate_call(config={"arbitrary_types_allowed": True})
-def rel_scan(
+def num_rscan(
     detectors: Annotated[
         Sequence[Readable | AsyncReadable],
         Field(
@@ -145,7 +145,7 @@ def rel_scan(
 
 @attach_data_session_metadata_decorator()
 @validate_call(config={"arbitrary_types_allowed": True})
-def grid_scan(
+def grid_num_scan(
     detectors: Annotated[
         Sequence[Readable | AsyncReadable],
         Field(
@@ -176,7 +176,7 @@ def grid_scan(
 
 @attach_data_session_metadata_decorator()
 @validate_call(config={"arbitrary_types_allowed": True})
-def rel_grid_scan(
+def grid_num_rscan(
     detectors: Annotated[
         Sequence[Readable | AsyncReadable],
         Field(
@@ -239,7 +239,7 @@ def list_scan(
 
 @attach_data_session_metadata_decorator()
 @validate_call(config={"arbitrary_types_allowed": True})
-def rel_list_scan(
+def list_rscan(
     detectors: Annotated[
         Sequence[Readable | AsyncReadable],
         Field(
@@ -302,7 +302,7 @@ def list_grid_scan(
 
 @attach_data_session_metadata_decorator()
 @validate_call(config={"arbitrary_types_allowed": True})
-def rel_list_grid_scan(
+def list_grid_rscan(
     detectors: Annotated[
         Sequence[Readable | AsyncReadable],
         Field(
