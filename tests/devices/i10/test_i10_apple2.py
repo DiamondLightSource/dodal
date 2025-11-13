@@ -2,7 +2,7 @@ import os
 import pickle
 from collections.abc import Mapping
 from unittest import mock
-from unittest.mock import MagicMock, Mock
+from unittest.mock import AsyncMock, MagicMock, Mock
 
 import pytest
 from bluesky.plans import scan
@@ -18,6 +18,7 @@ from ophyd_async.testing import (
 )
 
 from dodal.devices.apple2_undulator import (
+    MAXIMUM_MOVE_TIME,
     BeamEnergy,
     EnabledDisabledUpper,
     InsertionDeviceEnergy,
@@ -303,6 +304,18 @@ async def test_fail_i10_apple2_controller_set_id_not_ready(
     )
 
 
+async def test_fail_i10_apple2_controller_set_energy_has_default(
+    mock_id_energy: InsertionDeviceEnergy,
+    mock_id_controller: I10Apple2Controller,
+):
+    set_mock_value(mock_id_controller._energy, 700)
+    mock_id_controller.energy.set = AsyncMock()
+    await mock_id_energy.set(600)
+    mock_id_controller.energy.set.assert_awaited_once_with(
+        600, timeout=MAXIMUM_MOVE_TIME
+    )
+
+
 async def test_beam_energy_re_scan(
     run_engine: RunEngine,
     run_engine_documents: Mapping[str, list[dict]],
@@ -412,6 +425,18 @@ async def test_id_polarisation_set(
         gap = get_mock_put(mock_id_controller.apple2().gap().user_setpoint)
         gap.assert_called_once()
         assert float(gap.call_args[0][0]) == pytest.approx(expect_gap, 0.05)
+
+
+async def test_id_polarisation_set_has_default_timeout(
+    mock_id_pol: InsertionDevicePolarisation,
+    mock_id_controller: I10Apple2Controller,
+):
+    set_mock_value(mock_id_controller._energy, 700)
+    mock_id_controller.polarisation.set = AsyncMock()
+    await mock_id_pol.set(Pol.LV)
+    mock_id_controller.polarisation.set.assert_awaited_once_with(
+        Pol.LV, timeout=MAXIMUM_MOVE_TIME
+    )
 
 
 @pytest.mark.parametrize(
