@@ -29,7 +29,7 @@ from dodal.log import LOGGER
 T = TypeVar("T")
 
 DEFAULT_MOTOR_MIN_TIMEOUT = 10
-
+MAXIMUM_MOVE_TIME = 550  # There is no useful movements take longer than this.
 
 class UndulatorGateStatus(StrictEnum):
     OPEN = "Open"
@@ -728,7 +728,7 @@ class InsertionDeviceEnergy(InsertionDeviceEnergyBase):
 
     @AsyncStatus.wrap
     async def set(self, energy: float) -> None:
-        await self.energy().set(energy)
+        await self.energy().set(energy,timeout=MAXIMUM_MOVE_TIME)
 
 
 class InsertionDevicePolarisation(StandardReadable, Locatable[Pol]):
@@ -743,7 +743,7 @@ class InsertionDevicePolarisation(StandardReadable, Locatable[Pol]):
 
     @AsyncStatus.wrap
     async def set(self, pol: Pol) -> None:
-        await self.polarisation().set(pol)
+        await self.polarisation().set(pol,timeout=MAXIMUM_MOVE_TIME)
 
     async def locate(self) -> Location[Pol]:
         """Return the current polarisation"""
