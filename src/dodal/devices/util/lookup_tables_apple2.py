@@ -36,7 +36,7 @@ from pathlib import Path
 
 import numpy as np
 from daq_config_server.client import ConfigServer
-from pydantic import BaseModel, ConfigDict, RootModel
+from pydantic import BaseModel, ConfigDict, Field, RootModel
 
 from dodal.devices.apple2_undulator import Pol
 
@@ -75,8 +75,8 @@ class LookupTableColumnConfig(BaseModel):
     mode: str = "Mode"
     min_energy: str = "MinEnergy"
     max_energy: str = "MaxEnergy"
-    poly_deg: list[str] = DEFAULT_POLY_DEG
-    mode_name_convert: dict[str, str] = MODE_NAME_CONVERT
+    poly_deg: list[str] = Field(default_factory=lambda: DEFAULT_POLY_DEG)
+    mode_name_convert: dict[str, str] = Field(default_factory=lambda: MODE_NAME_CONVERT)
 
 
 class EnergyMinMax(BaseModel):
@@ -91,7 +91,7 @@ class EnergyCoverageEntry(BaseModel):
     poly: np.poly1d
 
 
-class EnergyCoverage(RootModel[dict[str, EnergyCoverageEntry]]):
+class EnergyCoverage(RootModel[dict[float, EnergyCoverageEntry]]):
     pass
     # def __init__(self, root: dict[str, EnergyCoverageEntry] | None = None):
     #     super().__init__(root=root or {})
@@ -109,8 +109,8 @@ class LookupTable(RootModel[dict[str, LookupTableEntries]]):
 
 
 class GapPhaseLookupTable(BaseModel):
-    gap: LookupTable = LookupTable({})
-    phase: LookupTable = LookupTable({})
+    gap: LookupTable = Field(default_factory=lambda: LookupTable({}))
+    phase: LookupTable = Field(default_factory=lambda: LookupTable({}))
 
 
 def convert_csv_to_lookup(
