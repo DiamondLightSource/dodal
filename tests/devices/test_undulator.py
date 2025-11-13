@@ -227,3 +227,12 @@ async def test_move_order_fails(
         match=f"Undulator order must be a positive integer. Requested value: {order_value}",
     ):
         await undulator_order.set(order_value)  # type: ignore
+
+
+async def test_locate_undulator_order(
+    undulator_order: UndulatorOrder,
+    order_value: int = 3,
+):
+    await undulator_order.set(order_value)
+    located_position = await undulator_order.locate()
+    assert located_position == {"readback": order_value, "setpoint": order_value}
