@@ -16,6 +16,7 @@ dodal.devices.apple2\_undulator
 
    ~apple2_undulator.Apple2
    ~apple2_undulator.Apple2Controller
+   ~apple2_undulator.Apple2LockedPhasesVal
    ~apple2_undulator.Apple2PhasesVal
    ~apple2_undulator.Apple2Val
    ~apple2_undulator.BeamEnergy
@@ -28,6 +29,7 @@ dodal.devices.apple2\_undulator
    ~apple2_undulator.UndulatorGap
    ~apple2_undulator.UndulatorGateStatus
    ~apple2_undulator.UndulatorJawPhase
+   ~apple2_undulator.UndulatorLockedPhaseAxes
    ~apple2_undulator.UndulatorPhaseAxes
    ~apple2_undulator.UndulatorPhaseMotor
 

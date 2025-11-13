@@ -30,6 +30,9 @@ dodal.devices.apple2\_undulator.SafeUndulatorMover
       ~SafeUndulatorMover.set
       
       
+      ~SafeUndulatorMover.set_demand_positions
+      
+      
       
       
    

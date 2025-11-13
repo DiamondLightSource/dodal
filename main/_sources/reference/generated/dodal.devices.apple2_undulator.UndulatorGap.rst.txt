@@ -26,6 +26,9 @@ dodal.devices.apple2\_undulator.UndulatorGap
       
       
       
+      ~UndulatorGap.set_demand_positions
+      
+      
       
       
    

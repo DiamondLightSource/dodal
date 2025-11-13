@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.apple2_undulator &#8212; dodal 1.65.1.dev8+gb2eaebdb4 documentation</title>
+    <title>dodal.devices.apple2_undulator &#8212; dodal 1.65.1.dev9+g8048fc5b2 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=1e4b4700"></script>
+    <script src="../../../_static/documentation_options.js?v=b34d133a"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -475,6 +475,7 @@ window.addEventListener("load", () => mermaid.run());
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">epics_signal_r</span><span class="p">,</span> <span class="n">epics_signal_rw</span><span class="p">,</span> <span class="n">epics_signal_w</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.motor</span><span class="w"> </span><span class="kn">import</span> <span class="n">Motor</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.common.enums</span><span class="w"> </span><span class="kn">import</span> <span class="n">EnabledDisabledUpper</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.log</span><span class="w"> </span><span class="kn">import</span> <span class="n">LOGGER</span>
 
 <span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">)</span>
@@ -490,13 +491,20 @@ window.addEventListener("load", () => mermaid.run());
 
 
 
+<div class="viewcode-block" id="Apple2LockedPhasesVal">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.apple2_undulator.Apple2LockedPhasesVal.html#dodal.devices.apple2_undulator.Apple2LockedPhasesVal">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Apple2LockedPhasesVal</span><span class="p">:</span>
+    <span class="n">top_outer</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">btm_inner</span><span class="p">:</span> <span class="nb">str</span></div>
+
+
+
 <div class="viewcode-block" id="Apple2PhasesVal">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.apple2_undulator.Apple2PhasesVal.html#dodal.devices.apple2_undulator.Apple2PhasesVal">[docs]</a>
 <span class="nd">@dataclass</span>
-<span class="k">class</span><span class="w"> </span><span class="nc">Apple2PhasesVal</span><span class="p">:</span>
-    <span class="n">top_outer</span><span class="p">:</span> <span class="nb">str</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Apple2PhasesVal</span><span class="p">(</span><span class="n">Apple2LockedPhasesVal</span><span class="p">):</span>
     <span class="n">top_inner</span><span class="p">:</span> <span class="nb">str</span>
-    <span class="n">btm_inner</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">btm_outer</span><span class="p">:</span> <span class="nb">str</span></div>
 
 
@@ -504,8 +512,12 @@ window.addEventListener("load", () => mermaid.run());
 <div class="viewcode-block" id="Apple2Val">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.apple2_undulator.Apple2Val.html#dodal.devices.apple2_undulator.Apple2Val">[docs]</a>
 <span class="nd">@dataclass</span>
-<span class="k">class</span><span class="w"> </span><span class="nc">Apple2Val</span><span class="p">(</span><span class="n">Apple2PhasesVal</span><span class="p">):</span>
-    <span class="n">gap</span><span class="p">:</span> <span class="nb">str</span></div>
+<span class="k">class</span><span class="w"> </span><span class="nc">Apple2Val</span><span class="p">:</span>
+    <span class="n">gap</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">phase</span><span class="p">:</span> <span class="n">Apple2LockedPhasesVal</span> <span class="o">|</span> <span class="n">Apple2PhasesVal</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">extract_phase_val</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">phase</span></div>
 
 
 
@@ -549,10 +561,7 @@ window.addEventListener("load", () => mermaid.run());
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">set_move</span><span class="p">:</span> <span class="n">SignalW</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
         <span class="c1"># Gate keeper open when move is requested, closed when move is completed</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">gate</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="n">UndulatorGateStatus</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;BLGATE&quot;</span><span class="p">)</span>
-
-        <span class="n">split_pv</span> <span class="o">=</span> <span class="n">prefix</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)</span>
-        <span class="n">fault_pv</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">split_pv</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">split_pv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">-STAT-</span><span class="si">{</span><span class="n">split_pv</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="si">}</span><span class="s2">ANYFAULT&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fault</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">fault_pv</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="n">EnabledDisabledUpper</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;IDBLENA&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_move</span> <span class="o">=</span> <span class="n">set_move</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
@@ -560,15 +569,18 @@ window.addEventListener("load", () => mermaid.run());
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">T</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Setting </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">raise_if_cannot_move</span><span class="p">()</span>
-        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_set_demand_positions</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">set_demand_positions</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
         <span class="n">timeout</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_timeout</span><span class="p">()</span>
         <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Moving </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2"> with timeout = </span><span class="si">{</span><span class="n">timeout</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">set_move</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
         <span class="k">await</span> <span class="n">wait_for_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gate</span><span class="p">,</span> <span class="n">UndulatorGateStatus</span><span class="o">.</span><span class="n">CLOSE</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
 
+<div class="viewcode-block" id="SafeUndulatorMover.set_demand_positions">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.apple2_undulator.SafeUndulatorMover.html#dodal.devices.apple2_undulator.SafeUndulatorMover.set_demand_positions">[docs]</a>
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_set_demand_positions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">T</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the demand positions on the device without actually hitting move.&quot;&quot;&quot;</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set_demand_positions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">T</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the demand positions on the device without actually hitting move.&quot;&quot;&quot;</span></div>
+
 
 <div class="viewcode-block" id="SafeUndulatorMover.get_timeout">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.apple2_undulator.SafeUndulatorMover.html#dodal.devices.apple2_undulator.SafeUndulatorMover.get_timeout">[docs]</a>
@@ -578,8 +590,8 @@ window.addEventListener("load", () => mermaid.run());
 
 
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">raise_if_cannot_move</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">if</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">fault</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> is in fault state&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">EnabledDisabledUpper</span><span class="o">.</span><span class="n">ENABLED</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> is DISABLED and cannot move.&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">gate</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span> <span class="o">==</span> <span class="n">UndulatorGateStatus</span><span class="o">.</span><span class="n">OPEN</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> is already in motion.&quot;</span><span class="p">)</span></div>
 
@@ -633,7 +645,7 @@ window.addEventListener("load", () => mermaid.run());
             <span class="bp">self</span><span class="o">.</span><span class="n">user_readback</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;CURRGAPD&quot;</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">set_move</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
 
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_set_demand_positions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set_demand_positions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_setpoint</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
 
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_timeout</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
@@ -685,9 +697,68 @@ window.addEventListener("load", () => mermaid.run());
 
 
 
+<span class="n">Apple2PhaseValType</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;Apple2PhaseValType&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">Apple2LockedPhasesVal</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="UndulatorLockedPhaseAxes">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.apple2_undulator.UndulatorLockedPhaseAxes.html#dodal.devices.apple2_undulator.UndulatorLockedPhaseAxes">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">UndulatorLockedPhaseAxes</span><span class="p">(</span><span class="n">SafeUndulatorMover</span><span class="p">[</span><span class="n">Apple2PhaseValType</span><span class="p">]):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Two phase Motor to make up the locked id phase motion.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">top_outer</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">btm_inner</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="c1"># Gap demand set point and readback</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">top_outer</span> <span class="o">=</span> <span class="n">UndulatorPhaseMotor</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">,</span> <span class="n">infix</span><span class="o">=</span><span class="n">top_outer</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">btm_inner</span> <span class="o">=</span> <span class="n">UndulatorPhaseMotor</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">,</span> <span class="n">infix</span><span class="o">=</span><span class="n">btm_inner</span><span class="p">)</span>
+        <span class="c1"># Nothing move until this is set to 1 and it will return to 0 when done.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_move</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">BL</span><span class="si">{</span><span class="n">top_outer</span><span class="si">}</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;MOVE&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">axes</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">top_outer</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">btm_inner</span><span class="p">]</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">set_move</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set_demand_positions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Apple2PhaseValType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">top_outer</span><span class="o">.</span><span class="n">user_setpoint</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="o">.</span><span class="n">top_outer</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">btm_inner</span><span class="o">.</span><span class="n">user_setpoint</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="o">.</span><span class="n">btm_inner</span><span class="p">),</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="UndulatorLockedPhaseAxes.get_timeout">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.apple2_undulator.UndulatorLockedPhaseAxes.html#dodal.devices.apple2_undulator.UndulatorLockedPhaseAxes.get_timeout">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_timeout</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get all four motor speed, current positions and target positions to calculate required timeout.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">timeouts</span> <span class="o">=</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span>
+            <span class="o">*</span><span class="p">[</span>
+                <span class="n">estimate_motor_timeout</span><span class="p">(</span>
+                    <span class="n">axis</span><span class="o">.</span><span class="n">user_setpoint_readback</span><span class="p">,</span>
+                    <span class="n">axis</span><span class="o">.</span><span class="n">user_readback</span><span class="p">,</span>
+                    <span class="n">axis</span><span class="o">.</span><span class="n">velocity</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="k">for</span> <span class="n">axis</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;A 2.0 multiplier is required to prevent premature motor timeouts in phase</span>
+<span class="sd">        axes as it is a master-slave system, where the slave&#39;s movement,</span>
+<span class="sd">        being dependent on the master, can take up to twice as long to complete.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">timeouts</span><span class="p">)</span> <span class="o">*</span> <span class="mf">2.0</span></div>
+</div>
+
+
+
 <div class="viewcode-block" id="UndulatorPhaseAxes">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.apple2_undulator.UndulatorPhaseAxes.html#dodal.devices.apple2_undulator.UndulatorPhaseAxes">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">UndulatorPhaseAxes</span><span class="p">(</span><span class="n">SafeUndulatorMover</span><span class="p">[</span><span class="n">Apple2PhasesVal</span><span class="p">]):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">UndulatorPhaseAxes</span><span class="p">(</span><span class="n">UndulatorLockedPhaseAxes</span><span class="p">[</span><span class="n">Apple2PhasesVal</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A collection of 4 phase Motor to make up the full id phase motion. We are using the diamond pv convention.</span>
 <span class="sd">    e.g. top_outer == Q1</span>
@@ -708,46 +779,19 @@ window.addEventListener("load", () => mermaid.run());
     <span class="p">):</span>
         <span class="c1"># Gap demand set point and readback</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">top_outer</span> <span class="o">=</span> <span class="n">UndulatorPhaseMotor</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">,</span> <span class="n">infix</span><span class="o">=</span><span class="n">top_outer</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">top_inner</span> <span class="o">=</span> <span class="n">UndulatorPhaseMotor</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">,</span> <span class="n">infix</span><span class="o">=</span><span class="n">top_inner</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">btm_inner</span> <span class="o">=</span> <span class="n">UndulatorPhaseMotor</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">,</span> <span class="n">infix</span><span class="o">=</span><span class="n">btm_inner</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">btm_outer</span> <span class="o">=</span> <span class="n">UndulatorPhaseMotor</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">,</span> <span class="n">infix</span><span class="o">=</span><span class="n">btm_outer</span><span class="p">)</span>
-        <span class="c1"># Nothing move until this is set to 1 and it will return to 0 when done.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set_move</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">BL</span><span class="si">{</span><span class="n">top_outer</span><span class="si">}</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;MOVE&quot;</span><span class="p">)</span>
 
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">set_move</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">top_outer</span><span class="o">=</span><span class="n">top_outer</span><span class="p">,</span> <span class="n">btm_inner</span><span class="o">=</span><span class="n">btm_inner</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">top_inner</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">btm_outer</span><span class="p">])</span>
 
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_set_demand_positions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Apple2PhasesVal</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set_demand_positions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Apple2PhasesVal</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">top_outer</span><span class="o">.</span><span class="n">user_setpoint</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="o">.</span><span class="n">top_outer</span><span class="p">),</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">top_inner</span><span class="o">.</span><span class="n">user_setpoint</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="o">.</span><span class="n">top_inner</span><span class="p">),</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">btm_inner</span><span class="o">.</span><span class="n">user_setpoint</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="o">.</span><span class="n">btm_inner</span><span class="p">),</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">btm_outer</span><span class="o">.</span><span class="n">user_setpoint</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="o">.</span><span class="n">btm_outer</span><span class="p">),</span>
-        <span class="p">)</span>
-
-<div class="viewcode-block" id="UndulatorPhaseAxes.get_timeout">
-<a class="viewcode-back" href="../../../reference/generated/dodal.devices.apple2_undulator.UndulatorPhaseAxes.html#dodal.devices.apple2_undulator.UndulatorPhaseAxes.get_timeout">[docs]</a>
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_timeout</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Get all four motor speed, current positions and target positions to calculate required timeout.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">axes</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">top_outer</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">top_inner</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">btm_inner</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">btm_outer</span><span class="p">]</span>
-        <span class="n">timeouts</span> <span class="o">=</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span>
-            <span class="o">*</span><span class="p">[</span>
-                <span class="n">estimate_motor_timeout</span><span class="p">(</span>
-                    <span class="n">axis</span><span class="o">.</span><span class="n">user_setpoint_readback</span><span class="p">,</span>
-                    <span class="n">axis</span><span class="o">.</span><span class="n">user_readback</span><span class="p">,</span>
-                    <span class="n">axis</span><span class="o">.</span><span class="n">velocity</span><span class="p">,</span>
-                <span class="p">)</span>
-                <span class="k">for</span> <span class="n">axis</span> <span class="ow">in</span> <span class="n">axes</span>
-            <span class="p">]</span>
-        <span class="p">)</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;A 2.0 multiplier is required to prevent premature motor timeouts in phase</span>
-<span class="sd">        axes as it is a master-slave system, where the slave&#39;s movement,</span>
-<span class="sd">        being dependent on the master, can take up to twice as long to complete.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">timeouts</span><span class="p">)</span> <span class="o">*</span> <span class="mf">2.0</span></div>
-</div>
+        <span class="p">)</span></div>
 
 
 
@@ -774,7 +818,7 @@ window.addEventListener("load", () => mermaid.run());
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">set_move</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
 
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_set_demand_positions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set_demand_positions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">jaw_phase</span><span class="o">.</span><span class="n">user_setpoint</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
 
 <div class="viewcode-block" id="UndulatorJawPhase.get_timeout">
@@ -792,9 +836,12 @@ window.addEventListener("load", () => mermaid.run());
 
 
 
+<span class="n">PhaseAxesType</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;PhaseAxesType&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">UndulatorLockedPhaseAxes</span><span class="p">)</span>
+
+
 <div class="viewcode-block" id="Apple2">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.apple2_undulator.Apple2.html#dodal.devices.apple2_undulator.Apple2">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">Apple2</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">,</span> <span class="n">Movable</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Apple2</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">,</span> <span class="n">Movable</span><span class="p">[</span><span class="n">Apple2Val</span><span class="p">],</span> <span class="n">Generic</span><span class="p">[</span><span class="n">PhaseAxesType</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Device representing the combined motor controls for an Apple2 undulator.</span>
 
@@ -806,7 +853,7 @@ window.addEventListener("load", () => mermaid.run());
 <span class="sd">        The undulator phase axes device, consisting of four phase motors.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">id_gap</span><span class="p">:</span> <span class="n">UndulatorGap</span><span class="p">,</span> <span class="n">id_phase</span><span class="p">:</span> <span class="n">UndulatorPhaseAxes</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">id_gap</span><span class="p">:</span> <span class="n">UndulatorGap</span><span class="p">,</span> <span class="n">id_phase</span><span class="p">:</span> <span class="n">PhaseAxesType</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -834,12 +881,12 @@ window.addEventListener("load", () => mermaid.run());
 
         <span class="c1"># Only need to check gap as the phase motors share both fault and gate with gap.</span>
         <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">gap</span><span class="p">()</span><span class="o">.</span><span class="n">raise_if_cannot_move</span><span class="p">()</span>
+
         <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">phase</span><span class="p">()</span><span class="o">.</span><span class="n">top_outer</span><span class="o">.</span><span class="n">user_setpoint</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">id_motor_values</span><span class="o">.</span><span class="n">top_outer</span><span class="p">),</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">phase</span><span class="p">()</span><span class="o">.</span><span class="n">top_inner</span><span class="o">.</span><span class="n">user_setpoint</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">id_motor_values</span><span class="o">.</span><span class="n">top_inner</span><span class="p">),</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">phase</span><span class="p">()</span><span class="o">.</span><span class="n">btm_inner</span><span class="o">.</span><span class="n">user_setpoint</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">id_motor_values</span><span class="o">.</span><span class="n">btm_inner</span><span class="p">),</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">phase</span><span class="p">()</span><span class="o">.</span><span class="n">btm_outer</span><span class="o">.</span><span class="n">user_setpoint</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">id_motor_values</span><span class="o">.</span><span class="n">btm_outer</span><span class="p">),</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">gap</span><span class="p">()</span><span class="o">.</span><span class="n">user_setpoint</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">id_motor_values</span><span class="o">.</span><span class="n">gap</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">phase</span><span class="p">()</span><span class="o">.</span><span class="n">set_demand_positions</span><span class="p">(</span>
+                <span class="n">value</span><span class="o">=</span><span class="n">id_motor_values</span><span class="o">.</span><span class="n">extract_phase_val</span><span class="p">()</span>
+            <span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">gap</span><span class="p">()</span><span class="o">.</span><span class="n">set_demand_positions</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">id_motor_values</span><span class="o">.</span><span class="n">gap</span><span class="p">)),</span>
         <span class="p">)</span>
         <span class="n">timeout</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span>
             <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gap</span><span class="p">()</span><span class="o">.</span><span class="n">get_timeout</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">phase</span><span class="p">()</span><span class="o">.</span><span class="n">get_timeout</span><span class="p">())</span>
@@ -867,7 +914,7 @@ window.addEventListener("load", () => mermaid.run());
 
 
 
-<span class="n">Apple2Type</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;Apple2Type&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="s2">&quot;Apple2&quot;</span><span class="p">)</span>
+<span class="n">Apple2Type</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;Apple2Type&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">Apple2</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="Apple2Controller">
@@ -946,16 +993,25 @@ window.addEventListener("load", () => mermaid.run());
         <span class="bp">self</span><span class="o">.</span><span class="n">polarisation_setpoint</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_polarisation_setpoint_set</span> <span class="o">=</span> <span class="p">(</span>
             <span class="n">soft_signal_r_and_setter</span><span class="p">(</span><span class="n">Pol</span><span class="p">)</span>
         <span class="p">)</span>
+        <span class="c1"># check if undulator phase is unlocked.</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">apple2</span><span class="p">()</span><span class="o">.</span><span class="n">phase</span><span class="p">(),</span> <span class="n">UndulatorPhaseAxes</span><span class="p">):</span>
+            <span class="n">top_inner</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">apple2</span><span class="p">()</span><span class="o">.</span><span class="n">phase</span><span class="p">()</span><span class="o">.</span><span class="n">top_inner</span><span class="o">.</span><span class="n">user_readback</span>
+            <span class="n">btm_outer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">apple2</span><span class="p">()</span><span class="o">.</span><span class="n">phase</span><span class="p">()</span><span class="o">.</span><span class="n">btm_outer</span><span class="o">.</span><span class="n">user_readback</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># If locked phase axes make the locked phase 0.</span>
+            <span class="n">top_inner</span> <span class="o">=</span> <span class="n">btm_outer</span> <span class="o">=</span> <span class="n">soft_signal_rw</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">initial_value</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">(</span><span class="n">StandardReadableFormat</span><span class="o">.</span><span class="n">HINTED_SIGNAL</span><span class="p">):</span>
             <span class="c1"># Hardware backed read/write for polarisation.</span>
+
             <span class="bp">self</span><span class="o">.</span><span class="n">polarisation</span> <span class="o">=</span> <span class="n">derived_signal_rw</span><span class="p">(</span>
                 <span class="n">raw_to_derived</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_read_pol</span><span class="p">,</span>
                 <span class="n">set_derived</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_set_pol</span><span class="p">,</span>
                 <span class="n">pol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">polarisation_setpoint</span><span class="p">,</span>
                 <span class="n">top_outer</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">apple2</span><span class="p">()</span><span class="o">.</span><span class="n">phase</span><span class="p">()</span><span class="o">.</span><span class="n">top_outer</span><span class="o">.</span><span class="n">user_readback</span><span class="p">,</span>
-                <span class="n">top_inner</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">apple2</span><span class="p">()</span><span class="o">.</span><span class="n">phase</span><span class="p">()</span><span class="o">.</span><span class="n">top_inner</span><span class="o">.</span><span class="n">user_readback</span><span class="p">,</span>
+                <span class="n">top_inner</span><span class="o">=</span><span class="n">top_inner</span><span class="p">,</span>
                 <span class="n">btm_inner</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">apple2</span><span class="p">()</span><span class="o">.</span><span class="n">phase</span><span class="p">()</span><span class="o">.</span><span class="n">btm_inner</span><span class="o">.</span><span class="n">user_readback</span><span class="p">,</span>
-                <span class="n">btm_outer</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">apple2</span><span class="p">()</span><span class="o">.</span><span class="n">phase</span><span class="p">()</span><span class="o">.</span><span class="n">btm_outer</span><span class="o">.</span><span class="n">user_readback</span><span class="p">,</span>
+                <span class="n">btm_outer</span><span class="o">=</span><span class="n">btm_outer</span><span class="p">,</span>
                 <span class="n">gap</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">apple2</span><span class="p">()</span><span class="o">.</span><span class="n">gap</span><span class="p">()</span><span class="o">.</span><span class="n">user_readback</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>

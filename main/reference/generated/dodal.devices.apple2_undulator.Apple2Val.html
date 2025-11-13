@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.apple2_undulator.Apple2Val &#8212; dodal 1.65.1.dev8+gb2eaebdb4 documentation</title>
+    <title>dodal.devices.apple2_undulator.Apple2Val &#8212; dodal 1.65.1.dev9+g8048fc5b2 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=1e4b4700"></script>
+    <script src="../../_static/documentation_options.js?v=b34d133a"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -413,6 +413,7 @@
 <li class="toctree-l3"><a class="reference internal" href="dodal.beamlines.i04.html">dodal.beamlines.i04</a></li>
 <li class="toctree-l3"><a class="reference internal" href="dodal.beamlines.i05.html">dodal.beamlines.i05</a></li>
 <li class="toctree-l3"><a class="reference internal" href="dodal.beamlines.i05_1.html">dodal.beamlines.i05_1</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dodal.beamlines.i06.html">dodal.beamlines.i06</a></li>
 <li class="toctree-l3"><a class="reference internal" href="dodal.beamlines.i07.html">dodal.beamlines.i07</a></li>
 <li class="toctree-l3"><a class="reference internal" href="dodal.beamlines.i09.html">dodal.beamlines.i09</a></li>
 <li class="toctree-l3"><a class="reference internal" href="dodal.beamlines.i09_1.html">dodal.beamlines.i09_1</a></li>
@@ -477,6 +478,7 @@
 <li class="toctree-l3 current active has-children"><a class="reference internal" href="dodal.devices.apple2_undulator.html">dodal.devices.apple2_undulator</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.apple2_undulator.Apple2.html">dodal.devices.apple2_undulator.Apple2</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.apple2_undulator.Apple2Controller.html">dodal.devices.apple2_undulator.Apple2Controller</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.apple2_undulator.Apple2LockedPhasesVal.html">dodal.devices.apple2_undulator.Apple2LockedPhasesVal</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.apple2_undulator.Apple2PhasesVal.html">dodal.devices.apple2_undulator.Apple2PhasesVal</a></li>
 <li class="toctree-l4 current active"><a class="current reference internal" href="#">dodal.devices.apple2_undulator.Apple2Val</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.apple2_undulator.BeamEnergy.html">dodal.devices.apple2_undulator.BeamEnergy</a></li>
@@ -489,6 +491,7 @@
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.apple2_undulator.UndulatorGap.html">dodal.devices.apple2_undulator.UndulatorGap</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.apple2_undulator.UndulatorGateStatus.html">dodal.devices.apple2_undulator.UndulatorGateStatus</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.apple2_undulator.UndulatorJawPhase.html">dodal.devices.apple2_undulator.UndulatorJawPhase</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.apple2_undulator.UndulatorLockedPhaseAxes.html">dodal.devices.apple2_undulator.UndulatorLockedPhaseAxes</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.apple2_undulator.UndulatorPhaseAxes.html">dodal.devices.apple2_undulator.UndulatorPhaseAxes</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.apple2_undulator.UndulatorPhaseMotor.html">dodal.devices.apple2_undulator.UndulatorPhaseMotor</a></li>
 </ul>
@@ -1081,34 +1084,31 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="dodal.devices.apple2_undulator.Apple2Val">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dodal.devices.apple2_undulator.</span></span><span class="sig-name descname"><span class="pre">Apple2Val</span></span><a class="reference internal" href="../../_modules/dodal/devices/apple2_undulator.html#Apple2Val"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.apple2_undulator.Apple2Val" title="Link to this definition">#</a></dt>
-<dd><p>Apple2Val(top_outer: str, top_inner: str, btm_inner: str, btm_outer: str, gap: str)</p>
+<dd><p>Apple2Val(gap: str, phase: dodal.devices.apple2_undulator.Apple2LockedPhasesVal | dodal.devices.apple2_undulator.Apple2PhasesVal)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>top_outer</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
-<li><p><strong>top_inner</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
-<li><p><strong>btm_inner</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
-<li><p><strong>btm_outer</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
 <li><p><strong>gap</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>phase</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="dodal.devices.apple2_undulator.Apple2LockedPhasesVal.html#dodal.devices.apple2_undulator.Apple2LockedPhasesVal" title="dodal.devices.apple2_undulator.Apple2LockedPhasesVal"><code class="xref py py-class docutils literal notranslate"><span class="pre">Apple2LockedPhasesVal</span></code></a> | <a class="reference internal" href="dodal.devices.apple2_undulator.Apple2PhasesVal.html#dodal.devices.apple2_undulator.Apple2PhasesVal" title="dodal.devices.apple2_undulator.Apple2PhasesVal"><code class="xref py py-class docutils literal notranslate"><span class="pre">Apple2PhasesVal</span></code></a></span>)</p></li>
 </ul>
 </dd>
 </dl>
+<p class="rubric">Methods</p>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">extract_phase_val</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</div>
 <p class="rubric">Attributes</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">gap</span></code></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">top_outer</span></code></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">top_inner</span></code></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">btm_inner</span></code></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">btm_outer</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">phase</span></code></p></td>
 <td><p></p></td>
 </tr>
 </tbody>

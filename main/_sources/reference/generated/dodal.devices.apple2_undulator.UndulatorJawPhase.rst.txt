@@ -26,6 +26,9 @@ dodal.devices.apple2\_undulator.UndulatorJawPhase
       
       
       
+      ~UndulatorJawPhase.set_demand_positions
+      
+      
       
       
    

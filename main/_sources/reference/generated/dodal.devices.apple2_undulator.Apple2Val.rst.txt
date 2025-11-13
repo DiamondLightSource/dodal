@@ -8,6 +8,14 @@ dodal.devices.apple2\_undulator.Apple2Val
 
    
    
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      ~Apple2Val.extract_phase_val
+      
+   
    
 
    
@@ -20,16 +28,7 @@ dodal.devices.apple2\_undulator.Apple2Val
       ~Apple2Val.gap
       
       
-      ~Apple2Val.top_outer
-      
-      
-      ~Apple2Val.top_inner
-      
-      
-      ~Apple2Val.btm_inner
-      
-      
-      ~Apple2Val.btm_outer
+      ~Apple2Val.phase
       
    
    
