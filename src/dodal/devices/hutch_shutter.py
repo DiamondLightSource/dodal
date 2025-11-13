@@ -40,9 +40,6 @@ class HutchInterlock(StandardReadable):
     """Device to check the interlock status of the hutch."""
 
     def __init__(self, bl_prefix: str, name: str = "") -> None:
-        # I03 Experimental Hutch interlock is BL03I-PS-IOC-01:M11:LOP
-        # I03 Optics Hutch interlock is BL03I-PS-IOC-01:M03:LOP
-        # XXX - not sure what this is then?
         self.status = epics_signal_r(float, bl_prefix + "-PS-IOC-01:M14:LOP")
         super().__init__(name)
 
