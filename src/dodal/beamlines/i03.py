@@ -461,7 +461,7 @@ def collimation_table() -> CollimationTable:
 
 @device_factory()
 def ipin() -> IPin:
-    """Get the i04 ipin device, instantiate it if it hasn't already been.
+    """Get the i03 ipin device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
     """
     return IPin(f"{PREFIX.beamline_prefix}-EA-PIN-01:")
