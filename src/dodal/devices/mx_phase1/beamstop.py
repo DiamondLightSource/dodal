@@ -10,6 +10,8 @@ from ophyd_async.epics.motor import Motor
 
 from dodal.common.beamlines.beamline_parameters import GDABeamlineParameters
 
+_BEAMSTOP_OUT_DELTA_Y_MM = -2
+
 
 class BeamstopPositions(StrictEnum):
     """
@@ -64,9 +66,9 @@ class Beamstop(StandardReadable):
             float(beamline_parameters[f"in_beam_{axis}_STANDARD"])
             for axis in ("x", "y", "z")
         ]
-        # XXX need better way to configure this
+
         self._out_of_beam_xyz_mm = list(self._in_beam_xyz_mm)
-        self._out_of_beam_xyz_mm[1] -= 5
+        self._out_of_beam_xyz_mm[1] += _BEAMSTOP_OUT_DELTA_Y_MM
 
         self._xyz_tolerance_mm = [
             float(beamline_parameters[f"bs_{axis}_tolerance"])
