@@ -33,6 +33,7 @@ import io
 from collections.abc import Generator
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Any
 
 import numpy as np
 from daq_config_server.client import ConfigServer
@@ -92,9 +93,9 @@ class EnergyCoverageEntry(BaseModel):
 
 
 class EnergyCoverage(RootModel[dict[str, EnergyCoverageEntry]]):
-    pass
-    # def __init__(self, root: dict[str, EnergyCoverageEntry] | None = None):
-    #     super().__init__(root=root or {})
+    # Allow to auto speficy a dict if one not provided
+    def __init__(self, root: dict[str, EnergyCoverageEntry] | None = None):
+        super().__init__(root=root or {})
 
 
 class LookupTableEntries(BaseModel):
@@ -103,14 +104,14 @@ class LookupTableEntries(BaseModel):
 
 
 class LookupTable(RootModel[dict[str, LookupTableEntries]]):
-    pass
-    # def __init__(self, root: dict[str, LookupTableEntries] | None = None):
-    #     super().__init__(root=root or {})
+    # Allow to auto speficy a dict if one not provided
+    def __init__(self, root: dict[str, LookupTableEntries] | None = None):
+        super().__init__(root=root or {})
 
 
 class GapPhaseLookupTable(BaseModel):
-    gap: LookupTable = Field(default_factory=lambda: LookupTable({}))
-    phase: LookupTable = Field(default_factory=lambda: LookupTable({}))
+    gap: LookupTable = Field(default_factory=lambda: LookupTable())
+    phase: LookupTable = Field(default_factory=lambda: LookupTable())
 
 
 def convert_csv_to_lookup(
@@ -143,17 +144,11 @@ def convert_csv_to_lookup(
 
     """
 
-    polarisations = set()
-
-    def process_row(row: dict, lut: LookupTable) -> LookupTable:
+    def process_row(row: dict[str, Any], lut: LookupTable):
         """Process a single row from the CSV file and update the lookup table."""
         mode_value = str(row[lut_column_config.mode]).lower()
         if mode_value in lut_column_config.mode_name_convert:
             mode_value = lut_column_config.mode_name_convert[f"{mode_value}"]
-        if mode_value not in polarisations:
-            polarisations.add(mode_value)
-
-        print(f"lut = {lut}")
 
         # Create polynomial object for energy-to-gap/phase conversion
         coefficients = [float(row[coef]) for coef in lut_column_config.poly_deg]
@@ -182,24 +177,24 @@ def convert_csv_to_lookup(
             lut.root[mode_value].limit.maximum,
             float(row[lut_column_config.max_energy]),
         )
-
         return lut
 
     reader = csv.DictReader(read_file_and_skip(file, skip_line_start_with))
 
-    lookup_table = LookupTable({})
+    lut = LookupTable()
 
     for row in reader:
         # If there are multiple source only convert requested.
         if lut_column_config.source is not None:
             if row[lut_column_config.source[0]] == lut_column_config.source[1]:
-                lookup_table = process_row(row=row, lut=lookup_table)
+                process_row(row=row, lut=lut)
         else:
-            lookup_table = process_row(row=row, lut=lookup_table)
+            process_row(row=row, lut=lut)
 
-    if not lookup_table:
+    if not lut:
         raise RuntimeError(f"Unable to convert lookup table:\t{file}")
-    return lookup_table
+
+    return lut
 
 
 def read_file_and_skip(file: str, skip_line_start_with: str = "#") -> Generator[str]:
@@ -269,14 +264,6 @@ def generate_lookup_table_entry(
     )
 
 
-def generate_lookup_table(
-    pol: Pol, min_energy: float, max_energy: float, poly1d_param: list[float]
-) -> LookupTable:
-    return LookupTable(
-        {pol.value: generate_lookup_table_entry(min_energy, max_energy, poly1d_param)}
-    )
-
-
 def make_phase_tables(
     pols: list[Pol],
     min_energies: list[float],
@@ -285,7 +272,7 @@ def make_phase_tables(
 ) -> LookupTable:
     """Generate a dictionary containing multiple lookuptable entries
     for provided polarisations."""
-    lookuptable_phase = LookupTable({})
+    lookuptable_phase = LookupTable()
     for i in range(len(pols)):
         lookuptable_phase.root[pols[i]] = generate_lookup_table_entry(
             min_energy=min_energies[i],
