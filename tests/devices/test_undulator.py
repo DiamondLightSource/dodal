@@ -209,9 +209,9 @@ async def test_move_order(
     undulator_order: UndulatorOrder,
     run_engine: RunEngine,
 ):
-    assert await undulator_order.get() == 3  # default order
+    assert await undulator_order.value.get_value() == 3  # default order
     run_engine(mv(undulator_order, 1))
-    assert await undulator_order.get() == 1  # no error
+    assert await undulator_order.value.get_value() == 1  # no error
 
 
 @pytest.mark.parametrize(
