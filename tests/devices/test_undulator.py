@@ -201,7 +201,7 @@ async def test_order_read(
 ):
     await assert_reading(
         undulator_order,
-        {"undulator_order-_value": partial_reading(3)},
+        {"undulator_order-value": partial_reading(3)},
     )
 
 
@@ -209,9 +209,9 @@ async def test_move_order(
     undulator_order: UndulatorOrder,
     run_engine: RunEngine,
 ):
-    assert (await undulator_order.locate())["readback"] == 3  # default order
+    assert await undulator_order.value.get_value() == 3  # default order
     run_engine(mv(undulator_order, 1))
-    assert (await undulator_order.locate())["readback"] == 1  # no error
+    assert await undulator_order.value.get_value() == 1  # no error
 
 
 @pytest.mark.parametrize(
@@ -227,3 +227,12 @@ async def test_move_order_fails(
         match=f"Undulator order must be a positive integer. Requested value: {order_value}",
     ):
         await undulator_order.set(order_value)  # type: ignore
+
+
+async def test_locate_undulator_order(
+    undulator_order: UndulatorOrder,
+    order_value: int = 3,
+):
+    await undulator_order.set(order_value)
+    located_position = await undulator_order.locate()
+    assert located_position == {"readback": order_value, "setpoint": order_value}

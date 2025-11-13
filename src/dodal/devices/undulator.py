@@ -255,17 +255,17 @@ class UndulatorOrder(StandardReadable, Locatable[int]):
             name: Name for device. Defaults to ""
         """
         with self.add_children_as_readables():
-            self._value = soft_signal_rw(int, initial_value=3)
+            self.value = soft_signal_rw(int, initial_value=3)
         super().__init__(name=name)
 
     @AsyncStatus.wrap
     async def set(self, value: int) -> None:
         if (value >= 0) and isinstance(value, int):
-            await self._value.set(value)
+            await self.value.set(value)
         else:
             raise ValueError(
                 f"Undulator order must be a positive integer. Requested value: {value}"
             )
 
     async def locate(self) -> Location[int]:
-        return await self._value.locate()
+        return await self.value.locate()
