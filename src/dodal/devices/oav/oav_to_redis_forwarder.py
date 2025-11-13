@@ -21,8 +21,6 @@ from redis.asyncio import StrictRedis
 from dodal.devices.oav.oav_detector import OAV
 from dodal.log import LOGGER
 
-FORWARDING_COMPLETE_MESSAGE = "image_forwarding_complete"
-
 
 async def get_next_jpeg(response: ClientResponse) -> bytes:
     jpeg_start_byte = b"\xff\xd8"

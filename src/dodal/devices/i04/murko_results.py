@@ -73,7 +73,8 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
     solutions for y and z can be calculated using numpy's linear algebra library.
     """
 
-    TIMEOUT_S = 2
+    GET_MESSAGE_TIMEOUT_S = 2
+    RESULTS_COMPLETE_TIMEOUT_S = 5
     PERCENTAGE_TO_USE = 25
     LEFTMOST_PIXEL_TO_USE = 10
     NUMBER_OF_WRONG_RESULTS_TO_LOG = 5
@@ -123,13 +124,13 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
         sample_id = await self.sample_id.get_value()
         t_last_result = time.time()
         while True:
-            if time.time() - t_last_result > 5:
+            if time.time() - t_last_result > self.RESULTS_COMPLETE_TIMEOUT_S:
                 LOGGER.warning(
-                    f"Time since last result > 5, expected to receive {RESULTS_COMPLETE_MESSAGE}"
+                    f"Time since last result > {self.RESULTS_COMPLETE_TIMEOUT_S}, expected to receive {RESULTS_COMPLETE_MESSAGE}"
                 )
                 break
             # waits here for next batch to be received
-            message = await self.pubsub.get_message(timeout=self.TIMEOUT_S)
+            message = await self.pubsub.get_message(timeout=self.GET_MESSAGE_TIMEOUT_S)
             if message and message["type"] == "message":
                 t_last_result = time.time()
                 data = pickle.loads(message["data"])
