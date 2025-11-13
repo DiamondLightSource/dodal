@@ -7,12 +7,19 @@ from dodal.devices.oav.oav_parameters import OAVConfigBeamCentre
 ZOOM_PARAMS_FILE = "/dls_sw/i23/software/aithre/aithre_oav.xml"
 DISPLAY_CONFIG = "/dls_sw/i23/software/aithre/aithre_display.configuration"
 
+
 PREFIX = "LA18L"
 
 
 @device_factory()
 def goniometer() -> Goniometer:
-    return Goniometer(f"{PREFIX}-MO-LSR-01:")
+    return Goniometer(
+        f"{PREFIX}-MO-LSR-01:",
+        y_infix="SAMPZ",
+        z_infix="SAMPY",
+        sampy_infix="Y",
+        sampz_infix="Z",
+    )
 
 
 @device_factory()
@@ -22,8 +29,20 @@ def robot() -> LaserRobot:
 
 @device_factory()
 def oav(params: OAVConfigBeamCentre | None = None) -> OAVBeamCentreFile:
+    config = (
+        params
+        if params is not None
+        else OAVConfigBeamCentre(
+            zoom_params_file=ZOOM_PARAMS_FILE, display_config_file=DISPLAY_CONFIG
+        )
+    )
     return OAVBeamCentreFile(
         prefix=f"{PREFIX}-DI-OAV-01:",
-        config=params or OAVConfigBeamCentre(ZOOM_PARAMS_FILE, DISPLAY_CONFIG),
+        config=config,
         zoom_controller=NullZoomController(),
+        mjpg_x_size_pv="ArraySize0_RBV",
+        mjpg_y_size_pv="ArraySize1_RBV",
+        x_direction=-1,
+        y_direction=-1,
+        z_direction=-1,
     )
