@@ -19,6 +19,7 @@ from ophyd_async.testing import (
 
 from dodal.devices.apple2_undulator import (
     BeamEnergy,
+    EnabledDisabledUpper,
     InsertionDeviceEnergy,
     InsertionDevicePolarisation,
     Pol,
@@ -36,6 +37,7 @@ from dodal.devices.i10.i10_apple2 import (
 )
 from dodal.devices.i10.i10_setting_data import I10Grating
 from dodal.devices.pgm import PlaneGratingMonochromator
+from dodal.devices.util.lookup_tables_apple2 import convert_csv_to_lookup
 from dodal.testing import patch_motor
 from tests.devices.i10.test_data import (
     EXPECTED_ID_ENERGY_2_GAP_CALIBRATIONS_IDD_PKL,
@@ -61,7 +63,7 @@ async def mock_id_gap(prefix: str = "BLXX-EA-DET-007:") -> UndulatorGap:
     set_mock_value(mock_id_gap.velocity, 1)
     set_mock_value(mock_id_gap.user_readback, 20)
     set_mock_value(mock_id_gap.user_setpoint, "20")
-    set_mock_value(mock_id_gap.fault, 0)
+    set_mock_value(mock_id_gap.status, EnabledDisabledUpper.ENABLED)
     return mock_id_gap
 
 
@@ -89,7 +91,7 @@ async def mock_phase_axes(prefix: str = "BLXX-EA-DET-007:") -> UndulatorPhaseAxe
     set_mock_value(mock_phase_axes.top_inner.user_setpoint_readback, 0)
     set_mock_value(mock_phase_axes.btm_outer.user_setpoint_readback, 0)
     set_mock_value(mock_phase_axes.btm_inner.user_setpoint_readback, 0)
-    set_mock_value(mock_phase_axes.fault, 0)
+    set_mock_value(mock_phase_axes.status, EnabledDisabledUpper.ENABLED)
     return mock_phase_axes
 
 
@@ -112,7 +114,7 @@ async def mock_jaw_phase(prefix: str = "BLXX-EA-DET-007:") -> UndulatorJawPhase:
     set_mock_value(mock_jaw_phase.gate, UndulatorGateStatus.CLOSE)
     set_mock_value(mock_jaw_phase.jaw_phase.velocity, 2)
     set_mock_value(mock_jaw_phase.jaw_phase.user_readback, 0)
-    set_mock_value(mock_jaw_phase.fault, 0)
+    set_mock_value(mock_jaw_phase.status, EnabledDisabledUpper.ENABLED)
     return mock_jaw_phase
 
 
@@ -280,11 +282,18 @@ async def test_fail_i10_apple2_controller_set_undefined_pol(
 async def test_fail_i10_apple2_controller_set_id_not_ready(
     mock_id_controller: I10Apple2Controller,
 ):
-    set_mock_value(mock_id_controller.apple2().gap().fault, 1)
+    set_mock_value(
+        mock_id_controller.apple2().gap().status, EnabledDisabledUpper.DISABLED
+    )
     with pytest.raises(RuntimeError) as e:
         await mock_id_controller.energy.set(600)
-    assert str(e.value) == mock_id_controller.apple2().gap().name + " is in fault state"
-    set_mock_value(mock_id_controller.apple2().gap().fault, 0)
+    assert (
+        str(e.value)
+        == mock_id_controller.apple2().gap().name + " is DISABLED and cannot move."
+    )
+    set_mock_value(
+        mock_id_controller.apple2().gap().status, EnabledDisabledUpper.ENABLED
+    )
     set_mock_value(mock_id_controller.apple2().gap().gate, UndulatorGateStatus.OPEN)
     with pytest.raises(RuntimeError) as e:
         await mock_id_controller.energy.set(600)
@@ -683,8 +692,11 @@ def test_i10_energy_motor_lookup_convert_csv_to_lookup_success(
     expected_dict_file_name: str,
     source: tuple[str, str],
 ):
-    data = mock_i10_energy_motor_lookup_idu.convert_csv_to_lookup(
-        file=file_name,
+    file = mock_i10_energy_motor_lookup_idu.config_client.get_file_contents(
+        file_path=file_name, reset_cached_result=True
+    )
+    data = convert_csv_to_lookup(
+        file=file,
         source=source,
     )
     with open(expected_dict_file_name, "rb") as f:
@@ -696,7 +708,7 @@ def test_i10_energy_motor_lookup_convert_csv_to_lookup_failed(
     mock_i10_energy_motor_lookup_idu: I10EnergyMotorLookup,
 ):
     with pytest.raises(RuntimeError):
-        mock_i10_energy_motor_lookup_idu.convert_csv_to_lookup(
+        convert_csv_to_lookup(
             file=ID_ENERGY_2_GAP_CALIBRATIONS_CSV,
             source=("Source", "idw"),
         )
@@ -706,12 +718,12 @@ async def test_fail_i10_energy_motor_lookup_no_lookup(
     mock_i10_energy_motor_lookup_idu: I10EnergyMotorLookup,
 ):
     wrong_path = "fnslkfndlsnf"
-    with pytest.raises(FileNotFoundError) as e:
-        mock_i10_energy_motor_lookup_idu.convert_csv_to_lookup(
+    with pytest.raises(RuntimeError) as e:
+        convert_csv_to_lookup(
             file=wrong_path,
             source=("Source", "idd"),
         )
-    assert str(e.value) == f"[Errno 2] No such file or directory: '{wrong_path}'"
+    assert str(e.value) == f"Unable to convert lookup table:\t{wrong_path}"
 
 
 @pytest.mark.parametrize("energy", [(100), (5500), (-299)])
@@ -722,12 +734,12 @@ async def test_fail_i10_energy_motor_lookup_outside_energy_limits(
     with pytest.raises(ValueError) as e:
         await mock_id_controller.energy.set(energy)
     assert str(e.value) == "Demanding energy must lie between {} and {} eV!".format(
-        mock_id_controller.lookup_table_client.lookup_tables["Gap"][
+        mock_id_controller.lookup_table_client.lookup_tables["gap"][
             await mock_id_controller.polarisation_setpoint.get_value()
-        ]["Limit"]["Minimum"],
-        mock_id_controller.lookup_table_client.lookup_tables["Gap"][
+        ]["limit"]["minimum"],
+        mock_id_controller.lookup_table_client.lookup_tables["gap"][
             await mock_id_controller.polarisation_setpoint.get_value()
-        ]["Limit"]["Maximum"],
+        ]["limit"]["maximum"],
     )
 
 
@@ -736,24 +748,24 @@ async def test_fail_i10_energy_motor_lookup_with_lookup_gap(
 ):
     mock_id_controller.lookup_table_client.update_lookuptable()
     # make gap in energy
-    mock_id_controller.lookup_table_client.lookup_tables["Gap"]["lh"]["Energies"] = {
+    mock_id_controller.lookup_table_client.lookup_tables["gap"]["lh"]["energies"] = {
         "1": {
-            "Low": 255.3,
-            "High": 500,
-            "Poly": poly1d([4.33435e-08, -7.52562e-05, 6.41791e-02, 3.88755e00]),
+            "low": 255.3,
+            "high": 500,
+            "poly": poly1d([4.33435e-08, -7.52562e-05, 6.41791e-02, 3.88755e00]),
         }
     }
-    mock_id_controller.lookup_table_client.lookup_tables["Gap"]["lh"]["Energies"] = {
+    mock_id_controller.lookup_table_client.lookup_tables["gap"]["lh"]["energies"] = {
         "2": {
-            "Low": 600,
-            "High": 1000,
-            "Poly": poly1d([4.33435e-08, -7.52562e-05, 6.41791e-02, 3.88755e00]),
+            "low": 600,
+            "high": 1000,
+            "poly": poly1d([4.33435e-08, -7.52562e-05, 6.41791e-02, 3.88755e00]),
         }
     }
     with pytest.raises(ValueError) as e:
         await mock_id_controller.energy.set(555)
     assert (
         str(e.value)
-        == """Cannot find polynomial coefficients for your requested energy.
-        There might be gap in the calibration lookup table."""
+        == "Cannot find polynomial coefficients for your requested energy."
+        + " There might be gap in the calibration lookup table."
     )
