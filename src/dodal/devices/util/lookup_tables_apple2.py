@@ -82,7 +82,7 @@ DEFAULT_POLY_DEG = [
 MODE_NAME_CONVERT = {"CR": "pc", "CL": "nc"}
 
 
-class LookupTableColumnConfig(BaseModel):
+class LookupTableConfig(BaseModel):
     path: LookupPath
     source: tuple[str, str] | None = None
     mode: str = "Mode"
@@ -126,7 +126,7 @@ class GapPhaseLookupTable(BaseModel):
 
 def convert_csv_to_lookup(
     file_contents: str,
-    lut_column_config: LookupTableColumnConfig,
+    lut_config: LookupTableConfig,
     skip_line_start_with: str = "#",
 ) -> LookupTable:
     """
@@ -135,7 +135,7 @@ def convert_csv_to_lookup(
     args:
         file_contents:
             The CSV file content as a string.
-        lut_column_config:
+        lut_config:
             The configuration that defines how to read the file_contents into a LookupTable
         skip_line_start_with
             Lines beginning with this prefix are skipped (default "#").
@@ -143,24 +143,24 @@ def convert_csv_to_lookup(
 
     def process_row(row: dict[str, Any], lut: LookupTable):
         """Process a single row from the CSV file and update the lookup table."""
-        mode_value = str(row[lut_column_config.mode]).lower()
-        if mode_value in lut_column_config.mode_name_convert:
-            mode_value = lut_column_config.mode_name_convert[f"{mode_value}"]
+        mode_value = str(row[lut_config.mode]).lower()
+        if mode_value in lut_config.mode_name_convert:
+            mode_value = lut_config.mode_name_convert[f"{mode_value}"]
 
         # Create polynomial object for energy-to-gap/phase conversion
-        coefficients = [float(row[coef]) for coef in lut_column_config.poly_deg]
+        coefficients = [float(row[coef]) for coef in lut_config.poly_deg]
         if mode_value not in lut.root:
             lut.root[Pol(mode_value)] = generate_lookup_table_entry(
-                min_energy=float(row[lut_column_config.min_energy]),
-                max_energy=float(row[lut_column_config.max_energy]),
+                min_energy=float(row[lut_config.min_energy]),
+                max_energy=float(row[lut_config.max_energy]),
                 poly1d_param=coefficients,
             )
 
         else:
-            lut.root[mode_value].energies.root[row[lut_column_config.min_energy]] = (
+            lut.root[mode_value].energies.root[row[lut_config.min_energy]] = (
                 EnergyCoverageEntry(
-                    low=float(row[lut_column_config.min_energy]),
-                    high=float(row[lut_column_config.max_energy]),
+                    low=float(row[lut_config.min_energy]),
+                    high=float(row[lut_config.max_energy]),
                     poly=np.poly1d(coefficients),
                 )
             )
@@ -168,11 +168,11 @@ def convert_csv_to_lookup(
         # Update energy limits
         lut.root[mode_value].limit.minimum = min(
             lut.root[mode_value].limit.minimum,
-            float(row[lut_column_config.min_energy]),
+            float(row[lut_config.min_energy]),
         )
         lut.root[mode_value].limit.maximum = max(
             lut.root[mode_value].limit.maximum,
-            float(row[lut_column_config.max_energy]),
+            float(row[lut_config.max_energy]),
         )
         return lut
 
@@ -181,8 +181,8 @@ def convert_csv_to_lookup(
 
     for row in reader:
         # If there are multiple source only convert requested.
-        if lut_column_config.source is not None:
-            if row[lut_column_config.source[0]] == lut_column_config.source[1]:
+        if lut_config.source is not None:
+            if row[lut_config.source[0]] == lut_config.source[1]:
                 process_row(row=row, lut=lut)
         else:
             process_row(row=row, lut=lut)
@@ -301,19 +301,19 @@ class BaseEnergyMotorLookup:
     def __init__(
         self,
         config_client: ConfigServer,
-        lut_column_config: LookupTableColumnConfig,
+        lut_config: LookupTableConfig,
     ):
         """Initialise the EnergyMotorLookup class with lookup table headers provided.
 
         Args:
-            lut_column_config:
+            lut_config:
                 The configuration that contains the lookup table file paths and how to
                 read them.
             config_client:
                 The config server client to fetch the look up table.
         """
         self.lookup_tables = GapPhaseLookupTable()
-        self.lut_column_config = lut_column_config
+        self.lut_config = lut_config
         self.config_client = config_client
         self._available_pol = []
 

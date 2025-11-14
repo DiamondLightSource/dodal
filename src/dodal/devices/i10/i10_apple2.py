@@ -24,7 +24,7 @@ from dodal.devices.apple2_undulator import (
 )
 from dodal.devices.util.lookup_tables_apple2 import (
     BaseEnergyMotorLookup,
-    LookupTableColumnConfig,
+    LookupTableConfig,
     convert_csv_to_lookup,
 )
 from dodal.log import LOGGER
@@ -50,19 +50,19 @@ class I10EnergyMotorLookup(BaseEnergyMotorLookup):
         """
         LOGGER.info("Updating lookup dictionary from file for gap.")
         gap_csv_file = self.config_client.get_file_contents(
-            self.lut_column_config.path.gap, reset_cached_result=True
+            self.lut_config.path.gap, reset_cached_result=True
         )
         self.lookup_tables.gap = convert_csv_to_lookup(
-            file_contents=gap_csv_file, lut_column_config=self.lut_column_config
+            file_contents=gap_csv_file, lut_config=self.lut_config
         )
         self.available_pol = list(self.lookup_tables.gap.root.keys())
 
         LOGGER.info("Updating lookup dictionary from file for phase.")
         phase_csv_file = self.config_client.get_file_contents(
-            self.lut_column_config.path.phase, reset_cached_result=True
+            self.lut_config.path.phase, reset_cached_result=True
         )
         self.lookup_tables.phase = convert_csv_to_lookup(
-            file_contents=phase_csv_file, lut_column_config=self.lut_column_config
+            file_contents=phase_csv_file, lut_config=self.lut_config
         )
 
 
@@ -104,7 +104,7 @@ class I10Apple2Controller(Apple2Controller[I10Apple2]):
         self,
         apple2: I10Apple2,
         config_client: ConfigServer,
-        lut_column_config: LookupTableColumnConfig,
+        lut_config: LookupTableConfig,
         jaw_phase_limit: float = 12.0,
         jaw_phase_poly_param: list[float] = DEFAULT_JAW_PHASE_POLY_PARAMS,
         angle_threshold_deg=30.0,
@@ -133,7 +133,7 @@ class I10Apple2Controller(Apple2Controller[I10Apple2]):
         """
 
         self.lookup_table_client = I10EnergyMotorLookup(
-            lut_column_config=lut_column_config,
+            lut_config=lut_config,
             config_client=config_client,
         )
         super().__init__(

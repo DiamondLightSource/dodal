@@ -7,7 +7,7 @@ from dodal.devices.apple2_undulator import Pol
 from dodal.devices.util.lookup_tables_apple2 import (
     BaseEnergyMotorLookup,
     LookupPath,
-    LookupTableColumnConfig,
+    LookupTableConfig,
     convert_csv_to_lookup,
     generate_lookup_table,
     get_poly,
@@ -89,8 +89,8 @@ class DummyLookup(BaseEnergyMotorLookup):
 
 
 @pytest.fixture
-def lut_column_config() -> LookupTableColumnConfig:
-    return LookupTableColumnConfig(
+def lut_config() -> LookupTableConfig:
+    return LookupTableConfig(
         path=LookupPath.create(
             ".",
         ),
@@ -103,15 +103,15 @@ def lut_column_config() -> LookupTableColumnConfig:
 
 
 @pytest.fixture
-def dummy_lookup(lut_column_config: LookupTableColumnConfig) -> DummyLookup:
+def dummy_lookup(lut_config: LookupTableConfig) -> DummyLookup:
     return DummyLookup(
         config_client=MagicMock(),
-        lut_column_config=lut_column_config,
+        lut_config=lut_config,
     )
 
 
 def test_energy_motor_lookup_with_phase_path_none(dummy_lookup: DummyLookup) -> None:
-    # assert dummy_lookup.lut_column_config.path.phase is None
+    # assert dummy_lookup.lut_config.path.phase is None
 
     dummy_lookup.update_lookuptable()
 
@@ -135,13 +135,13 @@ def test_read_file_and_skip_basic():
 
 
 def test_convert_csv_to_lookup_overwrite_name_convert_default(
-    lut_column_config: LookupTableColumnConfig,
+    lut_config: LookupTableConfig,
 ) -> None:
     csv_content = (
         "Mode,MinEnergy,MaxEnergy,c1,c0\nHL,100,200,2.0,1.0\nVL,200,300,1.0,0.0\n"
     )
 
-    lookuptable = convert_csv_to_lookup(csv_content, lut_column_config)
+    lookuptable = convert_csv_to_lookup(csv_content, lut_config)
 
     assert "lh" in lookuptable.root
     assert "lv" in lookuptable.root
@@ -156,11 +156,11 @@ def test_convert_csv_to_lookup_overwrite_name_convert_default(
 
 
 async def test_bad_file_contents_causes_convert_csv_to_lookup_fails(
-    lut_column_config: LookupTableColumnConfig,
+    lut_config: LookupTableConfig,
 ):
     bad_file_contents = "fnslkfndlsnf"
     with pytest.raises(RuntimeError):
         convert_csv_to_lookup(
             file_contents=bad_file_contents,
-            lut_column_config=lut_column_config,
+            lut_config=lut_config,
         )

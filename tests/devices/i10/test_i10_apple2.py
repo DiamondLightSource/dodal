@@ -42,7 +42,7 @@ from dodal.devices.util.lookup_tables_apple2 import (
     EnergyCoverageEntry,
     LookupPath,
     LookupTable,
-    LookupTableColumnConfig,
+    LookupTableConfig,
     convert_csv_to_lookup,
 )
 from dodal.testing import patch_motor
@@ -162,7 +162,7 @@ async def mock_id_controller(
     async with init_devices(mock=True):
         mock_id_controller = I10Apple2Controller(
             apple2=mock_id,
-            lut_column_config=LookupTableColumnConfig(
+            lut_config=LookupTableConfig(
                 path=LookupPath.create(LOOKUP_TABLE_PATH),
                 source=("Source", "idu"),
             ),
@@ -228,7 +228,7 @@ def mock_i10_energy_motor_lookup_idu(
     mock_config_client: ConfigServer,
 ) -> I10EnergyMotorLookup:
     return I10EnergyMotorLookup(
-        lut_column_config=LookupTableColumnConfig(
+        lut_config=LookupTableConfig(
             path=LookupPath.create(LOOKUP_TABLE_PATH),
             source=("Source", "idu"),
         ),
@@ -241,7 +241,7 @@ def mock_i10_energy_motor_lookup_idd(
     mock_config_client: ConfigServer,
 ) -> I10EnergyMotorLookup:
     return I10EnergyMotorLookup(
-        lut_column_config=LookupTableColumnConfig(
+        lut_config=LookupTableConfig(
             path=LookupPath.create(LOOKUP_TABLE_PATH),
             source=("Source", "idd"),
         ),
@@ -710,7 +710,7 @@ def test_i10_energy_motor_lookup_idu_convert_csv_to_lookup_success(
     )
     lut = convert_csv_to_lookup(
         file_contents=file_contents,
-        lut_column_config=mock_i10_energy_motor_lookup_idu.lut_column_config,
+        lut_config=mock_i10_energy_motor_lookup_idu.lut_config,
     )
     with open(expected_dict_file_name, "rb") as f:
         expected_lut = LookupTable(pickle.load(f))
@@ -740,7 +740,7 @@ def test_i10_energy_motor_lookup_idd_convert_csv_to_lookup_success(
     )
     lut = convert_csv_to_lookup(
         file_contents=file_contents,
-        lut_column_config=mock_i10_energy_motor_lookup_idd.lut_column_config,
+        lut_config=mock_i10_energy_motor_lookup_idd.lut_config,
     )
     with open(expected_dict_file_name, "rb") as f:
         expected_lut = LookupTable(pickle.load(f))
@@ -754,7 +754,7 @@ def test_i10_energy_motor_lookup_convert_csv_to_lookup_failed(
     with pytest.raises(RuntimeError):
         convert_csv_to_lookup(
             file_contents=ID_ENERGY_2_GAP_CALIBRATIONS_CSV,
-            lut_column_config=mock_i10_energy_motor_lookup_idu.lut_column_config,
+            lut_config=mock_i10_energy_motor_lookup_idu.lut_config,
         )
 
 

@@ -36,7 +36,7 @@ from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.util.lookup_tables_apple2 import (
     LookupPath,
-    LookupTableColumnConfig,
+    LookupTableConfig,
 )
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
@@ -122,7 +122,7 @@ def idd_controller() -> I10Apple2Controller:
     return I10Apple2Controller(
         apple2=idd(),
         config_client=I10_CONF_CLIENT,
-        lut_column_config=LookupTableColumnConfig(
+        lut_config=LookupTableConfig(
             source=("Source", "idd"), path=LookupPath.create(LOOK_UPTABLE_DIR)
         ),
     )
@@ -187,7 +187,7 @@ def idu_controller() -> I10Apple2Controller:
     return I10Apple2Controller(
         apple2=idu(),
         config_client=I10_CONF_CLIENT,
-        lut_column_config=LookupTableColumnConfig(
+        lut_config=LookupTableConfig(
             source=("Source", "idu"), path=LookupPath.create(LOOK_UPTABLE_DIR)
         ),
     )
