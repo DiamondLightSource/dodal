@@ -50,7 +50,7 @@ class LookupPath(BaseModel):
         cls,
         path: str,
         gap_file: str = "IDEnergy2GapCalibrations.csv",
-        phase_file: str = "IDEnergy2GapCalibrations.csv",
+        phase_file: str = "IDEnergy2PhaseCalibrations.csv",
     ) -> "LookupPath":
         """
         Factory method to easily create LookupPath using some default file names.
