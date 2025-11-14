@@ -10,6 +10,11 @@ from dodal.devices.common_dcm import (
 from dodal.devices.electron_analyser import EnergySource
 from dodal.devices.electron_analyser.specs import SpecsDetector
 from dodal.devices.i09_1 import LensMode, PsuMode
+from dodal.devices.i09_1_shared.energy import HardEnergy, HardInsertionDeviceEnergy
+from dodal.devices.i09_1_shared.hard_undulator_functions import (
+    calculate_gap_i09_hu,
+    get_hu_lut_as_dict,
+)
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.undulator import UndulatorInMm, UndulatorOrder
 from dodal.log import set_beamline as set_log_beamline
@@ -58,3 +63,31 @@ def undulator() -> UndulatorInMm:
 @device_factory()
 def harmonics() -> UndulatorOrder:
     return UndulatorOrder(name="harmonics")
+
+
+HU_LUT_PATH = "/dls_sw/i09/software/gda/workspace_git/gda-diamond.git/configurations/i09-1-shared/lookupTables/IIDCalibrationTable.txt"
+
+
+async def lut_dictionary() -> dict:
+    return await get_hu_lut_as_dict(HU_LUT_PATH)
+
+
+@device_factory()
+def hu_id_energy() -> HardInsertionDeviceEnergy:
+    return HardInsertionDeviceEnergy(
+        undulator_order=harmonics(),
+        undulator=undulator(),
+        lut=lut_dictionary(),
+        gap_to_energy_func=lambda x: x,  # Placeholder, not used in this context
+        energy_to_gap_func=calculate_gap_i09_hu,
+        name="hu_id_energy",
+    )
+
+
+@device_factory()
+def hu_energy() -> HardEnergy:
+    return HardEnergy(
+        dcm=dcm(),
+        undulator_energy=hu_id_energy(),
+        name="hu_energy",
+    )

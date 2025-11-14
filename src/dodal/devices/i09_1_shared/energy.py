@@ -1,5 +1,5 @@
 from asyncio import gather
-from collections.abc import Callable
+from collections.abc import Awaitable, Callable
 
 from bluesky.protocols import Locatable, Location, Movable
 from numpy import ndarray
@@ -26,14 +26,14 @@ class HardInsertionDeviceEnergy(StandardReadable, Movable[float]):
     """
 
     def __init__(
-            self,
-            undulator_order: UndulatorOrder,
-            undulator: UndulatorInMm,
-            lut: dict[int, ndarray],
-            gap_to_energy_func: Callable[..., float],
-            energy_to_gap_func: Callable[..., float],
-            name: str = ""
-        ) -> None:
+        self,
+        undulator_order: UndulatorOrder,
+        undulator: UndulatorInMm,
+        lut: dict[int, ndarray] | Awaitable[dict[int, ndarray]],
+        gap_to_energy_func: Callable[..., float],
+        energy_to_gap_func: Callable[..., float],
+        name: str = "",
+    ) -> None:
         self._lut = lut
         self.gap_to_energy_func = gap_to_energy_func
         self.energy_to_gap_func = energy_to_gap_func
@@ -43,22 +43,24 @@ class HardInsertionDeviceEnergy(StandardReadable, Movable[float]):
             self.energy = derived_signal_rw(
                 raw_to_derived=self._read_energy,
                 set_derived=self._set_energy,
-                current_gap = self._undulator().gap_motor.user_readback,
-                current_order = self._undulator_order().value,
+                current_gap=self._undulator().gap_motor.user_readback,
+                current_order=self._undulator_order().value,
                 derived_units="eV",
             )
         super().__init__(name=name)
 
     def _read_energy(self, current_gap: float, current_order: int) -> float:
         return self.gap_to_energy_func(
-            gap = current_gap,
-            look_up_table = self._lut,
-            order = current_order,
-            )
+            gap=current_gap,
+            look_up_table=self._lut,
+            order=current_order,
+        )
 
     async def _set_energy(self, energy: float):
         current_order = await self._undulator_order().value.get_value()
-        min_energy, max_energy = self._lut[current_order][MIN_ENERGY_COLUMN:MAX_ENERGY_COLUMN + 1]
+        min_energy, max_energy = self._lut[current_order][
+            MIN_ENERGY_COLUMN : MAX_ENERGY_COLUMN + 1
+        ]
         if not (min_energy <= energy <= max_energy):
             raise ValueError(
                 f"Requested energy {energy} keV is out of range for harmonic {current_order}: "
@@ -66,9 +68,7 @@ class HardInsertionDeviceEnergy(StandardReadable, Movable[float]):
             )
 
         target_gap = self.energy_to_gap_func(
-            photon_energy_kev=energy,
-            look_up_table = self._lut,
-            order=current_order
+            photon_energy_kev=energy, look_up_table=self._lut, order=current_order
         )
         await self._undulator().set(target_gap)
 
@@ -81,12 +81,13 @@ class HardEnergy(StandardReadable, Locatable[float]):
     """
     Energy compound device that provides combined change of both DCM energy and undulator gap accordingly.
     """
+
     def __init__(
-            self,
-            dcm: DoubleCrystalMonochromatorBase,
-            undulator_energy: HardInsertionDeviceEnergy,
-            name: str = ""
-        ) -> None:
+        self,
+        dcm: DoubleCrystalMonochromatorBase,
+        undulator_energy: HardInsertionDeviceEnergy,
+        name: str = "",
+    ) -> None:
         with self.add_children_as_readables():
             self._dcm = Reference(dcm)
             self._undulator_energy = Reference(undulator_energy)
@@ -95,12 +96,11 @@ class HardEnergy(StandardReadable, Locatable[float]):
     @AsyncStatus.wrap
     async def set(self, value: float):
         await gather(
-            self._dcm().energy_in_keV.set(value),
-            self._undulator_energy().set(value)
-            )
+            self._dcm().energy_in_keV.set(value), self._undulator_energy().set(value)
+        )
 
     async def locate(self) -> Location[float]:
         return Location(
-            setpoint = await self._dcm().energy_in_keV.user_setpoint.get_value(),
-            readback = await self._dcm().energy_in_keV.user_readback.get_value()
-            )
+            setpoint=await self._dcm().energy_in_keV.user_setpoint.get_value(),
+            readback=await self._dcm().energy_in_keV.user_readback.get_value(),
+        )
