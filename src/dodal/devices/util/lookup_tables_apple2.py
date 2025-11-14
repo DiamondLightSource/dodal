@@ -264,6 +264,14 @@ def generate_lookup_table_entry(
     )
 
 
+def generate_lookup_table(
+    pol: Pol, min_energy: float, max_energy: float, poly1d_param: list[float]
+) -> LookupTable:
+    return LookupTable(
+        {pol: generate_lookup_table_entry(min_energy, max_energy, poly1d_param)}
+    )
+
+
 def make_phase_tables(
     pols: list[Pol],
     min_energies: list[float],
