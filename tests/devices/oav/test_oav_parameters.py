@@ -15,6 +15,16 @@ from tests.test_data import (
     TEST_OAV_ZOOM_LEVELS_XML,
 )
 
+# @pytest.fixture(autouse=True)
+# def mock_config_server():
+#     # Don't actually talk to central service during unit tests, and reset caches between test
+
+#     with patch(
+#         "dodal.devices.oav.oav_parameters.ConfigServer.get_file_contents",
+#         side_effect=_fake_config_server_read,
+#     ):
+#         yield
+
 
 @pytest.fixture
 def mock_parameters():
