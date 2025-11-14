@@ -6,6 +6,8 @@ from typing import Any, Generic, TypeVar
 from xml.etree import ElementTree
 from xml.etree.ElementTree import Element
 
+from daq_config_server.client import ConfigServer
+
 # GDA currently assumes this aspect ratio for the OAV window size.
 # For some beamline this doesn't affect anything as the actual OAV aspect ratio
 # matches. Others need to take it into account to rescale the values stored in
@@ -36,21 +38,25 @@ class OAVParameters:
     ):
         self.oav_config_json: str = oav_config_json
         self.context = context
+        config_server = ConfigServer(url="https://daq-config.diamond.ac.uk")
 
-        self.global_params, self.context_dicts = self.load_json(self.oav_config_json)
+        self.global_params, self.context_dicts = self.load_json(
+            config_server, self.oav_config_json
+        )
         self.active_params: ChainMap = ChainMap(
             self.context_dicts[self.context], self.global_params
         )
         self.update_self_from_current_context()
 
     @staticmethod
-    def load_json(filename: str) -> tuple[dict[str, Any], dict[str, dict]]:
+    def load_json(
+        config_server: ConfigServer, filename: str
+    ) -> tuple[dict[str, Any], dict[str, dict]]:
         """
-        Loads the json from the specified file, and returns a dict with all the
+        Loads the specified file from the config server, and returns a dict with all the
         individual top-level k-v pairs, and one with all the subdicts.
         """
-        with open(filename) as f:
-            raw_params: dict[str, Any] = json.load(f)
+        raw_params: dict[str, Any] = config_server.get_file_contents(filename, dict)
         global_params = {
             k: raw_params.pop(k)
             for k, v in list(raw_params.items())
