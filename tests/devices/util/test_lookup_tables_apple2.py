@@ -143,8 +143,8 @@ def test_convert_csv_to_lookup_overwrite_name_convert_default(
 
     lookuptable = convert_csv_to_lookup(csv_content, lut_config)
 
-    assert "lh" in lookuptable.root
-    assert "lv" in lookuptable.root
+    assert Pol.LH in lookuptable.root
+    assert Pol.LV in lookuptable.root
     # Check polynomials evaluate as expected
     poly_lh = lookuptable.root[Pol.LH].energies.root["100.0"].poly
     assert isinstance(poly_lh, np.poly1d)
