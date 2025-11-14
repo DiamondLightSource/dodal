@@ -32,7 +32,6 @@ import csv
 import io
 from collections.abc import Generator
 from pathlib import Path
-from typing import Any
 
 import numpy as np
 from daq_config_server.client import ConfigServer
@@ -114,9 +113,9 @@ class LookupTableEntries(BaseModel):
     limit: EnergyMinMax
 
 
-class LookupTable(RootModel[dict[str, LookupTableEntries]]):
+class LookupTable(RootModel[dict[Pol, LookupTableEntries]]):
     # Allow to auto speficy a dict if one not provided
-    def __init__(self, root: dict[str, LookupTableEntries] | None = None):
+    def __init__(self, root: dict[Pol, LookupTableEntries] | None = None):
         super().__init__(root=root or {})
 
 
@@ -147,16 +146,17 @@ def convert_csv_to_lookup(
     LookupTable
     """
 
-    def process_row(row: dict[str, Any], lut: LookupTable):
+    def process_row(row: dict, lut: LookupTable):
         """Process a single row from the CSV file and update the lookup table."""
         mode_value = str(row[lut_config.mode]).lower()
         if mode_value in lut_config.mode_name_convert:
             mode_value = lut_config.mode_name_convert[f"{mode_value}"]
+        mode_value = Pol(mode_value)
 
         # Create polynomial object for energy-to-gap/phase conversion
         coefficients = [float(row[coef]) for coef in lut_config.poly_deg]
         if mode_value not in lut.root:
-            lut.root[Pol(mode_value)] = generate_lookup_table_entry(
+            lut.root[mode_value] = generate_lookup_table_entry(
                 min_energy=float(row[lut_config.min_energy]),
                 max_energy=float(row[lut_config.max_energy]),
                 poly1d_param=coefficients,

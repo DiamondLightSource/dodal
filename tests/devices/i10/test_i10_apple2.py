@@ -781,7 +781,7 @@ async def test_fail_i10_energy_motor_lookup_with_lookup_gap(
     mock_id_controller.lookup_table_client.update_lookuptable()
     # make gap in energy
     mock_id_controller.lookup_table_client.lookup_tables.gap.root[
-        "lh"
+        Pol.LH
     ].energies = EnergyCoverage(
         {
             "1": EnergyCoverageEntry(
@@ -792,7 +792,7 @@ async def test_fail_i10_energy_motor_lookup_with_lookup_gap(
         }
     )
     mock_id_controller.lookup_table_client.lookup_tables.gap.root[
-        "lh"
+        Pol.LH
     ].energies = EnergyCoverage(
         {
             "2": EnergyCoverageEntry(

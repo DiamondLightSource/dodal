@@ -24,7 +24,7 @@ def test_generate_lookup_table_structure_and_poly():
         pol=Pol.LH, min_energy=min_e, max_energy=max_e, poly1d_param=coeffs
     )
 
-    key = Pol.LH.value
+    key = Pol.LH
     assert key in table.root
 
     entry = table.root[key]
@@ -57,7 +57,7 @@ def test_make_phase_tables_multiple_entries():
     )
 
     for i, pol in enumerate(pols):
-        key = pol.value
+        key = pol
         assert key in table.root
         entry = table.root[key]
         assert entry.limit.minimum == pytest.approx(min_energies[i])
@@ -146,11 +146,11 @@ def test_convert_csv_to_lookup_overwrite_name_convert_default(
     assert "lh" in lookuptable.root
     assert "lv" in lookuptable.root
     # Check polynomials evaluate as expected
-    poly_lh = lookuptable.root["lh"].energies.root["100.0"].poly
+    poly_lh = lookuptable.root[Pol.LH].energies.root["100.0"].poly
     assert isinstance(poly_lh, np.poly1d)
     assert poly_lh(150.0) == pytest.approx(np.poly1d([2.0, 1.0])(150.0))
 
-    poly_lv = lookuptable.root["lv"].energies.root["200.0"].poly
+    poly_lv = lookuptable.root[Pol.LV].energies.root["200.0"].poly
     assert isinstance(poly_lv, np.poly1d)
     assert poly_lv(250.0) == pytest.approx(np.poly1d([1.0, 0.0])(250.0))
 
