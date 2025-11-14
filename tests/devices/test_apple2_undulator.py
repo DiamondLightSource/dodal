@@ -62,14 +62,6 @@ async def mock_phase_axes(prefix: str = "BLXX-EA-DET-007:") -> UndulatorPhaseAxe
     set_mock_value(mock_phase_axes.top_inner.velocity, 2)
     set_mock_value(mock_phase_axes.btm_outer.velocity, 2)
     set_mock_value(mock_phase_axes.btm_inner.velocity, 2)
-    set_mock_value(mock_phase_axes.top_outer.user_readback, 2)
-    set_mock_value(mock_phase_axes.top_inner.user_readback, 2)
-    set_mock_value(mock_phase_axes.btm_outer.user_readback, 2)
-    set_mock_value(mock_phase_axes.btm_inner.user_readback, 2)
-    set_mock_value(mock_phase_axes.top_outer.user_setpoint_readback, 2)
-    set_mock_value(mock_phase_axes.top_inner.user_setpoint_readback, 2)
-    set_mock_value(mock_phase_axes.btm_outer.user_setpoint_readback, 2)
-    set_mock_value(mock_phase_axes.btm_inner.user_setpoint_readback, 2)
     set_mock_value(mock_phase_axes.status, EnabledDisabledUpper.ENABLED)
     return mock_phase_axes
 
