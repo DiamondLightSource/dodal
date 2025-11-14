@@ -3,6 +3,7 @@ import re
 import pytest
 
 from dodal.devices.i09_1_shared import calculate_gap_i09_hu, get_hu_lut_as_dict
+from dodal.devices.i09_1_shared.hard_undulator_functions import calculate_energy_i09_hu
 from tests.devices.i09_1_shared.test_data import TEST_HARD_UNDULATOR_LUT
 
 
@@ -16,7 +17,7 @@ async def lut_dictionary() -> dict:
     [
         (2.13, 1, 12.81),
         (2.78, 3, 6.05),
-        (6.24, 5, 7.95),
+        (6.24, 5, 7.96),
     ],
 )
 async def test_calculate_gap_from_energy(
@@ -26,7 +27,26 @@ async def test_calculate_gap_from_energy(
     lut_dictionary: dict,
 ):
     assert calculate_gap_i09_hu(energy, lut_dictionary, order) == pytest.approx(
-        expected_gap, abs=0.01
+        expected_gap, abs=0.005
+    )
+
+
+@pytest.mark.parametrize(
+    "energy, order, gap",
+    [
+        (2.145, 1, 12.91),
+        (2.64, 3, 5.75),
+        (6.135, 5, 7.84),
+    ],
+)
+async def test_calculate_energy_from_gap(
+    energy: float,
+    order: int,
+    gap: float,
+    lut_dictionary: dict,
+):
+    assert calculate_energy_i09_hu(gap, lut_dictionary, order) == pytest.approx(
+        energy, abs=0.005
     )
 
 
