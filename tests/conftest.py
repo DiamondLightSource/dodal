@@ -1,4 +1,5 @@
 import importlib
+import json
 import os
 from collections.abc import AsyncGenerator
 from pathlib import Path
@@ -88,3 +89,35 @@ async def baton_in_commissioning_mode() -> AsyncGenerator[Baton]:
     set_mock_value(baton.commissioning, True)
     yield baton
     set_commissioning_signal(None)
+
+
+def _fake_config_server_read(
+    filepath: str | Path,
+    desired_return_type: type[str] | type[dict] = str,
+    reset_cached_result=False,
+):
+    filepath = Path(filepath)
+    # Minimal logic required for unit tests
+    with filepath.open("r") as f:
+        contents = f.read()
+        if desired_return_type is str:
+            return contents
+        elif desired_return_type is dict:
+            return json.loads(contents)
+
+
+IMPLEMENTED_CONFIG_CLIENTS = []
+
+
+@pytest.fixture(autouse=True)
+def mock_config_server():
+    # Don't actually talk to central service during unit tests, and reset caches between test
+
+    for client in IMPLEMENTED_CONFIG_CLIENTS:
+        client.cache_clear()  # type: ignore - currently no option for "cachable" static type
+
+    with patch(
+        "daq_config_server.client.ConfigServer.get_file_contents",
+        side_effect=_fake_config_server_read,
+    ):
+        yield
