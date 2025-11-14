@@ -6,9 +6,9 @@ import pytest
 from dodal.devices.apple2_undulator import Pol
 from dodal.devices.util.lookup_tables_apple2 import (
     BaseEnergyMotorLookup,
+    LookupPath,
     LookupTableColumnConfig,
     convert_csv_to_lookup,
-    create_lookup_path,
     generate_lookup_table,
     get_poly,
     make_phase_tables,
@@ -91,7 +91,7 @@ class DummyLookup(BaseEnergyMotorLookup):
 @pytest.fixture
 def lut_column_config() -> LookupTableColumnConfig:
     return LookupTableColumnConfig(
-        path=create_lookup_path(
+        path=LookupPath.create(
             ".",
         ),
         mode="Mode",

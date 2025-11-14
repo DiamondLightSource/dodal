@@ -31,7 +31,6 @@ import abc
 import csv
 import io
 from collections.abc import Generator
-from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
@@ -42,18 +41,31 @@ from pydantic import BaseModel, ConfigDict, Field, RootModel
 from dodal.devices.apple2_undulator import Pol
 
 
-@dataclass
-class LookupPath:
+class LookupPath(BaseModel):
     gap: Path
     phase: Path
 
+    @classmethod
+    def create(
+        cls,
+        path: str,
+        gap_file: str = "IDEnergy2GapCalibrations.csv",
+        phase_file: str = "IDEnergy2GapCalibrations.csv",
+    ) -> "LookupPath":
+        """
+        Factory method to easily create LookupPath using some default file names.
+        Args:
+            path:
+                The file path to the lookup tables.
+            gap_file:
+                The gap lookup table file name.
+            phase_file:
+                The phase lookup table file name.
 
-def create_lookup_path(
-    path: str,
-    gap_file: str = "IDEnergy2GapCalibrations.csv",
-    phase_file: str = "IDEnergy2GapCalibrations.csv",
-) -> LookupPath:
-    return LookupPath(gap=Path(path, gap_file), phase=Path(path, phase_file))
+        Returns:
+            LookupPath instance.
+        """
+        return cls(gap=Path(path, gap_file), phase=Path(path, phase_file))
 
 
 DEFAULT_POLY_DEG = [
@@ -115,31 +127,18 @@ class GapPhaseLookupTable(BaseModel):
 def convert_csv_to_lookup(
     file_contents: str,
     lut_column_config: LookupTableColumnConfig,
-    # mode_name_convert: dict[str, str] = MODE_NAME_CONVERT,
     skip_line_start_with: str = "#",
 ) -> LookupTable:
     """
     Convert CSV content into the Apple2 lookup-table dictionary.
 
-    Parameters
-    ----------
-    file:
-        The CSV content as a string.
-    source:
-        Optional (column_name) pair to filter rows by source.
-    mode
-        Name of the column that identifies the polarisation for a row.
-    mode_name_convert
-        Optional mapping to normalise non-standard mode names
-        (e.g. {"CR": "PC", "CL": "NC"}).
-    min_energy, max_energy
-        Column names for the energy coverage range in the CSV.
-    poly_deg
-        Ordered list of CSV column names to read polynomial coefficients from.
-        If None, defaults to ["7th-order", ..., "1st-order", "b"].
-    skip_line_start_with
-        Lines beginning with this prefix are skipped (default "#").
-
+    args:
+        file_contents:
+            The CSV file content as a string.
+        lut_column_config:
+            The configuration that defines how to read the file_contents into a LookupTable
+        skip_line_start_with
+            Lines beginning with this prefix are skipped (default "#").
     """
 
     def process_row(row: dict[str, Any], lut: LookupTable):
@@ -177,8 +176,6 @@ def convert_csv_to_lookup(
         )
         return lut
 
-    # if not os.path.isfile(file):
-    #     raise FileNotFoundError(f"Lookup table file {file} doesn't exist.")
     reader = csv.DictReader(read_file_and_skip(file_contents, skip_line_start_with))
     lut = LookupTable()
 
@@ -190,9 +187,12 @@ def convert_csv_to_lookup(
         else:
             process_row(row=row, lut=lut)
 
+    # Check if our LookupTable is empty after processing, raise error if it is.
     if not lut.root:
-        raise RuntimeError("Unable to convert lookup table")
-
+        raise RuntimeError(
+            "LookupTable content is empty, failed to convert the file contents to "
+            "a LookupTable!"
+        )
     return lut
 
 
@@ -213,15 +213,13 @@ def get_poly(
     """
     Return the numpy.poly1d polynomial applicable for the given energy and polarisation.
 
-    Parameters
-    ----------
-    energy:
-        Energy value in the same units used to create the lookup table (eV).
-    pol:
-        Polarisation mode (Pol enum).
-    lookup_table:
-        The converted lookup-table dictionary for either 'gap' or 'phase'.
-
+    Args:
+        energy:
+            Energy value in the same units used to create the lookup table (eV).
+        pol:
+            Polarisation mode (Pol enum).
+        lookup_table:
+            The converted lookup-table dictionary for either 'gap' or 'phase'.
     """
     if (
         energy < lookup_table.root[pol].limit.minimum
@@ -307,27 +305,12 @@ class BaseEnergyMotorLookup:
     ):
         """Initialise the EnergyMotorLookup class with lookup table headers provided.
 
-        Parameters
-        ----------
-        look_up_table_dir:
-            The path to look up table.
-        source:
-            The column name and the name of the source in look up table. e.g. ( "source", "idu")
-        config_client:
-            The config server client to fetch the look up table.
-        mode:
-            The column name of the mode in look up table.
-        min_energy:
-            The column name that contain the maximum energy in look up table.
-        max_energy:
-            The column name that contain the maximum energy in look up table.
-        gap_file_name:
-            File name for the id game.
-        phase_file_name:
-            File name for the phase(option.al).
-        poly_deg:
-            The column names for the parameters for the energy conversion polynomial, starting with the least significant.
-
+        Args:
+            lut_column_config:
+                The configuration that contains the lookup table file paths and how to
+                read them.
+            config_client:
+                The config server client to fetch the look up table.
         """
         self.lookup_tables = GapPhaseLookupTable()
         self.lut_column_config = lut_column_config
@@ -352,17 +335,15 @@ class BaseEnergyMotorLookup:
         """
         Convert energy and polarisation to gap and phase motor positions.
 
-        Parameters
-        ----------
-        energy : float
-            Desired energy in eV.
-        pol : Pol
-            Polarisation mode.
+        Args:
+            energy : float
+                Desired energy in eV.
+            pol : Pol
+                Polarisation mode.
 
-        Returns
-        -------
-        tuple[float, float]
-            (gap, phase) motor positions.
+        Returns:
+            tuple[float, float]
+                (gap, phase) motor positions.
 
         """
         if self.available_pol == []:

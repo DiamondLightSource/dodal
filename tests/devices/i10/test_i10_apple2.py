@@ -40,10 +40,10 @@ from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.devices.util.lookup_tables_apple2 import (
     EnergyCoverage,
     EnergyCoverageEntry,
+    LookupPath,
     LookupTable,
     LookupTableColumnConfig,
     convert_csv_to_lookup,
-    create_lookup_path,
 )
 from dodal.testing import patch_motor
 from tests.devices.i10.test_data import (
@@ -163,7 +163,7 @@ async def mock_id_controller(
         mock_id_controller = I10Apple2Controller(
             apple2=mock_id,
             lut_column_config=LookupTableColumnConfig(
-                path=create_lookup_path(LOOKUP_TABLE_PATH),
+                path=LookupPath.create(LOOKUP_TABLE_PATH),
                 source=("Source", "idu"),
             ),
             config_client=mock_config_client,
@@ -229,7 +229,7 @@ def mock_i10_energy_motor_lookup_idu(
 ) -> I10EnergyMotorLookup:
     return I10EnergyMotorLookup(
         lut_column_config=LookupTableColumnConfig(
-            path=create_lookup_path(LOOKUP_TABLE_PATH),
+            path=LookupPath.create(LOOKUP_TABLE_PATH),
             source=("Source", "idu"),
         ),
         config_client=mock_config_client,
@@ -242,7 +242,7 @@ def mock_i10_energy_motor_lookup_idd(
 ) -> I10EnergyMotorLookup:
     return I10EnergyMotorLookup(
         lut_column_config=LookupTableColumnConfig(
-            path=create_lookup_path(LOOKUP_TABLE_PATH),
+            path=LookupPath.create(LOOKUP_TABLE_PATH),
             source=("Source", "idd"),
         ),
         config_client=mock_config_client,
@@ -758,16 +758,16 @@ def test_i10_energy_motor_lookup_convert_csv_to_lookup_failed(
         )
 
 
+# this should be moved to test_lookup_tables_apple2
 async def test_fail_i10_energy_motor_lookup_no_lookup(
     mock_i10_energy_motor_lookup_idu: I10EnergyMotorLookup,
 ):
-    wrong_path = "fnslkfndlsnf"
-    with pytest.raises(RuntimeError) as e:
+    bad_file_contents = "fnslkfndlsnf"
+    with pytest.raises(RuntimeError):
         convert_csv_to_lookup(
-            file_contents=wrong_path,
+            file_contents=bad_file_contents,
             lut_column_config=mock_i10_energy_motor_lookup_idu.lut_column_config,
         )
-    assert str(e.value) == "Unable to convert lookup table"
 
 
 @pytest.mark.parametrize("energy", [(100), (5500), (-299)])
