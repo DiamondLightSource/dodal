@@ -758,18 +758,6 @@ def test_i10_energy_motor_lookup_convert_csv_to_lookup_failed(
         )
 
 
-# this should be moved to test_lookup_tables_apple2
-async def test_fail_i10_energy_motor_lookup_no_lookup(
-    mock_i10_energy_motor_lookup_idu: I10EnergyMotorLookup,
-):
-    bad_file_contents = "fnslkfndlsnf"
-    with pytest.raises(RuntimeError):
-        convert_csv_to_lookup(
-            file_contents=bad_file_contents,
-            lut_column_config=mock_i10_energy_motor_lookup_idu.lut_column_config,
-        )
-
-
 @pytest.mark.parametrize("energy", [(100), (5500), (-299)])
 async def test_fail_i10_energy_motor_lookup_outside_energy_limits(
     mock_id_controller: I10Apple2Controller,

@@ -153,3 +153,14 @@ def test_convert_csv_to_lookup_overwrite_name_convert_default(
     poly_lv = lookuptable.root["lv"].energies.root["200.0"].poly
     assert isinstance(poly_lv, np.poly1d)
     assert poly_lv(250.0) == pytest.approx(np.poly1d([1.0, 0.0])(250.0))
+
+
+async def test_bad_file_contents_causes_convert_csv_to_lookup_fails(
+    lut_column_config: LookupTableColumnConfig,
+):
+    bad_file_contents = "fnslkfndlsnf"
+    with pytest.raises(RuntimeError):
+        convert_csv_to_lookup(
+            file_contents=bad_file_contents,
+            lut_column_config=lut_column_config,
+        )
