@@ -61,7 +61,7 @@ class ErrorStatus(Device):
             raise RobotLoadError(int(error_code), error_string) from raise_from
 
 
-class BartRobot(StandardReadable, Movable[SampleLocation]):
+class BartRobot(StandardReadable, Movable[SampleLocation | None]):
     """The sample changing robot."""
 
     # How long to wait for the robot if it is busy soaking/drying
@@ -104,7 +104,6 @@ class BartRobot(StandardReadable, Movable[SampleLocation]):
         self.init = epics_signal_x(prefix + "INIT.PROC")
         self.soak = epics_signal_x(prefix + "SOAK.PROC")
         self.home = epics_signal_x(prefix + "GOHM.PROC")
-        self.unload = epics_signal_x(prefix + "UNLD.PROC")
         self.dry = epics_signal_x(prefix + "DRY.PROC")
         self.open = epics_signal_x(prefix + "COLO.PROC")
         self.close = epics_signal_x(prefix + "COLC.PROC")
@@ -175,12 +174,23 @@ class BartRobot(StandardReadable, Movable[SampleLocation]):
         await self.pin_mounted_or_no_pin_found()
 
     @AsyncStatus.wrap
-    async def set(self, value: SampleLocation):
+    async def set(self, value: SampleLocation | None):
+        """
+        Perform a sample load from the specified sample location
+        Args:
+            value: The pin and puck to load, or None to unload the sample.
+        Raises:
+            RobotLoadError if a timeout occurs, or if an error occurs loading the smaple.
+        """
         try:
-            await wait_for(
-                self._load_pin_and_puck(value),
-                timeout=self.LOAD_TIMEOUT + self.NOT_BUSY_TIMEOUT,
-            )
+            if value is not None:
+                await wait_for(
+                    self._load_pin_and_puck(value),
+                    timeout=self.LOAD_TIMEOUT + self.NOT_BUSY_TIMEOUT,
+                )
+            else:
+                await self.unload.trigger(timeout=self.LOAD_TIMEOUT)
+                await wait_for_value(self.program_running, False, self.NOT_BUSY_TIMEOUT)
         except TimeoutError as e:
             await self.prog_error.raise_if_error(e)
             await self.controller_error.raise_if_error(e)

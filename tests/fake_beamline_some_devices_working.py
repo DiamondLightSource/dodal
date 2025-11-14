@@ -3,7 +3,7 @@ from unittest.mock import MagicMock
 from bluesky.protocols import Readable
 from ophyd_async.epics.motor import Motor
 
-from dodal.devices.undulator import Undulator
+from dodal.devices.undulator import UndulatorInKeV
 
 
 def device_a() -> Readable:
@@ -14,7 +14,7 @@ def device_b() -> Motor:
     raise TimeoutError
 
 
-def device_c() -> Undulator:
+def device_c() -> UndulatorInKeV:
     return _mock_with_name("undulator")
 
 
