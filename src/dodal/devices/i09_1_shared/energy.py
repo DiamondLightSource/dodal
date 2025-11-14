@@ -1,5 +1,5 @@
 from asyncio import gather
-from collections.abc import Awaitable, Callable
+from collections.abc import Callable
 
 from bluesky.protocols import Locatable, Location, Movable
 from numpy import ndarray
@@ -29,7 +29,7 @@ class HardInsertionDeviceEnergy(StandardReadable, Movable[float]):
         self,
         undulator_order: UndulatorOrder,
         undulator: UndulatorInMm,
-        lut: dict[int, ndarray] | Awaitable[dict[int, ndarray]],
+        lut: dict[int, ndarray],
         gap_to_energy_func: Callable[..., float],
         energy_to_gap_func: Callable[..., float],
         name: str = "",
