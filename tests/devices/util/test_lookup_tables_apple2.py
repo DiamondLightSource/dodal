@@ -140,16 +140,16 @@ def test_convert_csv_to_lookup_overwrite_name_convert_default() -> None:
         min_energy="MinEnergy",
         max_energy="MaxEnergy",
         poly_deg=["c1", "c0"],
-        mode_name_convert={"HL": "LH", "VL": "LV"},
+        mode_name_convert={"HL": "lh", "VL": "lv"},
     )
 
     assert "lh" in lookuptable
     assert "lv" in lookuptable
     # Check polynomials evaluate as expected
-    poly_lh = lookuptable["LH"]["energies"]["100"]["poly"]
+    poly_lh = lookuptable["lh"]["energies"]["100"]["poly"]
     assert isinstance(poly_lh, np.poly1d)
     assert poly_lh(150.0) == pytest.approx(np.poly1d([2.0, 1.0])(150.0))
 
-    poly_lv = lookuptable["LV"]["energies"]["200"]["poly"]
+    poly_lv = lookuptable["lv"]["energies"]["200"]["poly"]
     assert isinstance(poly_lv, np.poly1d)
     assert poly_lv(250.0) == pytest.approx(np.poly1d([1.0, 0.0])(250.0))

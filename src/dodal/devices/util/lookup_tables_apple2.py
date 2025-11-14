@@ -214,7 +214,7 @@ def get_poly(
         or energy > lookup_table[pol]["limit"]["maximum"]
     ):
         raise ValueError(
-            "Demanding energy must lie between {} and {} eV!".format(
+            "Demanding energy must lie between {} and {}!".format(
                 lookup_table[pol]["limit"]["minimum"],
                 lookup_table[pol]["limit"]["maximum"],
             )
