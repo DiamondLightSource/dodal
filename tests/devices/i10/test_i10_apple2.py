@@ -521,13 +521,13 @@ async def test_id_polarisation_read_check_pol_from_hardware(
 @pytest.mark.parametrize(
     "pol,energy, top_outer, top_inner, btm_inner,btm_outer",
     [
-        ("lh3", 500, 0.0, 0.0, 0.0, 0.0),
+        (Pol.LH3, 500, 0.0, 0.0, 0.0, 0.0),
     ],
 )
 async def test_id_polarisation_read_leave_lh3_unchanged_when_hardware_match(
     mock_id_pol: InsertionDevicePolarisation,
     mock_id_controller: I10Apple2Controller,
-    pol: str,
+    pol: Pol,
     energy: float,
     top_inner: float,
     top_outer: float,
@@ -535,7 +535,7 @@ async def test_id_polarisation_read_leave_lh3_unchanged_when_hardware_match(
     btm_outer: float,
 ):
     set_mock_value(mock_id_controller._energy, energy)
-    mock_id_controller._polarisation_setpoint_set(Pol("lh3"))
+    mock_id_controller._polarisation_setpoint_set(Pol.LH3)
     set_mock_value(
         mock_id_controller.apple2().phase().top_inner.user_readback, top_inner
     )
