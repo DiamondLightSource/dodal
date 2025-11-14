@@ -93,9 +93,7 @@ class EnergyCoverageEntry(BaseModel):
 
 
 class EnergyCoverage(RootModel[dict[str, EnergyCoverageEntry]]):
-    # Allow to auto speficy a dict if one not provided
-    def __init__(self, root: dict[str, EnergyCoverageEntry] | None = None):
-        super().__init__(root=root or {})
+    pass
 
 
 class LookupTableEntries(BaseModel):
@@ -115,7 +113,7 @@ class GapPhaseLookupTable(BaseModel):
 
 
 def convert_csv_to_lookup(
-    file: str,
+    file_contents: str,
     lut_column_config: LookupTableColumnConfig,
     # mode_name_convert: dict[str, str] = MODE_NAME_CONVERT,
     skip_line_start_with: str = "#",
@@ -179,8 +177,9 @@ def convert_csv_to_lookup(
         )
         return lut
 
-    reader = csv.DictReader(read_file_and_skip(file, skip_line_start_with))
-
+    # if not os.path.isfile(file):
+    #     raise FileNotFoundError(f"Lookup table file {file} doesn't exist.")
+    reader = csv.DictReader(read_file_and_skip(file_contents, skip_line_start_with))
     lut = LookupTable()
 
     for row in reader:
@@ -191,8 +190,8 @@ def convert_csv_to_lookup(
         else:
             process_row(row=row, lut=lut)
 
-    if not lut:
-        raise RuntimeError(f"Unable to convert lookup table:\t{file}")
+    if not lut.root:
+        raise RuntimeError("Unable to convert lookup table")
 
     return lut
 

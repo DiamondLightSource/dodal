@@ -53,7 +53,7 @@ class I10EnergyMotorLookup(BaseEnergyMotorLookup):
             self.lut_column_config.path.gap, reset_cached_result=True
         )
         self.lookup_tables.gap = convert_csv_to_lookup(
-            file=gap_csv_file, lut_column_config=self.lut_column_config
+            file_contents=gap_csv_file, lut_column_config=self.lut_column_config
         )
         self.available_pol = list(self.lookup_tables.gap.root.keys())
 
@@ -62,7 +62,7 @@ class I10EnergyMotorLookup(BaseEnergyMotorLookup):
             self.lut_column_config.path.phase, reset_cached_result=True
         )
         self.lookup_tables.phase = convert_csv_to_lookup(
-            file=phase_csv_file, lut_column_config=self.lut_column_config
+            file_contents=phase_csv_file, lut_column_config=self.lut_column_config
         )
 
 

@@ -705,11 +705,12 @@ def test_i10_energy_motor_lookup_idu_convert_csv_to_lookup_success(
     file_name: str,
     expected_dict_file_name: str,
 ):
-    file = mock_i10_energy_motor_lookup_idu.config_client.get_file_contents(
+    file_contents = mock_i10_energy_motor_lookup_idu.config_client.get_file_contents(
         file_path=file_name, reset_cached_result=True
     )
     lut = convert_csv_to_lookup(
-        file=file, lut_column_config=mock_i10_energy_motor_lookup_idu.lut_column_config
+        file_contents=file_contents,
+        lut_column_config=mock_i10_energy_motor_lookup_idu.lut_column_config,
     )
     with open(expected_dict_file_name, "rb") as f:
         expected_lut = LookupTable(pickle.load(f))
@@ -734,11 +735,12 @@ def test_i10_energy_motor_lookup_idd_convert_csv_to_lookup_success(
     file_name: str,
     expected_dict_file_name: str,
 ):
-    file = mock_i10_energy_motor_lookup_idd.config_client.get_file_contents(
+    file_contents = mock_i10_energy_motor_lookup_idd.config_client.get_file_contents(
         file_path=file_name, reset_cached_result=True
     )
     lut = convert_csv_to_lookup(
-        file=file, lut_column_config=mock_i10_energy_motor_lookup_idd.lut_column_config
+        file_contents=file_contents,
+        lut_column_config=mock_i10_energy_motor_lookup_idd.lut_column_config,
     )
     with open(expected_dict_file_name, "rb") as f:
         expected_lut = LookupTable(pickle.load(f))
@@ -751,7 +753,7 @@ def test_i10_energy_motor_lookup_convert_csv_to_lookup_failed(
 ):
     with pytest.raises(RuntimeError):
         convert_csv_to_lookup(
-            file=ID_ENERGY_2_GAP_CALIBRATIONS_CSV,
+            file_contents=ID_ENERGY_2_GAP_CALIBRATIONS_CSV,
             lut_column_config=mock_i10_energy_motor_lookup_idu.lut_column_config,
         )
 
@@ -762,10 +764,10 @@ async def test_fail_i10_energy_motor_lookup_no_lookup(
     wrong_path = "fnslkfndlsnf"
     with pytest.raises(RuntimeError) as e:
         convert_csv_to_lookup(
-            file=wrong_path,
+            file_contents=wrong_path,
             lut_column_config=mock_i10_energy_motor_lookup_idu.lut_column_config,
         )
-    assert str(e.value) == f"Unable to convert lookup table:\t{wrong_path}"
+    assert str(e.value) == "Unable to convert lookup table"
 
 
 @pytest.mark.parametrize("energy", [(100), (5500), (-299)])
