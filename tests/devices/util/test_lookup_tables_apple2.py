@@ -146,11 +146,11 @@ def test_convert_csv_to_lookup_overwrite_name_convert_default(
     assert Pol.LH in lookuptable.root
     assert Pol.LV in lookuptable.root
     # Check polynomials evaluate as expected
-    poly_lh = lookuptable.root[Pol.LH].energies.root["100.0"].poly
+    poly_lh = lookuptable.root[Pol.LH].energies.root[100.0].poly
     assert isinstance(poly_lh, np.poly1d)
     assert poly_lh(150.0) == pytest.approx(np.poly1d([2.0, 1.0])(150.0))
 
-    poly_lv = lookuptable.root[Pol.LV].energies.root["200.0"].poly
+    poly_lv = lookuptable.root[Pol.LV].energies.root[200.0].poly
     assert isinstance(poly_lv, np.poly1d)
     assert poly_lv(250.0) == pytest.approx(np.poly1d([1.0, 0.0])(250.0))
 

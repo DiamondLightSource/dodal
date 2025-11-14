@@ -687,6 +687,24 @@ async def test_linear_arbitrary_run_engine_scan(
         )
 
 
+def assert_lookup_table_matches_expected(
+    energy_motor_lookup: I10EnergyMotorLookup,
+    file_name: str,
+    expected_dict_file_name: str,
+) -> None:
+    file_contents = energy_motor_lookup.config_client.get_file_contents(
+        file_path=file_name, reset_cached_result=True
+    )
+    lut = convert_csv_to_lookup(
+        file_contents=file_contents,
+        lut_config=energy_motor_lookup.lut_config,
+    )
+    with open(expected_dict_file_name, "rb") as f:
+        expected_lut = LookupTable(pickle.load(f))
+
+    assert lut == expected_lut
+
+
 @pytest.mark.parametrize(
     "file_name, expected_dict_file_name",
     [
@@ -705,16 +723,9 @@ def test_i10_energy_motor_lookup_idu_convert_csv_to_lookup_success(
     file_name: str,
     expected_dict_file_name: str,
 ):
-    file_contents = mock_i10_energy_motor_lookup_idu.config_client.get_file_contents(
-        file_path=file_name, reset_cached_result=True
+    assert_lookup_table_matches_expected(
+        mock_i10_energy_motor_lookup_idu, file_name, expected_dict_file_name
     )
-    lut = convert_csv_to_lookup(
-        file_contents=file_contents,
-        lut_config=mock_i10_energy_motor_lookup_idu.lut_config,
-    )
-    with open(expected_dict_file_name, "rb") as f:
-        expected_lut = LookupTable(pickle.load(f))
-    assert lut == expected_lut
 
 
 @pytest.mark.parametrize(
@@ -735,17 +746,9 @@ def test_i10_energy_motor_lookup_idd_convert_csv_to_lookup_success(
     file_name: str,
     expected_dict_file_name: str,
 ):
-    file_contents = mock_i10_energy_motor_lookup_idd.config_client.get_file_contents(
-        file_path=file_name, reset_cached_result=True
+    assert_lookup_table_matches_expected(
+        mock_i10_energy_motor_lookup_idd, file_name, expected_dict_file_name
     )
-    lut = convert_csv_to_lookup(
-        file_contents=file_contents,
-        lut_config=mock_i10_energy_motor_lookup_idd.lut_config,
-    )
-    with open(expected_dict_file_name, "rb") as f:
-        expected_lut = LookupTable(pickle.load(f))
-
-    assert lut == expected_lut
 
 
 def test_i10_energy_motor_lookup_convert_csv_to_lookup_failed(
@@ -784,7 +787,7 @@ async def test_fail_i10_energy_motor_lookup_with_lookup_gap(
         Pol.LH
     ].energies = EnergyCoverage(
         {
-            "1": EnergyCoverageEntry(
+            1: EnergyCoverageEntry(
                 low=255.3,
                 high=500,
                 poly=poly1d([4.33435e-08, -7.52562e-05, 6.41791e-02, 3.88755e00]),
@@ -795,7 +798,7 @@ async def test_fail_i10_energy_motor_lookup_with_lookup_gap(
         Pol.LH
     ].energies = EnergyCoverage(
         {
-            "2": EnergyCoverageEntry(
+            2: EnergyCoverageEntry(
                 low=600,
                 high=1000,
                 poly=poly1d([4.33435e-08, -7.52562e-05, 6.41791e-02, 3.88755e00]),

@@ -35,7 +35,13 @@ from pathlib import Path
 
 import numpy as np
 from daq_config_server.client import ConfigServer
-from pydantic import BaseModel, ConfigDict, Field, RootModel
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    RootModel,
+    field_serializer,
+)
 
 from dodal.devices.apple2_undulator import Pol
 
@@ -98,13 +104,18 @@ class EnergyMinMax(BaseModel):
 
 
 class EnergyCoverageEntry(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True)  # So np.poly1d can be used.
     low: float
     high: float
     poly: np.poly1d
 
+    @field_serializer("poly", mode="plain")
+    def serialize_poly(self, value: np.poly1d) -> list:
+        """Allow np.poly1d to work when serializing."""
+        return value.coefficients.tolist()
 
-class EnergyCoverage(RootModel[dict[str, EnergyCoverageEntry]]):
+
+class EnergyCoverage(RootModel[dict[float, EnergyCoverageEntry]]):
     pass
 
 
@@ -163,7 +174,7 @@ def convert_csv_to_lookup(
             )
 
         else:
-            lut.root[mode_value].energies.root[row[lut_config.min_energy]] = (
+            lut.root[mode_value].energies.root[float(row[lut_config.min_energy])] = (
                 EnergyCoverageEntry(
                     low=float(row[lut_config.min_energy]),
                     high=float(row[lut_config.max_energy]),
@@ -254,7 +265,7 @@ def generate_lookup_table_entry(
     return LookupTableEntries(
         energies=EnergyCoverage(
             {
-                str(min_energy): EnergyCoverageEntry(
+                min_energy: EnergyCoverageEntry(
                     low=min_energy,
                     high=max_energy,
                     poly=np.poly1d(poly1d_param),
