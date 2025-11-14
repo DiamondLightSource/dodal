@@ -54,13 +54,14 @@ class LookupPath(BaseModel):
     ) -> "LookupPath":
         """
         Factory method to easily create LookupPath using some default file names.
-        Args:
-            path:
-                The file path to the lookup tables.
-            gap_file:
-                The gap lookup table file name.
-            phase_file:
-                The phase lookup table file name.
+        Parameters:
+        -----------
+        path:
+            The file path to the lookup tables.
+        gap_file:
+            The gap lookup table file name.
+        phase_file:
+            The phase lookup table file name.
 
         Returns:
             LookupPath instance.
@@ -132,13 +133,18 @@ def convert_csv_to_lookup(
     """
     Convert CSV content into the Apple2 lookup-table dictionary.
 
-    args:
-        file_contents:
-            The CSV file content as a string.
-        lut_config:
-            The configuration that defines how to read the file_contents into a LookupTable
-        skip_line_start_with
-            Lines beginning with this prefix are skipped (default "#").
+    Parameters:
+    -----------
+    file_contents:
+        The CSV file content as a string.
+    lut_config:
+        The configuration that defines how to read the file_contents into a LookupTable
+    skip_line_start_with
+        Lines beginning with this prefix are skipped (default "#").
+
+    Returns:
+    -----------
+    LookupTable
     """
 
     def process_row(row: dict[str, Any], lut: LookupTable):
@@ -213,13 +219,14 @@ def get_poly(
     """
     Return the numpy.poly1d polynomial applicable for the given energy and polarisation.
 
-    Args:
-        energy:
-            Energy value in the same units used to create the lookup table (eV).
-        pol:
-            Polarisation mode (Pol enum).
-        lookup_table:
-            The converted lookup-table dictionary for either 'gap' or 'phase'.
+    Parameters:
+    -----------
+    energy:
+        Energy value in the same units used to create the lookup table (eV).
+    pol:
+        Polarisation mode (Pol enum).
+    lookup_table:
+        The converted lookup table dictionary for either 'gap' or 'phase'.
     """
     if (
         energy < lookup_table.root[pol].limit.minimum
@@ -305,12 +312,13 @@ class BaseEnergyMotorLookup:
     ):
         """Initialise the EnergyMotorLookup class with lookup table headers provided.
 
-        Args:
-            lut_config:
-                The configuration that contains the lookup table file paths and how to
-                read them.
-            config_client:
-                The config server client to fetch the look up table.
+        Parameters:
+        -----------
+        lut_config:
+            The configuration that contains the lookup table file paths and how to read
+            them.
+        config_client:
+            The config server client to fetch the look up table.
         """
         self.lookup_tables = GapPhaseLookupTable()
         self.lut_config = lut_config
@@ -335,16 +343,17 @@ class BaseEnergyMotorLookup:
         """
         Convert energy and polarisation to gap and phase motor positions.
 
-        Args:
-            energy : float
-                Desired energy in eV.
-            pol : Pol
-                Polarisation mode.
+        Parameters:
+        -----------
+        energy : float
+            Desired energy in eV.
+        pol : Pol
+            Polarisation mode.
 
         Returns:
-            tuple[float, float]
-                (gap, phase) motor positions.
-
+        ----------
+        tuple[float, float]
+            (gap, phase) motor positions.
         """
         if self.available_pol == []:
             self.update_lookuptable()

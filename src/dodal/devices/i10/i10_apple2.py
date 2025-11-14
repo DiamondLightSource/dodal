@@ -40,8 +40,8 @@ MAXIMUM_MOVE_TIME = 550  # There is no useful movements take longer than this.
 class I10EnergyMotorLookup(BaseEnergyMotorLookup):
     """
     Handles lookup tables for I10 Apple2 ID, converting energy and polarisation to gap
-     and phase. Fetches and parses lookup tables from a config server, supports dynamic
-     updates, and validates input.
+    and phase. Fetches and parses lookup tables from a config server, supports dynamic
+    updates, and validates input.
     """
 
     def update_lookuptable(self):
@@ -67,6 +67,8 @@ class I10EnergyMotorLookup(BaseEnergyMotorLookup):
 
 
 class I10Apple2(Apple2):
+    """I10Apple2 device is an apple2 with extra jaw phase motor."""
+
     def __init__(
         self,
         id_gap: UndulatorGap,
@@ -75,11 +77,8 @@ class I10Apple2(Apple2):
         name: str = "",
     ) -> None:
         """
-        I10Apple2 device is an apple2 with extra jaw phase motor.
-
-        Parameters
-        ----------
-
+        Parameters:
+        ------------
         id_gap : UndulatorJawPhase
             The gap motor of the undulator.
         id_phase : UndulatorJawPhase
@@ -111,17 +110,14 @@ class I10Apple2Controller(Apple2Controller[I10Apple2]):
         name: str = "",
     ) -> None:
         """
-
-        parameters
-        ----------
+        Parameters:
+        -----------
         apple2 : I10Apple2
             An I10Apple2 device.
-        lookuptable_dir : str
-            The path to look up table.
-        source : tuple[str, str]
-            The column name and the name of the source in look up table. e.g. ( "source", "idu")
         config_client : ConfigServer
             The config server client to fetch the look up table.
+        lut_config:
+            Configuration that defines where the lookup table is and how to read it.
         jaw_phase_limit : float, optional
             The maximum allowed jaw_phase movement., by default 12.0
         jaw_phase_poly_param : list[float], optional
