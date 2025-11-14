@@ -1,9 +1,16 @@
 from daq_config_server.client import ConfigServer
 
-from dodal.devices.apple2_undulator import Apple2, Apple2Controller, Apple2Val, Pol
+from dodal.devices.apple2_undulator import (
+    Apple2,
+    Apple2Controller,
+    Apple2PhasesVal,
+    Apple2Val,
+    Pol,
+)
 from dodal.devices.util.lookup_tables_apple2 import (
     EnergyMotorLookup,
     Lookuptable,
+    LookupTableKeys,
     convert_csv_to_lookup,
     make_phase_tables,
 )
@@ -108,19 +115,27 @@ class J09EnergyMotorLookup(EnergyMotorLookup):
         max_energies = []
         pols = []
         poly1d_params = []
-        for key in self.lookup_tables["Gap"].keys():
+        for key in self.lookup_tables[LookupTableKeys.GAP].keys():
             if key is not None:
                 pols.append(Pol(key.lower()))
-                mix_energies.append(self.lookup_tables["Gap"][key]["Limit"]["Minimum"])
-                max_energies.append(self.lookup_tables["Gap"][key]["Limit"]["Maximum"])
+                mix_energies.append(
+                    self.lookup_tables[LookupTableKeys.GAP][key][LookupTableKeys.LIMIT][
+                        LookupTableKeys.MIN
+                    ]
+                )
+                max_energies.append(
+                    self.lookup_tables[LookupTableKeys.GAP][key][LookupTableKeys.LIMIT][
+                        LookupTableKeys.MAX
+                    ]
+                )
                 poly1d_params.append(J09PhasePoly1dParameters[key])
-        self.lookup_tables["Phase"] = make_phase_tables(
+        self.lookup_tables[LookupTableKeys.PHASE] = make_phase_tables(
             pols=pols,
             min_energies=mix_energies,
             max_energies=max_energies,
             poly1d_params=poly1d_params,
         )
-        Lookuptable.model_validate(self.lookup_tables["Phase"])
+        Lookuptable.model_validate(self.lookup_tables[LookupTableKeys.PHASE])
 
 
 class J09Apple2Controller(Apple2Controller[Apple2]):
@@ -153,11 +168,13 @@ class J09Apple2Controller(Apple2Controller[Apple2]):
         pol = await self._check_and_get_pol_setpoint()
         gap, phase = self.energy_to_motor(energy=value, pol=pol)
         id_set_val = Apple2Val(
-            top_outer=f"{phase:.6f}",
-            top_inner="0.0",
-            btm_inner=f"{phase:.6f}",
-            btm_outer="0.0",
             gap=f"{gap:.6f}",
+            phase=Apple2PhasesVal(
+                top_outer=f"{phase:.6f}",
+                top_inner="0.0",
+                btm_inner=f"{phase:.6f}",
+                btm_outer="0.0",
+            ),
         )
 
         LOGGER.info(f"Setting polarisation to {pol}, with values: {id_set_val}")

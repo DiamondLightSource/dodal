@@ -119,6 +119,7 @@ def test_j09_energy_motor_lookup_convert_csv_to_lookup_success(
         poly_deg=POLY_DEG,
         skip_line_start_with="#",
     )
+
     with open(TEST_EXPECTED_UNDULATOR_LUT, "rb") as f:
         loaded_dict = pickle.load(f)
     assert data == loaded_dict
@@ -222,9 +223,10 @@ async def test_j09_apple2_controller_set_pol(
     "pol, energy, expected_gap",
     [
         (Pol.LH, 0.3, 28),
-        (Pol.LV, 0.5, 35),
-        (Pol.PC, 1.1, 52),
-        (Pol.NC, 0.8, 43),
+        (Pol.LV, 0.5, 23),
+        (Pol.PC, 1.1, 46),
+        (Pol.NC, 0.8, 37),
+        (Pol.LH3, 0.9, 28),
     ],
 )
 async def test_j09_apple2_controller_set_energy(
@@ -233,6 +235,8 @@ async def test_j09_apple2_controller_set_energy(
     energy: float,
     expected_gap: float,
 ):
+    mock_id_controller._polarisation_setpoint_set(pol)
+
     await mock_id_controller.energy.set(energy)
     mock_gap_setpoint = get_mock_put(mock_id_controller.apple2().gap().user_setpoint)
     assert float(mock_gap_setpoint.call_args_list[0].args[0]) == pytest.approx(

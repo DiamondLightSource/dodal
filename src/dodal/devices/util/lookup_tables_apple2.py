@@ -131,7 +131,7 @@ def convert_csv_to_lookup(
     """
     # Change none standard name to standard used in Pol
     if mode_name_convert is None:
-        mode_name_convert = {"CR": "pc", "CL": "nc"}
+        mode_name_convert = {"cr": "pc", "cl": "nc"}
     if poly_deg is None:
         poly_deg = [
             "7th-order",
