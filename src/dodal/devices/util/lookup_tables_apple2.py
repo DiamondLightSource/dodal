@@ -131,7 +131,7 @@ def convert_csv_to_lookup(
     """
     # Change none standard name to standard used in Pol
     if mode_name_convert is None:
-        mode_name_convert = {"CR": "pc", "CL": "nc"}
+        mode_name_convert = {"cr": "pc", "cl": "nc"}
     if poly_deg is None:
         poly_deg = [
             "7th-order",
@@ -220,7 +220,7 @@ def get_poly(
     Parameters
     ----------
     energy:
-        Energy value in the same units used to create the lookup table (eV).
+        Energy value in the same units used to create the lookup table.
     pol:
         Polarisation mode (Pol enum).
     lookup_table:
@@ -234,7 +234,7 @@ def get_poly(
         raise ValueError(
             "Demanding energy must lie between"
             + f" {lookup_table[pol][LookupTableKeys.LIMIT][LookupTableKeys.MIN]}"
-            + f" and {lookup_table[pol][LookupTableKeys.LIMIT][LookupTableKeys.MAX]} eV!"
+            + f" and {lookup_table[pol][LookupTableKeys.LIMIT][LookupTableKeys.MAX]}!"
         )
     else:
         for energy_range in lookup_table[pol][LookupTableKeys.ENERGIES].values():
@@ -336,7 +336,7 @@ class EnergyMotorLookup:
         gap_file_name:
             File name for the id game.
         phase_file_name:
-            File name for the phase(option.al).
+            File name for the phase(optional).
         poly_deg:
             The column names for the parameters for the energy conversion polynomial, starting with the least significant.
 
