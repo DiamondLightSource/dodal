@@ -44,18 +44,19 @@ from pydantic import (
 )
 
 from dodal.devices.apple2_undulator import Pol
+from dodal.log import LOGGER
 
 
 class LookupPath(BaseModel):
     gap: Path
-    phase: Path
+    phase: Path | None = None
 
     @classmethod
     def create(
         cls,
         path: str,
         gap_file: str = "IDEnergy2GapCalibrations.csv",
-        phase_file: str = "IDEnergy2PhaseCalibrations.csv",
+        phase_file: str | None = "IDEnergy2PhaseCalibrations.csv",
     ) -> "LookupPath":
         """
         Factory method to easily create LookupPath using some default file names.
@@ -71,7 +72,10 @@ class LookupPath(BaseModel):
         Returns:
             LookupPath instance.
         """
-        return cls(gap=Path(path, gap_file), phase=Path(path, phase_file))
+        return cls(
+            gap=Path(path, gap_file),
+            phase=Path(path, phase_file) if phase_file else None,
+        )
 
 
 DEFAULT_POLY_DEG = [
@@ -349,6 +353,33 @@ class BaseEnergyMotorLookup:
         """
         Update lookup tables from files and validate their format.
         """
+
+    def update_gap_lookuptable(self):
+        """
+        Update lookup tables from files and validate their format.
+        """
+        LOGGER.info("Updating lookup dictionary from file for gap.")
+        gap_csv_file = self.config_client.get_file_contents(
+            self.lut_config.path.gap, reset_cached_result=True
+        )
+        self.lookup_tables.gap = convert_csv_to_lookup(
+            file_contents=gap_csv_file, lut_config=self.lut_config
+        )
+        self.available_pol = list(self.lookup_tables.gap.root.keys())
+
+    def update_phase_lookuptable(self):
+        """
+        Update lookup tables from files and validate their format.
+        """
+        LOGGER.info("Updating lookup dictionary from file for phase.")
+        if self.lut_config.path.phase is None:
+            raise RuntimeError("Phase lookup table path is not provided.")
+        phase_csv_file = self.config_client.get_file_contents(
+            self.lut_config.path.phase, reset_cached_result=True
+        )
+        self.lookup_tables.phase = convert_csv_to_lookup(
+            file_contents=phase_csv_file, lut_config=self.lut_config
+        )
 
     def get_motor_from_energy(self, energy: float, pol: Pol) -> tuple[float, float]:
         """

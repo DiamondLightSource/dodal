@@ -8,10 +8,9 @@ from dodal.devices.apple2_undulator import (
     Pol,
 )
 from dodal.devices.util.lookup_tables_apple2 import (
-    EnergyMotorLookup,
-    Lookuptable,
-    LookupTableKeys,
-    convert_csv_to_lookup,
+    BaseEnergyMotorLookup,
+    LookupPath,
+    LookupTableConfig,
     make_phase_tables,
 )
 from dodal.log import LOGGER
@@ -30,7 +29,31 @@ J09PhasePoly1dParameters = {
 }
 
 
-class J09EnergyMotorLookup(EnergyMotorLookup):
+J09DefaultLookupTableConfig = LookupTableConfig(
+    path=LookupPath.create(
+        path="i09_apple2",
+        gap_file="i09_apple2/j09_energy2gap_calibrations.csv",
+        phase_file=None,
+    ),
+    mode="Mode",
+    min_energy="MinEnergy",
+    max_energy="MaxEnergy",
+    poly_deg=[
+        "9th-order",
+        "8th-order",
+        "7th-order",
+        "6th-order",
+        "5th-order",
+        "4th-order",
+        "3rd-order",
+        "2nd-order",
+        "1st-order",
+        "0th-order",
+    ],
+)
+
+
+class J09EnergyMotorLookup(BaseEnergyMotorLookup):
     """
     Handles lookup tables for I10 Apple2 ID, converting energy and polarisation to gap
      and phase. Fetches and parses lookup tables from a config server, supports dynamic
@@ -39,13 +62,8 @@ class J09EnergyMotorLookup(EnergyMotorLookup):
 
     def __init__(
         self,
-        lookuptable_dir: str,
         config_client: ConfigServer,
-        mode: str = "Mode",
-        min_energy: str = "MinEnergy",
-        max_energy: str = "MaxEnergy",
-        gap_file_name: str = "JIDEnergy2GapCalibrations.csv",
-        poly_deg: list | None = None,
+        lut_config: LookupTableConfig = J09DefaultLookupTableConfig,
     ):
         """Initialise the I10EnergyMotorLookup class with lookup table headers provided.
 
@@ -67,50 +85,17 @@ class J09EnergyMotorLookup(EnergyMotorLookup):
             The column names for the parameters for the energy conversion polynomial, starting with the least significant.
 
         """
-        if poly_deg is None:
-            poly_deg = [
-                "9th-order",
-                "8th-order",
-                "7th-order",
-                "6th-order",
-                "5th-order",
-                "4th-order",
-                "3rd-order",
-                "2nd-order",
-                "1st-order",
-                "0th-order",
-            ]
 
         super().__init__(
-            lookuptable_dir=lookuptable_dir,
             config_client=config_client,
-            mode=mode,
-            min_energy=min_energy,
-            max_energy=max_energy,
-            gap_file_name=gap_file_name,
-            phase_file_name=None,
-            poly_deg=poly_deg,
+            lut_config=lut_config,
         )
 
     def update_lookuptable(self):
         """
         Update lookup tables from files and validate their format.
         """
-        LOGGER.info("Updating lookup dictionary from file.")
-        for key, path in self.lookup_table_config.path.__dict__.items():
-            if path is not None:
-                csv_file = self.config_client.get_file_contents(
-                    path, reset_cached_result=True
-                )
-                self.lookup_tables[key] = convert_csv_to_lookup(
-                    file=csv_file,
-                    mode=self.lookup_table_config.mode,
-                    min_energy=self.lookup_table_config.min_energy,
-                    max_energy=self.lookup_table_config.max_energy,
-                    poly_deg=self.lookup_table_config.poly_deg,
-                    skip_line_start_with="#",
-                )
-                Lookuptable.model_validate(self.lookup_tables[key])
+        self.update_gap_lookuptable()
         mix_energies = []
         max_energies = []
         pols = []

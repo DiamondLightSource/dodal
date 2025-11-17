@@ -58,6 +58,8 @@ class I10EnergyMotorLookup(BaseEnergyMotorLookup):
         self.available_pol = list(self.lookup_tables.gap.root.keys())
 
         LOGGER.info("Updating lookup dictionary from file for phase.")
+        if self.lut_config.path.phase is None:
+            raise RuntimeError("Phase lookup table is required for I10 Apple2.")
         phase_csv_file = self.config_client.get_file_contents(
             self.lut_config.path.phase, reset_cached_result=True
         )
