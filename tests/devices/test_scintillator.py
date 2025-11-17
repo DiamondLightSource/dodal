@@ -103,40 +103,40 @@ async def test_given_aperture_scatterguard_parked_when_set_to_in_position_then_r
     await assert_value(scintillator.z_mm.user_setpoint, 101.5115)
 
 
-async def test_given_aperture_scatterguard_not_parked_when_set_to_out_position_then_exception_raised(
-    scintillator_and_ap_sg: tuple[Scintillator, ApertureScatterguard],
+@pytest.mark.parametrize("scint_pos", [InOut.OUT, InOut.IN])
+async def test_given_aperture_scatterguard_not_parked_when_set_to_in_or_out_position_then_exception_raised(
+    scintillator_and_ap_sg: tuple[Scintillator, ApertureScatterguard], scint_pos
 ):
     for position in ApertureValue:
         if position != ApertureValue.PARKED:
             scintillator, ap_sg = scintillator_and_ap_sg
             ap_sg.return_value.selected_aperture.get_value.return_value = position  # type: ignore
             with pytest.raises(ValueError):
-                await scintillator.selected_pos.set(InOut.OUT)
+                await scintillator.selected_pos.set(scint_pos)
 
 
-async def test_given_aperture_scatterguard_not_parked_when_set_to_in_position_then_exception_raised(
+@pytest.mark.parametrize(
+    "y, z, expected_position",
+    [
+        (100.855, 101.5115, InOut.IN),
+        (-0.02, 0.1, InOut.OUT),
+    ],
+)
+async def test_given_scintillator_already_out_when_moved_in_or_out_then_does_nothing(
     scintillator_and_ap_sg: tuple[Scintillator, ApertureScatterguard],
-):
-    for position in ApertureValue:
-        if position != ApertureValue.PARKED:
-            scintillator, ap_sg = scintillator_and_ap_sg
-            ap_sg.return_value.selected_aperture.get_value.return_value = position  # type: ignore
-            with pytest.raises(ValueError):
-                await scintillator.selected_pos.set(InOut.IN)
-
-
-async def test_given_scintillator_already_out_when_moved_out_then_does_nothing(
-    scintillator_and_ap_sg: tuple[Scintillator, ApertureScatterguard],
+    expected_position,
+    y,
+    z,
 ):
     scintillator, ap_sg = scintillator_and_ap_sg
-    await scintillator.y_mm.set(0)
-    await scintillator.z_mm.set(0)
+    await scintillator.y_mm.set(y)
+    await scintillator.z_mm.set(z)
 
     get_mock_put(scintillator.y_mm.user_setpoint).reset_mock()
     get_mock_put(scintillator.z_mm.user_setpoint).reset_mock()
 
     ap_sg.return_value.selected_aperture.get_value.return_value = ApertureValue.LARGE  # type: ignore
-    await scintillator.selected_pos.set(InOut.OUT)
+    await scintillator.selected_pos.set(expected_position)
 
     get_mock_put(scintillator.y_mm.user_setpoint).assert_not_called()
     get_mock_put(scintillator.z_mm.user_setpoint).assert_not_called()

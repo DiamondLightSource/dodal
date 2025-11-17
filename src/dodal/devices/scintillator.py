@@ -55,9 +55,7 @@ class Scintillator(StandardReadable):
 
         super().__init__(name)
 
-    def _check_position(
-        self, current_pos: list[float, float], pos_to_check: tuple[float, float]
-    ):
+    def _check_position(self, current_pos: list[float], pos_to_check: list[float]):
         return all(
             isclose(axis_pos, axis_in_beam, abs_tol=axis_tolerance)
             for axis_pos, axis_in_beam, axis_tolerance in zip(
@@ -69,7 +67,7 @@ class Scintillator(StandardReadable):
         )
 
     def _get_selected_position(self, y: float, z: float) -> InOut:
-        current_pos = (y, z)
+        current_pos = [y, z]
         if self._check_position(current_pos, self._scintillator_out_yz_mm):
             return InOut.OUT
 
@@ -99,6 +97,8 @@ class Scintillator(StandardReadable):
                 await self.y_mm.set(self._scintillator_out_yz_mm[0])
                 await self.z_mm.set(self._scintillator_out_yz_mm[1])
             case InOut.IN:
+                current_y = await self.y_mm.user_readback.get_value()
+                current_z = await self.z_mm.user_readback.get_value()
                 if self._get_selected_position(current_y, current_z) == InOut.IN:
                     return
                 await self._check_aperture_parked()
