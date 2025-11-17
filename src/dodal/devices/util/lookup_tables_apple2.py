@@ -354,9 +354,9 @@ class EnergyMotorLookup:
         """
         Update lookup tables from files and validate their format.
         """
-        LOGGER.info("Updating lookup dictionary from file for gap.")
+        LOGGER.info("Updating lookup table from file for gap.")
         self._update_gap_lut()
-        LOGGER.info("Updating lookup dictionary from file for phase.")
+        LOGGER.info("Updating lookup table from file for phase.")
         self._update_phase_lut()
 
     def get_motor_from_energy(self, energy: float, pol: Pol) -> tuple[float, float]:
