@@ -13,6 +13,7 @@ from ophyd_async.core import (
 )
 
 from dodal.devices.apple2_undulator import (
+    MAXIMUM_MOVE_TIME,
     Apple2,
     Apple2Controller,
     Apple2PhasesVal,
@@ -34,7 +35,6 @@ MAXIMUM_ROW_PHASE_MOTOR_POSITION = 24.0
 MAXIMUM_GAP_MOTOR_POSITION = 100
 DEFAULT_JAW_PHASE_POLY_PARAMS = [1.0 / 7.5, -120.0 / 7.5]
 ALPHA_OFFSET = 180
-MAXIMUM_MOVE_TIME = 550  # There is no useful movements take longer than this.
 
 
 class I10EnergyMotorLookup(EnergyMotorLookup):
@@ -282,4 +282,4 @@ class LinearArbitraryAngle(StandardReadable, Movable[SupportsFloat]):
 
     @AsyncStatus.wrap
     async def set(self, angle: float) -> None:
-        await self.linear_arbitrary_angle().set(angle)
+        await self.linear_arbitrary_angle().set(angle, timeout=MAXIMUM_MOVE_TIME)
