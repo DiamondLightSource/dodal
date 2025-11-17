@@ -66,7 +66,7 @@ class I10EnergyMotorLookup(BaseEnergyMotorLookup):
         )
 
 
-class I10Apple2(Apple2):
+class I10Apple2(Apple2[UndulatorPhaseAxes]):
     """I10Apple2 device is an apple2 with extra jaw phase motor."""
 
     def __init__(
