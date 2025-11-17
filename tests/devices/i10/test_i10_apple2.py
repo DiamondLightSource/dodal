@@ -1,5 +1,5 @@
+import json
 import os
-import pickle
 from collections.abc import Mapping
 from unittest import mock
 from unittest.mock import AsyncMock, MagicMock, Mock
@@ -48,10 +48,10 @@ from dodal.devices.util.lookup_tables_apple2 import (
 )
 from dodal.testing import patch_motor
 from tests.devices.i10.test_data import (
-    EXPECTED_ID_ENERGY_2_GAP_CALIBRATIONS_IDD_PKL,
-    EXPECTED_ID_ENERGY_2_GAP_CALIBRATIONS_IDU_PKL,
-    EXPECTED_ID_ENERGY_2_PHASE_CALIBRATIONS_IDD_PKL,
-    EXPECTED_ID_ENERGY_2_PHASE_CALIBRATIONS_IDU_PKL,
+    EXPECTED_ID_ENERGY_2_GAP_CALIBRATIONS_IDD_JSON,
+    EXPECTED_ID_ENERGY_2_GAP_CALIBRATIONS_IDU_JSON,
+    EXPECTED_ID_ENERGY_2_PHASE_CALIBRATIONS_IDD_JSON,
+    EXPECTED_ID_ENERGY_2_PHASE_CALIBRATIONS_IDU_JSON,
     ID_ENERGY_2_GAP_CALIBRATIONS_CSV,
     ID_ENERGY_2_PHASE_CALIBRATIONS_CSV,
     LOOKUP_TABLE_PATH,
@@ -735,7 +735,7 @@ def assert_lookup_table_matches_expected(
         lut_config=energy_motor_lookup.lut_config,
     )
     with open(expected_dict_file_name, "rb") as f:
-        expected_lut = LookupTable(pickle.load(f))
+        expected_lut = LookupTable(json.load(f))
 
     assert lut == expected_lut
 
@@ -745,11 +745,11 @@ def assert_lookup_table_matches_expected(
     [
         (
             ID_ENERGY_2_GAP_CALIBRATIONS_CSV,
-            EXPECTED_ID_ENERGY_2_GAP_CALIBRATIONS_IDU_PKL,
+            EXPECTED_ID_ENERGY_2_GAP_CALIBRATIONS_IDU_JSON,
         ),
         (
             ID_ENERGY_2_PHASE_CALIBRATIONS_CSV,
-            EXPECTED_ID_ENERGY_2_PHASE_CALIBRATIONS_IDU_PKL,
+            EXPECTED_ID_ENERGY_2_PHASE_CALIBRATIONS_IDU_JSON,
         ),
     ],
 )
@@ -768,11 +768,11 @@ def test_i10_energy_motor_lookup_idu_convert_csv_to_lookup_success(
     [
         (
             ID_ENERGY_2_GAP_CALIBRATIONS_CSV,
-            EXPECTED_ID_ENERGY_2_GAP_CALIBRATIONS_IDD_PKL,
+            EXPECTED_ID_ENERGY_2_GAP_CALIBRATIONS_IDD_JSON,
         ),
         (
             ID_ENERGY_2_PHASE_CALIBRATIONS_CSV,
-            EXPECTED_ID_ENERGY_2_PHASE_CALIBRATIONS_IDD_PKL,
+            EXPECTED_ID_ENERGY_2_PHASE_CALIBRATIONS_IDD_JSON,
         ),
     ],
 )
