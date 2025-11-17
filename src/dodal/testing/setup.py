@@ -39,6 +39,8 @@ def patch_motor(
     set_mock_value(motor.max_velocity, max_velocity)
     set_mock_value(motor.low_limit_travel, low_limit_travel)
     set_mock_value(motor.high_limit_travel, high_limit_travel)
+    set_mock_value(motor.dial_low_limit_travel, low_limit_travel)
+    set_mock_value(motor.dial_high_limit_travel, high_limit_travel)
     return callback_on_mock_put(
         motor.user_setpoint,
         lambda pos, *args, **kwargs: set_mock_value(motor.user_readback, pos),
