@@ -111,8 +111,6 @@ def dummy_lookup(lut_config: LookupTableConfig) -> DummyLookup:
 
 
 def test_energy_motor_lookup_with_phase_path_none(dummy_lookup: DummyLookup) -> None:
-    # assert dummy_lookup.lut_config.path.phase is None
-
     dummy_lookup.update_lookuptable()
 
     assert dummy_lookup.available_pol == [Pol.LH.value]

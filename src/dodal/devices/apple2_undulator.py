@@ -216,10 +216,7 @@ Apple2PhaseValType = TypeVar("Apple2PhaseValType", bound=Apple2LockedPhasesVal)
 
 
 class UndulatorLockedPhaseAxes(SafeUndulatorMover[Apple2PhaseValType]):
-    """
-    Two phase Motor to make up the locked id phase motion.
-
-    """
+    """Two phase Motor to make up the locked id phase motion."""
 
     def __init__(
         self,
