@@ -1,5 +1,4 @@
 import json
-import os
 from collections.abc import Mapping
 from pathlib import Path
 from unittest import mock
@@ -55,10 +54,6 @@ from tests.devices.i10.test_data import (
     ID_ENERGY_2_GAP_CALIBRATIONS_CSV,
     ID_ENERGY_2_PHASE_CALIBRATIONS_CSV,
 )
-
-ID_ENERGY_2_GAP_CALIBRATIONS_FILE_CSV = os.path.split(ID_ENERGY_2_GAP_CALIBRATIONS_CSV)[
-    1
-]
 
 
 @pytest.fixture
