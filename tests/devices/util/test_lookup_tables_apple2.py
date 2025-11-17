@@ -1,12 +1,13 @@
+from pathlib import Path
 from unittest.mock import MagicMock
 
 import numpy as np
 import pytest
+from daq_config_server.client import ConfigServer
 
 from dodal.devices.apple2_undulator import Pol
 from dodal.devices.util.lookup_tables_apple2 import (
-    BaseEnergyMotorLookup,
-    LookupPath,
+    EnergyMotorLookup,
     LookupTableConfig,
     convert_csv_to_lookup,
     generate_lookup_table,
@@ -16,18 +17,18 @@ from dodal.devices.util.lookup_tables_apple2 import (
 )
 
 
-def test_generate_lookup_table_structure_and_poly():
+def test_generate_lookup_table_structure_and_poly() -> None:
     min_e = 100.0
     max_e = 200.0
     coeffs = [2.0, -1.0, 0.5]
-    table = generate_lookup_table(
+    lut = generate_lookup_table(
         pol=Pol.LH, min_energy=min_e, max_energy=max_e, poly1d_param=coeffs
     )
 
     key = Pol.LH
-    assert key in table.root
+    assert key in lut.root
 
-    entry = table.root[key]
+    entry = lut.root[key]
     assert entry.limit.minimum == pytest.approx(min_e)
     assert entry.limit.maximum == pytest.approx(max_e)
 
@@ -42,13 +43,13 @@ def test_generate_lookup_table_structure_and_poly():
     assert ec.poly(150.0) == pytest.approx(expected)
 
 
-def test_make_phase_tables_multiple_entries():
+def test_make_phase_tables_multiple_entries() -> None:
     pols = [Pol.LH, Pol.LV]
     min_energies = [100.0, 200.0]
     max_energies = [150.0, 250.0]
     poly_params = [[1.0, 0.0], [0.5, 1.0]]
 
-    table = make_phase_tables(
+    lut = make_phase_tables(
         pols=pols,
         min_energies=min_energies,
         max_energies=max_energies,
@@ -57,8 +58,8 @@ def test_make_phase_tables_multiple_entries():
 
     for i, pol in enumerate(pols):
         key = pol
-        assert key in table.root
-        entry = table.root[key]
+        assert key in lut.root
+        entry = lut.root[key]
         assert entry.limit.minimum == pytest.approx(min_energies[i])
         assert entry.limit.maximum == pytest.approx(max_energies[i])
 
@@ -72,11 +73,10 @@ def test_make_phase_tables_multiple_entries():
         )
 
 
-class DummyLookup(BaseEnergyMotorLookup):
+class DummyEnergyMotorLookup(EnergyMotorLookup):
     """Concrete test subclass that only populates the Gap table (Phase left empty)."""
 
-    def update_lookuptable(self) -> None:
-        # Populate only the Gap table and intentionally leave Phase empty
+    def _update_gap_lut(self) -> None:
         self.lookup_tables.gap = generate_lookup_table(
             pol=Pol.LH,
             min_energy=100.0,
@@ -85,13 +85,14 @@ class DummyLookup(BaseEnergyMotorLookup):
         )
         self.available_pol = list(self.lookup_tables.gap.root.keys())
 
+    def _update_phase_lut(self):
+        pass
+
 
 @pytest.fixture
-def lut_config() -> LookupTableConfig:
+def gap_lut_config() -> LookupTableConfig:
     return LookupTableConfig(
-        path=LookupPath.create(
-            ".",
-        ),
+        path=Path(""),
         mode="Mode",
         min_energy="MinEnergy",
         max_energy="MaxEnergy",
@@ -101,24 +102,50 @@ def lut_config() -> LookupTableConfig:
 
 
 @pytest.fixture
-def dummy_lookup(lut_config: LookupTableConfig) -> DummyLookup:
-    return DummyLookup(
-        config_client=MagicMock(),
-        lut_config=lut_config,
+def phase_lut_config() -> LookupTableConfig:
+    return LookupTableConfig(
+        path=Path(""),
+        mode="Mode",
+        min_energy="MinEnergy",
+        max_energy="MaxEnergy",
+        poly_deg=["c1", "c0"],
+        mode_name_convert={"hl": "lh", "vl": "lv"},
     )
 
 
-def test_energy_motor_lookup_with_phase_path_none(dummy_lookup: DummyLookup) -> None:
-    dummy_lookup.update_lookuptable()
+@pytest.fixture
+def mock_config_client() -> ConfigServer:
+    mock_config_client = ConfigServer()
+    mock_config_client.get_file_contents = MagicMock(spec=["get_file_contents"])
+    return mock_config_client
 
-    assert dummy_lookup.available_pol == [Pol.LH.value]
 
-    poly = get_poly(150.0, Pol.LH, dummy_lookup.lookup_tables.gap)
+@pytest.fixture
+def dummy_energy_motor_lookup(
+    mock_config_client: ConfigServer,
+    gap_lut_config: LookupTableConfig,
+    phase_lut_config: LookupTableConfig,
+) -> DummyEnergyMotorLookup:
+    return DummyEnergyMotorLookup(
+        config_client=mock_config_client,
+        gap_lut_config=gap_lut_config,
+        phase_lut_config=phase_lut_config,
+    )
+
+
+def test_energy_motor_lookup_with_phase_path_none(
+    dummy_energy_motor_lookup: DummyEnergyMotorLookup,
+) -> None:
+    dummy_energy_motor_lookup.update_lookuptables()
+
+    assert dummy_energy_motor_lookup.available_pol == [Pol.LH.value]
+
+    poly = get_poly(150.0, Pol.LH, dummy_energy_motor_lookup.lookup_tables.gap)
     assert isinstance(poly, np.poly1d)
     assert poly(150.0) == pytest.approx(np.poly1d([2.0, -1.0, 0.5])(150.0))
 
 
-def test_read_file_and_skip_basic():
+def test_read_file_and_skip_basic() -> None:
     content = (
         "# this is a comment line\n"
         "data_line_1,1,2,3\n"
@@ -130,15 +157,29 @@ def test_read_file_and_skip_basic():
     assert lines == ["data_line_1,1,2,3\n", "data_line_2,4,5,6\n"]
 
 
+def configure_mock_config_server_get_file_contents(
+    file_content: str, config_client: ConfigServer
+) -> None:
+    def my_side_effect(file_path, reset_cached_result) -> str:
+        assert reset_cached_result is True
+        return file_content
+
+    config_client.get_file_contents.side_effect = my_side_effect  # type:ignore
+
+
 def test_convert_csv_to_lookup_overwrite_name_convert_default(
-    lut_config: LookupTableConfig,
+    dummy_energy_motor_lookup: DummyEnergyMotorLookup,
 ) -> None:
     csv_content = (
         "Mode,MinEnergy,MaxEnergy,c1,c0\nHL,100,200,2.0,1.0\nVL,200,300,1.0,0.0\n"
     )
-
-    lut = convert_csv_to_lookup(csv_content, lut_config)
-
+    configure_mock_config_server_get_file_contents(
+        csv_content, dummy_energy_motor_lookup.config_client
+    )
+    lut = convert_csv_to_lookup(
+        dummy_energy_motor_lookup.config_client,
+        dummy_energy_motor_lookup.lookup_tables.gap_config,
+    )
     assert Pol.LH in lut.root
     assert Pol.LV in lut.root
     # Check polynomials evaluate as expected
@@ -150,23 +191,27 @@ def test_convert_csv_to_lookup_overwrite_name_convert_default(
     assert isinstance(poly_lv, np.poly1d)
     assert poly_lv(250.0) == pytest.approx(np.poly1d([1.0, 0.0])(250.0))
 
+    # Assert phase dict is empty
+    assert not dummy_energy_motor_lookup.lookup_tables.phase.root
 
-def test_lookup_table_is_serialisable(lut_config: LookupTableConfig) -> None:
-    csv_content = (
-        "Mode,MinEnergy,MaxEnergy,c1,c0\nHL,100,200,2.0,1.0\nVL,200,300,1.0,0.0\n"
+
+def test_lookup_table_is_serialisable() -> None:
+    lut = generate_lookup_table(
+        pol=Pol.LH, min_energy=100, max_energy=200, poly1d_param=[2.0, -1.0, 0.5]
     )
-    lut = convert_csv_to_lookup(csv_content, lut_config)
     # There should be no errors when calling the below functions
     lut.model_dump()
     lut.model_dump_json()
 
 
 async def test_bad_file_contents_causes_convert_csv_to_lookup_fails(
-    lut_config: LookupTableConfig,
-):
-    bad_file_contents = "fnslkfndlsnf"
+    dummy_energy_motor_lookup: DummyEnergyMotorLookup,
+) -> None:
+    configure_mock_config_server_get_file_contents(
+        "fnslkfndlsnf", dummy_energy_motor_lookup.config_client
+    )
     with pytest.raises(RuntimeError):
         convert_csv_to_lookup(
-            file_contents=bad_file_contents,
-            lut_config=lut_config,
+            dummy_energy_motor_lookup.config_client,
+            dummy_energy_motor_lookup.lookup_tables.gap_config,
         )

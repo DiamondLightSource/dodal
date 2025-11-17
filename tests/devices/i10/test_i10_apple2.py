@@ -1,6 +1,7 @@
 import json
 import os
 from collections.abc import Mapping
+from pathlib import Path
 from unittest import mock
 from unittest.mock import AsyncMock, MagicMock, Mock
 
@@ -33,7 +34,6 @@ from dodal.devices.i10.i10_apple2 import (
     DEFAULT_JAW_PHASE_POLY_PARAMS,
     I10Apple2,
     I10Apple2Controller,
-    I10EnergyMotorLookup,
     LinearArbitraryAngle,
 )
 from dodal.devices.i10.i10_setting_data import I10Grating
@@ -41,7 +41,7 @@ from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.devices.util.lookup_tables_apple2 import (
     EnergyCoverage,
     EnergyCoverageEntry,
-    LookupPath,
+    EnergyMotorLookup,
     LookupTable,
     LookupTableConfig,
     convert_csv_to_lookup,
@@ -54,7 +54,6 @@ from tests.devices.i10.test_data import (
     EXPECTED_ID_ENERGY_2_PHASE_CALIBRATIONS_IDU_JSON,
     ID_ENERGY_2_GAP_CALIBRATIONS_CSV,
     ID_ENERGY_2_PHASE_CALIBRATIONS_CSV,
-    LOOKUP_TABLE_PATH,
 )
 
 ID_ENERGY_2_GAP_CALIBRATIONS_FILE_CSV = os.path.split(ID_ENERGY_2_GAP_CALIBRATIONS_CSV)[
@@ -156,18 +155,50 @@ async def mock_id(
 
 
 @pytest.fixture
+def mock_i10_energy_motor_lookup_idu(
+    mock_config_client: ConfigServer,
+) -> EnergyMotorLookup:
+    source = ("Source", "idu")
+    return EnergyMotorLookup(
+        config_client=mock_config_client,
+        gap_lut_config=LookupTableConfig(
+            path=Path(ID_ENERGY_2_GAP_CALIBRATIONS_CSV),
+            source=source,
+        ),
+        phase_lut_config=LookupTableConfig(
+            path=Path(ID_ENERGY_2_PHASE_CALIBRATIONS_CSV),
+            source=source,
+        ),
+    )
+
+
+@pytest.fixture
+def mock_i10_energy_motor_lookup_idd(
+    mock_config_client: ConfigServer,
+) -> EnergyMotorLookup:
+    source = ("Source", "idd")
+    return EnergyMotorLookup(
+        config_client=mock_config_client,
+        gap_lut_config=LookupTableConfig(
+            path=Path(ID_ENERGY_2_GAP_CALIBRATIONS_CSV),
+            source=source,
+        ),
+        phase_lut_config=LookupTableConfig(
+            path=Path(ID_ENERGY_2_PHASE_CALIBRATIONS_CSV),
+            source=source,
+        ),
+    )
+
+
+@pytest.fixture
 async def mock_id_controller(
     mock_id: I10Apple2,
-    mock_config_client: ConfigServer,
+    mock_i10_energy_motor_lookup_idu: EnergyMotorLookup,
 ) -> I10Apple2Controller:
     async with init_devices(mock=True):
         mock_id_controller = I10Apple2Controller(
             apple2=mock_id,
-            lut_config=LookupTableConfig(
-                path=LookupPath.create(LOOKUP_TABLE_PATH),
-                source=("Source", "idu"),
-            ),
-            config_client=mock_config_client,
+            lookup_table_client=mock_i10_energy_motor_lookup_idu,
         )
     set_mock_value(mock_id_controller.apple2().gap().gate, UndulatorGateStatus.CLOSE)
     set_mock_value(mock_id_controller.apple2().phase().gate, UndulatorGateStatus.CLOSE)
@@ -222,32 +253,6 @@ async def mock_linear_arbitrary_angle(
             id_controller=mock_id_controller
         )
     return mock_linear_arbitrary_angle
-
-
-@pytest.fixture
-def mock_i10_energy_motor_lookup_idu(
-    mock_config_client: ConfigServer,
-) -> I10EnergyMotorLookup:
-    return I10EnergyMotorLookup(
-        lut_config=LookupTableConfig(
-            path=LookupPath.create(LOOKUP_TABLE_PATH),
-            source=("Source", "idu"),
-        ),
-        config_client=mock_config_client,
-    )
-
-
-@pytest.fixture
-def mock_i10_energy_motor_lookup_idd(
-    mock_config_client: ConfigServer,
-) -> I10EnergyMotorLookup:
-    return I10EnergyMotorLookup(
-        lut_config=LookupTableConfig(
-            path=LookupPath.create(LOOKUP_TABLE_PATH),
-            source=("Source", "idd"),
-        ),
-        config_client=mock_config_client,
-    )
 
 
 @pytest.mark.parametrize(
@@ -723,17 +728,11 @@ async def test_linear_arbitrary_run_engine_scan(
 
 
 def assert_lookup_table_matches_expected(
-    energy_motor_lookup: I10EnergyMotorLookup,
-    file_name: str,
+    mock_config_client: ConfigServer,
+    lut_config: LookupTableConfig,
     expected_dict_file_name: str,
 ) -> None:
-    file_contents = energy_motor_lookup.config_client.get_file_contents(
-        file_path=file_name, reset_cached_result=True
-    )
-    lut = convert_csv_to_lookup(
-        file_contents=file_contents,
-        lut_config=energy_motor_lookup.lut_config,
-    )
+    lut = convert_csv_to_lookup(mock_config_client, lut_config)
     with open(expected_dict_file_name, "rb") as f:
         expected_lut = LookupTable(json.load(f))
 
@@ -741,59 +740,47 @@ def assert_lookup_table_matches_expected(
 
 
 @pytest.mark.parametrize(
-    "file_name, expected_dict_file_name",
+    "expected_dict_file_name",
     [
-        (
-            ID_ENERGY_2_GAP_CALIBRATIONS_CSV,
-            EXPECTED_ID_ENERGY_2_GAP_CALIBRATIONS_IDU_JSON,
-        ),
-        (
-            ID_ENERGY_2_PHASE_CALIBRATIONS_CSV,
-            EXPECTED_ID_ENERGY_2_PHASE_CALIBRATIONS_IDU_JSON,
-        ),
+        EXPECTED_ID_ENERGY_2_GAP_CALIBRATIONS_IDU_JSON,
+        EXPECTED_ID_ENERGY_2_PHASE_CALIBRATIONS_IDU_JSON,
     ],
 )
 def test_i10_energy_motor_lookup_idu_convert_csv_to_lookup_success(
-    mock_i10_energy_motor_lookup_idu: I10EnergyMotorLookup,
-    file_name: str,
+    mock_i10_energy_motor_lookup_idu: EnergyMotorLookup,
     expected_dict_file_name: str,
 ):
+    if "gap" in expected_dict_file_name.lower():
+        config = mock_i10_energy_motor_lookup_idu.lookup_tables.gap_config
+    else:
+        config = mock_i10_energy_motor_lookup_idu.lookup_tables.phase_config
     assert_lookup_table_matches_expected(
-        mock_i10_energy_motor_lookup_idu, file_name, expected_dict_file_name
+        mock_i10_energy_motor_lookup_idu.config_client,
+        config,
+        expected_dict_file_name,
     )
 
 
 @pytest.mark.parametrize(
-    "file_name, expected_dict_file_name",
+    "expected_dict_file_name",
     [
-        (
-            ID_ENERGY_2_GAP_CALIBRATIONS_CSV,
-            EXPECTED_ID_ENERGY_2_GAP_CALIBRATIONS_IDD_JSON,
-        ),
-        (
-            ID_ENERGY_2_PHASE_CALIBRATIONS_CSV,
-            EXPECTED_ID_ENERGY_2_PHASE_CALIBRATIONS_IDD_JSON,
-        ),
+        EXPECTED_ID_ENERGY_2_GAP_CALIBRATIONS_IDD_JSON,
+        EXPECTED_ID_ENERGY_2_PHASE_CALIBRATIONS_IDD_JSON,
     ],
 )
 def test_i10_energy_motor_lookup_idd_convert_csv_to_lookup_success(
-    mock_i10_energy_motor_lookup_idd: I10EnergyMotorLookup,
-    file_name: str,
+    mock_i10_energy_motor_lookup_idd: EnergyMotorLookup,
     expected_dict_file_name: str,
 ):
+    if "gap" in expected_dict_file_name.lower():
+        config = mock_i10_energy_motor_lookup_idd.lookup_tables.gap_config
+    else:
+        config = mock_i10_energy_motor_lookup_idd.lookup_tables.phase_config
     assert_lookup_table_matches_expected(
-        mock_i10_energy_motor_lookup_idd, file_name, expected_dict_file_name
+        mock_i10_energy_motor_lookup_idd.config_client,
+        config,
+        expected_dict_file_name,
     )
-
-
-def test_i10_energy_motor_lookup_convert_csv_to_lookup_failed(
-    mock_i10_energy_motor_lookup_idu: I10EnergyMotorLookup,
-):
-    with pytest.raises(RuntimeError):
-        convert_csv_to_lookup(
-            file_contents=ID_ENERGY_2_GAP_CALIBRATIONS_CSV,
-            lut_config=mock_i10_energy_motor_lookup_idu.lut_config,
-        )
 
 
 @pytest.mark.parametrize("energy", [(100), (5500), (-299)])
@@ -816,7 +803,7 @@ async def test_fail_i10_energy_motor_lookup_outside_energy_limits(
 async def test_fail_i10_energy_motor_lookup_with_lookup_gap(
     mock_id_controller: I10Apple2Controller,
 ):
-    mock_id_controller.lookup_table_client.update_lookuptable()
+    mock_id_controller.lookup_table_client.update_lookuptables()
     # make gap in energy
     mock_id_controller.lookup_table_client.lookup_tables.gap.root[
         Pol.LH
