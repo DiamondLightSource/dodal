@@ -125,7 +125,7 @@ class LookupTableEntries(BaseModel):
 
 
 class LookupTable(RootModel[dict[Pol, LookupTableEntries]]):
-    # Allow to auto speficy a dict if one not provided
+    # Allow to auto specify a dict if one not provided
     def __init__(self, root: dict[Pol, LookupTableEntries] | None = None):
         super().__init__(root=root or {})
 
