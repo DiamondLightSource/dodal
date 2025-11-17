@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.apple2_undulator &#8212; dodal 1.65.1.dev13+ge2be4db6f documentation</title>
+    <title>dodal.devices.apple2_undulator &#8212; dodal 1.65.1.dev14+gbdebc72a8 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=75493328"></script>
+    <script src="../../../_static/documentation_options.js?v=f62772c9"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -481,6 +481,7 @@ window.addEventListener("load", () => mermaid.run());
 <span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">)</span>
 
 <span class="n">DEFAULT_MOTOR_MIN_TIMEOUT</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">MAXIMUM_MOVE_TIME</span> <span class="o">=</span> <span class="mi">550</span>  <span class="c1"># There is no useful movements take longer than this.</span>
 
 
 <div class="viewcode-block" id="UndulatorGateStatus">
@@ -1059,7 +1060,7 @@ window.addEventListener("load", () => mermaid.run());
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="c1"># This changes the pol setpoint and then changes polarisation via set energy.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_polarisation_setpoint_set</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
-        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy</span><span class="o">.</span><span class="n">get_value</span><span class="p">())</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy</span><span class="o">.</span><span class="n">get_value</span><span class="p">(),</span> <span class="n">timeout</span><span class="o">=</span><span class="n">MAXIMUM_MOVE_TIME</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_read_pol</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -1251,7 +1252,7 @@ window.addEventListener("load", () => mermaid.run());
 
     <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energy</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy</span><span class="p">()</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">energy</span><span class="p">)</span></div>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy</span><span class="p">()</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">energy</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">MAXIMUM_MOVE_TIME</span><span class="p">)</span></div>
 
 
 
@@ -1269,7 +1270,7 @@ window.addEventListener("load", () => mermaid.run());
 
     <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pol</span><span class="p">:</span> <span class="n">Pol</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">polarisation</span><span class="p">()</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">pol</span><span class="p">)</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">polarisation</span><span class="p">()</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">pol</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">MAXIMUM_MOVE_TIME</span><span class="p">)</span>
 
 <div class="viewcode-block" id="InsertionDevicePolarisation.locate">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.apple2_undulator.InsertionDevicePolarisation.html#dodal.devices.apple2_undulator.InsertionDevicePolarisation.locate">[docs]</a>
