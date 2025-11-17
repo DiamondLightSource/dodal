@@ -233,6 +233,8 @@ def list_scan(
     """Scan over one or more variables in steps simultaneously.
     Wraps bluesky.plans.list_scan(det, *args, md=metadata)."""
     metadata = metadata or {}
+    shape = [len(positions) for positions in params]
+    metadata["shape"] = (shape,)
     args = _make_args(movers=movers, params=params, num_params=1)
     yield from bp.list_scan(tuple(detectors), *args, md=metadata)
 
@@ -263,6 +265,8 @@ def list_rscan(
     """Scan over one or more variables simultaneously relative to current position.
     Wraps bluesky.plans.rel_list_scan(det, *args, md=metadata)."""
     metadata = metadata or {}
+    shape = [len(positions) for positions in params]
+    metadata["shape"] = (shape,)
     args = _make_args(movers=movers, params=params, num_params=1)
     yield from bp.rel_list_scan(tuple(detectors), *args, md=metadata)
 
@@ -294,6 +298,8 @@ def list_grid_scan(
     """Scan over one or more variables for each given point on independent trajectories.
     Wraps bluesky.plans.list_grid_scan(det, *args, md=metadata)."""
     metadata = metadata or {}
+    shape = [len(positions) for positions in params]
+    metadata["shape"] = (shape,)
     args = _make_args(movers=movers, params=params, num_params=1)
     yield from bp.list_grid_scan(
         tuple(detectors), *args, snake_axes=snake_axes, md=metadata
@@ -327,6 +333,8 @@ def list_grid_rscan(
     """Scan over some variables for each given point relative to current position.
     Wraps bluesky.plans.rel_list_grid_scan(det, *args, md=metadata)."""
     metadata = metadata or {}
+    shape = [len(positions) for positions in params]
+    metadata["shape"] = (shape,)
     args = _make_args(movers=movers, params=params, num_params=1)
     yield from bp.rel_list_grid_scan(
         tuple(detectors), *args, snake_axes=snake_axes, md=metadata
