@@ -128,11 +128,10 @@ def convert_csv_to_lookup(
 
     Parameters:
     -----------
-    config_client:
-        The client that is able to retrieve the file contents.
+    file_contents:
+        The CSV file contents as string.
     lut_config:
-        The configuration that defines which file to read for the config_client and how
-        to process the file contents into a LookupTable.
+        The configuration that how to process the file_contents into a LookupTable.
     skip_line_start_with
         Lines beginning with this prefix are skipped (default "#").
 
@@ -313,11 +312,14 @@ class EnergyMotorLookup:
 
         Parameters:
         -----------
-        lut_config:
-            The configuration that contains the lookup table file paths and how to read
-            them.
         config_client:
-            The config server client to fetch the look up table.
+            The config server client to fetch the look up table data.
+        lut_config:
+            Configuration that defines how to process file contents into a LookupTable
+        gap_path:
+            File path to the gap lookup table.
+        phase_path:
+            File path to the phase lookup table.
         """
         self.lookup_tables = GapPhaseLookupTables()
         self.config_client = config_client
