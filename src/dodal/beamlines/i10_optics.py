@@ -6,6 +6,8 @@ note:
     idd == id1,    idu == id2.
 """
 
+from pathlib import Path
+
 from daq_config_server.client import ConfigServer
 
 from dodal.common.beamlines.beamline_utils import device_factory
@@ -35,10 +37,10 @@ from dodal.devices.i10.i10_setting_data import I10Grating
 from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.util.lookup_tables_apple2 import (
+    DEFAULT_GAP_FILE,
+    DEFAULT_PHASE_FILE,
     EnergyMotorLookup,
     LookupTableConfig,
-    default_gap_file,
-    default_phase_file,
 )
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
@@ -125,10 +127,10 @@ def idd_controller() -> I10Apple2Controller:
     idd_energy_motor_lut = EnergyMotorLookup(
         config_client=I10_CONF_CLIENT,
         gap_lut_config=LookupTableConfig(
-            source=source, path=default_gap_file(LOOK_UPTABLE_DIR)
+            source=source, path=Path(LOOK_UPTABLE_DIR, DEFAULT_GAP_FILE)
         ),
         phase_lut_config=LookupTableConfig(
-            source=source, path=default_phase_file(LOOK_UPTABLE_DIR)
+            source=source, path=Path(LOOK_UPTABLE_DIR, DEFAULT_PHASE_FILE)
         ),
     )
     return I10Apple2Controller(apple2=idd(), energy_motor_lut=idd_energy_motor_lut)
@@ -194,10 +196,10 @@ def idu_controller() -> I10Apple2Controller:
     idu_energy_motor_lut = EnergyMotorLookup(
         config_client=I10_CONF_CLIENT,
         gap_lut_config=LookupTableConfig(
-            source=source, path=default_gap_file(LOOK_UPTABLE_DIR)
+            source=source, path=Path(LOOK_UPTABLE_DIR, DEFAULT_GAP_FILE)
         ),
         phase_lut_config=LookupTableConfig(
-            source=source, path=default_phase_file(LOOK_UPTABLE_DIR)
+            source=source, path=Path(LOOK_UPTABLE_DIR, DEFAULT_PHASE_FILE)
         ),
     )
     return I10Apple2Controller(apple2=idd(), energy_motor_lut=idu_energy_motor_lut)

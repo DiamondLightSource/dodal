@@ -46,13 +46,8 @@ from pydantic import (
 from dodal.devices.apple2_undulator import Pol
 from dodal.log import LOGGER
 
-
-def default_gap_file(path: str, file: str = "IDEnergy2GapCalibrations.csv") -> Path:
-    return Path(path, file)
-
-
-def default_phase_file(path: str, file: str = "IDEnergy2PhaseCalibrations.csv") -> Path:
-    return Path(path, file)
+DEFAULT_GAP_FILE = "IDEnergy2GapCalibrations.csv"
+DEFAULT_PHASE_FILE = "IDEnergy2PhaseCalibrations.csv"
 
 
 DEFAULT_POLY_DEG = [
