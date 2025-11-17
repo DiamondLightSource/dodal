@@ -62,9 +62,8 @@ def test_make_phase_tables_multiple_entries():
         assert entry.limit.minimum == pytest.approx(min_energies[i])
         assert entry.limit.maximum == pytest.approx(max_energies[i])
 
-        energy_key = f"{min_energies[i]}"
-        assert energy_key in entry.energies.root
-        poly = entry.energies.root[energy_key].poly
+        assert min_energies[i] in entry.energies.root
+        poly = entry.energies.root[min_energies[i]].poly
         assert isinstance(poly, np.poly1d)
 
         test_energy = (min_energies[i] + max_energies[i]) / 2.0
@@ -138,18 +137,28 @@ def test_convert_csv_to_lookup_overwrite_name_convert_default(
         "Mode,MinEnergy,MaxEnergy,c1,c0\nHL,100,200,2.0,1.0\nVL,200,300,1.0,0.0\n"
     )
 
-    lookuptable = convert_csv_to_lookup(csv_content, lut_config)
+    lut = convert_csv_to_lookup(csv_content, lut_config)
 
-    assert Pol.LH in lookuptable.root
-    assert Pol.LV in lookuptable.root
+    assert Pol.LH in lut.root
+    assert Pol.LV in lut.root
     # Check polynomials evaluate as expected
-    poly_lh = lookuptable.root[Pol.LH].energies.root[100.0].poly
+    poly_lh = lut.root[Pol.LH].energies.root[100.0].poly
     assert isinstance(poly_lh, np.poly1d)
     assert poly_lh(150.0) == pytest.approx(np.poly1d([2.0, 1.0])(150.0))
 
-    poly_lv = lookuptable.root[Pol.LV].energies.root[200.0].poly
+    poly_lv = lut.root[Pol.LV].energies.root[200.0].poly
     assert isinstance(poly_lv, np.poly1d)
     assert poly_lv(250.0) == pytest.approx(np.poly1d([1.0, 0.0])(250.0))
+
+
+def test_lookup_table_is_serialisable(lut_config: LookupTableConfig) -> None:
+    csv_content = (
+        "Mode,MinEnergy,MaxEnergy,c1,c0\nHL,100,200,2.0,1.0\nVL,200,300,1.0,0.0\n"
+    )
+    lut = convert_csv_to_lookup(csv_content, lut_config)
+    # There should be no errors when calling the below functions
+    lut.model_dump()
+    lut.model_dump_json()
 
 
 async def test_bad_file_contents_causes_convert_csv_to_lookup_fails(
