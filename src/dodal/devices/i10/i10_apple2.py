@@ -24,8 +24,8 @@ from dodal.devices.apple2_undulator import (
     UndulatorPhaseAxes,
 )
 from dodal.devices.util.lookup_tables_apple2 import (
-    EnergyMotorLookup,
-    Lookuptable,
+    BaseEnergyMotorLookup,
+    LookupTableConfig,
     convert_csv_to_lookup,
 )
 from dodal.log import LOGGER
@@ -37,80 +37,38 @@ DEFAULT_JAW_PHASE_POLY_PARAMS = [1.0 / 7.5, -120.0 / 7.5]
 ALPHA_OFFSET = 180
 
 
-class I10EnergyMotorLookup(EnergyMotorLookup):
+class I10EnergyMotorLookup(BaseEnergyMotorLookup):
     """
     Handles lookup tables for I10 Apple2 ID, converting energy and polarisation to gap
-     and phase. Fetches and parses lookup tables from a config server, supports dynamic
-     updates, and validates input.
+    and phase. Fetches and parses lookup tables from a config server, supports dynamic
+    updates, and validates input.
     """
-
-    def __init__(
-        self,
-        lookuptable_dir: str,
-        source: tuple[str, str],
-        config_client: ConfigServer,
-        mode: str = "Mode",
-        min_energy: str = "MinEnergy",
-        max_energy: str = "MaxEnergy",
-        gap_file_name: str = "IDEnergy2GapCalibrations.csv",
-        phase_file_name: str = "IDEnergy2PhaseCalibrations.csv",
-        poly_deg: list | None = None,
-    ):
-        """Initialise the I10EnergyMotorLookup class with lookup table headers provided.
-
-        Parameters
-        ----------
-        look_up_table_dir:
-            The path to look up table.
-        source:
-            The column name and the name of the source in look up table. e.g. ( "source", "idu")
-        config_client:
-            The config server client to fetch the look up table.
-        mode:
-            The column name of the mode in look up table.
-        min_energy:
-            The column name that contain the maximum energy in look up table.
-        max_energy:
-            The column name that contain the maximum energy in look up table.
-        poly_deg:
-            The column names for the parameters for the energy conversion polynomial, starting with the least significant.
-
-        """
-        super().__init__(
-            lookuptable_dir=lookuptable_dir,
-            config_client=config_client,
-            mode=mode,
-            source=source,
-            min_energy=min_energy,
-            max_energy=max_energy,
-            gap_file_name=gap_file_name,
-            phase_file_name=phase_file_name,
-            poly_deg=poly_deg,
-        )
 
     def update_lookuptable(self):
         """
         Update lookup tables from files and validate their format.
         """
-        LOGGER.info("Updating lookup dictionary from file.")
-        for key, path in self.lookup_table_config.path.__dict__.items():
-            csv_file = self.config_client.get_file_contents(
-                path, reset_cached_result=True
-            )
-            self.lookup_tables[key] = convert_csv_to_lookup(
-                file=csv_file,
-                source=self.lookup_table_config.source,
-                mode=self.lookup_table_config.mode,
-                min_energy=self.lookup_table_config.min_energy,
-                max_energy=self.lookup_table_config.max_energy,
-                poly_deg=self.lookup_table_config.poly_deg,
-            )
-            Lookuptable.model_validate(self.lookup_tables[key])
+        LOGGER.info("Updating lookup dictionary from file for gap.")
+        gap_csv_file = self.config_client.get_file_contents(
+            self.lut_config.path.gap, reset_cached_result=True
+        )
+        self.lookup_tables.gap = convert_csv_to_lookup(
+            file_contents=gap_csv_file, lut_config=self.lut_config
+        )
+        self.available_pol = list(self.lookup_tables.gap.root.keys())
 
-        self.available_pol = list(self.lookup_tables["gap"].keys())
+        LOGGER.info("Updating lookup dictionary from file for phase.")
+        phase_csv_file = self.config_client.get_file_contents(
+            self.lut_config.path.phase, reset_cached_result=True
+        )
+        self.lookup_tables.phase = convert_csv_to_lookup(
+            file_contents=phase_csv_file, lut_config=self.lut_config
+        )
 
 
-class I10Apple2(Apple2):
+class I10Apple2(Apple2[UndulatorPhaseAxes]):
+    """I10Apple2 device is an apple2 with extra jaw phase motor."""
+
     def __init__(
         self,
         id_gap: UndulatorGap,
@@ -119,11 +77,8 @@ class I10Apple2(Apple2):
         name: str = "",
     ) -> None:
         """
-        I10Apple2 device is an apple2 with extra jaw phase motor.
-
-        Parameters
-        ----------
-
+        Parameters:
+        ------------
         id_gap : UndulatorJawPhase
             The gap motor of the undulator.
         id_phase : UndulatorJawPhase
@@ -147,26 +102,22 @@ class I10Apple2Controller(Apple2Controller[I10Apple2]):
     def __init__(
         self,
         apple2: I10Apple2,
-        lookuptable_dir: str,
-        source: tuple[str, str],
         config_client: ConfigServer,
+        lut_config: LookupTableConfig,
         jaw_phase_limit: float = 12.0,
         jaw_phase_poly_param: list[float] = DEFAULT_JAW_PHASE_POLY_PARAMS,
         angle_threshold_deg=30.0,
         name: str = "",
     ) -> None:
         """
-
-        parameters
-        ----------
+        Parameters:
+        -----------
         apple2 : I10Apple2
             An I10Apple2 device.
-        lookuptable_dir : str
-            The path to look up table.
-        source : tuple[str, str]
-            The column name and the name of the source in look up table. e.g. ( "source", "idu")
         config_client : ConfigServer
             The config server client to fetch the look up table.
+        lut_config:
+            Configuration that defines where the lookup table is and how to read it.
         jaw_phase_limit : float, optional
             The maximum allowed jaw_phase movement., by default 12.0
         jaw_phase_poly_param : list[float], optional
@@ -178,8 +129,7 @@ class I10Apple2Controller(Apple2Controller[I10Apple2]):
         """
 
         self.lookup_table_client = I10EnergyMotorLookup(
-            lookuptable_dir=lookuptable_dir,
-            source=source,
+            lut_config=lut_config,
             config_client=config_client,
         )
         super().__init__(
