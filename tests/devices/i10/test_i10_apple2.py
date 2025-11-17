@@ -728,11 +728,14 @@ async def test_linear_arbitrary_run_engine_scan(
 
 
 def assert_lookup_table_matches_expected(
-    mock_config_client: ConfigServer,
-    lut_config: LookupTableConfig,
+    energy_motor_lut: EnergyMotorLookup,
     expected_dict_file_name: str,
 ) -> None:
-    lut = convert_csv_to_lookup(mock_config_client, lut_config)
+    if "gap" in expected_dict_file_name.lower():
+        lut_config = energy_motor_lut.lookup_tables.gap_config
+    else:
+        lut_config = energy_motor_lut.lookup_tables.phase_config
+    lut = convert_csv_to_lookup(energy_motor_lut.config_client, lut_config)
     with open(expected_dict_file_name, "rb") as f:
         expected_lut = LookupTable(json.load(f))
 
@@ -750,13 +753,8 @@ def test_i10_energy_motor_lookup_idu_convert_csv_to_lookup_success(
     mock_i10_energy_motor_lookup_idu: EnergyMotorLookup,
     expected_dict_file_name: str,
 ):
-    if "gap" in expected_dict_file_name.lower():
-        config = mock_i10_energy_motor_lookup_idu.lookup_tables.gap_config
-    else:
-        config = mock_i10_energy_motor_lookup_idu.lookup_tables.phase_config
     assert_lookup_table_matches_expected(
-        mock_i10_energy_motor_lookup_idu.config_client,
-        config,
+        mock_i10_energy_motor_lookup_idu,
         expected_dict_file_name,
     )
 
@@ -772,13 +770,8 @@ def test_i10_energy_motor_lookup_idd_convert_csv_to_lookup_success(
     mock_i10_energy_motor_lookup_idd: EnergyMotorLookup,
     expected_dict_file_name: str,
 ):
-    if "gap" in expected_dict_file_name.lower():
-        config = mock_i10_energy_motor_lookup_idd.lookup_tables.gap_config
-    else:
-        config = mock_i10_energy_motor_lookup_idd.lookup_tables.phase_config
     assert_lookup_table_matches_expected(
-        mock_i10_energy_motor_lookup_idd.config_client,
-        config,
+        mock_i10_energy_motor_lookup_idd,
         expected_dict_file_name,
     )
 
