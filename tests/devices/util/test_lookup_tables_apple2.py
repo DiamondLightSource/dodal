@@ -31,10 +31,9 @@ def test_generate_lookup_table_structure_and_poly():
     assert entry.limit.minimum == pytest.approx(min_e)
     assert entry.limit.maximum == pytest.approx(max_e)
 
-    energy_key = f"{min_e}"
-    assert energy_key in entry.energies.root
+    assert min_e in entry.energies.root
 
-    ec = entry.energies.root[energy_key]
+    ec = entry.energies.root[min_e]
     assert ec.low == pytest.approx(min_e)
     assert ec.high == pytest.approx(max_e)
 
