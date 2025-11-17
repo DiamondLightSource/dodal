@@ -70,7 +70,7 @@ class I10Apple2Controller(Apple2Controller[I10Apple2]):
     def __init__(
         self,
         apple2: I10Apple2,
-        lookup_table_client: EnergyMotorLookup,
+        energy_motor_lut: EnergyMotorLookup,
         jaw_phase_limit: float = 12.0,
         jaw_phase_poly_param: list[float] = DEFAULT_JAW_PHASE_POLY_PARAMS,
         angle_threshold_deg=30.0,
@@ -81,10 +81,8 @@ class I10Apple2Controller(Apple2Controller[I10Apple2]):
         -----------
         apple2 : I10Apple2
             An I10Apple2 device.
-        config_client : ConfigServer
-            The config server client to fetch the look up table.
-        lut_config:
-            Configuration that defines where the lookup table is and how to read it.
+        energy_motor_lut: EnergyMotorLookup
+            The class that handles the look up table logic for the insertion device.
         jaw_phase_limit : float, optional
             The maximum allowed jaw_phase movement., by default 12.0
         jaw_phase_poly_param : list[float], optional
@@ -95,10 +93,10 @@ class I10Apple2Controller(Apple2Controller[I10Apple2]):
             New device name.
         """
 
-        self.lookup_table_client = lookup_table_client
+        self.energy_motor_lut = energy_motor_lut
         super().__init__(
             apple2=apple2,
-            energy_to_motor_converter=self.lookup_table_client.get_motor_from_energy,
+            energy_to_motor_converter=self.energy_motor_lut.get_motor_from_energy,
             name=name,
         )
 

@@ -137,10 +137,11 @@ def convert_csv_to_lookup(
 
     Parameters:
     -----------
-    file_contents:
-        The CSV file content as a string.
+    config_client:
+        The client that is able to retrieve the file contents.
     lut_config:
-        The configuration that defines how to read the file_contents into a LookupTable
+        The configuration that defines which file to read for the config_client and how
+        to process the file contents into a LookupTable.
     skip_line_start_with
         Lines beginning with this prefix are skipped (default "#").
 
@@ -303,12 +304,14 @@ def make_phase_tables(
 
 class EnergyMotorLookup:
     """
-    Base for energy->motor lookup.
+    Handles lookup tables for Apple2 ID, converting energy and polarisation to gap
+    and phase. Fetches and parses lookup tables from a config server, supports dynamic
+    updates, and validates input. If custom logic is required for lookup tables, sub
+    classes should override the _update_gap_lut and _update_phase_lut methods.
 
-    Subclasses should implement `update_lookuptable()` to populate `self.lookup_tables`
-    from the configured file sources. After update_lookuptable() has populated the
-    'gap' and 'phase' tables, `get_motor_from_energy()` can be used to compute
-    (gap, phase) for a requested (energy, pol) pair.
+    After update_lookuptable() has populated the 'gap' and 'phase' tables,
+    `get_motor_from_energy()` can be used to compute (gap, phase) for a requested
+    (energy, pol) pair.
     """
 
     def __init__(

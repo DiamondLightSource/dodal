@@ -198,7 +198,7 @@ async def mock_id_controller(
     async with init_devices(mock=True):
         mock_id_controller = I10Apple2Controller(
             apple2=mock_id,
-            lookup_table_client=mock_i10_energy_motor_lookup_idu,
+            energy_motor_lut=mock_i10_energy_motor_lookup_idu,
         )
     set_mock_value(mock_id_controller.apple2().gap().gate, UndulatorGateStatus.CLOSE)
     set_mock_value(mock_id_controller.apple2().phase().gate, UndulatorGateStatus.CLOSE)
@@ -791,10 +791,10 @@ async def test_fail_i10_energy_motor_lookup_outside_energy_limits(
     with pytest.raises(ValueError) as e:
         await mock_id_controller.energy.set(energy)
     assert str(e.value) == "Demanding energy must lie between {} and {} eV!".format(
-        mock_id_controller.lookup_table_client.lookup_tables.gap.root[
+        mock_id_controller.energy_motor_lut.lookup_tables.gap.root[
             await mock_id_controller.polarisation_setpoint.get_value()
         ].limit.minimum,
-        mock_id_controller.lookup_table_client.lookup_tables.gap.root[
+        mock_id_controller.energy_motor_lut.lookup_tables.gap.root[
             await mock_id_controller.polarisation_setpoint.get_value()
         ].limit.maximum,
     )
@@ -803,9 +803,9 @@ async def test_fail_i10_energy_motor_lookup_outside_energy_limits(
 async def test_fail_i10_energy_motor_lookup_with_lookup_gap(
     mock_id_controller: I10Apple2Controller,
 ):
-    mock_id_controller.lookup_table_client.update_lookuptables()
+    mock_id_controller.energy_motor_lut.update_lookuptables()
     # make gap in energy
-    mock_id_controller.lookup_table_client.lookup_tables.gap.root[
+    mock_id_controller.energy_motor_lut.lookup_tables.gap.root[
         Pol.LH
     ].energies = EnergyCoverage(
         {
@@ -816,7 +816,7 @@ async def test_fail_i10_energy_motor_lookup_with_lookup_gap(
             )
         }
     )
-    mock_id_controller.lookup_table_client.lookup_tables.gap.root[
+    mock_id_controller.energy_motor_lut.lookup_tables.gap.root[
         Pol.LH
     ].energies = EnergyCoverage(
         {

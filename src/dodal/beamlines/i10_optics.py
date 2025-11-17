@@ -122,7 +122,7 @@ def idd() -> I10Apple2:
 def idd_controller() -> I10Apple2Controller:
     """I10 downstream insertion device controller."""
     source = ("Source", "idd")
-    idd_lookup_table_client = EnergyMotorLookup(
+    idd_energy_motor_lut = EnergyMotorLookup(
         config_client=I10_CONF_CLIENT,
         gap_lut_config=LookupTableConfig(
             source=source, path=default_gap_file(LOOK_UPTABLE_DIR)
@@ -131,9 +131,7 @@ def idd_controller() -> I10Apple2Controller:
             source=source, path=default_phase_file(LOOK_UPTABLE_DIR)
         ),
     )
-    return I10Apple2Controller(
-        apple2=idd(), lookup_table_client=idd_lookup_table_client
-    )
+    return I10Apple2Controller(apple2=idd(), energy_motor_lut=idd_energy_motor_lut)
 
 
 @device_factory()
@@ -193,7 +191,7 @@ def idu() -> I10Apple2:
 def idu_controller() -> I10Apple2Controller:
     """I10 upstream insertion device controller."""
     source = ("Source", "idu")
-    idu_lookup_table_client = EnergyMotorLookup(
+    idu_energy_motor_lut = EnergyMotorLookup(
         config_client=I10_CONF_CLIENT,
         gap_lut_config=LookupTableConfig(
             source=source, path=default_gap_file(LOOK_UPTABLE_DIR)
@@ -202,9 +200,7 @@ def idu_controller() -> I10Apple2Controller:
             source=source, path=default_phase_file(LOOK_UPTABLE_DIR)
         ),
     )
-    return I10Apple2Controller(
-        apple2=idd(), lookup_table_client=idu_lookup_table_client
-    )
+    return I10Apple2Controller(apple2=idd(), energy_motor_lut=idu_energy_motor_lut)
 
 
 @device_factory()
