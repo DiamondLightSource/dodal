@@ -112,6 +112,15 @@ async def test_given_aperture_scatterguard_not_parked_when_set_to_out_position_t
             ap_sg.return_value.selected_aperture.get_value.return_value = position  # type: ignore
             with pytest.raises(ValueError):
                 await scintillator.selected_pos.set(InOut.OUT)
+
+
+async def test_given_aperture_scatterguard_not_parked_when_set_to_in_position_then_exception_raised(
+    scintillator_and_ap_sg: tuple[Scintillator, ApertureScatterguard],
+):
+    for position in ApertureValue:
+        if position != ApertureValue.PARKED:
+            scintillator, ap_sg = scintillator_and_ap_sg
+            ap_sg.return_value.selected_aperture.get_value.return_value = position  # type: ignore
             with pytest.raises(ValueError):
                 await scintillator.selected_pos.set(InOut.IN)
 
