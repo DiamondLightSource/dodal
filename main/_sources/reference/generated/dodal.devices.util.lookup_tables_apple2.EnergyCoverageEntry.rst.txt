@@ -38,6 +38,9 @@ dodal.devices.util.lookup\_tables\_apple2.EnergyCoverageEntry
       
       
       
+      
+      ~EnergyCoverageEntry.validate_and_convert_poly
+      
    
    
 
