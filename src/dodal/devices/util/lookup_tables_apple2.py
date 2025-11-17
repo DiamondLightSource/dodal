@@ -65,7 +65,6 @@ MODE_NAME_CONVERT = {"CR": "pc", "CL": "nc"}
 
 
 class LookupTableConfig(BaseModel):
-    path: Path
     source: tuple[str, str] | None = None
     mode: str = "Mode"
     min_energy: str = "MinEnergy"
@@ -116,14 +115,11 @@ class LookupTable(RootModel[dict[Pol, LookupTableEntries]]):
 
 class GapPhaseLookupTables(BaseModel):
     gap: LookupTable = Field(default_factory=lambda: LookupTable())
-    gap_config: LookupTableConfig
-
     phase: LookupTable = Field(default_factory=lambda: LookupTable())
-    phase_config: LookupTableConfig
 
 
 def convert_csv_to_lookup(
-    config_client: ConfigServer,
+    file_contents: str,
     lut_config: LookupTableConfig,
     skip_line_start_with: str = "#",
 ) -> LookupTable:
@@ -181,9 +177,6 @@ def convert_csv_to_lookup(
         )
         return lut
 
-    file_contents = config_client.get_file_contents(
-        lut_config.path, reset_cached_result=True
-    )
     reader = csv.DictReader(read_file_and_skip(file_contents, skip_line_start_with))
     lut = LookupTable()
 
@@ -312,8 +305,9 @@ class EnergyMotorLookup:
     def __init__(
         self,
         config_client: ConfigServer,
-        gap_lut_config: LookupTableConfig,
-        phase_lut_config: LookupTableConfig,
+        lut_config: LookupTableConfig,
+        gap_path: Path,
+        phase_path: Path,
     ):
         """Initialise the EnergyMotorLookup class with lookup table headers provided.
 
@@ -325,10 +319,11 @@ class EnergyMotorLookup:
         config_client:
             The config server client to fetch the look up table.
         """
-        self.lookup_tables = GapPhaseLookupTables(
-            gap_config=gap_lut_config, phase_config=phase_lut_config
-        )
+        self.lookup_tables = GapPhaseLookupTables()
         self.config_client = config_client
+        self.lut_config = lut_config
+        self.gap_path = gap_path
+        self.phase_path = phase_path
         self._available_pol = []
 
     @property
@@ -340,14 +335,20 @@ class EnergyMotorLookup:
         self._available_pol = value
 
     def _update_gap_lut(self) -> None:
+        file_contents = self.config_client.get_file_contents(
+            self.gap_path, reset_cached_result=True
+        )
         self.lookup_tables.gap = convert_csv_to_lookup(
-            config_client=self.config_client, lut_config=self.lookup_tables.gap_config
+            file_contents, lut_config=self.lut_config
         )
         self.available_pol = list(self.lookup_tables.gap.root.keys())
 
     def _update_phase_lut(self) -> None:
+        file_contents = self.config_client.get_file_contents(
+            self.phase_path, reset_cached_result=True
+        )
         self.lookup_tables.phase = convert_csv_to_lookup(
-            config_client=self.config_client, lut_config=self.lookup_tables.phase_config
+            file_contents, lut_config=self.lut_config
         )
 
     def update_lookuptables(self):
