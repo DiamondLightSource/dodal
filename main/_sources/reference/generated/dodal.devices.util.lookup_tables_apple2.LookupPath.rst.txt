@@ -8,6 +8,37 @@ dodal.devices.util.lookup\_tables\_apple2.LookupPath
 
    
    
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      ~LookupPath.create
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
    
 
    
@@ -16,6 +47,13 @@ dodal.devices.util.lookup\_tables\_apple2.LookupPath
 
    .. autosummary::
    
+      
+      
+      ~LookupPath.model_config
+      
+      
+      
+      
       
       ~LookupPath.gap
       

@@ -1,0 +1,61 @@
+dodal.devices.util.lookup\_tables\_apple2.GapPhaseLookupTable
+=============================================================
+
+.. currentmodule:: dodal.devices.util.lookup_tables_apple2
+
+.. autoclass:: GapPhaseLookupTable
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      ~GapPhaseLookupTable.model_config
+      
+      
+      
+      
+      
+      ~GapPhaseLookupTable.gap
+      
+      
+      ~GapPhaseLookupTable.phase
+      
+   
+   

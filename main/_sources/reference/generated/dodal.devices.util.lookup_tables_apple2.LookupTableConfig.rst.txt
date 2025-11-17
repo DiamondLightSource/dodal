@@ -8,6 +8,34 @@ dodal.devices.util.lookup\_tables\_apple2.LookupTableConfig
 
    
    
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
    
 
    
@@ -16,6 +44,13 @@ dodal.devices.util.lookup\_tables\_apple2.LookupTableConfig
 
    .. autosummary::
    
+      
+      
+      ~LookupTableConfig.model_config
+      
+      
+      
+      
       
       ~LookupTableConfig.path
       
@@ -33,6 +68,9 @@ dodal.devices.util.lookup\_tables\_apple2.LookupTableConfig
       
       
       ~LookupTableConfig.poly_deg
+      
+      
+      ~LookupTableConfig.mode_name_convert
       
    
    

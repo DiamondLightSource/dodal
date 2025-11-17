@@ -34,6 +34,9 @@ dodal.devices.util.lookup\_tables\_apple2.EnergyCoverageEntry
       
       
       
+      ~EnergyCoverageEntry.serialize_poly
+      
+      
       
    
    
