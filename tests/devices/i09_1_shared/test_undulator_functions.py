@@ -15,9 +15,9 @@ async def lut_dictionary() -> dict:
 @pytest.mark.parametrize(
     "energy, order, expected_gap",
     [
-        (2.13, 1, 12.81),
-        (2.78, 3, 6.05),
-        (6.24, 5, 7.96),
+        (2.13, 1, 12.8146),
+        (2.78, 3, 6.0537),
+        (6.24, 5, 7.9561),
     ],
 )
 async def test_calculate_gap_from_energy(
@@ -27,16 +27,16 @@ async def test_calculate_gap_from_energy(
     lut_dictionary: dict,
 ):
     assert calculate_gap_i09_hu(energy, lut_dictionary, order) == pytest.approx(
-        expected_gap, abs=0.005
+        expected_gap, abs=0.0001
     )
 
 
 @pytest.mark.parametrize(
     "energy, order, gap",
     [
-        (2.145, 1, 12.91),
-        (2.64, 3, 5.75),
-        (6.135, 5, 7.84),
+        (2.1454, 1, 12.91),
+        (2.6410, 3, 5.75),
+        (6.1355, 5, 7.84),
     ],
 )
 async def test_calculate_energy_from_gap(
@@ -46,7 +46,7 @@ async def test_calculate_energy_from_gap(
     lut_dictionary: dict,
 ):
     assert calculate_energy_i09_hu(gap, lut_dictionary, order) == pytest.approx(
-        energy, abs=0.005
+        energy, abs=0.0001
     )
 
 
