@@ -55,3 +55,28 @@ def count(
     metadata = metadata or {}
     metadata["shape"] = (num,)
     yield from bp.count(tuple(detectors), num, delay=delay, md=metadata)
+
+
+@attach_data_session_metadata_decorator()
+@validate_call(config={"arbitrary_types_allowed": True})
+def list_scan(
+    detectors: Annotated[
+        set[Readable] | list[Readable],
+        Field(
+            description="Set of readable devices, will take a reading at each point",
+            min_length=1,
+        ),
+    ],
+    args: Annotated[
+        tuple,
+        Field(
+            description="For one or more dimensions, 'motor1, [point1, point2, ...], \
+              ..., motorN, [point1, point2, ...]'. Motors can be any 'settable' object \
+              (motor, temp controller, etc.)"
+        ),
+    ],
+    metadata: dict[str, Any] | None = None,
+) -> MsgGenerator:
+    """Scan over one or more variables in steps simultaneously (inner product)."""
+    metadata = metadata or {}
+    yield from bp.list_scan(tuple(detectors), *args, md=metadata)

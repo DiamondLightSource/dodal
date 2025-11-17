@@ -1,9 +1,10 @@
 from collections.abc import Sequence
-from typing import cast
+from typing import Any, cast
 
 import pytest
 from bluesky.protocols import Readable
 from bluesky.run_engine import RunEngine
+from bluesky.utils import FailedStatus
 from event_model.documents import (
     Document,
     Event,
@@ -17,7 +18,8 @@ from ophyd_async.core import (
 )
 from pydantic import ValidationError
 
-from dodal.plans.wrapped import count
+from dodal.devices.motors import Motor
+from dodal.plans.wrapped import count, list_scan
 
 
 @pytest.fixture
@@ -157,3 +159,44 @@ def test_plan_produces_expected_datums(
     docs = documents_from_num.get("stream_datum")
     data_keys = [det.name, f"{det.name}-sum"]
     assert docs and len(docs) == len(data_keys) * length
+
+
+@pytest.mark.parametrize("x_list", ([1, 2, 3], [1, 2, 3, 4, 5], [1.1, 2.2, 3.3]))
+def test_list_scan(
+    run_engine: RunEngine, det: StandardDetector, x_axis: Motor, x_list: list[Any]
+):
+    run_engine(list_scan(detectors={det}, args=(x_axis, x_list)))
+
+
+@pytest.mark.parametrize(
+    "x_list, y_list",
+    (
+        [[1, 2, 3], [4, 5, 6]],
+        [[1, 2, 3, 4, 5], [4, 5, 6, 7, 8]],
+        [[1.1, 2.2, 3.3], [4.4, 5.5, 6.6]],
+    ),
+)
+def test_list_scan_n_motors(
+    run_engine: RunEngine,
+    det: StandardDetector,
+    x_axis: Motor,
+    x_list: list[Any],
+    y_axis: Motor,
+    y_list: list[Any],
+):
+    run_engine(list_scan(detectors={det}, args=(x_axis, x_list, y_axis, y_list)))
+
+
+def test_list_scan_fails_when_given_bad_info(
+    run_engine: RunEngine, det: StandardDetector, x_axis: Motor
+):
+    with pytest.raises(FailedStatus):
+        run_engine(
+            list_scan(
+                detectors={det},
+                args=(
+                    x_axis,
+                    ["one"],
+                ),
+            )
+        )
