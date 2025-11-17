@@ -9,6 +9,7 @@ from ophyd_async.core import (
     StandardReadable,
     StandardReadableFormat,
     derived_signal_rw,
+    soft_signal_rw,
 )
 
 from dodal.devices.common_dcm import DoubleCrystalMonochromatorBase
@@ -37,9 +38,12 @@ class HardInsertionDeviceEnergy(StandardReadable, Movable[float]):
         self._lut = lut
         self.gap_to_energy_func = gap_to_energy_func
         self.energy_to_gap_func = energy_to_gap_func
+        self._undulator_order = Reference(undulator_order)
+        self._undulator = Reference(undulator)
+
+        self.add_readables([undulator_order, undulator.current_gap])
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
-            self._undulator_order = Reference(undulator_order)
-            self._undulator = Reference(undulator)
+            self.energy_demand = soft_signal_rw(float)
             self.energy = derived_signal_rw(
                 raw_to_derived=self._read_energy,
                 set_derived=self._set_energy,
@@ -74,6 +78,7 @@ class HardInsertionDeviceEnergy(StandardReadable, Movable[float]):
 
     @AsyncStatus.wrap
     async def set(self, value: float) -> None:
+        self.energy_demand.set(value)
         await self.energy.set(value)
 
 
