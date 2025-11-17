@@ -1,3 +1,4 @@
+import json
 import os
 from collections.abc import Mapping
 from unittest import mock
@@ -691,8 +692,6 @@ def assert_lookup_table_matches_expected(
     file_name: str,
     expected_dict_file_name: str,
 ) -> None:
-    import json
-
     file_contents = energy_motor_lookup.config_client.get_file_contents(
         file_path=file_name, reset_cached_result=True
     )
@@ -704,11 +703,6 @@ def assert_lookup_table_matches_expected(
         expected_lut = LookupTable(json.load(f))
 
     assert lut == expected_lut
-
-    # with open(expected_dict_file_name.replace(".pkl", ".json"), "w") as f:
-    #     import json
-
-    #     json.dump(expected_lut.model_dump(), f, indent=4)
 
 
 @pytest.mark.parametrize(
