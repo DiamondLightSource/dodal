@@ -125,7 +125,6 @@ class EnergyCoverageEntry(BaseModel):
         """Allow np.poly1d to work when serializing."""
         return value.coefficients.tolist()
 
-
 class EnergyCoverage(RootModel[dict[float, EnergyCoverageEntry]]):
     pass
 
