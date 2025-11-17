@@ -62,9 +62,8 @@ def test_make_phase_tables_multiple_entries():
         assert entry.limit.minimum == pytest.approx(min_energies[i])
         assert entry.limit.maximum == pytest.approx(max_energies[i])
 
-        energy_key = f"{min_energies[i]}"
-        assert energy_key in entry.energies.root
-        poly = entry.energies.root[energy_key].poly
+        assert min_energies[i] in entry.energies.root
+        poly = entry.energies.root[min_energies[i]].poly
         assert isinstance(poly, np.poly1d)
 
         test_energy = (min_energies[i] + max_energies[i]) / 2.0
