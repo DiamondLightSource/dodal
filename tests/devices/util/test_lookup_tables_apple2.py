@@ -1,4 +1,3 @@
-from pathlib import Path
 from unittest.mock import MagicMock
 
 import numpy as np
@@ -11,7 +10,6 @@ from dodal.devices.util.lookup_tables_apple2 import (
     LookupTableConfig,
     convert_csv_to_lookup,
     generate_lookup_table,
-    get_poly,
     make_phase_tables,
     read_file_and_skip,
 )
@@ -85,9 +83,6 @@ class DummyEnergyMotorLookup(EnergyMotorLookup):
         )
         self.available_pol = list(self.lookup_tables.gap.root.keys())
 
-    def _update_phase_lut(self):
-        pass
-
 
 @pytest.fixture
 def lut_config() -> LookupTableConfig:
@@ -123,21 +118,23 @@ def dummy_energy_motor_lookup(
     return DummyEnergyMotorLookup(
         config_client=mock_config_client,
         lut_config=lut_config,
-        gap_path=Path("dummy"),
-        phase_path=Path("dummy"),
+        gap_path=None,
+        phase_path=None,
     )
 
 
 def test_energy_motor_lookup_with_phase_path_none(
     dummy_energy_motor_lookup: DummyEnergyMotorLookup,
 ) -> None:
-    dummy_energy_motor_lookup.update_lookuptables()
+    with pytest.raises(RuntimeError, match="Phase path is not provided"):
+        dummy_energy_motor_lookup.update_lookuptables()
 
-    assert dummy_energy_motor_lookup.available_pol == [Pol.LH.value]
 
-    poly = get_poly(150.0, Pol.LH, dummy_energy_motor_lookup.lookup_tables.gap)
-    assert isinstance(poly, np.poly1d)
-    assert poly(150.0) == pytest.approx(np.poly1d([2.0, -1.0, 0.5])(150.0))
+def test_energy_motor_lookup_with_gap_path_none(
+    dummy_energy_motor_lookup: DummyEnergyMotorLookup,
+) -> None:
+    with pytest.raises(RuntimeError, match="Phase path is not provided"):
+        dummy_energy_motor_lookup.update_lookuptables()
 
 
 def test_read_file_and_skip_basic() -> None:

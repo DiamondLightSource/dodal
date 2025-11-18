@@ -127,6 +127,16 @@ def test_j09_energy_motor_lookup_convert_csv_to_lookup_success(
     assert data == loaded_dict
 
 
+def test_j09_energy_motor_lookup_fail_with_phase_path(
+    mock_j09_energy_motor_lookup: J09EnergyMotorLookup,
+):
+    mock_j09_energy_motor_lookup.phase_path = Path("some/fake/path")
+    with pytest.raises(FileNotFoundError):
+        mock_j09_energy_motor_lookup._update_phase_lut()
+    data = mock_j09_energy_motor_lookup.lookup_tables.phase
+    assert data == LookupTable()
+
+
 def test_j09_energy_motor_lookup_update_lookuptables(
     mock_j09_energy_motor_lookup: J09EnergyMotorLookup,
 ):
