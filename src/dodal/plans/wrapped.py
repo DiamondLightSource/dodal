@@ -3,6 +3,7 @@ from collections.abc import Sequence
 from typing import Annotated, Any
 
 import bluesky.plans as bp
+import numpy as np
 from bluesky.protocols import Movable, Readable
 from ophyd_async.core import AsyncReadable
 from pydantic import Field, NonNegativeFloat, validate_call
@@ -67,15 +68,15 @@ def _make_args(
 ):
     movers_len = len(movers)
     params_len = len(params)
-    if params_len % movers_len != 0 or params_len % num_params != 0:
-        raise ValueError(f"params must contain {num_params} values for each movable")
-
     args = []
-    it = iter(params)
-    param_chunks = iter(lambda: tuple(itertools.islice(it, num_params)), ())
-    for movable, param_chunk in zip(movers, param_chunks, strict=False):
-        args.append(movable)
-        args.extend(param_chunk)
+    if params_len % movers_len == 0 and params_len % num_params == 0:
+        it = iter(params)
+        param_chunks = iter(lambda: tuple(itertools.islice(it, num_params)), ())
+        for movable, param_chunk in zip(movers, param_chunks, strict=False):
+            args.append(movable)
+            args.extend(param_chunk)
+    else:
+        raise ValueError(f"params must contain {num_params} values for each movable")
     return args
 
 
@@ -160,8 +161,8 @@ def grid_num_scan(
     params: Annotated[
         Sequence[float | int],
         Field(
-            description="Start and stop points for each movable, 'start1, stop1, ...,"
-            "startN, stopN' for every movable in `movers`."
+            description="Start and stop and number of points for each movable, 'start1,"
+            "stop1, num1, ..., startN, stopN, numN' for every movable in `movers`."
         ),
     ],
     snake_axes: list | bool | None = None,
@@ -191,8 +192,8 @@ def grid_num_rscan(
     params: Annotated[
         Sequence[float | int],
         Field(
-            description="Start and stop points for each movable, 'start1, stop1, ...,"
-            "startN, stopN' for every movable in `movers`."
+            description="Start and stop and number of points for each movable, 'start1,"
+            "stop1, num1, ..., startN, stopN, numN' for every movable in `movers`."
         ),
     ],
     snake_axes: list | bool | None = None,
@@ -233,8 +234,6 @@ def list_scan(
     """Scan over one or more variables in steps simultaneously.
     Wraps bluesky.plans.list_scan(det, *args, md=metadata)."""
     metadata = metadata or {}
-    shape = [len(positions) for positions in params]
-    metadata["shape"] = (shape,)
     args = _make_args(movers=movers, params=params, num_params=1)
     yield from bp.list_scan(tuple(detectors), *args, md=metadata)
 
@@ -265,8 +264,6 @@ def list_rscan(
     """Scan over one or more variables simultaneously relative to current position.
     Wraps bluesky.plans.rel_list_scan(det, *args, md=metadata)."""
     metadata = metadata or {}
-    shape = [len(positions) for positions in params]
-    metadata["shape"] = (shape,)
     args = _make_args(movers=movers, params=params, num_params=1)
     yield from bp.rel_list_scan(tuple(detectors), *args, md=metadata)
 
@@ -298,8 +295,6 @@ def list_grid_scan(
     """Scan over one or more variables for each given point on independent trajectories.
     Wraps bluesky.plans.list_grid_scan(det, *args, md=metadata)."""
     metadata = metadata or {}
-    shape = [len(positions) for positions in params]
-    metadata["shape"] = (shape,)
     args = _make_args(movers=movers, params=params, num_params=1)
     yield from bp.list_grid_scan(
         tuple(detectors), *args, snake_axes=snake_axes, md=metadata
@@ -333,9 +328,218 @@ def list_grid_rscan(
     """Scan over some variables for each given point relative to current position.
     Wraps bluesky.plans.rel_list_grid_scan(det, *args, md=metadata)."""
     metadata = metadata or {}
-    shape = [len(positions) for positions in params]
-    metadata["shape"] = (shape,)
     args = _make_args(movers=movers, params=params, num_params=1)
+    yield from bp.rel_list_grid_scan(
+        tuple(detectors), *args, snake_axes=snake_axes, md=metadata
+    )
+
+
+def _make_stepped_list(
+    params: list[Any] | Sequence[Any],
+    num: int | None = None,
+):
+    start = params[0]
+    if len(params) == 3:
+        stop = params[1]
+        step = params[2]
+        stepped_list = np.arange(start=start, stop=stop, step=step).tolist()
+        if abs((stepped_list[-1] + step) - stop) <= (step * 0.01):
+            stepped_list.append(stepped_list[-1] + step)
+    elif len(params) == 2 and num:
+        step = params[1]
+        stepped_list = [start + (n * step) for n in range(num)]
+    else:
+        stepped_list = []
+    return stepped_list
+
+
+def _make_concurrently_stepped_lists(
+    movers_len: int,
+    params: list[Any] | Sequence[Any],
+):
+    # separate out the first three elements
+    # separate the rest of the elements into chunks of two
+    stepped_lists = []
+    params_len = len(params)
+    if movers_len == 1 and params_len == 3:
+        stepped_lists.append(_make_stepped_list(params))
+    elif movers_len > 1 and (params_len - 3) % 2 == 0:
+        leader_params = params[:3]
+        follower_params = params[3:]
+        stepped_lists.append(_make_stepped_list(leader_params))
+        num = len(stepped_lists[0])
+        it = iter(follower_params)
+        param_chunks = iter(lambda: tuple(itertools.islice(it, 2)), ())
+        for param_chunk in param_chunks:
+            stepped_lists.append(_make_stepped_list(param_chunk, num=num))
+    else:
+        raise ValueError(
+            "params must contain 3 values for the first movable and 2 values for each "
+            "successive movable."
+        )
+    return stepped_lists
+
+
+def _make_independently_stepped_lists(
+    movers_len: int,
+    params: list[Any] | Sequence[Any],
+):
+    num_params = 3  # It will always be start stop step for each axis
+    stepped_lists = []
+    params_len = len(params)
+    if params_len % movers_len == 0 and params_len % num_params == 0:
+        it = iter(params)
+        param_chunks = iter(lambda: tuple(itertools.islice(it, num_params)), ())
+        for param_chunk in param_chunks:
+            stepped_lists.append(_make_stepped_list(param_chunk))
+    else:
+        raise ValueError(f"params must contain {num_params} values for each movable")
+    return stepped_lists
+
+
+@attach_data_session_metadata_decorator()
+@validate_call(config={"arbitrary_types_allowed": True})
+def step_scan(
+    detectors: Annotated[
+        Sequence[Readable | AsyncReadable],
+        Field(
+            description="Set of readable devices, will take a reading at each point",
+            min_length=1,
+        ),
+    ],
+    movers: Annotated[
+        Sequence[Movable | Motor],
+        Field(description="One or more movable to move during the scan."),
+    ],
+    params: Annotated[
+        list[Any],
+        Field(
+            description="Start, stop, and step values for the first movable, and start "
+            "and step values for each successive movable, 'start1, stop1, step1, "
+            "start2, step 2, ..., startN, stepN' for every movable in `movers`."
+        ),
+    ],
+    metadata: dict[str, Any] | None = None,
+) -> MsgGenerator:
+    """Scan over one multi-motor trajectory with specified step size.
+    Generates lists of points for each trajectory for bp.list_scan.
+    """
+    movers_len = len(movers)
+    stepped_lists = _make_concurrently_stepped_lists(
+        movers_len=movers_len, params=params
+    )
+    metadata = metadata or {}
+    args = _make_args(movers=movers, params=stepped_lists, num_params=1)
+    yield from bp.list_scan(tuple(detectors), *args, md=metadata)
+
+
+@attach_data_session_metadata_decorator()
+@validate_call(config={"arbitrary_types_allowed": True})
+def step_rscan(
+    detectors: Annotated[
+        Sequence[Readable | AsyncReadable],
+        Field(
+            description="Set of readable devices, will take a reading at each point",
+            min_length=1,
+        ),
+    ],
+    movers: Annotated[
+        Sequence[Movable | Motor],
+        Field(description="One or more movable to move during the scan."),
+    ],
+    params: Annotated[
+        list[Any],
+        Field(
+            description="Start, stop, and step values for the first movable, and start "
+            "and step values for each successive movable, 'start1, stop1, step1, "
+            "start2, step 2, ..., startN, stepN' for every movable in `movers`."
+        ),
+    ],
+    metadata: dict[str, Any] | None = None,
+) -> MsgGenerator:
+    """Scan over multi-motor trajectory relative to position with specified step size.
+    Generates lists of points for each trajectory for bp.rel_list_scan.
+    """
+    movers_len = len(movers)
+    stepped_lists = _make_concurrently_stepped_lists(
+        movers_len=movers_len, params=params
+    )
+    metadata = metadata or {}
+    args = _make_args(movers=movers, params=stepped_lists, num_params=1)
+    yield from bp.rel_list_scan(tuple(detectors), *args, md=metadata)
+
+
+@attach_data_session_metadata_decorator()
+@validate_call(config={"arbitrary_types_allowed": True})
+def step_grid_scan(
+    detectors: Annotated[
+        Sequence[Readable | AsyncReadable],
+        Field(
+            description="Set of readable devices, will take a reading at each point",
+            min_length=1,
+        ),
+    ],
+    movers: Annotated[
+        Sequence[Movable | Motor],
+        Field(description="One or more movable to move during the scan."),
+    ],
+    params: Annotated[
+        list[Any],
+        Field(
+            description="Start, stop, and step values 'start1, stop1, step1, ..., "
+            "startN, stepN' for every movable in `movers`."
+        ),
+    ],
+    snake_axes: bool = False,  # Currently specifying axes to snake is not supported
+    metadata: dict[str, Any] | None = None,
+) -> MsgGenerator:
+    """Scan over independent multi-motor trajectories with specified step size.
+    Generates lists of points for each trajectory for bp.list_grid_scan.
+    """
+    movers_len = len(movers)
+    stepped_lists = _make_independently_stepped_lists(
+        movers_len=movers_len, params=params
+    )
+    metadata = metadata or {}
+    args = _make_args(movers=movers, params=stepped_lists, num_params=1)
+    yield from bp.list_grid_scan(
+        tuple(detectors), *args, snake_axes=snake_axes, md=metadata
+    )
+
+
+@attach_data_session_metadata_decorator()
+@validate_call(config={"arbitrary_types_allowed": True})
+def step_grid_rscan(
+    detectors: Annotated[
+        Sequence[Readable | AsyncReadable],
+        Field(
+            description="Set of readable devices, will take a reading at each point",
+            min_length=1,
+        ),
+    ],
+    movers: Annotated[
+        Sequence[Movable | Motor],
+        Field(description="One or more movable to move during the scan."),
+    ],
+    params: Annotated[
+        list[Any],
+        Field(
+            description="Start, stop, and step values 'start1, stop1, step1, ..., "
+            "startN, stepN' for every movable in `movers`."
+        ),
+    ],
+    snake_axes: bool = False,  # Currently specifying axes to snake is not supported
+    metadata: dict[str, Any] | None = None,
+) -> MsgGenerator:
+    """Scan over independent multi-motor relative trajectories with specified step size.
+    Generates lists of points for each trajectory for bp.rel_list_grid_scan.
+    """
+    movers_len = len(movers)
+    stepped_lists = _make_independently_stepped_lists(
+        movers_len=movers_len, params=params
+    )
+    metadata = metadata or {}
+    args = _make_args(movers=movers, params=stepped_lists, num_params=1)
     yield from bp.rel_list_grid_scan(
         tuple(detectors), *args, snake_axes=snake_axes, md=metadata
     )
