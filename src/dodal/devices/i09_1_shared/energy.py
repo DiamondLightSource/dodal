@@ -93,9 +93,9 @@ class HardEnergy(StandardReadable, Locatable[float]):
         undulator_energy: HardInsertionDeviceEnergy,
         name: str = "",
     ) -> None:
-        with self.add_children_as_readables():
-            self._dcm = Reference(dcm)
-            self._undulator_energy = Reference(undulator_energy)
+        self._dcm = Reference(dcm)
+        self._undulator_energy = Reference(undulator_energy)
+        self.add_readables([undulator_energy, dcm.energy_in_keV])
         super().__init__(name=name)
 
     @AsyncStatus.wrap

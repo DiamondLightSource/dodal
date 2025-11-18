@@ -10,7 +10,13 @@ from ophyd_async.testing import (
     set_mock_value,
 )
 
+from dodal.devices.common_dcm import (
+    DoubleCrystalMonochromatorWithDSpacing,
+    PitchAndRollCrystal,
+    StationaryCrystal,
+)
 from dodal.devices.i09_1_shared import (
+    HardEnergy,
     HardInsertionDeviceEnergy,
     calculate_gap_i09_hu,
     get_hu_lut_as_dict,
@@ -31,6 +37,16 @@ def undulator_order() -> UndulatorOrder:
         order = UndulatorOrder(name="undulator_order")
     set_mock_value(order.value, 3)
     return order
+
+
+@pytest.fixture
+async def dcm() -> DoubleCrystalMonochromatorWithDSpacing:
+    async with init_devices(mock=True):
+        dcm = DoubleCrystalMonochromatorWithDSpacing(
+            "TEST-MO-DCM-01:", PitchAndRollCrystal, StationaryCrystal
+        )
+    patch_all_motors(dcm)
+    return dcm
 
 
 @pytest.fixture
@@ -61,7 +77,24 @@ async def hu_id_energy(
     return hu
 
 
-async def test_reading_includes_read_fields(hu_id_energy: HardInsertionDeviceEnergy):
+@pytest.fixture
+async def hu_energy(
+    hu_id_energy: HardInsertionDeviceEnergy,
+    dcm: DoubleCrystalMonochromatorWithDSpacing,
+) -> HardEnergy:
+    async with init_devices(mock=True):
+        hu_energy_device = HardEnergy(
+            dcm=dcm,
+            undulator_energy=hu_id_energy,
+            name="hu_energy",
+        )
+    patch_all_motors(hu_energy_device)
+    return hu_energy_device
+
+
+async def test_hu_id_energy_reading_includes_read_fields(
+    hu_id_energy: HardInsertionDeviceEnergy,
+):
     await assert_reading(
         hu_id_energy,
         {
@@ -73,7 +106,7 @@ async def test_reading_includes_read_fields(hu_id_energy: HardInsertionDeviceEne
     )
 
 
-async def test_set_energy_fails(
+async def test_hu_id_energy_set_energy_fails(
     hu_id_energy: HardInsertionDeviceEnergy,
 ):
     value = 100.5
@@ -84,7 +117,7 @@ async def test_set_energy_fails(
         await hu_id_energy.set(value)
 
 
-async def test_energy_demand_initialised_correctly(
+async def test_hu_id_energy_energy_demand_initialised_correctly(
     hu_id_energy: HardInsertionDeviceEnergy,
     run_engine: RunEngine,
 ):
@@ -98,12 +131,12 @@ async def test_energy_demand_initialised_correctly(
 @pytest.mark.parametrize(
     "energy_value, order_value, expected_gap",
     [
-        (2.13, 1, 12.814),
-        (2.78, 3, 6.053),
-        (6.24, 5, 7.956),
+        (2.130, 1, 12.814),
+        (2.780, 3, 6.053),
+        (6.240, 5, 7.956),
     ],
 )
-async def test_set_energy_updates_gap(
+async def test_hu_id_energy_set_energy_updates_gap(
     run_engine: RunEngine,
     hu_id_energy: HardInsertionDeviceEnergy,
     energy_value: float,
@@ -120,3 +153,72 @@ async def test_set_energy_updates_gap(
         await hu_id_energy._undulator().gap_motor.user_readback.get_value()
         == pytest.approx(expected_gap, abs=0.001)
     )
+
+
+async def test_hu_energy_read_include_read_fields(
+    hu_energy: HardEnergy,
+):
+    await assert_reading(
+        hu_energy,
+        {
+            "dcm-energy_in_keV": partial_reading(0.0),
+            "hu_id_energy-energy": partial_reading(0.0),
+            "hu_id_energy-energy_demand": partial_reading(0.0),
+            "undulator_mm-current_gap": partial_reading(0.0),
+            "undulator_order-value": partial_reading(3.0),
+        },
+    )
+
+
+async def test_hu_energy_set_both_dcm_and_id_energy(
+    run_engine: RunEngine,
+    hu_energy: HardEnergy,
+):
+    energy_value = 3.1415
+    run_engine(mv(hu_energy, energy_value))
+    assert (
+        await hu_energy._undulator_energy().energy_demand.get_value()
+        == pytest.approx(energy_value, abs=0.00001)
+    )
+    assert (
+        await hu_energy._dcm().energy_in_keV.user_readback.get_value()
+        == pytest.approx(energy_value, abs=0.00001)
+    )
+
+
+@pytest.mark.parametrize(
+    "energy_value, order_value, expected_gap",
+    [
+        (2.781, 3, 6.055),
+        (6.241, 5, 7.957),
+    ],
+)
+async def test_hu_energy_set_moves_gap(
+    run_engine: RunEngine,
+    hu_energy: HardEnergy,
+    energy_value: float,
+    order_value: int,
+    expected_gap: float,
+):
+    await hu_energy._undulator_energy()._undulator_order().value.set(order_value)
+    assert (
+        await hu_energy._undulator_energy()._undulator_order().value.get_value()
+        == pytest.approx(order_value, abs=0.00001)
+    )
+    run_engine(mv(hu_energy, energy_value))
+    assert (
+        await hu_energy._undulator_energy()
+        ._undulator()
+        .gap_motor.user_readback.get_value()
+        == pytest.approx(expected_gap, abs=0.001)
+    )
+
+
+async def test_hu_energy_locate(
+    run_engine: RunEngine,
+    hu_energy: HardEnergy,
+):
+    energy_value = 3.1415
+    run_engine(mv(hu_energy, energy_value))
+    located_position = await hu_energy.locate()
+    assert located_position == {"readback": energy_value, "setpoint": energy_value}

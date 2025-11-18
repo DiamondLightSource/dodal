@@ -26,7 +26,7 @@ async def get_hu_lut_as_dict(lut_path: str) -> dict:
     )
     for i in range(_lookup_table.shape[0]):
         lut_dict[_lookup_table[i][0]] = _lookup_table[i]
-        LOGGER.debug(f"Loaded lookup table:\n {lut_dict}")
+        # LOGGER.debug(f"Loaded lookup table:\n {lut_dict}")
     return lut_dict
 
 
