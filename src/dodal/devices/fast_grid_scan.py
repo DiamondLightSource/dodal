@@ -318,7 +318,7 @@ class FastGridScanCommon(
             matcher.__name__ = "does_parameter_match"  # type: ignore # Remove when https://github.com/bluesky/ophyd-async/pull/1123 deployed
 
             set_statuses.append(
-                await set_and_wait_for_value(
+                set_and_wait_for_value(
                     signal,  # type: ignore
                     param_value,
                     match_value=matcher,
@@ -326,7 +326,7 @@ class FastGridScanCommon(
             )
 
         # Counter should always start at 0
-        set_statuses.append(await set_and_wait_for_value(self.position_counter, 0))
+        set_statuses.append(set_and_wait_for_value(self.position_counter, 0))
 
         LOGGER.info("Gridscan parameters applied, waiting for sets to complete...")
 
