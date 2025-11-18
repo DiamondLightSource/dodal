@@ -21,6 +21,9 @@ from pydantic import ValidationError
 from dodal.devices.motors import Motor
 from dodal.plans.wrapped import (
     _make_args,
+    _make_concurrently_stepped_lists,
+    _make_independently_stepped_lists,
+    _make_stepped_list,
     count,
     grid_num_rscan,
     grid_num_scan,
@@ -30,6 +33,10 @@ from dodal.plans.wrapped import (
     list_scan,
     num_rscan,
     num_scan,
+    step_grid_rscan,
+    step_grid_scan,
+    step_rscan,
+    step_scan,
 )
 
 
@@ -787,5 +794,193 @@ def test_list_grid_rscan_when_given_bad_info(
                 detectors=[det],
                 movers=[x_axis, y_axis],
                 params=[[1, 2, 3, 4, 5], ["one", 2, 3, 4, 5]],
+            )
+        )
+
+
+def test_make_stepped_list_when_given_three_params():
+    stepped_list = _make_stepped_list(params=[0, 1, 0.1])
+    assert len(stepped_list) == 11
+    assert stepped_list[0] == 0
+    assert stepped_list[-1] == 1
+
+
+def test_make_stepped_list_when_given_two_params():
+    stepped_list = _make_stepped_list(params=[0, 0.1], num=11)
+    assert len(stepped_list) == 11
+    assert stepped_list[0] == 0
+    assert stepped_list[-1] == 1
+
+
+def test_make_concurrently_stepped_lists():
+    stepped_lists = _make_concurrently_stepped_lists(
+        movers_len=2, params=[0, 1, 0.1, 0, 1]
+    )
+    assert len(stepped_lists) == 2
+    assert len(stepped_lists[0]) == 11 and len(stepped_lists[1]) == 11
+    assert stepped_lists[0][-1] == 1
+    assert stepped_lists[1][-1] == 10
+
+
+def test_make_independently_stepped_lists():
+    stepped_lists = _make_independently_stepped_lists(
+        movers_len=2, params=[0, 1, 0.1, -10, 10, 1]
+    )
+    assert len(stepped_lists) == 2
+    assert len(stepped_lists[0]) == 11 and len(stepped_lists[1]) == 21
+    assert stepped_lists[0][-1] == 1
+    assert stepped_lists[1][-1] == 10
+
+
+@pytest.mark.parametrize("params", ([0, 1, 0.1], [-1, 1, 0.1], [0, 10, 1]))
+def test_step_scan(
+    run_engine: RunEngine,
+    det: StandardDetector,
+    x_axis: Motor,
+    params: list[Any],
+):
+    run_engine(step_scan(detectors=[det], movers=[x_axis], params=params))
+
+
+@pytest.mark.parametrize(
+    "params", ([0, 1, 0.1, 0, 0.1], [-1, 1, 0.1, -1, 0.1], [0, 10, 1, 0, 1])
+)
+def test_step_scan_with_multiple_movers(
+    run_engine: RunEngine,
+    det: StandardDetector,
+    x_axis: Motor,
+    y_axis: Motor,
+    params: list[Any],
+):
+    run_engine(step_scan(detectors=[det], movers=[x_axis, y_axis], params=params))
+
+
+@pytest.mark.parametrize("params", ([0, 1, 0.1, 0, 1, 0.1], [0, 1, 0.1, 0]))
+def test_step_scan_fails_when_given_incorrect_number_of_params(
+    run_engine: RunEngine,
+    det: StandardDetector,
+    x_axis: Motor,
+    y_axis: Motor,
+    params: list[Any],
+):
+    with pytest.raises(ValueError):
+        run_engine(step_scan(detectors=[det], movers=[x_axis, y_axis], params=params))
+
+
+@pytest.mark.parametrize("params", ([0, 1, 0.1], [-1, 1, 0.1], [0, 10, 1]))
+def test_step_rscan(
+    run_engine: RunEngine,
+    det: StandardDetector,
+    x_axis: Motor,
+    params: list[Any],
+):
+    run_engine(step_rscan(detectors=[det], movers=[x_axis], params=params))
+
+
+@pytest.mark.parametrize(
+    "params", ([0, 1, 0.1, 0, 0.1], [-1, 1, 0.1, -1, 0.1], [0, 10, 1, 0, 1])
+)
+def test_step_rscan_with_multiple_movers(
+    run_engine: RunEngine,
+    det: StandardDetector,
+    x_axis: Motor,
+    y_axis: Motor,
+    params: list[Any],
+):
+    run_engine(step_rscan(detectors=[det], movers=[x_axis, y_axis], params=params))
+
+
+@pytest.mark.parametrize("params", ([0, 1, 0.1, 0, 1, 0.1], [0, 1, 0.1, 0]))
+def test_step_rscan_fails_when_given_incorrect_number_of_params(
+    run_engine: RunEngine,
+    det: StandardDetector,
+    x_axis: Motor,
+    y_axis: Motor,
+    params: list[Any],
+):
+    with pytest.raises(ValueError):
+        run_engine(step_rscan(detectors=[det], movers=[x_axis, y_axis], params=params))
+
+
+@pytest.mark.parametrize("params", ([0, 1, 0.1, 0, 1, 0.1], [0, 10, 1, 0, 10, 1]))
+def test_step_grid_scan(
+    run_engine: RunEngine,
+    det: StandardDetector,
+    x_axis: Motor,
+    y_axis: Motor,
+    params: list[Any],
+):
+    run_engine(step_grid_scan(detectors=[det], movers=[y_axis, x_axis], params=params))
+
+
+@pytest.mark.parametrize("params", ([0, 1, 0.1, 0, 1, 0.1], [0, 10, 1, 0, 10, 1]))
+def test_step_grid_scan_when_snaking(
+    run_engine: RunEngine,
+    det: StandardDetector,
+    x_axis: Motor,
+    y_axis: Motor,
+    params: list[Any],
+):
+    run_engine(
+        step_grid_scan(
+            detectors=[det], movers=[y_axis, x_axis], params=params, snake_axes=True
+        )
+    )
+
+
+@pytest.mark.parametrize("params", ([0, 1, 0.1, 0, 1], [0, 10, 1, 0]))
+def test_step_grid_scan_fails_when_given_incorrect_number_of_params(
+    run_engine: RunEngine,
+    det: StandardDetector,
+    x_axis: Motor,
+    y_axis: Motor,
+    params: list[Any],
+):
+    with pytest.raises(ValueError):
+        run_engine(
+            step_grid_scan(
+                detectors=[det], movers=[y_axis, x_axis], params=params, snake_axes=True
+            )
+        )
+
+
+@pytest.mark.parametrize("params", ([0, 1, 0.1, 0, 1, 0.1], [0, 10, 1, 0, 10, 1]))
+def test_step_grid_rscan(
+    run_engine: RunEngine,
+    det: StandardDetector,
+    x_axis: Motor,
+    y_axis: Motor,
+    params: list[Any],
+):
+    run_engine(step_grid_rscan(detectors=[det], movers=[y_axis, x_axis], params=params))
+
+
+@pytest.mark.parametrize("params", ([0, 1, 0.1, 0, 1, 0.1], [0, 10, 1, 0, 10, 1]))
+def test_step_grid_rscan_when_snaking(
+    run_engine: RunEngine,
+    det: StandardDetector,
+    x_axis: Motor,
+    y_axis: Motor,
+    params: list[Any],
+):
+    run_engine(
+        step_grid_rscan(
+            detectors=[det], movers=[y_axis, x_axis], params=params, snake_axes=True
+        )
+    )
+
+
+@pytest.mark.parametrize("params", ([0, 1, 0.1, 0, 1], [0, 10, 1, 0]))
+def test_step_grid_rscan_fails_when_given_incorrect_number_of_params(
+    run_engine: RunEngine,
+    det: StandardDetector,
+    x_axis: Motor,
+    y_axis: Motor,
+    params: list[Any],
+):
+    with pytest.raises(ValueError):
+        run_engine(
+            step_grid_rscan(
+                detectors=[det], movers=[y_axis, x_axis], params=params, snake_axes=True
             )
         )
