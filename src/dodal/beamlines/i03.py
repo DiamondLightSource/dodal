@@ -256,27 +256,27 @@ def synchrotron() -> Synchrotron:
 
 
 @devices.factory()
-def undulator(daq_configuration_path: str) -> UndulatorInKeV:
+def undulator(baton: Baton, daq_configuration_path: str) -> UndulatorInKeV:
     """Get the i03 undulator device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
     return UndulatorInKeV(
         f"{BeamlinePrefix(BL).insertion_prefix}-MO-SERVC-01:",
         id_gap_lookup_table_path=f"{daq_configuration_path}/lookup/BeamLine_Undulator_toGap.txt",
-        baton=baton(),
+        baton=baton,
     )
 
 
 @devices.factory()
 def undulator_dcm(
-    undulator: UndulatorInKeV, daq_configuration_path: str
+    undulator: UndulatorInKeV, dcm: DCM, daq_configuration_path: str
 ) -> UndulatorDCM:
     """Get the i03 undulator DCM device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
     return UndulatorDCM(
         undulator=undulator,
-        dcm=dcm(),
+        dcm=dcm,
         daq_configuration_path=daq_configuration_path,
     )
 
