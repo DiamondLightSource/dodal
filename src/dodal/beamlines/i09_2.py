@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from daq_config_server.client import ConfigServer
 
 from dodal.common.beamlines.beamline_utils import (
@@ -13,7 +15,10 @@ from dodal.devices.apple2_undulator import (
     UndulatorPhaseAxes,
 )
 from dodal.devices.i09.enums import Grating
-from dodal.devices.i09_2_shared.i09_apple2 import J09Apple2Controller
+from dodal.devices.i09_2_shared.i09_apple2 import (
+    J09Apple2Controller,
+    J09EnergyMotorLookup,
+)
 from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.devices.synchrotron import Synchrotron
 from dodal.log import set_beamline as set_log_beamline
@@ -21,7 +26,7 @@ from dodal.utils import BeamlinePrefix, get_beamline_name
 
 J09_CONF_CLIENT = ConfigServer(url="https://daq-config.diamond.ac.uk")
 LOOK_UPTABLE_DIR = "/dls_sw/i09-2/software/gda/workspace_git/gda-diamond.git/configurations/i09-2-shared/lookupTables/"
-
+GAP_LOOKUP_FILE_NAME = "JIDEnergy2GapCalibrations.csv"
 
 BL = get_beamline_name("i09-2")
 PREFIX = BeamlinePrefix(BL, suffix="J")
@@ -72,8 +77,10 @@ def jid_controller() -> J09Apple2Controller:
     """J09 insertion device controller."""
     return J09Apple2Controller(
         apple2=jid(),
-        lookuptable_dir=LOOK_UPTABLE_DIR,
-        config_client=J09_CONF_CLIENT,
+        energy_motor_lut=J09EnergyMotorLookup(
+            gap_path=Path(LOOK_UPTABLE_DIR, GAP_LOOKUP_FILE_NAME),
+            config_client=J09_CONF_CLIENT,
+        ),
     )
 
 

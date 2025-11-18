@@ -50,8 +50,6 @@ set_log_beamline(BL)
 set_utils_beamline(BL)
 PREFIX = BeamlinePrefix(BL)
 
-LOOK_UPTABLE_DIR = "/dls_sw/i10/software/blueapi/scratch/i10-config/lookupTables/"
-
 
 @device_factory()
 def synchrotron() -> Synchrotron:
