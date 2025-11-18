@@ -2,7 +2,6 @@ from typing import SupportsFloat
 
 import numpy as np
 from bluesky.protocols import Movable
-from daq_config_server.client import ConfigServer
 from ophyd_async.core import (
     AsyncStatus,
     Reference,
@@ -23,11 +22,7 @@ from dodal.devices.apple2_undulator import (
     UndulatorJawPhase,
     UndulatorPhaseAxes,
 )
-from dodal.devices.util.lookup_tables_apple2 import (
-    BaseEnergyMotorLookup,
-    LookupTableConfig,
-    convert_csv_to_lookup,
-)
+from dodal.devices.util.lookup_tables_apple2 import EnergyMotorLookup
 from dodal.log import LOGGER
 
 ROW_PHASE_MOTOR_TOLERANCE = 0.004
@@ -35,35 +30,6 @@ MAXIMUM_ROW_PHASE_MOTOR_POSITION = 24.0
 MAXIMUM_GAP_MOTOR_POSITION = 100
 DEFAULT_JAW_PHASE_POLY_PARAMS = [1.0 / 7.5, -120.0 / 7.5]
 ALPHA_OFFSET = 180
-
-
-class I10EnergyMotorLookup(BaseEnergyMotorLookup):
-    """
-    Handles lookup tables for I10 Apple2 ID, converting energy and polarisation to gap
-    and phase. Fetches and parses lookup tables from a config server, supports dynamic
-    updates, and validates input.
-    """
-
-    def update_lookuptable(self):
-        """
-        Update lookup tables from files and validate their format.
-        """
-        LOGGER.info("Updating lookup dictionary from file for gap.")
-        gap_csv_file = self.config_client.get_file_contents(
-            self.lut_config.path.gap, reset_cached_result=True
-        )
-        self.lookup_tables.gap = convert_csv_to_lookup(
-            file_contents=gap_csv_file, lut_config=self.lut_config
-        )
-        self.available_pol = list(self.lookup_tables.gap.root.keys())
-
-        LOGGER.info("Updating lookup dictionary from file for phase.")
-        phase_csv_file = self.config_client.get_file_contents(
-            self.lut_config.path.phase, reset_cached_result=True
-        )
-        self.lookup_tables.phase = convert_csv_to_lookup(
-            file_contents=phase_csv_file, lut_config=self.lut_config
-        )
 
 
 class I10Apple2(Apple2[UndulatorPhaseAxes]):
@@ -102,8 +68,7 @@ class I10Apple2Controller(Apple2Controller[I10Apple2]):
     def __init__(
         self,
         apple2: I10Apple2,
-        config_client: ConfigServer,
-        lut_config: LookupTableConfig,
+        energy_motor_lut: EnergyMotorLookup,
         jaw_phase_limit: float = 12.0,
         jaw_phase_poly_param: list[float] = DEFAULT_JAW_PHASE_POLY_PARAMS,
         angle_threshold_deg=30.0,
@@ -114,10 +79,8 @@ class I10Apple2Controller(Apple2Controller[I10Apple2]):
         -----------
         apple2 : I10Apple2
             An I10Apple2 device.
-        config_client : ConfigServer
-            The config server client to fetch the look up table.
-        lut_config:
-            Configuration that defines where the lookup table is and how to read it.
+        energy_motor_lut: EnergyMotorLookup
+            The class that handles the look up table logic for the insertion device.
         jaw_phase_limit : float, optional
             The maximum allowed jaw_phase movement., by default 12.0
         jaw_phase_poly_param : list[float], optional
@@ -128,13 +91,10 @@ class I10Apple2Controller(Apple2Controller[I10Apple2]):
             New device name.
         """
 
-        self.lookup_table_client = I10EnergyMotorLookup(
-            lut_config=lut_config,
-            config_client=config_client,
-        )
+        self.energy_motor_lut = energy_motor_lut
         super().__init__(
             apple2=apple2,
-            energy_to_motor_converter=self.lookup_table_client.get_motor_from_energy,
+            energy_to_motor_converter=self.energy_motor_lut.get_motor_from_energy,
             name=name,
         )
 
