@@ -116,7 +116,15 @@ def phase_lut_config() -> LookupTableConfig:
 @pytest.fixture
 def mock_config_client() -> ConfigServer:
     mock_config_client = ConfigServer()
+
     mock_config_client.get_file_contents = MagicMock(spec=["get_file_contents"])
+
+    def my_side_effect(file_path, reset_cached_result) -> str:
+        assert reset_cached_result is True
+        with open(file_path) as f:
+            return f.read()
+
+    mock_config_client.get_file_contents.side_effect = my_side_effect
     return mock_config_client
 
 
