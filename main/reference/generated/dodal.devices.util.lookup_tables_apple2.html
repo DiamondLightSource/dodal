@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.util.lookup_tables_apple2 &#8212; dodal 1.65.1.dev18+gbc36da8ad documentation</title>
+    <title>dodal.devices.util.lookup_tables_apple2 &#8212; dodal 1.65.1.dev19+g54b182222 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=74d4e6c7"></script>
+    <script src="../../_static/documentation_options.js?v=5b396ef4"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -58,7 +58,7 @@
     <link rel="icon" href="../../_static/dls-logo.svg"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="dodal.devices.util.lookup_tables_apple2.BaseEnergyMotorLookup" href="dodal.devices.util.lookup_tables_apple2.BaseEnergyMotorLookup.html" />
+    <link rel="next" title="dodal.devices.util.lookup_tables_apple2.EnergyCoverage" href="dodal.devices.util.lookup_tables_apple2.EnergyCoverage.html" />
     <link rel="prev" title="dodal.devices.util.lookup_tables" href="dodal.devices.util.lookup_tables.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -1086,31 +1086,28 @@
 <p class="rubric">Classes</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.util.lookup_tables_apple2.BaseEnergyMotorLookup.html#dodal.devices.util.lookup_tables_apple2.BaseEnergyMotorLookup" title="dodal.devices.util.lookup_tables_apple2.BaseEnergyMotorLookup"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BaseEnergyMotorLookup</span></code></a></p></td>
-<td><p>Abstract base for energy-&gt;motor lookup.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.util.lookup_tables_apple2.EnergyCoverage.html#dodal.devices.util.lookup_tables_apple2.EnergyCoverage" title="dodal.devices.util.lookup_tables_apple2.EnergyCoverage"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EnergyCoverage</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.util.lookup_tables_apple2.EnergyCoverage.html#dodal.devices.util.lookup_tables_apple2.EnergyCoverage" title="dodal.devices.util.lookup_tables_apple2.EnergyCoverage"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EnergyCoverage</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.util.lookup_tables_apple2.EnergyCoverageEntry.html#dodal.devices.util.lookup_tables_apple2.EnergyCoverageEntry" title="dodal.devices.util.lookup_tables_apple2.EnergyCoverageEntry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EnergyCoverageEntry</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.util.lookup_tables_apple2.EnergyCoverageEntry.html#dodal.devices.util.lookup_tables_apple2.EnergyCoverageEntry" title="dodal.devices.util.lookup_tables_apple2.EnergyCoverageEntry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EnergyCoverageEntry</span></code></a></p></td>
 <td><p>Create a new model by parsing and validating input data from keyword arguments.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.util.lookup_tables_apple2.EnergyMinMax.html#dodal.devices.util.lookup_tables_apple2.EnergyMinMax" title="dodal.devices.util.lookup_tables_apple2.EnergyMinMax"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EnergyMinMax</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.util.lookup_tables_apple2.EnergyMinMax.html#dodal.devices.util.lookup_tables_apple2.EnergyMinMax" title="dodal.devices.util.lookup_tables_apple2.EnergyMinMax"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EnergyMinMax</span></code></a></p></td>
 <td><p>Create a new model by parsing and validating input data from keyword arguments.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.util.lookup_tables_apple2.GapPhaseLookupTable.html#dodal.devices.util.lookup_tables_apple2.GapPhaseLookupTable" title="dodal.devices.util.lookup_tables_apple2.GapPhaseLookupTable"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GapPhaseLookupTable</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.util.lookup_tables_apple2.EnergyMotorLookup.html#dodal.devices.util.lookup_tables_apple2.EnergyMotorLookup" title="dodal.devices.util.lookup_tables_apple2.EnergyMotorLookup"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EnergyMotorLookup</span></code></a></p></td>
+<td><p>Handles lookup tables for Apple2 ID, converting energy and polarisation to gap and phase.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.util.lookup_tables_apple2.GapPhaseLookupTables.html#dodal.devices.util.lookup_tables_apple2.GapPhaseLookupTables" title="dodal.devices.util.lookup_tables_apple2.GapPhaseLookupTables"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GapPhaseLookupTables</span></code></a></p></td>
 <td><p>Create a new model by parsing and validating input data from keyword arguments.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.util.lookup_tables_apple2.LookupPath.html#dodal.devices.util.lookup_tables_apple2.LookupPath" title="dodal.devices.util.lookup_tables_apple2.LookupPath"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LookupPath</span></code></a></p></td>
-<td><p>Create a new model by parsing and validating input data from keyword arguments.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.util.lookup_tables_apple2.LookupTable.html#dodal.devices.util.lookup_tables_apple2.LookupTable" title="dodal.devices.util.lookup_tables_apple2.LookupTable"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LookupTable</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.util.lookup_tables_apple2.LookupTable.html#dodal.devices.util.lookup_tables_apple2.LookupTable" title="dodal.devices.util.lookup_tables_apple2.LookupTable"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LookupTable</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.util.lookup_tables_apple2.LookupTableConfig.html#dodal.devices.util.lookup_tables_apple2.LookupTableConfig" title="dodal.devices.util.lookup_tables_apple2.LookupTableConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LookupTableConfig</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.util.lookup_tables_apple2.LookupTableConfig.html#dodal.devices.util.lookup_tables_apple2.LookupTableConfig" title="dodal.devices.util.lookup_tables_apple2.LookupTableConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LookupTableConfig</span></code></a></p></td>
 <td><p>Create a new model by parsing and validating input data from keyword arguments.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.util.lookup_tables_apple2.LookupTableEntries.html#dodal.devices.util.lookup_tables_apple2.LookupTableEntries" title="dodal.devices.util.lookup_tables_apple2.LookupTableEntries"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LookupTableEntries</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.util.lookup_tables_apple2.LookupTableEntries.html#dodal.devices.util.lookup_tables_apple2.LookupTableEntries" title="dodal.devices.util.lookup_tables_apple2.LookupTableEntries"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LookupTableEntries</span></code></a></p></td>
 <td><p>Create a new model by parsing and validating input data from keyword arguments.</p></td>
 </tr>
 </tbody>
@@ -1183,9 +1180,9 @@ structure:</p>
 <section id="parameters">
 <h2>Parameters:<a class="headerlink" href="#parameters" title="Link to this heading">#</a></h2>
 <dl class="simple">
-<dt>file_contents:</dt><dd><p>The CSV file content as a string.</p>
+<dt>file_contents:</dt><dd><p>The CSV file contents as string.</p>
 </dd>
-<dt>lut_config:</dt><dd><p>The configuration that defines how to read the file_contents into a LookupTable</p>
+<dt>lut_config:</dt><dd><p>The configuration that how to process the file_contents into a LookupTable.</p>
 </dd>
 <dt>skip_line_start_with</dt><dd><p>Lines beginning with this prefix are skipped (default “#”).</p>
 </dd>
@@ -1348,11 +1345,11 @@ for provided polarisations.</p>
       </div>
     </a>
     <a class="right-next"
-       href="dodal.devices.util.lookup_tables_apple2.BaseEnergyMotorLookup.html"
+       href="dodal.devices.util.lookup_tables_apple2.EnergyCoverage.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">dodal.devices.util.lookup_tables_apple2.BaseEnergyMotorLookup</p>
+        <p class="prev-next-title">dodal.devices.util.lookup_tables_apple2.EnergyCoverage</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

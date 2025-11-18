@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.util.lookup_tables_apple2.EnergyMotorLookup &#8212; dodal 1.65.1.dev14+gbdebc72a8 documentation</title>
+    <title>dodal.devices.util.lookup_tables_apple2.EnergyMotorLookup &#8212; dodal 1.65.1.dev19+g54b182222 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=f62772c9"></script>
+    <script src="../../_static/documentation_options.js?v=5b396ef4"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -58,7 +58,7 @@
     <link rel="icon" href="../../_static/dls-logo.svg"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="dodal.devices.util.lookup_tables_apple2.LookupPath" href="dodal.devices.util.lookup_tables_apple2.LookupPath.html" />
+    <link rel="next" title="dodal.devices.util.lookup_tables_apple2.GapPhaseLookupTables" href="dodal.devices.util.lookup_tables_apple2.GapPhaseLookupTables.html" />
     <link rel="prev" title="dodal.devices.util.lookup_tables_apple2.EnergyMinMax" href="dodal.devices.util.lookup_tables_apple2.EnergyMinMax.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -1089,41 +1089,56 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="dodal.devices.util.lookup_tables_apple2.EnergyMotorLookup">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dodal.devices.util.lookup_tables_apple2.</span></span><span class="sig-name descname"><span class="pre">EnergyMotorLookup</span></span><a class="reference internal" href="../../_modules/dodal/devices/util/lookup_tables_apple2.html#EnergyMotorLookup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.util.lookup_tables_apple2.EnergyMotorLookup" title="Link to this definition">#</a></dt>
-<dd><p>Abstract base for energy-&gt;motor lookup.</p>
-<p>Subclasses should implement <a class="reference internal" href="#dodal.devices.util.lookup_tables_apple2.EnergyMotorLookup.update_lookuptable" title="dodal.devices.util.lookup_tables_apple2.EnergyMotorLookup.update_lookuptable"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">update_lookuptable()</span></code></a> to populate <code class="xref any docutils literal notranslate"><span class="pre">self.lookup_tables</span></code>
-from the configured file sources. After update_lookuptable() has populated the
-‘gap’ and ‘phase’ tables, <a class="reference internal" href="#dodal.devices.util.lookup_tables_apple2.EnergyMotorLookup.get_motor_from_energy" title="dodal.devices.util.lookup_tables_apple2.EnergyMotorLookup.get_motor_from_energy"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">get_motor_from_energy()</span></code></a> can be used to compute
-(gap, phase) for a requested (energy, pol) pair.</p>
+<dd><p>Handles lookup tables for Apple2 ID, converting energy and polarisation to gap
+and phase. Fetches and parses lookup tables from a config server, supports dynamic
+updates, and validates input. If custom logic is required for lookup tables, sub
+classes should override the _update_gap_lut and _update_phase_lut methods.</p>
+<p>After update_lookuptable() has populated the ‘gap’ and ‘phase’ tables,
+<a class="reference internal" href="#dodal.devices.util.lookup_tables_apple2.EnergyMotorLookup.get_motor_from_energy" title="dodal.devices.util.lookup_tables_apple2.EnergyMotorLookup.get_motor_from_energy"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">get_motor_from_energy()</span></code></a> can be used to compute (gap, phase) for a requested
+(energy, pol) pair.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>lookuptable_dir</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
 <li><p><strong>config_client</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConfigServer</span></code></span>)</p></li>
-<li><p><strong>source</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>] | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
-<li><p><strong>mode</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">'Mode'</span></code>)</p></li>
-<li><p><strong>min_energy</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">'MinEnergy'</span></code>)</p></li>
-<li><p><strong>max_energy</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">'MaxEnergy'</span></code>)</p></li>
-<li><p><strong>gap_file_name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">'IDEnergy2GapCalibrations.csv'</span></code>)</p></li>
-<li><p><strong>phase_file_name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">'IDEnergy2PhaseCalibrations.csv'</span></code>)</p></li>
-<li><p><strong>poly_deg</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
+<li><p><strong>lut_config</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="dodal.devices.util.lookup_tables_apple2.LookupTableConfig.html#dodal.devices.util.lookup_tables_apple2.LookupTableConfig" title="dodal.devices.util.lookup_tables_apple2.LookupTableConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">LookupTableConfig</span></code></a></span>)</p></li>
+<li><p><strong>gap_path</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></a></span>)</p></li>
+<li><p><strong>phase_path</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></a></span>)</p></li>
 </ul>
 </dd>
 </dl>
 <p>Initialise the EnergyMotorLookup class with lookup table headers provided.</p>
+<section id="parameters">
+<h2>Parameters:<a class="headerlink" href="#parameters" title="Link to this heading">#</a></h2>
+<dl class="simple">
+<dt>config_client:</dt><dd><p>The config server client to fetch the look up table data.</p>
+</dd>
+<dt>lut_config:</dt><dd><p>Configuration that defines how to process file contents into a LookupTable</p>
+</dd>
+<dt>gap_path:</dt><dd><p>File path to the gap lookup table.</p>
+</dd>
+<dt>phase_path:</dt><dd><p>File path to the phase lookup table.</p>
+</dd>
+</dl>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>look_up_table_dir</strong> – The path to look up table.</p></li>
-<li><p><strong>source</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>] | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">None</span></code>) – The column name and the name of the source in look up table. e.g. ( “source”, “idu”)</p></li>
-<li><p><strong>config_client</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConfigServer</span></code></span>) – The config server client to fetch the look up table.</p></li>
-<li><p><strong>mode</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">'Mode'</span></code>) – The column name of the mode in look up table.</p></li>
-<li><p><strong>min_energy</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">'MinEnergy'</span></code>) – The column name that contain the maximum energy in look up table.</p></li>
-<li><p><strong>max_energy</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">'MaxEnergy'</span></code>) – The column name that contain the maximum energy in look up table.</p></li>
-<li><p><strong>gap_file_name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">'IDEnergy2GapCalibrations.csv'</span></code>) – File name for the id game.</p></li>
-<li><p><strong>phase_file_name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">'IDEnergy2PhaseCalibrations.csv'</span></code>) – File name for the phase(option.al).</p></li>
-<li><p><strong>poly_deg</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">None</span></code>) – The column names for the parameters for the energy conversion polynomial, starting with the least significant.</p></li>
-<li><p><strong>lookuptable_dir</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
-</ul>
+<dt class="field-odd">param config_client<span class="colon">:</span></dt>
+<dd class="field-odd"><p></p></dd>
+<dt class="field-even">type config_client<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConfigServer</span></code></span></p>
+</dd>
+<dt class="field-odd">param lut_config<span class="colon">:</span></dt>
+<dd class="field-odd"><p></p></dd>
+<dt class="field-even">type lut_config<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="dodal.devices.util.lookup_tables_apple2.LookupTableConfig.html#dodal.devices.util.lookup_tables_apple2.LookupTableConfig" title="dodal.devices.util.lookup_tables_apple2.LookupTableConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">LookupTableConfig</span></code></a></span></p>
+</dd>
+<dt class="field-odd">param gap_path<span class="colon">:</span></dt>
+<dd class="field-odd"><p></p></dd>
+<dt class="field-even">type gap_path<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></a></span></p>
+</dd>
+<dt class="field-odd">param phase_path<span class="colon">:</span></dt>
+<dd class="field-odd"><p></p></dd>
+<dt class="field-even">type phase_path<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></a></span></p>
 </dd>
 </dl>
 <p class="rubric">Methods</p>
@@ -1132,7 +1147,7 @@ from the configured file sources. After update_lookuptable() has populated the
 <tr class="row-odd"><td><p><a class="reference internal" href="#dodal.devices.util.lookup_tables_apple2.EnergyMotorLookup.get_motor_from_energy" title="dodal.devices.util.lookup_tables_apple2.EnergyMotorLookup.get_motor_from_energy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_motor_from_energy</span></code></a>(energy, pol)</p></td>
 <td><p>Convert energy and polarisation to gap and phase motor positions.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#dodal.devices.util.lookup_tables_apple2.EnergyMotorLookup.update_lookuptable" title="dodal.devices.util.lookup_tables_apple2.EnergyMotorLookup.update_lookuptable"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_lookuptable</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#dodal.devices.util.lookup_tables_apple2.EnergyMotorLookup.update_lookuptables" title="dodal.devices.util.lookup_tables_apple2.EnergyMotorLookup.update_lookuptables"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_lookuptables</span></code></a>()</p></td>
 <td><p>Update lookup tables from files and validate their format.</p></td>
 </tr>
 </tbody>
@@ -1148,8 +1163,8 @@ from the configured file sources. After update_lookuptable() has populated the
 </table>
 </div>
 <dl class="py method">
-<dt class="sig sig-object py" id="dodal.devices.util.lookup_tables_apple2.EnergyMotorLookup.update_lookuptable">
-<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">update_lookuptable</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dodal/devices/util/lookup_tables_apple2.html#EnergyMotorLookup.update_lookuptable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.util.lookup_tables_apple2.EnergyMotorLookup.update_lookuptable" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="dodal.devices.util.lookup_tables_apple2.EnergyMotorLookup.update_lookuptables">
+<span class="sig-name descname"><span class="pre">update_lookuptables</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dodal/devices/util/lookup_tables_apple2.html#EnergyMotorLookup.update_lookuptables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.util.lookup_tables_apple2.EnergyMotorLookup.update_lookuptables" title="Link to this definition">#</a></dt>
 <dd><p>Update lookup tables from files and validate their format.</p>
 </dd></dl>
 
@@ -1158,21 +1173,42 @@ from the configured file sources. After update_lookuptable() has populated the
 <span class="sig-name descname"><span class="pre">get_motor_from_energy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">energy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">pol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="dodal.devices.apple2_undulator.Pol.html#dodal.devices.apple2_undulator.Pol" title="dodal.devices.apple2_undulator.Pol"><span class="pre">Pol</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/dodal/devices/util/lookup_tables_apple2.html#EnergyMotorLookup.get_motor_from_energy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.util.lookup_tables_apple2.EnergyMotorLookup.get_motor_from_energy" title="Link to this definition">#</a></dt>
 <dd><p>Convert energy and polarisation to gap and phase motor positions.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>energy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Desired energy in eV.</p></li>
-<li><p><strong>pol</strong> (<a class="reference internal" href="dodal.devices.apple2_undulator.Pol.html#dodal.devices.apple2_undulator.Pol" title="dodal.devices.apple2_undulator.Pol"><em>Pol</em></a>) – Polarisation mode.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>(gap, phase) motor positions.</p>
-</dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a>]</p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>]</span></p>
 </dd>
 </dl>
+<section id="id1">
+<h3>Parameters:<a class="headerlink" href="#id1" title="Link to this heading">#</a></h3>
+<dl class="simple">
+<dt>energy<span class="classifier">float</span></dt><dd><p>Desired energy in eV.</p>
+</dd>
+<dt>pol<span class="classifier">Pol</span></dt><dd><p>Polarisation mode.</p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h3>Returns:<a class="headerlink" href="#returns" title="Link to this heading">#</a></h3>
+<p>:
+tuple[float, float]</p>
+<blockquote>
+<div><p>(gap, phase) motor positions.</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">param energy<span class="colon">:</span></dt>
+<dd class="field-odd"><p></p></dd>
+<dt class="field-even">type energy<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span></p>
+</dd>
+<dt class="field-odd">param pol<span class="colon">:</span></dt>
+<dd class="field-odd"><p></p></dd>
+<dt class="field-even">type pol<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="dodal.devices.apple2_undulator.Pol.html#dodal.devices.apple2_undulator.Pol" title="dodal.devices.apple2_undulator.Pol"><code class="xref py py-class docutils literal notranslate"><span class="pre">Pol</span></code></a></span></p>
+</dd>
+</dl>
+</section>
 </dd></dl>
 
+</section>
 </dd></dl>
 
 </section>
@@ -1197,11 +1233,11 @@ from the configured file sources. After update_lookuptable() has populated the
       </div>
     </a>
     <a class="right-next"
-       href="dodal.devices.util.lookup_tables_apple2.LookupPath.html"
+       href="dodal.devices.util.lookup_tables_apple2.GapPhaseLookupTables.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">dodal.devices.util.lookup_tables_apple2.LookupPath</p>
+        <p class="prev-next-title">dodal.devices.util.lookup_tables_apple2.GapPhaseLookupTables</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -1225,7 +1261,7 @@ from the configured file sources. After update_lookuptable() has populated the
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.util.lookup_tables_apple2.EnergyMotorLookup"><code class="docutils literal notranslate"><span class="pre">EnergyMotorLookup</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.util.lookup_tables_apple2.EnergyMotorLookup.update_lookuptable"><code class="docutils literal notranslate"><span class="pre">EnergyMotorLookup.update_lookuptable()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.util.lookup_tables_apple2.EnergyMotorLookup.update_lookuptables"><code class="docutils literal notranslate"><span class="pre">EnergyMotorLookup.update_lookuptables()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.util.lookup_tables_apple2.EnergyMotorLookup.get_motor_from_energy"><code class="docutils literal notranslate"><span class="pre">EnergyMotorLookup.get_motor_from_energy()</span></code></a></li>
 </ul>
 </li>

@@ -16,7 +16,7 @@ dodal.devices.util.lookup\_tables\_apple2.EnergyMotorLookup
       ~EnergyMotorLookup.get_motor_from_energy
       
       
-      ~EnergyMotorLookup.update_lookuptable
+      ~EnergyMotorLookup.update_lookuptables
       
    
    

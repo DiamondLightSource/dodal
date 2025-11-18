@@ -52,9 +52,6 @@ dodal.devices.util.lookup\_tables\_apple2.LookupTableConfig
       
       
       
-      ~LookupTableConfig.path
-      
-      
       ~LookupTableConfig.source
       
       
