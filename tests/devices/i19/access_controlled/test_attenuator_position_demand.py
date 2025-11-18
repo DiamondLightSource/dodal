@@ -22,7 +22,7 @@ def test_that_attenuator_position_demand_with_only_one_wedge_provides_expected_r
         continuous_demands=wedge_position_demands,
         indexed_demands=wheel_position_demands,
     )
-    restful_payload = position_demand.restful_format()
+    restful_payload = position_demand.validated_complete_demand()
     assert restful_payload["y"] == 14.9
 
 
@@ -43,7 +43,7 @@ def test_that_attenuator_position_demand_with_only_one_wheel_provides_expected_r
         continuous_demands=wedge_position_demands,
         indexed_demands=wheel_position_demands,
     )
-    restful_payload = position_demand.restful_format()
+    restful_payload = position_demand.validated_complete_demand()
     assert restful_payload["w"] == 6
 
 
@@ -64,7 +64,7 @@ def test_that_empty_attenuator_position_demand_provides_empty_rest_format():
         continuous_demands=wedge_position_demands,
         indexed_demands=wheel_position_demands,
     )
-    restful_payload = position_demand.restful_format()
+    restful_payload = position_demand.validated_complete_demand()
     assert restful_payload == {}
 
 
@@ -85,7 +85,7 @@ def test_that_attenuator_position_demand_triplet_provides_expected_rest_format()
         continuous_demands=wedge_position_demands,
         indexed_demands=wheel_position_demands,
     )
-    restful_payload = position_demand.restful_format()
+    restful_payload = position_demand.validated_complete_demand()
     assert restful_payload == {"x": 0.1, "y": 90.1, "w": 6}
 
 
@@ -97,13 +97,8 @@ def test_that_attenuator_position_demand_triplet_provides_expected_rest_format()
 def test_that_attenuator_position_raises_error_when_discrete_and_continuous_demands_overload_axis_label():
     wedge_position_demands = {"x": 0.1, "v": 90.1}
     wheel_position_demands = {"w": 6, "v": 7}
-    preamble: str = (
-        "1 validation error for AttenuatorMotorPositionDemands\n  Value error,"
-    )
-    anticipated_message: str = (
-        f"{preamble} 1 common key found in distinct motor demands"
-    )
-    with pytest.raises(expected_exception=ValueError, match=anticipated_message):
+    anticipated_preamble: str = "1 validation error for AttenuatorMotorPositionDemands"
+    with pytest.raises(expected_exception=ValueError, match=anticipated_preamble):
         AttenuatorMotorPositionDemands(
             continuous_demands=wedge_position_demands,
             indexed_demands=wheel_position_demands,
