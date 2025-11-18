@@ -1,3 +1,5 @@
+import re
+
 import pytest
 from bluesky.plan_stubs import mv
 from bluesky.run_engine import RunEngine
@@ -69,6 +71,17 @@ async def test_reading_includes_read_fields(hu_id_energy: HardInsertionDeviceEne
             "undulator_order-value": partial_reading(3.0),
         },
     )
+
+
+async def test_set_energy_fails(
+    hu_id_energy: HardInsertionDeviceEnergy,
+):
+    value = 100.5
+    with pytest.raises(
+        ValueError,
+        match=re.escape(f"Requested energy {value} keV is out of range for harmonic 3"),
+    ):
+        await hu_id_energy.set(value)
 
 
 async def test_energy_demand_initialised_correctly(
