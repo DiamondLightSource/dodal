@@ -14,6 +14,12 @@ class ScanDirections(Enum):
     REVERSE = -1
 
 
+"""
+See https://opencv24-python-tutorials.readthedocs.io/en/latest/py_tutorials/py_imgproc/py_morphological_ops/py_morphological_ops.html
+for description of functions below.
+"""
+
+
 def identity(*args, **kwargs) -> Callable[[np.ndarray], np.ndarray]:
     return lambda arr: arr
 

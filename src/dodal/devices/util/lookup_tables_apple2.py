@@ -41,6 +41,7 @@ from pydantic import (
     Field,
     RootModel,
     field_serializer,
+    field_validator,
 )
 
 from dodal.devices.apple2_undulator import Pol
@@ -108,6 +109,14 @@ class EnergyCoverageEntry(BaseModel):
     low: float
     high: float
     poly: np.poly1d
+
+    @field_validator("poly", mode="before")
+    @classmethod
+    def validate_and_convert_poly(cls, value):
+        """If reading from serialized data, it will be using a list. Convert to np.poly1d"""
+        if isinstance(value, list):
+            return np.poly1d(value)
+        return value
 
     @field_serializer("poly", mode="plain")
     def serialize_poly(self, value: np.poly1d) -> list:
