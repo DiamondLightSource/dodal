@@ -3,7 +3,7 @@ import os
 from collections.abc import Mapping
 from pathlib import Path
 from unittest import mock
-from unittest.mock import AsyncMock, Mock
+from unittest.mock import AsyncMock, MagicMock, Mock
 
 import pytest
 from bluesky.plans import scan
@@ -59,6 +59,21 @@ from tests.devices.i10.test_data import (
 ID_ENERGY_2_GAP_CALIBRATIONS_FILE_CSV = os.path.split(ID_ENERGY_2_GAP_CALIBRATIONS_CSV)[
     1
 ]
+
+
+@pytest.fixture
+def mock_config_client() -> ConfigServer:
+    mock_config_client = ConfigServer()
+
+    mock_config_client.get_file_contents = MagicMock(spec=["get_file_contents"])
+
+    def my_side_effect(file_path, reset_cached_result) -> str:
+        assert reset_cached_result is True
+        with open(file_path) as f:
+            return f.read()
+
+    mock_config_client.get_file_contents.side_effect = my_side_effect
+    return mock_config_client
 
 
 @pytest.fixture

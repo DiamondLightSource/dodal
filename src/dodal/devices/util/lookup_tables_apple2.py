@@ -87,6 +87,8 @@ DEFAULT_POLY_DEG = [
 ]
 
 MODE_NAME_CONVERT = {"CR": "pc", "CL": "nc"}
+DEFAULT_GAP_FILE = "IDEnergy2GapCalibrations.csv"
+DEFAULT_PHASE_FILE = "IDEnergy2PhaseCalibrations.csv"
 
 
 class LookupTableConfig(BaseModel):
