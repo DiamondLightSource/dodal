@@ -22,9 +22,7 @@ from dodal.devices.apple2_undulator import (
     UndulatorJawPhase,
     UndulatorPhaseAxes,
 )
-from dodal.devices.util.lookup_tables_apple2 import (
-    EnergyMotorLookup,
-)
+from dodal.devices.util.lookup_tables_apple2 import EnergyMotorLookup
 from dodal.log import LOGGER
 
 ROW_PHASE_MOTOR_TOLERANCE = 0.004

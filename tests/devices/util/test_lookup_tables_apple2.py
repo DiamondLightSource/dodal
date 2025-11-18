@@ -90,21 +90,8 @@ class DummyEnergyMotorLookup(EnergyMotorLookup):
 
 
 @pytest.fixture
-def gap_lut_config() -> LookupTableConfig:
+def lut_config() -> LookupTableConfig:
     return LookupTableConfig(
-        path=Path(""),
-        mode="Mode",
-        min_energy="MinEnergy",
-        max_energy="MaxEnergy",
-        poly_deg=["c1", "c0"],
-        mode_name_convert={"hl": "lh", "vl": "lv"},
-    )
-
-
-@pytest.fixture
-def phase_lut_config() -> LookupTableConfig:
-    return LookupTableConfig(
-        path=Path(""),
         mode="Mode",
         min_energy="MinEnergy",
         max_energy="MaxEnergy",
@@ -131,13 +118,13 @@ def mock_config_client() -> ConfigServer:
 @pytest.fixture
 def dummy_energy_motor_lookup(
     mock_config_client: ConfigServer,
-    gap_lut_config: LookupTableConfig,
-    phase_lut_config: LookupTableConfig,
+    lut_config: LookupTableConfig,
 ) -> DummyEnergyMotorLookup:
     return DummyEnergyMotorLookup(
         config_client=mock_config_client,
-        gap_lut_config=gap_lut_config,
-        phase_lut_config=phase_lut_config,
+        lut_config=lut_config,
+        gap_path=Path("dummy"),
+        phase_path=Path("dummy"),
     )
 
 
@@ -165,29 +152,13 @@ def test_read_file_and_skip_basic() -> None:
     assert lines == ["data_line_1,1,2,3\n", "data_line_2,4,5,6\n"]
 
 
-def configure_mock_config_server_get_file_contents(
-    file_content: str, config_client: ConfigServer
-) -> None:
-    def my_side_effect(file_path, reset_cached_result) -> str:
-        assert reset_cached_result is True
-        return file_content
-
-    config_client.get_file_contents.side_effect = my_side_effect  # type:ignore
-
-
 def test_convert_csv_to_lookup_overwrite_name_convert_default(
     dummy_energy_motor_lookup: DummyEnergyMotorLookup,
 ) -> None:
     csv_content = (
         "Mode,MinEnergy,MaxEnergy,c1,c0\nHL,100,200,2.0,1.0\nVL,200,300,1.0,0.0\n"
     )
-    configure_mock_config_server_get_file_contents(
-        csv_content, dummy_energy_motor_lookup.config_client
-    )
-    lut = convert_csv_to_lookup(
-        dummy_energy_motor_lookup.config_client,
-        dummy_energy_motor_lookup.lookup_tables.gap_config,
-    )
+    lut = convert_csv_to_lookup(csv_content, dummy_energy_motor_lookup.lut_config)
     assert Pol.LH in lut.root
     assert Pol.LV in lut.root
     # Check polynomials evaluate as expected
@@ -215,11 +186,8 @@ def test_lookup_table_is_serialisable() -> None:
 async def test_bad_file_contents_causes_convert_csv_to_lookup_fails(
     dummy_energy_motor_lookup: DummyEnergyMotorLookup,
 ) -> None:
-    configure_mock_config_server_get_file_contents(
-        "fnslkfndlsnf", dummy_energy_motor_lookup.config_client
-    )
     with pytest.raises(RuntimeError):
         convert_csv_to_lookup(
-            dummy_energy_motor_lookup.config_client,
-            dummy_energy_motor_lookup.lookup_tables.gap_config,
+            "fnslkfndlsnf",
+            dummy_energy_motor_lookup.lut_config,
         )

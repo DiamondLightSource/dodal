@@ -1,5 +1,4 @@
 import json
-import os
 from collections.abc import Mapping
 from pathlib import Path
 from unittest import mock
@@ -56,10 +55,6 @@ from tests.devices.i10.test_data import (
     ID_ENERGY_2_PHASE_CALIBRATIONS_CSV,
 )
 
-ID_ENERGY_2_GAP_CALIBRATIONS_FILE_CSV = os.path.split(ID_ENERGY_2_GAP_CALIBRATIONS_CSV)[
-    1
-]
-
 
 @pytest.fixture
 async def mock_pgm(prefix: str = "BLXX-EA-DET-007:") -> PlaneGratingMonochromator:
@@ -88,17 +83,11 @@ async def mock_id(
 def mock_i10_energy_motor_lookup_idu(
     mock_config_client: ConfigServer,
 ) -> EnergyMotorLookup:
-    source = ("Source", "idu")
     return EnergyMotorLookup(
         config_client=mock_config_client,
-        gap_lut_config=LookupTableConfig(
-            path=Path(ID_ENERGY_2_GAP_CALIBRATIONS_CSV),
-            source=source,
-        ),
-        phase_lut_config=LookupTableConfig(
-            path=Path(ID_ENERGY_2_PHASE_CALIBRATIONS_CSV),
-            source=source,
-        ),
+        lut_config=LookupTableConfig(source=("Source", "idu")),
+        gap_path=Path(ID_ENERGY_2_GAP_CALIBRATIONS_CSV),
+        phase_path=Path(ID_ENERGY_2_PHASE_CALIBRATIONS_CSV),
     )
 
 
@@ -106,17 +95,11 @@ def mock_i10_energy_motor_lookup_idu(
 def mock_i10_energy_motor_lookup_idd(
     mock_config_client: ConfigServer,
 ) -> EnergyMotorLookup:
-    source = ("Source", "idd")
     return EnergyMotorLookup(
         config_client=mock_config_client,
-        gap_lut_config=LookupTableConfig(
-            path=Path(ID_ENERGY_2_GAP_CALIBRATIONS_CSV),
-            source=source,
-        ),
-        phase_lut_config=LookupTableConfig(
-            path=Path(ID_ENERGY_2_PHASE_CALIBRATIONS_CSV),
-            source=source,
-        ),
+        lut_config=LookupTableConfig(source=("Source", "idd")),
+        gap_path=Path(ID_ENERGY_2_GAP_CALIBRATIONS_CSV),
+        phase_path=Path(ID_ENERGY_2_PHASE_CALIBRATIONS_CSV),
     )
 
 
@@ -285,7 +268,7 @@ async def test_beam_energy_re_scan_with_offset(
     beam_energy: BeamEnergy,
     mock_id_controller: I10Apple2Controller,
 ):
-    mock_id_controller._polarisation_setpoint_set(Pol("lh3"))
+    mock_id_controller._polarisation_setpoint_set(Pol.LH3)
     # with energy offset
     await beam_energy.id_energy_offset.set(20)
     rbv_mocks = Mock()
@@ -648,11 +631,17 @@ async def test_linear_arbitrary_run_engine_scan(
 
 
 def assert_lookup_table_matches_expected(
-    mock_config_client: ConfigServer,
-    lut_config: LookupTableConfig,
+    energy_motor_lookup: EnergyMotorLookup,
+    file_name: str,
     expected_dict_file_name: str,
 ) -> None:
-    lut = convert_csv_to_lookup(mock_config_client, lut_config)
+    file_contents = energy_motor_lookup.config_client.get_file_contents(
+        file_path=file_name, reset_cached_result=True
+    )
+    lut = convert_csv_to_lookup(
+        file_contents=file_contents,
+        lut_config=energy_motor_lookup.lut_config,
+    )
     with open(expected_dict_file_name, "rb") as f:
         expected_lut = LookupTable(json.load(f))
 
@@ -660,45 +649,51 @@ def assert_lookup_table_matches_expected(
 
 
 @pytest.mark.parametrize(
-    "expected_dict_file_name",
+    "file_name, expected_dict_file_name",
     [
-        EXPECTED_ID_ENERGY_2_GAP_CALIBRATIONS_IDU_JSON,
-        EXPECTED_ID_ENERGY_2_PHASE_CALIBRATIONS_IDU_JSON,
+        (
+            ID_ENERGY_2_GAP_CALIBRATIONS_CSV,
+            EXPECTED_ID_ENERGY_2_GAP_CALIBRATIONS_IDU_JSON,
+        ),
+        (
+            ID_ENERGY_2_PHASE_CALIBRATIONS_CSV,
+            EXPECTED_ID_ENERGY_2_PHASE_CALIBRATIONS_IDU_JSON,
+        ),
     ],
 )
 def test_i10_energy_motor_lookup_idu_convert_csv_to_lookup_success(
     mock_i10_energy_motor_lookup_idu: EnergyMotorLookup,
+    file_name: str,
     expected_dict_file_name: str,
-):
-    if "gap" in expected_dict_file_name.lower():
-        config = mock_i10_energy_motor_lookup_idu.lookup_tables.gap_config
-    else:
-        config = mock_i10_energy_motor_lookup_idu.lookup_tables.phase_config
+) -> None:
     assert_lookup_table_matches_expected(
-        mock_i10_energy_motor_lookup_idu.config_client,
-        config,
+        mock_i10_energy_motor_lookup_idu,
+        file_name,
         expected_dict_file_name,
     )
 
 
 @pytest.mark.parametrize(
-    "expected_dict_file_name",
+    "file_name, expected_dict_file_name",
     [
-        EXPECTED_ID_ENERGY_2_GAP_CALIBRATIONS_IDD_JSON,
-        EXPECTED_ID_ENERGY_2_PHASE_CALIBRATIONS_IDD_JSON,
+        (
+            ID_ENERGY_2_GAP_CALIBRATIONS_CSV,
+            EXPECTED_ID_ENERGY_2_GAP_CALIBRATIONS_IDD_JSON,
+        ),
+        (
+            ID_ENERGY_2_PHASE_CALIBRATIONS_CSV,
+            EXPECTED_ID_ENERGY_2_PHASE_CALIBRATIONS_IDD_JSON,
+        ),
     ],
 )
 def test_i10_energy_motor_lookup_idd_convert_csv_to_lookup_success(
     mock_i10_energy_motor_lookup_idd: EnergyMotorLookup,
+    file_name: str,
     expected_dict_file_name: str,
-):
-    if "gap" in expected_dict_file_name.lower():
-        config = mock_i10_energy_motor_lookup_idd.lookup_tables.gap_config
-    else:
-        config = mock_i10_energy_motor_lookup_idd.lookup_tables.phase_config
+) -> None:
     assert_lookup_table_matches_expected(
-        mock_i10_energy_motor_lookup_idd.config_client,
-        config,
+        mock_i10_energy_motor_lookup_idd,
+        file_name,
         expected_dict_file_name,
     )
 
