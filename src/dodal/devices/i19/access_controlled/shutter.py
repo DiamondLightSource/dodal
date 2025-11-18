@@ -43,7 +43,7 @@ class AccessControlledShutter(OpticsBlueAPIDevice):
         request_params = {
             "name": "operate_shutter_plan",
             "params": {
-                "experiment_hutch": self._get_invoking_hutch(),
+                "experiment_hutch": self._invoking_hutch,
                 "access_device": ACCESS_DEVICE_NAME,
                 "shutter_demand": value.value,
             },

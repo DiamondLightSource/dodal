@@ -18,20 +18,16 @@ class AttenuatorMotorPositionDemands(BaseModel):
 
     @model_validator(mode="after")
     def no_keys_clash(self) -> Self:
-        common_key_filter = filter(
-            lambda k: k in self.continuous_demands, self.indexed_demands
-        )
-        common_key_count = sum(1 for _ in common_key_filter)
+        common_keys = set(self.continuous_demands).intersection(self.indexed_demands)
+        common_key_count = sum(1 for _ in common_keys)
         if common_key_count < 1:
             return self
         else:
             ks: str = "key" if common_key_count == 1 else "keys"
-            error_msg = (
-                f"{common_key_count} common {ks} found in distinct motor demands"
-            )
+            error_msg = f"Common {ks} found in distinct motor demands: {common_keys}"
             raise ValueError(error_msg)
 
-    def restful_format(self) -> dict[PermittedKeyStr, Any]:
+    def validated_complete_demand(self) -> dict[PermittedKeyStr, Any]:
         return self.continuous_demands | self.indexed_demands
 
 
@@ -56,9 +52,9 @@ class AttenuatorMotorSquad(OpticsBlueAPIDevice):
         request_params = {
             "name": "operate_motor_squad_plan",
             "params": {
-                "experiment_hutch": self._get_invoking_hutch(),
+                "experiment_hutch": self._invoking_hutch,
                 "access_device": ACCESS_DEVICE_NAME,
-                "attenuator_demands": value.restful_format(),
+                "attenuator_demands": value.validated_complete_demand(),
             },
             "instrument_session": self.instrument_session,
         }

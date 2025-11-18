@@ -38,7 +38,8 @@ class OpticsBlueAPIDevice(StandardReadable, Movable[D]):
         self.headers = HEADERS
         super().__init__(name)
 
-    def _get_invoking_hutch(self) -> str:
+    @property
+    def _invoking_hutch(self) -> str:
         return self.hutch_request.value
 
     @AsyncStatus.wrap
