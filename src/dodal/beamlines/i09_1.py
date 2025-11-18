@@ -10,7 +10,7 @@ from dodal.devices.common_dcm import (
 from dodal.devices.electron_analyser import EnergySource
 from dodal.devices.electron_analyser.specs import SpecsDetector
 from dodal.devices.i09_1 import LensMode, PsuMode
-from dodal.devices.i09_1_shared.energy import HardEnergy, HardInsertionDeviceEnergy
+from dodal.devices.i09_1_shared.hard_energy import HardEnergy, HardInsertionDeviceEnergy
 from dodal.devices.i09_1_shared.hard_undulator_functions import (
     calculate_gap_i09_hu,
 )
