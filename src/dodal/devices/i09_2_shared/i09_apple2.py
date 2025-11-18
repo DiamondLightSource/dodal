@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from daq_config_server.client import ConfigServer
 
 from dodal.devices.apple2_undulator import (
@@ -8,10 +10,9 @@ from dodal.devices.apple2_undulator import (
     Pol,
 )
 from dodal.devices.util.lookup_tables_apple2 import (
-    BaseEnergyMotorLookup,
-    LookupPath,
+    EnergyMotorLookup,
     LookupTableConfig,
-    make_phase_tables,
+    generate_lookup_table_entry,
 )
 from dodal.log import LOGGER
 
@@ -30,11 +31,6 @@ J09PhasePoly1dParameters = {
 
 
 J09DefaultLookupTableConfig = LookupTableConfig(
-    path=LookupPath.create(
-        path="i09_apple2",
-        gap_file="i09_apple2/j09_energy2gap_calibrations.csv",
-        phase_file=None,
-    ),
     mode="Mode",
     min_energy="MinEnergy",
     max_energy="MaxEnergy",
@@ -50,10 +46,11 @@ J09DefaultLookupTableConfig = LookupTableConfig(
         "1st-order",
         "0th-order",
     ],
+    mode_name_convert={"cr": "pc", "cl": "nc"},
 )
 
 
-class J09EnergyMotorLookup(BaseEnergyMotorLookup):
+class J09EnergyMotorLookup(EnergyMotorLookup):
     """
     Handles lookup tables for I10 Apple2 ID, converting energy and polarisation to gap
      and phase. Fetches and parses lookup tables from a config server, supports dynamic
@@ -64,6 +61,8 @@ class J09EnergyMotorLookup(BaseEnergyMotorLookup):
         self,
         config_client: ConfigServer,
         lut_config: LookupTableConfig = J09DefaultLookupTableConfig,
+        gap_path: Path | None = None,
+        phase_path: Path | None = None,
     ):
         """Initialise the I10EnergyMotorLookup class with lookup table headers provided.
 
@@ -89,55 +88,38 @@ class J09EnergyMotorLookup(BaseEnergyMotorLookup):
         super().__init__(
             config_client=config_client,
             lut_config=lut_config,
+            gap_path=gap_path,
+            phase_path=phase_path,
         )
 
-    def update_lookuptable(self):
-        """
-        Update lookup tables from files and validate their format.
-        """
-        self.update_gap_lookuptable()
-        mix_energies = []
-        max_energies = []
-        pols = []
-        poly1d_params = []
-        for key in self.lookup_tables[LookupTableKeys.GAP].keys():
-            if key is not None:
-                pols.append(Pol(key.lower()))
-                mix_energies.append(
-                    self.lookup_tables[LookupTableKeys.GAP][key][LookupTableKeys.LIMIT][
-                        LookupTableKeys.MIN
-                    ]
-                )
-                max_energies.append(
-                    self.lookup_tables[LookupTableKeys.GAP][key][LookupTableKeys.LIMIT][
-                        LookupTableKeys.MAX
-                    ]
-                )
-                poly1d_params.append(J09PhasePoly1dParameters[key])
-        self.lookup_tables[LookupTableKeys.PHASE] = make_phase_tables(
-            pols=pols,
-            min_energies=mix_energies,
-            max_energies=max_energies,
-            poly1d_params=poly1d_params,
-        )
-        Lookuptable.model_validate(self.lookup_tables[LookupTableKeys.PHASE])
+    def _update_phase_lut(self) -> None:
+        if self.phase_path is None:
+            for key in self.lookup_tables.gap.root.keys():
+                if key is not None:
+                    self.lookup_tables.phase.root[Pol(key.lower())] = (
+                        generate_lookup_table_entry(
+                            min_energy=self.lookup_tables.gap.root[
+                                Pol(key.lower())
+                            ].limit.minimum,
+                            max_energy=self.lookup_tables.gap.root[
+                                Pol(key.lower())
+                            ].limit.maximum,
+                            poly1d_param=(J09PhasePoly1dParameters[Pol(key.lower())]),
+                        )
+                    )
+        else:
+            super()._update_phase_lut()
 
 
 class J09Apple2Controller(Apple2Controller[Apple2]):
     def __init__(
         self,
         apple2: Apple2,
-        lookuptable_dir: str,
-        config_client: ConfigServer,
-        poly_deg: list[str] | None = None,
+        energy_motor_lut: J09EnergyMotorLookup,
         units: str = "keV",
         name: str = "",
     ) -> None:
-        self.lookup_table_client = J09EnergyMotorLookup(
-            lookuptable_dir=lookuptable_dir,
-            config_client=config_client,
-            poly_deg=poly_deg,
-        )
+        self.lookup_table_client = energy_motor_lut
         super().__init__(
             apple2=apple2,
             energy_to_motor_converter=self.lookup_table_client.get_motor_from_energy,

@@ -1,4 +1,5 @@
-import pickle
+import json
+from pathlib import Path
 
 import pytest
 from daq_config_server.client import ConfigServer
@@ -19,12 +20,16 @@ from dodal.devices.i09_2_shared.i09_apple2 import (
     MAXIMUM_ROW_PHASE_MOTOR_POSITION,
     ROW_PHASE_CIRCULAR,
     J09Apple2Controller,
+    J09DefaultLookupTableConfig,
     J09EnergyMotorLookup,
 )
 from dodal.devices.pgm import PlaneGratingMonochromator
-from dodal.devices.util.lookup_tables_apple2 import convert_csv_to_lookup
+from dodal.devices.util.lookup_tables_apple2 import (
+    GapPhaseLookupTables,
+    LookupTable,
+    convert_csv_to_lookup,
+)
 from tests.devices.i09_2_shared.test_data import (
-    LOOKUP_TABLE_PATH,
     TEST_EXPECTED_ENERGY_MOTOR_LOOKUP,
     TEST_EXPECTED_UNDULATOR_LUT,
     TEST_SOFT_UNDULATOR_LUT,
@@ -45,10 +50,11 @@ POLY_DEG = [
 
 
 @pytest.fixture
-def mock_j09_energy_motor_lookup(mock_config_client) -> J09EnergyMotorLookup:
+def mock_j09_energy_motor_lookup(
+    mock_config_client: ConfigServer,
+) -> J09EnergyMotorLookup:
     return J09EnergyMotorLookup(
-        lookuptable_dir=LOOKUP_TABLE_PATH,
-        gap_file_name="JIDEnergy2GapCalibrations.csv",
+        gap_path=Path(TEST_SOFT_UNDULATOR_LUT),
         config_client=mock_config_client,
     )
 
@@ -63,14 +69,12 @@ async def mock_apple2(mock_id_gap, mock_phase_axes) -> Apple2:
 @pytest.fixture
 async def mock_id_controller(
     mock_apple2: Apple2,
-    mock_config_client: ConfigServer,
+    mock_j09_energy_motor_lookup: J09EnergyMotorLookup,
 ) -> J09Apple2Controller:
     async with init_devices(mock=True):
         mock_id_controller = J09Apple2Controller(
             apple2=mock_apple2,
-            lookuptable_dir=LOOKUP_TABLE_PATH,
-            poly_deg=POLY_DEG,
-            config_client=mock_config_client,
+            energy_motor_lut=mock_j09_energy_motor_lookup,
         )
     mock_id_controller._energy_set(0.5)
     return mock_id_controller
@@ -114,23 +118,25 @@ def test_j09_energy_motor_lookup_convert_csv_to_lookup_success(
         file_path=TEST_SOFT_UNDULATOR_LUT, reset_cached_result=True
     )
     data = convert_csv_to_lookup(
-        file=file,
-        source=None,
-        poly_deg=POLY_DEG,
+        file_contents=file,
+        lut_config=J09DefaultLookupTableConfig,
         skip_line_start_with="#",
     )
-
     with open(TEST_EXPECTED_UNDULATOR_LUT, "rb") as f:
-        loaded_dict = pickle.load(f)
+        loaded_dict = LookupTable(json.load(f))
     assert data == loaded_dict
 
 
-def test_j09_energy_motor_lookup_update_lookuptable(
+def test_j09_energy_motor_lookup_update_lookuptables(
     mock_j09_energy_motor_lookup: J09EnergyMotorLookup,
 ):
-    mock_j09_energy_motor_lookup.update_lookuptable()
+    mock_j09_energy_motor_lookup.update_lookuptables()
     with open(TEST_EXPECTED_ENERGY_MOTOR_LOOKUP, "rb") as f:
-        map_dict = pickle.load(f)
+        data = json.load(f)
+        map_dict = GapPhaseLookupTables(
+            gap=LookupTable(data["gap"]),
+            phase=LookupTable(data["phase"]),
+        )
 
     assert mock_j09_energy_motor_lookup.lookup_tables == map_dict
 

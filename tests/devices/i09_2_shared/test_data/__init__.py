@@ -4,9 +4,9 @@ from pathlib import Path
 
 LOOKUP_TABLE_PATH = fspath(Path(__file__).parent)
 TEST_SOFT_UNDULATOR_LUT = join(LOOKUP_TABLE_PATH, "JIDEnergy2GapCalibrations.csv")
-TEST_EXPECTED_UNDULATOR_LUT = join(LOOKUP_TABLE_PATH, "JIDEnergy2GapCalibrations.pkl")
+TEST_EXPECTED_UNDULATOR_LUT = join(LOOKUP_TABLE_PATH, "JIDEnergy2GapCalibrations.json")
 TEST_EXPECTED_ENERGY_MOTOR_LOOKUP = join(
-    LOOKUP_TABLE_PATH, "ExpectedJ09EnergyMotorLookup.pkl"
+    LOOKUP_TABLE_PATH, "ExpectedJ09EnergyMotorLookup.json"
 )
 __all__ = [
     "LOOKUP_TABLE_PATH",

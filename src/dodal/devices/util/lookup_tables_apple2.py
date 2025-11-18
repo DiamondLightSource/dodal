@@ -46,35 +46,6 @@ from pydantic import (
 from dodal.devices.apple2_undulator import Pol
 from dodal.log import LOGGER
 
-
-class LookupPath(BaseModel):
-    gap: Path
-    phase: Path
-
-    @classmethod
-    def create(
-        cls,
-        path: str,
-        gap_file: str = "IDEnergy2GapCalibrations.csv",
-        phase_file: str = "IDEnergy2PhaseCalibrations.csv",
-    ) -> "LookupPath":
-        """
-        Factory method to easily create LookupPath using some default file names.
-        Parameters:
-        -----------
-        path:
-            The file path to the lookup tables.
-        gap_file:
-            The gap lookup table file name.
-        phase_file:
-            The phase lookup table file name.
-
-        Returns:
-            LookupPath instance.
-        """
-        return cls(gap=Path(path, gap_file), phase=Path(path, phase_file))
-
-
 DEFAULT_POLY_DEG = [
     "7th-order",
     "6th-order",
@@ -86,7 +57,7 @@ DEFAULT_POLY_DEG = [
     "b",
 ]
 
-MODE_NAME_CONVERT = {"CR": "pc", "CL": "nc"}
+MODE_NAME_CONVERT = {"cr": "pc", "cl": "nc"}
 DEFAULT_GAP_FILE = "IDEnergy2GapCalibrations.csv"
 DEFAULT_PHASE_FILE = "IDEnergy2PhaseCalibrations.csv"
 
@@ -332,8 +303,8 @@ class EnergyMotorLookup:
         self,
         config_client: ConfigServer,
         lut_config: LookupTableConfig,
-        gap_path: Path,
-        phase_path: Path,
+        gap_path: Path | None = None,
+        phase_path: Path | None = None,
     ):
         """Initialise the EnergyMotorLookup class with lookup table headers provided.
 
@@ -364,6 +335,8 @@ class EnergyMotorLookup:
         self._available_pol = value
 
     def _update_gap_lut(self) -> None:
+        if self.gap_path is None:
+            raise RuntimeError("Gap path is not provided!")
         file_contents = self.config_client.get_file_contents(
             self.gap_path, reset_cached_result=True
         )
@@ -373,6 +346,8 @@ class EnergyMotorLookup:
         self.available_pol = list(self.lookup_tables.gap.root.keys())
 
     def _update_phase_lut(self) -> None:
+        if self.phase_path is None:
+            raise RuntimeError("Phase path is not provided!")
         file_contents = self.config_client.get_file_contents(
             self.phase_path, reset_cached_result=True
         )
@@ -384,9 +359,9 @@ class EnergyMotorLookup:
         """
         Update lookup tables from files and validate their format.
         """
-        LOGGER.info("Updating lookup table from file for gap.")
+        LOGGER.info("Updating lookup table for gap.")
         self._update_gap_lut()
-        LOGGER.info("Updating lookup table from file for phase.")
+        LOGGER.info("Updating lookup table for phase.")
         self._update_phase_lut()
 
     def get_motor_from_energy(self, energy: float, pol: Pol) -> tuple[float, float]:
