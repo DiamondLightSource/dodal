@@ -92,8 +92,10 @@ class OAVParameters:
         self.preprocess_K_size: int = update(
             "preProcessKSize", int
         )  # length scale for blur preprocessing
+        self.preprocess_iter: int = update("preProcessIteration", int, default=5)
         self.detection_script_filename: str = update("filename", str)
-        self.close_ksize: int = update("close_ksize", int, default=11)
+        self.open_ksize: int = update("open_ksize", int, default=0)
+        self.close_ksize: int = update("close_ksize", int, default=5)
         self.min_callback_time: float = update("min_callback_time", float, default=0.08)
         self.direction: int = update("direction", int)
         self.max_tip_distance: float = update("max_tip_distance", float, default=300)

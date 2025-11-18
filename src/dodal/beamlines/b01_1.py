@@ -37,7 +37,7 @@ def panda() -> HDFPanda:
         HDFPanda: The HDF5-based detector trigger device.
     """
     return HDFPanda(
-        f"{PREFIX.beamline_prefix}-MO-PANDA-01:",
+        f"{PREFIX.beamline_prefix}-MO-PPANDA-01:",
         path_provider=get_path_provider(),
     )
 
