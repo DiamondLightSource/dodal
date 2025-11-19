@@ -9,6 +9,10 @@ from .wrapped import (
     list_scan,
     num_rscan,
     num_scan,
+    step_grid_rscan,
+    step_grid_scan,
+    step_rscan,
+    step_scan,
 )
 
 __all__ = [
@@ -22,4 +26,8 @@ __all__ = [
     "num_rscan",
     "num_scan",
     "spec_scan",
+    "step_grid_rscan",
+    "step_grid_scan",
+    "step_rscan",
+    "step_scan",
 ]
