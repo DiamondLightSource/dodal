@@ -6,6 +6,8 @@ note:
     idd == id1,    idu == id2.
 """
 
+from pathlib import Path
+
 from daq_config_server.client import ConfigServer
 
 from dodal.common.beamlines.beamline_utils import device_factory
@@ -34,6 +36,12 @@ from dodal.devices.i10.i10_apple2 import (
 from dodal.devices.i10.i10_setting_data import I10Grating
 from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.devices.synchrotron import Synchrotron
+from dodal.devices.util.lookup_tables_apple2 import (
+    DEFAULT_GAP_FILE,
+    DEFAULT_PHASE_FILE,
+    EnergyMotorLookup,
+    LookupTableConfig,
+)
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
@@ -115,12 +123,13 @@ def idd() -> I10Apple2:
 @device_factory()
 def idd_controller() -> I10Apple2Controller:
     """I10 downstream insertion device controller."""
-    return I10Apple2Controller(
-        apple2=idd(),
-        lookuptable_dir=LOOK_UPTABLE_DIR,
-        source=("Source", "idd"),
+    idd_energy_motor_lut = EnergyMotorLookup(
         config_client=I10_CONF_CLIENT,
+        lut_config=LookupTableConfig(source=("Source", "idd")),
+        gap_path=Path(LOOK_UPTABLE_DIR, DEFAULT_GAP_FILE),
+        phase_path=Path(LOOK_UPTABLE_DIR, DEFAULT_PHASE_FILE),
     )
+    return I10Apple2Controller(apple2=idd(), energy_motor_lut=idd_energy_motor_lut)
 
 
 @device_factory()
@@ -179,12 +188,13 @@ def idu() -> I10Apple2:
 @device_factory()
 def idu_controller() -> I10Apple2Controller:
     """I10 upstream insertion device controller."""
-    return I10Apple2Controller(
-        apple2=idu(),
-        lookuptable_dir=LOOK_UPTABLE_DIR,
-        source=("Source", "idu"),
+    idu_energy_motor_lut = EnergyMotorLookup(
         config_client=I10_CONF_CLIENT,
+        lut_config=LookupTableConfig(source=("Source", "idu")),
+        gap_path=Path(LOOK_UPTABLE_DIR, DEFAULT_GAP_FILE),
+        phase_path=Path(LOOK_UPTABLE_DIR, DEFAULT_PHASE_FILE),
     )
+    return I10Apple2Controller(apple2=idd(), energy_motor_lut=idu_energy_motor_lut)
 
 
 @device_factory()
