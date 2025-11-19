@@ -422,8 +422,7 @@ def test_devices_or_raise(dm: DeviceManager):
 
 
 def test_connect(dm: DeviceManager):
-    s1 = Mock()
-    s1.return_value = Mock(spec=OphydV2Device)
+    s1 = Mock(return_value=Mock(spec=OphydV2Device))
 
     @dm.factory
     def foo():
@@ -439,8 +438,7 @@ def test_connect(dm: DeviceManager):
 
 
 def test_build_and_connect(dm: DeviceManager):
-    s1 = Mock()
-    s1.return_value = Mock(spec=OphydV2Device)
+    s1 = Mock(return_value=Mock(spec=OphydV2Device))
 
     @dm.factory
     def foo():
@@ -456,8 +454,7 @@ def test_build_and_connect(dm: DeviceManager):
 
 
 def test_factory_options(dm: DeviceManager):
-    s1 = Mock()
-    s1.return_value = Mock(spec=OphydV2Device)
+    s1 = Mock(return_value=Mock(spec=OphydV2Device))
 
     @dm.factory(mock=True, timeout=12)
     def foo():
@@ -470,8 +467,7 @@ def test_factory_options(dm: DeviceManager):
 
 
 def test_connect_failures(dm: DeviceManager):
-    s1 = Mock()
-    s1.return_value = Mock(spec=OphydV2Device)
+    s1 = Mock(return_value=Mock(spec=OphydV2Device))
     err = ValueError("Not connected")
     s1.return_value.connect.side_effect = err
 
@@ -486,8 +482,7 @@ def test_connect_failures(dm: DeviceManager):
 
 
 def test_connect_or_raise_without_errors(dm: DeviceManager):
-    s1 = Mock()
-    s1.return_value = Mock(spec=OphydV2Device)
+    s1 = Mock(return_value=Mock(spec=OphydV2Device))
 
     @dm.factory
     def foo():
@@ -501,8 +496,7 @@ def test_connect_or_raise_without_errors(dm: DeviceManager):
 
 
 def test_connect_or_raise_with_build_errors(dm: DeviceManager):
-    s1 = Mock()
-    s1.return_value = Mock(spec=OphydV2Device)
+    Mock(return_value=Mock(spec=OphydV2Device))
 
     @dm.factory
     def foo():
@@ -513,8 +507,7 @@ def test_connect_or_raise_with_build_errors(dm: DeviceManager):
 
 
 def test_connect_or_raise_with_connect_errors(dm: DeviceManager):
-    s1 = Mock()
-    s1.return_value = Mock(spec=OphydV2Device)
+    s1 = Mock(return_value=Mock(spec=OphydV2Device))
     s1.return_value.connect.side_effect = ValueError("foo connection")
 
     @dm.factory
@@ -526,14 +519,13 @@ def test_connect_or_raise_with_connect_errors(dm: DeviceManager):
 
 
 def test_build_and_connect_immediately(dm: DeviceManager):
-    s1 = Mock()
-    s1.return_value = Mock(spec=OphydV2Device)
+    s1 = Mock(return_value=Mock(spec=OphydV2Device))
 
     @dm.factory
     def foo():
         return s1()
 
-    f = foo.build(connect_immediately=True)
+    f = foo.build(connect_immediately=True)  # type: ignore
     s1.assert_called_once()
     s1().connect.assert_called_with(mock=False, timeout=DEFAULT_TIMEOUT)
     assert f is s1()
@@ -576,8 +568,7 @@ def test_skip_ignored_if_required(dm: DeviceManager):
 
 
 def test_mock_all(dm: DeviceManager):
-    s1 = Mock()
-    s1.return_value = Mock(spec=OphydV2Device)
+    s1 = Mock(return_value=Mock(spec=OphydV2Device))
 
     @dm.factory
     def foo():
@@ -655,8 +646,7 @@ def test_connect_ignores_v1():
 
 
 def test_v1_mocking(dm: DeviceManager):
-    s1 = Mock()
-    s1.return_value = Mock(spec=OphydV1Device)
+    s1 = Mock(return_value=Mock(spec=OphydV1Device))
 
     @dm.v1_init(s1, prefix="S1_PREFIX", mock=True)  # type: ignore
     def foo(_):
@@ -669,8 +659,7 @@ def test_v1_mocking(dm: DeviceManager):
 
 def test_v1_init_params(dm: DeviceManager):
     # values are passed from fixtures
-    s1 = Mock()
-    s1.return_value = Mock(spec=OphydV1Device)
+    s1 = Mock(return_value=Mock(spec=OphydV1Device))
     s1.return_value.mock_add_spec(["set_up_with"])
 
     @dm.fixture
@@ -692,8 +681,7 @@ def test_lazy_fixtures_non_lazy():
 
 
 def test_lazy_fixtures_lazy():
-    buzz = Mock()
-    buzz.return_value = "buzz"
+    buzz = Mock(return_value="buzz")
     lf = LazyFixtures(provided={}, factories={"fizz": buzz})
 
     assert lf.get("foo") is None
@@ -704,8 +692,7 @@ def test_lazy_fixtures_lazy():
 
 
 def test_lazy_fixtures_provided_overrides_factory():
-    buzz = Mock()
-    buzz.return_value = "buzz"
+    buzz = Mock(return_value="buzz")
 
     lf = LazyFixtures(provided={"fizz": "foo"}, factories={"fizz": buzz})
 
@@ -714,8 +701,7 @@ def test_lazy_fixtures_provided_overrides_factory():
 
 
 def test_lazy_fixtures_deduplicated():
-    buzz = Mock()
-    buzz.return_value = "buzz"
+    buzz = Mock(return_value="buzz")
 
     lf = LazyFixtures(provided={"fizz": "foo"}, factories={"fizz": buzz})
 
@@ -723,8 +709,7 @@ def test_lazy_fixtures_deduplicated():
 
 
 def test_lazy_fixtures_iter():
-    buzz = Mock()
-    buzz.return_value = "buzz"
+    buzz = Mock(return_value="buzz")
 
     lf = LazyFixtures(
         provided={"foo": "bar", "one": "two"}, factories={"fizz": buzz, "one": "two"}
@@ -734,8 +719,7 @@ def test_lazy_fixtures_iter():
 
 
 def test_lazy_fixtures_contains():
-    buzz = Mock()
-    buzz.return_value = "buzz"
+    buzz = Mock(return_value="buzz")
 
     lf = LazyFixtures(
         provided={"foo": "bar", "one": "two"}, factories={"fizz": buzz, "one": "two"}
