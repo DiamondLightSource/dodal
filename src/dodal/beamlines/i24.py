@@ -25,12 +25,15 @@ from dodal.devices.i24.vgonio import VerticalGoniometer
 from dodal.devices.motors import YZStage
 from dodal.devices.oav.oav_detector import OAVBeamCentreFile
 from dodal.devices.oav.oav_parameters import OAVConfigBeamCentre
+from dodal.devices.synchrotron import Synchrotron
+from dodal.devices.xbpm_feedback import XBPMFeedback
 from dodal.devices.zebra.zebra import Zebra
 from dodal.devices.zebra.zebra_constants_mapping import (
     ZebraMapping,
     ZebraSources,
     ZebraTTLOutputs,
 )
+from dodal.devices.zebra.zebra_controlled_shutter import ZebraShutter
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
@@ -216,3 +219,29 @@ def commissioning_jungfrau(
             StaticFilenameProvider(filename), PurePath(path_to_dir)
         ),
     )
+
+
+@device_factory()
+def synchrotron() -> Synchrotron:
+    """Get the i24 synchrotron device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i24, it will return the existing object.
+    """
+    return Synchrotron()
+
+
+@device_factory()
+def sample_shutter() -> ZebraShutter:
+    """Get the i24 sample shutter device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i24, it will return the existing object.
+    """
+    return ZebraShutter(
+        f"{PREFIX.beamline_prefix}-EA-SHTR-01:",
+    )
+
+
+@device_factory()
+def xbpm_feedback() -> XBPMFeedback:
+    """Get the i24 XBPM feeback device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i24, it will return the existing object.
+    """
+    return XBPMFeedback(f"{PREFIX.beamline_prefix}-EA-FDBK-01:")
