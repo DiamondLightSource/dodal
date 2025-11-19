@@ -1,4 +1,3 @@
-import asyncio
 from unittest.mock import MagicMock, patch
 
 import numpy as np
@@ -9,9 +8,6 @@ from dodal.devices.oav.pin_image_recognition import (
     PinTipDetection,
 )
 from dodal.devices.oav.pin_image_recognition.utils import NONE_VALUE, SampleLocation
-
-EVENT_LOOP = asyncio.new_event_loop()
-
 
 DEVICE_NAME = "pin_tip_detection"
 TRIGGERED_TIP_READING = DEVICE_NAME + "-triggered_tip"
@@ -79,7 +75,9 @@ async def test_invalid_processing_func_uses_identity_function():
 
     with (
         patch.object(MxSampleDetect, "__init__", return_value=None) as mock_init,
-        patch.object(MxSampleDetect, "processArray", return_value=test_sample_location),
+        patch.object(
+            MxSampleDetect, "process_array", return_value=test_sample_location
+        ),
     ):
         await device._get_tip_and_edge_data(np.array([]))
 
@@ -87,7 +85,7 @@ async def test_invalid_processing_func_uses_identity_function():
 
         captured_func = mock_init.call_args[1]["preprocess"]
 
-    # Assert captured preprocess function is the identitiy function
+    # Assert captured preprocess function is the identity function
     arg = object()
     assert arg == captured_func(arg)
 
@@ -106,7 +104,7 @@ async def test_given_valid_data_reading_then_used_to_find_location():
     with (
         patch.object(MxSampleDetect, "__init__", return_value=None),
         patch.object(
-            MxSampleDetect, "processArray", return_value=test_sample_location
+            MxSampleDetect, "process_array", return_value=test_sample_location
         ) as mock_process_array,
     ):
         await device.trigger()
@@ -127,7 +125,7 @@ async def test_given_find_tip_fails_when_triggered_then_tip_invalid():
 
     with (
         patch.object(MxSampleDetect, "__init__", return_value=None),
-        patch.object(MxSampleDetect, "processArray", side_effect=Exception()),
+        patch.object(MxSampleDetect, "process_array", side_effect=Exception()),
     ):
         await device.trigger()
         reading = await device.read()
@@ -151,7 +149,7 @@ async def test_given_find_tip_fails_twice_when_triggered_then_tip_invalid_and_tr
     with (
         patch.object(MxSampleDetect, "__init__", return_value=None),
         patch.object(
-            MxSampleDetect, "processArray", side_effect=Exception()
+            MxSampleDetect, "process_array", side_effect=Exception()
         ) as mock_process_array,
     ):
         await device.trigger()
@@ -187,7 +185,7 @@ async def test_given_tip_invalid_then_loop_keeps_retrying_until_valid(
         patch.object(MxSampleDetect, "__init__", return_value=None),
         patch.object(
             MxSampleDetect,
-            "processArray",
+            "process_array",
             side_effect=[
                 FakeLocation(None, None, fake_top_edge, fake_bottom_edge),
                 FakeLocation(1, 1, fake_top_edge, fake_bottom_edge),

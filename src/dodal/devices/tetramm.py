@@ -24,7 +24,9 @@ from ophyd_async.epics.adcore import (
     NDFileHDFIO,
     NDPluginBaseIO,
 )
-from ophyd_async.epics.core import PvSuffix, epics_signal_r
+from ophyd_async.epics.core import PvSuffix, epics_signal_r, stop_busy_record
+
+from dodal.log import LOGGER
 
 
 class TetrammRange(StrictEnum):
@@ -110,6 +112,7 @@ class TetrammController(DetectorController):
         current_trig_status = await self.driver.trigger_mode.get_value()
 
         if current_trig_status == TetrammTrigger.FREE_RUN:  # if freerun turn off first
+            LOGGER.info("Disarming TetrAMM from free run")
             await self.disarm()
 
         # trigger mode must be set first and on its own!
@@ -144,13 +147,14 @@ class TetrammController(DetectorController):
         await wait_for_value(self._file_io.acquire, False, timeout=None)
 
     async def unstage(self):
-        await self.disarm()
-        await self._file_io.acquire.set(False)
+        LOGGER.info("Unstaging TetrAMM")
+        await self._file_io.acquire.set(False, wait=False)
 
     async def disarm(self):
         # We can't use caput callback as we already used it in arm() and we can't have
-        # 2 or they will deadlock
-        await set_and_wait_for_value(self.driver.acquire, False, timeout=1)
+        # 2 or they will deadlock. Therefore must use stop_busy_record
+        LOGGER.info("Disarming TetrAMM")
+        await stop_busy_record(self.driver.acquire, False, timeout=DEFAULT_TIMEOUT)
 
     async def set_exposure(self, exposure: float) -> None:
         """Set the exposure time and acquire period.

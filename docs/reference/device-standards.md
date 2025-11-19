@@ -26,8 +26,8 @@ Determining where in dodal a device should live can be summarised below:
 
 ## Device Best Practices
 
-Ophyd-async directory contains a [flowchart](https://blueskyproject.io/ophyd-async/main/how-to/choose-interfaces-for-devices.html) for a simplified decision tree about what interfaces
-should a given device implement. In addition to this the following guidelines are strongly recommended:
+In general, you should follow the ophyd-async [guide](https://blueskyproject.io/ophyd-async/main/how-to/choose-right-baseclass.html) for what interfaces a device should implement.
+In addition to this the following guidelines are strongly recommended:
 
 * Device should have their name as an optional str parameter with a default of ""- this allows ophyd-async to automatically name the device
 * Devices should contain only the PV suffixes that are generic for any instance of the device. See [PV Suffixes](#pv-suffixes)
@@ -112,7 +112,7 @@ Whilst it would be possible to do:
 this has potential negative side effects:
 
 * When the plan is simulated it will still set the parameter on the device
-* There may be external things attached to the RE that are tracking messages e.g. metrics. A set like this would be
+* There may be external things attached to the RunEngine that are tracking messages e.g. metrics. A set like this would be
   lost
 
 Instead you should make a soft signal:

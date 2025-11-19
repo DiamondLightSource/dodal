@@ -45,7 +45,6 @@ class JunfrauCommissioningWriter(DetectorWriter, StandardReadable):
             self.expected_frames = epics_signal_rw(
                 int, "BL24I-JUNGFRAU-META:FD:NumCapture"
             )
-
         super().__init__(name)
 
     async def open(self, name: str, exposures_per_event: int = 1) -> dict[str, DataKey]:
@@ -87,7 +86,7 @@ class JunfrauCommissioningWriter(DetectorWriter, StandardReadable):
     async def observe_indices_written(
         self, timeout: float
     ) -> AsyncGenerator[int, None]:
-        timeout = timeout * 4  # This filewriter is slow
+        timeout = timeout * 4  # This filewriter is very slow
         async for num_captured in observe_value(self.frame_counter, timeout):
             print(f"frame counter is at {num_captured}")
             yield num_captured // (self._exposures_per_event)

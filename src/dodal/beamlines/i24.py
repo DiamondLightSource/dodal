@@ -1,9 +1,7 @@
 from pathlib import PurePath
 
 from ophyd_async.core import (
-    AutoIncrementingPathProvider,
     AutoMaxIncrementingPathProvider,
-    StaticFilenameProvider,
 )
 
 from dodal.common.beamlines.beamline_utils import (
@@ -13,8 +11,8 @@ from dodal.common.beamlines.beamline_utils import (
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.devices.attenuator.attenuator import EnumFilterAttenuator
 from dodal.devices.attenuator.filter_selections import (
-    I24_FilterOneSelections,
-    I24_FilterTwoSelections,
+    I24FilterOneSelections,
+    I24FilterTwoSelections,
 )
 from dodal.devices.hutch_shutter import HutchShutter
 from dodal.devices.i24.aperture import Aperture
@@ -30,7 +28,6 @@ from dodal.devices.motors import YZStage
 from dodal.devices.oav.oav_detector import OAVBeamCentreFile
 from dodal.devices.oav.oav_parameters import OAVConfigBeamCentre
 from dodal.devices.synchrotron import Synchrotron
-from dodal.devices.xbpm_feedback import XBPMFeedback
 from dodal.devices.zebra.zebra import Zebra
 from dodal.devices.zebra.zebra_constants_mapping import (
     ZebraMapping,
@@ -66,7 +63,7 @@ def attenuator() -> EnumFilterAttenuator:
     existing object."""
     return EnumFilterAttenuator(
         f"{PREFIX.beamline_prefix}-OP-ATTN-01:",
-        filter_selection=(I24_FilterOneSelections, I24_FilterTwoSelections),
+        filter_selection=(I24FilterOneSelections, I24FilterTwoSelections),
     )
 
 
