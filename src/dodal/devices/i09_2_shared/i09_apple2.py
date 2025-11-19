@@ -3,6 +3,7 @@ from pathlib import Path
 from daq_config_server.client import ConfigServer
 
 from dodal.devices.apple2_undulator import (
+    MAXIMUM_MOVE_TIME,
     Apple2,
     Apple2Controller,
     Apple2PhasesVal,
@@ -138,11 +139,29 @@ class J09Apple2Controller(Apple2Controller[Apple2]):
             gap=f"{gap:.6f}",
             phase=Apple2PhasesVal(
                 top_outer=f"{phase:.6f}",
-                top_inner="0.0",
+                top_inner=f"{0.0:.6f}",
                 btm_inner=f"{phase:.6f}",
-                btm_outer="0.0",
+                btm_outer=f"{0.0:.6f}",
             ),
         )
 
         LOGGER.info(f"Setting polarisation to {pol}, with values: {id_set_val}")
         await self.apple2().set(id_motor_values=id_set_val)
+
+    async def _set_pol(
+        self,
+        value: Pol,
+    ) -> None:
+        # I09 require all palarisation change to go to LH first
+        target_energy = await self.energy.get_value()
+        if value is not Pol.LH:
+            self._polarisation_setpoint_set(Pol.LH)
+            max_lh_energy = float(
+                self.lookup_table_client.lookup_tables.gap.root[Pol("lh")].limit.maximum
+            )
+            lh_setpoint = (
+                max_lh_energy if target_energy > max_lh_energy else target_energy
+            )
+            await self.energy.set(lh_setpoint, timeout=MAXIMUM_MOVE_TIME)
+        self._polarisation_setpoint_set(value)
+        await self.energy.set(target_energy, timeout=MAXIMUM_MOVE_TIME)
