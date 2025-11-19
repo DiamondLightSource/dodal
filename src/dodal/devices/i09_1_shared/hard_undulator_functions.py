@@ -22,7 +22,7 @@ MAGNET_BLOCKS_PER_PERIOD = 4
 MAGNTE_BLOCK_HEIGHT_MM = 16
 
 
-async def get_hu_lut_as_dict(lut_path: str) -> dict:
+async def get_hu_lut_as_dict(lut_path: str) -> dict[int, np.ndarray]:
     lut_dict: dict[int, np.ndarray] = {}
     _lookup_table: np.ndarray = await energy_distance_table(
         lut_path,
@@ -68,7 +68,7 @@ def _calculate_undulator_parameter_max(
 
 def calculate_gap_i09_hu(
     photon_energy_kev: float,
-    look_up_table: dict[int, "np.ndarray"],
+    look_up_table: dict[int, np.ndarray],
     order: int = 1,
     gap_offset: float = 0.0,
     undulator_period_mm: int = 27,
