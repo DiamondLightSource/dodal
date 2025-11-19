@@ -1,9 +1,9 @@
 import cv2
 import numpy as np
-from ophyd_async.core import (
-    StandardReadable,
+from ophyd_async.core import StandardReadable, soft_signal_r_and_setter
+from ophyd_async.epics.core import (
+    epics_signal_r,
 )
-from ophyd_async.epics.core import epics_signal_r
 
 
 class MaxPixel(StandardReadable):
@@ -11,6 +11,9 @@ class MaxPixel(StandardReadable):
 
     def __init__(self, prefix: str, name: str = "") -> None:
         self.array_data = epics_signal_r(np.ndarray, f"pva://{prefix}PVA:ARRAY")
+        self.max_pixel_x, self._x_setter = soft_signal_r_and_setter(int)
+        self.max_pixel_y, self._y_setter = soft_signal_r_and_setter(int)
+        self.max_pixel_val, self._max_val_setter = soft_signal_r_and_setter(float)
         # type: ignore
         pass
 
@@ -20,7 +23,15 @@ class MaxPixel(StandardReadable):
         return blurred_arr
 
     def _get_max_pixel_and_loc(self):
-        # convert to grayscale
         arr = self.preprocess()
         (_, max_val, _, max_loc) = cv2.minMaxLoc(arr)
         return (max_val, max_loc)
+
+    def trigger(self):
+        max_val_loc = self._get_max_pixel_and_loc()
+        max_val = max_val_loc[0]
+        max_loc = max_val_loc[1]
+
+        self._max_val_setter(max_val)
+        self._x_setter(max_loc[0])
+        self._y_setter(max_loc[1])
