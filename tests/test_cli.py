@@ -298,18 +298,17 @@ def test_cli_connect_when_devices_error(
         )
 
 
+@patch("dodal.cli.importlib")
+@patch("dodal.cli.make_all_devices")
+@patch("dodal.cli._connect_devices")
 @patch.dict(os.environ, clear=True)
-def test_missing_device_manager(runner: CliRunner):
-    with patch("dodal.cli.importlib"):
-        with pytest.raises(
-            ValueError,
-            match="Name 'devices' could not be found or is not a DeviceManager",
-        ):
-            print("Invoking connect")
-            runner.invoke(
-                main, ["connect", "-n", "devices", "i22"], catch_exceptions=False
-            )
-            print("Ran connect")
+def test_missing_device_manager(connect, make, imp, runner: CliRunner):
+    # If the device manager cannot be found, it should fall back to the
+    # make_all_devices + _connect_devices approach.
+    make.return_value = ({}, {})
+    runner.invoke(main, ["connect", "-n", "devices", "i22"])
+    make.assert_called_once()
+    connect.assert_called_once()
 
 
 @patch.dict(os.environ, clear=True)
