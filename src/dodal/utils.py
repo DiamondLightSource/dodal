@@ -11,7 +11,7 @@ from functools import update_wrapper, wraps
 from importlib import import_module
 from inspect import signature
 from os import environ
-from types import ModuleType
+from types import FunctionType, ModuleType
 from typing import (
     Any,
     Generic,
@@ -413,7 +413,9 @@ def is_v2_device_factory(func: Callable) -> TypeGuard[V2DeviceFactory]:
 
 
 def is_any_device_factory(func: Callable) -> TypeGuard[AnyDeviceFactory]:
-    return is_v1_device_factory(func) or is_v2_device_factory(func)
+    return isinstance(func, (FunctionType, DeviceInitializationController)) and (
+        is_v1_device_factory(func) or is_v2_device_factory(func)
+    )
 
 
 def is_v2_device_type(obj: type[Any]) -> bool:
