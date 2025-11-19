@@ -12,6 +12,7 @@ from dodal.devices.electron_analyser.specs import SpecsDetector
 from dodal.devices.i09_1 import LensMode, PsuMode
 from dodal.devices.i09_1_shared.hard_energy import HardEnergy, HardInsertionDeviceEnergy
 from dodal.devices.i09_1_shared.hard_undulator_functions import (
+    calculate_energy_i09_hu,
     calculate_gap_i09_hu,
 )
 from dodal.devices.synchrotron import Synchrotron
@@ -70,7 +71,7 @@ def hu_id_energy() -> HardInsertionDeviceEnergy:
         undulator_order=harmonics(),
         undulator=undulator(),
         lut={},  # Placeholder, will be set later_
-        gap_to_energy_func=lambda x: x,  # Placeholder, need https://github.com/DiamondLightSource/dodal/pull/1712 merged first
+        gap_to_energy_func=calculate_energy_i09_hu,
         energy_to_gap_func=calculate_gap_i09_hu,
         name="hu_id_energy",
     )

@@ -18,6 +18,7 @@ from dodal.devices.common_dcm import (
 from dodal.devices.i09_1_shared import (
     HardEnergy,
     HardInsertionDeviceEnergy,
+    calculate_energy_i09_hu,
     calculate_gap_i09_hu,
     get_hu_lut_as_dict,
 )
@@ -66,10 +67,8 @@ async def hu_id_energy(
     hu = HardInsertionDeviceEnergy(
         undulator_order=undulator_order,
         undulator=undulator_in_mm,
-        lut=lut_dictionary,  # Placeholder, will be set later_
-        gap_to_energy_func=lambda gap,
-        look_up_table,
-        order: gap,  # Placeholder, not used in this context
+        lut=lut_dictionary,
+        gap_to_energy_func=calculate_energy_i09_hu,
         energy_to_gap_func=calculate_gap_i09_hu,
         name="hu_id_energy",
     )
@@ -93,13 +92,18 @@ async def hu_energy(
 
 
 async def test_hu_id_energy_reading_includes_read_fields(
+    run_engine: RunEngine,
     hu_id_energy: HardInsertionDeviceEnergy,
 ):
+    # need to set correct order to avoid errors in reading
+    await hu_id_energy._undulator_order().value.set(3)
+    energy_value = 3.1416
+    run_engine(mv(hu_id_energy, energy_value))
     await assert_reading(
         hu_id_energy,
         {
-            "hu_id_energy-energy": partial_reading(0.0),
-            "hu_id_energy-energy_demand": partial_reading(0.0),
+            "hu_id_energy-energy": partial_reading(energy_value),
+            "hu_id_energy-energy_demand": partial_reading(energy_value),
             "undulator_mm-current_gap": partial_reading(0.0),
             "undulator_order-value": partial_reading(3.0),
         },
@@ -149,6 +153,9 @@ async def test_hu_id_energy_set_energy_updates_gap(
     assert await hu_id_energy.energy_demand.get_value() == pytest.approx(
         energy_value, abs=0.001
     )
+    assert await hu_id_energy.energy.get_value() == pytest.approx(
+        energy_value, abs=0.001
+    )
     assert (
         await hu_id_energy._undulator().gap_motor.user_readback.get_value()
         == pytest.approx(expected_gap, abs=0.001)
@@ -157,13 +164,17 @@ async def test_hu_id_energy_set_energy_updates_gap(
 
 async def test_hu_energy_read_include_read_fields(
     hu_energy: HardEnergy,
+    run_engine: RunEngine,
 ):
+    await hu_energy._undulator_energy()._undulator_order().value.set(3)
+    energy_value = 3.1416
+    run_engine(mv(hu_energy, energy_value))
     await assert_reading(
         hu_energy,
         {
-            "dcm-energy_in_keV": partial_reading(0.0),
-            "hu_id_energy-energy": partial_reading(0.0),
-            "hu_id_energy-energy_demand": partial_reading(0.0),
+            "dcm-energy_in_keV": partial_reading(energy_value),
+            "hu_id_energy-energy": partial_reading(energy_value),
+            "hu_id_energy-energy_demand": partial_reading(energy_value),
             "undulator_mm-current_gap": partial_reading(0.0),
             "undulator_order-value": partial_reading(3.0),
         },
