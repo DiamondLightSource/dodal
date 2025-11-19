@@ -45,8 +45,8 @@ def main(ctx: click.Context) -> None:
     "attempt any I/O. Useful as a a dry-run.",
     default=False,
 )
-@click.option("-n", "--name")
-def connect(beamline: str, all: bool, sim_backend: bool, name: str | None) -> None:
+@click.option("-n", "--name", "device_manager", default="devices")
+def connect(beamline: str, all: bool, sim_backend: bool, device_manager: str) -> None:
     """Initialises a beamline module, connects to all devices, reports
     any connection issues."""
 
@@ -70,18 +70,14 @@ def connect(beamline: str, all: bool, sim_backend: bool, name: str | None) -> No
     # because the alternatives is handling the fact that only some devices may
     # be lazy.
 
-    if name:
-        if (manager := getattr(mod, name, None)) and isinstance(manager, DeviceManager):
-            devices, instance_exceptions, connect_exceptions = (
-                manager.build_and_connect(
-                    mock=sim_backend,
-                )
-            )
-        else:
-            raise ValueError(
-                f"Name '{name}' could not be found or is not a DeviceManager"
-            )
+    if (manager := getattr(mod, device_manager, None)) and isinstance(
+        manager, DeviceManager
+    ):
+        devices, instance_exceptions, connect_exceptions = manager.build_and_connect(
+            mock=sim_backend,
+        )
     else:
+        print(f"No device manager named '{device_manager}' found in {mod}")
         _spoof_path_provider()
         devices, instance_exceptions = make_all_devices(
             full_module_path,
