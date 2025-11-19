@@ -14,23 +14,26 @@ class MaxPixel(StandardReadable):
         self.max_pixel_x, self._x_setter = soft_signal_r_and_setter(int)
         self.max_pixel_y, self._y_setter = soft_signal_r_and_setter(int)
         self.max_pixel_val, self._max_val_setter = soft_signal_r_and_setter(float)
-        # type: ignore
-        pass
 
-    def preprocess(self):
+    def preprocessed_data(
+        self, dist_from_x: int | None = None, dist_from_y: int | None = None
+    ):
+        """
+        Preprocess the image array data (convert to grayscale and apply a guassian blur)
+        """
         gray_arr = cv2.cvtColor(self.array_data, cv2.COLOR_BGR2GRAY)  # type: ignore
         blurred_arr = cv2.GaussianBlur(gray_arr, (7, 7), 0)
         return blurred_arr
 
     def _get_max_pixel_and_loc(self):
-        arr = self.preprocess()
+        arr = self.preprocessed_data()
         (_, max_val, _, max_loc) = cv2.minMaxLoc(arr)
         return (max_val, max_loc)
 
     def trigger(self):
         max_val_loc = self._get_max_pixel_and_loc()
-        max_val = max_val_loc[0]
-        max_loc = max_val_loc[1]
+        max_val = max_val_loc[0]  # brightest pixel value
+        max_loc = max_val_loc[1]  # x, y
 
         self._max_val_setter(max_val)
         self._x_setter(max_loc[0])
