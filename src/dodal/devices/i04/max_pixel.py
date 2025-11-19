@@ -25,16 +25,7 @@ class MaxPixel(StandardReadable):
         blurred_arr = cv2.GaussianBlur(gray_arr, (7, 7), 0)
         return blurred_arr
 
-    def _get_max_pixel_and_loc(self):
-        arr = self.preprocessed_data()
-        (_, max_val, _, max_loc) = cv2.minMaxLoc(arr)
-        return (max_val, max_loc)
-
     def trigger(self):
-        max_val_loc = self._get_max_pixel_and_loc()
-        max_val = max_val_loc[0]  # brightest pixel value
-        max_loc = max_val_loc[1]  # x, y
-
+        arr = self.preprocessed_data()
+        max_val = np.max(arr)
         self._max_val_setter(max_val)
-        self._x_setter(max_loc[0])
-        self._y_setter(max_loc[1])
