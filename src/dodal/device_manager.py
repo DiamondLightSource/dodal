@@ -167,7 +167,7 @@ class DeviceFactory(Generic[Args, V2]):
         return device  # type: ignore - it's us, honest
 
     def create(self, *args, **kwargs) -> V2:
-        # TODO: Remove when v1 support is no longer required
+        # TODO: Remove when v1 support is no longer required - see #1718
         return self(*args, **kwargs)
 
     def __call__(self, *args, **kwargs) -> V2:
@@ -181,7 +181,7 @@ class DeviceFactory(Generic[Args, V2]):
         return f"<{self.name}: DeviceFactory{params}>"
 
 
-# TODO: Remove when ophyd v1 support is no longer required
+# TODO: Remove when ophyd v1 support is no longer required - see #1718
 class V1DeviceFactory(Generic[V1]):
     """
     Wrapper around an ophyd v1 device that holds a reference to a device
@@ -240,7 +240,7 @@ class V1DeviceFactory(Generic[V1]):
         return self._skip() if callable(self._skip) else self._skip
 
     def mock_if_needed(self, mock=False) -> Self:
-        # TODO: Remove when Ophyd V1 support is no longer required
+        # TODO: Remove when Ophyd V1 support is no longer required - see #1718
         factory = (
             make_fake_device(self.factory) if (self.mock or mock) else self.factory
         )
@@ -320,7 +320,7 @@ class DeviceBuildResult(NamedTuple):
         loop: asyncio.EventLoop = get_bluesky_event_loop()  # type: ignore
         for name, device in self.devices.items():
             if not isinstance(device, OphydV2Device):
-                # TODO: Remove when ophyd v1 support is no longer required
+                # TODO: Remove when ophyd v1 support is no longer required - see #1718
                 # V1 devices are connected at creation time assuming wait is not set to False
                 connected[name] = device
                 continue
@@ -513,7 +513,7 @@ class DeviceManager:
                 }
                 try:
                     if isinstance(factory, V1DeviceFactory):
-                        # TODO: Remove when ophyd v1 support is no longer required
+                        # TODO: Remove when ophyd v1 support is no longer required - see #1718
                         factory = factory.mock_if_needed(mock)
                     built_device = factory.create(**params)
                     built[device] = built_device
@@ -577,8 +577,8 @@ class DeviceManager:
         given factory list.
         """
 
-        # TODO: This is not an efficient way of doing this
-        # However, for realistic use cases, it is fast enough for now
+        # This is not an efficient way of doing this, however, for realistic use
+        # cases, it is fast enough for now
         order = []
         available = set(fixtures.keys())
         pending = factories
