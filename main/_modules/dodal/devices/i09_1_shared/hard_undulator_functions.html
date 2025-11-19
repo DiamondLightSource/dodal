@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.i09_1_shared.hard_undulator_functions &#8212; dodal 1.65.1.dev20+g4fc878dca documentation</title>
+    <title>dodal.devices.i09_1_shared.hard_undulator_functions &#8212; dodal 1.65.1.dev21+g2b7fa797b documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=a6386a64"></script>
+    <script src="../../../../_static/documentation_options.js?v=45bd4413"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -466,13 +466,18 @@ window.addEventListener("load", () => mermaid.run());
 <span class="n">MAGNET_FIELD_COLUMN</span> <span class="o">=</span> <span class="mi">2</span>
 <span class="n">MIN_ENERGY_COLUMN</span> <span class="o">=</span> <span class="mi">3</span>
 <span class="n">MAX_ENERGY_COLUMN</span> <span class="o">=</span> <span class="mi">4</span>
+<span class="n">MIN_GAP_COLUMN</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="n">MAX_GAP_COLUMN</span> <span class="o">=</span> <span class="mi">6</span>
 <span class="n">GAP_OFFSET_COLUMN</span> <span class="o">=</span> <span class="mi">7</span>
+
+<span class="n">MAGNET_BLOCKS_PER_PERIOD</span> <span class="o">=</span> <span class="mi">4</span>
+<span class="n">MAGNTE_BLOCK_HEIGHT_MM</span> <span class="o">=</span> <span class="mi">16</span>
 
 
 <div class="viewcode-block" id="get_hu_lut_as_dict">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i09_1_shared.html#dodal.devices.i09_1_shared.get_hu_lut_as_dict">[docs]</a>
-<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_hu_lut_as_dict</span><span class="p">(</span><span class="n">lut_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-    <span class="n">lut_dict</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_hu_lut_as_dict</span><span class="p">(</span><span class="n">lut_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+    <span class="n">lut_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">_lookup_table</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="k">await</span> <span class="n">energy_distance_table</span><span class="p">(</span>
         <span class="n">lut_path</span><span class="p">,</span>
         <span class="n">comments</span><span class="o">=</span><span class="n">LUT_COMMENTS</span><span class="p">,</span>
@@ -480,16 +485,47 @@ window.addEventListener("load", () => mermaid.run());
     <span class="p">)</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">_lookup_table</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
         <span class="n">lut_dict</span><span class="p">[</span><span class="n">_lookup_table</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">_lookup_table</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-        <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Loaded lookup table:</span><span class="se">\n</span><span class="s2"> </span><span class="si">{</span><span class="n">lut_dict</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Loaded lookup table: </span><span class="si">{</span><span class="n">lut_dict</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">lut_dict</span></div>
 
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_validate_order</span><span class="p">(</span><span class="n">order</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">look_up_table</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="s2">&quot;np.ndarray&quot;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate that the harmonic order exists in the lookup table.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">order</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">look_up_table</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Order parameter </span><span class="si">{</span><span class="n">order</span><span class="si">}</span><span class="s2"> not found in lookup table&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_calculate_gamma</span><span class="p">(</span><span class="n">look_up_table</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="s2">&quot;np.ndarray&quot;</span><span class="p">],</span> <span class="n">order</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the Lorentz factor gamma from the lookup table.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="mi">1000</span> <span class="o">*</span> <span class="n">look_up_table</span><span class="p">[</span><span class="n">order</span><span class="p">][</span><span class="n">RING_ENERGY_COLUMN</span><span class="p">]</span> <span class="o">/</span> <span class="n">ELECTRON_REST_ENERGY_MEV</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_calculate_undulator_parameter_max</span><span class="p">(</span>
+    <span class="n">magnet_field</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">undulator_period_mm</span><span class="p">:</span> <span class="nb">int</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the maximum undulator parameter.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="p">(</span>
+            <span class="mi">2</span>
+            <span class="o">*</span> <span class="mf">0.0934</span>
+            <span class="o">*</span> <span class="n">undulator_period_mm</span>
+            <span class="o">*</span> <span class="n">magnet_field</span>
+            <span class="o">*</span> <span class="n">MAGNET_BLOCKS_PER_PERIOD</span>
+            <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span>
+        <span class="p">)</span>
+        <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="n">MAGNET_BLOCKS_PER_PERIOD</span><span class="p">)</span>
+        <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">MAGNTE_BLOCK_HEIGHT_MM</span> <span class="o">/</span> <span class="n">undulator_period_mm</span><span class="p">))</span>
+    <span class="p">)</span>
 
 
 <div class="viewcode-block" id="calculate_gap_i09_hu">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i09_1_shared.html#dodal.devices.i09_1_shared.calculate_gap_i09_hu">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">calculate_gap_i09_hu</span><span class="p">(</span>
     <span class="n">photon_energy_kev</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-    <span class="n">look_up_table</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="s2">&quot;np.ndarray&quot;</span><span class="p">],</span>
+    <span class="n">look_up_table</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span>
     <span class="n">order</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
     <span class="n">gap_offset</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
     <span class="n">undulator_period_mm</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">27</span><span class="p">,</span>
@@ -509,13 +545,9 @@ window.addEventListener("load", () => mermaid.run());
 <span class="sd">    Returns:</span>
 <span class="sd">        float: Calculated undulator gap in millimeters.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">magnet_blocks_per_period</span> <span class="o">=</span> <span class="mi">4</span>
-    <span class="n">magnet_block_height_mm</span> <span class="o">=</span> <span class="mi">16</span>
 
-    <span class="k">if</span> <span class="n">order</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">look_up_table</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Order parameter </span><span class="si">{</span><span class="n">order</span><span class="si">}</span><span class="s2"> not found in lookup table&quot;</span><span class="p">)</span>
-
-    <span class="n">gamma</span> <span class="o">=</span> <span class="mi">1000</span> <span class="o">*</span> <span class="n">look_up_table</span><span class="p">[</span><span class="n">order</span><span class="p">][</span><span class="n">RING_ENERGY_COLUMN</span><span class="p">]</span> <span class="o">/</span> <span class="n">ELECTRON_REST_ENERGY_MEV</span>
+    <span class="n">_validate_order</span><span class="p">(</span><span class="n">order</span><span class="p">,</span> <span class="n">look_up_table</span><span class="p">)</span>
+    <span class="n">gamma</span> <span class="o">=</span> <span class="n">_calculate_gamma</span><span class="p">(</span><span class="n">look_up_table</span><span class="p">,</span> <span class="n">order</span><span class="p">)</span>
 
     <span class="c1"># Constructive interference of radiation emitted at different poles</span>
     <span class="c1"># lamda = (lambda_u/2*gamma^2)*(1+K^2/2 + gamma^2*theta^2)/n for n=1,2,3...</span>
@@ -540,17 +572,8 @@ window.addEventListener("load", () => mermaid.run());
     <span class="c1"># leading to K = 0.934*B0[T]*lambda_u[cm]*exp(-pi*gap/lambda_u) or</span>
     <span class="c1"># K = undulator_parameter_max*exp(-pi*gap/lambda_u)</span>
     <span class="c1"># Calculating undulator_parameter_max gives:</span>
-    <span class="n">undulator_parameter_max</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="p">(</span>
-            <span class="mi">2</span>
-            <span class="o">*</span> <span class="mf">0.0934</span>
-            <span class="o">*</span> <span class="n">undulator_period_mm</span>
-            <span class="o">*</span> <span class="n">look_up_table</span><span class="p">[</span><span class="n">order</span><span class="p">][</span><span class="n">MAGNET_FIELD_COLUMN</span><span class="p">]</span>
-            <span class="o">*</span> <span class="n">magnet_blocks_per_period</span>
-            <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span>
-        <span class="p">)</span>
-        <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="n">magnet_blocks_per_period</span><span class="p">)</span>
-        <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">magnet_block_height_mm</span> <span class="o">/</span> <span class="n">undulator_period_mm</span><span class="p">))</span>
+    <span class="n">undulator_parameter_max</span> <span class="o">=</span> <span class="n">_calculate_undulator_parameter_max</span><span class="p">(</span>
+        <span class="n">look_up_table</span><span class="p">[</span><span class="n">order</span><span class="p">][</span><span class="n">MAGNET_FIELD_COLUMN</span><span class="p">],</span> <span class="n">undulator_period_mm</span>
     <span class="p">)</span>
 
     <span class="c1"># Finnaly, rearranging the equation:</span>
@@ -566,6 +589,50 @@ window.addEventListener("load", () => mermaid.run());
     <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">gap</span></div>
+
+
+
+<div class="viewcode-block" id="calculate_energy_i09_hu">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i09_1_shared.html#dodal.devices.i09_1_shared.calculate_energy_i09_hu">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">calculate_energy_i09_hu</span><span class="p">(</span>
+    <span class="n">gap</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">look_up_table</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="s2">&quot;np.ndarray&quot;</span><span class="p">],</span>
+    <span class="n">order</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">gap_offset</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">undulator_period_mm</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">27</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the photon energy produced by the undulator at a given gap and harmonic order.</span>
+<span class="sd">    Reverse of the calculate_gap_i09_hu function.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        gap (float): Undulator gap in millimeters.</span>
+<span class="sd">        look_up_table (dict[int, np.ndarray]): Lookup table containing undulator and beamline parameters for each harmonic order.</span>
+<span class="sd">        order (int, optional): Harmonic order for which to calculate the energy. Defaults to 1.</span>
+<span class="sd">        gap_offset (float, optional): Additional gap offset to apply (in mm). Defaults to 0.0.</span>
+<span class="sd">        undulator_period_mm (int, optional): Undulator period in mm. Defaults to 27.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: Calculated photon energy in keV.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_validate_order</span><span class="p">(</span><span class="n">order</span><span class="p">,</span> <span class="n">look_up_table</span><span class="p">)</span>
+
+    <span class="n">gamma</span> <span class="o">=</span> <span class="n">_calculate_gamma</span><span class="p">(</span><span class="n">look_up_table</span><span class="p">,</span> <span class="n">order</span><span class="p">)</span>
+    <span class="n">undulator_parameter_max</span> <span class="o">=</span> <span class="n">_calculate_undulator_parameter_max</span><span class="p">(</span>
+        <span class="n">look_up_table</span><span class="p">[</span><span class="n">order</span><span class="p">][</span><span class="n">MAGNET_FIELD_COLUMN</span><span class="p">],</span> <span class="n">undulator_period_mm</span>
+    <span class="p">)</span>
+
+    <span class="n">undulator_parameter</span> <span class="o">=</span> <span class="n">undulator_parameter_max</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span>
+        <span class="p">(</span><span class="n">gap</span> <span class="o">-</span> <span class="n">look_up_table</span><span class="p">[</span><span class="n">order</span><span class="p">][</span><span class="n">GAP_OFFSET_COLUMN</span><span class="p">]</span> <span class="o">-</span> <span class="n">gap_offset</span><span class="p">)</span>
+        <span class="o">/</span> <span class="p">(</span><span class="n">undulator_period_mm</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">energy_kev</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="mf">4.959368e-6</span>
+        <span class="o">*</span> <span class="n">order</span>
+        <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">gamma</span><span class="p">)</span>
+        <span class="o">/</span> <span class="p">(</span><span class="n">undulator_period_mm</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">undulator_parameter</span><span class="p">)</span> <span class="o">+</span> <span class="mi">2</span><span class="p">))</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">energy_kev</span></div>
 
 </pre></div>
 

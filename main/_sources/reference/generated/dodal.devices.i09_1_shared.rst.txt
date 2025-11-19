@@ -26,6 +26,7 @@ dodal.devices.i09\_1\_shared
    
       calculate_gap_i09_hu
       get_hu_lut_as_dict
+      calculate_energy_i09_hu
    
    
 
