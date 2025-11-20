@@ -10,7 +10,6 @@ from ophyd_async.core import get_mock_put, set_mock_value
 
 from dodal.common.beamlines.beamline_parameters import GDABeamlineParameters
 from dodal.devices.i03 import Beamstop, BeamstopPositions
-from dodal.testing import patch_motor
 from tests.common.beamlines.test_beamline_parameters import TEST_BEAMLINE_PARAMETERS_TXT
 
 
@@ -72,10 +71,6 @@ async def test_set_beamstop_position_to_data_collection_moves_beamstop_into_beam
 ):
     beamstop = Beamstop("-MO-BS-01:", beamline_parameters, name="beamstop")
     await beamstop.connect(mock=True)
-
-    patch_motor(beamstop.x_mm)
-    patch_motor(beamstop.y_mm)
-    patch_motor(beamstop.z_mm)
 
     x_mock = beamstop.x_mm.user_setpoint
     y_mock = beamstop.y_mm.user_setpoint

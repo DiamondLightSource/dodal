@@ -11,7 +11,6 @@ from dodal.devices.i03.dcm import DCM
 from dodal.devices.i03.undulator_dcm import UndulatorDCM
 from dodal.devices.undulator import AccessError, UndulatorInKeV
 from dodal.log import LOGGER
-from dodal.testing import patch_all_motors
 from tests.devices.test_daq_configuration import MOCK_DAQ_CONFIG_PATH
 from tests.devices.test_daq_configuration.lookup import (
     BEAMLINE_ENERGY_DCM_PITCH_CONVERTER_TXT,
@@ -52,8 +51,6 @@ async def fake_undulator_dcm() -> UndulatorDCM:
             daq_configuration_path=MOCK_DAQ_CONFIG_PATH,
             name="undulator_dcm",
         )
-    patch_all_motors(dcm)
-    patch_all_motors(undulator)
     return undulator_dcm
 
 

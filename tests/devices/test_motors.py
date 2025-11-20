@@ -12,7 +12,6 @@ from dodal.devices.motors import (
     XYZPitchYawRollStage,
     XYZThetaStage,
 )
-from dodal.testing import patch_all_motors
 
 
 @pytest.fixture
@@ -179,9 +178,7 @@ async def test_reading_training_rig(xtheta_stage: XThetaStage):
 def six_axis_gonio() -> Generator[SixAxisGonio]:
     with init_devices(mock=True):
         gonio = SixAxisGonio("")
-
-    with patch_all_motors(gonio):
-        yield gonio
+    yield gonio
 
 
 async def test_reading_six_axis_gonio(six_axis_gonio: SixAxisGonio):

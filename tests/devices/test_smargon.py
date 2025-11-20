@@ -8,15 +8,13 @@ from ophyd_async.core import get_mock_put, init_devices, observe_value, set_mock
 from ophyd_async.epics.motor import MotorLimitsError
 
 from dodal.devices.smargon import CombinedMove, DeferMoves, Smargon, StubPosition
-from dodal.testing import patch_all_motors
 
 
 @pytest.fixture
 async def smargon() -> AsyncGenerator[Smargon]:
     async with init_devices(mock=True):
         smargon = Smargon("")
-    with patch_all_motors(smargon):
-        yield smargon
+    yield smargon
 
 
 def set_smargon_pos(smargon: Smargon, pos: tuple[float, float, float]):
@@ -117,6 +115,8 @@ async def test_given_set_with_value_outside_motor_limit(
     ]:
         set_mock_value(motor.low_limit_travel, -1999)
         set_mock_value(motor.high_limit_travel, 1999)
+        set_mock_value(motor.dial_low_limit_travel, -1999)
+        set_mock_value(motor.dial_high_limit_travel, 1999)
 
     with pytest.raises(MotorLimitsError):
         await smargon.set(

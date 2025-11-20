@@ -12,15 +12,13 @@ from dodal.devices.i19.pin_col_stages import (
     _PinColPosition,
 )
 from dodal.devices.motors import XYStage
-from dodal.testing import patch_all_motors
 
 
 @pytest.fixture
 async def pincol() -> AsyncGenerator[PinholeCollimatorControl]:
     async with init_devices(mock=True):
         pc = PinholeCollimatorControl("", "test_pincol")
-    with patch_all_motors(pc):
-        yield pc
+    yield pc
 
 
 def test_pincol_created_without_errors(pincol: PinholeCollimatorControl):

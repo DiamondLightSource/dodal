@@ -21,7 +21,6 @@ from dodal.devices.undulator import (
     UndulatorOrder,
     _get_gap_for_energy,
 )
-from dodal.testing import patch_all_motors
 from tests.devices.test_data import (
     TEST_BEAMLINE_UNDULATOR_TO_GAP_LUT,
 )
@@ -53,7 +52,6 @@ async def undulator_in_mm() -> UndulatorInMm:
             "UND-02",
             baton=baton,
         )
-    patch_all_motors(undulator_mm)
     return undulator_mm
 
 
@@ -72,7 +70,7 @@ async def test_undulator_mm_config_default_parameters(undulator_in_mm: Undulator
             "undulator_mm-gap_discrepancy_tolerance_mm": partial_reading(0.002),
             "undulator_mm-gap_motor-motor_egu": partial_reading(""),
             "undulator_mm-gap_motor-offset": partial_reading(0.0),
-            "undulator_mm-gap_motor-velocity": partial_reading(3.0),
+            "undulator_mm-gap_motor-velocity": partial_reading(1000.0),
         },
     )
 
@@ -177,21 +175,19 @@ async def test_gap_access_check_disabled_and_move_inhibited_when_commissioning_m
 async def test_gap_access_check_move_not_inhibited_when_commissioning_mode_disabled(
     undulator: UndulatorInKeV,
 ):
-    with patch_all_motors(undulator):
-        set_mock_value(undulator.gap_access, EnabledDisabledUpper.ENABLED)
-        await undulator.set(5)
+    set_mock_value(undulator.gap_access, EnabledDisabledUpper.ENABLED)
+    await undulator.set(5)
 
-        get_mock_put(undulator.gap_motor.user_setpoint).assert_called_once_with(
-            15.0, wait=True
-        )
+    get_mock_put(undulator.gap_motor.user_setpoint).assert_called_once_with(
+        15.0, wait=True
+    )
 
 
 async def test_undulator_mm_move(undulator_in_mm: UndulatorInMm):
-    with patch_all_motors(undulator_in_mm):
-        await undulator_in_mm.set(10.0)
-        get_mock_put(undulator_in_mm.gap_motor.user_setpoint).assert_called_once_with(
-            10.0, wait=True
-        )
+    await undulator_in_mm.set(10.0)
+    get_mock_put(undulator_in_mm.gap_motor.user_setpoint).assert_called_once_with(
+        10.0, wait=True
+    )
 
 
 async def test_order_read(

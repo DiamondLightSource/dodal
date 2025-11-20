@@ -32,7 +32,6 @@ from dodal.devices.i02_1.fast_grid_scan import (
     ZebraGridScanParamsTwoD,
 )
 from dodal.devices.smargon import Smargon
-from dodal.testing import patch_all_motors
 
 
 def discard_status(st: Status | DeviceStatus):
@@ -94,9 +93,7 @@ async def zebra_fast_grid_scan_2d():
 async def smargon():
     async with init_devices(mock=True):
         smargon = Smargon("")
-
-    with patch_all_motors(smargon):
-        yield smargon
+    yield smargon
 
 
 @pytest.fixture(

@@ -22,7 +22,6 @@ from dodal.devices.aperturescatterguard import (
     InvalidApertureMoveError,
     load_positions_from_beamline_parameters,
 )
-from dodal.testing import patch_all_motors
 
 
 @pytest.fixture
@@ -99,8 +98,7 @@ async def ap_sg(
             tolerances=aperture_tolerances,
         )
 
-    with patch_all_motors(ap_sg):
-        yield ap_sg
+    yield ap_sg
 
 
 async def set_to_position(

@@ -45,7 +45,6 @@ from dodal.devices.util.lookup_tables_apple2 import (
     LookupTableConfig,
     convert_csv_to_lookup,
 )
-from dodal.testing import patch_motor
 from tests.devices.i10.test_data import (
     EXPECTED_ID_ENERGY_2_GAP_CALIBRATIONS_IDD_JSON,
     EXPECTED_ID_ENERGY_2_GAP_CALIBRATIONS_IDU_JSON,
@@ -103,7 +102,6 @@ async def mock_pgm(prefix: str = "BLXX-EA-DET-007:") -> PlaneGratingMonochromato
         mock_pgm = PlaneGratingMonochromator(
             prefix=prefix, grating=I10Grating, grating_pv="NLINES2"
         )
-    patch_motor(mock_pgm.energy)
     return mock_pgm
 
 

@@ -3,15 +3,13 @@ import pytest
 from bluesky import RunEngine
 
 from dodal.devices.i24.vgonio import VerticalGoniometer
-from dodal.testing import patch_all_motors
 
 
 @pytest.fixture
 async def vgonio():
     vgonio = VerticalGoniometer("", name="fake_vgonio")
     await vgonio.connect(mock=True)
-    with patch_all_motors(vgonio):
-        yield vgonio
+    return vgonio
 
 
 def test_vertical_gonio_device_can_be_created(vgonio: VerticalGoniometer):
