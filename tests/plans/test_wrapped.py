@@ -798,18 +798,22 @@ def test_list_grid_rscan_when_given_bad_info(
         )
 
 
-def test_make_stepped_list_when_given_three_params():
-    stepped_list = _make_stepped_list(params=[0, 1, 0.1])
-    assert len(stepped_list) == 11
-    assert stepped_list[0] == 0
-    assert stepped_list[-1] == 1
+@pytest.mark.parametrize(
+    "params", ([-1, 1, 0.1], [-2, 2, 0.2], [1, -1, -0.1], [2, -2, -0.2])
+)
+def test_make_stepped_list_when_given_three_params(params: list[Any]):
+    stepped_list = _make_stepped_list(params=params)
+    assert len(stepped_list) == 21
+    assert stepped_list[0] / stepped_list[-1] == -1
+    assert stepped_list[10] == 0
 
 
-def test_make_stepped_list_when_given_two_params():
-    stepped_list = _make_stepped_list(params=[0, 0.1], num=11)
-    assert len(stepped_list) == 11
-    assert stepped_list[0] == 0
-    assert stepped_list[-1] == 1
+@pytest.mark.parametrize("params", ([-1, 0.1], [-2, 0.2], [1, -0.1], [2, -0.2]))
+def test_make_stepped_list_when_given_two_params(params: list[Any]):
+    stepped_list = _make_stepped_list(params=params, num=21)
+    assert len(stepped_list) == 21
+    assert stepped_list[0] / stepped_list[-1] == -1
+    assert stepped_list[10] == 0
 
 
 def test_make_concurrently_stepped_lists():
