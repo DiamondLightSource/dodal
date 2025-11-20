@@ -38,7 +38,7 @@ async def test_read_config_includes(mock_ccmc: ChannelCutMonochromator):
             f"{mock_ccmc.name}-_xyz-x-velocity": partial_reading(1000.0),
             f"{mock_ccmc.name}-_xyz-y-motor_egu": partial_reading(""),
             f"{mock_ccmc.name}-_xyz-y-offset": partial_reading(0.0),
-            f"{mock_ccmc.name}-_xyz-y-velocity": partial_reading(0.0),
+            f"{mock_ccmc.name}-_xyz-y-velocity": partial_reading(1000.0),
             f"{mock_ccmc.name}-_xyz-z-motor_egu": partial_reading(""),
             f"{mock_ccmc.name}-_xyz-z-offset": partial_reading(0.0),
             f"{mock_ccmc.name}-_xyz-z-velocity": partial_reading(1000.0),

@@ -100,7 +100,7 @@ async def test_configuration_includes_configuration_fields(undulator: UndulatorI
         undulator,
         {
             "undulator-gap_motor-motor_egu": partial_reading(""),
-            "undulator-gap_motor-velocity": partial_reading(0.0),
+            "undulator-gap_motor-velocity": partial_reading(1000.0),
             "undulator-length": partial_reading(2.0),
             "undulator-poles": partial_reading(80),
             "undulator-gap_discrepancy_tolerance_mm": partial_reading(0.002),
