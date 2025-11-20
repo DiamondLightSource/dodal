@@ -1,5 +1,6 @@
 import itertools
 from collections.abc import Sequence
+from decimal import Decimal
 from typing import Annotated, Any
 
 import bluesky.plans as bp
@@ -338,19 +339,27 @@ def _make_stepped_list(
     params: list[Any] | Sequence[Any],
     num: int | None = None,
 ):
+    def round_list_elements(stepped_list, step):
+        d = Decimal(str(step))
+        exponent = d.as_tuple().exponent
+        decimal_places = -exponent  # type: ignore
+        return np.round(stepped_list, decimals=decimal_places).tolist()
+
     start = params[0]
     if len(params) == 3:
         stop = params[1]
         step = params[2]
         stepped_list = np.arange(start=start, stop=stop, step=step).tolist()
-        if abs((stepped_list[-1] + step) - stop) <= (step * 0.01):
+        if abs((stepped_list[-1] + step) - stop) <= abs(step * 0.01):
             stepped_list.append(stepped_list[-1] + step)
+        rounded_stepped_list = round_list_elements(stepped_list=stepped_list, step=step)
     elif len(params) == 2 and num:
         step = params[1]
         stepped_list = [start + (n * step) for n in range(num)]
+        rounded_stepped_list = round_list_elements(stepped_list=stepped_list, step=step)
     else:
-        stepped_list = []
-    return stepped_list
+        rounded_stepped_list = []
+    return rounded_stepped_list
 
 
 def _make_concurrently_stepped_lists(
