@@ -88,8 +88,7 @@ class J09EnergyMotorLookup(EnergyMotorLookup):
         )
 
     def _update_phase_lut(self) -> None:
-        """ The generate a J09 phase lookup table if no phase look up table path is given. 
-        """
+        """The generate a J09 phase lookup table if no phase look up table path is given."""
         if self.phase_path is None:
             for key in self.lookup_tables.gap.root.keys():
                 if key is not None:
