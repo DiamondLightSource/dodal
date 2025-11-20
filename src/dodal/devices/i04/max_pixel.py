@@ -1,12 +1,13 @@
 import cv2
 import numpy as np
+from bluesky.protocols import Triggerable
 from ophyd_async.core import StandardReadable, soft_signal_r_and_setter
 from ophyd_async.epics.core import (
     epics_signal_r,
 )
 
 
-class MaxPixel(StandardReadable):
+class MaxPixel(StandardReadable, Triggerable):
     """Gets the max pixel from the image"""
 
     def __init__(self, prefix: str, name: str = "") -> None:
