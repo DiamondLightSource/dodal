@@ -53,7 +53,7 @@ J09DefaultLookupTableConfig = LookupTableConfig(
 
 class J09EnergyMotorLookup(EnergyMotorLookup):
     """
-    Handles lookup tables for I10 Apple2 ID, converting energy and polarisation to gap
+    Handles lookup tables for I09-2 Apple2 ID, converting energy and polarisation to gap
      and phase. Fetches and parses lookup tables from a config server, supports dynamic
      updates, and validates input.
     """
@@ -65,24 +65,18 @@ class J09EnergyMotorLookup(EnergyMotorLookup):
         gap_path: Path | None = None,
         phase_path: Path | None = None,
     ):
-        """Initialise the I10EnergyMotorLookup class with lookup table headers provided.
+        """Initialise the J09EnergyMotorLookup class with lookup table headers provided.
 
         Parameters
         ----------
-        look_up_table_dir:
-            The path to look up table.
-        source:
-            The column name and the name of the source in look up table. e.g. ( "source", "idu")
         config_client:
             The config server client to fetch the look up table.
-        mode:
-            The column name of the mode in look up table.
-        min_energy:
-            The column name that contain the maximum energy in look up table.
-        max_energy:
-            The column name that contain the maximum energy in look up table.
-        poly_deg:
-            The column names for the parameters for the energy conversion polynomial, starting with the least significant.
+        lut_config: LookupTableConfig
+            Look up table configuration.
+        gap_path: Path | None = None,
+            The path for the gap lookup table file.
+        phase_path: Path | None = None,
+            The path for the phase lookup table file.
 
         """
 
@@ -94,6 +88,8 @@ class J09EnergyMotorLookup(EnergyMotorLookup):
         )
 
     def _update_phase_lut(self) -> None:
+        """ The generate a J09 phase lookup table if no phase look up table path is given. 
+        """
         if self.phase_path is None:
             for key in self.lookup_tables.gap.root.keys():
                 if key is not None:
@@ -152,7 +148,7 @@ class J09Apple2Controller(Apple2Controller[Apple2]):
         self,
         value: Pol,
     ) -> None:
-        # I09 require all palarisation change to go to LH first
+        # I09 require all palarisation change to go via LH.
         target_energy = await self.energy.get_value()
         if value is not Pol.LH:
             self._polarisation_setpoint_set(Pol.LH)
