@@ -871,7 +871,7 @@ def test_step_scan_fails_when_given_incorrect_number_of_params(
         run_engine(step_scan(detectors=[det], movers=[x_axis, y_axis], params=params))
 
 
-@pytest.mark.parametrize("params", ([0, 1, 0.1], [-1, 1, 0.1], [0, 10, 1]))
+@pytest.mark.parametrize("params", ([0, 1, 0.25], [-1, 1, 0.5], [0, 10, 2.5]))
 def test_step_rscan(
     run_engine: RunEngine,
     det: StandardDetector,
@@ -882,7 +882,7 @@ def test_step_rscan(
 
 
 @pytest.mark.parametrize(
-    "params", ([0, 1, 0.1, 0, 0.1], [-1, 1, 0.1, -1, 0.1], [0, 10, 1, 0, 1])
+    "params", ([0, 1, 0.25, 0, 0.25], [-1, 1, 0.5, -1, 0.5], [0, 10, 2.5, 0, 2.5])
 )
 def test_step_rscan_with_multiple_movers(
     run_engine: RunEngine,
@@ -894,7 +894,7 @@ def test_step_rscan_with_multiple_movers(
     run_engine(step_rscan(detectors=[det], movers=[x_axis, y_axis], params=params))
 
 
-@pytest.mark.parametrize("params", ([0, 1, 0.1, 0, 1, 0.1], [0, 1, 0.1, 0]))
+@pytest.mark.parametrize("params", ([0, 1, 0.5, 0, 1, 0.5], [0, 1, 0.5, 0]))
 def test_step_rscan_fails_when_given_incorrect_number_of_params(
     run_engine: RunEngine,
     det: StandardDetector,
@@ -906,7 +906,7 @@ def test_step_rscan_fails_when_given_incorrect_number_of_params(
         run_engine(step_rscan(detectors=[det], movers=[x_axis, y_axis], params=params))
 
 
-@pytest.mark.parametrize("params", ([0, 1, 0.1, 0, 1, 0.1], [0, 10, 1, 0, 10, 1]))
+@pytest.mark.parametrize("params", ([0, 1, 0.5, 0, 1, 0.5], [0, 10, 5, 0, 10, 5]))
 def test_step_grid_scan(
     run_engine: RunEngine,
     det: StandardDetector,
@@ -917,7 +917,7 @@ def test_step_grid_scan(
     run_engine(step_grid_scan(detectors=[det], movers=[y_axis, x_axis], params=params))
 
 
-@pytest.mark.parametrize("params", ([0, 1, 0.1, 0, 1, 0.1], [0, 10, 1, 0, 10, 1]))
+@pytest.mark.parametrize("params", ([0, 1, 0.5, 0, 1, 0.5], [0, 10, 5, 0, 10, 5]))
 def test_step_grid_scan_when_snaking(
     run_engine: RunEngine,
     det: StandardDetector,
@@ -932,7 +932,7 @@ def test_step_grid_scan_when_snaking(
     )
 
 
-@pytest.mark.parametrize("params", ([0, 1, 0.1, 0, 1], [0, 10, 1, 0]))
+@pytest.mark.parametrize("params", ([0, 1, 0.25, 0, 1], [0, 10, 2.5, 0]))
 def test_step_grid_scan_fails_when_given_incorrect_number_of_params(
     run_engine: RunEngine,
     det: StandardDetector,
@@ -948,7 +948,7 @@ def test_step_grid_scan_fails_when_given_incorrect_number_of_params(
         )
 
 
-@pytest.mark.parametrize("params", ([0, 1, 0.1, 0, 1, 0.1], [0, 10, 1, 0, 10, 1]))
+@pytest.mark.parametrize("params", ([0, 1, 0.5, 0, 1, 0.5], [0, 10, 5, 0, 10, 5]))
 def test_step_grid_rscan(
     run_engine: RunEngine,
     det: StandardDetector,
@@ -959,7 +959,7 @@ def test_step_grid_rscan(
     run_engine(step_grid_rscan(detectors=[det], movers=[y_axis, x_axis], params=params))
 
 
-@pytest.mark.parametrize("params", ([0, 1, 0.1, 0, 1, 0.1], [0, 10, 1, 0, 10, 1]))
+@pytest.mark.parametrize("params", ([0, 1, 0.5, 0, 1, 0.5], [0, 10, 5, 0, 10, 5]))
 def test_step_grid_rscan_when_snaking(
     run_engine: RunEngine,
     det: StandardDetector,
