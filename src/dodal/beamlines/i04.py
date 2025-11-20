@@ -39,6 +39,7 @@ from dodal.devices.thawer import Thawer
 from dodal.devices.undulator import UndulatorInKeV
 from dodal.devices.xbpm_feedback import XBPMFeedback
 from dodal.devices.zebra.zebra import Zebra
+from dodal.devices.i04.max_pixel import MaxPixel
 from dodal.devices.zebra.zebra_constants_mapping import (
     ZebraMapping,
     ZebraSources,
@@ -377,3 +378,7 @@ def scintillator() -> Scintillator:
         Reference(aperture_scatterguard()),
         get_beamline_parameters(),
     )
+
+@device_factory()
+def max_pixel() -> MaxPixel:
+    return MaxPixel(f"{PREFIX.beamline_prefix}-DI-OAV-01:",)
