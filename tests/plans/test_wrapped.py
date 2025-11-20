@@ -816,6 +816,11 @@ def test_make_stepped_list_when_given_two_params(params: list[Any]):
     assert stepped_list[10] == 0
 
 
+def test_make_stepped_list_when_given_wrong_number_of_params():
+    stepped_list = _make_stepped_list(params=[1])
+    assert stepped_list == []
+
+
 def test_make_concurrently_stepped_lists():
     stepped_lists = _make_concurrently_stepped_lists(
         movers_len=2, params=[0, 1, 0.1, 0, 1]
