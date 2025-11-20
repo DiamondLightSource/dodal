@@ -9,13 +9,13 @@ from bluesky.plans import scan
 from bluesky.run_engine import RunEngine
 from daq_config_server.client import ConfigServer
 from numpy import linspace, poly1d
-from ophyd_async.core import init_devices
-from ophyd_async.testing import (
-    assert_emitted,
+from ophyd_async.core import (
     callback_on_mock_put,
     get_mock_put,
+    init_devices,
     set_mock_value,
 )
+from ophyd_async.testing import assert_emitted
 
 from dodal.devices.apple2_undulator import (
     MAXIMUM_MOVE_TIME,

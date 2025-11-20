@@ -5,13 +5,11 @@ import numpy as np
 import pytest
 from bluesky import RunEngine
 from bluesky.plan_stubs import mv
-from ophyd_async.core import init_devices
+from ophyd_async.core import get_mock_put, init_devices, set_mock_value
 from ophyd_async.testing import (
     assert_configuration,
     assert_reading,
-    get_mock_put,
     partial_reading,
-    set_mock_value,
 )
 
 from dodal.common.enums import EnabledDisabledUpper

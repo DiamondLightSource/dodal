@@ -5,8 +5,7 @@ from unittest.mock import AsyncMock, patch
 import pytest
 from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import init_devices
-from ophyd_async.testing import set_mock_value
+from ophyd_async.core import init_devices, set_mock_value
 
 from dodal.devices.baton import Baton
 from dodal.devices.xbpm_feedback import XBPMFeedback

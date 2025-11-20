@@ -4,12 +4,14 @@ import pytest
 from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
 from bluesky.utils import FailedStatus
-from ophyd_async.core import Device, init_devices, soft_signal_rw
-from ophyd_async.epics.motor import Motor
-from ophyd_async.testing import (
+from ophyd_async.core import (
+    Device,
     get_mock_put,
+    init_devices,
     set_mock_value,
+    soft_signal_rw,
 )
+from ophyd_async.epics.motor import Motor
 
 from dodal.plan_stubs.motor_utils import (
     MoveTooLargeError,

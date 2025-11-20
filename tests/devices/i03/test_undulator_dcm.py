@@ -3,8 +3,7 @@ from unittest.mock import MagicMock, patch
 
 import numpy as np
 import pytest
-from ophyd_async.core import AsyncStatus, init_devices
-from ophyd_async.testing import get_mock_put, set_mock_value
+from ophyd_async.core import AsyncStatus, get_mock_put, init_devices, set_mock_value
 
 from dodal.common.enums import EnabledDisabledUpper
 from dodal.devices.baton import Baton

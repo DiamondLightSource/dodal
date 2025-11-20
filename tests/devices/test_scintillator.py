@@ -3,8 +3,8 @@ from contextlib import ExitStack
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
-from ophyd_async.core import init_devices
-from ophyd_async.testing import assert_value, get_mock_put
+from ophyd_async.core import get_mock_put, init_devices
+from ophyd_async.testing import assert_value
 
 from dodal.common.beamlines.beamline_parameters import GDABeamlineParameters
 from dodal.devices.aperturescatterguard import ApertureScatterguard, ApertureValue

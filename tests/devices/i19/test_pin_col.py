@@ -2,8 +2,7 @@ from collections.abc import AsyncGenerator
 from unittest.mock import AsyncMock, MagicMock, call
 
 import pytest
-from ophyd_async.core import init_devices
-from ophyd_async.testing import get_mock_put, set_mock_value
+from ophyd_async.core import get_mock_put, init_devices, set_mock_value
 
 from dodal.devices.i19.pin_col_stages import (
     AperturePosition,

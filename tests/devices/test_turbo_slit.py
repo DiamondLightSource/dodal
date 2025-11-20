@@ -1,11 +1,10 @@
 import pytest
-from ophyd_async.core import init_devices
-from ophyd_async.testing import (
-    assert_reading,
+from ophyd_async.core import (
     get_mock_put,
-    partial_reading,
+    init_devices,
     set_mock_value,
 )
+from ophyd_async.testing import assert_reading, partial_reading
 
 from dodal.devices.turbo_slit import TurboSlit
 from dodal.testing.setup import patch_all_motors

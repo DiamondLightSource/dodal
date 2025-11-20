@@ -14,11 +14,13 @@ from numpy import linspace
 from ophyd_async.core import (
     PathProvider,
     StandardDetector,
+    callback_on_mock_put,
+    get_mock_put,
     init_devices,
+    set_mock_value,
     walk_rw_signals,
 )
 from ophyd_async.sim import SimBlobDetector
-from ophyd_async.testing import callback_on_mock_put, get_mock_put, set_mock_value
 
 from dodal.devices.bimorph_mirror import BimorphMirror, BimorphMirrorStatus
 from dodal.devices.slits import Slits

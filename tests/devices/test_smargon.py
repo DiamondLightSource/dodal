@@ -4,9 +4,8 @@ from unittest.mock import MagicMock, call
 import pytest
 from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import init_devices, observe_value
+from ophyd_async.core import get_mock_put, init_devices, observe_value, set_mock_value
 from ophyd_async.epics.motor import MotorLimitsError
-from ophyd_async.testing import get_mock_put, set_mock_value
 
 from dodal.devices.smargon import CombinedMove, DeferMoves, Smargon, StubPosition
 from dodal.testing import patch_all_motors

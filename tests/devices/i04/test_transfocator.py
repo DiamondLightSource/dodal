@@ -5,9 +5,9 @@ import pytest
 from bluesky.protocols import Reading
 from ophyd_async.core import (
     init_devices,
+    set_mock_value,
     wait_for_value,
 )
-from ophyd_async.testing import set_mock_value
 
 from dodal.devices.i04.transfocator import Transfocator
 
