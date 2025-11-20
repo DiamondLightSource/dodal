@@ -12,8 +12,6 @@ class MaxPixel(StandardReadable, Triggerable):
 
     def __init__(self, prefix: str, name: str = "") -> None:
         self.array_data = epics_signal_r(np.ndarray, f"pva://{prefix}PVA:ARRAY")
-        self.max_pixel_x, self._x_setter = soft_signal_r_and_setter(int)
-        self.max_pixel_y, self._y_setter = soft_signal_r_and_setter(int)
         self.max_pixel_val, self._max_val_setter = soft_signal_r_and_setter(float)
 
     def preprocessed_data(
