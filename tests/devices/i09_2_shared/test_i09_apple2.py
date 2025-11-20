@@ -38,20 +38,6 @@ from tests.devices.i09_2_shared.test_data import (
     TEST_SOFT_UNDULATOR_LUT,
 )
 
-POLY_DEG = [
-    "9th-order",
-    "8th-order",
-    "7th-order",
-    "6th-order",
-    "5th-order",
-    "4th-order",
-    "3rd-order",
-    "2nd-order",
-    "1st-order",
-    "0th-order",
-]
-
-
 @pytest.fixture
 def mock_j09_energy_motor_lookup(
     mock_config_client: ConfigServer,
