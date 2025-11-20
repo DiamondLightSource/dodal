@@ -6,8 +6,7 @@ from unittest.mock import ANY, AsyncMock, call, patch
 import pytest
 from bluesky import RunEngine, RunEngineInterrupted
 from bluesky import plan_stubs as bps
-from ophyd_async.core import OnOff, init_devices
-from ophyd_async.testing import get_mock_put
+from ophyd_async.core import OnOff, get_mock_put, init_devices
 
 from dodal.devices.thawer import Thawer, ThawingTimer
 

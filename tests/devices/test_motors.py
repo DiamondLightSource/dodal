@@ -2,8 +2,8 @@ import math
 from collections.abc import Generator
 
 import pytest
-from ophyd_async.core import init_devices
-from ophyd_async.testing import assert_reading, partial_reading, set_mock_value
+from ophyd_async.core import init_devices, set_mock_value
+from ophyd_async.testing import assert_reading, partial_reading
 
 from dodal.devices.motors import (
     SixAxisGonio,
@@ -12,7 +12,6 @@ from dodal.devices.motors import (
     XYZPitchYawRollStage,
     XYZThetaStage,
 )
-from dodal.testing import patch_all_motors
 
 
 @pytest.fixture
@@ -179,9 +178,7 @@ async def test_reading_training_rig(xtheta_stage: XThetaStage):
 def six_axis_gonio() -> Generator[SixAxisGonio]:
     with init_devices(mock=True):
         gonio = SixAxisGonio("")
-
-    with patch_all_motors(gonio):
-        yield gonio
+    yield gonio
 
 
 async def test_reading_six_axis_gonio(six_axis_gonio: SixAxisGonio):

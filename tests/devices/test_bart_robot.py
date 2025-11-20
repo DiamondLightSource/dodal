@@ -5,8 +5,8 @@ from functools import partial
 from unittest.mock import ANY, AsyncMock, MagicMock, call, patch
 
 import pytest
-from ophyd_async.core import AsyncStatus
-from ophyd_async.testing import (
+from ophyd_async.core import (
+    AsyncStatus,
     callback_on_mock_put,
     get_mock,
     get_mock_put,

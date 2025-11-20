@@ -1,15 +1,12 @@
-from collections.abc import AsyncGenerator
-from contextlib import ExitStack
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
-from ophyd_async.core import init_devices
-from ophyd_async.testing import assert_value, get_mock_put
+from ophyd_async.core import get_mock_put, init_devices
+from ophyd_async.testing import assert_value
 
 from dodal.common.beamlines.beamline_parameters import GDABeamlineParameters
 from dodal.devices.aperturescatterguard import ApertureScatterguard, ApertureValue
 from dodal.devices.scintillator import InOut, Scintillator
-from dodal.testing import patch_motor
 
 
 @pytest.fixture
@@ -29,7 +26,7 @@ def mock_beamline_parameters() -> GDABeamlineParameters:
 @pytest.fixture
 async def scintillator_and_ap_sg(
     mock_beamline_parameters: GDABeamlineParameters,
-) -> AsyncGenerator[tuple[Scintillator, MagicMock], None]:
+) -> tuple[Scintillator, MagicMock]:
     async with init_devices(mock=True):
         mock_ap_sg = MagicMock()
         mock_ap_sg.return_value.selected_aperture.set = AsyncMock()
@@ -40,12 +37,9 @@ async def scintillator_and_ap_sg(
             aperture_scatterguard=mock_ap_sg,
             beamline_parameters=mock_beamline_parameters,
         )
-    with ExitStack() as motor_patch_stack:
-        for motor in [scintillator.y_mm, scintillator.z_mm]:
-            motor_patch_stack.enter_context(patch_motor(motor))
-        await scintillator.y_mm.set(5)
-        await scintillator.z_mm.set(5)
-        yield scintillator, mock_ap_sg
+    await scintillator.y_mm.set(5)
+    await scintillator.z_mm.set(5)
+    return scintillator, mock_ap_sg
 
 
 @pytest.mark.parametrize(

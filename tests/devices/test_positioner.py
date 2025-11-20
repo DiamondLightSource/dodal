@@ -1,7 +1,8 @@
 import pytest
-from ophyd_async.core import StrictEnum, init_devices
-from ophyd_async.testing import (
+from ophyd_async.core import (
+    StrictEnum,
     get_mock_put,
+    init_devices,
 )
 
 from dodal.devices.positioner import Positioner1D, create_positioner

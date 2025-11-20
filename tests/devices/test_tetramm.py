@@ -2,9 +2,15 @@ import re
 from unittest.mock import MagicMock, patch
 
 import pytest
-from ophyd_async.core import DetectorTrigger, PathProvider, TriggerInfo, init_devices
+from ophyd_async.core import (
+    DetectorTrigger,
+    PathProvider,
+    TriggerInfo,
+    callback_on_mock_put,
+    init_devices,
+    set_mock_value,
+)
 from ophyd_async.epics.adcore import ADFileWriteMode
-from ophyd_async.testing import callback_on_mock_put, set_mock_value
 
 from dodal.devices.tetramm import (
     TetrammChannels,

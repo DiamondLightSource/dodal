@@ -7,8 +7,8 @@ from ophyd_async.core import (
     PathProvider,
     TriggerInfo,
     init_devices,
+    set_mock_value,
 )
-from ophyd_async.testing import set_mock_value
 
 from dodal.devices.i13_1.merlin import Merlin
 

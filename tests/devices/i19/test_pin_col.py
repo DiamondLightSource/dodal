@@ -2,8 +2,7 @@ from collections.abc import AsyncGenerator
 from unittest.mock import AsyncMock, MagicMock, call
 
 import pytest
-from ophyd_async.core import init_devices
-from ophyd_async.testing import get_mock_put, set_mock_value
+from ophyd_async.core import get_mock_put, init_devices, set_mock_value
 
 from dodal.devices.i19.pin_col_stages import (
     AperturePosition,
@@ -13,15 +12,13 @@ from dodal.devices.i19.pin_col_stages import (
     _PinColPosition,
 )
 from dodal.devices.motors import XYStage
-from dodal.testing import patch_all_motors
 
 
 @pytest.fixture
 async def pincol() -> AsyncGenerator[PinholeCollimatorControl]:
     async with init_devices(mock=True):
         pc = PinholeCollimatorControl("", "test_pincol")
-    with patch_all_motors(pc):
-        yield pc
+    yield pc
 
 
 def test_pincol_created_without_errors(pincol: PinholeCollimatorControl):

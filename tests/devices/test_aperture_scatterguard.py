@@ -6,11 +6,11 @@ from unittest.mock import AsyncMock, call
 import bluesky.plan_stubs as bps
 import pytest
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import init_devices
-from ophyd_async.testing import (
+from ophyd_async.core import (
     callback_on_mock_put,
     get_mock,
     get_mock_put,
+    init_devices,
     set_mock_value,
 )
 
@@ -22,7 +22,6 @@ from dodal.devices.aperturescatterguard import (
     InvalidApertureMoveError,
     load_positions_from_beamline_parameters,
 )
-from dodal.testing import patch_all_motors
 
 
 @pytest.fixture
@@ -99,8 +98,7 @@ async def ap_sg(
             tolerances=aperture_tolerances,
         )
 
-    with patch_all_motors(ap_sg):
-        yield ap_sg
+    yield ap_sg
 
 
 async def set_to_position(

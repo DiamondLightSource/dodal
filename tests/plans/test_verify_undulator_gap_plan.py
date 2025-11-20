@@ -1,7 +1,7 @@
 from unittest.mock import AsyncMock, patch
 
 from bluesky.run_engine import RunEngine
-from ophyd_async.testing import set_mock_value
+from ophyd_async.core import set_mock_value
 
 from dodal.plans.verify_undulator_gap import verify_undulator_gap
 from tests.plans.conftest import UndulatorGapCheckDevices
