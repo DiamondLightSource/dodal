@@ -16,6 +16,7 @@ from ophyd_async.core import (
     AsyncReadable,
     StandardDetector,
 )
+from ophyd_async.sim import SimMotor
 from pydantic import ValidationError
 
 from dodal.devices.motors import Motor
@@ -23,6 +24,7 @@ from dodal.plans.wrapped import (
     _make_args,
     _make_concurrently_stepped_lists,
     _make_independently_stepped_lists,
+    _make_new_args,
     _make_stepped_list,
     count,
     grid_num_rscan,
@@ -31,6 +33,7 @@ from dodal.plans.wrapped import (
     list_grid_scan,
     list_rscan,
     list_scan,
+    mapping_num_scan,
     num_rscan,
     num_scan,
     step_grid_rscan,
@@ -177,6 +180,22 @@ def test_plan_produces_expected_datums(
     docs = documents_from_num.get("stream_datum")
     data_keys = [det.name, f"{det.name}-sum"]
     assert docs and len(docs) == len(data_keys) * length
+
+
+def test_make_new_args(x_axis: Motor, y_axis: Motor):
+    args = _make_new_args({x_axis: [0, 1], y_axis: [2, 3]})
+    assert args[0] == x_axis
+    assert args[1] == 0
+    assert args[2] == 1
+    assert args[3] == y_axis
+    assert args[4] == 2
+    assert args[5] == 3
+
+
+def test_mapping_num_scan(
+    run_engine: RunEngine, det: StandardDetector, x_axis: SimMotor
+):
+    run_engine(mapping_num_scan(detectors=[det], params={x_axis: [1, 2]}, num=3))
 
 
 @pytest.mark.parametrize(
