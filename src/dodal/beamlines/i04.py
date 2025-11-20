@@ -23,6 +23,7 @@ from dodal.devices.i03.dcm import DCM
 from dodal.devices.i04.constants import RedisConstants
 from dodal.devices.i04.murko_results import MurkoResultsDevice
 from dodal.devices.i04.transfocator import Transfocator
+from dodal.devices.i04.max-pixel import MaxPixel # check correct path of this 
 from dodal.devices.ipin import IPin
 from dodal.devices.motors import XYZStage
 from dodal.devices.mx_phase1.beamstop import Beamstop
@@ -377,3 +378,7 @@ def scintillator() -> Scintillator:
         Reference(aperture_scatterguard()),
         get_beamline_parameters(),
     )
+
+@device_factory()
+def max_pixel() -> MaxPixel:
+	return MaxPixel()# add correct PV name here
