@@ -17,7 +17,7 @@ def group_uuid(name: str) -> Group:
     return f"{name}-{str(uuid.uuid4())[:6]}"
 
 
-def inject(name: str) -> Any:  # type: ignore
+def inject(name: str = "") -> Any:  # type: ignore
     """
     Function to mark a defaulted argument of a plan as a reference to a device stored
     in another context and not available to be referenced directly.
@@ -30,7 +30,8 @@ def inject(name: str) -> Any:  # type: ignore
     def scan(x: Movable = inject("stage_x"), start: float = 0.0 ...)
 
     Args:
-        name (str): Name of a Device to be fetched from an external context
+        name (str): Name of a Device to be fetched from an external context. This can be
+        left blank when injecting device composites (the default)
 
     Returns:
         Any: name but without typing checking, valid as any default type
