@@ -66,6 +66,7 @@ class Pol(StrictEnum):
     NC = "nc"
     LA = "la"
     LH3 = "lh3"
+    LV3 = "lv3"
 
 
 ROW_PHASE_MOTOR_TOLERANCE = 0.004
