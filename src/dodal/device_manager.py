@@ -1,7 +1,7 @@
 import asyncio
 import inspect
-import itertools
 import typing
+from collections import UserDict
 from collections.abc import Callable, Iterable, Mapping, MutableMapping
 from functools import cached_property, wraps
 from inspect import Parameter
@@ -47,14 +47,13 @@ _EMPTY = object()
 """Sentinel value to distinguish between missing values and present but null values"""
 
 
-class LazyFixtures(Mapping[str, Any]):
+class LazyFixtures(UserDict[str, Any]):
     """
     Wrapper around fixtures and fixture generators
 
     If a fixture is provided at runtime, the generator function does not have to be called.
     """
 
-    ready: MutableMapping[str, Any]
     lazy: MutableMapping[str, Callable[[], Any]]
 
     def __init__(
@@ -62,29 +61,13 @@ class LazyFixtures(Mapping[str, Any]):
         provided: Mapping[str, Any] | None,
         factories: Mapping[str, Callable[[], Any]],
     ):
-        # wrap to prevent modification escaping
-        self.ready = dict(provided or {})
-        # drop duplicate keys so the len and iter methods are easier
-        self.lazy = {k: v for k, v in factories.items() if k not in self.ready}
-
-    def __contains__(self, key: Any) -> bool:
-        return key in self.ready or key in self.lazy
-
-    def __len__(self) -> int:
-        # Can just add the lengths as the keys are distinct by construction
-        return len(self.ready.keys()) + len(self.lazy.keys())
+        super().__init__(dict.fromkeys(factories, _EMPTY) | dict(provided or {}))
+        self.lazy = dict(factories)
 
     def __getitem__(self, key: str) -> Any:
-        if key in self.ready:
-            return self.ready[key]
-        if factory := self.lazy.pop(key, None):
-            value = factory()
-            self.ready[key] = value
-            return value
-        raise KeyError(key)
-
-    def __iter__(self):
-        return itertools.chain(self.lazy.keys(), self.ready.keys())
+        if self.data[key] is _EMPTY:
+            self.data[key] = self.lazy[key]()
+        return self.data[key]
 
 
 class DeviceFactory(Generic[Args, V2]):
