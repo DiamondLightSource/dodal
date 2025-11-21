@@ -48,7 +48,7 @@ dev = [
     # Commented out due to dependency version conflict with pydantic 1.x
     # "copier",
     "myst-parser",
-    "ophyd_async[sim]",
+    "ophyd_async[sim]>=v0.13.6",
     "pipdeptree",
     "pre-commit",
     "psutil",
