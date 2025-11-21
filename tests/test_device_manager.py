@@ -567,7 +567,7 @@ def test_skip_factory(dm: DeviceManager):
     assert devices.devices == {"foo": s1()}
 
 
-def test_skip_ignored_if_required(dm: DeviceManager):
+def test_skip_is_ignored_if_device_is_required(dm: DeviceManager):
     s1 = Mock()
     s2 = Mock()
 
