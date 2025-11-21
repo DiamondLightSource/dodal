@@ -46,10 +46,6 @@ from pydantic import (
 from dodal.devices.apple2_undulator import Pol
 from dodal.log import LOGGER
 
-DEFAULT_GAP_FILE = "IDEnergy2GapCalibrations.csv"
-DEFAULT_PHASE_FILE = "IDEnergy2PhaseCalibrations.csv"
-
-
 DEFAULT_POLY_DEG = [
     "7th-order",
     "6th-order",
@@ -61,7 +57,22 @@ DEFAULT_POLY_DEG = [
     "b",
 ]
 
-MODE_NAME_CONVERT = {"CR": "pc", "CL": "nc"}
+MODE_NAME_CONVERT = {"cr": "pc", "cl": "nc"}
+DEFAULT_GAP_FILE = "IDEnergy2GapCalibrations.csv"
+DEFAULT_PHASE_FILE = "IDEnergy2PhaseCalibrations.csv"
+
+ROW_PHASE_MOTOR_TOLERANCE = 0.004
+ROW_PHASE_CIRCULAR = 15
+MAXIMUM_ROW_PHASE_MOTOR_POSITION = 24.0
+MAXIMUM_GAP_MOTOR_POSITION = 100
+
+PhasePoly1dParameters = {
+    "lh": [0],
+    "lv": [MAXIMUM_ROW_PHASE_MOTOR_POSITION],
+    "pc": [ROW_PHASE_CIRCULAR],
+    "nc": [-ROW_PHASE_CIRCULAR],
+    "lh3": [0],
+}
 
 
 class LookupTableConfig(BaseModel):
@@ -71,6 +82,8 @@ class LookupTableConfig(BaseModel):
     max_energy: str = "MaxEnergy"
     poly_deg: list[str] = Field(default_factory=lambda: DEFAULT_POLY_DEG)
     mode_name_convert: dict[str, str] = Field(default_factory=lambda: MODE_NAME_CONVERT)
+    gap_path: Path | None = None
+    phase_path: Path | None = None
 
 
 class EnergyMinMax(BaseModel):
@@ -216,7 +229,7 @@ def get_poly(
     Parameters:
     -----------
     energy:
-        Energy value in the same units used to create the lookup table (eV).
+        Energy value in the same units used to create the lookup table.
     pol:
         Polarisation mode (Pol enum).
     lookup_table:
@@ -305,8 +318,6 @@ class EnergyMotorLookup:
         self,
         config_client: ConfigServer,
         lut_config: LookupTableConfig,
-        gap_path: Path,
-        phase_path: Path,
     ):
         """Initialise the EnergyMotorLookup class with lookup table headers provided.
 
@@ -324,8 +335,6 @@ class EnergyMotorLookup:
         self.lookup_tables = GapPhaseLookupTables()
         self.config_client = config_client
         self.lut_config = lut_config
-        self.gap_path = gap_path
-        self.phase_path = phase_path
         self._available_pol = []
 
     @property
@@ -337,8 +346,10 @@ class EnergyMotorLookup:
         self._available_pol = value
 
     def _update_gap_lut(self) -> None:
+        if self.lut_config.gap_path is None:
+            raise RuntimeError("Gap path is not provided!")
         file_contents = self.config_client.get_file_contents(
-            self.gap_path, reset_cached_result=True
+            self.lut_config.gap_path, reset_cached_result=True
         )
         self.lookup_tables.gap = convert_csv_to_lookup(
             file_contents, lut_config=self.lut_config
@@ -346,8 +357,10 @@ class EnergyMotorLookup:
         self.available_pol = list(self.lookup_tables.gap.root.keys())
 
     def _update_phase_lut(self) -> None:
+        if self.lut_config.phase_path is None:
+            raise RuntimeError("Phase path is not provided!")
         file_contents = self.config_client.get_file_contents(
-            self.phase_path, reset_cached_result=True
+            self.lut_config.phase_path, reset_cached_result=True
         )
         self.lookup_tables.phase = convert_csv_to_lookup(
             file_contents, lut_config=self.lut_config
@@ -357,10 +370,30 @@ class EnergyMotorLookup:
         """
         Update lookup tables from files and validate their format.
         """
-        LOGGER.info("Updating lookup table from file for gap.")
+        LOGGER.info("Updating lookup table for gap.")
         self._update_gap_lut()
-        LOGGER.info("Updating lookup table from file for phase.")
-        self._update_phase_lut()
+        if self.lut_config.phase_path is None:
+            LOGGER.info("Generating lookup table for phase.")
+            self._generate_phase_lut()
+
+        else:
+            LOGGER.info("Updating lookup table for phase.")
+            self._update_phase_lut()
+
+    def _generate_phase_lut(self):
+        for key in self.lookup_tables.gap.root.keys():
+            if key is not None:
+                self.lookup_tables.phase.root[Pol(key.lower())] = (
+                    generate_lookup_table_entry(
+                        min_energy=self.lookup_tables.gap.root[
+                            Pol(key.lower())
+                        ].limit.minimum,
+                        max_energy=self.lookup_tables.gap.root[
+                            Pol(key.lower())
+                        ].limit.maximum,
+                        poly1d_param=(PhasePoly1dParameters[Pol(key.lower())]),
+                    )
+                )
 
     def get_motor_from_energy(self, energy: float, pol: Pol) -> tuple[float, float]:
         """
