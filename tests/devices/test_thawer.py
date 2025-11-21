@@ -12,6 +12,6 @@ def thawer():
 
 
 async def test_when_thawer_stopped_then_stops_thawing(thawer: Thawer):
-    await thawer.control.set(OnOff.ON)
+    await thawer.set(OnOff.ON)
     await thawer.stop()
-    assert (await thawer.control.get_value()) == OnOff.OFF
+    assert (await thawer._control.get_value()) == OnOff.OFF
