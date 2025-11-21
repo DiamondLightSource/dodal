@@ -72,6 +72,9 @@ dodal.devices.mx\_phase1.beamstop.BeamstopPositions
       ~BeamstopPositions.DATA_COLLECTION
       
       
+      ~BeamstopPositions.OUT_OF_BEAM
+      
+      
       ~BeamstopPositions.UNKNOWN
       
    

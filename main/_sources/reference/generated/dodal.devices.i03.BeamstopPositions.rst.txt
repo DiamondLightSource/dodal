@@ -72,6 +72,9 @@ dodal.devices.i03.BeamstopPositions
       ~BeamstopPositions.DATA_COLLECTION
       
       
+      ~BeamstopPositions.OUT_OF_BEAM
+      
+      
       ~BeamstopPositions.UNKNOWN
       
    

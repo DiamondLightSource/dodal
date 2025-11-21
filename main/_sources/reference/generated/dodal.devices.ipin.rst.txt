@@ -15,6 +15,7 @@ dodal.devices.ipin
    :recursive:
 
    ~ipin.IPin
+   ~ipin.IPinGain
 
 
 
