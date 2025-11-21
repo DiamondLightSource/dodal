@@ -384,7 +384,7 @@ class DeviceManager:
         and is not used to create the device.
         """
 
-        def decorator(init: OphydInitialiser[V1]):
+        def decorator(init: OphydInitialiser[V1]) -> V1DeviceFactory[V1]:
             name = init.__name__
             if name in self:
                 raise ValueError(f"Duplicate factory name: {name}")
