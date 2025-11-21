@@ -1,4 +1,3 @@
-from pathlib import Path
 from unittest.mock import MagicMock
 
 import numpy as np
@@ -119,17 +118,14 @@ def dummy_energy_motor_lookup(
     return DummyEnergyMotorLookup(
         config_client=mock_config_client,
         lut_config=lut_config,
-        gap_path=Path("Dummy"),
-        phase_path=Path("Dummy"),
     )
 
 
 def test_energy_motor_lookup_with_phase_path_none(
     dummy_energy_motor_lookup: DummyEnergyMotorLookup,
 ) -> None:
-    dummy_energy_motor_lookup.phase_path = None
     with pytest.raises(RuntimeError, match="Phase path is not provided"):
-        dummy_energy_motor_lookup.update_lookuptables()
+        dummy_energy_motor_lookup._update_phase_lut()
 
 
 def test_energy_motor_lookup_with_gap_path_none(
@@ -139,8 +135,6 @@ def test_energy_motor_lookup_with_gap_path_none(
     empty_energy_mortor_lookup = EnergyMotorLookup(
         config_client=mock_config_client,
         lut_config=lut_config,
-        gap_path=None,
-        phase_path=Path("Dummy"),
     )
 
     with pytest.raises(RuntimeError, match="Gap path is not provided"):

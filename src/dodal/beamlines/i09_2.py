@@ -16,8 +16,9 @@ from dodal.devices.apple2_undulator import (
 )
 from dodal.devices.i09.enums import Grating
 from dodal.devices.i09_2_shared.i09_apple2 import (
+    EnergyMotorLookup,
     J09Apple2Controller,
-    J09EnergyMotorLookup,
+    J09DefaultLookupTableConfig,
 )
 from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.devices.synchrotron import Synchrotron
@@ -75,10 +76,11 @@ def jid() -> Apple2:
 @device_factory()
 def jid_controller() -> J09Apple2Controller:
     """J09 insertion device controller."""
+    J09DefaultLookupTableConfig.gap_path = Path(LOOK_UPTABLE_DIR, GAP_LOOKUP_FILE_NAME)
     return J09Apple2Controller(
         apple2=jid(),
-        energy_motor_lut=J09EnergyMotorLookup(
-            gap_path=Path(LOOK_UPTABLE_DIR, GAP_LOOKUP_FILE_NAME),
+        energy_motor_lut=EnergyMotorLookup(
+            lut_config=J09DefaultLookupTableConfig,
             config_client=J09_CONF_CLIENT,
         ),
     )

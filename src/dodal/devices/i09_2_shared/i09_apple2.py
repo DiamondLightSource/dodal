@@ -1,7 +1,3 @@
-from pathlib import Path
-
-from daq_config_server.client import ConfigServer
-
 from dodal.devices.apple2_undulator import (
     MAXIMUM_MOVE_TIME,
     Apple2,
@@ -13,23 +9,8 @@ from dodal.devices.apple2_undulator import (
 from dodal.devices.util.lookup_tables_apple2 import (
     EnergyMotorLookup,
     LookupTableConfig,
-    generate_lookup_table_entry,
 )
 from dodal.log import LOGGER
-
-ROW_PHASE_MOTOR_TOLERANCE = 0.004
-ROW_PHASE_CIRCULAR = 15
-MAXIMUM_ROW_PHASE_MOTOR_POSITION = 24.0
-MAXIMUM_GAP_MOTOR_POSITION = 100
-
-J09PhasePoly1dParameters = {
-    "lh": [0],
-    "lv": [MAXIMUM_ROW_PHASE_MOTOR_POSITION],
-    "pc": [ROW_PHASE_CIRCULAR],
-    "nc": [-ROW_PHASE_CIRCULAR],
-    "lh3": [0],
-}
-
 
 J09DefaultLookupTableConfig = LookupTableConfig(
     mode="Mode",
@@ -51,67 +32,11 @@ J09DefaultLookupTableConfig = LookupTableConfig(
 )
 
 
-class J09EnergyMotorLookup(EnergyMotorLookup):
-    """
-    Handles lookup tables for I09-2 Apple2 ID, converting energy and polarisation to gap
-     and phase. Fetches and parses lookup tables from a config server, supports dynamic
-     updates, and validates input.
-    """
-
-    def __init__(
-        self,
-        config_client: ConfigServer,
-        lut_config: LookupTableConfig = J09DefaultLookupTableConfig,
-        gap_path: Path | None = None,
-        phase_path: Path | None = None,
-    ):
-        """Initialise the J09EnergyMotorLookup class with lookup table headers provided.
-
-        Parameters
-        ----------
-        config_client:
-            The config server client to fetch the look up table.
-        lut_config: LookupTableConfig
-            Look up table configuration.
-        gap_path: Path | None = None,
-            The path for the gap lookup table file.
-        phase_path: Path | None = None,
-            The path for the phase lookup table file.
-
-        """
-
-        super().__init__(
-            config_client=config_client,
-            lut_config=lut_config,
-            gap_path=gap_path,
-            phase_path=phase_path,
-        )
-
-    def _update_phase_lut(self) -> None:
-        """The generate a J09 phase lookup table if no phase look up table path is given."""
-        if self.phase_path is None:
-            for key in self.lookup_tables.gap.root.keys():
-                if key is not None:
-                    self.lookup_tables.phase.root[Pol(key.lower())] = (
-                        generate_lookup_table_entry(
-                            min_energy=self.lookup_tables.gap.root[
-                                Pol(key.lower())
-                            ].limit.minimum,
-                            max_energy=self.lookup_tables.gap.root[
-                                Pol(key.lower())
-                            ].limit.maximum,
-                            poly1d_param=(J09PhasePoly1dParameters[Pol(key.lower())]),
-                        )
-                    )
-        else:
-            super()._update_phase_lut()
-
-
 class J09Apple2Controller(Apple2Controller[Apple2]):
     def __init__(
         self,
         apple2: Apple2,
-        energy_motor_lut: J09EnergyMotorLookup,
+        energy_motor_lut: EnergyMotorLookup,
         units: str = "keV",
         name: str = "",
     ) -> None:

@@ -20,14 +20,14 @@ from dodal.devices.apple2_undulator import (
     UndulatorPhaseAxes,
 )
 from dodal.devices.i09_2_shared.i09_apple2 import (
-    MAXIMUM_ROW_PHASE_MOTOR_POSITION,
-    ROW_PHASE_CIRCULAR,
     J09Apple2Controller,
     J09DefaultLookupTableConfig,
-    J09EnergyMotorLookup,
 )
 from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.devices.util.lookup_tables_apple2 import (
+    MAXIMUM_ROW_PHASE_MOTOR_POSITION,
+    ROW_PHASE_CIRCULAR,
+    EnergyMotorLookup,
     GapPhaseLookupTables,
     LookupTable,
     convert_csv_to_lookup,
@@ -42,9 +42,10 @@ from tests.devices.i09_2_shared.test_data import (
 @pytest.fixture
 def mock_j09_energy_motor_lookup(
     mock_config_client: ConfigServer,
-) -> J09EnergyMotorLookup:
-    return J09EnergyMotorLookup(
-        gap_path=Path(TEST_SOFT_UNDULATOR_LUT),
+) -> EnergyMotorLookup:
+    J09DefaultLookupTableConfig.gap_path = Path(TEST_SOFT_UNDULATOR_LUT)
+    return EnergyMotorLookup(
+        lut_config=J09DefaultLookupTableConfig,
         config_client=mock_config_client,
     )
 
@@ -61,7 +62,7 @@ async def mock_apple2(
 @pytest.fixture
 async def mock_id_controller(
     mock_apple2: Apple2,
-    mock_j09_energy_motor_lookup: J09EnergyMotorLookup,
+    mock_j09_energy_motor_lookup: EnergyMotorLookup,
 ) -> J09Apple2Controller:
     async with init_devices(mock=True):
         mock_id_controller = J09Apple2Controller(
@@ -104,7 +105,7 @@ async def mock_id_pol(
 
 
 def test_j09_energy_motor_lookup_convert_csv_to_lookup_success(
-    mock_j09_energy_motor_lookup: J09EnergyMotorLookup,
+    mock_j09_energy_motor_lookup: EnergyMotorLookup,
 ):
     file = mock_j09_energy_motor_lookup.config_client.get_file_contents(
         file_path=TEST_SOFT_UNDULATOR_LUT, reset_cached_result=True
@@ -120,17 +121,18 @@ def test_j09_energy_motor_lookup_convert_csv_to_lookup_success(
 
 
 def test_j09_energy_motor_lookup_fail_with_phase_path(
-    mock_j09_energy_motor_lookup: J09EnergyMotorLookup,
+    mock_j09_energy_motor_lookup: EnergyMotorLookup,
 ):
-    mock_j09_energy_motor_lookup.phase_path = Path("some/fake/path")
+    mock_j09_energy_motor_lookup.lut_config.phase_path = Path("dfsdfs")
     with pytest.raises(FileNotFoundError):
         mock_j09_energy_motor_lookup._update_phase_lut()
     data = mock_j09_energy_motor_lookup.lookup_tables.phase
     assert data == LookupTable()
+    mock_j09_energy_motor_lookup.lut_config.phase_path = None
 
 
 def test_j09_energy_motor_lookup_update_lookuptables(
-    mock_j09_energy_motor_lookup: J09EnergyMotorLookup,
+    mock_j09_energy_motor_lookup: EnergyMotorLookup,
 ):
     mock_j09_energy_motor_lookup.update_lookuptables()
     with open(TEST_EXPECTED_ENERGY_MOTOR_LOOKUP, "rb") as f:
