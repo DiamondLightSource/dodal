@@ -17,7 +17,7 @@ class CryoStream(StandardReadable):
     MAX_PRESSURE_BAR = 0.1
 
     def __init__(self, prefix: str, name: str = ""):
-        self.course = epics_signal_rw(InOut, f"{prefix}-EA-CJET-01:COARSE:CTRL")
+        self.coarse = epics_signal_rw(InOut, f"{prefix}-EA-CJET-01:COARSE:CTRL")
         self.fine = epics_signal_rw(InOut, f"{prefix}-EA-CJET-01:FINE:CTRL")
         self.temperature_k = epics_signal_r(float, f"{prefix}-EA-CSTRM-01:TEMP")
         self.back_pressure_bar = epics_signal_r(
@@ -115,6 +115,14 @@ class OxfordCryoStream(StandardReadable):
 
 
 class CryoStreamGantry(StandardReadable):
+    """Gantry controlling whether the standard Cryostream or the
+    HC1 cryostream is in position.
+
+    Note: this device is currently implemented read-only; moving the gantry without
+    adequate checks risks a collision if the gantry is moved while HC1 is selected
+    and in the IN position.
+    """
+
     def __init__(self, prefix: str, name: str = ""):
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             self.cryostream_selector = epics_signal_r(
