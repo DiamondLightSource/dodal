@@ -36,16 +36,14 @@ class AccessControlledShutter(OpticsBlueAPIDevice):
         # see https://github.com/DiamondLightSource/blueapi/issues/1187
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             self.shutter_status = epics_signal_r(ShutterState, f"{prefix}STA")
-        self.hutch_request = hutch
-        self.instrument_session = instrument_session
-        super().__init__(name)
+        super().__init__(hutch=hutch, instrument_session=instrument_session, name=name)
 
     @AsyncStatus.wrap
     async def set(self, value: ShutterDemand):
         request_params = {
             "name": "operate_shutter_plan",
             "params": {
-                "experiment_hutch": self.hutch_request.value,
+                "experiment_hutch": self._invoking_hutch,
                 "access_device": ACCESS_DEVICE_NAME,
                 "shutter_demand": value.value,
             },
