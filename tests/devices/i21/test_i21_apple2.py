@@ -22,8 +22,10 @@ def mock_i21_energy_motor_lookup(
 ) -> EnergyMotorLookup:
     return EnergyMotorLookup(
         config_client=mock_config_client,
-        lut_config=LookupTableConfig(grading="Grating"),
-        gap_path=Path(ID_ENERGY_2_GAP_CALIBRATIONS_CSV),
+        lut_config=LookupTableConfig(
+            grading="Grating",
+            gap_path=Path(ID_ENERGY_2_GAP_CALIBRATIONS_CSV),
+        ),
     )
 
 
