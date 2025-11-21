@@ -129,7 +129,7 @@ def test_energy_motor_lookup_with_phase_path_none(
 ) -> None:
     dummy_energy_motor_lookup.phase_path = None
     with pytest.raises(RuntimeError, match="Phase path is not provided"):
-        dummy_energy_motor_lookup.update_lookuptables()
+        dummy_energy_motor_lookup._update_phase_lut()
 
 
 def test_energy_motor_lookup_with_gap_path_none(

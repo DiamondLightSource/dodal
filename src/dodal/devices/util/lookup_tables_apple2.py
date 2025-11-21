@@ -61,6 +61,19 @@ MODE_NAME_CONVERT = {"cr": "pc", "cl": "nc"}
 DEFAULT_GAP_FILE = "IDEnergy2GapCalibrations.csv"
 DEFAULT_PHASE_FILE = "IDEnergy2PhaseCalibrations.csv"
 
+ROW_PHASE_MOTOR_TOLERANCE = 0.004
+ROW_PHASE_CIRCULAR = 15
+MAXIMUM_ROW_PHASE_MOTOR_POSITION = 24.0
+MAXIMUM_GAP_MOTOR_POSITION = 100
+
+PhasePoly1dParameters = {
+    "lh": [0],
+    "lv": [MAXIMUM_ROW_PHASE_MOTOR_POSITION],
+    "pc": [ROW_PHASE_CIRCULAR],
+    "nc": [-ROW_PHASE_CIRCULAR],
+    "lh3": [0],
+}
+
 
 class LookupTableConfig(BaseModel):
     source: tuple[str, str] | None = None
@@ -361,8 +374,28 @@ class EnergyMotorLookup:
         """
         LOGGER.info("Updating lookup table for gap.")
         self._update_gap_lut()
-        LOGGER.info("Updating lookup table for phase.")
-        self._update_phase_lut()
+        if self.phase_path is None:
+            LOGGER.info("Generating lookup table for phase.")
+            self._generate_phase_lut()
+
+        else:
+            LOGGER.info("Updating lookup table for phase.")
+            self._update_phase_lut()
+
+    def _generate_phase_lut(self):
+        for key in self.lookup_tables.gap.root.keys():
+            if key is not None:
+                self.lookup_tables.phase.root[Pol(key.lower())] = (
+                    generate_lookup_table_entry(
+                        min_energy=self.lookup_tables.gap.root[
+                            Pol(key.lower())
+                        ].limit.minimum,
+                        max_energy=self.lookup_tables.gap.root[
+                            Pol(key.lower())
+                        ].limit.maximum,
+                        poly1d_param=(PhasePoly1dParameters[Pol(key.lower())]),
+                    )
+                )
 
     def get_motor_from_energy(self, energy: float, pol: Pol) -> tuple[float, float]:
         """
