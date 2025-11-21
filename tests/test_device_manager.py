@@ -268,7 +268,7 @@ def test_missing_fixture_ok_if_not_required(dm: DeviceManager):
 
     @dm.factory
     def foo(unknown):
-        return s1(bar)
+        return s1(unknown)
 
     @dm.factory
     def bar():
@@ -319,9 +319,8 @@ def test_repr(dm: DeviceManager):
 
 
 def test_build_errors_are_caught(dm: DeviceManager):
-    s1 = Mock()
     err = RuntimeError("Build failed")
-    s1.side_effect = err
+    s1 = Mock(side_effect=err)
 
     @dm.factory
     def foo():
@@ -337,8 +336,7 @@ def test_build_errors_are_caught(dm: DeviceManager):
 def test_dependency_errors_propagate(dm: DeviceManager):
     s1 = Mock()
     err = RuntimeError("Build failed")
-    s2 = Mock()
-    s2.side_effect = err
+    s2 = Mock(side_effect=err)
 
     @dm.factory
     def foo(bar):
@@ -401,16 +399,36 @@ def test_override_name(dm: DeviceManager):
 def test_positional_only_args_error(dm: DeviceManager):
     s1 = Mock()
 
-    with pytest.raises(ValueError, match="positional only arguments"):
+    with pytest.raises(ValueError, match="positional only argument 'bar'"):
 
         @dm.factory
-        def foo(foo, /):
+        def foo(bar, /):
             return s1()
 
 
-def test_devices_or_raise(dm: DeviceManager):
+def test_variadic_args_error(dm: DeviceManager):
     s1 = Mock()
-    s1.side_effect = RuntimeError("Build failed")
+    with pytest.raises(ValueError, match="variadic argument 'args'"):
+
+        @dm.factory
+        def foo(*args):
+            return s1(*args)
+
+
+def test_kwargs_factory(dm: DeviceManager):
+    s1 = Mock()
+
+    # Factories can have kwargs but they're ignored by the device manager
+    @dm.factory
+    def foo(**kwargs):
+        s1(**kwargs)
+
+    dm.build_all(s1)
+    s1.assert_called_once_with()
+
+
+def test_devices_or_raise(dm: DeviceManager):
+    s1 = Mock(side_effect=RuntimeError("Build failed"))
 
     @dm.factory
     def foo():
