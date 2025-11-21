@@ -41,7 +41,7 @@ V1 = TypeVar("V1", bound=OphydV1Device)
 V2 = TypeVar("V2", bound=OphydV2Device)
 
 DeviceFactoryDecorator = Callable[[Callable[Args, V2]], "DeviceFactory[Args, V2]"]
-OphydInitialiser = Callable[Concatenate[V1, ...], V1 | None]
+OphydInitialiser = Callable[Concatenate[V1, Args], V1 | None]
 
 _EMPTY = object()
 """Sentinel value to distinguish between missing values and present but null values"""
@@ -166,11 +166,11 @@ class DeviceFactory(Generic[Args, V2]):
             device.set_name(name)
         return device  # type: ignore - it's us, honest
 
-    def create(self, *args, **kwargs) -> V2:
+    def create(self, *args: Args.args, **kwargs: Args.kwargs) -> V2:
         # TODO: Remove when v1 support is no longer required - see #1718
         return self(*args, **kwargs)
 
-    def __call__(self, *args, **kwargs) -> V2:
+    def __call__(self, *args: Args.args, **kwargs: Args.kwargs) -> V2:
         device = self.factory(*args, **kwargs)
         if self.use_factory_name:
             device.set_name(self.name)
@@ -182,7 +182,7 @@ class DeviceFactory(Generic[Args, V2]):
 
 
 # TODO: Remove when ophyd v1 support is no longer required - see #1718
-class V1DeviceFactory(Generic[V1]):
+class V1DeviceFactory(Generic[Args, V1]):
     """
     Wrapper around an ophyd v1 device that holds a reference to a device
     manager that can provide dependencies, along with default connection
@@ -198,7 +198,7 @@ class V1DeviceFactory(Generic[V1]):
         skip: SkipType,
         wait: bool,
         timeout: int,
-        init: OphydInitialiser[V1],
+        init: OphydInitialiser[V1, Args],
         manager: "DeviceManager",
     ):
         self.factory = factory
@@ -255,11 +255,11 @@ class V1DeviceFactory(Generic[V1]):
             manager=self._manager,
         )
 
-    def __call__(self, *args, **kwargs):
+    def __call__(self, dev: V1, *args: Args.args, **kwargs: Args.kwargs):
         """Call the wrapped function to make decorator transparent"""
-        return self.post_create(*args, **kwargs)
+        return self.post_create(dev, *args, **kwargs)
 
-    def create(self, *args, **kwargs) -> V1:
+    def create(self, *args: Args.args, **kwargs: Args.kwargs) -> V1:
         device = self.factory(name=self.name, prefix=self.prefix)
         if self.wait:
             wait_for_connection(device, timeout=self.timeout)
@@ -384,7 +384,7 @@ class DeviceManager:
         and is not used to create the device.
         """
 
-        def decorator(init: OphydInitialiser[V1]) -> V1DeviceFactory[V1]:
+        def decorator(init: OphydInitialiser[V1, Args]) -> V1DeviceFactory[Args, V1]:
             name = init.__name__
             if name in self:
                 raise ValueError(f"Duplicate factory name: {name}")
@@ -534,7 +534,7 @@ class DeviceManager:
 
     def _expand_dependencies(
         self,
-        factories: Iterable[DeviceFactory[..., V2] | V1DeviceFactory[V1]],
+        factories: Iterable[DeviceFactory[..., V2] | V1DeviceFactory[..., V1]],
         available_fixtures: Mapping[str, Any],
     ) -> set[str]:
         """
@@ -566,7 +566,7 @@ class DeviceManager:
 
     def _build_order(
         self,
-        factories: dict[str, DeviceFactory[..., V2] | V1DeviceFactory[V1]],
+        factories: dict[str, DeviceFactory[..., V2] | V1DeviceFactory[..., V1]],
         fixtures: Mapping[str, Any],
     ) -> list[str]:
         """
