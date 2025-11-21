@@ -75,8 +75,8 @@ class LazyFixtures(Mapping[str, Any]):
         return len(self.ready.keys()) + len(self.lazy.keys())
 
     def __getitem__(self, key: str) -> Any:
-        if (value := self.ready.get(key, _EMPTY)) is not _EMPTY:
-            return value
+        if key in self.ready:
+            return self.ready[key]
         if factory := self.lazy.pop(key, None):
             value = factory()
             self.ready[key] = value
