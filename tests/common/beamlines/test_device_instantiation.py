@@ -4,6 +4,7 @@ import pytest
 from ophyd_async.core import NotConnectedError
 
 from dodal.beamlines import all_beamline_modules
+from dodal.device_manager import DeviceManager
 from dodal.utils import BLUESKY_PROTOCOLS, make_all_devices
 
 
@@ -44,6 +45,10 @@ def test_devices_are_identical(module_and_devices_for_beamline):
     Ensures that for every beamline all device functions prevent duplicate instantiation.
     """
     bl_mod, devices_a, _ = module_and_devices_for_beamline
+    if isinstance(getattr(bl_mod, "devices", None), DeviceManager):
+        # DeviceManager beamline modules do not cache device instances
+        return
+
     devices_b, _ = make_all_devices(
         bl_mod,
         include_skipped=True,
@@ -55,7 +60,7 @@ def test_devices_are_identical(module_and_devices_for_beamline):
         if device is not devices_b[device_name]
     ]
     total_number_of_devices = len(devices_a)
-    non_identical_number_of_devies = len(devices_a)
+    non_identical_number_of_devices = len(devices_a)
     assert len(non_identical_names) == 0, (
-        f"{non_identical_number_of_devies}/{total_number_of_devices} devices were not identical: {non_identical_names}"
+        f"{non_identical_number_of_devices}/{total_number_of_devices} devices were not identical: {non_identical_names}"
     )
