@@ -95,19 +95,23 @@ class DeviceFactory(Generic[Args, V2]):
     connected.
     """
 
-    factory: Callable[Args, V2]
-    use_factory_name: bool
-    timeout: float
-    mock: bool
-    _skip: SkipType
-    _manager: "DeviceManager"
+    def __init__(
+        self,
+        factory: Callable[Args, V2],
+        use_factory_name: bool,
+        timeout: float,
+        mock: bool,
+        skip: SkipType,
+        manager: "DeviceManager",
+    ):
+        for name, param in inspect.signature(factory).parameters.items():
+            if param.kind == Parameter.POSITIONAL_ONLY:
+                raise ValueError(
+                    f"{factory.__name__} has positional only argument '{name}'"
+                )
+            elif param.kind == Parameter.VAR_POSITIONAL:
+                raise ValueError(f"{factory.__name__} has variadic argument '{name}'")
 
-    def __init__(self, factory, use_factory_name, timeout, mock, skip, manager):
-        if any(
-            p.kind == Parameter.POSITIONAL_ONLY
-            for p in inspect.signature(factory).parameters.values()
-        ):
-            raise ValueError(f"{factory.__name__} has positional only arguments")
         self.factory = factory
         self.use_factory_name = use_factory_name
         self.timeout = timeout
@@ -125,7 +129,11 @@ class DeviceFactory(Generic[Args, V2]):
     def dependencies(self) -> set[str]:
         """Names of all parameters"""
         sig = inspect.signature(self.factory)
-        return {para.name for para in sig.parameters.values()}
+        return {
+            para.name
+            for para in sig.parameters.values()
+            if para.kind is not Parameter.VAR_KEYWORD
+        }
 
     @cached_property
     def optional_dependencies(self) -> set[str]:
@@ -135,6 +143,7 @@ class DeviceFactory(Generic[Args, V2]):
             para.name
             for para in sig.parameters.values()
             if para.default is not Parameter.empty
+            and para.kind is not Parameter.VAR_KEYWORD
         }
 
     @property
@@ -222,7 +231,7 @@ class V1DeviceFactory(Generic[Args, V1]):
         sig = inspect.signature(self.post_create)
         # first parameter should be the device we've just built
         _, *params = sig.parameters.values()
-        return {para.name for para in params}
+        return {para.name for para in params if para.kind is not Parameter.VAR_KEYWORD}
 
     @cached_property
     def optional_dependencies(self) -> set[str]:
