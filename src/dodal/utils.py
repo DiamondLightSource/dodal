@@ -240,7 +240,8 @@ def make_device(
 def make_all_devices(
     module: str | ModuleType | None = None, include_skipped: bool = False, **kwargs
 ) -> tuple[dict[str, AnyDevice], dict[str, Exception]]:
-    """Makes all devices in the given beamline module.
+    """Makes all devices in the given beamline module, for those modules using device factories
+    as opposed to the DeviceManager.
 
     In cases of device interdependencies it ensures a device is created before any which
     depend on it.
@@ -413,7 +414,7 @@ def is_v2_device_factory(func: Callable) -> TypeGuard[V2DeviceFactory]:
 
 
 def is_any_device_factory(func: Callable) -> TypeGuard[AnyDeviceFactory]:
-    return isinstance(func, (FunctionType, DeviceInitializationController)) and (
+    return isinstance(func, FunctionType | DeviceInitializationController) and (
         is_v1_device_factory(func) or is_v2_device_factory(func)
     )
 
