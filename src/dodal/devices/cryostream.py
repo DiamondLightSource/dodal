@@ -84,7 +84,7 @@ class OxfordCryoJet(StandardReadable):
     # This is a placeholder implementation to get it working with I03, the actual cryojet has many more PVs
     def __init__(self, prefix: str, name=""):
         with self.add_children_as_readables():
-            self.course = epics_signal_rw(InOut, f"{prefix}COARSE:CTRL")
+            self.coarse = epics_signal_rw(InOut, f"{prefix}COARSE:CTRL")
             self.fine = epics_signal_rw(InOut, f"{prefix}FINE:CTRL")
 
         super().__init__(name)
