@@ -9,13 +9,13 @@ from bluesky.plans import scan
 from bluesky.run_engine import RunEngine
 from daq_config_server.client import ConfigServer
 from numpy import linspace, poly1d
-from ophyd_async.core import init_devices
-from ophyd_async.testing import (
-    assert_emitted,
+from ophyd_async.core import (
     callback_on_mock_put,
     get_mock_put,
+    init_devices,
     set_mock_value,
 )
+from ophyd_async.testing import assert_emitted
 
 from dodal.devices.apple2_undulator import (
     MAXIMUM_MOVE_TIME,
@@ -45,7 +45,6 @@ from dodal.devices.util.lookup_tables_apple2 import (
     LookupTableConfig,
     convert_csv_to_lookup,
 )
-from dodal.testing import patch_motor
 from tests.devices.i10.test_data import (
     EXPECTED_ID_ENERGY_2_GAP_CALIBRATIONS_IDD_JSON,
     EXPECTED_ID_ENERGY_2_GAP_CALIBRATIONS_IDU_JSON,
@@ -62,7 +61,6 @@ async def mock_pgm(prefix: str = "BLXX-EA-DET-007:") -> PlaneGratingMonochromato
         mock_pgm = PlaneGratingMonochromator(
             prefix=prefix, grating=I10Grating, grating_pv="NLINES2"
         )
-    patch_motor(mock_pgm.energy)
     return mock_pgm
 
 
