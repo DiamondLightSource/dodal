@@ -2,6 +2,7 @@ import asyncio
 from asyncio import wait_for
 from contextlib import nullcontext
 from dataclasses import dataclass
+from typing import Any
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import numpy as np
@@ -11,7 +12,12 @@ from bluesky import preprocessors as bpp
 from bluesky.run_engine import RunEngine
 from ophyd.status import DeviceStatus, Status
 from ophyd_async.core import init_devices
-from ophyd_async.testing import get_mock_put, set_mock_put_proceeds, set_mock_value
+from ophyd_async.testing import (
+    callback_on_mock_put,
+    get_mock_put,
+    set_mock_put_proceeds,
+    set_mock_value,
+)
 
 from dodal.devices.fast_grid_scan import (
     FastGridScanCommon,
@@ -476,7 +482,9 @@ async def test_i02_1_gridscan_has_2d_behaviour(
 
 
 async def test_gridscan_prepare_writes_values_and_checks_readback(
-    grid_scan_devices_with_params_and_valid_state,
+    grid_scan_devices_with_params_and_valid_state: tuple[
+        FastGridScanCommon, GridScanParamsCommon, Any
+    ],
 ):
     grid_scan_device, grid_scan_params, valid_state = (
         grid_scan_devices_with_params_and_valid_state
@@ -516,7 +524,9 @@ async def test_gridscan_prepare_writes_values_and_checks_readback(
 
 
 async def test_gridscan_prepare_checks_validity_after_writes(
-    grid_scan_devices_with_params_and_valid_state,
+    grid_scan_devices_with_params_and_valid_state: tuple[
+        FastGridScanCommon, GridScanParamsCommon, Any
+    ],
 ):
     grid_scan_device, grid_scan_params, valid_state = (
         grid_scan_devices_with_params_and_valid_state
@@ -549,7 +559,9 @@ async def test_gridscan_prepare_checks_validity_after_writes(
 
 
 async def test_gridscan_prepare_times_out_for_validity_check(
-    grid_scan_devices_with_params_and_valid_state,
+    grid_scan_devices_with_params_and_valid_state: tuple[
+        FastGridScanCommon, GridScanParamsCommon, Any
+    ],
 ):
     grid_scan_device, grid_scan_params, valid_state = (
         grid_scan_devices_with_params_and_valid_state
@@ -572,3 +584,22 @@ async def test_gridscan_prepare_times_out_for_validity_check(
         and cause.args[0]
         == f"{device_name}-scan_invalid didn't match 0.0 in 0.5s, last value 1.0"
     )
+
+
+async def test_gridscan_prepare_works_within_tolerance_on_the_readback(
+    grid_scan_devices_with_params_and_valid_state: tuple[
+        FastGridScanCommon, GridScanParamsCommon, Any
+    ],
+):
+    grid_scan_device, grid_scan_params, valid_state = (
+        grid_scan_devices_with_params_and_valid_state
+    )
+
+    grid_scan_params.x_step_size_mm = 0.1111111
+
+    def return_rounded_value(value, *_, **__):
+        return round(value, 3)
+
+    callback_on_mock_put(grid_scan_device.x_step_size, return_rounded_value)
+
+    await grid_scan_device.prepare(grid_scan_params)

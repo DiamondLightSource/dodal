@@ -34,6 +34,7 @@ from dodal.devices.i03 import Beamstop
 from dodal.devices.i03.beamsize import Beamsize
 from dodal.devices.i03.dcm import DCM
 from dodal.devices.i03.undulator_dcm import UndulatorDCM
+from dodal.devices.ipin import IPin
 from dodal.devices.motors import XYZStage
 from dodal.devices.oav.oav_detector import OAVBeamCentreFile
 from dodal.devices.oav.oav_parameters import OAVConfigBeamCentre
@@ -467,3 +468,11 @@ def beamsize() -> Beamsize:
     return Beamsize(
         aperture_scatterguard=aperture_scatterguard(),
     )
+
+
+@device_factory()
+def ipin() -> IPin:
+    """Get the i03 ipin device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i04, it will return the existing object.
+    """
+    return IPin(f"{PREFIX.beamline_prefix}-EA-PIN-01:")
