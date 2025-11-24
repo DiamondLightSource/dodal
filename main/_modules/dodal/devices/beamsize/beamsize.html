@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.beamsize.beamsize &#8212; dodal 1.65.1.dev25+g143c2c3ac documentation</title>
+    <title>dodal.devices.beamsize.beamsize &#8212; dodal 1.65.1.dev26+g90a2fdd18 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=5d240d6a"></script>
+    <script src="../../../../_static/documentation_options.js?v=2472fc6a"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -807,17 +807,14 @@ window.addEventListener("load", load);
                 <article class="bd-article">
                   
   <h1>Source code for dodal.devices.beamsize.beamsize</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Annotated</span>
-
-<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">SignalR</span><span class="p">,</span> <span class="n">StandardReadable</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">StandardReadableFormat</span> <span class="k">as</span> <span class="n">Format</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">SignalR</span><span class="p">,</span> <span class="n">StandardReadable</span>
 
 
 <div class="viewcode-block" id="BeamsizeBase">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.beamsize.beamsize.BeamsizeBase.html#dodal.devices.beamsize.beamsize.BeamsizeBase">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">BeamsizeBase</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">):</span>
-    <span class="n">x_um</span><span class="p">:</span> <span class="n">Annotated</span><span class="p">[</span><span class="n">SignalR</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">Format</span><span class="o">.</span><span class="n">HINTED_SIGNAL</span><span class="p">]</span>
-    <span class="n">y_um</span><span class="p">:</span> <span class="n">Annotated</span><span class="p">[</span><span class="n">SignalR</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">Format</span><span class="o">.</span><span class="n">HINTED_SIGNAL</span><span class="p">]</span></div>
+    <span class="n">x_um</span><span class="p">:</span> <span class="n">SignalR</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span>
+    <span class="n">y_um</span><span class="p">:</span> <span class="n">SignalR</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span></div>
 
 </pre></div>
 
