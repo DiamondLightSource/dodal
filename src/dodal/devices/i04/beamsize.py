@@ -16,18 +16,19 @@ class Beamsize(BeamsizeBase):
         self._transfocator_ref = Reference(transfocator)
         self._aperture_scatterguard_ref = Reference(aperture_scatterguard)
 
-        self.x_um = derived_signal_r(
-            self._get_beamsize_x,
-            transfocator_size_x=self._transfocator_ref().current_horizontal_size_rbv,
-            aperture_radius=self._aperture_scatterguard_ref().radius,
-            derived_units="µm",
-        )
-        self.y_um = derived_signal_r(
-            self._get_beamsize_y,
-            transfocator_size_y=self._transfocator_ref().current_vertical_size_rbv,
-            aperture_radius=self._aperture_scatterguard_ref().radius,
-            derived_units="µm",
-        )
+        with self.add_children_as_readables():
+            self.x_um = derived_signal_r(
+                self._get_beamsize_x,
+                transfocator_size_x=self._transfocator_ref().current_horizontal_size_rbv,
+                aperture_radius=self._aperture_scatterguard_ref().radius,
+                derived_units="µm",
+            )
+            self.y_um = derived_signal_r(
+                self._get_beamsize_y,
+                transfocator_size_y=self._transfocator_ref().current_vertical_size_rbv,
+                aperture_radius=self._aperture_scatterguard_ref().radius,
+                derived_units="µm",
+            )
 
     def _get_beamsize_x(
         self,
