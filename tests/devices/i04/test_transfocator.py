@@ -3,20 +3,9 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 from bluesky.protocols import Reading
-from ophyd_async.core import (
-    init_devices,
-    set_mock_value,
-    wait_for_value,
-)
+from ophyd_async.core import set_mock_value, wait_for_value
 
 from dodal.devices.i04.transfocator import Transfocator
-
-
-@pytest.fixture
-async def fake_transfocator() -> Transfocator:
-    async with init_devices(mock=True):
-        transfocator = Transfocator(prefix="", name="transfocator")
-    return transfocator
 
 
 def given_predicted_lenses_is_half_of_beamsize(transfocator: Transfocator):
