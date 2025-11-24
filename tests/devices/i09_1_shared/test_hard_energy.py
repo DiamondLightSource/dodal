@@ -3,11 +3,10 @@ import re
 import pytest
 from bluesky.plan_stubs import mv
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import init_devices
+from ophyd_async.core import init_devices, set_mock_value
 from ophyd_async.testing import (
     assert_reading,
     partial_reading,
-    set_mock_value,
 )
 
 from dodal.devices.common_dcm import (
@@ -23,7 +22,6 @@ from dodal.devices.i09_1_shared import (
     get_hu_lut_as_dict,
 )
 from dodal.devices.undulator import UndulatorInMm, UndulatorOrder
-from dodal.testing.setup import patch_all_motors
 from tests.devices.i09_1_shared.test_data import TEST_HARD_UNDULATOR_LUT
 
 
@@ -46,7 +44,6 @@ async def dcm() -> DoubleCrystalMonochromatorWithDSpacing:
         dcm = DoubleCrystalMonochromatorWithDSpacing(
             "TEST-MO-DCM-01:", PitchAndRollCrystal, StationaryCrystal
         )
-    patch_all_motors(dcm)
     return dcm
 
 
@@ -54,7 +51,6 @@ async def dcm() -> DoubleCrystalMonochromatorWithDSpacing:
 async def undulator_in_mm() -> UndulatorInMm:
     async with init_devices(mock=True):
         undulator_mm = UndulatorInMm("UND-02")
-    patch_all_motors(undulator_mm)
     return undulator_mm
 
 
@@ -87,7 +83,6 @@ async def hu_energy(
             undulator_energy=hu_id_energy,
             name="hu_energy",
         )
-    patch_all_motors(hu_energy_device)
     return hu_energy_device
 
 
