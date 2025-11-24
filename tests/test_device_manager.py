@@ -2,6 +2,7 @@ from unittest.mock import MagicMock, Mock, patch
 
 import pytest
 from ophyd.device import Device as OphydV1Device
+from ophyd_async.core import Device
 from ophyd_async.core import Device as OphydV2Device
 from ophyd_async.sim import SimMotor
 from pytest import RaisesExc, RaisesGroup
@@ -420,7 +421,7 @@ def test_kwargs_factory(dm: DeviceManager):
 
     # Factories can have kwargs but they're ignored by the device manager
     @dm.factory
-    def foo(**kwargs):
+    def foo(**kwargs) -> Device:  # type: ignore
         s1(**kwargs)
 
     dm.build_all(s1)
