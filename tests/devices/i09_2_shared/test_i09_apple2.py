@@ -4,9 +4,9 @@ from unittest.mock import call
 
 import pytest
 from daq_config_server.client import ConfigServer
-from ophyd_async.core import init_devices
-from ophyd_async.testing import (
+from ophyd_async.core import (
     get_mock_put,
+    init_devices,
     set_mock_value,
 )
 
