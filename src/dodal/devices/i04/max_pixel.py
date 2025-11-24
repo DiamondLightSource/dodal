@@ -23,8 +23,10 @@ class MaxPixel(StandardReadable, Triggerable):
         """
         data = await self.array_data.get_value()
         gray_arr = cv2.cvtColor(data, cv2.COLOR_BGR2GRAY)
-        # 7,7 ia the kernal size, higher means more of a blur effect
-        blurred_arr = cv2.GaussianBlur(gray_arr, (7, 7), 0)
+        # kernal size describes how many of the neigbouring pixels are used for the blur,
+        # higher kernal size means more of a blur effect
+        kernal_size = (7, 7)
+        blurred_arr = cv2.GaussianBlur(gray_arr, kernal_size, 0)
         return blurred_arr
 
     @AsyncStatus.wrap
