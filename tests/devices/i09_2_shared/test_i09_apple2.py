@@ -20,7 +20,7 @@ from dodal.devices.apple2_undulator import (
     UndulatorPhaseAxes,
 )
 from dodal.devices.i09_2_shared.i09_apple2 import (
-    J09_Poly_Deg,
+    J09_POLY_DEG,
     J09Apple2Controller,
 )
 from dodal.devices.pgm import PlaneGratingMonochromator
@@ -31,7 +31,6 @@ from dodal.devices.util.lookup_tables_apple2 import (
     GapPhaseLookupTables,
     LookupTable,
     LookupTableConfig,
-    convert_csv_to_lookup,
 )
 from tests.devices.i09_2_shared.test_data import (
     TEST_EXPECTED_ENERGY_MOTOR_LOOKUP,
@@ -45,7 +44,7 @@ def mock_j09_energy_motor_lookup(
     mock_config_client: ConfigServer,
 ) -> EnergyMotorLookup:
     return EnergyMotorLookup(
-        lut_config=LookupTableConfig(poly_deg=J09_Poly_Deg),
+        lut_config=LookupTableConfig(poly_deg=J09_POLY_DEG),
         config_client=mock_config_client,
         gap_path=Path(TEST_SOFT_UNDULATOR_LUT),
     )
