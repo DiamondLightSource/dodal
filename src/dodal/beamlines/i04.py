@@ -382,4 +382,6 @@ def scintillator() -> Scintillator:
 
 @device_factory()
 def max_pixel() -> MaxPixel:
-    return MaxPixel(prefix=f"{PREFIX.beamline_prefix}-DI-OAV-01:")
+    return MaxPixel(
+        f"{PREFIX.beamline_prefix}-DI-OAV-01:",
+    )
