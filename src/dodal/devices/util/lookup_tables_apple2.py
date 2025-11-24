@@ -147,8 +147,6 @@ def convert_csv_to_lookup(
         mode_value = Pol(mode_value)
 
         # Create polynomial object for energy-to-gap/phase conversion
-        print(row)
-        print(lut_config.poly_deg)
         coefficients = [float(row[coef]) for coef in lut_config.poly_deg]
         if mode_value not in lut.root:
             lut.root[mode_value] = generate_lookup_table_entry(

@@ -31,7 +31,6 @@ class J09Apple2Controller(Apple2Controller[Apple2[UndulatorPhaseAxes]]):
         """
         Set the undulator motors for a given energy and polarisation.
         """
-
         pol = await self._check_and_get_pol_setpoint()
         gap, phase = self.energy_to_motor(energy=value, pol=pol)
         id_set_val = Apple2Val(
@@ -51,7 +50,7 @@ class J09Apple2Controller(Apple2Controller[Apple2[UndulatorPhaseAxes]]):
         self,
         value: Pol,
     ) -> None:
-        # I09 require all palarisation change to go via LH.
+        # I09 require all polarisation change to go via LH.
         target_energy = await self.energy.get_value()
         if value is not Pol.LH:
             self._polarisation_setpoint_set(Pol.LH)
