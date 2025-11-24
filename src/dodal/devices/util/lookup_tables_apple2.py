@@ -67,11 +67,11 @@ MAXIMUM_ROW_PHASE_MOTOR_POSITION = 24.0
 MAXIMUM_GAP_MOTOR_POSITION = 100
 
 PhasePoly1dParameters = {
-    "lh": [0],
-    "lv": [MAXIMUM_ROW_PHASE_MOTOR_POSITION],
-    "pc": [ROW_PHASE_CIRCULAR],
-    "nc": [-ROW_PHASE_CIRCULAR],
-    "lh3": [0],
+    Pol.LH: [0],
+    Pol.LV: [MAXIMUM_ROW_PHASE_MOTOR_POSITION],
+    Pol.PC: [ROW_PHASE_CIRCULAR],
+    Pol.NC: [-ROW_PHASE_CIRCULAR],
+    Pol.LH3: [0],
 }
 
 
@@ -385,15 +385,15 @@ class EnergyMotorLookup:
     def _generate_phase_lut(self):
         for key in self.lookup_tables.gap.root.keys():
             if key is not None:
-                self.lookup_tables.phase.root[Pol(key.lower())] = (
+                self.lookup_tables.phase.root[key] = (
                     generate_lookup_table_entry(
                         min_energy=self.lookup_tables.gap.root[
-                            Pol(key.lower())
+                            key
                         ].limit.minimum,
                         max_energy=self.lookup_tables.gap.root[
-                            Pol(key.lower())
+                            key
                         ].limit.maximum,
-                        poly1d_param=(PhasePoly1dParameters[Pol(key.lower())]),
+                        poly1d_param=(PhasePoly1dParameters[key]),
                     )
                 )
 
