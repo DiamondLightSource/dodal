@@ -20,6 +20,7 @@
    dodal.devices.b16
    dodal.devices.backlight
    dodal.devices.baton
+   dodal.devices.beamsize
    dodal.devices.bimorph_mirror
    dodal.devices.collimation_table
    dodal.devices.common_dcm

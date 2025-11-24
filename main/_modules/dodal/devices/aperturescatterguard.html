@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.aperturescatterguard &#8212; dodal 1.65.1.dev24+gace824a75 documentation</title>
+    <title>dodal.devices.aperturescatterguard &#8212; dodal 1.65.1.dev25+g143c2c3ac documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=c6cf3f80"></script>
+    <script src="../../../_static/documentation_options.js?v=5d240d6a"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -810,6 +810,7 @@ window.addEventListener("load", load);
 <span></span><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">math</span><span class="w"> </span><span class="kn">import</span> <span class="n">inf</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">bluesky.protocols</span><span class="w"> </span><span class="kn">import</span> <span class="n">Preparable</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
@@ -929,7 +930,7 @@ window.addEventListener("load", load);
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="n">ApertureValue</span><span class="p">,</span> <span class="n">AperturePosition</span><span class="p">]:</span>
     <span class="k">return</span> <span class="p">{</span>
         <span class="n">ApertureValue</span><span class="o">.</span><span class="n">OUT_OF_BEAM</span><span class="p">:</span> <span class="n">AperturePosition</span><span class="o">.</span><span class="n">from_gda_params</span><span class="p">(</span>
-            <span class="n">_GDAParamApertureValue</span><span class="o">.</span><span class="n">ROBOT_LOAD</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">params</span>
+            <span class="n">_GDAParamApertureValue</span><span class="o">.</span><span class="n">ROBOT_LOAD</span><span class="p">,</span> <span class="n">inf</span><span class="p">,</span> <span class="n">params</span>
         <span class="p">),</span>
         <span class="n">ApertureValue</span><span class="o">.</span><span class="n">SMALL</span><span class="p">:</span> <span class="n">AperturePosition</span><span class="o">.</span><span class="n">from_gda_params</span><span class="p">(</span>
             <span class="n">_GDAParamApertureValue</span><span class="o">.</span><span class="n">SMALL</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="n">params</span>
@@ -941,7 +942,7 @@ window.addEventListener("load", load);
             <span class="n">_GDAParamApertureValue</span><span class="o">.</span><span class="n">LARGE</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="n">params</span>
         <span class="p">),</span>
         <span class="n">ApertureValue</span><span class="o">.</span><span class="n">PARKED</span><span class="p">:</span> <span class="n">AperturePosition</span><span class="o">.</span><span class="n">from_gda_params</span><span class="p">(</span>
-            <span class="n">_GDAParamApertureValue</span><span class="o">.</span><span class="n">MANUAL_LOAD</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">params</span>
+            <span class="n">_GDAParamApertureValue</span><span class="o">.</span><span class="n">MANUAL_LOAD</span><span class="p">,</span> <span class="n">inf</span><span class="p">,</span> <span class="n">params</span>
         <span class="p">),</span>
     <span class="p">}</span></div>
 
