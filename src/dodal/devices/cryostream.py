@@ -1,5 +1,4 @@
 from ophyd_async.core import (
-    EnabledDisabled,
     InOut,
     StandardReadable,
     StandardReadableFormat,
@@ -30,7 +29,6 @@ class OxfordCryoStream(StandardReadable):
             self.turbo = epics_signal_rw(str, f"{prefix}TURBO")
             self.turbo_mode = epics_signal_rw(TurboEnum, f"{prefix}TURBOMODE")
 
-            self.serial_comms = epics_signal_rw(EnabledDisabled, f"{prefix}DISABLE")
             self.status = epics_signal_r(str, f"{prefix}STATUS.SEVR")
 
             self.pump_uptime = epics_signal_r(float, f"{prefix}RUNTIME")
