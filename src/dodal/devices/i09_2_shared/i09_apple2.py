@@ -11,7 +11,7 @@ from dodal.devices.util.lookup_tables_apple2 import (
 )
 from dodal.log import LOGGER
 
-J09_Poly_Deg = [
+J09_POLY_DEG = [
     "9th-order",
     "8th-order",
     "7th-order",

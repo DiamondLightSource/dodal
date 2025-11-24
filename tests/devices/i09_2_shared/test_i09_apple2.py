@@ -105,20 +105,13 @@ async def mock_id_pol(
     return mock_id_pol
 
 
-def test_j09_energy_motor_lookup_convert_csv_to_lookup_success(
+def test_j09_energy_motor_lookup_convert_gap_csv_to_lookup_success(
     mock_j09_energy_motor_lookup: EnergyMotorLookup,
-):
-    file = mock_j09_energy_motor_lookup.config_client.get_file_contents(
-        file_path=TEST_SOFT_UNDULATOR_LUT, reset_cached_result=True
-    )
-    data = convert_csv_to_lookup(
-        file_contents=file,
-        lut_config=LookupTableConfig(poly_deg=J09_Poly_Deg),
-        skip_line_start_with="#",
-    )
+) -> None:
+    mock_j09_energy_motor_lookup._update_phase_lut()
     with open(TEST_EXPECTED_UNDULATOR_LUT, "rb") as f:
-        loaded_dict = LookupTable(json.load(f))
-    assert data == loaded_dict
+        expected_luts = LookupTable(json.load(f))
+    assert mock_j09_energy_motor_lookup.lookup_tables == expected_luts
 
 
 def test_j09_energy_motor_lookup_fail_with_phase_path(
@@ -138,12 +131,11 @@ def test_j09_energy_motor_lookup_update_lookuptables(
     mock_j09_energy_motor_lookup.update_lookuptables()
     with open(TEST_EXPECTED_ENERGY_MOTOR_LOOKUP, "rb") as f:
         data = json.load(f)
-        map_dict = GapPhaseLookupTables(
+        expected_luts = GapPhaseLookupTables(
             gap=LookupTable(data["gap"]),
             phase=LookupTable(data["phase"]),
         )
-
-    assert mock_j09_energy_motor_lookup.lookup_tables == map_dict
+    assert mock_j09_energy_motor_lookup.lookup_tables == expected_luts
 
 
 @pytest.mark.parametrize(
