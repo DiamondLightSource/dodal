@@ -3,7 +3,8 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 from aiohttp.client import ClientConnectionError
-from ophyd_async.testing import assert_reading, partial_reading, set_mock_value
+from ophyd_async.core import set_mock_value
+from ophyd_async.testing import assert_reading, partial_reading
 
 from dodal.devices.hutch_shutter import (
     ShutterDemand,

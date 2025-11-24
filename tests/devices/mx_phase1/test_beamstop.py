@@ -6,11 +6,10 @@ from bluesky import FailedStatus
 from bluesky import plan_stubs as bps
 from bluesky.preprocessors import run_decorator
 from bluesky.run_engine import RunEngine
-from ophyd_async.testing import get_mock, get_mock_put, set_mock_value
+from ophyd_async.core import get_mock, get_mock_put, set_mock_value
 
 from dodal.common.beamlines.beamline_parameters import GDABeamlineParameters
 from dodal.devices.i03 import Beamstop, BeamstopPositions
-from dodal.testing import patch_all_motors, patch_motor
 from tests.common.beamlines.test_beamline_parameters import TEST_BEAMLINE_PARAMETERS_TXT
 
 
@@ -84,10 +83,6 @@ async def test_set_beamstop_position_to_data_collection_moves_beamstop(
     beamstop = Beamstop("-MO-BS-01:", beamline_parameters, name="beamstop")
     await beamstop.connect(mock=True)
 
-    patch_motor(beamstop.x_mm)
-    patch_motor(beamstop.y_mm)
-    patch_motor(beamstop.z_mm)
-
     x_mock = beamstop.x_mm.user_setpoint
     y_mock = beamstop.y_mm.user_setpoint
     z_mock = beamstop.z_mm.user_setpoint
@@ -123,7 +118,6 @@ async def test_beamstop_select_pos_moves_z_axis_first(
 ):
     beamstop = Beamstop("-MO-BS-01:", beamline_parameters, name="beamstop")
     await beamstop.connect(mock=True)
-    patch_all_motors(beamstop)
 
     run_engine(
         bps.abs_set(beamstop.selected_pos, BeamstopPositions.DATA_COLLECTION, wait=True)
