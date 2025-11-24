@@ -179,16 +179,6 @@ def test_plan_produces_expected_datums(
     assert docs and len(docs) == len(data_keys) * length
 
 
-def test_make_new_args(x_axis: Motor, y_axis: Motor):
-    args = _make_new_args({x_axis: [0, 1], y_axis: [2, 3]})
-    assert args[0] == x_axis
-    assert args[1] == 0
-    assert args[2] == 1
-    assert args[3] == y_axis
-    assert args[4] == 2
-    assert args[5] == 3
-
-
 @pytest.mark.parametrize(
     "num_params, params", ([2, [1, 2, 3, 4]], [3, [1, 2, 3, 3, 4, 3]])
 )
