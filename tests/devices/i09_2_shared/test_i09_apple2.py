@@ -107,10 +107,11 @@ async def mock_id_pol(
 def test_j09_energy_motor_lookup_convert_gap_csv_to_lookup_success(
     mock_j09_energy_motor_lookup: EnergyMotorLookup,
 ) -> None:
-    mock_j09_energy_motor_lookup._update_phase_lut()
+    mock_j09_energy_motor_lookup.update_lookuptables()
+
     with open(TEST_EXPECTED_UNDULATOR_LUT, "rb") as f:
         expected_luts = LookupTable(json.load(f))
-    assert mock_j09_energy_motor_lookup.lookup_tables == expected_luts
+    assert mock_j09_energy_motor_lookup.lookup_tables.gap == expected_luts
 
 
 def test_j09_energy_motor_lookup_fail_with_phase_path(
