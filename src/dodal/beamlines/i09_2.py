@@ -17,11 +17,12 @@ from dodal.devices.apple2_undulator import (
 from dodal.devices.i09.enums import Grating
 from dodal.devices.i09_2_shared.i09_apple2 import (
     EnergyMotorLookup,
+    J09_Poly_Deg,
     J09Apple2Controller,
-    J09DefaultLookupTableConfig,
 )
 from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.devices.synchrotron import Synchrotron
+from dodal.devices.util.lookup_tables_apple2 import LookupTableConfig
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
@@ -79,7 +80,7 @@ def jid_controller() -> J09Apple2Controller:
     return J09Apple2Controller(
         apple2=jid(),
         energy_motor_lut=EnergyMotorLookup(
-            lut_config=J09DefaultLookupTableConfig,
+            lut_config=LookupTableConfig(poly_deg=J09_Poly_Deg),
             config_client=J09_CONF_CLIENT,
             gap_path=Path(LOOK_UPTABLE_DIR, GAP_LOOKUP_FILE_NAME),
         ),

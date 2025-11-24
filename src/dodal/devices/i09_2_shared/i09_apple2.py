@@ -8,28 +8,21 @@ from dodal.devices.apple2_undulator import (
 )
 from dodal.devices.util.lookup_tables_apple2 import (
     EnergyMotorLookup,
-    LookupTableConfig,
 )
 from dodal.log import LOGGER
 
-J09DefaultLookupTableConfig = LookupTableConfig(
-    mode="Mode",
-    min_energy="MinEnergy",
-    max_energy="MaxEnergy",
-    poly_deg=[
-        "9th-order",
-        "8th-order",
-        "7th-order",
-        "6th-order",
-        "5th-order",
-        "4th-order",
-        "3rd-order",
-        "2nd-order",
-        "1st-order",
-        "0th-order",
-    ],
-    mode_name_convert={"cr": "pc", "cl": "nc"},
-)
+J09_Poly_Deg = [
+    "9th-order",
+    "8th-order",
+    "7th-order",
+    "6th-order",
+    "5th-order",
+    "4th-order",
+    "3rd-order",
+    "2nd-order",
+    "1st-order",
+    "0th-order",
+]
 
 
 class J09Apple2Controller(Apple2Controller[Apple2]):
@@ -77,7 +70,7 @@ class J09Apple2Controller(Apple2Controller[Apple2]):
         if value is not Pol.LH:
             self._polarisation_setpoint_set(Pol.LH)
             max_lh_energy = float(
-                self.lookup_table_client.lookup_tables.gap.root[Pol("lh")].limit.maximum
+                self.lookup_table_client.lookup_tables.gap.root[Pol.LH].limit.maximum
             )
             lh_setpoint = (
                 max_lh_energy if target_energy > max_lh_energy else target_energy
