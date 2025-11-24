@@ -1,9 +1,10 @@
 from collections.abc import AsyncGenerator
 from contextlib import ExitStack
-from unittest.mock import MagicMock
+from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 from ophyd_async.core import init_devices
+from ophyd_async.testing import assert_value, get_mock_put
 
 from dodal.common.beamlines.beamline_parameters import GDABeamlineParameters
 from dodal.devices.aperturescatterguard import ApertureScatterguard, ApertureValue
@@ -31,6 +32,8 @@ async def scintillator_and_ap_sg(
 ) -> AsyncGenerator[tuple[Scintillator, MagicMock], None]:
     async with init_devices(mock=True):
         mock_ap_sg = MagicMock()
+        mock_ap_sg.return_value.selected_aperture.set = AsyncMock()
+        mock_ap_sg.return_value.selected_aperture.get_value = AsyncMock()
         scintillator = Scintillator(
             prefix="",
             name="test_scin",
@@ -40,12 +43,15 @@ async def scintillator_and_ap_sg(
     with ExitStack() as motor_patch_stack:
         for motor in [scintillator.y_mm, scintillator.z_mm]:
             motor_patch_stack.enter_context(patch_motor(motor))
+        await scintillator.y_mm.set(5)
+        await scintillator.z_mm.set(5)
         yield scintillator, mock_ap_sg
 
 
 @pytest.mark.parametrize(
     "y, z, expected_position",
     [
+        (100.855, 101.5115, InOut.IN),
         (-0.02, 0.1, InOut.OUT),
         (0.1, 0.1, InOut.UNKNOWN),
         (10.2, 15.6, InOut.UNKNOWN),
@@ -81,17 +87,56 @@ async def test_given_aperture_scatterguard_parked_when_set_to_out_position_then_
 
     await scintillator.selected_pos.set(InOut.OUT)
 
-    assert await scintillator.y_mm.user_setpoint.get_value() == -0.02
-    assert await scintillator.z_mm.user_setpoint.get_value() == 0.1
+    await assert_value(scintillator.y_mm.user_setpoint, -0.02)
+    await assert_value(scintillator.z_mm.user_setpoint, 0.1)
 
 
-async def test_given_aperture_scatterguard_not_parked_when_set_to_out_position_then_exception_raised(
+async def test_given_aperture_scatterguard_parked_when_set_to_in_position_then_returns_expected(
     scintillator_and_ap_sg: tuple[Scintillator, ApertureScatterguard],
+):
+    scintillator, ap_sg = scintillator_and_ap_sg
+    ap_sg.return_value.selected_aperture.get_value.return_value = ApertureValue.PARKED  # type: ignore
+
+    await scintillator.selected_pos.set(InOut.IN)
+
+    await assert_value(scintillator.y_mm.user_setpoint, 100.855)
+    await assert_value(scintillator.z_mm.user_setpoint, 101.5115)
+
+
+@pytest.mark.parametrize("scint_pos", [InOut.OUT, InOut.IN])
+async def test_given_aperture_scatterguard_not_parked_when_set_to_in_or_out_position_then_exception_raised(
+    scintillator_and_ap_sg: tuple[Scintillator, ApertureScatterguard], scint_pos
 ):
     for position in ApertureValue:
         if position != ApertureValue.PARKED:
             scintillator, ap_sg = scintillator_and_ap_sg
             ap_sg.return_value.selected_aperture.get_value.return_value = position  # type: ignore
-
             with pytest.raises(ValueError):
-                await scintillator.selected_pos.set(InOut.OUT)
+                await scintillator.selected_pos.set(scint_pos)
+
+
+@pytest.mark.parametrize(
+    "y, z, expected_position",
+    [
+        (100.855, 101.5115, InOut.IN),
+        (-0.02, 0.1, InOut.OUT),
+    ],
+)
+async def test_given_scintillator_already_out_when_moved_in_or_out_then_does_nothing(
+    scintillator_and_ap_sg: tuple[Scintillator, ApertureScatterguard],
+    expected_position,
+    y,
+    z,
+):
+    scintillator, ap_sg = scintillator_and_ap_sg
+    await scintillator.y_mm.set(y)
+    await scintillator.z_mm.set(z)
+
+    get_mock_put(scintillator.y_mm.user_setpoint).reset_mock()
+    get_mock_put(scintillator.z_mm.user_setpoint).reset_mock()
+
+    ap_sg.return_value.selected_aperture.get_value.return_value = ApertureValue.LARGE  # type: ignore
+    await scintillator.selected_pos.set(expected_position)
+
+    get_mock_put(scintillator.y_mm.user_setpoint).assert_not_called()
+    get_mock_put(scintillator.z_mm.user_setpoint).assert_not_called()

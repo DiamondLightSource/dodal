@@ -33,6 +33,7 @@ from dodal.devices.hutch_shutter import HutchShutter
 from dodal.devices.i03 import Beamstop
 from dodal.devices.i03.dcm import DCM
 from dodal.devices.i03.undulator_dcm import UndulatorDCM
+from dodal.devices.ipin import IPin
 from dodal.devices.motors import XYZStage
 from dodal.devices.oav.oav_detector import OAVBeamCentreFile
 from dodal.devices.oav.oav_parameters import OAVConfigBeamCentre
@@ -44,7 +45,7 @@ from dodal.devices.scintillator import Scintillator
 from dodal.devices.smargon import Smargon
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.thawer import Thawer
-from dodal.devices.undulator import Undulator
+from dodal.devices.undulator import UndulatorInKeV
 from dodal.devices.webcam import Webcam
 from dodal.devices.xbpm_feedback import XBPMFeedback
 from dodal.devices.xspress3.xspress3 import Xspress3
@@ -256,11 +257,11 @@ def synchrotron() -> Synchrotron:
 
 
 @device_factory()
-def undulator(daq_configuration_path: str | None = None) -> Undulator:
+def undulator(daq_configuration_path: str | None = None) -> UndulatorInKeV:
     """Get the i03 undulator device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return Undulator(
+    return UndulatorInKeV(
         f"{BeamlinePrefix(BL).insertion_prefix}-MO-SERVC-01:",
         # evaluate here not as parameter default to enable post-import mocking
         id_gap_lookup_table_path=f"{daq_configuration_path or DAQ_CONFIGURATION_PATH}/lookup/BeamLine_Undulator_toGap.txt",
@@ -456,3 +457,11 @@ def collimation_table() -> CollimationTable:
     If this is called when already instantiated in i03, it will return the existing object.
     """
     return CollimationTable(prefix=f"{PREFIX.beamline_prefix}-MO-TABLE-01")
+
+
+@device_factory()
+def ipin() -> IPin:
+    """Get the i03 ipin device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i04, it will return the existing object.
+    """
+    return IPin(f"{PREFIX.beamline_prefix}-EA-PIN-01:")
