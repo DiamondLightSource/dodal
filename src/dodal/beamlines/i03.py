@@ -24,8 +24,6 @@ from dodal.devices.collimation_table import CollimationTable
 from dodal.devices.cryostream import (
     CompositeCryoStreamCryoJet,
     CryoStreamGantry,
-    OxfordCryoJet,
-    OxfordCryoStream,
 )
 from dodal.devices.detector.detector_motion import DetectorMotion
 from dodal.devices.diamond_filter import DiamondFilter, I03Filters
@@ -400,8 +398,8 @@ def cryostream() -> CompositeCryoStreamCryoJet:
     If this is called when already instantiated in i03, it will return the existing object.
     """
     return CompositeCryoStreamCryoJet(
-        cryostream=OxfordCryoStream(f"{PREFIX.beamline_prefix}-EA-CSTRM-01:"),
-        cryojet=OxfordCryoJet(f"{PREFIX.beamline_prefix}-EA-CJET-01:"),
+        cryostream_prefix=f"{PREFIX.beamline_prefix}-EA-CSTRM-01:",
+        cryojet_prefix=f"{PREFIX.beamline_prefix}-EA-CJET-01:",
     )
 
 

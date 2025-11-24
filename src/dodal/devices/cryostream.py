@@ -23,7 +23,7 @@ class CryoStreamSelection(StrictEnum):
     HC1 = "HC1"
 
 
-class OxfordCryoStreamController(StandardReadable):
+class OxfordCryoStream(StandardReadable):
     def __init__(self, prefix: str, name: str = ""):
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             # Any signals that should be read once at the start of the scan
@@ -32,6 +32,12 @@ class OxfordCryoStreamController(StandardReadable):
 
             self.serial_comms = epics_signal_rw(EnabledDisabled, f"{prefix}DISABLE")
             self.status = epics_signal_r(str, f"{prefix}STATUS.SEVR")
+
+            self.pump_uptime = epics_signal_r(float, f"{prefix}RUNTIME")
+            self.controller_number = epics_signal_r(float, f"{prefix}CTRLNUM")
+            self.software_version = epics_signal_r(float, f"{prefix}VER")
+            self.evap_adjust = epics_signal_r(float, f"{prefix}EVAPADJUST")
+            self.series = epics_signal_r(str, f"{prefix}SERIES")
 
         with self.add_children_as_readables():
             # Any signals that should be read at every point in the scan
@@ -56,22 +62,6 @@ class OxfordCryoStreamController(StandardReadable):
 
             self.end_rate = epics_signal_rw(float, f"{prefix}ERATE")
 
-        super().__init__(name)
-
-
-class OxfordCryoStreamStatus(StandardReadable):
-    def __init__(self, prefix: str, name: str = ""):
-        with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
-            # Any signals that should be read once at the start of the scan
-
-            self.pump_uptime = epics_signal_r(float, f"{prefix}RUNTIME")
-            self.controller_number = epics_signal_r(float, f"{prefix}CTRLNUM")
-            self.software_version = epics_signal_r(float, f"{prefix}VER")
-            self.evap_adjust = epics_signal_r(float, f"{prefix}EVAPADJUST")
-            self.series = epics_signal_r(str, f"{prefix}SERIES")
-
-        with self.add_children_as_readables():
-            # Any signals that should be read at every point in the scan
             self.setpoint = epics_signal_r(float, f"{prefix}SETPOINT")
             self.temp = epics_signal_r(float, f"{prefix}TEMP")
             self.error = epics_signal_r(float, f"{prefix}ERROR")
@@ -91,15 +81,6 @@ class OxfordCryoStreamStatus(StandardReadable):
         super().__init__(name)
 
 
-class OxfordCryoStream(StandardReadable):
-    def __init__(self, prefix: str, name=""):
-        with self.add_children_as_readables():
-            self.controller = OxfordCryoStreamController(prefix=prefix)
-            self.status = OxfordCryoStreamStatus(prefix=prefix)
-
-        super().__init__(name)
-
-
 class OxfordCryoJet(StandardReadable):
     # TODO: https://github.com/DiamondLightSource/dodal/issues/1486
     # This is a placeholder implementation to get it working with I03, the actual cryojet has many more PVs
@@ -114,13 +95,13 @@ class OxfordCryoJet(StandardReadable):
 class CompositeCryoStreamCryoJet(StandardReadable):
     def __init__(
         self,
-        cryostream: OxfordCryoStream,
-        cryojet: OxfordCryoJet,
+        cryostream_prefix: str,
+        cryojet_prefix: str,
         name: str = "",
     ):
         with self.add_children_as_readables():
-            self.cryostream = cryostream
-            self.cryojet = cryojet
+            self.cryostream = OxfordCryoStream(f"{cryostream_prefix}")
+            self.cryojet = OxfordCryoJet(f"{cryojet_prefix}")
         super().__init__(name)
 
 
