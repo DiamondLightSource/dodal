@@ -90,19 +90,6 @@ class OxfordCryoJet(StandardReadable):
         super().__init__(name)
 
 
-class CompositeCryoStreamCryoJet(StandardReadable):
-    def __init__(
-        self,
-        cryostream_prefix: str,
-        cryojet_prefix: str,
-        name: str = "",
-    ):
-        with self.add_children_as_readables():
-            self.cryostream = OxfordCryoStream(f"{cryostream_prefix}")
-            self.cryojet = OxfordCryoJet(f"{cryojet_prefix}")
-        super().__init__(name)
-
-
 class CryoStreamGantry(StandardReadable):
     def __init__(self, prefix: str, name: str = ""):
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
