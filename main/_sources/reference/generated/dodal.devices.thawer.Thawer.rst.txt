@@ -21,6 +21,9 @@ dodal.devices.thawer.Thawer
       
       
       
+      ~Thawer.set
+      
+      
       
       
       ~Thawer.stop
