@@ -76,12 +76,12 @@ def jid() -> Apple2:
 @device_factory()
 def jid_controller() -> J09Apple2Controller:
     """J09 insertion device controller."""
-    J09DefaultLookupTableConfig.gap_path = Path(LOOK_UPTABLE_DIR, GAP_LOOKUP_FILE_NAME)
     return J09Apple2Controller(
         apple2=jid(),
         energy_motor_lut=EnergyMotorLookup(
             lut_config=J09DefaultLookupTableConfig,
             config_client=J09_CONF_CLIENT,
+            gap_path=Path(LOOK_UPTABLE_DIR, GAP_LOOKUP_FILE_NAME),
         ),
     )
 

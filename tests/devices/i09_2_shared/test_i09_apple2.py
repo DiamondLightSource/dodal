@@ -43,10 +43,10 @@ from tests.devices.i09_2_shared.test_data import (
 def mock_j09_energy_motor_lookup(
     mock_config_client: ConfigServer,
 ) -> EnergyMotorLookup:
-    J09DefaultLookupTableConfig.gap_path = Path(TEST_SOFT_UNDULATOR_LUT)
     return EnergyMotorLookup(
         lut_config=J09DefaultLookupTableConfig,
         config_client=mock_config_client,
+        gap_path=Path(TEST_SOFT_UNDULATOR_LUT),
     )
 
 
@@ -123,12 +123,12 @@ def test_j09_energy_motor_lookup_convert_csv_to_lookup_success(
 def test_j09_energy_motor_lookup_fail_with_phase_path(
     mock_j09_energy_motor_lookup: EnergyMotorLookup,
 ):
-    mock_j09_energy_motor_lookup.lut_config.phase_path = Path("dfsdfs")
+    mock_j09_energy_motor_lookup.phase_path = Path("dfsdfs")
     with pytest.raises(FileNotFoundError):
         mock_j09_energy_motor_lookup._update_phase_lut()
     data = mock_j09_energy_motor_lookup.lookup_tables.phase
     assert data == LookupTable()
-    mock_j09_energy_motor_lookup.lut_config.phase_path = None
+    mock_j09_energy_motor_lookup.phase_path = None
 
 
 def test_j09_energy_motor_lookup_update_lookuptables(

@@ -87,9 +87,9 @@ def mock_i10_energy_motor_lookup_idu(
         config_client=mock_config_client,
         lut_config=LookupTableConfig(
             source=("Source", "idu"),
-            gap_path=Path(ID_ENERGY_2_GAP_CALIBRATIONS_CSV),
-            phase_path=Path(ID_ENERGY_2_PHASE_CALIBRATIONS_CSV),
         ),
+        gap_path=Path(ID_ENERGY_2_GAP_CALIBRATIONS_CSV),
+        phase_path=Path(ID_ENERGY_2_PHASE_CALIBRATIONS_CSV),
     )
 
 
@@ -101,9 +101,9 @@ def mock_i10_energy_motor_lookup_idd(
         config_client=mock_config_client,
         lut_config=LookupTableConfig(
             source=("Source", "idd"),
-            gap_path=Path(ID_ENERGY_2_GAP_CALIBRATIONS_CSV),
-            phase_path=Path(ID_ENERGY_2_PHASE_CALIBRATIONS_CSV),
         ),
+        gap_path=Path(ID_ENERGY_2_GAP_CALIBRATIONS_CSV),
+        phase_path=Path(ID_ENERGY_2_PHASE_CALIBRATIONS_CSV),
     )
 
 

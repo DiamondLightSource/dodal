@@ -125,9 +125,9 @@ def idd_controller() -> I10Apple2Controller:
         config_client=I10_CONF_CLIENT,
         lut_config=LookupTableConfig(
             source=("Source", "idd"),
-            gap_path=Path(LOOK_UPTABLE_DIR, DEFAULT_GAP_FILE),
-            phase_path=Path(LOOK_UPTABLE_DIR, DEFAULT_PHASE_FILE),
         ),
+        gap_path=Path(LOOK_UPTABLE_DIR, DEFAULT_GAP_FILE),
+        phase_path=Path(LOOK_UPTABLE_DIR, DEFAULT_PHASE_FILE),
     )
     return I10Apple2Controller(apple2=idd(), energy_motor_lut=idd_energy_motor_lut)
 
@@ -192,9 +192,9 @@ def idu_controller() -> I10Apple2Controller:
         config_client=I10_CONF_CLIENT,
         lut_config=LookupTableConfig(
             source=("Source", "idu"),
-            gap_path=Path(LOOK_UPTABLE_DIR, DEFAULT_GAP_FILE),
-            phase_path=Path(LOOK_UPTABLE_DIR, DEFAULT_PHASE_FILE),
         ),
+        gap_path=Path(LOOK_UPTABLE_DIR, DEFAULT_GAP_FILE),
+        phase_path=Path(LOOK_UPTABLE_DIR, DEFAULT_PHASE_FILE),
     )
     return I10Apple2Controller(apple2=idd(), energy_motor_lut=idu_energy_motor_lut)
 
