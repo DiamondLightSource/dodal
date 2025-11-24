@@ -34,6 +34,7 @@ from pathlib import Path
 
 import numpy as np
 from daq_config_server.client import ConfigServer
+from ophyd_async.core import StrictEnum
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -43,7 +44,6 @@ from pydantic import (
     field_validator,
 )
 
-from dodal.devices.apple2_undulator import Pol
 from dodal.log import LOGGER
 
 DEFAULT_POLY_DEG = [
@@ -56,6 +56,18 @@ DEFAULT_POLY_DEG = [
     "1st-order",
     "b",
 ]
+
+
+class Pol(StrictEnum):
+    NONE = "None"
+    LH = "lh"
+    LV = "lv"
+    PC = "pc"
+    NC = "nc"
+    LA = "la"
+    LH3 = "lh3"
+    LV3 = "lv3"
+
 
 MODE_NAME_CONVERT = {"cr": "pc", "cl": "nc"}
 DEFAULT_GAP_FILE = "IDEnergy2GapCalibrations.csv"

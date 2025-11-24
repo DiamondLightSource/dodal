@@ -4,8 +4,8 @@ from pathlib import Path
 import pytest
 from daq_config_server.client import ConfigServer
 
+from dodal.devices.i21 import I21EnergyMotorLookup
 from dodal.devices.util.lookup_tables_apple2 import (
-    EnergyMotorLookup,
     LookupTable,
     LookupTableConfig,
     convert_csv_to_lookup,
@@ -19,8 +19,8 @@ from tests.devices.i21.test_data import (
 @pytest.fixture
 def mock_i21_energy_motor_lookup(
     mock_config_client: ConfigServer,
-) -> EnergyMotorLookup:
-    return EnergyMotorLookup(
+) -> I21EnergyMotorLookup:
+    return I21EnergyMotorLookup(
         config_client=mock_config_client,
         lut_config=LookupTableConfig(
             grading="Grating",
@@ -30,7 +30,7 @@ def mock_i21_energy_motor_lookup(
 
 
 def test_21_energy_motor_lookup_convert_csv_to_lookup_success(
-    mock_i21_energy_motor_lookup: EnergyMotorLookup,
+    mock_i21_energy_motor_lookup: I21EnergyMotorLookup,
 ):
     file = mock_i21_energy_motor_lookup.config_client.get_file_contents(
         file_path=ID_ENERGY_2_GAP_CALIBRATIONS_CSV, reset_cached_result=True
