@@ -17,7 +17,6 @@ dependencies = [
     "ophyd-async[ca,pva]>=0.13.7",
     "bluesky>=1.14.5",
     "pyepics",
-    "dataclasses-json",
     "pillow",
     "zocalo>=1.0.0",
     "requests",
