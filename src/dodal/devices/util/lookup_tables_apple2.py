@@ -67,11 +67,11 @@ MAXIMUM_ROW_PHASE_MOTOR_POSITION = 24.0
 MAXIMUM_GAP_MOTOR_POSITION = 100
 
 PhasePoly1dParameters = {
-    "lh": [0],
-    "lv": [MAXIMUM_ROW_PHASE_MOTOR_POSITION],
-    "pc": [ROW_PHASE_CIRCULAR],
-    "nc": [-ROW_PHASE_CIRCULAR],
-    "lh3": [0],
+    Pol.LH: [0],
+    Pol.LV: [MAXIMUM_ROW_PHASE_MOTOR_POSITION],
+    Pol.PC: [ROW_PHASE_CIRCULAR],
+    Pol.NC: [-ROW_PHASE_CIRCULAR],
+    Pol.LH3: [0],
 }
 
 
