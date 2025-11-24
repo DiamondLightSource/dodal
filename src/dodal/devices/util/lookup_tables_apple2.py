@@ -385,15 +385,15 @@ class EnergyMotorLookup:
     def _generate_phase_lut(self):
         for key in self.lookup_tables.gap.root.keys():
             if key is not None:
-                self.lookup_tables.phase.root[Pol(key.lower())] = (
+                self.lookup_tables.phase.root[key] = (
                     generate_lookup_table_entry(
                         min_energy=self.lookup_tables.gap.root[
-                            Pol(key.lower())
+                            key
                         ].limit.minimum,
                         max_energy=self.lookup_tables.gap.root[
-                            Pol(key.lower())
+                            key
                         ].limit.maximum,
-                        poly1d_param=(PhasePoly1dParameters[Pol(key.lower())]),
+                        poly1d_param=(PhasePoly1dParameters[key]),
                     )
                 )
 
