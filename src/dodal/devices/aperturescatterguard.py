@@ -18,7 +18,7 @@ from dodal.devices.aperture import Aperture
 from dodal.devices.motors import XYStage
 
 
-class InvalidApertureMove(Exception):
+class InvalidApertureMoveError(Exception):
     pass
 
 
@@ -163,13 +163,14 @@ class ApertureScatterguard(StandardReadable, Preparable):
 
     def __init__(
         self,
+        aperture_prefix: str,
+        scatterguard_prefix: str,
         loaded_positions: dict[ApertureValue, AperturePosition],
         tolerances: AperturePosition,
-        prefix: str = "",
         name: str = "",
     ) -> None:
-        self.aperture = Aperture(prefix + "-MO-MAPT-01:")
-        self.scatterguard = XYStage(prefix + "-MO-SCAT-01:")
+        self.aperture = Aperture(aperture_prefix)
+        self.scatterguard = XYStage(scatterguard_prefix)
         self._loaded_positions = loaded_positions
         self._tolerances = tolerances
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
@@ -241,7 +242,7 @@ class ApertureScatterguard(StandardReadable, Preparable):
         diff_on_z = abs(current_ap_z - expected_z_position)
         aperture_z_tolerance = self._tolerances.aperture_z
         if diff_on_z > aperture_z_tolerance:
-            raise InvalidApertureMove(
+            raise InvalidApertureMoveError(
                 f"Current aperture z ({current_ap_z}), outside of tolerance ({aperture_z_tolerance}) from target ({expected_z_position})."
             )
 
@@ -255,7 +256,7 @@ class ApertureScatterguard(StandardReadable, Preparable):
         for axis in all_axes:
             axis_stationary = await axis.motor_done_move.get_value()
             if not axis_stationary:
-                raise InvalidApertureMove(
+                raise InvalidApertureMoveError(
                     f"{axis.name} is still moving. Wait for it to finish before"
                     "triggering another move."
                 )
@@ -293,7 +294,9 @@ class ApertureScatterguard(StandardReadable, Preparable):
         ):
             return ApertureValue.OUT_OF_BEAM
 
-        raise InvalidApertureMove("Current aperture/scatterguard state unrecognised")
+        raise InvalidApertureMoveError(
+            "Current aperture/scatterguard state unrecognised"
+        )
 
     async def _safe_move_whilst_in_beam(self, position: AperturePosition):
         """
