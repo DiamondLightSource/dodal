@@ -23,7 +23,6 @@ from dodal.plans.wrapped import (
     _make_args,
     _make_concurrently_stepped_lists,
     _make_independently_stepped_lists,
-    _make_new_args,
     _make_stepped_list,
     count,
     grid_num_rscan,
