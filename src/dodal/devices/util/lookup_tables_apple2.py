@@ -34,6 +34,7 @@ from pathlib import Path
 
 import numpy as np
 from daq_config_server.client import ConfigServer
+from ophyd_async.core import StrictEnum
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -43,7 +44,6 @@ from pydantic import (
     field_validator,
 )
 
-from dodal.devices.apple2_undulator import Pol
 from dodal.log import LOGGER
 
 DEFAULT_POLY_DEG = [
@@ -56,6 +56,18 @@ DEFAULT_POLY_DEG = [
     "1st-order",
     "b",
 ]
+
+
+class Pol(StrictEnum):
+    NONE = "None"
+    LH = "lh"
+    LV = "lv"
+    PC = "pc"
+    NC = "nc"
+    LA = "la"
+    LH3 = "lh3"
+    LV3 = "lv3"
+
 
 MODE_NAME_CONVERT = {"cr": "pc", "cl": "nc"}
 DEFAULT_GAP_FILE = "IDEnergy2GapCalibrations.csv"
@@ -80,6 +92,7 @@ class LookupTableConfig(BaseModel):
     mode: str = "Mode"
     min_energy: str = "MinEnergy"
     max_energy: str = "MaxEnergy"
+    grading: str | None = None
     poly_deg: list[str] = Field(default_factory=lambda: DEFAULT_POLY_DEG)
     mode_name_convert: dict[str, str] = Field(default_factory=lambda: MODE_NAME_CONVERT)
     gap_path: Path | None = None
@@ -96,6 +109,7 @@ class EnergyCoverageEntry(BaseModel):
     low: float
     high: float
     poly: np.poly1d
+    grading: str | None = None
 
     @field_validator("poly", mode="before")
     @classmethod
@@ -155,18 +169,21 @@ def convert_csv_to_lookup(
 
     def process_row(row: dict, lut: LookupTable):
         """Process a single row from the CSV file and update the lookup table."""
+
         mode_value = str(row[lut_config.mode]).lower()
         if mode_value in lut_config.mode_name_convert:
             mode_value = lut_config.mode_name_convert[f"{mode_value}"]
-        mode_value = Pol(mode_value)
+        mode_value = Pol(mode_value.replace(" ", ""))
 
         # Create polynomial object for energy-to-gap/phase conversion
         coefficients = [float(row[coef]) for coef in lut_config.poly_deg]
+        grading = row[lut_config.grading] if lut_config.grading else None
         if mode_value not in lut.root:
             lut.root[mode_value] = generate_lookup_table_entry(
                 min_energy=float(row[lut_config.min_energy]),
                 max_energy=float(row[lut_config.max_energy]),
                 poly1d_param=coefficients,
+                grading=grading,
             )
 
         else:
@@ -175,6 +192,7 @@ def convert_csv_to_lookup(
                     low=float(row[lut_config.min_energy]),
                     high=float(row[lut_config.max_energy]),
                     poly=np.poly1d(coefficients),
+                    grading=grading,
                 )
             )
 
@@ -256,7 +274,10 @@ def get_poly(
 
 
 def generate_lookup_table_entry(
-    min_energy: float, max_energy: float, poly1d_param: list[float]
+    min_energy: float,
+    max_energy: float,
+    poly1d_param: list[float],
+    grading: str | None = None,
 ) -> LookupTableEntries:
     return LookupTableEntries(
         energies=EnergyCoverage(
@@ -265,6 +286,7 @@ def generate_lookup_table_entry(
                     low=min_energy,
                     high=max_energy,
                     poly=np.poly1d(poly1d_param),
+                    grading=grading,
                 )
             }
         ),

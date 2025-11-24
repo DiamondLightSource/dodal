@@ -13,6 +13,7 @@ from ophyd_async.testing import (
 from dodal.devices.apple2_undulator import (
     Apple2,
     BeamEnergy,
+    FullMotionApple2Controller,
     InsertionDeviceEnergy,
     InsertionDevicePolarisation,
     Pol,
@@ -20,7 +21,6 @@ from dodal.devices.apple2_undulator import (
     UndulatorPhaseAxes,
 )
 from dodal.devices.i09_2_shared.i09_apple2 import (
-    J09Apple2Controller,
     J09DefaultLookupTableConfig,
 )
 from dodal.devices.pgm import PlaneGratingMonochromator
@@ -63,9 +63,9 @@ async def mock_apple2(
 async def mock_id_controller(
     mock_apple2: Apple2,
     mock_j09_energy_motor_lookup: EnergyMotorLookup,
-) -> J09Apple2Controller:
+) -> FullMotionApple2Controller:
     async with init_devices(mock=True):
-        mock_id_controller = J09Apple2Controller(
+        mock_id_controller = FullMotionApple2Controller(
             apple2=mock_apple2,
             energy_motor_lut=mock_j09_energy_motor_lookup,
         )
@@ -75,7 +75,7 @@ async def mock_id_controller(
 
 @pytest.fixture
 async def mock_id_energy(
-    mock_id_controller: J09Apple2Controller,
+    mock_id_controller: FullMotionApple2Controller,
 ) -> InsertionDeviceEnergy:
     async with init_devices(mock=True):
         mock_id_energy = InsertionDeviceEnergy(
@@ -96,7 +96,7 @@ async def beam_energy(
 
 @pytest.fixture
 async def mock_id_pol(
-    mock_id_controller: J09Apple2Controller,
+    mock_id_controller: FullMotionApple2Controller,
 ) -> InsertionDevicePolarisation:
     async with init_devices(mock=True):
         mock_id_pol = InsertionDevicePolarisation(id_controller=mock_id_controller)
@@ -156,7 +156,7 @@ def test_j09_energy_motor_lookup_update_lookuptables(
     ],
 )
 async def test_j09_apple2_controller_determine_pol(
-    mock_id_controller: J09Apple2Controller,
+    mock_id_controller: FullMotionApple2Controller,
     pol: Pol,
     top_inner_phase: float,
     top_outer_phase: float,
@@ -198,7 +198,7 @@ async def test_j09_apple2_controller_determine_pol(
     ],
 )
 async def test_j09_apple2_controller_set_pol_lh(
-    mock_id_controller: J09Apple2Controller,
+    mock_id_controller: FullMotionApple2Controller,
     pol: Pol,
     top_inner_phase: float,
     top_outer_phase: float,
@@ -237,7 +237,7 @@ async def test_j09_apple2_controller_set_pol_lh(
     ],
 )
 async def test_j09_apple2_controller_set_pol(
-    mock_id_controller: J09Apple2Controller,
+    mock_id_controller: FullMotionApple2Controller,
     pol: Pol,
     top_inner_phase: float,
     top_outer_phase: float,
@@ -284,7 +284,7 @@ async def test_j09_apple2_controller_set_pol(
     ],
 )
 async def test_j09_apple2_controller_set_energy(
-    mock_id_controller: J09Apple2Controller,
+    mock_id_controller: FullMotionApple2Controller,
     pol: Pol,
     energy: float,
     expected_gap: float,

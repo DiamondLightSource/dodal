@@ -9,6 +9,7 @@ from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beam
 from dodal.devices.apple2_undulator import (
     Apple2,
     BeamEnergy,
+    FullMotionApple2Controller,
     InsertionDeviceEnergy,
     InsertionDevicePolarisation,
     UndulatorGap,
@@ -16,12 +17,11 @@ from dodal.devices.apple2_undulator import (
 )
 from dodal.devices.i09.enums import Grating
 from dodal.devices.i09_2_shared.i09_apple2 import (
-    EnergyMotorLookup,
-    J09Apple2Controller,
     J09DefaultLookupTableConfig,
 )
 from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.devices.synchrotron import Synchrotron
+from dodal.devices.util.lookup_tables_apple2 import EnergyMotorLookup
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
@@ -74,15 +74,16 @@ def jid() -> Apple2:
 
 
 @device_factory()
-def jid_controller() -> J09Apple2Controller:
+def jid_controller() -> FullMotionApple2Controller:
     """J09 insertion device controller."""
     J09DefaultLookupTableConfig.gap_path = Path(LOOK_UPTABLE_DIR, GAP_LOOKUP_FILE_NAME)
-    return J09Apple2Controller(
+    return FullMotionApple2Controller(
         apple2=jid(),
         energy_motor_lut=EnergyMotorLookup(
             lut_config=J09DefaultLookupTableConfig,
             config_client=J09_CONF_CLIENT,
         ),
+        units="keV",
     )
 
 
