@@ -1,3 +1,4 @@
+from pathlib import Path
 from unittest.mock import MagicMock
 
 import numpy as np
@@ -85,13 +86,20 @@ class DummyEnergyMotorLookup(EnergyMotorLookup):
 
 
 @pytest.fixture
-def lut_config() -> LookupTableConfig:
+def gap_lut_config() -> LookupTableConfig:
     return LookupTableConfig(
-        mode="Mode",
-        min_energy="MinEnergy",
-        max_energy="MaxEnergy",
         poly_deg=["c1", "c0"],
         mode_name_convert={"hl": "lh", "vl": "lv"},
+        path=Path("dummy_gap_file.csv"),
+    )
+
+
+@pytest.fixture
+def phase_lut_config() -> LookupTableConfig:
+    return LookupTableConfig(
+        poly_deg=["c1", "c0"],
+        mode_name_convert={"hl": "lh", "vl": "lv"},
+        path=Path("dummy_phase_file.csv"),
     )
 
 
@@ -113,32 +121,14 @@ def mock_config_client() -> ConfigServer:
 @pytest.fixture
 def dummy_energy_motor_lookup(
     mock_config_client: ConfigServer,
-    lut_config: LookupTableConfig,
+    gap_lut_config: LookupTableConfig,
+    phase_lut_config: LookupTableConfig,
 ) -> DummyEnergyMotorLookup:
     return DummyEnergyMotorLookup(
         config_client=mock_config_client,
-        lut_config=lut_config,
+        gap_lut_config=gap_lut_config,
+        phase_lut_config=phase_lut_config,
     )
-
-
-def test_energy_motor_lookup_with_phase_path_none(
-    dummy_energy_motor_lookup: DummyEnergyMotorLookup,
-) -> None:
-    with pytest.raises(RuntimeError, match="Phase path is not provided"):
-        dummy_energy_motor_lookup._update_phase_lut()
-
-
-def test_energy_motor_lookup_with_gap_path_none(
-    lut_config: LookupTableConfig,
-    mock_config_client: ConfigServer,
-) -> None:
-    empty_energy_mortor_lookup = EnergyMotorLookup(
-        config_client=mock_config_client,
-        lut_config=lut_config,
-    )
-
-    with pytest.raises(RuntimeError, match="Gap path is not provided"):
-        empty_energy_mortor_lookup.update_lookuptables()
 
 
 def test_read_file_and_skip_basic() -> None:
@@ -159,7 +149,7 @@ def test_convert_csv_to_lookup_overwrite_name_convert_default(
     csv_content = (
         "Mode,MinEnergy,MaxEnergy,c1,c0\nHL,100,200,2.0,1.0\nVL,200,300,1.0,0.0\n"
     )
-    lut = convert_csv_to_lookup(csv_content, dummy_energy_motor_lookup.lut_config)
+    lut = convert_csv_to_lookup(csv_content, dummy_energy_motor_lookup.gap_lut_config)
     assert Pol.LH in lut.root
     assert Pol.LV in lut.root
     # Check polynomials evaluate as expected
@@ -190,5 +180,5 @@ async def test_bad_file_contents_causes_convert_csv_to_lookup_fails(
     with pytest.raises(RuntimeError):
         convert_csv_to_lookup(
             "fnslkfndlsnf",
-            dummy_energy_motor_lookup.lut_config,
+            dummy_energy_motor_lookup.gap_lut_config,
         )

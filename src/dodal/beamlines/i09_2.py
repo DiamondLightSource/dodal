@@ -15,19 +15,17 @@ from dodal.devices.apple2_undulator import (
     UndulatorPhaseAxes,
 )
 from dodal.devices.i09.enums import Grating
-from dodal.devices.i09_2_shared.i09_apple2 import (
-    EnergyMotorLookup,
-    J09Apple2Controller,
-    J09DefaultLookupTableConfig,
-)
+from dodal.devices.i09_2_shared.i09_apple2 import J09Apple2Controller
 from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.devices.synchrotron import Synchrotron
+from dodal.devices.util.lookup_tables_apple2 import EnergyMotorLookup, LookupTableConfig
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
 J09_CONF_CLIENT = ConfigServer(url="https://daq-config.diamond.ac.uk")
 LOOK_UPTABLE_DIR = "/dls_sw/i09-2/software/gda/workspace_git/gda-diamond.git/configurations/i09-2-shared/lookupTables/"
 GAP_LOOKUP_FILE_NAME = "JIDEnergy2GapCalibrations.csv"
+PHASE_LOOKUP_FILE_NAME = "JIDEnergy2PhaseCalibrations.csv"
 
 BL = get_beamline_name("i09-2")
 PREFIX = BeamlinePrefix(BL, suffix="J")
@@ -76,12 +74,29 @@ def jid() -> Apple2:
 @device_factory()
 def jid_controller() -> J09Apple2Controller:
     """J09 insertion device controller."""
-    J09DefaultLookupTableConfig.gap_path = Path(LOOK_UPTABLE_DIR, GAP_LOOKUP_FILE_NAME)
     return J09Apple2Controller(
         apple2=jid(),
         energy_motor_lut=EnergyMotorLookup(
-            lut_config=J09DefaultLookupTableConfig,
             config_client=J09_CONF_CLIENT,
+            gap_lut_config=LookupTableConfig(
+                poly_deg=[
+                    "9th-order",
+                    "8th-order",
+                    "7th-order",
+                    "6th-order",
+                    "5th-order",
+                    "4th-order",
+                    "3rd-order",
+                    "2nd-order",
+                    "1st-order",
+                    "0th-order",
+                ],
+                path=Path(GAP_LOOKUP_FILE_NAME),
+            ),
+            phase_lut_config=LookupTableConfig(
+                poly_deg=["0th-order"],
+                path=Path(PHASE_LOOKUP_FILE_NAME),
+            ),
         ),
     )
 

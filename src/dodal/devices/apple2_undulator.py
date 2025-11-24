@@ -482,9 +482,10 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
             soft_signal_r_and_setter(Pol)
         )
         # check if undulator phase is unlocked.
-        if isinstance(self.apple2().phase(), UndulatorPhaseAxes):
-            top_inner = self.apple2().phase().top_inner.user_readback
-            btm_outer = self.apple2().phase().btm_outer.user_readback
+        phase = self.apple2().phase()
+        if isinstance(phase, UndulatorPhaseAxes):
+            top_inner = phase.top_inner.user_readback
+            btm_outer = phase.btm_outer.user_readback
         else:
             # If locked phase axes make the locked phase 0.
             top_inner = btm_outer = soft_signal_rw(float, initial_value=0.0)
@@ -496,9 +497,9 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
                 raw_to_derived=self._read_pol,
                 set_derived=self._set_pol,
                 pol=self.polarisation_setpoint,
-                top_outer=self.apple2().phase().top_outer.user_readback,
+                top_outer=phase.top_outer.user_readback,
                 top_inner=top_inner,
-                btm_inner=self.apple2().phase().btm_inner.user_readback,
+                btm_inner=phase.btm_inner.user_readback,
                 btm_outer=btm_outer,
                 gap=self.apple2().gap().user_readback,
             )

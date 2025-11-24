@@ -83,12 +83,16 @@ async def mock_id(
 def mock_i10_energy_motor_lookup_idu(
     mock_config_client: ConfigServer,
 ) -> EnergyMotorLookup:
+    source = ("Source", "idu")
     return EnergyMotorLookup(
         config_client=mock_config_client,
-        lut_config=LookupTableConfig(
-            source=("Source", "idu"),
-            gap_path=Path(ID_ENERGY_2_GAP_CALIBRATIONS_CSV),
-            phase_path=Path(ID_ENERGY_2_PHASE_CALIBRATIONS_CSV),
+        gap_lut_config=LookupTableConfig(
+            source=source,
+            path=Path(ID_ENERGY_2_GAP_CALIBRATIONS_CSV),
+        ),
+        phase_lut_config=LookupTableConfig(
+            source=source,
+            path=Path(ID_ENERGY_2_PHASE_CALIBRATIONS_CSV),
         ),
     )
 
@@ -97,12 +101,16 @@ def mock_i10_energy_motor_lookup_idu(
 def mock_i10_energy_motor_lookup_idd(
     mock_config_client: ConfigServer,
 ) -> EnergyMotorLookup:
+    source = ("Source", "idd")
     return EnergyMotorLookup(
         config_client=mock_config_client,
-        lut_config=LookupTableConfig(
-            source=("Source", "idd"),
-            gap_path=Path(ID_ENERGY_2_GAP_CALIBRATIONS_CSV),
-            phase_path=Path(ID_ENERGY_2_PHASE_CALIBRATIONS_CSV),
+        gap_lut_config=LookupTableConfig(
+            source=source,
+            path=Path(ID_ENERGY_2_GAP_CALIBRATIONS_CSV),
+        ),
+        phase_lut_config=LookupTableConfig(
+            source=source,
+            path=Path(ID_ENERGY_2_PHASE_CALIBRATIONS_CSV),
         ),
     )
 
@@ -644,7 +652,7 @@ def assert_lookup_table_matches_expected(
     )
     lut = convert_csv_to_lookup(
         file_contents=file_contents,
-        lut_config=energy_motor_lookup.lut_config,
+        lut_config=energy_motor_lookup.gap_lut_config,
     )
     with open(expected_dict_file_name, "rb") as f:
         expected_lut = LookupTable(json.load(f))

@@ -5,10 +5,7 @@ from unittest.mock import call
 import pytest
 from daq_config_server.client import ConfigServer
 from ophyd_async.core import init_devices
-from ophyd_async.testing import (
-    get_mock_put,
-    set_mock_value,
-)
+from ophyd_async.testing import get_mock_put, set_mock_value
 
 from dodal.devices.apple2_undulator import (
     Apple2,
@@ -19,34 +16,53 @@ from dodal.devices.apple2_undulator import (
     UndulatorGap,
     UndulatorPhaseAxes,
 )
-from dodal.devices.i09_2_shared.i09_apple2 import (
-    J09Apple2Controller,
-    J09DefaultLookupTableConfig,
-)
+from dodal.devices.i09_2_shared.i09_apple2 import J09Apple2Controller
 from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.devices.util.lookup_tables_apple2 import (
-    MAXIMUM_ROW_PHASE_MOTOR_POSITION,
-    ROW_PHASE_CIRCULAR,
     EnergyMotorLookup,
-    GapPhaseLookupTables,
     LookupTable,
-    convert_csv_to_lookup,
+    LookupTableConfig,
 )
 from tests.devices.i09_2_shared.test_data import (
-    TEST_EXPECTED_ENERGY_MOTOR_LOOKUP,
-    TEST_EXPECTED_UNDULATOR_LUT,
-    TEST_SOFT_UNDULATOR_LUT,
+    TEST_SOFT_GAP_EXPECTED_UNDULATOR_LUT,
+    TEST_SOFT_GAP_UNDULATOR_LUT,
+    TEST_SOFT_PHASE_EXPECTED_UNDULATOR_LUT,
+    TEST_SOFT_PHASE_UNDULATOR_LUT,
 )
+
+ROW_PHASE_MOTOR_TOLERANCE = 0.004
+ROW_PHASE_CIRCULAR = 15
+MAXIMUM_ROW_PHASE_MOTOR_POSITION = 24.0
+MAXIMUM_GAP_MOTOR_POSITION = 100
 
 
 @pytest.fixture
 def mock_j09_energy_motor_lookup(
     mock_config_client: ConfigServer,
 ) -> EnergyMotorLookup:
-    J09DefaultLookupTableConfig.gap_path = Path(TEST_SOFT_UNDULATOR_LUT)
+    gap_lut_config = LookupTableConfig(
+        poly_deg=[
+            "9th-order",
+            "8th-order",
+            "7th-order",
+            "6th-order",
+            "5th-order",
+            "4th-order",
+            "3rd-order",
+            "2nd-order",
+            "1st-order",
+            "0th-order",
+        ],
+        path=Path(TEST_SOFT_GAP_UNDULATOR_LUT),
+    )
+    phase_lut_config = LookupTableConfig(
+        poly_deg=["0th-order"],
+        path=Path(TEST_SOFT_PHASE_UNDULATOR_LUT),
+    )
     return EnergyMotorLookup(
-        lut_config=J09DefaultLookupTableConfig,
         config_client=mock_config_client,
+        gap_lut_config=gap_lut_config,
+        phase_lut_config=phase_lut_config,
     )
 
 
@@ -107,42 +123,14 @@ async def mock_id_pol(
 def test_j09_energy_motor_lookup_convert_csv_to_lookup_success(
     mock_j09_energy_motor_lookup: EnergyMotorLookup,
 ):
-    file = mock_j09_energy_motor_lookup.config_client.get_file_contents(
-        file_path=TEST_SOFT_UNDULATOR_LUT, reset_cached_result=True
-    )
-    data = convert_csv_to_lookup(
-        file_contents=file,
-        lut_config=J09DefaultLookupTableConfig,
-        skip_line_start_with="#",
-    )
-    with open(TEST_EXPECTED_UNDULATOR_LUT, "rb") as f:
-        loaded_dict = LookupTable(json.load(f))
-    assert data == loaded_dict
-
-
-def test_j09_energy_motor_lookup_fail_with_phase_path(
-    mock_j09_energy_motor_lookup: EnergyMotorLookup,
-):
-    mock_j09_energy_motor_lookup.lut_config.phase_path = Path("dfsdfs")
-    with pytest.raises(FileNotFoundError):
-        mock_j09_energy_motor_lookup._update_phase_lut()
-    data = mock_j09_energy_motor_lookup.lookup_tables.phase
-    assert data == LookupTable()
-    mock_j09_energy_motor_lookup.lut_config.phase_path = None
-
-
-def test_j09_energy_motor_lookup_update_lookuptables(
-    mock_j09_energy_motor_lookup: EnergyMotorLookup,
-):
     mock_j09_energy_motor_lookup.update_lookuptables()
-    with open(TEST_EXPECTED_ENERGY_MOTOR_LOOKUP, "rb") as f:
-        data = json.load(f)
-        map_dict = GapPhaseLookupTables(
-            gap=LookupTable(data["gap"]),
-            phase=LookupTable(data["phase"]),
-        )
+    with open(TEST_SOFT_GAP_EXPECTED_UNDULATOR_LUT, "rb") as f:
+        expected_gap_lut = LookupTable(json.load(f))
+    assert mock_j09_energy_motor_lookup.lookup_tables.gap == expected_gap_lut
 
-    assert mock_j09_energy_motor_lookup.lookup_tables == map_dict
+    with open(TEST_SOFT_PHASE_EXPECTED_UNDULATOR_LUT, "rb") as f:
+        expected_phase_lut = LookupTable(json.load(f))
+    assert mock_j09_energy_motor_lookup.lookup_tables.phase == expected_phase_lut
 
 
 @pytest.mark.parametrize(
