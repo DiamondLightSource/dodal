@@ -11,10 +11,10 @@ from bluesky import plan_stubs as bps
 from bluesky import preprocessors as bpp
 from bluesky.run_engine import RunEngine
 from ophyd.status import DeviceStatus, Status
-from ophyd_async.core import init_devices
-from ophyd_async.testing import (
+from ophyd_async.core import (
     callback_on_mock_put,
     get_mock_put,
+    init_devices,
     set_mock_put_proceeds,
     set_mock_value,
 )
@@ -34,7 +34,6 @@ from dodal.devices.i02_1.fast_grid_scan import (
     ZebraGridScanParamsTwoD,
 )
 from dodal.devices.smargon import Smargon
-from dodal.testing import patch_all_motors
 
 
 def discard_status(st: Status | DeviceStatus):
@@ -96,9 +95,7 @@ async def zebra_fast_grid_scan_2d():
 async def smargon():
     async with init_devices(mock=True):
         smargon = Smargon("")
-
-    with patch_all_motors(smargon):
-        yield smargon
+    yield smargon
 
 
 @pytest.fixture(

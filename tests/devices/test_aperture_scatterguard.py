@@ -6,7 +6,7 @@ from unittest.mock import AsyncMock, call
 import bluesky.plan_stubs as bps
 import pytest
 from bluesky.run_engine import RunEngine
-from ophyd_async.testing import (
+from ophyd_async.core import (
     callback_on_mock_put,
     get_mock,
     get_mock_put,

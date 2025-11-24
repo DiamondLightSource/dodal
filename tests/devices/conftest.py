@@ -1,5 +1,4 @@
 import asyncio
-from collections.abc import AsyncGenerator
 
 import pytest
 from ophyd_async.core import init_devices
@@ -11,7 +10,6 @@ from dodal.devices.aperturescatterguard import (
     ApertureValue,
     load_positions_from_beamline_parameters,
 )
-from dodal.testing import patch_all_motors
 
 
 @pytest.fixture
@@ -68,7 +66,7 @@ def aperture_tolerances():
 async def ap_sg(
     aperture_positions: dict[ApertureValue, AperturePosition],
     aperture_tolerances: AperturePosition,
-) -> AsyncGenerator[ApertureScatterguard]:
+) -> ApertureScatterguard:
     async with init_devices(mock=True):
         ap_sg = ApertureScatterguard(
             aperture_prefix="-MO-MAPT-01:",
@@ -77,9 +75,7 @@ async def ap_sg(
             loaded_positions=aperture_positions,
             tolerances=aperture_tolerances,
         )
-
-    with patch_all_motors(ap_sg):
-        yield ap_sg
+    return ap_sg
 
 
 async def set_to_position(

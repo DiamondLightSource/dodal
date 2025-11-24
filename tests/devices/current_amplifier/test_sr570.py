@@ -8,9 +8,10 @@ from bluesky.plan_stubs import abs_set, prepare
 from bluesky.plans import count
 from bluesky.run_engine import RunEngine
 from ophyd_async.core import (
+    callback_on_mock_put,
     init_devices,
+    set_mock_value,
 )
-from ophyd_async.testing import callback_on_mock_put, set_mock_value
 
 from dodal.devices.current_amplifiers import (
     SR570,

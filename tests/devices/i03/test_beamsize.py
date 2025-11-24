@@ -2,7 +2,7 @@ from math import inf
 from unittest.mock import AsyncMock
 
 import pytest
-from ophyd_async.testing import set_mock_value
+from ophyd_async.core import set_mock_value
 
 from dodal.devices.aperturescatterguard import (
     ApertureScatterguard,
