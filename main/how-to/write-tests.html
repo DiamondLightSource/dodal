@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Writing Tests in This Python Project &#8212; dodal 1.65.1.dev26+g90a2fdd18 documentation</title>
+    <title>Writing Tests in This Python Project &#8212; dodal 1.65.1.dev27+g400fe8430 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=2472fc6a"></script>
+    <script src="../_static/documentation_options.js?v=ef4fddc1"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -488,7 +488,7 @@
 <li><p><strong>Unit Tests</strong>: Place unit tests for individual components in the <code class="docutils literal notranslate"><span class="pre">tests</span></code> directory, but take care to mirror the file structure of the <code class="docutils literal notranslate"><span class="pre">src</span></code> folder with the corresponding code files. Use the <code class="docutils literal notranslate"><span class="pre">test_*.py</span></code> naming convention for test files.</p></li>
 <li><p><strong>System Tests</strong>: Tests that interact with DLS infrastructure, network, and filesystem should be placed in the top-level <code class="docutils literal notranslate"><span class="pre">systems_test</span></code> folder. This separation ensures that these tests are easily identifiable and can be run independently from unit tests.</p></li>
 </ul>
-<p>Useful functions for testing that can be reused across multiple tests for common devices and for external plan repositories belong in the <code class="docutils literal notranslate"><span class="pre">dodal/testing</span></code> directory. For example, when mocking a <code class="docutils literal notranslate"><span class="pre">Motor</span></code> device, all of the signals will default to zero, which will cause errors when trying to move. The <code class="docutils literal notranslate"><span class="pre">patch_motor</span></code> and <code class="docutils literal notranslate"><span class="pre">patch_all_motors</span></code> functions, found in <code class="docutils literal notranslate"><span class="pre">dodal.testing</span></code>, will populate the mocked motor with useful default values for the signals so that it can still be used in tests.</p>
+<p>Useful functions for testing that can be reused across multiple tests for common devices and for external plan repositories belong in the <code class="docutils literal notranslate"><span class="pre">dodal/testing</span></code> directory.</p>
 </section>
 <section id="writing-a-test-for-a-device">
 <h2>Writing a test for a device<a class="headerlink" href="#writing-a-test-for-a-device" title="Link to this heading">#</a></h2>
