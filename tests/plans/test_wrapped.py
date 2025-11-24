@@ -16,7 +16,6 @@ from ophyd_async.core import (
     AsyncReadable,
     StandardDetector,
 )
-from ophyd_async.sim import SimMotor
 from pydantic import ValidationError
 
 from dodal.devices.motors import Motor
@@ -33,7 +32,6 @@ from dodal.plans.wrapped import (
     list_grid_scan,
     list_rscan,
     list_scan,
-    mapping_num_scan,
     num_rscan,
     num_scan,
     step_grid_rscan,
@@ -190,12 +188,6 @@ def test_make_new_args(x_axis: Motor, y_axis: Motor):
     assert args[3] == y_axis
     assert args[4] == 2
     assert args[5] == 3
-
-
-def test_mapping_num_scan(
-    run_engine: RunEngine, det: StandardDetector, x_axis: SimMotor
-):
-    run_engine(mapping_num_scan(detectors=[det], params={x_axis: [1, 2]}, num=3))
 
 
 @pytest.mark.parametrize(

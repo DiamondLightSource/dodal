@@ -62,37 +62,6 @@ def count(
     yield from bp.count(tuple(detectors), num, delay=delay, md=metadata)
 
 
-@attach_data_session_metadata_decorator()
-@validate_call(config={"arbitrary_types_allowed": True})
-def mapping_num_scan(
-    detectors: Annotated[
-        Sequence[Readable | AsyncReadable],
-        Field(
-            description="Set of readable devices, will take a reading at each point",
-            min_length=1,
-        ),
-    ],
-    params: dict[Movable | Motor, list[float | int]],
-    num: Annotated[int, Field(description="Number of points")],
-    metadata: dict[str, Any] | None = None,
-):
-    """Scan over one multi-motor trajectory.
-    Wraps bluesky.plans.scan(det, *args, num, md=metadata)"""
-    metadata = metadata or {}
-    metadata["shape"] = (num,)
-
-    args = _make_new_args(params)
-    yield from bp.scan(tuple(detectors), *args, num=num, md=metadata)
-
-
-def _make_new_args(params: dict[Movable | Motor, list[float | int]]):
-    args = []
-    for param in params:
-        args.append(param)
-        args.extend(params[param])
-    return args
-
-
 def _make_args(
     movers: Sequence[Movable | Motor],
     params: list[Any] | Sequence[Any],
