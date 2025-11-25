@@ -1,6 +1,5 @@
 import pytest
-from ophyd_async.core import init_devices
-from ophyd_async.testing import set_mock_value
+from ophyd_async.core import init_devices, set_mock_value
 
 from dodal.devices.i02_1.fast_grid_scan import (
     ZebraFastGridScanTwoD,

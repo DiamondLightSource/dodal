@@ -4,8 +4,8 @@ import pytest
 from bluesky.plans import count
 from bluesky.run_engine import RunEngine
 from event_model import DataKey
-from ophyd_async.core import init_devices
-from ophyd_async.testing import assert_reading, partial_reading, set_mock_value
+from ophyd_async.core import init_devices, set_mock_value
+from ophyd_async.testing import assert_reading, partial_reading
 
 from dodal.common.enums import InOutUpper
 from dodal.devices.i22.fswitch import FSwitch

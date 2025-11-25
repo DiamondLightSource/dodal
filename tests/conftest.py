@@ -6,8 +6,7 @@ from types import ModuleType
 from unittest.mock import patch
 
 import pytest
-from ophyd_async.core import init_devices
-from ophyd_async.testing import set_mock_value
+from ophyd_async.core import init_devices, set_mock_value
 
 from conftest import mock_attributes_table
 from dodal.common.beamlines import beamline_parameters, beamline_utils
