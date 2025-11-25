@@ -8,9 +8,10 @@ from dodal.devices.aperturescatterguard import ApertureScatterguard, ApertureVal
 
 
 class InOut(StrictEnum):
-    """Currently Hyperion only needs to move the scintillator out for data collection."""
+    """Moves scintillator in and out of the beam."""
 
-    OUT = "Out"
+    OUT = "Out"  # Out of beam
+    IN = "In"  # In to beam
     UNKNOWN = "Unknown"
 
 
@@ -45,26 +46,45 @@ class Scintillator(StandardReadable):
         self._scintillator_out_yz_mm = [
             float(beamline_parameters[f"scin_{axis}_SCIN_OUT"]) for axis in ("y", "z")
         ]
+        self._scintillator_in_yz_mm = [
+            float(beamline_parameters[f"scin_{axis}_SCIN_IN"]) for axis in ("y", "z")
+        ]
         self._yz_tolerance_mm = [
             float(beamline_parameters[f"scin_{axis}_tolerance"]) for axis in ("y", "z")
         ]
 
         super().__init__(name)
 
-    def _get_selected_position(self, y: float, z: float) -> InOut:
-        current_pos = [y, z]
-        if all(
+    def _check_position(self, current_pos: list[float], pos_to_check: list[float]):
+        return all(
             isclose(axis_pos, axis_in_beam, abs_tol=axis_tolerance)
             for axis_pos, axis_in_beam, axis_tolerance in zip(
                 current_pos,
-                self._scintillator_out_yz_mm,
+                pos_to_check,
                 self._yz_tolerance_mm,
                 strict=False,
             )
-        ):
+        )
+
+    def _get_selected_position(self, y: float, z: float) -> InOut:
+        current_pos = [y, z]
+        if self._check_position(current_pos, self._scintillator_out_yz_mm):
             return InOut.OUT
+
+        elif self._check_position(current_pos, self._scintillator_in_yz_mm):
+            return InOut.IN
+
         else:
             return InOut.UNKNOWN
+
+    async def _check_aperture_parked(self):
+        if (
+            await self._aperture_scatterguard().selected_aperture.get_value()
+            != ApertureValue.PARKED
+        ):
+            raise ValueError(
+                f"Cannot move scintillator if aperture/scatterguard is not parked. Position is currently {await self._aperture_scatterguard().selected_aperture.get_value()}"
+            )
 
     async def _set_selected_position(self, position: InOut) -> None:
         match position:
@@ -73,14 +93,16 @@ class Scintillator(StandardReadable):
                 current_z = await self.z_mm.user_readback.get_value()
                 if self._get_selected_position(current_y, current_z) == InOut.OUT:
                     return
-                if (
-                    self._aperture_scatterguard().selected_aperture.get_value()
-                    != ApertureValue.PARKED
-                ):
-                    raise ValueError(
-                        "Cannot move scintillator out if aperture/scatterguard is not parked"
-                    )
+                await self._check_aperture_parked()
                 await self.y_mm.set(self._scintillator_out_yz_mm[0])
                 await self.z_mm.set(self._scintillator_out_yz_mm[1])
+            case InOut.IN:
+                current_y = await self.y_mm.user_readback.get_value()
+                current_z = await self.z_mm.user_readback.get_value()
+                if self._get_selected_position(current_y, current_z) == InOut.IN:
+                    return
+                await self._check_aperture_parked()
+                await self.z_mm.set(self._scintillator_in_yz_mm[1])
+                await self.y_mm.set(self._scintillator_in_yz_mm[0])
             case _:
                 raise ValueError(f"Cannot set scintillator to position {position}")

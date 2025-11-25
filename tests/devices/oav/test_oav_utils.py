@@ -4,8 +4,7 @@ from unittest.mock import AsyncMock
 import numpy as np
 import pytest
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import init_devices
-from ophyd_async.testing import set_mock_value
+from ophyd_async.core import init_devices, set_mock_value
 
 from dodal.devices.oav.oav_calculations import calculate_beam_distance
 from dodal.devices.oav.oav_detector import OAV
@@ -18,7 +17,6 @@ from dodal.devices.oav.utils import (
     wait_for_tip_to_be_found,
 )
 from dodal.devices.smargon import Smargon
-from dodal.testing import patch_all_motors
 
 
 def test_bottom_right_from_top_left():
@@ -36,8 +34,7 @@ async def smargon() -> AsyncGenerator[Smargon]:
     async with init_devices(mock=True):
         smargon = Smargon("")
 
-    with patch_all_motors(smargon):
-        yield smargon
+    yield smargon
 
 
 @pytest.fixture

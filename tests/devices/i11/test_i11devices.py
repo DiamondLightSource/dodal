@@ -1,8 +1,7 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
-from ophyd_async.core import init_devices
-from ophyd_async.testing import set_mock_value
+from ophyd_async.core import init_devices, set_mock_value
 
 from dodal.devices.eurotherm import UpdatingEurothermGeneral
 from dodal.devices.i11.cyberstar_blower import AutotunedCyberstarBlower

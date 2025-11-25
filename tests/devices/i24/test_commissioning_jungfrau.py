@@ -9,8 +9,6 @@ from ophyd_async.core import (
     StaticPathProvider,
     TriggerInfo,
     init_devices,
-)
-from ophyd_async.testing import (
     set_mock_value,
 )
 

@@ -14,11 +14,13 @@ from numpy import linspace
 from ophyd_async.core import (
     PathProvider,
     StandardDetector,
+    callback_on_mock_put,
+    get_mock_put,
     init_devices,
+    set_mock_value,
     walk_rw_signals,
 )
 from ophyd_async.sim import SimBlobDetector
-from ophyd_async.testing import callback_on_mock_put, get_mock_put, set_mock_value
 
 from dodal.devices.bimorph_mirror import BimorphMirror, BimorphMirrorStatus
 from dodal.devices.slits import Slits
@@ -34,7 +36,6 @@ from dodal.plans.bimorph import (
     restore_bimorph_state,
     validate_bimorph_plan,
 )
-from dodal.testing import patch_all_motors
 
 VALID_BIMORPH_CHANNELS = [2]
 
@@ -80,12 +81,9 @@ def mirror_with_mocked_put(mirror: BimorphMirror) -> BimorphMirror:
 
 @pytest.fixture
 def slits() -> Slits:
-    """Mock slits with propagation from setpoint to readback."""
     with init_devices(mock=True):
         slits = Slits("FAKE-PREFIX:")
-
-    with patch_all_motors(slits):
-        return slits
+    return slits
 
 
 @pytest.fixture

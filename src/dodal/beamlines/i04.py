@@ -22,6 +22,7 @@ from dodal.devices.eiger import EigerDetector
 from dodal.devices.fast_grid_scan import ZebraFastGridScanThreeD
 from dodal.devices.flux import Flux
 from dodal.devices.i03.dcm import DCM
+from dodal.devices.i04.beamsize import Beamsize
 from dodal.devices.i04.constants import RedisConstants
 from dodal.devices.i04.murko_results import MurkoResultsDevice
 from dodal.devices.i04.transfocator import Transfocator
@@ -391,4 +392,14 @@ def fastcs_eiger() -> FastCSEiger:
         path_provider=get_path_provider(),
         drv_suffix="-EA-EIGER-02:",
         hdf_suffix="-EA-EIGER-01:OD:",
+
+
+@device_factory()
+def beamsize() -> Beamsize:
+    """Get the i04 beamsize device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i04, it will return the existing object.
+    """
+    return Beamsize(
+        transfocator=transfocator(),
+        aperture_scatterguard=aperture_scatterguard(),
     )

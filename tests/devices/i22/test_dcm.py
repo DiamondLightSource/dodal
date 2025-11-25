@@ -1,13 +1,12 @@
 import bluesky.plans as bp
 import pytest
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import init_devices
+from ophyd_async.core import init_devices, set_mock_value
 from ophyd_async.testing import (
     assert_configuration,
     assert_emitted,
     assert_reading,
     partial_reading,
-    set_mock_value,
 )
 
 from dodal.common.crystal_metadata import (
@@ -95,7 +94,7 @@ async def test_configuration(dcm: DCM):
         {
             "dcm-bragg_in_degrees-motor_egu": partial_reading(""),
             "dcm-bragg_in_degrees-offset": partial_reading(0.0),
-            "dcm-bragg_in_degrees-velocity": partial_reading(0.0),
+            "dcm-bragg_in_degrees-velocity": partial_reading(1000.0),
             "dcm-crystal_1_d_spacing": partial_reading(0.31356),
             "dcm-crystal_1_reflection": partial_reading([1, 1, 1]),
             "dcm-crystal_1_type": partial_reading("silicon"),
@@ -106,24 +105,24 @@ async def test_configuration(dcm: DCM):
             "dcm-crystal_2_usage": partial_reading("Bragg"),
             "dcm-energy_in_keV-motor_egu": partial_reading(""),
             "dcm-energy_in_keV-offset": partial_reading(0.0),
-            "dcm-energy_in_keV-velocity": partial_reading(0.0),
+            "dcm-energy_in_keV-velocity": partial_reading(1000.0),
             "dcm-offset_in_mm-motor_egu": partial_reading(""),
             "dcm-offset_in_mm-offset": partial_reading(0.0),
-            "dcm-offset_in_mm-velocity": partial_reading(0.0),
+            "dcm-offset_in_mm-velocity": partial_reading(1000.0),
             "dcm-perp-motor_egu": partial_reading(""),
             "dcm-perp-offset": partial_reading(0.0),
-            "dcm-perp-velocity": partial_reading(0.0),
+            "dcm-perp-velocity": partial_reading(1000.0),
             "dcm-wavelength_in_a-motor_egu": partial_reading(""),
             "dcm-wavelength_in_a-offset": partial_reading(0.0),
-            "dcm-wavelength_in_a-velocity": partial_reading(0.0),
+            "dcm-wavelength_in_a-velocity": partial_reading(1000.0),
             "dcm-xtal_1-roll_in_mrad-motor_egu": partial_reading(""),
             "dcm-xtal_1-roll_in_mrad-offset": partial_reading(0.0),
-            "dcm-xtal_1-roll_in_mrad-velocity": partial_reading(0.0),
+            "dcm-xtal_1-roll_in_mrad-velocity": partial_reading(1000.0),
             "dcm-xtal_2-pitch_in_mrad-motor_egu": partial_reading(""),
             "dcm-xtal_2-pitch_in_mrad-offset": partial_reading(0.0),
-            "dcm-xtal_2-pitch_in_mrad-velocity": partial_reading(0.0),
+            "dcm-xtal_2-pitch_in_mrad-velocity": partial_reading(1000.0),
             "dcm-xtal_2-roll_in_mrad-motor_egu": partial_reading(""),
             "dcm-xtal_2-roll_in_mrad-offset": partial_reading(0.0),
-            "dcm-xtal_2-roll_in_mrad-velocity": partial_reading(0.0),
+            "dcm-xtal_2-roll_in_mrad-velocity": partial_reading(1000.0),
         },
     )
