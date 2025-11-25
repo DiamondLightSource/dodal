@@ -392,6 +392,7 @@ def fastcs_eiger() -> FastCSEiger:
         path_provider=get_path_provider(),
         drv_suffix="-EA-EIGER-02:",
         hdf_suffix="-EA-EIGER-01:OD:",
+    )
 
 
 @device_factory()
