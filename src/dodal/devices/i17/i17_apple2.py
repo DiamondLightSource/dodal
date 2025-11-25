@@ -27,11 +27,8 @@ class I17Apple2Controller(Apple2Controller[Apple2]):
         energy_to_motor_converter: EnergyMotorConvertor,
         name: str = "",
     ) -> None:
-        super().__init__(
-            apple2=apple2,
-            energy_to_motor_converter=energy_to_motor_converter,
-            name=name,
-        )
+        self.energy_to_motor_converter = energy_to_motor_converter
+        super().__init__(apple2=apple2, name=name)
 
     async def _set_motors_from_energy(self, value: float) -> None:
         """
@@ -39,7 +36,7 @@ class I17Apple2Controller(Apple2Controller[Apple2]):
         """
 
         pol = await self._check_and_get_pol_setpoint()
-        gap, phase = self.energy_to_motor(energy=value, pol=pol)
+        gap, phase = self.energy_to_motor_converter(energy=value, pol=pol)
         id_set_val = Apple2Val(
             gap=f"{gap:.6f}",
             phase=Apple2PhasesVal(
