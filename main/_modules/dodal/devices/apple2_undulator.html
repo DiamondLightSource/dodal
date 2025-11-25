@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.apple2_undulator &#8212; dodal 1.66.1.dev1+g89675933a documentation</title>
+    <title>dodal.devices.apple2_undulator &#8212; dodal 1.66.1.dev2+gf50aaaa2c documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=ff65c7ff"></script>
+    <script src="../../../_static/documentation_options.js?v=dec0f989"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -1317,6 +1317,7 @@ window.addEventListener("load", load);
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">apple2</span><span class="p">:</span> <span class="n">Apple2Type</span><span class="p">,</span>
         <span class="n">energy_to_motor_converter</span><span class="p">:</span> <span class="n">EnergyMotorConvertor</span><span class="p">,</span>
+        <span class="n">units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;eV&quot;</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1333,14 +1334,14 @@ window.addEventListener("load", load);
 
         <span class="c1"># Store the set energy for readback.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_energy</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_energy_set</span> <span class="o">=</span> <span class="n">soft_signal_r_and_setter</span><span class="p">(</span>
-            <span class="nb">float</span><span class="p">,</span> <span class="n">initial_value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s2">&quot;eV&quot;</span>
+            <span class="nb">float</span><span class="p">,</span> <span class="n">initial_value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="n">units</span>
         <span class="p">)</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">(</span><span class="n">StandardReadableFormat</span><span class="o">.</span><span class="n">HINTED_SIGNAL</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">energy</span> <span class="o">=</span> <span class="n">derived_signal_rw</span><span class="p">(</span>
                 <span class="n">raw_to_derived</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_read_energy</span><span class="p">,</span>
                 <span class="n">set_derived</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_set_energy</span><span class="p">,</span>
                 <span class="n">energy</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_energy</span><span class="p">,</span>
-                <span class="n">derived_units</span><span class="o">=</span><span class="s2">&quot;eV&quot;</span><span class="p">,</span>
+                <span class="n">derived_units</span><span class="o">=</span><span class="n">units</span><span class="p">,</span>
             <span class="p">)</span>
 
         <span class="c1"># Store the polarisation for setpoint. And provide readback for LH3.</span>

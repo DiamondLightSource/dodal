@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.util.lookup_tables_apple2 &#8212; dodal 1.66.1.dev1+g89675933a documentation</title>
+    <title>dodal.devices.util.lookup_tables_apple2 &#8212; dodal 1.66.1.dev2+gf50aaaa2c documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=ff65c7ff"></script>
+    <script src="../../../../_static/documentation_options.js?v=dec0f989"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -855,10 +855,6 @@ window.addEventListener("load", load);
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.apple2_undulator</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pol</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.log</span><span class="w"> </span><span class="kn">import</span> <span class="n">LOGGER</span>
 
-<span class="n">DEFAULT_GAP_FILE</span> <span class="o">=</span> <span class="s2">&quot;IDEnergy2GapCalibrations.csv&quot;</span>
-<span class="n">DEFAULT_PHASE_FILE</span> <span class="o">=</span> <span class="s2">&quot;IDEnergy2PhaseCalibrations.csv&quot;</span>
-
-
 <span class="n">DEFAULT_POLY_DEG</span> <span class="o">=</span> <span class="p">[</span>
     <span class="s2">&quot;7th-order&quot;</span><span class="p">,</span>
     <span class="s2">&quot;6th-order&quot;</span><span class="p">,</span>
@@ -870,7 +866,22 @@ window.addEventListener("load", load);
     <span class="s2">&quot;b&quot;</span><span class="p">,</span>
 <span class="p">]</span>
 
-<span class="n">MODE_NAME_CONVERT</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;CR&quot;</span><span class="p">:</span> <span class="s2">&quot;pc&quot;</span><span class="p">,</span> <span class="s2">&quot;CL&quot;</span><span class="p">:</span> <span class="s2">&quot;nc&quot;</span><span class="p">}</span>
+<span class="n">MODE_NAME_CONVERT</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;cr&quot;</span><span class="p">:</span> <span class="s2">&quot;pc&quot;</span><span class="p">,</span> <span class="s2">&quot;cl&quot;</span><span class="p">:</span> <span class="s2">&quot;nc&quot;</span><span class="p">}</span>
+<span class="n">DEFAULT_GAP_FILE</span> <span class="o">=</span> <span class="s2">&quot;IDEnergy2GapCalibrations.csv&quot;</span>
+<span class="n">DEFAULT_PHASE_FILE</span> <span class="o">=</span> <span class="s2">&quot;IDEnergy2PhaseCalibrations.csv&quot;</span>
+
+<span class="n">ROW_PHASE_MOTOR_TOLERANCE</span> <span class="o">=</span> <span class="mf">0.004</span>
+<span class="n">ROW_PHASE_CIRCULAR</span> <span class="o">=</span> <span class="mi">15</span>
+<span class="n">MAXIMUM_ROW_PHASE_MOTOR_POSITION</span> <span class="o">=</span> <span class="mf">24.0</span>
+<span class="n">MAXIMUM_GAP_MOTOR_POSITION</span> <span class="o">=</span> <span class="mi">100</span>
+
+<span class="n">PhASE_POLY1D_PARAMETERS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">Pol</span><span class="o">.</span><span class="n">LH</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+    <span class="n">Pol</span><span class="o">.</span><span class="n">LV</span><span class="p">:</span> <span class="p">[</span><span class="n">MAXIMUM_ROW_PHASE_MOTOR_POSITION</span><span class="p">],</span>
+    <span class="n">Pol</span><span class="o">.</span><span class="n">PC</span><span class="p">:</span> <span class="p">[</span><span class="n">ROW_PHASE_CIRCULAR</span><span class="p">],</span>
+    <span class="n">Pol</span><span class="o">.</span><span class="n">NC</span><span class="p">:</span> <span class="p">[</span><span class="o">-</span><span class="n">ROW_PHASE_CIRCULAR</span><span class="p">],</span>
+    <span class="n">Pol</span><span class="o">.</span><span class="n">LH3</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+<span class="p">}</span>
 
 
 <div class="viewcode-block" id="LookupTableConfig">
@@ -1060,7 +1071,7 @@ window.addEventListener("load", load);
 <span class="sd">    Parameters:</span>
 <span class="sd">    -----------</span>
 <span class="sd">    energy:</span>
-<span class="sd">        Energy value in the same units used to create the lookup table (eV).</span>
+<span class="sd">        Energy value in the same units used to create the lookup table.</span>
 <span class="sd">    pol:</span>
 <span class="sd">        Polarisation mode (Pol enum).</span>
 <span class="sd">    lookup_table:</span>
@@ -1161,8 +1172,8 @@ window.addEventListener("load", load);
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">config_client</span><span class="p">:</span> <span class="n">ConfigServer</span><span class="p">,</span>
         <span class="n">lut_config</span><span class="p">:</span> <span class="n">LookupTableConfig</span><span class="p">,</span>
-        <span class="n">gap_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
-        <span class="n">phase_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
+        <span class="n">gap_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">phase_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialise the EnergyMotorLookup class with lookup table headers provided.</span>
 
@@ -1177,11 +1188,11 @@ window.addEventListener("load", load);
 <span class="sd">        phase_path:</span>
 <span class="sd">            File path to the phase lookup table.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gap_path</span> <span class="o">=</span> <span class="n">gap_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">phase_path</span> <span class="o">=</span> <span class="n">phase_path</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lookup_tables</span> <span class="o">=</span> <span class="n">GapPhaseLookupTables</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">config_client</span> <span class="o">=</span> <span class="n">config_client</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lut_config</span> <span class="o">=</span> <span class="n">lut_config</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">gap_path</span> <span class="o">=</span> <span class="n">gap_path</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">phase_path</span> <span class="o">=</span> <span class="n">phase_path</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_available_pol</span> <span class="o">=</span> <span class="p">[]</span>
 
     <span class="nd">@property</span>
@@ -1193,6 +1204,8 @@ window.addEventListener("load", load);
         <span class="bp">self</span><span class="o">.</span><span class="n">_available_pol</span> <span class="o">=</span> <span class="n">value</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_update_gap_lut</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">gap_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Gap path is not provided!&quot;</span><span class="p">)</span>
         <span class="n">file_contents</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config_client</span><span class="o">.</span><span class="n">get_file_contents</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">gap_path</span><span class="p">,</span> <span class="n">reset_cached_result</span><span class="o">=</span><span class="kc">True</span>
         <span class="p">)</span>
@@ -1202,6 +1215,8 @@ window.addEventListener("load", load);
         <span class="bp">self</span><span class="o">.</span><span class="n">available_pol</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lookup_tables</span><span class="o">.</span><span class="n">gap</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_update_phase_lut</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">phase_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Phase path is not provided!&quot;</span><span class="p">)</span>
         <span class="n">file_contents</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config_client</span><span class="o">.</span><span class="n">get_file_contents</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">phase_path</span><span class="p">,</span> <span class="n">reset_cached_result</span><span class="o">=</span><span class="kc">True</span>
         <span class="p">)</span>
@@ -1215,11 +1230,25 @@ window.addEventListener("load", load);
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Update lookup tables from files and validate their format.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Updating lookup table from file for gap.&quot;</span><span class="p">)</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Updating lookup table for gap.&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_update_gap_lut</span><span class="p">()</span>
-        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Updating lookup table from file for phase.&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_update_phase_lut</span><span class="p">()</span></div>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">phase_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Generating lookup table for phase.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_generate_phase_lut</span><span class="p">()</span>
 
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Updating lookup table for phase.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_update_phase_lut</span><span class="p">()</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_generate_phase_lut</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">lookup_tables</span><span class="o">.</span><span class="n">gap</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">lookup_tables</span><span class="o">.</span><span class="n">phase</span><span class="o">.</span><span class="n">root</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">generate_lookup_table_entry</span><span class="p">(</span>
+                    <span class="n">min_energy</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lookup_tables</span><span class="o">.</span><span class="n">gap</span><span class="o">.</span><span class="n">root</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">limit</span><span class="o">.</span><span class="n">minimum</span><span class="p">,</span>
+                    <span class="n">max_energy</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lookup_tables</span><span class="o">.</span><span class="n">gap</span><span class="o">.</span><span class="n">root</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">limit</span><span class="o">.</span><span class="n">maximum</span><span class="p">,</span>
+                    <span class="n">poly1d_param</span><span class="o">=</span><span class="p">(</span><span class="n">PhASE_POLY1D_PARAMETERS</span><span class="p">[</span><span class="n">key</span><span class="p">]),</span>
+                <span class="p">)</span>
 
 <div class="viewcode-block" id="EnergyMotorLookup.get_motor_from_energy">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.util.lookup_tables_apple2.EnergyMotorLookup.html#dodal.devices.util.lookup_tables_apple2.EnergyMotorLookup.get_motor_from_energy">[docs]</a>
