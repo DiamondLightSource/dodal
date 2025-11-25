@@ -34,6 +34,7 @@ from dodal.devices.apple2_undulator import (
     UndulatorPhaseAxes,
 )
 
+# add mock_config_client, mock_id_gap, mock_phase and mock_jaw_phase_axes to pytest.
 pytest_plugins = ["dodal.testing.fixtures.apple2"]
 
 

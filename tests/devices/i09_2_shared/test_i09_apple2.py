@@ -38,6 +38,7 @@ from tests.devices.i09_2_shared.test_data import (
     TEST_SOFT_UNDULATOR_LUT,
 )
 
+# add mock_config_client, mock_id_gap, mock_phase and mock_jaw_phase_axes to pytest.
 pytest_plugins = ["dodal.testing.fixtures.apple2"]
 
 
