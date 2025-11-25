@@ -341,6 +341,7 @@ def zoom_controller() -> ZoomControllerWithBeamCentres:
     return ZoomControllerWithBeamCentres(f"{PREFIX.beamline_prefix}-EA-OAV-01:FZOOM:")
 
 
+@device_factory()
 def fastcs_eiger() -> FastCSEiger:
     """Get the i04 FastCS Eiger device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
