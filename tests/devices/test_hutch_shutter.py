@@ -3,7 +3,7 @@ from unittest.mock import call, patch
 import bluesky.plan_stubs as bps
 import pytest
 from bluesky.run_engine import RunEngine
-from ophyd_async.testing import (
+from ophyd_async.core import (
     callback_on_mock_put,
     get_mock_put,
     set_mock_value,
@@ -70,11 +70,11 @@ async def test_shutter_operations(
     expected_calls: list,
     expected_state: ShutterState,
     fake_shutter: HutchShutter,
-    RE: RunEngine,
+    run_engine: RunEngine,
 ):
     set_mock_value(fake_shutter.interlock.status, 0)
 
-    RE(bps.abs_set(fake_shutter, demand, wait=True))
+    run_engine(bps.abs_set(fake_shutter, demand, wait=True))
 
     assert await fake_shutter.status.get_value() == expected_state
 
@@ -88,13 +88,13 @@ async def test_shutter_operations(
 @patch("dodal.devices.hutch_shutter.LOGGER")
 @patch("dodal.devices.hutch_shutter.TEST_MODE")
 async def test_shutter_does_not_operate_in_test_mode(
-    patch_test_mode, patch_log, fake_shutter: HutchShutter, RE: RunEngine
+    patch_test_mode, patch_log, fake_shutter: HutchShutter, run_engine: RunEngine
 ):
     patch_test_mode.return_value = True
     set_mock_value(fake_shutter.interlock.status, 1)  # Optics hutch open
     set_mock_value(fake_shutter.status, ShutterState.CLOSED)
 
-    RE(bps.abs_set(fake_shutter, ShutterDemand.OPEN, wait=True))
+    run_engine(bps.abs_set(fake_shutter, ShutterDemand.OPEN, wait=True))
 
     # Assert shutter state didn't change and warning was logged
     patch_log.warning.assert_called_once_with(

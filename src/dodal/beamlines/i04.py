@@ -1,3 +1,5 @@
+from ophyd_async.core import Reference
+
 from dodal.common.beamlines.beamline_parameters import get_beamline_parameters
 from dodal.common.beamlines.beamline_utils import (
     device_factory,
@@ -15,9 +17,10 @@ from dodal.devices.detector import DetectorParams
 from dodal.devices.detector.detector_motion import DetectorMotion
 from dodal.devices.diamond_filter import DiamondFilter, I04Filters
 from dodal.devices.eiger import EigerDetector
-from dodal.devices.fast_grid_scan import ZebraFastGridScan
+from dodal.devices.fast_grid_scan import ZebraFastGridScanThreeD
 from dodal.devices.flux import Flux
 from dodal.devices.i03.dcm import DCM
+from dodal.devices.i04.beamsize import Beamsize
 from dodal.devices.i04.constants import RedisConstants
 from dodal.devices.i04.murko_results import MurkoResultsDevice
 from dodal.devices.i04.transfocator import Transfocator
@@ -30,10 +33,11 @@ from dodal.devices.oav.oav_to_redis_forwarder import OAVToRedisForwarder
 from dodal.devices.oav.pin_image_recognition import PinTipDetection
 from dodal.devices.robot import BartRobot
 from dodal.devices.s4_slit_gaps import S4SlitGaps
+from dodal.devices.scintillator import Scintillator
 from dodal.devices.smargon import Smargon
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.thawer import Thawer
-from dodal.devices.undulator import Undulator
+from dodal.devices.undulator import UndulatorInKeV
 from dodal.devices.xbpm_feedback import XBPMFeedback
 from dodal.devices.zebra.zebra import Zebra
 from dodal.devices.zebra.zebra_constants_mapping import (
@@ -207,11 +211,13 @@ def eiger(mock: bool = False, params: DetectorParams | None = None) -> EigerDete
 
 
 @device_factory()
-def zebra_fast_grid_scan() -> ZebraFastGridScan:
+def zebra_fast_grid_scan() -> ZebraFastGridScanThreeD:
     """Get the i04 zebra_fast_grid_scan device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
     """
-    return ZebraFastGridScan(f"{PREFIX.beamline_prefix}-MO-SGON-01:")
+    return ZebraFastGridScanThreeD(
+        prefix=f"{PREFIX.beamline_prefix}-MO-SGON-01:",
+    )
 
 
 @device_factory()
@@ -223,13 +229,13 @@ def s4_slit_gaps() -> S4SlitGaps:
 
 
 @device_factory()
-def undulator() -> Undulator:
+def undulator() -> UndulatorInKeV:
     """Get the i04 undulator device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
     """
-    return Undulator(
+    return UndulatorInKeV(
         prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:",
-        id_gap_lookup_table_path="/dls_sw/i04/software/gda/config/lookupTables/BeamLine_Undulator_toGap.txt",
+        id_gap_lookup_table_path="/dls_sw/i04/software/daq_configuration/lookup/BeamLine_Undulator_toGap.txt",
     )
 
 
@@ -276,6 +282,7 @@ def oav_full_screen(params: OAVConfig | None = None) -> OAVBeamCentrePV:
         prefix=f"{PREFIX.beamline_prefix}-DI-OAV-01:",
         config=params or OAVConfig(ZOOM_PARAMS_FILE),
         overlay_channel=3,
+        mjpeg_prefix="XTAL",
     )
 
 
@@ -315,6 +322,8 @@ def oav_to_redis_forwarder() -> OAVToRedisForwarder:
     """
     return OAVToRedisForwarder(
         f"{PREFIX.beamline_prefix}-DI-OAV-01:",
+        oav_roi=oav(),
+        oav_fs=oav_full_screen(),
         redis_host=RedisConstants.REDIS_HOST,
         redis_password=RedisConstants.REDIS_PASSWORD,
         redis_db=RedisConstants.MURKO_REDIS_DB,
@@ -357,3 +366,26 @@ def pin_tip_detection() -> PinTipDetection:
     If this is called when already instantiated in i04, it will return the existing object.
     """
     return PinTipDetection(f"{PREFIX.beamline_prefix}-DI-OAV-01:")
+
+
+@device_factory()
+def scintillator() -> Scintillator:
+    """Get the i04 scintillator device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i04, it will return the existing object.
+    """
+    return Scintillator(
+        f"{PREFIX.beamline_prefix}-MO-SCIN-01:",
+        Reference(aperture_scatterguard()),
+        get_beamline_parameters(),
+    )
+
+
+@device_factory()
+def beamsize() -> Beamsize:
+    """Get the i04 beamsize device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i04, it will return the existing object.
+    """
+    return Beamsize(
+        transfocator=transfocator(),
+        aperture_scatterguard=aperture_scatterguard(),
+    )

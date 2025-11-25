@@ -2,8 +2,8 @@ import asyncio
 from unittest.mock import ANY, MagicMock, patch
 
 import pytest
-from ophyd_async.core import init_devices
-from ophyd_async.testing import assert_reading, partial_reading, set_mock_value
+from ophyd_async.core import init_devices, set_mock_value
+from ophyd_async.testing import assert_reading, partial_reading
 
 from dodal.devices.pressure_jump_cell import (
     OPENSEQ_PULSE_LENGTH,

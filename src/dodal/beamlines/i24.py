@@ -1,17 +1,25 @@
+from pathlib import PurePath
+
+from ophyd_async.core import AutoIncrementingPathProvider, StaticFilenameProvider
+
 from dodal.common.beamlines.beamline_utils import (
     BL,
     device_factory,
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.devices.attenuator.attenuator import ReadOnlyAttenuator
+from dodal.devices.attenuator.attenuator import EnumFilterAttenuator
+from dodal.devices.attenuator.filter_selections import (
+    I24FilterOneSelections,
+    I24FilterTwoSelections,
+)
 from dodal.devices.hutch_shutter import HutchShutter
 from dodal.devices.i24.aperture import Aperture
 from dodal.devices.i24.beam_center import DetectorBeamCenter
 from dodal.devices.i24.beamstop import Beamstop
+from dodal.devices.i24.commissioning_jungfrau import CommissioningJungfrau
 from dodal.devices.i24.dcm import DCM
 from dodal.devices.i24.dual_backlight import DualBacklight
 from dodal.devices.i24.focus_mirrors import FocusMirrorsMode
-from dodal.devices.i24.pilatus_metadata import PilatusMetadata
 from dodal.devices.i24.pmac import PMAC
 from dodal.devices.i24.vgonio import VerticalGoniometer
 from dodal.devices.motors import YZStage
@@ -45,12 +53,13 @@ PREFIX = BeamlinePrefix(BL)
 
 
 @device_factory()
-def attenuator() -> ReadOnlyAttenuator:
+def attenuator() -> EnumFilterAttenuator:
     """Get a read-only attenuator device for i24, instantiate it if it hasn't already
     been. If this is called when already instantiated in i24, it will return the
     existing object."""
-    return ReadOnlyAttenuator(
+    return EnumFilterAttenuator(
         f"{PREFIX.beamline_prefix}-OP-ATTN-01:",
+        filter_selection=(I24FilterOneSelections, I24FilterTwoSelections),
     )
 
 
@@ -100,8 +109,8 @@ def dcm() -> DCM:
     If this is called when already instantiated in i24, it will return the existing object.
     """
     return DCM(
-        prefix=f"{PREFIX.beamline_prefix}-DI-DCM-01",
-        motion_prefix=f"{PREFIX.beamline_prefix}-MO-DCM-01",
+        prefix=f"{PREFIX.beamline_prefix}-DI-DCM-01:",
+        motion_prefix=f"{PREFIX.beamline_prefix}-MO-DCM-01:",
     )
 
 
@@ -191,18 +200,19 @@ def eiger_beam_center() -> DetectorBeamCenter:
 
 
 @device_factory()
-def pilatus_beam_center() -> DetectorBeamCenter:
-    """A device for setting/reading the beamcenter from the pilatus on i24."""
-    return DetectorBeamCenter(
-        f"{PREFIX.beamline_prefix}-EA-PILAT-01:cam1:",
-        "pilatus_bc",
-    )
+def commissioning_jungfrau(
+    path_to_dir: str = "/tmp/jf",  # Device factory doesn't allow for required args,
+    filename: str = "jf_output",  # but these should be manually entered when commissioning
+) -> CommissioningJungfrau:
+    """Get the commissionning Jungfrau 9M device, which uses a temporary filewriter
+    device in place of Odin while the detector is in commissioning.
+    Instantiates the device if it hasn't already been.
+    If this is called when already instantiated, it will return the existing object."""
 
-
-@device_factory()
-def pilatus_metadata() -> PilatusMetadata:
-    """A small pilatus driver device for figuring out the filename template."""
-    return PilatusMetadata(
-        f"{PREFIX.beamline_prefix}-EA-PILAT-01:",
-        "pilatus_meta",
+    return CommissioningJungfrau(
+        f"{PREFIX.beamline_prefix}-EA-JFRAU-01:",
+        f"{PREFIX.beamline_prefix}-JUNGFRAU-META:FD:",
+        AutoIncrementingPathProvider(
+            StaticFilenameProvider(filename), PurePath(path_to_dir)
+        ),
     )

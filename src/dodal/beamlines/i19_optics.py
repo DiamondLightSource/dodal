@@ -5,7 +5,10 @@ from dodal.common.beamlines.beamline_utils import (
     set_beamline as set_utils_beamline,
 )
 from dodal.devices.hutch_shutter import HutchShutter
-from dodal.devices.i19.hutch_access import ACCESS_DEVICE_NAME, HutchAccessControl
+from dodal.devices.i19.access_controlled.hutch_access import (
+    ACCESS_DEVICE_NAME,
+    HutchAccessControl,
+)
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix
 

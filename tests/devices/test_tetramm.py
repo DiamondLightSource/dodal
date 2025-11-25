@@ -1,9 +1,16 @@
 import re
+from unittest.mock import MagicMock, patch
 
 import pytest
-from ophyd_async.core import DetectorTrigger, PathProvider, TriggerInfo, init_devices
+from ophyd_async.core import (
+    DetectorTrigger,
+    PathProvider,
+    TriggerInfo,
+    callback_on_mock_put,
+    init_devices,
+    set_mock_value,
+)
 from ophyd_async.epics.adcore import ADFileWriteMode
-from ophyd_async.testing import callback_on_mock_put, set_mock_value
 
 from dodal.devices.tetramm import (
     TetrammChannels,
@@ -50,13 +57,17 @@ def supported_trigger_info() -> TriggerInfo:
     return TriggerInfo(
         number_of_events=1,
         trigger=DetectorTrigger.CONSTANT_GATE,
-        deadtime=1.0,
-        livetime=0.02,
+        deadtime=1e-4,
+        livetime=1,
         exposure_timeout=None,
     )
 
 
-VALID_TEST_EXPOSURE_TIME = 1 / 19
+VALID_TEST_TOTAL_TRIGGERS = 5
+VALID_TEST_EXPOSURE_TIME_PER_COLLECTION = 1 / 6
+VALID_TEST_EXPOSURE_TIME = (
+    VALID_TEST_EXPOSURE_TIME_PER_COLLECTION / VALID_TEST_TOTAL_TRIGGERS
+)
 VALID_TEST_DEADTIME = 1 / 100
 
 
@@ -97,7 +108,6 @@ async def test_set_invalid_exposure_for_number_of_values_per_reading(
     "trigger_type",
     [
         DetectorTrigger.INTERNAL,
-        DetectorTrigger.VARIABLE_GATE,
     ],
 )
 async def test_arm_raises_value_error_for_invalid_trigger_type(
@@ -107,6 +117,7 @@ async def test_arm_raises_value_error_for_invalid_trigger_type(
     accepted_types = [
         "EDGE_TRIGGER",
         "CONSTANT_GATE",
+        "VARIABLE_GATE",
     ]
     with pytest.raises(
         TypeError,
@@ -225,10 +236,15 @@ async def test_stage_sets_up_accurate_describe_output(
     await tetramm.stage()
     await tetramm.prepare(supported_trigger_info)
 
+    averaging_time = await tetramm.driver.averaging_time.get_value()
+    averaging_time = round(averaging_time, 3)  # avoid floating point issues
+
+    assert averaging_time == 1.0
+
     assert await tetramm.describe() == {
         "tetramm": {
             "source": "mock+ca://MY-TETRAMM:HDF5:FullFileName_RBV",
-            "shape": [1, 4, 1999],
+            "shape": [1, 4, averaging_time],
             "dtype_numpy": "<f8",
             "dtype": "array",
             "external": "STREAM:",
@@ -243,7 +259,7 @@ async def test_error_if_armed_without_exposure(tetramm_controller: TetrammContro
         )
 
 
-async def test_pilatus_controller(
+async def test_tetramm_controller(
     tetramm: TetrammDetector,
     tetramm_controller: TetrammController,
 ):
@@ -265,12 +281,43 @@ async def test_pilatus_controller(
     assert await tetramm.driver.acquire.get_value() is False
 
 
+async def test_tetramm_unstage(tetramm_controller: TetrammController):
+    set_mock_value(tetramm_controller._file_io.acquire, True)
+    await tetramm_controller.unstage()
+    assert await tetramm_controller._file_io.acquire.get_value() is False
+
+
+async def test_tetramm_prepare_when_freerunning(tetramm_controller: TetrammController):
+    set_mock_value(tetramm_controller.driver.trigger_mode, TetrammTrigger.FREE_RUN)
+    set_mock_value(tetramm_controller.driver.acquire, True)
+
+    await tetramm_controller.prepare(
+        TriggerInfo(
+            number_of_events=1,
+            trigger=DetectorTrigger.CONSTANT_GATE,
+            livetime=VALID_TEST_EXPOSURE_TIME,
+            deadtime=VALID_TEST_DEADTIME,
+        )
+    )
+    assert await tetramm_controller.driver.acquire.get_value() is False
+
+
 async def assert_armed(driver: TetrammDriver) -> None:
     sample_time = await driver.sample_time.get_value()
     samples_per_reading = int(VALID_TEST_EXPOSURE_TIME / sample_time)
-    exposure = samples_per_reading * sample_time
+    averaging_time = samples_per_reading * sample_time
 
     assert (await driver.trigger_mode.get_value()) is TetrammTrigger.EXT_TRIGGER
-    assert (await driver.averaging_time.get_value()) == exposure
     assert (await driver.values_per_reading.get_value()) == 5
     assert (await driver.acquire.get_value()) == 1
+
+    assert (await driver.averaging_time.get_value()) == averaging_time
+
+
+@patch("dodal.devices.tetramm.stop_busy_record")
+async def test_tetramm_disarm_calls_stop_busy_recording(
+    stop_busy_record_mock: MagicMock,
+    tetramm_controller: TetrammController,
+):
+    await tetramm_controller.disarm()
+    stop_busy_record_mock.assert_called_once()

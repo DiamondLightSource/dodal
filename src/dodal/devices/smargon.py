@@ -1,13 +1,9 @@
 import asyncio
-from collections.abc import Collection, Generator
-from dataclasses import dataclass
 from enum import Enum
 from math import isclose
 from typing import TypedDict, cast
 
-from bluesky import plan_stubs as bps
 from bluesky.protocols import Movable
-from bluesky.utils import Msg
 from ophyd_async.core import (
     AsyncStatus,
     Device,
@@ -18,7 +14,7 @@ from ophyd_async.core import (
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 from ophyd_async.epics.motor import Motor
 
-from dodal.devices.motors import XYZStage
+from dodal.devices.motors import XYZOmegaStage
 from dodal.devices.util.epics_util import SetWhenEnabled
 
 
@@ -66,40 +62,6 @@ class StubOffsets(Device):
             await self.to_robot_load.set(1)
 
 
-@dataclass
-class AxisLimit:
-    """Represents the minimum and maximum allowable values on an axis"""
-
-    min_value: float
-    max_value: float
-
-    def contains(self, pos: float):
-        """Determine if the specified value is within limits.
-
-        Args:
-            pos: the value to check
-
-        Returns:
-            True if the value does not exceed the limits
-        """
-        return self.min_value <= pos <= self.max_value
-
-
-@dataclass
-class XYZLimits:
-    """The limits of the smargon x, y, z axes."""
-
-    x: AxisLimit
-    y: AxisLimit
-    z: AxisLimit
-
-    def position_valid(self, pos: Collection[float]) -> bool:
-        return all(
-            axis_limits.contains(value)
-            for axis_limits, value in zip([self.x, self.y, self.z], pos, strict=False)
-        )
-
-
 class DeferMoves(StrictEnum):
     ON = "Defer On"
     OFF = "Defer Off"
@@ -116,7 +78,7 @@ class CombinedMove(TypedDict, total=False):
     chi: float | None
 
 
-class Smargon(XYZStage, Movable):
+class Smargon(XYZOmegaStage, Movable):
     """
     Real motors added to allow stops following pin load (e.g. real_x1.stop() )
     X1 and X2 real motors provide compound chi motion as well as the compound X travel,
@@ -130,7 +92,6 @@ class Smargon(XYZStage, Movable):
         with self.add_children_as_readables():
             self.chi = Motor(prefix + "CHI")
             self.phi = Motor(prefix + "PHI")
-            self.omega = Motor(prefix + "OMEGA")
             self.real_x1 = Motor(prefix + "MOTOR_3")
             self.real_x2 = Motor(prefix + "MOTOR_4")
             self.real_y = Motor(prefix + "MOTOR_1")
@@ -143,24 +104,6 @@ class Smargon(XYZStage, Movable):
         self.defer_move = epics_signal_rw(DeferMoves, prefix + "CS1:DeferMoves")
 
         super().__init__(prefix, name)
-
-    def get_xyz_limits(self) -> Generator[Msg, None, XYZLimits]:
-        """Obtain a plan stub that returns the smargon XYZ axis limits
-
-        Yields:
-            Bluesky messages
-
-        Returns:
-            the axis limits
-        """
-        limits = {}
-        for name, pv in [
-            (attr_name, getattr(self, attr_name)) for attr_name in ["x", "y", "z"]
-        ]:
-            min_value = yield from bps.rd(pv.low_limit_travel)
-            max_value = yield from bps.rd(pv.high_limit_travel)
-            limits[name] = AxisLimit(min_value, max_value)
-        return XYZLimits(**limits)
 
     @AsyncStatus.wrap
     async def set(self, value: CombinedMove):
