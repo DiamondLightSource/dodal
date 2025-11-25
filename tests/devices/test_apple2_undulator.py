@@ -35,7 +35,7 @@ from dodal.devices.apple2_undulator import (
 )
 
 # add mock_config_client, mock_id_gap, mock_phase and mock_jaw_phase_axes to pytest.
-pytest_plugins = ["dodal.testing.fixtures.apple2"]
+pytest_plugins = ["dodal.testing.fixtures.devices.apple2"]
 
 
 @pytest.fixture
@@ -88,15 +88,15 @@ async def mock_locked_controller(
             energy_to_motor_converter: EnergyMotorConvertor,
             name: str = "",
         ) -> None:
+            self.energy_to_motor_converter = energy_to_motor_converter
             super().__init__(
                 apple2=apple2,
-                energy_to_motor_converter=energy_to_motor_converter,
                 name=name,
             )
 
         async def _set_motors_from_energy(self, value: float) -> None:
             pol = await self._check_and_get_pol_setpoint()
-            gap, phase = self.energy_to_motor(energy=value, pol=pol)
+            gap, phase = self.energy_to_motor_converter(energy=value, pol=pol)
             id_set_val = Apple2Val(
                 phase=Apple2LockedPhasesVal(
                     top_outer=f"{phase:.6f}", btm_inner=f"{phase:.6f}"
