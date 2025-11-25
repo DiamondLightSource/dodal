@@ -71,7 +71,7 @@ def test_make_phase_tables_multiple_entries() -> None:
 
 
 class DummyEnergyMotorLookup(AbstractEnergyMotorLookup):
-    """Concrete test subclass that only populates the Gap table (Phase left empty)."""
+    """Concrete test subclass that generates a pre determined basic lookup table"""
 
     def __init__(self) -> None:
         super().__init__()
@@ -131,9 +131,6 @@ def test_convert_csv_to_lookup_overwrite_name_convert_default(
     poly_lv = lut.root[Pol.LV].energies.root[200.0].poly
     assert isinstance(poly_lv, np.poly1d)
     assert poly_lv(250.0) == pytest.approx(np.poly1d([1.0, 0.0])(250.0))
-
-    # Assert phase dict is empty
-    assert not lut.root
 
 
 def test_lookup_table_is_serialisable() -> None:
