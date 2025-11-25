@@ -349,6 +349,9 @@ def _make_stepped_list(
     if len(params) == 3:
         stop = params[1]
         step = params[2]
+        if abs(step) > abs(stop - start):
+            step = abs(stop - start)
+        step = abs(step) * np.sign(stop - start)
         stepped_list = np.arange(start=start, stop=stop, step=step).tolist()
         if abs((stepped_list[-1] + step) - stop) <= abs(step * 0.01):
             stepped_list.append(stepped_list[-1] + step)
