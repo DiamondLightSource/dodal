@@ -426,16 +426,11 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
         Soft signal for the polarisation setpoint.
     polarisation : derived_signal_rw
         Hardware-backed signal for polarisation readback and control.
-    energy_to_motor : EnergyMotorConvertor
-        Callable that converts energy and polarisation to motor positions.
 
     Abstract Methods
     ----------------
     _set_motors_from_energy(value: float) -> None
         Abstract method to set motor positions for a given energy and polarisation.
-    energy_to_motor : EnergyMotorConvertor
-        A callable that converts energy and polarisation to motor positions.
-
     Notes
     -----
     - Subclasses must implement `_set_motors_from_energy` for beamline-specific logic.
@@ -448,7 +443,6 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
     def __init__(
         self,
         apple2: Apple2Type,
-        energy_to_motor_converter: EnergyMotorConvertor,
         units: str = "eV",
         name: str = "",
     ) -> None:
@@ -461,7 +455,6 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
         name: str
             Name of the device.
         """
-        self.energy_to_motor = energy_to_motor_converter
         self.apple2 = Reference(apple2)
 
         # Store the set energy for readback.

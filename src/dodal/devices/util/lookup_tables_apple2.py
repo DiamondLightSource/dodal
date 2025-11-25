@@ -29,8 +29,10 @@ structure:
 
 import csv
 import io
+from abc import abstractmethod
 from collections.abc import Generator
 from pathlib import Path
+from typing import TypeVar
 
 import numpy as np
 from daq_config_server.client import ConfigServer
@@ -44,7 +46,6 @@ from pydantic import (
 )
 
 from dodal.devices.apple2_undulator import Pol
-from dodal.log import LOGGER
 
 DEFAULT_POLY_DEG = [
     "7th-order",
@@ -66,7 +67,7 @@ ROW_PHASE_CIRCULAR = 15
 MAXIMUM_ROW_PHASE_MOTOR_POSITION = 24.0
 MAXIMUM_GAP_MOTOR_POSITION = 100
 
-PhasePoly1dParameters = {
+DEFAULT_POLY1D_PARAMETERS = {
     Pol.LH: [0],
     Pol.LV: [MAXIMUM_ROW_PHASE_MOTOR_POSITION],
     Pol.PC: [ROW_PHASE_CIRCULAR],
@@ -122,11 +123,6 @@ class LookupTable(RootModel[dict[Pol, LookupTableEntries]]):
     # Allow to auto specify a dict if one not provided
     def __init__(self, root: dict[Pol, LookupTableEntries] | None = None):
         super().__init__(root=root or {})
-
-
-class GapPhaseLookupTables(BaseModel):
-    gap: LookupTable = Field(default_factory=lambda: LookupTable())
-    phase: LookupTable = Field(default_factory=lambda: LookupTable())
 
 
 def convert_csv_to_lookup(
@@ -300,7 +296,7 @@ def make_phase_tables(
     return lookuptable_phase
 
 
-class EnergyMotorLookup:
+class AbstractEnergyMotorLookup:
     """
     Handles lookup tables for Apple2 ID, converting energy and polarisation to gap
     and phase. Fetches and parses lookup tables from a config server, supports dynamic
@@ -312,32 +308,13 @@ class EnergyMotorLookup:
     (energy, pol) pair.
     """
 
-    def __init__(
-        self,
-        config_client: ConfigServer,
-        lut_config: LookupTableConfig,
-        gap_path: Path | None = None,
-        phase_path: Path | None = None,
-    ):
-        """Initialise the EnergyMotorLookup class with lookup table headers provided.
-
-        Parameters:
-        -----------
-        config_client:
-            The config server client to fetch the look up table data.
-        lut_config:
-            Configuration that defines how to process file contents into a LookupTable
-        gap_path:
-            File path to the gap lookup table.
-        phase_path:
-            File path to the phase lookup table.
-        """
-        self.gap_path = gap_path
-        self.phase_path = phase_path
-        self.lookup_tables = GapPhaseLookupTables()
-        self.config_client = config_client
-        self.lut_config = lut_config
+    def __init__(self) -> None:
+        self.lut = LookupTable()
         self._available_pol = []
+
+    @abstractmethod
+    def update_lut(self):
+        pass
 
     @property
     def available_pol(self) -> list[Pol]:
@@ -346,50 +323,6 @@ class EnergyMotorLookup:
     @available_pol.setter
     def available_pol(self, value: list[Pol]) -> None:
         self._available_pol = value
-
-    def _update_gap_lut(self) -> None:
-        if self.gap_path is None:
-            raise RuntimeError("Gap path is not provided!")
-        file_contents = self.config_client.get_file_contents(
-            self.gap_path, reset_cached_result=True
-        )
-        self.lookup_tables.gap = convert_csv_to_lookup(
-            file_contents, lut_config=self.lut_config
-        )
-        self.available_pol = list(self.lookup_tables.gap.root.keys())
-
-    def _update_phase_lut(self) -> None:
-        if self.phase_path is None:
-            raise RuntimeError("Phase path is not provided!")
-        file_contents = self.config_client.get_file_contents(
-            self.phase_path, reset_cached_result=True
-        )
-        self.lookup_tables.phase = convert_csv_to_lookup(
-            file_contents, lut_config=self.lut_config
-        )
-
-    def update_lookuptables(self):
-        """
-        Update lookup tables from files and validate their format.
-        """
-        LOGGER.info("Updating lookup table for gap.")
-        self._update_gap_lut()
-        if self.phase_path is None:
-            LOGGER.info("Generating lookup table for phase.")
-            self._generate_phase_lut()
-
-        else:
-            LOGGER.info("Updating lookup table for phase.")
-            self._update_phase_lut()
-
-    def _generate_phase_lut(self):
-        for key in self.lookup_tables.gap.root.keys():
-            if key is not None:
-                self.lookup_tables.phase.root[key] = generate_lookup_table_entry(
-                    min_energy=self.lookup_tables.gap.root[key].limit.minimum,
-                    max_energy=self.lookup_tables.gap.root[key].limit.maximum,
-                    poly1d_param=(PhasePoly1dParameters[key]),
-                )
 
     def get_motor_from_energy(self, energy: float, pol: Pol) -> tuple[float, float]:
         """
@@ -408,12 +341,81 @@ class EnergyMotorLookup:
             (gap, phase) motor positions.
         """
         if self.available_pol == []:
-            self.update_lookuptables()
+            self.update_lut()
+        poly = get_poly(lookup_table=self.lut, energy=energy, pol=pol)
+        return poly(energy)
 
-        gap_poly = get_poly(lookup_table=self.lookup_tables.gap, energy=energy, pol=pol)
-        phase_poly = get_poly(
-            lookup_table=self.lookup_tables.phase,
-            energy=energy,
-            pol=pol,
+
+TAbstractEnergyMotorLookup = TypeVar(
+    "TAbstractEnergyMotorLookup", bound=AbstractEnergyMotorLookup
+)
+
+
+class FileReadingEnergyMotorLookup(AbstractEnergyMotorLookup):
+    def __init__(
+        self,
+        config_client: ConfigServer,
+        lut_config: LookupTableConfig,
+        path: Path,
+    ):
+        """Initialise the EnergyMotorLookup class with lookup table headers provided.
+
+        Parameters:
+        -----------
+        config_client:
+            The config server client to fetch the look up table data.
+        lut_config:
+            Configuration that defines how to process file contents into a LookupTable
+        path:
+            File path to the gap lookup table.
+        """
+        self.path = path
+        self.config_client = config_client
+        self.lut = LookupTable()
+        self.lut_config = lut_config
+        super().__init__()
+
+    def read_lut(self):
+        file_contents = self.config_client.get_file_contents(
+            self.path, reset_cached_result=True
         )
-        return gap_poly(energy), phase_poly(energy)
+        return convert_csv_to_lookup(file_contents, lut_config=self.lut_config)
+
+    def update_lut(self):
+        self.lut = self.read_lut()
+        self.available_pol = list(self.lut.root.keys())
+
+
+class GeneratePoly1DFromFileEnergyMotorLookup(FileReadingEnergyMotorLookup):
+    def __init__(
+        self,
+        config_client: ConfigServer,
+        lut_config: LookupTableConfig,
+        path: Path,
+        poly_1d_parameters: dict[Pol, list[float]] = DEFAULT_POLY1D_PARAMETERS,
+    ):
+        """Initialise the EnergyMotorLookup class with lookup table headers provided.
+
+        Parameters:
+        -----------
+        config_client:
+            The config server client to fetch the look up table data.
+        lut_config:
+            Configuration that defines how to process file contents into a LookupTable
+        path:
+            File path to the gap lookup table.
+        """
+        self.poly_1d_parameters = poly_1d_parameters
+        super().__init__(config_client, lut_config, path)
+
+    def update_lut(self):
+        self.lut = LookupTable()
+        base_lut = self.read_lut()
+        for key in base_lut.root.keys():
+            if key is not None:
+                self.lut.root[key] = generate_lookup_table_entry(
+                    min_energy=base_lut.root[key].limit.minimum,
+                    max_energy=base_lut.root[key].limit.maximum,
+                    poly1d_param=(self.poly_1d_parameters[key]),
+                )
+        self.available_pol = list(self.lut.root.keys())

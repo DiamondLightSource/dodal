@@ -6,7 +6,7 @@ from daq_config_server.client import ConfigServer
 
 from dodal.devices.apple2_undulator import Pol
 from dodal.devices.util.lookup_tables_apple2 import (
-    EnergyMotorLookup,
+    AbstractEnergyMotorLookup,
     LookupTableConfig,
     convert_csv_to_lookup,
     generate_lookup_table,
@@ -71,17 +71,20 @@ def test_make_phase_tables_multiple_entries() -> None:
         )
 
 
-class DummyEnergyMotorLookup(EnergyMotorLookup):
+class DummyEnergyMotorLookup(AbstractEnergyMotorLookup):
     """Concrete test subclass that only populates the Gap table (Phase left empty)."""
 
-    def _update_gap_lut(self) -> None:
-        self.lookup_tables.gap = generate_lookup_table(
+    def __init__(self) -> None:
+        super().__init__()
+
+    def update_lut(self) -> None:
+        self.lut = generate_lookup_table(
             pol=Pol.LH,
             min_energy=100.0,
             max_energy=200.0,
             poly1d_param=[2.0, -1.0, 0.5],
         )
-        self.available_pol = list(self.lookup_tables.gap.root.keys())
+        self.available_pol = list(self.lut.root.keys())
 
 
 @pytest.fixture
@@ -111,34 +114,8 @@ def mock_config_client() -> ConfigServer:
 
 
 @pytest.fixture
-def dummy_energy_motor_lookup(
-    mock_config_client: ConfigServer,
-    lut_config: LookupTableConfig,
-) -> DummyEnergyMotorLookup:
-    return DummyEnergyMotorLookup(
-        config_client=mock_config_client,
-        lut_config=lut_config,
-    )
-
-
-def test_energy_motor_lookup_with_phase_path_none(
-    dummy_energy_motor_lookup: DummyEnergyMotorLookup,
-) -> None:
-    with pytest.raises(RuntimeError, match="Phase path is not provided"):
-        dummy_energy_motor_lookup._update_phase_lut()
-
-
-def test_energy_motor_lookup_with_gap_path_none(
-    lut_config: LookupTableConfig,
-    mock_config_client: ConfigServer,
-) -> None:
-    empty_energy_mortor_lookup = EnergyMotorLookup(
-        config_client=mock_config_client,
-        lut_config=lut_config,
-    )
-
-    with pytest.raises(RuntimeError, match="Gap path is not provided"):
-        empty_energy_mortor_lookup.update_lookuptables()
+def dummy_energy_motor_lookup() -> DummyEnergyMotorLookup:
+    return DummyEnergyMotorLookup()
 
 
 def test_read_file_and_skip_basic() -> None:
@@ -154,12 +131,12 @@ def test_read_file_and_skip_basic() -> None:
 
 
 def test_convert_csv_to_lookup_overwrite_name_convert_default(
-    dummy_energy_motor_lookup: DummyEnergyMotorLookup,
+    lut_config: LookupTableConfig,
 ) -> None:
     csv_content = (
         "Mode,MinEnergy,MaxEnergy,c1,c0\nHL,100,200,2.0,1.0\nVL,200,300,1.0,0.0\n"
     )
-    lut = convert_csv_to_lookup(csv_content, dummy_energy_motor_lookup.lut_config)
+    lut = convert_csv_to_lookup(csv_content, lut_config)
     assert Pol.LH in lut.root
     assert Pol.LV in lut.root
     # Check polynomials evaluate as expected
@@ -172,7 +149,7 @@ def test_convert_csv_to_lookup_overwrite_name_convert_default(
     assert poly_lv(250.0) == pytest.approx(np.poly1d([1.0, 0.0])(250.0))
 
     # Assert phase dict is empty
-    assert not dummy_energy_motor_lookup.lookup_tables.phase.root
+    assert not lut.root
 
 
 def test_lookup_table_is_serialisable() -> None:
@@ -185,10 +162,7 @@ def test_lookup_table_is_serialisable() -> None:
 
 
 async def test_bad_file_contents_causes_convert_csv_to_lookup_fails(
-    dummy_energy_motor_lookup: DummyEnergyMotorLookup,
+    lut_config: LookupTableConfig,
 ) -> None:
     with pytest.raises(RuntimeError):
-        convert_csv_to_lookup(
-            "fnslkfndlsnf",
-            dummy_energy_motor_lookup.lut_config,
-        )
+        convert_csv_to_lookup("fnslkfndlsnf", lut_config)

@@ -39,7 +39,7 @@ from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.util.lookup_tables_apple2 import (
     DEFAULT_GAP_FILE,
     DEFAULT_PHASE_FILE,
-    EnergyMotorLookup,
+    FileReadingEnergyMotorLookup,
     LookupTableConfig,
 )
 from dodal.log import set_beamline as set_log_beamline
@@ -121,15 +121,22 @@ def idd() -> I10Apple2:
 @device_factory()
 def idd_controller() -> I10Apple2Controller:
     """I10 downstream insertion device controller."""
-    idd_energy_motor_lut = EnergyMotorLookup(
+    source = ("Source", "idd")
+    idd_gap_energy_motor_lut = FileReadingEnergyMotorLookup(
         config_client=I10_CONF_CLIENT,
-        lut_config=LookupTableConfig(
-            source=("Source", "idd"),
-        ),
-        gap_path=Path(LOOK_UPTABLE_DIR, DEFAULT_GAP_FILE),
-        phase_path=Path(LOOK_UPTABLE_DIR, DEFAULT_PHASE_FILE),
+        lut_config=LookupTableConfig(source=source),
+        path=Path(LOOK_UPTABLE_DIR, DEFAULT_GAP_FILE),
     )
-    return I10Apple2Controller(apple2=idd(), energy_motor_lut=idd_energy_motor_lut)
+    idd_phase_energy_motor_lut = FileReadingEnergyMotorLookup(
+        config_client=I10_CONF_CLIENT,
+        lut_config=LookupTableConfig(source=source),
+        path=Path(LOOK_UPTABLE_DIR, DEFAULT_PHASE_FILE),
+    )
+    return I10Apple2Controller(
+        apple2=idd(),
+        gap_energy_motor_lut=idd_gap_energy_motor_lut,
+        phase_energy_motor_lut=idd_phase_energy_motor_lut,
+    )
 
 
 @device_factory()
@@ -188,15 +195,22 @@ def idu() -> I10Apple2:
 @device_factory()
 def idu_controller() -> I10Apple2Controller:
     """I10 upstream insertion device controller."""
-    idu_energy_motor_lut = EnergyMotorLookup(
+    source = ("Source", "idu")
+    idu_gap_energy_motor_lut = FileReadingEnergyMotorLookup(
         config_client=I10_CONF_CLIENT,
-        lut_config=LookupTableConfig(
-            source=("Source", "idu"),
-        ),
-        gap_path=Path(LOOK_UPTABLE_DIR, DEFAULT_GAP_FILE),
-        phase_path=Path(LOOK_UPTABLE_DIR, DEFAULT_PHASE_FILE),
+        lut_config=LookupTableConfig(source=source),
+        path=Path(LOOK_UPTABLE_DIR, DEFAULT_GAP_FILE),
     )
-    return I10Apple2Controller(apple2=idd(), energy_motor_lut=idu_energy_motor_lut)
+    idu_phase_energy_motor_lut = FileReadingEnergyMotorLookup(
+        config_client=I10_CONF_CLIENT,
+        lut_config=LookupTableConfig(source=source),
+        path=Path(LOOK_UPTABLE_DIR, DEFAULT_PHASE_FILE),
+    )
+    return I10Apple2Controller(
+        apple2=idd(),
+        gap_energy_motor_lut=idu_gap_energy_motor_lut,
+        phase_energy_motor_lut=idu_phase_energy_motor_lut,
+    )
 
 
 @device_factory()

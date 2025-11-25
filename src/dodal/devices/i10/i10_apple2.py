@@ -22,7 +22,7 @@ from dodal.devices.apple2_undulator import (
     UndulatorJawPhase,
     UndulatorPhaseAxes,
 )
-from dodal.devices.util.lookup_tables_apple2 import EnergyMotorLookup
+from dodal.devices.util.lookup_tables_apple2 import AbstractEnergyMotorLookup
 from dodal.log import LOGGER
 
 ROW_PHASE_MOTOR_TOLERANCE = 0.004
@@ -68,7 +68,8 @@ class I10Apple2Controller(Apple2Controller[I10Apple2]):
     def __init__(
         self,
         apple2: I10Apple2,
-        energy_motor_lut: EnergyMotorLookup,
+        gap_energy_motor_lut: AbstractEnergyMotorLookup,
+        phase_energy_motor_lut: AbstractEnergyMotorLookup,
         jaw_phase_limit: float = 12.0,
         jaw_phase_poly_param: list[float] = DEFAULT_JAW_PHASE_POLY_PARAMS,
         angle_threshold_deg=30.0,
@@ -91,13 +92,12 @@ class I10Apple2Controller(Apple2Controller[I10Apple2]):
             New device name.
         """
 
-        self.energy_motor_lut = energy_motor_lut
+        self.gap_energy_motor_lut = gap_energy_motor_lut
+        self.phase_energy_motor_lut = phase_energy_motor_lut
         super().__init__(
             apple2=apple2,
-            energy_to_motor_converter=self.energy_motor_lut.get_motor_from_energy,
             name=name,
         )
-
         self.jaw_phase_from_angle = np.poly1d(jaw_phase_poly_param)
         self.angle_threshold_deg = angle_threshold_deg
         self.jaw_phase_limit = jaw_phase_limit
@@ -136,9 +136,9 @@ class I10Apple2Controller(Apple2Controller[I10Apple2]):
         """
         Set the undulator motors for a given energy and polarisation.
         """
-
         pol = await self._check_and_get_pol_setpoint()
-        gap, phase = self.energy_to_motor(energy=value, pol=pol)
+        gap = self.gap_energy_motor_lut.get_motor_from_energy(energy=value, pol=pol)
+        phase = self.phase_energy_motor_lut.get_motor_from_energy(energy=value, pol=pol)
         phase3 = phase * (-1 if pol == Pol.LA else 1)
         id_set_val = Apple2Val(
             gap=f"{gap:.6f}",
@@ -149,7 +149,6 @@ class I10Apple2Controller(Apple2Controller[I10Apple2]):
                 btm_outer="0.0",
             ),
         )
-
         LOGGER.info(f"Setting polarisation to {pol}, with values: {id_set_val}")
         await self.apple2().set(id_motor_values=id_set_val)
         if pol != Pol.LA:

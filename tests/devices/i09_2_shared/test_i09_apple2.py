@@ -27,26 +27,36 @@ from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.devices.util.lookup_tables_apple2 import (
     MAXIMUM_ROW_PHASE_MOTOR_POSITION,
     ROW_PHASE_CIRCULAR,
-    EnergyMotorLookup,
-    GapPhaseLookupTables,
+    FileReadingEnergyMotorLookup,
+    GeneratePoly1DFromFileEnergyMotorLookup,
     LookupTable,
     LookupTableConfig,
 )
 from tests.devices.i09_2_shared.test_data import (
     TEST_EXPECTED_ENERGY_MOTOR_LOOKUP,
-    TEST_EXPECTED_UNDULATOR_LUT,
     TEST_SOFT_UNDULATOR_LUT,
 )
 
 
 @pytest.fixture
-def mock_j09_energy_motor_lookup(
+def mock_j09_gap_energy_motor_lookup(
     mock_config_client: ConfigServer,
-) -> EnergyMotorLookup:
-    return EnergyMotorLookup(
+) -> FileReadingEnergyMotorLookup:
+    return FileReadingEnergyMotorLookup(
         lut_config=LookupTableConfig(poly_deg=J09_POLY_DEG),
         config_client=mock_config_client,
-        gap_path=Path(TEST_SOFT_UNDULATOR_LUT),
+        path=Path(TEST_SOFT_UNDULATOR_LUT),
+    )
+
+
+@pytest.fixture
+def mock_j09_phase_energy_motor_lookup(
+    mock_config_client: ConfigServer,
+) -> GeneratePoly1DFromFileEnergyMotorLookup:
+    return GeneratePoly1DFromFileEnergyMotorLookup(
+        lut_config=LookupTableConfig(poly_deg=J09_POLY_DEG),
+        config_client=mock_config_client,
+        path=Path(TEST_SOFT_UNDULATOR_LUT),
     )
 
 
@@ -62,12 +72,14 @@ async def mock_apple2(
 @pytest.fixture
 async def mock_id_controller(
     mock_apple2: Apple2,
-    mock_j09_energy_motor_lookup: EnergyMotorLookup,
+    mock_j09_gap_energy_motor_lookup: FileReadingEnergyMotorLookup,
+    mock_j09_phase_energy_motor_lookup: GeneratePoly1DFromFileEnergyMotorLookup,
 ) -> J09Apple2Controller:
     async with init_devices(mock=True):
         mock_id_controller = J09Apple2Controller(
             apple2=mock_apple2,
-            energy_motor_lut=mock_j09_energy_motor_lookup,
+            gap_energy_motor_lut=mock_j09_gap_energy_motor_lookup,
+            phase_energy_motor_lut=mock_j09_phase_energy_motor_lookup,
         )
     mock_id_controller._energy_set(0.5)
     return mock_id_controller
@@ -104,38 +116,19 @@ async def mock_id_pol(
     return mock_id_pol
 
 
-def test_j09_energy_motor_lookup_convert_gap_csv_to_lookup_success(
-    mock_j09_energy_motor_lookup: EnergyMotorLookup,
-) -> None:
-    mock_j09_energy_motor_lookup.update_lookuptables()
-
-    with open(TEST_EXPECTED_UNDULATOR_LUT, "rb") as f:
-        expected_luts = LookupTable(json.load(f))
-    assert mock_j09_energy_motor_lookup.lookup_tables.gap == expected_luts
-
-
-def test_j09_energy_motor_lookup_fail_with_phase_path(
-    mock_j09_energy_motor_lookup: EnergyMotorLookup,
+def test_j09_energy_motor_lookup_update_lut_success(
+    mock_j09_gap_energy_motor_lookup: FileReadingEnergyMotorLookup,
+    mock_j09_phase_energy_motor_lookup: GeneratePoly1DFromFileEnergyMotorLookup,
 ):
-    mock_j09_energy_motor_lookup.phase_path = Path("dfsdfs")
-    with pytest.raises(FileNotFoundError):
-        mock_j09_energy_motor_lookup._update_phase_lut()
-    data = mock_j09_energy_motor_lookup.lookup_tables.phase
-    assert data == LookupTable()
-    mock_j09_energy_motor_lookup.phase_path = None
-
-
-def test_j09_energy_motor_lookup_update_lookuptables(
-    mock_j09_energy_motor_lookup: EnergyMotorLookup,
-):
-    mock_j09_energy_motor_lookup.update_lookuptables()
+    mock_j09_gap_energy_motor_lookup.update_lut()
+    mock_j09_phase_energy_motor_lookup.update_lut()
     with open(TEST_EXPECTED_ENERGY_MOTOR_LOOKUP, "rb") as f:
         data = json.load(f)
-        expected_luts = GapPhaseLookupTables(
-            gap=LookupTable(data["gap"]),
-            phase=LookupTable(data["phase"]),
-        )
-    assert mock_j09_energy_motor_lookup.lookup_tables == expected_luts
+        expected_gap_lut = LookupTable(data["gap"])
+        expected_phase_lut = LookupTable(data["phase"])
+
+    assert mock_j09_gap_energy_motor_lookup.lut == expected_gap_lut
+    assert mock_j09_phase_energy_motor_lookup.lut == expected_phase_lut
 
 
 @pytest.mark.parametrize(
@@ -198,7 +191,8 @@ async def test_j09_apple2_controller_set_pol_lh(
     btm_inner_phase: float,
     btm_outer_phase: float,
 ):
-    mock_id_controller.lookup_table_client.update_lookuptables()
+    mock_id_controller.gap_energy_motor_lut.update_lut()
+    mock_id_controller.gap_energy_motor_lut.update_lut()
 
     await mock_id_controller.polarisation.set(pol)
     get_mock_put(
@@ -237,7 +231,8 @@ async def test_j09_apple2_controller_set_pol(
     btm_inner_phase: float,
     btm_outer_phase: float,
 ):
-    mock_id_controller.lookup_table_client.update_lookuptables()
+    mock_id_controller.gap_energy_motor_lut.update_lut()
+    mock_id_controller.gap_energy_motor_lut.update_lut()
 
     await mock_id_controller.polarisation.set(pol)
     assert get_mock_put(

@@ -5,10 +5,9 @@ from dodal.devices.apple2_undulator import (
     Apple2PhasesVal,
     Apple2Val,
     Pol,
+    UndulatorPhaseAxes,
 )
-from dodal.devices.util.lookup_tables_apple2 import (
-    EnergyMotorLookup,
-)
+from dodal.devices.util.lookup_tables_apple2 import AbstractEnergyMotorLookup
 from dodal.log import LOGGER
 
 J09_POLY_DEG = [
@@ -25,18 +24,23 @@ J09_POLY_DEG = [
 ]
 
 
-class J09Apple2Controller(Apple2Controller[Apple2]):
+class J09Apple2Controller(Apple2Controller[Apple2[UndulatorPhaseAxes]]):
     def __init__(
         self,
         apple2: Apple2,
-        energy_motor_lut: EnergyMotorLookup,
+        gap_energy_motor_lut: AbstractEnergyMotorLookup,
+        phase_energy_motor_lut: AbstractEnergyMotorLookup,
         units: str = "keV",
         name: str = "",
     ) -> None:
-        self.lookup_table_client = energy_motor_lut
+        """
+        energy_to_motor : EnergyMotorConvertor
+            A callable that converts energy and polarisation to motor positions.
+        """
+        self.gap_energy_motor_lut = gap_energy_motor_lut
+        self.phase_energy_motor_lut = phase_energy_motor_lut
         super().__init__(
             apple2=apple2,
-            energy_to_motor_converter=self.lookup_table_client.get_motor_from_energy,
             units=units,
             name=name,
         )
@@ -45,9 +49,9 @@ class J09Apple2Controller(Apple2Controller[Apple2]):
         """
         Set the undulator motors for a given energy and polarisation.
         """
-
         pol = await self._check_and_get_pol_setpoint()
-        gap, phase = self.energy_to_motor(energy=value, pol=pol)
+        gap = self.gap_energy_motor_lut.get_motor_from_energy(energy=value, pol=pol)
+        phase = self.phase_energy_motor_lut.get_motor_from_energy(energy=value, pol=pol)
         id_set_val = Apple2Val(
             gap=f"{gap:.6f}",
             phase=Apple2PhasesVal(
@@ -57,7 +61,6 @@ class J09Apple2Controller(Apple2Controller[Apple2]):
                 btm_outer=f"{0.0:.6f}",
             ),
         )
-
         LOGGER.info(f"Setting polarisation to {pol}, with values: {id_set_val}")
         await self.apple2().set(id_motor_values=id_set_val)
 
@@ -70,7 +73,7 @@ class J09Apple2Controller(Apple2Controller[Apple2]):
         if value is not Pol.LH:
             self._polarisation_setpoint_set(Pol.LH)
             max_lh_energy = float(
-                self.lookup_table_client.lookup_tables.gap.root[Pol.LH].limit.maximum
+                self.gap_energy_motor_lut.lut.root[Pol.LH].limit.maximum
             )
             lh_setpoint = (
                 max_lh_energy if target_energy > max_lh_energy else target_energy
