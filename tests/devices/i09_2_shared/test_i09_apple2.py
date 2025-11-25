@@ -123,8 +123,8 @@ def test_j09_energy_motor_lookup_update_lut_success(
     mock_j09_gap_energy_motor_lookup: FileReadingEnergyMotorLookup,
     mock_j09_phase_energy_motor_lookup: GeneratePoly1DFromFileEnergyMotorLookup,
 ):
-    mock_j09_gap_energy_motor_lookup.update_lut()
-    mock_j09_phase_energy_motor_lookup.update_lut()
+    mock_j09_gap_energy_motor_lookup.update_lookup_table()
+    mock_j09_phase_energy_motor_lookup.update_lookup_table()
     with open(TEST_EXPECTED_ENERGY_MOTOR_LOOKUP, "rb") as f:
         data = json.load(f)
         expected_gap_lut = LookupTable(data["gap"])
@@ -194,8 +194,8 @@ async def test_j09_apple2_controller_set_pol_lh(
     btm_inner_phase: float,
     btm_outer_phase: float,
 ):
-    mock_id_controller.gap_energy_motor_lut.update_lut()
-    mock_id_controller.gap_energy_motor_lut.update_lut()
+    mock_id_controller.gap_energy_motor_lut.update_lookup_table()
+    mock_id_controller.gap_energy_motor_lut.update_lookup_table()
 
     await mock_id_controller.polarisation.set(pol)
     get_mock_put(
@@ -234,8 +234,8 @@ async def test_j09_apple2_controller_set_pol(
     btm_inner_phase: float,
     btm_outer_phase: float,
 ):
-    mock_id_controller.gap_energy_motor_lut.update_lut()
-    mock_id_controller.gap_energy_motor_lut.update_lut()
+    mock_id_controller.gap_energy_motor_lut.update_lookup_table()
+    mock_id_controller.gap_energy_motor_lut.update_lookup_table()
 
     await mock_id_controller.polarisation.set(pol)
     assert get_mock_put(

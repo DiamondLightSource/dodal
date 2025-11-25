@@ -71,7 +71,7 @@ def test_make_phase_tables_multiple_entries() -> None:
 class DummyEnergyMotorLookup(AbstractEnergyMotorLookup):
     """Concrete test subclass that generates a pre determined basic lookup table"""
 
-    def update_lut(self) -> None:
+    def update_lookup_table(self) -> None:
         self.lut = generate_lookup_table(
             pol=Pol.LH,
             min_energy=100.0,

@@ -655,7 +655,7 @@ def assert_lookup_table_matches_expected(
     energy_motor_lookup: FileReadingEnergyMotorLookup,
     expected_dict_file_name: str,
 ) -> None:
-    energy_motor_lookup.update_lut()
+    energy_motor_lookup.update_lookup_table()
     with open(expected_dict_file_name, "rb") as f:
         expected_lut = LookupTable(json.load(f))
     assert energy_motor_lookup.lut == expected_lut
@@ -709,7 +709,7 @@ async def test_fail_i10_energy_motor_lookup_outside_energy_limits(
 async def test_fail_i10_energy_motor_lookup_with_lookup_gap(
     mock_id_controller: I10Apple2Controller,
 ):
-    mock_id_controller.gap_energy_motor_lut.update_lut()
+    mock_id_controller.gap_energy_motor_lut.update_lookup_table()
     # make gap in energy
     mock_id_controller.gap_energy_motor_lut.lut.root[Pol.LH].energies = EnergyCoverage(
         {

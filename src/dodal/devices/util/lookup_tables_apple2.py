@@ -301,7 +301,7 @@ class AbstractEnergyMotorLookup:
     Handles lookup tables for Apple2 ID, converting energy and polarisation to gap
     and phase.
 
-    After update_lut() has populated the lookup table, `get_motor_from_energy()` can be
+    After update_lookup_table() has populated the lookup table, `get_motor_from_energy()` can be
     used to compute gap / phase for a requested energy and polarisation pair.
     """
 
@@ -310,7 +310,7 @@ class AbstractEnergyMotorLookup:
         self._available_pol = []
 
     @abstractmethod
-    def update_lut(self):
+    def update_lookup_table(self):
         """Sub classes must define a way to update the lookup table"""
 
     @property
@@ -338,7 +338,7 @@ class AbstractEnergyMotorLookup:
             (gap, phase) motor positions.
         """
         if self.available_pol == []:
-            self.update_lut()
+            self.update_lookup_table()
         poly = get_poly(lookup_table=self.lut, energy=energy, pol=pol)
         return poly(energy)
 
@@ -380,7 +380,7 @@ class FileReadingEnergyMotorLookup(AbstractEnergyMotorLookup):
         )
         return convert_csv_to_lookup(file_contents, lut_config=self.lut_config)
 
-    def update_lut(self):
+    def update_lookup_table(self):
         self.lut = self.read_lut()
         self.available_pol = list(self.lut.root.keys())
 
@@ -410,7 +410,7 @@ class GeneratePoly1DFromFileEnergyMotorLookup(FileReadingEnergyMotorLookup):
         self.poly_1d_parameters = poly_1d_parameters
         super().__init__(config_client, lut_config, path)
 
-    def update_lut(self):
+    def update_lookup_table(self):
         self.lut = LookupTable()
         base_lut = self.read_lut()
         for key in base_lut.root.keys():
