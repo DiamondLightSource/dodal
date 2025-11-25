@@ -192,6 +192,20 @@ async def test_hu_energy_set_both_dcm_and_id_energy(
     )
 
 
+async def test_hu_energy_set_fails(
+    run_engine: RunEngine,
+    hu_energy: HardEnergy,
+):
+    energy_value = 5.15
+    with pytest.raises(
+        ValueError,
+        match=re.escape(
+            f"Requested energy {energy_value} keV is out of range for harmonic 3: [2.4, 4.3] keV"
+        ),
+    ):
+        await hu_energy.set(energy_value)
+
+
 @pytest.mark.parametrize(
     "energy_value, order_value, expected_gap",
     [
