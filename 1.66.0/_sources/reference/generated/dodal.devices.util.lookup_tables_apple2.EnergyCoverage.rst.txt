@@ -1,0 +1,58 @@
+dodal.devices.util.lookup\_tables\_apple2.EnergyCoverage
+========================================================
+
+.. currentmodule:: dodal.devices.util.lookup_tables_apple2
+
+.. autoclass:: EnergyCoverage
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      ~EnergyCoverage.model_config
+      
+      
+      
+      
+      
+      ~EnergyCoverage.root
+      
+   
+   

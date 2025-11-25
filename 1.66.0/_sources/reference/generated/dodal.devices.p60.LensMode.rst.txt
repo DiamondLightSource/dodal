@@ -1,0 +1,90 @@
+dodal.devices.p60.LensMode
+==========================
+
+.. currentmodule:: dodal.devices.p60
+
+.. autoclass:: LensMode
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~LensMode.TRANSMISSION
+      
+      
+      ~LensMode.ANGULAR14
+      
+      
+      ~LensMode.ANGULAR7NF
+      
+      
+      ~LensMode.ANGULAR30
+      
+      
+      ~LensMode.ANGULAR30_SMALLSPOT
+      
+      
+      ~LensMode.ANGULAR14_SMALLSPOT
+      
+   
+   

@@ -1,0 +1,1899 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Python Module Index &#8212; dodal 1.66.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="_static/documentation_options.js?v=9ef8be08"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=30646c52"></script>
+    <script src="_static/design-tabs.js?v=f930bc37"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid@11.12.1/dist/mermaid.esm.min.mjs"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+    <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.12.1/dist/mermaid.esm.min.mjs";import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs";mermaid.registerLayoutLoaders(elkLayouts);mermaid.initialize({startOnLoad:false});</script>
+    <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+    <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.12.1/dist/mermaid.esm.min.mjs";
+
+const defaultStyle = document.createElement('style');
+defaultStyle.textContent = `pre.mermaid {
+    /* Same as .mermaid-container > pre */
+    display: block;
+    width: 100%;
+}
+
+pre.mermaid > svg {
+    /* Same as .mermaid-container > pre > svg */
+    height: 500px;
+    width: 100%;
+    max-width: 100% !important;
+}
+`;
+document.head.appendChild(defaultStyle);
+
+const fullscreenStyle = document.createElement('style');
+fullscreenStyle.textContent = `.mermaid-container {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+}
+
+.mermaid-container > pre {
+    display: block;
+    width: 100%;
+}
+
+.mermaid-container > pre > svg {
+    height: 500px;
+    width: 100%;
+    max-width: 100% !important;
+}
+
+.mermaid-fullscreen-btn {
+    width: 28px;
+    height: 28px;
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    font-size: 14px;
+    line-height: 1;
+    padding: 0;
+    color: #333;
+}
+
+.mermaid-fullscreen-btn:hover {
+    opacity: 100% !important;
+    background: rgba(255, 255, 255, 1);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+    transform: scale(1.1);
+}
+
+.mermaid-fullscreen-btn.dark-theme {
+    background: rgba(50, 50, 50, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #e0e0e0;
+}
+
+.mermaid-fullscreen-btn.dark-theme:hover {
+    background: rgba(60, 60, 60, 1);
+    box-shadow: 0 3px 10px rgba(255, 255, 255, 0.2);
+}
+
+.mermaid-fullscreen-modal {
+    display: none;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 95vw;
+    height: 100vh;
+    background: rgba(255, 255, 255, 0.98);
+    z-index: 9999;
+    padding: 20px;
+    overflow: auto;
+}
+
+.mermaid-fullscreen-modal.dark-theme {
+    background: rgba(0, 0, 0, 0.98);
+}
+
+.mermaid-fullscreen-modal.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mermaid-container-fullscreen {
+    position: relative;
+    width: 95vw;
+    height: 90vh;
+    max-width: 95vw;
+    max-height: 90vh;
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    overflow: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mermaid-container-fullscreen.dark-theme {
+    background: #1a1a1a;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+}
+
+.mermaid-container-fullscreen pre.mermaid {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mermaid-container-fullscreen .mermaid svg {
+    height: 100% !important;
+    width: 100% !important;
+    cursor: grab;
+}
+
+.mermaid-fullscreen-close {
+    position: fixed !important;
+    top: 20px !important;
+    right: 20px !important;
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transition: all 0.2s;
+    font-size: 24px;
+    line-height: 1;
+    color: #333;
+}
+
+.mermaid-fullscreen-close:hover {
+    background: white;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+    transform: scale(1.1);
+}
+
+.mermaid-fullscreen-close.dark-theme {
+    background: rgba(50, 50, 50, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #e0e0e0;
+}
+
+.mermaid-fullscreen-close.dark-theme:hover {
+    background: rgba(60, 60, 60, 1);
+    box-shadow: 0 6px 16px rgba(255, 255, 255, 0.2);
+}
+
+.mermaid-fullscreen-modal .mermaid-fullscreen-btn {
+    display: none !important;
+}`;
+document.head.appendChild(fullscreenStyle);
+
+// Detect if page has dark background
+const isDarkTheme = () => {
+    const bgColor = window.getComputedStyle(document.body).backgroundColor;
+    const match = bgColor.match(/rgb\((\d+),\s*(\d+),\s*(\d+)/);
+    if (match) {
+        const r = parseInt(match[1]);
+        const g = parseInt(match[2]);
+        const b = parseInt(match[3]);
+        const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+        return brightness < 128;
+    }
+    return false;
+};
+
+const load = async () => {
+    await mermaid.run();
+
+    const all_mermaids = document.querySelectorAll(".mermaid");
+    const mermaids_processed = document.querySelectorAll(".mermaid[data-processed='true']");
+
+    if ("False" === "True") {
+        const mermaids_to_add_zoom = -1 === -1 ? all_mermaids.length : -1;
+        if(mermaids_to_add_zoom > 0) {
+            var svgs = d3.selectAll("");
+            if(all_mermaids.length !== mermaids_processed.length) {
+                setTimeout(load, 200);
+                return;
+            } else if(svgs.size() !== mermaids_to_add_zoom) {
+                setTimeout(load, 200);
+                return;
+            } else {
+                svgs.each(function() {
+                    var svg = d3.select(this);
+                    svg.html("<g class='wrapper'>" + svg.html() + "</g>");
+                    var inner = svg.select("g");
+                    var zoom = d3.zoom().on("zoom", function(event) {
+                        inner.attr("transform", event.transform);
+                    });
+                    svg.call(zoom);
+                });
+            }
+        }
+    } else if(all_mermaids.length !== mermaids_processed.length) {
+        // Wait for mermaid to process all diagrams
+        setTimeout(load, 200);
+        return;
+    }
+
+    const darkTheme = isDarkTheme();
+
+    // Stop here if not adding fullscreen capability
+    if ("True" !== "True") return;
+
+    const modal = document.createElement('div');
+    modal.className = 'mermaid-fullscreen-modal' + (darkTheme ? ' dark-theme' : '');
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
+    modal.setAttribute('aria-label', 'Fullscreen diagram viewer');
+    modal.innerHTML = `
+        <button class="mermaid-fullscreen-close${darkTheme ? ' dark-theme' : ''}" aria-label="Close fullscreen">✕</button>
+        <div class="mermaid-container-fullscreen${darkTheme ? ' dark-theme' : ''}"></div>
+    `;
+    document.body.appendChild(modal);
+
+    const modalContent = modal.querySelector('.mermaid-container-fullscreen');
+    const closeBtn = modal.querySelector('.mermaid-fullscreen-close');
+
+    let previousScrollOffset = [window.scrollX, window.scrollY];
+
+    const closeModal = () => {
+        modal.classList.remove('active');
+        modalContent.innerHTML = '';
+        document.body.style.overflow = ''
+        window.scrollTo({left: previousScrollOffset[0], top: previousScrollOffset[1], behavior: 'instant'});
+    };
+
+    closeBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+    });
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modal.classList.contains('active')) {
+            closeModal();
+        }
+    });
+
+    const allButtons = [];
+
+    document.querySelectorAll('.mermaid').forEach((mermaidDiv) => {
+        if (mermaidDiv.parentNode.classList.contains('mermaid-container') ||
+            mermaidDiv.closest('.mermaid-fullscreen-modal')) {
+            return;
+        }
+
+        const container = document.createElement('div');
+        container.className = 'mermaid-container';
+        mermaidDiv.parentNode.insertBefore(container, mermaidDiv);
+        container.appendChild(mermaidDiv);
+
+        const fullscreenBtn = document.createElement('button');
+        fullscreenBtn.className = 'mermaid-fullscreen-btn' + (darkTheme ? ' dark-theme' : '');
+        fullscreenBtn.setAttribute('aria-label', 'View diagram in fullscreen');
+        fullscreenBtn.textContent = '⛶';
+        fullscreenBtn.style.opacity = '50%';
+
+        // Calculate dynamic position based on diagram's margin and padding
+        const diagramStyle = window.getComputedStyle(mermaidDiv);
+        const marginTop = parseFloat(diagramStyle.marginTop) || 0;
+        const marginRight = parseFloat(diagramStyle.marginRight) || 0;
+        const paddingTop = parseFloat(diagramStyle.paddingTop) || 0;
+        const paddingRight = parseFloat(diagramStyle.paddingRight) || 0;
+        fullscreenBtn.style.top = `${marginTop + paddingTop + 4}px`;
+        fullscreenBtn.style.right = `${marginRight + paddingRight + 4}px`;
+
+        fullscreenBtn.addEventListener('click', () => {
+            previousScrollOffset = [window.scroll, window.scrollY];
+            const clone = mermaidDiv.cloneNode(true);
+            modalContent.innerHTML = '';
+            modalContent.appendChild(clone);
+
+            const svg = clone.querySelector('svg');
+            if (svg) {
+                svg.removeAttribute('width');
+                svg.removeAttribute('height');
+                svg.style.width = '100%';
+                svg.style.height = 'auto';
+                svg.style.maxWidth = '100%';
+                svg.style.sdisplay = 'block';
+
+                if ("False" === "True") {
+                    setTimeout(() => {
+                        const g = svg.querySelector('g');
+                        if (g) {
+                            var svgD3 = d3.select(svg);
+                            svgD3.html("<g class='wrapper'>" + svgD3.html() + "</g>");
+                            var inner = svgD3.select("g");
+                            var zoom = d3.zoom().on("zoom", function(event) {
+                                inner.attr("transform", event.transform);
+                            });
+                            svgD3.call(zoom);
+                        }
+                    }, 100);
+                }
+            }
+
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+
+        container.appendChild(fullscreenBtn);
+        allButtons.push(fullscreenBtn);
+    });
+
+    // Update theme classes when theme changes
+    const updateTheme = () => {
+        const dark = isDarkTheme();
+        allButtons.forEach(btn => {
+            if (dark) {
+                btn.classList.add('dark-theme');
+            } else {
+                btn.classList.remove('dark-theme');
+            }
+        });
+        if (dark) {
+            modal.classList.add('dark-theme');
+            modalContent.classList.add('dark-theme');
+            closeBtn.classList.add('dark-theme');
+        } else {
+            modal.classList.remove('dark-theme');
+            modalContent.classList.remove('dark-theme');
+            closeBtn.classList.remove('dark-theme');
+        }
+    };
+
+    // Watch for theme changes
+    const observer = new MutationObserver(updateTheme);
+    observer.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['class', 'style', 'data-theme']
+    });
+    observer.observe(document.body, {
+        attributes: true,
+        attributeFilter: ['class', 'style']
+    });
+};
+
+window.addEventListener("load", load);
+</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'py-modindex';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://DiamondLightSource.github.io/dodal/switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '1.66.0';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            false;
+        </script>
+    <link rel="icon" href="_static/dls-logo.svg"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="1.66.0" />
+
+
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="_static/dls-logo.svg" class="logo__image only-light" alt=""/>
+    <img src="_static/dls-logo.svg" class="logo__image only-dark pst-js-only" alt=""/>
+  
+  
+    <p class="title logo__title">dodal</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="tutorials.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="how-to.html">
+    How-to Guides
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="explanations.html">
+    Explanations
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="reference.html">
+    Reference
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/DiamondLightSource/dodal" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/dodal" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-cube fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">PyPI</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="tutorials.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="how-to.html">
+    How-to Guides
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="explanations.html">
+    Explanations
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="reference.html">
+    Reference
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/DiamondLightSource/dodal" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/dodal" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-cube fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">PyPI</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none"></div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+
+   <h1>Python Module Index</h1>
+
+   <div class="modindex-jumpbox">
+   <a href="#cap-d"><strong>d</strong></a>
+   </div>
+
+   <table class="indextable modindextable">
+     <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
+     <tr class="cap" id="cap-d"><td></td><td>
+       <strong>d</strong></td><td></td></tr>
+     <tr>
+       <td><img src="_static/minus.png" class="toggler"
+              id="toggle-1" style="display: none" alt="-" /></td>
+       <td>
+       <a href="reference/api.html#module-dodal"><code class="xref">dodal</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.beamlines.html#module-dodal.beamlines"><code class="xref">dodal.beamlines</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.beamlines.adsim.html#module-dodal.beamlines.adsim"><code class="xref">dodal.beamlines.adsim</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.beamlines.aithre.html#module-dodal.beamlines.aithre"><code class="xref">dodal.beamlines.aithre</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.beamlines.b01_1.html#module-dodal.beamlines.b01_1"><code class="xref">dodal.beamlines.b01_1</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.beamlines.b07.html#module-dodal.beamlines.b07"><code class="xref">dodal.beamlines.b07</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.beamlines.b07_1.html#module-dodal.beamlines.b07_1"><code class="xref">dodal.beamlines.b07_1</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.beamlines.b16.html#module-dodal.beamlines.b16"><code class="xref">dodal.beamlines.b16</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.beamlines.b18.html#module-dodal.beamlines.b18"><code class="xref">dodal.beamlines.b18</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.beamlines.b21.html#module-dodal.beamlines.b21"><code class="xref">dodal.beamlines.b21</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.beamlines.i02_1.html#module-dodal.beamlines.i02_1"><code class="xref">dodal.beamlines.i02_1</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.beamlines.i02_2.html#module-dodal.beamlines.i02_2"><code class="xref">dodal.beamlines.i02_2</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.beamlines.i03.html#module-dodal.beamlines.i03"><code class="xref">dodal.beamlines.i03</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.beamlines.i04.html#module-dodal.beamlines.i04"><code class="xref">dodal.beamlines.i04</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.beamlines.i05.html#module-dodal.beamlines.i05"><code class="xref">dodal.beamlines.i05</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.beamlines.i05_1.html#module-dodal.beamlines.i05_1"><code class="xref">dodal.beamlines.i05_1</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.beamlines.i06.html#module-dodal.beamlines.i06"><code class="xref">dodal.beamlines.i06</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.beamlines.i07.html#module-dodal.beamlines.i07"><code class="xref">dodal.beamlines.i07</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.beamlines.i09.html#module-dodal.beamlines.i09"><code class="xref">dodal.beamlines.i09</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.beamlines.i09_1.html#module-dodal.beamlines.i09_1"><code class="xref">dodal.beamlines.i09_1</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.beamlines.i09_2.html#module-dodal.beamlines.i09_2"><code class="xref">dodal.beamlines.i09_2</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.beamlines.i10.html#module-dodal.beamlines.i10"><code class="xref">dodal.beamlines.i10</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.beamlines.i10_1.html#module-dodal.beamlines.i10_1"><code class="xref">dodal.beamlines.i10_1</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.beamlines.i10_optics.html#module-dodal.beamlines.i10_optics"><code class="xref">dodal.beamlines.i10_optics</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.beamlines.i11.html#module-dodal.beamlines.i11"><code class="xref">dodal.beamlines.i11</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.beamlines.i13_1.html#module-dodal.beamlines.i13_1"><code class="xref">dodal.beamlines.i13_1</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.beamlines.i15.html#module-dodal.beamlines.i15"><code class="xref">dodal.beamlines.i15</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.beamlines.i15_1.html#module-dodal.beamlines.i15_1"><code class="xref">dodal.beamlines.i15_1</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.beamlines.i17.html#module-dodal.beamlines.i17"><code class="xref">dodal.beamlines.i17</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.beamlines.i18.html#module-dodal.beamlines.i18"><code class="xref">dodal.beamlines.i18</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.beamlines.i19_1.html#module-dodal.beamlines.i19_1"><code class="xref">dodal.beamlines.i19_1</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.beamlines.i19_2.html#module-dodal.beamlines.i19_2"><code class="xref">dodal.beamlines.i19_2</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.beamlines.i19_optics.html#module-dodal.beamlines.i19_optics"><code class="xref">dodal.beamlines.i19_optics</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.beamlines.i20_1.html#module-dodal.beamlines.i20_1"><code class="xref">dodal.beamlines.i20_1</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.beamlines.i21.html#module-dodal.beamlines.i21"><code class="xref">dodal.beamlines.i21</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.beamlines.i22.html#module-dodal.beamlines.i22"><code class="xref">dodal.beamlines.i22</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.beamlines.i23.html#module-dodal.beamlines.i23"><code class="xref">dodal.beamlines.i23</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.beamlines.i24.html#module-dodal.beamlines.i24"><code class="xref">dodal.beamlines.i24</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.beamlines.k07.html#module-dodal.beamlines.k07"><code class="xref">dodal.beamlines.k07</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.beamlines.k11.html#module-dodal.beamlines.k11"><code class="xref">dodal.beamlines.k11</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.beamlines.p38.html#module-dodal.beamlines.p38"><code class="xref">dodal.beamlines.p38</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.beamlines.p45.html#module-dodal.beamlines.p45"><code class="xref">dodal.beamlines.p45</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.beamlines.p60.html#module-dodal.beamlines.p60"><code class="xref">dodal.beamlines.p60</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.beamlines.p99.html#module-dodal.beamlines.p99"><code class="xref">dodal.beamlines.p99</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.beamlines.training_rig.html#module-dodal.beamlines.training_rig"><code class="xref">dodal.beamlines.training_rig</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.common.html#module-dodal.common"><code class="xref">dodal.common</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.html#module-dodal.devices"><code class="xref">dodal.devices</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.aithre_lasershaping.html#module-dodal.devices.aithre_lasershaping"><code class="xref">dodal.devices.aithre_lasershaping</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.aithre_lasershaping.goniometer.html#module-dodal.devices.aithre_lasershaping.goniometer"><code class="xref">dodal.devices.aithre_lasershaping.goniometer</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.aithre_lasershaping.laser_robot.html#module-dodal.devices.aithre_lasershaping.laser_robot"><code class="xref">dodal.devices.aithre_lasershaping.laser_robot</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.aperture.html#module-dodal.devices.aperture"><code class="xref">dodal.devices.aperture</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.aperturescatterguard.html#module-dodal.devices.aperturescatterguard"><code class="xref">dodal.devices.aperturescatterguard</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.apple2_undulator.html#module-dodal.devices.apple2_undulator"><code class="xref">dodal.devices.apple2_undulator</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.areadetector.html#module-dodal.devices.areadetector"><code class="xref">dodal.devices.areadetector</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.areadetector.plugins.html#module-dodal.devices.areadetector.plugins"><code class="xref">dodal.devices.areadetector.plugins</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.areadetector.plugins.cam.html#module-dodal.devices.areadetector.plugins.cam"><code class="xref">dodal.devices.areadetector.plugins.cam</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.areadetector.plugins.mjpg.html#module-dodal.devices.areadetector.plugins.mjpg"><code class="xref">dodal.devices.areadetector.plugins.mjpg</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.attenuator.html#module-dodal.devices.attenuator"><code class="xref">dodal.devices.attenuator</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.attenuator.attenuator.html#module-dodal.devices.attenuator.attenuator"><code class="xref">dodal.devices.attenuator.attenuator</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.attenuator.filter.html#module-dodal.devices.attenuator.filter"><code class="xref">dodal.devices.attenuator.filter</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.attenuator.filter_selections.html#module-dodal.devices.attenuator.filter_selections"><code class="xref">dodal.devices.attenuator.filter_selections</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.b07.html#module-dodal.devices.b07"><code class="xref">dodal.devices.b07</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.b07_1.html#module-dodal.devices.b07_1"><code class="xref">dodal.devices.b07_1</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.b16.html#module-dodal.devices.b16"><code class="xref">dodal.devices.b16</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.b16.detector.html#module-dodal.devices.b16.detector"><code class="xref">dodal.devices.b16.detector</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.backlight.html#module-dodal.devices.backlight"><code class="xref">dodal.devices.backlight</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.baton.html#module-dodal.devices.baton"><code class="xref">dodal.devices.baton</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.beamsize.html#module-dodal.devices.beamsize"><code class="xref">dodal.devices.beamsize</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.beamsize.beamsize.html#module-dodal.devices.beamsize.beamsize"><code class="xref">dodal.devices.beamsize.beamsize</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.bimorph_mirror.html#module-dodal.devices.bimorph_mirror"><code class="xref">dodal.devices.bimorph_mirror</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.collimation_table.html#module-dodal.devices.collimation_table"><code class="xref">dodal.devices.collimation_table</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.common_dcm.html#module-dodal.devices.common_dcm"><code class="xref">dodal.devices.common_dcm</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.controllers.html#module-dodal.devices.controllers"><code class="xref">dodal.devices.controllers</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.cryostream.html#module-dodal.devices.cryostream"><code class="xref">dodal.devices.cryostream</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.current_amplifiers.html#module-dodal.devices.current_amplifiers"><code class="xref">dodal.devices.current_amplifiers</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.detector.html#module-dodal.devices.detector"><code class="xref">dodal.devices.detector</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.diamond_filter.html#module-dodal.devices.diamond_filter"><code class="xref">dodal.devices.diamond_filter</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.eiger.html#module-dodal.devices.eiger"><code class="xref">dodal.devices.eiger</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.eiger_odin.html#module-dodal.devices.eiger_odin"><code class="xref">dodal.devices.eiger_odin</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.electron_analyser.html#module-dodal.devices.electron_analyser"><code class="xref">dodal.devices.electron_analyser</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.eurotherm.html#module-dodal.devices.eurotherm"><code class="xref">dodal.devices.eurotherm</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.fast_grid_scan.html#module-dodal.devices.fast_grid_scan"><code class="xref">dodal.devices.fast_grid_scan</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.fast_shutter.html#module-dodal.devices.fast_shutter"><code class="xref">dodal.devices.fast_shutter</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.fluorescence_detector_motion.html#module-dodal.devices.fluorescence_detector_motion"><code class="xref">dodal.devices.fluorescence_detector_motion</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.flux.html#module-dodal.devices.flux"><code class="xref">dodal.devices.flux</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.focusing_mirror.html#module-dodal.devices.focusing_mirror"><code class="xref">dodal.devices.focusing_mirror</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.hutch_shutter.html#module-dodal.devices.hutch_shutter"><code class="xref">dodal.devices.hutch_shutter</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.i02_1.html#module-dodal.devices.i02_1"><code class="xref">dodal.devices.i02_1</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.i02_1.fast_grid_scan.html#module-dodal.devices.i02_1.fast_grid_scan"><code class="xref">dodal.devices.i02_1.fast_grid_scan</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.i02_1.sample_motors.html#module-dodal.devices.i02_1.sample_motors"><code class="xref">dodal.devices.i02_1.sample_motors</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.i02_2.html#module-dodal.devices.i02_2"><code class="xref">dodal.devices.i02_2</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.i03.html#module-dodal.devices.i03"><code class="xref">dodal.devices.i03</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.i04.html#module-dodal.devices.i04"><code class="xref">dodal.devices.i04</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.i05.html#module-dodal.devices.i05"><code class="xref">dodal.devices.i05</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.i07.html#module-dodal.devices.i07"><code class="xref">dodal.devices.i07</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.i07.dcm.html#module-dodal.devices.i07.dcm"><code class="xref">dodal.devices.i07.dcm</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.i07.id.html#module-dodal.devices.i07.id"><code class="xref">dodal.devices.i07.id</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.i09.html#module-dodal.devices.i09"><code class="xref">dodal.devices.i09</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.i09_1.html#module-dodal.devices.i09_1"><code class="xref">dodal.devices.i09_1</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.i09_1_shared.html#module-dodal.devices.i09_1_shared"><code class="xref">dodal.devices.i09_1_shared</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.i10.html#module-dodal.devices.i10"><code class="xref">dodal.devices.i10</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.i11.html#module-dodal.devices.i11"><code class="xref">dodal.devices.i11</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.i11.cyberstar_blower.html#module-dodal.devices.i11.cyberstar_blower"><code class="xref">dodal.devices.i11.cyberstar_blower</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.i11.diff_stages.html#module-dodal.devices.i11.diff_stages"><code class="xref">dodal.devices.i11.diff_stages</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.i11.mythen.html#module-dodal.devices.i11.mythen"><code class="xref">dodal.devices.i11.mythen</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.i11.nx100robot.html#module-dodal.devices.i11.nx100robot"><code class="xref">dodal.devices.i11.nx100robot</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.i11.spinner.html#module-dodal.devices.i11.spinner"><code class="xref">dodal.devices.i11.spinner</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.i13_1.html#module-dodal.devices.i13_1"><code class="xref">dodal.devices.i13_1</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.i13_1.merlin.html#module-dodal.devices.i13_1.merlin"><code class="xref">dodal.devices.i13_1.merlin</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.i13_1.merlin_controller.html#module-dodal.devices.i13_1.merlin_controller"><code class="xref">dodal.devices.i13_1.merlin_controller</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.i15.html#module-dodal.devices.i15"><code class="xref">dodal.devices.i15</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.i15.dcm.html#module-dodal.devices.i15.dcm"><code class="xref">dodal.devices.i15.dcm</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.i15.focussing_mirror.html#module-dodal.devices.i15.focussing_mirror"><code class="xref">dodal.devices.i15.focussing_mirror</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.i15.jack.html#module-dodal.devices.i15.jack"><code class="xref">dodal.devices.i15.jack</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.i15.laue.html#module-dodal.devices.i15.laue"><code class="xref">dodal.devices.i15.laue</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.i15.motors.html#module-dodal.devices.i15.motors"><code class="xref">dodal.devices.i15.motors</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.i15.multilayer_mirror.html#module-dodal.devices.i15.multilayer_mirror"><code class="xref">dodal.devices.i15.multilayer_mirror</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.i15.rail.html#module-dodal.devices.i15.rail"><code class="xref">dodal.devices.i15.rail</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.i17.html#module-dodal.devices.i17"><code class="xref">dodal.devices.i17</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.i17.i17_apple2.html#module-dodal.devices.i17.i17_apple2"><code class="xref">dodal.devices.i17.i17_apple2</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.i18.html#module-dodal.devices.i18"><code class="xref">dodal.devices.i18</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.i18.diode.html#module-dodal.devices.i18.diode"><code class="xref">dodal.devices.i18.diode</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.i18.kb_mirror.html#module-dodal.devices.i18.kb_mirror"><code class="xref">dodal.devices.i18.kb_mirror</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.i19.html#module-dodal.devices.i19"><code class="xref">dodal.devices.i19</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.i19.access_controlled.html#module-dodal.devices.i19.access_controlled"><code class="xref">dodal.devices.i19.access_controlled</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.i19.access_controlled.blueapi_device.html#module-dodal.devices.i19.access_controlled.blueapi_device"><code class="xref">dodal.devices.i19.access_controlled.blueapi_device</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.i19.access_controlled.hutch_access.html#module-dodal.devices.i19.access_controlled.hutch_access"><code class="xref">dodal.devices.i19.access_controlled.hutch_access</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.i19.access_controlled.shutter.html#module-dodal.devices.i19.access_controlled.shutter"><code class="xref">dodal.devices.i19.access_controlled.shutter</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.i19.backlight.html#module-dodal.devices.i19.backlight"><code class="xref">dodal.devices.i19.backlight</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.i19.beamstop.html#module-dodal.devices.i19.beamstop"><code class="xref">dodal.devices.i19.beamstop</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.i19.diffractometer.html#module-dodal.devices.i19.diffractometer"><code class="xref">dodal.devices.i19.diffractometer</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.i19.mapt_configuration.html#module-dodal.devices.i19.mapt_configuration"><code class="xref">dodal.devices.i19.mapt_configuration</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.i19.pin_col_stages.html#module-dodal.devices.i19.pin_col_stages"><code class="xref">dodal.devices.i19.pin_col_stages</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.i20_1.html#module-dodal.devices.i20_1"><code class="xref">dodal.devices.i20_1</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.i21.html#module-dodal.devices.i21"><code class="xref">dodal.devices.i21</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.i22.html#module-dodal.devices.i22"><code class="xref">dodal.devices.i22</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.i22.dcm.html#module-dodal.devices.i22.dcm"><code class="xref">dodal.devices.i22.dcm</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.i22.fswitch.html#module-dodal.devices.i22.fswitch"><code class="xref">dodal.devices.i22.fswitch</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.i22.nxsas.html#module-dodal.devices.i22.nxsas"><code class="xref">dodal.devices.i22.nxsas</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.i24.html#module-dodal.devices.i24"><code class="xref">dodal.devices.i24</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.i24.aperture.html#module-dodal.devices.i24.aperture"><code class="xref">dodal.devices.i24.aperture</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.i24.beam_center.html#module-dodal.devices.i24.beam_center"><code class="xref">dodal.devices.i24.beam_center</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.i24.beamstop.html#module-dodal.devices.i24.beamstop"><code class="xref">dodal.devices.i24.beamstop</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.i24.commissioning_jungfrau.html#module-dodal.devices.i24.commissioning_jungfrau"><code class="xref">dodal.devices.i24.commissioning_jungfrau</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.i24.dcm.html#module-dodal.devices.i24.dcm"><code class="xref">dodal.devices.i24.dcm</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.i24.dual_backlight.html#module-dodal.devices.i24.dual_backlight"><code class="xref">dodal.devices.i24.dual_backlight</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.i24.focus_mirrors.html#module-dodal.devices.i24.focus_mirrors"><code class="xref">dodal.devices.i24.focus_mirrors</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.i24.pmac.html#module-dodal.devices.i24.pmac"><code class="xref">dodal.devices.i24.pmac</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.i24.vgonio.html#module-dodal.devices.i24.vgonio"><code class="xref">dodal.devices.i24.vgonio</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.ipin.html#module-dodal.devices.ipin"><code class="xref">dodal.devices.ipin</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.linkam3.html#module-dodal.devices.linkam3"><code class="xref">dodal.devices.linkam3</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.motors.html#module-dodal.devices.motors"><code class="xref">dodal.devices.motors</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.mx_phase1.html#module-dodal.devices.mx_phase1"><code class="xref">dodal.devices.mx_phase1</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.mx_phase1.beamstop.html#module-dodal.devices.mx_phase1.beamstop"><code class="xref">dodal.devices.mx_phase1.beamstop</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.oav.html#module-dodal.devices.oav"><code class="xref">dodal.devices.oav</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.oav.oav_calculations.html#module-dodal.devices.oav.oav_calculations"><code class="xref">dodal.devices.oav.oav_calculations</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.oav.oav_detector.html#module-dodal.devices.oav.oav_detector"><code class="xref">dodal.devices.oav.oav_detector</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.oav.oav_parameters.html#module-dodal.devices.oav.oav_parameters"><code class="xref">dodal.devices.oav.oav_parameters</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.oav.oav_to_redis_forwarder.html#module-dodal.devices.oav.oav_to_redis_forwarder"><code class="xref">dodal.devices.oav.oav_to_redis_forwarder</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.oav.pin_image_recognition.html#module-dodal.devices.oav.pin_image_recognition"><code class="xref">dodal.devices.oav.pin_image_recognition</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.oav.pin_image_recognition.manual_test.html#module-dodal.devices.oav.pin_image_recognition.manual_test"><code class="xref">dodal.devices.oav.pin_image_recognition.manual_test</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.oav.pin_image_recognition.utils.html#module-dodal.devices.oav.pin_image_recognition.utils"><code class="xref">dodal.devices.oav.pin_image_recognition.utils</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.oav.snapshots.html#module-dodal.devices.oav.snapshots"><code class="xref">dodal.devices.oav.snapshots</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.oav.snapshots.grid_overlay.html#module-dodal.devices.oav.snapshots.grid_overlay"><code class="xref">dodal.devices.oav.snapshots.grid_overlay</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.oav.snapshots.snapshot.html#module-dodal.devices.oav.snapshots.snapshot"><code class="xref">dodal.devices.oav.snapshots.snapshot</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.oav.snapshots.snapshot_image_processing.html#module-dodal.devices.oav.snapshots.snapshot_image_processing"><code class="xref">dodal.devices.oav.snapshots.snapshot_image_processing</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.oav.snapshots.snapshot_with_grid.html#module-dodal.devices.oav.snapshots.snapshot_with_grid"><code class="xref">dodal.devices.oav.snapshots.snapshot_with_grid</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.oav.utils.html#module-dodal.devices.oav.utils"><code class="xref">dodal.devices.oav.utils</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.p45.html#module-dodal.devices.p45"><code class="xref">dodal.devices.p45</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.p60.html#module-dodal.devices.p60"><code class="xref">dodal.devices.p60</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.p99.html#module-dodal.devices.p99"><code class="xref">dodal.devices.p99</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.p99.andor2_point.html#module-dodal.devices.p99.andor2_point"><code class="xref">dodal.devices.p99.andor2_point</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.p99.sample_stage.html#module-dodal.devices.p99.sample_stage"><code class="xref">dodal.devices.p99.sample_stage</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.pgm.html#module-dodal.devices.pgm"><code class="xref">dodal.devices.pgm</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.positioner.html#module-dodal.devices.positioner"><code class="xref">dodal.devices.positioner</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.pressure_jump_cell.html#module-dodal.devices.pressure_jump_cell"><code class="xref">dodal.devices.pressure_jump_cell</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.qbpm.html#module-dodal.devices.qbpm"><code class="xref">dodal.devices.qbpm</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.robot.html#module-dodal.devices.robot"><code class="xref">dodal.devices.robot</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.s4_slit_gaps.html#module-dodal.devices.s4_slit_gaps"><code class="xref">dodal.devices.s4_slit_gaps</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.scintillator.html#module-dodal.devices.scintillator"><code class="xref">dodal.devices.scintillator</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.slits.html#module-dodal.devices.slits"><code class="xref">dodal.devices.slits</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.smargon.html#module-dodal.devices.smargon"><code class="xref">dodal.devices.smargon</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.status.html#module-dodal.devices.status"><code class="xref">dodal.devices.status</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.synchrotron.html#module-dodal.devices.synchrotron"><code class="xref">dodal.devices.synchrotron</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.temperture_controller.html#module-dodal.devices.temperture_controller"><code class="xref">dodal.devices.temperture_controller</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.tetramm.html#module-dodal.devices.tetramm"><code class="xref">dodal.devices.tetramm</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.thawer.html#module-dodal.devices.thawer"><code class="xref">dodal.devices.thawer</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.turbo_slit.html#module-dodal.devices.turbo_slit"><code class="xref">dodal.devices.turbo_slit</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.undulator.html#module-dodal.devices.undulator"><code class="xref">dodal.devices.undulator</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.util.html#module-dodal.devices.util"><code class="xref">dodal.devices.util</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.util.adjuster_plans.html#module-dodal.devices.util.adjuster_plans"><code class="xref">dodal.devices.util.adjuster_plans</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.util.epics_util.html#module-dodal.devices.util.epics_util"><code class="xref">dodal.devices.util.epics_util</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.util.lookup_tables.html#module-dodal.devices.util.lookup_tables"><code class="xref">dodal.devices.util.lookup_tables</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.util.lookup_tables_apple2.html#module-dodal.devices.util.lookup_tables_apple2"><code class="xref">dodal.devices.util.lookup_tables_apple2</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.v2f.html#module-dodal.devices.v2f"><code class="xref">dodal.devices.v2f</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.watsonmarlow323_pump.html#module-dodal.devices.watsonmarlow323_pump"><code class="xref">dodal.devices.watsonmarlow323_pump</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.webcam.html#module-dodal.devices.webcam"><code class="xref">dodal.devices.webcam</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.xbpm_feedback.html#module-dodal.devices.xbpm_feedback"><code class="xref">dodal.devices.xbpm_feedback</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.xspress3.html#module-dodal.devices.xspress3"><code class="xref">dodal.devices.xspress3</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.xspress3.xspress3.html#module-dodal.devices.xspress3.xspress3"><code class="xref">dodal.devices.xspress3.xspress3</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.xspress3.xspress3_channel.html#module-dodal.devices.xspress3.xspress3_channel"><code class="xref">dodal.devices.xspress3.xspress3_channel</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.zebra.html#module-dodal.devices.zebra"><code class="xref">dodal.devices.zebra</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.zebra.zebra.html#module-dodal.devices.zebra.zebra"><code class="xref">dodal.devices.zebra.zebra</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.zebra.zebra_constants_mapping.html#module-dodal.devices.zebra.zebra_constants_mapping"><code class="xref">dodal.devices.zebra.zebra_constants_mapping</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.zebra.zebra_controlled_shutter.html#module-dodal.devices.zebra.zebra_controlled_shutter"><code class="xref">dodal.devices.zebra.zebra_controlled_shutter</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.devices.zocalo.html#module-dodal.devices.zocalo"><code class="xref">dodal.devices.zocalo</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.parameters.html#module-dodal.parameters"><code class="xref">dodal.parameters</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.parameters.experiment_parameter_base.html#module-dodal.parameters.experiment_parameter_base"><code class="xref">dodal.parameters.experiment_parameter_base</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.plan_stubs.html#module-dodal.plan_stubs"><code class="xref">dodal.plan_stubs</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="reference/generated/dodal.plans.html#module-dodal.plans"><code class="xref">dodal.plans</code></a></td><td>
+       <em></em></td></tr>
+   </table>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

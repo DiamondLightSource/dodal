@@ -1,0 +1,59 @@
+dodal.devices.apple2\_undulator
+===============================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~apple2_undulator.Apple2
+   ~apple2_undulator.Apple2Controller
+   ~apple2_undulator.Apple2LockedPhasesVal
+   ~apple2_undulator.Apple2PhasesVal
+   ~apple2_undulator.Apple2Val
+   ~apple2_undulator.BeamEnergy
+   ~apple2_undulator.EnergyMotorConvertor
+   ~apple2_undulator.InsertionDeviceEnergy
+   ~apple2_undulator.InsertionDeviceEnergyBase
+   ~apple2_undulator.InsertionDevicePolarisation
+   ~apple2_undulator.Pol
+   ~apple2_undulator.SafeUndulatorMover
+   ~apple2_undulator.UndulatorGap
+   ~apple2_undulator.UndulatorGateStatus
+   ~apple2_undulator.UndulatorJawPhase
+   ~apple2_undulator.UndulatorLockedPhaseAxes
+   ~apple2_undulator.UndulatorPhaseAxes
+   ~apple2_undulator.UndulatorPhaseMotor
+
+
+
+
+.. automodule:: dodal.devices.apple2_undulator
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      estimate_motor_timeout
+   
+   
+
+   
+   
+   

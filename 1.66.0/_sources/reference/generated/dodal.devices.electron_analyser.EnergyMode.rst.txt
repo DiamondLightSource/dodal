@@ -1,0 +1,78 @@
+dodal.devices.electron\_analyser.EnergyMode
+===========================================
+
+.. currentmodule:: dodal.devices.electron_analyser
+
+.. autoclass:: EnergyMode
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~EnergyMode.KINETIC
+      
+      
+      ~EnergyMode.BINDING
+      
+   
+   

@@ -1,0 +1,61 @@
+dodal.devices.util.lookup\_tables\_apple2.EnergyMinMax
+======================================================
+
+.. currentmodule:: dodal.devices.util.lookup_tables_apple2
+
+.. autoclass:: EnergyMinMax
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      ~EnergyMinMax.model_config
+      
+      
+      
+      
+      
+      ~EnergyMinMax.minimum
+      
+      
+      ~EnergyMinMax.maximum
+      
+   
+   

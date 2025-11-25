@@ -1,0 +1,99 @@
+dodal.devices.current\_amplifiers.SR570FineGainTable
+====================================================
+
+.. currentmodule:: dodal.devices.current_amplifiers
+
+.. autoclass:: SR570FineGainTable
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~SR570FineGainTable.SEN_1
+      
+      
+      ~SR570FineGainTable.SEN_2
+      
+      
+      ~SR570FineGainTable.SEN_3
+      
+      
+      ~SR570FineGainTable.SEN_4
+      
+      
+      ~SR570FineGainTable.SEN_5
+      
+      
+      ~SR570FineGainTable.SEN_6
+      
+      
+      ~SR570FineGainTable.SEN_7
+      
+      
+      ~SR570FineGainTable.SEN_8
+      
+      
+      ~SR570FineGainTable.SEN_9
+      
+   
+   
