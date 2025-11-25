@@ -28,13 +28,14 @@ from dodal.devices.util.lookup_tables_apple2 import (
     MAXIMUM_ROW_PHASE_MOTOR_POSITION,
     ROW_PHASE_CIRCULAR,
     FileReadingEnergyMotorLookup,
-    GeneratePoly1DFromFileEnergyMotorLookup,
     LookupTable,
     LookupTableConfig,
 )
 from tests.devices.i09_2_shared.test_data import (
-    TEST_EXPECTED_ENERGY_MOTOR_LOOKUP,
-    TEST_SOFT_UNDULATOR_LUT,
+    TEST_EXPECTED_SOFT_GAP_UNDULATOR_LUT,
+    TEST_EXPECTED_SOFT_PHASE_UNDULATOR_LUT,
+    TEST_SOFT_GAP_UNDULATOR_LUT,
+    TEST_SOFT_PHASE_UNDULATOR_LUT,
 )
 
 # add mock_config_client, mock_id_gap, mock_phase and mock_jaw_phase_axes to pytest.
@@ -48,18 +49,18 @@ def mock_j09_gap_energy_motor_lookup(
     return FileReadingEnergyMotorLookup(
         lut_config=LookupTableConfig(poly_deg=J09_POLY_DEG),
         config_client=mock_config_client,
-        path=Path(TEST_SOFT_UNDULATOR_LUT),
+        path=Path(TEST_SOFT_GAP_UNDULATOR_LUT),
     )
 
 
 @pytest.fixture
 def mock_j09_phase_energy_motor_lookup(
     mock_config_client: ConfigServer,
-) -> GeneratePoly1DFromFileEnergyMotorLookup:
-    return GeneratePoly1DFromFileEnergyMotorLookup(
-        lut_config=LookupTableConfig(poly_deg=J09_POLY_DEG),
+) -> FileReadingEnergyMotorLookup:
+    return FileReadingEnergyMotorLookup(
+        lut_config=LookupTableConfig(poly_deg=["0th-order"]),
         config_client=mock_config_client,
-        path=Path(TEST_SOFT_UNDULATOR_LUT),
+        path=Path(TEST_SOFT_PHASE_UNDULATOR_LUT),
     )
 
 
@@ -76,7 +77,7 @@ async def mock_apple2(
 async def mock_id_controller(
     mock_apple2: Apple2,
     mock_j09_gap_energy_motor_lookup: FileReadingEnergyMotorLookup,
-    mock_j09_phase_energy_motor_lookup: GeneratePoly1DFromFileEnergyMotorLookup,
+    mock_j09_phase_energy_motor_lookup: FileReadingEnergyMotorLookup,
 ) -> J09Apple2Controller:
     async with init_devices(mock=True):
         mock_id_controller = J09Apple2Controller(
@@ -121,14 +122,15 @@ async def mock_id_pol(
 
 def test_j09_energy_motor_lookup_update_lut_success(
     mock_j09_gap_energy_motor_lookup: FileReadingEnergyMotorLookup,
-    mock_j09_phase_energy_motor_lookup: GeneratePoly1DFromFileEnergyMotorLookup,
+    mock_j09_phase_energy_motor_lookup: FileReadingEnergyMotorLookup,
 ):
     mock_j09_gap_energy_motor_lookup.update_lookup_table()
     mock_j09_phase_energy_motor_lookup.update_lookup_table()
-    with open(TEST_EXPECTED_ENERGY_MOTOR_LOOKUP, "rb") as f:
-        data = json.load(f)
-        expected_gap_lut = LookupTable(data["gap"])
-        expected_phase_lut = LookupTable(data["phase"])
+    with open(TEST_EXPECTED_SOFT_GAP_UNDULATOR_LUT, "rb") as f:
+        expected_gap_lut = LookupTable(json.load(f))
+
+    with open(TEST_EXPECTED_SOFT_PHASE_UNDULATOR_LUT, "rb") as f:
+        expected_phase_lut = LookupTable(json.load(f))
 
     assert mock_j09_gap_energy_motor_lookup.lut == expected_gap_lut
     assert mock_j09_phase_energy_motor_lookup.lut == expected_phase_lut

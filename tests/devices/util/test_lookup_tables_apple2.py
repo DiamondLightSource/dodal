@@ -1,84 +1,73 @@
+from collections import namedtuple
+
 import numpy as np
 import pytest
+from pytest import FixtureRequest
 
 from dodal.devices.apple2_undulator import Pol
 from dodal.devices.util.lookup_tables_apple2 import (
-    AbstractEnergyMotorLookup,
+    ConfiguredEnergyMotorLookup,
     LookupTableConfig,
     convert_csv_to_lookup,
     generate_lookup_table,
-    make_phase_tables,
     read_file_and_skip,
 )
 
+Config = namedtuple(
+    "Config", ["polarisations", "min_energies", "max_energies", "polys"]
+)
 
-def test_generate_lookup_table_structure_and_poly() -> None:
-    min_e = 100.0
-    max_e = 200.0
-    coeffs = [2.0, -1.0, 0.5]
-    lut = generate_lookup_table(
-        pol=Pol.LH, min_energy=min_e, max_energy=max_e, poly1d_param=coeffs
+TEST_PARAMS = [
+    Config([Pol.LH], [100], [200], [[2.0, -1.0, 0.5]]),
+    Config([Pol.LH, Pol.LV], [100, 200], [150.0, 250.0], [[1.0, 0.0], [0.5, 1.0]]),
+]
+
+
+@pytest.fixture(params=TEST_PARAMS)
+def config(request: FixtureRequest) -> Config:
+    return request.param
+
+
+@pytest.fixture
+def configured_energy_motor_lookup(config: Config) -> ConfiguredEnergyMotorLookup:
+    return ConfiguredEnergyMotorLookup(
+        lut=generate_lookup_table(
+            pols=config.polarisations,
+            min_energies=config.min_energies,
+            max_energies=config.max_energies,
+            poly1d_params=config.polys,
+        )
     )
 
-    key = Pol.LH
-    assert key in lut.root
 
-    entry = lut.root[key]
-    assert entry.limit.minimum == pytest.approx(min_e)
-    assert entry.limit.maximum == pytest.approx(max_e)
-
-    assert min_e in entry.energies.root
-
-    ec = entry.energies.root[min_e]
-    assert ec.low == pytest.approx(min_e)
-    assert ec.high == pytest.approx(max_e)
-
-    assert isinstance(ec.poly, np.poly1d)
-    expected = np.poly1d(coeffs)(150.0)
-    assert ec.poly(150.0) == pytest.approx(expected)
+def test_configured_energy_motor_lookup_is_static(
+    configured_energy_motor_lookup: ConfiguredEnergyMotorLookup,
+) -> None:
+    before_update_lut = configured_energy_motor_lookup.lut
+    configured_energy_motor_lookup.update_lookup_table()
+    after_update_lut = configured_energy_motor_lookup.lut
+    assert before_update_lut == after_update_lut
 
 
-def test_make_phase_tables_multiple_entries() -> None:
-    pols = [Pol.LH, Pol.LV]
-    min_energies = [100.0, 200.0]
-    max_energies = [150.0, 250.0]
-    poly_params = [[1.0, 0.0], [0.5, 1.0]]
-
-    lut = make_phase_tables(
-        pols=pols,
-        min_energies=min_energies,
-        max_energies=max_energies,
-        poly1d_params=poly_params,
-    )
-
-    for i, pol in enumerate(pols):
+def test_make_phase_tables_multiple_entries(
+    config: Config,
+    configured_energy_motor_lookup: ConfiguredEnergyMotorLookup,
+) -> None:
+    for i, pol in enumerate(config.polarisations):
         key = pol
-        assert key in lut.root
-        entry = lut.root[key]
-        assert entry.limit.minimum == pytest.approx(min_energies[i])
-        assert entry.limit.maximum == pytest.approx(max_energies[i])
+        assert key in configured_energy_motor_lookup.lut.root
+        entry = configured_energy_motor_lookup.lut.root[key]
+        assert entry.limit.minimum == pytest.approx(config.min_energies[i])
+        assert entry.limit.maximum == pytest.approx(config.max_energies[i])
 
-        assert min_energies[i] in entry.energies.root
-        poly = entry.energies.root[min_energies[i]].poly
+        assert config.min_energies[i] in entry.energies.root
+        poly = entry.energies.root[config.min_energies[i]].poly
         assert isinstance(poly, np.poly1d)
 
-        test_energy = (min_energies[i] + max_energies[i]) / 2.0
+        test_energy = (config.min_energies[i] + config.max_energies[i]) / 2.0
         assert poly(test_energy) == pytest.approx(
-            np.poly1d(poly_params[i])(test_energy)
+            np.poly1d(config.polys[i])(test_energy)
         )
-
-
-class DummyEnergyMotorLookup(AbstractEnergyMotorLookup):
-    """Concrete test subclass that generates a pre determined basic lookup table"""
-
-    def update_lookup_table(self) -> None:
-        self.lut = generate_lookup_table(
-            pol=Pol.LH,
-            min_energy=100.0,
-            max_energy=200.0,
-            poly1d_param=[2.0, -1.0, 0.5],
-        )
-        self.available_pol = list(self.lut.root.keys())
 
 
 @pytest.fixture
@@ -92,11 +81,6 @@ def lut_config() -> LookupTableConfig:
     )
 
 
-@pytest.fixture
-def dummy_energy_motor_lookup() -> DummyEnergyMotorLookup:
-    return DummyEnergyMotorLookup()
-
-
 def test_read_file_and_skip_basic() -> None:
     content = (
         "# this is a comment line\n"
@@ -104,7 +88,6 @@ def test_read_file_and_skip_basic() -> None:
         "# another comment\n"
         "data_line_2,4,5,6\n"
     )
-
     lines = list(read_file_and_skip(content))
     assert lines == ["data_line_1,1,2,3\n", "data_line_2,4,5,6\n"]
 
@@ -128,13 +111,12 @@ def test_convert_csv_to_lookup_overwrite_name_convert_default(
     assert poly_lv(250.0) == pytest.approx(np.poly1d([1.0, 0.0])(250.0))
 
 
-def test_lookup_table_is_serialisable() -> None:
-    lut = generate_lookup_table(
-        pol=Pol.LH, min_energy=100, max_energy=200, poly1d_param=[2.0, -1.0, 0.5]
-    )
+def test_lookup_table_is_serialisable(
+    configured_energy_motor_lookup: ConfiguredEnergyMotorLookup,
+) -> None:
     # There should be no errors when calling the below functions
-    lut.model_dump()
-    lut.model_dump_json()
+    configured_energy_motor_lookup.lut.model_dump()
+    configured_energy_motor_lookup.lut.model_dump_json()
 
 
 async def test_bad_file_contents_causes_convert_csv_to_lookup_fails(

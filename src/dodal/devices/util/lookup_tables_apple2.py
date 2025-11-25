@@ -270,14 +270,6 @@ def generate_lookup_table_entry(
 
 
 def generate_lookup_table(
-    pol: Pol, min_energy: float, max_energy: float, poly1d_param: list[float]
-) -> LookupTable:
-    return LookupTable(
-        {pol: generate_lookup_table_entry(min_energy, max_energy, poly1d_param)}
-    )
-
-
-def make_phase_tables(
     pols: list[Pol],
     min_energies: list[float],
     max_energies: list[float],
@@ -292,7 +284,6 @@ def make_phase_tables(
             max_energy=max_energies[i],
             poly1d_param=poly1d_params[i],
         )
-
     return lookuptable_phase
 
 
@@ -385,39 +376,14 @@ class FileReadingEnergyMotorLookup(AbstractEnergyMotorLookup):
         self.available_pol = list(self.lut.root.keys())
 
 
-class GeneratePoly1DFromFileEnergyMotorLookup(FileReadingEnergyMotorLookup):
-    """Generate a LookupTable using configured poly 1d parameters"""
+class ConfiguredEnergyMotorLookup(AbstractEnergyMotorLookup):
+    """Static LookupTable used for converting energy and polarisation to gap and phase."""
 
-    def __init__(
-        self,
-        config_client: ConfigServer,
-        lut_config: LookupTableConfig,
-        path: Path,
-        poly_1d_parameters: dict[Pol, list[float]] = DEFAULT_POLY1D_PARAMETERS,
-    ):
-        """
-        Parameters:
-        -----------
-        config_client:
-            The config server client to fetch the look up table data.
-        lut_config:
-            Configuration that defines how to process file contents into a LookupTable
-        path:
-            File path to the gap lookup table.
-        poly_1d_parameters:
-            The poly configuration used to build a LookupTable
-        """
-        self.poly_1d_parameters = poly_1d_parameters
-        super().__init__(config_client, lut_config, path)
+    def __init__(self, lut: LookupTable):
+        super().__init__()
+        self.lut = lut
+        self.available_pol = list(self.lut.root.keys())
 
     def update_lookup_table(self):
-        self.lut = LookupTable()
-        base_lut = self.read_lut()
-        for key in base_lut.root.keys():
-            if key is not None:
-                self.lut.root[key] = generate_lookup_table_entry(
-                    min_energy=base_lut.root[key].limit.minimum,
-                    max_energy=base_lut.root[key].limit.maximum,
-                    poly1d_param=(self.poly_1d_parameters[key]),
-                )
-        self.available_pol = list(self.lut.root.keys())
+        """Do nothing as LookupTable provided as configuration, no update required."""
+        pass
