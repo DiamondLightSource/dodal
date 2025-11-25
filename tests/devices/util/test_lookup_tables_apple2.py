@@ -11,8 +11,6 @@ from dodal.devices.util.lookup_tables_apple2 import (
     read_file_and_skip,
 )
 
-pytest_plugins = ["dodal.testing.fixtures.devices.apple2"]
-
 
 def test_generate_lookup_table_structure_and_poly() -> None:
     min_e = 100.0
