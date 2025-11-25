@@ -597,6 +597,12 @@ def test_make_stepped_list_when_given_wrong_number_of_params():
         _make_stepped_list(params=[1])
 
 
+def test_make_stepped_list_when_given_step_larger_than_range():
+    stepped_list, stepped_list_length = _make_stepped_list(params=[1, 2, 3])
+    assert stepped_list_length == 2
+    assert stepped_list == [1, 2]
+
+
 @pytest.mark.parametrize(
     "x_args, y_args, final_shape, final_length",
     (
