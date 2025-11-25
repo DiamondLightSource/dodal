@@ -4,6 +4,7 @@ from dodal.devices.apple2_undulator import (
     Apple2PhasesVal,
     Apple2Val,
     EnergyMotorConvertor,
+    UndulatorPhaseAxes,
 )
 from dodal.log import LOGGER
 
@@ -15,7 +16,7 @@ ALPHA_OFFSET = 180
 MAXIMUM_MOVE_TIME = 550  # There is no useful movements take longer than this.
 
 
-class I17Apple2Controller(Apple2Controller[Apple2]):
+class I17Apple2Controller(Apple2Controller[Apple2[UndulatorPhaseAxes]]):
     """
     I10Apple2Controller is a extension of Apple2Controller which provide linear
     arbitrary angle control.
@@ -34,7 +35,6 @@ class I17Apple2Controller(Apple2Controller[Apple2]):
         """
         Set the undulator motors for a given energy and polarisation.
         """
-
         pol = await self._check_and_get_pol_setpoint()
         gap, phase = self.energy_to_motor_converter(energy=value, pol=pol)
         id_set_val = Apple2Val(
@@ -46,6 +46,5 @@ class I17Apple2Controller(Apple2Controller[Apple2]):
                 btm_outer="0.0",
             ),
         )
-
         LOGGER.info(f"Setting polarisation to {pol}, with values: {id_set_val}")
         await self.apple2().set(id_motor_values=id_set_val)
