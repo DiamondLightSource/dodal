@@ -299,13 +299,10 @@ def make_phase_tables(
 class AbstractEnergyMotorLookup:
     """
     Handles lookup tables for Apple2 ID, converting energy and polarisation to gap
-    and phase. Fetches and parses lookup tables from a config server, supports dynamic
-    updates, and validates input. If custom logic is required for lookup tables, sub
-    classes should override the _update_gap_lut and _update_phase_lut methods.
+    and phase.
 
-    After update_lookuptable() has populated the 'gap' and 'phase' tables,
-    `get_motor_from_energy()` can be used to compute (gap, phase) for a requested
-    (energy, pol) pair.
+    After update_lut() has populated the lookup table, `get_motor_from_energy()` can be
+    used to compute gap / phase for a requested energy and polarisation pair.
     """
 
     def __init__(self) -> None:
@@ -314,7 +311,7 @@ class AbstractEnergyMotorLookup:
 
     @abstractmethod
     def update_lut(self):
-        pass
+        """Sub classes must define a way to update the lookup table"""
 
     @property
     def available_pol(self) -> list[Pol]:
@@ -352,14 +349,16 @@ TAbstractEnergyMotorLookup = TypeVar(
 
 
 class FileReadingEnergyMotorLookup(AbstractEnergyMotorLookup):
+    """Fetches and parses lookup table from a config server, supports dynamic
+    updates, and validates input."""
+
     def __init__(
         self,
         config_client: ConfigServer,
         lut_config: LookupTableConfig,
         path: Path,
     ):
-        """Initialise the EnergyMotorLookup class with lookup table headers provided.
-
+        """
         Parameters:
         -----------
         config_client:
@@ -387,6 +386,8 @@ class FileReadingEnergyMotorLookup(AbstractEnergyMotorLookup):
 
 
 class GeneratePoly1DFromFileEnergyMotorLookup(FileReadingEnergyMotorLookup):
+    """Generate a LookupTable using configured poly 1d parameters"""
+
     def __init__(
         self,
         config_client: ConfigServer,
@@ -394,8 +395,7 @@ class GeneratePoly1DFromFileEnergyMotorLookup(FileReadingEnergyMotorLookup):
         path: Path,
         poly_1d_parameters: dict[Pol, list[float]] = DEFAULT_POLY1D_PARAMETERS,
     ):
-        """Initialise the EnergyMotorLookup class with lookup table headers provided.
-
+        """
         Parameters:
         -----------
         config_client:
@@ -404,6 +404,8 @@ class GeneratePoly1DFromFileEnergyMotorLookup(FileReadingEnergyMotorLookup):
             Configuration that defines how to process file contents into a LookupTable
         path:
             File path to the gap lookup table.
+        poly_1d_parameters:
+            The poly configuration used to build a LookupTable
         """
         self.poly_1d_parameters = poly_1d_parameters
         super().__init__(config_client, lut_config, path)
