@@ -13,6 +13,7 @@ from dodal.devices.aperturescatterguard import (
 )
 from dodal.devices.attenuator.attenuator import BinaryFilterAttenuator
 from dodal.devices.backlight import Backlight
+from dodal.devices.baton import Baton
 from dodal.devices.detector import DetectorParams
 from dodal.devices.detector.detector_motion import DetectorMotion
 from dodal.devices.diamond_filter import DiamondFilter, I04Filters
@@ -143,11 +144,19 @@ def transfocator() -> Transfocator:
 
 
 @device_factory()
+def baton() -> Baton:
+    """Get the i04 baton device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i04, it will return the existing object.
+    """
+    return Baton(f"{PREFIX.beamline_prefix}-CS-BATON-01:")
+
+
+@device_factory()
 def xbpm_feedback() -> XBPMFeedback:
     """Get the i04 xbpm_feedback device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
     """
-    return XBPMFeedback(f"{PREFIX.beamline_prefix}-EA-FDBK-01:")
+    return XBPMFeedback(f"{PREFIX.beamline_prefix}-EA-FDBK-01:", baton=baton())
 
 
 @device_factory()
@@ -236,6 +245,7 @@ def undulator() -> UndulatorInKeV:
     return UndulatorInKeV(
         prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:",
         id_gap_lookup_table_path="/dls_sw/i04/software/daq_configuration/lookup/BeamLine_Undulator_toGap.txt",
+        baton=baton(),
     )
 
 
