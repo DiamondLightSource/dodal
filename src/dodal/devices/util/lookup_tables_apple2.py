@@ -66,7 +66,7 @@ ROW_PHASE_CIRCULAR = 15
 MAXIMUM_ROW_PHASE_MOTOR_POSITION = 24.0
 MAXIMUM_GAP_MOTOR_POSITION = 100
 
-PhasePoly1dParameters = {
+PhASE_POLY1D_PARAMETERS = {
     Pol.LH: [0],
     Pol.LV: [MAXIMUM_ROW_PHASE_MOTOR_POSITION],
     Pol.PC: [ROW_PHASE_CIRCULAR],
@@ -388,7 +388,7 @@ class EnergyMotorLookup:
                 self.lookup_tables.phase.root[key] = generate_lookup_table_entry(
                     min_energy=self.lookup_tables.gap.root[key].limit.minimum,
                     max_energy=self.lookup_tables.gap.root[key].limit.maximum,
-                    poly1d_param=(PhasePoly1dParameters[key]),
+                    poly1d_param=(PhASE_POLY1D_PARAMETERS[key]),
                 )
 
     def get_motor_from_energy(self, energy: float, pol: Pol) -> tuple[float, float]:

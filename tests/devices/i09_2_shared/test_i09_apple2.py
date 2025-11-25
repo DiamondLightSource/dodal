@@ -38,6 +38,11 @@ from tests.devices.i09_2_shared.test_data import (
     TEST_SOFT_UNDULATOR_LUT,
 )
 
+pytest_plugins = [
+    "tests.devices.util.test_lookup_tables_apple2",
+    "tests.devices.test_apple2_undulator",
+]
+
 
 @pytest.fixture
 def mock_j09_energy_motor_lookup(
