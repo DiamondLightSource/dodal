@@ -1,5 +1,3 @@
-from unittest.mock import MagicMock
-
 import numpy as np
 import pytest
 from daq_config_server.client import ConfigServer
@@ -13,6 +11,8 @@ from dodal.devices.util.lookup_tables_apple2 import (
     make_phase_tables,
     read_file_and_skip,
 )
+
+pytest_plugins = ["dodal.testing.fixtures.apple2"]
 
 
 def test_generate_lookup_table_structure_and_poly() -> None:
@@ -93,21 +93,6 @@ def lut_config() -> LookupTableConfig:
         poly_deg=["c1", "c0"],
         mode_name_convert={"hl": "lh", "vl": "lv"},
     )
-
-
-@pytest.fixture
-def mock_config_client() -> ConfigServer:
-    mock_config_client = ConfigServer()
-
-    mock_config_client.get_file_contents = MagicMock(spec=["get_file_contents"])
-
-    def my_side_effect(file_path, reset_cached_result) -> str:
-        assert reset_cached_result is True
-        with open(file_path) as f:
-            return f.read()
-
-    mock_config_client.get_file_contents.side_effect = my_side_effect
-    return mock_config_client
 
 
 @pytest.fixture

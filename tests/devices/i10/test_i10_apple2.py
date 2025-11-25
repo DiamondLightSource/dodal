@@ -54,10 +54,7 @@ from tests.devices.i10.test_data import (
     ID_ENERGY_2_PHASE_CALIBRATIONS_CSV,
 )
 
-pytest_plugins = [
-    "tests.devices.util.test_lookup_tables_apple2",
-    "tests.devices.test_apple2_undulator",
-]
+pytest_plugins = ["dodal.testing.fixtures.apple2"]
 
 
 @pytest.fixture
