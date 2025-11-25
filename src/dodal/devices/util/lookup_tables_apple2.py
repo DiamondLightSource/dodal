@@ -277,14 +277,14 @@ def generate_lookup_table(
 ) -> LookupTable:
     """Generate a dictionary containing multiple lookuptable entries
     for provided polarisations."""
-    lookuptable_phase = LookupTable()
+    lut = LookupTable()
     for i in range(len(pols)):
-        lookuptable_phase.root[pols[i]] = generate_lookup_table_entry(
+        lut.root[pols[i]] = generate_lookup_table_entry(
             min_energy=min_energies[i],
             max_energy=max_energies[i],
             poly1d_param=poly1d_params[i],
         )
-    return lookuptable_phase
+    return lut
 
 
 class AbstractEnergyMotorLookup:
