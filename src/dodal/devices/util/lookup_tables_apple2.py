@@ -386,10 +386,12 @@ class FileReadingEnergyMotorLookup(AbstractEnergyMotorLookup):
         self.available_pol = list(self.lut.root.keys())
 
 
-class GeneratePoly1DFromFileEnergyMotorLookup(AbstractEnergyMotorLookup):
+class GeneratePoly1DFromFileEnergyMotorLookup(FileReadingEnergyMotorLookup):
     def __init__(
         self,
-        file_reading_energy_motor_lut: FileReadingEnergyMotorLookup,
+        config_client: ConfigServer,
+        lut_config: LookupTableConfig,
+        path: Path,
         poly_1d_parameters: dict[Pol, list[float]] = DEFAULT_POLY1D_PARAMETERS,
     ):
         """Initialise the EnergyMotorLookup class with lookup table headers provided.
@@ -404,12 +406,11 @@ class GeneratePoly1DFromFileEnergyMotorLookup(AbstractEnergyMotorLookup):
             File path to the gap lookup table.
         """
         self.poly_1d_parameters = poly_1d_parameters
-        self.file_reading_energy_motor_lut = file_reading_energy_motor_lut
-        super().__init__()
+        super().__init__(config_client, lut_config, path)
 
     def update_lut(self):
         self.lut = LookupTable()
-        base_lut = self.file_reading_energy_motor_lut.read_lut()
+        base_lut = self.read_lut()
         for key in base_lut.root.keys():
             if key is not None:
                 self.lut.root[key] = generate_lookup_table_entry(
