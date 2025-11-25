@@ -27,7 +27,7 @@ J09_POLY_DEG = [
 class J09Apple2Controller(Apple2Controller[Apple2[UndulatorPhaseAxes]]):
     def __init__(
         self,
-        apple2: Apple2,
+        apple2: Apple2[UndulatorPhaseAxes],
         gap_energy_motor_lut: AbstractEnergyMotorLookup,
         phase_energy_motor_lut: AbstractEnergyMotorLookup,
         units: str = "keV",

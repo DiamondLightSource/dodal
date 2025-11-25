@@ -24,7 +24,7 @@ class I17Apple2Controller(Apple2Controller[Apple2[UndulatorPhaseAxes]]):
 
     def __init__(
         self,
-        apple2: Apple2,
+        apple2: Apple2[UndulatorPhaseAxes],
         energy_to_motor_converter: EnergyMotorConvertor,
         name: str = "",
     ) -> None:
