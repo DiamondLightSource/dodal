@@ -245,7 +245,7 @@ def test_num_scan_with_two_axes_and_independent_trajectories(
 @pytest.mark.parametrize(
     "x_args, y_args", ([[-1.1, 1.1, 5], [2.2, -2.2, 3]], [[0, 1.1, 5], [2.2, 3.3, 5]])
 )
-def test_num_scan_with_two_axes_and_independent_trajectories_when_snaking(
+def test_num_scan_with_two_axes_and_independent_trajectories_when_not_snaking(
     run_engine: RunEngine,
     det: StandardDetector,
     x_axis: Motor,
@@ -255,7 +255,7 @@ def test_num_scan_with_two_axes_and_independent_trajectories_when_snaking(
 ):
     run_engine(
         num_scan(
-            detectors=[det], params={x_axis: x_args, y_axis: y_args}, snake_axes=True
+            detectors=[det], params={x_axis: x_args, y_axis: y_args}, snake_axes=False
         )
     )
 
@@ -361,7 +361,7 @@ def test_num_rscan_with_two_axes_and_independent_trajectories(
 @pytest.mark.parametrize(
     "x_args, y_args", ([[-1.1, 1.1, 5], [2.2, -2.2, 3]], [[0, 1.1, 5], [2.2, 3.3, 5]])
 )
-def test_num_rscan_with_two_axes_and_independent_trajectories_when_snaking(
+def test_num_rscan_with_two_axes_and_independent_trajectories_when_not_snaking(
     run_engine: RunEngine,
     det: StandardDetector,
     x_axis: Motor,
@@ -371,7 +371,7 @@ def test_num_rscan_with_two_axes_and_independent_trajectories_when_snaking(
 ):
     run_engine(
         num_rscan(
-            detectors=[det], params={x_axis: x_args, y_axis: y_args}, snake_axes=True
+            detectors=[det], params={x_axis: x_args, y_axis: y_args}, snake_axes=False
         )
     )
 
@@ -603,6 +603,11 @@ def test_make_stepped_list_when_given_step_larger_than_range():
     assert stepped_list == [1, 2]
 
 
+def test_make_stepped_list_fails_when_given_equal_start_and_stop_values():
+    with pytest.raises(ValueError):
+        _make_stepped_list(params=[1.1, 1.1, 0.25])
+
+
 @pytest.mark.parametrize(
     "x_args, y_args, final_shape, final_length",
     (
@@ -699,7 +704,7 @@ def test_step_scan_with_multiple_axes_and_independent_trajectories(
         [[-1, 1, 0.25], [1, -1, -0.5]],
     ),
 )
-def test_step_scan_with_multiple_axes_and_independent_trajectories_when_snaking(
+def test_step_scan_with_multiple_axes_and_independent_trajectories_when_not_snaking(
     run_engine: RunEngine,
     det: StandardDetector,
     x_axis: Motor,
@@ -709,7 +714,7 @@ def test_step_scan_with_multiple_axes_and_independent_trajectories_when_snaking(
 ):
     run_engine(
         step_scan(
-            detectors=[det], params={x_axis: x_args, y_axis: y_args}, snake_axes=True
+            detectors=[det], params={x_axis: x_args, y_axis: y_args}, snake_axes=False
         )
     )
 
@@ -780,7 +785,7 @@ def test_step_rscan_with_multiple_axes_and_independent_trajectories(
         [[-1, 1, 0.25], [1, -1, -0.5]],
     ),
 )
-def test_step_rscan_with_multiple_axes_and_independent_trajectories_when_snaking(
+def test_step_rscan_with_multiple_axes_and_independent_trajectories_when_not_snaking(
     run_engine: RunEngine,
     det: StandardDetector,
     x_axis: Motor,
@@ -790,7 +795,7 @@ def test_step_rscan_with_multiple_axes_and_independent_trajectories_when_snaking
 ):
     run_engine(
         step_rscan(
-            detectors=[det], params={x_axis: x_args, y_axis: y_args}, snake_axes=True
+            detectors=[det], params={x_axis: x_args, y_axis: y_args}, snake_axes=False
         )
     )
 
