@@ -208,24 +208,21 @@ class EigerDetector(Device, Stageable):
             if enable
             else self.detector_params.detector_size_constants.det_size_pixels
         )
-
-        self.cam.roi_mode.set(
+        status = self.cam.roi_mode.set(
             1 if enable else 0, timeout=self.timeouts.general_status_timeout
-        ).wait(timeout=self.timeouts.general_status_timeout)
-        self.odin.file_writer.image_height.set(
+        )
+        status &= self.odin.file_writer.image_height.set(
             detector_dimensions.height, timeout=self.timeouts.general_status_timeout
-        ).wait(timeout=self.timeouts.general_status_timeout)
-        self.odin.file_writer.image_width.set(
-            detector_dimensions.width, timeout=self.timeouts.general_status_timeout
-        ).wait(timeout=self.timeouts.general_status_timeout)
-        self.odin.file_writer.num_row_chunks.set(
-            detector_dimensions.height, timeout=self.timeouts.general_status_timeout
-        ).wait(timeout=self.timeouts.general_status_timeout)
-        status = self.odin.file_writer.num_col_chunks.set(
+        )
+        status &= self.odin.file_writer.image_width.set(
             detector_dimensions.width, timeout=self.timeouts.general_status_timeout
         )
-        LOGGER.info("Done")
-
+        status &= self.odin.file_writer.num_row_chunks.set(
+            detector_dimensions.height, timeout=self.timeouts.general_status_timeout
+        )
+        status &= self.odin.file_writer.num_col_chunks.set(
+            detector_dimensions.width, timeout=self.timeouts.general_status_timeout
+        )
         return status
 
     def set_cam_pvs(self) -> AndStatus:
@@ -287,24 +284,25 @@ class EigerDetector(Device, Stageable):
         beam_x_pixels, beam_y_pixels = self.detector_params.get_beam_position_pixels(
             self.detector_params.detector_distance
         )
-        self.cam.beam_center_x.set(
+        status = self.cam.beam_center_x.set(
             beam_x_pixels, timeout=self.timeouts.general_status_timeout
-        ).wait(timeout=self.timeouts.general_status_timeout)
-        self.cam.beam_center_y.set(
+        )
+        status &= self.cam.beam_center_y.set(
             beam_y_pixels, timeout=self.timeouts.general_status_timeout
-        ).wait(timeout=self.timeouts.general_status_timeout)
-        self.cam.det_distance.set(
+        )
+        status &= self.cam.det_distance.set(
             self.detector_params.detector_distance,
             timeout=self.timeouts.general_status_timeout,
-        ).wait(timeout=self.timeouts.general_status_timeout)
-        self.cam.omega_start.set(
+        )
+        status &= self.cam.omega_start.set(
             self.detector_params.omega_start,
             timeout=self.timeouts.general_status_timeout,
-        ).wait(timeout=self.timeouts.general_status_timeout)
-        status = self.cam.omega_incr.set(
+        )
+        status &= self.cam.omega_incr.set(
             self.detector_params.omega_increment,
             timeout=self.timeouts.general_status_timeout,
         )
+
         return status
 
     def set_detector_threshold(self, energy: float, tolerance: float = 0.1) -> Status:
