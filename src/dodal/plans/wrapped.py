@@ -96,7 +96,7 @@ def num_scan(
             "numN]}'."
         ),
     ],
-    snake_axes: list | bool | None = None,
+    snake_axes: list | bool = True,
     metadata: dict[str, Any] | None = None,
 ) -> MsgGenerator:
     """Scan over concurrent or independent multi-motor trajectories.
@@ -134,7 +134,7 @@ def num_rscan(
             "numN]}'."
         ),
     ],
-    snake_axes: list | bool | None = None,
+    snake_axes: list | bool = True,
     metadata: dict[str, Any] | None = None,
 ) -> MsgGenerator:
     """Scan over concurrent or independent trajectories relative to current position.
@@ -184,7 +184,7 @@ def list_scan(
         ),
     ],
     grid: bool = False,
-    snake_axes: bool = False,  # Currently specifying axes to snake is not supported
+    snake_axes: bool = True,  # Currently specifying axes to snake is not supported
     metadata: dict[str, Any] | None = None,
 ) -> MsgGenerator:
     """Scan over concurrent or independent trajectories relative to current position.
@@ -223,7 +223,7 @@ def list_rscan(
         ),
     ],
     grid: bool = False,
-    snake_axes: bool = False,  # Currently specifying axes to snake is not supported
+    snake_axes: bool = True,  # Currently specifying axes to snake is not supported
     metadata: dict[str, Any] | None = None,
 ) -> MsgGenerator:
     """Scan over concurrent or independent trajectories relative to current position.
@@ -257,6 +257,10 @@ def _make_stepped_list(
     if len(params) == 3:
         stop = params[1]
         step = params[2]
+        if start == stop:
+            raise ValueError(
+                f"Start ({start}) and stop ({stop}) values cannot be the same."
+            )
         if abs(step) > abs(stop - start):
             step = stop - start
         step = abs(step) * np.sign(stop - start)
@@ -339,7 +343,7 @@ def step_scan(
             "[startN, stopN, stepN]}'."
         ),
     ],
-    snake_axes: bool = False,  # Currently specifying axes to snake is not supported
+    snake_axes: bool = True,  # Currently specifying axes to snake is not supported
     metadata: dict[str, Any] | None = None,
 ) -> MsgGenerator:
     """Scan over multi-motor trajectories with specified step size.
@@ -378,7 +382,7 @@ def step_rscan(
             "[startN, stopN, stepN]}'."
         ),
     ],
-    snake_axes: bool = False,  # Currently specifying axes to snake is not supported
+    snake_axes: bool = True,  # Currently specifying axes to snake is not supported
     metadata: dict[str, Any] | None = None,
 ) -> MsgGenerator:
     """Scan over multi-motor trajectories with specified step size.
