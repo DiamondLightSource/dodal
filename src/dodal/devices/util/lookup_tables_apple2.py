@@ -147,7 +147,7 @@ def convert_csv_to_lookup(
     LookupTable
     """
 
-    def process_row(row: dict, lut: LookupTable):
+    def process_row(row: dict, lut: LookupTable) -> None:
         """Process a single row from the CSV file and update the lookup table."""
         mode_value = str(row[lut_config.mode]).lower()
         if mode_value in lut_config.mode_name_convert:
@@ -162,7 +162,6 @@ def convert_csv_to_lookup(
                 max_energy=float(row[lut_config.max_energy]),
                 poly1d_param=coefficients,
             )
-
         else:
             lut.root[mode_value].energies.root[float(row[lut_config.min_energy])] = (
                 EnergyCoverageEntry(
@@ -181,7 +180,6 @@ def convert_csv_to_lookup(
             lut.root[mode_value].limit.maximum,
             float(row[lut_config.max_energy]),
         )
-        return lut
 
     reader = csv.DictReader(read_file_and_skip(file_contents, skip_line_start_with))
     lut = LookupTable()
