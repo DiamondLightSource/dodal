@@ -16,7 +16,8 @@ from dodal.devices.apple2_undulator import (
 )
 from dodal.devices.i09.enums import Grating
 from dodal.devices.i09_2_shared.i09_apple2 import (
-    J09_POLY_DEG,
+    J09_GAP_POLY_DEG_COLUMNS,
+    J09_PHASE_POLY_DEG_COLUMNS,
     J09Apple2Controller,
 )
 from dodal.devices.pgm import PlaneGratingMonochromator
@@ -83,12 +84,12 @@ def jid_controller() -> J09Apple2Controller:
     return J09Apple2Controller(
         apple2=jid(),
         gap_energy_motor_lut=FileReadingEnergyMotorLookup(
-            lut_config=LookupTableConfig(poly_deg=J09_POLY_DEG),
+            lut_config=LookupTableConfig(poly_deg=J09_GAP_POLY_DEG_COLUMNS),
             config_client=J09_CONF_CLIENT,
             path=Path(LOOK_UPTABLE_DIR, GAP_LOOKUP_FILE_NAME),
         ),
         phase_energy_motor_lut=FileReadingEnergyMotorLookup(
-            lut_config=LookupTableConfig(poly_deg=["0th-order"]),
+            lut_config=LookupTableConfig(poly_deg=J09_PHASE_POLY_DEG_COLUMNS),
             config_client=J09_CONF_CLIENT,
             path=Path(LOOK_UPTABLE_DIR, PHASE_LOOKUP_FILE_NAME),
         ),

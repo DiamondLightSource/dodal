@@ -312,7 +312,7 @@ class AbstractEnergyMotorLookup:
     def available_pol(self, value: list[Pol]) -> None:
         self._available_pol = value
 
-    def get_motor_from_energy(self, energy: float, pol: Pol) -> tuple[float, float]:
+    def get_motor_from_energy(self, energy: float, pol: Pol) -> float:
         """
         Convert energy and polarisation to gap and phase motor positions.
 

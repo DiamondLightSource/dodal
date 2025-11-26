@@ -398,7 +398,7 @@ class Apple2(StandardReadable, Movable[Apple2Val], Generic[PhaseAxesType]):
 
 
 class EnergyMotorConvertor(Protocol):
-    def __call__(self, energy: float, pol: Pol) -> tuple[float, float]:
+    def __call__(self, energy: float, pol: Pol) -> float:
         """Protocol to provide energy to motor position conversion"""
         ...
 
@@ -429,8 +429,8 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
 
     Abstract Methods
     ----------------
-    _set_motors_from_energy(value: float) -> None
-        Abstract method to set motor positions for a given energy and polarisation.
+    _id_set_value(gap: float, phase: float, pol: Pol) -> Apple2Val
+        Abstract method to return the Apple2Val used to set the apple2 with.
     Notes
     -----
     - Subclasses must implement `_set_motors_from_energy` for beamline-specific logic.
@@ -443,6 +443,8 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
     def __init__(
         self,
         apple2: Apple2Type,
+        gap_energy_motor_converter: EnergyMotorConvertor,
+        phase_energy_motor_converter: EnergyMotorConvertor,
         units: str = "eV",
         name: str = "",
     ) -> None:
@@ -456,6 +458,8 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
             Name of the device.
         """
         self.apple2 = Reference(apple2)
+        self.gap_energy_motor_converter = gap_energy_motor_converter
+        self.phase_energy_motor_converter = phase_energy_motor_converter
 
         # Store the set energy for readback.
         self._energy, self._energy_set = soft_signal_r_and_setter(
@@ -474,10 +478,11 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
         self.polarisation_setpoint, self._polarisation_setpoint_set = (
             soft_signal_r_and_setter(Pol)
         )
+        phase = self.apple2().phase()
         # check if undulator phase is unlocked.
-        if isinstance(self.apple2().phase(), UndulatorPhaseAxes):
-            top_inner = self.apple2().phase().top_inner.user_readback
-            btm_outer = self.apple2().phase().btm_outer.user_readback
+        if isinstance(phase, UndulatorPhaseAxes):
+            top_inner = phase.top_inner.user_readback
+            btm_outer = phase.btm_outer.user_readback
         else:
             # If locked phase axes make the locked phase 0.
             top_inner = btm_outer = soft_signal_rw(float, initial_value=0.0)
@@ -489,24 +494,37 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
                 raw_to_derived=self._read_pol,
                 set_derived=self._set_pol,
                 pol=self.polarisation_setpoint,
-                top_outer=self.apple2().phase().top_outer.user_readback,
+                top_outer=phase.top_outer.user_readback,
                 top_inner=top_inner,
-                btm_inner=self.apple2().phase().btm_inner.user_readback,
+                btm_inner=phase.btm_inner.user_readback,
                 btm_outer=btm_outer,
                 gap=self.apple2().gap().user_readback,
             )
         super().__init__(name)
 
     @abc.abstractmethod
-    async def _set_motors_from_energy(self, value: float) -> None:
+    def _id_set_value(self, gap: float, phase: float, pol: Pol) -> Apple2Val:
         """
         This method should be implemented by the beamline specific ID class as the
         motor positions will be different for each beamline depending on the
-        undulator design and the lookup table used.
+        undulator design.
         """
 
+    async def _set_apple2(self, id_motor_values: Apple2Val, pol: Pol) -> None:
+        """ """
+        await self.apple2().set(id_motor_values=id_motor_values)
+
+    async def _set_motors_from_energy(self, value: float, pol: Pol) -> None:
+        """Set the undulator motors for a given energy and polarisation."""
+        gap = self.gap_energy_motor_converter(energy=value, pol=pol)
+        phase = self.phase_energy_motor_converter(energy=value, pol=pol)
+        id_set_val = self._id_set_value(gap, phase, pol)
+        LOGGER.info(f"Setting polarisation to {pol}, with values: {id_set_val}")
+        await self._set_apple2(id_motor_values=id_set_val, pol=pol)
+
     async def _set_energy(self, energy: float) -> None:
-        await self._set_motors_from_energy(energy)
+        pol = await self._check_and_get_pol_setpoint()
+        await self._set_motors_from_energy(energy, pol)
         self._energy_set(energy)
 
     def _read_energy(self, energy: float) -> float:
@@ -518,7 +536,6 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
         Check the polarisation setpoint and if it is NONE try to read it from
         hardware.
         """
-
         pol = await self.polarisation_setpoint.get_value()
 
         if pol == Pol.NONE:

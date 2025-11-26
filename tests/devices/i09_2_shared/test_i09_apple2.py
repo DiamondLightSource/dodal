@@ -20,7 +20,8 @@ from dodal.devices.apple2_undulator import (
     UndulatorPhaseAxes,
 )
 from dodal.devices.i09_2_shared.i09_apple2 import (
-    J09_POLY_DEG,
+    J09_GAP_POLY_DEG_COLUMNS,
+    J09_PHASE_POLY_DEG_COLUMNS,
     J09Apple2Controller,
 )
 from dodal.devices.pgm import PlaneGratingMonochromator
@@ -47,7 +48,7 @@ def mock_j09_gap_energy_motor_lookup(
     mock_config_client: ConfigServer,
 ) -> FileReadingEnergyMotorLookup:
     return FileReadingEnergyMotorLookup(
-        lut_config=LookupTableConfig(poly_deg=J09_POLY_DEG),
+        lut_config=LookupTableConfig(poly_deg=J09_GAP_POLY_DEG_COLUMNS),
         config_client=mock_config_client,
         path=Path(TEST_SOFT_GAP_UNDULATOR_LUT),
     )
@@ -58,7 +59,7 @@ def mock_j09_phase_energy_motor_lookup(
     mock_config_client: ConfigServer,
 ) -> FileReadingEnergyMotorLookup:
     return FileReadingEnergyMotorLookup(
-        lut_config=LookupTableConfig(poly_deg=["0th-order"]),
+        lut_config=LookupTableConfig(poly_deg=J09_PHASE_POLY_DEG_COLUMNS),
         config_client=mock_config_client,
         path=Path(TEST_SOFT_PHASE_UNDULATOR_LUT),
     )
