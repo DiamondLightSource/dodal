@@ -192,7 +192,7 @@ async def test_hu_energy_set_both_dcm_and_id_energy(
     )
 
 
-async def test_hu_energy_move_fails(
+async def test_hu_energy_move_energy_fails(
     run_engine: RunEngine,
     hu_energy: HardEnergy,
 ):
