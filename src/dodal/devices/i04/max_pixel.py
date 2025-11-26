@@ -15,9 +15,7 @@ class MaxPixel(StandardReadable, Triggerable):
         self.max_pixel_val, self._max_val_setter = soft_signal_r_and_setter(float)
         super().__init__(name)
 
-    async def preprocessed_data(
-        self, dist_from_x: int | None = None, dist_from_y: int | None = None
-    ):
+    async def preprocessed_data(self):
         """
         Preprocess the image array data (convert to grayscale and apply a guassian blur)
         """
@@ -31,6 +29,6 @@ class MaxPixel(StandardReadable, Triggerable):
 
     @AsyncStatus.wrap
     async def trigger(self):
-        arr = self.preprocessed_data()
+        arr = await self.preprocessed_data()
         max_val = np.max(arr)
         self._max_val_setter(max_val)
