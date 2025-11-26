@@ -69,6 +69,7 @@ class EigerDetector(Device, Stageable):
         self.beamline = beamline
         # using i03 timeouts as default
         self.timeouts = AVAILABLE_TIMEOUTS.get(beamline, AVAILABLE_TIMEOUTS["i03"])
+        self.disarming_status = None
 
     @classmethod
     def with_params(
