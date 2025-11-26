@@ -48,7 +48,7 @@ async def mock_id_controller(
     return mock_id_controller
 
 
-async def test_set_motors_from_energy_sets_correct_values(
+async def test_set_motors_from_energy_and_polarisation_sets_correct_values(
     mock_id_controller: I17Apple2Controller,
     mock_apple2: Apple2[UndulatorPhaseAxes],
 ):

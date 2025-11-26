@@ -444,7 +444,7 @@ async def test_id_polarisation_set_for_id_controller(
     assert await mock_locked_controller.polarisation.get_value() == pol
 
 
-async def test_id_controller_set_motors_from_energy_sets_correct_values(
+async def test_id_controller_energy_sets_correct_values(
     mock_locked_controller: DummyLockedApple2Controller,
     mock_locked_apple2: Apple2[UndulatorLockedPhaseAxes],
     configured_gap: float,

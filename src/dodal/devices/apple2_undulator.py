@@ -433,7 +433,7 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
         Abstract method to return the Apple2Val used to set the apple2 with.
     Notes
     -----
-    - Subclasses must implement `_set_motors_from_energy` for beamline-specific logic.
+    - Subclasses must implement `_id_set_value` for beamline-specific logic.
     - LH3 polarisation is indistinguishable from LH in hardware; special handling is provided.
     - Supports multiple polarisation modes, including linear horizontal (LH), linear vertical (LV),
       positive circular (PC), negative circular (NC), and linear arbitrary (LA).
@@ -511,20 +511,22 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
         """
 
     async def _set_apple2(self, id_motor_values: Apple2Val, pol: Pol) -> None:
-        """ """
+        """Logic to set the apple2 with the motor values. Specialised logic can also extend this method."""
         await self.apple2().set(id_motor_values=id_motor_values)
 
-    async def _set_motors_from_energy(self, value: float, pol: Pol) -> None:
+    async def _set_motors_from_energy_and_polarisation(
+        self, energy: float, pol: Pol
+    ) -> None:
         """Set the undulator motors for a given energy and polarisation."""
-        gap = self.gap_energy_motor_converter(energy=value, pol=pol)
-        phase = self.phase_energy_motor_converter(energy=value, pol=pol)
+        gap = self.gap_energy_motor_converter(energy=energy, pol=pol)
+        phase = self.phase_energy_motor_converter(energy=energy, pol=pol)
         id_set_val = self._id_set_value(gap, phase, pol)
         LOGGER.info(f"Setting polarisation to {pol}, with values: {id_set_val}")
         await self._set_apple2(id_motor_values=id_set_val, pol=pol)
 
     async def _set_energy(self, energy: float) -> None:
         pol = await self._check_and_get_pol_setpoint()
-        await self._set_motors_from_energy(energy, pol)
+        await self._set_motors_from_energy_and_polarisation(energy, pol)
         self._energy_set(energy)
 
     def _read_energy(self, energy: float) -> float:
