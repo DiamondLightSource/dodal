@@ -301,7 +301,7 @@ class AbstractEnergyMotorLookup:
         self._available_pol = []
 
     @abstractmethod
-    def update_lookup_table(self):
+    def update_lookup_table(self) -> None:
         """Sub classes must define a way to update the lookup table"""
 
     @property
@@ -365,13 +365,13 @@ class FileReadingEnergyMotorLookup(AbstractEnergyMotorLookup):
         self.lut_config = lut_config
         super().__init__()
 
-    def read_lut(self):
+    def read_lut(self) -> LookupTable:
         file_contents = self.config_client.get_file_contents(
             self.path, reset_cached_result=True
         )
         return convert_csv_to_lookup(file_contents, lut_config=self.lut_config)
 
-    def update_lookup_table(self):
+    def update_lookup_table(self) -> None:
         self.lut = self.read_lut()
         self.available_pol = list(self.lut.root.keys())
 
@@ -384,6 +384,6 @@ class ConfiguredEnergyMotorLookup(AbstractEnergyMotorLookup):
         self.lut = lut
         self.available_pol = list(self.lut.root.keys())
 
-    def update_lookup_table(self):
+    def update_lookup_table(self) -> None:
         """Do nothing as LookupTable provided as configuration, no update required."""
         pass
