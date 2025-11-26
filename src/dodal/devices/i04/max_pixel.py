@@ -6,6 +6,10 @@ from ophyd_async.epics.core import (
     epics_signal_r,
 )
 
+# kernal size describes how many of the neigbouring pixels are used for the blur,
+# higher kernal size means more of a blur effect
+KERNAL_SIZE = (7, 7)
+
 
 class MaxPixel(StandardReadable, Triggerable):
     """Gets the max pixel from the image"""
@@ -21,14 +25,11 @@ class MaxPixel(StandardReadable, Triggerable):
         """
         data = await self.array_data.get_value()
         gray_arr = cv2.cvtColor(data, cv2.COLOR_BGR2GRAY)
-        # kernal size describes how many of the neigbouring pixels are used for the blur,
-        # higher kernal size means more of a blur effect
-        kernal_size = (7, 7)
-        blurred_arr = cv2.GaussianBlur(gray_arr, kernal_size, 0)
-        return blurred_arr
+        return cv2.GaussianBlur(gray_arr, KERNAL_SIZE, 0)
 
     @AsyncStatus.wrap
     async def trigger(self):
         arr = await self.preprocessed_data()
         max_val = np.max(arr)
+        assert isinstance(max_val, int)
         self._max_val_setter(max_val)
