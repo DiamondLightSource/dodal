@@ -308,8 +308,7 @@ class EigerDetector(Device, Stageable):
                 this tolerance it is not set again. Defaults to 0.1eV.
         """
 
-        current_energy = self.cam.photon_energy.get()
-        assert isinstance(current_energy, float)
+        current_energy = float(self.cam.photon_energy.get())
         if abs(current_energy - energy) > tolerance:
             LOGGER.info(f"Setting detector threshold to {energy}")
             return self.cam.photon_energy.set(
@@ -404,6 +403,8 @@ class EigerDetector(Device, Stageable):
         functions_to_do_arm = []
         assert self.detector_params
         detector_params: DetectorParams = self.detector_params
+        if detector_params.use_roi_mode:
+            functions_to_do_arm.append(self.enable_roi_mode)
         threshold_energy = (
             detector_params.expected_energy_ev
             if detector_params.expected_energy_ev
