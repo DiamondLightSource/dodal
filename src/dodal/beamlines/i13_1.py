@@ -161,7 +161,7 @@ def panda_01() -> HDFPanda:
 @device_factory()
 def panda_02() -> HDFPanda:
     return HDFPanda(
-        prefix=f"{PREFIX.beamline_prefix}-TS-PANDA-02:",
+        prefix=f"{PREFIX.beamline_prefix}-MO-PANDA-02:",
         # path_provider=get_path_provider(),
         path_provider=static_path,
     )
