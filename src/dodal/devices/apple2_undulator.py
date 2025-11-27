@@ -429,11 +429,11 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
 
     Abstract Methods
     ----------------
-    _id_set_value(gap: float, phase: float, pol: Pol) -> Apple2Val
+    _get_apple2_value(gap: float, phase: float, pol: Pol) -> Apple2Val
         Abstract method to return the Apple2Val used to set the apple2 with.
     Notes
     -----
-    - Subclasses must implement `_id_set_value` for beamline-specific logic.
+    - Subclasses must implement `_get_apple2_value` for beamline-specific logic.
     - LH3 polarisation is indistinguishable from LH in hardware; special handling is provided.
     - Supports multiple polarisation modes, including linear horizontal (LH), linear vertical (LV),
       positive circular (PC), negative circular (NC), and linear arbitrary (LA).
@@ -503,7 +503,7 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
         super().__init__(name)
 
     @abc.abstractmethod
-    def _id_set_value(self, gap: float, phase: float, pol: Pol) -> Apple2Val:
+    def _get_apple2_value(self, gap: float, phase: float, pol: Pol) -> Apple2Val:
         """
         This method should be implemented by the beamline specific ID class as the
         motor positions will be different for each beamline depending on the
@@ -520,7 +520,7 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
         """Set the undulator motors for a given energy and polarisation."""
         gap = self.gap_energy_motor_converter(energy=energy, pol=pol)
         phase = self.phase_energy_motor_converter(energy=energy, pol=pol)
-        id_set_val = self._id_set_value(gap, phase, pol)
+        id_set_val = self._get_apple2_value(gap, phase, pol)
         LOGGER.info(f"Setting polarisation to {pol}, with values: {id_set_val}")
         await self._set_apple2(id_motor_values=id_set_val, pol=pol)
 

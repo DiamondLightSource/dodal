@@ -144,7 +144,7 @@ class I10Apple2Controller(Apple2Controller[I10Apple2]):
             await self.apple2().jaw_phase().set(0)
             await self.apple2().jaw_phase().set_move.set(1)
 
-    def _id_set_value(self, gap: float, phase: float, pol: Pol) -> Apple2Val:
+    def _get_apple2_value(self, gap: float, phase: float, pol: Pol) -> Apple2Val:
         phase3 = phase * (-1 if pol == Pol.LA else 1)
         return Apple2Val(
             gap=f"{gap:.6f}",

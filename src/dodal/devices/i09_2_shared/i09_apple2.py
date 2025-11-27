@@ -58,7 +58,7 @@ class J09Apple2Controller(Apple2Controller[Apple2[UndulatorPhaseAxes]]):
             name=name,
         )
 
-    def _id_set_value(self, gap: float, phase: float, pol: Pol) -> Apple2Val:
+    def _get_apple2_value(self, gap: float, phase: float, pol: Pol) -> Apple2Val:
         return Apple2Val(
             gap=f"{gap:.6f}",
             phase=Apple2PhasesVal(

@@ -387,7 +387,7 @@ class DummyLockedApple2Controller(Apple2Controller[Apple2[UndulatorLockedPhaseAx
             name=name,
         )
 
-    def _id_set_value(self, gap: float, phase: float, pol: Pol) -> Apple2Val:
+    def _get_apple2_value(self, gap: float, phase: float, pol: Pol) -> Apple2Val:
         return Apple2Val(
             phase=Apple2LockedPhasesVal(
                 top_outer=f"{phase:.6f}", btm_inner=f"{phase:.6f}"
