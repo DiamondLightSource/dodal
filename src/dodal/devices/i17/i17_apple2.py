@@ -48,8 +48,8 @@ class I17Apple2Controller(Apple2Controller[Apple2[UndulatorPhaseAxes]]):
         self.phase_energy_motor_lut = phase_energy_motor_lut
         super().__init__(
             apple2=apple2,
-            gap_energy_motor_converter=gap_energy_motor_lut.get_motor_from_energy,
-            phase_energy_motor_converter=phase_energy_motor_lut.get_motor_from_energy,
+            gap_energy_motor_converter=gap_energy_motor_lut.find_value_in_lookup_table,
+            phase_energy_motor_converter=phase_energy_motor_lut.find_value_in_lookup_table,
             units=units,
             name=name,
         )
