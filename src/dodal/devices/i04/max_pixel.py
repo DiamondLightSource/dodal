@@ -24,8 +24,7 @@ class MaxPixel(StandardReadable, Triggerable):
         Preprocess the image array data (convert to grayscale and apply a gaussian blur)
         Image is converted to grayscale (using a weighted mean as green contributes more to brightness)
         as we aren't interested in data relating to colour. A blur is then applied to mitigate
-        errors due to rogue hot pixels and provide smoother results for binarization of the image,
-        which in turn gives a better ellipse fit.
+        errors due to rogue hot pixels.
         """
         data = await self.array_data.get_value()
         gray_arr = cv2.cvtColor(data, cv2.COLOR_BGR2GRAY)

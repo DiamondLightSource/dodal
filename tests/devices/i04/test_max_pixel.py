@@ -58,12 +58,10 @@ test_arr = np.array(
 
 async def test_greyscale_works(max_pixel: MaxPixel):
     test_arr_shape = test_arr.shape  # (4, 3, 3)
-    print(test_arr_shape)
     set_mock_value(max_pixel.array_data, test_arr)
     await max_pixel.array_data.get_value()
     processed_data = await max_pixel._convert_to_gray_and_blur()
     processed_data_shape = processed_data.shape  # (4,3)
-    print(processed_data_shape)
 
     assert processed_data_shape[0] == test_arr_shape[0]
     assert processed_data_shape[1] == test_arr_shape[1]
