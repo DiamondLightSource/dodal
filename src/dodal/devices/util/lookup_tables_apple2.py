@@ -325,7 +325,7 @@ class EnergyMotorLookup:
 
 
 class ConfigServerEnergyMotorLookup(EnergyMotorLookup):
-    """Fetches and parses lookup table from a config server, supports dynamic
+    """Fetches and parses lookup table (csv) from a config server, supports dynamic
     updates, and validates input."""
 
     def __init__(
