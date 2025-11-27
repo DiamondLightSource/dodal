@@ -342,7 +342,7 @@ class ConfigServerEnergyMotorLookup(EnergyMotorLookup):
         lut_config:
             Configuration that defines how to process file contents into a LookupTable
         path:
-            File path to the gap lookup table.
+            File path to the lookup table.
         """
         self.path = path
         self.config_client = config_client
