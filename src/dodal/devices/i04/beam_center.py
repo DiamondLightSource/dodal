@@ -31,12 +31,40 @@ def binary_img(img, img_name="Threshold"):
     return thresh_img
 
 
+async def get_roi(image_arr, current_x, current_y, dist_from_x=100, dist_from_y=100):
+    # need to add logic to make sure that you don't accidentally reach the end of the pixel range.
+    # use the .shape method for this
+    roi_arr = image_arr[
+        current_y - dist_from_y : current_y + dist_from_y,
+        current_x - dist_from_x : current_x + dist_from_x,
+    ]
+
+    return roi_arr
+
+
 class CentreEllipseMethod(StandardReadable, Triggerable):
-    def __init__(self, prefix: str, name: str = ""):
+    """
+    Finds the centre of the beam through fitting an ellipse and extracting the centre.
+    First a ROI is taken which is taken at 100 pixels from the PVs for the previous centre.
+    Then the image is converted to a binary (see above function), after which an ellipse is
+    fitted.
+    The placeholder PVs should then be updated (but not sure if that is happening yet).
+    """
+
+    def __init__(self, prefix: str, name: str = "", overlay_channel: int = 1) -> None:
         self.array_data = epics_signal_r(np.ndarray, f"pva://{prefix}PVA:ARRAY")
+        self.current_centre_x = epics_signal_r(
+            int, f"{prefix}OVER:{overlay_channel}:CenterX"
+        ).get_value()
+        self.current_centre_y = epics_signal_r(
+            int, f"{prefix}OVER:{overlay_channel}:CenterY"
+        ).get_value()
+        self.roi_image_data = get_roi(
+            self.get_img_data(), self.current_centre_x, self.current_centre_y
+        )
         self.binary = binary_img(
-            self.get_img_data()
-        )  # does func need to be async for this
+            self.roi_image_data
+        )  # does func need to be async for this and so can't go in the init?
         self.ellipse = self.fit_ellipse()
         self.center_x_val, self._center_x_val_setter = soft_signal_r_and_setter(float)
         self.center_y_val, self._center_y_val_setter = soft_signal_r_and_setter(float)
