@@ -453,17 +453,15 @@ def collimation_table() -> CollimationTable:
     return CollimationTable(prefix=f"{PREFIX.beamline_prefix}-MO-TABLE-01")
 
 
-@device_factory()
-def beamsize() -> Beamsize:
+@devices.factory()
+def beamsize(aperture_scatterguard: ApertureScatterguard) -> Beamsize:
     """Get the i03 beamsize device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return Beamsize(
-        aperture_scatterguard=aperture_scatterguard(),
-    )
+    return Beamsize(aperture_scatterguard)
 
 
-@device_factory()
+@devices.factory()
 def ipin() -> IPin:
     """Get the i03 ipin device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
