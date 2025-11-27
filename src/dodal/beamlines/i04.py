@@ -393,9 +393,13 @@ def scintillator() -> Scintillator:
 
 @device_factory()
 def max_pixel() -> MaxPixel:
+    """Get the i04 max pixel device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i04, it will return the existing object.
+    """
     return MaxPixel(
         f"{PREFIX.beamline_prefix}-DI-OAV-01:",
-      
+    )
+
 
 @device_factory()
 def beamsize() -> Beamsize:
