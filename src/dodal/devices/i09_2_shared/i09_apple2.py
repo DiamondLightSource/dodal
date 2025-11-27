@@ -7,7 +7,7 @@ from dodal.devices.apple2_undulator import (
     Pol,
     UndulatorPhaseAxes,
 )
-from dodal.devices.util.lookup_tables_apple2 import AbstractEnergyMotorLookup
+from dodal.devices.util.lookup_tables_apple2 import EnergyMotorLookup
 
 J09_GAP_POLY_DEG_COLUMNS = [
     "9th-order",
@@ -29,8 +29,8 @@ class J09Apple2Controller(Apple2Controller[Apple2[UndulatorPhaseAxes]]):
     def __init__(
         self,
         apple2: Apple2[UndulatorPhaseAxes],
-        gap_energy_motor_lut: AbstractEnergyMotorLookup,
-        phase_energy_motor_lut: AbstractEnergyMotorLookup,
+        gap_energy_motor_lut: EnergyMotorLookup,
+        phase_energy_motor_lut: EnergyMotorLookup,
         units: str = "keV",
         name: str = "",
     ) -> None:

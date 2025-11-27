@@ -6,7 +6,7 @@ from dodal.devices.apple2_undulator import (
     Pol,
     UndulatorPhaseAxes,
 )
-from dodal.devices.util.lookup_tables_apple2 import AbstractEnergyMotorLookup
+from dodal.devices.util.lookup_tables_apple2 import EnergyMotorLookup
 
 ROW_PHASE_MOTOR_TOLERANCE = 0.004
 MAXIMUM_ROW_PHASE_MOTOR_POSITION = 24.0
@@ -25,8 +25,8 @@ class I17Apple2Controller(Apple2Controller[Apple2[UndulatorPhaseAxes]]):
     def __init__(
         self,
         apple2: Apple2[UndulatorPhaseAxes],
-        gap_energy_motor_lut: AbstractEnergyMotorLookup,
-        phase_energy_motor_lut: AbstractEnergyMotorLookup,
+        gap_energy_motor_lut: EnergyMotorLookup,
+        phase_energy_motor_lut: EnergyMotorLookup,
         units: str = "eV",
         name: str = "",
     ) -> None:

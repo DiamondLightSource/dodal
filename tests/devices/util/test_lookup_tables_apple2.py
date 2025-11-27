@@ -6,7 +6,7 @@ from pytest import FixtureRequest
 
 from dodal.devices.apple2_undulator import Pol
 from dodal.devices.util.lookup_tables_apple2 import (
-    ConfiguredEnergyMotorLookup,
+    EnergyMotorLookup,
     LookupTableConfig,
     convert_csv_to_lookup,
     generate_lookup_table,
@@ -29,8 +29,8 @@ def config(request: FixtureRequest) -> Config:
 
 
 @pytest.fixture
-def configured_energy_motor_lookup(config: Config) -> ConfiguredEnergyMotorLookup:
-    return ConfiguredEnergyMotorLookup(
+def configured_energy_motor_lookup(config: Config) -> EnergyMotorLookup:
+    return EnergyMotorLookup(
         lut=generate_lookup_table(
             pols=config.polarisations,
             min_energies=config.min_energies,
@@ -41,7 +41,7 @@ def configured_energy_motor_lookup(config: Config) -> ConfiguredEnergyMotorLooku
 
 
 def test_configured_energy_motor_lookup_is_static(
-    configured_energy_motor_lookup: ConfiguredEnergyMotorLookup,
+    configured_energy_motor_lookup: EnergyMotorLookup,
 ) -> None:
     before_update_lut = configured_energy_motor_lookup.lut
     configured_energy_motor_lookup.update_lookup_table()
@@ -51,7 +51,7 @@ def test_configured_energy_motor_lookup_is_static(
 
 def test_make_phase_tables_multiple_entries(
     config: Config,
-    configured_energy_motor_lookup: ConfiguredEnergyMotorLookup,
+    configured_energy_motor_lookup: EnergyMotorLookup,
 ) -> None:
     for i, pol in enumerate(config.polarisations):
         key = pol
@@ -112,7 +112,7 @@ def test_convert_csv_to_lookup_overwrite_name_convert_default(
 
 
 def test_lookup_table_is_serialisable(
-    configured_energy_motor_lookup: ConfiguredEnergyMotorLookup,
+    configured_energy_motor_lookup: EnergyMotorLookup,
 ) -> None:
     # There should be no errors when calling the below functions
     configured_energy_motor_lookup.lut.model_dump()

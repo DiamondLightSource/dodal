@@ -20,7 +20,7 @@ from dodal.devices.i17.i17_apple2 import I17Apple2Controller
 from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.util.lookup_tables_apple2 import (
-    ConfiguredEnergyMotorLookup,
+    EnergyMotorLookup,
     LookupTable,
 )
 from dodal.log import set_beamline as set_log_beamline
@@ -81,8 +81,8 @@ def id_controller() -> Apple2Controller:
     """I17 insertion device controller with dummy energy to motor_converter."""
     return I17Apple2Controller(
         apple2=id(),
-        gap_energy_motor_lut=ConfiguredEnergyMotorLookup(lut=LookupTable()),
-        phase_energy_motor_lut=ConfiguredEnergyMotorLookup(lut=LookupTable()),
+        gap_energy_motor_lut=EnergyMotorLookup(lut=LookupTable()),
+        phase_energy_motor_lut=EnergyMotorLookup(lut=LookupTable()),
     )
 
 

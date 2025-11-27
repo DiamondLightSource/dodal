@@ -39,7 +39,7 @@ from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.util.lookup_tables_apple2 import (
     DEFAULT_GAP_FILE,
     DEFAULT_PHASE_FILE,
-    FileReadingEnergyMotorLookup,
+    ConfigServerEnergyMotorLookup,
     LookupTableConfig,
 )
 from dodal.log import set_beamline as set_log_beamline
@@ -122,12 +122,12 @@ def idd() -> I10Apple2:
 def idd_controller() -> I10Apple2Controller:
     """I10 downstream insertion device controller."""
     source = ("Source", "idd")
-    idd_gap_energy_motor_lut = FileReadingEnergyMotorLookup(
+    idd_gap_energy_motor_lut = ConfigServerEnergyMotorLookup(
         config_client=I10_CONF_CLIENT,
         lut_config=LookupTableConfig(source=source),
         path=Path(LOOK_UPTABLE_DIR, DEFAULT_GAP_FILE),
     )
-    idd_phase_energy_motor_lut = FileReadingEnergyMotorLookup(
+    idd_phase_energy_motor_lut = ConfigServerEnergyMotorLookup(
         config_client=I10_CONF_CLIENT,
         lut_config=LookupTableConfig(source=source),
         path=Path(LOOK_UPTABLE_DIR, DEFAULT_PHASE_FILE),
@@ -196,12 +196,12 @@ def idu() -> I10Apple2:
 def idu_controller() -> I10Apple2Controller:
     """I10 upstream insertion device controller."""
     source = ("Source", "idu")
-    idu_gap_energy_motor_lut = FileReadingEnergyMotorLookup(
+    idu_gap_energy_motor_lut = ConfigServerEnergyMotorLookup(
         config_client=I10_CONF_CLIENT,
         lut_config=LookupTableConfig(source=source),
         path=Path(LOOK_UPTABLE_DIR, DEFAULT_GAP_FILE),
     )
-    idu_phase_energy_motor_lut = FileReadingEnergyMotorLookup(
+    idu_phase_energy_motor_lut = ConfigServerEnergyMotorLookup(
         config_client=I10_CONF_CLIENT,
         lut_config=LookupTableConfig(source=source),
         path=Path(LOOK_UPTABLE_DIR, DEFAULT_PHASE_FILE),

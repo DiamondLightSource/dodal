@@ -28,7 +28,7 @@ from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.devices.util.lookup_tables_apple2 import (
     MAXIMUM_ROW_PHASE_MOTOR_POSITION,
     ROW_PHASE_CIRCULAR,
-    FileReadingEnergyMotorLookup,
+    ConfigServerEnergyMotorLookup,
     LookupTable,
     LookupTableConfig,
 )
@@ -46,8 +46,8 @@ pytest_plugins = ["dodal.testing.fixtures.devices.apple2"]
 @pytest.fixture
 def mock_j09_gap_energy_motor_lookup(
     mock_config_client: ConfigServer,
-) -> FileReadingEnergyMotorLookup:
-    return FileReadingEnergyMotorLookup(
+) -> ConfigServerEnergyMotorLookup:
+    return ConfigServerEnergyMotorLookup(
         lut_config=LookupTableConfig(poly_deg=J09_GAP_POLY_DEG_COLUMNS),
         config_client=mock_config_client,
         path=Path(TEST_SOFT_GAP_UNDULATOR_LUT),
@@ -57,8 +57,8 @@ def mock_j09_gap_energy_motor_lookup(
 @pytest.fixture
 def mock_j09_phase_energy_motor_lookup(
     mock_config_client: ConfigServer,
-) -> FileReadingEnergyMotorLookup:
-    return FileReadingEnergyMotorLookup(
+) -> ConfigServerEnergyMotorLookup:
+    return ConfigServerEnergyMotorLookup(
         lut_config=LookupTableConfig(poly_deg=J09_PHASE_POLY_DEG_COLUMNS),
         config_client=mock_config_client,
         path=Path(TEST_SOFT_PHASE_UNDULATOR_LUT),
@@ -77,8 +77,8 @@ async def mock_apple2(
 @pytest.fixture
 async def mock_id_controller(
     mock_apple2: Apple2,
-    mock_j09_gap_energy_motor_lookup: FileReadingEnergyMotorLookup,
-    mock_j09_phase_energy_motor_lookup: FileReadingEnergyMotorLookup,
+    mock_j09_gap_energy_motor_lookup: ConfigServerEnergyMotorLookup,
+    mock_j09_phase_energy_motor_lookup: ConfigServerEnergyMotorLookup,
 ) -> J09Apple2Controller:
     async with init_devices(mock=True):
         mock_id_controller = J09Apple2Controller(
@@ -122,8 +122,8 @@ async def mock_id_pol(
 
 
 def test_j09_energy_motor_lookup_update_lut_success(
-    mock_j09_gap_energy_motor_lookup: FileReadingEnergyMotorLookup,
-    mock_j09_phase_energy_motor_lookup: FileReadingEnergyMotorLookup,
+    mock_j09_gap_energy_motor_lookup: ConfigServerEnergyMotorLookup,
+    mock_j09_phase_energy_motor_lookup: ConfigServerEnergyMotorLookup,
 ):
     mock_j09_gap_energy_motor_lookup.update_lookup_table()
     mock_j09_phase_energy_motor_lookup.update_lookup_table()

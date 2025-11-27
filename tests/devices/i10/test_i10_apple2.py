@@ -38,9 +38,9 @@ from dodal.devices.i10.i10_apple2 import (
 from dodal.devices.i10.i10_setting_data import I10Grating
 from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.devices.util.lookup_tables_apple2 import (
+    ConfigServerEnergyMotorLookup,
     EnergyCoverage,
     EnergyCoverageEntry,
-    FileReadingEnergyMotorLookup,
     LookupTable,
     LookupTableConfig,
 )
@@ -82,8 +82,8 @@ async def mock_id(
 @pytest.fixture
 def mock_i10_gap_energy_motor_lookup_idu(
     mock_config_client: ConfigServer,
-) -> FileReadingEnergyMotorLookup:
-    return FileReadingEnergyMotorLookup(
+) -> ConfigServerEnergyMotorLookup:
+    return ConfigServerEnergyMotorLookup(
         config_client=mock_config_client,
         lut_config=LookupTableConfig(source=("Source", "idu")),
         path=Path(ID_ENERGY_2_GAP_CALIBRATIONS_CSV),
@@ -93,8 +93,8 @@ def mock_i10_gap_energy_motor_lookup_idu(
 @pytest.fixture
 def mock_i10_phase_energy_motor_lookup_idu(
     mock_config_client: ConfigServer,
-) -> FileReadingEnergyMotorLookup:
-    return FileReadingEnergyMotorLookup(
+) -> ConfigServerEnergyMotorLookup:
+    return ConfigServerEnergyMotorLookup(
         config_client=mock_config_client,
         lut_config=LookupTableConfig(source=("Source", "idu")),
         path=Path(ID_ENERGY_2_PHASE_CALIBRATIONS_CSV),
@@ -104,8 +104,8 @@ def mock_i10_phase_energy_motor_lookup_idu(
 @pytest.fixture
 def mock_i10_gap_energy_motor_lookup_idd(
     mock_config_client: ConfigServer,
-) -> FileReadingEnergyMotorLookup:
-    return FileReadingEnergyMotorLookup(
+) -> ConfigServerEnergyMotorLookup:
+    return ConfigServerEnergyMotorLookup(
         config_client=mock_config_client,
         lut_config=LookupTableConfig(source=("Source", "idd")),
         path=Path(ID_ENERGY_2_GAP_CALIBRATIONS_CSV),
@@ -115,8 +115,8 @@ def mock_i10_gap_energy_motor_lookup_idd(
 @pytest.fixture
 def mock_i10_phase_energy_motor_lookup_idd(
     mock_config_client: ConfigServer,
-) -> FileReadingEnergyMotorLookup:
-    return FileReadingEnergyMotorLookup(
+) -> ConfigServerEnergyMotorLookup:
+    return ConfigServerEnergyMotorLookup(
         config_client=mock_config_client,
         lut_config=LookupTableConfig(
             source=("Source", "idd"),
@@ -128,8 +128,8 @@ def mock_i10_phase_energy_motor_lookup_idd(
 @pytest.fixture
 async def mock_id_controller(
     mock_id: I10Apple2,
-    mock_i10_gap_energy_motor_lookup_idu: FileReadingEnergyMotorLookup,
-    mock_i10_phase_energy_motor_lookup_idu: FileReadingEnergyMotorLookup,
+    mock_i10_gap_energy_motor_lookup_idu: ConfigServerEnergyMotorLookup,
+    mock_i10_phase_energy_motor_lookup_idu: ConfigServerEnergyMotorLookup,
 ) -> I10Apple2Controller:
     async with init_devices(mock=True):
         mock_id_controller = I10Apple2Controller(
@@ -652,7 +652,7 @@ async def test_linear_arbitrary_run_engine_scan(
 
 
 def assert_lookup_table_matches_expected(
-    energy_motor_lookup: FileReadingEnergyMotorLookup,
+    energy_motor_lookup: ConfigServerEnergyMotorLookup,
     expected_dict_file_name: str,
 ) -> None:
     energy_motor_lookup.update_lookup_table()
@@ -662,8 +662,8 @@ def assert_lookup_table_matches_expected(
 
 
 def test_i10_energy_motor_lookup_idu_convert_csv_to_lookup_success(
-    mock_i10_gap_energy_motor_lookup_idu: FileReadingEnergyMotorLookup,
-    mock_i10_phase_energy_motor_lookup_idu: FileReadingEnergyMotorLookup,
+    mock_i10_gap_energy_motor_lookup_idu: ConfigServerEnergyMotorLookup,
+    mock_i10_phase_energy_motor_lookup_idu: ConfigServerEnergyMotorLookup,
 ) -> None:
     assert_lookup_table_matches_expected(
         mock_i10_gap_energy_motor_lookup_idu,
@@ -676,8 +676,8 @@ def test_i10_energy_motor_lookup_idu_convert_csv_to_lookup_success(
 
 
 def test_i10_energy_motor_lookup_idd_convert_csv_to_lookup_success(
-    mock_i10_gap_energy_motor_lookup_idd: FileReadingEnergyMotorLookup,
-    mock_i10_phase_energy_motor_lookup_idd: FileReadingEnergyMotorLookup,
+    mock_i10_gap_energy_motor_lookup_idd: ConfigServerEnergyMotorLookup,
+    mock_i10_phase_energy_motor_lookup_idd: ConfigServerEnergyMotorLookup,
 ) -> None:
     assert_lookup_table_matches_expected(
         mock_i10_gap_energy_motor_lookup_idd,

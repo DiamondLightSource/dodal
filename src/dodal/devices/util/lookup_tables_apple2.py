@@ -29,10 +29,8 @@ structure:
 
 import csv
 import io
-from abc import abstractmethod
 from collections.abc import Generator
 from pathlib import Path
-from typing import TypeVar
 
 import numpy as np
 from daq_config_server.client import ConfigServer
@@ -285,22 +283,23 @@ def generate_lookup_table(
     return lut
 
 
-class AbstractEnergyMotorLookup:
+class EnergyMotorLookup:
     """
     Handles lookup tables for Apple2 ID, converting energy and polarisation to gap
     and phase.
 
     After update_lookup_table() has populated the lookup table, `get_motor_from_energy()` can be
-    used to compute gap / phase for a requested energy and polarisation pair.
+    used to compute gap / phase for a requested energy / polarisation pair.
     """
 
-    def __init__(self) -> None:
-        self.lut = LookupTable()
-        self._available_pol = []
+    def __init__(self, lut: LookupTable):
+        self.lut = lut
+        self.available_pol = list(self.lut.root.keys())
 
-    @abstractmethod
     def update_lookup_table(self) -> None:
-        """Sub classes must define a way to update the lookup table"""
+        """Do nothing by default. Sub classes may override this method to provide logic
+        on what updating lookup table does."""
+        self.available_pol = list(self.lut.root.keys())
 
     @property
     def available_pol(self) -> list[Pol]:
@@ -312,7 +311,7 @@ class AbstractEnergyMotorLookup:
 
     def get_motor_from_energy(self, energy: float, pol: Pol) -> float:
         """
-        Convert energy and polarisation to gap and phase motor positions.
+        Convert energy and polarisation to a value from the lookup table.
 
         Parameters:
         -----------
@@ -323,8 +322,8 @@ class AbstractEnergyMotorLookup:
 
         Returns:
         ----------
-        tuple[float, float]
-            (gap, phase) motor positions.
+        float
+            gap / phase motor position from the lookup table.
         """
         if self.available_pol == []:
             self.update_lookup_table()
@@ -332,12 +331,7 @@ class AbstractEnergyMotorLookup:
         return poly(energy)
 
 
-TAbstractEnergyMotorLookup = TypeVar(
-    "TAbstractEnergyMotorLookup", bound=AbstractEnergyMotorLookup
-)
-
-
-class FileReadingEnergyMotorLookup(AbstractEnergyMotorLookup):
+class ConfigServerEnergyMotorLookup(EnergyMotorLookup):
     """Fetches and parses lookup table from a config server, supports dynamic
     updates, and validates input."""
 
@@ -359,9 +353,8 @@ class FileReadingEnergyMotorLookup(AbstractEnergyMotorLookup):
         """
         self.path = path
         self.config_client = config_client
-        self.lut = LookupTable()
         self.lut_config = lut_config
-        super().__init__()
+        super().__init__(lut=self.read_lut())
 
     def read_lut(self) -> LookupTable:
         file_contents = self.config_client.get_file_contents(
@@ -372,16 +365,3 @@ class FileReadingEnergyMotorLookup(AbstractEnergyMotorLookup):
     def update_lookup_table(self) -> None:
         self.lut = self.read_lut()
         self.available_pol = list(self.lut.root.keys())
-
-
-class ConfiguredEnergyMotorLookup(AbstractEnergyMotorLookup):
-    """Static LookupTable used for converting energy and polarisation to gap and phase."""
-
-    def __init__(self, lut: LookupTable):
-        super().__init__()
-        self.lut = lut
-        self.available_pol = list(self.lut.root.keys())
-
-    def update_lookup_table(self) -> None:
-        """Do nothing as LookupTable provided as configuration, no update required."""
-        pass
