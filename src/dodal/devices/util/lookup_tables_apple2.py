@@ -285,7 +285,8 @@ def generate_lookup_table(
 
 class EnergyMotorLookup:
     """
-    Handles lookup tables for Apple2 ID, converting energy/polarisation to motor position.
+    Handles a lookup table for Apple2 ID, converting energy/polarisation to a motor
+    position.
 
     After update_lookup_table() has populated the lookup table, `find_value_in_lookup_table()` can be
     used to compute gap / phase for a requested energy / polarisation pair.
@@ -308,7 +309,7 @@ class EnergyMotorLookup:
         Parameters:
         -----------
         energy : float
-            Desired energy in eV.
+            Desired energy.
         pol : Pol
             Polarisation mode.
 
