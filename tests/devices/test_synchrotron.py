@@ -5,8 +5,7 @@ from typing import Any
 import bluesky.plan_stubs as bps
 import pytest
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import StandardReadable, init_devices
-from ophyd_async.testing import set_mock_value
+from ophyd_async.core import StandardReadable, init_devices, set_mock_value
 
 from dodal.devices.synchrotron import (
     Synchrotron,
