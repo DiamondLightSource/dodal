@@ -1,98 +1,56 @@
 import cv2
 import numpy as np
-from ophyd_async.core import StandardReadable, soft_signal_r_and_setter
+from bluesky.protocols import Triggerable
+from ophyd_async.core import AsyncStatus, StandardReadable, soft_signal_r_and_setter
 from ophyd_async.epics.core import (
     epics_signal_r,
 )
 
+KERNAL_SIZE = (7, 7)
 
-# the location of the max_pixel doesn't matter so instead you should implement this same logic but in the centring device.
-class MaxPixel(StandardReadable):
-    """Gets the max pixel from the image"""
+
+async def get_roi(image_arr, current_x, current_y, dist_from_x=100, dist_from_y=100):
+    # need to add logic to make sure that you don't accidentally reach the end of the pixel range.
+    # use the .shape method for this. this will also depend on the format of the pixel data.
+    roi_arr = image_arr[
+        current_y - dist_from_y : current_y + dist_from_y,
+        current_x - dist_from_x : current_x + dist_from_x,
+    ]
+
+    return roi_arr
+
+
+class MaxPixel(StandardReadable, Triggerable):
+    """Gets the max pixel (brightest pixel) from an ROI of the beam image after some image processing."""
 
     def __init__(self, prefix: str, name: str = "", overlay_channel: int = 1) -> None:
-        self.array_data = epics_signal_r(
-            np.ndarray, prefix + f"pva://{prefix}PVA:ARRAY"
-        )
+        self.array_data = epics_signal_r(np.ndarray, f"pva://{prefix}PVA:ARRAY")
         self.current_centre_x = epics_signal_r(
             int, f"{prefix}OVER:{overlay_channel}:CenterX"
-        )
+        ).get_value()
         self.current_centre_y = epics_signal_r(
             int, f"{prefix}OVER:{overlay_channel}:CenterY"
-        )
-        self.dist_from_x = 100
-        self.dist_from_y = 100
-        self.max_pixel_x, self._x_setter = soft_signal_r_and_setter(int)
-        self.max_pixel_y, self._y_setter = soft_signal_r_and_setter(int)
+        ).get_value()
         self.max_pixel_val, self._max_val_setter = soft_signal_r_and_setter(float)
+        super().__init__(name)
 
-    async def get_roi(
-        self, arr, dist_from_x: int | None = None, dist_from_y: int | None = None
-    ):
+    async def _convert_to_gray_and_blur(self):
         """
-        This gets an ROI and crops the image based on where the previous centre was.
-        Default sets the ROI to 100 pixels from the centre (up, down, left and right).
-
+        Preprocess the image array data (convert to grayscale and apply a gaussian blur)
+        Image is converted to grayscale (using a weighted mean as green contributes more to brightness)
+        as we aren't interested in data relating to colour. A blur is then applied to mitigate
+        errors due to rogue hot pixels and provide smoother results for binarization of the image,
+        which in turn gives a better ellipse fit.
         """
-        if dist_from_x is None:
-            dist_from_x = self.dist_from_x
-        if dist_from_y is None:
-            dist_from_y = self.dist_from_y
 
-        x = await self.current_centre_x.get_value()
-        y = await self.current_centre_y.get_value()
+        data = await self.array_data.get_value()
+        await get_roi(data, self.current_centre_x, self.current_centre_y)
+        gray_arr = cv2.cvtColor(data, cv2.COLOR_BGR2GRAY)
+        return cv2.GaussianBlur(gray_arr, KERNAL_SIZE, 0)
 
-        roi = arr[y : y + dist_from_y, x : x + dist_from_x]
-
-        # update the class variables so that you can revert the coords back to full image after.
-        self.dist_from_y = dist_from_y
-        self.dist_from_x = dist_from_x
-
-        return roi
-
-    # all i need is the centre and the top left corner coords which I can calculate from the distance I input.
-
-    def preprocessed_data(
-        self, dist_from_x: int | None = None, dist_from_y: int | None = None
-    ):
-        """
-        Preprocess the image array data (convert to grayscale and apply a guassian blur)
-        """
-        arr_data = self.array_data.get_value()
-        roi_data = self.get_roi(arr_data, dist_from_x, dist_from_y)
-        gray_arr = cv2.cvtColor(roi_data, cv2.COLOR_BGR2GRAY)  # type: ignore
-        blurred_arr = cv2.GaussianBlur(gray_arr, (7, 7), 0)
-        return blurred_arr
-
-    def _get_max_pixel_and_loc(self):
-        arr = self.preprocessed_data()
-        (_, max_val, _, max_loc) = cv2.minMaxLoc(arr)
-        return (max_val, max_loc)
-
-    async def _convert_coords_to_image_coords(self):
-        # this function will convert back to image coords.
-        # the max pixel on the roi image
-        max_loc_cropped = self._get_max_pixel_and_loc()[1]
-
-        current_x = await self.current_centre_x.get_value()
-        current_y = await self.current_centre_y.get_value()
-
-        # you  just add whatever the top left coords are to get the actual from the cropped
-        top_left_x, top_left_y = (
-            current_x - self.dist_from_x,
-            current_y - self.dist_from_y,
-        )
-        # the actual max_pixel
-        max_loc_x = max_loc_cropped[0] + top_left_x
-        max_loc_y = max_loc_cropped[1] + top_left_y
-
-        return max_loc_x, max_loc_y
-
-    def trigger(self):
-        max_val_loc = self._get_max_pixel_and_loc()
-        max_val = max_val_loc[0]
-        max_loc = max_val_loc[1]
-
+    @AsyncStatus.wrap
+    async def trigger(self):
+        arr = await self.preprocessed_data()
+        max_val = np.max(arr)
+        assert isinstance(max_val, int)
         self._max_val_setter(max_val)
-        self._x_setter(max_loc[0])
-        self._y_setter(max_loc[1])
