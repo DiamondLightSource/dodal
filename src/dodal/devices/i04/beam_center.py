@@ -13,7 +13,7 @@ from dodal.log import LOGGER
 
 def binary_img(img, img_name="Threshold"):
     """
-    Function which creates a binary image from a beamline image using Otsu's method for automatic threshholding.
+    Function which creates a binary image from a beamline image using Otsu's method for automatic thresholding.
     The threshold is increased by 10 (brightness taken from image in grayscale) in order to get more the centre of the beam.
     """
     # take this from the max pixel function preprocessing once merged in
