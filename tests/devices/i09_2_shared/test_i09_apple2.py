@@ -197,9 +197,6 @@ async def test_j09_apple2_controller_set_pol_lh(
     btm_inner_phase: float,
     btm_outer_phase: float,
 ):
-    mock_id_controller.gap_energy_motor_lut.update_lookup_table()
-    mock_id_controller.gap_energy_motor_lut.update_lookup_table()
-
     await mock_id_controller.polarisation.set(pol)
     get_mock_put(
         mock_id_controller.apple2().phase().top_outer.user_setpoint
@@ -237,9 +234,6 @@ async def test_j09_apple2_controller_set_pol(
     btm_inner_phase: float,
     btm_outer_phase: float,
 ):
-    mock_id_controller.gap_energy_motor_lut.update_lookup_table()
-    mock_id_controller.gap_energy_motor_lut.update_lookup_table()
-
     await mock_id_controller.polarisation.set(pol)
     assert get_mock_put(
         mock_id_controller.apple2().phase().top_outer.user_setpoint
