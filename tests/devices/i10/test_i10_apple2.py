@@ -2,7 +2,7 @@ import json
 from collections.abc import Mapping
 from pathlib import Path
 from unittest import mock
-from unittest.mock import AsyncMock, MagicMock, Mock
+from unittest.mock import AsyncMock, Mock
 
 import pytest
 from bluesky.plans import scan
@@ -54,46 +54,8 @@ from tests.devices.i10.test_data import (
     ID_ENERGY_2_PHASE_CALIBRATIONS_CSV,
 )
 
-
-@pytest.fixture
-async def mock_id_gap(prefix: str = "BLXX-EA-DET-007:") -> UndulatorGap:
-    async with init_devices(mock=True):
-        mock_id_gap = UndulatorGap(prefix, "mock_id_gap")
-    assert mock_id_gap.name == "mock_id_gap"
-    set_mock_value(mock_id_gap.gate, UndulatorGateStatus.CLOSE)
-    set_mock_value(mock_id_gap.velocity, 1)
-    set_mock_value(mock_id_gap.user_readback, 20)
-    set_mock_value(mock_id_gap.user_setpoint, "20")
-    set_mock_value(mock_id_gap.status, EnabledDisabledUpper.ENABLED)
-    return mock_id_gap
-
-
-@pytest.fixture
-async def mock_phase_axes(prefix: str = "BLXX-EA-DET-007:") -> UndulatorPhaseAxes:
-    async with init_devices(mock=True):
-        mock_phase_axes = UndulatorPhaseAxes(
-            prefix=prefix,
-            top_outer="RPQ1",
-            top_inner="RPQ2",
-            btm_outer="RPQ3",
-            btm_inner="RPQ4",
-        )
-    assert mock_phase_axes.name == "mock_phase_axes"
-    set_mock_value(mock_phase_axes.gate, UndulatorGateStatus.CLOSE)
-    set_mock_value(mock_phase_axes.top_outer.velocity, 2)
-    set_mock_value(mock_phase_axes.top_inner.velocity, 2)
-    set_mock_value(mock_phase_axes.btm_outer.velocity, 2)
-    set_mock_value(mock_phase_axes.btm_inner.velocity, 2)
-    set_mock_value(mock_phase_axes.top_outer.user_readback, 0)
-    set_mock_value(mock_phase_axes.top_inner.user_readback, 0)
-    set_mock_value(mock_phase_axes.btm_outer.user_readback, 0)
-    set_mock_value(mock_phase_axes.btm_inner.user_readback, 0)
-    set_mock_value(mock_phase_axes.top_outer.user_setpoint_readback, 0)
-    set_mock_value(mock_phase_axes.top_inner.user_setpoint_readback, 0)
-    set_mock_value(mock_phase_axes.btm_outer.user_setpoint_readback, 0)
-    set_mock_value(mock_phase_axes.btm_inner.user_setpoint_readback, 0)
-    set_mock_value(mock_phase_axes.status, EnabledDisabledUpper.ENABLED)
-    return mock_phase_axes
+# add mock_config_client, mock_id_gap, mock_phase and mock_jaw_phase_axes to pytest.
+pytest_plugins = ["dodal.testing.fixtures.apple2"]
 
 
 @pytest.fixture
@@ -103,35 +65,6 @@ async def mock_pgm(prefix: str = "BLXX-EA-DET-007:") -> PlaneGratingMonochromato
             prefix=prefix, grating=I10Grating, grating_pv="NLINES2"
         )
     return mock_pgm
-
-
-@pytest.fixture
-async def mock_jaw_phase(prefix: str = "BLXX-EA-DET-007:") -> UndulatorJawPhase:
-    async with init_devices(mock=True):
-        mock_jaw_phase = UndulatorJawPhase(
-            prefix=prefix, move_pv="RPQ1", jaw_phase="JAW"
-        )
-    set_mock_value(mock_jaw_phase.gate, UndulatorGateStatus.CLOSE)
-    set_mock_value(mock_jaw_phase.jaw_phase.velocity, 2)
-    set_mock_value(mock_jaw_phase.jaw_phase.user_readback, 0)
-    set_mock_value(mock_jaw_phase.status, EnabledDisabledUpper.ENABLED)
-    return mock_jaw_phase
-
-
-@pytest.fixture
-def mock_config_client() -> ConfigServer:
-    mock.patch("dodal.devices.i10.i10_apple2.ConfigServer")
-    mock_config_client = ConfigServer()
-
-    mock_config_client.get_file_contents = MagicMock(spec=["get_file_contents"])
-
-    def my_side_effect(file_path, reset_cached_result) -> str:
-        assert reset_cached_result is True
-        with open(file_path) as f:
-            return f.read()
-
-    mock_config_client.get_file_contents.side_effect = my_side_effect
-    return mock_config_client
 
 
 @pytest.fixture
@@ -153,7 +86,9 @@ def mock_i10_energy_motor_lookup_idu(
 ) -> EnergyMotorLookup:
     return EnergyMotorLookup(
         config_client=mock_config_client,
-        lut_config=LookupTableConfig(source=("Source", "idu")),
+        lut_config=LookupTableConfig(
+            source=("Source", "idu"),
+        ),
         gap_path=Path(ID_ENERGY_2_GAP_CALIBRATIONS_CSV),
         phase_path=Path(ID_ENERGY_2_PHASE_CALIBRATIONS_CSV),
     )
@@ -165,7 +100,9 @@ def mock_i10_energy_motor_lookup_idd(
 ) -> EnergyMotorLookup:
     return EnergyMotorLookup(
         config_client=mock_config_client,
-        lut_config=LookupTableConfig(source=("Source", "idd")),
+        lut_config=LookupTableConfig(
+            source=("Source", "idd"),
+        ),
         gap_path=Path(ID_ENERGY_2_GAP_CALIBRATIONS_CSV),
         phase_path=Path(ID_ENERGY_2_PHASE_CALIBRATIONS_CSV),
     )
@@ -181,17 +118,7 @@ async def mock_id_controller(
             apple2=mock_id,
             energy_motor_lut=mock_i10_energy_motor_lookup_idu,
         )
-    set_mock_value(mock_id_controller.apple2().gap().gate, UndulatorGateStatus.CLOSE)
-    set_mock_value(mock_id_controller.apple2().phase().gate, UndulatorGateStatus.CLOSE)
-    set_mock_value(
-        mock_id_controller.apple2().jaw_phase().gate, UndulatorGateStatus.CLOSE
-    )
-    set_mock_value(mock_id_controller.apple2().gap().velocity, 1)
-    set_mock_value(mock_id_controller.apple2().jaw_phase().jaw_phase.velocity, 1)
-    set_mock_value(mock_id_controller.apple2().phase().btm_inner.velocity, 1)
-    set_mock_value(mock_id_controller.apple2().phase().top_inner.velocity, 1)
-    set_mock_value(mock_id_controller.apple2().phase().btm_outer.velocity, 1)
-    set_mock_value(mock_id_controller.apple2().phase().top_outer.velocity, 1)
+
     return mock_id_controller
 
 
