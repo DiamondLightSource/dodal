@@ -293,20 +293,11 @@ class EnergyMotorLookup:
 
     def __init__(self, lut: LookupTable):
         self.lut = lut
-        self.available_pol = list(self.lut.root.keys())
 
     def update_lookup_table(self) -> None:
         """Do nothing by default. Sub classes may override this method to provide logic
         on what updating lookup table does."""
-        self.available_pol = list(self.lut.root.keys())
-
-    @property
-    def available_pol(self) -> list[Pol]:
-        return self._available_pol
-
-    @available_pol.setter
-    def available_pol(self, value: list[Pol]) -> None:
-        self._available_pol = value
+        pass
 
     def find_value_in_lookup_table(self, energy: float, pol: Pol) -> float:
         """
@@ -324,8 +315,7 @@ class EnergyMotorLookup:
         float
             gap / phase motor position from the lookup table.
         """
-        if self.available_pol == []:
-            self.update_lookup_table()
+        self.update_lookup_table()
         poly = get_poly(lookup_table=self.lut, energy=energy, pol=pol)
         return poly(energy)
 
@@ -363,4 +353,3 @@ class ConfigServerEnergyMotorLookup(EnergyMotorLookup):
 
     def update_lookup_table(self) -> None:
         self.lut = self.read_lut()
-        self.available_pol = list(self.lut.root.keys())
