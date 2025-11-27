@@ -138,12 +138,6 @@ class I10Apple2Controller(Apple2Controller[I10Apple2]):
         await self.apple2().jaw_phase().set(jaw_phase)
         await self._linear_arbitrary_angle.set(pol_angle)
 
-    async def _set_apple2(self, apple2_val: Apple2Val, pol: Pol) -> None:
-        await super()._set_apple2(apple2_val, pol)
-        if pol != Pol.LA:
-            await self.apple2().jaw_phase().set(0)
-            await self.apple2().jaw_phase().set_move.set(1)
-
     def _get_apple2_value(self, gap: float, phase: float, pol: Pol) -> Apple2Val:
         phase3 = phase * (-1 if pol == Pol.LA else 1)
         return Apple2Val(
@@ -155,6 +149,14 @@ class I10Apple2Controller(Apple2Controller[I10Apple2]):
                 btm_outer="0.0",
             ),
         )
+
+    async def _set_motors_from_energy_and_polarisation(
+        self, energy: float, pol: Pol
+    ) -> None:
+        await super()._set_motors_from_energy_and_polarisation(energy, pol)
+        if pol != Pol.LA:
+            await self.apple2().jaw_phase().set(0)
+            await self.apple2().jaw_phase().set_move.set(1)
 
     def _raise_if_not_la(self, pol: Pol) -> None:
         if pol != Pol.LA:
