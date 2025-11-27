@@ -6,6 +6,7 @@ from ophyd_async.epics.core import (
 )
 
 
+# the location of the max_pixel doesn't matter so instead you should implement this same logic but in the centring device.
 class MaxPixel(StandardReadable):
     """Gets the max pixel from the image"""
 
@@ -14,10 +15,10 @@ class MaxPixel(StandardReadable):
             np.ndarray, prefix + f"pva://{prefix}PVA:ARRAY"
         )
         self.current_centre_x = epics_signal_r(
-            int, prefix + f"OVER:{overlay_channel}:CenterX"
+            int, f"{prefix}OVER:{overlay_channel}:CenterX"
         )
         self.current_centre_y = epics_signal_r(
-            int, prefix + f"OVER:{overlay_channel}:CenterY"
+            int, f"{prefix}OVER:{overlay_channel}:CenterY"
         )
         self.dist_from_x = 100
         self.dist_from_y = 100
@@ -28,7 +29,11 @@ class MaxPixel(StandardReadable):
     async def get_roi(
         self, arr, dist_from_x: int | None = None, dist_from_y: int | None = None
     ):
-        """This gets an ROI and crops the image based on where the previous centre was"""
+        """
+        This gets an ROI and crops the image based on where the previous centre was.
+        Default sets the ROI to 100 pixels from the centre (up, down, left and right).
+
+        """
         if dist_from_x is None:
             dist_from_x = self.dist_from_x
         if dist_from_y is None:
