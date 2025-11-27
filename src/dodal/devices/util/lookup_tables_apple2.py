@@ -291,7 +291,9 @@ class EnergyMotorLookup:
     used to compute gap / phase for a requested energy / polarisation pair.
     """
 
-    def __init__(self, lut: LookupTable):
+    def __init__(self, lut: LookupTable | None = None):
+        if lut is None:
+            lut = LookupTable()
         self.lut = lut
 
     def update_lookup_table(self) -> None:
@@ -315,7 +317,9 @@ class EnergyMotorLookup:
         float
             gap / phase motor position from the lookup table.
         """
-        self.update_lookup_table()
+        # if lut is empty, force an update to pull updated file.
+        if not self.lut.root:
+            self.update_lookup_table()
         poly = get_poly(lookup_table=self.lut, energy=energy, pol=pol)
         return poly(energy)
 
@@ -343,7 +347,7 @@ class ConfigServerEnergyMotorLookup(EnergyMotorLookup):
         self.path = path
         self.config_client = config_client
         self.lut_config = lut_config
-        super().__init__(lut=self.read_lut())
+        super().__init__()
 
     def read_lut(self) -> LookupTable:
         file_contents = self.config_client.get_file_contents(
