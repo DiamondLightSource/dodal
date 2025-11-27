@@ -138,8 +138,8 @@ class I10Apple2Controller(Apple2Controller[I10Apple2]):
         await self.apple2().jaw_phase().set(jaw_phase)
         await self._linear_arbitrary_angle.set(pol_angle)
 
-    async def _set_apple2(self, id_motor_values: Apple2Val, pol: Pol) -> None:
-        await super()._set_apple2(id_motor_values, pol)
+    async def _set_apple2(self, apple2_val: Apple2Val, pol: Pol) -> None:
+        await super()._set_apple2(apple2_val, pol)
         if pol != Pol.LA:
             await self.apple2().jaw_phase().set(0)
             await self.apple2().jaw_phase().set_move.set(1)
