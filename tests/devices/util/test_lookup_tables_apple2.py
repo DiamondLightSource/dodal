@@ -29,7 +29,7 @@ def config(request: FixtureRequest) -> Config:
 
 
 @pytest.fixture
-def configured_energy_motor_lookup(config: Config) -> EnergyMotorLookup:
+def energy_motor_lookup(config: Config) -> EnergyMotorLookup:
     return EnergyMotorLookup(
         lut=generate_lookup_table(
             pols=config.polarisations,
@@ -40,23 +40,23 @@ def configured_energy_motor_lookup(config: Config) -> EnergyMotorLookup:
     )
 
 
-def test_configured_energy_motor_lookup_is_static(
-    configured_energy_motor_lookup: EnergyMotorLookup,
+def test_energy_motor_lookup_is_static(
+    energy_motor_lookup: EnergyMotorLookup,
 ) -> None:
-    before_update_lut = configured_energy_motor_lookup.lut
-    configured_energy_motor_lookup.update_lookup_table()
-    after_update_lut = configured_energy_motor_lookup.lut
+    before_update_lut = energy_motor_lookup.lut
+    energy_motor_lookup.update_lookup_table()
+    after_update_lut = energy_motor_lookup.lut
     assert before_update_lut == after_update_lut
 
 
 def test_make_phase_tables_multiple_entries(
     config: Config,
-    configured_energy_motor_lookup: EnergyMotorLookup,
+    energy_motor_lookup: EnergyMotorLookup,
 ) -> None:
     for i, pol in enumerate(config.polarisations):
         key = pol
-        assert key in configured_energy_motor_lookup.lut.root
-        entry = configured_energy_motor_lookup.lut.root[key]
+        assert key in energy_motor_lookup.lut.root
+        entry = energy_motor_lookup.lut.root[key]
         assert entry.limit.minimum == pytest.approx(config.min_energies[i])
         assert entry.limit.maximum == pytest.approx(config.max_energies[i])
 
@@ -112,11 +112,11 @@ def test_convert_csv_to_lookup_overwrite_name_convert_default(
 
 
 def test_lookup_table_is_serialisable(
-    configured_energy_motor_lookup: EnergyMotorLookup,
+    energy_motor_lookup: EnergyMotorLookup,
 ) -> None:
     # There should be no errors when calling the below functions
-    configured_energy_motor_lookup.lut.model_dump()
-    configured_energy_motor_lookup.lut.model_dump_json()
+    energy_motor_lookup.lut.model_dump()
+    energy_motor_lookup.lut.model_dump_json()
 
 
 async def test_bad_file_contents_causes_convert_csv_to_lookup_fails(
