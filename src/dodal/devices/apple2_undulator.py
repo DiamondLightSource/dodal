@@ -426,10 +426,14 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
         Soft signal for the polarisation setpoint.
     polarisation : derived_signal_rw
         Hardware-backed signal for polarisation readback and control.
+    gap_energy_to_motor_converter : EnergyMotorConvertor
+        Callable that converts energy and polarisation to gap motor positions.
+    phase_energy_to_motor_converter : EnergyMotorConvertor
+        Callable that converts energy and polarisation to phase motor positions.
 
     Abstract Methods
     ----------------
-    _get_apple2_value(gap: float, phase: float, pol: Pol) -> Apple2Val
+    _get_apple2_value(gap: float, phase: float) -> Apple2Val
         Abstract method to return the Apple2Val used to set the apple2 with.
     Notes
     -----
