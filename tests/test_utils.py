@@ -1,6 +1,7 @@
 import os
 from collections.abc import Iterable, Mapping
 from shutil import copytree
+from types import ModuleType
 from typing import Any, cast
 from unittest.mock import ANY, MagicMock, Mock, patch
 
@@ -308,15 +309,17 @@ def device_b() -> Motor:
 
 
 @pytest.mark.parametrize("bl", ["", "$%^&*", "nonexistent"])
-def test_invalid_beamline_variable_causes_get_device_module_to_raise(bl):
+def test_invalid_beamline_variable_causes_get_device_module_to_raise(bl: str):
     with patch.dict(os.environ, {"BEAMLINE": bl}), pytest.raises(ValueError):
         get_beamline_based_on_environment_variable()
 
 
 @pytest.mark.parametrize("bl,module", [("i04", i04), ("i23", i23)])
-def test_valid_beamline_variable_causes_get_device_module_to_return_module(bl, module):
+def test_valid_beamline_variable_causes_get_device_module_to_return_module(
+    bl: str, module: ModuleType
+):
     with patch.dict(os.environ, {"BEAMLINE": bl}):
-        assert get_beamline_based_on_environment_variable() == module
+        assert get_beamline_based_on_environment_variable().__name__ == module.__name__
 
 
 def test_find_next_run_number_from_files_gets_correct_number():
