@@ -29,10 +29,18 @@ class OpticsBlueAPIDevice(StandardReadable, Movable[D]):
     https://github.com/DiamondLightSource/i19-bluesky/issues/30.
     """
 
-    def __init__(self, name: str = "") -> None:
+    def __init__(
+        self, hutch: HutchState, instrument_session: str = "", name: str = ""
+    ) -> None:
+        self.hutch_request = hutch
+        self.instrument_session = instrument_session
         self.url = OPTICS_BLUEAPI_URL
         self.headers = HEADERS
         super().__init__(name)
+
+    @property
+    def _invoking_hutch(self) -> str:
+        return self.hutch_request.value
 
     @AsyncStatus.wrap
     async def set(self, value: D):
