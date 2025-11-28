@@ -6,7 +6,7 @@ import numpy as np
 import pytest
 from ophyd_async.core import init_devices, set_mock_value
 
-from dodal.devices.i04.max_pixel import KERNAL_SIZE, MaxPixel
+from dodal.devices.i04.max_pixel import KERNAL_SIZE, MaxPixel, _convert_to_gray_and_blur
 
 
 @pytest.fixture
@@ -40,11 +40,13 @@ async def test_returns_max(
 @patch("dodal.devices.i04.max_pixel.cv2.cvtColor")
 @patch("dodal.devices.i04.max_pixel.cv2.GaussianBlur")
 async def test_preprocessed_data_grayscale_is_called(
-    mocked_cv2_blur: MagicMock, mocked_cv2_grey: MagicMock, max_pixel: MaxPixel
+    mocked_cv2_blur: MagicMock,
+    mocked_cv2_grey: MagicMock,
 ):
     data = np.array([1])
-    set_mock_value(max_pixel.array_data, data)
-    await max_pixel._convert_to_gray_and_blur()
+    # set_mock_value(max_pixel.array_data, data)
+    # await max_pixel._convert_to_gray_and_blur()
+    await _convert_to_gray_and_blur(data)
     mocked_cv2_grey.assert_called_once_with(data, cv2.COLOR_BGR2GRAY)
     mocked_cv2_blur.assert_called_once_with(ANY, KERNAL_SIZE, 0)
 

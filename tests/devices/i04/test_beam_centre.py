@@ -4,7 +4,7 @@ from unittest.mock import ANY, AsyncMock, MagicMock, patch
 import pytest
 from ophyd_async.core import init_devices, set_mock_value
 
-from dodal.devices.i04.beam_center import CentreEllipseMethod
+from dodal.devices.i04.beam_centre import CentreEllipseMethod
 
 
 @pytest.fixture
@@ -16,8 +16,6 @@ async def beam_centre_ellipse() -> AsyncGenerator[CentreEllipseMethod]:
 
 @patch("dodal.devices.i04.max_pixel.cv2.GaussianBlur")
 def test_binary_img():
-    pass
-
     # Patch each cv2 function that is used. For each one, do assert_called_once_with(...). Also set return value for
     # cv2.threshold and assert binary_img() == this return value
 

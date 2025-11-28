@@ -8,17 +8,18 @@ from ophyd_async.epics.core import (
     epics_signal_r,
 )
 
+from dodal.devices.i04.max_pixel import convert_to_gray_and_blur
 from dodal.log import LOGGER
 
 
-def binary_img(img, img_name="Threshold"):
+async def binary_img(img, img_name="Threshold"):
     """
     Function which creates a binary image from a beamline image using Otsu's method for automatic threshholding.
     The threshold is increased by 10 (brightness taken from image in grayscale) in order to get more the centre of the beam.
     """
     # take this from the max pixel function preprocessing once merged in
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    blurred = cv2.GaussianBlur(gray, (7, 7), 0)
+    blurred = await convert_to_gray_and_blur(img)
+
     (thresh, thresh_img) = cv2.threshold(
         blurred, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU
     )
@@ -33,21 +34,17 @@ def binary_img(img, img_name="Threshold"):
 
 class CentreEllipseMethod(StandardReadable, Triggerable):
     def __init__(self, prefix: str, name: str = ""):
-        self.array_data = epics_signal_r(np.ndarray, f"pva://{prefix}PVA:ARRAY")
-        self.binary = binary_img(
-            self.get_img_data()
-        )  # does func need to be async for this
-        self.ellipse = self.fit_ellipse()
+        self.array_data = epics_signal_r(
+            np.ndarray, f"pva://{prefix}PVA:ARRAY"
+        ).get_value()
+
         self.center_x_val, self._center_x_val_setter = soft_signal_r_and_setter(float)
         self.center_y_val, self._center_y_val_setter = soft_signal_r_and_setter(float)
         super().__init__(name)
 
-    async def get_img_data(self):
-        return await self.array_data.get_value()
-
-    def fit_ellipse(self):
+    def fit_ellipse(self, binary_img):
         contours, _ = cv2.findContours(
-            self.binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE
+            binary_img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE
         )
         if not contours:
             raise ValueError("No contours found in image.")
@@ -58,13 +55,11 @@ class CentreEllipseMethod(StandardReadable, Triggerable):
 
         return cv2.fitEllipse(largest_contour)
 
-    def center_x(self) -> Any:
-        return self.ellipse[0][0]
-
-    def center_y(self) -> Any:
-        return self.ellipse[0][1]
-
     @AsyncStatus.wrap
     async def trigger(self):
-        self._center_x_val_setter(self.center_x())
-        self._center_y_val_setter(self.center_y())
+        binary = await binary_img(self.array_data)
+        ellipse_fit = self.fit_ellipse(binary)
+        centre_x = ellipse_fit[0][0]
+        centre_y = ellipse_fit[0][1]
+        self._center_x_val_setter(centre_x)
+        self._center_y_val_setter(centre_y)
