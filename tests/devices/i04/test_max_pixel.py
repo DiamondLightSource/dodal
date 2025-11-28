@@ -18,7 +18,12 @@ async def max_pixel() -> AsyncGenerator[MaxPixel]:
 
 @pytest.mark.parametrize(
     "preprocessed_data, expected",
-    [([1, 2, 3], 3), ([[0, 0, 0], [0, 0, 0], [0, 0, 0]], 0), ([-9, -8, 0], 0)],
+    [
+        ([1, 2, 3], 3),  # test can handle standard input
+        ([[0, 0, 0], [0, 0, 0], [0, 0, 0]], 0),  # test can handle all 0's
+        ([-9, -8, 0], 0),  # test can handle negatives
+        ([6.9, 8.9, 7.5, 6.45], 8.9),  # check can handle floats
+    ],
 )
 @patch("dodal.devices.i04.max_pixel.MaxPixel._convert_to_gray_and_blur")
 async def test_returns_max(
