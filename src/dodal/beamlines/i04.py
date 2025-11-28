@@ -23,6 +23,7 @@ from dodal.devices.flux import Flux
 from dodal.devices.i03.dcm import DCM
 from dodal.devices.i04.beamsize import Beamsize
 from dodal.devices.i04.constants import RedisConstants
+from dodal.devices.i04.max_pixel import MaxPixel
 from dodal.devices.i04.murko_results import MurkoResultsDevice
 from dodal.devices.i04.transfocator import Transfocator
 from dodal.devices.ipin import IPin
@@ -387,6 +388,16 @@ def scintillator() -> Scintillator:
         f"{PREFIX.beamline_prefix}-MO-SCIN-01:",
         Reference(aperture_scatterguard()),
         get_beamline_parameters(),
+    )
+
+
+@device_factory()
+def max_pixel() -> MaxPixel:
+    """Get the i04 max pixel device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i04, it will return the existing object.
+    """
+    return MaxPixel(
+        f"{PREFIX.beamline_prefix}-DI-OAV-01:",
     )
 
 
