@@ -24,21 +24,11 @@ class CryoStreamSelection(StrictEnum):
 
 class OxfordCryoStream(StandardReadable):
     def __init__(self, prefix: str, name: str = ""):
+        with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
+            self.temp = epics_signal_r(float, f"{prefix}TEMP")
+
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             # Any signals that should be read once at the start of the scan
-            self.turbo = epics_signal_rw(str, f"{prefix}TURBO")
-            self.turbo_mode = epics_signal_rw(TurboEnum, f"{prefix}TURBOMODE")
-
-            self.status = epics_signal_r(str, f"{prefix}STATUS.SEVR")
-
-            self.pump_uptime = epics_signal_r(float, f"{prefix}RUNTIME")
-            self.controller_number = epics_signal_r(float, f"{prefix}CTRLNUM")
-            self.software_version = epics_signal_r(float, f"{prefix}VER")
-            self.evap_adjust = epics_signal_r(float, f"{prefix}EVAPADJUST")
-            self.series = epics_signal_r(str, f"{prefix}SERIES")
-
-        with self.add_children_as_readables():
-            # Any signals that should be read at every point in the scan
 
             self.purge = epics_signal_x(f"{prefix}PURGE.PROC")
             self.hold = epics_signal_x(f"{prefix}HOLD.PROC")
@@ -47,23 +37,29 @@ class OxfordCryoStream(StandardReadable):
             self.resume = epics_signal_x(f"{prefix}RESUME.PROC")
             self.end = epics_signal_x(f"{prefix}END.PROC")
             self.stop = epics_signal_x(f"{prefix}STOP.PROC")
-
-            self.ramp_rate = epics_signal_rw(float, f"{prefix}RRATE")
-            self.ramp_temp = epics_signal_rw(float, f"{prefix}RTEMP")
+            self.plat = epics_signal_x(f"{prefix}PLAT.PROC")
+            self.cool = epics_signal_x(f"{prefix}COOL.PROC")
             self.ramp = epics_signal_x(f"{prefix}RAMP.PROC")
 
-            self.plat_time = epics_signal_rw(float, f"{prefix}PTIME")
-            self.plat = epics_signal_x(f"{prefix}PLAT.PROC")
-
-            self.cool_temp = epics_signal_rw(float, f"{prefix}CTEMP")
-            self.cool = epics_signal_x(f"{prefix}COOL.PROC")
-
-            self.end_rate = epics_signal_rw(float, f"{prefix}ERATE")
-
-            self.setpoint = epics_signal_r(float, f"{prefix}SETPOINT")
-            self.temp = epics_signal_r(float, f"{prefix}TEMP")
+            self.turbo = epics_signal_rw(str, f"{prefix}TURBO")
+            self.turbo_mode = epics_signal_rw(TurboEnum, f"{prefix}TURBOMODE")
+            self.status = epics_signal_r(str, f"{prefix}STATUS.SEVR")
+            self.pump_uptime = epics_signal_r(float, f"{prefix}RUNTIME")
+            self.controller_number = epics_signal_r(float, f"{prefix}CTRLNUM")
+            self.software_version = epics_signal_r(float, f"{prefix}VER")
+            self.evap_adjust = epics_signal_r(float, f"{prefix}EVAPADJUST")
+            self.series = epics_signal_r(str, f"{prefix}SERIES")
             self.error = epics_signal_r(float, f"{prefix}ERROR")
             self.mode = epics_signal_r(str, f"{prefix}RUNMODE")
+
+        with self.add_children_as_readables():
+            # Any signals that should be read at every point in the scan
+            self.ramp_rate = epics_signal_rw(float, f"{prefix}RRATE")
+            self.ramp_temp = epics_signal_rw(float, f"{prefix}RTEMP")
+            self.plat_time = epics_signal_rw(float, f"{prefix}PTIME")
+            self.cool_temp = epics_signal_rw(float, f"{prefix}CTEMP")
+            self.end_rate = epics_signal_rw(float, f"{prefix}ERATE")
+            self.setpoint = epics_signal_r(float, f"{prefix}SETPOINT")
             self.phase = epics_signal_r(str, f"{prefix}PHASE")
             self.ramp_rate_setpoint = epics_signal_r(float, f"{prefix}RAMPRATE")
             self.target_temp = epics_signal_r(float, f"{prefix}TARGETTEMP")
