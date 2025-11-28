@@ -343,6 +343,18 @@ class DeviceBuildResult(NamedTuple):
         return self
 
 
+def combine_dicts_no_duplicates(dict1, dict2):
+    # Find overlapping keys (keys present in both dictionaries)
+    overlapping_keys = set(dict1) & set(dict2)
+
+    if overlapping_keys:
+        raise ValueError(f"Duplicate keys detected: {', '.join(overlapping_keys)}")
+
+    # If no duplicates, combine the dictionaries
+    combined_dict = {**dict1, **dict2}
+    return combined_dict
+
+
 class DeviceManager:
     """Manager to handle building and connecting interdependent devices"""
 
@@ -354,6 +366,28 @@ class DeviceManager:
         self._factories = {}
         self._v1_factories = {}
         self._fixtures = {}
+
+    def combine(self, devices: Self) -> None:
+        self._factories = combine_dicts_no_duplicates(
+            self._factories,
+            devices._factories,  # noqa: SLF001
+        )
+        self._v1_factories = combine_dicts_no_duplicates(
+            self._v1_factories,
+            devices._v1_factories,  # noqa: SLF001
+        )
+        self._fixtures = combine_dicts_no_duplicates(self._fixtures, devices._fixtures)  # noqa: SLF001
+
+    def combine_dicts_no_duplicates(self, dict1, dict2):
+        # Find overlapping keys (keys present in both dictionaries)
+        overlapping_keys = set(dict1) & set(dict2)
+
+        if overlapping_keys:
+            raise ValueError(f"Duplicate keys detected: {', '.join(overlapping_keys)}")
+
+        # If no duplicates, combine the dictionaries
+        combined_dict = {**dict1, **dict2}
+        return combined_dict
 
     def fixture(self, func: Callable[[], T]) -> Callable[[], T]:
         """Add a function that can provide fixtures required by the factories"""
