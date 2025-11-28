@@ -4,8 +4,7 @@ from unittest.mock import ANY, AsyncMock, MagicMock, patch
 import cv2
 import numpy as np
 import pytest
-from ophyd_async.core import init_devices
-from ophyd_async.testing import set_mock_value
+from ophyd_async.core import init_devices, set_mock_value
 
 from dodal.devices.i04.max_pixel import KERNAL_SIZE, MaxPixel
 
