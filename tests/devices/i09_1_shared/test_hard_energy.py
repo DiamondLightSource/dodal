@@ -131,7 +131,7 @@ async def test_hu_id_energy_energy_demand_initialised_correctly(
     "energy_value, order_value, expected_gap",
     [
         (2.130, 1, 12.814),
-        (2.780, 3, 6.053),
+        (2.780, 3, 6.0531),
         (6.240, 5, 7.956),
     ],
 )
