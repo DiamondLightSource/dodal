@@ -42,7 +42,9 @@ class JunfrauCommissioningWriter(DetectorWriter, StandardReadable):
             self.file_name = epics_signal_rw_rbv(str, f"{prefix}FileName")
             self.file_path = epics_signal_rw_rbv(str, f"{prefix}FilePath")
             self.writer_ready = epics_signal_r(int, f"{prefix}Ready_RBV")
-            self.expected_frames = epics_signal_rw(int, f"{prefix}NumCapture")
+            self.expected_frames = epics_signal_rw(
+                int, "BL24I-JUNGFRAU-META:FD:NumCapture"
+            )
         super().__init__(name)
 
     async def open(self, name: str, exposures_per_event: int = 1) -> dict[str, DataKey]:
@@ -65,6 +67,7 @@ class JunfrauCommissioningWriter(DetectorWriter, StandardReadable):
             f"Jungfrau writing to folder {_path_info.directory_path} with filename {_path_info.filename}"
         )
         await wait_for_value(self.writer_ready, 1, timeout=10)
+        self.final_path = requested_filepath
         return await self._describe()
 
     async def _describe(self) -> dict[str, DataKey]:
@@ -85,6 +88,7 @@ class JunfrauCommissioningWriter(DetectorWriter, StandardReadable):
     ) -> AsyncGenerator[int, None]:
         timeout = timeout * 4  # This filewriter is very slow
         async for num_captured in observe_value(self.frame_counter, timeout):
+            print(f"frame counter is at {num_captured}")
             yield num_captured // (self._exposures_per_event)
 
     async def get_indices_written(self) -> int:
