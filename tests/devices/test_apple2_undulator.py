@@ -5,14 +5,16 @@ import bluesky.plan_stubs as bps
 import pytest
 from bluesky.plans import scan
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import init_devices
+from ophyd_async.core import (
+    callback_on_mock_put,
+    get_mock_put,
+    init_devices,
+    set_mock_value,
+)
 from ophyd_async.testing import (
     assert_emitted,
     assert_reading,
-    callback_on_mock_put,
-    get_mock_put,
     partial_reading,
-    set_mock_value,
 )
 
 from dodal.devices.apple2_undulator import (
@@ -32,60 +34,8 @@ from dodal.devices.apple2_undulator import (
     UndulatorPhaseAxes,
 )
 
-
-@pytest.fixture
-async def mock_id_gap(prefix: str = "BLXX-EA-DET-007:") -> UndulatorGap:
-    async with init_devices(mock=True):
-        mock_id_gap = UndulatorGap(prefix, "mock_id_gap")
-    assert mock_id_gap.name == "mock_id_gap"
-    set_mock_value(mock_id_gap.gate, UndulatorGateStatus.CLOSE)
-    set_mock_value(mock_id_gap.velocity, 1)
-    set_mock_value(mock_id_gap.user_readback, 1)
-    set_mock_value(mock_id_gap.user_setpoint, "1")
-    set_mock_value(mock_id_gap.status, EnabledDisabledUpper.ENABLED)
-    return mock_id_gap
-
-
-@pytest.fixture
-async def mock_phase_axes(prefix: str = "BLXX-EA-DET-007:") -> UndulatorPhaseAxes:
-    async with init_devices(mock=True):
-        mock_phase_axes = UndulatorPhaseAxes(
-            prefix=prefix,
-            top_outer="RPQ1",
-            top_inner="RPQ2",
-            btm_outer="RPQ3",
-            btm_inner="RPQ4",
-        )
-    assert mock_phase_axes.name == "mock_phase_axes"
-    set_mock_value(mock_phase_axes.gate, UndulatorGateStatus.CLOSE)
-    set_mock_value(mock_phase_axes.top_outer.velocity, 2)
-    set_mock_value(mock_phase_axes.top_inner.velocity, 2)
-    set_mock_value(mock_phase_axes.btm_outer.velocity, 2)
-    set_mock_value(mock_phase_axes.btm_inner.velocity, 2)
-    set_mock_value(mock_phase_axes.top_outer.user_readback, 2)
-    set_mock_value(mock_phase_axes.top_inner.user_readback, 2)
-    set_mock_value(mock_phase_axes.btm_outer.user_readback, 2)
-    set_mock_value(mock_phase_axes.btm_inner.user_readback, 2)
-    set_mock_value(mock_phase_axes.top_outer.user_setpoint_readback, 2)
-    set_mock_value(mock_phase_axes.top_inner.user_setpoint_readback, 2)
-    set_mock_value(mock_phase_axes.btm_outer.user_setpoint_readback, 2)
-    set_mock_value(mock_phase_axes.btm_inner.user_setpoint_readback, 2)
-    set_mock_value(mock_phase_axes.status, EnabledDisabledUpper.ENABLED)
-    return mock_phase_axes
-
-
-@pytest.fixture
-async def mock_jaw_phase(prefix: str = "BLXX-EA-DET-007:") -> UndulatorJawPhase:
-    async with init_devices(mock=True):
-        mock_jaw_phase = UndulatorJawPhase(
-            prefix=prefix, move_pv="RPQ1", jaw_phase="JAW"
-        )
-    set_mock_value(mock_jaw_phase.gate, UndulatorGateStatus.CLOSE)
-    set_mock_value(mock_jaw_phase.jaw_phase.velocity, 2)
-    set_mock_value(mock_jaw_phase.jaw_phase.user_readback, 0)
-    set_mock_value(mock_jaw_phase.jaw_phase.user_setpoint_readback, 0)
-    set_mock_value(mock_jaw_phase.status, EnabledDisabledUpper.ENABLED)
-    return mock_jaw_phase
+# add mock_config_client, mock_id_gap, mock_phase and mock_jaw_phase_axes to pytest.
+pytest_plugins = ["dodal.testing.fixtures.apple2"]
 
 
 @pytest.fixture

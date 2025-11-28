@@ -1,4 +1,5 @@
 # type: ignore # Eiger will soon be ophyd-async https://github.com/DiamondLightSource/dodal/issues/700
+import asyncio
 import threading
 from unittest.mock import ANY, MagicMock, Mock, call, create_autospec, patch
 
@@ -724,3 +725,15 @@ def test_given_eiger_is_disarming_when_eiger_is_stopped_then_wait_for_disarming_
 
     disarming_status.wait.assert_called_once()
     fake_eiger.disarm_detector.assert_not_called()
+
+
+async def test_multiple_stops_disarms_eiger_once(fake_eiger: EigerDetector):
+    fake_eiger.disarming_status = None
+    fake_eiger.disarm_detector = MagicMock()
+
+    async def do_stop():
+        await asyncio.sleep(0.01)
+        fake_eiger.stop()
+
+    await asyncio.gather(do_stop(), do_stop())
+    fake_eiger.disarm_detector.assert_called_once()

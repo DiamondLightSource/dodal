@@ -4,7 +4,6 @@ import pytest
 from ophyd_async.core import DetectorTrigger, TriggerInfo, init_devices
 from ophyd_async.epics.adcore import ADImageMode
 
-# from ophyd_async.testing import set_mock_value
 from dodal.common.beamlines.beamline_utils import get_path_provider, set_path_provider
 from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitPathProvider
 from dodal.devices.i11.mythen import _BIT_DEPTH, _DEADTIMES, Mythen3, Mythen3TriggerMode

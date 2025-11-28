@@ -5,9 +5,8 @@ import pytest
 from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
 from bluesky.utils import FailedStatus
-from ophyd_async.core import StrictEnum, init_devices
+from ophyd_async.core import StrictEnum, get_mock_put, init_devices
 from ophyd_async.epics.adcore import ADImageMode
-from ophyd_async.testing import get_mock_put
 
 from dodal.devices import b07, i09
 from dodal.devices.electron_analyser import DualEnergySource, EnergyMode, EnergySource

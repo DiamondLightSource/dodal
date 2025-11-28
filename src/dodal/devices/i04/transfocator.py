@@ -30,6 +30,7 @@ class Transfocator(StandardReadable):
 
         with self.add_children_as_readables():
             self.number_filters_sp = epics_signal_rw(int, prefix + "NUM_FILTERS")
+            self.current_horizontal_size_rbv = epics_signal_r(float, prefix + "HOR")
             self.current_vertical_size_rbv = epics_signal_r(float, prefix + "VER")
 
         self.TIMEOUT = 120
