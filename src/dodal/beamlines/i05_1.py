@@ -1,7 +1,6 @@
-from ophyd_async.sim import SimMotor
-
 from dodal.beamlines.i05_shared import devices
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
+from dodal.devices.motors import XYZStage
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
@@ -12,5 +11,10 @@ set_utils_beamline(BL)
 
 
 @devices.factory()
-def sim_motor() -> SimMotor:
-    return SimMotor()
+def sm() -> XYZStage:
+    return XYZStage(
+        f"{J_PREFIX.beamline_prefix}-EA-SM-01:",
+        x_infix="SMX",
+        y_infix="SMY",
+        z_infix="SMZ",
+    )
