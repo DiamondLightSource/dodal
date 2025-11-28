@@ -1,5 +1,5 @@
 from ophyd_async.core import Reference
-from ophyd_async.fastcs.eiger import EigerDetector as FastEiger
+from ophyd_async.fastcs.eiger import EigerDetector as FastCSEiger
 from ophyd_async.fastcs.panda import HDFPanda
 from yarl import URL
 
@@ -180,12 +180,11 @@ def eiger(mock: bool = False) -> EigerDetector:
 
 
 @device_factory()
-def fastcs_eiger() -> FastEiger:
+def fastcs_eiger() -> FastCSEiger:
     """Get the i03 FastCS Eiger device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-
-    return FastEiger(
+    return FastCSEiger(
         prefix=PREFIX.beamline_prefix,
         path_provider=get_path_provider(),
         drv_suffix="-EA-EIGER-02:",
