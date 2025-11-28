@@ -6,8 +6,7 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 from aiohttp.client_exceptions import ClientConnectorError
-from ophyd_async.core import init_devices
-from ophyd_async.testing import set_mock_value
+from ophyd_async.core import init_devices, set_mock_value
 from tests.devices.oav.conftest import (
     oav_beam_centre_pv_fs,  # noqa: F401
     oav_beam_centre_pv_roi,  # noqa: F401

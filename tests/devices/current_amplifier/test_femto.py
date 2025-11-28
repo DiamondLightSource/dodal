@@ -7,10 +7,10 @@ import pytest
 from bluesky.plan_stubs import abs_set
 from bluesky.plans import count
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import init_devices
-from ophyd_async.testing import (
+from ophyd_async.core import (
     callback_on_mock_put,
     get_mock_put,
+    init_devices,
     set_mock_value,
 )
 

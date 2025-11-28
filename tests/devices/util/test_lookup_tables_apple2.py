@@ -1,6 +1,3 @@
-from pathlib import Path
-from unittest.mock import MagicMock
-
 import numpy as np
 import pytest
 from daq_config_server.client import ConfigServer
@@ -11,10 +8,11 @@ from dodal.devices.util.lookup_tables_apple2 import (
     LookupTableConfig,
     convert_csv_to_lookup,
     generate_lookup_table,
-    get_poly,
     make_phase_tables,
     read_file_and_skip,
 )
+
+pytest_plugins = ["dodal.testing.fixtures.apple2"]
 
 
 def test_generate_lookup_table_structure_and_poly() -> None:
@@ -85,9 +83,6 @@ class DummyEnergyMotorLookup(EnergyMotorLookup):
         )
         self.available_pol = list(self.lookup_tables.gap.root.keys())
 
-    def _update_phase_lut(self):
-        pass
-
 
 @pytest.fixture
 def lut_config() -> LookupTableConfig:
@@ -101,13 +96,6 @@ def lut_config() -> LookupTableConfig:
 
 
 @pytest.fixture
-def mock_config_client() -> ConfigServer:
-    mock_config_client = ConfigServer()
-    mock_config_client.get_file_contents = MagicMock(spec=["get_file_contents"])
-    return mock_config_client
-
-
-@pytest.fixture
 def dummy_energy_motor_lookup(
     mock_config_client: ConfigServer,
     lut_config: LookupTableConfig,
@@ -115,21 +103,27 @@ def dummy_energy_motor_lookup(
     return DummyEnergyMotorLookup(
         config_client=mock_config_client,
         lut_config=lut_config,
-        gap_path=Path("dummy"),
-        phase_path=Path("dummy"),
     )
 
 
 def test_energy_motor_lookup_with_phase_path_none(
     dummy_energy_motor_lookup: DummyEnergyMotorLookup,
 ) -> None:
-    dummy_energy_motor_lookup.update_lookuptables()
+    with pytest.raises(RuntimeError, match="Phase path is not provided"):
+        dummy_energy_motor_lookup._update_phase_lut()
 
-    assert dummy_energy_motor_lookup.available_pol == [Pol.LH.value]
 
-    poly = get_poly(150.0, Pol.LH, dummy_energy_motor_lookup.lookup_tables.gap)
-    assert isinstance(poly, np.poly1d)
-    assert poly(150.0) == pytest.approx(np.poly1d([2.0, -1.0, 0.5])(150.0))
+def test_energy_motor_lookup_with_gap_path_none(
+    lut_config: LookupTableConfig,
+    mock_config_client: ConfigServer,
+) -> None:
+    empty_energy_mortor_lookup = EnergyMotorLookup(
+        config_client=mock_config_client,
+        lut_config=lut_config,
+    )
+
+    with pytest.raises(RuntimeError, match="Gap path is not provided"):
+        empty_energy_mortor_lookup.update_lookuptables()
 
 
 def test_read_file_and_skip_basic() -> None:

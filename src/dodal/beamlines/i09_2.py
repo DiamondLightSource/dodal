@@ -1,17 +1,34 @@
+from pathlib import Path
+
+from daq_config_server.client import ConfigServer
+
 from dodal.common.beamlines.beamline_utils import (
     device_factory,
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.devices.apple2_undulator import (
     Apple2,
+    BeamEnergy,
+    InsertionDeviceEnergy,
+    InsertionDevicePolarisation,
     UndulatorGap,
     UndulatorPhaseAxes,
 )
 from dodal.devices.i09.enums import Grating
+from dodal.devices.i09_2_shared.i09_apple2 import (
+    J09_POLY_DEG,
+    EnergyMotorLookup,
+    J09Apple2Controller,
+)
 from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.devices.synchrotron import Synchrotron
+from dodal.devices.util.lookup_tables_apple2 import LookupTableConfig
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
+
+J09_CONF_CLIENT = ConfigServer(url="https://daq-config.diamond.ac.uk")
+LOOK_UPTABLE_DIR = "/dls_sw/i09-2/software/gda/workspace_git/gda-diamond.git/configurations/i09-2-shared/lookupTables/"
+GAP_LOOKUP_FILE_NAME = "JIDEnergy2GapCalibrations.csv"
 
 BL = get_beamline_name("i09-2")
 PREFIX = BeamlinePrefix(BL, suffix="J")
@@ -55,3 +72,32 @@ def jid() -> Apple2:
         id_gap=jid_gap(),
         id_phase=jid_phase(),
     )
+
+
+@device_factory()
+def jid_controller() -> J09Apple2Controller:
+    """J09 insertion device controller."""
+    return J09Apple2Controller(
+        apple2=jid(),
+        energy_motor_lut=EnergyMotorLookup(
+            lut_config=LookupTableConfig(poly_deg=J09_POLY_DEG),
+            config_client=J09_CONF_CLIENT,
+            gap_path=Path(LOOK_UPTABLE_DIR, GAP_LOOKUP_FILE_NAME),
+        ),
+    )
+
+
+@device_factory()
+def jid_energy() -> InsertionDeviceEnergy:
+    return InsertionDeviceEnergy(id_controller=jid_controller())
+
+
+@device_factory()
+def jid_polarisation() -> InsertionDevicePolarisation:
+    return InsertionDevicePolarisation(id_controller=jid_controller())
+
+
+@device_factory()
+def energy_jid() -> BeamEnergy:
+    """Beam energy."""
+    return BeamEnergy(id_energy=jid_energy(), mono=pgm().energy)
