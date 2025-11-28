@@ -6,7 +6,7 @@ import numpy as np
 import pytest
 from ophyd_async.core import init_devices, set_mock_value
 
-from dodal.devices.i04.max_pixel import KERNAL_SIZE, MaxPixel, _convert_to_gray_and_blur
+from dodal.devices.i04.max_pixel import KERNAL_SIZE, MaxPixel, convert_to_gray_and_blur
 
 
 @pytest.fixture
@@ -46,7 +46,7 @@ async def test_preprocessed_data_grayscale_is_called(
     data = np.array([1])
     # set_mock_value(max_pixel.array_data, data)
     # await max_pixel._convert_to_gray_and_blur()
-    await _convert_to_gray_and_blur(data)
+    await convert_to_gray_and_blur(data)
     mocked_cv2_grey.assert_called_once_with(data, cv2.COLOR_BGR2GRAY)
     mocked_cv2_blur.assert_called_once_with(ANY, KERNAL_SIZE, 0)
 
@@ -62,11 +62,9 @@ test_arr = np.array(
 )
 
 
-async def test_greyscale_works(max_pixel: MaxPixel):
+async def test_greyscale_works():
     test_arr_shape = test_arr.shape  # (4, 3, 3)
-    set_mock_value(max_pixel.array_data, test_arr)
-    await max_pixel.array_data.get_value()
-    processed_data = await max_pixel._convert_to_gray_and_blur()
+    processed_data = await convert_to_gray_and_blur(test_arr)
     processed_data_shape = processed_data.shape  # (4,3)
 
     assert processed_data_shape[0] == test_arr_shape[0]
