@@ -32,7 +32,7 @@ class MaxPixel(StandardReadable, Triggerable):
 
     @AsyncStatus.wrap
     async def trigger(self):
-        arr = await self.preprocessed_data()
+        arr = await self._convert_to_gray_and_blur()
         max_val = np.max(arr)
         assert isinstance(max_val, int)
         self._max_val_setter(max_val)
