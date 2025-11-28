@@ -14,11 +14,13 @@ from numpy import linspace
 from ophyd_async.core import (
     PathProvider,
     StandardDetector,
+    callback_on_mock_put,
+    get_mock_put,
     init_devices,
+    set_mock_value,
     walk_rw_signals,
 )
 from ophyd_async.sim import SimBlobDetector
-from ophyd_async.testing import callback_on_mock_put, get_mock_put, set_mock_value
 
 from dodal.devices.bimorph_mirror import BimorphMirror, BimorphMirrorStatus
 from dodal.devices.slits import Slits
@@ -39,7 +41,7 @@ VALID_BIMORPH_CHANNELS = [2]
 
 
 @pytest.fixture(params=VALID_BIMORPH_CHANNELS)
-def mirror(request, RE: RunEngine) -> BimorphMirror:
+def mirror(request) -> BimorphMirror:
     number_of_channels = request.param
 
     with init_devices(mock=True):
@@ -47,7 +49,6 @@ def mirror(request, RE: RunEngine) -> BimorphMirror:
             prefix="FAKE-PREFIX:",
             number_of_channels=number_of_channels,
         )
-
     return bm
 
 
@@ -79,24 +80,14 @@ def mirror_with_mocked_put(mirror: BimorphMirror) -> BimorphMirror:
 
 
 @pytest.fixture
-def slits(RE: RunEngine) -> Slits:
-    """Mock slits with propagation from setpoint to readback."""
+def slits() -> Slits:
     with init_devices(mock=True):
         slits = Slits("FAKE-PREFIX:")
-
-    for motor in [slits.x_gap, slits.y_gap, slits.x_centre, slits.y_centre]:
-        # Set velocity to avoid zero velocity error:
-        set_mock_value(motor.velocity, 1)
-
-        def callback(value, wait=False, signal=motor.user_readback):
-            set_mock_value(signal, value)
-
-        callback_on_mock_put(motor.user_setpoint, callback)
     return slits
 
 
 @pytest.fixture
-async def oav(RE: RunEngine, static_path_provider: PathProvider) -> StandardDetector:
+async def oav(static_path_provider: PathProvider) -> StandardDetector:
     with init_devices():
         det = SimBlobDetector(static_path_provider)
     return det
@@ -142,7 +133,7 @@ async def test_move_slits(
 
 
 async def test_save_and_restore(
-    RE: RunEngine, mirror_with_mocked_put: BimorphMirror, slits: Slits
+    run_engine: RunEngine, mirror_with_mocked_put: BimorphMirror, slits: Slits
 ):
     signals = [
         slits.x_gap.user_setpoint,
@@ -161,7 +152,7 @@ async def test_save_and_restore(
 
         yield from restore_bimorph_state(mirror_with_mocked_put, slits, state)
 
-    RE(plan())
+    run_engine(plan())
 
     for put in puts:
         assert put.call_args_list == [call(4.0, wait=True), call(0.0, wait=True)]
@@ -251,7 +242,7 @@ class TestInnerScan:
         mock_bps_trigger_and_read: Mock,
         mock_bps_sleep: Mock,
         detectors: list[Readable],
-        RE: RunEngine,
+        run_engine: RunEngine,
         mirror: BimorphMirror,
         slits: Slits,
         active_dimension: SlitDimension,
@@ -262,7 +253,7 @@ class TestInnerScan:
         slit_settle_time: float,
         stream_name: str,
     ):
-        RE(
+        run_engine(
             inner_scan(
                 detectors,
                 mirror,
@@ -294,7 +285,7 @@ class TestInnerScan:
         mock_bps_trigger_and_read: Mock,
         mock_bps_sleep: Mock,
         detectors: list[Readable],
-        RE: RunEngine,
+        run_engine: RunEngine,
         mirror: BimorphMirror,
         slits: Slits,
         active_dimension: SlitDimension,
@@ -305,7 +296,7 @@ class TestInnerScan:
         slit_settle_time: float,
         stream_name: str,
     ):
-        RE(
+        run_engine(
             inner_scan(
                 detectors,
                 mirror,
@@ -336,7 +327,7 @@ class TestInnerScan:
         mock_bps_trigger_and_read: Mock,
         mock_bps_sleep: Mock,
         detectors: list[Readable],
-        RE: RunEngine,
+        run_engine: RunEngine,
         mirror: BimorphMirror,
         slits: Slits,
         active_dimension: SlitDimension,
@@ -347,7 +338,7 @@ class TestInnerScan:
         slit_settle_time: float,
         stream_name: str,
     ):
-        RE(
+        run_engine(
             inner_scan(
                 detectors,
                 mirror,
@@ -404,7 +395,7 @@ class TestBimorphOptimisation:
             def mock_capture_plan_stub(
                 *args: Any, **kwargs: Any
             ) -> Generator[None, None, BimorphState]:
-                # return start_state without yielding Msg to RE:
+                # return start_state without yielding Msg to run_engine:
                 yield from iter([])
                 return start_state
 
@@ -420,7 +411,7 @@ class TestBimorphOptimisation:
         mock_bps_sleep: Mock,
         mock_capture_bimorph_state: Mock,
         detectors: list[Readable],
-        RE: RunEngine,
+        run_engine: RunEngine,
         mirror_with_mocked_put: BimorphMirror,
         slits: Slits,
         voltage_increment: float,
@@ -443,7 +434,7 @@ class TestBimorphOptimisation:
         def start_subscription(name, doc):
             future.set_result(doc)
 
-        RE(
+        run_engine(
             bimorph_optimisation(
                 detectors,
                 mirror_with_mocked_put,
@@ -499,7 +490,7 @@ class TestBimorphOptimisation:
         mock_bps_sleep: Mock,
         mock_capture_bimorph_state: Mock,
         detectors: list[Readable],
-        RE: RunEngine,
+        run_engine: RunEngine,
         mirror_with_mocked_put: BimorphMirror,
         slits: Slits,
         voltage_increment: float,
@@ -514,7 +505,7 @@ class TestBimorphOptimisation:
         slit_settle_time: float,
         initial_voltage_list: list[float],
     ):
-        RE(
+        run_engine(
             bimorph_optimisation(
                 detectors,
                 mirror_with_mocked_put,
@@ -546,7 +537,7 @@ class TestBimorphOptimisation:
         mock_bps_sleep: Mock,
         mock_capture_bimorph_state: Mock,
         detectors: list[Readable],
-        RE: RunEngine,
+        run_engine: RunEngine,
         mirror_with_mocked_put: BimorphMirror,
         slits: Slits,
         voltage_increment: float,
@@ -562,7 +553,7 @@ class TestBimorphOptimisation:
         initial_voltage_list: list[float],
         start_state,
     ):
-        RE(
+        run_engine(
             bimorph_optimisation(
                 detectors,
                 mirror_with_mocked_put,
@@ -593,7 +584,7 @@ class TestBimorphOptimisation:
         mock_bps_sleep: Mock,
         mock_capture_bimorph_state: Mock,
         detectors: list[Readable],
-        RE: RunEngine,
+        run_engine: RunEngine,
         mirror_with_mocked_put: BimorphMirror,
         slits: Slits,
         voltage_increment: float,
@@ -613,7 +604,7 @@ class TestBimorphOptimisation:
             SlitDimension.Y if active_dimension == SlitDimension.X else SlitDimension.X
         )
 
-        RE(
+        run_engine(
             bimorph_optimisation(
                 detectors,
                 mirror_with_mocked_put,
@@ -644,7 +635,7 @@ class TestBimorphOptimisation:
         mock_bps_sleep: Mock,
         mock_capture_bimorph_state: Mock,
         detectors: list[Readable],
-        RE: RunEngine,
+        run_engine: RunEngine,
         mirror_with_mocked_put: BimorphMirror,
         slits: Slits,
         voltage_increment: float,
@@ -660,7 +651,7 @@ class TestBimorphOptimisation:
         initial_voltage_list: list[float],
         start_state: BimorphState,
     ):
-        RE(
+        run_engine(
             bimorph_optimisation(
                 detectors,
                 mirror_with_mocked_put,
@@ -702,7 +693,7 @@ class TestBimorphOptimisation:
         mock_bps_sleep: Mock,
         mock_capture_bimorph_state: Mock,
         detectors: list[Readable],
-        RE: RunEngine,
+        run_engine: RunEngine,
         mirror_with_mocked_put: BimorphMirror,
         slits: Slits,
         voltage_increment: float,
@@ -718,7 +709,7 @@ class TestBimorphOptimisation:
         initial_voltage_list: list[float],
         start_state: BimorphState,
     ):
-        RE(
+        run_engine(
             bimorph_optimisation(
                 detectors,
                 mirror_with_mocked_put,
@@ -753,7 +744,7 @@ class TestBimorphOptimisation:
         mock_bps_sleep: Mock,
         mock_capture_bimorph_state: Mock,
         detectors: list[Readable],
-        RE: RunEngine,
+        run_engine: RunEngine,
         mirror_with_mocked_put: BimorphMirror,
         slits: Slits,
         voltage_increment: float,
@@ -769,7 +760,7 @@ class TestBimorphOptimisation:
         initial_voltage_list: list[float],
         start_state: BimorphState,
     ):
-        RE(
+        run_engine(
             bimorph_optimisation(
                 detectors,
                 mirror_with_mocked_put,

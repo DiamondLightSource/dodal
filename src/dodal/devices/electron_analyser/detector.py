@@ -1,13 +1,13 @@
 from typing import Generic, TypeVar
 
-from ophyd_async.core import (
-    AsyncStatus,
-    Reference,
-)
+from bluesky.protocols import Stageable
+from ophyd_async.core import AsyncStatus
+from ophyd_async.epics.adcore import ADBaseController
 
 from dodal.common.data_util import load_json_file_to_class
+from dodal.devices.controllers import ConstantDeadTimeController
 from dodal.devices.electron_analyser.abstract.base_detector import (
-    AbstractElectronAnalyserDetector,
+    BaseElectronAnalyserDetector,
 )
 from dodal.devices.electron_analyser.abstract.base_driver_io import (
     TAbstractAnalyserDriverIO,
@@ -19,35 +19,27 @@ from dodal.devices.electron_analyser.abstract.base_region import (
 
 
 class ElectronAnalyserRegionDetector(
-    AbstractElectronAnalyserDetector[TAbstractAnalyserDriverIO],
+    BaseElectronAnalyserDetector[TAbstractAnalyserDriverIO],
     Generic[TAbstractAnalyserDriverIO, TAbstractBaseRegion],
 ):
     """
     Extends electron analyser detector to configure specific region settings before data
-    acqusition. This object must be passed in a driver and store it as a reference. It
-    is designed to only exist inside a plan.
+    acquisition. It is designed to only exist inside a plan.
     """
 
     def __init__(
         self,
-        driver: TAbstractAnalyserDriverIO,
+        controller: ADBaseController[TAbstractAnalyserDriverIO],
         region: TAbstractBaseRegion,
         name: str = "",
     ):
-        self._driver_ref = Reference(driver)
         self.region = region
-        super().__init__(driver, name)
-
-    @property
-    def driver(self) -> TAbstractAnalyserDriverIO:
-        # Store as a reference, this implementation will be given a driver so needs to
-        # make sure we don't get conflicting parents.
-        return self._driver_ref()
+        super().__init__(controller, name)
 
     @AsyncStatus.wrap
     async def trigger(self) -> None:
         # Configure region parameters on the driver first before data collection.
-        await self.driver.set(self.region)
+        await self._controller.driver.set(self.region)
         await super().trigger()
 
 
@@ -58,7 +50,8 @@ TElectronAnalyserRegionDetector = TypeVar(
 
 
 class ElectronAnalyserDetector(
-    AbstractElectronAnalyserDetector[TAbstractAnalyserDriverIO],
+    BaseElectronAnalyserDetector[TAbstractAnalyserDriverIO],
+    Stageable,
     Generic[
         TAbstractAnalyserDriverIO,
         TAbstractBaseSequence,
@@ -77,16 +70,33 @@ class ElectronAnalyserDetector(
         driver: TAbstractAnalyserDriverIO,
         name: str = "",
     ):
-        # Pass in driver
-        self._driver = driver
+        # Save driver as direct child so participates with connect()
+        self.driver = driver
         self._sequence_class = sequence_class
-        super().__init__(self.driver, name)
+        controller = ConstantDeadTimeController[TAbstractAnalyserDriverIO](driver, 0)
+        super().__init__(controller, name)
 
-    @property
-    def driver(self) -> TAbstractAnalyserDriverIO:
-        # This implementation creates the driver and wants this to be the parent so it
-        # can be used with connect() method.
-        return self._driver
+    @AsyncStatus.wrap
+    async def stage(self) -> None:
+        """
+        Prepare the detector for use by ensuring it is idle and ready.
+
+        This method asynchronously stages the detector by first disarming the controller
+        to ensure the detector is not actively acquiring data, then invokes the driver's
+        stage procedure. This ensures the detector is in a known, ready state
+        before use.
+
+        Raises:
+            Any exceptions raised by the driver's stage or controller's disarm methods.
+        """
+        await self._controller.disarm()
+        await self.driver.stage()
+
+    @AsyncStatus.wrap
+    async def unstage(self) -> None:
+        """Disarm the detector."""
+        await self._controller.disarm()
+        await self.driver.unstage()
 
     def load_sequence(self, filename: str) -> TAbstractBaseSequence:
         """
@@ -120,7 +130,9 @@ class ElectronAnalyserDetector(
         seq = self.load_sequence(filename)
         regions = seq.get_enabled_regions() if enabled_only else seq.regions
         return [
-            ElectronAnalyserRegionDetector(self.driver, r, self.name + "_" + r.name)
+            ElectronAnalyserRegionDetector(
+                self._controller, r, self.name + "_" + r.name
+            )
             for r in regions
         ]
 

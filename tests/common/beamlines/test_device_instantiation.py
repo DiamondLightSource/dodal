@@ -1,7 +1,7 @@
 from typing import Any
 
 import pytest
-from ophyd_async.core import NotConnected
+from ophyd_async.core import NotConnectedError
 
 from dodal.beamlines import all_beamline_modules
 from dodal.utils import BLUESKY_PROTOCOLS, make_all_devices
@@ -16,14 +16,14 @@ def follows_bluesky_protocols(obj: Any) -> bool:
     set(all_beamline_modules()),
     indirect=True,
 )
-def test_device_creation(RE, module_and_devices_for_beamline):
+def test_device_creation(module_and_devices_for_beamline):
     """
     Ensures that for every beamline all device factories are using valid args
     and creating types that conform to Bluesky protocols.
     """
     _, devices, exceptions = module_and_devices_for_beamline
     if len(exceptions) > 0:
-        raise NotConnected(exceptions)
+        raise NotConnectedError(exceptions)
     devices_not_following_bluesky_protocols = [
         name
         for name, device in devices.items()
@@ -39,7 +39,7 @@ def test_device_creation(RE, module_and_devices_for_beamline):
     set(all_beamline_modules()),
     indirect=True,
 )
-def test_devices_are_identical(RE, module_and_devices_for_beamline):
+def test_devices_are_identical(module_and_devices_for_beamline):
     """
     Ensures that for every beamline all device functions prevent duplicate instantiation.
     """

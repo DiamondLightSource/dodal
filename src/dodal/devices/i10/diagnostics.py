@@ -28,7 +28,7 @@ class D3Position(StrictEnum):
     GRID = "Grid"
 
 
-class D5Position(StrictEnum):
+class CellPosition(StrictEnum):
     CELL_IN = "Cell In"
     CELL_OUT = "Cell Out"
 
@@ -54,18 +54,33 @@ class D7Position(StrictEnum):
     SHUTTER = "Shutter"
 
 
-class InOutTable(StrictEnum):
+class InStateTable(StrictEnum):
     MOVE_IN = "Move In"
     MOVE_OUT = "Move Out"
     RESET = "Reset"
 
 
-class InOutReadBackTable(StrictEnum):
+class InStateReadBackTable(StrictEnum):
     MOVE_IN = "Moving In"
     MOVE_OUT = "Moving Out"
     IN_BEAM = "In Beam"
     FAULT = "Fault"
     OUT_OF_BEAM = "Out of Beam"
+
+
+class D2jPosition(StrictEnum):
+    OUT_OF_THE_BEAM = "Out of the beam"
+    DIODE = "Diode"
+    BLADE = "Blade"
+    LA = "La ref"
+    GD = "Gd ref"
+    YB = "Yb ref"
+
+
+class D3jPosition(StrictEnum):
+    OUT_OF_THE_BEAM = "Out of the beam"
+    DIODE_IN = "Diode In"
+    DIAMOND_WINDOW = "Diamond window"
 
 
 class I10PneumaticStage(StandardReadable):
@@ -80,11 +95,11 @@ class I10PneumaticStage(StandardReadable):
     ) -> None:
         with self.add_children_as_readables(Format.HINTED_SIGNAL):
             self.stage_position_set = epics_signal_rw(
-                InOutTable,
+                InStateTable,
                 read_pv=prefix + "CON",
             )
             self.stage_position_readback = epics_signal_r(
-                InOutReadBackTable,
+                InStateReadBackTable,
                 read_pv=prefix + "STA",
             )
         super().__init__(name=name)
@@ -138,9 +153,7 @@ class FullDiagnostic(Device):
         super().__init__(name)
 
 
-class I10Diagnostic(Device):
-    """Collection of all the diagnostic stage on i10."""
-
+class I10SharedDiagnostic(Device):
     def __init__(self, prefix, name: str = "") -> None:
         self.d1 = ScreenCam(prefix=prefix + "PHDGN-01:")
         self.d2 = ScreenCam(prefix=prefix + "PHDGN-02:")
@@ -149,11 +162,30 @@ class I10Diagnostic(Device):
             positioner_enum=D3Position,
             positioner_suffix="DET:X",
         )
+        super().__init__(name)
+
+
+class I10Diagnostic(Device):
+    """Collection of all the diagnostic stage on i10."""
+
+    def __init__(self, prefix, name: str = "") -> None:
         self.d4 = ScreenCam(prefix=prefix + "PHDGN-04:")
-        self.d5 = create_positioner(D5Position, f"{prefix}IONC-01:Y")
+        self.d5 = create_positioner(CellPosition, f"{prefix}IONC-01:Y")
         self.d5A = create_positioner(D5APosition, f"{prefix}PHDGN-06:DET:X")
         self.d6 = FullDiagnostic(f"{prefix}PHDGN-05:", D6Position, "DET:X")
         self.d7 = create_positioner(D7Position, f"{prefix}PHDGN-07:Y")
+
+        super().__init__(name)
+
+
+class I10JDiagnostic(Device):
+    """Collection of all the diagnostic stage on i10-1."""
+
+    def __init__(self, prefix, name: str = "") -> None:
+        self.dj1 = ScreenCam(prefix=prefix + "PHDGN-01:")
+        self.dj2 = create_positioner(CellPosition, f"{prefix}IONC-01:Y")
+        self.dj2A = create_positioner(D2jPosition, f"{prefix}PHDGN-03:DET:X")
+        self.dj3 = FullDiagnostic(f"{prefix}PHDGN-02:", D3jPosition, "DET:X")
 
         super().__init__(name)
 

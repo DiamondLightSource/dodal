@@ -13,7 +13,7 @@ from ophyd_async.epics.motor import Motor
 
 from dodal.common.crystal_metadata import CrystalMetadata
 from dodal.devices.common_dcm import (
-    BaseDCM,
+    DoubleCrystalMonochromatorWithDSpacing,
     PitchAndRollCrystal,
     RollCrystal,
 )
@@ -23,7 +23,7 @@ from dodal.devices.common_dcm import (
 _CONVERSION_CONSTANT = 12.3984
 
 
-class DCM(BaseDCM[RollCrystal, PitchAndRollCrystal]):
+class DCM(DoubleCrystalMonochromatorWithDSpacing[RollCrystal, PitchAndRollCrystal]):
     """
     A double crystal monochromator (DCM), used to select the energy of the beam.
 
@@ -38,7 +38,7 @@ class DCM(BaseDCM[RollCrystal, PitchAndRollCrystal]):
         temperature_prefix: str,
         crystal_1_metadata: CrystalMetadata,
         crystal_2_metadata: CrystalMetadata,
-        prefix: str = "",
+        prefix: str,
         name: str = "",
     ) -> None:
         with self.add_children_as_readables():
@@ -107,7 +107,7 @@ class DCM(BaseDCM[RollCrystal, PitchAndRollCrystal]):
 
     async def read(self) -> dict[str, Reading]:
         default_reading = await super().read()
-        energy: float = default_reading[f"{self.name}-energy_in_kev"]["value"]
+        energy: float = default_reading[f"{self.name}-energy_in_keV"]["value"]
         if energy > 0.0:
             wavelength = _CONVERSION_CONSTANT / energy
         else:

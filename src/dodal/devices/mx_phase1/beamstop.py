@@ -10,6 +10,8 @@ from ophyd_async.epics.motor import Motor
 
 from dodal.common.beamlines.beamline_parameters import GDABeamlineParameters
 
+_BEAMSTOP_OUT_DELTA_Y_MM = -2
+
 
 class BeamstopPositions(StrictEnum):
     """
@@ -17,9 +19,6 @@ class BeamstopPositions(StrictEnum):
     GDA supports Standard/High/Low resolution positions, as well as parked and
     robot load however all 3 resolution positions are the same. We also
     do not use the robot load position in Hyperion.
-
-    Until we support moving the beamstop it is only necessary to check whether the
-    beamstop is in beam or not.
 
     See Also:
         https://github.com/DiamondLightSource/mx-bluesky/issues/484
@@ -31,6 +30,7 @@ class BeamstopPositions(StrictEnum):
     """
 
     DATA_COLLECTION = "Data Collection"
+    OUT_OF_BEAM = "Out"
     UNKNOWN = "Unknown"
 
 
@@ -66,6 +66,10 @@ class Beamstop(StandardReadable):
             float(beamline_parameters[f"in_beam_{axis}_STANDARD"])
             for axis in ("x", "y", "z")
         ]
+
+        self._out_of_beam_xyz_mm = list(self._in_beam_xyz_mm)
+        self._out_of_beam_xyz_mm[1] += _BEAMSTOP_OUT_DELTA_Y_MM
+
         self._xyz_tolerance_mm = [
             float(beamline_parameters[f"bs_{axis}_tolerance"])
             for axis in ("x", "y", "z")
@@ -75,22 +79,36 @@ class Beamstop(StandardReadable):
 
     def _get_selected_position(self, x: float, y: float, z: float) -> BeamstopPositions:
         current_pos = [x, y, z]
-        if all(
-            isclose(axis_pos, axis_in_beam, abs_tol=axis_tolerance)
-            for axis_pos, axis_in_beam, axis_tolerance in zip(
-                current_pos, self._in_beam_xyz_mm, self._xyz_tolerance_mm, strict=False
-            )
-        ):
+        if self._is_near_position(current_pos, self._in_beam_xyz_mm):
             return BeamstopPositions.DATA_COLLECTION
+        elif self._is_near_position(current_pos, self._out_of_beam_xyz_mm):
+            return BeamstopPositions.OUT_OF_BEAM
         else:
             return BeamstopPositions.UNKNOWN
 
-    async def _set_selected_position(self, position: BeamstopPositions) -> None:
-        if position == BeamstopPositions.DATA_COLLECTION:
-            await asyncio.gather(
-                self.x_mm.set(self._in_beam_xyz_mm[0]),
-                self.y_mm.set(self._in_beam_xyz_mm[1]),
-                self.z_mm.set(self._in_beam_xyz_mm[2]),
+    def _is_near_position(
+        self, current_pos: list[float], target_pos: list[float]
+    ) -> bool:
+        return all(
+            isclose(axis_pos, axis_in_beam, abs_tol=axis_tolerance)
+            for axis_pos, axis_in_beam, axis_tolerance in zip(
+                current_pos, target_pos, self._xyz_tolerance_mm, strict=False
             )
-        elif position == BeamstopPositions.UNKNOWN:
-            raise ValueError(f"Cannot set beamstop to position {position}")
+        )
+
+    async def _set_selected_position(self, position: BeamstopPositions) -> None:
+        match position:
+            case BeamstopPositions.DATA_COLLECTION:
+                await self._safe_move_above_table(self._in_beam_xyz_mm)
+            case BeamstopPositions.OUT_OF_BEAM:
+                await self._safe_move_above_table(self._out_of_beam_xyz_mm)
+            case _:
+                raise ValueError(f"Cannot set beamstop to position {position}")
+
+    async def _safe_move_above_table(self, pos: list[float]):
+        # Move z first as it could be under the table
+        await self.z_mm.set(pos[2])
+        await asyncio.gather(
+            self.x_mm.set(pos[0]),
+            self.y_mm.set(pos[1]),
+        )

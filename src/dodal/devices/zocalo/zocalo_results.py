@@ -24,11 +24,11 @@ from dodal.devices.zocalo.zocalo_interaction import _get_zocalo_connection
 from dodal.log import LOGGER
 
 
-class NoResultsFromZocalo(Exception):
+class NoResultsFromZocaloError(Exception):
     pass
 
 
-class NoZocaloSubscription(Exception):
+class NoZocaloSubscriptionError(Exception):
     pass
 
 
@@ -125,19 +125,17 @@ class ZocaloResults(StandardReadable, Triggerable):
 
     def __init__(
         self,
-        name: str = "zocalo",
+        name: str = "",
         zocalo_environment: str = ZOCALO_ENV,
         channel: str = "xrc.i03",
         sort_key: str = DEFAULT_SORT_KEY.value,
         timeout_s: float = DEFAULT_TIMEOUT,
-        prefix: str = "",
         results_source: ZocaloSource = ZocaloSource.CPU,
     ) -> None:
         self.zocalo_environment = zocalo_environment
         self.sort_key = SortKeys[sort_key]
         self.channel = channel
         self.timeout_s = timeout_s
-        self._prefix = prefix
         self._raw_results_received: Queue = Queue()
         self.transport: CommonTransport | None = None
         self.results_source = results_source
@@ -236,7 +234,7 @@ class ZocaloResults(StandardReadable, Triggerable):
             "meant for it"
         )
         if not self.transport:
-            raise NoZocaloSubscription(msg)
+            raise NoZocaloSubscriptionError(msg)
 
         try:
             LOGGER.info(
@@ -268,7 +266,7 @@ class ZocaloResults(StandardReadable, Triggerable):
             )
         except Empty as timeout_exception:
             LOGGER.warning("Timed out waiting for zocalo results!")
-            raise NoResultsFromZocalo(
+            raise NoResultsFromZocaloError(
                 "Timed out waiting for Zocalo results"
             ) from timeout_exception
         finally:

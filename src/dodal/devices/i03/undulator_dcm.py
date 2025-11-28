@@ -5,7 +5,7 @@ from ophyd_async.core import AsyncStatus, Reference, StandardReadable
 
 from dodal.common.beamlines.beamline_parameters import get_beamline_parameters
 from dodal.devices.i03.dcm import DCM
-from dodal.devices.undulator import Undulator
+from dodal.devices.undulator import UndulatorInKeV
 from dodal.log import LOGGER
 
 ENERGY_TIMEOUT_S: float = 30.0
@@ -31,10 +31,9 @@ class UndulatorDCM(StandardReadable, Movable[float]):
 
     def __init__(
         self,
-        undulator: Undulator,
+        undulator: UndulatorInKeV,
         dcm: DCM,
         daq_configuration_path: str,
-        prefix: str = "",
         name: str = "",
     ):
         self.undulator_ref = Reference(undulator)
@@ -59,7 +58,7 @@ class UndulatorDCM(StandardReadable, Movable[float]):
     async def set(self, value: float):
         await self.undulator_ref().raise_if_not_enabled()
         await asyncio.gather(
-            self.dcm_ref().energy_in_kev.set(value, timeout=ENERGY_TIMEOUT_S),
+            self.dcm_ref().energy_in_keV.set(value, timeout=ENERGY_TIMEOUT_S),
             self.undulator_ref().set(value),
         )
 

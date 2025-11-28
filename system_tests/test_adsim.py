@@ -31,8 +31,8 @@ from dodal.plans import count
 System tests that can be run against the containerised IOCs from epics-containers:
 https://github.com/epics-containers/example-services
 
-Check out that repository and using docker or podman deploy the services in the compose
-file:
+Check out that repository and using docker or podman deploy the services in the
+compose file:
 
 ```sh
 docker compose up -d
@@ -51,9 +51,9 @@ def with_env():
     with patch.dict(
         os.environ,
         {
-            "EPICS_CA_NAME_SERVERS": "127.0.0.1:5094",
-            "EPICS_PVA_NAME_SERVERS": "127.0.0.1:5095",
-            "EPICS_CA_ADDR_LIST": "127.0.0.1:5094",
+            "EPICS_CA_NAME_SERVERS": "127.0.0.1:9064",
+            "EPICS_PVA_NAME_SERVERS": "127.0.0.1:9075",
+            "EPICS_CA_ADDR_LIST": "127.0.0.1:9064",
         },
         clear=True,
     ):
@@ -70,23 +70,23 @@ def path_provider() -> Generator[PathProvider]:
 
 
 @pytest.fixture
-def det(RE, path_provider: PathProvider) -> Generator[StandardDetector]:
+def det(run_engine, path_provider: PathProvider) -> Generator[StandardDetector]:
     yield adsim.det(connect_immediately=True)
     adsim.det.cache_clear()
 
 
 @pytest.fixture
-def sim_stage(RE) -> Generator[XThetaStage]:
+def sim_stage(run_engine) -> Generator[XThetaStage]:
     yield adsim.stage(connect_immediately=True)
     adsim.stage.cache_clear()
 
 
 @pytest.fixture
 def documents_from_num(
-    request: pytest.FixtureRequest, det: StandardDetector, RE: RunEngine
+    request: pytest.FixtureRequest, det: StandardDetector, run_engine: RunEngine
 ) -> dict[str, list[DocumentType]]:
     docs: dict[str, list[DocumentType]] = {}
-    RE(
+    run_engine(
         count({det}, num=request.param),
         lambda name, doc: docs.setdefault(name, []).append(doc),
     )

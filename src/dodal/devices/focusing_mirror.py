@@ -17,6 +17,7 @@ from ophyd_async.epics.core import (
 )
 from ophyd_async.epics.motor import Motor
 
+from dodal.devices.motors import XYPitchStage
 from dodal.log import LOGGER
 
 VOLTAGE_POLLING_DELAY_S = 0.5
@@ -56,7 +57,7 @@ class SingleMirrorVoltage(Device):
     the demanded voltage setpoint is accepted, without blocking the caller as this process can take significant time.
     """
 
-    def __init__(self, name: str = "", prefix: str = ""):
+    def __init__(self, prefix: str, name: str = ""):
         self._actual_v = epics_signal_r(int, prefix + "R")
         self._setpoint_v = epics_signal_rw(int, prefix + "D")
         self._demand_accepted = epics_signal_r(MirrorVoltageDemand, prefix + "DSEV")
@@ -132,6 +133,35 @@ class MirrorVoltages(StandardReadable):
                 for i in range(start_idx, end_idx)
             }
         )
+
+
+class SimpleMirror(XYPitchStage):
+    """Simple Focusing Mirror"""
+
+    def __init__(
+        self,
+        prefix: str,
+        name: str = "",
+        x_infix: str = "X",
+        y_infix: str = "Y",
+        pitch_infix: str = "PITCH",
+    ):
+        super().__init__(
+            name=name,
+            prefix=prefix,
+            x_infix=x_infix,
+            y_infix=y_infix,
+            pitch_infix=pitch_infix,
+        )
+
+        with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
+            self.type, _ = soft_signal_r_and_setter(MirrorType, MirrorType.SINGLE)
+
+        with self.add_children_as_readables():
+            self.yaw = Motor(prefix + "YAW")
+            self.bend = Motor(prefix + "BEND")
+            self.jack1 = Motor(prefix + "J1")
+            self.jack2 = Motor(prefix + "J2")
 
 
 class FocusingMirror(StandardReadable):

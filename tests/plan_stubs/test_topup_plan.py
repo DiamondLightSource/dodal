@@ -3,18 +3,22 @@ from unittest.mock import MagicMock, patch
 import bluesky.plan_stubs as bps
 import pytest
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import init_devices
-from ophyd_async.testing import set_mock_value
+from ophyd_async.core import init_devices, set_mock_value
 
 from dodal.devices.synchrotron import Synchrotron, SynchrotronMode
 from dodal.plan_stubs.check_topup import (
     check_topup_and_wait_if_necessary,
     wait_for_topup_complete,
 )
+from tests.plan_stubs.test_data import (
+    TEST_TOPUP_LONG_DELAY_TXT,
+    TEST_TOPUP_SHORT_PARAMS_TXT,
+)
+from tests.test_data import TEST_BEAMLINE_PARAMETERS_TXT
 
 
 @pytest.fixture
-async def synchrotron(RE) -> Synchrotron:
+async def synchrotron() -> Synchrotron:
     async with init_devices(mock=True):
         synchrotron = Synchrotron()
     return synchrotron
@@ -23,13 +27,16 @@ async def synchrotron(RE) -> Synchrotron:
 @patch("dodal.plan_stubs.check_topup.wait_for_topup_complete")
 @patch("dodal.plan_stubs.check_topup.bps.sleep")
 def test_when_topup_before_end_of_collection_wait(
-    fake_sleep: MagicMock, fake_wait: MagicMock, synchrotron: Synchrotron, RE: RunEngine
+    fake_sleep: MagicMock,
+    fake_wait: MagicMock,
+    synchrotron: Synchrotron,
+    run_engine: RunEngine,
 ):
     set_mock_value(synchrotron.synchrotron_mode, SynchrotronMode.USER)
     set_mock_value(synchrotron.top_up_start_countdown, 20.0)
     set_mock_value(synchrotron.top_up_end_countdown, 60.0)
 
-    RE(
+    run_engine(
         check_topup_and_wait_if_necessary(
             synchrotron=synchrotron,
             total_exposure_time=40.0,
@@ -42,7 +49,10 @@ def test_when_topup_before_end_of_collection_wait(
 @patch("dodal.plan_stubs.check_topup.bps.rd")
 @patch("dodal.plan_stubs.check_topup.bps.sleep")
 def test_wait_for_topup_complete(
-    fake_sleep: MagicMock, fake_rd: MagicMock, synchrotron: Synchrotron, RE: RunEngine
+    fake_sleep: MagicMock,
+    fake_rd: MagicMock,
+    synchrotron: Synchrotron,
+    run_engine: RunEngine,
 ):
     def fake_generator(value):
         yield from bps.null()
@@ -55,7 +65,7 @@ def test_wait_for_topup_complete(
         fake_generator(10.0),
     ]
 
-    RE(wait_for_topup_complete(synchrotron))
+    run_engine(wait_for_topup_complete(synchrotron))
 
     assert fake_sleep.call_count == 3
     fake_sleep.assert_called_with(0.1)
@@ -64,11 +74,14 @@ def test_wait_for_topup_complete(
 @patch("dodal.plan_stubs.check_topup.bps.sleep")
 @patch("dodal.plan_stubs.check_topup.bps.null")
 def test_no_waiting_if_decay_mode(
-    fake_null: MagicMock, fake_sleep: MagicMock, synchrotron: Synchrotron, RE: RunEngine
+    fake_null: MagicMock,
+    fake_sleep: MagicMock,
+    synchrotron: Synchrotron,
+    run_engine: RunEngine,
 ):
     set_mock_value(synchrotron.top_up_start_countdown, -1)
 
-    RE(
+    run_engine(
         check_topup_and_wait_if_necessary(
             synchrotron=synchrotron,
             total_exposure_time=10.0,
@@ -81,12 +94,12 @@ def test_no_waiting_if_decay_mode(
 
 @patch("dodal.plan_stubs.check_topup.bps.null")
 def test_no_waiting_when_mode_does_not_allow_gating(
-    fake_null: MagicMock, synchrotron: Synchrotron, RE: RunEngine
+    fake_null: MagicMock, synchrotron: Synchrotron, run_engine: RunEngine
 ):
     set_mock_value(synchrotron.top_up_start_countdown, 1.0)
     set_mock_value(synchrotron.synchrotron_mode, SynchrotronMode.SHUTDOWN)
 
-    RE(
+    run_engine(
         check_topup_and_wait_if_necessary(
             synchrotron=synchrotron,
             total_exposure_time=10.0,
@@ -101,31 +114,31 @@ def test_no_waiting_when_mode_does_not_allow_gating(
     "expected_wait, parameter_file",
     # limit = 120, delay = 1
     [
-        (100, 108, 121, 1, 0, "test_beamline_parameters.txt"),
-        (100, 108, 119, 1, 108 + 1, "test_beamline_parameters.txt"),
-        (110, 120, 120, 1, 0, "test_beamline_parameters.txt"),
-        (110.1, 120, 119.99, 1, 120 + 1, "test_beamline_parameters.txt"),
+        (100, 108, 121, 1, 0, TEST_BEAMLINE_PARAMETERS_TXT),
+        (100, 108, 119, 1, 108 + 1, TEST_BEAMLINE_PARAMETERS_TXT),
+        (110, 120, 120, 1, 0, TEST_BEAMLINE_PARAMETERS_TXT),
+        (110.1, 120, 119.99, 1, 120 + 1, TEST_BEAMLINE_PARAMETERS_TXT),
         # limit = 35, delay = 1
-        (110.1, 120, 36, 1, 0, "topup_short_params.txt"),
-        (36, 42, 36, 1, 0, "topup_short_params.txt"),
-        (36, 42, 34, 4, 42 + 1, "topup_short_params.txt"),
-        (36, 42, 34, 2, 0, "topup_short_params.txt"),
-        (36, 42, 35, 3, 0, "topup_short_params.txt"),
-        (31.1, 39, 31, 1, 39 + 1, "topup_short_params.txt"),
-        (30.1, 38, 31, 1, 38 + 1, "topup_short_params.txt"),
+        (110.1, 120, 36, 1, 0, TEST_TOPUP_SHORT_PARAMS_TXT),
+        (36, 42, 36, 1, 0, TEST_TOPUP_SHORT_PARAMS_TXT),
+        (36, 42, 34, 4, 42 + 1, TEST_TOPUP_SHORT_PARAMS_TXT),
+        (36, 42, 34, 2, 0, TEST_TOPUP_SHORT_PARAMS_TXT),
+        (36, 42, 35, 3, 0, TEST_TOPUP_SHORT_PARAMS_TXT),
+        (31.1, 39, 31, 1, 39 + 1, TEST_TOPUP_SHORT_PARAMS_TXT),
+        (30.1, 38, 31, 1, 38 + 1, TEST_TOPUP_SHORT_PARAMS_TXT),
         # limit = 30, delay = 19
-        (30, 40, 29, 1, 0, "topup_long_delay.txt"),
-        (29, 39, 29, 1, 39 + 19, "topup_long_delay.txt"),
-        (29, 39, 28, 1, 0, "topup_long_delay.txt"),
-        (29, 39, 28, 2, 39 + 19, "topup_long_delay.txt"),
-        (29, 39, 27, 2, 0, "topup_long_delay.txt"),
-        (29, 39, 35, 1, 0, "topup_long_delay.txt"),
+        (30, 40, 29, 1, 0, TEST_TOPUP_LONG_DELAY_TXT),
+        (29, 39, 29, 1, 39 + 19, TEST_TOPUP_LONG_DELAY_TXT),
+        (29, 39, 28, 1, 0, TEST_TOPUP_LONG_DELAY_TXT),
+        (29, 39, 28, 2, 39 + 19, TEST_TOPUP_LONG_DELAY_TXT),
+        (29, 39, 27, 2, 0, TEST_TOPUP_LONG_DELAY_TXT),
+        (29, 39, 35, 1, 0, TEST_TOPUP_LONG_DELAY_TXT),
     ],
 )
 @patch("dodal.plan_stubs.check_topup.bps.sleep")
 def test_topup_not_allowed_when_exceeds_threshold_percentage_of_topup_time(
     mock_sleep,
-    RE: RunEngine,
+    run_engine: RunEngine,
     synchrotron: Synchrotron,
     topup_start_countdown: float,
     topup_end_countdown: float,
@@ -140,9 +153,9 @@ def test_topup_not_allowed_when_exceeds_threshold_percentage_of_topup_time(
 
     with patch(
         "dodal.common.beamlines.beamline_parameters.BEAMLINE_PARAMETER_PATHS",
-        {"i03": f"tests/test_data/{parameter_file}"},
+        {"i03": parameter_file},
     ):
-        RE(
+        run_engine(
             check_topup_and_wait_if_necessary(
                 synchrotron, total_exposure_time, ops_time
             )

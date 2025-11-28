@@ -1,6 +1,5 @@
 from .base_detector import (
-    AbstractAnalyserDriverIO,
-    AbstractElectronAnalyserDetector,
+    BaseElectronAnalyserDetector,
 )
 from .base_driver_io import AbstractAnalyserDriverIO, TAbstractAnalyserDriverIO
 from .base_region import (
@@ -20,7 +19,7 @@ __all__ = [
     "TAcquisitionMode",
     "TLensMode",
     "AbstractAnalyserDriverIO",
-    "AbstractElectronAnalyserDetector",
+    "BaseElectronAnalyserDetector",
     "AbstractAnalyserDriverIO",
     "TAbstractAnalyserDriverIO",
 ]

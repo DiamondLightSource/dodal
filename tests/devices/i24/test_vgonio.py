@@ -1,0 +1,24 @@
+import bluesky.plan_stubs as bps
+import pytest
+from bluesky import RunEngine
+
+from dodal.devices.i24.vgonio import VerticalGoniometer
+
+
+@pytest.fixture
+async def vgonio():
+    vgonio = VerticalGoniometer("", name="fake_vgonio")
+    await vgonio.connect(mock=True)
+    return vgonio
+
+
+def test_vertical_gonio_device_can_be_created(vgonio: VerticalGoniometer):
+    assert isinstance(vgonio, VerticalGoniometer)
+
+
+async def test_vgonio_motor_move(vgonio: VerticalGoniometer, run_engine: RunEngine):
+    pos = (1.0, 1.5)
+    run_engine(bps.mv(vgonio.x, pos[0], vgonio.yh, pos[1]))  # type:ignore
+
+    assert await vgonio.x.user_readback.get_value() == 1.0
+    assert await vgonio.yh.user_readback.get_value() == 1.5
