@@ -77,10 +77,11 @@ class TetrammDriver(NDArrayBaseIO):
 class TetrammController(DetectorController):
     """Controller for a TetrAMM current monitor"""
 
-    _supported_trigger_types = {
+    _trigger_types = {
         DetectorTrigger.EDGE_TRIGGER: TetrammTrigger.EXT_TRIGGER,
         DetectorTrigger.CONSTANT_GATE: TetrammTrigger.EXT_TRIGGER,
         DetectorTrigger.VARIABLE_GATE: TetrammTrigger.EXT_TRIGGER,
+        DetectorTrigger.INTERNAL: TetrammTrigger.FREE_RUN,
     }
     """"On the TetrAMM ASCII mode requires a minimum value of ValuesPerRead of 500,
     [...] binary mode the minimum value of ValuesPerRead is 5."
@@ -100,10 +101,10 @@ class TetrammController(DetectorController):
         return 2 / self._base_sample_rate
 
     async def prepare(self, trigger_info: TriggerInfo) -> None:
-        if trigger_info.trigger not in self._supported_trigger_types:
+        if trigger_info.trigger not in self._trigger_types:
             raise TypeError(
                 f"{self.__class__.__name__} only supports the following trigger "
-                f"types: {[k.name for k in self._supported_trigger_types]} but was asked to "
+                f"types: {[k.name for k in self._trigger_types]} but was asked to "
                 f"use {trigger_info.trigger}"
             )
         if trigger_info.livetime is None:
@@ -116,9 +117,7 @@ class TetrammController(DetectorController):
             await self.disarm()
 
         # trigger mode must be set first and on its own!
-        await self.driver.trigger_mode.set(
-            self._supported_trigger_types[trigger_info.trigger]
-        )
+        await self.driver.trigger_mode.set(self._trigger_types[trigger_info.trigger])
 
         await asyncio.gather(
             self.set_exposure(trigger_info.livetime),
