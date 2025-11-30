@@ -1,6 +1,7 @@
 from collections.abc import AsyncGenerator
 from unittest.mock import ANY, AsyncMock, MagicMock, call, patch
 
+import cv2
 import git
 import numpy as np
 import pytest
@@ -13,8 +14,8 @@ from dodal.devices.i04.beam_centre import CentreEllipseMethod, binary_img
 @pytest.fixture
 async def beam_centre_ellipse() -> AsyncGenerator[CentreEllipseMethod]:
     async with init_devices(mock=True):
-        max_pixel = CentreEllipseMethod("TEST: ELLIPSE_CENTRE")
-    yield max_pixel
+        centre_device = CentreEllipseMethod("TEST: ELLIPSE_CENTRE")
+    yield centre_device
 
 
 test_arr = np.array(
@@ -27,36 +28,66 @@ test_arr = np.array(
     dtype=np.uint8,
 )
 
+
 expected_result = np.array(
-    [[255, 0, 0], [255, 0, 0], [255, 0, 0], [255, 0, 0]],
+    [
+        [255, 200, 150, 150, 100, 100, 20, 20, 20, 10, 0],
+        [255, 200, 150, 150, 100, 100, 20, 20, 20, 10, 0],
+        [255, 200, 150, 150, 100, 100, 20, 20, 20, 10, 0],
+        [255, 200, 150, 150, 100, 100, 20, 20, 20, 10, 0],
+    ],
     dtype=np.uint8,
 )
 
 
 @patch("dodal.devices.i04.beam_centre.cv2.threshold")
-async def test_binary_img(mock_threshold_func: MagicMock):
-    await binary_img(test_arr)  # maybe you need to use real image data for this to work
-    assert mock_threshold_func.call_count == 2
-    # assert mock_threshold_func.call_args_list[0] == call()
-    # assert result == expected_result
+@patch("dodal.devices.i04.beam_centre.convert_to_gray_and_blur")
+async def test_binary_img_calls_threshold_twice(mock_convert, mock_threshold):
+    fake_img = np.ones((10, 10), dtype=np.uint8) * 127
+    mock_threshold.return_value = (127, fake_img)
+    mock_convert.return_value = fake_img
 
-    # Patch each cv2 function that is used. For each one, do assert_called_once_with(...). Also set return value for
-    # cv2.threshold and assert binary_img() == this return value
+    await binary_img(fake_img)
+    assert mock_threshold.call_count == 2
+
+    # check the args from the two times it's called.
+    first_call_args = mock_threshold.call_args_list[0][0]
+    second_call_args = mock_threshold.call_args_list[1][0]
+
+    # First call should use Otsu
+    assert first_call_args[3] == cv2.THRESH_BINARY + cv2.THRESH_OTSU
+    # Second call should use the adjusted threshold
+    assert second_call_args[1] == 147
 
 
-@patch("dodal.devices.i04.beam_centre.cv2.fit_ellipse")
-def test_fit_ellipse_good_params(fit_ellipse_mock: MagicMock):
-    fit_ellipse_mock.return_value()
+contour_array = np.array(
+    [[[10, 10]], [[10, 50]], [[50, 50]], [[50, 10]]], dtype=np.uint8
+)
+
+
+@patch("dodal.devices.i04.beam_centre.cv2.findContours")
+def test_fit_ellipse_good_params(find_contours_mock: MagicMock):
+    find_contours_mock.return_value = (
+        contour_array,
+        (),
+    )  # find out what this actually returns for your ellipse !
 
     # patch cv2 functiosn and assert_called_once_with, assert return value is correct by setting return value of
     # the cv2.fitellipse magicmock
     pass
 
 
-def test_fit_ellipse_raises_error_if_not_enough_image_points():
+@patch("dodal.devices.i04.beam_centre.cv2.findContours")
+def test_fit_ellipse_raises_error_if_not_enough_image_points(
+    find_contours_mock: MagicMock, centre_device: CentreEllipseMethod
+):
+    find_contours_mock.return_value = ([0, 0, 0], None)
+    dummy_img = np.zeros((10, 10), dtype=np.uint8)
+
     with pytest.raises(ValueError, match="No contours found in image."):
-        pass
+        centre_device.fit_ellipse(dummy_img)
 
 
-def test_fit_ellipse_raises_error_if_not_enough_contour_points():
-    pass
+# @patch("dodal.devices.i04.beam_centre.cv2.findContours")
+# def test_fit_ellipse_raises_error_if_not_enough_contour_points():
+#     pass

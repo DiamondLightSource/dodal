@@ -17,8 +17,9 @@ async def binary_img(img, img_name="Threshold"):
     Function which creates a binary image from a beamline image using Otsu's method for automatic threshholding.
     The threshold is increased by 10 (brightness taken from image in grayscale) in order to get more the centre of the beam.
     """
-    # take this from the max pixel function preprocessing once merged in
     blurred = await convert_to_gray_and_blur(img)
+    assert blurred is not None, "Image is None before thresholding"
+    print(blurred.shape, blurred.dtype)
 
     (thresh, thresh_img) = cv2.threshold(
         blurred, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU
