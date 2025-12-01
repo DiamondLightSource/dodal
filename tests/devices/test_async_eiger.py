@@ -280,14 +280,14 @@ async def test_observe_indices_written(odin_driver_and_writer: OdinDriverAndWrit
 
     indices = writer.observe_indices_written(timeout=0.5)
 
-    c = 0
+    trigger_count = 0
 
     async for val in indices:
-        set_mock_value(writer._drv.num_captured, c)
+        set_mock_value(writer._drv.num_captured, trigger_count)
         assert isinstance(val, int)
-        if c >= writer._exposures_per_event:
+        if trigger_count >= writer._exposures_per_event:
             break
-        c += 1
+        trigger_count += 1
 
 
 async def test_odin_close_when_capture_status_not_none(
