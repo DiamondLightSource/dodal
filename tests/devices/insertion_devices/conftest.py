@@ -23,15 +23,15 @@ GenerateConfigLookupTable = namedtuple(
         ),
     ]
 )
-def generate_lut_config(request: FixtureRequest) -> GenerateConfigLookupTable:
+def generate_config_lut(request: FixtureRequest) -> GenerateConfigLookupTable:
     return request.param
 
 
 @pytest.fixture
-def lut(generate_lut_config: GenerateConfigLookupTable) -> LookupTable:
+def lut(generate_config_lut: GenerateConfigLookupTable) -> LookupTable:
     return generate_lookup_table(
-        pols=generate_lut_config.polarisations,
-        min_energies=generate_lut_config.min_energies,
-        max_energies=generate_lut_config.max_energies,
-        poly1d_params=generate_lut_config.polys,
+        pols=generate_config_lut.polarisations,
+        min_energies=generate_config_lut.min_energies,
+        max_energies=generate_config_lut.max_energies,
+        poly1d_params=generate_config_lut.polys,
     )

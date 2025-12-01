@@ -21,13 +21,13 @@ def energy_motor_lookup(lut: LookupTable) -> EnergyMotorLookup:
 
 
 def test_get_poly(
-    lut: LookupTable, generate_lut_config: GenerateConfigLookupTable
+    lut: LookupTable, generate_config_lut: GenerateConfigLookupTable
 ) -> None:
-    for i in range(len(generate_lut_config.polarisations)):
-        expected_poly = np.poly1d(generate_lut_config.polys[i])
+    for i in range(len(generate_config_lut.polarisations)):
+        expected_poly = np.poly1d(generate_config_lut.polys[i])
         poly = get_poly(
-            energy=generate_lut_config.min_energies[i],
-            pol=generate_lut_config.polarisations[i],
+            energy=generate_config_lut.min_energies[i],
+            pol=generate_config_lut.polarisations[i],
             lut=lut,
         )
         assert poly == expected_poly
@@ -35,15 +35,15 @@ def test_get_poly(
 
 def test_energy_motor_lookup_find_value_in_lookup_table(
     energy_motor_lookup: EnergyMotorLookup,
-    generate_lut_config: GenerateConfigLookupTable,
+    generate_config_lut: GenerateConfigLookupTable,
 ) -> None:
-    for i in range(len(generate_lut_config.polarisations)):
+    for i in range(len(generate_config_lut.polarisations)):
         value = energy_motor_lookup.find_value_in_lookup_table(
-            energy=generate_lut_config.min_energies[i],
-            pol=generate_lut_config.polarisations[i],
+            energy=generate_config_lut.min_energies[i],
+            pol=generate_config_lut.polarisations[i],
         )
-        expected_poly = np.poly1d(generate_lut_config.polys[i])
-        expected_value = expected_poly(generate_lut_config.min_energies[i])
+        expected_poly = np.poly1d(generate_config_lut.polys[i])
+        expected_value = expected_poly(generate_config_lut.min_energies[i])
         assert value == expected_value
 
 

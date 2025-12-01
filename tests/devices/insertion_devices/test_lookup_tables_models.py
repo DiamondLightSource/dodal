@@ -12,23 +12,25 @@ from tests.devices.insertion_devices.conftest import GenerateConfigLookupTable
 
 
 def test_generate_lookup_table(
-    config: GenerateConfigLookupTable,
+    generate_config_lut: GenerateConfigLookupTable,
     lut: LookupTable,
 ) -> None:
-    for i, pol in enumerate(config.polarisations):
+    for i, pol in enumerate(generate_config_lut.polarisations):
         key = pol
         assert key in lut.root
         entry = lut.root[key]
-        assert entry.limit.minimum == pytest.approx(config.min_energies[i])
-        assert entry.limit.maximum == pytest.approx(config.max_energies[i])
+        assert entry.limit.minimum == pytest.approx(generate_config_lut.min_energies[i])
+        assert entry.limit.maximum == pytest.approx(generate_config_lut.max_energies[i])
 
-        assert config.min_energies[i] in entry.energies.root
-        poly = entry.energies.root[config.min_energies[i]].poly
+        assert generate_config_lut.min_energies[i] in entry.energies.root
+        poly = entry.energies.root[generate_config_lut.min_energies[i]].poly
         assert isinstance(poly, np.poly1d)
 
-        test_energy = (config.min_energies[i] + config.max_energies[i]) / 2.0
+        test_energy = (
+            generate_config_lut.min_energies[i] + generate_config_lut.max_energies[i]
+        ) / 2.0
         assert poly(test_energy) == pytest.approx(
-            np.poly1d(config.polys[i])(test_energy)
+            np.poly1d(generate_config_lut.polys[i])(test_energy)
         )
 
 
