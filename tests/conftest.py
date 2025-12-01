@@ -4,10 +4,12 @@ import os
 from collections.abc import AsyncGenerator
 from pathlib import Path
 from types import ModuleType
+from typing import Any, TypeVar
 from unittest.mock import patch
 
 import pytest
 from ophyd_async.core import init_devices, set_mock_value
+from pydantic import BaseModel, TypeAdapter
 
 from conftest import mock_attributes_table
 from dodal.common.beamlines import beamline_parameters, beamline_utils
@@ -93,8 +95,7 @@ async def baton_in_commissioning_mode() -> AsyncGenerator[Baton]:
 
 def _fake_config_server_read(
     filepath: str | Path,
-    desired_return_type: type[str] | type[dict] = str,
-    reset_cached_result=False,
+    desired_return_type: type[str] | type[dict] | BaseModel = str,
 ):
     filepath = Path(filepath)
     # Minimal logic required for unit tests
@@ -104,6 +105,8 @@ def _fake_config_server_read(
             return contents
         elif desired_return_type is dict:
             return json.loads(contents)
+        elif issubclass(desired_return_type, BaseModel):  # type: ignore
+            return desired_return_type.model_validate(json.loads(contents))
 
 
 IMPLEMENTED_CONFIG_CLIENTS = []

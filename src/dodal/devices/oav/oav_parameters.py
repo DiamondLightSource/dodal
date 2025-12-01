@@ -6,6 +6,7 @@ from xml.etree import ElementTree
 from xml.etree.ElementTree import Element
 
 from daq_config_server.client import ConfigServer
+from daq_config_server.converters.models import DisplayConfig
 
 # GDA currently assumes this aspect ratio for the OAV window size.
 # For some beamline this doesn't affect anything as the actual OAV aspect ratio
@@ -174,14 +175,14 @@ class OAVConfigBeamCentre(OAVConfigBase[ZoomParamsCrosshair]):
         self.display_config = self._get_display_config(display_config_file)
         super().__init__(zoom_params_file)
 
-    def _get_display_config(self, display_config_file: str):
+    def _get_display_config(self, display_config_file: str) -> DisplayConfig:
         config_server = ConfigServer(url="https://daq-config.diamond.ac.uk")
-        return config_server.get_file_contents(display_config_file, dict)
+        return config_server.get_file_contents(display_config_file, DisplayConfig)
 
     def _read_display_config(self) -> dict:
         crosshairs = {}
-        for zoom, values in self.display_config.items():
-            crosshairs[zoom] = (values["crosshairX"], values["crosshairY"])
+        for zoom, values in self.display_config.zoom_levels.items():
+            crosshairs[str(zoom)] = (values.crosshairX, values.crosshairY)
         return crosshairs
 
     def get_parameters(self) -> dict[str, ZoomParamsCrosshair]:
