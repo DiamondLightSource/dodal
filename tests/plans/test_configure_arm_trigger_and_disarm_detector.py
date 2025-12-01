@@ -9,8 +9,8 @@ from ophyd_async.core import (
     callback_on_mock_put,
     set_mock_value,
 )
-from ophyd_async.fastcs.eiger import EigerDetector as FastEiger
 
+from dodal.devices.async_adeiger.adeiger import EigerDetector as FastEiger
 from dodal.plans.configure_arm_trigger_and_disarm_detector import (
     configure_arm_trigger_and_disarm_detector,
 )

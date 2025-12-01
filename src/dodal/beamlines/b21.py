@@ -1,5 +1,4 @@
 from ophyd_async.epics.adaravis import AravisDetector
-from ophyd_async.fastcs.eiger import EigerDetector
 from ophyd_async.fastcs.panda import HDFPanda
 
 from dodal.common.beamlines.beamline_utils import (
@@ -8,6 +7,7 @@ from dodal.common.beamlines.beamline_utils import (
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.beamlines.device_helpers import CAM_SUFFIX, HDF5_SUFFIX
+from dodal.devices.async_adeiger.adeiger import EigerDetector
 from dodal.devices.focusing_mirror import SimpleMirror
 from dodal.devices.i22.nxsas import NXSasMetadataHolder, NXSasOAV
 from dodal.devices.linkam3 import Linkam3
