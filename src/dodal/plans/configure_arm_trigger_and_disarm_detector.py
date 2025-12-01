@@ -163,9 +163,7 @@ if __name__ == "__main__":
         PurePath("/dls/i03/data/2025/cm40607-2/test_new_eiger/"),
     )
 
-    set_path_provider(path_provider)
-
-    eiger = fastcs_eiger(connect_immediately=True)
+    eiger = fastcs_eiger.build(connect_immediately=True, path_provider=path_provider)
     run_engine(
         configure_arm_trigger_and_disarm_detector(
             eiger=eiger,
