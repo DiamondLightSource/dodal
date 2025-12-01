@@ -20,6 +20,13 @@ dodal.beamlines.i03
 
    
    
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      daq_configuration_path
+      path_provider
+   
    
 
    
