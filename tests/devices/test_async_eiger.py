@@ -270,6 +270,6 @@ async def test_odin_close_when_capture_status_not_none(
 ):
     _, writer = odin_driver_and_writer
 
-    writer._capture_status = AsyncStatus(asyncio.sleep(3))  # type: ignore
+    writer._capture_status = AsyncStatus(asyncio.sleep(0.99))  # type: ignore
 
     await writer.close()
