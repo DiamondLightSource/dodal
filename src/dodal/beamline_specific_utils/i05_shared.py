@@ -1,4 +1,3 @@
-from dodal.devices.i05.enums import Grating
 from ophyd_async.core import StrictEnum
 
 from dodal.common.beamlines.beamline_utils import device_factory
@@ -29,7 +28,8 @@ def m1_collimating_mirror() -> XYZPitchYawRollStage:
     return XYZPitchYawRollStage(prefix=f"{PREFIX.beamline_prefix}-OP-COL-01:")
 
 
-@device_factory()
+# will connect after https://jira.diamond.ac.uk/browse/I05-731
+@device_factory(skip=True)
 def m3mj6_switching_mirror() -> XYZPiezoSwitchingMirror:
     return XYZPiezoSwitchingMirror(
         prefix=f"{PREFIX.beamline_prefix}-OP-SWTCH-01:",

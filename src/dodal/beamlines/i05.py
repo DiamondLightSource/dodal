@@ -4,10 +4,6 @@ from dodal.beamline_specific_utils.i05_shared import (
     m1_collimating_mirror,
     m3mj6_switching_mirror,
 )
-from dodal.common.beamlines.beamline_utils import device_factory
-from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.devices.i05.common_mirror import XYZPiezoSwitchingMirror, XYZSwitchingMirror
-from dodal.devices.motors import XYZPitchYawRollStage
 from dodal.beamline_specific_utils.i05_shared import pgm as i05_pgm
 from dodal.common.beamlines.beamline_utils import (
     device_factory,
@@ -18,8 +14,9 @@ from dodal.devices.apple2_undulator import (
     UndulatorGap,
     UndulatorLockedPhaseAxes,
 )
+from dodal.devices.i05.common_mirror import XYZPiezoSwitchingMirror, XYZSwitchingMirror
+from dodal.devices.motors import XYZPitchYawRollStage
 from dodal.devices.pgm import PlaneGratingMonochromator
-
 from dodal.devices.synchrotron import Synchrotron
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
@@ -44,7 +41,7 @@ def m1() -> XYZPitchYawRollStage:
 
 
 # will connect after https://jira.diamond.ac.uk/browse/I05-731
-@device_factory()
+@device_factory(skip=True)
 def m3mj6() -> XYZPiezoSwitchingMirror:
     return m3mj6_switching_mirror()
 
@@ -52,7 +49,6 @@ def m3mj6() -> XYZPiezoSwitchingMirror:
 # beamline specific devices
 
 
-# will connect after https://jira.diamond.ac.uk/browse/I05-731
 class M4M5Mirror(StrictEnum):
     UNKNOWN = "Unknown"
     M4 = "M4"
@@ -60,7 +56,8 @@ class M4M5Mirror(StrictEnum):
     REFERENCE = "Reference"
 
 
-@device_factory()
+# will connect after https://jira.diamond.ac.uk/browse/I05-731
+@device_factory(skip=True)
 def m4m5() -> XYZSwitchingMirror:
     return XYZSwitchingMirror(
         prefix=f"{PREFIX.beamline_prefix}-OP-RFM-01:",
