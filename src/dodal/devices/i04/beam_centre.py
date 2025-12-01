@@ -35,9 +35,7 @@ async def binary_img(img, img_name="Threshold"):
 
 class CentreEllipseMethod(StandardReadable, Triggerable):
     def __init__(self, prefix: str, name: str = ""):
-        self.array_data = epics_signal_r(
-            np.ndarray, f"pva://{prefix}PVA:ARRAY"
-        ).get_value()
+        self.array_signal = epics_signal_r(np.ndarray, f"pva://{prefix}PVA:ARRAY")
 
         self.center_x_val, self._center_x_val_setter = soft_signal_r_and_setter(float)
         self.center_y_val, self._center_y_val_setter = soft_signal_r_and_setter(float)
@@ -58,7 +56,8 @@ class CentreEllipseMethod(StandardReadable, Triggerable):
 
     @AsyncStatus.wrap
     async def trigger(self):
-        binary = await binary_img(self.array_data)
+        array_data = await self.array_signal.get_value()
+        binary = await binary_img(array_data)
         ellipse_fit = self.fit_ellipse(binary)
         centre_x = ellipse_fit[0][0]
         centre_y = ellipse_fit[0][1]
