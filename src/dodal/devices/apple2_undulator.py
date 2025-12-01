@@ -514,10 +514,6 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
         undulator design.
         """
 
-    async def _set_apple2(self, apple2_val: Apple2Val) -> None:
-        """Logic to set the apple2 with the motor values. Specialised logic can also extend this method."""
-        await self.apple2().set(id_motor_values=apple2_val)
-
     async def _set_motors_from_energy_and_polarisation(
         self, energy: float, pol: Pol
     ) -> None:
@@ -526,7 +522,7 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
         phase = self.phase_energy_motor_converter(energy=energy, pol=pol)
         apple2_val = self._get_apple2_value(gap, phase, pol)
         LOGGER.info(f"Setting polarisation to {pol}, with values: {apple2_val}")
-        await self._set_apple2(apple2_val=apple2_val)
+        await self.apple2().set(id_motor_values=apple2_val)
 
     async def _set_energy(self, energy: float) -> None:
         pol = await self._check_and_get_pol_setpoint()
