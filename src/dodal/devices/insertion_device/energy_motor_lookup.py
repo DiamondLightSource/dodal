@@ -14,7 +14,7 @@ from dodal.devices.insertion_device.lookup_table_models import (
 def get_poly(
     energy: float,
     pol: Pol,
-    lookup_table: LookupTable,
+    lut: LookupTable,
 ) -> np.poly1d:
     """
     Return the numpy.poly1d polynomial applicable for the given energy and polarisation.
@@ -25,20 +25,17 @@ def get_poly(
         Energy value in the same units used to create the lookup table.
     pol:
         Polarisation mode (Pol enum).
-    lookup_table:
+    lut:
         The converted lookup table dictionary for either 'gap' or 'phase'.
     """
-    if (
-        energy < lookup_table.root[pol].limit.minimum
-        or energy > lookup_table.root[pol].limit.maximum
-    ):
+    if energy < lut.root[pol].limit.minimum or energy > lut.root[pol].limit.maximum:
         raise ValueError(
             "Demanding energy must lie between"
-            + f" {lookup_table.root[pol].limit.minimum}"
-            + f" and {lookup_table.root[pol].limit.maximum} eV!"
+            + f" {lut.root[pol].limit.minimum}"
+            + f" and {lut.root[pol].limit.maximum} eV!"
         )
     else:
-        for energy_range in lookup_table.root[pol].energies.root.values():
+        for energy_range in lut.root[pol].energies.root.values():
             if energy >= energy_range.low and energy < energy_range.high:
                 return energy_range.poly
 
@@ -86,7 +83,7 @@ class EnergyMotorLookup:
         # if lut is empty, force an update to pull updated file.
         if not self.lut.root:
             self.update_lookup_table()
-        poly = get_poly(lookup_table=self.lut, energy=energy, pol=pol)
+        poly = get_poly(energy=energy, pol=pol, lut=self.lut)
         return poly(energy)
 
 
