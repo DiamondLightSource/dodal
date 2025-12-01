@@ -5,6 +5,7 @@ from unittest.mock import ANY, AsyncMock, MagicMock
 
 import pytest
 from ophyd_async.core import (
+    AsyncStatus,
     HDFDatasetDescription,
     HDFDocumentComposer,
     callback_on_mock_put,
@@ -262,3 +263,13 @@ async def test_observe_indices_written(odin_driver_and_writer: OdinDriverAndWrit
     writer._exposures_per_event = 1
 
     writer.observe_indices_written(10)
+
+
+async def test_odin_close_when_capture_status_not_none(
+    odin_driver_and_writer: OdinDriverAndWriter,
+):
+    _, writer = odin_driver_and_writer
+
+    writer._capture_status = AsyncStatus(asyncio.sleep(3))  # type: ignore
+
+    await writer.close()
