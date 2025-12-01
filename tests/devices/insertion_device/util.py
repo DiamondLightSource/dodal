@@ -17,7 +17,6 @@ def assert_expected_lut_file_equals_config_server_energy_motor_update_lookup_tab
     expected_lut_path: str,
     energy_motor_lookup: ConfigServerEnergyMotorLookup,
 ) -> None:
-    # Should we add default test here and each beamline adds there config_server_energy_motor_lookup or be done in apple2 file?
     with open(expected_lut_path, "rb") as f:
         expected_lut = LookupTable(json.load(f))
     assert_expected_lut_equals_energy_motor_update_after_update(
