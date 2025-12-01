@@ -70,7 +70,7 @@ def hu_id_energy() -> HardInsertionDeviceEnergy:
     return HardInsertionDeviceEnergy(
         undulator_order=harmonics(),
         undulator=undulator(),
-        lut={},  # Placeholder, will be set later_
+        lut={},  # Placeholder, will be set in another separate issue
         gap_to_energy_func=calculate_energy_i09_hu,
         energy_to_gap_func=calculate_gap_i09_hu,
         name="hu_id_energy",

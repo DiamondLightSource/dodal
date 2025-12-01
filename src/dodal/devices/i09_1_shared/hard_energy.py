@@ -49,7 +49,7 @@ class HardInsertionDeviceEnergy(StandardReadable, Movable[float]):
                 set_derived=self._set_energy,
                 current_gap=self._undulator().gap_motor.user_readback,
                 current_order=self._undulator_order().value,
-                derived_units="eV",
+                derived_units="keV",
             )
         super().__init__(name=name)
 
@@ -60,7 +60,7 @@ class HardInsertionDeviceEnergy(StandardReadable, Movable[float]):
             order=current_order,
         )
 
-    async def _set_energy(self, energy: float):
+    async def _set_energy(self, energy: float) -> None:
         current_order = await self._undulator_order().value.get_value()
         min_energy, max_energy = self._lut[current_order][
             MIN_ENERGY_COLUMN : MAX_ENERGY_COLUMN + 1
@@ -99,7 +99,7 @@ class HardEnergy(StandardReadable, Locatable[float]):
         super().__init__(name=name)
 
     @AsyncStatus.wrap
-    async def set(self, value: float):
+    async def set(self, value: float) -> None:
         await gather(
             self._dcm().energy_in_keV.set(value), self._undulator_energy().set(value)
         )
