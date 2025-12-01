@@ -10,7 +10,8 @@ from dodal.devices.insertion_device.lookup_table_models import (
 )
 
 GenerateLookupTableConfig = namedtuple(
-    "Config", ["polarisations", "min_energies", "max_energies", "polys"]
+    "GenerateLookupTableConfig",
+    ["polarisations", "min_energies", "max_energies", "polys"],
 )
 
 
@@ -22,15 +23,15 @@ GenerateLookupTableConfig = namedtuple(
         ),
     ]
 )
-def config(request: FixtureRequest) -> GenerateLookupTableConfig:
+def generate_lut_config(request: FixtureRequest) -> GenerateLookupTableConfig:
     return request.param
 
 
 @pytest.fixture
-def lut(config: GenerateLookupTableConfig) -> LookupTable:
+def lut(generate_lut_config: GenerateLookupTableConfig) -> LookupTable:
     return generate_lookup_table(
-        pols=config.polarisations,
-        min_energies=config.min_energies,
-        max_energies=config.max_energies,
-        poly1d_params=config.polys,
+        pols=generate_lut_config.polarisations,
+        min_energies=generate_lut_config.min_energies,
+        max_energies=generate_lut_config.max_energies,
+        poly1d_params=generate_lut_config.polys,
     )

@@ -11,7 +11,7 @@ from dodal.devices.insertion_device.lookup_table_models import (
 from tests.devices.insertion_devices.conftest import GenerateLookupTableConfig
 
 
-def test_generate_lookup_table_entries(
+def test_generate_lookup_table(
     config: GenerateLookupTableConfig,
     lut: LookupTable,
 ) -> None:
