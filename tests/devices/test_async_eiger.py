@@ -275,10 +275,19 @@ async def test_collect_stream_docs(odin_driver_and_writer: OdinDriverAndWriter):
 async def test_observe_indices_written(odin_driver_and_writer: OdinDriverAndWriter):
     _, writer = odin_driver_and_writer
 
-    set_mock_value(writer._drv.num_captured, 1000)
-    writer._exposures_per_event = 1
+    set_mock_value(writer._drv.num_captured, 0)
+    writer._exposures_per_event = 10
 
-    writer.observe_indices_written(10)
+    indices = writer.observe_indices_written(timeout=0.5)
+
+    c = 0
+
+    async for val in indices:
+        set_mock_value(writer._drv.num_captured, c)
+        assert isinstance(val, int)
+        if c >= writer._exposures_per_event:
+            break
+        c += 1
 
 
 async def test_odin_close_when_capture_status_not_none(
@@ -286,6 +295,6 @@ async def test_odin_close_when_capture_status_not_none(
 ):
     _, writer = odin_driver_and_writer
 
-    writer._capture_status = AsyncStatus(asyncio.sleep(0.99))  # type: ignore
+    writer._capture_status = AsyncStatus(asyncio.sleep(0.5))  # type: ignore
 
     await writer.close()
