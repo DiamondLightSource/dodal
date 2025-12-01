@@ -1,45 +1,18 @@
-from collections import namedtuple
-
 import numpy as np
 import pytest
-from pytest import FixtureRequest
 
 from dodal.devices.insertion_device.apple2_undulator import Pol
 from dodal.devices.insertion_device.lookup_table_models import (
     LookupTable,
     LookupTableConfig,
     convert_csv_to_lookup,
-    generate_lookup_table,
     read_file_and_skip,
 )
-
-Config = namedtuple(
-    "Config", ["polarisations", "min_energies", "max_energies", "polys"]
-)
-
-TEST_PARAMS = [
-    Config([Pol.LH], [100], [200], [[2.0, -1.0, 0.5]]),
-    Config([Pol.LH, Pol.LV], [100, 200], [150.0, 250.0], [[1.0, 0.0], [0.5, 1.0]]),
-]
+from tests.devices.insertion_devices.conftest import GenerateLookupTableConfig
 
 
-@pytest.fixture(params=TEST_PARAMS)
-def config(request: FixtureRequest) -> Config:
-    return request.param
-
-
-@pytest.fixture
-def lut(config: Config) -> LookupTable:
-    return generate_lookup_table(
-        pols=config.polarisations,
-        min_energies=config.min_energies,
-        max_energies=config.max_energies,
-        poly1d_params=config.polys,
-    )
-
-
-def test_make_phase_tables_multiple_entries(
-    config: Config,
+def test_generate_lookup_table_entries(
+    config: GenerateLookupTableConfig,
     lut: LookupTable,
 ) -> None:
     for i, pol in enumerate(config.polarisations):
