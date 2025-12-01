@@ -163,7 +163,6 @@ async def test_wait_for_active_and_file_names_before_capture_then_wait_for_writi
 
     await asyncio.gather(writer.open(ODIN_DETECTOR_NAME), wait_and_set_signals())
     assert type(writer._composer) is HDFDocumentComposer
-    writer.collect_stream_docs("", 1)
 
 
 async def test_append_plugins_to_datasets(
@@ -255,6 +254,22 @@ async def test_get_odin_filename_suffix_wraps_for_1_node(
 
     writer._total_number_of_frames = 1500
     assert await writer._get_odin_filename_suffix() == "_000001"
+
+
+async def test_collect_stream_docs(odin_driver_and_writer: OdinDriverAndWriter):
+    driver, writer = odin_driver_and_writer
+
+    initialise_signals_to_armed(driver)
+
+    await asyncio.gather(
+        writer.open(ODIN_DETECTOR_NAME),
+    )
+    assert type(writer._composer) is HDFDocumentComposer
+
+    stream = writer.collect_stream_docs("", 1)
+
+    async for doc in stream:
+        assert "stream_resource" in str(doc)
 
 
 async def test_observe_indices_written(odin_driver_and_writer: OdinDriverAndWriter):
