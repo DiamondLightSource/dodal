@@ -6,7 +6,13 @@ from dodal.common.beamlines.beamline_utils import (
     device_factory,
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.devices.apple2_undulator import (
+from dodal.devices.i09.enums import Grating
+from dodal.devices.i09_2_shared.i09_apple2 import (
+    J09_GAP_POLY_DEG_COLUMNS,
+    J09_PHASE_POLY_DEG_COLUMNS,
+    J09Apple2Controller,
+)
+from dodal.devices.insertion_device.apple2_undulator import (
     Apple2,
     BeamEnergy,
     InsertionDeviceEnergy,
@@ -14,18 +20,12 @@ from dodal.devices.apple2_undulator import (
     UndulatorGap,
     UndulatorPhaseAxes,
 )
-from dodal.devices.i09.enums import Grating
-from dodal.devices.i09_2_shared.i09_apple2 import (
-    J09_GAP_POLY_DEG_COLUMNS,
-    J09_PHASE_POLY_DEG_COLUMNS,
-    J09Apple2Controller,
+from dodal.devices.insertion_device.energy_motor_lookup import (
+    ConfigServerEnergyMotorLookup,
 )
+from dodal.devices.insertion_device.lookup_table_models import LookupTableConfig
 from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.devices.synchrotron import Synchrotron
-from dodal.devices.util.lookup_tables_apple2 import (
-    ConfigServerEnergyMotorLookup,
-    LookupTableConfig,
-)
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 

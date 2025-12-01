@@ -4,9 +4,9 @@ import numpy as np
 import pytest
 from pytest import FixtureRequest
 
-from dodal.devices.apple2_undulator import Pol
-from dodal.devices.util.lookup_tables_apple2 import (
-    EnergyMotorLookup,
+from dodal.devices.insertion_device.apple2_undulator import Pol
+from dodal.devices.insertion_device.lookup_table_models import (
+    LookupTable,
     LookupTableConfig,
     convert_csv_to_lookup,
     generate_lookup_table,
@@ -29,34 +29,23 @@ def config(request: FixtureRequest) -> Config:
 
 
 @pytest.fixture
-def energy_motor_lookup(config: Config) -> EnergyMotorLookup:
-    return EnergyMotorLookup(
-        lut=generate_lookup_table(
-            pols=config.polarisations,
-            min_energies=config.min_energies,
-            max_energies=config.max_energies,
-            poly1d_params=config.polys,
-        )
+def lut(config: Config) -> LookupTable:
+    return generate_lookup_table(
+        pols=config.polarisations,
+        min_energies=config.min_energies,
+        max_energies=config.max_energies,
+        poly1d_params=config.polys,
     )
-
-
-def test_energy_motor_lookup_is_static(
-    energy_motor_lookup: EnergyMotorLookup,
-) -> None:
-    before_update_lut = energy_motor_lookup.lut
-    energy_motor_lookup.update_lookup_table()
-    after_update_lut = energy_motor_lookup.lut
-    assert before_update_lut == after_update_lut
 
 
 def test_make_phase_tables_multiple_entries(
     config: Config,
-    energy_motor_lookup: EnergyMotorLookup,
+    lut: LookupTable,
 ) -> None:
     for i, pol in enumerate(config.polarisations):
         key = pol
-        assert key in energy_motor_lookup.lut.root
-        entry = energy_motor_lookup.lut.root[key]
+        assert key in lut.root
+        entry = lut.root[key]
         assert entry.limit.minimum == pytest.approx(config.min_energies[i])
         assert entry.limit.maximum == pytest.approx(config.max_energies[i])
 
@@ -111,12 +100,10 @@ def test_convert_csv_to_lookup_overwrite_name_convert_default(
     assert poly_lv(250.0) == pytest.approx(np.poly1d([1.0, 0.0])(250.0))
 
 
-def test_lookup_table_is_serialisable(
-    energy_motor_lookup: EnergyMotorLookup,
-) -> None:
+def test_lookup_table_is_serialisable(lut: LookupTable) -> None:
     # There should be no errors when calling the below functions
-    energy_motor_lookup.lut.model_dump()
-    energy_motor_lookup.lut.model_dump_json()
+    lut.model_dump()
+    lut.model_dump_json()
 
 
 async def test_bad_file_contents_causes_convert_csv_to_lookup_fails(

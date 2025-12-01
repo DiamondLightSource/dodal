@@ -12,14 +12,6 @@ from daq_config_server.client import ConfigServer
 
 from dodal.common.beamlines.beamline_utils import device_factory
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.devices.apple2_undulator import (
-    BeamEnergy,
-    InsertionDeviceEnergy,
-    InsertionDevicePolarisation,
-    UndulatorGap,
-    UndulatorJawPhase,
-    UndulatorPhaseAxes,
-)
 from dodal.devices.i10 import (
     I10SharedDiagnostic,
     I10SharedSlits,
@@ -34,14 +26,24 @@ from dodal.devices.i10.i10_apple2 import (
 
 # Imports taken from i10 while we work out how to deal with split end stations
 from dodal.devices.i10.i10_setting_data import I10Grating
-from dodal.devices.pgm import PlaneGratingMonochromator
-from dodal.devices.synchrotron import Synchrotron
-from dodal.devices.util.lookup_tables_apple2 import (
+from dodal.devices.insertion_device.apple2_undulator import (
+    BeamEnergy,
+    InsertionDeviceEnergy,
+    InsertionDevicePolarisation,
+    UndulatorGap,
+    UndulatorJawPhase,
+    UndulatorPhaseAxes,
+)
+from dodal.devices.insertion_device.energy_motor_lookup import (
+    ConfigServerEnergyMotorLookup,
+)
+from dodal.devices.insertion_device.lookup_table_models import (
     DEFAULT_GAP_FILE,
     DEFAULT_PHASE_FILE,
-    ConfigServerEnergyMotorLookup,
     LookupTableConfig,
 )
+from dodal.devices.pgm import PlaneGratingMonochromator
+from dodal.devices.synchrotron import Synchrotron
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 

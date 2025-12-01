@@ -17,7 +17,14 @@ from ophyd_async.core import (
 )
 from ophyd_async.testing import assert_emitted
 
-from dodal.devices.apple2_undulator import (
+from dodal.devices.i10.i10_apple2 import (
+    DEFAULT_JAW_PHASE_POLY_PARAMS,
+    I10Apple2,
+    I10Apple2Controller,
+    LinearArbitraryAngle,
+)
+from dodal.devices.i10.i10_setting_data import I10Grating
+from dodal.devices.insertion_device.apple2_undulator import (
     MAXIMUM_MOVE_TIME,
     BeamEnergy,
     EnabledDisabledUpper,
@@ -29,21 +36,16 @@ from dodal.devices.apple2_undulator import (
     UndulatorJawPhase,
     UndulatorPhaseAxes,
 )
-from dodal.devices.i10.i10_apple2 import (
-    DEFAULT_JAW_PHASE_POLY_PARAMS,
-    I10Apple2,
-    I10Apple2Controller,
-    LinearArbitraryAngle,
-)
-from dodal.devices.i10.i10_setting_data import I10Grating
-from dodal.devices.pgm import PlaneGratingMonochromator
-from dodal.devices.util.lookup_tables_apple2 import (
+from dodal.devices.insertion_device.energy_motor_lookup import (
     ConfigServerEnergyMotorLookup,
+)
+from dodal.devices.insertion_device.lookup_table_models import (
     EnergyCoverage,
     EnergyCoverageEntry,
     LookupTable,
     LookupTableConfig,
 )
+from dodal.devices.pgm import PlaneGratingMonochromator
 from tests.devices.i10.test_data import (
     EXPECTED_ID_ENERGY_2_GAP_CALIBRATIONS_IDD_JSON,
     EXPECTED_ID_ENERGY_2_GAP_CALIBRATIONS_IDU_JSON,
