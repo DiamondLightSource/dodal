@@ -20,6 +20,7 @@ dodal.devices.motors
    ~motors.XThetaStage
    ~motors.XYPhiStage
    ~motors.XYPitchStage
+   ~motors.XYRollStage
    ~motors.XYStage
    ~motors.XYZOmegaStage
    ~motors.XYZPitchYawRollStage
