@@ -378,17 +378,6 @@ class DeviceManager:
         )
         self._fixtures = combine_dicts_no_duplicates(self._fixtures, devices._fixtures)  # noqa: SLF001
 
-    def combine_dicts_no_duplicates(self, dict1, dict2):
-        # Find overlapping keys (keys present in both dictionaries)
-        overlapping_keys = set(dict1) & set(dict2)
-
-        if overlapping_keys:
-            raise ValueError(f"Duplicate keys detected: {', '.join(overlapping_keys)}")
-
-        # If no duplicates, combine the dictionaries
-        combined_dict = {**dict1, **dict2}
-        return combined_dict
-
     def fixture(self, func: Callable[[], T]) -> Callable[[], T]:
         """Add a function that can provide fixtures required by the factories"""
         self._fixtures[func.__name__] = func
@@ -552,10 +541,10 @@ class DeviceManager:
 
         return DeviceBuildResult(built, errors, connection_specs)
 
-    def __contains__(self, name):
+    def __contains__(self, name) -> bool:
         return name in self._factories or name in self._v1_factories
 
-    def __getitem__(self, name):
+    def __getitem__(self, name) -> DeviceFactory | V1DeviceFactory:
         return self._factories.get(name) or self._v1_factories[name]
 
     def _expand_dependencies(
