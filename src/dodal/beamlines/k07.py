@@ -1,3 +1,6 @@
+from pathlib import Path
+
+from daq_config_server.client import ConfigServer
 from ophyd_async.core import StrictEnum
 
 from dodal.common.beamlines.beamline_utils import (
@@ -12,10 +15,23 @@ from dodal.devices.apple2_undulator import (
     UndulatorPhaseAxes,
 )
 from dodal.devices.k07 import K07Apple2Controller
+from dodal.devices.k07.insertion_device import (
+    K07_GAP_POLY_DEG_COLUMNS,
+    K07_PHASE_POLY_DEG_COLUMNS,
+)
 from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.devices.synchrotron import Synchrotron
+from dodal.devices.util.lookup_tables_apple2 import (
+    ConfigServerEnergyMotorLookup,
+    LookupTableConfig,
+)
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
+
+K07_CONF_CLIENT = ConfigServer(url="https://daq-config.diamond.ac.uk")
+LOOK_UPTABLE_DIR = "/dls_sw/k07/software/gda/workspace_git/gda-diamond.git/configurations/k07/lookupTables/"
+GAP_LOOKUP_FILE_NAME = "JIDEnergy2GapCalibrations.csv"
+PHASE_LOOKUP_FILE_NAME = "JIDEnergy2PhaseCalibrations.csv"
 
 BL = get_beamline_name("k07")
 PREFIX = BeamlinePrefix(BL)
@@ -67,7 +83,19 @@ def id() -> Apple2:
 # Insertion device controller does not exist yet - this class is a placeholder for when it does
 @device_factory(skip=True)
 def id_controller() -> K07Apple2Controller:
-    return K07Apple2Controller(apple2=id())
+    return K07Apple2Controller(
+        apple2=id(),
+        gap_energy_motor_lut=ConfigServerEnergyMotorLookup(
+            lut_config=LookupTableConfig(poly_deg=K07_GAP_POLY_DEG_COLUMNS),
+            config_client=K07_CONF_CLIENT,
+            path=Path(LOOK_UPTABLE_DIR, GAP_LOOKUP_FILE_NAME),
+        ),
+        phase_energy_motor_lut=ConfigServerEnergyMotorLookup(
+            lut_config=LookupTableConfig(poly_deg=K07_PHASE_POLY_DEG_COLUMNS),
+            config_client=K07_CONF_CLIENT,
+            path=Path(LOOK_UPTABLE_DIR, PHASE_LOOKUP_FILE_NAME),
+        ),
+    )
 
 
 # Insertion device energy does not exist yet - this class is a placeholder for when it does
