@@ -4,8 +4,8 @@ import pytest
 from bluesky.plan_stubs import mv, stop
 from bluesky.protocols import Location
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import init_devices
-from ophyd_async.testing import assert_reading, partial_reading, set_mock_value
+from ophyd_async.core import init_devices, set_mock_value
+from ophyd_async.testing import assert_reading, partial_reading
 
 from dodal.beamline_specific_utils.i05_shared import M3MJ6Mirror
 from dodal.devices.i05.common_mirror import (
@@ -126,21 +126,21 @@ async def test_setting_xyz_switching_mirror_position_table(
 
 async def test_move_xyz_switching_mirror(
     xyz_switching_mirror: XYZSwitchingMirror,
-    RE: RunEngine,
+    run_engine: RunEngine,
 ):
     assert await xyz_switching_mirror.mirror.get_value() == M3MJ6Mirror.UNKNOWN
-    RE(mv(xyz_switching_mirror, M3MJ6Mirror.M3))
+    run_engine(mv(xyz_switching_mirror, M3MJ6Mirror.M3))
     assert await xyz_switching_mirror.mirror.get_value() == M3MJ6Mirror.M3
 
 
 async def test_locate_xyz_switching_mirror(
     xyz_switching_mirror: XYZSwitchingMirror,
-    RE: RunEngine,
+    run_engine: RunEngine,
 ):
     assert await xyz_switching_mirror.locate() == Location(
         setpoint=M3MJ6Mirror.UNKNOWN, readback=M3MJ6Mirror.UNKNOWN
     )
-    RE(mv(xyz_switching_mirror, M3MJ6Mirror.M3))
+    run_engine(mv(xyz_switching_mirror, M3MJ6Mirror.M3))
     assert await xyz_switching_mirror.locate() == Location(
         setpoint=M3MJ6Mirror.M3, readback=M3MJ6Mirror.M3
     )
@@ -148,10 +148,10 @@ async def test_locate_xyz_switching_mirror(
 
 async def test_stop_xyz_switching_mirror(
     xyz_switching_mirror: XYZSwitchingMirror,
-    RE: RunEngine,
+    run_engine: RunEngine,
 ):
     xyz_switching_mirror.mirror_abort.trigger = AsyncMock()
-    RE(stop(xyz_switching_mirror))
+    run_engine(stop(xyz_switching_mirror))
     xyz_switching_mirror.mirror_abort.trigger.assert_awaited_once()
 
 
@@ -204,21 +204,21 @@ async def test_setting_xyz_piezo_switching_mirror_positions(
 
 async def test_move_xyz_piezo_switching_mirror(
     xyz_piezo_switching_mirror: XYZPiezoSwitchingMirror,
-    RE: RunEngine,
+    run_engine: RunEngine,
 ):
     assert await xyz_piezo_switching_mirror.mirror.get_value() == M3MJ6Mirror.UNKNOWN
-    RE(mv(xyz_piezo_switching_mirror, M3MJ6Mirror.M3))
+    run_engine(mv(xyz_piezo_switching_mirror, M3MJ6Mirror.M3))
     assert await xyz_piezo_switching_mirror.mirror.get_value() == M3MJ6Mirror.M3
 
 
 async def test_locate_xyz_piezo_switching_mirror(
     xyz_piezo_switching_mirror: XYZPiezoSwitchingMirror,
-    RE: RunEngine,
+    run_engine: RunEngine,
 ):
     assert await xyz_piezo_switching_mirror.locate() == Location(
         setpoint=M3MJ6Mirror.UNKNOWN, readback=M3MJ6Mirror.UNKNOWN
     )
-    RE(mv(xyz_piezo_switching_mirror, M3MJ6Mirror.M3))
+    run_engine(mv(xyz_piezo_switching_mirror, M3MJ6Mirror.M3))
     assert await xyz_piezo_switching_mirror.locate() == Location(
         setpoint=M3MJ6Mirror.M3, readback=M3MJ6Mirror.M3
     )
@@ -226,8 +226,8 @@ async def test_locate_xyz_piezo_switching_mirror(
 
 async def test_stop_xyz_piezo_switching_mirror(
     xyz_piezo_switching_mirror: XYZPiezoSwitchingMirror,
-    RE: RunEngine,
+    run_engine: RunEngine,
 ):
     xyz_piezo_switching_mirror.mirror_abort.trigger = AsyncMock()
-    RE(stop(xyz_piezo_switching_mirror))
+    run_engine(stop(xyz_piezo_switching_mirror))
     xyz_piezo_switching_mirror.mirror_abort.trigger.assert_awaited_once()
