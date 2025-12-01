@@ -4,21 +4,19 @@ from unittest.mock import AsyncMock
 import numpy as np
 import pytest
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import init_devices
-from ophyd_async.testing import set_mock_value
+from ophyd_async.core import init_devices, set_mock_value
 
 from dodal.devices.oav.oav_calculations import calculate_beam_distance
 from dodal.devices.oav.oav_detector import OAV
 from dodal.devices.oav.pin_image_recognition import PinTipDetection
 from dodal.devices.oav.pin_image_recognition.utils import SampleLocation
 from dodal.devices.oav.utils import (
-    PinNotFoundException,
+    PinNotFoundError,
     bottom_right_from_top_left,
     get_move_required_so_that_beam_is_at_pixel,
     wait_for_tip_to_be_found,
 )
 from dodal.devices.smargon import Smargon
-from dodal.testing import patch_all_motors
 
 
 def test_bottom_right_from_top_left():
@@ -36,8 +34,14 @@ async def smargon() -> AsyncGenerator[Smargon]:
     async with init_devices(mock=True):
         smargon = Smargon("")
 
-    with patch_all_motors(smargon):
-        yield smargon
+    yield smargon
+
+
+@pytest.fixture
+async def mock_pin_tip_detect() -> PinTipDetection:
+    async with init_devices(mock=True):
+        mock_pin_tip_detect = PinTipDetection("")
+        return mock_pin_tip_detect
 
 
 @pytest.mark.parametrize(
@@ -78,11 +82,11 @@ async def test_values_for_move_so_that_beam_is_at_pixel(
     expected_xyz: tuple,
     oav: OAV,
     smargon: Smargon,
+    run_engine: RunEngine,
 ):
     set_mock_value(oav.zoom_controller.level, zoom_level)
     set_mock_value(smargon.omega.user_readback, angle)
-    RE = RunEngine(call_returns_result=True)
-    pos = RE(
+    pos = run_engine(
         get_move_required_so_that_beam_is_at_pixel(smargon, pixel_to_move_to, oav)
     ).plan_result  # type: ignore
 
@@ -90,26 +94,20 @@ async def test_values_for_move_so_that_beam_is_at_pixel(
 
 
 async def test_given_tip_found_when_wait_for_tip_to_be_found_called_then_tip_immediately_returned(
-    RE,
+    run_engine: RunEngine, mock_pin_tip_detect: PinTipDetection
 ):
-    async with init_devices(mock=True):
-        mock_pin_tip_detect = PinTipDetection("")
-
-    await mock_pin_tip_detect.connect(mock=True)
     mock_pin_tip_detect._get_tip_and_edge_data = AsyncMock(
         return_value=SampleLocation(100, 100, np.array([]), np.array([]))
     )
-    RE = RunEngine(call_returns_result=True)
-    result = RE(wait_for_tip_to_be_found(mock_pin_tip_detect))
+    result = run_engine(wait_for_tip_to_be_found(mock_pin_tip_detect))
     assert result.plan_result == (100, 100)  # type: ignore
     mock_pin_tip_detect._get_tip_and_edge_data.assert_called_once()
 
 
-async def test_given_no_tip_when_wait_for_tip_to_be_found_called_then_exception_thrown():
-    async with init_devices(mock=True):
-        mock_pin_tip_detect = PinTipDetection("")
-
-    await mock_pin_tip_detect.connect(mock=True)
+async def test_given_no_tip_when_wait_for_tip_to_be_found_called_then_exception_thrown(
+    run_engine: RunEngine,
+    mock_pin_tip_detect: PinTipDetection,
+):
     await mock_pin_tip_detect.validity_timeout.set(0.2)
     mock_pin_tip_detect._get_tip_and_edge_data = AsyncMock(
         return_value=SampleLocation(
@@ -119,6 +117,5 @@ async def test_given_no_tip_when_wait_for_tip_to_be_found_called_then_exception_
             np.array([]),
         )
     )
-    RE = RunEngine(call_returns_result=True)
-    with pytest.raises(PinNotFoundException):
-        RE(wait_for_tip_to_be_found(mock_pin_tip_detect))
+    with pytest.raises(PinNotFoundError):
+        run_engine(wait_for_tip_to_be_found(mock_pin_tip_detect))

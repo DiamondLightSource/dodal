@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+from math import inf
 
 from bluesky.protocols import Preparable
 from ophyd_async.core import (
@@ -18,7 +19,7 @@ from dodal.devices.aperture import Aperture
 from dodal.devices.motors import XYStage
 
 
-class InvalidApertureMove(Exception):
+class InvalidApertureMoveError(Exception):
     pass
 
 
@@ -112,7 +113,7 @@ def load_positions_from_beamline_parameters(
 ) -> dict[ApertureValue, AperturePosition]:
     return {
         ApertureValue.OUT_OF_BEAM: AperturePosition.from_gda_params(
-            _GDAParamApertureValue.ROBOT_LOAD, 0, params
+            _GDAParamApertureValue.ROBOT_LOAD, inf, params
         ),
         ApertureValue.SMALL: AperturePosition.from_gda_params(
             _GDAParamApertureValue.SMALL, 20, params
@@ -124,7 +125,7 @@ def load_positions_from_beamline_parameters(
             _GDAParamApertureValue.LARGE, 100, params
         ),
         ApertureValue.PARKED: AperturePosition.from_gda_params(
-            _GDAParamApertureValue.MANUAL_LOAD, 0, params
+            _GDAParamApertureValue.MANUAL_LOAD, inf, params
         ),
     }
 
@@ -242,7 +243,7 @@ class ApertureScatterguard(StandardReadable, Preparable):
         diff_on_z = abs(current_ap_z - expected_z_position)
         aperture_z_tolerance = self._tolerances.aperture_z
         if diff_on_z > aperture_z_tolerance:
-            raise InvalidApertureMove(
+            raise InvalidApertureMoveError(
                 f"Current aperture z ({current_ap_z}), outside of tolerance ({aperture_z_tolerance}) from target ({expected_z_position})."
             )
 
@@ -256,7 +257,7 @@ class ApertureScatterguard(StandardReadable, Preparable):
         for axis in all_axes:
             axis_stationary = await axis.motor_done_move.get_value()
             if not axis_stationary:
-                raise InvalidApertureMove(
+                raise InvalidApertureMoveError(
                     f"{axis.name} is still moving. Wait for it to finish before"
                     "triggering another move."
                 )
@@ -294,7 +295,9 @@ class ApertureScatterguard(StandardReadable, Preparable):
         ):
             return ApertureValue.OUT_OF_BEAM
 
-        raise InvalidApertureMove("Current aperture/scatterguard state unrecognised")
+        raise InvalidApertureMoveError(
+            "Current aperture/scatterguard state unrecognised"
+        )
 
     async def _safe_move_whilst_in_beam(self, position: AperturePosition):
         """

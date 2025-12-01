@@ -4,12 +4,12 @@ from dodal.common.beamlines.beamline_utils import (
 from dodal.common.beamlines.beamline_utils import (
     set_beamline as set_utils_beamline,
 )
-from dodal.devices.i19.beamstop import BeamStop
-from dodal.devices.i19.blueapi_device import HutchState
-from dodal.devices.i19.shutter import (
+from dodal.devices.i19.access_controlled.blueapi_device import HutchState
+from dodal.devices.i19.access_controlled.shutter import (
     AccessControlledShutter,
     HutchState,
 )
+from dodal.devices.i19.beamstop import BeamStop
 from dodal.devices.oav.oav_detector import OAVBeamCentreFile
 from dodal.devices.oav.oav_parameters import OAVConfigBeamCentre
 from dodal.devices.synchrotron import Synchrotron
@@ -58,6 +58,8 @@ def oav() -> OAVBeamCentreFile:
     )
 
 
+# NOTE EH1 uses the Zebra 2 box. While a Zebra 1 box exists and is connected
+# on the beamline, it is currently not in use
 @device_factory()
 def zebra() -> Zebra:
     """Get the i19-1 zebra device, instantiate it if it hasn't already been.
@@ -65,7 +67,7 @@ def zebra() -> Zebra:
     """
     return Zebra(
         mapping=I19_1_ZEBRA_MAPPING,
-        prefix=f"{PREFIX.beamline_prefix}-EA-ZEBRA-03:",
+        prefix=f"{PREFIX.beamline_prefix}-EA-ZEBRA-02:",
     )
 
 

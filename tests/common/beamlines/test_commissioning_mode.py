@@ -1,7 +1,7 @@
 import pytest
 from bluesky import RunEngine
 from bluesky.utils import MsgGenerator
-from ophyd_async.testing import set_mock_value
+from ophyd_async.core import set_mock_value
 
 from dodal.common.beamlines.commissioning_mode import read_commissioning_mode
 from dodal.devices.baton import Baton
@@ -9,7 +9,7 @@ from dodal.devices.baton import Baton
 
 @pytest.mark.parametrize("mode", [True, False])
 def test_read_commissioning_mode_returns_signal_status_when_signal_registered(
-    RE: RunEngine, baton_in_commissioning_mode: Baton, mode: bool
+    run_engine: RunEngine, baton_in_commissioning_mode: Baton, mode: bool
 ):
     actual_mode = False
 
@@ -18,12 +18,12 @@ def test_read_commissioning_mode_returns_signal_status_when_signal_registered(
         actual_mode = yield from read_commissioning_mode()
 
     set_mock_value(baton_in_commissioning_mode.commissioning, mode)
-    RE(check_commissioning_mode())
+    run_engine(check_commissioning_mode())
     assert actual_mode == mode
 
 
 def test_read_commissioning_mode_returns_false_when_no_signal_registered(
-    RE: RunEngine,
+    run_engine: RunEngine,
 ):
     actual_mode = False
 
@@ -31,5 +31,5 @@ def test_read_commissioning_mode_returns_false_when_no_signal_registered(
         nonlocal actual_mode
         actual_mode = yield from read_commissioning_mode()
 
-    RE(check_commissioning_mode())
+    run_engine(check_commissioning_mode())
     assert not actual_mode

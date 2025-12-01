@@ -1,6 +1,7 @@
 import json
 import os
 import time
+import traceback
 from collections import defaultdict
 from pathlib import Path
 from typing import Any
@@ -60,21 +61,35 @@ def load_configuration_file(filename):
 
 
 def get_dcgid_and_prefix(dcid: int, session_maker: sessionmaker) -> tuple[int, str]:
+    tries_left = 2
     try:
-        with session_maker() as session:
-            assert isinstance(session, Session)
-            query = (
-                session.query(
-                    DataCollection.dataCollectionId, DataCollection.imagePrefix
-                )
-                .filter(DataCollection.dataCollectionId == dcid)
-                .first()
-            )
-            assert query is not None, (
-                f"Failed to find dcid {dcid} which matches any in dev ispyb"
-            )
-            dcgid, prefix = query
-
+        while True:
+            try:
+                tries_left -= 1
+                with session_maker() as session:
+                    assert isinstance(session, Session)
+                    query = (
+                        session.query(
+                            DataCollection.dataCollectionGroupId,
+                            DataCollection.imagePrefix,
+                        )
+                        .filter(DataCollection.dataCollectionId == dcid)
+                        .first()
+                    )
+                    assert query is not None, (
+                        f"Failed to find dcid {dcid} which matches any in dev ispyb"
+                    )
+                    dcgid, prefix = query
+                    break
+            except Exception as e:
+                if tries_left > 0:
+                    print("Exception occured when reading from ISPyB database.\n")
+                    traceback.print_exception(e)
+                    print(
+                        "Retrying as the connection has probably gone stale due to inactivity"
+                    )
+                else:
+                    raise
     except Exception as e:
         print("Exception occured when reading from ISPyB database:\n")
         print(e)

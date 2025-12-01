@@ -3,7 +3,8 @@ from ophyd_async.core import StrictEnum
 from dodal.common.beamlines.beamline_utils import device_factory
 from dodal.devices.i05.common_mirror import XYZPiezoSwitchingMirror
 from dodal.devices.motors import XYZPitchYawRollStage
-from dodal.devices.pgm import PGM
+from dodal.devices.i05.enums import Grating
+from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.utils import BeamlinePrefix
 
 PREFIX = BeamlinePrefix("i05", "I")
@@ -24,11 +25,6 @@ class Grating(StrictEnum):
 
 
 @device_factory()
-def pgm() -> PGM:
-    return PGM(prefix=f"{PREFIX.beamline_prefix}-OP-PGM-01:", grating=Grating)
-
-
-@device_factory()
 def m1_collimating_mirror() -> XYZPitchYawRollStage:
     return XYZPitchYawRollStage(prefix=f"{PREFIX.beamline_prefix}-OP-COL-01:")
 
@@ -38,4 +34,11 @@ def m3mj6_switching_mirror() -> XYZPiezoSwitchingMirror:
     return XYZPiezoSwitchingMirror(
         prefix=f"{PREFIX.beamline_prefix}-OP-SWTCH-01:",
         mirrors=M3MJ6Mirror,
+
+
+@device_factory()
+def pgm() -> PlaneGratingMonochromator:
+    return PlaneGratingMonochromator(
+        prefix=f"{PREFIX.beamline_prefix}-OP-PGM-01:",
+        grating=Grating,
     )
