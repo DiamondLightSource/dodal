@@ -1,0 +1,10 @@
+#I09 Soft X-ray ID fitting parameters, created 24th Nov 2025
+Mode,MinEnergy,MaxEnergy,0th-order
+LH,0.104,1.2,0
+#MAXIMUM_ROW_PHASE_MOTOR_POSITION
+LV,0.22,1,24.0
+#ROW_PHASE_CIRCULAR
+CR,0.145,1.2,15
+#ROW_PHASE_CIRCULAR
+CL,0.145,1.2,-15
+LH3,0.7,2,0
