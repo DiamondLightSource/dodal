@@ -1,5 +1,3 @@
-from collections import namedtuple
-
 import pytest
 from pytest import FixtureRequest
 
@@ -8,11 +6,7 @@ from dodal.devices.insertion_device.lookup_table_models import (
     LookupTable,
     generate_lookup_table,
 )
-
-GenerateConfigLookupTable = namedtuple(
-    "GenerateConfigLookupTable",
-    ["polarisations", "min_energies", "max_energies", "polys"],
-)
+from tests.devices.insertion_device.util import GenerateConfigLookupTable
 
 
 @pytest.fixture(

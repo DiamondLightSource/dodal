@@ -8,7 +8,7 @@ from dodal.devices.insertion_device.lookup_table_models import (
     convert_csv_to_lookup,
     read_file_and_skip,
 )
-from tests.devices.insertion_devices.conftest import GenerateConfigLookupTable
+from tests.devices.insertion_device.conftest import GenerateConfigLookupTable
 
 
 def test_generate_lookup_table(

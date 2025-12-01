@@ -1,10 +1,16 @@
 import json
+from collections import namedtuple
 
 from dodal.devices.insertion_device.energy_motor_lookup import (
     ConfigServerEnergyMotorLookup,
     EnergyMotorLookup,
 )
 from dodal.devices.insertion_device.lookup_table_models import LookupTable
+
+GenerateConfigLookupTable = namedtuple(
+    "GenerateConfigLookupTable",
+    ["polarisations", "min_energies", "max_energies", "polys"],
+)
 
 
 def assert_expected_lut_file_equals_config_server_energy_motor_update_lookup_table(

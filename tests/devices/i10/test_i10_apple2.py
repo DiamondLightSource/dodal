@@ -52,7 +52,7 @@ from tests.devices.i10.test_data import (
     ID_ENERGY_2_GAP_CALIBRATIONS_CSV,
     ID_ENERGY_2_PHASE_CALIBRATIONS_CSV,
 )
-from tests.devices.insertion_devices.util import (
+from tests.devices.insertion_device.util import (
     assert_expected_lut_file_equals_config_server_energy_motor_update_lookup_table,
 )
 

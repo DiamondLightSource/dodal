@@ -1,18 +1,20 @@
+from pathlib import Path
+from unittest.mock import MagicMock, patch
+
 import numpy as np
 import pytest
 
+from dodal.devices.insertion_device.apple2_undulator import Pol
 from dodal.devices.insertion_device.energy_motor_lookup import (
+    ConfigServerEnergyMotorLookup,
     EnergyMotorLookup,
     get_poly,
 )
 from dodal.devices.insertion_device.lookup_table_models import LookupTable
-from tests.devices.insertion_devices.conftest import GenerateConfigLookupTable
-from tests.devices.insertion_devices.util import (
+from tests.devices.insertion_device.util import (
+    GenerateConfigLookupTable,
     assert_expected_lut_equals_energy_motor_update_after_update,
 )
-
-# add mock_config_client to pytest
-pytest_plugins = ["dodal.testing.fixtures.devices.apple2"]
 
 
 @pytest.fixture
@@ -56,28 +58,30 @@ def test_energy_motor_lookup_update_is_static(
     )
 
 
-# @pytest.fixture
-# def lut_config() -> LookupTableConfig:
-#     return LookupTableConfig(
-#         mode="Mode",
-#         min_energy="MinEnergy",
-#         max_energy="MaxEnergy",
-#         poly_deg=["c1", "c0"],
-#         mode_name_convert={"hl": "lh", "vl": "lv"},
-#     )
+def test_energy_motor_lookup_find_value_in_lookup_table_updates_lut_if_lut_empty(
+    energy_motor_lookup: EnergyMotorLookup,
+) -> None:
+    energy_motor_lookup.lut = LookupTable()
+    mock_update_lut = MagicMock()
+    energy_motor_lookup.update_lookup_table = mock_update_lut
+    with patch("dodal.devices.insertion_device.energy_motor_lookup.get_poly"):
+        energy_motor_lookup.find_value_in_lookup_table(100, Pol.LH)
+        mock_update_lut.assert_called_once()
 
 
-# @pytest.fixture
-# def config_server_energy_motor_lookup(
-#     lut_config: LookupTableConfig,
-#     config_server: ConfigServer,
-#     path: Path,
-# ) -> ConfigServerEnergyMotorLookup:
-#     return ConfigServerEnergyMotorLookup(config_server, lut_config, path)
+@pytest.fixture
+def config_server_energy_motor_lookup() -> ConfigServerEnergyMotorLookup:
+    return ConfigServerEnergyMotorLookup(MagicMock(), MagicMock(), Path("dummy_path"))
 
 
-# def test_config_server_energy_motor_lookup_read_lut(
-#     config_server_energy_motor_lookup: ConfigServerEnergyMotorLookup,
-# ) -> None:
-#     # Should we add default test here and each beamline adds there config_server_energy_motor_lookup or be done in apple2 file?
-#     pass
+def test_config_server_energy_motor_lookup_update_lookup_table(
+    config_server_energy_motor_lookup: ConfigServerEnergyMotorLookup,
+    lut: LookupTable,
+) -> None:
+    assert config_server_energy_motor_lookup.lut == LookupTable()
+    mock_read_lut = MagicMock(return_value=lut)
+    config_server_energy_motor_lookup.read_lut = mock_read_lut
+
+    config_server_energy_motor_lookup.find_value_in_lookup_table(100, Pol.LH)
+    mock_read_lut.assert_called_once()
+    assert config_server_energy_motor_lookup.lut == lut
