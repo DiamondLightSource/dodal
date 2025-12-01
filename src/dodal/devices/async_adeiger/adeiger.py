@@ -1,4 +1,3 @@
-from dodal.devices.eiger.adodin_io import Odin, OdinWriter
 from ophyd_async.core import (
     AsyncStatus,
     PathProvider,
@@ -8,6 +7,8 @@ from ophyd_async.core import (
 from ophyd_async.epics.adcore import NDPluginBaseIO
 from ophyd_async.fastcs.eiger._eiger_controller import EigerController
 from ophyd_async.fastcs.eiger._eiger_io import EigerDriverIO
+
+from dodal.devices.async_adeiger.adodin_io import Odin, OdinWriter
 
 
 class EigerDetector(StandardDetector):
