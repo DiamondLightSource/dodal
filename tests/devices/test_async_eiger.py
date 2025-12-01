@@ -253,3 +253,12 @@ async def test_get_odin_filename_suffix_wraps_for_1_node(
 
     writer._total_number_of_frames = 1500
     assert await writer._get_odin_filename_suffix() == "_000001"
+
+
+async def test_observe_indices_written(odin_driver_and_writer: OdinDriverAndWriter):
+    _, writer = odin_driver_and_writer
+
+    set_mock_value(writer._drv.num_captured, 1000)
+    writer._exposures_per_event = 1
+
+    writer.observe_indices_written(10)
