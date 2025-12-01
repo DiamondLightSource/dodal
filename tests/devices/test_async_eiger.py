@@ -163,6 +163,7 @@ async def test_wait_for_active_and_file_names_before_capture_then_wait_for_writi
 
     await asyncio.gather(writer.open(ODIN_DETECTOR_NAME), wait_and_set_signals())
     assert type(writer._composer) is HDFDocumentComposer
+    writer.collect_stream_docs("", 1)
 
 
 async def test_append_plugins_to_datasets(
