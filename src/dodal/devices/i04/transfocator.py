@@ -1,5 +1,4 @@
 import asyncio
-import math
 
 from ophyd_async.core import (
     AsyncStatus,
@@ -9,6 +8,7 @@ from ophyd_async.core import (
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
+from dodal.common.device_utils import periodic_reminder
 from dodal.log import LOGGER
 
 
@@ -23,15 +23,15 @@ class Transfocator(StandardReadable):
     """
 
     def __init__(self, prefix: str, name: str = ""):
+        self._vert_size_calc_sp = epics_signal_rw(float, prefix + "VERT_REQ")
+        self._num_lenses_calc_rbv = epics_signal_r(float, prefix + "LENS_PRED")
+        self.start = epics_signal_rw(int, prefix + "START.PROC")
+        self.start_rbv = epics_signal_r(int, prefix + "START_RBV")
+
         with self.add_children_as_readables():
-            self.beamsize_set_microns = epics_signal_rw(float, prefix + "VERT_REQ")
-            self.predicted_vertical_num_lenses = epics_signal_rw(
-                float, prefix + "LENS_PRED"
-            )
             self.number_filters_sp = epics_signal_rw(int, prefix + "NUM_FILTERS")
-            self.start = epics_signal_rw(int, prefix + "START.PROC")
-            self.start_rbv = epics_signal_r(int, prefix + "START_RBV")
-            self.vertical_lens_rbv = epics_signal_r(float, prefix + "VER")
+            self.current_horizontal_size_rbv = epics_signal_r(float, prefix + "HOR")
+            self.current_vertical_size_rbv = epics_signal_r(float, prefix + "VER")
 
         self.TIMEOUT = 120
 
@@ -41,14 +41,10 @@ class Transfocator(StandardReadable):
         # We can only put an integer number of lenses in the beam but the
         # calculation in the IOC returns the theoretical float number of lenses
         value = round(value)
-        LOGGER.info(f"Transfocator setting {value} filters")
         await self.number_filters_sp.set(value)
         await self.start.set(1)
-        LOGGER.info("Waiting for start_rbv to change to 1")
         await wait_for_value(self.start_rbv, 1, self.TIMEOUT)
-        LOGGER.info("Waiting for start_rbv to change to 0")
         await wait_for_value(self.start_rbv, 0, self.TIMEOUT)
-        self.latest_pred_vertical_num_lenses = value
 
     @AsyncStatus.wrap
     async def set(self, value: float):
@@ -59,29 +55,27 @@ class Transfocator(StandardReadable):
         4. Start the device moving
         5. Wait for the start_rbv goes high and low again
         """
-        self.latest_pred_vertical_num_lenses = (
-            await self.predicted_vertical_num_lenses.get_value()
-        )
-
         LOGGER.info(f"Transfocator setting {value} beamsize")
 
-        if await self.beamsize_set_microns.get_value() != value:
-            # Logic in the IOC calculates predicted_vertical_num_lenses when beam_set_microns changes
+        # Logic in the IOC calculates _num_lenses_calc_rbv when _vert_size_calc_sp changes
 
-            # Register an observer before setting beamsize_set_microns to ensure we don't miss changes
-            predicted_vertical_num_lenses_iterator = observe_value(
-                self.predicted_vertical_num_lenses, timeout=self.TIMEOUT
-            )
-            # Keep initial prediction before setting to later compare with change after setting
-            current_prediction = await anext(predicted_vertical_num_lenses_iterator)
-            await self.beamsize_set_microns.set(value)
-            accepted_prediction = await anext(predicted_vertical_num_lenses_iterator)
-            if not math.isclose(current_prediction, accepted_prediction, abs_tol=1e-8):
-                await self.set_based_on_prediction(accepted_prediction)
+        # Register an observer before setting _vert_size_calc_sp to ensure we don't miss changes
+        num_lenses_calc_iterator = observe_value(
+            self._num_lenses_calc_rbv, timeout=self.TIMEOUT
+        )
+
+        await anext(num_lenses_calc_iterator)
+        await self._vert_size_calc_sp.set(value)
+        calc_lenses = await anext(num_lenses_calc_iterator)
+
+        async with periodic_reminder(
+            f"Waiting for transfocator to insert {calc_lenses} into beam"
+        ):
+            await self.set_based_on_prediction(calc_lenses)
 
         number_filters_rbv, vertical_lens_size_rbv = await asyncio.gather(
             self.number_filters_sp.get_value(),
-            self.vertical_lens_rbv.get_value(),
+            self.current_vertical_size_rbv.get_value(),
         )
 
         LOGGER.info(

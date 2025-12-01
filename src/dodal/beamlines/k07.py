@@ -12,7 +12,7 @@ from dodal.devices.apple2_undulator import (
     UndulatorPhaseAxes,
 )
 from dodal.devices.k07 import K07Apple2Controller
-from dodal.devices.pgm import PGM
+from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.devices.synchrotron import Synchrotron
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
@@ -31,15 +31,6 @@ def synchrotron() -> Synchrotron:
 # Grating does not exist yet - this class is a placeholder for when it does
 class Grating(StrictEnum):
     NO_GRATING = "No Grating"
-
-
-# Grating does not exist yet - this class is a placeholder for when it does
-@device_factory(skip=True)
-def pgm() -> PGM:
-    return PGM(
-        prefix=f"{PREFIX.beamline_prefix}-OP-PGM-01:",
-        grating=Grating,
-    )
 
 
 # Insertion device objects
@@ -88,3 +79,12 @@ def id_energy() -> InsertionDeviceEnergy:
 @device_factory(skip=True)
 def id_polarisation() -> InsertionDevicePolarisation:
     return InsertionDevicePolarisation(id_controller=id_controller())
+
+
+# Grating does not exist yet - this class is a placeholder for when it does
+@device_factory(skip=True)
+def pgm() -> PlaneGratingMonochromator:
+    return PlaneGratingMonochromator(
+        prefix=f"{PREFIX.beamline_prefix}-OP-PGM-01:",
+        grating=Grating,
+    )

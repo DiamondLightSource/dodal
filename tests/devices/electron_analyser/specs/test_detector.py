@@ -1,6 +1,5 @@
 import pytest
-from ophyd_async.core import init_devices
-from ophyd_async.testing import set_mock_value
+from ophyd_async.core import init_devices, set_mock_value
 
 from dodal.devices.b07 import LensMode, PsuMode
 from dodal.devices.electron_analyser import EnergySource

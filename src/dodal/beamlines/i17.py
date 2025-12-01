@@ -17,8 +17,12 @@ from dodal.devices.apple2_undulator import (
     UndulatorPhaseAxes,
 )
 from dodal.devices.i17.i17_apple2 import I17Apple2Controller
-from dodal.devices.pgm import PGM
+from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.devices.synchrotron import Synchrotron
+from dodal.devices.util.lookup_tables_apple2 import (
+    EnergyMotorLookup,
+    LookupTable,
+)
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
@@ -39,11 +43,27 @@ def synchrotron() -> Synchrotron:
 
 
 @device_factory(skip=True)
-def pgm() -> PGM:
-    return PGM(
+def pgm() -> PlaneGratingMonochromator:
+    return PlaneGratingMonochromator(
         prefix=f"{PREFIX.beamline_prefix}-OP-PGM-01:",
         grating=I17Grating,
         grating_pv="NLINES2",
+    )
+
+
+@device_factory()
+def id_gap() -> UndulatorGap:
+    return UndulatorGap(prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:")
+
+
+@device_factory()
+def id_phase() -> UndulatorPhaseAxes:
+    return UndulatorPhaseAxes(
+        prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:",
+        top_outer="RPQ1",
+        top_inner="RPQ2",
+        btm_inner="RPQ3",
+        btm_outer="RPQ4",
     )
 
 
@@ -51,14 +71,8 @@ def pgm() -> PGM:
 def id() -> Apple2:
     """I17 insertion device:"""
     return Apple2(
-        id_gap=UndulatorGap(prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:"),
-        id_phase=UndulatorPhaseAxes(
-            prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:",
-            top_outer="RPQ1",
-            top_inner="RPQ2",
-            btm_inner="RPQ3",
-            btm_outer="RPQ4",
-        ),
+        id_gap=id_gap(),
+        id_phase=id_phase(),
     )
 
 
@@ -66,7 +80,9 @@ def id() -> Apple2:
 def id_controller() -> Apple2Controller:
     """I17 insertion device controller with dummy energy to motor_converter."""
     return I17Apple2Controller(
-        apple2=id(), energy_to_motor_converter=lambda energy, pol: (0.0, 0.0)
+        apple2=id(),
+        gap_energy_motor_lut=EnergyMotorLookup(lut=LookupTable()),
+        phase_energy_motor_lut=EnergyMotorLookup(lut=LookupTable()),
     )
 
 

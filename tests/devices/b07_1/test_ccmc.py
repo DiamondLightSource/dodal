@@ -35,13 +35,13 @@ async def test_read_config_includes(mock_ccmc: ChannelCutMonochromator):
         {
             f"{mock_ccmc.name}-_xyz-x-motor_egu": partial_reading(""),
             f"{mock_ccmc.name}-_xyz-x-offset": partial_reading(0.0),
-            f"{mock_ccmc.name}-_xyz-x-velocity": partial_reading(0.0),
+            f"{mock_ccmc.name}-_xyz-x-velocity": partial_reading(1000.0),
             f"{mock_ccmc.name}-_xyz-y-motor_egu": partial_reading(""),
             f"{mock_ccmc.name}-_xyz-y-offset": partial_reading(0.0),
-            f"{mock_ccmc.name}-_xyz-y-velocity": partial_reading(0.0),
+            f"{mock_ccmc.name}-_xyz-y-velocity": partial_reading(1000.0),
             f"{mock_ccmc.name}-_xyz-z-motor_egu": partial_reading(""),
             f"{mock_ccmc.name}-_xyz-z-offset": partial_reading(0.0),
-            f"{mock_ccmc.name}-_xyz-z-velocity": partial_reading(0.0),
+            f"{mock_ccmc.name}-_xyz-z-velocity": partial_reading(1000.0),
         },
     )
 
@@ -75,18 +75,18 @@ async def test_move_crystal(
     list(ChannelCutMonochromatorPositions),
     ids=[c.name for c in ChannelCutMonochromatorPositions],
 )
-async def test_get_energy_in_ev(
+async def test_get_energy_in_eV(  # noqa: N802
     position: ChannelCutMonochromatorPositions,
     mock_ccmc: ChannelCutMonochromator,
 ):
     if position == ChannelCutMonochromatorPositions.OUT:
         await mock_ccmc.set(position)
         with pytest.raises(ValueError):
-            await mock_ccmc.energy_in_ev.get_value()
+            await mock_ccmc.energy_in_eV.get_value()
     else:
         await mock_ccmc.set(position)
         await assert_value(
-            mock_ccmc.energy_in_ev, float(str(position.value).split("Xtal_")[1])
+            mock_ccmc.energy_in_eV, float(str(position.value).split("Xtal_")[1])
         )
 
 

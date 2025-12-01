@@ -1,24 +1,26 @@
-import os
-import pickle
-from collections import defaultdict
+import json
+from collections.abc import Mapping
+from pathlib import Path
 from unittest import mock
-from unittest.mock import MagicMock, Mock
+from unittest.mock import AsyncMock, Mock
 
 import pytest
 from bluesky.plans import scan
 from bluesky.run_engine import RunEngine
 from daq_config_server.client import ConfigServer
 from numpy import linspace, poly1d
-from ophyd_async.core import init_devices
-from ophyd_async.testing import (
-    assert_emitted,
+from ophyd_async.core import (
     callback_on_mock_put,
     get_mock_put,
+    init_devices,
     set_mock_value,
 )
+from ophyd_async.testing import assert_emitted
 
 from dodal.devices.apple2_undulator import (
+    MAXIMUM_MOVE_TIME,
     BeamEnergy,
+    EnabledDisabledUpper,
     InsertionDeviceEnergy,
     InsertionDevicePolarisation,
     Pol,
@@ -31,103 +33,37 @@ from dodal.devices.i10.i10_apple2 import (
     DEFAULT_JAW_PHASE_POLY_PARAMS,
     I10Apple2,
     I10Apple2Controller,
-    I10EnergyMotorLookup,
     LinearArbitraryAngle,
 )
 from dodal.devices.i10.i10_setting_data import I10Grating
-from dodal.devices.pgm import PGM
-from dodal.testing import patch_motor
+from dodal.devices.pgm import PlaneGratingMonochromator
+from dodal.devices.util.lookup_tables_apple2 import (
+    ConfigServerEnergyMotorLookup,
+    EnergyCoverage,
+    EnergyCoverageEntry,
+    LookupTable,
+    LookupTableConfig,
+)
 from tests.devices.i10.test_data import (
-    EXPECTED_ID_ENERGY_2_GAP_CALIBRATIONS_IDD_PKL,
-    EXPECTED_ID_ENERGY_2_GAP_CALIBRATIONS_IDU_PKL,
-    EXPECTED_ID_ENERGY_2_PHASE_CALIBRATIONS_IDD_PKL,
-    EXPECTED_ID_ENERGY_2_PHASE_CALIBRATIONS_IDU_PKL,
+    EXPECTED_ID_ENERGY_2_GAP_CALIBRATIONS_IDD_JSON,
+    EXPECTED_ID_ENERGY_2_GAP_CALIBRATIONS_IDU_JSON,
+    EXPECTED_ID_ENERGY_2_PHASE_CALIBRATIONS_IDD_JSON,
+    EXPECTED_ID_ENERGY_2_PHASE_CALIBRATIONS_IDU_JSON,
     ID_ENERGY_2_GAP_CALIBRATIONS_CSV,
     ID_ENERGY_2_PHASE_CALIBRATIONS_CSV,
-    LOOKUP_TABLE_PATH,
 )
 
-ID_ENERGY_2_GAP_CALIBRATIONS_FILE_CSV = os.path.split(ID_ENERGY_2_GAP_CALIBRATIONS_CSV)[
-    1
-]
+# add mock_config_client, mock_id_gap, mock_phase and mock_jaw_phase_axes to pytest.
+pytest_plugins = ["dodal.testing.fixtures.devices.apple2"]
 
 
 @pytest.fixture
-async def mock_id_gap(prefix: str = "BLXX-EA-DET-007:") -> UndulatorGap:
+async def mock_pgm(prefix: str = "BLXX-EA-DET-007:") -> PlaneGratingMonochromator:
     async with init_devices(mock=True):
-        mock_id_gap = UndulatorGap(prefix, "mock_id_gap")
-    assert mock_id_gap.name == "mock_id_gap"
-    set_mock_value(mock_id_gap.gate, UndulatorGateStatus.CLOSE)
-    set_mock_value(mock_id_gap.velocity, 1)
-    set_mock_value(mock_id_gap.user_readback, 20)
-    set_mock_value(mock_id_gap.user_setpoint, "20")
-    set_mock_value(mock_id_gap.fault, 0)
-    return mock_id_gap
-
-
-@pytest.fixture
-async def mock_phase_axes(prefix: str = "BLXX-EA-DET-007:") -> UndulatorPhaseAxes:
-    async with init_devices(mock=True):
-        mock_phase_axes = UndulatorPhaseAxes(
-            prefix=prefix,
-            top_outer="RPQ1",
-            top_inner="RPQ2",
-            btm_outer="RPQ3",
-            btm_inner="RPQ4",
+        mock_pgm = PlaneGratingMonochromator(
+            prefix=prefix, grating=I10Grating, grating_pv="NLINES2"
         )
-    assert mock_phase_axes.name == "mock_phase_axes"
-    set_mock_value(mock_phase_axes.gate, UndulatorGateStatus.CLOSE)
-    set_mock_value(mock_phase_axes.top_outer.velocity, 2)
-    set_mock_value(mock_phase_axes.top_inner.velocity, 2)
-    set_mock_value(mock_phase_axes.btm_outer.velocity, 2)
-    set_mock_value(mock_phase_axes.btm_inner.velocity, 2)
-    set_mock_value(mock_phase_axes.top_outer.user_readback, 0)
-    set_mock_value(mock_phase_axes.top_inner.user_readback, 0)
-    set_mock_value(mock_phase_axes.btm_outer.user_readback, 0)
-    set_mock_value(mock_phase_axes.btm_inner.user_readback, 0)
-    set_mock_value(mock_phase_axes.top_outer.user_setpoint_readback, 0)
-    set_mock_value(mock_phase_axes.top_inner.user_setpoint_readback, 0)
-    set_mock_value(mock_phase_axes.btm_outer.user_setpoint_readback, 0)
-    set_mock_value(mock_phase_axes.btm_inner.user_setpoint_readback, 0)
-    set_mock_value(mock_phase_axes.fault, 0)
-    return mock_phase_axes
-
-
-@pytest.fixture
-async def mock_pgm(prefix: str = "BLXX-EA-DET-007:") -> PGM:
-    async with init_devices(mock=True):
-        mock_pgm = PGM(prefix=prefix, grating=I10Grating, grating_pv="NLINES2")
-    patch_motor(mock_pgm.energy)
     return mock_pgm
-
-
-@pytest.fixture
-async def mock_jaw_phase(prefix: str = "BLXX-EA-DET-007:") -> UndulatorJawPhase:
-    async with init_devices(mock=True):
-        mock_jaw_phase = UndulatorJawPhase(
-            prefix=prefix, move_pv="RPQ1", jaw_phase="JAW"
-        )
-    set_mock_value(mock_jaw_phase.gate, UndulatorGateStatus.CLOSE)
-    set_mock_value(mock_jaw_phase.jaw_phase.velocity, 2)
-    set_mock_value(mock_jaw_phase.jaw_phase.user_readback, 0)
-    set_mock_value(mock_jaw_phase.fault, 0)
-    return mock_jaw_phase
-
-
-@pytest.fixture
-def mock_config_client() -> ConfigServer:
-    mock.patch("dodal.devices.i10.i10_apple2.ConfigServer")
-    mock_config_client = ConfigServer()
-
-    mock_config_client.get_file_contents = MagicMock(spec=["get_file_contents"])
-
-    def my_side_effect(file_path, reset_cached_result) -> str:
-        assert reset_cached_result is True
-        with open(file_path) as f:
-            return f.read()
-
-    mock_config_client.get_file_contents.side_effect = my_side_effect
-    return mock_config_client
 
 
 @pytest.fixture
@@ -144,28 +80,64 @@ async def mock_id(
 
 
 @pytest.fixture
+def mock_i10_gap_energy_motor_lookup_idu(
+    mock_config_client: ConfigServer,
+) -> ConfigServerEnergyMotorLookup:
+    return ConfigServerEnergyMotorLookup(
+        config_client=mock_config_client,
+        lut_config=LookupTableConfig(source=("Source", "idu")),
+        path=Path(ID_ENERGY_2_GAP_CALIBRATIONS_CSV),
+    )
+
+
+@pytest.fixture
+def mock_i10_phase_energy_motor_lookup_idu(
+    mock_config_client: ConfigServer,
+) -> ConfigServerEnergyMotorLookup:
+    return ConfigServerEnergyMotorLookup(
+        config_client=mock_config_client,
+        lut_config=LookupTableConfig(source=("Source", "idu")),
+        path=Path(ID_ENERGY_2_PHASE_CALIBRATIONS_CSV),
+    )
+
+
+@pytest.fixture
+def mock_i10_gap_energy_motor_lookup_idd(
+    mock_config_client: ConfigServer,
+) -> ConfigServerEnergyMotorLookup:
+    return ConfigServerEnergyMotorLookup(
+        config_client=mock_config_client,
+        lut_config=LookupTableConfig(source=("Source", "idd")),
+        path=Path(ID_ENERGY_2_GAP_CALIBRATIONS_CSV),
+    )
+
+
+@pytest.fixture
+def mock_i10_phase_energy_motor_lookup_idd(
+    mock_config_client: ConfigServer,
+) -> ConfigServerEnergyMotorLookup:
+    return ConfigServerEnergyMotorLookup(
+        config_client=mock_config_client,
+        lut_config=LookupTableConfig(
+            source=("Source", "idd"),
+        ),
+        path=Path(ID_ENERGY_2_PHASE_CALIBRATIONS_CSV),
+    )
+
+
+@pytest.fixture
 async def mock_id_controller(
     mock_id: I10Apple2,
-    mock_config_client: ConfigServer,
+    mock_i10_gap_energy_motor_lookup_idu: ConfigServerEnergyMotorLookup,
+    mock_i10_phase_energy_motor_lookup_idu: ConfigServerEnergyMotorLookup,
 ) -> I10Apple2Controller:
     async with init_devices(mock=True):
         mock_id_controller = I10Apple2Controller(
             apple2=mock_id,
-            lookuptable_dir=LOOKUP_TABLE_PATH,
-            source=("Source", "idu"),
-            config_client=mock_config_client,
+            gap_energy_motor_lut=mock_i10_gap_energy_motor_lookup_idu,
+            phase_energy_motor_lut=mock_i10_phase_energy_motor_lookup_idu,
         )
-    set_mock_value(mock_id_controller.apple2().gap.gate, UndulatorGateStatus.CLOSE)
-    set_mock_value(mock_id_controller.apple2().phase.gate, UndulatorGateStatus.CLOSE)
-    set_mock_value(
-        mock_id_controller.apple2().jaw_phase.gate, UndulatorGateStatus.CLOSE
-    )
-    set_mock_value(mock_id_controller.apple2().gap.velocity, 1)
-    set_mock_value(mock_id_controller.apple2().jaw_phase.jaw_phase.velocity, 1)
-    set_mock_value(mock_id_controller.apple2().phase.btm_inner.velocity, 1)
-    set_mock_value(mock_id_controller.apple2().phase.top_inner.velocity, 1)
-    set_mock_value(mock_id_controller.apple2().phase.btm_outer.velocity, 1)
-    set_mock_value(mock_id_controller.apple2().phase.top_outer.velocity, 1)
+
     return mock_id_controller
 
 
@@ -174,15 +146,13 @@ async def mock_id_energy(
     mock_id_controller: I10Apple2Controller,
 ) -> InsertionDeviceEnergy:
     async with init_devices(mock=True):
-        mock_id_energy = InsertionDeviceEnergy(
-            id_controller=mock_id_controller,
-        )
+        mock_id_energy = InsertionDeviceEnergy(id_controller=mock_id_controller)
     return mock_id_energy
 
 
 @pytest.fixture
 async def beam_energy(
-    mock_id_energy: InsertionDeviceEnergy, mock_pgm: PGM
+    mock_id_energy: InsertionDeviceEnergy, mock_pgm: PlaneGratingMonochromator
 ) -> BeamEnergy:
     async with init_devices(mock=True):
         beam_energy = BeamEnergy(id_energy=mock_id_energy, mono=mock_pgm.energy)
@@ -210,15 +180,6 @@ async def mock_linear_arbitrary_angle(
     return mock_linear_arbitrary_angle
 
 
-@pytest.fixture
-def mock_i10_energy_motor_lookup_idu(mock_config_client) -> I10EnergyMotorLookup:
-    return I10EnergyMotorLookup(
-        lookuptable_dir=LOOKUP_TABLE_PATH,
-        source=("Source", "idu"),
-        config_client=mock_config_client,
-    )
-
-
 @pytest.mark.parametrize(
     "pol, top_outer_phase,top_inner_phase,btm_inner_phase, btm_outer_phase",
     [
@@ -243,16 +204,16 @@ async def test_i10_apple2_controller_determine_pol(
 ):
     assert await mock_id_controller.polarisation_setpoint.get_value() == Pol.NONE
     set_mock_value(
-        mock_id_controller.apple2().phase.top_inner.user_readback, top_inner_phase
+        mock_id_controller.apple2().phase().top_inner.user_readback, top_inner_phase
     )
     set_mock_value(
-        mock_id_controller.apple2().phase.top_outer.user_readback, top_outer_phase
+        mock_id_controller.apple2().phase().top_outer.user_readback, top_outer_phase
     )
     set_mock_value(
-        mock_id_controller.apple2().phase.btm_inner.user_readback, btm_inner_phase
+        mock_id_controller.apple2().phase().btm_inner.user_readback, btm_inner_phase
     )
     set_mock_value(
-        mock_id_controller.apple2().phase.btm_outer.user_readback, btm_outer_phase
+        mock_id_controller.apple2().phase().btm_outer.user_readback, btm_outer_phase
     )
     if pol == Pol.NONE:
         with pytest.raises(ValueError):
@@ -265,7 +226,7 @@ async def test_i10_apple2_controller_determine_pol(
 async def test_fail_i10_apple2_controller_set_undefined_pol(
     mock_id_controller: I10Apple2Controller,
 ):
-    set_mock_value(mock_id_controller.apple2().gap.user_readback, 101)
+    set_mock_value(mock_id_controller.apple2().gap().user_readback, 101)
     with pytest.raises(RuntimeError) as e:
         await mock_id_controller.energy.set(600)
     assert (
@@ -278,44 +239,58 @@ async def test_fail_i10_apple2_controller_set_undefined_pol(
 async def test_fail_i10_apple2_controller_set_id_not_ready(
     mock_id_controller: I10Apple2Controller,
 ):
-    set_mock_value(mock_id_controller.apple2().gap.fault, 1)
-    with pytest.raises(RuntimeError) as e:
-        await mock_id_controller.energy.set(600)
-    assert str(e.value) == mock_id_controller.apple2().gap.name + " is in fault state"
-    set_mock_value(mock_id_controller.apple2().gap.fault, 0)
-    set_mock_value(mock_id_controller.apple2().gap.gate, UndulatorGateStatus.OPEN)
+    set_mock_value(
+        mock_id_controller.apple2().gap().status, EnabledDisabledUpper.DISABLED
+    )
     with pytest.raises(RuntimeError) as e:
         await mock_id_controller.energy.set(600)
     assert (
-        str(e.value) == mock_id_controller.apple2().gap.name + " is already in motion."
+        str(e.value)
+        == mock_id_controller.apple2().gap().name + " is DISABLED and cannot move."
+    )
+    set_mock_value(
+        mock_id_controller.apple2().gap().status, EnabledDisabledUpper.ENABLED
+    )
+    set_mock_value(mock_id_controller.apple2().gap().gate, UndulatorGateStatus.OPEN)
+    with pytest.raises(RuntimeError) as e:
+        await mock_id_controller.energy.set(600)
+    assert (
+        str(e.value)
+        == mock_id_controller.apple2().gap().name + " is already in motion."
     )
 
 
-async def test_beam_energy_re_scan(beam_energy: BeamEnergy, run_engine: RunEngine):
-    docs = defaultdict(list)
+async def test_fail_i10_apple2_controller_set_energy_has_default(
+    mock_id_energy: InsertionDeviceEnergy,
+    mock_id_controller: I10Apple2Controller,
+):
+    mock_id_controller.energy.set = AsyncMock()
+    await mock_id_energy.set(600)
+    mock_id_controller.energy.set.assert_awaited_once_with(
+        600, timeout=MAXIMUM_MOVE_TIME
+    )
 
-    def capture_emitted(name, doc):
-        docs[name].append(doc)
 
-    run_engine(scan([], beam_energy, 500, 600, num=11), capture_emitted)
-    assert_emitted(docs, start=1, descriptor=1, event=11, stop=1)
+async def test_beam_energy_re_scan(
+    run_engine: RunEngine,
+    run_engine_documents: Mapping[str, list[dict]],
+    beam_energy: BeamEnergy,
+):
+    run_engine(scan([], beam_energy, 500, 600, num=11))
+    assert_emitted(run_engine_documents, start=1, descriptor=1, event=11, stop=1)
 
-    for cnt, data in enumerate(docs["event"]):
+    for cnt, data in enumerate(run_engine_documents["event"]):
         assert data["data"]["mock_id_controller-energy"] == 500 + cnt * 10
         assert data["data"]["mock_pgm-energy"] == 500 + cnt * 10
 
 
 async def test_beam_energy_re_scan_with_offset(
+    run_engine: RunEngine,
+    run_engine_documents: Mapping[str, list[dict]],
     beam_energy: BeamEnergy,
     mock_id_controller: I10Apple2Controller,
-    run_engine: RunEngine,
 ):
-    docs = defaultdict(list)
-
-    def capture_emitted(name, doc):
-        docs[name].append(doc)
-
-    mock_id_controller._polarisation_setpoint_set(Pol("lh3"))
+    mock_id_controller._polarisation_setpoint_set(Pol.LH3)
     # with energy offset
     await beam_energy.id_energy_offset.set(20)
     rbv_mocks = Mock()
@@ -326,17 +301,9 @@ async def test_beam_energy_re_scan_with_offset(
             beam_energy._mono_energy().user_readback, rbv_mocks.get()
         ),
     )
-    run_engine(
-        scan(
-            [],
-            beam_energy,
-            1700,
-            1800,
-            num=11,
-        ),
-        capture_emitted,
-    )
-    for cnt, data in enumerate(docs["event"]):
+    run_engine(scan([], beam_energy, 1700, 1800, num=11))
+
+    for cnt, data in enumerate(run_engine_documents["event"]):
         assert data["data"]["mock_id_controller-energy"] == 1700 + cnt * 10 + 20
         assert data["data"]["mock_pgm-energy"] == 1700 + cnt * 10
 
@@ -387,32 +354,44 @@ async def test_id_polarisation_set(
         await mock_id_pol.set(pol)
 
         top_inner = get_mock_put(
-            mock_id_controller.apple2().phase.top_inner.user_setpoint
+            mock_id_controller.apple2().phase().top_inner.user_setpoint
         )
         top_inner.assert_called_once()
         assert float(top_inner.call_args[0][0]) == pytest.approx(expect_top_inner, 0.01)
 
         top_outer = get_mock_put(
-            mock_id_controller.apple2().phase.top_outer.user_setpoint
+            mock_id_controller.apple2().phase().top_outer.user_setpoint
         )
         top_outer.assert_called_once()
         assert float(top_outer.call_args[0][0]) == pytest.approx(expect_top_outer, 0.01)
 
         btm_inner = get_mock_put(
-            mock_id_controller.apple2().phase.btm_inner.user_setpoint
+            mock_id_controller.apple2().phase().btm_inner.user_setpoint
         )
         btm_inner.assert_called_once()
         assert float(btm_inner.call_args[0][0]) == pytest.approx(expect_btm_inner, 0.01)
 
         btm_outer = get_mock_put(
-            mock_id_controller.apple2().phase.btm_outer.user_setpoint
+            mock_id_controller.apple2().phase().btm_outer.user_setpoint
         )
         btm_outer.assert_called_once()
         assert float(btm_outer.call_args[0][0]) == pytest.approx(expect_btm_outer, 0.01)
 
-        gap = get_mock_put(mock_id_controller.apple2().gap.user_setpoint)
+        gap = get_mock_put(mock_id_controller.apple2().gap().user_setpoint)
         gap.assert_called_once()
         assert float(gap.call_args[0][0]) == pytest.approx(expect_gap, 0.05)
+
+
+async def test_id_polarisation_set_has_default_timeout(
+    mock_id_pol: InsertionDevicePolarisation,
+    mock_id_controller: I10Apple2Controller,
+):
+    set_mock_value(mock_id_controller._energy, 700)
+    mock_id_controller.polarisation.set = AsyncMock()
+    await mock_id_pol.set(Pol.LV)
+    mock_id_controller.polarisation.set.assert_awaited_once_with(
+        Pol.LV, timeout=MAXIMUM_MOVE_TIME
+    )
 
 
 @pytest.mark.parametrize(
@@ -440,10 +419,18 @@ async def test_id_polarisation_locate(
     await mock_id_pol.set(pol=pol)
     assert await mock_id_pol.locate() == {"setpoint": pol, "readback": Pol.LH}
     # move the motor
-    set_mock_value(mock_id_controller.apple2().phase.top_inner.user_readback, top_inner)
-    set_mock_value(mock_id_controller.apple2().phase.top_outer.user_readback, top_outer)
-    set_mock_value(mock_id_controller.apple2().phase.btm_inner.user_readback, btm_inner)
-    set_mock_value(mock_id_controller.apple2().phase.btm_outer.user_readback, btm_outer)
+    set_mock_value(
+        mock_id_controller.apple2().phase().top_inner.user_readback, top_inner
+    )
+    set_mock_value(
+        mock_id_controller.apple2().phase().top_outer.user_readback, top_outer
+    )
+    set_mock_value(
+        mock_id_controller.apple2().phase().btm_inner.user_readback, btm_inner
+    )
+    set_mock_value(
+        mock_id_controller.apple2().phase().btm_outer.user_readback, btm_outer
+    )
     assert await mock_id_pol.locate() == {"setpoint": pol, "readback": pol}
 
 
@@ -469,10 +456,18 @@ async def test_id_polarisation_read_check_pol_from_hardware(
 ):
     set_mock_value(mock_id_controller._energy, energy)
 
-    set_mock_value(mock_id_controller.apple2().phase.top_inner.user_readback, top_inner)
-    set_mock_value(mock_id_controller.apple2().phase.top_outer.user_readback, top_outer)
-    set_mock_value(mock_id_controller.apple2().phase.btm_inner.user_readback, btm_inner)
-    set_mock_value(mock_id_controller.apple2().phase.btm_outer.user_readback, btm_outer)
+    set_mock_value(
+        mock_id_controller.apple2().phase().top_inner.user_readback, top_inner
+    )
+    set_mock_value(
+        mock_id_controller.apple2().phase().top_outer.user_readback, top_outer
+    )
+    set_mock_value(
+        mock_id_controller.apple2().phase().btm_inner.user_readback, btm_inner
+    )
+    set_mock_value(
+        mock_id_controller.apple2().phase().btm_outer.user_readback, btm_outer
+    )
 
     assert (await mock_id_pol.read())["mock_id_controller-polarisation"]["value"] == pol
 
@@ -480,13 +475,13 @@ async def test_id_polarisation_read_check_pol_from_hardware(
 @pytest.mark.parametrize(
     "pol,energy, top_outer, top_inner, btm_inner,btm_outer",
     [
-        ("lh3", 500, 0.0, 0.0, 0.0, 0.0),
+        (Pol.LH3, 500, 0.0, 0.0, 0.0, 0.0),
     ],
 )
 async def test_id_polarisation_read_leave_lh3_unchanged_when_hardware_match(
     mock_id_pol: InsertionDevicePolarisation,
     mock_id_controller: I10Apple2Controller,
-    pol: str,
+    pol: Pol,
     energy: float,
     top_inner: float,
     top_outer: float,
@@ -494,11 +489,19 @@ async def test_id_polarisation_read_leave_lh3_unchanged_when_hardware_match(
     btm_outer: float,
 ):
     set_mock_value(mock_id_controller._energy, energy)
-    mock_id_controller._polarisation_setpoint_set(Pol("lh3"))
-    set_mock_value(mock_id_controller.apple2().phase.top_inner.user_readback, top_inner)
-    set_mock_value(mock_id_controller.apple2().phase.top_outer.user_readback, top_outer)
-    set_mock_value(mock_id_controller.apple2().phase.btm_inner.user_readback, btm_inner)
-    set_mock_value(mock_id_controller.apple2().phase.btm_outer.user_readback, btm_outer)
+    mock_id_controller._polarisation_setpoint_set(Pol.LH3)
+    set_mock_value(
+        mock_id_controller.apple2().phase().top_inner.user_readback, top_inner
+    )
+    set_mock_value(
+        mock_id_controller.apple2().phase().top_outer.user_readback, top_outer
+    )
+    set_mock_value(
+        mock_id_controller.apple2().phase().btm_inner.user_readback, btm_inner
+    )
+    set_mock_value(
+        mock_id_controller.apple2().phase().btm_outer.user_readback, btm_outer
+    )
     assert (await mock_id_pol.read())["mock_id_controller-polarisation"]["value"] == pol
 
 
@@ -528,6 +531,17 @@ async def test_linear_arbitrary_pol_fail_read(
     )
 
 
+async def test_linear_arbitrary_pol_set_default_timeout(
+    mock_linear_arbitrary_angle: LinearArbitraryAngle,
+    mock_id_controller: I10Apple2Controller,
+):
+    mock_id_controller.linear_arbitrary_angle.set = AsyncMock()
+    await mock_linear_arbitrary_angle.set(60)
+    mock_id_controller.linear_arbitrary_angle.set.assert_awaited_once_with(
+        60, timeout=MAXIMUM_MOVE_TIME
+    )
+
+
 @pytest.mark.parametrize(
     "poly",
     [18, -18, 12.01, -12.01],
@@ -538,19 +552,19 @@ async def test_linear_arbitrary_limit_fail(
     poly: float,
 ):
     set_mock_value(
-        mock_id_controller.apple2().phase.top_inner.user_readback,
+        mock_id_controller.apple2().phase().top_inner.user_readback,
         16.4,
     )
     set_mock_value(
-        mock_id_controller.apple2().phase.top_outer.user_readback,
+        mock_id_controller.apple2().phase().top_outer.user_readback,
         0,
     )
     set_mock_value(
-        mock_id_controller.apple2().phase.btm_inner.user_readback,
+        mock_id_controller.apple2().phase().btm_inner.user_readback,
         0,
     )
     set_mock_value(
-        mock_id_controller.apple2().phase.btm_outer.user_readback,
+        mock_id_controller.apple2().phase().btm_outer.user_readback,
         -16.4,
     )
     mock_id_controller.jaw_phase_from_angle = poly1d([poly])
@@ -573,33 +587,30 @@ async def test_linear_arbitrary_limit_fail(
     ],
 )
 async def test_linear_arbitrary_run_engine_scan(
+    run_engine: RunEngine,
+    run_engine_documents: Mapping[str, list[dict]],
     mock_linear_arbitrary_angle: LinearArbitraryAngle,
     mock_id_controller: I10Apple2Controller,
-    run_engine: RunEngine,
     start: float,
     stop: float,
     num_point: int,
 ):
     angles = linspace(start, stop, num_point, endpoint=True)
-    docs = defaultdict(list)
-
-    def capture_emitted(name, doc):
-        docs[name].append(doc)
 
     set_mock_value(
-        mock_id_controller.apple2().phase.top_inner.user_readback,
+        mock_id_controller.apple2().phase().top_inner.user_readback,
         16.4,
     )
     set_mock_value(
-        mock_id_controller.apple2().phase.top_outer.user_readback,
+        mock_id_controller.apple2().phase().top_outer.user_readback,
         0,
     )
     set_mock_value(
-        mock_id_controller.apple2().phase.btm_inner.user_readback,
+        mock_id_controller.apple2().phase().btm_inner.user_readback,
         0,
     )
     set_mock_value(
-        mock_id_controller.apple2().phase.btm_outer.user_readback,
+        mock_id_controller.apple2().phase().btm_outer.user_readback,
         -16.4,
     )
     run_engine(
@@ -610,27 +621,25 @@ async def test_linear_arbitrary_run_engine_scan(
             stop,
             num=num_point,
         ),
-        capture_emitted,
     )
-    assert_emitted(docs, start=1, descriptor=1, event=num_point, stop=1)
+    assert_emitted(run_engine_documents, start=1, descriptor=1, event=num_point, stop=1)
     set_mock_value(
-        mock_id_controller.apple2().gap.gate,
+        mock_id_controller.apple2().gap().gate,
         UndulatorGateStatus.CLOSE,
     )
     set_mock_value(
-        mock_id_controller.apple2().phase.gate,
+        mock_id_controller.apple2().phase().gate,
         UndulatorGateStatus.CLOSE,
     )
     jaw_phase = get_mock_put(
-        mock_id_controller.apple2().jaw_phase.jaw_phase.user_setpoint
+        mock_id_controller.apple2().jaw_phase().jaw_phase.user_setpoint
     )
 
     poly = poly1d(
         DEFAULT_JAW_PHASE_POLY_PARAMS
     )  # default setting for i10 jaw phase to angle
-    for cnt, data in enumerate(docs["event"]):
+    for cnt, data in enumerate(run_engine_documents["event"]):
         temp_angle = angles[cnt]
-        print(data["data"])
         assert data["data"]["mock_id_controller-linear_arbitrary_angle"] == temp_angle
         alpha_real = (
             temp_angle
@@ -642,66 +651,42 @@ async def test_linear_arbitrary_run_engine_scan(
         )
 
 
-@pytest.mark.parametrize(
-    "file_name, expected_dict_file_name, source",
-    [
-        (
-            ID_ENERGY_2_GAP_CALIBRATIONS_CSV,
-            EXPECTED_ID_ENERGY_2_GAP_CALIBRATIONS_IDU_PKL,
-            ("Source", "idu"),
-        ),
-        (
-            ID_ENERGY_2_GAP_CALIBRATIONS_CSV,
-            EXPECTED_ID_ENERGY_2_GAP_CALIBRATIONS_IDD_PKL,
-            ("Source", "idd"),
-        ),
-        (
-            ID_ENERGY_2_PHASE_CALIBRATIONS_CSV,
-            EXPECTED_ID_ENERGY_2_PHASE_CALIBRATIONS_IDU_PKL,
-            ("Source", "idu"),
-        ),
-        (
-            ID_ENERGY_2_PHASE_CALIBRATIONS_CSV,
-            EXPECTED_ID_ENERGY_2_PHASE_CALIBRATIONS_IDD_PKL,
-            ("Source", "idd"),
-        ),
-    ],
-)
-def test_i10_energy_motor_lookup_convert_csv_to_lookup_success(
-    mock_i10_energy_motor_lookup_idu: I10EnergyMotorLookup,
-    file_name: str,
+def assert_lookup_table_matches_expected(
+    energy_motor_lookup: ConfigServerEnergyMotorLookup,
     expected_dict_file_name: str,
-    source: tuple[str, str],
-):
-    data = mock_i10_energy_motor_lookup_idu.convert_csv_to_lookup(
-        file=file_name,
-        source=source,
-    )
+) -> None:
+    energy_motor_lookup.update_lookup_table()
     with open(expected_dict_file_name, "rb") as f:
-        loaded_dict = pickle.load(f)
-    assert data == loaded_dict
+        expected_lut = LookupTable(json.load(f))
+    assert energy_motor_lookup.lut == expected_lut
 
 
-def test_i10_energy_motor_lookup_convert_csv_to_lookup_failed(
-    mock_i10_energy_motor_lookup_idu: I10EnergyMotorLookup,
-):
-    with pytest.raises(RuntimeError):
-        mock_i10_energy_motor_lookup_idu.convert_csv_to_lookup(
-            file=ID_ENERGY_2_GAP_CALIBRATIONS_CSV,
-            source=("Source", "idw"),
-        )
+def test_i10_energy_motor_lookup_idu_convert_csv_to_lookup_success(
+    mock_i10_gap_energy_motor_lookup_idu: ConfigServerEnergyMotorLookup,
+    mock_i10_phase_energy_motor_lookup_idu: ConfigServerEnergyMotorLookup,
+) -> None:
+    assert_lookup_table_matches_expected(
+        mock_i10_gap_energy_motor_lookup_idu,
+        EXPECTED_ID_ENERGY_2_GAP_CALIBRATIONS_IDU_JSON,
+    )
+    assert_lookup_table_matches_expected(
+        mock_i10_phase_energy_motor_lookup_idu,
+        EXPECTED_ID_ENERGY_2_PHASE_CALIBRATIONS_IDU_JSON,
+    )
 
 
-async def test_fail_i10_energy_motor_lookup_no_lookup(
-    mock_i10_energy_motor_lookup_idu: I10EnergyMotorLookup,
-):
-    wrong_path = "fnslkfndlsnf"
-    with pytest.raises(FileNotFoundError) as e:
-        mock_i10_energy_motor_lookup_idu.convert_csv_to_lookup(
-            file=wrong_path,
-            source=("Source", "idd"),
-        )
-    assert str(e.value) == f"[Errno 2] No such file or directory: '{wrong_path}'"
+def test_i10_energy_motor_lookup_idd_convert_csv_to_lookup_success(
+    mock_i10_gap_energy_motor_lookup_idd: ConfigServerEnergyMotorLookup,
+    mock_i10_phase_energy_motor_lookup_idd: ConfigServerEnergyMotorLookup,
+) -> None:
+    assert_lookup_table_matches_expected(
+        mock_i10_gap_energy_motor_lookup_idd,
+        EXPECTED_ID_ENERGY_2_GAP_CALIBRATIONS_IDD_JSON,
+    )
+    assert_lookup_table_matches_expected(
+        mock_i10_phase_energy_motor_lookup_idd,
+        EXPECTED_ID_ENERGY_2_PHASE_CALIBRATIONS_IDD_JSON,
+    )
 
 
 @pytest.mark.parametrize("energy", [(100), (5500), (-299)])
@@ -712,38 +697,42 @@ async def test_fail_i10_energy_motor_lookup_outside_energy_limits(
     with pytest.raises(ValueError) as e:
         await mock_id_controller.energy.set(energy)
     assert str(e.value) == "Demanding energy must lie between {} and {} eV!".format(
-        mock_id_controller.lookup_table_client.lookup_tables["Gap"][
+        mock_id_controller.gap_energy_motor_lut.lut.root[
             await mock_id_controller.polarisation_setpoint.get_value()
-        ]["Limit"]["Minimum"],
-        mock_id_controller.lookup_table_client.lookup_tables["Gap"][
+        ].limit.minimum,
+        mock_id_controller.gap_energy_motor_lut.lut.root[
             await mock_id_controller.polarisation_setpoint.get_value()
-        ]["Limit"]["Maximum"],
+        ].limit.maximum,
     )
 
 
 async def test_fail_i10_energy_motor_lookup_with_lookup_gap(
     mock_id_controller: I10Apple2Controller,
 ):
-    mock_id_controller.lookup_table_client.update_lookuptable()
+    mock_id_controller.gap_energy_motor_lut.update_lookup_table()
     # make gap in energy
-    mock_id_controller.lookup_table_client.lookup_tables["Gap"]["lh"]["Energies"] = {
-        "1": {
-            "Low": 255.3,
-            "High": 500,
-            "Poly": poly1d([4.33435e-08, -7.52562e-05, 6.41791e-02, 3.88755e00]),
+    mock_id_controller.gap_energy_motor_lut.lut.root[Pol.LH].energies = EnergyCoverage(
+        {
+            1: EnergyCoverageEntry(
+                low=255.3,
+                high=500,
+                poly=poly1d([4.33435e-08, -7.52562e-05, 6.41791e-02, 3.88755e00]),
+            )
         }
-    }
-    mock_id_controller.lookup_table_client.lookup_tables["Gap"]["lh"]["Energies"] = {
-        "2": {
-            "Low": 600,
-            "High": 1000,
-            "Poly": poly1d([4.33435e-08, -7.52562e-05, 6.41791e-02, 3.88755e00]),
+    )
+    mock_id_controller.gap_energy_motor_lut.lut.root[Pol.LH].energies = EnergyCoverage(
+        {
+            2: EnergyCoverageEntry(
+                low=600,
+                high=1000,
+                poly=poly1d([4.33435e-08, -7.52562e-05, 6.41791e-02, 3.88755e00]),
+            )
         }
-    }
+    )
     with pytest.raises(ValueError) as e:
         await mock_id_controller.energy.set(555)
     assert (
         str(e.value)
-        == """Cannot find polynomial coefficients for your requested energy.
-        There might be gap in the calibration lookup table."""
+        == "Cannot find polynomial coefficients for your requested energy."
+        + " There might be gap in the calibration lookup table."
     )

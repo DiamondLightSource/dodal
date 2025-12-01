@@ -6,6 +6,8 @@ note:
     idd == id1,    idu == id2.
 """
 
+from pathlib import Path
+
 from daq_config_server.client import ConfigServer
 
 from dodal.common.beamlines.beamline_utils import device_factory
@@ -32,8 +34,14 @@ from dodal.devices.i10.i10_apple2 import (
 
 # Imports taken from i10 while we work out how to deal with split end stations
 from dodal.devices.i10.i10_setting_data import I10Grating
-from dodal.devices.pgm import PGM
+from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.devices.synchrotron import Synchrotron
+from dodal.devices.util.lookup_tables_apple2 import (
+    DEFAULT_GAP_FILE,
+    DEFAULT_PHASE_FILE,
+    ConfigServerEnergyMotorLookup,
+    LookupTableConfig,
+)
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
@@ -41,8 +49,6 @@ BL = get_beamline_name("i10")
 set_log_beamline(BL)
 set_utils_beamline(BL)
 PREFIX = BeamlinePrefix(BL)
-
-LOOK_UPTABLE_DIR = "/dls_sw/i10/software/blueapi/scratch/i10-config/lookupTables/"
 
 
 @device_factory()
@@ -59,9 +65,9 @@ def first_mirror() -> PiezoMirror:
 
 
 @device_factory()
-def pgm() -> PGM:
+def pgm() -> PlaneGratingMonochromator:
     "I10 Plane Grating Monochromator, it can change energy via pgm.energy.set(<energy>)"
-    return PGM(
+    return PlaneGratingMonochromator(
         prefix=f"{PREFIX.beamline_prefix}-OP-PGM-01:",
         grating=I10Grating,
         grating_pv="NLINES2",
@@ -81,32 +87,55 @@ LOOK_UPTABLE_DIR = "/dls_sw/i10/software/gda/workspace_git/gda-diamond.git/confi
 
 
 @device_factory()
+def idd_gap() -> UndulatorGap:
+    return UndulatorGap(prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:")
+
+
+@device_factory()
+def idd_phase() -> UndulatorPhaseAxes:
+    return UndulatorPhaseAxes(
+        prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:",
+        top_outer="RPQ1",
+        top_inner="RPQ2",
+        btm_inner="RPQ3",
+        btm_outer="RPQ4",
+    )
+
+
+@device_factory()
+def idd_jaw_phase() -> UndulatorJawPhase:
+    return UndulatorJawPhase(
+        prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:",
+        move_pv="RPQ1",
+    )
+
+
+@device_factory()
 def idd() -> I10Apple2:
     """i10 downstream insertion device:"""
     return I10Apple2(
-        id_gap=UndulatorGap(prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:"),
-        id_phase=UndulatorPhaseAxes(
-            prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:",
-            top_outer="RPQ1",
-            top_inner="RPQ2",
-            btm_inner="RPQ3",
-            btm_outer="RPQ4",
-        ),
-        id_jaw_phase=UndulatorJawPhase(
-            prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:",
-            move_pv="RPQ1",
-        ),
+        id_gap=idd_gap(), id_phase=idd_phase(), id_jaw_phase=idd_jaw_phase()
     )
 
 
 @device_factory()
 def idd_controller() -> I10Apple2Controller:
     """I10 downstream insertion device controller."""
+    source = ("Source", "idd")
+    idd_gap_energy_motor_lut = ConfigServerEnergyMotorLookup(
+        config_client=I10_CONF_CLIENT,
+        lut_config=LookupTableConfig(source=source),
+        path=Path(LOOK_UPTABLE_DIR, DEFAULT_GAP_FILE),
+    )
+    idd_phase_energy_motor_lut = ConfigServerEnergyMotorLookup(
+        config_client=I10_CONF_CLIENT,
+        lut_config=LookupTableConfig(source=source),
+        path=Path(LOOK_UPTABLE_DIR, DEFAULT_PHASE_FILE),
+    )
     return I10Apple2Controller(
         apple2=idd(),
-        lookuptable_dir=LOOK_UPTABLE_DIR,
-        source=("Source", "idd"),
-        config_client=I10_CONF_CLIENT,
+        gap_energy_motor_lut=idd_gap_energy_motor_lut,
+        phase_energy_motor_lut=idd_phase_energy_motor_lut,
     )
 
 
@@ -132,32 +161,55 @@ def energy_dd() -> BeamEnergy:
 
 
 @device_factory()
+def idu_gap() -> UndulatorGap:
+    return UndulatorGap(prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-21:")
+
+
+@device_factory()
+def idu_phase() -> UndulatorPhaseAxes:
+    return UndulatorPhaseAxes(
+        prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-21:",
+        top_outer="RPQ1",
+        top_inner="RPQ2",
+        btm_inner="RPQ3",
+        btm_outer="RPQ4",
+    )
+
+
+@device_factory()
+def idu_jaw_phase() -> UndulatorJawPhase:
+    return UndulatorJawPhase(
+        prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-21:",
+        move_pv="RPQ1",
+    )
+
+
+@device_factory()
 def idu() -> I10Apple2:
     """i10 upstream insertion device"""
     return I10Apple2(
-        id_gap=UndulatorGap(prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-21:"),
-        id_phase=UndulatorPhaseAxes(
-            prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-21:",
-            top_outer="RPQ1",
-            top_inner="RPQ2",
-            btm_inner="RPQ3",
-            btm_outer="RPQ4",
-        ),
-        id_jaw_phase=UndulatorJawPhase(
-            prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-21:",
-            move_pv="RPQ1",
-        ),
+        id_gap=idu_gap(), id_phase=idu_phase(), id_jaw_phase=idu_jaw_phase()
     )
 
 
 @device_factory()
 def idu_controller() -> I10Apple2Controller:
     """I10 upstream insertion device controller."""
-    return I10Apple2Controller(
-        apple2=idu(),
-        lookuptable_dir=LOOK_UPTABLE_DIR,
-        source=("Source", "idu"),
+    source = ("Source", "idu")
+    idu_gap_energy_motor_lut = ConfigServerEnergyMotorLookup(
         config_client=I10_CONF_CLIENT,
+        lut_config=LookupTableConfig(source=source),
+        path=Path(LOOK_UPTABLE_DIR, DEFAULT_GAP_FILE),
+    )
+    idu_phase_energy_motor_lut = ConfigServerEnergyMotorLookup(
+        config_client=I10_CONF_CLIENT,
+        lut_config=LookupTableConfig(source=source),
+        path=Path(LOOK_UPTABLE_DIR, DEFAULT_PHASE_FILE),
+    )
+    return I10Apple2Controller(
+        apple2=idd(),
+        gap_energy_motor_lut=idu_gap_energy_motor_lut,
+        phase_energy_motor_lut=idu_phase_energy_motor_lut,
     )
 
 

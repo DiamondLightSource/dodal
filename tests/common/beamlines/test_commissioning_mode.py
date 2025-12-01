@@ -1,7 +1,7 @@
 import pytest
 from bluesky import RunEngine
 from bluesky.utils import MsgGenerator
-from ophyd_async.testing import set_mock_value
+from ophyd_async.core import set_mock_value
 
 from dodal.common.beamlines.commissioning_mode import read_commissioning_mode
 from dodal.devices.baton import Baton

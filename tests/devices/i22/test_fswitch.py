@@ -1,9 +1,11 @@
+from collections.abc import Mapping
+
 import pytest
 from bluesky.plans import count
 from bluesky.run_engine import RunEngine
 from event_model import DataKey
-from ophyd_async.core import init_devices
-from ophyd_async.testing import assert_reading, partial_reading, set_mock_value
+from ophyd_async.core import init_devices, set_mock_value
+from ophyd_async.testing import assert_reading, partial_reading
 
 from dodal.common.enums import InOutUpper
 from dodal.devices.i22.fswitch import FSwitch
@@ -35,18 +37,14 @@ async def test_reading_fswitch(fswitch: FSwitch):
     )
 
 
-def test_fswitch_count_plan(run_engine: RunEngine, fswitch: FSwitch):
-    names = []
-    docs = []
-
-    def subscription(name, doc):
-        names.append(name)
-        docs.append(doc)
-
-    run_engine(count([fswitch]), subscription)
-
-    descriptor_doc = docs[names.index("descriptor")]
-    event_doc = docs[names.index("event")]
+def test_fswitch_count_plan(
+    run_engine: RunEngine,
+    run_engine_documents: Mapping[str, list[dict]],
+    fswitch: FSwitch,
+):
+    run_engine(count([fswitch]))
+    descriptor_doc = run_engine_documents["descriptor"][0]
+    event_doc = run_engine_documents["event"][0]
 
     expected_data_key = DataKey(
         dtype="integer", shape=[], source="fswitch", object_name="fswitch"

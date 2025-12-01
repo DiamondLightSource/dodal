@@ -64,14 +64,12 @@ class EigerDetector(Device, Stageable):
     arming_status = Status()
     arming_status.set_finished()
 
-    disarming_status = Status()
-    disarming_status.set_finished()
-
     def __init__(self, beamline: str = "i03", *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.beamline = beamline
         # using i03 timeouts as default
         self.timeouts = AVAILABLE_TIMEOUTS.get(beamline, AVAILABLE_TIMEOUTS["i03"])
+        self.disarming_status = None
 
     @classmethod
     def with_params(
@@ -106,6 +104,7 @@ class EigerDetector(Device, Stageable):
             raise Exception("\n".join(errors))
 
     def async_stage(self):
+        self.disarming_status = None
         self.odin.nodes.clear_odin_errors()
         status_ok, error_message = self.odin.wait_for_odin_initialised(
             self.timeouts.general_status_timeout
@@ -170,22 +169,31 @@ class EigerDetector(Device, Stageable):
     def stop(self, *args):
         """Emergency stop the device, mainly used to clean up after error."""
         LOGGER.info("Eiger stop() called - cleaning up...")
-        if not self.disarming_status.done:
+        if self.disarming_status and not self.disarming_status.done:
             LOGGER.info("Eiger still disarming, waiting on disarm")
             self.disarming_status.wait(self.timeouts.arming_timeout)
+        elif not self.disarming_status:
+            self.disarming_status = Status()
+            try:
+                self.wait_on_arming_if_started()
+                stop_status = self.odin.stop()
+                self.odin.file_writer.start_timeout.set(1).wait(
+                    self.timeouts.general_status_timeout
+                )
+                self.disarm_detector()
+                stop_status &= self.disable_roi_mode()
+                LOGGER.info("Waiting on stop status")
+                stop_status.wait(self.timeouts.general_status_timeout)
+                # See https://github.com/DiamondLightSource/hyperion/issues/1395
+                LOGGER.info("Turning off Eiger dev/shm streaming")
+                self.odin.fan.dev_shm_enable.set(0).wait(
+                    self.timeouts.general_status_timeout
+                )
+                LOGGER.info("Eiger has successfully been stopped")
+            finally:
+                self.disarming_status.set_finished()
         else:
-            self.wait_on_arming_if_started()
-            stop_status = self.odin.stop()
-            self.odin.file_writer.start_timeout.set(1).wait(
-                self.timeouts.general_status_timeout
-            )
-            self.disarm_detector()
-            stop_status &= self.disable_roi_mode()
-            stop_status.wait(self.timeouts.general_status_timeout)
-            # See https://github.com/DiamondLightSource/hyperion/issues/1395
-            LOGGER.info("Turning off Eiger dev/shm streaming")
-            self.odin.fan.dev_shm_enable.set(0).wait()
-            LOGGER.info("Eiger has successfully been stopped")
+            LOGGER.info("Already disarmed, doing nothing")
 
     def disable_roi_mode(self):
         return self.change_roi_mode(False)
@@ -194,13 +202,13 @@ class EigerDetector(Device, Stageable):
         return self.change_roi_mode(True)
 
     def change_roi_mode(self, enable: bool) -> StatusBase:
+        LOGGER.info(f"Changing ROI mode to {enable}")
         assert self.detector_params is not None
         detector_dimensions = (
             self.detector_params.detector_size_constants.roi_size_pixels
             if enable
             else self.detector_params.detector_size_constants.det_size_pixels
         )
-
         status = self.cam.roi_mode.set(
             1 if enable else 0, timeout=self.timeouts.general_status_timeout
         )
@@ -216,7 +224,6 @@ class EigerDetector(Device, Stageable):
         status &= self.odin.file_writer.num_col_chunks.set(
             detector_dimensions.width, timeout=self.timeouts.general_status_timeout
         )
-
         return status
 
     def set_cam_pvs(self) -> AndStatus:
@@ -296,6 +303,7 @@ class EigerDetector(Device, Stageable):
             self.detector_params.omega_increment,
             timeout=self.timeouts.general_status_timeout,
         )
+
         return status
 
     def set_detector_threshold(self, energy: float, tolerance: float = 0.1) -> Status:
