@@ -1,4 +1,3 @@
-import json
 from pathlib import Path
 from unittest.mock import call
 
@@ -30,7 +29,6 @@ from dodal.devices.insertion_device.energy_motor_lookup import (
 from dodal.devices.insertion_device.lookup_table_models import (
     MAXIMUM_ROW_PHASE_MOTOR_POSITION,
     ROW_PHASE_CIRCULAR,
-    LookupTable,
     LookupTableConfig,
 )
 from dodal.devices.pgm import PlaneGratingMonochromator
@@ -39,6 +37,9 @@ from tests.devices.i09_2_shared.test_data import (
     TEST_EXPECTED_SOFT_PHASE_UNDULATOR_LUT,
     TEST_SOFT_GAP_UNDULATOR_LUT,
     TEST_SOFT_PHASE_UNDULATOR_LUT,
+)
+from tests.devices.insertion_devices.util import (
+    assert_expected_lut_file_equals_config_server_energy_motor_update_lookup_table,
 )
 
 # add mock_config_client, mock_id_gap, mock_phase and mock_jaw_phase_axes to pytest.
@@ -127,16 +128,12 @@ def test_j09_energy_motor_lookup_update_lut_success(
     mock_j09_gap_energy_motor_lookup: ConfigServerEnergyMotorLookup,
     mock_j09_phase_energy_motor_lookup: ConfigServerEnergyMotorLookup,
 ):
-    mock_j09_gap_energy_motor_lookup.update_lookup_table()
-    mock_j09_phase_energy_motor_lookup.update_lookup_table()
-    with open(TEST_EXPECTED_SOFT_GAP_UNDULATOR_LUT, "rb") as f:
-        expected_gap_lut = LookupTable(json.load(f))
-
-    with open(TEST_EXPECTED_SOFT_PHASE_UNDULATOR_LUT, "rb") as f:
-        expected_phase_lut = LookupTable(json.load(f))
-
-    assert mock_j09_gap_energy_motor_lookup.lut == expected_gap_lut
-    assert mock_j09_phase_energy_motor_lookup.lut == expected_phase_lut
+    assert_expected_lut_file_equals_config_server_energy_motor_update_lookup_table(
+        TEST_EXPECTED_SOFT_GAP_UNDULATOR_LUT, mock_j09_gap_energy_motor_lookup
+    )
+    assert_expected_lut_file_equals_config_server_energy_motor_update_lookup_table(
+        TEST_EXPECTED_SOFT_PHASE_UNDULATOR_LUT, mock_j09_phase_energy_motor_lookup
+    )
 
 
 @pytest.mark.parametrize(

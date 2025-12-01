@@ -1,4 +1,3 @@
-import json
 from collections.abc import Mapping
 from pathlib import Path
 from unittest import mock
@@ -42,7 +41,6 @@ from dodal.devices.insertion_device.energy_motor_lookup import (
 from dodal.devices.insertion_device.lookup_table_models import (
     EnergyCoverage,
     EnergyCoverageEntry,
-    LookupTable,
     LookupTableConfig,
 )
 from dodal.devices.pgm import PlaneGratingMonochromator
@@ -53,6 +51,9 @@ from tests.devices.i10.test_data import (
     EXPECTED_ID_ENERGY_2_PHASE_CALIBRATIONS_IDU_JSON,
     ID_ENERGY_2_GAP_CALIBRATIONS_CSV,
     ID_ENERGY_2_PHASE_CALIBRATIONS_CSV,
+)
+from tests.devices.insertion_devices.util import (
+    assert_expected_lut_file_equals_config_server_energy_motor_update_lookup_table,
 )
 
 # add mock_config_client, mock_id_gap, mock_phase and mock_jaw_phase_axes to pytest.
@@ -653,27 +654,17 @@ async def test_linear_arbitrary_run_engine_scan(
         )
 
 
-def assert_lookup_table_matches_expected(
-    energy_motor_lookup: ConfigServerEnergyMotorLookup,
-    expected_dict_file_name: str,
-) -> None:
-    energy_motor_lookup.update_lookup_table()
-    with open(expected_dict_file_name, "rb") as f:
-        expected_lut = LookupTable(json.load(f))
-    assert energy_motor_lookup.lut == expected_lut
-
-
 def test_i10_energy_motor_lookup_idu_convert_csv_to_lookup_success(
     mock_i10_gap_energy_motor_lookup_idu: ConfigServerEnergyMotorLookup,
     mock_i10_phase_energy_motor_lookup_idu: ConfigServerEnergyMotorLookup,
 ) -> None:
-    assert_lookup_table_matches_expected(
-        mock_i10_gap_energy_motor_lookup_idu,
+    assert_expected_lut_file_equals_config_server_energy_motor_update_lookup_table(
         EXPECTED_ID_ENERGY_2_GAP_CALIBRATIONS_IDU_JSON,
+        mock_i10_gap_energy_motor_lookup_idu,
     )
-    assert_lookup_table_matches_expected(
-        mock_i10_phase_energy_motor_lookup_idu,
+    assert_expected_lut_file_equals_config_server_energy_motor_update_lookup_table(
         EXPECTED_ID_ENERGY_2_PHASE_CALIBRATIONS_IDU_JSON,
+        mock_i10_phase_energy_motor_lookup_idu,
     )
 
 
@@ -681,13 +672,13 @@ def test_i10_energy_motor_lookup_idd_convert_csv_to_lookup_success(
     mock_i10_gap_energy_motor_lookup_idd: ConfigServerEnergyMotorLookup,
     mock_i10_phase_energy_motor_lookup_idd: ConfigServerEnergyMotorLookup,
 ) -> None:
-    assert_lookup_table_matches_expected(
-        mock_i10_gap_energy_motor_lookup_idd,
+    assert_expected_lut_file_equals_config_server_energy_motor_update_lookup_table(
         EXPECTED_ID_ENERGY_2_GAP_CALIBRATIONS_IDD_JSON,
+        mock_i10_gap_energy_motor_lookup_idd,
     )
-    assert_lookup_table_matches_expected(
-        mock_i10_phase_energy_motor_lookup_idd,
+    assert_expected_lut_file_equals_config_server_energy_motor_update_lookup_table(
         EXPECTED_ID_ENERGY_2_PHASE_CALIBRATIONS_IDD_JSON,
+        mock_i10_phase_energy_motor_lookup_idd,
     )
 
 

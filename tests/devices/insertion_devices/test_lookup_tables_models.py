@@ -8,11 +8,11 @@ from dodal.devices.insertion_device.lookup_table_models import (
     convert_csv_to_lookup,
     read_file_and_skip,
 )
-from tests.devices.insertion_devices.conftest import GenerateLookupTableConfig
+from tests.devices.insertion_devices.conftest import GenerateConfigLookupTable
 
 
 def test_generate_lookup_table(
-    config: GenerateLookupTableConfig,
+    config: GenerateConfigLookupTable,
     lut: LookupTable,
 ) -> None:
     for i, pol in enumerate(config.polarisations):

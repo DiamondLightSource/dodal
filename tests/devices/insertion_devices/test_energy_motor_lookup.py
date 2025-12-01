@@ -1,19 +1,15 @@
-from pathlib import Path
-
 import numpy as np
 import pytest
-from daq_config_server.client import ConfigServer
 
 from dodal.devices.insertion_device.energy_motor_lookup import (
-    ConfigServerEnergyMotorLookup,
     EnergyMotorLookup,
     get_poly,
 )
-from dodal.devices.insertion_device.lookup_table_models import (
-    LookupTable,
-    LookupTableConfig,
+from dodal.devices.insertion_device.lookup_table_models import LookupTable
+from tests.devices.insertion_devices.conftest import GenerateConfigLookupTable
+from tests.devices.insertion_devices.util import (
+    assert_expected_lut_equals_energy_motor_update_after_update,
 )
-from tests.devices.insertion_devices.conftest import GenerateLookupTableConfig
 
 # add mock_config_client to pytest
 pytest_plugins = ["dodal.testing.fixtures.devices.apple2"]
@@ -25,10 +21,10 @@ def energy_motor_lookup(lut: LookupTable) -> EnergyMotorLookup:
 
 
 def test_get_poly(
-    lut: LookupTable, generate_lut_config: GenerateLookupTableConfig
+    lut: LookupTable, generate_lut_config: GenerateConfigLookupTable
 ) -> None:
     for i in range(len(generate_lut_config.polarisations)):
-        expected_poly = np.poly1d(generate_lut_config[i])
+        expected_poly = np.poly1d(generate_lut_config.polys[i])
         poly = get_poly(
             energy=generate_lut_config.min_energies[i],
             pol=generate_lut_config.polarisations[i],
@@ -39,7 +35,7 @@ def test_get_poly(
 
 def test_energy_motor_lookup_find_value_in_lookup_table(
     energy_motor_lookup: EnergyMotorLookup,
-    generate_lut_config: GenerateLookupTableConfig,
+    generate_lut_config: GenerateConfigLookupTable,
 ) -> None:
     for i in range(len(generate_lut_config.polarisations)):
         value = energy_motor_lookup.find_value_in_lookup_table(
@@ -55,33 +51,33 @@ def test_energy_motor_lookup_update_is_static(
     energy_motor_lookup: EnergyMotorLookup,
 ) -> None:
     before_update_lut = energy_motor_lookup.lut
-    energy_motor_lookup.update_lookup_table()
-    after_update_lut = energy_motor_lookup.lut
-    assert before_update_lut == after_update_lut
-
-
-@pytest.fixture
-def lut_config() -> LookupTableConfig:
-    return LookupTableConfig(
-        mode="Mode",
-        min_energy="MinEnergy",
-        max_energy="MaxEnergy",
-        poly_deg=["c1", "c0"],
-        mode_name_convert={"hl": "lh", "vl": "lv"},
+    assert_expected_lut_equals_energy_motor_update_after_update(
+        before_update_lut, energy_motor_lookup
     )
 
 
-@pytest.fixture
-def config_server_energy_motor_lookup(
-    lut_config: LookupTableConfig,
-    config_server: ConfigServer,
-    path: Path,
-) -> ConfigServerEnergyMotorLookup:
-    return ConfigServerEnergyMotorLookup(config_server, lut_config, path)
+# @pytest.fixture
+# def lut_config() -> LookupTableConfig:
+#     return LookupTableConfig(
+#         mode="Mode",
+#         min_energy="MinEnergy",
+#         max_energy="MaxEnergy",
+#         poly_deg=["c1", "c0"],
+#         mode_name_convert={"hl": "lh", "vl": "lv"},
+#     )
 
 
-def test_config_server_energy_motor_lookup_read_lut(
-    config_server_energy_motor_lookup: ConfigServerEnergyMotorLookup,
-) -> None:
-    # Should we add default test here and each beamline adds there config_server_energy_motor_lookup or be done in apple2 file?
-    pass
+# @pytest.fixture
+# def config_server_energy_motor_lookup(
+#     lut_config: LookupTableConfig,
+#     config_server: ConfigServer,
+#     path: Path,
+# ) -> ConfigServerEnergyMotorLookup:
+#     return ConfigServerEnergyMotorLookup(config_server, lut_config, path)
+
+
+# def test_config_server_energy_motor_lookup_read_lut(
+#     config_server_energy_motor_lookup: ConfigServerEnergyMotorLookup,
+# ) -> None:
+#     # Should we add default test here and each beamline adds there config_server_energy_motor_lookup or be done in apple2 file?
+#     pass
