@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.apple2_undulator.Apple2Controller &#8212; dodal 1.66.1.dev6+g75e94dc2d documentation</title>
+    <title>dodal.devices.apple2_undulator.Apple2Controller &#8212; dodal 1.66.1.dev7+g9ed11d4e3 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=3ebff1c8"></script>
+    <script src="../../_static/documentation_options.js?v=c36dfa0b"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -1145,9 +1145,20 @@ motor positions via a user-supplied conversion callable.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="dodal.devices.apple2_undulator.Apple2Controller.energy_to_motor">
-<span class="sig-name descname"><span class="pre">energy_to_motor</span></span><a class="headerlink" href="#dodal.devices.apple2_undulator.Apple2Controller.energy_to_motor" title="Link to this definition">#</a></dt>
-<dd><p>Callable that converts energy and polarisation to motor positions.</p>
+<dt class="sig sig-object py" id="dodal.devices.apple2_undulator.Apple2Controller.gap_energy_to_motor_converter">
+<span class="sig-name descname"><span class="pre">gap_energy_to_motor_converter</span></span><a class="headerlink" href="#dodal.devices.apple2_undulator.Apple2Controller.gap_energy_to_motor_converter" title="Link to this definition">#</a></dt>
+<dd><p>Callable that converts energy and polarisation to gap motor positions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="dodal.devices.apple2_undulator.EnergyMotorConvertor.html#dodal.devices.apple2_undulator.EnergyMotorConvertor" title="dodal.devices.apple2_undulator.EnergyMotorConvertor">EnergyMotorConvertor</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="dodal.devices.apple2_undulator.Apple2Controller.phase_energy_to_motor_converter">
+<span class="sig-name descname"><span class="pre">phase_energy_to_motor_converter</span></span><a class="headerlink" href="#dodal.devices.apple2_undulator.Apple2Controller.phase_energy_to_motor_converter" title="Link to this definition">#</a></dt>
+<dd><p>Callable that converts energy and polarisation to phase motor positions.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="dodal.devices.apple2_undulator.EnergyMotorConvertor.html#dodal.devices.apple2_undulator.EnergyMotorConvertor" title="dodal.devices.apple2_undulator.EnergyMotorConvertor">EnergyMotorConvertor</a></p>
@@ -1167,29 +1178,18 @@ motor positions via a user-supplied conversion callable.</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">_set_motors_from_energy(value</span></span></dt>
-<dd><p>Abstract method to set motor positions for a given energy and polarisation.</p>
+<span class="sig-name descname"><span class="pre">_get_apple2_value(gap</span></span></dt>
+<dd><p>Abstract method to return the Apple2Val used to set the apple2 with.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a>) -&gt; None</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="id0">
-<span class="sig-name descname"><span class="pre">energy_to_motor</span></span><a class="headerlink" href="#id0" title="Link to this definition">#</a></dt>
-<dd><p>A callable that converts energy and polarisation to motor positions.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="dodal.devices.apple2_undulator.EnergyMotorConvertor.html#dodal.devices.apple2_undulator.EnergyMotorConvertor" title="dodal.devices.apple2_undulator.EnergyMotorConvertor">EnergyMotorConvertor</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a>, phase: float) -&gt; Apple2Val</p>
 </dd>
 </dl>
 </dd></dl>
 
 <p class="rubric">Notes</p>
 <ul class="simple">
-<li><p>Subclasses must implement <code class="xref any docutils literal notranslate"><span class="pre">_set_motors_from_energy</span></code> for beamline-specific logic.</p></li>
+<li><p>Subclasses must implement <code class="xref any docutils literal notranslate"><span class="pre">_get_apple2_value</span></code> for beamline-specific logic.</p></li>
 <li><p>LH3 polarisation is indistinguishable from LH in hardware; special handling is provided.</p></li>
 <li><p>Supports multiple polarisation modes, including linear horizontal (LH), linear vertical (LV),
 positive circular (PC), negative circular (NC), and linear arbitrary (LA).</p></li>
@@ -1198,12 +1198,14 @@ positive circular (PC), negative circular (NC), and linear arbitrary (LA).</p></
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>apple2</strong> (<a class="reference internal" href="dodal.devices.apple2_undulator.Apple2.html#dodal.devices.apple2_undulator.Apple2" title="dodal.devices.apple2_undulator.Apple2"><em>Apple2</em></a>)</p></li>
-<li><p><strong>energy_to_motor_converter</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="dodal.devices.apple2_undulator.EnergyMotorConvertor.html#dodal.devices.apple2_undulator.EnergyMotorConvertor" title="dodal.devices.apple2_undulator.EnergyMotorConvertor"><code class="xref py py-class docutils literal notranslate"><span class="pre">EnergyMotorConvertor</span></code></a></span>)</p></li>
+<li><p><strong>gap_energy_motor_converter</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="dodal.devices.apple2_undulator.EnergyMotorConvertor.html#dodal.devices.apple2_undulator.EnergyMotorConvertor" title="dodal.devices.apple2_undulator.EnergyMotorConvertor"><code class="xref py py-class docutils literal notranslate"><span class="pre">EnergyMotorConvertor</span></code></a></span>)</p></li>
+<li><p><strong>phase_energy_motor_converter</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="dodal.devices.apple2_undulator.EnergyMotorConvertor.html#dodal.devices.apple2_undulator.EnergyMotorConvertor" title="dodal.devices.apple2_undulator.EnergyMotorConvertor"><code class="xref py py-class docutils literal notranslate"><span class="pre">EnergyMotorConvertor</span></code></a></span>)</p></li>
 <li><p><strong>units</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">'eV'</span></code>)</p></li>
 <li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
 <li><p><strong>apple2</strong> – An Apple2 device.</p></li>
 <li><p><strong>name</strong> – Name of the device.</p></li>
-<li><p><strong>energy_to_motor_converter</strong></p></li>
+<li><p><strong>gap_energy_motor_converter</strong></p></li>
+<li><p><strong>phase_energy_motor_converter</strong></p></li>
 <li><p><strong>units</strong></p></li>
 </ul>
 </dd>
@@ -1302,8 +1304,8 @@ to workout the polarisation but during my test the inverse poly is too unstable 
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.apple2_undulator.Apple2Controller.energy"><code class="docutils literal notranslate"><span class="pre">Apple2Controller.energy</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.apple2_undulator.Apple2Controller.polarisation_setpoint"><code class="docutils literal notranslate"><span class="pre">Apple2Controller.polarisation_setpoint</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.apple2_undulator.Apple2Controller.polarisation"><code class="docutils literal notranslate"><span class="pre">Apple2Controller.polarisation</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.apple2_undulator.Apple2Controller.energy_to_motor"><code class="docutils literal notranslate"><span class="pre">Apple2Controller.energy_to_motor</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id0"><code class="docutils literal notranslate"><span class="pre">Apple2Controller.energy_to_motor</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.apple2_undulator.Apple2Controller.gap_energy_to_motor_converter"><code class="docutils literal notranslate"><span class="pre">Apple2Controller.gap_energy_to_motor_converter</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.apple2_undulator.Apple2Controller.phase_energy_to_motor_converter"><code class="docutils literal notranslate"><span class="pre">Apple2Controller.phase_energy_to_motor_converter</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.apple2_undulator.Apple2Controller.determine_phase_from_hardware"><code class="docutils literal notranslate"><span class="pre">Apple2Controller.determine_phase_from_hardware()</span></code></a></li>
 </ul>
 </li>

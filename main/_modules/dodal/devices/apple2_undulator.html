@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.apple2_undulator &#8212; dodal 1.66.1.dev6+g75e94dc2d documentation</title>
+    <title>dodal.devices.apple2_undulator &#8212; dodal 1.66.1.dev7+g9ed11d4e3 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=3ebff1c8"></script>
+    <script src="../../../_static/documentation_options.js?v=c36dfa0b"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -1263,7 +1263,7 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="EnergyMotorConvertor">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.apple2_undulator.EnergyMotorConvertor.html#dodal.devices.apple2_undulator.EnergyMotorConvertor">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">EnergyMotorConvertor</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energy</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">pol</span><span class="p">:</span> <span class="n">Pol</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energy</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">pol</span><span class="p">:</span> <span class="n">Pol</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Protocol to provide energy to motor position conversion&quot;&quot;&quot;</span>
         <span class="o">...</span></div>
 
@@ -1294,19 +1294,18 @@ window.addEventListener("load", load);
 <span class="sd">        Soft signal for the polarisation setpoint.</span>
 <span class="sd">    polarisation : derived_signal_rw</span>
 <span class="sd">        Hardware-backed signal for polarisation readback and control.</span>
-<span class="sd">    energy_to_motor : EnergyMotorConvertor</span>
-<span class="sd">        Callable that converts energy and polarisation to motor positions.</span>
+<span class="sd">    gap_energy_to_motor_converter : EnergyMotorConvertor</span>
+<span class="sd">        Callable that converts energy and polarisation to gap motor positions.</span>
+<span class="sd">    phase_energy_to_motor_converter : EnergyMotorConvertor</span>
+<span class="sd">        Callable that converts energy and polarisation to phase motor positions.</span>
 
 <span class="sd">    Abstract Methods</span>
 <span class="sd">    ----------------</span>
-<span class="sd">    _set_motors_from_energy(value: float) -&gt; None</span>
-<span class="sd">        Abstract method to set motor positions for a given energy and polarisation.</span>
-<span class="sd">    energy_to_motor : EnergyMotorConvertor</span>
-<span class="sd">        A callable that converts energy and polarisation to motor positions.</span>
-
+<span class="sd">    _get_apple2_value(gap: float, phase: float) -&gt; Apple2Val</span>
+<span class="sd">        Abstract method to return the Apple2Val used to set the apple2 with.</span>
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
-<span class="sd">    - Subclasses must implement `_set_motors_from_energy` for beamline-specific logic.</span>
+<span class="sd">    - Subclasses must implement `_get_apple2_value` for beamline-specific logic.</span>
 <span class="sd">    - LH3 polarisation is indistinguishable from LH in hardware; special handling is provided.</span>
 <span class="sd">    - Supports multiple polarisation modes, including linear horizontal (LH), linear vertical (LV),</span>
 <span class="sd">      positive circular (PC), negative circular (NC), and linear arbitrary (LA).</span>
@@ -1316,7 +1315,8 @@ window.addEventListener("load", load);
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">apple2</span><span class="p">:</span> <span class="n">Apple2Type</span><span class="p">,</span>
-        <span class="n">energy_to_motor_converter</span><span class="p">:</span> <span class="n">EnergyMotorConvertor</span><span class="p">,</span>
+        <span class="n">gap_energy_motor_converter</span><span class="p">:</span> <span class="n">EnergyMotorConvertor</span><span class="p">,</span>
+        <span class="n">phase_energy_motor_converter</span><span class="p">:</span> <span class="n">EnergyMotorConvertor</span><span class="p">,</span>
         <span class="n">units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;eV&quot;</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -1329,8 +1329,9 @@ window.addEventListener("load", load);
 <span class="sd">        name: str</span>
 <span class="sd">            Name of the device.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">energy_to_motor</span> <span class="o">=</span> <span class="n">energy_to_motor_converter</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">apple2</span> <span class="o">=</span> <span class="n">Reference</span><span class="p">(</span><span class="n">apple2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gap_energy_motor_converter</span> <span class="o">=</span> <span class="n">gap_energy_motor_converter</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">phase_energy_motor_converter</span> <span class="o">=</span> <span class="n">phase_energy_motor_converter</span>
 
         <span class="c1"># Store the set energy for readback.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_energy</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_energy_set</span> <span class="o">=</span> <span class="n">soft_signal_r_and_setter</span><span class="p">(</span>
@@ -1349,10 +1350,11 @@ window.addEventListener("load", load);
         <span class="bp">self</span><span class="o">.</span><span class="n">polarisation_setpoint</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_polarisation_setpoint_set</span> <span class="o">=</span> <span class="p">(</span>
             <span class="n">soft_signal_r_and_setter</span><span class="p">(</span><span class="n">Pol</span><span class="p">)</span>
         <span class="p">)</span>
+        <span class="n">phase</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">apple2</span><span class="p">()</span><span class="o">.</span><span class="n">phase</span><span class="p">()</span>
         <span class="c1"># check if undulator phase is unlocked.</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">apple2</span><span class="p">()</span><span class="o">.</span><span class="n">phase</span><span class="p">(),</span> <span class="n">UndulatorPhaseAxes</span><span class="p">):</span>
-            <span class="n">top_inner</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">apple2</span><span class="p">()</span><span class="o">.</span><span class="n">phase</span><span class="p">()</span><span class="o">.</span><span class="n">top_inner</span><span class="o">.</span><span class="n">user_readback</span>
-            <span class="n">btm_outer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">apple2</span><span class="p">()</span><span class="o">.</span><span class="n">phase</span><span class="p">()</span><span class="o">.</span><span class="n">btm_outer</span><span class="o">.</span><span class="n">user_readback</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">phase</span><span class="p">,</span> <span class="n">UndulatorPhaseAxes</span><span class="p">):</span>
+            <span class="n">top_inner</span> <span class="o">=</span> <span class="n">phase</span><span class="o">.</span><span class="n">top_inner</span><span class="o">.</span><span class="n">user_readback</span>
+            <span class="n">btm_outer</span> <span class="o">=</span> <span class="n">phase</span><span class="o">.</span><span class="n">btm_outer</span><span class="o">.</span><span class="n">user_readback</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># If locked phase axes make the locked phase 0.</span>
             <span class="n">top_inner</span> <span class="o">=</span> <span class="n">btm_outer</span> <span class="o">=</span> <span class="n">soft_signal_rw</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">initial_value</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
@@ -1364,24 +1366,35 @@ window.addEventListener("load", load);
                 <span class="n">raw_to_derived</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_read_pol</span><span class="p">,</span>
                 <span class="n">set_derived</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_set_pol</span><span class="p">,</span>
                 <span class="n">pol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">polarisation_setpoint</span><span class="p">,</span>
-                <span class="n">top_outer</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">apple2</span><span class="p">()</span><span class="o">.</span><span class="n">phase</span><span class="p">()</span><span class="o">.</span><span class="n">top_outer</span><span class="o">.</span><span class="n">user_readback</span><span class="p">,</span>
+                <span class="n">top_outer</span><span class="o">=</span><span class="n">phase</span><span class="o">.</span><span class="n">top_outer</span><span class="o">.</span><span class="n">user_readback</span><span class="p">,</span>
                 <span class="n">top_inner</span><span class="o">=</span><span class="n">top_inner</span><span class="p">,</span>
-                <span class="n">btm_inner</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">apple2</span><span class="p">()</span><span class="o">.</span><span class="n">phase</span><span class="p">()</span><span class="o">.</span><span class="n">btm_inner</span><span class="o">.</span><span class="n">user_readback</span><span class="p">,</span>
+                <span class="n">btm_inner</span><span class="o">=</span><span class="n">phase</span><span class="o">.</span><span class="n">btm_inner</span><span class="o">.</span><span class="n">user_readback</span><span class="p">,</span>
                 <span class="n">btm_outer</span><span class="o">=</span><span class="n">btm_outer</span><span class="p">,</span>
                 <span class="n">gap</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">apple2</span><span class="p">()</span><span class="o">.</span><span class="n">gap</span><span class="p">()</span><span class="o">.</span><span class="n">user_readback</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_set_motors_from_energy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_apple2_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gap</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">phase</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">pol</span><span class="p">:</span> <span class="n">Pol</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Apple2Val</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This method should be implemented by the beamline specific ID class as the</span>
 <span class="sd">        motor positions will be different for each beamline depending on the</span>
-<span class="sd">        undulator design and the lookup table used.</span>
+<span class="sd">        undulator design.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_set_motors_from_energy_and_polarisation</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">energy</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">pol</span><span class="p">:</span> <span class="n">Pol</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the undulator motors for a given energy and polarisation.&quot;&quot;&quot;</span>
+        <span class="n">gap</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gap_energy_motor_converter</span><span class="p">(</span><span class="n">energy</span><span class="o">=</span><span class="n">energy</span><span class="p">,</span> <span class="n">pol</span><span class="o">=</span><span class="n">pol</span><span class="p">)</span>
+        <span class="n">phase</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">phase_energy_motor_converter</span><span class="p">(</span><span class="n">energy</span><span class="o">=</span><span class="n">energy</span><span class="p">,</span> <span class="n">pol</span><span class="o">=</span><span class="n">pol</span><span class="p">)</span>
+        <span class="n">apple2_val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_apple2_value</span><span class="p">(</span><span class="n">gap</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">pol</span><span class="p">)</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Setting polarisation to </span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">, with values: </span><span class="si">{</span><span class="n">apple2_val</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">apple2</span><span class="p">()</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">id_motor_values</span><span class="o">=</span><span class="n">apple2_val</span><span class="p">)</span>
+
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_set_energy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energy</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_set_motors_from_energy</span><span class="p">(</span><span class="n">energy</span><span class="p">)</span>
+        <span class="n">pol</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_and_get_pol_setpoint</span><span class="p">()</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_set_motors_from_energy_and_polarisation</span><span class="p">(</span><span class="n">energy</span><span class="p">,</span> <span class="n">pol</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_energy_set</span><span class="p">(</span><span class="n">energy</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_read_energy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energy</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
@@ -1393,7 +1406,6 @@ window.addEventListener("load", load);
 <span class="sd">        Check the polarisation setpoint and if it is NONE try to read it from</span>
 <span class="sd">        hardware.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
         <span class="n">pol</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">polarisation_setpoint</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="n">pol</span> <span class="o">==</span> <span class="n">Pol</span><span class="o">.</span><span class="n">NONE</span><span class="p">:</span>

@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.util.lookup_tables_apple2 &#8212; dodal 1.66.1.dev6+g75e94dc2d documentation</title>
+    <title>dodal.devices.util.lookup_tables_apple2 &#8212; dodal 1.66.1.dev7+g9ed11d4e3 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=3ebff1c8"></script>
+    <script src="../../../../_static/documentation_options.js?v=c36dfa0b"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -853,7 +853,6 @@ window.addEventListener("load", load);
 <span class="p">)</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.apple2_undulator</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pol</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.log</span><span class="w"> </span><span class="kn">import</span> <span class="n">LOGGER</span>
 
 <span class="n">DEFAULT_POLY_DEG</span> <span class="o">=</span> <span class="p">[</span>
     <span class="s2">&quot;7th-order&quot;</span><span class="p">,</span>
@@ -875,7 +874,7 @@ window.addEventListener("load", load);
 <span class="n">MAXIMUM_ROW_PHASE_MOTOR_POSITION</span> <span class="o">=</span> <span class="mf">24.0</span>
 <span class="n">MAXIMUM_GAP_MOTOR_POSITION</span> <span class="o">=</span> <span class="mi">100</span>
 
-<span class="n">PhASE_POLY1D_PARAMETERS</span> <span class="o">=</span> <span class="p">{</span>
+<span class="n">DEFAULT_POLY1D_PARAMETERS</span> <span class="o">=</span> <span class="p">{</span>
     <span class="n">Pol</span><span class="o">.</span><span class="n">LH</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span>
     <span class="n">Pol</span><span class="o">.</span><span class="n">LV</span><span class="p">:</span> <span class="p">[</span><span class="n">MAXIMUM_ROW_PHASE_MOTOR_POSITION</span><span class="p">],</span>
     <span class="n">Pol</span><span class="o">.</span><span class="n">PC</span><span class="p">:</span> <span class="p">[</span><span class="n">ROW_PHASE_CIRCULAR</span><span class="p">],</span>
@@ -957,14 +956,6 @@ window.addEventListener("load", load);
 
 
 
-<div class="viewcode-block" id="GapPhaseLookupTables">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.util.lookup_tables_apple2.GapPhaseLookupTables.html#dodal.devices.util.lookup_tables_apple2.GapPhaseLookupTables">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">GapPhaseLookupTables</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-    <span class="n">gap</span><span class="p">:</span> <span class="n">LookupTable</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">LookupTable</span><span class="p">())</span>
-    <span class="n">phase</span><span class="p">:</span> <span class="n">LookupTable</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">LookupTable</span><span class="p">())</span></div>
-
-
-
 <div class="viewcode-block" id="convert_csv_to_lookup">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.util.lookup_tables_apple2.html#dodal.devices.util.lookup_tables_apple2.convert_csv_to_lookup">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">convert_csv_to_lookup</span><span class="p">(</span>
@@ -989,7 +980,7 @@ window.addEventListener("load", load);
 <span class="sd">    LookupTable</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">process_row</span><span class="p">(</span><span class="n">row</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">lut</span><span class="p">:</span> <span class="n">LookupTable</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">process_row</span><span class="p">(</span><span class="n">row</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">lut</span><span class="p">:</span> <span class="n">LookupTable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Process a single row from the CSV file and update the lookup table.&quot;&quot;&quot;</span>
         <span class="n">mode_value</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">lut_config</span><span class="o">.</span><span class="n">mode</span><span class="p">])</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">mode_value</span> <span class="ow">in</span> <span class="n">lut_config</span><span class="o">.</span><span class="n">mode_name_convert</span><span class="p">:</span>
@@ -1004,7 +995,6 @@ window.addEventListener("load", load);
                 <span class="n">max_energy</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">lut_config</span><span class="o">.</span><span class="n">max_energy</span><span class="p">]),</span>
                 <span class="n">poly1d_param</span><span class="o">=</span><span class="n">coefficients</span><span class="p">,</span>
             <span class="p">)</span>
-
         <span class="k">else</span><span class="p">:</span>
             <span class="n">lut</span><span class="o">.</span><span class="n">root</span><span class="p">[</span><span class="n">mode_value</span><span class="p">]</span><span class="o">.</span><span class="n">energies</span><span class="o">.</span><span class="n">root</span><span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">lut_config</span><span class="o">.</span><span class="n">min_energy</span><span class="p">])]</span> <span class="o">=</span> <span class="p">(</span>
                 <span class="n">EnergyCoverageEntry</span><span class="p">(</span>
@@ -1023,7 +1013,6 @@ window.addEventListener("load", load);
             <span class="n">lut</span><span class="o">.</span><span class="n">root</span><span class="p">[</span><span class="n">mode_value</span><span class="p">]</span><span class="o">.</span><span class="n">limit</span><span class="o">.</span><span class="n">maximum</span><span class="p">,</span>
             <span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">lut_config</span><span class="o">.</span><span class="n">max_energy</span><span class="p">]),</span>
         <span class="p">)</span>
-        <span class="k">return</span> <span class="n">lut</span>
 
     <span class="n">reader</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">DictReader</span><span class="p">(</span><span class="n">read_file_and_skip</span><span class="p">(</span><span class="n">file_contents</span><span class="p">,</span> <span class="n">skip_line_start_with</span><span class="p">))</span>
     <span class="n">lut</span> <span class="o">=</span> <span class="n">LookupTable</span><span class="p">()</span>
@@ -1124,17 +1113,6 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="generate_lookup_table">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.util.lookup_tables_apple2.html#dodal.devices.util.lookup_tables_apple2.generate_lookup_table">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">generate_lookup_table</span><span class="p">(</span>
-    <span class="n">pol</span><span class="p">:</span> <span class="n">Pol</span><span class="p">,</span> <span class="n">min_energy</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">max_energy</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">poly1d_param</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LookupTable</span><span class="p">:</span>
-    <span class="k">return</span> <span class="n">LookupTable</span><span class="p">(</span>
-        <span class="p">{</span><span class="n">pol</span><span class="p">:</span> <span class="n">generate_lookup_table_entry</span><span class="p">(</span><span class="n">min_energy</span><span class="p">,</span> <span class="n">max_energy</span><span class="p">,</span> <span class="n">poly1d_param</span><span class="p">)}</span>
-    <span class="p">)</span></div>
-
-
-
-<div class="viewcode-block" id="make_phase_tables">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.util.lookup_tables_apple2.html#dodal.devices.util.lookup_tables_apple2.make_phase_tables">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">make_phase_tables</span><span class="p">(</span>
     <span class="n">pols</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Pol</span><span class="p">],</span>
     <span class="n">min_energies</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
     <span class="n">max_energies</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
@@ -1142,15 +1120,14 @@ window.addEventListener("load", load);
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LookupTable</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate a dictionary containing multiple lookuptable entries</span>
 <span class="sd">    for provided polarisations.&quot;&quot;&quot;</span>
-    <span class="n">lookuptable_phase</span> <span class="o">=</span> <span class="n">LookupTable</span><span class="p">()</span>
+    <span class="n">lut</span> <span class="o">=</span> <span class="n">LookupTable</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">pols</span><span class="p">)):</span>
-        <span class="n">lookuptable_phase</span><span class="o">.</span><span class="n">root</span><span class="p">[</span><span class="n">pols</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="o">=</span> <span class="n">generate_lookup_table_entry</span><span class="p">(</span>
+        <span class="n">lut</span><span class="o">.</span><span class="n">root</span><span class="p">[</span><span class="n">pols</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="o">=</span> <span class="n">generate_lookup_table_entry</span><span class="p">(</span>
             <span class="n">min_energy</span><span class="o">=</span><span class="n">min_energies</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
             <span class="n">max_energy</span><span class="o">=</span><span class="n">max_energies</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
             <span class="n">poly1d_param</span><span class="o">=</span><span class="n">poly1d_params</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
         <span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">lookuptable_phase</span></div>
+    <span class="k">return</span> <span class="n">lut</span></div>
 
 
 
@@ -1158,127 +1135,88 @@ window.addEventListener("load", load);
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.util.lookup_tables_apple2.EnergyMotorLookup.html#dodal.devices.util.lookup_tables_apple2.EnergyMotorLookup">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">EnergyMotorLookup</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Handles lookup tables for Apple2 ID, converting energy and polarisation to gap</span>
-<span class="sd">    and phase. Fetches and parses lookup tables from a config server, supports dynamic</span>
-<span class="sd">    updates, and validates input. If custom logic is required for lookup tables, sub</span>
-<span class="sd">    classes should override the _update_gap_lut and _update_phase_lut methods.</span>
+<span class="sd">    Handles a lookup table for Apple2 ID, converting energy/polarisation to a motor</span>
+<span class="sd">    position.</span>
 
-<span class="sd">    After update_lookuptable() has populated the &#39;gap&#39; and &#39;phase&#39; tables,</span>
-<span class="sd">    `get_motor_from_energy()` can be used to compute (gap, phase) for a requested</span>
-<span class="sd">    (energy, pol) pair.</span>
+<span class="sd">    After update_lookup_table() has populated the lookup table, `find_value_in_lookup_table()` can be</span>
+<span class="sd">    used to compute gap / phase for a requested energy / polarisation pair.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lut</span><span class="p">:</span> <span class="n">LookupTable</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">lut</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">lut</span> <span class="o">=</span> <span class="n">LookupTable</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lut</span> <span class="o">=</span> <span class="n">lut</span>
+
+<div class="viewcode-block" id="EnergyMotorLookup.update_lookup_table">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.util.lookup_tables_apple2.EnergyMotorLookup.html#dodal.devices.util.lookup_tables_apple2.EnergyMotorLookup.update_lookup_table">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_lookup_table</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Do nothing by default. Sub classes may override this method to provide logic</span>
+<span class="sd">        on what updating lookup table does.&quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="EnergyMotorLookup.find_value_in_lookup_table">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.util.lookup_tables_apple2.EnergyMotorLookup.html#dodal.devices.util.lookup_tables_apple2.EnergyMotorLookup.find_value_in_lookup_table">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">find_value_in_lookup_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energy</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">pol</span><span class="p">:</span> <span class="n">Pol</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert energy and polarisation to a value from the lookup table.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">        -----------</span>
+<span class="sd">        energy : float</span>
+<span class="sd">            Desired energy.</span>
+<span class="sd">        pol : Pol</span>
+<span class="sd">            Polarisation mode.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">        ----------</span>
+<span class="sd">        float</span>
+<span class="sd">            gap / phase motor position from the lookup table.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># if lut is empty, force an update to pull updated file.</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">lut</span><span class="o">.</span><span class="n">root</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update_lookup_table</span><span class="p">()</span>
+        <span class="n">poly</span> <span class="o">=</span> <span class="n">get_poly</span><span class="p">(</span><span class="n">lookup_table</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lut</span><span class="p">,</span> <span class="n">energy</span><span class="o">=</span><span class="n">energy</span><span class="p">,</span> <span class="n">pol</span><span class="o">=</span><span class="n">pol</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">poly</span><span class="p">(</span><span class="n">energy</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="ConfigServerEnergyMotorLookup">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.util.lookup_tables_apple2.ConfigServerEnergyMotorLookup.html#dodal.devices.util.lookup_tables_apple2.ConfigServerEnergyMotorLookup">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ConfigServerEnergyMotorLookup</span><span class="p">(</span><span class="n">EnergyMotorLookup</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetches and parses lookup table (csv) from a config server, supports dynamic</span>
+<span class="sd">    updates, and validates input.&quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">config_client</span><span class="p">:</span> <span class="n">ConfigServer</span><span class="p">,</span>
         <span class="n">lut_config</span><span class="p">:</span> <span class="n">LookupTableConfig</span><span class="p">,</span>
-        <span class="n">gap_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">phase_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialise the EnergyMotorLookup class with lookup table headers provided.</span>
-
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Parameters:</span>
 <span class="sd">        -----------</span>
 <span class="sd">        config_client:</span>
 <span class="sd">            The config server client to fetch the look up table data.</span>
 <span class="sd">        lut_config:</span>
 <span class="sd">            Configuration that defines how to process file contents into a LookupTable</span>
-<span class="sd">        gap_path:</span>
-<span class="sd">            File path to the gap lookup table.</span>
-<span class="sd">        phase_path:</span>
-<span class="sd">            File path to the phase lookup table.</span>
+<span class="sd">        path:</span>
+<span class="sd">            File path to the lookup table.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">gap_path</span> <span class="o">=</span> <span class="n">gap_path</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">phase_path</span> <span class="o">=</span> <span class="n">phase_path</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">lookup_tables</span> <span class="o">=</span> <span class="n">GapPhaseLookupTables</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">path</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">config_client</span> <span class="o">=</span> <span class="n">config_client</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lut_config</span> <span class="o">=</span> <span class="n">lut_config</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_available_pol</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
-    <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">available_pol</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Pol</span><span class="p">]:</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_available_pol</span>
-
-    <span class="nd">@available_pol</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">available_pol</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Pol</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_available_pol</span> <span class="o">=</span> <span class="n">value</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">_update_gap_lut</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">gap_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Gap path is not provided!&quot;</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">read_lut</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LookupTable</span><span class="p">:</span>
         <span class="n">file_contents</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config_client</span><span class="o">.</span><span class="n">get_file_contents</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">gap_path</span><span class="p">,</span> <span class="n">reset_cached_result</span><span class="o">=</span><span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">reset_cached_result</span><span class="o">=</span><span class="kc">True</span>
         <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">lookup_tables</span><span class="o">.</span><span class="n">gap</span> <span class="o">=</span> <span class="n">convert_csv_to_lookup</span><span class="p">(</span>
-            <span class="n">file_contents</span><span class="p">,</span> <span class="n">lut_config</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lut_config</span>
-        <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">available_pol</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lookup_tables</span><span class="o">.</span><span class="n">gap</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">convert_csv_to_lookup</span><span class="p">(</span><span class="n">file_contents</span><span class="p">,</span> <span class="n">lut_config</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lut_config</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_update_phase_lut</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">phase_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Phase path is not provided!&quot;</span><span class="p">)</span>
-        <span class="n">file_contents</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config_client</span><span class="o">.</span><span class="n">get_file_contents</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">phase_path</span><span class="p">,</span> <span class="n">reset_cached_result</span><span class="o">=</span><span class="kc">True</span>
-        <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">lookup_tables</span><span class="o">.</span><span class="n">phase</span> <span class="o">=</span> <span class="n">convert_csv_to_lookup</span><span class="p">(</span>
-            <span class="n">file_contents</span><span class="p">,</span> <span class="n">lut_config</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lut_config</span>
-        <span class="p">)</span>
-
-<div class="viewcode-block" id="EnergyMotorLookup.update_lookuptables">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.util.lookup_tables_apple2.EnergyMotorLookup.html#dodal.devices.util.lookup_tables_apple2.EnergyMotorLookup.update_lookuptables">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">update_lookuptables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Update lookup tables from files and validate their format.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Updating lookup table for gap.&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_update_gap_lut</span><span class="p">()</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">phase_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Generating lookup table for phase.&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_generate_phase_lut</span><span class="p">()</span>
-
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Updating lookup table for phase.&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_update_phase_lut</span><span class="p">()</span></div>
-
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">_generate_phase_lut</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">lookup_tables</span><span class="o">.</span><span class="n">gap</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-            <span class="k">if</span> <span class="n">key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">lookup_tables</span><span class="o">.</span><span class="n">phase</span><span class="o">.</span><span class="n">root</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">generate_lookup_table_entry</span><span class="p">(</span>
-                    <span class="n">min_energy</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lookup_tables</span><span class="o">.</span><span class="n">gap</span><span class="o">.</span><span class="n">root</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">limit</span><span class="o">.</span><span class="n">minimum</span><span class="p">,</span>
-                    <span class="n">max_energy</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lookup_tables</span><span class="o">.</span><span class="n">gap</span><span class="o">.</span><span class="n">root</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">limit</span><span class="o">.</span><span class="n">maximum</span><span class="p">,</span>
-                    <span class="n">poly1d_param</span><span class="o">=</span><span class="p">(</span><span class="n">PhASE_POLY1D_PARAMETERS</span><span class="p">[</span><span class="n">key</span><span class="p">]),</span>
-                <span class="p">)</span>
-
-<div class="viewcode-block" id="EnergyMotorLookup.get_motor_from_energy">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.util.lookup_tables_apple2.EnergyMotorLookup.html#dodal.devices.util.lookup_tables_apple2.EnergyMotorLookup.get_motor_from_energy">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">get_motor_from_energy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energy</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">pol</span><span class="p">:</span> <span class="n">Pol</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Convert energy and polarisation to gap and phase motor positions.</span>
-
-<span class="sd">        Parameters:</span>
-<span class="sd">        -----------</span>
-<span class="sd">        energy : float</span>
-<span class="sd">            Desired energy in eV.</span>
-<span class="sd">        pol : Pol</span>
-<span class="sd">            Polarisation mode.</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">        ----------</span>
-<span class="sd">        tuple[float, float]</span>
-<span class="sd">            (gap, phase) motor positions.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">available_pol</span> <span class="o">==</span> <span class="p">[]:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">update_lookuptables</span><span class="p">()</span>
-
-        <span class="n">gap_poly</span> <span class="o">=</span> <span class="n">get_poly</span><span class="p">(</span><span class="n">lookup_table</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lookup_tables</span><span class="o">.</span><span class="n">gap</span><span class="p">,</span> <span class="n">energy</span><span class="o">=</span><span class="n">energy</span><span class="p">,</span> <span class="n">pol</span><span class="o">=</span><span class="n">pol</span><span class="p">)</span>
-        <span class="n">phase_poly</span> <span class="o">=</span> <span class="n">get_poly</span><span class="p">(</span>
-            <span class="n">lookup_table</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lookup_tables</span><span class="o">.</span><span class="n">phase</span><span class="p">,</span>
-            <span class="n">energy</span><span class="o">=</span><span class="n">energy</span><span class="p">,</span>
-            <span class="n">pol</span><span class="o">=</span><span class="n">pol</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="k">return</span> <span class="n">gap_poly</span><span class="p">(</span><span class="n">energy</span><span class="p">),</span> <span class="n">phase_poly</span><span class="p">(</span><span class="n">energy</span><span class="p">)</span></div>
-</div>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_lookup_table</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lut</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_lut</span><span class="p">()</span></div>
 
 </pre></div>
 

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.i17.i17_apple2.I17Apple2Controller &#8212; dodal 1.66.1.dev6+g75e94dc2d documentation</title>
+    <title>dodal.devices.i17.i17_apple2.I17Apple2Controller &#8212; dodal 1.66.1.dev7+g9ed11d4e3 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=3ebff1c8"></script>
+    <script src="../../_static/documentation_options.js?v=c36dfa0b"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -1103,10 +1103,53 @@ arbitrary angle control.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>apple2</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="dodal.devices.apple2_undulator.Apple2.html#dodal.devices.apple2_undulator.Apple2" title="dodal.devices.apple2_undulator.Apple2"><code class="xref py py-class docutils literal notranslate"><span class="pre">Apple2</span></code></a></span>)</p></li>
-<li><p><strong>energy_to_motor_converter</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="dodal.devices.apple2_undulator.EnergyMotorConvertor.html#dodal.devices.apple2_undulator.EnergyMotorConvertor" title="dodal.devices.apple2_undulator.EnergyMotorConvertor"><code class="xref py py-class docutils literal notranslate"><span class="pre">EnergyMotorConvertor</span></code></a></span>)</p></li>
+<li><p><strong>apple2</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="dodal.devices.apple2_undulator.Apple2.html#dodal.devices.apple2_undulator.Apple2" title="dodal.devices.apple2_undulator.Apple2"><code class="xref py py-class docutils literal notranslate"><span class="pre">Apple2</span></code></a>[<a class="reference internal" href="dodal.devices.apple2_undulator.UndulatorPhaseAxes.html#dodal.devices.apple2_undulator.UndulatorPhaseAxes" title="dodal.devices.apple2_undulator.UndulatorPhaseAxes"><code class="xref py py-class docutils literal notranslate"><span class="pre">UndulatorPhaseAxes</span></code></a>]</span>)</p></li>
+<li><p><strong>gap_energy_motor_lut</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="dodal.devices.util.lookup_tables_apple2.EnergyMotorLookup.html#dodal.devices.util.lookup_tables_apple2.EnergyMotorLookup" title="dodal.devices.util.lookup_tables_apple2.EnergyMotorLookup"><code class="xref py py-class docutils literal notranslate"><span class="pre">EnergyMotorLookup</span></code></a></span>)</p></li>
+<li><p><strong>phase_energy_motor_lut</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="dodal.devices.util.lookup_tables_apple2.EnergyMotorLookup.html#dodal.devices.util.lookup_tables_apple2.EnergyMotorLookup" title="dodal.devices.util.lookup_tables_apple2.EnergyMotorLookup"><code class="xref py py-class docutils literal notranslate"><span class="pre">EnergyMotorLookup</span></code></a></span>)</p></li>
+<li><p><strong>units</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">'eV'</span></code>)</p></li>
 <li><p><strong>name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">''</span></code>)</p></li>
 </ul>
+</dd>
+</dl>
+<section id="parameters">
+<h2>Parameters:<a class="headerlink" href="#parameters" title="Link to this heading">#</a></h2>
+<dl class="simple">
+<dt>apple2<span class="classifier">Apple2</span></dt><dd><p>An Apple2 device.</p>
+</dd>
+<dt>gap_energy_motor_lut: EnergyMotorLookup</dt><dd><p>The class that handles the gap look up table logic for the insertion device.</p>
+</dd>
+<dt>phase_energy_motor_lut: EnergyMotorLookup</dt><dd><p>The class that handles the phase look up table logic for the insertion device.</p>
+</dd>
+<dt>units:</dt><dd><p>the units of this device. Defaults to eV.</p>
+</dd>
+<dt>name<span class="classifier">str, optional</span></dt><dd><p>New device name.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">param apple2<span class="colon">:</span></dt>
+<dd class="field-odd"><p></p></dd>
+<dt class="field-even">type apple2<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="dodal.devices.apple2_undulator.Apple2.html#dodal.devices.apple2_undulator.Apple2" title="dodal.devices.apple2_undulator.Apple2"><code class="xref py py-class docutils literal notranslate"><span class="pre">Apple2</span></code></a>[<a class="reference internal" href="dodal.devices.apple2_undulator.UndulatorPhaseAxes.html#dodal.devices.apple2_undulator.UndulatorPhaseAxes" title="dodal.devices.apple2_undulator.UndulatorPhaseAxes"><code class="xref py py-class docutils literal notranslate"><span class="pre">UndulatorPhaseAxes</span></code></a>]</span></p>
+</dd>
+<dt class="field-odd">param gap_energy_motor_lut<span class="colon">:</span></dt>
+<dd class="field-odd"><p></p></dd>
+<dt class="field-even">type gap_energy_motor_lut<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="dodal.devices.util.lookup_tables_apple2.EnergyMotorLookup.html#dodal.devices.util.lookup_tables_apple2.EnergyMotorLookup" title="dodal.devices.util.lookup_tables_apple2.EnergyMotorLookup"><code class="xref py py-class docutils literal notranslate"><span class="pre">EnergyMotorLookup</span></code></a></span></p>
+</dd>
+<dt class="field-odd">param phase_energy_motor_lut<span class="colon">:</span></dt>
+<dd class="field-odd"><p></p></dd>
+<dt class="field-even">type phase_energy_motor_lut<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="dodal.devices.util.lookup_tables_apple2.EnergyMotorLookup.html#dodal.devices.util.lookup_tables_apple2.EnergyMotorLookup" title="dodal.devices.util.lookup_tables_apple2.EnergyMotorLookup"><code class="xref py py-class docutils literal notranslate"><span class="pre">EnergyMotorLookup</span></code></a></span></p>
+</dd>
+<dt class="field-odd">param units<span class="colon">:</span></dt>
+<dd class="field-odd"><p></p></dd>
+<dt class="field-even">type units<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">'eV'</span></code></p>
+</dd>
+<dt class="field-odd">param name<span class="colon">:</span></dt>
+<dd class="field-odd"><p></p></dd>
+<dt class="field-even">type name<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">''</span></code></p>
 </dd>
 </dl>
 <p class="rubric">Methods</p>
@@ -1121,6 +1164,7 @@ arbitrary angle control.</p>
 </tbody>
 </table>
 </div>
+</section>
 </dd></dl>
 
 </section>

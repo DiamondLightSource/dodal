@@ -1,0 +1,27 @@
+dodal.devices.util.lookup\_tables\_apple2.ConfigServerEnergyMotorLookup
+=======================================================================
+
+.. currentmodule:: dodal.devices.util.lookup_tables_apple2
+
+.. autoclass:: ConfigServerEnergyMotorLookup
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      ~ConfigServerEnergyMotorLookup.read_lut
+      
+      
+      ~ConfigServerEnergyMotorLookup.update_lookup_table
+      
+   
+   
+
+   
+   
+   

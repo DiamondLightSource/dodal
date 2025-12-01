@@ -13,22 +13,14 @@ dodal.devices.util.lookup\_tables\_apple2.EnergyMotorLookup
    .. autosummary::
    
       
-      ~EnergyMotorLookup.get_motor_from_energy
+      ~EnergyMotorLookup.find_value_in_lookup_table
       
       
-      ~EnergyMotorLookup.update_lookuptables
+      ~EnergyMotorLookup.update_lookup_table
       
    
    
 
    
-   
-   .. rubric:: Attributes
-
-   .. autosummary::
-   
-      
-      ~EnergyMotorLookup.available_pol
-      
    
    

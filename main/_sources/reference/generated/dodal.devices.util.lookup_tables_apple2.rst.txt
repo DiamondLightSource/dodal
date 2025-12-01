@@ -14,11 +14,11 @@ dodal.devices.util.lookup\_tables\_apple2
    :toctree:
    :recursive:
 
+   ~lookup_tables_apple2.ConfigServerEnergyMotorLookup
    ~lookup_tables_apple2.EnergyCoverage
    ~lookup_tables_apple2.EnergyCoverageEntry
    ~lookup_tables_apple2.EnergyMinMax
    ~lookup_tables_apple2.EnergyMotorLookup
-   ~lookup_tables_apple2.GapPhaseLookupTables
    ~lookup_tables_apple2.LookupTable
    ~lookup_tables_apple2.LookupTableConfig
    ~lookup_tables_apple2.LookupTableEntries
@@ -44,7 +44,6 @@ dodal.devices.util.lookup\_tables\_apple2
       generate_lookup_table
       generate_lookup_table_entry
       get_poly
-      make_phase_tables
       read_file_and_skip
    
    
