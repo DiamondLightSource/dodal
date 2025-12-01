@@ -3,14 +3,15 @@ from ophyd_async.core import StrictEnum
 from dodal.beamline_specific_utils.i05_shared import (
     m1_collimating_mirror,
     m3mj6_switching_mirror,
-    pgm,
+)
+from dodal.beamline_specific_utils.i05_shared import (
+    pgm as i05_pgm,
 )
 from dodal.common.beamlines.beamline_utils import device_factory
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.devices.i05.common_mirror import XYZPiezoSwitchingMirror
 from dodal.devices.motors import XYZPitchYawRollStage
 from dodal.devices.pgm import PlaneGratingMonochromator
-from dodal.devices.synchrotron import Synchrotron
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 

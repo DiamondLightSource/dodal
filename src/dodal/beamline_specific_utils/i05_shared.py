@@ -1,9 +1,9 @@
+from dodal.devices.i05.enums import Grating
 from ophyd_async.core import StrictEnum
 
 from dodal.common.beamlines.beamline_utils import device_factory
 from dodal.devices.i05.common_mirror import XYZPiezoSwitchingMirror
 from dodal.devices.motors import XYZPitchYawRollStage
-from dodal.devices.i05.enums import Grating
 from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.utils import BeamlinePrefix
 
@@ -34,6 +34,7 @@ def m3mj6_switching_mirror() -> XYZPiezoSwitchingMirror:
     return XYZPiezoSwitchingMirror(
         prefix=f"{PREFIX.beamline_prefix}-OP-SWTCH-01:",
         mirrors=M3MJ6Mirror,
+    )
 
 
 @device_factory()
