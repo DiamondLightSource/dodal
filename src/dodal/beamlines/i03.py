@@ -1,4 +1,6 @@
-from ophyd_async.core import Reference
+from functools import cache
+
+from ophyd_async.core import PathProvider, Reference
 from ophyd_async.fastcs.panda import HDFPanda
 from yarl import URL
 
