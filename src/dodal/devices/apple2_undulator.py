@@ -398,7 +398,7 @@ class Apple2(StandardReadable, Movable[Apple2Val], Generic[PhaseAxesType]):
 
 
 class EnergyMotorConvertor(Protocol):
-    def __call__(self, energy: float, pol: Pol) -> tuple[float, float]:
+    def __call__(self, energy: float, pol: Pol) -> float:
         """Protocol to provide energy to motor position conversion"""
         ...
 
@@ -426,19 +426,18 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
         Soft signal for the polarisation setpoint.
     polarisation : derived_signal_rw
         Hardware-backed signal for polarisation readback and control.
-    energy_to_motor : EnergyMotorConvertor
-        Callable that converts energy and polarisation to motor positions.
+    gap_energy_to_motor_converter : EnergyMotorConvertor
+        Callable that converts energy and polarisation to gap motor positions.
+    phase_energy_to_motor_converter : EnergyMotorConvertor
+        Callable that converts energy and polarisation to phase motor positions.
 
     Abstract Methods
     ----------------
-    _set_motors_from_energy(value: float) -> None
-        Abstract method to set motor positions for a given energy and polarisation.
-    energy_to_motor : EnergyMotorConvertor
-        A callable that converts energy and polarisation to motor positions.
-
+    _get_apple2_value(gap: float, phase: float) -> Apple2Val
+        Abstract method to return the Apple2Val used to set the apple2 with.
     Notes
     -----
-    - Subclasses must implement `_set_motors_from_energy` for beamline-specific logic.
+    - Subclasses must implement `_get_apple2_value` for beamline-specific logic.
     - LH3 polarisation is indistinguishable from LH in hardware; special handling is provided.
     - Supports multiple polarisation modes, including linear horizontal (LH), linear vertical (LV),
       positive circular (PC), negative circular (NC), and linear arbitrary (LA).
@@ -448,7 +447,9 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
     def __init__(
         self,
         apple2: Apple2Type,
-        energy_to_motor_converter: EnergyMotorConvertor,
+        gap_energy_motor_converter: EnergyMotorConvertor,
+        phase_energy_motor_converter: EnergyMotorConvertor,
+        units: str = "eV",
         name: str = "",
     ) -> None:
         """
@@ -460,19 +461,20 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
         name: str
             Name of the device.
         """
-        self.energy_to_motor = energy_to_motor_converter
         self.apple2 = Reference(apple2)
+        self.gap_energy_motor_converter = gap_energy_motor_converter
+        self.phase_energy_motor_converter = phase_energy_motor_converter
 
         # Store the set energy for readback.
         self._energy, self._energy_set = soft_signal_r_and_setter(
-            float, initial_value=None, units="eV"
+            float, initial_value=None, units=units
         )
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             self.energy = derived_signal_rw(
                 raw_to_derived=self._read_energy,
                 set_derived=self._set_energy,
                 energy=self._energy,
-                derived_units="eV",
+                derived_units=units,
             )
 
         # Store the polarisation for setpoint. And provide readback for LH3.
@@ -480,10 +482,11 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
         self.polarisation_setpoint, self._polarisation_setpoint_set = (
             soft_signal_r_and_setter(Pol)
         )
+        phase = self.apple2().phase()
         # check if undulator phase is unlocked.
-        if isinstance(self.apple2().phase(), UndulatorPhaseAxes):
-            top_inner = self.apple2().phase().top_inner.user_readback
-            btm_outer = self.apple2().phase().btm_outer.user_readback
+        if isinstance(phase, UndulatorPhaseAxes):
+            top_inner = phase.top_inner.user_readback
+            btm_outer = phase.btm_outer.user_readback
         else:
             # If locked phase axes make the locked phase 0.
             top_inner = btm_outer = soft_signal_rw(float, initial_value=0.0)
@@ -495,24 +498,35 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
                 raw_to_derived=self._read_pol,
                 set_derived=self._set_pol,
                 pol=self.polarisation_setpoint,
-                top_outer=self.apple2().phase().top_outer.user_readback,
+                top_outer=phase.top_outer.user_readback,
                 top_inner=top_inner,
-                btm_inner=self.apple2().phase().btm_inner.user_readback,
+                btm_inner=phase.btm_inner.user_readback,
                 btm_outer=btm_outer,
                 gap=self.apple2().gap().user_readback,
             )
         super().__init__(name)
 
     @abc.abstractmethod
-    async def _set_motors_from_energy(self, value: float) -> None:
+    def _get_apple2_value(self, gap: float, phase: float, pol: Pol) -> Apple2Val:
         """
         This method should be implemented by the beamline specific ID class as the
         motor positions will be different for each beamline depending on the
-        undulator design and the lookup table used.
+        undulator design.
         """
 
+    async def _set_motors_from_energy_and_polarisation(
+        self, energy: float, pol: Pol
+    ) -> None:
+        """Set the undulator motors for a given energy and polarisation."""
+        gap = self.gap_energy_motor_converter(energy=energy, pol=pol)
+        phase = self.phase_energy_motor_converter(energy=energy, pol=pol)
+        apple2_val = self._get_apple2_value(gap, phase, pol)
+        LOGGER.info(f"Setting polarisation to {pol}, with values: {apple2_val}")
+        await self.apple2().set(id_motor_values=apple2_val)
+
     async def _set_energy(self, energy: float) -> None:
-        await self._set_motors_from_energy(energy)
+        pol = await self._check_and_get_pol_setpoint()
+        await self._set_motors_from_energy_and_polarisation(energy, pol)
         self._energy_set(energy)
 
     def _read_energy(self, energy: float) -> float:
@@ -524,7 +538,6 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
         Check the polarisation setpoint and if it is NONE try to read it from
         hardware.
         """
-
         pol = await self.polarisation_setpoint.get_value()
 
         if pol == Pol.NONE:

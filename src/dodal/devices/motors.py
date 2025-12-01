@@ -122,6 +122,20 @@ class XYPitchStage(XYStage):
         super().__init__(prefix, name, x_infix, y_infix)
 
 
+class XYRollStage(XYStage):
+    def __init__(
+        self,
+        prefix: str,
+        x_infix: str = _X,
+        y_infix: str = _Y,
+        roll_infix: str = "ROLL",
+        name: str = "",
+    ) -> None:
+        with self.add_children_as_readables():
+            self.roll = Motor(prefix + roll_infix)
+        super().__init__(prefix, name, x_infix, y_infix)
+
+
 class XYZPitchYawStage(XYZStage):
     def __init__(
         self,

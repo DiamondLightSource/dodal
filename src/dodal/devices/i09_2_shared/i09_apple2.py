@@ -1,4 +1,5 @@
 from dodal.devices.apple2_undulator import (
+    MAXIMUM_MOVE_TIME,
     Apple2,
     Apple2Controller,
     Apple2PhasesVal,
@@ -8,26 +9,29 @@ from dodal.devices.apple2_undulator import (
 )
 from dodal.devices.util.lookup_tables_apple2 import EnergyMotorLookup
 
-ROW_PHASE_MOTOR_TOLERANCE = 0.004
-MAXIMUM_ROW_PHASE_MOTOR_POSITION = 24.0
-MAXIMUM_GAP_MOTOR_POSITION = 100
-DEFAULT_JAW_PHASE_POLY_PARAMS = [1.0 / 7.5, -120.0 / 7.5]
-ALPHA_OFFSET = 180
-MAXIMUM_MOVE_TIME = 550  # There is no useful movements take longer than this.
+J09_GAP_POLY_DEG_COLUMNS = [
+    "9th-order",
+    "8th-order",
+    "7th-order",
+    "6th-order",
+    "5th-order",
+    "4th-order",
+    "3rd-order",
+    "2nd-order",
+    "1st-order",
+    "0th-order",
+]
+
+J09_PHASE_POLY_DEG_COLUMNS = ["0th-order"]
 
 
-class I17Apple2Controller(Apple2Controller[Apple2[UndulatorPhaseAxes]]):
-    """
-    I10Apple2Controller is a extension of Apple2Controller which provide linear
-    arbitrary angle control.
-    """
-
+class J09Apple2Controller(Apple2Controller[Apple2[UndulatorPhaseAxes]]):
     def __init__(
         self,
         apple2: Apple2[UndulatorPhaseAxes],
         gap_energy_motor_lut: EnergyMotorLookup,
         phase_energy_motor_lut: EnergyMotorLookup,
-        units: str = "eV",
+        units: str = "keV",
         name: str = "",
     ) -> None:
         """
@@ -64,3 +68,21 @@ class I17Apple2Controller(Apple2Controller[Apple2[UndulatorPhaseAxes]]):
                 btm_outer=f"{0.0:.6f}",
             ),
         )
+
+    async def _set_pol(
+        self,
+        value: Pol,
+    ) -> None:
+        # I09 require all palarisation change to go via LH.
+        target_energy = await self.energy.get_value()
+        if value is not Pol.LH:
+            self._polarisation_setpoint_set(Pol.LH)
+            max_lh_energy = float(
+                self.gap_energy_motor_lut.lut.root[Pol.LH].limit.maximum
+            )
+            lh_setpoint = (
+                max_lh_energy if target_energy > max_lh_energy else target_energy
+            )
+            await self.energy.set(lh_setpoint, timeout=MAXIMUM_MOVE_TIME)
+        self._polarisation_setpoint_set(value)
+        await self.energy.set(target_energy, timeout=MAXIMUM_MOVE_TIME)
