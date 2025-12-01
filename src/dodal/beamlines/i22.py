@@ -19,7 +19,7 @@ from dodal.devices.i22.dcm import DCM
 from dodal.devices.i22.fswitch import FSwitch
 from dodal.devices.i22.nxsas import NXSasMetadataHolder, NXSasOAV, NXSasPilatus
 from dodal.devices.linkam3 import Linkam3
-from dodal.devices.motors import XYPitchStage
+from dodal.devices.motors import XYPitchStage, XYRollStage, XYStage
 from dodal.devices.slits import Slits
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.tetramm import TetrammDetector
@@ -274,3 +274,18 @@ def ppump() -> WatsonMarlow323Pump:
 @device_factory()
 def base() -> XYPitchStage:
     return XYPitchStage(f"{PREFIX.beamline_prefix}-MO-STABL-01:")
+
+
+@device_factory()
+def bs1() -> XYStage:
+    return XYStage(f"{PREFIX.beamline_prefix}-MO-SAXSP-01:BS1:")
+
+
+@device_factory()
+def bs2() -> XYStage:
+    return XYStage(f"{PREFIX.beamline_prefix}-MO-SAXSP-01:BS2:")
+
+
+@device_factory()
+def bs3() -> XYRollStage:
+    return XYRollStage(f"{PREFIX.beamline_prefix}-MO-SAXSP-01:BS3:")
