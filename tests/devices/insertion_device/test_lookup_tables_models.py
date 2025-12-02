@@ -17,11 +17,10 @@ def test_lookup_table_generate(
 ) -> None:
     for i, pol in enumerate(generate_config_lut.polarisations):
         assert pol in lut.root
-        assert lut.root[pol].limit.minimum == generate_config_lut.min_energies[i]
-        assert lut.root[pol].limit.maximum == generate_config_lut.max_energies[i]
-        assert generate_config_lut.min_energies[i] in lut.root[pol].energies.root
+        assert lut.root[pol].min_energy == generate_config_lut.min_energies[i]
+        assert lut.root[pol].max_energy == generate_config_lut.max_energies[i]
 
-        poly = lut.root[pol].energies.root[generate_config_lut.min_energies[i]].poly
+        poly = lut.root[pol].poly(generate_config_lut.min_energies[i])
         test_energy = (
             generate_config_lut.min_energies[i] + generate_config_lut.max_energies[i]
         ) / 2.0
@@ -77,10 +76,10 @@ def test_convert_csv_to_lookup_overwrite_name_convert_default(
     assert Pol.LH in lut.root
     assert Pol.LV in lut.root
     # Check polynomials evaluate as expected
-    poly_lh = lut.root[Pol.LH].energies.root[100.0].poly
+    poly_lh = lut.root[Pol.LH].poly(100)
     assert poly_lh(150.0) == pytest.approx(np.poly1d([2.0, 1.0])(150.0))
 
-    poly_lv = lut.root[Pol.LV].energies.root[200.0].poly
+    poly_lv = lut.root[Pol.LV].poly(200)
     assert poly_lv(250.0) == pytest.approx(np.poly1d([1.0, 0.0])(250.0))
 
 

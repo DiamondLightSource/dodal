@@ -82,15 +82,10 @@ class LookupTableConfig(BaseModel):
     mode_name_convert: dict[str, str] = Field(default_factory=lambda: MODE_NAME_CONVERT)
 
 
-class EnergyMinMax(BaseModel):
-    minimum: float
-    maximum: float
-
-
 class EnergyCoverageEntry(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)  # So np.poly1d can be used.
-    low: float
-    high: float
+    min_energy: float
+    max_energy: float
     poly: np.poly1d
 
     @field_validator("poly", mode="before")
@@ -109,38 +104,63 @@ class EnergyCoverageEntry(BaseModel):
         return value.coefficients.tolist()
 
 
-class EnergyCoverage(RootModel[dict[float, EnergyCoverageEntry]]):
-    pass
+class EnergyCoverage(BaseModel):
+    energy_entries: list[EnergyCoverageEntry]
 
+    @property
+    def min_energy(self) -> float:
+        min_e = 0
+        for energy_coverage in self.energy_entries:
+            if energy_coverage.min_energy < min_e or min_e == 0:
+                min_e = energy_coverage.min_energy
+        return min_e
 
-class LookupTableEntry(BaseModel):
-    energies: EnergyCoverage
-    limit: EnergyMinMax
+    @property
+    def max_energy(self) -> float:
+        max_e = 0
+        for energy_coverage in self.energy_entries:
+            if energy_coverage.max_energy > max_e:
+                max_e = energy_coverage.max_energy
+        return max_e
 
-    @classmethod
-    def generate(
-        cls: type[Self], min_energy: float, max_energy: float, poly1d_param: list[float]
-    ) -> Self:
-        return cls(
-            energies=EnergyCoverage(
-                {
-                    min_energy: EnergyCoverageEntry(
-                        low=min_energy,
-                        high=max_energy,
-                        poly=np.poly1d(poly1d_param),
-                    )
-                }
-            ),
-            limit=EnergyMinMax(
-                minimum=float(min_energy),
-                maximum=float(max_energy),
-            ),
+    def poly(self, energy: float) -> np.poly1d:
+        """
+        Return the numpy.poly1d polynomial applicable for the given energy and polarisation.
+
+        Parameters:
+        -----------
+        energy:
+            Energy value in the same units used to create the lookup table.
+        pol:
+            Polarisation mode (Pol enum).
+        """
+        # Cache initial values so don't do unnecessary work again
+        min_energy = self.min_energy
+        max_energy = self.max_energy
+
+        if energy < min_energy or energy > max_energy:
+            raise ValueError(
+                "Demanding energy must lie between"
+                + f" {min_energy}"
+                + f" and {max_energy} eV!"
+            )
+        else:
+            for energy_range in self.energy_entries:
+                if (
+                    energy >= energy_range.min_energy
+                    and energy < energy_range.max_energy
+                ):
+                    return energy_range.poly
+
+        raise ValueError(
+            "Cannot find polynomial coefficients for your requested energy."
+            + " There might be gap in the calibration lookup table."
         )
 
 
-class LookupTable(RootModel[dict[Pol, LookupTableEntry]]):
+class LookupTable(RootModel[dict[Pol, EnergyCoverage]]):
     # Allow to auto specify a dict if one not provided
-    def __init__(self, root: dict[Pol, LookupTableEntry] | None = None):
+    def __init__(self, root: dict[Pol, EnergyCoverage] | None = None):
         super().__init__(root=root or {})
 
     @classmethod
@@ -151,14 +171,18 @@ class LookupTable(RootModel[dict[Pol, LookupTableEntry]]):
         max_energies: list[float],
         poly1d_params: list[list[float]],
     ) -> Self:
-        """Generate a LookupTable containing multiple LookupTableEntry
+        """Generate a LookupTable containing multiple EnergyCoverage
         for provided polarisations."""
         lut = cls()
         for i in range(len(pols)):
-            lut.root[pols[i]] = LookupTableEntry.generate(
-                min_energy=min_energies[i],
-                max_energy=max_energies[i],
-                poly1d_param=poly1d_params[i],
+            lut.root[pols[i]] = EnergyCoverage(
+                energy_entries=[
+                    EnergyCoverageEntry(
+                        min_energy=min_energies[i],
+                        max_energy=max_energies[i],
+                        poly=np.poly1d(poly1d_params[i]),
+                    )
+                ]
             )
         return lut
 
@@ -177,24 +201,7 @@ class LookupTable(RootModel[dict[Pol, LookupTableEntry]]):
         pol:
             Polarisation mode (Pol enum).
         """
-        if (
-            energy < self.root[pol].limit.minimum
-            or energy > self.root[pol].limit.maximum
-        ):
-            raise ValueError(
-                "Demanding energy must lie between"
-                + f" {self.root[pol].limit.minimum}"
-                + f" and {self.root[pol].limit.maximum} eV!"
-            )
-        else:
-            for energy_range in self.root[pol].energies.root.values():
-                if energy >= energy_range.low and energy < energy_range.high:
-                    return energy_range.poly
-
-        raise ValueError(
-            "Cannot find polynomial coefficients for your requested energy."
-            + " There might be gap in the calibration lookup table."
-        )
+        return self.root[pol].poly(energy)
 
 
 def convert_csv_to_lookup(
@@ -227,31 +234,26 @@ def convert_csv_to_lookup(
         mode_value = Pol(mode_value)
 
         # Create polynomial object for energy-to-gap/phase conversion
-        coefficients = [float(row[coef]) for coef in lut_config.poly_deg]
+        coefficients = np.poly1d([float(row[coef]) for coef in lut_config.poly_deg])
+
         if mode_value not in lut.root:
-            lut.root[mode_value] = LookupTableEntry.generate(
-                min_energy=float(row[lut_config.min_energy]),
-                max_energy=float(row[lut_config.max_energy]),
-                poly1d_param=coefficients,
+            lut.root[mode_value] = EnergyCoverage(
+                energy_entries=[
+                    EnergyCoverageEntry(
+                        min_energy=float(row[lut_config.min_energy]),
+                        max_energy=float(row[lut_config.max_energy]),
+                        poly=coefficients,
+                    )
+                ]
             )
         else:
-            lut.root[mode_value].energies.root[float(row[lut_config.min_energy])] = (
+            lut.root[mode_value].energy_entries.append(
                 EnergyCoverageEntry(
-                    low=float(row[lut_config.min_energy]),
-                    high=float(row[lut_config.max_energy]),
+                    min_energy=float(row[lut_config.min_energy]),
+                    max_energy=float(row[lut_config.max_energy]),
                     poly=np.poly1d(coefficients),
                 )
             )
-
-        # Update energy limits
-        lut.root[mode_value].limit.minimum = min(
-            lut.root[mode_value].limit.minimum,
-            float(row[lut_config.min_energy]),
-        )
-        lut.root[mode_value].limit.maximum = max(
-            lut.root[mode_value].limit.maximum,
-            float(row[lut_config.max_energy]),
-        )
 
     reader = csv.DictReader(read_file_and_skip(file_contents, skip_line_start_with))
     lut = LookupTable()
