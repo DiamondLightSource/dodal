@@ -38,7 +38,6 @@ async def binary_img(img, img_name="Threshold"):
 async def get_roi(image_arr, current_x, current_y, dist_from_x=100, dist_from_y=100):
     # need to add logic to make sure that you don't accidentally reach the end of the pixel range.
     # use the .shape method for this. this will also depend on the format of the pixel data.
-    top_left_coords = (current_x - 100, current_y - 100)
     roi_arr = image_arr[
         current_y - dist_from_y : current_y + dist_from_y,
         current_x - dist_from_x : current_x + dist_from_x,
