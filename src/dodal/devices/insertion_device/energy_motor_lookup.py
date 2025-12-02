@@ -26,7 +26,7 @@ def get_poly(
     pol:
         Polarisation mode (Pol enum).
     lut:
-        The converted lookup table dictionary for either 'gap' or 'phase'.
+        The lookup table for either 'gap' or 'phase'.
     """
     if energy < lut.root[pol].limit.minimum or energy > lut.root[pol].limit.maximum:
         raise ValueError(
@@ -50,8 +50,8 @@ class EnergyMotorLookup:
     Handles a lookup table for Apple2 ID, converting energy/polarisation to a motor
     position.
 
-    After update_lookup_table() has populated the lookup table, `find_value_in_lookup_table()` can be
-    used to compute gap / phase for a requested energy / polarisation pair.
+    After update_lookup_table() has populated the lookup table, `find_value_in_lookup_table()`
+    can be used to compute gap / phase for a requested energy / polarisation pair.
     """
 
     def __init__(self, lut: LookupTable | None = None):
@@ -80,7 +80,8 @@ class EnergyMotorLookup:
         float
             gap / phase motor position from the lookup table.
         """
-        # if lut is empty, force an update to pull updated file.
+        # if lut is empty, force an update to pull updated lut incase subclasses have
+        # implemented it.
         if not self.lut.root:
             self.update_lookup_table()
         poly = get_poly(energy=energy, pol=pol, lut=self.lut)
