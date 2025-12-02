@@ -1,5 +1,5 @@
 from pathlib import Path
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 import numpy as np
 import pytest
@@ -8,7 +8,6 @@ from dodal.devices.insertion_device.apple2_undulator import Pol
 from dodal.devices.insertion_device.energy_motor_lookup import (
     ConfigServerEnergyMotorLookup,
     EnergyMotorLookup,
-    get_poly,
 )
 from dodal.devices.insertion_device.lookup_table_models import LookupTable
 from tests.devices.insertion_device.util import (
@@ -20,19 +19,6 @@ from tests.devices.insertion_device.util import (
 @pytest.fixture
 def energy_motor_lookup(lut: LookupTable) -> EnergyMotorLookup:
     return EnergyMotorLookup(lut)
-
-
-def test_get_poly(
-    lut: LookupTable, generate_config_lut: GenerateConfigLookupTable
-) -> None:
-    for i in range(len(generate_config_lut.polarisations)):
-        expected_poly = np.poly1d(generate_config_lut.polys[i])
-        poly = get_poly(
-            energy=generate_config_lut.min_energies[i],
-            pol=generate_config_lut.polarisations[i],
-            lut=lut,
-        )
-        assert poly == expected_poly
 
 
 def test_energy_motor_lookup_find_value_in_lookup_table(
@@ -60,13 +46,23 @@ def test_energy_motor_lookup_update_is_static(
 
 def test_energy_motor_lookup_find_value_in_lookup_table_updates_lut_if_lut_empty(
     energy_motor_lookup: EnergyMotorLookup,
+    generate_config_lut: GenerateConfigLookupTable,
 ) -> None:
-    energy_motor_lookup.lut = LookupTable()
+    mock_lut = MagicMock(wraps=LookupTable())
+    # Set the lut data to empty to force an update
+    mock_lut.root = {}
+    mock_lut.get_poly.return_value = np.poly1d(generate_config_lut.polys[0])
+
+    # Replace methods and data with mocks
+    energy_motor_lookup.lut = mock_lut
     mock_update_lut = MagicMock()
     energy_motor_lookup.update_lookup_table = mock_update_lut
-    with patch("dodal.devices.insertion_device.energy_motor_lookup.get_poly"):
-        energy_motor_lookup.find_value_in_lookup_table(100, Pol.LH)
-        mock_update_lut.assert_called_once()
+
+    energy = 100
+    pol = Pol.LH
+    energy_motor_lookup.find_value_in_lookup_table(energy, pol)
+    mock_update_lut.assert_called_once()
+    mock_lut.get_poly.assert_called_once_with(energy=energy, pol=pol)
 
 
 @pytest.fixture

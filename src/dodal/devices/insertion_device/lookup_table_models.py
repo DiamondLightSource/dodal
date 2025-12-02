@@ -30,6 +30,7 @@ structure:
 import csv
 import io
 from collections.abc import Generator
+from typing import Self
 
 import numpy as np
 from pydantic import (
@@ -110,53 +111,88 @@ class EnergyCoverage(RootModel[dict[float, EnergyCoverageEntry]]):
     pass
 
 
-class LookupTableEntries(BaseModel):
+class LookupTableEntry(BaseModel):
     energies: EnergyCoverage
     limit: EnergyMinMax
 
+    @classmethod
+    def generate(
+        cls: type[Self], min_energy: float, max_energy: float, poly1d_param: list[float]
+    ) -> Self:
+        return cls(
+            energies=EnergyCoverage(
+                {
+                    min_energy: EnergyCoverageEntry(
+                        low=min_energy,
+                        high=max_energy,
+                        poly=np.poly1d(poly1d_param),
+                    )
+                }
+            ),
+            limit=EnergyMinMax(
+                minimum=float(min_energy),
+                maximum=float(max_energy),
+            ),
+        )
 
-class LookupTable(RootModel[dict[Pol, LookupTableEntries]]):
+
+class LookupTable(RootModel[dict[Pol, LookupTableEntry]]):
     # Allow to auto specify a dict if one not provided
-    def __init__(self, root: dict[Pol, LookupTableEntries] | None = None):
+    def __init__(self, root: dict[Pol, LookupTableEntry] | None = None):
         super().__init__(root=root or {})
 
+    @classmethod
+    def generate(
+        cls: type[Self],
+        pols: list[Pol],
+        min_energies: list[float],
+        max_energies: list[float],
+        poly1d_params: list[list[float]],
+    ) -> Self:
+        """Generate a dictionary containing multiple lookuptable entries
+        for provided polarisations."""
+        lut = cls()
+        for i in range(len(pols)):
+            lut.root[pols[i]] = LookupTableEntry.generate(
+                min_energy=min_energies[i],
+                max_energy=max_energies[i],
+                poly1d_param=poly1d_params[i],
+            )
+        return lut
 
-def generate_lookup_table_entry(
-    min_energy: float, max_energy: float, poly1d_param: list[float]
-) -> LookupTableEntries:
-    return LookupTableEntries(
-        energies=EnergyCoverage(
-            {
-                min_energy: EnergyCoverageEntry(
-                    low=min_energy,
-                    high=max_energy,
-                    poly=np.poly1d(poly1d_param),
-                )
-            }
-        ),
-        limit=EnergyMinMax(
-            minimum=float(min_energy),
-            maximum=float(max_energy),
-        ),
-    )
+    def get_poly(
+        self,
+        energy: float,
+        pol: Pol,
+    ) -> np.poly1d:
+        """
+        Return the numpy.poly1d polynomial applicable for the given energy and polarisation.
 
+        Parameters:
+        -----------
+        energy:
+            Energy value in the same units used to create the lookup table.
+        pol:
+            Polarisation mode (Pol enum).
+        """
+        if (
+            energy < self.root[pol].limit.minimum
+            or energy > self.root[pol].limit.maximum
+        ):
+            raise ValueError(
+                "Demanding energy must lie between"
+                + f" {self.root[pol].limit.minimum}"
+                + f" and {self.root[pol].limit.maximum} eV!"
+            )
+        else:
+            for energy_range in self.root[pol].energies.root.values():
+                if energy >= energy_range.low and energy < energy_range.high:
+                    return energy_range.poly
 
-def generate_lookup_table(
-    pols: list[Pol],
-    min_energies: list[float],
-    max_energies: list[float],
-    poly1d_params: list[list[float]],
-) -> LookupTable:
-    """Generate a dictionary containing multiple lookuptable entries
-    for provided polarisations."""
-    lut = LookupTable()
-    for i in range(len(pols)):
-        lut.root[pols[i]] = generate_lookup_table_entry(
-            min_energy=min_energies[i],
-            max_energy=max_energies[i],
-            poly1d_param=poly1d_params[i],
+        raise ValueError(
+            "Cannot find polynomial coefficients for your requested energy."
+            + " There might be gap in the calibration lookup table."
         )
-    return lut
 
 
 def convert_csv_to_lookup(
@@ -191,7 +227,7 @@ def convert_csv_to_lookup(
         # Create polynomial object for energy-to-gap/phase conversion
         coefficients = [float(row[coef]) for coef in lut_config.poly_deg]
         if mode_value not in lut.root:
-            lut.root[mode_value] = generate_lookup_table_entry(
+            lut.root[mode_value] = LookupTableEntry.generate(
                 min_energy=float(row[lut_config.min_energy]),
                 max_energy=float(row[lut_config.max_energy]),
                 poly1d_param=coefficients,

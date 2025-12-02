@@ -11,7 +11,7 @@ from dodal.devices.insertion_device.lookup_table_models import (
 from tests.devices.insertion_device.util import GenerateConfigLookupTable
 
 
-def test_generate_lookup_table(
+def test_lookup_table_generate(
     generate_config_lut: GenerateConfigLookupTable,
     lut: LookupTable,
 ) -> None:
@@ -32,6 +32,18 @@ def test_generate_lookup_table(
         assert poly(test_energy) == pytest.approx(
             np.poly1d(generate_config_lut.polys[i])(test_energy)
         )
+
+
+def test_lookup_table_get_poly(
+    lut: LookupTable, generate_config_lut: GenerateConfigLookupTable
+) -> None:
+    for i in range(len(generate_config_lut.polarisations)):
+        expected_poly = np.poly1d(generate_config_lut.polys[i])
+        poly = lut.get_poly(
+            energy=generate_config_lut.min_energies[i],
+            pol=generate_config_lut.polarisations[i],
+        )
+        assert poly == expected_poly
 
 
 @pytest.fixture

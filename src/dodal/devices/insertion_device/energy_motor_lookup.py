@@ -1,6 +1,5 @@
 from pathlib import Path
 
-import numpy as np
 from daq_config_server.client import ConfigServer
 
 from dodal.devices.insertion_device.apple2_undulator import Pol
@@ -9,40 +8,6 @@ from dodal.devices.insertion_device.lookup_table_models import (
     LookupTableConfig,
     convert_csv_to_lookup,
 )
-
-
-def get_poly(
-    energy: float,
-    pol: Pol,
-    lut: LookupTable,
-) -> np.poly1d:
-    """
-    Return the numpy.poly1d polynomial applicable for the given energy and polarisation.
-
-    Parameters:
-    -----------
-    energy:
-        Energy value in the same units used to create the lookup table.
-    pol:
-        Polarisation mode (Pol enum).
-    lut:
-        The lookup table for either 'gap' or 'phase'.
-    """
-    if energy < lut.root[pol].limit.minimum or energy > lut.root[pol].limit.maximum:
-        raise ValueError(
-            "Demanding energy must lie between"
-            + f" {lut.root[pol].limit.minimum}"
-            + f" and {lut.root[pol].limit.maximum} eV!"
-        )
-    else:
-        for energy_range in lut.root[pol].energies.root.values():
-            if energy >= energy_range.low and energy < energy_range.high:
-                return energy_range.poly
-
-    raise ValueError(
-        "Cannot find polynomial coefficients for your requested energy."
-        + " There might be gap in the calibration lookup table."
-    )
 
 
 class EnergyMotorLookup:
@@ -84,7 +49,7 @@ class EnergyMotorLookup:
         # implemented it.
         if not self.lut.root:
             self.update_lookup_table()
-        poly = get_poly(energy=energy, pol=pol, lut=self.lut)
+        poly = self.lut.get_poly(energy=energy, pol=pol)
         return poly(energy)
 
 

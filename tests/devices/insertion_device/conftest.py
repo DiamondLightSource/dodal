@@ -2,10 +2,7 @@ import pytest
 from pytest import FixtureRequest
 
 from dodal.devices.insertion_device.apple2_undulator import Pol
-from dodal.devices.insertion_device.lookup_table_models import (
-    LookupTable,
-    generate_lookup_table,
-)
+from dodal.devices.insertion_device.lookup_table_models import LookupTable
 from tests.devices.insertion_device.util import GenerateConfigLookupTable
 
 
@@ -23,7 +20,7 @@ def generate_config_lut(request: FixtureRequest) -> GenerateConfigLookupTable:
 
 @pytest.fixture
 def lut(generate_config_lut: GenerateConfigLookupTable) -> LookupTable:
-    return generate_lookup_table(
+    return LookupTable.generate(
         pols=generate_config_lut.polarisations,
         min_energies=generate_config_lut.min_energies,
         max_energies=generate_config_lut.max_energies,
