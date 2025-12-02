@@ -3,7 +3,7 @@ from collections.abc import Mapping
 from typing import Annotated, TypeVar
 
 import bluesky.plan_stubs as bps
-from bluesky.protocols import Movable
+from bluesky.protocols import Movable, Readable, Stoppable
 from bluesky.utils import MsgGenerator
 
 """
@@ -146,3 +146,27 @@ def wait(
     """
 
     return (yield from bps.wait(group, timeout=timeout))
+
+
+def rd(readable: Readable) -> MsgGenerator:
+    """Reads a single-value non-triggered object, wrapper for `bp.rd`.
+
+    Args:
+        readable (Readable): The device to be read
+
+    Returns:
+        Iterator[MsgGenerator]: Bluesky messages
+    """
+    return (yield from bps.rd(readable))
+
+
+def stop(stoppable: Stoppable) -> MsgGenerator:
+    """Stop a device, wrapper for `bp.stop`.
+
+    Args:
+        stoppable (Stoppable): Device to be stopped
+
+    Returns:
+        Iterator[MsgGenerator]: Bluesky messages
+    """
+    return (yield from bps.stop(stoppable))
