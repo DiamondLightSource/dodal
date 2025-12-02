@@ -149,7 +149,7 @@ class LookupTable(RootModel[dict[Pol, LookupTableEntry]]):
         max_energies: list[float],
         poly1d_params: list[list[float]],
     ) -> Self:
-        """Generate a dictionary containing multiple lookuptable entries
+        """Generate a LookupTable containing multiple LookupTableEntry
         for provided polarisations."""
         lut = cls()
         for i in range(len(pols)):
