@@ -6,7 +6,7 @@ from unittest.mock import AsyncMock, MagicMock, call, patch
 
 import numpy as np
 import pytest
-from ophyd_async.core import get_mock_put, init_devices
+from ophyd_async.core import init_devices
 from pytest import approx
 from redis.asyncio import ConnectionError
 
@@ -26,6 +26,7 @@ async def murko_results(mock_strict_redis: MagicMock) -> MurkoResultsDevice:
     with init_devices(mock=True):
         murko_results = MurkoResultsDevice(name="murko_results")
     murko_results.pubsub = AsyncMock()
+    murko_results.redis_connected = True
     return murko_results
 
 
@@ -444,6 +445,7 @@ async def test_trigger_calls_get_message_and_hget(
 async def test_assert_subscribes_to_queue_and_clears_results_on_stage(
     murko_results: MurkoResultsDevice,
 ):
+    murko_results._check_redis_connection = AsyncMock(return_value=True)
     murko_results._x_mm_setter(1)
     murko_results._y_mm_setter(2)
     murko_results._z_mm_setter(3)

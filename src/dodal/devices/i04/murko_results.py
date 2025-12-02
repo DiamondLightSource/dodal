@@ -105,9 +105,12 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
 
     async def _check_redis_connection(self):
         try:
-            await self.redis_client.ping()
+            await self.redis_client.ping()  # type: ignore
             return True
         except ConnectionError:
+            LOGGER.warning(
+                f"Failed to connect to redis: {self.redis_client}. Murko results device will not trigger"
+            )
             return False
 
     def _reset(self):
@@ -116,16 +119,12 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
 
     @AsyncStatus.wrap
     async def stage(self):
-        self.redis_connected = await self._check_redis_connection(self.redis_client)
-        if not self.redis_connected:
-            LOGGER.warning(
-                f"Failed to connect to redis: {self.redis_client}. Murko results device will not trigger"
-            )
-        else:
+        self.redis_connected = await self._check_redis_connection()
+        if self.redis_connected:
             await self.pubsub.subscribe("murko-results")
-        self._x_mm_setter(0)
-        self._y_mm_setter(0)
-        self._z_mm_setter(0)
+            self._x_mm_setter(0)
+            self._y_mm_setter(0)
+            self._z_mm_setter(0)
 
     @AsyncStatus.wrap
     async def unstage(self):
@@ -181,8 +180,10 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
         self._z_mm_setter(-best_z)
 
         for result in self._results:
-            await self.redis_client.hset(
-                f"murko:{sample_id}:metadata", result.uuid, json.dumps(result.metadata)
+            await self.redis_client.hset(  # type: ignore
+                f"murko:{sample_id}:metadata",
+                result.uuid,
+                json.dumps(result.metadata),
             )
 
     async def process_batch(
@@ -190,8 +191,9 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
     ):
         for result_with_uuid in batch_results:
             uuid, result = result_with_uuid
-            if metadata_str := await self.redis_client.hget(
-                f"murko:{sample_id}:metadata", uuid
+            if metadata_str := await self.redis_client.hget(  # type: ignore
+                f"murko:{sample_id}:metadata",
+                uuid,
             ):
                 LOGGER.info(f"Found metadata for uuid {uuid}, processing result")
                 self.process_result(result, MurkoMetadata(json.loads(metadata_str)))
