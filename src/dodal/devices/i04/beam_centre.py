@@ -38,6 +38,7 @@ async def binary_img(img, img_name="Threshold"):
 async def get_roi(image_arr, current_x, current_y, dist_from_x=100, dist_from_y=100):
     # need to add logic to make sure that you don't accidentally reach the end of the pixel range.
     # use the .shape method for this. this will also depend on the format of the pixel data.
+    top_left_coords = (current_x - 100, current_y - 100)
     roi_arr = image_arr[
         current_y - dist_from_y : current_y + dist_from_y,
         current_x - dist_from_x : current_x + dist_from_x,
@@ -59,15 +60,11 @@ class CentreEllipseMethod(StandardReadable, Triggerable):
         self.array_signal = epics_signal_r(np.ndarray, f"pva://{prefix}PVA:ARRAY")
         self.center_x_val, self._center_x_val_setter = soft_signal_r_and_setter(float)
         self.center_y_val, self._center_y_val_setter = soft_signal_r_and_setter(float)
-        # you probably want to get rid of the .get_values and get rid of the bit which does the roi and put in the trigger
         self.current_centre_x = epics_signal_r(
             int, f"{prefix}OVER:{overlay_channel}:CenterX"
         )
         self.current_centre_y = epics_signal_r(
             int, f"{prefix}OVER:{overlay_channel}:CenterY"
-        )
-        self.roi_image_data = get_roi(
-            self.get_img_data(), self.current_centre_x, self.current_centre_y
         )
         super().__init__(name)
 
@@ -85,11 +82,23 @@ class CentreEllipseMethod(StandardReadable, Triggerable):
         return cv2.fitEllipse(largest_contour)
 
     @AsyncStatus.wrap
-    async def trigger(self):
+    async def trigger(self, roi_dist_from_centre=100):
         array_data = await self.array_signal.get_value()
-        binary = await binary_img(array_data)
+        current_x = await self.current_centre_x.get_value()
+        current_y = await self.current_centre_y.get_value()
+        top_left_corner = (
+            current_x - roi_dist_from_centre,
+            current_y - roi_dist_from_centre,
+        )
+        roi_data = await get_roi(
+            array_data, current_x, current_y, roi_dist_from_centre, roi_dist_from_centre
+        )
+        binary = await binary_img(roi_data)
         ellipse_fit = self.fit_ellipse(binary)
         centre_x = ellipse_fit[0][0]
         centre_y = ellipse_fit[0][1]
-        self._center_x_val_setter(centre_x)
-        self._center_y_val_setter(centre_y)
+        # convert back to original image coords
+        real_centre_x = centre_x + top_left_corner[0]
+        real_centre_y = centre_y + top_left_corner[1]
+        self._center_x_val_setter(real_centre_x)
+        self._center_y_val_setter(real_centre_y)
