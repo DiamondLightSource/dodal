@@ -19,8 +19,8 @@ def test_lookup_table_generate(
         key = pol
         assert key in lut.root
         entry = lut.root[key]
-        assert entry.limit.minimum == pytest.approx(generate_config_lut.min_energies[i])
-        assert entry.limit.maximum == pytest.approx(generate_config_lut.max_energies[i])
+        assert entry.limit.minimum == generate_config_lut.min_energies[i]
+        assert entry.limit.maximum == generate_config_lut.max_energies[i]
 
         assert generate_config_lut.min_energies[i] in entry.energies.root
         poly = entry.energies.root[generate_config_lut.min_energies[i]].poly
@@ -29,9 +29,7 @@ def test_lookup_table_generate(
         test_energy = (
             generate_config_lut.min_energies[i] + generate_config_lut.max_energies[i]
         ) / 2.0
-        assert poly(test_energy) == pytest.approx(
-            np.poly1d(generate_config_lut.polys[i])(test_energy)
-        )
+        assert poly(test_energy) == np.poly1d(generate_config_lut.polys[i])(test_energy)
 
 
 def test_lookup_table_get_poly(
