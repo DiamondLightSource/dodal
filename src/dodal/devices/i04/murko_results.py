@@ -103,10 +103,9 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
             self.z_mm, self._z_mm_setter = soft_signal_r_and_setter(float)
         super().__init__(name=name)
 
-    @staticmethod
-    async def check_redis_connection(redis_client: StrictRedis):
+    async def _check_redis_connection(self):
         try:
-            await redis_client.ping()
+            await self.redis_client.ping()
             return True
         except ConnectionError:
             return False
@@ -117,7 +116,7 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
 
     @AsyncStatus.wrap
     async def stage(self):
-        self.redis_connected = await self.check_redis_connection(self.redis_client)
+        self.redis_connected = await self._check_redis_connection(self.redis_client)
         if not self.redis_connected:
             LOGGER.warning(
                 f"Failed to connect to redis: {self.redis_client}. Murko results device will not trigger"
