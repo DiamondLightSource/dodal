@@ -21,6 +21,7 @@ from dodal.devices.eiger import EigerDetector
 from dodal.devices.fast_grid_scan import ZebraFastGridScanThreeD
 from dodal.devices.flux import Flux
 from dodal.devices.i03.dcm import DCM
+from dodal.devices.i04.beam_centre import CentreEllipseMethod
 from dodal.devices.i04.beamsize import Beamsize
 from dodal.devices.i04.constants import RedisConstants
 from dodal.devices.i04.max_pixel import MaxPixel
@@ -409,4 +410,14 @@ def beamsize() -> Beamsize:
     return Beamsize(
         transfocator=transfocator(),
         aperture_scatterguard=aperture_scatterguard(),
+    )
+
+
+@device_factory()
+def beam_centre() -> CentreEllipseMethod:
+    """Get the i04 centring device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i04, it will return the existing object.
+    """
+    return CentreEllipseMethod(
+        f"{PREFIX.beamline_prefix}-DI-OAV-01:",
     )
