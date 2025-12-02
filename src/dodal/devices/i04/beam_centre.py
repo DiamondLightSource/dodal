@@ -1,5 +1,3 @@
-from typing import Any
-
 import cv2
 import numpy as np
 from bluesky.protocols import Triggerable
@@ -14,8 +12,12 @@ from dodal.log import LOGGER
 
 async def binary_img(img, img_name="Threshold"):
     """
-    Function which creates a binary image from a beamline image using Otsu's method for automatic threshholding.
-    The threshold is increased by 10 (brightness taken from image in grayscale) in order to get more the centre of the beam.
+    Function which creates a binary image from a beamline image. This is where the
+    pixels of an image are converted to one of two values (a high and a low value).
+    Otsu's method is used for automatic threshholding.
+    See https://docs.opencv.org/4.x/d7/d4d/tutorial_py_thresholding.html.
+    The threshold is increased by 10 (brightness taken from image in grayscale)
+    in order to get more the centre of the beam.
     """
     blurred = await convert_to_gray_and_blur(img)
     assert blurred is not None, "Image is None before thresholding"
@@ -34,6 +36,11 @@ async def binary_img(img, img_name="Threshold"):
 
 
 class CentreEllipseMethod(StandardReadable, Triggerable):
+    """
+    Fits an ellipse a binary image of the beam. The centre of the fitted ellipse is taken
+    to be the centre of the beam.
+    """
+
     def __init__(self, prefix: str, name: str = ""):
         self.array_signal = epics_signal_r(np.ndarray, f"pva://{prefix}PVA:ARRAY")
 

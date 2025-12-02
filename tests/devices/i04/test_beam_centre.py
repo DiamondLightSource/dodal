@@ -44,7 +44,7 @@ contour_array = np.array(
 @patch("dodal.devices.i04.beam_centre.cv2.findContours")
 @patch("dodal.devices.i04.beam_centre.cv2.fitEllipse")
 def test_fit_ellipse_good_params(
-    fitEllipse: MagicMock,
+    fit_ellipse: MagicMock,
     find_contours_mock: MagicMock,
     centre_device: CentreEllipseMethod,
 ):
@@ -58,7 +58,7 @@ def test_fit_ellipse_good_params(
     dummy_img = np.zeros((10, 10), dtype=np.uint8)
 
     centre_device.fit_ellipse(dummy_img)
-    fitEllipse.assert_called_once()
+    fit_ellipse.assert_called_once()
 
 
 @patch("dodal.devices.i04.beam_centre.cv2.findContours")
@@ -77,7 +77,7 @@ def test_fit_ellipse_raises_error_if_not_enough_contour_points(
     find_contours_mock: MagicMock, centre_device: CentreEllipseMethod
 ):
     contours = [
-        np.array([[[0, 0]], [[1, 0]], [[1, 1]]]),  # 3 points (tiny triangle)
+        np.array([[[0, 0]], [[1, 0]], [[1, 1]]]),  # 3 points (triangle)
         np.array([[[10, 10]], [[20, 10]], [[20, 20]], [[10, 20]]]),  # 4 points (square)
     ]
 
