@@ -822,3 +822,11 @@ async def test_if_redis_connection_failed_then_no_error_is_raised_and_motors_set
     assert await murko_results.x_mm.get_value() == 0
     assert await murko_results.y_mm.get_value() == 0
     assert await murko_results.z_mm.get_value() == 0
+
+
+async def test_if_redis_connects_then_pubsub_is_subscribed_to(
+    murko_results: MurkoResultsDevice,
+):
+    murko_results.redis_client.ping = AsyncMock()
+    await murko_results.stage()
+    murko_results.pubsub.subscribe.assert_called_once()  # type: ignore
