@@ -25,7 +25,7 @@ async def max_pixel() -> AsyncGenerator[MaxPixel]:
         ([6.9, 8.9, 7.5, 6.45], 8.9),  # check can handle floats
     ],
 )
-@patch("dodal.devices.i04.max_pixel.MaxPixel._convert_to_gray_and_blur")
+@patch("dodal.devices.i04.max_pixel.convert_to_gray_and_blur")
 async def test_returns_max(
     mocked_preprocessed_data: AsyncMock,
     preprocessed_data,
