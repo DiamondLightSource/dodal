@@ -1,5 +1,6 @@
 import importlib
 import os
+import sys
 from collections.abc import AsyncGenerator
 from pathlib import Path
 from types import ModuleType
@@ -53,6 +54,12 @@ def module_and_devices_for_beamline(request: pytest.FixtureRequest):
             if isinstance(factory, DeviceInitializationController):
                 factory.cache_clear()
         del bl_mod
+
+        # Remove beamline module from sys.modules to make sure we are testing beamlines
+        # in isolated modules and doesn't leak over to the next one.
+        mods_to_clear = [m for m in sys.modules if m.startswith("dodal.beamlines")]
+        for m in mods_to_clear:
+            sys.modules.pop(m, None)
 
 
 def mock_beamline_module_filepaths(bl_name: str, bl_module: ModuleType):
