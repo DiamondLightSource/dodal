@@ -95,7 +95,9 @@ class EnergyCoverageEntry(BaseModel):
 
     @field_validator("poly", mode="before")
     @classmethod
-    def validate_and_convert_poly(cls, value):
+    def validate_and_convert_poly(
+        cls: type[Self], value: np.poly1d | list
+    ) -> np.poly1d:
         """If reading from serialized data, it will be using a list. Convert to np.poly1d"""
         if isinstance(value, list):
             return np.poly1d(value)
