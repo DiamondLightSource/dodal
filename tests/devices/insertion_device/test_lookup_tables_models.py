@@ -25,19 +25,18 @@ def test_lookup_table_generate(
         test_energy = (
             generate_config_lut.min_energies[i] + generate_config_lut.max_energies[i]
         ) / 2.0
-        assert poly(test_energy) == np.poly1d(generate_config_lut.polys[i])(test_energy)
+        assert poly(test_energy) == generate_config_lut.polys[i](test_energy)
 
 
 def test_lookup_table_get_poly(
     lut: LookupTable, generate_config_lut: GenerateConfigLookupTable
 ) -> None:
     for i in range(len(generate_config_lut.polarisations)):
-        expected_poly = np.poly1d(generate_config_lut.polys[i])
         poly = lut.get_poly(
             energy=generate_config_lut.min_energies[i],
             pol=generate_config_lut.polarisations[i],
         )
-        assert poly == expected_poly
+        assert poly == generate_config_lut.polys[i]
 
 
 def test_lookup_table_is_serialisable(lut: LookupTable) -> None:
@@ -79,11 +78,9 @@ def test_convert_csv_to_lookup_overwrite_name_convert_default(
     assert Pol.LV in lut.root
     # Check polynomials evaluate as expected
     poly_lh = lut.root[Pol.LH].energies.root[100.0].poly
-    assert isinstance(poly_lh, np.poly1d)
     assert poly_lh(150.0) == pytest.approx(np.poly1d([2.0, 1.0])(150.0))
 
     poly_lv = lut.root[Pol.LV].energies.root[200.0].poly
-    assert isinstance(poly_lv, np.poly1d)
     assert poly_lv(250.0) == pytest.approx(np.poly1d([1.0, 0.0])(250.0))
 
 

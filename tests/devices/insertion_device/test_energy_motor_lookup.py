@@ -1,7 +1,6 @@
 from pathlib import Path
 from unittest.mock import MagicMock
 
-import numpy as np
 import pytest
 
 from dodal.devices.insertion_device.apple2_undulator import Pol
@@ -30,7 +29,7 @@ def test_energy_motor_lookup_find_value_in_lookup_table(
             energy=generate_config_lut.min_energies[i],
             pol=generate_config_lut.polarisations[i],
         )
-        expected_poly = np.poly1d(generate_config_lut.polys[i])
+        expected_poly = generate_config_lut.polys[i]
         expected_value = expected_poly(generate_config_lut.min_energies[i])
         assert value == expected_value
 
@@ -51,7 +50,7 @@ def test_energy_motor_lookup_find_value_in_lookup_table_updates_lut_if_lut_empty
     mock_lut = MagicMock(wraps=LookupTable())
     # Set the lut data to empty to force an update
     mock_lut.root = {}
-    mock_lut.get_poly.return_value = np.poly1d(generate_config_lut.polys[0])
+    mock_lut.get_poly.return_value = generate_config_lut.polys[0]
 
     # Replace methods and data with mocks
     energy_motor_lookup.lut = mock_lut

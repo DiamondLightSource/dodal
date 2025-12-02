@@ -1,3 +1,4 @@
+import numpy as np
 import pytest
 from pytest import FixtureRequest
 
@@ -8,9 +9,14 @@ from tests.devices.insertion_device.util import GenerateConfigLookupTable
 
 @pytest.fixture(
     params=[
-        GenerateConfigLookupTable([Pol.LH], [100], [200], [[2.0, -1.0, 0.5]]),
         GenerateConfigLookupTable(
-            [Pol.LH, Pol.LV], [100, 200], [150.0, 250.0], [[1.0, 0.0], [0.5, 1.0]]
+            [Pol.LH], [100], [200], [np.poly1d([2.0, -1.0, 0.5])]
+        ),
+        GenerateConfigLookupTable(
+            [Pol.LH, Pol.LV],
+            [100, 200],
+            [150.0, 250.0],
+            [np.poly1d([1.0, 0.0]), np.poly1d([0.5, 1.0])],
         ),
     ]
 )
