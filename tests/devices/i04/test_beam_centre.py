@@ -87,3 +87,15 @@ def test_fit_ellipse_raises_error_if_not_enough_contour_points(
 
     with pytest.raises(ValueError, match="Not enough points to fit an ellipse."):
         centre_device.fit_ellipse(dummy_img)
+
+
+@patch("dodal.devices.i04.beam_centre.CentreEllipseMethod.fit_ellipse")
+@patch("dodal.devices.i04.beam_centre.binary_img")
+async def test_trigger(
+    mock_binary_img: MagicMock,
+    mock_fit_ellipse: MagicMock,
+    centre_device: CentreEllipseMethod,
+):
+    await centre_device.trigger()
+    mock_binary_img.assert_called_once()
+    mock_fit_ellipse.assert_called_once()
