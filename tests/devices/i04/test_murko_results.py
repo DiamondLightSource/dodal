@@ -6,8 +6,9 @@ from unittest.mock import AsyncMock, MagicMock, call, patch
 
 import numpy as np
 import pytest
-from ophyd_async.core import init_devices
+from ophyd_async.core import get_mock_put, init_devices
 from pytest import approx
+from redis.asyncio import ConnectionError
 
 from dodal.devices.i04.murko_results import (
     RESULTS_COMPLETE_MESSAGE,
@@ -807,3 +808,15 @@ async def test_trigger_stops_if_no_message_in_5_seconds_and_raises_warning(
         and record.levelname == "WARNING"
         for record in caplog.records
     )
+
+
+async def test_if_redis_connection_failed_then_no_error_is_raised_and_motors_set_to_0(
+    murko_results: MurkoResultsDevice,
+):
+    murko_results.redis_client.ping = AsyncMock(side_effect=ConnectionError)
+    await murko_results.stage()
+    await murko_results.trigger()
+    await murko_results.unstage()
+    assert await murko_results.x_mm.get_value() == 0
+    assert await murko_results.y_mm.get_value() == 0
+    assert await murko_results.z_mm.get_value() == 0

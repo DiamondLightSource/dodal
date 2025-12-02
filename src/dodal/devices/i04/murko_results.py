@@ -13,7 +13,7 @@ from ophyd_async.core import (
     soft_signal_r_and_setter,
     soft_signal_rw,
 )
-from redis.asyncio import StrictRedis
+from redis.asyncio import ConnectionError, StrictRedis
 
 from dodal.devices.i04.constants import RedisConstants
 from dodal.devices.oav.oav_calculations import (
@@ -104,9 +104,9 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
         super().__init__(name=name)
 
     @staticmethod
-    def check_redis_connection(redis_client: StrictRedis):
+    async def check_redis_connection(redis_client: StrictRedis):
         try:
-            redis_client.ping()
+            await redis_client.ping()
             return True
         except ConnectionError:
             return False
@@ -117,7 +117,7 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
 
     @AsyncStatus.wrap
     async def stage(self):
-        self.redis_connected = self.check_redis_connection(self.redis_client)
+        self.redis_connected = await self.check_redis_connection(self.redis_client)
         if not self.redis_connected:
             LOGGER.warning(
                 f"Failed to connect to redis: {self.redis_client}. Murko results device will not trigger"
