@@ -1,3 +1,4 @@
+from typing import Any
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -18,10 +19,12 @@ def given_position_demands() -> AttenuatorMotorPositionDemands:
     return position_demand
 
 
-def given_an_unhappy_restful_response() -> AsyncMock:
+def given_an_unhappy_restful_response(*args: Any, **kwargs: Any) -> AsyncMock:
     unhappy_response = AsyncMock()
     unhappy_response.ok = False
-    unhappy_response.json.return_value = {"task_id": "alas_not"}
+    unhappy_response.json = AsyncMock(
+        return_value={"task_id": "unhappy_response_intended"}
+    )
     return unhappy_response
 
 
@@ -61,7 +64,7 @@ async def test_that_motor_squad_can_be_instantiated(invoking_hutch):
     new_callable=AsyncMock,
 )
 async def test_when_motor_squad_is_set_that_expected_request_params_are_passed(
-    internal_setter, invoking_hutch
+    internal_setter, invoking_hutch: HutchState
 ):
     motors: AttenuatorMotorSquad = await given_a_squad_of_attenuator_motors(
         invoking_hutch
@@ -87,19 +90,22 @@ async def test_when_motor_squad_is_set_that_expected_request_params_are_passed(
 
 
 @pytest.mark.parametrize("invoking_hutch", [HutchState.EH1, HutchState.EH2])
-@patch("dodal.devices.i19.access_controlled.blueapi_device.ClientSession.post")
-async def test_when_rest_post_unsuccessful_that_error_raised(
-    unsuccessful_post, invoking_hutch
+async def test_that_set_raises_error_if_post_not_successful(
+    invoking_hutch: HutchState,
 ):
+    position_demands = given_position_demands()
     motors: AttenuatorMotorSquad = await given_a_squad_of_attenuator_motors(
         invoking_hutch
     )
     with pytest.raises(ClientConnectionError):
-        restful_response: AsyncMock = given_an_unhappy_restful_response()
-        unsuccessful_post.return_value.__aenter__.return_value = restful_response
+        with patch(
+            "dodal.devices.i19.access_controlled.blueapi_device.ClientSession.post"
+        ) as mock_post:
+            mock_post.return_value.__aenter__.return_value = (
+                given_an_unhappy_restful_response()
+            )
 
-        postion_demands = given_position_demands()
-        await motors.set(postion_demands)
+            await motors.set(position_demands)
 
 
 @pytest.mark.parametrize("invoking_hutch", [HutchState.EH1, HutchState.EH2])
