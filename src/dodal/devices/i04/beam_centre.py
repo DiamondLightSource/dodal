@@ -35,17 +35,40 @@ async def binary_img(img, img_name="Threshold"):
     return thresh_img
 
 
+async def get_roi(image_arr, current_x, current_y, dist_from_x=100, dist_from_y=100):
+    # need to add logic to make sure that you don't accidentally reach the end of the pixel range.
+    # use the .shape method for this. this will also depend on the format of the pixel data.
+    roi_arr = image_arr[
+        current_y - dist_from_y : current_y + dist_from_y,
+        current_x - dist_from_x : current_x + dist_from_x,
+    ]
+
+    return roi_arr
+
+
 class CentreEllipseMethod(StandardReadable, Triggerable):
     """
-    Fits an ellipse a binary image of the beam. The centre of the fitted ellipse is taken
-    to be the centre of the beam.
+    Finds the centre of the beam through fitting an ellipse and extracting the centre.
+    First a ROI is taken which is taken at 100 pixels from the PVs for the previous centre.
+    Then the image is converted to a binary (see above function), after which an ellipse is
+    fitted.
+    The placeholder PVs should then be updated (but not sure if that is happening yet).
     """
 
-    def __init__(self, prefix: str, name: str = ""):
+    def __init__(self, prefix: str, name: str = "", overlay_channel: int = 1):
         self.array_signal = epics_signal_r(np.ndarray, f"pva://{prefix}PVA:ARRAY")
-
         self.center_x_val, self._center_x_val_setter = soft_signal_r_and_setter(float)
         self.center_y_val, self._center_y_val_setter = soft_signal_r_and_setter(float)
+        # you probably want to get rid of the .get_values and get rid of the bit which does the roi and put in the trigger
+        self.current_centre_x = epics_signal_r(
+            int, f"{prefix}OVER:{overlay_channel}:CenterX"
+        )
+        self.current_centre_y = epics_signal_r(
+            int, f"{prefix}OVER:{overlay_channel}:CenterY"
+        )
+        self.roi_image_data = get_roi(
+            self.get_img_data(), self.current_centre_x, self.current_centre_y
+        )
         super().__init__(name)
 
     def fit_ellipse(self, binary_img):
