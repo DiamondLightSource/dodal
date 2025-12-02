@@ -40,6 +40,12 @@ def test_lookup_table_get_poly(
         assert poly == expected_poly
 
 
+def test_lookup_table_is_serialisable(lut: LookupTable) -> None:
+    # There should be no errors when calling the below functions
+    lut.model_dump()
+    lut.model_dump_json()
+
+
 @pytest.fixture
 def lut_config() -> LookupTableConfig:
     return LookupTableConfig(
@@ -79,12 +85,6 @@ def test_convert_csv_to_lookup_overwrite_name_convert_default(
     poly_lv = lut.root[Pol.LV].energies.root[200.0].poly
     assert isinstance(poly_lv, np.poly1d)
     assert poly_lv(250.0) == pytest.approx(np.poly1d([1.0, 0.0])(250.0))
-
-
-def test_lookup_table_is_serialisable(lut: LookupTable) -> None:
-    # There should be no errors when calling the below functions
-    lut.model_dump()
-    lut.model_dump_json()
 
 
 async def test_bad_file_contents_causes_convert_csv_to_lookup_fails(
