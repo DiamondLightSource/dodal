@@ -242,11 +242,9 @@ def convert_csv_to_lookup(
     lut = LookupTable()
 
     for row in reader:
+        source = lut_config.source
         # If there are multiple source only convert requested.
-        if lut_config.source is not None:
-            if row[lut_config.source[0]] == lut_config.source[1]:
-                process_row(row=row, lut=lut)
-        else:
+        if source is None or row[source[0]] == source[1]:
             process_row(row=row, lut=lut)
 
     # Check if our LookupTable is empty after processing, raise error if it is.
