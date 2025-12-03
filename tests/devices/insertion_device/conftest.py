@@ -11,16 +11,18 @@ from tests.devices.insertion_device.util import GenerateConfigLookupTable
 
 @pytest.fixture(
     params=[
+        # Single polarisation entry with multiple energy coverage entries e.g i10
         GenerateConfigLookupTable(
             [Pol.LH],
             [
                 EnergyCoverage.generate(
-                    min_energies=[100],
-                    max_energies=[200],
-                    poly1d_params=[[2.0, -1.0, 0.5]],
+                    min_energies=[100, 200],
+                    max_energies=[200, 250],
+                    poly1d_params=[[2.0, -1.0, 0.5], [1.0, 0.0]],
                 )
             ],
         ),
+        # Mutiple polarisation entries with single energy coverage entry e.g i09
         GenerateConfigLookupTable(
             [Pol.LH, Pol.LV],
             [
