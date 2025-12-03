@@ -9,7 +9,7 @@ from dodal.devices.insertion_device.lookup_table_models import LookupTable
 
 GenerateConfigLookupTable = namedtuple(
     "GenerateConfigLookupTable",
-    ["polarisations", "min_energies", "max_energies", "polys"],
+    ["polarisations", "energy_entries"],
 )
 
 

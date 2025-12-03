@@ -103,6 +103,25 @@ class EnergyCoverageEntry(BaseModel):
 class EnergyCoverage(BaseModel):
     energy_entries: list[EnergyCoverageEntry]
 
+    @classmethod
+    def generate(
+        cls: type[Self],
+        min_energies: list[float],
+        max_energies: list[float],
+        poly1d_params: list[list[float]],
+    ) -> Self:
+        energy_entries = [
+            EnergyCoverageEntry(
+                min_energy=min_energy,
+                max_energy=max_energy,
+                poly=np.poly1d(poly_params),
+            )
+            for min_energy, max_energy, poly_params in zip(
+                min_energies, max_energies, poly1d_params, strict=True
+            )
+        ]
+        return cls(energy_entries=energy_entries)
+
     @property
     def min_energy(self) -> float:
         return min(e.min_energy for e in self.energy_entries)
@@ -147,30 +166,17 @@ class LookupTable(RootModel[dict[Pol, EnergyCoverage]]):
     def __init__(self, root: dict[Pol, EnergyCoverage] | None = None):
         super().__init__(root=root or {})
 
-    # ToDo - Generate needs to support multiple EnergyCoverageEntry?
-    # Update tests
-
     @classmethod
     def generate(
         cls: type[Self],
         pols: list[Pol],
-        min_energies: list[float],
-        max_energies: list[float],
-        poly1d_params: list[list[float]],
+        energy_coverage: list[EnergyCoverage],
     ) -> Self:
         """Generate a LookupTable containing multiple EnergyCoverage
         for provided polarisations."""
         lut = cls()
         for i in range(len(pols)):
-            lut.root[pols[i]] = EnergyCoverage(
-                energy_entries=[
-                    EnergyCoverageEntry(
-                        min_energy=min_energies[i],
-                        max_energy=max_energies[i],
-                        poly=np.poly1d(poly1d_params[i]),
-                    )
-                ]
-            )
+            lut.root[pols[i]] = energy_coverage[i]
         return lut
 
     def get_poly(

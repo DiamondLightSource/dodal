@@ -17,25 +17,33 @@ def test_lookup_table_generate(
 ) -> None:
     for i, pol in enumerate(generate_config_lut.polarisations):
         assert pol in lut.root
-        assert lut.root[pol].min_energy == generate_config_lut.min_energies[i]
-        assert lut.root[pol].max_energy == generate_config_lut.max_energies[i]
+        assert (
+            lut.root[pol].min_energy == generate_config_lut.energy_entries[i].min_energy
+        )
+        assert (
+            lut.root[pol].max_energy == generate_config_lut.energy_entries[i].max_energy
+        )
 
-        poly = lut.root[pol].poly(generate_config_lut.min_energies[i])
+        poly = lut.root[pol].poly(generate_config_lut.energy_entries[i].min_energy)
         test_energy = (
-            generate_config_lut.min_energies[i] + generate_config_lut.max_energies[i]
+            generate_config_lut.energy_entries[i].min_energy
+            + generate_config_lut.energy_entries[i].max_energy
         ) / 2.0
-        assert poly(test_energy) == generate_config_lut.polys[i](test_energy)
+        expected_poly = generate_config_lut.energy_entries[i].poly(test_energy)
+        assert poly(test_energy) == expected_poly(test_energy)
 
 
 def test_lookup_table_get_poly(
     lut: LookupTable, generate_config_lut: GenerateConfigLookupTable
 ) -> None:
     for i in range(len(generate_config_lut.polarisations)):
+        min_energy = generate_config_lut.energy_entries[i].min_energy
         poly = lut.get_poly(
-            energy=generate_config_lut.min_energies[i],
+            energy=min_energy,
             pol=generate_config_lut.polarisations[i],
         )
-        assert poly == generate_config_lut.polys[i]
+        expected_poly = generate_config_lut.energy_entries[i].poly(min_energy)
+        assert poly == expected_poly
 
 
 def test_lookup_table_is_serialisable(lut: LookupTable) -> None:

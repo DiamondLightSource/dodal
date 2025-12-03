@@ -1,22 +1,36 @@
-import numpy as np
 import pytest
 from pytest import FixtureRequest
 
 from dodal.devices.insertion_device.apple2_undulator import Pol
-from dodal.devices.insertion_device.lookup_table_models import LookupTable
+from dodal.devices.insertion_device.lookup_table_models import (
+    EnergyCoverage,
+    LookupTable,
+)
 from tests.devices.insertion_device.util import GenerateConfigLookupTable
 
 
 @pytest.fixture(
     params=[
         GenerateConfigLookupTable(
-            [Pol.LH], [100], [200], [np.poly1d([2.0, -1.0, 0.5])]
+            [Pol.LH],
+            [
+                EnergyCoverage.generate(
+                    min_energies=[100],
+                    max_energies=[200],
+                    poly1d_params=[[2.0, -1.0, 0.5]],
+                )
+            ],
         ),
         GenerateConfigLookupTable(
             [Pol.LH, Pol.LV],
-            [100, 200],
-            [150.0, 250.0],
-            [np.poly1d([1.0, 0.0]), np.poly1d([0.5, 1.0])],
+            [
+                EnergyCoverage.generate(
+                    min_energies=[100], max_energies=[150], poly1d_params=[[1.0, 0.0]]
+                ),
+                EnergyCoverage.generate(
+                    min_energies=[200], max_energies=[250], poly1d_params=[[0.5, 1.0]]
+                ),
+            ],
         ),
     ]
 )
@@ -28,7 +42,5 @@ def generate_config_lut(request: FixtureRequest) -> GenerateConfigLookupTable:
 def lut(generate_config_lut: GenerateConfigLookupTable) -> LookupTable:
     return LookupTable.generate(
         pols=generate_config_lut.polarisations,
-        min_energies=generate_config_lut.min_energies,
-        max_energies=generate_config_lut.max_energies,
-        poly1d_params=generate_config_lut.polys,
+        energy_coverage=generate_config_lut.energy_entries,
     )
