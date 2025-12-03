@@ -26,7 +26,7 @@ structure:
 import csv
 import io
 from collections.abc import Generator
-from typing import Self
+from typing import Any, Self
 
 import numpy as np
 from pydantic import (
@@ -219,7 +219,7 @@ def convert_csv_to_lookup(
     LookupTable
     """
 
-    def process_row(row: dict, lut: LookupTable) -> None:
+    def process_row(row: dict[str, Any], lut: LookupTable) -> None:
         """Process a single row from the CSV file and update the lookup table."""
         mode_value = str(row[lut_config.mode]).lower()
         mode_value = lut_config.mode_name_convert.get(mode_value, mode_value)
