@@ -10,18 +10,14 @@ structure:
 
 {
   "POL_MODE": {
-    "energies": {
-      "<min_energy>": {
-        "low": <float>,
-        "high": <float>,
-        "poly": <numpy.poly1d>
-      },
+    "energy_entries": [
+        {
+            "low": <float>,
+            "high": <float>,
+            "poly": <numpy.poly1d>
+        },
       ...
-    },
-    "limit": {
-      "minimum": <float>,
-      "maximum": <float>
-    }
+    ]
   },
 }
 
@@ -109,19 +105,11 @@ class EnergyCoverage(BaseModel):
 
     @property
     def min_energy(self) -> float:
-        min_e = 0
-        for energy_coverage in self.energy_entries:
-            if energy_coverage.min_energy < min_e or min_e == 0:
-                min_e = energy_coverage.min_energy
-        return min_e
+        return min(e.min_energy for e in self.energy_entries)
 
     @property
     def max_energy(self) -> float:
-        max_e = 0
-        for energy_coverage in self.energy_entries:
-            if energy_coverage.max_energy > max_e:
-                max_e = energy_coverage.max_energy
-        return max_e
+        return max(e.max_energy for e in self.energy_entries)
 
     def poly(self, energy: float) -> np.poly1d:
         """
@@ -131,13 +119,10 @@ class EnergyCoverage(BaseModel):
         -----------
         energy:
             Energy value in the same units used to create the lookup table.
-        pol:
-            Polarisation mode (Pol enum).
         """
         # Cache initial values so don't do unnecessary work again
         min_energy = self.min_energy
         max_energy = self.max_energy
-
         if energy < min_energy or energy > max_energy:
             raise ValueError(
                 "Demanding energy must lie between"
@@ -145,13 +130,12 @@ class EnergyCoverage(BaseModel):
                 + f" and {max_energy} eV!"
             )
         else:
-            for energy_range in self.energy_entries:
+            for energy_coverage in self.energy_entries:
                 if (
-                    energy >= energy_range.min_energy
-                    and energy < energy_range.max_energy
+                    energy >= energy_coverage.min_energy
+                    and energy < energy_coverage.max_energy
                 ):
-                    return energy_range.poly
-
+                    return energy_coverage.poly
         raise ValueError(
             "Cannot find polynomial coefficients for your requested energy."
             + " There might be gap in the calibration lookup table."
@@ -162,6 +146,9 @@ class LookupTable(RootModel[dict[Pol, EnergyCoverage]]):
     # Allow to auto specify a dict if one not provided
     def __init__(self, root: dict[Pol, EnergyCoverage] | None = None):
         super().__init__(root=root or {})
+
+    # ToDo - Generate needs to support multiple EnergyCoverageEntry?
+    # Update tests
 
     @classmethod
     def generate(
