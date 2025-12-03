@@ -231,7 +231,7 @@ def convert_csv_to_lookup(
         energy_entry = EnergyCoverageEntry(
             min_energy=float(row[lut_config.min_energy]),
             max_energy=float(row[lut_config.max_energy]),
-            poly=np.poly1d(coefficients),
+            poly=coefficients,
         )
         if mode_value not in lut.root:
             lut.root[mode_value] = EnergyCoverage(energy_entries=[energy_entry])
