@@ -1,9 +1,9 @@
 {
     "lh": {
-        "energies": {
-            "0.104": {
-                "low": 0.104,
-                "high": 1.2,
+        "energy_entries": [
+            {
+                "min_energy": 0.104,
+                "max_energy": 1.2,
                 "poly": [
                     755.90853,
                     -4623.70738,
@@ -17,17 +17,13 @@
                     0.52071
                 ]
             }
-        },
-        "limit": {
-            "minimum": 0.104,
-            "maximum": 1.2
-        }
+        ]
     },
     "lv": {
-        "energies": {
-            "0.22": {
-                "low": 0.22,
-                "high": 1.0,
+        "energy_entries": [
+            {
+                "min_energy": 0.22,
+                "max_energy": 1.0,
                 "poly": [
                     39.34346,
                     -128.83048,
@@ -37,17 +33,13 @@
                     5.33595
                 ]
             }
-        },
-        "limit": {
-            "minimum": 0.22,
-            "maximum": 1.0
-        }
+        ]
     },
     "pc": {
-        "energies": {
-            "0.145": {
-                "low": 0.145,
-                "high": 1.2,
+        "energy_entries": [
+            {
+                "min_energy": 0.145,
+                "max_energy": 1.2,
                 "poly": [
                     47.22008,
                     -167.93323,
@@ -57,17 +49,13 @@
                     5.32869
                 ]
             }
-        },
-        "limit": {
-            "minimum": 0.145,
-            "maximum": 1.2
-        }
+        ]
     },
     "nc": {
-        "energies": {
-            "0.145": {
-                "low": 0.145,
-                "high": 1.2,
+        "energy_entries": [
+            {
+                "min_energy": 0.145,
+                "max_energy": 1.2,
                 "poly": [
                     47.22008,
                     -167.93323,
@@ -77,17 +65,13 @@
                     5.25639
                 ]
             }
-        },
-        "limit": {
-            "minimum": 0.145,
-            "maximum": 1.2
-        }
+        ]
     },
     "lh3": {
-        "energies": {
-            "0.7": {
-                "low": 0.7,
-                "high": 2.0,
+        "energy_entries": [
+            {
+                "min_energy": 0.7,
+                "max_energy": 2.0,
                 "poly": [
                     1.74461,
                     -9.36535,
@@ -95,10 +79,6 @@
                     10.98969
                 ]
             }
-        },
-        "limit": {
-            "minimum": 0.7,
-            "maximum": 2.0
-        }
+        ]
     }
 }

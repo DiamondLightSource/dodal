@@ -77,9 +77,7 @@ class J09Apple2Controller(Apple2Controller[Apple2[UndulatorPhaseAxes]]):
         target_energy = await self.energy.get_value()
         if value is not Pol.LH:
             self._polarisation_setpoint_set(Pol.LH)
-            max_lh_energy = float(
-                self.gap_energy_motor_lut.lut.root[Pol.LH].limit.maximum
-            )
+            max_lh_energy = self.gap_energy_motor_lut.lut.root[Pol.LH].max_energy
             lh_setpoint = (
                 max_lh_energy if target_energy > max_lh_energy else target_energy
             )

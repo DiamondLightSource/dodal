@@ -17,26 +17,28 @@ def test_lookup_table_generate(
 ) -> None:
     for i, pol in enumerate(generate_config_lut.polarisations):
         assert pol in lut.root
-        assert lut.root[pol].limit.minimum == generate_config_lut.min_energies[i]
-        assert lut.root[pol].limit.maximum == generate_config_lut.max_energies[i]
-        assert generate_config_lut.min_energies[i] in lut.root[pol].energies.root
+        expected_min_energy = generate_config_lut.energy_coveragies[i].min_energy
+        expected_max_energy = generate_config_lut.energy_coveragies[i].max_energy
+        assert lut.root[pol].min_energy == expected_min_energy
+        assert lut.root[pol].max_energy == expected_max_energy
 
-        poly = lut.root[pol].energies.root[generate_config_lut.min_energies[i]].poly
-        test_energy = (
-            generate_config_lut.min_energies[i] + generate_config_lut.max_energies[i]
-        ) / 2.0
-        assert poly(test_energy) == generate_config_lut.polys[i](test_energy)
+        poly = lut.root[pol].get_poly(expected_min_energy)
+        test_energy = (expected_min_energy + expected_max_energy) / 2.0
+        expected_poly = generate_config_lut.energy_coveragies[i].get_poly(test_energy)
+        assert poly(test_energy) == expected_poly(test_energy)
 
 
 def test_lookup_table_get_poly(
     lut: LookupTable, generate_config_lut: GenerateConfigLookupTable
 ) -> None:
     for i in range(len(generate_config_lut.polarisations)):
+        min_energy = generate_config_lut.energy_coveragies[i].min_energy
         poly = lut.get_poly(
-            energy=generate_config_lut.min_energies[i],
+            energy=min_energy,
             pol=generate_config_lut.polarisations[i],
         )
-        assert poly == generate_config_lut.polys[i]
+        expected_poly = generate_config_lut.energy_coveragies[i].get_poly(min_energy)
+        assert poly == expected_poly
 
 
 def test_lookup_table_is_serialisable(lut: LookupTable) -> None:
@@ -77,10 +79,10 @@ def test_convert_csv_to_lookup_overwrite_name_convert_default(
     assert Pol.LH in lut.root
     assert Pol.LV in lut.root
     # Check polynomials evaluate as expected
-    poly_lh = lut.root[Pol.LH].energies.root[100.0].poly
+    poly_lh = lut.root[Pol.LH].get_poly(100)
     assert poly_lh(150.0) == pytest.approx(np.poly1d([2.0, 1.0])(150.0))
 
-    poly_lv = lut.root[Pol.LV].energies.root[200.0].poly
+    poly_lv = lut.root[Pol.LV].get_poly(200)
     assert poly_lv(250.0) == pytest.approx(np.poly1d([1.0, 0.0])(250.0))
 
 
