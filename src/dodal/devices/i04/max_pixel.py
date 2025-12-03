@@ -5,7 +5,7 @@ from ophyd_async.core import AsyncStatus, StandardReadable, soft_signal_r_and_se
 from ophyd_async.epics.core import (
     epics_signal_r,
 )
-
+from time import sleep
 # kernal size describes how many of the neigbouring pixels are used for the blur,
 # higher kernal size means more of a blur effect
 KERNAL_SIZE = (7, 7)
@@ -21,14 +21,15 @@ class MaxPixel(StandardReadable, Triggerable):
 
     @AsyncStatus.wrap
     async def trigger(self):
+        sleep(0.5)
         img_data = await self.array_data.get_value()
-        arr = await convert_to_gray_and_blur(img_data)
+        arr = convert_to_gray_and_blur(img_data)
         max_val = float(np.max(arr))  # np.int64
         assert isinstance(max_val, float)
         self._max_val_setter(max_val)
 
 
-async def convert_to_gray_and_blur(data):
+def convert_to_gray_and_blur(data):
     """
     Preprocess the image array data (convert to grayscale and apply a gaussian blur)
     Image is converted to grayscale (using a weighted mean as green contributes more to brightness)

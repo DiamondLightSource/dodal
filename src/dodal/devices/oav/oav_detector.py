@@ -22,6 +22,8 @@ from dodal.devices.oav.oav_parameters import (
 )
 from dodal.devices.oav.snapshots.snapshot import Snapshot
 from dodal.devices.oav.snapshots.snapshot_with_grid import SnapshotWithGrid
+import asyncio
+from mx_bluesky.common.utils.log import LOGGER
 
 
 class Coords(IntEnum):
@@ -71,11 +73,37 @@ class ZoomController(BaseZoomController):
 
         # Level is the string description of the zoom level e.g. "1.0x" or "1.0"
         self.level = epics_signal_rw(str, f"{prefix}MP:SELECT")
+
+        self.x_placeholder_zoom_1 = epics_signal_rw(float, f"{prefix}PBCX:VALA")
+        self.x_placeholder_zoom_2 = epics_signal_rw(float, f"{prefix}PBCX:VALB")
+        self.x_placeholder_zoom_3 = epics_signal_rw(float, f"{prefix}PBCX:VALC")
+        self.x_placeholder_zoom_4 = epics_signal_rw(float, f"{prefix}PBCX:VALD")
+        self.x_placeholder_zoom_5 = epics_signal_rw(float, f"{prefix}PBCX:VALE")
+        self.x_placeholder_zoom_6 = epics_signal_rw(float, f"{prefix}PBCX:VALF")
+        self.x_placeholder_zoom_7 = epics_signal_rw(float, f"{prefix}PBCX:VALG")
+        self.x_placeholder_zoom_8 = epics_signal_rw(float, f"{prefix}PBCX:VALH")
+
+        self.y_placeholder_zoom_1 = epics_signal_rw(float, f"{prefix}PBCY:VALA")
+        self.y_placeholder_zoom_2 = epics_signal_rw(float, f"{prefix}PBCY:VALB")
+        self.y_placeholder_zoom_3 = epics_signal_rw(float, f"{prefix}PBCY:VALC")
+        self.y_placeholder_zoom_4 = epics_signal_rw(float, f"{prefix}PBCY:VALD")
+        self.y_placeholder_zoom_5 = epics_signal_rw(float, f"{prefix}PBCY:VALE")
+        self.y_placeholder_zoom_6 = epics_signal_rw(float, f"{prefix}PBCY:VALF")
+        self.y_placeholder_zoom_7 = epics_signal_rw(float, f"{prefix}PBCY:VALG")
+        self.y_placeholder_zoom_8 = epics_signal_rw(float, f"{prefix}PBCY:VALH")
+
+        self._zoom_done_move = epics_signal_rw(float, f"{prefix}MP:DMOV")
+        self._zoom_in_pos= epics_signal_rw(float, f"{prefix}MP:INPOS")
+
         super().__init__(name=name)
 
     @AsyncStatus.wrap
     async def set(self, value: str):
         await self.level.set(value, wait=True)
+        LOGGER.info("waiting 2 seconds for zoom to move...")
+        await asyncio.sleep(1)
+        # await self._zoom_done_move.set(1)
+        # await self._zoom_in_pos.set(1)
 
 
 class OAV(StandardReadable):
@@ -118,6 +146,11 @@ class OAV(StandardReadable):
             self.zoom_controller = zoom_controller
 
         self.cam = Cam(f"{prefix}CAM:", name=name)
+
+                                                    
+                                                    
+                                                    
+
         with self.add_children_as_readables():
             self.grid_snapshot = SnapshotWithGrid(
                 f"{prefix}{mjpeg_prefix}:", name, mjpg_x_size_pv, mjpg_y_size_pv

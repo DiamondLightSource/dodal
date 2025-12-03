@@ -10,7 +10,7 @@ from dodal.devices.i04.max_pixel import convert_to_gray_and_blur
 from dodal.log import LOGGER
 
 
-async def binary_img(img, img_name="Threshold"):
+def binary_img(img, img_name="Threshold"):
     """
     Function which creates a binary image from a beamline image. This is where the
     pixels of an image are converted to one of two values (a high and a low value).
@@ -19,7 +19,7 @@ async def binary_img(img, img_name="Threshold"):
     The threshold is increased by 10 (brightness taken from image in grayscale)
     in order to get more the centre of the beam.
     """
-    blurred = await convert_to_gray_and_blur(img)
+    blurred = convert_to_gray_and_blur(img)
     assert blurred is not None, "Image is None before thresholding"
     print(blurred.shape, blurred.dtype)
 
@@ -64,7 +64,7 @@ class CentreEllipseMethod(StandardReadable, Triggerable):
     @AsyncStatus.wrap
     async def trigger(self):
         array_data = await self.array_signal.get_value()
-        binary = await binary_img(array_data)
+        binary = binary_img(array_data)
         ellipse_fit = self.fit_ellipse(binary)
         centre_x = ellipse_fit[0][0]
         centre_y = ellipse_fit[0][1]
