@@ -17,18 +17,13 @@ def test_lookup_table_generate(
 ) -> None:
     for i, pol in enumerate(generate_config_lut.polarisations):
         assert pol in lut.root
-        assert (
-            lut.root[pol].min_energy == generate_config_lut.energy_entries[i].min_energy
-        )
-        assert (
-            lut.root[pol].max_energy == generate_config_lut.energy_entries[i].max_energy
-        )
+        expected_min_energy = generate_config_lut.energy_entries[i].min_energy
+        expected_max_energy = generate_config_lut.energy_entries[i].max_energy
+        assert lut.root[pol].min_energy == expected_min_energy
+        assert lut.root[pol].max_energy == expected_max_energy
 
-        poly = lut.root[pol].poly(generate_config_lut.energy_entries[i].min_energy)
-        test_energy = (
-            generate_config_lut.energy_entries[i].min_energy
-            + generate_config_lut.energy_entries[i].max_energy
-        ) / 2.0
+        poly = lut.root[pol].poly(expected_min_energy)
+        test_energy = (expected_min_energy + expected_max_energy) / 2.0
         expected_poly = generate_config_lut.energy_entries[i].poly(test_energy)
         assert poly(test_energy) == expected_poly(test_energy)
 
