@@ -19,8 +19,8 @@ structure:
       ...
     ]
   },
+  ...
 }
-
 """
 
 import csv
@@ -132,7 +132,7 @@ class EnergyCoverage(BaseModel):
 
     def poly(self, energy: float) -> np.poly1d:
         """
-        Return the numpy.poly1d polynomial applicable for the given energy and polarisation.
+        Return the numpy.poly1d polynomial applicable for the given energy.
 
         Parameters:
         -----------
@@ -222,31 +222,21 @@ def convert_csv_to_lookup(
     def process_row(row: dict, lut: LookupTable) -> None:
         """Process a single row from the CSV file and update the lookup table."""
         mode_value = str(row[lut_config.mode]).lower()
-        if mode_value in lut_config.mode_name_convert:
-            mode_value = lut_config.mode_name_convert[f"{mode_value}"]
+        mode_value = lut_config.mode_name_convert.get(mode_value, mode_value)
         mode_value = Pol(mode_value)
 
         # Create polynomial object for energy-to-gap/phase conversion
         coefficients = np.poly1d([float(row[coef]) for coef in lut_config.poly_deg])
 
+        energy_entry = EnergyCoverageEntry(
+            min_energy=float(row[lut_config.min_energy]),
+            max_energy=float(row[lut_config.max_energy]),
+            poly=np.poly1d(coefficients),
+        )
         if mode_value not in lut.root:
-            lut.root[mode_value] = EnergyCoverage(
-                energy_entries=[
-                    EnergyCoverageEntry(
-                        min_energy=float(row[lut_config.min_energy]),
-                        max_energy=float(row[lut_config.max_energy]),
-                        poly=coefficients,
-                    )
-                ]
-            )
+            lut.root[mode_value] = EnergyCoverage(energy_entries=[energy_entry])
         else:
-            lut.root[mode_value].energy_entries.append(
-                EnergyCoverageEntry(
-                    min_energy=float(row[lut_config.min_energy]),
-                    max_energy=float(row[lut_config.max_energy]),
-                    poly=np.poly1d(coefficients),
-                )
-            )
+            lut.root[mode_value].energy_entries.append(energy_entry)
 
     reader = csv.DictReader(read_file_and_skip(file_contents, skip_line_start_with))
     lut = LookupTable()
