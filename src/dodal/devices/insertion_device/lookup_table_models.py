@@ -130,7 +130,7 @@ class EnergyCoverage(BaseModel):
     def max_energy(self) -> float:
         return max(e.max_energy for e in self.energy_entries)
 
-    def poly(self, energy: float) -> np.poly1d:
+    def get_poly(self, energy: float) -> np.poly1d:
         """
         Return the numpy.poly1d polynomial applicable for the given energy.
 
@@ -194,7 +194,7 @@ class LookupTable(RootModel[dict[Pol, EnergyCoverage]]):
         pol:
             Polarisation mode (Pol enum).
         """
-        return self.root[pol].poly(energy)
+        return self.root[pol].get_poly(energy)
 
 
 def convert_csv_to_lookup(

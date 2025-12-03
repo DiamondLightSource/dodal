@@ -22,7 +22,7 @@ def test_lookup_table_generate(
         assert lut.root[pol].min_energy == expected_min_energy
         assert lut.root[pol].max_energy == expected_max_energy
 
-        poly = lut.root[pol].poly(expected_min_energy)
+        poly = lut.root[pol].get_poly(expected_min_energy)
         test_energy = (expected_min_energy + expected_max_energy) / 2.0
         expected_poly = generate_config_lut.energy_entries[i].poly(test_energy)
         assert poly(test_energy) == expected_poly(test_energy)
@@ -79,10 +79,10 @@ def test_convert_csv_to_lookup_overwrite_name_convert_default(
     assert Pol.LH in lut.root
     assert Pol.LV in lut.root
     # Check polynomials evaluate as expected
-    poly_lh = lut.root[Pol.LH].poly(100)
+    poly_lh = lut.root[Pol.LH].get_poly(100)
     assert poly_lh(150.0) == pytest.approx(np.poly1d([2.0, 1.0])(150.0))
 
-    poly_lv = lut.root[Pol.LV].poly(200)
+    poly_lv = lut.root[Pol.LV].get_poly(200)
     assert poly_lv(250.0) == pytest.approx(np.poly1d([1.0, 0.0])(250.0))
 
 
