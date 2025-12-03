@@ -25,12 +25,12 @@ def test_energy_motor_lookup_find_value_in_lookup_table(
     generate_config_lut: GenerateConfigLookupTable,
 ) -> None:
     for i in range(len(generate_config_lut.polarisations)):
-        energy = generate_config_lut.energy_entries[i].min_energy
+        energy = generate_config_lut.energy_coveragies[i].min_energy
         value = energy_motor_lookup.find_value_in_lookup_table(
             energy=energy,
             pol=generate_config_lut.polarisations[i],
         )
-        expected_poly = generate_config_lut.energy_entries[i].poly(energy)
+        expected_poly = generate_config_lut.energy_coveragies[i].get_poly(energy)
         expected_value = expected_poly(energy)
         assert value == expected_value
 
@@ -54,7 +54,9 @@ def test_energy_motor_lookup_find_value_in_lookup_table_updates_lut_if_lut_empty
     mock_lut = MagicMock(wraps=LookupTable())
     # Set the lut data to empty to force an update
     mock_lut.root = {}
-    mock_lut.get_poly.return_value = generate_config_lut.energy_entries[0].poly(energy)
+    mock_lut.get_poly.return_value = generate_config_lut.energy_coveragies[0].get_poly(
+        energy
+    )
 
     # Replace methods and data with mocks
     energy_motor_lookup.lut = mock_lut

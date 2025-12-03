@@ -13,8 +13,8 @@ from tests.devices.insertion_device.util import GenerateConfigLookupTable
     params=[
         # Single polarisation entry with multiple energy coverage entries e.g i10
         GenerateConfigLookupTable(
-            [Pol.LH],
-            [
+            polarisations=[Pol.LH],
+            energy_coveragies=[
                 EnergyCoverage.generate(
                     min_energies=[100, 200],
                     max_energies=[200, 250],
@@ -24,8 +24,8 @@ from tests.devices.insertion_device.util import GenerateConfigLookupTable
         ),
         # Mutiple polarisation entries with single energy coverage entry e.g i09
         GenerateConfigLookupTable(
-            [Pol.LH, Pol.LV],
-            [
+            polarisations=[Pol.LH, Pol.LV],
+            energy_coveragies=[
                 EnergyCoverage.generate(
                     min_energies=[100], max_energies=[150], poly1d_params=[[1.0, 0.0]]
                 ),
@@ -44,5 +44,5 @@ def generate_config_lut(request: FixtureRequest) -> GenerateConfigLookupTable:
 def lut(generate_config_lut: GenerateConfigLookupTable) -> LookupTable:
     return LookupTable.generate(
         pols=generate_config_lut.polarisations,
-        energy_coverage=generate_config_lut.energy_entries,
+        energy_coverage=generate_config_lut.energy_coveragies,
     )
