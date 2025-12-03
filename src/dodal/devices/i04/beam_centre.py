@@ -70,3 +70,66 @@ class CentreEllipseMethod(StandardReadable, Triggerable):
         centre_y = ellipse_fit[0][1]
         self._center_x_val_setter(centre_x)
         self._center_y_val_setter(centre_y)
+
+
+from scipy.optimize import curve_fit
+
+
+# to get vertical do array_data[:, cX]
+# to get horizonAL do array_data[cY, :]
+# need to call with cX for horizontal slice and cY for vertical slice
+def gauss(x, A, mu, H, sigma):
+    return (A * np.exp(-((x - mu) ** 2) / (2 * sigma**2))) + H
+
+
+# h_slice = img[cY, :]
+import numpy as np
+from scipy.optimize import curve_fit
+
+
+def gauss(x, A, mu, H, sigma):
+    return (A * np.exp(-((x - mu) ** 2) / (2 * sigma**2))) + H
+
+
+def fit_ellipse_and_get_errors_for_horizontal(input_array, cX, cY, window=50):
+    """
+    Fit a Gaussian to a horizontal slice of the image and return
+    the center offset and residuals.
+
+    Parameters:
+        input_array (np.ndarray): 1D horizontal slice of the image.
+        cX (int): X-coordinate of the center.
+        cY (int): Y-coordinate of the center (used for offset).
+        window (int): Half-width of fitting window around cX.
+
+    Returns:
+        offset (float): Difference between fitted mean and cY.
+        residuals (np.ndarray): y_fit - fitted_y for the chosen window.
+        fit_params (tuple): (A, mu, H, sigma) from the fit.
+    """
+    pixel_no_h = np.arange(len(input_array))
+
+    # Define fitting window
+    start = int(max(0, cX - window))
+    end = int(min(len(input_array), cX + window))
+
+    x_fit = pixel_no_h[start:end]
+    y_fit = input_array[start:end]
+
+    # Fit Gaussian
+    parameters, _ = curve_fit(
+        gauss, x_fit, y_fit, p0=[max(y_fit), cX, np.min(y_fit), 5]
+    )
+    fit_A, fit_mu, fit_H, fit_sigma = parameters
+
+    # Compute fitted curve
+    fit_y = gauss(x_fit, fit_A, fit_mu, fit_H, fit_sigma)
+
+    # Residuals
+    residuals = y_fit - fit_y
+    overall_ssr = np.sum(residuals**2)
+
+    # Offset from expected center
+    offset = fit_mu - cY
+
+    return offset, overall_ssr
