@@ -8,7 +8,7 @@ import pytest
 from bluesky.protocols import Readable
 from ophyd_async.epics.motor import Motor
 
-from dodal.beamlines import i03, i23
+from dodal.beamlines import i04, i23
 from dodal.devices.diamond_filter import DiamondFilter, I03Filters
 from dodal.utils import (
     AnyDevice,
@@ -288,7 +288,7 @@ def test_connect_immediately_passed_to_device_factory(fake_device_factory_beamli
     mock_device.connect.assert_not_called()
 
 
-def test_device_factory_can_rename(RE, fake_device_factory_beamline):
+def test_device_factory_can_rename(fake_device_factory_beamline):
     cryo = fake_device_factory_beamline.device_c(mock=True, connect_immediately=True)
     assert cryo.name == "device_c"
     assert cryo.fine.name == "device_c-fine"
@@ -313,7 +313,7 @@ def test_invalid_beamline_variable_causes_get_device_module_to_raise(bl):
         get_beamline_based_on_environment_variable()
 
 
-@pytest.mark.parametrize("bl,module", [("i03", i03), ("i23", i23)])
+@pytest.mark.parametrize("bl,module", [("i04", i04), ("i23", i23)])
 def test_valid_beamline_variable_causes_get_device_module_to_return_module(bl, module):
     with patch.dict(os.environ, {"BEAMLINE": bl}):
         assert get_beamline_based_on_environment_variable() == module
@@ -488,40 +488,24 @@ def test_is_v2_device_type(input: Any, expected_result: bool):
 
 
 def test_calling_factory_with_different_args_raises_an_exception():
-    i03.undulator(daq_configuration_path=MOCK_DAQ_CONFIG_PATH)
+    i04.oav(params=MagicMock())
     with pytest.raises(
         RuntimeError,
         match="Device factory method called multiple times with different parameters",
     ):
-        i03.undulator(daq_configuration_path=MOCK_DAQ_CONFIG_PATH + "x")
-    i03.undulator.cache_clear()
+        i04.oav(params=MagicMock())
+    i04.oav.cache_clear()
 
 
-def test_calling_factory_with_different_args_does_not_raise_an_exception_after_cache_clear(
-    alternate_config,
-):
-    i03.undulator(daq_configuration_path=MOCK_DAQ_CONFIG_PATH)
-    i03.undulator.cache_clear()
-    i03.undulator(daq_configuration_path=alternate_config)
-    i03.undulator.cache_clear()
+def test_calling_factory_with_different_args_does_not_raise_an_exception_after_cache_clear():
+    i04.oav(params=MagicMock())
+    i04.oav.cache_clear()
+    i04.oav(params=MagicMock())
+    i04.oav.cache_clear()
 
 
-def test_factories_can_be_called_in_any_order(alternate_config):
-    i03.undulator_dcm(daq_configuration_path=alternate_config)
-    i03.undulator(daq_configuration_path=alternate_config)
-
-    i03.undulator_dcm.cache_clear()
-    i03.undulator.cache_clear()
-
-    i03.undulator(daq_configuration_path=alternate_config)
-    i03.undulator_dcm(daq_configuration_path=alternate_config)
-
-    i03.undulator.cache_clear()
-    i03.undulator_dcm.cache_clear()
-
-
-def test_factory_calls_are_cached(alternate_config):
-    undulator1 = i03.undulator(daq_configuration_path=alternate_config)
-    undulator2 = i03.undulator(daq_configuration_path=alternate_config)
+def test_factory_calls_are_cached():
+    undulator1 = i04.undulator()
+    undulator2 = i04.undulator()
     assert undulator1 is undulator2
-    i03.undulator.cache_clear()
+    i04.undulator.cache_clear()

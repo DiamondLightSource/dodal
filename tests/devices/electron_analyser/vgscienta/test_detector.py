@@ -1,8 +1,6 @@
 import numpy as np
 import pytest
-from bluesky import RunEngine
-from ophyd_async.core import init_devices
-from ophyd_async.testing import set_mock_value
+from ophyd_async.core import init_devices, set_mock_value
 
 from dodal.devices.electron_analyser import DualEnergySource
 from dodal.devices.electron_analyser.vgscienta import (
@@ -15,7 +13,6 @@ from dodal.testing.electron_analyser import create_detector
 @pytest.fixture
 async def sim_detector(
     dual_energy_source: DualEnergySource,
-    RE: RunEngine,
 ) -> VGScientaDetector[LensMode, PsuMode, PassEnergy]:
     async with init_devices(mock=True):
         sim_driver = await create_detector(

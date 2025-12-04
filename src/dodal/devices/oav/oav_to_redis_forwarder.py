@@ -9,6 +9,7 @@ from bluesky.protocols import Flyable, Stoppable
 from ophyd_async.core import (
     AsyncStatus,
     DeviceVector,
+    Reference,
     StandardReadable,
     observe_value,
     soft_signal_r_and_setter,
@@ -17,16 +18,17 @@ from ophyd_async.core import (
 from ophyd_async.epics.core import epics_signal_r
 from redis.asyncio import StrictRedis
 
+from dodal.devices.oav.oav_detector import OAV
 from dodal.log import LOGGER
 
 
 async def get_next_jpeg(response: ClientResponse) -> bytes:
-    JPEG_START_BYTE = b"\xff\xd8"
-    JPEG_STOP_BYTE = b"\xff\xd9"
+    jpeg_start_byte = b"\xff\xd8"
+    jpeg_stop_byte = b"\xff\xd9"
     while True:
         line = await response.content.readline()
-        if line.startswith(JPEG_START_BYTE):
-            return line + await response.content.readuntil(JPEG_STOP_BYTE)
+        if line.startswith(jpeg_start_byte):
+            return line + await response.content.readuntil(jpeg_stop_byte)
 
 
 class Source(IntEnum):
@@ -35,13 +37,10 @@ class Source(IntEnum):
 
 
 class OAVSource(StandardReadable):
-    def __init__(
-        self,
-        prefix: str,
-        oav_name: str,
-    ):
-        self.url = epics_signal_r(str, f"{prefix}MJPG_URL_RBV")
-        self.oav_name = oav_name
+    def __init__(self, oav: OAV, label: str):
+        self.url_ref = Reference(oav.snapshot.video_url)
+        self.oav_ref = Reference(oav)
+        self.label = label
         super().__init__()
 
 
@@ -62,6 +61,8 @@ class OAVToRedisForwarder(StandardReadable, Flyable, Stoppable):
     def __init__(
         self,
         prefix: str,
+        oav_roi: OAV,
+        oav_fs: OAV,
         redis_host: str,
         redis_password: str,
         redis_db: int = 0,
@@ -78,13 +79,13 @@ class OAVToRedisForwarder(StandardReadable, Flyable, Stoppable):
             name: str               the name of this device
         """
         self.counter = epics_signal_r(int, f"{prefix}CAM:ArrayCounter_RBV")
-
         self.sources = DeviceVector(
             {
-                Source.ROI.value: OAVSource(f"{prefix}MJPG:", "roi"),
-                Source.FULL_SCREEN.value: OAVSource(f"{prefix}XTAL:", "fullscreen"),
+                Source.ROI.value: OAVSource(oav_roi, "roi"),
+                Source.FULL_SCREEN.value: OAVSource(oav_fs, "fullscreen"),
             }
         )
+
         self.selected_source = soft_signal_rw(int)
 
         self.forwarding_task = None
@@ -120,11 +121,11 @@ class OAVToRedisForwarder(StandardReadable, Flyable, Stoppable):
         self, function_to_do: Callable[[ClientResponse, OAVSource], Awaitable]
     ):
         source_idx = await self.selected_source.get_value()
-        LOGGER.info(
-            f"Forwarding data from sample {await self.sample_id.get_value()} and OAV {source_idx}"
-        )
         source = self.sources[source_idx]
-        stream_url = await source.url.get_value()
+        stream_url = await source.url_ref().get_value()
+        LOGGER.info(
+            f"Forwarding data from sample {await self.sample_id.get_value()} and OAV {source_idx} from URL {stream_url}"
+        )
         async with ClientSession() as session:
             async with session.get(stream_url) as response:
                 await function_to_do(response, source)
@@ -141,12 +142,14 @@ class OAVToRedisForwarder(StandardReadable, Flyable, Stoppable):
             asyncio.wait_for(self._stop_flag.wait(), timeout=self.TIMEOUT)
         )
         async for frame_count in observe_value(self.counter, done_status=done_status):
-            redis_uuid = f"{source.oav_name}-{frame_count}-{uuid4()}"
+            redis_uuid = f"{source.label}-{frame_count}-{uuid4()}"
             await self._get_frame_and_put_to_redis(redis_uuid, response)
 
     async def _confirm_mjpg_stream(self, response: ClientResponse, source: OAVSource):
         if response.content_type != "multipart/x-mixed-replace":
-            raise ValueError(f"{await source.url.get_value()} is not an MJPG stream")
+            raise ValueError(
+                f"{await source.url_ref().get_value()} is not an MJPG stream"
+            )
 
     @AsyncStatus.wrap
     async def kickoff(self):

@@ -25,7 +25,7 @@ from dodal.log import LOGGER
 Tip = Array1D[np.int32]
 
 
-class InvalidPinException(Exception):
+class InvalidPinError(Exception):
     pass
 
 
@@ -67,6 +67,8 @@ class PinTipDetection(StandardReadable):
         )
         self.canny_upper_threshold = soft_signal_rw(int, 100, name="canny_upper")
         self.canny_lower_threshold = soft_signal_rw(int, 50, name="canny_lower")
+        self.open_ksize = soft_signal_rw(int, 0, name="open_ksize")
+        self.open_iterations = soft_signal_rw(int, 5, name="open_iterations")
         self.close_ksize = soft_signal_rw(int, 5, name="close_ksize")
         self.close_iterations = soft_signal_rw(int, 5, name="close_iterations")
         self.scan_direction = soft_signal_rw(
@@ -88,7 +90,7 @@ class PinTipDetection(StandardReadable):
 
     def _set_triggered_values(self, results: SampleLocation):
         if results.tip_x is None or results.tip_y is None:
-            raise InvalidPinException
+            raise InvalidPinError
         else:
             tip = np.array([results.tip_x, results.tip_y])
             self._tip_setter(tip)
@@ -105,7 +107,7 @@ class PinTipDetection(StandardReadable):
 
         try:
             preprocess_func = ARRAY_PROCESSING_FUNCTIONS_MAP[preprocess_key](
-                iter=preprocess_iter, ksize=preprocess_ksize
+                iterations=preprocess_iter, ksize=preprocess_ksize
             )
         except KeyError:
             LOGGER.error("Invalid preprocessing function, using identity")
@@ -121,6 +123,8 @@ class PinTipDetection(StandardReadable):
             preprocess=preprocess_func,
             canny_lower=await self.canny_lower_threshold.get_value(),
             canny_upper=await self.canny_upper_threshold.get_value(),
+            open_ksize=await self.open_ksize.get_value(),
+            open_iterations=await self.open_iterations.get_value(),
             close_ksize=await self.close_ksize.get_value(),
             close_iterations=await self.close_iterations.get_value(),
             scan_direction=direction,
@@ -128,7 +132,7 @@ class PinTipDetection(StandardReadable):
         )
 
         start_time = time.time()
-        location = sample_detection.processArray(array_data)
+        location = sample_detection.process_array(array_data)
         end_time = time.time()
         LOGGER.debug(
             f"Sample location detection took {(end_time - start_time) * 1000.0}ms"

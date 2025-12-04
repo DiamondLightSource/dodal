@@ -4,19 +4,20 @@ import pytest
 from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
 from bluesky.utils import FailedStatus
-from ophyd_async.core import Device, init_devices, soft_signal_rw
-from ophyd_async.epics.motor import Motor
-from ophyd_async.testing import (
+from ophyd_async.core import (
+    Device,
     get_mock_put,
+    init_devices,
     set_mock_value,
+    soft_signal_rw,
 )
+from ophyd_async.epics.motor import Motor
 
 from dodal.plan_stubs.motor_utils import (
-    MoveTooLarge,
+    MoveTooLargeError,
     check_and_cache_values,
     home_and_reset_wrapper,
 )
-from dodal.testing import patch_motor
 
 
 class DeviceWithOnlyMotors(Device):
@@ -70,14 +71,12 @@ def test_given_types_of_device_when_home_and_reset_wrapper_called_then_motors_an
 
 
 def test_given_a_device_when_check_and_cache_values_then_motor_values_returned(
-    my_device,
+    my_device: DeviceWithOnlyMotors, run_engine: RunEngine
 ):
-    RE = RunEngine(call_returns_result=True)
-
     for i, motor in enumerate(my_device.motors, start=1):
         set_mock_value(motor.user_readback, i * 100)
 
-    motors_and_positions: dict[Motor, float] = RE(
+    motors_and_positions: dict[Motor, float] = run_engine(
         check_and_cache_values(dict.fromkeys(my_device.motors, 0.0), 0, 1000)
     ).plan_result  # type: ignore
     cached_positions = motors_and_positions.values()
@@ -97,15 +96,19 @@ def test_given_a_device_when_check_and_cache_values_then_motor_values_returned(
     ],
 )
 def test_given_a_device_with_a_too_large_move_when_check_and_cache_values_then_exception_thrown(
-    RE: RunEngine, my_device: DeviceWithOnlyMotors, initial, max, new_position: float
+    run_engine: RunEngine,
+    my_device: DeviceWithOnlyMotors,
+    initial,
+    max,
+    new_position: float,
 ):
     set_mock_value(my_device.x.user_readback, 10)
     set_mock_value(my_device.y.user_readback, initial)
 
     motors_and_positions = dict.fromkeys(my_device.motors, new_position)
 
-    with pytest.raises(MoveTooLarge) as e:
-        RE(check_and_cache_values(motors_and_positions, 0, max))
+    with pytest.raises(MoveTooLargeError) as e:
+        run_engine(check_and_cache_values(motors_and_positions, 0, max))
         assert e.value.axis == my_device.y
         assert e.value.maximum_move == max
 
@@ -120,16 +123,18 @@ def test_given_a_device_with_a_too_large_move_when_check_and_cache_values_then_e
     ],
 )
 def test_given_a_device_where_one_move_too_small_when_check_and_cache_values_then_other_positions_returned(
-    my_device: DeviceWithOnlyMotors, initial, min, new_position: float
+    my_device: DeviceWithOnlyMotors,
+    initial: float,
+    min: float,
+    new_position: float,
+    run_engine: RunEngine,
 ):
-    RE = RunEngine(call_returns_result=True)
-
     set_mock_value(my_device.x.user_readback, initial)
     set_mock_value(my_device.y.user_readback, 200)
 
     motors_and_new_positions = dict.fromkeys(my_device.motors, new_position)
 
-    motors_and_positions: dict[Motor, float] = RE(
+    motors_and_positions: dict[Motor, float] = run_engine(
         check_and_cache_values(motors_and_new_positions, min, 1000)
     ).plan_result  # type: ignore
     cached_positions = motors_and_positions.values()
@@ -140,16 +145,14 @@ def test_given_a_device_where_one_move_too_small_when_check_and_cache_values_the
 
 
 def test_given_a_device_where_all_moves_too_small_when_check_and_cache_values_then_no_positions_returned(
-    my_device,
+    my_device: DeviceWithOnlyMotors, run_engine: RunEngine
 ):
-    RE = RunEngine(call_returns_result=True)
-
     set_mock_value(my_device.x.user_readback, 10)
     set_mock_value(my_device.y.user_readback, 20)
 
     motors_and_new_positions = dict.fromkeys(my_device.motors, 0.0)
 
-    motors_and_positions: dict[Motor, float] = RE(
+    motors_and_positions: dict[Motor, float] = run_engine(
         check_and_cache_values(motors_and_new_positions, 40, 1000)
     ).plan_result  # type: ignore
     cached_positions = motors_and_positions.values()
@@ -166,8 +169,8 @@ def test_given_a_device_where_all_moves_too_small_when_check_and_cache_values_th
         (74, -89),
     ],
 )
-def test_when_home_and_reset_wrapper_called_with_null_plan_then_motors_homed_and_reset(
-    RE: RunEngine,
+async def test_when_home_and_reset_wrapper_called_with_null_plan_then_motors_homed_and_reset(
+    run_engine: RunEngine,
     my_device,
     initial_x,
     initial_y,
@@ -175,10 +178,10 @@ def test_when_home_and_reset_wrapper_called_with_null_plan_then_motors_homed_and
     def my_plan():
         yield from bps.null()
 
-    patch_motor(my_device.x, initial_x)
-    patch_motor(my_device.y, initial_y)
+    await my_device.x.set(initial_x)
+    await my_device.y.set(initial_y)
 
-    RE(
+    run_engine(
         home_and_reset_wrapper(
             my_plan(),
             my_device,
@@ -205,16 +208,18 @@ def test_when_home_and_reset_wrapper_called_with_null_plan_then_motors_homed_and
         (7, 10),
     ],
 )
-def test_given_motors_already_close_to_home_when_home_and_reset_wrapper_called_then_motors_do_not_move(
-    RE: RunEngine, my_device, initial, min
+async def test_given_motors_already_close_to_home_when_home_and_reset_wrapper_called_then_motors_do_not_move(
+    run_engine: RunEngine, my_device, initial, min
 ):
     def my_plan():
         yield from bps.null()
 
-    patch_motor(my_device.x, initial)
-    patch_motor(my_device.y, initial)
+    await my_device.x.set(initial)
+    await my_device.y.set(initial)
+    get_mock_put(my_device.x.user_setpoint).reset_mock()
+    get_mock_put(my_device.y.user_setpoint).reset_mock()
 
-    RE(
+    run_engine(
         home_and_reset_wrapper(
             my_plan(),
             my_device,
@@ -238,17 +243,19 @@ def test_given_motors_already_close_to_home_when_home_and_reset_wrapper_called_t
         (7, -8, 10, 5),
     ],
 )
-def test_given_an_axis_out_of_range_when_home_and_reset_wrapper_called_then_throws_and_no_motion(
-    RE: RunEngine, my_device, initial_x, initial_y, max, home
+async def test_given_an_axis_out_of_range_when_home_and_reset_wrapper_called_then_throws_and_no_motion(
+    run_engine: RunEngine, my_device, initial_x, initial_y, max, home
 ):
     def my_plan():
         yield from bps.null()
 
-    patch_motor(my_device.x, initial_x)
-    patch_motor(my_device.y, initial_y)
+    await my_device.x.set(initial_x)
+    await my_device.y.set(initial_y)
+    get_mock_put(my_device.x.user_setpoint).reset_mock()
+    get_mock_put(my_device.y.user_setpoint).reset_mock()
 
-    with pytest.raises(MoveTooLarge):
-        RE(
+    with pytest.raises(MoveTooLargeError):
+        run_engine(
             home_and_reset_wrapper(
                 my_plan(),
                 my_device,
@@ -262,22 +269,24 @@ def test_given_an_axis_out_of_range_when_home_and_reset_wrapper_called_then_thro
     get_mock_put(my_device.y.user_setpoint).assert_not_called()
 
 
-class MyException(Exception):
+class MyError(Exception):
     pass
 
 
-def test_given_home_and_reset_inner_plan_fails_reset_still(RE: RunEngine, my_device):
+async def test_given_home_and_reset_inner_plan_fails_reset_still(
+    run_engine: RunEngine, my_device
+):
     initial_x, initial_y = 10, 20
 
     def my_plan():
         yield from bps.null()
-        raise MyException()
+        raise MyError()
 
-    patch_motor(my_device.x, initial_x)
-    patch_motor(my_device.y, initial_y)
+    await my_device.x.set(initial_x)
+    await my_device.y.set(initial_y)
 
-    with pytest.raises(MyException):
-        RE(
+    with pytest.raises(MyError):
+        run_engine(
             home_and_reset_wrapper(
                 my_plan(),
                 my_device,
@@ -299,8 +308,8 @@ def test_given_home_and_reset_inner_plan_fails_reset_still(RE: RunEngine, my_dev
     "move_that_failed",
     ["x", "y"],
 )
-def test_given_move_to_home_fails_reset_still(
-    RE: RunEngine, my_device, move_that_failed
+async def test_given_move_to_home_fails_reset_still(
+    run_engine: RunEngine, my_device, move_that_failed
 ):
     initial_x, initial_y = 10, 20
 
@@ -308,14 +317,14 @@ def test_given_move_to_home_fails_reset_still(
         # This will never get called as fails before
         yield from bps.abs_set(my_device, 45)
 
-    patch_motor(my_device.x, initial_x)
-    patch_motor(my_device.y, initial_y)
+    await my_device.x.set(initial_x)
+    await my_device.y.set(initial_y)
     get_mock_put(
         getattr(my_device, move_that_failed).user_setpoint
-    ).side_effect = MyException()
+    ).side_effect = MyError()
 
     with pytest.raises(FailedStatus) as e:
-        RE(
+        run_engine(
             home_and_reset_wrapper(
                 my_plan(),
                 my_device,
@@ -324,7 +333,7 @@ def test_given_move_to_home_fails_reset_still(
             )
         )
 
-    assert isinstance(e.value.__cause__, MyException)
+    assert isinstance(e.value.__cause__, MyError)
 
     get_mock_put(my_device.x.user_setpoint).assert_has_calls(
         [call(0.0, wait=ANY), call(initial_x, wait=ANY)]

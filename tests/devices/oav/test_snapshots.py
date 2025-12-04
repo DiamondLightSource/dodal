@@ -9,8 +9,7 @@ from aiohttp.client import ClientSession
 from aiohttp.test_utils import TestClient, TestServer, unused_port
 from aiohttp.web import Response
 from aiohttp.web_app import Application
-from ophyd_async.core import init_devices
-from ophyd_async.testing import set_mock_value
+from ophyd_async.core import init_devices, set_mock_value
 from PIL import Image
 
 from dodal.devices.oav.snapshots.snapshot import (
@@ -59,7 +58,7 @@ async def snapshot(
         return test_client.session
 
     with patch(
-        "dodal.devices.areadetector.plugins.MJPG.ClientSession", new=get_session
+        "dodal.devices.areadetector.plugins.mjpg.ClientSession", new=get_session
     ):
         async with init_devices(mock=True):
             fake_snapshot = Snapshot("")
@@ -80,7 +79,7 @@ async def grid_snapshot(
         return test_client.session
 
     with patch(
-        "dodal.devices.areadetector.plugins.MJPG.ClientSession", new=get_session
+        "dodal.devices.areadetector.plugins.mjpg.ClientSession", new=get_session
     ):
         async with init_devices(mock=True):
             fake_grid = SnapshotWithGrid("")

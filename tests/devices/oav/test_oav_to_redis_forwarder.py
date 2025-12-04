@@ -3,9 +3,9 @@ from datetime import timedelta
 from unittest.mock import ANY, AsyncMock, MagicMock, call, patch
 
 import pytest
-from ophyd_async.core import init_devices
-from ophyd_async.testing import set_mock_value
+from ophyd_async.core import init_devices, set_mock_value
 
+from dodal.devices.oav.oav_detector import OAV
 from dodal.devices.oav.oav_to_redis_forwarder import (
     OAVToRedisForwarder,
     Source,
@@ -15,14 +15,20 @@ from dodal.devices.oav.oav_to_redis_forwarder import (
 
 @pytest.fixture
 @patch("dodal.devices.oav.oav_to_redis_forwarder.StrictRedis", new=AsyncMock)
-async def oav_forwarder():
-    with init_devices(mock=True):
-        oav_forwarder = OAVToRedisForwarder("prefix", "host", "password")
+async def oav_forwarder(oav_beam_centre_pv_fs: OAV, oav_beam_centre_pv_roi: OAV):
     set_mock_value(
-        oav_forwarder.sources[Source.FULL_SCREEN.value].url,
+        oav_beam_centre_pv_fs.snapshot.video_url,
         "test-full-screen-stream-url",
     )
-    set_mock_value(oav_forwarder.sources[Source.ROI.value].url, "test-roi-stream-url")
+    set_mock_value(
+        oav_beam_centre_pv_roi.snapshot.video_url,
+        "test-roi-stream-url",
+    )
+    with init_devices(mock=True):
+        oav_forwarder = OAVToRedisForwarder(
+            "prefix", oav_beam_centre_pv_roi, oav_beam_centre_pv_fs, "host", "password"
+        )
+
     set_mock_value(oav_forwarder.selected_source, Source.FULL_SCREEN.value)
     return oav_forwarder
 
@@ -111,8 +117,8 @@ async def test_given_byte_stream_when_get_next_jpeg_called_then_jpeg_bytes_retur
 async def test_when_get_frame_and_put_to_redis_called_then_data_put_in_redis_under_sample_id(
     oav_forwarder,
 ):
-    SAMPLE_ID = 100
-    await oav_forwarder.sample_id.set(SAMPLE_ID)
+    sample_id = 100
+    await oav_forwarder.sample_id.set(sample_id)
     await oav_forwarder._get_frame_and_put_to_redis(ANY, get_mock_response())
     redis_call = oav_forwarder.redis_client.hset.call_args[0]
     assert redis_call[0] == "murko:100:raw"
@@ -132,8 +138,8 @@ async def test_when_get_frame_and_put_to_redis_called_then_data_is_jpeg_bytes(
 async def test_when_get_frame_and_put_to_redis_called_then_data_put_in_redis_with_expiry_time(
     oav_forwarder,
 ):
-    SAMPLE_ID = 100
-    await oav_forwarder.sample_id.set(SAMPLE_ID)
+    sample_id = 100
+    await oav_forwarder.sample_id.set(sample_id)
     await oav_forwarder._get_frame_and_put_to_redis(ANY, get_mock_response())
     redis_expire_call = oav_forwarder.redis_client.expire.call_args[0]
     assert redis_expire_call[0] == "murko:100:raw"

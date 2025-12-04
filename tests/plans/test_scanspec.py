@@ -23,7 +23,7 @@ from dodal.plans import spec_scan
 def documents_from_expected_shape(
     request: pytest.FixtureRequest,
     det: StandardDetector,
-    RE: RunEngine,
+    run_engine: RunEngine,
     x_axis: SimMotor,
     y_axis: SimMotor,
 ) -> dict[str, list[Document]]:
@@ -36,7 +36,7 @@ def documents_from_expected_shape(
         spec = spec * Line(motors[i], 0, 5, shape[i])
 
     docs: dict[str, list[Document]] = {}
-    RE(
+    run_engine(
         spec_scan({det}, spec),  # type: ignore
         lambda name, doc: docs.setdefault(name, []).append(doc),
     )

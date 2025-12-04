@@ -1,7 +1,5 @@
 import pytest
-from bluesky import RunEngine
-from ophyd_async.core import init_devices
-from ophyd_async.testing import set_mock_value
+from ophyd_async.core import init_devices, set_mock_value
 
 from dodal.devices.b07 import LensMode, PsuMode
 from dodal.devices.electron_analyser import EnergySource
@@ -12,7 +10,6 @@ from dodal.testing.electron_analyser import create_detector
 @pytest.fixture
 async def sim_detector(
     single_energy_source: EnergySource,
-    RE: RunEngine,
 ) -> SpecsDetector[LensMode, PsuMode]:
     async with init_devices(mock=True):
         sim_driver = await create_detector(
