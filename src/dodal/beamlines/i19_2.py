@@ -51,8 +51,11 @@ I19_2_ZEBRA_MAPPING = ZebraMapping(
 
 
 @device_factory()
-def diffractometer() -> FourCircleDiffractometer:
-    return FourCircleDiffractometer(prefix=PREFIX.beamline_prefix)
+def backlight() -> BacklightPosition:
+    """Get the i19-2 backlight device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i19-2, it will return the existing object.
+    """
+    return BacklightPosition(prefix=f"{PREFIX.beamline_prefix}-EA-IOC-12:")
 
 
 @device_factory()
@@ -64,14 +67,35 @@ def beamstop() -> BeamStop:
 
 
 @device_factory()
-def zebra() -> Zebra:
-    """Get the i19-2 zebra device, instantiate it if it hasn't already been.
-    If this is called when already instantiated in i19-2, it will return the existing object.
-    """
-    return Zebra(
-        mapping=I19_2_ZEBRA_MAPPING,
-        prefix=f"{PREFIX.beamline_prefix}-EA-ZEBRA-03:",
+def diffractometer() -> FourCircleDiffractometer:
+    return FourCircleDiffractometer(prefix=PREFIX.beamline_prefix)
+
+
+@device_factory()
+def eiger() -> EigerDetector:
+    return EigerDetector(
+        prefix=PREFIX.beamline_prefix,
+        path_provider=get_path_provider(),
+        drv_suffix="-EA-EIGER-01:",
+        hdf_suffix="-EA-EIGER-01:OD:",
     )
+
+
+@device_factory()
+def panda() -> HDFPanda:
+    return HDFPanda(
+        prefix=f"{PREFIX.beamline_prefix}-EA-PANDA-01:",
+        path_provider=get_path_provider(),
+    )
+
+
+@device_factory()
+def pinhole_and_collimator() -> PinholeCollimatorControl:
+    """Get the i19-2 pinhole and collimator control device, instantiate it if it
+    hasn't already been. If this is called when already instantiated in i19-2,
+    it will return the existing object.
+    """
+    return PinholeCollimatorControl(prefix=PREFIX.beamline_prefix)
 
 
 @device_factory()
@@ -95,35 +119,11 @@ def synchrotron() -> Synchrotron:
 
 
 @device_factory()
-def pinhole_and_collimator() -> PinholeCollimatorControl:
-    """Get the i19-2 pinhole and collimator control device, instantiate it if it
-    hasn't already been. If this is called when already instantiated in i19-2,
-    it will return the existing object.
-    """
-    return PinholeCollimatorControl(prefix=PREFIX.beamline_prefix)
-
-
-@device_factory()
-def backlight() -> BacklightPosition:
-    """Get the i19-2 backlight device, instantiate it if it hasn't already been.
+def zebra() -> Zebra:
+    """Get the i19-2 zebra device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i19-2, it will return the existing object.
     """
-    return BacklightPosition(prefix=f"{PREFIX.beamline_prefix}-EA-IOC-12:")
-
-
-@device_factory()
-def panda() -> HDFPanda:
-    return HDFPanda(
-        prefix=f"{PREFIX.beamline_prefix}-EA-PANDA-01:",
-        path_provider=get_path_provider(),
-    )
-
-
-@device_factory()
-def eiger() -> EigerDetector:
-    return EigerDetector(
-        prefix=PREFIX.beamline_prefix,
-        path_provider=get_path_provider(),
-        drv_suffix="-EA-EIGER-01:",
-        hdf_suffix="-EA-EIGER-01:OD:",
+    return Zebra(
+        mapping=I19_2_ZEBRA_MAPPING,
+        prefix=f"{PREFIX.beamline_prefix}-EA-ZEBRA-03:",
     )

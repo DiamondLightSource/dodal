@@ -58,19 +58,6 @@ def oav() -> OAVBeamCentreFile:
     )
 
 
-# NOTE EH1 uses the Zebra 2 box. While a Zebra 1 box exists and is connected
-# on the beamline, it is currently not in use
-@device_factory()
-def zebra() -> Zebra:
-    """Get the i19-1 zebra device, instantiate it if it hasn't already been.
-    If this is called when already instantiated in i19-1, it will return the existing object.
-    """
-    return Zebra(
-        mapping=I19_1_ZEBRA_MAPPING,
-        prefix=f"{PREFIX.beamline_prefix}-EA-ZEBRA-02:",
-    )
-
-
 @device_factory()
 def shutter() -> AccessControlledShutter:
     """Get the i19-1 hutch shutter device, instantiate it if it hasn't already been.
@@ -89,3 +76,16 @@ def synchrotron() -> Synchrotron:
     If this is called when already instantiated in i19-1, it will return the existing object.
     """
     return Synchrotron()
+
+
+# NOTE EH1 uses the Zebra 2 box. While a Zebra 1 box exists and is connected
+# on the beamline, it is currently not in use
+@device_factory()
+def zebra() -> Zebra:
+    """Get the i19-1 zebra device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i19-1, it will return the existing object.
+    """
+    return Zebra(
+        mapping=I19_1_ZEBRA_MAPPING,
+        prefix=f"{PREFIX.beamline_prefix}-EA-ZEBRA-02:",
+    )
