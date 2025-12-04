@@ -137,15 +137,6 @@ def attenuator() -> BinaryFilterAttenuator:
     )
 
 
-# @device_factory()
-# def centre_ellipse() -> CentreEllipseMethod:
-#     """Get the i04 attenuator device, instantiate it if it hasn't already been.
-#     If this is called when already instantiated in i04, it will return the existing object.
-#     """
-#     return CentreEllipseMethod(
-#         prefix=f"{PREFIX.beamline_prefix}-EA-ATTN-01:",
-#     )
-
 @device_factory()
 def transfocator() -> Transfocator:
     """Get the i04 transfocator device, instantiate it if it hasn't already been.
