@@ -1,6 +1,8 @@
 import asyncio
 
 from bluesky.protocols import Movable
+from daq_config_server.client import ConfigServer
+from daq_config_server.converters.models import GenericLookupTable
 from ophyd_async.core import AsyncStatus, Reference, StandardReadable
 
 from dodal.common.beamlines.beamline_parameters import get_beamline_parameters
@@ -39,12 +41,16 @@ class UndulatorDCM(StandardReadable, Movable[float]):
         self.undulator_ref = Reference(undulator)
         self.dcm_ref = Reference(dcm)
 
+        config_server = ConfigServer(url="https://daq-config.diamond.ac.uk")
+
         # These attributes are just used by hyperion for lookup purposes
-        self.pitch_energy_table_path = (
-            daq_configuration_path + "/lookup/BeamLineEnergy_DCM_Pitch_converter.txt"
+        self.pitch_energy_table = config_server.get_file_contents(
+            daq_configuration_path + "/lookup/BeamLineEnergy_DCM_Pitch_converter.txt",
+            GenericLookupTable,
         )
-        self.roll_energy_table_path = (
-            daq_configuration_path + "/lookup/BeamLineEnergy_DCM_Roll_converter.txt"
+        self.roll_energy_table = config_server.get_file_contents(
+            daq_configuration_path + "/lookup/BeamLineEnergy_DCM_Roll_converter.txt",
+            GenericLookupTable,
         )
         # I03 configures the DCM Perp as a side effect of applying this fixed value to the DCM Offset after an energy change
         # Nb this parameter is misleadingly named to confuse you
