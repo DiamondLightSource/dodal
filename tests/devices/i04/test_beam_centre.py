@@ -6,7 +6,7 @@ import numpy as np
 import pytest
 from ophyd_async.core import init_devices
 
-from dodal.devices.i04.beam_centre import CentreEllipseMethod, binary_img
+from dodal.devices.i04.beam_centre import CentreEllipseMethod, binary_img, get_roi
 
 
 @pytest.fixture
@@ -91,11 +91,72 @@ def test_fit_ellipse_raises_error_if_not_enough_contour_points(
 
 @patch("dodal.devices.i04.beam_centre.CentreEllipseMethod.fit_ellipse")
 @patch("dodal.devices.i04.beam_centre.binary_img")
+@patch("dodal.devices.i04.beam_centre.get_roi")
 async def test_trigger(
+    mock_roi_img: MagicMock,
     mock_binary_img: MagicMock,
     mock_fit_ellipse: MagicMock,
     centre_device: CentreEllipseMethod,
 ):
     await centre_device.trigger()
+    mock_roi_img.assert_called_once()
     mock_binary_img.assert_called_once()
     mock_fit_ellipse.assert_called_once()
+
+
+test_img = np.array(
+    [
+        [0, 0, 0, 0, 0],
+        [0, 5, 5, 5, 0],
+        [0, 5, 10, 5, 0],
+        [0, 5, 5, 5, 0],
+        [0, 0, 0, 0, 0],
+    ],
+    dtype=np.uint8,
+)
+
+
+def test_roi_logic():
+    # checking test img
+    assert test_img.shape == (5, 5)
+    assert test_img[2, 2] == 10
+
+    # test previous centre in middle
+    expected_result = [[5, 5, 5], [5, 10, 5], [5, 5, 5]]
+    standard_test = get_roi(
+        image_arr=test_img, current_x=3, current_y=3, dist_from_x=1, dist_from_y=1
+    )
+    assert (standard_test == expected_result).all()
+
+    # test when you go out of bounds for the roi
+    out_of_bounds = get_roi(
+        image_arr=test_img, current_x=3, current_y=3, dist_from_x=10, dist_from_y=50
+    )
+    assert (out_of_bounds == test_img).all()
+
+    # test different dist from x and dist from y
+    diff_x_and_y = get_roi(
+        image_arr=test_img, current_x=3, current_y=3, dist_from_x=2, dist_from_y=1
+    )
+    print(diff_x_and_y)
+    expected_result = [[0, 5, 5, 5, 0], [0, 5, 10, 5, 0], [0, 5, 5, 5, 0]]
+    assert (diff_x_and_y == expected_result).all()
+
+    # test when previous centre is not in middle
+    off_centre = get_roi(
+        image_arr=test_img, current_x=2, current_y=3, dist_from_x=2, dist_from_y=1
+    )
+    expected_result = [[0, 5, 5, 5], [0, 5, 10, 5], [0, 5, 5, 5]]
+    assert (off_centre == expected_result).all()
+
+    # test another off centre and part out of bounds
+    off_centre_2 = get_roi(
+        image_arr=test_img, current_x=2, current_y=2, dist_from_x=2, dist_from_y=2
+    )
+    expected_result = [
+        [0, 0, 0, 0],
+        [0, 5, 5, 5],
+        [0, 5, 10, 5],
+        [0, 5, 5, 5],
+    ]
+    assert (off_centre_2 == expected_result).all()

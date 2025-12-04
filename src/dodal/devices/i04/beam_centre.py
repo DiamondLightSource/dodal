@@ -44,12 +44,12 @@ def get_roi(image_arr, current_x, current_y, dist_from_x=100, dist_from_y=100):
     height, width = image_arr.shape[:2]
 
     # Clip coordinates to stay within bounds
-    x_min = max(current_x - dist_from_x, 0)
+    x_min = max(current_x - dist_from_x, 1)
     x_max = min(current_x + dist_from_x, width)
-    y_min = max(current_y - dist_from_y, 0)
+    y_min = max(current_y - dist_from_y, 1)
     y_max = min(current_y + dist_from_y, height)
 
-    roi_arr = image_arr[y_min:y_max, x_min:x_max]
+    roi_arr = image_arr[y_min - 1 : y_max, x_min - 1 : x_max]
 
     return roi_arr
 
@@ -111,3 +111,6 @@ class CentreEllipseMethod(StandardReadable, Triggerable):
         real_centre_y = centre_y + top_left_corner[1]
         self._center_x_val_setter(real_centre_x)
         self._center_y_val_setter(real_centre_y)
+
+        # here you want to implement the errors of the fit.
+        # Along with something which tells you if the fit is bad.
