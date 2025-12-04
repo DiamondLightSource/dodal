@@ -5,12 +5,14 @@ import pytest
 from bluesky.run_engine import RunEngine
 from ophyd_async.core import (
     DetectorTrigger,
+    Reference,
     TriggerInfo,
     callback_on_mock_put,
     set_mock_value,
 )
-from ophyd_async.fastcs.eiger import EigerDetector as FastEiger
+from ophyd_async.epics.core import epics_signal_r
 
+from dodal.devices.async_adeiger.adeiger import EigerDetector as FastEiger
 from dodal.plans.configure_arm_trigger_and_disarm_detector import (
     configure_arm_trigger_and_disarm_detector,
 )
@@ -19,10 +21,20 @@ from dodal.plans.configure_arm_trigger_and_disarm_detector import (
 @pytest.fixture
 async def fake_eiger():
     fake_eiger = FastEiger("", MagicMock())
+
     await fake_eiger.connect(mock=True)
+
+    set_mock_value(fake_eiger._writer._drv.data_type, "UInt16")
+
     fake_eiger.drv.detector.arm.trigger = AsyncMock()
     fake_eiger.drv.detector.disarm.trigger = AsyncMock()
     fake_eiger._writer.observe_indices_written = fake_observe_indices_written
+
+    bit_depth = epics_signal_r(int, "16")
+    await bit_depth.connect(mock=True)
+    set_mock_value(bit_depth, 16)
+    fake_eiger._writer._detector_bit_depth = Reference(bit_depth)
+
     return fake_eiger
 
 

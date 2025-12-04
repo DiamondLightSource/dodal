@@ -10,9 +10,9 @@ from ophyd_async.core import (
     StaticPathProvider,
     TriggerInfo,
 )
-from ophyd_async.fastcs.eiger import EigerDetector
 
 from dodal.beamlines.i03 import fastcs_eiger
+from dodal.devices.async_adeiger.adeiger import EigerDetector
 from dodal.devices.detector import DetectorParams
 from dodal.log import LOGGER, do_default_logging_setup
 

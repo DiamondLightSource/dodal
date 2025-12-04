@@ -1,6 +1,5 @@
 from pathlib import Path
 
-from ophyd_async.fastcs.eiger import EigerDetector
 from ophyd_async.fastcs.panda import HDFPanda
 
 from dodal.common.beamlines.beamline_utils import (
@@ -12,6 +11,7 @@ from dodal.common.beamlines.beamline_utils import (
     set_beamline as set_utils_beamline,
 )
 from dodal.common.visit import StaticVisitPathProvider
+from dodal.devices.async_adeiger.adeiger import EigerDetector
 from dodal.devices.i19.access_controlled.blueapi_device import HutchState
 from dodal.devices.i19.access_controlled.shutter import AccessControlledShutter
 from dodal.devices.i19.backlight import BacklightPosition

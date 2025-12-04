@@ -1,0 +1,300 @@
+import asyncio
+from asyncio import Event
+from pathlib import Path
+from unittest.mock import ANY, AsyncMock, MagicMock
+
+import pytest
+from ophyd_async.core import (
+    AsyncStatus,
+    HDFDatasetDescription,
+    HDFDocumentComposer,
+    callback_on_mock_put,
+    get_mock_put,
+    init_devices,
+    set_mock_value,
+)
+from ophyd_async.epics.adcore import NDPluginBaseIO
+
+from dodal.devices.async_adeiger.adodin_io import Odin, OdinWriter, Writing
+
+ODIN_DETECTOR_NAME = "odin_detector"
+EIGER_BIT_DEPTH = 16
+
+OdinDriverAndWriter = tuple[Odin, OdinWriter]
+
+
+@pytest.fixture
+def odin_driver_and_writer() -> OdinDriverAndWriter:
+    eiger_bit_depth = AsyncMock(get_value=AsyncMock(return_value=EIGER_BIT_DEPTH))
+    with init_devices(mock=True):
+        driver = Odin("")
+        writer = OdinWriter(MagicMock(), driver, eiger_bit_depth)
+    writer._path_provider.return_value.filename = "filename.h5"  # type: ignore
+    set_mock_value(writer._drv.block_size, 1000)
+    set_mock_value(writer._drv.blocks_per_file, 0)
+    return driver, writer
+
+
+@pytest.fixture()
+def plugin() -> NDPluginBaseIO:
+    with init_devices(mock=True):
+        plugin = NDPluginBaseIO("prefix")
+    return plugin
+
+
+def initialise_signals_to_armed(driver: Odin):
+    set_mock_value(driver.meta_active, "Active")
+    set_mock_value(driver.capture_rbv, "Capturing")
+    set_mock_value(driver.meta_writing, "Writing")
+    set_mock_value(driver.meta_file_name, "filename.h5")
+    set_mock_value(driver.id, "filename.h5")
+
+
+async def test_when_open_called_then_file_correctly_set(
+    odin_driver_and_writer: OdinDriverAndWriter, tmp_path: Path
+):
+    driver, writer = odin_driver_and_writer
+    initialise_signals_to_armed(driver)
+    path_info = writer._path_provider.return_value  # type: ignore
+    path_info.directory_path = tmp_path
+    expected_filename = "filename.h5"
+
+    await writer.open(ODIN_DETECTOR_NAME)
+
+    get_mock_put(driver.file_path).assert_called_once_with(str(tmp_path), wait=ANY)
+    get_mock_put(driver.file_name).assert_called_once_with(expected_filename, wait=ANY)
+
+
+async def test_when_open_called_then_all_expected_signals_set(
+    odin_driver_and_writer: OdinDriverAndWriter,
+):
+    driver, writer = odin_driver_and_writer
+    initialise_signals_to_armed(driver)
+
+    await writer.open(ODIN_DETECTOR_NAME)
+
+    get_mock_put(driver.data_type).assert_called_once_with("UInt16", wait=ANY)
+    get_mock_put(driver.num_to_capture).assert_called_once_with(0, wait=ANY)
+
+    get_mock_put(driver.capture).assert_called_once_with(Writing.CAPTURE, wait=ANY)
+
+
+async def test_bit_depth_is_passed_before_open_and_set_to_data_type_after_open(
+    odin_driver_and_writer: OdinDriverAndWriter,
+):
+    driver, writer = odin_driver_and_writer
+    initialise_signals_to_armed(driver)
+
+    assert await writer._detector_bit_depth().get_value() == EIGER_BIT_DEPTH
+    assert await driver.data_type.get_value() == ""
+    await writer.open(ODIN_DETECTOR_NAME)
+    get_mock_put(driver.data_type).assert_called_once_with(
+        f"UInt{EIGER_BIT_DEPTH}", wait=ANY
+    )
+
+
+async def test_given_data_shape_set_when_open_called_then_describe_has_correct_shape(
+    odin_driver_and_writer: OdinDriverAndWriter,
+):
+    driver, writer = odin_driver_and_writer
+    initialise_signals_to_armed(driver)
+
+    set_mock_value(driver.image_width, 1024)
+    set_mock_value(driver.image_height, 768)
+    description = await writer.open(ODIN_DETECTOR_NAME)
+
+    assert description["odin_detector"]["shape"] == [1, 768, 1024]
+
+
+async def test_when_closed_then_data_capture_turned_off(
+    odin_driver_and_writer: OdinDriverAndWriter,
+):
+    driver, writer = odin_driver_and_writer
+    await writer.close()
+    get_mock_put(driver.capture).assert_called_once_with(Writing.DONE, wait=ANY)
+
+
+@pytest.mark.asyncio
+async def test_odin_test_collect_stream_docs_fails_when_composer_is_none(
+    odin_driver_and_writer: OdinDriverAndWriter,
+):
+    _, writer = odin_driver_and_writer
+    writer._composer = None
+
+    with pytest.raises(RuntimeError):
+        [item async for item in writer.collect_stream_docs("ODIN", 1)]
+
+
+@pytest.mark.asyncio
+async def test_wait_for_active_and_file_names_before_capture_then_wait_for_writing(
+    odin_driver_and_writer,
+):
+    driver, writer = odin_driver_and_writer
+
+    file_name_is_set = Event()
+    capture_is_set = Event()
+    callback_on_mock_put(
+        driver.file_name, lambda *args, **kwargs: file_name_is_set.set()
+    )
+    callback_on_mock_put(driver.capture, lambda *args, **kwargs: capture_is_set.set())
+
+    async def set_waited_signals():
+        set_mock_value(driver.meta_active, "Active")
+        set_mock_value(driver.id, "filename.h5")
+        set_mock_value(driver.meta_file_name, "filename.h5")
+
+    async def set_ready_signals():
+        set_mock_value(driver.meta_writing, "Writing")
+        set_mock_value(driver.capture_rbv, "Capturing")
+
+    async def wait_and_set_signals():
+        # Block until filename is set
+        await file_name_is_set.wait()
+        # Allow writer.open to proceed to wait_for_value.
+        await asyncio.sleep(0.1)
+        # writer.open now waits on signals; set these, and unset event
+        await set_waited_signals()
+        # Block until capture sets event
+        await capture_is_set.wait()
+        # Allow writer.open to proceed to wait_for_value.
+        await asyncio.sleep(0.1)
+        # writer.open now waits on signals; set these
+        await set_ready_signals()
+
+    await asyncio.gather(writer.open(ODIN_DETECTOR_NAME), wait_and_set_signals())
+    assert type(writer._composer) is HDFDocumentComposer
+
+
+async def test_append_plugins_to_datasets(
+    odin_driver_and_writer: OdinDriverAndWriter, plugin: NDPluginBaseIO
+):
+    _, writer = odin_driver_and_writer
+
+    valid_xml = """<?xml version='1.0' encoding='utf-8'?>
+    <Attributes>
+        <Attribute
+            name="Attribute 1"
+            type="PARAM"
+            source="odin:1"
+            datatype="DOUBLE"
+            description="Testing _plugin append" />
+        <Attribute
+            name="Attribute 2"
+            type="EPICS_PV"
+            source="odin:2"
+            dbrtype="DBR_FLOAT"/>
+    </Attributes>
+    """
+
+    writer._exposures_per_event = 1
+    writer.data_shape = (100, 100)
+    set_mock_value(plugin.nd_attributes_file, valid_xml)
+
+    writer._datasets = [
+        HDFDatasetDescription(
+            data_key=ODIN_DETECTOR_NAME,
+            dataset="/data",
+            shape=(writer._exposures_per_event, *writer.data_shape),
+            dtype_numpy="<u2",
+            chunk_shape=(writer._exposures_per_event, *writer.data_shape),
+        )
+    ]
+
+    assert len(writer._datasets) == 1
+
+    writer._plugins = {"mock1": plugin, "mock2": plugin}
+
+    await writer.append_plugins_to_datasets()
+    assert len(writer._datasets) == 5
+
+
+async def test_get_odin_filename_suffix_with_4_nodes(
+    odin_driver_and_writer: OdinDriverAndWriter,
+):
+    _, writer = odin_driver_and_writer
+
+    set_mock_value(writer._drv.block_size, 1000)
+    set_mock_value(writer._drv.blocks_per_file, 1)
+    writer._drv.nodes = [1, 2, 3, 4]  # type: ignore For mock len(nodes)
+    writer._odin_writer_number = 1
+
+    with pytest.raises(NotImplementedError):
+        writer._total_number_of_frames = 10
+        assert await writer._get_odin_filename_suffix() == "_000001"
+        # Until this has been completed:
+        # "https://github.com/bluesky/ophyd-async/issues/1137"
+
+
+async def test_get_odin_filename_suffix_with_blocks_per_file_off(
+    odin_driver_and_writer: OdinDriverAndWriter,
+):
+    _, writer = odin_driver_and_writer
+
+    writer._total_number_of_frames = 1000
+    set_mock_value(writer._drv.block_size, 1000)
+    set_mock_value(writer._drv.blocks_per_file, 0)
+    writer._drv.nodes = [1]  # type: ignore For mock len(nodes)
+
+    writer._odin_writer_number = 1
+    writer._total_number_of_frames = 10
+    assert await writer._get_odin_filename_suffix() == "_000001"
+
+    writer._total_number_of_frames = 1500
+    assert await writer._get_odin_filename_suffix() == "_000001"
+
+
+async def test_get_odin_filename_suffix_wraps_for_1_node(
+    odin_driver_and_writer: OdinDriverAndWriter,
+):
+    _, writer = odin_driver_and_writer
+    writer._total_number_of_frames = 1000
+    set_mock_value(writer._drv.block_size, 1000)
+    set_mock_value(writer._drv.blocks_per_file, 1)
+    writer._drv.nodes = [1]  # type: ignore For mock len(nodes)
+
+    writer._total_number_of_frames = 1500
+    assert await writer._get_odin_filename_suffix() == "_000001"
+
+
+async def test_collect_stream_docs(odin_driver_and_writer: OdinDriverAndWriter):
+    driver, writer = odin_driver_and_writer
+
+    initialise_signals_to_armed(driver)
+
+    await asyncio.gather(
+        writer.open(ODIN_DETECTOR_NAME),
+    )
+    assert type(writer._composer) is HDFDocumentComposer
+
+    stream = writer.collect_stream_docs("", 1)
+
+    async for doc in stream:
+        assert "stream_resource" in str(doc)
+
+
+async def test_observe_indices_written(odin_driver_and_writer: OdinDriverAndWriter):
+    _, writer = odin_driver_and_writer
+
+    set_mock_value(writer._drv.num_captured, 0)
+    writer._exposures_per_event = 10
+
+    indices = writer.observe_indices_written(timeout=0.5)
+
+    trigger_count = 0
+
+    async for val in indices:
+        set_mock_value(writer._drv.num_captured, trigger_count)
+        assert isinstance(val, int)
+        if trigger_count >= writer._exposures_per_event:
+            break
+        trigger_count += 1
+
+
+async def test_odin_close_when_capture_status_not_none(
+    odin_driver_and_writer: OdinDriverAndWriter,
+):
+    _, writer = odin_driver_and_writer
+
+    writer._capture_status = AsyncStatus(asyncio.sleep(0.5))  # type: ignore
+
+    await writer.close()

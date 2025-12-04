@@ -1,7 +1,6 @@
 from functools import cache
 
 from ophyd_async.core import PathProvider, Reference
-from ophyd_async.fastcs.eiger import EigerDetector as FastEiger
 from ophyd_async.fastcs.panda import HDFPanda
 from yarl import URL
 
@@ -14,6 +13,7 @@ from dodal.devices.aperturescatterguard import (
     ApertureScatterguard,
     load_positions_from_beamline_parameters,
 )
+from dodal.devices.async_adeiger.adeiger import EigerDetector as FastEiger
 from dodal.devices.attenuator.attenuator import BinaryFilterAttenuator
 from dodal.devices.backlight import Backlight
 from dodal.devices.baton import Baton
