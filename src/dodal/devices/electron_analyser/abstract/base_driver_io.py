@@ -28,8 +28,13 @@ from dodal.devices.electron_analyser.energy_sources import (
     DualEnergySource,
     EnergySource,
 )
-from dodal.devices.electron_analyser.enums import EnergyMode
+from dodal.devices.electron_analyser.enums import EnergyMode, SelectedSource
 from dodal.devices.electron_analyser.util import to_binding_energy
+from dodal.devices.fast_shutter import (
+    AbstractFastShutter,
+    DualFastShutter,
+    SelectedDevice,
+)
 
 
 class AbstractAnalyserDriverIO(
@@ -53,6 +58,7 @@ class AbstractAnalyserDriverIO(
         psu_mode_type: type[TPsuMode],
         pass_energy_type: type[TPassEnergy],
         energy_source: EnergySource | DualEnergySource,
+        shutter: AbstractFastShutter | None,
         name: str = "",
     ) -> None:
         """
@@ -88,6 +94,11 @@ class AbstractAnalyserDriverIO(
                 self._calculate_total_intensity, spectrum=self.spectrum
             )
             self.energy_source = energy_source
+            self.shutter = shutter
+
+        self._cached_excitation_energy = soft_signal_rw(
+            float, initial_value=0, units="eV"
+        )
 
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             # Read once per scan after data acquired
@@ -121,7 +132,7 @@ class AbstractAnalyserDriverIO(
                 self._calculate_binding_energy_axis,
                 "eV",
                 energy_axis=self.energy_axis,
-                excitation_energy=self.energy_source.energy,
+                excitation_energy=self.energy_source.energy,  # Need to check this actaully takes the correct source...
                 energy_mode=self.energy_mode,
             )
             self.angle_axis = self._create_angle_axis_signal(prefix)
@@ -151,14 +162,31 @@ class AbstractAnalyserDriverIO(
         """
         if isinstance(self.energy_source, DualEnergySource):
             self.energy_source.selected_source.set(region.excitation_energy_source)
+
+        if isinstance(self.shutter, DualFastShutter):
+            selected_shutter = (
+                SelectedDevice.DEVICE1
+                if region.excitation_energy_source == SelectedSource.SOURCE1
+                else SelectedDevice.DEVICE2
+            )
+            self.shutter.selected_shutter.set(selected_shutter)
+
         excitation_energy = await self.energy_source.energy.get_value()
+
+        shutter = self.shutter
+        if shutter is not None:
+            await shutter.set(shutter.close_state)
 
         # Switch to kinetic energy as epics doesn't support BINDING.
         ke_region = region.switch_energy_mode(EnergyMode.KINETIC, excitation_energy)
         await self._set_region(ke_region)
+
         # Set the true energy mode from original region so binding_energy_axis can be
         # calculated correctly.
         await self.energy_mode.set(region.energy_mode)
+
+        if shutter is not None:
+            await shutter.set(shutter.open_state)
 
     @abstractmethod
     async def _set_region(self, ke_region: TAbstractBaseRegion):
