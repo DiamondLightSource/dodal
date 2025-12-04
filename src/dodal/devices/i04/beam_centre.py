@@ -109,7 +109,8 @@ def fit_ellipse_and_get_errors_for_horizontal(input_array, cX, cY, window=50):
     """
     pixel_no_h = np.arange(len(input_array))
 
-    # Define fitting window
+    # Define fitting window as we don't want to fit the whole profile.
+    # later you can make sure that this matches the ROI
     start = int(max(0, cX - window))
     end = int(min(len(input_array), cX + window))
 
@@ -127,9 +128,54 @@ def fit_ellipse_and_get_errors_for_horizontal(input_array, cX, cY, window=50):
 
     # Residuals
     residuals = y_fit - fit_y
-    overall_ssr = np.sum(residuals**2)
+    overall_ssr = np.sum(residuals)
 
     # Offset from expected center
     offset = fit_mu - cY
+
+    return offset, overall_ssr
+
+
+def fit_ellipse_and_get_errors_for_vertical(input_array, cX, cY, window=50):
+    """
+    Fit a Gaussian to a horizontal slice of the image and return
+    the center offset and residuals.
+
+    Parameters:
+        input_array (np.ndarray): 1D horizontal slice of the image.
+        cX (int): X-coordinate of the center.
+        cY (int): Y-coordinate of the center (used for offset).
+        window (int): Half-width of fitting window around cX.
+
+    Returns:
+        offset (float): Difference between fitted mean and cY.
+        residuals (np.ndarray): y_fit - fitted_y for the chosen window.
+        fit_params (tuple): (A, mu, H, sigma) from the fit.
+    """
+    pixel_no_v = np.arange(len(input_array))
+
+    # Define fitting window as we don't want to fit the whole profile.
+    # later you can make sure that this matches the ROI
+    start = int(max(0, cY - window))
+    end = int(min(len(input_array), cY + window))
+
+    x_fit = pixel_no_v[start:end]
+    y_fit = input_array[start:end]
+
+    # Fit Gaussian
+    parameters, _ = curve_fit(
+        gauss, x_fit, y_fit, p0=[max(y_fit), cY, np.min(y_fit), 5]
+    )
+    fit_A, fit_mu, fit_H, fit_sigma = parameters
+
+    # Compute fitted curve
+    fit_y = gauss(x_fit, fit_A, fit_mu, fit_H, fit_sigma)
+
+    # Residuals
+    residuals = y_fit - fit_y
+    overall_ssr = np.sum(residuals)  # this should not be too far from 0
+
+    # Offset from expected center
+    offset = fit_mu - cX
 
     return offset, overall_ssr
