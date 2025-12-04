@@ -9,6 +9,7 @@ dodal.devices.i19.access\_controlled
    :toctree:
    :recursive:
 
+   dodal.devices.i19.access_controlled.attenuator_motor_squad
    dodal.devices.i19.access_controlled.blueapi_device
    dodal.devices.i19.access_controlled.hutch_access
    dodal.devices.i19.access_controlled.shutter
