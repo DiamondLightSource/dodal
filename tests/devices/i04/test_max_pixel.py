@@ -44,7 +44,7 @@ async def test_preprocessed_data_grayscale_is_called(
     mocked_cv2_grey: MagicMock,
 ):
     data = np.array([1])
-    await convert_to_gray_and_blur(data)
+    convert_to_gray_and_blur(data)
     mocked_cv2_grey.assert_called_once_with(data, cv2.COLOR_BGR2GRAY)
     mocked_cv2_blur.assert_called_once_with(ANY, KERNAL_SIZE, 0)
 
@@ -62,7 +62,7 @@ test_arr = np.array(
 
 async def test_greyscale_works():
     test_arr_shape = test_arr.shape  # (4, 3, 3)
-    processed_data = await convert_to_gray_and_blur(test_arr)
+    processed_data = convert_to_gray_and_blur(test_arr)
     processed_data_shape = processed_data.shape  # (4,3)
 
     assert processed_data_shape[0] == test_arr_shape[0]

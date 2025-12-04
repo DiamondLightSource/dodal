@@ -1,3 +1,5 @@
+import asyncio
+
 import cv2
 import numpy as np
 from bluesky.protocols import Triggerable
@@ -21,14 +23,15 @@ class MaxPixel(StandardReadable, Triggerable):
 
     @AsyncStatus.wrap
     async def trigger(self):
+        await asyncio.sleep(0.5)
         img_data = await self.array_data.get_value()
-        arr = await convert_to_gray_and_blur(img_data)
+        arr = convert_to_gray_and_blur(img_data)
         max_val = float(np.max(arr))  # np.int64
         assert isinstance(max_val, float)
         self._max_val_setter(max_val)
 
 
-async def convert_to_gray_and_blur(data):
+def convert_to_gray_and_blur(data: cv2.typing.MatLike) -> cv2.typing.MatLike:
     """
     Preprocess the image array data (convert to grayscale and apply a gaussian blur)
     Image is converted to grayscale (using a weighted mean as green contributes more to brightness)
