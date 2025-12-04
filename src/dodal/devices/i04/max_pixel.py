@@ -1,3 +1,5 @@
+from time import sleep
+
 import cv2
 import numpy as np
 from bluesky.protocols import Triggerable
@@ -5,7 +7,7 @@ from ophyd_async.core import AsyncStatus, StandardReadable, soft_signal_r_and_se
 from ophyd_async.epics.core import (
     epics_signal_r,
 )
-from time import sleep
+
 # kernal size describes how many of the neigbouring pixels are used for the blur,
 # higher kernal size means more of a blur effect
 KERNAL_SIZE = (7, 7)
@@ -29,7 +31,7 @@ class MaxPixel(StandardReadable, Triggerable):
         self._max_val_setter(max_val)
 
 
-def convert_to_gray_and_blur(data):
+def convert_to_gray_and_blur(data: cv2.typing.MatLike) -> cv2.typing.MatLike:
     """
     Preprocess the image array data (convert to grayscale and apply a gaussian blur)
     Image is converted to grayscale (using a weighted mean as green contributes more to brightness)
