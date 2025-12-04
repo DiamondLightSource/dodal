@@ -20,8 +20,7 @@ def binary_img(img, img_name="Threshold"):
     Pixels of the input image are converted to one of two values (a high and a low value).
     Otsu's method is used for automatic thresholding.
     See https://docs.opencv.org/4.x/d7/d4d/tutorial_py_thresholding.html.
-    The threshold is increased by [constant name] (brightness taken from image in grayscale)
-    in order to get more of the centre of the beam.
+    The threshold is increased by INC_BINARY_THRESH (brightness taken from image in grayscale) in order to get the inner beam.
     """
     # convert to greyscale as not interested in information relating to colour and blur to eliminate rouge hot pixels
     blurred = convert_to_gray_and_blur(img)
