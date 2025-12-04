@@ -23,7 +23,7 @@ async def test_binary_img_calls_threshold_twice(mock_convert, mock_threshold):
     mock_threshold.return_value = (127, fake_img)
     mock_convert.return_value = fake_img
 
-    await binary_img(fake_img)
+    binary_img(fake_img)
     assert mock_threshold.call_count == 2
 
     # check the args from the two times it's called.
