@@ -1,0 +1,58 @@
+dodal.devices.insertion\_device.lookup\_table\_models.EnergyCoverage
+====================================================================
+
+.. currentmodule:: dodal.devices.insertion_device.lookup_table_models
+
+.. autoclass:: EnergyCoverage
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      ~EnergyCoverage.model_config
+      
+      
+      
+      
+      
+      ~EnergyCoverage.root
+      
+   
+   

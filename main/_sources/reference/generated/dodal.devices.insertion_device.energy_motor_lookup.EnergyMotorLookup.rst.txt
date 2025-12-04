@@ -1,0 +1,26 @@
+dodal.devices.insertion\_device.energy\_motor\_lookup.EnergyMotorLookup
+=======================================================================
+
+.. currentmodule:: dodal.devices.insertion_device.energy_motor_lookup
+
+.. autoclass:: EnergyMotorLookup
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      ~EnergyMotorLookup.find_value_in_lookup_table
+      
+      
+      ~EnergyMotorLookup.update_lookup_table
+      
+   
+   
+
+   
+   
+   

@@ -1,0 +1,40 @@
+dodal.devices.insertion\_device.apple2\_undulator.UndulatorPhaseMotor
+=====================================================================
+
+.. currentmodule:: dodal.devices.insertion_device.apple2_undulator
+
+.. autoclass:: UndulatorPhaseMotor
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

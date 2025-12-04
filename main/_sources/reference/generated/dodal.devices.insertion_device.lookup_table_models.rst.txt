@@ -1,0 +1,48 @@
+dodal.devices.insertion\_device.lookup\_table\_models
+=====================================================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices.insertion_device
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~lookup_table_models.EnergyCoverage
+   ~lookup_table_models.EnergyCoverageEntry
+   ~lookup_table_models.EnergyMinMax
+   ~lookup_table_models.LookupTable
+   ~lookup_table_models.LookupTableConfig
+   ~lookup_table_models.LookupTableEntry
+
+
+
+
+.. automodule:: dodal.devices.insertion_device.lookup_table_models
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      convert_csv_to_lookup
+      read_file_and_skip
+   
+   
+
+   
+   
+   

@@ -1,0 +1,43 @@
+dodal.devices.insertion\_device.apple2\_undulator.Apple2
+========================================================
+
+.. currentmodule:: dodal.devices.insertion_device.apple2_undulator
+
+.. autoclass:: Apple2
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~Apple2.set
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

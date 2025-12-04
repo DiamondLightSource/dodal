@@ -1,0 +1,64 @@
+dodal.devices.insertion\_device.lookup\_table\_models.LookupTableEntry
+======================================================================
+
+.. currentmodule:: dodal.devices.insertion_device.lookup_table_models
+
+.. autoclass:: LookupTableEntry
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      ~LookupTableEntry.generate
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      ~LookupTableEntry.model_config
+      
+      
+      
+      
+      
+      ~LookupTableEntry.energies
+      
+      
+      ~LookupTableEntry.limit
+      
+   
+   

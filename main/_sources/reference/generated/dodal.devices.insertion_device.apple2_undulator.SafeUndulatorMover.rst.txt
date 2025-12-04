@@ -1,0 +1,52 @@
+dodal.devices.insertion\_device.apple2\_undulator.SafeUndulatorMover
+====================================================================
+
+.. currentmodule:: dodal.devices.insertion_device.apple2_undulator
+
+.. autoclass:: SafeUndulatorMover
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      ~SafeUndulatorMover.get_timeout
+      
+      
+      ~SafeUndulatorMover.raise_if_cannot_move
+      
+      
+      
+      
+      ~SafeUndulatorMover.set
+      
+      
+      ~SafeUndulatorMover.set_demand_positions
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

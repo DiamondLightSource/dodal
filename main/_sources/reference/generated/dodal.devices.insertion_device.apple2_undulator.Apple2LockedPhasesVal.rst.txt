@@ -1,0 +1,26 @@
+dodal.devices.insertion\_device.apple2\_undulator.Apple2LockedPhasesVal
+=======================================================================
+
+.. currentmodule:: dodal.devices.insertion_device.apple2_undulator
+
+.. autoclass:: Apple2LockedPhasesVal
+   :members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~Apple2LockedPhasesVal.top_outer
+      
+      
+      ~Apple2LockedPhasesVal.btm_inner
+      
+   
+   
