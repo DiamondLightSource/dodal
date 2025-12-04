@@ -46,6 +46,7 @@ set_path_provider(
     )
 )
 
+I19_2_COMMISSIONING_INSTR_SESSION: str = "cm40639-5"
 
 I19_2_ZEBRA_MAPPING = ZebraMapping(
     outputs=ZebraTTLOutputs(),
@@ -55,7 +56,9 @@ I19_2_ZEBRA_MAPPING = ZebraMapping(
 
 @device_factory()
 def attenuator_motor_squad() -> AttenuatorMotorSquad:
-    return AttenuatorMotorSquad(hutch=HutchState.EH2)
+    return AttenuatorMotorSquad(
+        hutch=HutchState.EH2, instrument_session=I19_2_COMMISSIONING_INSTR_SESSION
+    )
 
 
 @device_factory()
@@ -114,7 +117,7 @@ def shutter() -> AccessControlledShutter:
     return AccessControlledShutter(
         prefix=f"{PREFIX.beamline_prefix}-PS-SHTR-01:",
         hutch=HutchState.EH2,
-        instrument_session="cm40639-4",
+        instrument_session=I19_2_COMMISSIONING_INSTR_SESSION,
     )
 
 

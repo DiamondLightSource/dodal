@@ -32,6 +32,8 @@ set_log_beamline(BL)
 set_utils_beamline(BL)
 
 
+I19_1_COMMISSIONING_INSTR_SESSION: str = "cm40638-5"
+
 I19_1_ZEBRA_MAPPING = ZebraMapping(
     outputs=ZebraTTLOutputs(TTL_PILATUS=1),
     sources=ZebraSources(),
@@ -45,7 +47,9 @@ DISPLAY_CONFIG = "/dls_sw/i19-1/software/daq_configuration/domain/display.config
 
 @device_factory()
 def attenuator_motor_squad() -> AttenuatorMotorSquad:
-    return AttenuatorMotorSquad(hutch=HutchState.EH1)
+    return AttenuatorMotorSquad(
+        hutch=HutchState.EH1, instrument_session=I19_1_COMMISSIONING_INSTR_SESSION
+    )
 
 
 # Needs to wait until enum is fixed on the beamline
@@ -74,7 +78,7 @@ def shutter() -> AccessControlledShutter:
     return AccessControlledShutter(
         prefix=f"{PREFIX.beamline_prefix}-PS-SHTR-01:",
         hutch=HutchState.EH1,
-        instrument_session="cm40638-4",
+        instrument_session=I19_1_COMMISSIONING_INSTR_SESSION,
     )
 
 
