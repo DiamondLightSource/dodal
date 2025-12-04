@@ -1,6 +1,8 @@
+import asyncio
 from enum import IntEnum
 
 from bluesky.protocols import Movable
+from mx_bluesky.common.utils.log import LOGGER
 from ophyd_async.core import (
     DEFAULT_TIMEOUT,
     AsyncStatus,
@@ -22,8 +24,6 @@ from dodal.devices.oav.oav_parameters import (
 )
 from dodal.devices.oav.snapshots.snapshot import Snapshot
 from dodal.devices.oav.snapshots.snapshot_with_grid import SnapshotWithGrid
-import asyncio
-from mx_bluesky.common.utils.log import LOGGER
 
 
 class Coords(IntEnum):
@@ -65,7 +65,7 @@ class ZoomController(BaseZoomController):
         oav.zoom_controller.set("1.0x")
 
     Note that changing the zoom may change the AD wiring on the associated OAV, as such
-    you should wait on any zoom changs to finish before changing the OAV wiring.
+    you should wait on any zoom changes to finish before changing the OAV wiring.
     """
 
     def __init__(self, prefix: str, name: str = "") -> None:
@@ -93,7 +93,7 @@ class ZoomController(BaseZoomController):
         self.y_placeholder_zoom_8 = epics_signal_rw(float, f"{prefix}PBCY:VALH")
 
         self._zoom_done_move = epics_signal_rw(float, f"{prefix}MP:DMOV")
-        self._zoom_in_pos= epics_signal_rw(float, f"{prefix}MP:INPOS")
+        self._zoom_in_pos = epics_signal_rw(float, f"{prefix}MP:INPOS")
 
         super().__init__(name=name)
 
@@ -146,10 +146,6 @@ class OAV(StandardReadable):
             self.zoom_controller = zoom_controller
 
         self.cam = Cam(f"{prefix}CAM:", name=name)
-
-                                                    
-                                                    
-                                                    
 
         with self.add_children_as_readables():
             self.grid_snapshot = SnapshotWithGrid(
