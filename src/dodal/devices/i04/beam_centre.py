@@ -72,9 +72,6 @@ class CentreEllipseMethod(StandardReadable, Triggerable):
         self._center_y_val_setter(centre_y)
 
 
-from scipy.optimize import curve_fit
-
-
 # to get vertical do array_data[:, cX]
 # to get horizonAL do array_data[cY, :]
 # need to call with cX for horizontal slice and cY for vertical slice
@@ -179,3 +176,8 @@ def fit_ellipse_and_get_errors_for_vertical(input_array, cX, cY, window=50):
     offset = fit_mu - cX
 
     return offset, overall_ssr
+
+
+# for tests you should do one where you make sure you get really bad results
+# if you accidentally input CX and CY the wrong way around
+# also make sure that you get what you expect for vertical and horizontal.
