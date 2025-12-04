@@ -4,6 +4,9 @@ from dodal.common.beamlines.beamline_utils import (
 from dodal.common.beamlines.beamline_utils import (
     set_beamline as set_utils_beamline,
 )
+from dodal.devices.i19.access_controlled.attenuator_motor_squad import (
+    AttenuatorMotorSquad,
+)
 from dodal.devices.i19.access_controlled.blueapi_device import HutchState
 from dodal.devices.i19.access_controlled.shutter import (
     AccessControlledShutter,
@@ -38,6 +41,11 @@ ZOOM_PARAMS_FILE = (
     "/dls_sw/i19-1/software/gda_versions/gda/config/xml/jCameraManZoomLevels.xml"
 )
 DISPLAY_CONFIG = "/dls_sw/i19-1/software/daq_configuration/domain/display.configuration"
+
+
+@device_factory()
+def attenuator_motor_squad() -> AttenuatorMotorSquad:
+    return AttenuatorMotorSquad(hutch=HutchState.EH1)
 
 
 # Needs to wait until enum is fixed on the beamline

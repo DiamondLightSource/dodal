@@ -12,6 +12,9 @@ from dodal.common.beamlines.beamline_utils import (
     set_beamline as set_utils_beamline,
 )
 from dodal.common.visit import StaticVisitPathProvider
+from dodal.devices.i19.access_controlled.attenuator_motor_squad import (
+    AttenuatorMotorSquad,
+)
 from dodal.devices.i19.access_controlled.blueapi_device import HutchState
 from dodal.devices.i19.access_controlled.shutter import AccessControlledShutter
 from dodal.devices.i19.backlight import BacklightPosition
@@ -48,6 +51,11 @@ I19_2_ZEBRA_MAPPING = ZebraMapping(
     outputs=ZebraTTLOutputs(),
     sources=ZebraSources(),
 )
+
+
+@device_factory()
+def attenuator_motor_squad() -> AttenuatorMotorSquad:
+    return AttenuatorMotorSquad(hutch=HutchState.EH2)
 
 
 @device_factory()
