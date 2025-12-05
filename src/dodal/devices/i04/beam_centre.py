@@ -5,6 +5,7 @@ from ophyd_async.core import AsyncStatus, StandardReadable, soft_signal_r_and_se
 from ophyd_async.epics.core import (
     epics_signal_r,
 )
+from scipy.optimize import curve_fit
 
 from dodal.devices.i04.max_pixel import convert_to_gray_and_blur
 from dodal.log import LOGGER
@@ -113,3 +114,120 @@ class CentreEllipseMethod(StandardReadable, Triggerable):
         real_centre_y = centre_y + top_left_corner[1]
         self._center_x_val_setter(real_centre_x)
         self._center_y_val_setter(real_centre_y)
+
+
+# errors
+def gauss(x, A, mu, H, sigma):
+    """
+    Docstring for gauss fit
+    :param A: Amplitude
+    :param mu: Centre
+    :param H: Vertical offset
+    :param sigma: Width of peak
+    """
+    return (A * np.exp(-((x - mu) ** 2) / (2 * sigma**2))) + H
+
+
+def fit_ellipse_and_get_errors_for_horizontal(input_array, cX, cY, window=50):
+    """
+    Fit a Gaussian to a horizontal slice of the image and return
+    the center offset and residuals.
+    Parameters:
+        input_array (np.ndarray): 1D horizontal slice of the image.
+        cX (int): X-coordinate of the center.
+        cY (int): Y-coordinate of the center (used for offset).
+        window (int): Half-width of fitting window around cX.
+    Returns:
+        offset (float): Difference between fitted mean and cY.
+        residuals (np.ndarray): y_fit - fitted_y for the chosen window.
+        fit_params (tuple): (A, mu, H, sigma) from the fit.
+    """
+    pixel_no_h = np.arange(len(input_array))
+
+    # Define fitting window as we don't want to fit the whole profile.
+    # later you can make sure that this matches the ROI
+    if window:
+        start = int(max(0, cX - window))
+        end = int(min(len(input_array), cX + window))
+
+        x_fit = pixel_no_h[start:end]
+        y_fit = input_array[start:end]
+    else:
+        x_fit = pixel_no_h
+        y_fit = input_array
+
+    # Fit Gaussian
+    parameters, _ = curve_fit(
+        gauss, x_fit, y_fit, p0=[max(y_fit), cX, np.min(y_fit), 5]
+    )
+    fit_A, fit_mu, fit_H, fit_sigma = parameters
+
+    # Compute fitted curve
+    fit_y = gauss(x_fit, fit_A, fit_mu, fit_H, fit_sigma)
+
+    # Residuals
+    residuals = y_fit - fit_y
+    overall_res = np.sum(
+        residuals
+    )  # this should be no greater than 1 times ten to the minus 5 (otherwise indicates that something has gone really wrong)
+
+    # Offset from expected center
+    offset = fit_mu - cY
+
+    return offset, overall_res
+
+
+def fit_ellipse_and_get_errors_for_vertical(input_array, cX, cY, window=50):  # noqa: N803
+    """
+    Fit a Gaussian to a horizontal slice of the image and return
+    the center offset and residuals.
+    Parameters:
+        input_array (np.ndarray): 1D horizontal slice of the image.
+        cX (int): X-coordinate of the center.
+        cY (int): Y-coordinate of the center (used for offset).
+        window (int): Half-width of fitting window around cX.
+    Returns:
+        offset (float): Difference between fitted mean and cY.
+        residuals (np.ndarray): y_fit - fitted_y for the chosen window.
+        fit_params (tuple): (A, mu, H, sigma) from the fit.
+    """
+    pixel_no_v = np.arange(len(input_array))
+
+    # Define fitting window as we don't want to fit the whole profile.
+    # later you can make sure that this matches the ROI
+    start = int(max(0, cY - window))
+    end = int(min(len(input_array), cY + window))
+
+    x_fit = pixel_no_v[start:end]
+    y_fit = input_array[start:end]
+
+    # Fit Gaussian
+    parameters, _ = curve_fit(
+        gauss, x_fit, y_fit, p0=[max(y_fit), cY, np.min(y_fit), 5]
+    )
+    fit_A, fit_mu, fit_H, fit_sigma = parameters  # noqa: N806
+
+    # Compute fitted curve
+    fit_y = gauss(x_fit, fit_A, fit_mu, fit_H, fit_sigma)
+
+    # Residuals and offset
+    weight = 8
+    # reciprocal of this is my estimate for the errors of the intensities of the pixel
+    dof = (window * 2) - 3
+    # degrees of freedom (using 3 instead of 4 to account for the extra pixel)
+    residuals = y_fit - fit_y
+    overall_ssr_per_dof = (
+        np.sum(residuals**2) / dof
+    )  # if this is greater than 150 something has gone really wrong with the fit
+    residuals_with_weight = residuals * weight
+
+    chi_squared = np.sum((residuals_with_weight) ** 2 / fit_y)
+    chi_squared_per_dof = chi_squared / dof
+    offset = fit_mu - cX
+
+    return (
+        offset,
+        overall_ssr_per_dof,
+        chi_squared_per_dof,
+        (fit_A, fit_mu, fit_H, fit_sigma),
+    )
