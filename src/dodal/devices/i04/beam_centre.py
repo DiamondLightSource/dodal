@@ -112,8 +112,21 @@ class CentreEllipseMethod(StandardReadable, Triggerable):
         # convert back to original image coords
         real_centre_x = centre_x + top_left_corner[0]
         real_centre_y = centre_y + top_left_corner[1]
-        self._center_x_val_setter(real_centre_x)
-        self._center_y_val_setter(real_centre_y)
+        offset_h, overall_ssr_per_dof_h, chi_squared_per_dof_h, fit_params_h = (
+            fit_ellipse_and_get_errors_for_horizontal(
+                array_data, real_centre_x, real_centre_y, window=roi_dist_from_centre
+            )
+        )
+        offset_v, overall_ssr_per_dof_v, chi_squared_per_dof_v, fit_params_v = (
+            fit_ellipse_and_get_errors_for_vertical(
+                array_data, real_centre_x, real_centre_y, window=roi_dist_from_centre
+            )
+        )
+        if overall_ssr_per_dof_v < 100 and overall_ssr_per_dof_h < 100:
+            self._center_x_val_setter(real_centre_x)
+            self._center_y_val_setter(real_centre_y)
+        else:
+            LOGGER.info("Bad Guassian fit suggests centre not found!")
 
 
 # errors
@@ -128,7 +141,7 @@ def gauss(x, A, mu, H, sigma):
     return (A * np.exp(-((x - mu) ** 2) / (2 * sigma**2))) + H
 
 
-def fit_ellipse_and_get_errors_for_horizontal(input_array, cX, cY, window=50):  # noqa: N803
+def fit_ellipse_and_get_errors_for_horizontal(img_array, cX, cY, window=100):  # noqa: N803
     """
     Fit a Gaussian to a horizontal slice of the image and return
     the center offset and residuals.
@@ -142,10 +155,12 @@ def fit_ellipse_and_get_errors_for_horizontal(input_array, cX, cY, window=50):  
         residuals (np.ndarray): y_fit - fitted_y for the chosen window.
         fit_params (tuple): (A, mu, H, sigma) from the fit.
     """
+    if img_array is None:
+        raise ValueError(f"No image data inputted")
+
+    input_array = img_array[cY, :]
     pixel_no_h = np.arange(len(input_array))
 
-    # Define fitting window as we don't want to fit the whole profile.
-    # later you can make sure that this matches the ROI
     if window:
         start = int(max(0, cX - window))
         end = int(min(len(input_array), cX + window))
@@ -189,16 +204,16 @@ def fit_ellipse_and_get_errors_for_horizontal(input_array, cX, cY, window=50):  
     )
 
 
-def vertical_slice(img_path, cX, cY, ax=None, crop=None, distance_from_centre=100):
-    img = cv2.imread(img_path, 0)
-    if img is None:
-        raise ValueError(f"Could not read image from path: {img_path}")
+def fit_ellipse_and_get_errors_for_vertical(
+    img_array, cX, cY, ax=None, crop=None, window=100
+):
+    if img_array is None:
+        raise ValueError(f"No image data inputted")
 
-    v_slice = img[:, cX]
+    v_slice = img_array[:, cX]
     pixel_no_v = range(len(v_slice))  # Y positions
 
     # fit data to guassian
-    window = distance_from_centre
     start = int(max(0, cY - window))
     end = int(min(len(v_slice), cY + window))
 
