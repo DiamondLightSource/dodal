@@ -1,17 +1,15 @@
-from dodal.devices.apple2_undulator import (
+from dodal.devices.insertion_device.apple2_undulator import (
     MAXIMUM_MOVE_TIME,
     Apple2,
     Apple2Controller,
     Apple2PhasesVal,
     Apple2Val,
     Pol,
+    UndulatorPhaseAxes,
 )
-from dodal.devices.util.lookup_tables_apple2 import (
-    EnergyMotorLookup,
-)
-from dodal.log import LOGGER
+from dodal.devices.insertion_device.energy_motor_lookup import EnergyMotorLookup
 
-J09_POLY_DEG = [
+J09_GAP_POLY_DEG_COLUMNS = [
     "9th-order",
     "8th-order",
     "7th-order",
@@ -24,31 +22,44 @@ J09_POLY_DEG = [
     "0th-order",
 ]
 
+J09_PHASE_POLY_DEG_COLUMNS = ["0th-order"]
 
-class J09Apple2Controller(Apple2Controller[Apple2]):
+
+class J09Apple2Controller(Apple2Controller[Apple2[UndulatorPhaseAxes]]):
     def __init__(
         self,
-        apple2: Apple2,
-        energy_motor_lut: EnergyMotorLookup,
+        apple2: Apple2[UndulatorPhaseAxes],
+        gap_energy_motor_lut: EnergyMotorLookup,
+        phase_energy_motor_lut: EnergyMotorLookup,
         units: str = "keV",
         name: str = "",
     ) -> None:
-        self.lookup_table_client = energy_motor_lut
+        """
+        Parameters:
+        -----------
+        apple2 : Apple2
+            An Apple2 device.
+        gap_energy_motor_lut: EnergyMotorLookup
+            The class that handles the gap look up table logic for the insertion device.
+        phase_energy_motor_lut: EnergyMotorLookup
+            The class that handles the phase look up table logic for the insertion device.
+        units:
+            the units of this device. Defaults to eV.
+        name : str, optional
+            New device name.
+        """
+        self.gap_energy_motor_lut = gap_energy_motor_lut
+        self.phase_energy_motor_lut = phase_energy_motor_lut
         super().__init__(
             apple2=apple2,
-            energy_to_motor_converter=self.lookup_table_client.get_motor_from_energy,
+            gap_energy_motor_converter=gap_energy_motor_lut.find_value_in_lookup_table,
+            phase_energy_motor_converter=phase_energy_motor_lut.find_value_in_lookup_table,
             units=units,
             name=name,
         )
 
-    async def _set_motors_from_energy(self, value: float) -> None:
-        """
-        Set the undulator motors for a given energy and polarisation.
-        """
-
-        pol = await self._check_and_get_pol_setpoint()
-        gap, phase = self.energy_to_motor(energy=value, pol=pol)
-        id_set_val = Apple2Val(
+    def _get_apple2_value(self, gap: float, phase: float, pol: Pol) -> Apple2Val:
+        return Apple2Val(
             gap=f"{gap:.6f}",
             phase=Apple2PhasesVal(
                 top_outer=f"{phase:.6f}",
@@ -57,9 +68,6 @@ class J09Apple2Controller(Apple2Controller[Apple2]):
                 btm_outer=f"{0.0:.6f}",
             ),
         )
-
-        LOGGER.info(f"Setting polarisation to {pol}, with values: {id_set_val}")
-        await self.apple2().set(id_motor_values=id_set_val)
 
     async def _set_pol(
         self,
@@ -70,7 +78,7 @@ class J09Apple2Controller(Apple2Controller[Apple2]):
         if value is not Pol.LH:
             self._polarisation_setpoint_set(Pol.LH)
             max_lh_energy = float(
-                self.lookup_table_client.lookup_tables.gap.root[Pol.LH].limit.maximum
+                self.gap_energy_motor_lut.lut.root[Pol.LH].limit.maximum
             )
             lh_setpoint = (
                 max_lh_energy if target_energy > max_lh_energy else target_energy
