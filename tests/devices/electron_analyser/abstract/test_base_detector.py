@@ -52,7 +52,7 @@ def test_analyser_detector_trigger(
     sim_detector._controller.arm = AsyncMock()
     sim_detector._controller.wait_for_idle = AsyncMock()
 
-    run_engine(bps.trigger(sim_detector), wait=True)
+    run_engine(bps.trigger(sim_detector, wait=True), wait=True)
 
     sim_detector._controller.arm.assert_awaited_once()
     sim_detector._controller.wait_for_idle.assert_awaited_once()
