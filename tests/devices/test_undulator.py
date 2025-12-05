@@ -5,6 +5,7 @@ import numpy as np
 import pytest
 from bluesky import RunEngine
 from bluesky.plan_stubs import mv
+from daq_config_server.converters.models import GenericLookupTable
 from ophyd_async.core import get_mock_put, init_devices, set_mock_value
 from ophyd_async.testing import (
     assert_configuration,
@@ -168,13 +169,12 @@ async def test_gap_access_check_disabled_and_move_inhibited_when_commissioning_m
     ).assert_not_called()
 
 
-@patch(
-    "dodal.devices.undulator.energy_distance_table",
-    AsyncMock(return_value=np.array([[0, 10], [10000, 20]])),
-)
 async def test_gap_access_check_move_not_inhibited_when_commissioning_mode_disabled(
     undulator: UndulatorInKeV,
 ):
+    undulator.id_gap_lookup_table = GenericLookupTable(
+        column_names=["c1", "c2"], rows=[[0, 10], [10000, 20]]
+    )
     set_mock_value(undulator.gap_access, EnabledDisabledUpper.ENABLED)
     await undulator.set(5)
 

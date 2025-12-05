@@ -1,7 +1,6 @@
 import numpy as np
 
 from dodal.devices.undulator import UndulatorInKeV, UndulatorOrder
-from dodal.devices.util.lookup_tables import energy_distance_table
 
 
 class InsertionDevice(UndulatorInKeV):
@@ -28,9 +27,7 @@ class InsertionDevice(UndulatorInKeV):
         interpolate between these values, assuming a linear relationship on the relevant
         scale.
         """
-        energy_to_distance_table: np.ndarray = await energy_distance_table(
-            self.id_gap_lookup_table_path, comments="#", skiprows=2
-        )
+        energy_to_distance_table: np.ndarray = np.array(self.id_gap_lookup_table.rows)
         harmonic_value: int = await self.harmonic.value.get_value()
 
         row: np.ndarray = energy_to_distance_table[harmonic_value - 1, :]
