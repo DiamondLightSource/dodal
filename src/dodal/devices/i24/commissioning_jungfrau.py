@@ -41,9 +41,7 @@ class JunfrauCommissioningWriter(DetectorWriter, StandardReadable):
             self.file_name = epics_signal_rw_rbv(str, f"{prefix}FileName")
             self.file_path = epics_signal_rw_rbv(str, f"{prefix}FilePath")
             self.writer_ready = epics_signal_r(int, f"{prefix}Ready_RBV")
-            self.expected_frames = epics_signal_rw(
-                int, "BL24I-JUNGFRAU-META:FD:NumCapture"
-            )
+            self.expected_frames = epics_signal_rw(int, f"{prefix}NumCapture")
         super().__init__(name)
 
     async def open(self, name: str, exposures_per_event: int = 1) -> dict[str, DataKey]:
