@@ -6,11 +6,10 @@ from bluesky.protocols import StreamAsset
 from event_model import DataKey  # type: ignore
 from ophyd_async.core import (
     AsyncStatus,
-    AutoIncrementingPathProvider,
     DetectorWriter,
+    PathProvider,
     StandardDetector,
     StandardReadable,
-    StaticPathProvider,
     TriggerInfo,
     observe_value,
     wait_for_value,
@@ -33,11 +32,11 @@ class JunfrauCommissioningWriter(DetectorWriter, StandardReadable):
     def __init__(
         self,
         prefix,
-        path_provider: AutoIncrementingPathProvider | StaticPathProvider,
+        path_provider: PathProvider,
         name="",
     ) -> None:
         with self.add_children_as_readables():
-            self._path_info = path_provider
+            self._path_provider = path_provider
             self.frame_counter = epics_signal_rw(int, f"{prefix}NumCaptured")
             self.file_name = epics_signal_rw_rbv(str, f"{prefix}FileName")
             self.file_path = epics_signal_rw_rbv(str, f"{prefix}FilePath")
@@ -49,7 +48,7 @@ class JunfrauCommissioningWriter(DetectorWriter, StandardReadable):
 
     async def open(self, name: str, exposures_per_event: int = 1) -> dict[str, DataKey]:
         self._exposures_per_event = exposures_per_event
-        _path_info = self._path_info()
+        _path_info = self._path_provider()
 
         # Commissioning Jungfrau plans allow you to override path, so check to see if file exists
         requested_filepath = Path(_path_info.directory_path) / _path_info.filename
@@ -112,7 +111,7 @@ class CommissioningJungfrau(
         self,
         prefix: str,
         writer_prefix: str,
-        path_provider: AutoIncrementingPathProvider | StaticPathProvider,
+        path_provider: PathProvider,
         name="",
     ):
         self.drv = JungfrauDriverIO(prefix)
