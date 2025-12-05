@@ -3,7 +3,7 @@ from unittest.mock import AsyncMock
 import pytest
 from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import init_devices
+from ophyd_async.core import TriggerInfo, init_devices
 
 import dodal.devices.b07 as b07
 import dodal.devices.i09 as i09
@@ -106,6 +106,33 @@ def test_analyser_detector_has_driver_as_child_and_region_detector_does_not(
         assert det._controller.driver.parent == sim_detector
 
 
+def test_analyser_detector_trigger_called_controller_prepare(
+    sim_detector: GenericElectronAnalyserDetector,
+    run_engine: RunEngine,
+) -> None:
+    sim_detector._controller.prepare = AsyncMock()
+    sim_detector._controller.arm = AsyncMock()
+    sim_detector._controller.wait_for_idle = AsyncMock()
+
+    run_engine(bps.trigger(sim_detector, wait=True), wait=True)
+
+    sim_detector._controller.prepare.assert_awaited_once()
+    sim_detector._controller.arm.assert_awaited_once()
+    sim_detector._controller.wait_for_idle.assert_awaited_once()
+
+
+def test_analyser_detector_set_called_controller_setup_with_region(
+    sim_detector: GenericElectronAnalyserDetector,
+    sequence_file_path: str,
+    run_engine: RunEngine,
+) -> None:
+    seq = sim_detector.load_sequence(sequence_file_path)
+    region = seq.get_enabled_regions()[0]
+    sim_detector._controller.setup_with_region = AsyncMock()
+    run_engine(bps.mv(sim_detector, region), wait=True)
+    sim_detector._controller.setup_with_region.assert_awaited_once_with(region)
+
+
 async def test_analyser_region_detector_trigger_sets_driver_with_region(
     sim_detector: GenericElectronAnalyserDetector,
     sequence_file_path: str,
@@ -114,15 +141,17 @@ async def test_analyser_region_detector_trigger_sets_driver_with_region(
     region_detectors = sim_detector.create_region_detector_list(
         sequence_file_path, enabled_only=False
     )
+    trigger_info = TriggerInfo()
 
     for reg_det in region_detectors:
-        reg_det._controller.driver.set = AsyncMock()
-
+        reg_det.set = AsyncMock()
+        reg_det._controller.prepare = AsyncMock()
         reg_det._controller.arm = AsyncMock()
         reg_det._controller.wait_for_idle = AsyncMock()
 
-        run_engine(bps.trigger(reg_det), wait=True)
+        run_engine(bps.trigger(reg_det, wait=True), wait=True)
 
+        reg_det.set.assert_awaited_once_with(reg_det.region)
+        reg_det._controller.prepare.assert_awaited_once_with(trigger_info)
         reg_det._controller.arm.assert_awaited_once()
         reg_det._controller.wait_for_idle.assert_awaited_once()
-        reg_det._controller.driver.set.assert_awaited_once_with(reg_det.region)

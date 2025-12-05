@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 import pytest
 
 from dodal.common.data_util import load_json_file_to_class
@@ -128,3 +130,24 @@ def test_each_energy_field_for_region_is_correct_when_switching_energy_modes(
             assert new_r is not region
         else:
             assert new_r is region
+
+
+@pytest.mark.parametrize("copy", [True, False])
+@pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
+def test_region_prepare_for_epics(region: AbstractBaseRegion, copy: bool) -> None:
+    # Patch switch_energy_mode so we can spy on if it was called while also returning
+    # true function return value
+    with patch.object(
+        AbstractBaseRegion, "switch_energy_mode", wraps=region.switch_energy_mode
+    ) as mock_switch_energy_mode:
+        excitation_energy = 500
+        original_energy_mode = region.energy_mode
+        epics_region = region.prepare_for_epics(excitation_energy, copy)
+        assert epics_region.energy_mode == original_energy_mode
+        if copy:
+            assert epics_region is not region
+        else:
+            assert epics_region is region
+        mock_switch_energy_mode.assert_called_once_with(
+            EnergyMode.KINETIC, excitation_energy, copy
+        )

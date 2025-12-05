@@ -13,6 +13,7 @@ import dodal.devices.b07 as b07
 import dodal.devices.i09 as i09
 from dodal.devices.electron_analyser.abstract import (
     AbstractAnalyserDriverIO,
+    AbstractBaseRegion,
     BaseElectronAnalyserDetector,
 )
 from dodal.devices.electron_analyser.energy_sources import EnergySource
@@ -30,7 +31,7 @@ from dodal.testing.electron_analyser import create_detector
 async def sim_detector(
     request: pytest.FixtureRequest,
     single_energy_source: EnergySource,
-) -> BaseElectronAnalyserDetector[AbstractAnalyserDriverIO]:
+) -> BaseElectronAnalyserDetector[AbstractAnalyserDriverIO, AbstractBaseRegion]:
     async with init_devices(mock=True):
         sim_detector = await create_detector(
             request.param,
@@ -43,27 +44,33 @@ async def sim_detector(
 
 
 def test_analyser_detector_trigger(
-    sim_detector: BaseElectronAnalyserDetector[AbstractAnalyserDriverIO],
+    sim_detector: BaseElectronAnalyserDetector[
+        AbstractAnalyserDriverIO, AbstractBaseRegion
+    ],
     run_engine: RunEngine,
 ) -> None:
     sim_detector._controller.arm = AsyncMock()
     sim_detector._controller.wait_for_idle = AsyncMock()
 
-    run_engine(bps.trigger(sim_detector), wait=True)
+    run_engine(bps.trigger(sim_detector, wait=True), wait=True)
 
     sim_detector._controller.arm.assert_awaited_once()
     sim_detector._controller.wait_for_idle.assert_awaited_once()
 
 
 async def test_analyser_detector_read(
-    sim_detector: BaseElectronAnalyserDetector[AbstractAnalyserDriverIO],
+    sim_detector: BaseElectronAnalyserDetector[
+        AbstractAnalyserDriverIO, AbstractBaseRegion
+    ],
 ) -> None:
     driver_read = await sim_detector._controller.driver.read()
     await assert_reading(sim_detector, driver_read)
 
 
 async def test_analyser_describe(
-    sim_detector: BaseElectronAnalyserDetector[AbstractAnalyserDriverIO],
+    sim_detector: BaseElectronAnalyserDetector[
+        AbstractAnalyserDriverIO, AbstractBaseRegion
+    ],
 ) -> None:
     energy_array = await sim_detector._controller.driver.energy_axis.get_value()
     angle_array = await sim_detector._controller.driver.angle_axis.get_value()
@@ -75,14 +82,18 @@ async def test_analyser_describe(
 
 
 async def test_analyser_detector_configuration(
-    sim_detector: BaseElectronAnalyserDetector[AbstractAnalyserDriverIO],
+    sim_detector: BaseElectronAnalyserDetector[
+        AbstractAnalyserDriverIO, AbstractBaseRegion
+    ],
 ) -> None:
     driver_config = await sim_detector._controller.driver.read_configuration()
     await assert_configuration(sim_detector, driver_config)
 
 
 async def test_analyser_detector_describe_configuration(
-    sim_detector: BaseElectronAnalyserDetector[AbstractAnalyserDriverIO],
+    sim_detector: BaseElectronAnalyserDetector[
+        AbstractAnalyserDriverIO, AbstractBaseRegion
+    ],
 ) -> None:
     driver_describe_config = (
         await sim_detector._controller.driver.describe_configuration()
