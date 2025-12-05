@@ -140,11 +140,14 @@ def test_region_prepare_for_epics(region: AbstractBaseRegion, copy: bool) -> Non
     with patch.object(
         AbstractBaseRegion, "switch_energy_mode", wraps=region.switch_energy_mode
     ) as mock_switch_energy_mode:
+        excitation_energy = 500
         original_energy_mode = region.energy_mode
-        epics_region = region.prepare_for_epics(500, copy)
+        epics_region = region.prepare_for_epics(excitation_energy, copy)
         assert epics_region.energy_mode == original_energy_mode
         if copy:
             assert epics_region is not region
         else:
             assert epics_region is region
-        mock_switch_energy_mode.assert_called_once()
+        mock_switch_energy_mode.assert_called_once_with(
+            EnergyMode.KINETIC, excitation_energy, copy
+        )
