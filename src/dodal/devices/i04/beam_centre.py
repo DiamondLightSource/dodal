@@ -68,6 +68,9 @@ class CentreEllipseMethod(StandardReadable, Triggerable):
         self.array_signal = epics_signal_r(np.ndarray, f"pva://{prefix}PVA:ARRAY")
         self.center_x_val, self._center_x_val_setter = soft_signal_r_and_setter(float)
         self.center_y_val, self._center_y_val_setter = soft_signal_r_and_setter(float)
+        # I am assuming that these PVs change with the zoom (need to check that this is the case)
+        # Could change these so they look at the PVs for centre with zoom which look like {prefix}PBCX:VALH
+        # These PVs can be found in oav_detector
         self.current_centre_x = epics_signal_r(
             int, f"{prefix}OVER:{overlay_channel}:CenterX"
         )
@@ -110,6 +113,3 @@ class CentreEllipseMethod(StandardReadable, Triggerable):
         real_centre_y = centre_y + top_left_corner[1]
         self._center_x_val_setter(real_centre_x)
         self._center_y_val_setter(real_centre_y)
-
-        # here you want to implement the errors of the fit.
-        # Along with something which tells you if the fit is bad.
