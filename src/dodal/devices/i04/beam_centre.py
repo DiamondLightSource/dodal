@@ -223,6 +223,7 @@ def fit_ellipse_and_get_errors_for_vertical(input_array, cX, cY, window=50):  # 
 
     chi_squared = np.sum((residuals_with_weight) ** 2 / fit_y)
     chi_squared_per_dof = chi_squared / dof
+    # chi squared close to one is a better fit
     offset = fit_mu - cX
 
     return (
