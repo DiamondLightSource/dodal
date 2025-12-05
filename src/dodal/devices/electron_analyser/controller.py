@@ -18,6 +18,12 @@ class ElectronAnalyserController(
     ConstantDeadTimeController[TAbstractAnalyserDriverIO],
     Generic[TAbstractAnalyserDriverIO, TAbstractBaseRegion],
 ):
+    """
+    Specialised controller for the electron analysers to provide additional setup logic
+    such as selecting the energy source to use from requested region, giving the driver
+    the correct region parameters and controlling shutters.
+    """
+
     def __init__(
         self,
         driver: TAbstractAnalyserDriverIO,
@@ -25,10 +31,21 @@ class ElectronAnalyserController(
         deadtime: float,
         image_mode: ADImageMode = ADImageMode.SINGLE,
     ):
+        """
+        Parameters:
+            driver: The electron analyser driver to wrap around that holds the PV's.
+            energy_source: Device that holds the excitation energy and ability to switch
+                           between sources.
+            deadtime: For a given exposure, what is the safest minimum time between
+                      exposures that can be determined without reading signals.
+            image_mode: The image mode to configure the driver with before measuring.
+        """
         self.energy_source = energy_source
         super().__init__(driver, deadtime, image_mode)
 
     async def setup_with_region(self, region: TAbstractBaseRegion):
+        """Logic to set the driver with a region."""
+
         if isinstance(self.energy_source, DualEnergySource):
             self.energy_source.selected_source.set(region.excitation_energy_source)
         excitation_energy = await self.energy_source.energy.get_value()
@@ -36,7 +53,9 @@ class ElectronAnalyserController(
         await self.driver.set(epics_region)
 
     async def prepare(self, trigger_info: TriggerInfo) -> None:
-        # Let the driver know the excitation energy for binding energy axis
+        """Do all necessary steps to prepare the detector for triggers."""
+        # Let the driver know the excitation energy before measuring for binding energy
+        # axis calculation.
         excitation_energy = await self.energy_source.energy.get_value()
         await self.driver.cached_excitation_energy.set(excitation_energy)
         await super().prepare(trigger_info)
