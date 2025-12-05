@@ -160,3 +160,8 @@ def test_roi_logic():
         [0, 5, 5, 5],
     ]
     assert (off_centre_2 == expected_result).all()
+
+
+# you could test your vertical and horizontal slices with the expected results from your jupyter notebook
+# the notebook has images making it easier to know it's working corectly
+# see jupyter notebook here: http://i04-jupyter.diamond.ac.uk:8888/notebooks/OAV_image_analysis/QualityAssurancePipeline.ipynb
