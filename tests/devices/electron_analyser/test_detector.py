@@ -3,7 +3,7 @@ from unittest.mock import AsyncMock
 import pytest
 from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import init_devices
+from ophyd_async.core import TriggerInfo, init_devices
 
 import dodal.devices.b07 as b07
 import dodal.devices.i09 as i09
@@ -141,14 +141,17 @@ async def test_analyser_region_detector_trigger_sets_driver_with_region(
     region_detectors = sim_detector.create_region_detector_list(
         sequence_file_path, enabled_only=False
     )
+    trigger_info = TriggerInfo()
 
     for reg_det in region_detectors:
         reg_det.set = AsyncMock()
+        reg_det._controller.prepare = AsyncMock()
         reg_det._controller.arm = AsyncMock()
         reg_det._controller.wait_for_idle = AsyncMock()
 
-        run_engine(bps.trigger(reg_det), wait=True)
+        run_engine(bps.trigger(reg_det, wait=True), wait=True)
 
+        reg_det.set.assert_awaited_once_with(reg_det.region)
+        reg_det._controller.prepare.assert_awaited_once_with(trigger_info)
         reg_det._controller.arm.assert_awaited_once()
         reg_det._controller.wait_for_idle.assert_awaited_once()
-        reg_det.set.assert_awaited_once_with(reg_det.region)
