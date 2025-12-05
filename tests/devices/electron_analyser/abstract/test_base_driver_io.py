@@ -31,46 +31,6 @@ async def sim_driver(
     return sim_driver
 
 
-# @pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
-# async def test_driver_set(
-#     sim_driver: AbstractAnalyserDriverIO,
-#     region: AbstractBaseRegion,
-#     run_engine: RunEngine,
-# ) -> None:
-#     sim_driver._set_region = AsyncMock()
-
-#     # Patch switch_energy_mode so we can check on calls, but still run the real function
-#     with patch.object(
-#         AbstractBaseRegion,
-#         "switch_energy_mode",
-#         side_effect=AbstractBaseRegion.switch_energy_mode,  # run the real method
-#         autospec=True,
-#     ) as mock_switch_energy_mode:
-#         run_engine(bps.mv(sim_driver, region))
-
-#         mock_switch_energy_mode.assert_called_once_with(
-#             region,
-#             EnergyMode.KINETIC,
-#             await sim_driver.energy_source.energy.get_value(),
-#         )
-
-#         if isinstance(sim_driver.energy_source, DualEnergySource):
-#             get_mock_put(
-#                 sim_driver.energy_source.selected_source
-#             ).assert_called_once_with(region.excitation_energy_source, wait=True)
-
-#         # Check interal _set_region was set with ke_region
-#         ke_region = mock_switch_energy_mode.call_args[0][0].switch_energy_mode(
-#             EnergyMode.KINETIC,
-#             await sim_driver.energy_source.energy.get_value(),
-#         )
-#         sim_driver._set_region.assert_called_once_with(ke_region)
-
-#         get_mock_put(sim_driver.energy_mode).assert_called_once_with(
-#             region.energy_mode, wait=True
-#         )
-
-
 def test_driver_throws_error_with_wrong_lens_mode(
     sim_driver: AbstractAnalyserDriverIO,
     run_engine: RunEngine,
@@ -108,18 +68,3 @@ def test_driver_throws_error_with_wrong_psu_mode(
     psu_datatype_name = psu_datatype.__name__ if psu_datatype is not None else ""
     with pytest.raises(FailedStatus, match=f"is not a valid {psu_datatype_name}"):
         run_engine(bps.mv(sim_driver.psu_mode, PsuModeTestEnum.TEST_1))
-
-
-# Needs to be moved to detector
-# @pytest.mark.asyncio
-# async def test_stage_sets_image_mode_and_calls_super(
-#     sim_driver: AbstractAnalyserDriverIO,
-# ):
-#     # Patch image_mode.set and super().stage
-#     with patch.object(
-#         AbstractAnalyserDriverIO.__bases__[1], "stage", new=AsyncMock()
-#     ) as super_stage:
-#         sim_driver.image_mode.set = AsyncMock()
-#         await sim_driver.stage()
-#         sim_driver.image_mode.set.assert_awaited_once_with(ADImageMode.SINGLE)
-#         super_stage.assert_awaited_once()
