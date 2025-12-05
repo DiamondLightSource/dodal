@@ -132,7 +132,7 @@ class AbstractBaseRegion(
     def prepare_for_epics(self, excitation_energy: float, copy: bool = True) -> Self:
         """Prepares a region for epics by converting BINDING to KINETIC by calculating
         new values for low_energy, centre_energy, and high_energy while also preserving
-        the original energy mode e.g mode BINDING will stay as BINDING
+        the original energy mode e.g mode BINDING will stay as BINDING.
 
         Parameters:
             excitation_energy: Energy conversion for low_energy, centre_energy, and
@@ -140,11 +140,10 @@ class AbstractBaseRegion(
             copy: Defaults to True. If true, create a copy of this region to alter to
                   calculate new energy values to return. If false, alter this region.
         Returns:
-            Region with selected original energy mode and new calculated energy values
-            for epics (in KINETIC).
+            Region with selected original energy mode and new calculated KINETIC energy
+            values for epics.
         """
         original_energy_mode = self.energy_mode
-        # Switch to kinetic energy as epics doesn't support BINDING.
         r = self.switch_energy_mode(EnergyMode.KINETIC, excitation_energy, copy)
         r.energy_mode = original_energy_mode
         return r
