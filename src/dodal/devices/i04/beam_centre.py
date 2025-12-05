@@ -128,7 +128,7 @@ def gauss(x, A, mu, H, sigma):
     return (A * np.exp(-((x - mu) ** 2) / (2 * sigma**2))) + H
 
 
-def fit_ellipse_and_get_errors_for_horizontal(input_array, cX, cY, window=50):
+def fit_ellipse_and_get_errors_for_horizontal(input_array, cX, cY, window=50):  # noqa: N803
     """
     Fit a Gaussian to a horizontal slice of the image and return
     the center offset and residuals.
@@ -160,57 +160,55 @@ def fit_ellipse_and_get_errors_for_horizontal(input_array, cX, cY, window=50):
     parameters, _ = curve_fit(
         gauss, x_fit, y_fit, p0=[max(y_fit), cX, np.min(y_fit), 5]
     )
-    fit_A, fit_mu, fit_H, fit_sigma = parameters
-
-    # Compute fitted curve
-    fit_y = gauss(x_fit, fit_A, fit_mu, fit_H, fit_sigma)
-
-    # Residuals
-    residuals = y_fit - fit_y
-    overall_res = np.sum(
-        residuals
-    )  # this should be no greater than 1 times ten to the minus 5 (otherwise indicates that something has gone really wrong)
-
-    # Offset from expected center
-    offset = fit_mu - cY
-
-    return offset, overall_res
-
-
-def fit_ellipse_and_get_errors_for_vertical(input_array, cX, cY, window=50):  # noqa: N803
-    """
-    Fit a Gaussian to a horizontal slice of the image and return
-    the center offset and residuals.
-    Parameters:
-        input_array (np.ndarray): 1D horizontal slice of the image.
-        cX (int): X-coordinate of the center.
-        cY (int): Y-coordinate of the center (used for offset).
-        window (int): Half-width of fitting window around cX.
-    Returns:
-        offset (float): Difference between fitted mean and cY.
-        residuals (np.ndarray): y_fit - fitted_y for the chosen window.
-        fit_params (tuple): (A, mu, H, sigma) from the fit.
-    """
-    pixel_no_v = np.arange(len(input_array))
-
-    # Define fitting window as we don't want to fit the whole profile.
-    # later you can make sure that this matches the ROI
-    start = int(max(0, cY - window))
-    end = int(min(len(input_array), cY + window))
-
-    x_fit = pixel_no_v[start:end]
-    y_fit = input_array[start:end]
-
-    # Fit Gaussian
-    parameters, _ = curve_fit(
-        gauss, x_fit, y_fit, p0=[max(y_fit), cY, np.min(y_fit), 5]
-    )
     fit_A, fit_mu, fit_H, fit_sigma = parameters  # noqa: N806
 
     # Compute fitted curve
     fit_y = gauss(x_fit, fit_A, fit_mu, fit_H, fit_sigma)
 
     # Residuals and offset
+    weight = 8
+    # reciprocal of this is my estimate for the errors of the intensities of the pixel
+    dof = (window * 2) - 3
+    # degrees of freedom (using 3 instead of 4 to account for the extra pixel)
+    residuals = y_fit - fit_y
+    overall_ssr_per_dof = (
+        np.sum(residuals**2) / dof
+    )  # if this is greater than 150 something has gone really wrong with the fit
+    residuals_with_weight = residuals * weight
+
+    chi_squared = np.sum((residuals_with_weight) ** 2 / fit_y)
+    chi_squared_per_dof = chi_squared / dof
+    # chi squared close to one is a better fit
+    offset = fit_mu - cX
+
+    return (
+        offset,
+        overall_ssr_per_dof,
+        chi_squared_per_dof,
+        (fit_A, fit_mu, fit_H, fit_sigma),
+    )
+
+
+def vertical_slice(img_path, cX, cY, ax=None, crop=None, distance_from_centre=100):
+    img = cv2.imread(img_path, 0)
+    if img is None:
+        raise ValueError(f"Could not read image from path: {img_path}")
+
+    v_slice = img[:, cX]
+    pixel_no_v = range(len(v_slice))  # Y positions
+
+    # fit data to guassian
+    window = distance_from_centre
+    start = int(max(0, cY - window))
+    end = int(min(len(v_slice), cY + window))
+
+    x_fit = pixel_no_v[start:end]
+    y_fit = v_slice[start:end]
+
+    parameters, _ = curve_fit(gauss, x_fit, y_fit, p0=[max(v_slice), cY, 10, 5])
+    fit_A, fit_mu, fit_H, fit_sigma = parameters
+    fit_y = gauss(x_fit, fit_A, fit_mu, fit_H, fit_sigma)
+
     weight = 8
     # reciprocal of this is my estimate for the errors of the intensities of the pixel
     dof = (window * 2) - 3
