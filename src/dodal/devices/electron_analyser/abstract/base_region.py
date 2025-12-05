@@ -88,7 +88,10 @@ class AbstractBaseRegion(
         return self.energy_mode == EnergyMode.KINETIC
 
     def switch_energy_mode(
-        self, energy_mode: EnergyMode, excitation_energy: float, copy: bool = True
+        self,
+        energy_mode: EnergyMode,
+        excitation_energy: float,
+        copy: bool = True,
     ) -> Self:
         """
         Switch region with to a new energy mode with a new energy mode: Kinetic or Binding.
@@ -125,6 +128,13 @@ class AbstractBaseRegion(
         switched_r.energy_mode = energy_mode
 
         return switched_r
+
+    def prepare_for_epics(self, excitation_energy, copy=True):
+        energy_mode = self.energy_mode
+        # Switch to kinetic energy as epics doesn't support BINDING.
+        r = self.switch_energy_mode(EnergyMode.KINETIC, excitation_energy, copy)
+        r.energy_mode = energy_mode
+        return r
 
     @model_validator(mode="before")
     @classmethod

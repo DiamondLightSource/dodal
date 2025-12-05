@@ -2,10 +2,8 @@ from typing import Generic, TypeVar
 
 from bluesky.protocols import Stageable
 from ophyd_async.core import AsyncStatus
-from ophyd_async.epics.adcore import ADBaseController
 
 from dodal.common.data_util import load_json_file_to_class
-from dodal.devices.controllers import ConstantDeadTimeController
 from dodal.devices.electron_analyser.abstract.base_detector import (
     BaseElectronAnalyserDetector,
 )
@@ -16,10 +14,12 @@ from dodal.devices.electron_analyser.abstract.base_region import (
     TAbstractBaseRegion,
     TAbstractBaseSequence,
 )
+from dodal.devices.electron_analyser.controller import ElectronAnalyserController
+from dodal.devices.electron_analyser.energy_sources import AbstractEnergySource
 
 
 class ElectronAnalyserRegionDetector(
-    BaseElectronAnalyserDetector[TAbstractAnalyserDriverIO],
+    BaseElectronAnalyserDetector[TAbstractAnalyserDriverIO, TAbstractBaseRegion],
     Generic[TAbstractAnalyserDriverIO, TAbstractBaseRegion],
 ):
     """
@@ -29,7 +29,9 @@ class ElectronAnalyserRegionDetector(
 
     def __init__(
         self,
-        controller: ADBaseController[TAbstractAnalyserDriverIO],
+        controller: ElectronAnalyserController[
+            TAbstractAnalyserDriverIO, TAbstractBaseRegion
+        ],
         region: TAbstractBaseRegion,
         name: str = "",
     ):
@@ -39,7 +41,7 @@ class ElectronAnalyserRegionDetector(
     @AsyncStatus.wrap
     async def trigger(self) -> None:
         # Configure region parameters on the driver first before data collection.
-        await self._controller.driver.set(self.region)
+        await self.set(self.region)
         await super().trigger()
 
 
@@ -50,7 +52,7 @@ TElectronAnalyserRegionDetector = TypeVar(
 
 
 class ElectronAnalyserDetector(
-    BaseElectronAnalyserDetector[TAbstractAnalyserDriverIO],
+    BaseElectronAnalyserDetector[TAbstractAnalyserDriverIO, TAbstractBaseRegion],
     Stageable,
     Generic[
         TAbstractAnalyserDriverIO,
@@ -68,12 +70,15 @@ class ElectronAnalyserDetector(
         self,
         sequence_class: type[TAbstractBaseSequence],
         driver: TAbstractAnalyserDriverIO,
+        energy_source: AbstractEnergySource,
         name: str = "",
     ):
         # Save driver as direct child so participates with connect()
         self.driver = driver
         self._sequence_class = sequence_class
-        controller = ConstantDeadTimeController[TAbstractAnalyserDriverIO](driver, 0)
+        controller = ElectronAnalyserController[
+            TAbstractAnalyserDriverIO, TAbstractBaseRegion
+        ](driver=driver, energy_source=energy_source, deadtime=0)
         super().__init__(controller, name)
 
     @AsyncStatus.wrap
@@ -128,7 +133,9 @@ class ElectronAnalyserDetector(
             the sequence file.
         """
         seq = self.load_sequence(filename)
-        regions = seq.get_enabled_regions() if enabled_only else seq.regions
+        regions: list[TAbstractBaseRegion] = (
+            seq.get_enabled_regions() if enabled_only else seq.regions
+        )
         return [
             ElectronAnalyserRegionDetector(
                 self._controller, r, self.name + "_" + r.name

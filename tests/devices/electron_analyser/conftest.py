@@ -84,10 +84,12 @@ def sequence_class(
 def sequence(
     sim_driver: AbstractAnalyserDriverIO,
     sequence_class: type[TAbstractBaseSequence],
+    dual_energy_source: DualEnergySource,
 ) -> AbstractBaseSequence:
     det = ElectronAnalyserDetector(
         driver=sim_driver,
         sequence_class=sequence_class,
+        energy_source=dual_energy_source,
     )
     return det.load_sequence(get_test_sequence(type(sim_driver)))
 

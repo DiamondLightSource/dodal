@@ -39,10 +39,14 @@ class VGScientaDetector(
         name: str = "",
     ):
         driver = VGScientaAnalyserDriverIO[TLensMode, TPsuMode, TPassEnergyEnum](
-            prefix, lens_mode_type, psu_mode_type, pass_energy_type, energy_source
+            prefix,
+            lens_mode_type,
+            psu_mode_type,
+            pass_energy_type,
         )
         super().__init__(
             VGScientaSequence[lens_mode_type, psu_mode_type, pass_energy_type],
             driver,
+            energy_source,
             name,
         )
