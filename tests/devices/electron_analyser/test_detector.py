@@ -1,9 +1,9 @@
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock
 
 import pytest
 from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import get_mock_put, init_devices
+from ophyd_async.core import init_devices
 
 import dodal.devices.b07 as b07
 import dodal.devices.i09 as i09
@@ -11,8 +11,6 @@ from dodal.devices.electron_analyser import (
     EnergySource,
     GenericElectronAnalyserDetector,
 )
-from dodal.devices.electron_analyser.abstract import AbstractBaseRegion
-from dodal.devices.electron_analyser.energy_sources import DualEnergySource
 from dodal.devices.electron_analyser.specs import SpecsDetector
 from dodal.devices.electron_analyser.vgscienta import VGScientaDetector
 from dodal.testing.electron_analyser import create_detector
@@ -108,29 +106,34 @@ def test_analyser_detector_has_driver_as_child_and_region_detector_does_not(
         assert det._controller.driver.parent == sim_detector
 
 
-# async def test_analyser_region_detector_trigger_sets_driver_with_region(
-#     sim_detector: GenericElectronAnalyserDetector,
-#     sequence_file_path: str,
-#     run_engine: RunEngine,
-# ) -> None:
-#     region_detectors = sim_detector.create_region_detector_list(
-#         sequence_file_path, enabled_only=False
-#     )
+def test_analyser_detector_trigger_called_controller_prepare(
+    sim_detector: GenericElectronAnalyserDetector,
+    run_engine: RunEngine,
+) -> None:
+    sim_detector._controller.prepare = AsyncMock()
+    sim_detector._controller.arm = AsyncMock()
+    sim_detector._controller.wait_for_idle = AsyncMock()
 
-#     for reg_det in region_detectors:
-#         reg_det._controller.driver.set = AsyncMock()
+    run_engine(bps.trigger(sim_detector, wait=True), wait=True)
 
-#         reg_det._controller.arm = AsyncMock()
-#         reg_det._controller.wait_for_idle = AsyncMock()
-
-#         run_engine(bps.trigger(reg_det), wait=True)
-
-#         reg_det._controller.arm.assert_awaited_once()
-#         reg_det._controller.wait_for_idle.assert_awaited_once()
-#         reg_det._controller.driver.set.assert_awaited_once_with(reg_det.region)
+    sim_detector._controller.prepare.assert_awaited_once()
+    sim_detector._controller.arm.assert_awaited_once()
+    sim_detector._controller.wait_for_idle.assert_awaited_once()
 
 
-async def test_region_detector_trigger(
+def test_analyser_detector_set_called_controller_setup_with_region(
+    sim_detector: GenericElectronAnalyserDetector,
+    sequence_file_path: str,
+    run_engine: RunEngine,
+) -> None:
+    seq = sim_detector.load_sequence(sequence_file_path)
+    region = seq.get_enabled_regions()[0]
+    sim_detector._controller.setup_with_region = AsyncMock()
+    run_engine(bps.mv(sim_detector, region), wait=True)
+    sim_detector._controller.setup_with_region.assert_awaited_once_with(region)
+
+
+async def test_analyser_region_detector_trigger_sets_driver_with_region(
     sim_detector: GenericElectronAnalyserDetector,
     sequence_file_path: str,
     run_engine: RunEngine,
@@ -140,32 +143,12 @@ async def test_region_detector_trigger(
     )
 
     for reg_det in region_detectors:
-        region = reg_det.region
-        sim_driver = reg_det._controller.driver
-        sim_driver.set = AsyncMock()
+        reg_det.set = AsyncMock()
+        reg_det._controller.arm = AsyncMock()
+        reg_det._controller.wait_for_idle = AsyncMock()
 
-        # Patch switch_energy_mode so we can check on calls, but still run the real function
-        with patch.object(
-            AbstractBaseRegion,
-            "prepare_for_epics",
-            side_effect=AbstractBaseRegion.prepare_for_epics,  # run the real method
-            autospec=True,
-        ) as mock_prepare_for_epics:
-            energy_source = sim_detector._controller.energy_source
+        run_engine(bps.trigger(reg_det), wait=True)
 
-            run_engine(bps.trigger(reg_det, wait=True), wait=True)
-            mock_prepare_for_epics.assert_called_once_with(
-                region,
-                await energy_source.energy.get_value(),
-            )
-
-            if isinstance(energy_source, DualEnergySource):
-                get_mock_put(energy_source.selected_source).assert_called_once_with(
-                    region.excitation_energy_source, wait=True
-                )
-
-            # Check interal _set_region was set with ke_region
-            epics_region = mock_prepare_for_epics.call_args[0][0].prepare_for_epics(
-                await energy_source.energy.get_value(),
-            )
-            sim_driver.set.assert_called_once_with(epics_region)
+        reg_det._controller.arm.assert_awaited_once()
+        reg_det._controller.wait_for_idle.assert_awaited_once()
+        reg_det.set.assert_awaited_once_with(reg_det.region)

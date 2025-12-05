@@ -40,29 +40,3 @@ class ElectronAnalyserController(
         excitation_energy = await self.energy_source.energy.get_value()
         await self.driver.cached_excitation_energy.set(excitation_energy)
         await super().prepare(trigger_info)
-
-
-# class ElectronAnalyserControllerWithShutters(
-#     ElectronAnalyserController[TAbstractAnalyserDriverIO, TAbstractBaseRegion]
-# ):
-#     def __init__(
-#         self,
-#         driver: TAbstractAnalyserDriverIO,
-#         energy_source,
-#         shutter,
-#         close_shutter_between_regions: bool,
-#         deadtime: float,
-#         image_mode: ADImageMode = ADImageMode.SINGLE,
-#     ):
-#         self.close_shutter_between_regions = close_shutter_between_regions
-#         self.shutter = shutter
-#         super().__init__(driver, energy_source, deadtime, image_mode)
-
-#     async def setup_with_region(self, region: TAbstractBaseRegion):
-#         if isinstance(self.shutter, DualFastShutter):
-#             self.shutter.selected_source.set(region.excitation_energy_source)
-
-#         if self.close_shutter_between_regions:
-#             await self.shutter.set(self.shutter.close_state)
-#         await super().setup_with_region(region)
-#         await self.shutter.set(self.shutter.open_state)
