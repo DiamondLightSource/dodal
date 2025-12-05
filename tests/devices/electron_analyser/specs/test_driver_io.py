@@ -91,7 +91,6 @@ async def test_analyser_sets_region_correctly(
     get_mock_put(sim_driver.snapshot_values).assert_called_once_with(
         region.values, wait=True
     )
-    # Need to add energy_mode
 
 
 @pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
