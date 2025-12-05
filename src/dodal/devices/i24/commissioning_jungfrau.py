@@ -87,7 +87,6 @@ class JunfrauCommissioningWriter(DetectorWriter, StandardReadable):
     ) -> AsyncGenerator[int, None]:
         timeout = timeout * 4  # This filewriter is very slow
         async for num_captured in observe_value(self.frame_counter, timeout):
-            print(f"frame counter is at {num_captured}")
             yield num_captured // (self._exposures_per_event)
 
     async def get_indices_written(self) -> int:
