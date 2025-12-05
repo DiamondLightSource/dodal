@@ -14,6 +14,7 @@ from ophyd_async.core import (
 )
 
 from dodal.devices.robot import (
+    SAMPLE_LOCATION_EMPTY,
     WAIT_FOR_NEW_PIN_MSG,
     WAIT_FOR_OLD_PIN_MSG,
     BartRobot,
@@ -253,7 +254,7 @@ async def test_moving_the_robot_will_reset_error_if_light_curtain_is_tripped_and
 async def test_unloading_the_robot_waits_for_drying_to_complete(robot_for_unload):
     robot, trigger_completed, drying_completed = robot_for_unload
     drying_completed.set()
-    unload_status = robot.set(None)
+    unload_status = robot.set(SAMPLE_LOCATION_EMPTY)
 
     await asyncio.sleep(0.1)
     assert not unload_status.done
@@ -269,7 +270,7 @@ async def test_unloading_the_robot_times_out_if_unloading_takes_too_long(
 ):
     robot, trigger_completed, drying_completed = robot_for_unload
     drying_completed.set()
-    unload_status = robot.set(None)
+    unload_status = robot.set(SAMPLE_LOCATION_EMPTY)
 
     with pytest.raises(RobotLoadError) as exc_info:
         await unload_status
@@ -280,7 +281,7 @@ async def test_unloading_the_robot_times_out_if_unloading_takes_too_long(
 async def test_unloading_the_robot_times_out_if_drying_takes_too_long(robot_for_unload):
     robot, trigger_completed, drying_completed = robot_for_unload
     trigger_completed.set()
-    unload_status = robot.set(None)
+    unload_status = robot.set(SAMPLE_LOCATION_EMPTY)
 
     with pytest.raises(RobotLoadError) as exc_info:
         await unload_status
