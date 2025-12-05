@@ -43,7 +43,7 @@ class SampleLocation:
     pin: int
 
 
-SAMPLE_LOCATION_EMPTY = SampleLocation(0, 0)
+SAMPLE_LOCATION_EMPTY = SampleLocation(-1, -1)
 
 
 class PinMounted(StrictEnum):
