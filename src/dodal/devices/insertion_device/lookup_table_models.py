@@ -138,15 +138,20 @@ class EnergyCoverage(BaseModel):
                 min_energies, max_energies, poly1d_params, strict=True
             )
         ]
+        energy_entries.sort(key=lambda e: e.min_energy)
         return cls(energy_entries=energy_entries)
 
     @property
     def min_energy(self) -> float:
-        return min(e.min_energy for e in self.energy_entries)
+        return self.energy_entries[0].min_energy
 
     @property
     def max_energy(self) -> float:
-        return max(e.max_energy for e in self.energy_entries)
+        return self.energy_entries[-1].max_energy
+
+    def sort_energy_entries(self) -> None:
+        """Sort energy entries by their minimum energy values."""
+        self.energy_entries.sort(key=lambda e: e.min_energy)
 
     def get_poly(self, energy: float) -> np.poly1d:
         """
@@ -275,6 +280,8 @@ def convert_csv_to_lookup(
             "LookupTable content is empty, failed to convert the file contents to "
             "a LookupTable!"
         )
+    for pol in lut.root.values():
+        pol.sort_energy_entries()
     return lut
 
 
