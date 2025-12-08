@@ -58,10 +58,10 @@ dodal.devices.insertion\_device.lookup\_table\_models.EnergyCoverageEntry
       
       
       
-      ~EnergyCoverageEntry.low
+      ~EnergyCoverageEntry.min_energy
       
       
-      ~EnergyCoverageEntry.high
+      ~EnergyCoverageEntry.max_energy
       
       
       ~EnergyCoverageEntry.poly

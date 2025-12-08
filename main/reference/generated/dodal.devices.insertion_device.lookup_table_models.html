@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.insertion_device.lookup_table_models &#8212; dodal 1.66.1.dev13+g7cdf4cffe documentation</title>
+    <title>dodal.devices.insertion_device.lookup_table_models &#8212; dodal 1.66.1.dev14+g33d2b32a2 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=f26087d5"></script>
+    <script src="../../_static/documentation_options.js?v=48caae6a"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -1078,22 +1078,19 @@
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.insertion_device.lookup_table_models.EnergyCoverage.html#dodal.devices.insertion_device.lookup_table_models.EnergyCoverage" title="dodal.devices.insertion_device.lookup_table_models.EnergyCoverage"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EnergyCoverage</span></code></a></p></td>
-<td><p></p></td>
+<td><p>Create a new model by parsing and validating input data from keyword arguments.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.insertion_device.lookup_table_models.EnergyCoverageEntry.html#dodal.devices.insertion_device.lookup_table_models.EnergyCoverageEntry" title="dodal.devices.insertion_device.lookup_table_models.EnergyCoverageEntry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EnergyCoverageEntry</span></code></a></p></td>
 <td><p>Create a new model by parsing and validating input data from keyword arguments.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.insertion_device.lookup_table_models.EnergyMinMax.html#dodal.devices.insertion_device.lookup_table_models.EnergyMinMax" title="dodal.devices.insertion_device.lookup_table_models.EnergyMinMax"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EnergyMinMax</span></code></a></p></td>
-<td><p>Create a new model by parsing and validating input data from keyword arguments.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.insertion_device.lookup_table_models.LookupTable.html#dodal.devices.insertion_device.lookup_table_models.LookupTable" title="dodal.devices.insertion_device.lookup_table_models.LookupTable"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LookupTable</span></code></a></p></td>
+<td><p>Specialised lookup table for insertion devices to relate the energy and polarisation values to Apple2 motor positions.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.insertion_device.lookup_table_models.LookupTable.html#dodal.devices.insertion_device.lookup_table_models.LookupTable" title="dodal.devices.insertion_device.lookup_table_models.LookupTable"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LookupTable</span></code></a></p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.insertion_device.lookup_table_models.LookupTableColumnConfig.html#dodal.devices.insertion_device.lookup_table_models.LookupTableColumnConfig" title="dodal.devices.insertion_device.lookup_table_models.LookupTableColumnConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LookupTableColumnConfig</span></code></a></p></td>
+<td><p>Configuration on how to process a csv file columns into a LookupTable data model.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.insertion_device.lookup_table_models.LookupTableConfig.html#dodal.devices.insertion_device.lookup_table_models.LookupTableConfig" title="dodal.devices.insertion_device.lookup_table_models.LookupTableConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LookupTableConfig</span></code></a></p></td>
-<td><p>Create a new model by parsing and validating input data from keyword arguments.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.insertion_device.lookup_table_models.LookupTableEntry.html#dodal.devices.insertion_device.lookup_table_models.LookupTableEntry" title="dodal.devices.insertion_device.lookup_table_models.LookupTableEntry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LookupTableEntry</span></code></a></p></td>
-<td><p>Create a new model by parsing and validating input data from keyword arguments.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.insertion_device.lookup_table_models.Source.html#dodal.devices.insertion_device.lookup_table_models.Source" title="dodal.devices.insertion_device.lookup_table_models.Source"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Source</span></code></a></p></td>
+<td><p>Source(column, value)</p></td>
 </tr>
 </tbody>
 </table>
@@ -1107,25 +1104,22 @@ The lookup-table dictionary created by convert_csv_to_lookup() follows this
 structure:</p>
 <dl>
 <dt>{</dt><dd><dl>
-<dt>“POL_MODE”: {</dt><dd><dl class="simple">
-<dt>“energies”: {</dt><dd><dl class="simple">
-<dt>“&lt;min_energy&gt;”: {</dt><dd><p>“low”: &lt;float&gt;,
+<dt>“POL_MODE”: {</dt><dd><dl>
+<dt>“energy_entries”: [</dt><dd><blockquote>
+<div><dl class="simple">
+<dt>{</dt><dd><p>“low”: &lt;float&gt;,
 “high”: &lt;float&gt;,
 “poly”: &lt;numpy.poly1d&gt;</p>
 </dd>
 </dl>
-</dd>
-</dl>
-<p>},
-“limit”: {</p>
-<blockquote>
-<div><p>“minimum”: &lt;float&gt;,
-“maximum”: &lt;float&gt;</p>
-</div></blockquote>
-<p>}</p>
-</dd>
-</dl>
 <p>},</p>
+</div></blockquote>
+<p>…</p>
+</dd>
+</dl>
+<p>]</p>
+</dd>
+</dl>
 </dd>
 </dl>
 <p>}</p>
@@ -1143,7 +1137,7 @@ structure:</p>
 </div>
 <dl class="py function">
 <dt class="sig sig-object py" id="dodal.devices.insertion_device.lookup_table_models.convert_csv_to_lookup">
-<span class="sig-prename descclassname"><span class="pre">dodal.devices.insertion_device.lookup_table_models.</span></span><span class="sig-name descname"><span class="pre">convert_csv_to_lookup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_contents</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">lut_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="dodal.devices.insertion_device.lookup_table_models.LookupTableConfig.html#dodal.devices.insertion_device.lookup_table_models.LookupTableConfig" title="dodal.devices.insertion_device.lookup_table_models.LookupTableConfig"><span class="pre">LookupTableConfig</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_line_start_with</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'#'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="dodal.devices.insertion_device.lookup_table_models.LookupTable.html#dodal.devices.insertion_device.lookup_table_models.LookupTable" title="dodal.devices.insertion_device.lookup_table_models.LookupTable"><span class="pre">LookupTable</span></a></span></span><a class="reference internal" href="../../_modules/dodal/devices/insertion_device/lookup_table_models.html#convert_csv_to_lookup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.insertion_device.lookup_table_models.convert_csv_to_lookup" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">dodal.devices.insertion_device.lookup_table_models.</span></span><span class="sig-name descname"><span class="pre">convert_csv_to_lookup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_contents</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">lut_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="dodal.devices.insertion_device.lookup_table_models.LookupTableColumnConfig.html#dodal.devices.insertion_device.lookup_table_models.LookupTableColumnConfig" title="dodal.devices.insertion_device.lookup_table_models.LookupTableColumnConfig"><span class="pre">LookupTableColumnConfig</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_line_start_with</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'#'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="dodal.devices.insertion_device.lookup_table_models.LookupTable.html#dodal.devices.insertion_device.lookup_table_models.LookupTable" title="dodal.devices.insertion_device.lookup_table_models.LookupTable"><span class="pre">LookupTable</span></a></span></span><a class="reference internal" href="../../_modules/dodal/devices/insertion_device/lookup_table_models.html#convert_csv_to_lookup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.insertion_device.lookup_table_models.convert_csv_to_lookup" title="Link to this definition">#</a></dt>
 <dd><p>Convert CSV content into the Apple2 lookup-table dictionary.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
@@ -1174,7 +1168,7 @@ LookupTable</p>
 <dt class="field-odd">param lut_config<span class="colon">:</span></dt>
 <dd class="field-odd"><p></p></dd>
 <dt class="field-even">type lut_config<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="dodal.devices.insertion_device.lookup_table_models.LookupTableConfig.html#dodal.devices.insertion_device.lookup_table_models.LookupTableConfig" title="dodal.devices.insertion_device.lookup_table_models.LookupTableConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">LookupTableConfig</span></code></a></span></p>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="dodal.devices.insertion_device.lookup_table_models.LookupTableColumnConfig.html#dodal.devices.insertion_device.lookup_table_models.LookupTableColumnConfig" title="dodal.devices.insertion_device.lookup_table_models.LookupTableColumnConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">LookupTableColumnConfig</span></code></a></span></p>
 </dd>
 <dt class="field-odd">param skip_line_start_with<span class="colon">:</span></dt>
 <dd class="field-odd"><p></p></dd>

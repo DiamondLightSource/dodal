@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.insertion_device.lookup_table_models.LookupTable &#8212; dodal 1.66.1.dev13+g7cdf4cffe documentation</title>
+    <title>dodal.devices.insertion_device.lookup_table_models.LookupTable &#8212; dodal 1.66.1.dev14+g33d2b32a2 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=f26087d5"></script>
+    <script src="../../_static/documentation_options.js?v=48caae6a"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -58,8 +58,8 @@
     <link rel="icon" href="../../_static/dls-logo.svg"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="dodal.devices.insertion_device.lookup_table_models.LookupTableConfig" href="dodal.devices.insertion_device.lookup_table_models.LookupTableConfig.html" />
-    <link rel="prev" title="dodal.devices.insertion_device.lookup_table_models.EnergyMinMax" href="dodal.devices.insertion_device.lookup_table_models.EnergyMinMax.html" />
+    <link rel="next" title="dodal.devices.insertion_device.lookup_table_models.LookupTableColumnConfig" href="dodal.devices.insertion_device.lookup_table_models.LookupTableColumnConfig.html" />
+    <link rel="prev" title="dodal.devices.insertion_device.lookup_table_models.EnergyCoverageEntry" href="dodal.devices.insertion_device.lookup_table_models.EnergyCoverageEntry.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="main" />
@@ -1080,16 +1080,18 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="dodal.devices.insertion_device.lookup_table_models.LookupTable">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dodal.devices.insertion_device.lookup_table_models.</span></span><span class="sig-name descname"><span class="pre">LookupTable</span></span><a class="reference internal" href="../../_modules/dodal/devices/insertion_device/lookup_table_models.html#LookupTable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.insertion_device.lookup_table_models.LookupTable" title="Link to this definition">#</a></dt>
-<dd><dl class="field-list simple">
+<dd><p>Specialised lookup table for insertion devices to relate the energy and polarisation
+values to Apple2 motor positions.</p>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>root</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference internal" href="dodal.devices.insertion_device.apple2_undulator.Pol.html#dodal.devices.insertion_device.apple2_undulator.Pol" title="dodal.devices.insertion_device.apple2_undulator.Pol"><code class="xref py py-class docutils literal notranslate"><span class="pre">Pol</span></code></a>, <a class="reference internal" href="dodal.devices.insertion_device.lookup_table_models.LookupTableEntry.html#dodal.devices.insertion_device.lookup_table_models.LookupTableEntry" title="dodal.devices.insertion_device.lookup_table_models.LookupTableEntry"><code class="xref py py-class docutils literal notranslate"><span class="pre">LookupTableEntry</span></code></a>] | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p>
+<dd class="field-odd"><p><strong>root</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference internal" href="dodal.devices.insertion_device.apple2_undulator.Pol.html#dodal.devices.insertion_device.apple2_undulator.Pol" title="dodal.devices.insertion_device.apple2_undulator.Pol"><code class="xref py py-class docutils literal notranslate"><span class="pre">Pol</span></code></a>, <a class="reference internal" href="dodal.devices.insertion_device.lookup_table_models.EnergyCoverage.html#dodal.devices.insertion_device.lookup_table_models.EnergyCoverage" title="dodal.devices.insertion_device.lookup_table_models.EnergyCoverage"><code class="xref py py-class docutils literal notranslate"><span class="pre">EnergyCoverage</span></code></a>] | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p>
 </dd>
 </dl>
 <p class="rubric">Methods</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#dodal.devices.insertion_device.lookup_table_models.LookupTable.generate" title="dodal.devices.insertion_device.lookup_table_models.LookupTable.generate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate</span></code></a>(pols, min_energies, max_energies, ...)</p></td>
-<td><p>Generate a LookupTable containing multiple LookupTableEntry for provided polarisations.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dodal.devices.insertion_device.lookup_table_models.LookupTable.generate" title="dodal.devices.insertion_device.lookup_table_models.LookupTable.generate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate</span></code></a>(pols, energy_coverage)</p></td>
+<td><p>Generate a LookupTable containing multiple EnergyCoverage for provided polarisations.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#dodal.devices.insertion_device.lookup_table_models.LookupTable.get_poly" title="dodal.devices.insertion_device.lookup_table_models.LookupTable.get_poly"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_poly</span></code></a>(energy, pol)</p></td>
 <td><p>Return the numpy.poly1d polynomial applicable for the given energy and polarisation.</p></td>
@@ -1111,16 +1113,14 @@
 </div>
 <dl class="py method">
 <dt class="sig sig-object py" id="dodal.devices.insertion_device.lookup_table_models.LookupTable.generate">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">generate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pols</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="dodal.devices.insertion_device.apple2_undulator.Pol.html#dodal.devices.insertion_device.apple2_undulator.Pol" title="dodal.devices.insertion_device.apple2_undulator.Pol"><span class="pre">Pol</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_energies</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_energies</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">poly1d_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.14)"><span class="pre">Self</span></a></span></span><a class="reference internal" href="../../_modules/dodal/devices/insertion_device/lookup_table_models.html#LookupTable.generate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.insertion_device.lookup_table_models.LookupTable.generate" title="Link to this definition">#</a></dt>
-<dd><p>Generate a LookupTable containing multiple LookupTableEntry
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">generate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pols</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="dodal.devices.insertion_device.apple2_undulator.Pol.html#dodal.devices.insertion_device.apple2_undulator.Pol" title="dodal.devices.insertion_device.apple2_undulator.Pol"><span class="pre">Pol</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">energy_coverage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="dodal.devices.insertion_device.lookup_table_models.EnergyCoverage.html#dodal.devices.insertion_device.lookup_table_models.EnergyCoverage" title="dodal.devices.insertion_device.lookup_table_models.EnergyCoverage"><span class="pre">EnergyCoverage</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.14)"><span class="pre">Self</span></a></span></span><a class="reference internal" href="../../_modules/dodal/devices/insertion_device/lookup_table_models.html#LookupTable.generate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.insertion_device.lookup_table_models.LookupTable.generate" title="Link to this definition">#</a></dt>
+<dd><p>Generate a LookupTable containing multiple EnergyCoverage
 for provided polarisations.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>pols</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference internal" href="dodal.devices.insertion_device.apple2_undulator.Pol.html#dodal.devices.insertion_device.apple2_undulator.Pol" title="dodal.devices.insertion_device.apple2_undulator.Pol"><code class="xref py py-class docutils literal notranslate"><span class="pre">Pol</span></code></a>]</span>)</p></li>
-<li><p><strong>min_energies</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>]</span>)</p></li>
-<li><p><strong>max_energies</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>]</span>)</p></li>
-<li><p><strong>poly1d_params</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>]]</span>)</p></li>
+<li><p><strong>energy_coverage</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference internal" href="dodal.devices.insertion_device.lookup_table_models.EnergyCoverage.html#dodal.devices.insertion_device.lookup_table_models.EnergyCoverage" title="dodal.devices.insertion_device.lookup_table_models.EnergyCoverage"><code class="xref py py-class docutils literal notranslate"><span class="pre">EnergyCoverage</span></code></a>]</span>)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
@@ -1176,20 +1176,20 @@ for provided polarisations.</p>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="dodal.devices.insertion_device.lookup_table_models.EnergyMinMax.html"
+       href="dodal.devices.insertion_device.lookup_table_models.EnergyCoverageEntry.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">dodal.devices.insertion_device.lookup_table_models.EnergyMinMax</p>
+        <p class="prev-next-title">dodal.devices.insertion_device.lookup_table_models.EnergyCoverageEntry</p>
       </div>
     </a>
     <a class="right-next"
-       href="dodal.devices.insertion_device.lookup_table_models.LookupTableConfig.html"
+       href="dodal.devices.insertion_device.lookup_table_models.LookupTableColumnConfig.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">dodal.devices.insertion_device.lookup_table_models.LookupTableConfig</p>
+        <p class="prev-next-title">dodal.devices.insertion_device.lookup_table_models.LookupTableColumnConfig</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

@@ -16,10 +16,9 @@ dodal.devices.insertion\_device.lookup\_table\_models
 
    ~lookup_table_models.EnergyCoverage
    ~lookup_table_models.EnergyCoverageEntry
-   ~lookup_table_models.EnergyMinMax
    ~lookup_table_models.LookupTable
-   ~lookup_table_models.LookupTableConfig
-   ~lookup_table_models.LookupTableEntry
+   ~lookup_table_models.LookupTableColumnConfig
+   ~lookup_table_models.Source
 
 
 

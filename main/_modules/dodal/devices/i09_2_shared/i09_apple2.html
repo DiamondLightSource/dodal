@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.i09_2_shared.i09_apple2 &#8212; dodal 1.66.1.dev13+g7cdf4cffe documentation</title>
+    <title>dodal.devices.i09_2_shared.i09_apple2 &#8212; dodal 1.66.1.dev14+g33d2b32a2 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=f26087d5"></script>
+    <script src="../../../../_static/documentation_options.js?v=48caae6a"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -888,9 +888,7 @@ window.addEventListener("load", load);
         <span class="n">target_energy</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">Pol</span><span class="o">.</span><span class="n">LH</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_polarisation_setpoint_set</span><span class="p">(</span><span class="n">Pol</span><span class="o">.</span><span class="n">LH</span><span class="p">)</span>
-            <span class="n">max_lh_energy</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">gap_energy_motor_lut</span><span class="o">.</span><span class="n">lut</span><span class="o">.</span><span class="n">root</span><span class="p">[</span><span class="n">Pol</span><span class="o">.</span><span class="n">LH</span><span class="p">]</span><span class="o">.</span><span class="n">limit</span><span class="o">.</span><span class="n">maximum</span>
-            <span class="p">)</span>
+            <span class="n">max_lh_energy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gap_energy_motor_lut</span><span class="o">.</span><span class="n">lut</span><span class="o">.</span><span class="n">root</span><span class="p">[</span><span class="n">Pol</span><span class="o">.</span><span class="n">LH</span><span class="p">]</span><span class="o">.</span><span class="n">max_energy</span>
             <span class="n">lh_setpoint</span> <span class="o">=</span> <span class="p">(</span>
                 <span class="n">max_lh_energy</span> <span class="k">if</span> <span class="n">target_energy</span> <span class="o">&gt;</span> <span class="n">max_lh_energy</span> <span class="k">else</span> <span class="n">target_energy</span>
             <span class="p">)</span>

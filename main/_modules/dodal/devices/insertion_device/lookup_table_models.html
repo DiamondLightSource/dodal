@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.insertion_device.lookup_table_models &#8212; dodal 1.66.1.dev13+g7cdf4cffe documentation</title>
+    <title>dodal.devices.insertion_device.lookup_table_models &#8212; dodal 1.66.1.dev14+g33d2b32a2 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=f26087d5"></script>
+    <script src="../../../../_static/documentation_options.js?v=48caae6a"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -819,27 +819,24 @@ window.addEventListener("load", load);
 
 <span class="sd">{</span>
 <span class="sd">  &quot;POL_MODE&quot;: {</span>
-<span class="sd">    &quot;energies&quot;: {</span>
-<span class="sd">      &quot;&lt;min_energy&gt;&quot;: {</span>
-<span class="sd">        &quot;low&quot;: &lt;float&gt;,</span>
-<span class="sd">        &quot;high&quot;: &lt;float&gt;,</span>
-<span class="sd">        &quot;poly&quot;: &lt;numpy.poly1d&gt;</span>
-<span class="sd">      },</span>
+<span class="sd">    &quot;energy_entries&quot;: [</span>
+<span class="sd">        {</span>
+<span class="sd">            &quot;low&quot;: &lt;float&gt;,</span>
+<span class="sd">            &quot;high&quot;: &lt;float&gt;,</span>
+<span class="sd">            &quot;poly&quot;: &lt;numpy.poly1d&gt;</span>
+<span class="sd">        },</span>
 <span class="sd">      ...</span>
-<span class="sd">    },</span>
-<span class="sd">    &quot;limit&quot;: {</span>
-<span class="sd">      &quot;minimum&quot;: &lt;float&gt;,</span>
-<span class="sd">      &quot;maximum&quot;: &lt;float&gt;</span>
-<span class="sd">    }</span>
+<span class="sd">    ]</span>
 <span class="sd">  },</span>
+<span class="sd">  ...</span>
 <span class="sd">}</span>
-
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">csv</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">io</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Generator</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Self</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Annotated</span> <span class="k">as</span> <span class="n">A</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">NamedTuple</span><span class="p">,</span> <span class="n">Self</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
@@ -882,23 +879,35 @@ window.addEventListener("load", load);
 <span class="p">}</span>
 
 
-<div class="viewcode-block" id="LookupTableConfig">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.lookup_table_models.LookupTableConfig.html#dodal.devices.insertion_device.lookup_table_models.LookupTableConfig">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">LookupTableConfig</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-    <span class="n">source</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="n">mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Mode&quot;</span>
-    <span class="n">min_energy</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;MinEnergy&quot;</span>
-    <span class="n">max_energy</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;MaxEnergy&quot;</span>
-    <span class="n">poly_deg</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">DEFAULT_POLY_DEG</span><span class="p">)</span>
-    <span class="n">mode_name_convert</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">MODE_NAME_CONVERT</span><span class="p">)</span></div>
+<div class="viewcode-block" id="Source">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.lookup_table_models.Source.html#dodal.devices.insertion_device.lookup_table_models.Source">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Source</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
+    <span class="n">column</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">value</span><span class="p">:</span> <span class="nb">str</span></div>
 
 
 
-<div class="viewcode-block" id="EnergyMinMax">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.lookup_table_models.EnergyMinMax.html#dodal.devices.insertion_device.lookup_table_models.EnergyMinMax">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">EnergyMinMax</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-    <span class="n">minimum</span><span class="p">:</span> <span class="nb">float</span>
-    <span class="n">maximum</span><span class="p">:</span> <span class="nb">float</span></div>
+<div class="viewcode-block" id="LookupTableColumnConfig">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.lookup_table_models.LookupTableColumnConfig.html#dodal.devices.insertion_device.lookup_table_models.LookupTableColumnConfig">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">LookupTableColumnConfig</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Configuration on how to process a csv file columns into a LookupTable data model.&quot;&quot;&quot;</span>
+
+    <span class="n">source</span><span class="p">:</span> <span class="n">A</span><span class="p">[</span>
+        <span class="n">Source</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">Field</span><span class="p">(</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;If not None, only process the row if the source column name match the value.&quot;</span>
+        <span class="p">),</span>
+    <span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">mode</span><span class="p">:</span> <span class="n">A</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Polarisation mode column name.&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="s2">&quot;Mode&quot;</span>
+    <span class="n">min_energy</span><span class="p">:</span> <span class="n">A</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Minimum energy column name.&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="s2">&quot;MinEnergy&quot;</span>
+    <span class="n">max_energy</span><span class="p">:</span> <span class="n">A</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Maximum energy column name.&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="s2">&quot;MaxEnergy&quot;</span>
+    <span class="n">poly_deg</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Polynomial column names.&quot;</span><span class="p">,</span> <span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">DEFAULT_POLY_DEG</span>
+    <span class="p">)</span>
+    <span class="n">mode_name_convert</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;When processing polarisation mode values, map their alias values to a real value.&quot;</span><span class="p">,</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">MODE_NAME_CONVERT</span><span class="p">,</span>
+    <span class="p">)</span></div>
 
 
 
@@ -906,8 +915,8 @@ window.addEventListener("load", load);
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.lookup_table_models.EnergyCoverageEntry.html#dodal.devices.insertion_device.lookup_table_models.EnergyCoverageEntry">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">EnergyCoverageEntry</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
     <span class="n">model_config</span> <span class="o">=</span> <span class="n">ConfigDict</span><span class="p">(</span><span class="n">arbitrary_types_allowed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>  <span class="c1"># So np.poly1d can be used.</span>
-    <span class="n">low</span><span class="p">:</span> <span class="nb">float</span>
-    <span class="n">high</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">min_energy</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">max_energy</span><span class="p">:</span> <span class="nb">float</span>
     <span class="n">poly</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">poly1d</span>
 
 <div class="viewcode-block" id="EnergyCoverageEntry.validate_and_convert_poly">
@@ -935,44 +944,79 @@ window.addEventListener("load", load);
 
 <div class="viewcode-block" id="EnergyCoverage">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.lookup_table_models.EnergyCoverage.html#dodal.devices.insertion_device.lookup_table_models.EnergyCoverage">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">EnergyCoverage</span><span class="p">(</span><span class="n">RootModel</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">EnergyCoverageEntry</span><span class="p">]]):</span>
-    <span class="k">pass</span></div>
-
-
-
-<div class="viewcode-block" id="LookupTableEntry">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.lookup_table_models.LookupTableEntry.html#dodal.devices.insertion_device.lookup_table_models.LookupTableEntry">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">LookupTableEntry</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-    <span class="n">energies</span><span class="p">:</span> <span class="n">EnergyCoverage</span>
-    <span class="n">limit</span><span class="p">:</span> <span class="n">EnergyMinMax</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">EnergyCoverage</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">energy_entries</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">EnergyCoverageEntry</span><span class="p">]</span>
 
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">generate</span><span class="p">(</span>
-        <span class="bp">cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span> <span class="n">min_energy</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">max_energy</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">poly1d_param</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span>
+        <span class="bp">cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
+        <span class="n">min_energies</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+        <span class="n">max_energies</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+        <span class="n">poly1d_params</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]],</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
-            <span class="n">energies</span><span class="o">=</span><span class="n">EnergyCoverage</span><span class="p">(</span>
-                <span class="p">{</span>
-                    <span class="n">min_energy</span><span class="p">:</span> <span class="n">EnergyCoverageEntry</span><span class="p">(</span>
-                        <span class="n">low</span><span class="o">=</span><span class="n">min_energy</span><span class="p">,</span>
-                        <span class="n">high</span><span class="o">=</span><span class="n">max_energy</span><span class="p">,</span>
-                        <span class="n">poly</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">poly1d</span><span class="p">(</span><span class="n">poly1d_param</span><span class="p">),</span>
-                    <span class="p">)</span>
-                <span class="p">}</span>
-            <span class="p">),</span>
-            <span class="n">limit</span><span class="o">=</span><span class="n">EnergyMinMax</span><span class="p">(</span>
-                <span class="n">minimum</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">min_energy</span><span class="p">),</span>
-                <span class="n">maximum</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">max_energy</span><span class="p">),</span>
-            <span class="p">),</span>
+        <span class="n">energy_entries</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">EnergyCoverageEntry</span><span class="p">(</span>
+                <span class="n">min_energy</span><span class="o">=</span><span class="n">min_energy</span><span class="p">,</span>
+                <span class="n">max_energy</span><span class="o">=</span><span class="n">max_energy</span><span class="p">,</span>
+                <span class="n">poly</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">poly1d</span><span class="p">(</span><span class="n">poly_params</span><span class="p">),</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">min_energy</span><span class="p">,</span> <span class="n">max_energy</span><span class="p">,</span> <span class="n">poly_params</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+                <span class="n">min_energies</span><span class="p">,</span> <span class="n">max_energies</span><span class="p">,</span> <span class="n">poly1d_params</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span>
+            <span class="p">)</span>
+        <span class="p">]</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">energy_entries</span><span class="o">=</span><span class="n">energy_entries</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">min_energy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">min</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">min_energy</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy_entries</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">max_energy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">max_energy</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy_entries</span><span class="p">)</span>
+
+<div class="viewcode-block" id="EnergyCoverage.get_poly">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.lookup_table_models.EnergyCoverage.html#dodal.devices.insertion_device.lookup_table_models.EnergyCoverage.get_poly">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_poly</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energy</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">poly1d</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the numpy.poly1d polynomial applicable for the given energy.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">        -----------</span>
+<span class="sd">        energy:</span>
+<span class="sd">            Energy value in the same units used to create the lookup table.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Cache initial values so don&#39;t do unnecessary work again</span>
+        <span class="n">min_energy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_energy</span>
+        <span class="n">max_energy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_energy</span>
+        <span class="k">if</span> <span class="n">energy</span> <span class="o">&lt;</span> <span class="n">min_energy</span> <span class="ow">or</span> <span class="n">energy</span> <span class="o">&gt;</span> <span class="n">max_energy</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Demanding energy must lie between </span><span class="si">{</span><span class="n">min_energy</span><span class="si">}</span><span class="s2"> and </span><span class="si">{</span><span class="n">max_energy</span><span class="si">}</span><span class="s2">!&quot;</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">energy_coverage</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy_entries</span><span class="p">:</span>
+                <span class="k">if</span> <span class="p">(</span>
+                    <span class="n">energy</span> <span class="o">&gt;=</span> <span class="n">energy_coverage</span><span class="o">.</span><span class="n">min_energy</span>
+                    <span class="ow">and</span> <span class="n">energy</span> <span class="o">&lt;</span> <span class="n">energy_coverage</span><span class="o">.</span><span class="n">max_energy</span>
+                <span class="p">):</span>
+                    <span class="k">return</span> <span class="n">energy_coverage</span><span class="o">.</span><span class="n">poly</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;Cannot find polynomial coefficients for your requested energy.&quot;</span>
+            <span class="o">+</span> <span class="s2">&quot; There might be gap in the calibration lookup table.&quot;</span>
         <span class="p">)</span></div>
+</div>
 
 
 
 <div class="viewcode-block" id="LookupTable">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.lookup_table_models.LookupTable.html#dodal.devices.insertion_device.lookup_table_models.LookupTable">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">LookupTable</span><span class="p">(</span><span class="n">RootModel</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="n">Pol</span><span class="p">,</span> <span class="n">LookupTableEntry</span><span class="p">]]):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">LookupTable</span><span class="p">(</span><span class="n">RootModel</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="n">Pol</span><span class="p">,</span> <span class="n">EnergyCoverage</span><span class="p">]]):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Specialised lookup table for insertion devices to relate the energy and polarisation</span>
+<span class="sd">    values to Apple2 motor positions.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="c1"># Allow to auto specify a dict if one not provided</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Pol</span><span class="p">,</span> <span class="n">LookupTableEntry</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Pol</span><span class="p">,</span> <span class="n">EnergyCoverage</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="n">root</span> <span class="ow">or</span> <span class="p">{})</span>
 
 <div class="viewcode-block" id="LookupTable.generate">
@@ -981,19 +1025,13 @@ window.addEventListener("load", load);
     <span class="k">def</span><span class="w"> </span><span class="nf">generate</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
         <span class="n">pols</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Pol</span><span class="p">],</span>
-        <span class="n">min_energies</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
-        <span class="n">max_energies</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
-        <span class="n">poly1d_params</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]],</span>
+        <span class="n">energy_coverage</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">EnergyCoverage</span><span class="p">],</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate a LookupTable containing multiple LookupTableEntry</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate a LookupTable containing multiple EnergyCoverage</span>
 <span class="sd">        for provided polarisations.&quot;&quot;&quot;</span>
         <span class="n">lut</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">pols</span><span class="p">)):</span>
-            <span class="n">lut</span><span class="o">.</span><span class="n">root</span><span class="p">[</span><span class="n">pols</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="o">=</span> <span class="n">LookupTableEntry</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span>
-                <span class="n">min_energy</span><span class="o">=</span><span class="n">min_energies</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
-                <span class="n">max_energy</span><span class="o">=</span><span class="n">max_energies</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
-                <span class="n">poly1d_param</span><span class="o">=</span><span class="n">poly1d_params</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
-            <span class="p">)</span>
+            <span class="n">lut</span><span class="o">.</span><span class="n">root</span><span class="p">[</span><span class="n">pols</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="o">=</span> <span class="n">energy_coverage</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">lut</span></div>
 
 
@@ -1014,24 +1052,7 @@ window.addEventListener("load", load);
 <span class="sd">        pol:</span>
 <span class="sd">            Polarisation mode (Pol enum).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="p">(</span>
-            <span class="n">energy</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">[</span><span class="n">pol</span><span class="p">]</span><span class="o">.</span><span class="n">limit</span><span class="o">.</span><span class="n">minimum</span>
-            <span class="ow">or</span> <span class="n">energy</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">[</span><span class="n">pol</span><span class="p">]</span><span class="o">.</span><span class="n">limit</span><span class="o">.</span><span class="n">maximum</span>
-        <span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;Demanding energy must lie between&quot;</span>
-                <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">[</span><span class="n">pol</span><span class="p">]</span><span class="o">.</span><span class="n">limit</span><span class="o">.</span><span class="n">minimum</span><span class="si">}</span><span class="s2">&quot;</span>
-                <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot; and </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">[</span><span class="n">pol</span><span class="p">]</span><span class="o">.</span><span class="n">limit</span><span class="o">.</span><span class="n">maximum</span><span class="si">}</span><span class="s2"> eV!&quot;</span>
-            <span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">energy_range</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">[</span><span class="n">pol</span><span class="p">]</span><span class="o">.</span><span class="n">energies</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
-                <span class="k">if</span> <span class="n">energy</span> <span class="o">&gt;=</span> <span class="n">energy_range</span><span class="o">.</span><span class="n">low</span> <span class="ow">and</span> <span class="n">energy</span> <span class="o">&lt;</span> <span class="n">energy_range</span><span class="o">.</span><span class="n">high</span><span class="p">:</span>
-                    <span class="k">return</span> <span class="n">energy_range</span><span class="o">.</span><span class="n">poly</span>
-
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;Cannot find polynomial coefficients for your requested energy.&quot;</span>
-            <span class="o">+</span> <span class="s2">&quot; There might be gap in the calibration lookup table.&quot;</span>
-        <span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">[</span><span class="n">pol</span><span class="p">]</span><span class="o">.</span><span class="n">get_poly</span><span class="p">(</span><span class="n">energy</span><span class="p">)</span></div>
 </div>
 
 
@@ -1040,7 +1061,7 @@ window.addEventListener("load", load);
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.lookup_table_models.html#dodal.devices.insertion_device.lookup_table_models.convert_csv_to_lookup">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">convert_csv_to_lookup</span><span class="p">(</span>
     <span class="n">file_contents</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-    <span class="n">lut_config</span><span class="p">:</span> <span class="n">LookupTableConfig</span><span class="p">,</span>
+    <span class="n">lut_config</span><span class="p">:</span> <span class="n">LookupTableColumnConfig</span><span class="p">,</span>
     <span class="n">skip_line_start_with</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;#&quot;</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LookupTable</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1060,49 +1081,33 @@ window.addEventListener("load", load);
 <span class="sd">    LookupTable</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">process_row</span><span class="p">(</span><span class="n">row</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">lut</span><span class="p">:</span> <span class="n">LookupTable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">process_row</span><span class="p">(</span><span class="n">row</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">lut</span><span class="p">:</span> <span class="n">LookupTable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Process a single row from the CSV file and update the lookup table.&quot;&quot;&quot;</span>
-        <span class="n">mode_value</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">lut_config</span><span class="o">.</span><span class="n">mode</span><span class="p">])</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">mode_value</span> <span class="ow">in</span> <span class="n">lut_config</span><span class="o">.</span><span class="n">mode_name_convert</span><span class="p">:</span>
-            <span class="n">mode_value</span> <span class="o">=</span> <span class="n">lut_config</span><span class="o">.</span><span class="n">mode_name_convert</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">mode_value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span>
-        <span class="n">mode_value</span> <span class="o">=</span> <span class="n">Pol</span><span class="p">(</span><span class="n">mode_value</span><span class="p">)</span>
+        <span class="n">raw_mode_value</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">lut_config</span><span class="o">.</span><span class="n">mode</span><span class="p">])</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="n">mode_value</span> <span class="o">=</span> <span class="n">Pol</span><span class="p">(</span>
+            <span class="n">lut_config</span><span class="o">.</span><span class="n">mode_name_convert</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">raw_mode_value</span><span class="p">,</span> <span class="n">raw_mode_value</span><span class="p">)</span>
+        <span class="p">)</span>
 
         <span class="c1"># Create polynomial object for energy-to-gap/phase conversion</span>
-        <span class="n">coefficients</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">coef</span><span class="p">])</span> <span class="k">for</span> <span class="n">coef</span> <span class="ow">in</span> <span class="n">lut_config</span><span class="o">.</span><span class="n">poly_deg</span><span class="p">]</span>
-        <span class="k">if</span> <span class="n">mode_value</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">lut</span><span class="o">.</span><span class="n">root</span><span class="p">:</span>
-            <span class="n">lut</span><span class="o">.</span><span class="n">root</span><span class="p">[</span><span class="n">mode_value</span><span class="p">]</span> <span class="o">=</span> <span class="n">LookupTableEntry</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span>
-                <span class="n">min_energy</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">lut_config</span><span class="o">.</span><span class="n">min_energy</span><span class="p">]),</span>
-                <span class="n">max_energy</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">lut_config</span><span class="o">.</span><span class="n">max_energy</span><span class="p">]),</span>
-                <span class="n">poly1d_param</span><span class="o">=</span><span class="n">coefficients</span><span class="p">,</span>
-            <span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">lut</span><span class="o">.</span><span class="n">root</span><span class="p">[</span><span class="n">mode_value</span><span class="p">]</span><span class="o">.</span><span class="n">energies</span><span class="o">.</span><span class="n">root</span><span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">lut_config</span><span class="o">.</span><span class="n">min_energy</span><span class="p">])]</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="n">EnergyCoverageEntry</span><span class="p">(</span>
-                    <span class="n">low</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">lut_config</span><span class="o">.</span><span class="n">min_energy</span><span class="p">]),</span>
-                    <span class="n">high</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">lut_config</span><span class="o">.</span><span class="n">max_energy</span><span class="p">]),</span>
-                    <span class="n">poly</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">poly1d</span><span class="p">(</span><span class="n">coefficients</span><span class="p">),</span>
-                <span class="p">)</span>
-            <span class="p">)</span>
+        <span class="n">coefficients</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">poly1d</span><span class="p">([</span><span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">coef</span><span class="p">])</span> <span class="k">for</span> <span class="n">coef</span> <span class="ow">in</span> <span class="n">lut_config</span><span class="o">.</span><span class="n">poly_deg</span><span class="p">])</span>
 
-        <span class="c1"># Update energy limits</span>
-        <span class="n">lut</span><span class="o">.</span><span class="n">root</span><span class="p">[</span><span class="n">mode_value</span><span class="p">]</span><span class="o">.</span><span class="n">limit</span><span class="o">.</span><span class="n">minimum</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span>
-            <span class="n">lut</span><span class="o">.</span><span class="n">root</span><span class="p">[</span><span class="n">mode_value</span><span class="p">]</span><span class="o">.</span><span class="n">limit</span><span class="o">.</span><span class="n">minimum</span><span class="p">,</span>
-            <span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">lut_config</span><span class="o">.</span><span class="n">min_energy</span><span class="p">]),</span>
+        <span class="n">energy_entry</span> <span class="o">=</span> <span class="n">EnergyCoverageEntry</span><span class="p">(</span>
+            <span class="n">min_energy</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">lut_config</span><span class="o">.</span><span class="n">min_energy</span><span class="p">]),</span>
+            <span class="n">max_energy</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">lut_config</span><span class="o">.</span><span class="n">max_energy</span><span class="p">]),</span>
+            <span class="n">poly</span><span class="o">=</span><span class="n">coefficients</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="n">lut</span><span class="o">.</span><span class="n">root</span><span class="p">[</span><span class="n">mode_value</span><span class="p">]</span><span class="o">.</span><span class="n">limit</span><span class="o">.</span><span class="n">maximum</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span>
-            <span class="n">lut</span><span class="o">.</span><span class="n">root</span><span class="p">[</span><span class="n">mode_value</span><span class="p">]</span><span class="o">.</span><span class="n">limit</span><span class="o">.</span><span class="n">maximum</span><span class="p">,</span>
-            <span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">lut_config</span><span class="o">.</span><span class="n">max_energy</span><span class="p">]),</span>
-        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">mode_value</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">lut</span><span class="o">.</span><span class="n">root</span><span class="p">:</span>
+            <span class="n">lut</span><span class="o">.</span><span class="n">root</span><span class="p">[</span><span class="n">mode_value</span><span class="p">]</span> <span class="o">=</span> <span class="n">EnergyCoverage</span><span class="p">(</span><span class="n">energy_entries</span><span class="o">=</span><span class="p">[</span><span class="n">energy_entry</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">lut</span><span class="o">.</span><span class="n">root</span><span class="p">[</span><span class="n">mode_value</span><span class="p">]</span><span class="o">.</span><span class="n">energy_entries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">energy_entry</span><span class="p">)</span>
 
     <span class="n">reader</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">DictReader</span><span class="p">(</span><span class="n">read_file_and_skip</span><span class="p">(</span><span class="n">file_contents</span><span class="p">,</span> <span class="n">skip_line_start_with</span><span class="p">))</span>
     <span class="n">lut</span> <span class="o">=</span> <span class="n">LookupTable</span><span class="p">()</span>
 
     <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">reader</span><span class="p">:</span>
+        <span class="n">source</span> <span class="o">=</span> <span class="n">lut_config</span><span class="o">.</span><span class="n">source</span>
         <span class="c1"># If there are multiple source only convert requested.</span>
-        <span class="k">if</span> <span class="n">lut_config</span><span class="o">.</span><span class="n">source</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">row</span><span class="p">[</span><span class="n">lut_config</span><span class="o">.</span><span class="n">source</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">==</span> <span class="n">lut_config</span><span class="o">.</span><span class="n">source</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
-                <span class="n">process_row</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="n">row</span><span class="p">,</span> <span class="n">lut</span><span class="o">=</span><span class="n">lut</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">source</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">row</span><span class="p">[</span><span class="n">source</span><span class="o">.</span><span class="n">column</span><span class="p">]</span> <span class="o">==</span> <span class="n">source</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
             <span class="n">process_row</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="n">row</span><span class="p">,</span> <span class="n">lut</span><span class="o">=</span><span class="n">lut</span><span class="p">)</span>
 
     <span class="c1"># Check if our LookupTable is empty after processing, raise error if it is.</span>

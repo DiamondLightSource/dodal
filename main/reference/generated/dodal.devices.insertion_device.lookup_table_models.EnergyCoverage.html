@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.insertion_device.lookup_table_models.EnergyCoverage &#8212; dodal 1.66.1.dev13+g7cdf4cffe documentation</title>
+    <title>dodal.devices.insertion_device.lookup_table_models.EnergyCoverage &#8212; dodal 1.66.1.dev14+g33d2b32a2 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=f26087d5"></script>
+    <script src="../../_static/documentation_options.js?v=48caae6a"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -1080,29 +1080,70 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="dodal.devices.insertion_device.lookup_table_models.EnergyCoverage">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dodal.devices.insertion_device.lookup_table_models.</span></span><span class="sig-name descname"><span class="pre">EnergyCoverage</span></span><a class="reference internal" href="../../_modules/dodal/devices/insertion_device/lookup_table_models.html#EnergyCoverage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.insertion_device.lookup_table_models.EnergyCoverage" title="Link to this definition">#</a></dt>
-<dd><dl class="field-list simple">
+<dd><p>Create a new model by parsing and validating input data from keyword arguments.</p>
+<p>Raises [<code class="xref any docutils literal notranslate"><span class="pre">ValidationError</span></code>][pydantic_core.ValidationError] if the input data cannot be
+validated to form a valid model.</p>
+<p><code class="xref any docutils literal notranslate"><span class="pre">self</span></code> is explicitly positional-only to allow <code class="xref any docutils literal notranslate"><span class="pre">self</span></code> as a field name.</p>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>root</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.TypeVar" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code></a>(<code class="docutils literal notranslate"><span class="pre">RootModelRootType</span></code>)</span>, default: <code class="docutils literal notranslate"><span class="pre">PydanticUndefined</span></code>)</p>
+<dd class="field-odd"><p><strong>data</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a></span>)</p>
 </dd>
 </dl>
 <p class="rubric">Methods</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate</span></code>(min_energies, max_energies, ...)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#dodal.devices.insertion_device.lookup_table_models.EnergyCoverage.get_poly" title="dodal.devices.insertion_device.lookup_table_models.EnergyCoverage.get_poly"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_poly</span></code></a>(energy)</p></td>
+<td><p>Return the numpy.poly1d polynomial applicable for the given energy.</p></td>
+</tr>
 </tbody>
 </table>
 </div>
 <p class="rubric">Attributes</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">max_energy</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">min_energy</span></code></p></td>
+<td><p></p></td>
+</tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">model_config</span></code></p></td>
 <td><p>Configuration for the model, should be a dictionary conforming to [<code class="xref any docutils literal notranslate"><span class="pre">ConfigDict</span></code>][pydantic.config.ConfigDict].</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">root</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">energy_entries</span></code></p></td>
 <td><p></p></td>
 </tr>
 </tbody>
 </table>
 </div>
+<dl class="py method">
+<dt class="sig sig-object py" id="dodal.devices.insertion_device.lookup_table_models.EnergyCoverage.get_poly">
+<span class="sig-name descname"><span class="pre">get_poly</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">energy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">poly1d</span></span></span><a class="reference internal" href="../../_modules/dodal/devices/insertion_device/lookup_table_models.html#EnergyCoverage.get_poly"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.insertion_device.lookup_table_models.EnergyCoverage.get_poly" title="Link to this definition">#</a></dt>
+<dd><p>Return the numpy.poly1d polynomial applicable for the given energy.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">poly1d</span></code></span></p>
+</dd>
+</dl>
+<section id="parameters">
+<h2>Parameters:<a class="headerlink" href="#parameters" title="Link to this heading">#</a></h2>
+<dl class="simple">
+<dt>energy:</dt><dd><p>Energy value in the same units used to create the lookup table.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">param energy<span class="colon">:</span></dt>
+<dd class="field-odd"><p></p></dd>
+<dt class="field-even">type energy<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span></p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
 </dd></dl>
 
 </section>
@@ -1154,7 +1195,10 @@
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.insertion_device.lookup_table_models.EnergyCoverage"><code class="docutils literal notranslate"><span class="pre">EnergyCoverage</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.insertion_device.lookup_table_models.EnergyCoverage"><code class="docutils literal notranslate"><span class="pre">EnergyCoverage</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.insertion_device.lookup_table_models.EnergyCoverage.get_poly"><code class="docutils literal notranslate"><span class="pre">EnergyCoverage.get_poly()</span></code></a></li>
+</ul>
+</li>
 </ul>
   </nav></div>
 

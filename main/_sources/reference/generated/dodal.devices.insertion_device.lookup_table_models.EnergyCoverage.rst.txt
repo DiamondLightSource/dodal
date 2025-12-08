@@ -17,6 +17,12 @@ dodal.devices.insertion\_device.lookup\_table\_models.EnergyCoverage
       
       
       
+      ~EnergyCoverage.generate
+      
+      
+      ~EnergyCoverage.get_poly
+      
+      
       
       
       
@@ -45,6 +51,12 @@ dodal.devices.insertion\_device.lookup\_table\_models.EnergyCoverage
    .. autosummary::
    
       
+      ~EnergyCoverage.max_energy
+      
+      
+      ~EnergyCoverage.min_energy
+      
+      
       
       ~EnergyCoverage.model_config
       
@@ -52,7 +64,7 @@ dodal.devices.insertion\_device.lookup\_table\_models.EnergyCoverage
       
       
       
-      ~EnergyCoverage.root
+      ~EnergyCoverage.energy_entries
       
    
    
