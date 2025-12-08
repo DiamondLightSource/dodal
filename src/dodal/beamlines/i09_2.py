@@ -23,7 +23,7 @@ from dodal.devices.insertion_device.apple2_undulator import (
 from dodal.devices.insertion_device.energy_motor_lookup import (
     ConfigServerEnergyMotorLookup,
 )
-from dodal.devices.insertion_device.lookup_table_models import LookupTableConfig
+from dodal.devices.insertion_device.lookup_table_models import LookupTableColumnConfig
 from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.devices.synchrotron import Synchrotron
 from dodal.log import set_beamline as set_log_beamline
@@ -84,12 +84,12 @@ def jid_controller() -> J09Apple2Controller:
     return J09Apple2Controller(
         apple2=jid(),
         gap_energy_motor_lut=ConfigServerEnergyMotorLookup(
-            lut_config=LookupTableConfig(poly_deg=J09_GAP_POLY_DEG_COLUMNS),
+            lut_config=LookupTableColumnConfig(poly_deg=J09_GAP_POLY_DEG_COLUMNS),
             config_client=J09_CONF_CLIENT,
             path=Path(LOOK_UPTABLE_DIR, GAP_LOOKUP_FILE_NAME),
         ),
         phase_energy_motor_lut=ConfigServerEnergyMotorLookup(
-            lut_config=LookupTableConfig(poly_deg=J09_PHASE_POLY_DEG_COLUMNS),
+            lut_config=LookupTableColumnConfig(poly_deg=J09_PHASE_POLY_DEG_COLUMNS),
             config_client=J09_CONF_CLIENT,
             path=Path(LOOK_UPTABLE_DIR, PHASE_LOOKUP_FILE_NAME),
         ),
