@@ -41,6 +41,7 @@ from dodal.devices.insertion_device.lookup_table_models import (
     DEFAULT_GAP_FILE,
     DEFAULT_PHASE_FILE,
     LookupTableConfig,
+    Source,
 )
 from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.devices.synchrotron import Synchrotron
@@ -123,7 +124,7 @@ def idd() -> I10Apple2:
 @device_factory()
 def idd_controller() -> I10Apple2Controller:
     """I10 downstream insertion device controller."""
-    source = ("Source", "idd")
+    source = Source(column="Source", value="idd")
     idd_gap_energy_motor_lut = ConfigServerEnergyMotorLookup(
         config_client=I10_CONF_CLIENT,
         lut_config=LookupTableConfig(source=source),
@@ -197,7 +198,7 @@ def idu() -> I10Apple2:
 @device_factory()
 def idu_controller() -> I10Apple2Controller:
     """I10 upstream insertion device controller."""
-    source = ("Source", "idu")
+    source = Source(column="Source", value="idu")
     idu_gap_energy_motor_lut = ConfigServerEnergyMotorLookup(
         config_client=I10_CONF_CLIENT,
         lut_config=LookupTableConfig(source=source),

@@ -26,7 +26,7 @@ structure:
 import csv
 import io
 from collections.abc import Generator
-from typing import Any, Self
+from typing import Annotated, Any, NamedTuple, Self
 
 import numpy as np
 from pydantic import (
@@ -69,13 +69,30 @@ DEFAULT_POLY1D_PARAMETERS = {
 }
 
 
+class Source(NamedTuple):
+    column: str
+    value: str
+
+
 class LookupTableConfig(BaseModel):
-    source: tuple[str, str] | None = None
-    mode: str = "Mode"
-    min_energy: str = "MinEnergy"
-    max_energy: str = "MaxEnergy"
-    poly_deg: list[str] = Field(default_factory=lambda: DEFAULT_POLY_DEG)
-    mode_name_convert: dict[str, str] = Field(default_factory=lambda: MODE_NAME_CONVERT)
+    """Configuration on how to process a csv file columns into a LookupTable data model."""
+
+    source: Annotated[
+        Source | None,
+        Field(
+            "If not None, only process the row if the source column name match the value."
+        ),
+    ] = None
+    mode: Annotated[str, Field("Polarisation mode column name.")] = "Mode"
+    min_energy: Annotated[str, Field("Minium energy column name.")] = "MinEnergy"
+    max_energy: Annotated[str, Field("Maximum energy column name.")] = "MaxEnergy"
+    poly_deg: list[str] = Field(
+        description="Polynomial column names.", default_factory=lambda: DEFAULT_POLY_DEG
+    )
+    mode_name_convert: dict[str, str] = Field(
+        description="When processing polarisation mode values, map their alias values to a real value.",
+        default_factory=lambda: MODE_NAME_CONVERT,
+    )
 
 
 class EnergyCoverageEntry(BaseModel):
@@ -243,7 +260,7 @@ def convert_csv_to_lookup(
     for row in reader:
         source = lut_config.source
         # If there are multiple source only convert requested.
-        if source is None or row[source[0]] == source[1]:
+        if source is None or row[source.column] == source.value:
             process_row(row=row, lut=lut)
 
     # Check if our LookupTable is empty after processing, raise error if it is.

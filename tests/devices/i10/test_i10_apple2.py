@@ -42,6 +42,7 @@ from dodal.devices.insertion_device.lookup_table_models import (
     EnergyCoverage,
     EnergyCoverageEntry,
     LookupTableConfig,
+    Source,
 )
 from dodal.devices.pgm import PlaneGratingMonochromator
 from tests.devices.i10.test_data import (
@@ -88,7 +89,7 @@ def mock_i10_gap_energy_motor_lookup_idu(
 ) -> ConfigServerEnergyMotorLookup:
     return ConfigServerEnergyMotorLookup(
         config_client=mock_config_client,
-        lut_config=LookupTableConfig(source=("Source", "idu")),
+        lut_config=LookupTableConfig(source=Source(column="Source", value="idu")),
         path=Path(ID_ENERGY_2_GAP_CALIBRATIONS_CSV),
     )
 
@@ -99,7 +100,7 @@ def mock_i10_phase_energy_motor_lookup_idu(
 ) -> ConfigServerEnergyMotorLookup:
     return ConfigServerEnergyMotorLookup(
         config_client=mock_config_client,
-        lut_config=LookupTableConfig(source=("Source", "idu")),
+        lut_config=LookupTableConfig(source=Source(column="Source", value="idu")),
         path=Path(ID_ENERGY_2_PHASE_CALIBRATIONS_CSV),
     )
 
@@ -110,7 +111,7 @@ def mock_i10_gap_energy_motor_lookup_idd(
 ) -> ConfigServerEnergyMotorLookup:
     return ConfigServerEnergyMotorLookup(
         config_client=mock_config_client,
-        lut_config=LookupTableConfig(source=("Source", "idd")),
+        lut_config=LookupTableConfig(source=Source(column="Source", value="idd")),
         path=Path(ID_ENERGY_2_GAP_CALIBRATIONS_CSV),
     )
 
@@ -121,9 +122,7 @@ def mock_i10_phase_energy_motor_lookup_idd(
 ) -> ConfigServerEnergyMotorLookup:
     return ConfigServerEnergyMotorLookup(
         config_client=mock_config_client,
-        lut_config=LookupTableConfig(
-            source=("Source", "idd"),
-        ),
+        lut_config=LookupTableConfig(source=Source(column="Source", value="idd")),
         path=Path(ID_ENERGY_2_PHASE_CALIBRATIONS_CSV),
     )
 
