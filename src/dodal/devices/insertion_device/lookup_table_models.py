@@ -178,6 +178,11 @@ class EnergyCoverage(BaseModel):
 
 
 class LookupTable(RootModel[dict[Pol, EnergyCoverage]]):
+    """
+    Specialised lookup table for insertion devices to relate the energy and polarisation
+    values to Apple2 motor positions.
+    """
+
     # Allow to auto specify a dict if one not provided
     def __init__(self, root: dict[Pol, EnergyCoverage] | None = None):
         super().__init__(root=root or {})
