@@ -117,9 +117,9 @@ class BartRobot(StandardReadable, Movable[SampleLocation | None]):
         super().__init__(name=name)
 
     async def pin_state_or_error(self, expected_state=PinMounted.PIN_MOUNTED):
-        """This co-routine will finish when either a pin is detected or the robot gives
-        an error saying no pin was found (whichever happens first). In the case where no
-        pin was found a RobotLoadError error is raised.
+        """This co-routine will finish when either the pin sensor reaches the specified
+        state or the robot gives an error (whichever happens first). In the case where
+        there is an error a RobotLoadError error is raised.
         """
 
         async def raise_if_error():
