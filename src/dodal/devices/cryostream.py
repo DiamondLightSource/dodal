@@ -30,17 +30,6 @@ class OxfordCryoStream(StandardReadable):
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             # Any signals that should be read once at the start of the scan
 
-            self.purge = epics_signal_x(f"{prefix}PURGE.PROC")
-            self.hold = epics_signal_x(f"{prefix}HOLD.PROC")
-            self.start = epics_signal_x(f"{prefix}RESTART.PROC")
-            self.pause = epics_signal_x(f"{prefix}PAUSE.PROC")
-            self.resume = epics_signal_x(f"{prefix}RESUME.PROC")
-            self.end = epics_signal_x(f"{prefix}END.PROC")
-            self.stop = epics_signal_x(f"{prefix}STOP.PROC")
-            self.plat = epics_signal_x(f"{prefix}PLAT.PROC")
-            self.cool = epics_signal_x(f"{prefix}COOL.PROC")
-            self.ramp = epics_signal_x(f"{prefix}RAMP.PROC")
-
             self.turbo = epics_signal_rw(str, f"{prefix}TURBO")
             self.turbo_mode = epics_signal_rw(TurboEnum, f"{prefix}TURBOMODE")
             self.status = epics_signal_r(str, f"{prefix}STATUS.SEVR")
@@ -71,6 +60,17 @@ class OxfordCryoStream(StandardReadable):
             self.suct_temp = epics_signal_r(float, f"{prefix}SUCTTEMP")
             self.suct_heat = epics_signal_r(float, f"{prefix}SUCTHEAT")
             self.back_pressure = epics_signal_r(float, f"{prefix}BACKPRESS")
+
+        self.purge = epics_signal_x(f"{prefix}PURGE.PROC")
+        self.hold = epics_signal_x(f"{prefix}HOLD.PROC")
+        self.start = epics_signal_x(f"{prefix}RESTART.PROC")
+        self.pause = epics_signal_x(f"{prefix}PAUSE.PROC")
+        self.resume = epics_signal_x(f"{prefix}RESUME.PROC")
+        self.end = epics_signal_x(f"{prefix}END.PROC")
+        self.stop = epics_signal_x(f"{prefix}STOP.PROC")
+        self.plat = epics_signal_x(f"{prefix}PLAT.PROC")
+        self.cool = epics_signal_x(f"{prefix}COOL.PROC")
+        self.ramp = epics_signal_x(f"{prefix}RAMP.PROC")
 
         super().__init__(name)
 
