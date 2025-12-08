@@ -14,12 +14,10 @@ dodal.devices.cryostream
    :toctree:
    :recursive:
 
-   ~cryostream.CryoStream
    ~cryostream.CryoStreamGantry
    ~cryostream.CryoStreamSelection
+   ~cryostream.OxfordCryoJet
    ~cryostream.OxfordCryoStream
-   ~cryostream.OxfordCryoStreamController
-   ~cryostream.OxfordCryoStreamStatus
    ~cryostream.TurboEnum
 
 
