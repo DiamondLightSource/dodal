@@ -15,7 +15,7 @@ from dodal.devices.insertion_device.lookup_table_models import (
 
 class GenerateConfigLookupTable(BaseModel):
     polarisations: list[Pol]
-    energy_coveragies: list[EnergyCoverage]
+    energy_coverage: list[EnergyCoverage]
 
 
 def assert_expected_lut_file_equals_config_server_energy_motor_update_lookup_table(
