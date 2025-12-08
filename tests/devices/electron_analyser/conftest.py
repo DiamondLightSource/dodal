@@ -28,8 +28,7 @@ from dodal.devices.electron_analyser.vgscienta import (
     VGScientaSequence,
 )
 from dodal.devices.i09 import Grating
-from dodal.devices.pgm import PGM
-from dodal.testing import patch_motor
+from dodal.devices.pgm import PlaneGratingMonochromator
 from tests.devices.electron_analyser.helper_util import (
     get_test_sequence,
 )
@@ -41,9 +40,10 @@ async def single_energy_source() -> EnergySource:
         dcm = DoubleCrystalMonochromatorWithDSpacing(
             "DCM:", PitchAndRollCrystal, StationaryCrystal
         )
-    patch_motor(dcm.energy_in_keV, initial_position=2.2)
+    await dcm.energy_in_keV.set(2.2)
     async with init_devices(mock=True):
         dcm_energy_source = EnergySource(dcm.energy_in_eV)
+
     return dcm_energy_source
 
 
@@ -53,12 +53,9 @@ async def dual_energy_source() -> DualEnergySource:
         dcm = DoubleCrystalMonochromatorWithDSpacing(
             "DCM:", PitchAndRollCrystal, StationaryCrystal
         )
-    patch_motor(dcm.energy_in_keV, initial_position=2.2)
-
-    async with init_devices(mock=True):
-        pgm = PGM("PGM:", Grating)
-    patch_motor(pgm.energy, initial_position=500)
-
+        pgm = PlaneGratingMonochromator("PGM:", Grating)
+    await dcm.energy_in_keV.set(2.2)
+    await pgm.energy.set(500)
     async with init_devices(mock=True):
         dual_energy_source = DualEnergySource(
             source1=dcm.energy_in_eV, source2=pgm.energy.user_readback

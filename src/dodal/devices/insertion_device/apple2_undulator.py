@@ -23,11 +23,13 @@ from ophyd_async.core import (
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw, epics_signal_w
 from ophyd_async.epics.motor import Motor
 
+from dodal.common.enums import EnabledDisabledUpper
 from dodal.log import LOGGER
 
 T = TypeVar("T")
 
 DEFAULT_MOTOR_MIN_TIMEOUT = 10
+MAXIMUM_MOVE_TIME = 550  # There is no useful movements take longer than this.
 
 
 class UndulatorGateStatus(StrictEnum):
@@ -36,16 +38,24 @@ class UndulatorGateStatus(StrictEnum):
 
 
 @dataclass
-class Apple2PhasesVal:
+class Apple2LockedPhasesVal:
     top_outer: str
-    top_inner: str
     btm_inner: str
+
+
+@dataclass
+class Apple2PhasesVal(Apple2LockedPhasesVal):
+    top_inner: str
     btm_outer: str
 
 
 @dataclass
-class Apple2Val(Apple2PhasesVal):
+class Apple2Val:
     gap: str
+    phase: Apple2LockedPhasesVal | Apple2PhasesVal
+
+    def extract_phase_val(self):
+        return self.phase
 
 
 class Pol(StrictEnum):
@@ -80,10 +90,7 @@ class SafeUndulatorMover(StandardReadable, Movable[T], Generic[T]):
     def __init__(self, set_move: SignalW, prefix: str, name: str = ""):
         # Gate keeper open when move is requested, closed when move is completed
         self.gate = epics_signal_r(UndulatorGateStatus, prefix + "BLGATE")
-
-        split_pv = prefix.split("-")
-        fault_pv = f"{split_pv[0]}-{split_pv[1]}-STAT-{split_pv[3]}ANYFAULT"
-        self.fault = epics_signal_r(float, fault_pv)
+        self.status = epics_signal_r(EnabledDisabledUpper, prefix + "IDBLENA")
         self.set_move = set_move
         super().__init__(name)
 
@@ -91,14 +98,14 @@ class SafeUndulatorMover(StandardReadable, Movable[T], Generic[T]):
     async def set(self, value: T) -> None:
         LOGGER.info(f"Setting {self.name} to {value}")
         await self.raise_if_cannot_move()
-        await self._set_demand_positions(value)
+        await self.set_demand_positions(value)
         timeout = await self.get_timeout()
         LOGGER.info(f"Moving {self.name} to {value} with timeout = {timeout}")
         await self.set_move.set(value=1, timeout=timeout)
         await wait_for_value(self.gate, UndulatorGateStatus.CLOSE, timeout=timeout)
 
     @abc.abstractmethod
-    async def _set_demand_positions(self, value: T) -> None:
+    async def set_demand_positions(self, value: T) -> None:
         """Set the demand positions on the device without actually hitting move."""
 
     @abc.abstractmethod
@@ -106,8 +113,8 @@ class SafeUndulatorMover(StandardReadable, Movable[T], Generic[T]):
         """Get the timeout for the move based on an estimate of how long it will take."""
 
     async def raise_if_cannot_move(self) -> None:
-        if await self.fault.get_value() != 0:
-            raise RuntimeError(f"{self.name} is in fault state")
+        if await self.status.get_value() is not EnabledDisabledUpper.ENABLED:
+            raise RuntimeError(f"{self.name} is DISABLED and cannot move.")
         if await self.gate.get_value() == UndulatorGateStatus.OPEN:
             raise RuntimeError(f"{self.name} is already in motion.")
 
@@ -158,7 +165,7 @@ class UndulatorGap(SafeUndulatorMover[float]):
             self.user_readback = epics_signal_r(float, prefix + "CURRGAPD")
         super().__init__(self.set_move, prefix, name)
 
-    async def _set_demand_positions(self, value: float) -> None:
+    async def set_demand_positions(self, value: float) -> None:
         await self.user_setpoint.set(str(value))
 
     async def get_timeout(self) -> float:
@@ -206,7 +213,57 @@ class UndulatorPhaseMotor(StandardReadable):
         super().__init__(name=name)
 
 
-class UndulatorPhaseAxes(SafeUndulatorMover[Apple2PhasesVal]):
+Apple2PhaseValType = TypeVar("Apple2PhaseValType", bound=Apple2LockedPhasesVal)
+
+
+class UndulatorLockedPhaseAxes(SafeUndulatorMover[Apple2PhaseValType]):
+    """Two phase Motor to make up the locked id phase motion."""
+
+    def __init__(
+        self,
+        prefix: str,
+        top_outer: str,
+        btm_inner: str,
+        name: str = "",
+    ):
+        # Gap demand set point and readback
+        with self.add_children_as_readables():
+            self.top_outer = UndulatorPhaseMotor(prefix=prefix, infix=top_outer)
+            self.btm_inner = UndulatorPhaseMotor(prefix=prefix, infix=btm_inner)
+        # Nothing move until this is set to 1 and it will return to 0 when done.
+        self.set_move = epics_signal_rw(int, f"{prefix}BL{top_outer}" + "MOVE")
+        self.axes = [self.top_outer, self.btm_inner]
+        super().__init__(self.set_move, prefix, name)
+
+    async def set_demand_positions(self, value: Apple2PhaseValType) -> None:
+        await asyncio.gather(
+            self.top_outer.user_setpoint.set(value=value.top_outer),
+            self.btm_inner.user_setpoint.set(value=value.btm_inner),
+        )
+
+    async def get_timeout(self) -> float:
+        """
+        Get all four motor speed, current positions and target positions to calculate required timeout.
+        """
+
+        timeouts = await asyncio.gather(
+            *[
+                estimate_motor_timeout(
+                    axis.user_setpoint_readback,
+                    axis.user_readback,
+                    axis.velocity,
+                )
+                for axis in self.axes
+            ]
+        )
+        """A 2.0 multiplier is required to prevent premature motor timeouts in phase
+        axes as it is a master-slave system, where the slave's movement,
+        being dependent on the master, can take up to twice as long to complete.
+        """
+        return np.max(timeouts) * 2.0
+
+
+class UndulatorPhaseAxes(UndulatorLockedPhaseAxes[Apple2PhasesVal]):
     """
     A collection of 4 phase Motor to make up the full id phase motion. We are using the diamond pv convention.
     e.g. top_outer == Q1
@@ -227,43 +284,19 @@ class UndulatorPhaseAxes(SafeUndulatorMover[Apple2PhasesVal]):
     ):
         # Gap demand set point and readback
         with self.add_children_as_readables():
-            self.top_outer = UndulatorPhaseMotor(prefix=prefix, infix=top_outer)
             self.top_inner = UndulatorPhaseMotor(prefix=prefix, infix=top_inner)
-            self.btm_inner = UndulatorPhaseMotor(prefix=prefix, infix=btm_inner)
             self.btm_outer = UndulatorPhaseMotor(prefix=prefix, infix=btm_outer)
-        # Nothing move until this is set to 1 and it will return to 0 when done.
-        self.set_move = epics_signal_rw(int, f"{prefix}BL{top_outer}" + "MOVE")
 
-        super().__init__(self.set_move, prefix, name)
+        super().__init__(prefix, top_outer=top_outer, btm_inner=btm_inner, name=name)
+        self.axes.extend([self.top_inner, self.btm_outer])
 
-    async def _set_demand_positions(self, value: Apple2PhasesVal) -> None:
+    async def set_demand_positions(self, value: Apple2PhasesVal) -> None:
         await asyncio.gather(
             self.top_outer.user_setpoint.set(value=value.top_outer),
             self.top_inner.user_setpoint.set(value=value.top_inner),
             self.btm_inner.user_setpoint.set(value=value.btm_inner),
             self.btm_outer.user_setpoint.set(value=value.btm_outer),
         )
-
-    async def get_timeout(self) -> float:
-        """
-        Get all four motor speed, current positions and target positions to calculate required timeout.
-        """
-        axes = [self.top_outer, self.top_inner, self.btm_inner, self.btm_outer]
-        timeouts = await asyncio.gather(
-            *[
-                estimate_motor_timeout(
-                    axis.user_setpoint_readback,
-                    axis.user_readback,
-                    axis.velocity,
-                )
-                for axis in axes
-            ]
-        )
-        """A 2.0 multiplier is required to prevent premature motor timeouts in phase
-        axes as it is a master-slave system, where the slave's movement,
-        being dependent on the master, can take up to twice as long to complete.
-        """
-        return np.max(timeouts) * 2.0
 
 
 class UndulatorJawPhase(SafeUndulatorMover[float]):
@@ -287,7 +320,7 @@ class UndulatorJawPhase(SafeUndulatorMover[float]):
 
         super().__init__(self.set_move, prefix, name)
 
-    async def _set_demand_positions(self, value: float) -> None:
+    async def set_demand_positions(self, value: float) -> None:
         await self.jaw_phase.user_setpoint.set(value=str(value))
 
     async def get_timeout(self) -> float:
@@ -301,7 +334,10 @@ class UndulatorJawPhase(SafeUndulatorMover[float]):
         )
 
 
-class Apple2(StandardReadable, Movable):
+PhaseAxesType = TypeVar("PhaseAxesType", bound=UndulatorLockedPhaseAxes)
+
+
+class Apple2(StandardReadable, Movable[Apple2Val], Generic[PhaseAxesType]):
     """
     Device representing the combined motor controls for an Apple2 undulator.
 
@@ -313,7 +349,7 @@ class Apple2(StandardReadable, Movable):
         The undulator phase axes device, consisting of four phase motors.
     """
 
-    def __init__(self, id_gap: UndulatorGap, id_phase: UndulatorPhaseAxes, name=""):
+    def __init__(self, id_gap: UndulatorGap, id_phase: PhaseAxesType, name=""):
         """
         Parameters
         ----------
@@ -339,12 +375,12 @@ class Apple2(StandardReadable, Movable):
 
         # Only need to check gap as the phase motors share both fault and gate with gap.
         await self.gap().raise_if_cannot_move()
+
         await asyncio.gather(
-            self.phase().top_outer.user_setpoint.set(value=id_motor_values.top_outer),
-            self.phase().top_inner.user_setpoint.set(value=id_motor_values.top_inner),
-            self.phase().btm_inner.user_setpoint.set(value=id_motor_values.btm_inner),
-            self.phase().btm_outer.user_setpoint.set(value=id_motor_values.btm_outer),
-            self.gap().user_setpoint.set(value=id_motor_values.gap),
+            self.phase().set_demand_positions(
+                value=id_motor_values.extract_phase_val()
+            ),
+            self.gap().set_demand_positions(value=float(id_motor_values.gap)),
         )
         timeout = np.max(
             await asyncio.gather(self.gap().get_timeout(), self.phase().get_timeout())
@@ -362,12 +398,12 @@ class Apple2(StandardReadable, Movable):
 
 
 class EnergyMotorConvertor(Protocol):
-    def __call__(self, energy: float, pol: Pol) -> tuple[float, float]:
+    def __call__(self, energy: float, pol: Pol) -> float:
         """Protocol to provide energy to motor position conversion"""
         ...
 
 
-Apple2Type = TypeVar("Apple2Type", bound="Apple2")
+Apple2Type = TypeVar("Apple2Type", bound=Apple2)
 
 
 class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
@@ -390,19 +426,18 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
         Soft signal for the polarisation setpoint.
     polarisation : derived_signal_rw
         Hardware-backed signal for polarisation readback and control.
-    energy_to_motor : EnergyMotorConvertor
-        Callable that converts energy and polarisation to motor positions.
+    gap_energy_to_motor_converter : EnergyMotorConvertor
+        Callable that converts energy and polarisation to gap motor positions.
+    phase_energy_to_motor_converter : EnergyMotorConvertor
+        Callable that converts energy and polarisation to phase motor positions.
 
     Abstract Methods
     ----------------
-    _set_motors_from_energy(value: float) -> None
-        Abstract method to set motor positions for a given energy and polarisation.
-    energy_to_motor : EnergyMotorConvertor
-        A callable that converts energy and polarisation to motor positions.
-
+    _get_apple2_value(gap: float, phase: float) -> Apple2Val
+        Abstract method to return the Apple2Val used to set the apple2 with.
     Notes
     -----
-    - Subclasses must implement `_set_motors_from_energy` for beamline-specific logic.
+    - Subclasses must implement `_get_apple2_value` for beamline-specific logic.
     - LH3 polarisation is indistinguishable from LH in hardware; special handling is provided.
     - Supports multiple polarisation modes, including linear horizontal (LH), linear vertical (LV),
       positive circular (PC), negative circular (NC), and linear arbitrary (LA).
@@ -412,7 +447,9 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
     def __init__(
         self,
         apple2: Apple2Type,
-        energy_to_motor_converter: EnergyMotorConvertor,
+        gap_energy_motor_converter: EnergyMotorConvertor,
+        phase_energy_motor_converter: EnergyMotorConvertor,
+        units: str = "eV",
         name: str = "",
     ) -> None:
         """
@@ -424,19 +461,20 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
         name: str
             Name of the device.
         """
-        self.energy_to_motor = energy_to_motor_converter
         self.apple2 = Reference(apple2)
+        self.gap_energy_motor_converter = gap_energy_motor_converter
+        self.phase_energy_motor_converter = phase_energy_motor_converter
 
         # Store the set energy for readback.
         self._energy, self._energy_set = soft_signal_r_and_setter(
-            float, initial_value=None, units="eV"
+            float, initial_value=None, units=units
         )
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             self.energy = derived_signal_rw(
                 raw_to_derived=self._read_energy,
                 set_derived=self._set_energy,
                 energy=self._energy,
-                derived_units="eV",
+                derived_units=units,
             )
 
         # Store the polarisation for setpoint. And provide readback for LH3.
@@ -444,30 +482,51 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
         self.polarisation_setpoint, self._polarisation_setpoint_set = (
             soft_signal_r_and_setter(Pol)
         )
+        phase = self.apple2().phase()
+        # check if undulator phase is unlocked.
+        if isinstance(phase, UndulatorPhaseAxes):
+            top_inner = phase.top_inner.user_readback
+            btm_outer = phase.btm_outer.user_readback
+        else:
+            # If locked phase axes make the locked phase 0.
+            top_inner = btm_outer = soft_signal_rw(float, initial_value=0.0)
+
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             # Hardware backed read/write for polarisation.
+
             self.polarisation = derived_signal_rw(
                 raw_to_derived=self._read_pol,
                 set_derived=self._set_pol,
                 pol=self.polarisation_setpoint,
-                top_outer=self.apple2().phase().top_outer.user_readback,
-                top_inner=self.apple2().phase().top_inner.user_readback,
-                btm_inner=self.apple2().phase().btm_inner.user_readback,
-                btm_outer=self.apple2().phase().btm_outer.user_readback,
+                top_outer=phase.top_outer.user_readback,
+                top_inner=top_inner,
+                btm_inner=phase.btm_inner.user_readback,
+                btm_outer=btm_outer,
                 gap=self.apple2().gap().user_readback,
             )
         super().__init__(name)
 
     @abc.abstractmethod
-    async def _set_motors_from_energy(self, value: float) -> None:
+    def _get_apple2_value(self, gap: float, phase: float, pol: Pol) -> Apple2Val:
         """
         This method should be implemented by the beamline specific ID class as the
         motor positions will be different for each beamline depending on the
-        undulator design and the lookup table used.
+        undulator design.
         """
 
+    async def _set_motors_from_energy_and_polarisation(
+        self, energy: float, pol: Pol
+    ) -> None:
+        """Set the undulator motors for a given energy and polarisation."""
+        gap = self.gap_energy_motor_converter(energy=energy, pol=pol)
+        phase = self.phase_energy_motor_converter(energy=energy, pol=pol)
+        apple2_val = self._get_apple2_value(gap, phase, pol)
+        LOGGER.info(f"Setting polarisation to {pol}, with values: {apple2_val}")
+        await self.apple2().set(id_motor_values=apple2_val)
+
     async def _set_energy(self, energy: float) -> None:
-        await self._set_motors_from_energy(energy)
+        pol = await self._check_and_get_pol_setpoint()
+        await self._set_motors_from_energy_and_polarisation(energy, pol)
         self._energy_set(energy)
 
     def _read_energy(self, energy: float) -> float:
@@ -479,7 +538,6 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
         Check the polarisation setpoint and if it is NONE try to read it from
         hardware.
         """
-
         pol = await self.polarisation_setpoint.get_value()
 
         if pol == Pol.NONE:
@@ -501,7 +559,7 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
     ) -> None:
         # This changes the pol setpoint and then changes polarisation via set energy.
         self._polarisation_setpoint_set(value)
-        await self.energy.set(await self.energy.get_value())
+        await self.energy.set(await self.energy.get_value(), timeout=MAXIMUM_MOVE_TIME)
 
     def _read_pol(
         self,
@@ -672,16 +730,11 @@ class InsertionDeviceEnergy(InsertionDeviceEnergyBase):
         self.energy = Reference(id_controller.energy)
         super().__init__(name=name)
 
-        self.add_readables(
-            [
-                self.energy(),
-            ],
-            StandardReadableFormat.HINTED_SIGNAL,
-        )
+        self.add_readables([self.energy()], StandardReadableFormat.HINTED_SIGNAL)
 
     @AsyncStatus.wrap
     async def set(self, energy: float) -> None:
-        await self.energy().set(energy)
+        await self.energy().set(energy, timeout=MAXIMUM_MOVE_TIME)
 
 
 class InsertionDevicePolarisation(StandardReadable, Locatable[Pol]):
@@ -696,7 +749,7 @@ class InsertionDevicePolarisation(StandardReadable, Locatable[Pol]):
 
     @AsyncStatus.wrap
     async def set(self, pol: Pol) -> None:
-        await self.polarisation().set(pol)
+        await self.polarisation().set(pol, timeout=MAXIMUM_MOVE_TIME)
 
     async def locate(self) -> Location[Pol]:
         """Return the current polarisation"""

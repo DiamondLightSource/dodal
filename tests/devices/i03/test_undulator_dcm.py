@@ -3,16 +3,14 @@ from unittest.mock import MagicMock, patch
 
 import numpy as np
 import pytest
-from ophyd_async.core import AsyncStatus, init_devices
-from ophyd_async.testing import get_mock_put, set_mock_value
+from ophyd_async.core import AsyncStatus, get_mock_put, init_devices, set_mock_value
 
 from dodal.common.enums import EnabledDisabledUpper
 from dodal.devices.baton import Baton
 from dodal.devices.i03.dcm import DCM
 from dodal.devices.i03.undulator_dcm import UndulatorDCM
-from dodal.devices.undulator import AccessError, Undulator
+from dodal.devices.undulator import AccessError, UndulatorInKeV
 from dodal.log import LOGGER
-from dodal.testing import patch_all_motors
 from tests.devices.test_daq_configuration import MOCK_DAQ_CONFIG_PATH
 from tests.devices.test_daq_configuration.lookup import (
     BEAMLINE_ENERGY_DCM_PITCH_CONVERTER_TXT,
@@ -38,7 +36,7 @@ def flush_event_loop_on_finish():
 async def fake_undulator_dcm() -> UndulatorDCM:
     async with init_devices(mock=True):
         baton = Baton("BATON-01:")
-        undulator = Undulator(
+        undulator = UndulatorInKeV(
             "UND-01",
             name="undulator",
             poles=80,
@@ -53,8 +51,6 @@ async def fake_undulator_dcm() -> UndulatorDCM:
             daq_configuration_path=MOCK_DAQ_CONFIG_PATH,
             name="undulator_dcm",
         )
-    patch_all_motors(dcm)
-    patch_all_motors(undulator)
     return undulator_dcm
 
 

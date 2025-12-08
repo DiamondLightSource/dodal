@@ -6,12 +6,12 @@ from types import ModuleType
 from unittest.mock import patch
 
 import pytest
-from ophyd_async.core import init_devices
-from ophyd_async.testing import set_mock_value
+from ophyd_async.core import init_devices, set_mock_value
 
 from conftest import mock_attributes_table
 from dodal.common.beamlines import beamline_parameters, beamline_utils
 from dodal.common.beamlines.commissioning_mode import set_commissioning_signal
+from dodal.device_manager import DeviceManager
 from dodal.devices.baton import Baton
 from dodal.devices.detector import DetectorParams
 from dodal.devices.detector.det_dim_constants import EIGER2_X_16M_SIZE
@@ -33,11 +33,20 @@ def module_and_devices_for_beamline(request: pytest.FixtureRequest):
     with patch.dict(os.environ, {"BEAMLINE": beamline}, clear=True):
         bl_mod = importlib.import_module("dodal.beamlines." + beamline)
         mock_beamline_module_filepaths(beamline, bl_mod)
-        devices, exceptions = make_all_devices(
-            bl_mod,
-            include_skipped=True,
-            fake_with_ophyd_sim=True,
-        )
+        if isinstance(
+            device_manager := getattr(bl_mod, "devices", None), DeviceManager
+        ):
+            result = device_manager.build_all(include_skipped=True, mock=True).connect()
+            devices, exceptions = (
+                result.devices,
+                result.connection_errors | result.build_errors,
+            )
+        else:
+            devices, exceptions = make_all_devices(
+                bl_mod,
+                include_skipped=True,
+                fake_with_ophyd_sim=True,
+            )
         yield (bl_mod, devices, exceptions)
         beamline_utils.clear_devices()
         for factory in collect_factories(bl_mod).values():

@@ -7,7 +7,8 @@ from dodal.common.beamlines.beamline_utils import (
     device_factory,
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.devices.apple2_undulator import (
+from dodal.devices.i17.i17_apple2 import I17Apple2Controller
+from dodal.devices.insertion_device.apple2_undulator import (
     Apple2,
     Apple2Controller,
     BeamEnergy,
@@ -16,8 +17,9 @@ from dodal.devices.apple2_undulator import (
     UndulatorGap,
     UndulatorPhaseAxes,
 )
-from dodal.devices.i17.i17_apple2 import I17Apple2Controller
-from dodal.devices.pgm import PGM
+from dodal.devices.insertion_device.energy_motor_lookup import EnergyMotorLookup
+from dodal.devices.insertion_device.lookup_table_models import LookupTable
+from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.devices.synchrotron import Synchrotron
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
@@ -39,8 +41,8 @@ def synchrotron() -> Synchrotron:
 
 
 @device_factory(skip=True)
-def pgm() -> PGM:
-    return PGM(
+def pgm() -> PlaneGratingMonochromator:
+    return PlaneGratingMonochromator(
         prefix=f"{PREFIX.beamline_prefix}-OP-PGM-01:",
         grating=I17Grating,
         grating_pv="NLINES2",
@@ -76,7 +78,9 @@ def id() -> Apple2:
 def id_controller() -> Apple2Controller:
     """I17 insertion device controller with dummy energy to motor_converter."""
     return I17Apple2Controller(
-        apple2=id(), energy_to_motor_converter=lambda energy, pol: (0.0, 0.0)
+        apple2=id(),
+        gap_energy_motor_lut=EnergyMotorLookup(lut=LookupTable()),
+        phase_energy_motor_lut=EnergyMotorLookup(lut=LookupTable()),
     )
 
 

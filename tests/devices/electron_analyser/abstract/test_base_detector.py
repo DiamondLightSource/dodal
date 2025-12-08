@@ -3,11 +3,10 @@ from unittest.mock import AsyncMock
 import pytest
 from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import init_devices
+from ophyd_async.core import init_devices, set_mock_value
 from ophyd_async.testing import (
     assert_configuration,
     assert_reading,
-    set_mock_value,
 )
 
 import dodal.devices.b07 as b07

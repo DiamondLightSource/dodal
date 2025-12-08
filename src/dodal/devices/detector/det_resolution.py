@@ -10,14 +10,16 @@ def _get_detector_radius_mm(detector_params: DetectorParams):
     return 0.5 * _get_detector_max_size_mm(detector_params)
 
 
-def _get_detector_max_size_mm(detector_params):
+def _get_detector_max_size_mm(detector_params: DetectorParams):
     return max(
         detector_params.detector_size_constants.det_dimension.width,
         detector_params.detector_size_constants.det_dimension.height,
     )
 
 
-def _get_beam_xy_accounting_for_roi(detector_params, det_distance_mm):
+def _get_beam_xy_accounting_for_roi(
+    detector_params: DetectorParams, det_distance_mm: float
+):
     beam_x = detector_params.beam_xy_converter.get_beam_xy_from_det_dist(
         det_distance_mm, Axis.X_AXIS
     )

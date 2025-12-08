@@ -6,18 +6,12 @@ note:
     idd == id1,    idu == id2.
 """
 
+from pathlib import Path
+
 from daq_config_server.client import ConfigServer
 
 from dodal.common.beamlines.beamline_utils import device_factory
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.devices.apple2_undulator import (
-    BeamEnergy,
-    InsertionDeviceEnergy,
-    InsertionDevicePolarisation,
-    UndulatorGap,
-    UndulatorJawPhase,
-    UndulatorPhaseAxes,
-)
 from dodal.devices.i10 import (
     I10SharedDiagnostic,
     I10SharedSlits,
@@ -32,7 +26,24 @@ from dodal.devices.i10.i10_apple2 import (
 
 # Imports taken from i10 while we work out how to deal with split end stations
 from dodal.devices.i10.i10_setting_data import I10Grating
-from dodal.devices.pgm import PGM
+from dodal.devices.insertion_device.apple2_undulator import (
+    BeamEnergy,
+    InsertionDeviceEnergy,
+    InsertionDevicePolarisation,
+    UndulatorGap,
+    UndulatorJawPhase,
+    UndulatorPhaseAxes,
+)
+from dodal.devices.insertion_device.energy_motor_lookup import (
+    ConfigServerEnergyMotorLookup,
+)
+from dodal.devices.insertion_device.lookup_table_models import (
+    DEFAULT_GAP_FILE,
+    DEFAULT_PHASE_FILE,
+    LookupTableColumnConfig,
+    Source,
+)
+from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.devices.synchrotron import Synchrotron
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
@@ -41,8 +52,6 @@ BL = get_beamline_name("i10")
 set_log_beamline(BL)
 set_utils_beamline(BL)
 PREFIX = BeamlinePrefix(BL)
-
-LOOK_UPTABLE_DIR = "/dls_sw/i10/software/blueapi/scratch/i10-config/lookupTables/"
 
 
 @device_factory()
@@ -59,9 +68,9 @@ def first_mirror() -> PiezoMirror:
 
 
 @device_factory()
-def pgm() -> PGM:
+def pgm() -> PlaneGratingMonochromator:
     "I10 Plane Grating Monochromator, it can change energy via pgm.energy.set(<energy>)"
-    return PGM(
+    return PlaneGratingMonochromator(
         prefix=f"{PREFIX.beamline_prefix}-OP-PGM-01:",
         grating=I10Grating,
         grating_pv="NLINES2",
@@ -115,11 +124,21 @@ def idd() -> I10Apple2:
 @device_factory()
 def idd_controller() -> I10Apple2Controller:
     """I10 downstream insertion device controller."""
+    source = Source(column="Source", value="idd")
+    idd_gap_energy_motor_lut = ConfigServerEnergyMotorLookup(
+        config_client=I10_CONF_CLIENT,
+        lut_config=LookupTableColumnConfig(source=source),
+        path=Path(LOOK_UPTABLE_DIR, DEFAULT_GAP_FILE),
+    )
+    idd_phase_energy_motor_lut = ConfigServerEnergyMotorLookup(
+        config_client=I10_CONF_CLIENT,
+        lut_config=LookupTableColumnConfig(source=source),
+        path=Path(LOOK_UPTABLE_DIR, DEFAULT_PHASE_FILE),
+    )
     return I10Apple2Controller(
         apple2=idd(),
-        lookuptable_dir=LOOK_UPTABLE_DIR,
-        source=("Source", "idd"),
-        config_client=I10_CONF_CLIENT,
+        gap_energy_motor_lut=idd_gap_energy_motor_lut,
+        phase_energy_motor_lut=idd_phase_energy_motor_lut,
     )
 
 
@@ -179,11 +198,21 @@ def idu() -> I10Apple2:
 @device_factory()
 def idu_controller() -> I10Apple2Controller:
     """I10 upstream insertion device controller."""
-    return I10Apple2Controller(
-        apple2=idu(),
-        lookuptable_dir=LOOK_UPTABLE_DIR,
-        source=("Source", "idu"),
+    source = Source(column="Source", value="idu")
+    idu_gap_energy_motor_lut = ConfigServerEnergyMotorLookup(
         config_client=I10_CONF_CLIENT,
+        lut_config=LookupTableColumnConfig(source=source),
+        path=Path(LOOK_UPTABLE_DIR, DEFAULT_GAP_FILE),
+    )
+    idu_phase_energy_motor_lut = ConfigServerEnergyMotorLookup(
+        config_client=I10_CONF_CLIENT,
+        lut_config=LookupTableColumnConfig(source=source),
+        path=Path(LOOK_UPTABLE_DIR, DEFAULT_PHASE_FILE),
+    )
+    return I10Apple2Controller(
+        apple2=idd(),
+        gap_energy_motor_lut=idu_gap_energy_motor_lut,
+        phase_energy_motor_lut=idu_phase_energy_motor_lut,
     )
 
 
