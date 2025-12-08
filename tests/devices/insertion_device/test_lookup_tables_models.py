@@ -4,7 +4,7 @@ import pytest
 from dodal.devices.insertion_device.apple2_undulator import Pol
 from dodal.devices.insertion_device.lookup_table_models import (
     LookupTable,
-    LookupTableConfig,
+    LookupTableColumnConfig,
     convert_csv_to_lookup,
     read_file_and_skip,
 )
@@ -48,8 +48,8 @@ def test_lookup_table_is_serialisable(lut: LookupTable) -> None:
 
 
 @pytest.fixture
-def lut_config() -> LookupTableConfig:
-    return LookupTableConfig(
+def lut_config() -> LookupTableColumnConfig:
+    return LookupTableColumnConfig(
         mode="Mode",
         min_energy="MinEnergy",
         max_energy="MaxEnergy",
@@ -70,7 +70,7 @@ def test_read_file_and_skip_basic() -> None:
 
 
 def test_convert_csv_to_lookup_overwrite_name_convert_default(
-    lut_config: LookupTableConfig,
+    lut_config: LookupTableColumnConfig,
 ) -> None:
     csv_content = (
         "Mode,MinEnergy,MaxEnergy,c1,c0\nHL,100,200,2.0,1.0\nVL,200,300,1.0,0.0\n"
@@ -87,7 +87,7 @@ def test_convert_csv_to_lookup_overwrite_name_convert_default(
 
 
 async def test_bad_file_contents_causes_convert_csv_to_lookup_fails(
-    lut_config: LookupTableConfig,
+    lut_config: LookupTableColumnConfig,
 ) -> None:
     with pytest.raises(RuntimeError):
         convert_csv_to_lookup("fnslkfndlsnf", lut_config)

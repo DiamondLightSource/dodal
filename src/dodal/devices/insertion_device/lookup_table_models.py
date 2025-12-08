@@ -26,7 +26,8 @@ structure:
 import csv
 import io
 from collections.abc import Generator
-from typing import Annotated, Any, NamedTuple, Self
+from typing import Annotated as A
+from typing import Any, NamedTuple, Self
 
 import numpy as np
 from pydantic import (
@@ -74,18 +75,18 @@ class Source(NamedTuple):
     value: str
 
 
-class LookupTableConfig(BaseModel):
+class LookupTableColumnConfig(BaseModel):
     """Configuration on how to process a csv file columns into a LookupTable data model."""
 
-    source: Annotated[
+    source: A[
         Source | None,
         Field(
-            "If not None, only process the row if the source column name match the value."
+            description="If not None, only process the row if the source column name match the value."
         ),
     ] = None
-    mode: Annotated[str, Field("Polarisation mode column name.")] = "Mode"
-    min_energy: Annotated[str, Field("Minium energy column name.")] = "MinEnergy"
-    max_energy: Annotated[str, Field("Maximum energy column name.")] = "MaxEnergy"
+    mode: A[str, Field(description="Polarisation mode column name.")] = "Mode"
+    min_energy: A[str, Field(description="Minimum energy column name.")] = "MinEnergy"
+    max_energy: A[str, Field(description="Maximum energy column name.")] = "MaxEnergy"
     poly_deg: list[str] = Field(
         description="Polynomial column names.", default_factory=lambda: DEFAULT_POLY_DEG
     )
@@ -214,7 +215,7 @@ class LookupTable(RootModel[dict[Pol, EnergyCoverage]]):
 
 def convert_csv_to_lookup(
     file_contents: str,
-    lut_config: LookupTableConfig,
+    lut_config: LookupTableColumnConfig,
     skip_line_start_with: str = "#",
 ) -> LookupTable:
     """

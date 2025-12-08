@@ -29,7 +29,7 @@ from dodal.devices.insertion_device.energy_motor_lookup import (
 from dodal.devices.insertion_device.lookup_table_models import (
     MAXIMUM_ROW_PHASE_MOTOR_POSITION,
     ROW_PHASE_CIRCULAR,
-    LookupTableConfig,
+    LookupTableColumnConfig,
 )
 from dodal.devices.pgm import PlaneGratingMonochromator
 from tests.devices.i09_2_shared.test_data import (
@@ -51,7 +51,7 @@ def mock_j09_gap_energy_motor_lookup(
     mock_config_client: ConfigServer,
 ) -> ConfigServerEnergyMotorLookup:
     return ConfigServerEnergyMotorLookup(
-        lut_config=LookupTableConfig(poly_deg=J09_GAP_POLY_DEG_COLUMNS),
+        lut_config=LookupTableColumnConfig(poly_deg=J09_GAP_POLY_DEG_COLUMNS),
         config_client=mock_config_client,
         path=Path(TEST_SOFT_GAP_UNDULATOR_LUT),
     )
@@ -62,7 +62,7 @@ def mock_j09_phase_energy_motor_lookup(
     mock_config_client: ConfigServer,
 ) -> ConfigServerEnergyMotorLookup:
     return ConfigServerEnergyMotorLookup(
-        lut_config=LookupTableConfig(poly_deg=J09_PHASE_POLY_DEG_COLUMNS),
+        lut_config=LookupTableColumnConfig(poly_deg=J09_PHASE_POLY_DEG_COLUMNS),
         config_client=mock_config_client,
         path=Path(TEST_SOFT_PHASE_UNDULATOR_LUT),
     )
