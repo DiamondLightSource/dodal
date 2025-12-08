@@ -70,7 +70,7 @@ def hu_id_energy() -> HardInsertionDeviceEnergy:
     return HardInsertionDeviceEnergy(
         undulator_order=harmonics(),
         undulator=undulator(),
-        lut={},  # Placeholder, will be set in another separate issue
+        lut={},  # ToDo https://github.com/DiamondLightSource/sm-bluesky/issues/239
         gap_to_energy_func=calculate_energy_i09_hu,
         energy_to_gap_func=calculate_gap_i09_hu,
     )
