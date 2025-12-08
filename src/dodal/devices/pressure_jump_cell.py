@@ -211,7 +211,7 @@ class PressureJumpCellController(StandardReadable, Movable, Stoppable):
 
     def __init__(self, prefix: str, name: str = "") -> None:
         with self.add_children_as_readables():
-            # Consant pressure
+            # Constant pressure
             self.target_pressure = epics_signal_rw(int, f"{prefix}TARGET")
             self.go = epics_signal_rw(bool, f"{prefix}GO")
 
