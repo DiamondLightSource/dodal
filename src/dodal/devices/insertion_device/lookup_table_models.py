@@ -37,6 +37,7 @@ from pydantic import (
     RootModel,
     field_serializer,
     field_validator,
+    model_validator,
 )
 
 from dodal.devices.insertion_device.apple2_undulator import Pol
@@ -121,6 +122,17 @@ class EnergyCoverageEntry(BaseModel):
 class EnergyCoverage(BaseModel):
     energy_entries: list[EnergyCoverageEntry]
 
+    @model_validator(mode="after")
+    def _validate_coverage_and_sort(self) -> Self:
+        """
+        Pydantic validator to ensure entries are sorted.
+        """
+        if not self.energy_entries:
+            return self
+
+        self.energy_entries.sort(key=lambda e: e.min_energy)
+        return self
+
     @classmethod
     def generate(
         cls: type[Self],
@@ -138,7 +150,6 @@ class EnergyCoverage(BaseModel):
                 min_energies, max_energies, poly1d_params, strict=True
             )
         ]
-        energy_entries.sort(key=lambda e: e.min_energy)
         return cls(energy_entries=energy_entries)
 
     @property
@@ -162,29 +173,35 @@ class EnergyCoverage(BaseModel):
         energy:
             Energy value in the same units used to create the lookup table.
         """
-        # Cache initial values so don't do unnecessary work again
-        min_energy = self.min_energy
-        max_energy = self.max_energy
-        if energy < min_energy or energy > max_energy:
+
+        if not self.min_energy <= energy <= self.max_energy:
             raise ValueError(
-                f"Demanding energy must lie between {min_energy} and {max_energy}!"
+                f"Demanding energy must lie between {self.min_energy} and {self.max_energy}!"
             )
-        else:
-            max_index = len(self.energy_entries) - 1
-            min_index = 0
-            while min_index <= max_index:
-                mid_index = (min_index + max_index) // 2
-                en_try = self.energy_entries[mid_index]
-                if en_try.min_energy <= energy < en_try.max_energy:
-                    return en_try.poly
-                elif energy < en_try.min_energy:
-                    max_index = mid_index - 1
-                else:
-                    min_index = mid_index + 1
+
+        poly_index = self.do_energy_search(energy)
+        if poly_index is not None:
+            return self.energy_entries[poly_index].poly
         raise ValueError(
             "Cannot find polynomial coefficients for your requested energy."
             + " There might be gap in the calibration lookup table."
         )
+
+    def do_energy_search(self, energy: float) -> int | None:
+        """Binary search assumes self.energy_entries is sorted by min_energy.
+        Return index or None if not found."""
+        max_index = len(self.energy_entries) - 1
+        min_index = 0
+        while min_index <= max_index:
+            mid_index = (min_index + max_index) // 2
+            en_try = self.energy_entries[mid_index]
+            if en_try.min_energy <= energy < en_try.max_energy:
+                return mid_index
+            elif energy < en_try.min_energy:
+                max_index = mid_index - 1
+            else:
+                min_index = mid_index + 1
+        return None
 
 
 class LookupTable(RootModel[dict[Pol, EnergyCoverage]]):
