@@ -122,6 +122,10 @@ class EnergyCoverageEntry(BaseModel):
 class EnergyCoverage(BaseModel):
     energy_entries: list[EnergyCoverageEntry]
 
+    def sort_energy_entries(self) -> None:
+        """Ensure entries are sorted in-place by min_energy."""
+        self.energy_entries.sort(key=lambda e: e.min_energy)
+
     @model_validator(mode="after")
     def _validate_coverage_and_sort(self) -> Self:
         """
@@ -130,7 +134,7 @@ class EnergyCoverage(BaseModel):
         if not self.energy_entries:
             return self
 
-        self.energy_entries.sort(key=lambda e: e.min_energy)
+        self.sort_energy_entries()
         return self
 
     @classmethod
@@ -175,7 +179,7 @@ class EnergyCoverage(BaseModel):
                 f"Demanding energy must lie between {self.min_energy} and {self.max_energy}!"
             )
 
-        poly_index = self.do_energy_search(energy)
+        poly_index = self.get_energy_index(energy)
         if poly_index is not None:
             return self.energy_entries[poly_index].poly
         raise ValueError(
@@ -183,7 +187,7 @@ class EnergyCoverage(BaseModel):
             + " There might be gap in the calibration lookup table."
         )
 
-    def do_energy_search(self, energy: float) -> int | None:
+    def get_energy_index(self, energy: float) -> int | None:
         """Binary search assumes self.energy_entries is sorted by min_energy.
         Return index or None if not found."""
         max_index = len(self.energy_entries) - 1
@@ -191,7 +195,7 @@ class EnergyCoverage(BaseModel):
         while min_index <= max_index:
             mid_index = (min_index + max_index) // 2
             en_try = self.energy_entries[mid_index]
-            if en_try.min_energy <= energy < en_try.max_energy:
+            if en_try.min_energy <= energy <= en_try.max_energy:
                 return mid_index
             elif energy < en_try.min_energy:
                 max_index = mid_index - 1
