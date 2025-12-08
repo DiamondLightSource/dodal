@@ -17,7 +17,7 @@ from ophyd_async.testing import (
     partial_reading,
 )
 
-from dodal.devices.apple2_undulator import (
+from dodal.devices.insertion_device.apple2_undulator import (
     DEFAULT_MOTOR_MIN_TIMEOUT,
     Apple2,
     Apple2Controller,
