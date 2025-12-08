@@ -144,9 +144,7 @@ class EnergyCoverage(BaseModel):
         max_energy = self.max_energy
         if energy < min_energy or energy > max_energy:
             raise ValueError(
-                "Demanding energy must lie between"
-                + f" {min_energy}"
-                + f" and {max_energy} eV!"
+                f"Demanding energy must lie between {min_energy} and {max_energy}!"
             )
         else:
             for energy_coverage in self.energy_entries:
@@ -221,9 +219,10 @@ def convert_csv_to_lookup(
 
     def process_row(row: dict[str, Any], lut: LookupTable) -> None:
         """Process a single row from the CSV file and update the lookup table."""
-        mode_value = str(row[lut_config.mode]).lower()
-        mode_value = lut_config.mode_name_convert.get(mode_value, mode_value)
-        mode_value = Pol(mode_value)
+        raw_mode_value = str(row[lut_config.mode]).lower()
+        mode_value = Pol(
+            lut_config.mode_name_convert.get(raw_mode_value, raw_mode_value)
+        )
 
         # Create polynomial object for energy-to-gap/phase conversion
         coefficients = np.poly1d([float(row[coef]) for coef in lut_config.poly_deg])

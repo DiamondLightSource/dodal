@@ -689,7 +689,7 @@ async def test_fail_i10_energy_motor_lookup_outside_energy_limits(
 ):
     with pytest.raises(ValueError) as e:
         await mock_id_controller.energy.set(energy)
-    assert str(e.value) == "Demanding energy must lie between {} and {} eV!".format(
+    assert str(e.value) == "Demanding energy must lie between {} and {}!".format(
         mock_id_controller.gap_energy_motor_lut.lut.root[
             await mock_id_controller.polarisation_setpoint.get_value()
         ].min_energy,
