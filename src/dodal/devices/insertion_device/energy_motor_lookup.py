@@ -5,7 +5,7 @@ from daq_config_server.client import ConfigServer
 from dodal.devices.insertion_device.apple2_undulator import Pol
 from dodal.devices.insertion_device.lookup_table_models import (
     LookupTable,
-    LookupTableConfig,
+    LookupTableColumnConfig,
     convert_csv_to_lookup,
 )
 
@@ -60,7 +60,7 @@ class ConfigServerEnergyMotorLookup(EnergyMotorLookup):
     def __init__(
         self,
         config_client: ConfigServer,
-        lut_config: LookupTableConfig,
+        lut_config: LookupTableColumnConfig,
         path: Path,
     ):
         """
