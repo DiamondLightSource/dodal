@@ -186,6 +186,8 @@ class UndulatorInKeV(BaseUndulator):
             baton (optional): Baton object if provided.
             name (str, optional): Name for device. Defaults to "".
         """
+        self.config_server = ConfigServer(url="https://daq-config.diamond.ac.uk")
+
         self.id_gap_lookup_table_path = id_gap_lookup_table_path
         super().__init__(
             prefix=prefix,
@@ -216,9 +218,9 @@ class UndulatorInKeV(BaseUndulator):
         get a 2d np.array from lookup table that
         converts energies to undulator gap distance
         """
-        config_server = ConfigServer(url="https://daq-config.diamond.ac.uk")
-        energy_to_distance_table = config_server.get_file_contents(
-            self.id_gap_lookup_table_path, GenericLookupTable
+
+        energy_to_distance_table = self.config_server.get_file_contents(
+            self.id_gap_lookup_table_path, GenericLookupTable, reset_cached_result=True
         )
 
         # Use the lookup table to get the undulator gap associated with this dcm energy
