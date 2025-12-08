@@ -170,12 +170,17 @@ class EnergyCoverage(BaseModel):
                 f"Demanding energy must lie between {min_energy} and {max_energy}!"
             )
         else:
-            for energy_coverage in self.energy_entries:
-                if (
-                    energy >= energy_coverage.min_energy
-                    and energy < energy_coverage.max_energy
-                ):
-                    return energy_coverage.poly
+            max_index = len(self.energy_entries) - 1
+            min_index = 0
+            while min_index <= max_index:
+                mid_index = (min_index + max_index) // 2
+                en_try = self.energy_entries[mid_index]
+                if en_try.min_energy <= energy < en_try.max_energy:
+                    return en_try.poly
+                elif energy < en_try.min_energy:
+                    max_index = mid_index - 1
+                else:
+                    min_index = mid_index + 1
         raise ValueError(
             "Cannot find polynomial coefficients for your requested energy."
             + " There might be gap in the calibration lookup table."
