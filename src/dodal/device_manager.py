@@ -360,6 +360,20 @@ class DeviceManager:
         self._fixtures[func.__name__] = func
         return func
 
+    def include(self, other: "DeviceManager"):
+        common = self._factories.keys() & other._factories # noqa SLF001
+        common |= self._v1_factories.keys() & other._v1_factories # noqa SLF001
+        common |= self._factories.keys() & other._v1_factories # noqa SLF001
+        common |= self._v1_factories.keys() & other._factories # noqa SLF001
+        if common:
+            raise ValueError(f"Duplicate factories in included device manager: {common}")
+
+        self._factories.update(other._factories) # noqa SLF001
+        self._v1_factories.update(other._v1_factories) # noqa SLF001
+
+        # duplicate fixtures are not checked as fixtures can be overridden
+        self._fixtures.update(other._fixtures) # noqa SLF001
+
     def v1_init(
         self,
         factory: type[V1],
