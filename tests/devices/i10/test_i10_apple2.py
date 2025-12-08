@@ -1,8 +1,7 @@
-import json
 from collections.abc import Mapping
 from pathlib import Path
 from unittest import mock
-from unittest.mock import AsyncMock, MagicMock, Mock
+from unittest.mock import AsyncMock, Mock
 
 import pytest
 from bluesky.plans import scan
@@ -17,7 +16,14 @@ from ophyd_async.core import (
 )
 from ophyd_async.testing import assert_emitted
 
-from dodal.devices.apple2_undulator import (
+from dodal.devices.i10.i10_apple2 import (
+    DEFAULT_JAW_PHASE_POLY_PARAMS,
+    I10Apple2,
+    I10Apple2Controller,
+    LinearArbitraryAngle,
+)
+from dodal.devices.i10.i10_setting_data import I10Grating
+from dodal.devices.insertion_device.apple2_undulator import (
     MAXIMUM_MOVE_TIME,
     BeamEnergy,
     EnabledDisabledUpper,
@@ -29,22 +35,15 @@ from dodal.devices.apple2_undulator import (
     UndulatorJawPhase,
     UndulatorPhaseAxes,
 )
-from dodal.devices.i10.i10_apple2 import (
-    DEFAULT_JAW_PHASE_POLY_PARAMS,
-    I10Apple2,
-    I10Apple2Controller,
-    LinearArbitraryAngle,
+from dodal.devices.insertion_device.energy_motor_lookup import (
+    ConfigServerEnergyMotorLookup,
 )
-from dodal.devices.i10.i10_setting_data import I10Grating
-from dodal.devices.pgm import PlaneGratingMonochromator
-from dodal.devices.util.lookup_tables_apple2 import (
+from dodal.devices.insertion_device.lookup_table_models import (
     EnergyCoverage,
     EnergyCoverageEntry,
-    EnergyMotorLookup,
-    LookupTable,
     LookupTableConfig,
-    convert_csv_to_lookup,
 )
+from dodal.devices.pgm import PlaneGratingMonochromator
 from tests.devices.i10.test_data import (
     EXPECTED_ID_ENERGY_2_GAP_CALIBRATIONS_IDD_JSON,
     EXPECTED_ID_ENERGY_2_GAP_CALIBRATIONS_IDU_JSON,
@@ -53,47 +52,12 @@ from tests.devices.i10.test_data import (
     ID_ENERGY_2_GAP_CALIBRATIONS_CSV,
     ID_ENERGY_2_PHASE_CALIBRATIONS_CSV,
 )
+from tests.devices.insertion_device.util import (
+    assert_expected_lut_file_equals_config_server_energy_motor_update_lookup_table,
+)
 
-
-@pytest.fixture
-async def mock_id_gap(prefix: str = "BLXX-EA-DET-007:") -> UndulatorGap:
-    async with init_devices(mock=True):
-        mock_id_gap = UndulatorGap(prefix, "mock_id_gap")
-    assert mock_id_gap.name == "mock_id_gap"
-    set_mock_value(mock_id_gap.gate, UndulatorGateStatus.CLOSE)
-    set_mock_value(mock_id_gap.velocity, 1)
-    set_mock_value(mock_id_gap.user_readback, 20)
-    set_mock_value(mock_id_gap.user_setpoint, "20")
-    set_mock_value(mock_id_gap.status, EnabledDisabledUpper.ENABLED)
-    return mock_id_gap
-
-
-@pytest.fixture
-async def mock_phase_axes(prefix: str = "BLXX-EA-DET-007:") -> UndulatorPhaseAxes:
-    async with init_devices(mock=True):
-        mock_phase_axes = UndulatorPhaseAxes(
-            prefix=prefix,
-            top_outer="RPQ1",
-            top_inner="RPQ2",
-            btm_outer="RPQ3",
-            btm_inner="RPQ4",
-        )
-    assert mock_phase_axes.name == "mock_phase_axes"
-    set_mock_value(mock_phase_axes.gate, UndulatorGateStatus.CLOSE)
-    set_mock_value(mock_phase_axes.top_outer.velocity, 2)
-    set_mock_value(mock_phase_axes.top_inner.velocity, 2)
-    set_mock_value(mock_phase_axes.btm_outer.velocity, 2)
-    set_mock_value(mock_phase_axes.btm_inner.velocity, 2)
-    set_mock_value(mock_phase_axes.top_outer.user_readback, 0)
-    set_mock_value(mock_phase_axes.top_inner.user_readback, 0)
-    set_mock_value(mock_phase_axes.btm_outer.user_readback, 0)
-    set_mock_value(mock_phase_axes.btm_inner.user_readback, 0)
-    set_mock_value(mock_phase_axes.top_outer.user_setpoint_readback, 0)
-    set_mock_value(mock_phase_axes.top_inner.user_setpoint_readback, 0)
-    set_mock_value(mock_phase_axes.btm_outer.user_setpoint_readback, 0)
-    set_mock_value(mock_phase_axes.btm_inner.user_setpoint_readback, 0)
-    set_mock_value(mock_phase_axes.status, EnabledDisabledUpper.ENABLED)
-    return mock_phase_axes
+# add mock_config_client, mock_id_gap, mock_phase and mock_jaw_phase_axes to pytest.
+pytest_plugins = ["dodal.testing.fixtures.devices.apple2"]
 
 
 @pytest.fixture
@@ -103,35 +67,6 @@ async def mock_pgm(prefix: str = "BLXX-EA-DET-007:") -> PlaneGratingMonochromato
             prefix=prefix, grating=I10Grating, grating_pv="NLINES2"
         )
     return mock_pgm
-
-
-@pytest.fixture
-async def mock_jaw_phase(prefix: str = "BLXX-EA-DET-007:") -> UndulatorJawPhase:
-    async with init_devices(mock=True):
-        mock_jaw_phase = UndulatorJawPhase(
-            prefix=prefix, move_pv="RPQ1", jaw_phase="JAW"
-        )
-    set_mock_value(mock_jaw_phase.gate, UndulatorGateStatus.CLOSE)
-    set_mock_value(mock_jaw_phase.jaw_phase.velocity, 2)
-    set_mock_value(mock_jaw_phase.jaw_phase.user_readback, 0)
-    set_mock_value(mock_jaw_phase.status, EnabledDisabledUpper.ENABLED)
-    return mock_jaw_phase
-
-
-@pytest.fixture
-def mock_config_client() -> ConfigServer:
-    mock.patch("dodal.devices.i10.i10_apple2.ConfigServer")
-    mock_config_client = ConfigServer()
-
-    mock_config_client.get_file_contents = MagicMock(spec=["get_file_contents"])
-
-    def my_side_effect(file_path, reset_cached_result) -> str:
-        assert reset_cached_result is True
-        with open(file_path) as f:
-            return f.read()
-
-    mock_config_client.get_file_contents.side_effect = my_side_effect
-    return mock_config_client
 
 
 @pytest.fixture
@@ -148,50 +83,64 @@ async def mock_id(
 
 
 @pytest.fixture
-def mock_i10_energy_motor_lookup_idu(
+def mock_i10_gap_energy_motor_lookup_idu(
     mock_config_client: ConfigServer,
-) -> EnergyMotorLookup:
-    return EnergyMotorLookup(
+) -> ConfigServerEnergyMotorLookup:
+    return ConfigServerEnergyMotorLookup(
         config_client=mock_config_client,
         lut_config=LookupTableConfig(source=("Source", "idu")),
-        gap_path=Path(ID_ENERGY_2_GAP_CALIBRATIONS_CSV),
-        phase_path=Path(ID_ENERGY_2_PHASE_CALIBRATIONS_CSV),
+        path=Path(ID_ENERGY_2_GAP_CALIBRATIONS_CSV),
     )
 
 
 @pytest.fixture
-def mock_i10_energy_motor_lookup_idd(
+def mock_i10_phase_energy_motor_lookup_idu(
     mock_config_client: ConfigServer,
-) -> EnergyMotorLookup:
-    return EnergyMotorLookup(
+) -> ConfigServerEnergyMotorLookup:
+    return ConfigServerEnergyMotorLookup(
+        config_client=mock_config_client,
+        lut_config=LookupTableConfig(source=("Source", "idu")),
+        path=Path(ID_ENERGY_2_PHASE_CALIBRATIONS_CSV),
+    )
+
+
+@pytest.fixture
+def mock_i10_gap_energy_motor_lookup_idd(
+    mock_config_client: ConfigServer,
+) -> ConfigServerEnergyMotorLookup:
+    return ConfigServerEnergyMotorLookup(
         config_client=mock_config_client,
         lut_config=LookupTableConfig(source=("Source", "idd")),
-        gap_path=Path(ID_ENERGY_2_GAP_CALIBRATIONS_CSV),
-        phase_path=Path(ID_ENERGY_2_PHASE_CALIBRATIONS_CSV),
+        path=Path(ID_ENERGY_2_GAP_CALIBRATIONS_CSV),
+    )
+
+
+@pytest.fixture
+def mock_i10_phase_energy_motor_lookup_idd(
+    mock_config_client: ConfigServer,
+) -> ConfigServerEnergyMotorLookup:
+    return ConfigServerEnergyMotorLookup(
+        config_client=mock_config_client,
+        lut_config=LookupTableConfig(
+            source=("Source", "idd"),
+        ),
+        path=Path(ID_ENERGY_2_PHASE_CALIBRATIONS_CSV),
     )
 
 
 @pytest.fixture
 async def mock_id_controller(
     mock_id: I10Apple2,
-    mock_i10_energy_motor_lookup_idu: EnergyMotorLookup,
+    mock_i10_gap_energy_motor_lookup_idu: ConfigServerEnergyMotorLookup,
+    mock_i10_phase_energy_motor_lookup_idu: ConfigServerEnergyMotorLookup,
 ) -> I10Apple2Controller:
     async with init_devices(mock=True):
         mock_id_controller = I10Apple2Controller(
             apple2=mock_id,
-            energy_motor_lut=mock_i10_energy_motor_lookup_idu,
+            gap_energy_motor_lut=mock_i10_gap_energy_motor_lookup_idu,
+            phase_energy_motor_lut=mock_i10_phase_energy_motor_lookup_idu,
         )
-    set_mock_value(mock_id_controller.apple2().gap().gate, UndulatorGateStatus.CLOSE)
-    set_mock_value(mock_id_controller.apple2().phase().gate, UndulatorGateStatus.CLOSE)
-    set_mock_value(
-        mock_id_controller.apple2().jaw_phase().gate, UndulatorGateStatus.CLOSE
-    )
-    set_mock_value(mock_id_controller.apple2().gap().velocity, 1)
-    set_mock_value(mock_id_controller.apple2().jaw_phase().jaw_phase.velocity, 1)
-    set_mock_value(mock_id_controller.apple2().phase().btm_inner.velocity, 1)
-    set_mock_value(mock_id_controller.apple2().phase().top_inner.velocity, 1)
-    set_mock_value(mock_id_controller.apple2().phase().btm_outer.velocity, 1)
-    set_mock_value(mock_id_controller.apple2().phase().top_outer.velocity, 1)
+
     return mock_id_controller
 
 
@@ -200,9 +149,7 @@ async def mock_id_energy(
     mock_id_controller: I10Apple2Controller,
 ) -> InsertionDeviceEnergy:
     async with init_devices(mock=True):
-        mock_id_energy = InsertionDeviceEnergy(
-            id_controller=mock_id_controller,
-        )
+        mock_id_energy = InsertionDeviceEnergy(id_controller=mock_id_controller)
     return mock_id_energy
 
 
@@ -696,7 +643,6 @@ async def test_linear_arbitrary_run_engine_scan(
     )  # default setting for i10 jaw phase to angle
     for cnt, data in enumerate(run_engine_documents["event"]):
         temp_angle = angles[cnt]
-        print(data["data"])
         assert data["data"]["mock_id_controller-linear_arbitrary_angle"] == temp_angle
         alpha_real = (
             temp_angle
@@ -708,71 +654,31 @@ async def test_linear_arbitrary_run_engine_scan(
         )
 
 
-def assert_lookup_table_matches_expected(
-    energy_motor_lookup: EnergyMotorLookup,
-    file_name: str,
-    expected_dict_file_name: str,
-) -> None:
-    file_contents = energy_motor_lookup.config_client.get_file_contents(
-        file_path=file_name, reset_cached_result=True
-    )
-    lut = convert_csv_to_lookup(
-        file_contents=file_contents,
-        lut_config=energy_motor_lookup.lut_config,
-    )
-    with open(expected_dict_file_name, "rb") as f:
-        expected_lut = LookupTable(json.load(f))
-
-    assert lut == expected_lut
-
-
-@pytest.mark.parametrize(
-    "file_name, expected_dict_file_name",
-    [
-        (
-            ID_ENERGY_2_GAP_CALIBRATIONS_CSV,
-            EXPECTED_ID_ENERGY_2_GAP_CALIBRATIONS_IDU_JSON,
-        ),
-        (
-            ID_ENERGY_2_PHASE_CALIBRATIONS_CSV,
-            EXPECTED_ID_ENERGY_2_PHASE_CALIBRATIONS_IDU_JSON,
-        ),
-    ],
-)
 def test_i10_energy_motor_lookup_idu_convert_csv_to_lookup_success(
-    mock_i10_energy_motor_lookup_idu: EnergyMotorLookup,
-    file_name: str,
-    expected_dict_file_name: str,
+    mock_i10_gap_energy_motor_lookup_idu: ConfigServerEnergyMotorLookup,
+    mock_i10_phase_energy_motor_lookup_idu: ConfigServerEnergyMotorLookup,
 ) -> None:
-    assert_lookup_table_matches_expected(
-        mock_i10_energy_motor_lookup_idu,
-        file_name,
-        expected_dict_file_name,
+    assert_expected_lut_file_equals_config_server_energy_motor_update_lookup_table(
+        EXPECTED_ID_ENERGY_2_GAP_CALIBRATIONS_IDU_JSON,
+        mock_i10_gap_energy_motor_lookup_idu,
+    )
+    assert_expected_lut_file_equals_config_server_energy_motor_update_lookup_table(
+        EXPECTED_ID_ENERGY_2_PHASE_CALIBRATIONS_IDU_JSON,
+        mock_i10_phase_energy_motor_lookup_idu,
     )
 
 
-@pytest.mark.parametrize(
-    "file_name, expected_dict_file_name",
-    [
-        (
-            ID_ENERGY_2_GAP_CALIBRATIONS_CSV,
-            EXPECTED_ID_ENERGY_2_GAP_CALIBRATIONS_IDD_JSON,
-        ),
-        (
-            ID_ENERGY_2_PHASE_CALIBRATIONS_CSV,
-            EXPECTED_ID_ENERGY_2_PHASE_CALIBRATIONS_IDD_JSON,
-        ),
-    ],
-)
 def test_i10_energy_motor_lookup_idd_convert_csv_to_lookup_success(
-    mock_i10_energy_motor_lookup_idd: EnergyMotorLookup,
-    file_name: str,
-    expected_dict_file_name: str,
+    mock_i10_gap_energy_motor_lookup_idd: ConfigServerEnergyMotorLookup,
+    mock_i10_phase_energy_motor_lookup_idd: ConfigServerEnergyMotorLookup,
 ) -> None:
-    assert_lookup_table_matches_expected(
-        mock_i10_energy_motor_lookup_idd,
-        file_name,
-        expected_dict_file_name,
+    assert_expected_lut_file_equals_config_server_energy_motor_update_lookup_table(
+        EXPECTED_ID_ENERGY_2_GAP_CALIBRATIONS_IDD_JSON,
+        mock_i10_gap_energy_motor_lookup_idd,
+    )
+    assert_expected_lut_file_equals_config_server_energy_motor_update_lookup_table(
+        EXPECTED_ID_ENERGY_2_PHASE_CALIBRATIONS_IDD_JSON,
+        mock_i10_phase_energy_motor_lookup_idd,
     )
 
 
@@ -784,10 +690,10 @@ async def test_fail_i10_energy_motor_lookup_outside_energy_limits(
     with pytest.raises(ValueError) as e:
         await mock_id_controller.energy.set(energy)
     assert str(e.value) == "Demanding energy must lie between {} and {} eV!".format(
-        mock_id_controller.energy_motor_lut.lookup_tables.gap.root[
+        mock_id_controller.gap_energy_motor_lut.lut.root[
             await mock_id_controller.polarisation_setpoint.get_value()
         ].limit.minimum,
-        mock_id_controller.energy_motor_lut.lookup_tables.gap.root[
+        mock_id_controller.gap_energy_motor_lut.lut.root[
             await mock_id_controller.polarisation_setpoint.get_value()
         ].limit.maximum,
     )
@@ -796,11 +702,9 @@ async def test_fail_i10_energy_motor_lookup_outside_energy_limits(
 async def test_fail_i10_energy_motor_lookup_with_lookup_gap(
     mock_id_controller: I10Apple2Controller,
 ):
-    mock_id_controller.energy_motor_lut.update_lookuptables()
+    mock_id_controller.gap_energy_motor_lut.update_lookup_table()
     # make gap in energy
-    mock_id_controller.energy_motor_lut.lookup_tables.gap.root[
-        Pol.LH
-    ].energies = EnergyCoverage(
+    mock_id_controller.gap_energy_motor_lut.lut.root[Pol.LH].energies = EnergyCoverage(
         {
             1: EnergyCoverageEntry(
                 low=255.3,
@@ -809,9 +713,7 @@ async def test_fail_i10_energy_motor_lookup_with_lookup_gap(
             )
         }
     )
-    mock_id_controller.energy_motor_lut.lookup_tables.gap.root[
-        Pol.LH
-    ].energies = EnergyCoverage(
+    mock_id_controller.gap_energy_motor_lut.lut.root[Pol.LH].energies = EnergyCoverage(
         {
             2: EnergyCoverageEntry(
                 low=600,
