@@ -11,7 +11,7 @@ from ophyd_async.core import (
     soft_signal_rw,
 )
 
-from dodal.devices.apple2_undulator import (
+from dodal.devices.insertion_device.apple2_undulator import (
     MAXIMUM_MOVE_TIME,
     Apple2,
     Apple2Controller,
@@ -22,8 +22,7 @@ from dodal.devices.apple2_undulator import (
     UndulatorJawPhase,
     UndulatorPhaseAxes,
 )
-from dodal.devices.util.lookup_tables_apple2 import EnergyMotorLookup
-from dodal.log import LOGGER
+from dodal.devices.insertion_device.energy_motor_lookup import EnergyMotorLookup
 
 ROW_PHASE_MOTOR_TOLERANCE = 0.004
 MAXIMUM_ROW_PHASE_MOTOR_POSITION = 24.0
@@ -62,16 +61,18 @@ class I10Apple2(Apple2[UndulatorPhaseAxes]):
 class I10Apple2Controller(Apple2Controller[I10Apple2]):
     """
     I10Apple2Controller is a extension of Apple2Controller which provide linear
-     arbitrary angle control.
+    arbitrary angle control.
     """
 
     def __init__(
         self,
         apple2: I10Apple2,
-        energy_motor_lut: EnergyMotorLookup,
+        gap_energy_motor_lut: EnergyMotorLookup,
+        phase_energy_motor_lut: EnergyMotorLookup,
         jaw_phase_limit: float = 12.0,
         jaw_phase_poly_param: list[float] = DEFAULT_JAW_PHASE_POLY_PARAMS,
         angle_threshold_deg=30.0,
+        units: str = "eV",
         name: str = "",
     ) -> None:
         """
@@ -79,25 +80,30 @@ class I10Apple2Controller(Apple2Controller[I10Apple2]):
         -----------
         apple2 : I10Apple2
             An I10Apple2 device.
-        energy_motor_lut: EnergyMotorLookup
-            The class that handles the look up table logic for the insertion device.
+        gap_energy_motor_lut: EnergyMotorLookup
+            The class that handles the gap look up table logic for the insertion device.
+        phase_energy_motor_lut: EnergyMotorLookup
+            The class that handles the phase look up table logic for the insertion device.
         jaw_phase_limit : float, optional
             The maximum allowed jaw_phase movement., by default 12.0
         jaw_phase_poly_param : list[float], optional
             polynomial parameters highest power first., by default DEFAULT_JAW_PHASE_POLY_PARAMS
         angle_threshold_deg : float, optional
             The angle threshold to switch between 0-180 and 180-360 range., by default 30.0
+        units:
+            the units of this device. Defaults to eV.
         name : str, optional
             New device name.
         """
-
-        self.energy_motor_lut = energy_motor_lut
+        self.gap_energy_motor_lut = gap_energy_motor_lut
+        self.phase_energy_motor_lut = phase_energy_motor_lut
         super().__init__(
             apple2=apple2,
-            energy_to_motor_converter=self.energy_motor_lut.get_motor_from_energy,
+            gap_energy_motor_converter=gap_energy_motor_lut.find_value_in_lookup_table,
+            phase_energy_motor_converter=phase_energy_motor_lut.find_value_in_lookup_table,
+            units=units,
             name=name,
         )
-
         self.jaw_phase_from_angle = np.poly1d(jaw_phase_poly_param)
         self.angle_threshold_deg = angle_threshold_deg
         self.jaw_phase_limit = jaw_phase_limit
@@ -132,15 +138,9 @@ class I10Apple2Controller(Apple2Controller[I10Apple2]):
         await self.apple2().jaw_phase().set(jaw_phase)
         await self._linear_arbitrary_angle.set(pol_angle)
 
-    async def _set_motors_from_energy(self, value: float) -> None:
-        """
-        Set the undulator motors for a given energy and polarisation.
-        """
-
-        pol = await self._check_and_get_pol_setpoint()
-        gap, phase = self.energy_to_motor(energy=value, pol=pol)
+    def _get_apple2_value(self, gap: float, phase: float, pol: Pol) -> Apple2Val:
         phase3 = phase * (-1 if pol == Pol.LA else 1)
-        id_set_val = Apple2Val(
+        return Apple2Val(
             gap=f"{gap:.6f}",
             phase=Apple2PhasesVal(
                 top_outer=f"{phase:.6f}",
@@ -150,8 +150,10 @@ class I10Apple2Controller(Apple2Controller[I10Apple2]):
             ),
         )
 
-        LOGGER.info(f"Setting polarisation to {pol}, with values: {id_set_val}")
-        await self.apple2().set(id_motor_values=id_set_val)
+    async def _set_motors_from_energy_and_polarisation(
+        self, energy: float, pol: Pol
+    ) -> None:
+        await super()._set_motors_from_energy_and_polarisation(energy, pol)
         if pol != Pol.LA:
             await self.apple2().jaw_phase().set(0)
             await self.apple2().jaw_phase().set_move.set(1)
