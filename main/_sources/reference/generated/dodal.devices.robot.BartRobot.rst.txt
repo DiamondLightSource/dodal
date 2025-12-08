@@ -19,7 +19,7 @@ dodal.devices.robot.BartRobot
       
       
       
-      ~BartRobot.pin_mounted_or_no_pin_found
+      ~BartRobot.pin_state_or_error
       
       
       
@@ -49,6 +49,9 @@ dodal.devices.robot.BartRobot
       
       
       ~BartRobot.NOT_BUSY_TIMEOUT
+      
+      
+      ~BartRobot.NO_ERROR
       
       
       ~BartRobot.NO_PIN_ERROR_CODE
