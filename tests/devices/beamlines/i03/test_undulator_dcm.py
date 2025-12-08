@@ -3,6 +3,7 @@ from unittest.mock import MagicMock, patch
 
 import numpy as np
 import pytest
+from daq_config_server.converters.models import GenericLookupTable
 from ophyd_async.core import AsyncStatus, get_mock_put, init_devices, set_mock_value
 
 from dodal.common.enums import EnabledDisabledUpper
@@ -89,15 +90,23 @@ async def test_fixed_offset_decoded(fake_undulator_dcm: UndulatorDCM):
     assert fake_undulator_dcm.dcm_fixed_offset_mm == 25.6
 
 
-@patch("dodal.devices.util.lookup_tables.loadtxt")
 @patch("dodal.devices.undulator.LOGGER")
+@patch("dodal.devices.undulator.ConfigServer.get_file_contents")
 async def test_if_gap_is_wrong_then_logger_info_is_called_and_gap_is_set_correctly(
-    mock_logger: MagicMock, mock_load: MagicMock, fake_undulator_dcm: UndulatorDCM
+    mock_get_file_contents: MagicMock,
+    mock_logger: MagicMock,
+    fake_undulator_dcm: UndulatorDCM,
 ):
+    mock_get_file_contents.return_value = GenericLookupTable(
+        column_names=["energy_eV", "gap_mm"],
+        rows=[
+            [5700, 5.4606],
+            [7000, 6.045],
+            [9700, 6.404],
+        ],
+    )
     set_mock_value(fake_undulator_dcm.undulator_ref().current_gap, 5.3)
     set_mock_value(fake_undulator_dcm.dcm_ref().energy_in_keV.user_readback, 5.7)
-
-    mock_load.return_value = np.array([[5700, 5.4606], [7000, 6.045], [9700, 6.404]])
 
     await fake_undulator_dcm.set(6.9)
 
