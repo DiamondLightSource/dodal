@@ -1,9 +1,7 @@
-import ast
-from typing import Any, cast
+from typing import Any
 
 from daq_config_server.client import ConfigServer
 
-from dodal.log import LOGGER
 from dodal.utils import get_beamline_name
 
 BEAMLINE_PARAMETER_KEYWORDS = ["FB", "FULL", "deadtime"]
