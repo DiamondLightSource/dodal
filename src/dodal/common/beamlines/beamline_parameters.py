@@ -1,6 +1,8 @@
 import ast
 from typing import Any, cast
 
+from daq_config_server.client import ConfigServer
+
 from dodal.log import LOGGER
 from dodal.utils import get_beamline_name
 
@@ -25,40 +27,11 @@ class GDABeamlineParameters:
         return self.params[item]
 
     @classmethod
-    def from_lines(cls, file_name: str, config_lines: list[str]):
-        config_lines_nocomments = [line.split("#", 1)[0] for line in config_lines]
-        config_lines_sep_key_and_value = [
-            # XXX removes all whitespace instead of just trim
-            line.translate(str.maketrans("", "", " \n\t\r")).split("=")
-            for line in config_lines_nocomments
-        ]
-        config_pairs: list[tuple[str, Any]] = [
-            cast(tuple[str, Any], param)
-            for param in config_lines_sep_key_and_value
-            if len(param) == 2
-        ]
-        for i, (param, value) in enumerate(config_pairs):
-            try:
-                # BEAMLINE_PARAMETER_KEYWORDS effectively raw string but whitespace removed
-                if value not in BEAMLINE_PARAMETER_KEYWORDS:
-                    config_pairs[i] = (
-                        param,
-                        cls.parse_value(value),
-                    )
-            except Exception as e:
-                LOGGER.warning(f"Unable to parse {file_name} line {i}: {e}")
-
-        return cls(params=dict(config_pairs))
-
-    @classmethod
     def from_file(cls, path: str):
-        with open(path) as f:
-            config_lines = f.readlines()
-        return cls.from_lines(path, config_lines)
-
-    @classmethod
-    def parse_value(cls, value: str):
-        return ast.literal_eval(value.replace("Yes", "True").replace("No", "False"))
+        config_server = ConfigServer(url="https://daq-config.diamond.ac.uk")
+        return cls(
+            params=config_server.get_file_contents(path, dict, reset_cached_result=True)
+        )
 
 
 def get_beamline_parameters(beamline_param_path: str | None = None):
