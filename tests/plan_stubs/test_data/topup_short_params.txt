@@ -1,2 +1,4 @@
-dodal_topup_threshold_exposure_s = 35
-dodal_topup_end_delay_s = 1
+{
+    "dodal_topup_threshold_exposure_s": 35,
+    "dodal_topup_end_delay_s": 1
+}
