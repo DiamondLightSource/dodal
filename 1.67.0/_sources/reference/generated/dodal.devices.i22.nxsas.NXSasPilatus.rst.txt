@@ -1,0 +1,50 @@
+dodal.devices.i22.nxsas.NXSasPilatus
+====================================
+
+.. currentmodule:: dodal.devices.i22.nxsas
+
+.. autoclass:: NXSasPilatus
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      ~NXSasPilatus.describe_configuration
+      
+      
+      
+      
+      
+      
+      
+      ~NXSasPilatus.read_configuration
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

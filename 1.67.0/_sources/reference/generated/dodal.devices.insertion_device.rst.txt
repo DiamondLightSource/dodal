@@ -1,0 +1,37 @@
+dodal.devices.insertion\_device
+===============================
+
+
+
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   dodal.devices.insertion_device.apple2_undulator
+   dodal.devices.insertion_device.energy_motor_lookup
+   dodal.devices.insertion_device.lookup_table_models
+
+
+
+
+
+
+
+
+.. automodule:: dodal.devices.insertion_device
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

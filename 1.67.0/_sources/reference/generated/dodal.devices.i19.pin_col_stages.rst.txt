@@ -1,0 +1,39 @@
+dodal.devices.i19.pin\_col\_stages
+==================================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices.i19
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~pin_col_stages.AperturePosition
+   ~pin_col_stages.PinColConfiguration
+   ~pin_col_stages.PinColRequest
+   ~pin_col_stages.PinholeCollimatorControl
+
+
+
+
+.. automodule:: dodal.devices.i19.pin_col_stages
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

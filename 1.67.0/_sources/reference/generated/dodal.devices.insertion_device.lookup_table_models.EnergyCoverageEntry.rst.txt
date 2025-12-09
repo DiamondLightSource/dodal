@@ -1,0 +1,70 @@
+dodal.devices.insertion\_device.lookup\_table\_models.EnergyCoverageEntry
+=========================================================================
+
+.. currentmodule:: dodal.devices.insertion_device.lookup_table_models
+
+.. autoclass:: EnergyCoverageEntry
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~EnergyCoverageEntry.serialize_poly
+      
+      
+      
+      
+      ~EnergyCoverageEntry.validate_and_convert_poly
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      ~EnergyCoverageEntry.model_config
+      
+      
+      
+      
+      
+      ~EnergyCoverageEntry.min_energy
+      
+      
+      ~EnergyCoverageEntry.max_energy
+      
+      
+      ~EnergyCoverageEntry.poly
+      
+   
+   

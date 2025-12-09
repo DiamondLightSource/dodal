@@ -1,0 +1,40 @@
+dodal.devices.i19.diffractometer.DetectorMotion
+===============================================
+
+.. currentmodule:: dodal.devices.i19.diffractometer
+
+.. autoclass:: DetectorMotion
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

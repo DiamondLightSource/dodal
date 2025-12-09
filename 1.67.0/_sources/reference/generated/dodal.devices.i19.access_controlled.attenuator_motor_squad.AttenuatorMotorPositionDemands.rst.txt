@@ -1,0 +1,67 @@
+dodal.devices.i19.access\_controlled.attenuator\_motor\_squad.AttenuatorMotorPositionDemands
+============================================================================================
+
+.. currentmodule:: dodal.devices.i19.access_controlled.attenuator_motor_squad
+
+.. autoclass:: AttenuatorMotorPositionDemands
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~AttenuatorMotorPositionDemands.no_keys_clash
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~AttenuatorMotorPositionDemands.validated_complete_demand
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      ~AttenuatorMotorPositionDemands.model_config
+      
+      
+      
+      
+      
+      ~AttenuatorMotorPositionDemands.continuous_demands
+      
+      
+      ~AttenuatorMotorPositionDemands.indexed_demands
+      
+   
+   

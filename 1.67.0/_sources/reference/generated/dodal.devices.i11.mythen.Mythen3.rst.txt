@@ -1,0 +1,46 @@
+dodal.devices.i11.mythen.Mythen3
+================================
+
+.. currentmodule:: dodal.devices.i11.mythen
+
+.. autoclass:: Mythen3
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

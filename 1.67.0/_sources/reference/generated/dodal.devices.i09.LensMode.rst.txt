@@ -1,0 +1,87 @@
+dodal.devices.i09.LensMode
+==========================
+
+.. currentmodule:: dodal.devices.i09
+
+.. autoclass:: LensMode
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~LensMode.TRANSMISSION
+      
+      
+      ~LensMode.ANGULAR45
+      
+      
+      ~LensMode.ANGULAR60
+      
+      
+      ~LensMode.ANGULAR56
+      
+      
+      ~LensMode.ANGULAR45VUV
+      
+   
+   

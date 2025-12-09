@@ -1,0 +1,46 @@
+dodal.devices.insertion\_device.apple2\_undulator.UndulatorPhaseAxes
+====================================================================
+
+.. currentmodule:: dodal.devices.insertion_device.apple2_undulator
+
+.. autoclass:: UndulatorPhaseAxes
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~UndulatorPhaseAxes.set_demand_positions
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

@@ -1,0 +1,93 @@
+dodal.devices.insertion\_device.apple2\_undulator.Pol
+=====================================================
+
+.. currentmodule:: dodal.devices.insertion_device.apple2_undulator
+
+.. autoclass:: Pol
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~Pol.NONE
+      
+      
+      ~Pol.LH
+      
+      
+      ~Pol.LV
+      
+      
+      ~Pol.PC
+      
+      
+      ~Pol.NC
+      
+      
+      ~Pol.LA
+      
+      
+      ~Pol.LH3
+      
+   
+   

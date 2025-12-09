@@ -1,0 +1,73 @@
+dodal.devices.insertion\_device.lookup\_table\_models.LookupTableColumnConfig
+=============================================================================
+
+.. currentmodule:: dodal.devices.insertion_device.lookup_table_models
+
+.. autoclass:: LookupTableColumnConfig
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      ~LookupTableColumnConfig.model_config
+      
+      
+      
+      
+      
+      ~LookupTableColumnConfig.source
+      
+      
+      ~LookupTableColumnConfig.mode
+      
+      
+      ~LookupTableColumnConfig.min_energy
+      
+      
+      ~LookupTableColumnConfig.max_energy
+      
+      
+      ~LookupTableColumnConfig.poly_deg
+      
+      
+      ~LookupTableColumnConfig.mode_name_convert
+      
+   
+   
