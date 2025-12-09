@@ -1,4 +1,5 @@
 import importlib
+import json
 import logging
 import os
 import sys
@@ -8,6 +9,7 @@ from types import ModuleType
 from unittest.mock import MagicMock, patch
 
 import pytest
+from daq_config_server.converters.models import ConfigModel
 from ophyd_async.core import (
     PathProvider,
 )
@@ -167,3 +169,33 @@ def eiger_params(tmp_path: Path) -> DetectorParams:
         det_dist_to_beam_converter_path=TEST_LUT_TXT,
         detector_size_constants=EIGER2_X_16M_SIZE.det_type_string,  # type: ignore
     )
+
+
+def _fake_config_server_get_file_contents(
+    filepath: str | Path,
+    desired_return_type: type[str] | type[dict] | ConfigModel = str,
+    reset_cached_result: bool = True,
+):
+    filepath = Path(filepath)
+    # Minimal logic required for unit tests
+    with filepath.open("r") as f:
+        contents = f.read()
+        print(contents)
+        if desired_return_type is str:
+            return contents
+        elif desired_return_type is dict:
+            print("return type is dict")
+            return json.loads(contents)
+        elif issubclass(desired_return_type, ConfigModel):  # type: ignore
+            return desired_return_type.model_validate(json.loads(contents))
+
+
+@pytest.fixture(autouse=True)
+def mock_config_server():
+    # Don't actually talk to central service during unit tests, and reset caches between test
+
+    with patch(
+        "daq_config_server.client.ConfigServer.get_file_contents",
+        side_effect=_fake_config_server_get_file_contents,
+    ):
+        yield
