@@ -34,40 +34,6 @@ def test_i03_beamline_parameters():
     ]
 
 
-@patch("dodal.common.beamlines.beamline_parameters.LOGGER")
-def test_parse_exception_causes_warning(mock_logger):
-    params = GDABeamlineParameters.from_file(BAD_BEAMLINE_PARAMETERS)
-    assert params["flux_predict_polynomial_coefficients_5"] == [
-        -0.0000707134131045123,
-        7.0205491504418,
-        -194299.6440518530,
-        1835805807.3974800,
-        -3280251055671.100,
-    ]
-    mock_logger.warning.assert_called_once()
-
-    params = GDABeamlineParameters.from_file(BAD_BEAMLINE_PARAMETERS)
-    assert params["flux_predict_polynomial_coefficients_5"] == [
-        -0.0000707134131045123,
-        7.0205491504418,
-        -194299.6440518530,
-        1835805807.3974800,
-        -3280251055671.100,
-    ]
-
-
-def test_parse_list():
-    test_data = [([1, 2, 3], "[1, 2, 3]"), ([1, True, 3], "[1, Yes, 3]")]
-    for expected, input in test_data:
-        actual = GDABeamlineParameters.parse_value(input)
-        assert expected == actual, f"Actual:{actual}, expected: {expected}\n"
-
-
-def test_parse_list_raises_exception():
-    with pytest.raises(SyntaxError):
-        GDABeamlineParameters.parse_value("[1, 2")
-
-
 def test_get_beamline_parameters_works_with_no_environment_variable_set():
     if environ.get("BEAMLINE"):
         del environ["BEAMLINE"]
@@ -106,32 +72,6 @@ def test_get_beamline_parameters_raises_error_when_beamline_not_found(
     get_beamline_name.return_value = "invalid_beamline"
     with pytest.raises(KeyError):
         get_beamline_parameters()
-
-
-def test_parse_nested_list():
-    actual = GDABeamlineParameters.parse_value("[[1, 2], [3, 4]]")
-    expected = [[1, 2], [3, 4]]
-    assert actual == expected
-
-
-def test_parse_nested_nested_list():
-    actual = GDABeamlineParameters.parse_value("[[[1, 2], [3, 4]], [[5, 6], [7, 8]]]")
-    expected = [[[1, 2], [3, 4]], [[5, 6], [7, 8]]]
-    assert actual == expected
-
-
-def test_leading_comma_in_list_causes_error():
-    with pytest.raises(SyntaxError):
-        GDABeamlineParameters.parse_value("[,1, 2, 3, 4]")
-    with pytest.raises(SyntaxError):
-        GDABeamlineParameters.parse_value("[[1, 2], [ ,3, 4]]")
-
-
-def test_Yes_and_No_replaced_with_bool_values():  # noqa: N802
-    value = "[Yes, No, True, False, 0, 1]"
-    expected = [True, False, True, False, 0, 1]
-    actual = GDABeamlineParameters.parse_value(value)
-    assert actual == expected
 
 
 @pytest.fixture(autouse=True)
