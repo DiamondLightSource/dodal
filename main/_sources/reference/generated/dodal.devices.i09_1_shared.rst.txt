@@ -7,6 +7,16 @@ dodal.devices.i09\_1\_shared
 
 
 
+.. currentmodule:: dodal.devices
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~i09_1_shared.HardInsertionDeviceEnergy
+   ~i09_1_shared.HardEnergy
+
 
 
 
