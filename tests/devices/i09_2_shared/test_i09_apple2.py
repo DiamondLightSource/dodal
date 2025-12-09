@@ -1,4 +1,3 @@
-import json
 from pathlib import Path
 from unittest.mock import call
 
@@ -10,7 +9,12 @@ from ophyd_async.core import (
     set_mock_value,
 )
 
-from dodal.devices.apple2_undulator import (
+from dodal.devices.i09_2_shared.i09_apple2 import (
+    J09_GAP_POLY_DEG_COLUMNS,
+    J09_PHASE_POLY_DEG_COLUMNS,
+    J09Apple2Controller,
+)
+from dodal.devices.insertion_device.apple2_undulator import (
     Apple2,
     BeamEnergy,
     InsertionDeviceEnergy,
@@ -19,24 +23,23 @@ from dodal.devices.apple2_undulator import (
     UndulatorGap,
     UndulatorPhaseAxes,
 )
-from dodal.devices.i09_2_shared.i09_apple2 import (
-    J09_GAP_POLY_DEG_COLUMNS,
-    J09_PHASE_POLY_DEG_COLUMNS,
-    J09Apple2Controller,
+from dodal.devices.insertion_device.energy_motor_lookup import (
+    ConfigServerEnergyMotorLookup,
 )
-from dodal.devices.pgm import PlaneGratingMonochromator
-from dodal.devices.util.lookup_tables_apple2 import (
+from dodal.devices.insertion_device.lookup_table_models import (
     MAXIMUM_ROW_PHASE_MOTOR_POSITION,
     ROW_PHASE_CIRCULAR,
-    ConfigServerEnergyMotorLookup,
-    LookupTable,
-    LookupTableConfig,
+    LookupTableColumnConfig,
 )
+from dodal.devices.pgm import PlaneGratingMonochromator
 from tests.devices.i09_2_shared.test_data import (
     TEST_EXPECTED_SOFT_GAP_UNDULATOR_LUT,
     TEST_EXPECTED_SOFT_PHASE_UNDULATOR_LUT,
     TEST_SOFT_GAP_UNDULATOR_LUT,
     TEST_SOFT_PHASE_UNDULATOR_LUT,
+)
+from tests.devices.insertion_device.util import (
+    assert_expected_lut_file_equals_config_server_energy_motor_update_lookup_table,
 )
 
 # add mock_config_client, mock_id_gap, mock_phase and mock_jaw_phase_axes to pytest.
@@ -48,7 +51,7 @@ def mock_j09_gap_energy_motor_lookup(
     mock_config_client: ConfigServer,
 ) -> ConfigServerEnergyMotorLookup:
     return ConfigServerEnergyMotorLookup(
-        lut_config=LookupTableConfig(poly_deg=J09_GAP_POLY_DEG_COLUMNS),
+        lut_config=LookupTableColumnConfig(poly_deg=J09_GAP_POLY_DEG_COLUMNS),
         config_client=mock_config_client,
         path=Path(TEST_SOFT_GAP_UNDULATOR_LUT),
     )
@@ -59,7 +62,7 @@ def mock_j09_phase_energy_motor_lookup(
     mock_config_client: ConfigServer,
 ) -> ConfigServerEnergyMotorLookup:
     return ConfigServerEnergyMotorLookup(
-        lut_config=LookupTableConfig(poly_deg=J09_PHASE_POLY_DEG_COLUMNS),
+        lut_config=LookupTableColumnConfig(poly_deg=J09_PHASE_POLY_DEG_COLUMNS),
         config_client=mock_config_client,
         path=Path(TEST_SOFT_PHASE_UNDULATOR_LUT),
     )
@@ -125,16 +128,12 @@ def test_j09_energy_motor_lookup_update_lut_success(
     mock_j09_gap_energy_motor_lookup: ConfigServerEnergyMotorLookup,
     mock_j09_phase_energy_motor_lookup: ConfigServerEnergyMotorLookup,
 ):
-    mock_j09_gap_energy_motor_lookup.update_lookup_table()
-    mock_j09_phase_energy_motor_lookup.update_lookup_table()
-    with open(TEST_EXPECTED_SOFT_GAP_UNDULATOR_LUT, "rb") as f:
-        expected_gap_lut = LookupTable(json.load(f))
-
-    with open(TEST_EXPECTED_SOFT_PHASE_UNDULATOR_LUT, "rb") as f:
-        expected_phase_lut = LookupTable(json.load(f))
-
-    assert mock_j09_gap_energy_motor_lookup.lut == expected_gap_lut
-    assert mock_j09_phase_energy_motor_lookup.lut == expected_phase_lut
+    assert_expected_lut_file_equals_config_server_energy_motor_update_lookup_table(
+        TEST_EXPECTED_SOFT_GAP_UNDULATOR_LUT, mock_j09_gap_energy_motor_lookup
+    )
+    assert_expected_lut_file_equals_config_server_energy_motor_update_lookup_table(
+        TEST_EXPECTED_SOFT_PHASE_UNDULATOR_LUT, mock_j09_phase_energy_motor_lookup
+    )
 
 
 @pytest.mark.parametrize(
