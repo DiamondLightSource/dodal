@@ -3,15 +3,28 @@ from abc import ABC
 from collections.abc import Callable
 from typing import Generic, Self, TypeVar
 
+from ophyd_async.core import StrictEnum, SupersetEnum
 from pydantic import BaseModel, Field, model_validator
 
-from dodal.devices.electron_analyser.enums.base_enums import EnergyMode, SelectedSource
-from dodal.devices.electron_analyser.types.base_types import (
-    TAcquisitionMode,
-    TLensMode,
-    TPassEnergy,
+from dodal.devices.electron_analyser.common.enums import EnergyMode, SelectedSource
+from dodal.devices.electron_analyser.common.util import (
+    to_binding_energy,
+    to_kinetic_energy,
 )
-from dodal.devices.electron_analyser.util import to_binding_energy, to_kinetic_energy
+
+AnyAcqMode = StrictEnum
+AnyLensMode = SupersetEnum | StrictEnum
+AnyPassEnergy = StrictEnum | float
+AnyPsuMode = SupersetEnum | StrictEnum
+
+TAcquisitionMode = TypeVar("TAcquisitionMode", bound=AnyAcqMode)
+
+# Allow SupersetEnum. Specs analysers can connect to Lens and Psu mode separately to the
+# analyser which leaves the enum to either be "Not connected" OR the available enums
+# when connected.
+TLensMode = TypeVar("TLensMode", bound=AnyLensMode)
+TPassEnergy = TypeVar("TPassEnergy", bound=AnyPassEnergy)
+TPsuMode = TypeVar("TPsuMode", bound=AnyPsuMode)
 
 
 def java_to_python_case(java_str: str) -> str:
@@ -133,6 +146,7 @@ class AbstractBaseRegion(
         return energy_mode_validation(data)
 
 
+Region = AbstractBaseRegion[AnyAcqMode, AnyLensMode, AnyPassEnergy]
 TAbstractBaseRegion = TypeVar("TAbstractBaseRegion", bound=AbstractBaseRegion)
 
 
@@ -163,4 +177,5 @@ class AbstractBaseSequence(
         return next((region for region in self.regions if region.name == name), None)
 
 
+Sequence = AbstractBaseSequence[Region]
 TAbstractBaseSequence = TypeVar("TAbstractBaseSequence", bound=AbstractBaseSequence)

@@ -4,16 +4,24 @@ from .base_region import (
     TAbstractBaseRegion,
     TAbstractBaseSequence,
 )
-from .specs_region import SpecsRegion, SpecsSequence
-from .vgscienta_region import VGScientaRegion, VGScientaSequence
+from .specs_region import SpecsAcquisitionMode, SpecsRegion, SpecsSequence
+from .vgscienta_region import (
+    VGScientaAcquisitionMode,
+    VGScientaDetectorMode,
+    VGScientaRegion,
+    VGScientaSequence,
+)
 
 __all__ = [
     "AbstractBaseRegion",
     "AbstractBaseSequence",
     "TAbstractBaseRegion",
     "TAbstractBaseSequence",
+    "SpecsAcquisitionMode",
     "SpecsRegion",
     "SpecsSequence",
+    "VGScientaAcquisitionMode",
+    "VGScientaDetectorMode",
     "VGScientaRegion",
     "VGScientaSequence",
 ]

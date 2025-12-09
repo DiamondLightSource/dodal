@@ -13,7 +13,7 @@ from ophyd_async.testing import (
     partial_reading,
 )
 
-from dodal.devices.electron_analyser import DualEnergySource, EnergyMode
+from dodal.devices.electron_analyser.common import DualEnergySource, EnergyMode
 from dodal.devices.electron_analyser.driver_io import VGScientaAnalyserDriverIO
 from dodal.devices.electron_analyser.region import VGScientaRegion
 from dodal.devices.i09 import LensMode, PassEnergy, PsuMode

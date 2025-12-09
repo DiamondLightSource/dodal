@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 from ophyd_async.core import init_devices, set_mock_value
 
-from dodal.devices.electron_analyser import DualEnergySource
+from dodal.devices.electron_analyser.common import DualEnergySource
 from dodal.devices.electron_analyser.detector import VGScientaDetector
 from dodal.devices.i09 import LensMode, PassEnergy, PsuMode
 from dodal.testing.electron_analyser import create_detector

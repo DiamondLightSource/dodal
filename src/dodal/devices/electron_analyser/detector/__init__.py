@@ -2,6 +2,8 @@ from .base_detector import (
     BaseElectronAnalyserDetector,
     ElectronAnalyserDetector,
     ElectronAnalyserRegionDetector,
+    GenericElectronAnalyserDetector,
+    GenericElectronAnalyserRegionDetector,
     TElectronAnalyserDetector,
     TElectronAnalyserRegionDetector,
 )
@@ -12,6 +14,8 @@ __all__ = [
     "BaseElectronAnalyserDetector",
     "ElectronAnalyserDetector",
     "ElectronAnalyserRegionDetector",
+    "GenericElectronAnalyserDetector",
+    "GenericElectronAnalyserRegionDetector",
     "TElectronAnalyserDetector",
     "TElectronAnalyserRegionDetector",
     "SpecsDetector",

@@ -2,7 +2,11 @@ import pytest
 
 from dodal.common.data_util import load_json_file_to_class
 from dodal.devices import b07, i09
-from dodal.devices.electron_analyser import EnergyMode
+from dodal.devices.electron_analyser.common import (
+    EnergyMode,
+    to_binding_energy,
+    to_kinetic_energy,
+)
 from dodal.devices.electron_analyser.region import (
     AbstractBaseRegion,
     AbstractBaseSequence,
@@ -12,7 +16,6 @@ from dodal.devices.electron_analyser.region import (
     VGScientaRegion,
     VGScientaSequence,
 )
-from dodal.devices.electron_analyser.util import to_binding_energy, to_kinetic_energy
 from tests.devices.electron_analyser.helper_util import (
     TEST_SEQUENCE_REGION_NAMES,
     get_test_sequence,

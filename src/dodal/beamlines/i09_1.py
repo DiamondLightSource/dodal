@@ -7,7 +7,7 @@ from dodal.devices.common_dcm import (
     PitchAndRollCrystal,
     StationaryCrystal,
 )
-from dodal.devices.electron_analyser import EnergySource
+from dodal.devices.electron_analyser.common import EnergySource
 from dodal.devices.electron_analyser.detector import SpecsDetector
 from dodal.devices.i09_1 import LensMode, PsuMode
 from dodal.devices.synchrotron import Synchrotron

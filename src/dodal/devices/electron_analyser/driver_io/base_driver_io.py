@@ -15,21 +15,25 @@ from ophyd_async.core import (
 from ophyd_async.epics.adcore import ADBaseIO, ADImageMode
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
-from dodal.devices.electron_analyser.energy_sources import (
+from dodal.devices.electron_analyser.common.energy_sources import (
     DualEnergySource,
     EnergySource,
 )
-from dodal.devices.electron_analyser.enums.base_enums import EnergyMode
+from dodal.devices.electron_analyser.common.enums import EnergyMode
+from dodal.devices.electron_analyser.common.util import to_binding_energy
 from dodal.devices.electron_analyser.region.base_region import (
+    AnyAcqMode,
+    AnyLensMode,
+    AnyPassEnergy,
+    AnyPsuMode,
+    Region,
     TAbstractBaseRegion,
-)
-from dodal.devices.electron_analyser.types.base_types import (
     TAcquisitionMode,
     TLensMode,
     TPassEnergy,
-    TPsuMode,
 )
-from dodal.devices.electron_analyser.util import to_binding_energy
+
+TPsuMode = TypeVar("TPsuMode", bound=AnyPsuMode)
 
 
 class AbstractAnalyserDriverIO(
@@ -245,6 +249,9 @@ class AbstractAnalyserDriverIO(
         return float(np.sum(spectrum, dtype=np.float64))
 
 
+GenericAnalyserDriverIO = AbstractAnalyserDriverIO[
+    Region, AnyAcqMode, AnyLensMode, AnyPsuMode, AnyPassEnergy
+]
 TAbstractAnalyserDriverIO = TypeVar(
     "TAbstractAnalyserDriverIO", bound=AbstractAnalyserDriverIO
 )

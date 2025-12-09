@@ -11,17 +11,15 @@ from ophyd_async.testing import (
 
 import dodal.devices.b07 as b07
 import dodal.devices.i09 as i09
-from dodal.devices.electron_analyser import EnergySource
+from dodal.devices.electron_analyser.common.energy_sources import EnergySource
 from dodal.devices.electron_analyser.detector import (
     BaseElectronAnalyserDetector,
+    ElectronAnalyserDetector,
+    GenericElectronAnalyserDetector,
     SpecsDetector,
     VGScientaDetector,
 )
 from dodal.devices.electron_analyser.driver_io import AbstractAnalyserDriverIO
-from dodal.devices.electron_analyser.energy_sources import EnergySource
-from dodal.devices.electron_analyser.types.types import (
-    GenericElectronAnalyserDetector,
-)
 from dodal.testing.electron_analyser import create_detector
 from tests.devices.electron_analyser.helper_util import get_test_sequence
 
@@ -35,27 +33,76 @@ from tests.devices.electron_analyser.helper_util import get_test_sequence
 async def sim_detector(
     request: pytest.FixtureRequest,
     single_energy_source: EnergySource,
-) -> GenericElectronAnalyserDetector:
+) -> ElectronAnalyserDetector:
     async with init_devices(mock=True):
         sim_detector = await create_detector(
             request.param,
             prefix="TEST:",
             energy_source=single_energy_source,
         )
-        # Needed for specs so we don't get division by zero error.
+    # Needed for specs so we don't get division by zero error.
     set_mock_value(sim_detector.driver.slices, 1)
     return sim_detector
 
 
+def test_analyser_detector_trigger(
+    sim_detector: BaseElectronAnalyserDetector[AbstractAnalyserDriverIO],
+    run_engine: RunEngine,
+) -> None:
+    sim_detector._controller.arm = AsyncMock()
+    sim_detector._controller.wait_for_idle = AsyncMock()
+
+    run_engine(bps.trigger(sim_detector), wait=True)
+
+    sim_detector._controller.arm.assert_awaited_once()
+    sim_detector._controller.wait_for_idle.assert_awaited_once()
+
+
+async def test_analyser_detector_read(
+    sim_detector: BaseElectronAnalyserDetector[AbstractAnalyserDriverIO],
+) -> None:
+    driver_read = await sim_detector._controller.driver.read()
+    await assert_reading(sim_detector, driver_read)
+
+
+async def test_analyser_describe(
+    sim_detector: BaseElectronAnalyserDetector[AbstractAnalyserDriverIO],
+) -> None:
+    energy_array = await sim_detector._controller.driver.energy_axis.get_value()
+    angle_array = await sim_detector._controller.driver.angle_axis.get_value()
+    data = await sim_detector.describe()
+    assert data[f"{sim_detector._controller.driver.image.name}"]["shape"] == [
+        len(angle_array),
+        len(energy_array),
+    ]
+
+
+async def test_analyser_detector_configuration(
+    sim_detector: BaseElectronAnalyserDetector[AbstractAnalyserDriverIO],
+) -> None:
+    driver_config = await sim_detector._controller.driver.read_configuration()
+    await assert_configuration(sim_detector, driver_config)
+
+
+async def test_analyser_detector_describe_configuration(
+    sim_detector: BaseElectronAnalyserDetector[AbstractAnalyserDriverIO],
+) -> None:
+    driver_describe_config = (
+        await sim_detector._controller.driver.describe_configuration()
+    )
+
+    assert await sim_detector.describe_configuration() == driver_describe_config
+
+
 @pytest.fixture
 def sequence_file_path(
-    sim_detector: GenericElectronAnalyserDetector,
+    sim_detector: ElectronAnalyserDetector,
 ) -> str:
     return get_test_sequence(type(sim_detector))
 
 
 def test_analyser_detector_loads_sequence_correctly(
-    sim_detector: GenericElectronAnalyserDetector,
+    sim_detector: ElectronAnalyserDetector,
     sequence_file_path: str,
 ) -> None:
     seq = sim_detector.load_sequence(sequence_file_path)
@@ -63,7 +110,7 @@ def test_analyser_detector_loads_sequence_correctly(
 
 
 async def test_analyser_detector_stage(
-    sim_detector: GenericElectronAnalyserDetector,
+    sim_detector: ElectronAnalyserDetector,
 ) -> None:
     sim_detector._controller.disarm = AsyncMock()
     sim_detector.driver.stage = AsyncMock()
@@ -137,52 +184,3 @@ async def test_analyser_region_detector_trigger_sets_driver_with_region(
         reg_det._controller.arm.assert_awaited_once()
         reg_det._controller.wait_for_idle.assert_awaited_once()
         reg_det._controller.driver.set.assert_awaited_once_with(reg_det.region)
-
-
-def test_analyser_detector_trigger(
-    sim_detector: BaseElectronAnalyserDetector[AbstractAnalyserDriverIO],
-    run_engine: RunEngine,
-) -> None:
-    sim_detector._controller.arm = AsyncMock()
-    sim_detector._controller.wait_for_idle = AsyncMock()
-
-    run_engine(bps.trigger(sim_detector), wait=True)
-
-    sim_detector._controller.arm.assert_awaited_once()
-    sim_detector._controller.wait_for_idle.assert_awaited_once()
-
-
-async def test_analyser_detector_read(
-    sim_detector: BaseElectronAnalyserDetector[AbstractAnalyserDriverIO],
-) -> None:
-    driver_read = await sim_detector._controller.driver.read()
-    await assert_reading(sim_detector, driver_read)
-
-
-async def test_analyser_describe(
-    sim_detector: BaseElectronAnalyserDetector[AbstractAnalyserDriverIO],
-) -> None:
-    energy_array = await sim_detector._controller.driver.energy_axis.get_value()
-    angle_array = await sim_detector._controller.driver.angle_axis.get_value()
-    data = await sim_detector.describe()
-    assert data[f"{sim_detector._controller.driver.image.name}"]["shape"] == [
-        len(angle_array),
-        len(energy_array),
-    ]
-
-
-async def test_analyser_detector_configuration(
-    sim_detector: BaseElectronAnalyserDetector[AbstractAnalyserDriverIO],
-) -> None:
-    driver_config = await sim_detector._controller.driver.read_configuration()
-    await assert_configuration(sim_detector, driver_config)
-
-
-async def test_analyser_detector_describe_configuration(
-    sim_detector: BaseElectronAnalyserDetector[AbstractAnalyserDriverIO],
-) -> None:
-    driver_describe_config = (
-        await sim_detector._controller.driver.describe_configuration()
-    )
-
-    assert await sim_detector.describe_configuration() == driver_describe_config

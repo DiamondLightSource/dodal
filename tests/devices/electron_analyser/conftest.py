@@ -8,7 +8,7 @@ from dodal.devices.common_dcm import (
     PitchAndRollCrystal,
     StationaryCrystal,
 )
-from dodal.devices.electron_analyser import (
+from dodal.devices.electron_analyser.common import (
     DualEnergySource,
     EnergySource,
 )

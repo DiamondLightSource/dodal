@@ -6,7 +6,7 @@ from dodal.devices.b07_1 import (
     Grating,
     LensMode,
 )
-from dodal.devices.electron_analyser import EnergySource
+from dodal.devices.electron_analyser.common import EnergySource
 from dodal.devices.electron_analyser.detector import SpecsDetector
 from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.devices.synchrotron import Synchrotron

@@ -13,13 +13,9 @@ from ophyd_async.testing import (
 )
 
 from dodal.devices.b07 import LensMode, PsuMode
-from dodal.devices.electron_analyser import (
-    EnergyMode,
-    EnergySource,
-)
+from dodal.devices.electron_analyser.common import EnergyMode, EnergySource
 from dodal.devices.electron_analyser.driver_io import SpecsAnalyserDriverIO
-from dodal.devices.electron_analyser.enums import EnergyMode, SpecsAcquisitionMode
-from dodal.devices.electron_analyser.region import SpecsRegion
+from dodal.devices.electron_analyser.region import SpecsAcquisitionMode, SpecsRegion
 from dodal.testing.electron_analyser import create_driver
 from tests.devices.electron_analyser.helper_util import (
     TEST_SEQUENCE_REGION_NAMES,

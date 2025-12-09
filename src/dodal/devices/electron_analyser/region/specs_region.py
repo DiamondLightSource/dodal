@@ -1,13 +1,21 @@
 from typing import Generic
 
+from ophyd_async.core import StrictEnum
 from pydantic import Field
 
-from dodal.devices.electron_analyser.enums.specs_enums import SpecsAcquisitionMode
 from dodal.devices.electron_analyser.region.base_region import (
     AbstractBaseRegion,
     AbstractBaseSequence,
+    TLensMode,
+    TPsuMode,
 )
-from dodal.devices.electron_analyser.types.base_types import TLensMode, TPsuMode
+
+
+class SpecsAcquisitionMode(StrictEnum):
+    FIXED_TRANSMISSION = "Fixed Transmission"
+    SNAPSHOT = "Snapshot"
+    FIXED_RETARDING_RATIO = "Fixed Retarding Ratio"
+    FIXED_ENERGY = "Fixed Energy"
 
 
 class SpecsRegion(

@@ -1,23 +1,21 @@
 from typing import Generic
 
-from dodal.devices.electron_analyser.detector.base_detector import (
-    ElectronAnalyserDetector,
-)
-from dodal.devices.electron_analyser.driver_io.vgscienta_driver_io import (
-    VGScientaAnalyserDriverIO,
-)
-from dodal.devices.electron_analyser.energy_sources import (
+from dodal.devices.electron_analyser.common.energy_sources import (
     DualEnergySource,
     EnergySource,
 )
+from dodal.devices.electron_analyser.detector.base_detector import (
+    ElectronAnalyserDetector,
+)
+from dodal.devices.electron_analyser.driver_io.base_driver_io import TPsuMode
+from dodal.devices.electron_analyser.driver_io.vgscienta_driver_io import (
+    VGScientaAnalyserDriverIO,
+)
+from dodal.devices.electron_analyser.region.base_region import TLensMode
 from dodal.devices.electron_analyser.region.vgscienta_region import (
+    TPassEnergyEnum,
     VGScientaRegion,
     VGScientaSequence,
-)
-from dodal.devices.electron_analyser.types.base_types import (
-    TLensMode,
-    TPassEnergyEnum,
-    TPsuMode,
 )
 
 

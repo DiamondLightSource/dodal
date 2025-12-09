@@ -13,9 +13,12 @@ from ophyd_async.epics.adcore import ADBaseController
 from dodal.common.data_util import load_json_file_to_class
 from dodal.devices.controllers import ConstantDeadTimeController
 from dodal.devices.electron_analyser.driver_io.base_driver_io import (
+    GenericAnalyserDriverIO,
     TAbstractAnalyserDriverIO,
 )
 from dodal.devices.electron_analyser.region.base_region import (
+    Region,
+    Sequence,
     TAbstractBaseRegion,
     TAbstractBaseSequence,
 )
@@ -94,6 +97,10 @@ class ElectronAnalyserRegionDetector(
         await super().trigger()
 
 
+GenericElectronAnalyserRegionDetector = ElectronAnalyserRegionDetector[
+    GenericAnalyserDriverIO,
+    Region,
+]
 TElectronAnalyserRegionDetector = TypeVar(
     "TElectronAnalyserRegionDetector",
     bound=ElectronAnalyserRegionDetector,
@@ -181,12 +188,19 @@ class ElectronAnalyserDetector(
         seq = self.load_sequence(filename)
         regions = seq.get_enabled_regions() if enabled_only else seq.regions
         return [
-            ElectronAnalyserRegionDetector(
-                self._controller, r, self.name + "_" + r.name
-            )
+            ElectronAnalyserRegionDetector[
+                TAbstractAnalyserDriverIO, TAbstractBaseRegion
+            ](self._controller, r, self.name + "_" + r.name)
             for r in regions
         ]
 
+
+# Generic electron analyser types that supports full typing with the abstract classes.
+GenericElectronAnalyserDetector = ElectronAnalyserDetector[
+    GenericAnalyserDriverIO,
+    Sequence,
+    Region,
+]
 
 TElectronAnalyserDetector = TypeVar(
     "TElectronAnalyserDetector",

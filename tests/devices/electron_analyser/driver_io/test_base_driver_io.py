@@ -9,7 +9,11 @@ from ophyd_async.core import StrictEnum, get_mock_put, init_devices
 from ophyd_async.epics.adcore import ADImageMode
 
 from dodal.devices import b07, i09
-from dodal.devices.electron_analyser import DualEnergySource, EnergyMode, EnergySource
+from dodal.devices.electron_analyser.common import (
+    DualEnergySource,
+    EnergyMode,
+    EnergySource,
+)
 from dodal.devices.electron_analyser.driver_io import (
     AbstractAnalyserDriverIO,
     SpecsAnalyserDriverIO,

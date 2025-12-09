@@ -4,9 +4,9 @@ import pytest
 
 from dodal.common.data_util import load_json_file_to_class
 from dodal.devices.b07 import LensMode, PsuMode
-from dodal.devices.electron_analyser import EnergyMode, SelectedSource
-from dodal.devices.electron_analyser.enums import SpecsAcquisitionMode
+from dodal.devices.electron_analyser.common import EnergyMode, SelectedSource
 from dodal.devices.electron_analyser.region import SpecsSequence
+from dodal.devices.electron_analyser.region.specs_region import SpecsAcquisitionMode
 from tests.devices.electron_analyser.helper_util import (
     assert_region_has_expected_values,
     get_test_sequence,
