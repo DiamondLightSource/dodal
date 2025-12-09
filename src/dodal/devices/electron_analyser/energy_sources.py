@@ -10,7 +10,7 @@ from ophyd_async.core import (
     soft_signal_rw,
 )
 
-from dodal.devices.electron_analyser.enums import SelectedSource
+from dodal.devices.electron_analyser.enums.base_enums import SelectedSource
 
 
 class AbstractEnergySource(StandardReadable):

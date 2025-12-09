@@ -1,13 +1,9 @@
-from dodal.devices.electron_analyser.specs import (
+from dodal.devices.electron_analyser.detector import SpecsDetector, VGScientaDetector
+from dodal.devices.electron_analyser.driver_io import (
     SpecsAnalyserDriverIO,
-    SpecsDetector,
-    SpecsSequence,
-)
-from dodal.devices.electron_analyser.vgscienta import (
     VGScientaAnalyserDriverIO,
-    VGScientaDetector,
-    VGScientaSequence,
 )
+from dodal.devices.electron_analyser.region import SpecsSequence, VGScientaSequence
 from tests.devices.electron_analyser.test_data import (
     TEST_SPECS_SEQUENCE,
     TEST_VGSCIENTA_SEQUENCE,

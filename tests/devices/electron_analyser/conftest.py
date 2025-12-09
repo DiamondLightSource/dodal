@@ -10,21 +10,19 @@ from dodal.devices.common_dcm import (
 )
 from dodal.devices.electron_analyser import (
     DualEnergySource,
-    ElectronAnalyserDetector,
     EnergySource,
 )
-from dodal.devices.electron_analyser.abstract import (
+from dodal.devices.electron_analyser.detector import ElectronAnalyserDetector
+from dodal.devices.electron_analyser.driver_io import (
     AbstractAnalyserDriverIO,
+    SpecsAnalyserDriverIO,
+    VGScientaAnalyserDriverIO,
+)
+from dodal.devices.electron_analyser.region import (
     AbstractBaseRegion,
     AbstractBaseSequence,
-    TAbstractBaseSequence,
-)
-from dodal.devices.electron_analyser.specs import (
-    SpecsAnalyserDriverIO,
     SpecsSequence,
-)
-from dodal.devices.electron_analyser.vgscienta import (
-    VGScientaAnalyserDriverIO,
+    TAbstractBaseSequence,
     VGScientaSequence,
 )
 from dodal.devices.i09 import Grating

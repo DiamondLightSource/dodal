@@ -8,7 +8,7 @@ from dodal.devices.common_dcm import (
     StationaryCrystal,
 )
 from dodal.devices.electron_analyser import EnergySource
-from dodal.devices.electron_analyser.specs import SpecsDetector
+from dodal.devices.electron_analyser.detector import SpecsDetector
 from dodal.devices.i09_1 import LensMode, PsuMode
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.undulator import UndulatorInMm, UndulatorOrder

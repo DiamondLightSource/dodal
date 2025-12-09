@@ -2,7 +2,7 @@ from typing import Any
 
 from deepdiff import DeepDiff
 
-from dodal.devices.electron_analyser.abstract import AbstractBaseRegion
+from dodal.devices.electron_analyser.region import AbstractBaseRegion
 
 
 def assert_region_has_expected_values(
