@@ -195,7 +195,6 @@ class ElectronAnalyserDetector(
         ]
 
 
-# Generic electron analyser types that supports full typing with the abstract classes.
 GenericElectronAnalyserDetector = ElectronAnalyserDetector[
     GenericAnalyserDriverIO,
     Sequence,

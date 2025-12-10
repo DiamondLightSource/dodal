@@ -13,15 +13,14 @@ from dodal.devices.electron_analyser.common.util import (
 )
 
 AnyAcqMode = StrictEnum
+# Allow SupersetEnum. Specs analysers can connect to Lens and Psu mode separately to the
+# analyser which leaves the enum to either be "Not connected" OR the available enums
+# when connected.
 AnyLensMode = SupersetEnum | StrictEnum
 AnyPassEnergy = StrictEnum | float
 AnyPsuMode = SupersetEnum | StrictEnum
 
 TAcquisitionMode = TypeVar("TAcquisitionMode", bound=AnyAcqMode)
-
-# Allow SupersetEnum. Specs analysers can connect to Lens and Psu mode separately to the
-# analyser which leaves the enum to either be "Not connected" OR the available enums
-# when connected.
 TLensMode = TypeVar("TLensMode", bound=AnyLensMode)
 TPassEnergy = TypeVar("TPassEnergy", bound=AnyPassEnergy)
 TPsuMode = TypeVar("TPsuMode", bound=AnyPsuMode)
