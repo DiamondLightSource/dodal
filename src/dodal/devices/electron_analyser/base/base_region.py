@@ -15,7 +15,7 @@ from dodal.devices.electron_analyser.base.base_util import (
 AnyAcqMode: TypeAlias = StrictEnum
 AnyLensMode: TypeAlias = SupersetEnum | StrictEnum
 AnyPassEnergy: TypeAlias = StrictEnum | float
-AnyPassEnergyEnum: TypeAlias = StrictEnum
+AnyPsuMode: TypeAlias = SupersetEnum | StrictEnum
 
 TAcquisitionMode = TypeVar("TAcquisitionMode", bound=AnyAcqMode)
 # Allow SupersetEnum. Specs analysers can connect to Lens and Psu mode separately to the
@@ -23,7 +23,7 @@ TAcquisitionMode = TypeVar("TAcquisitionMode", bound=AnyAcqMode)
 # when connected.
 TLensMode = TypeVar("TLensMode", bound=AnyLensMode)
 TPassEnergy = TypeVar("TPassEnergy", bound=AnyPassEnergy)
-TPsuMode = TypeVar("TPsuMode", bound=SupersetEnum | StrictEnum)
+TPsuMode = TypeVar("TPsuMode", bound=AnyPsuMode)
 
 
 def java_to_python_case(java_str: str) -> str:
