@@ -224,7 +224,6 @@ class LookupTable(RootModel[dict[Pol, EnergyCoverage]]):
     def __init__(self, root: dict[Pol, EnergyCoverage] | None = None):
         super().__init__(root=root or {})
 
-    # ... (generate and get_poly remain the same) ...
     @classmethod
     def generate(
         cls: type[Self],
