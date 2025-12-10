@@ -25,7 +25,7 @@ async def sim_driver(
     request: pytest.FixtureRequest,
 ) -> GenericAnalyserDriverIO:
     async with init_devices(mock=True):
-        sim_driver = await create_driver(request.param, prefix="TEST:")
+        sim_driver = create_driver(request.param, prefix="TEST:")
     return sim_driver
 
 

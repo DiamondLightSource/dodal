@@ -34,7 +34,7 @@ async def sim_detector(
     single_energy_source: EnergySource,
 ) -> GenericElectronAnalyserDetector:
     async with init_devices(mock=True):
-        sim_detector = await create_detector(
+        sim_detector = create_detector(
             request.param,
             prefix="TEST:",
             energy_source=single_energy_source,

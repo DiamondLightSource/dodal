@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Generic, TypeVar
+from typing import Generic, TypeAlias, TypeVar
 
 import numpy as np
 from bluesky.protocols import Movable
@@ -30,7 +30,7 @@ from dodal.devices.electron_analyser.base.base_region import (
 )
 from dodal.devices.electron_analyser.base.base_util import to_binding_energy
 
-AnyPsuMode = SupersetEnum | StrictEnum
+AnyPsuMode: TypeAlias = SupersetEnum | StrictEnum
 TPsuMode = TypeVar("TPsuMode", bound=AnyPsuMode)
 
 

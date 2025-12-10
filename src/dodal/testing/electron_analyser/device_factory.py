@@ -10,7 +10,7 @@ from dodal.devices.electron_analyser.vgscienta import (
 )
 
 
-async def create_driver(
+def create_driver(
     driver_class: type[TAbstractAnalyserDriverIO],
     **kwargs: Any,
 ) -> TAbstractAnalyserDriverIO:
@@ -34,7 +34,7 @@ async def create_driver(
     return driver_class(**(parameters | kwargs))
 
 
-async def create_detector(
+def create_detector(
     detector_class: type[TElectronAnalyserDetector],
     **kwargs: Any,
 ) -> TElectronAnalyserDetector:

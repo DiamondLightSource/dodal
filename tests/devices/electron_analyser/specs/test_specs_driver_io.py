@@ -29,7 +29,7 @@ from tests.devices.electron_analyser.helper_util import (
 @pytest.fixture
 async def sim_driver() -> SpecsAnalyserDriverIO[LensMode, PsuMode]:
     async with init_devices(mock=True):
-        sim_driver = await create_driver(
+        sim_driver = create_driver(
             SpecsAnalyserDriverIO[LensMode, PsuMode],
             prefix="TEST:",
         )

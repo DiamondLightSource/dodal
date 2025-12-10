@@ -15,7 +15,7 @@ async def sim_detector(
     dual_energy_source: DualEnergySource,
 ) -> VGScientaDetector[LensMode, PsuMode, PassEnergy]:
     async with init_devices(mock=True):
-        sim_driver = await create_detector(
+        sim_driver = create_detector(
             VGScientaDetector[LensMode, PsuMode, PassEnergy],
             prefix="TEST:",
             energy_source=dual_energy_source,
