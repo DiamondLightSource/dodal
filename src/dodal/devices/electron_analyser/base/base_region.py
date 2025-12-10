@@ -1,7 +1,7 @@
 import re
 from abc import ABC
 from collections.abc import Callable
-from typing import Generic, Self, TypeVar
+from typing import Generic, Self, TypeAlias, TypeVar
 
 from ophyd_async.core import StrictEnum, SupersetEnum
 from pydantic import BaseModel, Field, model_validator
@@ -12,10 +12,10 @@ from dodal.devices.electron_analyser.base.base_util import (
     to_kinetic_energy,
 )
 
-AnyAcqMode = StrictEnum
-AnyLensMode = SupersetEnum | StrictEnum
-AnyPassEnergy = StrictEnum | float
-AnyPassEnergyEnum = StrictEnum
+AnyAcqMode: TypeAlias = StrictEnum
+AnyLensMode: TypeAlias = SupersetEnum | StrictEnum
+AnyPassEnergy: TypeAlias = StrictEnum | float
+AnyPassEnergyEnum: TypeAlias = StrictEnum
 
 TAcquisitionMode = TypeVar("TAcquisitionMode", bound=AnyAcqMode)
 # Allow SupersetEnum. Specs analysers can connect to Lens and Psu mode separately to the

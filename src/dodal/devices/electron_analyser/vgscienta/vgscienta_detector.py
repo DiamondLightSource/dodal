@@ -18,16 +18,14 @@ from dodal.devices.electron_analyser.vgscienta.vgscienta_region import (
     VGScientaSequence,
 )
 
+Region = VGScientaRegion[TLensMode, TPassEnergyEnum]
+Sequence = VGScientaSequence[TLensMode, TPsuMode, TPassEnergyEnum]
+Driver = VGScientaAnalyserDriverIO[TLensMode, TPsuMode, TPassEnergyEnum]
+Controller = ElectronAnalyserController[Driver, Region]
+
 
 class VGScientaDetector(
-    ElectronAnalyserDetector[
-        ElectronAnalyserController[
-            VGScientaAnalyserDriverIO[TLensMode, TPsuMode, TPassEnergyEnum],
-            VGScientaRegion[TLensMode, TPassEnergyEnum],
-        ],
-        VGScientaSequence[TLensMode, TPsuMode, TPassEnergyEnum],
-        VGScientaRegion[TLensMode, TPassEnergyEnum],
-    ],
+    ElectronAnalyserDetector[Controller, Sequence, Region],
     Generic[TLensMode, TPsuMode, TPassEnergyEnum],
 ):
     def __init__(

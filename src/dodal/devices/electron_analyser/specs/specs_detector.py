@@ -15,15 +15,14 @@ from dodal.devices.electron_analyser.specs.specs_region import (
     SpecsSequence,
 )
 
+Region = SpecsRegion[TLensMode, TPsuMode]
+Sequence = SpecsSequence[TLensMode, TPsuMode]
+Driver = SpecsAnalyserDriverIO[TLensMode, TPsuMode]
+Controller = ElectronAnalyserController[Driver, Region]
+
 
 class SpecsDetector(
-    ElectronAnalyserDetector[
-        ElectronAnalyserController[
-            SpecsAnalyserDriverIO[TLensMode, TPsuMode], SpecsRegion[TLensMode, TPsuMode]
-        ],
-        SpecsSequence[TLensMode, TPsuMode],
-        SpecsRegion[TLensMode, TPsuMode],
-    ],
+    ElectronAnalyserDetector[Controller, Sequence, Region],
     Generic[TLensMode, TPsuMode],
 ):
     def __init__(
