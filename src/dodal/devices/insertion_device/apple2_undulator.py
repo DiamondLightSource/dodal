@@ -730,12 +730,7 @@ class InsertionDeviceEnergy(InsertionDeviceEnergyBase):
         self.energy = Reference(id_controller.energy)
         super().__init__(name=name)
 
-        self.add_readables(
-            [
-                self.energy(),
-            ],
-            StandardReadableFormat.HINTED_SIGNAL,
-        )
+        self.add_readables([self.energy()], StandardReadableFormat.HINTED_SIGNAL)
 
     @AsyncStatus.wrap
     async def set(self, energy: float) -> None:

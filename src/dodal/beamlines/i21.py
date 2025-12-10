@@ -2,12 +2,12 @@ from dodal.common.beamlines.beamline_utils import (
     device_factory,
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.devices.apple2_undulator import (
+from dodal.devices.i21 import Grating
+from dodal.devices.insertion_device.apple2_undulator import (
     Apple2,
     UndulatorGap,
     UndulatorPhaseAxes,
 )
-from dodal.devices.i21 import Grating
 from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.devices.synchrotron import Synchrotron
 from dodal.log import set_beamline as set_log_beamline
