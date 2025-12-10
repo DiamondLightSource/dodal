@@ -98,7 +98,9 @@ class LookupTableColumnConfig(BaseModel):
 
 
 class EnergyCoverageEntry(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True)  # So np.poly1d can be used.
+    model_config = ConfigDict(
+        arbitrary_types_allowed=True, frozen=True
+    )  # So np.poly1d can be used.
     min_energy: float
     max_energy: float
     poly: np.poly1d
@@ -120,21 +122,28 @@ class EnergyCoverageEntry(BaseModel):
 
 
 class EnergyCoverage(BaseModel):
-    energy_entries: list[EnergyCoverageEntry]
-
-    def sort_energy_entries(self) -> None:
-        """Ensure entries are sorted in-place by min_energy."""
-        self.energy_entries.sort(key=lambda e: e.min_energy)
+    model_config = ConfigDict(frozen=True)
+    energy_entries: tuple[EnergyCoverageEntry, ...]
 
     @model_validator(mode="after")
     def _validate_coverage_and_sort(self) -> Self:
         """
         Pydantic validator to ensure entries are sorted.
         """
+        cls = type(self)
+
         if not self.energy_entries:
             return self
+        is_sorted = all(
+            self.energy_entries[i].min_energy <= self.energy_entries[i + 1].min_energy
+            for i in range(len(self.energy_entries) - 1)
+        )
+        if not is_sorted:
+            sorted_entries = tuple(
+                sorted(self.energy_entries, key=lambda e: e.min_energy)
+            )
+            return cls(energy_entries=sorted_entries)
 
-        self.sort_energy_entries()
         return self
 
     @classmethod
@@ -144,7 +153,7 @@ class EnergyCoverage(BaseModel):
         max_energies: list[float],
         poly1d_params: list[list[float]],
     ) -> Self:
-        energy_entries = [
+        energy_entries = tuple(
             EnergyCoverageEntry(
                 min_energy=min_energy,
                 max_energy=max_energy,
@@ -153,7 +162,7 @@ class EnergyCoverage(BaseModel):
             for min_energy, max_energy, poly_params in zip(
                 min_energies, max_energies, poly1d_params, strict=True
             )
-        ]
+        )
         return cls(energy_entries=energy_entries)
 
     @property
@@ -210,10 +219,12 @@ class LookupTable(RootModel[dict[Pol, EnergyCoverage]]):
     values to Apple2 motor positions.
     """
 
-    # Allow to auto specify a dict if one not provided
+    model_config = ConfigDict(frozen=True)
+
     def __init__(self, root: dict[Pol, EnergyCoverage] | None = None):
         super().__init__(root=root or {})
 
+    # ... (generate and get_poly remain the same) ...
     @classmethod
     def generate(
         cls: type[Self],
@@ -222,10 +233,8 @@ class LookupTable(RootModel[dict[Pol, EnergyCoverage]]):
     ) -> Self:
         """Generate a LookupTable containing multiple EnergyCoverage
         for provided polarisations."""
-        lut = cls()
-        for i in range(len(pols)):
-            lut.root[pols[i]] = energy_coverage[i]
-        return lut
+        root_data = dict(zip(pols, energy_coverage, strict=False))
+        return cls(root=root_data)
 
     def get_poly(
         self,
@@ -266,15 +275,15 @@ def convert_csv_to_lookup(
     -----------
     LookupTable
     """
+    temp_mode_entries: dict[Pol, list[EnergyCoverageEntry]] = {}
 
-    def process_row(row: dict[str, Any], lut: LookupTable) -> None:
-        """Process a single row from the CSV file and update the lookup table."""
+    def process_row(row: dict[str, Any]) -> None:
+        """Process a single row from the CSV file and update the temporary entry list."""
         raw_mode_value = str(row[lut_config.mode]).lower()
         mode_value = Pol(
             lut_config.mode_name_convert.get(raw_mode_value, raw_mode_value)
         )
 
-        # Create polynomial object for energy-to-gap/phase conversion
         coefficients = np.poly1d([float(row[coef]) for coef in lut_config.poly_deg])
 
         energy_entry = EnergyCoverageEntry(
@@ -282,30 +291,29 @@ def convert_csv_to_lookup(
             max_energy=float(row[lut_config.max_energy]),
             poly=coefficients,
         )
-        if mode_value not in lut.root:
-            lut.root[mode_value] = EnergyCoverage(energy_entries=[energy_entry])
-        else:
-            lut.root[mode_value].energy_entries.append(energy_entry)
+
+        if mode_value not in temp_mode_entries:
+            temp_mode_entries[mode_value] = []
+
+        temp_mode_entries[mode_value].append(energy_entry)
 
     reader = csv.DictReader(read_file_and_skip(file_contents, skip_line_start_with))
-    lut = LookupTable()
 
     for row in reader:
         source = lut_config.source
-        # If there are multiple source only convert requested.
         if source is None or row[source.column] == source.value:
-            process_row(row=row, lut=lut)
-
-    # Check if our LookupTable is empty after processing, raise error if it is.
-    if not lut.root:
+            process_row(row=row)
+    if not temp_mode_entries:
         raise RuntimeError(
             "LookupTable content is empty, failed to convert the file contents to "
             "a LookupTable!"
         )
-    # Validate each EnergyCoverage entry.
-    for pol in lut.root.values():
-        EnergyCoverage.model_validate(pol)
-    return lut
+
+    final_lut_root: dict[Pol, EnergyCoverage] = {}
+    for pol, entries in temp_mode_entries.items():
+        final_lut_root[pol] = EnergyCoverage.model_validate({"energy_entries": entries})
+
+    return LookupTable(root=final_lut_root)
 
 
 def read_file_and_skip(file: str, skip_line_start_with: str = "#") -> Generator[str]:

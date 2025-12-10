@@ -96,7 +96,7 @@ async def test_bad_file_contents_causes_convert_csv_to_lookup_fails(
 def test_energy_coverage_empty_entries_model_validate() -> None:
     from dodal.devices.insertion_device.lookup_table_models import EnergyCoverage
 
-    ec = EnergyCoverage(energy_entries=[])
+    ec = EnergyCoverage(energy_entries=())
     validated = EnergyCoverage.model_validate(ec)
     assert isinstance(validated, EnergyCoverage)
-    assert validated.energy_entries == []
+    assert validated.energy_entries == ()
