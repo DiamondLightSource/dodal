@@ -22,7 +22,7 @@ from dodal.devices.electron_analyser.base.base_region import (
     AnyAcqMode,
     AnyLensMode,
     AnyPassEnergy,
-    Region,
+    GenericRegion,
     TAbstractBaseRegion,
     TAcquisitionMode,
     TLensMode,
@@ -224,7 +224,7 @@ class AbstractAnalyserDriverIO(
 
 
 GenericAnalyserDriverIO = AbstractAnalyserDriverIO[
-    Region, AnyAcqMode, AnyLensMode, AnyPsuMode, AnyPassEnergy
+    GenericRegion, AnyAcqMode, AnyLensMode, AnyPsuMode, AnyPassEnergy
 ]
 TAbstractAnalyserDriverIO = TypeVar(
     "TAbstractAnalyserDriverIO", bound=AbstractAnalyserDriverIO

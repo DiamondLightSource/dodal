@@ -9,7 +9,7 @@ from dodal.devices.electron_analyser.base.base_driver_io import (
     TAbstractAnalyserDriverIO,
 )
 from dodal.devices.electron_analyser.base.base_region import (
-    Region,
+    GenericRegion,
     TAbstractBaseRegion,
 )
 from dodal.devices.electron_analyser.base.energy_sources import (
@@ -66,7 +66,7 @@ class ElectronAnalyserController(
 
 
 GenericElectronAnalyserController = ElectronAnalyserController[
-    GenericAnalyserDriverIO, Region
+    GenericAnalyserDriverIO, GenericRegion
 ]
 TElectronAnalyserController = TypeVar(
     "TElectronAnalyserController", bound=ElectronAnalyserController

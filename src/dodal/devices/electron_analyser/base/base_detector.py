@@ -16,8 +16,8 @@ from dodal.devices.electron_analyser.base.base_controller import (
     TElectronAnalyserController,
 )
 from dodal.devices.electron_analyser.base.base_region import (
-    Region,
-    Sequence,
+    GenericRegion,
+    GenericSequence,
     TAbstractBaseRegion,
     TAbstractBaseSequence,
 )
@@ -77,7 +77,7 @@ class BaseElectronAnalyserDetector(
 
 
 GenericBaseElectronAnalyserDetector = BaseElectronAnalyserDetector[
-    GenericElectronAnalyserController, Region
+    GenericElectronAnalyserController, GenericRegion
 ]
 
 
@@ -107,7 +107,7 @@ class ElectronAnalyserRegionDetector(
 
 
 GenericElectronAnalyserRegionDetector = ElectronAnalyserRegionDetector[
-    GenericElectronAnalyserController, Region
+    GenericElectronAnalyserController, GenericRegion
 ]
 TElectronAnalyserRegionDetector = TypeVar(
     "TElectronAnalyserRegionDetector",
@@ -203,7 +203,7 @@ class ElectronAnalyserDetector(
 
 
 GenericElectronAnalyserDetector = ElectronAnalyserDetector[
-    GenericElectronAnalyserController, Sequence, Region
+    GenericElectronAnalyserController, GenericSequence, GenericRegion
 ]
 TElectronAnalyserDetector = TypeVar(
     "TElectronAnalyserDetector",

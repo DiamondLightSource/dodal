@@ -4,13 +4,11 @@ import pytest
 from ophyd_async.core import TriggerInfo, get_mock_put, init_devices
 
 from dodal.beamlines import b07, i09
-from dodal.devices.electron_analyser import (
-    DualEnergySource,
-    EnergySource,
-)
 from dodal.devices.electron_analyser.base import (
     AbstractAnalyserDriverIO,
     AbstractBaseRegion,
+    DualEnergySource,
+    EnergySource,
 )
 from dodal.devices.electron_analyser.base.base_controller import (
     ElectronAnalyserController,

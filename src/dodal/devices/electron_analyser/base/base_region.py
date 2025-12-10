@@ -167,7 +167,7 @@ class AbstractBaseRegion(
         return energy_mode_validation(data)
 
 
-Region = AbstractBaseRegion[AnyAcqMode, AnyLensMode, AnyPassEnergy]
+GenericRegion = AbstractBaseRegion[AnyAcqMode, AnyLensMode, AnyPassEnergy]
 TAbstractBaseRegion = TypeVar("TAbstractBaseRegion", bound=AbstractBaseRegion)
 
 
@@ -198,5 +198,5 @@ class AbstractBaseSequence(
         return next((region for region in self.regions if region.name == name), None)
 
 
-Sequence = AbstractBaseSequence[Region]
+GenericSequence = AbstractBaseSequence[GenericRegion]
 TAbstractBaseSequence = TypeVar("TAbstractBaseSequence", bound=AbstractBaseSequence)
