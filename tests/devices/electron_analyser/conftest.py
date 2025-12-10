@@ -8,15 +8,14 @@ from dodal.devices.common_dcm import (
     PitchAndRollCrystal,
     StationaryCrystal,
 )
-from dodal.devices.electron_analyser import (
-    DualEnergySource,
-    ElectronAnalyserDetector,
-    EnergySource,
-)
-from dodal.devices.electron_analyser.abstract import (
+from dodal.devices.electron_analyser.base import (
     AbstractAnalyserDriverIO,
     AbstractBaseRegion,
     AbstractBaseSequence,
+    DualEnergySource,
+    ElectronAnalyserController,
+    ElectronAnalyserDetector,
+    EnergySource,
     TAbstractBaseSequence,
 )
 from dodal.devices.electron_analyser.specs import (
@@ -29,9 +28,7 @@ from dodal.devices.electron_analyser.vgscienta import (
 )
 from dodal.devices.i09 import Grating
 from dodal.devices.pgm import PlaneGratingMonochromator
-from tests.devices.electron_analyser.helper_util import (
-    get_test_sequence,
-)
+from tests.devices.electron_analyser.helper_util import get_test_sequence
 
 
 @pytest.fixture
@@ -86,10 +83,10 @@ def sequence(
     sequence_class: type[TAbstractBaseSequence],
     single_energy_source: EnergySource,
 ) -> AbstractBaseSequence:
+    controller = ElectronAnalyserController(sim_driver, single_energy_source, 0)
     det = ElectronAnalyserDetector(
-        driver=sim_driver,
+        controller=controller,
         sequence_class=sequence_class,
-        energy_source=single_energy_source,
     )
     return det.load_sequence(get_test_sequence(type(sim_driver)))
 

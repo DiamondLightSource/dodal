@@ -1,14 +1,18 @@
-from typing import Generic
+from typing import Generic, TypeVar
 
 from ophyd_async.core import TriggerInfo
 from ophyd_async.epics.adcore import ADImageMode
 
 from dodal.devices.controllers import ConstantDeadTimeController
-from dodal.devices.electron_analyser.abstract.base_driver_io import (
+from dodal.devices.electron_analyser.base.base_driver_io import (
+    GenericAnalyserDriverIO,
     TAbstractAnalyserDriverIO,
 )
-from dodal.devices.electron_analyser.abstract.base_region import TAbstractBaseRegion
-from dodal.devices.electron_analyser.energy_sources import (
+from dodal.devices.electron_analyser.base.base_region import (
+    Region,
+    TAbstractBaseRegion,
+)
+from dodal.devices.electron_analyser.base.energy_sources import (
     AbstractEnergySource,
     DualEnergySource,
 )
@@ -59,3 +63,11 @@ class ElectronAnalyserController(
         excitation_energy = await self.energy_source.energy.get_value()
         await self.driver.cached_excitation_energy.set(excitation_energy)
         await super().prepare(trigger_info)
+
+
+GenericElectronAnalyserController = ElectronAnalyserController[
+    GenericAnalyserDriverIO, Region
+]
+TElectronAnalyserController = TypeVar(
+    "TElectronAnalyserController", bound=ElectronAnalyserController
+)

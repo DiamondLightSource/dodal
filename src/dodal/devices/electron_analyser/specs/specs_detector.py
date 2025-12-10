@@ -1,0 +1,45 @@
+from typing import Generic
+
+from dodal.devices.electron_analyser.base.base_controller import (
+    ElectronAnalyserController,
+)
+from dodal.devices.electron_analyser.base.base_detector import ElectronAnalyserDetector
+from dodal.devices.electron_analyser.base.base_region import TLensMode, TPsuMode
+from dodal.devices.electron_analyser.base.energy_sources import (
+    DualEnergySource,
+    EnergySource,
+)
+from dodal.devices.electron_analyser.specs.specs_driver_io import SpecsAnalyserDriverIO
+from dodal.devices.electron_analyser.specs.specs_region import (
+    SpecsRegion,
+    SpecsSequence,
+)
+
+
+class SpecsDetector(
+    ElectronAnalyserDetector[
+        ElectronAnalyserController[
+            SpecsAnalyserDriverIO[TLensMode, TPsuMode], SpecsRegion[TLensMode, TPsuMode]
+        ],
+        SpecsSequence[TLensMode, TPsuMode],
+        SpecsRegion[TLensMode, TPsuMode],
+    ],
+    Generic[TLensMode, TPsuMode],
+):
+    def __init__(
+        self,
+        prefix: str,
+        lens_mode_type: type[TLensMode],
+        psu_mode_type: type[TPsuMode],
+        energy_source: DualEnergySource | EnergySource,
+        name: str = "",
+    ):
+        # Save to class so takes part with connect()
+        self.driver = SpecsAnalyserDriverIO[TLensMode, TPsuMode](
+            prefix, lens_mode_type, psu_mode_type
+        )
+        controller = ElectronAnalyserController[
+            SpecsAnalyserDriverIO[TLensMode, TPsuMode], SpecsRegion[TLensMode, TPsuMode]
+        ](self.driver, energy_source, 0)
+
+        super().__init__(SpecsSequence[lens_mode_type, psu_mode_type], controller, name)

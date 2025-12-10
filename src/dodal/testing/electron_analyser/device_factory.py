@@ -1,9 +1,9 @@
 from typing import Any, get_args, get_origin
 
-from dodal.devices.electron_analyser.abstract import (
+from dodal.devices.electron_analyser.base.base_detector import TElectronAnalyserDetector
+from dodal.devices.electron_analyser.base.base_driver_io import (
     TAbstractAnalyserDriverIO,
 )
-from dodal.devices.electron_analyser.detector import TElectronAnalyserDetector
 from dodal.devices.electron_analyser.vgscienta import (
     VGScientaAnalyserDriverIO,
     VGScientaDetector,

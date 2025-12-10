@@ -8,11 +8,13 @@ from dodal.devices.electron_analyser import (
     DualEnergySource,
     EnergySource,
 )
-from dodal.devices.electron_analyser.abstract import (
+from dodal.devices.electron_analyser.base import (
     AbstractAnalyserDriverIO,
     AbstractBaseRegion,
 )
-from dodal.devices.electron_analyser.controller import ElectronAnalyserController
+from dodal.devices.electron_analyser.base.base_controller import (
+    ElectronAnalyserController,
+)
 from dodal.devices.electron_analyser.specs import SpecsAnalyserDriverIO
 from dodal.devices.electron_analyser.vgscienta import (
     VGScientaAnalyserDriverIO,

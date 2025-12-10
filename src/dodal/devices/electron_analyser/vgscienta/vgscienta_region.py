@@ -1,21 +1,21 @@
 import uuid
-from typing import Generic
+from typing import Generic, TypeVar
 
+from ophyd_async.core import StrictEnum
 from pydantic import Field, field_validator
 
-from dodal.devices.electron_analyser.abstract.base_region import (
+from dodal.devices.electron_analyser.base.base_region import (
     AbstractBaseRegion,
     AbstractBaseSequence,
-)
-from dodal.devices.electron_analyser.abstract.types import (
     TLensMode,
-    TPassEnergyEnum,
     TPsuMode,
 )
-from dodal.devices.electron_analyser.vgscienta.enums import (
+from dodal.devices.electron_analyser.vgscienta.vgscienta_enums import (
     AcquisitionMode,
     DetectorMode,
 )
+
+TPassEnergyEnum = TypeVar("TPassEnergyEnum", bound=StrictEnum)
 
 
 class VGScientaRegion(

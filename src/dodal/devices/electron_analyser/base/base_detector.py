@@ -1,26 +1,89 @@
 from typing import Generic, TypeVar
 
-from bluesky.protocols import Stageable
-from ophyd_async.core import AsyncStatus
+from bluesky.protocols import Reading, Stageable, Triggerable
+from event_model import DataKey
+from ophyd_async.core import (
+    AsyncConfigurable,
+    AsyncReadable,
+    AsyncStatus,
+    Device,
+    TriggerInfo,
+)
 
 from dodal.common.data_util import load_json_file_to_class
-from dodal.devices.electron_analyser.abstract.base_detector import (
-    BaseElectronAnalyserDetector,
+from dodal.devices.electron_analyser.base.base_controller import (
+    GenericElectronAnalyserController,
+    TElectronAnalyserController,
 )
-from dodal.devices.electron_analyser.abstract.base_driver_io import (
-    TAbstractAnalyserDriverIO,
-)
-from dodal.devices.electron_analyser.abstract.base_region import (
+from dodal.devices.electron_analyser.base.base_region import (
+    Region,
+    Sequence,
     TAbstractBaseRegion,
     TAbstractBaseSequence,
 )
-from dodal.devices.electron_analyser.controller import ElectronAnalyserController
-from dodal.devices.electron_analyser.energy_sources import AbstractEnergySource
+
+
+class BaseElectronAnalyserDetector(
+    Device,
+    Triggerable,
+    AsyncReadable,
+    AsyncConfigurable,
+    Generic[TElectronAnalyserController, TAbstractBaseRegion],
+):
+    """
+    Detector for data acquisition of electron analyser. Can only acquire using settings
+    already configured for the device.
+
+    If possible, this should be changed to inherit from a StandardDetector. Currently,
+    StandardDetector forces you to use a file writer which doesn't apply here.
+    See issue https://github.com/bluesky/ophyd-async/issues/888
+    """
+
+    def __init__(
+        self,
+        controller: TElectronAnalyserController,
+        name: str = "",
+    ):
+        self._controller = controller
+        super().__init__(name)
+
+    @AsyncStatus.wrap
+    async def set(self, region: TAbstractBaseRegion) -> None:
+        await self._controller.setup_with_region(region)
+
+    @AsyncStatus.wrap
+    async def trigger(self) -> None:
+        await self._controller.prepare(TriggerInfo())
+        await self._controller.arm()
+        await self._controller.wait_for_idle()
+
+    async def read(self) -> dict[str, Reading]:
+        return await self._controller.driver.read()
+
+    async def describe(self) -> dict[str, DataKey]:
+        data = await self._controller.driver.describe()
+        # Correct the shape for image
+        prefix = self._controller.driver.name + "-"
+        energy_size = len(await self._controller.driver.energy_axis.get_value())
+        angle_size = len(await self._controller.driver.angle_axis.get_value())
+        data[prefix + "image"]["shape"] = [angle_size, energy_size]
+        return data
+
+    async def read_configuration(self) -> dict[str, Reading]:
+        return await self._controller.driver.read_configuration()
+
+    async def describe_configuration(self) -> dict[str, DataKey]:
+        return await self._controller.driver.describe_configuration()
+
+
+GenericBaseElectronAnalyserDetector = BaseElectronAnalyserDetector[
+    GenericElectronAnalyserController, Region
+]
 
 
 class ElectronAnalyserRegionDetector(
-    BaseElectronAnalyserDetector[TAbstractAnalyserDriverIO, TAbstractBaseRegion],
-    Generic[TAbstractAnalyserDriverIO, TAbstractBaseRegion],
+    BaseElectronAnalyserDetector[TElectronAnalyserController, TAbstractBaseRegion],
+    Generic[TElectronAnalyserController, TAbstractBaseRegion],
 ):
     """
     Extends electron analyser detector to configure specific region settings before data
@@ -29,9 +92,7 @@ class ElectronAnalyserRegionDetector(
 
     def __init__(
         self,
-        controller: ElectronAnalyserController[
-            TAbstractAnalyserDriverIO, TAbstractBaseRegion
-        ],
+        controller: TElectronAnalyserController,
         region: TAbstractBaseRegion,
         name: str = "",
     ):
@@ -45,6 +106,9 @@ class ElectronAnalyserRegionDetector(
         await super().trigger()
 
 
+GenericElectronAnalyserRegionDetector = ElectronAnalyserRegionDetector[
+    GenericElectronAnalyserController, Region
+]
 TElectronAnalyserRegionDetector = TypeVar(
     "TElectronAnalyserRegionDetector",
     bound=ElectronAnalyserRegionDetector,
@@ -52,10 +116,10 @@ TElectronAnalyserRegionDetector = TypeVar(
 
 
 class ElectronAnalyserDetector(
-    BaseElectronAnalyserDetector[TAbstractAnalyserDriverIO, TAbstractBaseRegion],
+    BaseElectronAnalyserDetector[TElectronAnalyserController, TAbstractBaseRegion],
     Stageable,
     Generic[
-        TAbstractAnalyserDriverIO,
+        TElectronAnalyserController,
         TAbstractBaseSequence,
         TAbstractBaseRegion,
     ],
@@ -69,16 +133,12 @@ class ElectronAnalyserDetector(
     def __init__(
         self,
         sequence_class: type[TAbstractBaseSequence],
-        driver: TAbstractAnalyserDriverIO,
-        energy_source: AbstractEnergySource,
+        controller: TElectronAnalyserController,
         name: str = "",
     ):
         # Save driver as direct child so participates with connect()
-        self.driver = driver
+        self._controller = controller
         self._sequence_class = sequence_class
-        controller = ElectronAnalyserController[
-            TAbstractAnalyserDriverIO, TAbstractBaseRegion
-        ](driver=driver, energy_source=energy_source, deadtime=0)
         super().__init__(controller, name)
 
     @AsyncStatus.wrap
@@ -95,13 +155,11 @@ class ElectronAnalyserDetector(
             Any exceptions raised by the driver's stage or controller's disarm methods.
         """
         await self._controller.disarm()
-        await self.driver.stage()
 
     @AsyncStatus.wrap
     async def unstage(self) -> None:
         """Disarm the detector."""
         await self._controller.disarm()
-        await self.driver.unstage()
 
     def load_sequence(self, filename: str) -> TAbstractBaseSequence:
         """
@@ -118,7 +176,7 @@ class ElectronAnalyserDetector(
     def create_region_detector_list(
         self, filename: str, enabled_only=True
     ) -> list[
-        ElectronAnalyserRegionDetector[TAbstractAnalyserDriverIO, TAbstractBaseRegion]
+        ElectronAnalyserRegionDetector[TElectronAnalyserController, TAbstractBaseRegion]
     ]:
         """
         Create a list of detectors equal to the number of regions in a sequence file.
@@ -144,6 +202,9 @@ class ElectronAnalyserDetector(
         ]
 
 
+GenericElectronAnalyserDetector = ElectronAnalyserDetector[
+    GenericElectronAnalyserController, Sequence, Region
+]
 TElectronAnalyserDetector = TypeVar(
     "TElectronAnalyserDetector",
     bound=ElectronAnalyserDetector,
