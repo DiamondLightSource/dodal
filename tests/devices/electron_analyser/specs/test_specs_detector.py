@@ -2,7 +2,7 @@ import pytest
 from ophyd_async.core import init_devices, set_mock_value
 
 from dodal.devices.b07 import LensMode, PsuMode
-from dodal.devices.electron_analyser import EnergySource
+from dodal.devices.electron_analyser.base import EnergySource
 from dodal.devices.electron_analyser.specs import SpecsDetector
 from dodal.testing.electron_analyser import create_detector
 

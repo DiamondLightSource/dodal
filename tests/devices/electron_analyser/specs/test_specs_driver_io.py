@@ -13,7 +13,7 @@ from ophyd_async.testing import (
 )
 
 from dodal.devices.b07 import LensMode, PsuMode
-from dodal.devices.electron_analyser import EnergyMode
+from dodal.devices.electron_analyser.base import EnergyMode
 from dodal.devices.electron_analyser.base.base_enums import EnergyMode
 from dodal.devices.electron_analyser.specs import (
     AcquisitionMode,
