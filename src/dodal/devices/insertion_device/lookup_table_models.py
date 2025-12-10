@@ -300,8 +300,10 @@ def convert_csv_to_lookup(
 
     for row in reader:
         source = lut_config.source
+        # If there are multiple source only convert requested.
         if source is None or row[source.column] == source.value:
             process_row(row=row)
+    # Check if our LookupTable is empty after processing, raise error if it is.
     if not temp_mode_entries:
         raise RuntimeError(
             "LookupTable content is empty, failed to convert the file contents to "
