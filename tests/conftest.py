@@ -22,6 +22,7 @@ from dodal.device_manager import DeviceManager
 from dodal.devices.detector import DetectorParams
 from dodal.devices.detector.det_dim_constants import EIGER2_X_16M_SIZE
 from dodal.log import LOGGER, GELFTCPHandler, set_up_all_logging_handlers
+from dodal.testing import MockConfigServer
 from dodal.utils import (
     DeviceInitializationController,
     collect_factories,
@@ -175,3 +176,20 @@ def eiger_params(tmp_path: Path) -> DetectorParams:
 @pytest.fixture(autouse=True)
 def clear_cache():
     get_config_client.cache_clear()
+
+
+IMPLEMENTED_CONFIG_CLIENTS = []
+
+
+@pytest.fixture(autouse=True)
+def mock_config_server():
+    # Don't actually talk to central service during unit tests, and reset caches between test
+
+    for client in IMPLEMENTED_CONFIG_CLIENTS:
+        client.cache_clear()  # type: ignore - currently no option for "cachable" static type
+
+    with patch(
+        "daq_config_server.client.ConfigServer.get_file_contents",
+        side_effect=MockConfigServer().get_file_contents,
+    ):
+        yield
