@@ -5,8 +5,8 @@ TEST_DATA_PATH = Path(__file__).parent
 BAD_BEAMLINE_PARAMETERS = join(TEST_DATA_PATH, "bad_beamlineParameters")
 I04_BEAMLINE_PARAMETERS = join(TEST_DATA_PATH, "i04_beamlineParameters")
 TEST_BEAMLINE_PARAMETERS_TXT = join(TEST_DATA_PATH, "test_beamline_parameters.txt")
-TEST_DISPLAY_CONFIG = join(TEST_DATA_PATH, "test_display_configuration.json")
-TEST_OAV_ZOOM_LEVELS = join(TEST_DATA_PATH, "test_oav_zoom_levels.json")
+TEST_DISPLAY_CONFIG = "test_display.configuration"
+TEST_OAV_ZOOM_LEVELS = "jCameraManZoomLevels.xml"
 
 __all__ = [
     "BAD_BEAMLINE_PARAMETERS",
