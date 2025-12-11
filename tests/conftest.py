@@ -54,7 +54,7 @@ BANNED_PATHS = [Path("/dls"), Path("/dls_sw")]
 environ["DODAL_TEST_MODE"] = "true"
 
 
-# Add run_engine fixtures to be used in tests
+# Add run_engine and util fixtures to be used in tests
 pytest_plugins = ["dodal.testing.fixtures.run_engine", "dodal.testing.fixtures.utils"]
 
 
