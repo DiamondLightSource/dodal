@@ -20,6 +20,9 @@ dodal.devices.insertion\_device.lookup\_table\_models.EnergyCoverage
       ~EnergyCoverage.generate
       
       
+      ~EnergyCoverage.get_energy_index
+      
+      
       ~EnergyCoverage.get_poly
       
       

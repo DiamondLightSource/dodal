@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.insertion_device.lookup_table_models.EnergyCoverage &#8212; dodal 1.66.1.dev17+gdfd2eada3 documentation</title>
+    <title>dodal.devices.insertion_device.lookup_table_models.EnergyCoverage &#8212; dodal 1.67.1.dev1+gdaa78f35e documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=370ebd83"></script>
+    <script src="../../_static/documentation_options.js?v=035698da"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -1099,7 +1099,10 @@ validated to form a valid model.</p>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate</span></code>(min_energies, max_energies, ...)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#dodal.devices.insertion_device.lookup_table_models.EnergyCoverage.get_poly" title="dodal.devices.insertion_device.lookup_table_models.EnergyCoverage.get_poly"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_poly</span></code></a>(energy)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#dodal.devices.insertion_device.lookup_table_models.EnergyCoverage.get_energy_index" title="dodal.devices.insertion_device.lookup_table_models.EnergyCoverage.get_energy_index"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_energy_index</span></code></a>(energy)</p></td>
+<td><p>Binary search assumes self.energy_entries is sorted by min_energy.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dodal.devices.insertion_device.lookup_table_models.EnergyCoverage.get_poly" title="dodal.devices.insertion_device.lookup_table_models.EnergyCoverage.get_poly"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_poly</span></code></a>(energy)</p></td>
 <td><p>Return the numpy.poly1d polynomial applicable for the given energy.</p></td>
 </tr>
 </tbody>
@@ -1146,6 +1149,21 @@ validated to form a valid model.</p>
 </dd>
 </dl>
 </section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dodal.devices.insertion_device.lookup_table_models.EnergyCoverage.get_energy_index">
+<span class="sig-name descname"><span class="pre">get_energy_index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">energy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../_modules/dodal/devices/insertion_device/lookup_table_models.html#EnergyCoverage.get_energy_index"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.insertion_device.lookup_table_models.EnergyCoverage.get_energy_index" title="Link to this definition">#</a></dt>
+<dd><p>Binary search assumes self.energy_entries is sorted by min_energy.
+Return index or None if not found.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>energy</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -1201,6 +1219,7 @@ validated to form a valid model.</p>
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.insertion_device.lookup_table_models.EnergyCoverage"><code class="docutils literal notranslate"><span class="pre">EnergyCoverage</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.insertion_device.lookup_table_models.EnergyCoverage.get_poly"><code class="docutils literal notranslate"><span class="pre">EnergyCoverage.get_poly()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.insertion_device.lookup_table_models.EnergyCoverage.get_energy_index"><code class="docutils literal notranslate"><span class="pre">EnergyCoverage.get_energy_index()</span></code></a></li>
 </ul>
 </li>
 </ul>
