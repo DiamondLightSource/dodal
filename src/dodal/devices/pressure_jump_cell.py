@@ -11,6 +11,7 @@ from ophyd_async.core import (
     StandardReadable,
     StandardReadableFormat,
     StrictEnum,
+    set_and_wait_for_other_value,
     wait_for_value,
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
@@ -246,17 +247,14 @@ class PressureJumpCellController(StandardReadable, Movable, Stoppable):
         if isinstance(value, int):
             # Static press requested
             await self.target_pressure.set(value)
-            await self.go.set(True)
+            await set_and_wait_for_other_value(self.go, True, self.busy, True)
 
         elif isinstance(value, PressureJumpParameters):
             # Pressure jump requested
             await self.from_pressure.set(value.pressure_from)
             await self.to_pressure.set(value.pressure_to)
-            await self.set_jump.set(True)
-        else:
-            raise TypeError(f"Unsupported value type of {type(value)} provided.")
+            await set_and_wait_for_other_value(self.set_jump, True, self.busy, True)
 
-        await wait_for_value(self.busy, True, timeout)  # Change started
         await wait_for_value(self.busy, False, timeout)  # Change complete
 
     @AsyncStatus.wrap
