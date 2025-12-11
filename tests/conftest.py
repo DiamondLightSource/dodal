@@ -1,15 +1,12 @@
 import importlib
-import json
 import os
 from collections.abc import AsyncGenerator
 from pathlib import Path
 from types import ModuleType
-from typing import Any, TypeVar
 from unittest.mock import patch
 
 import pytest
 from ophyd_async.core import init_devices, set_mock_value
-from pydantic import BaseModel, TypeAdapter
 
 from conftest import mock_attributes_table
 from dodal.common.beamlines import beamline_parameters, beamline_utils
@@ -18,6 +15,7 @@ from dodal.device_manager import DeviceManager
 from dodal.devices.baton import Baton
 from dodal.devices.detector import DetectorParams
 from dodal.devices.detector.det_dim_constants import EIGER2_X_16M_SIZE
+from dodal.testing import MockConfigServer
 from dodal.utils import (
     DeviceInitializationController,
     collect_factories,
@@ -93,22 +91,6 @@ async def baton_in_commissioning_mode() -> AsyncGenerator[Baton]:
     set_commissioning_signal(None)
 
 
-def _fake_config_server_read(
-    filepath: str | Path,
-    desired_return_type: type[str] | type[dict] | BaseModel = str,
-):
-    filepath = Path(filepath)
-    # Minimal logic required for unit tests
-    with filepath.open("r") as f:
-        contents = f.read()
-        if desired_return_type is str:
-            return contents
-        elif desired_return_type is dict:
-            return json.loads(contents)
-        elif issubclass(desired_return_type, BaseModel):  # type: ignore
-            return desired_return_type.model_validate(json.loads(contents))
-
-
 IMPLEMENTED_CONFIG_CLIENTS = []
 
 
@@ -121,6 +103,6 @@ def mock_config_server():
 
     with patch(
         "daq_config_server.client.ConfigServer.get_file_contents",
-        side_effect=_fake_config_server_read,
+        side_effect=MockConfigServer().get_file_contents,
     ):
         yield
