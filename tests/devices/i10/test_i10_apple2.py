@@ -704,7 +704,7 @@ async def test_fail_i10_energy_motor_lookup_with_lookup_gap(
     mock_id_controller.gap_energy_motor_lut.update_lookup_table()
     # make gap in energy
     mock_id_controller.gap_energy_motor_lut.lut.root[Pol.LH] = EnergyCoverage(
-        energy_entries=[
+        energy_entries=(
             EnergyCoverageEntry(
                 min_energy=255.3,
                 max_energy=500,
@@ -715,7 +715,7 @@ async def test_fail_i10_energy_motor_lookup_with_lookup_gap(
                 max_energy=1000,
                 poly=poly1d([4.33435e-08, -7.52562e-05, 6.41791e-02, 3.88755e00]),
             ),
-        ]
+        )
     )
     with pytest.raises(ValueError) as e:
         await mock_id_controller.energy.set(555)
