@@ -6,43 +6,49 @@ from ophyd_async.epics.core import (
     epics_signal_r,
 )
 
-from dodal.devices.i04.max_pixel import convert_to_gray_and_blur
+from dodal.devices.oav.utils import convert_to_gray_and_blur
 from dodal.log import LOGGER
 
-# constant was chosen from trial and error with test images
-INC_BINARY_THRESH = 20
+# Constant was chosen from trial and error with test images
+ADDITIONAL_BINARY_THRESH = 20
 
 
-def binary_img(img, img_name="Threshold"):
+def binary_img(image: np.ndarray):
     """
      Creates a binary image from OAV image array data.
 
     Pixels of the input image are converted to one of two values (a high and a low value).
     Otsu's method is used for automatic thresholding.
     See https://docs.opencv.org/4.x/d7/d4d/tutorial_py_thresholding.html.
-    The threshold is increased by [constant name] (brightness taken from image in grayscale)
-    in order to get more of the centre of the beam.
+    The threshold is increased by ADDITIONAL_BINARY_THRESH in order to get more of
+    the centre of the beam.
     """
-    # convert to greyscale as not interested in information relating to colour and blur to eliminate rouge hot pixels
-    blurred = convert_to_gray_and_blur(img)
-    assert blurred is not None, "Image is None before thresholding"
+    max_pixel_value = 255
 
-    (thresh, thresh_img) = cv2.threshold(
-        blurred, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU
+    blurred_image = convert_to_gray_and_blur(image)
+
+    threshold_value, _ = cv2.threshold(
+        blurred_image, 0, max_pixel_value, cv2.THRESH_BINARY + cv2.THRESH_OTSU
     )
-    # adjusting because the inner beam is less noisy compared to the outer.
-    thresh += INC_BINARY_THRESH
 
-    thresh_img = cv2.threshold(blurred, thresh, 255, cv2.THRESH_BINARY)[1]
+    # Adjusting because the inner beam is less noisy compared to the outer
+    threshold_value += ADDITIONAL_BINARY_THRESH
 
-    LOGGER.info(f"Thresholding value (otsu with blur): {thresh}")
-    return thresh_img
+    _, thresholded_image = cv2.threshold(
+        blurred_image, threshold_value, max_pixel_value, cv2.THRESH_BINARY
+    )[1]
+
+    LOGGER.info(f"Image binarised with threshold of {threshold_value}")
+    return thresholded_image
 
 
 class CentreEllipseMethod(StandardReadable, Triggerable):
     """
-    Upon triggering, fits an ellipse to a binary image of the OAV. The scintillator should be in position when reading the image. The centre of the fitted ellipse is taken
-    to be the centre of the beam, and these pixel values are stored in the device.
+    Upon triggering, fits an ellipse to a binary image from the area detector defined by
+    the prefix.
+
+    This is used, in conjunction with a scintillator, to determine the centre of the beam
+    on the image.
     """
 
     def __init__(self, prefix: str, name: str = ""):
@@ -52,7 +58,7 @@ class CentreEllipseMethod(StandardReadable, Triggerable):
         self.center_y_val, self._center_y_val_setter = soft_signal_r_and_setter(float)
         super().__init__(name)
 
-    def fit_ellipse(self, binary_img: cv2.typing.MatLike) -> cv2.typing.RotatedRect:
+    def _fit_ellipse(self, binary_img: cv2.typing.MatLike) -> cv2.typing.RotatedRect:
         contours, _ = cv2.findContours(
             binary_img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE
         )
@@ -69,7 +75,7 @@ class CentreEllipseMethod(StandardReadable, Triggerable):
     async def trigger(self):
         array_data = await self.oav_array_signal.get_value()
         binary = binary_img(array_data)
-        ellipse_fit = self.fit_ellipse(binary)
+        ellipse_fit = self._fit_ellipse(binary)
         centre_x = ellipse_fit[0][0]
         centre_y = ellipse_fit[0][1]
         self._center_x_val_setter(centre_x)
