@@ -136,8 +136,6 @@ class ElectronAnalyserDetector(
         controller: TElectronAnalyserController,
         name: str = "",
     ):
-        # Save driver as direct child so participates with connect()
-        self._controller = controller
         self._sequence_class = sequence_class
         super().__init__(controller, name)
 
