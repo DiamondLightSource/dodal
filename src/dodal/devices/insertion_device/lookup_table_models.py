@@ -37,7 +37,6 @@ from pydantic import (
     RootModel,
     field_serializer,
     field_validator,
-    model_validator,
 )
 
 from dodal.devices.insertion_device.apple2_undulator import Pol
@@ -125,26 +124,13 @@ class EnergyCoverage(BaseModel):
     model_config = ConfigDict(frozen=True)
     energy_entries: tuple[EnergyCoverageEntry, ...]
 
-    @model_validator(mode="after")
-    def _validate_coverage_and_sort(self) -> Self:
-        """
-        Pydantic validator to ensure entries are sorted.
-        """
-        cls = type(self)
-
-        if not self.energy_entries:
-            return self
-        is_sorted = all(
-            self.energy_entries[i].min_energy <= self.energy_entries[i + 1].min_energy
-            for i in range(len(self.energy_entries) - 1)
-        )
-        if not is_sorted:
-            sorted_entries = tuple(
-                sorted(self.energy_entries, key=lambda e: e.min_energy)
-            )
-            return cls(energy_entries=sorted_entries)
-
-        return self
+    @field_validator("energy_entries", mode="before")
+    @classmethod
+    def _prepare_energy_entries(
+        cls, value: tuple[EnergyCoverageEntry, ...]
+    ) -> tuple[EnergyCoverageEntry, ...]:
+        """Convert incoming energy_entries to a sorted, immutable tuple."""
+        return tuple(sorted(value, key=lambda e: e.min_energy))
 
     @classmethod
     def generate(
