@@ -59,7 +59,7 @@ def analyser_controller(
     elif isinstance(sim_driver, VGScientaAnalyserDriverIO):
         energy_source = dual_energy_source
     else:
-        raise ValueError()
+        raise ValueError(f"sim_driver is of type {type(sim_driver)}.")
 
     return ElectronAnalyserController[AbstractAnalyserDriverIO, AbstractBaseRegion](
         sim_driver, energy_source, 0
