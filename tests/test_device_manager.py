@@ -714,6 +714,7 @@ def test_inherited_device_manager(dm: DeviceManager):
     s2.assert_called_once_with(s1())
     assert built_bar is s2(s1())
 
+
 def test_inherited_device_manager_duplicate_name():
     s1 = Mock(return_value=Mock(spec=OphydV2Device))
     s2 = Mock(return_value=Mock(spec=OphydV2Device))
