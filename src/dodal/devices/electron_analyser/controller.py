@@ -20,8 +20,8 @@ class ElectronAnalyserController(
 ):
     """
     Specialised controller for the electron analysers to provide additional setup logic
-    such as selecting the energy source to use from requested region, giving the driver
-    the correct region parameters and controlling shutters.
+    such as selecting the energy source to use from requested region and giving the
+    driver the correct region parameters.
     """
 
     def __init__(
