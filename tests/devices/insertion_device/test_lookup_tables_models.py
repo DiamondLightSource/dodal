@@ -3,6 +3,7 @@ import pytest
 
 from dodal.devices.insertion_device.apple2_undulator import Pol
 from dodal.devices.insertion_device.lookup_table_models import (
+    EnergyCoverage,
     LookupTable,
     LookupTableColumnConfig,
     convert_csv_to_lookup,
@@ -94,8 +95,6 @@ async def test_bad_file_contents_causes_convert_csv_to_lookup_fails(
 
 
 def test_energy_coverage_empty_entries_model_validate() -> None:
-    from dodal.devices.insertion_device.lookup_table_models import EnergyCoverage
-
     ec = EnergyCoverage(energy_entries=())
     validated = EnergyCoverage.model_validate(ec)
     assert isinstance(validated, EnergyCoverage)
@@ -103,8 +102,6 @@ def test_energy_coverage_empty_entries_model_validate() -> None:
 
 
 def test_energy_coverage_get_energy_index() -> None:
-    from dodal.devices.insertion_device.lookup_table_models import EnergyCoverage
-
     ec = EnergyCoverage.generate(
         min_energies=[300.0, 100.0, 200.0],
         max_energies=[400.0, 200.0, 300.0],
@@ -119,8 +116,6 @@ def test_energy_coverage_get_energy_index() -> None:
 
 
 def test_energy_coverage_get_energy_index_gap_returns_none() -> None:
-    from dodal.devices.insertion_device.lookup_table_models import EnergyCoverage
-
     ec = EnergyCoverage.generate(
         min_energies=[100.0, 160.0],
         max_energies=[150.0, 250.0],
