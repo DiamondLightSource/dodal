@@ -3,10 +3,6 @@ import bluesky.plan_stubs as bps
 from dodal.devices.pressure_jump_cell import PressureJumpCell, PressureJumpParameters
 
 
-def test():
-    yield from bps.wait()
-
-
 def set_pressure(pressure_cell: PressureJumpCell, pressure: int):
     """
     Sets the desired pressure waiting for the device to complete the operation.
