@@ -10,27 +10,24 @@ structure:
 
 {
   "POL_MODE": {
-    "energies": {
-      "<min_energy>": {
-        "low": <float>,
-        "high": <float>,
-        "poly": <numpy.poly1d>
-      },
+    "energy_entries": [
+        {
+            "low": <float>,
+            "high": <float>,
+            "poly": <numpy.poly1d>
+        },
       ...
-    },
-    "limit": {
-      "minimum": <float>,
-      "maximum": <float>
-    }
+    ]
   },
+  ...
 }
-
 """
 
 import csv
 import io
 from collections.abc import Generator
-from typing import Self
+from typing import Annotated as A
+from typing import Any, NamedTuple, Self
 
 import numpy as np
 from pydantic import (
@@ -73,24 +70,36 @@ DEFAULT_POLY1D_PARAMETERS = {
 }
 
 
-class LookupTableConfig(BaseModel):
-    source: tuple[str, str] | None = None
-    mode: str = "Mode"
-    min_energy: str = "MinEnergy"
-    max_energy: str = "MaxEnergy"
-    poly_deg: list[str] = Field(default_factory=lambda: DEFAULT_POLY_DEG)
-    mode_name_convert: dict[str, str] = Field(default_factory=lambda: MODE_NAME_CONVERT)
+class Source(NamedTuple):
+    column: str
+    value: str
 
 
-class EnergyMinMax(BaseModel):
-    minimum: float
-    maximum: float
+class LookupTableColumnConfig(BaseModel):
+    """Configuration on how to process a csv file columns into a LookupTable data model."""
+
+    source: A[
+        Source | None,
+        Field(
+            description="If not None, only process the row if the source column name match the value."
+        ),
+    ] = None
+    mode: A[str, Field(description="Polarisation mode column name.")] = "Mode"
+    min_energy: A[str, Field(description="Minimum energy column name.")] = "MinEnergy"
+    max_energy: A[str, Field(description="Maximum energy column name.")] = "MaxEnergy"
+    poly_deg: list[str] = Field(
+        description="Polynomial column names.", default_factory=lambda: DEFAULT_POLY_DEG
+    )
+    mode_name_convert: dict[str, str] = Field(
+        description="When processing polarisation mode values, map their alias values to a real value.",
+        default_factory=lambda: MODE_NAME_CONVERT,
+    )
 
 
 class EnergyCoverageEntry(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)  # So np.poly1d can be used.
-    low: float
-    high: float
+    min_energy: float
+    max_energy: float
     poly: np.poly1d
 
     @field_validator("poly", mode="before")
@@ -109,57 +118,86 @@ class EnergyCoverageEntry(BaseModel):
         return value.coefficients.tolist()
 
 
-class EnergyCoverage(RootModel[dict[float, EnergyCoverageEntry]]):
-    pass
-
-
-class LookupTableEntry(BaseModel):
-    energies: EnergyCoverage
-    limit: EnergyMinMax
+class EnergyCoverage(BaseModel):
+    energy_entries: list[EnergyCoverageEntry]
 
     @classmethod
     def generate(
-        cls: type[Self], min_energy: float, max_energy: float, poly1d_param: list[float]
+        cls: type[Self],
+        min_energies: list[float],
+        max_energies: list[float],
+        poly1d_params: list[list[float]],
     ) -> Self:
-        return cls(
-            energies=EnergyCoverage(
-                {
-                    min_energy: EnergyCoverageEntry(
-                        low=min_energy,
-                        high=max_energy,
-                        poly=np.poly1d(poly1d_param),
-                    )
-                }
-            ),
-            limit=EnergyMinMax(
-                minimum=float(min_energy),
-                maximum=float(max_energy),
-            ),
+        energy_entries = [
+            EnergyCoverageEntry(
+                min_energy=min_energy,
+                max_energy=max_energy,
+                poly=np.poly1d(poly_params),
+            )
+            for min_energy, max_energy, poly_params in zip(
+                min_energies, max_energies, poly1d_params, strict=True
+            )
+        ]
+        return cls(energy_entries=energy_entries)
+
+    @property
+    def min_energy(self) -> float:
+        return min(e.min_energy for e in self.energy_entries)
+
+    @property
+    def max_energy(self) -> float:
+        return max(e.max_energy for e in self.energy_entries)
+
+    def get_poly(self, energy: float) -> np.poly1d:
+        """
+        Return the numpy.poly1d polynomial applicable for the given energy.
+
+        Parameters:
+        -----------
+        energy:
+            Energy value in the same units used to create the lookup table.
+        """
+        # Cache initial values so don't do unnecessary work again
+        min_energy = self.min_energy
+        max_energy = self.max_energy
+        if energy < min_energy or energy > max_energy:
+            raise ValueError(
+                f"Demanding energy must lie between {min_energy} and {max_energy}!"
+            )
+        else:
+            for energy_coverage in self.energy_entries:
+                if (
+                    energy >= energy_coverage.min_energy
+                    and energy < energy_coverage.max_energy
+                ):
+                    return energy_coverage.poly
+        raise ValueError(
+            "Cannot find polynomial coefficients for your requested energy."
+            + " There might be gap in the calibration lookup table."
         )
 
 
-class LookupTable(RootModel[dict[Pol, LookupTableEntry]]):
+class LookupTable(RootModel[dict[Pol, EnergyCoverage]]):
+    """
+    Specialised lookup table for insertion devices to relate the energy and polarisation
+    values to Apple2 motor positions.
+    """
+
     # Allow to auto specify a dict if one not provided
-    def __init__(self, root: dict[Pol, LookupTableEntry] | None = None):
+    def __init__(self, root: dict[Pol, EnergyCoverage] | None = None):
         super().__init__(root=root or {})
 
     @classmethod
     def generate(
         cls: type[Self],
         pols: list[Pol],
-        min_energies: list[float],
-        max_energies: list[float],
-        poly1d_params: list[list[float]],
+        energy_coverage: list[EnergyCoverage],
     ) -> Self:
-        """Generate a LookupTable containing multiple LookupTableEntry
+        """Generate a LookupTable containing multiple EnergyCoverage
         for provided polarisations."""
         lut = cls()
         for i in range(len(pols)):
-            lut.root[pols[i]] = LookupTableEntry.generate(
-                min_energy=min_energies[i],
-                max_energy=max_energies[i],
-                poly1d_param=poly1d_params[i],
-            )
+            lut.root[pols[i]] = energy_coverage[i]
         return lut
 
     def get_poly(
@@ -177,29 +215,12 @@ class LookupTable(RootModel[dict[Pol, LookupTableEntry]]):
         pol:
             Polarisation mode (Pol enum).
         """
-        if (
-            energy < self.root[pol].limit.minimum
-            or energy > self.root[pol].limit.maximum
-        ):
-            raise ValueError(
-                "Demanding energy must lie between"
-                + f" {self.root[pol].limit.minimum}"
-                + f" and {self.root[pol].limit.maximum} eV!"
-            )
-        else:
-            for energy_range in self.root[pol].energies.root.values():
-                if energy >= energy_range.low and energy < energy_range.high:
-                    return energy_range.poly
-
-        raise ValueError(
-            "Cannot find polynomial coefficients for your requested energy."
-            + " There might be gap in the calibration lookup table."
-        )
+        return self.root[pol].get_poly(energy)
 
 
 def convert_csv_to_lookup(
     file_contents: str,
-    lut_config: LookupTableConfig,
+    lut_config: LookupTableColumnConfig,
     skip_line_start_with: str = "#",
 ) -> LookupTable:
     """
@@ -219,49 +240,33 @@ def convert_csv_to_lookup(
     LookupTable
     """
 
-    def process_row(row: dict, lut: LookupTable) -> None:
+    def process_row(row: dict[str, Any], lut: LookupTable) -> None:
         """Process a single row from the CSV file and update the lookup table."""
-        mode_value = str(row[lut_config.mode]).lower()
-        if mode_value in lut_config.mode_name_convert:
-            mode_value = lut_config.mode_name_convert[f"{mode_value}"]
-        mode_value = Pol(mode_value)
+        raw_mode_value = str(row[lut_config.mode]).lower()
+        mode_value = Pol(
+            lut_config.mode_name_convert.get(raw_mode_value, raw_mode_value)
+        )
 
         # Create polynomial object for energy-to-gap/phase conversion
-        coefficients = [float(row[coef]) for coef in lut_config.poly_deg]
-        if mode_value not in lut.root:
-            lut.root[mode_value] = LookupTableEntry.generate(
-                min_energy=float(row[lut_config.min_energy]),
-                max_energy=float(row[lut_config.max_energy]),
-                poly1d_param=coefficients,
-            )
-        else:
-            lut.root[mode_value].energies.root[float(row[lut_config.min_energy])] = (
-                EnergyCoverageEntry(
-                    low=float(row[lut_config.min_energy]),
-                    high=float(row[lut_config.max_energy]),
-                    poly=np.poly1d(coefficients),
-                )
-            )
+        coefficients = np.poly1d([float(row[coef]) for coef in lut_config.poly_deg])
 
-        # Update energy limits
-        lut.root[mode_value].limit.minimum = min(
-            lut.root[mode_value].limit.minimum,
-            float(row[lut_config.min_energy]),
+        energy_entry = EnergyCoverageEntry(
+            min_energy=float(row[lut_config.min_energy]),
+            max_energy=float(row[lut_config.max_energy]),
+            poly=coefficients,
         )
-        lut.root[mode_value].limit.maximum = max(
-            lut.root[mode_value].limit.maximum,
-            float(row[lut_config.max_energy]),
-        )
+        if mode_value not in lut.root:
+            lut.root[mode_value] = EnergyCoverage(energy_entries=[energy_entry])
+        else:
+            lut.root[mode_value].energy_entries.append(energy_entry)
 
     reader = csv.DictReader(read_file_and_skip(file_contents, skip_line_start_with))
     lut = LookupTable()
 
     for row in reader:
+        source = lut_config.source
         # If there are multiple source only convert requested.
-        if lut_config.source is not None:
-            if row[lut_config.source[0]] == lut_config.source[1]:
-                process_row(row=row, lut=lut)
-        else:
+        if source is None or row[source.column] == source.value:
             process_row(row=row, lut=lut)
 
     # Check if our LookupTable is empty after processing, raise error if it is.
