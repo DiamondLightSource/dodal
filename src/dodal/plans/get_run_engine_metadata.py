@@ -27,7 +27,6 @@ class _GetRunEngineMetaDataCallback(CallbackBase, Generic[T]):
                 f"Requested RunEngine metadata '{self.metadata_name}' could not be found"
             )
         try:
-            assert self.metadata
             self.metadata = self.expected_datatype(self.metadata)
         except Exception as e:
             raise TypeError(
