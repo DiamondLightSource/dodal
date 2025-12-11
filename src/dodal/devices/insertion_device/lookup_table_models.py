@@ -124,7 +124,7 @@ class EnergyCoverage(BaseModel):
     model_config = ConfigDict(frozen=True)
     energy_entries: tuple[EnergyCoverageEntry, ...]
 
-    @field_validator("energy_entries", mode="before")
+    @field_validator("energy_entries", mode="after")
     @classmethod
     def _prepare_energy_entries(
         cls, value: tuple[EnergyCoverageEntry, ...]
