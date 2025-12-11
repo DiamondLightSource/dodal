@@ -716,19 +716,15 @@ def test_inherited_device_manager(dm: DeviceManager):
 
 
 def test_inherited_device_manager_duplicate_name():
-    s1 = Mock(return_value=Mock(spec=OphydV2Device))
-    s2 = Mock(return_value=Mock(spec=OphydV2Device))
+    device = Mock(return_value=Mock(spec=OphydV2Device))
 
     dm = DeviceManager()
     dm2 = DeviceManager()
 
     @dm.factory
-    def foo():
-        return s1()
-
     @dm2.factory
     def foo():
-        return s2()
+        return device()
 
     with pytest.raises(ValueError, match="{'foo'}"):
         dm.include(dm2)
