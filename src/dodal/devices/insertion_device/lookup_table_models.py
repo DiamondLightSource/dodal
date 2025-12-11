@@ -207,6 +207,7 @@ class LookupTable(RootModel[dict[Pol, EnergyCoverage]]):
 
     model_config = ConfigDict(frozen=True)
 
+    # Allow to auto specify a dict if one not provided
     def __init__(self, root: dict[Pol, EnergyCoverage] | None = None):
         super().__init__(root=root or {})
 
