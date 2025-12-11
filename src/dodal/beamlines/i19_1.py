@@ -8,9 +8,12 @@ from dodal.devices.i19.access_controlled.attenuator_motor_squad import (
     AttenuatorMotorSquad,
 )
 from dodal.devices.i19.access_controlled.blueapi_device import HutchState
+from dodal.devices.i19.access_controlled.piezo_control import (
+    AccessControlledPiezoActuator,
+    FocusingMirrorType,
+)
 from dodal.devices.i19.access_controlled.shutter import (
     AccessControlledShutter,
-    HutchState,
 )
 from dodal.devices.i19.beamstop import BeamStop
 from dodal.devices.oav.oav_detector import OAVBeamCentreFile
@@ -100,4 +103,30 @@ def zebra() -> Zebra:
     return Zebra(
         mapping=I19_1_ZEBRA_MAPPING,
         prefix=f"{PREFIX.beamline_prefix}-EA-ZEBRA-02:",
+    )
+
+
+@device_factory()
+def hfm_piezo() -> AccessControlledPiezoActuator:
+    """Get the i19-1 access controlled hfm piezo device, instantiate it if it hasn't already been.
+    If this is called when already instantiated, it will return the existing object.
+    """
+    return AccessControlledPiezoActuator(
+        prefix=f"{PREFIX.beamline_prefix}-OP-HFM-01:",
+        mirror_type=FocusingMirrorType.HFM,
+        hutch=HutchState.EH1,
+        instrument_session=I19_1_COMMISSIONING_INSTR_SESSION,
+    )
+
+
+@device_factory()
+def vfm_piezo() -> AccessControlledPiezoActuator:
+    """Get the i19-1 access controlled vfm piezo device, instantiate it if it hasn't already been.
+    If this is called when already instantiated, it will return the existing object.
+    """
+    return AccessControlledPiezoActuator(
+        prefix=f"{PREFIX.beamline_prefix}-OP-VFM-01:",
+        mirror_type=FocusingMirrorType.VFM,
+        hutch=HutchState.EH1,
+        instrument_session=I19_1_COMMISSIONING_INSTR_SESSION,
     )

@@ -39,7 +39,7 @@ def access_control() -> HutchAccessControl:
 
 @device_factory()
 def vfm() -> FocusingMirrorWithPiezo:
-    """Get a device that checks the active hutch for i19, instantiate it if it hasn't already been.
+    """Get the i19 vfm device, instantiate it if it hasn't already been.
     If this is called when already instantiated, it will return the existing object.
     """
     return FocusingMirrorWithPiezo(f"{PREFIX.beamline_prefix}-OP-VFM-01:")
@@ -47,7 +47,7 @@ def vfm() -> FocusingMirrorWithPiezo:
 
 @device_factory()
 def hfm() -> FocusingMirrorWithPiezo:
-    """Get a device that checks the active hutch for i19, instantiate it if it hasn't already been.
+    """Get the i19 hfm device, instantiate it if it hasn't already been.
     If this is called when already instantiated, it will return the existing object.
     """
     return FocusingMirrorWithPiezo(f"{PREFIX.beamline_prefix}-OP-HFM-01:")
