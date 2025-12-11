@@ -100,7 +100,7 @@ class LookupTableColumnConfig(BaseModel):
 class EnergyCoverageEntry(BaseModel):
     model_config = ConfigDict(
         arbitrary_types_allowed=True, frozen=True
-    )  # So np.poly1d can be used.
+    )  # arbitrary_types_allowed is True so np.poly1d can be used.
     min_energy: float
     max_energy: float
     poly: np.poly1d
