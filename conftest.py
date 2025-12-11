@@ -5,11 +5,7 @@ from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
-from ophyd.status import Status
-from ophyd_async.core import (
-    PathInfo,
-    PathProvider,
-)
+from ophyd_async.core import PathProvider
 from tests.devices.i10.test_data import LOOKUP_TABLE_PATH
 from tests.devices.test_daq_configuration import MOCK_DAQ_CONFIG_PATH
 from tests.test_data import (
@@ -83,12 +79,6 @@ def pytest_runtest_teardown():
         sys.modules["dodal.beamlines.beamline_utils"].clear_devices()
 
 
-PATH_INFO_FOR_TESTING: PathInfo = PathInfo(
-    directory_path=Path("/does/not/exist"),
-    filename="on_this_filesystem",
-)
-
-
 @pytest.fixture
 def dummy_visit_client() -> DirectoryServiceClient:
     return LocalDirectoryServiceClient()
@@ -103,9 +93,3 @@ async def static_path_provider(
     )
     await svpp.update()
     return svpp
-
-
-def failed_status(failure: Exception) -> Status:
-    status = Status()
-    status.set_exception(failure)
-    return status
