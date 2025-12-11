@@ -10,7 +10,6 @@ from unittest.mock import MagicMock, patch
 import pytest
 from ophyd_async.core import PathProvider
 
-from conftest import mock_attributes_table
 from dodal.common.beamlines import beamline_parameters, beamline_utils
 from dodal.common.visit import (
     DirectoryServiceClient,
@@ -35,20 +34,20 @@ from tests.test_data import (
     TEST_OAV_ZOOM_LEVELS_XML,
 )
 
-mock_paths = [
+MOCK_PATHS = [
     ("DAQ_CONFIGURATION_PATH", MOCK_DAQ_CONFIG_PATH),
     ("ZOOM_PARAMS_FILE", TEST_OAV_ZOOM_LEVELS_XML),
     ("DISPLAY_CONFIG", TEST_DISPLAY_CONFIG),
     ("LOOK_UPTABLE_DIR", LOOKUP_TABLE_PATH),
 ]
-mock_attributes_table = {
-    "i03": mock_paths,
-    "i10_optics": mock_paths,
-    "i04": mock_paths,
-    "s04": mock_paths,
-    "i19_1": mock_paths,
-    "i24": mock_paths,
-    "aithre": mock_paths,
+MOCK_ATTRIBUTES_TABLE = {
+    "i03": MOCK_PATHS,
+    "i10_optics": MOCK_PATHS,
+    "i04": MOCK_PATHS,
+    "s04": MOCK_PATHS,
+    "i19_1": MOCK_PATHS,
+    "i24": MOCK_PATHS,
+    "aithre": MOCK_PATHS,
 }
 
 BANNED_PATHS = [Path("/dls"), Path("/dls_sw")]
@@ -138,7 +137,7 @@ def module_and_devices_for_beamline(request: pytest.FixtureRequest):
 
 
 def mock_beamline_module_filepaths(bl_name: str, bl_module: ModuleType):
-    if mock_attributes := mock_attributes_table.get(bl_name):
+    if mock_attributes := MOCK_ATTRIBUTES_TABLE.get(bl_name):
         [bl_module.__setattr__(attr[0], attr[1]) for attr in mock_attributes]
         beamline_parameters.BEAMLINE_PARAMETER_PATHS[bl_name] = I04_BEAMLINE_PARAMETERS
 
