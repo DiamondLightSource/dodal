@@ -3,23 +3,19 @@ dodal.devices.electron\_analyser
 
 
 
-
-
-
-
-.. currentmodule:: dodal.devices
-.. rubric:: Classes
+.. rubric:: Modules
 
 .. autosummary::
    :toctree:
    :recursive:
 
-   ~electron_analyser.DualEnergySource
-   ~electron_analyser.SelectedSource
-   ~electron_analyser.EnergySource
-   ~electron_analyser.EnergyMode
-   ~electron_analyser.ElectronAnalyserDetector
-   ~electron_analyser.ElectronAnalyserRegionDetector
+   dodal.devices.electron_analyser.base
+   dodal.devices.electron_analyser.specs
+   dodal.devices.electron_analyser.vgscienta
+
+
+
+
 
 
 
@@ -33,13 +29,6 @@ dodal.devices.electron\_analyser
    
 
    
-   
-   .. rubric:: Functions
-
-   .. autosummary::
-   
-      to_binding_energy
-      to_kinetic_energy
    
    
 

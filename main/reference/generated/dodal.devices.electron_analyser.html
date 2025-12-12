@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.electron_analyser &#8212; dodal 1.67.1.dev2+g9036aff96 documentation</title>
+    <title>dodal.devices.electron_analyser &#8212; dodal 1.67.1.dev3+gf8d8a2b72 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=624cbd70"></script>
+    <script src="../../_static/documentation_options.js?v=309872ca"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -58,7 +58,7 @@
     <link rel="icon" href="../../_static/dls-logo.svg"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="dodal.devices.electron_analyser.DualEnergySource" href="dodal.devices.electron_analyser.DualEnergySource.html" />
+    <link rel="next" title="dodal.devices.electron_analyser.base" href="dodal.devices.electron_analyser.base.html" />
     <link rel="prev" title="dodal.devices.eiger_odin.OdinNodesStatus" href="dodal.devices.eiger_odin.OdinNodesStatus.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -591,12 +591,9 @@
 </ul>
 </details></li>
 <li class="toctree-l3 current active has-children"><a class="current reference internal" href="#">dodal.devices.electron_analyser</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.electron_analyser.DualEnergySource.html">dodal.devices.electron_analyser.DualEnergySource</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.electron_analyser.SelectedSource.html">dodal.devices.electron_analyser.SelectedSource</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.electron_analyser.EnergySource.html">dodal.devices.electron_analyser.EnergySource</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.electron_analyser.EnergyMode.html">dodal.devices.electron_analyser.EnergyMode</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.electron_analyser.ElectronAnalyserDetector.html">dodal.devices.electron_analyser.ElectronAnalyserDetector</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.electron_analyser.ElectronAnalyserRegionDetector.html">dodal.devices.electron_analyser.ElectronAnalyserRegionDetector</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.electron_analyser.base.html">dodal.devices.electron_analyser.base</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.electron_analyser.specs.html">dodal.devices.electron_analyser.specs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.electron_analyser.vgscienta.html">dodal.devices.electron_analyser.vgscienta</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.eurotherm.html">dodal.devices.eurotherm</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -1075,91 +1072,22 @@
                   
   <section id="dodal-devices-electron-analyser">
 <h1>dodal.devices.electron_analyser<a class="headerlink" href="#dodal-devices-electron-analyser" title="Link to this heading">#</a></h1>
-<p class="rubric">Classes</p>
+<p class="rubric">Modules</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.electron_analyser.DualEnergySource.html#dodal.devices.electron_analyser.DualEnergySource" title="dodal.devices.electron_analyser.DualEnergySource"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DualEnergySource</span></code></a></p></td>
-<td><p>Holds two EnergySource devices and provides a signal to read energy depending on which source is selected.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.electron_analyser.SelectedSource.html#dodal.devices.electron_analyser.SelectedSource" title="dodal.devices.electron_analyser.SelectedSource"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SelectedSource</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.electron_analyser.base.html#module-dodal.devices.electron_analyser.base" title="dodal.devices.electron_analyser.base"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dodal.devices.electron_analyser.base</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.electron_analyser.EnergySource.html#dodal.devices.electron_analyser.EnergySource" title="dodal.devices.electron_analyser.EnergySource"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EnergySource</span></code></a></p></td>
-<td><p>Wraps a signal that relates to energy and provides common interface via energy signal.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.electron_analyser.EnergyMode.html#dodal.devices.electron_analyser.EnergyMode" title="dodal.devices.electron_analyser.EnergyMode"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EnergyMode</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.electron_analyser.specs.html#module-dodal.devices.electron_analyser.specs" title="dodal.devices.electron_analyser.specs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dodal.devices.electron_analyser.specs</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.electron_analyser.ElectronAnalyserDetector.html#dodal.devices.electron_analyser.ElectronAnalyserDetector" title="dodal.devices.electron_analyser.ElectronAnalyserDetector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ElectronAnalyserDetector</span></code></a></p></td>
-<td><p>Electron analyser detector with the additional functionality to load a sequence file and create a list of temporary ElectronAnalyserRegionDetector objects.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.electron_analyser.ElectronAnalyserRegionDetector.html#dodal.devices.electron_analyser.ElectronAnalyserRegionDetector" title="dodal.devices.electron_analyser.ElectronAnalyserRegionDetector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ElectronAnalyserRegionDetector</span></code></a></p></td>
-<td><p>Extends electron analyser detector to configure specific region settings before data acquisition.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.electron_analyser.vgscienta.html#module-dodal.devices.electron_analyser.vgscienta" title="dodal.devices.electron_analyser.vgscienta"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dodal.devices.electron_analyser.vgscienta</span></code></a></p></td>
+<td><p></p></td>
 </tr>
 </tbody>
 </table>
 </div>
-<p class="rubric" id="module-dodal.devices.electron_analyser">Functions</p>
-<div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#dodal.devices.electron_analyser.to_binding_energy" title="dodal.devices.electron_analyser.to_binding_energy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_binding_energy</span></code></a>(value, value_mode, ...)</p></td>
-<td><p>Convert a value that is kinetic energy to binding energy. :type value: <span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span> :param value: The value to convert. :type value_mode: <span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="dodal.devices.electron_analyser.EnergyMode.html#dodal.devices.electron_analyser.EnergyMode" title="dodal.devices.electron_analyser.enums.EnergyMode"><code class="xref py py-class docutils literal notranslate"><span class="pre">EnergyMode</span></code></a></span> :param value_mode: Energy mode of the value. If it is already binding, return the                    same value. If it is kinetic, convert to binding. :type excitation_energy: <span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span> :param excitation_energy: Value to calculate the conversion.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#dodal.devices.electron_analyser.to_kinetic_energy" title="dodal.devices.electron_analyser.to_kinetic_energy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_kinetic_energy</span></code></a>(value, value_mode, ...)</p></td>
-<td><p>Convert a value that is binding energy to kinetic energy. :type value: <span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span> :param value: The value to convert. :type value_mode: <span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="dodal.devices.electron_analyser.EnergyMode.html#dodal.devices.electron_analyser.EnergyMode" title="dodal.devices.electron_analyser.enums.EnergyMode"><code class="xref py py-class docutils literal notranslate"><span class="pre">EnergyMode</span></code></a></span> :param value_mode: Energy mode of the value. If it is already kinetic, return the                    same value. If it is binding, convert to kinetic. :type excitation_energy: <span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span> :param excitation_energy: Value to calculate the conversion.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<dl class="py function">
-<dt class="sig sig-object py" id="dodal.devices.electron_analyser.to_binding_energy">
-<span class="sig-prename descclassname"><span class="pre">dodal.devices.electron_analyser.</span></span><span class="sig-name descname"><span class="pre">to_binding_energy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">value_mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="dodal.devices.electron_analyser.EnergyMode.html#dodal.devices.electron_analyser.EnergyMode" title="dodal.devices.electron_analyser.enums.EnergyMode"><span class="pre">EnergyMode</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">excitation_energy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></span><a class="reference internal" href="../../_modules/dodal/devices/electron_analyser/util.html#to_binding_energy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.electron_analyser.to_binding_energy" title="Link to this definition">#</a></dt>
-<dd><p>Convert a value that is kinetic energy to binding energy.
-:type value: <span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>
-:param value: The value to convert.
-:type value_mode: <span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="dodal.devices.electron_analyser.EnergyMode.html#dodal.devices.electron_analyser.EnergyMode" title="dodal.devices.electron_analyser.enums.EnergyMode"><code class="xref py py-class docutils literal notranslate"><span class="pre">EnergyMode</span></code></a></span>
-:param value_mode: Energy mode of the value. If it is already binding, return the</p>
-<blockquote>
-<div><p>same value. If it is kinetic, convert to binding.</p>
-</div></blockquote>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>excitation_energy</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>) – Value to calculate the conversion.</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span></p>
-</dd>
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Caluclated binding energy value</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="dodal.devices.electron_analyser.to_kinetic_energy">
-<span class="sig-prename descclassname"><span class="pre">dodal.devices.electron_analyser.</span></span><span class="sig-name descname"><span class="pre">to_kinetic_energy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">value_mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="dodal.devices.electron_analyser.EnergyMode.html#dodal.devices.electron_analyser.EnergyMode" title="dodal.devices.electron_analyser.enums.EnergyMode"><span class="pre">EnergyMode</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">excitation_energy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></span><a class="reference internal" href="../../_modules/dodal/devices/electron_analyser/util.html#to_kinetic_energy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.electron_analyser.to_kinetic_energy" title="Link to this definition">#</a></dt>
-<dd><p>Convert a value that is binding energy to kinetic energy.
-:type value: <span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>
-:param value: The value to convert.
-:type value_mode: <span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="dodal.devices.electron_analyser.EnergyMode.html#dodal.devices.electron_analyser.EnergyMode" title="dodal.devices.electron_analyser.enums.EnergyMode"><code class="xref py py-class docutils literal notranslate"><span class="pre">EnergyMode</span></code></a></span>
-:param value_mode: Energy mode of the value. If it is already kinetic, return the</p>
-<blockquote>
-<div><p>same value. If it is binding, convert to kinetic.</p>
-</div></blockquote>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>excitation_energy</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>) – Value to calculate the conversion.</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span></p>
-</dd>
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Caluclated kinetic energy value</p>
-</dd>
-</dl>
-</dd></dl>
-
-</section>
+<span class="target" id="module-dodal.devices.electron_analyser"></span></section>
 
 
                 </article>
@@ -1181,11 +1109,11 @@
       </div>
     </a>
     <a class="right-next"
-       href="dodal.devices.electron_analyser.DualEnergySource.html"
+       href="dodal.devices.electron_analyser.base.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">dodal.devices.electron_analyser.DualEnergySource</p>
+        <p class="prev-next-title">dodal.devices.electron_analyser.base</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -1199,19 +1127,6 @@
                 <dialog id="pst-secondary-sidebar-modal"></dialog>
                 <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
 
-
-  <div class="sidebar-secondary-item">
-<div
-    id="pst-page-navigation-heading-2"
-    class="page-toc tocsection onthispage">
-    <i class="fa-solid fa-list"></i> On this page
-  </div>
-  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
-    <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.electron_analyser.to_binding_energy"><code class="docutils literal notranslate"><span class="pre">to_binding_energy()</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.electron_analyser.to_kinetic_energy"><code class="docutils literal notranslate"><span class="pre">to_kinetic_energy()</span></code></a></li>
-</ul>
-  </nav></div>
 
   <div class="sidebar-secondary-item">
 

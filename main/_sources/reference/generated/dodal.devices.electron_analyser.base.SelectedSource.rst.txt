@@ -1,0 +1,78 @@
+dodal.devices.electron\_analyser.base.SelectedSource
+====================================================
+
+.. currentmodule:: dodal.devices.electron_analyser.base
+
+.. autoclass:: SelectedSource
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~SelectedSource.SOURCE1
+      
+      
+      ~SelectedSource.SOURCE2
+      
+   
+   
