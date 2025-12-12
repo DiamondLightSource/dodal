@@ -29,6 +29,8 @@ class SpecsDetector(
         name: str = "",
     ):
         driver = SpecsAnalyserDriverIO[TLensMode, TPsuMode](
-            prefix, lens_mode_type, psu_mode_type, energy_source
+            prefix, lens_mode_type, psu_mode_type
         )
-        super().__init__(SpecsSequence[lens_mode_type, psu_mode_type], driver, name)
+        super().__init__(
+            SpecsSequence[lens_mode_type, psu_mode_type], driver, energy_source, name
+        )

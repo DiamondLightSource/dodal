@@ -7,12 +7,14 @@ from ophyd_async.core import (
     AsyncReadable,
     AsyncStatus,
     Device,
+    TriggerInfo,
 )
-from ophyd_async.epics.adcore import ADBaseController
 
 from dodal.devices.electron_analyser.abstract.base_driver_io import (
     TAbstractAnalyserDriverIO,
 )
+from dodal.devices.electron_analyser.abstract.base_region import TAbstractBaseRegion
+from dodal.devices.electron_analyser.controller import ElectronAnalyserController
 
 
 class BaseElectronAnalyserDetector(
@@ -20,7 +22,7 @@ class BaseElectronAnalyserDetector(
     Triggerable,
     AsyncReadable,
     AsyncConfigurable,
-    Generic[TAbstractAnalyserDriverIO],
+    Generic[TAbstractAnalyserDriverIO, TAbstractBaseRegion],
 ):
     """
     Detector for data acquisition of electron analyser. Can only acquire using settings
@@ -33,14 +35,21 @@ class BaseElectronAnalyserDetector(
 
     def __init__(
         self,
-        controller: ADBaseController[TAbstractAnalyserDriverIO],
+        controller: ElectronAnalyserController[
+            TAbstractAnalyserDriverIO, TAbstractBaseRegion
+        ],
         name: str = "",
     ):
         self._controller = controller
         super().__init__(name)
 
     @AsyncStatus.wrap
+    async def set(self, region: TAbstractBaseRegion) -> None:
+        await self._controller.setup_with_region(region)
+
+    @AsyncStatus.wrap
     async def trigger(self) -> None:
+        await self._controller.prepare(TriggerInfo())
         await self._controller.arm()
         await self._controller.wait_for_idle()
 
