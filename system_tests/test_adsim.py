@@ -85,7 +85,7 @@ def sim_stage() -> Generator[XThetaStage]:
 @pytest.mark.parametrize("num, shape", ([1, (1,)], [3, (3,)]))
 def test_plan_produces_expected_start_document(
     num: int,
-    shape: list[int],
+    shape: tuple[int, ...],
     run_engine: RunEngine,
     run_engine_documents: Mapping[str, list[DocumentType]],
     det: StandardDetector,
