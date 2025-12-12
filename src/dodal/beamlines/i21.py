@@ -7,9 +7,6 @@ from dodal.common.beamlines.beamline_utils import (
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.devices.i21 import (
-    I21_GAP_POLY_DEG_COLUMNS,
-    I21_GRATING_COLUMNS,
-    I21_PHASE_POLY_DEG_COLUMNS,
     Grating,
 )
 from dodal.devices.insertion_device import (
@@ -35,6 +32,8 @@ PREFIX = BeamlinePrefix(BL)
 set_log_beamline(BL)
 set_utils_beamline(BL)
 
+I21_PHASE_POLY_DEG_COLUMNS = ["b"]
+I21_GRATING_COLUMNS = "Grating"
 
 I21_CONF_CLIENT = ConfigServer(url="https://daq-config.diamond.ac.uk")
 LOOK_UPTABLE_DIR = "/dls_sw/i21/software/gda/workspace_git/gda-diamond.git/configurations/i21-config/lookupTables/"
@@ -86,7 +85,7 @@ def id_controller() -> Apple2EnforceLHMoveController:
     return Apple2EnforceLHMoveController(
         apple2=id(),
         gap_energy_motor_lut=ConfigServerEnergyMotorLookup(
-            lut_config=LookupTableColumnConfig(poly_deg=I21_GAP_POLY_DEG_COLUMNS),
+            lut_config=LookupTableColumnConfig(),
             config_client=I21_CONF_CLIENT,
             path=Path(LOOK_UPTABLE_DIR, GAP_LOOKUP_FILE_NAME),
         ),
