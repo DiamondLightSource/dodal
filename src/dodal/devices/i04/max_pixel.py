@@ -1,3 +1,5 @@
+import asyncio
+
 import cv2
 import numpy as np
 from bluesky.protocols import Triggerable
@@ -19,20 +21,23 @@ class MaxPixel(StandardReadable, Triggerable):
         self.max_pixel_val, self._max_val_setter = soft_signal_r_and_setter(float)
         super().__init__(name)
 
-    async def _convert_to_gray_and_blur(self):
-        """
-        Preprocess the image array data (convert to grayscale and apply a gaussian blur)
-        Image is converted to grayscale (using a weighted mean as green contributes more to brightness)
-        as we aren't interested in data relating to colour. A blur is then applied to mitigate
-        errors due to rogue hot pixels.
-        """
-        data = await self.array_data.get_value()
-        gray_arr = cv2.cvtColor(data, cv2.COLOR_BGR2GRAY)
-        return cv2.GaussianBlur(gray_arr, KERNAL_SIZE, 0)
-
     @AsyncStatus.wrap
     async def trigger(self):
-        arr = await self._convert_to_gray_and_blur()
+        await asyncio.sleep(0.5)
+        img_data = await self.array_data.get_value()
+        arr = convert_to_gray_and_blur(img_data)
         max_val = float(np.max(arr))  # np.int64
         assert isinstance(max_val, float)
         self._max_val_setter(max_val)
+
+
+def convert_to_gray_and_blur(data: cv2.typing.MatLike) -> cv2.typing.MatLike:
+    """
+    Preprocess the image array data (convert to grayscale and apply a gaussian blur)
+    Image is converted to grayscale (using a weighted mean as green contributes more to brightness)
+    as we aren't interested in data relating to colour. A blur is then applied to mitigate
+    errors due to rogue hot pixels.
+    """
+    # data = await self.array_data.get_value()
+    gray_arr = cv2.cvtColor(data, cv2.COLOR_BGR2GRAY)
+    return cv2.GaussianBlur(gray_arr, KERNAL_SIZE, 0)
