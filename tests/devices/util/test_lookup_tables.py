@@ -27,18 +27,6 @@ async def test_energy_to_distance_table_correct_format():
     assert table.shape == (50, 2)
 
 
-@mark.parametrize(
-    "lut_path, num_columns",
-    [(TEST_BEAMLINE_DCM_ROLL_CONVERTER_TXT, 2), (TEST_DET_DIST_CONVERTER_LUT, 3)],
-)
-def test_parse_lookup_table_returns_list_of_the_same_length_as_num_of_columns(
-    lut_path, num_columns
-):
-    lut_values = parse_lookup_table(lut_path)
-
-    assert isinstance(lut_values, list) and len(lut_values) == num_columns
-
-
 @mark.parametrize("s, expected_t", [(2.0, 1.0), (3.0, 1.5), (5.0, 4.0), (5.25, 6.0)])
 def test_linear_interpolation(s, expected_t):
     lut_converter = linear_interpolation_lut(
