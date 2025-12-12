@@ -4,15 +4,15 @@ import pytest
 from ophyd_async.core import TriggerInfo, get_mock_put, init_devices
 
 from dodal.beamlines import b07, i09
-from dodal.devices.electron_analyser import (
+from dodal.devices.electron_analyser.base import (
+    AbstractAnalyserDriverIO,
+    AbstractBaseRegion,
     DualEnergySource,
     EnergySource,
 )
-from dodal.devices.electron_analyser.abstract import (
-    AbstractAnalyserDriverIO,
-    AbstractBaseRegion,
+from dodal.devices.electron_analyser.base.base_controller import (
+    ElectronAnalyserController,
 )
-from dodal.devices.electron_analyser.controller import ElectronAnalyserController
 from dodal.devices.electron_analyser.specs import SpecsAnalyserDriverIO
 from dodal.devices.electron_analyser.vgscienta import (
     VGScientaAnalyserDriverIO,
@@ -34,7 +34,7 @@ async def sim_driver(
     request: pytest.FixtureRequest,
 ) -> AbstractAnalyserDriverIO:
     async with init_devices(mock=True):
-        sim_detector = await create_driver(
+        sim_detector = create_driver(
             request.param,
             prefix="TEST:",
         )
