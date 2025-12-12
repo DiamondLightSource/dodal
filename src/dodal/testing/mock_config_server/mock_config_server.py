@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Any
 
 from daq_config_server.client import ConfigServer
-from daq_config_server.converters.models import (
+from daq_config_server.models import (
     ConfigModel,
 )
 

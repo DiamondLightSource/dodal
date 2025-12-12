@@ -1,4 +1,4 @@
-from daq_config_server.converters.models import (
+from daq_config_server.models import (
     DisplayConfig,
     DisplayConfigData,
 )
