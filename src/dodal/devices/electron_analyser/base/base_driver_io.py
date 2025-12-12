@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Generic, TypeVar
+from typing import Generic, TypeAlias, TypeVar
 
 import numpy as np
 from bluesky.protocols import Movable
@@ -9,23 +9,29 @@ from ophyd_async.core import (
     SignalR,
     StandardReadable,
     StandardReadableFormat,
+    StrictEnum,
+    SupersetEnum,
     derived_signal_r,
     soft_signal_rw,
 )
 from ophyd_async.epics.adcore import ADBaseIO
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
-from dodal.devices.electron_analyser.abstract.base_region import (
+from dodal.devices.electron_analyser.base.base_enums import EnergyMode
+from dodal.devices.electron_analyser.base.base_region import (
+    AnyAcqMode,
+    AnyLensMode,
+    AnyPassEnergy,
+    GenericRegion,
     TAbstractBaseRegion,
-)
-from dodal.devices.electron_analyser.abstract.types import (
     TAcquisitionMode,
     TLensMode,
     TPassEnergy,
-    TPsuMode,
 )
-from dodal.devices.electron_analyser.enums import EnergyMode
-from dodal.devices.electron_analyser.util import to_binding_energy
+from dodal.devices.electron_analyser.base.base_util import to_binding_energy
+
+AnyPsuMode: TypeAlias = SupersetEnum | StrictEnum
+TPsuMode = TypeVar("TPsuMode", bound=AnyPsuMode)
 
 
 class AbstractAnalyserDriverIO(
@@ -217,6 +223,9 @@ class AbstractAnalyserDriverIO(
         return float(np.sum(spectrum, dtype=np.float64))
 
 
+GenericAnalyserDriverIO = AbstractAnalyserDriverIO[
+    GenericRegion, AnyAcqMode, AnyLensMode, AnyPsuMode, AnyPassEnergy
+]
 TAbstractAnalyserDriverIO = TypeVar(
     "TAbstractAnalyserDriverIO", bound=AbstractAnalyserDriverIO
 )

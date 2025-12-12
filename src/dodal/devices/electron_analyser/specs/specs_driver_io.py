@@ -11,12 +11,12 @@ from ophyd_async.core import (
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
-from dodal.devices.electron_analyser.abstract.base_driver_io import (
+from dodal.devices.electron_analyser.base.base_driver_io import (
     AbstractAnalyserDriverIO,
 )
-from dodal.devices.electron_analyser.abstract.types import TLensMode, TPsuMode
-from dodal.devices.electron_analyser.specs.enums import AcquisitionMode
-from dodal.devices.electron_analyser.specs.region import SpecsRegion
+from dodal.devices.electron_analyser.base.base_region import TLensMode, TPsuMode
+from dodal.devices.electron_analyser.specs.specs_enums import AcquisitionMode
+from dodal.devices.electron_analyser.specs.specs_region import SpecsRegion
 
 
 class SpecsAnalyserDriverIO(
