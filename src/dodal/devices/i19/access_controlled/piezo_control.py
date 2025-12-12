@@ -21,7 +21,30 @@ PIEZO_CONTROL_PLAN_NAME = {
 }
 
 
+# NOTE This device is only meant to control the piezo. There should be a separate device
+# to control the actual focusing mirror motors, as the two operations are often done
+# independently.
 class AccessControlledPiezoActuator(OpticsBlueAPIDevice):
+    """I19-specific device to set a voltage on the focusing mirror piezoelectric
+    actuator.
+
+    This device will send a REST call to the blueapi instance controlling the optics
+    hutch running on the I19 cluster, which will evaluate the current hutch in use vs
+    the hutch sending the request and decide if the plan will be run or not.
+    As the two hutches are located in series, checking the hutch in use is necessary to
+    avoid accidentally operating the shutter from one hutch while the other has beamtime.
+
+    The name of the hutch that wants to operate the shutter, as well as a commissioning
+    directory to act as a placehlder for the instrument_session,should be passed to the
+    device upon instantiation.
+
+    A mirror type (vfm or hfm) also needs to be set upon instantiation so that the
+    correct plan can be run and the correct optics device is injected.
+
+    For details see the architecture described in
+    https://diamondlightsource.github.io/i19-bluesky/main/explanations/decisions/0004-optics-blueapi-architecture.html
+    """
+
     def __init__(
         self,
         prefix: str,
