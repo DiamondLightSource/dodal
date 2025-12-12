@@ -85,8 +85,8 @@ def sequence(
 ) -> AbstractBaseSequence:
     controller = ElectronAnalyserController(sim_driver, single_energy_source, 0)
     det = ElectronAnalyserDetector(
-        controller=controller,
         sequence_class=sequence_class,
+        controller=controller,
     )
     return det.load_sequence(get_test_sequence(type(sim_driver)))
 

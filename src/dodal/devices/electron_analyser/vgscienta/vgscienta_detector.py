@@ -18,14 +18,13 @@ from dodal.devices.electron_analyser.vgscienta.vgscienta_region import (
     VGScientaSequence,
 )
 
-Region = VGScientaRegion[TLensMode, TPassEnergyEnum]
-Sequence = VGScientaSequence[TLensMode, TPsuMode, TPassEnergyEnum]
-Driver = VGScientaAnalyserDriverIO[TLensMode, TPsuMode, TPassEnergyEnum]
-Controller = ElectronAnalyserController[Driver, Region]
-
 
 class VGScientaDetector(
-    ElectronAnalyserDetector[Controller, Sequence, Region],
+    ElectronAnalyserDetector[
+        VGScientaSequence[TLensMode, TPsuMode, TPassEnergyEnum],
+        VGScientaAnalyserDriverIO[TLensMode, TPsuMode, TPassEnergyEnum],
+        VGScientaRegion[TLensMode, TPassEnergyEnum],
+    ],
     Generic[TLensMode, TPsuMode, TPassEnergyEnum],
 ):
     def __init__(
@@ -39,18 +38,15 @@ class VGScientaDetector(
     ):
         # Save to class so takes part with connect()
         self.driver = VGScientaAnalyserDriverIO[TLensMode, TPsuMode, TPassEnergyEnum](
-            prefix,
-            lens_mode_type,
-            psu_mode_type,
-            pass_energy_type,
+            prefix, lens_mode_type, psu_mode_type, pass_energy_type
         )
+
         controller = ElectronAnalyserController[
             VGScientaAnalyserDriverIO[TLensMode, TPsuMode, TPassEnergyEnum],
             VGScientaRegion[TLensMode, TPassEnergyEnum],
         ](self.driver, energy_source, 0)
 
-        super().__init__(
-            VGScientaSequence[lens_mode_type, psu_mode_type, pass_energy_type],
-            controller,
-            name,
-        )
+        sequence_class = VGScientaSequence[
+            lens_mode_type, psu_mode_type, pass_energy_type
+        ]
+        super().__init__(sequence_class, controller, name)

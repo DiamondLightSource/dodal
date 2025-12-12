@@ -12,8 +12,11 @@ from ophyd_async.core import (
 
 from dodal.common.data_util import load_json_file_to_class
 from dodal.devices.electron_analyser.base.base_controller import (
-    GenericElectronAnalyserController,
-    TElectronAnalyserController,
+    ElectronAnalyserController,
+)
+from dodal.devices.electron_analyser.base.base_driver_io import (
+    GenericAnalyserDriverIO,
+    TAbstractAnalyserDriverIO,
 )
 from dodal.devices.electron_analyser.base.base_region import (
     GenericRegion,
@@ -28,7 +31,7 @@ class BaseElectronAnalyserDetector(
     Triggerable,
     AsyncReadable,
     AsyncConfigurable,
-    Generic[TElectronAnalyserController, TAbstractBaseRegion],
+    Generic[TAbstractAnalyserDriverIO, TAbstractBaseRegion],
 ):
     """
     Detector for data acquisition of electron analyser. Can only acquire using settings
@@ -41,7 +44,9 @@ class BaseElectronAnalyserDetector(
 
     def __init__(
         self,
-        controller: TElectronAnalyserController,
+        controller: ElectronAnalyserController[
+            TAbstractAnalyserDriverIO, TAbstractBaseRegion
+        ],
         name: str = "",
     ):
         self._controller = controller
@@ -77,13 +82,13 @@ class BaseElectronAnalyserDetector(
 
 
 GenericBaseElectronAnalyserDetector = BaseElectronAnalyserDetector[
-    GenericElectronAnalyserController, GenericRegion
+    GenericAnalyserDriverIO, GenericRegion
 ]
 
 
 class ElectronAnalyserRegionDetector(
-    BaseElectronAnalyserDetector[TElectronAnalyserController, TAbstractBaseRegion],
-    Generic[TElectronAnalyserController, TAbstractBaseRegion],
+    BaseElectronAnalyserDetector[TAbstractAnalyserDriverIO, TAbstractBaseRegion],
+    Generic[TAbstractAnalyserDriverIO, TAbstractBaseRegion],
 ):
     """
     Extends electron analyser detector to configure specific region settings before data
@@ -92,7 +97,9 @@ class ElectronAnalyserRegionDetector(
 
     def __init__(
         self,
-        controller: TElectronAnalyserController,
+        controller: ElectronAnalyserController[
+            TAbstractAnalyserDriverIO, TAbstractBaseRegion
+        ],
         region: TAbstractBaseRegion,
         name: str = "",
     ):
@@ -107,7 +114,7 @@ class ElectronAnalyserRegionDetector(
 
 
 GenericElectronAnalyserRegionDetector = ElectronAnalyserRegionDetector[
-    GenericElectronAnalyserController, GenericRegion
+    GenericAnalyserDriverIO, GenericRegion
 ]
 TElectronAnalyserRegionDetector = TypeVar(
     "TElectronAnalyserRegionDetector",
@@ -116,13 +123,9 @@ TElectronAnalyserRegionDetector = TypeVar(
 
 
 class ElectronAnalyserDetector(
-    BaseElectronAnalyserDetector[TElectronAnalyserController, TAbstractBaseRegion],
+    BaseElectronAnalyserDetector[TAbstractAnalyserDriverIO, TAbstractBaseRegion],
     Stageable,
-    Generic[
-        TElectronAnalyserController,
-        TAbstractBaseSequence,
-        TAbstractBaseRegion,
-    ],
+    Generic[TAbstractBaseSequence, TAbstractAnalyserDriverIO, TAbstractBaseRegion],
 ):
     """
     Electron analyser detector with the additional functionality to load a sequence file
@@ -133,7 +136,9 @@ class ElectronAnalyserDetector(
     def __init__(
         self,
         sequence_class: type[TAbstractBaseSequence],
-        controller: TElectronAnalyserController,
+        controller: ElectronAnalyserController[
+            TAbstractAnalyserDriverIO, TAbstractBaseRegion
+        ],
         name: str = "",
     ):
         self._sequence_class = sequence_class
@@ -174,7 +179,7 @@ class ElectronAnalyserDetector(
     def create_region_detector_list(
         self, filename: str, enabled_only=True
     ) -> list[
-        ElectronAnalyserRegionDetector[TElectronAnalyserController, TAbstractBaseRegion]
+        ElectronAnalyserRegionDetector[TAbstractAnalyserDriverIO, TAbstractBaseRegion]
     ]:
         """
         Create a list of detectors equal to the number of regions in a sequence file.
@@ -193,15 +198,15 @@ class ElectronAnalyserDetector(
             seq.get_enabled_regions() if enabled_only else seq.regions
         )
         return [
-            ElectronAnalyserRegionDetector(
-                self._controller, r, self.name + "_" + r.name
-            )
+            ElectronAnalyserRegionDetector[
+                TAbstractAnalyserDriverIO, TAbstractBaseRegion
+            ](self._controller, r, self.name + "_" + r.name)
             for r in regions
         ]
 
 
 GenericElectronAnalyserDetector = ElectronAnalyserDetector[
-    GenericElectronAnalyserController, GenericSequence, GenericRegion
+    GenericSequence, GenericAnalyserDriverIO, GenericRegion
 ]
 TElectronAnalyserDetector = TypeVar(
     "TElectronAnalyserDetector",
