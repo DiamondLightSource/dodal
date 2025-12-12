@@ -12,20 +12,20 @@ from ophyd_async.core import (
 from dodal.devices.i09_2_shared.i09_apple2 import (
     J09_GAP_POLY_DEG_COLUMNS,
     J09_PHASE_POLY_DEG_COLUMNS,
-    J09Apple2Controller,
 )
-from dodal.devices.insertion_device.apple2_undulator import (
+from dodal.devices.insertion_device import (
     Apple2,
+    Apple2EnforceLHMoveController,
     BeamEnergy,
     InsertionDeviceEnergy,
     InsertionDevicePolarisation,
-    Pol,
     UndulatorGap,
     UndulatorPhaseAxes,
 )
 from dodal.devices.insertion_device.energy_motor_lookup import (
     ConfigServerEnergyMotorLookup,
 )
+from dodal.devices.insertion_device.id_enum import Pol
 from dodal.devices.insertion_device.lookup_table_models import (
     MAXIMUM_ROW_PHASE_MOTOR_POSITION,
     ROW_PHASE_CIRCULAR,
@@ -82,9 +82,9 @@ async def mock_id_controller(
     mock_apple2: Apple2,
     mock_j09_gap_energy_motor_lookup: ConfigServerEnergyMotorLookup,
     mock_j09_phase_energy_motor_lookup: ConfigServerEnergyMotorLookup,
-) -> J09Apple2Controller:
+) -> Apple2EnforceLHMoveController:
     async with init_devices(mock=True):
-        mock_id_controller = J09Apple2Controller(
+        mock_id_controller = Apple2EnforceLHMoveController(
             apple2=mock_apple2,
             gap_energy_motor_lut=mock_j09_gap_energy_motor_lookup,
             phase_energy_motor_lut=mock_j09_phase_energy_motor_lookup,
@@ -95,7 +95,7 @@ async def mock_id_controller(
 
 @pytest.fixture
 async def mock_id_energy(
-    mock_id_controller: J09Apple2Controller,
+    mock_id_controller: Apple2EnforceLHMoveController,
 ) -> InsertionDeviceEnergy:
     async with init_devices(mock=True):
         mock_id_energy = InsertionDeviceEnergy(
@@ -116,7 +116,7 @@ async def beam_energy(
 
 @pytest.fixture
 async def mock_id_pol(
-    mock_id_controller: J09Apple2Controller,
+    mock_id_controller: Apple2EnforceLHMoveController,
 ) -> InsertionDevicePolarisation:
     async with init_devices(mock=True):
         mock_id_pol = InsertionDevicePolarisation(id_controller=mock_id_controller)
@@ -147,7 +147,7 @@ def test_j09_energy_motor_lookup_update_lut_success(
     ],
 )
 async def test_j09_apple2_controller_determine_pol(
-    mock_id_controller: J09Apple2Controller,
+    mock_id_controller: Apple2EnforceLHMoveController,
     pol: Pol,
     top_inner_phase: float,
     top_outer_phase: float,
@@ -189,7 +189,7 @@ async def test_j09_apple2_controller_determine_pol(
     ],
 )
 async def test_j09_apple2_controller_set_pol_lh(
-    mock_id_controller: J09Apple2Controller,
+    mock_id_controller: Apple2EnforceLHMoveController,
     pol: Pol,
     top_inner_phase: float,
     top_outer_phase: float,
@@ -226,15 +226,15 @@ async def test_j09_apple2_controller_set_pol_lh(
     ],
 )
 async def test_j09_apple2_controller_set_pol(
-    mock_id_controller: J09Apple2Controller,
+    mock_id_controller: Apple2EnforceLHMoveController,
     pol: Pol,
     top_inner_phase: float,
     top_outer_phase: float,
     btm_inner_phase: float,
     btm_outer_phase: float,
 ):
-    mock_id_controller.gap_energy_motor_lut.update_lookup_table()
-    mock_id_controller.phase_energy_motor_lut.update_lookup_table()
+    mock_id_controller.gap_energy_motor_lu.update_lookup_table()
+    mock_id_controller.phase_energy_motor_lu.update_lookup_table()
     await mock_id_controller.polarisation.set(pol)
     assert get_mock_put(
         mock_id_controller.apple2().phase().top_outer.user_setpoint
@@ -273,7 +273,7 @@ async def test_j09_apple2_controller_set_pol(
     ],
 )
 async def test_j09_apple2_controller_set_energy(
-    mock_id_controller: J09Apple2Controller,
+    mock_id_controller: Apple2EnforceLHMoveController,
     pol: Pol,
     energy: float,
     expected_gap: float,

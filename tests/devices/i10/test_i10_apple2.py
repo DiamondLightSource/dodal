@@ -23,7 +23,7 @@ from dodal.devices.i10.i10_apple2 import (
     LinearArbitraryAngle,
 )
 from dodal.devices.i10.i10_setting_data import I10Grating
-from dodal.devices.insertion_device.apple2_undulator import (
+from dodal.devices.insertion_device import (
     MAXIMUM_MOVE_TIME,
     BeamEnergy,
     EnabledDisabledUpper,
