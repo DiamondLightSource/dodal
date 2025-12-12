@@ -162,7 +162,7 @@ def test_plan_produces_expected_events(
 
 
 @pytest.mark.requires(instrument="adsim")
-@pytest.mark.parametrize("num", [1, 3], indirect=True)
+@pytest.mark.parametrize("num", [1, 3])
 def test_plan_produces_expected_resources(
     num: int,
     run_engine: RunEngine,
