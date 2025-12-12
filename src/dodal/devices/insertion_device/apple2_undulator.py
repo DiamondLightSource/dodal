@@ -696,19 +696,23 @@ class Apple2EnforceLHMoveController(Apple2Controller[Apple2]):
         self,
         value: Pol,
     ) -> None:
-        # I09/I21 require all palarisation change to go via LH.
-        target_energy = await self.energy.get_value()
-        if value is not Pol.LH:
-            self._polarisation_setpoint_set(Pol.LH)
-            max_lh_energy = float(
-                self.gap_energy_motor_lu.lut.root[Pol("lh")].max_energy
-            )
-            lh_setpoint = (
-                max_lh_energy if target_energy > max_lh_energy else target_energy
-            )
-            await self.energy.set(lh_setpoint, timeout=MAXIMUM_MOVE_TIME)
-        self._polarisation_setpoint_set(value)
-        await self.energy.set(target_energy, timeout=MAXIMUM_MOVE_TIME)
+        # I09/I21 require all polarisation change to go via LH.
+        if await self.polarisation.get_value() == value:
+            LOGGER.info(f"Polarisation already at {value}")
+        else:
+            target_energy = await self.energy.get_value()
+            if value is not Pol.LH:
+                self._polarisation_setpoint_set(Pol.LH)
+                max_lh_energy = float(
+                    self.gap_energy_motor_lu.lut.root[Pol("lh")].max_energy
+                )
+                lh_setpoint = (
+                    max_lh_energy if target_energy > max_lh_energy else target_energy
+                )
+                LOGGER.info(f"Changing polarisation to {value} via {Pol.LH}")
+                await self.energy.set(lh_setpoint, timeout=MAXIMUM_MOVE_TIME)
+            self._polarisation_setpoint_set(value)
+            await self.energy.set(target_energy, timeout=MAXIMUM_MOVE_TIME)
 
 
 class InsertionDeviceEnergyBase(abc.ABC, StandardReadable, Movable):
