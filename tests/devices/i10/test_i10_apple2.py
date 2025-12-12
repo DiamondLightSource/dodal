@@ -41,7 +41,8 @@ from dodal.devices.insertion_device.energy_motor_lookup import (
 from dodal.devices.insertion_device.lookup_table_models import (
     EnergyCoverage,
     EnergyCoverageEntry,
-    LookupTableConfig,
+    LookupTableColumnConfig,
+    Source,
 )
 from dodal.devices.pgm import PlaneGratingMonochromator
 from tests.devices.i10.test_data import (
@@ -88,7 +89,7 @@ def mock_i10_gap_energy_motor_lookup_idu(
 ) -> ConfigServerEnergyMotorLookup:
     return ConfigServerEnergyMotorLookup(
         config_client=mock_config_client,
-        lut_config=LookupTableConfig(source=("Source", "idu")),
+        lut_config=LookupTableColumnConfig(source=Source(column="Source", value="idu")),
         path=Path(ID_ENERGY_2_GAP_CALIBRATIONS_CSV),
     )
 
@@ -99,7 +100,7 @@ def mock_i10_phase_energy_motor_lookup_idu(
 ) -> ConfigServerEnergyMotorLookup:
     return ConfigServerEnergyMotorLookup(
         config_client=mock_config_client,
-        lut_config=LookupTableConfig(source=("Source", "idu")),
+        lut_config=LookupTableColumnConfig(source=Source(column="Source", value="idu")),
         path=Path(ID_ENERGY_2_PHASE_CALIBRATIONS_CSV),
     )
 
@@ -110,7 +111,7 @@ def mock_i10_gap_energy_motor_lookup_idd(
 ) -> ConfigServerEnergyMotorLookup:
     return ConfigServerEnergyMotorLookup(
         config_client=mock_config_client,
-        lut_config=LookupTableConfig(source=("Source", "idd")),
+        lut_config=LookupTableColumnConfig(source=Source(column="Source", value="idd")),
         path=Path(ID_ENERGY_2_GAP_CALIBRATIONS_CSV),
     )
 
@@ -121,9 +122,7 @@ def mock_i10_phase_energy_motor_lookup_idd(
 ) -> ConfigServerEnergyMotorLookup:
     return ConfigServerEnergyMotorLookup(
         config_client=mock_config_client,
-        lut_config=LookupTableConfig(
-            source=("Source", "idd"),
-        ),
+        lut_config=LookupTableColumnConfig(source=Source(column="Source", value="idd")),
         path=Path(ID_ENERGY_2_PHASE_CALIBRATIONS_CSV),
     )
 
@@ -689,13 +688,13 @@ async def test_fail_i10_energy_motor_lookup_outside_energy_limits(
 ):
     with pytest.raises(ValueError) as e:
         await mock_id_controller.energy.set(energy)
-    assert str(e.value) == "Demanding energy must lie between {} and {} eV!".format(
+    assert str(e.value) == "Demanding energy must lie between {} and {}!".format(
         mock_id_controller.gap_energy_motor_lut.lut.root[
             await mock_id_controller.polarisation_setpoint.get_value()
-        ].limit.minimum,
+        ].min_energy,
         mock_id_controller.gap_energy_motor_lut.lut.root[
             await mock_id_controller.polarisation_setpoint.get_value()
-        ].limit.maximum,
+        ].max_energy,
     )
 
 
@@ -704,23 +703,19 @@ async def test_fail_i10_energy_motor_lookup_with_lookup_gap(
 ):
     mock_id_controller.gap_energy_motor_lut.update_lookup_table()
     # make gap in energy
-    mock_id_controller.gap_energy_motor_lut.lut.root[Pol.LH].energies = EnergyCoverage(
-        {
-            1: EnergyCoverageEntry(
-                low=255.3,
-                high=500,
+    mock_id_controller.gap_energy_motor_lut.lut.root[Pol.LH] = EnergyCoverage(
+        energy_entries=(
+            EnergyCoverageEntry(
+                min_energy=255.3,
+                max_energy=500,
                 poly=poly1d([4.33435e-08, -7.52562e-05, 6.41791e-02, 3.88755e00]),
-            )
-        }
-    )
-    mock_id_controller.gap_energy_motor_lut.lut.root[Pol.LH].energies = EnergyCoverage(
-        {
-            2: EnergyCoverageEntry(
-                low=600,
-                high=1000,
+            ),
+            EnergyCoverageEntry(
+                min_energy=600,
+                max_energy=1000,
                 poly=poly1d([4.33435e-08, -7.52562e-05, 6.41791e-02, 3.88755e00]),
-            )
-        }
+            ),
+        )
     )
     with pytest.raises(ValueError) as e:
         await mock_id_controller.energy.set(555)
