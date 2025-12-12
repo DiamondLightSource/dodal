@@ -1,3 +1,4 @@
+import asyncio
 import importlib
 import os
 from collections.abc import AsyncGenerator
@@ -6,7 +7,7 @@ from types import ModuleType
 from unittest.mock import patch
 
 import pytest
-from ophyd_async.core import init_devices, set_mock_value
+from ophyd_async.core import callback_on_mock_put, init_devices, set_mock_value
 
 from conftest import mock_attributes_table
 from dodal.common.beamlines import beamline_parameters, beamline_utils
@@ -15,6 +16,7 @@ from dodal.device_manager import DeviceManager
 from dodal.devices.baton import Baton
 from dodal.devices.detector import DetectorParams
 from dodal.devices.detector.det_dim_constants import EIGER2_X_16M_SIZE
+from dodal.devices.pressure_jump_cell import PressureJumpCell
 from dodal.utils import (
     DeviceInitializationController,
     collect_factories,
@@ -88,3 +90,28 @@ async def baton_in_commissioning_mode() -> AsyncGenerator[Baton]:
     set_mock_value(baton.commissioning, True)
     yield baton
     set_commissioning_signal(None)
+
+
+@pytest.fixture
+async def cell() -> PressureJumpCell:
+    async with init_devices(mock=True):
+        pjump = PressureJumpCell("DEMO-PJUMPCELL-01:")
+
+    return pjump
+
+
+@pytest.fixture
+async def cell_with_mocked_busy(cell: PressureJumpCell) -> PressureJumpCell:
+    async def busy(*_, **__):
+        async def busy_idle():
+            await asyncio.sleep(0)
+            set_mock_value(cell.control.busy, True)
+            await asyncio.sleep(0)
+            set_mock_value(cell.control.busy, False)
+
+        asyncio.create_task(busy_idle())
+
+    callback_on_mock_put(cell.control.go, busy)
+    callback_on_mock_put(cell.control.set_jump, busy)
+
+    return cell
