@@ -85,7 +85,7 @@ def id_controller() -> Apple2EnforceLHMoveController:
     return Apple2EnforceLHMoveController(
         apple2=id(),
         gap_energy_motor_lut=ConfigServerEnergyMotorLookup(
-            lut_config=LookupTableColumnConfig(),
+            lut_config=LookupTableColumnConfig(grating=I21_GRATING_COLUMNS),
             config_client=I21_CONF_CLIENT,
             path=Path(LOOK_UPTABLE_DIR, GAP_LOOKUP_FILE_NAME),
         ),
