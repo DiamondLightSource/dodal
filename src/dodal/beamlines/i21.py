@@ -3,7 +3,7 @@ from dodal.common.beamlines.beamline_utils import (
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.devices.i21 import Grating
-from dodal.devices.insertion_device.apple2_undulator import (
+from dodal.devices.insertion_device import (
     Apple2,
     UndulatorGap,
     UndulatorPhaseAxes,
