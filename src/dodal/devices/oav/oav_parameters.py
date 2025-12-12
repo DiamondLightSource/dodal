@@ -6,7 +6,7 @@ from xml.etree import ElementTree
 from xml.etree.ElementTree import Element
 
 from daq_config_server.client import ConfigServer
-from daq_config_server.converters.models import DisplayConfig
+from daq_config_server.models import DisplayConfig
 
 # GDA currently assumes this aspect ratio for the OAV window size.
 # For some beamline this doesn't affect anything as the actual OAV aspect ratio
