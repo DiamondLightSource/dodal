@@ -6,7 +6,12 @@ from dodal.common.beamlines.beamline_utils import (
     device_factory,
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.devices.i21 import I21_GAP_POLY_DEG_COLUMNS, I21_GENERATED_PHASE_LUT, Grating
+from dodal.devices.i21 import (
+    I21_GAP_POLY_DEG_COLUMNS,
+    I21_GRATING_COLUMNS,
+    I21_PHASE_POLY_DEG_COLUMNS,
+    Grating,
+)
 from dodal.devices.insertion_device import (
     Apple2,
     Apple2EnforceLHMoveController,
@@ -18,7 +23,6 @@ from dodal.devices.insertion_device import (
 )
 from dodal.devices.insertion_device.energy_motor_lookup import (
     ConfigServerEnergyMotorLookup,
-    EnergyMotorLookup,
 )
 from dodal.devices.insertion_device.lookup_table_models import LookupTableColumnConfig
 from dodal.devices.pgm import PlaneGratingMonochromator
@@ -86,7 +90,13 @@ def id_controller() -> Apple2EnforceLHMoveController:
             config_client=I21_CONF_CLIENT,
             path=Path(LOOK_UPTABLE_DIR, GAP_LOOKUP_FILE_NAME),
         ),
-        phase_energy_motor_lut=EnergyMotorLookup(I21_GENERATED_PHASE_LUT),
+        phase_energy_motor_lut=ConfigServerEnergyMotorLookup(
+            lut_config=LookupTableColumnConfig(
+                grating=I21_GRATING_COLUMNS, poly_deg=I21_PHASE_POLY_DEG_COLUMNS
+            ),
+            config_client=I21_CONF_CLIENT,
+            path=Path(LOOK_UPTABLE_DIR, GAP_LOOKUP_FILE_NAME),
+        ),
         units="eV",
     )
 
