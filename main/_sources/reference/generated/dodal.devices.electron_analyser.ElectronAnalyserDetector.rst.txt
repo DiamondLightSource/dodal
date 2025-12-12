@@ -26,6 +26,7 @@ dodal.devices.electron\_analyser.ElectronAnalyserDetector
       
       
       
+      
       ~ElectronAnalyserDetector.stage
       
       

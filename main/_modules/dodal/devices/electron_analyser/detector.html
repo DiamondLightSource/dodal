@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.electron_analyser.detector &#8212; dodal 1.67.1.dev1+gdaa78f35e documentation</title>
+    <title>dodal.devices.electron_analyser.detector &#8212; dodal 1.67.1.dev2+g9036aff96 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=035698da"></script>
+    <script src="../../../../_static/documentation_options.js?v=624cbd70"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -811,10 +811,8 @@ window.addEventListener("load", load);
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">bluesky.protocols</span><span class="w"> </span><span class="kn">import</span> <span class="n">Stageable</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">AsyncStatus</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.adcore</span><span class="w"> </span><span class="kn">import</span> <span class="n">ADBaseController</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.common.data_util</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_json_file_to_class</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.controllers</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConstantDeadTimeController</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.electron_analyser.abstract.base_detector</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">BaseElectronAnalyserDetector</span><span class="p">,</span>
 <span class="p">)</span>
@@ -825,12 +823,14 @@ window.addEventListener("load", load);
     <span class="n">TAbstractBaseRegion</span><span class="p">,</span>
     <span class="n">TAbstractBaseSequence</span><span class="p">,</span>
 <span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.electron_analyser.controller</span><span class="w"> </span><span class="kn">import</span> <span class="n">ElectronAnalyserController</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.electron_analyser.energy_sources</span><span class="w"> </span><span class="kn">import</span> <span class="n">AbstractEnergySource</span>
 
 
 <div class="viewcode-block" id="ElectronAnalyserRegionDetector">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.electron_analyser.ElectronAnalyserRegionDetector.html#dodal.devices.electron_analyser.ElectronAnalyserRegionDetector">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ElectronAnalyserRegionDetector</span><span class="p">(</span>
-    <span class="n">BaseElectronAnalyserDetector</span><span class="p">[</span><span class="n">TAbstractAnalyserDriverIO</span><span class="p">],</span>
+    <span class="n">BaseElectronAnalyserDetector</span><span class="p">[</span><span class="n">TAbstractAnalyserDriverIO</span><span class="p">,</span> <span class="n">TAbstractBaseRegion</span><span class="p">],</span>
     <span class="n">Generic</span><span class="p">[</span><span class="n">TAbstractAnalyserDriverIO</span><span class="p">,</span> <span class="n">TAbstractBaseRegion</span><span class="p">],</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -840,7 +840,9 @@ window.addEventListener("load", load);
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">controller</span><span class="p">:</span> <span class="n">ADBaseController</span><span class="p">[</span><span class="n">TAbstractAnalyserDriverIO</span><span class="p">],</span>
+        <span class="n">controller</span><span class="p">:</span> <span class="n">ElectronAnalyserController</span><span class="p">[</span>
+            <span class="n">TAbstractAnalyserDriverIO</span><span class="p">,</span> <span class="n">TAbstractBaseRegion</span>
+        <span class="p">],</span>
         <span class="n">region</span><span class="p">:</span> <span class="n">TAbstractBaseRegion</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="p">):</span>
@@ -850,7 +852,7 @@ window.addEventListener("load", load);
     <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="c1"># Configure region parameters on the driver first before data collection.</span>
-        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_controller</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">region</span><span class="p">)</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">region</span><span class="p">)</span>
         <span class="k">await</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">trigger</span><span class="p">()</span></div>
 
 
@@ -864,7 +866,7 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="ElectronAnalyserDetector">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.electron_analyser.ElectronAnalyserDetector.html#dodal.devices.electron_analyser.ElectronAnalyserDetector">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ElectronAnalyserDetector</span><span class="p">(</span>
-    <span class="n">BaseElectronAnalyserDetector</span><span class="p">[</span><span class="n">TAbstractAnalyserDriverIO</span><span class="p">],</span>
+    <span class="n">BaseElectronAnalyserDetector</span><span class="p">[</span><span class="n">TAbstractAnalyserDriverIO</span><span class="p">,</span> <span class="n">TAbstractBaseRegion</span><span class="p">],</span>
     <span class="n">Stageable</span><span class="p">,</span>
     <span class="n">Generic</span><span class="p">[</span>
         <span class="n">TAbstractAnalyserDriverIO</span><span class="p">,</span>
@@ -882,12 +884,15 @@ window.addEventListener("load", load);
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">sequence_class</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">TAbstractBaseSequence</span><span class="p">],</span>
         <span class="n">driver</span><span class="p">:</span> <span class="n">TAbstractAnalyserDriverIO</span><span class="p">,</span>
+        <span class="n">energy_source</span><span class="p">:</span> <span class="n">AbstractEnergySource</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="c1"># Save driver as direct child so participates with connect()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">driver</span> <span class="o">=</span> <span class="n">driver</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_sequence_class</span> <span class="o">=</span> <span class="n">sequence_class</span>
-        <span class="n">controller</span> <span class="o">=</span> <span class="n">ConstantDeadTimeController</span><span class="p">[</span><span class="n">TAbstractAnalyserDriverIO</span><span class="p">](</span><span class="n">driver</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">controller</span> <span class="o">=</span> <span class="n">ElectronAnalyserController</span><span class="p">[</span>
+            <span class="n">TAbstractAnalyserDriverIO</span><span class="p">,</span> <span class="n">TAbstractBaseRegion</span>
+        <span class="p">](</span><span class="n">driver</span><span class="o">=</span><span class="n">driver</span><span class="p">,</span> <span class="n">energy_source</span><span class="o">=</span><span class="n">energy_source</span><span class="p">,</span> <span class="n">deadtime</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
 
 <div class="viewcode-block" id="ElectronAnalyserDetector.stage">
@@ -953,7 +958,9 @@ window.addEventListener("load", load);
 <span class="sd">            the sequence file.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">seq</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_sequence</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
-        <span class="n">regions</span> <span class="o">=</span> <span class="n">seq</span><span class="o">.</span><span class="n">get_enabled_regions</span><span class="p">()</span> <span class="k">if</span> <span class="n">enabled_only</span> <span class="k">else</span> <span class="n">seq</span><span class="o">.</span><span class="n">regions</span>
+        <span class="n">regions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">TAbstractBaseRegion</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">seq</span><span class="o">.</span><span class="n">get_enabled_regions</span><span class="p">()</span> <span class="k">if</span> <span class="n">enabled_only</span> <span class="k">else</span> <span class="n">seq</span><span class="o">.</span><span class="n">regions</span>
+        <span class="p">)</span>
         <span class="k">return</span> <span class="p">[</span>
             <span class="n">ElectronAnalyserRegionDetector</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_controller</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="n">r</span><span class="o">.</span><span class="n">name</span>

@@ -1,5 +1,5 @@
 const DOCUMENTATION_OPTIONS = {
-    VERSION: '1.67.1.dev1+gdaa78f35e',
+    VERSION: '1.67.1.dev2+g9036aff96',
     LANGUAGE: 'en',
     COLLAPSE_INDEX: false,
     BUILDER: 'html',
