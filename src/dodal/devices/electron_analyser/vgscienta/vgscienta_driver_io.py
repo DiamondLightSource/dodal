@@ -10,19 +10,16 @@ from ophyd_async.core import (
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
-from dodal.devices.electron_analyser.abstract.base_driver_io import (
+from dodal.devices.electron_analyser.base.base_driver_io import (
     AbstractAnalyserDriverIO,
 )
-from dodal.devices.electron_analyser.abstract.types import (
-    TLensMode,
-    TPassEnergyEnum,
-    TPsuMode,
-)
-from dodal.devices.electron_analyser.vgscienta.enums import (
+from dodal.devices.electron_analyser.base.base_region import TLensMode, TPsuMode
+from dodal.devices.electron_analyser.vgscienta.vgscienta_enums import (
     AcquisitionMode,
     DetectorMode,
 )
-from dodal.devices.electron_analyser.vgscienta.region import (
+from dodal.devices.electron_analyser.vgscienta.vgscienta_region import (
+    TPassEnergyEnum,
     VGScientaRegion,
 )
 
