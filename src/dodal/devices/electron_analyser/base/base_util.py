@@ -1,4 +1,4 @@
-from dodal.devices.electron_analyser.enums import EnergyMode
+from dodal.devices.electron_analyser.base.base_enums import EnergyMode
 
 
 def to_kinetic_energy(
