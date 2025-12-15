@@ -97,6 +97,19 @@ class ZoomController(BaseZoomController):
         # Level is the string description of the zoom level e.g. "1.0x" or "1.0"
         self.level = epics_signal_rw(str, f"{prefix}MP:SELECT")
 
+        super().__init__(name=name)
+
+    @AsyncStatus.wrap
+    async def set(self, value: str):
+        await self.level.set(value, wait=True)
+        LOGGER.info(
+            "Waiting {DELAY_BETWEEN_MOTORS_AND_IMAGE_UPDATING_S} seconds for zoom to be noticeable"
+        )
+        await asyncio.sleep(DELAY_BETWEEN_MOTORS_AND_IMAGE_UPDATING_S)
+
+
+class ZoomControllerWithBeamCentres(ZoomController):
+    def __init__(self, prefix: str, name: str = "") -> None:
         level_to_centre_mapping = [
             ("ZRST", "A"),
             ("ONST", "B"),
@@ -115,15 +128,7 @@ class ZoomController(BaseZoomController):
             }
         )
 
-        super().__init__(name=name)
-
-    @AsyncStatus.wrap
-    async def set(self, value: str):
-        await self.level.set(value, wait=True)
-        LOGGER.info(
-            "Waiting {DELAY_BETWEEN_MOTORS_AND_IMAGE_UPDATING_S} seconds for zoom to be noticeable"
-        )
-        await asyncio.sleep(DELAY_BETWEEN_MOTORS_AND_IMAGE_UPDATING_S)
+        super().__init__(prefix, name)
 
 
 class OAV(StandardReadable):
