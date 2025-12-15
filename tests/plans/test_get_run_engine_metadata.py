@@ -18,7 +18,7 @@ def test_good_get_run_engine_metadata(run_engine: RunEngine):
     def test_plan():
         assert (yield from get_run_engine_metadata("test_string")) == test_string
         assert (yield from get_run_engine_metadata("test_int", int)) == test_int
-        assert (yield from get_run_engine_metadata("test_float", int)) == test_float
+        assert (yield from get_run_engine_metadata("test_float", float)) == test_float
 
     run_engine(test_plan())
 

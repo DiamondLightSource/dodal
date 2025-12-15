@@ -1,14 +1,9 @@
-from typing import Generic, Protocol, TypeVar
+from typing import Generic, TypeVar
 
 import bluesky.plan_stubs as bps
 import bluesky.preprocessors as bpp
 from bluesky.callbacks import CallbackBase
 from bluesky.utils import MsgGenerator
-
-
-class FromStr(Protocol):
-    def __init__(self, value: str) -> None: ...
-
 
 T = TypeVar("T", str, int, float)
 
@@ -43,6 +38,8 @@ def get_run_engine_metadata(
     Creates a callback and a dummy run event to read metadata from the RunEngine. Useful
     for plans which don't have reference to the RunEngine, for example when running through
     BlueAPI
+
+    Example usage: visit = get_run_engine_metadata("instrument_session")
 
     Args:
     metadata_name: The string name for requested metadata
