@@ -4,7 +4,7 @@ import pytest
 
 from dodal.common.data_util import load_json_file_to_class
 from dodal.devices.b07 import LensMode, PsuMode
-from dodal.devices.electron_analyser import EnergyMode, SelectedSource
+from dodal.devices.electron_analyser.base import EnergyMode, SelectedSource
 from dodal.devices.electron_analyser.specs import (
     AcquisitionMode,
     SpecsSequence,
