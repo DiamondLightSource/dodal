@@ -196,6 +196,8 @@ async def test_j09_apple2_controller_set_pol_lh(
     btm_inner_phase: float,
     btm_outer_phase: float,
 ):
+    set_mock_value(mock_id_controller.apple2().phase().top_outer.user_readback, 10)
+    set_mock_value(mock_id_controller.apple2().phase().btm_inner.user_readback, 10)
     await mock_id_controller.polarisation.set(pol)
     get_mock_put(
         mock_id_controller.apple2().phase().top_outer.user_setpoint
@@ -209,6 +211,50 @@ async def test_j09_apple2_controller_set_pol_lh(
     get_mock_put(
         mock_id_controller.apple2().phase().btm_outer.user_setpoint
     ).assert_called_once_with(f"{btm_outer_phase:.6f}", wait=True)
+
+
+@pytest.mark.parametrize(
+    "pol, top_outer_phase,top_inner_phase,btm_inner_phase, btm_outer_phase",
+    [
+        (Pol.LH, 0, 0, 0, 0),
+        (Pol.LV, 24.0, 0, 24.0, 0),
+        (Pol.PC, 12, 0, 12, 0),
+        (Pol.NC, -12, 0, -12, 0),
+    ],
+)
+async def test_j09_apple2_controller_set_pol_does_nothing_when_pol_unchanged(
+    mock_id_controller: Apple2EnforceLHMoveController,
+    pol: Pol,
+    top_inner_phase: float,
+    top_outer_phase: float,
+    btm_inner_phase: float,
+    btm_outer_phase: float,
+):
+    set_mock_value(
+        mock_id_controller.apple2().phase().top_outer.user_readback, top_outer_phase
+    )
+    set_mock_value(
+        mock_id_controller.apple2().phase().btm_inner.user_readback, btm_inner_phase
+    )
+    set_mock_value(
+        mock_id_controller.apple2().phase().top_inner.user_readback, top_inner_phase
+    )
+    set_mock_value(
+        mock_id_controller.apple2().phase().btm_outer.user_readback, btm_outer_phase
+    )
+    await mock_id_controller.polarisation.set(pol)
+    get_mock_put(
+        mock_id_controller.apple2().phase().top_outer.user_setpoint
+    ).assert_not_called()
+    get_mock_put(
+        mock_id_controller.apple2().phase().top_inner.user_setpoint
+    ).assert_not_called()
+    get_mock_put(
+        mock_id_controller.apple2().phase().btm_inner.user_setpoint
+    ).assert_not_called()
+    get_mock_put(
+        mock_id_controller.apple2().phase().btm_outer.user_setpoint
+    ).assert_not_called()
 
 
 @pytest.mark.parametrize(
