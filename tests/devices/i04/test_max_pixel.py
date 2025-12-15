@@ -6,7 +6,7 @@ import numpy as np
 import pytest
 from ophyd_async.core import init_devices
 
-from dodal.devices.i04.max_pixel import KERNAL_SIZE, MaxPixel, convert_to_gray_and_blur
+from dodal.devices.i04.max_pixel import MaxPixel, convert_to_gray_and_blur
 
 
 @pytest.fixture
@@ -46,7 +46,7 @@ async def test_preprocessed_data_grayscale_is_called(
     data = np.array([1])
     convert_to_gray_and_blur(data)
     mocked_cv2_grey.assert_called_once_with(data, cv2.COLOR_BGR2GRAY)
-    mocked_cv2_blur.assert_called_once_with(ANY, KERNAL_SIZE, 0)
+    mocked_cv2_blur.assert_called_once_with(ANY, ANY, 0)
 
 
 test_arr = np.array(

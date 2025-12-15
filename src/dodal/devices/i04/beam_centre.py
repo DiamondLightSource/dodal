@@ -13,7 +13,7 @@ from dodal.log import LOGGER
 ADDITIONAL_BINARY_THRESH = 20
 
 
-def binary_img(image: np.ndarray):
+def convert_image_to_binary(image: np.ndarray):
     """
      Creates a binary image from OAV image array data.
 
@@ -36,7 +36,7 @@ def binary_img(image: np.ndarray):
 
     _, thresholded_image = cv2.threshold(
         blurred_image, threshold_value, max_pixel_value, cv2.THRESH_BINARY
-    )[1]
+    )
 
     LOGGER.info(f"Image binarised with threshold of {threshold_value}")
     return thresholded_image
@@ -74,7 +74,7 @@ class CentreEllipseMethod(StandardReadable, Triggerable):
     @AsyncStatus.wrap
     async def trigger(self):
         array_data = await self.oav_array_signal.get_value()
-        binary = binary_img(array_data)
+        binary = convert_image_to_binary(array_data)
         ellipse_fit = self._fit_ellipse(binary)
         centre_x = ellipse_fit[0][0]
         centre_y = ellipse_fit[0][1]

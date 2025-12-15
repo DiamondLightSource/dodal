@@ -1,5 +1,3 @@
-import asyncio
-
 import numpy as np
 from bluesky.protocols import Triggerable
 from ophyd_async.core import AsyncStatus, StandardReadable, soft_signal_r_and_setter
@@ -20,7 +18,6 @@ class MaxPixel(StandardReadable, Triggerable):
 
     @AsyncStatus.wrap
     async def trigger(self):
-        await asyncio.sleep(0.5)
         img_data = await self.array_data.get_value()
         arr = convert_to_gray_and_blur(img_data)
         max_val = float(np.max(arr))  # np.int64

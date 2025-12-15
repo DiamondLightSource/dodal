@@ -1,29 +1,32 @@
-from collections.abc import AsyncGenerator
 from unittest.mock import MagicMock, patch
 
 import cv2
 import numpy as np
 import pytest
-from ophyd_async.core import init_devices
+from ophyd_async.core import init_devices, set_mock_value
 
-from dodal.devices.i04.beam_centre import CentreEllipseMethod, binary_img
+from dodal.devices.i04.beam_centre import CentreEllipseMethod, convert_image_to_binary
 
 
 @pytest.fixture
-async def centre_device() -> AsyncGenerator[CentreEllipseMethod]:
+async def centre_device() -> CentreEllipseMethod:
     async with init_devices(mock=True):
         centre_device = CentreEllipseMethod("TEST: ELLIPSE_CENTRE")
-    yield centre_device
+    dummy_img = np.zeros((10, 10, 3), dtype=np.uint8)
+    set_mock_value(centre_device.oav_array_signal, dummy_img)
+    return centre_device
 
 
 @patch("dodal.devices.i04.beam_centre.cv2.threshold")
 @patch("dodal.devices.i04.beam_centre.convert_to_gray_and_blur")
-async def test_binary_img_calls_threshold_twice(mock_convert, mock_threshold):
+async def test_convert_image_to_binary_calls_threshold_twice(
+    mock_convert, mock_threshold
+):
     fake_img = np.ones((10, 10), dtype=np.uint8) * 127
     mock_threshold.return_value = (127, fake_img)
     mock_convert.return_value = fake_img
 
-    binary_img(fake_img)
+    convert_image_to_binary(fake_img)
     assert mock_threshold.call_count == 2
 
     # check the args from the two times it's called.
@@ -36,14 +39,9 @@ async def test_binary_img_calls_threshold_twice(mock_convert, mock_threshold):
     assert second_call_args[1] == 147
 
 
-contour_array = np.array(
-    [[[10, 10]], [[10, 50]], [[50, 50]], [[50, 10]]], dtype=np.uint8
-)
-
-
 @patch("dodal.devices.i04.beam_centre.cv2.findContours")
 @patch("dodal.devices.i04.beam_centre.cv2.fitEllipse")
-def test_fit_ellipse_good_params(
+async def test_fit_ellipse_good_params(
     fit_ellipse: MagicMock,
     find_contours_mock: MagicMock,
     centre_device: CentreEllipseMethod,
@@ -55,47 +53,59 @@ def test_fit_ellipse_good_params(
     ]
     hierarchy = np.array([[[-1, -1, -1, -1]]])
     find_contours_mock.return_value = (contours, hierarchy)
-    dummy_img = np.zeros((10, 10), dtype=np.uint8)
 
-    centre_device.fit_ellipse(dummy_img)
+    await centre_device.trigger()
     fit_ellipse.assert_called_once()
 
 
-@patch("dodal.devices.i04.beam_centre.cv2.findContours")
 async def test_fit_ellipse_raises_error_if_not_enough_image_points(
-    find_contours_mock: MagicMock, centre_device: CentreEllipseMethod
+    centre_device: CentreEllipseMethod,
 ):
-    find_contours_mock.return_value = (None, None)
-    dummy_img = np.zeros((10, 10), dtype=np.uint8)
-
     with pytest.raises(ValueError, match="No contours found in image."):
-        centre_device.fit_ellipse(dummy_img)
+        await centre_device.trigger()
 
 
+@pytest.mark.parametrize(
+    "mock_contours",
+    [
+        [np.array([[[0, 0]], [[1, 0]], [[1, 1]]])],  # 3 points (triangle)
+        [
+            np.array([[[10, 10]], [[20, 10]], [[20, 20]], [[10, 20]]])
+        ],  # 4 points (square)
+    ],
+)
 @patch("dodal.devices.i04.beam_centre.cv2.findContours")
-def test_fit_ellipse_raises_error_if_not_enough_contour_points(
-    find_contours_mock: MagicMock, centre_device: CentreEllipseMethod
+async def test_fit_ellipse_raises_error_if_not_enough_contour_points(
+    find_contours_mock: MagicMock,
+    centre_device: CentreEllipseMethod,
+    mock_contours: np.ndarray,
 ):
-    contours = [
-        np.array([[[0, 0]], [[1, 0]], [[1, 1]]]),  # 3 points (triangle)
-        np.array([[[10, 10]], [[20, 10]], [[20, 20]], [[10, 20]]]),  # 4 points (square)
-    ]
-
-    hierarchy = np.array([[[-1, -1, -1, -1], [-1, -1, -1, -1]]])
-    find_contours_mock.return_value = (contours, hierarchy)
-    dummy_img = np.zeros((10, 10), dtype=np.uint8)
+    hierarchy = np.array([[[-1, -1, -1, -1]]])
+    find_contours_mock.return_value = (mock_contours, hierarchy)
 
     with pytest.raises(ValueError, match="Not enough points to fit an ellipse."):
-        centre_device.fit_ellipse(dummy_img)
+        await centre_device.trigger()
 
 
 @patch("dodal.devices.i04.beam_centre.CentreEllipseMethod.fit_ellipse")
-@patch("dodal.devices.i04.beam_centre.binary_img")
-async def test_trigger(
-    mock_binary_img: MagicMock,
+@patch("dodal.devices.i04.beam_centre.convert_image_to_binary")
+async def test_trigger_converts_to_binary_then_finds_ellipse(
+    mock_convert_to_binary: MagicMock,
     mock_fit_ellipse: MagicMock,
     centre_device: CentreEllipseMethod,
 ):
     await centre_device.trigger()
-    mock_binary_img.assert_called_once()
+    mock_convert_to_binary.assert_called_once()
     mock_fit_ellipse.assert_called_once()
+
+
+async def test_real_image_gives_expected_centre(
+    centre_device: CentreEllipseMethod,
+):
+    image = cv2.imread("tests/test_data/scintillator_with_beam.jpg")
+    set_mock_value(centre_device.oav_array_signal, image)
+
+    await centre_device.trigger()
+
+    assert await centre_device.center_x_val.get_value() == pytest.approx(727.8381)
+    assert await centre_device.center_y_val.get_value() == pytest.approx(365.4453)
