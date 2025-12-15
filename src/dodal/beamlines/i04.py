@@ -217,6 +217,7 @@ def eiger(mock: bool = False, params: DetectorParams | None = None) -> EigerDete
         wait=False,
         fake=mock,
         post_create=set_params,
+        detector_id=72,
     )
 
 
