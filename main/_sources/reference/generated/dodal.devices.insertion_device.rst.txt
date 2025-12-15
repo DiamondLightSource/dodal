@@ -3,19 +3,39 @@ dodal.devices.insertion\_device
 
 
 
-.. rubric:: Modules
+
+
+
+
+.. currentmodule:: dodal.devices
+.. rubric:: Classes
 
 .. autosummary::
    :toctree:
    :recursive:
 
-   dodal.devices.insertion_device.apple2_undulator
-   dodal.devices.insertion_device.energy_motor_lookup
-   dodal.devices.insertion_device.lookup_table_models
-
-
-
-
+   ~insertion_device.Apple2
+   ~insertion_device.Apple2Controller
+   ~insertion_device.Apple2EnforceLHMoveController
+   ~insertion_device.UndulatorGap
+   ~insertion_device.UndulatorPhaseAxes
+   ~insertion_device.UndulatorJawPhase
+   ~insertion_device.Apple2Val
+   ~insertion_device.Apple2PhasesVal
+   ~insertion_device.LookupTable
+   ~insertion_device.LookupTableColumnConfig
+   ~insertion_device.InsertionDeviceEnergy
+   ~insertion_device.InsertionDevicePolarisation
+   ~insertion_device.BeamEnergy
+   ~insertion_device.UndulatorLockedPhaseAxes
+   ~insertion_device.EnergyCoverage
+   ~insertion_device.Pol
+   ~insertion_device.EnabledDisabledUpper
+   ~insertion_device.UndulatorGateStatus
+   ~insertion_device.Apple2LockedPhasesVal
+   ~insertion_device.EnergyMotorLookup
+   ~insertion_device.ConfigServerEnergyMotorLookup
+   ~insertion_device.EnergyMotorConvertor
 
 
 
@@ -29,6 +49,12 @@ dodal.devices.insertion\_device
    
 
    
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      convert_csv_to_lookup
    
    
 

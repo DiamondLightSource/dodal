@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.insertion_device.energy_motor_lookup &#8212; dodal 1.67.1.dev3+gf8d8a2b72 documentation</title>
+    <title>dodal.devices.insertion_device.energy_motor_lookup &#8212; dodal 1.67.1.dev4+g075fdca3c documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=309872ca"></script>
+    <script src="../../../../_static/documentation_options.js?v=ef903892"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -811,7 +811,7 @@ window.addEventListener("load", load);
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">daq_config_server.client</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConfigServer</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.insertion_device.apple2_undulator</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pol</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.insertion_device.id_enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pol</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.insertion_device.lookup_table_models</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">LookupTable</span><span class="p">,</span>
     <span class="n">LookupTableColumnConfig</span><span class="p">,</span>
@@ -820,7 +820,7 @@ window.addEventListener("load", load);
 
 
 <div class="viewcode-block" id="EnergyMotorLookup">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.energy_motor_lookup.EnergyMotorLookup.html#dodal.devices.insertion_device.energy_motor_lookup.EnergyMotorLookup">[docs]</a>
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.EnergyMotorLookup.html#dodal.devices.insertion_device.EnergyMotorLookup">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">EnergyMotorLookup</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Handles a lookup table for Apple2 ID, converting energy/polarisation to a motor</span>
@@ -836,7 +836,7 @@ window.addEventListener("load", load);
         <span class="bp">self</span><span class="o">.</span><span class="n">lut</span> <span class="o">=</span> <span class="n">lut</span>
 
 <div class="viewcode-block" id="EnergyMotorLookup.update_lookup_table">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.energy_motor_lookup.EnergyMotorLookup.html#dodal.devices.insertion_device.energy_motor_lookup.EnergyMotorLookup.update_lookup_table">[docs]</a>
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.EnergyMotorLookup.html#dodal.devices.insertion_device.EnergyMotorLookup.update_lookup_table">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">update_lookup_table</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Do nothing by default. Sub classes may override this method to provide logic</span>
 <span class="sd">        on what updating lookup table does.&quot;&quot;&quot;</span>
@@ -844,7 +844,7 @@ window.addEventListener("load", load);
 
 
 <div class="viewcode-block" id="EnergyMotorLookup.find_value_in_lookup_table">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.energy_motor_lookup.EnergyMotorLookup.html#dodal.devices.insertion_device.energy_motor_lookup.EnergyMotorLookup.find_value_in_lookup_table">[docs]</a>
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.EnergyMotorLookup.html#dodal.devices.insertion_device.EnergyMotorLookup.find_value_in_lookup_table">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">find_value_in_lookup_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energy</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">pol</span><span class="p">:</span> <span class="n">Pol</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Convert energy and polarisation to a value from the lookup table.</span>
@@ -872,7 +872,7 @@ window.addEventListener("load", load);
 
 
 <div class="viewcode-block" id="ConfigServerEnergyMotorLookup">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.energy_motor_lookup.ConfigServerEnergyMotorLookup.html#dodal.devices.insertion_device.energy_motor_lookup.ConfigServerEnergyMotorLookup">[docs]</a>
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.ConfigServerEnergyMotorLookup.html#dodal.devices.insertion_device.ConfigServerEnergyMotorLookup">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ConfigServerEnergyMotorLookup</span><span class="p">(</span><span class="n">EnergyMotorLookup</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetches and parses lookup table (csv) from a config server, supports dynamic</span>
 <span class="sd">    updates, and validates input.&quot;&quot;&quot;</span>

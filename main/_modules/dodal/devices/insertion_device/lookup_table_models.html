@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.insertion_device.lookup_table_models &#8212; dodal 1.67.1.dev3+gf8d8a2b72 documentation</title>
+    <title>dodal.devices.insertion_device.lookup_table_models &#8212; dodal 1.67.1.dev4+g075fdca3c documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=309872ca"></script>
+    <script src="../../../../_static/documentation_options.js?v=ef903892"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -848,7 +848,7 @@ window.addEventListener("load", load);
     <span class="n">field_validator</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.insertion_device.apple2_undulator</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pol</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.insertion_device.id_enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pol</span>
 
 <span class="n">DEFAULT_POLY_DEG</span> <span class="o">=</span> <span class="p">[</span>
     <span class="s2">&quot;7th-order&quot;</span><span class="p">,</span>
@@ -879,16 +879,13 @@ window.addEventListener("load", load);
 <span class="p">}</span>
 
 
-<div class="viewcode-block" id="Source">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.lookup_table_models.Source.html#dodal.devices.insertion_device.lookup_table_models.Source">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Source</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
     <span class="n">column</span><span class="p">:</span> <span class="nb">str</span>
-    <span class="n">value</span><span class="p">:</span> <span class="nb">str</span></div>
-
+    <span class="n">value</span><span class="p">:</span> <span class="nb">str</span>
 
 
 <div class="viewcode-block" id="LookupTableColumnConfig">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.lookup_table_models.LookupTableColumnConfig.html#dodal.devices.insertion_device.lookup_table_models.LookupTableColumnConfig">[docs]</a>
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.LookupTableColumnConfig.html#dodal.devices.insertion_device.LookupTableColumnConfig">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">LookupTableColumnConfig</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Configuration on how to process a csv file columns into a LookupTable data model.&quot;&quot;&quot;</span>
 
@@ -907,12 +904,13 @@ window.addEventListener("load", load);
     <span class="n">mode_name_convert</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
         <span class="n">description</span><span class="o">=</span><span class="s2">&quot;When processing polarisation mode values, map their alias values to a real value.&quot;</span><span class="p">,</span>
         <span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">MODE_NAME_CONVERT</span><span class="p">,</span>
-    <span class="p">)</span></div>
+    <span class="p">)</span>
+    <span class="n">grating</span><span class="p">:</span> <span class="n">A</span><span class="p">[</span>
+        <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Optional column name for entry grating.&quot;</span><span class="p">)</span>
+    <span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></div>
 
 
 
-<div class="viewcode-block" id="EnergyCoverageEntry">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.lookup_table_models.EnergyCoverageEntry.html#dodal.devices.insertion_device.lookup_table_models.EnergyCoverageEntry">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">EnergyCoverageEntry</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
     <span class="n">model_config</span> <span class="o">=</span> <span class="n">ConfigDict</span><span class="p">(</span>
         <span class="n">arbitrary_types_allowed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">frozen</span><span class="o">=</span><span class="kc">True</span>
@@ -920,9 +918,8 @@ window.addEventListener("load", load);
     <span class="n">min_energy</span><span class="p">:</span> <span class="nb">float</span>
     <span class="n">max_energy</span><span class="p">:</span> <span class="nb">float</span>
     <span class="n">poly</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">poly1d</span>
+    <span class="n">grating</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 
-<div class="viewcode-block" id="EnergyCoverageEntry.validate_and_convert_poly">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.lookup_table_models.EnergyCoverageEntry.html#dodal.devices.insertion_device.lookup_table_models.EnergyCoverageEntry.validate_and_convert_poly">[docs]</a>
     <span class="nd">@field_validator</span><span class="p">(</span><span class="s2">&quot;poly&quot;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;before&quot;</span><span class="p">)</span>
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">validate_and_convert_poly</span><span class="p">(</span>
@@ -931,21 +928,16 @@ window.addEventListener("load", load);
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;If reading from serialized data, it will be using a list. Convert to np.poly1d&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">poly1d</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">value</span></div>
+        <span class="k">return</span> <span class="n">value</span>
 
-
-<div class="viewcode-block" id="EnergyCoverageEntry.serialize_poly">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.lookup_table_models.EnergyCoverageEntry.html#dodal.devices.insertion_device.lookup_table_models.EnergyCoverageEntry.serialize_poly">[docs]</a>
     <span class="nd">@field_serializer</span><span class="p">(</span><span class="s2">&quot;poly&quot;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;plain&quot;</span><span class="p">)</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">serialize_poly</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">poly1d</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Allow np.poly1d to work when serializing.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">value</span><span class="o">.</span><span class="n">coefficients</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span></div>
-</div>
-
+        <span class="k">return</span> <span class="n">value</span><span class="o">.</span><span class="n">coefficients</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
 
 
 <div class="viewcode-block" id="EnergyCoverage">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.lookup_table_models.EnergyCoverage.html#dodal.devices.insertion_device.lookup_table_models.EnergyCoverage">[docs]</a>
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.EnergyCoverage.html#dodal.devices.insertion_device.EnergyCoverage">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">EnergyCoverage</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
     <span class="n">model_config</span> <span class="o">=</span> <span class="n">ConfigDict</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">energy_entries</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">EnergyCoverageEntry</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
@@ -986,7 +978,7 @@ window.addEventListener("load", load);
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy_entries</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">max_energy</span>
 
 <div class="viewcode-block" id="EnergyCoverage.get_poly">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.lookup_table_models.EnergyCoverage.html#dodal.devices.insertion_device.lookup_table_models.EnergyCoverage.get_poly">[docs]</a>
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.EnergyCoverage.html#dodal.devices.insertion_device.EnergyCoverage.get_poly">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_poly</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energy</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">poly1d</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return the numpy.poly1d polynomial applicable for the given energy.</span>
@@ -1012,7 +1004,7 @@ window.addEventListener("load", load);
 
 
 <div class="viewcode-block" id="EnergyCoverage.get_energy_index">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.lookup_table_models.EnergyCoverage.html#dodal.devices.insertion_device.lookup_table_models.EnergyCoverage.get_energy_index">[docs]</a>
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.EnergyCoverage.html#dodal.devices.insertion_device.EnergyCoverage.get_energy_index">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_energy_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energy</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Binary search assumes self.energy_entries is sorted by min_energy.</span>
 <span class="sd">        Return index or None if not found.&quot;&quot;&quot;</span>
@@ -1033,7 +1025,7 @@ window.addEventListener("load", load);
 
 
 <div class="viewcode-block" id="LookupTable">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.lookup_table_models.LookupTable.html#dodal.devices.insertion_device.lookup_table_models.LookupTable">[docs]</a>
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.LookupTable.html#dodal.devices.insertion_device.LookupTable">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">LookupTable</span><span class="p">(</span><span class="n">RootModel</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="n">Pol</span><span class="p">,</span> <span class="n">EnergyCoverage</span><span class="p">]]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Specialised lookup table for insertion devices to relate the energy and polarisation</span>
@@ -1047,7 +1039,7 @@ window.addEventListener("load", load);
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="n">root</span> <span class="ow">or</span> <span class="p">{})</span>
 
 <div class="viewcode-block" id="LookupTable.generate">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.lookup_table_models.LookupTable.html#dodal.devices.insertion_device.lookup_table_models.LookupTable.generate">[docs]</a>
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.LookupTable.html#dodal.devices.insertion_device.LookupTable.generate">[docs]</a>
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">generate</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Self</span><span class="p">],</span>
@@ -1061,7 +1053,7 @@ window.addEventListener("load", load);
 
 
 <div class="viewcode-block" id="LookupTable.get_poly">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.lookup_table_models.LookupTable.html#dodal.devices.insertion_device.lookup_table_models.LookupTable.get_poly">[docs]</a>
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.LookupTable.html#dodal.devices.insertion_device.LookupTable.get_poly">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_poly</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">energy</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
@@ -1083,7 +1075,7 @@ window.addEventListener("load", load);
 
 
 <div class="viewcode-block" id="convert_csv_to_lookup">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.lookup_table_models.html#dodal.devices.insertion_device.lookup_table_models.convert_csv_to_lookup">[docs]</a>
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.html#dodal.devices.insertion_device.convert_csv_to_lookup">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">convert_csv_to_lookup</span><span class="p">(</span>
     <span class="n">file_contents</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">lut_config</span><span class="p">:</span> <span class="n">LookupTableColumnConfig</span><span class="p">,</span>
@@ -1149,16 +1141,13 @@ window.addEventListener("load", load);
 
 
 
-<div class="viewcode-block" id="read_file_and_skip">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.lookup_table_models.html#dodal.devices.insertion_device.lookup_table_models.read_file_and_skip">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">read_file_and_skip</span><span class="p">(</span><span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">skip_line_start_with</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;#&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Yield non-comment lines from the CSV content string.&quot;&quot;&quot;</span>
     <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">(</span><span class="n">file</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">skip_line_start_with</span><span class="p">):</span>
             <span class="k">continue</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">yield</span> <span class="n">line</span></div>
-
+            <span class="k">yield</span> <span class="n">line</span>
 </pre></div>
 
                 </article>

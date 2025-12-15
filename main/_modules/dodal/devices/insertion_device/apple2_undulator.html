@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.insertion_device.apple2_undulator &#8212; dodal 1.67.1.dev3+gf8d8a2b72 documentation</title>
+    <title>dodal.devices.insertion_device.apple2_undulator &#8212; dodal 1.67.1.dev4+g075fdca3c documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=309872ca"></script>
+    <script src="../../../../_static/documentation_options.js?v=ef903892"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -823,7 +823,6 @@ window.addEventListener("load", load);
     <span class="n">SignalW</span><span class="p">,</span>
     <span class="n">StandardReadable</span><span class="p">,</span>
     <span class="n">StandardReadableFormat</span><span class="p">,</span>
-    <span class="n">StrictEnum</span><span class="p">,</span>
     <span class="n">derived_signal_rw</span><span class="p">,</span>
     <span class="n">soft_signal_r_and_setter</span><span class="p">,</span>
     <span class="n">soft_signal_rw</span><span class="p">,</span>
@@ -833,6 +832,8 @@ window.addEventListener("load", load);
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.motor</span><span class="w"> </span><span class="kn">import</span> <span class="n">Motor</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.common.enums</span><span class="w"> </span><span class="kn">import</span> <span class="n">EnabledDisabledUpper</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.insertion_device.energy_motor_lookup</span><span class="w"> </span><span class="kn">import</span> <span class="n">EnergyMotorLookup</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.insertion_device.id_enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pol</span><span class="p">,</span> <span class="n">UndulatorGateStatus</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.log</span><span class="w"> </span><span class="kn">import</span> <span class="n">LOGGER</span>
 
 <span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">)</span>
@@ -841,16 +842,8 @@ window.addEventListener("load", load);
 <span class="n">MAXIMUM_MOVE_TIME</span> <span class="o">=</span> <span class="mi">550</span>  <span class="c1"># There is no useful movements take longer than this.</span>
 
 
-<div class="viewcode-block" id="UndulatorGateStatus">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.apple2_undulator.UndulatorGateStatus.html#dodal.devices.insertion_device.apple2_undulator.UndulatorGateStatus">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">UndulatorGateStatus</span><span class="p">(</span><span class="n">StrictEnum</span><span class="p">):</span>
-    <span class="n">OPEN</span> <span class="o">=</span> <span class="s2">&quot;Open&quot;</span>
-    <span class="n">CLOSE</span> <span class="o">=</span> <span class="s2">&quot;Closed&quot;</span></div>
-
-
-
 <div class="viewcode-block" id="Apple2LockedPhasesVal">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.apple2_undulator.Apple2LockedPhasesVal.html#dodal.devices.insertion_device.apple2_undulator.Apple2LockedPhasesVal">[docs]</a>
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.Apple2LockedPhasesVal.html#dodal.devices.insertion_device.Apple2LockedPhasesVal">[docs]</a>
 <span class="nd">@dataclass</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">Apple2LockedPhasesVal</span><span class="p">:</span>
     <span class="n">top_outer</span><span class="p">:</span> <span class="nb">str</span>
@@ -859,7 +852,7 @@ window.addEventListener("load", load);
 
 
 <div class="viewcode-block" id="Apple2PhasesVal">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.apple2_undulator.Apple2PhasesVal.html#dodal.devices.insertion_device.apple2_undulator.Apple2PhasesVal">[docs]</a>
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.Apple2PhasesVal.html#dodal.devices.insertion_device.Apple2PhasesVal">[docs]</a>
 <span class="nd">@dataclass</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">Apple2PhasesVal</span><span class="p">(</span><span class="n">Apple2LockedPhasesVal</span><span class="p">):</span>
     <span class="n">top_inner</span><span class="p">:</span> <span class="nb">str</span>
@@ -868,7 +861,7 @@ window.addEventListener("load", load);
 
 
 <div class="viewcode-block" id="Apple2Val">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.apple2_undulator.Apple2Val.html#dodal.devices.insertion_device.apple2_undulator.Apple2Val">[docs]</a>
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.Apple2Val.html#dodal.devices.insertion_device.Apple2Val">[docs]</a>
 <span class="nd">@dataclass</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">Apple2Val</span><span class="p">:</span>
     <span class="n">gap</span><span class="p">:</span> <span class="nb">str</span>
@@ -879,38 +872,20 @@ window.addEventListener("load", load);
 
 
 
-<div class="viewcode-block" id="Pol">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.apple2_undulator.Pol.html#dodal.devices.insertion_device.apple2_undulator.Pol">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">Pol</span><span class="p">(</span><span class="n">StrictEnum</span><span class="p">):</span>
-    <span class="n">NONE</span> <span class="o">=</span> <span class="s2">&quot;None&quot;</span>
-    <span class="n">LH</span> <span class="o">=</span> <span class="s2">&quot;lh&quot;</span>
-    <span class="n">LV</span> <span class="o">=</span> <span class="s2">&quot;lv&quot;</span>
-    <span class="n">PC</span> <span class="o">=</span> <span class="s2">&quot;pc&quot;</span>
-    <span class="n">NC</span> <span class="o">=</span> <span class="s2">&quot;nc&quot;</span>
-    <span class="n">LA</span> <span class="o">=</span> <span class="s2">&quot;la&quot;</span>
-    <span class="n">LH3</span> <span class="o">=</span> <span class="s2">&quot;lh3&quot;</span></div>
-
-
-
 <span class="n">ROW_PHASE_MOTOR_TOLERANCE</span> <span class="o">=</span> <span class="mf">0.004</span>
 <span class="n">MAXIMUM_ROW_PHASE_MOTOR_POSITION</span> <span class="o">=</span> <span class="mf">24.0</span>
 <span class="n">MAXIMUM_GAP_MOTOR_POSITION</span> <span class="o">=</span> <span class="mi">100</span>
 
 
-<div class="viewcode-block" id="estimate_motor_timeout">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.apple2_undulator.html#dodal.devices.insertion_device.apple2_undulator.estimate_motor_timeout">[docs]</a>
 <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">estimate_motor_timeout</span><span class="p">(</span>
     <span class="n">setpoint</span><span class="p">:</span> <span class="n">SignalR</span><span class="p">,</span> <span class="n">curr_pos</span><span class="p">:</span> <span class="n">SignalR</span><span class="p">,</span> <span class="n">velocity</span><span class="p">:</span> <span class="n">SignalR</span>
 <span class="p">):</span>
     <span class="n">vel</span> <span class="o">=</span> <span class="k">await</span> <span class="n">velocity</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
     <span class="n">cur_pos</span> <span class="o">=</span> <span class="k">await</span> <span class="n">curr_pos</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
     <span class="n">target_pos</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="k">await</span> <span class="n">setpoint</span><span class="o">.</span><span class="n">get_value</span><span class="p">())</span>
-    <span class="k">return</span> <span class="nb">abs</span><span class="p">((</span><span class="n">target_pos</span> <span class="o">-</span> <span class="n">cur_pos</span><span class="p">)</span> <span class="o">*</span> <span class="mf">2.0</span> <span class="o">/</span> <span class="n">vel</span><span class="p">)</span> <span class="o">+</span> <span class="n">DEFAULT_MOTOR_MIN_TIMEOUT</span></div>
+    <span class="k">return</span> <span class="nb">abs</span><span class="p">((</span><span class="n">target_pos</span> <span class="o">-</span> <span class="n">cur_pos</span><span class="p">)</span> <span class="o">*</span> <span class="mf">2.0</span> <span class="o">/</span> <span class="n">vel</span><span class="p">)</span> <span class="o">+</span> <span class="n">DEFAULT_MOTOR_MIN_TIMEOUT</span>
 
 
-
-<div class="viewcode-block" id="SafeUndulatorMover">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.apple2_undulator.SafeUndulatorMover.html#dodal.devices.insertion_device.apple2_undulator.SafeUndulatorMover">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">SafeUndulatorMover</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">,</span> <span class="n">Movable</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">Generic</span><span class="p">[</span><span class="n">T</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A device that will check it&#39;s safe to move the undulator before moving it and</span>
 <span class="sd">    wait for the undulator to be safe again before calling the move complete.</span>
@@ -933,30 +908,23 @@ window.addEventListener("load", load);
         <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">set_move</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
         <span class="k">await</span> <span class="n">wait_for_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gate</span><span class="p">,</span> <span class="n">UndulatorGateStatus</span><span class="o">.</span><span class="n">CLOSE</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
 
-<div class="viewcode-block" id="SafeUndulatorMover.set_demand_positions">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.apple2_undulator.SafeUndulatorMover.html#dodal.devices.insertion_device.apple2_undulator.SafeUndulatorMover.set_demand_positions">[docs]</a>
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set_demand_positions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">T</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the demand positions on the device without actually hitting move.&quot;&quot;&quot;</span></div>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the demand positions on the device without actually hitting move.&quot;&quot;&quot;</span>
 
-
-<div class="viewcode-block" id="SafeUndulatorMover.get_timeout">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.apple2_undulator.SafeUndulatorMover.html#dodal.devices.insertion_device.apple2_undulator.SafeUndulatorMover.get_timeout">[docs]</a>
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_timeout</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the timeout for the move based on an estimate of how long it will take.&quot;&quot;&quot;</span></div>
-
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the timeout for the move based on an estimate of how long it will take.&quot;&quot;&quot;</span>
 
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">raise_if_cannot_move</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">EnabledDisabledUpper</span><span class="o">.</span><span class="n">ENABLED</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> is DISABLED and cannot move.&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">gate</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span> <span class="o">==</span> <span class="n">UndulatorGateStatus</span><span class="o">.</span><span class="n">OPEN</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> is already in motion.&quot;</span><span class="p">)</span></div>
-
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> is already in motion.&quot;</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="UndulatorGap">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.apple2_undulator.UndulatorGap.html#dodal.devices.insertion_device.apple2_undulator.UndulatorGap">[docs]</a>
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.UndulatorGap.html#dodal.devices.insertion_device.UndulatorGap">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">UndulatorGap</span><span class="p">(</span><span class="n">SafeUndulatorMover</span><span class="p">[</span><span class="nb">float</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A device with a collection of epics signals to set Apple 2 undulator gap motion.</span>
 <span class="sd">    Only PV used by beamline are added the full list is here:</span>
@@ -1013,8 +981,6 @@ window.addEventListener("load", load);
 
 
 
-<div class="viewcode-block" id="UndulatorPhaseMotor">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.apple2_undulator.UndulatorPhaseMotor.html#dodal.devices.insertion_device.apple2_undulator.UndulatorPhaseMotor">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">UndulatorPhaseMotor</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A collection of epics signals for ID phase motion.</span>
 <span class="sd">    Only PV used by beamline are added the full list is here:</span>
@@ -1051,15 +1017,14 @@ window.addEventListener("load", load);
         <span class="bp">self</span><span class="o">.</span><span class="n">motor_done_move</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">full_pv</span> <span class="o">+</span> <span class="s2">&quot;.DMOV&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">low_limit_travel</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">full_pv</span> <span class="o">+</span> <span class="s2">&quot;.LLM&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">high_limit_travel</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">full_pv</span> <span class="o">+</span> <span class="s2">&quot;.HLM&quot;</span><span class="p">)</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span></div>
-
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
 
 
 <span class="n">Apple2PhaseValType</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;Apple2PhaseValType&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">Apple2LockedPhasesVal</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="UndulatorLockedPhaseAxes">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.apple2_undulator.UndulatorLockedPhaseAxes.html#dodal.devices.insertion_device.apple2_undulator.UndulatorLockedPhaseAxes">[docs]</a>
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.UndulatorLockedPhaseAxes.html#dodal.devices.insertion_device.UndulatorLockedPhaseAxes">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">UndulatorLockedPhaseAxes</span><span class="p">(</span><span class="n">SafeUndulatorMover</span><span class="p">[</span><span class="n">Apple2PhaseValType</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Two phase Motor to make up the locked id phase motion.&quot;&quot;&quot;</span>
 
@@ -1086,7 +1051,7 @@ window.addEventListener("load", load);
         <span class="p">)</span>
 
 <div class="viewcode-block" id="UndulatorLockedPhaseAxes.get_timeout">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.apple2_undulator.UndulatorLockedPhaseAxes.html#dodal.devices.insertion_device.apple2_undulator.UndulatorLockedPhaseAxes.get_timeout">[docs]</a>
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.UndulatorLockedPhaseAxes.html#dodal.devices.insertion_device.UndulatorLockedPhaseAxes.get_timeout">[docs]</a>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_timeout</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get all four motor speed, current positions and target positions to calculate required timeout.</span>
@@ -1112,7 +1077,7 @@ window.addEventListener("load", load);
 
 
 <div class="viewcode-block" id="UndulatorPhaseAxes">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.apple2_undulator.UndulatorPhaseAxes.html#dodal.devices.insertion_device.apple2_undulator.UndulatorPhaseAxes">[docs]</a>
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.UndulatorPhaseAxes.html#dodal.devices.insertion_device.UndulatorPhaseAxes">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">UndulatorPhaseAxes</span><span class="p">(</span><span class="n">UndulatorLockedPhaseAxes</span><span class="p">[</span><span class="n">Apple2PhasesVal</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A collection of 4 phase Motor to make up the full id phase motion. We are using the diamond pv convention.</span>
@@ -1151,7 +1116,7 @@ window.addEventListener("load", load);
 
 
 <div class="viewcode-block" id="UndulatorJawPhase">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.apple2_undulator.UndulatorJawPhase.html#dodal.devices.insertion_device.apple2_undulator.UndulatorJawPhase">[docs]</a>
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.UndulatorJawPhase.html#dodal.devices.insertion_device.UndulatorJawPhase">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">UndulatorJawPhase</span><span class="p">(</span><span class="n">SafeUndulatorMover</span><span class="p">[</span><span class="nb">float</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A JawPhase movable, this is use for moving the jaw phase which is use to control the</span>
@@ -1177,7 +1142,7 @@ window.addEventListener("load", load);
         <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">jaw_phase</span><span class="o">.</span><span class="n">user_setpoint</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
 
 <div class="viewcode-block" id="UndulatorJawPhase.get_timeout">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.apple2_undulator.UndulatorJawPhase.html#dodal.devices.insertion_device.apple2_undulator.UndulatorJawPhase.get_timeout">[docs]</a>
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.UndulatorJawPhase.html#dodal.devices.insertion_device.UndulatorJawPhase.get_timeout">[docs]</a>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_timeout</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get motor speed, current position and target position to calculate required timeout.</span>
@@ -1195,7 +1160,7 @@ window.addEventListener("load", load);
 
 
 <div class="viewcode-block" id="Apple2">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.apple2_undulator.Apple2.html#dodal.devices.insertion_device.apple2_undulator.Apple2">[docs]</a>
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.Apple2.html#dodal.devices.insertion_device.Apple2">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Apple2</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">,</span> <span class="n">Movable</span><span class="p">[</span><span class="n">Apple2Val</span><span class="p">],</span> <span class="n">Generic</span><span class="p">[</span><span class="n">PhaseAxesType</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Device representing the combined motor controls for an Apple2 undulator.</span>
@@ -1226,7 +1191,7 @@ window.addEventListener("load", load);
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Apple2.set">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.apple2_undulator.Apple2.html#dodal.devices.insertion_device.apple2_undulator.Apple2.set">[docs]</a>
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.Apple2.html#dodal.devices.insertion_device.Apple2.set">[docs]</a>
     <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">id_motor_values</span><span class="p">:</span> <span class="n">Apple2Val</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1261,7 +1226,7 @@ window.addEventListener("load", load);
 
 
 <div class="viewcode-block" id="EnergyMotorConvertor">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.apple2_undulator.EnergyMotorConvertor.html#dodal.devices.insertion_device.apple2_undulator.EnergyMotorConvertor">[docs]</a>
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.EnergyMotorConvertor.html#dodal.devices.insertion_device.EnergyMotorConvertor">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">EnergyMotorConvertor</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energy</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">pol</span><span class="p">:</span> <span class="n">Pol</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Protocol to provide energy to motor position conversion&quot;&quot;&quot;</span>
@@ -1273,7 +1238,7 @@ window.addEventListener("load", load);
 
 
 <div class="viewcode-block" id="Apple2Controller">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.apple2_undulator.Apple2Controller.html#dodal.devices.insertion_device.apple2_undulator.Apple2Controller">[docs]</a>
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.Apple2Controller.html#dodal.devices.insertion_device.Apple2Controller">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Apple2Controller</span><span class="p">(</span><span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">,</span> <span class="n">StandardReadable</span><span class="p">,</span> <span class="n">Generic</span><span class="p">[</span><span class="n">Apple2Type</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 
@@ -1459,7 +1424,7 @@ window.addEventListener("load", load);
         <span class="k">return</span> <span class="n">read_pol</span>
 
 <div class="viewcode-block" id="Apple2Controller.determine_phase_from_hardware">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.apple2_undulator.Apple2Controller.html#dodal.devices.insertion_device.apple2_undulator.Apple2Controller.determine_phase_from_hardware">[docs]</a>
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.Apple2Controller.html#dodal.devices.insertion_device.Apple2Controller.determine_phase_from_hardware">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">determine_phase_from_hardware</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">top_outer</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
@@ -1538,8 +1503,73 @@ window.addEventListener("load", load);
 
 
 
-<div class="viewcode-block" id="InsertionDeviceEnergyBase">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.apple2_undulator.InsertionDeviceEnergyBase.html#dodal.devices.insertion_device.apple2_undulator.InsertionDeviceEnergyBase">[docs]</a>
+<div class="viewcode-block" id="Apple2EnforceLHMoveController">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.Apple2EnforceLHMoveController.html#dodal.devices.insertion_device.Apple2EnforceLHMoveController">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Apple2EnforceLHMoveController</span><span class="p">(</span><span class="n">Apple2Controller</span><span class="p">[</span><span class="n">Apple2</span><span class="p">]):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The latest Apple2 version allows unrestricted motor movement.</span>
+<span class="sd">    However, because of the high forces involved in polarization changes,</span>
+<span class="sd">    all movements must be performed using the Linear Horizontal (LH) mode.</span>
+<span class="sd">    A look-up table must also be used to determine the highest energy that can</span>
+<span class="sd">    be reached in LH mode.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">apple2</span><span class="p">:</span> <span class="n">Apple2</span><span class="p">,</span>
+        <span class="n">gap_energy_motor_lut</span><span class="p">:</span> <span class="n">EnergyMotorLookup</span><span class="p">,</span>
+        <span class="n">phase_energy_motor_lut</span><span class="p">:</span> <span class="n">EnergyMotorLookup</span><span class="p">,</span>
+        <span class="n">units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;eV&quot;</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gap_energy_motor_lu</span> <span class="o">=</span> <span class="n">gap_energy_motor_lut</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">phase_energy_motor_lu</span> <span class="o">=</span> <span class="n">phase_energy_motor_lut</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">apple2</span><span class="o">=</span><span class="n">apple2</span><span class="p">,</span>
+            <span class="n">gap_energy_motor_converter</span><span class="o">=</span><span class="n">gap_energy_motor_lut</span><span class="o">.</span><span class="n">find_value_in_lookup_table</span><span class="p">,</span>
+            <span class="n">phase_energy_motor_converter</span><span class="o">=</span><span class="n">phase_energy_motor_lut</span><span class="o">.</span><span class="n">find_value_in_lookup_table</span><span class="p">,</span>
+            <span class="n">units</span><span class="o">=</span><span class="n">units</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_apple2_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gap</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">phase</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">pol</span><span class="p">:</span> <span class="n">Pol</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Apple2Val</span><span class="p">:</span>
+        <span class="n">apple2_val</span> <span class="o">=</span> <span class="n">Apple2Val</span><span class="p">(</span>
+            <span class="n">gap</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">gap</span><span class="si">:</span><span class="s2">.6f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">phase</span><span class="o">=</span><span class="n">Apple2PhasesVal</span><span class="p">(</span>
+                <span class="n">top_outer</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">phase</span><span class="si">:</span><span class="s2">.6f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="n">top_inner</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="mf">0.0</span><span class="si">:</span><span class="s2">.6f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="n">btm_inner</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">phase</span><span class="si">:</span><span class="s2">.6f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="n">btm_outer</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="mf">0.0</span><span class="si">:</span><span class="s2">.6f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">)</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Getting apple2 value for pol=</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">, gap=</span><span class="si">{</span><span class="n">gap</span><span class="si">}</span><span class="s2">, phase=</span><span class="si">{</span><span class="n">phase</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Apple2 motor values: </span><span class="si">{</span><span class="n">apple2_val</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">apple2_val</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_set_pol</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">value</span><span class="p">:</span> <span class="n">Pol</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># I09/I21 require all polarisation change to go via LH.</span>
+        <span class="n">current_pol</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">polarisation</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">current_pol</span> <span class="o">==</span> <span class="n">value</span><span class="p">:</span>
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Polarisation already at </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">target_energy</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">Pol</span><span class="o">.</span><span class="n">LH</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">current_pol</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">Pol</span><span class="o">.</span><span class="n">LH</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_polarisation_setpoint_set</span><span class="p">(</span><span class="n">Pol</span><span class="o">.</span><span class="n">LH</span><span class="p">)</span>
+                <span class="n">max_lh_energy</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">gap_energy_motor_lu</span><span class="o">.</span><span class="n">lut</span><span class="o">.</span><span class="n">root</span><span class="p">[</span><span class="n">Pol</span><span class="p">(</span><span class="s2">&quot;lh&quot;</span><span class="p">)]</span><span class="o">.</span><span class="n">max_energy</span>
+                <span class="p">)</span>
+                <span class="n">lh_setpoint</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">max_lh_energy</span> <span class="k">if</span> <span class="n">target_energy</span> <span class="o">&gt;</span> <span class="n">max_lh_energy</span> <span class="k">else</span> <span class="n">target_energy</span>
+                <span class="p">)</span>
+                <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Changing polarisation to </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2"> via </span><span class="si">{</span><span class="n">Pol</span><span class="o">.</span><span class="n">LH</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">lh_setpoint</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">MAXIMUM_MOVE_TIME</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_polarisation_setpoint_set</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">target_energy</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">MAXIMUM_MOVE_TIME</span><span class="p">)</span></div>
+
+
+
 <span class="k">class</span><span class="w"> </span><span class="nc">InsertionDeviceEnergyBase</span><span class="p">(</span><span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">,</span> <span class="n">StandardReadable</span><span class="p">,</span> <span class="n">Movable</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Base class for ID energy movable device.&quot;&quot;&quot;</span>
 
@@ -1549,12 +1579,11 @@ window.addEventListener("load", load);
 
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energy</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span></div>
-
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energy</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span>
 
 
 <div class="viewcode-block" id="BeamEnergy">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.apple2_undulator.BeamEnergy.html#dodal.devices.insertion_device.apple2_undulator.BeamEnergy">[docs]</a>
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.BeamEnergy.html#dodal.devices.insertion_device.BeamEnergy">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">BeamEnergy</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">,</span> <span class="n">Movable</span><span class="p">[</span><span class="nb">float</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Compound device to set both ID and energy motor at the same time with an option to add an offset.</span>
@@ -1602,7 +1631,7 @@ window.addEventListener("load", load);
 
 
 <div class="viewcode-block" id="InsertionDeviceEnergy">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.apple2_undulator.InsertionDeviceEnergy.html#dodal.devices.insertion_device.apple2_undulator.InsertionDeviceEnergy">[docs]</a>
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.InsertionDeviceEnergy.html#dodal.devices.insertion_device.InsertionDeviceEnergy">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">InsertionDeviceEnergy</span><span class="p">(</span><span class="n">InsertionDeviceEnergyBase</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Apple2 ID energy movable device.&quot;&quot;&quot;</span>
 
@@ -1619,7 +1648,7 @@ window.addEventListener("load", load);
 
 
 <div class="viewcode-block" id="InsertionDevicePolarisation">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.apple2_undulator.InsertionDevicePolarisation.html#dodal.devices.insertion_device.apple2_undulator.InsertionDevicePolarisation">[docs]</a>
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.InsertionDevicePolarisation.html#dodal.devices.insertion_device.InsertionDevicePolarisation">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">InsertionDevicePolarisation</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">,</span> <span class="n">Locatable</span><span class="p">[</span><span class="n">Pol</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Apple2 ID polarisation movable device.&quot;&quot;&quot;</span>
 
@@ -1635,7 +1664,7 @@ window.addEventListener("load", load);
         <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">polarisation</span><span class="p">()</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">pol</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">MAXIMUM_MOVE_TIME</span><span class="p">)</span>
 
 <div class="viewcode-block" id="InsertionDevicePolarisation.locate">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.apple2_undulator.InsertionDevicePolarisation.html#dodal.devices.insertion_device.apple2_undulator.InsertionDevicePolarisation.locate">[docs]</a>
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.InsertionDevicePolarisation.html#dodal.devices.insertion_device.InsertionDevicePolarisation.locate">[docs]</a>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">locate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Location</span><span class="p">[</span><span class="n">Pol</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the current polarisation&quot;&quot;&quot;</span>
         <span class="n">setpoint</span><span class="p">,</span> <span class="n">readback</span> <span class="o">=</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span>
