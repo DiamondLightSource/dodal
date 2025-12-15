@@ -1,4 +1,4 @@
-from dodal.devices.apple2_undulator import (
+from dodal.devices.insertion_device.apple2_undulator import (
     Apple2,
     Apple2Controller,
     Apple2PhasesVal,
@@ -6,7 +6,7 @@ from dodal.devices.apple2_undulator import (
     Pol,
     UndulatorPhaseAxes,
 )
-from dodal.devices.util.lookup_tables_apple2 import EnergyMotorLookup
+from dodal.devices.insertion_device.energy_motor_lookup import EnergyMotorLookup
 
 ROW_PHASE_MOTOR_TOLERANCE = 0.004
 MAXIMUM_ROW_PHASE_MOTOR_POSITION = 24.0

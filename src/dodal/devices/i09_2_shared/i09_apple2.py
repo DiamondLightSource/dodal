@@ -1,4 +1,4 @@
-from dodal.devices.apple2_undulator import (
+from dodal.devices.insertion_device.apple2_undulator import (
     MAXIMUM_MOVE_TIME,
     Apple2,
     Apple2Controller,
@@ -7,7 +7,7 @@ from dodal.devices.apple2_undulator import (
     Pol,
     UndulatorPhaseAxes,
 )
-from dodal.devices.util.lookup_tables_apple2 import EnergyMotorLookup
+from dodal.devices.insertion_device.energy_motor_lookup import EnergyMotorLookup
 
 J09_GAP_POLY_DEG_COLUMNS = [
     "9th-order",
@@ -77,9 +77,7 @@ class J09Apple2Controller(Apple2Controller[Apple2[UndulatorPhaseAxes]]):
         target_energy = await self.energy.get_value()
         if value is not Pol.LH:
             self._polarisation_setpoint_set(Pol.LH)
-            max_lh_energy = float(
-                self.gap_energy_motor_lut.lut.root[Pol.LH].limit.maximum
-            )
+            max_lh_energy = self.gap_energy_motor_lut.lut.root[Pol.LH].max_energy
             lh_setpoint = (
                 max_lh_energy if target_energy > max_lh_energy else target_energy
             )
