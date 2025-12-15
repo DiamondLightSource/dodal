@@ -12,7 +12,7 @@ from dodal.devices.oav.oav_parameters import (
 from tests.devices.oav.test_data import TEST_OAV_CENTRING_JSON
 from tests.test_data import (
     TEST_DISPLAY_CONFIG,
-    TEST_OAV_ZOOM_LEVELS_XML,
+    TEST_OAV_ZOOM_LEVELS,
 )
 
 
@@ -26,13 +26,13 @@ def mock_parameters():
 
 @pytest.fixture
 def mock_config() -> dict[str, ZoomParams]:
-    return OAVConfig(TEST_OAV_ZOOM_LEVELS_XML).get_parameters()
+    return OAVConfig(TEST_OAV_ZOOM_LEVELS).get_parameters()
 
 
 @pytest.fixture
 def mock_config_with_beam_centre() -> dict[str, ZoomParamsCrosshair]:
     config = OAVConfigBeamCentre(
-        TEST_OAV_ZOOM_LEVELS_XML, TEST_DISPLAY_CONFIG
+        TEST_OAV_ZOOM_LEVELS, TEST_DISPLAY_CONFIG
     ).get_parameters()
     config = cast(dict[str, ZoomParamsCrosshair], config)
     return config

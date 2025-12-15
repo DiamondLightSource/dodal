@@ -15,6 +15,7 @@ from dodal.device_manager import DeviceManager
 from dodal.devices.baton import Baton
 from dodal.devices.detector import DetectorParams
 from dodal.devices.detector.det_dim_constants import EIGER2_X_16M_SIZE
+from dodal.testing import MockConfigServer
 from dodal.utils import (
     DeviceInitializationController,
     collect_factories,
@@ -88,3 +89,20 @@ async def baton_in_commissioning_mode() -> AsyncGenerator[Baton]:
     set_mock_value(baton.commissioning, True)
     yield baton
     set_commissioning_signal(None)
+
+
+IMPLEMENTED_CONFIG_CLIENTS = []
+
+
+@pytest.fixture(autouse=True)
+def mock_config_server():
+    # Don't actually talk to central service during unit tests, and reset caches between test
+
+    for client in IMPLEMENTED_CONFIG_CLIENTS:
+        client.cache_clear()  # type: ignore - currently no option for "cachable" static type
+
+    with patch(
+        "daq_config_server.client.ConfigServer.get_file_contents",
+        side_effect=MockConfigServer().get_file_contents,
+    ):
+        yield
