@@ -697,11 +697,12 @@ class Apple2EnforceLHMoveController(Apple2Controller[Apple2]):
         value: Pol,
     ) -> None:
         # I09/I21 require all polarisation change to go via LH.
-        if await self.polarisation.get_value() == value:
+        current_pol = await self.polarisation.get_value()
+        if current_pol == value:
             LOGGER.info(f"Polarisation already at {value}")
         else:
             target_energy = await self.energy.get_value()
-            if value is not Pol.LH:
+            if (value is not Pol.LH) and (current_pol is not Pol.LH):
                 self._polarisation_setpoint_set(Pol.LH)
                 max_lh_energy = float(
                     self.gap_energy_motor_lu.lut.root[Pol("lh")].max_energy
