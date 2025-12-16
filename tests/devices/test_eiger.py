@@ -767,6 +767,7 @@ def test_eiger_uses_current_energy_if_expected_energy_is_none(
     assert not thread.is_alive()
     assert fake_eiger.cam.photon_energy.get() == expected_energy
 
+
 async def test_multiple_stops_disarms_eiger_once(fake_eiger: EigerDetector):
     fake_eiger.disarming_status = None
     fake_eiger.disarm_detector = MagicMock()
@@ -777,4 +778,3 @@ async def test_multiple_stops_disarms_eiger_once(fake_eiger: EigerDetector):
 
     await asyncio.gather(do_stop(), do_stop())
     fake_eiger.disarm_detector.assert_called_once()
-
