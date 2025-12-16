@@ -8,7 +8,6 @@ from ophyd.sim import NullStatus, make_fake_device
 from ophyd.status import Status
 from ophyd.utils import UnknownStatusFailure
 
-from conftest import failed_status
 from dodal.devices.detector import DetectorParams, TriggerMode
 from dodal.devices.detector.det_dim_constants import EIGER2_X_16M_SIZE
 from dodal.devices.eiger import AVAILABLE_TIMEOUTS, EigerDetector
@@ -18,6 +17,12 @@ from dodal.log import LOGGER
 
 TEST_PREFIX = "test"
 TEST_RUN_NUMBER = 0
+
+
+def failed_status(failure: Exception) -> Status:
+    status = Status()
+    status.set_exception(failure)
+    return status
 
 
 class StatusError(Exception):
