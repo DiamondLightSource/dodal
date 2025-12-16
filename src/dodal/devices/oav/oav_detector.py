@@ -86,7 +86,7 @@ class InstantMovingZoom(DeviceMock["ZoomController"]):
 
     async def connect(self, device: "ZoomController") -> None:
         """Mock signals to do an instant move on setpoint write."""
-        device.DELAY_BETWEEN_MOTORS_AND_IMAGE_UPDATING_S = 0.001
+        device.DELAY_BETWEEN_MOTORS_AND_IMAGE_UPDATING_S = 0.001  # type:ignore
 
 
 @default_mock_class(InstantMovingZoom)
