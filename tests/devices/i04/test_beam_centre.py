@@ -87,7 +87,7 @@ async def test_fit_ellipse_raises_error_if_not_enough_contour_points(
         await centre_device.trigger()
 
 
-@patch("dodal.devices.i04.beam_centre.CentreEllipseMethod.fit_ellipse")
+@patch("dodal.devices.i04.beam_centre.CentreEllipseMethod._fit_ellipse")
 @patch("dodal.devices.i04.beam_centre.convert_image_to_binary")
 async def test_trigger_converts_to_binary_then_finds_ellipse(
     mock_convert_to_binary: MagicMock,

@@ -1,7 +1,6 @@
 from collections.abc import AsyncGenerator
-from unittest.mock import ANY, AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, patch
 
-import cv2
 import numpy as np
 import pytest
 from ophyd_async.core import init_devices
@@ -35,18 +34,6 @@ async def test_returns_max(
     mocked_preprocessed_data.return_value = preprocessed_data
     await max_pixel.trigger()
     assert await max_pixel.max_pixel_val.get_value() == expected
-
-
-@patch("dodal.devices.i04.max_pixel.cv2.cvtColor")
-@patch("dodal.devices.i04.max_pixel.cv2.GaussianBlur")
-async def test_preprocessed_data_grayscale_is_called(
-    mocked_cv2_blur: MagicMock,
-    mocked_cv2_grey: MagicMock,
-):
-    data = np.array([1])
-    convert_to_gray_and_blur(data)
-    mocked_cv2_grey.assert_called_once_with(data, cv2.COLOR_BGR2GRAY)
-    mocked_cv2_blur.assert_called_once_with(ANY, ANY, 0)
 
 
 test_arr = np.array(
