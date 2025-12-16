@@ -1,17 +1,29 @@
 import re
 from abc import ABC
 from collections.abc import Callable
-from typing import Generic, Self, TypeVar
+from typing import Generic, Self, TypeAlias, TypeVar
 
+from ophyd_async.core import StrictEnum, SupersetEnum
 from pydantic import BaseModel, Field, model_validator
 
-from dodal.devices.electron_analyser.abstract.types import (
-    TAcquisitionMode,
-    TLensMode,
-    TPassEnergy,
+from dodal.devices.electron_analyser.base.base_enums import EnergyMode, SelectedSource
+from dodal.devices.electron_analyser.base.base_util import (
+    to_binding_energy,
+    to_kinetic_energy,
 )
-from dodal.devices.electron_analyser.enums import EnergyMode, SelectedSource
-from dodal.devices.electron_analyser.util import to_binding_energy, to_kinetic_energy
+
+AnyAcqMode: TypeAlias = StrictEnum
+AnyLensMode: TypeAlias = SupersetEnum | StrictEnum
+AnyPassEnergy: TypeAlias = StrictEnum | float
+AnyPsuMode: TypeAlias = SupersetEnum | StrictEnum
+
+TAcquisitionMode = TypeVar("TAcquisitionMode", bound=AnyAcqMode)
+# Allow SupersetEnum. Specs analysers can connect to Lens and Psu mode separately to the
+# analyser which leaves the enum to either be "Not connected" OR the available enums
+# when connected.
+TLensMode = TypeVar("TLensMode", bound=AnyLensMode)
+TPassEnergy = TypeVar("TPassEnergy", bound=AnyPassEnergy)
+TPsuMode = TypeVar("TPsuMode", bound=AnyPsuMode)
 
 
 def java_to_python_case(java_str: str) -> str:
@@ -88,10 +100,13 @@ class AbstractBaseRegion(
         return self.energy_mode == EnergyMode.KINETIC
 
     def switch_energy_mode(
-        self, energy_mode: EnergyMode, excitation_energy: float, copy: bool = True
+        self,
+        energy_mode: EnergyMode,
+        excitation_energy: float,
+        copy: bool = True,
     ) -> Self:
         """
-        Switch region with to a new energy mode with a new energy mode: Kinetic or Binding.
+        Get a region with a new energy mode: Kinetic or Binding.
         It caculates new values for low_energy, centre_energy, high_energy, via the
         excitation enerrgy. It doesn't calculate anything if the region is already of
         the same energy mode.
@@ -100,8 +115,8 @@ class AbstractBaseRegion(
             energy_mode: Mode you want to switch the region to.
             excitation_energy: Energy conversion for low_energy, centre_energy, and
                                high_energy for new energy mode.
-            copy: Defaults to True. If true, create a copy of this region for the new
-                  energy_mode and return it. If False, alter this region for the
+            copy: Defaults to True. If true, create a copy of this region to alter for
+                  the new energy_mode and return it. If False, alter this region for the
                   energy_mode and return it self.
 
         Returns:
@@ -126,6 +141,25 @@ class AbstractBaseRegion(
 
         return switched_r
 
+    def prepare_for_epics(self, excitation_energy: float, copy: bool = True) -> Self:
+        """Prepares a region for epics by converting BINDING to KINETIC by calculating
+        new values for low_energy, centre_energy, and high_energy while also preserving
+        the original energy mode e.g mode BINDING will stay as BINDING.
+
+        Parameters:
+            excitation_energy: Energy conversion for low_energy, centre_energy, and
+                               high_energy for new energy mode.
+            copy: Defaults to True. If true, create a copy of this region to alter to
+                  calculate new energy values to return. If false, alter this region.
+        Returns:
+            Region with selected original energy mode and new calculated KINETIC energy
+            values for epics.
+        """
+        original_energy_mode = self.energy_mode
+        r = self.switch_energy_mode(EnergyMode.KINETIC, excitation_energy, copy)
+        r.energy_mode = original_energy_mode
+        return r
+
     @model_validator(mode="before")
     @classmethod
     def before_validation(cls, data: dict) -> dict:
@@ -133,6 +167,7 @@ class AbstractBaseRegion(
         return energy_mode_validation(data)
 
 
+GenericRegion = AbstractBaseRegion[AnyAcqMode, AnyLensMode, AnyPassEnergy]
 TAbstractBaseRegion = TypeVar("TAbstractBaseRegion", bound=AbstractBaseRegion)
 
 
@@ -163,4 +198,5 @@ class AbstractBaseSequence(
         return next((region for region in self.regions if region.name == name), None)
 
 
+GenericSequence = AbstractBaseSequence[GenericRegion]
 TAbstractBaseSequence = TypeVar("TAbstractBaseSequence", bound=AbstractBaseSequence)
