@@ -103,6 +103,7 @@ async def test_real_image_gives_expected_centre(
     centre_device: CentreEllipseMethod,
 ):
     image = cv2.imread("tests/test_data/scintillator_with_beam.jpg")
+    assert image is not None
     image = np.asarray(image[:, :])
     set_mock_value(centre_device.oav_array_signal, image)
 
