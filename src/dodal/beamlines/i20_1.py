@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from ophyd_async.epics.motor import Motor
+from ophyd_async.epics.pmac import PmacIO
 from ophyd_async.fastcs.panda import HDFPanda
 
 from dodal.common.beamlines.beamline_utils import (
@@ -57,6 +58,14 @@ def turbo_slit_x() -> Motor:
     """
     return Motor(f"{PREFIX.beamline_prefix}-OP-PCHRO-01:TS:XFINE")
 
+@device_factory()
+def turbo_slit_pmac() -> PmacIO:
+    motor = turbo_slit_x()
+    return PmacIO(
+        prefix=f"{PREFIX.beamline_prefix}-MO-STEP-06:",
+        raw_motors=[motor],
+        coord_nums=[3],
+    )
 
 @device_factory()
 def panda() -> HDFPanda:
