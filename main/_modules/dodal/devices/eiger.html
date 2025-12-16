@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.eiger &#8212; dodal 1.67.1.dev6+g9435d9ed0 documentation</title>
+    <title>dodal.devices.eiger &#8212; dodal 1.67.1.dev7+ga2e9629c6 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=bafc242d"></script>
+    <script src="../../../_static/documentation_options.js?v=6b57975c"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -807,14 +807,13 @@ window.addEventListener("load", load);
                 <article class="bd-article">
                   
   <h1>Source code for dodal.devices.eiger</h1><div class="highlight"><pre>
-<span></span><span class="c1"># type: ignore # Eiger will soon be ophyd-async https://github.com/DiamondLightSource/dodal/issues/700</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">bluesky.protocols</span><span class="w"> </span><span class="kn">import</span> <span class="n">Stageable</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd</span><span class="w"> </span><span class="kn">import</span> <span class="n">Component</span><span class="p">,</span> <span class="n">Device</span><span class="p">,</span> <span class="n">EpicsSignalRO</span><span class="p">,</span> <span class="n">Signal</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd.areadetector.cam</span><span class="w"> </span><span class="kn">import</span> <span class="n">EigerDetectorCam</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd.status</span><span class="w"> </span><span class="kn">import</span> <span class="n">AndStatus</span><span class="p">,</span> <span class="n">Status</span><span class="p">,</span> <span class="n">StatusBase</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd.status</span><span class="w"> </span><span class="kn">import</span> <span class="n">AndStatus</span><span class="p">,</span> <span class="n">Status</span><span class="p">,</span> <span class="n">StatusBase</span><span class="p">,</span> <span class="n">SubscriptionStatus</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.detector</span><span class="w"> </span><span class="kn">import</span> <span class="n">DetectorParams</span><span class="p">,</span> <span class="n">TriggerMode</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.eiger_odin</span><span class="w"> </span><span class="kn">import</span> <span class="n">EigerOdin</span>
@@ -940,7 +939,7 @@ window.addEventListener("load", load);
             <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Waiting for arming to finish&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">arming_status</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">timeouts</span><span class="o">.</span><span class="n">arming_timeout</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">stage</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">stage</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pyright: ignore[reportIncompatibleMethodOverride]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">wait_on_arming_if_started</span><span class="p">()</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_armed</span><span class="p">():</span>
             <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Eiger not armed, arming&quot;</span><span class="p">)</span>
@@ -949,6 +948,7 @@ window.addEventListener("load", load);
 
     <span class="k">def</span><span class="w"> </span><span class="nf">stop_odin_when_all_frames_collected</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Waiting on all frames&quot;</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">detector_params</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">await_value</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">odin</span><span class="o">.</span><span class="n">file_writer</span><span class="o">.</span><span class="n">num_captured</span><span class="p">,</span>
@@ -958,7 +958,7 @@ window.addEventListener("load", load);
             <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Stopping Odin&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">odin</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">timeouts</span><span class="o">.</span><span class="n">odin_stop_timeout</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">unstage</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">unstage</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>  <span class="c1"># pyright: ignore[reportIncompatibleMethodOverride]</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">detector_params</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">disarming_status</span> <span class="o">=</span> <span class="n">Status</span><span class="p">()</span>
@@ -985,7 +985,7 @@ window.addEventListener("load", load);
 
 <div class="viewcode-block" id="EigerDetector.stop">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.eiger.EigerDetector.html#dodal.devices.eiger.EigerDetector.stop">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>  <span class="c1"># pyright: ignore[reportIncompatibleMethodOverride]</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Emergency stop the device, mainly used to clean up after error.&quot;&quot;&quot;</span>
         <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Eiger stop() called - cleaning up...&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">disarming_status</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">disarming_status</span><span class="o">.</span><span class="n">done</span><span class="p">:</span>
@@ -1061,7 +1061,8 @@ window.addEventListener("load", load);
             <span class="mi">1</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeouts</span><span class="o">.</span><span class="n">general_status_timeout</span>
         <span class="p">)</span>
         <span class="n">status</span> <span class="o">&amp;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">image_mode</span><span class="o">.</span><span class="n">set</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">ImageMode</span><span class="o">.</span><span class="n">MULTIPLE</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeouts</span><span class="o">.</span><span class="n">general_status_timeout</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">ImageMode</span><span class="o">.</span><span class="n">MULTIPLE</span><span class="p">,</span>  <span class="c1"># pyright: ignore[reportAttributeAccessIssue]</span>
+            <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeouts</span><span class="o">.</span><span class="n">general_status_timeout</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="n">status</span> <span class="o">&amp;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">trigger_mode</span><span class="o">.</span><span class="n">set</span><span class="p">(</span>
             <span class="n">InternalEigerTriggerMode</span><span class="o">.</span><span class="n">EXTERNAL_SERIES</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
@@ -1137,7 +1138,7 @@ window.addEventListener("load", load);
 <span class="sd">                this tolerance it is not set again. Defaults to 0.1eV.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">current_energy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">photon_energy</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+        <span class="n">current_energy</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">photon_energy</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
         <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">current_energy</span> <span class="o">-</span> <span class="n">energy</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">tolerance</span><span class="p">:</span>
             <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Setting detector threshold to </span><span class="si">{</span><span class="n">energy</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">photon_energy</span><span class="o">.</span><span class="n">set</span><span class="p">(</span>
@@ -1224,7 +1225,7 @@ window.addEventListener("load", load);
     <span class="k">def</span><span class="w"> </span><span class="nf">disarm_detector</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">acquire</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">timeouts</span><span class="o">.</span><span class="n">general_status_timeout</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">wait_for_stale_params</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Status</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">wait_for_stale_params</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SubscriptionStatus</span><span class="p">:</span>
         <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Eiger arming: Waiting for stale params...&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">await_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stale_params</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">60</span><span class="p">)</span>
 
@@ -1238,6 +1239,11 @@ window.addEventListener("load", load);
         <span class="n">detector_params</span><span class="p">:</span> <span class="n">DetectorParams</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">detector_params</span>
         <span class="k">if</span> <span class="n">detector_params</span><span class="o">.</span><span class="n">use_roi_mode</span><span class="p">:</span>
             <span class="n">functions_to_do_arm</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">enable_roi_mode</span><span class="p">)</span>
+        <span class="n">threshold_energy</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">detector_params</span><span class="o">.</span><span class="n">expected_energy_ev</span>
+            <span class="k">if</span> <span class="n">detector_params</span><span class="o">.</span><span class="n">expected_energy_ev</span>
+            <span class="k">else</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">photon_energy</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
+        <span class="p">)</span>
 
         <span class="n">arming_sequence_funcs</span> <span class="o">=</span> <span class="p">[</span>
             <span class="c1"># If a beam dump occurs after arming the eiger but prior to eiger staging,</span>
@@ -1245,7 +1251,7 @@ window.addEventListener("load", load);
             <span class="c1"># if this previously completed successfully we must reset the odin first</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">odin</span><span class="o">.</span><span class="n">stop</span><span class="p">,</span>
             <span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">change_dev_shm</span><span class="p">(</span><span class="n">detector_params</span><span class="o">.</span><span class="n">enable_dev_shm</span><span class="p">),</span>
-            <span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">set_detector_threshold</span><span class="p">(</span><span class="n">detector_params</span><span class="o">.</span><span class="n">expected_energy_ev</span><span class="p">),</span>
+            <span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">set_detector_threshold</span><span class="p">(</span><span class="n">threshold_energy</span><span class="p">),</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">set_cam_pvs</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">set_odin_number_of_frame_chunks</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">set_odin_pvs</span><span class="p">,</span>
