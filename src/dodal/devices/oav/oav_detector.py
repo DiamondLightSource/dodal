@@ -6,11 +6,13 @@ from mx_bluesky.common.utils.log import LOGGER
 from ophyd_async.core import (
     DEFAULT_TIMEOUT,
     AsyncStatus,
+    DeviceMock,
     DeviceVector,
     LazyMock,
     SignalR,
     SignalRW,
     StandardReadable,
+    default_mock_class,
     derived_signal_r,
     soft_signal_rw,
 )
@@ -25,8 +27,6 @@ from dodal.devices.oav.oav_parameters import (
 )
 from dodal.devices.oav.snapshots.snapshot import Snapshot
 from dodal.devices.oav.snapshots.snapshot_with_grid import SnapshotWithGrid
-
-DELAY_BETWEEN_MOTORS_AND_IMAGE_UPDATING_S = 2
 
 
 class Coords(IntEnum):
@@ -81,6 +81,15 @@ class BeamCentreForZoom(StandardReadable):
         super().__init__()
 
 
+class InstantMovingZoom(DeviceMock["ZoomController"]):
+    """Mock behaviour that instantly moves the zoom."""
+
+    async def connect(self, device: "ZoomController") -> None:
+        """Mock signals to do an instant move on setpoint write."""
+        device.DELAY_BETWEEN_MOTORS_AND_IMAGE_UPDATING_S = 0.001
+
+
+@default_mock_class(InstantMovingZoom)
 class ZoomController(BaseZoomController):
     """
     Device to control the zoom level. This should be set like
@@ -90,6 +99,8 @@ class ZoomController(BaseZoomController):
     Note that changing the zoom may change the AD wiring on the associated OAV, as such
     you should wait on any zoom changes to finish before changing the OAV wiring.
     """
+
+    DELAY_BETWEEN_MOTORS_AND_IMAGE_UPDATING_S = 2
 
     def __init__(self, prefix: str, name: str = "") -> None:
         self.percentage = epics_signal_rw(float, f"{prefix}ZOOMPOSCMD")
@@ -103,9 +114,9 @@ class ZoomController(BaseZoomController):
     async def set(self, value: str):
         await self.level.set(value, wait=True)
         LOGGER.info(
-            "Waiting {DELAY_BETWEEN_MOTORS_AND_IMAGE_UPDATING_S} seconds for zoom to be noticeable"
+            "Waiting {self.DELAY_BETWEEN_MOTORS_AND_IMAGE_UPDATING_S} seconds for zoom to be noticeable"
         )
-        await asyncio.sleep(DELAY_BETWEEN_MOTORS_AND_IMAGE_UPDATING_S)
+        await asyncio.sleep(self.DELAY_BETWEEN_MOTORS_AND_IMAGE_UPDATING_S)
 
 
 class ZoomControllerWithBeamCentres(ZoomController):
