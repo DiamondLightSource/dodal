@@ -1,7 +1,5 @@
 import pytest
-from bluesky.run_engine import RunEngine
-from ophyd_async.core import PathProvider, init_devices
-from ophyd_async.testing import set_mock_value
+from ophyd_async.core import PathProvider, init_devices, set_mock_value
 
 from dodal.devices.areadetector import PressureJumpCellDetector
 from dodal.devices.areadetector.pressurejumpcell_io import (
@@ -11,9 +9,7 @@ from dodal.devices.areadetector.pressurejumpcell_io import (
 
 
 @pytest.fixture
-async def cell_ad(
-    static_path_provider: PathProvider, RE: RunEngine
-) -> PressureJumpCellDetector:
+async def cell_ad(static_path_provider: PathProvider) -> PressureJumpCellDetector:
     async with init_devices(mock=True):
         pjump_ad = PressureJumpCellDetector("DEMO-PJUMPAD-01:", static_path_provider)
 

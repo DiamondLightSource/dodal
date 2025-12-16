@@ -1,6 +1,13 @@
 import bluesky.plan_stubs as bps
 
-from dodal.devices.pressure_jump_cell import PressureJumpCell, PressureJumpParameters
+from dodal.devices.pressure_jump_cell import (
+    FastValveControlRequest,
+    FastValveState,
+    PressureJumpCell,
+    PressureJumpParameters,
+    ValveControlRequest,
+    ValveState,
+)
 
 
 def set_pressure(pressure_cell: PressureJumpCell, pressure: int):
@@ -18,15 +25,6 @@ def set_pressure_jump(
     """
     jump_params = PressureJumpParameters(pressure_from, pressure_to)
     yield from bps.mv(pressure_cell.control, jump_params)
-
-
-from dodal.devices.pressure_jump_cell import (
-    FastValveControlRequest,
-    FastValveState,
-    PressureJumpCell,
-    ValveControlRequest,
-    ValveState,
-)
 
 
 def prepare_fast_pressure_jump(
@@ -63,7 +61,7 @@ def prepare_fast_pressure_jump(
         pressure_cell.all_valves_control.valve_control[5],
         ValveControlRequest.CLOSE,
         pressure_cell.all_valves_control.valve_control[6],
-        ValveControlRequest.CLOSE
+        ValveControlRequest.CLOSE,
     )
 
     # Bring the reservoir section upto the jump to pressure
@@ -76,10 +74,10 @@ def prepare_fast_pressure_jump(
     if jump_direction_up:
         yield from bps.mv(
             pressure_cell.all_valves_control.valve_control[5],
-            FastValveControlRequest.ARM
+            FastValveControlRequest.ARM,
         )
     else:
         yield from bps.mv(
             pressure_cell.all_valves_control.valve_control[6],
-            FastValveControlRequest.ARM
+            FastValveControlRequest.ARM,
         )
