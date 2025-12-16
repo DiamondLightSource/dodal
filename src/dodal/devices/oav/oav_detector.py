@@ -2,7 +2,6 @@ import asyncio
 from enum import IntEnum
 
 from bluesky.protocols import Movable
-from mx_bluesky.common.utils.log import LOGGER
 from ophyd_async.core import (
     DEFAULT_TIMEOUT,
     AsyncStatus,
@@ -27,6 +26,7 @@ from dodal.devices.oav.oav_parameters import (
 )
 from dodal.devices.oav.snapshots.snapshot import Snapshot
 from dodal.devices.oav.snapshots.snapshot_with_grid import SnapshotWithGrid
+from dodal.log import LOGGER
 
 
 class Coords(IntEnum):
