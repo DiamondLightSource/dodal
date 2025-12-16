@@ -1,11 +1,7 @@
 import pytest
 from pytest import FixtureRequest
 
-from dodal.devices.insertion_device.apple2_undulator import Pol
-from dodal.devices.insertion_device.lookup_table_models import (
-    EnergyCoverage,
-    LookupTable,
-)
+from dodal.devices.insertion_device import EnergyCoverage, LookupTable, Pol
 from tests.devices.insertion_device.util import GenerateConfigLookupTable
 
 

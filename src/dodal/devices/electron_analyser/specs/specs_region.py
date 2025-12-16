@@ -2,12 +2,13 @@ from typing import Generic
 
 from pydantic import Field
 
-from dodal.devices.electron_analyser.abstract.base_region import (
+from dodal.devices.electron_analyser.base.base_region import (
     AbstractBaseRegion,
     AbstractBaseSequence,
+    TLensMode,
+    TPsuMode,
 )
-from dodal.devices.electron_analyser.abstract.types import TLensMode, TPsuMode
-from dodal.devices.electron_analyser.specs.enums import AcquisitionMode
+from dodal.devices.electron_analyser.specs.specs_enums import AcquisitionMode
 
 
 class SpecsRegion(
