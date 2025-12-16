@@ -139,6 +139,12 @@ def _set_pin_sensor_on_log_messages(device: BartRobot, msg: str):
         set_mock_value(device.gonio_pin_sensor, PinMounted.PIN_MOUNTED)
 
 
+def _error_on_unload_log_messages(device: BartRobot, msg: str):
+    if msg == WAIT_FOR_OLD_PIN_MSG:
+        set_mock_value(device.prog_error.code, 40)
+        set_mock_value(device.prog_error.str, "Test error")
+
+
 # Use log info messages to determine when to set the gonio_pin_sensor, so we don't have to use any sleeps during testing
 async def set_with_happy_path(
     device: BartRobot, mock_log_info: MagicMock
@@ -146,6 +152,18 @@ async def set_with_happy_path(
     """Mocks the logic that the robot would do on a successful load"""
 
     mock_log_info.side_effect = partial(_set_pin_sensor_on_log_messages, device)
+    set_mock_value(device.program_running, False)
+    set_mock_value(device.gonio_pin_sensor, PinMounted.PIN_MOUNTED)
+    status = device.set(SampleLocation(15, 10))
+    return status
+
+
+async def set_with_unhappy_path(
+    device: BartRobot, mock_log_info: MagicMock
+) -> AsyncStatus:
+    """Mocks the logic that the robot would do on a successful load"""
+
+    mock_log_info.side_effect = partial(_error_on_unload_log_messages, device)
     set_mock_value(device.program_running, False)
     set_mock_value(device.gonio_pin_sensor, PinMounted.PIN_MOUNTED)
     status = device.set(SampleLocation(15, 10))
@@ -168,14 +186,14 @@ async def test_given_program_not_running_and_pin_unmounts_then_mounts_when_load_
 async def test_given_waiting_for_pin_to_mount_when_no_pin_mounted_then_error_raised():
     device = await _get_bart_robot()
     set_mock_value(device.prog_error.code, 25)
-    status = device.pin_mounted_or_no_pin_found()
+    status = device.pin_state_or_error()
     with pytest.raises(RobotLoadError):
         await status
 
 
 async def test_given_waiting_for_pin_to_mount_when_pin_mounted_then_no_error_raised():
     device = await _get_bart_robot()
-    status = create_task(device.pin_mounted_or_no_pin_found())
+    status = create_task(device.pin_state_or_error())
     set_mock_value(device.gonio_pin_sensor, PinMounted.PIN_MOUNTED)
     await status
 
@@ -268,3 +286,16 @@ async def test_unloading_the_robot_times_out_if_drying_takes_too_long(robot_for_
         await unload_status
 
     assert isinstance(exc_info.value.__cause__, TimeoutError)
+
+
+@patch("dodal.devices.robot.LOGGER.info")
+async def test_moving_the_robot_will_raise_if_error_during_unload(
+    mock_log_info: MagicMock,
+):
+    device = await _get_bart_robot()
+
+    with pytest.raises(RobotLoadError) as exc_info:
+        await (await set_with_unhappy_path(device, mock_log_info))
+
+    assert exc_info.value.error_code == 40
+    assert exc_info.value.error_string == "Test error"

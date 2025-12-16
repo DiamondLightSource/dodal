@@ -1,4 +1,5 @@
 # type: ignore # Eiger will soon be ophyd-async https://github.com/DiamondLightSource/dodal/issues/700
+import asyncio
 import threading
 from unittest.mock import ANY, MagicMock, Mock, call, create_autospec, patch
 
@@ -7,7 +8,6 @@ from ophyd.sim import NullStatus, make_fake_device
 from ophyd.status import Status
 from ophyd.utils import UnknownStatusFailure
 
-from conftest import failed_status
 from dodal.devices.detector import DetectorParams, TriggerMode
 from dodal.devices.detector.det_dim_constants import EIGER2_X_16M_SIZE
 from dodal.devices.eiger import AVAILABLE_TIMEOUTS, EigerDetector
@@ -17,6 +17,12 @@ from dodal.log import LOGGER
 
 TEST_PREFIX = "test"
 TEST_RUN_NUMBER = 0
+
+
+def failed_status(failure: Exception) -> Status:
+    status = Status()
+    status.set_exception(failure)
+    return status
 
 
 class StatusError(Exception):
@@ -760,3 +766,15 @@ def test_eiger_uses_current_energy_if_expected_energy_is_none(
     thread.join(0.2)
     assert not thread.is_alive()
     assert fake_eiger.cam.photon_energy.get() == expected_energy
+
+async def test_multiple_stops_disarms_eiger_once(fake_eiger: EigerDetector):
+    fake_eiger.disarming_status = None
+    fake_eiger.disarm_detector = MagicMock()
+
+    async def do_stop():
+        await asyncio.sleep(0.01)
+        fake_eiger.stop()
+
+    await asyncio.gather(do_stop(), do_stop())
+    fake_eiger.disarm_detector.assert_called_once()
+
