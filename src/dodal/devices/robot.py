@@ -21,8 +21,8 @@ from ophyd_async.epics.core import (
 
 from dodal.log import LOGGER
 
-WAIT_FOR_OLD_PIN_MSG = "Waiting on old pin unloaded"
-WAIT_FOR_NEW_PIN_MSG = "Waiting on new pin loaded"
+WAIT_FOR_SMARGON_DISABLE_MSG = "Waiting on smargon disable"
+WAIT_FOR_SMARGON_ENABLE_MSG = "Waiting on smargon enable"
 
 
 class RobotLoadError(Exception):
@@ -46,6 +46,11 @@ class SampleLocation:
 class PinMounted(StrictEnum):
     NO_PIN_MOUNTED = "No Pin Mounted"
     PIN_MOUNTED = "Pin Mounted"
+
+
+class SmargonStatus(StrictEnum):
+    DISABLED = "Smargon disabled"
+    ENABLED = "Smargon enabled"
 
 
 class ErrorStatus(Device):
@@ -85,6 +90,9 @@ class BartRobot(StandardReadable, Movable[SampleLocation | None]):
 
             self.current_puck = epics_signal_r(float, prefix + "CURRENT_PUCK_RBV")
             self.current_pin = epics_signal_r(float, prefix + "CURRENT_PIN_RBV")
+            self.smargon_enabled = epics_signal_r(
+                SmargonStatus, prefix + "ROBOT_OP_16_BITS.B8"
+            )
 
         self.next_pin = epics_signal_rw_rbv(float, prefix + "NEXT_PIN")
         self.next_puck = epics_signal_rw_rbv(float, prefix + "NEXT_PUCK")
@@ -116,8 +124,10 @@ class BartRobot(StandardReadable, Movable[SampleLocation | None]):
         )
         super().__init__(name=name)
 
-    async def pin_state_or_error(self, expected_state=PinMounted.PIN_MOUNTED):
-        """This co-routine will finish when either the pin sensor reaches the specified
+    async def smargon_status_or_error(
+        self, expected_state: SmargonStatus = SmargonStatus.ENABLED
+    ):
+        """This co-routine will finish when either the smargon reaches the specified
         state or the robot gives an error (whichever happens first). In the case where
         there is an error a RobotLoadError error is raised.
         """
@@ -130,12 +140,12 @@ class BartRobot(StandardReadable, Movable[SampleLocation | None]):
             error_msg = await self.prog_error.str.get_value()
             raise RobotLoadError(error_code, error_msg)
 
-        async def wfv():
-            await wait_for_value(self.gonio_pin_sensor, expected_state, None)
+        async def wait_for_expected_state():
+            await wait_for_value(self.smargon_enabled, expected_state, None)
 
         tasks = [
             (Task(raise_if_error())),
-            (Task(wfv())),
+            (Task(wait_for_expected_state())),
         ]
         try:
             finished, unfinished = await asyncio.wait(
@@ -171,12 +181,12 @@ class BartRobot(StandardReadable, Movable[SampleLocation | None]):
             set_and_wait_for_value(self.next_pin, sample_location.pin),
         )
         await self.load.trigger()
-        if await self.gonio_pin_sensor.get_value() == PinMounted.PIN_MOUNTED:
-            LOGGER.info(WAIT_FOR_OLD_PIN_MSG)
-            await self.pin_state_or_error(PinMounted.NO_PIN_MOUNTED)
-        LOGGER.info(WAIT_FOR_NEW_PIN_MSG)
+        if await self.smargon_enabled.get_value() == SmargonStatus.ENABLED:
+            LOGGER.info(WAIT_FOR_SMARGON_DISABLE_MSG)
+            await self.smargon_status_or_error(SmargonStatus.DISABLED)
+        LOGGER.info(WAIT_FOR_SMARGON_ENABLE_MSG)
 
-        await self.pin_state_or_error()
+        await self.smargon_status_or_error()
 
     @AsyncStatus.wrap
     async def set(self, value: SampleLocation | None):
