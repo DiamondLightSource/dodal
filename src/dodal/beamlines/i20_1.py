@@ -58,14 +58,19 @@ def turbo_slit_x() -> Motor:
     """
     return Motor(f"{PREFIX.beamline_prefix}-OP-PCHRO-01:TS:XFINE")
 
+
 @device_factory()
 def turbo_slit_pmac() -> PmacIO:
+    """
+    PMac controller using running fly scans with trajectory
+    """
     motor = turbo_slit_x()
     return PmacIO(
         prefix=f"{PREFIX.beamline_prefix}-MO-STEP-06:",
         raw_motors=[motor],
         coord_nums=[3],
     )
+
 
 @device_factory()
 def panda() -> HDFPanda:
