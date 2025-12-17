@@ -206,6 +206,10 @@ class BartRobot(StandardReadable, Movable[SampleLocation | None]):
             else:
                 await self.unload.trigger(timeout=self.LOAD_TIMEOUT)
                 await wait_for_value(self.program_running, False, self.NOT_BUSY_TIMEOUT)
+                await wait_for(
+                    self.smargon_status_or_error(SmargonStatus.ENABLED),
+                    timeout=self.LOAD_TIMEOUT + self.NOT_BUSY_TIMEOUT,
+                )
         except TimeoutError as e:
             await self.prog_error.raise_if_error(e)
             await self.controller_error.raise_if_error(e)

@@ -37,6 +37,7 @@ async def robot_for_unload():
     async def finish_later():
         await drying_complete.wait()
         set_mock_value(device.program_running, False)
+        set_mock_value(device.smargon_enabled, SmargonStatus.ENABLED)
 
     async def fake_unload(*args, **kwargs):
         set_mock_value(device.program_running, True)
