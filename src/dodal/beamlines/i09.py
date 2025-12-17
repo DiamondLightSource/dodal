@@ -7,7 +7,7 @@ from dodal.devices.common_dcm import (
     PitchAndRollCrystal,
     StationaryCrystal,
 )
-from dodal.devices.electron_analyser import DualEnergySource
+from dodal.devices.electron_analyser.base import DualEnergySource
 from dodal.devices.electron_analyser.vgscienta import VGScientaDetector
 from dodal.devices.i09 import Grating, LensMode, PassEnergy, PsuMode
 from dodal.devices.pgm import PlaneGratingMonochromator

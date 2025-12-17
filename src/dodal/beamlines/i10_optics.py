@@ -26,7 +26,7 @@ from dodal.devices.i10.i10_apple2 import (
 
 # Imports taken from i10 while we work out how to deal with split end stations
 from dodal.devices.i10.i10_setting_data import I10Grating
-from dodal.devices.insertion_device.apple2_undulator import (
+from dodal.devices.insertion_device import (
     BeamEnergy,
     InsertionDeviceEnergy,
     InsertionDevicePolarisation,
@@ -40,7 +40,8 @@ from dodal.devices.insertion_device.energy_motor_lookup import (
 from dodal.devices.insertion_device.lookup_table_models import (
     DEFAULT_GAP_FILE,
     DEFAULT_PHASE_FILE,
-    LookupTableConfig,
+    LookupTableColumnConfig,
+    Source,
 )
 from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.devices.synchrotron import Synchrotron
@@ -123,15 +124,15 @@ def idd() -> I10Apple2:
 @device_factory()
 def idd_controller() -> I10Apple2Controller:
     """I10 downstream insertion device controller."""
-    source = ("Source", "idd")
+    source = Source(column="Source", value="idd")
     idd_gap_energy_motor_lut = ConfigServerEnergyMotorLookup(
         config_client=I10_CONF_CLIENT,
-        lut_config=LookupTableConfig(source=source),
+        lut_config=LookupTableColumnConfig(source=source),
         path=Path(LOOK_UPTABLE_DIR, DEFAULT_GAP_FILE),
     )
     idd_phase_energy_motor_lut = ConfigServerEnergyMotorLookup(
         config_client=I10_CONF_CLIENT,
-        lut_config=LookupTableConfig(source=source),
+        lut_config=LookupTableColumnConfig(source=source),
         path=Path(LOOK_UPTABLE_DIR, DEFAULT_PHASE_FILE),
     )
     return I10Apple2Controller(
@@ -197,15 +198,15 @@ def idu() -> I10Apple2:
 @device_factory()
 def idu_controller() -> I10Apple2Controller:
     """I10 upstream insertion device controller."""
-    source = ("Source", "idu")
+    source = Source(column="Source", value="idu")
     idu_gap_energy_motor_lut = ConfigServerEnergyMotorLookup(
         config_client=I10_CONF_CLIENT,
-        lut_config=LookupTableConfig(source=source),
+        lut_config=LookupTableColumnConfig(source=source),
         path=Path(LOOK_UPTABLE_DIR, DEFAULT_GAP_FILE),
     )
     idu_phase_energy_motor_lut = ConfigServerEnergyMotorLookup(
         config_client=I10_CONF_CLIENT,
-        lut_config=LookupTableConfig(source=source),
+        lut_config=LookupTableColumnConfig(source=source),
         path=Path(LOOK_UPTABLE_DIR, DEFAULT_PHASE_FILE),
     )
     return I10Apple2Controller(

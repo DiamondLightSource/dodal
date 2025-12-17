@@ -1,16 +1,21 @@
 import json
-from collections import namedtuple
 
+from pydantic import BaseModel
+
+from dodal.devices.insertion_device import Pol
 from dodal.devices.insertion_device.energy_motor_lookup import (
     ConfigServerEnergyMotorLookup,
     EnergyMotorLookup,
 )
-from dodal.devices.insertion_device.lookup_table_models import LookupTable
-
-GenerateConfigLookupTable = namedtuple(
-    "GenerateConfigLookupTable",
-    ["polarisations", "min_energies", "max_energies", "polys"],
+from dodal.devices.insertion_device.lookup_table_models import (
+    EnergyCoverage,
+    LookupTable,
 )
+
+
+class GenerateConfigLookupTable(BaseModel):
+    polarisations: list[Pol]
+    energy_coverage: list[EnergyCoverage]
 
 
 def assert_expected_lut_file_equals_config_server_energy_motor_update_lookup_table(
