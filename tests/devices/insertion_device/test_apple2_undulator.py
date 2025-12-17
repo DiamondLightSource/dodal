@@ -143,9 +143,7 @@ async def test_gap_success_scan(
     run_engine(scan([mock_id_gap], mock_id_gap, 0, 10, 11))
     assert_emitted(run_engine_documents, start=1, descriptor=1, event=11, stop=1)
     for i in output:
-        assert (
-            run_engine_documents["event"][i]["data"]["mock_id_gap-user_readback"] == i
-        )
+        assert run_engine_documents["event"][i]["data"]["mock_id_gap"] == i
 
 
 async def test_given_gate_never_closes_then_setting_phases_times_out(
