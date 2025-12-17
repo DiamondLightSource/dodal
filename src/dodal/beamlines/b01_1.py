@@ -1,22 +1,26 @@
 from ophyd_async.epics.adaravis import AravisDetector
 from ophyd_async.epics.adcore import NDROIStatIO
+from ophyd_async.epics.pmac import PmacIO
 from ophyd_async.fastcs.panda import HDFPanda
 
 from dodal.common.beamlines.beamline_utils import (
-    device_factory,
     get_path_provider,
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.beamlines.device_helpers import CAM_SUFFIX, HDF5_SUFFIX
+from dodal.device_manager import DeviceManager
 from dodal.devices.motors import XYZStage
 from dodal.devices.synchrotron import Synchrotron
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix
 
-BL = "c01"
-PREFIX = BeamlinePrefix(BL)
+BL = "b01-1"
+# TODO: Should not have to provide suffix.
+# Make issue for this.
+PREFIX = BeamlinePrefix(BL, suffix="C")
 set_log_beamline(BL)
 set_utils_beamline(BL)
+devices = DeviceManager()
 
 """
 NOTE: Due to ArgoCD and the k8s cluster configuration those PVs are not available remotely.
@@ -29,8 +33,8 @@ https://argocd.diamond.ac.uk/applications?showFavorites=false&proj=&sync=&autoSy
 """
 
 
-@device_factory()
-def panda() -> HDFPanda:
+@devices.factory()
+def pandabrick() -> HDFPanda:
     """Provides triggering of the detectors.
 
     Returns:
@@ -42,12 +46,25 @@ def panda() -> HDFPanda:
     )
 
 
-@device_factory()
+@devices.factory()
+def pandabox() -> HDFPanda:
+    """Provides triggering of the detectors.
+
+    Returns:
+        HDFPanda: The HDF5-based detector trigger device.
+    """
+    return HDFPanda(
+        f"{PREFIX.beamline_prefix}-EA-PANDA-01:",
+        path_provider=get_path_provider(),
+    )
+
+
+@devices.factory()
 def synchrotron() -> Synchrotron:
     return Synchrotron()
 
 
-@device_factory()
+@devices.factory()
 def spectroscopy_detector() -> AravisDetector:
     """The Manta camera for the spectroscopy experiment.
 
@@ -70,7 +87,7 @@ def spectroscopy_detector() -> AravisDetector:
     )
 
 
-@device_factory()
+@devices.factory()
 def imaging_detector() -> AravisDetector:
     """The Mako camera for the imaging experiment.
 
@@ -87,7 +104,7 @@ def imaging_detector() -> AravisDetector:
     )
 
 
-@device_factory()
+@devices.factory()
 def sample_stage() -> XYZStage:
     """An XYZ stage holding the sample.
 
@@ -96,4 +113,13 @@ def sample_stage() -> XYZStage:
     """
     return XYZStage(
         f"{PREFIX.beamline_prefix}-MO-PPMAC-01:",
+    )
+
+
+@devices.factory()
+def pmac(sample_stage: XYZStage) -> PmacIO:
+    return PmacIO(
+        prefix=f"{PREFIX.beamline_prefix}-MO-PPMAC-01:",
+        raw_motors=[sample_stage.y, sample_stage.x],
+        coord_nums=[1],
     )
