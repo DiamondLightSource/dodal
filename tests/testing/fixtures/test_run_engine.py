@@ -33,12 +33,12 @@ def test_run_engine_fixture_has_no_file_handler_leak(
             ) from exc
 
 
-def test_add_re_metadata(run_engine: RunEngine):
+def test_add_run_engine_metadata(run_engine: RunEngine):
     run_engine.md["new_metadata"] = "test"
 
 
 # This will fail when tests are running in parallel if the RE's md hasn't been
 # correctly cleared
-def test_check_re_metadata(run_engine: RunEngine):
+def test_check_run_engine_metadata(run_engine: RunEngine):
     with pytest.raises(KeyError):
         run_engine.md["new_metadata"]
