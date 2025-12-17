@@ -1,11 +1,10 @@
-# type: ignore # Eiger will soon be ophyd-async https://github.com/DiamondLightSource/dodal/issues/700
 from dataclasses import dataclass
 from enum import Enum
 
 from bluesky.protocols import Stageable
 from ophyd import Component, Device, EpicsSignalRO, Signal
 from ophyd.areadetector.cam import EigerDetectorCam
-from ophyd.status import AndStatus, Status, StatusBase
+from ophyd.status import AndStatus, Status, StatusBase, SubscriptionStatus
 
 from dodal.devices.detector import DetectorParams, TriggerMode
 from dodal.devices.eiger_odin import EigerOdin
@@ -64,14 +63,12 @@ class EigerDetector(Device, Stageable):
     arming_status = Status()
     arming_status.set_finished()
 
-    disarming_status = Status()
-    disarming_status.set_finished()
-
     def __init__(self, beamline: str = "i03", *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.beamline = beamline
         # using i03 timeouts as default
         self.timeouts = AVAILABLE_TIMEOUTS.get(beamline, AVAILABLE_TIMEOUTS["i03"])
+        self.disarming_status = None
 
     @classmethod
     def with_params(
@@ -106,6 +103,7 @@ class EigerDetector(Device, Stageable):
             raise Exception("\n".join(errors))
 
     def async_stage(self):
+        self.disarming_status = None
         self.odin.nodes.clear_odin_errors()
         status_ok, error_message = self.odin.wait_for_odin_initialised(
             self.timeouts.general_status_timeout
@@ -124,7 +122,7 @@ class EigerDetector(Device, Stageable):
             LOGGER.info("Waiting for arming to finish")
             self.arming_status.wait(self.timeouts.arming_timeout)
 
-    def stage(self):
+    def stage(self):  # pyright: ignore[reportIncompatibleMethodOverride]
         self.wait_on_arming_if_started()
         if not self.is_armed():
             LOGGER.info("Eiger not armed, arming")
@@ -133,6 +131,7 @@ class EigerDetector(Device, Stageable):
 
     def stop_odin_when_all_frames_collected(self):
         LOGGER.info("Waiting on all frames")
+        assert self.detector_params
         try:
             await_value(
                 self.odin.file_writer.num_captured,
@@ -142,7 +141,7 @@ class EigerDetector(Device, Stageable):
             LOGGER.info("Stopping Odin")
             self.odin.stop().wait(self.timeouts.odin_stop_timeout)
 
-    def unstage(self) -> bool:
+    def unstage(self) -> bool:  # pyright: ignore[reportIncompatibleMethodOverride]
         assert self.detector_params is not None
         try:
             self.disarming_status = Status()
@@ -167,25 +166,34 @@ class EigerDetector(Device, Stageable):
         self.disarming_status.set_finished()
         return status_ok
 
-    def stop(self, *args):
+    def stop(self, *args):  # pyright: ignore[reportIncompatibleMethodOverride]
         """Emergency stop the device, mainly used to clean up after error."""
         LOGGER.info("Eiger stop() called - cleaning up...")
-        if not self.disarming_status.done:
+        if self.disarming_status and not self.disarming_status.done:
             LOGGER.info("Eiger still disarming, waiting on disarm")
             self.disarming_status.wait(self.timeouts.arming_timeout)
+        elif not self.disarming_status:
+            self.disarming_status = Status()
+            try:
+                self.wait_on_arming_if_started()
+                stop_status = self.odin.stop()
+                self.odin.file_writer.start_timeout.set(1).wait(
+                    self.timeouts.general_status_timeout
+                )
+                self.disarm_detector()
+                stop_status &= self.disable_roi_mode()
+                LOGGER.info("Waiting on stop status")
+                stop_status.wait(self.timeouts.general_status_timeout)
+                # See https://github.com/DiamondLightSource/hyperion/issues/1395
+                LOGGER.info("Turning off Eiger dev/shm streaming")
+                self.odin.fan.dev_shm_enable.set(0).wait(
+                    self.timeouts.general_status_timeout
+                )
+                LOGGER.info("Eiger has successfully been stopped")
+            finally:
+                self.disarming_status.set_finished()
         else:
-            self.wait_on_arming_if_started()
-            stop_status = self.odin.stop()
-            self.odin.file_writer.start_timeout.set(1).wait(
-                self.timeouts.general_status_timeout
-            )
-            self.disarm_detector()
-            stop_status &= self.disable_roi_mode()
-            stop_status.wait(self.timeouts.general_status_timeout)
-            # See https://github.com/DiamondLightSource/hyperion/issues/1395
-            LOGGER.info("Turning off Eiger dev/shm streaming")
-            self.odin.fan.dev_shm_enable.set(0).wait()
-            LOGGER.info("Eiger has successfully been stopped")
+            LOGGER.info("Already disarmed, doing nothing")
 
     def disable_roi_mode(self):
         return self.change_roi_mode(False)
@@ -194,13 +202,13 @@ class EigerDetector(Device, Stageable):
         return self.change_roi_mode(True)
 
     def change_roi_mode(self, enable: bool) -> StatusBase:
+        LOGGER.info(f"Changing ROI mode to {enable}")
         assert self.detector_params is not None
         detector_dimensions = (
             self.detector_params.detector_size_constants.roi_size_pixels
             if enable
             else self.detector_params.detector_size_constants.det_size_pixels
         )
-
         status = self.cam.roi_mode.set(
             1 if enable else 0, timeout=self.timeouts.general_status_timeout
         )
@@ -216,7 +224,6 @@ class EigerDetector(Device, Stageable):
         status &= self.odin.file_writer.num_col_chunks.set(
             detector_dimensions.width, timeout=self.timeouts.general_status_timeout
         )
-
         return status
 
     def set_cam_pvs(self) -> AndStatus:
@@ -234,7 +241,8 @@ class EigerDetector(Device, Stageable):
             1, timeout=self.timeouts.general_status_timeout
         )
         status &= self.cam.image_mode.set(
-            self.cam.ImageMode.MULTIPLE, timeout=self.timeouts.general_status_timeout
+            self.cam.ImageMode.MULTIPLE,  # pyright: ignore[reportAttributeAccessIssue]
+            timeout=self.timeouts.general_status_timeout,
         )
         status &= self.cam.trigger_mode.set(
             InternalEigerTriggerMode.EXTERNAL_SERIES.value,
@@ -296,6 +304,7 @@ class EigerDetector(Device, Stageable):
             self.detector_params.omega_increment,
             timeout=self.timeouts.general_status_timeout,
         )
+
         return status
 
     def set_detector_threshold(self, energy: float, tolerance: float = 0.1) -> Status:
@@ -307,7 +316,7 @@ class EigerDetector(Device, Stageable):
                 this tolerance it is not set again. Defaults to 0.1eV.
         """
 
-        current_energy = self.cam.photon_energy.get()
+        current_energy = float(self.cam.photon_energy.get())
         if abs(current_energy - energy) > tolerance:
             LOGGER.info(f"Setting detector threshold to {energy}")
             return self.cam.photon_energy.set(
@@ -390,7 +399,7 @@ class EigerDetector(Device, Stageable):
     def disarm_detector(self):
         self.cam.acquire.set(0).wait(self.timeouts.general_status_timeout)
 
-    def wait_for_stale_params(self) -> Status:
+    def wait_for_stale_params(self) -> SubscriptionStatus:
         LOGGER.info("Eiger arming: Waiting for stale params...")
         return await_value(self.stale_params, 0, 60)
 
@@ -404,6 +413,11 @@ class EigerDetector(Device, Stageable):
         detector_params: DetectorParams = self.detector_params
         if detector_params.use_roi_mode:
             functions_to_do_arm.append(self.enable_roi_mode)
+        threshold_energy = (
+            detector_params.expected_energy_ev
+            if detector_params.expected_energy_ev
+            else float(self.cam.photon_energy.get())
+        )
 
         arming_sequence_funcs = [
             # If a beam dump occurs after arming the eiger but prior to eiger staging,
@@ -411,7 +425,7 @@ class EigerDetector(Device, Stageable):
             # if this previously completed successfully we must reset the odin first
             self.odin.stop,
             lambda: self.change_dev_shm(detector_params.enable_dev_shm),
-            lambda: self.set_detector_threshold(detector_params.expected_energy_ev),
+            lambda: self.set_detector_threshold(threshold_energy),
             self.set_cam_pvs,
             self.set_odin_number_of_frame_chunks,
             self.set_odin_pvs,

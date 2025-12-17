@@ -1,9 +1,9 @@
 import json
-import xml.etree.ElementTree as et
 from abc import abstractmethod
 from collections import ChainMap
 from dataclasses import dataclass
 from typing import Any, Generic, TypeVar
+from xml.etree import ElementTree
 from xml.etree.ElementTree import Element
 
 # GDA currently assumes this aspect ratio for the OAV window size.
@@ -92,17 +92,19 @@ class OAVParameters:
         self.preprocess_K_size: int = update(
             "preProcessKSize", int
         )  # length scale for blur preprocessing
+        self.preprocess_iter: int = update("preProcessIteration", int, default=5)
         self.detection_script_filename: str = update("filename", str)
-        self.close_ksize: int = update("close_ksize", int, default=11)
+        self.open_ksize: int = update("open_ksize", int, default=0)
+        self.close_ksize: int = update("close_ksize", int, default=5)
         self.min_callback_time: float = update("min_callback_time", float, default=0.08)
         self.direction: int = update("direction", int)
         self.max_tip_distance: float = update("max_tip_distance", float, default=300)
 
-    def get_max_tip_distance_in_pixels(self, micronsPerPixel: float) -> float:
+    def get_max_tip_distance_in_pixels(self, microns_per_pixel: float) -> float:
         """
         Get the maximum tip distance in pixels.
         """
-        return self.max_tip_distance / micronsPerPixel
+        return self.max_tip_distance / microns_per_pixel
 
 
 @dataclass
@@ -123,7 +125,7 @@ class OAVConfigBase(Generic[ParamType]):
         self.zoom_params = self._get_zoom_params(zoom_params_file)
 
     def _get_zoom_params(self, zoom_params_file: str):
-        tree = et.parse(zoom_params_file)
+        tree = ElementTree.parse(zoom_params_file)
         root = tree.getroot()
         return root.findall(".//zoomLevel")
 
