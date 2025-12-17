@@ -28,13 +28,13 @@ from dodal.devices.insertion_device import (
     Apple2Val,
     EnabledDisabledUpper,
     EnergyMotorConvertor,
-    MotorWithoutStop,
     Pol,
     UndulatorGap,
     UndulatorGateStatus,
     UndulatorJawPhase,
     UndulatorLockedPhaseAxes,
     UndulatorPhaseAxes,
+    UnstoppableMotor,
 )
 
 # add mock_config_client, mock_id_gap, mock_phase and mock_jaw_phase_axes to pytest.
@@ -44,7 +44,7 @@ pytest_plugins = ["dodal.testing.fixtures.devices.apple2"]
 @pytest.fixture
 async def unstoppable_motor():
     async with init_devices(mock=True):
-        unstoppable_motor = MotorWithoutStop(prefix="MOTOR:", name="unstopable_motor")
+        unstoppable_motor = UnstoppableMotor(prefix="MOTOR:", name="unstopable_motor")
     return unstoppable_motor
 
 
@@ -71,7 +71,7 @@ async def mock_locked_phase_axes(
 
 
 async def test_unstoppable_motor_stop_not_implemented(
-    unstoppable_motor: MotorWithoutStop, caplog: pytest.LogCaptureFixture
+    unstoppable_motor: UnstoppableMotor, caplog: pytest.LogCaptureFixture
 ):
     await unstoppable_motor.stop()
     assert caplog.records[0].msg == "Stopping unstopable_motor is not supported."

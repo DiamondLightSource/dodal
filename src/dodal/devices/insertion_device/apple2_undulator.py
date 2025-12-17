@@ -125,7 +125,7 @@ class SafeUndulatorMover(StandardReadable, UndulatorBase, Generic[T]):
         await wait_for_value(self.gate, UndulatorGateStatus.CLOSE, timeout=timeout)
 
 
-class MotorWithoutStop(Motor):
+class UnstoppableMotor(Motor):
     """A motor that does not support stop."""
 
     def __init__(self, prefix: str, name: str = ""):
@@ -136,7 +136,7 @@ class MotorWithoutStop(Motor):
         LOGGER.info(f"Stopping {self.name} is not supported.")
 
 
-class GapSafeUndulatorUnstoppable(MotorWithoutStop, UndulatorBase[float]):
+class GapSafeMotorNoStop(UnstoppableMotor, UndulatorBase[float]):
     """A device that will check it's safe to move the undulator before moving it and
     wait for the undulator to be safe again before calling the move complete.
     """
@@ -183,7 +183,7 @@ class GapSafeUndulatorUnstoppable(MotorWithoutStop, UndulatorBase[float]):
             )
 
 
-class UndulatorGap(GapSafeUndulatorUnstoppable):
+class UndulatorGap(GapSafeMotorNoStop):
     """A device with a collection of epics signals to set Apple 2 undulator gap motion.
     Only PV used by beamline are added the full list is here:
     /dls_sw/work/R3.14.12.7/support/insertionDevice/db/IDGapVelocityControl.template
@@ -245,7 +245,7 @@ class UndulatorGap(GapSafeUndulatorUnstoppable):
         await self.user_setpoint.set(str(value))
 
 
-class UndulatorPhaseMotor(MotorWithoutStop):
+class UndulatorPhaseMotor(UnstoppableMotor):
     """A collection of epics signals for ID phase motion.
     Only PV used by beamline are added the full list is here:
     /dls_sw/work/R3.14.12.7/support/insertionDevice/db/IDPhaseSoftMotor.template
