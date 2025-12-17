@@ -14,12 +14,13 @@ from ophyd_async.core import (
 )
 
 from dodal.devices.robot import (
-    WAIT_FOR_NEW_PIN_MSG,
-    WAIT_FOR_OLD_PIN_MSG,
+    WAIT_FOR_SMARGON_DISABLE_MSG,
+    WAIT_FOR_SMARGON_ENABLE_MSG,
     BartRobot,
     PinMounted,
     RobotLoadError,
     SampleLocation,
+    SmargonStatus,
 )
 
 
@@ -108,7 +109,7 @@ async def test_given_program_not_running_but_pin_not_unmounting_when_load_pin_th
         await device.set(SampleLocation(15, 10))
     device.load.trigger.assert_called_once()  # type:ignore
     last_log = patch_logger.mock_calls[1].args[0]
-    assert "Waiting on old pin unloaded" in last_log
+    assert WAIT_FOR_SMARGON_ENABLE_MSG in last_log
 
 
 @patch("dodal.devices.robot.LOGGER")
@@ -126,34 +127,34 @@ async def test_given_program_not_running_and_pin_unmounting_but_new_pin_not_moun
     try:
         device.load.trigger.assert_called_once()  # type:ignore
         last_log = patch_logger.mock_calls[1].args[0]
-        assert "Waiting on new pin loaded" in last_log
+        assert WAIT_FOR_SMARGON_ENABLE_MSG in last_log
     except AssertionError:
         traceback.print_exception(exc_info.value)
         raise
 
 
-def _set_pin_sensor_on_log_messages(device: BartRobot, msg: str):
-    if msg == WAIT_FOR_OLD_PIN_MSG:
-        set_mock_value(device.gonio_pin_sensor, PinMounted.NO_PIN_MOUNTED)
-    elif msg == WAIT_FOR_NEW_PIN_MSG:
-        set_mock_value(device.gonio_pin_sensor, PinMounted.PIN_MOUNTED)
+def _set_smargon_enabled_on_log_messages(device: BartRobot, msg: str):
+    if msg == WAIT_FOR_SMARGON_DISABLE_MSG:
+        set_mock_value(device.smargon_enabled, SmargonStatus.DISABLED)
+    elif msg == WAIT_FOR_SMARGON_ENABLE_MSG:
+        set_mock_value(device.smargon_enabled, SmargonStatus.ENABLED)
 
 
 def _error_on_unload_log_messages(device: BartRobot, msg: str):
-    if msg == WAIT_FOR_OLD_PIN_MSG:
+    if msg == WAIT_FOR_SMARGON_DISABLE_MSG:
         set_mock_value(device.prog_error.code, 40)
         set_mock_value(device.prog_error.str, "Test error")
 
 
-# Use log info messages to determine when to set the gonio_pin_sensor, so we don't have to use any sleeps during testing
+# Use log info messages to determine when to set the smargon enable, so we don't have to use any sleeps during testing
 async def set_with_happy_path(
     device: BartRobot, mock_log_info: MagicMock
 ) -> AsyncStatus:
     """Mocks the logic that the robot would do on a successful load"""
 
-    mock_log_info.side_effect = partial(_set_pin_sensor_on_log_messages, device)
+    mock_log_info.side_effect = partial(_set_smargon_enabled_on_log_messages, device)
     set_mock_value(device.program_running, False)
-    set_mock_value(device.gonio_pin_sensor, PinMounted.PIN_MOUNTED)
+    set_mock_value(device.smargon_enabled, SmargonStatus.ENABLED)
     status = device.set(SampleLocation(15, 10))
     return status
 
@@ -165,7 +166,7 @@ async def set_with_unhappy_path(
 
     mock_log_info.side_effect = partial(_error_on_unload_log_messages, device)
     set_mock_value(device.program_running, False)
-    set_mock_value(device.gonio_pin_sensor, PinMounted.PIN_MOUNTED)
+    set_mock_value(device.smargon_enabled, SmargonStatus.ENABLED)
     status = device.set(SampleLocation(15, 10))
     return status
 
@@ -186,15 +187,15 @@ async def test_given_program_not_running_and_pin_unmounts_then_mounts_when_load_
 async def test_given_waiting_for_pin_to_mount_when_no_pin_mounted_then_error_raised():
     device = await _get_bart_robot()
     set_mock_value(device.prog_error.code, 25)
-    status = device.pin_state_or_error()
+    status = device.smargon_status_or_error()
     with pytest.raises(RobotLoadError):
         await status
 
 
-async def test_given_waiting_for_pin_to_mount_when_pin_mounted_then_no_error_raised():
+async def test_given_waiting_for_smargon_to_enable_when_smargon_enabled_then_no_error_raised():
     device = await _get_bart_robot()
-    status = create_task(device.pin_state_or_error())
-    set_mock_value(device.gonio_pin_sensor, PinMounted.PIN_MOUNTED)
+    status = create_task(device.smargon_status_or_error())
+    set_mock_value(device.smargon_enabled, SmargonStatus.ENABLED)
     await status
 
 
