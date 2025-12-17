@@ -77,7 +77,7 @@ async def estimate_motor_timeout(
 class UndulatorBase(abc.ABC, Device, Generic[T]):
     """Abstract base class for Apple2 undulator devices.
     This class provides common functionality for undulator devices, including
-    gate and fault signal management, safety checks before motion, and abstract
+    gate and status signal management, safety checks before motion, and abstract
     methods for setting demand positions and estimating move timeouts.
     """
 
@@ -137,9 +137,7 @@ class UnstoppableMotor(Motor):
 
 
 class GapSafeMotorNoStop(UnstoppableMotor, UndulatorBase[float]):
-    """A device that will check it's safe to move the undulator before moving it and
-    wait for the undulator to be safe again before calling the move complete.
-    """
+    """Update gap safe motor that checks it's safe to move before moving."""
 
     def __init__(self, set_move: SignalW[int], prefix: str, name: str = ""):
         # Gate keeper open when move is requested, closed when move is completed
@@ -184,11 +182,7 @@ class GapSafeMotorNoStop(UnstoppableMotor, UndulatorBase[float]):
 
 
 class UndulatorGap(GapSafeMotorNoStop):
-    """A device with a collection of epics signals to set Apple 2 undulator gap motion.
-    Only PV used by beamline are added the full list is here:
-    /dls_sw/work/R3.14.12.7/support/insertionDevice/db/IDGapVelocityControl.template
-    /dls_sw/work/R3.14.12.7/support/insertionDevice/db/IDPhaseSoftMotor.template
-    """
+    """Apple 2 undulator gap motor device. With PV corrections."""
 
     def __init__(self, prefix: str, name: str = ""):
         """
@@ -246,10 +240,7 @@ class UndulatorGap(GapSafeMotorNoStop):
 
 
 class UndulatorPhaseMotor(UnstoppableMotor):
-    """A collection of epics signals for ID phase motion.
-    Only PV used by beamline are added the full list is here:
-    /dls_sw/work/R3.14.12.7/support/insertionDevice/db/IDPhaseSoftMotor.template
-    """
+    """Phase motor that will not stop."""
 
     def __init__(self, prefix: str, name: str = ""):
         """
@@ -429,7 +420,7 @@ class Apple2(StandardReadable, Movable[Apple2Val], Generic[PhaseAxesType]):
         all at the same time.
         """
 
-        # Only need to check gap as the phase motors share both fault and gate with gap.
+        # Only need to check gap as the phase motors share both status and gate with gap.
         await self.gap().raise_if_cannot_move()
 
         await asyncio.gather(
