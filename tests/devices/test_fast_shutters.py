@@ -1,3 +1,5 @@
+import asyncio
+
 import pytest
 from bluesky import RunEngine
 from bluesky import plan_stubs as bps
@@ -132,10 +134,9 @@ async def test_dual_fast_shutter_read(
     shutter2: GenericFastShutter,
     source_selector: SourceSelector,
 ) -> None:
-    shutter1_read = await shutter1.read()
-    shutter2_read = await shutter2.read()
-    source_selector_read = await source_selector.read()
-
+    shutter1_read, shutter2_read, source_selector_read = await asyncio.gather(
+        shutter1.read(), shutter2.read(), source_selector.read()
+    )
     await assert_reading(
         dual_fast_shutter,
         {f"{dual_fast_shutter.name}-shutter_state": partial_reading(InOut.IN)}
