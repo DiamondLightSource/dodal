@@ -249,8 +249,6 @@ class UndulatorPhaseMotor(UnstoppableMotor):
 
         prefix : str
             The setting prefix PV.
-        infix: str
-            Collection of pv that are different between beamlines
         name : str
             Name of the Id phase device
         """
