@@ -14,7 +14,7 @@ description = "Ophyd devices and other utils that could be used across DLS beaml
 dependencies = [
     "click",
     "ophyd",
-    "ophyd-async[ca,pva]>=v0.14.0",
+    "ophyd_async[ca,pva]@git+https://github.com/bluesky/ophyd-async.git@improve-error-when-raw2derived-has-no-type",
     "bluesky>=1.14.5",
     "pyepics",
     "pillow",
@@ -48,20 +48,20 @@ dev = [
     # Commented out due to dependency version conflict with pydantic 1.x
     # "copier",
     "myst-parser",
-    "ophyd_async[sim]>=v0.14.0",
+    "ophyd_async[ca,pva]@git+https://github.com/bluesky/ophyd-async.git@improve-error-when-raw2derived-has-no-type",
     "pipdeptree",
     "pre-commit",
     "psutil",
     "pydata-sphinx-theme>=0.12",
     # Pin to previous pyright until https://github.com/microsoft/pyright/issues/11060 is fixed
-    "pyright==1.1.406", 
+    "pyright==1.1.406",
     "pytest",
     "pytest-asyncio",
     "pytest-cov",
     "pytest-json-report",
     "pytest-random-order",
     "ruff",
-    "sphinx<7.4.6",              #  pinned due to https://github.com/sphinx-doc/sphinx/issues/12660
+    "sphinx<7.4.6",             #  pinned due to https://github.com/sphinx-doc/sphinx/issues/12660
     "sphinx-autobuild",
     "sphinx-copybutton",
     "sphinxcontrib-mermaid",

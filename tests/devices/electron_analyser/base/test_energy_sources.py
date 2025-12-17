@@ -8,8 +8,8 @@ from ophyd_async.testing import (
 from dodal.devices.electron_analyser.base import (
     DualEnergySource,
     EnergySource,
-    SelectedSource,
 )
+from dodal.devices.selectable_source import SelectedSource
 
 
 async def test_single_energy_source_read(
@@ -48,16 +48,16 @@ async def test_dual_energy_source_energy_is_correct_when_switching_between_sourc
     # part when switching
     assert dcm_energy_val != pgm_energy_val
 
-    await dual_energy_source.selected_source.set(SelectedSource.SOURCE1)
+    await dual_energy_source.selected_source_ref().set(SelectedSource.SOURCE1)
     await assert_value(dual_energy_source.energy, dcm_energy_val)
-    await dual_energy_source.selected_source.set(SelectedSource.SOURCE2)
+    await dual_energy_source.selected_source_ref().set(SelectedSource.SOURCE2)
     await assert_value(dual_energy_source.energy, pgm_energy_val)
 
 
 async def test_dual_energy_souce_read(
     dual_energy_source: DualEnergySource,
 ) -> None:
-    await dual_energy_source.selected_source.set(SelectedSource.SOURCE1)
+    await dual_energy_source.selected_source_ref().set(SelectedSource.SOURCE1)
     prefix = dual_energy_source.name
 
     source1_name = await dual_energy_source.source1.wrapped_device_name.get_value()

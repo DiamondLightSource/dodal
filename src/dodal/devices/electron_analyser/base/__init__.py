@@ -1,5 +1,6 @@
 from .base_controller import (
     ElectronAnalyserController,
+    ElectronAnalyserControllerWithShutters,
     GenericElectronAnalyserController,
 )
 from .base_detector import (
@@ -15,7 +16,7 @@ from .base_driver_io import (
     GenericAnalyserDriverIO,
     TAbstractAnalyserDriverIO,
 )
-from .base_enums import EnergyMode, SelectedSource
+from .base_enums import EnergyMode
 from .base_region import (
     AbstractBaseRegion,
     AbstractBaseSequence,
@@ -31,6 +32,7 @@ from .energy_sources import DualEnergySource, EnergySource
 
 __all__ = [
     "ElectronAnalyserController",
+    "ElectronAnalyserControllerWithShutters",
     "GenericElectronAnalyserController",
     "BaseElectronAnalyserDetector",
     "ElectronAnalyserDetector",
@@ -42,7 +44,6 @@ __all__ = [
     "GenericAnalyserDriverIO",
     "TAbstractAnalyserDriverIO",
     "EnergyMode",
-    "SelectedSource",
     "AbstractBaseRegion",
     "AbstractBaseSequence",
     "GenericRegion",

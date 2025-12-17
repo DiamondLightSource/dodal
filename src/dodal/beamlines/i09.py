@@ -1,3 +1,5 @@
+from ophyd_async.core import InOut
+
 from dodal.common.beamlines.beamline_utils import (
     device_factory,
 )
@@ -7,16 +9,20 @@ from dodal.devices.common_dcm import (
     PitchAndRollCrystal,
     StationaryCrystal,
 )
-from dodal.devices.electron_analyser.base import DualEnergySource
-from dodal.devices.electron_analyser.vgscienta import VGScientaDetector
-from dodal.devices.i09 import Grating, LensMode, PassEnergy, PsuMode
+from dodal.devices.electron_analyser.base import (
+    DualEnergySource,
+)
+from dodal.devices.fast_shutter import DualFastShutter, GenericFastShutter
+from dodal.devices.i09 import Grating
 from dodal.devices.pgm import PlaneGratingMonochromator
+from dodal.devices.selectable_source import SourceSelector
 from dodal.devices.synchrotron import Synchrotron
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
 BL = get_beamline_name("i09")
-PREFIX = BeamlinePrefix(BL)
+I_PREFIX = BeamlinePrefix(BL)
+J_PREFIX = BeamlinePrefix(BL, suffix="J")
 set_log_beamline(BL)
 set_utils_beamline(BL)
 
@@ -37,23 +43,68 @@ def pgm() -> PlaneGratingMonochromator:
 @device_factory()
 def dcm() -> DoubleCrystalMonochromatorWithDSpacing:
     return DoubleCrystalMonochromatorWithDSpacing(
-        f"{PREFIX.beamline_prefix}-MO-DCM-01:", PitchAndRollCrystal, StationaryCrystal
+        f"{I_PREFIX.beamline_prefix}-MO-DCM-01:", PitchAndRollCrystal, StationaryCrystal
     )
 
 
 @device_factory()
-def energy_source() -> DualEnergySource:
-    return DualEnergySource(dcm().energy_in_eV, pgm().energy.user_readback)
+def source_selector() -> SourceSelector:
+    return SourceSelector()
 
 
-# Connect will work again after this work completed
-# https://jira.diamond.ac.uk/browse/I09-651
 @device_factory()
-def ew4000() -> VGScientaDetector[LensMode, PsuMode, PassEnergy]:
-    return VGScientaDetector[LensMode, PsuMode, PassEnergy](
-        prefix=f"{PREFIX.beamline_prefix}-EA-DET-01:CAM:",
-        lens_mode_type=LensMode,
-        psu_mode_type=PsuMode,
-        pass_energy_type=PassEnergy,
-        energy_source=energy_source(),
+def dual_energy_source() -> DualEnergySource:
+    return DualEnergySource(
+        dcm().energy_in_eV,
+        pgm().energy.user_readback,
+        source_selector().selected_source,
     )
+
+
+@device_factory()
+def fsi1() -> GenericFastShutter[InOut]:
+    return GenericFastShutter[InOut](
+        f"{I_PREFIX.beamline_prefix}-EA-FSHTR-01:CTRL", InOut.OUT, InOut.IN
+    )
+
+
+@device_factory()
+def fsj1() -> GenericFastShutter[InOut]:
+    return GenericFastShutter[InOut](
+        f"{J_PREFIX.beamline_prefix}-EA-FSHTR-01:CTRL", InOut.OUT, InOut.IN
+    )
+
+
+@device_factory()
+def dual_fast_shutter() -> DualFastShutter[InOut]:
+    return DualFastShutter[InOut](fsi1(), fsj1(), source_selector().selected_source)
+
+
+# @device_factory()
+# def analyser_driver() -> VGScientaAnalyserDriverIO[LensMode, PsuMode, PassEnergy]:
+#     return VGScientaAnalyserDriverIO[LensMode, PsuMode, PassEnergy](
+#         prefix=f"{I_PREFIX.beamline_prefix}-EA-DET-01:CAM:",
+#         lens_mode_type=LensMode,
+#         psu_mode_type=PsuMode,
+#         pass_energy_type=PassEnergy,
+#     )
+
+
+# # Connect will work again after this work completed
+# # https://jira.diamond.ac.uk/browse/I09-651
+# @device_factory()
+# def ew4000() -> VGScientaDetector[LensMode, PsuMode, PassEnergy]:
+#     controller = ElectronAnalyserControllerWithShutters(
+#         driver=analyser_driver(),
+#         energy_source=dual_energy_source(),
+#         source_selector=source_selector(),
+#         shutter=dual_fast_shutter(),
+#         deadtime=0,
+#     )
+#     return VGScientaDetector[LensMode, PsuMode, PassEnergy](
+#         driver=analyser_driver(),
+#         controller=controller,
+#         lens_mode_type=LensMode,
+#         psu_mode_type=PsuMode,
+#         pass_energy_type=PassEnergy,
+#     )
