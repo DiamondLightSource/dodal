@@ -2,6 +2,7 @@ import pytest
 from bluesky import RunEngine
 from bluesky import plan_stubs as bps
 from ophyd_async.core import InOut, OnOff, init_devices
+from ophyd_async.testing import assert_reading, partial_reading
 
 from dodal.devices.fast_shutter import DualFastShutter, GenericFastShutter
 from dodal.devices.selectable_source import SelectedSource, SourceSelector
@@ -27,6 +28,12 @@ async def test_shutter_set_open_close_without_knowing_enum_values(
     assert await shutter1.shutter_state.get_value() == InOut.IN
 
 
+async def test_shutter_read(shutter1: GenericFastShutter) -> None:
+    await assert_reading(
+        shutter1, {f"{shutter1.name}-shutter_state": partial_reading(InOut.IN)}
+    )
+
+
 @pytest.fixture
 def shutter2() -> GenericFastShutter[InOut]:
     with init_devices(mock=True):
@@ -40,7 +47,9 @@ def shutter2() -> GenericFastShutter[InOut]:
 
 @pytest.fixture
 def source_selector() -> SourceSelector:
-    return SourceSelector()
+    with init_devices(mock=True):
+        source_selector = SourceSelector()
+    return source_selector
 
 
 @pytest.fixture
@@ -115,6 +124,25 @@ def test_dual_fast_shutter_open_close_states_are_correct(
 
     assert dual_fast_shutter.close_state == shutter1.close_state
     assert dual_fast_shutter.close_state == shutter2.close_state
+
+
+async def test_dual_fast_shutter_read(
+    dual_fast_shutter: DualFastShutter,
+    shutter1: GenericFastShutter,
+    shutter2: GenericFastShutter,
+    source_selector: SourceSelector,
+) -> None:
+    shutter1_read = await shutter1.read()
+    shutter2_read = await shutter2.read()
+    source_selector_read = await source_selector.read()
+
+    await assert_reading(
+        dual_fast_shutter,
+        {f"{dual_fast_shutter.name}-shutter_state": partial_reading(InOut.IN)}
+        | shutter1_read
+        | shutter2_read
+        | source_selector_read,
+    )
 
 
 async def test_dual_fast_shutter_raises_error_if_shutters_have_different_open_close_states(

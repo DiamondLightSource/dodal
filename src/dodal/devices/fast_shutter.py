@@ -98,13 +98,15 @@ class DualFastShutter(StandardReadable, FastShutter[EnumTypesT], Generic[EnumTyp
         self._shutter1_ref = Reference(shutter1)
         self._shutter2_ref = Reference(shutter2)
         self._selected_shutter_ref = Reference(selected_source)
-        self.shutter_state = derived_signal_rw(
-            self._read_shutter_state,
-            self._set_shutter_state,
-            selected_shutter=selected_source,
-            shutter1=shutter1.shutter_state,
-            shutter2=shutter2.shutter_state,
-        )
+        with self.add_children_as_readables():
+            self.shutter_state = derived_signal_rw(
+                self._read_shutter_state,
+                self._set_shutter_state,
+                selected_shutter=selected_source,
+                shutter1=shutter1.shutter_state,
+                shutter2=shutter2.shutter_state,
+            )
+        self.add_readables([shutter1, shutter2, selected_source])
         super().__init__(name)
 
     def _validate_shutter_states(

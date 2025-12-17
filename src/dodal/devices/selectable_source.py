@@ -1,7 +1,7 @@
 from typing import TypeVar
 
 from bluesky.protocols import Movable
-from ophyd_async.core import AsyncStatus, Device, StrictEnum, soft_signal_rw
+from ophyd_async.core import AsyncStatus, StandardReadable, StrictEnum, soft_signal_rw
 
 
 class SelectedSource(StrictEnum):
@@ -20,9 +20,12 @@ def get_obj_from_selected_source(selected_source: SelectedSource, s1: T, s2: T) 
             return s2
 
 
-class SourceSelector(Device, Movable[SelectedSource]):
+class SourceSelector(StandardReadable, Movable[SelectedSource]):
     def __init__(self, name: str = ""):
-        self.selected_source = soft_signal_rw(SelectedSource, SelectedSource.SOURCE1)
+        with self.add_children_as_readables():
+            self.selected_source = soft_signal_rw(
+                SelectedSource, SelectedSource.SOURCE1
+            )
         super().__init__(name)
 
     @AsyncStatus.wrap
