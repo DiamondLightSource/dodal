@@ -35,6 +35,7 @@
    dodal.beamlines.i13_1
    dodal.beamlines.i15
    dodal.beamlines.i15_1
+   dodal.beamlines.i16
    dodal.beamlines.i17
    dodal.beamlines.i18
    dodal.beamlines.i19_1
