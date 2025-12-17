@@ -15,9 +15,9 @@ devices = DeviceManager()
 
 @devices.factory()
 def id() -> UndulatorInMm:
-    return UndulatorInMm(name="id", prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:")
+    return UndulatorInMm(prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:")
 
 
 @devices.factory()
 def harmonic() -> UndulatorOrder:
-    return UndulatorOrder("harmonic")
+    return UndulatorOrder()
