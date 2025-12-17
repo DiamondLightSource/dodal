@@ -21,7 +21,7 @@ from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
 BL = get_beamline_name("i09")
-I_PREFIX = BeamlinePrefix(BL)
+I_PREFIX = BeamlinePrefix(BL, suffix="I")
 J_PREFIX = BeamlinePrefix(BL, suffix="J")
 set_log_beamline(BL)
 set_utils_beamline(BL)
@@ -33,10 +33,14 @@ def synchrotron() -> Synchrotron:
 
 
 @device_factory()
+def source_selector() -> SourceSelector:
+    return SourceSelector()
+
+
+@device_factory()
 def pgm() -> PlaneGratingMonochromator:
     return PlaneGratingMonochromator(
-        prefix=f"{BeamlinePrefix(BL, suffix='J').beamline_prefix}-MO-PGM-01:",
-        grating=Grating,
+        prefix=f"{J_PREFIX.beamline_prefix}-MO-PGM-01:", grating=Grating
     )
 
 
@@ -45,11 +49,6 @@ def dcm() -> DoubleCrystalMonochromatorWithDSpacing:
     return DoubleCrystalMonochromatorWithDSpacing(
         f"{I_PREFIX.beamline_prefix}-MO-DCM-01:", PitchAndRollCrystal, StationaryCrystal
     )
-
-
-@device_factory()
-def source_selector() -> SourceSelector:
-    return SourceSelector()
 
 
 @device_factory()
