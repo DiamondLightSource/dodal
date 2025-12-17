@@ -419,19 +419,21 @@ async def test_id_polarisation_locate(
     await mock_id_controller.energy.set(energy)
 
     await mock_id_pol.set(pol=pol)
-    assert await mock_id_pol.locate() == {"setpoint": pol, "readback": Pol.LH}
-    # move the motor
-    set_mock_value(
-        mock_id_controller.apple2().phase().top_inner.user_readback, top_inner
+    assert (
+        await mock_id_controller.apple2().phase().top_inner.user_readback.get_value()
+        == pytest.approx(top_inner, 0.01)
     )
-    set_mock_value(
-        mock_id_controller.apple2().phase().top_outer.user_readback, top_outer
+    assert (
+        await mock_id_controller.apple2().phase().top_outer.user_readback.get_value()
+        == pytest.approx(top_outer, 0.01)
     )
-    set_mock_value(
-        mock_id_controller.apple2().phase().btm_inner.user_readback, btm_inner
+    assert (
+        await mock_id_controller.apple2().phase().btm_inner.user_readback.get_value()
+        == pytest.approx(btm_inner, 0.01)
     )
-    set_mock_value(
-        mock_id_controller.apple2().phase().btm_outer.user_readback, btm_outer
+    assert (
+        await mock_id_controller.apple2().phase().btm_outer.user_readback.get_value()
+        == pytest.approx(btm_outer, 0.01)
     )
     assert await mock_id_pol.locate() == {"setpoint": pol, "readback": pol}
 

@@ -270,10 +270,10 @@ async def test_phase_success_set(
     await assert_reading(
         mock_phase_axes,
         {
-            "mock_phase_axes-top_inner-user_readback": partial_reading(3),
-            "mock_phase_axes-top_outer-user_readback": partial_reading(2),
-            "mock_phase_axes-btm_inner-user_readback": partial_reading(5),
-            "mock_phase_axes-btm_outer-user_readback": partial_reading(7),
+            "mock_phase_axes-top_inner": partial_reading(3),
+            "mock_phase_axes-top_outer": partial_reading(2),
+            "mock_phase_axes-btm_inner": partial_reading(5),
+            "mock_phase_axes-btm_outer": partial_reading(7),
         },
     )
 
@@ -346,12 +346,7 @@ async def test_jaw_phase_success_scan(
     run_engine(scan([mock_jaw_phase], mock_jaw_phase, 0, 10, 11))
     assert_emitted(run_engine_documents, start=1, descriptor=1, event=11, stop=1)
     for i in output:
-        assert (
-            run_engine_documents["event"][i]["data"][
-                "mock_jaw_phase-jaw_phase-user_readback"
-            ]
-            == i
-        )
+        assert run_engine_documents["event"][i]["data"]["mock_jaw_phase-jaw_phase"] == i
 
 
 @pytest.fixture
