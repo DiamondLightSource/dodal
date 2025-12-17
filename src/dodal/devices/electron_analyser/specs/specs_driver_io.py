@@ -4,22 +4,19 @@ from typing import Generic
 import numpy as np
 from ophyd_async.core import (
     Array1D,
+    AsyncStatus,
     SignalR,
     StandardReadableFormat,
     derived_signal_r,
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
-from dodal.devices.electron_analyser.abstract.base_driver_io import (
+from dodal.devices.electron_analyser.base.base_driver_io import (
     AbstractAnalyserDriverIO,
 )
-from dodal.devices.electron_analyser.abstract.types import TLensMode, TPsuMode
-from dodal.devices.electron_analyser.energy_sources import (
-    DualEnergySource,
-    EnergySource,
-)
-from dodal.devices.electron_analyser.specs.enums import AcquisitionMode
-from dodal.devices.electron_analyser.specs.region import SpecsRegion
+from dodal.devices.electron_analyser.base.base_region import TLensMode, TPsuMode
+from dodal.devices.electron_analyser.specs.specs_enums import AcquisitionMode
+from dodal.devices.electron_analyser.specs.specs_region import SpecsRegion
 
 
 class SpecsAnalyserDriverIO(
@@ -37,7 +34,6 @@ class SpecsAnalyserDriverIO(
         prefix: str,
         lens_mode_type: type[TLensMode],
         psu_mode_type: type[TPsuMode],
-        energy_source: EnergySource | DualEnergySource,
         name: str = "",
     ) -> None:
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
@@ -59,29 +55,30 @@ class SpecsAnalyserDriverIO(
             lens_mode_type=lens_mode_type,
             psu_mode_type=psu_mode_type,
             pass_energy_type=float,
-            energy_source=energy_source,
             name=name,
         )
 
-    async def _set_region(self, ke_region: SpecsRegion[TLensMode, TPsuMode]):
+    @AsyncStatus.wrap
+    async def set(self, epics_region: SpecsRegion[TLensMode, TPsuMode]):
         await asyncio.gather(
-            self.region_name.set(ke_region.name),
-            self.low_energy.set(ke_region.low_energy),
-            self.high_energy.set(ke_region.high_energy),
-            self.slices.set(ke_region.slices),
-            self.acquire_time.set(ke_region.acquire_time),
-            self.lens_mode.set(ke_region.lens_mode),
-            self.pass_energy.set(ke_region.pass_energy),
-            self.iterations.set(ke_region.iterations),
-            self.acquisition_mode.set(ke_region.acquisition_mode),
-            self.snapshot_values.set(ke_region.values),
-            self.psu_mode.set(ke_region.psu_mode),
+            self.region_name.set(epics_region.name),
+            self.low_energy.set(epics_region.low_energy),
+            self.high_energy.set(epics_region.high_energy),
+            self.slices.set(epics_region.slices),
+            self.acquire_time.set(epics_region.acquire_time),
+            self.lens_mode.set(epics_region.lens_mode),
+            self.pass_energy.set(epics_region.pass_energy),
+            self.iterations.set(epics_region.iterations),
+            self.acquisition_mode.set(epics_region.acquisition_mode),
+            self.snapshot_values.set(epics_region.values),
+            self.psu_mode.set(epics_region.psu_mode),
+            self.energy_mode.set(epics_region.energy_mode),
         )
-        if ke_region.acquisition_mode == AcquisitionMode.FIXED_TRANSMISSION:
-            await self.energy_step.set(ke_region.energy_step)
+        if epics_region.acquisition_mode == AcquisitionMode.FIXED_TRANSMISSION:
+            await self.energy_step.set(epics_region.energy_step)
 
-        if ke_region.acquisition_mode == AcquisitionMode.FIXED_ENERGY:
-            await self.centre_energy.set(ke_region.centre_energy)
+        if epics_region.acquisition_mode == AcquisitionMode.FIXED_ENERGY:
+            await self.centre_energy.set(epics_region.centre_energy)
 
     def _create_angle_axis_signal(self, prefix: str) -> SignalR[Array1D[np.float64]]:
         angle_axis = derived_signal_r(
