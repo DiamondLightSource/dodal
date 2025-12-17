@@ -56,11 +56,11 @@ class I17Apple2Controller(Apple2Controller[Apple2[UndulatorPhaseAxes]]):
 
     def _get_apple2_value(self, gap: float, phase: float, pol: Pol) -> Apple2Val:
         return Apple2Val(
-            gap=f"{gap:.6f}",
+            gap=gap,
             phase=Apple2PhasesVal(
-                top_outer=f"{phase:.6f}",
-                top_inner=f"{0.0:.6f}",
-                btm_inner=f"{phase:.6f}",
-                btm_outer=f"{0.0:.6f}",
+                top_outer=phase,
+                top_inner=0.0,
+                btm_inner=phase,
+                btm_outer=0.0,
             ),
         )

@@ -201,16 +201,16 @@ async def test_j09_apple2_controller_set_pol_lh(
     await mock_id_controller.polarisation.set(pol)
     get_mock_put(
         mock_id_controller.apple2().phase().top_outer.user_setpoint
-    ).assert_called_once_with(f"{top_outer_phase:.6f}", wait=True)
+    ).assert_called_once_with(f"{float(top_outer_phase)}", wait=True)
     get_mock_put(
         mock_id_controller.apple2().phase().top_inner.user_setpoint
-    ).assert_called_once_with(f"{top_inner_phase:.6f}", wait=True)
+    ).assert_called_once_with(f"{float(top_inner_phase)}", wait=True)
     get_mock_put(
         mock_id_controller.apple2().phase().btm_inner.user_setpoint
-    ).assert_called_once_with(f"{btm_inner_phase:.6f}", wait=True)
+    ).assert_called_once_with(f"{float(btm_inner_phase)}", wait=True)
     get_mock_put(
         mock_id_controller.apple2().phase().btm_outer.user_setpoint
-    ).assert_called_once_with(f"{btm_outer_phase:.6f}", wait=True)
+    ).assert_called_once_with(f"{float(btm_outer_phase)}", wait=True)
 
 
 @pytest.mark.parametrize(
@@ -290,26 +290,26 @@ async def test_j09_apple2_controller_set_pol(
     assert get_mock_put(
         mock_id_controller.apple2().phase().top_outer.user_setpoint
     ).call_args_list == [
-        call(f"{0:.6f}", wait=True),
-        call(f"{top_outer_phase:.6f}", wait=True),
+        call(f"{float(0)}", wait=True),
+        call(f"{float(top_outer_phase)}", wait=True),
     ]
     assert get_mock_put(
         mock_id_controller.apple2().phase().top_inner.user_setpoint
     ).call_args_list == [
-        call(f"{0:.6f}", wait=True),
-        call(f"{top_inner_phase:.6f}", wait=True),
+        call(f"{float(0)}", wait=True),
+        call(f"{float(top_inner_phase)}", wait=True),
     ]
     assert get_mock_put(
         mock_id_controller.apple2().phase().btm_inner.user_setpoint
     ).call_args_list == [
-        call(f"{0:.6f}", wait=True),
-        call(f"{btm_inner_phase:.6f}", wait=True),
+        call(f"{float(0)}", wait=True),
+        call(f"{float(btm_inner_phase)}", wait=True),
     ]
     assert get_mock_put(
         mock_id_controller.apple2().phase().btm_outer.user_setpoint
     ).call_args_list == [
-        call(f"{0:.6f}", wait=True),
-        call(f"{btm_outer_phase:.6f}", wait=True),
+        call(f"{float(0)}", wait=True),
+        call(f"{float(btm_outer_phase)}", wait=True),
     ]
 
 
@@ -336,16 +336,16 @@ async def test_j09_apple2_controller_set_pol_does_not_go_via_lh_if_already_at_lh
     await mock_id_controller.polarisation.set(pol)
     get_mock_put(
         mock_id_controller.apple2().phase().top_outer.user_setpoint
-    ).assert_called_once_with(f"{top_outer_phase:.6f}", wait=True)
+    ).assert_called_once_with(f"{float(top_outer_phase)}", wait=True)
     get_mock_put(
         mock_id_controller.apple2().phase().top_inner.user_setpoint
-    ).assert_called_once_with(f"{top_inner_phase:.6f}", wait=True)
+    ).assert_called_once_with(f"{float(top_inner_phase)}", wait=True)
     get_mock_put(
         mock_id_controller.apple2().phase().btm_inner.user_setpoint
-    ).assert_called_once_with(f"{btm_inner_phase:.6f}", wait=True)
+    ).assert_called_once_with(f"{float(btm_inner_phase)}", wait=True)
     get_mock_put(
         mock_id_controller.apple2().phase().btm_outer.user_setpoint
-    ).assert_called_once_with(f"{btm_outer_phase:.6f}", wait=True)
+    ).assert_called_once_with(f"{float(btm_outer_phase)}", wait=True)
 
 
 @pytest.mark.parametrize(

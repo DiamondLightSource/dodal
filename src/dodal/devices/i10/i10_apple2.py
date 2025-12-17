@@ -141,12 +141,12 @@ class I10Apple2Controller(Apple2Controller[I10Apple2]):
     def _get_apple2_value(self, gap: float, phase: float, pol: Pol) -> Apple2Val:
         phase3 = phase * (-1 if pol == Pol.LA else 1)
         return Apple2Val(
-            gap=f"{gap:.6f}",
+            gap=gap,
             phase=Apple2PhasesVal(
-                top_outer=f"{phase:.6f}",
-                top_inner="0.0",
-                btm_inner=f"{phase3:.6f}",
-                btm_outer="0.0",
+                top_outer=phase,
+                top_inner=0.0,
+                btm_inner=phase3,
+                btm_outer=0.0,
             ),
         )
 

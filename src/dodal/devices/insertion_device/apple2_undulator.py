@@ -35,19 +35,19 @@ MAXIMUM_MOVE_TIME = 550  # There is no useful movements take longer than this.
 
 @dataclass
 class Apple2LockedPhasesVal:
-    top_outer: str
-    btm_inner: str
+    top_outer: float
+    btm_inner: float
 
 
 @dataclass
 class Apple2PhasesVal(Apple2LockedPhasesVal):
-    top_inner: str
-    btm_outer: str
+    top_inner: float
+    btm_outer: float
 
 
 @dataclass
 class Apple2Val:
-    gap: str
+    gap: float
     phase: Apple2LockedPhasesVal | Apple2PhasesVal
 
     def extract_phase_val(self):
@@ -223,8 +223,8 @@ class UndulatorLockedPhaseAxes(SafeUndulatorMover[Apple2PhaseValType]):
 
     async def set_demand_positions(self, value: Apple2PhaseValType) -> None:
         await asyncio.gather(
-            self.top_outer.user_setpoint.set(value=value.top_outer),
-            self.btm_inner.user_setpoint.set(value=value.btm_inner),
+            self.top_outer.user_setpoint.set(value=str(value.top_outer)),
+            self.btm_inner.user_setpoint.set(value=str(value.btm_inner)),
         )
 
     async def get_timeout(self) -> float:
@@ -278,10 +278,10 @@ class UndulatorPhaseAxes(UndulatorLockedPhaseAxes[Apple2PhasesVal]):
 
     async def set_demand_positions(self, value: Apple2PhasesVal) -> None:
         await asyncio.gather(
-            self.top_outer.user_setpoint.set(value=value.top_outer),
-            self.top_inner.user_setpoint.set(value=value.top_inner),
-            self.btm_inner.user_setpoint.set(value=value.btm_inner),
-            self.btm_outer.user_setpoint.set(value=value.btm_outer),
+            self.top_outer.user_setpoint.set(value=str(value.top_outer)),
+            self.top_inner.user_setpoint.set(value=str(value.top_inner)),
+            self.btm_inner.user_setpoint.set(value=str(value.btm_inner)),
+            self.btm_outer.user_setpoint.set(value=str(value.btm_outer)),
         )
 
 
@@ -679,12 +679,12 @@ class Apple2EnforceLHMoveController(Apple2Controller[Apple2]):
 
     def _get_apple2_value(self, gap: float, phase: float, pol: Pol) -> Apple2Val:
         apple2_val = Apple2Val(
-            gap=f"{gap:.6f}",
+            gap=gap,
             phase=Apple2PhasesVal(
-                top_outer=f"{phase:.6f}",
-                top_inner=f"{0.0:.6f}",
-                btm_inner=f"{phase:.6f}",
-                btm_outer=f"{0.0:.6f}",
+                top_outer=phase,
+                top_inner=0.0,
+                btm_inner=phase,
+                btm_outer=0.0,
             ),
         )
         LOGGER.info(f"Getting apple2 value for pol={pol}, gap={gap}, phase={phase}.")
