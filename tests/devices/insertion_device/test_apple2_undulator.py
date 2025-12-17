@@ -6,12 +6,14 @@ import pytest
 from bluesky.plans import scan
 from bluesky.run_engine import RunEngine
 from ophyd_async.core import (
+    FlyMotorInfo,
     callback_on_mock_put,
     get_mock_put,
     init_devices,
     set_mock_value,
 )
 from ophyd_async.testing import (
+    assert_configuration,
     assert_emitted,
     assert_reading,
     partial_reading,
@@ -26,6 +28,7 @@ from dodal.devices.insertion_device import (
     Apple2Val,
     EnabledDisabledUpper,
     EnergyMotorConvertor,
+    MotorWithoutStop,
     Pol,
     UndulatorGap,
     UndulatorGateStatus,
@@ -36,6 +39,13 @@ from dodal.devices.insertion_device import (
 
 # add mock_config_client, mock_id_gap, mock_phase and mock_jaw_phase_axes to pytest.
 pytest_plugins = ["dodal.testing.fixtures.devices.apple2"]
+
+
+@pytest.fixture
+async def unstoppable_motor():
+    async with init_devices(mock=True):
+        unstoppable_motor = MotorWithoutStop(prefix="MOTOR:", name="unstopable_motor")
+    return unstoppable_motor
 
 
 @pytest.fixture
@@ -58,6 +68,13 @@ async def mock_locked_phase_axes(
     set_mock_value(mock_phase_axes.btm_inner.user_setpoint_readback, 2)
     set_mock_value(mock_phase_axes.status, EnabledDisabledUpper.ENABLED)
     return mock_phase_axes
+
+
+async def test_unstoppable_motor_stop_not_implemented(
+    unstoppable_motor: MotorWithoutStop, caplog: pytest.LogCaptureFixture
+):
+    await unstoppable_motor.stop()
+    assert caplog.records[0].msg == "Stopping unstopable_motor is not supported."
 
 
 async def test_in_motion_error(
@@ -165,6 +182,47 @@ async def test_phase_status_error(mock_phase_axes: UndulatorPhaseAxes):
     set_mock_value(mock_phase_axes.status, EnabledDisabledUpper.DISABLED)
     with pytest.raises(RuntimeError):
         await mock_phase_axes.set(set_value)
+
+
+async def test_gap_read_config(mock_id_gap: UndulatorGap):
+    set_mock_value(mock_id_gap.velocity, 2)
+    set_mock_value(mock_id_gap.motor_egu, "c")
+    await assert_configuration(
+        mock_id_gap,
+        {
+            "mock_id_gap-velocity": {
+                "value": 2.0,
+            },
+            "mock_id_gap-motor_egu": {
+                "value": "c",
+            },
+            "mock_id_gap-offset": {
+                "value": 0.0,
+            },
+        },
+        full_match=False,
+    )
+
+
+async def test_gap_prepare_velocity_min_limit_error(mock_id_gap: UndulatorGap):
+    set_mock_value(mock_id_gap.max_velocity, 20)
+    set_mock_value(mock_id_gap.min_velocity, 11)
+    with pytest.raises(ValueError):
+        fly_info = FlyMotorInfo(start_position=25, end_position=35, time_for_move=1)
+        await mock_id_gap.prepare(fly_info)
+
+
+async def test_gap_prepare_success(mock_id_gap: UndulatorGap):
+    set_mock_value(mock_id_gap.max_velocity, 30)
+    set_mock_value(mock_id_gap.min_velocity, 1)
+    set_mock_value(mock_id_gap.acceleration_time, 0.5)
+    fly_info = FlyMotorInfo(start_position=25, end_position=35, time_for_move=1)
+    await mock_id_gap.prepare(fly_info)
+    get_mock_put(mock_id_gap.user_setpoint).assert_awaited_once_with(
+        str(fly_info.ramp_up_start_pos(0.5)), wait=True
+    )
+
+    assert await mock_id_gap.velocity.get_value() == 10
 
 
 @pytest.mark.parametrize(
