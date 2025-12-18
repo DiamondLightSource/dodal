@@ -37,8 +37,7 @@ async def test_source_selector_read(source_selector: SourceSelector) -> None:
 
 
 def test_get_obj_from_selected_source() -> None:
-    obj1 = 1
-    obj2 = 2
+    obj1, obj2 = 1, 2
     selected_obj = get_obj_from_selected_source(SelectedSource.SOURCE1, obj1, obj2)
     assert selected_obj is obj1
     selected_obj = get_obj_from_selected_source(SelectedSource.SOURCE2, obj1, obj2)
