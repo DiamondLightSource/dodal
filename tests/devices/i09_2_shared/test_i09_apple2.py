@@ -290,25 +290,25 @@ async def test_j09_apple2_controller_set_pol(
     assert get_mock_put(
         mock_id_controller.apple2().phase().top_outer.user_setpoint
     ).call_args_list == [
-        call(f"{float(0)}", wait=True),
+        call("0.0", wait=True),
         call(f"{top_outer_phase}", wait=True),
     ]
     assert get_mock_put(
         mock_id_controller.apple2().phase().top_inner.user_setpoint
     ).call_args_list == [
-        call(f"{float(0)}", wait=True),
+        call("0.0", wait=True),
         call(f"{top_inner_phase}", wait=True),
     ]
     assert get_mock_put(
         mock_id_controller.apple2().phase().btm_inner.user_setpoint
     ).call_args_list == [
-        call(f"{float(0)}", wait=True),
+        call("0.0", wait=True),
         call(f"{btm_inner_phase}", wait=True),
     ]
     assert get_mock_put(
         mock_id_controller.apple2().phase().btm_outer.user_setpoint
     ).call_args_list == [
-        call(f"{float(0)}", wait=True),
+        call("0.0", wait=True),
         call(f"{btm_outer_phase}", wait=True),
     ]
 
