@@ -14,7 +14,7 @@ description = "Ophyd devices and other utils that could be used across DLS beaml
 dependencies = [
     "click",
     "ophyd",
-    "ophyd_async[ca,pva]@git+https://github.com/bluesky/ophyd-async.git@improve-error-when-raw2derived-has-no-type",
+    "ophyd_async[sim,ca,pva]@git+https://github.com/bluesky/ophyd-async.git@improve-error-when-raw2derived-has-no-type",
     "bluesky>=1.14.5",
     "pyepics",
     "pillow",
@@ -22,15 +22,15 @@ dependencies = [
     "requests",
     "graypy",
     "pydantic>=2.0",
-    "opencv-python-headless",         # For pin-tip detection.
+    "opencv-python-headless",                                                                                            # For pin-tip detection.
     "numpy",
     "aiofiles",
     "aiohttp",
     "redis",
     "scanspec>=0.7.3",
-    "pyzmq==26.3.0",                  # Until we can move to RHEL 8 https://github.com/DiamondLightSource/mx-bluesky/issues/1139
+    "pyzmq==26.3.0",                                                                                                     # Until we can move to RHEL 8 https://github.com/DiamondLightSource/mx-bluesky/issues/1139
     "deepdiff",
-    "daq-config-server>=v1.0.0-rc.2", # For getting Configuration settings.
+    "daq-config-server>=v1.0.0-rc.2",                                                                                    # For getting Configuration settings.
 ]
 
 dynamic = ["version"]
@@ -48,7 +48,7 @@ dev = [
     # Commented out due to dependency version conflict with pydantic 1.x
     # "copier",
     "myst-parser",
-    "ophyd_async[ca,pva]@git+https://github.com/bluesky/ophyd-async.git@improve-error-when-raw2derived-has-no-type",
+    "ophyd_async[sim,ca,pva]@git+https://github.com/bluesky/ophyd-async.git@improve-error-when-raw2derived-has-no-type",
     "pipdeptree",
     "pre-commit",
     "psutil",

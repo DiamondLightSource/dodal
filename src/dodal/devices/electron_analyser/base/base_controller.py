@@ -31,8 +31,9 @@ class ElectronAnalyserController(
         self,
         driver: TAbstractAnalyserDriverIO,
         energy_source: AbstractEnergySource,
-        deadtime: float,
+        shutter: FastShutter | None = None,
         source_selector: SourceSelector | None = None,
+        deadtime: float = 0,
         image_mode: ADImageMode = ADImageMode.SINGLE,
     ):
         """
@@ -45,12 +46,19 @@ class ElectronAnalyserController(
             image_mode: The image mode to configure the driver with before measuring.
         """
         self.energy_source = energy_source
+        self.shutter = shutter
         self.source_selector = source_selector
         super().__init__(driver, deadtime, image_mode)
 
     async def setup_with_region(self, region: TAbstractBaseRegion) -> None:
         """Logic to set the driver with a region."""
-        await self._setup_before_set_driver(region)
+        if self.source_selector is not None:
+            await self.source_selector.set(region.excitation_energy_source)
+
+        # Should this be moved to a VGScientController only?
+        if self.shutter is not None:
+            await self.shutter.set(self.shutter.close_state)
+
         excitation_energy = await self.energy_source.energy.get_value()
         epics_region = region.prepare_for_epics(excitation_energy)
         await self.driver.set(epics_region)
@@ -65,6 +73,10 @@ class ElectronAnalyserController(
         # axis calculation.
         excitation_energy = await self.energy_source.energy.get_value()
         await self.driver.cached_excitation_energy.set(excitation_energy)
+
+        if self.shutter is not None:
+            await self.shutter.set(self.shutter.open_state)
+
         await super().prepare(trigger_info)
 
 
@@ -74,28 +86,3 @@ GenericElectronAnalyserController = ElectronAnalyserController[
 TElectronAnalyserController = TypeVar(
     "TElectronAnalyserController", bound=ElectronAnalyserController
 )
-
-
-class ElectronAnalyserControllerWithShutters(
-    ElectronAnalyserController[TAbstractAnalyserDriverIO, TAbstractBaseRegion],
-    Generic[TAbstractAnalyserDriverIO, TAbstractBaseRegion],
-):
-    def __init__(
-        self,
-        driver: TAbstractAnalyserDriverIO,
-        energy_source: AbstractEnergySource,
-        shutter: FastShutter,
-        deadtime: float,
-        source_selector: SourceSelector | None = None,
-        image_mode: ADImageMode = ADImageMode.SINGLE,
-    ):
-        self.shutter = shutter
-        super().__init__(driver, energy_source, deadtime, source_selector, image_mode)
-
-    async def _setup_before_set_driver(self, region: TAbstractBaseRegion) -> None:
-        await super()._setup_before_set_driver(region)
-        await self.shutter.set(self.shutter.close_state)
-
-    async def prepare(self, trigger_info: TriggerInfo) -> None:
-        await self.shutter.set(self.shutter.open_state)
-        await super().prepare(trigger_info)

@@ -92,6 +92,8 @@ class DualEnergySource(AbstractEnergySource):
             s1=self.source1.energy,
             s2=self.source2.energy,
         )
+        self.add_readables([selected_source])
+
         super().__init__(name)
 
     @property

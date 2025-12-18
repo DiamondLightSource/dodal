@@ -62,7 +62,7 @@ def analyser_controller(
         raise ValueError(f"sim_driver is of type {type(sim_driver)}.")
 
     return ElectronAnalyserController[AbstractAnalyserDriverIO, AbstractBaseRegion](
-        sim_driver, energy_source, 0
+        sim_driver, energy_source
     )
 
 
@@ -85,8 +85,6 @@ async def test_controller_setup_with_region_sets_elected_source_and_converts_reg
     ],
     region: AbstractBaseRegion,
 ) -> None:
-    energy_source = analyser_controller.energy_source
-
     sim_driver = analyser_controller.driver
     sim_driver.set = AsyncMock()
 
@@ -101,15 +99,16 @@ async def test_controller_setup_with_region_sets_elected_source_and_converts_reg
 
         mock_prepare_for_epics.assert_called_once_with(
             region,
-            await energy_source.energy.get_value(),
+            await analyser_controller.energy_source.energy.get_value(),
         )
 
-        if isinstance(energy_source, DualEnergySource):
-            get_mock_put(energy_source.selected_source).assert_called_once_with(
+        source_selector = analyser_controller.source_selector
+        if source_selector is not None:
+            get_mock_put(source_selector.selected_source).assert_called_once_with(
                 region.excitation_energy_source, wait=True
             )
         # Check set was called with epics_region
         epics_region = mock_prepare_for_epics.call_args[0][0].prepare_for_epics(
-            await energy_source.energy.get_value(),
+            await analyser_controller.energy_source.energy.get_value(),
         )
         sim_driver.set.assert_called_once_with(epics_region)

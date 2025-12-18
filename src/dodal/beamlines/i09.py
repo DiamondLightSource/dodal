@@ -12,8 +12,9 @@ from dodal.devices.common_dcm import (
 from dodal.devices.electron_analyser.base import (
     DualEnergySource,
 )
+from dodal.devices.electron_analyser.vgscienta import VGScientaDetector
 from dodal.devices.fast_shutter import DualFastShutter, GenericFastShutter
-from dodal.devices.i09 import Grating
+from dodal.devices.i09 import Grating, LensMode, PassEnergy, PsuMode
 from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.devices.selectable_source import SourceSelector
 from dodal.devices.synchrotron import Synchrotron
@@ -79,31 +80,16 @@ def dual_fast_shutter() -> DualFastShutter[InOut]:
     return DualFastShutter[InOut](fsi1(), fsj1(), source_selector().selected_source)
 
 
-# @device_factory()
-# def analyser_driver() -> VGScientaAnalyserDriverIO[LensMode, PsuMode, PassEnergy]:
-#     return VGScientaAnalyserDriverIO[LensMode, PsuMode, PassEnergy](
-#         prefix=f"{I_PREFIX.beamline_prefix}-EA-DET-01:CAM:",
-#         lens_mode_type=LensMode,
-#         psu_mode_type=PsuMode,
-#         pass_energy_type=PassEnergy,
-#     )
-
-
-# # Connect will work again after this work completed
-# # https://jira.diamond.ac.uk/browse/I09-651
-# @device_factory()
-# def ew4000() -> VGScientaDetector[LensMode, PsuMode, PassEnergy]:
-#     controller = ElectronAnalyserControllerWithShutters(
-#         driver=analyser_driver(),
-#         energy_source=dual_energy_source(),
-#         source_selector=source_selector(),
-#         shutter=dual_fast_shutter(),
-#         deadtime=0,
-#     )
-#     return VGScientaDetector[LensMode, PsuMode, PassEnergy](
-#         driver=analyser_driver(),
-#         controller=controller,
-#         lens_mode_type=LensMode,
-#         psu_mode_type=PsuMode,
-#         pass_energy_type=PassEnergy,
-#     )
+# Connect will work again after this work completed
+# https://jira.diamond.ac.uk/browse/I09-651
+@device_factory()
+def ew4000() -> VGScientaDetector[LensMode, PsuMode, PassEnergy]:
+    return VGScientaDetector[LensMode, PsuMode, PassEnergy](
+        prefix=f"{I_PREFIX.beamline_prefix}-EA-DET-01:CAM:",
+        lens_mode_type=LensMode,
+        psu_mode_type=PsuMode,
+        pass_energy_type=PassEnergy,
+        energy_source=dual_energy_source(),
+        shutter=dual_fast_shutter(),
+        source_selector=source_selector(),
+    )
