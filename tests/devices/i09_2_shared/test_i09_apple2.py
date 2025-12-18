@@ -25,7 +25,7 @@ from dodal.devices.insertion_device import (
 from dodal.devices.insertion_device.energy_motor_lookup import (
     ConfigServerEnergyMotorLookup,
 )
-from dodal.devices.insertion_device.id_enum import Pol
+from dodal.devices.insertion_device.enum import Pol
 from dodal.devices.insertion_device.lookup_table_models import (
     MAXIMUM_ROW_PHASE_MOTOR_POSITION,
     ROW_PHASE_CIRCULAR,
