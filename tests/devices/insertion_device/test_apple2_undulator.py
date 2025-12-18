@@ -190,15 +190,9 @@ async def test_gap_read_config(mock_id_gap: UndulatorGap):
     await assert_configuration(
         mock_id_gap,
         {
-            "mock_id_gap-velocity": {
-                "value": 2.0,
-            },
-            "mock_id_gap-motor_egu": {
-                "value": "c",
-            },
-            "mock_id_gap-offset": {
-                "value": 0.0,
-            },
+            "mock_id_gap-velocity": partial_reading(2.0),
+            "mock_id_gap-motor_egu": partial_reading("c"),
+            "mock_id_gap-offset": partial_reading(0.0),
         },
         full_match=False,
     )
