@@ -133,7 +133,7 @@ class UnstoppableMotor(Motor):
         del self.motor_stop  # Remove motor_stop from the public interface
 
     async def stop(self, success=False):
-        LOGGER.info(f"Stopping {self.name} is not supported.")
+        LOGGER.warning(f"Stopping {self.name} is not supported.")
 
 
 class GapSafeMotorNoStop(UnstoppableMotor, UndulatorBase[float]):
