@@ -21,7 +21,7 @@ from ophyd_async.fastcs.jungfrau._signals import JungfrauDriverIO
 from dodal.log import LOGGER
 
 
-class JunfrauCommissioningWriter(DetectorWriter, StandardReadable):
+class JungfrauCommissioningWriter(DetectorWriter, StandardReadable):
     """Implementation of the temporary filewriter used for Jungfrau commissioning on i24.
 
     The PVs on this device are responsible for writing files of a specified name
@@ -48,7 +48,6 @@ class JunfrauCommissioningWriter(DetectorWriter, StandardReadable):
         self._exposures_per_event = exposures_per_event
         _path_info = self._path_provider()
 
-        # Commissioning Jungfrau plans allow you to override path, so check to see if file exists
         requested_filepath = Path(_path_info.directory_path) / _path_info.filename
         if requested_filepath.exists():
             raise FileExistsError(
@@ -99,7 +98,7 @@ class JunfrauCommissioningWriter(DetectorWriter, StandardReadable):
 
 
 class CommissioningJungfrau(
-    StandardDetector[JungfrauController, JunfrauCommissioningWriter]
+    StandardDetector[JungfrauController, JungfrauCommissioningWriter]
 ):
     """Ophyd-async implementation of a Jungfrau 9M Detector, using a temporary
     filewriter in place of Odin"""
@@ -112,7 +111,7 @@ class CommissioningJungfrau(
         name="",
     ):
         self.drv = JungfrauDriverIO(prefix)
-        writer = JunfrauCommissioningWriter(writer_prefix, path_provider)
+        writer = JungfrauCommissioningWriter(writer_prefix, path_provider)
         controller = JungfrauController(self.drv)
         super().__init__(controller, writer, name=name)
 
