@@ -6,9 +6,6 @@ from ophyd_async.fastcs.panda import HDFPanda
 from yarl import URL
 
 from dodal.common.beamlines.beamline_parameters import get_beamline_parameters
-from dodal.common.beamlines.beamline_utils import (
-    device_instantiation,
-)
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.udc_directory_provider import PandASubpathProvider
 from dodal.device_manager import DeviceManager
@@ -26,7 +23,6 @@ from dodal.devices.cryostream import (
     OxfordCryoJet,
     OxfordCryoStream,
 )
-from dodal.devices.detector import DetectorParams
 from dodal.devices.detector.detector_motion import DetectorMotion
 from dodal.devices.diamond_filter import DiamondFilter, I03Filters
 from dodal.devices.eiger import EigerDetector
