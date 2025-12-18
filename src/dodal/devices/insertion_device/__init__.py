@@ -20,7 +20,6 @@ from .apple2_undulator import (
 from .energy import (
     BeamEnergy,
     InsertionDeviceEnergy,
-    InsertionDevicePolarisation,
 )
 from .energy_motor_lookup import (
     ConfigServerEnergyMotorLookup,
@@ -33,6 +32,7 @@ from .lookup_table_models import (
     LookupTableColumnConfig,
     convert_csv_to_lookup,
 )
+from .polarisation import InsertionDevicePolarisation
 
 __all__ = [
     "Apple2",
