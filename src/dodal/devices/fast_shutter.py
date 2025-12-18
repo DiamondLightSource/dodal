@@ -38,7 +38,7 @@ class FastShutter(Movable[EnumTypesT], Protocol, Generic[EnumTypesT]):
 
     @AsyncStatus.wrap
     async def set(self, state: EnumTypesT):
-        self.shutter_state.set(state)
+        await self.shutter_state.set(state)
 
 
 class GenericFastShutter(
