@@ -159,20 +159,9 @@ def aperture_scatterguard() -> ApertureScatterguard:
     )
 
 
-@device_factory()
-def eiger(mock: bool = False, params: DetectorParams | None = None) -> EigerDetector:
-    def set_params(eiger: EigerDetector):
-        if params is not None:
-            eiger.set_detector_parameters(params)
-
-    return device_instantiation(
-        device_factory=EigerDetector,
-        name="eiger",
-        prefix="-EA-EIGER-01:",
-        wait=False,
-        fake=mock,
-        post_create=set_params,
-    )
+@devices.v1_init(EigerDetector, prefix="BL03I-EA-EIGER-01:", wait=False)
+def eiger(eiger: EigerDetector) -> EigerDetector:
+    return eiger
 
 
 @devices.factory()
@@ -187,6 +176,7 @@ def s4_slit_gaps() -> S4SlitGaps:
     return S4SlitGaps(f"{PREFIX.beamline_prefix}-AL-SLITS-04:")
 
 
+# TO DO: FIX UNDULATOR TO USE DEVICE MANAGER
 @device_factory()
 def undulator() -> UndulatorInKeV:
     return UndulatorInKeV(
@@ -209,6 +199,7 @@ def zebra() -> Zebra:
     )
 
 
+# TO DO: FIX OAV TO USE DEVICE MANAGER
 @device_factory()
 def oav(params: OAVConfig | None = None) -> OAVBeamCentrePV:
     return OAVBeamCentrePV(
