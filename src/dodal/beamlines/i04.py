@@ -176,13 +176,17 @@ def s4_slit_gaps() -> S4SlitGaps:
     return S4SlitGaps(f"{PREFIX.beamline_prefix}-AL-SLITS-04:")
 
 
-# TO DO: FIX UNDULATOR TO USE DEVICE MANAGER
-@device_factory()
-def undulator() -> UndulatorInKeV:
+@devices.fixture
+def daq_configuration_path() -> str:
+    return DAQ_CONFIGURATION_PATH
+
+
+@devices.factory()
+def undulator(baton: Baton, daq_configuration_path: str) -> UndulatorInKeV:
     return UndulatorInKeV(
         prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:",
-        id_gap_lookup_table_path="/dls_sw/i04/software/daq_configuration/lookup/BeamLine_Undulator_toGap.txt",
-        baton=baton(),
+        id_gap_lookup_table_path=f"{daq_configuration_path}/lookup/BeamLine_Undulator_toGap.txt",
+        baton=baton,
     )
 
 
@@ -199,8 +203,7 @@ def zebra() -> Zebra:
     )
 
 
-# TO DO: FIX OAV TO USE DEVICE MANAGER
-@device_factory()
+@devices.factory()
 def oav(params: OAVConfig | None = None) -> OAVBeamCentrePV:
     return OAVBeamCentrePV(
         prefix=f"{PREFIX.beamline_prefix}-DI-OAV-01:",
