@@ -213,11 +213,12 @@ def eiger(mock: bool = False, params: DetectorParams | None = None) -> EigerDete
     return device_instantiation(
         device_factory=EigerDetector,
         name="eiger",
+        beamline="i04",
         prefix="-EA-EIGER-01:",
         wait=False,
         fake=mock,
         post_create=set_params,
-        detector_id=72,
+        ispyb_detector_id=72,
     )
 
 

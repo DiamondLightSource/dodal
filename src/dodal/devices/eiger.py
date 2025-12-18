@@ -63,15 +63,21 @@ class EigerDetector(Device, Stageable):
     arming_status = Status()
     arming_status.set_finished()
 
-    def __init__(self, beamline: str = "i03", detector_id: int = 78, *args, **kwargs):
+    def __init__(
+        self,
+        beamline: str = "i03",
+        ispyb_detector_id: int | None = None,
+        *args,
+        **kwargs,
+    ):
         super().__init__(*args, **kwargs)
         self.beamline = beamline
 
-        self._detector_id = detector_id
-        self.detector_id = AttributeSignal(
-            attr="_detector_id",
+        self.detector_id = ispyb_detector_id
+        self.ispyb_detector_id = AttributeSignal(
+            attr="detector_id",
             parent=self,
-            name="eiger-detector_id",
+            name="eiger-ispyb_detector_id",
             write_access=False,
         )
 
@@ -83,10 +89,11 @@ class EigerDetector(Device, Stageable):
     def with_params(
         cls,
         params: DetectorParams,
-        name: str = "EigerDetector",
         beamline: str = "i03",
+        ispyb_detector_id: int | None = None,
+        name: str = "EigerDetector",
     ):
-        det = cls(name=name, beamline=beamline)
+        det = cls(name=name, beamline=beamline, ispyb_detector_id=ispyb_detector_id)
         det.set_detector_parameters(params)
         return det
 
