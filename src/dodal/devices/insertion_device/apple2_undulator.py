@@ -24,7 +24,7 @@ from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 from ophyd_async.epics.motor import Motor
 
 from dodal.common.enums import EnabledDisabledUpper
-from dodal.devices.insertion_device.id_enum import UndulatorGateStatus
+from dodal.devices.insertion_device.enum import UndulatorGateStatus
 from dodal.log import LOGGER
 
 T = TypeVar("T")

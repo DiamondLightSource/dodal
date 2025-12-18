@@ -11,7 +11,7 @@ from ophyd_async.core import (
 from dodal.devices.insertion_device import MAXIMUM_MOVE_TIME, Apple2Controller
 from dodal.log import LOGGER
 
-from .id_enum import Pol
+from .enum import Pol
 
 
 class InsertionDevicePolarisation(StandardReadable, Locatable[Pol]):

@@ -22,7 +22,7 @@ from dodal.devices.insertion_device import (
     UndulatorPhaseAxes,
 )
 from dodal.devices.insertion_device.energy_motor_lookup import EnergyMotorLookup
-from dodal.devices.insertion_device.id_enum import Pol
+from dodal.devices.insertion_device.enum import Pol
 
 ROW_PHASE_MOTOR_TOLERANCE = 0.004
 MAXIMUM_ROW_PHASE_MOTOR_POSITION = 24.0

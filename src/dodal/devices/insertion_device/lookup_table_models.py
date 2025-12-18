@@ -39,7 +39,7 @@ from pydantic import (
     field_validator,
 )
 
-from dodal.devices.insertion_device.id_enum import Pol
+from dodal.devices.insertion_device.enum import Pol
 
 DEFAULT_POLY_DEG = [
     "7th-order",

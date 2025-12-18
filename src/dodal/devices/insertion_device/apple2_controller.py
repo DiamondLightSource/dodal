@@ -14,7 +14,7 @@ from ophyd_async.core import (
 from dodal.devices.insertion_device.energy_motor_lookup import (
     EnergyMotorLookup,
 )
-from dodal.devices.insertion_device.id_enum import Pol
+from dodal.devices.insertion_device.enum import Pol
 from dodal.log import LOGGER
 
 from .apple2_undulator import Apple2, Apple2PhasesVal, Apple2Val, UndulatorPhaseAxes
