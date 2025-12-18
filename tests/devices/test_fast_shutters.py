@@ -4,7 +4,7 @@ import pytest
 from bluesky import RunEngine
 from bluesky import plan_stubs as bps
 from ophyd_async.core import InOut, OnOff, init_devices
-from ophyd_async.testing import assert_reading, partial_reading
+from ophyd_async.testing import assert_configuration, assert_reading, partial_reading
 
 from dodal.devices.fast_shutter import DualFastShutter, GenericFastShutter
 from dodal.devices.selectable_source import SelectedSource, SourceSelector
@@ -139,10 +139,30 @@ async def test_dual_fast_shutter_read(
     )
     await assert_reading(
         dual_fast_shutter,
-        {f"{dual_fast_shutter.name}-shutter_state": partial_reading(InOut.IN)}
+        {
+            f"{dual_fast_shutter.name}-shutter_state": partial_reading(InOut.IN),
+        }
         | shutter1_read
         | shutter2_read
         | source_selector_read,
+    )
+
+
+async def test_dual_fast_shutter_read_configuration(
+    dual_fast_shutter: DualFastShutter,
+    shutter1: GenericFastShutter,
+    shutter2: GenericFastShutter,
+) -> None:
+    await assert_configuration(
+        dual_fast_shutter,
+        {
+            f"{dual_fast_shutter.name}-shutter1_device_name": partial_reading(
+                shutter1.name
+            ),
+            f"{dual_fast_shutter.name}-shutter2_device_name": partial_reading(
+                shutter2.name
+            ),
+        },
     )
 
 

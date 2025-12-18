@@ -7,7 +7,9 @@ from ophyd_async.core import (
     Reference,
     SignalRW,
     StandardReadable,
+    StandardReadableFormat,
     derived_signal_rw,
+    soft_signal_r_and_setter,
 )
 from ophyd_async.epics.core import epics_signal_rw
 
@@ -98,6 +100,7 @@ class DualFastShutter(StandardReadable, FastShutter[EnumTypesT], Generic[EnumTyp
         self._shutter1_ref = Reference(shutter1)
         self._shutter2_ref = Reference(shutter2)
         self._selected_shutter_ref = Reference(selected_source)
+
         with self.add_children_as_readables():
             self.shutter_state = derived_signal_rw(
                 self._read_shutter_state,
@@ -106,7 +109,17 @@ class DualFastShutter(StandardReadable, FastShutter[EnumTypesT], Generic[EnumTyp
                 shutter1=shutter1.shutter_state,
                 shutter2=shutter2.shutter_state,
             )
+
+        with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
+            self.shutter1_device_name, _ = soft_signal_r_and_setter(
+                str, initial_value=shutter1.name
+            )
+            self.shutter2_device_name, _ = soft_signal_r_and_setter(
+                str, initial_value=shutter2.name
+            )
+
         self.add_readables([shutter1, shutter2, selected_source])
+
         super().__init__(name)
 
     def _validate_shutter_states(
