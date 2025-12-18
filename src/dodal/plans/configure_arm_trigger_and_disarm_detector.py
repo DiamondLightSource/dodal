@@ -76,7 +76,9 @@ def set_cam_pvs(
     yield from bps.abs_set(
         eiger.drv.detector.frame_time, detector_params.exposure_time_s, group=group
     )
-    yield from bps.abs_set(eiger.drv.detector.nexpi, 1, group=group)
+    if hasattr(eiger.drv.detector, "nexpi"):
+        if eiger.drv.detector.nexpi:
+            yield from bps.abs_set(eiger.drv.detector.nexpi, 1, group=group)
 
     if wait:
         yield from bps.wait(group)
