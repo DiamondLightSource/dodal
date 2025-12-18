@@ -351,7 +351,7 @@ async def test_id_polarisation_set(
 
     if pol == "dsf":
         with pytest.raises(ValueError):
-            await mock_id_pol.set(pol)
+            await mock_id_pol.set(Pol(pol))
     else:
         await mock_id_pol.set(pol)
 
