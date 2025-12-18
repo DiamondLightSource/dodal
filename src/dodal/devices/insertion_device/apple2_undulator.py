@@ -14,7 +14,6 @@ from ophyd_async.core import (
     SignalW,
     StandardReadable,
     StandardReadableFormat,
-    StrictEnum,
     derived_signal_rw,
     soft_signal_r_and_setter,
     soft_signal_rw,
@@ -24,17 +23,14 @@ from ophyd_async.epics.core import epics_signal_r, epics_signal_rw, epics_signal
 from ophyd_async.epics.motor import Motor
 
 from dodal.common.enums import EnabledDisabledUpper
+from dodal.devices.insertion_device.energy_motor_lookup import EnergyMotorLookup
+from dodal.devices.insertion_device.id_enum import Pol, UndulatorGateStatus
 from dodal.log import LOGGER
 
 T = TypeVar("T")
 
 DEFAULT_MOTOR_MIN_TIMEOUT = 10
 MAXIMUM_MOVE_TIME = 550  # There is no useful movements take longer than this.
-
-
-class UndulatorGateStatus(StrictEnum):
-    OPEN = "Open"
-    CLOSE = "Closed"
 
 
 @dataclass
@@ -56,16 +52,6 @@ class Apple2Val:
 
     def extract_phase_val(self):
         return self.phase
-
-
-class Pol(StrictEnum):
-    NONE = "None"
-    LH = "lh"
-    LV = "lv"
-    PC = "pc"
-    NC = "nc"
-    LA = "la"
-    LH3 = "lh3"
 
 
 ROW_PHASE_MOTOR_TOLERANCE = 0.004
@@ -664,6 +650,70 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
 
         LOGGER.warning("Unable to determine polarisation. Defaulting to NONE.")
         return Pol.NONE, 0.0
+
+
+class Apple2EnforceLHMoveController(Apple2Controller[Apple2]):
+    """The latest Apple2 version allows unrestricted motor movement.
+    However, because of the high forces involved in polarization changes,
+    all movements must be performed using the Linear Horizontal (LH) mode.
+    A look-up table must also be used to determine the highest energy that can
+    be reached in LH mode."""
+
+    def __init__(
+        self,
+        apple2: Apple2,
+        gap_energy_motor_lut: EnergyMotorLookup,
+        phase_energy_motor_lut: EnergyMotorLookup,
+        units: str = "eV",
+        name: str = "",
+    ) -> None:
+        self.gap_energy_motor_lu = gap_energy_motor_lut
+        self.phase_energy_motor_lu = phase_energy_motor_lut
+        super().__init__(
+            apple2=apple2,
+            gap_energy_motor_converter=gap_energy_motor_lut.find_value_in_lookup_table,
+            phase_energy_motor_converter=phase_energy_motor_lut.find_value_in_lookup_table,
+            units=units,
+            name=name,
+        )
+
+    def _get_apple2_value(self, gap: float, phase: float, pol: Pol) -> Apple2Val:
+        apple2_val = Apple2Val(
+            gap=f"{gap:.6f}",
+            phase=Apple2PhasesVal(
+                top_outer=f"{phase:.6f}",
+                top_inner=f"{0.0:.6f}",
+                btm_inner=f"{phase:.6f}",
+                btm_outer=f"{0.0:.6f}",
+            ),
+        )
+        LOGGER.info(f"Getting apple2 value for pol={pol}, gap={gap}, phase={phase}.")
+        LOGGER.info(f"Apple2 motor values: {apple2_val}.")
+
+        return apple2_val
+
+    async def _set_pol(
+        self,
+        value: Pol,
+    ) -> None:
+        # I09/I21 require all polarisation change to go via LH.
+        current_pol = await self.polarisation.get_value()
+        if current_pol == value:
+            LOGGER.info(f"Polarisation already at {value}")
+        else:
+            target_energy = await self.energy.get_value()
+            if (value is not Pol.LH) and (current_pol is not Pol.LH):
+                self._polarisation_setpoint_set(Pol.LH)
+                max_lh_energy = float(
+                    self.gap_energy_motor_lu.lut.root[Pol("lh")].max_energy
+                )
+                lh_setpoint = (
+                    max_lh_energy if target_energy > max_lh_energy else target_energy
+                )
+                LOGGER.info(f"Changing polarisation to {value} via {Pol.LH}")
+                await self.energy.set(lh_setpoint, timeout=MAXIMUM_MOVE_TIME)
+            self._polarisation_setpoint_set(value)
+            await self.energy.set(target_energy, timeout=MAXIMUM_MOVE_TIME)
 
 
 class InsertionDeviceEnergyBase(abc.ABC, StandardReadable, Movable):
