@@ -1,0 +1,72 @@
+dodal.devices.i22.nxsas.NXSasMetadataHolder
+===========================================
+
+.. currentmodule:: dodal.devices.i22.nxsas
+
+.. autoclass:: NXSasMetadataHolder
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~NXSasMetadataHolder.aequetorial_angle
+      
+      
+      ~NXSasMetadataHolder.azimuthal_angle
+      
+      
+      ~NXSasMetadataHolder.beam_center_x
+      
+      
+      ~NXSasMetadataHolder.beam_center_y
+      
+      
+      ~NXSasMetadataHolder.description
+      
+      
+      ~NXSasMetadataHolder.polar_angle
+      
+      
+      ~NXSasMetadataHolder.rotation_angle
+      
+      
+      ~NXSasMetadataHolder.sensor_material
+      
+      
+      ~NXSasMetadataHolder.sensor_thickness
+      
+      
+      ~NXSasMetadataHolder.serial_number
+      
+      
+      ~NXSasMetadataHolder.threshold_energy
+      
+      
+      ~NXSasMetadataHolder.type
+      
+      
+      ~NXSasMetadataHolder.distance
+      
+      
+      ~NXSasMetadataHolder.x_pixel_size
+      
+      
+      ~NXSasMetadataHolder.y_pixel_size
+      
+   
+   

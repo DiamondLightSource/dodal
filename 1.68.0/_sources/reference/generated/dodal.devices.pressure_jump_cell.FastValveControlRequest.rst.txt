@@ -1,0 +1,87 @@
+dodal.devices.pressure\_jump\_cell.FastValveControlRequest
+==========================================================
+
+.. currentmodule:: dodal.devices.pressure_jump_cell
+
+.. autoclass:: FastValveControlRequest
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~FastValveControlRequest.OPEN
+      
+      
+      ~FastValveControlRequest.CLOSE
+      
+      
+      ~FastValveControlRequest.RESET
+      
+      
+      ~FastValveControlRequest.ARM
+      
+      
+      ~FastValveControlRequest.DISARM
+      
+   
+   

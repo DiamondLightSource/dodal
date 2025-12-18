@@ -1,0 +1,42 @@
+dodal.devices.i07.id.InsertionDevice
+====================================
+
+.. currentmodule:: dodal.devices.i07.id
+
+.. autoclass:: InsertionDevice
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

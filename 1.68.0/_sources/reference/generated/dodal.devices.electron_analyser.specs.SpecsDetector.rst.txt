@@ -1,0 +1,41 @@
+dodal.devices.electron\_analyser.specs.SpecsDetector
+====================================================
+
+.. currentmodule:: dodal.devices.electron_analyser.specs
+
+.. autoclass:: SpecsDetector
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+   
+   

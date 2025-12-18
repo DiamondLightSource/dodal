@@ -1,0 +1,38 @@
+dodal.devices.i19.access\_controlled
+====================================
+
+
+
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   dodal.devices.i19.access_controlled.attenuator_motor_squad
+   dodal.devices.i19.access_controlled.blueapi_device
+   dodal.devices.i19.access_controlled.hutch_access
+   dodal.devices.i19.access_controlled.shutter
+
+
+
+
+
+
+
+
+.. automodule:: dodal.devices.i19.access_controlled
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

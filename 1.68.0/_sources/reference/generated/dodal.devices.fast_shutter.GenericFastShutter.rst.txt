@@ -1,0 +1,49 @@
+dodal.devices.fast\_shutter.GenericFastShutter
+==============================================
+
+.. currentmodule:: dodal.devices.fast_shutter
+
+.. autoclass:: GenericFastShutter
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      ~GenericFastShutter.is_closed
+      
+      
+      ~GenericFastShutter.is_open
+      
+      
+      
+      
+      ~GenericFastShutter.set
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

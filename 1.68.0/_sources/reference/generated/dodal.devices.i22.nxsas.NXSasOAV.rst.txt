@@ -1,0 +1,50 @@
+dodal.devices.i22.nxsas.NXSasOAV
+================================
+
+.. currentmodule:: dodal.devices.i22.nxsas
+
+.. autoclass:: NXSasOAV
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      ~NXSasOAV.describe_configuration
+      
+      
+      
+      
+      
+      
+      
+      ~NXSasOAV.read_configuration
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

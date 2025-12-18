@@ -1,0 +1,40 @@
+dodal.devices.i11.cyberstar\_blower.AutotunedCyberstarBlower
+============================================================
+
+.. currentmodule:: dodal.devices.i11.cyberstar_blower
+
+.. autoclass:: AutotunedCyberstarBlower
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

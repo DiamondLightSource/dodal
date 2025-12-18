@@ -1,0 +1,41 @@
+dodal.devices.electron\_analyser.vgscienta.VGScientaDetector
+============================================================
+
+.. currentmodule:: dodal.devices.electron_analyser.vgscienta
+
+.. autoclass:: VGScientaDetector
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+   
+   
