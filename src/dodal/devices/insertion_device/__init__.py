@@ -25,7 +25,7 @@ from .energy_motor_lookup import (
     ConfigServerEnergyMotorLookup,
     EnergyMotorLookup,
 )
-from .id_enum import Pol, UndulatorGateStatus
+from .enum import Pol, UndulatorGateStatus
 from .lookup_table_models import (
     EnergyCoverage,
     LookupTable,
