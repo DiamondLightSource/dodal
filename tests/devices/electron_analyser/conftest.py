@@ -93,7 +93,7 @@ def sequence(
     sequence_class: type[TAbstractBaseSequence],
     single_energy_source: EnergySource,
 ) -> AbstractBaseSequence:
-    controller = ElectronAnalyserController(sim_driver, single_energy_source, 0)
+    controller = ElectronAnalyserController(sim_driver, single_energy_source)
     det = ElectronAnalyserDetector(
         sequence_class=sequence_class,
         controller=controller,
