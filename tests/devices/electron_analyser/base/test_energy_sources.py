@@ -5,7 +5,7 @@ from ophyd_async.testing import (
     partial_reading,
 )
 
-from dodal.devices.electron_analyser import (
+from dodal.devices.electron_analyser.base import (
     DualEnergySource,
     EnergySource,
     SelectedSource,

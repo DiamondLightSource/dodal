@@ -4,17 +4,19 @@ import pytest
 
 from dodal.common.data_util import load_json_file_to_class
 from dodal.devices import b07, i09
-from dodal.devices.electron_analyser import EnergyMode
-from dodal.devices.electron_analyser.abstract import (
+from dodal.devices.electron_analyser.base import (
     AbstractBaseRegion,
-    AbstractBaseSequence,
+    EnergyMode,
+    GenericRegion,
+    GenericSequence,
     TAbstractBaseRegion,
+    to_binding_energy,
+    to_kinetic_energy,
 )
 from dodal.devices.electron_analyser.specs import (
     SpecsRegion,
     SpecsSequence,
 )
-from dodal.devices.electron_analyser.util import to_binding_energy, to_kinetic_energy
 from dodal.devices.electron_analyser.vgscienta import VGScientaRegion, VGScientaSequence
 from tests.devices.electron_analyser.helper_util import (
     TEST_SEQUENCE_REGION_NAMES,
@@ -28,13 +30,13 @@ from tests.devices.electron_analyser.helper_util import (
         VGScientaSequence[i09.LensMode, i09.PsuMode, i09.PassEnergy],
     ]
 )
-def sequence(request: pytest.FixtureRequest) -> AbstractBaseSequence:
+def sequence(request: pytest.FixtureRequest) -> GenericSequence:
     return load_json_file_to_class(request.param, get_test_sequence(request.param))
 
 
 @pytest.fixture
 def expected_region_class(
-    sequence: AbstractBaseSequence[AbstractBaseRegion],
+    sequence: GenericSequence,
 ) -> type[AbstractBaseRegion]:
     if isinstance(sequence, SpecsSequence):
         return SpecsRegion[b07.LensMode, b07.PsuMode]
@@ -49,7 +51,7 @@ def expected_region_names() -> list[str]:
 
 
 def test_sequence_get_expected_region_from_name(
-    sequence: AbstractBaseSequence[AbstractBaseRegion], expected_region_names: list[str]
+    sequence: GenericSequence, expected_region_names: list[str]
 ) -> None:
     for name in expected_region_names:
         assert sequence.get_region_by_name(name) is not None
@@ -57,7 +59,7 @@ def test_sequence_get_expected_region_from_name(
 
 
 def test_sequence_get_expected_region_type(
-    sequence: AbstractBaseSequence[AbstractBaseRegion],
+    sequence: GenericSequence,
     expected_region_class: type[TAbstractBaseRegion],
 ) -> None:
     regions = sequence.regions
@@ -71,13 +73,13 @@ def test_sequence_get_expected_region_type(
 
 
 def test_sequence_get_expected_region_names(
-    sequence: AbstractBaseSequence[AbstractBaseRegion], expected_region_names: list[str]
+    sequence: GenericSequence, expected_region_names: list[str]
 ) -> None:
     assert sequence.get_region_names() == expected_region_names
 
 
 def test_region_kinetic_and_binding_energy(
-    sequence: AbstractBaseSequence[AbstractBaseRegion],
+    sequence: GenericSequence,
 ) -> None:
     for r in sequence.regions:
         is_binding_energy = r.energy_mode == EnergyMode.BINDING
@@ -92,7 +94,7 @@ def test_region_kinetic_and_binding_energy(
 @pytest.mark.parametrize("copy", [True, False])
 @pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
 def test_each_energy_field_for_region_is_correct_when_switching_energy_modes(
-    region: AbstractBaseRegion, field: str, copy: bool
+    region: GenericRegion, field: str, copy: bool
 ) -> None:
     excitation_energy = 100
     conversion_func_map = {
@@ -134,7 +136,7 @@ def test_each_energy_field_for_region_is_correct_when_switching_energy_modes(
 
 @pytest.mark.parametrize("copy", [True, False])
 @pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
-def test_region_prepare_for_epics(region: AbstractBaseRegion, copy: bool) -> None:
+def test_region_prepare_for_epics(region: GenericRegion, copy: bool) -> None:
     # Patch switch_energy_mode so we can spy on if it was called while also returning
     # true function return value
     with patch.object(

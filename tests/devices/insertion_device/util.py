@@ -2,7 +2,7 @@ import json
 
 from pydantic import BaseModel
 
-from dodal.devices.insertion_device.apple2_undulator import Pol
+from dodal.devices.insertion_device import Pol
 from dodal.devices.insertion_device.energy_motor_lookup import (
     ConfigServerEnergyMotorLookup,
     EnergyMotorLookup,

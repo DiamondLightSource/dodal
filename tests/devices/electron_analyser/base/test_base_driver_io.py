@@ -5,9 +5,7 @@ from bluesky.utils import FailedStatus
 from ophyd_async.core import StrictEnum, init_devices
 
 from dodal.devices import b07, i09
-from dodal.devices.electron_analyser.abstract import (
-    AbstractAnalyserDriverIO,
-)
+from dodal.devices.electron_analyser.base import GenericAnalyserDriverIO
 from dodal.devices.electron_analyser.specs import (
     SpecsAnalyserDriverIO,
 )
@@ -25,14 +23,14 @@ from dodal.testing.electron_analyser import create_driver
 )
 async def sim_driver(
     request: pytest.FixtureRequest,
-) -> AbstractAnalyserDriverIO:
+) -> GenericAnalyserDriverIO:
     async with init_devices(mock=True):
-        sim_driver = await create_driver(request.param, prefix="TEST:")
+        sim_driver = create_driver(request.param, prefix="TEST:")
     return sim_driver
 
 
 def test_driver_throws_error_with_wrong_lens_mode(
-    sim_driver: AbstractAnalyserDriverIO,
+    sim_driver: GenericAnalyserDriverIO,
     run_engine: RunEngine,
 ) -> None:
     class LensModeTestEnum(StrictEnum):
@@ -45,7 +43,7 @@ def test_driver_throws_error_with_wrong_lens_mode(
 
 
 def test_driver_throws_error_with_wrong_acquisition_mode(
-    sim_driver: AbstractAnalyserDriverIO,
+    sim_driver: GenericAnalyserDriverIO,
     run_engine: RunEngine,
 ) -> None:
     class AcquisitionModeTestEnum(StrictEnum):
@@ -58,7 +56,7 @@ def test_driver_throws_error_with_wrong_acquisition_mode(
 
 
 def test_driver_throws_error_with_wrong_psu_mode(
-    sim_driver: AbstractAnalyserDriverIO,
+    sim_driver: GenericAnalyserDriverIO,
     run_engine: RunEngine,
 ) -> None:
     class PsuModeTestEnum(StrictEnum):

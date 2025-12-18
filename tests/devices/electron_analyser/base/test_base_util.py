@@ -1,6 +1,6 @@
 import pytest
 
-from dodal.devices.electron_analyser import (
+from dodal.devices.electron_analyser.base import (
     EnergyMode,
     to_binding_energy,
     to_kinetic_energy,

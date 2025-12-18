@@ -13,7 +13,7 @@ from ophyd_async.testing import (
     partial_reading,
 )
 
-from dodal.devices.electron_analyser import EnergyMode
+from dodal.devices.electron_analyser.base import EnergyMode
 from dodal.devices.electron_analyser.vgscienta import (
     VGScientaAnalyserDriverIO,
     VGScientaRegion,
@@ -28,7 +28,7 @@ from tests.devices.electron_analyser.helper_util import (
 @pytest.fixture
 async def sim_driver() -> VGScientaAnalyserDriverIO[LensMode, PsuMode, PassEnergy]:
     async with init_devices(mock=True):
-        sim_driver = await create_driver(
+        sim_driver = create_driver(
             VGScientaAnalyserDriverIO[LensMode, PsuMode, PassEnergy], prefix="TEST:"
         )
     return sim_driver
