@@ -1,9 +1,5 @@
 """Beamline i02-1 is also known as VMXm, or I02J"""
 
-from dodal.common.beamlines.beamline_utils import (
-    device_factory,
-    device_instantiation,
-)
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.device_manager import DeviceManager
 from dodal.devices.attenuator.attenuator import EnumFilterAttenuator
