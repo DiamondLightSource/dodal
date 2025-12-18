@@ -1,10 +1,9 @@
+from typing import Any
+
 import numpy as np
+from daq_config_server.client import ConfigServer
 
-from dodal.devices.util.lookup_tables import energy_distance_table
 from dodal.log import LOGGER
-
-LUT_COMMENTS = ["#"]
-HU_SKIP_ROWS = 3
 
 # Physics constants
 ELECTRON_REST_ENERGY_MEV = 0.510999
@@ -22,16 +21,14 @@ MAGNET_BLOCKS_PER_PERIOD = 4
 MAGNTE_BLOCK_HEIGHT_MM = 16
 
 
-async def get_hu_lut_as_dict(lut_path: str) -> dict[int, np.ndarray]:
+def get_convert_lut(client: ConfigServer, lut_path: str) -> dict[int, np.ndarray]:
     lut_dict: dict[int, np.ndarray] = {}
-    _lookup_table: np.ndarray = await energy_distance_table(
-        lut_path,
-        comments=LUT_COMMENTS,
-        skiprows=HU_SKIP_ROWS,
+    file_contents: dict[str, list[list[Any]]] = client.get_file_contents(
+        lut_path, reset_cached_result=True
     )
-    for i in range(_lookup_table.shape[0]):
-        lut_dict[_lookup_table[i][0]] = _lookup_table[i]
-    LOGGER.debug(f"Loaded lookup table: {lut_dict}")
+    lut_values: list[list[Any]] = file_contents["rows"]
+    for i in range(len(lut_values)):
+        lut_dict[lut_values[i][0]] = lut_values[i]
     return lut_dict
 
 
