@@ -1,4 +1,4 @@
-from dodal.devices.insertion_device.apple2_undulator import (
+from dodal.devices.insertion_device import (
     Apple2,
     Apple2Controller,
     Apple2PhasesVal,
