@@ -117,7 +117,10 @@ def sample_stage() -> XYZStage:
 
 
 @devices.factory()
-def pmac(sample_stage: XYZStage) -> PmacIO:
+def pmac() -> PmacIO:
+    sample_stage = XYZStage(
+        f"{PREFIX.beamline_prefix}-MO-PPMAC-01:",
+    )
     return PmacIO(
         prefix=f"{PREFIX.beamline_prefix}-MO-PPMAC-01:",
         raw_motors=[sample_stage.y, sample_stage.x],
