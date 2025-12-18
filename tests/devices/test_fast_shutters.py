@@ -24,9 +24,9 @@ def shutter1() -> GenericFastShutter[InOut]:
 async def test_shutter_set_open_close_without_knowing_enum_values(
     shutter1: GenericFastShutter, run_engine: RunEngine
 ) -> None:
-    run_engine(bps.mv(shutter1, shutter1.open_state))
+    run_engine(bps.mv(shutter1, shutter1.open_state), wait=True)
     assert await shutter1.shutter_state.get_value() == InOut.OUT
-    run_engine(bps.mv(shutter1, shutter1.close_state))
+    run_engine(bps.mv(shutter1, shutter1.close_state), wait=True)
     assert await shutter1.shutter_state.get_value() == InOut.IN
 
 
@@ -78,13 +78,13 @@ async def test_dual_fast_shutter_read_shutter_state(
 ) -> None:
     # Setup test so that the two shutters are not in the same state so test can tell
     # them a part.
-    run_engine(bps.mv(shutter1, shutter1.open_state))
-    run_engine(bps.mv(shutter2, shutter2.close_state))
+    run_engine(bps.mv(shutter1, shutter1.open_state), wait=True)
+    run_engine(bps.mv(shutter2, shutter2.close_state), wait=True)
 
-    run_engine(bps.mv(source_selector, SelectedSource.SOURCE2))
+    run_engine(bps.mv(source_selector, SelectedSource.SOURCE2), wait=True)
     assert await dual_fast_shutter.shutter_state.get_value() == shutter2.close_state
 
-    run_engine(bps.mv(source_selector, SelectedSource.SOURCE1))
+    run_engine(bps.mv(source_selector, SelectedSource.SOURCE1), wait=True)
     assert await dual_fast_shutter.shutter_state.get_value() == shutter1.open_state
 
 
@@ -95,23 +95,23 @@ async def test_dual_fast_shutter_set_shutter_state(
     source_selector: SourceSelector,
     run_engine: RunEngine,
 ) -> None:
-    run_engine(bps.mv(source_selector, SelectedSource.SOURCE2))
+    run_engine(bps.mv(source_selector, SelectedSource.SOURCE2), wait=True)
 
-    run_engine(bps.mv(dual_fast_shutter, dual_fast_shutter.open_state))
+    run_engine(bps.mv(dual_fast_shutter, dual_fast_shutter.open_state), wait=True)
     assert await shutter2.shutter_state.get_value() == shutter2.open_state
     assert await shutter1.shutter_state.get_value() == shutter1.close_state
 
-    run_engine(bps.mv(dual_fast_shutter, dual_fast_shutter.close_state))
+    run_engine(bps.mv(dual_fast_shutter, dual_fast_shutter.close_state), wait=True)
     assert await shutter2.shutter_state.get_value() == shutter2.close_state
     assert await shutter1.shutter_state.get_value() == shutter1.close_state
 
-    run_engine(bps.mv(source_selector, SelectedSource.SOURCE1))
+    run_engine(bps.mv(source_selector, SelectedSource.SOURCE1), wait=True)
 
-    run_engine(bps.mv(dual_fast_shutter, dual_fast_shutter.open_state))
+    run_engine(bps.mv(dual_fast_shutter, dual_fast_shutter.open_state), wait=True)
     assert await shutter1.shutter_state.get_value() == shutter1.open_state
     assert await shutter2.shutter_state.get_value() == shutter2.close_state
 
-    run_engine(bps.mv(dual_fast_shutter, dual_fast_shutter.close_state))
+    run_engine(bps.mv(dual_fast_shutter, dual_fast_shutter.close_state), wait=True)
     assert await shutter1.shutter_state.get_value() == shutter1.close_state
     assert await shutter2.shutter_state.get_value() == shutter2.close_state
 
