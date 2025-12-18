@@ -4,7 +4,7 @@ import pytest
 from ophyd_async.core import init_devices
 
 from dodal.devices.i17.i17_apple2 import I17Apple2Controller
-from dodal.devices.insertion_device.apple2_undulator import (
+from dodal.devices.insertion_device import (
     Apple2,
     Apple2PhasesVal,
     Apple2Val,
