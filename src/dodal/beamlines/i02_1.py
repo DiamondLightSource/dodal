@@ -5,6 +5,7 @@ from dodal.common.beamlines.beamline_utils import (
     device_instantiation,
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
+from dodal.device_manager import DeviceManager
 from dodal.devices.attenuator.attenuator import EnumFilterAttenuator
 from dodal.devices.attenuator.filter_selections import (
     I02_1FilterFourSelections,
@@ -37,46 +38,29 @@ I02_1_ZEBRA_MAPPING = ZebraMapping(
     sources=ZebraSources(),
 )
 
-
-@device_factory()
-def eiger(mock: bool = False) -> EigerDetector:
-    """Get the i02-1 Eiger device, instantiate it if it hasn't already been.
-    If this is called when already instantiated in i02-1, it will return the existing object.
-    """
-    return device_instantiation(
-        device_factory=EigerDetector,
-        prefix=f"{PREFIX.beamline_prefix}-EA-EIGER-01:",
-        bl_prefix=False,
-        wait=False,
-        fake=mock,
-        name="eiger",
-    )
+devices = DeviceManager()
 
 
-@device_factory()
+@devices.v1_init(EigerDetector, prefix="BL03I-EA-EIGER-01:", wait=False)
+def eiger(eiger: EigerDetector) -> EigerDetector:
+    return eiger
+
+
+@devices.factory()
 def zebra_fast_grid_scan() -> ZebraFastGridScanTwoD:
-    """Get the i02-1 zebra_fast_grid_scan device, instantiate it if it hasn't already been.
-    If this is called when already instantiated in i02-1, it will return the existing object.
-    """
     return ZebraFastGridScanTwoD(
         prefix=f"{PREFIX.beamline_prefix}-MO-SAMP-11:",
         motion_controller_prefix="BL02J-MO-STEP-11:",
     )
 
 
-@device_factory()
+@devices.factory()
 def synchrotron() -> Synchrotron:
-    """Get the i02-1 synchrotron device, instantiate it if it hasn't already been.
-    If this is called when already instantiated in i02-1, it will return the existing object.
-    """
     return Synchrotron()
 
 
-@device_factory()
+@devices.factory()
 def zebra() -> Zebra:
-    """Get the i02-1 zebra device, instantiate it if it hasn't already been.
-    If this is called when already instantiated in i02-1, it will return the existing object.
-    """
     return Zebra(
         prefix=f"{PREFIX.beamline_prefix}-EA-ZEBRA-01:",
         mapping=I02_1_ZEBRA_MAPPING,
@@ -84,28 +68,18 @@ def zebra() -> Zebra:
 
 
 # Device not needed after https://github.com/DiamondLightSource/mx-bluesky/issues/1299
-@device_factory()
+@devices.factory()
 def zocalo() -> ZocaloResults:
-    """Get the i02-1 ZocaloResults device, instantiate it if it hasn't already been.
-    If this is called when already instantiated in i02-1, it will return the existing object.
-    """
     return ZocaloResults()
 
 
-@device_factory()
+@devices.factory()
 def goniometer() -> SampleMotors:
-    """Get the i02-1 goniometer device, instantiate it if it hasn't already been.
-    If this is called when already instantiated in i02-1, it will return the existing object.
-    """
     return SampleMotors(f"{PREFIX.beamline_prefix}-MO-SAMP-01:")
 
 
-@device_factory()
+@devices.factory()
 def attenuator() -> EnumFilterAttenuator:
-    """Get the i02-1 attenuator device, instantiate it if it hasn't already been.
-    If this is called when already instantiated in i02-1, it will return the existing object.
-    """
-
     return EnumFilterAttenuator(
         f"{PREFIX.beamline_prefix}-OP-ATTN-01:",
         (
