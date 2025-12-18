@@ -2,11 +2,9 @@ from pathlib import PurePath
 
 from ophyd_async.core import AutoIncrementingPathProvider, StaticFilenameProvider
 
-from dodal.common.beamlines.beamline_utils import (
-    BL,
-    device_factory,
-)
+from dodal.common.beamlines.beamline_utils import BL
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
+from dodal.device_manager import DeviceManager
 from dodal.devices.attenuator.attenuator import EnumFilterAttenuator
 from dodal.devices.attenuator.filter_selections import (
     I24FilterOneSelections,
@@ -51,8 +49,10 @@ I24_ZEBRA_MAPPING = ZebraMapping(
 
 PREFIX = BeamlinePrefix(BL)
 
+devices = DeviceManager()
 
-@device_factory()
+
+@devices.factory()
 def attenuator() -> EnumFilterAttenuator:
     """Get a read-only attenuator device for i24, instantiate it if it hasn't already
     been. If this is called when already instantiated in i24, it will return the
@@ -63,7 +63,7 @@ def attenuator() -> EnumFilterAttenuator:
     )
 
 
-@device_factory()
+@devices.factory()
 def aperture() -> Aperture:
     """Get the i24 aperture device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i24, it will return the existing object.
@@ -73,7 +73,7 @@ def aperture() -> Aperture:
     )
 
 
-@device_factory()
+@devices.factory()
 def beamstop() -> Beamstop:
     """Get the i24 beamstop device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i24, it will return the existing object.
@@ -83,7 +83,7 @@ def beamstop() -> Beamstop:
     )
 
 
-@device_factory()
+@devices.factory()
 def backlight() -> DualBacklight:
     """Get the i24 backlight device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i24, it will return the existing object.
@@ -93,7 +93,7 @@ def backlight() -> DualBacklight:
     )
 
 
-@device_factory()
+@devices.factory()
 def detector_motion() -> YZStage:
     """Get the i24 detector motion device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i24, it will return the existing object.
@@ -103,7 +103,7 @@ def detector_motion() -> YZStage:
     )
 
 
-@device_factory()
+@devices.factory()
 def dcm() -> DCM:
     """Get the i24 DCM device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i24, it will return the existing object.
@@ -141,7 +141,7 @@ def dcm() -> DCM:
 #     )
 
 
-@device_factory()
+@devices.factory()
 def pmac() -> PMAC:
     """Get the i24 PMAC device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i24, it will return the existing object.
@@ -149,7 +149,7 @@ def pmac() -> PMAC:
     return PMAC(PREFIX.beamline_prefix)
 
 
-@device_factory()
+@devices.factory()
 def oav() -> OAVBeamCentreFile:
     return OAVBeamCentreFile(
         prefix=f"{PREFIX.beamline_prefix}-DI-OAV-01:",
@@ -157,7 +157,7 @@ def oav() -> OAVBeamCentreFile:
     )
 
 
-@device_factory()
+@devices.factory()
 def vgonio() -> VerticalGoniometer:
     """Get the i24 vertical goniometer device, instantiate it if it hasn't already been.
     If this is called when already instantiated, it will return the existing object.
@@ -165,7 +165,7 @@ def vgonio() -> VerticalGoniometer:
     return VerticalGoniometer(f"{PREFIX.beamline_prefix}-MO-VGON-01:")
 
 
-@device_factory()
+@devices.factory()
 def zebra() -> Zebra:
     """Get the i24 zebra device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i24, it will return the existing object.
@@ -176,7 +176,7 @@ def zebra() -> Zebra:
     )
 
 
-@device_factory()
+@devices.factory()
 def shutter() -> HutchShutter:
     """Get the i24 hutch shutter device, instantiate it if it hasn't already been.
     If this is called when already instantiated, it will return the existing object.
@@ -184,13 +184,13 @@ def shutter() -> HutchShutter:
     return HutchShutter(f"{PREFIX.beamline_prefix}-PS-SHTR-01:")
 
 
-@device_factory()
+@devices.factory()
 def focus_mirrors() -> FocusMirrorsMode:
     """Get the i24 focus mirror devise to find the beam size."""
     return FocusMirrorsMode(f"{PREFIX.beamline_prefix}-OP-MFM-01:")
 
 
-@device_factory()
+@devices.factory()
 def eiger_beam_center() -> DetectorBeamCenter:
     """A device for setting/reading the beamcenter from the eiger on i24."""
     return DetectorBeamCenter(
@@ -199,7 +199,7 @@ def eiger_beam_center() -> DetectorBeamCenter:
     )
 
 
-@device_factory()
+@devices.factory()
 def commissioning_jungfrau(
     path_to_dir: str = "/tmp/jf",  # Device factory doesn't allow for required args,
     filename: str = "jf_output",  # but these should be manually entered when commissioning
