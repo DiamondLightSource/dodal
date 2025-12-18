@@ -118,6 +118,11 @@ def sample_stage() -> XYZStage:
 
 @devices.factory()
 def pmac() -> PmacIO:
+    """A Power PMAC.
+
+    Returns:
+        PmacIO: IO interface for the Power PMAC.
+    """
     sample_stage = XYZStage(
         f"{PREFIX.beamline_prefix}-MO-PPMAC-01:",
     )
