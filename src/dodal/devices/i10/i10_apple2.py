@@ -11,18 +11,18 @@ from ophyd_async.core import (
     soft_signal_rw,
 )
 
-from dodal.devices.apple2_undulator import (
+from dodal.devices.insertion_device import (
     MAXIMUM_MOVE_TIME,
     Apple2,
     Apple2Controller,
     Apple2PhasesVal,
     Apple2Val,
-    Pol,
     UndulatorGap,
     UndulatorJawPhase,
     UndulatorPhaseAxes,
 )
-from dodal.devices.util.lookup_tables_apple2 import EnergyMotorLookup
+from dodal.devices.insertion_device.energy_motor_lookup import EnergyMotorLookup
+from dodal.devices.insertion_device.id_enum import Pol
 
 ROW_PHASE_MOTOR_TOLERANCE = 0.004
 MAXIMUM_ROW_PHASE_MOTOR_POSITION = 24.0

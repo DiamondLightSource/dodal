@@ -71,6 +71,7 @@ class BartRobot(StandardReadable, Movable[SampleLocation | None]):
     LOAD_TIMEOUT = 60
 
     # Error codes that we do special things on
+    NO_ERROR = 0
     NO_PIN_ERROR_CODE = 25
     LIGHT_CURTAIN_TRIPPED = 40
 
@@ -115,21 +116,25 @@ class BartRobot(StandardReadable, Movable[SampleLocation | None]):
         )
         super().__init__(name=name)
 
-    async def pin_mounted_or_no_pin_found(self):
-        """This co-routine will finish when either a pin is detected or the robot gives
-        an error saying no pin was found (whichever happens first). In the case where no
-        pin was found a RobotLoadError error is raised.
+    async def pin_state_or_error(self, expected_state=PinMounted.PIN_MOUNTED):
+        """This co-routine will finish when either the pin sensor reaches the specified
+        state or the robot gives an error (whichever happens first). In the case where
+        there is an error a RobotLoadError error is raised.
         """
 
-        async def raise_if_no_pin():
-            await wait_for_value(self.prog_error.code, self.NO_PIN_ERROR_CODE, None)
-            raise RobotLoadError(self.NO_PIN_ERROR_CODE, "Pin was not detected")
+        async def raise_if_error():
+            await wait_for_value(
+                self.prog_error.code, lambda value: value != self.NO_ERROR, None
+            )
+            error_code = await self.prog_error.code.get_value()
+            error_msg = await self.prog_error.str.get_value()
+            raise RobotLoadError(error_code, error_msg)
 
         async def wfv():
-            await wait_for_value(self.gonio_pin_sensor, PinMounted.PIN_MOUNTED, None)
+            await wait_for_value(self.gonio_pin_sensor, expected_state, None)
 
         tasks = [
-            (Task(raise_if_no_pin())),
+            (Task(raise_if_error())),
             (Task(wfv())),
         ]
         try:
@@ -168,10 +173,10 @@ class BartRobot(StandardReadable, Movable[SampleLocation | None]):
         await self.load.trigger()
         if await self.gonio_pin_sensor.get_value() == PinMounted.PIN_MOUNTED:
             LOGGER.info(WAIT_FOR_OLD_PIN_MSG)
-            await wait_for_value(self.gonio_pin_sensor, PinMounted.NO_PIN_MOUNTED, None)
+            await self.pin_state_or_error(PinMounted.NO_PIN_MOUNTED)
         LOGGER.info(WAIT_FOR_NEW_PIN_MSG)
 
-        await self.pin_mounted_or_no_pin_found()
+        await self.pin_state_or_error()
 
     @AsyncStatus.wrap
     async def set(self, value: SampleLocation | None):
