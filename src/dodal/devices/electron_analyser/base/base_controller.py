@@ -63,10 +63,6 @@ class ElectronAnalyserController(
         epics_region = region.prepare_for_epics(excitation_energy)
         await self.driver.set(epics_region)
 
-    async def _setup_before_set_driver(self, region: TAbstractBaseRegion):
-        if self.source_selector is not None:
-            await self.source_selector.set(region.excitation_energy_source)
-
     async def prepare(self, trigger_info: TriggerInfo) -> None:
         """Do all necessary steps to prepare the detector for triggers."""
         # Let the driver know the excitation energy before measuring for binding energy
