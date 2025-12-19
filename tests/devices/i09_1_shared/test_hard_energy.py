@@ -19,15 +19,10 @@ from dodal.devices.i09_1_shared import (
     HardInsertionDeviceEnergy,
     calculate_energy_i09_hu,
     calculate_gap_i09_hu,
-    get_hu_lut_as_dict,
 )
 from dodal.devices.undulator import UndulatorInMm, UndulatorOrder
-from tests.devices.i09_1_shared.test_data import TEST_HARD_UNDULATOR_LUT
 
-
-@pytest.fixture
-async def lut_dictionary() -> dict:
-    return await get_hu_lut_as_dict(TEST_HARD_UNDULATOR_LUT)
+pytest_plugins = ["dodal.testing.fixtures.devices.hard_undulator"]
 
 
 @pytest.fixture
