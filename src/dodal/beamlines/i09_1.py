@@ -12,12 +12,12 @@ from dodal.devices.common_dcm import (
 from dodal.devices.electron_analyser.base import EnergySource
 from dodal.devices.electron_analyser.specs import SpecsDetector
 from dodal.devices.i09_1 import LensMode, PsuMode
-from dodal.devices.i09_1_shared import (
+from dodal.devices.i09_1_shared.hard_energy import HardEnergy, HardInsertionDeviceEnergy
+from dodal.devices.i09_1_shared.hard_undulator_functions import (
     calculate_energy_i09_hu,
     calculate_gap_i09_hu,
     get_convert_lut,
 )
-from dodal.devices.i09_1_shared.hard_energy import HardEnergy, HardInsertionDeviceEnergy
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.undulator import UndulatorInMm, UndulatorOrder
 from dodal.log import set_beamline as set_log_beamline
