@@ -94,10 +94,12 @@ class SoftInState(StrictEnum):
 
 class InstantArmMock(DeviceMock["ArmingDevice"]):
     async def connect(self, device: ArmingDevice) -> None:
-        def mock_arm(value: float, *args, **kwargs):
-            set_mock_value(device.armed, value)
-
-        callback_on_mock_put(device.arm_set, mock_arm)
+        callback_on_mock_put(
+            device.arm_set, lambda *_, **__: set_mock_value(device.armed, 1)
+        )
+        callback_on_mock_put(
+            device.disarm_set, lambda *_, **__: set_mock_value(device.armed, 0)
+        )
 
 
 @default_mock_class(InstantArmMock)
