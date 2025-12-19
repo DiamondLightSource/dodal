@@ -54,16 +54,16 @@ class EnergySource(AbstractEnergySource):
 def get_float_from_selected_source(
     selected: SelectedSource, s1: float, s2: float
 ) -> float:
+    """Wrapper function to provide type hints for derived signal."""
     return get_obj_from_selected_source(selected, s1, s2)
 
 
 class DualEnergySource(AbstractEnergySource):
     """
     Holds two EnergySource devices and provides a signal to read energy depending on
-    which source is selected. This is controlled by a selected_source signal which can
-    switch source using SelectedSource enum. Both sources energy is recorded in the
-    read, the energy signal is used as a helper signal to know which source is being
-    used.
+    which source is selected. The energy is the one that corrosponds to the
+    selected_source signal. For example, selected_source is source1 if selected_source
+    is at SelectedSource.SOURCE1 and vise versa for source2 and SelectedSource.SOURCE2.
     """
 
     def __init__(
@@ -77,6 +77,7 @@ class DualEnergySource(AbstractEnergySource):
         Args:
             source1: Default energy signal to select.
             source2: Secondary energy signal to select.
+            selected_source: The signal controlling which source to use.
             name: name of this device.
         """
 
