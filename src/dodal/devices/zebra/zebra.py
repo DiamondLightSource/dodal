@@ -7,11 +7,15 @@ from functools import partialmethod
 from bluesky.protocols import Movable
 from ophyd_async.core import (
     AsyncStatus,
+    DeviceMock,
     DeviceVector,
     SignalRW,
     StandardReadable,
     StrictEnum,
+    callback_on_mock_put,
+    default_mock_class,
     observe_value,
+    set_mock_value,
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
@@ -88,6 +92,15 @@ class SoftInState(StrictEnum):
     NO = "No"
 
 
+class InstantArmMock(DeviceMock["ArmingDevice"]):
+    async def connect(self, device: ArmingDevice) -> None:
+        def mock_arm(value: float, *args, **kwargs):
+            set_mock_value(device.armed, value)
+
+        callback_on_mock_put(device.arm_set, mock_arm)
+
+
+@default_mock_class(InstantArmMock)
 class ArmingDevice(StandardReadable, Movable[ArmDemand]):
     """A useful device that can abstract some of the logic of arming.
     Allows a user to just call arm.set(ArmDemand.ARM)"""
