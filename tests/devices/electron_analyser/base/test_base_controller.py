@@ -17,6 +17,8 @@ from dodal.devices.electron_analyser.specs import SpecsAnalyserDriverIO
 from dodal.devices.electron_analyser.vgscienta import (
     VGScientaAnalyserDriverIO,
 )
+from dodal.devices.fast_shutter import DualFastShutter
+from dodal.devices.selectable_source import SourceSelector
 from dodal.testing.electron_analyser import create_driver
 from tests.devices.electron_analyser.helper_util import (
     TEST_SEQUENCE_REGION_NAMES,
@@ -53,17 +55,30 @@ def analyser_controller(
     sim_driver: AbstractAnalyserDriverIO,
     single_energy_source: EnergySource,
     dual_energy_source: DualEnergySource,
+    dual_fast_shutter: DualFastShutter,
+    source_selector: SourceSelector,
 ) -> ElectronAnalyserController[AbstractAnalyserDriverIO, AbstractBaseRegion]:
     if isinstance(sim_driver, SpecsAnalyserDriverIO):
-        energy_source = single_energy_source
+        controller = ElectronAnalyserController[
+            AbstractAnalyserDriverIO, AbstractBaseRegion
+        ](
+            sim_driver,
+            single_energy_source,
+            source_selector=None,
+        )
     elif isinstance(sim_driver, VGScientaAnalyserDriverIO):
-        energy_source = dual_energy_source
+        controller = ElectronAnalyserController[
+            AbstractAnalyserDriverIO, AbstractBaseRegion
+        ](
+            sim_driver,
+            dual_energy_source,
+            dual_fast_shutter,
+            source_selector,
+        )
     else:
-        raise ValueError(f"sim_driver is of type {type(sim_driver)}.")
+        raise ValueError(f"sim_driver is of unsupported type {type(sim_driver)}.")
 
-    return ElectronAnalyserController[AbstractAnalyserDriverIO, AbstractBaseRegion](
-        sim_driver, energy_source
-    )
+    return controller
 
 
 async def test_controller_prepare_sets_excitation_energy(
@@ -79,7 +94,7 @@ async def test_controller_prepare_sets_excitation_energy(
 
 
 @pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
-async def test_controller_setup_with_region_sets_elected_source_and_converts_region_for_epics(
+async def test_controller_setup_with_region_sets_region_for_epics_and_sets_driver(
     analyser_controller: ElectronAnalyserController[
         AbstractAnalyserDriverIO, AbstractBaseRegion
     ],
@@ -112,3 +127,33 @@ async def test_controller_setup_with_region_sets_elected_source_and_converts_reg
             await analyser_controller.energy_source.energy.get_value(),
         )
         sim_driver.set.assert_called_once_with(epics_region)
+
+
+@pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
+async def test_controller_setup_with_region_moves_selected_source_if_not_none(
+    analyser_controller: ElectronAnalyserController[
+        AbstractAnalyserDriverIO, AbstractBaseRegion
+    ],
+    region: AbstractBaseRegion,
+) -> None:
+    pass
+
+
+@pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
+async def test_controller_setup_with_region_moves_shutters_if_not_none(
+    analyser_controller: ElectronAnalyserController[
+        AbstractAnalyserDriverIO, AbstractBaseRegion
+    ],
+    region: AbstractBaseRegion,
+) -> None:
+    pass
+
+
+@pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
+async def test_controller_prepare_moves_shutters_if_not_none(
+    analyser_controller: ElectronAnalyserController[
+        AbstractAnalyserDriverIO, AbstractBaseRegion
+    ],
+    region: AbstractBaseRegion,
+) -> None:
+    pass
