@@ -122,9 +122,9 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
         self.redis_connected = await self._check_redis_connection()
         if self.redis_connected:
             await self.pubsub.subscribe("murko-results")
-            self._x_mm_setter(0)
-            self._y_mm_setter(0)
-            self._z_mm_setter(0)
+        self._x_mm_setter(0)
+        self._y_mm_setter(0)
+        self._z_mm_setter(0)
 
     @AsyncStatus.wrap
     async def unstage(self):
