@@ -1,7 +1,7 @@
 from unittest.mock import AsyncMock, patch
 
 import pytest
-from ophyd_async.core import TriggerInfo, get_mock_put, init_devices
+from ophyd_async.core import InOut, TriggerInfo, get_mock_put, init_devices
 
 from dodal.beamlines import b07, i09
 from dodal.devices.electron_analyser.base import (
@@ -17,7 +17,7 @@ from dodal.devices.electron_analyser.specs import SpecsAnalyserDriverIO
 from dodal.devices.electron_analyser.vgscienta import (
     VGScientaAnalyserDriverIO,
 )
-from dodal.devices.fast_shutter import DualFastShutter
+from dodal.devices.fast_shutter import DualFastShutter, GenericFastShutter
 from dodal.devices.selectable_source import SourceSelector
 from dodal.testing.electron_analyser import create_driver
 from tests.devices.electron_analyser.helper_util import (
@@ -48,6 +48,43 @@ def sequence_file_path(
     sim_driver: AbstractAnalyserDriverIO,
 ) -> str:
     return get_test_sequence(type(sim_driver))
+
+
+@pytest.fixture
+def shutter1() -> GenericFastShutter[InOut]:
+    with init_devices(mock=True):
+        shutter1 = GenericFastShutter[InOut](
+            pv="TEST:",
+            open_state=InOut.OUT,
+            close_state=InOut.IN,
+        )
+    return shutter1
+
+
+@pytest.fixture
+def shutter2() -> GenericFastShutter[InOut]:
+    with init_devices(mock=True):
+        shutter2 = GenericFastShutter[InOut](
+            pv="TEST:",
+            open_state=InOut.OUT,
+            close_state=InOut.IN,
+        )
+    return shutter2
+
+
+@pytest.fixture
+def dual_fast_shutter(
+    shutter1: GenericFastShutter[InOut],
+    shutter2: GenericFastShutter[InOut],
+    source_selector: SourceSelector,
+) -> DualFastShutter[InOut]:
+    with init_devices(mock=True):
+        dual_fast_shutter = DualFastShutter[InOut](
+            shutter1,
+            shutter2,
+            source_selector.selected_source,
+        )
+    return dual_fast_shutter
 
 
 @pytest.fixture
