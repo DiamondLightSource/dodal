@@ -2,6 +2,7 @@ from collections.abc import Generator
 from enum import IntEnum
 
 import bluesky.plan_stubs as bps
+import cv2
 import numpy as np
 from bluesky.utils import Msg
 
@@ -119,3 +120,19 @@ def wait_for_tip_to_be_found(
         raise PinNotFoundError(f"No pin found after {timeout} seconds")
 
     return Pixel((int(found_tip[0]), int(found_tip[1])))
+
+
+def convert_to_gray_and_blur(data: cv2.typing.MatLike) -> cv2.typing.MatLike:
+    """
+    Preprocess the image array data (convert to grayscale and apply a gaussian blur)
+    Image is converted to grayscale (using a weighted mean as green contributes more to brightness)
+    as we aren't interested in data relating to colour. A blur is then applied to mitigate
+    errors due to rogue hot pixels.
+    """
+
+    # kernel size describes how many of the neighbouring pixels are used for the blur,
+    # higher kernal size means more of a blur effect
+    kernel_size = (7, 7)
+
+    gray_arr = cv2.cvtColor(data, cv2.COLOR_BGR2GRAY)
+    return cv2.GaussianBlur(gray_arr, kernel_size, 0)
