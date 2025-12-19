@@ -122,11 +122,7 @@ class DualFastShutter(StandardReadable, FastShutter[EnumTypesT], Generic[EnumTyp
 
         super().__init__(name)
 
-    def _validate_shutter_states(
-        self,
-        state1: EnumTypesT,
-        state2: EnumTypesT,
-    ) -> None:
+    def _validate_shutter_states(self, state1: EnumTypesT, state2: EnumTypesT) -> None:
         if state1 is not state2:
             raise ValueError(
                 f"{state1} is not same value as {state2}. They must be the same to be compatible."

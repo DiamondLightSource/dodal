@@ -75,10 +75,10 @@ class DualEnergySource(AbstractEnergySource):
     ):
         """
         Args:
-            source1: Default energy signal to select.
-            source2: Secondary energy signal to select.
-            selected_source: The signal controlling which source to use.
-            name: name of this device.
+            source1: Energy source that corrosponds to SelectedSource.SOURCE1.
+            source2: Energy source that corrosponds to SelectedSource.SOURCE2.
+            selected_source: Signal that decides the active energy source.
+            name: Name of this device.
         """
 
         self.selected_source_ref = Reference(selected_source)
