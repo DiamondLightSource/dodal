@@ -835,8 +835,6 @@ async def test_if_redis_connection_failed_and_motors_have_values_then_motors_set
     assert await murko_results.y_mm.get_value() == 2
     assert await murko_results.z_mm.get_value() == 3
     await murko_results.stage()
-    await murko_results.trigger()
-    await murko_results.unstage()
     assert await murko_results.x_mm.get_value() == 0
     assert await murko_results.y_mm.get_value() == 0
     assert await murko_results.z_mm.get_value() == 0
