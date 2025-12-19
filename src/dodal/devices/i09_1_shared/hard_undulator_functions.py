@@ -23,12 +23,14 @@ MAGNTE_BLOCK_HEIGHT_MM = 16
 
 def get_convert_lut(client: ConfigServer, lut_path: str) -> dict[int, np.ndarray]:
     lut_dict: dict[int, np.ndarray] = {}
-    file_contents: dict[str, list[list[Any]]] = client.get_file_contents(
-        lut_path, reset_cached_result=True
+    file_contents: dict = client.get_file_contents(
+        lut_path,
+        desired_return_type=dict,
+        reset_cached_result=True,
     )
     lut_values: list[list[Any]] = file_contents["rows"]
     for i in range(len(lut_values)):
-        lut_dict[lut_values[i][0]] = lut_values[i]
+        lut_dict[int(lut_values[i][0])] = np.ndarray(lut_values[i])
     return lut_dict
 
 
