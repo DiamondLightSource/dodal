@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.eiger &#8212; dodal 1.67.1.dev9+gf919ae5e3 documentation</title>
+    <title>dodal.devices.eiger &#8212; dodal 1.68.1.dev1+g63cc6448a documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=73ffdcc9"></script>
+    <script src="../../../_static/documentation_options.js?v=43ff942f"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -813,6 +813,7 @@ window.addEventListener("load", load);
 <span class="kn">from</span><span class="w"> </span><span class="nn">bluesky.protocols</span><span class="w"> </span><span class="kn">import</span> <span class="n">Stageable</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd</span><span class="w"> </span><span class="kn">import</span> <span class="n">Component</span><span class="p">,</span> <span class="n">Device</span><span class="p">,</span> <span class="n">EpicsSignalRO</span><span class="p">,</span> <span class="n">Signal</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd.areadetector.cam</span><span class="w"> </span><span class="kn">import</span> <span class="n">EigerDetectorCam</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd.signal</span><span class="w"> </span><span class="kn">import</span> <span class="n">AttributeSignal</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd.status</span><span class="w"> </span><span class="kn">import</span> <span class="n">AndStatus</span><span class="p">,</span> <span class="n">Status</span><span class="p">,</span> <span class="n">StatusBase</span><span class="p">,</span> <span class="n">SubscriptionStatus</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.detector</span><span class="w"> </span><span class="kn">import</span> <span class="n">DetectorParams</span><span class="p">,</span> <span class="n">TriggerMode</span>
@@ -872,7 +873,6 @@ window.addEventListener("load", load);
 
     <span class="n">stale_params</span> <span class="o">=</span> <span class="n">Component</span><span class="p">(</span><span class="n">EpicsSignalRO</span><span class="p">,</span> <span class="s2">&quot;CAM:StaleParameters_RBV&quot;</span><span class="p">)</span>
     <span class="n">bit_depth</span> <span class="o">=</span> <span class="n">Component</span><span class="p">(</span><span class="n">EpicsSignalRO</span><span class="p">,</span> <span class="s2">&quot;CAM:BitDepthImage_RBV&quot;</span><span class="p">)</span>
-
     <span class="n">filewriters_finished</span><span class="p">:</span> <span class="n">StatusBase</span>
 
     <span class="n">detector_params</span><span class="p">:</span> <span class="n">DetectorParams</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
@@ -880,9 +880,24 @@ window.addEventListener("load", load);
     <span class="n">arming_status</span> <span class="o">=</span> <span class="n">Status</span><span class="p">()</span>
     <span class="n">arming_status</span><span class="o">.</span><span class="n">set_finished</span><span class="p">()</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">beamline</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;i03&quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">beamline</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;i03&quot;</span><span class="p">,</span>
+        <span class="n">ispyb_detector_id</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">*</span><span class="n">args</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">beamline</span> <span class="o">=</span> <span class="n">beamline</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">detector_id</span> <span class="o">=</span> <span class="n">ispyb_detector_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ispyb_detector_id</span> <span class="o">=</span> <span class="n">AttributeSignal</span><span class="p">(</span>
+            <span class="n">attr</span><span class="o">=</span><span class="s2">&quot;detector_id&quot;</span><span class="p">,</span>
+            <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;eiger-ispyb_detector_id&quot;</span><span class="p">,</span>
+            <span class="n">write_access</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="p">)</span>
+
         <span class="c1"># using i03 timeouts as default</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">timeouts</span> <span class="o">=</span> <span class="n">AVAILABLE_TIMEOUTS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">beamline</span><span class="p">,</span> <span class="n">AVAILABLE_TIMEOUTS</span><span class="p">[</span><span class="s2">&quot;i03&quot;</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">disarming_status</span> <span class="o">=</span> <span class="kc">None</span>
@@ -891,10 +906,11 @@ window.addEventListener("load", load);
     <span class="k">def</span><span class="w"> </span><span class="nf">with_params</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span>
         <span class="n">params</span><span class="p">:</span> <span class="n">DetectorParams</span><span class="p">,</span>
-        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;EigerDetector&quot;</span><span class="p">,</span>
         <span class="n">beamline</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;i03&quot;</span><span class="p">,</span>
+        <span class="n">ispyb_detector_id</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;EigerDetector&quot;</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="n">det</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">beamline</span><span class="o">=</span><span class="n">beamline</span><span class="p">)</span>
+        <span class="n">det</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">beamline</span><span class="o">=</span><span class="n">beamline</span><span class="p">,</span> <span class="n">ispyb_detector_id</span><span class="o">=</span><span class="n">ispyb_detector_id</span><span class="p">)</span>
         <span class="n">det</span><span class="o">.</span><span class="n">set_detector_parameters</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">det</span>
 
