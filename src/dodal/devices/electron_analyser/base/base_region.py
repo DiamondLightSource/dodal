@@ -6,11 +6,12 @@ from typing import Generic, Self, TypeAlias, TypeVar
 from ophyd_async.core import StrictEnum, SupersetEnum
 from pydantic import BaseModel, Field, model_validator
 
-from dodal.devices.electron_analyser.base.base_enums import EnergyMode, SelectedSource
+from dodal.devices.electron_analyser.base.base_enums import EnergyMode
 from dodal.devices.electron_analyser.base.base_util import (
     to_binding_energy,
     to_kinetic_energy,
 )
+from dodal.devices.selectable_source import SelectedSource
 
 AnyAcqMode: TypeAlias = StrictEnum
 AnyLensMode: TypeAlias = SupersetEnum | StrictEnum
