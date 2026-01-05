@@ -11,13 +11,17 @@ from ophyd_async.core import (
     soft_signal_rw,
 )
 
+from dodal.devices.insertion_device.apple2_undulator import (
+    Apple2,
+    Apple2PhasesVal,
+    Apple2Val,
+    UndulatorPhaseAxes,
+)
 from dodal.devices.insertion_device.energy_motor_lookup import (
     EnergyMotorLookup,
 )
 from dodal.devices.insertion_device.enum import Pol
 from dodal.log import LOGGER
-
-from .apple2_undulator import Apple2, Apple2PhasesVal, Apple2Val, UndulatorPhaseAxes
 
 T = TypeVar("T")
 MAXIMUM_MOVE_TIME = 550  # There is no useful movements take longer than this.
