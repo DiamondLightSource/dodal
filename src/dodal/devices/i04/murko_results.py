@@ -13,7 +13,7 @@ from ophyd_async.core import (
     soft_signal_r_and_setter,
     soft_signal_rw,
 )
-from redis.asyncio import StrictRedis
+from redis.asyncio import ConnectionError, StrictRedis
 
 from dodal.devices.i04.constants import RedisConstants
 from dodal.devices.oav.oav_calculations import (
@@ -103,13 +103,25 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
             self.z_mm, self._z_mm_setter = soft_signal_r_and_setter(float)
         super().__init__(name=name)
 
+    async def _check_redis_connection(self):
+        try:
+            await self.redis_client.ping()  # type: ignore
+            return True
+        except ConnectionError:
+            LOGGER.warning(
+                f"Failed to connect to redis: {self.redis_client}. Murko results device will not trigger"
+            )
+            return False
+
     def _reset(self):
         self._last_omega = None
         self._results: list[MurkoResult] = []
 
     @AsyncStatus.wrap
     async def stage(self):
-        await self.pubsub.subscribe("murko-results")
+        self.redis_connected = await self._check_redis_connection()
+        if self.redis_connected:
+            await self.pubsub.subscribe("murko-results")
         self._x_mm_setter(0)
         self._y_mm_setter(0)
         self._z_mm_setter(0)
@@ -117,10 +129,13 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
     @AsyncStatus.wrap
     async def unstage(self):
         self._reset()
-        await self.pubsub.unsubscribe()
+        if self.redis_connected:
+            await self.pubsub.unsubscribe()
 
     @AsyncStatus.wrap
     async def trigger(self):
+        if not self.redis_connected:
+            return
         sample_id = await self.sample_id.get_value()
         t_last_result = time.time()
         while True:
