@@ -33,7 +33,10 @@ class StatusError(Exception):
 def fake_eiger(request, eiger_params: DetectorParams):
     fake_eiger_class = make_fake_device(EigerDetector)
     fake_eiger: EigerDetector = fake_eiger_class.with_params(
-        params=eiger_params, name=f"test fake Eiger: {request.node.name}"
+        params=eiger_params,
+        name=f"test fake Eiger: {request.node.name}",
+        beamline="i03",
+        ispyb_detector_id=78,
     )
     return fake_eiger
 
