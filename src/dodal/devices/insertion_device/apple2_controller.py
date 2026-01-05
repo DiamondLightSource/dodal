@@ -87,6 +87,12 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
         ----------
         apple2: Apple2
             An Apple2 device.
+        gap_energy_motor_converter: EnergyMotorConvertor
+            The callable that handles the gap look up table logic for the insertion device.
+        phase_energy_motor_converter: EnergyMotorConvertor
+            The callable that handles the phase look up table logic for the insertion device.
+        units: str
+            the units of this device. Defaults to eV.
         name: str
             Name of the device.
         """
