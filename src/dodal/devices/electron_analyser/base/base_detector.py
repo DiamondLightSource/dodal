@@ -8,10 +8,8 @@ from ophyd_async.core import (
     AsyncStatus,
     Device,
     TriggerInfo,
-    soft_signal_rw,
 )
 
-from dodal.common.data_util import load_json_file_to_class
 from dodal.devices.electron_analyser.base.base_controller import (
     ElectronAnalyserController,
 )
@@ -22,48 +20,7 @@ from dodal.devices.electron_analyser.base.base_driver_io import (
 from dodal.devices.electron_analyser.base.base_region import (
     GenericRegion,
     TAbstractBaseRegion,
-    TAbstractBaseSequence,
 )
-
-
-class SequenceLoader(Device, Movable[str], Generic[TAbstractBaseSequence]):
-    """
-    Docstring for SequenceLoader
-
-    :var Args: Description
-    :var filename: Description
-    :vartype filename: Path
-    :var Returns: Description
-    :var https: Description
-    """
-
-    def __init__(
-        self,
-        sequence_class: type[TAbstractBaseSequence],
-        initial_file: str = "Not set",
-        name: str = "",
-    ):
-        self.sequence_file = soft_signal_rw(str, initial_value=initial_file)
-        self._sequence_class = sequence_class
-        super().__init__(name)
-
-    @AsyncStatus.wrap
-    async def set(self, filename: str) -> None:
-        await self.sequence_file.set(filename)
-
-    async def load_sequence(self) -> TAbstractBaseSequence:
-        """
-        Load the sequence data from a provided json file into a sequence class.
-
-        Args:
-            filename: Path to the sequence file containing the region data.
-
-        Returns:
-            Pydantic model representing the sequence file.
-        """
-        return load_json_file_to_class(
-            self._sequence_class, await self.sequence_file.get_value()
-        )
 
 
 class ElectronAnalyserDetector(

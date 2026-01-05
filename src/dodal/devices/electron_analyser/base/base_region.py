@@ -3,9 +3,17 @@ from abc import ABC
 from collections.abc import Callable
 from typing import Generic, Self, TypeAlias, TypeVar
 
-from ophyd_async.core import StrictEnum, SupersetEnum
+from bluesky.protocols import Movable
+from ophyd_async.core import (
+    AsyncStatus,
+    Device,
+    StrictEnum,
+    SupersetEnum,
+    soft_signal_rw,
+)
 from pydantic import BaseModel, Field, model_validator
 
+from dodal.common.data_util import load_json_file_to_class
 from dodal.devices.electron_analyser.base.base_enums import EnergyMode, SelectedSource
 from dodal.devices.electron_analyser.base.base_util import (
     to_binding_energy,
@@ -200,3 +208,43 @@ class AbstractBaseSequence(
 
 GenericSequence = AbstractBaseSequence[GenericRegion]
 TAbstractBaseSequence = TypeVar("TAbstractBaseSequence", bound=AbstractBaseSequence)
+
+
+class SequenceLoader(Device, Movable[str], Generic[TAbstractBaseSequence]):
+    """
+    Docstring for SequenceLoader
+
+    :var Args: Description
+    :var filename: Description
+    :vartype filename: Path
+    :var Returns: Description
+    :var https: Description
+    """
+
+    def __init__(
+        self,
+        sequence_class: type[TAbstractBaseSequence],
+        initial_file: str = "Not set",
+        name: str = "",
+    ):
+        self.sequence_file = soft_signal_rw(str, initial_value=initial_file)
+        self._sequence_class = sequence_class
+        super().__init__(name)
+
+    @AsyncStatus.wrap
+    async def set(self, filename: str) -> None:
+        await self.sequence_file.set(filename)
+
+    async def load(self) -> TAbstractBaseSequence:
+        """
+        Load the sequence data from a provided json file into a sequence class.
+
+        Args:
+            filename: Path to the sequence file containing the region data.
+
+        Returns:
+            Pydantic model representing the sequence file.
+        """
+        return load_json_file_to_class(
+            self._sequence_class, await self.sequence_file.get_value()
+        )
