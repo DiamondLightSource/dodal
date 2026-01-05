@@ -1,10 +1,6 @@
 from ophyd_async.core import Reference
 
 from dodal.common.beamlines.beamline_parameters import get_beamline_parameters
-from dodal.common.beamlines.beamline_utils import (
-    device_factory,
-    device_instantiation,
-)
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.device_manager import DeviceManager
 from dodal.devices.aperturescatterguard import (
@@ -15,7 +11,6 @@ from dodal.devices.aperturescatterguard import (
 from dodal.devices.attenuator.attenuator import BinaryFilterAttenuator
 from dodal.devices.backlight import Backlight
 from dodal.devices.baton import Baton
-from dodal.devices.detector import DetectorParams
 from dodal.devices.detector.detector_motion import DetectorMotion
 from dodal.devices.diamond_filter import DiamondFilter, I04Filters
 from dodal.devices.eiger import EigerDetector
