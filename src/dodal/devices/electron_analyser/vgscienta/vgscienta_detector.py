@@ -15,13 +15,11 @@ from dodal.devices.electron_analyser.vgscienta.vgscienta_driver_io import (
 from dodal.devices.electron_analyser.vgscienta.vgscienta_region import (
     TPassEnergyEnum,
     VGScientaRegion,
-    VGScientaSequence,
 )
 
 
 class VGScientaDetector(
     ElectronAnalyserDetector[
-        VGScientaSequence[TLensMode, TPsuMode, TPassEnergyEnum],
         VGScientaAnalyserDriverIO[TLensMode, TPsuMode, TPassEnergyEnum],
         VGScientaRegion[TLensMode, TPassEnergyEnum],
     ],
@@ -46,7 +44,4 @@ class VGScientaDetector(
             VGScientaRegion[TLensMode, TPassEnergyEnum],
         ](self.driver, energy_source, 0)
 
-        sequence_class = VGScientaSequence[
-            lens_mode_type, psu_mode_type, pass_energy_type
-        ]
-        super().__init__(sequence_class, controller, name)
+        super().__init__(controller, name)

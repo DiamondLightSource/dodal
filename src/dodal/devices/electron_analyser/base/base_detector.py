@@ -21,7 +21,6 @@ from dodal.devices.electron_analyser.base.base_driver_io import (
 )
 from dodal.devices.electron_analyser.base.base_region import (
     GenericRegion,
-    GenericSequence,
     TAbstractBaseRegion,
     TAbstractBaseSequence,
 )
@@ -68,7 +67,7 @@ class ElectronAnalyserDetector(
     AsyncConfigurable,
     Stageable,
     Movable,
-    Generic[TAbstractBaseSequence, TAbstractAnalyserDriverIO, TAbstractBaseRegion],
+    Generic[TAbstractAnalyserDriverIO, TAbstractBaseRegion],
 ):
     """
     Detector for data acquisition of electron analyser.
@@ -80,14 +79,12 @@ class ElectronAnalyserDetector(
 
     def __init__(
         self,
-        sequence_class: type[TAbstractBaseSequence],
         controller: ElectronAnalyserController[
             TAbstractAnalyserDriverIO, TAbstractBaseRegion
         ],
         name: str = "",
     ):
         self._controller = controller
-        self._sequence_class = sequence_class
 
         super().__init__(name)
 
@@ -131,7 +128,7 @@ class ElectronAnalyserDetector(
 
 
 GenericElectronAnalyserDetector = ElectronAnalyserDetector[
-    GenericSequence, GenericAnalyserDriverIO, GenericRegion
+    GenericAnalyserDriverIO, GenericRegion
 ]
 TElectronAnalyserDetector = TypeVar(
     "TElectronAnalyserDetector",
