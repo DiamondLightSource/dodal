@@ -9,8 +9,7 @@ from dodal.devices.insertion_device import (
     InsertionDevicePolarisation,
     Pol,
 )
-
-from .conftest import DummyApple2Controller
+from tests.devices.insertion_device.conftest import DummyApple2Controller
 
 pytest_plugins = ["dodal.testing.fixtures.devices.apple2"]
 
