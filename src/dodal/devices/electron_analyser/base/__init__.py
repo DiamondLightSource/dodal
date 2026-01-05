@@ -3,12 +3,8 @@ from .base_controller import (
     GenericElectronAnalyserController,
 )
 from .base_detector import (
-    BaseElectronAnalyserDetector,
     ElectronAnalyserDetector,
-    ElectronAnalyserRegionDetector,
-    GenericBaseElectronAnalyserDetector,
     GenericElectronAnalyserDetector,
-    GenericElectronAnalyserRegionDetector,
 )
 from .base_driver_io import (
     AbstractAnalyserDriverIO,
@@ -32,12 +28,8 @@ from .energy_sources import DualEnergySource, EnergySource
 __all__ = [
     "ElectronAnalyserController",
     "GenericElectronAnalyserController",
-    "BaseElectronAnalyserDetector",
     "ElectronAnalyserDetector",
-    "ElectronAnalyserRegionDetector",
-    "GenericBaseElectronAnalyserDetector",
     "GenericElectronAnalyserDetector",
-    "GenericElectronAnalyserRegionDetector",
     "AbstractAnalyserDriverIO",
     "GenericAnalyserDriverIO",
     "TAbstractAnalyserDriverIO",
