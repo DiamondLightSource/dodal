@@ -37,9 +37,15 @@ class SequenceLoader(Device, Movable[str], Generic[TAbstractBaseSequence]):
     :var https: Description
     """
 
-    def __init__(self, sequence_class: type[TAbstractBaseSequence], name):
-        self.sequence_file = soft_signal_rw(str, initial_value="Not set")
+    def __init__(
+        self,
+        sequence_class: type[TAbstractBaseSequence],
+        initial_file: str = "Not set",
+        name: str = "",
+    ):
+        self.sequence_file = soft_signal_rw(str, initial_value=initial_file)
         self._sequence_class = sequence_class
+        super().__init__(name)
 
     @AsyncStatus.wrap
     async def set(self, filename: str) -> None:
