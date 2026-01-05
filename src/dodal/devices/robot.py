@@ -1,6 +1,7 @@
 import asyncio
 from asyncio import FIRST_COMPLETED, CancelledError, Task, wait_for
 from dataclasses import dataclass
+from enum import IntEnum
 
 from bluesky.protocols import Movable
 from ophyd_async.core import (
@@ -21,8 +22,8 @@ from ophyd_async.epics.core import (
 
 from dodal.log import LOGGER
 
-WAIT_FOR_SMARGON_DISABLE_MSG = "Waiting on smargon disable"
-WAIT_FOR_SMARGON_ENABLE_MSG = "Waiting on smargon enable"
+WAIT_FOR_BEAMLINE_DISABLE_MSG = "Waiting on beamline disable"
+WAIT_FOR_BEAMLINE_ENABLE_MSG = "Waiting on beamline enable"
 
 
 class RobotLoadError(Exception):
@@ -48,9 +49,9 @@ class PinMounted(StrictEnum):
     PIN_MOUNTED = "Pin Mounted"
 
 
-class SmargonStatus(StrictEnum):
-    DISABLED = "Smargon disabled"
-    ENABLED = "Smargon enabled"
+class BeamlineStatus(IntEnum):
+    ENABLED = 0
+    DISABLED = 1
 
 
 class ErrorStatus(Device):
@@ -90,9 +91,8 @@ class BartRobot(StandardReadable, Movable[SampleLocation | None]):
 
             self.current_puck = epics_signal_r(float, prefix + "CURRENT_PUCK_RBV")
             self.current_pin = epics_signal_r(float, prefix + "CURRENT_PIN_RBV")
-            self.smargon_enabled = epics_signal_r(
-                SmargonStatus, prefix + "ROBOT_OP_16_BITS.B8"
-            )
+
+        self.beamline_disabled = epics_signal_r(int, prefix + "ROBOT_OP_16_BITS.B8")
 
         self.next_pin = epics_signal_rw_rbv(float, prefix + "NEXT_PIN")
         self.next_puck = epics_signal_rw_rbv(float, prefix + "NEXT_PUCK")
@@ -124,10 +124,8 @@ class BartRobot(StandardReadable, Movable[SampleLocation | None]):
         )
         super().__init__(name=name)
 
-    async def smargon_status_or_error(
-        self, expected_state: SmargonStatus = SmargonStatus.ENABLED
-    ):
-        """This co-routine will finish when either the smargon reaches the specified
+    async def beamline_status_or_error(self, expected_state: BeamlineStatus):
+        """This co-routine will finish when either the beamline reaches the specified
         state or the robot gives an error (whichever happens first). In the case where
         there is an error a RobotLoadError error is raised.
         """
@@ -141,7 +139,7 @@ class BartRobot(StandardReadable, Movable[SampleLocation | None]):
             raise RobotLoadError(error_code, error_msg)
 
         async def wait_for_expected_state():
-            await wait_for_value(self.smargon_enabled, expected_state, None)
+            await wait_for_value(self.beamline_disabled, expected_state.value, None)
 
         tasks = [
             (Task(raise_if_error())),
@@ -181,12 +179,15 @@ class BartRobot(StandardReadable, Movable[SampleLocation | None]):
             set_and_wait_for_value(self.next_pin, sample_location.pin),
         )
         await self.load.trigger()
-        if await self.smargon_enabled.get_value() == SmargonStatus.ENABLED:
-            LOGGER.info(WAIT_FOR_SMARGON_DISABLE_MSG)
-            await self.smargon_status_or_error(SmargonStatus.DISABLED)
-        LOGGER.info(WAIT_FOR_SMARGON_ENABLE_MSG)
+        await self._wait_for_beamline_enabled_after_load_or_unload()
 
-        await self.smargon_status_or_error()
+    async def _wait_for_beamline_enabled_after_load_or_unload(self):
+        if await self.beamline_disabled.get_value() == BeamlineStatus.ENABLED.value:
+            LOGGER.info(WAIT_FOR_BEAMLINE_DISABLE_MSG)
+            await self.beamline_status_or_error(BeamlineStatus.DISABLED)
+
+        LOGGER.info(WAIT_FOR_BEAMLINE_ENABLE_MSG)
+        await self.beamline_status_or_error(BeamlineStatus.ENABLED)
 
     @AsyncStatus.wrap
     async def set(self, value: SampleLocation | None):
@@ -195,7 +196,7 @@ class BartRobot(StandardReadable, Movable[SampleLocation | None]):
         Args:
             value: The pin and puck to load, or None to unload the sample.
         Raises:
-            RobotLoadError if a timeout occurs, or if an error occurs loading the smaple.
+            RobotLoadError if a timeout occurs, or if an error occurs loading the sample.
         """
         try:
             if value is not None:
@@ -205,9 +206,8 @@ class BartRobot(StandardReadable, Movable[SampleLocation | None]):
                 )
             else:
                 await self.unload.trigger(timeout=self.LOAD_TIMEOUT)
-                await wait_for_value(self.program_running, False, self.NOT_BUSY_TIMEOUT)
                 await wait_for(
-                    self.smargon_status_or_error(SmargonStatus.ENABLED),
+                    self._wait_for_beamline_enabled_after_load_or_unload(),
                     timeout=self.LOAD_TIMEOUT + self.NOT_BUSY_TIMEOUT,
                 )
         except TimeoutError as e:

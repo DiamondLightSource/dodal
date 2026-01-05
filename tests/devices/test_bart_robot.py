@@ -1,9 +1,11 @@
 import asyncio
+import time
 import traceback
 from asyncio import Event, create_task
 from functools import partial
 from unittest.mock import ANY, AsyncMock, MagicMock, call, patch
 
+import bluesky.plan_stubs as bps
 import pytest
 from ophyd_async.core import (
     AsyncStatus,
@@ -14,13 +16,13 @@ from ophyd_async.core import (
 )
 
 from dodal.devices.robot import (
-    WAIT_FOR_SMARGON_DISABLE_MSG,
-    WAIT_FOR_SMARGON_ENABLE_MSG,
+    WAIT_FOR_BEAMLINE_DISABLE_MSG,
+    WAIT_FOR_BEAMLINE_ENABLE_MSG,
     BartRobot,
+    BeamlineStatus,
     PinMounted,
     RobotLoadError,
     SampleLocation,
-    SmargonStatus,
 )
 
 
@@ -36,15 +38,18 @@ async def robot_for_unload():
 
     async def finish_later():
         await drying_complete.wait()
+        await asyncio.sleep(0.1)
         set_mock_value(device.program_running, False)
-        set_mock_value(device.smargon_enabled, SmargonStatus.ENABLED)
+        set_mock_value(device.beamline_disabled, BeamlineStatus.ENABLED.value)
 
     async def fake_unload(*args, **kwargs):
         set_mock_value(device.program_running, True)
+        set_mock_value(device.beamline_disabled, BeamlineStatus.DISABLED.value)
         await trigger_complete.wait()
         asyncio.create_task(finish_later())
 
     get_mock_put(device.unload).side_effect = fake_unload
+    # device.unload.trigger = AsyncMock(side_effect=fake_unload)
     return device, trigger_complete, drying_complete
 
 
@@ -53,6 +58,7 @@ async def _get_bart_robot() -> BartRobot:
     device.LOAD_TIMEOUT = 1  # type: ignore
     device.NOT_BUSY_TIMEOUT = 1  # type: ignore
     await device.connect(mock=True)
+    # set_mock_value(device.beamline_disabled, BeamlineStatus.DISABLED.value)
     return device
 
 
@@ -110,7 +116,7 @@ async def test_given_program_not_running_but_pin_not_unmounting_when_load_pin_th
         await device.set(SampleLocation(15, 10))
     device.load.trigger.assert_called_once()  # type:ignore
     last_log = patch_logger.mock_calls[1].args[0]
-    assert WAIT_FOR_SMARGON_ENABLE_MSG in last_log
+    assert WAIT_FOR_BEAMLINE_DISABLE_MSG in last_log
 
 
 @patch("dodal.devices.robot.LOGGER")
@@ -128,34 +134,34 @@ async def test_given_program_not_running_and_pin_unmounting_but_new_pin_not_moun
     try:
         device.load.trigger.assert_called_once()  # type:ignore
         last_log = patch_logger.mock_calls[1].args[0]
-        assert WAIT_FOR_SMARGON_ENABLE_MSG in last_log
+        assert WAIT_FOR_BEAMLINE_DISABLE_MSG in last_log
     except AssertionError:
         traceback.print_exception(exc_info.value)
         raise
 
 
-def _set_smargon_enabled_on_log_messages(device: BartRobot, msg: str):
-    if msg == WAIT_FOR_SMARGON_DISABLE_MSG:
-        set_mock_value(device.smargon_enabled, SmargonStatus.DISABLED)
-    elif msg == WAIT_FOR_SMARGON_ENABLE_MSG:
-        set_mock_value(device.smargon_enabled, SmargonStatus.ENABLED)
+def _set_beamline_enabled_on_log_messages(device: BartRobot, msg: str):
+    if msg == WAIT_FOR_BEAMLINE_DISABLE_MSG:
+        set_mock_value(device.beamline_disabled, BeamlineStatus.DISABLED.value)
+    elif msg == WAIT_FOR_BEAMLINE_ENABLE_MSG:
+        set_mock_value(device.beamline_disabled, BeamlineStatus.ENABLED.value)
 
 
 def _error_on_unload_log_messages(device: BartRobot, msg: str):
-    if msg == WAIT_FOR_SMARGON_DISABLE_MSG:
+    if msg == WAIT_FOR_BEAMLINE_DISABLE_MSG:
         set_mock_value(device.prog_error.code, 40)
         set_mock_value(device.prog_error.str, "Test error")
 
 
-# Use log info messages to determine when to set the smargon enable, so we don't have to use any sleeps during testing
+# Use log info messages to determine when to set the beamline enable, so we don't have to use any sleeps during testing
 async def set_with_happy_path(
     device: BartRobot, mock_log_info: MagicMock
 ) -> AsyncStatus:
     """Mocks the logic that the robot would do on a successful load"""
 
-    mock_log_info.side_effect = partial(_set_smargon_enabled_on_log_messages, device)
+    mock_log_info.side_effect = partial(_set_beamline_enabled_on_log_messages, device)
     set_mock_value(device.program_running, False)
-    set_mock_value(device.smargon_enabled, SmargonStatus.ENABLED)
+    set_mock_value(device.beamline_disabled, BeamlineStatus.ENABLED.value)
     status = device.set(SampleLocation(15, 10))
     return status
 
@@ -167,7 +173,7 @@ async def set_with_unhappy_path(
 
     mock_log_info.side_effect = partial(_error_on_unload_log_messages, device)
     set_mock_value(device.program_running, False)
-    set_mock_value(device.smargon_enabled, SmargonStatus.ENABLED)
+    set_mock_value(device.beamline_disabled, BeamlineStatus.ENABLED.value)
     status = device.set(SampleLocation(15, 10))
     return status
 
@@ -188,15 +194,16 @@ async def test_given_program_not_running_and_pin_unmounts_then_mounts_when_load_
 async def test_given_waiting_for_pin_to_mount_when_no_pin_mounted_then_error_raised():
     device = await _get_bart_robot()
     set_mock_value(device.prog_error.code, 25)
-    status = device.smargon_status_or_error()
+    set_mock_value(device.beamline_disabled, BeamlineStatus.DISABLED.value)
+    status = device.beamline_status_or_error(BeamlineStatus.ENABLED)
     with pytest.raises(RobotLoadError):
         await status
 
 
-async def test_given_waiting_for_smargon_to_enable_when_smargon_enabled_then_no_error_raised():
+async def test_given_waiting_for_beamline_to_enable_when_beamline_enabled_then_no_error_raised():
     device = await _get_bart_robot()
-    status = create_task(device.smargon_status_or_error())
-    set_mock_value(device.smargon_enabled, SmargonStatus.ENABLED)
+    status = create_task(device.beamline_status_or_error(BeamlineStatus.ENABLED))
+    set_mock_value(device.beamline_disabled, BeamlineStatus.ENABLED.value)
     await status
 
 
