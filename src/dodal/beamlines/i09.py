@@ -12,6 +12,9 @@ from dodal.devices.electron_analyser.vgscienta import VGScientaDetector
 from dodal.devices.i09 import Grating, LensMode, PassEnergy, PsuMode
 from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.devices.synchrotron import Synchrotron
+from dodal.devices.temperture_controller import (
+    Lakeshore336,
+)
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
@@ -57,3 +60,8 @@ def ew4000() -> VGScientaDetector[LensMode, PsuMode, PassEnergy]:
         pass_energy_type=PassEnergy,
         energy_source=energy_source(),
     )
+
+
+@device_factory()
+def lakeshore336() -> Lakeshore336:
+    return Lakeshore336(prefix="BL09L-VA-LAKE-01:")

@@ -26,6 +26,9 @@ from dodal.devices.insertion_device.energy_motor_lookup import (
 from dodal.devices.insertion_device.lookup_table_models import LookupTableColumnConfig
 from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.devices.synchrotron import Synchrotron
+from dodal.devices.temperture_controller import (
+    Lakeshore336,
+)
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
@@ -111,3 +114,8 @@ def jid_polarisation() -> InsertionDevicePolarisation:
 def energy_jid() -> BeamEnergy:
     """Beam energy."""
     return BeamEnergy(id_energy=jid_energy(), mono=pgm().energy)
+
+
+@device_factory()
+def lakeshore336() -> Lakeshore336:
+    return Lakeshore336(prefix="BL09K-EA-TCTRL-01:")
