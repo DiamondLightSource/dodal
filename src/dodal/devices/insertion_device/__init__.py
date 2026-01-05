@@ -17,10 +17,7 @@ from .apple2_undulator import (
     UndulatorPhaseAxes,
     UnstoppableMotor,
 )
-from .energy import (
-    BeamEnergy,
-    InsertionDeviceEnergy,
-)
+from .energy import BeamEnergy, InsertionDeviceEnergy, InsertionDeviceEnergyBase
 from .energy_motor_lookup import (
     ConfigServerEnergyMotorLookup,
     EnergyMotorLookup,
@@ -61,4 +58,5 @@ __all__ = [
     "ConfigServerEnergyMotorLookup",
     "EnergyMotorConvertor",
     "UnstoppableMotor",
+    "InsertionDeviceEnergyBase",
 ]
