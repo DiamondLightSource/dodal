@@ -118,7 +118,9 @@ def assert_images_identical(left: Image.Image, right: Image.Image):
     assert all(
         left_px == right_px
         for left_px, right_px in zip(
-            iter(left.getdata()), iter(right.getdata()), strict=True
+            iter(left.get_flattened_data()),
+            iter(right.get_flattened_data()),
+            strict=True,
         )
     )
 
