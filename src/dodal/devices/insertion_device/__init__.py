@@ -1,33 +1,35 @@
-from .apple2_undulator import (
-    DEFAULT_MOTOR_MIN_TIMEOUT,
+from .apple2_controller import (
     MAXIMUM_MOVE_TIME,
-    Apple2,
     Apple2Controller,
     Apple2EnforceLHMoveController,
+    EnergyMotorConvertor,
+)
+from .apple2_undulator import (
+    DEFAULT_MOTOR_MIN_TIMEOUT,
+    Apple2,
     Apple2LockedPhasesVal,
     Apple2PhasesVal,
     Apple2Val,
-    BeamEnergy,
     EnabledDisabledUpper,
-    EnergyMotorConvertor,
-    InsertionDeviceEnergy,
-    InsertionDevicePolarisation,
     UndulatorGap,
     UndulatorJawPhase,
     UndulatorLockedPhaseAxes,
     UndulatorPhaseAxes,
+    UnstoppableMotor,
 )
+from .energy import BeamEnergy, InsertionDeviceEnergy, InsertionDeviceEnergyBase
 from .energy_motor_lookup import (
     ConfigServerEnergyMotorLookup,
     EnergyMotorLookup,
 )
-from .id_enum import Pol, UndulatorGateStatus
+from .enum import Pol, UndulatorGateStatus
 from .lookup_table_models import (
     EnergyCoverage,
     LookupTable,
     LookupTableColumnConfig,
     convert_csv_to_lookup,
 )
+from .polarisation import InsertionDevicePolarisation
 
 __all__ = [
     "Apple2",
@@ -55,4 +57,6 @@ __all__ = [
     "EnergyMotorLookup",
     "ConfigServerEnergyMotorLookup",
     "EnergyMotorConvertor",
+    "UnstoppableMotor",
+    "InsertionDeviceEnergyBase",
 ]
