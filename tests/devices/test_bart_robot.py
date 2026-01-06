@@ -1,11 +1,9 @@
 import asyncio
-import time
 import traceback
 from asyncio import Event, create_task
 from functools import partial
 from unittest.mock import ANY, AsyncMock, MagicMock, call, patch
 
-import bluesky.plan_stubs as bps
 import pytest
 from ophyd_async.core import (
     AsyncStatus,
