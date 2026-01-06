@@ -20,7 +20,7 @@ class DetectorDistanceToBeamXYConverter:
 
         lookup_table_columns: list = config_server.get_file_contents(
             lookup_file, DetectorXYLookupTable
-        ).columns()
+        ).columns
         self._d_to_x = linear_extrapolation_lut(
             lookup_table_columns[0], lookup_table_columns[1]
         )
