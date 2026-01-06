@@ -39,7 +39,7 @@ from pydantic import (
     field_validator,
 )
 
-from dodal.devices.insertion_device.id_enum import Pol
+from dodal.devices.insertion_device.enum import Pol
 
 DEFAULT_POLY_DEG = [
     "7th-order",
@@ -57,7 +57,7 @@ DEFAULT_GAP_FILE = "IDEnergy2GapCalibrations.csv"
 DEFAULT_PHASE_FILE = "IDEnergy2PhaseCalibrations.csv"
 
 ROW_PHASE_MOTOR_TOLERANCE = 0.004
-ROW_PHASE_CIRCULAR = 15
+ROW_PHASE_CIRCULAR = 15.0
 MAXIMUM_ROW_PHASE_MOTOR_POSITION = 24.0
 MAXIMUM_GAP_MOTOR_POSITION = 100
 

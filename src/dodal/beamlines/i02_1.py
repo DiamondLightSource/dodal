@@ -50,6 +50,8 @@ def eiger(mock: bool = False) -> EigerDetector:
         wait=False,
         fake=mock,
         name="eiger",
+        beamline="i02-1",
+        ispyb_detector_id=101,
     )
 
 

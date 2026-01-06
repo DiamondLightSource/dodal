@@ -19,6 +19,9 @@ from dodal.devices.i09_1_shared.hard_undulator_functions import (
     get_convert_lut,
 )
 from dodal.devices.synchrotron import Synchrotron
+from dodal.devices.temperture_controller import (
+    Lakeshore336,
+)
 from dodal.devices.undulator import UndulatorInMm, UndulatorOrder
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
@@ -89,3 +92,8 @@ def hu_energy() -> HardEnergy:
         dcm=dcm(),
         undulator_energy=hu_id_energy(),
     )
+
+
+@device_factory()
+def lakeshore() -> Lakeshore336:
+    return Lakeshore336(prefix=f"{PREFIX.beamline_prefix}-EA-TCTRL-01:")
