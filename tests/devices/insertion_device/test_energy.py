@@ -159,7 +159,7 @@ async def test_beam_energy_kickoff_set_correct_delay(
     mock_id_gap: UndulatorGap,
     mock_id_controller: DummyApple2Controller,
 ):
-    mock_id_controller.gap_energy_motor_converter = Mock(side_effect=[20.0, 21, 22.0])
+    mock_id_controller.gap_energy_motor_converter = Mock(side_effect=[21.0, 20, 22.0])
     mock_id_controller.phase_energy_motor_converter = Mock(side_effect=[22.0, 22, 22.0])
     fly_info = FlyMotorInfo(start_position=700, end_position=800, time_for_move=10)
     id_acc_time = 3
@@ -185,7 +185,7 @@ async def test_beam_energy_kickoff_set_correct_delay(
 
 @patch("asyncio.sleep", new_callable=AsyncMock)
 async def test_energysetter_complete(
-    mock_sleep,
+    mock_sleep: AsyncMock,
     mock_beam_energy: BeamEnergy,
     mock_pgm: PlaneGratingMonochromator,
     mock_id_gap: UndulatorGap,
