@@ -1,5 +1,6 @@
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.device_manager import DeviceManager
+from dodal.devices.temperture_controller import Lakeshore336, Lakeshore340
 from dodal.devices.undulator import UndulatorInMm, UndulatorOrder
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
@@ -21,3 +22,13 @@ def id() -> UndulatorInMm:
 @devices.factory()
 def harmonic() -> UndulatorOrder:
     return UndulatorOrder()
+
+
+@devices.factory()
+def lakeshore340() -> Lakeshore340:
+    return Lakeshore340(prefix=f"{PREFIX.beamline_prefix}-EA-LS340-01:")
+
+
+@devices.factory()
+def lakeshore336() -> Lakeshore336:
+    return Lakeshore336(prefix=f"{PREFIX.beamline_prefix}-EA-LS336-01:")
