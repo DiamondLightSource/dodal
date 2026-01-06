@@ -1,3 +1,4 @@
+from collections import defaultdict
 from collections.abc import Sequence
 from typing import cast
 
@@ -16,6 +17,7 @@ from ophyd_async.core import (
     AsyncReadable,
     StandardDetector,
 )
+from ophyd_async.testing import assert_emitted
 from pydantic import ValidationError
 
 from dodal.devices.motors import Motor
@@ -201,35 +203,61 @@ def test_make_num_scan_args(
     assert args[0] == x_axis
 
 
-@pytest.mark.parametrize("x_args, num", ([[0.0, 2.2], 5], [[1.1, -1.1], 3]))
+@pytest.mark.parametrize("x_list, num", ([[0.0, 2.2], 5], [[1.1, -1.1], 3]))
 def test_num_scan_with_one_axis(
     run_engine: RunEngine,
     det: StandardDetector,
     x_axis: Motor,
-    x_args: list[float | int],
+    x_list: list[float | int],
     num: int,
 ):
-    run_engine(num_scan(detectors=[det], params={x_axis: x_args}, num=num))
+    docs = defaultdict(list)
+    run_engine.subscribe(lambda name, doc: docs[name].append(doc))
+
+    run_engine(num_scan(detectors=[det], params={x_axis: x_list}, num=num))
+
+    assert_emitted(
+        docs,
+        start=1,
+        descriptor=1,
+        stream_resource=2,
+        stream_datum=num * 2,
+        event=num,
+        stop=1,
+    )
 
 
 @pytest.mark.parametrize(
-    "x_args, y_args, num", ([[-1.1, 1.1], [2.2, -2.2], 5], [[0, 1.1], [2.2, 3.3], 5])
+    "x_list, y_list, num", ([[-1.1, 1.1], [2.2, -2.2], 5], [[0, 1.1], [2.2, 3.3], 5])
 )
 def test_num_scan_with_two_axes(
     run_engine: RunEngine,
     det: StandardDetector,
     x_axis: Motor,
-    x_args: list[float | int],
+    x_list: list[float | int],
     y_axis: Motor,
-    y_args: list[float | int],
+    y_list: list[float | int],
     num: int,
 ):
+    docs = defaultdict(list)
+    run_engine.subscribe(lambda name, doc: docs[name].append(doc))
+
     run_engine(
         num_scan(
             detectors=[det],
-            params={x_axis: x_args, y_axis: y_args},
+            params={x_axis: x_list, y_axis: y_list},
             num=num,
         )
+    )
+
+    assert_emitted(
+        docs,
+        start=1,
+        descriptor=1,
+        stream_resource=2,
+        stream_datum=num * 2,
+        event=num,
+        stop=1,
     )
 
 
@@ -241,59 +269,87 @@ def test_num_scan_fails_when_given_wrong_number_of_params(
 
 
 @pytest.mark.parametrize(
-    "x_args, y_args,", ([[-1, 1, 0], [2, 0]], [[-1, 1, 3.5], [-1, 1]])
+    "x_list, y_list,", ([[-1, 1, 0], [2, 0]], [[-1, 1, 3.5], [-1, 1]])
 )
 def test_num_scan_fails_when_given_bad_info(
     run_engine: RunEngine,
     det: StandardDetector,
     x_axis: Motor,
-    x_args: list[float | int],
+    x_list: list[float | int],
     y_axis: Motor,
-    y_args: list[float | int],
+    y_list: list[float | int],
 ):
     with pytest.raises(ValueError):
         run_engine(
             num_scan(
                 detectors=[det],
-                params={x_axis: x_args, y_axis: y_args},
+                params={x_axis: x_list, y_axis: y_list},
             )
         )
 
 
 @pytest.mark.parametrize(
-    "x_args, y_args", ([[-1.1, 1.1, 5], [2.2, -2.2, 3]], [[0, 1.1, 5], [2.2, 3.3, 5]])
+    "x_list, y_list", ([[-1.1, 1.1, 5], [2.2, -2.2, 3]], [[0, 1.1, 5], [2.2, 3.3, 5]])
 )
 def test_num_grid_scan(
     run_engine: RunEngine,
     det: StandardDetector,
     x_axis: Motor,
-    x_args: list[float | int],
+    x_list: list[float | int],
     y_axis: Motor,
-    y_args: list[float | int],
+    y_list: list[float | int],
 ):
+    docs = defaultdict(list)
+    run_engine.subscribe(lambda name, doc: docs[name].append(doc))
+    num = int(x_list[-1] * y_list[-1])
+
     run_engine(
         num_grid_scan(
             detectors=[det],
-            params={x_axis: x_args, y_axis: y_args},
+            params={x_axis: x_list, y_axis: y_list},
         )
+    )
+
+    assert_emitted(
+        docs,
+        start=1,
+        descriptor=1,
+        stream_resource=2,
+        stream_datum=num * 2,
+        event=num,
+        stop=1,
     )
 
 
 @pytest.mark.parametrize(
-    "x_args, y_args", ([[-1.1, 1.1, 5], [2.2, -2.2, 3]], [[0, 1.1, 5], [2.2, 3.3, 5]])
+    "x_list, y_list", ([[-1.1, 1.1, 5], [2.2, -2.2, 3]], [[0, 1.1, 5], [2.2, 3.3, 5]])
 )
 def test_num_grid_scan_when_not_snaking(
     run_engine: RunEngine,
     det: StandardDetector,
     x_axis: Motor,
-    x_args: list[float | int],
+    x_list: list[float | int],
     y_axis: Motor,
-    y_args: list[float | int],
+    y_list: list[float | int],
 ):
+    docs = defaultdict(list)
+    run_engine.subscribe(lambda name, doc: docs[name].append(doc))
+    num = int(x_list[-1] * y_list[-1])
+
     run_engine(
         num_grid_scan(
-            detectors=[det], params={x_axis: x_args, y_axis: y_args}, snake_axes=False
+            detectors=[det], params={x_axis: x_list, y_axis: y_list}, snake_axes=False
         )
+    )
+
+    assert_emitted(
+        docs,
+        start=1,
+        descriptor=1,
+        stream_resource=2,
+        stream_datum=num * 2,
+        event=num,
+        stop=1,
     )
 
 
@@ -307,149 +363,203 @@ def test_num_grid_scan_fails_when_given_wrong_number_of_params(
 
 
 @pytest.mark.parametrize(
-    "x_args, y_args", ([[-1.1, 1.1, 5], [2.2, -2.2, 3]], [[0, 1.1, 5], [2.2, 3.3, 5]])
+    "x_list, y_list", ([[-1.1, 1.1, 5], [2.2, -2.2, 3]], [[0, 1.1, 5], [2.2, 3.3, 5]])
 )
 def test_num_scan_fails_when_asked_to_snake_slow_axis(
     run_engine: RunEngine,
     det: StandardDetector,
     x_axis: Motor,
-    x_args: list[float | int],
+    x_list: list[float | int],
     y_axis: Motor,
-    y_args: list[float | int],
+    y_list: list[float | int],
 ):
     with pytest.raises(ValueError):
         run_engine(
             num_grid_scan(
                 detectors=[det],
-                params={x_axis: x_args, y_axis: y_args},
+                params={x_axis: x_list, y_axis: y_list},
                 snake_axes=[x_axis],
             )
         )
 
 
-@pytest.mark.parametrize("x_args, num", ([[0.0, 2.2], 5], [[1.1, -1.1], 3]))
+@pytest.mark.parametrize("x_list, num", ([[0.0, 2.2], 5], [[1.1, -1.1], 3]))
 def test_num_rscan(
     run_engine: RunEngine,
     det: StandardDetector,
     x_axis: Motor,
-    x_args: list[float | int],
+    x_list: list[float | int],
     num: int,
 ):
-    run_engine(num_rscan(detectors=[det], params={x_axis: x_args}, num=num))
+    docs = defaultdict(list)
+    run_engine.subscribe(lambda name, doc: docs[name].append(doc))
+
+    run_engine(num_rscan(detectors=[det], params={x_axis: x_list}, num=num))
+
+    assert_emitted(
+        docs,
+        start=1,
+        descriptor=1,
+        stream_resource=2,
+        stream_datum=num * 2,
+        event=num,
+        stop=1,
+    )
 
 
 @pytest.mark.parametrize(
-    "x_args, y_args, num", ([[-1.1, 1.1], [2.2, -2.2], 5], [[0, 1.1], [2.2, 3.3], 5])
+    "x_list, y_list, num", ([[-1.1, 1.1], [2.2, -2.2], 5], [[0, 1.1], [2.2, 3.3], 5])
 )
 def test_num_rscan_with_two_axes(
     run_engine: RunEngine,
     det: StandardDetector,
     x_axis: Motor,
-    x_args: list[float | int],
+    x_list: list[float | int],
     y_axis: Motor,
-    y_args: list[float | int],
+    y_list: list[float | int],
     num: int,
 ):
+    docs = defaultdict(list)
+    run_engine.subscribe(lambda name, doc: docs[name].append(doc))
+
     run_engine(
-        num_rscan(detectors=[det], params={x_axis: x_args, y_axis: y_args}, num=num)
+        num_rscan(detectors=[det], params={x_axis: x_list, y_axis: y_list}, num=num)
+    )
+
+    assert_emitted(
+        docs,
+        start=1,
+        descriptor=1,
+        stream_resource=2,
+        stream_datum=num * 2,
+        event=num,
+        stop=1,
     )
 
 
 @pytest.mark.parametrize(
-    "x_args, y_args, num", ([[-1, 1], [2, 0], 0], [[-1, 1], [-1, 1], 3.5])
+    "x_list, y_list, num", ([[-1, 1], [2, 0], 0], [[-1, 1], [-1, 1], 3.5])
 )
 def test_num_rscan_fails_when_given_bad_info(
     run_engine: RunEngine,
     det: StandardDetector,
     x_axis: Motor,
-    x_args: list[float | int],
+    x_list: list[float | int],
     y_axis: Motor,
-    y_args: list[float | int],
+    y_list: list[float | int],
     num: int,
 ):
     with pytest.raises(ValueError):
         run_engine(
             num_rscan(
                 detectors=[det],
-                params={x_axis: x_args, y_axis: y_args},
+                params={x_axis: x_list, y_axis: y_list},
                 num=num,
             )
         )
 
 
 @pytest.mark.parametrize(
-    "x_args, y_args", ([[-1.1, 1.1, 5], [2.2, -2.2, 3]], [[0, 1.1, 5], [2.2, 3.3, 5]])
+    "x_list, y_list", ([[-1.1, 1.1, 5], [2.2, -2.2, 3]], [[0, 1.1, 5], [2.2, 3.3, 5]])
 )
 def test_num_grid_rscan(
     run_engine: RunEngine,
     det: StandardDetector,
     x_axis: Motor,
-    x_args: list[float | int],
+    x_list: list[float | int],
     y_axis: Motor,
-    y_args: list[float | int],
+    y_list: list[float | int],
 ):
+    docs = defaultdict(list)
+    run_engine.subscribe(lambda name, doc: docs[name].append(doc))
+    num = int(x_list[-1] * y_list[-1])
+
     run_engine(
         num_grid_rscan(
             detectors=[det],
-            params={x_axis: x_args, y_axis: y_args},
+            params={x_axis: x_list, y_axis: y_list},
         )
+    )
+
+    assert_emitted(
+        docs,
+        start=1,
+        descriptor=1,
+        stream_resource=2,
+        stream_datum=num * 2,
+        event=num,
+        stop=1,
     )
 
 
 @pytest.mark.parametrize(
-    "x_args, y_args", ([[-1.1, 1.1, 5], [2.2, -2.2, 3]], [[0, 1.1, 5], [2.2, 3.3, 5]])
+    "x_list, y_list", ([[-1.1, 1.1, 5], [2.2, -2.2, 3]], [[0, 1.1, 5], [2.2, 3.3, 5]])
 )
 def test_num_grid_rscan_when_not_snaking(
     run_engine: RunEngine,
     det: StandardDetector,
     x_axis: Motor,
-    x_args: list[float | int],
+    x_list: list[float | int],
     y_axis: Motor,
-    y_args: list[float | int],
+    y_list: list[float | int],
 ):
+    docs = defaultdict(list)
+    run_engine.subscribe(lambda name, doc: docs[name].append(doc))
+    num = int(x_list[-1] * y_list[-1])
+
     run_engine(
         num_grid_rscan(
-            detectors=[det], params={x_axis: x_args, y_axis: y_args}, snake_axes=False
+            detectors=[det], params={x_axis: x_list, y_axis: y_list}, snake_axes=False
         )
+    )
+
+    assert_emitted(
+        docs,
+        start=1,
+        descriptor=1,
+        stream_resource=2,
+        stream_datum=num * 2,
+        event=num,
+        stop=1,
     )
 
 
 @pytest.mark.parametrize(
-    "x_args, y_args", ([[-1.1, 1.1, 5], [2.2, -2.2, 3]], [[0, 1.1, 5], [2.2, 3.3, 5]])
+    "x_list, y_list", ([[-1.1, 1.1, 5], [2.2, -2.2, 3]], [[0, 1.1, 5], [2.2, 3.3, 5]])
 )
 def test_num_grid_rscan_fails_when_asked_to_snake_slow_axis(
     run_engine: RunEngine,
     det: StandardDetector,
     x_axis: Motor,
-    x_args: list[float | int],
+    x_list: list[float | int],
     y_axis: Motor,
-    y_args: list[float | int],
+    y_list: list[float | int],
 ):
     with pytest.raises(ValueError):
         run_engine(
             num_grid_rscan(
                 detectors=[det],
-                params={x_axis: x_args, y_axis: y_args},
+                params={x_axis: x_list, y_axis: y_list},
                 snake_axes=[x_axis],
             )
         )
 
 
 @pytest.mark.parametrize(
-    "x_args, y_args, grid, final_shape, final_length",
+    "x_list, y_list, grid, final_shape, final_length",
     ([[0, 1, 2], [3, 4, 5], None, [3], 4], [[0, 1, 2], [3, 4, 5, 6], True, [3, 4], 4]),
 )
 def test_make_list_scan_args(
     x_axis: Motor,
-    x_args: list,
+    x_list: list,
     y_axis: Motor,
-    y_args: list,
+    y_list: list,
     grid: bool,
     final_shape: list,
     final_length: int,
 ):
     args, shape = _make_list_scan_args(
-        params={x_axis: x_args, y_axis: y_args}, grid=grid
+        params={x_axis: x_list, y_axis: y_list}, grid=grid
     )
     assert len(args) == final_length
     assert shape == final_shape
@@ -470,7 +580,21 @@ def test_list_scan(
     x_axis: Motor,
     x_list: list,
 ):
+    docs = defaultdict(list)
+    run_engine.subscribe(lambda name, doc: docs[name].append(doc))
+    num = int(len(x_list))
+
     run_engine(list_scan(detectors=[det], params={x_axis: x_list}))
+
+    assert_emitted(
+        docs,
+        start=1,
+        descriptor=1,
+        stream_resource=2,
+        stream_datum=num * 2,
+        event=num,
+        stop=1,
+    )
 
 
 @pytest.mark.parametrize(
@@ -488,7 +612,21 @@ def test_list_scan_with_two_axes(
     y_axis: Motor,
     y_list: list,
 ):
+    docs = defaultdict(list)
+    run_engine.subscribe(lambda name, doc: docs[name].append(doc))
+    num = int(len(x_list))
+
     run_engine(list_scan(detectors=[det], params={x_axis: x_list, y_axis: y_list}))
+
+    assert_emitted(
+        docs,
+        start=1,
+        descriptor=1,
+        stream_resource=2,
+        stream_datum=num * 2,
+        event=num,
+        stop=1,
+    )
 
 
 def test_list_scan_fails_with_differnt_list_lengths(
@@ -521,14 +659,42 @@ def test_list_grid_scan(
     y_axis: Motor,
     y_list: list,
 ):
+    docs = defaultdict(list)
+    run_engine.subscribe(lambda name, doc: docs[name].append(doc))
+    num = int(len(x_list) * len(y_list))
+
     run_engine(list_grid_scan(detectors=[det], params={x_axis: x_list, y_axis: y_list}))
+
+    assert_emitted(
+        docs,
+        start=1,
+        descriptor=1,
+        stream_resource=2,
+        stream_datum=num * 2,
+        event=num,
+        stop=1,
+    )
 
 
 @pytest.mark.parametrize("x_list", ([0, 1, 2, 3], [1.1, 2.2, 3.3]))
 def test_list_rscan(
     run_engine: RunEngine, det: StandardDetector, x_axis: Motor, x_list: list
 ):
+    docs = defaultdict(list)
+    run_engine.subscribe(lambda name, doc: docs[name].append(doc))
+    num = int(len(x_list))
+
     run_engine(list_rscan(detectors=[det], params={x_axis: x_list}))
+
+    assert_emitted(
+        docs,
+        start=1,
+        descriptor=1,
+        stream_resource=2,
+        stream_datum=num * 2,
+        event=num,
+        stop=1,
+    )
 
 
 @pytest.mark.parametrize(
@@ -546,7 +712,21 @@ def test_list_rscan_with_two_axes(
     y_axis: Motor,
     y_list: list,
 ):
+    docs = defaultdict(list)
+    run_engine.subscribe(lambda name, doc: docs[name].append(doc))
+    num = int(len(x_list))
+
     run_engine(list_rscan(detectors=[det], params={x_axis: x_list, y_axis: y_list}))
+
+    assert_emitted(
+        docs,
+        start=1,
+        descriptor=1,
+        stream_resource=2,
+        stream_datum=num * 2,
+        event=num,
+        stop=1,
+    )
 
 
 def test_list_rscan_fails_with_differnt_list_lengths(
@@ -579,8 +759,22 @@ def test_list_grid_rscan(
     y_axis: Motor,
     y_list: list,
 ):
+    docs = defaultdict(list)
+    run_engine.subscribe(lambda name, doc: docs[name].append(doc))
+    num = int(len(x_list) * len(y_list))
+
     run_engine(
         list_grid_rscan(detectors=[det], params={x_axis: x_list, y_axis: y_list})
+    )
+
+    assert_emitted(
+        docs,
+        start=1,
+        descriptor=1,
+        stream_resource=2,
+        stream_datum=num * 2,
+        event=num,
+        stop=1,
     )
 
 
@@ -627,7 +821,7 @@ def test_make_stepped_list_fails_when_given_equal_start_and_stop_values():
 
 
 @pytest.mark.parametrize(
-    "x_args, y_args, grid, final_shape, final_length",
+    "x_list, y_list, grid, final_shape, final_length",
     (
         [[0, 1, 0.25], [0, 0.1], None, [5], 4],
         [[0, 1, 0.25], [0, 1, 0.2], True, [5, 6], 4],
@@ -637,15 +831,15 @@ def test_make_stepped_list_fails_when_given_equal_start_and_stop_values():
 )
 def test_make_step_scan_args(
     x_axis: Motor,
-    x_args: list,
+    x_list: list,
     y_axis: Motor,
-    y_args: list,
+    y_list: list,
     grid: bool | None,
     final_shape: list,
     final_length: int,
 ):
     args, shape = _make_step_scan_args(
-        params={x_axis: x_args, y_axis: y_args}, grid=grid
+        params={x_axis: x_list, y_axis: y_list}, grid=grid
     )
     assert shape == final_shape
     assert len(args) == final_length
@@ -654,7 +848,7 @@ def test_make_step_scan_args(
 
 
 @pytest.mark.parametrize(
-    "x_args, y_args, z_args, grid",
+    "x_list, y_list, z_list, grid",
     (
         [[0, 1], [0, 0.2], [0, 0.5], None],
         [[0, 1, 0.25], [0, 0.2], [0, 1, 0.2, 0.5], None],
@@ -664,182 +858,306 @@ def test_make_step_scan_args(
 )
 def test_make_step_scan_args_fails_when_given_incorrect_number_of_parameters(
     x_axis: Motor,
-    x_args: list,
+    x_list: list,
     y_axis: Motor,
-    y_args: list,
+    y_list: list,
     z_axis: Motor,
-    z_args: list,
+    z_list: list,
     grid: bool | None,
 ):
     with pytest.raises(ValueError):
         _make_step_scan_args(
-            params={x_axis: x_args, y_axis: y_args, z_axis: z_args}, grid=grid
+            params={x_axis: x_list, y_axis: y_list, z_axis: z_list}, grid=grid
         )
 
 
-@pytest.mark.parametrize("x_args", ([0, 1, 0.1], [-1, 1, 0.1], [0, 10, 1]))
+@pytest.mark.parametrize(
+    "x_list, num", ([[0, 1, 0.1], 11], [[-1, 1, 0.1], 21], [[0, 10, 1], 11])
+)
 def test_step_scan(
     run_engine: RunEngine,
     det: StandardDetector,
     x_axis: Motor,
-    x_args: list,
+    x_list: list,
+    num,
 ):
-    run_engine(step_scan(detectors=[det], params={x_axis: x_args}))
+    docs = defaultdict(list)
+    run_engine.subscribe(lambda name, doc: docs[name].append(doc))
+
+    run_engine(step_scan(detectors=[det], params={x_axis: x_list}))
+
+    assert_emitted(
+        docs,
+        start=1,
+        descriptor=1,
+        stream_resource=2,
+        stream_datum=num * 2,
+        event=num,
+        stop=1,
+    )
 
 
 @pytest.mark.parametrize(
-    "x_args, y_args",
-    ([[0, 1, 0.25], [0, 0.1]], [[-1, 1, 0.25], [-1, 0.1]], [[0, 10, 2.5], [0, 1]]),
+    "x_list, y_list, num",
+    (
+        [[0, 1, 0.25], [0, 0.1], 5],
+        [[-1, 1, 0.25], [-1, 0.1], 9],
+        [[0, 10, 2.5], [0, 1], 5],
+    ),
 )
 def test_step_scan_with_multiple_axes(
     run_engine: RunEngine,
     det: StandardDetector,
     x_axis: Motor,
-    x_args: list,
+    x_list: list,
     y_axis: Motor,
-    y_args: list,
+    y_list: list,
+    num,
 ):
-    run_engine(step_scan(detectors=[det], params={x_axis: x_args, y_axis: y_args}))
+    docs = defaultdict(list)
+    run_engine.subscribe(lambda name, doc: docs[name].append(doc))
+
+    run_engine(step_scan(detectors=[det], params={x_axis: x_list, y_axis: y_list}))
+
+    assert_emitted(
+        docs,
+        start=1,
+        descriptor=1,
+        stream_resource=2,
+        stream_datum=num * 2,
+        event=num,
+        stop=1,
+    )
 
 
 @pytest.mark.parametrize(
-    "x_args, y_args",
+    "x_list, y_list, num",
     (
-        [[0, 1, 0.25], [0, 2, 0.5]],
-        [[-1, 1, 0.25], [1, -1, -0.5]],
-        [[0, 10, 2.5], [0, -10, -2.5]],
+        [[0, 1, 0.25], [0, 2, 0.5], 25],
+        [[-1, 1, 0.25], [1, -1, -0.5], 45],
+        [[0, 10, 2.5], [0, -10, -2.5], 25],
     ),
 )
 def test_step_grid_scan(
     run_engine: RunEngine,
     det: StandardDetector,
     x_axis: Motor,
-    x_args: list,
+    x_list: list,
     y_axis: Motor,
-    y_args: list,
+    y_list: list,
+    num,
 ):
-    run_engine(step_grid_scan(detectors=[det], params={x_axis: x_args, y_axis: y_args}))
+    docs = defaultdict(list)
+    run_engine.subscribe(lambda name, doc: docs[name].append(doc))
+
+    run_engine(step_grid_scan(detectors=[det], params={x_axis: x_list, y_axis: y_list}))
+
+    assert_emitted(
+        docs,
+        start=1,
+        descriptor=1,
+        stream_resource=2,
+        stream_datum=num * 2,
+        event=num,
+        stop=1,
+    )
 
 
 @pytest.mark.parametrize(
-    "x_args, y_args",
+    "x_list, y_list, num",
     (
-        [[0, 1, 0.25], [0, 2, 0.5]],
-        [[-1, 1, 0.25], [1, -1, -0.5]],
+        [[0, 1, 0.25], [0, 2, 0.5], 25],
+        [[-1, 1, 0.25], [1, -1, -0.5], 45],
     ),
 )
 def test_step_grid_scan_when_not_snaking(
     run_engine: RunEngine,
     det: StandardDetector,
     x_axis: Motor,
-    x_args: list,
+    x_list: list,
     y_axis: Motor,
-    y_args: list,
+    y_list: list,
+    num,
 ):
+    docs = defaultdict(list)
+    run_engine.subscribe(lambda name, doc: docs[name].append(doc))
+
     run_engine(
         step_grid_scan(
-            detectors=[det], params={x_axis: x_args, y_axis: y_args}, snake_axes=False
+            detectors=[det], params={x_axis: x_list, y_axis: y_list}, snake_axes=False
         )
+    )
+
+    assert_emitted(
+        docs,
+        start=1,
+        descriptor=1,
+        stream_resource=2,
+        stream_datum=num * 2,
+        event=num,
+        stop=1,
     )
 
 
 @pytest.mark.parametrize(
-    "x_args, y_args", ([[0, 1, 0.1], [0, 1, 0.1, 1]], [[0, 1, 0.1], [0]])
+    "x_list, y_list", ([[0, 1, 0.1], [0, 1, 0.1, 1]], [[0, 1, 0.1], [0]])
 )
 def test_step_grid_scan_fails_when_given_incorrect_number_of_params(
     run_engine: RunEngine,
     det: StandardDetector,
     x_axis: Motor,
-    x_args: list,
+    x_list: list,
     y_axis: Motor,
-    y_args: list,
+    y_list: list,
 ):
     with pytest.raises(ValueError):
         run_engine(
-            step_grid_scan(detectors=[det], params={x_axis: x_args, y_axis: y_args})
+            step_grid_scan(detectors=[det], params={x_axis: x_list, y_axis: y_list})
         )
 
 
-@pytest.mark.parametrize("x_args", ([0, 1, 0.1], [-1, 1, 0.1], [0, 10, 1]))
+@pytest.mark.parametrize(
+    "x_list, num", ([[0, 1, 0.1], 11], [[-1, 1, 0.1], 21], [[0, 10, 1], 11])
+)
 def test_step_rscan(
     run_engine: RunEngine,
     det: StandardDetector,
     x_axis: Motor,
-    x_args: list,
+    x_list: list,
+    num,
 ):
-    run_engine(step_rscan(detectors=[det], params={x_axis: x_args}))
+    docs = defaultdict(list)
+    run_engine.subscribe(lambda name, doc: docs[name].append(doc))
+
+    run_engine(step_rscan(detectors=[det], params={x_axis: x_list}))
+
+    assert_emitted(
+        docs,
+        start=1,
+        descriptor=1,
+        stream_resource=2,
+        stream_datum=num * 2,
+        event=num,
+        stop=1,
+    )
 
 
 @pytest.mark.parametrize(
-    "x_args, y_args",
-    ([[0, 1, 0.25], [0, 0.1]], [[-1, 1, 0.25], [-1, 0.1]], [[0, 10, 2.5], [0, 1]]),
+    "x_list, y_list, num",
+    (
+        [[0, 1, 0.25], [0, 0.1], 5],
+        [[-1, 1, 0.25], [-1, 0.1], 9],
+        [[0, 10, 2.5], [0, 1], 5],
+    ),
 )
 def test_step_rscan_with_multiple_axes(
     run_engine: RunEngine,
     det: StandardDetector,
     x_axis: Motor,
-    x_args: list,
+    x_list: list,
     y_axis: Motor,
-    y_args: list,
+    y_list: list,
+    num,
 ):
-    run_engine(step_rscan(detectors=[det], params={x_axis: x_args, y_axis: y_args}))
+    docs = defaultdict(list)
+    run_engine.subscribe(lambda name, doc: docs[name].append(doc))
+
+    run_engine(step_rscan(detectors=[det], params={x_axis: x_list, y_axis: y_list}))
+
+    assert_emitted(
+        docs,
+        start=1,
+        descriptor=1,
+        stream_resource=2,
+        stream_datum=num * 2,
+        event=num,
+        stop=1,
+    )
 
 
 @pytest.mark.parametrize(
-    "x_args, y_args",
+    "x_list, y_list, num",
     (
-        [[0, 1, 0.25], [0, 2, 0.5]],
-        [[-1, 1, 0.25], [1, -1, -0.5]],
-        [[0, 10, 2.5], [0, -10, -2.5]],
+        [[0, 1, 0.25], [0, 2, 0.5], 25],
+        [[-1, 1, 0.25], [1, -1, -0.5], 45],
+        [[0, 10, 2.5], [0, -10, -2.5], 25],
     ),
 )
 def test_step_grid_rscan(
     run_engine: RunEngine,
     det: StandardDetector,
     x_axis: Motor,
-    x_args: list,
+    x_list: list,
     y_axis: Motor,
-    y_args: list,
+    y_list: list,
+    num,
 ):
+    docs = defaultdict(list)
+    run_engine.subscribe(lambda name, doc: docs[name].append(doc))
+
     run_engine(
-        step_grid_rscan(detectors=[det], params={x_axis: x_args, y_axis: y_args})
+        step_grid_rscan(detectors=[det], params={x_axis: x_list, y_axis: y_list})
+    )
+
+    assert_emitted(
+        docs,
+        start=1,
+        descriptor=1,
+        stream_resource=2,
+        stream_datum=num * 2,
+        event=num,
+        stop=1,
     )
 
 
 @pytest.mark.parametrize(
-    "x_args, y_args",
+    "x_list, y_list, num",
     (
-        [[0, 1, 0.25], [0, 2, 0.5]],
-        [[-1, 1, 0.25], [1, -1, -0.5]],
+        [[0, 1, 0.25], [0, 2, 0.5], 25],
+        [[-1, 1, 0.25], [1, -1, -0.5], 45],
     ),
 )
 def test_step_grid_rscan_when_not_snaking(
     run_engine: RunEngine,
     det: StandardDetector,
     x_axis: Motor,
-    x_args: list,
+    x_list: list,
     y_axis: Motor,
-    y_args: list,
+    y_list: list,
+    num,
 ):
+    docs = defaultdict(list)
+    run_engine.subscribe(lambda name, doc: docs[name].append(doc))
+
     run_engine(
         step_grid_rscan(
-            detectors=[det], params={x_axis: x_args, y_axis: y_args}, snake_axes=False
+            detectors=[det], params={x_axis: x_list, y_axis: y_list}, snake_axes=False
         )
+    )
+
+    assert_emitted(
+        docs,
+        start=1,
+        descriptor=1,
+        stream_resource=2,
+        stream_datum=num * 2,
+        event=num,
+        stop=1,
     )
 
 
 @pytest.mark.parametrize(
-    "x_args, y_args", ([[0, 1, 0.1], [0, 1, 0.1, 1]], [[0, 1, 0.1], [0]])
+    "x_list, y_list", ([[0, 1, 0.1], [0, 1, 0.1, 1]], [[0, 1, 0.1], [0]])
 )
 def test_step_grid_rscan_fails_when_given_incorrect_number_of_params(
     run_engine: RunEngine,
     det: StandardDetector,
     x_axis: Motor,
-    x_args: list,
+    x_list: list,
     y_axis: Motor,
-    y_args: list,
+    y_list: list,
 ):
     with pytest.raises(ValueError):
         run_engine(
-            step_grid_rscan(detectors=[det], params={x_axis: x_args, y_axis: y_args})
+            step_grid_rscan(detectors=[det], params={x_axis: x_list, y_axis: y_list})
         )
