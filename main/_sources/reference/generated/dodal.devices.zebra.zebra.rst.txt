@@ -23,6 +23,7 @@ dodal.devices.zebra.zebra
    ~zebra.I03Axes
    ~zebra.I23Axes
    ~zebra.I24Axes
+   ~zebra.InstantArmMock
    ~zebra.LogicGateConfiguration
    ~zebra.LogicGateConfigurer
    ~zebra.PositionCompare
