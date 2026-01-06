@@ -3,7 +3,7 @@ from unittest.mock import MagicMock, patch
 
 import numpy as np
 import pytest
-from daq_config_server.converters.models import GenericLookupTable
+from daq_config_server.models import UndulatorEnergyGapLookupTable
 from ophyd_async.core import AsyncStatus, get_mock_put, init_devices, set_mock_value
 
 from dodal.common.enums import EnabledDisabledUpper
@@ -97,8 +97,7 @@ async def test_if_gap_is_wrong_then_logger_info_is_called_and_gap_is_set_correct
     mock_logger: MagicMock,
     fake_undulator_dcm: UndulatorDCM,
 ):
-    mock_get_file_contents.return_value = GenericLookupTable(
-        column_names=["energy_eV", "gap_mm"],
+    mock_get_file_contents.return_value = UndulatorEnergyGapLookupTable(
         rows=[
             [5700, 5.4606],
             [7000, 6.045],

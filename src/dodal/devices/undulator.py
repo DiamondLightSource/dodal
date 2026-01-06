@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 import numpy as np
 from bluesky.protocols import Locatable, Location, Movable
 from daq_config_server.client import ConfigServer
-from daq_config_server.converters.models import GenericLookupTable
+from daq_config_server.models import UndulatorEnergyGapLookupTable
 from numpy import ndarray
 from ophyd_async.core import (
     AsyncStatus,
@@ -212,7 +212,9 @@ class UndulatorInKeV(BaseUndulator):
         """
 
         energy_to_distance_table = self.config_server.get_file_contents(
-            self.id_gap_lookup_table_path, GenericLookupTable, reset_cached_result=True
+            self.id_gap_lookup_table_path,
+            UndulatorEnergyGapLookupTable,
+            reset_cached_result=True,
         )
 
         # Use the lookup table to get the undulator gap associated with this dcm energy
