@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.insertion_device &#8212; dodal 1.68.1.dev5+g00af332b8 documentation</title>
+    <title>dodal.devices.insertion_device &#8212; dodal 1.68.1.dev6+g6ca1b6eb4 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=dc658ff4"></script>
+    <script src="../../_static/documentation_options.js?v=7c6e28ca"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -800,6 +800,8 @@
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.insertion_device.EnergyMotorLookup.html">dodal.devices.insertion_device.EnergyMotorLookup</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.insertion_device.ConfigServerEnergyMotorLookup.html">dodal.devices.insertion_device.ConfigServerEnergyMotorLookup</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.insertion_device.EnergyMotorConvertor.html">dodal.devices.insertion_device.EnergyMotorConvertor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.insertion_device.UnstoppableMotor.html">dodal.devices.insertion_device.UnstoppableMotor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.insertion_device.InsertionDeviceEnergyBase.html">dodal.devices.insertion_device.InsertionDeviceEnergyBase</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.ipin.html">dodal.devices.ipin</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -1106,7 +1108,7 @@
 <td><p>The latest Apple2 version allows unrestricted motor movement.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.insertion_device.UndulatorGap.html#dodal.devices.insertion_device.UndulatorGap" title="dodal.devices.insertion_device.UndulatorGap"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UndulatorGap</span></code></a></p></td>
-<td><p>A device with a collection of epics signals to set Apple 2 undulator gap motion.</p></td>
+<td><p>Apple 2 undulator gap motor device.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.insertion_device.UndulatorPhaseAxes.html#dodal.devices.insertion_device.UndulatorPhaseAxes" title="dodal.devices.insertion_device.UndulatorPhaseAxes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UndulatorPhaseAxes</span></code></a></p></td>
 <td><p>A collection of 4 phase Motor to make up the full id phase motion. We are using the diamond pv convention. e.g. top_outer == Q1      top_inner == Q2      btm_inner == q3      btm_outer == q4.</p></td>
@@ -1115,10 +1117,10 @@
 <td><p>A JawPhase movable, this is use for moving the jaw phase which is use to control the linear arbitrary polarisation but only on some of the beamline.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.insertion_device.Apple2Val.html#dodal.devices.insertion_device.Apple2Val" title="dodal.devices.insertion_device.Apple2Val"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Apple2Val</span></code></a></p></td>
-<td><p>Apple2Val(gap: str, phase: dodal.devices.insertion_device.apple2_undulator.Apple2LockedPhasesVal | dodal.devices.insertion_device.apple2_undulator.Apple2PhasesVal)</p></td>
+<td><p>Apple2Val(gap: float, phase: dodal.devices.insertion_device.apple2_undulator.Apple2LockedPhasesVal | dodal.devices.insertion_device.apple2_undulator.Apple2PhasesVal)</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.insertion_device.Apple2PhasesVal.html#dodal.devices.insertion_device.Apple2PhasesVal" title="dodal.devices.insertion_device.Apple2PhasesVal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Apple2PhasesVal</span></code></a></p></td>
-<td><p>Apple2PhasesVal(top_outer: str, btm_inner: str, top_inner: str, btm_outer: str)</p></td>
+<td><p>Apple2PhasesVal(top_outer: float, btm_inner: float, top_inner: float, btm_outer: float)</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.insertion_device.LookupTable.html#dodal.devices.insertion_device.LookupTable" title="dodal.devices.insertion_device.LookupTable"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LookupTable</span></code></a></p></td>
 <td><p>Specialised lookup table for insertion devices to relate the energy and polarisation values to Apple2 motor positions.</p></td>
@@ -1151,7 +1153,7 @@
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.insertion_device.Apple2LockedPhasesVal.html#dodal.devices.insertion_device.Apple2LockedPhasesVal" title="dodal.devices.insertion_device.Apple2LockedPhasesVal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Apple2LockedPhasesVal</span></code></a></p></td>
-<td><p>Apple2LockedPhasesVal(top_outer: str, btm_inner: str)</p></td>
+<td><p>Apple2LockedPhasesVal(top_outer: float, btm_inner: float)</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.insertion_device.EnergyMotorLookup.html#dodal.devices.insertion_device.EnergyMotorLookup" title="dodal.devices.insertion_device.EnergyMotorLookup"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EnergyMotorLookup</span></code></a></p></td>
 <td><p>Handles a lookup table for Apple2 ID, converting energy/polarisation to a motor position.</p></td>
@@ -1161,6 +1163,12 @@
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.insertion_device.EnergyMotorConvertor.html#dodal.devices.insertion_device.EnergyMotorConvertor" title="dodal.devices.insertion_device.EnergyMotorConvertor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EnergyMotorConvertor</span></code></a></p></td>
 <td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.insertion_device.UnstoppableMotor.html#dodal.devices.insertion_device.UnstoppableMotor" title="dodal.devices.insertion_device.UnstoppableMotor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UnstoppableMotor</span></code></a></p></td>
+<td><p>A motor that does not support stop.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.insertion_device.InsertionDeviceEnergyBase.html#dodal.devices.insertion_device.InsertionDeviceEnergyBase" title="dodal.devices.insertion_device.InsertionDeviceEnergyBase"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InsertionDeviceEnergyBase</span></code></a></p></td>
+<td><p>Base class for ID energy movable device.</p></td>
 </tr>
 </tbody>
 </table>

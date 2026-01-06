@@ -36,6 +36,8 @@ dodal.devices.insertion\_device
    ~insertion_device.EnergyMotorLookup
    ~insertion_device.ConfigServerEnergyMotorLookup
    ~insertion_device.EnergyMotorConvertor
+   ~insertion_device.UnstoppableMotor
+   ~insertion_device.InsertionDeviceEnergyBase
 
 
 

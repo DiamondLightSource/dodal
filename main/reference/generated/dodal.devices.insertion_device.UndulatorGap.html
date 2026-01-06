@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.insertion_device.UndulatorGap &#8212; dodal 1.68.1.dev5+g00af332b8 documentation</title>
+    <title>dodal.devices.insertion_device.UndulatorGap &#8212; dodal 1.68.1.dev6+g6ca1b6eb4 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=dc658ff4"></script>
+    <script src="../../_static/documentation_options.js?v=7c6e28ca"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -800,6 +800,8 @@
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.insertion_device.EnergyMotorLookup.html">dodal.devices.insertion_device.EnergyMotorLookup</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.insertion_device.ConfigServerEnergyMotorLookup.html">dodal.devices.insertion_device.ConfigServerEnergyMotorLookup</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.insertion_device.EnergyMotorConvertor.html">dodal.devices.insertion_device.EnergyMotorConvertor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.insertion_device.UnstoppableMotor.html">dodal.devices.insertion_device.UnstoppableMotor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.insertion_device.InsertionDeviceEnergyBase.html">dodal.devices.insertion_device.InsertionDeviceEnergyBase</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.ipin.html">dodal.devices.ipin</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -1099,10 +1101,7 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="dodal.devices.insertion_device.UndulatorGap">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dodal.devices.insertion_device.</span></span><span class="sig-name descname"><span class="pre">UndulatorGap</span></span><a class="reference internal" href="../../_modules/dodal/devices/insertion_device/apple2_undulator.html#UndulatorGap"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.insertion_device.UndulatorGap" title="Link to this definition">#</a></dt>
-<dd><p>A device with a collection of epics signals to set Apple 2 undulator gap motion.
-Only PV used by beamline are added the full list is here:
-/dls_sw/work/R3.14.12.7/support/insertionDevice/db/IDGapVelocityControl.template
-/dls_sw/work/R3.14.12.7/support/insertionDevice/db/IDPhaseSoftMotor.template</p>
+<dd><p>Apple 2 undulator gap motor device. With PV corrections.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1119,7 +1118,10 @@ Only PV used by beamline are added the full list is here:
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_timeout</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_demand_positions</span></code>(value)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#dodal.devices.insertion_device.UndulatorGap.prepare" title="dodal.devices.insertion_device.UndulatorGap.prepare"><code class="xref py py-obj docutils literal notranslate"><span class="pre">prepare</span></code></a>(value)</p></td>
+<td><p>Prepare for a fly scan by moving to the run-up position at max velocity.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_demand_positions</span></code>(value)</p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -1128,9 +1130,33 @@ Only PV used by beamline are added the full list is here:
 <p class="rubric">Attributes</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dodal.devices.insertion_device.UndulatorGap.user_setpoint" title="dodal.devices.insertion_device.UndulatorGap.user_setpoint"><code class="xref py py-obj docutils literal notranslate"><span class="pre">user_setpoint</span></code></a></p></td>
+<td><p>Clear the motor config_signal as we need new PV for velocity.</p></td>
+</tr>
 </tbody>
 </table>
 </div>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="dodal.devices.insertion_device.UndulatorGap.user_setpoint">
+<span class="sig-name descname"><span class="pre">user_setpoint</span></span><a class="headerlink" href="#dodal.devices.insertion_device.UndulatorGap.user_setpoint" title="Link to this definition">#</a></dt>
+<dd><p>Clear the motor config_signal as we need new PV for velocity.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dodal.devices.insertion_device.UndulatorGap.prepare">
+<span class="sig-name descname"><span class="pre">prepare</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">FlyMotorInfo</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../_modules/dodal/devices/insertion_device/apple2_undulator.html#UndulatorGap.prepare"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.insertion_device.UndulatorGap.prepare" title="Link to this definition">#</a></dt>
+<dd><p>Prepare for a fly scan by moving to the run-up position at max velocity.
+Stores fly info for later use in kickoff.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>value</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">FlyMotorInfo</span></code></span>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 </section>
@@ -1182,7 +1208,11 @@ Only PV used by beamline are added the full list is here:
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.insertion_device.UndulatorGap"><code class="docutils literal notranslate"><span class="pre">UndulatorGap</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.insertion_device.UndulatorGap"><code class="docutils literal notranslate"><span class="pre">UndulatorGap</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.insertion_device.UndulatorGap.user_setpoint"><code class="docutils literal notranslate"><span class="pre">UndulatorGap.user_setpoint</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.insertion_device.UndulatorGap.prepare"><code class="docutils literal notranslate"><span class="pre">UndulatorGap.prepare()</span></code></a></li>
+</ul>
+</li>
 </ul>
   </nav></div>
 
