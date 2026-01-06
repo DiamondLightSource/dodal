@@ -1,9 +1,16 @@
 import re
+from unittest.mock import MagicMock, patch
 
 import pytest
-from ophyd_async.core import DetectorTrigger, PathProvider, TriggerInfo, init_devices
+from ophyd_async.core import (
+    DetectorTrigger,
+    PathProvider,
+    TriggerInfo,
+    callback_on_mock_put,
+    init_devices,
+    set_mock_value,
+)
 from ophyd_async.epics.adcore import ADFileWriteMode
-from ophyd_async.testing import callback_on_mock_put, set_mock_value
 
 from dodal.devices.tetramm import (
     TetrammChannels,
@@ -252,7 +259,7 @@ async def test_error_if_armed_without_exposure(tetramm_controller: TetrammContro
         )
 
 
-async def test_pilatus_controller(
+async def test_tetramm_controller(
     tetramm: TetrammDetector,
     tetramm_controller: TetrammController,
 ):
@@ -275,11 +282,8 @@ async def test_pilatus_controller(
 
 
 async def test_tetramm_unstage(tetramm_controller: TetrammController):
-    set_mock_value(tetramm_controller.driver.acquire, True)
     set_mock_value(tetramm_controller._file_io.acquire, True)
-
     await tetramm_controller.unstage()
-    assert await tetramm_controller.driver.acquire.get_value() is False
     assert await tetramm_controller._file_io.acquire.get_value() is False
 
 
@@ -308,3 +312,12 @@ async def assert_armed(driver: TetrammDriver) -> None:
     assert (await driver.acquire.get_value()) == 1
 
     assert (await driver.averaging_time.get_value()) == averaging_time
+
+
+@patch("dodal.devices.tetramm.stop_busy_record")
+async def test_tetramm_disarm_calls_stop_busy_recording(
+    stop_busy_record_mock: MagicMock,
+    tetramm_controller: TetrammController,
+):
+    await tetramm_controller.disarm()
+    stop_busy_record_mock.assert_called_once()

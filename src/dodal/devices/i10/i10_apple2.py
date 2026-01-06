@@ -1,12 +1,7 @@
-import csv
-import io
-from dataclasses import dataclass
-from pathlib import Path
-from typing import Any, SupportsFloat
+from typing import SupportsFloat
 
 import numpy as np
 from bluesky.protocols import Movable
-from daq_config_server.client import ConfigServer
 from ophyd_async.core import (
     AsyncStatus,
     Reference,
@@ -15,308 +10,30 @@ from ophyd_async.core import (
     derived_signal_rw,
     soft_signal_rw,
 )
-from pydantic import BaseModel, ConfigDict, RootModel
 
-from dodal.devices.apple2_undulator import (
+from dodal.devices.insertion_device import (
+    MAXIMUM_MOVE_TIME,
     Apple2,
     Apple2Controller,
+    Apple2PhasesVal,
     Apple2Val,
-    Pol,
     UndulatorGap,
     UndulatorJawPhase,
     UndulatorPhaseAxes,
 )
-from dodal.log import LOGGER
+from dodal.devices.insertion_device.energy_motor_lookup import EnergyMotorLookup
+from dodal.devices.insertion_device.enum import Pol
 
 ROW_PHASE_MOTOR_TOLERANCE = 0.004
 MAXIMUM_ROW_PHASE_MOTOR_POSITION = 24.0
 MAXIMUM_GAP_MOTOR_POSITION = 100
 DEFAULT_JAW_PHASE_POLY_PARAMS = [1.0 / 7.5, -120.0 / 7.5]
 ALPHA_OFFSET = 180
-MAXIMUM_MOVE_TIME = 550  # There is no useful movements take longer than this.
 
 
-# data class to store the lookup table configuration that is use in convert_csv_to_lookup
-@dataclass
-class LookupPath:
-    Gap: Path
-    Phase: Path
+class I10Apple2(Apple2[UndulatorPhaseAxes]):
+    """I10Apple2 device is an apple2 with extra jaw phase motor."""
 
-
-@dataclass
-class LookupTableConfig:
-    path: LookupPath
-    source: tuple[str, str]
-    mode: str | None
-    min_energy: str | None
-    max_energy: str | None
-    poly_deg: list | None
-
-
-class EnergyMinMax(BaseModel):
-    Minimum: float
-    Maximum: float
-
-
-class EnergyCoverageEntry(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True)
-    Low: float
-    High: float
-    Poly: np.poly1d
-
-
-class EnergyCoverage(RootModel):
-    root: dict[str, EnergyCoverageEntry]
-
-
-class LookupTableEntries(BaseModel):
-    Energies: EnergyCoverage
-    Limit: EnergyMinMax
-
-
-class Lookuptable(RootModel):
-    """BaseModel class for the lookup table.
-    Apple2 lookup table should be in this format.
-
-    {mode: {'Energies': {Any: {'Low': float,
-                            'High': float,
-                            'Poly':np.poly1d
-                            }
-                        }
-            'Limit': {'Minimum': float,
-                    'Maximum': float
-                    }
-        }
-    }
-    """
-
-    root: dict[str, LookupTableEntries]
-
-
-class I10EnergyMotorLookup:
-    """
-    Handles lookup tables for I10 Apple2 ID, converting energy and polarisation to gap
-     and phase. Fetches and parses lookup tables from a config server, supports dynamic
-     updates, and validates input.
-    """
-
-    def __init__(
-        self,
-        lookuptable_dir: str,
-        source: tuple[str, str],
-        config_client: ConfigServer,
-        mode: str = "Mode",
-        min_energy: str = "MinEnergy",
-        max_energy: str = "MaxEnergy",
-        gap_file_name: str = "IDEnergy2GapCalibrations.csv",
-        phase_file_name: str = "IDEnergy2PhaseCalibrations.csv",
-        poly_deg: list | None = None,
-    ):
-        """Initialise the I10EnergyMotorLookup class with lookup table headers provided.
-
-        Parameters
-        ----------
-        look_up_table_dir:
-            The path to look up table.
-        source:
-            The column name and the name of the source in look up table. e.g. ( "source", "idu")
-        config_client:
-            The config server client to fetch the look up table.
-        mode:
-            The column name of the mode in look up table.
-        min_energy:
-            The column name that contain the maximum energy in look up table.
-        max_energy:
-            The column name that contain the maximum energy in look up table.
-        poly_deg:
-            The column names for the parameters for the energy conversion polynomial, starting with the least significant.
-
-        """
-        self.lookup_tables: dict[str, dict[str | None, dict[str, dict[str, Any]]]] = {
-            "Gap": {},
-            "Phase": {},
-        }
-        energy_gap_table_path = Path(lookuptable_dir, gap_file_name)
-        energy_phase_table_path = Path(lookuptable_dir, phase_file_name)
-        self.lookup_table_config = LookupTableConfig(
-            path=LookupPath(Gap=energy_gap_table_path, Phase=energy_phase_table_path),
-            source=source,
-            mode=mode,
-            min_energy=min_energy,
-            max_energy=max_energy,
-            poly_deg=poly_deg,
-        )
-        self.config_client = config_client
-        self._available_pol = []
-
-    @property
-    def available_pol(self) -> list[str | None]:
-        return self._available_pol
-
-    @available_pol.setter
-    def available_pol(self, value: list[str | None]) -> None:
-        self._available_pol = value
-
-    def update_lookuptable(self):
-        """
-        Update lookup tables from files and validate their format.
-        """
-        LOGGER.info("Updating lookup dictionary from file.")
-        for key, path in self.lookup_table_config.path.__dict__.items():
-            self.lookup_tables[key] = self.convert_csv_to_lookup(
-                file=path,
-                source=self.lookup_table_config.source,
-                mode=self.lookup_table_config.mode,
-                min_energy=self.lookup_table_config.min_energy,
-                max_energy=self.lookup_table_config.max_energy,
-                poly_deg=self.lookup_table_config.poly_deg,
-            )
-            Lookuptable.model_validate(self.lookup_tables[key])
-
-        self.available_pol = list(self.lookup_tables["Gap"].keys())
-
-    def get_motor_from_energy(self, energy: float, pol: Pol) -> tuple[float, float]:
-        """
-        Convert energy and polarisation to gap and phase motor positions.
-
-        Parameters
-        ----------
-        energy : float
-            Desired energy in eV.
-        pol : Pol
-            Polarisation mode.
-
-        Returns
-        -------
-        tuple[float, float]
-            (gap, phase) motor positions.
-
-        """
-        if self.available_pol == []:
-            self.update_lookuptable()
-
-        gap_poly = self._get_poly(
-            lookup_table=self.lookup_tables["Gap"], energy=energy, pol=pol
-        )
-        phase_poly = self._get_poly(
-            lookup_table=self.lookup_tables["Phase"], energy=energy, pol=pol
-        )
-        return gap_poly(energy), phase_poly(energy)
-
-    def _get_poly(
-        self,
-        energy: float,
-        pol: Pol,
-        lookup_table: dict[str | None, dict[str, dict[str, Any]]],
-    ) -> np.poly1d:
-        """
-        Get polynomial for a given energy and polarisation.
-
-        Raises
-        ------
-        ValueError
-            If energy is out of bounds or coefficients are missing.
-        """
-        if (
-            energy < lookup_table[pol]["Limit"]["Minimum"]
-            or energy > lookup_table[pol]["Limit"]["Maximum"]
-        ):
-            raise ValueError(
-                "Demanding energy must lie between {} and {} eV!".format(
-                    lookup_table[pol]["Limit"]["Minimum"],
-                    lookup_table[pol]["Limit"]["Maximum"],
-                )
-            )
-        else:
-            for energy_range in lookup_table[pol]["Energies"].values():
-                if energy >= energy_range["Low"] and energy < energy_range["High"]:
-                    return energy_range["Poly"]
-
-        raise ValueError(
-            """Cannot find polynomial coefficients for your requested energy.
-        There might be gap in the calibration lookup table."""
-        )
-
-    def convert_csv_to_lookup(
-        self,
-        file: str,
-        source: tuple[str, str],
-        mode: str | None = "Mode",
-        min_energy: str | None = "MinEnergy",
-        max_energy: str | None = "MaxEnergy",
-        poly_deg: list | None = None,
-    ) -> dict[str | None, dict[str, dict[str, dict[str, Any]]]]:
-        """
-        Convert a CSV file to a lookup table dictionary.
-
-        Returns
-        -------
-        dict
-            Dictionary in Apple2 lookup table format.
-
-        Raises
-        ------
-        RuntimeError
-            If the CSV cannot be converted.
-
-        """
-        if poly_deg is None:
-            poly_deg = [
-                "7th-order",
-                "6th-order",
-                "5th-order",
-                "4th-order",
-                "3rd-order",
-                "2nd-order",
-                "1st-order",
-                "b",
-            ]
-        lookup_table = {}
-        polarisations = set()
-
-        def process_row(row: dict) -> None:
-            """Process a single row from the CSV file and update the lookup table."""
-            mode_value = row[mode]
-            if mode_value not in polarisations:
-                polarisations.add(mode_value)
-                lookup_table[mode_value] = {
-                    "Energies": {},
-                    "Limit": {
-                        "Minimum": float(row[min_energy]),
-                        "Maximum": float(row[max_energy]),
-                    },
-                }
-
-            # Create polynomial object for energy-to-gap/phase conversion
-            coefficients = [float(row[coef]) for coef in poly_deg]
-            polynomial = np.poly1d(coefficients)
-
-            lookup_table[mode_value]["Energies"][row[min_energy]] = {
-                "Low": float(row[min_energy]),
-                "High": float(row[max_energy]),
-                "Poly": polynomial,
-            }
-
-            # Update energy limits
-            lookup_table[mode_value]["Limit"]["Minimum"] = min(
-                lookup_table[mode_value]["Limit"]["Minimum"], float(row[min_energy])
-            )
-            lookup_table[mode_value]["Limit"]["Maximum"] = max(
-                lookup_table[mode_value]["Limit"]["Maximum"], float(row[max_energy])
-            )
-
-        csv_file = self.config_client.get_file_contents(file, reset_cached_result=True)
-        reader = csv.DictReader(io.StringIO(csv_file))
-        for row in reader:
-            # If there are multiple source only convert requested.
-            if row[source[0]] == source[1]:
-                process_row(row=row)
-        if not lookup_table:
-            raise RuntimeError(f"Unable to convert lookup table:\t{file}")
-        return lookup_table
-
-
-class I10Apple2(Apple2):
     def __init__(
         self,
         id_gap: UndulatorGap,
@@ -325,11 +42,8 @@ class I10Apple2(Apple2):
         name: str = "",
     ) -> None:
         """
-        I10Apple2 device is an apple2 with extra jaw phase motor.
-
-        Parameters
-        ----------
-
+        Parameters:
+        ------------
         id_gap : UndulatorJawPhase
             The gap motor of the undulator.
         id_phase : UndulatorJawPhase
@@ -341,60 +55,56 @@ class I10Apple2(Apple2):
         """
 
         with self.add_children_as_readables():
-            self.jaw_phase = id_jaw_phase
+            self.jaw_phase = Reference(id_jaw_phase)
         super().__init__(id_gap=id_gap, id_phase=id_phase, name=name)
 
 
 class I10Apple2Controller(Apple2Controller[I10Apple2]):
     """
     I10Apple2Controller is a extension of Apple2Controller which provide linear
-     arbitrary angle control.
+    arbitrary angle control.
     """
 
     def __init__(
         self,
         apple2: I10Apple2,
-        lookuptable_dir: str,
-        source: tuple[str, str],
-        config_client: ConfigServer,
+        gap_energy_motor_lut: EnergyMotorLookup,
+        phase_energy_motor_lut: EnergyMotorLookup,
         jaw_phase_limit: float = 12.0,
         jaw_phase_poly_param: list[float] = DEFAULT_JAW_PHASE_POLY_PARAMS,
         angle_threshold_deg=30.0,
+        units: str = "eV",
         name: str = "",
     ) -> None:
         """
-
-        parameters
-        ----------
+        Parameters:
+        -----------
         apple2 : I10Apple2
             An I10Apple2 device.
-        lookuptable_dir : str
-            The path to look up table.
-        source : tuple[str, str]
-            The column name and the name of the source in look up table. e.g. ( "source", "idu")
-        config_client : ConfigServer
-            The config server client to fetch the look up table.
+        gap_energy_motor_lut: EnergyMotorLookup
+            The class that handles the gap look up table logic for the insertion device.
+        phase_energy_motor_lut: EnergyMotorLookup
+            The class that handles the phase look up table logic for the insertion device.
         jaw_phase_limit : float, optional
             The maximum allowed jaw_phase movement., by default 12.0
         jaw_phase_poly_param : list[float], optional
             polynomial parameters highest power first., by default DEFAULT_JAW_PHASE_POLY_PARAMS
         angle_threshold_deg : float, optional
             The angle threshold to switch between 0-180 and 180-360 range., by default 30.0
+        units:
+            the units of this device. Defaults to eV.
         name : str, optional
             New device name.
         """
-
-        self.lookup_table_client = I10EnergyMotorLookup(
-            lookuptable_dir=lookuptable_dir,
-            source=source,
-            config_client=config_client,
-        )
+        self.gap_energy_motor_lut = gap_energy_motor_lut
+        self.phase_energy_motor_lut = phase_energy_motor_lut
         super().__init__(
             apple2=apple2,
-            energy_to_motor_converter=self.lookup_table_client.get_motor_from_energy,
+            gap_energy_motor_converter=gap_energy_motor_lut.find_value_in_lookup_table,
+            phase_energy_motor_converter=phase_energy_motor_lut.find_value_in_lookup_table,
+            units=units,
             name=name,
         )
-
         self.jaw_phase_from_angle = np.poly1d(jaw_phase_poly_param)
         self.angle_threshold_deg = angle_threshold_deg
         self.jaw_phase_limit = jaw_phase_limit
@@ -426,30 +136,28 @@ class I10Apple2Controller(Apple2Controller[I10Apple2]):
                 f"jaw_phase position for angle ({pol_angle}) is outside permitted range"
                 f" [-{self.jaw_phase_limit}, {self.jaw_phase_limit}]"
             )
-        await self.apple2().jaw_phase.set(jaw_phase)
+        await self.apple2().jaw_phase().set(jaw_phase)
         await self._linear_arbitrary_angle.set(pol_angle)
 
-    async def _set_motors_from_energy(self, value: float) -> None:
-        """
-        Set the undulator motors for a given energy and polarisation.
-        """
-
-        pol = await self._check_and_get_pol_setpoint()
-        gap, phase = self.energy_to_motor(energy=value, pol=pol)
+    def _get_apple2_value(self, gap: float, phase: float, pol: Pol) -> Apple2Val:
         phase3 = phase * (-1 if pol == Pol.LA else 1)
-        id_set_val = Apple2Val(
-            top_outer=phase,
-            top_inner=0.0,
-            btm_inner=phase3,
-            btm_outer=0.0,
+        return Apple2Val(
             gap=gap,
+            phase=Apple2PhasesVal(
+                top_outer=phase,
+                top_inner=0.0,
+                btm_inner=phase3,
+                btm_outer=0.0,
+            ),
         )
 
-        LOGGER.info(f"Setting polarisation to {pol}, with values: {id_set_val}")
-        await self.apple2().set(id_motor_values=id_set_val)
+    async def _set_motors_from_energy_and_polarisation(
+        self, energy: float, pol: Pol
+    ) -> None:
+        await super()._set_motors_from_energy_and_polarisation(energy, pol)
         if pol != Pol.LA:
-            await self.apple2().jaw_phase.set(0)
-            await self.apple2().jaw_phase.set_move.set(1)
+            await self.apple2().jaw_phase().set(0)
+            await self.apple2().jaw_phase().set_move.set(1)
 
     def _raise_if_not_la(self, pol: Pol) -> None:
         if pol != Pol.LA:
@@ -487,4 +195,4 @@ class LinearArbitraryAngle(StandardReadable, Movable[SupportsFloat]):
 
     @AsyncStatus.wrap
     async def set(self, angle: float) -> None:
-        await self.linear_arbitrary_angle().set(angle)
+        await self.linear_arbitrary_angle().set(angle, timeout=MAXIMUM_MOVE_TIME)

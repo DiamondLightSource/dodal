@@ -5,14 +5,13 @@ import pytest
 from ophyd.sim import NullStatus
 from ophyd.status import Status
 from ophyd.utils.errors import StatusTimeoutError, WaitTimeoutError
-from ophyd_async.core import AsyncStatus
-from ophyd_async.testing import get_mock_put, set_mock_value
+from ophyd_async.core import AsyncStatus, get_mock_put, set_mock_value
 
 from dodal.devices.util.epics_util import SetWhenEnabled, run_functions_without_blocking
 from dodal.log import LOGGER, GELFTCPHandler, logging, set_up_all_logging_handlers
 
 
-class StatusException(Exception):
+class StatusError(Exception):
     pass
 
 
@@ -38,7 +37,7 @@ def reset_logs():
 
 def get_bad_status():
     status = Status(obj="Dodal test utils - get bad status")
-    status.set_exception(StatusException())
+    status.set_exception(StatusError())
     return status
 
 
@@ -63,11 +62,11 @@ def test_full_status_gives_error_if_intermediate_status_fails():
 
 def test_check_call_back_error_gives_correct_error():
     LOGGER.error = MagicMock()
-    with pytest.raises(StatusException):
+    with pytest.raises(StatusError):
         returned_status = run_functions_without_blocking([get_bad_status])
         returned_status.wait(0.1)
 
-        assert isinstance(returned_status.exception(), StatusException)
+        assert isinstance(returned_status.exception(), StatusError)
 
     LOGGER.error.assert_called()
 
@@ -110,7 +109,7 @@ def test_status_points_to_provided_device_object():
     assert returned_status.obj == expected_obj
 
 
-async def test_given_disp_high_when_set_SetWhenEnabled_then_proc_not_set_until_disp_low():
+async def test_given_disp_high_when_set_SetWhenEnabled_then_proc_not_set_until_disp_low():  # noqa: N802
     device: SetWhenEnabled = SetWhenEnabled("", name="test")
     await device.connect(True)
     set_mock_value(device.disp, 1)
@@ -138,7 +137,7 @@ def test_if_one_status_errors_then_later_functions_not_called():
     returned_status = run_functions_without_blocking(
         status_calls, associated_obj=MagicMock()
     )
-    with pytest.raises(StatusException):
+    with pytest.raises(StatusError):
         returned_status.wait(0.1)
     assert returned_status.done
     tester.assert_not_called()
@@ -160,7 +159,7 @@ def test_if_one_status_pending_then_later_functions_not_called():
     with pytest.raises(WaitTimeoutError):
         returned_status.wait(0.1)
     tester.assert_not_called()
-    pending_status.set_exception(StatusException)
-    with pytest.raises(StatusException):
+    pending_status.set_exception(StatusError)
+    with pytest.raises(StatusError):
         returned_status.wait(0.1)
     tester.assert_not_called()

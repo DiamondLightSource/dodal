@@ -5,18 +5,18 @@ import bluesky.plan_stubs as bps
 import numpy as np
 from bluesky.utils import Msg
 
+from dodal.devices.motors import XYZOmegaStage
 from dodal.devices.oav.oav_calculations import (
     calculate_beam_distance,
     camera_coordinates_to_xyz_mm,
 )
 from dodal.devices.oav.oav_detector import OAV
 from dodal.devices.oav.pin_image_recognition import PinTipDetection
-from dodal.devices.smargon import Smargon
 
 Pixel = tuple[int, int]
 
 
-class PinNotFoundException(Exception):
+class PinNotFoundError(Exception):
     pass
 
 
@@ -52,24 +52,29 @@ class EdgeOutputArrayImageType(IntEnum):
 
 
 def get_move_required_so_that_beam_is_at_pixel(
-    smargon: Smargon, pixel: Pixel, oav: OAV
+    gonio: XYZOmegaStage,
+    pixel: Pixel,
+    oav: OAV,
 ) -> Generator[Msg, None, np.ndarray]:
     """Calculate the required move so that the given pixel is in the centre of the beam."""
 
     current_motor_xyz = np.array(
         [
-            (yield from bps.rd(smargon.x)),
-            (yield from bps.rd(smargon.y)),
-            (yield from bps.rd(smargon.z)),
+            (yield from bps.rd(gonio.x)),
+            (yield from bps.rd(gonio.y)),
+            (yield from bps.rd(gonio.z)),
         ],
         dtype=np.float64,
     )
-    current_angle = yield from bps.rd(smargon.omega)
+    current_angle = yield from bps.rd(gonio.omega)
 
     beam_x = yield from bps.rd(oav.beam_centre_i)
     beam_y = yield from bps.rd(oav.beam_centre_j)
     microns_per_pixel_x = yield from bps.rd(oav.microns_per_pixel_x)
     microns_per_pixel_y = yield from bps.rd(oav.microns_per_pixel_y)
+    x_direction = yield from bps.rd(oav.x_direction)
+    y_direction = yield from bps.rd(oav.y_direction)
+    z_direction = yield from bps.rd(oav.z_direction)
 
     return calculate_x_y_z_of_pixel(
         current_motor_xyz,
@@ -77,6 +82,7 @@ def get_move_required_so_that_beam_is_at_pixel(
         pixel,
         (beam_x, beam_y),
         (microns_per_pixel_x, microns_per_pixel_y),
+        (x_direction, y_direction, z_direction),
     )
 
 
@@ -86,6 +92,7 @@ def calculate_x_y_z_of_pixel(
     pixel: Pixel,
     beam_centre: tuple[int, int],
     microns_per_pixel: tuple[float, float],
+    xyz_direction: tuple[int, int, int],
 ) -> np.ndarray:
     """Get the x, y, z position of a pixel in mm"""
     beam_distance_px: Pixel = calculate_beam_distance(beam_centre, *pixel)
@@ -96,6 +103,9 @@ def calculate_x_y_z_of_pixel(
         current_omega,
         microns_per_pixel[0],
         microns_per_pixel[1],
+        xyz_direction[0],
+        xyz_direction[1],
+        xyz_direction[2],
     )
 
 
@@ -106,6 +116,6 @@ def wait_for_tip_to_be_found(
     found_tip = yield from bps.rd(ophyd_pin_tip_detection.triggered_tip)
     if all(found_tip == ophyd_pin_tip_detection.INVALID_POSITION):
         timeout = yield from bps.rd(ophyd_pin_tip_detection.validity_timeout)
-        raise PinNotFoundException(f"No pin found after {timeout} seconds")
+        raise PinNotFoundError(f"No pin found after {timeout} seconds")
 
     return Pixel((int(found_tip[0]), int(found_tip[1])))

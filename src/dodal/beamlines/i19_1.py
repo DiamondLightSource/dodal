@@ -4,12 +4,15 @@ from dodal.common.beamlines.beamline_utils import (
 from dodal.common.beamlines.beamline_utils import (
     set_beamline as set_utils_beamline,
 )
-from dodal.devices.i19.beamstop import BeamStop
-from dodal.devices.i19.blueapi_device import HutchState
-from dodal.devices.i19.shutter import (
+from dodal.devices.i19.access_controlled.attenuator_motor_squad import (
+    AttenuatorMotorSquad,
+)
+from dodal.devices.i19.access_controlled.blueapi_device import HutchState
+from dodal.devices.i19.access_controlled.shutter import (
     AccessControlledShutter,
     HutchState,
 )
+from dodal.devices.i19.beamstop import BeamStop
 from dodal.devices.oav.oav_detector import OAVBeamCentreFile
 from dodal.devices.oav.oav_parameters import OAVConfigBeamCentre
 from dodal.devices.synchrotron import Synchrotron
@@ -29,6 +32,8 @@ set_log_beamline(BL)
 set_utils_beamline(BL)
 
 
+I19_1_COMMISSIONING_INSTR_SESSION: str = "cm40638-5"
+
 I19_1_ZEBRA_MAPPING = ZebraMapping(
     outputs=ZebraTTLOutputs(TTL_PILATUS=1),
     sources=ZebraSources(),
@@ -38,6 +43,13 @@ ZOOM_PARAMS_FILE = (
     "/dls_sw/i19-1/software/gda_versions/gda/config/xml/jCameraManZoomLevels.xml"
 )
 DISPLAY_CONFIG = "/dls_sw/i19-1/software/daq_configuration/domain/display.configuration"
+
+
+@device_factory()
+def attenuator_motor_squad() -> AttenuatorMotorSquad:
+    return AttenuatorMotorSquad(
+        hutch=HutchState.EH1, instrument_session=I19_1_COMMISSIONING_INSTR_SESSION
+    )
 
 
 # Needs to wait until enum is fixed on the beamline
@@ -58,6 +70,26 @@ def oav() -> OAVBeamCentreFile:
     )
 
 
+@device_factory()
+def shutter() -> AccessControlledShutter:
+    """Get the i19-1 hutch shutter device, instantiate it if it hasn't already been.
+    If this is called when already instantiated, it will return the existing object.
+    """
+    return AccessControlledShutter(
+        prefix=f"{PREFIX.beamline_prefix}-PS-SHTR-01:",
+        hutch=HutchState.EH1,
+        instrument_session=I19_1_COMMISSIONING_INSTR_SESSION,
+    )
+
+
+@device_factory()
+def synchrotron() -> Synchrotron:
+    """Get the i19-1 synchrotron device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i19-1, it will return the existing object.
+    """
+    return Synchrotron()
+
+
 # NOTE EH1 uses the Zebra 2 box. While a Zebra 1 box exists and is connected
 # on the beamline, it is currently not in use
 @device_factory()
@@ -69,23 +101,3 @@ def zebra() -> Zebra:
         mapping=I19_1_ZEBRA_MAPPING,
         prefix=f"{PREFIX.beamline_prefix}-EA-ZEBRA-02:",
     )
-
-
-@device_factory()
-def shutter() -> AccessControlledShutter:
-    """Get the i19-1 hutch shutter device, instantiate it if it hasn't already been.
-    If this is called when already instantiated, it will return the existing object.
-    """
-    return AccessControlledShutter(
-        prefix=f"{PREFIX.beamline_prefix}-PS-SHTR-01:",
-        hutch=HutchState.EH1,
-        instrument_session="cm40638-4",
-    )
-
-
-@device_factory()
-def synchrotron() -> Synchrotron:
-    """Get the i19-1 synchrotron device, instantiate it if it hasn't already been.
-    If this is called when already instantiated in i19-1, it will return the existing object.
-    """
-    return Synchrotron()
