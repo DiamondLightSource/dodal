@@ -238,8 +238,9 @@ class SequenceLoader(Device, Movable[str], Generic[TAbstractBaseSequence]):
     @AsyncStatus.wrap
     async def set(self, filename: str) -> None:
         """Coordinate setting the sequence_file signal and also loading the data into sequence."""
-        self._sequence_file_setter(filename)
+        # Try loading the sequence first to check it is a valid file before setting signal.
         self.sequence = self.load(filename)
+        self._sequence_file_setter(filename)
 
     def load(self, filename: str) -> TAbstractBaseSequence:
         """
