@@ -9,15 +9,12 @@ from bluesky.run_engine import RunEngine
 from daq_config_server.client import ConfigServer
 from numpy import linspace, poly1d
 from ophyd_async.core import (
-    init_devices,
-)
-from ophyd_async.testing import (
-    assert_emitted,
     callback_on_mock_put,
     get_mock_put,
     init_devices,
     set_mock_value,
 )
+from ophyd_async.testing import assert_emitted
 
 from dodal.devices.i10.i10_apple2 import (
     DEFAULT_JAW_PHASE_POLY_PARAMS,
