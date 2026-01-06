@@ -4,6 +4,7 @@ from enum import Enum
 from bluesky.protocols import Stageable
 from ophyd import Component, Device, EpicsSignalRO, Signal
 from ophyd.areadetector.cam import EigerDetectorCam
+from ophyd.signal import AttributeSignal
 from ophyd.status import AndStatus, Status, StatusBase, SubscriptionStatus
 
 from dodal.devices.detector import DetectorParams, TriggerMode
@@ -55,7 +56,6 @@ class EigerDetector(Device, Stageable):
 
     stale_params = Component(EpicsSignalRO, "CAM:StaleParameters_RBV")
     bit_depth = Component(EpicsSignalRO, "CAM:BitDepthImage_RBV")
-
     filewriters_finished: StatusBase
 
     detector_params: DetectorParams | None = None
@@ -63,9 +63,24 @@ class EigerDetector(Device, Stageable):
     arming_status = Status()
     arming_status.set_finished()
 
-    def __init__(self, beamline: str = "i03", *args, **kwargs):
+    def __init__(
+        self,
+        beamline: str = "i03",
+        ispyb_detector_id: int | None = None,
+        *args,
+        **kwargs,
+    ):
         super().__init__(*args, **kwargs)
         self.beamline = beamline
+
+        self.detector_id = ispyb_detector_id
+        self.ispyb_detector_id = AttributeSignal(
+            attr="detector_id",
+            parent=self,
+            name="eiger-ispyb_detector_id",
+            write_access=False,
+        )
+
         # using i03 timeouts as default
         self.timeouts = AVAILABLE_TIMEOUTS.get(beamline, AVAILABLE_TIMEOUTS["i03"])
         self.disarming_status = None
@@ -74,10 +89,11 @@ class EigerDetector(Device, Stageable):
     def with_params(
         cls,
         params: DetectorParams,
-        name: str = "EigerDetector",
         beamline: str = "i03",
+        ispyb_detector_id: int | None = None,
+        name: str = "EigerDetector",
     ):
-        det = cls(name=name, beamline=beamline)
+        det = cls(name=name, beamline=beamline, ispyb_detector_id=ispyb_detector_id)
         det.set_detector_parameters(params)
         return det
 

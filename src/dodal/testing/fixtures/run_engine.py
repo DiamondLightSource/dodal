@@ -3,6 +3,7 @@ Allow external repos to reuse these fixtures so defined in single place.
 """
 
 import asyncio
+import copy
 import os
 import threading
 import time
@@ -34,10 +35,13 @@ async def _ensure_running_bluesky_event_loop(_global_run_engine):
 
 @pytest.fixture()
 async def run_engine(_global_run_engine: RunEngine) -> AsyncGenerator[RunEngine, None]:
+    initial_md = copy.deepcopy(_global_run_engine.md)
     try:
         yield _global_run_engine
     finally:
+        # Clear subscriptions, cache, and reset metadata
         _global_run_engine.reset()
+        _global_run_engine.md = initial_md
 
 
 @pytest_asyncio.fixture(scope="session", loop_scope="session")
