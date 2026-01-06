@@ -9,7 +9,7 @@ from ophyd_async.core import (
     Device,
     StrictEnum,
     SupersetEnum,
-    soft_signal_rw,
+    soft_signal_r_and_setter,
 )
 from pydantic import BaseModel, Field, model_validator
 
@@ -227,15 +227,21 @@ class SequenceLoader(Device, Movable[str], Generic[TAbstractBaseSequence]):
         initial_file: str = "Not set",
         name: str = "",
     ):
-        self.sequence_file = soft_signal_rw(str, initial_value=initial_file)
+        self.sequence_file, self._sequence_file_setter = soft_signal_r_and_setter(
+            str, initial_value=initial_file
+        )
         self._sequence_class = sequence_class
+
+        self.sequence: TAbstractBaseSequence | None = None
         super().__init__(name)
 
     @AsyncStatus.wrap
     async def set(self, filename: str) -> None:
-        await self.sequence_file.set(filename)
+        """Coordinate setting the sequence_file signal and also loading the data into sequence."""
+        self._sequence_file_setter(filename)
+        self.sequence = self.load(filename)
 
-    async def load(self) -> TAbstractBaseSequence:
+    def load(self, filename: str) -> TAbstractBaseSequence:
         """
         Load the sequence data from a provided json file into a sequence class.
 
@@ -245,6 +251,4 @@ class SequenceLoader(Device, Movable[str], Generic[TAbstractBaseSequence]):
         Returns:
             Pydantic model representing the sequence file.
         """
-        return load_json_file_to_class(
-            self._sequence_class, await self.sequence_file.get_value()
-        )
+        return load_json_file_to_class(self._sequence_class, filename)
