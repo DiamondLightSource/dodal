@@ -1,5 +1,4 @@
 {
-    "column_names": ["bragg_angle_deg", "pitch_mrad"],
     "rows": [
         [19.24347, -0.79775],
         [16.40949, -0.78679],

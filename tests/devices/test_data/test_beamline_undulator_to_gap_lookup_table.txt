@@ -1,5 +1,4 @@
 {
-    "column_names": ["energy_eV", "gap_mm"],
     "rows": [
         [5700, 5.4606],
         [5760, 5.5],

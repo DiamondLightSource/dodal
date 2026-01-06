@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 from bluesky import RunEngine
 from bluesky.plan_stubs import mv
-from daq_config_server.converters.models import GenericLookupTable
+from daq_config_server.models import UndulatorEnergyGapLookupTable
 from ophyd_async.core import get_mock_put, init_devices, set_mock_value
 from ophyd_async.testing import (
     assert_configuration,
@@ -157,8 +157,8 @@ async def test_gap_access_check_disabled_and_move_inhibited_when_commissioning_m
     mock_get_file_contents: MagicMock,
     undulator_in_commissioning_mode: UndulatorInKeV,
 ):
-    mock_get_file_contents.return_value = GenericLookupTable(
-        column_names=["energy_eV", "gap_mm"], rows=[[0, 10], [10, 20]]
+    mock_get_file_contents.return_value = UndulatorEnergyGapLookupTable(
+        rows=[[0, 10], [10, 20]]
     )
     set_mock_value(
         undulator_in_commissioning_mode.gap_access, EnabledDisabledUpper.DISABLED
@@ -175,8 +175,8 @@ async def test_gap_access_check_move_not_inhibited_when_commissioning_mode_disab
     mock_get_file_contents: MagicMock,
     undulator: UndulatorInKeV,
 ):
-    mock_get_file_contents.return_value = GenericLookupTable(
-        column_names=["energy_eV", "gap_mm"], rows=[[0, 10], [10000, 20]]
+    mock_get_file_contents.return_value = UndulatorEnergyGapLookupTable(
+        rows=[[0, 10], [10000, 20]]
     )
     set_mock_value(undulator.gap_access, EnabledDisabledUpper.ENABLED)
     await undulator.set(5)

@@ -1,8 +1,4 @@
 {
-    "column_names": [
-        "bragg_angle_deg",
-        "roll_mrad"
-    ],
     "rows": [
         [26.4095, -0.2799],
         [6.3075, -0.2799]
