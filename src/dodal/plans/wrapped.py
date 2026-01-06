@@ -102,9 +102,9 @@ def num_scan(
     params: Annotated[
         dict[Movable | Motor, list[float | int]],
         Field(
-            description="Dictionary of 'device: parameter' keys. For concurrent "
-            "trajectories, provide '{movable1: [start1, stop1], movable2: [start2,"
-            "stop2], ... , movableN: [startN, stopN]}'."
+            description="Dictionary of 'device: parameter' keys. For concurrent \
+            trajectories, provide '{movable1: [start1, stop1], movable2: [start2, \
+            stop2], ... , movableN: [startN, stopN]}'."
         ),
     ],
     num: int | None = None,
@@ -113,6 +113,7 @@ def num_scan(
     """Scan concurrent single or multi-motor trajector(y/ies).
     The scan is defined by number of points along scan trajector(y/ies).
     Wraps bluesky.plans.scan(det, *args, num, md=metadata)."""
+    # TODO: move to using Range spec and spec_scan when stable and tested at v1.0
     args, shape = _make_num_scan_args(params, num)
     metadata = metadata or {}
     metadata["shape"] = shape
@@ -133,9 +134,9 @@ def num_grid_scan(
     params: Annotated[
         dict[Movable | Motor, list[float | int]],
         Field(
-            description="Dictionary of 'device: parameter' keys. For independent "
-            "trajectories, provide '{movable1: [start1, stop1, num1], ... , movableN: "
-            "[startN, stopN, numN]}'."
+            description="Dictionary of 'device: parameter' keys. For independent \
+            trajectories, provide '{movable1: [start1, stop1, num1], ... , movableN: \
+            [startN, stopN, numN]}'."
         ),
     ],
     snake_axes: list | bool = True,
@@ -144,6 +145,7 @@ def num_grid_scan(
     """Scan independent multi-motor trajectories.
     The scan is defined by number of points along scan trajectories.
     Wraps bluesky.plans.grid_scan(det, *args, snake_axes, md=metadata)."""
+    # TODO: move to using Range spec and spec_scan when stable and tested at v1.0
     args, shape = _make_num_scan_args(params)
     metadata = metadata or {}
     metadata["shape"] = shape
@@ -164,9 +166,9 @@ def num_rscan(
     params: Annotated[
         dict[Movable | Motor, list[float | int]],
         Field(
-            description="Dictionary of 'device: parameter' keys. For concurrent "
-            "trajectories, provide '{movable1: [start1, stop1], movable2: [start2,"
-            "stop2], ... , movableN: [startN, stopN]}'."
+            description="Dictionary of 'device: parameter' keys. For concurrent \
+            trajectories, provide '{movable1: [start1, stop1], movable2: [start2, \
+            stop2], ... , movableN: [startN, stopN]}'."
         ),
     ],
     num: int | None = None,
@@ -175,6 +177,7 @@ def num_rscan(
     """Scan concurrent trajector(y/ies), relative to current position(s).
     The scan is defined by number of points along scan trajector(y/ies).
     Wraps bluesky.plans.rel_scan(det, *args, num, md=metadata)."""
+    # TODO: move to using Range spec and spec_scan when stable and tested at v1.0
     args, shape = _make_num_scan_args(params, num)
     metadata = metadata or {}
     metadata["shape"] = shape
@@ -195,9 +198,9 @@ def num_grid_rscan(
     params: Annotated[
         dict[Movable | Motor, list[float | int]],
         Field(
-            description="Dictionary of 'device: parameter' keys. For independent "
-            "trajectories, provide '{movable1: [start1, stop1, num1], ... , movableN: "
-            "[startN, stopN, numN]}'."
+            description="Dictionary of 'device: parameter' keys. For independent \
+            trajectories, provide '{movable1: [start1, stop1, num1], ... , movableN: \
+            [startN, stopN, numN]}'."
         ),
     ],
     snake_axes: list | bool = True,
@@ -206,6 +209,7 @@ def num_grid_rscan(
     """Scan independent trajectories, relative to current positions.
     The scan is defined by number of points along scan trajectories.
     Wraps bluesky.plans.rel_grid_scan(det, *args, md=metadata)."""
+    # TODO: move to using Range spec and spec_scan when stable and tested at v1.0
     args, shape = _make_num_scan_args(params)
     metadata = metadata or {}
     metadata["shape"] = shape
@@ -246,9 +250,9 @@ def list_scan(
     params: Annotated[
         dict[Movable | Motor, list[float | int]],
         Field(
-            description="Dictionary of 'device: parameter' keys. For all trajectories, "
-            "provide '{movable1: [point1, point2, ... ], movableN: [point1, point2, "
-            "...]}'. Number of points for each movable must be equal."
+            description="Dictionary of 'device: parameter' keys. For all trajectories, \
+            provide '{movable1: [point1, point2, ... ], movableN: [point1, point2, \
+            ...]}'. Number of points for each movable must be equal."
         ),
     ],
     metadata: dict[str, Any] | None = None,
@@ -276,9 +280,9 @@ def list_grid_scan(
     params: Annotated[
         dict[Movable | Motor, list[float | int]],
         Field(
-            description="Dictionary of 'device: parameter' keys. For all trajectories, "
-            "provide '{movable1: [point1, point2, ... ], movableN: [point1, point2, "
-            "...]}'."
+            description="Dictionary of 'device: parameter' keys. For all trajectories, \
+            provide '{movable1: [point1, point2, ... ], movableN: [point1, point2, \
+            ...]}'."
         ),
     ],
     snake_axes: bool = True,  # Currently specifying axes to snake is not supported
@@ -309,9 +313,9 @@ def list_rscan(
     params: Annotated[
         dict[Movable | Motor, list[float | int]],
         Field(
-            description="Dictionary of 'device: parameter' keys. For all trajectories, "
-            "provide '{movable1: [point1, point2, ... ], movableN: [point1, point2, "
-            "...]}'. Number of points for each movable must be equal."
+            description="Dictionary of 'device: parameter' keys. For all trajectories, \
+            provide '{movable1: [point1, point2, ... ], movableN: [point1, point2, \
+            ...]}'. Number of points for each movable must be equal."
         ),
     ],
     metadata: dict[str, Any] | None = None,
@@ -339,9 +343,9 @@ def list_grid_rscan(
     params: Annotated[
         dict[Movable | Motor, list[float | int]],
         Field(
-            description="Dictionary of 'device: parameter' keys. For all trajectories, "
-            "provide '{movable1: [point1, point2, ... ], movableN: [point1, point2, "
-            "...]}'."
+            description="Dictionary of 'device: parameter' keys. For all trajectories, \
+            provide '{movable1: [point1, point2, ... ], movableN: [point1, point2, \
+            ...]}'."
         ),
     ],
     snake_axes: bool = True,  # Currently specifying axes to snake is not supported
@@ -456,9 +460,9 @@ def step_scan(
     params: Annotated[
         dict[Movable | Motor, list[float | int]],
         Field(
-            description="Dictionary of 'device: parameter' keys. For concurrent "
-            "trajectories, provide '{movable1: [start1, stop1, step1], movable2: "
-            "[start2, step2], ... , movableN: [startN, stepN]}'."
+            description="Dictionary of 'device: parameter' keys. For concurrent \
+            trajectories, provide '{movable1: [start1, stop1, step1], movable2: \
+            [start2, step2], ... , movableN: [startN, stepN]}'."
         ),
     ],
     metadata: dict[str, Any] | None = None,
@@ -466,6 +470,7 @@ def step_scan(
     """Scan concurrent trajectories with specified step size.
     Generates list(s) of points for each trajectory, used with
     bluesky.plans.list_scan(det, *args, md=metadata)."""
+    # TODO: move to using Linspace spec and spec_scan when stable and tested at v1.0
     args, shape = _make_step_scan_args(params)
     metadata = metadata or {}
     metadata["shape"] = shape
@@ -486,9 +491,9 @@ def step_grid_scan(
     params: Annotated[
         dict[Movable | Motor, list[float | int]],
         Field(
-            description="Dictionary of 'device: parameter' keys. For independent "
-            "trajectories, provide '{movable1: [start1, stop1, step1], ... , movableN: "
-            "[startN, stopN, stepN]}'."
+            description="Dictionary of 'device: parameter' keys. For independent \
+            trajectories, provide '{movable1: [start1, stop1, step1], ... , movableN: \
+            [startN, stopN, stepN]}'."
         ),
     ],
     snake_axes: bool = True,  # Currently specifying axes to snake is not supported
@@ -497,6 +502,7 @@ def step_grid_scan(
     """Scan independent trajectories with specified step size.
     Generates list(s) of points for each trajectory, used with
     bluesky.plans.list_grid_scan(det, *args, md=metadata)."""
+    # TODO: move to using Linspace spec and spec_scan when stable and tested at v1.0
     args, shape = _make_step_scan_args(params, grid=True)
     metadata = metadata or {}
     metadata["shape"] = shape
@@ -519,9 +525,9 @@ def step_rscan(
     params: Annotated[
         dict[Movable | Motor, list[float | int]],
         Field(
-            description="Dictionary of 'device: parameter' keys. For concurrent "
-            "trajectories, provide '{movable1: [start1, stop1, step1], movable2: "
-            "[start2, step2], ... , movableN: [startN, stepN]}'."
+            description="Dictionary of 'device: parameter' keys. For concurrent \
+            trajectories, provide '{movable1: [start1, stop1, step1], movable2: \
+            [start2, step2], ... , movableN: [startN, stepN]}'."
         ),
     ],
     metadata: dict[str, Any] | None = None,
@@ -529,6 +535,7 @@ def step_rscan(
     """Scan concurrent trajectories with specified step size, relative to position.
     Generates list(s) of points for each trajectory, used with
     bluesky.plans.rel_list_scan(det, *args, md=metadata)."""
+    # TODO: move to using Linspace spec and spec_scan when stable and tested at v1.0
     args, shape = _make_step_scan_args(params)
     metadata = metadata or {}
     metadata["shape"] = shape
@@ -549,9 +556,9 @@ def step_grid_rscan(
     params: Annotated[
         dict[Movable | Motor, list[float | int]],
         Field(
-            description="Dictionary of 'device: parameter' keys. For independent "
-            "trajectories, provide '{movable1: [start1, stop1, step1], ... , movableN: "
-            "[startN, stopN, stepN]}'."
+            description="Dictionary of 'device: parameter' keys. For independent \
+            trajectories, provide '{movable1: [start1, stop1, step1], ... , movableN: \
+            [startN, stopN, stepN]}'."
         ),
     ],
     snake_axes: bool = True,  # Currently specifying axes to snake is not supported
@@ -560,6 +567,7 @@ def step_grid_rscan(
     """Scan independent trajectories with specified step size, relative to position.
     Generates list(s) of points for each trajectory, used with
     bluesky.plans.list_grid_scan(det, *args, md=metadata)."""
+    # TODO: move to using Linspace spec and spec_scan when stable and tested at v1.0
     args, shape = _make_step_scan_args(params, grid=True)
     metadata = metadata or {}
     metadata["shape"] = shape

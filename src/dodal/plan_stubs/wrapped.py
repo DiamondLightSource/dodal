@@ -14,7 +14,7 @@ T = TypeVar("T")
 
 
 def set_absolute(
-    movable: Movable[T], value: T, group: Group | None = None, wait: bool = False
+    movable: Movable[T], value: T, group: Group | None = None, wait: bool = True
 ) -> MsgGenerator:
     """Set a device, wrapper for `bp.abs_set`.
 
@@ -36,7 +36,7 @@ def set_absolute(
 
 
 def set_relative(
-    movable: Movable[T], value: T, group: Group | None = None, wait: bool = False
+    movable: Movable[T], value: T, group: Group | None = None, wait: bool = True
 ) -> MsgGenerator:
     """Change a device, wrapper for `bp.rel_set`.
 
