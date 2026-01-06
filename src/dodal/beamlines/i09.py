@@ -63,5 +63,5 @@ def ew4000() -> VGScientaDetector[LensMode, PsuMode, PassEnergy]:
 
 
 @device_factory()
-def lakeshore336() -> Lakeshore336:
+def lakeshore() -> Lakeshore336:
     return Lakeshore336(prefix="BL09L-VA-LAKE-01:")

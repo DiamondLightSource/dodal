@@ -88,5 +88,5 @@ def hu_energy() -> HardEnergy:
 
 
 @device_factory()
-def lakeshore336() -> Lakeshore336:
+def lakeshore() -> Lakeshore336:
     return Lakeshore336(prefix=f"{PREFIX.beamline_prefix}-EA-TCTRL-01:")
