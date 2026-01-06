@@ -1,6 +1,8 @@
 from unittest.mock import AsyncMock, MagicMock, Mock
 
 import pytest
+from bluesky import RunEngine
+from bluesky.plan_stubs import prepare
 from ophyd_async.core import FlyMotorInfo, get_mock_put, init_devices, set_mock_value
 
 from dodal.devices.insertion_device import (
@@ -113,3 +115,14 @@ def test_insertion_device_energy_complete_call_gap_complete(
     mock_id_gap.complete = MagicMock()
     mock_id_energy.complete()
     mock_id_gap.complete.assert_called_once()
+
+
+async def test_insertion_device_energy_prepare_success_in_run_engine(
+    run_engine: RunEngine, mock_id_energy: InsertionDeviceEnergy
+):
+    fly_motor_info = FlyMotorInfo(
+        start_position=600,
+        end_position=700,
+        time_for_move=60,
+    )
+    run_engine(prepare(mock_id_energy, fly_motor_info, wait=True))
