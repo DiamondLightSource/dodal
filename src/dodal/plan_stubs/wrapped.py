@@ -16,7 +16,7 @@ T = TypeVar("T")
 
 
 def set_absolute(
-    movable: Movable[T], value: T, group: Group | None = None, wait: bool = False
+    movable: Movable[T], value: T, group: Group | None = None, wait: bool = True
 ) -> MsgGenerator:
     """
     Set a device, wrapper for `bp.abs_set`.
@@ -27,7 +27,7 @@ def set_absolute(
         group (Group | None, optional): The message group to associate with the
                                            setting, for sequencing. Defaults to None.
         wait (bool, optional): The group should wait until all setting is complete
-                               (e.g. a motor has finished moving). Defaults to False.
+                               (e.g. a motor has finished moving). Defaults to True.
 
     Returns:
         MsgGenerator: Plan
@@ -39,7 +39,7 @@ def set_absolute(
 
 
 def set_relative(
-    movable: Movable[T], value: T, group: Group | None = None, wait: bool = False
+    movable: Movable[T], value: T, group: Group | None = None, wait: bool = True
 ) -> MsgGenerator:
     """
     Change a device, wrapper for `bp.rel_set`.
@@ -50,7 +50,7 @@ def set_relative(
         group (Group | None, optional): The message group to associate with the
                                            setting, for sequencing. Defaults to None.
         wait (bool, optional): The group should wait until all setting is complete
-                               (e.g. a motor has finished moving). Defaults to False.
+                               (e.g. a motor has finished moving). Defaults to True.
 
     Returns:
         MsgGenerator: Plan
