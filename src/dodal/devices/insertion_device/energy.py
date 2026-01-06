@@ -4,10 +4,12 @@ import asyncio
 from bluesky.protocols import Movable
 from ophyd_async.core import (
     AsyncStatus,
+    FlyMotorInfo,
     Reference,
     SignalRW,
     StandardReadable,
     StandardReadableFormat,
+    WatchableAsyncStatus,
     soft_signal_rw,
 )
 from ophyd_async.epics.motor import Motor
@@ -78,6 +80,7 @@ class InsertionDeviceEnergy(InsertionDeviceEnergyBase):
 
     def __init__(self, id_controller: Apple2Controller, name: str = "") -> None:
         self.energy = Reference(id_controller.energy)
+        self._id_controller = Reference(id_controller)
         super().__init__(name=name)
 
         self.add_readables([self.energy()], StandardReadableFormat.HINTED_SIGNAL)
@@ -86,3 +89,40 @@ class InsertionDeviceEnergy(InsertionDeviceEnergyBase):
     async def set(self, energy: float) -> None:
         LOGGER.info(f"Setting insertion device energy to {energy}.")
         await self.energy().set(energy, timeout=MAXIMUM_MOVE_TIME)
+
+    @AsyncStatus.wrap
+    async def prepare(self, value: FlyMotorInfo) -> None:
+        """Convert FlyMotorInfo from energy to gap motion and move phase motor to mid point."""
+        mid_energy = (value.start_position + value.end_position) / 2.0
+        LOGGER.info(
+            f"Preparing for fly energy scan, move {self._id_controller().apple2().phase} to {mid_energy}"
+        )
+        await self.set(energy=mid_energy)
+        current_pol = await self._id_controller().polarisation_setpoint.get_value()
+        start_position = self._id_controller().gap_energy_motor_converter(
+            energy=value.start_position,
+            pol=current_pol,
+        )
+        end_position = self._id_controller().gap_energy_motor_converter(
+            energy=value.end_position, pol=current_pol
+        )
+
+        gap_fly_motor_info = FlyMotorInfo(
+            start_position=start_position,
+            end_position=end_position,
+            time_for_move=value.time_for_move,
+        )
+
+        LOGGER.info(
+            f"Flyscan info in energy: {value}"
+            + f"Flyscan info in gap: {gap_fly_motor_info}"
+            + f"speed{gap_fly_motor_info.velocity}"
+        )
+        await self._id_controller().apple2().gap().prepare(value=gap_fly_motor_info)
+
+    @AsyncStatus.wrap
+    async def kickoff(self):
+        await self._id_controller().apple2().gap().kickoff()
+
+    def complete(self) -> WatchableAsyncStatus:
+        return self._id_controller().apple2().gap().complete()
