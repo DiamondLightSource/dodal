@@ -34,21 +34,19 @@ async def mock_beam_energy(
     mock_id_energy: InsertionDeviceEnergy, mock_pgm: PlaneGratingMonochromator
 ) -> BeamEnergy:
     async with init_devices(mock=True):
-        mock_beam_controller = BeamEnergy(
-            id_energy=mock_id_energy, mono=mock_pgm.energy
-        )
-    return mock_beam_controller
+        mock_beam_energy = BeamEnergy(id_energy=mock_id_energy, mono=mock_pgm.energy)
+    return mock_beam_energy
 
 
 async def test_mock_beam_controller_set_moves_both_devices(
-    mock_beam_controller: BeamEnergy,
+    mock_beam_energy: BeamEnergy,
     mock_id_energy: InsertionDeviceEnergy,
     mock_pgm: PlaneGratingMonochromator,
 ):
     mock_id_energy.set = AsyncMock()
     mock_pgm.energy.set = AsyncMock()
 
-    await mock_beam_controller.set(100.0)
+    await mock_beam_energy.set(100.0)
 
     mock_id_energy.set.assert_called_once_with(energy=100.0)
     mock_pgm.energy.set.assert_called_once_with(100.0)
