@@ -1,12 +1,9 @@
+from functools import cache
 from pathlib import Path
 
-from ophyd_async.core import InOut, StrictEnum
+from ophyd_async.core import InOut, PathProvider, StrictEnum
 from ophyd_async.epics.adpilatus import PilatusDetector
 
-from dodal.common.beamlines.beamline_utils import (
-    get_path_provider,
-    set_path_provider,
-)
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.beamlines.device_helpers import HDF5_SUFFIX
 from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitPathProvider
@@ -25,25 +22,28 @@ from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name, get_hostname
 
 BL = get_beamline_name("i23")
+PREFIX = BeamlinePrefix(BL)
 set_log_beamline(BL)
 set_utils_beamline(BL)
 
-set_path_provider(
-    StaticVisitPathProvider(
+devices = DeviceManager()
+
+
+@devices.fixture
+@cache
+def path_provider() -> PathProvider:
+    """Path provider for i23 Pilatus detector."""
+    return StaticVisitPathProvider(
         BL,
         Path("/tmp"),
         client=LocalDirectoryServiceClient(),
     )
-)
 
-PREFIX = BeamlinePrefix(BL)
 
 I23_ZEBRA_MAPPING = ZebraMapping(
     outputs=ZebraTTLOutputs(TTL_DETECTOR=1, TTL_SHUTTER=4),
     sources=ZebraSources(),
 )
-
-devices = DeviceManager()
 
 
 class I23DetectorPositions(StrictEnum):
@@ -93,11 +93,11 @@ def zebra() -> Zebra:
 
 
 @devices.factory()
-def pilatus() -> PilatusDetector:
+def pilatus(path_provider: PathProvider) -> PilatusDetector:
     """Get the i23 pilatus"""
     return PilatusDetector(
         prefix=f"{PREFIX.beamline_prefix}-EA-PILAT-01:",
-        path_provider=get_path_provider(),
+        path_provider=path_provider,
         drv_suffix="cam1:",
         fileio_suffix=HDF5_SUFFIX,
     )
