@@ -25,7 +25,7 @@ from dodal.devices.insertion_device import (
 from dodal.devices.insertion_device.energy_motor_lookup import (
     ConfigServerEnergyMotorLookup,
 )
-from dodal.devices.insertion_device.id_enum import Pol
+from dodal.devices.insertion_device.enum import Pol
 from dodal.devices.insertion_device.lookup_table_models import (
     MAXIMUM_ROW_PHASE_MOTOR_POSITION,
     ROW_PHASE_CIRCULAR,
@@ -201,16 +201,16 @@ async def test_j09_apple2_controller_set_pol_lh(
     await mock_id_controller.polarisation.set(pol)
     get_mock_put(
         mock_id_controller.apple2().phase().top_outer.user_setpoint
-    ).assert_called_once_with(f"{top_outer_phase:.6f}", wait=True)
+    ).assert_called_once_with(f"{top_outer_phase}", wait=True)
     get_mock_put(
         mock_id_controller.apple2().phase().top_inner.user_setpoint
-    ).assert_called_once_with(f"{top_inner_phase:.6f}", wait=True)
+    ).assert_called_once_with(f"{top_inner_phase}", wait=True)
     get_mock_put(
         mock_id_controller.apple2().phase().btm_inner.user_setpoint
-    ).assert_called_once_with(f"{btm_inner_phase:.6f}", wait=True)
+    ).assert_called_once_with(f"{btm_inner_phase}", wait=True)
     get_mock_put(
         mock_id_controller.apple2().phase().btm_outer.user_setpoint
-    ).assert_called_once_with(f"{btm_outer_phase:.6f}", wait=True)
+    ).assert_called_once_with(f"{btm_outer_phase}", wait=True)
 
 
 @pytest.mark.parametrize(
@@ -290,35 +290,35 @@ async def test_j09_apple2_controller_set_pol(
     assert get_mock_put(
         mock_id_controller.apple2().phase().top_outer.user_setpoint
     ).call_args_list == [
-        call(f"{0:.6f}", wait=True),
-        call(f"{top_outer_phase:.6f}", wait=True),
+        call("0.0", wait=True),
+        call(f"{top_outer_phase}", wait=True),
     ]
     assert get_mock_put(
         mock_id_controller.apple2().phase().top_inner.user_setpoint
     ).call_args_list == [
-        call(f"{0:.6f}", wait=True),
-        call(f"{top_inner_phase:.6f}", wait=True),
+        call("0.0", wait=True),
+        call(f"{top_inner_phase}", wait=True),
     ]
     assert get_mock_put(
         mock_id_controller.apple2().phase().btm_inner.user_setpoint
     ).call_args_list == [
-        call(f"{0:.6f}", wait=True),
-        call(f"{btm_inner_phase:.6f}", wait=True),
+        call("0.0", wait=True),
+        call(f"{btm_inner_phase}", wait=True),
     ]
     assert get_mock_put(
         mock_id_controller.apple2().phase().btm_outer.user_setpoint
     ).call_args_list == [
-        call(f"{0:.6f}", wait=True),
-        call(f"{btm_outer_phase:.6f}", wait=True),
+        call("0.0", wait=True),
+        call(f"{btm_outer_phase}", wait=True),
     ]
 
 
 @pytest.mark.parametrize(
     "pol, top_outer_phase,top_inner_phase,btm_inner_phase, btm_outer_phase",
     [
-        (Pol.LV, 24.0, 0, 24.0, 0),
-        (Pol.PC, 15, 0, 15, 0),
-        (Pol.NC, -15, 0, -15, 0),
+        (Pol.LV, 24.0, 0.0, 24.0, 0.0),
+        (Pol.PC, 15.0, 0.0, 15.0, 0.0),
+        (Pol.NC, -15.0, 0.0, -15.0, 0.0),
     ],
 )
 async def test_j09_apple2_controller_set_pol_does_not_go_via_lh_if_already_at_lh(
@@ -336,16 +336,16 @@ async def test_j09_apple2_controller_set_pol_does_not_go_via_lh_if_already_at_lh
     await mock_id_controller.polarisation.set(pol)
     get_mock_put(
         mock_id_controller.apple2().phase().top_outer.user_setpoint
-    ).assert_called_once_with(f"{top_outer_phase:.6f}", wait=True)
+    ).assert_called_once_with(f"{top_outer_phase}", wait=True)
     get_mock_put(
         mock_id_controller.apple2().phase().top_inner.user_setpoint
-    ).assert_called_once_with(f"{top_inner_phase:.6f}", wait=True)
+    ).assert_called_once_with(f"{top_inner_phase}", wait=True)
     get_mock_put(
         mock_id_controller.apple2().phase().btm_inner.user_setpoint
-    ).assert_called_once_with(f"{btm_inner_phase:.6f}", wait=True)
+    ).assert_called_once_with(f"{btm_inner_phase}", wait=True)
     get_mock_put(
         mock_id_controller.apple2().phase().btm_outer.user_setpoint
-    ).assert_called_once_with(f"{btm_outer_phase:.6f}", wait=True)
+    ).assert_called_once_with(f"{btm_outer_phase}", wait=True)
 
 
 @pytest.mark.parametrize(
