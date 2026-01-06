@@ -2,7 +2,7 @@ from math import isclose
 from unittest.mock import Mock, patch
 
 import pytest
-from daq_config_server.converters.models import GenericLookupTable
+from daq_config_server.models import DetectorXYLookupTable
 
 from dodal.devices.detector.det_dist_to_beam_converter import (
     Axis,
@@ -10,7 +10,7 @@ from dodal.devices.detector.det_dist_to_beam_converter import (
 )
 
 # fmt: off
-LOOKUP_TABLE_TEST_VALUES = GenericLookupTable(column_names = ["detector_distances_mm", "beam_centre_x_mm", "beam_centre_y_mm"], rows=[[100.0, 150.0, 160.0], [200.0, 151.0, 165.0]])
+LOOKUP_TABLE_TEST_VALUES = DetectorXYLookupTable(rows=[[100.0, 150.0, 160.0], [200.0, 151.0, 165.0]])
 
 # fmt: on
 
