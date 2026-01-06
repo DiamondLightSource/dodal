@@ -8,7 +8,11 @@ from dodal.devices.common_dcm import (
     StationaryCrystal,
 )
 from dodal.devices.electron_analyser.base import DualEnergySource
-from dodal.devices.electron_analyser.vgscienta import VGScientaDetector
+from dodal.devices.electron_analyser.base.base_region import SequenceLoader
+from dodal.devices.electron_analyser.vgscienta import (
+    VGScientaDetector,
+    VGScientaSequence,
+)
 from dodal.devices.i09 import Grating, LensMode, PassEnergy, PsuMode
 from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.devices.synchrotron import Synchrotron
@@ -46,6 +50,12 @@ def energy_source() -> DualEnergySource:
     return DualEnergySource(dcm().energy_in_eV, pgm().energy.user_readback)
 
 
+def sequence_loader() -> SequenceLoader[
+    VGScientaSequence[LensMode, PsuMode, PassEnergy]
+]:
+    return SequenceLoader(VGScientaSequence[LensMode, PsuMode, PassEnergy])
+
+
 # Connect will work again after this work completed
 # https://jira.diamond.ac.uk/browse/I09-651
 @device_factory()
@@ -56,4 +66,5 @@ def ew4000() -> VGScientaDetector[LensMode, PsuMode, PassEnergy]:
         psu_mode_type=PsuMode,
         pass_energy_type=PassEnergy,
         energy_source=energy_source(),
+        sequence_loader=sequence_loader(),
     )
