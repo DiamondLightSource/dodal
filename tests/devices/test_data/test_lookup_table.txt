@@ -1,5 +1,4 @@
 {
-    "column_names": ["detector_distances_mm", "beam_centre_x_mm", "beam_centre_y_mm"],
     "rows": [
         [100.0, 150.0, 160.0],
         [200.0, 151.0, 165.0]

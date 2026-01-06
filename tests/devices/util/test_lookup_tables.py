@@ -7,9 +7,6 @@ from dodal.devices.util.lookup_tables import (
     linear_interpolation_lut,
     parse_lookup_table,
 )
-from tests.devices.detector.test_data import (
-    TEST_DET_DIST_CONVERTER_LUT,
-)
 from tests.devices.test_data import (
     TEST_BEAMLINE_UNDULATOR_TO_GAP_LUT,
 )

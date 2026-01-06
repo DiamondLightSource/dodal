@@ -7,7 +7,7 @@ from types import ModuleType
 from unittest.mock import patch
 
 import pytest
-from daq_config_server.converters.models import ConfigModel
+from daq_config_server.models import ConfigModel
 from ophyd_async.core import init_devices, set_mock_value
 
 from conftest import mock_attributes_table
@@ -101,11 +101,9 @@ def _fake_config_server_get_file_contents(
     # Minimal logic required for unit tests
     with filepath.open("r") as f:
         contents = f.read()
-        print(contents)
         if desired_return_type is str:
             return contents
         elif desired_return_type is dict:
-            print("return type is dict")
             return json.loads(contents)
         elif issubclass(desired_return_type, ConfigModel):  # type: ignore
             return desired_return_type.model_validate(json.loads(contents))
