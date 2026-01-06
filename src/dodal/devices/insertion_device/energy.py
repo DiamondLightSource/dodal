@@ -1,7 +1,7 @@
 import abc
 import asyncio
 
-from bluesky.protocols import Movable
+from bluesky.protocols import Flyable, Movable, Preparable
 from ophyd_async.core import (
     AsyncStatus,
     FlyMotorInfo,
@@ -10,6 +10,7 @@ from ophyd_async.core import (
     StandardReadable,
     StandardReadableFormat,
     WatchableAsyncStatus,
+    error_if_none,
     soft_signal_rw,
 )
 from ophyd_async.epics.motor import Motor
@@ -30,52 +31,7 @@ class InsertionDeviceEnergyBase(abc.ABC, StandardReadable, Movable):
     async def set(self, energy: float) -> None: ...
 
 
-class BeamEnergy(StandardReadable, Movable[float]):
-    """
-    Compound device to set both ID and energy motor at the same time with an option to add an offset.
-    """
-
-    def __init__(
-        self, id_energy: InsertionDeviceEnergyBase, mono: Motor, name: str = ""
-    ) -> None:
-        """
-        Parameters
-        ----------
-
-        id_energy: InsertionDeviceEnergy
-            An InsertionDeviceEnergy device.
-        mono: Motor
-            A Motor(energy) device.
-        name:
-            New device name.
-        """
-        super().__init__(name=name)
-        self._id_energy = Reference(id_energy)
-        self._mono_energy = Reference(mono)
-
-        self.add_readables(
-            [
-                self._id_energy().energy(),
-                self._mono_energy().user_readback,
-            ],
-            StandardReadableFormat.HINTED_SIGNAL,
-        )
-
-        with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
-            self.id_energy_offset = soft_signal_rw(float, initial_value=0)
-
-    @AsyncStatus.wrap
-    async def set(self, energy: float) -> None:
-        LOGGER.info(f"Moving f{self.name} energy to {energy}.")
-        await asyncio.gather(
-            self._id_energy().set(
-                energy=energy + await self.id_energy_offset.get_value()
-            ),
-            self._mono_energy().set(energy),
-        )
-
-
-class InsertionDeviceEnergy(InsertionDeviceEnergyBase):
+class InsertionDeviceEnergy(InsertionDeviceEnergyBase, Preparable, Flyable):
     """Apple2 ID energy movable device."""
 
     def __init__(self, id_controller: Apple2Controller, name: str = "") -> None:
@@ -126,3 +82,81 @@ class InsertionDeviceEnergy(InsertionDeviceEnergyBase):
 
     def complete(self) -> WatchableAsyncStatus:
         return self._id_controller().apple2().gap().complete()
+
+    async def get_id_acceleration_time(self) -> float:
+        return await self._id_controller().apple2().gap().acceleration_time.get_value()
+
+
+class BeamEnergy(StandardReadable, Movable[float], Preparable, Flyable):
+    """
+    Compound device to set both ID and energy motor at the same time with an option to add an offset.
+    """
+
+    def __init__(
+        self, id_energy: InsertionDeviceEnergy, mono: Motor, name: str = ""
+    ) -> None:
+        """
+        Parameters
+        ----------
+
+        id_energy: InsertionDeviceEnergy
+            An InsertionDeviceEnergy device.
+        mono: Motor
+            A Motor(energy) device.
+        name:
+            New device name.
+        """
+        super().__init__(name=name)
+        self._id_energy = Reference(id_energy)
+        self._mono_energy = Reference(mono)
+
+        self.add_readables(
+            [
+                self._id_energy().energy(),
+                self._mono_energy().user_readback,
+            ],
+            StandardReadableFormat.HINTED_SIGNAL,
+        )
+
+        with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
+            self.id_energy_offset = soft_signal_rw(float, initial_value=0)
+
+    @AsyncStatus.wrap
+    async def set(self, energy: float) -> None:
+        LOGGER.info(f"Moving f{self.name} energy to {energy}.")
+        await asyncio.gather(
+            self._id_energy().set(
+                energy=energy + await self.id_energy_offset.get_value()
+            ),
+            self._mono_energy().set(energy),
+        )
+
+    @AsyncStatus.wrap
+    async def prepare(self, value: FlyMotorInfo) -> None:
+        await asyncio.gather(
+            self._id_energy().prepare(value), self._mono_energy().prepare(value)
+        )
+
+    @AsyncStatus.wrap
+    async def kickoff(self):
+        pgm_acceleration_time, gap_acceleration_time = await asyncio.gather(
+            self._mono_energy().acceleration_time.get_value(),
+            self._id_energy().get_id_acceleration_time(),
+        )
+        start_offset_time = pgm_acceleration_time - gap_acceleration_time
+
+        await self._mono_energy().kickoff()
+        await asyncio.sleep(start_offset_time)
+        await self._id_energy().kickoff()
+        self._fly_status = self._combined_fly_status()
+
+    def complete(self) -> AsyncStatus:
+        """Stop when both pgm and id is done moving."""
+        fly_status = error_if_none(self._fly_status, "kickoff not called")
+        return fly_status
+
+    @AsyncStatus.wrap
+    async def _combined_fly_status(self):
+        status_pgm = self._mono_energy().complete()
+        status_id = self._id_energy().complete()
+        await asyncio.gather(status_pgm, status_id)

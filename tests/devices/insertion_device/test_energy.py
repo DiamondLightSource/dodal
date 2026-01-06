@@ -1,9 +1,18 @@
-from unittest.mock import AsyncMock, MagicMock, Mock
+import asyncio
+from unittest.mock import AsyncMock, MagicMock, Mock, patch
 
 import pytest
 from bluesky import RunEngine
 from bluesky.plan_stubs import prepare
-from ophyd_async.core import FlyMotorInfo, get_mock_put, init_devices, set_mock_value
+from ophyd_async.core import (
+    AsyncStatus,
+    FlyMotorInfo,
+    get_mock_put,
+    init_devices,
+    set_mock_value,
+    soft_signal_rw,
+    wait_for_value,
+)
 
 from dodal.devices.insertion_device import (
     MAXIMUM_MOVE_TIME,
@@ -21,23 +30,25 @@ pytest_plugins = ["dodal.testing.fixtures.devices.apple2"]
 
 
 @pytest.fixture
-async def beam_energy(
+async def mock_beam_energy(
     mock_id_energy: InsertionDeviceEnergy, mock_pgm: PlaneGratingMonochromator
 ) -> BeamEnergy:
     async with init_devices(mock=True):
-        beam_energy = BeamEnergy(id_energy=mock_id_energy, mono=mock_pgm.energy)
-    return beam_energy
+        mock_beam_controller = BeamEnergy(
+            id_energy=mock_id_energy, mono=mock_pgm.energy
+        )
+    return mock_beam_controller
 
 
-async def test_beam_energy_set_moves_both_devices(
-    beam_energy: BeamEnergy,
+async def test_mock_beam_controller_set_moves_both_devices(
+    mock_beam_controller: BeamEnergy,
     mock_id_energy: InsertionDeviceEnergy,
     mock_pgm: PlaneGratingMonochromator,
 ):
     mock_id_energy.set = AsyncMock()
     mock_pgm.energy.set = AsyncMock()
 
-    await beam_energy.set(100.0)
+    await mock_beam_controller.set(100.0)
 
     mock_id_energy.set.assert_called_once_with(energy=100.0)
     mock_pgm.energy.set.assert_called_once_with(100.0)
@@ -126,3 +137,88 @@ async def test_insertion_device_energy_prepare_success_in_run_engine(
         time_for_move=60,
     )
     run_engine(prepare(mock_id_energy, fly_motor_info, wait=True))
+
+
+async def test_beam_energy_prepare_success(
+    run_engine: RunEngine,
+    mock_beam_energy: BeamEnergy,
+    mock_pgm: PlaneGratingMonochromator,
+    mock_id_energy: InsertionDeviceEnergy,
+):
+    fly_info = FlyMotorInfo(start_position=700, end_position=800, time_for_move=10)
+    mock_id_energy.prepare = AsyncMock()
+    mock_pgm.energy.prepare = AsyncMock()
+    run_engine(prepare(mock_beam_energy, fly_info))
+    mock_id_energy.prepare.assert_awaited_once_with(fly_info)
+    mock_pgm.energy.prepare.assert_awaited_once_with(fly_info)
+
+
+@patch("asyncio.sleep", new_callable=AsyncMock)
+async def test_beam_energy_kickoff_set_correct_delay(
+    mock_sleep: AsyncMock,
+    mock_beam_energy: BeamEnergy,
+    mock_pgm: PlaneGratingMonochromator,
+    mock_id_gap: UndulatorGap,
+    mock_id_controller: DummyApple2Controller,
+):
+    mock_id_controller.gap_energy_motor_converter = Mock(side_effect=[20.0, 21, 22.0])
+    mock_id_controller.phase_energy_motor_converter = Mock(side_effect=[22.0, 22, 22.0])
+    fly_info = FlyMotorInfo(start_position=700, end_position=800, time_for_move=10)
+    id_acc_time = 3
+    pgm_acc_time = 1
+    set_mock_value(mock_id_gap.max_velocity, 30)
+    set_mock_value(mock_id_gap.min_velocity, 0.1)
+    set_mock_value(mock_id_gap.acceleration_time, id_acc_time)
+    set_mock_value(mock_pgm.energy.max_velocity, 30)
+    set_mock_value(mock_id_gap.low_limit_travel, 0)
+    set_mock_value(mock_id_gap.high_limit_travel, 200)
+    set_mock_value(mock_pgm.energy.low_limit_travel, 0)
+    set_mock_value(mock_pgm.energy.high_limit_travel, 1000)
+    set_mock_value(mock_pgm.energy.acceleration_time, pgm_acc_time)
+    set_mock_value(mock_id_gap.gate, UndulatorGateStatus.CLOSE)
+    mock_id_gap.kickoff = AsyncMock()
+    mock_pgm.energy.kickoff = AsyncMock()
+    await mock_beam_energy.prepare(fly_info)
+    await mock_beam_energy.kickoff()
+    mock_sleep.assert_awaited_once_with(pgm_acc_time - id_acc_time)
+    mock_id_gap.kickoff.assert_awaited_once()
+    mock_pgm.energy.kickoff.assert_awaited_once()
+
+
+@patch("asyncio.sleep", new_callable=AsyncMock)
+async def test_energysetter_complete(
+    mock_sleep,
+    mock_beam_energy: BeamEnergy,
+    mock_pgm: PlaneGratingMonochromator,
+    mock_id_gap: UndulatorGap,
+    mock_id_energy: InsertionDeviceEnergy,
+) -> None:
+    fake_id_fly_status = soft_signal_rw(bool, initial_value=False)
+    fake_pgm_fly_status = soft_signal_rw(bool, initial_value=False)
+    await asyncio.gather(
+        fake_pgm_fly_status.connect(mock=True), fake_id_fly_status.connect(mock=True)
+    )
+
+    @AsyncStatus.wrap
+    async def get_status(signal):
+        await wait_for_value(signal, True, timeout=1)
+
+    mock_id_gap._fly_status = get_status(fake_id_fly_status)  # type: ignore
+
+    mock_pgm.energy._fly_status = get_status(fake_pgm_fly_status)  # type: ignore
+    mock_id_energy.kickoff = AsyncMock()
+    mock_pgm.energy.kickoff = AsyncMock()
+    pgm_status = mock_pgm.energy.complete()
+    id_status = mock_id_gap.complete()
+    assert not id_status.done
+    assert not pgm_status.done
+    await mock_beam_energy.kickoff()
+    energy_setter_fly_status = mock_beam_energy.complete()
+    assert not energy_setter_fly_status.done
+    await fake_id_fly_status.set(True)
+    assert mock_id_gap._fly_status.done  # type: ignore
+    assert not energy_setter_fly_status.done
+    await fake_pgm_fly_status.set(True)
+    assert mock_pgm.energy._fly_status.done  # type: ignore
+    await energy_setter_fly_status
+    assert energy_setter_fly_status.done
