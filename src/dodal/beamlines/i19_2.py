@@ -1,18 +1,26 @@
+from pathlib import Path
+
+from ophyd_async.fastcs.eiger import EigerDetector
 from ophyd_async.fastcs.panda import HDFPanda
 
 from dodal.common.beamlines.beamline_utils import (
     device_factory,
     get_path_provider,
+    set_path_provider,
 )
 from dodal.common.beamlines.beamline_utils import (
     set_beamline as set_utils_beamline,
 )
+from dodal.common.visit import StaticVisitPathProvider
+from dodal.devices.i19.access_controlled.attenuator_motor_squad import (
+    AttenuatorMotorSquad,
+)
+from dodal.devices.i19.access_controlled.blueapi_device import HutchState
+from dodal.devices.i19.access_controlled.shutter import AccessControlledShutter
 from dodal.devices.i19.backlight import BacklightPosition
 from dodal.devices.i19.beamstop import BeamStop
-from dodal.devices.i19.blueapi_device import HutchState
 from dodal.devices.i19.diffractometer import FourCircleDiffractometer
 from dodal.devices.i19.pin_col_stages import PinholeCollimatorControl
-from dodal.devices.i19.shutter import AccessControlledShutter
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.zebra.zebra import Zebra
 from dodal.devices.zebra.zebra_constants_mapping import (
@@ -31,6 +39,14 @@ PREFIX = BeamlinePrefix("i19", "I")
 set_log_beamline(BL)
 set_utils_beamline(BL)
 
+set_path_provider(
+    StaticVisitPathProvider(
+        BL,
+        Path("/dls/i19-2/data/2025/cm40639-4/"),
+    )
+)
+
+I19_2_COMMISSIONING_INSTR_SESSION: str = "cm40639-5"
 
 I19_2_ZEBRA_MAPPING = ZebraMapping(
     outputs=ZebraTTLOutputs(),
@@ -39,8 +55,18 @@ I19_2_ZEBRA_MAPPING = ZebraMapping(
 
 
 @device_factory()
-def diffractometer() -> FourCircleDiffractometer:
-    return FourCircleDiffractometer(prefix=PREFIX.beamline_prefix)
+def attenuator_motor_squad() -> AttenuatorMotorSquad:
+    return AttenuatorMotorSquad(
+        hutch=HutchState.EH2, instrument_session=I19_2_COMMISSIONING_INSTR_SESSION
+    )
+
+
+@device_factory()
+def backlight() -> BacklightPosition:
+    """Get the i19-2 backlight device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i19-2, it will return the existing object.
+    """
+    return BacklightPosition(prefix=f"{PREFIX.beamline_prefix}-EA-IOC-12:")
 
 
 @device_factory()
@@ -52,34 +78,26 @@ def beamstop() -> BeamStop:
 
 
 @device_factory()
-def zebra() -> Zebra:
-    """Get the i19-2 zebra device, instantiate it if it hasn't already been.
-    If this is called when already instantiated in i19-2, it will return the existing object.
-    """
-    return Zebra(
-        mapping=I19_2_ZEBRA_MAPPING,
-        prefix=f"{PREFIX.beamline_prefix}-EA-ZEBRA-03:",
+def diffractometer() -> FourCircleDiffractometer:
+    return FourCircleDiffractometer(prefix=PREFIX.beamline_prefix)
+
+
+@device_factory()
+def eiger() -> EigerDetector:
+    return EigerDetector(
+        prefix=PREFIX.beamline_prefix,
+        path_provider=get_path_provider(),
+        drv_suffix="-EA-EIGER-01:",
+        hdf_suffix="-EA-EIGER-01:OD:",
     )
 
 
 @device_factory()
-def shutter() -> AccessControlledShutter:
-    """Get the i19-2 hutch shutter device, instantiate it if it hasn't already been.
-    If this is called when already instantiated, it will return the existing object.
-    """
-    return AccessControlledShutter(
-        prefix=f"{PREFIX.beamline_prefix}-PS-SHTR-01:",
-        hutch=HutchState.EH2,
-        instrument_session="cm40639-4",
+def panda() -> HDFPanda:
+    return HDFPanda(
+        prefix=f"{PREFIX.beamline_prefix}-EA-PANDA-01:",
+        path_provider=get_path_provider(),
     )
-
-
-@device_factory()
-def synchrotron() -> Synchrotron:
-    """Get the i19-2 synchrotron device, instantiate it if it hasn't already been.
-    If this is called when already instantiated in i19-2, it will return the existing object.
-    """
-    return Synchrotron()
 
 
 @device_factory()
@@ -92,16 +110,31 @@ def pinhole_and_collimator() -> PinholeCollimatorControl:
 
 
 @device_factory()
-def backlight() -> BacklightPosition:
-    """Get the i19-2 backlight device, instantiate it if it hasn't already been.
-    If this is called when already instantiated in i19-2, it will return the existing object.
+def shutter() -> AccessControlledShutter:
+    """Get the i19-2 hutch shutter device, instantiate it if it hasn't already been.
+    If this is called when already instantiated, it will return the existing object.
     """
-    return BacklightPosition(prefix=f"{PREFIX.beamline_prefix}-EA-IOC-12:")
+    return AccessControlledShutter(
+        prefix=f"{PREFIX.beamline_prefix}-PS-SHTR-01:",
+        hutch=HutchState.EH2,
+        instrument_session=I19_2_COMMISSIONING_INSTR_SESSION,
+    )
 
 
 @device_factory()
-def panda() -> HDFPanda:
-    return HDFPanda(
-        prefix=f"{PREFIX.beamline_prefix}-EA-PANDA-01:",
-        path_provider=get_path_provider(),
+def synchrotron() -> Synchrotron:
+    """Get the i19-2 synchrotron device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i19-2, it will return the existing object.
+    """
+    return Synchrotron()
+
+
+@device_factory()
+def zebra() -> Zebra:
+    """Get the i19-2 zebra device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i19-2, it will return the existing object.
+    """
+    return Zebra(
+        mapping=I19_2_ZEBRA_MAPPING,
+        prefix=f"{PREFIX.beamline_prefix}-EA-ZEBRA-03:",
     )

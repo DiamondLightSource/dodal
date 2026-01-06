@@ -1,5 +1,7 @@
 import asyncio
 from abc import ABC, abstractmethod
+from functools import partial
+from math import isclose
 from typing import Generic, TypeVar
 
 import numpy as np
@@ -31,7 +33,7 @@ from dodal.log import LOGGER
 from dodal.parameters.experiment_parameter_base import AbstractExperimentWithBeamParams
 
 
-class GridScanInvalidException(RuntimeError):
+class GridScanInvalidError(RuntimeError):
     """Raised when the gridscan parameters are not valid."""
 
 
@@ -302,18 +304,28 @@ class FastGridScanCommon(
             value: the gridscan parameters
 
         Raises:
-            GridScanInvalidException: if the gridscan parameters were not valid
+            GridScanInvalidError: if the gridscan parameters were not valid
         """
         set_statuses = []
 
         LOGGER.info("Applying gridscan parameters...")
+
         # Create arguments for bps.mv
         for key, signal in self._movable_params.items():
             param_value = value.__dict__[key]
-            set_statuses.append(await set_and_wait_for_value(signal, param_value))  # type: ignore
+
+            matcher = partial(isclose, param_value, abs_tol=0.001)
+
+            set_statuses.append(
+                set_and_wait_for_value(
+                    signal,  # type: ignore
+                    param_value,
+                    match_value=matcher,
+                )
+            )
 
         # Counter should always start at 0
-        set_statuses.append(await set_and_wait_for_value(self.position_counter, 0))
+        set_statuses.append(set_and_wait_for_value(self.position_counter, 0))
 
         LOGGER.info("Gridscan parameters applied, waiting for sets to complete...")
 
@@ -326,7 +338,7 @@ class FastGridScanCommon(
                 self.scan_invalid, 0.0, timeout=self.VALIDITY_CHECK_TIMEOUT
             )
         except TimeoutError as e:
-            raise GridScanInvalidException(
+            raise GridScanInvalidError(
                 f"Gridscan parameters not validated after {self.VALIDITY_CHECK_TIMEOUT}s"
             ) from e
 
@@ -470,6 +482,6 @@ def set_fast_grid_scan_params(scan: FastGridScanCommon[ParamType], params: Param
         params: The parameters to set
 
     Raises:
-        GridScanInvalidException: if the grid scan parameters are not valid
+        GridScanInvalidError: if the grid scan parameters are not valid
     """
     yield from prepare(scan, params, wait=True)

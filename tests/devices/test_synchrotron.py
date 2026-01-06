@@ -5,8 +5,7 @@ from typing import Any
 import bluesky.plan_stubs as bps
 import pytest
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import StandardReadable, init_devices
-from ophyd_async.testing import set_mock_value
+from ophyd_async.core import StandardReadable, init_devices, set_mock_value
 
 from dodal.devices.synchrotron import (
     Synchrotron,
@@ -159,9 +158,9 @@ async def test_synchrotron_describe_configuration(sim_synchrotron: Synchrotron):
     )
 
 
-async def test_synchrotron_count(RE: RunEngine, sim_synchrotron: Synchrotron):
+async def test_synchrotron_count(run_engine: RunEngine, sim_synchrotron: Synchrotron):
     docs = []
-    RE(count_sim(sim_synchrotron), lambda x, y: docs.append(y))
+    run_engine(count_sim(sim_synchrotron), lambda x, y: docs.append(y))
 
     assert len(docs) == 4
     assert sim_synchrotron.name in docs[1]["configuration"]

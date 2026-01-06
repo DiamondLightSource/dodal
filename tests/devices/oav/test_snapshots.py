@@ -9,8 +9,7 @@ from aiohttp.client import ClientSession
 from aiohttp.test_utils import TestClient, TestServer, unused_port
 from aiohttp.web import Response
 from aiohttp.web_app import Application
-from ophyd_async.core import init_devices
-from ophyd_async.testing import set_mock_value
+from ophyd_async.core import init_devices, set_mock_value
 from PIL import Image
 
 from dodal.devices.oav.snapshots.snapshot import (
@@ -59,7 +58,7 @@ async def snapshot(
         return test_client.session
 
     with patch(
-        "dodal.devices.areadetector.plugins.MJPG.ClientSession", new=get_session
+        "dodal.devices.areadetector.plugins.mjpg.ClientSession", new=get_session
     ):
         async with init_devices(mock=True):
             fake_snapshot = Snapshot("")
@@ -80,7 +79,7 @@ async def grid_snapshot(
         return test_client.session
 
     with patch(
-        "dodal.devices.areadetector.plugins.MJPG.ClientSession", new=get_session
+        "dodal.devices.areadetector.plugins.mjpg.ClientSession", new=get_session
     ):
         async with init_devices(mock=True):
             fake_grid = SnapshotWithGrid("")
@@ -116,11 +115,14 @@ def image_data_coro(image_bytes: BytesIO) -> AsyncMock:
 
 
 def assert_images_identical(left: Image.Image, right: Image.Image):
-    left_data = left.getdata()
-    right_data = right.getdata()
-    assert len(left_data) == len(right_data)
-    for i in range(len(left_data)):
-        assert left_data[i] == right_data[i]
+    assert all(
+        left_px == right_px
+        for left_px, right_px in zip(
+            iter(left.get_flattened_data()),
+            iter(right.get_flattened_data()),
+            strict=True,
+        )
+    )
 
 
 async def test_snapshot_correctly_triggered_and_saved(

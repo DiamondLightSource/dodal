@@ -12,7 +12,7 @@ class ShutterStates(StrictEnum):
 
 
 @pytest.fixture
-def shutter(RE: RunEngine) -> GenericFastShutter[ShutterStates]:
+def shutter() -> GenericFastShutter[ShutterStates]:
     with init_devices(mock=True):
         shutter = GenericFastShutter[ShutterStates](
             "TEST:",
@@ -23,21 +23,25 @@ def shutter(RE: RunEngine) -> GenericFastShutter[ShutterStates]:
 
 
 async def test_shutter_set_open_close_without_knowing_enum_values(
-    shutter: GenericFastShutter, RE: RunEngine
+    shutter: GenericFastShutter, run_engine: RunEngine
 ) -> None:
-    RE(bps.mv(shutter, shutter.open_state))
+    run_engine(bps.mv(shutter, shutter.open_state))
     assert await shutter.state.get_value() == ShutterStates.OPEN
-    RE(bps.mv(shutter, shutter.close_state))
+    run_engine(bps.mv(shutter, shutter.close_state))
     assert await shutter.state.get_value() == ShutterStates.CLOSE
 
 
-async def test_shutter_is_open(shutter: GenericFastShutter, RE: RunEngine) -> None:
-    RE(bps.mv(shutter, shutter.open_state))
+async def test_shutter_is_open(
+    shutter: GenericFastShutter, run_engine: RunEngine
+) -> None:
+    run_engine(bps.mv(shutter, shutter.open_state))
     assert await shutter.is_open()
     assert not await shutter.is_closed()
 
 
-async def test_shutter_is_closed(shutter: GenericFastShutter, RE: RunEngine) -> None:
-    RE(bps.mv(shutter, shutter.close_state))
+async def test_shutter_is_closed(
+    shutter: GenericFastShutter, run_engine: RunEngine
+) -> None:
+    run_engine(bps.mv(shutter, shutter.close_state))
     assert not await shutter.is_open()
     assert await shutter.is_closed()

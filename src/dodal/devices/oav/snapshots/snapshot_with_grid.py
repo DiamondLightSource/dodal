@@ -3,7 +3,7 @@ from os.path import join as path_join
 from ophyd_async.core import soft_signal_rw
 from PIL.Image import Image
 
-from dodal.devices.areadetector.plugins.MJPG import IMG_FORMAT, MJPG, asyncio_save_image
+from dodal.devices.areadetector.plugins.mjpg import IMG_FORMAT, MJPG, asyncio_save_image
 from dodal.devices.oav.snapshots.grid_overlay import (
     add_grid_border_overlay_to_image,
     add_grid_overlay_to_image,
@@ -12,7 +12,13 @@ from dodal.log import LOGGER
 
 
 class SnapshotWithGrid(MJPG):
-    def __init__(self, prefix: str, name: str = "") -> None:
+    def __init__(
+        self,
+        prefix: str,
+        name: str = "",
+        x_size_pv: str = "ArraySize1_RBV",
+        y_size_pv: str = "ArraySize2_RBV",
+    ) -> None:
         with self.add_children_as_readables():
             self.top_left_x = soft_signal_rw(float)
             self.top_left_y = soft_signal_rw(float)
@@ -23,7 +29,7 @@ class SnapshotWithGrid(MJPG):
             self.last_path_outer = soft_signal_rw(str)
             self.last_path_full_overlay = soft_signal_rw(str)
 
-        super().__init__(prefix, name)
+        super().__init__(prefix, name, x_size_pv, y_size_pv)
 
     async def post_processing(self, image: Image):
         # Save an unmodified image with no suffix

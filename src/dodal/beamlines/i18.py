@@ -12,14 +12,18 @@ from dodal.common.visit import (
     LocalDirectoryServiceClient,
     StaticVisitPathProvider,
 )
-from dodal.devices.common_dcm import BaseDCM, PitchAndRollCrystal, RollCrystal
+from dodal.devices.common_dcm import (
+    DoubleCrystalMonochromatorWithDSpacing,
+    PitchAndRollCrystal,
+    RollCrystal,
+)
 from dodal.devices.i18.diode import Diode
-from dodal.devices.i18.KBMirror import KBMirror
+from dodal.devices.i18.kb_mirror import KBMirror
 from dodal.devices.motors import XYStage, XYZThetaStage
 from dodal.devices.slits import Slits
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.tetramm import TetrammDetector
-from dodal.devices.undulator import Undulator
+from dodal.devices.undulator import UndulatorInKeV
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
@@ -49,19 +53,21 @@ def synchrotron() -> Synchrotron:
 
 
 @device_factory()
-def undulator() -> Undulator:
-    return Undulator(f"{PREFIX.insertion_prefix}-MO-SERVC-01:")
+def undulator() -> UndulatorInKeV:
+    return UndulatorInKeV(f"{PREFIX.insertion_prefix}-MO-SERVC-01:")
 
 
 # See https://github.com/DiamondLightSource/dodal/issues/1180
 @device_factory(skip=True)
-def dcm() -> BaseDCM[RollCrystal, PitchAndRollCrystal]:
-    # once spacing is added Si111 d-spacing is 3.135 angsterm , and Si311 is 1.637
-    # calculations are in gda/config/lookupTables/Si111/eV_Deg_converter.xml
-    return BaseDCM(
-        prefix=f"{PREFIX.beamline_prefix}-MO-DCM-01:",
-        xtal_1=RollCrystal,
-        xtal_2=PitchAndRollCrystal,
+def dcm() -> DoubleCrystalMonochromatorWithDSpacing:
+    """
+    A double crystal monocromator device, used to select the beam energy.
+
+    Once spacing is added Si111 d-spacing is 3.135 angsterm , and Si311 is 1.637
+    calculations are in gda/config/lookupTables/Si111/eV_Deg_converter.xml
+    """
+    return DoubleCrystalMonochromatorWithDSpacing(
+        f"{PREFIX.beamline_prefix}-MO-DCM-01:", RollCrystal, PitchAndRollCrystal
     )
 
 
