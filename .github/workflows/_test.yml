@@ -28,17 +28,17 @@ jobs:
 
       - name: Install uv
         uses: astral-sh/setup-uv@v7
-
+          
       - if: inputs.python-version == 'dev'
         name: Install dev versions of python packages
-        run: uv pip install ".[dev]"
+        run: uv sync --python "$(sed -Ene "s/ARG PYTHON_VERSION=([0-9\.]+).*/\1/p" Dockerfile)" --group dev
 
       - if: inputs.python-version != 'dev'
         name: Install latest versions of python packages
-        run: uv sync --python ${{ inputs.python-version }} --extra dev
-
+        run: uv sync --python ${{ inputs.python-version }} --group dev
+      
       - name: Run tests
-        run: uv run --locked tox -e tests
+        run: uv run --locked tox -e unit-report
 
       - name: Check unit test durations
         run: |
