@@ -21,8 +21,8 @@ MAGNET_BLOCKS_PER_PERIOD = 4
 MAGNTE_BLOCK_HEIGHT_MM = 16
 
 
-def get_convert_lut(client: ConfigServer, lut_path: str) -> dict[int, np.ndarray]:
-    lut_dict: dict[int, np.ndarray] = {}
+def get_convert_lut(client: ConfigServer, lut_path: str) -> dict[int, list]:
+    lut_dict: dict[int, list] = {}
     file_contents: dict = client.get_file_contents(
         lut_path,
         desired_return_type=dict,
@@ -30,17 +30,17 @@ def get_convert_lut(client: ConfigServer, lut_path: str) -> dict[int, np.ndarray
     )
     lut_values: list[list[Any]] = file_contents["rows"]
     for i in range(len(lut_values)):
-        lut_dict[int(lut_values[i][0])] = np.ndarray(lut_values[i])
+        lut_dict[int(lut_values[i][0])] = lut_values[i]
     return lut_dict
 
 
-def _validate_order(order: int, look_up_table: dict[int, "np.ndarray"]) -> None:
+def _validate_order(order: int, look_up_table: dict[int, list]) -> None:
     """Validate that the harmonic order exists in the lookup table."""
     if order not in look_up_table.keys():
         raise ValueError(f"Order parameter {order} not found in lookup table")
 
 
-def _calculate_gamma(look_up_table: dict[int, "np.ndarray"], order: int) -> float:
+def _calculate_gamma(look_up_table: dict[int, list], order: int) -> float:
     """Calculate the Lorentz factor gamma from the lookup table."""
     return 1000 * look_up_table[order][RING_ENERGY_COLUMN] / ELECTRON_REST_ENERGY_MEV
 
@@ -67,7 +67,7 @@ def _calculate_undulator_parameter_max(
 
 def calculate_gap_i09_hu(
     photon_energy_kev: float,
-    look_up_table: dict[int, np.ndarray],
+    look_up_table: dict[int, list],
     order: int = 1,
     gap_offset: float = 0.0,
     undulator_period_mm: int = 27,
@@ -135,7 +135,7 @@ def calculate_gap_i09_hu(
 
 def calculate_energy_i09_hu(
     gap: float,
-    look_up_table: dict[int, "np.ndarray"],
+    look_up_table: dict[int, list],
     order: int = 1,
     gap_offset: float = 0.0,
     undulator_period_mm: int = 27,

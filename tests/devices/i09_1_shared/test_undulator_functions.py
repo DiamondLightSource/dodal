@@ -3,7 +3,9 @@ import re
 import pytest
 
 from dodal.devices.i09_1_shared import calculate_gap_i09_hu
-from dodal.devices.i09_1_shared.hard_undulator_functions import calculate_energy_i09_hu
+from dodal.devices.i09_1_shared.hard_undulator_functions import (
+    calculate_energy_i09_hu,
+)
 
 pytest_plugins = ["dodal.testing.fixtures.devices.hard_undulator"]
 

@@ -3,7 +3,7 @@ from unittest.mock import MagicMock
 import pytest
 from daq_config_server.client import ConfigServer
 
-from dodal.devices.i09_1_shared import get_convert_lut
+from dodal.devices.i09_1_shared.hard_undulator_functions import get_convert_lut
 
 lut = {
     "column_names": [
@@ -41,7 +41,7 @@ def mock_config_client() -> ConfigServer:
     mock_config_client = ConfigServer()
     mock_config_client.get_file_contents = MagicMock(spec=["get_file_contents"])
 
-    def my_side_effect(file_path, reset_cached_result) -> dict:
+    def my_side_effect(file_path, desired_return_type, reset_cached_result):
         assert reset_cached_result is True
         return lut
 
