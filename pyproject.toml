@@ -38,7 +38,7 @@ license.file = "LICENSE"
 readme = "README.md"
 requires-python = ">=3.11"
 
-[project.optional-dependencies]
+[dependency-groups]
 dev = [
     "black",
     "diff-cover",
@@ -49,7 +49,6 @@ dev = [
     # "copier",
     "myst-parser",
     "ophyd_async[sim]>=v0.14.0",
-    "pipdeptree",
     "pre-commit",
     "psutil",
     "pydata-sphinx-theme>=0.12",
@@ -67,7 +66,6 @@ dev = [
     "sphinxcontrib-mermaid",
     "sphinx-design",
     "sphinx-autodoc-typehints",
-    "tox-direct",
     "types-requests",
     "types-mock",
     "types-PyYAML",
@@ -140,37 +138,121 @@ exclude_also = [
 omit = ["*/dodal/testing/fixtures/*"]
 
 [tool.coverage.run]
+patch = ["subprocess"]
 data_file = "/tmp/dodal.coverage"
 
 [tool.coverage.paths]
 # Tests are run from installed location, map back to the src directory
 source = ["src", "**/site-packages/"]
 
-# tox must currently be configured via an embedded ini string
-# See: https://github.com/tox-dev/tox/issues/999
 [tool.tox]
-legacy_tox_ini = """
-[tox]
-skipsdist=True
+skipsdist = true
+# envs to runs automatically with tox -p
+env_list = ["pre-commit", "type-checking", "tests", "docs"]
 
-[testenv:{pre-commit,type-checking,tests,docs,unit-report,system-report}]
-# Don't create a virtualenv for the command, requires tox-direct plugin
-direct = True
-passenv = *
-allowlist_externals =
-    pytest
-    pre-commit
-    pyright
-    sphinx-build
-    sphinx-autobuild
-commands =
-    tests: pytest -m 'not requires' {posargs}
-    type-checking: pyright src tests {posargs}
-    pre-commit: pre-commit run --all-files --show-diff-on-failure {posargs}
-    docs: sphinx-{posargs:build -E} -T docs build/html
-    unit-report: pytest --cov-report xml:unit_cov.xml --json-report --json-report-file=unit-report.json tests {posargs}
-    system-report: pytest -m 'not requires(instrument="i04")' --cov-report xml:system_cov.xml --json-report --json-report-file=system-report.json system_tests {posargs}
-"""
+[tool.tox.env_run_base]
+# Pass all environment variables to the test environments
+passenv = ["*"]
+
+[tool.tox.env.pre-commit]
+description = "Run pre-commit on all files"
+commands = [
+    [
+        "pre-commit",
+        "run",
+        "--all-files",
+        "--show-diff-on-failure",
+        { replace = "posargs", default = [
+        ], extend = true },
+    ],
+]
+
+[tool.tox.env.type-checking]
+description = "Run pyright"
+commands = [
+    [
+        "pyright",
+        "--pythonpath",
+        ".venv/bin/python",
+        "src",
+        "tests",
+        { replace = "posargs", default = [
+        ], extend = true },
+    ],
+]
+
+[tool.tox.env.tests]
+description = "Run tests with coverage"
+commands = [
+    [
+        "pytest", 
+        "--cov=dodal",
+        "--cov-report",
+        "term",
+        "--cov-report",
+        "xml:cov.xml",
+        { replace = "posargs", default = [
+        ], extend = true },
+    ],
+]
+
+[tool.tox.env.unit-report]
+description = "Run unit tests with coverage and JSON report"
+commands = [
+    [
+        "pytest",
+        "--cov-report", "xml:unit_cov.xml",
+        "--json-report",
+        "--json-report-file=unit-report.json",
+        "tests",
+        { replace = "posargs", default = [], extend = true },
+    ],
+]
+
+[tool.tox.env.system-report]
+description = "Run system tests with coverage and JSON report"
+commands = [
+    [
+        "pytest",
+        "-m", "not requires(instrument=\"i04\")",
+        "--cov-report", "xml:system_cov.xml",
+        "--json-report",
+        "--json-report-file=system-report.json",
+        "system_tests",
+        { replace = "posargs", default = [], extend = true },
+    ],
+]
+
+[tool.tox.env.docs]
+description = "Run docs build with clean environment"
+commands = [
+    [
+        "sphinx-build",
+        "--fresh-env",
+        "--show-traceback",
+        "--fail-on-warning",
+        "--keep-going",
+        "docs",
+        "build/html",
+        { replace = "posargs", default = [
+        ], extend = true },
+    ],
+]
+
+[tool.tox.env.docs-autobuild]
+description = "Run docs with autobuild on change"
+commands = [
+    [
+        "sphinx-autobuild",
+        "--show-traceback",
+        "--watch",
+        "README.md",
+        "docs",
+        "build/html",
+        { replace = "posargs", default = [
+        ], extend = true },
+    ],
+]
 
 [tool.ruff]
 src = ["src", "tests"]

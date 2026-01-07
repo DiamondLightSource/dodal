@@ -3,19 +3,17 @@ on:
     inputs:
       python-version:
         type: string
-        description: The version of python to install
-        required: true
+        description: The version of python to install, default is from .python-version file
+        default: ""
       runs-on:
         type: string
         description: The runner to run this job on
-        required: true
-    secrets:
-      CODECOV_TOKEN:
         required: true
 
 env:
   # https://github.com/pytest-dev/pytest/issues/2042
   PY_IGNORE_IMPORTMISMATCH: "1"
+  UV_PYTHON: ${{ inputs.python-version }}
 
 jobs:
   run:
@@ -28,30 +26,19 @@ jobs:
           # Need this to get version number from last tag
           fetch-depth: 0
 
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+
       - if: inputs.python-version == 'dev'
         name: Install dev versions of python packages
-        uses: ./.github/actions/install_requirements
-
-      - if: inputs.python-version == 'dev'
-        name: Write the requirements as an artifact
-        run: pip freeze --exclude-editable > /tmp/dev-requirements.txt
-
-      - if: inputs.python-version == 'dev'
-        name: Upload dev-requirements.txt
-        uses: actions/upload-artifact@v5
-        with:
-          name: dev-requirements
-          path: /tmp/dev-requirements.txt
+        run: uv pip install ".[dev]"
 
       - if: inputs.python-version != 'dev'
         name: Install latest versions of python packages
-        uses: ./.github/actions/install_requirements
-        with:
-          python-version: ${{ inputs.python-version }}
-          pip-install: ".[dev]"
+        run: uv sync --python ${{ inputs.python-version }} --extra dev
 
-      - name: Run unit tests
-        run: tox -e unit-report
+      - name: Run tests
+        run: uv run --locked tox -e tests
 
       - name: Check unit test durations
         run: |
@@ -73,7 +60,7 @@ jobs:
             ca-gateway
 
       - name: Run system tests
-        run: tox -e system-report
+        run: uv run --locked tox -e system-report
 
       - name: Check system test durations
         run: |
