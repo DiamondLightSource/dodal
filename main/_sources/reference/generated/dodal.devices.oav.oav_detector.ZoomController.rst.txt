@@ -36,6 +36,9 @@ dodal.devices.oav.oav\_detector.ZoomController
    .. autosummary::
    
       
+      ~ZoomController.DELAY_BETWEEN_MOTORS_AND_IMAGE_UPDATING_S
+      
+      
       
       
       

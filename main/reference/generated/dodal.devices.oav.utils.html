@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.oav.utils &#8212; dodal 1.68.1.dev9+g8b911e55a documentation</title>
+    <title>dodal.devices.oav.utils &#8212; dodal 1.68.1.dev10+g1fdd7dba9 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=75f135d4"></script>
+    <script src="../../_static/documentation_options.js?v=8cefd6d0"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -1117,10 +1117,13 @@
 <tr class="row-even"><td><p><a class="reference internal" href="#dodal.devices.oav.utils.calculate_x_y_z_of_pixel" title="dodal.devices.oav.utils.calculate_x_y_z_of_pixel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">calculate_x_y_z_of_pixel</span></code></a>(current_x_y_z, ...)</p></td>
 <td><p>Get the x, y, z position of a pixel in mm</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#dodal.devices.oav.utils.get_move_required_so_that_beam_is_at_pixel" title="dodal.devices.oav.utils.get_move_required_so_that_beam_is_at_pixel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_move_required_so_that_beam_is_at_pixel</span></code></a>(...)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dodal.devices.oav.utils.convert_to_gray_and_blur" title="dodal.devices.oav.utils.convert_to_gray_and_blur"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_to_gray_and_blur</span></code></a>(data)</p></td>
+<td><p>Preprocess the image array data (convert to grayscale and apply a gaussian blur) Image is converted to grayscale (using a weighted mean as green contributes more to brightness) as we aren't interested in data relating to colour.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#dodal.devices.oav.utils.get_move_required_so_that_beam_is_at_pixel" title="dodal.devices.oav.utils.get_move_required_so_that_beam_is_at_pixel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_move_required_so_that_beam_is_at_pixel</span></code></a>(...)</p></td>
 <td><p>Calculate the required move so that the given pixel is in the centre of the beam.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#dodal.devices.oav.utils.wait_for_tip_to_be_found" title="dodal.devices.oav.utils.wait_for_tip_to_be_found"><code class="xref py py-obj docutils literal notranslate"><span class="pre">wait_for_tip_to_be_found</span></code></a>(ophyd_pin_tip_detection)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dodal.devices.oav.utils.wait_for_tip_to_be_found" title="dodal.devices.oav.utils.wait_for_tip_to_be_found"><code class="xref py py-obj docutils literal notranslate"><span class="pre">wait_for_tip_to_be_found</span></code></a>(ophyd_pin_tip_detection)</p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -1206,6 +1209,23 @@
 </dl>
 </dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="dodal.devices.oav.utils.convert_to_gray_and_blur">
+<span class="sig-prename descclassname"><span class="pre">dodal.devices.oav.utils.</span></span><span class="sig-name descname"><span class="pre">convert_to_gray_and_blur</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Mat</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Mat</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span></span></span><a class="reference internal" href="../../_modules/dodal/devices/oav/utils.html#convert_to_gray_and_blur"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.oav.utils.convert_to_gray_and_blur" title="Link to this definition">#</a></dt>
+<dd><p>Preprocess the image array data (convert to grayscale and apply a gaussian blur)
+Image is converted to grayscale (using a weighted mean as green contributes more to brightness)
+as we aren’t interested in data relating to colour. A blur is then applied to mitigate
+errors due to rogue hot pixels.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Mat</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]</span>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Mat</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 
 
@@ -1259,6 +1279,7 @@
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.oav.utils.get_move_required_so_that_beam_is_at_pixel"><code class="docutils literal notranslate"><span class="pre">get_move_required_so_that_beam_is_at_pixel()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.oav.utils.calculate_x_y_z_of_pixel"><code class="docutils literal notranslate"><span class="pre">calculate_x_y_z_of_pixel()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.oav.utils.wait_for_tip_to_be_found"><code class="docutils literal notranslate"><span class="pre">wait_for_tip_to_be_found()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.oav.utils.convert_to_gray_and_blur"><code class="docutils literal notranslate"><span class="pre">convert_to_gray_and_blur()</span></code></a></li>
 </ul>
   </nav></div>
 

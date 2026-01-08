@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.oav.oav_detector &#8212; dodal 1.68.1.dev9+g8b911e55a documentation</title>
+    <title>dodal.devices.oav.oav_detector &#8212; dodal 1.68.1.dev10+g1fdd7dba9 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=75f135d4"></script>
+    <script src="../../../../_static/documentation_options.js?v=8cefd6d0"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -807,16 +807,20 @@ window.addEventListener("load", load);
                 <article class="bd-article">
                   
   <h1>Source code for dodal.devices.oav.oav_detector</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">IntEnum</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">IntEnum</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">bluesky.protocols</span><span class="w"> </span><span class="kn">import</span> <span class="n">Movable</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">DEFAULT_TIMEOUT</span><span class="p">,</span>
     <span class="n">AsyncStatus</span><span class="p">,</span>
+    <span class="n">DeviceMock</span><span class="p">,</span>
+    <span class="n">DeviceVector</span><span class="p">,</span>
     <span class="n">LazyMock</span><span class="p">,</span>
     <span class="n">SignalR</span><span class="p">,</span>
     <span class="n">SignalRW</span><span class="p">,</span>
     <span class="n">StandardReadable</span><span class="p">,</span>
+    <span class="n">default_mock_class</span><span class="p">,</span>
     <span class="n">derived_signal_r</span><span class="p">,</span>
     <span class="n">soft_signal_rw</span><span class="p">,</span>
 <span class="p">)</span>
@@ -831,6 +835,7 @@ window.addEventListener("load", load);
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.oav.snapshots.snapshot</span><span class="w"> </span><span class="kn">import</span> <span class="n">Snapshot</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.oav.snapshots.snapshot_with_grid</span><span class="w"> </span><span class="kn">import</span> <span class="n">SnapshotWithGrid</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.log</span><span class="w"> </span><span class="kn">import</span> <span class="n">LOGGER</span>
 
 
 <div class="viewcode-block" id="Coords">
@@ -874,8 +879,46 @@ window.addEventListener("load", load);
 
 
 
+<div class="viewcode-block" id="BeamCentreForZoom">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.oav.oav_detector.BeamCentreForZoom.html#dodal.devices.oav.oav_detector.BeamCentreForZoom">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">BeamCentreForZoom</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;These PVs hold the beam centre on the OAV at each zoom level.</span>
+
+<span class="sd">    When the zoom level is changed the IOC will update the OAV overlay PVs to be at these positions.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">level_name_pv_suffix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">centre_value_pv_suffix</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">level_name</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span>
+            <span class="nb">str</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">MP:SELECT.</span><span class="si">{</span><span class="n">level_name_pv_suffix</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x_centre</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span>
+            <span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">PBCX:VAL</span><span class="si">{</span><span class="n">centre_value_pv_suffix</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y_centre</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span>
+            <span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">PBCY:VAL</span><span class="si">{</span><span class="n">centre_value_pv_suffix</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="InstantMovingZoom">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.oav.oav_detector.InstantMovingZoom.html#dodal.devices.oav.oav_detector.InstantMovingZoom">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">InstantMovingZoom</span><span class="p">(</span><span class="n">DeviceMock</span><span class="p">[</span><span class="s2">&quot;ZoomController&quot;</span><span class="p">]):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mock behaviour that instantly moves the zoom.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="InstantMovingZoom.connect">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.oav.oav_detector.InstantMovingZoom.html#dodal.devices.oav.oav_detector.InstantMovingZoom.connect">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device</span><span class="p">:</span> <span class="s2">&quot;ZoomController&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Mock signals to do an instant move on setpoint write.&quot;&quot;&quot;</span>
+        <span class="n">device</span><span class="o">.</span><span class="n">DELAY_BETWEEN_MOTORS_AND_IMAGE_UPDATING_S</span> <span class="o">=</span> <span class="mf">0.001</span>  <span class="c1"># type:ignore</span></div>
+</div>
+
+
+
 <div class="viewcode-block" id="ZoomController">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.oav.oav_detector.ZoomController.html#dodal.devices.oav.oav_detector.ZoomController">[docs]</a>
+<span class="nd">@default_mock_class</span><span class="p">(</span><span class="n">InstantMovingZoom</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">ZoomController</span><span class="p">(</span><span class="n">BaseZoomController</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Device to control the zoom level. This should be set like</span>
@@ -883,19 +926,52 @@ window.addEventListener("load", load);
 <span class="sd">        oav.zoom_controller.set(&quot;1.0x&quot;)</span>
 
 <span class="sd">    Note that changing the zoom may change the AD wiring on the associated OAV, as such</span>
-<span class="sd">    you should wait on any zoom changs to finish before changing the OAV wiring.</span>
+<span class="sd">    you should wait on any zoom changes to finish before changing the OAV wiring.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">DELAY_BETWEEN_MOTORS_AND_IMAGE_UPDATING_S</span> <span class="o">=</span> <span class="mi">2</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">percentage</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">ZOOMPOSCMD&quot;</span><span class="p">)</span>
 
         <span class="c1"># Level is the string description of the zoom level e.g. &quot;1.0x&quot; or &quot;1.0&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">level</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">MP:SELECT&quot;</span><span class="p">)</span>
+
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
 
     <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="s2">&quot;Waiting </span><span class="si">{self.DELAY_BETWEEN_MOTORS_AND_IMAGE_UPDATING_S}</span><span class="s2"> seconds for zoom to be noticeable&quot;</span>
+        <span class="p">)</span>
+        <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">DELAY_BETWEEN_MOTORS_AND_IMAGE_UPDATING_S</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="ZoomControllerWithBeamCentres">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.oav.oav_detector.ZoomControllerWithBeamCentres.html#dodal.devices.oav.oav_detector.ZoomControllerWithBeamCentres">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ZoomControllerWithBeamCentres</span><span class="p">(</span><span class="n">ZoomController</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">level_to_centre_mapping</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">(</span><span class="s2">&quot;ZRST&quot;</span><span class="p">,</span> <span class="s2">&quot;A&quot;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;ONST&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;TWST&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;THST&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;FRST&quot;</span><span class="p">,</span> <span class="s2">&quot;E&quot;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;FVST&quot;</span><span class="p">,</span> <span class="s2">&quot;F&quot;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;SXST&quot;</span><span class="p">,</span> <span class="s2">&quot;G&quot;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;SVST&quot;</span><span class="p">,</span> <span class="s2">&quot;H&quot;</span><span class="p">),</span>
+        <span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">beam_centres</span> <span class="o">=</span> <span class="n">DeviceVector</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="n">i</span><span class="p">:</span> <span class="n">BeamCentreForZoom</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="o">*</span><span class="n">level_to_centre_mapping</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">level_to_centre_mapping</span><span class="p">))</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span></div>
 
 
 
@@ -941,6 +1017,7 @@ window.addEventListener("load", load);
             <span class="bp">self</span><span class="o">.</span><span class="n">zoom_controller</span> <span class="o">=</span> <span class="n">zoom_controller</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">cam</span> <span class="o">=</span> <span class="n">Cam</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">CAM:&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">grid_snapshot</span> <span class="o">=</span> <span class="n">SnapshotWithGrid</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}{</span><span class="n">mjpeg_prefix</span><span class="si">}</span><span class="s2">:&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">mjpg_x_size_pv</span><span class="p">,</span> <span class="n">mjpg_y_size_pv</span>

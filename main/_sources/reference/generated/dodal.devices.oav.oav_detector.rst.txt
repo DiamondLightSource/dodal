@@ -15,12 +15,15 @@ dodal.devices.oav.oav\_detector
    :recursive:
 
    ~oav_detector.BaseZoomController
+   ~oav_detector.BeamCentreForZoom
    ~oav_detector.Coords
+   ~oav_detector.InstantMovingZoom
    ~oav_detector.NullZoomController
    ~oav_detector.OAV
    ~oav_detector.OAVBeamCentreFile
    ~oav_detector.OAVBeamCentrePV
    ~oav_detector.ZoomController
+   ~oav_detector.ZoomControllerWithBeamCentres
 
 
 
