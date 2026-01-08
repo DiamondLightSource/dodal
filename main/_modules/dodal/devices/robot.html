@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.robot &#8212; dodal 1.68.1.dev7+g3fe868027 documentation</title>
+    <title>dodal.devices.robot &#8212; dodal 1.68.1.dev8+ga03a288f4 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=c81fa66d"></script>
+    <script src="../../../_static/documentation_options.js?v=bcb069ca"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -855,6 +855,9 @@ window.addEventListener("load", load);
 
 
 
+<span class="n">SAMPLE_LOCATION_EMPTY</span> <span class="o">=</span> <span class="n">SampleLocation</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+
 <div class="viewcode-block" id="PinMounted">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.robot.PinMounted.html#dodal.devices.robot.PinMounted">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">PinMounted</span><span class="p">(</span><span class="n">StrictEnum</span><span class="p">):</span>
@@ -881,7 +884,7 @@ window.addEventListener("load", load);
 
 <div class="viewcode-block" id="BartRobot">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.robot.BartRobot.html#dodal.devices.robot.BartRobot">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">BartRobot</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">,</span> <span class="n">Movable</span><span class="p">[</span><span class="n">SampleLocation</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">BartRobot</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">,</span> <span class="n">Movable</span><span class="p">[</span><span class="n">SampleLocation</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;The sample changing robot.&quot;&quot;&quot;</span>
 
     <span class="c1"># How long to wait for the robot if it is busy soaking/drying</span>
@@ -1004,16 +1007,16 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="BartRobot.set">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.robot.BartRobot.html#dodal.devices.robot.BartRobot.set">[docs]</a>
     <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">SampleLocation</span> <span class="o">|</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">SampleLocation</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Perform a sample load from the specified sample location</span>
 <span class="sd">        Args:</span>
-<span class="sd">            value: The pin and puck to load, or None to unload the sample.</span>
+<span class="sd">            value: The pin and puck to load, or SAMPLE_LOCATION_EMPTY to unload the sample.</span>
 <span class="sd">        Raises:</span>
-<span class="sd">            RobotLoadError if a timeout occurs, or if an error occurs loading the smaple.</span>
+<span class="sd">            RobotLoadError if a timeout occurs, or if an error occurs loading the sample.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">value</span> <span class="o">!=</span> <span class="n">SAMPLE_LOCATION_EMPTY</span><span class="p">:</span>
                 <span class="k">await</span> <span class="n">wait_for</span><span class="p">(</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_load_pin_and_puck</span><span class="p">(</span><span class="n">value</span><span class="p">),</span>
                     <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">LOAD_TIMEOUT</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">NOT_BUSY_TIMEOUT</span><span class="p">,</span>
