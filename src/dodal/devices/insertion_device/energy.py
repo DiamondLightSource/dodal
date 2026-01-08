@@ -106,7 +106,6 @@ class BeamEnergy(StandardReadable, Movable[float], Preparable, Flyable):
         name:
             New device name.
         """
-        super().__init__(name=name)
         self._id_energy = Reference(id_energy)
         self._mono_energy = Reference(mono)
 
@@ -120,7 +119,7 @@ class BeamEnergy(StandardReadable, Movable[float], Preparable, Flyable):
 
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             self.id_energy_offset = soft_signal_rw(float, initial_value=0)
-
+        super().__init__(name=name)
     @AsyncStatus.wrap
     async def set(self, energy: float) -> None:
         LOGGER.info(f"Moving f{self.name} energy to {energy}.")
