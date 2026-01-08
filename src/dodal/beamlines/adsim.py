@@ -56,6 +56,11 @@ run_engine(count([d], num=10))
 
 @devices.fixture
 def path_provider():
+    # This fixture is only used if a path_provider is not passed to the device
+    # manager when the devices are built.
+    #
+    # When used via blueAPI with numtracker enabled, it will take priority and
+    # the path provider here will not be created.
     from pathlib import Path
 
     from ophyd_async.core import StaticPathProvider, UUIDFilenameProvider
