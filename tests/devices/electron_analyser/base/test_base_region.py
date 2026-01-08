@@ -1,14 +1,15 @@
 from unittest.mock import patch
 
 import pytest
+from ophyd_async.core import init_devices
 
-from dodal.common.data_util import load_json_file_to_class
 from dodal.devices import b07, i09
 from dodal.devices.electron_analyser.base import (
     AbstractBaseRegion,
     EnergyMode,
     GenericRegion,
     GenericSequence,
+    JsonSequenceLoader,
     TAbstractBaseRegion,
     to_binding_energy,
     to_kinetic_energy,
@@ -20,7 +21,6 @@ from dodal.devices.electron_analyser.specs import (
 from dodal.devices.electron_analyser.vgscienta import VGScientaRegion, VGScientaSequence
 from tests.devices.electron_analyser.helper_util import (
     TEST_SEQUENCE_REGION_NAMES,
-    get_test_sequence,
 )
 
 
@@ -30,8 +30,17 @@ from tests.devices.electron_analyser.helper_util import (
         VGScientaSequence[i09.LensMode, i09.PsuMode, i09.PassEnergy],
     ]
 )
-def sequence(request: pytest.FixtureRequest) -> GenericSequence:
-    return load_json_file_to_class(request.param, get_test_sequence(request.param))
+def sequence_class(request: pytest.FixtureRequest) -> GenericSequence:
+    return request.param
+
+
+@pytest.fixture
+def sequence_loader(
+    sequence_class: type[GenericSequence],
+) -> JsonSequenceLoader[GenericSequence]:
+    with init_devices(mock=True):
+        sequence_loader = JsonSequenceLoader[GenericSequence](sequence_class)
+    return sequence_loader
 
 
 @pytest.fixture

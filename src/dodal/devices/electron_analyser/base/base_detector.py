@@ -18,6 +18,7 @@ from dodal.devices.electron_analyser.base.base_driver_io import (
     TAbstractAnalyserDriverIO,
 )
 from dodal.devices.electron_analyser.base.base_region import (
+    AbstractBaseSequence,
     GenericRegion,
     SequenceLoader,
     TAbstractBaseRegion,
@@ -46,7 +47,7 @@ class ElectronAnalyserDetector(
         controller: ElectronAnalyserController[
             TAbstractAnalyserDriverIO, TAbstractBaseRegion
         ],
-        sequence_loader: SequenceLoader,
+        sequence_loader: SequenceLoader[AbstractBaseSequence[TAbstractBaseRegion]],
         name: str = "",
     ):
         self._controller = controller

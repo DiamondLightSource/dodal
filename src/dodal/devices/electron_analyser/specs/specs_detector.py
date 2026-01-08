@@ -4,13 +4,21 @@ from dodal.devices.electron_analyser.base.base_controller import (
     ElectronAnalyserController,
 )
 from dodal.devices.electron_analyser.base.base_detector import ElectronAnalyserDetector
-from dodal.devices.electron_analyser.base.base_region import TLensMode, TPsuMode
+from dodal.devices.electron_analyser.base.base_region import (
+    AbstractBaseSequence,
+    JsonSequenceLoader,
+    TLensMode,
+    TPsuMode,
+)
 from dodal.devices.electron_analyser.base.energy_sources import (
     DualEnergySource,
     EnergySource,
 )
 from dodal.devices.electron_analyser.specs.specs_driver_io import SpecsAnalyserDriverIO
-from dodal.devices.electron_analyser.specs.specs_region import SpecsRegion
+from dodal.devices.electron_analyser.specs.specs_region import (
+    SpecsRegion,
+    SpecsSequence,
+)
 
 
 class SpecsDetector(
@@ -37,4 +45,8 @@ class SpecsDetector(
             SpecsAnalyserDriverIO[TLensMode, TPsuMode], SpecsRegion[TLensMode, TPsuMode]
         ](self.driver, energy_source, 0)
 
-        super().__init__(controller, name)
+        sequence_loader = JsonSequenceLoader[
+            AbstractBaseSequence[SpecsRegion[TLensMode, TPsuMode]]
+        ](SpecsSequence[lens_mode_type, psu_mode_type])
+
+        super().__init__(controller, sequence_loader, name)

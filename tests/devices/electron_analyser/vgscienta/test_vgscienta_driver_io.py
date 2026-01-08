@@ -13,10 +13,11 @@ from ophyd_async.testing import (
     partial_reading,
 )
 
-from dodal.devices.electron_analyser.base import EnergyMode
+from dodal.devices.electron_analyser.base import EnergyMode, JsonSequenceLoader
 from dodal.devices.electron_analyser.vgscienta import (
     VGScientaAnalyserDriverIO,
     VGScientaRegion,
+    VGScientaSequence,
 )
 from dodal.devices.i09 import LensMode, PassEnergy, PsuMode
 from dodal.testing.electron_analyser import create_driver
@@ -32,6 +33,17 @@ async def sim_driver() -> VGScientaAnalyserDriverIO[LensMode, PsuMode, PassEnerg
             VGScientaAnalyserDriverIO[LensMode, PsuMode, PassEnergy], prefix="TEST:"
         )
     return sim_driver
+
+
+@pytest.fixture
+def sequence_loader() -> JsonSequenceLoader[
+    VGScientaSequence[LensMode, PsuMode, PassEnergy]
+]:
+    with init_devices(mock=True):
+        sequence_loader = JsonSequenceLoader[
+            VGScientaSequence[LensMode, PsuMode, PassEnergy]
+        ](VGScientaSequence[LensMode, PsuMode, PassEnergy])
+    return sequence_loader
 
 
 @pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)

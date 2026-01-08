@@ -1,12 +1,13 @@
 import re
-from abc import ABC
+from abc import ABC, abstractmethod
 from collections.abc import Callable
 from typing import Generic, Self, TypeAlias, TypeVar
 
 from bluesky.protocols import Movable
 from ophyd_async.core import (
     AsyncStatus,
-    Device,
+    StandardReadable,
+    StandardReadableFormat,
     StrictEnum,
     SupersetEnum,
     soft_signal_r_and_setter,
@@ -210,15 +211,10 @@ GenericSequence = AbstractBaseSequence[GenericRegion]
 TAbstractBaseSequence = TypeVar("TAbstractBaseSequence", bound=AbstractBaseSequence)
 
 
-class SequenceLoader(Device, Movable[str], Generic[TAbstractBaseSequence]):
+class SequenceLoader(StandardReadable, Movable[str], Generic[TAbstractBaseSequence]):
     """
-    Docstring for SequenceLoader
-
-    :var Args: Description
-    :var filename: Description
-    :vartype filename: Path
-    :var Returns: Description
-    :var https: Description
+    Device that controls the sequence file selected that configures the electron
+    analyser inside plans.
     """
 
     def __init__(
@@ -227,9 +223,10 @@ class SequenceLoader(Device, Movable[str], Generic[TAbstractBaseSequence]):
         initial_file: str = "Not set",
         name: str = "",
     ):
-        self.sequence_file, self._sequence_file_setter = soft_signal_r_and_setter(
-            str, initial_value=initial_file
-        )
+        with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
+            self.sequence_file, self._sequence_file_setter = soft_signal_r_and_setter(
+                str, initial_value=initial_file
+            )
         self._sequence_class = sequence_class
 
         self.sequence: TAbstractBaseSequence | None = None
@@ -242,9 +239,10 @@ class SequenceLoader(Device, Movable[str], Generic[TAbstractBaseSequence]):
         self.sequence = self.load(filename)
         self._sequence_file_setter(filename)
 
+    @abstractmethod
     def load(self, filename: str) -> TAbstractBaseSequence:
         """
-        Load the sequence data from a provided json file into a sequence class.
+        Load the sequence data from a provided file into a sequence class.
 
         Args:
             filename: Path to the sequence file containing the region data.
@@ -252,4 +250,11 @@ class SequenceLoader(Device, Movable[str], Generic[TAbstractBaseSequence]):
         Returns:
             Pydantic model representing the sequence file.
         """
+        # return load_json_file_to_class(self._sequence_class, filename)
+
+
+class JsonSequenceLoader(SequenceLoader[TAbstractBaseSequence]):
+    """Json specifc sequence loader for electron analysers"""
+
+    def load(self, filename: str) -> TAbstractBaseSequence:
         return load_json_file_to_class(self._sequence_class, filename)

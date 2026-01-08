@@ -5,7 +5,8 @@ from dodal.devices.electron_analyser.base.base_controller import (
 )
 from dodal.devices.electron_analyser.base.base_detector import ElectronAnalyserDetector
 from dodal.devices.electron_analyser.base.base_region import (
-    SequenceLoader,
+    AbstractBaseSequence,
+    JsonSequenceLoader,
     TLensMode,
     TPsuMode,
 )
@@ -19,6 +20,7 @@ from dodal.devices.electron_analyser.vgscienta.vgscienta_driver_io import (
 from dodal.devices.electron_analyser.vgscienta.vgscienta_region import (
     TPassEnergyEnum,
     VGScientaRegion,
+    VGScientaSequence,
 )
 
 
@@ -36,7 +38,6 @@ class VGScientaDetector(
         psu_mode_type: type[TPsuMode],
         pass_energy_type: type[TPassEnergyEnum],
         energy_source: DualEnergySource | EnergySource,
-        sequence_loader: SequenceLoader,
         name: str = "",
     ):
         # Save to class so takes part with connect()
@@ -48,5 +49,9 @@ class VGScientaDetector(
             VGScientaAnalyserDriverIO[TLensMode, TPsuMode, TPassEnergyEnum],
             VGScientaRegion[TLensMode, TPassEnergyEnum],
         ](self.driver, energy_source, 0)
+
+        sequence_loader = JsonSequenceLoader[
+            AbstractBaseSequence[VGScientaRegion[TLensMode, TPassEnergyEnum]]
+        ](VGScientaSequence[lens_mode_type, psu_mode_type, pass_energy_type])
 
         super().__init__(controller, sequence_loader, name)
