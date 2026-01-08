@@ -22,7 +22,7 @@ from dodal.devices.insertion_device import (
     UndulatorPhaseAxes,
 )
 from dodal.devices.insertion_device.energy_motor_lookup import EnergyMotorLookup
-from dodal.devices.insertion_device.id_enum import Pol
+from dodal.devices.insertion_device.enum import Pol
 
 ROW_PHASE_MOTOR_TOLERANCE = 0.004
 MAXIMUM_ROW_PHASE_MOTOR_POSITION = 24.0
@@ -141,12 +141,12 @@ class I10Apple2Controller(Apple2Controller[I10Apple2]):
     def _get_apple2_value(self, gap: float, phase: float, pol: Pol) -> Apple2Val:
         phase3 = phase * (-1 if pol == Pol.LA else 1)
         return Apple2Val(
-            gap=f"{gap:.6f}",
+            gap=gap,
             phase=Apple2PhasesVal(
-                top_outer=f"{phase:.6f}",
-                top_inner="0.0",
-                btm_inner=f"{phase3:.6f}",
-                btm_outer="0.0",
+                top_outer=phase,
+                top_inner=0.0,
+                btm_inner=phase3,
+                btm_outer=0.0,
             ),
         )
 

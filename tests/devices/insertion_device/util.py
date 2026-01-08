@@ -2,14 +2,12 @@ import json
 
 from pydantic import BaseModel
 
-from dodal.devices.insertion_device import Pol
-from dodal.devices.insertion_device.energy_motor_lookup import (
+from dodal.devices.insertion_device import (
     ConfigServerEnergyMotorLookup,
-    EnergyMotorLookup,
-)
-from dodal.devices.insertion_device.lookup_table_models import (
     EnergyCoverage,
+    EnergyMotorLookup,
     LookupTable,
+    Pol,
 )
 
 
