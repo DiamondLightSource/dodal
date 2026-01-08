@@ -15,11 +15,11 @@ dodal.devices.robot.BartRobot
       
       
       
+      ~BartRobot.beamline_status_or_error
       
       
       
       
-      ~BartRobot.pin_state_or_error
       
       
       

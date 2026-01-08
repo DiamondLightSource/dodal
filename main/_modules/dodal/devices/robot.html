@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.robot &#8212; dodal 1.68.1.dev8+ga03a288f4 documentation</title>
+    <title>dodal.devices.robot &#8212; dodal 1.68.1.dev9+g8b911e55a documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=bcb069ca"></script>
+    <script src="../../../_static/documentation_options.js?v=75f135d4"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -810,6 +810,7 @@ window.addEventListener("load", load);
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">asyncio</span><span class="w"> </span><span class="kn">import</span> <span class="n">FIRST_COMPLETED</span><span class="p">,</span> <span class="n">CancelledError</span><span class="p">,</span> <span class="n">Task</span><span class="p">,</span> <span class="n">wait_for</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">IntEnum</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">bluesky.protocols</span><span class="w"> </span><span class="kn">import</span> <span class="n">Movable</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
@@ -830,8 +831,8 @@ window.addEventListener("load", load);
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.log</span><span class="w"> </span><span class="kn">import</span> <span class="n">LOGGER</span>
 
-<span class="n">WAIT_FOR_OLD_PIN_MSG</span> <span class="o">=</span> <span class="s2">&quot;Waiting on old pin unloaded&quot;</span>
-<span class="n">WAIT_FOR_NEW_PIN_MSG</span> <span class="o">=</span> <span class="s2">&quot;Waiting on new pin loaded&quot;</span>
+<span class="n">WAIT_FOR_BEAMLINE_DISABLE_MSG</span> <span class="o">=</span> <span class="s2">&quot;Waiting on beamline disable&quot;</span>
+<span class="n">WAIT_FOR_BEAMLINE_ENABLE_MSG</span> <span class="o">=</span> <span class="s2">&quot;Waiting on beamline enable&quot;</span>
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">RobotLoadError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
@@ -863,6 +864,14 @@ window.addEventListener("load", load);
 <span class="k">class</span><span class="w"> </span><span class="nc">PinMounted</span><span class="p">(</span><span class="n">StrictEnum</span><span class="p">):</span>
     <span class="n">NO_PIN_MOUNTED</span> <span class="o">=</span> <span class="s2">&quot;No Pin Mounted&quot;</span>
     <span class="n">PIN_MOUNTED</span> <span class="o">=</span> <span class="s2">&quot;Pin Mounted&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="BeamlineStatus">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.robot.BeamlineStatus.html#dodal.devices.robot.BeamlineStatus">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">BeamlineStatus</span><span class="p">(</span><span class="n">IntEnum</span><span class="p">):</span>
+    <span class="n">ENABLED</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">DISABLED</span> <span class="o">=</span> <span class="mi">1</span></div>
 
 
 
@@ -909,6 +918,8 @@ window.addEventListener("load", load);
             <span class="bp">self</span><span class="o">.</span><span class="n">current_puck</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;CURRENT_PUCK_RBV&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">current_pin</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;CURRENT_PIN_RBV&quot;</span><span class="p">)</span>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">beamline_disabled</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;ROBOT_OP_16_BITS.B8&quot;</span><span class="p">)</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">next_pin</span> <span class="o">=</span> <span class="n">epics_signal_rw_rbv</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;NEXT_PIN&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">next_puck</span> <span class="o">=</span> <span class="n">epics_signal_rw_rbv</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;NEXT_PUCK&quot;</span><span class="p">)</span>
 
@@ -939,10 +950,10 @@ window.addEventListener("load", load);
         <span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
 
-<div class="viewcode-block" id="BartRobot.pin_state_or_error">
-<a class="viewcode-back" href="../../../reference/generated/dodal.devices.robot.BartRobot.html#dodal.devices.robot.BartRobot.pin_state_or_error">[docs]</a>
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">pin_state_or_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expected_state</span><span class="o">=</span><span class="n">PinMounted</span><span class="o">.</span><span class="n">PIN_MOUNTED</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;This co-routine will finish when either the pin sensor reaches the specified</span>
+<div class="viewcode-block" id="BartRobot.beamline_status_or_error">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.robot.BartRobot.html#dodal.devices.robot.BartRobot.beamline_status_or_error">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">beamline_status_or_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expected_state</span><span class="p">:</span> <span class="n">BeamlineStatus</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;This co-routine will finish when either the beamline reaches the specified</span>
 <span class="sd">        state or the robot gives an error (whichever happens first). In the case where</span>
 <span class="sd">        there is an error a RobotLoadError error is raised.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -955,12 +966,12 @@ window.addEventListener("load", load);
             <span class="n">error_msg</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">prog_error</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
             <span class="k">raise</span> <span class="n">RobotLoadError</span><span class="p">(</span><span class="n">error_code</span><span class="p">,</span> <span class="n">error_msg</span><span class="p">)</span>
 
-        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">wfv</span><span class="p">():</span>
-            <span class="k">await</span> <span class="n">wait_for_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gonio_pin_sensor</span><span class="p">,</span> <span class="n">expected_state</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">wait_for_expected_state</span><span class="p">():</span>
+            <span class="k">await</span> <span class="n">wait_for_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">beamline_disabled</span><span class="p">,</span> <span class="n">expected_state</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
         <span class="n">tasks</span> <span class="o">=</span> <span class="p">[</span>
             <span class="p">(</span><span class="n">Task</span><span class="p">(</span><span class="n">raise_if_error</span><span class="p">())),</span>
-            <span class="p">(</span><span class="n">Task</span><span class="p">(</span><span class="n">wfv</span><span class="p">())),</span>
+            <span class="p">(</span><span class="n">Task</span><span class="p">(</span><span class="n">wait_for_expected_state</span><span class="p">())),</span>
         <span class="p">]</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">finished</span><span class="p">,</span> <span class="n">unfinished</span> <span class="o">=</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span>
@@ -997,12 +1008,15 @@ window.addEventListener("load", load);
             <span class="n">set_and_wait_for_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">next_pin</span><span class="p">,</span> <span class="n">sample_location</span><span class="o">.</span><span class="n">pin</span><span class="p">),</span>
         <span class="p">)</span>
         <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">load</span><span class="o">.</span><span class="n">trigger</span><span class="p">()</span>
-        <span class="k">if</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">gonio_pin_sensor</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span> <span class="o">==</span> <span class="n">PinMounted</span><span class="o">.</span><span class="n">PIN_MOUNTED</span><span class="p">:</span>
-            <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">WAIT_FOR_OLD_PIN_MSG</span><span class="p">)</span>
-            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">pin_state_or_error</span><span class="p">(</span><span class="n">PinMounted</span><span class="o">.</span><span class="n">NO_PIN_MOUNTED</span><span class="p">)</span>
-        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">WAIT_FOR_NEW_PIN_MSG</span><span class="p">)</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wait_for_beamline_enabled_after_load_or_unload</span><span class="p">()</span>
 
-        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">pin_state_or_error</span><span class="p">()</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_wait_for_beamline_enabled_after_load_or_unload</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">beamline_disabled</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span> <span class="o">==</span> <span class="n">BeamlineStatus</span><span class="o">.</span><span class="n">ENABLED</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">WAIT_FOR_BEAMLINE_DISABLE_MSG</span><span class="p">)</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">beamline_status_or_error</span><span class="p">(</span><span class="n">BeamlineStatus</span><span class="o">.</span><span class="n">DISABLED</span><span class="p">)</span>
+
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">WAIT_FOR_BEAMLINE_ENABLE_MSG</span><span class="p">)</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">beamline_status_or_error</span><span class="p">(</span><span class="n">BeamlineStatus</span><span class="o">.</span><span class="n">ENABLED</span><span class="p">)</span>
 
 <div class="viewcode-block" id="BartRobot.set">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.robot.BartRobot.html#dodal.devices.robot.BartRobot.set">[docs]</a>
@@ -1023,7 +1037,10 @@ window.addEventListener("load", load);
                 <span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">unload</span><span class="o">.</span><span class="n">trigger</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">LOAD_TIMEOUT</span><span class="p">)</span>
-                <span class="k">await</span> <span class="n">wait_for_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">program_running</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">NOT_BUSY_TIMEOUT</span><span class="p">)</span>
+                <span class="k">await</span> <span class="n">wait_for</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_wait_for_beamline_enabled_after_load_or_unload</span><span class="p">(),</span>
+                    <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">LOAD_TIMEOUT</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">NOT_BUSY_TIMEOUT</span><span class="p">,</span>
+                <span class="p">)</span>
         <span class="k">except</span> <span class="ne">TimeoutError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">prog_error</span><span class="o">.</span><span class="n">raise_if_error</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
             <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">controller_error</span><span class="o">.</span><span class="n">raise_if_error</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>

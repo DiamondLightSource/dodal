@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.robot.BartRobot &#8212; dodal 1.68.1.dev8+ga03a288f4 documentation</title>
+    <title>dodal.devices.robot.BartRobot &#8212; dodal 1.68.1.dev9+g8b911e55a documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=bcb069ca"></script>
+    <script src="../../_static/documentation_options.js?v=75f135d4"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -58,7 +58,7 @@
     <link rel="icon" href="../../_static/dls-logo.svg"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="dodal.devices.robot.ErrorStatus" href="dodal.devices.robot.ErrorStatus.html" />
+    <link rel="next" title="dodal.devices.robot.BeamlineStatus" href="dodal.devices.robot.BeamlineStatus.html" />
     <link rel="prev" title="dodal.devices.robot" href="dodal.devices.robot.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -895,6 +895,7 @@
 </details></li>
 <li class="toctree-l3 current active has-children"><a class="reference internal" href="dodal.devices.robot.html">dodal.devices.robot</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l4 current active"><a class="current reference internal" href="#">dodal.devices.robot.BartRobot</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.robot.BeamlineStatus.html">dodal.devices.robot.BeamlineStatus</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.robot.ErrorStatus.html">dodal.devices.robot.ErrorStatus</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.robot.PinMounted.html">dodal.devices.robot.PinMounted</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.robot.SampleLocation.html">dodal.devices.robot.SampleLocation</a></li>
@@ -1113,8 +1114,8 @@
 <p class="rubric">Methods</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#dodal.devices.robot.BartRobot.pin_state_or_error" title="dodal.devices.robot.BartRobot.pin_state_or_error"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pin_state_or_error</span></code></a>([expected_state])</p></td>
-<td><p>This co-routine will finish when either the pin sensor reaches the specified state or the robot gives an error (whichever happens first).</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dodal.devices.robot.BartRobot.beamline_status_or_error" title="dodal.devices.robot.BartRobot.beamline_status_or_error"><code class="xref py py-obj docutils literal notranslate"><span class="pre">beamline_status_or_error</span></code></a>(expected_state)</p></td>
+<td><p>This co-routine will finish when either the beamline reaches the specified state or the robot gives an error (whichever happens first).</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#dodal.devices.robot.BartRobot.set" title="dodal.devices.robot.BartRobot.set"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set</span></code></a>(value)</p></td>
 <td><p>Perform a sample load from the specified sample location :type value: <span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="dodal.devices.robot.SampleLocation.html#dodal.devices.robot.SampleLocation" title="dodal.devices.robot.SampleLocation"><code class="xref py py-class docutils literal notranslate"><span class="pre">SampleLocation</span></code></a></span> :param value: The pin and puck to load, or SAMPLE_LOCATION_EMPTY to unload the sample.</p></td>
@@ -1147,11 +1148,16 @@
 </table>
 </div>
 <dl class="py method">
-<dt class="sig sig-object py" id="dodal.devices.robot.BartRobot.pin_state_or_error">
-<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pin_state_or_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expected_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">PinMounted.PIN_MOUNTED</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dodal/devices/robot.html#BartRobot.pin_state_or_error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.robot.BartRobot.pin_state_or_error" title="Link to this definition">#</a></dt>
-<dd><p>This co-routine will finish when either the pin sensor reaches the specified
+<dt class="sig sig-object py" id="dodal.devices.robot.BartRobot.beamline_status_or_error">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">beamline_status_or_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expected_state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="dodal.devices.robot.BeamlineStatus.html#dodal.devices.robot.BeamlineStatus" title="dodal.devices.robot.BeamlineStatus"><span class="pre">BeamlineStatus</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dodal/devices/robot.html#BartRobot.beamline_status_or_error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.robot.BartRobot.beamline_status_or_error" title="Link to this definition">#</a></dt>
+<dd><p>This co-routine will finish when either the beamline reaches the specified
 state or the robot gives an error (whichever happens first). In the case where
 there is an error a RobotLoadError error is raised.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>expected_state</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="dodal.devices.robot.BeamlineStatus.html#dodal.devices.robot.BeamlineStatus" title="dodal.devices.robot.BeamlineStatus"><code class="xref py py-class docutils literal notranslate"><span class="pre">BeamlineStatus</span></code></a></span>)</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -1191,11 +1197,11 @@ there is an error a RobotLoadError error is raised.</p>
       </div>
     </a>
     <a class="right-next"
-       href="dodal.devices.robot.ErrorStatus.html"
+       href="dodal.devices.robot.BeamlineStatus.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">dodal.devices.robot.ErrorStatus</p>
+        <p class="prev-next-title">dodal.devices.robot.BeamlineStatus</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -1219,7 +1225,7 @@ there is an error a RobotLoadError error is raised.</p>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.robot.BartRobot"><code class="docutils literal notranslate"><span class="pre">BartRobot</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.robot.BartRobot.pin_state_or_error"><code class="docutils literal notranslate"><span class="pre">BartRobot.pin_state_or_error()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.robot.BartRobot.beamline_status_or_error"><code class="docutils literal notranslate"><span class="pre">BartRobot.beamline_status_or_error()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.robot.BartRobot.set"><code class="docutils literal notranslate"><span class="pre">BartRobot.set()</span></code></a></li>
 </ul>
 </li>

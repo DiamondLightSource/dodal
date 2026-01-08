@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Index &#8212; dodal 1.68.1.dev8+ga03a288f4 documentation</title>
+    <title>Index &#8212; dodal 1.68.1.dev9+g8b911e55a documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="_static/documentation_options.js?v=bcb069ca"></script>
+    <script src="_static/documentation_options.js?v=75f135d4"></script>
     <script src="_static/doctools.js?v=9a2dae69"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -1253,6 +1253,7 @@ window.addEventListener("load", load);
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="reference/generated/dodal.devices.robot.html">dodal.devices.robot</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="reference/generated/dodal.devices.robot.BartRobot.html">dodal.devices.robot.BartRobot</a></li>
+<li class="toctree-l4"><a class="reference internal" href="reference/generated/dodal.devices.robot.BeamlineStatus.html">dodal.devices.robot.BeamlineStatus</a></li>
 <li class="toctree-l4"><a class="reference internal" href="reference/generated/dodal.devices.robot.ErrorStatus.html">dodal.devices.robot.ErrorStatus</a></li>
 <li class="toctree-l4"><a class="reference internal" href="reference/generated/dodal.devices.robot.PinMounted.html">dodal.devices.robot.PinMounted</a></li>
 <li class="toctree-l4"><a class="reference internal" href="reference/generated/dodal.devices.robot.SampleLocation.html">dodal.devices.robot.SampleLocation</a></li>
@@ -1586,6 +1587,10 @@ window.addEventListener("load", load);
 </li>
       <li><a href="reference/generated/dodal.devices.insertion_device.BeamEnergy.html#dodal.devices.insertion_device.BeamEnergy">BeamEnergy (class in dodal.devices.insertion_device)</a>
 </li>
+      <li><a href="reference/generated/dodal.devices.robot.BartRobot.html#dodal.devices.robot.BartRobot.beamline_status_or_error">beamline_status_or_error() (dodal.devices.robot.BartRobot method)</a>
+</li>
+      <li><a href="reference/generated/dodal.devices.robot.BeamlineStatus.html#dodal.devices.robot.BeamlineStatus">BeamlineStatus (class in dodal.devices.robot)</a>
+</li>
       <li><a href="reference/generated/dodal.devices.beamsize.beamsize.BeamsizeBase.html#dodal.devices.beamsize.beamsize.BeamsizeBase">BeamsizeBase (class in dodal.devices.beamsize.beamsize)</a>
 </li>
       <li><a href="reference/generated/dodal.devices.i03.Beamstop.html#dodal.devices.i03.Beamstop">Beamstop (class in dodal.devices.i03)</a>
@@ -1596,14 +1601,14 @@ window.addEventListener("load", load);
       </ul></li>
       <li><a href="reference/generated/dodal.devices.i19.beamstop.BeamStop.html#dodal.devices.i19.beamstop.BeamStop">BeamStop (class in dodal.devices.i19.beamstop)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/generated/dodal.devices.i24.beamstop.Beamstop.html#dodal.devices.i24.beamstop.Beamstop">Beamstop (class in dodal.devices.i24.beamstop)</a>
 
       <ul>
         <li><a href="reference/generated/dodal.devices.mx_phase1.beamstop.Beamstop.html#dodal.devices.mx_phase1.beamstop.Beamstop">(class in dodal.devices.mx_phase1.beamstop)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/generated/dodal.devices.i03.BeamstopPositions.html#dodal.devices.i03.BeamstopPositions">BeamstopPositions (class in dodal.devices.i03)</a>
 
       <ul>
@@ -4390,8 +4395,6 @@ window.addEventListener("load", load);
 </li>
       <li><a href="reference/generated/dodal.devices.i10.PiezoMirror.html#dodal.devices.i10.PiezoMirror">PiezoMirror (class in dodal.devices.i10)</a>
 </li>
-      <li><a href="reference/generated/dodal.devices.robot.BartRobot.html#dodal.devices.robot.BartRobot.pin_state_or_error">pin_state_or_error() (dodal.devices.robot.BartRobot method)</a>
-</li>
       <li><a href="reference/generated/dodal.devices.i19.pin_col_stages.PinColConfiguration.html#dodal.devices.i19.pin_col_stages.PinColConfiguration">PinColConfiguration (class in dodal.devices.i19.pin_col_stages)</a>
 </li>
       <li><a href="reference/generated/dodal.devices.i19.pin_col_stages.PinColRequest.html#dodal.devices.i19.pin_col_stages.PinColRequest">PinColRequest (class in dodal.devices.i19.pin_col_stages)</a>
@@ -4418,10 +4421,10 @@ window.addEventListener("load", load);
 </li>
       <li><a href="reference/generated/dodal.devices.i24.pmac.PMACStringMove.html#dodal.devices.i24.pmac.PMACStringMove">PMACStringMove (class in dodal.devices.i24.pmac)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/generated/dodal.devices.insertion_device.Pol.html#dodal.devices.insertion_device.Pol">Pol (class in dodal.devices.insertion_device)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/generated/dodal.devices.insertion_device.Apple2Controller.html#dodal.devices.insertion_device.Apple2Controller.polarisation">polarisation (dodal.devices.insertion_device.Apple2Controller attribute)</a>
 </li>
       <li><a href="reference/generated/dodal.devices.insertion_device.Apple2Controller.html#dodal.devices.insertion_device.Apple2Controller.polarisation_setpoint">polarisation_setpoint (dodal.devices.insertion_device.Apple2Controller attribute)</a>
