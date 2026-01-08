@@ -1,0 +1,14 @@
+- section: "Mirrors"
+  func: focusing_mirror
+  type: PiezoMirror
+  import_from: "dodal.devices.i10"
+  params:
+    prefix: "{PREFIX.beamline_prefix}-OP-FOCS-01:"
+  factory_args: { mock: true }
+
+- section: "Mirrors"
+  func: second_mirror
+  type: PiezoMirror
+  import_from: "dodal.devices.i10"
+  params:
+    prefix: "{PREFIX.beamline_prefix}-OP-FOCS-02:"
