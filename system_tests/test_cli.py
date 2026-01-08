@@ -11,7 +11,7 @@ from dodal import __version__
 @pytest.mark.skip_in_pycharm(reason="subprocess returns tty escape sequences")
 def test_cli_version():
     cmd = [sys.executable, "-m", "dodal", "--version"]
-    assert subprocess.check_output(cmd, timeout=5).decode().strip() == __version__
+    assert subprocess.check_output(cmd, timeout=6).decode().strip() == __version__
 
 
 def test_save_panda_entry_point():

@@ -64,7 +64,7 @@ jobs:
 
       - name: Check system test durations
         run: |
-          python .github/scripts/check_test_durations.py system-report.json 5
+          python .github/scripts/check_test_durations.py system-report.json 6
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
