@@ -1,7 +1,6 @@
 from asyncio import gather
 from collections.abc import Callable
 
-import numpy as np
 from bluesky.protocols import Locatable, Location, Movable
 from ophyd_async.core import (
     AsyncStatus,
@@ -30,7 +29,7 @@ class HardInsertionDeviceEnergy(StandardReadable, Movable[float]):
         self,
         undulator_order: UndulatorOrder,
         undulator: UndulatorInMm,
-        lut: dict[int, np.ndarray],
+        lut: dict[int, list],
         gap_to_energy_func: Callable[..., float],
         energy_to_gap_func: Callable[..., float],
         name: str = "",
