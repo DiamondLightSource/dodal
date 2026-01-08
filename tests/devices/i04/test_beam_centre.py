@@ -1,4 +1,4 @@
-from unittest.mock import MagicMock, patch
+from unittest.mock import ANY, MagicMock, call, patch
 
 import cv2
 import numpy as np
@@ -27,6 +27,9 @@ async def test_convert_image_to_binary_calls_threshold_twice(
     mock_convert.return_value = fake_img
 
     convert_image_to_binary(fake_img)
+
+    mock_convert.assert_called_once()
+
     assert mock_threshold.call_count == 2
 
     # check the args from the two times it's called.
@@ -94,9 +97,18 @@ async def test_trigger_converts_to_binary_then_finds_ellipse(
     mock_fit_ellipse: MagicMock,
     centre_device: CentreEllipseMethod,
 ):
+    parent_mock = MagicMock()
+    parent_mock.attach_mock(mock_convert_to_binary, "convert_to_binary")
+    parent_mock.attach_mock(mock_fit_ellipse, "fit_ellipse")
+
     await centre_device.trigger()
+
     mock_convert_to_binary.assert_called_once()
     mock_fit_ellipse.assert_called_once()
+
+    assert parent_mock.mock_calls.index(
+        call.convert_to_binary(ANY)
+    ) < parent_mock.mock_calls.index(call.fit_ellipse(ANY))
 
 
 async def test_real_image_gives_expected_centre(

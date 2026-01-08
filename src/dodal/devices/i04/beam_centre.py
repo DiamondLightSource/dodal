@@ -67,7 +67,9 @@ class CentreEllipseMethod(StandardReadable, Triggerable):
 
         largest_contour = max(contours, key=cv2.contourArea)
         if len(largest_contour) < 5:
-            raise ValueError("Not enough points to fit an ellipse.")
+            raise ValueError(
+                f"Not enough points to fit an ellipse. Found {largest_contour} points and need at least 5."
+            )
 
         return cv2.fitEllipse(largest_contour)
 
