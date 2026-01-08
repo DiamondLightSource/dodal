@@ -44,6 +44,9 @@ class SampleLocation:
     pin: int
 
 
+SAMPLE_LOCATION_EMPTY = SampleLocation(-1, -1)
+
+
 class PinMounted(StrictEnum):
     NO_PIN_MOUNTED = "No Pin Mounted"
     PIN_MOUNTED = "Pin Mounted"
@@ -67,7 +70,7 @@ class ErrorStatus(Device):
             raise RobotLoadError(int(error_code), error_string) from raise_from
 
 
-class BartRobot(StandardReadable, Movable[SampleLocation | None]):
+class BartRobot(StandardReadable, Movable[SampleLocation]):
     """The sample changing robot."""
 
     # How long to wait for the robot if it is busy soaking/drying
@@ -190,16 +193,16 @@ class BartRobot(StandardReadable, Movable[SampleLocation | None]):
         await self.beamline_status_or_error(BeamlineStatus.ENABLED)
 
     @AsyncStatus.wrap
-    async def set(self, value: SampleLocation | None):
+    async def set(self, value: SampleLocation):
         """
         Perform a sample load from the specified sample location
         Args:
-            value: The pin and puck to load, or None to unload the sample.
+            value: The pin and puck to load, or SAMPLE_LOCATION_EMPTY to unload the sample.
         Raises:
             RobotLoadError if a timeout occurs, or if an error occurs loading the sample.
         """
         try:
-            if value is not None:
+            if value != SAMPLE_LOCATION_EMPTY:
                 await wait_for(
                     self._load_pin_and_puck(value),
                     timeout=self.LOAD_TIMEOUT + self.NOT_BUSY_TIMEOUT,
