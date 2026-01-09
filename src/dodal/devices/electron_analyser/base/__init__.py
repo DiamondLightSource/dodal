@@ -15,7 +15,7 @@ from .base_driver_io import (
     GenericAnalyserDriverIO,
     TAbstractAnalyserDriverIO,
 )
-from .base_enums import EnergyMode, SelectedSource
+from .base_enums import EnergyMode
 from .base_region import (
     AbstractBaseRegion,
     AbstractBaseSequence,
@@ -27,7 +27,7 @@ from .base_region import (
     TLensMode,
 )
 from .base_util import to_binding_energy, to_kinetic_energy
-from .energy_sources import DualEnergySource, EnergySource
+from .energy_sources import AbstractEnergySource, DualEnergySource, EnergySource
 
 __all__ = [
     "ElectronAnalyserController",
@@ -42,7 +42,6 @@ __all__ = [
     "GenericAnalyserDriverIO",
     "TAbstractAnalyserDriverIO",
     "EnergyMode",
-    "SelectedSource",
     "AbstractBaseRegion",
     "AbstractBaseSequence",
     "GenericRegion",
@@ -53,6 +52,7 @@ __all__ = [
     "TLensMode",
     "to_binding_energy",
     "to_kinetic_energy",
+    "AbstractEnergySource",
     "DualEnergySource",
     "EnergySource",
 ]
