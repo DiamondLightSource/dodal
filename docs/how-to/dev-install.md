@@ -21,15 +21,15 @@ If on a DLS machine make sure you have python >3.11 running by doing `module loa
 ```
 python3 -m venv venv
 source venv/bin/activate
-pip install --upgrade pip
-pip install -e '.[dev]'
+pip install --upgrade pip && pip install uv
+uv sync --group dev
 ```
 
 ## See what was installed
 
 To see a graph of the python package dependency tree type:
 
-    $ pipdeptree
+    $ uv pip tree
 
 :::
 
