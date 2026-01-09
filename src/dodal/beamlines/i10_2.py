@@ -1,6 +1,10 @@
+import os
+
 from dodal.common.beamlines.config_generator import generate_beamline
 
-CONFIG_DIR = "/workspaces/dodal/src/dodal/devices/i10/i10_config/"
+current_dir = os.path.dirname(__file__)
+beamline_name = os.path.splitext(os.path.basename(__file__))[0]
+CONFIG_DIR = os.path.join(current_dir, "configs", beamline_name)
 
 try:
     code = generate_beamline(CONFIG_DIR)
