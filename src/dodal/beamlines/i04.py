@@ -21,6 +21,7 @@ from dodal.devices.eiger import EigerDetector
 from dodal.devices.fast_grid_scan import ZebraFastGridScanThreeD
 from dodal.devices.flux import Flux
 from dodal.devices.i03.dcm import DCM
+from dodal.devices.i04.beam_centre import CentreEllipseMethod
 from dodal.devices.i04.beamsize import Beamsize
 from dodal.devices.i04.constants import RedisConstants
 from dodal.devices.i04.max_pixel import MaxPixel
@@ -29,7 +30,10 @@ from dodal.devices.i04.transfocator import Transfocator
 from dodal.devices.ipin import IPin
 from dodal.devices.motors import XYZStage
 from dodal.devices.mx_phase1.beamstop import Beamstop
-from dodal.devices.oav.oav_detector import OAVBeamCentrePV
+from dodal.devices.oav.oav_detector import (
+    OAVBeamCentrePV,
+    ZoomControllerWithBeamCentres,
+)
 from dodal.devices.oav.oav_parameters import OAVConfig
 from dodal.devices.oav.oav_to_redis_forwarder import OAVToRedisForwarder
 from dodal.devices.oav.pin_image_recognition import PinTipDetection
@@ -213,10 +217,12 @@ def eiger(mock: bool = False, params: DetectorParams | None = None) -> EigerDete
     return device_instantiation(
         device_factory=EigerDetector,
         name="eiger",
+        beamline="i04",
         prefix="-EA-EIGER-01:",
         wait=False,
         fake=mock,
         post_create=set_params,
+        ispyb_detector_id=72,
     )
 
 
@@ -267,6 +273,14 @@ def zebra() -> Zebra:
         prefix=f"{PREFIX.beamline_prefix}-EA-ZEBRA-01:",
         mapping=I04_ZEBRA_MAPPING,
     )
+
+
+@device_factory()
+def zoom_controller() -> ZoomControllerWithBeamCentres:
+    """Get the i04 zoom controller, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i04, it will return the existing object.
+    """
+    return ZoomControllerWithBeamCentres(f"{PREFIX.beamline_prefix}-EA-OAV-01:FZOOM:")
 
 
 @device_factory(
@@ -409,4 +423,14 @@ def beamsize() -> Beamsize:
     return Beamsize(
         transfocator=transfocator(),
         aperture_scatterguard=aperture_scatterguard(),
+    )
+
+
+@device_factory()
+def beam_centre() -> CentreEllipseMethod:
+    """Get the i04 centring device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i04, it will return the existing object.
+    """
+    return CentreEllipseMethod(
+        f"{PREFIX.beamline_prefix}-DI-OAV-01:",
     )
