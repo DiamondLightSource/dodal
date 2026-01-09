@@ -2,6 +2,7 @@ from unittest.mock import patch
 
 import pytest
 from ophyd_async.core import init_devices
+from ophyd_async.testing import assert_configuration, partial_reading
 
 from dodal.devices import b07, i09
 from dodal.devices.electron_analyser.base import (
@@ -10,6 +11,7 @@ from dodal.devices.electron_analyser.base import (
     GenericRegion,
     GenericSequence,
     JsonSequenceLoader,
+    SequenceLoader,
     TAbstractBaseRegion,
     to_binding_energy,
     to_kinetic_energy,
@@ -21,6 +23,7 @@ from dodal.devices.electron_analyser.specs import (
 from dodal.devices.electron_analyser.vgscienta import VGScientaRegion, VGScientaSequence
 from tests.devices.electron_analyser.helper_util import (
     TEST_SEQUENCE_REGION_NAMES,
+    get_test_sequence,
 )
 
 
@@ -37,10 +40,22 @@ def sequence_class(request: pytest.FixtureRequest) -> GenericSequence:
 @pytest.fixture
 def sequence_loader(
     sequence_class: type[GenericSequence],
-) -> JsonSequenceLoader[GenericSequence]:
+) -> SequenceLoader[GenericSequence]:
     with init_devices(mock=True):
         sequence_loader = JsonSequenceLoader[GenericSequence](sequence_class)
     return sequence_loader
+
+
+async def test_sequence_loader_read_configuration(
+    sequence_loader: SequenceLoader[GenericSequence],
+) -> None:
+    assert sequence_loader.sequence is None
+    filename = get_test_sequence(sequence_loader._sequence_class)
+    await sequence_loader.set(filename)
+    assert sequence_loader.sequence is not None
+    await assert_configuration(
+        sequence_loader, {sequence_loader.sequence_file.name: partial_reading(filename)}
+    )
 
 
 @pytest.fixture

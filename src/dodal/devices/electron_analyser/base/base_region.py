@@ -251,7 +251,6 @@ class SequenceLoader(StandardReadable, Movable[str], Generic[TAbstractBaseSequen
         Returns:
             Pydantic model representing the sequence file.
         """
-        # return load_json_file_to_class(self._sequence_class, filename)
 
 
 class JsonSequenceLoader(SequenceLoader[TAbstractBaseSequence]):
