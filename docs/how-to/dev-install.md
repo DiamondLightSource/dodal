@@ -19,9 +19,9 @@ in a container under [VSCode](https://code.visualstudio.com/)
 If on a DLS machine make sure you have python >3.11 running by doing `module load python/3.11`
 
 ```
-python3 -m venv venv
-source venv/bin/activate
-pip install --upgrade pip && pip install uv
+module load uv
+uv venv .venv
+source .venv/bin/activate
 uv sync --group dev
 ```
 
@@ -29,7 +29,7 @@ uv sync --group dev
 
 To see a graph of the python package dependency tree type:
 
-    $ uv pip tree
+    $ uv tree
 
 :::
 
