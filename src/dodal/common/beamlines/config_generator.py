@@ -21,7 +21,7 @@ def format_value(v: Any) -> str:
     return repr(v)
 
 
-def generate_beamline(config_dir: str):
+def generate_beamline(config_dir: str) -> None:
     # Generate beamline configuration code based on YAML files
     config_file = os.path.join(config_dir, "config.yaml")
     with open(config_file) as f:
