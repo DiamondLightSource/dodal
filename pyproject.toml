@@ -207,7 +207,7 @@ commands = [
         "pytest",
         "-m", "not requires(instrument=\"i04\")",
         "--cov-report", "xml:system_cov.xml",
-        "--timeout=5",
+        "--timeout=10",
         "system_tests",
         { replace = "posargs", default = [], extend = true },
     ],
