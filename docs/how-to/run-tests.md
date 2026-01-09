@@ -54,6 +54,9 @@ cd example-services
 podman compose up -d bl01t-di-cam-01 bl01t-mo-sim-01 ca-gateway
 ```
 
+**Note:** Do not run the system tests from the same shell as the above `environment.sh` script interferes with the 
+ability to run the tests due to also setting EPICS_ environment variables.
+
 Once this is done, then the system tests can be run:
 
 ```commandline
