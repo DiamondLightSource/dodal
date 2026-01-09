@@ -28,7 +28,7 @@ If you find that your tests are being skipped or not recognised by `pytest`, che
 When you have some fully working tests then you can run it with coverage:
 
 ```
-$ tox -e tests
+$ uv run tox -e tests
 ```
 
 It will also report coverage to the command line and to `cov.xml`.
@@ -60,5 +60,5 @@ ability to run the tests due to also setting EPICS_ environment variables.
 Once this is done, then the system tests can be run:
 
 ```commandline
-tox -e system-report
+uv run tox -e system-report
 ```

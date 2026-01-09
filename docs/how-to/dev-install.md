@@ -49,7 +49,7 @@ code .
 Now you have a development environment you can run the tests in a terminal:
 
 ```
-tox -p
+uv run tox -p
 ```
 
 This will run in parallel the following checks:
