@@ -3,9 +3,7 @@ from dodal.common.beamlines.beamline_utils import (
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.devices.electron_analyser.base import DualEnergySource
-from dodal.devices.electron_analyser.vgscienta import (
-    VGScientaDetector,
-)
+from dodal.devices.electron_analyser.vgscienta import VGScientaDetector
 from dodal.devices.p60 import (
     LabXraySource,
     LabXraySourceReadable,
