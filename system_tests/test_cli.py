@@ -8,6 +8,7 @@ import dodal.plans.save_panda as save_panda
 from dodal import __version__
 
 
+@pytest.mark.timeout(10)
 @pytest.mark.skip_in_pycharm(reason="subprocess returns tty escape sequences")
 def test_cli_version():
     cmd = [sys.executable, "-m", "dodal", "--version"]
