@@ -17,7 +17,15 @@ from dodal.devices.electron_analyser.base import (
 )
 from dodal.devices.i09 import Grating
 from dodal.devices.pgm import PlaneGratingMonochromator
+from dodal.devices.selectable_source import SourceSelector
 from tests.devices.electron_analyser.helper_util import get_test_sequence
+
+
+@pytest.fixture
+async def source_selector() -> SourceSelector:
+    async with init_devices(mock=True):
+        source_selector = SourceSelector()
+    return source_selector
 
 
 @pytest.fixture
@@ -34,7 +42,7 @@ async def single_energy_source() -> EnergySource:
 
 
 @pytest.fixture
-async def dual_energy_source() -> DualEnergySource:
+async def dual_energy_source(source_selector: SourceSelector) -> DualEnergySource:
     async with init_devices(mock=True):
         dcm = DoubleCrystalMonochromatorWithDSpacing(
             "DCM:", PitchAndRollCrystal, StationaryCrystal
@@ -44,7 +52,9 @@ async def dual_energy_source() -> DualEnergySource:
     await pgm.energy.set(500)
     async with init_devices(mock=True):
         dual_energy_source = DualEnergySource(
-            source1=dcm.energy_in_eV, source2=pgm.energy.user_readback
+            source1=dcm.energy_in_eV,
+            source2=pgm.energy.user_readback,
+            selected_source=source_selector.selected_source,
         )
     return dual_energy_source
 

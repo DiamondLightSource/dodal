@@ -10,10 +10,7 @@ from dodal.devices.electron_analyser.base.base_region import (
     TLensMode,
     TPsuMode,
 )
-from dodal.devices.electron_analyser.base.energy_sources import (
-    DualEnergySource,
-    EnergySource,
-)
+from dodal.devices.electron_analyser.base.energy_sources import AbstractEnergySource
 from dodal.devices.electron_analyser.vgscienta.vgscienta_driver_io import (
     VGScientaAnalyserDriverIO,
 )
@@ -22,6 +19,8 @@ from dodal.devices.electron_analyser.vgscienta.vgscienta_region import (
     VGScientaRegion,
     VGScientaSequence,
 )
+from dodal.devices.fast_shutter import FastShutter
+from dodal.devices.selectable_source import SourceSelector
 
 
 class VGScientaDetector(
@@ -37,7 +36,9 @@ class VGScientaDetector(
         lens_mode_type: type[TLensMode],
         psu_mode_type: type[TPsuMode],
         pass_energy_type: type[TPassEnergyEnum],
-        energy_source: DualEnergySource | EnergySource,
+        energy_source: AbstractEnergySource,
+        shutter: FastShutter | None = None,
+        source_selector: SourceSelector | None = None,
         name: str = "",
     ):
         # Save to class so takes part with connect()
@@ -48,7 +49,7 @@ class VGScientaDetector(
         controller = ElectronAnalyserController[
             VGScientaAnalyserDriverIO[TLensMode, TPsuMode, TPassEnergyEnum],
             VGScientaRegion[TLensMode, TPassEnergyEnum],
-        ](self.driver, energy_source, 0)
+        ](self.driver, energy_source, shutter, source_selector)
 
         sequence_loader = JsonSequenceLoader[
             AbstractBaseSequence[VGScientaRegion[TLensMode, TPassEnergyEnum]]
