@@ -33,7 +33,7 @@ jobs:
         run: uv sync --python ${{ inputs.python-version }} --group dev
       
       - name: Run tests
-        run: uv run --locked tox -e unit-report
+        run: uv run --locked tox -e tests
 
       - name: Check unit test durations
         run: |

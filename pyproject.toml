@@ -193,21 +193,9 @@ commands = [
         "term",
         "--cov-report",
         "xml:cov.xml",
+        "tests",
         { replace = "posargs", default = [
         ], extend = true },
-    ],
-]
-
-[tool.tox.env.unit-report]
-description = "Run unit tests with coverage and JSON report"
-commands = [
-    [
-        "pytest",
-        "--cov-report", "xml:unit_cov.xml",
-        "--json-report",
-        "--json-report-file=unit-report.json",
-        "tests",
-        { replace = "posargs", default = [], extend = true },
     ],
 ]
 
