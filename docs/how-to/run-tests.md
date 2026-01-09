@@ -60,5 +60,5 @@ ability to run the tests due to also setting EPICS_ environment variables.
 Once this is done, then the system tests can be run:
 
 ```commandline
-uv run tox -e system-report
+uv run tox -e system-tests
 ```

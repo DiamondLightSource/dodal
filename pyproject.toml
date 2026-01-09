@@ -113,6 +113,7 @@ reportMissingImports = false  # Ignore missing stubs in imported modules
 [tool.pytest.ini_options]
 # Run pytest with all our checkers, and don't spam us with massive tracebacks on error
 asyncio_mode = "auto"
+timeout = 1
 markers = [
     "requires: marks tests as requiring other infrastructure",
     "skip_in_pycharm: marks test as not working in pycharm testrunner",
@@ -193,23 +194,20 @@ commands = [
         "term",
         "--cov-report",
         "xml:cov.xml",
-        "--json-report",
-        "--json-report-file=unit-report.json",
         "tests",
         { replace = "posargs", default = [
         ], extend = true },
     ],
 ]
 
-[tool.tox.env.system-report]
-description = "Run system tests with coverage and JSON report"
+[tool.tox.env.system-tests]
+description = "Run system tests with coverage"
 commands = [
     [
         "pytest",
         "-m", "not requires(instrument=\"i04\")",
         "--cov-report", "xml:system_cov.xml",
-        "--json-report",
-        "--json-report-file=system-report.json",
+        "--timeout=5",
         "system_tests",
         { replace = "posargs", default = [], extend = true },
     ],

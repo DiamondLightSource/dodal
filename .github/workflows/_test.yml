@@ -35,10 +35,6 @@ jobs:
       - name: Run tests
         run: uv run --locked tox -e tests
 
-      - name: Check unit test durations
-        run: |
-          python .github/scripts/check_test_durations.py unit-report.json 1
-
       - name: Checkout simulated devices
         uses: actions/checkout@v5
         with:
@@ -55,11 +51,7 @@ jobs:
             ca-gateway
 
       - name: Run system tests
-        run: uv run --locked tox -e system-report
-
-      - name: Check system test durations
-        run: |
-          python .github/scripts/check_test_durations.py system-report.json 6
+        run: uv run --locked tox -e system-tests
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
