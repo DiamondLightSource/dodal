@@ -21,7 +21,7 @@ def format_value(v: Any) -> str:
     return repr(v)
 
 
-def generate_beamline(config_dir: str) -> None:
+def generate_beamline(config_dir: str) -> str:
     # Generate beamline configuration code based on YAML files
     config_file = os.path.join(config_dir, "config.yaml")
     with open(config_file) as f:
@@ -100,11 +100,6 @@ def generate_beamline(config_dir: str) -> None:
                 f"\ndef {dev['func']}() -> {dev['type']}:"
                 f"\n    return {body}\n"
             )
-
-    # Write and Ruff
-    with open(output_file, "w") as f:
-        f.write(code)
-
     try:
         subprocess.run(
             ["ruff", "check", "--select", "I", "--fix", output_file], check=True
@@ -113,3 +108,4 @@ def generate_beamline(config_dir: str) -> None:
         print(f"Generated {output_file} successfully.")
     except Exception as e:
         print(f"File saved to {output_file}, but Ruff failed: {e}")
+    return code
