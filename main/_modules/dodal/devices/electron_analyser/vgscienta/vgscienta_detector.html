@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.electron_analyser.vgscienta.vgscienta_detector &#8212; dodal 1.68.1.dev10+g1fdd7dba9 documentation</title>
+    <title>dodal.devices.electron_analyser.vgscienta.vgscienta_detector &#8212; dodal 1.68.1.dev11+ge0d5a176c documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../../_static/documentation_options.js?v=8cefd6d0"></script>
+    <script src="../../../../../_static/documentation_options.js?v=b9fc95f6"></script>
     <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -814,10 +814,7 @@ window.addEventListener("load", load);
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.electron_analyser.base.base_detector</span><span class="w"> </span><span class="kn">import</span> <span class="n">ElectronAnalyserDetector</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.electron_analyser.base.base_region</span><span class="w"> </span><span class="kn">import</span> <span class="n">TLensMode</span><span class="p">,</span> <span class="n">TPsuMode</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.electron_analyser.base.energy_sources</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">DualEnergySource</span><span class="p">,</span>
-    <span class="n">EnergySource</span><span class="p">,</span>
-<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.electron_analyser.base.energy_sources</span><span class="w"> </span><span class="kn">import</span> <span class="n">AbstractEnergySource</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.electron_analyser.vgscienta.vgscienta_driver_io</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">VGScientaAnalyserDriverIO</span><span class="p">,</span>
 <span class="p">)</span>
@@ -826,6 +823,8 @@ window.addEventListener("load", load);
     <span class="n">VGScientaRegion</span><span class="p">,</span>
     <span class="n">VGScientaSequence</span><span class="p">,</span>
 <span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.fast_shutter</span><span class="w"> </span><span class="kn">import</span> <span class="n">FastShutter</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.selectable_source</span><span class="w"> </span><span class="kn">import</span> <span class="n">SourceSelector</span>
 
 
 <div class="viewcode-block" id="VGScientaDetector">
@@ -844,7 +843,9 @@ window.addEventListener("load", load);
         <span class="n">lens_mode_type</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">TLensMode</span><span class="p">],</span>
         <span class="n">psu_mode_type</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">TPsuMode</span><span class="p">],</span>
         <span class="n">pass_energy_type</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">TPassEnergyEnum</span><span class="p">],</span>
-        <span class="n">energy_source</span><span class="p">:</span> <span class="n">DualEnergySource</span> <span class="o">|</span> <span class="n">EnergySource</span><span class="p">,</span>
+        <span class="n">energy_source</span><span class="p">:</span> <span class="n">AbstractEnergySource</span><span class="p">,</span>
+        <span class="n">shutter</span><span class="p">:</span> <span class="n">FastShutter</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">source_selector</span><span class="p">:</span> <span class="n">SourceSelector</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="c1"># Save to class so takes part with connect()</span>
@@ -855,7 +856,7 @@ window.addEventListener("load", load);
         <span class="n">controller</span> <span class="o">=</span> <span class="n">ElectronAnalyserController</span><span class="p">[</span>
             <span class="n">VGScientaAnalyserDriverIO</span><span class="p">[</span><span class="n">TLensMode</span><span class="p">,</span> <span class="n">TPsuMode</span><span class="p">,</span> <span class="n">TPassEnergyEnum</span><span class="p">],</span>
             <span class="n">VGScientaRegion</span><span class="p">[</span><span class="n">TLensMode</span><span class="p">,</span> <span class="n">TPassEnergyEnum</span><span class="p">],</span>
-        <span class="p">](</span><span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="p">,</span> <span class="n">energy_source</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="p">](</span><span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="p">,</span> <span class="n">energy_source</span><span class="p">,</span> <span class="n">shutter</span><span class="p">,</span> <span class="n">source_selector</span><span class="p">)</span>
 
         <span class="n">sequence_class</span> <span class="o">=</span> <span class="n">VGScientaSequence</span><span class="p">[</span>
             <span class="n">lens_mode_type</span><span class="p">,</span> <span class="n">psu_mode_type</span><span class="p">,</span> <span class="n">pass_energy_type</span>

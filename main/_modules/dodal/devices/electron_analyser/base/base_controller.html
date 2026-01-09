@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.electron_analyser.base.base_controller &#8212; dodal 1.68.1.dev10+g1fdd7dba9 documentation</title>
+    <title>dodal.devices.electron_analyser.base.base_controller &#8212; dodal 1.68.1.dev11+ge0d5a176c documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../../_static/documentation_options.js?v=8cefd6d0"></script>
+    <script src="../../../../../_static/documentation_options.js?v=b9fc95f6"></script>
     <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -821,10 +821,9 @@ window.addEventListener("load", load);
     <span class="n">GenericRegion</span><span class="p">,</span>
     <span class="n">TAbstractBaseRegion</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.electron_analyser.base.energy_sources</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">AbstractEnergySource</span><span class="p">,</span>
-    <span class="n">DualEnergySource</span><span class="p">,</span>
-<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.electron_analyser.base.energy_sources</span><span class="w"> </span><span class="kn">import</span> <span class="n">AbstractEnergySource</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.fast_shutter</span><span class="w"> </span><span class="kn">import</span> <span class="n">FastShutter</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.selectable_source</span><span class="w"> </span><span class="kn">import</span> <span class="n">SourceSelector</span>
 
 
 <div class="viewcode-block" id="ElectronAnalyserController">
@@ -843,7 +842,9 @@ window.addEventListener("load", load);
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">driver</span><span class="p">:</span> <span class="n">TAbstractAnalyserDriverIO</span><span class="p">,</span>
         <span class="n">energy_source</span><span class="p">:</span> <span class="n">AbstractEnergySource</span><span class="p">,</span>
-        <span class="n">deadtime</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">shutter</span><span class="p">:</span> <span class="n">FastShutter</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">source_selector</span><span class="p">:</span> <span class="n">SourceSelector</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">deadtime</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
         <span class="n">image_mode</span><span class="p">:</span> <span class="n">ADImageMode</span> <span class="o">=</span> <span class="n">ADImageMode</span><span class="o">.</span><span class="n">SINGLE</span><span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -856,15 +857,21 @@ window.addEventListener("load", load);
 <span class="sd">            image_mode: The image mode to configure the driver with before measuring.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">energy_source</span> <span class="o">=</span> <span class="n">energy_source</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">shutter</span> <span class="o">=</span> <span class="n">shutter</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">source_selector</span> <span class="o">=</span> <span class="n">source_selector</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">driver</span><span class="p">,</span> <span class="n">deadtime</span><span class="p">,</span> <span class="n">image_mode</span><span class="p">)</span>
 
 <div class="viewcode-block" id="ElectronAnalyserController.setup_with_region">
 <a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.electron_analyser.base.ElectronAnalyserController.html#dodal.devices.electron_analyser.base.ElectronAnalyserController.setup_with_region">[docs]</a>
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">setup_with_region</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">region</span><span class="p">:</span> <span class="n">TAbstractBaseRegion</span><span class="p">):</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">setup_with_region</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">region</span><span class="p">:</span> <span class="n">TAbstractBaseRegion</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Logic to set the driver with a region.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">source_selector</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">source_selector</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">region</span><span class="o">.</span><span class="n">excitation_energy_source</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">energy_source</span><span class="p">,</span> <span class="n">DualEnergySource</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">energy_source</span><span class="o">.</span><span class="n">selected_source</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">region</span><span class="o">.</span><span class="n">excitation_energy_source</span><span class="p">)</span>
+        <span class="c1"># Should this be moved to a VGScientController only?</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">shutter</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">shutter</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shutter</span><span class="o">.</span><span class="n">close_state</span><span class="p">)</span>
+
         <span class="n">excitation_energy</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy_source</span><span class="o">.</span><span class="n">energy</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
         <span class="n">epics_region</span> <span class="o">=</span> <span class="n">region</span><span class="o">.</span><span class="n">prepare_for_epics</span><span class="p">(</span><span class="n">excitation_energy</span><span class="p">)</span>
         <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">epics_region</span><span class="p">)</span></div>
@@ -878,6 +885,10 @@ window.addEventListener("load", load);
         <span class="c1"># axis calculation.</span>
         <span class="n">excitation_energy</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy_source</span><span class="o">.</span><span class="n">energy</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
         <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">cached_excitation_energy</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">excitation_energy</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">shutter</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">shutter</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shutter</span><span class="o">.</span><span class="n">open_state</span><span class="p">)</span>
+
         <span class="k">await</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">prepare</span><span class="p">(</span><span class="n">trigger_info</span><span class="p">)</span></div>
 </div>
 

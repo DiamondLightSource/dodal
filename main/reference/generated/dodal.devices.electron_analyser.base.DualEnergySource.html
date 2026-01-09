@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.electron_analyser.base.DualEnergySource &#8212; dodal 1.68.1.dev10+g1fdd7dba9 documentation</title>
+    <title>dodal.devices.electron_analyser.base.DualEnergySource &#8212; dodal 1.68.1.dev11+ge0d5a176c documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=8cefd6d0"></script>
+    <script src="../../_static/documentation_options.js?v=b9fc95f6"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -59,7 +59,7 @@
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="dodal.devices.electron_analyser.base.EnergySource" href="dodal.devices.electron_analyser.base.EnergySource.html" />
-    <link rel="prev" title="dodal.devices.electron_analyser.base.GenericSequence" href="dodal.devices.electron_analyser.base.GenericSequence.html" />
+    <link rel="prev" title="dodal.devices.electron_analyser.base.AbstractEnergySource" href="dodal.devices.electron_analyser.base.AbstractEnergySource.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="main" />
@@ -623,6 +623,8 @@
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.fast_shutter.html">dodal.devices.fast_shutter</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.fast_shutter.DualFastShutter.html">dodal.devices.fast_shutter.DualFastShutter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.fast_shutter.FastShutter.html">dodal.devices.fast_shutter.FastShutter</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.fast_shutter.GenericFastShutter.html">dodal.devices.fast_shutter.GenericFastShutter</a></li>
 </ul>
 </details></li>
@@ -910,6 +912,11 @@
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.scintillator.Scintillator.html">dodal.devices.scintillator.Scintillator</a></li>
 </ul>
 </details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.selectable_source.html">dodal.devices.selectable_source</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.selectable_source.SelectedSource.html">dodal.devices.selectable_source.SelectedSource</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.selectable_source.SourceSelector.html">dodal.devices.selectable_source.SourceSelector</a></li>
+</ul>
+</details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.slits.html">dodal.devices.slits</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.slits.MinimalSlits.html">dodal.devices.slits.MinimalSlits</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.slits.Slits.html">dodal.devices.slits.Slits</a></li>
@@ -1106,19 +1113,20 @@
 <dt class="sig sig-object py" id="dodal.devices.electron_analyser.base.DualEnergySource">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dodal.devices.electron_analyser.base.</span></span><span class="sig-name descname"><span class="pre">DualEnergySource</span></span><a class="reference internal" href="../../_modules/dodal/devices/electron_analyser/base/energy_sources.html#DualEnergySource"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.electron_analyser.base.DualEnergySource" title="Link to this definition">#</a></dt>
 <dd><p>Holds two EnergySource devices and provides a signal to read energy depending on
-which source is selected. This is controlled by a selected_source signal which can
-switch source using SelectedSource enum. Both sources energy is recorded in the
-read, the energy signal is used as a helper signal to know which source is being
-used.</p>
+which source is selected. The energy is the one that corrosponds to the
+selected_source signal. For example, selected_source is source1 if selected_source
+is at SelectedSource.SOURCE1 and vise versa for source2 and SelectedSource.SOURCE2.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>source1</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">SignalR</span></code>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>]</span>)</p></li>
 <li><p><strong>source2</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">SignalR</span></code>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>]</span>)</p></li>
+<li><p><strong>selected_source</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">SignalRW</span></code>[<a class="reference internal" href="dodal.devices.selectable_source.SelectedSource.html#dodal.devices.selectable_source.SelectedSource" title="dodal.devices.selectable_source.SelectedSource"><code class="xref py py-class docutils literal notranslate"><span class="pre">SelectedSource</span></code></a>]</span>)</p></li>
 <li><p><strong>name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">''</span></code>)</p></li>
-<li><p><strong>source1</strong> – Default energy signal to select.</p></li>
-<li><p><strong>source2</strong> – Secondary energy signal to select.</p></li>
-<li><p><strong>name</strong> – name of this device.</p></li>
+<li><p><strong>source1</strong> – Energy source that corrosponds to SelectedSource.SOURCE1.</p></li>
+<li><p><strong>source2</strong> – Energy source that corrosponds to SelectedSource.SOURCE2.</p></li>
+<li><p><strong>selected_source</strong> – Signal that decides the active energy source.</p></li>
+<li><p><strong>name</strong> – Name of this device.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1152,12 +1160,12 @@ used.</p>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="dodal.devices.electron_analyser.base.GenericSequence.html"
+       href="dodal.devices.electron_analyser.base.AbstractEnergySource.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">dodal.devices.electron_analyser.base.GenericSequence</p>
+        <p class="prev-next-title">dodal.devices.electron_analyser.base.AbstractEnergySource</p>
       </div>
     </a>
     <a class="right-next"

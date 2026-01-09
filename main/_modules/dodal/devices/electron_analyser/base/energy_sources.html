@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.electron_analyser.base.energy_sources &#8212; dodal 1.68.1.dev10+g1fdd7dba9 documentation</title>
+    <title>dodal.devices.electron_analyser.base.energy_sources &#8212; dodal 1.68.1.dev11+ge0d5a176c documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../../_static/documentation_options.js?v=8cefd6d0"></script>
+    <script src="../../../../../_static/documentation_options.js?v=b9fc95f6"></script>
     <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -812,16 +812,18 @@ window.addEventListener("load", load);
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">Reference</span><span class="p">,</span>
     <span class="n">SignalR</span><span class="p">,</span>
+    <span class="n">SignalRW</span><span class="p">,</span>
     <span class="n">StandardReadable</span><span class="p">,</span>
     <span class="n">StandardReadableFormat</span><span class="p">,</span>
     <span class="n">derived_signal_r</span><span class="p">,</span>
     <span class="n">soft_signal_r_and_setter</span><span class="p">,</span>
-    <span class="n">soft_signal_rw</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.electron_analyser.base.base_enums</span><span class="w"> </span><span class="kn">import</span> <span class="n">SelectedSource</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.selectable_source</span><span class="w"> </span><span class="kn">import</span> <span class="n">SelectedSource</span><span class="p">,</span> <span class="n">get_obj_from_selected_source</span>
 
 
+<div class="viewcode-block" id="AbstractEnergySource">
+<a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.electron_analyser.base.AbstractEnergySource.html#dodal.devices.electron_analyser.base.AbstractEnergySource">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">AbstractEnergySource</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Abstract device that wraps an energy source signal and provides common interface via</span>
@@ -836,7 +838,8 @@ window.addEventListener("load", load);
     <span class="k">def</span><span class="w"> </span><span class="nf">energy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SignalR</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Signal to provide the excitation energy value in eV.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        &quot;&quot;&quot;</span></div>
+
 
 
 <div class="viewcode-block" id="EnergySource">
@@ -863,52 +866,53 @@ window.addEventListener("load", load);
 
 
 
+<span class="k">def</span><span class="w"> </span><span class="nf">get_float_from_selected_source</span><span class="p">(</span>
+    <span class="n">selected</span><span class="p">:</span> <span class="n">SelectedSource</span><span class="p">,</span> <span class="n">s1</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">s2</span><span class="p">:</span> <span class="nb">float</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Wrapper function to provide type hints for derived signal.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">get_obj_from_selected_source</span><span class="p">(</span><span class="n">selected</span><span class="p">,</span> <span class="n">s1</span><span class="p">,</span> <span class="n">s2</span><span class="p">)</span>
+
+
 <div class="viewcode-block" id="DualEnergySource">
 <a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.electron_analyser.base.DualEnergySource.html#dodal.devices.electron_analyser.base.DualEnergySource">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">DualEnergySource</span><span class="p">(</span><span class="n">AbstractEnergySource</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Holds two EnergySource devices and provides a signal to read energy depending on</span>
-<span class="sd">    which source is selected. This is controlled by a selected_source signal which can</span>
-<span class="sd">    switch source using SelectedSource enum. Both sources energy is recorded in the</span>
-<span class="sd">    read, the energy signal is used as a helper signal to know which source is being</span>
-<span class="sd">    used.</span>
+<span class="sd">    which source is selected. The energy is the one that corrosponds to the</span>
+<span class="sd">    selected_source signal. For example, selected_source is source1 if selected_source</span>
+<span class="sd">    is at SelectedSource.SOURCE1 and vise versa for source2 and SelectedSource.SOURCE2.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">source1</span><span class="p">:</span> <span class="n">SignalR</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">source2</span><span class="p">:</span> <span class="n">SignalR</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">source1</span><span class="p">:</span> <span class="n">SignalR</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+        <span class="n">source2</span><span class="p">:</span> <span class="n">SignalR</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+        <span class="n">selected_source</span><span class="p">:</span> <span class="n">SignalRW</span><span class="p">[</span><span class="n">SelectedSource</span><span class="p">],</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Args:</span>
-<span class="sd">            source1: Default energy signal to select.</span>
-<span class="sd">            source2: Secondary energy signal to select.</span>
-<span class="sd">            name: name of this device.</span>
+<span class="sd">            source1: Energy source that corrosponds to SelectedSource.SOURCE1.</span>
+<span class="sd">            source2: Energy source that corrosponds to SelectedSource.SOURCE2.</span>
+<span class="sd">            selected_source: Signal that decides the active energy source.</span>
+<span class="sd">            name: Name of this device.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">selected_source_ref</span> <span class="o">=</span> <span class="n">Reference</span><span class="p">(</span><span class="n">selected_source</span><span class="p">)</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">selected_source</span> <span class="o">=</span> <span class="n">soft_signal_rw</span><span class="p">(</span>
-                <span class="n">SelectedSource</span><span class="p">,</span> <span class="n">initial_value</span><span class="o">=</span><span class="n">SelectedSource</span><span class="o">.</span><span class="n">SOURCE1</span>
-            <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">source1</span> <span class="o">=</span> <span class="n">EnergySource</span><span class="p">(</span><span class="n">source1</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">source2</span> <span class="o">=</span> <span class="n">EnergySource</span><span class="p">(</span><span class="n">source2</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_selected_energy</span> <span class="o">=</span> <span class="n">derived_signal_r</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_get_excitation_energy</span><span class="p">,</span>
+            <span class="n">get_float_from_selected_source</span><span class="p">,</span>
             <span class="s2">&quot;eV&quot;</span><span class="p">,</span>
-            <span class="n">selected_source</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">selected_source</span><span class="p">,</span>
-            <span class="n">source1</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">source1</span><span class="o">.</span><span class="n">energy</span><span class="p">,</span>
-            <span class="n">source2</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">source2</span><span class="o">.</span><span class="n">energy</span><span class="p">,</span>
+            <span class="n">selected</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">selected_source_ref</span><span class="p">(),</span>
+            <span class="n">s1</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">source1</span><span class="o">.</span><span class="n">energy</span><span class="p">,</span>
+            <span class="n">s2</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">source2</span><span class="o">.</span><span class="n">energy</span><span class="p">,</span>
         <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_readables</span><span class="p">([</span><span class="n">selected_source</span><span class="p">])</span>
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">_get_excitation_energy</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">selected_source</span><span class="p">:</span> <span class="n">SelectedSource</span><span class="p">,</span> <span class="n">source1</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">source2</span><span class="p">:</span> <span class="nb">float</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-        <span class="k">match</span> <span class="n">selected_source</span><span class="p">:</span>
-            <span class="k">case</span> <span class="n">SelectedSource</span><span class="o">.</span><span class="n">SOURCE1</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">source1</span>
-            <span class="k">case</span> <span class="n">SelectedSource</span><span class="o">.</span><span class="n">SOURCE2</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">source2</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">energy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SignalR</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.fast_shutter &#8212; dodal 1.68.1.dev10+g1fdd7dba9 documentation</title>
+    <title>dodal.devices.fast_shutter &#8212; dodal 1.68.1.dev11+ge0d5a176c documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=8cefd6d0"></script>
+    <script src="../../_static/documentation_options.js?v=b9fc95f6"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -58,7 +58,7 @@
     <link rel="icon" href="../../_static/dls-logo.svg"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="dodal.devices.fast_shutter.GenericFastShutter" href="dodal.devices.fast_shutter.GenericFastShutter.html" />
+    <link rel="next" title="dodal.devices.fast_shutter.DualFastShutter" href="dodal.devices.fast_shutter.DualFastShutter.html" />
     <link rel="prev" title="dodal.devices.fast_grid_scan.ZebraGridScanParamsThreeD" href="dodal.devices.fast_grid_scan.ZebraGridScanParamsThreeD.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -623,6 +623,8 @@
 </ul>
 </details></li>
 <li class="toctree-l3 current active has-children"><a class="current reference internal" href="#">dodal.devices.fast_shutter</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.fast_shutter.DualFastShutter.html">dodal.devices.fast_shutter.DualFastShutter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.fast_shutter.FastShutter.html">dodal.devices.fast_shutter.FastShutter</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.fast_shutter.GenericFastShutter.html">dodal.devices.fast_shutter.GenericFastShutter</a></li>
 </ul>
 </details></li>
@@ -910,6 +912,11 @@
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.scintillator.Scintillator.html">dodal.devices.scintillator.Scintillator</a></li>
 </ul>
 </details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.selectable_source.html">dodal.devices.selectable_source</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.selectable_source.SelectedSource.html">dodal.devices.selectable_source.SelectedSource</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.selectable_source.SourceSelector.html">dodal.devices.selectable_source.SourceSelector</a></li>
+</ul>
+</details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.slits.html">dodal.devices.slits</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.slits.MinimalSlits.html">dodal.devices.slits.MinimalSlits</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.slits.Slits.html">dodal.devices.slits.Slits</a></li>
@@ -1099,8 +1106,14 @@
 <p class="rubric">Classes</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.fast_shutter.DualFastShutter.html#dodal.devices.fast_shutter.DualFastShutter" title="dodal.devices.fast_shutter.DualFastShutter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DualFastShutter</span></code></a></p></td>
+<td><p>A fast shutter device that handles the positions of two other fast shutters.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.fast_shutter.FastShutter.html#dodal.devices.fast_shutter.FastShutter" title="dodal.devices.fast_shutter.FastShutter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FastShutter</span></code></a></p></td>
+<td><p>Enum device specialised for a fast shutter with configured open_state and close_state so it is generic enough to be used with any device or plan without knowing the specific enum to use.</p></td>
+</tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.fast_shutter.GenericFastShutter.html#dodal.devices.fast_shutter.GenericFastShutter" title="dodal.devices.fast_shutter.GenericFastShutter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GenericFastShutter</span></code></a></p></td>
-<td><p>Basic enum device specialised for a fast shutter with configured open_state and close_state so it is generic enough to be used with any device or plan without knowing the specific enum to use.</p></td>
+<td><p>Implementation of fast shutter that connects to an epics pv.</p></td>
 </tr>
 </tbody>
 </table>
@@ -1127,11 +1140,11 @@
       </div>
     </a>
     <a class="right-next"
-       href="dodal.devices.fast_shutter.GenericFastShutter.html"
+       href="dodal.devices.fast_shutter.DualFastShutter.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">dodal.devices.fast_shutter.GenericFastShutter</p>
+        <p class="prev-next-title">dodal.devices.fast_shutter.DualFastShutter</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

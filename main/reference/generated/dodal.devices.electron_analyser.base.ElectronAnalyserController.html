@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.electron_analyser.base.ElectronAnalyserController &#8212; dodal 1.68.1.dev10+g1fdd7dba9 documentation</title>
+    <title>dodal.devices.electron_analyser.base.ElectronAnalyserController &#8212; dodal 1.68.1.dev11+ge0d5a176c documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=8cefd6d0"></script>
+    <script src="../../_static/documentation_options.js?v=b9fc95f6"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -623,6 +623,8 @@
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.fast_shutter.html">dodal.devices.fast_shutter</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.fast_shutter.DualFastShutter.html">dodal.devices.fast_shutter.DualFastShutter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.fast_shutter.FastShutter.html">dodal.devices.fast_shutter.FastShutter</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.fast_shutter.GenericFastShutter.html">dodal.devices.fast_shutter.GenericFastShutter</a></li>
 </ul>
 </details></li>
@@ -910,6 +912,11 @@
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.scintillator.Scintillator.html">dodal.devices.scintillator.Scintillator</a></li>
 </ul>
 </details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.selectable_source.html">dodal.devices.selectable_source</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.selectable_source.SelectedSource.html">dodal.devices.selectable_source.SelectedSource</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.selectable_source.SourceSelector.html">dodal.devices.selectable_source.SourceSelector</a></li>
+</ul>
+</details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.slits.html">dodal.devices.slits</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.slits.MinimalSlits.html">dodal.devices.slits.MinimalSlits</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.slits.Slits.html">dodal.devices.slits.Slits</a></li>
@@ -1112,8 +1119,10 @@ driver the correct region parameters.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>driver</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.TypeVar" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code></a>(<code class="docutils literal notranslate"><span class="pre">TAbstractAnalyserDriverIO</span></code>, bound= <a class="reference internal" href="dodal.devices.electron_analyser.base.AbstractAnalyserDriverIO.html#dodal.devices.electron_analyser.base.AbstractAnalyserDriverIO" title="dodal.devices.electron_analyser.base.base_driver_io.AbstractAnalyserDriverIO"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractAnalyserDriverIO</span></code></a>)</span>)</p></li>
-<li><p><strong>energy_source</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractEnergySource</span></code></span>)</p></li>
-<li><p><strong>deadtime</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>)</p></li>
+<li><p><strong>energy_source</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="dodal.devices.electron_analyser.base.AbstractEnergySource.html#dodal.devices.electron_analyser.base.AbstractEnergySource" title="dodal.devices.electron_analyser.base.energy_sources.AbstractEnergySource"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractEnergySource</span></code></a></span>)</p></li>
+<li><p><strong>shutter</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="dodal.devices.fast_shutter.FastShutter.html#dodal.devices.fast_shutter.FastShutter" title="dodal.devices.fast_shutter.FastShutter"><code class="xref py py-class docutils literal notranslate"><span class="pre">FastShutter</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
+<li><p><strong>source_selector</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="dodal.devices.selectable_source.SourceSelector.html#dodal.devices.selectable_source.SourceSelector" title="dodal.devices.selectable_source.SourceSelector"><code class="xref py py-class docutils literal notranslate"><span class="pre">SourceSelector</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
+<li><p><strong>deadtime</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">0</span></code>)</p></li>
 <li><p><strong>image_mode</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">ADImageMode</span></code></span>, default: <code class="docutils literal notranslate"><span class="pre">&lt;ADImageMode.SINGLE:</span> <span class="pre">'Single'&gt;</span></code>)</p></li>
 <li><p><strong>driver</strong> – The electron analyser driver to wrap around that holds the PV’s.</p></li>
 <li><p><strong>energy_source</strong> – Device that holds the excitation energy and ability to switch
@@ -1121,6 +1130,8 @@ between sources.</p></li>
 <li><p><strong>deadtime</strong> – For a given exposure, what is the safest minimum time between
 exposures that can be determined without reading signals.</p></li>
 <li><p><strong>image_mode</strong> – The image mode to configure the driver with before measuring.</p></li>
+<li><p><strong>shutter</strong></p></li>
+<li><p><strong>source_selector</strong></p></li>
 </ul>
 </dd>
 </dl>
@@ -1138,11 +1149,14 @@ exposures that can be determined without reading signals.</p></li>
 </div>
 <dl class="py method">
 <dt class="sig sig-object py" id="dodal.devices.electron_analyser.base.ElectronAnalyserController.setup_with_region">
-<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">setup_with_region</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">region</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">TAbstractBaseRegion</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dodal/devices/electron_analyser/base/base_controller.html#ElectronAnalyserController.setup_with_region"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.electron_analyser.base.ElectronAnalyserController.setup_with_region" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">setup_with_region</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">region</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">TAbstractBaseRegion</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../_modules/dodal/devices/electron_analyser/base/base_controller.html#ElectronAnalyserController.setup_with_region"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.electron_analyser.base.ElectronAnalyserController.setup_with_region" title="Link to this definition">#</a></dt>
 <dd><p>Logic to set the driver with a region.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>region</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.TypeVar" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code></a>(<code class="docutils literal notranslate"><span class="pre">TAbstractBaseRegion</span></code>, bound= <a class="reference internal" href="dodal.devices.electron_analyser.base.AbstractBaseRegion.html#dodal.devices.electron_analyser.base.AbstractBaseRegion" title="dodal.devices.electron_analyser.base.base_region.AbstractBaseRegion"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractBaseRegion</span></code></a>)</span>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
 </dd>
 </dl>
 </dd></dl>

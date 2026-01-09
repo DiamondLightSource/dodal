@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.fast_shutter.GenericFastShutter &#8212; dodal 1.68.1.dev10+g1fdd7dba9 documentation</title>
+    <title>dodal.devices.fast_shutter.GenericFastShutter &#8212; dodal 1.68.1.dev11+ge0d5a176c documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=8cefd6d0"></script>
+    <script src="../../_static/documentation_options.js?v=b9fc95f6"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -59,7 +59,7 @@
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="dodal.devices.fluorescence_detector_motion" href="dodal.devices.fluorescence_detector_motion.html" />
-    <link rel="prev" title="dodal.devices.fast_shutter" href="dodal.devices.fast_shutter.html" />
+    <link rel="prev" title="dodal.devices.fast_shutter.FastShutter" href="dodal.devices.fast_shutter.FastShutter.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="main" />
@@ -623,6 +623,8 @@
 </ul>
 </details></li>
 <li class="toctree-l3 current active has-children"><a class="reference internal" href="dodal.devices.fast_shutter.html">dodal.devices.fast_shutter</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.fast_shutter.DualFastShutter.html">dodal.devices.fast_shutter.DualFastShutter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.fast_shutter.FastShutter.html">dodal.devices.fast_shutter.FastShutter</a></li>
 <li class="toctree-l4 current active"><a class="current reference internal" href="#">dodal.devices.fast_shutter.GenericFastShutter</a></li>
 </ul>
 </details></li>
@@ -910,6 +912,11 @@
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.scintillator.Scintillator.html">dodal.devices.scintillator.Scintillator</a></li>
 </ul>
 </details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.selectable_source.html">dodal.devices.selectable_source</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.selectable_source.SelectedSource.html">dodal.devices.selectable_source.SelectedSource</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.selectable_source.SourceSelector.html">dodal.devices.selectable_source.SourceSelector</a></li>
+</ul>
+</details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.slits.html">dodal.devices.slits</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.slits.MinimalSlits.html">dodal.devices.slits.MinimalSlits</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.slits.Slits.html">dodal.devices.slits.Slits</a></li>
@@ -1102,23 +1109,14 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="dodal.devices.fast_shutter.GenericFastShutter">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dodal.devices.fast_shutter.</span></span><span class="sig-name descname"><span class="pre">GenericFastShutter</span></span><a class="reference internal" href="../../_modules/dodal/devices/fast_shutter.html#GenericFastShutter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.fast_shutter.GenericFastShutter" title="Link to this definition">#</a></dt>
-<dd><p>Basic enum device specialised for a fast shutter with configured open_state and
-close_state so it is generic enough to be used with any device or plan without
-knowing the specific enum to use.</p>
-<dl class="simple">
-<dt>For example:</dt><dd><p>await shutter.set(shutter.open_state)
-await shutter.set(shutter.close_state)</p>
-</dd>
-<dt>OR</dt><dd><p>run_engine(bps.mv(shutter, shutter.open_state))
-run_engine(bps.mv(shutter, shutter.close_state))</p>
-</dd>
-</dl>
+<dd><p>Implementation of fast shutter that connects to an epics pv. This pv is an enum that
+controls the open and close state of the shutter.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>pv</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
-<li><p><strong>open_state</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.TypeVar" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code></a>(<code class="docutils literal notranslate"><span class="pre">StrictEnumT</span></code>, bound= <code class="xref py py-class docutils literal notranslate"><span class="pre">StrictEnum</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">SubsetEnum</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">SupersetEnum</span></code>)</span>)</p></li>
-<li><p><strong>close_state</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.TypeVar" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code></a>(<code class="docutils literal notranslate"><span class="pre">StrictEnumT</span></code>, bound= <code class="xref py py-class docutils literal notranslate"><span class="pre">StrictEnum</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">SubsetEnum</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">SupersetEnum</span></code>)</span>)</p></li>
+<li><p><strong>open_state</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.TypeVar" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code></a>(<code class="docutils literal notranslate"><span class="pre">EnumTypesT</span></code>, bound= <code class="xref py py-class docutils literal notranslate"><span class="pre">StrictEnum</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">SubsetEnum</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">SupersetEnum</span></code>)</span>)</p></li>
+<li><p><strong>close_state</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.TypeVar" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code></a>(<code class="docutils literal notranslate"><span class="pre">EnumTypesT</span></code>, bound= <code class="xref py py-class docutils literal notranslate"><span class="pre">StrictEnum</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">SubsetEnum</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">SupersetEnum</span></code>)</span>)</p></li>
 <li><p><strong>name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">''</span></code>)</p></li>
 <li><p><strong>pv</strong> – The pv to connect to the shutter device.</p></li>
 <li><p><strong>open_state</strong> – The enum value that corresponds with opening the shutter.</p></li>
@@ -1130,48 +1128,24 @@ run_engine(bps.mv(shutter, shutter.close_state))</p>
 <p class="rubric">Methods</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#dodal.devices.fast_shutter.GenericFastShutter.is_closed" title="dodal.devices.fast_shutter.GenericFastShutter.is_closed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_closed</span></code></a>()</p></td>
-<td><p>Checks to see if shutter is in close_state.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#dodal.devices.fast_shutter.GenericFastShutter.is_open" title="dodal.devices.fast_shutter.GenericFastShutter.is_open"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_open</span></code></a>()</p></td>
-<td><p>Checks to see if shutter is in open_state.</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">set</span></code>(value)</p></td>
-<td><p></p></td>
-</tr>
 </tbody>
 </table>
 </div>
 <p class="rubric">Attributes</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">open_state</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">close_state</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">shutter_state</span></code></p></td>
+<td><p></p></td>
+</tr>
 </tbody>
 </table>
 </div>
-<dl class="py method">
-<dt class="sig sig-object py" id="dodal.devices.fast_shutter.GenericFastShutter.is_open">
-<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_open</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span></span><a class="reference internal" href="../../_modules/dodal/devices/fast_shutter.html#GenericFastShutter.is_open"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.fast_shutter.GenericFastShutter.is_open" title="Link to this definition">#</a></dt>
-<dd><p>Checks to see if shutter is in open_state. Should not be used directly inside a
-plan. A user should use the following instead in a plan:
-:rtype: <span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span></p>
-<blockquote>
-<div><p>from bluesky import plan_stubs as bps
-is_open = yield from bps.rd(shutter.state) == shutter.open_state</p>
-</div></blockquote>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="dodal.devices.fast_shutter.GenericFastShutter.is_closed">
-<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_closed</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span></span><a class="reference internal" href="../../_modules/dodal/devices/fast_shutter.html#GenericFastShutter.is_closed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.fast_shutter.GenericFastShutter.is_closed" title="Link to this definition">#</a></dt>
-<dd><p>Checks to see if shutter is in close_state. Should not be used directly inside a
-plan. A user should use the following instead in a plan:
-:rtype: <span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span></p>
-<blockquote>
-<div><p>from bluesky import plan_stubs as bps
-is_closed = yield from bps.rd(shutter.state) == shutter.close_state</p>
-</div></blockquote>
-</dd></dl>
-
 </dd></dl>
 
 </section>
@@ -1187,12 +1161,12 @@ is_closed = yield from bps.rd(shutter.state) == shutter.close_state</p>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="dodal.devices.fast_shutter.html"
+       href="dodal.devices.fast_shutter.FastShutter.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">dodal.devices.fast_shutter</p>
+        <p class="prev-next-title">dodal.devices.fast_shutter.FastShutter</p>
       </div>
     </a>
     <a class="right-next"
@@ -1223,11 +1197,7 @@ is_closed = yield from bps.rd(shutter.state) == shutter.close_state</p>
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.fast_shutter.GenericFastShutter"><code class="docutils literal notranslate"><span class="pre">GenericFastShutter</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.fast_shutter.GenericFastShutter.is_open"><code class="docutils literal notranslate"><span class="pre">GenericFastShutter.is_open()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.fast_shutter.GenericFastShutter.is_closed"><code class="docutils literal notranslate"><span class="pre">GenericFastShutter.is_closed()</span></code></a></li>
-</ul>
-</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.fast_shutter.GenericFastShutter"><code class="docutils literal notranslate"><span class="pre">GenericFastShutter</span></code></a></li>
 </ul>
   </nav></div>
 

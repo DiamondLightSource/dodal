@@ -75,6 +75,7 @@
    dodal.devices.robot
    dodal.devices.s4_slit_gaps
    dodal.devices.scintillator
+   dodal.devices.selectable_source
    dodal.devices.slits
    dodal.devices.smargon
    dodal.devices.status

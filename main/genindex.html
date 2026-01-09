@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Index &#8212; dodal 1.68.1.dev10+g1fdd7dba9 documentation</title>
+    <title>Index &#8212; dodal 1.68.1.dev11+ge0d5a176c documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="_static/documentation_options.js?v=8cefd6d0"></script>
+    <script src="_static/documentation_options.js?v=b9fc95f6"></script>
     <script src="_static/doctools.js?v=9a2dae69"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -981,6 +981,8 @@ window.addEventListener("load", load);
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="reference/generated/dodal.devices.fast_shutter.html">dodal.devices.fast_shutter</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="reference/generated/dodal.devices.fast_shutter.DualFastShutter.html">dodal.devices.fast_shutter.DualFastShutter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="reference/generated/dodal.devices.fast_shutter.FastShutter.html">dodal.devices.fast_shutter.FastShutter</a></li>
 <li class="toctree-l4"><a class="reference internal" href="reference/generated/dodal.devices.fast_shutter.GenericFastShutter.html">dodal.devices.fast_shutter.GenericFastShutter</a></li>
 </ul>
 </details></li>
@@ -1268,6 +1270,11 @@ window.addEventListener("load", load);
 <li class="toctree-l4"><a class="reference internal" href="reference/generated/dodal.devices.scintillator.Scintillator.html">dodal.devices.scintillator.Scintillator</a></li>
 </ul>
 </details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="reference/generated/dodal.devices.selectable_source.html">dodal.devices.selectable_source</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="reference/generated/dodal.devices.selectable_source.SelectedSource.html">dodal.devices.selectable_source.SelectedSource</a></li>
+<li class="toctree-l4"><a class="reference internal" href="reference/generated/dodal.devices.selectable_source.SourceSelector.html">dodal.devices.selectable_source.SourceSelector</a></li>
+</ul>
+</details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="reference/generated/dodal.devices.slits.html">dodal.devices.slits</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="reference/generated/dodal.devices.slits.MinimalSlits.html">dodal.devices.slits.MinimalSlits</a></li>
 <li class="toctree-l4"><a class="reference internal" href="reference/generated/dodal.devices.slits.Slits.html">dodal.devices.slits.Slits</a></li>
@@ -1468,6 +1475,8 @@ window.addEventListener("load", load);
       <li><a href="reference/generated/dodal.devices.electron_analyser.base.AbstractBaseRegion.html#dodal.devices.electron_analyser.base.AbstractBaseRegion">AbstractBaseRegion (class in dodal.devices.electron_analyser.base)</a>
 </li>
       <li><a href="reference/generated/dodal.devices.electron_analyser.base.AbstractBaseSequence.html#dodal.devices.electron_analyser.base.AbstractBaseSequence">AbstractBaseSequence (class in dodal.devices.electron_analyser.base)</a>
+</li>
+      <li><a href="reference/generated/dodal.devices.electron_analyser.base.AbstractEnergySource.html#dodal.devices.electron_analyser.base.AbstractEnergySource">AbstractEnergySource (class in dodal.devices.electron_analyser.base)</a>
 </li>
       <li><a href="reference/generated/dodal.parameters.experiment_parameter_base.AbstractExperimentParameterBase.html#dodal.parameters.experiment_parameter_base.AbstractExperimentParameterBase">AbstractExperimentParameterBase (class in dodal.parameters.experiment_parameter_base)</a>
 </li>
@@ -3124,6 +3133,13 @@ window.addEventListener("load", load);
 </li>
       </ul></li>
       <li>
+    dodal.devices.selectable_source
+
+      <ul>
+        <li><a href="reference/generated/dodal.devices.selectable_source.html#module-dodal.devices.selectable_source">module</a>
+</li>
+      </ul></li>
+      <li>
     dodal.devices.slits
 
       <ul>
@@ -3340,6 +3356,8 @@ window.addEventListener("load", load);
 </li>
       <li><a href="reference/generated/dodal.devices.electron_analyser.base.DualEnergySource.html#dodal.devices.electron_analyser.base.DualEnergySource">DualEnergySource (class in dodal.devices.electron_analyser.base)</a>
 </li>
+      <li><a href="reference/generated/dodal.devices.fast_shutter.DualFastShutter.html#dodal.devices.fast_shutter.DualFastShutter">DualFastShutter (class in dodal.devices.fast_shutter)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -3376,12 +3394,16 @@ window.addEventListener("load", load);
 </li>
       <li><a href="reference/generated/dodal.devices.fast_grid_scan.GridAxis.html#dodal.devices.fast_grid_scan.GridAxis.end">end (dodal.devices.fast_grid_scan.GridAxis property)</a>
 </li>
-      <li><a href="reference/generated/dodal.devices.insertion_device.Apple2Controller.html#dodal.devices.insertion_device.Apple2Controller.energy">energy (dodal.devices.insertion_device.Apple2Controller attribute)</a>
+      <li><a href="reference/generated/dodal.devices.electron_analyser.base.AbstractEnergySource.html#dodal.devices.electron_analyser.base.AbstractEnergySource.energy">energy (dodal.devices.electron_analyser.base.AbstractEnergySource property)</a>
+
+      <ul>
+        <li><a href="reference/generated/dodal.devices.insertion_device.Apple2Controller.html#dodal.devices.insertion_device.Apple2Controller.energy">(dodal.devices.insertion_device.Apple2Controller attribute)</a>
 </li>
-      <li><a href="reference/generated/dodal.devices.util.lookup_tables.html#dodal.devices.util.lookup_tables.energy_distance_table">energy_distance_table() (in module dodal.devices.util.lookup_tables)</a>
-</li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/generated/dodal.devices.util.lookup_tables.html#dodal.devices.util.lookup_tables.energy_distance_table">energy_distance_table() (in module dodal.devices.util.lookup_tables)</a>
+</li>
       <li><a href="reference/generated/dodal.devices.focusing_mirror.FocusingMirrorWithStripes.html#dodal.devices.focusing_mirror.FocusingMirrorWithStripes.energy_to_stripe">energy_to_stripe() (dodal.devices.focusing_mirror.FocusingMirrorWithStripes method)</a>
 </li>
       <li><a href="reference/generated/dodal.devices.insertion_device.EnergyCoverage.html#dodal.devices.insertion_device.EnergyCoverage">EnergyCoverage (class in dodal.devices.insertion_device)</a>
@@ -3423,6 +3445,8 @@ window.addEventListener("load", load);
       <li><a href="reference/generated/dodal.devices.fast_grid_scan.FastGridScanCommon.html#dodal.devices.fast_grid_scan.FastGridScanCommon">FastGridScanCommon (class in dodal.devices.fast_grid_scan)</a>
 </li>
       <li><a href="reference/generated/dodal.devices.fast_grid_scan.FastGridScanThreeD.html#dodal.devices.fast_grid_scan.FastGridScanThreeD">FastGridScanThreeD (class in dodal.devices.fast_grid_scan)</a>
+</li>
+      <li><a href="reference/generated/dodal.devices.fast_shutter.FastShutter.html#dodal.devices.fast_shutter.FastShutter">FastShutter (class in dodal.devices.fast_shutter)</a>
 </li>
       <li><a href="reference/generated/dodal.devices.pressure_jump_cell.FastValveControlRequest.html#dodal.devices.pressure_jump_cell.FastValveControlRequest">FastValveControlRequest (class in dodal.devices.pressure_jump_cell)</a>
 </li>
@@ -3535,6 +3559,8 @@ window.addEventListener("load", load);
       <li><a href="reference/generated/dodal.devices.oav.utils.html#dodal.devices.oav.utils.get_move_required_so_that_beam_is_at_pixel">get_move_required_so_that_beam_is_at_pixel() (in module dodal.devices.oav.utils)</a>
 </li>
       <li><a href="reference/generated/dodal.devices.oav.oav_to_redis_forwarder.html#dodal.devices.oav.oav_to_redis_forwarder.get_next_jpeg">get_next_jpeg() (in module dodal.devices.oav.oav_to_redis_forwarder)</a>
+</li>
+      <li><a href="reference/generated/dodal.devices.selectable_source.html#dodal.devices.selectable_source.get_obj_from_selected_source">get_obj_from_selected_source() (in module dodal.devices.selectable_source)</a>
 </li>
       <li><a href="reference/generated/dodal.devices.insertion_device.EnergyCoverage.html#dodal.devices.insertion_device.EnergyCoverage.get_poly">get_poly() (dodal.devices.insertion_device.EnergyCoverage method)</a>
 
@@ -3656,10 +3682,10 @@ window.addEventListener("load", load);
 </li>
       <li><a href="reference/generated/dodal.beamlines.i23.I23DetectorPositions.html#dodal.beamlines.i23.I23DetectorPositions">I23DetectorPositions (class in dodal.beamlines.i23)</a>
 </li>
-      <li><a href="reference/generated/dodal.devices.zebra.zebra.I24Axes.html#dodal.devices.zebra.zebra.I24Axes">I24Axes (class in dodal.devices.zebra.zebra)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/generated/dodal.devices.zebra.zebra.I24Axes.html#dodal.devices.zebra.zebra.I24Axes">I24Axes (class in dodal.devices.zebra.zebra)</a>
+</li>
       <li><a href="reference/generated/dodal.devices.attenuator.filter_selections.I24FilterOneSelections.html#dodal.devices.attenuator.filter_selections.I24FilterOneSelections">I24FilterOneSelections (class in dodal.devices.attenuator.filter_selections)</a>
 </li>
       <li><a href="reference/generated/dodal.devices.attenuator.filter_selections.I24FilterTwoSelections.html#dodal.devices.attenuator.filter_selections.I24FilterTwoSelections">I24FilterTwoSelections (class in dodal.devices.attenuator.filter_selections)</a>
@@ -3696,11 +3722,7 @@ window.addEventListener("load", load);
 </li>
       <li><a href="reference/generated/dodal.devices.electron_analyser.base.AbstractBaseRegion.html#dodal.devices.electron_analyser.base.AbstractBaseRegion.is_binding_energy">is_binding_energy() (dodal.devices.electron_analyser.base.AbstractBaseRegion method)</a>
 </li>
-      <li><a href="reference/generated/dodal.devices.fast_shutter.GenericFastShutter.html#dodal.devices.fast_shutter.GenericFastShutter.is_closed">is_closed() (dodal.devices.fast_shutter.GenericFastShutter method)</a>
-</li>
       <li><a href="reference/generated/dodal.devices.electron_analyser.base.AbstractBaseRegion.html#dodal.devices.electron_analyser.base.AbstractBaseRegion.is_kinetic_energy">is_kinetic_energy() (dodal.devices.electron_analyser.base.AbstractBaseRegion method)</a>
-</li>
-      <li><a href="reference/generated/dodal.devices.fast_shutter.GenericFastShutter.html#dodal.devices.fast_shutter.GenericFastShutter.is_open">is_open() (dodal.devices.fast_shutter.GenericFastShutter method)</a>
 </li>
       <li><a href="reference/generated/dodal.devices.fast_grid_scan.GridAxis.html#dodal.devices.fast_grid_scan.GridAxis.is_within">is_within() (dodal.devices.fast_grid_scan.GridAxis method)</a>
 </li>
@@ -4214,6 +4236,8 @@ window.addEventListener("load", load);
 </li>
         <li><a href="reference/generated/dodal.devices.scintillator.html#module-dodal.devices.scintillator">dodal.devices.scintillator</a>
 </li>
+        <li><a href="reference/generated/dodal.devices.selectable_source.html#module-dodal.devices.selectable_source">dodal.devices.selectable_source</a>
+</li>
         <li><a href="reference/generated/dodal.devices.slits.html#module-dodal.devices.slits">dodal.devices.slits</a>
 </li>
         <li><a href="reference/generated/dodal.devices.smargon.html#module-dodal.devices.smargon">dodal.devices.smargon</a>
@@ -4585,7 +4609,7 @@ window.addEventListener("load", load);
         <li><a href="reference/generated/dodal.devices.mx_phase1.beamstop.Beamstop.html#dodal.devices.mx_phase1.beamstop.Beamstop.selected_pos">(dodal.devices.mx_phase1.beamstop.Beamstop attribute)</a>
 </li>
       </ul></li>
-      <li><a href="reference/generated/dodal.devices.electron_analyser.base.SelectedSource.html#dodal.devices.electron_analyser.base.SelectedSource">SelectedSource (class in dodal.devices.electron_analyser.base)</a>
+      <li><a href="reference/generated/dodal.devices.selectable_source.SelectedSource.html#dodal.devices.selectable_source.SelectedSource">SelectedSource (class in dodal.devices.selectable_source)</a>
 </li>
       <li><a href="reference/generated/dodal.devices.attenuator.attenuator.BinaryFilterAttenuator.html#dodal.devices.attenuator.attenuator.BinaryFilterAttenuator.set">set() (dodal.devices.attenuator.attenuator.BinaryFilterAttenuator method)</a>
 
@@ -4647,10 +4671,10 @@ window.addEventListener("load", load);
 </li>
       <li><a href="reference/generated/dodal.devices.hutch_shutter.ShutterDemand.html#dodal.devices.hutch_shutter.ShutterDemand">ShutterDemand (class in dodal.devices.hutch_shutter)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/generated/dodal.devices.hutch_shutter.ShutterState.html#dodal.devices.hutch_shutter.ShutterState">ShutterState (class in dodal.devices.hutch_shutter)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/generated/dodal.devices.focusing_mirror.SimpleMirror.html#dodal.devices.focusing_mirror.SimpleMirror">SimpleMirror (class in dodal.devices.focusing_mirror)</a>
 </li>
       <li><a href="reference/generated/dodal.devices.focusing_mirror.SingleMirrorVoltage.html#dodal.devices.focusing_mirror.SingleMirrorVoltage">SingleMirrorVoltage (class in dodal.devices.focusing_mirror)</a>
@@ -4678,6 +4702,8 @@ window.addEventListener("load", load);
       <li><a href="reference/generated/dodal.devices.b16.detector.html#dodal.devices.b16.detector.software_triggered_tiff_area_detector">software_triggered_tiff_area_detector() (in module dodal.devices.b16.detector)</a>
 </li>
       <li><a href="reference/generated/dodal.devices.oav.oav_to_redis_forwarder.Source.html#dodal.devices.oav.oav_to_redis_forwarder.Source">Source (class in dodal.devices.oav.oav_to_redis_forwarder)</a>
+</li>
+      <li><a href="reference/generated/dodal.devices.selectable_source.SourceSelector.html#dodal.devices.selectable_source.SourceSelector">SourceSelector (class in dodal.devices.selectable_source)</a>
 </li>
       <li><a href="reference/generated/dodal.plans.html#dodal.plans.spec_scan">spec_scan() (in module dodal.plans)</a>
 </li>
