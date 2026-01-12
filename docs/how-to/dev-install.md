@@ -20,9 +20,8 @@ If on a DLS machine make sure you have python >3.11 running by doing `module loa
 
 ```
 module load uv
-uv venv .venv
-source .venv/bin/activate
 uv sync --group dev
+source .venv/bin/activate
 ```
 
 ## See what was installed

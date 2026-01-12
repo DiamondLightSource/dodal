@@ -57,6 +57,6 @@ jobs:
         uses: codecov/codecov-action@v5
         with:
           name: ${{ inputs.python-version }}/${{ inputs.runs-on }}
-          files: ./unit_cov.xml,./system_cov.xml
+          files: ./cov.xml
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
