@@ -1,5 +1,5 @@
 - section: "Rasor Detectors"
-  func: rasor_det_scalers
+  device: rasor_det_scalers
   type: RasorScalerCard1
   import_from: "dodal.devices.i10.rasor.rasor_scaler_cards"
   params:
@@ -7,7 +7,7 @@
   factory_args: { mock: true }
 
 - section: "Rasor Detectors"
-  func: rasor_sr570
+  device: rasor_sr570
   type: RasorSR570
   import_from: "dodal.devices.i10.rasor.rasor_current_amp"
   params:
@@ -15,7 +15,7 @@
   factory_args: { mock: true }
 
 - section: "Rasor Detectors"
-  func: rasor_sr570_pa_scaler_det
+  device: rasor_sr570_pa_scaler_det
   type: CurrentAmpDet
   import_from: "dodal.devices.current_amplifiers"
   params:

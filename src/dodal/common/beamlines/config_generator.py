@@ -47,9 +47,10 @@ def generate_beamline(config_dir: str) -> str:
             device_list: list[dict] = (
                 content if isinstance(content, list) else [content]
             )
-
+            print(content, device_list)
             for dev in device_list:
-                fname = dev.get("func")
+                fname = dev.get("device")
+                print(fname)
                 if fname in seen_functions:
                     raise ValueError(
                         f"Duplicate function name detected: '{fname}' in {y_path}"
@@ -97,7 +98,7 @@ def generate_beamline(config_dir: str) -> str:
 
             code += (
                 f"\n@devices.factory({f_str})"
-                f"\ndef {dev['func']}() -> {dev['type']}:"
+                f"\ndef {dev['device']}() -> {dev['type']}:"
                 f"\n    return {body}\n"
             )
     try:
