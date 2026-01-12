@@ -9,7 +9,7 @@ from types import ModuleType
 from unittest.mock import MagicMock, patch
 
 import pytest
-from daq_config_server.converters.models import ConfigModel
+from daq_config_server.models import ConfigModel
 from ophyd_async.core import (
     PathProvider,
 )
