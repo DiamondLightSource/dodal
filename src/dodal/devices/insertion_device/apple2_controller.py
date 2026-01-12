@@ -101,7 +101,7 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
         name: str
             Name of the device.
         """
-        self.apple2_ref = Reference(apple2)
+        self.apple2 = Reference(apple2)
         self.gap_energy_motor_converter = gap_energy_motor_converter
         self.phase_energy_motor_converter = phase_energy_motor_converter
 
@@ -122,7 +122,7 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
         self.polarisation_setpoint, self._polarisation_setpoint_set = (
             soft_signal_r_and_setter(Pol)
         )
-        phase = self.apple2_ref().phase_ref()
+        phase = self.apple2().phase()
         # check if undulator phase is unlocked.
         if isinstance(phase, UndulatorPhaseAxes):
             top_inner = phase.top_inner.user_readback
@@ -142,7 +142,7 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
                 top_inner=top_inner,
                 btm_inner=phase.btm_inner.user_readback,
                 btm_outer=btm_outer,
-                gap=self.apple2_ref().gap_ref().user_readback,
+                gap=self.apple2().gap().user_readback,
             )
         super().__init__(name)
 
@@ -155,8 +155,8 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
         """
 
     async def _get_current_apple2_value(self) -> Apple2Val:
-        gap = float(await self.apple2_ref().gap_ref().user_setpoint.get_value())
-        phase = await self.apple2_ref().phase_ref().user_setpoint.get_value()
+        gap = float(await self.apple2().gap().user_setpoint.get_value())
+        phase = await self.apple2().phase().user_setpoint.get_value()
         pol = await self._check_and_get_pol_setpoint()
         return self._get_apple2_value(gap, phase, pol)
 
@@ -168,7 +168,7 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
         phase = self.phase_energy_motor_converter(energy=energy, pol=pol)
         apple2_val = self._get_apple2_value(gap, phase, pol)
         LOGGER.info(f"Setting polarisation to {pol}, with values: {apple2_val}")
-        await self.apple2_ref().set(id_motor_values=apple2_val)
+        await self.apple2().set(id_motor_values=apple2_val)
 
     async def _set_energy(self, energy: float) -> None:
         pol = await self._check_and_get_pol_setpoint()
@@ -379,7 +379,7 @@ class Apple2EnforceLHMoveController(Apple2Controller[Apple2]):
 class AppleKnotController(Apple2Controller[Apple2]):
     """
     Controller for Apple Knot undulator with unique feature of calculating a move path
-    through gap and phase space which avoids the exclusion zone around 0-0 gap-phase.
+    through gap and phase space avoiding the exclusion zone around 0-0 gap-phase.
     See https://confluence.diamond.ac.uk/x/vQENAg for more details.
     """
 
@@ -418,7 +418,7 @@ class AppleKnotController(Apple2Controller[Apple2]):
             current_apple2_val, target_apple2_val
         ):
             LOGGER.info(f"Moving to apple2 values: {apple2_val}")
-            await self.apple2_ref().set(id_motor_values=apple2_val)
+            await self.apple2().set(id_motor_values=apple2_val)
 
     def _get_apple2_value(self, gap: float, phase: float, pol: Pol) -> Apple2Val:
         apple2_val = Apple2Val(

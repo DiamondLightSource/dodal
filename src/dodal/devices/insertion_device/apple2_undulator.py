@@ -395,8 +395,8 @@ class Apple2(StandardReadable, Movable[Apple2Val], Generic[PhaseAxesType]):
             Name of the device.
         """
         with self.add_children_as_readables():
-            self.gap_ref = Reference(id_gap)
-            self.phase_ref = Reference(id_phase)
+            self.gap = Reference(id_gap)
+            self.phase = Reference(id_phase)
         super().__init__(name=name)
 
     @AsyncStatus.wrap
@@ -407,26 +407,24 @@ class Apple2(StandardReadable, Movable[Apple2Val], Generic[PhaseAxesType]):
         """
 
         # Only need to check gap as the phase motors share both status and gate with gap.
-        await self.gap_ref().raise_if_cannot_move()
+        await self.gap().raise_if_cannot_move()
 
         await asyncio.gather(
-            self.phase_ref().set_demand_positions(
+            self.phase().set_demand_positions(
                 value=id_motor_values.extract_phase_val()
             ),
-            self.gap_ref().set_demand_positions(value=float(id_motor_values.gap)),
+            self.gap().set_demand_positions(value=float(id_motor_values.gap)),
         )
         timeout = np.max(
-            await asyncio.gather(
-                self.gap_ref().get_timeout(), self.phase_ref().get_timeout()
-            )
+            await asyncio.gather(self.gap().get_timeout(), self.phase().get_timeout())
         )
         LOGGER.info(
             f"Moving f{self.name} apple2 motors to {id_motor_values}, timeout = {timeout}"
         )
         await asyncio.gather(
-            self.gap_ref().set_move.set(value=1, wait=False, timeout=timeout),
-            self.phase_ref().set_move.set(value=1, wait=False, timeout=timeout),
+            self.gap().set_move.set(value=1, wait=False, timeout=timeout),
+            self.phase().set_move.set(value=1, wait=False, timeout=timeout),
         )
         await wait_for_value(
-            self.gap_ref().gate, UndulatorGateStatus.CLOSE, timeout=timeout
+            self.gap().gate, UndulatorGateStatus.CLOSE, timeout=timeout
         )
