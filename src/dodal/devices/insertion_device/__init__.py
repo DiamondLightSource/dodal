@@ -17,7 +17,11 @@ from .apple2_undulator import (
     UndulatorPhaseAxes,
     UnstoppableMotor,
 )
-from .apple_knot_controller import AppleKnotController
+from .apple_knot_controller import (
+    I05_APPLE_KNOT_EXCLUSION_ZONES,
+    AppleKnotController,
+    AppleKnotPathFinder,
+)
 from .energy import BeamEnergy, InsertionDeviceEnergy, InsertionDeviceEnergyBase
 from .energy_motor_lookup import (
     ConfigServerEnergyMotorLookup,
@@ -37,6 +41,7 @@ __all__ = [
     "Apple2Controller",
     "Apple2EnforceLHMoveController",
     "AppleKnotController",
+    "AppleKnotPathFinder",
     "UndulatorGap",
     "UndulatorPhaseAxes",
     "UndulatorJawPhase",
@@ -61,4 +66,5 @@ __all__ = [
     "EnergyMotorConvertor",
     "UnstoppableMotor",
     "InsertionDeviceEnergyBase",
+    "I05_APPLE_KNOT_EXCLUSION_ZONES",
 ]
