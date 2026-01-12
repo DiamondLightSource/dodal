@@ -2,14 +2,14 @@ from dodal.common import Rectangle2D, sign
 from dodal.devices.insertion_device import (
     Apple2,
     Apple2Controller,
-    Apple2PhasesVal,
     Apple2Val,
     EnergyMotorConvertor,
 )
+from dodal.devices.insertion_device.apple2_undulator import Apple2LockedPhasesVal
 from dodal.devices.insertion_device.enum import Pol
 from dodal.log import LOGGER
 
-# Define exclusion zones - not supposed to be crossed during moves
+# Define exclusion zones in phase-gap space - not supposed to be crossed during moves
 I05_APPLE_KNOT_EXCLUSION_ZONES = (
     Rectangle2D(-65.5, 0.0, 65.5, 25.5),
     Rectangle2D(-10.5, 0.0, 10.5, 37.5),
@@ -43,16 +43,19 @@ class AppleKnotPathFinder:
         ):
             LOGGER.warning("Start point same as end point, no path calculated.")
             return apple_knot_val_path
-        if [
-            zone.contains(start_val.gap, start_val.phase.top_outer)
-            or zone.contains(end_val.gap, end_val.phase.top_outer)
-            for zone in self.exclusion_zone
-        ]:
-            LOGGER.warning("Start point is inside exclusion zone, no path calculated.")
-            return apple_knot_val_path
+        for zone in self.exclusion_zone:
+            for value in (start_val, end_val):
+                if zone.contains(value.phase.top_outer, value.gap):
+                    LOGGER.warning(
+                        "Start point is inside exclusion zone, no path calculated."
+                    )
+                    return apple_knot_val_path
         apple_knot_val_path += (start_val,)
-        # Split the move if it pass phase 0 line
-        if sign(start_val.phase.top_outer) == (-1) * sign(end_val.phase.top_outer):
+        # Split the move if start and end are on opposite sides of zero phase
+        if (
+            sign(start_val.phase.top_outer) == (-1) * sign(end_val.phase.top_outer)
+            and sign(start_val.phase.top_outer) != 0
+        ):
             apple_knot_val_path += (
                 self.get_zero_phase_crossing_point(start_val, end_val),
             )
@@ -75,6 +78,12 @@ class AppleKnotPathFinder:
             start_val = apple_knot_val_path[i]
             end_val = apple_knot_val_path[i + 1]
             final_path.append(start_val)
+            if (
+                end_val.phase.top_outer == start_val.phase.top_outer
+                or end_val.gap == start_val.gap
+            ):
+                # Direct move along one axis, no intermediate point needed
+                continue
             # Determine move order based on quadrant rules
             if end_val.gap <= start_val.gap and abs(end_val.phase.top_outer) > abs(
                 start_val.phase.top_outer
@@ -99,16 +108,13 @@ class AppleKnotPathFinder:
             if self.exclusion_zone
             else 0.0
         )
-
         return Apple2Val(
             gap=max(
                 (start_val.gap + end_val.gap) / 2, max_exclusion_gap
             ),  # Ensure gap is above a minimum value
-            phase=Apple2PhasesVal(
+            phase=Apple2LockedPhasesVal(
                 top_outer=0.0,
-                top_inner=0.0,
                 btm_inner=0.0,
-                btm_outer=0.0,
             ),
         )
 
@@ -160,11 +166,9 @@ class AppleKnotController(Apple2Controller[Apple2]):
     def _get_apple2_value(self, gap: float, phase: float, pol: Pol) -> Apple2Val:
         apple2_val = Apple2Val(
             gap=gap,
-            phase=Apple2PhasesVal(
+            phase=Apple2LockedPhasesVal(
                 top_outer=phase,
-                top_inner=0.0,
                 btm_inner=phase,
-                btm_outer=0.0,
             ),
         )
         LOGGER.info(f"Getting apple2 value for pol={pol}, gap={gap}, phase={phase}.")
