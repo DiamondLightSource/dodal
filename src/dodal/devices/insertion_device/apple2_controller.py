@@ -100,7 +100,7 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
         name: str
             Name of the device.
         """
-        self.apple2 = Reference(apple2)
+        self.apple2_ref = Reference(apple2)
         self.gap_energy_motor_converter = gap_energy_motor_converter
         self.phase_energy_motor_converter = phase_energy_motor_converter
 
@@ -121,7 +121,7 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
         self.polarisation_setpoint, self._polarisation_setpoint_set = (
             soft_signal_r_and_setter(Pol)
         )
-        phase = self.apple2().phase()
+        phase = self.apple2_ref().phase_ref()
         # check if undulator phase is unlocked.
         if isinstance(phase, UndulatorPhaseAxes):
             top_inner = phase.top_inner.user_readback
@@ -141,7 +141,7 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
                 top_inner=top_inner,
                 btm_inner=phase.btm_inner.user_readback,
                 btm_outer=btm_outer,
-                gap=self.apple2().gap().user_readback,
+                gap=self.apple2_ref().gap_ref().user_readback,
             )
         super().__init__(name)
 
@@ -153,6 +153,12 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
         undulator design.
         """
 
+    async def _get_current_apple2_value(self) -> Apple2Val:
+        gap = float(await self.apple2_ref().gap_ref().user_setpoint.get_value())
+        phase = await self.apple2_ref().phase_ref().user_setpoint.get_value()
+        pol = await self._check_and_get_pol_setpoint()
+        return self._get_apple2_value(gap, phase, pol)
+
     async def _set_motors_from_energy_and_polarisation(
         self, energy: float, pol: Pol
     ) -> None:
@@ -161,7 +167,7 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
         phase = self.phase_energy_motor_converter(energy=energy, pol=pol)
         apple2_val = self._get_apple2_value(gap, phase, pol)
         LOGGER.info(f"Setting polarisation to {pol}, with values: {apple2_val}")
-        await self.apple2().set(id_motor_values=apple2_val)
+        await self.apple2_ref().set(id_motor_values=apple2_val)
 
     async def _set_energy(self, energy: float) -> None:
         pol = await self._check_and_get_pol_setpoint()
@@ -367,3 +373,179 @@ class Apple2EnforceLHMoveController(Apple2Controller[Apple2]):
                 await self.energy.set(lh_setpoint, timeout=MAXIMUM_MOVE_TIME)
             self._polarisation_setpoint_set(value)
             await self.energy.set(target_energy, timeout=MAXIMUM_MOVE_TIME)
+
+
+# Simple Rectangle2D class to represent exclusion zones
+class Rectangle2D:
+    def __init__(self, x1: float, y1: float, x2: float, y2: float):
+        self.x1, self.y1 = x1, y1
+        self.x2, self.y2 = x2, y2
+
+    def get_max_y(self) -> float:
+        return max(self.y1, self.y2)
+
+    def contains(self, point: list[float]) -> bool:
+        return self.x1 <= point[0] <= self.x2 and self.y1 <= point[1] <= self.y2
+
+
+def sign(x: float) -> int:
+    if x > 0:
+        return 1
+    if x < 0:
+        return -1
+    return 0
+
+
+class AppleKnotController(Apple2Controller[Apple2]):
+    """
+    Controller for Apple Knot undulator with unique feature of calculating a move path
+    through gap and phase space which avoids the exclusion zone around 0-0 gap-phase.
+    See https://confluence.diamond.ac.uk/x/vQENAg for more details.
+    """
+
+    def __init__(
+        self,
+        apple: Apple2,
+        gap_energy_motor_converter: EnergyMotorConvertor,
+        phase_energy_motor_converter: EnergyMotorConvertor,
+        exclusion_zone: list[Rectangle2D],
+        units: str = "eV",
+        name: str = "",
+    ) -> None:
+        self.path_finder = AppleKnotPathFinder(exclusion_zone=exclusion_zone)
+        super().__init__(
+            apple2=apple,
+            gap_energy_motor_converter=gap_energy_motor_converter,
+            phase_energy_motor_converter=phase_energy_motor_converter,
+            units=units,
+            name=name,
+        )
+
+    async def _set_energy(self, energy: float) -> None:
+        pol = await self._check_and_get_pol_setpoint()
+        await self._combined_move(energy, pol)
+        self._energy_set(energy)
+
+    async def _combined_move(self, energy: float, pol: Pol) -> None:
+        # get current apple2 val
+        current_apple2_val = await self._get_current_apple2_value()
+        # get target phase and gap
+        gap = self.gap_energy_motor_converter(energy=energy, pol=pol)
+        phase = self.phase_energy_motor_converter(energy=energy, pol=pol)
+        target_apple2_val = self._get_apple2_value(gap, phase, pol)
+        # get path avoiding exclusion zone
+        for apple2_val in self.path_finder.get_apple_knot_val_path(
+            current_apple2_val, target_apple2_val
+        ):
+            LOGGER.info(f"Moving to apple2 values: {apple2_val}")
+            await self.apple2_ref().set(id_motor_values=apple2_val)
+
+    def _get_apple2_value(self, gap: float, phase: float, pol: Pol) -> Apple2Val:
+        apple2_val = Apple2Val(
+            gap=gap,
+            phase=Apple2PhasesVal(
+                top_outer=phase,
+                top_inner=0.0,
+                btm_inner=phase,
+                btm_outer=0.0,
+            ),
+        )
+        LOGGER.info(f"Getting apple2 value for pol={pol}, gap={gap}, phase={phase}.")
+        LOGGER.info(f"Apple2 motor values: {apple2_val}.")
+
+        return apple2_val
+
+
+class AppleKnotPathFinder:
+    """
+    Class to find a safe path for AppleKnot undulator moves that avoids the exclusion zone
+    around 0-0 gap-phase.
+    """
+
+    def __init__(
+        self,
+        exclusion_zone: list[Rectangle2D],
+    ) -> None:
+        # Define the exclusion zone rectangles around (0,0)
+        self.exclusion_zone = exclusion_zone if exclusion_zone is not None else []
+
+    def get_apple_knot_val_path(
+        self, start_val: Apple2Val, end_val: Apple2Val
+    ) -> list[Apple2Val]:
+        """
+        Get a list of Apple2Val representing the path from start to end avoiding exclusion zones.
+        """
+        apple_knot_val_path = []
+        # Defensive checks for no movement
+        if (
+            start_val.gap == end_val.gap
+            and start_val.phase.top_outer == end_val.phase.top_outer
+        ):
+            LOGGER.warning("Start point same as end point, no path calculated.")
+            return apple_knot_val_path
+        if [
+            zone.contains([start_val.gap, start_val.phase.top_outer])
+            or zone.contains([end_val.gap, end_val.phase.top_outer])
+            for zone in self.exclusion_zone
+        ]:
+            LOGGER.warning("Start point is inside exclusion zone, no path calculated.")
+            return apple_knot_val_path
+        apple_knot_val_path.append(start_val)
+        # Split the move if it pass phase 0 line
+        if sign(start_val.phase.top_outer) == (-1) * sign(end_val.phase.top_outer):
+            apple_knot_val_path.append(
+                self.get_zero_phase_crossing_point(start_val, end_val)
+            )
+        apple_knot_val_path.append(end_val)
+        return self.apple_knot_manhattan_path(apple_knot_val_path)
+
+    def apple_knot_manhattan_path(
+        self, apple_knot_val_path: list[Apple2Val]
+    ) -> list[Apple2Val]:
+        """
+        Convert a list of Apple2Val into a manhattan path avoiding exclusion zones.
+        Here all moves are done in axis-aligned steps (gap first then phase or vice versa).
+        List of points is expanded to include intermediate points as needed so each move
+        happens within one sign of gap and phase (including zero phase).
+        """
+        final_path = []
+        for i in range(len(apple_knot_val_path) - 1):
+            start_val = apple_knot_val_path[i]
+            end_val = apple_knot_val_path[i + 1]
+            final_path.append(start_val)
+            if end_val.gap <= start_val.gap and abs(end_val.phase.top_outer) > abs(
+                start_val.phase.top_outer
+            ):
+                # Move phase first then gap
+                intermediate_val = Apple2Val(gap=start_val.gap, phase=end_val.phase)
+                final_path.append(intermediate_val)
+
+            else:  # Move gap first then phase
+                intermediate_val = Apple2Val(gap=end_val.gap, phase=start_val.phase)
+                final_path.append(intermediate_val)
+        final_path.append(apple_knot_val_path[-1])
+        return final_path
+
+    def get_zero_phase_crossing_point(
+        self, start_val: Apple2Val, end_val: Apple2Val
+    ) -> Apple2Val:
+        # Calculate the point where phase crosses zero
+        # This is a simplified version - in practice, you'd use a more complex algorithm
+        # to find the exact crossing point in the exclusion zone
+        max_exclusion_gap = (
+            max([zone.get_max_y() for zone in self.exclusion_zone])
+            if self.exclusion_zone
+            else 0.0
+        )
+
+        return Apple2Val(
+            gap=max(
+                (start_val.gap + end_val.gap) / 2, max_exclusion_gap
+            ),  # Ensure gap is above a minimum value
+            phase=Apple2PhasesVal(
+                top_outer=0.0,
+                top_inner=0.0,
+                btm_inner=0.0,
+                btm_outer=0.0,
+            ),
+        )
