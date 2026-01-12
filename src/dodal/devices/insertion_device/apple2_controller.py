@@ -11,6 +11,7 @@ from ophyd_async.core import (
     soft_signal_rw,
 )
 
+from dodal.common import Rectangle2D, sign
 from dodal.devices.insertion_device.apple2_undulator import (
     Apple2,
     Apple2PhasesVal,
@@ -375,27 +376,6 @@ class Apple2EnforceLHMoveController(Apple2Controller[Apple2]):
             await self.energy.set(target_energy, timeout=MAXIMUM_MOVE_TIME)
 
 
-# Simple Rectangle2D class to represent exclusion zones
-class Rectangle2D:
-    def __init__(self, x1: float, y1: float, x2: float, y2: float):
-        self.x1, self.y1 = x1, y1
-        self.x2, self.y2 = x2, y2
-
-    def get_max_y(self) -> float:
-        return max(self.y1, self.y2)
-
-    def contains(self, point: list[float]) -> bool:
-        return self.x1 <= point[0] <= self.x2 and self.y1 <= point[1] <= self.y2
-
-
-def sign(x: float) -> int:
-    if x > 0:
-        return 1
-    if x < 0:
-        return -1
-    return 0
-
-
 class AppleKnotController(Apple2Controller[Apple2]):
     """
     Controller for Apple Knot undulator with unique feature of calculating a move path
@@ -459,7 +439,7 @@ class AppleKnotController(Apple2Controller[Apple2]):
 class AppleKnotPathFinder:
     """
     Class to find a safe path for AppleKnot undulator moves that avoids the exclusion zone
-    around 0-0 gap-phase.
+    around 0-0 gap-phase. See https://confluence.diamond.ac.uk/x/vQENAg for more details.
     """
 
     def __init__(
@@ -484,8 +464,8 @@ class AppleKnotPathFinder:
             LOGGER.warning("Start point same as end point, no path calculated.")
             return apple_knot_val_path
         if [
-            zone.contains([start_val.gap, start_val.phase.top_outer])
-            or zone.contains([end_val.gap, end_val.phase.top_outer])
+            zone.contains(start_val.gap, start_val.phase.top_outer)
+            or zone.contains(end_val.gap, end_val.phase.top_outer)
             for zone in self.exclusion_zone
         ]:
             LOGGER.warning("Start point is inside exclusion zone, no path calculated.")

@@ -48,3 +48,81 @@ def in_micros(t: float) -> int:
     if t < 0:
         raise ValueError(f"Expected a positive time in seconds, got {t!r}")
     return int(np.ceil(t * 1e6))
+
+
+class Rectangle2D:
+    """
+    A 2D rectangle defined by two opposite corners.
+
+    This class represents a rectangle in 2D space using two points: (x1, y1) and (x2, y2).
+    It provides methods to query rectangle properties and check point containment.
+
+    Attributes:
+        x1 (float): The x-coordinate of the first corner.
+        y1 (float): The y-coordinate of the first corner.
+        x2 (float): The x-coordinate of the second corner.
+        y2 (float): The y-coordinate of the second corner.
+    """
+
+    def __init__(self, x1: float, y1: float, x2: float, y2: float):
+        """
+        Initialize a Rectangle2D with two corner points.
+
+        Args:
+            x1 (float): The x-coordinate of the first corner.
+            y1 (float): The y-coordinate of the first corner.
+            x2 (float): The x-coordinate of the second corner.
+            y2 (float): The y-coordinate of the second corner.
+        """
+        self.x1, self.y1 = x1, y1
+        self.x2, self.y2 = x2, y2
+
+    def get_max_x(self) -> float:
+        """
+        Get the maximum x-coordinate of the rectangle.
+
+        Returns:
+            float: The larger of the two x-coordinates (x1, x2).
+        """
+        return max(self.x1, self.x2)
+
+    def get_max_y(self) -> float:
+        """
+        Get the maximum y-coordinate of the rectangle.
+
+        Returns:
+            float: The larger of the two y-coordinates (y1, y2).
+        """
+        return max(self.y1, self.y2)
+
+    def contains(self, x: float, y: float) -> bool:
+        """
+        Check if a point is contained within the rectangle.
+
+        Args:
+            point (list[float]): A list containing [x, y] coordinates of the point.
+
+        Returns:
+            bool: True if the point is within the rectangle bounds, False otherwise.
+        """
+        return self.x1 <= x <= self.x2 and self.y1 <= y <= self.y2
+
+
+def sign(x: float) -> int:
+    """
+    Determine the sign of a number.
+
+    Args:
+        x: A float value to determine the sign of.
+
+    Returns:
+        An integer representing the sign:
+        - 1 if x is positive
+        - -1 if x is negative
+        - 0 if x is zero
+    """
+    if x > 0:
+        return 1
+    if x < 0:
+        return -1
+    return 0
