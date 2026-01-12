@@ -176,7 +176,7 @@ commands = [
     [
         "pyright",
         "--pythonpath",
-        ".venv/bin/python",
+        "{posargs:.venv/bin/python}",
         "src",
         "tests",
         { replace = "posargs", default = [
