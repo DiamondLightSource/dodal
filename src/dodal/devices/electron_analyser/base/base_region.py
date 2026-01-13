@@ -118,7 +118,7 @@ class AbstractBaseRegion(
         """
         Get a region with a new energy mode: Kinetic or Binding.
         It caculates new values for low_energy, centre_energy, high_energy, via the
-        excitation enerrgy. It doesn't calculate anything if the region is already of
+        excitation energy. It doesn't calculate anything if the region is already of
         the same energy mode.
 
         Parameters:
