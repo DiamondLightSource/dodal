@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.beamlines.adsim &#8212; dodal 1.68.1.dev11+ge0d5a176c documentation</title>
+    <title>dodal.beamlines.adsim &#8212; dodal 1.68.1.dev12+gd53119323 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=b9fc95f6"></script>
+    <script src="../../_static/documentation_options.js?v=791c4f67"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -1103,6 +1103,60 @@
                   
   <section id="module-dodal.beamlines.adsim">
 <span id="dodal-beamlines-adsim"></span><h1>dodal.beamlines.adsim<a class="headerlink" href="#module-dodal.beamlines.adsim" title="Link to this heading">#</a></h1>
+<p class="rubric">Module Attributes</p>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dodal.beamlines.adsim.devices" title="dodal.beamlines.adsim.devices"><code class="xref py py-obj docutils literal notranslate"><span class="pre">devices</span></code></a></p></td>
+<td><p>Beamline module for use with the simulated AreaDetector and motors.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="rubric">Functions</p>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dodal.beamlines.adsim.path_provider" title="dodal.beamlines.adsim.path_provider"><code class="xref py py-obj docutils literal notranslate"><span class="pre">path_provider</span></code></a>()</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<dl class="py data">
+<dt class="sig sig-object py" id="dodal.beamlines.adsim.devices">
+<span class="sig-prename descclassname"><span class="pre">dodal.beamlines.adsim.</span></span><span class="sig-name descname"><span class="pre">devices</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;DeviceManager:</span> <span class="pre">2</span> <span class="pre">devices&gt;</span></em><a class="headerlink" href="#dodal.beamlines.adsim.devices" title="Link to this definition">#</a></dt>
+<dd><p>Beamline module for use with the simulated AreaDetector and motors.
+These devices are simulated at the EPICS level, enabling testing of
+dodal and ophyd-async against what appear to be “real” signals.</p>
+<section id="usage-example">
+<h2>Usage Example<a class="headerlink" href="#usage-example" title="Link to this heading">#</a></h2>
+<p>Start the simulated beamline by following the epics-containers tutorial at
+<a class="reference external" href="https://epics-containers.github.io/main/tutorials/launch_example.html">https://epics-containers.github.io/main/tutorials/launch_example.html</a>
+And ensure that the signals are visible:</p>
+<p><code class="docutils literal notranslate"><span class="pre">`sh</span>
+<span class="pre">export</span> <span class="pre">EPICS_CA_ADDR_LIST=127.0.0.1:9064</span>
+<span class="pre">export</span> <span class="pre">EPICS_CA_NAME_SERVERS=127.0.0.1:9064</span>
+<span class="pre">export</span> <span class="pre">EPICS_PVA_NAME_SERVERS=127.0.0.1:9075</span>
+<span class="pre">`</span></code></p>
+<p>How to use the devices in a plan:
+In an ipython terminal run:</p>
+<p><a href="#id1"><span class="problematic" id="id2">``</span></a><a href="#id3"><span class="problematic" id="id4">`</span></a>python
+from bluesky.run_engine import RunEngine</p>
+<p>from dodal.beamlines.adsim import devices
+from dodal.plans import count</p>
+<p>run_engine = RunEngine()</p>
+<p>built = devices.build_and_connect().or_raise()
+d = built[“det”]
+s = built[“stage”]</p>
+<p>run_engine(count([d], num=10))
+<a href="#id5"><span class="problematic" id="id6">``</span></a><a href="#id7"><span class="problematic" id="id8">`</span></a></p>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dodal.beamlines.adsim.path_provider">
+<span class="sig-prename descclassname"><span class="pre">dodal.beamlines.adsim.</span></span><span class="sig-name descname"><span class="pre">path_provider</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dodal/beamlines/adsim.html#path_provider"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.beamlines.adsim.path_provider" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
 </section>
 
 
@@ -1143,6 +1197,19 @@
                 <dialog id="pst-secondary-sidebar-modal"></dialog>
                 <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
 
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.beamlines.adsim.devices"><code class="docutils literal notranslate"><span class="pre">devices</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.beamlines.adsim.path_provider"><code class="docutils literal notranslate"><span class="pre">path_provider()</span></code></a></li>
+</ul>
+  </nav></div>
 
   <div class="sidebar-secondary-item">
 

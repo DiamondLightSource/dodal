@@ -16,9 +16,21 @@ dodal.beamlines.adsim
 
    
    
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      devices
+   
    
 
    
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      path_provider
    
    
 
