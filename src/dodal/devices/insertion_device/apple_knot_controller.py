@@ -1,3 +1,5 @@
+from typing import Generic
+
 from numpy import sign
 
 from dodal.common import Rectangle2D
@@ -7,7 +9,10 @@ from dodal.devices.insertion_device import (
     Apple2Val,
     EnergyMotorConvertor,
 )
-from dodal.devices.insertion_device.apple2_undulator import Apple2LockedPhasesVal
+from dodal.devices.insertion_device.apple2_undulator import (
+    Apple2LockedPhasesVal,
+    PhaseAxesType,
+)
 from dodal.devices.insertion_device.enum import Pol
 from dodal.log import LOGGER
 
@@ -16,6 +21,9 @@ I05_APPLE_KNOT_EXCLUSION_ZONES = (
     Rectangle2D(-65.5, 0.0, 65.5, 25.5),  # mechanical limit
     Rectangle2D(-10.5, 0.0, 10.5, 37.5),  # power load limit
 )
+
+APPLE_KNOT_MAXIMUM_GAP_MOTOR_POSITION = 250.0
+APPLE_KNOT_MAXIMUM_PHASE_MOTOR_POSITION = 70.0
 
 
 class AppleKnotPathFinder:
@@ -127,7 +135,7 @@ class AppleKnotPathFinder:
         )
 
 
-class AppleKnotController(Apple2Controller[Apple2]):
+class AppleKnotController(Apple2Controller[Apple2], Generic[PhaseAxesType]):
     """
     Controller for Apple Knot undulator with unique feature of calculating a move path
     through gap and phase space avoiding the exclusion zone around 0-0 gap-phase.
@@ -136,10 +144,12 @@ class AppleKnotController(Apple2Controller[Apple2]):
 
     def __init__(
         self,
-        apple: Apple2,
+        apple: Apple2[PhaseAxesType],
         gap_energy_motor_converter: EnergyMotorConvertor,
         phase_energy_motor_converter: EnergyMotorConvertor,
         path_finder: AppleKnotPathFinder,
+        maximum_gap_motor_position: float = APPLE_KNOT_MAXIMUM_GAP_MOTOR_POSITION,
+        maximum_phase_motor_position: float = APPLE_KNOT_MAXIMUM_PHASE_MOTOR_POSITION,
         units: str = "eV",
         name: str = "",
     ) -> None:
@@ -148,6 +158,8 @@ class AppleKnotController(Apple2Controller[Apple2]):
             apple2=apple,
             gap_energy_motor_converter=gap_energy_motor_converter,
             phase_energy_motor_converter=phase_energy_motor_converter,
+            maximum_gap_motor_position=maximum_gap_motor_position,
+            maximum_phase_motor_position=maximum_phase_motor_position,
             units=units,
             name=name,
         )
@@ -159,15 +171,22 @@ class AppleKnotController(Apple2Controller[Apple2]):
 
     async def _combined_move(self, energy: float, pol: Pol) -> None:
         # get current apple2 val
-        current_apple2_val = await self._get_current_apple2_value()
+        gap = float(await self.apple2().gap().user_readback.get_value())
+        phase = float(await self.apple2().phase().top_outer.user_readback.get_value())
+        pol = await self._check_and_get_pol_setpoint()
+        current_apple2_val = self._get_apple2_value(gap, phase, pol)
         # get target phase and gap
         gap = self.gap_energy_motor_converter(energy=energy, pol=pol)
         phase = self.phase_energy_motor_converter(energy=energy, pol=pol)
         target_apple2_val = self._get_apple2_value(gap, phase, pol)
         # get path avoiding exclusion zone
-        for apple2_val in self.path_finder.get_apple_knot_val_path(
+        manhattan_path = self.path_finder.get_apple_knot_val_path(
             current_apple2_val, target_apple2_val
-        ):
+        )
+        if manhattan_path == ():
+            raise RuntimeError("No valid path found for move avoiding exclusion zones.")
+        # execute the moves along the path
+        for apple2_val in manhattan_path:
             LOGGER.info(f"Moving to apple2 values: {apple2_val}")
             await self.apple2().set(id_motor_values=apple2_val)
 
@@ -181,5 +200,4 @@ class AppleKnotController(Apple2Controller[Apple2]):
         )
         LOGGER.info(f"Getting apple2 value for pol={pol}, gap={gap}, phase={phase}.")
         LOGGER.info(f"Apple2 motor values: {apple2_val}.")
-
         return apple2_val

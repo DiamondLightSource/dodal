@@ -14,24 +14,11 @@ from dodal.devices.insertion_device import (
     EnabledDisabledUpper,
     EnergyMotorConvertor,
     Pol,
-    UndulatorGap,
     UndulatorGateStatus,
     UndulatorLockedPhaseAxes,
 )
 
 pytest_plugins = ["dodal.testing.fixtures.devices.apple2"]
-
-
-@pytest.fixture
-async def mock_locked_apple2(
-    mock_id_gap: UndulatorGap,
-    mock_locked_phase_axes: UndulatorLockedPhaseAxes,
-) -> Apple2:
-    mock_locked_apple2 = Apple2(
-        id_gap=mock_id_gap,
-        id_phase=mock_locked_phase_axes,
-    )
-    return mock_locked_apple2
 
 
 @pytest.fixture

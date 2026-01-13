@@ -63,6 +63,10 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
         Callable that converts energy and polarisation to gap motor positions.
     phase_energy_to_motor_converter : EnergyMotorConvertor
         Callable that converts energy and polarisation to phase motor positions.
+    maximum_gap_motor_position : float
+        Maximum allowed position for the gap motor.
+    maximum_phase_motor_position : float
+        Maximum allowed position for the raw phase motors.
 
     Abstract Methods
     ----------------
@@ -82,6 +86,8 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
         apple2: Apple2Type,
         gap_energy_motor_converter: EnergyMotorConvertor,
         phase_energy_motor_converter: EnergyMotorConvertor,
+        maximum_gap_motor_position: float = MAXIMUM_GAP_MOTOR_POSITION,
+        maximum_phase_motor_position: float = MAXIMUM_ROW_PHASE_MOTOR_POSITION,
         units: str = "eV",
         name: str = "",
     ) -> None:
@@ -100,6 +106,8 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
         name: str
             Name of the device.
         """
+        self.maximum_gap_motor_position = maximum_gap_motor_position
+        self.maximum_phase_motor_position = maximum_phase_motor_position
         self.apple2 = Reference(apple2)
         self.gap_energy_motor_converter = gap_energy_motor_converter
         self.phase_energy_motor_converter = phase_energy_motor_converter
@@ -152,12 +160,6 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
         motor positions will be different for each beamline depending on the
         undulator design.
         """
-
-    async def _get_current_apple2_value(self) -> Apple2Val:
-        gap = float(await self.apple2().gap().user_setpoint.get_value())
-        phase = await self.apple2().phase().user_setpoint.get_value()
-        pol = await self._check_and_get_pol_setpoint()
-        return self._get_apple2_value(gap, phase, pol)
 
     async def _set_motors_from_energy_and_polarisation(
         self, energy: float, pol: Pol
@@ -249,7 +251,7 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
         (May be for future one can use the inverse poly to work out the energy and try to match it with the current energy
         to workout the polarisation but during my test the inverse poly is too unstable for general use.)
         """
-        if gap > MAXIMUM_GAP_MOTOR_POSITION:
+        if gap > self.maximum_gap_motor_position:
             raise RuntimeError(
                 f"{self.name} is not in use, close gap or set polarisation to use this ID"
             )
@@ -263,19 +265,19 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
         if (
             isclose(
                 top_outer,
-                MAXIMUM_ROW_PHASE_MOTOR_POSITION,
+                self.maximum_phase_motor_position,
                 abs_tol=ROW_PHASE_MOTOR_TOLERANCE,
             )
             and isclose(top_inner, 0.0, abs_tol=ROW_PHASE_MOTOR_TOLERANCE)
             and isclose(
                 btm_inner,
-                MAXIMUM_ROW_PHASE_MOTOR_POSITION,
+                self.maximum_phase_motor_position,
                 abs_tol=ROW_PHASE_MOTOR_TOLERANCE,
             )
             and isclose(btm_outer, 0.0, abs_tol=ROW_PHASE_MOTOR_TOLERANCE)
         ):
             LOGGER.info("Determined polarisation: LV (Linear Vertical).")
-            return Pol.LV, MAXIMUM_ROW_PHASE_MOTOR_POSITION
+            return Pol.LV, self.maximum_phase_motor_position
         if (
             isclose(top_outer, btm_inner, abs_tol=ROW_PHASE_MOTOR_TOLERANCE)
             and top_outer > 0.0
