@@ -1,3 +1,4 @@
+import ast
 import os
 import subprocess
 from collections import defaultdict
@@ -84,3 +85,72 @@ def get_beamline_code(config_dir: str) -> str:
     except Exception as e:
         LOGGER.error(f"Ruff formatting failed, returning raw code. Error: {e}")
         return code
+
+
+def translate_beamline_py_config_to_yaml(py_file_path: str, output_dir: str):
+    with open(py_file_path) as f:
+        source = f.read()
+        tree = ast.parse(source)
+
+    devices = []
+    base_imports = []
+    setup_nodes = []
+
+    for node in tree.body:
+        if isinstance(node, (ast.Import, ast.ImportFrom)):
+            base_imports.append(ast.unparse(node))
+
+        elif isinstance(node, ast.FunctionDef):
+            device_meta = {
+                "device": node.name,
+                "type": node.returns.id if isinstance(node.returns, ast.Name) else None,
+            }
+
+            for decorator in node.decorator_list:
+                if isinstance(decorator, ast.Call) and "factory" in ast.unparse(
+                    decorator
+                ):
+                    f_args = {
+                        kw.arg: ast.literal_eval(kw.value) for kw in decorator.keywords
+                    }
+                    if f_args:
+                        device_meta["factory_args"] = f_args
+
+            ret_stmt = node.body[0]
+            if isinstance(ret_stmt, ast.Return) and isinstance(
+                ret_stmt.value, ast.Call
+            ):
+                params = {}
+                for kw in ret_stmt.value.keywords:
+                    try:
+                        params[kw.arg] = ast.literal_eval(kw.value)
+                    except ValueError:
+                        params[kw.arg] = ast.unparse(kw.value)
+                if params:
+                    device_meta["params"] = params
+
+            devices.append(device_meta)
+
+        elif not isinstance(node, ast.Expr) or not isinstance(node.value, ast.Constant):
+            setup_nodes.append(ast.unparse(node))
+
+    beamline_name = os.path.splitext(os.path.basename(py_file_path))[0]
+    setup_script = "\n".join(setup_nodes).replace(f"'{beamline_name}'", "'{beamline}'")
+
+    os.makedirs(output_dir, exist_ok=True)
+
+    master_config = {
+        "beamline": beamline_name,
+        "output_file": os.path.basename(py_file_path),
+        "base_imports": base_imports,
+        "setup_script": setup_script,
+        "device_files": ["devices.yaml"],
+    }
+
+    with open(os.path.join(output_dir, "config.yaml"), "w") as f:
+        yaml.dump(master_config, f, sort_keys=False, default_flow_style=False)
+
+    with open(os.path.join(output_dir, "devices.yaml"), "w") as f:
+        yaml.dump(devices, f, sort_keys=False, default_flow_style=False)
+
+    print(f"Successfully back-translated {py_file_path} to {output_dir}")

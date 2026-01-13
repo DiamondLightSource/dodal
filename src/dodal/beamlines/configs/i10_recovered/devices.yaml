@@ -1,0 +1,86 @@
+- device: focusing_mirror
+  type: PiezoMirror
+  params:
+    prefix: f'{PREFIX.beamline_prefix}-OP-FOCS-01:'
+- device: slits
+  type: I10Slits
+  params:
+    prefix: f'{PREFIX.beamline_prefix}-AL-SLITS-'
+- device: slits_current
+  type: I10SlitsDrainCurrent
+  params:
+    prefix: f'{PREFIX.beamline_prefix}-'
+- device: diagnostics
+  type: I10Diagnostic
+  params:
+    prefix: f'{PREFIX.beamline_prefix}-DI-'
+- device: d5a_det
+  type: I10Diagnostic5ADet
+  params:
+    prefix: f'{PREFIX.beamline_prefix}-DI-'
+- device: pin_hole
+  type: XYStage
+  params:
+    prefix: 'ME01D-EA-PINH-01:'
+- device: det_slits
+  type: DetSlits
+  params:
+    prefix: ME01D-MO-APTR-0
+- device: diffractometer
+  type: Diffractometer
+  params:
+    prefix: 'ME01D-MO-DIFF-01:'
+- device: pa_stage
+  type: PaStage
+  params:
+    prefix: 'ME01D-MO-POLAN-01:'
+- device: sample_stage
+  type: XYZStage
+  params:
+    prefix: 'ME01D-MO-CRYO-01:'
+- device: rasor_temperature_controller
+  type: Lakeshore340
+  params:
+    prefix: 'ME01D-EA-TCTRL-01:'
+- device: rasor_femto
+  type: RasorFemto
+  params:
+    prefix: ME01D-EA-IAMP
+- device: rasor_det_scalers
+  type: RasorScalerCard1
+  params:
+    prefix: ME01D-EA-SCLR-01:SCALER1
+- device: rasor_sr570
+  type: RasorSR570
+  params:
+    prefix: ME01D-EA-IAMP
+- device: rasor_sr570_pa_scaler_det
+  type: CurrentAmpDet
+  params:
+    current_amp: rasor_sr570().ca1
+    counter: rasor_det_scalers().det
+- device: rasor_femto_pa_scaler_det
+  type: CurrentAmpDet
+  params:
+    current_amp: rasor_femto().ca1
+    counter: rasor_det_scalers().det
+- device: rasor_sr570_fluo_scaler_det
+  type: CurrentAmpDet
+  params:
+    current_amp: rasor_sr570().ca2
+    counter: rasor_det_scalers().fluo
+- device: rasor_femto_fluo_scaler_det
+  type: CurrentAmpDet
+  params:
+    current_amp: rasor_femto().ca2
+    counter: rasor_det_scalers().fluo
+- device: rasor_sr570_drain_scaler_det
+  type: CurrentAmpDet
+  params:
+    current_amp: rasor_sr570().ca3
+    counter: rasor_det_scalers().drain
+- device: rasor_femto_drain_scaler_det
+  type: CurrentAmpDet
+  params:
+    current_amp: rasor_femto().ca3
+    counter: rasor_det_scalers().drain

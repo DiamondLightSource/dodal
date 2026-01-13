@@ -1,0 +1,27 @@
+beamline: i10
+output_file: i10.py
+base_imports:
+- from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
+- from dodal.device_manager import DeviceManager
+- from dodal.devices.current_amplifiers import CurrentAmpDet
+- from dodal.devices.i10 import I10Diagnostic, I10Diagnostic5ADet, I10Slits, I10SlitsDrainCurrent,
+  PiezoMirror
+- from dodal.devices.i10.diagnostics import I10Diagnostic, I10Diagnostic5ADet
+- from dodal.devices.i10.rasor.rasor_current_amp import RasorFemto, RasorSR570
+- from dodal.devices.i10.rasor.rasor_motors import DetSlits, Diffractometer, PaStage
+- from dodal.devices.i10.rasor.rasor_scaler_cards import RasorScalerCard1
+- from dodal.devices.motors import XYStage, XYZStage
+- from dodal.devices.temperture_controller import Lakeshore340
+- from dodal.log import set_beamline as set_log_beamline
+- from dodal.utils import BeamlinePrefix, get_beamline_name
+setup_script: 'devices = DeviceManager()
+
+  BL = get_beamline_name(''{beamline}'')
+
+  set_log_beamline(BL)
+
+  set_utils_beamline(BL)
+
+  PREFIX = BeamlinePrefix(BL)'
+device_files:
+- devices.yaml
