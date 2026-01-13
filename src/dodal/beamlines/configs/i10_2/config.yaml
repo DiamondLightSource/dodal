@@ -1,5 +1,4 @@
 beamline: "i10"
-output_file: "/workspaces/dodal/src/dodal/beamlines/i10_2.py"
 
 base_imports:
   - "from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline"
