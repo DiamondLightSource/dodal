@@ -180,7 +180,7 @@ def test_apple_knot_path_finder_cross_zero(
     start_val, target_val = get_pair_apple2_val(
         start_gap, start_phase, target_gap, target_phase
     )
-    zero_phase_val = apple_knot_i05_path_finder.get_zero_phase_crossing_point(
+    zero_phase_val = apple_knot_i05_path_finder._get_zero_phase_crossing_point(
         start_val, target_val
     )
     intermediate_neg_phase_val, intermediate_pos_phase_val = get_pair_apple2_val(
@@ -212,7 +212,7 @@ def test_apple_knot_path_finder_gap_phase_order_cross_zero(
     start_val, target_val = get_pair_apple2_val(
         start_gap, start_phase, target_gap, target_phase
     )
-    zero_phase_val = apple_knot_i05_path_finder.get_zero_phase_crossing_point(
+    zero_phase_val = apple_knot_i05_path_finder._get_zero_phase_crossing_point(
         start_val, target_val
     )
     intermediate_neg_phase_val, intermediate_pos_phase_val = get_pair_apple2_val(

@@ -106,23 +106,3 @@ class Rectangle2D:
             bool: True if the point is within the rectangle bounds, False otherwise.
         """
         return self.x1 <= x <= self.x2 and self.y1 <= y <= self.y2
-
-
-def sign(x: float) -> int:
-    """
-    Determine the sign of a number.
-
-    Args:
-        x: A float value to determine the sign of.
-
-    Returns:
-        An integer representing the sign:
-        - 1 if x is positive
-        - -1 if x is negative
-        - 0 if x is zero
-    """
-    if x > 0:
-        return 1
-    if x < 0:
-        return -1
-    return 0

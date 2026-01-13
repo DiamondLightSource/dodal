@@ -1,4 +1,6 @@
-from dodal.common import Rectangle2D, sign
+from numpy import sign
+
+from dodal.common import Rectangle2D
 from dodal.devices.insertion_device import (
     Apple2,
     Apple2Controller,
@@ -61,12 +63,12 @@ class AppleKnotPathFinder:
             and sign(start_val.phase.top_outer) != 0
         ):
             apple_knot_val_path += (
-                self.get_zero_phase_crossing_point(start_val, end_val),
+                self._get_zero_phase_crossing_point(start_val, end_val),
             )
         apple_knot_val_path += (end_val,)
-        return self.apple_knot_manhattan_path(apple_knot_val_path)
+        return self._apple_knot_manhattan_path(apple_knot_val_path)
 
-    def apple_knot_manhattan_path(
+    def _apple_knot_manhattan_path(
         self, apple_knot_val_path: tuple[Apple2Val, ...]
     ) -> tuple[Apple2Val, ...]:
         """
@@ -105,7 +107,7 @@ class AppleKnotPathFinder:
         final_path.append(apple_knot_val_path[-1])
         return tuple(final_path)
 
-    def get_zero_phase_crossing_point(
+    def _get_zero_phase_crossing_point(
         self, start_val: Apple2Val, end_val: Apple2Val
     ) -> Apple2Val:
         # Calculate the point where phase crosses zero
