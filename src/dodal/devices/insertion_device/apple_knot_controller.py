@@ -11,15 +11,19 @@ from dodal.log import LOGGER
 
 # Define exclusion zones in phase-gap space - not supposed to be crossed during moves
 I05_APPLE_KNOT_EXCLUSION_ZONES = (
-    Rectangle2D(-65.5, 0.0, 65.5, 25.5),
-    Rectangle2D(-10.5, 0.0, 10.5, 37.5),
+    Rectangle2D(-65.5, 0.0, 65.5, 25.5),  # mechanical limit
+    Rectangle2D(-10.5, 0.0, 10.5, 37.5),  # power load limit
 )
 
 
 class AppleKnotPathFinder:
     """
     Class to find a safe path for AppleKnot undulator moves that avoids the exclusion zone
-    around 0-0 gap-phase. See https://confluence.diamond.ac.uk/x/vQENAg for more details.
+    around 0-0 gap-phase. We rely on axis-aligned (manhattan) moves and splitting moves
+    that cross zero phase into two segments via an intermediate point at zero phase and
+    a safe gap value. We ASSUME the exclusion zones are rectangles aligned with the axes
+    in a shape of hanoi tower centered at (0,0).
+    See https://confluence.diamond.ac.uk/x/vQENAg for more details.
     """
 
     def __init__(
@@ -70,30 +74,32 @@ class AppleKnotPathFinder:
         Here all moves are done in axis-aligned steps (gap first then phase or vice versa).
         List of points is expanded to include intermediate points as needed so each move
         happens within one sign of gap and phase (including zero phase).
-        Only SW move in negative phase region and SE move in positive phase region
-        need a phase first then gap move, the rest needs gap first then phase.
+        For convenience we define:phase increase as West-East axis and gap increase
+        as North-South axis. Only SW move in negative phase region and SE move in
+        positive phase region need a PHASE first then GAP move, the rest needs GAP
+        first then PHASE move.
         """
         final_path = []
         for i in range(len(apple_knot_val_path) - 1):
             start_val = apple_knot_val_path[i]
             end_val = apple_knot_val_path[i + 1]
             final_path.append(start_val)
+            # Direct move along one axis, no intermediate point needed
             if (
                 end_val.phase.top_outer == start_val.phase.top_outer
                 or end_val.gap == start_val.gap
             ):
-                # Direct move along one axis, no intermediate point needed
                 continue
             # Determine move order based on quadrant rules
             if end_val.gap <= start_val.gap and abs(end_val.phase.top_outer) > abs(
                 start_val.phase.top_outer
             ):
-                # Move phase first then gap
+                # Move PHASE first then GAP (SW move in negative phase or SE move in positive phase)
                 intermediate_val = Apple2Val(gap=start_val.gap, phase=end_val.phase)
                 final_path.append(intermediate_val)
 
             else:
-                # Move gap first then phase
+                # Move GAP first then PHASE (other moves)
                 intermediate_val = Apple2Val(gap=end_val.gap, phase=start_val.phase)
                 final_path.append(intermediate_val)
         final_path.append(apple_knot_val_path[-1])
