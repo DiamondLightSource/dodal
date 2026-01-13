@@ -1,86 +1,126 @@
 - device: focusing_mirror
   type: PiezoMirror
+  import_from: dodal.devices.i10
+  factory_args: {}
   params:
     prefix: f'{PREFIX.beamline_prefix}-OP-FOCS-01:'
 - device: slits
   type: I10Slits
+  import_from: dodal.devices.i10
+  factory_args: {}
   params:
     prefix: f'{PREFIX.beamline_prefix}-AL-SLITS-'
 - device: slits_current
   type: I10SlitsDrainCurrent
+  import_from: dodal.devices.i10
+  factory_args: {}
   params:
     prefix: f'{PREFIX.beamline_prefix}-'
 - device: diagnostics
   type: I10Diagnostic
+  import_from: dodal.devices.i10.diagnostics
+  factory_args: {}
   params:
     prefix: f'{PREFIX.beamline_prefix}-DI-'
 - device: d5a_det
   type: I10Diagnostic5ADet
+  import_from: dodal.devices.i10.diagnostics
+  factory_args: {}
   params:
     prefix: f'{PREFIX.beamline_prefix}-DI-'
 - device: pin_hole
   type: XYStage
+  import_from: dodal.devices.motors
+  factory_args: {}
   params:
     prefix: 'ME01D-EA-PINH-01:'
 - device: det_slits
   type: DetSlits
+  import_from: dodal.devices.i10.rasor.rasor_motors
+  factory_args: {}
   params:
     prefix: ME01D-MO-APTR-0
 - device: diffractometer
   type: Diffractometer
+  import_from: dodal.devices.i10.rasor.rasor_motors
+  factory_args: {}
   params:
     prefix: 'ME01D-MO-DIFF-01:'
 - device: pa_stage
   type: PaStage
+  import_from: dodal.devices.i10.rasor.rasor_motors
+  factory_args: {}
   params:
     prefix: 'ME01D-MO-POLAN-01:'
 - device: sample_stage
   type: XYZStage
+  import_from: dodal.devices.motors
+  factory_args: {}
   params:
     prefix: 'ME01D-MO-CRYO-01:'
 - device: rasor_temperature_controller
   type: Lakeshore340
+  import_from: dodal.devices.temperture_controller
+  factory_args: {}
   params:
     prefix: 'ME01D-EA-TCTRL-01:'
 - device: rasor_femto
   type: RasorFemto
+  import_from: dodal.devices.i10.rasor.rasor_current_amp
+  factory_args: {}
   params:
     prefix: ME01D-EA-IAMP
 - device: rasor_det_scalers
   type: RasorScalerCard1
+  import_from: dodal.devices.i10.rasor.rasor_scaler_cards
+  factory_args: {}
   params:
     prefix: ME01D-EA-SCLR-01:SCALER1
 - device: rasor_sr570
   type: RasorSR570
+  import_from: dodal.devices.i10.rasor.rasor_current_amp
+  factory_args: {}
   params:
     prefix: ME01D-EA-IAMP
 - device: rasor_sr570_pa_scaler_det
   type: CurrentAmpDet
+  import_from: dodal.devices.current_amplifiers
+  factory_args: {}
   params:
     current_amp: rasor_sr570().ca1
     counter: rasor_det_scalers().det
 - device: rasor_femto_pa_scaler_det
   type: CurrentAmpDet
+  import_from: dodal.devices.current_amplifiers
+  factory_args: {}
   params:
     current_amp: rasor_femto().ca1
     counter: rasor_det_scalers().det
 - device: rasor_sr570_fluo_scaler_det
   type: CurrentAmpDet
+  import_from: dodal.devices.current_amplifiers
+  factory_args: {}
   params:
     current_amp: rasor_sr570().ca2
     counter: rasor_det_scalers().fluo
 - device: rasor_femto_fluo_scaler_det
   type: CurrentAmpDet
+  import_from: dodal.devices.current_amplifiers
+  factory_args: {}
   params:
     current_amp: rasor_femto().ca2
     counter: rasor_det_scalers().fluo
 - device: rasor_sr570_drain_scaler_det
   type: CurrentAmpDet
+  import_from: dodal.devices.current_amplifiers
+  factory_args: {}
   params:
     current_amp: rasor_sr570().ca3
     counter: rasor_det_scalers().drain
 - device: rasor_femto_drain_scaler_det
   type: CurrentAmpDet
+  import_from: dodal.devices.current_amplifiers
+  factory_args: {}
   params:
     current_amp: rasor_femto().ca3
     counter: rasor_det_scalers().drain

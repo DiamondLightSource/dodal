@@ -6,8 +6,28 @@ from datetime import datetime
 from typing import Any
 
 import yaml
+from pydantic import BaseModel, Field
 
 from dodal.log import LOGGER
+
+
+class DeviceModel(BaseModel):
+    device: str = Field(..., description="The name of the function to be generated")
+    type: str = Field(..., description="The Python class type of the device")
+    import_from: str | None = Field(
+        "", description="The module to import the type from"
+    )
+    section: str = "Other"
+    params: dict[str, Any] = Field(default_factory=dict)
+    factory_args: dict[str, Any] = Field(default_factory=dict)
+
+
+class MasterConfigModel(BaseModel):
+    beamline: str
+    base_imports: list[str]
+    setup_script: str
+    device_files: list[str]
+    note: str | None = ""
 
 
 def format_value(v: Any) -> str:
@@ -21,16 +41,16 @@ def format_value(v: Any) -> str:
 def get_beamline_code(config_dir: str) -> str:
     config_file = os.path.join(config_dir, "config.yaml")
     with open(config_file) as f:
-        master: dict = yaml.safe_load(f)
+        master_raw: dict = yaml.safe_load(f)
+        master = MasterConfigModel(**master_raw)
 
-    beamline = master["beamline"]
-    device_files = master.get("device_files", [])
+    beamline = master.beamline
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     sections = defaultdict(list)
     needed_imports = defaultdict(set)
     seen_functions = set()
 
-    for y_path in device_files:
+    for y_path in master.device_files:
         full_device_path = os.path.join(config_dir, y_path)
         if not os.path.exists(full_device_path):
             LOGGER.warning(f"Device file not found: {full_device_path}")
@@ -38,41 +58,39 @@ def get_beamline_code(config_dir: str) -> str:
 
         with open(full_device_path) as f:
             content = yaml.safe_load(f)
-            device_list = content if isinstance(content, list) else [content]
-            for dev in device_list:
-                fname = dev.get("device")
-                if fname in seen_functions:
-                    raise ValueError(f"Duplicate function: {fname}")
-                seen_functions.add(fname)
-                sections[dev.get("section", "Other")].append(dev)
-                if dev.get("import_from") and dev.get("type"):
-                    needed_imports[dev["import_from"]].add(dev["type"])
+            device_list_raw = content if isinstance(content, list) else [content]
+            for dev_dict in device_list_raw:
+                dev = DeviceModel(**dev_dict)
+                if dev.device in seen_functions:
+                    raise ValueError(f"Duplicate function: {dev.device}")
+                seen_functions.add(dev.device)
+                sections[dev.section].append(dev)
+                needed_imports[dev.import_from].add(dev.type)
 
-    code = f'"""\nGenerated on: {timestamp}\nBeamline: {beamline}\n\nnote:\n{master.get("note", "")}\n"""\n\n'
-
-    code_lines = master["base_imports"][:]
+    code = f'"""\nGenerated on: {timestamp}\nBeamline: {beamline}\n\nnote:\n{master.note}\n"""\n\n'
+    code_lines = master.base_imports[:]
     for module, classes in sorted(needed_imports.items()):
         cls_str = ", ".join(sorted(classes))
         code_lines.append(f"from {module} import {cls_str}")
     code += "\n".join(code_lines) + "\n\n"
-    code += master["setup_script"].format(beamline=beamline) + "\n"
+    code += master.setup_script.format(beamline=beamline) + "\n"
 
     for section_name in sorted(sections.keys()):
         code += f'\n\n""" {section_name} """\n'
         for dev in sections[section_name]:
-            f_args = dev.get("factory_args", {})
+            f_args = dev.factory_args
             f_str = ", ".join([f"{k}={repr(v)}" for k, v in f_args.items()])
 
-            if "params" in dev:
+            if dev.params:
                 args = ",\n        ".join(
-                    [f"{k}={format_value(v)}" for k, v in dev["params"].items()]
+                    [f"{k}={format_value(v)}" for k, v in dev.params.items()]
                 )
-                body = f"{dev['type']}(\n        {args}\n    )"
+                body = f"{dev.type}(\n        {args}\n    )"
             else:
-                body = f"{dev['type']}()"
+                body = f"{dev.type}()"
 
-            code += f"\n@devices.factory({f_str})\ndef {dev['device']}() -> {dev['type']}:\n    return {body}\n"
-
+            code += f"\n@devices.factory({f_str})\ndef {dev.device}() -> {dev.type}:\n    return {body}\n"
+            print(code)
     try:
         fmt = subprocess.run(
             ["ruff", "format", "-"],
@@ -95,54 +113,68 @@ def translate_beamline_py_config_to_yaml(py_file_path: str, output_dir: str):
     devices = []
     base_imports = []
     setup_nodes = []
+    import_map = {}
+
+    for node in tree.body:
+        if isinstance(node, ast.ImportFrom):
+            module = node.module
+            for alias in node.names:
+                import_map[alias.name] = module
 
     for node in tree.body:
         if isinstance(node, (ast.Import, ast.ImportFrom)):
             base_imports.append(ast.unparse(node))
 
         elif isinstance(node, ast.FunctionDef):
+            ret_type = node.returns.id if isinstance(node.returns, ast.Name) else None
+
             device_meta = {
                 "device": node.name,
-                "type": node.returns.id if isinstance(node.returns, ast.Name) else None,
+                "type": ret_type,
+                "import_from": import_map.get(ret_type, "unknown.module"),
             }
 
             for decorator in node.decorator_list:
                 if isinstance(decorator, ast.Call) and "factory" in ast.unparse(
                     decorator
                 ):
-                    f_args = {
+                    device_meta["factory_args"] = {
                         kw.arg: ast.literal_eval(kw.value) for kw in decorator.keywords
                     }
-                    if f_args:
-                        device_meta["factory_args"] = f_args
 
-            ret_stmt = node.body[0]
-            if isinstance(ret_stmt, ast.Return) and isinstance(
-                ret_stmt.value, ast.Call
-            ):
-                params = {}
-                for kw in ret_stmt.value.keywords:
-                    try:
-                        params[kw.arg] = ast.literal_eval(kw.value)
-                    except ValueError:
-                        params[kw.arg] = ast.unparse(kw.value)
-                if params:
-                    device_meta["params"] = params
+            if node.body and isinstance(node.body[0], ast.Return):
+                ret_val = node.body[0].value
+                if isinstance(ret_val, ast.Call):
+                    params = {}
+                    for kw in ret_val.keywords:
+                        try:
+                            params[kw.arg] = ast.literal_eval(kw.value)
+                        except (ValueError, TypeError):
+                            params[kw.arg] = ast.unparse(kw.value)
+                    if params:
+                        device_meta["params"] = params
 
             devices.append(device_meta)
 
-        elif not isinstance(node, ast.Expr) or not isinstance(node.value, ast.Constant):
+        elif not (isinstance(node, ast.Expr) and isinstance(node.value, ast.Constant)):
             setup_nodes.append(ast.unparse(node))
 
     beamline_name = os.path.splitext(os.path.basename(py_file_path))[0]
-    setup_script = "\n".join(setup_nodes).replace(f"'{beamline_name}'", "'{beamline}'")
+    setup_raw = "\n".join(setup_nodes)
+    setup_script = setup_raw.replace(f"'{beamline_name}'", "'{beamline}'")
+    device_types = {d["type"] for d in devices}
+    filtered_base_imports = []
+    for imp in base_imports:
+        if not any(f"import {t}" in imp or f", {t}" in imp for t in device_types):
+            filtered_base_imports.append(imp)
 
+    # Write Output
     os.makedirs(output_dir, exist_ok=True)
 
     master_config = {
         "beamline": beamline_name,
         "output_file": os.path.basename(py_file_path),
-        "base_imports": base_imports,
+        "base_imports": filtered_base_imports,
         "setup_script": setup_script,
         "device_files": ["devices.yaml"],
     }
@@ -152,5 +184,3 @@ def translate_beamline_py_config_to_yaml(py_file_path: str, output_dir: str):
 
     with open(os.path.join(output_dir, "devices.yaml"), "w") as f:
         yaml.dump(devices, f, sort_keys=False, default_flow_style=False)
-
-    print(f"Successfully back-translated {py_file_path} to {output_dir}")
