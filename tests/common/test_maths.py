@@ -1,6 +1,7 @@
 import pytest
 
 from dodal.common import in_micros, step_to_num
+from dodal.common.maths import Rectangle2D
 
 
 @pytest.mark.parametrize(
@@ -61,3 +62,43 @@ def test_step_to_num(
     assert actual_start == start
     assert actual_stop == truncated_stop
     assert num == expected_num
+
+
+@pytest.mark.parametrize(
+    "x_1,y_1,x_2,y_2, inside, outside",
+    [
+        (0, 0, 10.0, 10.0, (5, 5), (15, 15)),
+        (-20, 0.0, 20, 10.0, (0, 5), (25, 15)),
+    ],
+)
+def test_rectangle_contains(
+    x_1: float,
+    y_1: float,
+    x_2: float,
+    y_2: float,
+    inside: tuple[float, float],
+    outside: tuple[float, float],
+):
+    rect = Rectangle2D(x_1, y_1, x_2, y_2)
+    assert rect.contains(*inside)
+    assert not rect.contains(*outside)
+
+
+@pytest.mark.parametrize(
+    "x_1,y_1,x_2,y_2, max_x, max_y",
+    [
+        (0, 0, 10.0, 10.0, 10.0, 10.0),
+        (-20, 0.0, 20, 10.0, 20.0, 10.0),
+    ],
+)
+def test_rectangle_max_x_max_y(
+    x_1: float,
+    y_1: float,
+    x_2: float,
+    y_2: float,
+    max_x: float,
+    max_y: float,
+):
+    rect = Rectangle2D(x_1, y_1, x_2, y_2)
+    assert rect.get_max_x() == max_x
+    assert rect.get_max_y() == max_y
