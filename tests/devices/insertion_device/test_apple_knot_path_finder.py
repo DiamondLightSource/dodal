@@ -1,7 +1,7 @@
 import pytest
 
+from dodal.common.maths import Rectangle2D
 from dodal.devices.insertion_device import (
-    I05_APPLE_KNOT_EXCLUSION_ZONES,
     AppleKnotPathFinder,
 )
 from dodal.devices.insertion_device.apple2_undulator import (
@@ -11,6 +11,12 @@ from dodal.devices.insertion_device.apple2_undulator import (
 
 # add mock_config_client, mock_id_gap, mock_phase and mock_jaw_phase_axes to pytest.
 pytest_plugins = ["dodal.testing.fixtures.devices.apple2"]
+
+# Define exclusion zones in phase-gap space
+TEST_APPLE_KNOT_EXCLUSION_ZONES = (
+    Rectangle2D(-65.5, 0.0, 65.5, 25.5),  # mechanical limit
+    Rectangle2D(-10.5, 0.0, 10.5, 37.5),  # power load limit
+)
 
 
 def get_pair_apple2_val(
@@ -38,7 +44,7 @@ def get_pair_apple2_val(
 
 @pytest.fixture
 def apple_knot_i05_path_finder() -> AppleKnotPathFinder:
-    return AppleKnotPathFinder(I05_APPLE_KNOT_EXCLUSION_ZONES)
+    return AppleKnotPathFinder(TEST_APPLE_KNOT_EXCLUSION_ZONES)
 
 
 @pytest.mark.parametrize(

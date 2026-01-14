@@ -159,5 +159,8 @@ async def test_id_set_fails_exclusion_zone(
         mock_locked_apple2.phase().btm_inner.user_readback, initial_phase_top_outer
     )
     set_mock_value(mock_locked_apple2.gap().user_readback, initial_gap)
-    with pytest.raises(RuntimeError):
+    with pytest.raises(
+        RuntimeError,
+        match="No valid path found for move avoiding exclusion zones.",
+    ):
         await mock_apple_knot_i05_controller.energy.set(target_energy)
