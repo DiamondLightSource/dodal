@@ -86,6 +86,15 @@ class Rectangle2D:
         """
         return max(self.x1, self.x2)
 
+    def get_min_x(self) -> float:
+        """
+        Get the minimum x-coordinate of the rectangle.
+
+        Returns:
+            float: The smaller of the two x-coordinates (x1, x2).
+        """
+        return min(self.x1, self.x2)
+
     def get_max_y(self) -> float:
         """
         Get the maximum y-coordinate of the rectangle.
@@ -95,14 +104,27 @@ class Rectangle2D:
         """
         return max(self.y1, self.y2)
 
+    def get_min_y(self) -> float:
+        """
+        Get the minimum y-coordinate of the rectangle.
+
+        Returns:
+            float: The smaller of the two y-coordinates (y1, y2).
+        """
+        return min(self.y1, self.y2)
+
     def contains(self, x: float, y: float) -> bool:
         """
         Check if a point is contained within the rectangle.
 
         Args:
-            point (list[float]): A list containing [x, y] coordinates of the point.
+            x (float): The x-coordinate of the point.
+            y (float): The y-coordinate of the point.
 
         Returns:
             bool: True if the point is within the rectangle bounds, False otherwise.
         """
-        return self.x1 <= x <= self.x2 and self.y1 <= y <= self.y2
+        return (
+            self.get_min_x() <= x <= self.get_max_x()
+            and self.get_min_y() <= y <= self.get_max_y()
+        )
