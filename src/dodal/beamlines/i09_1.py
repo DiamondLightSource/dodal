@@ -7,10 +7,18 @@ from dodal.devices.common_dcm import (
     PitchAndRollCrystal,
     StationaryCrystal,
 )
-from dodal.devices.electron_analyser import EnergySource
+from dodal.devices.electron_analyser.base import EnergySource
 from dodal.devices.electron_analyser.specs import SpecsDetector
 from dodal.devices.i09_1 import LensMode, PsuMode
+from dodal.devices.i09_1_shared.hard_energy import HardEnergy, HardInsertionDeviceEnergy
+from dodal.devices.i09_1_shared.hard_undulator_functions import (
+    calculate_energy_i09_hu,
+    calculate_gap_i09_hu,
+)
 from dodal.devices.synchrotron import Synchrotron
+from dodal.devices.temperture_controller import (
+    Lakeshore336,
+)
 from dodal.devices.undulator import UndulatorInMm, UndulatorOrder
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
@@ -52,9 +60,33 @@ def analyser() -> SpecsDetector[LensMode, PsuMode]:
 
 @device_factory()
 def undulator() -> UndulatorInMm:
-    return UndulatorInMm(prefix=f"{PREFIX.beamline_prefix}-MO-UND-01:")
+    return UndulatorInMm(prefix=f"{BeamlinePrefix(BL).insertion_prefix}-MO-SERVC-01:")
 
 
 @device_factory()
 def harmonics() -> UndulatorOrder:
-    return UndulatorOrder(name="harmonics")
+    return UndulatorOrder()
+
+
+@device_factory()
+def hu_id_energy() -> HardInsertionDeviceEnergy:
+    return HardInsertionDeviceEnergy(
+        undulator_order=harmonics(),
+        undulator=undulator(),
+        lut={},  # ToDo https://github.com/DiamondLightSource/sm-bluesky/issues/239
+        gap_to_energy_func=calculate_energy_i09_hu,
+        energy_to_gap_func=calculate_gap_i09_hu,
+    )
+
+
+@device_factory()
+def hu_energy() -> HardEnergy:
+    return HardEnergy(
+        dcm=dcm(),
+        undulator_energy=hu_id_energy(),
+    )
+
+
+@device_factory()
+def lakeshore() -> Lakeshore336:
+    return Lakeshore336(prefix=f"{PREFIX.beamline_prefix}-EA-TCTRL-01:")

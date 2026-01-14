@@ -7,7 +7,7 @@ from ophyd_async.core import (
     set_mock_value,
 )
 
-from dodal.devices.apple2_undulator import (
+from dodal.devices.insertion_device import (
     EnabledDisabledUpper,
     UndulatorGap,
     UndulatorGateStatus,

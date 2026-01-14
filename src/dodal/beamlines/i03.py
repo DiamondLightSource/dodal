@@ -18,7 +18,11 @@ from dodal.devices.attenuator.attenuator import BinaryFilterAttenuator
 from dodal.devices.backlight import Backlight
 from dodal.devices.baton import Baton
 from dodal.devices.collimation_table import CollimationTable
-from dodal.devices.cryostream import CryoStream, CryoStreamGantry
+from dodal.devices.cryostream import (
+    CryoStreamGantry,
+    OxfordCryoJet,
+    OxfordCryoStream,
+)
 from dodal.devices.detector.detector_motion import DetectorMotion
 from dodal.devices.diamond_filter import DiamondFilter, I03Filters
 from dodal.devices.eiger import EigerDetector
@@ -155,6 +159,7 @@ def detector_motion() -> DetectorMotion:
 
 @devices.v1_init(EigerDetector, prefix="BL03I-EA-EIGER-01:", wait=False)
 def eiger(eiger: EigerDetector) -> EigerDetector:
+    eiger.detector_id = 78
     return eiger
 
 
@@ -298,8 +303,13 @@ def lower_gonio() -> XYZStage:
 
 
 @devices.factory()
-def cryostream() -> CryoStream:
-    return CryoStream(PREFIX.beamline_prefix)
+def cryostream() -> OxfordCryoStream:
+    return OxfordCryoStream(f"{PREFIX.beamline_prefix}-EA-CSTRM-01:")
+
+
+@devices.factory()
+def cryojet() -> OxfordCryoJet:
+    return OxfordCryoJet(f"{PREFIX.beamline_prefix}-EA-CJET-01:")
 
 
 @devices.factory()

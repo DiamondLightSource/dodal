@@ -1,12 +1,11 @@
 from collections.abc import AsyncGenerator
-from unittest.mock import ANY, AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, patch
 
-import cv2
 import numpy as np
 import pytest
-from ophyd_async.core import init_devices, set_mock_value
+from ophyd_async.core import init_devices
 
-from dodal.devices.i04.max_pixel import KERNAL_SIZE, MaxPixel
+from dodal.devices.i04.max_pixel import MaxPixel, convert_to_gray_and_blur
 
 
 @pytest.fixture
@@ -25,7 +24,7 @@ async def max_pixel() -> AsyncGenerator[MaxPixel]:
         ([6.9, 8.9, 7.5, 6.45], 8.9),  # check can handle floats
     ],
 )
-@patch("dodal.devices.i04.max_pixel.MaxPixel._convert_to_gray_and_blur")
+@patch("dodal.devices.i04.max_pixel.convert_to_gray_and_blur")
 async def test_returns_max(
     mocked_preprocessed_data: AsyncMock,
     preprocessed_data,
@@ -35,18 +34,6 @@ async def test_returns_max(
     mocked_preprocessed_data.return_value = preprocessed_data
     await max_pixel.trigger()
     assert await max_pixel.max_pixel_val.get_value() == expected
-
-
-@patch("dodal.devices.i04.max_pixel.cv2.cvtColor")
-@patch("dodal.devices.i04.max_pixel.cv2.GaussianBlur")
-async def test_preprocessed_data_grayscale_is_called(
-    mocked_cv2_blur: MagicMock, mocked_cv2_grey: MagicMock, max_pixel: MaxPixel
-):
-    data = np.array([1])
-    set_mock_value(max_pixel.array_data, data)
-    await max_pixel._convert_to_gray_and_blur()
-    mocked_cv2_grey.assert_called_once_with(data, cv2.COLOR_BGR2GRAY)
-    mocked_cv2_blur.assert_called_once_with(ANY, KERNAL_SIZE, 0)
 
 
 test_arr = np.array(
@@ -60,11 +47,9 @@ test_arr = np.array(
 )
 
 
-async def test_greyscale_works(max_pixel: MaxPixel):
+async def test_greyscale_works():
     test_arr_shape = test_arr.shape  # (4, 3, 3)
-    set_mock_value(max_pixel.array_data, test_arr)
-    await max_pixel.array_data.get_value()
-    processed_data = await max_pixel._convert_to_gray_and_blur()
+    processed_data = convert_to_gray_and_blur(test_arr)
     processed_data_shape = processed_data.shape  # (4,3)
 
     assert processed_data_shape[0] == test_arr_shape[0]

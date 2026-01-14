@@ -1,10 +1,11 @@
-from pathlib import PurePath
-
-from ophyd_async.core import AutoIncrementingPathProvider, StaticFilenameProvider
+from ophyd_async.core import (
+    AutoMaxIncrementingPathProvider,
+)
 
 from dodal.common.beamlines.beamline_utils import (
     BL,
     device_factory,
+    get_path_provider,
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.devices.attenuator.attenuator import EnumFilterAttenuator
@@ -25,12 +26,14 @@ from dodal.devices.i24.vgonio import VerticalGoniometer
 from dodal.devices.motors import YZStage
 from dodal.devices.oav.oav_detector import OAVBeamCentreFile
 from dodal.devices.oav.oav_parameters import OAVConfigBeamCentre
+from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.zebra.zebra import Zebra
 from dodal.devices.zebra.zebra_constants_mapping import (
     ZebraMapping,
     ZebraSources,
     ZebraTTLOutputs,
 )
+from dodal.devices.zebra.zebra_controlled_shutter import ZebraShutter
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
@@ -45,7 +48,7 @@ set_log_beamline(BL)
 set_utils_beamline(BL)
 
 I24_ZEBRA_MAPPING = ZebraMapping(
-    outputs=ZebraTTLOutputs(TTL_EIGER=1, TTL_PILATUS=2, TTL_FAST_SHUTTER=4),
+    outputs=ZebraTTLOutputs(TTL_EIGER=1, TTL_JUNGFRAU=2, TTL_FAST_SHUTTER=4),
     sources=ZebraSources(),
 )
 
@@ -200,10 +203,7 @@ def eiger_beam_center() -> DetectorBeamCenter:
 
 
 @device_factory()
-def commissioning_jungfrau(
-    path_to_dir: str = "/tmp/jf",  # Device factory doesn't allow for required args,
-    filename: str = "jf_output",  # but these should be manually entered when commissioning
-) -> CommissioningJungfrau:
+def commissioning_jungfrau() -> CommissioningJungfrau:
     """Get the commissionning Jungfrau 9M device, which uses a temporary filewriter
     device in place of Odin while the detector is in commissioning.
     Instantiates the device if it hasn't already been.
@@ -212,7 +212,23 @@ def commissioning_jungfrau(
     return CommissioningJungfrau(
         f"{PREFIX.beamline_prefix}-EA-JFRAU-01:",
         f"{PREFIX.beamline_prefix}-JUNGFRAU-META:FD:",
-        AutoIncrementingPathProvider(
-            StaticFilenameProvider(filename), PurePath(path_to_dir)
-        ),
+        AutoMaxIncrementingPathProvider(get_path_provider()),
+    )
+
+
+@device_factory()
+def synchrotron() -> Synchrotron:
+    """Get the i24 synchrotron device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i24, it will return the existing object.
+    """
+    return Synchrotron()
+
+
+@device_factory()
+def sample_shutter() -> ZebraShutter:
+    """Get the i24 sample shutter device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i24, it will return the existing object.
+    """
+    return ZebraShutter(
+        f"{PREFIX.beamline_prefix}-EA-SHTR-01:",
     )
