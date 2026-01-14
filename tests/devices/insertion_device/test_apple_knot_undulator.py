@@ -164,3 +164,29 @@ async def test_id_set_fails_exclusion_zone(
         match="No valid path found for move avoiding exclusion zones.",
     ):
         await mock_apple_knot_i05_controller.energy.set(target_energy)
+
+
+@pytest.mark.parametrize(
+    "initial_phase_top_outer, initial_phase_bottom_inner",
+    [
+        (0.0, 0.1),
+    ],
+)
+async def test_id_set_fails_top_bottom_phase_mismatch(
+    mock_apple_knot_i05_controller: AppleKnotController,
+    mock_locked_apple2: Apple2[UndulatorLockedPhaseAxes],
+    initial_phase_top_outer: float,
+    initial_phase_bottom_inner: float,
+):
+    set_mock_value(
+        mock_locked_apple2.phase().top_outer.user_readback, initial_phase_top_outer
+    )
+    set_mock_value(
+        mock_locked_apple2.phase().btm_inner.user_readback, initial_phase_bottom_inner
+    )
+    set_mock_value(mock_locked_apple2.gap().user_readback, 50.0)
+    with pytest.raises(
+        RuntimeError,
+        match=f"Upper phase {initial_phase_top_outer} and lower phase {initial_phase_bottom_inner} values are not close enough.",
+    ):
+        await mock_apple_knot_i05_controller.energy.set(10.0)

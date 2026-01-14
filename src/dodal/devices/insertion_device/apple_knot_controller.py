@@ -1,3 +1,4 @@
+from math import isclose
 from typing import Generic
 
 from numpy import sign
@@ -159,20 +160,47 @@ class AppleKnotController(Apple2Controller[Apple2], Generic[PhaseAxesType]):
         )
 
     async def _set_energy(self, energy: float) -> None:
+        await self.check_top_bottom_phase_match()
         pol = await self._check_and_get_pol_setpoint()
         await self._combined_move(energy, pol)
         self._energy_set(energy)
 
+    async def check_top_bottom_phase_match(self) -> None:
+        """
+        Check that the top and bottom phase motors are in sync.
+        Raise an error if they are not within tolerance.
+        """
+        current_phase_top = float(
+            await self.apple2().phase().top_outer.user_readback.get_value()
+        )
+        current_phase_bottom = float(
+            await self.apple2().phase().btm_inner.user_readback.get_value()
+        )
+        if not isclose(current_phase_top, current_phase_bottom, abs_tol=5e-2):
+            raise RuntimeError(
+                f"Upper phase {current_phase_top} and lower phase {current_phase_bottom} values are not close enough."
+            )
+
     async def _combined_move(self, energy: float, pol: Pol) -> None:
-        # get current apple2 val
-        gap = float(await self.apple2().gap().user_readback.get_value())
-        phase = float(await self.apple2().phase().top_outer.user_readback.get_value())
-        pol = await self._check_and_get_pol_setpoint()
-        current_apple2_val = self._get_apple2_value(gap, phase, pol)
-        # get target phase and gap
-        gap = self.gap_energy_motor_converter(energy=energy, pol=pol)
-        phase = self.phase_energy_motor_converter(energy=energy, pol=pol)
-        target_apple2_val = self._get_apple2_value(gap, phase, pol)
+        # get current apple2 value
+        current_phase_top = float(
+            await self.apple2().phase().top_outer.user_readback.get_value()
+        )
+        current_gap = float(await self.apple2().gap().user_readback.get_value())
+        current_pol, _ = self.determine_phase_from_hardware(
+            top_outer=current_phase_top,
+            top_inner=current_phase_top,
+            btm_inner=current_phase_top,
+            btm_outer=current_phase_top,
+            gap=current_gap,
+        )
+        current_apple2_val = self._get_apple2_value(
+            current_gap, current_phase_top, current_pol
+        )
+        # get target apple2 value
+        target_gap = self.gap_energy_motor_converter(energy=energy, pol=pol)
+        target_phase = self.phase_energy_motor_converter(energy=energy, pol=pol)
+        target_apple2_val = self._get_apple2_value(target_gap, target_phase, pol)
         # get path avoiding exclusion zone
         manhattan_path = self.path_finder.get_apple_knot_val_path(
             current_apple2_val, target_apple2_val
