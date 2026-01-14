@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.eiger &#8212; dodal 1.68.1.dev14+g67774c13f documentation</title>
+    <title>dodal.devices.eiger &#8212; dodal 1.68.1.dev15+g993e1dc39 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=265f85db"></script>
+    <script src="../../../_static/documentation_options.js?v=18be04ce"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -1192,25 +1192,24 @@ window.addEventListener("load", load);</script>
         <span class="n">beam_x_pixels</span><span class="p">,</span> <span class="n">beam_y_pixels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">detector_params</span><span class="o">.</span><span class="n">get_beam_position_pixels</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">detector_params</span><span class="o">.</span><span class="n">detector_distance</span>
         <span class="p">)</span>
-        <span class="n">status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">beam_center_x</span><span class="o">.</span><span class="n">set</span><span class="p">(</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">beam_center_x</span><span class="o">.</span><span class="n">set</span><span class="p">(</span>
             <span class="n">beam_x_pixels</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeouts</span><span class="o">.</span><span class="n">general_status_timeout</span>
-        <span class="p">)</span>
-        <span class="n">status</span> <span class="o">&amp;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">beam_center_y</span><span class="o">.</span><span class="n">set</span><span class="p">(</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeouts</span><span class="o">.</span><span class="n">general_status_timeout</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">beam_center_y</span><span class="o">.</span><span class="n">set</span><span class="p">(</span>
             <span class="n">beam_y_pixels</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeouts</span><span class="o">.</span><span class="n">general_status_timeout</span>
-        <span class="p">)</span>
-        <span class="n">status</span> <span class="o">&amp;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">det_distance</span><span class="o">.</span><span class="n">set</span><span class="p">(</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeouts</span><span class="o">.</span><span class="n">general_status_timeout</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">det_distance</span><span class="o">.</span><span class="n">set</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">detector_params</span><span class="o">.</span><span class="n">detector_distance</span><span class="p">,</span>
             <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeouts</span><span class="o">.</span><span class="n">general_status_timeout</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="n">status</span> <span class="o">&amp;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">omega_start</span><span class="o">.</span><span class="n">set</span><span class="p">(</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeouts</span><span class="o">.</span><span class="n">general_status_timeout</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">omega_start</span><span class="o">.</span><span class="n">set</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">detector_params</span><span class="o">.</span><span class="n">omega_start</span><span class="p">,</span>
             <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeouts</span><span class="o">.</span><span class="n">general_status_timeout</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="n">status</span> <span class="o">&amp;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">omega_incr</span><span class="o">.</span><span class="n">set</span><span class="p">(</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeouts</span><span class="o">.</span><span class="n">general_status_timeout</span><span class="p">)</span>
+        <span class="n">status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">omega_incr</span><span class="o">.</span><span class="n">set</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">detector_params</span><span class="o">.</span><span class="n">omega_increment</span><span class="p">,</span>
             <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeouts</span><span class="o">.</span><span class="n">general_status_timeout</span><span class="p">,</span>
         <span class="p">)</span>
-
         <span class="k">return</span> <span class="n">status</span>
 
 <div class="viewcode-block" id="EigerDetector.set_detector_threshold">
