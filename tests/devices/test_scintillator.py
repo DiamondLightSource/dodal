@@ -31,10 +31,12 @@ async def scintillator_and_ap_sg(
         mock_ap_sg = MagicMock()
         mock_ap_sg.return_value.selected_aperture.set = AsyncMock()
         mock_ap_sg.return_value.selected_aperture.get_value = AsyncMock()
+        mock_beamstop = MagicMock()
         scintillator = Scintillator(
             prefix="",
             name="test_scin",
             aperture_scatterguard=mock_ap_sg,
+            beamstop=mock_beamstop,
             beamline_parameters=mock_beamline_parameters,
         )
     await scintillator.y_mm.set(5)
@@ -134,3 +136,19 @@ async def test_given_scintillator_already_out_when_moved_in_or_out_then_does_not
 
     get_mock_put(scintillator.y_mm.user_setpoint).assert_not_called()
     get_mock_put(scintillator.z_mm.user_setpoint).assert_not_called()
+
+
+def test_move_scintillator_out_moves_beamstop_to_data_collection_if_needed():
+    pass
+
+
+def test_move_scintillator_out_does_not_move_beamstop_if_already_in_dc():
+    pass
+
+
+def test_move_scintillator_out_moves_ap_sg_to_parked_if_needed():
+    pass
+
+
+def test_move_scintillator_out_does_not_move_ap_sg_if_already_parked():
+    pass

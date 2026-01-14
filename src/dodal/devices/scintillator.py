@@ -5,6 +5,7 @@ from ophyd_async.epics.motor import Motor
 
 from dodal.common.beamlines.beamline_parameters import GDABeamlineParameters
 from dodal.devices.aperturescatterguard import ApertureScatterguard, ApertureValue
+from dodal.devices.mx_phase1.beamstop import Beamstop
 
 
 class InOut(StrictEnum):
@@ -29,6 +30,7 @@ class Scintillator(StandardReadable):
         self,
         prefix: str,
         aperture_scatterguard: Reference[ApertureScatterguard],
+        beamstop: Reference[Beamstop],
         beamline_parameters: GDABeamlineParameters,
         name: str = "",
     ):
@@ -43,6 +45,7 @@ class Scintillator(StandardReadable):
             )
 
         self._aperture_scatterguard = aperture_scatterguard
+        self._beamstop = beamstop
         self._scintillator_out_yz_mm = [
             float(beamline_parameters[f"scin_{axis}_SCIN_OUT"]) for axis in ("y", "z")
         ]
@@ -94,8 +97,13 @@ class Scintillator(StandardReadable):
                 if self._get_selected_position(current_y, current_z) == InOut.OUT:
                     return
                 await self._check_aperture_parked()
-                await self.y_mm.set(self._scintillator_out_yz_mm[0])
-                await self.z_mm.set(self._scintillator_out_yz_mm[1])
+
+                async def move_scin_out():
+                    await self.y_mm.set(self._scintillator_out_yz_mm[0])
+                    await self.z_mm.set(self._scintillator_out_yz_mm[1])
+
+                await self.do_with_ap_sg_in_safe_pos(move_scin_out)
+
             case InOut.IN:
                 current_y = await self.y_mm.user_readback.get_value()
                 current_z = await self.z_mm.user_readback.get_value()
@@ -106,3 +114,17 @@ class Scintillator(StandardReadable):
                 await self.y_mm.set(self._scintillator_in_yz_mm[0])
             case _:
                 raise ValueError(f"Cannot set scintillator to position {position}")
+
+    async def do_with_ap_sg_in_safe_pos(self, func):
+        scin_move_positions = self._aperture_scatterguard().get_scin_move_position()
+        saved_positions: dict[Motor, float] = {
+            motor: await motor.user_readback.get_value()
+            for motor in scin_move_positions
+        }
+        for motor, pos in scin_move_positions.items():
+            await motor.set(pos)
+
+        await func()
+        # If  func() fails then do not restore motors back to avoid potential collision
+        for motor, pos in saved_positions.items():
+            await motor.set(pos)

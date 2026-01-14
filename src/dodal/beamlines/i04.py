@@ -6,7 +6,7 @@ from dodal.device_manager import DeviceManager
 from dodal.devices.aperturescatterguard import (
     AperturePosition,
     ApertureScatterguard,
-    load_positions_from_beamline_parameters,
+    load_configuration,
 )
 from dodal.devices.attenuator.attenuator import BinaryFilterAttenuator
 from dodal.devices.backlight import Backlight
@@ -152,7 +152,7 @@ def aperture_scatterguard() -> ApertureScatterguard:
     return ApertureScatterguard(
         aperture_prefix=f"{PREFIX.beamline_prefix}-MO-MAPT-01:",
         scatterguard_prefix=f"{PREFIX.beamline_prefix}-MO-SCAT-01:",
-        loaded_positions=load_positions_from_beamline_parameters(params),
+        config=load_configuration(params),
         tolerances=AperturePosition.tolerances_from_gda_params(params),
     )
 
@@ -277,10 +277,11 @@ def pin_tip_detection() -> PinTipDetection:
 
 
 @devices.factory()
-def scintillator(aperture_scatterguard: ApertureScatterguard) -> Scintillator:
+def scintillator(aperture_scatterguard: ApertureScatterguard, beamstop: Beamstop) -> Scintillator:
     return Scintillator(
         f"{PREFIX.beamline_prefix}-MO-SCIN-01:",
         Reference(aperture_scatterguard),
+        Reference(beamstop),
         get_beamline_parameters(),
     )
 
