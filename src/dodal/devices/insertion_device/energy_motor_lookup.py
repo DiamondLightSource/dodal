@@ -2,7 +2,7 @@ from pathlib import Path
 
 from daq_config_server.client import ConfigServer
 
-from dodal.devices.insertion_device.id_enum import Pol
+from dodal.devices.insertion_device.enum import Pol
 from dodal.devices.insertion_device.lookup_table_models import (
     LookupTable,
     LookupTableColumnConfig,

@@ -3,7 +3,7 @@ from typing import Any
 import pytest
 
 from dodal.common.data_util import load_json_file_to_class
-from dodal.devices.electron_analyser.base import EnergyMode, SelectedSource
+from dodal.devices.electron_analyser.base import EnergyMode
 from dodal.devices.electron_analyser.vgscienta import (
     AcquisitionMode,
     DetectorMode,
@@ -11,6 +11,7 @@ from dodal.devices.electron_analyser.vgscienta import (
     VGScientaSequence,
 )
 from dodal.devices.i09 import LensMode, PassEnergy, PsuMode
+from dodal.devices.selectable_source import SelectedSource
 from tests.devices.electron_analyser.helper_util import (
     assert_region_has_expected_values,
     get_test_sequence,
