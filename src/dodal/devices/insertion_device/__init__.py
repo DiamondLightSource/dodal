@@ -18,7 +18,6 @@ from .apple2_undulator import (
     UnstoppableMotor,
 )
 from .apple_knot_controller import (
-    I05_APPLE_KNOT_EXCLUSION_ZONES,
     AppleKnotController,
     AppleKnotPathFinder,
 )
@@ -66,5 +65,4 @@ __all__ = [
     "EnergyMotorConvertor",
     "UnstoppableMotor",
     "InsertionDeviceEnergyBase",
-    "I05_APPLE_KNOT_EXCLUSION_ZONES",
 ]

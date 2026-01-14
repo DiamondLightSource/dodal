@@ -16,13 +16,7 @@ from dodal.devices.insertion_device.apple2_undulator import (
 from dodal.devices.insertion_device.enum import Pol
 from dodal.log import LOGGER
 
-# Define exclusion zones in phase-gap space - not supposed to be crossed during moves
-I05_APPLE_KNOT_EXCLUSION_ZONES = (
-    Rectangle2D(-65.5, 0.0, 65.5, 25.5),  # mechanical limit
-    Rectangle2D(-10.5, 0.0, 10.5, 37.5),  # power load limit
-)
-
-APPLE_KNOT_MAXIMUM_GAP_MOTOR_POSITION = 250.0
+APPLE_KNOT_MAXIMUM_GAP_MOTOR_POSITION = 100.0
 APPLE_KNOT_MAXIMUM_PHASE_MOTOR_POSITION = 70.0
 
 
