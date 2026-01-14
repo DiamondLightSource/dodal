@@ -73,5 +73,8 @@ dodal.devices.zebra.zebra\_constants\_mapping.ZebraTTLOutputs
       
       ~ZebraTTLOutputs.TTL_PANDA
       
+      
+      ~ZebraTTLOutputs.TTL_JUNGFRAU
+      
    
    

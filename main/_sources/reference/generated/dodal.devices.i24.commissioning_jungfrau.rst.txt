@@ -15,7 +15,7 @@ dodal.devices.i24.commissioning\_jungfrau
    :recursive:
 
    ~commissioning_jungfrau.CommissioningJungfrau
-   ~commissioning_jungfrau.JunfrauCommissioningWriter
+   ~commissioning_jungfrau.JungfrauCommissioningWriter
 
 
 
