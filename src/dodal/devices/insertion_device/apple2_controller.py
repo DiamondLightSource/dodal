@@ -63,6 +63,10 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
         Callable that converts energy and polarisation to gap motor positions.
     phase_energy_to_motor_converter : EnergyMotorConvertor
         Callable that converts energy and polarisation to phase motor positions.
+    maximum_gap_motor_position : float
+        Maximum allowed position for the gap motor.
+    maximum_phase_motor_position : float
+        Maximum allowed position for the raw phase motors.
 
     Abstract Methods
     ----------------
@@ -82,6 +86,8 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
         apple2: Apple2Type,
         gap_energy_motor_converter: EnergyMotorConvertor,
         phase_energy_motor_converter: EnergyMotorConvertor,
+        maximum_gap_motor_position: float = MAXIMUM_GAP_MOTOR_POSITION,
+        maximum_phase_motor_position: float = MAXIMUM_ROW_PHASE_MOTOR_POSITION,
         units: str = "eV",
         name: str = "",
     ) -> None:
@@ -104,6 +110,8 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
         self.gap_energy_motor_converter = gap_energy_motor_converter
         self.phase_energy_motor_converter = phase_energy_motor_converter
 
+        self.maximum_gap_motor_position = maximum_gap_motor_position
+        self.maximum_phase_motor_position = maximum_phase_motor_position
         # Store the set energy for readback.
         self._energy, self._energy_set = soft_signal_r_and_setter(
             float, initial_value=None, units=units
@@ -243,7 +251,7 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
         (May be for future one can use the inverse poly to work out the energy and try to match it with the current energy
         to workout the polarisation but during my test the inverse poly is too unstable for general use.)
         """
-        if gap > MAXIMUM_GAP_MOTOR_POSITION:
+        if gap > self.maximum_gap_motor_position:
             raise RuntimeError(
                 f"{self.name} is not in use, close gap or set polarisation to use this ID"
             )
@@ -257,19 +265,19 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
         if (
             isclose(
                 top_outer,
-                MAXIMUM_ROW_PHASE_MOTOR_POSITION,
+                self.maximum_phase_motor_position,
                 abs_tol=ROW_PHASE_MOTOR_TOLERANCE,
             )
             and isclose(top_inner, 0.0, abs_tol=ROW_PHASE_MOTOR_TOLERANCE)
             and isclose(
                 btm_inner,
-                MAXIMUM_ROW_PHASE_MOTOR_POSITION,
+                self.maximum_phase_motor_position,
                 abs_tol=ROW_PHASE_MOTOR_TOLERANCE,
             )
             and isclose(btm_outer, 0.0, abs_tol=ROW_PHASE_MOTOR_TOLERANCE)
         ):
             LOGGER.info("Determined polarisation: LV (Linear Vertical).")
-            return Pol.LV, MAXIMUM_ROW_PHASE_MOTOR_POSITION
+            return Pol.LV, self.maximum_phase_motor_position
         if (
             isclose(top_outer, btm_inner, abs_tol=ROW_PHASE_MOTOR_TOLERANCE)
             and top_outer > 0.0
