@@ -91,27 +91,24 @@ class Scintillator(StandardReadable):
                 )
 
     async def _set_selected_position(self, position: InOut) -> None:
+        current_y = await self.y_mm.user_readback.get_value()
+        current_z = await self.z_mm.user_readback.get_value()
+        if self._get_selected_position(current_y, current_z) == position:
+            return
+
         await self._check_beamstop_position()
-        match position:
-            case InOut.OUT:
-                current_y = await self.y_mm.user_readback.get_value()
-                current_z = await self.z_mm.user_readback.get_value()
-                if self._get_selected_position(current_y, current_z) == InOut.OUT:
-                    return
 
-                async def move_scin_out():
-                    await self.y_mm.set(self._scintillator_out_yz_mm[0])
-                    await self.z_mm.set(self._scintillator_out_yz_mm[1])
-
-                await self.do_with_ap_sg_in_safe_pos(move_scin_out)
-
-            case InOut.IN:
-                current_y = await self.y_mm.user_readback.get_value()
-                current_z = await self.z_mm.user_readback.get_value()
-                if self._get_selected_position(current_y, current_z) == InOut.IN:
-                    return
+        async def move_to_new_position():
+            if position == InOut.OUT:
+                await self.y_mm.set(self._scintillator_out_yz_mm[0])
+                await self.z_mm.set(self._scintillator_out_yz_mm[1])
+            elif position == InOut.IN:
                 await self.z_mm.set(self._scintillator_in_yz_mm[1])
                 await self.y_mm.set(self._scintillator_in_yz_mm[0])
+
+        match position:
+            case InOut.OUT | InOut.IN:
+                await self.do_with_ap_sg_in_safe_pos(move_to_new_position)
             case _:
                 raise ValueError(f"Cannot set scintillator to position {position}")
 

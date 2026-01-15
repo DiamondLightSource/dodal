@@ -94,6 +94,8 @@ async def test_when_set_to_unknown_position_then_error_raised(
     scintillator_and_ap_sg: tuple[Scintillator, ApertureScatterguard],
 ):
     scintillator, _ = scintillator_and_ap_sg
+    await scintillator.y_mm.set(100.855)
+    await scintillator.z_mm.set(101.5115)
     with pytest.raises(ValueError):
         await scintillator.selected_pos.set(InOut.UNKNOWN)
 
@@ -131,11 +133,17 @@ async def test_given_aperture_scatterguard_parked_when_set_to_in_position_then_r
 )
 async def test_given_scintillator_already_out_when_moved_in_or_out_then_does_nothing(
     scintillator_and_ap_sg: tuple[Scintillator, ApertureScatterguard],
+    beamstop: Beamstop,
     expected_position,
     y,
     z,
 ):
     scintillator, ap_sg = scintillator_and_ap_sg
+    ap_sg.get_scin_move_position.return_value = {
+        ap_sg.aperture.x: -1.0,
+        ap_sg.scatterguard.x: -1.5,
+    }
+    beamstop.selected_pos.get_value.return_value = BeamstopPositions.UNKNOWN
     await scintillator.y_mm.set(y)
     await scintillator.z_mm.set(z)
 
@@ -147,6 +155,8 @@ async def test_given_scintillator_already_out_when_moved_in_or_out_then_does_not
 
     get_mock_put(scintillator.y_mm.user_setpoint).assert_not_called()
     get_mock_put(scintillator.z_mm.user_setpoint).assert_not_called()
+    get_mock_put(ap_sg.aperture.x.user_setpoint).assert_not_called()
+    get_mock_put(ap_sg.scatterguard.x.user_setpoint).assert_not_called()
 
 
 @pytest.mark.parametrize(
@@ -176,14 +186,29 @@ async def test_beamstop_check_in_known_good_position(
         await scintillator.selected_pos.set(InOut.OUT)
 
 
-async def test_move_scintillator_out_moves_ap_sg_to_scin_move_and_back(
+@pytest.mark.parametrize(
+    "initial_y, initial_z, final_y, final_z, swap_order, final_position",
+    [
+        [100.855, 101.5115, -0.02, 0.1, False, InOut.OUT],
+        [-0.02, 0.1, 100.855, 101.5115, True, InOut.IN],
+    ],
+)
+async def test_move_scintillator_moves_ap_sg_to_scin_move_and_back(
     scintillator_and_ap_sg: tuple[Scintillator, ApertureScatterguard],
+    initial_y: float,
+    initial_z: float,
+    final_y: float,
+    final_z: float,
+    swap_order: bool,
+    final_position: InOut,
 ):
     scintillator, ap_sg = scintillator_and_ap_sg
     ap_sg.get_scin_move_position.return_value = {
         ap_sg.aperture.x: -1.0,
         ap_sg.scatterguard.x: -1.5,
     }
+    set_mock_value(scintillator.y_mm.user_readback, initial_y)
+    set_mock_value(scintillator.z_mm.user_readback, initial_z)
 
     parent = MagicMock()
     parent.aperture.attach_mock(get_mock_put(ap_sg.aperture.x.user_setpoint), "x")
@@ -201,15 +226,20 @@ async def test_move_scintillator_out_moves_ap_sg_to_scin_move_and_back(
     parent.scintillator.attach_mock(
         get_mock_put(scintillator.z_mm.user_setpoint), "z_mm"
     )
-    await scintillator.selected_pos.set(InOut.OUT)
+    await scintillator.selected_pos.set(final_position)
 
-    parent.assert_has_calls(
-        [
-            call.aperture.x(-1.0, wait=True),
-            call.scatterguard.x(-1.5, wait=True),
-            call.scintillator.y_mm(-0.02, wait=True),
-            call.scintillator.z_mm(0.1, wait=True),
+    expected_scintillator_move = [
+        call.scintillator.y_mm(final_y, wait=True),
+        call.scintillator.z_mm(final_z, wait=True),
+    ]
+    if swap_order:
+        expected_scintillator_move = expected_scintillator_move[::-1]
+    expected_calls = (
+        [call.aperture.x(-1.0, wait=True), call.scatterguard.x(-1.5, wait=True)]
+        + expected_scintillator_move
+        + [
             call.aperture.x(1.0, wait=True),
             call.scatterguard.x(2.0, wait=True),
         ]
     )
+    parent.assert_has_calls(expected_calls)
