@@ -1,12 +1,12 @@
 import asyncio
-from dataclasses import dataclass
 from enum import IntEnum
 from typing import Generic, TypeVar
 
-from bluesky.protocols import Movable, Stoppable
+from bluesky.protocols import Movable, Stoppable, Triggerable
 from ophyd_async.core import (
     AsyncStatus,
     DeviceVector,
+    Reference,
     SignalR,
     StandardReadable,
     StandardReadableFormat,
@@ -70,12 +70,6 @@ class FastValveState(StrictEnum):
 TValveControlRequest = TypeVar(
     "TValveControlRequest", bound=ValveControlRequest | FastValveControlRequest
 )
-
-
-@dataclass
-class PressureJumpParameters:
-    pressure_from: int
-    pressure_to: int
 
 
 class ValveControl(
@@ -205,6 +199,32 @@ class PressureTransducer(StandardReadable):
         super().__init__(name)
 
 
+class DoJump(StandardReadable, Triggerable):
+    def __init__(
+        self,
+        prefix: str,
+        busy_signal: Reference,
+        timeout_signal: Reference,
+        name: str = "",
+    ):
+        self._busy_signal = busy_signal
+        self._timeout_signal = timeout_signal
+
+        with self.add_children_as_readables():
+            self.set_jump = epics_signal_rw(bool, f"{prefix}SETJUMP")
+
+        self._name = name
+        super().__init__(name)
+
+    @AsyncStatus.wrap
+    async def trigger(self):
+        await set_and_wait_for_other_value(
+            self.set_jump, True, self._busy_signal(), True
+        )
+
+        await wait_for_value(self._busy_signal(), False, self._timeout_signal())
+
+
 class PressureJumpCellController(StandardReadable, Movable, Stoppable):
     """
     Top-level control for a fixed pressure or pressure jumps.
@@ -212,6 +232,11 @@ class PressureJumpCellController(StandardReadable, Movable, Stoppable):
 
     def __init__(self, prefix: str, name: str = "") -> None:
         with self.add_children_as_readables():
+            # Common
+            self.busy = epics_signal_r(bool, f"{prefix}GOTOBUSY")
+            self.result = epics_signal_r(str, f"{prefix}RESULT")
+            self.timeout = epics_signal_rw(float, f"{prefix}TIMER.HIGH")
+
             # Constant pressure
             self.target_pressure = epics_signal_rw(int, f"{prefix}TARGET")
             self.go = epics_signal_rw(bool, f"{prefix}GO")
@@ -219,41 +244,25 @@ class PressureJumpCellController(StandardReadable, Movable, Stoppable):
             # Pressure jump
             self.from_pressure = epics_signal_rw(int, f"{prefix}JUMPF")
             self.to_pressure = epics_signal_rw(int, f"{prefix}JUMPT")
-            self.set_jump = epics_signal_rw(bool, f"{prefix}SETJUMP")
-
-            # Common
-            self.busy = epics_signal_r(bool, f"{prefix}GOTOBUSY")
-            self.result = epics_signal_r(str, f"{prefix}RESULT")
-            self.timeout = epics_signal_rw(float, f"{prefix}TIMER.HIGH")
+            self.do_jump = DoJump(
+                prefix, Reference(self.busy), Reference(self.timeout), name
+            )
 
             # Internal
             self._stop = epics_signal_rw(bool, f"{prefix}STOP")
-
             self._name = name
 
         super().__init__(name)
 
     @AsyncStatus.wrap
-    async def set(self, value: int | PressureJumpParameters):
+    async def set(self, value: int):
         """
         Sets the desired pressure waiting for the device to complete the operation.
-
-        If value is of type int, the pressure is set to the given fixed value.
-        If value is is of type PressureJumpParameters, a pressure jump is performed
-        given by its pressure_from and pressure_to.
         """
         timeout = await self.timeout.get_value()
 
-        if isinstance(value, int):
-            # Static press requested
-            await self.target_pressure.set(value)
-            await set_and_wait_for_other_value(self.go, True, self.busy, True)
-
-        elif isinstance(value, PressureJumpParameters):
-            # Pressure jump requested
-            await self.from_pressure.set(value.pressure_from)
-            await self.to_pressure.set(value.pressure_to)
-            await set_and_wait_for_other_value(self.set_jump, True, self.busy, True)
+        await self.target_pressure.set(value)
+        await set_and_wait_for_other_value(self.go, True, self.busy, True)
 
         await wait_for_value(self.busy, False, timeout)  # Change complete
 
