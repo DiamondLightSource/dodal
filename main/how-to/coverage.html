@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>How to check code coverage &#8212; dodal 1.68.1.dev15+g993e1dc39 documentation</title>
+    <title>How to check code coverage &#8212; dodal 1.68.1.dev16+g9067ea50f documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=18be04ce"></script>
+    <script src="../_static/documentation_options.js?v=860da92b"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -481,7 +481,7 @@
                   
   <section id="how-to-check-code-coverage">
 <h1>How to check code coverage<a class="headerlink" href="#how-to-check-code-coverage" title="Link to this heading">#</a></h1>
-<p>Code coverage is reported to the command line and to a <code class="docutils literal notranslate"><span class="pre">cov.xml</span></code> file by the command <code class="docutils literal notranslate"><span class="pre">tox</span> <span class="pre">-e</span> <span class="pre">tests</span></code>. The file is uploaded to the Codecov service in CI.</p>
+<p>Code coverage is reported to the command line and to a <code class="docutils literal notranslate"><span class="pre">cov.xml</span></code> file by the command <code class="docutils literal notranslate"><span class="pre">uv</span> <span class="pre">run</span> <span class="pre">tox</span> <span class="pre">-e</span> <span class="pre">tests</span></code>. The file is uploaded to the Codecov service in CI.</p>
 <p>If you are using VSCode IDE, you can also check code coverage by right-clicking on the test icon and selecting <code class="docutils literal notranslate"><span class="pre">Run</span> <span class="pre">with</span> <span class="pre">coverage</span></code>. This will re-run the test and highlight line numbers in your file:</p>
 <ul class="simple">
 <li><p>Green = covered by tests</p></li>

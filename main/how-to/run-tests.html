@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Running tests &#8212; dodal 1.68.1.dev15+g993e1dc39 documentation</title>
+    <title>Running tests &#8212; dodal 1.68.1.dev16+g9067ea50f documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=18be04ce"></script>
+    <script src="../_static/documentation_options.js?v=860da92b"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -504,7 +504,7 @@
 <h3>Unit tests<a class="headerlink" href="#unit-tests" title="Link to this heading">#</a></h3>
 <p><code class="docutils literal notranslate"><span class="pre">pytest</span></code> will find functions in the project that <a class="reference external" href="https://docs.pytest.org/explanation/goodpractices.html#test-discovery">look like tests</a>, and run them to check for errors.</p>
 <p>When you have some fully working tests then you can run it with coverage:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ tox -e tests
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ uv run tox -e tests
 </pre></div>
 </div>
 <p>It will also report coverage to the command line and to <code class="docutils literal notranslate"><span class="pre">cov.xml</span></code>.</p>
@@ -523,8 +523,10 @@ cd example-services
 podman compose up -d bl01t-di-cam-01 bl01t-mo-sim-01 ca-gateway
 </pre></div>
 </div>
+<p><strong>Note:</strong> Do not run the system tests from the same shell as the above <code class="docutils literal notranslate"><span class="pre">environment.sh</span></code> script interferes with the
+ability to run the tests due to also setting EPICS_ environment variables.</p>
 <p>Once this is done, then the system tests can be run:</p>
-<div class="highlight-commandline notranslate"><div class="highlight"><pre><span></span>tox -e system-report
+<div class="highlight-commandline notranslate"><div class="highlight"><pre><span></span>uv run tox -e system-tests
 </pre></div>
 </div>
 </section>
