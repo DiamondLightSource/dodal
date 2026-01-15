@@ -48,7 +48,7 @@ async def scintillator_and_ap_sg(
     mock_beamline_parameters: GDABeamlineParameters,
     beamstop: Beamstop,
     ap_sg: ApertureScatterguard,
-) -> tuple[Scintillator, MagicMock]:
+) -> tuple[Scintillator, ApertureScatterguard]:
     async with init_devices(mock=True):
         ap_sg.selected_aperture.set = AsyncMock()
         ap_sg.selected_aperture.get_value = AsyncMock()
@@ -139,11 +139,11 @@ async def test_given_scintillator_already_out_when_moved_in_or_out_then_does_not
     z,
 ):
     scintillator, ap_sg = scintillator_and_ap_sg
-    ap_sg.get_scin_move_position.return_value = {
+    ap_sg.get_scin_move_position.return_value = {  # type: ignore
         ap_sg.aperture.x: -1.0,
         ap_sg.scatterguard.x: -1.5,
     }
-    beamstop.selected_pos.get_value.return_value = BeamstopPositions.UNKNOWN
+    beamstop.selected_pos.get_value.return_value = BeamstopPositions.UNKNOWN  # type: ignore
     await scintillator.y_mm.set(y)
     await scintillator.z_mm.set(z)
 
@@ -173,7 +173,7 @@ async def test_beamstop_check_in_known_good_position(
     beamstop_position: BeamstopPositions,
     expected_good: bool,
 ):
-    beamstop.selected_pos.get_value.return_value = beamstop_position
+    beamstop.selected_pos.get_value.return_value = beamstop_position  # type: ignore
     scintillator, _ = scintillator_and_ap_sg
 
     with (
@@ -203,7 +203,7 @@ async def test_move_scintillator_moves_ap_sg_to_scin_move_and_back(
     final_position: InOut,
 ):
     scintillator, ap_sg = scintillator_and_ap_sg
-    ap_sg.get_scin_move_position.return_value = {
+    ap_sg.get_scin_move_position.return_value = {  # type: ignore
         ap_sg.aperture.x: -1.0,
         ap_sg.scatterguard.x: -1.5,
     }
