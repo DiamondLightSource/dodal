@@ -1,5 +1,6 @@
+from abc import ABC, abstractmethod
 from asyncio import gather
-from collections.abc import Callable
+from typing import Any, Protocol
 
 from bluesky.protocols import Locatable, Location, Movable
 from ophyd_async.core import (
@@ -12,11 +13,19 @@ from ophyd_async.core import (
 )
 
 from dodal.devices.common_dcm import DoubleCrystalMonochromatorBase
-from dodal.devices.i09_1_shared.hard_undulator_functions import (
-    MAX_ENERGY_COLUMN,
-    MIN_ENERGY_COLUMN,
-)
 from dodal.devices.undulator import UndulatorInMm, UndulatorOrder
+
+
+class LookUpTableProvider(ABC):
+    @abstractmethod
+    def get_look_up_table(self, *args, **kwargs) -> Any:
+        pass
+
+
+class EnergyGapConvertor(Protocol):
+    def __call__(self, lut: LookUpTableProvider, value: float, order: int) -> float:
+        """Protocol to provide energy to motor position conversion"""
+        ...
 
 
 class HardInsertionDeviceEnergy(StandardReadable, Movable[float]):
@@ -29,16 +38,16 @@ class HardInsertionDeviceEnergy(StandardReadable, Movable[float]):
         self,
         undulator_order: UndulatorOrder,
         undulator: UndulatorInMm,
-        lut: dict[int, list],
-        gap_to_energy_func: Callable[..., float],
-        energy_to_gap_func: Callable[..., float],
+        lut_provider: LookUpTableProvider,
+        gap_to_energy_func: EnergyGapConvertor,
+        energy_to_gap_func: EnergyGapConvertor,
         name: str = "",
     ) -> None:
-        self._lut = lut
-        self.gap_to_energy_func = gap_to_energy_func
-        self.energy_to_gap_func = energy_to_gap_func
         self._undulator_order_ref = Reference(undulator_order)
         self._undulator_ref = Reference(undulator)
+        self._lut_provider = lut_provider
+        self.gap_to_energy_func = gap_to_energy_func
+        self.energy_to_gap_func = energy_to_gap_func
 
         self.add_readables([undulator_order, undulator.current_gap])
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
@@ -53,26 +62,11 @@ class HardInsertionDeviceEnergy(StandardReadable, Movable[float]):
         super().__init__(name=name)
 
     def _read_energy(self, current_gap: float, current_order: int) -> float:
-        return self.gap_to_energy_func(
-            gap=current_gap,
-            look_up_table=self._lut,
-            order=current_order,
-        )
+        return self.gap_to_energy_func(self._lut_provider, current_gap, current_order)
 
     async def _set_energy(self, energy: float) -> None:
         current_order = await self._undulator_order_ref().value.get_value()
-        min_energy, max_energy = self._lut[current_order][
-            MIN_ENERGY_COLUMN : MAX_ENERGY_COLUMN + 1
-        ]
-        if not (min_energy <= energy <= max_energy):
-            raise ValueError(
-                f"Requested energy {energy} keV is out of range for harmonic {current_order}: "
-                f"[{min_energy}, {max_energy}] keV"
-            )
-
-        target_gap = self.energy_to_gap_func(
-            photon_energy_kev=energy, look_up_table=self._lut, order=current_order
-        )
+        target_gap = self.energy_to_gap_func(self._lut_provider, energy, current_order)
         await self._undulator_ref().set(target_gap)
 
     @AsyncStatus.wrap

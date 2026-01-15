@@ -3,6 +3,7 @@ import re
 import pytest
 from bluesky.plan_stubs import mv
 from bluesky.run_engine import RunEngine
+from daq_config_server.client import ConfigServer
 from ophyd_async.core import init_devices
 from ophyd_async.testing import (
     assert_reading,
@@ -20,6 +21,7 @@ from dodal.devices.i09_1_shared import (
     calculate_energy_i09_hu,
     calculate_gap_i09_hu,
 )
+from dodal.devices.i09_1_shared.hard_undulator_functions import I09HardLutProvider
 from dodal.devices.undulator import UndulatorInMm, UndulatorOrder
 
 pytest_plugins = ["dodal.testing.fixtures.devices.hard_undulator"]
@@ -50,15 +52,15 @@ async def undulator_in_mm() -> UndulatorInMm:
 
 @pytest.fixture
 async def hu_id_energy(
+    mock_config_client: ConfigServer,
     undulator_order: UndulatorOrder,
     undulator_in_mm: UndulatorInMm,
-    lut_dictionary: dict,
 ) -> HardInsertionDeviceEnergy:
     async with init_devices():
         hu_id_energy = HardInsertionDeviceEnergy(
             undulator_order=undulator_order,
             undulator=undulator_in_mm,
-            lut=lut_dictionary,
+            lut_provider=I09HardLutProvider(mock_config_client, "path/to/lut"),
             gap_to_energy_func=calculate_energy_i09_hu,
             energy_to_gap_func=calculate_gap_i09_hu,
         )

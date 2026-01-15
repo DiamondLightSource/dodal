@@ -3,6 +3,7 @@ from typing import Any
 import numpy as np
 from daq_config_server.client import ConfigServer
 
+from dodal.devices.i09_1_shared.hard_energy import LookUpTableProvider
 from dodal.log import LOGGER
 
 # Physics constants
@@ -19,6 +20,16 @@ GAP_OFFSET_COLUMN = 7
 
 MAGNET_BLOCKS_PER_PERIOD = 4
 MAGNTE_BLOCK_HEIGHT_MM = 16
+
+
+class I09HardLutProvider(LookUpTableProvider):
+    def __init__(self, config_server: ConfigServer, filepath: str) -> None:
+        self.config_server = config_server
+        self.filepath = filepath
+
+    def get_look_up_table(self) -> dict[int, list]:
+        self._lut = get_convert_lut(self.config_server, self.filepath)
+        return self._lut
 
 
 def get_convert_lut(client: ConfigServer, lut_path: str) -> dict[int, list]:
@@ -66,11 +77,9 @@ def _calculate_undulator_parameter_max(
 
 
 def calculate_gap_i09_hu(
-    photon_energy_kev: float,
-    look_up_table: dict[int, list],
+    lut: LookUpTableProvider,
+    value: float,
     order: int = 1,
-    gap_offset: float = 0.0,
-    undulator_period_mm: int = 27,
 ) -> float:
     """
     Calculate the undulator gap required to produce a given energy at a given harmonic order.
@@ -87,8 +96,11 @@ def calculate_gap_i09_hu(
     Returns:
         float: Calculated undulator gap in millimeters.
     """
-
+    gap_offset: float = 0.0
+    undulator_period_mm: int = 27
+    look_up_table = lut.get_look_up_table()
     _validate_order(order, look_up_table)
+    _validate_energy_in_range(look_up_table, value, order)
     gamma = _calculate_gamma(look_up_table, order)
 
     # Constructive interference of radiation emitted at different poles
@@ -98,9 +110,7 @@ def calculate_gap_i09_hu(
     # gives K^2 = 2*((2*n*gamma^2*lamda/lambda_u)-1)
 
     undulator_parameter_sqr = (
-        4.959368e-6
-        * (order * gamma * gamma / (undulator_period_mm * photon_energy_kev))
-        - 2
+        4.959368e-6 * (order * gamma * gamma / (undulator_period_mm * value)) - 2
     )
     if undulator_parameter_sqr < 0:
         raise ValueError(
@@ -126,19 +136,15 @@ def calculate_gap_i09_hu(
         + look_up_table[order][GAP_OFFSET_COLUMN]
         + gap_offset
     )
-    LOGGER.debug(
-        f"Calculated gap is {gap}mm for energy {photon_energy_kev}keV at order {order}"
-    )
+    LOGGER.debug(f"Calculated gap is {gap}mm for energy {value}keV at order {order}")
 
     return gap
 
 
 def calculate_energy_i09_hu(
-    gap: float,
-    look_up_table: dict[int, list],
+    lut: LookUpTableProvider,
+    value: float,
     order: int = 1,
-    gap_offset: float = 0.0,
-    undulator_period_mm: int = 27,
 ) -> float:
     """
     Calculate the photon energy produced by the undulator at a given gap and harmonic order.
@@ -154,6 +160,10 @@ def calculate_energy_i09_hu(
     Returns:
         float: Calculated photon energy in keV.
     """
+    gap_offset: float = 0.0
+    undulator_period_mm: int = 27
+
+    look_up_table = lut.get_look_up_table()
     _validate_order(order, look_up_table)
 
     gamma = _calculate_gamma(look_up_table, order)
@@ -162,7 +172,7 @@ def calculate_energy_i09_hu(
     )
 
     undulator_parameter = undulator_parameter_max / np.exp(
-        (gap - look_up_table[order][GAP_OFFSET_COLUMN] - gap_offset)
+        (value - look_up_table[order][GAP_OFFSET_COLUMN] - gap_offset)
         / (undulator_period_mm / np.pi)
     )
     energy_kev = (
@@ -172,3 +182,18 @@ def calculate_energy_i09_hu(
         / (undulator_period_mm * (np.square(undulator_parameter) + 2))
     )
     return energy_kev
+
+
+def _validate_energy_in_range(
+    look_up_table: dict[int, list],
+    energy: float,
+    current_order: int,
+) -> None:
+    """Check if the requested energy is within the allowed range for the current harmonic order."""
+    min_energy = look_up_table[current_order][MIN_ENERGY_COLUMN]
+    max_energy = look_up_table[current_order][MAX_ENERGY_COLUMN]
+    if not (min_energy <= energy <= max_energy):
+        raise ValueError(
+            f"Requested energy {energy} keV is out of range for harmonic {current_order}: "
+            f"[{min_energy}, {max_energy}] keV"
+        )

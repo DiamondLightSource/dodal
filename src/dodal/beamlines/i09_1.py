@@ -14,9 +14,9 @@ from dodal.devices.electron_analyser.specs import SpecsDetector
 from dodal.devices.i09_1 import LensMode, PsuMode
 from dodal.devices.i09_1_shared.hard_energy import HardEnergy, HardInsertionDeviceEnergy
 from dodal.devices.i09_1_shared.hard_undulator_functions import (
+    I09HardLutProvider,
     calculate_energy_i09_hu,
     calculate_gap_i09_hu,
-    get_convert_lut,
 )
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.temperture_controller import (
@@ -80,7 +80,7 @@ def hu_id_energy() -> HardInsertionDeviceEnergy:
     return HardInsertionDeviceEnergy(
         undulator_order=harmonics(),
         undulator=id(),
-        lut=get_convert_lut(I09_1_CONF_CLIENT, LOOK_UPTABLE_FILE),
+        lut_provider=I09HardLutProvider(I09_1_CONF_CLIENT, LOOK_UPTABLE_FILE),
         gap_to_energy_func=calculate_energy_i09_hu,
         energy_to_gap_func=calculate_gap_i09_hu,
     )
