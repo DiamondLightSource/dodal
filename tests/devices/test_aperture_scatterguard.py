@@ -178,13 +178,17 @@ async def test_aperture_scatterguard_returns_status_if_within_tolerance(
     await ap_sg._safe_move_whilst_in_beam(pos)
 
 
-def set_underlying_motors(ap_sg: ApertureScatterguard, position: AperturePosition):
+async def set_underlying_motors(
+    ap_sg: ApertureScatterguard,
+    config: ApertureScatterguardConfiguration,
+    aperture: ApertureValue,
+):
     for motor, pos in zip(
         get_all_motors(ap_sg),
-        position.values,
+        dict(config.aperture_positions[aperture]).values(),
         strict=False,
     ):
-        motor.set(pos)
+        await motor.set(pos)
 
 
 @pytest.mark.parametrize(
@@ -578,9 +582,25 @@ async def test_calling_prepare_then_set_in_quick_succession_throws_an_error(
         await aperture_in_medium_pos.selected_aperture.set(ApertureValue.SMALL)
 
 
-def test_restore_ap_sg_from_scin_move_position():
-    pass
+@pytest.mark.parametrize(
+    "selected_aperture",
+    [
+        ApertureValue.SMALL,
+        ApertureValue.MEDIUM,
+        ApertureValue.LARGE,
+        ApertureValue.OUT_OF_BEAM,
+        ApertureValue.PARKED,
+    ],
+)
+async def test_restore_ap_sg_from_scin_move_position(
+    aperture_in_medium_pos: ApertureScatterguard,
+    ap_sg_configuration: ApertureScatterguardConfiguration,
+    selected_aperture: ApertureValue,
+    run_engine: RunEngine,
+):
+    ap_sg = aperture_in_medium_pos
+    await set_underlying_motors(ap_sg, ap_sg_configuration, selected_aperture)
 
-
-def test_ap_sg_moves_to_scin_move_position_from_current_pos():
-    pass
+    positions = ap_sg.get_scin_move_position()
+    assert positions[ap_sg.aperture.x] == ap_sg_configuration.scintillator_move_miniap_x
+    assert positions[ap_sg.scatterguard.x] == ap_sg_configuration.scintillator_move_sg_x

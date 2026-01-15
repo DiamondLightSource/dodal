@@ -4,8 +4,8 @@ from ophyd_async.core import Reference, StandardReadable, StrictEnum, derived_si
 from ophyd_async.epics.motor import Motor
 
 from dodal.common.beamlines.beamline_parameters import GDABeamlineParameters
-from dodal.devices.aperturescatterguard import ApertureScatterguard, ApertureValue
-from dodal.devices.mx_phase1.beamstop import Beamstop
+from dodal.devices.aperturescatterguard import ApertureScatterguard
+from dodal.devices.mx_phase1.beamstop import Beamstop, BeamstopPositions
 
 
 class InOut(StrictEnum):
@@ -80,23 +80,24 @@ class Scintillator(StandardReadable):
         else:
             return InOut.UNKNOWN
 
-    async def _check_aperture_parked(self):
-        if (
-            await self._aperture_scatterguard().selected_aperture.get_value()
-            != ApertureValue.PARKED
-        ):
-            raise ValueError(
-                f"Cannot move scintillator if aperture/scatterguard is not parked. Position is currently {await self._aperture_scatterguard().selected_aperture.get_value()}"
-            )
+    async def _check_beamstop_position(self):
+        position = await self._beamstop().selected_pos.get_value()
+        match position:
+            case BeamstopPositions.OUT_OF_BEAM | BeamstopPositions.DATA_COLLECTION:
+                return
+            case _:
+                raise ValueError(
+                    f"Scintillator cannot be moved due to beamstop position {position}, must be in either in DATA_COLLECTION or OUT_OF_BEAM position."
+                )
 
     async def _set_selected_position(self, position: InOut) -> None:
+        await self._check_beamstop_position()
         match position:
             case InOut.OUT:
                 current_y = await self.y_mm.user_readback.get_value()
                 current_z = await self.z_mm.user_readback.get_value()
                 if self._get_selected_position(current_y, current_z) == InOut.OUT:
                     return
-                await self._check_aperture_parked()
 
                 async def move_scin_out():
                     await self.y_mm.set(self._scintillator_out_yz_mm[0])
@@ -109,7 +110,6 @@ class Scintillator(StandardReadable):
                 current_z = await self.z_mm.user_readback.get_value()
                 if self._get_selected_position(current_y, current_z) == InOut.IN:
                     return
-                await self._check_aperture_parked()
                 await self.z_mm.set(self._scintillator_in_yz_mm[1])
                 await self.y_mm.set(self._scintillator_in_yz_mm[0])
             case _:
