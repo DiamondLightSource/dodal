@@ -18,15 +18,9 @@ devices = DeviceManager()
 
 @devices.factory()
 def synchrotron() -> Synchrotron:
-    """Get the i02-2 synchrotron device, instantiate it if it hasn't already been.
-    If this is called when already instantiated in i02-2, it will return the existing object.
-    """
     return Synchrotron()
 
 
 @devices.factory()
 def sample_motors() -> XYStage:
-    """Get the i02-2 goniometer device, instantiate it if it hasn't already been.
-    If this is called when already instantiated in i02-2, it will return the existing object.
-    """
     return XYStage(f"{PREFIX.beamline_prefix}-MO-GONIO-01:SAMPLE:")

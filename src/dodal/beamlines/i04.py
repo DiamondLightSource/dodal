@@ -154,16 +154,15 @@ def aperture_scatterguard() -> ApertureScatterguard:
     )
 
 
-@devices.v1_init(EigerDetector, prefix="BL03I-EA-EIGER-01:", wait=False)
+@devices.v1_init(EigerDetector, prefix="BL04I-EA-EIGER-01:", wait=False)
 def eiger(eiger: EigerDetector) -> EigerDetector:
+    eiger.detector_id = 78
     return eiger
 
 
 @devices.factory()
 def zebra_fast_grid_scan() -> ZebraFastGridScanThreeD:
-    return ZebraFastGridScanThreeD(
-        prefix=f"{PREFIX.beamline_prefix}-MO-SGON-01:",
-    )
+    return ZebraFastGridScanThreeD(prefix=f"{PREFIX.beamline_prefix}-MO-SGON-01:")
 
 
 @devices.factory()
@@ -235,11 +234,13 @@ def robot() -> BartRobot:
 
 
 @devices.factory()
-def oav_to_redis_forwarder() -> OAVToRedisForwarder:
+def oav_to_redis_forwarder(
+    oav: OAVBeamCentrePV, oav_full_screen: OAVBeamCentrePV
+) -> OAVToRedisForwarder:
     return OAVToRedisForwarder(
         f"{PREFIX.beamline_prefix}-DI-OAV-01:",
-        oav_roi=oav(),
-        oav_fs=oav_full_screen(),
+        oav_roi=oav,
+        oav_fs=oav_full_screen,
         redis_host=RedisConstants.REDIS_HOST,
         redis_password=RedisConstants.REDIS_PASSWORD,
         redis_db=RedisConstants.MURKO_REDIS_DB,
@@ -283,9 +284,7 @@ def scintillator(aperture_scatterguard: ApertureScatterguard) -> Scintillator:
 
 @devices.factory()
 def max_pixel() -> MaxPixel:
-    return MaxPixel(
-        f"{PREFIX.beamline_prefix}-DI-OAV-01:",
-    )
+    return MaxPixel(f"{PREFIX.beamline_prefix}-DI-OAV-01:")
 
 
 @devices.factory()
