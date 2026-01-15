@@ -66,7 +66,7 @@ def analyser() -> SpecsDetector[LensMode, PsuMode]:
 
 
 @device_factory()
-def undulator() -> UndulatorInMm:
+def id() -> UndulatorInMm:
     return UndulatorInMm(prefix=f"{BeamlinePrefix(BL).insertion_prefix}-MO-SERVC-01:")
 
 
@@ -79,7 +79,7 @@ def harmonics() -> UndulatorOrder:
 def hu_id_energy() -> HardInsertionDeviceEnergy:
     return HardInsertionDeviceEnergy(
         undulator_order=harmonics(),
-        undulator=undulator(),
+        undulator=id(),
         lut=get_convert_lut(I09_1_CONF_CLIENT, LOOK_UPTABLE_FILE),
         gap_to_energy_func=calculate_energy_i09_hu,
         energy_to_gap_func=calculate_gap_i09_hu,
