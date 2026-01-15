@@ -1,4 +1,3 @@
-from abc import ABC, abstractmethod
 from asyncio import gather
 from typing import Any, Protocol
 
@@ -16,15 +15,15 @@ from dodal.devices.common_dcm import DoubleCrystalMonochromatorBase
 from dodal.devices.undulator import UndulatorInMm, UndulatorOrder
 
 
-class LookUpTableProvider(ABC):
-    @abstractmethod
+class LookUpTableProvider(Protocol):
     def get_look_up_table(self, *args, **kwargs) -> Any:
-        pass
+        """Protocol to provide lookup table data."""
+        ...
 
 
 class EnergyGapConvertor(Protocol):
     def __call__(self, lut: LookUpTableProvider, value: float, order: int) -> float:
-        """Protocol to provide energy to motor position conversion"""
+        """Protocol to provide value conversion using lookup table."""
         ...
 
 
