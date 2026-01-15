@@ -422,33 +422,15 @@ async def test_reading_pjumpcell_includes_fields_control(
     await assert_reading(
         cell.control,
         {
-            "pjump-control-busy": {
-                "value": False,
-            },
-            "pjump-control-go": {
-                "value": False,
-            },
-            "pjump-control-result": {
-                "value": "SP_SUCCESS",
-            },
-            "pjump-control-target_pressure": {
-                "value": 0,
-            },
-            "pjump-control-timeout": {
-                "value": 0.0,
-            },
-            "pjump-control-_stop": {
-                "value": False,
-            },
-            "pjump-control-from_pressure": {
-                "value": ANY,
-            },
-            "pjump-control-to_pressure": {
-                "value": ANY,
-            },
-            "pjump-control-do_jump-set_jump": {
-                "value": ANY,
-            },
+            "pjump-control-busy": partial_reading(False),
+            "pjump-control-go": partial_reading(False),
+            "pjump-control-result": partial_reading("SP_SUCCESS"),
+            "pjump-control-target_pressure": partial_reading(0),
+            "pjump-control-timeout": partial_reading(0.0),
+            "pjump-control-_stop": partial_reading(False),
+            "pjump-control-from_pressure": partial_reading(ANY),
+            "pjump-control-to_pressure": partial_reading(ANY),
+            "pjump-control-do_jump-set_jump": partial_reading(ANY),
         },
     )
 
@@ -467,33 +449,15 @@ async def test_reading_pjumpcell_includes_fields_control_jump(
     await assert_reading(
         cell.control,
         {
-            "pjump-control-busy": {
-                "value": False,
-            },
-            "pjump-control-go": {
-                "value": False,
-            },
-            "pjump-control-result": {
-                "value": "SP_SUCCESS",
-            },
-            "pjump-control-target_pressure": {
-                "value": ANY,
-            },
-            "pjump-control-timeout": {
-                "value": 0.0,
-            },
-            "pjump-control-_stop": {
-                "value": False,
-            },
-            "pjump-control-from_pressure": {
-                "value": 0.0,
-            },
-            "pjump-control-to_pressure": {
-                "value": 0.0,
-            },
-            "pjump-control-do_jump-set_jump": {
-                "value": False,
-            },
+            "pjump-control-busy": partial_reading(False),
+            "pjump-control-go": partial_reading(False),
+            "pjump-control-result": partial_reading("SP_SUCCESS"),
+            "pjump-control-target_pressure": partial_reading(ANY),
+            "pjump-control-timeout": partial_reading(0.0),
+            "pjump-control-_stop": partial_reading(False),
+            "pjump-control-from_pressure": partial_reading(0.0),
+            "pjump-control-to_pressure": partial_reading(0.0),
+            "pjump-control-do_jump-set_jump": partial_reading(False),
         },
     )
 

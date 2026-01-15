@@ -9,7 +9,12 @@ from types import ModuleType
 from unittest.mock import MagicMock, patch
 
 import pytest
-from ophyd_async.core import callback_on_mock_put, init_devices, PathProvider, set_mock_value
+from ophyd_async.core import (
+    PathProvider,
+    callback_on_mock_put,
+    init_devices,
+    set_mock_value,
+)
 
 from dodal.common.beamlines import beamline_parameters, beamline_utils
 from dodal.common.visit import (
