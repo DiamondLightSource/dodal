@@ -59,12 +59,12 @@ async def test_set_motors_from_energy_and_polarisation_sets_correct_values(
         energy=100.0, pol=Pol.LH
     )
     expected_val = Apple2Val(
-        gap=f"{42.0:.6f}",
+        gap=42.0,
         phase=Apple2PhasesVal(
-            top_outer=f"{7.5:.6f}",
-            top_inner=f"{0.0:.6f}",
-            btm_inner=f"{7.5:.6f}",
-            btm_outer=f"{0.0:.6f}",
+            top_outer=7.5,
+            top_inner=0.0,
+            btm_inner=7.5,
+            btm_outer=0.0,
         ),
     )
     mock_apple2.set.assert_awaited_once_with(id_motor_values=expected_val)
