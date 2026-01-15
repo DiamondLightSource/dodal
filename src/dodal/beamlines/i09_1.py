@@ -7,7 +7,7 @@ from dodal.devices.common_dcm import (
     PitchAndRollCrystal,
     StationaryCrystal,
 )
-from dodal.devices.electron_analyser import EnergySource
+from dodal.devices.electron_analyser.base import EnergySource
 from dodal.devices.electron_analyser.specs import SpecsDetector
 from dodal.devices.i09_1 import LensMode, PsuMode
 from dodal.devices.i09_1_shared.hard_energy import HardEnergy, HardInsertionDeviceEnergy
@@ -16,6 +16,9 @@ from dodal.devices.i09_1_shared.hard_undulator_functions import (
     calculate_gap_i09_hu,
 )
 from dodal.devices.synchrotron import Synchrotron
+from dodal.devices.temperture_controller import (
+    Lakeshore336,
+)
 from dodal.devices.undulator import UndulatorInMm, UndulatorOrder
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
@@ -82,3 +85,8 @@ def hu_energy() -> HardEnergy:
         dcm=dcm(),
         undulator_energy=hu_id_energy(),
     )
+
+
+@device_factory()
+def lakeshore() -> Lakeshore336:
+    return Lakeshore336(prefix=f"{PREFIX.beamline_prefix}-EA-TCTRL-01:")

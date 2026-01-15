@@ -2,7 +2,7 @@ from dodal.common.beamlines.beamline_utils import (
     device_factory,
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.devices.electron_analyser import DualEnergySource
+from dodal.devices.electron_analyser.base import DualEnergySource
 from dodal.devices.electron_analyser.vgscienta import VGScientaDetector
 from dodal.devices.p60 import (
     LabXraySource,
@@ -11,6 +11,7 @@ from dodal.devices.p60 import (
     PassEnergy,
     PsuMode,
 )
+from dodal.devices.selectable_source import SourceSelector
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
@@ -18,6 +19,11 @@ BL = get_beamline_name("p60")
 PREFIX = BeamlinePrefix(BL)
 set_log_beamline(BL)
 set_utils_beamline(BL)
+
+
+@device_factory()
+def source_selector() -> SourceSelector:
+    return SourceSelector()
 
 
 @device_factory()
@@ -32,7 +38,11 @@ def mg_kalpha_source() -> LabXraySourceReadable:
 
 @device_factory()
 def energy_source() -> DualEnergySource:
-    return DualEnergySource(al_kalpha_source().energy_ev, mg_kalpha_source().energy_ev)
+    return DualEnergySource(
+        al_kalpha_source().energy_ev,
+        mg_kalpha_source().energy_ev,
+        source_selector().selected_source,
+    )
 
 
 # Connect will work again after this work completed

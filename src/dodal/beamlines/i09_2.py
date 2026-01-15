@@ -10,10 +10,10 @@ from dodal.devices.i09.enums import Grating
 from dodal.devices.i09_2_shared.i09_apple2 import (
     J09_GAP_POLY_DEG_COLUMNS,
     J09_PHASE_POLY_DEG_COLUMNS,
-    J09Apple2Controller,
 )
-from dodal.devices.insertion_device.apple2_undulator import (
+from dodal.devices.insertion_device import (
     Apple2,
+    Apple2EnforceLHMoveController,
     BeamEnergy,
     InsertionDeviceEnergy,
     InsertionDevicePolarisation,
@@ -79,9 +79,9 @@ def jid() -> Apple2:
 
 
 @device_factory()
-def jid_controller() -> J09Apple2Controller:
+def jid_controller() -> Apple2EnforceLHMoveController:
     """J09 insertion device controller."""
-    return J09Apple2Controller(
+    return Apple2EnforceLHMoveController(
         apple2=jid(),
         gap_energy_motor_lut=ConfigServerEnergyMotorLookup(
             lut_config=LookupTableColumnConfig(poly_deg=J09_GAP_POLY_DEG_COLUMNS),
@@ -93,6 +93,7 @@ def jid_controller() -> J09Apple2Controller:
             config_client=J09_CONF_CLIENT,
             path=Path(LOOK_UPTABLE_DIR, PHASE_LOOKUP_FILE_NAME),
         ),
+        units="keV",
     )
 
 
