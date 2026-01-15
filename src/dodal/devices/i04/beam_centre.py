@@ -6,11 +6,11 @@ from ophyd_async.epics.core import (
     epics_signal_r,
 )
 
-from dodal.devices.i04.max_pixel import convert_to_gray_and_blur
+from dodal.devices.oav.utils import convert_to_gray_and_blur
 from dodal.log import LOGGER
 
-# constant was chosen from trial and error with test images
-INC_BINARY_THRESH = 20
+# Constant was chosen from trial and error with test images
+ADDITIONAL_BINARY_THRESH = 20
 
 
 def convert_image_to_binary(image: np.ndarray):
@@ -32,7 +32,7 @@ def convert_image_to_binary(image: np.ndarray):
     )
 
     # Adjusting because the inner beam is less noisy compared to the outer
-    threshold_value += INC_BINARY_THRESH
+    threshold_value += ADDITIONAL_BINARY_THRESH
 
     _, thresholded_image = cv2.threshold(
         blurred_image, threshold_value, max_pixel_value, cv2.THRESH_BINARY
@@ -59,12 +59,11 @@ def get_roi(image_arr, current_x, current_y, dist_from_x=100, dist_from_y=100):
 
 class CentreEllipseMethod(StandardReadable, Triggerable):
     """
-    <<<<<<< HEAD
-        Upon triggering, fits an ellipse to a binary image from the area detector defined by
-        the prefix.
+    Upon triggering, fits an ellipse to a binary image from the area detector defined by
+    the prefix.
 
-        This is used, in conjunction with a scintillator, to determine the centre of the beam
-        on the image.
+    This is used, in conjunction with a scintillator, to determine the centre of the beam
+    on the image.
     """
 
     def __init__(self, prefix: str, overlay_channel: int = 1, name: str = ""):

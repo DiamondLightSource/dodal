@@ -163,7 +163,6 @@ def test_roi_logic():
     diff_x_and_y = get_roi(
         image_arr=test_img, current_x=3, current_y=3, dist_from_x=2, dist_from_y=1
     )
-    print(diff_x_and_y)
     expected_result = [[0, 5, 5, 5, 0], [0, 5, 10, 5, 0], [0, 5, 5, 5, 0]]
     assert (diff_x_and_y == expected_result).all()
 
