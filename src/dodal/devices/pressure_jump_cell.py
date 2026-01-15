@@ -222,7 +222,8 @@ class DoJump(StandardReadable, Triggerable):
             self.set_jump, True, self._busy_signal(), True
         )
 
-        await wait_for_value(self._busy_signal(), False, self._timeout_signal())
+        timeout_value = await self._timeout_signal().get_value()
+        await wait_for_value(self._busy_signal(), False, timeout_value)
 
 
 class PressureJumpCellController(StandardReadable, Movable, Stoppable):

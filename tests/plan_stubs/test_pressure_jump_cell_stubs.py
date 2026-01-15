@@ -7,53 +7,30 @@ from ophyd_async.core import (
 
 import dodal.plan_stubs.pressure_jump_cell as pressure_cell_stubs
 from dodal.devices.pressure_jump_cell import (
+    DoJump,
     PressureJumpCell,
-    PressureJumpCellController,
-    PressureJumpParameters,
 )
-
-
-def test_set_pressure_stub_calls_control_set(
-    run_engine: RunEngine, cell_with_mocked_busy: PressureJumpCell
-):
-    target_pressure = 1234
-    set_mock_value(cell_with_mocked_busy.control.timeout, 1)
-
-    with patch.object(
-        PressureJumpCellController,
-        "set",
-        side_effect=PressureJumpCellController.set,
-        autospec=True,
-    ) as fake_control_set:
-        run_engine(
-            pressure_cell_stubs.set_pressure(cell_with_mocked_busy, target_pressure)
-        )
-
-    # Functionality of control.set checked in device tests so just check plan stub calls set
-    fake_control_set.assert_called_once_with(
-        cell_with_mocked_busy.control, target_pressure
-    )
 
 
 def test_set_pressure_jump_stub_calls_control_set(
     run_engine: RunEngine, cell_with_mocked_busy: PressureJumpCell
 ):
-    target_jump = PressureJumpParameters(123, 5678)
+    target_pressure_from = 123
+    target_pressure_to = 5678
 
     set_mock_value(cell_with_mocked_busy.control.timeout, 1)
 
     with patch.object(
-        PressureJumpCellController,
-        "set",
-        side_effect=PressureJumpCellController.set,
+        DoJump,
+        "trigger",
+        side_effect=DoJump.trigger,
         autospec=True,
-    ) as fake_control_set:
+    ) as fake_dojump_trigger:
         run_engine(
             pressure_cell_stubs.set_pressure_jump(
-                cell_with_mocked_busy,
-                target_jump.pressure_from,
-                target_jump.pressure_to,
+                cell_with_mocked_busy, target_pressure_from, target_pressure_to
             )
         )
-    # Functionality of control.set checked in device tests so just check plan stub calls set
-    fake_control_set.assert_called_once_with(cell_with_mocked_busy.control, target_jump)
+
+    # Functionality of control.set checked in device tests so just check plan stub calls trigger
+    fake_dojump_trigger.assert_called_once()

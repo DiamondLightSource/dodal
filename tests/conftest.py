@@ -112,6 +112,6 @@ async def cell_with_mocked_busy(cell: PressureJumpCell) -> PressureJumpCell:
         asyncio.create_task(busy_idle())
 
     callback_on_mock_put(cell.control.go, busy)
-    callback_on_mock_put(cell.control.set_jump, busy)
+    callback_on_mock_put(cell.control.do_jump.set_jump, busy)
 
     return cell
