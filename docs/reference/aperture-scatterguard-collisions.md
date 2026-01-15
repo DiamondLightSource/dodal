@@ -13,3 +13,7 @@ Normally the scintillator is stowed behind the aperture/scatterguard in the z di
 
 The aperture/scatterguard must be moved in the -ve x direction in order to avoid colliding with the scintillator when it is 
 moved in / out (scintillator only has motion in the y, z axes).
+
+```{raw} html
+:file: ../images/scintillator-motion.svg
+```
