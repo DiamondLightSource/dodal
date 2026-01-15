@@ -13,29 +13,33 @@ from dodal.log import LOGGER
 INC_BINARY_THRESH = 20
 
 
-def binary_img(img, img_name="Threshold"):
+def convert_image_to_binary(image: np.ndarray):
     """
      Creates a binary image from OAV image array data.
 
     Pixels of the input image are converted to one of two values (a high and a low value).
     Otsu's method is used for automatic thresholding.
     See https://docs.opencv.org/4.x/d7/d4d/tutorial_py_thresholding.html.
-    The threshold is increased by INC_BINARY_THRESH (brightness taken from image in grayscale) in order to get the inner beam.
+    The threshold is increased by ADDITIONAL_BINARY_THRESH in order to get more of
+    the centre of the beam.
     """
-    # convert to greyscale as not interested in information relating to colour and blur to eliminate rouge hot pixels
-    blurred = convert_to_gray_and_blur(img)
-    assert blurred is not None, "Image is None before thresholding"
+    max_pixel_value = 255
 
-    (thresh, thresh_img) = cv2.threshold(
-        blurred, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU
+    blurred_image = convert_to_gray_and_blur(image)
+
+    threshold_value, _ = cv2.threshold(
+        blurred_image, 0, max_pixel_value, cv2.THRESH_BINARY + cv2.THRESH_OTSU
     )
-    # adjusting because the inner beam is less noisy compared to the outer.
-    thresh += INC_BINARY_THRESH
 
-    thresh_img = cv2.threshold(blurred, thresh, 255, cv2.THRESH_BINARY)[1]
+    # Adjusting because the inner beam is less noisy compared to the outer
+    threshold_value += INC_BINARY_THRESH
 
-    LOGGER.info(f"Thresholding value (otsu with blur): {thresh}")
-    return thresh_img
+    _, thresholded_image = cv2.threshold(
+        blurred_image, threshold_value, max_pixel_value, cv2.THRESH_BINARY
+    )
+
+    LOGGER.info(f"Image binarised with threshold of {threshold_value}")
+    return thresholded_image
 
 
 def get_roi(image_arr, current_x, current_y, dist_from_x=100, dist_from_y=100):
@@ -55,31 +59,22 @@ def get_roi(image_arr, current_x, current_y, dist_from_x=100, dist_from_y=100):
 
 class CentreEllipseMethod(StandardReadable, Triggerable):
     """
-    Fits an ellipse a binary image of the beam. The centre of the fitted ellipse is taken
-    to be the centre of the beam.
-    Centre is found through fitting an ellipse and extracting the centre.
-    First a ROI is taken which is taken at 100 pixels from the PVs for the previous centre.
-    Then the image is converted to a binary (see above function), after which an ellipse is
-    fitted.
-    The placeholder PVs for the centre are then updated.
+    <<<<<<< HEAD
+        Upon triggering, fits an ellipse to a binary image from the area detector defined by
+        the prefix.
+
+        This is used, in conjunction with a scintillator, to determine the centre of the beam
+        on the image.
     """
 
-    def __init__(self, prefix: str, name: str = "", overlay_channel: int = 1):
-        self.array_signal = epics_signal_r(np.ndarray, f"pva://{prefix}PVA:ARRAY")
+    def __init__(self, prefix: str, name: str = ""):
+        self.oav_array_signal = epics_signal_r(np.ndarray, f"pva://{prefix}PVA:ARRAY")
+
         self.center_x_val, self._center_x_val_setter = soft_signal_r_and_setter(float)
         self.center_y_val, self._center_y_val_setter = soft_signal_r_and_setter(float)
-        # I am assuming that these PVs change with the zoom (need to check that this is the case)
-        # Could change these so they look at the PVs for centre with zoom which look like {prefix}PBCX:VALH
-        # These PVs can be found in oav_detector
-        self.current_centre_x = epics_signal_r(
-            int, f"{prefix}OVER:{overlay_channel}:CenterX"
-        )
-        self.current_centre_y = epics_signal_r(
-            int, f"{prefix}OVER:{overlay_channel}:CenterY"
-        )
         super().__init__(name)
 
-    def fit_ellipse(self, binary_img: cv2.typing.MatLike) -> cv2.typing.RotatedRect:
+    def _fit_ellipse(self, binary_img: cv2.typing.MatLike) -> cv2.typing.RotatedRect:
         contours, _ = cv2.findContours(
             binary_img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE
         )
@@ -88,13 +83,15 @@ class CentreEllipseMethod(StandardReadable, Triggerable):
 
         largest_contour = max(contours, key=cv2.contourArea)
         if len(largest_contour) < 5:
-            raise ValueError("Not enough points to fit an ellipse.")
+            raise ValueError(
+                f"Not enough points to fit an ellipse. Found {largest_contour} points and need at least 5."
+            )
 
         return cv2.fitEllipse(largest_contour)
 
     @AsyncStatus.wrap
     async def trigger(self, roi_dist_from_centre=100):
-        array_data = await self.array_signal.get_value()
+        array_data = await self.oav_array_signal.get_value()
         current_x = await self.current_centre_x.get_value()
         current_y = await self.current_centre_y.get_value()
         top_left_corner = (
@@ -104,11 +101,10 @@ class CentreEllipseMethod(StandardReadable, Triggerable):
         roi_data = get_roi(
             array_data, current_x, current_y, roi_dist_from_centre, roi_dist_from_centre
         )
-        binary = binary_img(roi_data)
-        ellipse_fit = self.fit_ellipse(binary)
+        binary = convert_image_to_binary(roi_data)
+        ellipse_fit = self._fit_ellipse(binary)
         centre_x = ellipse_fit[0][0]
         centre_y = ellipse_fit[0][1]
-        # convert back to original image coords
         real_centre_x = centre_x + top_left_corner[0]
         real_centre_y = centre_y + top_left_corner[1]
         self._center_x_val_setter(real_centre_x)

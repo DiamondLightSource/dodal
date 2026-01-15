@@ -1,4 +1,3 @@
-import json
 from collections.abc import Mapping
 from pathlib import Path
 from unittest import mock
@@ -17,7 +16,14 @@ from ophyd_async.core import (
 )
 from ophyd_async.testing import assert_emitted
 
-from dodal.devices.apple2_undulator import (
+from dodal.devices.i10.i10_apple2 import (
+    DEFAULT_JAW_PHASE_POLY_PARAMS,
+    I10Apple2,
+    I10Apple2Controller,
+    LinearArbitraryAngle,
+)
+from dodal.devices.i10.i10_setting_data import I10Grating
+from dodal.devices.insertion_device import (
     MAXIMUM_MOVE_TIME,
     BeamEnergy,
     EnabledDisabledUpper,
@@ -29,21 +35,16 @@ from dodal.devices.apple2_undulator import (
     UndulatorJawPhase,
     UndulatorPhaseAxes,
 )
-from dodal.devices.i10.i10_apple2 import (
-    DEFAULT_JAW_PHASE_POLY_PARAMS,
-    I10Apple2,
-    I10Apple2Controller,
-    LinearArbitraryAngle,
-)
-from dodal.devices.i10.i10_setting_data import I10Grating
-from dodal.devices.pgm import PlaneGratingMonochromator
-from dodal.devices.util.lookup_tables_apple2 import (
+from dodal.devices.insertion_device.energy_motor_lookup import (
     ConfigServerEnergyMotorLookup,
+)
+from dodal.devices.insertion_device.lookup_table_models import (
     EnergyCoverage,
     EnergyCoverageEntry,
-    LookupTable,
-    LookupTableConfig,
+    LookupTableColumnConfig,
+    Source,
 )
+from dodal.devices.pgm import PlaneGratingMonochromator
 from tests.devices.i10.test_data import (
     EXPECTED_ID_ENERGY_2_GAP_CALIBRATIONS_IDD_JSON,
     EXPECTED_ID_ENERGY_2_GAP_CALIBRATIONS_IDU_JSON,
@@ -51,6 +52,9 @@ from tests.devices.i10.test_data import (
     EXPECTED_ID_ENERGY_2_PHASE_CALIBRATIONS_IDU_JSON,
     ID_ENERGY_2_GAP_CALIBRATIONS_CSV,
     ID_ENERGY_2_PHASE_CALIBRATIONS_CSV,
+)
+from tests.devices.insertion_device.util import (
+    assert_expected_lut_file_equals_config_server_energy_motor_update_lookup_table,
 )
 
 # add mock_config_client, mock_id_gap, mock_phase and mock_jaw_phase_axes to pytest.
@@ -85,7 +89,7 @@ def mock_i10_gap_energy_motor_lookup_idu(
 ) -> ConfigServerEnergyMotorLookup:
     return ConfigServerEnergyMotorLookup(
         config_client=mock_config_client,
-        lut_config=LookupTableConfig(source=("Source", "idu")),
+        lut_config=LookupTableColumnConfig(source=Source(column="Source", value="idu")),
         path=Path(ID_ENERGY_2_GAP_CALIBRATIONS_CSV),
     )
 
@@ -96,7 +100,7 @@ def mock_i10_phase_energy_motor_lookup_idu(
 ) -> ConfigServerEnergyMotorLookup:
     return ConfigServerEnergyMotorLookup(
         config_client=mock_config_client,
-        lut_config=LookupTableConfig(source=("Source", "idu")),
+        lut_config=LookupTableColumnConfig(source=Source(column="Source", value="idu")),
         path=Path(ID_ENERGY_2_PHASE_CALIBRATIONS_CSV),
     )
 
@@ -107,7 +111,7 @@ def mock_i10_gap_energy_motor_lookup_idd(
 ) -> ConfigServerEnergyMotorLookup:
     return ConfigServerEnergyMotorLookup(
         config_client=mock_config_client,
-        lut_config=LookupTableConfig(source=("Source", "idd")),
+        lut_config=LookupTableColumnConfig(source=Source(column="Source", value="idd")),
         path=Path(ID_ENERGY_2_GAP_CALIBRATIONS_CSV),
     )
 
@@ -118,9 +122,7 @@ def mock_i10_phase_energy_motor_lookup_idd(
 ) -> ConfigServerEnergyMotorLookup:
     return ConfigServerEnergyMotorLookup(
         config_client=mock_config_client,
-        lut_config=LookupTableConfig(
-            source=("Source", "idd"),
-        ),
+        lut_config=LookupTableColumnConfig(source=Source(column="Source", value="idd")),
         path=Path(ID_ENERGY_2_PHASE_CALIBRATIONS_CSV),
     )
 
@@ -349,7 +351,7 @@ async def test_id_polarisation_set(
 
     if pol == "dsf":
         with pytest.raises(ValueError):
-            await mock_id_pol.set(pol)
+            await mock_id_pol.set(Pol(pol))
     else:
         await mock_id_pol.set(pol)
 
@@ -417,19 +419,21 @@ async def test_id_polarisation_locate(
     await mock_id_controller.energy.set(energy)
 
     await mock_id_pol.set(pol=pol)
-    assert await mock_id_pol.locate() == {"setpoint": pol, "readback": Pol.LH}
-    # move the motor
-    set_mock_value(
-        mock_id_controller.apple2().phase().top_inner.user_readback, top_inner
+    assert (
+        await mock_id_controller.apple2().phase().top_inner.user_readback.get_value()
+        == pytest.approx(top_inner, 0.01)
     )
-    set_mock_value(
-        mock_id_controller.apple2().phase().top_outer.user_readback, top_outer
+    assert (
+        await mock_id_controller.apple2().phase().top_outer.user_readback.get_value()
+        == pytest.approx(top_outer, 0.01)
     )
-    set_mock_value(
-        mock_id_controller.apple2().phase().btm_inner.user_readback, btm_inner
+    assert (
+        await mock_id_controller.apple2().phase().btm_inner.user_readback.get_value()
+        == pytest.approx(btm_inner, 0.01)
     )
-    set_mock_value(
-        mock_id_controller.apple2().phase().btm_outer.user_readback, btm_outer
+    assert (
+        await mock_id_controller.apple2().phase().btm_outer.user_readback.get_value()
+        == pytest.approx(btm_outer, 0.01)
     )
     assert await mock_id_pol.locate() == {"setpoint": pol, "readback": pol}
 
@@ -651,27 +655,17 @@ async def test_linear_arbitrary_run_engine_scan(
         )
 
 
-def assert_lookup_table_matches_expected(
-    energy_motor_lookup: ConfigServerEnergyMotorLookup,
-    expected_dict_file_name: str,
-) -> None:
-    energy_motor_lookup.update_lookup_table()
-    with open(expected_dict_file_name, "rb") as f:
-        expected_lut = LookupTable(json.load(f))
-    assert energy_motor_lookup.lut == expected_lut
-
-
 def test_i10_energy_motor_lookup_idu_convert_csv_to_lookup_success(
     mock_i10_gap_energy_motor_lookup_idu: ConfigServerEnergyMotorLookup,
     mock_i10_phase_energy_motor_lookup_idu: ConfigServerEnergyMotorLookup,
 ) -> None:
-    assert_lookup_table_matches_expected(
-        mock_i10_gap_energy_motor_lookup_idu,
+    assert_expected_lut_file_equals_config_server_energy_motor_update_lookup_table(
         EXPECTED_ID_ENERGY_2_GAP_CALIBRATIONS_IDU_JSON,
+        mock_i10_gap_energy_motor_lookup_idu,
     )
-    assert_lookup_table_matches_expected(
-        mock_i10_phase_energy_motor_lookup_idu,
+    assert_expected_lut_file_equals_config_server_energy_motor_update_lookup_table(
         EXPECTED_ID_ENERGY_2_PHASE_CALIBRATIONS_IDU_JSON,
+        mock_i10_phase_energy_motor_lookup_idu,
     )
 
 
@@ -679,13 +673,13 @@ def test_i10_energy_motor_lookup_idd_convert_csv_to_lookup_success(
     mock_i10_gap_energy_motor_lookup_idd: ConfigServerEnergyMotorLookup,
     mock_i10_phase_energy_motor_lookup_idd: ConfigServerEnergyMotorLookup,
 ) -> None:
-    assert_lookup_table_matches_expected(
-        mock_i10_gap_energy_motor_lookup_idd,
+    assert_expected_lut_file_equals_config_server_energy_motor_update_lookup_table(
         EXPECTED_ID_ENERGY_2_GAP_CALIBRATIONS_IDD_JSON,
+        mock_i10_gap_energy_motor_lookup_idd,
     )
-    assert_lookup_table_matches_expected(
-        mock_i10_phase_energy_motor_lookup_idd,
+    assert_expected_lut_file_equals_config_server_energy_motor_update_lookup_table(
         EXPECTED_ID_ENERGY_2_PHASE_CALIBRATIONS_IDD_JSON,
+        mock_i10_phase_energy_motor_lookup_idd,
     )
 
 
@@ -696,13 +690,13 @@ async def test_fail_i10_energy_motor_lookup_outside_energy_limits(
 ):
     with pytest.raises(ValueError) as e:
         await mock_id_controller.energy.set(energy)
-    assert str(e.value) == "Demanding energy must lie between {} and {} eV!".format(
+    assert str(e.value) == "Demanding energy must lie between {} and {}!".format(
         mock_id_controller.gap_energy_motor_lut.lut.root[
             await mock_id_controller.polarisation_setpoint.get_value()
-        ].limit.minimum,
+        ].min_energy,
         mock_id_controller.gap_energy_motor_lut.lut.root[
             await mock_id_controller.polarisation_setpoint.get_value()
-        ].limit.maximum,
+        ].max_energy,
     )
 
 
@@ -711,23 +705,19 @@ async def test_fail_i10_energy_motor_lookup_with_lookup_gap(
 ):
     mock_id_controller.gap_energy_motor_lut.update_lookup_table()
     # make gap in energy
-    mock_id_controller.gap_energy_motor_lut.lut.root[Pol.LH].energies = EnergyCoverage(
-        {
-            1: EnergyCoverageEntry(
-                low=255.3,
-                high=500,
+    mock_id_controller.gap_energy_motor_lut.lut.root[Pol.LH] = EnergyCoverage(
+        energy_entries=(
+            EnergyCoverageEntry(
+                min_energy=255.3,
+                max_energy=500,
                 poly=poly1d([4.33435e-08, -7.52562e-05, 6.41791e-02, 3.88755e00]),
-            )
-        }
-    )
-    mock_id_controller.gap_energy_motor_lut.lut.root[Pol.LH].energies = EnergyCoverage(
-        {
-            2: EnergyCoverageEntry(
-                low=600,
-                high=1000,
+            ),
+            EnergyCoverageEntry(
+                min_energy=600,
+                max_energy=1000,
                 poly=poly1d([4.33435e-08, -7.52562e-05, 6.41791e-02, 3.88755e00]),
-            )
-        }
+            ),
+        )
     )
     with pytest.raises(ValueError) as e:
         await mock_id_controller.energy.set(555)
