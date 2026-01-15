@@ -67,11 +67,19 @@ class CentreEllipseMethod(StandardReadable, Triggerable):
         on the image.
     """
 
-    def __init__(self, prefix: str, name: str = ""):
+    def __init__(self, prefix: str, overlay_channel: int = 1, name: str = ""):
         self.oav_array_signal = epics_signal_r(np.ndarray, f"pva://{prefix}PVA:ARRAY")
 
         self.center_x_val, self._center_x_val_setter = soft_signal_r_and_setter(float)
         self.center_y_val, self._center_y_val_setter = soft_signal_r_and_setter(float)
+
+        self.current_centre_x = epics_signal_r(
+            int, f"{prefix}OVER:{overlay_channel}:CenterX"
+        )
+        self.current_centre_y = epics_signal_r(
+            int, f"{prefix}OVER:{overlay_channel}:CenterY"
+        )
+
         super().__init__(name)
 
     def _fit_ellipse(self, binary_img: cv2.typing.MatLike) -> cv2.typing.RotatedRect:
