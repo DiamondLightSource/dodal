@@ -1,9 +1,11 @@
-from ophyd_async.core import (
-    AutoMaxIncrementingPathProvider,
-)
+from functools import cache
+from pathlib import Path
+
+from ophyd_async.core import AutoMaxIncrementingPathProvider, PathProvider
 
 from dodal.common.beamlines.beamline_utils import BL
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
+from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitPathProvider
 from dodal.device_manager import DeviceManager
 from dodal.devices.attenuator.attenuator import EnumFilterAttenuator
 from dodal.devices.attenuator.filter_selections import (
@@ -52,6 +54,16 @@ I24_ZEBRA_MAPPING = ZebraMapping(
 PREFIX = BeamlinePrefix(BL)
 
 devices = DeviceManager()
+
+
+@devices.fixture
+@cache
+def path_provider() -> PathProvider:
+    return StaticVisitPathProvider(
+        BL,
+        Path("/tmp"),
+        client=LocalDirectoryServiceClient(),
+    )
 
 
 @devices.factory()
@@ -133,29 +145,24 @@ def eiger_beam_center() -> DetectorBeamCenter:
 
 @devices.factory()
 def commissioning_jungfrau(
+    path_provider: PathProvider,
     path_to_dir: str = "/tmp/jf",  # Device factory doesn't allow for required args,
     filename: str = "jf_output",  # but these should be manually entered when commissioning
 ) -> CommissioningJungfrau:
     return CommissioningJungfrau(
         f"{PREFIX.beamline_prefix}-EA-JFRAU-01:",
         f"{PREFIX.beamline_prefix}-JUNGFRAU-META:FD:",
-        AutoMaxIncrementingPathProvider(get_path_provider()),
+        AutoMaxIncrementingPathProvider(path_provider),
     )
 
 
-@device_factory()
+@devices.factory()
 def synchrotron() -> Synchrotron:
-    """Get the i24 synchrotron device, instantiate it if it hasn't already been.
-    If this is called when already instantiated in i24, it will return the existing object.
-    """
     return Synchrotron()
 
 
-@device_factory()
+@devices.factory()
 def sample_shutter() -> ZebraShutter:
-    """Get the i24 sample shutter device, instantiate it if it hasn't already been.
-    If this is called when already instantiated in i24, it will return the existing object.
-    """
     return ZebraShutter(
         f"{PREFIX.beamline_prefix}-EA-SHTR-01:",
     )

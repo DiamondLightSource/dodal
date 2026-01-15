@@ -28,7 +28,6 @@ from dodal.devices.motors import XYZStage
 from dodal.devices.mx_phase1.beamstop import Beamstop
 from dodal.devices.oav.oav_detector import (
     OAVBeamCentrePV,
-    ZoomControllerWithBeamCentres,
 )
 from dodal.devices.oav.oav_parameters import OAVConfig
 from dodal.devices.oav.oav_to_redis_forwarder import OAVToRedisForwarder
@@ -301,11 +300,8 @@ def beamsize(
     )
 
 
-@device_factory()
+@devices.factory()
 def beam_centre() -> CentreEllipseMethod:
-    """Get the i04 centring device, instantiate it if it hasn't already been.
-    If this is called when already instantiated in i04, it will return the existing object.
-    """
     return CentreEllipseMethod(
         f"{PREFIX.beamline_prefix}-DI-OAV-01:",
     )
