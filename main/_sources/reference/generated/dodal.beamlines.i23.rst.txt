@@ -29,6 +29,12 @@ dodal.beamlines.i23
 
    
    
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      path_provider
+   
    
 
    
