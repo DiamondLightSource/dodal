@@ -1,5 +1,5 @@
 # Changes here will be overwritten by Copier
-_commit: 4.0.1
+_commit: 5.0.1
 _src_path: https://github.com/DiamondLightSource/python-copier-template
 author_email: dominic.oram@diamond.ac.uk
 author_name: Dominic Oram
@@ -7,7 +7,7 @@ component_lifecycle: production
 component_owner: group:data-acquisition
 component_type: library
 description: Ophyd devices and other utils that could be used across DLS beamlines
-distribution_name: dls-dodal
+distribution_name: dls-dodal  # Can change to dodal https://github.com/DiamondLightSource/dodal/issues/681
 docker: false
 docs_type: sphinx
 git_platform: github.com
@@ -15,5 +15,5 @@ github_org: DiamondLightSource
 package_name: dodal
 pypi: true
 repo_name: dodal
-strict_typing: false
+strict_typing: false  # Should move to strict typing in future
 type_checker: pyright

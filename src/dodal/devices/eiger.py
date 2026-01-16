@@ -302,25 +302,24 @@ class EigerDetector(Device, Stageable):
         beam_x_pixels, beam_y_pixels = self.detector_params.get_beam_position_pixels(
             self.detector_params.detector_distance
         )
-        status = self.cam.beam_center_x.set(
+        self.cam.beam_center_x.set(
             beam_x_pixels, timeout=self.timeouts.general_status_timeout
-        )
-        status &= self.cam.beam_center_y.set(
+        ).wait(timeout=self.timeouts.general_status_timeout)
+        self.cam.beam_center_y.set(
             beam_y_pixels, timeout=self.timeouts.general_status_timeout
-        )
-        status &= self.cam.det_distance.set(
+        ).wait(timeout=self.timeouts.general_status_timeout)
+        self.cam.det_distance.set(
             self.detector_params.detector_distance,
             timeout=self.timeouts.general_status_timeout,
-        )
-        status &= self.cam.omega_start.set(
+        ).wait(timeout=self.timeouts.general_status_timeout)
+        self.cam.omega_start.set(
             self.detector_params.omega_start,
             timeout=self.timeouts.general_status_timeout,
-        )
-        status &= self.cam.omega_incr.set(
+        ).wait(timeout=self.timeouts.general_status_timeout)
+        status = self.cam.omega_incr.set(
             self.detector_params.omega_increment,
             timeout=self.timeouts.general_status_timeout,
         )
-
         return status
 
     def set_detector_threshold(self, energy: float, tolerance: float = 0.1) -> Status:

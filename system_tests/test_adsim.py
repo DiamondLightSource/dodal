@@ -16,14 +16,12 @@ from event_model.documents import (
     StreamResource,
 )
 from ophyd_async.core import (
-    PathProvider,
     StandardDetector,
     StaticPathProvider,
     UUIDFilenameProvider,
 )
 
 from dodal.beamlines import adsim
-from dodal.common.beamlines.beamline_utils import clear_path_provider, set_path_provider
 from dodal.devices.motors import XThetaStage
 from dodal.plans import count
 
@@ -61,24 +59,14 @@ def with_env():
 
 
 @pytest.fixture
-def path_provider() -> Generator[PathProvider]:
-    # path must be available to the `det` container, so cannot use tmp_path
+def det() -> Generator[StandardDetector]:
     path_provider = StaticPathProvider(UUIDFilenameProvider(), PurePath("/tmp"))
-    set_path_provider(path_provider)
-    yield path_provider
-    clear_path_provider()
-
-
-@pytest.fixture
-def det(path_provider: PathProvider) -> Generator[StandardDetector]:
-    yield adsim.det(connect_immediately=True)
-    adsim.det.cache_clear()
+    yield adsim.det.build(connect_immediately=True, path_provider=path_provider)
 
 
 @pytest.fixture
 def sim_stage() -> Generator[XThetaStage]:
-    yield adsim.stage(connect_immediately=True)
-    adsim.stage.cache_clear()
+    yield adsim.stage.build(connect_immediately=True)
 
 
 @pytest.mark.requires(instrument="adsim")

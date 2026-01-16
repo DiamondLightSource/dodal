@@ -70,18 +70,18 @@ def jid_phase() -> UndulatorPhaseAxes:
 
 
 @device_factory()
-def jid() -> Apple2:
+def jid() -> Apple2[UndulatorPhaseAxes]:
     """I09 soft x-ray insertion device."""
-    return Apple2(
+    return Apple2[UndulatorPhaseAxes](
         id_gap=jid_gap(),
         id_phase=jid_phase(),
     )
 
 
 @device_factory()
-def jid_controller() -> Apple2EnforceLHMoveController:
+def jid_controller() -> Apple2EnforceLHMoveController[UndulatorPhaseAxes]:
     """J09 insertion device controller."""
-    return Apple2EnforceLHMoveController(
+    return Apple2EnforceLHMoveController[UndulatorPhaseAxes](
         apple2=jid(),
         gap_energy_motor_lut=ConfigServerEnergyMotorLookup(
             lut_config=LookupTableColumnConfig(poly_deg=J09_GAP_POLY_DEG_COLUMNS),

@@ -419,7 +419,7 @@ class Apple2(StandardReadable, Movable[Apple2Val], Generic[PhaseAxesType]):
             await asyncio.gather(self.gap().get_timeout(), self.phase().get_timeout())
         )
         LOGGER.info(
-            f"Moving f{self.name} apple2 motors to {id_motor_values}, timeout = {timeout}"
+            f"Moving {self.name} apple2 motors to {id_motor_values}, timeout = {timeout}"
         )
         await asyncio.gather(
             self.gap().set_move.set(value=1, wait=False, timeout=timeout),
