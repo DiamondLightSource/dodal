@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.insertion_device.apple2_controller &#8212; dodal 1.68.1.dev17+g11c03e6c9 documentation</title>
+    <title>dodal.devices.insertion_device.apple2_controller &#8212; dodal 1.68.1.dev18+g9f921c1d5 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=33cdeb04"></script>
+    <script src="../../../../_static/documentation_options.js?v=f08aa159"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -877,6 +877,10 @@ window.addEventListener("load", load);
 <span class="sd">        Callable that converts energy and polarisation to gap motor positions.</span>
 <span class="sd">    phase_energy_to_motor_converter : EnergyMotorConvertor</span>
 <span class="sd">        Callable that converts energy and polarisation to phase motor positions.</span>
+<span class="sd">    maximum_gap_motor_position : float</span>
+<span class="sd">        Maximum allowed position for the gap motor.</span>
+<span class="sd">    maximum_phase_motor_position : float</span>
+<span class="sd">        Maximum allowed position for the raw phase motors.</span>
 
 <span class="sd">    Abstract Methods</span>
 <span class="sd">    ----------------</span>
@@ -896,6 +900,8 @@ window.addEventListener("load", load);
         <span class="n">apple2</span><span class="p">:</span> <span class="n">Apple2Type</span><span class="p">,</span>
         <span class="n">gap_energy_motor_converter</span><span class="p">:</span> <span class="n">EnergyMotorConvertor</span><span class="p">,</span>
         <span class="n">phase_energy_motor_converter</span><span class="p">:</span> <span class="n">EnergyMotorConvertor</span><span class="p">,</span>
+        <span class="n">maximum_gap_motor_position</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">MAXIMUM_GAP_MOTOR_POSITION</span><span class="p">,</span>
+        <span class="n">maximum_phase_motor_position</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">MAXIMUM_ROW_PHASE_MOTOR_POSITION</span><span class="p">,</span>
         <span class="n">units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;eV&quot;</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -918,6 +924,8 @@ window.addEventListener("load", load);
         <span class="bp">self</span><span class="o">.</span><span class="n">gap_energy_motor_converter</span> <span class="o">=</span> <span class="n">gap_energy_motor_converter</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">phase_energy_motor_converter</span> <span class="o">=</span> <span class="n">phase_energy_motor_converter</span>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">maximum_gap_motor_position</span> <span class="o">=</span> <span class="n">maximum_gap_motor_position</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">maximum_phase_motor_position</span> <span class="o">=</span> <span class="n">maximum_phase_motor_position</span>
         <span class="c1"># Store the set energy for readback.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_energy</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_energy_set</span> <span class="o">=</span> <span class="n">soft_signal_r_and_setter</span><span class="p">(</span>
             <span class="nb">float</span><span class="p">,</span> <span class="n">initial_value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="n">units</span>
@@ -1059,7 +1067,7 @@ window.addEventListener("load", load);
 <span class="sd">        (May be for future one can use the inverse poly to work out the energy and try to match it with the current energy</span>
 <span class="sd">        to workout the polarisation but during my test the inverse poly is too unstable for general use.)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">gap</span> <span class="o">&gt;</span> <span class="n">MAXIMUM_GAP_MOTOR_POSITION</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">gap</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">maximum_gap_motor_position</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> is not in use, close gap or set polarisation to use this ID&quot;</span>
             <span class="p">)</span>
@@ -1073,19 +1081,19 @@ window.addEventListener("load", load);
         <span class="k">if</span> <span class="p">(</span>
             <span class="n">isclose</span><span class="p">(</span>
                 <span class="n">top_outer</span><span class="p">,</span>
-                <span class="n">MAXIMUM_ROW_PHASE_MOTOR_POSITION</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">maximum_phase_motor_position</span><span class="p">,</span>
                 <span class="n">abs_tol</span><span class="o">=</span><span class="n">ROW_PHASE_MOTOR_TOLERANCE</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="ow">and</span> <span class="n">isclose</span><span class="p">(</span><span class="n">top_inner</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">abs_tol</span><span class="o">=</span><span class="n">ROW_PHASE_MOTOR_TOLERANCE</span><span class="p">)</span>
             <span class="ow">and</span> <span class="n">isclose</span><span class="p">(</span>
                 <span class="n">btm_inner</span><span class="p">,</span>
-                <span class="n">MAXIMUM_ROW_PHASE_MOTOR_POSITION</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">maximum_phase_motor_position</span><span class="p">,</span>
                 <span class="n">abs_tol</span><span class="o">=</span><span class="n">ROW_PHASE_MOTOR_TOLERANCE</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="ow">and</span> <span class="n">isclose</span><span class="p">(</span><span class="n">btm_outer</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">abs_tol</span><span class="o">=</span><span class="n">ROW_PHASE_MOTOR_TOLERANCE</span><span class="p">)</span>
         <span class="p">):</span>
             <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Determined polarisation: LV (Linear Vertical).&quot;</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">Pol</span><span class="o">.</span><span class="n">LV</span><span class="p">,</span> <span class="n">MAXIMUM_ROW_PHASE_MOTOR_POSITION</span>
+            <span class="k">return</span> <span class="n">Pol</span><span class="o">.</span><span class="n">LV</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">maximum_phase_motor_position</span>
         <span class="k">if</span> <span class="p">(</span>
             <span class="n">isclose</span><span class="p">(</span><span class="n">top_outer</span><span class="p">,</span> <span class="n">btm_inner</span><span class="p">,</span> <span class="n">abs_tol</span><span class="o">=</span><span class="n">ROW_PHASE_MOTOR_TOLERANCE</span><span class="p">)</span>
             <span class="ow">and</span> <span class="n">top_outer</span> <span class="o">&gt;</span> <span class="mf">0.0</span>
