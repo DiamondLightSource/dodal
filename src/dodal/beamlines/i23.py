@@ -52,6 +52,10 @@ class I23DetectorPositions(StrictEnum):
 
 
 def _is_i23_machine():
+    """
+    Devices using PVA can only connect from i23 machines, due to the absence of
+    PVA gateways at present.
+    """
     hostname = get_hostname()
     return hostname.startswith("i23-ws") or hostname.startswith("i23-control")
 

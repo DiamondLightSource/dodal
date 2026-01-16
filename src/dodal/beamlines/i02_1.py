@@ -37,7 +37,9 @@ I02_1_ZEBRA_MAPPING = ZebraMapping(
 devices = DeviceManager()
 
 
-@devices.v1_init(EigerDetector, prefix="BL04I-EA-EIGER-01:", wait=False)
+@devices.v1_init(
+    EigerDetector, prefix=f"{PREFIX.beamline_prefix}-EA-EIGER-01:", wait=False
+)
 def eiger(eiger: EigerDetector) -> EigerDetector:
     return eiger
 

@@ -146,9 +146,9 @@ def eiger_beam_center() -> DetectorBeamCenter:
 @devices.factory()
 def commissioning_jungfrau(
     path_provider: PathProvider,
-    path_to_dir: str = "/tmp/jf",  # Device factory doesn't allow for required args,
-    filename: str = "jf_output",  # but these should be manually entered when commissioning
 ) -> CommissioningJungfrau:
+    """Get the commissionning Jungfrau 9M device, which uses a temporary filewriter
+    device in place of Odin while the detector is in commissioning."""
     return CommissioningJungfrau(
         f"{PREFIX.beamline_prefix}-EA-JFRAU-01:",
         f"{PREFIX.beamline_prefix}-JUNGFRAU-META:FD:",
