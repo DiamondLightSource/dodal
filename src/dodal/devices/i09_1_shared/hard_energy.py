@@ -23,7 +23,7 @@ class LookUpTableProvider(Protocol):
 
 class EnergyGapConvertor(Protocol):
     def __call__(self, lut: LookUpTableProvider, value: float, order: int) -> float:
-        """Protocol to provide value conversion using lookup table."""
+        """Protocol to provide value conversion using lookup table provider."""
         ...
 
 

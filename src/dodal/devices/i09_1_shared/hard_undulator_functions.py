@@ -1,7 +1,6 @@
-from typing import Any
-
 import numpy as np
 from daq_config_server.client import ConfigServer
+from daq_config_server.models.converters.lookup_tables import GenericLookupTable
 
 from dodal.devices.i09_1_shared.hard_energy import LookUpTableProvider
 from dodal.log import LOGGER
@@ -9,17 +8,18 @@ from dodal.log import LOGGER
 # Physics constants
 ELECTRON_REST_ENERGY_MEV = 0.510999
 
-# Columns in the lookup table
-RING_ENERGY_COLUMN = 1
-MAGNET_FIELD_COLUMN = 2
-MIN_ENERGY_COLUMN = 3
-MAX_ENERGY_COLUMN = 4
-MIN_GAP_COLUMN = 5
-MAX_GAP_COLUMN = 6
-GAP_OFFSET_COLUMN = 7
+# Column names in the lookup table
+HARMONICS_COLUMN_NAME = "order"
+RING_ENERGY_COLUMN_NAME = "ring_energy_gev"
+MAGNET_FIELD_COLUMN_NAME = "magnetic_field_t"
+MIN_ENERGY_COLUMN_NAME = "energy_min_ev"
+MAX_ENERGY_COLUMN_NAME = "energy_max_ev"
+MIN_GAP_COLUMN_NAME = "gap_min_mm"
+MAX_GAP_COLUMN_NAME = "gap_max_mm"
+GAP_OFFSET_COLUMN_NAME = "gap_offset_mm"
 
 MAGNET_BLOCKS_PER_PERIOD = 4
-MAGNTE_BLOCK_HEIGHT_MM = 16
+MAGNET_BLOCK_HEIGHT_MM = 16
 
 
 class I09HardLutProvider(LookUpTableProvider):
@@ -27,33 +27,47 @@ class I09HardLutProvider(LookUpTableProvider):
         self.config_server = config_server
         self.filepath = filepath
 
-    def get_look_up_table(self) -> dict[int, list]:
-        self._lut = get_convert_lut(self.config_server, self.filepath)
+    def get_look_up_table(self) -> GenericLookupTable:
+        self._lut = self.config_server.get_file_contents(
+            self.filepath,
+            desired_return_type=GenericLookupTable,
+            reset_cached_result=True,
+        )
         return self._lut
 
 
-def get_convert_lut(client: ConfigServer, lut_path: str) -> dict[int, list]:
-    lut_dict: dict[int, list] = {}
-    file_contents: dict = client.get_file_contents(
-        lut_path,
-        desired_return_type=dict,
-        reset_cached_result=True,
-    )
-    lut_values: list[list[Any]] = file_contents["rows"]
-    for i in range(len(lut_values)):
-        lut_dict[int(lut_values[i][0])] = lut_values[i]
-    return lut_dict
-
-
-def _validate_order(order: int, look_up_table: dict[int, list]) -> None:
+def _validate_order(look_up_table: GenericLookupTable, order: int) -> None:
     """Validate that the harmonic order exists in the lookup table."""
-    if order not in look_up_table.keys():
+    order_column_index = look_up_table.get_column_names().index(HARMONICS_COLUMN_NAME)
+    if order not in look_up_table.columns[order_column_index]:
         raise ValueError(f"Order parameter {order} not found in lookup table")
 
 
-def _calculate_gamma(look_up_table: dict[int, list], order: int) -> float:
+def _validate_energy_in_range(
+    look_up_table: GenericLookupTable,
+    energy: float,
+    order: int,
+) -> None:
+    """Check if the requested energy is within the allowed range for the current harmonic order."""
+    min_energy = look_up_table.get_value(
+        HARMONICS_COLUMN_NAME, order, MIN_ENERGY_COLUMN_NAME
+    )
+    max_energy = look_up_table.get_value(
+        HARMONICS_COLUMN_NAME, order, MAX_ENERGY_COLUMN_NAME
+    )
+    if not (min_energy <= energy <= max_energy):
+        raise ValueError(
+            f"Requested energy {energy} keV is out of range for harmonic {order}: "
+            f"[{min_energy}, {max_energy}] keV"
+        )
+
+
+def _calculate_gamma(look_up_table: GenericLookupTable, order: int) -> float:
     """Calculate the Lorentz factor gamma from the lookup table."""
-    return 1000 * look_up_table[order][RING_ENERGY_COLUMN] / ELECTRON_REST_ENERGY_MEV
+    ring_energy_gev = look_up_table.get_value(
+        HARMONICS_COLUMN_NAME, order, "ring_energy_gev"
+    )
+    return 1000 * ring_energy_gev / ELECTRON_REST_ENERGY_MEV
 
 
 def _calculate_undulator_parameter_max(
@@ -72,7 +86,7 @@ def _calculate_undulator_parameter_max(
             / np.pi
         )
         * np.sin(np.pi / MAGNET_BLOCKS_PER_PERIOD)
-        * (1 - np.exp(-2 * np.pi * MAGNTE_BLOCK_HEIGHT_MM / undulator_period_mm))
+        * (1 - np.exp(-2 * np.pi * MAGNET_BLOCK_HEIGHT_MM / undulator_period_mm))
     )
 
 
@@ -98,9 +112,12 @@ def calculate_gap_i09_hu(
     """
     gap_offset: float = 0.0
     undulator_period_mm: int = 27
-    look_up_table = lut.get_look_up_table()
-    _validate_order(order, look_up_table)
+    look_up_table: GenericLookupTable = lut.get_look_up_table()
+
+    # Validate inputs
+    _validate_order(look_up_table, order)
     _validate_energy_in_range(look_up_table, value, order)
+
     gamma = _calculate_gamma(look_up_table, order)
 
     # Constructive interference of radiation emitted at different poles
@@ -125,7 +142,8 @@ def calculate_gap_i09_hu(
     # K = undulator_parameter_max*exp(-pi*gap/lambda_u)
     # Calculating undulator_parameter_max gives:
     undulator_parameter_max = _calculate_undulator_parameter_max(
-        look_up_table[order][MAGNET_FIELD_COLUMN], undulator_period_mm
+        look_up_table.get_value(HARMONICS_COLUMN_NAME, order, MAGNET_FIELD_COLUMN_NAME),
+        undulator_period_mm,
     )
 
     # Finnaly, rearranging the equation:
@@ -133,7 +151,7 @@ def calculate_gap_i09_hu(
     gap = (
         (undulator_period_mm / np.pi)
         * np.log(undulator_parameter_max / undulator_parameter)
-        + look_up_table[order][GAP_OFFSET_COLUMN]
+        + look_up_table.get_value(HARMONICS_COLUMN_NAME, order, GAP_OFFSET_COLUMN_NAME)
         + gap_offset
     )
     LOGGER.debug(f"Calculated gap is {gap}mm for energy {value}keV at order {order}")
@@ -163,16 +181,23 @@ def calculate_energy_i09_hu(
     gap_offset: float = 0.0
     undulator_period_mm: int = 27
 
-    look_up_table = lut.get_look_up_table()
-    _validate_order(order, look_up_table)
+    look_up_table: GenericLookupTable = lut.get_look_up_table()
+    _validate_order(look_up_table, order)
 
     gamma = _calculate_gamma(look_up_table, order)
     undulator_parameter_max = _calculate_undulator_parameter_max(
-        look_up_table[order][MAGNET_FIELD_COLUMN], undulator_period_mm
+        look_up_table.get_value(HARMONICS_COLUMN_NAME, order, MAGNET_FIELD_COLUMN_NAME),
+        undulator_period_mm,
     )
 
     undulator_parameter = undulator_parameter_max / np.exp(
-        (value - look_up_table[order][GAP_OFFSET_COLUMN] - gap_offset)
+        (
+            value
+            - look_up_table.get_value(
+                HARMONICS_COLUMN_NAME, order, GAP_OFFSET_COLUMN_NAME
+            )
+            - gap_offset
+        )
         / (undulator_period_mm / np.pi)
     )
     energy_kev = (
@@ -182,18 +207,3 @@ def calculate_energy_i09_hu(
         / (undulator_period_mm * (np.square(undulator_parameter) + 2))
     )
     return energy_kev
-
-
-def _validate_energy_in_range(
-    look_up_table: dict[int, list],
-    energy: float,
-    current_order: int,
-) -> None:
-    """Check if the requested energy is within the allowed range for the current harmonic order."""
-    min_energy = look_up_table[current_order][MIN_ENERGY_COLUMN]
-    max_energy = look_up_table[current_order][MAX_ENERGY_COLUMN]
-    if not (min_energy <= energy <= max_energy):
-        raise ValueError(
-            f"Requested energy {energy} keV is out of range for harmonic {current_order}: "
-            f"[{min_energy}, {max_energy}] keV"
-        )

@@ -2,11 +2,10 @@ from unittest.mock import MagicMock
 
 import pytest
 from daq_config_server.client import ConfigServer
+from daq_config_server.models.converters.lookup_tables import GenericLookupTable
 
-from dodal.devices.i09_1_shared.hard_undulator_functions import get_convert_lut
-
-lut = {
-    "column_names": [
+lut = GenericLookupTable(
+    column_names=[
         "order",
         "ring_energy_gev",
         "magnetic_field_t",
@@ -16,7 +15,7 @@ lut = {
         "gap_max_mm",
         "gap_offset_mm",
     ],
-    "rows": [
+    rows=[
         [1, 3.00089, 0.98928, 2.12, 3.05, 14.265, 23.72, 0.0],
         [2, 3.04129, 1.02504, 2.5, 2.8, 5.05165, 8.88007, 0.0],
         [3, 3.05798, 1.03065, 2.4, 4.3, 5.2, 8.99036, 0.0],
@@ -33,7 +32,7 @@ lut = {
         [14, 3.06964, 1.03587, 11.0, 18.3, 5.13985, 8.30146, 0.0],
         [15, 3.06515, 1.03391, 11.8, 18.3, 5.14643, 7.8238, 0.0],
     ],
-}
+)
 
 
 @pytest.fixture
@@ -47,10 +46,3 @@ def mock_config_client() -> ConfigServer:
 
     mock_config_client.get_file_contents.side_effect = my_side_effect
     return mock_config_client
-
-
-@pytest.fixture
-def lut_dictionary(
-    mock_config_client: ConfigServer,
-) -> dict:
-    return get_convert_lut(mock_config_client, "")
