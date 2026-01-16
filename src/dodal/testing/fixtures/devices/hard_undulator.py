@@ -4,17 +4,12 @@ import pytest
 from daq_config_server.client import ConfigServer
 from daq_config_server.models.converters.lookup_tables import GenericLookupTable
 
+from dodal.devices.i09_1_shared.hard_undulator_functions import (
+    I09_HU_UNDULATOR_LUT_COLUMN_NAMES,
+)
+
 lut = GenericLookupTable(
-    column_names=[
-        "order",
-        "ring_energy_gev",
-        "magnetic_field_t",
-        "energy_min_eV",
-        "energy_max_eV",
-        "gap_min_mm",
-        "gap_max_mm",
-        "gap_offset_mm",
-    ],
+    column_names=I09_HU_UNDULATOR_LUT_COLUMN_NAMES,
     rows=[
         [1, 3.00089, 0.98928, 2.12, 3.05, 14.265, 23.72, 0.0],
         [2, 3.04129, 1.02504, 2.5, 2.8, 5.05165, 8.88007, 0.0],

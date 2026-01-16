@@ -17,7 +17,16 @@ MAX_ENERGY_COLUMN_NAME = "energy_max_ev"
 MIN_GAP_COLUMN_NAME = "gap_min_mm"
 MAX_GAP_COLUMN_NAME = "gap_max_mm"
 GAP_OFFSET_COLUMN_NAME = "gap_offset_mm"
-
+I09_HU_UNDULATOR_LUT_COLUMN_NAMES = [
+    HARMONICS_COLUMN_NAME,
+    RING_ENERGY_COLUMN_NAME,
+    MAGNET_FIELD_COLUMN_NAME,
+    MIN_ENERGY_COLUMN_NAME,
+    MAX_ENERGY_COLUMN_NAME,
+    MIN_GAP_COLUMN_NAME,
+    MAX_GAP_COLUMN_NAME,
+    GAP_OFFSET_COLUMN_NAME,
+]
 MAGNET_BLOCKS_PER_PERIOD = 4
 MAGNET_BLOCK_HEIGHT_MM = 16
 
@@ -104,8 +113,6 @@ def calculate_gap_i09_hu(
         photon_energy_kev (float): Requested photon energy in keV.
         look_up_table (dict[int, np.ndarray]): Lookup table containing undulator and beamline parameters for each harmonic order.
         order (int, optional): Harmonic order for which to calculate the gap. Defaults to 1.
-        gap_offset (float, optional): Additional gap offset to apply (in mm). Defaults to 0.0.
-        undulator_period_mm (int, optional): Undulator period in mm. Defaults to 27.
 
     Returns:
         float: Calculated undulator gap in millimeters.
@@ -172,8 +179,6 @@ def calculate_energy_i09_hu(
         gap (float): Undulator gap in millimeters.
         look_up_table (dict[int, np.ndarray]): Lookup table containing undulator and beamline parameters for each harmonic order.
         order (int, optional): Harmonic order for which to calculate the energy. Defaults to 1.
-        gap_offset (float, optional): Additional gap offset to apply (in mm). Defaults to 0.0.
-        undulator_period_mm (int, optional): Undulator period in mm. Defaults to 27.
 
     Returns:
         float: Calculated photon energy in keV.
