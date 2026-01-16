@@ -38,7 +38,7 @@ def format_value(v: Any) -> str:
     return repr(v)
 
 
-def get_beamline_code(config_dir: str) -> str:
+def beamline_config_generator(config_dir: str) -> str:
     config_file = os.path.join(config_dir, "config.yaml")
     with open(config_file) as f:
         master_raw: dict = yaml.safe_load(f)
@@ -168,12 +168,10 @@ def translate_beamline_py_config_to_yaml(py_file_path: str, output_dir: str):
         if not any(f"import {t}" in imp or f", {t}" in imp for t in device_types):
             filtered_base_imports.append(imp)
 
-    # Write Output
     os.makedirs(output_dir, exist_ok=True)
 
     master_config = {
         "beamline": beamline_name,
-        "output_file": os.path.basename(py_file_path),
         "base_imports": filtered_base_imports,
         "setup_script": setup_script,
         "device_files": ["devices.yaml"],

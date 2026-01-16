@@ -1,5 +1,4 @@
 beamline: i10
-output_file: i10.py
 base_imports:
 - from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 - from dodal.device_manager import DeviceManager
