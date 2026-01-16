@@ -182,7 +182,7 @@ class OAVConfigBeamCentre(OAVConfigBase[ZoomParamsCrosshair]):
     def _read_display_config(self) -> dict:
         crosshairs = {}
         for zoom, values in self.display_config.zoom_levels.items():
-            crosshairs[str(zoom)] = (values.crosshairX, values.crosshairY)
+            crosshairs[str(zoom)] = (values.crosshair_x, values.crosshair_y)
         return crosshairs
 
     def get_parameters(self) -> dict[str, ZoomParamsCrosshair]:
