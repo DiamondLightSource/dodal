@@ -11,4 +11,15 @@
   import_from: "dodal.devices.i10"
   params:
     prefix: "f'{PREFIX.beamline_prefix}-OP-SWTCH-01:'"
-  factory_args: {}
+  decorators:
+    - name: "devices.factory"
+      args:
+        skip: false
+
+- section: "Mirrors"
+  device: switching_mirror_backup
+  type: PiezoMirror
+  import_from: "dodal.devices.i10"
+  params:
+    prefix: "tbsjkfbnskfbnsk"
+  decorators: [] #no decorators

@@ -11,15 +11,23 @@ from pydantic import BaseModel, Field
 from dodal.log import LOGGER
 
 
-class DeviceModel(BaseModel):
-    device: str = Field(..., description="The name of the function to be generated")
-    type: str = Field(..., description="The Python class type of the device")
-    import_from: str | None = Field(
-        "", description="The module to import the type from"
+class DecoratorModel(BaseModel):
+    name: str = Field(..., description="The decorator name, e.g., 'devices.factory'")
+    args: dict[str, Any] = Field(
+        default_factory=dict, description="Keyword arguments for the decorator"
     )
+
+
+class DeviceModel(BaseModel):
+    device: str
+    type: str
+    import_from: str | None = ""
     section: str = "Other"
     params: dict[str, Any] = Field(default_factory=dict)
-    factory_args: dict[str, Any] = Field(default_factory=dict)
+    # Default to devices.factory() if none provided
+    decorators: list[DecoratorModel] = Field(
+        default_factory=lambda: [DecoratorModel(name="devices.factory")]
+    )
 
 
 class MasterConfigModel(BaseModel):
@@ -77,9 +85,11 @@ def beamline_config_generator(config_dir: str) -> str:
 
     for section_name in sorted(sections.keys()):
         code += f'\n\n""" {section_name} """\n'
+
         for dev in sections[section_name]:
-            f_args = dev.factory_args
-            f_str = ", ".join([f"{k}={repr(v)}" for k, v in f_args.items()])
+            for dec in dev.decorators:
+                arg_str = ", ".join([f"{k}={repr(v)}" for k, v in dec.args.items()])
+                code += f"\n@{dec.name}({arg_str})"
 
             if dev.params:
                 args = ",\n        ".join(
@@ -89,7 +99,7 @@ def beamline_config_generator(config_dir: str) -> str:
             else:
                 body = f"{dev.type}()"
 
-            code += f"\n@devices.factory({f_str})\ndef {dev.device}() -> {dev.type}:\n    return {body}\n"
+            code += f"\ndef {dev.device}() -> {dev.type}:\n    return {body}\n"
     try:
         fmt = subprocess.run(
             ["ruff", "format", "-"],
@@ -132,15 +142,6 @@ def translate_beamline_py_config_to_yaml(py_file_path: str, output_dir: str):
                 "type": ret_type,
                 "import_from": import_map.get(ret_type, "unknown.module"),
             }
-
-            for decorator in node.decorator_list:
-                if isinstance(decorator, ast.Call) and "factory" in ast.unparse(
-                    decorator
-                ):
-                    device_meta["factory_args"] = {
-                        kw.arg: ast.literal_eval(kw.value) for kw in decorator.keywords
-                    }
-
             if node.body and isinstance(node.body[0], ast.Return):
                 ret_val = node.body[0].value
                 if isinstance(ret_val, ast.Call):

@@ -4,7 +4,6 @@
   import_from: "dodal.devices.i10.rasor.rasor_scaler_cards"
   params:
     prefix: "ME01D-EA-SCLR-01:SCALER1"
-  factory_args: { mock: true }
 
 - section: "Rasor Detectors"
   device: rasor_sr570
@@ -12,7 +11,6 @@
   import_from: "dodal.devices.i10.rasor.rasor_current_amp"
   params:
     prefix: "ME01D-EA-IAMP"
-  factory_args: { mock: true }
 
 - section: "Rasor Detectors"
   device: rasor_sr570_pa_scaler_det
@@ -21,4 +19,7 @@
   params:
     current_amp: "rasor_sr570().ca1"
     counter: "rasor_det_scalers().det"
-  factory_args: { mock: true, skip: true }
+  decorators:
+    - name: "devices.factory"
+      args:
+        mock: true
