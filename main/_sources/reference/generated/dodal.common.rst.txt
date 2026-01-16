@@ -17,6 +17,7 @@
    ~common.EnabledDisabledUpper
    ~common.InOutUpper
    ~common.OnOffUpper
+   ~common.Rectangle2D
 
 
 

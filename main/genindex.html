@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Index &#8212; dodal 1.68.1.dev20+g905cd1f0c documentation</title>
+    <title>Index &#8212; dodal 1.68.1.dev21+gd245f0ae6 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="_static/documentation_options.js?v=f2a1e29f"></script>
+    <script src="_static/documentation_options.js?v=fd81a28f"></script>
     <script src="_static/doctools.js?v=9a2dae69"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -818,6 +818,7 @@ window.addEventListener("load", load);
 <li class="toctree-l3"><a class="reference internal" href="reference/generated/dodal.common.EnabledDisabledUpper.html">dodal.common.EnabledDisabledUpper</a></li>
 <li class="toctree-l3"><a class="reference internal" href="reference/generated/dodal.common.InOutUpper.html">dodal.common.InOutUpper</a></li>
 <li class="toctree-l3"><a class="reference internal" href="reference/generated/dodal.common.OnOffUpper.html">dodal.common.OnOffUpper</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/generated/dodal.common.Rectangle2D.html">dodal.common.Rectangle2D</a></li>
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="reference/generated/dodal.devices.html">dodal.devices</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -1707,15 +1708,17 @@ window.addEventListener("load", load);
 </li>
       <li><a href="reference/generated/dodal.devices.i24.pmac.ProgramRunner.html#dodal.devices.i24.pmac.ProgramRunner.complete">complete() (dodal.devices.i24.pmac.ProgramRunner method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/generated/dodal.devices.oav.snapshots.snapshot_image_processing.html#dodal.devices.oav.snapshots.snapshot_image_processing.compute_beam_centre_pixel_xy_for_mm_position">compute_beam_centre_pixel_xy_for_mm_position() (in module dodal.devices.oav.snapshots.snapshot_image_processing)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/generated/dodal.devices.insertion_device.ConfigServerEnergyMotorLookup.html#dodal.devices.insertion_device.ConfigServerEnergyMotorLookup">ConfigServerEnergyMotorLookup (class in dodal.devices.insertion_device)</a>
 </li>
       <li><a href="reference/generated/dodal.devices.oav.oav_detector.InstantMovingZoom.html#dodal.devices.oav.oav_detector.InstantMovingZoom.connect">connect() (dodal.devices.oav.oav_detector.InstantMovingZoom method)</a>
 </li>
       <li><a href="reference/generated/dodal.devices.controllers.ConstantDeadTimeController.html#dodal.devices.controllers.ConstantDeadTimeController">ConstantDeadTimeController (class in dodal.devices.controllers)</a>
+</li>
+      <li><a href="reference/generated/dodal.common.Rectangle2D.html#dodal.common.Rectangle2D.contains">contains() (dodal.common.Rectangle2D method)</a>
 </li>
       <li><a href="reference/generated/dodal.devices.temperture_controller.Lakeshore.html#dodal.devices.temperture_controller.Lakeshore.control_channel">control_channel (dodal.devices.temperture_controller.Lakeshore attribute)</a>
 </li>
@@ -3568,8 +3571,16 @@ window.addEventListener("load", load);
 </li>
       <li><a href="reference/generated/dodal.devices.oav.oav_parameters.OAVParameters.html#dodal.devices.oav.oav_parameters.OAVParameters.get_max_tip_distance_in_pixels">get_max_tip_distance_in_pixels() (dodal.devices.oav.oav_parameters.OAVParameters method)</a>
 </li>
+      <li><a href="reference/generated/dodal.common.Rectangle2D.html#dodal.common.Rectangle2D.get_max_x">get_max_x() (dodal.common.Rectangle2D method)</a>
+</li>
+      <li><a href="reference/generated/dodal.common.Rectangle2D.html#dodal.common.Rectangle2D.get_max_y">get_max_y() (dodal.common.Rectangle2D method)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/generated/dodal.common.Rectangle2D.html#dodal.common.Rectangle2D.get_min_x">get_min_x() (dodal.common.Rectangle2D method)</a>
+</li>
+      <li><a href="reference/generated/dodal.common.Rectangle2D.html#dodal.common.Rectangle2D.get_min_y">get_min_y() (dodal.common.Rectangle2D method)</a>
+</li>
       <li><a href="reference/generated/dodal.devices.oav.utils.html#dodal.devices.oav.utils.get_move_required_so_that_beam_is_at_pixel">get_move_required_so_that_beam_is_at_pixel() (in module dodal.devices.oav.utils)</a>
 </li>
       <li><a href="reference/generated/dodal.devices.oav.oav_to_redis_forwarder.html#dodal.devices.oav.oav_to_redis_forwarder.get_next_jpeg">get_next_jpeg() (in module dodal.devices.oav.oav_to_redis_forwarder)</a>
@@ -4581,6 +4592,8 @@ window.addEventListener("load", load);
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/generated/dodal.common.Rectangle2D.html#dodal.common.Rectangle2D">Rectangle2D (class in dodal.common)</a>
+</li>
       <li><a href="reference/generated/dodal.devices.i11.nx100robot.RobotJobs.html#dodal.devices.i11.nx100robot.RobotJobs">RobotJobs (class in dodal.devices.i11.nx100robot)</a>
 </li>
       <li><a href="reference/generated/dodal.devices.i11.nx100robot.RobotSampleState.html#dodal.devices.i11.nx100robot.RobotSampleState">RobotSampleState (class in dodal.devices.i11.nx100robot)</a>
@@ -5001,6 +5014,10 @@ window.addEventListener("load", load);
         <li><a href="reference/generated/dodal.devices.mx_phase1.beamstop.Beamstop.html#dodal.devices.mx_phase1.beamstop.Beamstop.x">(dodal.devices.mx_phase1.beamstop.Beamstop attribute)</a>
 </li>
       </ul></li>
+      <li><a href="reference/generated/dodal.common.Rectangle2D.html#dodal.common.Rectangle2D.x1">x1 (dodal.common.Rectangle2D attribute)</a>
+</li>
+      <li><a href="reference/generated/dodal.common.Rectangle2D.html#dodal.common.Rectangle2D.x2">x2 (dodal.common.Rectangle2D attribute)</a>
+</li>
       <li><a href="reference/generated/dodal.devices.xbpm_feedback.XBPMFeedback.html#dodal.devices.xbpm_feedback.XBPMFeedback">XBPMFeedback (class in dodal.devices.xbpm_feedback)</a>
 </li>
       <li><a href="reference/generated/dodal.devices.zocalo.XrcResult.html#dodal.devices.zocalo.XrcResult">XrcResult (class in dodal.devices.zocalo)</a>
@@ -5011,10 +5028,10 @@ window.addEventListener("load", load);
 </li>
       <li><a href="reference/generated/dodal.devices.xspress3.xspress3_channel.Xspress3ROIChannel.html#dodal.devices.xspress3.xspress3_channel.Xspress3ROIChannel">Xspress3ROIChannel (class in dodal.devices.xspress3.xspress3_channel)</a>
 </li>
-      <li><a href="reference/generated/dodal.devices.motors.XThetaStage.html#dodal.devices.motors.XThetaStage">XThetaStage (class in dodal.devices.motors)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/generated/dodal.devices.motors.XThetaStage.html#dodal.devices.motors.XThetaStage">XThetaStage (class in dodal.devices.motors)</a>
+</li>
       <li><a href="reference/generated/dodal.devices.motors.XYPhiStage.html#dodal.devices.motors.XYPhiStage">XYPhiStage (class in dodal.devices.motors)</a>
 </li>
       <li><a href="reference/generated/dodal.devices.motors.XYPitchStage.html#dodal.devices.motors.XYPitchStage">XYPitchStage (class in dodal.devices.motors)</a>
@@ -5049,6 +5066,10 @@ window.addEventListener("load", load);
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/generated/dodal.common.Rectangle2D.html#dodal.common.Rectangle2D.y1">y1 (dodal.common.Rectangle2D attribute)</a>
+</li>
+      <li><a href="reference/generated/dodal.common.Rectangle2D.html#dodal.common.Rectangle2D.y2">y2 (dodal.common.Rectangle2D attribute)</a>
+</li>
       <li><a href="reference/generated/dodal.devices.attenuator.attenuator.YesNo.html#dodal.devices.attenuator.attenuator.YesNo">YesNo (class in dodal.devices.attenuator.attenuator)</a>
 </li>
       <li><a href="reference/generated/dodal.devices.motors.YZStage.html#dodal.devices.motors.YZStage">YZStage (class in dodal.devices.motors)</a>
