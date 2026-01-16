@@ -3,14 +3,7 @@ from dodal.common.beamlines.beamline_utils import (
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.devices.electron_analyser.base import DualEnergySource
-from dodal.devices.electron_analyser.vgscienta import VGScientaDetector
-from dodal.devices.p60 import (
-    LabXraySource,
-    LabXraySourceReadable,
-    LensMode,
-    PassEnergy,
-    PsuMode,
-)
+from dodal.devices.p60 import R4000, LabXraySource, LabXraySourceReadable
 from dodal.devices.selectable_source import SourceSelector
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
@@ -48,11 +41,5 @@ def energy_source() -> DualEnergySource:
 # Connect will work again after this work completed
 # https://jira.diamond.ac.uk/browse/P60-13
 @device_factory()
-def r4000() -> VGScientaDetector[LensMode, PsuMode, PassEnergy]:
-    return VGScientaDetector[LensMode, PsuMode, PassEnergy](
-        prefix=f"{PREFIX.beamline_prefix}-EA-DET-01:CAM:",
-        lens_mode_type=LensMode,
-        psu_mode_type=PsuMode,
-        pass_energy_type=PassEnergy,
-        energy_source=energy_source(),
-    )
+def r4000() -> R4000:
+    return R4000(f"{PREFIX.beamline_prefix}-EA-DET-01:CAM:", energy_source())

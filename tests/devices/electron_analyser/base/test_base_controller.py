@@ -3,7 +3,7 @@ from unittest.mock import AsyncMock, patch
 import pytest
 from ophyd_async.core import InOut, TriggerInfo, get_mock_put, init_devices
 
-from dodal.beamlines import b07, i09
+from dodal.devices import b07, b07_shared, i09
 from dodal.devices.electron_analyser.base import (
     AbstractAnalyserDriverIO,
     AbstractBaseRegion,
@@ -28,7 +28,7 @@ from tests.devices.electron_analyser.helper_util import (
 
 @pytest.fixture(
     params=[
-        SpecsAnalyserDriverIO[b07.LensMode, b07.PsuMode],
+        SpecsAnalyserDriverIO[b07.LensMode, b07_shared.PsuMode],
         VGScientaAnalyserDriverIO[i09.LensMode, i09.PsuMode, i09.PassEnergy],
     ]
 )

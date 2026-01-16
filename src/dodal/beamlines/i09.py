@@ -12,15 +12,12 @@ from dodal.devices.common_dcm import (
 from dodal.devices.electron_analyser.base import (
     DualEnergySource,
 )
-from dodal.devices.electron_analyser.vgscienta import VGScientaDetector
 from dodal.devices.fast_shutter import DualFastShutter, GenericFastShutter
-from dodal.devices.i09 import Grating, LensMode, PassEnergy, PsuMode
+from dodal.devices.i09 import EW4000, Grating
 from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.devices.selectable_source import SourceSelector
 from dodal.devices.synchrotron import Synchrotron
-from dodal.devices.temperture_controller import (
-    Lakeshore336,
-)
+from dodal.devices.temperture_controller import Lakeshore336
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
@@ -86,12 +83,9 @@ def dual_fast_shutter() -> DualFastShutter[InOut]:
 # Connect will work again after this work completed
 # https://jira.diamond.ac.uk/browse/I09-651
 @device_factory()
-def ew4000() -> VGScientaDetector[LensMode, PsuMode, PassEnergy]:
-    return VGScientaDetector[LensMode, PsuMode, PassEnergy](
+def ew4000() -> EW4000:
+    return EW4000(
         prefix=f"{I_PREFIX.beamline_prefix}-EA-DET-01:CAM:",
-        lens_mode_type=LensMode,
-        psu_mode_type=PsuMode,
-        pass_energy_type=PassEnergy,
         energy_source=dual_energy_source(),
         shutter=dual_fast_shutter(),
         source_selector=source_selector(),

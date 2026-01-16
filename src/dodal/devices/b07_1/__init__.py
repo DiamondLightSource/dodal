@@ -1,10 +1,9 @@
-from dodal.devices.b07_1.ccmc import (
-    ChannelCutMonochromator,
-    ChannelCutMonochromatorPositions,
-)
-from dodal.devices.b07_1.enums import Grating, LensMode
+from .analyser import SpecsPhoibos
+from .ccmc import ChannelCutMonochromator, ChannelCutMonochromatorPositions
+from .enums import Grating, LensMode
 
 __all__ = [
+    "SpecsPhoibos",
     "Grating",
     "LensMode",
     "ChannelCutMonochromator",

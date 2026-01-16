@@ -10,6 +10,7 @@ from ophyd_async.testing import (
 )
 
 import dodal.devices.b07 as b07
+import dodal.devices.b07_shared as b07_shared
 import dodal.devices.i09 as i09
 from dodal.devices.electron_analyser.base import (
     EnergySource,
@@ -22,13 +23,11 @@ from dodal.devices.electron_analyser.vgscienta import VGScientaDetector
 from dodal.testing.electron_analyser import create_detector
 from tests.devices.electron_analyser.helper_util import get_test_sequence
 
+VGScientaDetector = VGScientaDetector[i09.LensMode, i09.PsuMode, i09.PassEnergy]
+SpecsDetector = SpecsDetector[b07.LensMode, b07_shared.PsuMode]
 
-@pytest.fixture(
-    params=[
-        VGScientaDetector[i09.LensMode, i09.PsuMode, i09.PassEnergy],
-        SpecsDetector[b07.LensMode, b07.PsuMode],
-    ]
-)
+
+@pytest.fixture(params=[VGScientaDetector, SpecsDetector])
 async def sim_detector(
     request: pytest.FixtureRequest,
     single_energy_source: EnergySource,

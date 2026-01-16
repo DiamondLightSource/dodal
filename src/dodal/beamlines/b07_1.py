@@ -1,13 +1,7 @@
 from dodal.common.beamlines.beamline_utils import device_factory
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.devices.b07 import PsuMode
-from dodal.devices.b07_1 import (
-    ChannelCutMonochromator,
-    Grating,
-    LensMode,
-)
+from dodal.devices.b07_1 import ChannelCutMonochromator, Grating, SpecsPhoibos
 from dodal.devices.electron_analyser.base import EnergySource
-from dodal.devices.electron_analyser.specs import SpecsDetector
 from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.devices.synchrotron import Synchrotron
 from dodal.log import set_beamline as set_log_beamline
@@ -32,8 +26,6 @@ def pgm() -> PlaneGratingMonochromator:
     )
 
 
-# Connect will work again after this work completed
-# https://jira.diamond.ac.uk/browse/B07-1104
 @device_factory()
 def ccmc() -> ChannelCutMonochromator:
     return ChannelCutMonochromator(prefix=f"{PREFIX.beamline_prefix}-OP-CCM-01:")
@@ -44,11 +36,8 @@ def energy_source() -> EnergySource:
     return EnergySource(pgm().energy.user_readback)
 
 
+# Connect will work again after this work completed
+# https://jira.diamond.ac.uk/browse/B07-1104
 @device_factory()
-def analyser() -> SpecsDetector[LensMode, PsuMode]:
-    return SpecsDetector[LensMode, PsuMode](
-        prefix=f"{PREFIX.beamline_prefix}-EA-DET-01:CAM:",
-        lens_mode_type=LensMode,
-        psu_mode_type=PsuMode,
-        energy_source=energy_source(),
-    )
+def analyser() -> SpecsPhoibos:
+    return SpecsPhoibos(f"{PREFIX.beamline_prefix}-EA-DET-01:CAM:", energy_source())
