@@ -90,7 +90,6 @@ def beamline_config_generator(config_dir: str) -> str:
                 body = f"{dev.type}()"
 
             code += f"\n@devices.factory({f_str})\ndef {dev.device}() -> {dev.type}:\n    return {body}\n"
-            print(code)
     try:
         fmt = subprocess.run(
             ["ruff", "format", "-"],
