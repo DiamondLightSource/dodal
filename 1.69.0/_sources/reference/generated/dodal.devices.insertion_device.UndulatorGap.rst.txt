@@ -1,0 +1,62 @@
+dodal.devices.insertion\_device.UndulatorGap
+============================================
+
+.. currentmodule:: dodal.devices.insertion_device
+
+.. autoclass:: UndulatorGap
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~UndulatorGap.get_timeout
+      
+      
+      
+      
+      ~UndulatorGap.prepare
+      
+      
+      
+      
+      
+      
+      ~UndulatorGap.set_demand_positions
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      ~UndulatorGap.user_setpoint
+      
+   
+   

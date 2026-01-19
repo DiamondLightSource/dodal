@@ -1,0 +1,102 @@
+dodal.devices.i11.nx100robot.RobotJobs
+======================================
+
+.. currentmodule:: dodal.devices.i11.nx100robot
+
+.. autoclass:: RobotJobs
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~RobotJobs.RECOVER
+      
+      
+      ~RobotJobs.PICK_CAROUSEL
+      
+      
+      ~RobotJobs.PLACE_CAROUSEL
+      
+      
+      ~RobotJobs.PICK_DIFFRACTOMETER
+      
+      
+      ~RobotJobs.PLACE_DIFFRACTOMETER
+      
+      
+      ~RobotJobs.GRIPO
+      
+      
+      ~RobotJobs.GRIPC
+      
+      
+      ~RobotJobs.TABLEIN
+      
+      
+      ~RobotJobs.TABLEOUT
+      
+      
+      ~RobotJobs.UNLOAD
+      
+   
+   

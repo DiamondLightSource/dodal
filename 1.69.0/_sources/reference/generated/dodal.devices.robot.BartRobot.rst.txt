@@ -1,0 +1,64 @@
+dodal.devices.robot.BartRobot
+=============================
+
+.. currentmodule:: dodal.devices.robot
+
+.. autoclass:: BartRobot
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      ~BartRobot.beamline_status_or_error
+      
+      
+      
+      
+      
+      
+      
+      
+      ~BartRobot.set
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~BartRobot.LIGHT_CURTAIN_TRIPPED
+      
+      
+      ~BartRobot.LOAD_TIMEOUT
+      
+      
+      ~BartRobot.LOAD_TOLERANCE_MM
+      
+      
+      ~BartRobot.NOT_BUSY_TIMEOUT
+      
+      
+      ~BartRobot.NO_ERROR
+      
+      
+      ~BartRobot.NO_PIN_ERROR_CODE
+      
+      
+      
+      
+      
+   
+   

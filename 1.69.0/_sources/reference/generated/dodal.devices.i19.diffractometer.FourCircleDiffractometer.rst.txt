@@ -1,0 +1,40 @@
+dodal.devices.i19.diffractometer.FourCircleDiffractometer
+=========================================================
+
+.. currentmodule:: dodal.devices.i19.diffractometer
+
+.. autoclass:: FourCircleDiffractometer
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

@@ -1,0 +1,40 @@
+dodal.devices.i11.diff\_stages.DiffractometerBase
+=================================================
+
+.. currentmodule:: dodal.devices.i11.diff_stages
+
+.. autoclass:: DiffractometerBase
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

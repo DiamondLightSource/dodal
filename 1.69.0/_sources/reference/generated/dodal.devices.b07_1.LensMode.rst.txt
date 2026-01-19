@@ -1,0 +1,87 @@
+dodal.devices.b07\_1.LensMode
+=============================
+
+.. currentmodule:: dodal.devices.b07_1
+
+.. autoclass:: LensMode
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~LensMode.SMALL_AREA
+      
+      
+      ~LensMode.ANGLE_RESOLVED_MODE_22
+      
+      
+      ~LensMode.ANGLE_RESOLVED_MODE_30
+      
+      
+      ~LensMode.LARGE_AREA
+      
+      
+      ~LensMode.NOT_CONNECTED
+      
+   
+   

@@ -1,0 +1,46 @@
+dodal.devices.i09\_1\_shared.HardEnergy
+=======================================
+
+.. currentmodule:: dodal.devices.i09_1_shared
+
+.. autoclass:: HardEnergy
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      ~HardEnergy.locate
+      
+      
+      
+      
+      ~HardEnergy.set
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

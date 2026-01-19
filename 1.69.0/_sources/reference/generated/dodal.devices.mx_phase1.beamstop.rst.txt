@@ -1,0 +1,37 @@
+dodal.devices.mx\_phase1.beamstop
+=================================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices.mx_phase1
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~beamstop.Beamstop
+   ~beamstop.BeamstopPositions
+
+
+
+
+.. automodule:: dodal.devices.mx_phase1.beamstop
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

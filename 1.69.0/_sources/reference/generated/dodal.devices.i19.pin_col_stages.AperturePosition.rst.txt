@@ -1,0 +1,67 @@
+dodal.devices.i19.pin\_col\_stages.AperturePosition
+===================================================
+
+.. currentmodule:: dodal.devices.i19.pin_col_stages
+
+.. autoclass:: AperturePosition
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      ~AperturePosition.model_config
+      
+      
+      
+      
+      
+      ~AperturePosition.pinhole_x
+      
+      
+      ~AperturePosition.pinhole_y
+      
+      
+      ~AperturePosition.collimator_x
+      
+      
+      ~AperturePosition.collimator_y
+      
+   
+   

@@ -1,0 +1,50 @@
+dodal.devices.fast\_shutter.DualFastShutter
+===========================================
+
+.. currentmodule:: dodal.devices.fast_shutter
+
+.. autoclass:: DualFastShutter
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      ~DualFastShutter.open_state
+      
+      
+      ~DualFastShutter.close_state
+      
+      
+      ~DualFastShutter.shutter_state
+      
+   
+   

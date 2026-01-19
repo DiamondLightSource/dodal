@@ -1,0 +1,37 @@
+dodal.devices.i11.diff\_stages
+==============================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices.i11
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~diff_stages.DiffractometerBase
+   ~diff_stages.DiffractometerStage
+
+
+
+
+.. automodule:: dodal.devices.i11.diff_stages
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

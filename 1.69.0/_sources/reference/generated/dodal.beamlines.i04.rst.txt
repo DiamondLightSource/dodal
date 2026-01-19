@@ -1,0 +1,33 @@
+dodal.beamlines.i04
+===================
+
+
+
+
+
+
+
+
+
+
+.. automodule:: dodal.beamlines.i04
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      daq_configuration_path
+   
+   
+
+   
+   
+   
