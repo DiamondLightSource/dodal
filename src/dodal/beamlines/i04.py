@@ -277,7 +277,9 @@ def pin_tip_detection() -> PinTipDetection:
 
 
 @devices.factory()
-def scintillator(aperture_scatterguard: ApertureScatterguard, beamstop: Beamstop) -> Scintillator:
+def scintillator(
+    aperture_scatterguard: ApertureScatterguard, beamstop: Beamstop
+) -> Scintillator:
     return Scintillator(
         f"{PREFIX.beamline_prefix}-MO-SCIN-01:",
         Reference(aperture_scatterguard),
