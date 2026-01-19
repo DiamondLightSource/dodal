@@ -20,6 +20,8 @@ from dodal.devices.insertion_device import (
 
 pytest_plugins = ["dodal.testing.fixtures.devices.apple2"]
 
+TEST_MAXIMUM_ROW_PHASE_MOTOR_POSITION = 24.0
+
 
 @pytest.fixture
 async def mock_locked_phase_axes(
@@ -57,6 +59,7 @@ class DummyLockedApple2Controller(Apple2Controller[Apple2[UndulatorLockedPhaseAx
             apple2=apple2,
             gap_energy_motor_converter=gap_energy_motor_converter,
             phase_energy_motor_converter=phase_energy_motor_converter,
+            maximum_phase_motor_position=TEST_MAXIMUM_ROW_PHASE_MOTOR_POSITION,
             name=name,
         )
 
@@ -95,7 +98,16 @@ async def mock_locked_controller(
     "pol, expect_top_outer, expect_btm_inner",
     [
         (Pol.LH, 0.0, 0.0),
-        (Pol.LV, 24.0, 24.0),
+        (
+            Pol.LV,
+            TEST_MAXIMUM_ROW_PHASE_MOTOR_POSITION,
+            TEST_MAXIMUM_ROW_PHASE_MOTOR_POSITION,
+        ),
+        (
+            Pol.LV,
+            -TEST_MAXIMUM_ROW_PHASE_MOTOR_POSITION,
+            -TEST_MAXIMUM_ROW_PHASE_MOTOR_POSITION,
+        ),
         (Pol.PC, 16.5, 16.5),
         (Pol.NC, -15.5, -15.5),
         (Pol.LA, -16.4, 16.4),
