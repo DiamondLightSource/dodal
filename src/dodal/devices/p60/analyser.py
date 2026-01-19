@@ -15,12 +15,12 @@ class R4000(VGScientaDetector[LensMode, PsuMode, PassEnergy]):
         name: str = "",
     ):
         super().__init__(
-            prefix,
-            LensMode,
-            PsuMode,
-            PassEnergy,
-            energy_source,
-            None,
-            None,
-            name,
+            prefix=prefix,
+            lens_mode_type=LensMode,
+            psu_mode_type=PsuMode,
+            pass_energy_type=PassEnergy,
+            energy_source=energy_source,
+            shutter=None,
+            source_selector=None,
+            name=name,
         )
