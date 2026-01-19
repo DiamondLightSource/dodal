@@ -8,8 +8,7 @@ from dodal.devices.common_dcm import (
     StationaryCrystal,
 )
 from dodal.devices.electron_analyser.base import EnergySource
-from dodal.devices.electron_analyser.specs import SpecsDetector
-from dodal.devices.i09_1 import LensMode, PsuMode
+from dodal.devices.i09_1 import SpecsPhoibos225
 from dodal.devices.i09_1_shared.hard_energy import HardEnergy, HardInsertionDeviceEnergy
 from dodal.devices.i09_1_shared.hard_undulator_functions import (
     calculate_energy_i09_hu,
@@ -49,13 +48,8 @@ def energy_source() -> EnergySource:
 # Connect will work again after this work completed
 # https://jira.diamond.ac.uk/browse/I09-651
 @device_factory(skip=True)
-def analyser() -> SpecsDetector[LensMode, PsuMode]:
-    return SpecsDetector[LensMode, PsuMode](
-        prefix=f"{PREFIX.beamline_prefix}-EA-DET-02:CAM:",
-        lens_mode_type=LensMode,
-        psu_mode_type=PsuMode,
-        energy_source=energy_source(),
-    )
+def analyser() -> SpecsPhoibos225:
+    return SpecsPhoibos225(f"{PREFIX.beamline_prefix}-EA-DET-02:CAM:", energy_source())
 
 
 @device_factory()
