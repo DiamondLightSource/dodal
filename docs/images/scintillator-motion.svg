@@ -143,18 +143,18 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.7"
-     inkscape:cx="-100.78553"
-     inkscape:cy="440.79498"
+     inkscape:zoom="0.98994949"
+     inkscape:cx="21.357968"
+     inkscape:cy="384.80054"
      inkscape:document-units="mm"
-     inkscape:current-layer="layer1"
+     inkscape:current-layer="g2362"
      inkscape:document-rotation="0"
      showgrid="false"
      inkscape:snap-page="true"
      inkscape:window-width="1682"
      inkscape:window-height="863"
      inkscape:window-x="238"
-     inkscape:window-y="314"
+     inkscape:window-y="203"
      inkscape:window-maximized="0"
      fit-margin-top="0"
      fit-margin-left="0"
@@ -242,15 +242,15 @@
            id="path155-9"
            style="fill:#e9e9ff;fill-rule:evenodd;stroke:none;stroke-linejoin:round"
            inkscape:box3dsidetype="11"
-           points="130.0731,77.855811 130.0731,165.40224 126.21895,163.76541 126.21895,76.218975 "
-           d="m 126.21895,76.218975 3.85415,1.636836 v 87.546429 l -3.85415,-1.63683 z" />
+           points="130.0731,77.855811 130.0731,165.40224 126.21895,163.76541 126.21895,76.218974 "
+           d="m 126.21895,76.218974 3.85415,1.636837 v 87.546429 l -3.85415,-1.63683 z" />
         <path
            sodipodi:type="inkscape:box3dside"
            id="path145-7"
            style="fill:#353564;fill-rule:evenodd;stroke:none;stroke-linejoin:round"
            inkscape:box3dsidetype="6"
-           points="116.35042,169.46301 126.21895,163.76541 126.21895,76.218975 116.35042,81.916576 "
-           d="m 116.35042,81.916576 v 87.546434 l 9.86853,-5.6976 V 76.218975 Z" />
+           points="116.35042,169.46301 126.21895,163.76541 126.21895,76.218974 116.35042,81.916576 "
+           d="m 116.35042,81.916576 v 87.546434 l 9.86853,-5.6976 V 76.218974 Z" />
         <path
            sodipodi:type="inkscape:box3dside"
            id="path153-3"
@@ -263,8 +263,8 @@
            id="path147-6"
            style="fill:#4d4d9f;fill-rule:evenodd;stroke:none;stroke-linejoin:round"
            inkscape:box3dsidetype="5"
-           points="120.20457,83.553413 130.0731,77.855811 126.21895,76.218975 116.35042,81.916576 "
-           d="m 116.35042,81.916576 3.85415,1.636837 9.86853,-5.697602 -3.85415,-1.636836 z" />
+           points="120.20457,83.553413 130.0731,77.855811 126.21895,76.218974 116.35042,81.916576 "
+           d="m 116.35042,81.916576 3.85415,1.636837 9.86853,-5.697602 -3.85415,-1.636837 z" />
         <path
            sodipodi:type="inkscape:box3dside"
            id="path151-1"
@@ -292,15 +292,15 @@
            id="path433"
            style="fill:#e9e9ff;fill-rule:evenodd;stroke:none;stroke-linejoin:round"
            inkscape:box3dsidetype="11"
-           d="m 130.18779,77.789598 2.95948,1.256878 v 35.811694 l -2.95948,-1.25688 z"
-           points="133.14727,79.046476 133.14727,114.85817 130.18779,113.60129 130.18779,77.789598 " />
+           d="m 130.18779,77.789597 2.95948,1.256879 v 35.811694 l -2.95948,-1.25688 z"
+           points="133.14727,79.046476 133.14727,114.85817 130.18779,113.60129 130.18779,77.789597 " />
         <path
            sodipodi:type="inkscape:box3dside"
            id="path423"
            style="fill:#353564;fill-rule:evenodd;stroke:none;stroke-linejoin:round"
            inkscape:box3dsidetype="6"
-           d="M 120.20457,83.553413 V 119.3651 l 9.98322,-5.76381 V 77.789598 Z"
-           points="120.20457,119.3651 130.18779,113.60129 130.18779,77.789598 120.20457,83.553413 " />
+           d="M 120.20457,83.553413 V 119.3651 l 9.98322,-5.76381 V 77.789597 Z"
+           points="120.20457,119.3651 130.18779,113.60129 130.18779,77.789597 120.20457,83.553413 " />
         <path
            sodipodi:type="inkscape:box3dside"
            id="path431"
@@ -313,22 +313,22 @@
            id="path425"
            style="fill:#4d4d9f;fill-rule:evenodd;stroke:none;stroke-linejoin:round"
            inkscape:box3dsidetype="5"
-           d="m 120.20457,83.553413 2.95948,1.256879 9.98322,-5.763816 -2.95948,-1.256878 z"
-           points="123.16405,84.810292 133.14727,79.046476 130.18779,77.789598 120.20457,83.553413 " />
+           d="m 120.20457,83.553413 2.95948,1.256878 9.98322,-5.763815 -2.95948,-1.256879 z"
+           points="123.16405,84.810291 133.14727,79.046476 130.18779,77.789597 120.20457,83.553413 " />
         <path
            sodipodi:type="inkscape:box3dside"
            id="path429"
            style="fill:#d7d7ff;fill-rule:evenodd;stroke:none;stroke-linejoin:round"
            inkscape:box3dsidetype="14"
-           d="m 123.16405,84.810292 v 35.811688 l 9.98322,-5.76381 V 79.046476 Z"
-           points="123.16405,120.62198 133.14727,114.85817 133.14727,79.046476 123.16405,84.810292 " />
+           d="m 123.16405,84.810291 v 35.811689 l 9.98322,-5.76381 V 79.046476 Z"
+           points="123.16405,120.62198 133.14727,114.85817 133.14727,79.046476 123.16405,84.810291 " />
         <path
            sodipodi:type="inkscape:box3dside"
            id="path427"
            style="fill:#8686bf;fill-rule:evenodd;stroke:none;stroke-linejoin:round"
            inkscape:box3dsidetype="3"
-           d="m 120.20457,83.553413 2.95948,1.256879 v 35.811688 l -2.95948,-1.25688 z"
-           points="123.16405,84.810292 123.16405,120.62198 120.20457,119.3651 120.20457,83.553413 " />
+           d="m 120.20457,83.553413 2.95948,1.256878 v 35.811689 l -2.95948,-1.25688 z"
+           points="123.16405,84.810291 123.16405,120.62198 120.20457,119.3651 120.20457,83.553413 " />
       </g>
       <ellipse
          style="fill:#ff0000;fill-rule:evenodd;stroke-width:0.264583"
@@ -440,7 +440,7 @@
            id="tspan1981" /></text>
       <path
          style="fill:none;stroke:#000000;stroke-width:0.265;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#Arrow1Lstart-4)"
-         d="M 27.322665,212.04106 73.295437,186.02271"
+         d="M 78.453323,207.64802 106.50248,191.37933"
          id="path466-6"
          sodipodi:nodetypes="cc" />
       <text
