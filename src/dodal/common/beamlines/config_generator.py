@@ -1,6 +1,5 @@
 import ast
 import os
-import subprocess
 from collections import defaultdict
 from datetime import datetime
 from typing import Any
@@ -100,18 +99,8 @@ def beamline_config_generator(config_dir: str) -> str:
                 body = f"{dev.type}()"
 
             code += f"\ndef {dev.device}() -> {dev.type}:\n    return {body}\n"
-    try:
-        fmt = subprocess.run(
-            ["ruff", "format", "-"],
-            input=code,
-            capture_output=True,
-            text=True,
-            check=True,
-        )
-        return fmt.stdout
-    except Exception as e:
-        LOGGER.error(f"Ruff formatting failed, returning raw code. Error: {e}")
-        return code
+
+    return code
 
 
 def translate_beamline_py_config_to_yaml(py_file_path: str, output_dir: str):
@@ -137,10 +126,23 @@ def translate_beamline_py_config_to_yaml(py_file_path: str, output_dir: str):
         elif isinstance(node, ast.FunctionDef):
             ret_type = node.returns.id if isinstance(node.returns, ast.Name) else None
 
+            recovered_decs = []
+            for dec_node in node.decorator_list:
+                if isinstance(dec_node, ast.Call):
+                    name = ast.unparse(dec_node.func)
+                    args = {
+                        kw.arg: ast.literal_eval(kw.value) for kw in dec_node.keywords
+                    }
+                    recovered_decs.append({"name": name, "args": args})
+                else:
+                    # Handle decorators without parentheses, e.g., @devices.factory
+                    recovered_decs.append({"name": ast.unparse(dec_node), "args": {}})
+
             device_meta = {
                 "device": node.name,
                 "type": ret_type,
                 "import_from": import_map.get(ret_type, "unknown.module"),
+                "decorators": recovered_decs,
             }
             if node.body and isinstance(node.body[0], ast.Return):
                 ret_val = node.body[0].value
