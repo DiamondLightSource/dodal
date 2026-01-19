@@ -74,18 +74,18 @@ def id_phase() -> UndulatorPhaseAxes:
 
 
 @device_factory()
-def id() -> Apple2:
+def id() -> Apple2[UndulatorPhaseAxes]:
     """I21 insertion device."""
-    return Apple2(
+    return Apple2[UndulatorPhaseAxes](
         id_gap=id_gap(),
         id_phase=id_phase(),
     )
 
 
 @device_factory()
-def id_controller() -> Apple2EnforceLHMoveController:
+def id_controller() -> Apple2EnforceLHMoveController[UndulatorPhaseAxes]:
     """i21 insertion device controller."""
-    return Apple2EnforceLHMoveController(
+    return Apple2EnforceLHMoveController[UndulatorPhaseAxes](
         apple2=id(),
         gap_energy_motor_lut=ConfigServerEnergyMotorLookup(
             lut_config=LookupTableColumnConfig(grating=I21_GRATING_COLUMNS),

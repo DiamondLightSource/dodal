@@ -44,7 +44,6 @@ MOCK_ATTRIBUTES_TABLE = {
     "i03": MOCK_PATHS,
     "i10_optics": MOCK_PATHS,
     "i04": MOCK_PATHS,
-    "s04": MOCK_PATHS,
     "i19_1": MOCK_PATHS,
     "i24": MOCK_PATHS,
     "aithre": MOCK_PATHS,
