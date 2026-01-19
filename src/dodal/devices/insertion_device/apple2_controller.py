@@ -107,8 +107,6 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
         name: str
             Name of the device.
         """
-        self.maximum_gap_motor_position = maximum_gap_motor_position
-        self.maximum_phase_motor_position = maximum_phase_motor_position
         self.apple2 = Reference(apple2)
         self.gap_energy_motor_converter = gap_energy_motor_converter
         self.phase_energy_motor_converter = phase_energy_motor_converter
