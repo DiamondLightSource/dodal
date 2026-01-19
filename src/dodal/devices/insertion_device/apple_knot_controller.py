@@ -61,6 +61,8 @@ class AppleKnotPathFinder:
                     return apple_knot_val_path
         apple_knot_val_path += (start_val,)
         # Split the move if start and end are on opposite sides of zero phase
+        # TBD This can be potentially improved to always have max 3 sections in path!
+        # Currently in copies java class logic
         if (
             sign(start_val.phase.top_outer) == (-1) * sign(end_val.phase.top_outer)
             and sign(start_val.phase.top_outer) != 0
@@ -102,7 +104,6 @@ class AppleKnotPathFinder:
                 # Move PHASE first then GAP (SW move in negative phase or SE move in positive phase)
                 intermediate_val = Apple2Val(gap=start_val.gap, phase=end_val.phase)
                 final_path.append(intermediate_val)
-
             else:
                 # Move GAP first then PHASE (other moves)
                 intermediate_val = Apple2Val(gap=end_val.gap, phase=start_val.phase)

@@ -77,9 +77,11 @@ async def mock_apple_knot_i05_controller(
     "target_energy, initial_gap, initial_phase_top_outer, expected_pol",
     [
         (100.0, 40.0, 70.0, Pol.LV),
-        (100.0, 40.0, 70.0, Pol.LV),
+        (100.0, 40.0, -70.0, Pol.LV),
         (100.0, 40.0, 0.0, Pol.LH),
         (50.0, 40.0, 0.0, Pol.LH),
+        (60.0, 40.0, -50.0, Pol.NC),
+        (60.0, 40.0, 50.0, Pol.PC),
     ],
 )
 async def test_id_set_energy_const_pol(
