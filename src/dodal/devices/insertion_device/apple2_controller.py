@@ -15,6 +15,7 @@ from dodal.devices.insertion_device.apple2_undulator import (
     Apple2,
     Apple2PhasesVal,
     Apple2Val,
+    PhaseAxesType,
     UndulatorPhaseAxes,
 )
 from dodal.devices.insertion_device.energy_motor_lookup import (
@@ -112,6 +113,8 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
         self.gap_energy_motor_converter = gap_energy_motor_converter
         self.phase_energy_motor_converter = phase_energy_motor_converter
 
+        self.maximum_gap_motor_position = maximum_gap_motor_position
+        self.maximum_phase_motor_position = maximum_phase_motor_position
         # Store the set energy for readback.
         self._energy, self._energy_set = soft_signal_r_and_setter(
             float, initial_value=None, units=units
@@ -313,7 +316,9 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
         return Pol.NONE, 0.0
 
 
-class Apple2EnforceLHMoveController(Apple2Controller[Apple2]):
+class Apple2EnforceLHMoveController(
+    Apple2Controller[Apple2[PhaseAxesType]], Generic[PhaseAxesType]
+):
     """The latest Apple2 version allows unrestricted motor movement.
     However, because of the high forces involved in polarization changes,
     all movements must be performed using the Linear Horizontal (LH) mode.
@@ -322,7 +327,7 @@ class Apple2EnforceLHMoveController(Apple2Controller[Apple2]):
 
     def __init__(
         self,
-        apple2: Apple2,
+        apple2: Apple2[PhaseAxesType],
         gap_energy_motor_lut: EnergyMotorLookup,
         phase_energy_motor_lut: EnergyMotorLookup,
         units: str = "eV",
