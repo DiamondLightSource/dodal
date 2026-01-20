@@ -34,6 +34,9 @@ class XThetaStage(Stage):
     def __init__(
         self, prefix: str, name: str = "", x_infix: str = _X, theta_infix: str = "A"
     ):
+        """
+        Two-axis stage with an x and a theta motor.
+        """
         with self.add_children_as_readables():
             self.x = Motor(prefix + x_infix)
             self.theta = Motor(prefix + theta_infix)
@@ -44,6 +47,9 @@ class XYStage(Stage):
     def __init__(
         self, prefix: str, name: str = "", x_infix: str = _X, y_infix: str = _Y
     ):
+        """
+        A standard two-axis stage with an x and a y motor.
+        """
         with self.add_children_as_readables():
             self.x = Motor(prefix + x_infix)
             self.y = Motor(prefix + y_infix)
@@ -59,6 +65,9 @@ class XYZStage(XYStage):
         y_infix: str = _Y,
         z_infix: str = _Z,
     ):
+        """
+        A standard three-axis stage with an x, a y, and a z motor.
+        """
         with self.add_children_as_readables():
             self.z = Motor(prefix + z_infix)
         super().__init__(prefix, name, x_infix, y_infix)
@@ -74,6 +83,9 @@ class XYZThetaStage(XYZStage):
         z_infix: str = _Z,
         theta_infix: str = "THETA",
     ) -> None:
+        """
+        Four-axis stage with a standard xyz stage and one axis of rotation: theta.
+        """
         with self.add_children_as_readables():
             self.theta = Motor(prefix + theta_infix)
         super().__init__(prefix, name, x_infix, y_infix, z_infix)
@@ -89,6 +101,9 @@ class XYZOmegaStage(XYZStage):
         z_infix: str = _Z,
         omega_infix: str = _OMEGA,
     ) -> None:
+        """
+        Four-axis stage with a standard xyz stage and one axis of rotation: omega.
+        """
         with self.add_children_as_readables():
             self.omega = Motor(prefix + omega_infix)
         super().__init__(prefix, name, x_infix, y_infix, z_infix)
@@ -103,6 +118,9 @@ class XYPhiStage(XYStage):
         phi_infix: str = "PHI",
         name: str = "",
     ) -> None:
+        """
+        Three-axis stage with a standard xy stage and one axis of rotation: phi.
+        """
         with self.add_children_as_readables():
             self.phi = Motor(prefix + phi_infix)
         super().__init__(prefix, name, x_infix, y_infix)
@@ -117,6 +135,9 @@ class XYPitchStage(XYStage):
         pitch_infix: str = "PITCH",
         name: str = "",
     ) -> None:
+        """
+        Three-axis stage with a standard xy stage and one axis of rotation: pitch.
+        """
         with self.add_children_as_readables():
             self.pitch = Motor(prefix + pitch_infix)
         super().__init__(prefix, name, x_infix, y_infix)
@@ -131,6 +152,9 @@ class XYRollStage(XYStage):
         roll_infix: str = "ROLL",
         name: str = "",
     ) -> None:
+        """
+        Three-axis stage with a standard xy stage and one axis of rotation: roll.
+        """
         with self.add_children_as_readables():
             self.roll = Motor(prefix + roll_infix)
         super().__init__(prefix, name, x_infix, y_infix)
@@ -147,6 +171,9 @@ class XYZPitchYawStage(XYZStage):
         pitch_infix="PITCH",
         yaw_infix="YAW",
     ):
+        """
+        Five-axis stage with a standard xyz stage and two axes of rotation: pitch and yaw.
+        """
         with self.add_children_as_readables():
             self.pitch = Motor(prefix + pitch_infix)
             self.yaw = Motor(prefix + yaw_infix)
@@ -165,6 +192,10 @@ class XYZPitchYawRollStage(XYZStage):
         yaw_infix: str = "YAW",
         roll_infix: str = "ROLL",
     ):
+        """
+        Five-axis stage with a standard xyz stage and three axes of rotation: pitch, yaw,
+        and roll.
+        """
         with self.add_children_as_readables():
             self.pitch = Motor(prefix + pitch_infix)
             self.yaw = Motor(prefix + yaw_infix)
@@ -221,6 +252,9 @@ class YZStage(Stage):
     def __init__(
         self, prefix: str, name: str = "", y_infix: str = _Y, z_infix: str = _Z
     ) -> None:
+        """
+        Two-axis stage with an x and a z motor.
+        """
         with self.add_children_as_readables():
             self.y = Motor(prefix + y_infix)
             self.z = Motor(prefix + z_infix)
