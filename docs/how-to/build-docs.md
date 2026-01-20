@@ -37,3 +37,11 @@ If you are making changes to source code too, you can tell it to watch changes i
 ```
 $ tox -e docs autobuild -- --watch src
 ```
+
+## Common issues
+
+### Building docs fails due to cached *rst files
+
+If the module stucture changes from "x.y" to "x.z.y" one could get "module x.z.y not found" error trying to build the docs locally.
+
+The solution is to clean up "/workspaces/dodal/docs/reference/generated" folder.
