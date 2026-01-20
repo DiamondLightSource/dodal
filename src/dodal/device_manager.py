@@ -5,6 +5,7 @@ from collections import UserDict
 from collections.abc import Callable, Iterable, Mapping, MutableMapping
 from functools import cached_property, wraps
 from inspect import Parameter
+from itertools import chain
 from types import NoneType
 from typing import (
     Annotated,
@@ -602,3 +603,6 @@ class DeviceManager:
 
     def __repr__(self) -> str:
         return f"<DeviceManager: {len(self)} devices>"
+
+    def __iter__(self):
+        return chain(self._factories.items(), self._v1_factories.items())
