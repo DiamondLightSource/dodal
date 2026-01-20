@@ -4,8 +4,10 @@ from daq_config_server.client import ConfigServer
 
 from dodal.utils import get_beamline_name
 
-BEAMLINE_PARAMETER_KEYWORDS = ["FB", "FULL", "deadtime"]
-
+BEAMLINE_CONFIG_SERVER_ENDPOINTS = {
+    "i03": "https://daq-config.diamond.ac.uk",
+    "i04": "https://daq-config.diamond.ac.uk",
+}
 BEAMLINE_PARAMETER_PATHS = {
     "i03": "/dls_sw/i03/software/daq_configuration/domain/beamlineParameters",
     "i04": "/dls_sw/i04/software/daq_configuration/domain/beamlineParameters",
