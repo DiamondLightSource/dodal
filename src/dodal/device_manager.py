@@ -48,6 +48,38 @@ _EMPTY = object()
 """Sentinel value to distinguish between missing values and present but null values"""
 
 
+def _format_doc(factory: object, func: object) -> None:
+    """Helper function to combine the doc strings of our factory instance and the
+    return type of the function we wrap."""
+    instance_docs = factory.__doc__ or ""
+
+    return_type = func.__annotations__.get("return", None)
+    return_type_docs = ""
+
+    if return_type is not None:
+        # Get the class name and docstring for the return type
+        class_name = return_type.__name__ + ":\n"
+
+        class_doc = return_type.__doc__ or NO_DOCS
+
+        if class_doc[0] != "\n":
+            class_doc = "\n" + class_doc
+
+        # Format the return type doc string
+        return_type_docs = f"{class_name}{class_doc}"
+
+        if instance_docs != "":
+            return_type_docs = "\n" + return_type_docs
+
+    # Only add a line break if instance_docs is not empty and we know return_type
+    # is not empty
+    if instance_docs != "" and return_type is not None:
+        instance_docs = f"{instance_docs}\n"
+
+    # Combine the factory instance docstring with the return type docstring
+    factory.__doc__ = instance_docs + return_type_docs
+
+
 class LazyFixtures(UserDict[str, Any]):
     """
     Wrapper around fixtures and fixture generators
@@ -430,36 +462,13 @@ class DeviceManager:
             if func.__name__ in self:
                 raise ValueError(f"Duplicate factory name: {func.__name__}")
             factory = DeviceFactory(func, use_factory_name, timeout, mock, skip, self)
-            self._format_doc(factory, func)
+            _format_doc(factory, func)
             self._factories[func.__name__] = factory
             return factory
 
         if func is None:
             return decorator
         return decorator(func)
-
-    def _format_doc(self, factory: DeviceFactory, func: Callable[Args, V2]) -> None:
-        """Helper function to combine the doc strings of our factory instance and the
-        return type of the function we wrap."""
-        return_type = func.__annotations__.get("return", None)
-        return_type_docs = ""
-
-        if return_type is not None:
-            # Get the class name and docstring for the return type
-            class_name = return_type.__name__
-            class_doc = return_type.__doc__ or NO_DOCS
-
-            # Format the return type doc string
-            return_type_docs = f"{class_name}:{class_doc}"
-
-        instance_docs = f"{factory.__doc__}" or ""
-
-        if instance_docs != "" and NO_DOCS in return_type_docs:
-            instance_docs = f"\n{instance_docs}"
-            return_type_docs = f"\n{return_type_docs}"
-
-        # Combine the factory docstring with the return type docstring
-        factory.__doc__ = f"{instance_docs}{return_type_docs}"
 
     def build_and_connect(
         self,

@@ -9,6 +9,7 @@ from pytest import RaisesExc, RaisesGroup
 
 from dodal.device_manager import (
     DEFAULT_TIMEOUT,
+    NO_DOCS,
     DeviceBuildResult,
     DeviceManager,
     LazyFixtures,
@@ -769,4 +770,45 @@ def test_docsstrings_for_device_are_kept(dm: DeviceManager):
     def foo() -> Device:
         return Device()
 
-    assert foo.__doc__ == Device.__doc__
+    assert foo.__doc__ == f"{Device.__name__}:\n{Device.__doc__}"
+
+
+def test_docstrings_for_factory_instance_and_devices_are_kept(dm: DeviceManager):
+    @dm.factory()
+    def foo() -> Device:
+        """Additional info on my device instance."""
+        return Device()
+
+    expected_doc_str = f"Additional info on my device instance.\n\n{Device.__name__}:\n{Device.__doc__}"
+    assert foo.__doc__ == expected_doc_str
+
+
+def test_docs_for_factory_kept_and_no_docs_avaliable_added_for_no_docs_device(
+    dm: DeviceManager,
+):
+    class NoDocsDevice(Device):
+        pass
+
+    @dm.factory()
+    def foo() -> NoDocsDevice:
+        """Additional info on my device instance."""
+        return NoDocsDevice()
+
+    expected_doc_str = (
+        f"Additional info on my device instance.\n\n{NoDocsDevice.__name__}:\n{NO_DOCS}"
+    )
+
+    assert foo.__doc__ == expected_doc_str
+
+
+def test_docs_no_docs_avaliable_added_for_no_docs_device(dm: DeviceManager):
+    class NoDocsDevice(Device):
+        pass
+
+    @dm.factory()
+    def foo() -> NoDocsDevice:
+        return NoDocsDevice()
+
+    expected_doc_str = f"{NoDocsDevice.__name__}:\n{NO_DOCS}"
+
+    assert foo.__doc__ == expected_doc_str
