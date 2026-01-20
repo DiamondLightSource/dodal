@@ -17,14 +17,10 @@ from typing import (
     TypeVar,
 )
 
-from bluesky.run_engine import (
-    get_bluesky_event_loop,
-)
+from bluesky.run_engine import get_bluesky_event_loop
 from ophyd.sim import make_fake_device
 
-from dodal.common.beamlines.beamline_utils import (
-    wait_for_connection,
-)
+from dodal.common.beamlines.beamline_utils import wait_for_connection
 from dodal.utils import (
     AnyDevice,
     OphydV1Device,
@@ -33,7 +29,7 @@ from dodal.utils import (
 )
 
 DEFAULT_TIMEOUT = 30
-NO_DOCS = "\n    No documentation available."
+NO_DOCS = "No documentation available."
 
 T = TypeVar("T")
 Args = ParamSpec("Args")
@@ -46,38 +42,6 @@ OphydInitialiser = Callable[Concatenate[V1, Args], V1 | None]
 
 _EMPTY = object()
 """Sentinel value to distinguish between missing values and present but null values"""
-
-
-def _format_doc(factory: object, func: object) -> None:
-    """Helper function to combine the doc strings of our factory instance and the
-    return type of the function we wrap."""
-    instance_docs = factory.__doc__ or ""
-
-    return_type = func.__annotations__.get("return", None)
-    return_type_docs = ""
-
-    if return_type is not None:
-        # Get the class name and docstring for the return type
-        class_name = return_type.__name__ + ":\n"
-
-        class_doc = return_type.__doc__ or NO_DOCS
-
-        if class_doc[0] != "\n":
-            class_doc = "\n" + class_doc
-
-        # Format the return type doc string
-        return_type_docs = f"{class_name}{class_doc}"
-
-        if instance_docs != "":
-            return_type_docs = "\n" + return_type_docs
-
-    # Only add a line break if instance_docs is not empty and we know return_type
-    # is not empty
-    if instance_docs != "" and return_type is not None:
-        instance_docs = f"{instance_docs}\n"
-
-    # Combine the factory instance docstring with the return type docstring
-    factory.__doc__ = instance_docs + return_type_docs
 
 
 class LazyFixtures(UserDict[str, Any]):
@@ -135,6 +99,8 @@ class DeviceFactory(Generic[Args, V2]):
         self._skip = skip
         self._manager = manager
         wraps(factory)(self)
+
+        self.__doc__ = _format_doc(self, factory)
 
     @property
     def name(self) -> str:
@@ -235,6 +201,7 @@ class V1DeviceFactory(Generic[Args, V1]):
         self.post_create = init or (lambda x: x)
         self._manager = manager
         wraps(init)(self)
+        self.__doc__ = _format_doc(self, factory)
 
     @property
     def name(self) -> str:
@@ -462,7 +429,7 @@ class DeviceManager:
             if func.__name__ in self:
                 raise ValueError(f"Duplicate factory name: {func.__name__}")
             factory = DeviceFactory(func, use_factory_name, timeout, mock, skip, self)
-            _format_doc(factory, func)
+
             self._factories[func.__name__] = factory
             return factory
 
@@ -636,3 +603,42 @@ class DeviceManager:
 
     def __repr__(self) -> str:
         return f"<DeviceManager: {len(self)} devices>"
+
+
+def _format_doc(
+    factory: DeviceFactory | V1DeviceFactory, func: Callable[Args, V2] | type[V1]
+) -> str:
+    """Helper function to combine the doc strings of our factory instance and the
+    return type of the function we wrap."""
+    instance_docs = factory.__doc__ or ""
+
+    if isinstance(func, type):
+        return_type = func
+    else:
+        return_type = inspect.get_annotations(func).get("return")
+    return_type_docs = ""
+
+    if return_type is not None:
+        # Get the class name and docstring for the return type
+        class_name = return_type.__name__ + ":\n"
+
+        class_doc = inspect.cleandoc(return_type.__doc__ or NO_DOCS)
+
+        if class_doc[0] != "\n":
+            class_doc = "\n" + class_doc
+
+        # Format the return type doc string
+        return_type_docs = f"{class_name}{class_doc}"
+
+        if instance_docs != "":
+            return_type_docs = "\n" + return_type_docs
+
+    # Only add a line break if instance_docs is not empty and we know return_type
+    # is not empty
+    if instance_docs != "" and return_type is not None:
+        instance_docs = f"{instance_docs}\n"
+
+    print(return_type is not None)
+
+    # Combine the factory instance docstring with the return type docstring
+    return instance_docs + return_type_docs
