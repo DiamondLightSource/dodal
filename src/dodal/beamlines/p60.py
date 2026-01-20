@@ -37,22 +37,28 @@ def mg_kalpha_source() -> LabXraySourceReadable:
 
 
 @devices.factory()
-def energy_source() -> DualEnergySource:
+def energy_source(
+    al_kalpha_source: LabXraySourceReadable,
+    mg_kalpha_source: LabXraySourceReadable,
+    source_selector: SourceSelector,
+) -> DualEnergySource:
     return DualEnergySource(
-        al_kalpha_source().energy_ev,
-        mg_kalpha_source().energy_ev,
-        source_selector().selected_source,
+        al_kalpha_source.energy_ev,
+        mg_kalpha_source.energy_ev,
+        source_selector.selected_source,
     )
 
 
 # Connect will work again after this work completed
 # https://jira.diamond.ac.uk/browse/P60-13
 @devices.factory()
-def r4000() -> VGScientaDetector[LensMode, PsuMode, PassEnergy]:
+def r4000(
+    energy_source: DualEnergySource,
+) -> VGScientaDetector[LensMode, PsuMode, PassEnergy]:
     return VGScientaDetector[LensMode, PsuMode, PassEnergy](
         prefix=f"{PREFIX.beamline_prefix}-EA-DET-01:CAM:",
         lens_mode_type=LensMode,
         psu_mode_type=PsuMode,
         pass_energy_type=PassEnergy,
-        energy_source=energy_source(),
+        energy_source=energy_source,
     )
