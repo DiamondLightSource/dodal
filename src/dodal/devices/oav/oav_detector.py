@@ -2,7 +2,6 @@ import asyncio
 from enum import IntEnum
 
 from bluesky.protocols import Movable
-from mx_bluesky.common.utils.log import LOGGER
 from ophyd_async.core import (
     DEFAULT_TIMEOUT,
     AsyncStatus,
@@ -115,7 +114,7 @@ class ZoomController(BaseZoomController):
     async def set(self, value: str):
         await self.level.set(value, wait=True)
         LOGGER.info(
-            "Waiting {self.DELAY_BETWEEN_MOTORS_AND_IMAGE_UPDATING_S} seconds for zoom to be noticeable"
+            f"Waiting {self.DELAY_BETWEEN_MOTORS_AND_IMAGE_UPDATING_S} seconds for zoom to be noticeable"
         )
         await asyncio.sleep(self.DELAY_BETWEEN_MOTORS_AND_IMAGE_UPDATING_S)
 
