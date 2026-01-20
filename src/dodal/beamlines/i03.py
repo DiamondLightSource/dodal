@@ -157,8 +157,11 @@ def detector_motion() -> DetectorMotion:
     )
 
 
-@devices.v1_init(EigerDetector, prefix="BL03I-EA-EIGER-01:", wait=False)
+@devices.v1_init(
+    EigerDetector, prefix=f"{PREFIX.beamline_prefix}-EA-EIGER-01:", wait=False
+)
 def eiger(eiger: EigerDetector) -> EigerDetector:
+    eiger.detector_id = 78
     return eiger
 
 
