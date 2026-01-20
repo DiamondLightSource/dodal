@@ -7,10 +7,11 @@ from dodal.devices.i04.transfocator import Transfocator
 
 class Beamsize(BeamsizeBase):
     """
-    Device that calculates the size of the beam by taking the minimum of the transfocator 
+    Device that calculates the size of the beam by taking the minimum of the transfocator
     size and the aperture scatterguard diameter (misnamed radius in the device
     https://github.com/DiamondLightSource/dodal/issues/1710).
     """
+
     def __init__(
         self,
         transfocator: Transfocator,
