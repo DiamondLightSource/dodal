@@ -1,12 +1,14 @@
-from dodal.common.beamlines.beamline_utils import device_factory
+from dodal.device_manager import DeviceManager
 from dodal.devices.i05.enums import Grating
 from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.utils import BeamlinePrefix
 
 PREFIX = BeamlinePrefix("i05", "I")
 
+devices = DeviceManager()
 
-@device_factory()
+
+@devices.factory()
 def pgm() -> PlaneGratingMonochromator:
     return PlaneGratingMonochromator(
         prefix=f"{PREFIX.beamline_prefix}-OP-PGM-01:",
