@@ -3,10 +3,16 @@ import math
 import cv2
 import numpy as np
 from bluesky.protocols import Triggerable
-from ophyd_async.core import AsyncStatus, StandardReadable, soft_signal_r_and_setter
+from ophyd_async.core import (
+    AsyncStatus,
+    StandardReadable,
+    soft_signal_r_and_setter,
+    soft_signal_rw,
+)
 from ophyd_async.epics.core import (
     epics_signal_r,
 )
+from PIL import Image
 
 from dodal.devices.oav.utils import convert_to_gray_and_blur
 from dodal.log import LOGGER
@@ -109,6 +115,8 @@ class CentreEllipseMethod(StandardReadable, Triggerable):
             int, f"{prefix}OVER:{overlay_channel}:CenterY"
         )
 
+        self.roi_box_size = soft_signal_rw(int, 300)
+
         super().__init__(name)
 
     def _fit_ellipse(self, binary_img: cv2.typing.MatLike) -> cv2.typing.RotatedRect:
@@ -127,13 +135,14 @@ class CentreEllipseMethod(StandardReadable, Triggerable):
         return cv2.fitEllipse(largest_contour)
 
     @AsyncStatus.wrap
-    async def trigger(self, roi_box_size=200):
+    async def trigger(self):
         array_data = await self.oav_array_signal.get_value()
         current_x = await self.current_centre_x.get_value()
         current_y = await self.current_centre_y.get_value()
+        roi_box_size = await self.roi_box_size.get_value()
 
         roi_data, top_left_corner, _ = get_roi(
-            array_data, current_x, current_y, roi_box_size
+            array_data, current_x, current_y, roi_box_size, roi_box_size
         )
 
         roi_binary = convert_image_to_binary(roi_data)
