@@ -1,3 +1,5 @@
+import math
+
 import cv2
 import numpy as np
 from bluesky.protocols import Triggerable
@@ -42,19 +44,47 @@ def convert_image_to_binary(image: np.ndarray):
     return thresholded_image
 
 
-def get_roi(image_arr, current_x, current_y, dist_from_x=100, dist_from_y=100):
-    # Get image dimensions
+def round_half_up(x):
+    return int(math.floor(x + 0.5))
+
+
+def get_roi(
+    image_arr: np.ndarray,
+    centre_x: int,
+    centre_y: int,
+    box_width: int = 200,
+    box_height: int = 200,
+) -> tuple[np.ndarray, tuple[int, int], tuple[int, int]]:
+    """Creates an ROI image array from a full screen image array, given a centre for the
+    ROI image and a width and height of the ROI box. Note that if the centre of the ROI
+    box is close to the edge of the full screen image, the box may be smaller than the
+    width and height provided, as the ROI will be trimmed to fit inside the full screen
+    image.
+
+    Args:
+        image_arr (np.ndarray): The full screen image array
+        centre_x (int): The x coordinate of the centre of the ROI box
+        centre_y (int): The y coordinate of the centre of the ROI box
+        box_width (int, optional): The width of the ROI box. Defaults to 200.
+        box_height (int, optional): The height of the ROI box. Defaults to 200.
+
+    Returns:
+        tuple[np.ndarray, tuple[int, int], tuple[int, int]]: The ROI array, and (x, y)
+        coordinates of the top left and bottom right corners of the ROI box.
+    """
     height, width = image_arr.shape[:2]
+    x_dist = (box_width) / 2
+    y_dist = (box_height) / 2
 
     # Clip coordinates to stay within bounds
-    x_min = max(current_x - dist_from_x, 1)
-    x_max = min(current_x + dist_from_x, width)
-    y_min = max(current_y - dist_from_y, 1)
-    y_max = min(current_y + dist_from_y, height)
+    x_min = max(round_half_up(centre_x - x_dist), 0)
+    x_max = min(round_half_up(centre_x + x_dist), width) - 1
+    y_min = max(round_half_up(centre_y - y_dist), 0)
+    y_max = min(round_half_up(centre_y + y_dist), height) - 1
 
-    roi_arr = image_arr[y_min - 1 : y_max, x_min - 1 : x_max]
+    roi_arr = image_arr[y_min : y_max + 1, x_min : x_max + 1]
 
-    return roi_arr
+    return roi_arr, (x_min, y_min), (x_max, y_max)
 
 
 class CentreEllipseMethod(StandardReadable, Triggerable):
@@ -97,22 +127,19 @@ class CentreEllipseMethod(StandardReadable, Triggerable):
         return cv2.fitEllipse(largest_contour)
 
     @AsyncStatus.wrap
-    async def trigger(self, roi_dist_from_centre=100):
+    async def trigger(self, roi_box_size=200):
         array_data = await self.oav_array_signal.get_value()
         current_x = await self.current_centre_x.get_value()
         current_y = await self.current_centre_y.get_value()
-        top_left_corner = (
-            current_x - roi_dist_from_centre,
-            current_y - roi_dist_from_centre,
+
+        roi_data, top_left_corner, _ = get_roi(
+            array_data, current_x, current_y, roi_box_size
         )
-        roi_data = get_roi(
-            array_data, current_x, current_y, roi_dist_from_centre, roi_dist_from_centre
-        )
-        binary = convert_image_to_binary(roi_data)
-        ellipse_fit = self._fit_ellipse(binary)
-        centre_x = ellipse_fit[0][0]
-        centre_y = ellipse_fit[0][1]
-        real_centre_x = centre_x + top_left_corner[0]
-        real_centre_y = centre_y + top_left_corner[1]
-        self._center_x_val_setter(real_centre_x)
-        self._center_y_val_setter(real_centre_y)
+
+        roi_binary = convert_image_to_binary(roi_data)
+        ellipse_fit = self._fit_ellipse(roi_binary)
+        roi_centre_x = ellipse_fit[0][0]
+        roi_centre_y = ellipse_fit[0][1]
+        # convert back to full screen image coords and set beam centre
+        self._center_x_val_setter(roi_centre_x + top_left_corner[0])
+        self._center_y_val_setter(roi_centre_y + top_left_corner[1])
