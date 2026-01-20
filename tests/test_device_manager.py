@@ -2,7 +2,6 @@ from unittest.mock import MagicMock, Mock, patch
 
 import pytest
 from ophyd.device import Device as OphydV1Device
-from ophyd_async.core import Device
 from ophyd_async.core import Device as OphydV2Device
 from ophyd_async.sim import SimMotor
 from pytest import RaisesExc, RaisesGroup
@@ -767,26 +766,29 @@ def test_docstrings_for_factory_instane_are_kept(dm: DeviceManager):
 
 def test_docsstrings_for_device_are_kept(dm: DeviceManager):
     @dm.factory()
-    def foo() -> Device:
-        return Device()
+    def foo() -> OphydV2Device:
+        return OphydV2Device()
 
-    assert foo.__doc__ == f"{Device.__name__}:\n{Device.__doc__}"
+    assert foo.__doc__ == f"{OphydV2Device.__name__}:\n{OphydV2Device.__doc__}"
 
 
 def test_docstrings_for_factory_instance_and_devices_are_kept(dm: DeviceManager):
     @dm.factory()
-    def foo() -> Device:
+    def foo() -> OphydV2Device:
         """Additional info on my device instance."""
-        return Device()
+        return OphydV2Device()
 
-    expected_doc_str = f"Additional info on my device instance.\n\n{Device.__name__}:\n{Device.__doc__}"
+    expected_doc_str = (
+        "Additional info on my device instance.\n\n"
+        f"{OphydV2Device.__name__}:\n{OphydV2Device.__doc__}"
+    )
     assert foo.__doc__ == expected_doc_str
 
 
 def test_docs_for_factory_kept_and_no_docs_avaliable_added_for_no_docs_device(
     dm: DeviceManager,
 ):
-    class NoDocsDevice(Device):
+    class NoDocsDevice(OphydV2Device):
         pass
 
     @dm.factory()
@@ -802,7 +804,7 @@ def test_docs_for_factory_kept_and_no_docs_avaliable_added_for_no_docs_device(
 
 
 def test_docs_no_docs_avaliable_added_for_no_docs_device(dm: DeviceManager):
-    class NoDocsDevice(Device):
+    class NoDocsDevice(OphydV2Device):
         pass
 
     @dm.factory()
