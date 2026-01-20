@@ -24,6 +24,41 @@ def main(ctx: click.Context) -> None:
         print("Please invoke subcommand!")
 
 
+@main.command(name="describe")
+@click.argument(
+    "beamline",
+    type=click.Choice(list(all_beamline_names())),
+    required=True,
+)
+@click.option("-n", "--name", "device_manager", default="devices")
+def describe(beamline: str, device_manager: str) -> None:
+    """Initialises a beamline module, gets the docs of all devices and prints them."""
+
+    os.environ["BEAMLINE"] = beamline
+
+    module_name = module_name_for_beamline(beamline)
+    full_module_path = f"dodal.beamlines.{module_name}"
+
+    print(f"Analysing {beamline} (using {full_module_path})")
+
+    mod = importlib.import_module(full_module_path)
+
+    if (manager := getattr(mod, device_manager, None)) and isinstance(
+        manager, DeviceManager
+    ):
+        devices, _, _ = manager.build_all()
+    else:
+        print(
+            f"No device manager named '{device_manager}' found in {mod}, convert the beamline to use device manager"
+        )
+        return
+
+    for device_name, device in sorted(devices.items()):
+        print(f"{device_name}:")
+        print(device.__doc__)
+        print("\n")
+
+
 @main.command(name="connect")
 @click.argument(
     "beamline",
