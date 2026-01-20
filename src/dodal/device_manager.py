@@ -638,7 +638,5 @@ def _format_doc(
     if instance_docs != "" and return_type is not None:
         instance_docs = f"{instance_docs}\n"
 
-    print(return_type is not None)
-
     # Combine the factory instance docstring with the return type docstring
     return instance_docs + return_type_docs
