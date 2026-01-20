@@ -21,6 +21,20 @@ async def centre_device() -> CentreEllipseMethod:
     return centre_device
 
 
+@pytest.fixture
+def test_image_array():
+    return np.array(
+        [
+            [00, 10, 20, 30, 40],
+            [1, 11, 21, 31, 41],
+            [2, 12, 22, 32, 24],
+            [3, 13, 23, 33, 43],
+            [4, 14, 24, 34, 44],
+        ],
+        dtype=np.uint8,
+    )
+
+
 @patch("dodal.devices.i04.beam_centre.cv2.threshold")
 @patch("dodal.devices.i04.beam_centre.convert_to_gray_and_blur")
 async def test_convert_image_to_binary_calls_threshold_twice(
@@ -129,58 +143,50 @@ async def test_real_image_gives_expected_centre(
     assert await centre_device.center_y_val.get_value() == pytest.approx(365.4453)
 
 
-test_img = np.array(
+@pytest.mark.parametrize(
+    "centre_xy, box_dimensions, expected",
     [
-        [0, 0, 0, 0, 0],
-        [0, 5, 5, 5, 0],
-        [0, 5, 10, 5, 0],
-        [0, 5, 5, 5, 0],
-        [0, 0, 0, 0, 0],
+        ((2, 2), (3, 3), [[11, 21, 31], [12, 22, 32], [13, 23, 33]]),
+        (
+            (3, 3),
+            (20, 100),
+            [
+                [00, 10, 20, 30, 40],
+                [1, 11, 21, 31, 41],
+                [2, 12, 22, 32, 24],
+                [3, 13, 23, 33, 43],
+                [4, 14, 24, 34, 44],
+            ],
+        ),
+        ((2, 2), (4, 2), [[1, 11, 21, 31], [2, 12, 22, 32]]),
+        ((1, 1), (3, 1), [[1, 11, 21]]),
+        ((1, 4), (1, 3), [[13], [14]]),
+        ((4, 4), (5, 5), [[22, 32, 24], [23, 33, 43], [24, 34, 44]]),
     ],
-    dtype=np.uint8,
 )
-
-
-def test_roi_logic():
-    # checking test img
-    assert test_img.shape == (5, 5)
-    assert test_img[2, 2] == 10
-
-    # test previous centre in middle
-    expected_result = [[5, 5, 5], [5, 10, 5], [5, 5, 5]]
-    standard_test = get_roi(
-        image_arr=test_img, current_x=3, current_y=3, dist_from_x=1, dist_from_y=1
+def test_get_roi_creates_correct_image_array(
+    test_image_array: np.ndarray,
+    centre_xy: tuple[int, int],
+    box_dimensions: tuple[int, int],
+    expected: list[list[int]],
+):
+    result, _, _ = get_roi(
+        image_arr=test_image_array,
+        centre_x=centre_xy[0],
+        centre_y=centre_xy[1],
+        box_width=box_dimensions[0],
+        box_height=box_dimensions[1],
     )
-    assert (standard_test == expected_result).all()
+    assert (result == expected).all()
 
-    # test when you go out of bounds for the roi
-    out_of_bounds = get_roi(
-        image_arr=test_img, current_x=3, current_y=3, dist_from_x=10, dist_from_y=50
-    )
-    assert (out_of_bounds == test_img).all()
 
-    # test different dist from x and dist from y
-    diff_x_and_y = get_roi(
-        image_arr=test_img, current_x=3, current_y=3, dist_from_x=2, dist_from_y=1
+def test_get_roi_creates_box_with_correct_shape():
+    test_image_array = np.zeros((500, 500))
+    result, _, _ = get_roi(
+        image_arr=test_image_array,
+        centre_x=200,
+        centre_y=200,
+        box_width=150,
+        box_height=250,
     )
-    expected_result = [[0, 5, 5, 5, 0], [0, 5, 10, 5, 0], [0, 5, 5, 5, 0]]
-    assert (diff_x_and_y == expected_result).all()
-
-    # test when previous centre is not in middle
-    off_centre = get_roi(
-        image_arr=test_img, current_x=2, current_y=3, dist_from_x=2, dist_from_y=1
-    )
-    expected_result = [[0, 5, 5, 5], [0, 5, 10, 5], [0, 5, 5, 5]]
-    assert (off_centre == expected_result).all()
-
-    # test another off centre and part out of bounds
-    off_centre_2 = get_roi(
-        image_arr=test_img, current_x=2, current_y=2, dist_from_x=2, dist_from_y=2
-    )
-    expected_result = [
-        [0, 0, 0, 0],
-        [0, 5, 5, 5],
-        [0, 5, 10, 5],
-        [0, 5, 5, 5],
-    ]
-    assert (off_centre_2 == expected_result).all()
+    assert result.shape == (250, 150)  # (height, width)
