@@ -4,20 +4,17 @@ from unittest.mock import MagicMock, call
 import pytest
 from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import init_devices, observe_value
+from ophyd_async.core import get_mock_put, init_devices, observe_value, set_mock_value
 from ophyd_async.epics.motor import MotorLimitsError
-from ophyd_async.testing import get_mock_put, set_mock_value
 
 from dodal.devices.smargon import CombinedMove, DeferMoves, Smargon, StubPosition
-from dodal.testing import patch_all_motors
 
 
 @pytest.fixture
 async def smargon() -> AsyncGenerator[Smargon]:
     async with init_devices(mock=True):
         smargon = Smargon("")
-    with patch_all_motors(smargon):
-        yield smargon
+    yield smargon
 
 
 def set_smargon_pos(smargon: Smargon, pos: tuple[float, float, float]):
@@ -108,18 +105,18 @@ async def test_given_center_disp_low_when_stub_offsets_set_to_center_and_moved_t
 async def test_given_set_with_value_outside_motor_limit(
     smargon: Smargon, test_x, test_y, test_z, test_omega, test_chi, test_phi
 ):
-    set_mock_value(smargon.x.low_limit_travel, -1999)
-    set_mock_value(smargon.y.low_limit_travel, -1999)
-    set_mock_value(smargon.z.low_limit_travel, -1999)
-    set_mock_value(smargon.omega.low_limit_travel, -1999)
-    set_mock_value(smargon.chi.low_limit_travel, -1999)
-    set_mock_value(smargon.phi.low_limit_travel, -1999)
-    set_mock_value(smargon.x.high_limit_travel, 1999)
-    set_mock_value(smargon.y.high_limit_travel, 1999)
-    set_mock_value(smargon.z.high_limit_travel, 1999)
-    set_mock_value(smargon.omega.high_limit_travel, 1999)
-    set_mock_value(smargon.chi.high_limit_travel, 1999)
-    set_mock_value(smargon.phi.high_limit_travel, 1999)
+    for motor in [
+        smargon.x,
+        smargon.y,
+        smargon.z,
+        smargon.omega,
+        smargon.chi,
+        smargon.phi,
+    ]:
+        set_mock_value(motor.low_limit_travel, -1999)
+        set_mock_value(motor.high_limit_travel, 1999)
+        set_mock_value(motor.dial_low_limit_travel, -1999)
+        set_mock_value(motor.dial_high_limit_travel, 1999)
 
     with pytest.raises(MotorLimitsError):
         await smargon.set(

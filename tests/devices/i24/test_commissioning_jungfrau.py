@@ -9,8 +9,6 @@ from ophyd_async.core import (
     StaticPathProvider,
     TriggerInfo,
     init_devices,
-)
-from ophyd_async.testing import (
     set_mock_value,
 )
 
@@ -32,7 +30,7 @@ async def test_jungfrau_with_temporary_writer(
 ):
     set_mock_value(jungfrau._writer.writer_ready, 1)
     set_mock_value(jungfrau._writer.frame_counter, 10)
-    jungfrau._writer._path_info = MagicMock()
+    jungfrau._writer._path_provider = MagicMock()
     trigger_info = TriggerInfo(livetime=1e-3, exposures_per_event=5)
     await jungfrau.prepare(trigger_info)
     assert await jungfrau._writer.frame_counter.get_value() == 0
@@ -50,7 +48,7 @@ async def test_jungfrau_with_temporary_writer(
         set_mock_value(jungfrau._writer.frame_counter, 5)
 
     await asyncio.gather(status, _do_fake_writing())
-    jungfrau._writer._path_info.assert_called_once()
+    jungfrau._writer._path_provider.assert_called_once()
 
 
 async def test_jungfrau_error_when_writing_to_existing_file(tmp_path: Path):

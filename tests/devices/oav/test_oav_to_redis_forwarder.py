@@ -3,9 +3,9 @@ from datetime import timedelta
 from unittest.mock import ANY, AsyncMock, MagicMock, call, patch
 
 import pytest
-from ophyd_async.core import init_devices
-from ophyd_async.testing import set_mock_value
+from ophyd_async.core import init_devices, set_mock_value
 
+from dodal.devices.oav.oav_detector import OAV
 from dodal.devices.oav.oav_to_redis_forwarder import (
     OAVToRedisForwarder,
     Source,
@@ -15,14 +15,20 @@ from dodal.devices.oav.oav_to_redis_forwarder import (
 
 @pytest.fixture
 @patch("dodal.devices.oav.oav_to_redis_forwarder.StrictRedis", new=AsyncMock)
-async def oav_forwarder():
-    with init_devices(mock=True):
-        oav_forwarder = OAVToRedisForwarder("prefix", "host", "password")
+async def oav_forwarder(oav_beam_centre_pv_fs: OAV, oav_beam_centre_pv_roi: OAV):
     set_mock_value(
-        oav_forwarder.sources[Source.FULL_SCREEN.value].url,
+        oav_beam_centre_pv_fs.snapshot.video_url,
         "test-full-screen-stream-url",
     )
-    set_mock_value(oav_forwarder.sources[Source.ROI.value].url, "test-roi-stream-url")
+    set_mock_value(
+        oav_beam_centre_pv_roi.snapshot.video_url,
+        "test-roi-stream-url",
+    )
+    with init_devices(mock=True):
+        oav_forwarder = OAVToRedisForwarder(
+            "prefix", oav_beam_centre_pv_roi, oav_beam_centre_pv_fs, "host", "password"
+        )
+
     set_mock_value(oav_forwarder.selected_source, Source.FULL_SCREEN.value)
     return oav_forwarder
 

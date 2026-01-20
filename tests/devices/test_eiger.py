@@ -1,4 +1,5 @@
 # type: ignore # Eiger will soon be ophyd-async https://github.com/DiamondLightSource/dodal/issues/700
+import asyncio
 import threading
 from unittest.mock import ANY, MagicMock, Mock, call, create_autospec, patch
 
@@ -7,7 +8,6 @@ from ophyd.sim import NullStatus, make_fake_device
 from ophyd.status import Status
 from ophyd.utils import UnknownStatusFailure
 
-from conftest import failed_status
 from dodal.devices.detector import DetectorParams, TriggerMode
 from dodal.devices.detector.det_dim_constants import EIGER2_X_16M_SIZE
 from dodal.devices.eiger import AVAILABLE_TIMEOUTS, EigerDetector
@@ -19,6 +19,12 @@ TEST_PREFIX = "test"
 TEST_RUN_NUMBER = 0
 
 
+def failed_status(failure: Exception) -> Status:
+    status = Status()
+    status.set_exception(failure)
+    return status
+
+
 class StatusError(Exception):
     pass
 
@@ -27,7 +33,10 @@ class StatusError(Exception):
 def fake_eiger(request, eiger_params: DetectorParams):
     fake_eiger_class = make_fake_device(EigerDetector)
     fake_eiger: EigerDetector = fake_eiger_class.with_params(
-        params=eiger_params, name=f"test fake Eiger: {request.node.name}"
+        params=eiger_params,
+        name=f"test fake Eiger: {request.node.name}",
+        beamline="i03",
+        ispyb_detector_id=78,
     )
     return fake_eiger
 
@@ -724,3 +733,51 @@ def test_given_eiger_is_disarming_when_eiger_is_stopped_then_wait_for_disarming_
 
     disarming_status.wait.assert_called_once()
     fake_eiger.disarm_detector.assert_not_called()
+
+
+def test_eiger_uses_current_energy_if_expected_energy_is_none(
+    fake_eiger: EigerDetector,
+):
+    fake_eiger.detector_params.use_roi_mode = False  # type: ignore
+    fake_eiger.detector_params.expected_energy_ev = None
+    expected_energy = 100
+    fake_eiger.cam.photon_energy.put(expected_energy)
+
+    set_up_eiger_to_stage_happily(fake_eiger)
+
+    mock_eiger_odin_statuses(fake_eiger)
+
+    def wait_on_staging():
+        st = fake_eiger.async_stage()
+        st.wait()
+
+    waiting_status = Status()
+    fake_eiger.cam.num_images.set = MagicMock(return_value=waiting_status)
+
+    thread = threading.Thread(target=wait_on_staging, daemon=True)
+    thread.start()
+
+    assert thread.is_alive()
+
+    fake_eiger.stale_params.sim_put(1)  # type: ignore
+    waiting_status.set_finished()
+
+    assert thread.is_alive()
+
+    fake_eiger.stale_params.sim_put(0)  # type: ignore
+
+    thread.join(0.2)
+    assert not thread.is_alive()
+    assert fake_eiger.cam.photon_energy.get() == expected_energy
+
+
+async def test_multiple_stops_disarms_eiger_once(fake_eiger: EigerDetector):
+    fake_eiger.disarming_status = None
+    fake_eiger.disarm_detector = MagicMock()
+
+    async def do_stop():
+        await asyncio.sleep(0.01)
+        fake_eiger.stop()
+
+    await asyncio.gather(do_stop(), do_stop())
+    fake_eiger.disarm_detector.assert_called_once()

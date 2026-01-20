@@ -1,5 +1,6 @@
 import json
 import pickle
+import time
 from dataclasses import dataclass
 from enum import Enum
 from typing import TypedDict
@@ -12,7 +13,7 @@ from ophyd_async.core import (
     soft_signal_r_and_setter,
     soft_signal_rw,
 )
-from redis.asyncio import StrictRedis
+from redis.asyncio import ConnectionError, StrictRedis
 
 from dodal.devices.i04.constants import RedisConstants
 from dodal.devices.oav.oav_calculations import (
@@ -21,6 +22,7 @@ from dodal.devices.oav.oav_calculations import (
 from dodal.log import LOGGER
 
 NO_MURKO_RESULT = (-1, -1)
+RESULTS_COMPLETE_MESSAGE = "murko_results_complete"
 
 
 class MurkoMetadata(TypedDict):
@@ -71,7 +73,8 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
     solutions for y and z can be calculated using numpy's linear algebra library.
     """
 
-    TIMEOUT_S = 2
+    GET_MESSAGE_TIMEOUT_S = 2
+    RESULTS_COMPLETE_TIMEOUT_S = 5
     PERCENTAGE_TO_USE = 25
     LEFTMOST_PIXEL_TO_USE = 10
     NUMBER_OF_WRONG_RESULTS_TO_LOG = 5
@@ -82,7 +85,6 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
         redis_password=RedisConstants.REDIS_PASSWORD,
         redis_db=RedisConstants.MURKO_REDIS_DB,
         name="",
-        stop_angle=350,
     ):
         self.redis_client = StrictRedis(
             host=redis_host,
@@ -91,7 +93,6 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
         )
         self.pubsub = self.redis_client.pubsub()
         self.sample_id = soft_signal_rw(str)  # Should get from redis
-        self.stop_angle = stop_angle
 
         self._reset()
 
@@ -102,13 +103,25 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
             self.z_mm, self._z_mm_setter = soft_signal_r_and_setter(float)
         super().__init__(name=name)
 
+    async def _check_redis_connection(self):
+        try:
+            await self.redis_client.ping()  # type: ignore
+            return True
+        except ConnectionError:
+            LOGGER.warning(
+                f"Failed to connect to redis: {self.redis_client}. Murko results device will not trigger"
+            )
+            return False
+
     def _reset(self):
-        self._last_omega = 0
+        self._last_omega = None
         self._results: list[MurkoResult] = []
 
     @AsyncStatus.wrap
     async def stage(self):
-        await self.pubsub.subscribe("murko-results")
+        self.redis_connected = await self._check_redis_connection()
+        if self.redis_connected:
+            await self.pubsub.subscribe("murko-results")
         self._x_mm_setter(0)
         self._y_mm_setter(0)
         self._z_mm_setter(0)
@@ -116,18 +129,34 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
     @AsyncStatus.wrap
     async def unstage(self):
         self._reset()
-        await self.pubsub.unsubscribe()
+        if self.redis_connected:
+            await self.pubsub.unsubscribe()
 
     @AsyncStatus.wrap
     async def trigger(self):
-        # Wait for results
+        if not self.redis_connected:
+            return
         sample_id = await self.sample_id.get_value()
-        while self._last_omega < self.stop_angle:
+        t_last_result = time.time()
+        while True:
+            if time.time() - t_last_result > self.RESULTS_COMPLETE_TIMEOUT_S:
+                LOGGER.warning(
+                    f"Time since last result > {self.RESULTS_COMPLETE_TIMEOUT_S}, expected to receive {RESULTS_COMPLETE_MESSAGE}"
+                )
+                break
             # waits here for next batch to be received
-            message = await self.pubsub.get_message(timeout=self.TIMEOUT_S)
-            if message is None:
-                continue
-            await self.process_batch(message, sample_id)
+            message = await self.pubsub.get_message(timeout=self.GET_MESSAGE_TIMEOUT_S)
+            if message and message["type"] == "message":
+                t_last_result = time.time()
+                data = pickle.loads(message["data"])
+
+                if data == RESULTS_COMPLETE_MESSAGE:
+                    LOGGER.info(
+                        f"Received results complete message: {RESULTS_COMPLETE_MESSAGE}"
+                    )
+                    break
+
+                await self.process_batch(data, sample_id)
 
         if not self._results:
             raise NoResultsFoundError("No results retrieved from Murko")
@@ -155,22 +184,18 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
                 f"murko:{sample_id}:metadata", result.uuid, json.dumps(result.metadata)
             )
 
-    async def process_batch(self, message: dict | None, sample_id: str):
-        if message and message["type"] == "message":
-            batch_results: list[dict] = pickle.loads(message["data"])
-            for results in batch_results:
-                for uuid, result in results.items():
-                    if metadata_str := await self.redis_client.hget(  # type: ignore
-                        f"murko:{sample_id}:metadata", uuid
-                    ):
-                        LOGGER.info(
-                            f"Found metadata for uuid {uuid}, processing result"
-                        )
-                        self.process_result(
-                            result, MurkoMetadata(json.loads(metadata_str))
-                        )
-                    else:
-                        LOGGER.info(f"Found no metadata for uuid {uuid}")
+    async def process_batch(
+        self, batch_results: list[tuple[str, dict]], sample_id: str
+    ):
+        for result_with_uuid in batch_results:
+            uuid, result = result_with_uuid
+            if metadata_str := await self.redis_client.hget(  # type: ignore
+                f"murko:{sample_id}:metadata", uuid
+            ):
+                LOGGER.info(f"Found metadata for uuid {uuid}, processing result")
+                self.process_result(result, MurkoMetadata(json.loads(metadata_str)))
+            else:
+                LOGGER.info(f"Found no metadata for uuid {uuid}")
 
     def process_result(self, result: dict, metadata: MurkoMetadata):
         """Uses the 'most_likely_click' coordinates from Murko to calculate the

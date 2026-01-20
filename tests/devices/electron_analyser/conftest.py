@@ -8,15 +8,14 @@ from dodal.devices.common_dcm import (
     PitchAndRollCrystal,
     StationaryCrystal,
 )
-from dodal.devices.electron_analyser import (
-    DualEnergySource,
-    ElectronAnalyserDetector,
-    EnergySource,
-)
-from dodal.devices.electron_analyser.abstract import (
+from dodal.devices.electron_analyser.base import (
     AbstractAnalyserDriverIO,
     AbstractBaseRegion,
     AbstractBaseSequence,
+    DualEnergySource,
+    ElectronAnalyserController,
+    ElectronAnalyserDetector,
+    EnergySource,
     TAbstractBaseSequence,
 )
 from dodal.devices.electron_analyser.specs import (
@@ -29,10 +28,15 @@ from dodal.devices.electron_analyser.vgscienta import (
 )
 from dodal.devices.i09 import Grating
 from dodal.devices.pgm import PlaneGratingMonochromator
-from dodal.testing import patch_motor
-from tests.devices.electron_analyser.helper_util import (
-    get_test_sequence,
-)
+from dodal.devices.selectable_source import SourceSelector
+from tests.devices.electron_analyser.helper_util import get_test_sequence
+
+
+@pytest.fixture
+async def source_selector() -> SourceSelector:
+    async with init_devices(mock=True):
+        source_selector = SourceSelector()
+    return source_selector
 
 
 @pytest.fixture
@@ -41,27 +45,27 @@ async def single_energy_source() -> EnergySource:
         dcm = DoubleCrystalMonochromatorWithDSpacing(
             "DCM:", PitchAndRollCrystal, StationaryCrystal
         )
-    patch_motor(dcm.energy_in_keV, initial_position=2.2)
+    await dcm.energy_in_keV.set(2.2)
     async with init_devices(mock=True):
         dcm_energy_source = EnergySource(dcm.energy_in_eV)
+
     return dcm_energy_source
 
 
 @pytest.fixture
-async def dual_energy_source() -> DualEnergySource:
+async def dual_energy_source(source_selector: SourceSelector) -> DualEnergySource:
     async with init_devices(mock=True):
         dcm = DoubleCrystalMonochromatorWithDSpacing(
             "DCM:", PitchAndRollCrystal, StationaryCrystal
         )
-    patch_motor(dcm.energy_in_keV, initial_position=2.2)
-
-    async with init_devices(mock=True):
         pgm = PlaneGratingMonochromator("PGM:", Grating)
-    patch_motor(pgm.energy, initial_position=500)
-
+    await dcm.energy_in_keV.set(2.2)
+    await pgm.energy.set(500)
     async with init_devices(mock=True):
         dual_energy_source = DualEnergySource(
-            source1=dcm.energy_in_eV, source2=pgm.energy.user_readback
+            source1=dcm.energy_in_eV,
+            source2=pgm.energy.user_readback,
+            selected_source=source_selector.selected_source,
         )
     return dual_energy_source
 
@@ -87,10 +91,12 @@ def sequence_class(
 def sequence(
     sim_driver: AbstractAnalyserDriverIO,
     sequence_class: type[TAbstractBaseSequence],
+    single_energy_source: EnergySource,
 ) -> AbstractBaseSequence:
+    controller = ElectronAnalyserController(sim_driver, single_energy_source)
     det = ElectronAnalyserDetector(
-        driver=sim_driver,
         sequence_class=sequence_class,
+        controller=controller,
     )
     return det.load_sequence(get_test_sequence(type(sim_driver)))
 

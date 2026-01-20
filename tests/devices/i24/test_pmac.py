@@ -4,7 +4,12 @@ from unittest.mock import call, patch
 import bluesky.plan_stubs as bps
 import pytest
 from bluesky import RunEngine
-from ophyd_async.testing import callback_on_mock_put, get_mock_put, set_mock_value
+from ophyd_async.core import (
+    callback_on_mock_put,
+    get_mock_put,
+    init_devices,
+    set_mock_value,
+)
 
 from dodal.devices.i24.pmac import (
     CS_STR,
@@ -13,16 +18,13 @@ from dodal.devices.i24.pmac import (
     EncReset,
     LaserSettings,
 )
-from dodal.testing import patch_all_motors
 
 
 @pytest.fixture
 async def fake_pmac():
-    pmac = PMAC("", name="fake_pmac")
-    await pmac.connect(mock=True)
-
-    with patch_all_motors(pmac):
-        yield pmac
+    with init_devices(mock=True):
+        pmac = PMAC("", name="fake_pmac")
+    yield pmac
 
 
 def test_pmac_can_be_created(fake_pmac: PMAC):
@@ -68,15 +70,16 @@ async def test_set_pmac_string_for_enc_reset(fake_pmac: PMAC, run_engine: RunEng
 
 
 async def test_run_program(fake_pmac: PMAC):
-    async def go_high_then_low():
-        set_mock_value(fake_pmac.scanstatus, 1)
-        await asyncio.sleep(0.01)
-        set_mock_value(fake_pmac.scanstatus, 0)
+    def go_high_then_low(value, *_, **__):
+        async def async_go_high_then_low():
+            set_mock_value(fake_pmac.scanstatus, 1)
+            await asyncio.sleep(0.01)
+            set_mock_value(fake_pmac.scanstatus, 0)
 
-    callback_on_mock_put(
-        fake_pmac.pmac_string,
-        lambda *args, **kwargs: asyncio.create_task(go_high_then_low()),  # type: ignore
-    )
+        asyncio.create_task(async_go_high_then_low())
+        return value
+
+    callback_on_mock_put(fake_pmac.pmac_string, go_high_then_low)
 
     set_mock_value(fake_pmac.program_number, 11)
     await fake_pmac.run_program.kickoff()

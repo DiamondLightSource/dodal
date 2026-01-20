@@ -2,6 +2,7 @@ import asyncio
 from asyncio import wait_for
 from contextlib import nullcontext
 from dataclasses import dataclass
+from typing import Any
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import numpy as np
@@ -10,8 +11,13 @@ from bluesky import plan_stubs as bps
 from bluesky import preprocessors as bpp
 from bluesky.run_engine import RunEngine
 from ophyd.status import DeviceStatus, Status
-from ophyd_async.core import init_devices
-from ophyd_async.testing import get_mock_put, set_mock_put_proceeds, set_mock_value
+from ophyd_async.core import (
+    callback_on_mock_put,
+    get_mock_put,
+    init_devices,
+    set_mock_put_proceeds,
+    set_mock_value,
+)
 
 from dodal.devices.fast_grid_scan import (
     FastGridScanCommon,
@@ -28,7 +34,6 @@ from dodal.devices.i02_1.fast_grid_scan import (
     ZebraGridScanParamsTwoD,
 )
 from dodal.devices.smargon import Smargon
-from dodal.testing import patch_all_motors
 
 
 def discard_status(st: Status | DeviceStatus):
@@ -90,9 +95,7 @@ async def zebra_fast_grid_scan_2d():
 async def smargon():
     async with init_devices(mock=True):
         smargon = Smargon("")
-
-    with patch_all_motors(smargon):
-        yield smargon
+    yield smargon
 
 
 @pytest.fixture(
@@ -139,13 +142,14 @@ async def test_waits_for_running_motion(grid_scan: FastGridScanCommon):
     ],
 )
 async def test_given_different_step_numbers_then_expected_images_correct(
-    zebra_fast_grid_scan: ZebraFastGridScanThreeD, steps, expected_images
+    run_engine: RunEngine,
+    zebra_fast_grid_scan: ZebraFastGridScanThreeD,
+    steps: tuple[int, int, int],
+    expected_images: int,
 ):
     set_mock_value(zebra_fast_grid_scan.x_steps, steps[0])
     set_mock_value(zebra_fast_grid_scan.y_steps, steps[1])
     set_mock_value(zebra_fast_grid_scan.z_steps, steps[2])
-
-    run_engine = RunEngine(call_returns_result=True)
 
     result = run_engine(bps.rd(zebra_fast_grid_scan.expected_images))
 
@@ -161,12 +165,13 @@ async def test_given_different_step_numbers_then_expected_images_correct(
     ],
 )
 async def test_given_different_2d_step_numbers_then_expected_images_correct(
-    zebra_fast_grid_scan_2d: ZebraFastGridScanTwoD, steps, expected_images
+    zebra_fast_grid_scan_2d: ZebraFastGridScanTwoD,
+    steps: tuple[int, int],
+    expected_images: int,
+    run_engine: RunEngine,
 ):
     set_mock_value(zebra_fast_grid_scan_2d.x_steps, steps[0])
     set_mock_value(zebra_fast_grid_scan_2d.y_steps, steps[1])
-
-    run_engine = RunEngine(call_returns_result=True)
 
     result = run_engine(bps.rd(zebra_fast_grid_scan_2d.expected_images))
 
@@ -474,7 +479,9 @@ async def test_i02_1_gridscan_has_2d_behaviour(
 
 
 async def test_gridscan_prepare_writes_values_and_checks_readback(
-    grid_scan_devices_with_params_and_valid_state,
+    grid_scan_devices_with_params_and_valid_state: tuple[
+        FastGridScanCommon, GridScanParamsCommon, Any
+    ],
 ):
     grid_scan_device, grid_scan_params, valid_state = (
         grid_scan_devices_with_params_and_valid_state
@@ -514,7 +521,9 @@ async def test_gridscan_prepare_writes_values_and_checks_readback(
 
 
 async def test_gridscan_prepare_checks_validity_after_writes(
-    grid_scan_devices_with_params_and_valid_state,
+    grid_scan_devices_with_params_and_valid_state: tuple[
+        FastGridScanCommon, GridScanParamsCommon, Any
+    ],
 ):
     grid_scan_device, grid_scan_params, valid_state = (
         grid_scan_devices_with_params_and_valid_state
@@ -547,7 +556,9 @@ async def test_gridscan_prepare_checks_validity_after_writes(
 
 
 async def test_gridscan_prepare_times_out_for_validity_check(
-    grid_scan_devices_with_params_and_valid_state,
+    grid_scan_devices_with_params_and_valid_state: tuple[
+        FastGridScanCommon, GridScanParamsCommon, Any
+    ],
 ):
     grid_scan_device, grid_scan_params, valid_state = (
         grid_scan_devices_with_params_and_valid_state
@@ -570,3 +581,22 @@ async def test_gridscan_prepare_times_out_for_validity_check(
         and cause.args[0]
         == f"{device_name}-scan_invalid didn't match 0.0 in 0.5s, last value 1.0"
     )
+
+
+async def test_gridscan_prepare_works_within_tolerance_on_the_readback(
+    grid_scan_devices_with_params_and_valid_state: tuple[
+        FastGridScanCommon, GridScanParamsCommon, Any
+    ],
+):
+    grid_scan_device, grid_scan_params, valid_state = (
+        grid_scan_devices_with_params_and_valid_state
+    )
+
+    grid_scan_params.x_step_size_mm = 0.1111111
+
+    def return_rounded_value(value, *_, **__):
+        return round(value, 3)
+
+    callback_on_mock_put(grid_scan_device.x_step_size, return_rounded_value)
+
+    await grid_scan_device.prepare(grid_scan_params)

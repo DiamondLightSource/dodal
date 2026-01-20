@@ -1,8 +1,18 @@
 from dodal.beamline_specific_utils.i05_shared import pgm as i05_pgm
-from dodal.common.beamlines.beamline_utils import device_factory
+from dodal.common.beamlines.beamline_utils import (
+    device_factory,
+)
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
+from dodal.devices.insertion_device import (
+    Apple2,
+    UndulatorGap,
+    UndulatorLockedPhaseAxes,
+)
 from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.devices.synchrotron import Synchrotron
+from dodal.devices.temperture_controller import (
+    Lakeshore336,
+)
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
@@ -20,3 +30,28 @@ def synchrotron() -> Synchrotron:
 @device_factory()
 def pgm() -> PlaneGratingMonochromator:
     return i05_pgm()
+
+
+@device_factory()
+def id_gap() -> UndulatorGap:
+    return UndulatorGap(prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:")
+
+
+@device_factory()
+def id_phase() -> UndulatorLockedPhaseAxes:
+    return UndulatorLockedPhaseAxes(
+        prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:",
+        top_outer="PL",
+        btm_inner="PU",
+    )
+
+
+@device_factory()
+def id() -> Apple2:
+    """i05 insertion device."""
+    return Apple2(id_gap=id_gap(), id_phase=id_phase())
+
+
+@device_factory()
+def sample_temperature_controller() -> Lakeshore336:
+    return Lakeshore336(prefix=f"{PREFIX.beamline_prefix}-EA-TCTRL-02:")

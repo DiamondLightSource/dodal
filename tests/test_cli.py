@@ -1,7 +1,8 @@
 import os
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 import pytest
+from bluesky import RunEngine
 from click.testing import CliRunner, Result
 from ophyd.device import DEFAULT_CONNECTION_TIMEOUT
 from ophyd_async.core import (
@@ -12,11 +13,18 @@ from ophyd_async.core import (
 
 from dodal import __version__
 from dodal.cli import main
+from dodal.device_manager import DeviceManager
 from dodal.utils import AnyDevice, OphydV1Device, OphydV2Device
 
 # Test with an example beamline, device instantiation is already tested
 # in beamline unit tests
 EXAMPLE_BEAMLINE = "i22"
+
+
+@pytest.fixture(autouse=True)
+def patch_run_engine_in_cli_to_avoid_leaks(run_engine: RunEngine):
+    with patch("dodal.cli.RunEngine", return_value=run_engine):
+        yield
 
 
 @pytest.fixture
@@ -288,6 +296,33 @@ def test_cli_connect_when_devices_error(
             runner=runner,
             devices=devices,
         )
+
+
+@patch("dodal.cli.importlib")
+@patch("dodal.cli.make_all_devices")
+@patch("dodal.cli._connect_devices")
+@patch.dict(os.environ, clear=True)
+def test_missing_device_manager(connect, make, imp, runner: CliRunner):
+    # If the device manager cannot be found, it should fall back to the
+    # make_all_devices + _connect_devices approach.
+    make.return_value = ({}, {})
+    runner.invoke(main, ["connect", "-n", "devices", "i22"])
+    make.assert_called_once()
+    connect.assert_called_once()
+
+
+@patch.dict(os.environ, clear=True)
+@pytest.mark.parametrize("mock", [True, False], ids=["live", "sim"].__getitem__)
+def test_device_manager_init(runner: CliRunner, mock: bool):
+    with patch("dodal.cli.importlib") as mock_import:
+        dm = mock_import.import_module("dodal.beamlines.i22")
+        dm.devices = Mock(spec=DeviceManager)
+        mock_import.reset_mock()
+        runner.invoke(
+            main, ["connect", "-n", "devices", "i22"] + (["-s"] if mock else [])
+        )
+        mock_import.import_module.assert_called_once_with("dodal.beamlines.i22")
+        dm.devices.build_and_connect.assert_called_once_with(mock=mock)
 
 
 def _mock_connect(

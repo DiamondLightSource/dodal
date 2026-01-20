@@ -1,6 +1,7 @@
 import asyncio
 from asyncio import FIRST_COMPLETED, CancelledError, Task, wait_for
 from dataclasses import dataclass
+from enum import IntEnum
 
 from bluesky.protocols import Movable
 from ophyd_async.core import (
@@ -21,8 +22,8 @@ from ophyd_async.epics.core import (
 
 from dodal.log import LOGGER
 
-WAIT_FOR_OLD_PIN_MSG = "Waiting on old pin unloaded"
-WAIT_FOR_NEW_PIN_MSG = "Waiting on new pin loaded"
+WAIT_FOR_BEAMLINE_DISABLE_MSG = "Waiting on beamline disable"
+WAIT_FOR_BEAMLINE_ENABLE_MSG = "Waiting on beamline enable"
 
 
 class RobotLoadError(Exception):
@@ -43,9 +44,17 @@ class SampleLocation:
     pin: int
 
 
+SAMPLE_LOCATION_EMPTY = SampleLocation(-1, -1)
+
+
 class PinMounted(StrictEnum):
     NO_PIN_MOUNTED = "No Pin Mounted"
     PIN_MOUNTED = "Pin Mounted"
+
+
+class BeamlineStatus(IntEnum):
+    ENABLED = 0
+    DISABLED = 1
 
 
 class ErrorStatus(Device):
@@ -71,6 +80,7 @@ class BartRobot(StandardReadable, Movable[SampleLocation]):
     LOAD_TIMEOUT = 60
 
     # Error codes that we do special things on
+    NO_ERROR = 0
     NO_PIN_ERROR_CODE = 25
     LIGHT_CURTAIN_TRIPPED = 40
 
@@ -84,6 +94,8 @@ class BartRobot(StandardReadable, Movable[SampleLocation]):
 
             self.current_puck = epics_signal_r(float, prefix + "CURRENT_PUCK_RBV")
             self.current_pin = epics_signal_r(float, prefix + "CURRENT_PIN_RBV")
+
+        self.beamline_disabled = epics_signal_r(int, prefix + "ROBOT_OP_16_BITS.B8")
 
         self.next_pin = epics_signal_rw_rbv(float, prefix + "NEXT_PIN")
         self.next_puck = epics_signal_rw_rbv(float, prefix + "NEXT_PUCK")
@@ -104,7 +116,6 @@ class BartRobot(StandardReadable, Movable[SampleLocation]):
         self.init = epics_signal_x(prefix + "INIT.PROC")
         self.soak = epics_signal_x(prefix + "SOAK.PROC")
         self.home = epics_signal_x(prefix + "GOHM.PROC")
-        self.unload = epics_signal_x(prefix + "UNLD.PROC")
         self.dry = epics_signal_x(prefix + "DRY.PROC")
         self.open = epics_signal_x(prefix + "COLO.PROC")
         self.close = epics_signal_x(prefix + "COLC.PROC")
@@ -116,22 +127,26 @@ class BartRobot(StandardReadable, Movable[SampleLocation]):
         )
         super().__init__(name=name)
 
-    async def pin_mounted_or_no_pin_found(self):
-        """This co-routine will finish when either a pin is detected or the robot gives
-        an error saying no pin was found (whichever happens first). In the case where no
-        pin was found a RobotLoadError error is raised.
+    async def beamline_status_or_error(self, expected_state: BeamlineStatus):
+        """This co-routine will finish when either the beamline reaches the specified
+        state or the robot gives an error (whichever happens first). In the case where
+        there is an error a RobotLoadError error is raised.
         """
 
-        async def raise_if_no_pin():
-            await wait_for_value(self.prog_error.code, self.NO_PIN_ERROR_CODE, None)
-            raise RobotLoadError(self.NO_PIN_ERROR_CODE, "Pin was not detected")
+        async def raise_if_error():
+            await wait_for_value(
+                self.prog_error.code, lambda value: value != self.NO_ERROR, None
+            )
+            error_code = await self.prog_error.code.get_value()
+            error_msg = await self.prog_error.str.get_value()
+            raise RobotLoadError(error_code, error_msg)
 
-        async def wfv():
-            await wait_for_value(self.gonio_pin_sensor, PinMounted.PIN_MOUNTED, None)
+        async def wait_for_expected_state():
+            await wait_for_value(self.beamline_disabled, expected_state.value, None)
 
         tasks = [
-            (Task(raise_if_no_pin())),
-            (Task(wfv())),
+            (Task(raise_if_error())),
+            (Task(wait_for_expected_state())),
         ]
         try:
             finished, unfinished = await asyncio.wait(
@@ -167,20 +182,37 @@ class BartRobot(StandardReadable, Movable[SampleLocation]):
             set_and_wait_for_value(self.next_pin, sample_location.pin),
         )
         await self.load.trigger()
-        if await self.gonio_pin_sensor.get_value() == PinMounted.PIN_MOUNTED:
-            LOGGER.info(WAIT_FOR_OLD_PIN_MSG)
-            await wait_for_value(self.gonio_pin_sensor, PinMounted.NO_PIN_MOUNTED, None)
-        LOGGER.info(WAIT_FOR_NEW_PIN_MSG)
+        await self._wait_for_beamline_enabled_after_load_or_unload()
 
-        await self.pin_mounted_or_no_pin_found()
+    async def _wait_for_beamline_enabled_after_load_or_unload(self):
+        if await self.beamline_disabled.get_value() == BeamlineStatus.ENABLED.value:
+            LOGGER.info(WAIT_FOR_BEAMLINE_DISABLE_MSG)
+            await self.beamline_status_or_error(BeamlineStatus.DISABLED)
+
+        LOGGER.info(WAIT_FOR_BEAMLINE_ENABLE_MSG)
+        await self.beamline_status_or_error(BeamlineStatus.ENABLED)
 
     @AsyncStatus.wrap
     async def set(self, value: SampleLocation):
+        """
+        Perform a sample load from the specified sample location
+        Args:
+            value: The pin and puck to load, or SAMPLE_LOCATION_EMPTY to unload the sample.
+        Raises:
+            RobotLoadError if a timeout occurs, or if an error occurs loading the sample.
+        """
         try:
-            await wait_for(
-                self._load_pin_and_puck(value),
-                timeout=self.LOAD_TIMEOUT + self.NOT_BUSY_TIMEOUT,
-            )
+            if value != SAMPLE_LOCATION_EMPTY:
+                await wait_for(
+                    self._load_pin_and_puck(value),
+                    timeout=self.LOAD_TIMEOUT + self.NOT_BUSY_TIMEOUT,
+                )
+            else:
+                await self.unload.trigger(timeout=self.LOAD_TIMEOUT)
+                await wait_for(
+                    self._wait_for_beamline_enabled_after_load_or_unload(),
+                    timeout=self.LOAD_TIMEOUT + self.NOT_BUSY_TIMEOUT,
+                )
         except TimeoutError as e:
             await self.prog_error.raise_if_error(e)
             await self.controller_error.raise_if_error(e)
