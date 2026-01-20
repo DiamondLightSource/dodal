@@ -12,7 +12,6 @@ from ophyd_async.core import (
 from ophyd_async.epics.core import (
     epics_signal_r,
 )
-from PIL import Image
 
 from dodal.devices.oav.utils import convert_to_gray_and_blur
 from dodal.log import LOGGER
