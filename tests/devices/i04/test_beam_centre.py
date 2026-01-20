@@ -136,7 +136,7 @@ async def test_real_image_gives_expected_centre(
     assert image is not None
     image = np.asarray(image[:, :])
     set_mock_value(centre_device.oav_array_signal, image)
-
+    set_mock_value(centre_device.roi_box_size, 10000)
     await centre_device.trigger()
 
     assert await centre_device.center_x_val.get_value() == pytest.approx(727.8381)
@@ -190,3 +190,20 @@ def test_get_roi_creates_box_with_correct_shape():
         box_height=250,
     )
     assert result.shape == (250, 150)  # (height, width)
+
+
+async def test_real_image_gives_expected_centre_with_roi(
+    centre_device: CentreEllipseMethod,
+):
+    image = cv2.imread("tests/test_data/scintillator_with_beam.jpg")
+    assert image is not None
+    image = np.asarray(image[:, :])
+    set_mock_value(centre_device.oav_array_signal, image)
+    set_mock_value(centre_device.current_centre_x, 700)
+    set_mock_value(centre_device.current_centre_y, 400)
+    set_mock_value(centre_device.roi_box_size, 300)
+
+    await centre_device.trigger()
+
+    assert await centre_device.center_x_val.get_value() == pytest.approx(727.8, abs=0.1)
+    assert await centre_device.center_y_val.get_value() == pytest.approx(365.4, abs=0.1)
