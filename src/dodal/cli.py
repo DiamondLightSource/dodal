@@ -46,7 +46,7 @@ def describe(beamline: str, device_manager: str) -> None:
     if (manager := getattr(mod, device_manager, None)) and isinstance(
         manager, DeviceManager
     ):
-        devices, _, _ = manager.build_all()
+        devices = manager.get_all_factories()
     else:
         print(
             f"No device manager named '{device_manager}' found in {mod}, convert the beamline to use device manager"

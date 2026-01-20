@@ -363,12 +363,7 @@ def _describe_devices(runner, device_docstrings):
             mocked_device.__doc__ = docstring
             devices[device_name] = mocked_device
 
-        dm.devices.build_all.return_value = (
-            devices,
-            None,
-            None,
-        )
-
+        dm.devices.get_all_factories.return_value = devices
         return runner.invoke(main, ["describe", "-n", "devices", "i22"])
 
 
