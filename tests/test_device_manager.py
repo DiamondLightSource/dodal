@@ -2,6 +2,7 @@ from unittest.mock import MagicMock, Mock, patch
 
 import pytest
 from ophyd.device import Device as OphydV1Device
+from ophyd_async.core import Device
 from ophyd_async.core import Device as OphydV2Device
 from ophyd_async.sim import SimMotor
 from pytest import RaisesExc, RaisesGroup
@@ -748,7 +749,7 @@ def test_lazy_fixtures_contains():
     assert "two" not in lf
 
 
-def test_docstrings_are_kept(dm: DeviceManager):
+def test_docstrings_for_factory_instane_are_kept(dm: DeviceManager):
     @dm.factory
     def foo():
         """This is the docstring for foo"""
@@ -761,3 +762,11 @@ def test_docstrings_are_kept(dm: DeviceManager):
 
     assert foo.__doc__ == "This is the docstring for foo"
     assert bar.__doc__ == "This is the docstring for bar"
+
+
+def test_docsstrings_for_device_are_kept(dm: DeviceManager):
+    @dm.factory()
+    def foo() -> Device:
+        return Device()
+
+    assert foo.__doc__ == Device.__doc__
