@@ -98,7 +98,7 @@ async def test_aperture_unsafe_move(
         aperture_z=5.6,
         scatterguard_x=7.8,
         scatterguard_y=9.0,
-        radius=0,
+        diameter=0,
     )
     ap_sg = aperture_in_medium_pos
     await ap_sg._set_raw_unsafe(pos)
@@ -120,7 +120,7 @@ async def test_aperture_scatterguard_select_top_moves_assembly_down_then_sg_up(
             aperture_z=15.8,
             scatterguard_x=5.25,
             scatterguard_y=4.43,
-            radius=100,
+            diameter=100,
         ),
     )
 
@@ -202,7 +202,7 @@ async def test_aperture_positions(
     reading = await ap_sg.read()
     assert isinstance(reading, dict)
     assert (
-        reading[f"{ap_sg.name}-radius"]["value"] == aperture_positions[aperture].radius
+        reading[f"{ap_sg.name}-diameter"]["value"] == aperture_positions[aperture].diameter
     )
     assert reading[f"{ap_sg.name}-selected_aperture"]["value"] == aperture
 
@@ -219,7 +219,7 @@ async def test_aperture_positions_robot_load(
     await ap_sg.aperture.z.set(robot_load.aperture_z)
     reading = await ap_sg.read()
     assert isinstance(reading, dict)
-    assert reading[f"{ap_sg.name}-radius"]["value"] == inf
+    assert reading[f"{ap_sg.name}-diameter"]["value"] == inf
     assert (
         reading[f"{ap_sg.name}-selected_aperture"]["value"] == ApertureValue.OUT_OF_BEAM
     )
@@ -239,7 +239,7 @@ async def test_aperture_positions_robot_load_within_tolerance(
     await ap_sg.aperture.z.set(robot_load.aperture_z)
     reading = await ap_sg.read()
     assert isinstance(reading, dict)
-    assert reading[f"{ap_sg.name}-radius"]["value"] == inf
+    assert reading[f"{ap_sg.name}-diameter"]["value"] == inf
     assert (
         reading[f"{ap_sg.name}-selected_aperture"]["value"] == ApertureValue.OUT_OF_BEAM
     )
@@ -273,7 +273,7 @@ async def test_aperture_positions_parked(
     await ap_sg.aperture.z.set(parked.aperture_z)
     reading = await ap_sg.read()
     assert isinstance(reading, dict)
-    assert reading[f"{ap_sg.name}-radius"]["value"] == inf
+    assert reading[f"{ap_sg.name}-diameter"]["value"] == inf
     assert reading[f"{ap_sg.name}-selected_aperture"]["value"] == ApertureValue.PARKED
 
 
@@ -291,7 +291,7 @@ async def test_aperture_positions_parked_within_tolerance(
     await ap_sg.aperture.z.set(parked_z + tolerance)
     reading = await ap_sg.read()
     assert isinstance(reading, dict)
-    assert reading[f"{ap_sg.name}-radius"]["value"] == inf
+    assert reading[f"{ap_sg.name}-diameter"]["value"] == inf
     assert reading[f"{ap_sg.name}-selected_aperture"]["value"] == ApertureValue.PARKED
 
 
@@ -389,7 +389,7 @@ async def test_ap_sg_in_runengine(
         await aperture_in_medium_pos.selected_aperture.get_value()
         == ApertureValue.SMALL
     )
-    assert await aperture_in_medium_pos.radius.get_value() == 20
+    assert await aperture_in_medium_pos.diameter.get_value() == 20
 
 
 async def test_ap_sg_descriptor(
