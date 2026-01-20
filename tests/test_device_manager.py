@@ -769,7 +769,7 @@ def test_docsstrings_for_device_are_kept(dm: DeviceManager):
     def foo() -> OphydV2Device:
         return OphydV2Device()
 
-    assert foo.__doc__ == f"{OphydV2Device.__name__}:\n{OphydV2Device.__doc__}"
+    assert foo.__doc__ == f"{OphydV2Device.__name__}:\n\n{OphydV2Device.__doc__}"
 
 
 def test_docstrings_for_factory_instance_and_devices_are_kept(dm: DeviceManager):
@@ -780,7 +780,7 @@ def test_docstrings_for_factory_instance_and_devices_are_kept(dm: DeviceManager)
 
     expected_doc_str = (
         "Additional info on my device instance.\n\n"
-        f"{OphydV2Device.__name__}:\n{OphydV2Device.__doc__}"
+        f"{OphydV2Device.__name__}:\n\n{OphydV2Device.__doc__}"
     )
     assert foo.__doc__ == expected_doc_str
 
