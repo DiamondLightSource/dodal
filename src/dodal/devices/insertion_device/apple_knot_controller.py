@@ -28,6 +28,10 @@ class AppleKnotPathFinder:
     that cross zero phase into two segments via an intermediate point at zero phase and
     a safe gap value. We ASSUME the exclusion zones are rectangles aligned with the axes
     in a shape of hanoi tower centered at (0,0).
+    Gap and phase motors are NOT moved together but instead are moved sequentially.
+    Sequential move guarantees safe pass avoiding exslusion zones.
+    We can not use asynchronous move of gap and phase because we can not currently rely
+    on gap and phase motors relative speed.
     See https://confluence.diamond.ac.uk/x/vQENAg for more details.
     """
 
@@ -82,9 +86,9 @@ class AppleKnotPathFinder:
         List of points is expanded to include intermediate points as needed so each move
         happens within one sign of gap and phase (including zero phase).
         For convenience we define:phase increase as West-East axis and gap increase
-        as North-South axis. Only SW move in negative phase region and SE move in
+        as South-North axis. Only SW move in negative phase region and SE move in
         positive phase region need a PHASE first then GAP move, the rest needs GAP
-        first then PHASE move.
+        first then PHASE move or there is no difference in order.
         """
         final_path = []
         for i in range(len(apple_knot_val_path) - 1):
