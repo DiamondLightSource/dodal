@@ -846,6 +846,4 @@ def test_docs_no_docs_avaliable_added_for_no_docs_device(dm: DeviceManager):
     def foo() -> NoDocsDevice:
         return NoDocsDevice()
 
-    expected_doc_str = _type_docs(NoDocsDevice)
-
-    assert foo.__doc__ == expected_doc_str
+    assert foo.__doc__ == _type_docs(NoDocsDevice)
