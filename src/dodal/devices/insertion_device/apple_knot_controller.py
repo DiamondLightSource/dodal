@@ -188,15 +188,8 @@ class AppleKnotController(Apple2Controller[Apple2], Generic[PhaseAxesType]):
             await self.apple2().phase().top_outer.user_readback.get_value()
         )
         current_gap = float(await self.apple2().gap().user_readback.get_value())
-        current_pol, _ = self.determine_phase_from_hardware(
-            top_outer=current_phase_top,
-            top_inner=current_phase_top,
-            btm_inner=current_phase_top,
-            btm_outer=current_phase_top,
-            gap=current_gap,
-        )
         current_apple2_val = self._get_apple2_value(
-            current_gap, current_phase_top, current_pol
+            current_gap, current_phase_top, Pol.NONE
         )
         # get target apple2 value
         target_gap = self.gap_energy_motor_converter(energy=energy, pol=pol)
@@ -221,6 +214,6 @@ class AppleKnotController(Apple2Controller[Apple2], Generic[PhaseAxesType]):
                 btm_inner=phase,
             ),
         )
-        LOGGER.info(f"Getting apple2 value for pol={pol}, gap={gap}, phase={phase}.")
+        LOGGER.info(f"Getting apple2 value for gap={gap}, phase={phase}.")
         LOGGER.info(f"Apple2 motor values: {apple2_val}.")
         return apple2_val

@@ -266,32 +266,16 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
         if (
             isclose(
                 top_outer,
-                (-1 * self.maximum_phase_motor_position),
+                btm_inner,
                 abs_tol=ROW_PHASE_MOTOR_TOLERANCE,
             )
             and isclose(top_inner, 0.0, abs_tol=ROW_PHASE_MOTOR_TOLERANCE)
-            and isclose(
-                btm_inner,
-                (-1 * self.maximum_phase_motor_position),
-                abs_tol=ROW_PHASE_MOTOR_TOLERANCE,
-            )
             and isclose(btm_outer, 0.0, abs_tol=ROW_PHASE_MOTOR_TOLERANCE)
-        ):
-            LOGGER.info("Determined polarisation: LV (Linear Vertical).")
-            return Pol.LV, self.maximum_phase_motor_position
-        if (
-            isclose(
-                top_outer,
+            and isclose(
+                abs(btm_inner),
                 self.maximum_phase_motor_position,
                 abs_tol=ROW_PHASE_MOTOR_TOLERANCE,
             )
-            and isclose(top_inner, 0.0, abs_tol=ROW_PHASE_MOTOR_TOLERANCE)
-            and isclose(
-                btm_inner,
-                self.maximum_phase_motor_position,
-                abs_tol=ROW_PHASE_MOTOR_TOLERANCE,
-            )
-            and isclose(btm_outer, 0.0, abs_tol=ROW_PHASE_MOTOR_TOLERANCE)
         ):
             LOGGER.info("Determined polarisation: LV (Linear Vertical).")
             return Pol.LV, self.maximum_phase_motor_position
