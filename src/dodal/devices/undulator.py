@@ -3,6 +3,8 @@ from abc import ABC, abstractmethod
 
 import numpy as np
 from bluesky.protocols import Locatable, Location, Movable
+from daq_config_server.client import ConfigServer
+from daq_config_server.models import UndulatorEnergyGapLookupTable
 from numpy import ndarray
 from ophyd_async.core import (
     AsyncStatus,
@@ -19,7 +21,6 @@ from dodal.common.enums import EnabledDisabledUpper
 from dodal.log import LOGGER
 
 from .baton import Baton
-from .util.lookup_tables import energy_distance_table
 
 
 class AccessError(Exception):
@@ -185,6 +186,7 @@ class UndulatorInKeV(BaseUndulator):
             baton (optional): Baton object if provided.
             name (str, optional): Name for device. Defaults to "".
         """
+        self.config_server = ConfigServer(url="https://daq-config.diamond.ac.uk")
 
         self.id_gap_lookup_table_path = id_gap_lookup_table_path
         super().__init__(
@@ -216,14 +218,17 @@ class UndulatorInKeV(BaseUndulator):
         get a 2d np.array from lookup table that
         converts energies to undulator gap distance
         """
-        energy_to_distance_table: np.ndarray = await energy_distance_table(
-            self.id_gap_lookup_table_path
+
+        energy_to_distance_table = self.config_server.get_file_contents(
+            self.id_gap_lookup_table_path,
+            UndulatorEnergyGapLookupTable,
+            reset_cached_result=True,
         )
 
         # Use the lookup table to get the undulator gap associated with this dcm energy
         return _get_gap_for_energy(
             energy_kev * 1000,
-            energy_to_distance_table,
+            np.array(energy_to_distance_table.rows),
         )
 
 
