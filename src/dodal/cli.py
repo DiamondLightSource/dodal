@@ -46,17 +46,17 @@ def describe(beamline: str, device_manager: str) -> None:
     if (manager := getattr(mod, device_manager, None)) and isinstance(
         manager, DeviceManager
     ):
-        devices = manager.get_all_factories()
+        factories = manager.get_all_factories()
     else:
         print(
             f"No device manager named '{device_manager}' found in {mod}, convert the beamline to use device manager"
         )
         return
 
-    for device_name, device in sorted(devices.items()):
+    for device_name, factory in sorted(factories.items()):
         print(f"{device_name}:")
-        print(device.__doc__)
-        print("\n")
+        print(factory.__doc__)
+        print("*****************************************")
 
 
 @main.command(name="connect")
