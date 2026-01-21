@@ -53,14 +53,18 @@ def dual_energy_source(
 @devices.factory()
 def fsi1() -> GenericFastShutter[InOut]:
     return GenericFastShutter[InOut](
-        f"{I_PREFIX.beamline_prefix}-EA-FSHTR-01:CTRL", InOut.OUT, InOut.IN
+        f"{I_PREFIX.beamline_prefix}-EA-FSHTR-01:CTRL",
+        open_state=InOut.OUT,
+        close_state=InOut.IN,
     )
 
 
 @devices.factory()
 def fsj1() -> GenericFastShutter[InOut]:
     return GenericFastShutter[InOut](
-        f"{J_PREFIX.beamline_prefix}-EA-FSHTR-01:CTRL", InOut.OUT, InOut.IN
+        f"{J_PREFIX.beamline_prefix}-EA-FSHTR-01:CTRL",
+        open_state=InOut.OUT,
+        close_state=InOut.IN,
     )
 
 
