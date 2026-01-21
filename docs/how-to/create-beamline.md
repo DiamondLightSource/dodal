@@ -87,7 +87,7 @@ The following example creates a fictitious beamline ``w41``, with a simulated tw
         )
 ```
 
-Some beamlines have multiple endstations and shared optics. To reduce duplicate configuration, the DeviceManager allows us to include devices from another instance of `DeviceManager`.
+Some beamlines have multiple endstations and shared optics. To reduce duplicate configuration, the `DeviceManager` allows us to include devices from another instance of `DeviceManager`.
 
 An example is shown below for a shared beamline setup:
 
