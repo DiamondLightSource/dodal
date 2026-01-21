@@ -11,6 +11,7 @@ import pytest
 from ophyd_async.core import PathProvider
 
 from dodal.common.beamlines import beamline_parameters, beamline_utils
+from dodal.common.beamlines.beamline_utils import clear_path_provider
 from dodal.common.visit import (
     DirectoryServiceClient,
     LocalDirectoryServiceClient,
@@ -55,6 +56,12 @@ environ["DODAL_TEST_MODE"] = "true"
 
 # Add run_engine and util fixtures to be used in tests
 pytest_plugins = ["dodal.testing.fixtures.run_engine", "dodal.testing.fixtures.utils"]
+
+
+@pytest.fixture(autouse=True)
+def reset_path_provider():
+    yield
+    clear_path_provider()
 
 
 @pytest.fixture(autouse=True)

@@ -114,7 +114,7 @@ class ZoomController(BaseZoomController):
     async def set(self, value: str):
         await self.level.set(value, wait=True)
         LOGGER.info(
-            "Waiting {self.DELAY_BETWEEN_MOTORS_AND_IMAGE_UPDATING_S} seconds for zoom to be noticeable"
+            f"Waiting {self.DELAY_BETWEEN_MOTORS_AND_IMAGE_UPDATING_S} seconds for zoom to be noticeable"
         )
         await asyncio.sleep(self.DELAY_BETWEEN_MOTORS_AND_IMAGE_UPDATING_S)
 
