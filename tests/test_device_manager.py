@@ -602,7 +602,6 @@ def test_mock_all(dm: DeviceManager):
 def test_v1_device_factory(dm: DeviceManager):
     s1 = MagicMock(spec=V1)
     s1.__name__ = "S1"
-    s1.__doc__ = V1.__doc__
 
     @dm.v1_init(s1, prefix="S1_PREFIX")  # type: ignore
     def foo(_):
@@ -633,7 +632,7 @@ def test_v1_v2_name_clash(dm: DeviceManager):
 
 
 def test_v1_decorator_is_transparent(dm: DeviceManager):
-    s1 = MagicMock()
+    s1 = MagicMock(__name__="S1")
 
     @dm.v1_init(s1, prefix="S1_PREFIX")  # type: ignore
     def foo(s):
@@ -648,7 +647,7 @@ def test_v1_decorator_is_transparent(dm: DeviceManager):
 
 
 def test_v1_no_wait(dm: DeviceManager):
-    s1 = Mock()
+    s1 = MagicMock(__name__="S1")
 
     @dm.v1_init(s1, prefix="S1_PREFIX", wait=False)  # type: ignore
     def foo(_):
@@ -668,7 +667,7 @@ def test_connect_ignores_v1():
 
 
 def test_v1_mocking(dm: DeviceManager):
-    s1 = Mock(return_value=Mock(spec=OphydV1Device))
+    s1 = Mock(__name__="S1", return_value=Mock(spec=OphydV1Device))
 
     @dm.v1_init(s1, prefix="S1_PREFIX", mock=True)  # type: ignore
     def foo(_):
@@ -681,7 +680,7 @@ def test_v1_mocking(dm: DeviceManager):
 
 def test_v1_init_params(dm: DeviceManager):
     # values are passed from fixtures
-    s1 = Mock(return_value=Mock(spec=OphydV1Device))
+    s1 = Mock(__name__="S1", return_value=Mock(spec=OphydV1Device))
     s1.return_value.mock_add_spec(["set_up_with"])
 
     @dm.fixture
@@ -795,7 +794,7 @@ def test_docstrings_for_factory_instane_are_kept(dm: DeviceManager):
         """This is the docstring for foo"""
         return Mock()
 
-    @dm.v1_init(Mock(), prefix="MOCK_PREFIX")  # type: ignore
+    @dm.v1_init(Mock(__name__=None), prefix="MOCK_PREFIX")  # type: ignore
     def bar(_):
         """This is the docstring for bar"""
         pass

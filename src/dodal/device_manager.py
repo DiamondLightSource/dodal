@@ -100,7 +100,8 @@ class DeviceFactory(Generic[Args, V2]):
         self._manager = manager
         wraps(factory)(self)
 
-        self.__doc__ = _format_doc(self, factory)
+        return_type = inspect.get_annotations(factory).get("return")
+        self.__doc__ = _format_doc(self, return_type)
 
     @property
     def name(self) -> str:
@@ -637,21 +638,24 @@ class DeviceManager:
 
 
 def _format_doc(
-    factory: DeviceFactory | V1DeviceFactory, func: Callable[Args, V2] | type[V1]
+    factory: DeviceFactory | V1DeviceFactory,
+    return_type: type[OphydV1Device | OphydV2Device] | None,
 ) -> str:
     """Helper function to combine the doc strings of our factory instance and the
     return type of the function we wrap."""
     instance_docs = factory.__doc__ or ""
 
-    if isinstance(func, type):
-        return_type = func
-    else:
-        return_type = inspect.get_annotations(func).get("return")
+    # if isinstance(func, type):
+    #     return_type = func
+    # else:
+    #     return_type = inspect.get_annotations(func).get("return")
     return_type_docs = ""
 
-    if return_type is not None:
+    use_return_type = return_type is not None and return_type.__name__ is not None
+
+    if use_return_type:
         # Get the class name and docstring for the return type
-        class_name = return_type.__name__ + ":\n"
+        class_name = return_type.__name__ + ":\n"  # type: ignore
 
         class_doc = inspect.cleandoc(return_type.__doc__ or NO_DOCS)
 
@@ -666,7 +670,7 @@ def _format_doc(
 
     # Only add a line break if instance_docs is not empty and we know return_type
     # is not empty
-    if instance_docs != "" and return_type is not None:
+    if instance_docs != "" and use_return_type:
         instance_docs = f"{instance_docs}\n"
 
     # Combine the factory instance docstring with the return type docstring
