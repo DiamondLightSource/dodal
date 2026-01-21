@@ -202,7 +202,8 @@ async def test_aperture_positions(
     reading = await ap_sg.read()
     assert isinstance(reading, dict)
     assert (
-        reading[f"{ap_sg.name}-diameter"]["value"] == aperture_positions[aperture].diameter
+        reading[f"{ap_sg.name}-diameter"]["value"]
+        == aperture_positions[aperture].diameter
     )
     assert reading[f"{ap_sg.name}-selected_aperture"]["value"] == aperture
 
