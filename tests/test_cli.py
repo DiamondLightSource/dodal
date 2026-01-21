@@ -370,7 +370,7 @@ def _describe_devices(runner, device_docstrings):
 @patch.dict(os.environ, clear=True)
 def test_cli_describe_prints_expected_for_one_device(runner: CliRunner):
     result = _describe_devices(runner, {"test_device": "doc_string"})
-    assert len(result.stdout.split()) == 6
+    assert len(result.stdout.split()) == 7
     assert "test_device" in result.stdout
     assert "doc_string" in result.stdout
 
@@ -385,6 +385,6 @@ def test_cli_describe_prints_expected_for_many_devices(runner: CliRunner):
             "final_test": "final_doc",
         },
     )
-    assert len(result.stdout.split()) == 10
+    assert len(result.stdout.split()) == 13
     assert "test_other" in result.stdout
     assert "final_doc" in result.stdout
