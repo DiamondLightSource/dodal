@@ -1,3 +1,4 @@
+from inspect import cleandoc
 from unittest.mock import MagicMock, Mock, patch
 
 import pytest
@@ -8,6 +9,7 @@ from pytest import RaisesExc, RaisesGroup
 
 from dodal.device_manager import (
     DEFAULT_TIMEOUT,
+    NO_DOCS,
     DeviceBuildResult,
     DeviceManager,
     LazyFixtures,
@@ -828,6 +830,10 @@ class NoDocsDevice(OphydV2Device):
     pass
 
 
+class DocsDevice(OphydV2Device):
+    "Documentation"
+
+
 def test_docs_for_factory_kept_and_no_docs_avaliable_added_for_no_docs_device(
     dm: DeviceManager,
 ):
@@ -847,3 +853,23 @@ def test_docs_no_docs_avaliable_added_for_no_docs_device(dm: DeviceManager):
         return NoDocsDevice()
 
     assert foo.__doc__ == _type_docs(NoDocsDevice)
+
+
+def test_type_docs_is_as_expected():
+    extra_docs = "foo"
+    expected_no_docs_device_docs = f"{NoDocsDevice.__name__}:\n\n{NO_DOCS}"
+    assert _type_docs(NoDocsDevice) == expected_no_docs_device_docs
+    assert (
+        _type_docs(NoDocsDevice, extra_docs)
+        == f"{extra_docs}\n\n{expected_no_docs_device_docs}"
+    )
+
+    expected_docs_device_docs = (
+        f"{DocsDevice.__name__}:\n\n{cleandoc(DocsDevice.__doc__)}"  # type: ignore
+    )
+    assert _type_docs(DocsDevice) == expected_docs_device_docs
+
+    assert (
+        _type_docs(DocsDevice, extra_docs=extra_docs)
+        == f"{extra_docs}\n\n{expected_docs_device_docs}"
+    )
