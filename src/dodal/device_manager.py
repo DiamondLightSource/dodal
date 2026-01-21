@@ -638,40 +638,21 @@ class DeviceManager:
 
 
 def _format_doc(
-    factory: DeviceFactory | V1DeviceFactory,
-    return_type: type[OphydV1Device | OphydV2Device] | None,
-) -> str:
-    """Helper function to combine the doc strings of our factory instance and the
-    return type of the function we wrap."""
-    instance_docs = factory.__doc__ or ""
+    factory: DeviceFactory | V1DeviceFactory, return_type: type[V1 | V2] | None
+) -> str | None:
+    """
+    Helper function to combine the doc strings of our factory instance and the
+    return type of the function we wrap.
+    """
+    if not return_type:
+        return factory.__doc__
+    if existing := factory.__doc__:
+        return _type_docs(return_type, extra_docs=existing)
+    return _type_docs(return_type)
 
-    # if isinstance(func, type):
-    #     return_type = func
-    # else:
-    #     return_type = inspect.get_annotations(func).get("return")
-    return_type_docs = ""
 
-    use_return_type = return_type is not None and return_type.__name__ is not None
-
-    if use_return_type:
-        # Get the class name and docstring for the return type
-        class_name = return_type.__name__ + ":\n"  # type: ignore
-
-        class_doc = inspect.cleandoc(return_type.__doc__ or NO_DOCS)
-
-        if class_doc[0] != "\n":
-            class_doc = "\n" + class_doc
-
-        # Format the return type doc string
-        return_type_docs = f"{class_name}{class_doc}"
-
-        if instance_docs != "":
-            return_type_docs = "\n" + return_type_docs
-
-    # Only add a line break if instance_docs is not empty and we know return_type
-    # is not empty
-    if instance_docs != "" and use_return_type:
-        instance_docs = f"{instance_docs}\n"
-
-    # Combine the factory instance docstring with the return type docstring
-    return instance_docs + return_type_docs
+def _type_docs(target: type[V1 | V2], extra_docs: str = "") -> str:
+    docs = f"{target.__name__}:\n\n{inspect.cleandoc(target.__doc__ or NO_DOCS)}"
+    if extra_docs != "":
+        docs = f"{extra_docs}\n\n{docs}"
+    return docs

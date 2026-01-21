@@ -1,4 +1,3 @@
-from inspect import cleandoc
 from unittest.mock import MagicMock, Mock, patch
 
 import pytest
@@ -9,11 +8,10 @@ from pytest import RaisesExc, RaisesGroup
 
 from dodal.device_manager import (
     DEFAULT_TIMEOUT,
-    NO_DOCS,
-    V1,
     DeviceBuildResult,
     DeviceManager,
     LazyFixtures,
+    _type_docs,
 )
 
 
@@ -600,7 +598,7 @@ def test_mock_all(dm: DeviceManager):
 
 
 def test_v1_device_factory(dm: DeviceManager):
-    s1 = MagicMock(spec=V1)
+    s1 = MagicMock(spec=OphydV1Device)
     s1.__name__ = "S1"
 
     @dm.v1_init(s1, prefix="S1_PREFIX")  # type: ignore
@@ -794,13 +792,15 @@ def test_docstrings_for_factory_instance_are_kept(dm: DeviceManager):
         """This is the docstring for foo"""
         return Mock()
 
-    @dm.v1_init(Mock(__name__=None), prefix="MOCK_PREFIX")  # type: ignore
+    mock = Mock(__name__="Mock", __doc__=None)
+
+    @dm.v1_init(mock, prefix="MOCK_PREFIX")  # type: ignore
     def bar(_):
         """This is the docstring for bar"""
         pass
 
     assert foo.__doc__ == "This is the docstring for foo"
-    assert bar.__doc__ == "This is the docstring for bar"
+    assert bar.__doc__ == _type_docs(mock, extra_docs="This is the docstring for bar")  # type: ignore
 
 
 def test_docstrings_for_device_are_kept(dm: DeviceManager):
@@ -809,9 +809,8 @@ def test_docstrings_for_device_are_kept(dm: DeviceManager):
         return OphydV2Device()
 
     assert OphydV2Device.__doc__ is not None
-    assert (
-        foo.__doc__ == f"{OphydV2Device.__name__}:\n\n{cleandoc(OphydV2Device.__doc__)}"
-    )
+
+    assert foo.__doc__ == _type_docs(OphydV2Device)
 
 
 def test_docstrings_for_factory_instance_and_devices_are_kept(dm: DeviceManager):
@@ -820,12 +819,9 @@ def test_docstrings_for_factory_instance_and_devices_are_kept(dm: DeviceManager)
         """Additional info on my device instance."""
         return OphydV2Device()
 
-    assert OphydV2Device.__doc__ is not None
-    expected_doc_str = (
-        "Additional info on my device instance.\n\n"
-        f"{OphydV2Device.__name__}:\n\n{cleandoc(OphydV2Device.__doc__)}"
+    assert foo.__doc__ == _type_docs(
+        OphydV2Device, extra_docs="Additional info on my device instance."
     )
-    assert foo.__doc__ == expected_doc_str
 
 
 class NoDocsDevice(OphydV2Device):
@@ -840,9 +836,9 @@ def test_docs_for_factory_kept_and_no_docs_avaliable_added_for_no_docs_device(
         """Additional info on my device instance."""
         return NoDocsDevice()
 
-    expected_doc_str = f"Additional info on my device instance.\n\n{NoDocsDevice.__name__}:\n\n{NO_DOCS}"
-
-    assert foo.__doc__ == expected_doc_str
+    assert foo.__doc__ == _type_docs(
+        NoDocsDevice, extra_docs="Additional info on my device instance."
+    )
 
 
 def test_docs_no_docs_avaliable_added_for_no_docs_device(dm: DeviceManager):
@@ -850,6 +846,6 @@ def test_docs_no_docs_avaliable_added_for_no_docs_device(dm: DeviceManager):
     def foo() -> NoDocsDevice:
         return NoDocsDevice()
 
-    expected_doc_str = f"{NoDocsDevice.__name__}:\n\n{NO_DOCS}"
+    expected_doc_str = _type_docs(NoDocsDevice)
 
     assert foo.__doc__ == expected_doc_str
