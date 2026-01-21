@@ -803,7 +803,7 @@ def test_docstrings_for_factory_instance_are_kept(dm: DeviceManager):
     assert bar.__doc__ == "This is the docstring for bar"
 
 
-def test_docsstrings_for_device_are_kept(dm: DeviceManager):
+def test_docstrings_for_device_are_kept(dm: DeviceManager):
     @dm.factory()
     def foo() -> OphydV2Device:
         return OphydV2Device()
