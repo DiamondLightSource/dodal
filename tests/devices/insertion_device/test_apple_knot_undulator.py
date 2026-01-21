@@ -63,8 +63,8 @@ def apple_knot_i05_path_finder() -> AppleKnotPathFinder:
 async def mock_apple_knot_i05_controller(
     mock_locked_apple2: Apple2[UndulatorLockedPhaseAxes],
     apple_knot_i05_path_finder: AppleKnotPathFinder,
-) -> AppleKnotController:
-    mock_apple_knot_controller = AppleKnotController(
+) -> AppleKnotController[UndulatorLockedPhaseAxes]:
+    mock_apple_knot_controller = AppleKnotController[UndulatorLockedPhaseAxes](
         apple=mock_locked_apple2,
         gap_energy_motor_converter=energy_to_gap_converter,
         phase_energy_motor_converter=energy_to_phase_converter,
@@ -85,7 +85,7 @@ async def mock_apple_knot_i05_controller(
     ],
 )
 async def test_id_set_energy_const_pol(
-    mock_apple_knot_i05_controller: AppleKnotController,
+    mock_apple_knot_i05_controller: AppleKnotController[UndulatorLockedPhaseAxes],
     mock_locked_apple2: Apple2[UndulatorLockedPhaseAxes],
     target_energy: float,
     initial_gap: float,
@@ -115,7 +115,7 @@ async def test_id_set_energy_const_pol(
     ],
 )
 async def test_id_set_pol(
-    mock_apple_knot_i05_controller: AppleKnotController,
+    mock_apple_knot_i05_controller: AppleKnotController[UndulatorLockedPhaseAxes],
     mock_locked_apple2: Apple2[UndulatorLockedPhaseAxes],
     initial_pol: Pol,
     initial_energy: float,
@@ -148,7 +148,7 @@ async def test_id_set_pol(
     ],
 )
 async def test_id_set_fails_exclusion_zone(
-    mock_apple_knot_i05_controller: AppleKnotController,
+    mock_apple_knot_i05_controller: AppleKnotController[UndulatorLockedPhaseAxes],
     mock_locked_apple2: Apple2[UndulatorLockedPhaseAxes],
     target_energy: float,
     initial_gap: float,
@@ -175,7 +175,7 @@ async def test_id_set_fails_exclusion_zone(
     ],
 )
 async def test_id_set_fails_top_bottom_phase_mismatch(
-    mock_apple_knot_i05_controller: AppleKnotController,
+    mock_apple_knot_i05_controller: AppleKnotController[UndulatorLockedPhaseAxes],
     mock_locked_apple2: Apple2[UndulatorLockedPhaseAxes],
     initial_phase_top_outer: float,
     initial_phase_bottom_inner: float,

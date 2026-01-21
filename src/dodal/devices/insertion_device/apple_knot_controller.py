@@ -135,7 +135,9 @@ class AppleKnotPathFinder:
         )
 
 
-class AppleKnotController(Apple2Controller[Apple2], Generic[PhaseAxesType]):
+class AppleKnotController(
+    Apple2Controller[Apple2[PhaseAxesType]], Generic[PhaseAxesType]
+):
     """
     Controller for Apple Knot undulator with unique feature of calculating a move path
     through gap and phase space avoiding the exclusion zone around 0-0 gap-phase.

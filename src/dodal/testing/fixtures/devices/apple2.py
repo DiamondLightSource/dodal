@@ -108,8 +108,8 @@ async def mock_locked_phase_axes(
 async def mock_locked_apple2(
     mock_id_gap: UndulatorGap,
     mock_locked_phase_axes: UndulatorLockedPhaseAxes,
-) -> Apple2:
-    mock_locked_apple2 = Apple2(
+) -> Apple2[UndulatorLockedPhaseAxes]:
+    mock_locked_apple2 = Apple2[UndulatorLockedPhaseAxes](
         id_gap=mock_id_gap,
         id_phase=mock_locked_phase_axes,
     )
