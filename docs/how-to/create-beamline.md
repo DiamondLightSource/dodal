@@ -87,7 +87,9 @@ The following example creates a fictitious beamline ``w41``, with a simulated tw
         )
 ```
 
-Some beamlines have multiple endstations and shared optics. To reduce duplicate configuration, the DeviceManager allows us to include devices from a  beamline defining shared devices to be used on multiple endstations. An example is show below for a shared beamline setup:
+Some beamlines have multiple endstations and shared optics. To reduce duplicate configuration, the DeviceManager allows us to include devices from another instance of `DeviceManager`.
+
+An example is shown below for a shared beamline setup:
 
 ```python
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
