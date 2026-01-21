@@ -693,6 +693,43 @@ def test_v1_init_params(dm: DeviceManager):
     s1().set_up_with.assert_called_once_with("one", 2)
 
 
+def test_inherited_device_manager(dm: DeviceManager):
+    s1 = Mock(return_value=Mock(spec=OphydV2Device))
+    s2 = Mock(return_value=Mock(spec=OphydV2Device))
+
+    @dm.factory
+    def foo():
+        return s1()
+
+    dm2 = DeviceManager()
+
+    @dm2.factory
+    def bar(foo):
+        return s2(foo)
+
+    dm2.include(dm)
+
+    built_bar = bar.build()
+    s1.assert_called_once()
+    s2.assert_called_once_with(s1())
+    assert built_bar is s2(s1())
+
+
+def test_inherited_device_manager_duplicate_name():
+    device = Mock(return_value=Mock(spec=OphydV2Device))
+
+    dm = DeviceManager()
+    dm2 = DeviceManager()
+
+    @dm.factory
+    @dm2.factory
+    def foo():
+        return device()
+
+    with pytest.raises(ValueError, match="{'foo'}"):
+        dm.include(dm2)
+
+
 def test_lazy_fixtures_non_lazy():
     lf = LazyFixtures(provided={"foo": "bar"}, factories={})
     assert lf["foo"] == "bar"
