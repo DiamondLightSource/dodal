@@ -1,4 +1,4 @@
-from dodal.beamlines.i05_shared import devices as i05_devices
+from dodal.beamlines.i05_shared import devices as i05_shared_devices
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.device_manager import DeviceManager
 from dodal.log import set_beamline as set_log_beamline
@@ -10,4 +10,4 @@ set_log_beamline(BL)
 set_utils_beamline(BL)
 
 devices = DeviceManager()
-devices.include(i05_devices)
+devices.include(i05_shared_devices)
