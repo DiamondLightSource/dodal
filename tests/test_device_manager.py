@@ -788,7 +788,7 @@ def test_lazy_fixtures_contains():
     assert "two" not in lf
 
 
-def test_docstrings_for_factory_instane_are_kept(dm: DeviceManager):
+def test_docstrings_for_factory_instance_are_kept(dm: DeviceManager):
     @dm.factory
     def foo():
         """This is the docstring for foo"""
