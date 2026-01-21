@@ -86,3 +86,54 @@ The following example creates a fictitious beamline ``w41``, with a simulated tw
             fileio_suffix=HDF5_SUFFIX,
         )
 ```
+
+Some beamlines have multiple endstations and shared optics. To reduce duplicate configuration, the DeviceManager allows us to include devices from a  beamline defining shared devices to be used on multiple endstations. An example is show below for a shared beamline setup:
+
+```python
+from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
+from dodal.device_manager import DeviceManager
+from dodal.devices.pgm import PlaneGratingMonochromator
+from dodal.log import set_beamline as set_log_beamline
+from dodal.utils import BeamlinePrefix, get_beamline_name
+
+BL = get_beamline_name("i05-shared")
+PREFIX = BeamlinePrefix("i05-shared", "I")
+set_log_beamline(BL)
+set_utils_beamline(BL)
+
+devices = DeviceManager()
+
+"""Device that is shared between multiple endstations, i05 and i05-1."""
+@devices.factory()
+def pgm() -> PlaneGratingMonochromator:
+    return PlaneGratingMonochromator(
+        prefix=f"{PREFIX.beamline_prefix}-OP-PGM-01:",
+        grating=Grating,
+    )
+```
+
+Then for i05, we include the i05_shared devices so we have access to the shared devices.
+
+```python
+from dodal.beamlines.i05_shared import devices as i05_shared_devices
+from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
+from dodal.device_manager import DeviceManager
+from dodal.devices.temperture_controller import Lakeshore336
+from dodal.log import set_beamline as set_log_beamline
+from dodal.utils import BeamlinePrefix, get_beamline_name
+
+"""Include all the i05 shared beamline devices which should be avaliable for every end station.
+In this example, the pgm device will be included in this beamline."""
+devices = DeviceManager()
+devices.include(i05_shared_devices)
+
+BL = get_beamline_name("i05")
+PREFIX = BeamlinePrefix(BL)
+set_log_beamline(BL)
+set_utils_beamline(BL)
+
+"""Beamline specific device for i05 only."""
+@devices.factory()
+def sample_temperature_controller() -> Lakeshore336:
+    return Lakeshore336(prefix=f"{PREFIX.beamline_prefix}-EA-TCTRL-02:")
+```
