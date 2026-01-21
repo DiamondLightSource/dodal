@@ -7,15 +7,19 @@ from dodal.beamlines import b07, i09
 from dodal.devices.electron_analyser.base import (
     AbstractAnalyserDriverIO,
     AbstractBaseRegion,
+    AbstractBaseSequence,
     DualEnergySource,
     EnergySource,
+    GenericSequence,
+    JsonSequenceLoader,
 )
 from dodal.devices.electron_analyser.base.base_controller import (
     ElectronAnalyserController,
 )
-from dodal.devices.electron_analyser.specs import SpecsAnalyserDriverIO
+from dodal.devices.electron_analyser.specs import SpecsAnalyserDriverIO, SpecsSequence
 from dodal.devices.electron_analyser.vgscienta import (
     VGScientaAnalyserDriverIO,
+    VGScientaSequence,
 )
 from dodal.devices.fast_shutter import DualFastShutter, GenericFastShutter
 from dodal.devices.selectable_source import SourceSelector
@@ -41,6 +45,32 @@ async def sim_driver(
             prefix="TEST:",
         )
     return sim_detector
+
+
+@pytest.fixture
+def sequence_class(
+    sim_driver: AbstractAnalyserDriverIO,
+) -> type[AbstractBaseSequence]:
+    # We must include the pass energy, lens and psu mode types here, otherwise the
+    # sequence file can't be loaded as pydantic won't be able to resolve the enums.
+    if isinstance(sim_driver, VGScientaAnalyserDriverIO):
+        return VGScientaSequence[
+            sim_driver.lens_mode_type,
+            sim_driver.psu_mode_type,
+            sim_driver.pass_energy_type,
+        ]
+    elif isinstance(sim_driver, SpecsAnalyserDriverIO):
+        return SpecsSequence[sim_driver.lens_mode_type, sim_driver.psu_mode_type]
+    raise ValueError("class " + str(sim_driver) + " not recognised")
+
+
+@pytest.fixture
+def sequence_loader(
+    sequence_class: type[GenericSequence],
+) -> JsonSequenceLoader[GenericSequence]:
+    with init_devices(mock=True):
+        sequence_loader = JsonSequenceLoader[GenericSequence](sequence_class)
+    return sequence_loader
 
 
 @pytest.fixture

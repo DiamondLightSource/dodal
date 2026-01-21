@@ -9,22 +9,11 @@ from dodal.devices.common_dcm import (
     StationaryCrystal,
 )
 from dodal.devices.electron_analyser.base import (
-    AbstractAnalyserDriverIO,
     AbstractBaseRegion,
-    AbstractBaseSequence,
     DualEnergySource,
-    ElectronAnalyserController,
-    ElectronAnalyserDetector,
     EnergySource,
-    TAbstractBaseSequence,
-)
-from dodal.devices.electron_analyser.specs import (
-    SpecsAnalyserDriverIO,
-    SpecsSequence,
-)
-from dodal.devices.electron_analyser.vgscienta import (
-    VGScientaAnalyserDriverIO,
-    VGScientaSequence,
+    GenericSequence,
+    SequenceLoader,
 )
 from dodal.devices.i09 import Grating
 from dodal.devices.pgm import PlaneGratingMonochromator
@@ -71,40 +60,20 @@ async def dual_energy_source(source_selector: SourceSelector) -> DualEnergySourc
 
 
 @pytest.fixture
-def sequence_class(
-    sim_driver: AbstractAnalyserDriverIO,
-) -> type[AbstractBaseSequence]:
-    # We must include the pass energy, lens and psu mode types here, otherwise the
-    # sequence file can't be loaded as pydantic won't be able to resolve the enums.
-    if isinstance(sim_driver, VGScientaAnalyserDriverIO):
-        return VGScientaSequence[
-            sim_driver.lens_mode_type,
-            sim_driver.psu_mode_type,
-            sim_driver.pass_energy_type,
-        ]
-    elif isinstance(sim_driver, SpecsAnalyserDriverIO):
-        return SpecsSequence[sim_driver.lens_mode_type, sim_driver.psu_mode_type]
-    raise ValueError("class " + str(sim_driver) + " not recognised")
+async def sequence(
+    sequence_loader: SequenceLoader[GenericSequence],
+) -> GenericSequence:
+    filename = get_test_sequence(sequence_loader._sequence_class)
+    await sequence_loader.set(filename)
+    if sequence_loader.sequence is None:
+        raise ValueError(f"Sequence is None when set to file: {filename}.")
+    return sequence_loader.sequence
 
 
 @pytest.fixture
-def sequence(
-    sim_driver: AbstractAnalyserDriverIO,
-    sequence_class: type[TAbstractBaseSequence],
-    single_energy_source: EnergySource,
-) -> AbstractBaseSequence:
-    controller = ElectronAnalyserController(sim_driver, single_energy_source)
-    det = ElectronAnalyserDetector(
-        sequence_class=sequence_class,
-        controller=controller,
-    )
-    return det.load_sequence(get_test_sequence(type(sim_driver)))
-
-
-@pytest.fixture
-def region(
+async def region(
     request: pytest.FixtureRequest,
-    sequence: AbstractBaseSequence,
+    sequence: GenericSequence,
 ) -> AbstractBaseRegion:
     region = sequence.get_region_by_name(request.param)
     if region is None:

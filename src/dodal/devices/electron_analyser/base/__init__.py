@@ -3,12 +3,8 @@ from .base_controller import (
     GenericElectronAnalyserController,
 )
 from .base_detector import (
-    BaseElectronAnalyserDetector,
     ElectronAnalyserDetector,
-    ElectronAnalyserRegionDetector,
-    GenericBaseElectronAnalyserDetector,
     GenericElectronAnalyserDetector,
-    GenericElectronAnalyserRegionDetector,
 )
 from .base_driver_io import (
     AbstractAnalyserDriverIO,
@@ -21,6 +17,8 @@ from .base_region import (
     AbstractBaseSequence,
     GenericRegion,
     GenericSequence,
+    JsonSequenceLoader,
+    SequenceLoader,
     TAbstractBaseRegion,
     TAbstractBaseSequence,
     TAcquisitionMode,
@@ -32,12 +30,8 @@ from .energy_sources import AbstractEnergySource, DualEnergySource, EnergySource
 __all__ = [
     "ElectronAnalyserController",
     "GenericElectronAnalyserController",
-    "BaseElectronAnalyserDetector",
     "ElectronAnalyserDetector",
-    "ElectronAnalyserRegionDetector",
-    "GenericBaseElectronAnalyserDetector",
     "GenericElectronAnalyserDetector",
-    "GenericElectronAnalyserRegionDetector",
     "AbstractAnalyserDriverIO",
     "GenericAnalyserDriverIO",
     "TAbstractAnalyserDriverIO",
@@ -46,6 +40,8 @@ __all__ = [
     "AbstractBaseSequence",
     "GenericRegion",
     "GenericSequence",
+    "JsonSequenceLoader",
+    "SequenceLoader",
     "TAbstractBaseRegion",
     "TAbstractBaseSequence",
     "TAcquisitionMode",

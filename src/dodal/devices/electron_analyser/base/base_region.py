@@ -1,11 +1,20 @@
 import re
-from abc import ABC
+from abc import ABC, abstractmethod
 from collections.abc import Callable
 from typing import Generic, Self, TypeAlias, TypeVar
 
-from ophyd_async.core import StrictEnum, SupersetEnum
+from bluesky.protocols import Movable
+from ophyd_async.core import (
+    AsyncStatus,
+    StandardReadable,
+    StandardReadableFormat,
+    StrictEnum,
+    SupersetEnum,
+    soft_signal_r_and_setter,
+)
 from pydantic import BaseModel, Field, model_validator
 
+from dodal.common.data_util import load_json_file_to_class
 from dodal.devices.electron_analyser.base.base_enums import EnergyMode
 from dodal.devices.electron_analyser.base.base_util import (
     to_binding_energy,
@@ -109,7 +118,7 @@ class AbstractBaseRegion(
         """
         Get a region with a new energy mode: Kinetic or Binding.
         It caculates new values for low_energy, centre_energy, high_energy, via the
-        excitation enerrgy. It doesn't calculate anything if the region is already of
+        excitation energy. It doesn't calculate anything if the region is already of
         the same energy mode.
 
         Parameters:
@@ -201,3 +210,51 @@ class AbstractBaseSequence(
 
 GenericSequence = AbstractBaseSequence[GenericRegion]
 TAbstractBaseSequence = TypeVar("TAbstractBaseSequence", bound=AbstractBaseSequence)
+
+
+class SequenceLoader(StandardReadable, Movable[str], Generic[TAbstractBaseSequence]):
+    """
+    Device that controls the sequence file selected that configures the electron
+    analyser inside plans.
+    """
+
+    def __init__(
+        self,
+        sequence_class: type[TAbstractBaseSequence],
+        initial_file: str = "Not set",
+        name: str = "",
+    ):
+        with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
+            self.sequence_file, self._sequence_file_setter = soft_signal_r_and_setter(
+                str, initial_value=initial_file
+            )
+        self._sequence_class = sequence_class
+
+        self.sequence: TAbstractBaseSequence | None = None
+        super().__init__(name)
+
+    @AsyncStatus.wrap
+    async def set(self, filename: str) -> None:
+        """Coordinate setting the sequence_file signal and also loading the data into sequence."""
+        # Try loading the sequence first to check it is a valid file before setting signal.
+        self.sequence = self.load(filename)
+        self._sequence_file_setter(filename)
+
+    @abstractmethod
+    def load(self, filename: str) -> TAbstractBaseSequence:
+        """
+        Load the sequence data from a provided file into a sequence class.
+
+        Args:
+            filename: Path to the sequence file containing the region data.
+
+        Returns:
+            Pydantic model representing the sequence file.
+        """
+
+
+class JsonSequenceLoader(SequenceLoader[TAbstractBaseSequence]):
+    """Json specifc sequence loader for electron analysers"""
+
+    def load(self, filename: str) -> TAbstractBaseSequence:
+        return load_json_file_to_class(self._sequence_class, filename)
