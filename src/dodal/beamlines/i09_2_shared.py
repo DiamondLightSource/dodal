@@ -64,12 +64,11 @@ def jid_phase() -> UndulatorPhaseAxes:
 
 
 @devices.factory()
-def jid() -> Apple2[UndulatorPhaseAxes]:
+def jid(
+    jid_gap: UndulatorGap, jid_phase: UndulatorPhaseAxes
+) -> Apple2[UndulatorPhaseAxes]:
     """I09 soft x-ray insertion device."""
-    return Apple2[UndulatorPhaseAxes](
-        id_gap=jid_gap(),
-        id_phase=jid_phase(),
-    )
+    return Apple2[UndulatorPhaseAxes](id_gap=jid_gap, id_phase=jid_phase)
 
 
 @devices.factory()
