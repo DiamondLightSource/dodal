@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.pressure_jump_cell &#8212; dodal 1.69.1.dev8+gdc0d8edea documentation</title>
+    <title>dodal.devices.pressure_jump_cell &#8212; dodal 1.69.1.dev9+gd8e8aaba8 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=af061028"></script>
+    <script src="../../../_static/documentation_options.js?v=36503339"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -811,14 +811,21 @@ window.addEventListener("load", load);
 <span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">IntEnum</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Generic</span><span class="p">,</span> <span class="n">TypeVar</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">bluesky.protocols</span><span class="w"> </span><span class="kn">import</span> <span class="n">Movable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">bluesky.protocols</span><span class="w"> </span><span class="kn">import</span> <span class="n">Movable</span><span class="p">,</span> <span class="n">Stoppable</span><span class="p">,</span> <span class="n">Triggerable</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">AsyncStatus</span><span class="p">,</span>
+    <span class="n">DeviceMock</span><span class="p">,</span>
     <span class="n">DeviceVector</span><span class="p">,</span>
+    <span class="n">Reference</span><span class="p">,</span>
     <span class="n">SignalR</span><span class="p">,</span>
     <span class="n">StandardReadable</span><span class="p">,</span>
     <span class="n">StandardReadableFormat</span><span class="p">,</span>
     <span class="n">StrictEnum</span><span class="p">,</span>
+    <span class="n">callback_on_mock_put</span><span class="p">,</span>
+    <span class="n">default_mock_class</span><span class="p">,</span>
+    <span class="n">set_and_wait_for_other_value</span><span class="p">,</span>
+    <span class="n">set_mock_value</span><span class="p">,</span>
+    <span class="n">wait_for_value</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">epics_signal_r</span><span class="p">,</span> <span class="n">epics_signal_rw</span>
 
@@ -831,14 +838,6 @@ window.addEventListener("load", load);
     <span class="n">MANUAL</span> <span class="o">=</span> <span class="s2">&quot;Manual&quot;</span>
     <span class="n">AUTO_PRESSURE</span> <span class="o">=</span> <span class="s2">&quot;Auto Pressure&quot;</span>
     <span class="n">AUTO_POSITION</span> <span class="o">=</span> <span class="s2">&quot;Auto Position&quot;</span></div>
-
-
-
-<div class="viewcode-block" id="StopState">
-<a class="viewcode-back" href="../../../reference/generated/dodal.devices.pressure_jump_cell.StopState.html#dodal.devices.pressure_jump_cell.StopState">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">StopState</span><span class="p">(</span><span class="n">StrictEnum</span><span class="p">):</span>
-    <span class="n">CONTINUE</span> <span class="o">=</span> <span class="s2">&quot;CONTINUE&quot;</span>
-    <span class="n">STOP</span> <span class="o">=</span> <span class="s2">&quot;STOP&quot;</span></div>
 
 
 
@@ -1046,34 +1045,109 @@ window.addEventListener("load", load);
 
 
 
+<div class="viewcode-block" id="DoJump">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.pressure_jump_cell.DoJump.html#dodal.devices.pressure_jump_cell.DoJump">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">DoJump</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">,</span> <span class="n">Triggerable</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">busy_signal</span><span class="p">:</span> <span class="n">Reference</span><span class="p">,</span>
+        <span class="n">timeout_signal</span><span class="p">:</span> <span class="n">Reference</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_busy_signal</span> <span class="o">=</span> <span class="n">busy_signal</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_timeout_signal</span> <span class="o">=</span> <span class="n">timeout_signal</span>
+
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_jump</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">bool</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">SETJUMP&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
+    <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">await</span> <span class="n">set_and_wait_for_other_value</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_jump</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_busy_signal</span><span class="p">(),</span> <span class="kc">True</span>
+        <span class="p">)</span>
+
+        <span class="n">timeout_value</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_timeout_signal</span><span class="p">()</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
+        <span class="k">await</span> <span class="n">wait_for_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_busy_signal</span><span class="p">(),</span> <span class="kc">False</span><span class="p">,</span> <span class="n">timeout_value</span><span class="p">)</span></div>
+
+
+
 <div class="viewcode-block" id="PressureJumpCellController">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.pressure_jump_cell.PressureJumpCellController.html#dodal.devices.pressure_jump_cell.PressureJumpCellController">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">PressureJumpCellController</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">PressureJumpCellController</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">,</span> <span class="n">Movable</span><span class="p">,</span> <span class="n">Stoppable</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Top-level control for a fixed pressure or pressure jumps.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">stop</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="n">StopState</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">STOP&quot;</span><span class="p">)</span>
-
-            <span class="bp">self</span><span class="o">.</span><span class="n">target_pressure</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">TARGET&quot;</span><span class="p">)</span>
+            <span class="c1"># Common</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">busy</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">bool</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">GOTOBUSY&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">result</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">RESULT&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">timeout</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">TIMER.HIGH&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Constant pressure</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">target_pressure</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">TARGET&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">go</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">bool</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">GO&quot;</span><span class="p">)</span>
 
-            <span class="bp">self</span><span class="o">.</span><span class="n">from_pressure</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">JUMPF&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">to_pressure</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">JUMPT&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">jump_ready</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">bool</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">SETJUMP&quot;</span><span class="p">)</span>
+            <span class="c1"># Pressure jump</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">from_pressure</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">JUMPF&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">to_pressure</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">JUMPT&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">do_jump</span> <span class="o">=</span> <span class="n">DoJump</span><span class="p">(</span>
+                <span class="n">prefix</span><span class="p">,</span> <span class="n">Reference</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">busy</span><span class="p">),</span> <span class="n">Reference</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">),</span> <span class="n">name</span>
+            <span class="p">)</span>
 
-            <span class="bp">self</span><span class="o">.</span><span class="n">result</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">RESULT&quot;</span><span class="p">)</span>
-
+            <span class="c1"># Internal</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_stop</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">bool</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">STOP&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">name</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
+<div class="viewcode-block" id="PressureJumpCellController.set">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.pressure_jump_cell.PressureJumpCellController.html#dodal.devices.pressure_jump_cell.PressureJumpCellController.set">[docs]</a>
+    <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the desired pressure waiting for the device to complete the operation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">timeout</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
+
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_pressure</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">await</span> <span class="n">set_and_wait_for_other_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">go</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">busy</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+
+        <span class="k">await</span> <span class="n">wait_for_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">busy</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">timeout</span><span class="p">)</span>  <span class="c1"># Change complete</span></div>
+
+
+    <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">success</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stop</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="BusyMock">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.pressure_jump_cell.BusyMock.html#dodal.devices.pressure_jump_cell.BusyMock">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">BusyMock</span><span class="p">(</span><span class="n">DeviceMock</span><span class="p">[</span><span class="s2">&quot;PressureJumpCell&quot;</span><span class="p">]):</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">busy</span><span class="p">(</span><span class="o">*</span><span class="n">_</span><span class="p">,</span> <span class="o">**</span><span class="n">__</span><span class="p">):</span>
+            <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">busy_idle</span><span class="p">():</span>
+                <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                <span class="n">set_mock_value</span><span class="p">(</span><span class="n">device</span><span class="o">.</span><span class="n">control</span><span class="o">.</span><span class="n">busy</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+                <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                <span class="n">set_mock_value</span><span class="p">(</span><span class="n">device</span><span class="o">.</span><span class="n">control</span><span class="o">.</span><span class="n">busy</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+
+            <span class="n">asyncio</span><span class="o">.</span><span class="n">create_task</span><span class="p">(</span><span class="n">busy_idle</span><span class="p">())</span>
+
+        <span class="n">callback_on_mock_put</span><span class="p">(</span><span class="n">device</span><span class="o">.</span><span class="n">control</span><span class="o">.</span><span class="n">go</span><span class="p">,</span> <span class="n">busy</span><span class="p">)</span>
+        <span class="n">callback_on_mock_put</span><span class="p">(</span><span class="n">device</span><span class="o">.</span><span class="n">control</span><span class="o">.</span><span class="n">do_jump</span><span class="o">.</span><span class="n">set_jump</span><span class="p">,</span> <span class="n">busy</span><span class="p">)</span></div>
 
 
 
 <div class="viewcode-block" id="PressureJumpCell">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.pressure_jump_cell.PressureJumpCell.html#dodal.devices.pressure_jump_cell.PressureJumpCell">[docs]</a>
+<span class="nd">@default_mock_class</span><span class="p">(</span><span class="n">BusyMock</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">PressureJumpCell</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    High pressure X-ray cell, used to apply pressure or pressure jumps to a sample.</span>
@@ -1091,9 +1165,7 @@ window.addEventListener("load", load);
         <span class="bp">self</span><span class="o">.</span><span class="n">all_valves_control</span> <span class="o">=</span> <span class="n">AllValvesControl</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}{</span><span class="n">cell_prefix</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pump</span> <span class="o">=</span> <span class="n">Pump</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}{</span><span class="n">cell_prefix</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">controller</span> <span class="o">=</span> <span class="n">PressureJumpCellController</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}{</span><span class="n">cell_prefix</span><span class="si">}</span><span class="s2">CTRL:&quot;</span><span class="p">,</span> <span class="n">name</span>
-        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">control</span> <span class="o">=</span> <span class="n">PressureJumpCellController</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}{</span><span class="n">cell_prefix</span><span class="si">}</span><span class="s2">CTRL:&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
 
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">pressure_transducers</span><span class="p">:</span> <span class="n">DeviceVector</span><span class="p">[</span><span class="n">PressureTransducer</span><span class="p">]</span> <span class="o">=</span> <span class="n">DeviceVector</span><span class="p">(</span>

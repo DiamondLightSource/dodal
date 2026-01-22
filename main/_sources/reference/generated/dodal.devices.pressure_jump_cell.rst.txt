@@ -15,6 +15,8 @@ dodal.devices.pressure\_jump\_cell
    :recursive:
 
    ~pressure_jump_cell.AllValvesControl
+   ~pressure_jump_cell.BusyMock
+   ~pressure_jump_cell.DoJump
    ~pressure_jump_cell.FastValveControlRequest
    ~pressure_jump_cell.FastValveState
    ~pressure_jump_cell.PressureJumpCell
@@ -23,7 +25,6 @@ dodal.devices.pressure\_jump\_cell
    ~pressure_jump_cell.Pump
    ~pressure_jump_cell.PumpMotorDirectionState
    ~pressure_jump_cell.PumpState
-   ~pressure_jump_cell.StopState
    ~pressure_jump_cell.ValveControl
    ~pressure_jump_cell.ValveControlRequest
    ~pressure_jump_cell.ValveOpenSeqRequest

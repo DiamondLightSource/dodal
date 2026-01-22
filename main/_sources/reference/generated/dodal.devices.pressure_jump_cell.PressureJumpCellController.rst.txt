@@ -21,6 +21,12 @@ dodal.devices.pressure\_jump\_cell.PressureJumpCellController
       
       
       
+      ~PressureJumpCellController.set
+      
+      
+      
+      
+      ~PressureJumpCellController.stop
       
       
    
