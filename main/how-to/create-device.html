@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Creating a new device &#8212; dodal 1.69.1.dev14+g7b9498c8e documentation</title>
+    <title>Creating a new device &#8212; dodal 1.69.1.dev15+g96f1222fa documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=2f727b9f"></script>
+    <script src="../_static/documentation_options.js?v=49573c8e"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -405,6 +405,7 @@
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">Creating a new device</a></li>
 
 
+
 <li class="toctree-l1"><a class="reference internal" href="dev-install.html">Setup Developer Environment</a></li>
 <li class="toctree-l1"><a class="reference internal" href="excalidraw.html">How to embed Excalidraw diagrams</a></li>
 <li class="toctree-l1"><a class="reference internal" href="external-io-devices.html">How to Write External IO Devices</a></li>
@@ -516,12 +517,15 @@
 <ul class="simple">
 <li><p><strong>Follow the <a class="reference external" href="https://blueskyproject.io/ophyd-async/main/tutorials/implementing-devices.html">ophyd-async device implementation guide</a></strong> to structure your device code.</p></li>
 <li><p><strong>Choose the right base class</strong> by consulting the <a class="reference external" href="https://blueskyproject.io/ophyd-async/main/how-to/choose-right-baseclass.html">base class guide</a>, If your device needs to move, you’ll need to extend the Movable protocol. For detailed guidance on when and how to do this, refer to the <a class="reference external" href="https://blueskyproject.io/ophyd-async/main/explanations/when-to-extend-movable.html">movable device guide</a>.</p></li>
+<li><p><strong>Add static metadata (if any) to the device class</strong> using a <a class="reference external" href="https://blueskyproject.io/ophyd-async/main/_api/ophyd_async/ophyd_async.core.html#ophyd_async.core.soft_signal_rw">soft signal</a> or existing device epics record. For example this could be a manufacturer or brand name of the device. Another example is crystal metadata in <a class="reference external" href="https://diamondlightsource.github.io/dodal/main/reference/generated/dodal.devices.i22.dcm.DCM.html#dodal.devices.i22.dcm.DCM">i22 DCM</a> In some cases it might be beneficial to ask controls team to create an additional epics field containing metadata for such device.</p></li>
 <li><p><strong>Write thorough unit tests</strong> for all expected use cases. Reference the <a class="reference external" href="https://blueskyproject.io/ophyd-async/main/tutorials/implementing-devices.html">ophyd-async device test guide</a> for best practices.</p></li>
 <li><p><strong>Validate your device on the beamline</strong> and keep notes of any issues for later fixes.</p></li>
 <li><p><strong>Make use of type annotations</strong> so that pyright will validate that you are passing around values that ophyd-async will accept.</p></li>
 <li><p>Use <code class="docutils literal notranslate"><span class="pre">dodal</span> <span class="pre">connect</span> <span class="pre">&lt;beamline&gt;</span></code> to check device connectivity and <code class="docutils literal notranslate"><span class="pre">cainfo</span> <span class="pre">&lt;PV</span> <span class="pre">address&gt;</span></code> to confirm PVs and datatypes. You can check a PV’s datatype by using the <code class="docutils literal notranslate"><span class="pre">cainfo</span> <span class="pre">&lt;PV</span> <span class="pre">address&gt;</span></code> command. If the datatype is an enum, <code class="docutils literal notranslate"><span class="pre">caget</span> <span class="pre">-d</span> <span class="pre">31</span> <span class="pre">&lt;PV</span> <span class="pre">address&gt;</span></code> will also display the available enums that the PV takes. Common enums are defined in <code class="docutils literal notranslate"><span class="pre">ophyd-async.core</span></code> for devices to use, but you can define custom ones when suitable (inheriting from <code class="docutils literal notranslate"><span class="pre">ophyd_async.core</span></code> <code class="docutils literal notranslate"><span class="pre">StrictEnum</span></code>, <code class="docutils literal notranslate"><span class="pre">SupersetEnum</span></code> or <code class="docutils literal notranslate"><span class="pre">SubsetEnum</span></code>). The values should be capitalised e.g <code class="docutils literal notranslate"><span class="pre">ON</span> <span class="pre">=</span> <span class="pre">&quot;On&quot;</span></code>. If the PV expects upper case for the enum (e.g <code class="docutils literal notranslate"><span class="pre">ON</span> <span class="pre">=</span> <span class="pre">&quot;ON&quot;</span></code>), please speak to the relevant controls engineer(s) to get this changed if possible. For more infomation, please visit <a class="reference external" href="https://blueskyproject.io/ophyd-async/main/explanations/decisions/0008-signal-types.html">here</a>.</p></li>
 </ul>
-<p><strong>Device best practices for Bluesky plans:</strong></p>
+</section>
+<section id="device-best-practices-for-bluesky-plans">
+<h1>Device best practices for Bluesky plans<a class="headerlink" href="#device-best-practices-for-bluesky-plans" title="Link to this heading">#</a></h1>
 <ul class="simple">
 <li><p>Interact with devices in plans only through the Bluesky <a class="reference external" href="https://blueskyproject.io/bluesky/main/msg.html">messages protocol</a>, such as <code class="docutils literal notranslate"><span class="pre">yield</span> <span class="pre">from</span> <span class="pre">bps.abs_set(...)</span></code> or <code class="docutils literal notranslate"><span class="pre">yield</span> <span class="pre">Msg(&quot;set&quot;,</span> <span class="pre">...)</span></code>.</p></li>
 <li><p>Avoid calling device methods directly inside plans (e.g. <code class="docutils literal notranslate"><span class="pre">device.do_thing()</span></code>), as this breaks the abstraction and can lead to unpredictable behaviour.</p></li>
@@ -595,6 +599,7 @@
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Creating a new device</a></li>
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#reusing-an-existing-class">Reusing an existing class</a></li>
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#writing-a-device-class">Writing a device class</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#device-best-practices-for-bluesky-plans">Device best practices for Bluesky plans</a></li>
 </ul>
 
   </nav></div>
