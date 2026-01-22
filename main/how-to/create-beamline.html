@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Creating a new beamline &#8212; dodal 1.69.1.dev5+ge23e028ff documentation</title>
+    <title>Creating a new beamline &#8212; dodal 1.69.1.dev6+g0d976607a documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=690376a9"></script>
+    <script src="../_static/documentation_options.js?v=b03c3985"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -562,6 +562,42 @@ go somewhere else e.g. <code class="docutils literal notranslate"><span class="p
             <span class="n">drv_suffix</span><span class="o">=</span><span class="n">CAM_SUFFIX</span><span class="p">,</span>
             <span class="n">fileio_suffix</span><span class="o">=</span><span class="n">HDF5_SUFFIX</span><span class="p">,</span>
         <span class="p">)</span>
+</pre></div>
+</div>
+<p>Some beamlines have multiple endstations and shared optics. To reduce duplicate configuration, the <code class="docutils literal notranslate"><span class="pre">DeviceManager</span></code> allows us to include devices from another instance of <code class="docutils literal notranslate"><span class="pre">DeviceManager</span></code>.</p>
+<p>An example is shown below for a shared beamline setup:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">dodal.device_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeviceManager</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.pgm</span><span class="w"> </span><span class="kn">import</span> <span class="n">PlaneGratingMonochromator</span>
+
+<span class="o">...</span>
+
+<span class="n">devices</span> <span class="o">=</span> <span class="n">DeviceManager</span><span class="p">()</span>
+
+<span class="sd">&quot;&quot;&quot;Device that is shared between multiple endstations, i05 and i05-1.&quot;&quot;&quot;</span>
+<span class="nd">@devices</span><span class="o">.</span><span class="n">factory</span><span class="p">()</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">pgm</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">PlaneGratingMonochromator</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">PlaneGratingMonochromator</span><span class="p">(</span>
+        <span class="n">prefix</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">PREFIX</span><span class="o">.</span><span class="n">beamline_prefix</span><span class="si">}</span><span class="s2">-OP-PGM-01:&quot;</span><span class="p">,</span>
+        <span class="n">grating</span><span class="o">=</span><span class="n">Grating</span><span class="p">,</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+<p>Then for i05, we include the i05_shared devices so we have access to the shared devices.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">dodal.beamlines.i05_shared</span><span class="w"> </span><span class="kn">import</span> <span class="n">devices</span> <span class="k">as</span> <span class="n">i05_shared_devices</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.device_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeviceManager</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.temperture_controller</span><span class="w"> </span><span class="kn">import</span> <span class="n">Lakeshore336</span>
+
+<span class="o">...</span>
+
+<span class="sd">&quot;&quot;&quot;Include all the i05 shared beamline devices which should be avaliable for every end station.</span>
+<span class="sd">In this example, the pgm device will be included in this beamline.&quot;&quot;&quot;</span>
+<span class="n">devices</span> <span class="o">=</span> <span class="n">DeviceManager</span><span class="p">()</span>
+<span class="n">devices</span><span class="o">.</span><span class="n">include</span><span class="p">(</span><span class="n">i05_shared_devices</span><span class="p">)</span>
+
+<span class="sd">&quot;&quot;&quot;Beamline specific device for i05 only.&quot;&quot;&quot;</span>
+<span class="nd">@devices</span><span class="o">.</span><span class="n">factory</span><span class="p">()</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">sample_temperature_controller</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Lakeshore336</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">Lakeshore336</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">PREFIX</span><span class="o">.</span><span class="n">beamline_prefix</span><span class="si">}</span><span class="s2">-EA-TCTRL-02:&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>

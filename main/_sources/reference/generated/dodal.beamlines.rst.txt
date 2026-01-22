@@ -24,6 +24,7 @@
    dodal.beamlines.i04
    dodal.beamlines.i05
    dodal.beamlines.i05_1
+   dodal.beamlines.i05_shared
    dodal.beamlines.i06
    dodal.beamlines.i06_1
    dodal.beamlines.i07
