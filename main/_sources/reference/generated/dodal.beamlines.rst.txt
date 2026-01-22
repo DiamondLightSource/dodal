@@ -25,15 +25,15 @@
    dodal.beamlines.i05
    dodal.beamlines.i05_1
    dodal.beamlines.i05_shared
-   dodal.beamlines.i06
    dodal.beamlines.i06_1
+   dodal.beamlines.i06_shared
    dodal.beamlines.i07
    dodal.beamlines.i09
    dodal.beamlines.i09_1
    dodal.beamlines.i09_2
    dodal.beamlines.i10
    dodal.beamlines.i10_1
-   dodal.beamlines.i10_optics
+   dodal.beamlines.i10_shared
    dodal.beamlines.i11
    dodal.beamlines.i13_1
    dodal.beamlines.i15
