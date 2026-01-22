@@ -86,3 +86,44 @@ The following example creates a fictitious beamline ``w41``, with a simulated tw
             fileio_suffix=HDF5_SUFFIX,
         )
 ```
+
+Some beamlines have multiple endstations and shared optics. To reduce duplicate configuration, the `DeviceManager` allows us to include devices from another instance of `DeviceManager`.
+
+An example is shown below for a shared beamline setup:
+
+```python
+from dodal.device_manager import DeviceManager
+from dodal.devices.pgm import PlaneGratingMonochromator
+
+...
+
+devices = DeviceManager()
+
+"""Device that is shared between multiple endstations, i05 and i05-1."""
+@devices.factory()
+def pgm() -> PlaneGratingMonochromator:
+    return PlaneGratingMonochromator(
+        prefix=f"{PREFIX.beamline_prefix}-OP-PGM-01:",
+        grating=Grating,
+    )
+```
+
+Then for i05, we include the i05_shared devices so we have access to the shared devices.
+
+```python
+from dodal.beamlines.i05_shared import devices as i05_shared_devices
+from dodal.device_manager import DeviceManager
+from dodal.devices.temperture_controller import Lakeshore336
+
+...
+
+"""Include all the i05 shared beamline devices which should be avaliable for every end station.
+In this example, the pgm device will be included in this beamline."""
+devices = DeviceManager()
+devices.include(i05_shared_devices)
+
+"""Beamline specific device for i05 only."""
+@devices.factory()
+def sample_temperature_controller() -> Lakeshore336:
+    return Lakeshore336(prefix=f"{PREFIX.beamline_prefix}-EA-TCTRL-02:")
+```
