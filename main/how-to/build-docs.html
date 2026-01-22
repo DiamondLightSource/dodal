@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Build the docs using sphinx &#8212; dodal 1.69.1.dev11+ge1d2c9b6f documentation</title>
+    <title>Build the docs using sphinx &#8212; dodal 1.69.1.dev12+g5635ae654 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=31713bd4"></script>
+    <script src="../_static/documentation_options.js?v=e71f6c2e"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -510,6 +510,14 @@
 </pre></div>
 </div>
 </section>
+<section id="common-issues">
+<h2>Common issues<a class="headerlink" href="#common-issues" title="Link to this heading">#</a></h2>
+<section id="building-docs-fails-due-to-cached-rst-files">
+<h3>Building docs fails due to cached *rst files<a class="headerlink" href="#building-docs-fails-due-to-cached-rst-files" title="Link to this heading">#</a></h3>
+<p>If the module stucture changes from “x.y” to “x.z.y” one could get “module x.z.y not found” error trying to build the docs locally.</p>
+<p>The solution is to clear “/workspaces/dodal/docs/reference/generated” folder.</p>
+</section>
+</section>
 </section>
 
 
@@ -560,6 +568,10 @@
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#autobuild">Autobuild</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#common-issues">Common issues</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#building-docs-fails-due-to-cached-rst-files">Building docs fails due to cached *rst files</a></li>
+</ul>
+</li>
 </ul>
   </nav></div>
 
