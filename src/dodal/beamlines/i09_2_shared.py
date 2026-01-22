@@ -2,7 +2,6 @@ from pathlib import Path
 
 from daq_config_server.client import ConfigServer
 
-from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.device_manager import DeviceManager
 from dodal.devices.i09.enums import Grating
 from dodal.devices.i09_2_shared.i09_apple2 import (
@@ -23,7 +22,6 @@ from dodal.devices.insertion_device.energy_motor_lookup import (
 )
 from dodal.devices.insertion_device.lookup_table_models import LookupTableColumnConfig
 from dodal.devices.pgm import PlaneGratingMonochromator
-from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
 J09_CONF_CLIENT = ConfigServer(url="https://daq-config.diamond.ac.uk")
@@ -33,8 +31,6 @@ PHASE_LOOKUP_FILE_NAME = "JIDEnergy2PhaseCalibrations.csv"
 
 BL = get_beamline_name("i09-2-shared")
 J_PREFIX = BeamlinePrefix(BL, suffix="J")
-set_log_beamline(BL)
-set_utils_beamline(BL)
 
 devices = DeviceManager()
 

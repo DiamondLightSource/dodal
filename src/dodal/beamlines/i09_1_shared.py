@@ -1,4 +1,3 @@
-from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.device_manager import DeviceManager
 from dodal.devices.common_dcm import (
     DoubleCrystalMonochromatorWithDSpacing,
@@ -11,13 +10,10 @@ from dodal.devices.i09_1_shared.hard_undulator_functions import (
     calculate_gap_i09_hu,
 )
 from dodal.devices.undulator import UndulatorInMm, UndulatorOrder
-from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
 BL = get_beamline_name("i09-1-shared")
 I_PREFIX = BeamlinePrefix(BL, suffix="I")
-set_log_beamline(BL)
-set_utils_beamline(BL)
 
 devices = DeviceManager()
 
