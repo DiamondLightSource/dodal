@@ -6,12 +6,12 @@ from dodal.devices.selectable_source import SourceSelector
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
-devices = DeviceManager()
-
 BL = get_beamline_name("p60")
 PREFIX = BeamlinePrefix(BL)
 set_log_beamline(BL)
 set_utils_beamline(BL)
+
+devices = DeviceManager()
 
 
 @devices.factory()
