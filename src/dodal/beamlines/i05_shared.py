@@ -1,4 +1,3 @@
-from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.device_manager import DeviceManager
 from dodal.devices.i05.enums import Grating
 from dodal.devices.insertion_device import (
@@ -8,13 +7,10 @@ from dodal.devices.insertion_device import (
 )
 from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.devices.synchrotron import Synchrotron
-from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
 BL = get_beamline_name("i05-shared")
 PREFIX = BeamlinePrefix("i05-shared", "I")
-set_log_beamline(BL)
-set_utils_beamline(BL)
 
 devices = DeviceManager()
 
