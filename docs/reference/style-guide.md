@@ -2,9 +2,19 @@
 
 This project is based on the [python-copier-template](https://diamondlightsource.github.io/python-copier-template/main/index.html), which integrates a number of tools which assist in usability and enforce style decisions. It is recommended that developers use a [vscode devcontainer](https://code.visualstudio.com/docs/devcontainers/containers) to easily take advantage of the tools available to them. You will need complete a short set of [instructions](https://diamondlightsource.github.io/python-copier-template/main/how-to/dev-install.html#install-dependencies) to enable use of vscode devcontainers. 
 
-For this project, we follow the [Google Python Style Guide](https://google.github.io/styleguide/pyguide.html) with a notable set of exceptions:
+For this project, we follow [the Google Python Style Guide](https://google.github.io/styleguide/pyguide.html) with a notable set of exceptions:
 
-## 
+## dodal Specific Guidance
+
+Specific guidelines for use within this project which are not outlined in [the Google Python Style Guide](https://google.github.io/styleguide/pyguide.html) or [PEP 8](https://peps.python.org/pep-0008/). 
+
+1. Prefer the use of `params` over `args` when a group of parameters is used (i.e. in [GDABeamlineParameters](https://github.com/DiamondLightSource/dodal/blob/e23e028ff46e0e75aad0248d0ba06fa5382eff1e/src/dodal/common/beamlines/beamline_parameters.py#L15)) or [EigerDetector](https://github.com/DiamondLightSource/dodal/blob/e23e028ff46e0e75aad0248d0ba06fa5382eff1e/src/dodal/devices/eiger.py#L91).
+
+2. Handle devices shared between beamlines as outlined in [Handle devices shared between multiple endstations](../explanations/decisions/0006-devices-shared-between-endstations.md)
+
+## Guidance Against [the Google Python Style Guide](https://google.github.io/styleguide/pyguide.html)
+
+Specific guidelines for use within this project which directly oppose decisions in [the Google Python Style Guide](https://google.github.io/styleguide/pyguide.html). 
 
 1. [PEP 8](https://peps.python.org/pep-0008/) should take precedence over [the google style guide](https://google.github.io/styleguide/pyguide.html#316-naming) on any naming disputes to ensure continuity throughout the project.
 
@@ -16,10 +26,12 @@ For this project, we follow the [Google Python Style Guide](https://google.githu
 
 5. Prefer using explicit true/false evaluation over [implicit false evaluations](https://google.github.io/styleguide/pyguide.html#214-truefalse-evaluations). Explicit false evaluation is more predictable when handling different data types (i.e. integers), as `0` is falsy.
 
-6. setters and getters
+## Guidance Which Agrees with [the Google Python Style Guide](https://google.github.io/styleguide/pyguide.html)
 
-7. Prefer utility functions over staticmethod
+Specific guidelines for use within this project which agree with decisions in [the Google Python Style Guide](https://google.github.io/styleguide/pyguide.html), but may be uncommon practice for those unfamiliar with Python. These tend to be practices which cannot be checked by enabling a ruff rule.
 
-8. Prefer `args` over `params`
+1. [Use decorators judiciously](https://google.github.io/styleguide/pyguide.html#2174-decision) when there is a clear advantage. Avoid `staticmethod` and limit use of `classmethod`.
 
-9. Avoid global mutable state, as is the decision in [the google style guide](https://google.github.io/styleguide/pyguide.html#25-mutable-global-state). 
+2. [Use of properties](https://google.github.io/styleguide/pyguide.html#213-properties) over [getters and setters](https://google.github.io/styleguide/pyguide.html#315-getters-and-setters) is encouraged, unless getting or setting the variable is complex or the cost is significant, either currently or in a reasonable future.
+
+3. [Avoid global mutable state](https://google.github.io/styleguide/pyguide.html#25-mutable-global-state). 
