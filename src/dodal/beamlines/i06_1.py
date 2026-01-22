@@ -1,3 +1,4 @@
+from dodal.beamlines.i06_shared import devices as i06_shared_devices
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.device_manager import DeviceManager
 from dodal.devices.temperture_controller import (
@@ -11,6 +12,7 @@ PREFIX = BeamlinePrefix(BL, suffix="J")
 set_log_beamline(BL)
 set_utils_beamline(BL)
 devices = DeviceManager()
+devices.include(i06_shared_devices)
 
 
 @devices.factory()
