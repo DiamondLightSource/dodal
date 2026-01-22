@@ -1,6 +1,11 @@
+from pathlib import Path
+
+from ophyd_async.core import StaticPathProvider, UUIDFilenameProvider
+
 from dodal.common.beamlines.beamline_utils import (
     device_factory,
     get_path_provider,
+    set_path_provider,
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.beamlines.device_helpers import DET_SUFFIX
@@ -29,6 +34,13 @@ BL = get_beamline_name("i11")
 PREFIX = BeamlinePrefix(BL)
 set_log_beamline(BL)
 set_utils_beamline(BL)
+
+# This should be removed when the DeviceManager is adopted
+try:
+    get_path_provider()
+except NameError:
+    # If one hasn't already been set, use a default to stop things crashing
+    set_path_provider(StaticPathProvider(UUIDFilenameProvider(), Path("/tmp")))
 
 
 @device_factory()
