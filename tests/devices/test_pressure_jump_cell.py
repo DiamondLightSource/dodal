@@ -1,5 +1,5 @@
 import asyncio
-from unittest.mock import ANY, MagicMock, patch
+from unittest.mock import ANY
 
 import pytest
 from ophyd_async.core import set_mock_value
@@ -462,14 +462,9 @@ async def test_reading_pjumpcell_includes_fields_control_jump(
     )
 
 
-@patch("dodal.devices.pressure_jump_cell.wait_for_value")
 async def test_pjumpcell_toplevel_pressure_control(
-    mock_wait_for_device: MagicMock,
     cell_with_mocked_busy: PressureJumpCell,
 ):
-    # Override device wait to complete successfully
-    mock_wait_for_device.side_effect = [None, None]
-
     target_pressure = 250
     set_mock_value(cell_with_mocked_busy.control.go, False)
     set_mock_value(cell_with_mocked_busy.control._stop, False)
@@ -496,17 +491,11 @@ async def test_pjumpcell_toplevel_pressure_control(
     )
 
 
-@patch("dodal.devices.pressure_jump_cell.wait_for_value")
 async def test_pjumpcell_toplevel_pressure_jump_control(
-    mock_wait_for_device: MagicMock,
     cell_with_mocked_busy: PressureJumpCell,
 ):
-    # Override device wait to complete successfully
-    mock_wait_for_device.side_effect = [None, None]
-
     target_pressure_from = 500
     target_pressure_to = 1000
-
     set_mock_value(cell_with_mocked_busy.control.go, False)
     set_mock_value(cell_with_mocked_busy.control._stop, False)
     set_mock_value(cell_with_mocked_busy.control.busy, False)
