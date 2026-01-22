@@ -42,8 +42,8 @@ class AperturePosition(BaseModel):
         aperture_z: The z position of the aperture component in mm
         scatterguard_x: The x position of the scatterguard component in mm
         scatterguard_y: The y position of the scatterguard component in mm
-        radius: Radius of the selected aperture. When in the Robot Load position, the
-            radius is defined to be 0
+        diameter: Diameter of the selected aperture. When in the Robot Load position, the
+            diameter is defined to be 0
     """
 
     aperture_x: float
@@ -51,7 +51,7 @@ class AperturePosition(BaseModel):
     aperture_z: float
     scatterguard_x: float
     scatterguard_y: float
-    radius: float = Field(json_schema_extra={"units": "µm"}, default=0.0)
+    diameter: float = Field(json_schema_extra={"units": "µm"}, default=0.0)
 
     @property
     def values(self) -> tuple[float, float, float, float, float]:
@@ -78,7 +78,7 @@ class AperturePosition(BaseModel):
     @staticmethod
     def from_gda_params(
         name: _GDAParamApertureValue,
-        radius: float,
+        diameter: float,
         params: GDABeamlineParameters,
     ) -> AperturePosition:
         return AperturePosition(
@@ -87,7 +87,7 @@ class AperturePosition(BaseModel):
             aperture_z=params[f"miniap_z_{name.value}"],
             scatterguard_x=params[f"sg_x_{name.value}"],
             scatterguard_y=params[f"sg_y_{name.value}"],
-            radius=radius,
+            diameter=diameter,
         )
 
 
@@ -185,8 +185,8 @@ class ApertureScatterguard(StandardReadable, Preparable):
                 current_ap_z=self.aperture.z.user_readback,
             )
 
-        self.radius = derived_signal_r(
-            self._get_current_radius,
+        self.diameter = derived_signal_r(
+            self._get_current_diameter,
             current_aperture=self.selected_aperture,
             derived_units="µm",
         )
@@ -198,7 +198,7 @@ class ApertureScatterguard(StandardReadable, Preparable):
                 self.aperture.z.user_readback,
                 self.scatterguard.x.user_readback,
                 self.scatterguard.y.user_readback,
-                self.radius,
+                self.diameter,
             ],
         )
 
@@ -262,8 +262,8 @@ class ApertureScatterguard(StandardReadable, Preparable):
                     "triggering another move."
                 )
 
-    def _get_current_radius(self, current_aperture: ApertureValue) -> float:
-        return self._loaded_positions[current_aperture].radius
+    def _get_current_diameter(self, current_aperture: ApertureValue) -> float:
+        return self._loaded_positions[current_aperture].diameter
 
     def _is_in_position(
         self, position: ApertureValue, current_ap_y: float, current_ap_z: float
