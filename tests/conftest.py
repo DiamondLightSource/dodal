@@ -13,6 +13,7 @@ from ophyd_async.core import (
 )
 
 from dodal.common.beamlines import beamline_parameters, beamline_utils
+from dodal.common.beamlines.beamline_utils import clear_path_provider
 from dodal.common.visit import (
     DirectoryServiceClient,
     LocalDirectoryServiceClient,
@@ -46,7 +47,6 @@ MOCK_ATTRIBUTES_TABLE = {
     "i03": MOCK_PATHS,
     "i10_optics": MOCK_PATHS,
     "i04": MOCK_PATHS,
-    "s04": MOCK_PATHS,
     "i19_1": MOCK_PATHS,
     "i24": MOCK_PATHS,
     "aithre": MOCK_PATHS,
@@ -58,6 +58,12 @@ environ["DODAL_TEST_MODE"] = "true"
 
 # Add run_engine and util fixtures to be used in tests
 pytest_plugins = ["dodal.testing.fixtures.run_engine", "dodal.testing.fixtures.utils"]
+
+
+@pytest.fixture(autouse=True)
+def reset_path_provider():
+    yield
+    clear_path_provider()
 
 
 @pytest.fixture(autouse=True)
