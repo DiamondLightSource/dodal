@@ -1,0 +1,19 @@
+beamline: "i10"
+
+base_imports:
+  - "from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline"
+  - "from dodal.device_manager import DeviceManager"
+  - "from dodal.log import set_beamline as set_log_beamline"
+  - "from dodal.utils import BeamlinePrefix, get_beamline_name"
+
+setup_script: |
+  devices = DeviceManager()
+  BL = get_beamline_name('{beamline}')
+  set_log_beamline(BL)
+  set_utils_beamline(BL)
+  PREFIX = BeamlinePrefix(BL)
+
+# Only these files will be processed
+device_files:
+  - "devices/mirrors.yaml"
+  - "devices/detectors.yaml"

@@ -1,0 +1,25 @@
+- section: "Mirrors"
+  device: focusing_mirror
+  type: PiezoMirror
+  import_from: "dodal.devices.i10"
+  params:
+    prefix: 'f"{PREFIX.beamline_prefix}-OP-FOCS-01:"'
+
+- section: "Mirrors"
+  device: switching_mirror
+  type: PiezoMirror
+  import_from: "dodal.devices.i10"
+  params:
+    prefix: "f'{PREFIX.beamline_prefix}-OP-SWTCH-01:'"
+  decorators:
+    - name: "devices.factory"
+      args:
+        skip: false
+
+- section: "Mirrors"
+  device: switching_mirror_backup
+  type: PiezoMirror
+  import_from: "dodal.devices.i10"
+  params:
+    prefix: "tbsjkfbnskfbnsk"
+  decorators: [] #no decorators
