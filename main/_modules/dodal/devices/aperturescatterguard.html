@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.aperturescatterguard &#8212; dodal 1.69.1.dev6+g0d976607a documentation</title>
+    <title>dodal.devices.aperturescatterguard &#8212; dodal 1.69.1.dev7+gce0fd2897 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=b03c3985"></script>
+    <script src="../../../_static/documentation_options.js?v=259d751f"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -853,8 +853,8 @@ window.addEventListener("load", load);
 <span class="sd">        aperture_z: The z position of the aperture component in mm</span>
 <span class="sd">        scatterguard_x: The x position of the scatterguard component in mm</span>
 <span class="sd">        scatterguard_y: The y position of the scatterguard component in mm</span>
-<span class="sd">        radius: Radius of the selected aperture. When in the Robot Load position, the</span>
-<span class="sd">            radius is defined to be 0</span>
+<span class="sd">        diameter: Diameter of the selected aperture. When in the Robot Load position, the</span>
+<span class="sd">            diameter is defined to be 0</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">aperture_x</span><span class="p">:</span> <span class="nb">float</span>
@@ -862,7 +862,7 @@ window.addEventListener("load", load);
     <span class="n">aperture_z</span><span class="p">:</span> <span class="nb">float</span>
     <span class="n">scatterguard_x</span><span class="p">:</span> <span class="nb">float</span>
     <span class="n">scatterguard_y</span><span class="p">:</span> <span class="nb">float</span>
-    <span class="n">radius</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">json_schema_extra</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;units&quot;</span><span class="p">:</span> <span class="s2">&quot;µm&quot;</span><span class="p">},</span> <span class="n">default</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+    <span class="n">diameter</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">json_schema_extra</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;units&quot;</span><span class="p">:</span> <span class="s2">&quot;µm&quot;</span><span class="p">},</span> <span class="n">default</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">values</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
@@ -889,7 +889,7 @@ window.addEventListener("load", load);
     <span class="nd">@staticmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">from_gda_params</span><span class="p">(</span>
         <span class="n">name</span><span class="p">:</span> <span class="n">_GDAParamApertureValue</span><span class="p">,</span>
-        <span class="n">radius</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">diameter</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
         <span class="n">params</span><span class="p">:</span> <span class="n">GDABeamlineParameters</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AperturePosition</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">AperturePosition</span><span class="p">(</span>
@@ -898,7 +898,7 @@ window.addEventListener("load", load);
             <span class="n">aperture_z</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;miniap_z_</span><span class="si">{</span><span class="n">name</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">],</span>
             <span class="n">scatterguard_x</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;sg_x_</span><span class="si">{</span><span class="n">name</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">],</span>
             <span class="n">scatterguard_y</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;sg_y_</span><span class="si">{</span><span class="n">name</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">],</span>
-            <span class="n">radius</span><span class="o">=</span><span class="n">radius</span><span class="p">,</span>
+            <span class="n">diameter</span><span class="o">=</span><span class="n">diameter</span><span class="p">,</span>
         <span class="p">)</span></div>
 
 
@@ -1005,8 +1005,8 @@ window.addEventListener("load", load);
                 <span class="n">current_ap_z</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">aperture</span><span class="o">.</span><span class="n">z</span><span class="o">.</span><span class="n">user_readback</span><span class="p">,</span>
             <span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">radius</span> <span class="o">=</span> <span class="n">derived_signal_r</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_get_current_radius</span><span class="p">,</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">diameter</span> <span class="o">=</span> <span class="n">derived_signal_r</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_get_current_diameter</span><span class="p">,</span>
             <span class="n">current_aperture</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">selected_aperture</span><span class="p">,</span>
             <span class="n">derived_units</span><span class="o">=</span><span class="s2">&quot;µm&quot;</span><span class="p">,</span>
         <span class="p">)</span>
@@ -1018,7 +1018,7 @@ window.addEventListener("load", load);
                 <span class="bp">self</span><span class="o">.</span><span class="n">aperture</span><span class="o">.</span><span class="n">z</span><span class="o">.</span><span class="n">user_readback</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">scatterguard</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">user_readback</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">scatterguard</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">user_readback</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">radius</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">diameter</span><span class="p">,</span>
             <span class="p">],</span>
         <span class="p">)</span>
 
@@ -1082,8 +1082,8 @@ window.addEventListener("load", load);
                     <span class="s2">&quot;triggering another move.&quot;</span>
                 <span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_get_current_radius</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_aperture</span><span class="p">:</span> <span class="n">ApertureValue</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loaded_positions</span><span class="p">[</span><span class="n">current_aperture</span><span class="p">]</span><span class="o">.</span><span class="n">radius</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_current_diameter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_aperture</span><span class="p">:</span> <span class="n">ApertureValue</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loaded_positions</span><span class="p">[</span><span class="n">current_aperture</span><span class="p">]</span><span class="o">.</span><span class="n">diameter</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_is_in_position</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">position</span><span class="p">:</span> <span class="n">ApertureValue</span><span class="p">,</span> <span class="n">current_ap_y</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">current_ap_z</span><span class="p">:</span> <span class="nb">float</span>

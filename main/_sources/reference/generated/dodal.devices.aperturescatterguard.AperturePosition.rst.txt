@@ -76,7 +76,7 @@ dodal.devices.aperturescatterguard.AperturePosition
       ~AperturePosition.scatterguard_y
       
       
-      ~AperturePosition.radius
+      ~AperturePosition.diameter
       
    
    
