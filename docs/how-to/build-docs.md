@@ -44,4 +44,4 @@ $ tox -e docs autobuild -- --watch src
 
 If the module stucture changes from "x.y" to "x.z.y" one could get "module x.z.y not found" error trying to build the docs locally.
 
-The solution is to clean up "/workspaces/dodal/docs/reference/generated" folder.
+The solution is to clear "/workspaces/dodal/docs/reference/generated" folder.
