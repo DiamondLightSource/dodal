@@ -30,7 +30,9 @@
    dodal.beamlines.i07
    dodal.beamlines.i09
    dodal.beamlines.i09_1
+   dodal.beamlines.i09_1_shared
    dodal.beamlines.i09_2
+   dodal.beamlines.i09_2_shared
    dodal.beamlines.i10
    dodal.beamlines.i10_1
    dodal.beamlines.i10_shared
