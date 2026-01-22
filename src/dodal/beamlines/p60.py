@@ -30,7 +30,7 @@ def mg_kalpha_source() -> LabXraySourceReadable:
 
 
 @devices.factory()
-def energy_source(
+def dual_energy_source(
     al_kalpha_source: LabXraySourceReadable,
     mg_kalpha_source: LabXraySourceReadable,
     source_selector: SourceSelector,
@@ -45,7 +45,5 @@ def energy_source(
 # Connect will work again after this work completed
 # https://jira.diamond.ac.uk/browse/P60-13
 @devices.factory()
-def r4000(energy_source: DualEnergySource) -> R4000:
-    return R4000(f"{PREFIX.beamline_prefix}-EA-DET-01:CAM:", energy_source)
-
-
+def r4000(dual_energy_source: DualEnergySource) -> R4000:
+    return R4000(f"{PREFIX.beamline_prefix}-EA-DET-01:CAM:", dual_energy_source)
