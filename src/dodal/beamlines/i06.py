@@ -1,7 +1,5 @@
-from dodal.common.beamlines.beamline_utils import (
-    device_factory,
-)
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
+from dodal.device_manager import DeviceManager
 from dodal.devices.insertion_device import (
     Apple2,
     UndulatorGap,
@@ -15,19 +13,20 @@ BL = get_beamline_name("i06")
 PREFIX = BeamlinePrefix(BL)
 set_log_beamline(BL)
 set_utils_beamline(BL)
+devices = DeviceManager()
 
 
-@device_factory()
+@devices.factory()
 def synchrotron() -> Synchrotron:
     return Synchrotron()
 
 
-@device_factory()
+@devices.factory()
 def idd_gap() -> UndulatorGap:
     return UndulatorGap(prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:")
 
 
-@device_factory()
+@devices.factory()
 def idd_phase() -> UndulatorLockedPhaseAxes:
     return UndulatorLockedPhaseAxes(
         prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:",
@@ -36,18 +35,18 @@ def idd_phase() -> UndulatorLockedPhaseAxes:
     )
 
 
-@device_factory()
-def idd() -> Apple2:
+@devices.factory()
+def idd(idd_gap: UndulatorGap, idd_phase: UndulatorLockedPhaseAxes) -> Apple2:
     """i06 downstream insertion device."""
-    return Apple2(id_gap=idd_gap(), id_phase=idd_phase())
+    return Apple2(id_gap=idd_gap, id_phase=idd_phase)
 
 
-@device_factory()
+@devices.factory()
 def idu_gap() -> UndulatorGap:
     return UndulatorGap(prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-21:")
 
 
-@device_factory()
+@devices.factory()
 def idu_phase() -> UndulatorLockedPhaseAxes:
     return UndulatorLockedPhaseAxes(
         prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-21:",
@@ -56,7 +55,7 @@ def idu_phase() -> UndulatorLockedPhaseAxes:
     )
 
 
-@device_factory()
-def idu() -> Apple2:
+@devices.factory()
+def idu(idu_gap: UndulatorGap, idu_phase: UndulatorLockedPhaseAxes) -> Apple2:
     """i06 upstream insertion device."""
-    return Apple2(id_gap=idd_gap(), id_phase=idd_phase())
+    return Apple2(id_gap=idu_gap, id_phase=idu_phase)
