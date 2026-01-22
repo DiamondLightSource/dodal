@@ -1,11 +1,4 @@
-"""
-note:
-    I10 has two insertion devices one up(idu) and one down stream(idd).
-    It is worth noting that the downstream device is slightly longer,
-    so it can reach Mn edge for linear arbitrary.
-    idd == id1,    idu == id2.
-"""
-
+from dodal.beamlines.i10_shared import devices as i10_shared_devices
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.device_manager import DeviceManager
 from dodal.devices.current_amplifiers import CurrentAmpDet
@@ -36,6 +29,7 @@ set_log_beamline(BL)
 set_utils_beamline(BL)
 PREFIX = BeamlinePrefix(BL)
 devices = DeviceManager()
+devices.include(i10_shared_devices)
 """Mirrors"""
 
 
