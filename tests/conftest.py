@@ -1,4 +1,3 @@
-import asyncio
 import importlib
 import logging
 import os
@@ -11,9 +10,6 @@ from unittest.mock import MagicMock, patch
 import pytest
 from ophyd_async.core import (
     PathProvider,
-    callback_on_mock_put,
-    init_devices,
-    set_mock_value,
 )
 
 from dodal.common.beamlines import beamline_parameters, beamline_utils
@@ -25,7 +21,6 @@ from dodal.common.visit import (
 from dodal.device_manager import DeviceManager
 from dodal.devices.detector import DetectorParams
 from dodal.devices.detector.det_dim_constants import EIGER2_X_16M_SIZE
-from dodal.devices.pressure_jump_cell import PressureJumpCell
 from dodal.log import LOGGER, GELFTCPHandler, set_up_all_logging_handlers
 from dodal.utils import (
     DeviceInitializationController,
@@ -166,28 +161,3 @@ def eiger_params(tmp_path: Path) -> DetectorParams:
         det_dist_to_beam_converter_path=TEST_LUT_TXT,
         detector_size_constants=EIGER2_X_16M_SIZE.det_type_string,  # type: ignore
     )
-
-
-@pytest.fixture
-async def cell() -> PressureJumpCell:
-    async with init_devices(mock=True):
-        pjump = PressureJumpCell("DEMO-PJUMPCELL-01:")
-
-    return pjump
-
-
-@pytest.fixture
-async def cell_with_mocked_busy(cell: PressureJumpCell) -> PressureJumpCell:
-    async def busy(*_, **__):
-        async def busy_idle():
-            await asyncio.sleep(0)
-            set_mock_value(cell.control.busy, True)
-            await asyncio.sleep(0)
-            set_mock_value(cell.control.busy, False)
-
-        asyncio.create_task(busy_idle())
-
-    callback_on_mock_put(cell.control.go, busy)
-    callback_on_mock_put(cell.control.do_jump.set_jump, busy)
-
-    return cell

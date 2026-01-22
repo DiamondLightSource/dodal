@@ -5,13 +5,17 @@ from typing import Generic, TypeVar
 from bluesky.protocols import Movable, Stoppable, Triggerable
 from ophyd_async.core import (
     AsyncStatus,
+    DeviceMock,
     DeviceVector,
     Reference,
     SignalR,
     StandardReadable,
     StandardReadableFormat,
     StrictEnum,
+    callback_on_mock_put,
+    default_mock_class,
     set_and_wait_for_other_value,
+    set_mock_value,
     wait_for_value,
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
@@ -272,6 +276,22 @@ class PressureJumpCellController(StandardReadable, Movable, Stoppable):
         await self._stop.set(True)
 
 
+class BusyMock(DeviceMock["PressureJumpCell"]):
+    async def connect(self, device) -> None:
+        async def busy(*_, **__):
+            async def busy_idle():
+                await asyncio.sleep(0)
+                set_mock_value(device.control.busy, True)
+                await asyncio.sleep(0)
+                set_mock_value(device.control.busy, False)
+
+            asyncio.create_task(busy_idle())
+
+        callback_on_mock_put(device.control.go, busy)
+        callback_on_mock_put(device.control.do_jump.set_jump, busy)
+
+
+@default_mock_class(BusyMock)
 class PressureJumpCell(StandardReadable):
     """
     High pressure X-ray cell, used to apply pressure or pressure jumps to a sample.
