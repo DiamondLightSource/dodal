@@ -40,8 +40,6 @@ def energy_source(pgm: PlaneGratingMonochromator) -> EnergySource:
     return EnergySource(pgm.energy.user_readback)
 
 
-# Connect will work again after this work completed
-# https://jira.diamond.ac.uk/browse/B07-1104
 @devices.factory()
 def analyser(energy_source: EnergySource) -> SpecsDetector[LensMode, PsuMode]:
     return SpecsDetector[LensMode, PsuMode](
