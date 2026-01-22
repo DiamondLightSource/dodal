@@ -12,7 +12,7 @@ from dodal.devices.i04.transfocator import Transfocator
 
 
 @pytest.mark.parametrize(
-    "aperture_radius, transfocator_sizes, expected_beamsize",
+    "aperture_diameter, transfocator_sizes, expected_beamsize",
     [
         (10.0, (50.0, 60.0), (10.0, 10.0)),
         (20.0, (10.0, 30.0), (10.0, 20.0)),
@@ -22,7 +22,7 @@ from dodal.devices.i04.transfocator import Transfocator
     ],
 )
 async def test_beamsize_gives_min_of_aperture_and_transfocator_width_and_height(
-    aperture_radius: float,
+    aperture_diameter: float,
     transfocator_sizes: tuple[float, float],
     expected_beamsize: tuple[float, float],
     fake_transfocator: Transfocator,
@@ -30,10 +30,10 @@ async def test_beamsize_gives_min_of_aperture_and_transfocator_width_and_height(
 ):
     set_mock_value(ap_sg.aperture.medium, 1)
 
-    ap_sg.radius.read = AsyncMock(
+    ap_sg.diameter.read = AsyncMock(
         return_value={
-            "test_ap_sg-radius": {
-                "value": aperture_radius,
+            "test_ap_sg-diameter": {
+                "value": aperture_diameter,
                 "timestamp": 1763051436.7372239,
                 "alarm_severity": 0,
             }
