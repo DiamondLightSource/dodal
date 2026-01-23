@@ -13,7 +13,7 @@ from dodal.devices.i19.access_controlled.shutter import (
     HutchState,
 )
 from dodal.devices.i19.beamstop import BeamStop
-from dodal.devices.i19.oav_pin_tip import OAVPinTipCentre
+from dodal.devices.i19.pin_tip import PinTipCentre
 from dodal.devices.oav.pin_image_recognition import PinTipDetection
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.zebra.zebra import Zebra
@@ -61,15 +61,15 @@ def beamstop() -> BeamStop:
 
 
 @device_factory()
-def oav1() -> OAVPinTipCentre:
-    return OAVPinTipCentre(
+def pin_tip_centre1() -> PinTipCentre:
+    return PinTipCentre(
         prefix=f"{PREFIX.beamline_prefix}-EA-OAV-01:",
     )
 
 
 @device_factory()
-def oav2() -> OAVPinTipCentre:
-    return OAVPinTipCentre(
+def pin_tip_centre1v2() -> PinTipCentre:
+    return PinTipCentre(
         prefix=f"{PREFIX.beamline_prefix}-EA-OAV-02:",
     )
 
