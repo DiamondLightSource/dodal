@@ -13,7 +13,9 @@ from dodal.devices.i19.access_controlled.shutter import (
     HutchState,
 )
 from dodal.devices.i19.beamstop import BeamStop
-from dodal.devices.i19.oav_pin_tip import OAVPinTipCentre
+from dodal.devices.i19.pin_tip import PinTipCentre
+from dodal.devices.oav.oav_detector import OAVBeamCentreFile
+from dodal.devices.oav.oav_parameters import OAVConfigBeamCentre
 from dodal.devices.oav.pin_image_recognition import PinTipDetection
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.zebra.zebra import Zebra
@@ -61,15 +63,31 @@ def beamstop() -> BeamStop:
 
 
 @device_factory()
-def oav1() -> OAVPinTipCentre:
-    return OAVPinTipCentre(
+def oav1() -> OAVBeamCentreFile:
+    return OAVBeamCentreFile(
+        prefix=f"{PREFIX.beamline_prefix}-EA-OAV-01:",
+        config=OAVConfigBeamCentre(ZOOM_PARAMS_FILE, DISPLAY_CONFIG),
+    )
+
+
+@device_factory()
+def oav2() -> OAVBeamCentreFile:
+    return OAVBeamCentreFile(
+        prefix=f"{PREFIX.beamline_prefix}-EA-OAV-02:",
+        config=OAVConfigBeamCentre(ZOOM_PARAMS_FILE, DISPLAY_CONFIG),
+    )
+
+
+@device_factory()
+def pin_tip_centre1() -> PinTipCentre:
+    return PinTipCentre(
         prefix=f"{PREFIX.beamline_prefix}-EA-OAV-01:",
     )
 
 
 @device_factory()
-def oav2() -> OAVPinTipCentre:
-    return OAVPinTipCentre(
+def pin_tip_centre1v2() -> PinTipCentre:
+    return PinTipCentre(
         prefix=f"{PREFIX.beamline_prefix}-EA-OAV-02:",
     )
 

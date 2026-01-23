@@ -2,7 +2,7 @@ from ophyd_async.core import StandardReadable
 from ophyd_async.epics.core import epics_signal_rw
 
 
-class OAVPinTipCentre(StandardReadable):
+class PinTipCentre(StandardReadable):
     """"""
 
     def __init__(
