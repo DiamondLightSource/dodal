@@ -14,7 +14,7 @@ from tests.test_data import (
 
 
 def test_beamline_parameters():
-    params = GDABeamlineParameters.from_file(TEST_BEAMLINE_PARAMETERS_TXT)
+    params = GDABeamlineParameters.from_server(TEST_BEAMLINE_PARAMETERS_TXT)
     assert params["sg_x_MEDIUM_APERTURE"] == 5.285
     assert params["col_parked_downstream_x"] == 0
     assert params["beamLineEnergy__pitchStep"] == 0.002
@@ -23,7 +23,7 @@ def test_beamline_parameters():
 
 
 def test_i03_beamline_parameters():
-    params = GDABeamlineParameters.from_file(I04_BEAMLINE_PARAMETERS)
+    params = GDABeamlineParameters.from_server(I04_BEAMLINE_PARAMETERS)
     assert params["flux_predict_polynomial_coefficients_5"] == [
         -0.0000707134131045123,
         7.0205491504418,

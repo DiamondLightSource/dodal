@@ -15,7 +15,7 @@ from tests.common.beamlines.test_beamline_parameters import TEST_BEAMLINE_PARAME
 
 @pytest.fixture
 def beamline_parameters() -> GDABeamlineParameters:
-    return GDABeamlineParameters.from_file(TEST_BEAMLINE_PARAMETERS_TXT)
+    return GDABeamlineParameters.from_server(TEST_BEAMLINE_PARAMETERS_TXT)
 
 
 @pytest.mark.parametrize(

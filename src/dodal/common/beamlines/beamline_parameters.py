@@ -27,8 +27,8 @@ class GDABeamlineParameters:
         return self.params[item]
 
     @classmethod
-    def from_file(cls, path: str):
-        config_server = ConfigServer(url="https://daq-config.diamond.ac.uk")
+    def from_server(cls, path: str, url="https://daq-config.diamond.ac.uk"):
+        config_server = ConfigServer(url=url)
         return cls(
             params=config_server.get_file_contents(path, dict, reset_cached_result=True)
         )
@@ -37,11 +37,14 @@ class GDABeamlineParameters:
 def get_beamline_parameters(beamline_param_path: str | None = None):
     """Loads the beamline parameters from the specified path, or according to the
     environment variable if none is given"""
+    beamline_name = get_beamline_name("i03")
+    config_server_url = BEAMLINE_CONFIG_SERVER_ENDPOINTS.get(
+        beamline_name, "https://daq-config.diamond.ac.uk"
+    )
     if not beamline_param_path:
-        beamline_name = get_beamline_name("i03")
         beamline_param_path = BEAMLINE_PARAMETER_PATHS.get(beamline_name)
         if beamline_param_path is None:
             raise KeyError(
                 "No beamline parameter path found, maybe 'BEAMLINE' environment variable is not set!"
             )
-    return GDABeamlineParameters.from_file(beamline_param_path)
+    return GDABeamlineParameters.from_server(beamline_param_path, config_server_url)
