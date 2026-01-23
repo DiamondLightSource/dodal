@@ -29,9 +29,9 @@ def energy_source(dcm: DoubleCrystalMonochromatorWithDSpacing) -> EnergySource:
     return EnergySource(dcm.energy_in_eV)
 
 
-# Connect will work again after this work completed
-# https://jira.diamond.ac.uk/browse/I09-651
-@devices.factory(skip=True)
+# CAM:IMAGE will fail to connect outside the beamline network,
+# see https://github.com/DiamondLightSource/dodal/issues/1852
+@devices.factory()
 def analyser(energy_source: EnergySource) -> SpecsDetector[LensMode, PsuMode]:
     return SpecsDetector[LensMode, PsuMode](
         prefix=f"{PREFIX.beamline_prefix}-EA-DET-02:CAM:",
