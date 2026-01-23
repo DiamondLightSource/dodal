@@ -1,5 +1,3 @@
-from daq_config_server.client import ConfigServer
-
 from dodal.beamlines.i09_1_shared import devices as i09_1_shared_devices
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.device_manager import DeviceManager
@@ -7,12 +5,6 @@ from dodal.devices.common_dcm import DoubleCrystalMonochromatorWithDSpacing
 from dodal.devices.electron_analyser.base import EnergySource
 from dodal.devices.electron_analyser.specs import SpecsDetector
 from dodal.devices.i09_1 import LensMode, PsuMode
-from dodal.devices.i09_1_shared.hard_energy import HardEnergy, HardInsertionDeviceEnergy
-from dodal.devices.i09_1_shared.hard_undulator_functions import (
-    I09HardLutProvider,
-    calculate_energy_i09_hu,
-    calculate_gap_i09_hu,
-)
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.temperture_controller import Lakeshore336
 from dodal.log import set_beamline as set_log_beamline
@@ -25,9 +17,6 @@ set_utils_beamline(BL)
 
 devices = DeviceManager()
 devices.include(i09_1_shared_devices)
-
-I09_1_CONF_CLIENT = ConfigServer()
-LOOK_UPTABLE_FILE = "/dls_sw/i09-1/software/gda/workspace_git/gda-diamond.git/configurations/i09-1-shared/lookupTables/IIDCalibrationTable.txt"
 
 
 @devices.factory()
@@ -48,36 +37,7 @@ def analyser(energy_source: EnergySource) -> SpecsDetector[LensMode, PsuMode]:
         prefix=f"{PREFIX.beamline_prefix}-EA-DET-02:CAM:",
         lens_mode_type=LensMode,
         psu_mode_type=PsuMode,
-        energy_source=energy_source(),
-    )
-
-
-@device_factory()
-def id() -> UndulatorInMm:
-    return UndulatorInMm(prefix=f"{BeamlinePrefix(BL).insertion_prefix}-MO-SERVC-01:")
-
-
-@device_factory()
-def harmonics() -> UndulatorOrder:
-    return UndulatorOrder()
-
-
-@device_factory()
-def hu_id_energy() -> HardInsertionDeviceEnergy:
-    return HardInsertionDeviceEnergy(
-        undulator_order=harmonics(),
-        undulator=id(),
-        lut_provider=I09HardLutProvider(I09_1_CONF_CLIENT, LOOK_UPTABLE_FILE),
-        gap_to_energy_func=calculate_energy_i09_hu,
-        energy_to_gap_func=calculate_gap_i09_hu,
-    )
-
-
-@device_factory()
-def hu_energy() -> HardEnergy:
-    return HardEnergy(
-        dcm=dcm(),
-        undulator_energy=hu_id_energy(),
+        energy_source=energy_source,
     )
 
 
