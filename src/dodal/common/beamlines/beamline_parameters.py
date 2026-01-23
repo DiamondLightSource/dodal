@@ -1,50 +1,25 @@
 from typing import Any
 
-from daq_config_server.client import ConfigServer
+from dodal.common.beamlines.config_client import get_config_client
 
-from dodal.utils import get_beamline_name
-
-BEAMLINE_CONFIG_SERVER_ENDPOINTS = {
-    "i03": "https://daq-config.diamond.ac.uk",
-    "i04": "https://daq-config.diamond.ac.uk",
-}
 BEAMLINE_PARAMETER_PATHS = {
     "i03": "/dls_sw/i03/software/daq_configuration/domain/beamlineParameters",
     "i04": "/dls_sw/i04/software/daq_configuration/domain/beamlineParameters",
 }
 
 
-class GDABeamlineParameters:
-    params: dict[str, Any]
-
-    def __init__(self, params: dict[str, Any]):
-        self.params = params
-
-    def __repr__(self) -> str:
-        return repr(self.params)
-
-    def __getitem__(self, item: str):
-        return self.params[item]
-
-    @classmethod
-    def from_server(cls, path: str, url="https://daq-config.diamond.ac.uk"):
-        config_server = ConfigServer(url=url)
-        return cls(
-            params=config_server.get_file_contents(path, dict, reset_cached_result=True)
-        )
-
-
-def get_beamline_parameters(beamline_param_path: str | None = None):
+def get_beamline_parameters(
+    beamline: str, beamline_param_path: str | None = None
+) -> dict[str, Any]:
     """Loads the beamline parameters from the specified path, or according to the
     environment variable if none is given"""
-    beamline_name = get_beamline_name("i03")
-    config_server_url = BEAMLINE_CONFIG_SERVER_ENDPOINTS.get(
-        beamline_name, "https://daq-config.diamond.ac.uk"
-    )
     if not beamline_param_path:
-        beamline_param_path = BEAMLINE_PARAMETER_PATHS.get(beamline_name)
+        beamline_param_path = BEAMLINE_PARAMETER_PATHS.get(beamline)
         if beamline_param_path is None:
             raise KeyError(
                 "No beamline parameter path found, maybe 'BEAMLINE' environment variable is not set!"
             )
-    return GDABeamlineParameters.from_server(beamline_param_path, config_server_url)
+    config_client = get_config_client(beamline)
+    return config_client.get_file_contents(
+        beamline_param_path, dict, reset_cached_result=True
+    )

@@ -7,6 +7,7 @@ from dodal.common.beamlines.beamline_parameters import get_beamline_parameters
 from dodal.devices.i03.dcm import DCM
 from dodal.devices.undulator import UndulatorInKeV
 from dodal.log import LOGGER
+from dodal.utils import get_beamline_name
 
 ENERGY_TIMEOUT_S: float = 30.0
 
@@ -49,7 +50,8 @@ class UndulatorDCM(StandardReadable, Movable[float]):
         # I03 configures the DCM Perp as a side effect of applying this fixed value to the DCM Offset after an energy change
         # Nb this parameter is misleadingly named to confuse you
         self.dcm_fixed_offset_mm = get_beamline_parameters(
-            daq_configuration_path + "/domain/beamlineParameters"
+            get_beamline_name("i03"),
+            daq_configuration_path + "/domain/beamlineParameters",
         )["DCM_Perp_Offset_FIXED"]
 
         super().__init__(name)
