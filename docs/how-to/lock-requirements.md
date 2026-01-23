@@ -2,38 +2,42 @@
 
 ## Introduction
 
-By design this project only defines dependencies in one place, i.e. in the `requires` table in `pyproject.toml`.
+Since the move to `uv`, this project natively supports a lockfile. This is a set of "known good" dependencies that the tests are run against, and will be used to create a container if one is built.
 
-In the `requires` table it is possible to pin versions of some dependencies as needed. For library projects it is best to leave  pinning to a minimum so that your library can be used by the widest range of applications.
+## Specifying dependencies
 
-When CI builds the project it will use the latest compatible set of dependencies available (after applying your pins and any dependencies' pins).
+The source of dependencies is the project's `pyproject.toml`. They can come from:
+- Project dependencies (from `[project]` `dependencies =`)
+- Dev dependencies (from `[dependency-groups]` `dev =`)
+- Transitive dependencies (child dependencies of the above)
 
-This approach means that there is a possibility that a future build may break because an updated release of a dependency has made a breaking change.
+Dependencies are loosely specified in `pyproject.toml`, like `sphinx-autobuild` or `pydata-sphinx-theme>=0.12`. They should state a minimum version if you are using features that are added in a specific version. There should be no upper bound by default, only insert one if an upstream release of a dependency breaks your code, and you don't have time to fix it immediately.
 
-The correct way to fix such an issue is to work out the minimum pinning in `requires` that will resolve the problem. However this can be quite hard to do and may be time consuming when simply trying to release a minor update.
+## Updating the lockfile
 
-For this reason we provide a mechanism for locking all dependencies to the same version as a previous successful release. This is a quick fix that should guarantee a successful CI build.
+When you have updated `pyproject.toml` then run:
+```
+$ uv sync
+```
 
-## Finding the lock files
+This will ensure that any new dependencies you add will be placed in the lockfile, and your venv updated to match. It will *not* update any existing dependencies, unless `pyproject.toml` requires a later version.
 
-Every release of the project will have a set of requirements files published as release assets.
+This command will be run by [pre-commit](./lint) during a `git commit` and by CI.
 
-For example take a look at the release page for python-copier-template [here](https://github.com/DiamondLightSource/python-copier-template/releases/tag/1.1.0)
+To update all dependencies to their latest versions run:
+```
+uv sync --upgrade
+```
+This command will be run by [renovate](./renovate) once a week in CI.
 
-There is a single `dev-requirements.txt` file showing as an asset on the release. This has been created using `pip freeze --exclude-editable` on a successful test run using the same version of python as the devcontainer, and will contain a full list of the dependencies and sub-dependencies with pinned versions. You can download this file by clicking on it.
+```{seealso}
+[The uv docs on locking and syncing](https://docs.astral.sh/uv/concepts/projects/sync)
+```
 
-## Applying the lock file
+## Modifying the venv to add other projects
 
-To apply a lockfile:
+Peer projects (those checked out next to the project) are visible in the devcontainer, and can be added into the venv by running `uv pip install -e ../other_project`. This will allow live changes made in this other project to be immediately reflected in the venv.
 
-- copy the requirements file you have downloaded to the root of your repository
-- commit it into the repo
-- push the changes
-
-The CI looks for a `dev-requirements.txt` in the root and will pass it to pip as a constraint when installing the dev environment. If a package is required to be installed by `pyproject.toml` then `pip` will use the version specified in `dev-requirements.txt`.
-
-## Removing dependency locking from CI
-
-Once the reasons for locking the build have been resolved it is a good idea to go back to an unlocked build. This is because you get an early indication of any incoming problems.
-
-To restore unlocked builds in CI simply remove `dev-requirements.txt` from the root of the repo and push.
+```{note}
+This venv is activated by default, and global to the container, so if you `uv sync` from `other_project` then it will **replace** the contents of the venv with `other_project`'s dependencies.
+```

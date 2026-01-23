@@ -28,7 +28,7 @@ If you find that your tests are being skipped or not recognised by `pytest`, che
 When you have some fully working tests then you can run it with coverage:
 
 ```
-$ tox -e tests
+$ uv run tox -e tests
 ```
 
 It will also report coverage to the command line and to `cov.xml`.
@@ -54,8 +54,11 @@ cd example-services
 podman compose up -d bl01t-di-cam-01 bl01t-mo-sim-01 ca-gateway
 ```
 
+**Note:** Do not run the system tests from the same shell as the above `environment.sh` script interferes with the 
+ability to run the tests due to also setting EPICS_ environment variables.
+
 Once this is done, then the system tests can be run:
 
 ```commandline
-tox -e system-report
+uv run tox -e system-tests
 ```

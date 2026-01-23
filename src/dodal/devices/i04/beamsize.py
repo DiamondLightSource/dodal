@@ -6,6 +6,11 @@ from dodal.devices.i04.transfocator import Transfocator
 
 
 class Beamsize(BeamsizeBase):
+    """
+    Device that calculates the size of the beam by taking the minimum of the
+    transfocator size and the aperture scatterguard diameter.
+    """
+
     def __init__(
         self,
         transfocator: Transfocator,
@@ -20,26 +25,26 @@ class Beamsize(BeamsizeBase):
             self.x_um = derived_signal_r(
                 self._get_beamsize_x,
                 transfocator_size_x=self._transfocator_ref().current_horizontal_size_rbv,
-                aperture_radius=self._aperture_scatterguard_ref().radius,
+                aperture_diameter=self._aperture_scatterguard_ref().diameter,
                 derived_units="µm",
             )
             self.y_um = derived_signal_r(
                 self._get_beamsize_y,
                 transfocator_size_y=self._transfocator_ref().current_vertical_size_rbv,
-                aperture_radius=self._aperture_scatterguard_ref().radius,
+                aperture_diameter=self._aperture_scatterguard_ref().diameter,
                 derived_units="µm",
             )
 
     def _get_beamsize_x(
         self,
         transfocator_size_x: float,
-        aperture_radius: float,
+        aperture_diameter: float,
     ) -> float:
-        return min(transfocator_size_x, aperture_radius)
+        return min(transfocator_size_x, aperture_diameter)
 
     def _get_beamsize_y(
         self,
         transfocator_size_y: float,
-        aperture_radius: float,
+        aperture_diameter: float,
     ) -> float:
-        return min(transfocator_size_y, aperture_radius)
+        return min(transfocator_size_y, aperture_diameter)
