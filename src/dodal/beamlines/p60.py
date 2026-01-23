@@ -6,6 +6,11 @@ from dodal.devices.selectable_source import SourceSelector
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
+"""
+NOTE: Due to p60 not having a CA gateway, PVs are not available remotely and you need to
+be on the beamline network to access them so a remote `dodal connect p60` will fail.
+"""
+
 BL = get_beamline_name("p60")
 PREFIX = BeamlinePrefix(BL)
 set_log_beamline(BL)

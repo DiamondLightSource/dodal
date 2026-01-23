@@ -1,38 +1,36 @@
-from dodal.common.beamlines.beamline_utils import device_factory
+from dodal.beamlines.b07_shared import devices as b07_shared_devices
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
+from dodal.device_manager import DeviceManager
 from dodal.devices.b07 import Grating, Specs2DCMOS
 from dodal.devices.electron_analyser.base import EnergySource
 from dodal.devices.pgm import PlaneGratingMonochromator
-from dodal.devices.synchrotron import Synchrotron
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
 BL = get_beamline_name("b07")
-PREFIX = BeamlinePrefix(BL, suffix="B")
+B_PREFIX = BeamlinePrefix(BL, suffix="B")
 set_log_beamline(BL)
 set_utils_beamline(BL)
 
-
-@device_factory()
-def synchrotron() -> Synchrotron:
-    return Synchrotron()
+devices = DeviceManager()
+devices.include(b07_shared_devices)
 
 
-@device_factory()
+@devices.factory()
 def pgm() -> PlaneGratingMonochromator:
     return PlaneGratingMonochromator(
-        prefix=f"{PREFIX.beamline_prefix}-OP-PGM-01:",
+        prefix=f"{B_PREFIX.beamline_prefix}-OP-PGM-01:",
         grating=Grating,
     )
 
 
-@device_factory()
-def energy_source() -> EnergySource:
-    return EnergySource(pgm().energy.user_readback)
+@devices.factory()
+def energy_source(pgm: PlaneGratingMonochromator) -> EnergySource:
+    return EnergySource(pgm.energy.user_readback)
 
 
-# Connect will work again after this work completed
-# https://jira.diamond.ac.uk/browse/B07-1104
-@device_factory()
-def analyser() -> Specs2DCMOS:
-    return Specs2DCMOS(f"{PREFIX.beamline_prefix}-EA-DET-01:CAM:", energy_source())
+# CAM:IMAGE will fail to connect outside the beamline network,
+# see https://github.com/DiamondLightSource/dodal/issues/1852
+@devices.factory()
+def analyser(energy_source: EnergySource) -> Specs2DCMOS:
+    return Specs2DCMOS(f"{B_PREFIX.beamline_prefix}-EA-DET-01:CAM:", energy_source)
