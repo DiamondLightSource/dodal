@@ -2,14 +2,21 @@ import asyncio
 from enum import IntEnum
 from typing import Generic, TypeVar
 
-from bluesky.protocols import Movable
+from bluesky.protocols import Movable, Stoppable, Triggerable
 from ophyd_async.core import (
     AsyncStatus,
+    DeviceMock,
     DeviceVector,
+    Reference,
     SignalR,
     StandardReadable,
     StandardReadableFormat,
     StrictEnum,
+    callback_on_mock_put,
+    default_mock_class,
+    set_and_wait_for_other_value,
+    set_mock_value,
+    wait_for_value,
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
@@ -20,11 +27,6 @@ class PumpState(StrictEnum):
     MANUAL = "Manual"
     AUTO_PRESSURE = "Auto Pressure"
     AUTO_POSITION = "Auto Position"
-
-
-class StopState(StrictEnum):
-    CONTINUE = "CONTINUE"
-    STOP = "STOP"
 
 
 class ValveControlRequest(StrictEnum):
@@ -201,29 +203,95 @@ class PressureTransducer(StandardReadable):
         super().__init__(name)
 
 
-class PressureJumpCellController(StandardReadable):
+class DoJump(StandardReadable, Triggerable):
+    def __init__(
+        self,
+        prefix: str,
+        busy_signal: Reference,
+        timeout_signal: Reference,
+        name: str = "",
+    ):
+        self._busy_signal = busy_signal
+        self._timeout_signal = timeout_signal
+
+        with self.add_children_as_readables():
+            self.set_jump = epics_signal_rw(bool, f"{prefix}SETJUMP")
+
+        self._name = name
+        super().__init__(name)
+
+    @AsyncStatus.wrap
+    async def trigger(self):
+        await set_and_wait_for_other_value(
+            self.set_jump, True, self._busy_signal(), True
+        )
+
+        timeout_value = await self._timeout_signal().get_value()
+        await wait_for_value(self._busy_signal(), False, timeout_value)
+
+
+class PressureJumpCellController(StandardReadable, Movable, Stoppable):
     """
     Top-level control for a fixed pressure or pressure jumps.
     """
 
     def __init__(self, prefix: str, name: str = "") -> None:
         with self.add_children_as_readables():
-            self.stop = epics_signal_rw(StopState, f"{prefix}STOP")
-
-            self.target_pressure = epics_signal_rw(float, f"{prefix}TARGET")
+            # Common
+            self.busy = epics_signal_r(bool, f"{prefix}GOTOBUSY")
+            self.result = epics_signal_r(str, f"{prefix}RESULT")
             self.timeout = epics_signal_rw(float, f"{prefix}TIMER.HIGH")
+
+            # Constant pressure
+            self.target_pressure = epics_signal_rw(int, f"{prefix}TARGET")
             self.go = epics_signal_rw(bool, f"{prefix}GO")
 
-            self.from_pressure = epics_signal_rw(float, f"{prefix}JUMPF")
-            self.to_pressure = epics_signal_rw(float, f"{prefix}JUMPT")
-            self.jump_ready = epics_signal_rw(bool, f"{prefix}SETJUMP")
+            # Pressure jump
+            self.from_pressure = epics_signal_rw(int, f"{prefix}JUMPF")
+            self.to_pressure = epics_signal_rw(int, f"{prefix}JUMPT")
+            self.do_jump = DoJump(
+                prefix, Reference(self.busy), Reference(self.timeout), name
+            )
 
-            self.result = epics_signal_r(str, f"{prefix}RESULT")
-
+            # Internal
+            self._stop = epics_signal_rw(bool, f"{prefix}STOP")
             self._name = name
+
         super().__init__(name)
 
+    @AsyncStatus.wrap
+    async def set(self, value: int):
+        """
+        Sets the desired pressure waiting for the device to complete the operation.
+        """
+        timeout = await self.timeout.get_value()
 
+        await self.target_pressure.set(value)
+        await set_and_wait_for_other_value(self.go, True, self.busy, True)
+
+        await wait_for_value(self.busy, False, timeout)  # Change complete
+
+    @AsyncStatus.wrap
+    async def stop(self, success=True):
+        await self._stop.set(True)
+
+
+class BusyMock(DeviceMock["PressureJumpCell"]):
+    async def connect(self, device) -> None:
+        async def busy(*_, **__):
+            async def busy_idle():
+                await asyncio.sleep(0)
+                set_mock_value(device.control.busy, True)
+                await asyncio.sleep(0)
+                set_mock_value(device.control.busy, False)
+
+            asyncio.create_task(busy_idle())
+
+        callback_on_mock_put(device.control.go, busy)
+        callback_on_mock_put(device.control.do_jump.set_jump, busy)
+
+
+@default_mock_class(BusyMock)
 class PressureJumpCell(StandardReadable):
     """
     High pressure X-ray cell, used to apply pressure or pressure jumps to a sample.
@@ -241,9 +309,7 @@ class PressureJumpCell(StandardReadable):
         self.all_valves_control = AllValvesControl(f"{prefix}{cell_prefix}", name)
         self.pump = Pump(f"{prefix}{cell_prefix}", name)
 
-        self.controller = PressureJumpCellController(
-            f"{prefix}{cell_prefix}CTRL:", name
-        )
+        self.control = PressureJumpCellController(f"{prefix}{cell_prefix}CTRL:", name)
 
         with self.add_children_as_readables():
             self.pressure_transducers: DeviceVector[PressureTransducer] = DeviceVector(

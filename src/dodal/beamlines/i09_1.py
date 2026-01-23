@@ -1,14 +1,9 @@
 from daq_config_server.client import ConfigServer
 
-from dodal.common.beamlines.beamline_utils import (
-    device_factory,
-)
+from dodal.beamlines.i09_1_shared import devices as i09_1_shared_devices
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.devices.common_dcm import (
-    DoubleCrystalMonochromatorWithDSpacing,
-    PitchAndRollCrystal,
-    StationaryCrystal,
-)
+from dodal.device_manager import DeviceManager
+from dodal.devices.common_dcm import DoubleCrystalMonochromatorWithDSpacing
 from dodal.devices.electron_analyser.base import EnergySource
 from dodal.devices.electron_analyser.specs import SpecsDetector
 from dodal.devices.i09_1 import LensMode, PsuMode
@@ -19,10 +14,7 @@ from dodal.devices.i09_1_shared.hard_undulator_functions import (
     calculate_gap_i09_hu,
 )
 from dodal.devices.synchrotron import Synchrotron
-from dodal.devices.temperture_controller import (
-    Lakeshore336,
-)
-from dodal.devices.undulator import UndulatorInMm, UndulatorOrder
+from dodal.devices.temperture_controller import Lakeshore336
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
@@ -31,32 +23,27 @@ PREFIX = BeamlinePrefix(BL, suffix="I")
 set_log_beamline(BL)
 set_utils_beamline(BL)
 
+devices = DeviceManager()
+devices.include(i09_1_shared_devices)
 
 I09_1_CONF_CLIENT = ConfigServer()
 LOOK_UPTABLE_FILE = "/dls_sw/i09-1/software/gda/workspace_git/gda-diamond.git/configurations/i09-1-shared/lookupTables/IIDCalibrationTable.txt"
 
 
-@device_factory()
+@devices.factory()
 def synchrotron() -> Synchrotron:
     return Synchrotron()
 
 
-@device_factory()
-def dcm() -> DoubleCrystalMonochromatorWithDSpacing:
-    return DoubleCrystalMonochromatorWithDSpacing(
-        f"{PREFIX.beamline_prefix}-MO-DCM-01:", PitchAndRollCrystal, StationaryCrystal
-    )
-
-
-@device_factory()
-def energy_source() -> EnergySource:
-    return EnergySource(dcm().energy_in_eV)
+@devices.factory()
+def energy_source(dcm: DoubleCrystalMonochromatorWithDSpacing) -> EnergySource:
+    return EnergySource(dcm.energy_in_eV)
 
 
 # Connect will work again after this work completed
 # https://jira.diamond.ac.uk/browse/I09-651
-@device_factory(skip=True)
-def analyser() -> SpecsDetector[LensMode, PsuMode]:
+@devices.factory(skip=True)
+def analyser(energy_source: EnergySource) -> SpecsDetector[LensMode, PsuMode]:
     return SpecsDetector[LensMode, PsuMode](
         prefix=f"{PREFIX.beamline_prefix}-EA-DET-02:CAM:",
         lens_mode_type=LensMode,
@@ -94,6 +81,6 @@ def hu_energy() -> HardEnergy:
     )
 
 
-@device_factory()
+@devices.factory()
 def lakeshore() -> Lakeshore336:
     return Lakeshore336(prefix=f"{PREFIX.beamline_prefix}-EA-TCTRL-01:")
