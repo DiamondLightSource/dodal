@@ -13,8 +13,8 @@ from dodal.devices.i19.access_controlled.shutter import (
     HutchState,
 )
 from dodal.devices.i19.beamstop import BeamStop
-from dodal.devices.oav.oav_detector import OAVBeamCentreFile
-from dodal.devices.oav.oav_parameters import OAVConfigBeamCentre
+from dodal.devices.oav.oav_detector import OAVBeamCentrePV
+from dodal.devices.oav.oav_parameters import OAVConfig
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.zebra.zebra import Zebra
 from dodal.devices.zebra.zebra_constants_mapping import (
@@ -39,10 +39,8 @@ I19_1_ZEBRA_MAPPING = ZebraMapping(
     sources=ZebraSources(),
 )
 
-ZOOM_PARAMS_FILE = (
-    "/dls_sw/i19-1/software/gda_versions/gda/config/xml/jCameraManZoomLevels.xml"
-)
-DISPLAY_CONFIG = "/dls_sw/i19-1/software/daq_configuration/domain/display.configuration"
+ZOOM_PARAMS_FILE = "/dls_sw/i19-1/software/bluesky/jCameraManZoomLevels.xml"
+DISPLAY_CONFIG = "/dls_sw/i19-1/software/bluesky/display.configuration"
 
 
 @device_factory()
@@ -63,10 +61,18 @@ def beamstop() -> BeamStop:
 
 
 @device_factory()
-def oav() -> OAVBeamCentreFile:
-    return OAVBeamCentreFile(
+def oav1(params: OAVConfig | None = None) -> OAVBeamCentrePV:
+    return OAVBeamCentrePV(
         prefix=f"{PREFIX.beamline_prefix}-EA-OAV-01:",
-        config=OAVConfigBeamCentre(ZOOM_PARAMS_FILE, DISPLAY_CONFIG),
+        config=params or OAVConfig(ZOOM_PARAMS_FILE),
+    )
+
+
+@device_factory()
+def oav2(params: OAVConfig | None = None) -> OAVBeamCentrePV:
+    return OAVBeamCentrePV(
+        prefix=f"{PREFIX.beamline_prefix}-EA-OAV-02:",
+        config=params or OAVConfig(ZOOM_PARAMS_FILE),
     )
 
 
