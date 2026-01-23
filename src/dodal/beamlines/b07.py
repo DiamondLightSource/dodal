@@ -30,8 +30,8 @@ def energy_source(pgm: PlaneGratingMonochromator) -> EnergySource:
     return EnergySource(pgm.energy.user_readback)
 
 
-# Connect will work again after this work completed
-# https://jira.diamond.ac.uk/browse/B07-1104
+# CAM:IMAGE will fail to connect outside the beamline network,
+# see https://github.com/DiamondLightSource/dodal/issues/1852
 @devices.factory()
 def analyser(energy_source: EnergySource) -> SpecsDetector[LensMode, PsuMode]:
     return SpecsDetector[LensMode, PsuMode](
