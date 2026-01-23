@@ -15,6 +15,7 @@ from dodal.devices.i19.access_controlled.shutter import (
 from dodal.devices.i19.beamstop import BeamStop
 from dodal.devices.oav.oav_detector import OAVBeamCentrePV
 from dodal.devices.oav.oav_parameters import OAVConfig
+from dodal.devices.oav.pin_image_recognition import PinTipDetection
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.zebra.zebra import Zebra
 from dodal.devices.zebra.zebra_constants_mapping import (
@@ -74,6 +75,16 @@ def oav2(params: OAVConfig | None = None) -> OAVBeamCentrePV:
         prefix=f"{PREFIX.beamline_prefix}-EA-OAV-02:",
         config=params or OAVConfig(ZOOM_PARAMS_FILE),
     )
+
+
+@device_factory()
+def pin_tip_detection1() -> PinTipDetection:
+    return PinTipDetection(f"{PREFIX.beamline_prefix}-EA-OAV-01:")
+
+
+@device_factory()
+def pin_tip_detection2() -> PinTipDetection:
+    return PinTipDetection(f"{PREFIX.beamline_prefix}-EA-OAV-02:")
 
 
 @device_factory()
