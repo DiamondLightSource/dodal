@@ -1,3 +1,5 @@
+from daq_config_server.client import ConfigServer
+
 from dodal.device_manager import DeviceManager
 from dodal.devices.common_dcm import (
     DoubleCrystalMonochromatorWithDSpacing,
@@ -6,6 +8,7 @@ from dodal.devices.common_dcm import (
 )
 from dodal.devices.i09_1_shared.hard_energy import HardEnergy, HardInsertionDeviceEnergy
 from dodal.devices.i09_1_shared.hard_undulator_functions import (
+    I09HardLutProvider,
     calculate_energy_i09_hu,
     calculate_gap_i09_hu,
 )
@@ -16,6 +19,9 @@ BL = get_beamline_name("i09-1-shared")
 I_PREFIX = BeamlinePrefix(BL, suffix="I")
 
 devices = DeviceManager()
+
+I09_1_CONF_CLIENT = ConfigServer()
+LOOK_UPTABLE_FILE = "/dls_sw/i09-1/software/gda/workspace_git/gda-diamond.git/configurations/i09-1-shared/lookupTables/IIDCalibrationTable.txt"
 
 
 @devices.factory()
@@ -44,7 +50,7 @@ def hu_id_energy(
     return HardInsertionDeviceEnergy(
         undulator_order=harmonics,
         undulator=undulator,
-        lut={},  # ToDo https://github.com/DiamondLightSource/sm-bluesky/issues/239
+        lut_provider=I09HardLutProvider(I09_1_CONF_CLIENT, LOOK_UPTABLE_FILE),
         gap_to_energy_func=calculate_energy_i09_hu,
         energy_to_gap_func=calculate_gap_i09_hu,
     )
