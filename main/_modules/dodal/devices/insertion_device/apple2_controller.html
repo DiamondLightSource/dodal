@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.insertion_device.apple2_controller &#8212; dodal 1.69.1.dev16+g58ccd0b73 documentation</title>
+    <title>dodal.devices.insertion_device.apple2_controller &#8212; dodal 1.69.1.dev17+gaf74ac043 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=bc941146"></script>
+    <script src="../../../../_static/documentation_options.js?v=a7f73954"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -1082,16 +1082,16 @@ window.addEventListener("load", load);
         <span class="k">if</span> <span class="p">(</span>
             <span class="n">isclose</span><span class="p">(</span>
                 <span class="n">top_outer</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">maximum_phase_motor_position</span><span class="p">,</span>
+                <span class="n">btm_inner</span><span class="p">,</span>
                 <span class="n">abs_tol</span><span class="o">=</span><span class="n">ROW_PHASE_MOTOR_TOLERANCE</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="ow">and</span> <span class="n">isclose</span><span class="p">(</span><span class="n">top_inner</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">abs_tol</span><span class="o">=</span><span class="n">ROW_PHASE_MOTOR_TOLERANCE</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="n">isclose</span><span class="p">(</span><span class="n">btm_outer</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">abs_tol</span><span class="o">=</span><span class="n">ROW_PHASE_MOTOR_TOLERANCE</span><span class="p">)</span>
             <span class="ow">and</span> <span class="n">isclose</span><span class="p">(</span>
-                <span class="n">btm_inner</span><span class="p">,</span>
+                <span class="nb">abs</span><span class="p">(</span><span class="n">btm_inner</span><span class="p">),</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">maximum_phase_motor_position</span><span class="p">,</span>
                 <span class="n">abs_tol</span><span class="o">=</span><span class="n">ROW_PHASE_MOTOR_TOLERANCE</span><span class="p">,</span>
             <span class="p">)</span>
-            <span class="ow">and</span> <span class="n">isclose</span><span class="p">(</span><span class="n">btm_outer</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">abs_tol</span><span class="o">=</span><span class="n">ROW_PHASE_MOTOR_TOLERANCE</span><span class="p">)</span>
         <span class="p">):</span>
             <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Determined polarisation: LV (Linear Vertical).&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">Pol</span><span class="o">.</span><span class="n">LV</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">maximum_phase_motor_position</span>
