@@ -48,28 +48,6 @@ async def unstoppable_motor():
     return unstoppable_motor
 
 
-@pytest.fixture
-async def mock_locked_phase_axes(
-    prefix: str = "BLXX-EA-DET-007:",
-) -> UndulatorLockedPhaseAxes:
-    async with init_devices(mock=True):
-        mock_phase_axes = UndulatorLockedPhaseAxes(
-            prefix=prefix,
-            top_outer="RPQ1",
-            btm_inner="RPQ4",
-        )
-    assert mock_phase_axes.name == "mock_phase_axes"
-    set_mock_value(mock_phase_axes.gate, UndulatorGateStatus.CLOSE)
-    set_mock_value(mock_phase_axes.top_outer.velocity, 2)
-    set_mock_value(mock_phase_axes.btm_inner.velocity, 2)
-    set_mock_value(mock_phase_axes.top_outer.user_readback, 2)
-    set_mock_value(mock_phase_axes.btm_inner.user_readback, 2)
-    set_mock_value(mock_phase_axes.top_outer.user_setpoint_readback, 2)
-    set_mock_value(mock_phase_axes.btm_inner.user_setpoint_readback, 2)
-    set_mock_value(mock_phase_axes.status, EnabledDisabledUpper.ENABLED)
-    return mock_phase_axes
-
-
 async def test_unstoppable_motor_stop_not_implemented(
     unstoppable_motor: UnstoppableMotor, caplog: pytest.LogCaptureFixture
 ):
@@ -399,18 +377,6 @@ async def test_jaw_phase_success_scan(
     assert_emitted(run_engine_documents, start=1, descriptor=1, event=11, stop=1)
     for i in output:
         assert run_engine_documents["event"][i]["data"]["mock_jaw_phase-jaw_phase"] == i
-
-
-@pytest.fixture
-async def mock_locked_apple2(
-    mock_id_gap: UndulatorGap,
-    mock_locked_phase_axes: UndulatorLockedPhaseAxes,
-) -> Apple2:
-    mock_locked_apple2 = Apple2(
-        id_gap=mock_id_gap,
-        id_phase=mock_locked_phase_axes,
-    )
-    return mock_locked_apple2
 
 
 class DummyLockedApple2Controller(Apple2Controller[Apple2[UndulatorLockedPhaseAxes]]):
