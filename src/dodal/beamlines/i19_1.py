@@ -14,6 +14,8 @@ from dodal.devices.i19.access_controlled.shutter import (
 )
 from dodal.devices.i19.beamstop import BeamStop
 from dodal.devices.i19.pin_tip import PinTipCentre
+from dodal.devices.oav.oav_detector import OAVBeamCentreFile
+from dodal.devices.oav.oav_parameters import OAVConfigBeamCentre
 from dodal.devices.oav.pin_image_recognition import PinTipDetection
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.zebra.zebra import Zebra
@@ -58,6 +60,22 @@ def beamstop() -> BeamStop:
     If this is called when already instantiated in i19-1, it will return the existing object.
     """
     return BeamStop(prefix=f"{PREFIX.beamline_prefix}-RS-ABSB-01:")
+
+
+@device_factory()
+def oav1() -> OAVBeamCentreFile:
+    return OAVBeamCentreFile(
+        prefix=f"{PREFIX.beamline_prefix}-EA-OAV-01:",
+        config=OAVConfigBeamCentre(ZOOM_PARAMS_FILE, DISPLAY_CONFIG),
+    )
+
+
+@device_factory()
+def oav2() -> OAVBeamCentreFile:
+    return OAVBeamCentreFile(
+        prefix=f"{PREFIX.beamline_prefix}-EA-OAV-02:",
+        config=OAVConfigBeamCentre(ZOOM_PARAMS_FILE, DISPLAY_CONFIG),
+    )
 
 
 @device_factory()
