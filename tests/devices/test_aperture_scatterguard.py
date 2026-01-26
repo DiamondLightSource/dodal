@@ -592,7 +592,7 @@ async def test_calling_prepare_then_set_in_quick_succession_throws_an_error(
         ApertureValue.PARKED,
     ],
 )
-async def test_restore_ap_sg_from_scin_move_position(
+async def test_get_scin_move_position_returns_expected(
     aperture_in_medium_pos: ApertureScatterguard,
     ap_sg_configuration: ApertureScatterguardConfiguration,
     selected_aperture: ApertureValue,
@@ -602,5 +602,10 @@ async def test_restore_ap_sg_from_scin_move_position(
     await set_underlying_motors(ap_sg, ap_sg_configuration, selected_aperture)
 
     positions = ap_sg.get_scin_move_position()
-    assert positions[ap_sg.aperture.x] == ap_sg_configuration.scintillator_move_miniap_x
-    assert positions[ap_sg.scatterguard.x] == ap_sg_configuration.scintillator_move_sg_x
+    assert (
+        positions[ap_sg.aperture.x] == ap_sg_configuration.scintillator_move_aperture_x
+    )
+    assert (
+        positions[ap_sg.scatterguard.x]
+        == ap_sg_configuration.scintillator_move_scatterguard_x
+    )

@@ -1,3 +1,4 @@
+from functools import partial
 from math import isclose
 
 from ophyd_async.core import Reference, StandardReadable, StrictEnum, derived_signal_rw
@@ -98,21 +99,27 @@ class Scintillator(StandardReadable):
 
         await self._check_beamstop_position()
 
-        async def move_to_new_position():
-            if position == InOut.OUT:
-                await self.y_mm.set(self._scintillator_out_yz_mm[0])
-                await self.z_mm.set(self._scintillator_out_yz_mm[1])
-            elif position == InOut.IN:
-                await self.z_mm.set(self._scintillator_in_yz_mm[1])
-                await self.y_mm.set(self._scintillator_in_yz_mm[0])
-
         match position:
             case InOut.OUT | InOut.IN:
-                await self.do_with_ap_sg_in_safe_pos(move_to_new_position)
+                await self.do_with_aperture_scatterguard_in_safe_pos(
+                    partial(self._move_to_new_position, position)
+                )
             case _:
                 raise ValueError(f"Cannot set scintillator to position {position}")
 
-    async def do_with_ap_sg_in_safe_pos(self, func):
+    async def _move_to_new_position(self, position):
+        if position == InOut.OUT:
+            await self.y_mm.set(self._scintillator_out_yz_mm[0])
+            await self.z_mm.set(self._scintillator_out_yz_mm[1])
+        elif position == InOut.IN:
+            await self.z_mm.set(self._scintillator_in_yz_mm[1])
+            await self.y_mm.set(self._scintillator_in_yz_mm[0])
+
+    async def do_with_aperture_scatterguard_in_safe_pos(self, func):
+        """Perform the supplied function with the aperture-scatterguard to the SCIN_MOVE position,
+        then restore to its previous position.
+        Args:
+            func: The async function to be applied"""
         scin_move_positions = self._aperture_scatterguard().get_scin_move_position()
         saved_positions: dict[Motor, float] = {
             motor: await motor.user_readback.get_value()

@@ -114,9 +114,16 @@ class ApertureValue(StrictEnum):
 @dataclasses.dataclass
 class ApertureScatterguardConfiguration:
     aperture_positions: dict[ApertureValue, AperturePosition]
-    # The SCIN MOVE position is defined only for x-axis
-    scintillator_move_miniap_x: float
-    scintillator_move_sg_x: float
+    # Note on scintillator move configuration:
+    # The aperture scatterguard must move out of the way of the scintillator when
+    # the scintillator moves.
+    # (see "Aperture Scatterguard and Scintillator Collisions" in the documentation)
+    # The SCIN MOVE position is defined only for the x-axis; the y and z coordinates
+    # are preserved at the current aperture-scatterguard position.
+    # Both the aperture (miniap) and scatterguard(sg) are moved, and then subsequently restored.
+    # As this is a transient move, it is not represented in the ApertureValue enumeration.
+    scintillator_move_aperture_x: float
+    scintillator_move_scatterguard_x: float
 
 
 def load_configuration(
@@ -141,8 +148,8 @@ def load_configuration(
     }
     return ApertureScatterguardConfiguration(
         aperture_positions=positions,
-        scintillator_move_miniap_x=params["miniap_x_SCIN_MOVE"],
-        scintillator_move_sg_x=params["sg_x_SCIN_MOVE"],
+        scintillator_move_aperture_x=params["miniap_x_SCIN_MOVE"],
+        scintillator_move_scatterguard_x=params["sg_x_SCIN_MOVE"],
     )
 
 
@@ -392,6 +399,6 @@ class ApertureScatterguard(StandardReadable, Preparable):
 
     def get_scin_move_position(self) -> dict[Motor, float]:
         return {
-            self.aperture.x: self._config.scintillator_move_miniap_x,
-            self.scatterguard.x: self._config.scintillator_move_sg_x,
+            self.aperture.x: self._config.scintillator_move_aperture_x,
+            self.scatterguard.x: self._config.scintillator_move_scatterguard_x,
         }
