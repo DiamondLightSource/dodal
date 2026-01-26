@@ -78,7 +78,6 @@ class XYZPiezoSwitchingMirror(
 ):
     """
     A device represention set of mirrors on a hexapod stage with x,y,z and yaw, pitch, roll motors, including a fine pitch piezo motor.
-    To change mirror set mirror enum and trigger mirror change.
     """
 
     def __init__(

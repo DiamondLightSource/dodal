@@ -4,15 +4,21 @@ import pytest
 from bluesky.plan_stubs import mv, stop
 from bluesky.protocols import Location
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import init_devices, set_mock_value
+from ophyd_async.core import StrictEnum, init_devices, set_mock_value
 from ophyd_async.testing import assert_reading, partial_reading
 
-from dodal.beamline_specific_utils.i05_shared import M3MJ6Mirror
 from dodal.devices.i05.common_mirror import (
     XYZPiezoCollimatingMirror,
     XYZPiezoSwitchingMirror,
     XYZSwitchingMirror,
 )
+
+
+class MirrorEnum(StrictEnum):
+    UNKNOWN = "Unknown"
+    MJ6 = "MJ6"
+    M3 = "M3"
+    REFERENCE = "Reference"
 
 
 @pytest.fixture
@@ -23,16 +29,16 @@ async def xyz_piezo_coll_mirror() -> XYZPiezoCollimatingMirror:
 
 
 @pytest.fixture
-async def xyz_switching_mirror() -> XYZSwitchingMirror[M3MJ6Mirror]:
+async def xyz_switching_mirror() -> XYZSwitchingMirror[MirrorEnum]:
     async with init_devices(mock=True):
-        xyz_switching_mirror = XYZSwitchingMirror("", M3MJ6Mirror)
+        xyz_switching_mirror = XYZSwitchingMirror("", MirrorEnum)
     return xyz_switching_mirror
 
 
 @pytest.fixture
-async def xyz_piezo_switching_mirror() -> XYZPiezoSwitchingMirror[M3MJ6Mirror]:
+async def xyz_piezo_switching_mirror() -> XYZPiezoSwitchingMirror[MirrorEnum]:
     async with init_devices(mock=True):
-        xyz_piezo_switching_mirror = XYZPiezoSwitchingMirror("", M3MJ6Mirror)
+        xyz_piezo_switching_mirror = XYZPiezoSwitchingMirror("", MirrorEnum)
     return xyz_piezo_switching_mirror
 
 
@@ -83,9 +89,9 @@ async def test_setting_xyz_piezo_coll_mirror_positions(
 @pytest.mark.parametrize(
     "x, y, z, pitch, yaw, roll, mirror",
     [
-        (0, 0, 0, 0, 0, 0, M3MJ6Mirror.UNKNOWN),
-        (1.23, 2.40, 0.0, 0.0, 0.0, 0.0, M3MJ6Mirror.M3),
-        (1.23, 2.40, 3.51, 24.06, 12.02, 3.56, M3MJ6Mirror.REFERENCE),
+        (0, 0, 0, 0, 0, 0, MirrorEnum.UNKNOWN),
+        (1.23, 2.40, 0.0, 0.0, 0.0, 0.0, MirrorEnum.M3),
+        (1.23, 2.40, 3.51, 24.06, 12.02, 3.56, MirrorEnum.REFERENCE),
     ],
 )
 async def test_setting_xyz_switching_mirror_position_table(
@@ -96,7 +102,7 @@ async def test_setting_xyz_switching_mirror_position_table(
     pitch: float,
     yaw: float,
     roll: float,
-    mirror: M3MJ6Mirror,
+    mirror: MirrorEnum,
 ):
     """
     Test setting positions on the Table using the ophyd_async mock tools.
@@ -128,9 +134,9 @@ async def test_move_xyz_switching_mirror(
     xyz_switching_mirror: XYZSwitchingMirror,
     run_engine: RunEngine,
 ):
-    assert await xyz_switching_mirror.mirror.get_value() == M3MJ6Mirror.UNKNOWN
-    run_engine(mv(xyz_switching_mirror, M3MJ6Mirror.M3))
-    assert await xyz_switching_mirror.mirror.get_value() == M3MJ6Mirror.M3
+    assert await xyz_switching_mirror.mirror.get_value() == MirrorEnum.UNKNOWN
+    run_engine(mv(xyz_switching_mirror, MirrorEnum.M3))
+    assert await xyz_switching_mirror.mirror.get_value() == MirrorEnum.M3
 
 
 async def test_locate_xyz_switching_mirror(
@@ -138,11 +144,11 @@ async def test_locate_xyz_switching_mirror(
     run_engine: RunEngine,
 ):
     assert await xyz_switching_mirror.locate() == Location(
-        setpoint=M3MJ6Mirror.UNKNOWN, readback=M3MJ6Mirror.UNKNOWN
+        setpoint=MirrorEnum.UNKNOWN, readback=MirrorEnum.UNKNOWN
     )
-    run_engine(mv(xyz_switching_mirror, M3MJ6Mirror.M3))
+    run_engine(mv(xyz_switching_mirror, MirrorEnum.M3))
     assert await xyz_switching_mirror.locate() == Location(
-        setpoint=M3MJ6Mirror.M3, readback=M3MJ6Mirror.M3
+        setpoint=MirrorEnum.M3, readback=MirrorEnum.M3
     )
 
 
@@ -158,9 +164,9 @@ async def test_stop_xyz_switching_mirror(
 @pytest.mark.parametrize(
     "x, y, z, pitch, yaw, roll,fpitch, mirror",
     [
-        (0, 0, 0, 0, 0, 0, 0, M3MJ6Mirror.UNKNOWN),
-        (1.23, 2.40, 0.21, 0.0, 0.0, 0.0, 0.0, M3MJ6Mirror.M3),
-        (1.23, 2.40, 3.51, 24.06, 12.02, 3.56, 1.81, M3MJ6Mirror.REFERENCE),
+        (0, 0, 0, 0, 0, 0, 0, MirrorEnum.UNKNOWN),
+        (1.23, 2.40, 0.21, 0.0, 0.0, 0.0, 0.0, MirrorEnum.M3),
+        (1.23, 2.40, 3.51, 24.06, 12.02, 3.56, 1.81, MirrorEnum.REFERENCE),
     ],
 )
 async def test_setting_xyz_piezo_switching_mirror_positions(
@@ -172,7 +178,7 @@ async def test_setting_xyz_piezo_switching_mirror_positions(
     yaw: float,
     roll: float,
     fpitch: float,
-    mirror: M3MJ6Mirror,
+    mirror: MirrorEnum,
 ):
     """
     Test setting positions on the Table using the ophyd_async mock tools.
@@ -206,9 +212,9 @@ async def test_move_xyz_piezo_switching_mirror(
     xyz_piezo_switching_mirror: XYZPiezoSwitchingMirror,
     run_engine: RunEngine,
 ):
-    assert await xyz_piezo_switching_mirror.mirror.get_value() == M3MJ6Mirror.UNKNOWN
-    run_engine(mv(xyz_piezo_switching_mirror, M3MJ6Mirror.M3))
-    assert await xyz_piezo_switching_mirror.mirror.get_value() == M3MJ6Mirror.M3
+    assert await xyz_piezo_switching_mirror.mirror.get_value() == MirrorEnum.UNKNOWN
+    run_engine(mv(xyz_piezo_switching_mirror, MirrorEnum.M3))
+    assert await xyz_piezo_switching_mirror.mirror.get_value() == MirrorEnum.M3
 
 
 async def test_locate_xyz_piezo_switching_mirror(
@@ -216,11 +222,11 @@ async def test_locate_xyz_piezo_switching_mirror(
     run_engine: RunEngine,
 ):
     assert await xyz_piezo_switching_mirror.locate() == Location(
-        setpoint=M3MJ6Mirror.UNKNOWN, readback=M3MJ6Mirror.UNKNOWN
+        setpoint=MirrorEnum.UNKNOWN, readback=MirrorEnum.UNKNOWN
     )
-    run_engine(mv(xyz_piezo_switching_mirror, M3MJ6Mirror.M3))
+    run_engine(mv(xyz_piezo_switching_mirror, MirrorEnum.M3))
     assert await xyz_piezo_switching_mirror.locate() == Location(
-        setpoint=M3MJ6Mirror.M3, readback=M3MJ6Mirror.M3
+        setpoint=MirrorEnum.M3, readback=MirrorEnum.M3
     )
 
 

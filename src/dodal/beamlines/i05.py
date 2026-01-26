@@ -1,6 +1,8 @@
 from dodal.beamlines.i05_shared import devices as i05_shared_devices
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.device_manager import DeviceManager
+from dodal.devices.i05.common_mirror import XYZSwitchingMirror
+from dodal.devices.i05.enums import M4M5Mirror
 from dodal.devices.temperture_controller import Lakeshore336
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
@@ -12,6 +14,15 @@ BL = get_beamline_name("i05")
 PREFIX = BeamlinePrefix(BL)
 set_log_beamline(BL)
 set_utils_beamline(BL)
+
+
+# will connect after https://jira.diamond.ac.uk/browse/I05-731
+@devices.factory(skip=True)
+def m4m5() -> XYZSwitchingMirror:
+    return XYZSwitchingMirror(
+        prefix=f"{PREFIX.beamline_prefix}-OP-RFM-01:",
+        mirrors=M4M5Mirror,
+    )
 
 
 @devices.factory()
