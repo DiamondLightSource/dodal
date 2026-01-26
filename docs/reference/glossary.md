@@ -4,14 +4,14 @@ This is a glossary of abbreviations, acronyms and terms used throughout this pro
 
 ## Abbreviations
 
-| Abbreviation | Explanation |
+| Abbreviation | Full Term |
 | ----------- | -----------|
 | repo | repository |
 | async | asynchronous |
 
 ## Acronyms
 
-| Acronym | Explanation |
+| Acronym | Full Term |
 | ----------- | -----------|
 | CI | Continuous Integration |
 | CD | Continuous Deployment |
@@ -26,16 +26,16 @@ This is a glossary of abbreviations, acronyms and terms used throughout this pro
 
 ## Terms
 
-| Term | Explanation |
+| Term | Definition |
 | ----------- | -----------|
 | blueapi | Lightweight bluesky-as-a-service wrapper application. Also usable as a library. |
 | bluesky | Bluesky is a library for experiment control and collection of scientific data and metadata. |
-| beamline | A beamline is a collection of devices that can be used together to run experiments, they may be read-only or capable of being set. |
+| beamline | A beamline is a collection of all devices used to run experiments. A beamline's devices include all components from an insertion device which produces synchrotron light (beam) to detectors which collect experimental data, which may be read-only or capable of being set. |
 | beamline workstation | A linux workstation which is present on the beamline-local network. |
 | device | Hardware defined via ophyd protocols, although ophyd-async is the standard implementation at Diamond. |
 | endstation | An endstation is a collection of devices which can be used together to run experiments, usually distinct from optical devices on a beamline. Beamlines may have one or more endstations which can be used for data collection either in parallel or exclusively. |
 | graylog | A log management platform, which all container stdout/stderr logs are sent to at DLS. | 
-| ISPyB | A managed environment for keeping track of your experiments at some Diamond beamlines. |
+| ISPyB | A managed experimental information service for keeping track of your experiments at some Diamond beamlines. |
 | the machine | The synchrotron. |
 | ophyd | Ophyd is a Python library for interfacing with hardware. |
 | ophyd-async | Ophyd-async is a Python library for asynchronously interfacing with hardware. |
