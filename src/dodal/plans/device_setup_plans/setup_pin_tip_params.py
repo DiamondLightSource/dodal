@@ -9,8 +9,10 @@ from dodal.devices.oav.pin_image_recognition import PinTipDetection
 def setup_pin_tip_detection_params(
     pin_tip_detect_device: PinTipDetection,
     parameters: OAVParameters,
+    group: str = "pin_tip_parameters",
+    wait: bool = True,
 ):
-    set_using_group = partial(bps.abs_set, group="pin_tip_parameters")
+    set_using_group = partial(bps.abs_set, group=group)
     # select which blur to apply to image
     yield from set_using_group(
         pin_tip_detect_device.preprocess_operation, parameters.preprocess
@@ -56,3 +58,6 @@ def setup_pin_tip_detection_params(
         pin_tip_detect_device.min_tip_height,
         parameters.minimum_height,
     )
+
+    if wait:
+        yield from bps.wait(group=group)
