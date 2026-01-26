@@ -13,7 +13,7 @@ from dodal.devices.i19.access_controlled.shutter import (
     HutchState,
 )
 from dodal.devices.i19.beamstop import BeamStop
-from dodal.devices.i19.pin_tip import PinTipCentre
+from dodal.devices.i19.pin_tip import PinTipCentreHolder
 from dodal.devices.oav.oav_detector import OAVBeamCentreFile
 from dodal.devices.oav.oav_parameters import OAVConfigBeamCentre
 from dodal.devices.oav.pin_image_recognition import PinTipDetection
@@ -79,15 +79,15 @@ def oav2() -> OAVBeamCentreFile:
 
 
 @device_factory()
-def pin_tip_centre1() -> PinTipCentre:
-    return PinTipCentre(
+def pin_tip_centre1() -> PinTipCentreHolder:
+    return PinTipCentreHolder(
         prefix=f"{PREFIX.beamline_prefix}-EA-OAV-01:",
     )
 
 
 @device_factory()
-def pin_tip_centre1v2() -> PinTipCentre:
-    return PinTipCentre(
+def pin_tip_centre2() -> PinTipCentreHolder:
+    return PinTipCentreHolder(
         prefix=f"{PREFIX.beamline_prefix}-EA-OAV-02:",
     )
 
