@@ -356,6 +356,9 @@ class DeviceManager:
         self._v1_factories = {}
         self._fixtures = {}
 
+    def get_all_factories(self) -> dict[str, V1DeviceFactory | DeviceFactory]:
+        return self._factories | self._v1_factories
+
     def fixture(self, func: Callable[[], T]) -> Callable[[], T]:
         """Add a function that can provide fixtures required by the factories"""
         self._fixtures[func.__name__] = func
@@ -489,7 +492,7 @@ class DeviceManager:
         return self.build_devices(
             *(
                 f
-                for f in (self._factories | self._v1_factories).values()
+                for f in (self.get_all_factories()).values()
                 # allow overriding skip but still allow fixtures to override devices
                 if (include_skipped or not f.skip)
             ),

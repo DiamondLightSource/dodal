@@ -4,7 +4,6 @@ from ophyd_async.epics.adandor import Andor2Detector
 from ophyd_async.fastcs.panda import HDFPanda
 
 from dodal.common.beamlines.beamline_utils import (
-    device_factory,
     get_path_provider,
     set_beamline,
     set_path_provider,
@@ -14,6 +13,7 @@ from dodal.common.visit import (
     LocalDirectoryServiceClient,
     StaticVisitPathProvider,
 )
+from dodal.device_manager import DeviceManager
 from dodal.devices.attenuator.filter import FilterMotor
 from dodal.devices.attenuator.filter_selections import P99FilterSelections
 from dodal.devices.motors import XYZStage
@@ -26,24 +26,25 @@ BL = get_beamline_name("p99")
 PREFIX = BeamlinePrefix(BL)
 set_log_beamline(BL)
 set_beamline(BL)
+devices = DeviceManager()
 
 
-@device_factory()
+@devices.factory()
 def angle_stage() -> SampleAngleStage:
     return SampleAngleStage(f"{PREFIX.beamline_prefix}-MO-STAGE-01:")
 
 
-@device_factory()
+@devices.factory()
 def filter() -> FilterMotor:
     return FilterMotor(f"{PREFIX.beamline_prefix}-MO-STAGE-02:MP:", P99FilterSelections)
 
 
-@device_factory()
+@devices.factory()
 def sample_stage() -> XYZStage:
     return XYZStage(f"{PREFIX.beamline_prefix}-MO-STAGE-02:")
 
 
-@device_factory()
+@devices.factory()
 def lab_stage() -> XYZStage:
     return XYZStage(f"{PREFIX.beamline_prefix}-MO-STAGE-02:LAB:")
 
@@ -57,7 +58,7 @@ set_path_provider(
 )
 
 
-@device_factory()
+@devices.factory()
 def andor2_det() -> Andor2Detector:
     """Andor model:DU897_BV."""
     return Andor2Detector(
@@ -68,7 +69,7 @@ def andor2_det() -> Andor2Detector:
     )
 
 
-@device_factory()
+@devices.factory()
 def andor2_point() -> Andor2Point:
     """Using the andor2 as if it is a massive point detector, read the meanValue and total after
     a picture is taken."""
@@ -79,7 +80,7 @@ def andor2_point() -> Andor2Point:
     )
 
 
-@device_factory()
+@devices.factory()
 def panda() -> HDFPanda:
     """
     The Panda device is connected to two PMAC motors for position comparison under
