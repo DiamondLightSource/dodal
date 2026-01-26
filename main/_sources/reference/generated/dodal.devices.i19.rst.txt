@@ -15,6 +15,7 @@ dodal.devices.i19
    dodal.devices.i19.diffractometer
    dodal.devices.i19.mapt_configuration
    dodal.devices.i19.pin_col_stages
+   dodal.devices.i19.pin_tip
 
 
 

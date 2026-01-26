@@ -1,0 +1,36 @@
+dodal.devices.i19.pin\_tip
+==========================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices.i19
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~pin_tip.PinTipCentreHolder
+
+
+
+
+.. automodule:: dodal.devices.i19.pin_tip
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

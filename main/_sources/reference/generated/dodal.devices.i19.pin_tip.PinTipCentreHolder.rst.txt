@@ -1,0 +1,40 @@
+dodal.devices.i19.pin\_tip.PinTipCentreHolder
+=============================================
+
+.. currentmodule:: dodal.devices.i19.pin_tip
+
+.. autoclass:: PinTipCentreHolder
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   
