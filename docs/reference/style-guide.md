@@ -8,9 +8,7 @@ For this project, we follow [the Google Python Style Guide](https://google.githu
 
 Specific guidelines for use within this project which are not outlined in [the Google Python Style Guide](https://google.github.io/styleguide/pyguide.html) or [PEP 8](https://peps.python.org/pep-0008/). 
 
-1. Prefer the use of `params` over `args` when a group of parameters is used (i.e. in [GDABeamlineParameters](https://github.com/DiamondLightSource/dodal/blob/e23e028ff46e0e75aad0248d0ba06fa5382eff1e/src/dodal/common/beamlines/beamline_parameters.py#L15) or [EigerDetector](https://github.com/DiamondLightSource/dodal/blob/e23e028ff46e0e75aad0248d0ba06fa5382eff1e/src/dodal/devices/eiger.py#L91)).
-
-2. Handle shared devices as outlined in [handle devices shared between multiple endstations](../explanations/decisions/0006-devices-shared-between-endstations.md)
+1. Handle shared devices as outlined in [handle devices shared between multiple endstations](../explanations/decisions/0006-devices-shared-between-endstations.md)
 
 ## Guidance Against [the Google Python Style Guide](https://google.github.io/styleguide/pyguide.html)
 
@@ -35,3 +33,5 @@ Specific guidelines for use within this project which agree with decisions in [t
 2. [Use of properties](https://google.github.io/styleguide/pyguide.html#213-properties) over [getters and setters](https://google.github.io/styleguide/pyguide.html#315-getters-and-setters) is encouraged, unless getting or setting the variable is complex or the cost is significant, either currently or in a reasonable future.
 
 3. [Avoid global mutable state](https://google.github.io/styleguide/pyguide.html#25-mutable-global-state) where possible. 
+
+4. [Prefer the use of `Args` over `Parameters`](https://google.github.io/styleguide/pyguide.html#doc-function-args) when writing docstrings. An example is given in [standards](standards.md).
