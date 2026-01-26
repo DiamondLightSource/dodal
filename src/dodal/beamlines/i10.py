@@ -1,4 +1,5 @@
-from dodal.beamlines.i10_devices import (
+from dodal.device_manager import DeviceManager
+from dodal.devices.i10.i10_devices_configs import (
     devices_det_slits,
     devices_diagnostics_i,
     devices_diffractometer,
@@ -19,7 +20,6 @@ from dodal.beamlines.i10_devices import (
     devices_sr570_det,
     pgm_device,
 )
-from dodal.device_manager import DeviceManager
 
 devices = DeviceManager()
 

@@ -1,4 +1,5 @@
-from dodal.beamlines.i10_devices import (
+from dodal.device_manager import DeviceManager
+from dodal.devices.i10.i10_devices_configs import (
     devices_diagnostics_j,
     devices_em_temperature_controller,
     devices_idd,
@@ -10,7 +11,6 @@ from dodal.beamlines.i10_devices import (
     devices_slit_j,
     pgm_device,
 )
-from dodal.device_manager import DeviceManager
 
 devices = DeviceManager()
 
