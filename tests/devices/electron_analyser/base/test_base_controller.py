@@ -1,9 +1,9 @@
 from unittest.mock import AsyncMock, patch
 
 import pytest
-from ophyd_async.core import InOut, TriggerInfo, get_mock_put, init_devices
+from ophyd_async.core import TriggerInfo, get_mock_put, init_devices
 
-from dodal.devices import b07, b07_shared, i09
+from dodal.devices.b07.analyser import Specs2DCMOS
 from dodal.devices.electron_analyser.base import (
     AbstractAnalyserDriverIO,
     AbstractBaseRegion,
@@ -13,109 +13,49 @@ from dodal.devices.electron_analyser.base import (
 from dodal.devices.electron_analyser.base.base_controller import (
     ElectronAnalyserController,
 )
-from dodal.devices.electron_analyser.specs import SpecsAnalyserDriverIO
-from dodal.devices.electron_analyser.vgscienta import (
-    VGScientaAnalyserDriverIO,
-)
-from dodal.devices.fast_shutter import DualFastShutter, GenericFastShutter
+from dodal.devices.fast_shutter import DualFastShutter
+from dodal.devices.i09.analyser import EW4000
 from dodal.devices.selectable_source import SourceSelector
-from dodal.testing.electron_analyser import create_driver
-from tests.devices.electron_analyser.helper_util import (
-    TEST_SEQUENCE_REGION_NAMES,
-    get_test_sequence,
-)
-
-
-@pytest.fixture(
-    params=[
-        SpecsAnalyserDriverIO[b07.LensMode, b07_shared.PsuMode],
-        VGScientaAnalyserDriverIO[i09.LensMode, i09.PsuMode, i09.PassEnergy],
-    ]
-)
-async def sim_driver(
-    request: pytest.FixtureRequest,
-) -> AbstractAnalyserDriverIO:
-    async with init_devices(mock=True):
-        sim_detector = create_driver(
-            request.param,
-            prefix="TEST:",
-        )
-    return sim_detector
+from tests.devices.electron_analyser.helper_util import TEST_SEQUENCE_REGION_NAMES
 
 
 @pytest.fixture
-def sequence_file_path(
-    sim_driver: AbstractAnalyserDriverIO,
-) -> str:
-    return get_test_sequence(type(sim_driver))
-
-
-@pytest.fixture
-def shutter1() -> GenericFastShutter[InOut]:
-    with init_devices(mock=True):
-        shutter1 = GenericFastShutter[InOut](
-            pv="TEST:",
-            open_state=InOut.OUT,
-            close_state=InOut.IN,
-        )
-    return shutter1
-
-
-@pytest.fixture
-def shutter2() -> GenericFastShutter[InOut]:
-    with init_devices(mock=True):
-        shutter2 = GenericFastShutter[InOut](
-            pv="TEST:",
-            open_state=InOut.OUT,
-            close_state=InOut.IN,
-        )
-    return shutter2
-
-
-@pytest.fixture
-def dual_fast_shutter(
-    shutter1: GenericFastShutter[InOut],
-    shutter2: GenericFastShutter[InOut],
-    source_selector: SourceSelector,
-) -> DualFastShutter[InOut]:
-    with init_devices(mock=True):
-        dual_fast_shutter = DualFastShutter[InOut](
-            shutter1,
-            shutter2,
-            source_selector.selected_source,
-        )
-    return dual_fast_shutter
-
-
-@pytest.fixture
-def analyser_controller(
-    sim_driver: AbstractAnalyserDriverIO,
-    single_energy_source: EnergySource,
+def ew4000(
     dual_energy_source: DualEnergySource,
     dual_fast_shutter: DualFastShutter,
     source_selector: SourceSelector,
-) -> ElectronAnalyserController[AbstractAnalyserDriverIO, AbstractBaseRegion]:
-    if isinstance(sim_driver, SpecsAnalyserDriverIO):
-        controller = ElectronAnalyserController[
-            AbstractAnalyserDriverIO, AbstractBaseRegion
-        ](
-            sim_driver,
-            single_energy_source,
-            source_selector=None,
-        )
-    elif isinstance(sim_driver, VGScientaAnalyserDriverIO):
-        controller = ElectronAnalyserController[
-            AbstractAnalyserDriverIO, AbstractBaseRegion
-        ](
-            sim_driver,
-            dual_energy_source,
-            dual_fast_shutter,
-            source_selector,
-        )
-    else:
-        raise ValueError(f"sim_driver is of unsupported type {type(sim_driver)}.")
+) -> EW4000:
+    with init_devices(mock=True):
+        ew4000 = EW4000("TEST:", dual_energy_source, dual_fast_shutter, source_selector)
+    return ew4000
 
-    return controller
+
+@pytest.fixture
+def specs_2dcmos(single_energy_source: EnergySource) -> Specs2DCMOS:
+    with init_devices(mock=True):
+        specs_2dcmos = Specs2DCMOS("TEST:", single_energy_source)
+    return specs_2dcmos
+
+
+@pytest.fixture(params=["ew4000", "specs_2dcmos"])
+def analyser_controller(
+    request: pytest.FixtureRequest, ew4000: EW4000, specs_2dcmos: Specs2DCMOS
+):
+    detectors = [ew4000, specs_2dcmos]
+    for detector in detectors:
+        if detector.name == request.param:
+            return detector._controller
+
+    raise ValueError(f"Detector with name '{request.param}' not found")
+
+
+@pytest.fixture
+def sim_driver(
+    analyser_controller: ElectronAnalyserController[
+        AbstractAnalyserDriverIO, AbstractBaseRegion
+    ],
+) -> AbstractAnalyserDriverIO:
+    return analyser_controller.driver
 
 
 async def test_controller_prepare_sets_excitation_energy(

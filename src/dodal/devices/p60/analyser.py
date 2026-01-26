@@ -1,9 +1,41 @@
 from dodal.devices.electron_analyser.base import AbstractEnergySource
-from dodal.devices.electron_analyser.vgscienta import VGScientaDetector
+from dodal.devices.electron_analyser.base.base_controller import (
+    ElectronAnalyserController,
+)
+from dodal.devices.electron_analyser.base.base_detector import ElectronAnalyserDetector
+from dodal.devices.electron_analyser.vgscienta import (
+    VGScientaAnalyserDriverIO,
+    VGScientaRegion,
+    VGScientaSequence,
+)
+from dodal.devices.electron_analyser.vgscienta.vgscienta_driver_io import (
+    VGScientaAnalyserDriverIO,
+)
+from dodal.devices.electron_analyser.vgscienta.vgscienta_region import (
+    VGScientaRegion,
+    VGScientaSequence,
+)
 from dodal.devices.p60.enums import LensMode, PassEnergy, PsuMode
 
+P60VGScientnaRegion = VGScientaRegion[LensMode, PassEnergy]
+P60VGScientaSequence = VGScientaSequence[LensMode, PsuMode, PassEnergy]
 
-class R4000(VGScientaDetector[LensMode, PsuMode, PassEnergy]):
+
+class P60VGScientaAnalyserDriverIO(
+    VGScientaAnalyserDriverIO[LensMode, PsuMode, PassEnergy]
+):
+    def __init__(self, prefix: str, name: str = ""):
+        super().__init__(prefix, LensMode, PsuMode, PassEnergy, name)
+
+
+P60ElectronAnalyserController = ElectronAnalyserController[
+    P60VGScientaAnalyserDriverIO, P60VGScientnaRegion
+]
+
+
+class R4000(
+    ElectronAnalyserDetector[P60VGScientaAnalyserDriverIO, P60VGScientnaRegion]
+):
     """Lab specific analyser for P60 lab. It does not have any shutters connected so
     will be None for this implementation. The selected_source also cannot be dynamically
     changed between regions, so will also be None so regions cannot select."""
@@ -14,13 +46,11 @@ class R4000(VGScientaDetector[LensMode, PsuMode, PassEnergy]):
         energy_source: AbstractEnergySource,
         name: str = "",
     ):
-        super().__init__(
-            prefix=prefix,
-            lens_mode_type=LensMode,
-            psu_mode_type=PsuMode,
-            pass_energy_type=PassEnergy,
+        driver = P60VGScientaAnalyserDriverIO(prefix)
+        controller = P60ElectronAnalyserController(
+            driver,
             energy_source=energy_source,
             shutter=None,
             source_selector=None,
-            name=name,
         )
+        super().__init__(controller, name)

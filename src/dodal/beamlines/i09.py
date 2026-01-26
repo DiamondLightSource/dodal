@@ -5,9 +5,7 @@ from dodal.beamlines.i09_2_shared import devices as i09_2_shared_devices
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.device_manager import DeviceManager
 from dodal.devices.common_dcm import DoubleCrystalMonochromatorWithDSpacing
-from dodal.devices.electron_analyser.base import (
-    DualEnergySource,
-)
+from dodal.devices.electron_analyser.base import DualEnergySource
 from dodal.devices.fast_shutter import DualFastShutter, GenericFastShutter
 from dodal.devices.i09 import EW4000
 from dodal.devices.pgm import PlaneGratingMonochromator
@@ -80,15 +78,15 @@ def dual_fast_shutter(
 # see https://github.com/DiamondLightSource/dodal/issues/1852
 @devices.factory()
 def ew4000(
-    dual_fast_shutter: DualFastShutter,
     dual_energy_source: DualEnergySource,
+    dual_fast_shutter: DualFastShutter,
     source_selector: SourceSelector,
 ) -> EW4000:
     return EW4000(
-        prefix=f"{I_PREFIX.beamline_prefix}-EA-DET-01:CAM:",
-        energy_source=dual_energy_source,
-        shutter=dual_fast_shutter,
-        source_selector=source_selector,
+        f"{I_PREFIX.beamline_prefix}-EA-DET-01:CAM:",
+        dual_energy_source,
+        dual_fast_shutter,
+        source_selector,
     )
 
 

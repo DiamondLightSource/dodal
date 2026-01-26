@@ -2,25 +2,21 @@ from typing import Any
 
 import pytest
 
-from dodal.common.data_util import load_json_file_to_class
 from dodal.devices.b07 import LensMode
+from dodal.devices.b07.analyser import B07SpecsSequence
 from dodal.devices.b07_shared import PsuMode
 from dodal.devices.electron_analyser.base import EnergyMode
-from dodal.devices.electron_analyser.specs import (
-    AcquisitionMode,
-    SpecsSequence,
-)
+from dodal.devices.electron_analyser.specs import AcquisitionMode
 from dodal.devices.selectable_source import SelectedSource
 from tests.devices.electron_analyser.helper_util import (
     assert_region_has_expected_values,
-    get_test_sequence,
+    b07_specs_sequence_loader,
 )
 
 
 @pytest.fixture
-def sequence() -> SpecsSequence[LensMode, PsuMode]:
-    seq = SpecsSequence[LensMode, PsuMode]
-    return load_json_file_to_class(seq, get_test_sequence(seq))
+def sequence() -> B07SpecsSequence:
+    return b07_specs_sequence_loader()
 
 
 @pytest.fixture
@@ -87,7 +83,7 @@ def expected_region_values() -> list[dict[str, Any]]:
 
 
 def test_sequence_get_expected_enabled_region_names(
-    sequence: SpecsSequence[LensMode, PsuMode],
+    sequence: B07SpecsSequence,
     expected_enabled_region_names: list[str],
 ) -> None:
     assert sequence.get_enabled_region_names() == expected_enabled_region_names
@@ -96,7 +92,7 @@ def test_sequence_get_expected_enabled_region_names(
 
 
 def test_file_loads_into_class_with_expected_values(
-    sequence: SpecsSequence[LensMode, PsuMode],
+    sequence: B07SpecsSequence,
     expected_region_values: list[dict[str, Any]],
 ) -> None:
     assert len(sequence.regions) == len(expected_region_values)

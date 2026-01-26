@@ -9,38 +9,51 @@ from ophyd_async.testing import (
     assert_reading,
 )
 
-import dodal.devices.b07 as b07
-import dodal.devices.b07_shared as b07_shared
-import dodal.devices.i09 as i09
+from dodal.devices.b07.analyser import Specs2DCMOS
 from dodal.devices.electron_analyser.base import (
+    DualEnergySource,
     EnergySource,
+    GenericAnalyserDriverIO,
     GenericBaseElectronAnalyserDetector,
     GenericElectronAnalyserDetector,
+    GenericSequence,
 )
 from dodal.devices.electron_analyser.base.energy_sources import EnergySource
-from dodal.devices.electron_analyser.specs import SpecsDetector
-from dodal.devices.electron_analyser.vgscienta import VGScientaDetector
-from dodal.testing.electron_analyser import create_detector
-from tests.devices.electron_analyser.helper_util import get_test_sequence
-
-VGScientaDetector = VGScientaDetector[i09.LensMode, i09.PsuMode, i09.PassEnergy]
-SpecsDetector = SpecsDetector[b07.LensMode, b07_shared.PsuMode]
+from dodal.devices.fast_shutter import DualFastShutter
+from dodal.devices.i09.analyser import EW4000
+from dodal.devices.selectable_source import SourceSelector
 
 
-@pytest.fixture(params=[VGScientaDetector, SpecsDetector])
-async def sim_detector(
-    request: pytest.FixtureRequest,
-    single_energy_source: EnergySource,
-) -> GenericElectronAnalyserDetector:
-    async with init_devices(mock=True):
-        sim_detector = create_detector(
-            request.param,
-            prefix="TEST:",
-            energy_source=single_energy_source,
-        )
+@pytest.fixture
+def ew4000(
+    dual_energy_source: DualEnergySource,
+    dual_fast_shutter: DualFastShutter,
+    source_selector: SourceSelector,
+) -> EW4000:
+    with init_devices(mock=True):
+        ew4000 = EW4000("TEST:", dual_energy_source, dual_fast_shutter, source_selector)
+    return ew4000
+
+
+@pytest.fixture
+def specs_2dcmos(single_energy_source: EnergySource) -> Specs2DCMOS:
+    with init_devices(mock=True):
+        specs_2dcmos = Specs2DCMOS("TEST:", single_energy_source)
     # Needed for specs so we don't get division by zero error.
-    set_mock_value(sim_detector.driver.slices, 1)
-    return sim_detector
+    set_mock_value(specs_2dcmos.driver.slices, 1)
+    return specs_2dcmos
+
+
+@pytest.fixture(params=["ew4000", "specs_2dcmos"])
+def sim_detector(
+    request: pytest.FixtureRequest, ew4000: EW4000, specs_2dcmos: Specs2DCMOS
+) -> GenericElectronAnalyserDetector:
+    detectors = [ew4000, specs_2dcmos]
+    for detector in detectors:
+        if detector.name == request.param:
+            return detector
+
+    raise ValueError(f"Detector with name '{request.param}' not found")
 
 
 def test_base_analyser_detector_trigger(
@@ -93,18 +106,10 @@ async def test_base_analyser_detector_describe_configuration(
 
 
 @pytest.fixture
-def sequence_file_path(
+def sim_driver(
     sim_detector: GenericElectronAnalyserDetector,
-) -> str:
-    return get_test_sequence(type(sim_detector))
-
-
-def test_analyser_detector_loads_sequence_correctly(
-    sim_detector: GenericElectronAnalyserDetector,
-    sequence_file_path: str,
-) -> None:
-    seq = sim_detector.load_sequence(sequence_file_path)
-    assert seq is not None
+) -> GenericAnalyserDriverIO:
+    return sim_detector.driver
 
 
 async def test_analyser_detector_stage(
@@ -129,20 +134,18 @@ async def test_analyser_detector_unstage(
 
 def test_analyser_detector_creates_region_detectors(
     sim_detector: GenericElectronAnalyserDetector,
-    sequence_file_path: str,
+    sequence: GenericSequence,
 ) -> None:
-    seq = sim_detector.load_sequence(sequence_file_path)
-    region_detectors = sim_detector.create_region_detector_list(sequence_file_path)
+    region_detectors = sim_detector.create_region_detector_list(sequence.regions)
 
-    assert len(region_detectors) == len(seq.get_enabled_regions())
+    assert len(region_detectors) == len(sequence.regions)
     for det in region_detectors:
-        assert det.region.enabled is True
         assert det.name == sim_detector.name + "_" + det.region.name
 
 
 def test_analyser_detector_has_driver_as_child_and_region_detector_does_not(
     sim_detector: GenericElectronAnalyserDetector,
-    sequence_file_path: str,
+    sequence: GenericSequence,
 ) -> None:
     # Remove parent name from driver name so it can be checked it exists in
     # _child_devices dict
@@ -153,7 +156,7 @@ def test_analyser_detector_has_driver_as_child_and_region_detector_does_not(
     assert sim_detector._controller.driver.parent == sim_detector
     assert sim_detector._child_devices.get(driver_name) is not None
 
-    region_detectors = sim_detector.create_region_detector_list(sequence_file_path)
+    region_detectors = sim_detector.create_region_detector_list(sequence.regions)
 
     for det in region_detectors:
         assert det._child_devices.get(driver_name) is None
@@ -177,11 +180,10 @@ def test_analyser_detector_trigger_called_controller_prepare(
 
 def test_analyser_detector_set_called_controller_setup_with_region(
     sim_detector: GenericElectronAnalyserDetector,
-    sequence_file_path: str,
+    sequence: GenericSequence,
     run_engine: RunEngine,
 ) -> None:
-    seq = sim_detector.load_sequence(sequence_file_path)
-    region = seq.get_enabled_regions()[0]
+    region = sequence.get_enabled_regions()[0]
     sim_detector._controller.setup_with_region = AsyncMock()
     run_engine(bps.mv(sim_detector, region), wait=True)
     sim_detector._controller.setup_with_region.assert_awaited_once_with(region)
@@ -189,12 +191,10 @@ def test_analyser_detector_set_called_controller_setup_with_region(
 
 async def test_analyser_region_detector_trigger_sets_driver_with_region(
     sim_detector: GenericElectronAnalyserDetector,
-    sequence_file_path: str,
+    sequence: GenericSequence,
     run_engine: RunEngine,
 ) -> None:
-    region_detectors = sim_detector.create_region_detector_list(
-        sequence_file_path, enabled_only=False
-    )
+    region_detectors = sim_detector.create_region_detector_list(sequence.regions)
     trigger_info = TriggerInfo()
 
     for reg_det in region_detectors:
