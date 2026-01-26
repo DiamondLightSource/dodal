@@ -9,6 +9,7 @@ from dodal.devices.i10.i10_devices_configs import (
     devices_idu,
     devices_mirror_i,
     devices_pa_stage,
+    devices_pin_hole,
     devices_rasor_temperature_controller,
     devices_sample_stage,
     devices_scaler_cards,
@@ -57,6 +58,7 @@ devices.include(devices_diagnostics_i)
 
 """Rasor devices"""
 """Stage devices"""
+devices.include(devices_pin_hole)
 devices.include(devices_det_slits)
 devices.include(devices_diffractometer)
 devices.include(devices_pa_stage)

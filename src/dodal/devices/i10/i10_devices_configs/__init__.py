@@ -19,11 +19,13 @@ from .rasor.stages import (
     devices_det_slits,
     devices_diffractometer,
     devices_pa_stage,
+    devices_pin_hole,
     devices_sample_stage,
 )
 from .slits import devices_shared_slit, devices_slit_i, devices_slit_j
 
 __all__ = [
+    "devices_pin_hole",
     "devices_mirror_i",
     "devices_shared_mirror",
     "devices_shared_slit",
