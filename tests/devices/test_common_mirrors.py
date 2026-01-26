@@ -7,7 +7,7 @@ from bluesky.run_engine import RunEngine
 from ophyd_async.core import StrictEnum, init_devices, set_mock_value
 from ophyd_async.testing import assert_reading, partial_reading
 
-from dodal.devices.i05.common_mirror import (
+from dodal.devices.common_mirror import (
     XYZPiezoCollimatingMirror,
     XYZPiezoSwitchingMirror,
     XYZSwitchingMirror,
