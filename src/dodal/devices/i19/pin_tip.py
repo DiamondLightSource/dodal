@@ -9,7 +9,11 @@ class PinTipCentreHolder(StandardReadable):
 
     Signals:
         pin_tip_i: x position of the pin tip, in pixels.
-        pin_tip_j: x position of the pin tip, in pixels.
+        pin_tip_j: y position of the pin tip, in pixels.
+
+    This workaround is necessary because it's not yet possible to get these values back
+    from a plan in blueapi. It will be removed once this is completed
+    https://github.com/DiamondLightSource/blueapi/issues/1349
     """
 
     def __init__(
