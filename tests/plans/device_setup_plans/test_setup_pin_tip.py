@@ -28,3 +28,8 @@ async def test_setup_pin_tip_from_params(
     run_engine(setup_pin_tip_detection_params(pin_tip_detection, params))
 
     assert await pin_tip_detection.preprocess_operation.get_value() == 8
+    assert await pin_tip_detection.canny_lower_threshold == 5.0
+    assert await pin_tip_detection.canny_upper_threshold == 20.0
+    assert await pin_tip_detection.preprocess_ksize == 21
+    assert await pin_tip_detection.scan_direction == 0
+    assert await pin_tip_detection.min_tip_height == 10
