@@ -291,12 +291,12 @@ def test_connect_immediately_passed_to_device_factory(fake_device_factory_beamli
 def test_device_factory_can_rename(fake_device_factory_beamline):
     cryo = fake_device_factory_beamline.device_c(mock=True, connect_immediately=True)
     assert cryo.name == "device_c"
-    assert cryo.fine.name == "device_c-fine"
+    assert cryo.temp.name == "device_c-temp"
 
     cryo_2 = fake_device_factory_beamline.device_c(name="cryo")
     assert cryo is cryo_2
     assert cryo_2.name == "cryo"
-    assert cryo_2.fine.name == "cryo-fine"
+    assert cryo_2.temp.name == "cryo-temp"
 
 
 def device_a() -> Readable:
@@ -485,27 +485,3 @@ def test_filter_ophyd_devices_raises_for_extra_types():
 )
 def test_is_v2_device_type(input: Any, expected_result: bool):
     assert is_v2_device_type(input) == expected_result
-
-
-def test_calling_factory_with_different_args_raises_an_exception():
-    i04.oav(params=MagicMock())
-    with pytest.raises(
-        RuntimeError,
-        match="Device factory method called multiple times with different parameters",
-    ):
-        i04.oav(params=MagicMock())
-    i04.oav.cache_clear()
-
-
-def test_calling_factory_with_different_args_does_not_raise_an_exception_after_cache_clear():
-    i04.oav(params=MagicMock())
-    i04.oav.cache_clear()
-    i04.oav(params=MagicMock())
-    i04.oav.cache_clear()
-
-
-def test_factory_calls_are_cached():
-    undulator1 = i04.undulator()
-    undulator2 = i04.undulator()
-    assert undulator1 is undulator2
-    i04.undulator.cache_clear()

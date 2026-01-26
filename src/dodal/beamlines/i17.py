@@ -7,7 +7,8 @@ from dodal.common.beamlines.beamline_utils import (
     device_factory,
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.devices.apple2_undulator import (
+from dodal.devices.i17.i17_apple2 import I17Apple2Controller
+from dodal.devices.insertion_device import (
     Apple2,
     Apple2Controller,
     BeamEnergy,
@@ -16,13 +17,10 @@ from dodal.devices.apple2_undulator import (
     UndulatorGap,
     UndulatorPhaseAxes,
 )
-from dodal.devices.i17.i17_apple2 import I17Apple2Controller
+from dodal.devices.insertion_device.energy_motor_lookup import EnergyMotorLookup
+from dodal.devices.insertion_device.lookup_table_models import LookupTable
 from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.devices.synchrotron import Synchrotron
-from dodal.devices.util.lookup_tables_apple2 import (
-    EnergyMotorLookup,
-    LookupTable,
-)
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 

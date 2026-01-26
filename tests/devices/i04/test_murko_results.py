@@ -8,6 +8,7 @@ import numpy as np
 import pytest
 from ophyd_async.core import init_devices
 from pytest import approx
+from redis.asyncio import ConnectionError
 
 from dodal.devices.i04.murko_results import (
     RESULTS_COMPLETE_MESSAGE,
@@ -25,6 +26,7 @@ async def murko_results(mock_strict_redis: MagicMock) -> MurkoResultsDevice:
     with init_devices(mock=True):
         murko_results = MurkoResultsDevice(name="murko_results")
     murko_results.pubsub = AsyncMock()
+    murko_results.redis_connected = True
     return murko_results
 
 
@@ -443,6 +445,7 @@ async def test_trigger_calls_get_message_and_hget(
 async def test_assert_subscribes_to_queue_and_clears_results_on_stage(
     murko_results: MurkoResultsDevice,
 ):
+    murko_results._check_redis_connection = AsyncMock(return_value=True)
     murko_results._x_mm_setter(1)
     murko_results._y_mm_setter(2)
     murko_results._z_mm_setter(3)
@@ -807,3 +810,39 @@ async def test_trigger_stops_if_no_message_in_5_seconds_and_raises_warning(
         and record.levelname == "WARNING"
         for record in caplog.records
     )
+
+
+async def test_if_redis_connection_failed_then_no_error_is_raised_and_motors_set_to_0(
+    murko_results: MurkoResultsDevice,
+):
+    murko_results.redis_client.ping = AsyncMock(side_effect=ConnectionError)
+    await murko_results.stage()
+    await murko_results.trigger()
+    await murko_results.unstage()
+    assert await murko_results.x_mm.get_value() == 0
+    assert await murko_results.y_mm.get_value() == 0
+    assert await murko_results.z_mm.get_value() == 0
+
+
+async def test_if_redis_connection_failed_and_motors_have_values_then_motors_set_to_0(
+    murko_results: MurkoResultsDevice,
+):
+    murko_results.redis_client.ping = AsyncMock(side_effect=ConnectionError)
+    murko_results._x_mm_setter(1)
+    murko_results._y_mm_setter(2)
+    murko_results._z_mm_setter(3)
+    assert await murko_results.x_mm.get_value() == 1
+    assert await murko_results.y_mm.get_value() == 2
+    assert await murko_results.z_mm.get_value() == 3
+    await murko_results.stage()
+    assert await murko_results.x_mm.get_value() == 0
+    assert await murko_results.y_mm.get_value() == 0
+    assert await murko_results.z_mm.get_value() == 0
+
+
+async def test_if_redis_connects_then_pubsub_is_subscribed_to(
+    murko_results: MurkoResultsDevice,
+):
+    murko_results.redis_client.ping = AsyncMock()
+    await murko_results.stage()
+    murko_results.pubsub.subscribe.assert_called_once()  # type: ignore

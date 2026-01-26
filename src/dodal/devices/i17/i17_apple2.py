@@ -1,4 +1,4 @@
-from dodal.devices.apple2_undulator import (
+from dodal.devices.insertion_device import (
     Apple2,
     Apple2Controller,
     Apple2PhasesVal,
@@ -6,7 +6,7 @@ from dodal.devices.apple2_undulator import (
     Pol,
     UndulatorPhaseAxes,
 )
-from dodal.devices.util.lookup_tables_apple2 import EnergyMotorLookup
+from dodal.devices.insertion_device.energy_motor_lookup import EnergyMotorLookup
 
 ROW_PHASE_MOTOR_TOLERANCE = 0.004
 MAXIMUM_ROW_PHASE_MOTOR_POSITION = 24.0
@@ -56,11 +56,11 @@ class I17Apple2Controller(Apple2Controller[Apple2[UndulatorPhaseAxes]]):
 
     def _get_apple2_value(self, gap: float, phase: float, pol: Pol) -> Apple2Val:
         return Apple2Val(
-            gap=f"{gap:.6f}",
+            gap=gap,
             phase=Apple2PhasesVal(
-                top_outer=f"{phase:.6f}",
-                top_inner=f"{0.0:.6f}",
-                btm_inner=f"{phase:.6f}",
-                btm_outer=f"{0.0:.6f}",
+                top_outer=phase,
+                top_inner=0.0,
+                btm_inner=phase,
+                btm_outer=0.0,
             ),
         )

@@ -7,12 +7,16 @@ from ophyd_async.core import (
     set_mock_value,
 )
 
-from dodal.devices.apple2_undulator import (
+from dodal.devices.insertion_device import (
     EnabledDisabledUpper,
     UndulatorGap,
     UndulatorGateStatus,
     UndulatorJawPhase,
     UndulatorPhaseAxes,
+)
+from dodal.devices.insertion_device.apple2_undulator import (
+    Apple2,
+    UndulatorLockedPhaseAxes,
 )
 
 
@@ -76,3 +80,37 @@ async def mock_jaw_phase(prefix: str = "BLXX-EA-DET-007:") -> UndulatorJawPhase:
     set_mock_value(mock_jaw_phase.jaw_phase.user_setpoint_readback, 0)
     set_mock_value(mock_jaw_phase.status, EnabledDisabledUpper.ENABLED)
     return mock_jaw_phase
+
+
+@pytest.fixture
+async def mock_locked_phase_axes(
+    prefix: str = "BLXX-EA-DET-007:",
+) -> UndulatorLockedPhaseAxes:
+    async with init_devices(mock=True):
+        mock_phase_axes = UndulatorLockedPhaseAxes(
+            prefix=prefix,
+            top_outer="RPQ1",
+            btm_inner="RPQ4",
+        )
+    assert mock_phase_axes.name == "mock_phase_axes"
+    set_mock_value(mock_phase_axes.gate, UndulatorGateStatus.CLOSE)
+    set_mock_value(mock_phase_axes.top_outer.velocity, 2)
+    set_mock_value(mock_phase_axes.btm_inner.velocity, 2)
+    set_mock_value(mock_phase_axes.top_outer.user_readback, 2)
+    set_mock_value(mock_phase_axes.btm_inner.user_readback, 2)
+    set_mock_value(mock_phase_axes.top_outer.user_setpoint_readback, 2)
+    set_mock_value(mock_phase_axes.btm_inner.user_setpoint_readback, 2)
+    set_mock_value(mock_phase_axes.status, EnabledDisabledUpper.ENABLED)
+    return mock_phase_axes
+
+
+@pytest.fixture
+async def mock_locked_apple2(
+    mock_id_gap: UndulatorGap,
+    mock_locked_phase_axes: UndulatorLockedPhaseAxes,
+) -> Apple2[UndulatorLockedPhaseAxes]:
+    mock_locked_apple2 = Apple2[UndulatorLockedPhaseAxes](
+        id_gap=mock_id_gap,
+        id_phase=mock_locked_phase_axes,
+    )
+    return mock_locked_apple2
