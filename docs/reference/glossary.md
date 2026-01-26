@@ -17,10 +17,11 @@ This is a glossary of abbreviations, acronyms and terms used throughout this pro
 | CD | Continuous Deployment |
 | [DLS](https://www.diamond.ac.uk/Home.html) | Diamond Light Source |
 | dodal | Diamond Ophyd Device Abstraction Layer |
-| [EPICS](https://epics-controls.org/) | Experimental Physics and Industrial Control System |
-| GDA | Generic Data Acquisition |
+| [EPICS](https://epics-controls.org/) | A set of software tools and applications which provide a software infrastructure for use in building distributed control systems to operate devices such as Particle Accelerators, Large Experiments and major Telescopes ("Experimental Physics and Industrial Control System") |
+| GDA | Java/RCP acquisition platform developed at Diamond ("Generic Data Acquisition") |
 | IDE | Integrated Development Environment |
 | IO | Input / Output |
+| IOC | Input / Output Controller |
 | PR | Pull Request |
 | PV | Process Variable |
 
@@ -42,7 +43,7 @@ This is a glossary of abbreviations, acronyms and terms used throughout this pro
 | [plan](https://blueskyproject.io/bluesky/main/plans.html) | Bluesky’s concept of an experimental procedure. |
 | [plan stub](https://blueskyproject.io/bluesky/main/plans.html#stub-plans) | An instruction or ingredient which can be used to to write a bluesky plan. |
 | [run_engine](https://blueskyproject.io/bluesky/main/tutorial.html#the-runengine) | The executor of bluesky plans. |
-| signal | Anything in a device that is expected to be set externally e.g. by a plan should be a signal, even if it does not connect to EPICS. |
-| sphinx | A documentation generator. |
+| signal | Anything in a device that is expected to be set or read externally (e.g. by a plan) should be a signal, even if it does not connect to EPICS. |
+| [sphinx](https://www.sphinx-doc.org/en/master/index.html) | A documentation generator. |
 | training-rig | A prototyped beamline, with a small number of devices. |
 | [zocalo](https://zocalo.readthedocs.io/en/latest/) | An automated data processing system used at some Diamond beamlines. |
