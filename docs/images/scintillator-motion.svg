@@ -151,10 +151,10 @@
      inkscape:document-rotation="0"
      showgrid="false"
      inkscape:snap-page="true"
-     inkscape:window-width="1682"
-     inkscape:window-height="863"
-     inkscape:window-x="2112"
-     inkscape:window-y="174"
+     inkscape:window-width="1877"
+     inkscape:window-height="1160"
+     inkscape:window-x="2109"
+     inkscape:window-y="153"
      inkscape:window-maximized="0"
      fit-margin-top="0"
      fit-margin-left="0"
@@ -180,6 +180,13 @@
     <g
        id="g2362"
        transform="translate(10.896867,-46.690119)">
+      <rect
+         style="fill:#ffffff;fill-opacity:1;stroke-width:0.264999"
+         id="rect1149"
+         width="110.20584"
+         height="169.3904"
+         x="26.874935"
+         y="59.583038" />
       <g
          sodipodi:type="inkscape:box3d"
          id="g143"
