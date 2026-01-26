@@ -17,8 +17,6 @@ from dodal.devices.i10.i10_apple2 import (
     I10Apple2Controller,
     LinearArbitraryAngle,
 )
-
-# Imports taken from i10 while we work out how to deal with split end stations
 from dodal.devices.insertion_device import (
     BeamEnergy,
     InsertionDeviceEnergy,

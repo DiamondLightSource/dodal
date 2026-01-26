@@ -1,7 +1,5 @@
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.device_manager import DeviceManager
-
-# Imports taken from i10 while we work out how to deal with split end stations
 from dodal.devices.i10.i10_setting_data import I10Grating
 from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.log import set_beamline as set_log_beamline

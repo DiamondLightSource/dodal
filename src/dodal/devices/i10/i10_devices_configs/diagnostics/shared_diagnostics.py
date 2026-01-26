@@ -4,8 +4,6 @@ from dodal.devices.i10 import (
     I10SharedDiagnostic,
     I10SharedSlitsDrainCurrent,
 )
-
-# Imports taken from i10 while we work out how to deal with split end stations
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
