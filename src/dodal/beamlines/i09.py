@@ -75,9 +75,9 @@ def dual_fast_shutter(
     return DualFastShutter[InOut](fsi1, fsj1, source_selector.selected_source)
 
 
-# Connect will work again after this work completed
-# https://jira.diamond.ac.uk/browse/I09-651
-@devices.factory(skip=True)
+# CAM:IMAGE will fail to connect outside the beamline network,
+# see https://github.com/DiamondLightSource/dodal/issues/1852
+@devices.factory()
 def ew4000(
     dual_fast_shutter: DualFastShutter,
     dual_energy_source: DualEnergySource,
