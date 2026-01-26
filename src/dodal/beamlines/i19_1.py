@@ -1,9 +1,7 @@
 from dodal.common.beamlines.beamline_utils import (
-    device_factory,
-)
-from dodal.common.beamlines.beamline_utils import (
     set_beamline as set_utils_beamline,
 )
+from dodal.device_manager import DeviceManager
 from dodal.devices.i19.access_controlled.attenuator_motor_squad import (
     AttenuatorMotorSquad,
 )
@@ -44,8 +42,10 @@ I19_1_ZEBRA_MAPPING = ZebraMapping(
 ZOOM_PARAMS_FILE = "/dls_sw/i19-1/software/bluesky/jCameraManZoomLevels.xml"
 DISPLAY_CONFIG = "/dls_sw/i19-1/software/bluesky/display.configuration"
 
+devices = DeviceManager()
 
-@device_factory()
+
+@devices.factory()
 def attenuator_motor_squad() -> AttenuatorMotorSquad:
     return AttenuatorMotorSquad(
         hutch=HutchState.EH1, instrument_session=I19_1_COMMISSIONING_INSTR_SESSION
@@ -54,7 +54,7 @@ def attenuator_motor_squad() -> AttenuatorMotorSquad:
 
 # Needs to wait until enum is fixed on the beamline
 # See https://github.com/DiamondLightSource/dodal/issues/1150
-@device_factory()
+@devices.factory()
 def beamstop() -> BeamStop:
     """Get the i19-1 beamstop device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i19-1, it will return the existing object.
@@ -62,7 +62,7 @@ def beamstop() -> BeamStop:
     return BeamStop(prefix=f"{PREFIX.beamline_prefix}-RS-ABSB-01:")
 
 
-@device_factory()
+@devices.factory()
 def oav1() -> OAVBeamCentreFile:
     """Get the i19-1 OAV1 device, instantiate it if it hasn't already been.
     The OAV1 camera is placed next to the beampipe along with the Zoom lens."""
@@ -72,7 +72,7 @@ def oav1() -> OAVBeamCentreFile:
     )
 
 
-@device_factory()
+@devices.factory()
 def oav2() -> OAVBeamCentreFile:
     """Get the i19-1 OAV2 device, instantiate it if it hasn't already been.
     The OAV2 camera is places diagonally to the sample and has no FZoom."""
@@ -82,7 +82,7 @@ def oav2() -> OAVBeamCentreFile:
     )
 
 
-@device_factory()
+@devices.factory()
 def pin_tip_centre1() -> PinTipCentreHolder:
     """I19-1 temporary device to hold the pin tip centre position for OAV1."""
     return PinTipCentreHolder(
@@ -90,7 +90,7 @@ def pin_tip_centre1() -> PinTipCentreHolder:
     )
 
 
-@device_factory()
+@devices.factory()
 def pin_tip_centre2() -> PinTipCentreHolder:
     """I19-1 temporary device to hold the pin tip centre position for OAV2."""
     return PinTipCentreHolder(
@@ -98,19 +98,19 @@ def pin_tip_centre2() -> PinTipCentreHolder:
     )
 
 
-@device_factory()
+@devices.factory()
 def pin_tip_detection1() -> PinTipDetection:
     """Pin tip detection device for OAV1 camera."""
     return PinTipDetection(f"{PREFIX.beamline_prefix}-EA-OAV-01:")
 
 
-@device_factory()
+@devices.factory()
 def pin_tip_detection2() -> PinTipDetection:
     """Pin tip detection device for OAV2 camera."""
     return PinTipDetection(f"{PREFIX.beamline_prefix}-EA-OAV-02:")
 
 
-@device_factory()
+@devices.factory()
 def shutter() -> AccessControlledShutter:
     """Get the i19-1 hutch shutter device, instantiate it if it hasn't already been.
     If this is called when already instantiated, it will return the existing object.
@@ -122,7 +122,7 @@ def shutter() -> AccessControlledShutter:
     )
 
 
-@device_factory()
+@devices.factory()
 def synchrotron() -> Synchrotron:
     """Get the i19-1 synchrotron device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i19-1, it will return the existing object.
@@ -132,7 +132,7 @@ def synchrotron() -> Synchrotron:
 
 # NOTE EH1 uses the Zebra 2 box. While a Zebra 1 box exists and is connected
 # on the beamline, it is currently not in use
-@device_factory()
+@devices.factory()
 def zebra() -> Zebra:
     """Get the i19-1 zebra device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i19-1, it will return the existing object.

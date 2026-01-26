@@ -1,9 +1,7 @@
 from dodal.common.beamlines.beamline_utils import (
-    device_factory,
-)
-from dodal.common.beamlines.beamline_utils import (
     set_beamline as set_utils_beamline,
 )
+from dodal.device_manager import DeviceManager
 from dodal.devices.hutch_shutter import HutchShutter
 from dodal.devices.i19.access_controlled.hutch_access import (
     ACCESS_DEVICE_NAME,
@@ -17,8 +15,10 @@ PREFIX = BeamlinePrefix("i19", "I")
 set_log_beamline(BL)
 set_utils_beamline(BL)
 
+devices = DeviceManager()
 
-@device_factory()
+
+@devices.factory()
 def shutter() -> HutchShutter:
     """Get the i19 hutch shutter device, instantiate it if it hasn't already been.
     If this is called when already instantiated, it will return the existing object.
@@ -26,7 +26,7 @@ def shutter() -> HutchShutter:
     return HutchShutter(f"{PREFIX.beamline_prefix}-PS-SHTR-01:")
 
 
-@device_factory()
+@devices.factory()
 def access_control() -> HutchAccessControl:
     """Get a device that checks the active hutch for i19, instantiate it if it hasn't already been.
     If this is called when already instantiated, it will return the existing object.

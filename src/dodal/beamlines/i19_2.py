@@ -4,7 +4,6 @@ from ophyd_async.fastcs.eiger import EigerDetector
 from ophyd_async.fastcs.panda import HDFPanda
 
 from dodal.common.beamlines.beamline_utils import (
-    device_factory,
     get_path_provider,
     set_path_provider,
 )
@@ -12,6 +11,7 @@ from dodal.common.beamlines.beamline_utils import (
     set_beamline as set_utils_beamline,
 )
 from dodal.common.visit import StaticVisitPathProvider
+from dodal.device_manager import DeviceManager
 from dodal.devices.i19.access_controlled.attenuator_motor_squad import (
     AttenuatorMotorSquad,
 )
@@ -53,15 +53,17 @@ I19_2_ZEBRA_MAPPING = ZebraMapping(
     sources=ZebraSources(),
 )
 
+devices = DeviceManager()
 
-@device_factory()
+
+@devices.factory()
 def attenuator_motor_squad() -> AttenuatorMotorSquad:
     return AttenuatorMotorSquad(
         hutch=HutchState.EH2, instrument_session=I19_2_COMMISSIONING_INSTR_SESSION
     )
 
 
-@device_factory()
+@devices.factory()
 def backlight() -> BacklightPosition:
     """Get the i19-2 backlight device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i19-2, it will return the existing object.
@@ -69,7 +71,7 @@ def backlight() -> BacklightPosition:
     return BacklightPosition(prefix=f"{PREFIX.beamline_prefix}-EA-IOC-12:")
 
 
-@device_factory()
+@devices.factory()
 def beamstop() -> BeamStop:
     """Get the i19-2 beamstop device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i19-2, it will return the existing object.
@@ -77,12 +79,12 @@ def beamstop() -> BeamStop:
     return BeamStop(prefix=f"{PREFIX.beamline_prefix}-OP-ABSB-02:")
 
 
-@device_factory()
+@devices.factory()
 def diffractometer() -> FourCircleDiffractometer:
     return FourCircleDiffractometer(prefix=PREFIX.beamline_prefix)
 
 
-@device_factory()
+@devices.factory()
 def eiger() -> EigerDetector:
     return EigerDetector(
         prefix=PREFIX.beamline_prefix,
@@ -92,7 +94,7 @@ def eiger() -> EigerDetector:
     )
 
 
-@device_factory()
+@devices.factory()
 def panda() -> HDFPanda:
     return HDFPanda(
         prefix=f"{PREFIX.beamline_prefix}-EA-PANDA-01:",
@@ -100,7 +102,7 @@ def panda() -> HDFPanda:
     )
 
 
-@device_factory()
+@devices.factory()
 def pinhole_and_collimator() -> PinholeCollimatorControl:
     """Get the i19-2 pinhole and collimator control device, instantiate it if it
     hasn't already been. If this is called when already instantiated in i19-2,
@@ -109,7 +111,7 @@ def pinhole_and_collimator() -> PinholeCollimatorControl:
     return PinholeCollimatorControl(prefix=PREFIX.beamline_prefix)
 
 
-@device_factory()
+@devices.factory()
 def shutter() -> AccessControlledShutter:
     """Get the i19-2 hutch shutter device, instantiate it if it hasn't already been.
     If this is called when already instantiated, it will return the existing object.
@@ -121,7 +123,7 @@ def shutter() -> AccessControlledShutter:
     )
 
 
-@device_factory()
+@devices.factory()
 def synchrotron() -> Synchrotron:
     """Get the i19-2 synchrotron device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i19-2, it will return the existing object.
@@ -129,7 +131,7 @@ def synchrotron() -> Synchrotron:
     return Synchrotron()
 
 
-@device_factory()
+@devices.factory()
 def zebra() -> Zebra:
     """Get the i19-2 zebra device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i19-2, it will return the existing object.
