@@ -8,6 +8,7 @@ from dodal.beamlines.i10_devices import (
     devices_idu,
     devices_mirror_i,
     devices_pa_stage,
+    devices_rasor_temperature_controller,
     devices_sample_stage,
     devices_scaler_cards,
     devices_shared_diagnostics,
@@ -16,7 +17,6 @@ from dodal.beamlines.i10_devices import (
     devices_slit_i,
     devices_sr570,
     devices_sr570_det,
-    devices_temperature_controller,
     pgm_device,
 )
 from dodal.device_manager import DeviceManager
@@ -62,7 +62,7 @@ devices.include(devices_diffractometer)
 devices.include(devices_pa_stage)
 devices.include(devices_sample_stage)
 """Temperature controller"""
-devices.include(devices_temperature_controller)
+devices.include(devices_rasor_temperature_controller)
 """ detectors """
 """Current amplifiers"""
 devices.include(devices_femto)
