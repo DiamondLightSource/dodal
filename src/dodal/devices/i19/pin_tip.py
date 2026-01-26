@@ -2,8 +2,15 @@ from ophyd_async.core import StandardReadable
 from ophyd_async.epics.core import epics_signal_rw
 
 
-class PinTipCentre(StandardReadable):
-    """"""
+class PinTipCentreHolder(StandardReadable):
+    """Temporary device to hold the pin tip x,y positions for centring.
+    It uses the CenterX and CenterY PVs in the overlay plugin for the OAV device to
+    save and read the pit tip location.
+
+    Signals:
+        pin_tip_i: x position of the pin tip, in pixels.
+        pin_tip_j: x position of the pin tip, in pixels.
+    """
 
     def __init__(
         self,
@@ -12,10 +19,10 @@ class PinTipCentre(StandardReadable):
         overlay_channel: int = 1,
     ):
         with self.add_children_as_readables():
-            self.beam_centre_i = epics_signal_rw(
+            self.pin_tip_i = epics_signal_rw(
                 int, prefix + f"OVER:{overlay_channel}:CenterX"
             )
-            self.beam_centre_j = epics_signal_rw(
+            self.pin_tip_j = epics_signal_rw(
                 int, prefix + f"OVER:{overlay_channel}:CenterY"
             )
         super().__init__(name)

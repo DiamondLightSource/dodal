@@ -13,7 +13,7 @@ from dodal.devices.i19.access_controlled.shutter import (
     HutchState,
 )
 from dodal.devices.i19.beamstop import BeamStop
-from dodal.devices.i19.pin_tip import PinTipCentre
+from dodal.devices.i19.pin_tip import PinTipCentreHolder
 from dodal.devices.oav.oav_detector import OAVBeamCentreFile
 from dodal.devices.oav.oav_parameters import OAVConfigBeamCentre
 from dodal.devices.oav.pin_image_recognition import PinTipDetection
@@ -64,6 +64,8 @@ def beamstop() -> BeamStop:
 
 @device_factory()
 def oav1() -> OAVBeamCentreFile:
+    """Get the i19-1 OAV1 device, instantiate it if it hasn't already been.
+    The OAV1 camera is placed next to the beampipe along with the Zoom lens."""
     return OAVBeamCentreFile(
         prefix=f"{PREFIX.beamline_prefix}-EA-OAV-01:",
         config=OAVConfigBeamCentre(ZOOM_PARAMS_FILE, DISPLAY_CONFIG),
@@ -72,6 +74,8 @@ def oav1() -> OAVBeamCentreFile:
 
 @device_factory()
 def oav2() -> OAVBeamCentreFile:
+    """Get the i19-1 OAV2 device, instantiate it if it hasn't already been.
+    The OAV2 camera is places diagonally to the sample and has no FZoom."""
     return OAVBeamCentreFile(
         prefix=f"{PREFIX.beamline_prefix}-EA-OAV-02:",
         config=OAVConfigBeamCentre(ZOOM_PARAMS_FILE, DISPLAY_CONFIG),
@@ -79,26 +83,30 @@ def oav2() -> OAVBeamCentreFile:
 
 
 @device_factory()
-def pin_tip_centre1() -> PinTipCentre:
-    return PinTipCentre(
+def pin_tip_centre1() -> PinTipCentreHolder:
+    """I19-1 temporary device to hold the pin tip centre position for OAV1."""
+    return PinTipCentreHolder(
         prefix=f"{PREFIX.beamline_prefix}-EA-OAV-01:",
     )
 
 
 @device_factory()
-def pin_tip_centre1v2() -> PinTipCentre:
-    return PinTipCentre(
+def pin_tip_centre2() -> PinTipCentreHolder:
+    """I19-1 temporary device to hold the pin tip centre position for OAV2."""
+    return PinTipCentreHolder(
         prefix=f"{PREFIX.beamline_prefix}-EA-OAV-02:",
     )
 
 
 @device_factory()
 def pin_tip_detection1() -> PinTipDetection:
+    """Pin tip detection device for OAV1 camera."""
     return PinTipDetection(f"{PREFIX.beamline_prefix}-EA-OAV-01:")
 
 
 @device_factory()
 def pin_tip_detection2() -> PinTipDetection:
+    """Pin tip detection device for OAV2 camera."""
     return PinTipDetection(f"{PREFIX.beamline_prefix}-EA-OAV-02:")
 
 
