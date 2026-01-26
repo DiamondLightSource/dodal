@@ -61,6 +61,7 @@
    dodal.devices.i24
    dodal.devices.insertion_device
    dodal.devices.ipin
+   dodal.devices.k07
    dodal.devices.linkam3
    dodal.devices.motors
    dodal.devices.mx_phase1

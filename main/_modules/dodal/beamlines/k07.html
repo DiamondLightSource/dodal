@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.beamlines.k07 &#8212; dodal 1.69.1.dev18+gc056dd470 documentation</title>
+    <title>dodal.beamlines.k07 &#8212; dodal 1.69.1.dev19+g0ce884c00 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=97ff3b4e"></script>
+    <script src="../../../_static/documentation_options.js?v=1953ab83"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -810,16 +810,38 @@ window.addEventListener("load", load);
                 <article class="bd-article">
                   
   <h1>Source code for dodal.beamlines.k07</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">StrictEnum</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.common.beamlines.beamline_utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">device_factory</span><span class="p">,</span>
-<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">daq_config_server.client</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConfigServer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">StrictEnum</span>
+
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.common.beamlines.beamline_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">set_beamline</span> <span class="k">as</span> <span class="n">set_utils_beamline</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.device_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeviceManager</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.insertion_device</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Apple2</span><span class="p">,</span>
+    <span class="n">Apple2EnforceLHMoveController</span><span class="p">,</span>
+    <span class="n">ConfigServerEnergyMotorLookup</span><span class="p">,</span>
+    <span class="n">InsertionDeviceEnergy</span><span class="p">,</span>
+    <span class="n">InsertionDevicePolarisation</span><span class="p">,</span>
+    <span class="n">LookupTableColumnConfig</span><span class="p">,</span>
+    <span class="n">UndulatorGap</span><span class="p">,</span>
+    <span class="n">UndulatorPhaseAxes</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.pgm</span><span class="w"> </span><span class="kn">import</span> <span class="n">PlaneGratingMonochromator</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.synchrotron</span><span class="w"> </span><span class="kn">import</span> <span class="n">Synchrotron</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.log</span><span class="w"> </span><span class="kn">import</span> <span class="n">set_beamline</span> <span class="k">as</span> <span class="n">set_log_beamline</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">BeamlinePrefix</span><span class="p">,</span> <span class="n">get_beamline_name</span>
+
+<span class="n">devices</span> <span class="o">=</span> <span class="n">DeviceManager</span><span class="p">()</span>
+
+
+<span class="n">K07_CONF_CLIENT</span> <span class="o">=</span> <span class="n">ConfigServer</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s2">&quot;https://daq-config.diamond.ac.uk&quot;</span><span class="p">)</span>
+
+<span class="n">LOOK_UPTABLE_DIR</span> <span class="o">=</span> <span class="s2">&quot;/dls_sw/k07/software/gda/workspace_git/gda-diamond.git/configurations/k07/lookupTables/&quot;</span>
+<span class="n">GAP_LOOKUP_FILE_NAME</span> <span class="o">=</span> <span class="s2">&quot;JIDEnergy2GapCalibrations.csv&quot;</span>
+<span class="n">PHASE_LOOKUP_FILE_NAME</span> <span class="o">=</span> <span class="s2">&quot;JIDEnergy2PhaseCalibrations.csv&quot;</span>
+<span class="n">K07_GRATING_COLUMNS</span> <span class="o">=</span> <span class="s2">&quot;Grating&quot;</span>
+<span class="n">K07_PHASE_POLY_DEG_COLUMNS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;0th-order&quot;</span><span class="p">]</span>
 
 <span class="n">BL</span> <span class="o">=</span> <span class="n">get_beamline_name</span><span class="p">(</span><span class="s2">&quot;k07&quot;</span><span class="p">)</span>
 <span class="n">PREFIX</span> <span class="o">=</span> <span class="n">BeamlinePrefix</span><span class="p">(</span><span class="n">BL</span><span class="p">)</span>
@@ -827,7 +849,7 @@ window.addEventListener("load", load);
 <span class="n">set_utils_beamline</span><span class="p">(</span><span class="n">BL</span><span class="p">)</span>
 
 
-<span class="nd">@device_factory</span><span class="p">()</span>
+<span class="nd">@devices</span><span class="o">.</span><span class="n">factory</span><span class="p">()</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">synchrotron</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Synchrotron</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">Synchrotron</span><span class="p">()</span>
 
@@ -841,12 +863,84 @@ window.addEventListener("load", load);
 
 
 <span class="c1"># Grating does not exist yet - this class is a placeholder for when it does</span>
-<span class="nd">@device_factory</span><span class="p">(</span><span class="n">skip</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="nd">@devices</span><span class="o">.</span><span class="n">factory</span><span class="p">(</span><span class="n">skip</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">pgm</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">PlaneGratingMonochromator</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">PlaneGratingMonochromator</span><span class="p">(</span>
         <span class="n">prefix</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">PREFIX</span><span class="o">.</span><span class="n">beamline_prefix</span><span class="si">}</span><span class="s2">-OP-PGM-01:&quot;</span><span class="p">,</span>
         <span class="n">grating</span><span class="o">=</span><span class="n">Grating</span><span class="p">,</span>
     <span class="p">)</span>
+
+
+<span class="c1"># Insertion device does not exist yet - these classes are placeholders at the moment.</span>
+<span class="nd">@devices</span><span class="o">.</span><span class="n">factory</span><span class="p">(</span><span class="n">skip</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">id_gap</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">UndulatorGap</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">UndulatorGap</span><span class="p">(</span>
+        <span class="n">prefix</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">PREFIX</span><span class="o">.</span><span class="n">insertion_prefix</span><span class="si">}</span><span class="s2">-MO-SERVC-01:&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+
+<span class="c1"># Insertion device does not exist yet - these classes are placeholders at the moment.</span>
+<span class="nd">@devices</span><span class="o">.</span><span class="n">factory</span><span class="p">(</span><span class="n">skip</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">id_phase</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">UndulatorPhaseAxes</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">UndulatorPhaseAxes</span><span class="p">(</span>
+        <span class="n">prefix</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">PREFIX</span><span class="o">.</span><span class="n">insertion_prefix</span><span class="si">}</span><span class="s2">-MO-SERVC-01:&quot;</span><span class="p">,</span>
+        <span class="n">top_outer</span><span class="o">=</span><span class="s2">&quot;RPQ1&quot;</span><span class="p">,</span>
+        <span class="n">top_inner</span><span class="o">=</span><span class="s2">&quot;RPQ2&quot;</span><span class="p">,</span>
+        <span class="n">btm_inner</span><span class="o">=</span><span class="s2">&quot;RPQ3&quot;</span><span class="p">,</span>
+        <span class="n">btm_outer</span><span class="o">=</span><span class="s2">&quot;RPQ4&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+
+<span class="c1"># Insertion device does not exist yet - these classes are placeholders at the moment.</span>
+<span class="nd">@devices</span><span class="o">.</span><span class="n">factory</span><span class="p">(</span><span class="n">skip</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">id</span><span class="p">(</span>
+    <span class="n">id_gap</span><span class="p">:</span> <span class="n">UndulatorGap</span><span class="p">,</span> <span class="n">id_phase</span><span class="p">:</span> <span class="n">UndulatorPhaseAxes</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Apple2</span><span class="p">[</span><span class="n">UndulatorPhaseAxes</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;K07 insertion device.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">Apple2</span><span class="p">[</span><span class="n">UndulatorPhaseAxes</span><span class="p">](</span>
+        <span class="n">id_gap</span><span class="o">=</span><span class="n">id_gap</span><span class="p">,</span>
+        <span class="n">id_phase</span><span class="o">=</span><span class="n">id_phase</span><span class="p">,</span>
+    <span class="p">)</span>
+
+
+<span class="c1"># Insertion device does not exist yet - temporary use Apple2EnforceLHMoveController</span>
+<span class="nd">@devices</span><span class="o">.</span><span class="n">factory</span><span class="p">(</span><span class="n">skip</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">id_controller</span><span class="p">(</span>
+    <span class="nb">id</span><span class="p">:</span> <span class="n">Apple2</span><span class="p">[</span><span class="n">UndulatorPhaseAxes</span><span class="p">],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Apple2EnforceLHMoveController</span><span class="p">[</span><span class="n">UndulatorPhaseAxes</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;i21 insertion device controller.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">Apple2EnforceLHMoveController</span><span class="p">[</span><span class="n">UndulatorPhaseAxes</span><span class="p">](</span>
+        <span class="n">apple2</span><span class="o">=</span><span class="nb">id</span><span class="p">,</span>
+        <span class="n">gap_energy_motor_lut</span><span class="o">=</span><span class="n">ConfigServerEnergyMotorLookup</span><span class="p">(</span>
+            <span class="n">lut_config</span><span class="o">=</span><span class="n">LookupTableColumnConfig</span><span class="p">(</span><span class="n">grating</span><span class="o">=</span><span class="n">K07_GRATING_COLUMNS</span><span class="p">),</span>
+            <span class="n">config_client</span><span class="o">=</span><span class="n">K07_CONF_CLIENT</span><span class="p">,</span>
+            <span class="n">path</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="n">LOOK_UPTABLE_DIR</span><span class="p">,</span> <span class="n">GAP_LOOKUP_FILE_NAME</span><span class="p">),</span>
+        <span class="p">),</span>
+        <span class="n">phase_energy_motor_lut</span><span class="o">=</span><span class="n">ConfigServerEnergyMotorLookup</span><span class="p">(</span>
+            <span class="n">lut_config</span><span class="o">=</span><span class="n">LookupTableColumnConfig</span><span class="p">(</span>
+                <span class="n">grating</span><span class="o">=</span><span class="n">K07_GRATING_COLUMNS</span><span class="p">,</span> <span class="n">poly_deg</span><span class="o">=</span><span class="n">K07_PHASE_POLY_DEG_COLUMNS</span>
+            <span class="p">),</span>
+            <span class="n">config_client</span><span class="o">=</span><span class="n">K07_CONF_CLIENT</span><span class="p">,</span>
+            <span class="n">path</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="n">LOOK_UPTABLE_DIR</span><span class="p">,</span> <span class="n">GAP_LOOKUP_FILE_NAME</span><span class="p">),</span>
+        <span class="p">),</span>
+        <span class="n">units</span><span class="o">=</span><span class="s2">&quot;eV&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+
+<span class="c1"># Insertion device does not exist yet - these classes are placeholders at the moment.</span>
+<span class="nd">@devices</span><span class="o">.</span><span class="n">factory</span><span class="p">(</span><span class="n">skip</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">id_energy</span><span class="p">(</span>
+    <span class="n">id_controller</span><span class="p">:</span> <span class="n">Apple2EnforceLHMoveController</span><span class="p">[</span><span class="n">UndulatorPhaseAxes</span><span class="p">],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">InsertionDeviceEnergy</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">InsertionDeviceEnergy</span><span class="p">(</span><span class="n">id_controller</span><span class="p">)</span>
+
+
+<span class="c1"># Insertion device does not exist yet - these classes are placeholders at the moment.</span>
+<span class="nd">@devices</span><span class="o">.</span><span class="n">factory</span><span class="p">(</span><span class="n">skip</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">id_polarisation</span><span class="p">(</span>
+    <span class="n">id_controller</span><span class="p">:</span> <span class="n">Apple2EnforceLHMoveController</span><span class="p">[</span><span class="n">UndulatorPhaseAxes</span><span class="p">],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">InsertionDevicePolarisation</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">InsertionDevicePolarisation</span><span class="p">(</span><span class="n">id_controller</span><span class="p">)</span>
 </pre></div>
 
                 </article>
