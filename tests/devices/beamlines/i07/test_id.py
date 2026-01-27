@@ -7,12 +7,18 @@ from tests.devices.beamlines.i07 import TEST_LOOKUP_TABLE_PATH
 
 
 @pytest.fixture
-async def id() -> InsertionDevice:
+def harmonic() -> UndulatorOrder:
+    with init_devices(mock=True):
+        harmonic = UndulatorOrder()
+    return harmonic
+
+
+@pytest.fixture
+async def id(harmonic: UndulatorOrder) -> InsertionDevice:
     async with init_devices(mock=True):
         id = InsertionDevice(
             "ID-01",
-            "ID-01",
-            UndulatorOrder("harmonic"),
+            harmonic,
             TEST_LOOKUP_TABLE_PATH,
         )
     return id
@@ -24,5 +30,5 @@ async def id() -> InsertionDevice:
 )
 async def test_id_gap_calculation(energy_kev: float, gap: float, id: InsertionDevice):
     id.harmonic.set(5)
-    interpolated_gap: float = await id._get_gap_to_match_energy(energy_kev)
+    interpolated_gap = await id._get_gap_to_match_energy(energy_kev)
     assert interpolated_gap == pytest.approx(gap, abs=0.01)

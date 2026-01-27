@@ -13,8 +13,10 @@ from dodal.devices.beamlines.i19.access_controlled.shutter import (
     HutchState,
 )
 from dodal.devices.beamlines.i19.beamstop import BeamStop
+from dodal.devices.beamlines.i19.pin_tip import PinTipCentreHolder
 from dodal.devices.oav.oav_detector import OAVBeamCentreFile
 from dodal.devices.oav.oav_parameters import OAVConfigBeamCentre
+from dodal.devices.oav.pin_image_recognition import PinTipDetection
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.zebra.zebra import Zebra
 from dodal.devices.zebra.zebra_constants_mapping import (
@@ -39,10 +41,8 @@ I19_1_ZEBRA_MAPPING = ZebraMapping(
     sources=ZebraSources(),
 )
 
-ZOOM_PARAMS_FILE = (
-    "/dls_sw/i19-1/software/gda_versions/gda/config/xml/jCameraManZoomLevels.xml"
-)
-DISPLAY_CONFIG = "/dls_sw/i19-1/software/daq_configuration/domain/display.configuration"
+ZOOM_PARAMS_FILE = "/dls_sw/i19-1/software/bluesky/jCameraManZoomLevels.xml"
+DISPLAY_CONFIG = "/dls_sw/i19-1/software/bluesky/display.configuration"
 
 
 @device_factory()
@@ -63,11 +63,51 @@ def beamstop() -> BeamStop:
 
 
 @device_factory()
-def oav() -> OAVBeamCentreFile:
+def oav1() -> OAVBeamCentreFile:
+    """Get the i19-1 OAV1 device, instantiate it if it hasn't already been.
+    The OAV1 camera is placed next to the beampipe along with the Zoom lens."""
     return OAVBeamCentreFile(
         prefix=f"{PREFIX.beamline_prefix}-EA-OAV-01:",
         config=OAVConfigBeamCentre(ZOOM_PARAMS_FILE, DISPLAY_CONFIG),
     )
+
+
+@device_factory()
+def oav2() -> OAVBeamCentreFile:
+    """Get the i19-1 OAV2 device, instantiate it if it hasn't already been.
+    The OAV2 camera is places diagonally to the sample and has no FZoom."""
+    return OAVBeamCentreFile(
+        prefix=f"{PREFIX.beamline_prefix}-EA-OAV-02:",
+        config=OAVConfigBeamCentre(ZOOM_PARAMS_FILE, DISPLAY_CONFIG),
+    )
+
+
+@device_factory()
+def pin_tip_centre1() -> PinTipCentreHolder:
+    """I19-1 temporary device to hold the pin tip centre position for OAV1."""
+    return PinTipCentreHolder(
+        prefix=f"{PREFIX.beamline_prefix}-EA-OAV-01:",
+    )
+
+
+@device_factory()
+def pin_tip_centre2() -> PinTipCentreHolder:
+    """I19-1 temporary device to hold the pin tip centre position for OAV2."""
+    return PinTipCentreHolder(
+        prefix=f"{PREFIX.beamline_prefix}-EA-OAV-02:",
+    )
+
+
+@device_factory()
+def pin_tip_detection1() -> PinTipDetection:
+    """Pin tip detection device for OAV1 camera."""
+    return PinTipDetection(f"{PREFIX.beamline_prefix}-EA-OAV-01:")
+
+
+@device_factory()
+def pin_tip_detection2() -> PinTipDetection:
+    """Pin tip detection device for OAV2 camera."""
+    return PinTipDetection(f"{PREFIX.beamline_prefix}-EA-OAV-02:")
 
 
 @device_factory()
