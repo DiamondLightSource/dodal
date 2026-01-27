@@ -20,6 +20,12 @@ dodal.beamlines.i19\_1
 
    
    
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      oav_config
+   
    
 
    
