@@ -3,6 +3,7 @@ from typing import Any
 import pytest
 from ophyd_async.core import init_devices
 
+from dodal.devices.beamlines.i09 import Grating
 from dodal.devices.common_dcm import (
     DoubleCrystalMonochromatorWithDSpacing,
     PitchAndRollCrystal,
@@ -26,7 +27,6 @@ from dodal.devices.electron_analyser.vgscienta import (
     VGScientaAnalyserDriverIO,
     VGScientaSequence,
 )
-from dodal.devices.i09 import Grating
 from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.devices.selectable_source import SourceSelector
 from tests.devices.electron_analyser.helper_util import get_test_sequence

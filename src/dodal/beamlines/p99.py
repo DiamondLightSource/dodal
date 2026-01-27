@@ -16,9 +16,9 @@ from dodal.common.visit import (
 from dodal.device_manager import DeviceManager
 from dodal.devices.attenuator.filter import FilterMotor
 from dodal.devices.attenuator.filter_selections import P99FilterSelections
+from dodal.devices.beamlines.p99.andor2_point import Andor2Point
+from dodal.devices.beamlines.p99.sample_stage import SampleAngleStage
 from dodal.devices.motors import XYZStage
-from dodal.devices.p99.andor2_point import Andor2Point
-from dodal.devices.p99.sample_stage import SampleAngleStage
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 

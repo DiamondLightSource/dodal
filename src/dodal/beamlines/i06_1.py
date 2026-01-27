@@ -11,6 +11,7 @@ BL = get_beamline_name("i06_1")
 PREFIX = BeamlinePrefix(BL, suffix="J")
 set_log_beamline(BL)
 set_utils_beamline(BL)
+
 devices = DeviceManager()
 devices.include(i06_shared_devices)
 

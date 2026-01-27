@@ -12,15 +12,17 @@ from dodal.common.beamlines.beamline_utils import (
     set_beamline as set_utils_beamline,
 )
 from dodal.common.visit import StaticVisitPathProvider
-from dodal.devices.i19.access_controlled.attenuator_motor_squad import (
+from dodal.devices.beamlines.i19.access_controlled.attenuator_motor_squad import (
     AttenuatorMotorSquad,
 )
-from dodal.devices.i19.access_controlled.blueapi_device import HutchState
-from dodal.devices.i19.access_controlled.shutter import AccessControlledShutter
-from dodal.devices.i19.backlight import BacklightPosition
-from dodal.devices.i19.beamstop import BeamStop
-from dodal.devices.i19.diffractometer import FourCircleDiffractometer
-from dodal.devices.i19.pin_col_stages import PinholeCollimatorControl
+from dodal.devices.beamlines.i19.access_controlled.blueapi_device import HutchState
+from dodal.devices.beamlines.i19.access_controlled.shutter import (
+    AccessControlledShutter,
+)
+from dodal.devices.beamlines.i19.backlight import BacklightPosition
+from dodal.devices.beamlines.i19.beamstop import BeamStop
+from dodal.devices.beamlines.i19.diffractometer import FourCircleDiffractometer
+from dodal.devices.beamlines.i19.pin_col_stages import PinholeCollimatorControl
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.zebra.zebra import Zebra
 from dodal.devices.zebra.zebra_constants_mapping import (

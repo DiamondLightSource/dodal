@@ -9,22 +9,22 @@ from dodal.common.beamlines.beamline_utils import (
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.beamlines.device_helpers import DET_SUFFIX
+from dodal.devices.beamlines.i11.cyberstar_blower import (
+    AutotunedCyberstarBlower,
+    CyberstarBlower,
+)
+from dodal.devices.beamlines.i11.diff_stages import (
+    DiffractometerBase,
+    DiffractometerStage,
+)
+from dodal.devices.beamlines.i11.mythen import Mythen3
+from dodal.devices.beamlines.i11.nx100robot import NX100Robot
+from dodal.devices.beamlines.i11.spinner import Spinner
 from dodal.devices.cryostream import OxfordCryoStream
 from dodal.devices.eurotherm import (
     EurothermGeneral,
     UpdatingEurothermGeneral,
 )
-from dodal.devices.i11.cyberstar_blower import (
-    AutotunedCyberstarBlower,
-    CyberstarBlower,
-)
-from dodal.devices.i11.diff_stages import (
-    DiffractometerBase,
-    DiffractometerStage,
-)
-from dodal.devices.i11.mythen import Mythen3
-from dodal.devices.i11.nx100robot import NX100Robot
-from dodal.devices.i11.spinner import Spinner
 from dodal.devices.slits import Slits
 from dodal.devices.synchrotron import Synchrotron
 from dodal.log import set_beamline as set_log_beamline
