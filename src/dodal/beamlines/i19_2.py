@@ -65,17 +65,11 @@ def attenuator_motor_squad() -> AttenuatorMotorSquad:
 
 @devices.factory()
 def backlight() -> BacklightPosition:
-    """Get the i19-2 backlight device, instantiate it if it hasn't already been.
-    If this is called when already instantiated in i19-2, it will return the existing object.
-    """
     return BacklightPosition(prefix=f"{PREFIX.beamline_prefix}-EA-IOC-12:")
 
 
 @devices.factory()
 def beamstop() -> BeamStop:
-    """Get the i19-2 beamstop device, instantiate it if it hasn't already been.
-    If this is called when already instantiated in i19-2, it will return the existing object.
-    """
     return BeamStop(prefix=f"{PREFIX.beamline_prefix}-OP-ABSB-02:")
 
 
@@ -104,18 +98,12 @@ def panda() -> HDFPanda:
 
 @devices.factory()
 def pinhole_and_collimator() -> PinholeCollimatorControl:
-    """Get the i19-2 pinhole and collimator control device, instantiate it if it
-    hasn't already been. If this is called when already instantiated in i19-2,
-    it will return the existing object.
-    """
     return PinholeCollimatorControl(prefix=PREFIX.beamline_prefix)
 
 
 @devices.factory()
 def shutter() -> AccessControlledShutter:
-    """Get the i19-2 hutch shutter device, instantiate it if it hasn't already been.
-    If this is called when already instantiated, it will return the existing object.
-    """
+    """Access controlled wrapper for the experiment shutter."""
     return AccessControlledShutter(
         prefix=f"{PREFIX.beamline_prefix}-PS-SHTR-01:",
         hutch=HutchState.EH2,
@@ -125,17 +113,11 @@ def shutter() -> AccessControlledShutter:
 
 @devices.factory()
 def synchrotron() -> Synchrotron:
-    """Get the i19-2 synchrotron device, instantiate it if it hasn't already been.
-    If this is called when already instantiated in i19-2, it will return the existing object.
-    """
     return Synchrotron()
 
 
 @devices.factory()
 def zebra() -> Zebra:
-    """Get the i19-2 zebra device, instantiate it if it hasn't already been.
-    If this is called when already instantiated in i19-2, it will return the existing object.
-    """
     return Zebra(
         mapping=I19_2_ZEBRA_MAPPING,
         prefix=f"{PREFIX.beamline_prefix}-EA-ZEBRA-03:",

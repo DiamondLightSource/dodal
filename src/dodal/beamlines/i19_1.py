@@ -52,13 +52,8 @@ def attenuator_motor_squad() -> AttenuatorMotorSquad:
     )
 
 
-# Needs to wait until enum is fixed on the beamline
-# See https://github.com/DiamondLightSource/dodal/issues/1150
 @devices.factory()
 def beamstop() -> BeamStop:
-    """Get the i19-1 beamstop device, instantiate it if it hasn't already been.
-    If this is called when already instantiated in i19-1, it will return the existing object.
-    """
     return BeamStop(prefix=f"{PREFIX.beamline_prefix}-RS-ABSB-01:")
 
 
@@ -69,8 +64,7 @@ def oav_config() -> OAVConfigBeamCentre:
 
 @devices.factory()
 def oav1() -> OAVBeamCentreFile:
-    """Get the i19-1 OAV1 device, instantiate it if it hasn't already been.
-    The OAV1 camera is placed next to the beampipe along with the Zoom lens."""
+    """The OAV1 camera, placed next to the beampipe along with the Zoom lens."""
     return OAVBeamCentreFile(
         prefix=f"{PREFIX.beamline_prefix}-EA-OAV-01:",
         config=oav_config(),
@@ -79,8 +73,7 @@ def oav1() -> OAVBeamCentreFile:
 
 @devices.factory()
 def oav2() -> OAVBeamCentreFile:
-    """Get the i19-1 OAV2 device, instantiate it if it hasn't already been.
-    The OAV2 camera is places diagonally to the sample and has no FZoom."""
+    """The OAV2 camera, placed diagonally to the sample. It has no FZoom."""
     return OAVBeamCentreFile(
         prefix=f"{PREFIX.beamline_prefix}-EA-OAV-02:",
         config=oav_config(),
@@ -117,9 +110,7 @@ def pin_tip_detection2() -> PinTipDetection:
 
 @devices.factory()
 def shutter() -> AccessControlledShutter:
-    """Get the i19-1 hutch shutter device, instantiate it if it hasn't already been.
-    If this is called when already instantiated, it will return the existing object.
-    """
+    """Access controlled wrapper for the experiment shutter."""
     return AccessControlledShutter(
         prefix=f"{PREFIX.beamline_prefix}-PS-SHTR-01:",
         hutch=HutchState.EH1,
@@ -129,9 +120,6 @@ def shutter() -> AccessControlledShutter:
 
 @devices.factory()
 def synchrotron() -> Synchrotron:
-    """Get the i19-1 synchrotron device, instantiate it if it hasn't already been.
-    If this is called when already instantiated in i19-1, it will return the existing object.
-    """
     return Synchrotron()
 
 
@@ -139,9 +127,6 @@ def synchrotron() -> Synchrotron:
 # on the beamline, it is currently not in use
 @devices.factory()
 def zebra() -> Zebra:
-    """Get the i19-1 zebra device, instantiate it if it hasn't already been.
-    If this is called when already instantiated in i19-1, it will return the existing object.
-    """
     return Zebra(
         mapping=I19_1_ZEBRA_MAPPING,
         prefix=f"{PREFIX.beamline_prefix}-EA-ZEBRA-02:",

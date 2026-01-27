@@ -20,17 +20,13 @@ devices = DeviceManager()
 
 @devices.factory()
 def shutter() -> HutchShutter:
-    """Get the i19 hutch shutter device, instantiate it if it hasn't already been.
-    If this is called when already instantiated, it will return the existing object.
-    """
+    """Real experiment shutter device for I19"""
     return HutchShutter(f"{PREFIX.beamline_prefix}-PS-SHTR-01:")
 
 
 @devices.factory()
 def access_control() -> HutchAccessControl:
-    """Get a device that checks the active hutch for i19, instantiate it if it hasn't already been.
-    If this is called when already instantiated, it will return the existing object.
-    """
+    """Device to check which hutch is the active hutch on i19."""
     return HutchAccessControl(
         f"{PREFIX.beamline_prefix}-OP-STAT-01:", ACCESS_DEVICE_NAME
     )
