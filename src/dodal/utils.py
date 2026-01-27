@@ -153,30 +153,30 @@ class DeviceInitializationController(Generic[T]):
 
         Args:
             connect_immediately (bool, default False): whether to call connect on the
-              device before returning it- connect is idempotent for ophyd-async devices.
-              Not connecting to the device allows for the instance to be created prior
-              to the RunEngine event loop being configured or for connect to be called
-              lazily e.g. by the `ensure_connected` stub.
+                device before returning it- connect is idempotent for ophyd-async
+                devices. Not connecting to the device allows for the instance to be
+                created prior to the RunEngine event loop being configured or for
+                connect to be called lazily e.g. by the `ensure_connected` stub.
             name (str | None, optional): an override name to give the device, which is
-              also used to name its children. Defaults to None, which does not name the
-              device unless the device has no name and this Controller is configured to
-              use_factory_name, which propagates the name of the wrapped factory
-              function to the device instance.
+                also used to name its children. Defaults to None, which does not name
+                the device unless the device has no name and this Controller is
+                configured to use_factory_name, which propagates the name of the wrapped
+                factory function to the device instance.
             connection_timeout (float | None, optional): an override timeout length in
-              seconds for the connect method, if it is called. Defaults to None, which
-              defers to the timeout configured for this Controller: the default uses
-              ophyd_async's DEFAULT_TIMEOUT.
+                seconds for the connect method, if it is called. Defaults to None, which
+                defers to the timeout configured for this Controller: the default uses
+                ophyd_async's DEFAULT_TIMEOUT.
             mock (bool | None, optional): overrides whether to connect to Mock signal
-              backends, if connect is called. Defaults to None, which uses the mock
-              parameter of this Controller. This value must be used consistently when
-              connect is called on the Device.
+                backends, if connect is called. Defaults to None, which uses the mock
+                parameter of this Controller. This value must be used consistently when
+                connect is called on the Device.
 
         Returns:
             T: a singleton instance of the Device class returned by the wrapped factory.
 
         Raises:
-            RuntimeError:   If the device factory was invoked again with different
-             keyword arguments, without previously invoking cache_clear()
+            RuntimeError: If the device factory was invoked again with different
+                keyword arguments, without previously invoking cache_clear()
         """
         is_v2_device = is_v2_device_factory(self._factory)
         is_mock = mock if mock is not None else self._mock
@@ -240,8 +240,8 @@ def make_device(
 def make_all_devices(
     module: str | ModuleType | None = None, include_skipped: bool = False, **kwargs
 ) -> tuple[dict[str, AnyDevice], dict[str, Exception]]:
-    """Makes all devices in the given beamline module, for those modules using device factories
-    as opposed to the DeviceManager.
+    """Makes all devices in the given beamline module, for those modules using device
+    factories as opposed to the DeviceManager.
 
     In cases of device interdependencies it ensures a device is created before any which
     depend on it.
@@ -251,10 +251,10 @@ def make_all_devices(
         **kwargs: Arguments passed on to every device.
 
     Returns:
-        Tuple[Dict[str, AnyDevice], Dict[str, Exception]]: This represents a tuple containing two dictionaries:
-
-    A dictionary where the keys are device names and the values are devices.
-    A dictionary where the keys are device names and the values are exceptions.
+        Tuple[Dict[str, AnyDevice], Dict[str, Exception]]: This represents a tuple
+            containing two dictionaries:
+                -A dictionary where the keys are device names and the values are devices.
+                -A dictionary where the keys are device names and the values are exceptions.
     """
     if isinstance(module, str) or module is None:
         module = import_module(module or __name__)
@@ -281,9 +281,9 @@ def invoke_factories(
         factories: Mapping of function name -> function
 
     Returns:
-        Tuple[Dict[str, AnyDevice], Dict[str, Exception]]: Tuple of two dictionaries.
-        One mapping device name to device, one mapping device name to exception for
-        any failed devices
+        Tuple[Dict[str, AnyDevice], Dict[str, Exception]]: Tuple of two dictionaries:
+            - One mapping device name to device
+            - One mapping device name to exception for any failed devices
     """
 
     devices: dict[str, AnyDevice] = {}
@@ -350,7 +350,7 @@ def extract_dependencies(
     Args:
         factories: All factories, mapping of function name -> function
         factory_name: The name of the factory in factories whose dependencies need
-        computing
+            computing
 
     Returns:
         Iterable[str]: Generator of factory names
@@ -373,7 +373,7 @@ def collect_factories(
     Args:
         module: The module to inspect
         include_skipped: If True, also load factories with the @skip_device annotation.
-        Defaults to False.
+            Defaults to False.
 
     Returns:
         dict[str, AnyDeviceFactory]: Mapping of factory name -> factory.
@@ -458,7 +458,7 @@ def filter_ophyd_devices(
 
     Returns:
         Tuple of two dictionaries, one mapping names to ophyd devices and one mapping
-        names to ophyd-async devices.
+            names to ophyd-async devices.
     """
 
     ophyd_devices = {}

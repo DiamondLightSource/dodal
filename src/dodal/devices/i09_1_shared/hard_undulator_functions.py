@@ -80,9 +80,12 @@ def calculate_gap_i09_hu(
 
     Args:
         photon_energy_kev (float): Requested photon energy in keV.
-        look_up_table (dict[int, np.ndarray]): Lookup table containing undulator and beamline parameters for each harmonic order.
-        order (int, optional): Harmonic order for which to calculate the gap. Defaults to 1.
-        gap_offset (float, optional): Additional gap offset to apply (in mm). Defaults to 0.0.
+        look_up_table (dict[int, np.ndarray]): Lookup table containing undulator and
+            beamline parameters for each harmonic order.
+        order (int, optional): Harmonic order for which to calculate the gap. Defaults
+            to 1.
+        gap_offset (float, optional): Additional gap offset to apply (in mm). Defaults
+            to 0.0.
         undulator_period_mm (int, optional): Undulator period in mm. Defaults to 27.
 
     Returns:
@@ -147,9 +150,12 @@ def calculate_energy_i09_hu(
 
     Args:
         gap (float): Undulator gap in millimeters.
-        look_up_table (dict[int, np.ndarray]): Lookup table containing undulator and beamline parameters for each harmonic order.
-        order (int, optional): Harmonic order for which to calculate the energy. Defaults to 1.
-        gap_offset (float, optional): Additional gap offset to apply (in mm). Defaults to 0.0.
+        look_up_table (dict[int, np.ndarray]): Lookup table containing undulator and
+            beamline parameters for each harmonic order.
+        order (int, optional): Harmonic order for which to calculate the energy.
+            Defaults to 1.
+        gap_offset (float, optional): Additional gap offset to apply (in mm). Defaults
+            to 0.0.
         undulator_period_mm (int, optional): Undulator period in mm. Defaults to 27.
 
     Returns:

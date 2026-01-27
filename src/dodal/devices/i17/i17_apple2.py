@@ -31,18 +31,14 @@ class I17Apple2Controller(Apple2Controller[Apple2[UndulatorPhaseAxes]]):
         name: str = "",
     ) -> None:
         """
-        Parameters:
-        -----------
-        apple2 : Apple2
-            An Apple2 device.
-        gap_energy_motor_lut: EnergyMotorLookup
-            The class that handles the gap look up table logic for the insertion device.
-        phase_energy_motor_lut: EnergyMotorLookup
-            The class that handles the phase look up table logic for the insertion device.
-        units:
-            the units of this device. Defaults to eV.
-        name : str, optional
-            New device name.
+        Args:
+            apple2 (Apple2): An Apple2 device.
+            gap_energy_motor_lut (EnergyMotorLookup): The class that handles the gap
+                look up table logic for the insertion device.
+            phase_energy_motor_lut (EnergyMotorLookup): The class that handles the phase
+                look up table logic for the insertion device.
+            units: the units of this device. Defaults to eV.
+            name (str, optional): New device name.
         """
         self.gap_energy_motor_lut = gap_energy_motor_lut
         self.phase_energy_motor_lut = phase_energy_motor_lut

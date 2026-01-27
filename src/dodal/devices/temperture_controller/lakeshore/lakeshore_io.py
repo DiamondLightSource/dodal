@@ -18,16 +18,12 @@ class LakeshoreControlChannel(Device):
         name: str = "",
     ):
         """Initialize the LakeshoreControlChannel device.
-        Parameters
-        ----------
-            prefix: str
-                The EPICS prefix for the Lakeshore device.
-            suffix: str
-                Suffix for the channel, used to differentiate multiple channels.
-            heater_type: SignalDatatypeT
-                Type of the heater output range.
-            name: str
-                Optional name for the device.
+
+        Args:
+            prefix (str): The EPICS prefix for the Lakeshore device.
+            suffix (str): Suffix for the channel, used to differentiate multiple channels.
+            heater_type (SignalDatatypeT): Type of the heater output range.
+            name (str): Optional name for the device.
         """
 
         def channel_rw(channel_type, pv_name):
@@ -53,8 +49,9 @@ class LakeshoreControlChannel(Device):
 class LakeshoreBaseIO(Device):
     """Base class for Lakeshore temperature controller IO.
 
-    Provides access to control channels and readback channels for setpoint, ramp rate, heater output,
-    and PID parameters. Supports both single and multiple control channel configurations.
+    Provides access to control channels and readback channels for setpoint, ramp rate,
+    heater output, and PID parameters. Supports both single and multiple control channel
+    configurations.
     Note:
         Almost all models have a controller for each readback channel but some models
             only has a single controller for multiple readback channels.
@@ -70,18 +67,13 @@ class LakeshoreBaseIO(Device):
     ):
         """Initialize the LakeshoreBaseIO device.
 
-        Parameters
-        -----------
-            prefix: str
-                The EPICS prefix for the Lakeshore device.
-            num_readback_channel: int
-                Number of readback channels to create.
-            heater_setting: SignalDatatypeT
-                Type of the heater setting.
-            name: str
-                Optional name for the device.
-            single_control_channel: bool
-                If True, use a single control channel for all readback.
+        Args:
+            prefix (str): The EPICS prefix for the Lakeshore device.
+            num_readback_channel (int): Number of readback channels to create.
+            heater_setting (SignalDatatypeT): Type of the heater setting.
+            name (str): Optional name for the device.
+            single_control_channel (bool): If True, use a single control channel for
+                all readback.
         """
 
         suffixes = (

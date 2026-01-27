@@ -116,6 +116,7 @@ class SR570(CurrentAmp):
     SR570 current amplifier device. This is similar to Femto with the only different
      is SR570 has two gain setting fine and coarse, therefore it requires extra
      gain tables.
+
     Attributes:
         fine_gain (SignalRW): This is the epic signal that control SR570 fine gain.
         coarse_gain (SignalRW): This is the epic signal that control SR570 coarse gain.
@@ -129,7 +130,6 @@ class SR570(CurrentAmp):
             setting in gain_conversion_table.
         upperlimit (float): upperlimit of the current amplifier
         lowerlimit (float): lowerlimit of the current amplifier
-
     """
 
     def __init__(

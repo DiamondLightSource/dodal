@@ -170,7 +170,6 @@ class PressureTransducer(StandardReadable):
     This is the chamber and there are three of them.
     1 is the start, 3 is where the sample is.
     NOTE: the distinction between the adc prefix and the cell prefix is kept here.
-
     """
 
     def __init__(
@@ -295,8 +294,10 @@ class BusyMock(DeviceMock["PressureJumpCell"]):
 class PressureJumpCell(StandardReadable):
     """
     High pressure X-ray cell, used to apply pressure or pressure jumps to a sample.
-    prefix: str
-        The prefix of beamline - SPECIAL - unusual that the cell prefix is computed separately
+
+    Args:
+        prefix (str): The prefix of beamline - SPECIAL - unusual that the cell prefix is
+            computed separately
     """
 
     def __init__(

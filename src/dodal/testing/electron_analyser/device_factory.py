@@ -21,7 +21,7 @@ def create_driver(
 
     Args:
         driver_class: The class for the driver which must include the enums in the
-                      subscript, for example MyDriverClass[MyLensMode, ...]
+            subscript, for example MyDriverClass[MyLensMode, ...]
         kwargs: Additional key worded arguments that the driver needs for initalisation.
     """
     parameters = {
@@ -45,9 +45,9 @@ def create_detector(
 
     Args:
         detector_class: The class for the detector which must include the enums in the
-                        subscript, for example MyDetectorClass[MyLensMode, ...]
+            subscript, for example MyDetectorClass[MyLensMode, ...]
         kwargs: Additional key worded arguments that the detector needs for
-                initalisation.
+            initalisation.
     """
     parameters = {
         "lens_mode_type": get_args(detector_class)[0],

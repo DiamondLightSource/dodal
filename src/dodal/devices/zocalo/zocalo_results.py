@@ -57,12 +57,14 @@ class XrcResult(TypedDict):
     Information about a diffracting centre.
 
     NOTE: the coordinate systems of centre_of_mass and max_voxel/bounding_box are not
-        the same; centre_of_mass coordinates are continuous whereas max_voxel and bounding_box
-        coordinates are discrete.
+        the same; centre_of_mass coordinates are continuous whereas max_voxel and
+        bounding_box coordinates are discrete.
+
     Attributes:
-         centre_of_mass: The position of the centre of mass of the crystal, adjusted so that
-         grid box centres lie on integer grid coordinates, such that a 1x1x1 crystal detected in
-         a single grid box at 0, 0, 0, has c.o.m. of 0, 0, 0, not 0.5, 0.5, 0.5
+         centre_of_mass: The position of the centre of mass of the crystal, adjusted so
+            that grid box centres lie on integer grid coordinates, such that a 1x1x1
+            crystal detected in a single grid box at 0, 0, 0, has c.o.m. of 0, 0, 0,
+            not 0.5, 0.5, 0.5
          max_voxel: Position of the voxel with the maximum count, in integer coordinates
          max_count: max count achieved in a single voxel for the crystal
          n_voxels: Number of voxels (aka grid boxes) in the diffracting centre
@@ -107,20 +109,14 @@ class ZocaloResults(StandardReadable, Triggerable):
 
     Args:
         name (str): Name of the device
-
-        zocalo_environment (str): How zocalo is configured. Defaults to i03's development configuration
-
+        zocalo_environment (str): How zocalo is configured. Defaults to i03's
+            development configuration
         channel (str): Name for the results Queue
-
         sort_key (str): How results are ranked. Defaults to sorting by highest counts
-
-        timeout_s (float): Maximum time to wait for the Queue to be filled by an object, starting
-        from when the ZocaloResults device is triggered
-
+        timeout_s (float): Maximum time to wait for the Queue to be filled by an object,
+            starting from when the ZocaloResults device is triggered
         prefix (str): EPICS PV prefix for the device
-
         results_source (ZocaloSource): Where to get results from, GPU or CPU analysis
-
     """
 
     def __init__(
@@ -312,7 +308,8 @@ def _corrected_xrc_result(uncorrected: XrcResult) -> XrcResult:
 def get_full_processing_results(
     zocalo: ZocaloResults,
 ) -> Generator[Msg, Any, Sequence[XrcResult]]:
-    """A plan that will return the raw zocalo results, ranked in descending order according to the sort key.
+    """A plan that will return the raw zocalo results, ranked in descending order
+    according to the sort key.
     Returns empty list in the event no results found."""
     LOGGER.info("Retrieving raw zocalo processing results")
     com = yield from bps.rd(zocalo.centre_of_mass, default_value=[])

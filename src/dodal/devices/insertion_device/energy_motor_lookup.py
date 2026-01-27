@@ -33,17 +33,12 @@ class EnergyMotorLookup:
         """
         Convert energy and polarisation to a value from the lookup table.
 
-        Parameters:
-        -----------
-        energy : float
-            Desired energy.
-        pol : Pol
-            Polarisation mode.
+        Args:
+            energy (float): Desired energy.
+            pol (Pol): Polarisation mode.
 
         Returns:
-        ----------
-        float
-            gap / phase motor position from the lookup table.
+            float: gap / phase motor position from the lookup table.
         """
         # if lut is empty, force an update to pull updated lut incase subclasses have
         # implemented it.
@@ -64,14 +59,11 @@ class ConfigServerEnergyMotorLookup(EnergyMotorLookup):
         path: Path,
     ):
         """
-        Parameters:
-        -----------
-        config_client:
-            The config server client to fetch the look up table data.
-        lut_config:
-            Configuration that defines how to process file contents into a LookupTable
-        path:
-            File path to the lookup table.
+        Args:
+            config_client: The config server client to fetch the look up table data.
+            lut_config: Configuration that defines how to process file contents into a
+                LookupTable
+            path: File path to the lookup table.
         """
         self.path = path
         self.config_client = config_client

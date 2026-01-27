@@ -186,7 +186,7 @@ class ElectronAnalyserDetector(
         Each detector is responsible for setting up a specific region.
 
         Args:
-            filename:     Path to the sequence file containing the region data.
+            filename: Path to the sequence file containing the region data.
             enabled_only: If true, only include the region if enabled is True.
 
         Returns:

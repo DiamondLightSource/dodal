@@ -61,8 +61,8 @@ class I23Axes:
 
 class RotationDirection(StrictEnum):
     """
-    Defines for a swept angle whether the scan width (sweep) is to be added or subtracted from
-    the initial angle to obtain the final angle.
+    Defines for a swept angle whether the scan width (sweep) is to be added or
+    subtracted from the initial angle to obtain the final angle.
     """
 
     POSITIVE = "Positive"
@@ -268,8 +268,7 @@ class LogicGateConfiguration:
 
         Args:
             input_source (int): The source for the input (must be between 0 and 63).
-            invert (bool, optional): Whether the input should be inverted. Default
-                False.
+            invert (bool, optional): Whether the input should be inverted. Default False.
 
         Returns:
             LogicGateConfiguration: A description of the gate configuration.

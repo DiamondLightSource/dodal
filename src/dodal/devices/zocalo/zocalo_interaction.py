@@ -25,11 +25,11 @@ class ZocaloStartInfo:
     """
     ispyb_dcid (int): The ID of the data collection in ISPyB
     filename (str): The name of the file that the detector will store into dev/shm
-    start_frame_index (int): The index of the first image of this collection within the file
-                             written by the detector
+    start_frame_index (int): The index of the first image of this collection within the
+        file written by the detector
     number_of_frames (int): The number of frames in this collection
     message_index (int): Which trigger this is in the detector collection e.g. 0 for the
-                         first collection after a single arm, 1 for the next...
+        first collection after a single arm, 1 for the next...
     """
 
     ispyb_dcid: int
@@ -99,8 +99,7 @@ class ZocaloTrigger:
 
         Args:
             data_collection_id (int): The ID of the data collection representing the
-                                    gridscan in ISPyB
-
+                gridscan in ISPyB
         """
         LOGGER.info(f"Ending Zocalo job with ispyb id {data_collection_id}")
         self._send_to_zocalo(

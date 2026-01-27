@@ -42,16 +42,11 @@ class I10Apple2(Apple2[UndulatorPhaseAxes]):
         name: str = "",
     ) -> None:
         """
-        Parameters:
-        ------------
-        id_gap : UndulatorJawPhase
-            The gap motor of the undulator.
-        id_phase : UndulatorJawPhase
-            The phase motors of the undulator.
-        id_jaw_phase : UndulatorJawPhase
-            The jaw phase motor of the undulator.
-        name : str, optional
-            The name of the device, by default "".
+        Args:
+            id_gap (UndulatorJawPhase): The gap motor of the undulator.
+            id_phase (UndulatorJawPhase): The phase motors of the undulator.
+            id_jaw_phase (UndulatorJawPhase): The jaw phase motor of the undulator.
+            name (str, optional): The name of the device, by default "".
         """
         with self.add_children_as_readables():
             self.jaw_phase = Reference(id_jaw_phase)
@@ -76,24 +71,20 @@ class I10Apple2Controller(Apple2Controller[I10Apple2]):
         name: str = "",
     ) -> None:
         """
-        Parameters:
-        -----------
-        apple2 : I10Apple2
-            An I10Apple2 device.
-        gap_energy_motor_lut: EnergyMotorLookup
-            The class that handles the gap look up table logic for the insertion device.
-        phase_energy_motor_lut: EnergyMotorLookup
-            The class that handles the phase look up table logic for the insertion device.
-        jaw_phase_limit : float, optional
-            The maximum allowed jaw_phase movement., by default 12.0
-        jaw_phase_poly_param : list[float], optional
-            polynomial parameters highest power first., by default DEFAULT_JAW_PHASE_POLY_PARAMS
-        angle_threshold_deg : float, optional
-            The angle threshold to switch between 0-180 and 180-360 range., by default 30.0
-        units:
-            the units of this device. Defaults to eV.
-        name : str, optional
-            New device name.
+        Args:
+            apple2 (I10Apple2): An I10Apple2 device.
+            gap_energy_motor_lut (EnergyMotorLookup): The class that handles the gap
+                look up table logic for the insertion device.
+            phase_energy_motor_lut (EnergyMotorLookup): The class that handles the phase
+                look up table logic for the insertion device.
+            jaw_phase_limit (float, optional): The maximum allowed jaw_phase movement.,
+                by default 12.0
+            jaw_phase_poly_param (list[float], optional): polynomial parameters highest
+                power first., by default DEFAULT_JAW_PHASE_POLY_PARAMS
+            angle_threshold_deg (float, optional): The angle threshold to switch between
+                0-180 and 180-360 range., by default 30.0
+            units: the units of this device. Defaults to eV.
+            name (str, optional): New device name.
         """
         self.gap_energy_motor_lut = gap_energy_motor_lut
         self.phase_energy_motor_lut = phase_energy_motor_lut
@@ -177,12 +168,10 @@ class LinearArbitraryAngle(StandardReadable, Movable[SupportsFloat]):
         name: str = "",
     ) -> None:
         """
-        Parameters
-        ----------
-        id_controller : I10Apple2Controller
-            The I10Apple2Controller which control the ID.
-        name : str, optional
-            New device name.
+        Args:
+            id_controller (I10Apple2Controller): The I10Apple2Controller which control
+                the ID.
+            name (str, optional): New device name.
         """
         super().__init__(name=name)
         self.linear_arbitrary_angle = Reference(id_controller.linear_arbitrary_angle)

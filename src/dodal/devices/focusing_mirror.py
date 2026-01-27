@@ -53,8 +53,9 @@ class MirrorVoltageDemand(StrictEnum):
 
 
 class SingleMirrorVoltage(Device):
-    """Abstract the bimorph mirror voltage PVs into a single device that can be set asynchronously and returns when
-    the demanded voltage setpoint is accepted, without blocking the caller as this process can take significant time.
+    """Abstract the bimorph mirror voltage PVs into a single device that can be set
+    asynchronously and returns when the demanded voltage setpoint is accepted, without
+    blocking the caller as this process can take significant time.
     """
 
     def __init__(self, prefix: str, name: str = ""):

@@ -99,11 +99,14 @@ class LocalDirectoryServiceClient(DirectoryServiceClient):
 
 class StaticVisitPathProvider(UpdatingPathProvider):
     """
-    Static (single visit) implementation of PathProvider whilst awaiting auth infrastructure to generate necessary information per-scan.
+    Static (single visit) implementation of PathProvider whilst awaiting auth
+    infrastructure to generate necessary information per-scan.
     Allows setting a singular visit into which all run files will be saved.
-    update() queries a visit service to get the next DataCollectionIdentifier to increment the suffix of all file writers' next files.
+    update() queries a visit service to get the next DataCollectionIdentifier to
+    increment the suffix of all file writers' next files.
     Requires that all detectors are running with a mutual view on the filesystem.
-    Supports a single Visit which should be passed as a Path relative to the root of the Detector IOC mounting.
+    Supports a single Visit which should be passed as a Path relative to the root of
+    the Detector IOC mounting.
     i.e. to write to visit /dls/ixx/data/YYYY/cm12345-1
     """
 

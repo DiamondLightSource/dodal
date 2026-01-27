@@ -31,7 +31,7 @@ def inject(name: str = "") -> Any:  # type: ignore
 
     Args:
         name (str): Name of a Device to be fetched from an external context. This can be
-        left blank when injecting device composites (the default)
+            left blank when injecting device composites (the default)
 
     Returns:
         Any: name but without typing checking, valid as any default type

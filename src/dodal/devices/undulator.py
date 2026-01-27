@@ -134,6 +134,7 @@ class BaseUndulator(StandardReadable, Movable[float], ABC):
 
         Args:
             target_gap: target gap in mm
+
         Returns:
             True if the gap is within the threshold, False otherwise
         """

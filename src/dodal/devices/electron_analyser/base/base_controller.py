@@ -37,12 +37,12 @@ class ElectronAnalyserController(
         image_mode: ADImageMode = ADImageMode.SINGLE,
     ):
         """
-        Parameters:
+        Args:
             driver: The electron analyser driver to wrap around that holds the PV's.
             energy_source: Device that holds the excitation energy and ability to switch
-                           between sources.
+                between sources.
             deadtime: For a given exposure, what is the safest minimum time between
-                      exposures that can be determined without reading signals.
+                exposures that can be determined without reading signals.
             image_mode: The image mode to configure the driver with before measuring.
         """
         self.energy_source = energy_source

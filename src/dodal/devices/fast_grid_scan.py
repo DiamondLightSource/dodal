@@ -110,8 +110,10 @@ class GridScanParamsCommon(AbstractExperimentWithBeamParams):
         Args:
             grid_position: The x, y, z position in grid steps. The origin is at the
                 centre of the first grid box
+
         Returns:
             The motor position this corresponds to.
+
         Raises:
             IndexError if the desired position is outside the grid.
         """
@@ -300,6 +302,7 @@ class FastGridScanCommon(
         """
         Submit the gridscan parameters to the device for validation prior to
         gridscan kickoff
+
         Args:
             value: the gridscan parameters
 
@@ -477,6 +480,7 @@ class PandAFastGridScan(FastGridScanThreeD[PandAGridScanParams]):
 def set_fast_grid_scan_params(scan: FastGridScanCommon[ParamType], params: ParamType):
     """
     Apply the fast grid scan parameters to the grid scan device and validate them
+
     Args:
         scan: The fast grid scan device
         params: The parameters to set

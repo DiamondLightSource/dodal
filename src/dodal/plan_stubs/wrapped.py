@@ -24,10 +24,10 @@ def set_absolute(
     Args:
         movable (Movable[T]): The device to set
         value (T): The new value
-        group (Group | None, optional): The message group to associate with the
-                                           setting, for sequencing. Defaults to None.
-        wait (bool, optional): The group should wait until all setting is complete
-                               (e.g. a motor has finished moving). Defaults to False.
+        group (Group | None, optional): The message group to associate with the setting,
+            for sequencing. Defaults to None.
+        wait (bool, optional): The group should wait until all setting is complete (e.g.
+            a motor has finished moving). Defaults to False.
 
     Returns:
         MsgGenerator: Plan
@@ -47,10 +47,10 @@ def set_relative(
     Args:
         movable (Movable): The device to set
         value (T): The new value
-        group (Group | None, optional): The message group to associate with the
-                                           setting, for sequencing. Defaults to None.
-        wait (bool, optional): The group should wait until all setting is complete
-                               (e.g. a motor has finished moving). Defaults to False.
+        group (Group | None, optional): The message group to associate with the setting,
+            for sequencing. Defaults to None.
+        wait (bool, optional): The group should wait until all setting is complete (e.g.
+            a motor has finished moving). Defaults to False.
 
     Returns:
         MsgGenerator: Plan
@@ -68,8 +68,8 @@ def move(moves: Mapping[Movable[T], T], group: Group | None = None) -> MsgGenera
 
     Args:
         moves (Mapping[Movable, T]): Mapping of Movables to target positions
-        group (Group | None, optional): The message group to associate with the
-                                           setting, for sequencing. Defaults to None.
+        group (Group | None, optional): The message group to associate with the setting,
+            for sequencing. Defaults to None.
 
     Returns:
         MsgGenerator: Plan
@@ -92,7 +92,7 @@ def move_relative(
     Args:
         moves (Mapping[Movable, T]): Mapping of Movables to target deltas
         group (Group | None, optional): The message group to associate with the
-                                           setting, for sequencing. Defaults to None.
+            setting, for sequencing. Defaults to None.
 
     Returns:
         MsgGenerator: Plan
@@ -132,11 +132,9 @@ def wait(
     Does not expose move_on, as when used as a stub will not fail on Timeout.
 
     Args:
-        group (Group | None, optional): The name of the group to wait for, defaults
-                                           to None, in which case waits for all
-                                           groups that have not yet been awaited.
+        group (Group | None, optional): The name of the group to wait for, defaults to
+            None, in which case waits for all groups that have not yet been awaited.
         timeout (float | None, default=None): a timeout in seconds
-
 
     Returns:
         MsgGenerator: Plan

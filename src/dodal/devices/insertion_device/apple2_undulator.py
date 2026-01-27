@@ -174,14 +174,9 @@ class UndulatorGap(GapSafeMotorNoStop):
 
     def __init__(self, prefix: str, name: str = ""):
         """
-
-        Parameters
-        ----------
-            prefix : str
-                Beamline specific part of the PV
-            name : str
-                Name of the Id device
-
+        Args:
+            prefix (str): Beamline specific part of the PV
+            name (str): Name of the Id device
         """
         self.set_move = epics_signal_rw(int, prefix + "BLGSETP")
         # Nothing move until this is set to 1 and it will return to 0 when done.
@@ -232,13 +227,9 @@ class UndulatorPhaseMotor(UnstoppableMotor):
 
     def __init__(self, prefix: str, name: str = ""):
         """
-        Parameters
-        ----------
-
-        prefix : str
-            The setting prefix PV.
-        name : str
-            Name of the Id phase device
+        Args:
+            prefix (str): The setting prefix PV.
+            name (str): Name of the Id phase device
         """
         motor_pv = f"{prefix}MTR"
         super().__init__(prefix=motor_pv, name=name)
@@ -303,7 +294,6 @@ class UndulatorPhaseAxes(UndulatorLockedPhaseAxes[Apple2PhasesVal]):
          top_inner == Q2
          btm_inner == q3
          btm_outer == q4
-
     """
 
     def __init__(
@@ -374,25 +364,18 @@ class Apple2(StandardReadable, Movable[Apple2Val], Generic[PhaseAxesType]):
     """
     Device representing the combined motor controls for an Apple2 undulator.
 
-    Attributes
-    ----------
-    gap : UndulatorGap
-        The undulator gap motor device.
-    phase : UndulatorPhaseAxes
-        The undulator phase axes device, consisting of four phase motors.
+    Attributes:
+        gap (UndulatorGap): The undulator gap motor device.
+        phase (UndulatorPhaseAxes): The undulator phase axes device, consisting of four
+            phase motors.
     """
 
     def __init__(self, id_gap: UndulatorGap, id_phase: PhaseAxesType, name=""):
         """
-        Parameters
-        ----------
-
-        id_gap: UndulatorGap
-            An UndulatorGap device.
-        id_phase: UndulatorPhaseAxes
-            An UndulatorPhaseAxes device.
-        name: str
-            Name of the device.
+        Args:
+            id_gap (UndulatorGap): An UndulatorGap device.
+            id_phase (UndulatorPhaseAxes): An UndulatorPhaseAxes device.
+            name (str): Name of the device.
         """
         with self.add_children_as_readables():
             self.gap = Reference(id_gap)

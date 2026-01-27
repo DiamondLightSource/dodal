@@ -102,15 +102,10 @@ class BeamEnergy(StandardReadable, Movable[float], Preparable, Flyable):
         self, id_energy: InsertionDeviceEnergy, mono: Motor, name: str = ""
     ) -> None:
         """
-        Parameters
-        ----------
-
-        id_energy: InsertionDeviceEnergy
-            An InsertionDeviceEnergy device.
-        mono: Motor
-            A Motor(energy) device.
-        name:
-            New device name.
+        Args:
+            id_energy (InsertionDeviceEnergy): An InsertionDeviceEnergy device.
+            mono (Motor): A Motor(energy) device.
+            name: New device name.
         """
         self._id_energy = Reference(id_energy)
         self._mono_energy = Reference(mono)

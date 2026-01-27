@@ -84,7 +84,7 @@ def andor2_point() -> Andor2Point:
 def panda() -> HDFPanda:
     """
     The Panda device is connected to two PMAC motors for position comparison under
-     the pcomp[1] and pcomp[2] blocks, which handle positive and negative directions.
+        the pcomp[1] and pcomp[2] blocks, which handle positive and negative directions.
     This setup is used for triggering detectors during a flyscan.
     """
     return HDFPanda(

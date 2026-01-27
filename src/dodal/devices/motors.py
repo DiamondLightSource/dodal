@@ -20,14 +20,11 @@ class Stage(StandardReadable, ABC):
     - y is vertical and antiparallel to the force of gravity
     - x is the cross product of y🞬z
 
-    Parameters
-    ----------
-    prefix:
-        Common part of the EPICS PV for all motors, including ":".
-    name:
-        Name of the stage, each child motor will be named "{name}-{field_name}"
-    *_infix:
-        Infix between the common prefix and the EPICS motor record fields for the field.
+    Attributes:
+        prefix: Common part of the EPICS PV for all motors, including ":".
+        name: Name of the stage, each child motor will be named "{name}-{field_name}"
+        *_infix: Infix between the common prefix and the EPICS motor record fields for
+            the field.
     """
 
     ...
@@ -357,9 +354,9 @@ def create_axis_perp_to_rotation(motor_theta: Motor, motor_i: Motor, motor_j: Mo
     Args:
         motor_theta (Motor): this is the rotation axis of the sample.
         motor_i (Motor): this is the axis that, when the sample is at 0 deg rotation,
-                         a move here is entirely parallel with the derived axis.
+            a move here is entirely parallel with the derived axis.
         motor_j (Motor): this is the axis that, when the sample is at 90 deg rotation,
-                         a move here is entirely parallel with the derived axis.
+            a move here is entirely parallel with the derived axis.
     """
 
     def _get(j_val: float, i_val: float, rot_value: float) -> float:

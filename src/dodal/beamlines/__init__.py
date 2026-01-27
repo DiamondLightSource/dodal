@@ -74,7 +74,7 @@ def _module_name_overrides() -> Mapping[str, set[str]]:
 
     Returns:
         Mapping[str, set[str]]: A dictionary mapping the name of a dodal module to the
-        set of beamlines it supports.
+            set of beamlines it supports.
     """
 
     inverse_mapping: dict[str, set[str]] = {}

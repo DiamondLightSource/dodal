@@ -196,8 +196,11 @@ class BartRobot(StandardReadable, Movable[SampleLocation]):
     async def set(self, value: SampleLocation):
         """
         Perform a sample load from the specified sample location
+
         Args:
-            value: The pin and puck to load, or SAMPLE_LOCATION_EMPTY to unload the sample.
+            value: The pin and puck to load, or SAMPLE_LOCATION_EMPTY to unload the
+                sample.
+
         Raises:
             RobotLoadError if a timeout occurs, or if an error occurs loading the sample.
         """

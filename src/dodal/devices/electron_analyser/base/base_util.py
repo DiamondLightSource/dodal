@@ -6,11 +6,13 @@ def to_kinetic_energy(
 ) -> float:
     """
     Convert a value that is binding energy to kinetic energy.
-    Parameters:
+
+    Args:
         value: The value to convert.
         value_mode: Energy mode of the value. If it is already kinetic, return the
-                    same value. If it is binding, convert to kinetic.
+            same value. If it is binding, convert to kinetic.
         excitation_energy: Value to calculate the conversion.
+
     Returns:
         Caluclated kinetic energy value
     """
@@ -22,11 +24,13 @@ def to_binding_energy(
 ) -> float:
     """
     Convert a value that is kinetic energy to binding energy.
-    Parameters:
+
+    Args:
         value: The value to convert.
         value_mode: Energy mode of the value. If it is already binding, return the
-                    same value. If it is kinetic, convert to binding.
+            same value. If it is kinetic, convert to binding.
         excitation_energy: Value to calculate the conversion.
+
     Returns:
         Caluclated binding energy value
     """

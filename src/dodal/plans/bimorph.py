@@ -50,6 +50,7 @@ def check_valid_bimorph_state(
     voltage_list: list[float], abs_range: float, abs_diff: float
 ) -> bool:
     """Checks that a set of bimorph voltages is valid.
+
     Args:
         voltage_list: float amount each actuator will be increased by per scan
         abs_range: float absolute value of maximum possible voltage of each actuator
@@ -201,15 +202,18 @@ def bimorph_optimisation(
         slit: Slits
         voltage_increment: float voltage increment applied to each bimorph electrode
         active_dimension: SlitDimension that slit will move in (X or Y)
-        active_slit_center_start: float start position of center of slit in active dimension
-        active_slit_center_end: float final position of center of slit in active dimension
+        active_slit_center_start: float start position of center of slit in active
+            dimension
+        active_slit_center_end: float final position of center of slit in active
+            dimension
         active_slit_size: float size of slit in active dimension
         inactive_slit_center: float center of slit in inactive dimension
         inactive_slit_size: float size of slit in inactive dimension
         number_of_slit_positions: int number of slit positions per pencil beam scan
         bimorph_settle_time: float time in seconds to wait after bimorph move
         slit_settle_time: float time in seconds to wait after slit move
-        initial_voltage_list: optional list[float] starting voltages for bimorph (defaults to current voltages)
+        initial_voltage_list: optional list[float] starting voltages for bimorph
+            (defaults to current voltages)
         metadata: optional dict[str, Any] metadata to add to start document
     """
 
@@ -318,8 +322,10 @@ def inner_scan(
         slit: Slits
         oav: oav on-axis viewer
         active_dimension: SlitDimension that slit will move in (X or Y)
-        active_slit_center_start: float start position of center of slit in active dimension
-        active_slit_center_end: float final position of center of slit in active dimension
+        active_slit_center_start: float start position of center of slit in active
+        dimension
+        active_slit_center_end: float final position of center of slit in active
+            dimension
         active_slit_size: float size of slit in active dimension
         number_of_slit_positions: int number of slit positions per pencil beam scan
         slit_settle_time: float time in seconds to wait after slit move
