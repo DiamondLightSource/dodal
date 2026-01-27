@@ -9,6 +9,7 @@ _X, _Y, _Z = "X", "Y", "Z"
 
 _OMEGA = "OMEGA"
 _POLAR = "POLAR"
+_AZIMUTH = "AZIMUTH"
 
 
 class Stage(StandardReadable, ABC):
@@ -145,9 +146,10 @@ class XYZPolarAzimuthStage(XYZPolarStage):
         y_infix: str = _Y,
         z_infix: str = _Z,
         polar_infix: str = _POLAR,
+        azimuth_infix: str = _AZIMUTH,
     ):
         with self.add_children_as_readables():
-            self.azimuth = Motor(prefix + "AZIMUTH")
+            self.azimuth = Motor(prefix + azimuth_infix)
 
         super().__init__(prefix, name, x_infix, y_infix, z_infix, polar_infix)
 
