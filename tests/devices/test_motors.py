@@ -134,10 +134,6 @@ async def test_setting_xyzp_position_table(
     z: float,
     polar: float,
 ):
-    """
-    Test setting positions on the Table using the ophyd_async mock tools.
-    """
-    # Call set to update the position
     set_mock_value(xyzp_stage.x.user_readback, x)
     set_mock_value(xyzp_stage.y.user_readback, y)
     set_mock_value(xyzp_stage.z.user_readback, z)
@@ -170,10 +166,6 @@ async def test_setting_xyzpa_position_table(
     polar: float,
     azimuth: float,
 ):
-    """
-    Test setting positions on the Table using the ophyd_async mock tools.
-    """
-    # Call set to update the position
     set_mock_value(xyzpa_stage.x.user_readback, x)
     set_mock_value(xyzpa_stage.y.user_readback, y)
     set_mock_value(xyzpa_stage.z.user_readback, z)
