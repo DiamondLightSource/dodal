@@ -25,7 +25,7 @@ class P60VGScientaAnalyserDriverIO(
     VGScientaAnalyserDriverIO[LensMode, PsuMode, PassEnergy]
 ):
     def __init__(self, prefix: str, name: str = ""):
-        super().__init__(prefix, LensMode, PsuMode, PassEnergy, name)
+        super().__init__(prefix, LensMode, PsuMode, PassEnergy, "ELEMENT_SET", name)
 
 
 P60ElectronAnalyserController = ElectronAnalyserController[

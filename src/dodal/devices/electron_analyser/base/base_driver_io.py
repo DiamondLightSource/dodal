@@ -54,6 +54,7 @@ class AbstractAnalyserDriverIO(
         lens_mode_type: type[TLensMode],
         psu_mode_type: type[TPsuMode],
         pass_energy_type: type[TPassEnergy],
+        psu_mode_suffix: str = "PSU_MODE",
         name: str = "",
     ) -> None:
         """
@@ -112,7 +113,7 @@ class AbstractAnalyserDriverIO(
             )
             # This is used by each electron analyser, however it depends on the electron
             # analyser type to know if is moved with region settings.
-            self.psu_mode = epics_signal_rw(psu_mode_type, prefix + "PSU_MODE")
+            self.psu_mode = epics_signal_rw(psu_mode_type, prefix + psu_mode_suffix)
 
         # This is defined in the parent class, add it as readable configuration.
         self.add_readables([self.acquire_time], StandardReadableFormat.CONFIG_SIGNAL)
