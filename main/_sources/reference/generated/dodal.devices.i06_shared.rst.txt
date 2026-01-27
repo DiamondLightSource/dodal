@@ -1,0 +1,36 @@
+dodal.devices.i06\_shared
+=========================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~i06_shared.I06Grating
+
+
+
+
+.. automodule:: dodal.devices.i06_shared
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

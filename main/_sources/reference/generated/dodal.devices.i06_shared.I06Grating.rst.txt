@@ -1,0 +1,81 @@
+dodal.devices.i06\_shared.I06Grating
+====================================
+
+.. currentmodule:: dodal.devices.i06_shared
+
+.. autoclass:: I06Grating
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~I06Grating.GRATING_150
+      
+      
+      ~I06Grating.GRATING_400
+      
+      
+      ~I06Grating.GRATING_1200
+      
+   
+   

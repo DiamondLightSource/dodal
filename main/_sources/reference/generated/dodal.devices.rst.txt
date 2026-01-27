@@ -43,6 +43,7 @@
    dodal.devices.i03
    dodal.devices.i04
    dodal.devices.i05
+   dodal.devices.i06_shared
    dodal.devices.i07
    dodal.devices.i09
    dodal.devices.i09_1
