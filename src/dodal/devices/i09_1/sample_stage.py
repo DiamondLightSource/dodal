@@ -5,7 +5,7 @@ from dodal.devices.motors import XYZPolarAzimuthStage
 
 class SampleManipulator(XYZPolarAzimuthStage):
     """
-    Six-axis stage with a standard xyz stage and two axis of rotation: polar, azimuth
+    Six-axis stage with a standard xyz stage and three axis of rotation: polar, azimuth
     and tilt.
     """
 
