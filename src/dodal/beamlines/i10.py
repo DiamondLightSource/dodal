@@ -1,13 +1,13 @@
 from dodal.beamlines.i10_shared import devices as i10_shared_devices
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.device_manager import DeviceManager
+from dodal.devices.common_mirror import XYZPiezoCollimatingMirror
 from dodal.devices.current_amplifiers import CurrentAmpDet
 from dodal.devices.i10 import (
     I10Diagnostic,
     I10Diagnostic5ADet,
     I10Slits,
     I10SlitsDrainCurrent,
-    PiezoMirror,
 )
 from dodal.devices.i10.diagnostics import I10Diagnostic, I10Diagnostic5ADet
 from dodal.devices.i10.rasor.rasor_current_amp import RasorFemto, RasorSR570
@@ -34,8 +34,8 @@ devices.include(i10_shared_devices)
 
 
 @devices.factory()
-def focusing_mirror() -> PiezoMirror:
-    return PiezoMirror(prefix=f"{PREFIX.beamline_prefix}-OP-FOCS-01:")
+def focusing_mirror() -> XYZPiezoCollimatingMirror:
+    return XYZPiezoCollimatingMirror(prefix=f"{PREFIX.beamline_prefix}-OP-FOCS-01:")
 
 
 """Optic slits"""

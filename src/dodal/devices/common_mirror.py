@@ -61,8 +61,8 @@ class XYZPiezoCollimatingMirror(XYZPitchYawRollStage):
         self,
         prefix: str,
         name: str = "",
-        fpitch_read_suffix: str = "FPITCH:RBV",
-        fpitch_write_suffix: str = "FPITCH:DMD",
+        fpitch_read_suffix: str = "FPITCH:RBV:AI",
+        fpitch_write_suffix: str = "FPITCH:DMD:AO",
     ):
         with self.add_children_as_readables():
             self.fine_pitch = epics_signal_rw(

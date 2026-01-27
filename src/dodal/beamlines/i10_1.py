@@ -1,7 +1,8 @@
 from dodal.beamlines.i10_shared import devices as i10_shared_devices
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.device_manager import DeviceManager
-from dodal.devices.i10 import I10JDiagnostic, I10JSlits, PiezoMirror
+from dodal.devices.common_mirror import XYZPiezoCollimatingMirror
+from dodal.devices.i10 import I10JDiagnostic, I10JSlits
 from dodal.devices.temperture_controller.lakeshore.lakeshore import Lakeshore336
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
@@ -34,5 +35,5 @@ def diagnostic() -> I10JDiagnostic:
 
 
 @devices.factory()
-def focusing_mirror() -> PiezoMirror:
-    return PiezoMirror(prefix=f"{PREFIX.beamline_prefix}-OP-FOCA-01:")
+def focusing_mirror() -> XYZPiezoCollimatingMirror:
+    return XYZPiezoCollimatingMirror(prefix=f"{PREFIX.beamline_prefix}-OP-FOCA-01:")
