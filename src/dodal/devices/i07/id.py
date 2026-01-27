@@ -11,12 +11,12 @@ class InsertionDevice(UndulatorInKeV):
 
     def __init__(
         self,
-        name: str,
         prefix: str,
         harmonic: UndulatorOrder,
         id_gap_lookup_table_path: str = "/dls_sw/i07/software/gda/config/lookupTables/"
         + "IIDCalibrationTable.txt",
-    ) -> None:
+        name: str = "",
+    ):
         super().__init__(prefix, id_gap_lookup_table_path, name=name)
         self.harmonic = harmonic
 
@@ -28,11 +28,11 @@ class InsertionDevice(UndulatorInKeV):
         interpolate between these values, assuming a linear relationship on the relevant
         scale.
         """
-        energy_to_distance_table: np.ndarray = await energy_distance_table(
+        energy_to_distance_table = await energy_distance_table(
             self.id_gap_lookup_table_path, comments="#", skiprows=2
         )
-        harmonic_value: int = await self.harmonic.value.get_value()
+        harmonic_value = await self.harmonic.value.get_value()
 
-        row: np.ndarray = energy_to_distance_table[harmonic_value - 1, :]
+        row = energy_to_distance_table[harmonic_value - 1, :]
         gap = np.interp(energy_kev, [row[1], row[2]], [row[3], row[4]])
         return gap
