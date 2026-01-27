@@ -341,3 +341,50 @@ def _mock_connect(
             catch_exceptions=catch_exceptions,
         )
     return result
+
+
+@patch("dodal.cli.importlib")
+@patch.dict(os.environ, clear=True)
+def test_cli_describe_prints_warning_on_no_device_manager(imp, runner: CliRunner):
+    result = runner.invoke(main, ["describe", "-n", "devices", "i22"])
+    assert len(result.stdout.split("\n")) == 3
+    assert "No device manager" in result.stdout
+
+
+def _describe_devices(runner, device_docstrings):
+    with patch("dodal.cli.importlib") as mock_import:
+        dm = mock_import.import_module("dodal.beamlines.i22")
+        dm.devices = Mock(spec=DeviceManager)
+
+        devices = {}
+
+        for device_name, docstring in device_docstrings.items():
+            mocked_device = Mock()
+            mocked_device.__doc__ = docstring
+            devices[device_name] = mocked_device
+
+        dm.devices.get_all_factories.return_value = devices
+        return runner.invoke(main, ["describe", "-n", "devices", "i22"])
+
+
+@patch.dict(os.environ, clear=True)
+def test_cli_describe_prints_expected_for_one_device(runner: CliRunner):
+    result = _describe_devices(runner, {"test_device": "doc_string"})
+    assert len(result.stdout.split()) == 7
+    assert "test_device" in result.stdout
+    assert "doc_string" in result.stdout
+
+
+@patch.dict(os.environ, clear=True)
+def test_cli_describe_prints_expected_for_many_devices(runner: CliRunner):
+    result = _describe_devices(
+        runner,
+        {
+            "test_device": "doc_string",
+            "test_other": "different_doc",
+            "final_test": "final_doc",
+        },
+    )
+    assert len(result.stdout.split()) == 13
+    assert "test_other" in result.stdout
+    assert "final_doc" in result.stdout
