@@ -5,6 +5,7 @@ from dodal.devices.common_dcm import DoubleCrystalMonochromatorWithDSpacing
 from dodal.devices.electron_analyser.base import EnergySource
 from dodal.devices.electron_analyser.specs import SpecsDetector
 from dodal.devices.i09_1 import LensMode, PsuMode
+from dodal.devices.i09_1.sample_stage import SampleManipulator
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.temperture_controller import Lakeshore336
 from dodal.log import set_beamline as set_log_beamline
@@ -44,3 +45,8 @@ def analyser(energy_source: EnergySource) -> SpecsDetector[LensMode, PsuMode]:
 @devices.factory()
 def lakeshore() -> Lakeshore336:
     return Lakeshore336(prefix=f"{PREFIX.beamline_prefix}-EA-TCTRL-01:")
+
+
+@devices.factory()
+def hsmpm() -> SampleManipulator:
+    return SampleManipulator(prefix=f"{PREFIX.beamline_prefix}-MO-HSMPM-01:")

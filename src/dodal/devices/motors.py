@@ -8,6 +8,7 @@ from ophyd_async.epics.motor import Motor
 _X, _Y, _Z = "X", "Y", "Z"
 
 _OMEGA = "OMEGA"
+_POLAR = "POLAR"
 
 
 class Stage(StandardReadable, ABC):
@@ -112,6 +113,43 @@ class XYZOmegaStage(XYZStage):
         with self.add_children_as_readables():
             self.omega = Motor(prefix + omega_infix)
         super().__init__(prefix, name, x_infix, y_infix, z_infix)
+
+
+class XYZPolarStage(XYZStage):
+    """Four-axis stage with a standard xyz stage and one axis of rotation: polar."""
+
+    def __init__(
+        self,
+        prefix: str,
+        name: str = "",
+        x_infix: str = _X,
+        y_infix: str = _Y,
+        z_infix: str = _Z,
+        polar_infix: str = _POLAR,
+    ) -> None:
+        with self.add_children_as_readables():
+            self.polar = Motor(prefix + polar_infix)
+        super().__init__(prefix, name, x_infix, y_infix, z_infix)
+
+
+class XYZPolarAzimuthStage(XYZPolarStage):
+    """
+    Four-axis stage with a standard xyz stage and two axis of rotation: polar and azimuth.
+    """
+
+    def __init__(
+        self,
+        prefix: str,
+        name: str = "",
+        x_infix: str = _X,
+        y_infix: str = _Y,
+        z_infix: str = _Z,
+        polar_infix: str = _POLAR,
+    ):
+        with self.add_children_as_readables():
+            self.azimuth = Motor(prefix + "AZIMUTH")
+
+        super().__init__(prefix, name, x_infix, y_infix, z_infix, polar_infix)
 
 
 class XYPhiStage(XYStage):

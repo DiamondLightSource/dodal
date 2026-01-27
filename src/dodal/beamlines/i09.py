@@ -9,6 +9,7 @@ from dodal.devices.electron_analyser.base import DualEnergySource
 from dodal.devices.electron_analyser.vgscienta import VGScientaDetector
 from dodal.devices.fast_shutter import DualFastShutter, GenericFastShutter
 from dodal.devices.i09 import LensMode, PassEnergy, PsuMode
+from dodal.devices.motors import XYZPolarAzimuthStage
 from dodal.devices.pgm import PlaneGratingMonochromator
 from dodal.devices.selectable_source import SourceSelector
 from dodal.devices.synchrotron import Synchrotron
@@ -77,7 +78,7 @@ def dual_fast_shutter(
 
 # CAM:IMAGE will fail to connect outside the beamline network,
 # see https://github.com/DiamondLightSource/dodal/issues/1852
-@devices.factory()
+@devices.factory(skip=True)
 def ew4000(
     dual_fast_shutter: DualFastShutter,
     dual_energy_source: DualEnergySource,
@@ -97,3 +98,8 @@ def ew4000(
 @devices.factory()
 def lakeshore() -> Lakeshore336:
     return Lakeshore336(prefix="BL09L-VA-LAKE-01:")
+
+
+@devices.factory()
+def smpm() -> XYZPolarAzimuthStage:
+    return XYZPolarAzimuthStage(prefix=f"{I_PREFIX.beamline_prefix}-MO-SMPM-01:")
