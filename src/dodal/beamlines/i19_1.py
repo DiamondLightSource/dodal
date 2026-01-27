@@ -62,13 +62,18 @@ def beamstop() -> BeamStop:
     return BeamStop(prefix=f"{PREFIX.beamline_prefix}-RS-ABSB-01:")
 
 
+@devices.fixture
+def oav_config() -> OAVConfigBeamCentre:
+    return OAVConfigBeamCentre(ZOOM_PARAMS_FILE, DISPLAY_CONFIG)
+
+
 @devices.factory()
 def oav1() -> OAVBeamCentreFile:
     """Get the i19-1 OAV1 device, instantiate it if it hasn't already been.
     The OAV1 camera is placed next to the beampipe along with the Zoom lens."""
     return OAVBeamCentreFile(
         prefix=f"{PREFIX.beamline_prefix}-EA-OAV-01:",
-        config=OAVConfigBeamCentre(ZOOM_PARAMS_FILE, DISPLAY_CONFIG),
+        config=oav_config(),
     )
 
 
@@ -78,7 +83,7 @@ def oav2() -> OAVBeamCentreFile:
     The OAV2 camera is places diagonally to the sample and has no FZoom."""
     return OAVBeamCentreFile(
         prefix=f"{PREFIX.beamline_prefix}-EA-OAV-02:",
-        config=OAVConfigBeamCentre(ZOOM_PARAMS_FILE, DISPLAY_CONFIG),
+        config=oav_config(),
     )
 
 
