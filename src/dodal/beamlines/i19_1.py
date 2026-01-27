@@ -63,20 +63,20 @@ def oav_config() -> OAVConfigBeamCentre:
 
 
 @devices.factory()
-def oav1() -> OAVBeamCentreFile:
+def oav1(oav_config: OAVConfigBeamCentre) -> OAVBeamCentreFile:
     """The OAV1 camera, placed next to the beampipe along with the Zoom lens."""
     return OAVBeamCentreFile(
         prefix=f"{PREFIX.beamline_prefix}-EA-OAV-01:",
-        config=oav_config(),
+        config=oav_config,
     )
 
 
 @devices.factory()
-def oav2() -> OAVBeamCentreFile:
+def oav2(oav_config: OAVConfigBeamCentre) -> OAVBeamCentreFile:
     """The OAV2 camera, placed diagonally to the sample. It has no FZoom."""
     return OAVBeamCentreFile(
         prefix=f"{PREFIX.beamline_prefix}-EA-OAV-02:",
-        config=oav_config(),
+        config=oav_config,
     )
 
 
