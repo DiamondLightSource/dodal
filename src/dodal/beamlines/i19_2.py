@@ -1,12 +1,10 @@
+from functools import cache
 from pathlib import Path
 
+from ophyd_async.core import PathProvider
 from ophyd_async.fastcs.eiger import EigerDetector
 from ophyd_async.fastcs.panda import HDFPanda
 
-from dodal.common.beamlines.beamline_utils import (
-    get_path_provider,
-    set_path_provider,
-)
 from dodal.common.beamlines.beamline_utils import (
     set_beamline as set_utils_beamline,
 )
@@ -39,13 +37,6 @@ PREFIX = BeamlinePrefix("i19", "I")
 set_log_beamline(BL)
 set_utils_beamline(BL)
 
-set_path_provider(
-    StaticVisitPathProvider(
-        BL,
-        Path("/dls/i19-2/data/2025/cm40639-4/"),
-    )
-)
-
 I19_2_COMMISSIONING_INSTR_SESSION: str = "cm40639-5"
 
 I19_2_ZEBRA_MAPPING = ZebraMapping(
@@ -54,6 +45,15 @@ I19_2_ZEBRA_MAPPING = ZebraMapping(
 )
 
 devices = DeviceManager()
+
+
+@devices.fixture
+@cache
+def path_provider() -> PathProvider:
+    return StaticVisitPathProvider(
+        BL,
+        Path("/dls/i19-2/data/2026/cm44169-1/"),
+    )
 
 
 @devices.factory()
@@ -88,7 +88,7 @@ def diffractometer() -> FourCircleDiffractometer:
 def eiger() -> EigerDetector:
     return EigerDetector(
         prefix=PREFIX.beamline_prefix,
-        path_provider=get_path_provider(),
+        path_provider=path_provider(),
         drv_suffix="-EA-EIGER-01:",
         hdf_suffix="-EA-EIGER-01:OD:",
     )
@@ -98,7 +98,7 @@ def eiger() -> EigerDetector:
 def panda() -> HDFPanda:
     return HDFPanda(
         prefix=f"{PREFIX.beamline_prefix}-EA-PANDA-01:",
-        path_provider=get_path_provider(),
+        path_provider=path_provider(),
     )
 
 
