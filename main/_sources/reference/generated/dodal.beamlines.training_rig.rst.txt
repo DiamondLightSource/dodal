@@ -20,6 +20,12 @@ dodal.beamlines.training\_rig
 
    
    
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      path_provider
+   
    
 
    
