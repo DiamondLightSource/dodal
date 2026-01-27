@@ -30,7 +30,7 @@ class I09VGScientaAnalyserDriverIO(
         super().__init__(prefix, LensMode, PsuMode, PassEnergy, name)
 
 
-I09Controller = ElectronAnalyserController[
+I09ElectronAnalyserController = ElectronAnalyserController[
     I09VGScientaAnalyserDriverIO, I09VGScientaRegion
 ]
 
@@ -38,7 +38,9 @@ I09Controller = ElectronAnalyserController[
 class EW4000(
     ElectronAnalyserDetector[I09VGScientaAnalyserDriverIO, I09VGScientaRegion]
 ):
-    """ """
+    """Implementation of VGScienta Electron Analyser. This model is unique for i09
+    beamline because it has access to multiple energy sources and shutters. The selected
+    source is deterimined by the source_selector device."""
 
     def __init__(
         self,
@@ -49,7 +51,7 @@ class EW4000(
         name: str = "",
     ):
         driver = I09VGScientaAnalyserDriverIO(prefix)
-        controller = I09Controller(
+        controller = I09ElectronAnalyserController(
             driver, dual_energy_source, dual_fast_shutter, source_selector
         )
         super().__init__(controller, name)
