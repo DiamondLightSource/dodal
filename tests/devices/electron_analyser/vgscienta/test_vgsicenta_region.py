@@ -12,13 +12,13 @@ from dodal.devices.i09.analyser import I09VGScientaRegion, I09VGScientaSequence
 from dodal.devices.selectable_source import SelectedSource
 from tests.devices.electron_analyser.helper_util import (
     assert_region_has_expected_values,
-    i09_vgscienta_sequence_loader,
+    i09_vgscienta_test_sequence_loader,
 )
 
 
 @pytest.fixture
 def sequence() -> I09VGScientaSequence:
-    return i09_vgscienta_sequence_loader()
+    return i09_vgscienta_test_sequence_loader()
 
 
 @pytest.fixture

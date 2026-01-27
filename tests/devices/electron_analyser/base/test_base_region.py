@@ -17,15 +17,15 @@ from dodal.devices.electron_analyser.vgscienta import VGScientaSequence
 from dodal.devices.i09 import I09VGScientaRegion
 from tests.devices.electron_analyser.helper_util import (
     TEST_SEQUENCE_REGION_NAMES,
-    b07_specs_sequence_loader,
-    i09_vgscienta_sequence_loader,
+    b07_specs_test_sequence_loader,
+    i09_vgscienta_test_sequence_loader,
 )
 
 
 @pytest.fixture(
     params=[
-        b07_specs_sequence_loader(),
-        i09_vgscienta_sequence_loader(),
+        b07_specs_test_sequence_loader(),
+        i09_vgscienta_test_sequence_loader(),
     ]
 )
 def sequence(request: pytest.FixtureRequest) -> GenericSequence:
