@@ -65,7 +65,6 @@ def idu(idu_gap: UndulatorGap, idu_phase: UndulatorLockedPhaseAxes) -> Apple2:
 
 @devices.factory()
 def pgm() -> PlaneGratingMonochromator:
-    "I06 Plane Grating Monochromator."
     return PlaneGratingMonochromator(
         prefix=f"{PREFIX.beamline_prefix}-OP-PGM-01:",
         grating=I06Grating,
