@@ -135,7 +135,7 @@ class XYZPolarStage(XYZStage):
 
 class XYZPolarAzimuthStage(XYZPolarStage):
     """
-    Four-axis stage with a standard xyz stage and two axis of rotation: polar and azimuth.
+    Five-axis stage with a standard xyz stage and two axis of rotation: polar and azimuth.
     """
 
     def __init__(
