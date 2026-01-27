@@ -43,7 +43,8 @@ class BimorphMirrorChannel(StandardReadable, EpicsDevice):
     """Collection of PVs comprising a single bimorph channel.
 
     Attributes:
-        target_voltage: Float RW_RBV for target voltage, which can be set using parent mirror's all target proc
+        target_voltage: Float RW_RBV for target voltage, which can be set using parent
+            mirror's all target proc
         output_voltage: Float RW_RBV for current voltage on bimorph
         status: BimorphMirrorOnOff readable for ON/OFF status of channel
         shift: Float writeable shifting channel voltage

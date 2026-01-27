@@ -38,14 +38,14 @@ def run_functions_without_blocking(
     ensures exceptions on each returned status are propagated
 
     Args:
-    functions_to_chain( list(function - > StatusBase) ): A list of functions which each
-                                                            return a status object
-    associated_obj (Device | None): The device that should be associated with the
-                                        returned status
+        functions_to_chain( list(function - > StatusBase) ): A list of functions which
+            each return a status object
+        associated_obj (Device | None): The device that should be associated with the
+            returned status
 
     Returns:
-    Status: A status object which is marked as complete once all of the Status objects
-    returned by the unwrapped functions have completed.
+        Status: A status object which is marked as complete once all of the Status
+            objects returned by the unwrapped functions have completed.
     """
 
     # The returned status - marked as finished at the end of the callback chain. If any

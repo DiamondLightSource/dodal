@@ -64,7 +64,8 @@ class NullZoomController(BaseZoomController):
 class BeamCentreForZoom(StandardReadable):
     """These PVs hold the beam centre on the OAV at each zoom level.
 
-    When the zoom level is changed the IOC will update the OAV overlay PVs to be at these positions."""
+    When the zoom level is changed the IOC will update the OAV overlay PVs to be at
+    these positions."""
 
     def __init__(
         self, prefix: str, level_name_pv_suffix: str, centre_value_pv_suffix: str
@@ -146,11 +147,13 @@ class OAV(StandardReadable):
     """
     Class for oav device
 
-    x_direction(int): Should only be 1 or -1, with 1 indicating the oav x direction is the same with motor x
-    y_direction(int): Same with x_direction but for motor y
-    z_direction(int): Same with x_direction but for motor z
-    mjpg_x_size_pv(str): PV infix for x_size in mjpg
-    mjpg_y_size_pv(str): PV infix for y_size in mjpg
+    Attributes:
+        x_direction(int): Should only be 1 or -1, with 1 indicating the oav x direction
+            is the same with motor x
+        y_direction(int): Same with x_direction but for motor y
+        z_direction(int): Same with x_direction but for motor z
+        mjpg_x_size_pv(str): PV infix for x_size in mjpg
+        mjpg_y_size_pv(str): PV infix for y_size in mjpg
     """
 
     beam_centre_i: SignalR[int]
@@ -240,11 +243,13 @@ class OAVBeamCentreFile(OAV):
     must be a OAVConfigBeamCentre object, as this contains a filepath to where the beam
     centre values are stored.
 
-    x_direction(int): Should only be 1 or -1, with 1 indicating the oav x direction is the same with motor x
-    y_direction(int): Same with x_direction but for motor y
-    z_direction(int): Same with x_direction but for motor z
-    mjpg_x_size_pv(str): PV infix for x_size in mjpg
-    mjpg_y_size_pv(str): PV infix for y_size in mjpg
+    Attributes:
+        x_direction(int): Should only be 1 or -1, with 1 indicating the oav x direction
+            is the same with motor x
+        y_direction(int): Same with x_direction but for motor y
+        z_direction(int): Same with x_direction but for motor z
+        mjpg_x_size_pv(str): PV infix for x_size in mjpg
+        mjpg_y_size_pv(str): PV infix for y_size in mjpg
     """
 
     def __init__(

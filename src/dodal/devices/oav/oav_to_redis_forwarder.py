@@ -71,12 +71,12 @@ class OAVToRedisForwarder(StandardReadable, Flyable, Stoppable):
         """Reads image data from the MJPEG stream on an OAV and forwards it into a
         redis database. This is currently only used for murko integration.
 
-        Arguments:
-            prefix: str             the PV prefix of the OAV
-            redis_host: str         the host where the redis database is running
-            redis_password: str     the password for the redis database
-            redis_db: int           which redis database to connect to, defaults to 0
-            name: str               the name of this device
+        Args:
+            prefix (str): The PV prefix of the OAV
+            redis_host (str): The host where the redis database is running
+            redis_password (str): The password for the redis database
+            redis_db (int): Which redis database to connect to, defaults to 0
+            name (str): The name of this device
         """
         self.counter = epics_signal_r(int, f"{prefix}CAM:ArrayCounter_RBV")
         self.sources = DeviceVector(

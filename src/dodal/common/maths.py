@@ -10,14 +10,11 @@ def step_to_num(start: float, stop: float, step: float) -> tuple[float, float, i
     outer axis.
 
     Args:
-        start (float):
-            Start of length, will be returned unchanged
-        stop (float):
-            End of length, if length/step does not divide cleanly will be returned
-            extended up to 1% of step, or else truncated.
-        step (float):
-            Length of a step along the line formed from start to stop.
-            If stop < start, will be coerced to be backwards.
+        start (float): Start of length, will be returned unchanged
+        stop (float): End of length, if length/step does not divide cleanly will be
+            returned extended up to 1% of step, or else truncated.
+        step (float): Length of a step along the line formed from start to stop. If
+            stop < start, will be coerced to be backwards.
 
     Returns:
         start, adjusted_stop, num = Tuple[float, float, int]
@@ -40,10 +37,12 @@ def in_micros(t: float) -> int:
 
     Args:
         t (float): A time in seconds
+
     Raises:
         ValueError: if t < 0
+
     Returns:
-        t (int): A time in microseconds, rounded up to the nearest whole microsecond,
+        t (int): A time in microseconds, rounded up to the nearest whole microsecond
     """
     if t < 0:
         raise ValueError(f"Expected a positive time in seconds, got {t!r}")

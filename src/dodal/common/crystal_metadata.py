@@ -36,7 +36,8 @@ class CrystalMetadata:
         lattice_parameter: float, reflection: tuple[int, int, int]
     ) -> tuple[float, str]:
         """
-        Calculates the d-spacing value in nanometers based on the given lattice parameter and reflection indices.
+        Calculates the d-spacing value in nanometers based on the given lattice
+        parameter and reflection indices.
         """
         h_index, k_index, l_index = reflection
         d_spacing_m = lattice_parameter / math.sqrt(

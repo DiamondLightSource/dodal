@@ -62,16 +62,15 @@ class AbstractAnalyserDriverIO(
         Args:
             prefix: Base PV to connect to EPICS for this device.
             acquisition_mode_type: Enum that determines the available acquisition modes
-                                   for this device.
+                for this device.
             lens_mode_type: Enum that determines the available lens mode for this
-                            device.
+                device.
             psu_mode_type: Enum that determines the available psu modes for this device.
             pass_energy_type: Can be enum or float, depends on electron analyser model.
-                              If enum, it determines the available pass energies for
-                              this device.
+                If enum, it determines the available pass energies for this device.
             energy_source: Device that can give us the correct excitation energy and
-                           switch sources if applicable.
-                            (in eV).
+                switch sources if applicable.
+                (in eV).
             name: Name of the device.
         """
         self.acquisition_mode_type = acquisition_mode_type
@@ -183,11 +182,11 @@ class AbstractAnalyserDriverIO(
         derived signal.
 
         Args:
-            energy_axis:       Array data of the original energy_axis from epics.
+            energy_axis: Array data of the original energy_axis from epics.
             excitation_energy: The excitation energy value used for the scan of this
-                               region.
-            energy_mode:       The energy_mode of the region that was used for the scan
-                               of this region.
+                region.
+            energy_mode: The energy_mode of the region that was used for the scan of
+                this region.
 
         Returns:
             Array that is the correct axis for the spectra data.

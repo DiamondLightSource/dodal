@@ -26,8 +26,9 @@ def set_commissioning_signal(signal: SignalR[bool] | None):
     """Commissioning mode is enabled by a PV which when set enables commissioning mode.
     This allows beamline staff to ensure that commissioning mode is disabled prior
     to production use, via their own 'good morning' startup scripts.
+
     Args:
         signal: The signal which will be read in order to determine whether
-        commissioning mode is enabled."""
+            commissioning mode is enabled."""
     global _commissioning_signal
     _commissioning_signal = signal

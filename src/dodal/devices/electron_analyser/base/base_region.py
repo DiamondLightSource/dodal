@@ -31,8 +31,11 @@ def java_to_python_case(java_str: str) -> str:
     """
     Convert a camelCase Java-style string to a snake_case Python-style string.
 
-    :param java_str: The Java-style camelCase string.
-    :return: The Python-style snake_case string.
+    Args:
+        java_str: The Java-style camelCase string.
+
+    Returns:
+        str: The Python-style snake_case string.
     """
     new_value = re.sub("(.)([A-Z][a-z]+)", r"\1_\2", java_str)
     new_value = re.sub("([a-z0-9])([A-Z])", r"\1_\2", new_value).lower()
@@ -112,13 +115,13 @@ class AbstractBaseRegion(
         excitation enerrgy. It doesn't calculate anything if the region is already of
         the same energy mode.
 
-        Parameters:
+        Args:
             energy_mode: Mode you want to switch the region to.
             excitation_energy: Energy conversion for low_energy, centre_energy, and
-                               high_energy for new energy mode.
+                high_energy for new energy mode.
             copy: Defaults to True. If true, create a copy of this region to alter for
-                  the new energy_mode and return it. If False, alter this region for the
-                  energy_mode and return it self.
+                the new energy_mode and return it. If False, alter this region for the
+                energy_mode and return it self.
 
         Returns:
             Region with selected energy mode and new calculated energy values.
@@ -147,14 +150,14 @@ class AbstractBaseRegion(
         new values for low_energy, centre_energy, and high_energy while also preserving
         the original energy mode e.g mode BINDING will stay as BINDING.
 
-        Parameters:
+        Args:
             excitation_energy: Energy conversion for low_energy, centre_energy, and
-                               high_energy for new energy mode.
+                high_energy for new energy mode.
             copy: Defaults to True. If true, create a copy of this region to alter to
-                  calculate new energy values to return. If false, alter this region.
+                calculate new energy values to return. If false, alter this region.
         Returns:
             Region with selected original energy mode and new calculated KINETIC energy
-            values for epics.
+                values for epics.
         """
         original_energy_mode = self.energy_mode
         r = self.switch_energy_mode(EnergyMode.KINETIC, excitation_energy, copy)

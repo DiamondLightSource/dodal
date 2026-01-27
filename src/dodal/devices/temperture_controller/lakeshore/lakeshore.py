@@ -28,27 +28,19 @@ class Lakeshore(LakeshoreBaseIO, StandardReadable, Movable[float]):
     Device for controlling and reading from a Lakeshore temperature controller.
     It supports multiple channels and PID control.
 
-    Attributes
-    ----------
-    temperature : LakeshoreBaseIO
-        Temperature IO interface.
-    PID : PIDBaseIO
-        PID IO interface.
-    control_channel : derived_signal_rw
-        Signal for selecting the control channel,
-        optional readback as hinted signal
-        (default readback channel is the same as control channel).
+    Attributes:
+        temperature (LakeshoreBaseIO): Temperature IO interface.
+        PID (PIDBaseIO): PID IO interface.
+        control_channel (derived_signal_rw): Signal for selecting the control channel,
+            optional readback as hinted signal (default readback channel is the same
+            as control channel).
+        temperature_high_limit (soft_signal_rw): Signal to store the soft high
+            temperature limit.
+        temperature_low_limit (soft_signal_rw): Signal to store the soft low
+            temperature limit.
 
-    temperature_high_limit: soft_signal_rw
-        Signal to store the soft high temperature limit.
-    temperature_low_limit: soft_signal_rw
-        Signal to store the soft low temperature limit.
-
-
-    Methods
-    -------
-    set(value: float)
-        Set the temperature setpoint for the selected control channel.
+    Methods:
+        set(value: float): Set the temperature setpoint for the selected control channel.
     """
 
     def __init__(
@@ -61,20 +53,14 @@ class Lakeshore(LakeshoreBaseIO, StandardReadable, Movable[float]):
         name: str = "",
     ):
         """
-        Parameters
-        ----------
-        prefix : str
-            The EPICS prefix for the device.
-        no_channels : int
-            Number of temperature channels.
-        heater_setting : type[SignalDatatypeT]
-            Enum type for heater settings.
-        control_channel : int, optional
-            The initial control channel (default is 1).
-        single_control_channel : bool, optional
-            Whether to use a single control channel (default is False).
-        name : str, optional
-            Name of the device.
+        Args:
+            prefix (str): The EPICS prefix for the device.
+            no_channels (int): Number of temperature channels.
+            heater_setting (type[SignalDatatypeT]): Enum type for heater settings.
+            control_channel (int, optional): The initial control channel (default is 1).
+            single_control_channel (bool, optional): Whether to use a single control
+                channel (default is False).
+            name (str, optional): Name of the device.
         """
         self._control_channel = soft_signal_rw(int, initial_value=control_channel)
         self.temperature_high_limit = soft_signal_rw(float, initial_value=400)
@@ -158,12 +144,10 @@ class Lakeshore336(Lakeshore):
         """
         Lakeshore 336 temperature controller. With 4 readback and control channels.
         Heater settings are: Off, Low, Medium, High.
-        Parameters
-        ----------
-        prefix : str
-            The EPICS prefix for the device.
-        control_channel : int, optional
-            The initial control channel (default is 1).
+
+        Args:
+            prefix (str): The EPICS prefix for the device.
+            control_channel (int, optional): The initial control channel (default is 1).
         """
         super().__init__(
             prefix=prefix,
@@ -186,12 +170,9 @@ class Lakeshore340(Lakeshore):
         control channel.
         Heater settings are in power from 0 to 5. 0 is 0 watt, 5 is 50 watt.
 
-        Parameters
-        ----------
-        prefix : str
-            The EPICS prefix for the device.
-        control_channel : int, optional
-            The initial control channel (default is 1).
+        Args:
+            prefix (str): The EPICS prefix for the device.
+            control_channel (int, optional): The initial control channel (default is 1).
         """
 
         super().__init__(

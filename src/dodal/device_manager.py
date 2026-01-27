@@ -569,9 +569,9 @@ class DeviceManager:
         will not be included unless explicitly requested allowing for devices to
         be overridden.
 
-        Errors:
-            If a required dependency is not available as either a device
-            factory or a fixture, a ValueError is raised
+        Raises:
+            If a required dependency is not available as either a device factory or a
+                fixture, a ValueError is raised
         """
         dependencies = set()
         factories = set(factories)

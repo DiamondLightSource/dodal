@@ -50,35 +50,32 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
     energy and polarisation, and handles conversion between energy/polarisation and
     motor positions via a user-supplied conversion callable.
 
-    Attributes
-    ----------
-    apple2 : Reference[Apple2Type]
-        Reference to the Apple2 device containing gap and phase motors.
-    energy : derived_signal_rw
-        Derived signal for moving and reading back energy.
-    polarisation_setpoint : SignalR
-        Soft signal for the polarisation setpoint.
-    polarisation : derived_signal_rw
-        Hardware-backed signal for polarisation readback and control.
-    gap_energy_to_motor_converter : EnergyMotorConvertor
-        Callable that converts energy and polarisation to gap motor positions.
-    phase_energy_to_motor_converter : EnergyMotorConvertor
-        Callable that converts energy and polarisation to phase motor positions.
-    maximum_gap_motor_position : float
-        Maximum allowed position for the gap motor.
-    maximum_phase_motor_position : float
-        Maximum allowed position for the raw phase motors.
+    Attributes:
+        apple2 (Reference[Apple2Type]): Reference to the Apple2 device containing gap
+            and phase motors.
+        energy (derived_signal_rw): Derived signal for moving and reading back energy.
+        polarisation_setpoint (SignalR): Soft signal for the polarisation setpoint.
+        polarisation (derived_signal_rw): Hardware-backed signal for polarisation
+            readback and control.
+        gap_energy_to_motor_converter (EnergyMotorConvertor): Callable that converts
+            energy and polarisation to gap motor positions.
+        phase_energy_to_motor_converter (EnergyMotorConvertor): Callable that converts
+            energy and polarisation to phase motor positions.
+        maximum_gap_motor_position (float): Maximum allowed position for the gap motor.
+        maximum_phase_motor_position (float): Maximum allowed position for the raw phase
+            motors.
 
-    Abstract Methods
-    ----------------
-    _get_apple2_value(gap: float, phase: float) -> Apple2Val
-        Abstract method to return the Apple2Val used to set the apple2 with.
-    Notes
-    -----
-    - Subclasses must implement `_get_apple2_value` for beamline-specific logic.
-    - LH3 polarisation is indistinguishable from LH in hardware; special handling is provided.
-    - Supports multiple polarisation modes, including linear horizontal (LH), linear vertical (LV),
-      positive circular (PC), negative circular (NC), and linear arbitrary (LA).
+    Abstract Methods:
+        _get_apple2_value(gap: float, phase: float) -> Apple2Val
+            Abstract method to return the Apple2Val used to set the apple2 with.
+
+    Notes:
+        - Subclasses must implement `_get_apple2_value` for beamline-specific logic.
+        - LH3 polarisation is indistinguishable from LH in hardware; special handling is
+            provided.
+        - Supports multiple polarisation modes, including linear horizontal (LH), linear
+            vertical (LV), positive circular (PC), negative circular (NC), and linear
+            arbitrary (LA).
 
     """
 
@@ -93,19 +90,14 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
         name: str = "",
     ) -> None:
         """
-
-        Parameters
-        ----------
-        apple2: Apple2
-            An Apple2 device.
-        gap_energy_motor_converter: EnergyMotorConvertor
-            The callable that handles the gap look up table logic for the insertion device.
-        phase_energy_motor_converter: EnergyMotorConvertor
-            The callable that handles the phase look up table logic for the insertion device.
-        units: str
-            the units of this device. Defaults to eV.
-        name: str
-            Name of the device.
+        Args:
+            apple2 (Apple2): An Apple2 device.
+            gap_energy_motor_converter (EnergyMotorConvertor): The callable that handles
+                the gap look up table logic for the insertion device.
+            phase_energy_motor_converter (EnergyMotorConvertor): The callable that
+                handles the phase look up table logic for the insertion device.
+            units (str): the units of this device. Defaults to eV.
+            name (str): Name of the device.
         """
         self.apple2 = Reference(apple2)
         self.gap_energy_motor_converter = gap_energy_motor_converter
@@ -249,8 +241,10 @@ class Apple2Controller(abc.ABC, StandardReadable, Generic[Apple2Type]):
         """
         Determine polarisation and phase value using motor position patterns.
         However there is no way to return lh3 polarisation or higher harmonic setting.
-        (May be for future one can use the inverse poly to work out the energy and try to match it with the current energy
-        to workout the polarisation but during my test the inverse poly is too unstable for general use.)
+        (May be for future one can use the inverse poly to work out the energy and try
+        to match it with the current energy
+        to workout the polarisation but during my test the inverse poly is too unstable
+        for general use.)
         """
         if gap > self.maximum_gap_motor_position:
             raise RuntimeError(

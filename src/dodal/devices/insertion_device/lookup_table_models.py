@@ -167,10 +167,8 @@ class EnergyCoverage(BaseModel):
         """
         Return the numpy.poly1d polynomial applicable for the given energy.
 
-        Parameters:
-        -----------
-        energy:
-            Energy value in the same units used to create the lookup table.
+        Args:
+            energy: Energy value in the same units used to create the lookup table.
         """
 
         if not self.min_energy <= energy <= self.max_energy:
@@ -232,14 +230,12 @@ class LookupTable(RootModel[dict[Pol, EnergyCoverage]]):
         pol: Pol,
     ) -> np.poly1d:
         """
-        Return the numpy.poly1d polynomial applicable for the given energy and polarisation.
+        Return the numpy.poly1d polynomial applicable for the given energy and
+        polarisation.
 
-        Parameters:
-        -----------
-        energy:
-            Energy value in the same units used to create the lookup table.
-        pol:
-            Polarisation mode (Pol enum).
+        Args:
+            energy: Energy value in the same units used to create the lookup table.
+            pol: Polarisation mode (Pol enum).
         """
         return self.root[pol].get_poly(energy)
 
@@ -252,18 +248,14 @@ def convert_csv_to_lookup(
     """
     Convert CSV content into the Apple2 lookup-table dictionary.
 
-    Parameters:
-    -----------
-    file_contents:
-        The CSV file contents as string.
-    lut_config:
-        The configuration that how to process the file_contents into a LookupTable.
-    skip_line_start_with
-        Lines beginning with this prefix are skipped (default "#").
+    Args:
+        file_contents: The CSV file contents as string.
+        lut_config: The configuration that how to process the file_contents into a
+            LookupTable.
+        skip_line_start_with: Lines beginning with this prefix are skipped (default "#").
 
     Returns:
-    -----------
-    LookupTable
+        LookupTable
     """
     temp_mode_entries: dict[Pol, list[EnergyCoverageEntry]] = {}
 

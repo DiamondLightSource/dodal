@@ -10,6 +10,7 @@ CROSSHAIR_FILL_COLOUR = "White"
 def draw_crosshair(image: Image.Image, beam_x: int, beam_y: int):
     """
     Draw a crosshair at the beam centre coordinates specified.
+
     Args:
         image: The image to draw the crosshair onto. This is mutated.
         beam_x: The x-coordinate of the crosshair (pixels)
@@ -53,11 +54,15 @@ def compute_beam_centre_pixel_xy_for_mm_position(
 ) -> Pixel:
     """
     Compute the location of the beam centre in pixels on a reference image.
+
     Args:
-        sample_pos_mm: x, y location of the sample in mm relative to when the reference image
-            was taken.
-        beam_pos_at_origin_px: x, y position of the beam centre in the reference image (pixels)
-        microns_per_pixel: x, y scaling factor relating the sample position to the position in the image.
+        sample_pos_mm: x, y location of the sample in mm relative to when the reference
+            image was taken.
+        beam_pos_at_origin_px: x, y position of the beam centre in the reference image
+            (pixels)
+        microns_per_pixel: x, y scaling factor relating the sample position to the
+            position in the image.
+
     Returns:
         x, y location of the beam centre (pixels)
 

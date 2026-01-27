@@ -19,18 +19,14 @@ class Andor2Point(SingleTriggerDetector):
         plugins: dict[str, NDPluginBaseIO] | None = None,
     ) -> None:
         """
-        Parameters
-        ----------
-        prefix: str,
-           Beamline camera pv
-        drv_suffix : str,
-            Camera pv suffix
-        read_uncached: dict[str,str]
-            A dictionary contains the name and the pv suffix for the statistic plugin.
-        name: str:
-            Name of the device.
-        plugins:: Optional[dict[str, NDPluginBaseIO] | None
-            Dictionary containing plugin that are forward to the base class.
+        Args:
+            prefix (str): Beamline camera pv
+            drv_suffix (str): Camera pv suffix
+            read_uncached (dict[str,str]): A dictionary contains the name and the pv
+                suffix for the statistic plugin.
+            name (str): Name of the device.
+            plugins (Optional[dict[str, NDPluginBaseIO] | None): Dictionary containing
+                plugin that are forward to the base class.
         """
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             for k, v in read_uncached.items():

@@ -30,6 +30,7 @@ class StruckScaler(CurrentAmpCounter):
       range of detectors. This class contains the basic control to run the struckscaler
       card together with a current amplifier. It has functions that provide conversion
       between count and voltage.
+
     Attributes:
         readout(SignalR): Scaler card output.
         count_mode (SignalR[CountMode]): Counting card setting.

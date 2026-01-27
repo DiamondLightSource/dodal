@@ -204,17 +204,20 @@ def set_up_all_logging_handlers(
     debug_logging_path: Path | None = None,
 ) -> DodalLogHandlers:
     """Set up the default logging environment.
+
     Args:
-        logger:                 the logging.Logger object to apply all the handlers to.
-        logging_path:           The location to store log files.
-        filename:               The log filename.
-        dev_mode:               If true, will log to graylog on localhost instead of
-                                production. Defaults to False.
+        logger: The logging.Logger object to apply all the handlers to.
+        logging_path: The location to store log files.
+        filename: The log filename.
+        dev_mode: If true, will log to graylog on localhost instead of production.
+            Defaults to False.
         error_log_buffer_lines: Number of lines for the CircularMemoryHandler to keep in
-                                buffer and write to file when encountering an error message.
-        graylog_port:           The port to send graylog messages to, if None uses the
-                                default dodal port
-        debug_logging_path:     The location to store debug log files, if None uses `logging_path`
+            buffer and write to file when encountering an error message.
+        graylog_port: The port to send graylog messages to, if None uses the default
+            dodal port
+        debug_logging_path: The location to store debug log files, if None uses
+            `logging_path`
+
     Returns:
         A DodaLogHandlers TypedDict with the created handlers.
     """
@@ -261,7 +264,7 @@ def get_logging_file_paths() -> tuple[Path, Path]:
 
     Returns:
         tuple[Path, Path]: Paths to the standard log file and to the debug log file,
-                           for the file handlers to write to
+            for the file handlers to write to
     """
     beamline: str | None = environ.get("BEAMLINE")
 

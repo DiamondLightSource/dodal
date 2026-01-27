@@ -17,8 +17,10 @@ class Linkam3(StandardReadable):
     """Device to represent a Linkam3 temperature controller
 
     Attributes:
-        tolerance (float): Deadband around the setpoint within which the position is assumed to have been reached
-        settle_time (int): The delay between reaching the setpoint and the move being considered complete
+        tolerance (float): Deadband around the setpoint within which the position is
+            assumed to have been reached
+        settle_time (int): The delay between reaching the setpoint and the move being
+            considered complete
 
     Args:
         prefix (str): PV prefix for this device

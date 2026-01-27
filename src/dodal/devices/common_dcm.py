@@ -34,18 +34,22 @@ Xtal_2 = TypeVar("Xtal_2", bound=StationaryCrystal)
 
 class DoubleCrystalMonochromatorBase(StandardReadable, Generic[Xtal_1, Xtal_2]):
     """
-    Base device for the double crystal monochromator (DCM), used to select the energy of the beam.
+    Base device for the double crystal monochromator (DCM), used to select the energy of
+    the beam.
 
-    Features common across all DCM's should include virtual motors to set energy/wavelength and contain two crystals,
-    each of which can be movable. Some DCM's contain crystals with roll motors, and some contain crystals with roll and pitch motors.
-    This base device accounts for all combinations of this.
+    Features common across all DCM's should include virtual motors to set
+    energy/wavelength and contain two crystals, each of which can be movable. Some DCM's
+    contain crystals with roll motors, and some contain crystals with roll and pitch
+    motors. This base device accounts for all combinations of this.
 
-    This device should act as a parent for beamline-specific DCM's which do not match the standard EPICS interface, it provides
-    only energy and the crystal configuration.  Most beamlines should use DoubleCrystalMonochromator instead
+    This device should act as a parent for beamline-specific DCM's which do not match
+    the standard EPICS interface, it provides only energy and the crystal configuration.
+    Most beamlines should use DoubleCrystalMonochromator instead.
 
-    Bluesky plans using DCM's should be typed to specify which types of crystals are required. For example, a plan
-    which only requires one crystal which can roll should be typed
-    'def my_plan(dcm: DoubleCrystalMonochromatorBase[RollCrystal, StationaryCrystal])`
+    Bluesky plans using DCM's should be typed to specify which types of crystals are
+    required. For example, a plan which only requires one crystal which can roll should
+    be typed 'def my_plan(dcm: DoubleCrystalMonochromatorBase[RollCrystal,
+    StationaryCrystal])`
     """
 
     def __init__(

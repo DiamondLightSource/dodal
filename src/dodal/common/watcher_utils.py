@@ -56,15 +56,15 @@ def log_on_percentage_complete(
     percent_interval: int = 25,
 ):
     """
-    Add watcher to a WatchableAsyncStatus status which will periodically log a message based on percentage completion
+    Add watcher to a WatchableAsyncStatus status which will periodically log a message
+    based on percentage completion
 
     Args:
-        status: A WatchableAsyncStatus. For example, Ophyd-async produces this status from a Motor.set method
-
+        status: A WatchableAsyncStatus. For example, Ophyd-async produces this status
+            from a Motor.set method
         message_prefix: The string at the start of each of the produced logging messages
-
-        percent_interval: How often to produce logging message, in terms of percentage completion
-        of the status.
+        percent_interval: How often to produce logging message, in terms of percentage
+            completion of the status.
 
     Note that when using with Bluesky plan stubs you will need to cast the status (as of
     Bluesky v1.14.2), since a Bluesky status doesn't use generics - see https://github.com/bluesky/bluesky/issues/1948.
@@ -78,6 +78,5 @@ def log_on_percentage_complete(
     status = cast(WatchableAsyncStatus, status)
     log_on_percentage_complete(status, "Data collection triggers received", 10)
     yield from bps.wait("collection complete")
-
     """
     _LogOnPercentageProgressWatcher(status, message_prefix, percent_interval)

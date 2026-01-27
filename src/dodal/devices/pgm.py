@@ -20,16 +20,11 @@ class PlaneGratingMonochromator(StandardReadable):
         name: str = "",
     ) -> None:
         """
-        Parameters
-        ----------
-        prefix:
-            Beamline specific part of the PV
-        grating:
-            The Enum for the grating table.
-        grating_pv:
-            The suffix pv part of grating Pv
-        name:
-            Name of the device
+        Args:
+            prefix: Beamline specific part of the PV
+            grating: The Enum for the grating table.
+            grating_pv: The suffix pv part of grating Pv
+            name: Name of the device
         """
         with self.add_children_as_readables():
             self.energy = Motor(prefix + "ENERGY")

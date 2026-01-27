@@ -57,7 +57,7 @@ class GenericFastShutter(
         name: str = "",
     ):
         """
-        Arguments:
+        Args:
             pv: The pv to connect to the shutter device.
             open_state: The enum value that corresponds with opening the shutter.
             close_state: The enum value that corresponds with closing the shutter.
@@ -86,7 +86,7 @@ class DualFastShutter(StandardReadable, FastShutter[EnumTypesT], Generic[EnumTyp
         name: str = "",
     ):
         """
-        Arguments:
+        Args:
             shutter1: Active shutter that corrosponds to SelectedSource.SOURCE1.
             shutter2: Active shutter that corrosponds to SelectedSource.SOURCE2.
             selected_source: Signal that decides the active shutter.

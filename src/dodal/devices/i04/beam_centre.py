@@ -75,7 +75,7 @@ def get_roi(
 
     Returns:
         tuple[np.ndarray, tuple[int, int], tuple[int, int]]: The ROI array, and (x, y)
-        coordinates of the top left and bottom right corners of the ROI box.
+            coordinates of the top left and bottom right corners of the ROI box.
     """
     height, width = image_arr.shape[:2]
     x_dist = (box_width) / 2

@@ -286,7 +286,7 @@ def get_yz_least_squares(vertical_dists: list, omegas: list) -> tuple[float, flo
 
     Returns:
         tuple[float, float]: y, z distances from centre, in whichever units
-        v_dists came as.
+            v_dists came as.
     """
     thetas = np.radians(omegas)
     matrix = np.column_stack([np.cos(thetas), -np.sin(thetas)])

@@ -23,7 +23,8 @@ async def periodic_reminder(
         schedule: A tuple list of tuples consisting of (int|float, int|None).
             A sequence of (delay_seconds, count) pairs defining the logging intervals.
             - delay_seconds is the number of seconds to wait between logs.
-            - count is how many times to log at this interval. If count is None, it logs indefinitely at that delay.
+            - count is how many times to log at this interval. If count is None, it logs
+                indefinitely at that delay.
     """
 
     async def _log_loop():

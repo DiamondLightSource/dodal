@@ -40,12 +40,9 @@ class ChannelCutMonochromator(
         name: str = "",
     ) -> None:
         """
-        Parameters
-        ----------
-        prefix:
-            Beamline specific part of the PV
-        name:
-            Name of the device
+        Args:
+            prefix: Beamline specific part of the PV
+            name: Name of the device
         """
         with self.add_children_as_readables():
             # crystal motors

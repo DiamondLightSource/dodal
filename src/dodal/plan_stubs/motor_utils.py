@@ -29,8 +29,8 @@ def check_and_cache_values(
     maximum_move: float,
 ) -> Generator[Msg, Any, dict[Motor, float]]:
     """Caches the positions of all Motors on specified device if they are within
-    smallest_move of home_position. Throws MoveTooLargeError if they are outside maximum_move
-    of the home_position
+    smallest_move of home_position. Throws MoveTooLargeError if they are outside
+    maximum_move of the home_position
     """
     positions = {}
     for axis, new_position in devices_and_positions.items():
@@ -76,16 +76,11 @@ def move_and_reset_wrapper(
     Args:
         plan (Callable[[], MsgGenerator]): The plan to move between homing and returning to the cache
         device (Device): The device to move. All Motors in the device will be cached and moved
-        smallest_move (float): The smallest move that we care about doing the home and cache for.
-                               Useful for not wearing out motors if you have large tolerances
-        maximum_move (float): If any Motor starts this far from the home an exception is raised
-                              and no moves occur
+        smallest_move (float): The smallest move that we care about doing the home and cache for.  Useful for not wearing out motors if you have large tolerances
+        maximum_move (float): If any Motor starts this far from the home an exception is raised and no moves occur
         home_position (float): The position to move every motor to after caching
-        group (str, optional): If set the home move will be done using the home-{group}
-                               group and the reset to cache done using reset-{group}
-        wait_for_all (bool, optional): If true the home and reset to cache will be waited
-                                       on. If false it is left up to the caller to wait on
-                                       them. Defaults to True.
+        group (str, optional): If set the home move will be done using the home-{group} group and the reset to cache done using reset-{group}
+        wait_for_all (bool, optional): If true the home and reset to cache will be waited on. If false it is left up to the caller to wait on them. Defaults to True.
     """
     initial_positions = yield from check_and_cache_values(
         device_and_positions, smallest_move, maximum_move

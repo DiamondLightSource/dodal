@@ -36,14 +36,15 @@ class _GDAParamApertureValue(StrictEnum):
 class AperturePosition(BaseModel):
     """
     Represents one of the available positions for the Aperture-Scatterguard.
+
     Attributes:
         aperture_x: The x position of the aperture component in mm
         aperture_y: The y position of the aperture component in mm
         aperture_z: The z position of the aperture component in mm
         scatterguard_x: The x position of the scatterguard component in mm
         scatterguard_y: The y position of the scatterguard component in mm
-        diameter: Diameter of the selected aperture. When in the Robot Load position, the
-            diameter is defined to be 0
+        diameter: Diameter of the selected aperture. When in the Robot Load position,
+            the diameter is defined to be 0
     """
 
     aperture_x: float

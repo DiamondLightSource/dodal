@@ -10,14 +10,18 @@ def verify_undulator_gap_before_run_wrapper(
     run_key_to_wrap: str | None = None,
 ):
     """
-    Modifies the wrapped plan so that it checks the undulator gap before the specified run is opened and sets it to the correct value if needed.
+    Modifies the wrapped plan so that it checks the undulator gap before the specified
+        run is opened and sets it to the correct value if needed.
 
-    After a beam dump, the undulator gap may not return correctly, scientists have often requested that this check is done before collections.
+    After a beam dump, the undulator gap may not return correctly, scientists have often
+        requested that this check is done before collections.
 
     Args:
         plan: The plan performing the run.
-        devices (CheckUndulatorDevices): Any device composite including the DCM and undulator
-        run_key_to_wrap: (str | None): The plan to verify the undulator gap is inserted after the 'open_run' message is seen with
+        devices (CheckUndulatorDevices): Any device composite including the DCM and
+            undulator
+        run_key_to_wrap: (str | None): The plan to verify the undulator gap is inserted
+            after the 'open_run' message is seen with
         the matching run key. If not specified, instead wrap the first run encountered.
     """
 
