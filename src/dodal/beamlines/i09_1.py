@@ -4,8 +4,7 @@ from dodal.device_manager import DeviceManager
 from dodal.devices.common_dcm import DoubleCrystalMonochromatorWithDSpacing
 from dodal.devices.electron_analyser.base import EnergySource
 from dodal.devices.electron_analyser.specs import SpecsDetector
-from dodal.devices.i09_1 import LensMode, PsuMode
-from dodal.devices.i09_1.sample_stage import SampleManipulator
+from dodal.devices.i09_1 import LensMode, PsuMode, SampleManipulator
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.temperture_controller import Lakeshore336
 from dodal.log import set_beamline as set_log_beamline
