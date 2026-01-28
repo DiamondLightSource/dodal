@@ -9,8 +9,8 @@ from ophyd_async.testing import (
     assert_reading,
 )
 
-import dodal.devices.b07 as b07
-import dodal.devices.i09 as i09
+import dodal.devices.beamlines.b07 as b07
+import dodal.devices.beamlines.i09 as i09
 from dodal.devices.electron_analyser.base import (
     EnergySource,
     GenericBaseElectronAnalyserDetector,

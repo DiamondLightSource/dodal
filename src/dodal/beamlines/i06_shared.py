@@ -15,6 +15,7 @@ BL = get_beamline_name("i06")
 PREFIX = BeamlinePrefix(BL)
 set_log_beamline(BL)
 set_utils_beamline(BL)
+
 devices = DeviceManager()
 
 

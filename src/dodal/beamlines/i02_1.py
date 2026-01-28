@@ -9,9 +9,9 @@ from dodal.devices.attenuator.filter_selections import (
     I02_1FilterThreeSelections,
     I02_1FilterTwoSelections,
 )
+from dodal.devices.beamlines.i02_1.fast_grid_scan import ZebraFastGridScanTwoD
+from dodal.devices.beamlines.i02_1.sample_motors import SampleMotors
 from dodal.devices.eiger import EigerDetector
-from dodal.devices.i02_1.fast_grid_scan import ZebraFastGridScanTwoD
-from dodal.devices.i02_1.sample_motors import SampleMotors
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.zebra.zebra import Zebra
 from dodal.devices.zebra.zebra_constants_mapping import (

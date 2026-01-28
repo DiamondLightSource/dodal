@@ -13,12 +13,12 @@ from ophyd_async.testing import (
     partial_reading,
 )
 
+from dodal.devices.beamlines.i09 import LensMode, PassEnergy, PsuMode
 from dodal.devices.electron_analyser.base import EnergyMode
 from dodal.devices.electron_analyser.vgscienta import (
     VGScientaAnalyserDriverIO,
     VGScientaRegion,
 )
-from dodal.devices.i09 import LensMode, PassEnergy, PsuMode
 from dodal.testing.electron_analyser import create_driver
 from tests.devices.electron_analyser.helper_util import (
     TEST_SEQUENCE_REGION_NAMES,

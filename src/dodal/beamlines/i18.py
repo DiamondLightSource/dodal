@@ -12,13 +12,13 @@ from dodal.common.visit import (
     LocalDirectoryServiceClient,
     StaticVisitPathProvider,
 )
+from dodal.devices.beamlines.i18.diode import Diode
+from dodal.devices.beamlines.i18.kb_mirror import KBMirror
 from dodal.devices.common_dcm import (
     DoubleCrystalMonochromatorWithDSpacing,
     PitchAndRollCrystal,
     RollCrystal,
 )
-from dodal.devices.i18.diode import Diode
-from dodal.devices.i18.kb_mirror import KBMirror
 from dodal.devices.motors import XYStage, XYZThetaStage
 from dodal.devices.slits import Slits
 from dodal.devices.synchrotron import Synchrotron

@@ -3,7 +3,7 @@ from typing import Any
 import pytest
 
 from dodal.common.data_util import load_json_file_to_class
-from dodal.devices.b07 import LensMode, PsuMode
+from dodal.devices.beamlines.b07 import LensMode, PsuMode
 from dodal.devices.electron_analyser.base import EnergyMode
 from dodal.devices.electron_analyser.specs import (
     AcquisitionMode,

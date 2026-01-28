@@ -1,5 +1,5 @@
 from dodal.device_manager import DeviceManager
-from dodal.devices.i05.enums import Grating
+from dodal.devices.beamlines.i05.enums import Grating
 from dodal.devices.insertion_device import (
     Apple2,
     UndulatorGap,

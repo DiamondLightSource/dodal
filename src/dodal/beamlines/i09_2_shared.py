@@ -3,8 +3,8 @@ from pathlib import Path
 from daq_config_server.client import ConfigServer
 
 from dodal.device_manager import DeviceManager
-from dodal.devices.i09.enums import Grating
-from dodal.devices.i09_2_shared.i09_apple2 import (
+from dodal.devices.beamlines.i09.enums import Grating
+from dodal.devices.beamlines.i09_2_shared.i09_apple2 import (
     J09_GAP_POLY_DEG_COLUMNS,
     J09_PHASE_POLY_DEG_COLUMNS,
 )

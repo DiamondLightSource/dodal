@@ -11,18 +11,18 @@ from dodal.devices.aperturescatterguard import (
 from dodal.devices.attenuator.attenuator import BinaryFilterAttenuator
 from dodal.devices.backlight import Backlight
 from dodal.devices.baton import Baton
+from dodal.devices.beamlines.i03.dcm import DCM
+from dodal.devices.beamlines.i04.beam_centre import CentreEllipseMethod
+from dodal.devices.beamlines.i04.beamsize import Beamsize
+from dodal.devices.beamlines.i04.constants import RedisConstants
+from dodal.devices.beamlines.i04.max_pixel import MaxPixel
+from dodal.devices.beamlines.i04.murko_results import MurkoResultsDevice
+from dodal.devices.beamlines.i04.transfocator import Transfocator
 from dodal.devices.detector.detector_motion import DetectorMotion
 from dodal.devices.diamond_filter import DiamondFilter, I04Filters
 from dodal.devices.eiger import EigerDetector
 from dodal.devices.fast_grid_scan import ZebraFastGridScanThreeD
 from dodal.devices.flux import Flux
-from dodal.devices.i03.dcm import DCM
-from dodal.devices.i04.beam_centre import CentreEllipseMethod
-from dodal.devices.i04.beamsize import Beamsize
-from dodal.devices.i04.constants import RedisConstants
-from dodal.devices.i04.max_pixel import MaxPixel
-from dodal.devices.i04.murko_results import MurkoResultsDevice
-from dodal.devices.i04.transfocator import Transfocator
 from dodal.devices.ipin import IPin
 from dodal.devices.motors import XYZStage
 from dodal.devices.mx_phase1.beamstop import Beamstop

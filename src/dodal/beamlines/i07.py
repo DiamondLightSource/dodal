@@ -1,7 +1,7 @@
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.device_manager import DeviceManager
-from dodal.devices.i07.dcm import DCM
-from dodal.devices.i07.id import InsertionDevice
+from dodal.devices.beamlines.i07.dcm import DCM
+from dodal.devices.beamlines.i07.id import InsertionDevice
 from dodal.devices.undulator import UndulatorOrder
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
