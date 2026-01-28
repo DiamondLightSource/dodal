@@ -119,23 +119,11 @@ def shutter() -> AccessControlledShutter:
 
 @devices.factory()
 def synchrotron() -> Synchrotron:
-<<<<<<< HEAD
-=======
-    """Get the i19-2 synchrotron device, instantiate it if it hasn't already been.
-    If this is called when already instantiated in i19-2, it will return the existing
-    object."""
->>>>>>> ae81c4554a (make docstrings consistent: grammar, punctuation, type hits)
     return Synchrotron()
 
 
 @devices.factory()
 def zebra() -> Zebra:
-<<<<<<< HEAD
-=======
-    """Get the i19-2 zebra device, instantiate it if it hasn't already been.
-    If this is called when already instantiated in i19-2, it will return the existing
-    object."""
->>>>>>> ae81c4554a (make docstrings consistent: grammar, punctuation, type hits)
     return Zebra(
         mapping=I19_2_ZEBRA_MAPPING,
         prefix=f"{PREFIX.beamline_prefix}-EA-ZEBRA-03:",
