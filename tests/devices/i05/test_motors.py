@@ -12,7 +12,6 @@ from dodal.devices.i05.motors import THETA, I05Goniometer
 async def goniometer():
     with init_devices(mock=True):
         goniometer = I05Goniometer("TEST:")
-    # await goniometer.polar.set(50)
     return goniometer
 
 
