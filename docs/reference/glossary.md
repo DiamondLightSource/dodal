@@ -19,6 +19,7 @@ This is a glossary of abbreviations, acronyms and terms used throughout this pro
 | dodal | Diamond Ophyd Device Abstraction Layer |
 | [EPICS](https://epics-controls.org/) | A set of software tools and applications which provide a software infrastructure for use in building distributed control systems to operate devices such as Particle Accelerators, Large Experiments and major Telescopes ("Experimental Physics and Industrial Control System") |
 | GDA | Java/RCP acquisition platform developed at Diamond ("Generic Data Acquisition") |
+| ID | Insertion Device |
 | IDE | Integrated Development Environment |
 | IO | Input / Output |
 | IOC | Input / Output Controller |
