@@ -49,4 +49,5 @@ def lakeshore() -> Lakeshore336:
 
 @devices.factory()
 def hsmpm() -> XYZPolarAzimuthTiltStage:
+    """Sample Manipulator"""
     return XYZPolarAzimuthTiltStage(prefix=f"{PREFIX.beamline_prefix}-MO-HSMPM-01:")
