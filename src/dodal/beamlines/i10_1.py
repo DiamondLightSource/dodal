@@ -1,10 +1,9 @@
 from dodal.beamlines.i10_shared import devices as i10_shared_devices
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.device_manager import DeviceManager
-from dodal.devices.current_amplifiers.current_amplifier_detector import CurrentAmpDet
+from dodal.devices.current_amplifiers import SR570, CurrentAmpDet
 from dodal.devices.i10 import I10JDiagnostic, I10JSlits, PiezoMirror
 from dodal.devices.i10_1 import (
-    I10JSR570,
     ElectromagnetMagnetField,
     ElectromagnetScalerCard1,
     ElectromagnetSR570,
@@ -25,10 +24,8 @@ devices.include(i10_shared_devices)
 
 
 @devices.factory()
-def mirror6_sr570() -> I10JSR570:
-    return I10JSR570(
-        prefix=f"{PREFIX.beamline_prefix}-DI-IAMP",
-    )
+def mirror6_sr570() -> SR570:
+    return SR570(prefix=f"{PREFIX.beamline_prefix}-DI-IAMP-07:")
 
 
 @devices.factory()
@@ -84,11 +81,11 @@ def electromagnet_sr570() -> ElectromagnetSR570:
 
 @devices.factory()
 def electromagnet_sr570_scaler_monitor(
-    mirror6_sr570: I10JSR570,
+    mirror6_sr570: SR570,
     electromagnet_scaler_card: ElectromagnetScalerCard1,
 ) -> CurrentAmpDet:
     return CurrentAmpDet(
-        current_amp=mirror6_sr570.ca1, counter=electromagnet_scaler_card.mon
+        current_amp=mirror6_sr570, counter=electromagnet_scaler_card.mon
     )
 
 
