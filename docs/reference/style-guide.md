@@ -24,6 +24,8 @@ Specific guidelines for use within this project which directly oppose decisions 
 
 5. Prefer using explicit true/false evaluation over [implicit false evaluations](https://google.github.io/styleguide/pyguide.html#214-truefalse-evaluations). Explicit false evaluation is more predictable when handling different data types (i.e. integers), as `0` is falsy.
 
+6. Prefer `Args:` documented in the [class docstring over `__init__` docstring](https://google.github.io/styleguide/pyguide.html#384-classes), to increase [readability of auto-generated documentation](https://www.sphinx-doc.org/en/master/usage/extensions/example_google.html).
+
 ## Guidance Which Agrees with [the Google Python Style Guide](https://google.github.io/styleguide/pyguide.html)
 
 Specific guidelines for use within this project which agree with decisions in [the Google Python Style Guide](https://google.github.io/styleguide/pyguide.html), but may be uncommon practice for those unfamiliar with Python. These tend to be guidelines which cannot be enforced by enabling a ruff rule.
