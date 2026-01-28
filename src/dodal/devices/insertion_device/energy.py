@@ -15,7 +15,11 @@ from ophyd_async.core import (
 )
 from ophyd_async.epics.motor import Motor
 
-from dodal.devices.insertion_device import MAXIMUM_MOVE_TIME, Apple2Controller
+from dodal.devices.insertion_device import (
+    MAXIMUM_MOVE_TIME,
+    Apple2Controller,
+    Apple2Type,
+)
 from dodal.log import LOGGER
 
 
@@ -34,7 +38,9 @@ class InsertionDeviceEnergyBase(abc.ABC, StandardReadable, Movable):
 class InsertionDeviceEnergy(InsertionDeviceEnergyBase, Preparable, Flyable):
     """Apple2 ID energy movable device."""
 
-    def __init__(self, id_controller: Apple2Controller, name: str = "") -> None:
+    def __init__(
+        self, id_controller: Apple2Controller[Apple2Type], name: str = ""
+    ) -> None:
         self.energy = Reference(id_controller.energy)
         self._id_controller = Reference(id_controller)
         super().__init__(name=name)
