@@ -12,11 +12,11 @@ from daq_config_server.client import ConfigServer
 
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.device_manager import DeviceManager
+from dodal.devices.common_mirror import XYZPiezoCollimatingMirror
 from dodal.devices.i10 import (
     I10SharedDiagnostic,
     I10SharedSlits,
     I10SharedSlitsDrainCurrent,
-    PiezoMirror,
 )
 from dodal.devices.i10.i10_apple2 import (
     I10Apple2,
@@ -64,8 +64,8 @@ def synchrotron() -> Synchrotron:
 
 
 @devices.factory()
-def first_mirror() -> PiezoMirror:
-    return PiezoMirror(prefix=f"{PREFIX.beamline_prefix}-OP-COL-01:")
+def first_mirror() -> XYZPiezoCollimatingMirror:
+    return XYZPiezoCollimatingMirror(prefix=f"{PREFIX.beamline_prefix}-OP-COL-01:")
 
 
 @devices.factory()
@@ -79,8 +79,8 @@ def pgm() -> PlaneGratingMonochromator:
 
 
 @devices.factory()
-def switching_mirror() -> PiezoMirror:
-    return PiezoMirror(prefix=f"{PREFIX.beamline_prefix}-OP-SWTCH-01:")
+def switching_mirror() -> XYZPiezoCollimatingMirror:
+    return XYZPiezoCollimatingMirror(prefix=f"{PREFIX.beamline_prefix}-OP-SWTCH-01:")
 
 
 """ID"""
