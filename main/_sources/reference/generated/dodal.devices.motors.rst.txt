@@ -25,6 +25,9 @@ dodal.devices.motors
    ~motors.XYZOmegaStage
    ~motors.XYZPitchYawRollStage
    ~motors.XYZPitchYawStage
+   ~motors.XYZPolarAzimuthStage
+   ~motors.XYZPolarAzimuthTiltStage
+   ~motors.XYZPolarStage
    ~motors.XYZStage
    ~motors.XYZThetaStage
    ~motors.YZStage

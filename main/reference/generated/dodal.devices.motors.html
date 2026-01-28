@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.motors &#8212; dodal 1.69.1.dev25+g98eb4b68d documentation</title>
+    <title>dodal.devices.motors &#8212; dodal 1.69.1.dev26+g193dec0cf documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=03f0f730"></script>
+    <script src="../../_static/documentation_options.js?v=67ca1be0"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -842,6 +842,9 @@
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.motors.XYZOmegaStage.html">dodal.devices.motors.XYZOmegaStage</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.motors.XYZPitchYawRollStage.html">dodal.devices.motors.XYZPitchYawRollStage</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.motors.XYZPitchYawStage.html">dodal.devices.motors.XYZPitchYawStage</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.motors.XYZPolarAzimuthStage.html">dodal.devices.motors.XYZPolarAzimuthStage</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.motors.XYZPolarAzimuthTiltStage.html">dodal.devices.motors.XYZPolarAzimuthTiltStage</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.motors.XYZPolarStage.html">dodal.devices.motors.XYZPolarStage</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.motors.XYZStage.html">dodal.devices.motors.XYZStage</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.motors.XYZThetaStage.html">dodal.devices.motors.XYZThetaStage</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.motors.YZStage.html">dodal.devices.motors.YZStage</a></li>
@@ -1154,13 +1157,22 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.motors.XYZPitchYawStage.html#dodal.devices.motors.XYZPitchYawStage" title="dodal.devices.motors.XYZPitchYawStage"><code class="xref py py-obj docutils literal notranslate"><span class="pre">XYZPitchYawStage</span></code></a></p></td>
 <td><p>Five-axis stage with a standard xyz stage and two axes of rotation: pitch and yaw.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.motors.XYZStage.html#dodal.devices.motors.XYZStage" title="dodal.devices.motors.XYZStage"><code class="xref py py-obj docutils literal notranslate"><span class="pre">XYZStage</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.motors.XYZPolarAzimuthStage.html#dodal.devices.motors.XYZPolarAzimuthStage" title="dodal.devices.motors.XYZPolarAzimuthStage"><code class="xref py py-obj docutils literal notranslate"><span class="pre">XYZPolarAzimuthStage</span></code></a></p></td>
+<td><p>Five-axis stage with a standard xyz stage and two axis of rotation: polar and azimuth.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.motors.XYZPolarAzimuthTiltStage.html#dodal.devices.motors.XYZPolarAzimuthTiltStage" title="dodal.devices.motors.XYZPolarAzimuthTiltStage"><code class="xref py py-obj docutils literal notranslate"><span class="pre">XYZPolarAzimuthTiltStage</span></code></a></p></td>
+<td><p>Six-axis stage with a standard xyz stage and three axis of rotation: polar, azimuth and tilt.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.motors.XYZPolarStage.html#dodal.devices.motors.XYZPolarStage" title="dodal.devices.motors.XYZPolarStage"><code class="xref py py-obj docutils literal notranslate"><span class="pre">XYZPolarStage</span></code></a></p></td>
+<td><p>Four-axis stage with a standard xyz stage and one axis of rotation: polar.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.motors.XYZStage.html#dodal.devices.motors.XYZStage" title="dodal.devices.motors.XYZStage"><code class="xref py py-obj docutils literal notranslate"><span class="pre">XYZStage</span></code></a></p></td>
 <td><p>A standard three-axis stage with an x, a y, and a z motor.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.motors.XYZThetaStage.html#dodal.devices.motors.XYZThetaStage" title="dodal.devices.motors.XYZThetaStage"><code class="xref py py-obj docutils literal notranslate"><span class="pre">XYZThetaStage</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.motors.XYZThetaStage.html#dodal.devices.motors.XYZThetaStage" title="dodal.devices.motors.XYZThetaStage"><code class="xref py py-obj docutils literal notranslate"><span class="pre">XYZThetaStage</span></code></a></p></td>
 <td><p>Four-axis stage with a standard xyz stage and one axis of rotation: theta.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.motors.YZStage.html#dodal.devices.motors.YZStage" title="dodal.devices.motors.YZStage"><code class="xref py py-obj docutils literal notranslate"><span class="pre">YZStage</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.motors.YZStage.html#dodal.devices.motors.YZStage" title="dodal.devices.motors.YZStage"><code class="xref py py-obj docutils literal notranslate"><span class="pre">YZStage</span></code></a></p></td>
 <td><p>Two-axis stage with an x and a z motor.</p></td>
 </tr>
 </tbody>
