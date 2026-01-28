@@ -21,7 +21,7 @@ PREFIX = BeamlinePrefix("i10", "J")
 devices = DeviceManager()
 devices.include(i10_shared_devices)
 
-"""I10-1 J Beamline Devices"""
+"""I10J Beamline Devices"""
 
 
 @devices.factory()
@@ -48,7 +48,7 @@ def focusing_mirror() -> PiezoMirror:
     return PiezoMirror(prefix=f"{PREFIX.beamline_prefix}-OP-FOCA-01:")
 
 
-"""I10-1 Electromagnet Devices"""
+"""I10J Electromagnet Devices"""
 
 
 @devices.factory()
@@ -56,6 +56,16 @@ def electromagnet_field() -> ElectromagnetMagnetField:
     return ElectromagnetMagnetField(
         prefix=f"{PREFIX.beamline_prefix}-EA-MAGC-01:",
     )
+
+
+@devices.factory()
+def electromagnet_stage() -> ElectromagnetStage:
+    return ElectromagnetStage(
+        prefix=f"{PREFIX.beamline_prefix}-MO-CRYO-01:",
+    )
+
+
+"""I10J Electromagnet Measurement Devices"""
 
 
 @devices.factory()
@@ -98,11 +108,4 @@ def electromagnet_sr570_scaler_fy(
 def em_temperature_controller() -> Lakeshore336:
     return Lakeshore336(
         prefix=f"{PREFIX.beamline_prefix}-EA-TCTRL-41:",
-    )
-
-
-@devices.factory()
-def electromagnet_stage() -> ElectromagnetStage:
-    return ElectromagnetStage(
-        prefix=f"{PREFIX.beamline_prefix}-MO-CRYO-01:",
     )
