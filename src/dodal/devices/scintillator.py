@@ -1,10 +1,12 @@
+from functools import partial
 from math import isclose
 
 from ophyd_async.core import Reference, StandardReadable, StrictEnum, derived_signal_rw
 from ophyd_async.epics.motor import Motor
 
 from dodal.common.beamlines.beamline_parameters import GDABeamlineParameters
-from dodal.devices.aperturescatterguard import ApertureScatterguard, ApertureValue
+from dodal.devices.aperturescatterguard import ApertureScatterguard
+from dodal.devices.mx_phase1.beamstop import Beamstop, BeamstopPositions
 
 
 class InOut(StrictEnum):
@@ -29,6 +31,7 @@ class Scintillator(StandardReadable):
         self,
         prefix: str,
         aperture_scatterguard: Reference[ApertureScatterguard],
+        beamstop: Reference[Beamstop],
         beamline_parameters: GDABeamlineParameters,
         name: str = "",
     ):
@@ -43,6 +46,7 @@ class Scintillator(StandardReadable):
             )
 
         self._aperture_scatterguard = aperture_scatterguard
+        self._beamstop = beamstop
         self._scintillator_out_yz_mm = [
             float(beamline_parameters[f"scin_{axis}_SCIN_OUT"]) for axis in ("y", "z")
         ]
@@ -77,32 +81,54 @@ class Scintillator(StandardReadable):
         else:
             return InOut.UNKNOWN
 
-    async def _check_aperture_parked(self):
-        if (
-            await self._aperture_scatterguard().selected_aperture.get_value()
-            != ApertureValue.PARKED
-        ):
-            raise ValueError(
-                f"Cannot move scintillator if aperture/scatterguard is not parked. Position is currently {await self._aperture_scatterguard().selected_aperture.get_value()}"
-            )
+    async def _check_beamstop_position(self):
+        position = await self._beamstop().selected_pos.get_value()
+        match position:
+            case BeamstopPositions.OUT_OF_BEAM | BeamstopPositions.DATA_COLLECTION:
+                return
+            case _:
+                raise ValueError(
+                    f"Scintillator cannot be moved due to beamstop position {position}, must be in either in DATA_COLLECTION or OUT_OF_BEAM position."
+                )
 
     async def _set_selected_position(self, position: InOut) -> None:
+        current_y = await self.y_mm.user_readback.get_value()
+        current_z = await self.z_mm.user_readback.get_value()
+        if self._get_selected_position(current_y, current_z) == position:
+            return
+
+        await self._check_beamstop_position()
+
         match position:
-            case InOut.OUT:
-                current_y = await self.y_mm.user_readback.get_value()
-                current_z = await self.z_mm.user_readback.get_value()
-                if self._get_selected_position(current_y, current_z) == InOut.OUT:
-                    return
-                await self._check_aperture_parked()
-                await self.y_mm.set(self._scintillator_out_yz_mm[0])
-                await self.z_mm.set(self._scintillator_out_yz_mm[1])
-            case InOut.IN:
-                current_y = await self.y_mm.user_readback.get_value()
-                current_z = await self.z_mm.user_readback.get_value()
-                if self._get_selected_position(current_y, current_z) == InOut.IN:
-                    return
-                await self._check_aperture_parked()
-                await self.z_mm.set(self._scintillator_in_yz_mm[1])
-                await self.y_mm.set(self._scintillator_in_yz_mm[0])
+            case InOut.OUT | InOut.IN:
+                await self.do_with_aperture_scatterguard_in_safe_pos(
+                    partial(self._move_to_new_position, position)
+                )
             case _:
                 raise ValueError(f"Cannot set scintillator to position {position}")
+
+    async def _move_to_new_position(self, position):
+        if position == InOut.OUT:
+            await self.y_mm.set(self._scintillator_out_yz_mm[0])
+            await self.z_mm.set(self._scintillator_out_yz_mm[1])
+        elif position == InOut.IN:
+            await self.z_mm.set(self._scintillator_in_yz_mm[1])
+            await self.y_mm.set(self._scintillator_in_yz_mm[0])
+
+    async def do_with_aperture_scatterguard_in_safe_pos(self, func):
+        """Perform the supplied function with the aperture-scatterguard to the SCIN_MOVE position,
+        then restore to its previous position.
+        Args:
+            func: The async function to be applied"""
+        scin_move_positions = self._aperture_scatterguard().get_scin_move_position()
+        saved_positions: dict[Motor, float] = {
+            motor: await motor.user_readback.get_value()
+            for motor in scin_move_positions
+        }
+        for motor, pos in scin_move_positions.items():
+            await motor.set(pos)
+
+        await func()
+        # If  func() fails then do not restore motors back to avoid potential collision
+        for motor, pos in saved_positions.items():
+            await motor.set(pos)

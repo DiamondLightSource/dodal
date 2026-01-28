@@ -7,14 +7,14 @@ from dodal.common.beamlines.beamline_parameters import GDABeamlineParameters
 from dodal.devices.aperturescatterguard import (
     AperturePosition,
     ApertureScatterguard,
-    ApertureValue,
-    load_positions_from_beamline_parameters,
+    ApertureScatterguardConfiguration,
+    load_configuration,
 )
 
 
 @pytest.fixture
-def aperture_positions() -> dict[ApertureValue, AperturePosition]:
-    return load_positions_from_beamline_parameters(
+def ap_sg_configuration() -> ApertureScatterguardConfiguration:
+    return load_configuration(
         GDABeamlineParameters(
             params={
                 "miniap_x_LARGE_APERTURE": 2.389,
@@ -42,6 +42,8 @@ def aperture_positions() -> dict[ApertureValue, AperturePosition]:
                 "miniap_z_MANUAL_LOAD": -10.0,
                 "sg_x_MANUAL_LOAD": -4.7,
                 "sg_y_MANUAL_LOAD": 1.8,
+                "miniap_x_SCIN_MOVE": -4.91,
+                "sg_x_SCIN_MOVE": -4.75,
             }
         )
     )
@@ -64,7 +66,7 @@ def aperture_tolerances():
 
 @pytest.fixture
 async def ap_sg(
-    aperture_positions: dict[ApertureValue, AperturePosition],
+    ap_sg_configuration: ApertureScatterguardConfiguration,
     aperture_tolerances: AperturePosition,
 ) -> ApertureScatterguard:
     async with init_devices(mock=True):
@@ -72,7 +74,7 @@ async def ap_sg(
             aperture_prefix="-MO-MAPT-01:",
             scatterguard_prefix="-MO-SCAT-01:",
             name="test_ap_sg",
-            loaded_positions=aperture_positions,
+            config=ap_sg_configuration,
             tolerances=aperture_tolerances,
         )
     return ap_sg
