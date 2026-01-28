@@ -11,6 +11,7 @@ from dodal.devices.motors import (
     XYStage,
     XYZPitchYawRollStage,
     XYZPolarAzimuthStage,
+    XYZPolarAzimuthTiltStage,
     XYZPolarStage,
     XYZThetaStage,
 )
@@ -35,6 +36,13 @@ async def xyzpa_stage() -> XYZPolarAzimuthStage:
     async with init_devices(mock=True):
         xyzpa_stage = XYZPolarAzimuthStage("")
     return xyzpa_stage
+
+
+@pytest.fixture
+async def xyzpat_stage() -> XYZPolarAzimuthTiltStage:
+    async with init_devices(mock=True):
+        xyzpat_stage = XYZPolarAzimuthTiltStage("")
+    return xyzpat_stage
 
 
 @pytest.fixture
@@ -180,6 +188,43 @@ async def test_setting_xyzpa_position_table(
             "xyzpa_stage-z": partial_reading(z),
             "xyzpa_stage-polar": partial_reading(polar),
             "xyzpa_stage-azimuth": partial_reading(azimuth),
+        },
+    )
+
+
+@pytest.mark.parametrize(
+    "x, y, z, polar, azimuth, tilt",
+    [
+        (0, 0, 0, 0, 0, 0),
+        (1.23, 2.40, 0.0, 0.0, 0.0, 0.0),
+        (1.23, 2.40, 3.51, 24.0, 1.0, 2.0),
+    ],
+)
+async def test_setting_xyzpat_position_table(
+    xyzpat_stage: XYZPolarAzimuthTiltStage,
+    x: float,
+    y: float,
+    z: float,
+    polar: float,
+    azimuth: float,
+    tilt: float,
+) -> None:
+    set_mock_value(xyzpat_stage.x.user_readback, x)
+    set_mock_value(xyzpat_stage.y.user_readback, y)
+    set_mock_value(xyzpat_stage.z.user_readback, z)
+    set_mock_value(xyzpat_stage.polar.user_readback, polar)
+    set_mock_value(xyzpat_stage.azimuth.user_readback, azimuth)
+    set_mock_value(xyzpat_stage.tilt.user_readback, tilt)
+
+    await assert_reading(
+        xyzpat_stage,
+        {
+            "xyzpat_stage-x": partial_reading(x),
+            "xyzpat_stage-y": partial_reading(y),
+            "xyzpat_stage-z": partial_reading(z),
+            "xyzpat_stage-polar": partial_reading(polar),
+            "xyzpat_stage-azimuth": partial_reading(azimuth),
+            "xyzpat_stage-tilt": partial_reading(tilt),
         },
     )
 
