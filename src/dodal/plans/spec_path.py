@@ -29,8 +29,7 @@ def spec_scan(
     metadata: dict[str, Any] | None = None,
 ) -> MsgGenerator:
     """Generic plan for reading `detectors` at every point of a ScanSpec `Spec`.
-    A `Spec` is an N-dimensional path.
-    """
+    A `Spec` is an N-dimensional path."""
     # TODO: https://github.com/bluesky/scanspec/issues/154
     # support Static.duration: Spec[Literal["DURATION"]]
 
@@ -48,16 +47,15 @@ def spec_scan(
 
 
 def _as_cycler(spec: Spec[Movable]) -> Cycler:
-    """
-    Convert a scanspec to a cycler for compatibility with legacy Bluesky plans such as
+    """Convert a scanspec to a cycler for compatibility with legacy Bluesky plans such as
     `bp.scan_nd`. Use the midpoints of the scanspec since cyclers are normally used
     for software triggered scans.
 
     Args:
-        spec: A scanspec
+        spec (Spec[Movable]): A scanspec.
 
     Returns:
-        Cycler: A new cycler
+        Cycler: A new cycler.
     """
 
     midpoints = spec.frames().midpoints

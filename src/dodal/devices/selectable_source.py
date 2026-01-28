@@ -24,7 +24,8 @@ def get_obj_from_selected_source(selected_source: SelectedSource, s1: T, s2: T) 
 
 class SourceSelector(StandardReadable, Movable[SelectedSource]):
     """Device that holds a selected_source signal enum of SelectedSource. Useful for
-    beamlines with multiple sources to coordinate which energy source or shutter to use."""
+    beamlines with multiple sources to coordinate which energy source or shutter to
+    use."""
 
     def __init__(self, name: str = ""):
         with self.add_children_as_readables():

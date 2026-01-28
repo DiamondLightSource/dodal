@@ -60,10 +60,8 @@ class I23Axes:
 
 
 class RotationDirection(StrictEnum):
-    """
-    Defines for a swept angle whether the scan width (sweep) is to be added or
-    subtracted from the initial angle to obtain the final angle.
-    """
+    """Defines for a swept angle whether the scan width (sweep) is to be added or
+    subtracted from the initial angle to obtain the final angle."""
 
     POSITIVE = "Positive"
     NEGATIVE = "Negative"
@@ -105,7 +103,7 @@ class InstantArmMock(DeviceMock["ArmingDevice"]):
 @default_mock_class(InstantArmMock)
 class ArmingDevice(StandardReadable, Movable[ArmDemand]):
     """A useful device that can abstract some of the logic of arming.
-    Allows a user to just call arm.set(ArmDemand.ARM)"""
+    Allows a user to just call arm.set(ArmDemand.ARM)."""
 
     TIMEOUT: float = 3
 
@@ -230,7 +228,7 @@ class LogicGateConfigurer(StandardReadable):
         """Uses the specified `LogicGateConfiguration` to configure a gate on the Zebra.
 
         Args:
-            type (GateType): The type of gate e.g. AND/OR
+            type (GateType): The type of gate e.g. AND/OR.
             gate_number (int): Which gate to configure.
             config (LogicGateConfiguration): A configuration for the gate.
         """

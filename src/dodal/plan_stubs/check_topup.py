@@ -55,10 +55,10 @@ def _delay_to_avoid_topup(
     topup-interval, therefore we may wish to collect during a topup.
 
     Args:
-        total_run_time_s: Anticipated time until end of the collection in seconds
-        time_to_topup_s: Time to the start of the topup as measured from the PV
-        topup_configuration: configuration dictionary
-        total_exposure_time_s: Total exposure time of the sample in s
+        total_run_time_s (float): Anticipated time until end of the collection in seconds.
+        time_to_topup_s (float): Time to the start of the topup as measured from the PV.
+        topup_configuration (dict): Configuration dictionary.
+        total_exposure_time_s (float): Total exposure time of the sample in s.
     """
     if total_run_time_s > time_to_topup_s:
         limit_s = topup_configuration.get(
@@ -77,9 +77,7 @@ def _delay_to_avoid_topup(
                 """)
         return gate
     LOGGER.info(
-        """
-        Total run time less than time to next topup. Proceeding with collection.
-        """
+        """Total run time less than time to next topup. Proceeding with collection."""
     )
     return False
 
@@ -97,7 +95,7 @@ def check_topup_and_wait_if_necessary(
     total_exposure_time: float,
     ops_time: float,  # Account for xray centering, rotation speed, etc
 ):  # See https://github.com/DiamondLightSource/hyperion/issues/932
-    """A small plan to check if topup gating is permitted and sleep until the topup\
+    """A small plan to check if topup gating is permitted and sleep until the topup
         is over if it starts before the end of collection.
 
     Args:

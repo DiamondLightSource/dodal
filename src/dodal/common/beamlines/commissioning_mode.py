@@ -28,7 +28,7 @@ def set_commissioning_signal(signal: SignalR[bool] | None):
     to production use, via their own 'good morning' startup scripts.
 
     Args:
-        signal: The signal which will be read in order to determine whether
+        signal (SignalR): The signal which will be read in order to determine whether
             commissioning mode is enabled."""
     global _commissioning_signal
     _commissioning_signal = signal

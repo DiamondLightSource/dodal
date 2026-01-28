@@ -134,10 +134,8 @@ class Mythen3Controller(ADBaseController):
 
 
 class Mythen3(AreaDetector[Mythen3Controller]):
-    """
-    The detector may be configured for an external trigger on a GPIO port,
-    which must be done prior to preparing the detector
-    """
+    """The detector may be configured for an external trigger on a GPIO port,
+    which must be done prior to preparing the detector."""
 
     def __init__(
         self,

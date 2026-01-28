@@ -26,7 +26,7 @@ class JungfrauCommissioningWriter(DetectorWriter, StandardReadable):
 
     The PVs on this device are responsible for writing files of a specified name
     to a specified path, marking itself as "ready to write", and having a counter of
-    frames written, which must be zero'd at the ophyd level
+    frames written, which must be zero'd at the ophyd level.
     """
 
     def __init__(

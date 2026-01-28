@@ -48,8 +48,7 @@ _EMPTY = object()
 
 
 class LazyFixtures(UserDict[str, Any]):
-    """
-    Wrapper around fixtures and fixture generators
+    """Wrapper around fixtures and fixture generators
 
     If a fixture is provided at runtime, the generator function does not have to be called.
     """
@@ -71,11 +70,9 @@ class LazyFixtures(UserDict[str, Any]):
 
 
 class DeviceFactory(Generic[Args, V2]):
-    """
-    Wrapper around a device factory (any function returning a device) that holds
+    """Wrapper around a device factory (any function returning a device) that holds
     a reference to a device manager that can provide dependencies, along with
-    default connection information for how the created device should be
-    connected.
+    default connection information for how the created device should be connected.
     """
 
     def __init__(
@@ -131,8 +128,7 @@ class DeviceFactory(Generic[Args, V2]):
 
     @property
     def skip(self) -> bool:
-        """
-        Whether this device should be skipped as part of build_all - it will
+        """Whether this device should be skipped as part of build_all - it will
         still be built if a required device depends on it
         """
         return self._skip() if callable(self._skip) else self._skip
@@ -175,8 +171,7 @@ class DeviceFactory(Generic[Args, V2]):
 
 # TODO: Remove when ophyd v1 support is no longer required - see #1718
 class V1DeviceFactory(Generic[Args, V1]):
-    """
-    Wrapper around an ophyd v1 device that holds a reference to a device
+    """Wrapper around an ophyd v1 device that holds a reference to a device
     manager that can provide dependencies, along with default connection
     information for how the created device should be connected.
     """
@@ -225,8 +220,7 @@ class V1DeviceFactory(Generic[Args, V1]):
 
     @property
     def skip(self) -> bool:
-        """
-        Whether this device should be skipped as part of build_all - it will
+        """Whether this device should be skipped as part of build_all - it will
         still be built if a required device depends on it
         """
         return self._skip() if callable(self._skip) else self._skip
@@ -364,8 +358,7 @@ class DeviceManager:
         return func
 
     def include(self, other: "DeviceManager"):
-        """
-        Merge an external DeviceManager into this one.
+        """Merge an external DeviceManager into this one.
 
         Registered devices from the included DeviceManager will be included
         when all devices are built and will be available as dependencies when
@@ -403,8 +396,7 @@ class DeviceManager:
         wait: bool = True,
         timeout: int = DEFAULT_TIMEOUT,
     ):
-        """
-        Register an ophyd v1 device
+        """Register an ophyd v1 device
 
         The function this decorates is an initialiser that takes a built device
         and is not used to create the device.
@@ -504,8 +496,7 @@ class DeviceManager:
         fixtures: Mapping[str, Any] | None = None,
         mock: bool = False,
     ) -> DeviceBuildResult:
-        """
-        Build the devices from the given factories, ensuring that any
+        """Build the devices from the given factories, ensuring that any
         dependencies are built first and passed to later factories as required.
         """
 
@@ -563,8 +554,7 @@ class DeviceManager:
         factories: Iterable[DeviceFactory[..., V2] | V1DeviceFactory[..., V1]],
         available_fixtures: Mapping[str, Any],
     ) -> set[str]:
-        """
-        Determine full list of devices that are required to build the given devices.
+        """Determine full list of devices that are required to build the given devices.
         If a dependency is available via the fixtures, a matching device factory
         will not be included unless explicitly requested allowing for devices to
         be overridden.
@@ -595,8 +585,7 @@ class DeviceManager:
         factories: dict[str, DeviceFactory[..., V2] | V1DeviceFactory[..., V1]],
         fixtures: Mapping[str, Any],
     ) -> list[str]:
-        """
-        Determine the order devices in which devices should be build to ensure
+        """Determine the order devices in which devices should be build to ensure
         that dependencies are built before the things that depend on them
 
         Assumes that all required devices and fixtures are included in the

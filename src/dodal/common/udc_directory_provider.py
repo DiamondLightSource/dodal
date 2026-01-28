@@ -38,11 +38,12 @@ class PandASubpathProvider(UpdatingPathProvider):
         result in the panda subdirectory being created if it does not already exist.
 
         Args:
-            directory: Path instance that identifies the root folder. This folder must
+            directory (Path): Instance that identifies the root folder. This folder must
                 exist. The panda will attempt to write into the "panda" subdirectory
-                    which will be created if not already present.
-            suffix: Optional str that will be appended to the panda device name along
-                with the file type extension to construct the output filename
+                which will be created if not already present.
+            suffix (str, optional): Optional str that will be appended to the panda
+                device name along with the file type extension to construct the output
+                filename.
         """
         self._output_directory = directory / self.resource_dir
         self._filename_provider.suffix = suffix

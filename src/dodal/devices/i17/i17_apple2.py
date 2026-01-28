@@ -17,9 +17,17 @@ MAXIMUM_MOVE_TIME = 550  # There is no useful movements take longer than this.
 
 
 class I17Apple2Controller(Apple2Controller[Apple2[UndulatorPhaseAxes]]):
-    """
-    I10Apple2Controller is a extension of Apple2Controller which provide linear
+    """I17Apple2Controller is a extension of Apple2Controller which provide linear
     arbitrary angle control.
+
+    Args:
+        apple2 (Apple2): An Apple2 device.
+        gap_energy_motor_lut (EnergyMotorLookup): The class that handles the gap
+            look up table logic for the insertion device.
+        phase_energy_motor_lut (EnergyMotorLookup): The class that handles the phase
+            look up table logic for the insertion device.
+        units (str, optional): The units of this device. Defaults to eV.
+        name (str, optional): New device name.
     """
 
     def __init__(
@@ -30,16 +38,6 @@ class I17Apple2Controller(Apple2Controller[Apple2[UndulatorPhaseAxes]]):
         units: str = "eV",
         name: str = "",
     ) -> None:
-        """
-        Args:
-            apple2 (Apple2): An Apple2 device.
-            gap_energy_motor_lut (EnergyMotorLookup): The class that handles the gap
-                look up table logic for the insertion device.
-            phase_energy_motor_lut (EnergyMotorLookup): The class that handles the phase
-                look up table logic for the insertion device.
-            units: the units of this device. Defaults to eV.
-            name (str, optional): New device name.
-        """
         self.gap_energy_motor_lut = gap_energy_motor_lut
         self.phase_energy_motor_lut = phase_energy_motor_lut
         super().__init__(

@@ -18,17 +18,17 @@ async def energy_distance_table(
     comments: Sequence[str] = ["#", "Units"],
     skiprows: int = 0,
 ) -> np.ndarray:
-    """
-    Returns a numpy formatted lookup table for required positions of an ID gap to
+    """Returns a numpy formatted lookup table for required positions of an ID gap to
     provide emission at a given beam energy.
 
     Args:
-        lookup_table_path: Path to lookup table
-        comments: Lines starting with any of these strings will be ignored
-        skiprows: Number of rows to skip at the start of the file
+        lookup_table_path (str): Path to lookup table.
+        comments (Sequence[str], optional): Lines starting with any of these strings
+            will be ignored.
+        skiprows (int, optional): Number of rows to skip at the start of the file.
 
     Returns:
-        ndarray: Lookup table
+        ndarray: Lookup table.
     """
 
     # Slight cheat to make the file IO async, numpy doesn't do any real IO now, just
@@ -75,17 +75,16 @@ def linear_interpolation_lut(
 def linear_extrapolation_lut(
     s_values: Sequence[float], t_values: Sequence[float]
 ) -> Callable[[float], float]:
-    """
-    Return a callable that implements f(s) = t according to the conversion table data
-    supplied, with linear extrapolation outside that range. Inside the range of the table,
-    the function is equivalent to that returned by linear_interpolation_lut
+    """Return a callable that implements f(s) = t according to the conversion table data
+    supplied, with linear extrapolation outside that range. Inside the range of the
+    table, the function is equivalent to that returned by linear_interpolation_lut.
 
     Args:
-        s_values:  Values of the independent axis
-        t_values:  Values of the dependent axis
+        s_values (Sequence[float]): Values of the independent axis.
+        t_values (Sequence[float]): Values of the dependent axis.
 
     Returns:
-        A callable that returns t for the given s
+        Callable: A callable that returns t for the given s.
     """
     assert len(s_values) == len(t_values), (
         "Lookup table does not have the same number of values for each axis"

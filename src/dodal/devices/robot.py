@@ -130,8 +130,7 @@ class BartRobot(StandardReadable, Movable[SampleLocation]):
     async def beamline_status_or_error(self, expected_state: BeamlineStatus):
         """This co-routine will finish when either the beamline reaches the specified
         state or the robot gives an error (whichever happens first). In the case where
-        there is an error a RobotLoadError error is raised.
-        """
+        there is an error a RobotLoadError error is raised."""
 
         async def raise_if_error():
             await wait_for_value(
@@ -194,15 +193,15 @@ class BartRobot(StandardReadable, Movable[SampleLocation]):
 
     @AsyncStatus.wrap
     async def set(self, value: SampleLocation):
-        """
-        Perform a sample load from the specified sample location
+        """Perform a sample load from the specified sample location.
 
         Args:
-            value: The pin and puck to load, or SAMPLE_LOCATION_EMPTY to unload the
-                sample.
+            value (SampleLocation): The pin and puck to load, or SAMPLE_LOCATION_EMPTY
+                to unload the sample.
 
         Raises:
-            RobotLoadError if a timeout occurs, or if an error occurs loading the sample.
+            RobotLoadError: If a timeout occurs, or if an error occurs loading the
+                sample.
         """
         try:
             if value != SAMPLE_LOCATION_EMPTY:

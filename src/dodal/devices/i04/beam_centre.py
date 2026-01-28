@@ -21,8 +21,7 @@ ADDITIONAL_BINARY_THRESH = 20
 
 
 def convert_image_to_binary(image: np.ndarray):
-    """
-     Creates a binary image from OAV image array data.
+    """Creates a binary image from OAV image array data.
 
     Pixels of the input image are converted to one of two values (a high and a low value).
     Otsu's method is used for automatic thresholding.
@@ -67,9 +66,9 @@ def get_roi(
     image.
 
     Args:
-        image_arr (np.ndarray): The full screen image array
-        centre_x (int): The x coordinate of the centre of the ROI box
-        centre_y (int): The y coordinate of the centre of the ROI box
+        image_arr (np.ndarray): The full screen image array.
+        centre_x (int): The x coordinate of the centre of the ROI box.
+        centre_y (int): The y coordinate of the centre of the ROI box.
         box_width (int, optional): The width of the ROI box. Defaults to 200.
         box_height (int, optional): The height of the ROI box. Defaults to 200.
 
@@ -93,12 +92,11 @@ def get_roi(
 
 
 class CentreEllipseMethod(StandardReadable, Triggerable):
-    """
-    Upon triggering, fits an ellipse to a binary image from the area detector defined by
-    the prefix.
+    """Upon triggering, fits an ellipse to a binary image from the area detector defined
+    by the prefix.
 
-    This is used, in conjunction with a scintillator, to determine the centre of the beam
-    on the image.
+    This is used, in conjunction with a scintillator, to determine the centre of the
+    beam on the image.
     """
 
     def __init__(self, prefix: str, overlay_channel: int = 1, name: str = ""):

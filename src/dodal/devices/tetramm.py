@@ -165,7 +165,7 @@ class TetrammController(DetectorController):
         are not missed.
 
         Args:
-            exposure: Desired exposure time.
+            exposure (float): Desired exposure time.
         """
         sample_time = await self.driver.sample_time.get_value()
         minimum_samples = self._minimal_values_per_reading[

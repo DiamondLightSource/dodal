@@ -101,11 +101,8 @@ class ValveControl(
 
 
 class AllValvesControl(StandardReadable):
-    """
-    The default IOC for this device only controls
-    specific valves. Other valves are under manual
-    control.
-    """
+    """The default IOC for this device only controls specific valves. Other valves are
+    under manual control."""
 
     def __init__(
         self,
@@ -165,8 +162,7 @@ class Pump(StandardReadable):
 
 
 class PressureTransducer(StandardReadable):
-    """
-    Pressure transducer for a high pressure X-ray cell.
+    """Pressure transducer for a high pressure X-ray cell.
     This is the chamber and there are three of them.
     1 is the start, 3 is where the sample is.
     NOTE: the distinction between the adc prefix and the cell prefix is kept here.
@@ -230,9 +226,7 @@ class DoJump(StandardReadable, Triggerable):
 
 
 class PressureJumpCellController(StandardReadable, Movable, Stoppable):
-    """
-    Top-level control for a fixed pressure or pressure jumps.
-    """
+    """Top-level control for a fixed pressure or pressure jumps."""
 
     def __init__(self, prefix: str, name: str = "") -> None:
         with self.add_children_as_readables():
@@ -260,9 +254,8 @@ class PressureJumpCellController(StandardReadable, Movable, Stoppable):
 
     @AsyncStatus.wrap
     async def set(self, value: int):
-        """
-        Sets the desired pressure waiting for the device to complete the operation.
-        """
+        """Sets the desired pressure waiting for the device to complete the
+        operation."""
         timeout = await self.timeout.get_value()
 
         await self.target_pressure.set(value)
@@ -292,12 +285,11 @@ class BusyMock(DeviceMock["PressureJumpCell"]):
 
 @default_mock_class(BusyMock)
 class PressureJumpCell(StandardReadable):
-    """
-    High pressure X-ray cell, used to apply pressure or pressure jumps to a sample.
+    """High pressure X-ray cell, used to apply pressure or pressure jumps to a sample.
 
     Args:
         prefix (str): The prefix of beamline - SPECIAL - unusual that the cell prefix is
-            computed separately
+            computed separately.
     """
 
     def __init__(
