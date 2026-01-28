@@ -3,7 +3,7 @@ from ophyd_async.core import Device
 from dodal.devices.current_amplifiers import StruckScaler
 
 
-class ElectromagnetScalerCard1(Device):
+class I10JScalerCard(Device):
     def __init__(self, prefix, name: str = "") -> None:
         self.mon = StruckScaler(prefix=prefix, suffix=".S17")
         self.tey = StruckScaler(prefix=prefix, suffix=".S18")

@@ -5,9 +5,9 @@ from dodal.devices.current_amplifiers import SR570, CurrentAmpDet
 from dodal.devices.i10 import I10JDiagnostic, I10JSlits, PiezoMirror
 from dodal.devices.i10_1 import (
     ElectromagnetMagnetField,
-    ElectromagnetScalerCard1,
     ElectromagnetSR570,
     ElectromagnetStage,
+    I10JScalerCard,
 )
 from dodal.devices.temperture_controller.lakeshore.lakeshore import Lakeshore336
 from dodal.log import set_beamline as set_log_beamline
@@ -66,8 +66,8 @@ def electromagnet_stage() -> ElectromagnetStage:
 
 
 @devices.factory()
-def electromagnet_scaler_card() -> ElectromagnetScalerCard1:
-    return ElectromagnetScalerCard1(
+def electromagnet_scaler_card() -> I10JScalerCard:
+    return I10JScalerCard(
         prefix=f"{PREFIX.beamline_prefix}-EA-SCLR-02:SCALERJ3",
     )
 
@@ -82,7 +82,7 @@ def electromagnet_sr570() -> ElectromagnetSR570:
 @devices.factory()
 def electromagnet_sr570_scaler_monitor(
     mirror6_sr570: SR570,
-    electromagnet_scaler_card: ElectromagnetScalerCard1,
+    electromagnet_scaler_card: I10JScalerCard,
 ) -> CurrentAmpDet:
     return CurrentAmpDet(
         current_amp=mirror6_sr570, counter=electromagnet_scaler_card.mon
@@ -92,7 +92,7 @@ def electromagnet_sr570_scaler_monitor(
 @devices.factory()
 def electromagnet_sr570_scaler_tey(
     electromagnet_sr570: ElectromagnetSR570,
-    electromagnet_scaler_card: ElectromagnetScalerCard1,
+    electromagnet_scaler_card: I10JScalerCard,
 ) -> CurrentAmpDet:
     return CurrentAmpDet(
         current_amp=electromagnet_sr570.ca1,
@@ -103,7 +103,7 @@ def electromagnet_sr570_scaler_tey(
 @devices.factory()
 def electromagnet_sr570_scaler_fy(
     electromagnet_sr570: ElectromagnetSR570,
-    electromagnet_scaler_card: ElectromagnetScalerCard1,
+    electromagnet_scaler_card: I10JScalerCard,
 ) -> CurrentAmpDet:
     return CurrentAmpDet(
         current_amp=electromagnet_sr570.ca2,
