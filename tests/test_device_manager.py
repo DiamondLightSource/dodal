@@ -1,3 +1,4 @@
+from inspect import cleandoc
 from unittest.mock import MagicMock, Mock, patch
 
 import pytest
@@ -8,9 +9,11 @@ from pytest import RaisesExc, RaisesGroup
 
 from dodal.device_manager import (
     DEFAULT_TIMEOUT,
+    NO_DOCS,
     DeviceBuildResult,
     DeviceManager,
     LazyFixtures,
+    _type_docs,
 )
 
 
@@ -597,7 +600,7 @@ def test_mock_all(dm: DeviceManager):
 
 
 def test_v1_device_factory(dm: DeviceManager):
-    s1 = Mock(spec=OphydV1Device)
+    s1 = MagicMock(spec=OphydV1Device)
     s1.__name__ = "S1"
 
     @dm.v1_init(s1, prefix="S1_PREFIX")  # type: ignore
@@ -629,7 +632,7 @@ def test_v1_v2_name_clash(dm: DeviceManager):
 
 
 def test_v1_decorator_is_transparent(dm: DeviceManager):
-    s1 = MagicMock()
+    s1 = MagicMock(__name__="S1")
 
     @dm.v1_init(s1, prefix="S1_PREFIX")  # type: ignore
     def foo(s):
@@ -644,7 +647,7 @@ def test_v1_decorator_is_transparent(dm: DeviceManager):
 
 
 def test_v1_no_wait(dm: DeviceManager):
-    s1 = Mock()
+    s1 = MagicMock(__name__="S1")
 
     @dm.v1_init(s1, prefix="S1_PREFIX", wait=False)  # type: ignore
     def foo(_):
@@ -664,7 +667,7 @@ def test_connect_ignores_v1():
 
 
 def test_v1_mocking(dm: DeviceManager):
-    s1 = Mock(return_value=Mock(spec=OphydV1Device))
+    s1 = Mock(__name__="S1", return_value=Mock(spec=OphydV1Device))
 
     @dm.v1_init(s1, prefix="S1_PREFIX", mock=True)  # type: ignore
     def foo(_):
@@ -677,7 +680,7 @@ def test_v1_mocking(dm: DeviceManager):
 
 def test_v1_init_params(dm: DeviceManager):
     # values are passed from fixtures
-    s1 = Mock(return_value=Mock(spec=OphydV1Device))
+    s1 = Mock(__name__="S1", return_value=Mock(spec=OphydV1Device))
     s1.return_value.mock_add_spec(["set_up_with"])
 
     @dm.fixture
@@ -785,16 +788,88 @@ def test_lazy_fixtures_contains():
     assert "two" not in lf
 
 
-def test_docstrings_are_kept(dm: DeviceManager):
+def test_docstrings_for_factory_instance_are_kept(dm: DeviceManager):
     @dm.factory
     def foo():
         """This is the docstring for foo"""
         return Mock()
 
-    @dm.v1_init(Mock(), prefix="MOCK_PREFIX")  # type: ignore
+    mock = Mock(__name__="Mock", __doc__=None)
+
+    @dm.v1_init(mock, prefix="MOCK_PREFIX")  # type: ignore
     def bar(_):
         """This is the docstring for bar"""
         pass
 
     assert foo.__doc__ == "This is the docstring for foo"
-    assert bar.__doc__ == "This is the docstring for bar"
+    assert bar.__doc__ == _type_docs(mock, extra_docs="This is the docstring for bar")  # type: ignore
+
+
+def test_docstrings_for_device_are_kept(dm: DeviceManager):
+    @dm.factory()
+    def foo() -> OphydV2Device:
+        return OphydV2Device()
+
+    assert OphydV2Device.__doc__ is not None
+
+    assert foo.__doc__ == _type_docs(OphydV2Device)
+
+
+def test_docstrings_for_factory_instance_and_devices_are_kept(dm: DeviceManager):
+    @dm.factory()
+    def foo() -> OphydV2Device:
+        """Additional info on my device instance."""
+        return OphydV2Device()
+
+    assert foo.__doc__ == _type_docs(
+        OphydV2Device, extra_docs="Additional info on my device instance."
+    )
+
+
+class NoDocsDevice(OphydV2Device):
+    pass
+
+
+class DocsDevice(OphydV2Device):
+    "Documentation"
+
+
+def test_docs_for_factory_kept_and_no_docs_avaliable_added_for_no_docs_device(
+    dm: DeviceManager,
+):
+    @dm.factory()
+    def foo() -> NoDocsDevice:
+        """Additional info on my device instance."""
+        return NoDocsDevice()
+
+    assert foo.__doc__ == _type_docs(
+        NoDocsDevice, extra_docs="Additional info on my device instance."
+    )
+
+
+def test_docs_no_docs_avaliable_added_for_no_docs_device(dm: DeviceManager):
+    @dm.factory()
+    def foo() -> NoDocsDevice:
+        return NoDocsDevice()
+
+    assert foo.__doc__ == _type_docs(NoDocsDevice)
+
+
+def test_type_docs_is_as_expected():
+    extra_docs = "foo"
+    expected_no_docs_device_docs = f"{NoDocsDevice.__name__}:\n\n{NO_DOCS}"
+    assert _type_docs(NoDocsDevice) == expected_no_docs_device_docs
+    assert (
+        _type_docs(NoDocsDevice, extra_docs)
+        == f"{extra_docs}\n\n{expected_no_docs_device_docs}"
+    )
+
+    expected_docs_device_docs = (
+        f"{DocsDevice.__name__}:\n\n{cleandoc(DocsDevice.__doc__)}"  # type: ignore
+    )
+    assert _type_docs(DocsDevice) == expected_docs_device_docs
+
+    assert (
+        _type_docs(DocsDevice, extra_docs=extra_docs)
+        == f"{extra_docs}\n\n{expected_docs_device_docs}"
+    )

@@ -17,14 +17,10 @@ from typing import (
     TypeVar,
 )
 
-from bluesky.run_engine import (
-    get_bluesky_event_loop,
-)
+from bluesky.run_engine import get_bluesky_event_loop
 from ophyd.sim import make_fake_device
 
-from dodal.common.beamlines.beamline_utils import (
-    wait_for_connection,
-)
+from dodal.common.beamlines.beamline_utils import wait_for_connection
 from dodal.utils import (
     AnyDevice,
     OphydV1Device,
@@ -33,6 +29,7 @@ from dodal.utils import (
 )
 
 DEFAULT_TIMEOUT = 30
+NO_DOCS = "No documentation available."
 
 T = TypeVar("T")
 Args = ParamSpec("Args")
@@ -102,6 +99,9 @@ class DeviceFactory(Generic[Args, V2]):
         self._skip = skip
         self._manager = manager
         wraps(factory)(self)
+
+        return_type = inspect.get_annotations(factory).get("return")
+        self.__doc__ = _format_doc(self, return_type)
 
     @property
     def name(self) -> str:
@@ -202,6 +202,7 @@ class V1DeviceFactory(Generic[Args, V1]):
         self.post_create = init or (lambda x: x)
         self._manager = manager
         wraps(init)(self)
+        self.__doc__ = _format_doc(self, factory)
 
     @property
     def name(self) -> str:
@@ -463,6 +464,7 @@ class DeviceManager:
             if func.__name__ in self:
                 raise ValueError(f"Duplicate factory name: {func.__name__}")
             factory = DeviceFactory(func, use_factory_name, timeout, mock, skip, self)
+
             self._factories[func.__name__] = factory
             return factory
 
@@ -636,3 +638,24 @@ class DeviceManager:
 
     def __repr__(self) -> str:
         return f"<DeviceManager: {len(self)} devices>"
+
+
+def _format_doc(
+    factory: DeviceFactory | V1DeviceFactory, return_type: type[V1 | V2] | None
+) -> str | None:
+    """
+    Helper function to combine the doc strings of our factory instance and the
+    return type of the function we wrap.
+    """
+    if not return_type:
+        return factory.__doc__
+    if existing := factory.__doc__:
+        return _type_docs(return_type, extra_docs=existing)
+    return _type_docs(return_type)
+
+
+def _type_docs(target: type[V1 | V2], extra_docs: str = "") -> str:
+    docs = f"{target.__name__}:\n\n{inspect.cleandoc(target.__doc__ or NO_DOCS)}"
+    if extra_docs != "":
+        docs = f"{extra_docs}\n\n{docs}"
+    return docs
