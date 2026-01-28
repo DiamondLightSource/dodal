@@ -9,6 +9,7 @@ from dodal.devices.i10_1 import (
     ElectromagnetStage,
     I10JScalerCard,
 )
+from dodal.devices.motors import XYPitchStage
 from dodal.devices.temperture_controller.lakeshore.lakeshore import Lakeshore336
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
@@ -59,6 +60,19 @@ def electromagnet_field() -> ElectromagnetMagnetField:
 def electromagnet_stage() -> ElectromagnetStage:
     return ElectromagnetStage(
         prefix=f"{PREFIX.beamline_prefix}-MO-CRYO-01:",
+    )
+
+
+"""I10J Hight Field Magnet Devices"""
+
+
+@devices.factory()
+def high_field_magnet_stage() -> XYPitchStage:
+    return XYPitchStage(
+        prefix=f"{PREFIX.beamline_prefix}-EA-MAG-01:",
+        x_infix="X",
+        y_infix="INSERT:Y",
+        pitch_infix="INSERT:ROTY",
     )
 
 
