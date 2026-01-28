@@ -10,6 +10,7 @@ _X, _Y, _Z = "X", "Y", "Z"
 _OMEGA = "OMEGA"
 _POLAR = "POLAR"
 _AZIMUTH = "AZIMUTH"
+_TILT = "TILT"
 
 
 class Stage(StandardReadable, ABC):
@@ -150,8 +151,31 @@ class XYZPolarAzimuthStage(XYZPolarStage):
     ):
         with self.add_children_as_readables():
             self.azimuth = Motor(prefix + azimuth_infix)
-
         super().__init__(prefix, name, x_infix, y_infix, z_infix, polar_infix)
+
+
+class XYZPolarAzimuthTiltStage(XYZPolarAzimuthStage):
+    """
+    Six-axis stage with a standard xyz stage and three axis of rotation: polar, azimuth
+    and tilt.
+    """
+
+    def __init__(
+        self,
+        prefix: str,
+        name: str = "",
+        x_infix: str = _X,
+        y_infix: str = _Y,
+        z_infix: str = _Z,
+        polar_infix: str = _POLAR,
+        azimuth_infix: str = _AZIMUTH,
+        tilt_infix: str = _TILT,
+    ):
+        with self.add_children_as_readables():
+            self.tilt = Motor(prefix + tilt_infix)
+        super().__init__(
+            prefix, name, x_infix, y_infix, z_infix, polar_infix, azimuth_infix
+        )
 
 
 class XYPhiStage(XYStage):
