@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.insertion_device.energy &#8212; dodal 1.69.1.dev26+g193dec0cf documentation</title>
+    <title>dodal.devices.insertion_device.energy &#8212; dodal 1.69.1.dev27+g384caa297 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=67ca1be0"></script>
+    <script src="../../../../_static/documentation_options.js?v=f816b362"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -810,18 +810,25 @@ window.addEventListener("load", load);
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">abc</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">bluesky.protocols</span><span class="w"> </span><span class="kn">import</span> <span class="n">Movable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">bluesky.protocols</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flyable</span><span class="p">,</span> <span class="n">Movable</span><span class="p">,</span> <span class="n">Preparable</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">AsyncStatus</span><span class="p">,</span>
+    <span class="n">FlyMotorInfo</span><span class="p">,</span>
     <span class="n">Reference</span><span class="p">,</span>
     <span class="n">SignalRW</span><span class="p">,</span>
     <span class="n">StandardReadable</span><span class="p">,</span>
     <span class="n">StandardReadableFormat</span><span class="p">,</span>
+    <span class="n">WatchableAsyncStatus</span><span class="p">,</span>
+    <span class="n">error_if_none</span><span class="p">,</span>
     <span class="n">soft_signal_rw</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.motor</span><span class="w"> </span><span class="kn">import</span> <span class="n">Motor</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.insertion_device</span><span class="w"> </span><span class="kn">import</span> <span class="n">MAXIMUM_MOVE_TIME</span><span class="p">,</span> <span class="n">Apple2Controller</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.insertion_device</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">MAXIMUM_MOVE_TIME</span><span class="p">,</span>
+    <span class="n">Apple2Controller</span><span class="p">,</span>
+    <span class="n">Apple2Type</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.log</span><span class="w"> </span><span class="kn">import</span> <span class="n">LOGGER</span>
 
 
@@ -840,15 +847,79 @@ window.addEventListener("load", load);
 
 
 
+<div class="viewcode-block" id="InsertionDeviceEnergy">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.InsertionDeviceEnergy.html#dodal.devices.insertion_device.InsertionDeviceEnergy">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">InsertionDeviceEnergy</span><span class="p">(</span><span class="n">InsertionDeviceEnergyBase</span><span class="p">,</span> <span class="n">Preparable</span><span class="p">,</span> <span class="n">Flyable</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Apple2 ID energy movable device.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">id_controller</span><span class="p">:</span> <span class="n">Apple2Controller</span><span class="p">[</span><span class="n">Apple2Type</span><span class="p">],</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">energy</span> <span class="o">=</span> <span class="n">Reference</span><span class="p">(</span><span class="n">id_controller</span><span class="o">.</span><span class="n">energy</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_id_controller</span> <span class="o">=</span> <span class="n">Reference</span><span class="p">(</span><span class="n">id_controller</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_readables</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">energy</span><span class="p">()],</span> <span class="n">StandardReadableFormat</span><span class="o">.</span><span class="n">HINTED_SIGNAL</span><span class="p">)</span>
+
+    <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energy</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Setting insertion device energy to </span><span class="si">{</span><span class="n">energy</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy</span><span class="p">()</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">energy</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">MAXIMUM_MOVE_TIME</span><span class="p">)</span>
+
+<div class="viewcode-block" id="InsertionDeviceEnergy.prepare">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.InsertionDeviceEnergy.html#dodal.devices.insertion_device.InsertionDeviceEnergy.prepare">[docs]</a>
+    <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">prepare</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">FlyMotorInfo</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert FlyMotorInfo from energy to gap motion and move phase motor to mid point.&quot;&quot;&quot;</span>
+        <span class="n">mid_energy</span> <span class="o">=</span> <span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">start_position</span> <span class="o">+</span> <span class="n">value</span><span class="o">.</span><span class="n">end_position</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Preparing for fly energy scan, move </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_id_controller</span><span class="p">()</span><span class="o">.</span><span class="n">apple2</span><span class="p">()</span><span class="o">.</span><span class="n">phase</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">mid_energy</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">energy</span><span class="o">=</span><span class="n">mid_energy</span><span class="p">)</span>
+        <span class="n">current_pol</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id_controller</span><span class="p">()</span><span class="o">.</span><span class="n">polarisation_setpoint</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
+        <span class="n">start_position</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id_controller</span><span class="p">()</span><span class="o">.</span><span class="n">gap_energy_motor_converter</span><span class="p">(</span>
+            <span class="n">energy</span><span class="o">=</span><span class="n">value</span><span class="o">.</span><span class="n">start_position</span><span class="p">,</span>
+            <span class="n">pol</span><span class="o">=</span><span class="n">current_pol</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">end_position</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id_controller</span><span class="p">()</span><span class="o">.</span><span class="n">gap_energy_motor_converter</span><span class="p">(</span>
+            <span class="n">energy</span><span class="o">=</span><span class="n">value</span><span class="o">.</span><span class="n">end_position</span><span class="p">,</span> <span class="n">pol</span><span class="o">=</span><span class="n">current_pol</span>
+        <span class="p">)</span>
+
+        <span class="n">gap_fly_motor_info</span> <span class="o">=</span> <span class="n">FlyMotorInfo</span><span class="p">(</span>
+            <span class="n">start_position</span><span class="o">=</span><span class="n">start_position</span><span class="p">,</span>
+            <span class="n">end_position</span><span class="o">=</span><span class="n">end_position</span><span class="p">,</span>
+            <span class="n">time_for_move</span><span class="o">=</span><span class="n">value</span><span class="o">.</span><span class="n">time_for_move</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Flyscan info in energy: </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">. &quot;</span>
+            <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;Flyscan info in gap: </span><span class="si">{</span><span class="n">gap_fly_motor_info</span><span class="si">}</span><span class="s2">. &quot;</span>
+            <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;Speed: </span><span class="si">{</span><span class="n">gap_fly_motor_info</span><span class="o">.</span><span class="n">velocity</span><span class="si">}</span><span class="s2">.&quot;</span>
+        <span class="p">)</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id_controller</span><span class="p">()</span><span class="o">.</span><span class="n">apple2</span><span class="p">()</span><span class="o">.</span><span class="n">gap</span><span class="p">()</span><span class="o">.</span><span class="n">prepare</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">gap_fly_motor_info</span><span class="p">)</span></div>
+
+
+    <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">kickoff</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id_controller</span><span class="p">()</span><span class="o">.</span><span class="n">apple2</span><span class="p">()</span><span class="o">.</span><span class="n">gap</span><span class="p">()</span><span class="o">.</span><span class="n">kickoff</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">complete</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">WatchableAsyncStatus</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id_controller</span><span class="p">()</span><span class="o">.</span><span class="n">apple2</span><span class="p">()</span><span class="o">.</span><span class="n">gap</span><span class="p">()</span><span class="o">.</span><span class="n">complete</span><span class="p">()</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_id_acceleration_time</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id_controller</span><span class="p">()</span><span class="o">.</span><span class="n">apple2</span><span class="p">()</span><span class="o">.</span><span class="n">gap</span><span class="p">()</span><span class="o">.</span><span class="n">acceleration_time</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span></div>
+
+
+
 <div class="viewcode-block" id="BeamEnergy">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.BeamEnergy.html#dodal.devices.insertion_device.BeamEnergy">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">BeamEnergy</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">,</span> <span class="n">Movable</span><span class="p">[</span><span class="nb">float</span><span class="p">]):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">BeamEnergy</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">,</span> <span class="n">Movable</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">Preparable</span><span class="p">,</span> <span class="n">Flyable</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Compound device to set both ID and energy motor at the same time with an option to add an offset.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">id_energy</span><span class="p">:</span> <span class="n">InsertionDeviceEnergyBase</span><span class="p">,</span> <span class="n">mono</span><span class="p">:</span> <span class="n">Motor</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">id_energy</span><span class="p">:</span> <span class="n">InsertionDeviceEnergy</span><span class="p">,</span> <span class="n">mono</span><span class="p">:</span> <span class="n">Motor</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Parameters</span>
@@ -861,7 +932,6 @@ window.addEventListener("load", load);
 <span class="sd">        name:</span>
 <span class="sd">            New device name.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_id_energy</span> <span class="o">=</span> <span class="n">Reference</span><span class="p">(</span><span class="n">id_energy</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_mono_energy</span> <span class="o">=</span> <span class="n">Reference</span><span class="p">(</span><span class="n">mono</span><span class="p">)</span>
 
@@ -875,6 +945,7 @@ window.addEventListener("load", load);
 
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">(</span><span class="n">StandardReadableFormat</span><span class="o">.</span><span class="n">CONFIG_SIGNAL</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">id_energy_offset</span> <span class="o">=</span> <span class="n">soft_signal_rw</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">initial_value</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
 
     <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energy</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -884,25 +955,40 @@ window.addEventListener("load", load);
                 <span class="n">energy</span><span class="o">=</span><span class="n">energy</span> <span class="o">+</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">id_energy_offset</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
             <span class="p">),</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_mono_energy</span><span class="p">()</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">energy</span><span class="p">),</span>
-        <span class="p">)</span></div>
-
-
-
-<div class="viewcode-block" id="InsertionDeviceEnergy">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.InsertionDeviceEnergy.html#dodal.devices.insertion_device.InsertionDeviceEnergy">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">InsertionDeviceEnergy</span><span class="p">(</span><span class="n">InsertionDeviceEnergyBase</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Apple2 ID energy movable device.&quot;&quot;&quot;</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">id_controller</span><span class="p">:</span> <span class="n">Apple2Controller</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">energy</span> <span class="o">=</span> <span class="n">Reference</span><span class="p">(</span><span class="n">id_controller</span><span class="o">.</span><span class="n">energy</span><span class="p">)</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">add_readables</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">energy</span><span class="p">()],</span> <span class="n">StandardReadableFormat</span><span class="o">.</span><span class="n">HINTED_SIGNAL</span><span class="p">)</span>
+        <span class="p">)</span>
 
     <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energy</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Setting insertion device energy to </span><span class="si">{</span><span class="n">energy</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
-        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy</span><span class="p">()</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">energy</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">MAXIMUM_MOVE_TIME</span><span class="p">)</span></div>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">prepare</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">FlyMotorInfo</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_id_energy</span><span class="p">()</span><span class="o">.</span><span class="n">prepare</span><span class="p">(</span><span class="n">value</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mono_energy</span><span class="p">()</span><span class="o">.</span><span class="n">prepare</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">kickoff</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">pgm_acceleration_time</span><span class="p">,</span> <span class="n">gap_acceleration_time</span> <span class="o">=</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_mono_energy</span><span class="p">()</span><span class="o">.</span><span class="n">acceleration_time</span><span class="o">.</span><span class="n">get_value</span><span class="p">(),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_id_energy</span><span class="p">()</span><span class="o">.</span><span class="n">get_id_acceleration_time</span><span class="p">(),</span>
+        <span class="p">)</span>
+        <span class="n">start_offset_time</span> <span class="o">=</span> <span class="n">pgm_acceleration_time</span> <span class="o">-</span> <span class="n">gap_acceleration_time</span>
+
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mono_energy</span><span class="p">()</span><span class="o">.</span><span class="n">kickoff</span><span class="p">()</span>
+        <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">start_offset_time</span><span class="p">)</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id_energy</span><span class="p">()</span><span class="o">.</span><span class="n">kickoff</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fly_status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_combined_fly_status</span><span class="p">()</span>
+
+<div class="viewcode-block" id="BeamEnergy.complete">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.insertion_device.BeamEnergy.html#dodal.devices.insertion_device.BeamEnergy.complete">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">complete</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AsyncStatus</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Stop when both pgm and id is done moving.&quot;&quot;&quot;</span>
+        <span class="n">fly_status</span> <span class="o">=</span> <span class="n">error_if_none</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fly_status</span><span class="p">,</span> <span class="s2">&quot;kickoff not called&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">fly_status</span></div>
+
+
+    <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_combined_fly_status</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">status_pgm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mono_energy</span><span class="p">()</span><span class="o">.</span><span class="n">complete</span><span class="p">()</span>
+        <span class="n">status_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id_energy</span><span class="p">()</span><span class="o">.</span><span class="n">complete</span><span class="p">()</span>
+        <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">status_pgm</span><span class="p">,</span> <span class="n">status_id</span><span class="p">)</span></div>
 
 </pre></div>
 

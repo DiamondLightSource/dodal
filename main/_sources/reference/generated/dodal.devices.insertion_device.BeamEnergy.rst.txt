@@ -16,7 +16,16 @@ dodal.devices.insertion\_device.BeamEnergy
       
       
       
+      ~BeamEnergy.complete
       
+      
+      
+      
+      
+      ~BeamEnergy.kickoff
+      
+      
+      ~BeamEnergy.prepare
       
       
       

@@ -16,7 +16,19 @@ dodal.devices.insertion\_device.InsertionDeviceEnergy
       
       
       
+      ~InsertionDeviceEnergy.complete
       
+      
+      
+      
+      
+      ~InsertionDeviceEnergy.get_id_acceleration_time
+      
+      
+      ~InsertionDeviceEnergy.kickoff
+      
+      
+      ~InsertionDeviceEnergy.prepare
       
       
       
