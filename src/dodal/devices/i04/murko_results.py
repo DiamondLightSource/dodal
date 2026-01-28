@@ -1,5 +1,7 @@
 import json
 import pickle
+import time
+from dataclasses import dataclass
 from enum import Enum
 from typing import TypedDict
 
@@ -11,7 +13,7 @@ from ophyd_async.core import (
     soft_signal_r_and_setter,
     soft_signal_rw,
 )
-from redis.asyncio import StrictRedis
+from redis.asyncio import ConnectionError, StrictRedis
 
 from dodal.devices.i04.constants import RedisConstants
 from dodal.devices.oav.oav_calculations import (
@@ -20,9 +22,7 @@ from dodal.devices.oav.oav_calculations import (
 from dodal.log import LOGGER
 
 NO_MURKO_RESULT = (-1, -1)
-
-MurkoResult = dict
-FullMurkoResults = dict[str, list[MurkoResult]]
+RESULTS_COMPLETE_MESSAGE = "murko_results_complete"
 
 
 class MurkoMetadata(TypedDict):
@@ -34,12 +34,27 @@ class MurkoMetadata(TypedDict):
     sample_id: str
     omega_angle: float
     uuid: str
+    used_for_centring: bool | None
 
 
 class Coord(Enum):
     x = 0
     y = 1
     z = 2
+
+
+@dataclass
+class MurkoResult:
+    chosen_point_px: tuple[int, int]
+    x_dist_mm: float
+    y_dist_mm: float
+    omega: float
+    uuid: str
+    metadata: MurkoMetadata
+
+
+class NoResultsFoundError(ValueError):
+    pass
 
 
 class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
@@ -58,7 +73,11 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
     solutions for y and z can be calculated using numpy's linear algebra library.
     """
 
-    TIMEOUT_S = 2
+    GET_MESSAGE_TIMEOUT_S = 2
+    RESULTS_COMPLETE_TIMEOUT_S = 5
+    PERCENTAGE_TO_USE = 25
+    LEFTMOST_PIXEL_TO_USE = 10
+    NUMBER_OF_WRONG_RESULTS_TO_LOG = 5
 
     def __init__(
         self,
@@ -66,7 +85,6 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
         redis_password=RedisConstants.REDIS_PASSWORD,
         redis_db=RedisConstants.MURKO_REDIS_DB,
         name="",
-        stop_angle=350,
     ):
         self.redis_client = StrictRedis(
             host=redis_host,
@@ -74,12 +92,9 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
             db=redis_db,
         )
         self.pubsub = self.redis_client.pubsub()
-        self._last_omega = 0
         self.sample_id = soft_signal_rw(str)  # Should get from redis
-        self.stop_angle = stop_angle
-        self.x_dists_mm = []
-        self.y_dists_mm = []
-        self.omegas = []
+
+        self._reset()
 
         with self.add_children_as_readables():
             # Diffs from current x/y/z
@@ -88,58 +103,99 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
             self.z_mm, self._z_mm_setter = soft_signal_r_and_setter(float)
         super().__init__(name=name)
 
+    async def _check_redis_connection(self):
+        try:
+            await self.redis_client.ping()  # type: ignore
+            return True
+        except ConnectionError:
+            LOGGER.warning(
+                f"Failed to connect to redis: {self.redis_client}. Murko results device will not trigger"
+            )
+            return False
+
+    def _reset(self):
+        self._last_omega = None
+        self._results: list[MurkoResult] = []
+
     @AsyncStatus.wrap
     async def stage(self):
-        await self.pubsub.subscribe("murko-results")
+        self.redis_connected = await self._check_redis_connection()
+        if self.redis_connected:
+            await self.pubsub.subscribe("murko-results")
         self._x_mm_setter(0)
         self._y_mm_setter(0)
         self._z_mm_setter(0)
 
     @AsyncStatus.wrap
     async def unstage(self):
-        await self.pubsub.unsubscribe()
+        self._reset()
+        if self.redis_connected:
+            await self.pubsub.unsubscribe()
 
     @AsyncStatus.wrap
     async def trigger(self):
-        # Wait for results
+        if not self.redis_connected:
+            return
         sample_id = await self.sample_id.get_value()
-        while self._last_omega < self.stop_angle:
-            # waits here for next batch to be received
-            message = await self.pubsub.get_message(timeout=self.TIMEOUT_S)
-            if message is None:  # No more messages to process
+        t_last_result = time.time()
+        while True:
+            if time.time() - t_last_result > self.RESULTS_COMPLETE_TIMEOUT_S:
+                LOGGER.warning(
+                    f"Time since last result > {self.RESULTS_COMPLETE_TIMEOUT_S}, expected to receive {RESULTS_COMPLETE_MESSAGE}"
+                )
                 break
-            await self.process_batch(message, sample_id)
+            # waits here for next batch to be received
+            message = await self.pubsub.get_message(timeout=self.GET_MESSAGE_TIMEOUT_S)
+            if message and message["type"] == "message":
+                t_last_result = time.time()
+                data = pickle.loads(message["data"])
 
-        for i in range(len(self.omegas)):
-            LOGGER.debug(
-                f"omega: {round(self.omegas[i], 2)}, x: {round(self.x_dists_mm[i], 2)}, y: {round(self.y_dists_mm[i], 2)}"
-            )
+                if data == RESULTS_COMPLETE_MESSAGE:
+                    LOGGER.info(
+                        f"Received results complete message: {RESULTS_COMPLETE_MESSAGE}"
+                    )
+                    break
 
-        LOGGER.info(f"Using average of x beam distances: {self.x_dists_mm}")
-        avg_x = float(np.mean(self.x_dists_mm))
-        LOGGER.info(f"Finding least square y and z from y distances: {self.y_dists_mm}")
-        best_y, best_z = get_yz_least_squares(self.y_dists_mm, self.omegas)
+                await self.process_batch(data, sample_id)
+
+        if not self._results:
+            raise NoResultsFoundError("No results retrieved from Murko")
+
+        for result in self._results:
+            LOGGER.debug(result)
+
+        filtered_results = self.filter_outliers()
+
+        x_dists_mm = [result.x_dist_mm for result in filtered_results]
+        y_dists_mm = [result.y_dist_mm for result in filtered_results]
+        omegas = [result.omega for result in filtered_results]
+
+        LOGGER.info(f"Using average of x beam distances: {x_dists_mm}")
+        avg_x = float(np.mean(x_dists_mm))
+        LOGGER.info(f"Finding least square y and z from y distances: {y_dists_mm}")
+        best_y, best_z = get_yz_least_squares(y_dists_mm, omegas)
         # x, y, z are relative to beam centre. Need to move negative these values to get centred.
         self._x_mm_setter(-avg_x)
         self._y_mm_setter(-best_y)
         self._z_mm_setter(-best_z)
 
-    async def process_batch(self, message: dict | None, sample_id: str):
-        if message and message["type"] == "message":
-            batch_results: list[dict] = pickle.loads(message["data"])
-            for results in batch_results:
-                for uuid, result in results.items():
-                    if metadata_str := await self.redis_client.hget(  # type: ignore
-                        f"murko:{sample_id}:metadata", uuid
-                    ):
-                        LOGGER.info(
-                            f"Found metadata for uuid {uuid}, processing result"
-                        )
-                        self.process_result(
-                            result, MurkoMetadata(json.loads(metadata_str))
-                        )
-                    else:
-                        LOGGER.info(f"Found no metadata for uuid {uuid}")
+        for result in self._results:
+            await self.redis_client.hset(  # type: ignore
+                f"murko:{sample_id}:metadata", result.uuid, json.dumps(result.metadata)
+            )
+
+    async def process_batch(
+        self, batch_results: list[tuple[str, dict]], sample_id: str
+    ):
+        for result_with_uuid in batch_results:
+            uuid, result = result_with_uuid
+            if metadata_str := await self.redis_client.hget(  # type: ignore
+                f"murko:{sample_id}:metadata", uuid
+            ):
+                LOGGER.info(f"Found metadata for uuid {uuid}, processing result")
+                self.process_result(result, MurkoMetadata(json.loads(metadata_str)))
+            else:
+                LOGGER.info(f"Found no metadata for uuid {uuid}")
 
     def process_result(self, result: dict, metadata: MurkoMetadata):
         """Uses the 'most_likely_click' coordinates from Murko to calculate the
@@ -156,21 +212,69 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
         else:
             shape = result["original_shape"]  # Dimensions of image in pixels
             # Murko returns coords as y, x
-            centre_px = (coords[1] * shape[1], coords[0] * shape[0])
+            chosen_point_px = (coords[1] * shape[1], coords[0] * shape[0])
 
             beam_dist_px = calculate_beam_distance(
                 (metadata["beam_centre_i"], metadata["beam_centre_j"]),
-                centre_px[0],
-                centre_px[1],
+                chosen_point_px[0],
+                chosen_point_px[1],
             )
-            self.x_dists_mm.append(
-                beam_dist_px[0] * metadata["microns_per_x_pixel"] / 1000
+            self._results.append(
+                MurkoResult(
+                    chosen_point_px=chosen_point_px,
+                    x_dist_mm=beam_dist_px[0] * metadata["microns_per_x_pixel"] / 1000,
+                    y_dist_mm=beam_dist_px[1] * metadata["microns_per_y_pixel"] / 1000,
+                    omega=omega,
+                    uuid=metadata["uuid"],
+                    metadata=metadata,
+                )
             )
-            self.y_dists_mm.append(
-                beam_dist_px[1] * metadata["microns_per_y_pixel"] / 1000
-            )
-            self.omegas.append(omega)
             self._last_omega = omega
+
+    def filter_outliers(self):
+        """Whilst murko is not fully trained it often gives us poor results.
+        When it is wrong it usually picks up the base of the pin, rather than the tip,
+        meaning that by keeping only a percentage of the results with the smallest X we
+        remove many of the outliers. Murko also occasionally picks a point in the bottom
+        left corner, which can be removed by filtering results with a small x pixel.
+        """
+
+        LOGGER.info(f"Number of results before filtering: {len(self._results)}")
+        sorted_results = sorted(self._results, key=lambda item: item.chosen_point_px[0])
+
+        results_without_tiny_x = [
+            result
+            for result in sorted_results
+            if result.chosen_point_px[0] >= self.LEFTMOST_PIXEL_TO_USE
+        ]
+        result_uuids_with_tiny_x = [
+            result.uuid
+            for result in sorted_results
+            if result not in results_without_tiny_x
+        ]
+
+        LOGGER.info(
+            f"Results with tiny x have been removed: {result_uuids_with_tiny_x}"
+        )
+
+        worst_results = [
+            r.uuid for r in sorted_results[-self.NUMBER_OF_WRONG_RESULTS_TO_LOG :]
+        ]
+
+        LOGGER.info(
+            f"Worst {self.NUMBER_OF_WRONG_RESULTS_TO_LOG} murko results were {worst_results}"
+        )
+
+        cutoff = max(1, int(len(sorted_results) * self.PERCENTAGE_TO_USE / 100))
+        cutoff = min(cutoff, len(results_without_tiny_x))
+
+        best_x = results_without_tiny_x[:cutoff]
+
+        for result in sorted_results:
+            result.metadata["used_for_centring"] = result in best_x
+
+        LOGGER.info(f"Number of results after filtering: {len(best_x)}")
+        return best_x
 
 
 def get_yz_least_squares(vertical_dists: list, omegas: list) -> tuple[float, float]:

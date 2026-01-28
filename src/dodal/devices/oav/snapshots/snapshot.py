@@ -1,6 +1,6 @@
 from PIL import Image
 
-from dodal.devices.areadetector.plugins.MJPG import MJPG
+from dodal.devices.areadetector.plugins.mjpg import MJPG
 
 CROSSHAIR_LENGTH_PX = 20
 CROSSHAIR_OUTLINE_COLOUR = "Black"

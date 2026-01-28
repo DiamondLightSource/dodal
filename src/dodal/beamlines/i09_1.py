@@ -1,12 +1,13 @@
-from dodal.common.beamlines.beamline_utils import (
-    device_factory,
-)
+from dodal.beamlines.i09_1_shared import devices as i09_1_shared_devices
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.devices.electron_analyser import SelectedSource
+from dodal.device_manager import DeviceManager
+from dodal.devices.common_dcm import DoubleCrystalMonochromatorWithDSpacing
+from dodal.devices.electron_analyser.base import EnergySource
 from dodal.devices.electron_analyser.specs import SpecsDetector
-from dodal.devices.i09.dcm import DCM
 from dodal.devices.i09_1 import LensMode, PsuMode
+from dodal.devices.motors import XYZPolarAzimuthTiltStage
 from dodal.devices.synchrotron import Synchrotron
+from dodal.devices.temperture_controller import Lakeshore336
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
@@ -15,24 +16,38 @@ PREFIX = BeamlinePrefix(BL, suffix="I")
 set_log_beamline(BL)
 set_utils_beamline(BL)
 
+devices = DeviceManager()
+devices.include(i09_1_shared_devices)
 
-@device_factory()
+
+@devices.factory()
 def synchrotron() -> Synchrotron:
     return Synchrotron()
 
 
-@device_factory()
-def dcm() -> DCM:
-    return DCM(prefix=f"{PREFIX.beamline_prefix}-MO-DCM-01:")
+@devices.factory()
+def energy_source(dcm: DoubleCrystalMonochromatorWithDSpacing) -> EnergySource:
+    return EnergySource(dcm.energy_in_eV)
 
 
-# Connect will work again after this work completed
-# https://jira.diamond.ac.uk/browse/I09-651
-@device_factory()
-def analyser() -> SpecsDetector[LensMode, PsuMode]:
+# CAM:IMAGE will fail to connect outside the beamline network,
+# see https://github.com/DiamondLightSource/dodal/issues/1852
+@devices.factory()
+def analyser(energy_source: EnergySource) -> SpecsDetector[LensMode, PsuMode]:
     return SpecsDetector[LensMode, PsuMode](
         prefix=f"{PREFIX.beamline_prefix}-EA-DET-02:CAM:",
         lens_mode_type=LensMode,
         psu_mode_type=PsuMode,
-        energy_sources={SelectedSource.SOURCE1: dcm().energy_in_ev},
+        energy_source=energy_source,
     )
+
+
+@devices.factory()
+def lakeshore() -> Lakeshore336:
+    return Lakeshore336(prefix=f"{PREFIX.beamline_prefix}-EA-TCTRL-01:")
+
+
+@devices.factory()
+def hsmpm() -> XYZPolarAzimuthTiltStage:
+    """Sample Manipulator"""
+    return XYZPolarAzimuthTiltStage(prefix=f"{PREFIX.beamline_prefix}-MO-HSMPM-01:")

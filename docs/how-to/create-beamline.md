@@ -23,28 +23,31 @@ The following example creates a fictitious beamline ``w41``, with a simulated tw
 
 ```python
 
+    from functools import cache
+    from pathlib import Path
+    from ophyd_async.core import PathProvider
     from ophyd_async.epics.adaravis import AravisDetector
 
-    from dodal.common.beamlines.beamline_utils import (
-        device_factory,
-        get_path_provider,
-        set_path_provider,
-    )
     from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
     from dodal.common.beamlines.device_helpers import CAM_SUFFIX, HDF5_SUFFIX
-    from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitPathProvider
+    from dodal.common.visit import RemoteDirectoryServiceClient, StaticVisitPathProvider
+    from dodal.device_manager import DeviceManager
     from dodal.devices.synchrotron import Synchrotron
     from dodal.log import set_beamline as set_log_beamline
-    from dodal.utils import BeamlinePrefix
+    from dodal.utils import BeamlinePrefix, get_beamline_name
 
     BL = get_beamline_name("s41")  # Default used when not on a live beamline
     PREFIX = BeamlinePrefix(BL)
     set_log_beamline(BL)  # Configure logging and util functions
     set_utils_beamline(BL)
 
-    # Currently we must hard-code the visit, determining the visit is WIP.
-    set_path_provider(
-        StaticVisitPathProvider(
+    devices = DeviceManager()
+    
+    @devices.fixture
+    @cache
+    def path_provider() -> PathProvider:
+        # Currently we must hard-code the visit, determining the visit is WIP.
+        return StaticVisitPathProvider(
             BL,
             # Root directory for all detectors
             Path("/dls/w41/data/YYYY/cm12345-1"),
@@ -52,7 +55,7 @@ The following example creates a fictitious beamline ``w41``, with a simulated tw
             client=RemoteDirectoryServiceClient("http://s41-control:8088/api"),
             # Else if no GDA server use a LocalDirectoryServiceClient(),
         )
-    )
+
 
     """
     Define device factory functions below this point.
@@ -63,24 +66,64 @@ The following example creates a fictitious beamline ``w41``, with a simulated tw
     """
     This decorator gives extra desirable behaviour to this factory function:
     - it may be instantiated automatically, selectively on live beamline
-        - caching and re-using the result for subsequent calls
     - it automatically names the device if no name is explicitly set
     - it may be skipped when make_all_devices is called on this module
     - it must be explicitly connected (which may be automated by tools)
         - when connected it may connect to a simulated backend
         - it may be connected concurrently (when automated by tools)
-    """"
-    @device_factory(skip = BL == "s41")
+    """
+    @devices.factory(skip = BL == "s41")
     def synchrotron() -> Synchrotron:
         return Synchrotron()
 
 
-    @device_factory()
-    def d11() -> AravisDetector:
+    @devices.factory()
+    def d11(path_provider: PathProvider) -> AravisDetector:
         return AravisDetector(
             f"{PREFIX.beamline_prefix}-DI-DCAM-01:",
-            path_provider=get_path_provider(),
+            path_provider=path_provider,
             drv_suffix=CAM_SUFFIX,
             fileio_suffix=HDF5_SUFFIX,
         )
+```
+
+Some beamlines have multiple endstations and shared optics. To reduce duplicate configuration, the `DeviceManager` allows us to include devices from another instance of `DeviceManager`.
+
+An example is shown below for a shared beamline setup:
+
+```python
+from dodal.device_manager import DeviceManager
+from dodal.devices.pgm import PlaneGratingMonochromator
+
+...
+
+devices = DeviceManager()
+
+"""Device that is shared between multiple endstations, i05 and i05-1."""
+@devices.factory()
+def pgm() -> PlaneGratingMonochromator:
+    return PlaneGratingMonochromator(
+        prefix=f"{PREFIX.beamline_prefix}-OP-PGM-01:",
+        grating=Grating,
+    )
+```
+
+Then for i05, we include the i05_shared devices so we have access to the shared devices.
+
+```python
+from dodal.beamlines.i05_shared import devices as i05_shared_devices
+from dodal.device_manager import DeviceManager
+from dodal.devices.temperture_controller import Lakeshore336
+
+...
+
+"""Include all the i05 shared beamline devices which should be avaliable for every end station.
+In this example, the pgm device will be included in this beamline."""
+devices = DeviceManager()
+devices.include(i05_shared_devices)
+
+"""Beamline specific device for i05 only."""
+@devices.factory()
+def sample_temperature_controller() -> Lakeshore336:
+    return Lakeshore336(prefix=f"{PREFIX.beamline_prefix}-EA-TCTRL-02:")
 ```

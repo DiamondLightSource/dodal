@@ -1,9 +1,6 @@
-from dodal.common.beamlines.beamline_utils import (
-    device_factory,
-)
+from dodal.beamlines.i09_2_shared import devices as i09_2_shared_devices
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.devices.i09.enums import Grating
-from dodal.devices.pgm import PGM
+from dodal.device_manager import DeviceManager
 from dodal.devices.synchrotron import Synchrotron
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
@@ -13,12 +10,10 @@ PREFIX = BeamlinePrefix(BL, suffix="J")
 set_log_beamline(BL)
 set_utils_beamline(BL)
 
+devices = DeviceManager()
+devices.include(i09_2_shared_devices)
 
-@device_factory()
+
+@devices.factory()
 def synchrotron() -> Synchrotron:
     return Synchrotron()
-
-
-@device_factory()
-def pgm() -> PGM:
-    return PGM(prefix=f"{PREFIX.beamline_prefix}-MO-PGM-01:", grating=Grating)

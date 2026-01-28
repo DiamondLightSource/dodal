@@ -1,9 +1,15 @@
 import time
+from pathlib import PurePath
 
 import bluesky.plan_stubs as bps
 from bluesky import preprocessors as bpp
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import DetectorTrigger, TriggerInfo
+from ophyd_async.core import (
+    DetectorTrigger,
+    StaticFilenameProvider,
+    StaticPathProvider,
+    TriggerInfo,
+)
 from ophyd_async.fastcs.eiger import EigerDetector
 
 from dodal.beamlines.i03 import fastcs_eiger
@@ -28,8 +34,16 @@ def configure_arm_trigger_and_disarm_detector(
     yield from change_roi_mode(eiger, detector_params, wait=True)
     LOGGER.info(f"Changing ROI Mode: {time.time() - start}s")
     start = time.time()
-    yield from bps.abs_set(eiger.odin.num_frames_chunks, 1)
+    yield from bps.abs_set(eiger.odin.num_frames_chunks, 1, wait=True)
     LOGGER.info(f"Setting # of Frame Chunks: {time.time() - start}s")
+    start = time.time()
+    yield from bps.abs_set(
+        eiger.drv.detector.photon_energy, detector_params.expected_energy_ev, wait=True
+    )
+    LOGGER.info(f"Setting Photon Energy: {time.time() - start}s")
+    start = time.time()
+    yield from bps.abs_set(eiger.drv.detector.ntrigger, 1, wait=True)
+    LOGGER.info(f"Setting Number of Triggers: {time.time() - start}s")
     start = time.time()
     yield from set_mx_settings_pvs(eiger, detector_params, wait=True)
     LOGGER.info(f"Setting MX PVs: {time.time() - start}s")
@@ -40,7 +54,7 @@ def configure_arm_trigger_and_disarm_detector(
     yield from bps.kickoff(eiger, wait=True)
     LOGGER.info(f"Kickoff Eiger: {time.time() - start}s")
     start = time.time()
-    yield from bps.trigger(eiger.drv.detector.trigger)  # type: ignore
+    yield from bps.trigger(eiger.drv.detector.trigger, wait=True)
     LOGGER.info(f"Triggering Eiger: {time.time() - start}s")
     start = time.time()
     yield from bps.complete(eiger, wait=True)
@@ -62,7 +76,6 @@ def set_cam_pvs(
     yield from bps.abs_set(
         eiger.drv.detector.frame_time, detector_params.exposure_time_s, group=group
     )
-    yield from bps.abs_set(eiger.drv.detector.nexpi, 1, group=group)
 
     if wait:
         yield from bps.wait(group)
@@ -82,7 +95,7 @@ def change_roi_mode(
 
     yield from bps.abs_set(
         eiger.drv.detector.roi_mode,
-        1 if detector_params.use_roi_mode else 0,
+        "4M" if detector_params.use_roi_mode else "disabled",
         group=group,
     )
     yield from bps.abs_set(
@@ -141,10 +154,16 @@ def set_mx_settings_pvs(
 
 
 if __name__ == "__main__":
-    RE = RunEngine()
+    run_engine = RunEngine()
     do_default_logging_setup()
-    eiger = fastcs_eiger(connect_immediately=True)
-    RE(
+
+    path_provider = StaticPathProvider(
+        StaticFilenameProvider("eiger_test_file12.h5"),
+        PurePath("/dls/i03/data/2025/cm40607-2/test_new_eiger/"),
+    )
+
+    eiger = fastcs_eiger.build(connect_immediately=True, path_provider=path_provider)
+    run_engine(
         configure_arm_trigger_and_disarm_detector(
             eiger=eiger,
             detector_params=DetectorParams(

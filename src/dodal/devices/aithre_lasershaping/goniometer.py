@@ -1,9 +1,9 @@
 from ophyd_async.epics.motor import Motor
 
-from dodal.devices.motors import XYZStage, create_axis_perp_to_rotation
+from dodal.devices.motors import XYZOmegaStage, create_axis_perp_to_rotation
 
 
-class Goniometer(XYZStage):
+class Goniometer(XYZOmegaStage):
     """The Aithre lab goniometer and the XYZ stage it sits on.
 
     `x`, `y` and `z` control the axes of the positioner at the base, while `sampy` and
@@ -15,11 +15,28 @@ class Goniometer(XYZStage):
     regardless of the current rotation.
     """
 
-    def __init__(self, prefix: str, name: str = "") -> None:
-        self.sampy = Motor(prefix + "SAMPY")
-        self.sampz = Motor(prefix + "SAMPZ")
-        self.omega = Motor(prefix + "OMEGA")
-        self.vertical_position = create_axis_perp_to_rotation(
-            self.omega, self.sampz, self.sampy
+    def __init__(
+        self,
+        prefix: str,
+        name: str = "",
+        x_infix: str = "X",
+        y_infix: str = "Y",
+        z_infix: str = "Z",
+        omega_infix: str = "OMEGA",
+        sampy_infix: str = "SAMPY",
+        sampz_infix: str = "SAMPZ",
+    ) -> None:
+        super().__init__(
+            prefix=prefix,
+            name=name,
+            x_infix=x_infix,
+            y_infix=y_infix,
+            z_infix=z_infix,
+            omega_infix=omega_infix,
         )
-        super().__init__(name)
+        with self.add_children_as_readables():
+            self.sampy = Motor(prefix + sampy_infix)
+            self.sampz = Motor(prefix + sampz_infix)
+            self.vertical_position = create_axis_perp_to_rotation(
+                self.omega, self.sampz, self.sampy
+            )

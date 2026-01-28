@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+from math import inf
 
 from bluesky.protocols import Preparable
 from ophyd_async.core import (
@@ -18,7 +19,7 @@ from dodal.devices.aperture import Aperture
 from dodal.devices.motors import XYStage
 
 
-class InvalidApertureMove(Exception):
+class InvalidApertureMoveError(Exception):
     pass
 
 
@@ -41,8 +42,8 @@ class AperturePosition(BaseModel):
         aperture_z: The z position of the aperture component in mm
         scatterguard_x: The x position of the scatterguard component in mm
         scatterguard_y: The y position of the scatterguard component in mm
-        radius: Radius of the selected aperture. When in the Robot Load position, the
-            radius is defined to be 0
+        diameter: Diameter of the selected aperture. When in the Robot Load position, the
+            diameter is defined to be 0
     """
 
     aperture_x: float
@@ -50,7 +51,7 @@ class AperturePosition(BaseModel):
     aperture_z: float
     scatterguard_x: float
     scatterguard_y: float
-    radius: float = Field(json_schema_extra={"units": "µm"}, default=0.0)
+    diameter: float = Field(json_schema_extra={"units": "µm"}, default=0.0)
 
     @property
     def values(self) -> tuple[float, float, float, float, float]:
@@ -77,7 +78,7 @@ class AperturePosition(BaseModel):
     @staticmethod
     def from_gda_params(
         name: _GDAParamApertureValue,
-        radius: float,
+        diameter: float,
         params: GDABeamlineParameters,
     ) -> AperturePosition:
         return AperturePosition(
@@ -86,7 +87,7 @@ class AperturePosition(BaseModel):
             aperture_z=params[f"miniap_z_{name.value}"],
             scatterguard_x=params[f"sg_x_{name.value}"],
             scatterguard_y=params[f"sg_y_{name.value}"],
-            radius=radius,
+            diameter=diameter,
         )
 
 
@@ -112,7 +113,7 @@ def load_positions_from_beamline_parameters(
 ) -> dict[ApertureValue, AperturePosition]:
     return {
         ApertureValue.OUT_OF_BEAM: AperturePosition.from_gda_params(
-            _GDAParamApertureValue.ROBOT_LOAD, 0, params
+            _GDAParamApertureValue.ROBOT_LOAD, inf, params
         ),
         ApertureValue.SMALL: AperturePosition.from_gda_params(
             _GDAParamApertureValue.SMALL, 20, params
@@ -124,7 +125,7 @@ def load_positions_from_beamline_parameters(
             _GDAParamApertureValue.LARGE, 100, params
         ),
         ApertureValue.PARKED: AperturePosition.from_gda_params(
-            _GDAParamApertureValue.MANUAL_LOAD, 0, params
+            _GDAParamApertureValue.MANUAL_LOAD, inf, params
         ),
     }
 
@@ -184,8 +185,8 @@ class ApertureScatterguard(StandardReadable, Preparable):
                 current_ap_z=self.aperture.z.user_readback,
             )
 
-        self.radius = derived_signal_r(
-            self._get_current_radius,
+        self.diameter = derived_signal_r(
+            self._get_current_diameter,
             current_aperture=self.selected_aperture,
             derived_units="µm",
         )
@@ -197,7 +198,7 @@ class ApertureScatterguard(StandardReadable, Preparable):
                 self.aperture.z.user_readback,
                 self.scatterguard.x.user_readback,
                 self.scatterguard.y.user_readback,
-                self.radius,
+                self.diameter,
             ],
         )
 
@@ -242,7 +243,7 @@ class ApertureScatterguard(StandardReadable, Preparable):
         diff_on_z = abs(current_ap_z - expected_z_position)
         aperture_z_tolerance = self._tolerances.aperture_z
         if diff_on_z > aperture_z_tolerance:
-            raise InvalidApertureMove(
+            raise InvalidApertureMoveError(
                 f"Current aperture z ({current_ap_z}), outside of tolerance ({aperture_z_tolerance}) from target ({expected_z_position})."
             )
 
@@ -256,13 +257,13 @@ class ApertureScatterguard(StandardReadable, Preparable):
         for axis in all_axes:
             axis_stationary = await axis.motor_done_move.get_value()
             if not axis_stationary:
-                raise InvalidApertureMove(
+                raise InvalidApertureMoveError(
                     f"{axis.name} is still moving. Wait for it to finish before"
                     "triggering another move."
                 )
 
-    def _get_current_radius(self, current_aperture: ApertureValue) -> float:
-        return self._loaded_positions[current_aperture].radius
+    def _get_current_diameter(self, current_aperture: ApertureValue) -> float:
+        return self._loaded_positions[current_aperture].diameter
 
     def _is_in_position(
         self, position: ApertureValue, current_ap_y: float, current_ap_z: float
@@ -294,7 +295,9 @@ class ApertureScatterguard(StandardReadable, Preparable):
         ):
             return ApertureValue.OUT_OF_BEAM
 
-        raise InvalidApertureMove("Current aperture/scatterguard state unrecognised")
+        raise InvalidApertureMoveError(
+            "Current aperture/scatterguard state unrecognised"
+        )
 
     async def _safe_move_whilst_in_beam(self, position: AperturePosition):
         """

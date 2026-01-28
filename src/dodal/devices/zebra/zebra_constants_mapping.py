@@ -13,7 +13,7 @@ class ZebraMappingValidations(BaseModel):
         value = object.__getattribute__(self, name)
         if not name.startswith("__"):
             if value == -1:
-                raise UnmappedZebraException(
+                raise UnmappedZebraError(
                     f"'{type(self).__name__}.{name}' was accessed but is set to -1. Please check the zebra mappings against the zebra's physical configuration"
                 )
         return value
@@ -49,6 +49,7 @@ class ZebraTTLOutputs(ZebraMappingValidations):
     TTL_SHUTTER: int = Field(default=-1, ge=-1, le=4)
     TTL_XSPRESS3: int = Field(default=-1, ge=-1, le=4)
     TTL_PANDA: int = Field(default=-1, ge=-1, le=4)
+    TTL_JUNGFRAU: int = Field(default=-1, ge=-1, le=4)
 
 
 class ZebraSources(ZebraMappingValidations):
@@ -77,7 +78,7 @@ class ZebraMapping(ZebraMappingValidations):
     Zebra's hardware configuration and wiring.
     """
 
-    # Zebra ophyd signal for connection can be accessed
+    # Zebra ophyd signal for output can be accessed
     # with, eg, zebra.output.out_pvs[zebra.mapping.outputs.TTL_DETECTOR]
     outputs: ZebraTTLOutputs = ZebraTTLOutputs()
 
@@ -92,5 +93,5 @@ class ZebraMapping(ZebraMappingValidations):
     AND_GATE_FOR_AUTO_SHUTTER: int = Field(default=2, ge=-1, le=4)
 
 
-class UnmappedZebraException(Exception):
+class UnmappedZebraError(Exception):
     pass
