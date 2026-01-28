@@ -1,7 +1,7 @@
 from dodal.beamlines.i05_shared import devices as i05_shared_devices
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.device_manager import DeviceManager
-from dodal.devices.motors import XYZPolarAzimuthTiltStage
+from dodal.devices.i05.motors import I05Goniometer
 from dodal.devices.temperture_controller import Lakeshore336
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
@@ -21,9 +21,9 @@ def sample_temperature_controller() -> Lakeshore336:
 
 
 @devices.factory()
-def sa() -> XYZPolarAzimuthTiltStage:
+def sa() -> I05Goniometer:
     """Sample Manipulator."""
-    return XYZPolarAzimuthTiltStage(
+    return I05Goniometer(
         f"{PREFIX.beamline_prefix}-EA-SM-01:",
         x_infix="SAX",
         y_infix="SAY",
