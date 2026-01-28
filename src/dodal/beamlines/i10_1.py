@@ -1,7 +1,14 @@
 from dodal.beamlines.i10_shared import devices as i10_shared_devices
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.device_manager import DeviceManager
+from dodal.devices.current_amplifiers import SR570, CurrentAmpDet
 from dodal.devices.i10 import I10JDiagnostic, I10JSlits, PiezoMirror
+from dodal.devices.i10_1 import (
+    ElectromagnetMagnetField,
+    ElectromagnetSR570,
+    ElectromagnetStage,
+    I10JScalerCard,
+)
 from dodal.devices.temperture_controller.lakeshore.lakeshore import Lakeshore336
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
@@ -13,12 +20,12 @@ PREFIX = BeamlinePrefix("i10", "J")
 devices = DeviceManager()
 devices.include(i10_shared_devices)
 
+"""I10J Beamline Devices"""
+
 
 @devices.factory()
-def em_temperature_controller() -> Lakeshore336:
-    return Lakeshore336(
-        prefix=f"{PREFIX.beamline_prefix}-EA-TCTRL-41:",
-    )
+def mirror6_sr570() -> SR570:
+    return SR570(prefix=f"{PREFIX.beamline_prefix}-DI-IAMP-07:")
 
 
 @devices.factory()
@@ -36,3 +43,76 @@ def diagnostic() -> I10JDiagnostic:
 @devices.factory()
 def focusing_mirror() -> PiezoMirror:
     return PiezoMirror(prefix=f"{PREFIX.beamline_prefix}-OP-FOCA-01:")
+
+
+"""I10J Electromagnet Devices"""
+
+
+@devices.factory()
+def electromagnet_field() -> ElectromagnetMagnetField:
+    return ElectromagnetMagnetField(
+        prefix=f"{PREFIX.beamline_prefix}-EA-MAGC-01:",
+    )
+
+
+@devices.factory()
+def electromagnet_stage() -> ElectromagnetStage:
+    return ElectromagnetStage(
+        prefix=f"{PREFIX.beamline_prefix}-MO-CRYO-01:",
+    )
+
+
+"""I10J Electromagnet Measurement Devices"""
+
+
+@devices.factory()
+def electromagnet_scaler_card() -> I10JScalerCard:
+    return I10JScalerCard(
+        prefix=f"{PREFIX.beamline_prefix}-EA-SCLR-02:SCALERJ3",
+    )
+
+
+@devices.factory()
+def electromagnet_sr570() -> ElectromagnetSR570:
+    return ElectromagnetSR570(
+        prefix=f"{PREFIX.beamline_prefix}-DI-IAMP",
+    )
+
+
+@devices.factory()
+def electromagnet_sr570_scaler_monitor(
+    mirror6_sr570: SR570,
+    electromagnet_scaler_card: I10JScalerCard,
+) -> CurrentAmpDet:
+    return CurrentAmpDet(
+        current_amp=mirror6_sr570, counter=electromagnet_scaler_card.mon
+    )
+
+
+@devices.factory()
+def electromagnet_sr570_scaler_tey(
+    electromagnet_sr570: ElectromagnetSR570,
+    electromagnet_scaler_card: I10JScalerCard,
+) -> CurrentAmpDet:
+    return CurrentAmpDet(
+        current_amp=electromagnet_sr570.ca1,
+        counter=electromagnet_scaler_card.tey,
+    )
+
+
+@devices.factory()
+def electromagnet_sr570_scaler_fy(
+    electromagnet_sr570: ElectromagnetSR570,
+    electromagnet_scaler_card: I10JScalerCard,
+) -> CurrentAmpDet:
+    return CurrentAmpDet(
+        current_amp=electromagnet_sr570.ca2,
+        counter=electromagnet_scaler_card.fy,
+    )
+
+
+@devices.factory()
+def em_temperature_controller() -> Lakeshore336:
+    return Lakeshore336(
+        prefix=f"{PREFIX.beamline_prefix}-EA-TCTRL-41:",
+    )
