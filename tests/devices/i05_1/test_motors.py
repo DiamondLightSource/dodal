@@ -44,6 +44,6 @@ async def test_setting_xyzpad_position_table(
             "xyzpad_stage-z": partial_reading(z),
             "xyzpad_stage-polar": partial_reading(polar),
             "xyzpad_stage-azimuth": partial_reading(azimuth),
-            "xyzpad_stage-defoucs": partial_reading(defocus),
+            "xyzpad_stage-defocus": partial_reading(defocus),
         },
     )
