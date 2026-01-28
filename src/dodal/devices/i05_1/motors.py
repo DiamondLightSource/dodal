@@ -9,15 +9,25 @@ class XYZPolarAzimuthDefocusStage(XYZPolarAzimuthStage):
     and defocus.
     """
 
-    def __init__(self, prefix: str, name=""):
+    def __init__(
+        self,
+        prefix: str,
+        x_infix="SMX",
+        y_infix="SMY",
+        z_infix="SMZ",
+        polar_infix="POL",
+        azimuth_infix="AZM",
+        defocus_infix="SDMF",
+        name="",
+    ):
         with self.add_children_as_readables():
-            self.defocus = Motor(prefix + "SMDF")
+            self.defocus = Motor(prefix + defocus_infix)
         super().__init__(
             prefix,
             name,
-            x_infix="SMX",
-            y_infix="SMY",
-            z_infix="SMZ",
-            polar_infix="POL",
-            azimuth_infix="AZM",
+            x_infix=x_infix,
+            y_infix=y_infix,
+            z_infix=z_infix,
+            polar_infix=polar_infix,
+            azimuth_infix=azimuth_infix,
         )

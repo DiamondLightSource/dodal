@@ -22,7 +22,7 @@ def sample_temperature_controller() -> Lakeshore336:
 
 @devices.factory()
 def sa() -> XYZPolarAzimuthTiltStage:
-    """Sample manipulator."""
+    """Sample Manipulator."""
     return XYZPolarAzimuthTiltStage(
         f"{PREFIX.beamline_prefix}-EA-SM-01:",
         x_infix="SAX",

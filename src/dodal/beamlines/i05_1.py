@@ -16,5 +16,5 @@ devices.include(i05_shared_devices)
 
 @devices.factory
 def sm() -> XYZPolarAzimuthDefocusStage:
-    """Sample manipulator."""
+    """Sample Manipulator."""
     return XYZPolarAzimuthDefocusStage(prefix=f"{PREFIX.beamline_prefix}-EA-SM-01:")
