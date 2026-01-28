@@ -1,5 +1,6 @@
 import asyncio
 from math import isclose
+from typing import Any
 
 from ophyd_async.core import (
     StandardReadable,
@@ -7,8 +8,6 @@ from ophyd_async.core import (
     derived_signal_rw,
 )
 from ophyd_async.epics.motor import Motor
-
-from dodal.common.beamlines.beamline_parameters import GDABeamlineParameters
 
 _BEAMSTOP_OUT_DELTA_Y_MM = -2
 
@@ -48,7 +47,7 @@ class Beamstop(StandardReadable):
     def __init__(
         self,
         prefix: str,
-        beamline_parameters: GDABeamlineParameters,
+        beamline_parameters: dict[str, Any],
         name: str = "",
     ):
         with self.add_children_as_readables():

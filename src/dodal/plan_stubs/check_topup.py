@@ -7,6 +7,7 @@ from dodal.common.beamlines.beamline_parameters import (
 )
 from dodal.devices.synchrotron import Synchrotron, SynchrotronMode
 from dodal.log import LOGGER
+from dodal.utils import get_beamline_name
 
 ALLOWED_MODES = [SynchrotronMode.USER, SynchrotronMode.SPECIAL]
 DECAY_MODE_COUNTDOWN = -1  # Value of the start_countdown PV when in decay mode
@@ -133,5 +134,5 @@ def check_topup_and_wait_if_necessary(
 
 
 def _load_topup_configuration_from_properties_file() -> dict[str, Any]:
-    params = get_beamline_parameters()
-    return params.params
+    params = get_beamline_parameters(get_beamline_name("i03"))
+    return params
