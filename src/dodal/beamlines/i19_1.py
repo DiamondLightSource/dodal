@@ -54,9 +54,6 @@ def attenuator_motor_squad() -> AttenuatorMotorSquad:
 
 @devices.factory()
 def beamstop() -> BeamStop:
-    """Get the i19-1 beamstop device, instantiate it if it hasn't already been.
-    If this is called when already instantiated in i19-1, it will return the existing
-    object."""
     return BeamStop(prefix=f"{PREFIX.beamline_prefix}-RS-ABSB-01:")
 
 
