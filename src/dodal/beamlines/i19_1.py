@@ -85,6 +85,7 @@ def pin_tip_centre1() -> PinTipCentreHolder:
     """I19-1 temporary device to hold the pin tip centre position for OAV1."""
     return PinTipCentreHolder(
         prefix=f"{PREFIX.beamline_prefix}-EA-OAV-01:",
+        overlay_channel=8,
     )
 
 
@@ -93,6 +94,7 @@ def pin_tip_centre2() -> PinTipCentreHolder:
     """I19-1 temporary device to hold the pin tip centre position for OAV2."""
     return PinTipCentreHolder(
         prefix=f"{PREFIX.beamline_prefix}-EA-OAV-02:",
+        overlay_channel=8,
     )
 
 
