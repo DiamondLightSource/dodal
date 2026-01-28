@@ -10,18 +10,18 @@ from dodal.devices.i19.access_controlled.hutch_access import ACCESS_DEVICE_NAME
 
 
 class AccessControlledShutter(OpticsBlueAPIDevice):
-    """ I19-specific device to operate the hutch shutter.
+    """I19-specific device to operate the hutch shutter.
 
-    This device will send a REST call to the blueapi instance controlling the optics \
-    hutch running on the I19 cluster, which will evaluate the current hutch in use vs \
+    This device will send a REST call to the blueapi instance controlling the optics
+    hutch running on the I19 cluster, which will evaluate the current hutch in use vs
     the hutch sending the request and decide if the plan will be run or not.
-    As the two hutches are located in series, checking the hutch in use is necessary to \
+    As the two hutches are located in series, checking the hutch in use is necessary to
     avoid accidentally operating the shutter from one hutch while the other has beamtime.
 
-    The name of the hutch that wants to operate the shutter should be passed to the \
+    The name of the hutch that wants to operate the shutter should be passed to the
     device upon instantiation.
 
-    For details see the architecture described in \
+    For details see the architecture described in
     https://github.com/DiamondLightSource/i19-bluesky/issues/30.
     """
 

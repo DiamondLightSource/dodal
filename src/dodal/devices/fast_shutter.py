@@ -19,15 +19,17 @@ EnumTypesT = TypeVar("EnumTypesT", bound=EnumTypes)
 
 
 class FastShutter(Movable[EnumTypesT], Protocol, Generic[EnumTypesT]):
-    """
-    Enum device specialised for a fast shutter with configured open_state and
+    """Enum device specialised for a fast shutter with configured open_state and
     close_state so it is generic enough to be used with any device or plan without
     knowing the specific enum to use.
 
-    For example:
+    For example::
+
         await shutter.set(shutter.open_state)
         await shutter.set(shutter.close_state)
-    OR
+
+    OR::
+
         run_engine(bps.mv(shutter, shutter.open_state))
         run_engine(bps.mv(shutter, shutter.close_state))
     """
@@ -44,9 +46,16 @@ class FastShutter(Movable[EnumTypesT], Protocol, Generic[EnumTypesT]):
 class GenericFastShutter(
     StandardReadable, FastShutter[EnumTypesT], Generic[EnumTypesT]
 ):
-    """
-    Implementation of fast shutter that connects to an epics pv. This pv is an enum that
+    """Implementation of fast shutter that connects to an epics pv. This pv is an enum that
     controls the open and close state of the shutter.
+
+    Args:
+        pv (str): The pv to connect to the shutter device.
+        open_state (EnumTypesT): The enum value that corresponds with opening the
+            shutter.
+        close_state (EnumTypesT): The enum value that corresponds with closing the
+            shutter.
+        name (str, optional): The name of the shutter.
     """
 
     def __init__(
@@ -56,12 +65,6 @@ class GenericFastShutter(
         close_state: EnumTypesT,
         name: str = "",
     ):
-        """
-        Args:
-            pv: The pv to connect to the shutter device.
-            open_state: The enum value that corresponds with opening the shutter.
-            close_state: The enum value that corresponds with closing the shutter.
-        """
         self.open_state = open_state
         self.close_state = close_state
         with self.add_children_as_readables():
@@ -70,12 +73,19 @@ class GenericFastShutter(
 
 
 class DualFastShutter(StandardReadable, FastShutter[EnumTypesT], Generic[EnumTypesT]):
-    """
-    A fast shutter device that handles the positions of two other fast shutters. The
+    """A fast shutter device that handles the positions of two other fast shutters. The
     "active" shutter is the one that corrosponds to the selected_shutter signal. For
     example, active shutter is shutter1 if selected_source is at SelectedSource.SOURCE1
     and vise versa for shutter2 and SelectedSource.SOURCE2. Whenever a move is done on
     this device, the inactive shutter is always set to the close_state.
+
+    Args:
+        shutter1 (GenericFastShutter): Active shutter that corrosponds to
+            SelectedSource.SOURCE1.
+        shutter2 (GenericFastShutter): Active shutter that corrosponds to
+            SelectedSource.SOURCE2.
+        selected_source (SignalRW): Signal that decides the active shutter.
+        name (str, optional): Name of this device.
     """
 
     def __init__(
@@ -85,13 +95,6 @@ class DualFastShutter(StandardReadable, FastShutter[EnumTypesT], Generic[EnumTyp
         selected_source: SignalRW[SelectedSource],
         name: str = "",
     ):
-        """
-        Args:
-            shutter1: Active shutter that corrosponds to SelectedSource.SOURCE1.
-            shutter2: Active shutter that corrosponds to SelectedSource.SOURCE2.
-            selected_source: Signal that decides the active shutter.
-            name: Name of this device.
-        """
         self._validate_shutter_states(shutter1.open_state, shutter2.open_state)
         self._validate_shutter_states(shutter1.close_state, shutter2.close_state)
         self.open_state = shutter1.open_state

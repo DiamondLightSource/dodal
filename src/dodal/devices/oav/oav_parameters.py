@@ -25,9 +25,7 @@ def _get_element_as_float(node: Element, element_name: str) -> float:
 
 
 class OAVParameters:
-    """
-    The parameters to set up the OAV depending on the context.
-    """
+    """The parameters to set up the OAV depending on the context."""
 
     def __init__(
         self,
@@ -47,8 +45,7 @@ class OAVParameters:
     def load_json(filename: str) -> tuple[dict[str, Any], dict[str, dict]]:
         """
         Loads the json from the specified file, and returns a dict with all the
-        individual top-level k-v pairs, and one with all the subdicts.
-        """
+        individual top-level k-v pairs, and one with all the subdicts."""
         with open(filename) as f:
             raw_params: dict[str, Any] = json.load(f)
         global_params = {
@@ -101,9 +98,7 @@ class OAVParameters:
         self.max_tip_distance: float = update("max_tip_distance", float, default=300)
 
     def get_max_tip_distance_in_pixels(self, microns_per_pixel: float) -> float:
-        """
-        Get the maximum tip distance in pixels.
-        """
+        """Get the maximum tip distance in pixels."""
         return self.max_tip_distance / microns_per_pixel
 
 
@@ -154,9 +149,8 @@ class OAVConfig(OAVConfigBase[ZoomParams]):
 
 
 class OAVConfigBeamCentre(OAVConfigBase[ZoomParamsCrosshair]):
-    """ Read the OAV config files and return a dictionary of {'zoom_level': ZoomParams}\
-    with information about microns per pixels and crosshairs.
-    """
+    """Read the OAV config files and return a dictionary of {'zoom_level': ZoomParams}
+    with information about microns per pixels and crosshairs."""
 
     def __init__(
         self,

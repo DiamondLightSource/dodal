@@ -13,7 +13,7 @@ from dodal.log import LOGGER
 
 
 class Femto3xxGainTable(StrictEnum):
-    """These are the sensitivity setting for Femto 3xx current amplifier"""
+    """These are the sensitivity setting for Femto 3xx current amplifier."""
 
     SEN_1 = "10^4"
     SEN_2 = "10^5"
@@ -28,7 +28,7 @@ class Femto3xxGainTable(StrictEnum):
 
 
 class Femto3xxGainToCurrentTable(float, Enum):
-    """These are the voltage to current setting for Femto 3xx current amplifier"""
+    """These are the voltage to current setting for Femto 3xx current amplifier."""
 
     SEN_1 = 1e4
     SEN_2 = 1e5
@@ -43,7 +43,7 @@ class Femto3xxGainToCurrentTable(float, Enum):
 
 
 class Femto3xxRaiseTime(float, Enum):
-    """These are the gain dependent raise time(s) for Femto 3xx current amplifier"""
+    """These are the gain dependent raise time(s) for Femto 3xx current amplifier."""
 
     SEN_1 = 0.8e-3
     SEN_2 = 0.8e-3
@@ -58,10 +58,9 @@ class Femto3xxRaiseTime(float, Enum):
 
 
 class FemtoDDPCA(CurrentAmp):
-    """
-    Femto current amplifier device, this class should cover all DDPCA Femto current
-      amplifiers, As the main different between all the DDPCA Femto is their gain table
-        and response time table.
+    """Femto current amplifier device, this class should cover all DDPCA Femto current
+    amplifiers, As the main different between all the DDPCA Femto is their gain table
+    and response time table.
 
     Attributes:
         gain (SignalRW): This is the epic signal that control current amplifier gain.
@@ -71,7 +70,6 @@ class FemtoDDPCA(CurrentAmp):
         timeout (float): Maximum waiting time in second for setting gain.
         raise_timetable (Enum): Table contain the minimum amount of time to wait after
             changing gain.
-
     """
 
     def __init__(

@@ -11,9 +11,8 @@ def camera_coordinates_to_xyz_mm(
     y_vertical_sign: int,
     z_vertical_sign: int,
 ) -> np.ndarray:
-    """
-    Converts from (horizontal,vertical) pixel measurements from the OAV camera into to
-    (x, y, z) motor coordinates in millimetres.
+    """Converts from (horizontal,vertical) pixel measurements from the OAV camera into
+    to (x, y, z) motor coordinates in millimetres.
     For an overview of the coordinate system for I03 see
     https://github.com/DiamondLightSource/hyperion/wiki/Gridscan-Coordinate-System.
 
@@ -27,9 +26,9 @@ def camera_coordinates_to_xyz_mm(
         microns_per_j_pixel (float): The number of microns per j pixel, adjusted for
             the zoom level vertical was measured at.
         x_horizontal_sign (int): Direction mapping for x, positive means the oav and
-            motor are on same direction, default from hyperion
-        y_vertical_sign (int): Direction mapping for y
-        z_vertical_sign (int): Direction mapping for z
+            motor are on same direction, default from hyperion.
+        y_vertical_sign (int): Direction mapping for y.
+        z_vertical_sign (int): Direction mapping for z.
     """
     # Convert the vertical and horizontal into mm.
     horizontal *= microns_per_i_pixel * 1e-3
@@ -55,16 +54,16 @@ def calculate_beam_distance(
     horizontal_pixels: int,
     vertical_pixels: int,
 ) -> tuple[int, int]:
-    """
-    Calculates the distance between the beam centre and the given (horizontal, vertical).
+    """Calculates the distance between the beam centre and the given (horizontal,
+    vertical).
 
     Args:
         horizontal_pixels (int): The x (camera coordinates) value in pixels.
         vertical_pixels (int): The y (camera coordinates) value in pixels.
 
     Returns:
-        The distance between the beam centre and the (horizontal, vertical) point in
-            pixels as a tuple (horizontal_distance, vertical_distance).
+        tuple: The distance between the beam centre and the (horizontal, vertical) point
+            in pixels as a tuple (horizontal_distance, vertical_distance).
     """
     beam_x, beam_y = beam_centre
     return (

@@ -11,10 +11,8 @@ from dodal.log import LOGGER
 
 
 class ZebraGridScanParamsTwoD(GridScanParamsCommon, WithDwellTime):
-    """
-    Params for 2D Zebra FGS. Adds on the dwell time, which is really the time
-    between trigger positions.
-    """
+    """Params for 2D Zebra FGS. Adds on the dwell time, which is really the time
+    between trigger positions."""
 
 
 class ZebraFastGridScanTwoD(FastGridScanCommon[ZebraGridScanParamsTwoD]):

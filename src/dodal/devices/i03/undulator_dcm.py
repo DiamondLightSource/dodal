@@ -12,9 +12,8 @@ ENERGY_TIMEOUT_S: float = 30.0
 
 
 class UndulatorDCM(StandardReadable, Movable[float]):
-    """
-    Composite device to handle changing beamline energies, wraps the Undulator and the
-    DCM. The DCM has a motor which controls the beam energy, when it moves, the
+    """Composite device to handle changing beamline energies, wraps the Undulator and
+    the DCM. The DCM has a motor which controls the beam energy, when it moves, the
     Undulator gap may also have to change to enable emission at the new energy.
     The relationship between the two motor motor positions is provided via a lookup
     table.
@@ -24,7 +23,7 @@ class UndulatorDCM(StandardReadable, Movable[float]):
     a comprehensive way to set beam energy.
 
     This class will be removed in the future. Use the separate Undulator and DCM devices
-    instead. See https://github.com/DiamondLightSource/dodal/issues/1092
+    instead. See https://github.com/DiamondLightSource/dodal/issues/1092.
     """
 
     DCM_PERP_TOLERANCE = 0.01

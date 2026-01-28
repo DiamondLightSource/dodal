@@ -19,8 +19,8 @@ async def periodic_reminder(
     """Periodically logs a message according to a schedule with increasing delays.
 
     Args:
-        message: The message the user wants to output through logging.
-        schedule: A tuple list of tuples consisting of (int|float, int|None).
+        message (str): The message the user wants to output through logging.
+        schedule (tuple): A tuple list of tuples consisting of (int|float, int|None).
             A sequence of (delay_seconds, count) pairs defining the logging intervals.
             - delay_seconds is the number of seconds to wait between logs.
             - count is how many times to log at this interval. If count is None, it logs

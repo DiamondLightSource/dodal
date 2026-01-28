@@ -8,10 +8,8 @@ class AcquireState(StrictEnum):
 
 
 class Xspress3Channel(Device):
-    """
-    Xspress3 Channel contains the truncated detector data and its collection conditions
-     including the definition of ROI(region of interest).
-    """
+    """Xspress3 Channel contains the truncated detector data and its collection conditions
+    including the definition of ROI(region of interest)."""
 
     def __init__(self, prefix: str, name: str = "") -> None:
         self.update_arrays = epics_signal_rw(AcquireState, prefix + "SCAS:TS:TSAcquire")
@@ -30,9 +28,7 @@ class Xspress3Channel(Device):
 
 
 class Xspress3ROIChannel(Device):
-    """
-    This is the Xspress3 multi-channel analyzer range
-    """
+    """This is the Xspress3 multi-channel analyzer range."""
 
     def __init__(self, prefix: str, name: str = "") -> None:
         self.roi_start_x = epics_signal_rw(int, prefix + "MinX")

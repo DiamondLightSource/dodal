@@ -96,17 +96,16 @@ class InsertionDeviceEnergy(InsertionDeviceEnergyBase, Preparable, Flyable):
 class BeamEnergy(StandardReadable, Movable[float], Preparable, Flyable):
     """
     Compound device to set both ID and energy motor at the same time with an option to add an offset.
+
+    Args:
+        id_energy (InsertionDeviceEnergy): An InsertionDeviceEnergy device.
+        mono (Motor): A Motor(energy) device.
+        name: New device name.
     """
 
     def __init__(
         self, id_energy: InsertionDeviceEnergy, mono: Motor, name: str = ""
     ) -> None:
-        """
-        Args:
-            id_energy (InsertionDeviceEnergy): An InsertionDeviceEnergy device.
-            mono (Motor): A Motor(energy) device.
-            name: New device name.
-        """
         self._id_energy = Reference(id_energy)
         self._mono_energy = Reference(mono)
 

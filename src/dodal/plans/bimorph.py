@@ -15,14 +15,14 @@ from dodal.devices.slits import Slits
 
 
 class SlitDimension(str, Enum):
-    """Enum representing the dimensions of a 2d slit
+    """Enum representing the dimensions of a 2d slit.
 
     Used to describe which dimension the pencil beam scan should move across.
     The other dimension will be held constant.
 
     Attributes:
-        X: Represents X dimension
-        Y: Represents Y dimension
+        X: Represents X dimension.
+        Y: Represents Y dimension.
     """
 
     X = "X"
@@ -33,10 +33,10 @@ def move_slits(slits: Slits, dimension: SlitDimension, gap: float, center: float
     """Moves ones dimension of Slits object to given position.
 
     Args:
-        slits: Slits to move
-        dimension: SlitDimension (X or Y)
-        gap: float size of gap
-        center: float position of center
+        slits (Slits): Slits to move.
+        dimension (SlitDimension): SlitDimension (X or Y).
+        gap (float): Size of gap.
+        center (float): Position of center.
     """
     if dimension == SlitDimension.X:
         yield from bps.mv(slits.x_gap, gap)
@@ -52,12 +52,12 @@ def check_valid_bimorph_state(
     """Checks that a set of bimorph voltages is valid.
 
     Args:
-        voltage_list: float amount each actuator will be increased by per scan
-        abs_range: float absolute value of maximum possible voltage of each actuator
-        abs_diff: float absolute maximum difference between two consecutive actuators
+        voltage_list (list[float]): Amount each actuator will be increased by per scan.
+        abs_range (float): Absolute value of maximum possible voltage of each actuator.
+        abs_diff (float): Absolute maximum difference between two consecutive actuators.
 
     Returns:
-        Bool representing state validity
+        Bool: Representing state validity.
     """
     for voltage in voltage_list:
         if abs(voltage) > abs_range:
@@ -79,13 +79,17 @@ def validate_bimorph_plan(
     """Checks that every position the bimorph will move through will not error.
 
     Args:
-        initial_voltage_list: float list starting position
-        voltage_increment: float amount each actuator will be increased by per scan
-        abs_range: float absolute value of maximum possible voltage of each actuator
-        abs_diff: float absolute maximum difference between two consecutive actuators
+        initial_voltage_list (list[float]): Starting position.
+        voltage_increment (float): Amount each actuator will be increased by per scan.
+        abs_range (float): Absolute value of maximum possible voltage of each actuator.
+        abs_diff (float): Absolute maximum difference between two consecutive actuators.
+
+    Returns:
+        Bool: Representing state validity.
 
     Raises:
-        Exception if the plan will lead to an error state"""
+        Exception if the plan will lead to an error state.
+    """
     voltage_list = initial_voltage_list.copy()
 
     if not check_valid_bimorph_state(voltage_list, abs_range, abs_diff):
@@ -102,7 +106,7 @@ def validate_bimorph_plan(
 
 @dataclass
 class BimorphState:
-    """Data class containing positions of BimorphMirror and Slits"""
+    """Data class containing positions of BimorphMirror and Slits."""
 
     voltages: list[float]
     x_gap: float
@@ -115,11 +119,12 @@ def capture_bimorph_state(mirror: BimorphMirror, slits: Slits):
     """Plan stub that captures current position of BimorphMirror and Slits.
 
     Args:
-        mirror: BimorphMirror to read from
-        slits: Slits to read from
+        mirror (BimorphMirror): BimorphMirror to read from.
+        slits (Slits): Slits to read from.
 
     Returns:
-        A BimorphState containing BimorphMirror and Slits positions"""
+        A BimorphState containing BimorphMirror and Slits positions.
+    """
     original_voltage_list = []
 
     for channel in mirror.channels.values():
@@ -143,9 +148,9 @@ def restore_bimorph_state(mirror: BimorphMirror, slits: Slits, state: BimorphSta
     """Moves BimorphMirror and Slits to state given in BirmophState.
 
     Args:
-        mirror: BimorphMirror to move
-        slits: Slits to move
-        state: BimorphState to move to.
+        mirror (BimorphMirror): BimorphMirror to move.
+        slits (Slits): Slits to move.
+        state (BimorphState): BimorphState to move to.
     """
     yield from move_slits(slits, SlitDimension.X, state.x_gap, state.x_center)
     yield from move_slits(slits, SlitDimension.Y, state.y_gap, state.y_center)
@@ -159,11 +164,11 @@ def bimorph_position_generator(
     """Generator that produces bimorph positions, starting with the initial_voltage_list.
 
     Args:
-        initial_voltage_list: list starting position for bimorph
-        voltage_increment: float amount to increase each actuator by in turn
+        initial_voltage_list (list[float]): Starting position for bimorph.
+        voltage_increment (float): Amount to increase each actuator by in turn.
 
     Yields:
-        List bimorph positions, starting with initial_voltage_list
+        List bimorph positions, starting with initial_voltage_list.
     """
     voltage_list = initial_voltage_list.copy()
 
@@ -197,24 +202,24 @@ def bimorph_optimisation(
     bimorph mirror, of using a 2-dimensional slit.
 
     Args:
-        detectors: list[Readable] detectors
-        bimorph: BimorphMirror to move
-        slit: Slits
-        voltage_increment: float voltage increment applied to each bimorph electrode
-        active_dimension: SlitDimension that slit will move in (X or Y)
-        active_slit_center_start: float start position of center of slit in active
-            dimension
-        active_slit_center_end: float final position of center of slit in active
-            dimension
-        active_slit_size: float size of slit in active dimension
-        inactive_slit_center: float center of slit in inactive dimension
-        inactive_slit_size: float size of slit in inactive dimension
-        number_of_slit_positions: int number of slit positions per pencil beam scan
-        bimorph_settle_time: float time in seconds to wait after bimorph move
-        slit_settle_time: float time in seconds to wait after slit move
-        initial_voltage_list: optional list[float] starting voltages for bimorph
-            (defaults to current voltages)
-        metadata: optional dict[str, Any] metadata to add to start document
+        detectors (list[Readable]): Detectors.
+        bimorph (BimorphMirror): BimorphMirror to move.
+        slit (Slits): Slits.
+        voltage_increment (float): Voltage increment applied to each bimorph electrode.
+        active_dimension (SlitDimension): SlitDimension that slit will move in (X or Y).
+        active_slit_center_start (float): Start position of center of slit in active
+            dimension.
+        active_slit_center_end (float): Final position of center of slit in active
+            dimension.
+        active_slit_size (float): Size of slit in active dimension.
+        inactive_slit_center (float): Center of slit in inactive dimension.
+        inactive_slit_size (float): Size of slit in inactive dimension.
+        number_of_slit_positions (int): Number of slit positions per pencil beam scan.
+        bimorph_settle_time (float): Time in seconds to wait after bimorph move.
+        slit_settle_time (float): Time in seconds to wait after slit move.
+        initial_voltage_list (list[float], optional): Starting voltages for bimorph
+            (defaults to current voltages).
+        metadata (dict[string, Any], optional): Metadata to add to start document.
     """
 
     _metadata = {
@@ -318,18 +323,18 @@ def inner_scan(
     """Inner plan stub, which moves Slits and performs a read.
 
     Args:
-        mirror: BimorphMirror to move
-        slit: Slits
-        oav: oav on-axis viewer
-        active_dimension: SlitDimension that slit will move in (X or Y)
-        active_slit_center_start: float start position of center of slit in active
-        dimension
-        active_slit_center_end: float final position of center of slit in active
-            dimension
-        active_slit_size: float size of slit in active dimension
-        number_of_slit_positions: int number of slit positions per pencil beam scan
-        slit_settle_time: float time in seconds to wait after slit move
-        stream_name: str name to pass to trigger_and_read
+        mirror (BimorphMirror): BimorphMirror to move.
+        slit (Slits): Slits.
+        oav: oav on-axis viewer.
+        active_dimension (SlitDimension): SlitDimension that slit will move in (X or Y).
+        active_slit_center_start (float): Start position of center of slit in active
+            dimension.
+        active_slit_center_end (float): Final position of center of slit in active
+            dimension.
+        active_slit_size (float): Size of slit in active dimension.
+        number_of_slit_positions (int): Number of slit positions per pencil beam scan.
+        slit_settle_time (float): Time in seconds to wait after slit move.
+        stream_name (str): Name to pass to trigger_and_read.
     """
     for value in linspace(
         active_slit_center_start, active_slit_center_end, number_of_slit_positions

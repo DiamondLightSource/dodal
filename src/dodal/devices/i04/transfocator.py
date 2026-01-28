@@ -49,11 +49,11 @@ class Transfocator(StandardReadable):
     @AsyncStatus.wrap
     async def set(self, value: float):
         """To set the beamsize on the transfocator we must:
-        1. Set the beamsize in the calculator part of the transfocator
-        2. Get the predicted number of lenses needed from this calculator
-        3. Enter this back into the device
-        4. Start the device moving
-        5. Wait for the start_rbv goes high and low again
+        1. Set the beamsize in the calculator part of the transfocator.
+        2. Get the predicted number of lenses needed from this calculator.
+        3. Enter this back into the device.
+        4. Start the device moving.
+        5. Wait for the start_rbv goes high and low again.
         """
         LOGGER.info(f"Transfocator setting {value} beamsize")
 

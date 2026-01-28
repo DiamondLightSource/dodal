@@ -28,11 +28,10 @@ TPsuMode = TypeVar("TPsuMode", bound=AnyPsuMode)
 
 
 def java_to_python_case(java_str: str) -> str:
-    """
-    Convert a camelCase Java-style string to a snake_case Python-style string.
+    """Convert a camelCase Java-style string to a snake_case Python-style string.
 
     Args:
-        java_str: The Java-style camelCase string.
+        java_str (str): The Java-style camelCase string.
 
     Returns:
         str: The Python-style snake_case string.
@@ -70,9 +69,8 @@ class AbstractBaseRegion(
     JavaToPythonModel,
     Generic[TAcquisitionMode, TLensMode, TPassEnergy],
 ):
-    """
-    Generic region model that holds the data. Specialised region models should inherit
-    this to extend functionality. All energy units are assumed to be in eV.
+    """Generic region model that holds the data. Specialised region models should
+    inherit this to extend functionality. All energy units are assumed to be in eV.
     """
 
     name: str = "New_region"
@@ -92,15 +90,11 @@ class AbstractBaseRegion(
     energy_mode: EnergyMode = EnergyMode.KINETIC
 
     def is_binding_energy(self) -> bool:
-        """
-        Returns true if the energy_mode is binding.
-        """
+        """Returns true if the energy_mode is binding."""
         return self.energy_mode == EnergyMode.BINDING
 
     def is_kinetic_energy(self) -> bool:
-        """
-        Returns true if the energy_mode is kinetic.
-        """
+        """Returns true if the energy_mode is kinetic."""
         return self.energy_mode == EnergyMode.KINETIC
 
     def switch_energy_mode(
@@ -109,19 +103,18 @@ class AbstractBaseRegion(
         excitation_energy: float,
         copy: bool = True,
     ) -> Self:
-        """
-        Get a region with a new energy mode: Kinetic or Binding.
+        """Get a region with a new energy mode: Kinetic or Binding.
         It caculates new values for low_energy, centre_energy, high_energy, via the
         excitation enerrgy. It doesn't calculate anything if the region is already of
         the same energy mode.
 
         Args:
-            energy_mode: Mode you want to switch the region to.
-            excitation_energy: Energy conversion for low_energy, centre_energy, and
-                high_energy for new energy mode.
-            copy: Defaults to True. If true, create a copy of this region to alter for
-                the new energy_mode and return it. If False, alter this region for the
-                energy_mode and return it self.
+            energy_mode (EnergyMode): Mode you want to switch the region to.
+            excitation_energy (float): Energy conversion for low_energy, centre_energy,
+                and high_energy for new energy mode.
+            copy (bool, optional): Defaults to True. If true, create a copy of this
+                region to alter for the new energy_mode and return it. If False, alter
+                this region for the energy_mode and return it self.
 
         Returns:
             Region with selected energy mode and new calculated energy values.
@@ -151,10 +144,12 @@ class AbstractBaseRegion(
         the original energy mode e.g mode BINDING will stay as BINDING.
 
         Args:
-            excitation_energy: Energy conversion for low_energy, centre_energy, and
-                high_energy for new energy mode.
-            copy: Defaults to True. If true, create a copy of this region to alter to
-                calculate new energy values to return. If false, alter this region.
+            excitation_energy (float): Energy conversion for low_energy, centre_energy,
+                and high_energy for new energy mode.
+            copy (bool, optional): Defaults to True. If true, create a copy of this
+                region to alter to calculate new energy values to return. If false,
+                alter this region.
+
         Returns:
             Region with selected original energy mode and new calculated KINETIC energy
                 values for epics.
@@ -180,11 +175,9 @@ class AbstractBaseSequence(
     JavaToPythonModel,
     Generic[TAbstractBaseRegion],
 ):
-    """
-    Generic sequence model that holds the list of region data. Specialised sequence
+    """Generic sequence model that holds the list of region data. Specialised sequence
     models should inherit this to extend functionality and define type of region to
-    hold.
-    """
+    hold."""
 
     version: float = 0.1  # If file format changes within prod, increment this number!
     regions: list[TAbstractBaseRegion] = Field(default_factory=lambda: [])

@@ -54,6 +54,9 @@ def attenuator_motor_squad() -> AttenuatorMotorSquad:
 
 @devices.factory()
 def beamstop() -> BeamStop:
+    """Get the i19-1 beamstop device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i19-1, it will return the existing
+    object."""
     return BeamStop(prefix=f"{PREFIX.beamline_prefix}-RS-ABSB-01:")
 
 
@@ -110,7 +113,12 @@ def pin_tip_detection2() -> PinTipDetection:
 
 @devices.factory()
 def shutter() -> AccessControlledShutter:
+<<<<<<< HEAD
     """Access controlled wrapper for the experiment shutter."""
+=======
+    """Get the i19-1 hutch shutter device, instantiate it if it hasn't already been.
+    If this is called when already instantiated, it will return the existing object."""
+>>>>>>> ae81c4554a (make docstrings consistent: grammar, punctuation, type hits)
     return AccessControlledShutter(
         prefix=f"{PREFIX.beamline_prefix}-PS-SHTR-01:",
         hutch=HutchState.EH1,
@@ -120,6 +128,12 @@ def shutter() -> AccessControlledShutter:
 
 @devices.factory()
 def synchrotron() -> Synchrotron:
+<<<<<<< HEAD
+=======
+    """Get the i19-1 synchrotron device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i19-1, it will return the existing
+    object."""
+>>>>>>> ae81c4554a (make docstrings consistent: grammar, punctuation, type hits)
     return Synchrotron()
 
 
@@ -127,6 +141,12 @@ def synchrotron() -> Synchrotron:
 # on the beamline, it is currently not in use
 @devices.factory()
 def zebra() -> Zebra:
+<<<<<<< HEAD
+=======
+    """Get the i19-1 zebra device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i19-1, it will return the existing
+    object."""
+>>>>>>> ae81c4554a (make docstrings consistent: grammar, punctuation, type hits)
     return Zebra(
         mapping=I19_1_ZEBRA_MAPPING,
         prefix=f"{PREFIX.beamline_prefix}-EA-ZEBRA-02:",

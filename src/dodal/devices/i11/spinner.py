@@ -8,7 +8,7 @@ from ophyd_async.epics.core import epics_signal_rw
 
 
 class Spinner(StandardReadable, Pausable):
-    """This is a simple sample spinner, that has enable and speed (%)"""
+    """This is a simple sample spinner, that has enable and speed (%)."""
 
     def __init__(
         self,

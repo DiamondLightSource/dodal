@@ -53,27 +53,27 @@ _NO_SAMPLE_ID = -1
 
 
 class XrcResult(TypedDict):
-    """
-    Information about a diffracting centre.
+    """Information about a diffracting centre.
 
     NOTE: the coordinate systems of centre_of_mass and max_voxel/bounding_box are not
         the same; centre_of_mass coordinates are continuous whereas max_voxel and
         bounding_box coordinates are discrete.
 
     Attributes:
-         centre_of_mass: The position of the centre of mass of the crystal, adjusted so
-            that grid box centres lie on integer grid coordinates, such that a 1x1x1
-            crystal detected in a single grid box at 0, 0, 0, has c.o.m. of 0, 0, 0,
-            not 0.5, 0.5, 0.5
-         max_voxel: Position of the voxel with the maximum count, in integer coordinates
-         max_count: max count achieved in a single voxel for the crystal
-         n_voxels: Number of voxels (aka grid boxes) in the diffracting centre
-         total_count: Total of above-threshold spot counts in the labelled voxels
-         bounding_box: The rectangular prism that bounds the crystal, expressed
-            as the volume of whole boxes as a half-open range i.e such that
+         centre_of_mass (list[float]): The position of the centre of mass of the
+            crystal, adjusted so that grid box centres lie on integer grid coordinates,
+            such that a 1x1x1 crystal detected in a single grid box at 0, 0, 0, has
+            c.o.m. of 0, 0, 0, not 0.5, 0.5, 0.5.
+         max_voxel (list[int]): Position of the voxel with the maximum count, in integer
+            coordinates.
+         max_count (int): Max count achieved in a single voxel for the crystal.
+         n_voxels (int): Number of voxels (aka grid boxes) in the diffracting centre.
+         total_count (int): Total of above-threshold spot counts in the labelled voxels.
+         bounding_box (list[list[int]]): The rectangular prism that bounds the crystal,
+            expressed as the volume of whole boxes as a half-open range i.e such that
             p1 = (x1, y1, z1) <= p < p2 = (x2, y2, z2) and
             p2 - p1 gives the dimensions in whole voxels.
-         sample_id: The sample id associated with the centre.
+         sample_id (int): The sample id associated with the centre.
     """
 
     centre_of_mass: list[float]
@@ -108,15 +108,17 @@ class ZocaloResults(StandardReadable, Triggerable):
     See https://diamondlightsource.github.io/dodal/main/how-to/zocalo.html
 
     Args:
-        name (str): Name of the device
-        zocalo_environment (str): How zocalo is configured. Defaults to i03's
-            development configuration
-        channel (str): Name for the results Queue
-        sort_key (str): How results are ranked. Defaults to sorting by highest counts
-        timeout_s (float): Maximum time to wait for the Queue to be filled by an object,
-            starting from when the ZocaloResults device is triggered
-        prefix (str): EPICS PV prefix for the device
-        results_source (ZocaloSource): Where to get results from, GPU or CPU analysis
+        name (str, optional): Name of the device.
+        zocalo_environment (str, optional): How zocalo is configured. Defaults to i03's
+            development configuration.
+        channel (str, optional): Name for the results Queue.
+        sort_key (str, optional): How results are ranked. Defaults to sorting by highest
+            counts.
+        timeout_s (float, optional): Maximum time to wait for the Queue to be filled by
+            an object, starting from when the ZocaloResults device is triggered.
+        prefix (str): EPICS PV prefix for the device.
+        results_source (ZocaloSource, optional): Where to get results from, GPU or CPU
+            analysis.
     """
 
     def __init__(

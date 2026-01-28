@@ -55,8 +55,7 @@ class MirrorVoltageDemand(StrictEnum):
 class SingleMirrorVoltage(Device):
     """Abstract the bimorph mirror voltage PVs into a single device that can be set
     asynchronously and returns when the demanded voltage setpoint is accepted, without
-    blocking the caller as this process can take significant time.
-    """
+    blocking the caller as this process can take significant time."""
 
     def __init__(self, prefix: str, name: str = ""):
         self._actual_v = epics_signal_r(int, prefix + "R")
@@ -67,9 +66,13 @@ class SingleMirrorVoltage(Device):
     @AsyncStatus.wrap
     async def set(self, value, *args, **kwargs):
         """Combine the following operations into a single set:
-        1. apply the value to the setpoint PV
-        3. Wait until demand is accepted
-        4. When either demand is accepted or DEFAULT_SETTLE_TIME expires, signal the result on the Status
+
+        1. apply the value to the setpoint PV.
+
+        3. Wait until demand is accepted.
+
+        4. When either demand is accepted or DEFAULT_SETTLE_TIME expires, signal the
+           result on the Status.
         """
 
         setpoint_v = self._setpoint_v

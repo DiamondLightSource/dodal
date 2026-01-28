@@ -14,15 +14,15 @@ _TILT = "TILT"
 
 
 class Stage(StandardReadable, ABC):
-    """
-    For these devices, the following co-ordinates are typical but not enforced:
+    """For these devices, the following co-ordinates are typical but not enforced:
     - z is horizontal & parallel to the direction of beam travel
     - y is vertical and antiparallel to the force of gravity
     - x is the cross product of y🞬z
 
     Attributes:
-        prefix: Common part of the EPICS PV for all motors, including ":".
-        name: Name of the stage, each child motor will be named "{name}-{field_name}"
+        prefix (str): Common part of the EPICS PV for all motors, including ":".
+        name (str, optional): Name of the stage, each child motor will be named
+            "{name}-{field_name}".
         *_infix: Infix between the common prefix and the EPICS motor record fields for
             the field.
     """
@@ -31,9 +31,7 @@ class Stage(StandardReadable, ABC):
 
 
 class XThetaStage(Stage):
-    """
-    Two-axis stage with an x and a theta motor.
-    """
+    """Two-axis stage with an x and a theta motor."""
 
     def __init__(
         self, prefix: str, name: str = "", x_infix: str = _X, theta_infix: str = "A"
@@ -45,9 +43,7 @@ class XThetaStage(Stage):
 
 
 class XYStage(Stage):
-    """
-    A standard two-axis stage with an x and a y motor.
-    """
+    """A standard two-axis stage with an x and a y motor."""
 
     def __init__(
         self, prefix: str, name: str = "", x_infix: str = _X, y_infix: str = _Y
@@ -59,9 +55,7 @@ class XYStage(Stage):
 
 
 class XYZStage(XYStage):
-    """
-    A standard three-axis stage with an x, a y, and a z motor.
-    """
+    """A standard three-axis stage with an x, a y, and a z motor."""
 
     def __init__(
         self,
@@ -77,9 +71,7 @@ class XYZStage(XYStage):
 
 
 class XYZThetaStage(XYZStage):
-    """
-    Four-axis stage with a standard xyz stage and one axis of rotation: theta.
-    """
+    """Four-axis stage with a standard xyz stage and one axis of rotation: theta."""
 
     def __init__(
         self,
@@ -96,9 +88,7 @@ class XYZThetaStage(XYZStage):
 
 
 class XYZOmegaStage(XYZStage):
-    """
-    Four-axis stage with a standard xyz stage and one axis of rotation: omega.
-    """
+    """Four-axis stage with a standard xyz stage and one axis of rotation: omega."""
 
     def __init__(
         self,
@@ -176,9 +166,7 @@ class XYZPolarAzimuthTiltStage(XYZPolarAzimuthStage):
 
 
 class XYPhiStage(XYStage):
-    """
-    Three-axis stage with a standard xy stage and one axis of rotation: phi.
-    """
+    """Three-axis stage with a standard xy stage and one axis of rotation: phi."""
 
     def __init__(
         self,
@@ -194,9 +182,7 @@ class XYPhiStage(XYStage):
 
 
 class XYPitchStage(XYStage):
-    """
-    Three-axis stage with a standard xy stage and one axis of rotation: pitch.
-    """
+    """Three-axis stage with a standard xy stage and one axis of rotation: pitch."""
 
     def __init__(
         self,
@@ -212,9 +198,7 @@ class XYPitchStage(XYStage):
 
 
 class XYRollStage(XYStage):
-    """
-    Three-axis stage with a standard xy stage and one axis of rotation: roll.
-    """
+    """Three-axis stage with a standard xy stage and one axis of rotation: roll."""
 
     def __init__(
         self,
@@ -230,9 +214,8 @@ class XYRollStage(XYStage):
 
 
 class XYZPitchYawStage(XYZStage):
-    """
-    Five-axis stage with a standard xyz stage and two axes of rotation: pitch and yaw.
-    """
+    """Five-axis stage with a standard xyz stage and two axes of rotation: pitch and
+    yaw."""
 
     def __init__(
         self,
@@ -251,10 +234,8 @@ class XYZPitchYawStage(XYZStage):
 
 
 class XYZPitchYawRollStage(XYZStage):
-    """
-    Five-axis stage with a standard xyz stage and three axes of rotation: pitch, yaw,
-    and roll.
-    """
+    """Five-axis stage with a standard xyz stage and three axes of rotation: pitch, yaw,
+    and roll."""
 
     def __init__(
         self,
@@ -275,10 +256,8 @@ class XYZPitchYawRollStage(XYZStage):
 
 
 class SixAxisGonio(XYZOmegaStage):
-    """
-    Six-axis goniometer with a standard xyz stage and three axes of rotation:
-    kappa, phi and omega.
-    """
+    """Six-axis goniometer with a standard xyz stage and three axes of rotation:
+    kappa, phi and omega."""
 
     def __init__(
         self,
@@ -302,10 +281,8 @@ class SixAxisGonio(XYZOmegaStage):
 
 
 class SixAxisGonioKappaPhi(XYZStage):
-    """
-    Six-axis goniometer with a standard xyz stage and two axes of rotation:
-    kappa and phi.
-    """
+    """Six-axis goniometer with a standard xyz stage and two axes of rotation:
+    kappa and phi."""
 
     def __init__(
         self,
@@ -324,9 +301,7 @@ class SixAxisGonioKappaPhi(XYZStage):
 
 
 class YZStage(Stage):
-    """
-    Two-axis stage with an x and a z motor.
-    """
+    """Two-axis stage with an x and a z motor."""
 
     def __init__(
         self, prefix: str, name: str = "", y_infix: str = _Y, z_infix: str = _Z

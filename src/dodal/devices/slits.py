@@ -19,10 +19,8 @@ class MinimalSlits(StandardReadable):
 
 
 class Slits(MinimalSlits):
-    """
-    Representation of a 4-blade set of slits. Allows control/readout of the gap
-    between each pair of blades.
-    """
+    """Representation of a 4-blade set of slits. Allows control/readout of the gap
+    between each pair of blades."""
 
     def __init__(
         self,
@@ -40,9 +38,7 @@ class Slits(MinimalSlits):
 
 
 class SlitsY(StandardReadable):
-    """
-    Representation of a 2-blade slits.
-    """
+    """Representation of a 2-blade slits."""
 
     def __init__(
         self,

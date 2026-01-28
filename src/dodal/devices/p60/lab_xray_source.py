@@ -12,7 +12,7 @@ class LabXraySource(float, Enum):
 
 
 class LabXraySourceReadable(StandardReadable):
-    """Simple device to get the laboratory x-ray tube energy reading"""
+    """Simple device to get the laboratory x-ray tube energy reading."""
 
     def __init__(self, xraysource: LabXraySource, name: str = "") -> None:
         with self.add_children_as_readables():

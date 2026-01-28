@@ -55,23 +55,21 @@ class GridAxis:
         return self.steps_to_motor_position(self.full_steps - 1)
 
     def is_within(self, steps: float):
-        """
-        Determine whether a single axis coordinate is within the grid.
+        """Determine whether a single axis coordinate is within the grid.
         The coordinate is from a continuous coordinate space based on the
         XRC grid where the origin corresponds to the centre of the first grid box.
 
         Args:
-            steps: The coordinate to check
+            steps (float): The coordinate to check.
 
         Returns:
-            True if the coordinate falls within the grid.
+            bool: True if the coordinate falls within the grid.
         """
         return -0.5 <= steps <= self.full_steps - 0.5
 
 
 class GridScanParamsCommon(AbstractExperimentWithBeamParams):
-    """
-    Common holder class for the parameters of a grid scan in a similar
+    """Common holder class for the parameters of a grid scan in a similar
     layout to EPICS. The parameters and functions of this class are common
     to both the zebra and panda triggered fast grid scans in 2d or 3d.
 
@@ -108,11 +106,11 @@ class GridScanParamsCommon(AbstractExperimentWithBeamParams):
         to a real motor position.
 
         Args:
-            grid_position: The x, y, z position in grid steps. The origin is at the
-                centre of the first grid box
+            grid_position (ndarray): The x, y, z position in grid steps. The origin is
+                at the centre of the first grid box
 
         Returns:
-            The motor position this corresponds to.
+            ndarray: The motor position this corresponds to.
 
         Raises:
             IndexError if the desired position is outside the grid.
@@ -135,8 +133,8 @@ class GridScanParamsCommon(AbstractExperimentWithBeamParams):
 class GridScanParamsThreeD(GridScanParamsCommon):
     """Additional parameters required to do a 3 dimensional gridscan.
 
-    A 3D gridscan works by doing two 2D gridscans. The first of these grids is x_steps by
-    y_steps. The sample is then rotated by 90 degrees, and then the second grid is
+    A 3D gridscan works by doing two 2D gridscans. The first of these grids is x_steps
+    by y_steps. The sample is then rotated by 90 degrees, and then the second grid is
     x_steps by z_steps.
     """
 
@@ -175,16 +173,12 @@ class WithDwellTime(BaseModel):
 
 
 class ZebraGridScanParamsThreeD(GridScanParamsThreeD, WithDwellTime):
-    """
-    Params for standard Zebra FGS. Adds on the dwell time, which is really the time
-    between trigger positions.
-    """
+    """Params for standard Zebra FGS. Adds on the dwell time, which is really the time
+    between trigger positions."""
 
 
 class PandAGridScanParams(GridScanParamsThreeD):
-    """
-    Params for panda constant-motion scan. Adds on the goniometer run-up distance
-    """
+    """Params for panda constant-motion scan. Adds on the goniometer run-up distance."""
 
     run_up_distance_mm: float = 0.17
 
@@ -205,8 +199,8 @@ class FastGridScanCommon(
 ):
     """Device containing the minimal signals for a general fast grid scan.
 
-    When the motion program is started, the goniometer will move in a snake-like grid trajectory,
-    with X as the fast axis and Y as the slow axis.
+    When the motion program is started, the goniometer will move in a snake-like grid
+    trajectory, with X as the fast axis and Y as the slow axis.
 
     See ZebraFastGridScanThreeD as an example of how to implement.
     """
@@ -299,15 +293,14 @@ class FastGridScanCommon(
 
     @AsyncStatus.wrap
     async def prepare(self, value: ParamType):
-        """
-        Submit the gridscan parameters to the device for validation prior to
-        gridscan kickoff
+        """Submit the gridscan parameters to the device for validation prior to
+        gridscan kickoff.
 
         Args:
-            value: the gridscan parameters
+            value (ParamType): The gridscan parameters.
 
         Raises:
-            GridScanInvalidError: if the gridscan parameters were not valid
+            GridScanInvalidError: If the gridscan parameters were not valid.
         """
         set_statuses = []
 
@@ -429,8 +422,8 @@ class FastGridScanThreeD(FastGridScanCommon[ParamType]):
 class ZebraFastGridScanThreeD(FastGridScanThreeD[ZebraGridScanParamsThreeD]):
     """Device for standard Zebra 3D FGS.
 
-    In this scan, the goniometer's velocity profile follows a parabolic shape between X steps,
-    with the slowest points occuring at each X step.
+    In this scan, the goniometer's velocity profile follows a parabolic shape between X
+    steps, with the slowest points occuring at each X step.
     """
 
     def __init__(self, prefix: str, name: str = "") -> None:
@@ -451,8 +444,8 @@ class ZebraFastGridScanThreeD(FastGridScanThreeD[ZebraGridScanParamsThreeD]):
 class PandAFastGridScan(FastGridScanThreeD[PandAGridScanParams]):
     """Device for panda constant-motion scan.
 
-    In this scan, the goniometer's velocity
-    is constant through each row. It doesn't slow down when going through trigger points.
+    In this scan, the goniometer's velocity is constant through each row. It doesn't
+    slow down when going through trigger points.
     """
 
     def __init__(self, prefix: str, name: str = "") -> None:
@@ -478,14 +471,13 @@ class PandAFastGridScan(FastGridScanThreeD[PandAGridScanParams]):
 
 
 def set_fast_grid_scan_params(scan: FastGridScanCommon[ParamType], params: ParamType):
-    """
-    Apply the fast grid scan parameters to the grid scan device and validate them
+    """Apply the fast grid scan parameters to the grid scan device and validate them.
 
     Args:
-        scan: The fast grid scan device
-        params: The parameters to set
+        scan (FastGridScancommon[ParamType]): The fast grid scan device.
+        params (ParamType): The parameters to set.
 
     Raises:
-        GridScanInvalidError: if the grid scan parameters are not valid
+        GridScanInvalidError: if the grid scan parameters are not valid.
     """
     yield from prepare(scan, params, wait=True)

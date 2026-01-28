@@ -41,10 +41,24 @@ class AbstractAnalyserDriverIO(
     Movable[TAbstractBaseRegion],
     Generic[TAbstractBaseRegion, TAcquisitionMode, TLensMode, TPsuMode, TPassEnergy],
 ):
-    """
-    Driver device that defines signals and readables that should be common to all
+    """Driver device that defines signals and readables that should be common to all
     electron analysers. Implementations of electron analyser devices should inherit
     from this class and define additional specialised signals and methods.
+
+    Args:
+        prefix (str): Base PV to connect to EPICS for this device.
+        acquisition_mode_type (type[TAcquisitionMode]): Enum that determines the
+            available acquisition modes for this device.
+        lens_mode_type (type[TLensMode]): Enum that determines the available lens
+            mode for this device.
+        psu_mode_type (type[TPsuMode]): Enum that determines the available psu modes
+            for this device.
+        pass_energy_type (type[TPassEnergy]): Can be enum or float, depending on
+            electron analyser model. If enum, it determines the available pass
+            energies for this device.
+        energy_source: Device that can give us the correct excitation energy (in eV)
+            and switch sources if applicable.
+        name (str, optional): Name of the device.
     """
 
     def __init__(
@@ -56,23 +70,6 @@ class AbstractAnalyserDriverIO(
         pass_energy_type: type[TPassEnergy],
         name: str = "",
     ) -> None:
-        """
-        Constructor method for setting up electron analyser.
-
-        Args:
-            prefix: Base PV to connect to EPICS for this device.
-            acquisition_mode_type: Enum that determines the available acquisition modes
-                for this device.
-            lens_mode_type: Enum that determines the available lens mode for this
-                device.
-            psu_mode_type: Enum that determines the available psu modes for this device.
-            pass_energy_type: Can be enum or float, depends on electron analyser model.
-                If enum, it determines the available pass energies for this device.
-            energy_source: Device that can give us the correct excitation energy and
-                switch sources if applicable.
-                (in eV).
-            name: Name of the device.
-        """
         self.acquisition_mode_type = acquisition_mode_type
         self.lens_mode_type = lens_mode_type
         self.psu_mode_type = psu_mode_type
@@ -139,33 +136,31 @@ class AbstractAnalyserDriverIO(
     @abstractmethod
     @AsyncStatus.wrap
     async def set(self, epics_region: TAbstractBaseRegion):
-        """
-        Move a group of signals defined in a region. Each implementation of this class
-        is responsible for implementing this method correctly.
+        """Move a group of signals defined in a region. Each implementation of this
+        class is responsible for implementing this method correctly.
 
         Args:
-            region: Contains the parameters to setup the driver for a scan.
+            epics_region (TAbstractBaseRegion): Contains the parameters to setup the
+                driver for a scan.
         """
 
     @abstractmethod
     def _create_angle_axis_signal(self, prefix: str) -> SignalR[Array1D[np.float64]]:
-        """
-        The signal that defines the angle axis. Depends on analyser model.
+        """The signal that defines the angle axis. Depends on analyser model.
 
         Args:
-            prefix: PV string used for connecting to angle axis.
+            prefix (str): PV string used for connecting to angle axis.
 
         Returns:
-            Signal that can give us angle axis array data.
+            SignalR that can give us angle axis array data.
         """
 
     @abstractmethod
     def _create_energy_axis_signal(self, prefix: str) -> SignalR[Array1D[np.float64]]:
-        """
-        The signal that defines the energy axis. Depends on analyser model.
+        """The signal that defines the energy axis. Depends on analyser model.
 
         Args:
-            prefix: PV string used for connecting to energy axis.
+            prefix (str): PV string used for connecting to energy axis.
 
         Returns:
             Signal that can give us energy axis array data.
@@ -177,16 +172,16 @@ class AbstractAnalyserDriverIO(
         excitation_energy: float,
         energy_mode: EnergyMode,
     ) -> Array1D[np.float64]:
-        """
-        Calculate the binding energy axis to calibrate the spectra data. Function for a
-        derived signal.
+        """Calculate the binding energy axis to calibrate the spectra data. Function for
+        a derived signal.
 
         Args:
-            energy_axis: Array data of the original energy_axis from epics.
-            excitation_energy: The excitation energy value used for the scan of this
-                region.
-            energy_mode: The energy_mode of the region that was used for the scan of
+            energy_axis (Array1D[np.float64]): Array data of the original energy_axis
+                from epics.
+            excitation_energy (float): The excitation energy value used for the scan of
                 this region.
+            energy_mode (EnergyMode): The energy_mode of the region that was used for
+                the scan of this region.
 
         Returns:
             Array that is the correct axis for the spectra data.
@@ -204,17 +199,16 @@ class AbstractAnalyserDriverIO(
     def _calculate_total_time(
         self, total_steps: int, step_time: float, iterations: int
     ) -> float:
-        """
-        Calulcate the total time the scan takes for this region. Function for a derived
-        signal.
+        """Calulcate the total time the scan takes for this region. Function for a
+        derived signal.
 
         Args:
-            total_steps: Number of steps for the region.
-            step_time: Time for each step for the region.
-            iterations: The number of iterations the region collected data for.
+            total_steps (int): Number of steps for the region.
+            step_time (float): Time for each step for the region.
+            iterations (int): The number of iterations the region collected data for.
 
         Returns:
-            Calculated total time in seconds.
+            Float: Calculated total time in seconds.
         """
         return total_steps * step_time * iterations
 

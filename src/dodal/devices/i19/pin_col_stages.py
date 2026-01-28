@@ -45,10 +45,10 @@ class AperturePosition(BaseModel):
     one of the available apertures.
 
     Attributes:
-        pinhole_x: The position of the x motor on the pinhole stage
-        pinhole_y: The position of the y motor on the pinhole stage
-        collimator_x: The position of the x motor on the collimator stage
-        collimator_y: The position of the y motor on the collimator stage
+        pinhole_x (float): The position of the x motor on the pinhole stage.
+        pinhole_y (float): The position of the y motor on the pinhole stage.
+        collimator_x (float): The position of the x motor on the collimator stage.
+        collimator_y (float): The position of the y motor on the collimator stage.
     """
 
     pinhole_x: float

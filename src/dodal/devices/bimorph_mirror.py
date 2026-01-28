@@ -43,11 +43,19 @@ class BimorphMirrorChannel(StandardReadable, EpicsDevice):
     """Collection of PVs comprising a single bimorph channel.
 
     Attributes:
-        target_voltage: Float RW_RBV for target voltage, which can be set using parent
-            mirror's all target proc
-        output_voltage: Float RW_RBV for current voltage on bimorph
-        status: BimorphMirrorOnOff readable for ON/OFF status of channel
-        shift: Float writeable shifting channel voltage
+        target_voltage (SignalRW): Float RW_RBV for target voltage, which can be set
+            using parent mirror's all target proc.
+        output_voltage (SignalRW): Float RW_RBV for current voltage on bimorph.
+        status (SignalR): BimorphMirrorOnOff readable for ON/OFF status of channel.
+        shift (SignalW): Float writeable shifting channel voltage.
+
+    Args:
+        prefix (str): PV prefix.
+        number_of_channels (int): Number of channels on bimorph mirror (can be zero).
+        name (str, optional): Name of device.
+
+    Raises:
+        ValueError: number_of_channels is less than zero.
     """
 
     target_voltage: A[SignalRW[float], PvSuffix.rbv("VTRGT"), Format.CONFIG_SIGNAL]
@@ -60,21 +68,14 @@ class BimorphMirror(StandardReadable, Movable[list[float]]):
     """Class to represent CAENels Bimorph Mirrors.
 
     Attributes:
-        channels: DeviceVector of BimorphMirrorChannel, indexed from 1, for each channel
-        enabled: Writeable BimorphOnOff
-        status: Readable BimorphMirrorStatus Busy/Idle status
-        err: Alarm status"""
+        channels (DeviceVector): DeviceVector of BimorphMirrorChannel, indexed from 1,
+            for each channel.
+        enabled (SignalW): Writeable BimorphOnOff.
+        status (SignalR): Readable BimorphMirrorStatus Busy/Idle status.
+        err (SignalR): Alarm status.
+    """
 
     def __init__(self, prefix: str, number_of_channels: int, name=""):
-        """
-        Args:
-            prefix: str PV prefix
-            number_of_channels: int number of channels on bimorph mirror (can be zero)
-            name: str name of device
-
-        Raises:
-            ValueError: number_of_channels is less than zero"""
-
         if number_of_channels < 0:
             raise ValueError(f"Number of channels is below zero: {number_of_channels}")
 
@@ -96,10 +97,10 @@ class BimorphMirror(StandardReadable, Movable[list[float]]):
         """Sets bimorph voltages in parallel via target voltage and all proc.
 
         Args:
-            value: List of float target voltages
+            value (list[float]): List of float target voltages.
 
         Raises:
-            ValueError: On set to non-existent channel"""
+            ValueError: On set to non-existent channel."""
 
         if len(value) != len(self.channels):
             raise ValueError(

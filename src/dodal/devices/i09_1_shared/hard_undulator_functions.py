@@ -49,9 +49,7 @@ def _calculate_gamma(look_up_table: dict[int, "np.ndarray"], order: int) -> floa
 def _calculate_undulator_parameter_max(
     magnet_field: float, undulator_period_mm: int
 ) -> float:
-    """
-    Calculate the maximum undulator parameter.
-    """
+    """Calculate the maximum undulator parameter."""
     return (
         (
             2
@@ -73,9 +71,9 @@ def calculate_gap_i09_hu(
     gap_offset: float = 0.0,
     undulator_period_mm: int = 27,
 ) -> float:
-    """
-    Calculate the undulator gap required to produce a given energy at a given harmonic order.
-    This algorithm was provided by the I09 beamline scientists, and is based on the physics of undulator radiation.
+    """Calculate the undulator gap required to produce a given energy at a given
+    harmonic order. This algorithm was provided by the I09 beamline scientists, and is
+    based on the physics of undulator radiation.
     https://cxro.lbl.gov//PDF/X-Ray-Data-Booklet.pdf
 
     Args:
@@ -144,9 +142,8 @@ def calculate_energy_i09_hu(
     gap_offset: float = 0.0,
     undulator_period_mm: int = 27,
 ) -> float:
-    """
-    Calculate the photon energy produced by the undulator at a given gap and harmonic order.
-    Reverse of the calculate_gap_i09_hu function.
+    """Calculate the photon energy produced by the undulator at a given gap and harmonic
+    order. Reverse of the calculate_gap_i09_hu function.
 
     Args:
         gap (float): Undulator gap in millimeters.

@@ -30,8 +30,7 @@ def harmonic() -> UndulatorOrder:
 @devices.factory()
 def id(harmonic: UndulatorOrder) -> InsertionDevice:
     """Get the i07 undulator device, instantiate it if it hasn't already been.
-    If this is called when already instantiated it will return the existing object.
-    """
+    If this is called when already instantiated it will return the existing object."""
     return InsertionDevice(
         f"{PREFIX.insertion_prefix}-MO-SERVC-01:",
         harmonic,

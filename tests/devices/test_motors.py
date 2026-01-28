@@ -67,9 +67,7 @@ async def xyzpyr_stage() -> XYZPitchYawRollStage:
 
 
 async def test_setting_xy_position_table(xyzt_stage: XYZThetaStage):
-    """
-    Test setting x and y positions on the Table using the ophyd_async mock tools.
-    """
+    """Test setting x and y positions on the Table using the ophyd_async mock tools."""
 
     await assert_reading(
         xyzt_stage,
@@ -97,9 +95,7 @@ async def test_setting_xy_position_table(xyzt_stage: XYZThetaStage):
 
 
 async def test_setting_xyztheta_position_table(xyzt_stage: XYZThetaStage):
-    """
-    Test setting x and y positions on the Table using the ophyd_async mock tools.
-    """
+    """Test setting x and y positions on the Table using the ophyd_async mock tools."""
     await assert_reading(
         xyzt_stage,
         {
@@ -246,9 +242,7 @@ async def test_setting_xyzpyr_position_table(
     yaw: float,
     roll: float,
 ):
-    """
-    Test setting positions on the Table using the ophyd_async mock tools.
-    """
+    """Test setting positions on the Table using the ophyd_async mock tools."""
     # Call set to update the position
     set_mock_value(xyzpyr_stage.x.user_readback, x)
     set_mock_value(xyzpyr_stage.y.user_readback, y)
@@ -271,9 +265,7 @@ async def test_setting_xyzpyr_position_table(
 
 
 async def test_setting(xy_stage: XYStage):
-    """
-    Test setting x and y positions on the XYStage using ophyd_async mock tools.
-    """
+    """Test setting x and y positions on the XYStage using ophyd_async mock tools."""
 
     await assert_reading(
         xy_stage,

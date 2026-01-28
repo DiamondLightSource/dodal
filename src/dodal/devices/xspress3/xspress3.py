@@ -61,11 +61,11 @@ class Xspress3(Device, Stageable):
     This currently only provide staging functionality.
 
     Args:
-        prefix: Beamline part of PV
-        name: Name of the device
-        num_channels: Number of channel xspress3 has, default is 1 for mini.
-        timeout: How long to wait for before timing out for staging/arming of detector
-            default is 1 sec
+        prefix (str): Beamline part of PV.
+        name (str, optional): Name of the device.
+        num_channels (int): Number of channel xspress3 has, default is 1 for mini.
+        timeout (float): How long to wait for before timing out for staging/arming of
+            detector, the default is 1 sec.
     """
 
     def __init__(

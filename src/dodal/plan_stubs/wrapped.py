@@ -6,9 +6,7 @@ import bluesky.plan_stubs as bps
 from bluesky.protocols import Movable
 from bluesky.utils import MsgGenerator
 
-"""
-Wrappers for Bluesky built-in plan stubs with type hinting
-"""
+"""Wrappers for Bluesky built-in plan stubs with type hinting."""
 
 Group = Annotated[str, "String identifier used by 'wait' or stubs that await"]
 
@@ -18,22 +16,21 @@ T = TypeVar("T")
 def set_absolute(
     movable: Movable[T], value: T, group: Group | None = None, wait: bool = False
 ) -> MsgGenerator:
-    """
-    Set a device, wrapper for `bp.abs_set`.
+    """Set a device, wrapper for `bp.abs_set`.
 
     Args:
-        movable (Movable[T]): The device to set
-        value (T): The new value
+        movable (Movable[T]): The device to set.
+        value (T): The new value.
         group (Group | None, optional): The message group to associate with the setting,
             for sequencing. Defaults to None.
         wait (bool, optional): The group should wait until all setting is complete (e.g.
             a motor has finished moving). Defaults to False.
 
     Returns:
-        MsgGenerator: Plan
+        MsgGenerator: Plan.
 
     Yields:
-        Iterator[MsgGenerator]: Bluesky messages
+        Iterator[MsgGenerator]: Bluesky messages.
     """
     return (yield from bps.abs_set(movable, value, group=group, wait=wait))
 
@@ -41,41 +38,39 @@ def set_absolute(
 def set_relative(
     movable: Movable[T], value: T, group: Group | None = None, wait: bool = False
 ) -> MsgGenerator:
-    """
-    Change a device, wrapper for `bp.rel_set`.
+    """Change a device, wrapper for `bp.rel_set`.
 
     Args:
-        movable (Movable): The device to set
-        value (T): The new value
+        movable (Movable): The device to set.
+        value (T): The new value.
         group (Group | None, optional): The message group to associate with the setting,
             for sequencing. Defaults to None.
         wait (bool, optional): The group should wait until all setting is complete (e.g.
             a motor has finished moving). Defaults to False.
 
     Returns:
-        MsgGenerator: Plan
+        MsgGenerator: Plan.
 
     Yields:
-        Iterator[MsgGenerator]: Bluesky messages
+        Iterator[MsgGenerator]: Bluesky messages.
     """
 
     return (yield from bps.rel_set(movable, value, group=group, wait=wait))
 
 
 def move(moves: Mapping[Movable[T], T], group: Group | None = None) -> MsgGenerator:
-    """
-    Move a device, wrapper for `bp.mv`.
+    """Move a device, wrapper for `bp.mv`.
 
     Args:
-        moves (Mapping[Movable, T]): Mapping of Movables to target positions
+        moves (Mapping[Movable, T]): Mapping of Movables to target positions.
         group (Group | None, optional): The message group to associate with the setting,
             for sequencing. Defaults to None.
 
     Returns:
-        MsgGenerator: Plan
+        MsgGenerator: Plan.
 
     Yields:
-        Iterator[MsgGenerator]: Bluesky messages
+        Iterator[MsgGenerator]: Bluesky messages.
     """
 
     return (
@@ -86,19 +81,18 @@ def move(moves: Mapping[Movable[T], T], group: Group | None = None) -> MsgGenera
 def move_relative(
     moves: Mapping[Movable[T], T], group: Group | None = None
 ) -> MsgGenerator:
-    """
-    Move a device relative to its current position, wrapper for `bp.mvr`.
+    """Move a device relative to its current position, wrapper for `bp.mvr`.
 
     Args:
-        moves (Mapping[Movable, T]): Mapping of Movables to target deltas
+        moves (Mapping[Movable, T]): Mapping of Movables to target deltas.
         group (Group | None, optional): The message group to associate with the
             setting, for sequencing. Defaults to None.
 
     Returns:
-        MsgGenerator: Plan
+        MsgGenerator: Plan.
 
     Yields:
-        Iterator[MsgGenerator]: Bluesky messages
+        Iterator[MsgGenerator]: Bluesky messages.
     """
 
     return (
@@ -107,17 +101,16 @@ def move_relative(
 
 
 def sleep(time: float) -> MsgGenerator:
-    """
-    Suspend all action for a given time, wrapper for `bp.sleep`
+    """Suspend all action for a given time, wrapper for `bp.sleep`.
 
     Args:
-        time (float): Time to wait in seconds
+        time (float): Time to wait in seconds.
 
     Returns:
-        MsgGenerator: Plan
+        MsgGenerator: Plan.
 
     Yields:
-        Iterator[MsgGenerator]: Bluesky messages
+        Iterator[MsgGenerator]: Bluesky messages.
     """
 
     return (yield from bps.sleep(time))
@@ -127,20 +120,19 @@ def wait(
     group: Group | None = None,
     timeout: float | None = None,
 ) -> MsgGenerator:
-    """
-    Wait for a group status to complete, wrapper for `bp.wait`.
+    """Wait for a group status to complete, wrapper for `bp.wait`.
     Does not expose move_on, as when used as a stub will not fail on Timeout.
 
     Args:
         group (Group | None, optional): The name of the group to wait for, defaults to
             None, in which case waits for all groups that have not yet been awaited.
-        timeout (float | None, default=None): a timeout in seconds
+        timeout (float | None, default=None): a timeout in seconds.
 
     Returns:
-        MsgGenerator: Plan
+        MsgGenerator: Plan.
 
     Yields:
-        Iterator[MsgGenerator]: Bluesky messages
+        Iterator[MsgGenerator]: Bluesky messages.
     """
 
     return (yield from bps.wait(group, timeout=timeout))

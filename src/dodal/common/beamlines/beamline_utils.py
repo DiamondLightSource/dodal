@@ -94,14 +94,14 @@ def device_instantiation(
     directly to the device constructor.
 
     Args:
-        device_factory (Callable): The device class
-        name (str): The name for ophyd
-        prefix (str): The PV prefix for the most (usually all) components
-        wait (bool): Whether to run .wait_for_connection()
-        fake (bool): Whether to fake with ophyd.sim
+        device_factory (Callable): The device class.
+        name (str): The name for ophyd.
+        prefix (str): The PV prefix for the most (usually all) components.
+        wait (bool): Whether to run .wait_for_connection().
+        fake (bool): Whether to fake with ophyd.sim.
         post_create (Callable): (optional) a function to be run on the device after
-            creation
-        bl_prefix (bool): If true, add the beamline prefix when instantiating
+            creation.
+        bl_prefix (bool): If true, add the beamline prefix when instantiating.
 
     Returns:
         The instance of the device.

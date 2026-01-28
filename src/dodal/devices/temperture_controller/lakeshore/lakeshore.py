@@ -24,8 +24,7 @@ class Heater336Settings(StrictEnum):
 
 
 class Lakeshore(LakeshoreBaseIO, StandardReadable, Movable[float]):
-    """
-    Device for controlling and reading from a Lakeshore temperature controller.
+    """Device for controlling and reading from a Lakeshore temperature controller.
     It supports multiple channels and PID control.
 
     Attributes:
@@ -39,8 +38,14 @@ class Lakeshore(LakeshoreBaseIO, StandardReadable, Movable[float]):
         temperature_low_limit (soft_signal_rw): Signal to store the soft low
             temperature limit.
 
-    Methods:
-        set(value: float): Set the temperature setpoint for the selected control channel.
+    Args:
+        prefix (str): The EPICS prefix for the device.
+        no_channels (int): Number of temperature channels.
+        heater_setting (type[SignalDatatypeT]): Enum type for heater settings.
+        control_channel (int, optional): The initial control channel (default is 1).
+        single_control_channel (bool, optional): Whether to use a single control
+            channel (default is False).
+        name (str, optional): Name of the device.
     """
 
     def __init__(
@@ -52,16 +57,6 @@ class Lakeshore(LakeshoreBaseIO, StandardReadable, Movable[float]):
         single_control_channel: bool = False,
         name: str = "",
     ):
-        """
-        Args:
-            prefix (str): The EPICS prefix for the device.
-            no_channels (int): Number of temperature channels.
-            heater_setting (type[SignalDatatypeT]): Enum type for heater settings.
-            control_channel (int, optional): The initial control channel (default is 1).
-            single_control_channel (bool, optional): Whether to use a single control
-                channel (default is False).
-            name (str, optional): Name of the device.
-        """
         self._control_channel = soft_signal_rw(int, initial_value=control_channel)
         self.temperature_high_limit = soft_signal_rw(float, initial_value=400)
         self.temperature_low_limit = soft_signal_rw(float, initial_value=0)
@@ -99,9 +94,7 @@ class Lakeshore(LakeshoreBaseIO, StandardReadable, Movable[float]):
 
     @AsyncStatus.wrap
     async def set(self, value: float) -> None:
-        """
-        Set the temperature setpoint for the active control channel.
-        """
+        """Set the temperature setpoint for the active control channel."""
         high, low = await gather(
             self.temperature_high_limit.get_value(),
             self.temperature_low_limit.get_value(),
@@ -135,20 +128,20 @@ class Lakeshore(LakeshoreBaseIO, StandardReadable, Movable[float]):
 
 
 class Lakeshore336(Lakeshore):
+    """Lakeshore 336 temperature controller. With 4 readback and control channels.
+    Heater settings are: Off, Low, Medium, High.
+
+    Args:
+        prefix (str): The EPICS prefix for the device.
+        control_channel (int, optional): The initial control channel (default is 1).
+    """
+
     def __init__(
         self,
         prefix: str,
         control_channel: int = 1,
         name: str = "",
     ):
-        """
-        Lakeshore 336 temperature controller. With 4 readback and control channels.
-        Heater settings are: Off, Low, Medium, High.
-
-        Args:
-            prefix (str): The EPICS prefix for the device.
-            control_channel (int, optional): The initial control channel (default is 1).
-        """
         super().__init__(
             prefix=prefix,
             num_readback_channel=4,
@@ -160,21 +153,21 @@ class Lakeshore336(Lakeshore):
 
 
 class Lakeshore340(Lakeshore):
+    """Lakeshore 340 temperature controller. With 4 readback channels and a single
+    control channel.
+    Heater settings are in power from 0 to 5. 0 is 0 watt, 5 is 50 watt.
+
+    Args:
+        prefix (str): The EPICS prefix for the device.
+        control_channel (int, optional): The initial control channel (default is 1).
+    """
+
     def __init__(
         self,
         prefix: str,
         control_channel: int = 1,
         name: str = "",
     ):
-        """Lakeshore 340 temperature controller. With 4 readback channels and a single
-        control channel.
-        Heater settings are in power from 0 to 5. 0 is 0 watt, 5 is 50 watt.
-
-        Args:
-            prefix (str): The EPICS prefix for the device.
-            control_channel (int, optional): The initial control channel (default is 1).
-        """
-
         super().__init__(
             prefix=prefix,
             num_readback_channel=4,
